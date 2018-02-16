@@ -23,4 +23,4 @@ interface Conversations {
   has_more: boolean;
 }
 
-export default Conversations;
+export {Conversations};

@@ -21,4 +21,4 @@ interface PublicClient {
   id: string;
 }
 
-export default PublicClient;
+export {PublicClient};

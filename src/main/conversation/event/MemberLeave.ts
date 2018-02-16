@@ -25,4 +25,4 @@ interface MemberLeave extends ConversationEvent {
   type: ConversationEventType.MEMBER_LEAVE;
 }
 
-export default MemberLeave;
+export {MemberLeave};

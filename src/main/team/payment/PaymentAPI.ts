@@ -30,7 +30,7 @@ import {
 } from '.';
 import {HttpClient} from '../../http';
 
-export default class TeamAPI {
+class PaymentAPI {
   constructor(private client: HttpClient) {}
 
   static get URL() {
@@ -49,7 +49,7 @@ export default class TeamAPI {
     const config: AxiosRequestConfig = {
       data: paymentData,
       method: 'put',
-      url: `${TeamAPI.URL.TEAMS}/${teamId}/${TeamAPI.URL.BILLING}`,
+      url: `${PaymentAPI.URL.TEAMS}/${teamId}/${PaymentAPI.URL.BILLING}`,
     };
 
     return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
@@ -58,7 +58,7 @@ export default class TeamAPI {
   public getPaymentData(teamId: string): Promise<PaymentData> {
     const config: AxiosRequestConfig = {
       method: 'get',
-      url: `${TeamAPI.URL.TEAMS}/${teamId}/${TeamAPI.URL.BILLING}`,
+      url: `${PaymentAPI.URL.TEAMS}/${teamId}/${PaymentAPI.URL.BILLING}`,
     };
 
     return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
@@ -68,7 +68,7 @@ export default class TeamAPI {
     const config: AxiosRequestConfig = {
       data,
       method: 'delete',
-      url: `${TeamAPI.URL.TEAMS}/${teamId}/${TeamAPI.URL.BILLING}`,
+      url: `${PaymentAPI.URL.TEAMS}/${teamId}/${PaymentAPI.URL.BILLING}`,
     };
 
     return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
@@ -78,7 +78,7 @@ export default class TeamAPI {
     const config: AxiosRequestConfig = {
       data: billingInfo,
       method: 'put',
-      url: `${TeamAPI.URL.TEAMS}/${teamId}/${TeamAPI.URL.BILLING}/${TeamAPI.URL.INFO}`,
+      url: `${PaymentAPI.URL.TEAMS}/${teamId}/${PaymentAPI.URL.BILLING}/${PaymentAPI.URL.INFO}`,
     };
 
     return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
@@ -87,7 +87,7 @@ export default class TeamAPI {
   public getPaymentBilling(teamId: string): Promise<PaymentBillingData> {
     const config: AxiosRequestConfig = {
       method: 'get',
-      url: `${TeamAPI.URL.TEAMS}/${teamId}/${TeamAPI.URL.BILLING}/${TeamAPI.URL.INFO}`,
+      url: `${PaymentAPI.URL.TEAMS}/${teamId}/${PaymentAPI.URL.BILLING}/${PaymentAPI.URL.INFO}`,
     };
 
     return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
@@ -97,7 +97,7 @@ export default class TeamAPI {
     const config: AxiosRequestConfig = {
       data: plan,
       method: 'put',
-      url: `${TeamAPI.URL.TEAMS}/${teamId}/${TeamAPI.URL.BILLING}/${TeamAPI.URL.PLAN}/${plan.id}`,
+      url: `${PaymentAPI.URL.TEAMS}/${teamId}/${PaymentAPI.URL.BILLING}/${PaymentAPI.URL.PLAN}/${plan.id}`,
     };
 
     return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
@@ -106,7 +106,7 @@ export default class TeamAPI {
   public getPlans(teamId: string): Promise<PaymentStripePlan[]> {
     const config: AxiosRequestConfig = {
       method: 'get',
-      url: `${TeamAPI.URL.TEAMS}/${teamId}/${TeamAPI.URL.BILLING}/${TeamAPI.URL.PLANS}`,
+      url: `${PaymentAPI.URL.TEAMS}/${teamId}/${PaymentAPI.URL.BILLING}/${PaymentAPI.URL.PLANS}`,
     };
 
     return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
@@ -115,7 +115,7 @@ export default class TeamAPI {
   public getCharges(teamId: string): Promise<PaymentStripeCharge[]> {
     const config: AxiosRequestConfig = {
       method: 'get',
-      url: `${TeamAPI.URL.TEAMS}/${teamId}/${TeamAPI.URL.BILLING}/${TeamAPI.URL.CHARGES}`,
+      url: `${PaymentAPI.URL.TEAMS}/${teamId}/${PaymentAPI.URL.BILLING}/${PaymentAPI.URL.CHARGES}`,
     };
 
     return this.client.sendJSON(config).then((response: AxiosResponse) => response.data.data);
@@ -124,9 +124,11 @@ export default class TeamAPI {
   public getInvoices(teamId: string): Promise<PaymentStripeInvoice[]> {
     const config: AxiosRequestConfig = {
       method: 'get',
-      url: `${TeamAPI.URL.TEAMS}/${teamId}/${TeamAPI.URL.BILLING}/${TeamAPI.URL.INVOICES}`,
+      url: `${PaymentAPI.URL.TEAMS}/${teamId}/${PaymentAPI.URL.BILLING}/${PaymentAPI.URL.INVOICES}`,
     };
 
     return this.client.sendJSON(config).then((response: AxiosResponse) => response.data.data);
   }
 }
+
+export {PaymentAPI};

@@ -16,10 +16,8 @@
 // along with this program. If not, see http://www.gnu.org/licenses/.
 //
 
-import ChangePassword from './ChangePassword';
-import Delete from './Delete';
-import SearchableStatus from './SearchableStatus';
-import Self from './Self';
-import SelfAPI from './SelfAPI';
-
-export {ChangePassword, Delete, SearchableStatus, Self, SelfAPI};
+export * from './ChangePassword';
+export * from './Delete';
+export * from './SearchableStatus';
+export * from './Self';
+export * from './SelfAPI';

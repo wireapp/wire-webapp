@@ -23,4 +23,4 @@ interface PreKeyBundle {
   user: string;
 }
 
-export default PreKeyBundle;
+export {PreKeyBundle};

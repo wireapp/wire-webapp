@@ -25,4 +25,4 @@ interface InvitationRequest {
   phone?: string;
 }
 
-export default InvitationRequest;
+export {InvitationRequest};

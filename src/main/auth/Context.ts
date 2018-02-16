@@ -16,6 +16,8 @@
 // along with this program. If not, see http://www.gnu.org/licenses/.
 //
 
-export default class Context {
+class Context {
   constructor(public userID: string, public clientID?: string) {}
 }
+
+export {Context};

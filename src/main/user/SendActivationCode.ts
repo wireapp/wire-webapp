@@ -30,4 +30,4 @@ interface SendActivationCode {
   voice_call?: boolean;
 }
 
-export default SendActivationCode;
+export {SendActivationCode};

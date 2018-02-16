@@ -17,8 +17,8 @@
  *
  */
 
-import Client from '../../../dist/commonjs/Client';
-import Context from '../../../dist/commonjs/auth/Context';
+import Client from '@wireapp/api-client';
+import {Context} from '@wireapp/api-client/dist/commonjs/auth/Context';
 
 describe('Client', () => {
   describe('"connect"', () => {

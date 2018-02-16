@@ -19,7 +19,7 @@
 import {Backend} from './env';
 import {CRUDEngine, MemoryEngine} from '@wireapp/store-engine/dist/commonjs/engine';
 
-export default class Config {
+class Config {
   constructor(
     public store: CRUDEngine = new MemoryEngine('temporary'),
     public urls: {
@@ -29,3 +29,5 @@ export default class Config {
     } = Backend.PRODUCTION
   ) {}
 }
+
+export {Config};

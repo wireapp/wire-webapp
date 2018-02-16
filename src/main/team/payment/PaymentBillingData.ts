@@ -28,4 +28,4 @@ interface PaymentBillingData {
   zip: string;
 }
 
-export default PaymentBillingData;
+export {PaymentBillingData};

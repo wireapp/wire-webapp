@@ -25,4 +25,4 @@ interface Connection {
   to: string;
 }
 
-export default Connection;
+export {Connection};

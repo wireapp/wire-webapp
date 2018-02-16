@@ -27,4 +27,4 @@ interface NewOTRMessage {
   transient?: boolean;
 }
 
-export default NewOTRMessage;
+export {NewOTRMessage};

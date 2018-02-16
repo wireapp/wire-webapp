@@ -34,4 +34,4 @@ interface PaymentStripeInvoice {
   total: number;
 }
 
-export default PaymentStripeInvoice;
+export {PaymentStripeInvoice};

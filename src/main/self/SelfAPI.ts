@@ -22,7 +22,7 @@ import {HttpClient} from '../http';
 import {ChangePassword, Delete, SearchableStatus, Self} from '../self';
 import {UserUpdate} from '../user';
 
-export default class SelfAPI {
+class SelfAPI {
   constructor(private client: HttpClient) {}
 
   static get URL() {
@@ -222,3 +222,5 @@ export default class SelfAPI {
     return this.client.sendJSON(config).then(() => ({}));
   }
 }
+
+export {SelfAPI};

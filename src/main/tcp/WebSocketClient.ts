@@ -24,10 +24,10 @@ const buffer = require('../shims/node/buffer');
 const Html5WebSocket = require('html5-websocket');
 const ReconnectingWebsocket = require('reconnecting-websocket');
 
-export default class WebSocketClient extends EventEmitter {
+class WebSocketClient extends EventEmitter {
   private clientId: string | undefined;
 
-  private socket: WebSocket;
+  private socket: WebSocket | undefined;
 
   public static CLOSE_EVENT_CODE = {
     NORMAL_CLOSURE: 1000,
@@ -72,13 +72,15 @@ export default class WebSocketClient extends EventEmitter {
       WebSocketClient.RECONNECTING_OPTIONS
     );
 
-    this.socket.onmessage = (event: MessageEvent) => {
-      const notification: IncomingNotification = JSON.parse(buffer.bufferToString(event.data));
-      this.emit(WebSocketClient.TOPIC.ON_MESSAGE, notification);
-    };
+    if (this.socket) {
+      this.socket.onmessage = (event: MessageEvent) => {
+        const notification: IncomingNotification = JSON.parse(buffer.bufferToString(event.data));
+        this.emit(WebSocketClient.TOPIC.ON_MESSAGE, notification);
+      };
 
-    this.socket.onerror = () => this.client.refreshAccessToken();
-    this.socket.onopen = () => (this.socket.binaryType = 'arraybuffer');
+      this.socket.onerror = () => this.client.refreshAccessToken();
+      this.socket.onopen = () => (this.socket ? (this.socket.binaryType = 'arraybuffer') : undefined);
+    }
 
     return Promise.resolve(this);
   }
@@ -95,3 +97,5 @@ export default class WebSocketClient extends EventEmitter {
     }
   }
 }
+
+export {WebSocketClient};

@@ -25,4 +25,4 @@ interface LoginData {
   phone?: string;
 }
 
-export default LoginData;
+export {LoginData};

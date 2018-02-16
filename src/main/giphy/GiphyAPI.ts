@@ -21,7 +21,7 @@ import {AxiosRequestConfig, AxiosResponse} from 'axios';
 import {HttpClient} from '../http/';
 import {Image} from '../giphy/';
 
-export default class GiphyAPI {
+class GiphyAPI {
   constructor(private client: HttpClient) {}
 
   static get URL() {
@@ -47,3 +47,5 @@ export default class GiphyAPI {
     return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
   }
 }
+
+export {GiphyAPI};

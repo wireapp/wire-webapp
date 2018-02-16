@@ -22,7 +22,7 @@ import {NewTeamInvitation, TeamInvitation, TeamInvitationChunk} from '../invitat
 import {HttpClient} from '../../http';
 import {TeamAPI} from '../team';
 
-export default class TeamInvitationAPI {
+class TeamInvitationAPI {
   constructor(private client: HttpClient) {}
 
   static get URL() {
@@ -81,3 +81,5 @@ export default class TeamInvitationAPI {
     return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
   }
 }
+
+export {TeamInvitationAPI};

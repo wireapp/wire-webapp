@@ -24,4 +24,4 @@ interface NewConversation {
   users: string[];
 }
 
-export default NewConversation;
+export {NewConversation};

@@ -21,4 +21,4 @@ interface CheckHandles {
   return?: number; // Desired number of free handles to return (1 - 10)
 }
 
-export default CheckHandles;
+export {CheckHandles};

@@ -24,4 +24,4 @@ interface UserPreKeyBundleMap {
   };
 }
 
-export default UserPreKeyBundleMap;
+export {UserPreKeyBundleMap};

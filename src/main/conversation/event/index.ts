@@ -16,12 +16,10 @@
 // along with this program. If not, see http://www.gnu.org/licenses/.
 //
 
-import ConversationEvent from './ConversationEvent';
-import ConversationEventType from './ConversationEventType';
-import MemberJoin from './MemberJoin';
-import MemberLeave from './MemberLeave';
-import MemberUpdate from './MemberUpdate';
-import OTRMessageAdd from './OTRMessageAdd';
-import Rename from './Rename';
-
-export {ConversationEvent, ConversationEventType, MemberJoin, MemberLeave, MemberUpdate, OTRMessageAdd, Rename};
+export * from './ConversationEvent';
+export * from './ConversationEventType';
+export * from './MemberJoin';
+export * from './MemberLeave';
+export * from './MemberUpdate';
+export * from './OTRMessageAdd';
+export * from './Rename';

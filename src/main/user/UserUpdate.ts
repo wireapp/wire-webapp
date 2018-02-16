@@ -24,4 +24,4 @@ interface UserUpdate {
   name: string;
 }
 
-export default UserUpdate;
+export {UserUpdate};

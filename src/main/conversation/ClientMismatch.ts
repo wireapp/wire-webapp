@@ -25,4 +25,4 @@ interface ClientMismatch {
   time: string;
 }
 
-export default ClientMismatch;
+export {ClientMismatch};

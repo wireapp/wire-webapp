@@ -23,4 +23,4 @@ interface Contact {
   name: string;
 }
 
-export default Contact;
+export {Contact};

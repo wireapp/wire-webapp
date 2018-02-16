@@ -16,9 +16,7 @@
 // along with this program. If not, see http://www.gnu.org/licenses/.
 //
 
-import NewTeamInvitation from './NewTeamInvitation';
-import TeamInvitationAPI from './TeamInvitationAPI';
-import TeamInvitationChunk from './TeamInvitationChunk';
-import TeamInvitation from './TeamInvitation';
-
-export {NewTeamInvitation, TeamInvitationAPI, TeamInvitationChunk, TeamInvitation};
+export * from './NewTeamInvitation';
+export * from './TeamInvitationAPI';
+export * from './TeamInvitationChunk';
+export * from './TeamInvitation';

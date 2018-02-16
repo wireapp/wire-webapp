@@ -21,4 +21,4 @@ interface VerifyDelete {
   code: string;
 }
 
-export default VerifyDelete;
+export {VerifyDelete};

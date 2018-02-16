@@ -22,4 +22,4 @@ interface UserAsset {
   type: 'image';
 }
 
-export default UserAsset;
+export {UserAsset};

@@ -16,7 +16,7 @@
 // along with this program. If not, see http://www.gnu.org/licenses/.
 //
 
-export default class StatusCode {
+class StatusCode {
   public static readonly ACCEPTED: number = 202;
   public static readonly BAD_GATEWAY: number = 502;
   public static readonly BAD_REQUEST: number = 400;
@@ -34,3 +34,5 @@ export default class StatusCode {
   public static readonly TOO_MANY_REQUESTS: number = 429;
   public static readonly UNAUTHORIZED: number = 401;
 }
+
+export {StatusCode};

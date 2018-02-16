@@ -16,7 +16,7 @@
 // along with this program. If not, see http://www.gnu.org/licenses/.
 //
 
-export default class Backend {
+class Backend {
   public static PRODUCTION: {rest: string; ws: string; name?: string} = {
     name: 'prod',
     rest: 'https://prod-nginz-https.wire.com',
@@ -29,3 +29,5 @@ export default class Backend {
     ws: 'wss://staging-nginz-ssl.zinfra.io',
   };
 }
+
+export {Backend};

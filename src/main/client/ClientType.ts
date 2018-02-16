@@ -21,4 +21,4 @@ enum ClientType {
   TEMPORARY = 'temporary',
 }
 
-export default ClientType;
+export {ClientType};

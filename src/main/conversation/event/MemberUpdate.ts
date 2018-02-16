@@ -29,4 +29,4 @@ interface MemberUpdate extends ConversationEvent {
   type: ConversationEventType.MEMBER_UPDATE;
 }
 
-export default MemberUpdate;
+export {MemberUpdate};

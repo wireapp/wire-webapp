@@ -23,4 +23,4 @@ interface OtherMember {
   service?: ServiceRef;
 }
 
-export default OtherMember;
+export {OtherMember};

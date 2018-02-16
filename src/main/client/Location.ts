@@ -16,10 +16,9 @@
 // along with this program. If not, see http://www.gnu.org/licenses/.
 //
 
-interface ConnectionRequest {
-  message: string;
-  name: string;
-  user: string;
+interface Location {
+  lon: number;
+  lat: number;
 }
 
-export {ConnectionRequest};
+export {Location};

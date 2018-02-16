@@ -25,4 +25,4 @@ interface Rename extends ConversationEvent {
   type: ConversationEventType.RENAME;
 }
 
-export default Rename;
+export {Rename};

@@ -24,4 +24,4 @@ interface PaymentPlan {
   name: string;
 }
 
-export default PaymentPlan;
+export {PaymentPlan};

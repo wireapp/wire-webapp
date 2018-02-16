@@ -21,4 +21,4 @@ interface PermissionsData {
   copy: number;
 }
 
-export default PermissionsData;
+export {PermissionsData};

@@ -22,4 +22,4 @@ enum BackendErrorLabel {
   UNKNOWN_CLIENT = 'unknown-client',
 }
 
-export default BackendErrorLabel;
+export {BackendErrorLabel};

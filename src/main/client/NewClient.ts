@@ -17,7 +17,7 @@
 //
 
 import {PreKey} from '../auth/';
-import {ClientClassification, ClientType} from '../client/';
+import {ClientClassification, ClientType, Location} from '../client/';
 
 interface NewClient {
   class: ClientClassification.DESKTOP | ClientClassification.PHONE | ClientClassification.TABLET;
@@ -25,6 +25,7 @@ interface NewClient {
   label?: string;
   lastkey: PreKey;
   model?: string;
+  location?: Location;
   password?: string;
   prekeys: PreKey[]; // Serialized PreKey
   sigkeys: {
@@ -34,4 +35,4 @@ interface NewClient {
   type: ClientType.PERMANENT | ClientType.TEMPORARY;
 }
 
-export default NewClient;
+export {NewClient};

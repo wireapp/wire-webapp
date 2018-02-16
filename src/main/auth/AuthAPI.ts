@@ -16,7 +16,7 @@
 // along with this program. If not, see http://www.gnu.org/licenses/.
 //
 
-import RegisterData from './RegisterData';
+import {RegisterData} from './RegisterData';
 import {User} from '../user';
 import {AccessTokenData, LoginData} from '../auth';
 import {AxiosPromise, AxiosRequestConfig, AxiosResponse} from 'axios';
@@ -24,7 +24,7 @@ import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine';
 import {retrieveCookie, sendRequestWithCookie} from '../shims/node/cookie';
 import {HttpClient} from '../http';
 
-export default class AuthAPI {
+class AuthAPI {
   constructor(private client: HttpClient, private engine: CRUDEngine) {}
 
   static get URL() {
@@ -128,3 +128,5 @@ export default class AuthAPI {
     return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
   }
 }
+
+export {AuthAPI};

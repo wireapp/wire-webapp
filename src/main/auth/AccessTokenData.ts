@@ -23,4 +23,4 @@ interface AccessTokenData {
   user: string;
 }
 
-export default AccessTokenData;
+export {AccessTokenData};

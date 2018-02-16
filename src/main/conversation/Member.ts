@@ -29,4 +29,4 @@ interface Member {
   service?: ServiceRef;
 }
 
-export default Member;
+export {Member};

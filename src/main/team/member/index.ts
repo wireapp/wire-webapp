@@ -16,8 +16,6 @@
 // along with this program. If not, see http://www.gnu.org/licenses/.
 //
 
-import MemberAPI from './MemberAPI';
-import MemberData from './MemberData';
-import PermissionsData from './PermissionsData';
-
-export {MemberAPI, MemberData, PermissionsData};
+export * from './MemberAPI';
+export * from './MemberData';
+export * from './PermissionsData';

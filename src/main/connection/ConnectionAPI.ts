@@ -21,7 +21,7 @@ import {AxiosRequestConfig, AxiosResponse} from 'axios';
 import {HttpClient} from '../http';
 import {Connection, ConnectionRequest, ConnectionUpdate, UserConnectionList} from '../connection';
 
-export default class ConnectionsAPI {
+class ConnectionAPI {
   constructor(private client: HttpClient) {}
 
   static get URL() {
@@ -38,7 +38,7 @@ export default class ConnectionsAPI {
   public getConnection(userId: string): Promise<Connection> {
     const config: AxiosRequestConfig = {
       method: 'get',
-      url: `${ConnectionsAPI.URL.CONNECTIONS}/${userId}`,
+      url: `${ConnectionAPI.URL.CONNECTIONS}/${userId}`,
     };
 
     return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
@@ -56,7 +56,7 @@ export default class ConnectionsAPI {
       params: {
         size: limit,
       },
-      url: ConnectionsAPI.URL.CONNECTIONS,
+      url: ConnectionAPI.URL.CONNECTIONS,
     };
 
     if (connectionId) {
@@ -76,7 +76,7 @@ export default class ConnectionsAPI {
     const config: AxiosRequestConfig = {
       data: connectionRequestData,
       method: 'post',
-      url: ConnectionsAPI.URL.CONNECTIONS,
+      url: ConnectionAPI.URL.CONNECTIONS,
     };
 
     return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
@@ -92,9 +92,11 @@ export default class ConnectionsAPI {
     const config: AxiosRequestConfig = {
       data: updatedConnection,
       method: 'put',
-      url: ConnectionsAPI.URL.CONNECTIONS,
+      url: ConnectionAPI.URL.CONNECTIONS,
     };
 
     return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
   }
 }
+
+export {ConnectionAPI};

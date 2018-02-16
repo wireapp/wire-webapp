@@ -16,11 +16,11 @@
 // along with this program. If not, see http://www.gnu.org/licenses/.
 //
 
-import PermissionsData from './PermissionsData';
+import {PermissionsData} from './PermissionsData';
 
 interface MemberData {
   user: string;
   permissions: PermissionsData;
 }
 
-export default MemberData;
+export {MemberData};

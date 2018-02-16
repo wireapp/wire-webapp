@@ -16,7 +16,7 @@
 // along with this program. If not, see http://www.gnu.org/licenses/.
 //
 
-export default class ValidationError extends Error {
+class ValidationError extends Error {
   constructor(public message: string) {
     super(message);
     Object.setPrototypeOf(this, ValidationError.prototype);
@@ -26,3 +26,5 @@ export default class ValidationError extends Error {
     this.stack = new Error().stack;
   }
 }
+
+export {ValidationError};

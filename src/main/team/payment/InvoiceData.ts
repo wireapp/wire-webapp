@@ -24,4 +24,4 @@ interface InvoiceData {
   date: number;
 }
 
-export default InvoiceData;
+export {InvoiceData};

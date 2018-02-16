@@ -23,4 +23,4 @@ interface ConversationMembers {
   self: Member;
 }
 
-export default ConversationMembers;
+export {ConversationMembers};

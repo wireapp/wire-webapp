@@ -16,9 +16,7 @@
 // along with this program. If not, see http://www.gnu.org/licenses/.
 //
 
-import Invitation from './Invitation';
-import InvitationAPI from './InvitationAPI';
-import InvitationList from './InvitationList';
-import InvitationRequest from './InvitationRequest';
-
-export {Invitation, InvitationAPI, InvitationList, InvitationRequest};
+export * from './Invitation';
+export * from './InvitationAPI';
+export * from './InvitationList';
+export * from './InvitationRequest';

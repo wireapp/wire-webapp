@@ -27,4 +27,4 @@ interface PaymentStripePlan {
   trialPeriodDays: number;
 }
 
-export default PaymentStripePlan;
+export {PaymentStripePlan};

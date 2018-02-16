@@ -22,4 +22,4 @@ interface BackendError {
   message: string;
 }
 
-export default BackendError;
+export {BackendError};

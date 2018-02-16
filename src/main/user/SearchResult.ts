@@ -25,4 +25,4 @@ interface SearchResult {
   took: number;
 }
 
-export default SearchResult;
+export {SearchResult};

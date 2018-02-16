@@ -16,6 +16,4 @@
 // along with this program. If not, see http://www.gnu.org/licenses/.
 //
 
-import WebSocketClient from './WebSocketClient';
-
-export {WebSocketClient};
+export * from './WebSocketClient';

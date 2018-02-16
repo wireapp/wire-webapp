@@ -23,4 +23,4 @@ interface UserConnectionList {
   has_more: boolean;
 }
 
-export default UserConnectionList;
+export {UserConnectionList};

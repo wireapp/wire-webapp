@@ -22,4 +22,4 @@ interface ActivationResponse {
   phone?: string;
 }
 
-export default ActivationResponse;
+export {ActivationResponse};

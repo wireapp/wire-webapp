@@ -25,4 +25,4 @@ interface MemberUpdate {
   otr_muted?: boolean;
 }
 
-export default MemberUpdate;
+export {MemberUpdate};

@@ -17,7 +17,7 @@
 //
 
 import {UserAsset} from '../user';
-import TeamData from '../team/team/TeamData';
+import {TeamData} from '../team/team/TeamData';
 
 interface RegisterData {
   accent_id?: number;
@@ -34,4 +34,4 @@ interface RegisterData {
   team?: TeamData;
 }
 
-export default RegisterData;
+export {RegisterData};
