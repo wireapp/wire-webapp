@@ -23,36 +23,35 @@ window.z = window.z || {};
 window.z.links = z.links || {};
 
 z.links.LinkPreviewProtoBuilder = {
-  /*
-  Create Protocol Buffers message for link previews.
-  Open Graph data can be validated through: https://developers.facebook.com/tools/debug/
+  /**
+   * Create Protocol Buffers message for link previews.
+   * Open Graph data can be validated through: https://developers.facebook.com/tools/debug/
+   *
+   * @param {Object} data - Open graph data
+   * @param {string} url - Link entered by the user
+   * @param {number} offset - Starting index of the link
+   *
+   * @returns {z.proto.LinkPreview} Link preview proto
+   */
+  buildFromOpenGraphData(data, url, offset = 0) {
+    if (!_.isEmpty(data)) {
+      data.url = data.url || url;
 
-  @param {Object} data - open graph data
-  @param {string} url - link entered by the user
-  @param {number} offset - starting index of the link
+      if (data.title && data.url) {
+        const article = new z.proto.Article(data.url, data.title, data.description); // deprecated format
+        const linkPreview = new z.proto.LinkPreview(url, offset, article, data.url, data.title, data.description);
 
-  @returns {z.proto.LinkPreview}
-  */
-  build_from_open_graph_data(data, url, offset = 0) {
-    if (_.isEmpty(data)) {
-      return;
-    }
+        if (data.site_name === 'Twitter' && z.util.ValidationUtil.urls.is_tweet(data.url)) {
+          const author = data.title.replace('on Twitter', '').trim();
+          const username = data.url.match(/com\/([^/]*)\//)[1];
+          const tweet = new z.proto.Tweet(author, username);
 
-    data.url = data.url || url;
+          linkPreview.set('tweet', tweet);
+          linkPreview.set('title', data.description);
+        }
 
-    if (data.title && data.url) {
-      const article = new z.proto.Article(data.url, data.title, data.description); // deprecated format
-      const preview = new z.proto.LinkPreview(url, offset, article, data.url, data.title, data.description);
-
-      if (data.site_name === 'Twitter' && z.util.ValidationUtil.urls.is_tweet(data.url)) {
-        const author = data.title.replace('on Twitter', '').trim();
-        const username = data.url.match(/com\/([^/]*)\//)[1];
-        const tweet = new z.proto.Tweet(author, username);
-        preview.set('tweet', tweet);
-        preview.set('title', data.description);
+        return linkPreview;
       }
-
-      return preview;
     }
   },
 };

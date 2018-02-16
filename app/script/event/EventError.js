@@ -72,16 +72,16 @@ z.event.EventError = class EventError extends Error {
 
   static get TYPE() {
     return {
-      DATABASE_FAILURE: 'z.event.EventError.TYPE.DATABASE_FAILURE',
-      DEPRECATED_SCHEMA: 'z.event.EventError.TYPE.DEPRECATED_SCHEMA',
-      NO_CLIENT_ID: 'z.event.EventError.TYPE.NO_CLIENT_ID',
-      NO_EVENT: 'z.event.EventError.TYPE.NO_EVENT',
-      NO_LAST_DATE: 'z.event.EventError.TYPE.NO_LAST_DATE',
-      NO_LAST_ID: 'z.event.EventError.TYPE.NO_LAST_ID',
-      NO_NOTIFICATIONS: 'z.event.EventError.TYPE.NO_NOTIFICATIONS',
-      OUTDATED_E_CALL_EVENT: 'z.event.EventError.OUTDATED_E_CALL_EVENT',
-      REQUEST_FAILURE: 'z.event.EventError.TYPE.REQUEST_FAILURE',
-      VALIDATION_FAILED: 'z.event.EventError.TYPE.VALIDATION_FAILED',
+      DATABASE_FAILURE: 'EventError.TYPE.DATABASE_FAILURE',
+      DEPRECATED_SCHEMA: 'EventError.TYPE.DEPRECATED_SCHEMA',
+      NO_CLIENT_ID: 'EventError.TYPE.NO_CLIENT_ID',
+      NO_EVENT: 'EventError.TYPE.NO_EVENT',
+      NO_LAST_DATE: 'EventError.TYPE.NO_LAST_DATE',
+      NO_LAST_ID: 'EventError.TYPE.NO_LAST_ID',
+      NO_NOTIFICATIONS: 'EventError.TYPE.NO_NOTIFICATIONS',
+      OUTDATED_E_CALL_EVENT: 'EventError.OUTDATED_E_CALL_EVENT',
+      REQUEST_FAILURE: 'EventError.TYPE.REQUEST_FAILURE',
+      VALIDATION_FAILED: 'EventError.TYPE.VALIDATION_FAILED',
     };
   }
 };

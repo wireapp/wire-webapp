@@ -65,16 +65,16 @@ z.conversation.ConversationError = class ConversationError extends Error {
 
   static get TYPE() {
     return {
-      CONVERSATION_NOT_FOUND: 'z.conversation.ConversationError.TYPE.CONVERSATION_NOT_FOUND',
-      DEGRADED_CONVERSATION_CANCELLATION: 'z.conversation.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION',
-      MESSAGE_NOT_FOUND: 'z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND',
-      NO_CHANGES: 'z.conversation.ConversationError.TYPE.NO_CHANGES',
-      NO_CONVERSATION_ID: 'z.conversation.ConversationError.TYPE.NO_CONVERSATION_ID',
-      REQUEST_FAILURE: 'z.conversation.ConversationError.TYPE.REQUEST_FAILURE',
-      UNKNOWN: 'z.conversation.ConversationError.TYPE.UNKNOWN',
-      WRONG_CONVERSATION: 'z.conversation.ConversationError.TYPE.WRONG_CONVERSATION',
-      WRONG_TYPE: 'z.conversation.ConversationError.TYPE.WRONG_TYPE',
-      WRONG_USER: 'z.conversation.ConversationError.TYPE.WRONG_USER',
+      CONVERSATION_NOT_FOUND: 'ConversationError.TYPE.CONVERSATION_NOT_FOUND',
+      DEGRADED_CONVERSATION_CANCELLATION: 'ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION',
+      MESSAGE_NOT_FOUND: 'ConversationError.TYPE.MESSAGE_NOT_FOUND',
+      NO_CHANGES: 'ConversationError.TYPE.NO_CHANGES',
+      NO_CONVERSATION_ID: 'ConversationError.TYPE.NO_CONVERSATION_ID',
+      REQUEST_FAILURE: 'ConversationError.TYPE.REQUEST_FAILURE',
+      UNKNOWN: 'ConversationError.TYPE.UNKNOWN',
+      WRONG_CONVERSATION: 'ConversationError.TYPE.WRONG_CONVERSATION',
+      WRONG_TYPE: 'ConversationError.TYPE.WRONG_TYPE',
+      WRONG_USER: 'ConversationError.TYPE.WRONG_USER',
     };
   }
 };
