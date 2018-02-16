@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -55,9 +55,9 @@ describe('z.components.UserProfile', () => {
       .catch(done.fail);
   });
 
-  describe('detail_message', () => {
+  describe('detailMessage', () => {
     it('returns message parts that can safely be rendered by a template engine', () => {
-      const fingerprintExplanation = viewModel.detail_message();
+      const fingerprintExplanation = viewModel.detailMessage();
       expect(fingerprintExplanation.length).toBe(3);
     });
   });

@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -245,7 +245,6 @@ z.string.da.conversations_contacts = 'Kontakter';
 z.string.da.conversations_connection_request_many = '{{number}} personer venter';
 z.string.da.conversations_connection_request_one = '1 person venter';
 z.string.da.conversations_empty_conversation = 'Gruppesamtale';
-z.string.da.conversations_empty_conversation_description = 'Alle forlod gruppen';
 z.string.da.conversations_no_conversations = 'Ingen samtaler';
 z.string.da.conversations_popover_archive = 'Arkivér';
 z.string.da.conversations_popover_block = 'Blokér';
@@ -286,8 +285,6 @@ z.string.da.extensions_giphy_message = '{{tag}} • via giphy.com';
 z.string.da.extensions_giphy_no_gifs = 'Ups, ingen gifs';
 z.string.da.extensions_giphy_random = 'Tilfældig';
 
-z.string.da.search_open = 'Åbn';
-z.string.da.search_open_group = 'Opret Gruppe';
 z.string.da.people_confirm_label = 'Tilføj personer til gruppe';
 z.string.da.people_people = '{{number}} Personer';
 z.string.da.people_search_placeholder = 'Søg ved navn';
@@ -335,7 +332,8 @@ z.string.da.people_remove_message = '{{user}} vil ikke være i stand til at send
 z.string.da.people_unblock_headline = 'Fjern Blokering?';
 z.string.da.people_unblock_message = '{{user}} vil igen kunne kontakte dig og tilføje dig til gruppesamtaler.';
 
-z.string.da.people_button_add = 'Tilføj personer';
+z.string.da.people_button_add = 'Tilføj';
+z.string.da.people_button_add_people = 'Tilføj personer';
 z.string.da.people_button_block = 'Blokér';
 z.string.da.people_button_cancel = 'Annuller';
 z.string.da.people_button_connect = 'Forbind';
@@ -420,7 +418,6 @@ z.string.da.preferences_options_notifications_obfuscate = 'Skjul detaljer';
 z.string.da.preferences_options_notifications_obfuscate_message = 'Vis afsender';
 z.string.da.preferences_options_notifications_on = 'Vis afsender og besked';
 
-z.string.da.search_group_hint = 'Bliv ved med at skrive eller vælg flere personer for at oprette en gruppe';
 z.string.da.search_connect = 'Forbind';
 z.string.da.search_connections = 'Forbindelser';
 z.string.da.search_contacts = 'Kontakter';

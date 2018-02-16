@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -126,7 +126,7 @@ z.string.hu.modal_call_second_ongoing_headline = 'Bontsuk a hívást a másik es
 z.string.hu.modal_call_second_ongoing_message = 'Egyszerre csak egy hívásban vehetsz részt.';
 z.string.hu.modal_call_second_ongoing_action = 'Hívás befejezése';
 z.string.hu.modal_call_second_outgoing_headline = 'Leteszed a folyamatban lévő hívást?';
-z.string.hu.modal_call_second_outgoing_message = 'Egyszerre csak egy hívás lehetséges.';
+z.string.hu.modal_call_second_outgoing_message = 'Egyszerre csak egy hívásban vehetsz részt.';
 z.string.hu.modal_call_second_outgoing_action = 'Hívás befejezése';
 z.string.hu.modal_clear_conversation_headline = 'Törlöd a tartalmat?';
 z.string.hu.modal_clear_conversation_message = 'Ezzel törlöd a beszélgetés előzményeit és eltávolítod a beszélgetést a listáról.';
@@ -247,9 +247,14 @@ z.string.hu.conversation_send_pasted_file = 'Kép beillesztve ({{date}})';
 z.string.hu.conversation_someone = 'Valaki';
 z.string.hu.conversation_tweet_author = ' Twitteren';
 
-z.string.hu.conversation_creation_preferences_action = 'Tovább';
-z.string.hu.conversation_creation_participants_header = 'Partnerek hozzáadása';
-z.string.hu.conversation_creation_participants_placeholder = 'Keresés név szerint';
+z.string.hu.groupCreationPreferencesAction = 'Tovább';
+z.string.hu.groupCreationPreferencesHeader = 'Beszélgetés létrehozása';
+z.string.hu.groupCreationPreferencesPlaceholder = 'Beszélgetés neve';
+z.string.hu.groupCreationParticipantsActionCreate = 'Létrehozás';
+z.string.hu.groupCreationParticipantsActionSkip = 'Kihagyás';
+z.string.hu.groupCreationParticipantsHeader = 'Partnerek hozzáadása';
+z.string.hu.groupCreationParticipantsHeaderWithCounter = 'Partnerek hozzáadása ({{number}})';
+z.string.hu.groupCreationParticipantsPlaceholder = 'Keresés név szerint';
 
 z.string.hu.collection_show_all = 'Mind a(z) {{number}} mutatása';
 z.string.hu.collection_section_links = 'Hivatkozások';
@@ -267,7 +272,6 @@ z.string.hu.conversations_contacts = 'Névjegyek';
 z.string.hu.conversations_connection_request_many = '{{number}} partner várakozik';
 z.string.hu.conversations_connection_request_one = '1 partner várakozik';
 z.string.hu.conversations_empty_conversation = 'Csoportos beszélgetés';
-z.string.hu.conversations_empty_conversation_description = 'Mindenki elhagyta a beszélgetést';
 z.string.hu.conversations_no_conversations = 'Indíts egy beszélgetést vagy hozz létre egy csoportot.';
 z.string.hu.conversations_popover_archive = 'Archiválás';
 z.string.hu.conversations_popover_block = 'Tiltás';
@@ -316,8 +320,6 @@ z.string.hu.extensions_giphy_message = '{{tag}} • Forrás: giphy.com';
 z.string.hu.extensions_giphy_no_gifs = 'Hoppá, nincs gif';
 z.string.hu.extensions_giphy_random = 'Véletlenszerű';
 
-z.string.hu.search_open = 'Megnyitás';
-z.string.hu.search_open_group = 'Csoport létrehozása';
 z.string.hu.people_confirm_label = 'Partnerek hozzáadása a csoporthoz';
 z.string.hu.people_people = '{{number}} Partner';
 z.string.hu.people_search_placeholder = 'Keresés név szerint';
@@ -343,7 +345,7 @@ z.string.hu.people_tabs_device_detail_all_my_devices = 'Összes saját eszköz m
 z.string.hu.people_tabs_device_detail_device_fingerprint = 'Eszköz ujjlenyomata';
 z.string.hu.people_tabs_device_detail_headline = 'Ellenőrizd, hogy ez egyezik-e {{html1}}{{user}} eszközén látható{{html2}} ujjlenyomattal.';
 z.string.hu.people_tabs_device_detail_how_to = 'Hogyan csináljam?';
-z.string.hu.people_tabs_device_detail_reset_session = 'Visszaállítás';
+z.string.hu.people_tabs_device_detail_reset_session = 'Munkamenet visszaállítása';
 z.string.hu.people_tabs_device_detail_show_my_device = 'Eszköz ujjlenyomatának megjelenítése';
 z.string.hu.people_tabs_device_detail_verify = 'Ellenőrizve';
 z.string.hu.people_tabs_people = 'Partner';
@@ -431,7 +433,7 @@ z.string.hu.preferences_devices_remove_cancel = 'Mégsem';
 z.string.hu.preferences_devices_remove_detail = 'Távolítsd el ezt az eszközt, ha már nem használod. Ezzel együtt azonnal ki is jelentkezel erről az eszközről.';
 z.string.hu.preferences_devices_session_confirmation = 'A munkamenet alaphelyzetbe lett állítva.';
 z.string.hu.preferences_devices_session_detail = 'Ha az ujjlenyomatok nem egyeznek, állítsd vissza a munkamenet, így mindkét oldalon új titkosítási kulcsok jönnek létre.';
-z.string.hu.preferences_devices_session_reset = 'Visszaállítás';
+z.string.hu.preferences_devices_session_reset = 'Munkamenet visszaállítása';
 z.string.hu.preferences_devices_session_ongoing = 'Munkamenet visszaállítása…';
 z.string.hu.preferences_devices_verification = 'Ellenőrizve';
 
@@ -450,6 +452,7 @@ z.string.hu.preferences_options_data = 'Használati adatok és hibajelentések';
 z.string.hu.preferences_options_data_checkbox = 'Adatok küldése névtelenül';
 z.string.hu.preferences_options_data_detail = 'Anonim információk küldésével segíts nekünk, hogy a Wire még jobb legyen.';
 z.string.hu.preferences_options_popular = 'Közkívánatra';
+z.string.hu.preferences_options_emoji_replace_detail = ':-) → {{icon}}';
 z.string.hu.preferences_options_emoji_replace_checkbox = 'Cserélje ki a begépelt hangulatjeleket emojikra';
 z.string.hu.preferences_options_previews_send_checkbox = 'Előnézet készítése az elküldött hivatkozásokról';
 z.string.hu.preferences_options_previews_send_detail = 'A más partnerektől kapott hivatkozások előnézete továbbra is látható lesz.';
@@ -459,7 +462,6 @@ z.string.hu.preferences_options_notifications_obfuscate = 'Részletek elrejtése
 z.string.hu.preferences_options_notifications_obfuscate_message = 'Küldő mutatása';
 z.string.hu.preferences_options_notifications_on = 'Küldő és üzenet mutatása';
 
-z.string.hu.search_group_hint = 'Gépeljen be neveket vagy válasszon ki több partnert a csoport létrehozásához';
 z.string.hu.search_connect = 'Csatlakozás';
 z.string.hu.search_connections = 'Kapcsolatok';
 z.string.hu.search_contacts = 'Névjegyek';
@@ -473,7 +475,7 @@ z.string.hu.search_top_people = 'Top Partnerek';
 z.string.hu.search_try_search = 'Partnerek keresése\nnév vagy felhasználónév alapján';
 z.string.hu.search_no_contacts_on_wire = 'Nincsenek névjegyeid a Wire-ön.\nPróbálj új partnereket keresni, \nnév vagy @felhasználónév alapján.';
 z.string.hu.search_member_invite = 'Hívj meg másokat a csapatba';
-z.string.hu.search_others = 'Kapcsolatfelvétel';
+z.string.hu.search_others = 'Csatlakozás';
 
 z.string.hu.upload_google_headline = 'Keress partnereket\na Wire-ön.';
 z.string.hu.upload_google_message = 'A névjegyeid importálásával könnyebben kapcsolatba léphetsz másokkal. Minden információt anonimizálunk, és semmit nem osszuk meg senki mással.';
@@ -584,7 +586,7 @@ z.string.hu.init_events = 'Üzenetek betöltése';
 z.string.hu.init_updated_from_notifications = 'Majdnem kész - Élvezd a Wire-t';
 z.string.hu.init_progress = ' — {{number1}} / {{number2}}';
 
-z.string.hu.ephememal_units_none = 'Kikapcsolás';
+z.string.hu.ephememal_units_none = 'Kikapcsolva';
 z.string.hu.ephememal_units_second = 'másodperc';
 z.string.hu.ephememal_units_seconds = 'másodperc';
 z.string.hu.ephememal_units_minute = 'perc';

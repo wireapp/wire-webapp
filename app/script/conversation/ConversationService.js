@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -51,15 +51,15 @@ z.conversation.ConversationService = class ConversationService {
    * @note Supply at least 2 user IDs! Do not include the requestor
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/createGroupConversation
    *
-   * @param {Array<string>} userId - IDs of users (excluding the requestor) to be part of the conversation
+   * @param {Array<string>} userIds - IDs of users (excluding the requestor) to be part of the conversation
    * @param {string} [name] - User defined name for the Conversation
    * @param {string} [teamId] - ID of team conversation belongs to
    * @returns {Promise} Resolves when the conversation was created
    */
-  postConversations(userId, name, teamId) {
+  postConversations(userIds, name, teamId) {
     const payload = {
       name: name,
-      users: userId,
+      users: userIds,
     };
 
     if (teamId) {

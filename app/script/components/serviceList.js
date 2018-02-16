@@ -41,14 +41,9 @@ z.components.ServiceList = class ServiceList {
 
     this.avatarSize = this.isCompactMode
       ? z.components.ParticipantAvatar.SIZE.LARGE
-      : z.components.ParticipantAvatar.SIZE.MEDIUM;
+      : z.components.ParticipantAvatar.SIZE.SMALL;
 
-    this.cssClasses = ko.pureComputed(() => {
-      if (this.isCompactMode) {
-        return 'search-list-sm';
-      }
-      return 'search-list-lg';
-    });
+    this.cssClasses = ko.pureComputed(() => (this.isCompactMode ? 'search-list-sm' : 'search-list-lg'));
   }
 };
 

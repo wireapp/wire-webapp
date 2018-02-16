@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -105,8 +105,8 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
       this.user_repository
     );
     this.giphy = new z.ViewModel.GiphyViewModel('giphy-modal', this.conversation_repository, this.giphy_repository);
-    this.conversationCreation = new z.ViewModel.content.ConversationCreationViewModel(
-      'conversation-creation-modal',
+    this.groupCreation = new z.ViewModel.content.GroupCreationViewModel(
+      'group-creation-modal',
       this.conversation_repository,
       this.team_repository,
       this.user_repository

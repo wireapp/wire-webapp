@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -257,14 +257,13 @@ z.string.el.conversations_contacts = 'Επαφές';
 z.string.el.conversations_connection_request_many = '{{number}} άτομα σε αναμονή';
 z.string.el.conversations_connection_request_one = '1 άτομο σε αναμονή';
 z.string.el.conversations_empty_conversation = 'Ομαδική συζήτηση';
-z.string.el.conversations_empty_conversation_description = 'Αποχώρηση όλων';
 z.string.el.conversations_no_conversations = 'Δεν υπάρχουν ακόμα συζητήσεις';
 z.string.el.conversations_popover_archive = 'Αρχειοθέτηση';
 z.string.el.conversations_popover_block = 'Αποκλεισμός';
 z.string.el.conversations_popover_cancel = 'Ακύρωση αιτήματος';
 z.string.el.conversations_popover_clear = 'Διαγραφή';
 z.string.el.conversations_popover_leave = 'Αποχώρηση';
-z.string.el.conversations_popover_notify = 'Αύξηση έντασης';
+z.string.el.conversations_popover_notify = 'Ενεργή ένταση';
 z.string.el.conversations_popover_silence = 'Σίγαση';
 z.string.el.conversations_popover_unarchive = 'Αναίρεση αρχειοθέτησης';
 
@@ -306,8 +305,6 @@ z.string.el.extensions_giphy_message = '{{tag}} • μέσω giphy.com';
 z.string.el.extensions_giphy_no_gifs = 'Ουπς! δεν υπάρχουν gifs';
 z.string.el.extensions_giphy_random = 'Τυχαία';
 
-z.string.el.search_open = 'Άνοιγμα';
-z.string.el.search_open_group = 'Δημιουργία Ομάδος';
 z.string.el.people_confirm_label = 'Προσθήκη ατόμων σε ομάδα';
 z.string.el.people_people = '{{number}} Άτομα';
 z.string.el.people_search_placeholder = 'Αναζήτηση βάση ονόματος';
@@ -338,7 +335,7 @@ z.string.el.people_tabs_services = 'Υπηρεσίες';
 z.string.el.people_verified = 'Επιβεβαιωμένο';
 
 z.string.el.people_block_headline = 'Αποκλεισμός;';
-z.string.el.people_block_message = '{{user}} δεν θα μπορεί να επικοινωνήσει μαζί σας ή να σας προσθέσει σε ομαδικές συνομιλίες.';
+z.string.el.people_block_message = '{{user}} δεν θα μπορέσει να επικοινωνήσει μαζί σας ή να σας προσθέσει σε ομαδικές συνομιλίες.';
 
 z.string.el.people_connect_headline = 'Αποδοχή;';
 z.string.el.people_connect_message = 'Αυτό θα σας συνδέσει και θα ανοίξει συνομιλία με {{user}}.';
@@ -355,7 +352,8 @@ z.string.el.people_remove_message = '{{user}} δεν θα μπορεί να στ
 z.string.el.people_unblock_headline = 'Άρση αποκλεισμού';
 z.string.el.people_unblock_message = '{{user}} θα μπορεί να επικοινωνήσει μαζί σας και να σας προσθέσει ξανά σε ομαδικές συνομιλίες.';
 
-z.string.el.people_button_add = 'Προσθήκη ατόμων';
+z.string.el.people_button_add = 'Προσθήκη';
+z.string.el.people_button_add_people = 'Προσθήκη ατόμων';
 z.string.el.people_button_block = 'Αποκλεισμός';
 z.string.el.people_button_cancel = 'Ακύρωση';
 z.string.el.people_button_connect = 'Σύνδεση';
@@ -375,7 +373,7 @@ z.string.el.preferences_account = 'Λογαριασμός';
 z.string.el.preferences_av = 'Ήχος / βίντεο';
 z.string.el.preferences_device_details = 'Λεπτομέρειες Συσκευής';
 z.string.el.preferences_devices = 'Συσκευές';
-z.string.el.preferences_headline = 'Προτιμησεις';
+z.string.el.preferences_headline = 'Προτιμήσεις';
 z.string.el.preferences_options = 'Επιλογές';
 
 z.string.el.preferences_about_privacy_policy = 'Πολιτική Απορρήτου';
@@ -426,7 +424,7 @@ z.string.el.preferences_options_audio_none = 'Καθόλου';
 z.string.el.preferences_options_audio_none_detail = 'Σσσσς!';
 z.string.el.preferences_options_audio_some = 'Μερικώς';
 z.string.el.preferences_options_audio_some_detail = 'Κουδουνίσματα και κλήσεις';
-z.string.el.preferences_options_contacts = 'Επαφες';
+z.string.el.preferences_options_contacts = 'Επαφές';
 z.string.el.preferences_options_contacts_gmail = 'Εισαγωγή από το Gmail';
 z.string.el.preferences_options_contacts_macos = 'Εισαγωγή από τις Επαφές';
 z.string.el.preferences_options_contacts_detail = 'Χρησιμοποιούμε τις επαφές σας για να συνδέεστε με άλλους. Κρατάμε όλες σας τις πληροφορίες ανώνυμες και δεν τις μοιραζόμαστε με κανέναν άλλον.';
@@ -443,7 +441,6 @@ z.string.el.preferences_options_notifications_obfuscate = 'Απόκρυψη λε
 z.string.el.preferences_options_notifications_obfuscate_message = 'Εμφάνιση αποστολέα';
 z.string.el.preferences_options_notifications_on = 'Εμφάνιση αποστολέα και μηνύματος';
 
-z.string.el.search_group_hint = 'Συνεχίστε να πληκτρολογείτε ή επιλέξτε περισσότερα άτομα για να δημιουργήσετε μία ομάδα';
 z.string.el.search_connect = 'Σύνδεση';
 z.string.el.search_connections = 'Συνδέσεις';
 z.string.el.search_contacts = 'Επαφές';

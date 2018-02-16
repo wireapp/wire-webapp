@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -258,7 +258,6 @@ z.string.sk.conversations_contacts = 'Kontakty';
 z.string.sk.conversations_connection_request_many = '{{number}} ľudí čaká';
 z.string.sk.conversations_connection_request_one = '1 osoba čaká';
 z.string.sk.conversations_empty_conversation = 'Skupinová konverzácia';
-z.string.sk.conversations_empty_conversation_description = 'Všetci opustili rozhovor';
 z.string.sk.conversations_no_conversations = 'Zatiaľ žiadne konverzácie';
 z.string.sk.conversations_popover_archive = 'Archív';
 z.string.sk.conversations_popover_block = 'Blokovať';
@@ -307,8 +306,6 @@ z.string.sk.extensions_giphy_message = '{{tag}} • cez giphy.com';
 z.string.sk.extensions_giphy_no_gifs = 'Ej, žiadne gify';
 z.string.sk.extensions_giphy_random = 'Náhodný';
 
-z.string.sk.search_open = 'Otvoriť';
-z.string.sk.search_open_group = 'Vytvoriť skupinu';
 z.string.sk.people_confirm_label = 'Pridať ľudí do skupiny';
 z.string.sk.people_people = '{{number}} Ľudí';
 z.string.sk.people_search_placeholder = 'Vyhľadať podľa mena';
@@ -356,7 +353,8 @@ z.string.sk.people_remove_message = '{{user}} nebude môcť odosielať ani prij�
 z.string.sk.people_unblock_headline = 'Odblokovať?';
 z.string.sk.people_unblock_message = '{{user}} Vás bude môcť kontaktovať, alebo Vás pozvať do skupinového rozhovoru.';
 
-z.string.sk.people_button_add = 'Pridať ľudí';
+z.string.sk.people_button_add = 'Pridať';
+z.string.sk.people_button_add_people = 'Pridať ľudí';
 z.string.sk.people_button_block = 'Blokovať';
 z.string.sk.people_button_cancel = 'Zrušiť';
 z.string.sk.people_button_connect = 'Pripojiť';
@@ -445,7 +443,6 @@ z.string.sk.preferences_options_notifications_obfuscate = 'Skryť detaily';
 z.string.sk.preferences_options_notifications_obfuscate_message = 'Zobraziť odosielateľa';
 z.string.sk.preferences_options_notifications_on = 'Zobraziť odosielateľa a správu';
 
-z.string.sk.search_group_hint = 'Pokračujte v písaní, alebo vyberte viac ľudí pre vytvorenie skupiny';
 z.string.sk.search_connect = 'Pripojiť';
 z.string.sk.search_connections = 'Pripojenia';
 z.string.sk.search_contacts = 'Kontakty';

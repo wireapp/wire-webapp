@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -58,6 +58,7 @@
     cursor: default;
     opacity: 1;
     pointer-events: auto;
+    background-color: @app-bg;
   }
 
   &:not(:hover) {
@@ -99,11 +100,16 @@
 }
 
 .message-header-label {
-  .label-xs;
+  font-size: 12px;
+  font-weight: @font-weight-regular;
   align-items: center;
   display: flex;
   flex: 1;
   min-width: 0; // fixes ellipsis not working with flexbox (FF)
+  .message-header-sender-name {
+    font-weight: @font-weight-bold;
+    text-transform: capitalize;
+  }
 }
 
 .message-header-label-sender {
@@ -140,6 +146,7 @@
   font-size: 12px;
   margin-left: 4px;
   color: fade(@graphite-dark, 40%);
+  text-transform: uppercase;
 }
 
 .message-header-line {
@@ -432,6 +439,19 @@
   .label-xs;
   cursor: pointer;
   margin-top: 32px;
+}
+
+.message-group-creation-header {
+  font-size: 12px;
+  margin-left: 72px;
+  padding-top: 16px;
+  font-weight: @font-weight-regular;
+}
+
+.message-group-creation-header-name {
+  font-size: @font-size-lg;
+  font-weight: @font-weight-bold;
+  margin: 8px 0;
 }
 
 // PING MESSAGE

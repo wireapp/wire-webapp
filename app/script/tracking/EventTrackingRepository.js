@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -54,6 +54,9 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
           z.tracking.EventName.CALLING.RECEIVED_VIDEO_CALL,
           z.tracking.EventName.CALLING.SHARED_SCREEN,
           z.tracking.EventName.CONTRIBUTED,
+          z.tracking.EventName.CONVERSATION.GROUP_CREATION_SUCCEEDED,
+          z.tracking.EventName.CONVERSATION.OPENED_GROUP_CREATION,
+          z.tracking.EventName.CONVERSATION.OPENED_SELECT_PARTICIPANTS,
           z.tracking.EventName.E2EE.FAILED_MESSAGE_DECRYPTION,
           z.tracking.EventName.INTEGRATION.ADDED_SERVICE,
           z.tracking.EventName.INTEGRATION.REMOVED_SERVICE,

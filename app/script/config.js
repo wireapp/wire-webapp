@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -53,8 +53,6 @@ window.z.config = {
 
   // Maximum of parallel uploads
   MAXIMUM_ASSET_UPLOADS: 10,
-
-  MAXIMUM_CONVERSATION_SIZE: 128,
 
   // 15 megabyte image upload limit
   MAXIMUM_IMAGE_FILE_SIZE: 15 * 1024 * 1024,

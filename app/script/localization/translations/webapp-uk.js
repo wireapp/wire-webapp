@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -248,8 +248,14 @@ z.string.uk.conversation_send_pasted_file = 'Надіслав(-ла) зобра�
 z.string.uk.conversation_someone = 'Хтось';
 z.string.uk.conversation_tweet_author = ' в Twitter';
 
-z.string.uk.conversation_creation_participants_header = 'Додати учасників';
-z.string.uk.conversation_creation_participants_placeholder = 'Пошук за іменем';
+z.string.uk.groupCreationPreferencesAction = 'Далі';
+z.string.uk.groupCreationPreferencesHeader = 'Створити нову розмову';
+z.string.uk.groupCreationPreferencesPlaceholder = 'Ім’я розмови';
+z.string.uk.groupCreationParticipantsActionCreate = 'Створити';
+z.string.uk.groupCreationParticipantsActionSkip = 'Пропустити';
+z.string.uk.groupCreationParticipantsHeader = 'Додати учасників';
+z.string.uk.groupCreationParticipantsHeaderWithCounter = 'Додати учасників ({{number}})';
+z.string.uk.groupCreationParticipantsPlaceholder = 'Пошук за іменем';
 
 z.string.uk.collection_show_all = 'Показати всі {{number}}';
 z.string.uk.collection_section_links = 'Посилання';
@@ -267,7 +273,6 @@ z.string.uk.conversations_contacts = 'Контакти';
 z.string.uk.conversations_connection_request_many = '{{number}} людей очікують';
 z.string.uk.conversations_connection_request_one = '1 людина очікує';
 z.string.uk.conversations_empty_conversation = 'Групова розмова';
-z.string.uk.conversations_empty_conversation_description = 'Всі вийшли';
 z.string.uk.conversations_no_conversations = 'Розпочніть розмову або створіть групу.';
 z.string.uk.conversations_popover_archive = 'Архівувати';
 z.string.uk.conversations_popover_block = 'Заблокувати';
@@ -316,8 +321,6 @@ z.string.uk.extensions_giphy_message = '{{tag}} • через giphy.com';
 z.string.uk.extensions_giphy_no_gifs = 'Упс, анімацій не знайдено';
 z.string.uk.extensions_giphy_random = 'Випадкова';
 
-z.string.uk.search_open = 'Вiдкрити';
-z.string.uk.search_open_group = 'Створити групу';
 z.string.uk.people_confirm_label = 'Додати учасників до групи';
 z.string.uk.people_people = '{{number}} учасників';
 z.string.uk.people_search_placeholder = 'Пошук за іменем';
@@ -368,7 +371,7 @@ z.string.uk.people_remove_message = '{{user}} більше не зможе на�
 z.string.uk.people_unblock_headline = 'Розблокувати?';
 z.string.uk.people_unblock_message = '{{user}} не буде мати можливості зв’язатися з вами або додати вас до групових розмов.';
 
-z.string.uk.people_button_add = 'Додати учасників';
+z.string.uk.people_button_add = 'Додати';
 z.string.uk.people_button_add_people = 'Додати учасників';
 z.string.uk.people_button_block = 'Заблокувати';
 z.string.uk.people_button_cancel = 'Скасувати';
@@ -451,6 +454,7 @@ z.string.uk.preferences_options_data_checkbox = 'Статистика викор
 z.string.uk.preferences_options_data_detail = 'Зробіть Wire кращим, відправляючи анонімну інформацію.';
 z.string.uk.preferences_options_popular = 'У відповідь на численні прохання';
 z.string.uk.preferences_options_emoji_replace_checkbox = 'Замінювати текстові смайлики іконками';
+z.string.uk.preferences_options_emoji_replace_detail = ':-) → {{icon}}';
 z.string.uk.preferences_options_previews_send_checkbox = 'Генерувати попередній перегляд для надісланих лінків';
 z.string.uk.preferences_options_previews_send_detail = 'Дана опція не впливає на попередній перегляд лінків від інших людей.';
 z.string.uk.preferences_options_notifications = 'Сповіщення';
@@ -459,7 +463,6 @@ z.string.uk.preferences_options_notifications_obfuscate = 'Приховати д
 z.string.uk.preferences_options_notifications_obfuscate_message = 'Показувати відправника';
 z.string.uk.preferences_options_notifications_on = 'Показувати відправника та повідомлення';
 
-z.string.uk.search_group_hint = 'Спробуйте ще раз або виберіть більше людей, щоб створити групову розмову';
 z.string.uk.search_connect = 'Додати до контактів';
 z.string.uk.search_connections = 'Контакти';
 z.string.uk.search_contacts = 'Контакти';

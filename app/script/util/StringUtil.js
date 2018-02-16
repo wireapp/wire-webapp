@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,8 +26,9 @@ z.util.StringUtil = {
   capitalize_first_char: function(string = '') {
     return `${string.charAt(0).toUpperCase()}${string.substring(1)}`;
   },
-  compare_transliteration: function(name_a, name_b) {
-    return z.util.StringUtil.includes(window.getSlug(name_a), window.getSlug(name_b));
+  compare_transliteration: function(name_a, name_b, excludedChars = []) {
+    const options = {custom: excludedChars};
+    return z.util.StringUtil.includes(window.getSlug(name_a, options), window.getSlug(name_b, options));
   },
   format: function() {
     let string = arguments[0];

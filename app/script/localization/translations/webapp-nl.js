@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -266,7 +266,6 @@ z.string.nl.conversations_contacts = 'Contacten';
 z.string.nl.conversations_connection_request_many = '{{number}} personen wachten';
 z.string.nl.conversations_connection_request_one = '1 persoon wacht';
 z.string.nl.conversations_empty_conversation = 'Groepsgesprek';
-z.string.nl.conversations_empty_conversation_description = 'Verlaten door iedereen';
 z.string.nl.conversations_no_conversations = 'Nog geen gesprekken';
 z.string.nl.conversations_popover_archive = 'Archiveren';
 z.string.nl.conversations_popover_block = 'Blokkeren';
@@ -315,8 +314,6 @@ z.string.nl.extensions_giphy_message = '{{tag}} • via giphy.com';
 z.string.nl.extensions_giphy_no_gifs = 'Oeps, geen gifjes';
 z.string.nl.extensions_giphy_random = 'Random';
 
-z.string.nl.search_open = 'Openen';
-z.string.nl.search_open_group = 'Groep aanmaken';
 z.string.nl.people_confirm_label = 'Voeg Personen aan Groep toe';
 z.string.nl.people_people = '{{number}} mensen';
 z.string.nl.people_search_placeholder = 'Zoeken op naam';
@@ -366,7 +363,8 @@ z.string.nl.people_remove_message = '{{user}} zal geen berichten kunnen versture
 z.string.nl.people_unblock_headline = 'Deblokkeer?';
 z.string.nl.people_unblock_message = '{{user}} zal weer in staat zijn je te contacteren en je toe te voegen aan een groepsgesprek.';
 
-z.string.nl.people_button_add = 'Contacten toevoegen';
+z.string.nl.people_button_add = 'Toevoegen';
+z.string.nl.people_button_add_people = 'Contacten toevoegen';
 z.string.nl.people_button_block = 'Blokkeren';
 z.string.nl.people_button_cancel = 'Annuleer';
 z.string.nl.people_button_connect = 'Verbind';
@@ -456,7 +454,6 @@ z.string.nl.preferences_options_notifications_obfuscate = 'Details verbergen';
 z.string.nl.preferences_options_notifications_obfuscate_message = 'Toon zender';
 z.string.nl.preferences_options_notifications_on = 'Toon verzender en bericht';
 
-z.string.nl.search_group_hint = 'Type verder of kies meer mensen om een groep aan te maken';
 z.string.nl.search_connect = 'Verbind';
 z.string.nl.search_connections = 'Contacten';
 z.string.nl.search_contacts = 'Contacten';

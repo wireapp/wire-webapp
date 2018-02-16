@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -260,7 +260,6 @@ z.string.es.conversations_contacts = 'Contactos';
 z.string.es.conversations_connection_request_many = '{{number}} personas en espera';
 z.string.es.conversations_connection_request_one = '1 persona en espera';
 z.string.es.conversations_empty_conversation = 'Conversación en grupo';
-z.string.es.conversations_empty_conversation_description = 'Todo el mundo se fue';
 z.string.es.conversations_no_conversations = 'Iniciar una conversación o crear un grupo.';
 z.string.es.conversations_popover_archive = 'Archivar';
 z.string.es.conversations_popover_block = 'Bloquear';
@@ -309,8 +308,6 @@ z.string.es.extensions_giphy_message = '{{tag}} · vía giphy.com';
 z.string.es.extensions_giphy_no_gifs = 'Uups, no hay gifs';
 z.string.es.extensions_giphy_random = 'Aleatorio';
 
-z.string.es.search_open = 'Abrir';
-z.string.es.search_open_group = 'Crear Grupo';
 z.string.es.people_confirm_label = 'Añadir gente al grupo';
 z.string.es.people_people = '{{number}} Personas';
 z.string.es.people_search_placeholder = 'Buscar por nombre';
@@ -358,7 +355,8 @@ z.string.es.people_remove_message = '{{user}} no podrá enviar o recibir mensaje
 z.string.es.people_unblock_headline = '¿Desbloquear?';
 z.string.es.people_unblock_message = '{{user}} ahora podrá ponerse en contacto contigo o añadirte a chats de grupo.';
 
-z.string.es.people_button_add = 'Agregar personas';
+z.string.es.people_button_add = 'Agregar';
+z.string.es.people_button_add_people = 'Agregar personas';
 z.string.es.people_button_block = 'Bloquear';
 z.string.es.people_button_cancel = 'Cancelar';
 z.string.es.people_button_connect = 'Conectar';
@@ -448,7 +446,6 @@ z.string.es.preferences_options_notifications_obfuscate = 'Ocultar detalles';
 z.string.es.preferences_options_notifications_obfuscate_message = 'Mostrar remitente';
 z.string.es.preferences_options_notifications_on = 'Mostrar remitente y mensaje';
 
-z.string.es.search_group_hint = 'Seguir intentando o elegir más personas para crear un grupo';
 z.string.es.search_connect = 'Conectar';
 z.string.es.search_connections = 'Conexiones';
 z.string.es.search_contacts = 'Contactos';
