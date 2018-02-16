@@ -2658,6 +2658,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         }
       })
       .then((entityObject = {}) => this._handledConversationEvent(entityObject, eventSource, previouslyArchived));
+  }
 
   _handledConversationEvent(entityObject = {}, eventSource, previouslyArchived) {
     const {conversationEntity, messageEntity} = entityObject;

@@ -292,6 +292,7 @@ z.conversation.ConversationCellState = (() => {
 
   function _generate(conversationEntity) {
     const states = [
+      emptyState,
       removedState,
       mutedState,
       alertState,
