@@ -79,8 +79,9 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     this.notification_service = new z.event.NotificationService(this.auth.client, this.storageService);
     this.web_socket_service = new z.event.WebSocketService(this.auth.client);
     this.event_repository = new z.event.EventRepository(
-      this.web_socket_service,
       this.notification_service,
+      this.web_socket_service,
+      undefined,
       this.cryptography_repository,
       this.user_repository
     );
@@ -1801,7 +1802,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
       .then(() => this.client_repository.registerClient(auto_login ? undefined : this.password()))
       .then(client_observable => {
         this.event_repository.current_client = client_observable;
-        return this.event_repository.initialize_stream_state(client_observable().id);
+        return this.event_repository.initializeStreamState(client_observable().id);
       })
       .catch(error => {
         if (error.code === z.service.BackendClientError.STATUS_CODE.NOT_FOUND) {
