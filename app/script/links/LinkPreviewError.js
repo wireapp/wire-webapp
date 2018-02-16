@@ -46,11 +46,11 @@ z.links.LinkPreviewError = class LinkPreviewError extends Error {
 
   static get TYPE() {
     return {
-      BLACKLISTED: 'z.links.LinkPreviewError.TYPE.BLACKLISTED',
-      NO_DATA_AVAILABLE: 'z.links.LinkPreviewError.TYPE.NO_DATA_AVAILABLE',
-      NOT_SUPPORTED: 'z.links.LinkPreviewError.TYPE.NOT_SUPPORTED',
-      UNKNOWN: 'z.links.LinkPreviewError.TYPE.UNKNOWN',
-      UNSUPPORTED_TYPE: 'z.links.LinkPreviewError.TYPE.UNSUPPORTED_TYPE',
+      BLACKLISTED: 'LinkPreviewError.TYPE.BLACKLISTED',
+      NO_DATA_AVAILABLE: 'LinkPreviewError.TYPE.NO_DATA_AVAILABLE',
+      NOT_SUPPORTED: 'LinkPreviewError.TYPE.NOT_SUPPORTED',
+      UNKNOWN: 'LinkPreviewError.TYPE.UNKNOWN',
+      UNSUPPORTED_TYPE: 'LinkPreviewError.TYPE.UNSUPPORTED_TYPE',
     };
   }
 };
