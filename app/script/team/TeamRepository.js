@@ -110,10 +110,8 @@ z.team.TeamRepository = class TeamRepository {
   onTeamEvent(eventJson, source) {
     const type = eventJson.type;
 
-    this.logger.info(`»» Team Event: '${type}' (Source: ${source})`, {
-      event_json: JSON.stringify(eventJson),
-      event_object: eventJson,
-    });
+    const logObject = {eventJson: JSON.stringify(eventJson), eventObject: eventJson};
+    this.logger.info(`»» Team Event: '${type}' (Source: ${source})`, logObject);
 
     switch (type) {
       case z.event.Backend.TEAM.CONVERSATION_CREATE:

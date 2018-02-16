@@ -624,13 +624,12 @@ z.event.EventRepository = class EventRepository {
         const {data: mappedData, from: mappedFrom, type: mappedType, time: mappedTime} = event;
         const {data: storedData, from: storedFrom, type: storedType, time: storedTime} = storedEvent;
 
+        const logMessage = `Ignored '${mappedType}' (${eventId}) in '${conversationId}' from '${mappedFrom}':'`;
+
         const fromDifferentUsers = storedFrom !== mappedFrom;
         if (fromDifferentUsers) {
-          this.logger.warn(
-            `Ignored '${mappedType}' in conversation '${conversationId}' from user '${mappedFrom}' with ID '${eventId}' previously used by user '${storedFrom}'`,
-            event
-          );
-          const errorMessage = 'Event validation failed: ID reused from other user';
+          this.logger.warn(`${logMessage} ID previously used by user '${storedFrom}'`, event);
+          const errorMessage = 'Event validation failed: ID reused by other user';
           throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, errorMessage);
         }
 
@@ -638,30 +637,21 @@ z.event.EventRepository = class EventRepository {
         const storedISMessageAdd = storedType === z.event.Client.CONVERSATION.MESSAGE_ADD;
         const userReusedId = !mappedIsMessageAdd || !storedISMessageAdd || !mappedData.previews.length;
         if (userReusedId) {
-          this.logger.warn(
-            `Ignored '${mappedType}' in conversation '${conversationId}' from user '${mappedFrom}' with previously used ID '${eventId}'`,
-            event
-          );
-          const errorMessage = 'Event validation failed: ID reused from same user';
+          this.logger.warn(`${logMessage} ID previously used by same user`, event);
+          const errorMessage = 'Event validation failed: ID reused by same user';
           throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, errorMessage);
         }
 
         const updatingLinkPreview = !!storedData.previews.length;
         if (updatingLinkPreview) {
-          this.logger.warn(
-            `Ignored '${mappedType}' in conversation '${conversationId}' from user '${mappedFrom}' with ID '${eventId}' that previously contained link preview`,
-            event
-          );
+          this.logger.warn(`${logMessage} ID of link preview  reused`, event);
           const errorMessage = 'Event validation failed: ID of link preview reused';
           throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, errorMessage);
         }
 
         const textContentMatches = mappedData.content === storedData.content;
         if (!textContentMatches) {
-          this.logger.warn(
-            `Ignored '${mappedType}' in conversation '${conversationId}' from user '${mappedFrom}' with ID '${eventId}' not matching text content`,
-            event
-          );
+          this.logger.warn(`${logMessage} Text content for link preview not matching`, event);
           const errorMessage = 'Event validation failed: ID of link preview reused';
           throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, errorMessage);
         }
@@ -697,10 +687,8 @@ z.event.EventRepository = class EventRepository {
         const outdatedEvent = this.lastEventDate() >= new Date(event.time).toISOString();
 
         if (outdatedEvent) {
-          this.logger.info(`Event from stream skipped as outdated: '${event.type}'`, {
-            event_json: JSON.stringify(event),
-            event_object: event,
-          });
+          const logObject = {eventJson: JSON.stringify(event), eventObject: event};
+          this.logger.info(`Event from stream skipped as outdated: '${event.type}'`, logObject);
           const errorMessage = 'Event validation failed: Outdated timestamp';
           throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, errorMessage);
         }
@@ -768,10 +756,9 @@ z.event.EventRepository = class EventRepository {
       return true;
     }
 
-    this.logger.info(
-      `Ignored outdated '${type}' event in conversation '${conversationId}' - Event: '${thresholdTimestamp}', Local: '${correctedTimestamp}'`,
-      {event_json: JSON.stringify(event), event_object: event}
-    );
+    const message = `Ignored outdated '${type}' event in conversation '${conversationId}'`;
+    const logObject = {eventJson: JSON.stringify(event), eventObject: event};
+    this.logger.info(`${message} - Event: '${thresholdTimestamp}', Local: '${correctedTimestamp}'`, logObject);
     throw new z.event.EventError(z.event.EventError.TYPE.OUTDATED_E_CALL_EVENT);
   }
 };
