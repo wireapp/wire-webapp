@@ -83,13 +83,13 @@ z.calling.CallingRepository = class CallingRepository {
     this.messageLog = [];
 
     // Media Handler
-    this.mediaDevicesHandler = this.mediaRepository.devicesHandler;
-    this.mediaStreamHandler = this.mediaRepository.streamHandler;
+    this.mediaDevicesHandler = this.mediaRepository.devices_handler;
+    this.mediaStreamHandler = this.mediaRepository.stream_handler;
     this.mediaElementHandler = this.mediaRepository.element_handler;
-    this.remoteMediaStreams = this.mediaRepository.streamHandler.remoteMediaStreams;
-    this.selfStreamState = this.mediaRepository.streamHandler.selfStreamState;
+    this.remote_media_streams = this.mediaRepository.stream_handler.remote_media_streams;
+    this.selfStreamState = this.mediaRepository.stream_handler.self_stream_state;
 
-    this.selfState = this.mediaStreamHandler.selfStreamState;
+    this.selfState = this.mediaStreamHandler.self_stream_state;
 
     this.calls = ko.observableArray([]);
     this.joinedCall = ko.pureComputed(() => {
@@ -111,8 +111,8 @@ z.calling.CallingRepository = class CallingRepository {
    * @returns {undefined} No return value
    */
   shareCallStates() {
-    this.mediaRepository.streamHandler.calls = this.calls;
-    this.mediaRepository.streamHandler.joinedCall = this.joinedCall;
+    this.mediaRepository.stream_handler.calls = this.calls;
+    this.mediaRepository.stream_handler.joinedCall = this.joinedCall;
   }
 
   /**
