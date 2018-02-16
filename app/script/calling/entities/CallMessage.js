@@ -42,7 +42,7 @@ z.calling.entities.CallMessage = class CallMessage {
   constructor(type, response = false, sessionId) {
     this.type = type;
     this.response = response;
-    this.sessionId = sessionId || this.createSessionId();
+    this.sessionId = sessionId || this._create_session_id();
   }
 
   /**
@@ -111,7 +111,7 @@ z.calling.entities.CallMessage = class CallMessage {
    * @private
    * @returns {string} Random char session ID of length CallMessage.CONFIG.SESSION_ID_LENGTH
    */
-  createSessionId() {
+  _create_session_id() {
     return _.range(CallMessage.CONFIG.SESSION_ID_LENGTH)
       .map(() => z.util.StringUtil.getRandomCharacter())
       .join('');

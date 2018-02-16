@@ -28,12 +28,12 @@ z.calling.entities.Participant = class Participant {
    * Construct a new participant.
    *
    * @class z.calling.entities.Participant
-   * @param {Call} callEt - Call entity
+   * @param {Call} callEntity - Call entity
    * @param {z.entity.User} user - User entity to base the participant on
    * @param {CallSetupTimings} timings - Timing statistics of call setup steps
    */
-  constructor(callEt, user, timings) {
-    this.callEt = callEt;
+  constructor(callEntity, user, timings) {
+    this.callEntity = callEntity;
     this.user = user;
     this.id = this.user.id;
     this.sessionId = undefined;
@@ -50,7 +50,7 @@ z.calling.entities.Participant = class Participant {
       videoSend: ko.observable(false),
     };
 
-    this.flowEt = new z.calling.entities.Flow(this.callEt, this, timings);
+    this.flowEntity = new z.calling.entities.Flow(this.callEntity, this, timings);
 
     this.isConnected.subscribe(isConnected => {
       if (isConnected && !this.wasConnected) {
@@ -65,8 +65,8 @@ z.calling.entities.Participant = class Participant {
    * @returns {undefined} No return value
    */
   resetParticipant() {
-    if (this.flowEt) {
-      this.flowEt.reset_flow();
+    if (this.flowEntity) {
+      this.flowEntity.reset_flow();
     }
   }
 
@@ -75,23 +75,23 @@ z.calling.entities.Participant = class Participant {
    * @returns {undefined} No return value
    */
   startNegotiation() {
-    this.flowEt.startNegotiation();
+    this.flowEntity.startNegotiation();
   }
 
   /**
    * Update the participant state.
-   * @param {CallMessage} callMessageEt - Call message to update state from.
+   * @param {CallMessage} callMessageEntity - Call message to update state from.
    * @returns {Promise} Resolves when the state was updated
    */
-  updateState(callMessageEt) {
-    const {clientId, props, sdp: rtcSdp, sessionId} = callMessageEt;
+  updateState(callMessageEntity) {
+    const {clientId, props, sdp: rtcSdp, sessionId} = callMessageEntity;
 
     return this.updateProperties(props).then(() => {
       this.sessionId = sessionId;
-      this.flowEt.setRemoteClientId(clientId);
+      this.flowEntity.setRemoteClientId(clientId);
 
       if (rtcSdp) {
-        return this.flowEt.saveRemoteSdp(callMessageEt);
+        return this.flowEntity.saveRemoteSdp(callMessageEntity);
       }
 
       return false;
@@ -130,7 +130,7 @@ z.calling.entities.Participant = class Participant {
    */
   verifyClientId(clientId) {
     if (clientId) {
-      const connectedClientId = this.flowEt.remoteClientId;
+      const connectedClientId = this.flowEntity.remoteClientId;
 
       if (connectedClientId && clientId !== connectedClientId) {
         this.logger.warn(
@@ -139,7 +139,7 @@ z.calling.entities.Participant = class Participant {
         );
         throw new z.calling.CallError(z.calling.CallError.TYPE.WRONG_SENDER);
       }
-      this.flowEt.remoteClientId = clientId;
+      this.flowEntity.remoteClientId = clientId;
     } else {
       throw new z.calling.CallError(z.calling.CallError.TYPE.WRONG_SENDER, 'Sender ID missing');
     }

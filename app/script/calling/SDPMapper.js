@@ -43,11 +43,11 @@ z.calling.SDPMapper = {
 
   /**
    * Map call setup message to RTCSessionDescription.
-   * @param {CallMessage} callMessageEt - Call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.SETUP
+   * @param {CallMessage} callMessageEntity - Call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.SETUP
    * @returns {Promise} Resolves with a webRTC standard compliant RTCSessionDescription
    */
-  mapCallMessageToObject(callMessageEt) {
-    const {response, sdp: sdpString} = callMessageEt;
+  mapCallMessageToObject(callMessageEntity) {
+    const {response, sdp: sdpString} = callMessageEntity;
     const sdp = {
       sdp: sdpString,
       type: response ? z.calling.rtc.SDP_TYPE.ANSWER : z.calling.rtc.SDP_TYPE.OFFER,
@@ -61,10 +61,10 @@ z.calling.SDPMapper = {
    *
    * @param {RTCSessionDescription} rtcSdp - Session Description Protocol to be rewritten
    * @param {z.calling.enum.SDP_SOURCE} [sdpSource=z.calling.enum.SDP_SOURCE.REMOTE] - Source of the SDP - local or remote
-   * @param {Flow} flowEt - Flow entity
+   * @param {Flow} flowEntity - Flow entity
    * @returns {Object} Object containing rewritten Session Description Protocol and number of ICE candidates
    */
-  rewriteSdp(rtcSdp, sdpSource = z.calling.enum.SDP_SOURCE.REMOTE, flowEt) {
+  rewriteSdp(rtcSdp, sdpSource = z.calling.enum.SDP_SOURCE.REMOTE, flowEntity) {
     if (!rtcSdp) {
       throw new z.calling.CallError(z.calling.CallError.TYPE.NOT_FOUND, 'Cannot rewrite undefined SDP');
     }
@@ -109,18 +109,18 @@ z.calling.SDPMapper = {
 
         // Code to nail in bit-rate and ptime settings for improved performance and experience
       } else if (sdpLine.startsWith('m=audio')) {
-        const isIceRestart = flowEt.negotiation_mode() === z.calling.enum.SDP_NEGOTIATION_MODE.ICE_RESTART;
+        const isIceRestart = flowEntity.negotiation_mode() === z.calling.enum.SDP_NEGOTIATION_MODE.ICE_RESTART;
         const isLocalSdp = sdpSource === z.calling.enum.SDP_SOURCE.LOCAL;
 
-        if (isIceRestart || (isLocalSdp && flowEt.isGroup)) {
+        if (isIceRestart || (isLocalSdp && flowEntity.isGroup)) {
           sdpLines.push(sdpLine);
           outline = `b=AS:${z.calling.SDPMapper.CONFIG.AUDIO_BITRATE}`;
         }
       } else if (sdpLine.startsWith('a=rtpmap')) {
-        const isIceRestart = flowEt.negotiation_mode() === z.calling.enum.SDP_NEGOTIATION_MODE.ICE_RESTART;
+        const isIceRestart = flowEntity.negotiation_mode() === z.calling.enum.SDP_NEGOTIATION_MODE.ICE_RESTART;
         const isLocalSdp = sdpSource === z.calling.enum.SDP_SOURCE.LOCAL;
 
-        if (isIceRestart || (isLocalSdp && flowEt.isGroup)) {
+        if (isIceRestart || (isLocalSdp && flowEntity.isGroup)) {
           if (z.util.StringUtil.includes(sdpLine, 'opus')) {
             sdpLines.push(sdpLine);
             outline = `a=ptime:${z.calling.SDPMapper.CONFIG.AUDIO_PTIME}`;

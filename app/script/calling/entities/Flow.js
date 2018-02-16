@@ -38,36 +38,36 @@ z.calling.entities.Flow = class Flow {
    * Construct a new flow entity.
    *
    * @class z.calling.entities.Flow
-   * @param {Call} callEt - Call entity that the flow belongs to
-   * @param {Participant} participantEt - Participant entity that the flow belongs to
+   * @param {Call} callEntity - Call entity that the flow belongs to
+   * @param {Participant} participantEntity - Participant entity that the flow belongs to
    * @param {CallSetupTimings} timings - Timing statistics of call setup steps
    */
-  constructor(callEt, participantEt, timings) {
-    this.callingRepository = callEt.callingRepository;
+  constructor(callEntity, participantEntity, timings) {
+    this.callingRepository = callEntity.callingRepository;
 
-    this.callEt = callEt;
-    this.participantEt = participantEt;
-    this.logger = new z.util.Logger(`z.calling.entities.Flow (${this.participantEt.id})`, z.config.LOGGER.OPTIONS);
+    this.callEntity = callEntity;
+    this.participantEntity = participantEntity;
+    this.logger = new z.util.Logger(`z.calling.entities.Flow (${this.participantEntity.id})`, z.config.LOGGER.OPTIONS);
 
-    this.id = this.participantEt.id;
-    this.conversationId = this.callEt.id;
+    this.id = this.participantEntity.id;
+    this.conversationId = this.callEntity.id;
 
     // States
     this.isAnswer = ko.observable(false);
-    this.selfState = this.callEt.selfState;
+    this.selfState = this.callEntity.selfState;
 
     // Audio
     this.audio = new z.calling.entities.FlowAudio(this, this.callingRepository.mediaRepository);
 
     // Users
     this.remoteClientId = undefined;
-    this.remoteUser = this.participantEt.user;
+    this.remoteUser = this.participantEntity.user;
     this.remoteUserId = this.remoteUser.id;
-    this.selfUser = this.callEt.selfUser;
+    this.selfUser = this.callEntity.selfUser;
     this.selfUserId = this.selfUser.id;
 
     // Telemetry
-    this.telemetry = new z.telemetry.calling.FlowTelemetry(this.id, this.remoteUserId, this.callEt, timings);
+    this.telemetry = new z.telemetry.calling.FlowTelemetry(this.id, this.remoteUserId, this.callEntity, timings);
 
     //##############################################################################
     // PeerConnection
@@ -76,7 +76,7 @@ z.calling.entities.Flow = class Flow {
     this.peerConnection = undefined;
     this.pcInitialized = ko.observable(false);
 
-    this.mediaStream = this.callEt.localMediaStream;
+    this.mediaStream = this.callEntity.localMediaStream;
     this.dataChannel = undefined;
     this.dataChannelOpened = false;
 
@@ -92,20 +92,20 @@ z.calling.entities.Flow = class Flow {
           this.negotiationMode(z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT);
           this.telemetry.timeStep(z.telemetry.calling.CallSetupSteps.ICE_CONNECTION_CONNECTED);
 
-          this.callEt.isConnected(true);
-          this.participantEt.isConnected(true);
+          this.callEntity.isConnected(true);
+          this.participantEntity.isConnected(true);
 
-          this.callEt.interruptedParticipants.remove(this.participantEt);
-          this.callEt.state(z.calling.enum.CALL_STATE.ONGOING);
-          this.callEt.terminationReason = undefined;
+          this.callEntity.interruptedParticipants.remove(this.participantEntity);
+          this.callEntity.state(z.calling.enum.CALL_STATE.ONGOING);
+          this.callEntity.terminationReason = undefined;
           break;
         }
 
         case z.calling.rtc.ICE_CONNECTION_STATE.CLOSED: {
-          this.participantEt.isConnected(false);
+          this.participantEntity.isConnected(false);
 
-          if (this.callEt.selfClientJoined()) {
-            this.callEt.deleteParticipant(this.participantEt.id, this.remoteClientId);
+          if (this.callEntity.selfClientJoined()) {
+            this.callEntity.deleteParticipant(this.participantEntity.id, this.remoteClientId);
           }
           break;
         }
@@ -116,7 +116,7 @@ z.calling.entities.Flow = class Flow {
         }
 
         case z.calling.rtc.ICE_CONNECTION_STATE.FAILED: {
-          if (this.callEt.selfClientJoined()) {
+          if (this.callEntity.selfClientJoined()) {
             this.removeParticipant();
           }
           break;
@@ -133,7 +133,7 @@ z.calling.entities.Flow = class Flow {
       switch (signalingState) {
         case z.calling.rtc.SIGNALING_STATE.CLOSED: {
           this.logger.info(`PeerConnection with '${this.remoteUser.name()}' was closed`);
-          this.callEt.deleteParticipant(this.participantEt.id, this.remoteClientId);
+          this.callEntity.deleteParticipant(this.participantEntity.id, this.remoteClientId);
           break;
         }
 
@@ -344,18 +344,22 @@ z.calling.entities.Flow = class Flow {
    * @returns {undefined} No return value
    */
   removeParticipant(terminationReason) {
-    this.participantEt.isConnected(false);
+    this.participantEntity.isConnected(false);
 
-    this.callEt
-      .deleteParticipant(this.participantEt.id, this.remoteClientId, z.calling.enum.TERMINATION_REASON.CONNECTION_DROP)
+    this.callEntity
+      .deleteParticipant(
+        this.participantEntity.id,
+        this.remoteClientId,
+        z.calling.enum.TERMINATION_REASON.CONNECTION_DROP
+      )
       .then(() => {
-        if (!this.callEt.participants().length) {
+        if (!this.callEntity.participants().length) {
           if (!terminationReason) {
-            terminationReason = this.callEt.isConnected()
+            terminationReason = this.callEntity.isConnected()
               ? z.calling.enum.TERMINATION_REASON.CONNECTION_DROP
               : z.calling.enum.TERMINATION_REASON.CONNECTION_FAILED;
           }
-          amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, this.callEt.id, terminationReason);
+          amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, this.callEntity.id, terminationReason);
         }
       });
   }
@@ -468,7 +472,7 @@ z.calling.entities.Flow = class Flow {
       z.media.MediaStreamSource.REMOTE,
       this.remoteUser.id,
       mediaStream,
-      this.callEt
+      this.callEntity
     );
     amplify.publish(z.event.WebApp.CALL.MEDIA.ADD_STREAM, mediaStreamInfo);
   }
@@ -499,7 +503,7 @@ z.calling.entities.Flow = class Flow {
    */
   onIceConnectionStateChange(event) {
     const endingCallStates = [z.calling.enum.CALL_STATE.DISCONNECTING, z.calling.enum.CALL_STATE.ENDED];
-    const isEndingCall = endingCallStates.includes(this.callEt.state());
+    const isEndingCall = endingCallStates.includes(this.callEntity.state());
 
     if (this.peerConnection || !isEndingCall) {
       this.logger.info('State changed - ICE connection', event);
@@ -551,18 +555,18 @@ z.calling.entities.Flow = class Flow {
 
   /**
    * Send an call message through the data channel.
-   * @param {CallMessage} callMessageEt - Call message to be send
+   * @param {CallMessage} callMessageEntity - Call message to be send
    * @returns {undefined} No return value
    */
-  sendMessage(callMessageEt) {
-    const {conversationId, response, type} = callMessageEt;
+  sendMessage(callMessageEntity) {
+    const {conversationId, response, type} = callMessageEntity;
 
     if (this.dataChannel && this.dataChannelOpened) {
       try {
-        this.dataChannel.send(callMessageEt.to_content_string());
+        this.dataChannel.send(callMessageEntity.to_content_string());
         this.logger.info(
           `Sending '${type}' message to conversation '${conversationId}' via data channel`,
-          callMessageEt.toJSON()
+          callMessageEntity.toJSON()
         );
         return;
       } catch (error) {
@@ -665,7 +669,7 @@ z.calling.entities.Flow = class Flow {
   onMessage({data: message}) {
     const callMessage = JSON.parse(message);
     const {resp: response, type} = callMessage;
-    const {conversationEt} = this.callEt;
+    const {conversationEntity} = this.callEntity;
 
     if (response) {
       this.logger.debug(`Received confirmation for '${type}' message via data channel`, callMessage);
@@ -674,7 +678,7 @@ z.calling.entities.Flow = class Flow {
     }
 
     const callEvent = z.conversation.EventBuilder.buildCalling(
-      conversationEt,
+      conversationEntity,
       callMessage,
       this.remoteUserId,
       this.remoteClientId
@@ -702,13 +706,13 @@ z.calling.entities.Flow = class Flow {
    * Save the remote SDP received via an call message within the flow.
    *
    * @note The resolving value indicates whether negotiation should be skipped for the current state.
-   * @param {CallMessage} callMessageEt - Call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.SETUP
+   * @param {CallMessage} callMessageEntity - Call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.SETUP
    * @returns {Promise} Resolves when the remote SDP was saved
    */
-  saveRemoteSdp(callMessageEt) {
+  saveRemoteSdp(callMessageEntity) {
     let skipNegotiation = false;
 
-    return z.calling.SDPMapper.mapCallMessageToObject(callMessageEt)
+    return z.calling.SDPMapper.mapCallMessageToObject(callMessageEntity)
       .then(rtcSdp => z.calling.SDPMapper.rewriteSdp(rtcSdp, z.calling.enum.SDP_SOURCE.REMOTE, this))
       .then(({sdp: remoteSdp}) => {
         const isRemoteOffer = remoteSdp.type === z.calling.rtc.SDP_TYPE.OFFER;
@@ -723,7 +727,7 @@ z.calling.entities.Flow = class Flow {
 
             case z.calling.rtc.SIGNALING_STATE.NEW:
             case z.calling.rtc.SIGNALING_STATE.STABLE: {
-              const isUpdate = callMessageEt.type === z.calling.enum.CALL_MESSAGE_TYPE.UPDATE;
+              const isUpdate = callMessageEntity.type === z.calling.enum.CALL_MESSAGE_TYPE.UPDATE;
 
               if (isUpdate) {
                 this.restartNegotiation(z.calling.enum.SDP_NEGOTIATION_MODE.STREAM_CHANGE, true);
@@ -773,22 +777,22 @@ z.calling.entities.Flow = class Flow {
         this.shouldSendLocalSdp(false);
 
         const response = localSdp.type === z.calling.rtc.SDP_TYPE.ANSWER;
-        let callMessageEt;
+        let callMessageEntity;
 
         const additionalPayload = this.createAdditionalPayload();
-        const sessionId = this.callEt.sessionId;
+        const sessionId = this.callEntity.sessionId;
         const inDefaultMode = this.negotiationMode() === z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT;
         if (inDefaultMode) {
-          if (this.callEt.isGroup) {
-            callMessageEt = z.calling.CallMessageBuilder.buildGroupSetup(response, sessionId, additionalPayload);
+          if (this.callEntity.isGroup) {
+            callMessageEntity = z.calling.CallMessageBuilder.buildGroupSetup(response, sessionId, additionalPayload);
           } else {
-            callMessageEt = z.calling.CallMessageBuilder.buildSetup(response, sessionId, additionalPayload);
+            callMessageEntity = z.calling.CallMessageBuilder.buildSetup(response, sessionId, additionalPayload);
           }
         } else {
-          callMessageEt = z.calling.CallMessageBuilder.buildUpdate(response, sessionId, additionalPayload);
+          callMessageEntity = z.calling.CallMessageBuilder.buildUpdate(response, sessionId, additionalPayload);
         }
 
-        return this.callEt.sendCallMessage(callMessageEt).then(() => {
+        return this.callEntity.sendCallMessage(callMessageEntity).then(() => {
           this.telemetry.timeStep(z.telemetry.calling.CallSetupSteps.LOCAL_SDP_SEND);
           this.logger.debug(`Sending local '${localSdp.type}' SDP successful`, this.localSdp());
         });
@@ -868,9 +872,9 @@ z.calling.entities.Flow = class Flow {
     this.logger.error(`Creating '${sdpType}' failed: ${name} - ${message}`, error);
 
     const attributes = {cause: name, step: 'create_sdp', type: sdpType};
-    this.callEt.telemetry.trackEvent(z.tracking.EventName.CALLING.FAILED_RTC, undefined, attributes);
+    this.callEntity.telemetry.trackEvent(z.tracking.EventName.CALLING.FAILED_RTC, undefined, attributes);
 
-    amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, this.callEt.id, z.calling.enum.TERMINATION_REASON.SDP_FAILED);
+    amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, this.callEntity.id, z.calling.enum.TERMINATION_REASON.SDP_FAILED);
   }
 
   /**
@@ -934,8 +938,8 @@ z.calling.entities.Flow = class Flow {
     const additionalPayload = Object.assign({remoteUser: this.remoteUser, sdp: this.localSdp().sdp}, payload);
 
     return z.calling.CallMessageBuilder.createPayloadPropSync(
-      this.callEt.selfState,
-      this.callEt.selfState.videoSend(),
+      this.callEntity.selfState,
+      this.callEntity.selfState.videoSend(),
       false,
       additionalPayload
     );
@@ -1009,7 +1013,7 @@ z.calling.entities.Flow = class Flow {
     this.logger.error(`Setting ${sdpSource} '${sdpType}' SDP failed: ${name} - ${message}`, error);
 
     const attributes = {cause: name, location: sdpSource, step: 'set_sdp', type: sdpType};
-    this.callEt.telemetry.trackEvent(z.tracking.EventName.CALLING.FAILED_RTC, undefined, attributes);
+    this.callEntity.telemetry.trackEvent(z.tracking.EventName.CALLING.FAILED_RTC, undefined, attributes);
 
     this.removeParticipant(z.calling.enum.TERMINATION_REASON.SDP_FAILED);
   }
@@ -1033,10 +1037,10 @@ z.calling.entities.Flow = class Flow {
    */
   setNegotiationRestartTimeout() {
     this.negotiationTimeout = window.setTimeout(() => {
-      this.callEt.terminationReason = z.calling.enum.TERMINATION_REASON.CONNECTION_DROP;
-      this.participantEt.isConnected(false);
+      this.callEntity.terminationReason = z.calling.enum.TERMINATION_REASON.CONNECTION_DROP;
+      this.participantEntity.isConnected(false);
 
-      this.callEt.interruptedParticipants.push(this.participantEt);
+      this.callEntity.interruptedParticipants.push(this.participantEntity);
       if (this.negotiationMode() === z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT) {
         return this.restartNegotiation(z.calling.enum.SDP_NEGOTIATION_MODE.ICE_RESTART, false);
       }
@@ -1418,7 +1422,7 @@ z.calling.entities.Flow = class Flow {
    * @returns {undefined} No return value
    */
   logStatus() {
-    this.telemetry.logStatus(this.participantEt);
+    this.telemetry.logStatus(this.participantEntity);
   }
 
   /**

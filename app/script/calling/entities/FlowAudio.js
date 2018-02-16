@@ -28,22 +28,22 @@ z.calling.entities.FlowAudio = class FlowAudio {
    * Create a new flow audio.
    *
    * @class z.calling.entities.FlowAudio
-   * @param {z.entities.Flow} flowEt - Flow entity
+   * @param {z.entities.Flow} flowEntity - Flow entity
    * @param {MediaRepository} mediaRepository - Media repository
    */
-  constructor(flowEt, mediaRepository) {
+  constructor(flowEntity, mediaRepository) {
     this.setGainNode = this.setGainNode.bind(this);
 
-    this.flowEt = flowEt;
+    this.flowEntity = flowEntity;
     this.mediaRepository = mediaRepository;
-    this.logger = new z.util.Logger(`z.calling.FlowAudio (${this.flowEt.id})`, z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger(`z.calling.FlowAudio (${this.flowEntity.id})`, z.config.LOGGER.OPTIONS);
 
     this.audioContext = undefined;
 
     // Panning
-    this.panning = this.flowEt.participantEt.panning;
+    this.panning = this.flowEntity.participantEntity.panning;
     this.panning.subscribe(updatedPanningValue => {
-      this.logger.debug(`Panning of ${this.flowEt.remoteUser.name()} changed to '${updatedPanningValue}'`);
+      this.logger.debug(`Panning of ${this.flowEntity.remoteUser.name()} changed to '${updatedPanningValue}'`);
       this.setPan(updatedPanningValue);
     });
 
