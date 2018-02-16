@@ -92,7 +92,7 @@ z.calling.CallingRepository = class CallingRepository {
     this.selfState = this.mediaStreamHandler.self_stream_state;
 
     this.calls = ko.observableArray([]);
-    this.joinedCall = ko.pureComputed(() => {
+    this.joined_call = ko.pureComputed(() => {
       for (const callEntity of this.calls()) {
         if (callEntity.selfClientJoined()) {
           return callEntity;
@@ -112,7 +112,7 @@ z.calling.CallingRepository = class CallingRepository {
    */
   shareCallStates() {
     this.mediaRepository.stream_handler.calls = this.calls;
-    this.mediaRepository.stream_handler.joined_call = this.joinedCall;
+    this.mediaRepository.stream_handler.joined_call = this.joined_call;
   }
 
   /**
