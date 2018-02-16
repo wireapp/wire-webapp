@@ -4,7 +4,7 @@ const webpack = require('webpack');
 module.exports = {
   devtool: 'source-map',
   entry: {
-    filename: `${__dirname}/dist/commonjs/index.js`,
+    filename: `${__dirname}/${pkg.main}`,
   },
   externals: {
     dexie: 'Dexie',

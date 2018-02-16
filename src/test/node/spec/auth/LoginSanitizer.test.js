@@ -17,7 +17,7 @@
  *
  */
 
-const {auth} = require('@wireapp/core');
+const auth = require('../../../../../dist/auth/root');
 
 describe('LoginSanitizer', () => {
   describe('"removeNonPrintableCharacters"', () => {
