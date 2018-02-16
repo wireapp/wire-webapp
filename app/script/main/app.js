@@ -214,7 +214,7 @@ z.main.App = class App {
 
     view_models.main = new z.ViewModel.MainViewModel('wire-main', this.repository.user);
     view_models.content = new z.ViewModel.content.ContentViewModel(
-      'right',
+      'center-column',
       this.repository.calling,
       this.repository.client,
       this.repository.conversation,
@@ -225,7 +225,7 @@ z.main.App = class App {
       this.repository.team
     );
     view_models.list = new z.ViewModel.list.ListViewModel(
-      'left',
+      'left-column',
       view_models.content,
       this.repository.calling,
       this.repository.connect,

@@ -5,7 +5,7 @@
      data-uie-value="is-loading">
   <!-- ko stopBinding: true -->
     <div id="app" class="app">
-      <div id="left" class="left">
+      <div id="left-column" class="left-column">
         #include('list/background.htm')
         <!-- ko if: webapp_loaded -->
           <!-- ko ifnot: list_modal() -->
@@ -19,7 +19,7 @@
           <!-- /ko -->
         <!-- /ko -->
       </div>
-      <div id="right" class="right">
+      <div id="center-column" class="center-column">
         <!-- ko if: content_state() === z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS -->
           #include('content/connect-requests.htm')
         <!-- /ko -->
@@ -55,6 +55,7 @@
         <!-- /ko -->
         #include('modal/group-creation.htm')
       </div>
+      <div id="right-column"></div>
     </div>
     #include('detail-view.htm')
     #include('video-calling.htm')
