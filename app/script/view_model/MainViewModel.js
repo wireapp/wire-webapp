@@ -103,21 +103,12 @@ z.ViewModel.MainViewModel = class MainViewModel {
         return;
       }
       const step = smoothStep(currTime / duration);
-      leftColumn.style.transform = `scale(${lerp(scaleLeft0, 1, step)}, 1) translateX(${lerp(
-        transLeft0,
-        trans1,
-        step
-      )}px)`;
-      centerColumn.style.transform = `scale(${lerp(scaleCenter0, 1, step)}, 1) translateX(${lerp(
-        transCenter0,
-        trans1,
-        step
-      )}px)`;
-      rightColumn.style.transform = `scale(${lerp(scaleRight0, 1, step)}, 1) translateX(${lerp(
-        transRight0,
-        trans1,
-        step
-      )}px)`;
+      leftColumn.style.transform = `scale(${lerp(scaleLeft0, 1, step)}, 1)
+      translateX(${lerp(transLeft0, trans1, step)}px)`;
+      centerColumn.style.transform = `scale(${lerp(scaleCenter0, 1, step)}, 1)
+      translateX(${lerp(transCenter0, trans1, step)}px)`;
+      rightColumn.style.transform = `scale(${lerp(scaleRight0, 1, step)}, 1)
+      translateX(${lerp(transRight0, trans1, step)}px)`;
     }
     animate();
   }
