@@ -133,7 +133,7 @@ class Login extends React.PureComponent {
               <div>
                 <H1 center>{_(loginStrings.headline)}</H1>
                 <Text>{_(loginStrings.subhead)}</Text>
-                <Form style={{marginTop: 30}}>
+                <Form style={{marginTop: 30}} data-uie-name="login">
                   <InputBlock>
                     <Input
                       name="email"
