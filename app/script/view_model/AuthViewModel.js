@@ -1801,7 +1801,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
       .create_cryptobox(this.storageService.db)
       .then(() => this.client_repository.registerClient(auto_login ? undefined : this.password()))
       .then(client_observable => {
-        this.event_repository.current_client = client_observable;
+        this.event_repository.currentClient = client_observable;
         return this.event_repository.initializeStreamState(client_observable().id);
       })
       .catch(error => {
