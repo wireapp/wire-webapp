@@ -29,12 +29,16 @@ z.client.ClientEntity = class ClientEntity {
     };
   }
 
-  constructor(payload = {}) {
+  constructor(isSelfClient = false) {
     this.class = ClientEntity.CONFIG.DEFAULT_VALUE;
+    this.id = '';
 
-    if (payload.address) {
+    if (isSelfClient) {
       this.label = ClientEntity.CONFIG.DEFAULT_VALUE;
+      this.location = {};
       this.model = ClientEntity.CONFIG.DEFAULT_VALUE;
+      this.time = '';
+      this.type = z.client.ClientType.TEMPORARY;
     }
 
     for (const property in payload) {
