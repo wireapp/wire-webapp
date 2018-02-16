@@ -2749,7 +2749,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   _on1to1Creation(conversationEntity, eventJson) {
     return Promise.resolve()
-      .then(() => this.event_mapper.map_json_event(eventJson, conversationEntity))
+      .then(() => this.eventMapper.map_json_event(eventJson, conversationEntity))
       .then(messageEntity => this._updateMessageUserEntities(messageEntity))
       .then(messageEntity => {
         if (conversationEntity && messageEntity) {
@@ -2863,7 +2863,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           conversationEntity.hasCreationMessage = true;
           const creationEvent = z.conversation.EventBuilder.buildGroupCreation(conversationEntity, initialTimestamp);
           amplify.publish(z.event.WebApp.EVENT.INJECT, creationEvent, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
-          this.verification_state_handler.onConversationCreate(conversationEntity);
+          this.verificationStateHandler.onConversationCreate(conversationEntity);
           return {conversationEntity};
         }
       })
@@ -2877,7 +2877,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   _onGroupCreation(conversationEntity, eventJson) {
     return Promise.resolve()
-      .then(() => this.event_mapper.map_json_event(eventJson, conversationEntity))
+      .then(() => this.eventMapper.map_json_event(eventJson, conversationEntity))
       .then(messageEntity => {
         const creatorId = conversationEntity.creator;
         const createdByParticipant = !!conversationEntity.participating_user_ids().find(userId => userId === creatorId);
@@ -2934,7 +2934,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return this.update_participating_user_ets(conversationEntity)
       .then(() => this._add_event_to_conversation(eventJson, conversationEntity))
       .then(messageEntity => {
-        this.verification_state_handler.onMemberJoined(conversationEntity, eventData.user_ids);
+        this.verificationStateHandler.onMemberJoined(conversationEntity, eventData.user_ids);
         return {conversationEntity, messageEntity};
       });
   }
@@ -2982,7 +2982,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           return this.update_participating_user_ets(conversationEntity).then(() => messageEntity);
         })
         .then(messageEntity => {
-          this.verification_state_handler.onMemberLeft(conversationEntity);
+          this.verificationStateHandler.onMemberLeft(conversationEntity);
 
           if (isFromSelf && conversationEntity.removed_from_conversation()) {
             this.archive_conversation(conversationEntity);
@@ -3310,7 +3310,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   _add_events_to_conversation(events, conversationEntity, prepend = true) {
     return Promise.resolve()
       .then(() => {
-        const message_ets = this.event_mapper.map_json_events(events, conversationEntity, true);
+        const message_ets = this.eventMapper.map_json_events(events, conversationEntity, true);
         return Promise.all(message_ets.map(message_et => this._updateMessageUserEntities(message_et)));
       })
       .then(message_ets => {

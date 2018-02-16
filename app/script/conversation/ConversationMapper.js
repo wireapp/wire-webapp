@@ -36,7 +36,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
    * @param {number} [timestamp=1] - Initial timestamp for conversation
    * @returns {Array<Conversation>} Mapped conversation entities
    */
-  mapConversations(conversations = [undefined], timestamp = 1) {
+  map_conversations(conversations = [undefined], timestamp = 1) {
     return conversations.map((conversation, index) => this._createConversationEntity(conversation, timestamp + index));
   }
 
@@ -75,7 +75,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
    * @param {Object} selfState - Conversation self data
    * @returns {Conversation} Updated conversation entity
    */
-  updateSelfStatus(conversationEntity, selfState) {
+  update_self_status(conversationEntity, selfState) {
     if (conversationEntity) {
       // Database states
       const {
@@ -168,7 +168,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
     conversationEntity.name(name ? name : '');
 
     const selfState = members ? members.self : conversationData;
-    conversationEntity = this.updateSelfStatus(conversationEntity, selfState);
+    conversationEntity = this.update_self_status(conversationEntity, selfState);
 
     if (!conversationEntity.last_event_timestamp() && initialTimestamp) {
       conversationEntity.last_event_timestamp(initialTimestamp);
