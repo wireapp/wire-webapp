@@ -23,8 +23,8 @@ window.z = window.z || {};
 window.z.conversation = z.conversation || {};
 
 z.conversation.ConversationVerificationStateHandler = class ConversationVerificationStateHandler {
-  constructor(conversation_repository) {
-    this.conversation_repository = conversation_repository;
+  constructor(conversationRepository) {
+    this.conversation_repository = conversationRepository;
     this.time_offset = this.conversation_repository.time_offset;
     this.logger = new z.util.Logger('z.conversation.ConversationVerificationStateHandler', z.config.LOGGER.OPTIONS);
 
@@ -36,21 +36,21 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
 
   /**
    * Handle client verification state change.
-   * @param {string} user_id - Self user ID
+   * @param {string} userId - Self user ID
    * @returns {undefined} No return value
    */
-  on_client_verification_changed(user_id) {
-    this._get_active_conversations().forEach(conversation_et => {
-      if (this._will_change_to_degraded(conversation_et)) {
+  on_client_verification_changed(userId) {
+    this._get_active_conversations().forEach(conversationEntity => {
+      if (this._will_change_to_degraded(conversationEntity)) {
         const degraded_event = z.conversation.EventBuilder.build_degraded(
-          conversation_et,
-          [user_id],
+          conversationEntity,
+          [userId],
           z.message.VerificationMessageType.UNVERIFIED,
           this.time_offset
         );
         amplify.publish(z.event.WebApp.EVENT.INJECT, degraded_event);
-      } else if (this._will_change_to_verified(conversation_et)) {
-        const all_verified_event = z.conversation.EventBuilder.build_all_verified(conversation_et, this.time_offset);
+      } else if (this._will_change_to_verified(conversationEntity)) {
+        const all_verified_event = z.conversation.EventBuilder.build_all_verified(conversationEntity, this.time_offset);
         amplify.publish(z.event.WebApp.EVENT.INJECT, all_verified_event);
       }
     });
@@ -58,25 +58,25 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
 
   /**
    * Self user added a client or other participants added clients.
-   * @param {string|Array<string>} user_ids - Can include self user ID
+   * @param {string|Array<string>} userIds - Can include self user ID
    * @returns {undefined} No return value
    */
-  on_client_add(user_ids) {
-    if (_.isString(user_ids)) {
-      user_ids = [user_ids];
+  on_client_add(userIds) {
+    if (_.isString(userIds)) {
+      userIds = [userIds];
     }
 
-    this._get_active_conversations().forEach(conversation_et => {
-      if (this._will_change_to_degraded(conversation_et)) {
-        const user_ids_in_conversation = _.intersection(
-          user_ids,
-          conversation_et.participating_user_ids().concat(conversation_et.self.id)
+    this._get_active_conversations().forEach(conversationEntity => {
+      if (this._will_change_to_degraded(conversationEntity)) {
+        const userIdsInConversation = _.intersection(
+          userIds,
+          conversationEntity.participating_user_ids().concat(conversationEntity.self.id)
         );
 
-        if (user_ids_in_conversation.length) {
+        if (userIdsInConversation.length) {
           const degraded_event = z.conversation.EventBuilder.build_degraded(
-            conversation_et,
-            user_ids,
+            conversationEntity,
+            userIds,
             z.message.VerificationMessageType.NEW_DEVICE,
             this.time_offset
           );
@@ -91,9 +91,9 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
    * @returns {undefined} No return value
    */
   on_client_removed() {
-    this._get_active_conversations().forEach(conversation_et => {
-      if (this._will_change_to_verified(conversation_et)) {
-        const all_verified_event = z.conversation.EventBuilder.build_all_verified(conversation_et, this.time_offset);
+    this._get_active_conversations().forEach(conversationEntity => {
+      if (this._will_change_to_verified(conversationEntity)) {
+        const all_verified_event = z.conversation.EventBuilder.build_all_verified(conversationEntity, this.time_offset);
         amplify.publish(z.event.WebApp.EVENT.INJECT, all_verified_event);
       }
     });
@@ -101,21 +101,21 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
 
   /**
    * Clients of a user were updated.
-   * @param {string} user_id - User ID
+   * @param {string} userId - User ID
    * @returns {undefined} No return value
    */
-  on_clients_updated(user_id) {
-    this._get_active_conversations().forEach(conversation_et => {
-      if (this._will_change_to_degraded(conversation_et)) {
+  on_clients_updated(userId) {
+    this._get_active_conversations().forEach(conversationEntity => {
+      if (this._will_change_to_degraded(conversationEntity)) {
         const degraded_event = z.conversation.EventBuilder.build_degraded(
-          conversation_et,
-          [user_id],
+          conversationEntity,
+          [userId],
           z.message.VerificationMessageType.NEW_DEVICE,
           this.time_offset
         );
         amplify.publish(z.event.WebApp.EVENT.INJECT, degraded_event);
-      } else if (this._will_change_to_verified(conversation_et)) {
-        const all_verified_event = z.conversation.EventBuilder.build_all_verified(conversation_et, this.time_offset);
+      } else if (this._will_change_to_verified(conversationEntity)) {
+        const all_verified_event = z.conversation.EventBuilder.build_all_verified(conversationEntity, this.time_offset);
         amplify.publish(z.event.WebApp.EVENT.INJECT, all_verified_event);
       }
     });
@@ -123,19 +123,19 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
 
   /**
    * New member(s) joined the conversation
-   * @param {z.entity.Conversation} conversation_et - Changed conversation entity
-   * @param {string|Array<string>} user_ids - IDs of added members
+   * @param {z.entity.Conversation} conversationEntity - Changed conversation entity
+   * @param {string|Array<string>} userIds - IDs of added members
    * @returns {undefined} No return value
    */
-  on_member_joined(conversation_et, user_ids) {
-    if (_.isString(user_ids)) {
-      user_ids = [user_ids];
+  on_member_joined(conversationEntity, userIds) {
+    if (_.isString(userIds)) {
+      userIds = [userIds];
     }
 
-    if (this._will_change_to_degraded(conversation_et)) {
+    if (this._will_change_to_degraded(conversationEntity)) {
       const degraded_event = z.conversation.EventBuilder.build_degraded(
-        conversation_et,
-        user_ids,
+        conversationEntity,
+        userIds,
         z.message.VerificationMessageType.NEW_MEMBER,
         this.time_offset
       );
@@ -145,12 +145,12 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
 
   /**
    * Member(s) left the conversation
-   * @param {z.entity.Conversation} conversation_et - Changed conversation entity
+   * @param {z.entity.Conversation} conversationEntity - Changed conversation entity
    * @returns {undefined} No return value
    */
-  on_member_left(conversation_et) {
-    if (this._will_change_to_verified(conversation_et)) {
-      const all_verified_event = z.conversation.EventBuilder.build_all_verified(conversation_et, this.time_offset);
+  on_member_left(conversationEntity) {
+    if (this._will_change_to_verified(conversationEntity)) {
+      const all_verified_event = z.conversation.EventBuilder.build_all_verified(conversationEntity, this.time_offset);
       amplify.publish(z.event.WebApp.EVENT.INJECT, all_verified_event);
     }
   }
@@ -162,23 +162,23 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
   _get_active_conversations() {
     return this.conversation_repository
       .filtered_conversations()
-      .filter(conversation_et => !conversation_et.removed_from_conversation());
+      .filter(conversationEntity => !conversationEntity.removed_from_conversation());
   }
 
   /**
    * Check whether to degrade conversation and set corresponding state
-   * @param {z.entity.Conversation} conversation_et - Conversation entity to evaluate
+   * @param {z.entity.Conversation} conversationEntity - Conversation entity to evaluate
    * @returns {boolean} Conversation changing to degraded
    */
-  _will_change_to_degraded(conversation_et) {
-    const state = conversation_et.verification_state();
+  _will_change_to_degraded(conversationEntity) {
+    const state = conversationEntity.verification_state();
 
     if (state === z.conversation.ConversationVerificationState.DEGRADED) {
       return false;
     }
 
-    if (state === z.conversation.ConversationVerificationState.VERIFIED && !conversation_et.is_verified()) {
-      conversation_et.verification_state(z.conversation.ConversationVerificationState.DEGRADED);
+    if (state === z.conversation.ConversationVerificationState.VERIFIED && !conversationEntity.is_verified()) {
+      conversationEntity.verification_state(z.conversation.ConversationVerificationState.DEGRADED);
       return true;
     }
 
@@ -187,16 +187,16 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
 
   /**
    * Check whether to verify conversation and set corresponding state
-   * @param {z.entity.Conversation} conversation_et - Conversation entity to evaluate
+   * @param {z.entity.Conversation} conversationEntity - Conversation entity to evaluate
    * @returns {boolean} Conversation changing to verified
    */
-  _will_change_to_verified(conversation_et) {
-    if (conversation_et.verification_state() === z.conversation.ConversationVerificationState.VERIFIED) {
+  _will_change_to_verified(conversationEntity) {
+    if (conversationEntity.verification_state() === z.conversation.ConversationVerificationState.VERIFIED) {
       return false;
     }
 
-    if (conversation_et.is_verified()) {
-      conversation_et.verification_state(z.conversation.ConversationVerificationState.VERIFIED);
+    if (conversationEntity.is_verified()) {
+      conversationEntity.verification_state(z.conversation.ConversationVerificationState.VERIFIED);
       return true;
     }
 

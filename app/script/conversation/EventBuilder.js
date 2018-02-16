@@ -23,8 +23,8 @@ window.z = window.z || {};
 window.z.conversation = z.conversation || {};
 
 z.conversation.EventBuilder = (function() {
-  const _build_all_verified = (conversation_et, time_offset) => {
-    const {self, id} = conversation_et;
+  const _build_all_verified = (conversationEntity, timeOffset) => {
+    const {self, id} = conversationEntity;
 
     return {
       conversation: id,
@@ -33,70 +33,70 @@ z.conversation.EventBuilder = (function() {
       },
       from: self.id,
       id: z.util.create_random_uuid(),
-      time: conversation_et.get_next_iso_date(time_offset),
+      time: conversationEntity.get_next_iso_date(timeOffset),
       type: z.event.Client.CONVERSATION.VERIFICATION,
     };
   };
 
-  const _build_asset_add = (conversation_et, data, time_offset) => {
-    const {self, id} = conversation_et;
+  const _build_asset_add = (conversationEntity, data, timeOffset) => {
+    const {self, id} = conversationEntity;
 
     return {
       conversation: id,
       data: data,
       from: self.id,
       status: z.message.StatusType.SENDING,
-      time: conversation_et.get_next_iso_date(time_offset),
+      time: conversationEntity.get_next_iso_date(timeOffset),
       type: z.event.Client.CONVERSATION.ASSET_ADD,
     };
   };
 
-  const _build_calling = (conversation_et, e_call_message, user_id, client_id) => {
+  const _build_calling = (conversationEntity, eCallMessage, userId, clientId) => {
     return {
-      content: e_call_message,
-      conversation: conversation_et.id,
-      from: user_id,
-      sender: client_id,
+      content: eCallMessage,
+      conversation: conversationEntity.id,
+      from: userId,
+      sender: clientId,
       type: z.event.Client.CALL.E_CALL,
     };
   };
 
-  const _build_degraded = (conversation_et, user_ids, type, time_offset) => {
-    const {self, id} = conversation_et;
+  const _build_degraded = (conversationEntity, userIds, type, timeOffset) => {
+    const {self, id} = conversationEntity;
 
     return {
       conversation: id,
       data: {
         type: type,
-        user_ids: user_ids,
+        user_ids: userIds,
       },
       from: self.id,
       id: z.util.create_random_uuid(),
-      time: conversation_et.get_next_iso_date(time_offset),
+      time: conversationEntity.get_next_iso_date(timeOffset),
       type: z.event.Client.CONVERSATION.VERIFICATION,
     };
   };
 
-  const _build_delete = (conversation_id, message_id, time, deleted_message_et) => {
+  const _build_delete = (conversationId, messageId, time, deletedMessageEntity) => {
     return {
-      conversation: conversation_id,
+      conversation: conversationId,
       data: {
         deleted_time: time,
       },
-      from: deleted_message_et.from,
-      id: message_id,
-      time: new Date(deleted_message_et.timestamp()).toISOString(),
+      from: deletedMessageEntity.from,
+      id: messageId,
+      time: new Date(deletedMessageEntity.timestamp()).toISOString(),
       type: z.event.Client.CONVERSATION.DELETE_EVERYWHERE,
     };
   };
 
-  const _build_incoming_message_too_big = (event, message_error, error_code) => {
-    const {conversation: conversation_id, data: event_data, from, time} = event;
+  const _build_incoming_message_too_big = (event, messageError, errorCode) => {
+    const {conversation: conversationId, data: event_data, from, time} = event;
 
     return {
-      conversation: conversation_id,
-      error: `${message_error.message} (${event_data.sender})`,
-      error_code: `${error_code} (${event_data.sender})`,
+      conversation: conversationId,
+      error: `${messageError.message} (${event_data.sender})`,
+      error_code: `${errorCode} (${event_data.sender})`,
       from: from,
       id: z.util.create_random_uuid(),
       time: time,
@@ -118,52 +118,52 @@ z.conversation.EventBuilder = (function() {
     };
   };
 
-  const _build_message_add = (conversation_et, time_offset) => {
-    const {self, id} = conversation_et;
+  const _build_message_add = (conversationEntity, timeOffset) => {
+    const {self, id} = conversationEntity;
 
     return {
       conversation: id,
       data: {},
       from: self.id,
       status: z.message.StatusType.SENDING,
-      time: conversation_et.get_next_iso_date(time_offset),
+      time: conversationEntity.get_next_iso_date(timeOffset),
       type: z.event.Client.CONVERSATION.MESSAGE_ADD,
     };
   };
 
-  const _build_missed = (conversation_et, time_offset) => {
-    const {id, self} = conversation_et;
+  const _build_missed = (conversationEntity, timeOffset) => {
+    const {id, self} = conversationEntity;
 
     return {
       conversation: id,
       from: self.id,
       id: z.util.create_random_uuid(),
-      time: conversation_et.get_next_iso_date(time_offset),
+      time: conversationEntity.get_next_iso_date(timeOffset),
       type: z.event.Client.CONVERSATION.MISSED_MESSAGES,
     };
   };
 
-  const _build_team_member_leave = (conversation_et, user_et, iso_date) => {
+  const _build_team_member_leave = (conversationEntity, userEntity, isoDate) => {
     return {
-      conversation: conversation_et.id,
+      conversation: conversationEntity.id,
       data: {
-        name: user_et.name(),
-        user_ids: [user_et.id],
+        name: userEntity.name(),
+        user_ids: [userEntity.id],
       },
-      from: user_et.id,
+      from: userEntity.id,
       id: z.util.create_random_uuid(),
-      time: iso_date,
+      time: isoDate,
       type: z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE,
     };
   };
 
-  const _build_unable_to_decrypt = (event, decrypt_error, error_code) => {
-    const {conversation: conversation_id, data: event_data, from, time} = event;
+  const _build_unable_to_decrypt = (event, decryptError, errorCode) => {
+    const {conversation: conversationId, data: event_data, from, time} = event;
 
     return {
-      conversation: conversation_id,
-      error: `${decrypt_error.message} (${event_data.sender})`,
-      error_code: `${error_code} (${event_data.sender})`,
+      conversation: conversationId,
+      error: `${decryptError.message} (${event_data.sender})`,
+      error_code: `${errorCode} (${event_data.sender})`,
       from: from,
       id: z.util.create_random_uuid(),
       time: time,
@@ -171,11 +171,11 @@ z.conversation.EventBuilder = (function() {
     };
   };
 
-  const _build_voice_channel_activate = call_message_et => {
-    const {conversation_id, user_id, time} = call_message_et;
+  const _build_voice_channel_activate = callMessageEntity => {
+    const {conversationId, user_id, time} = callMessageEntity;
 
     return {
-      conversation: conversation_id,
+      conversation: conversationId,
       from: user_id,
       id: z.util.create_random_uuid(),
       protocol_version: z.calling.CallingRepository.CONFIG.PROTOCOL_VERSION,
@@ -185,14 +185,14 @@ z.conversation.EventBuilder = (function() {
   };
 
   const _build_voice_channel_deactivate = (
-    call_message_et,
+    callMessageEntity,
     reason = z.calling.enum.TERMINATION_REASON.COMPLETED,
-    time_offset = 0
+    timeOffset = 0
   ) => {
-    const {conversation_id, user_id, time = new Date(Date.now() - time_offset).toISOString()} = call_message_et;
+    const {conversationId, user_id, time = new Date(Date.now() - timeOffset).toISOString()} = callMessageEntity;
 
     return {
-      conversation: conversation_id,
+      conversation: conversationId,
       data: {
         reason: reason,
       },

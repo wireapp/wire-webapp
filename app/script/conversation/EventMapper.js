@@ -36,15 +36,15 @@ z.conversation.EventMapper = class EventMapper {
    * Convert multiple JSON events into message entities.
    *
    * @param {Object} events - Event data
-   * @param {Conversation} conversation_et - Conversation entity the events belong to
-   * @param {boolean} should_create_dummy_image - Create a dummy image
+   * @param {Conversation} conversationEt - Conversation entity the events belong to
+   * @param {boolean} shouldCreateDummyImage - Create a dummy image
    * @returns {Array<Message>} Mapped message entities
    */
-  map_json_events(events, conversation_et, should_create_dummy_image) {
+  map_json_events(events, conversationEt, shouldCreateDummyImage) {
     return events
       .reverse()
       .filter(event => event)
-      .map(event => this.map_json_event(event, conversation_et, should_create_dummy_image))
+      .map(event => this.map_json_event(event, conversationEt, shouldCreateDummyImage))
       .filter(message_et => message_et);
   }
 
@@ -52,13 +52,13 @@ z.conversation.EventMapper = class EventMapper {
    * Convert JSON event into a message entity.
    *
    * @param {Object} event - Event data
-   * @param {Conversation} conversation_et - Conversation entity the event belong to
-   * @param {boolean} should_create_dummy_image - Create a dummy image
+   * @param {Conversation} conversationEt - Conversation entity the event belong to
+   * @param {boolean} shouldCreateDummyImage - Create a dummy image
    * @returns {Message} Mapped message entity
    */
-  map_json_event(event, conversation_et, should_create_dummy_image) {
+  map_json_event(event, conversationEt, shouldCreateDummyImage) {
     try {
-      return this._map_json_event(event, conversation_et, should_create_dummy_image);
+      return this._map_json_event(event, conversationEt, shouldCreateDummyImage);
     } catch (error) {
       this.logger.error(`Failed to map event of type '${event.type}': ${error.message}`, {error, event});
       return undefined;
@@ -69,89 +69,89 @@ z.conversation.EventMapper = class EventMapper {
    * Convert JSON event into a message entity.
    *
    * @param {Object} event - Event data
-   * @param {Conversation} conversation_et - Conversation entity the event belong to
-   * @param {boolean} should_create_dummy_image - Create a dummy image
+   * @param {Conversation} conversationEt - Conversation entity the event belong to
+   * @param {boolean} shouldCreateDummyImage - Create a dummy image
    * @returns {Message} Mapped message entity
    */
-  _map_json_event(event, conversation_et, should_create_dummy_image) {
-    let message_et;
+  _map_json_event(event, conversationEt, shouldCreateDummyImage) {
+    let messageEntity;
 
     switch (event.type) {
       case z.event.Backend.CONVERSATION.MEMBER_JOIN:
-        message_et = this._map_event_member_join(event, conversation_et);
+        messageEntity = this._map_event_member_join(event, conversationEt);
         break;
       case z.event.Backend.CONVERSATION.MEMBER_LEAVE:
-        message_et = this._map_event_member_leave(event);
+        messageEntity = this._map_event_member_leave(event);
         break;
       case z.event.Backend.CONVERSATION.RENAME:
-        message_et = this._map_event_rename(event);
+        messageEntity = this._map_event_rename(event);
         break;
       case z.event.Client.CONVERSATION.ASSET_ADD:
-        message_et = this._map_event_asset_add(event, should_create_dummy_image);
+        messageEntity = this._map_event_asset_add(event, shouldCreateDummyImage);
         break;
       case z.event.Client.CONVERSATION.DELETE_EVERYWHERE:
-        message_et = this._map_event_delete_everywhere(event);
+        messageEntity = this._map_event_delete_everywhere(event);
         break;
       case z.event.Client.CONVERSATION.KNOCK:
-        message_et = this._map_event_ping(event);
+        messageEntity = this._map_event_ping(event);
         break;
       case z.event.Client.CONVERSATION.LOCATION:
-        message_et = this._map_event_location(event);
+        messageEntity = this._map_event_location(event);
         break;
       case z.event.Client.CONVERSATION.MESSAGE_ADD:
-        message_et = this._map_event_message_add(event);
+        messageEntity = this._map_event_message_add(event);
         break;
       case z.event.Client.CONVERSATION.MISSED_MESSAGES:
-        message_et = this._map_event_missed_messages();
+        messageEntity = this._map_event_missed_messages();
         break;
       case z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE:
-        message_et = this._map_event_team_member_leave(event);
+        messageEntity = this._map_event_team_member_leave(event);
         break;
       case z.event.Client.CONVERSATION.UNABLE_TO_DECRYPT:
       case z.event.Client.CONVERSATION.INCOMING_MESSAGE_TOO_BIG:
-        message_et = this._map_event_unable_to_decrypt(event);
+        messageEntity = this._map_event_unable_to_decrypt(event);
         break;
       case z.event.Client.CONVERSATION.VERIFICATION:
-        message_et = this._map_event_verification(event);
+        messageEntity = this._map_event_verification(event);
         break;
       case z.event.Client.CONVERSATION.VOICE_CHANNEL_ACTIVATE:
-        message_et = this._map_event_voice_channel_activate();
+        messageEntity = this._map_event_voice_channel_activate();
         break;
       case z.event.Client.CONVERSATION.VOICE_CHANNEL_DEACTIVATE:
-        message_et = this._map_event_voice_channel_deactivate(event);
+        messageEntity = this._map_event_voice_channel_deactivate(event);
         break;
       default:
         this.logger.warn(`Ignored unhandled event '${event.id}' of type '${event.type}'`);
-        return message_et;
+        return messageEntity;
     }
 
-    message_et.category = event.category;
-    message_et.conversation_id = conversation_et.id;
-    message_et.from = event.from;
-    message_et.id = event.id;
-    message_et.primary_key = event.primary_key;
-    message_et.timestamp(new Date(event.time).getTime());
-    message_et.type = event.type;
-    message_et.version = event.version || 1;
+    messageEntity.category = event.category;
+    messageEntity.conversation_id = conversationEt.id;
+    messageEntity.from = event.from;
+    messageEntity.id = event.id;
+    messageEntity.primary_key = event.primary_key;
+    messageEntity.timestamp(new Date(event.time).getTime());
+    messageEntity.type = event.type;
+    messageEntity.version = event.version || 1;
 
-    if (message_et.is_reactable()) {
-      message_et.reactions(event.reactions || {});
+    if (messageEntity.is_reactable()) {
+      messageEntity.reactions(event.reactions || {});
       if (event.status) {
-        message_et.status(event.status);
+        messageEntity.status(event.status);
       }
     }
 
     if (event.ephemeral_expires) {
-      message_et.ephemeral_expires(event.ephemeral_expires);
-      message_et.ephemeral_started(event.ephemeral_started || '0');
+      messageEntity.ephemeral_expires(event.ephemeral_expires);
+      messageEntity.ephemeral_started(event.ephemeral_started || '0');
     }
 
-    if (window.isNaN(message_et.timestamp())) {
-      this.logger.warn(`Could not get timestamp for message '${message_et.id}'. Skipping it.`, event);
-      message_et = undefined;
+    if (window.isNaN(messageEntity.timestamp())) {
+      this.logger.warn(`Could not get timestamp for message '${messageEntity.id}'. Skipping it.`, event);
+      messageEntity = undefined;
     }
 
-    return message_et;
+    return messageEntity;
   }
 
   //##############################################################################
@@ -163,21 +163,21 @@ z.conversation.EventMapper = class EventMapper {
    *
    * @private
    * @param {Object} event - Message data
-   * @param {boolean} should_create_dummy_image - Create a dummy image
+   * @param {boolean} shouldCreateDummyImage - Create a dummy image
    * @returns {ContentMessage} Content message entity
    */
-  _map_event_asset_add(event, should_create_dummy_image) {
+  _map_event_asset_add(event, shouldCreateDummyImage) {
     const event_data = event.data;
-    const message_et = new z.entity.ContentMessage();
+    const messageEntity = new z.entity.ContentMessage();
 
     if (event_data.info.tag === 'medium') {
-      message_et.assets.push(this._map_asset_image(event, should_create_dummy_image));
+      messageEntity.assets.push(this._map_asset_image(event, shouldCreateDummyImage));
     } else {
-      message_et.assets.push(this._map_asset_file(event));
+      messageEntity.assets.push(this._map_asset_file(event));
     }
 
-    message_et.nonce = event_data.info.nonce;
-    return message_et;
+    messageEntity.nonce = event_data.info.nonce;
+    return messageEntity;
   }
 
   /**
@@ -188,9 +188,9 @@ z.conversation.EventMapper = class EventMapper {
    * @returns {DeleteMessage} Delete message entity
    */
   _map_event_delete_everywhere({data: event_data}) {
-    const message_et = new z.entity.DeleteMessage();
-    message_et.deleted_timestamp = new Date(event_data.deleted_time).getTime();
-    return message_et;
+    const messageEntity = new z.entity.DeleteMessage();
+    messageEntity.deleted_timestamp = new Date(event_data.deleted_time).getTime();
+    return messageEntity;
   }
 
   /**
@@ -202,18 +202,18 @@ z.conversation.EventMapper = class EventMapper {
    */
   _map_event_location({data: event_data}) {
     const {location, nonce} = event_data;
-    const message_et = new z.entity.ContentMessage();
-    const asset_et = new z.entity.Location();
+    const messageEntity = new z.entity.ContentMessage();
+    const assetEntity = new z.entity.Location();
 
-    asset_et.longitude = location.longitude;
-    asset_et.latitude = location.latitude;
-    asset_et.name = location.name;
-    asset_et.zoom = location.zoom;
+    assetEntity.longitude = location.longitude;
+    assetEntity.latitude = location.latitude;
+    assetEntity.name = location.name;
+    assetEntity.zoom = location.zoom;
 
-    message_et.assets.push(asset_et);
-    message_et.nonce = nonce;
+    messageEntity.assets.push(assetEntity);
+    messageEntity.nonce = nonce;
 
-    return message_et;
+    return messageEntity;
   }
 
   /**
@@ -221,36 +221,34 @@ z.conversation.EventMapper = class EventMapper {
    *
    * @private
    * @param {Object} event - Message data
-   * @param {z.entity.Conversation} conversation_et - Conversation entity the event belong to
+   * @param {z.entity.Conversation} conversationEt - Conversation entity the event belong to
    * @returns {MemberMessage} Member message entity
    */
-  _map_event_member_join(event, conversation_et) {
+  _map_event_member_join(event, conversationEt) {
     const {data: event_data, from} = event;
-    const message_et = new z.entity.MemberMessage();
+    const messageEntity = new z.entity.MemberMessage();
 
     if (
-      [z.conversation.ConversationType.CONNECT, z.conversation.ConversationType.ONE2ONE].includes(
-        conversation_et.type()
-      )
+      [z.conversation.ConversationType.CONNECT, z.conversation.ConversationType.ONE2ONE].includes(conversationEt.type())
     ) {
-      if (from === conversation_et.creator && event_data.user_ids.length === 1) {
-        message_et.member_message_type = z.message.SystemMessageType.CONNECTION_ACCEPTED;
-        event_data.user_ids = conversation_et.participating_user_ids();
+      if (from === conversationEt.creator && event_data.user_ids.length === 1) {
+        messageEntity.member_message_type = z.message.SystemMessageType.CONNECTION_ACCEPTED;
+        event_data.user_ids = conversationEt.participating_user_ids();
       } else {
-        message_et.visible(false);
+        messageEntity.visible(false);
       }
     } else {
       const creator_index = event_data.user_ids.indexOf(event.from);
 
-      if (from === conversation_et.creator && creator_index !== -1) {
+      if (from === conversationEt.creator && creator_index !== -1) {
         event_data.user_ids.splice(creator_index, 1);
-        message_et.member_message_type = z.message.SystemMessageType.CONVERSATION_CREATE;
+        messageEntity.member_message_type = z.message.SystemMessageType.CONVERSATION_CREATE;
       }
     }
 
-    message_et.user_ids(event_data.user_ids);
+    messageEntity.user_ids(event_data.user_ids);
 
-    return message_et;
+    return messageEntity;
   }
 
   /**
@@ -261,9 +259,9 @@ z.conversation.EventMapper = class EventMapper {
    * @returns {MemberMessage} Member message entity
    */
   _map_event_member_leave({data: event_data}) {
-    const message_et = new z.entity.MemberMessage();
-    message_et.user_ids(event_data.user_ids);
-    return message_et;
+    const messageEntity = new z.entity.MemberMessage();
+    messageEntity.user_ids(event_data.user_ids);
+    return messageEntity;
   }
 
   /**
@@ -274,10 +272,10 @@ z.conversation.EventMapper = class EventMapper {
    * @returns {MemberMessage} Member message entity
    */
   _map_event_member_update({data: event_data}) {
-    const message_et = new z.entity.MemberMessage();
+    const messageEntity = new z.entity.MemberMessage();
     // Don't render last read
-    message_et.visible(!event_data.last_read_timestamp);
-    return message_et;
+    messageEntity.visible(!event_data.last_read_timestamp);
+    return messageEntity;
   }
 
   /**
@@ -289,14 +287,14 @@ z.conversation.EventMapper = class EventMapper {
    */
   _map_event_message_add(event) {
     const {data: event_data, edited_time} = event;
-    const message_et = new z.entity.ContentMessage();
+    const messageEntity = new z.entity.ContentMessage();
 
-    message_et.assets.push(this._map_asset_text(event_data));
-    message_et.nonce = event_data.nonce;
-    message_et.replacing_message_id = event_data.replacing_message_id;
-    message_et.edited_timestamp = new Date(edited_time || event_data.edited_time).getTime();
+    messageEntity.assets.push(this._map_asset_text(event_data));
+    messageEntity.nonce = event_data.nonce;
+    messageEntity.replacing_message_id = event_data.replacing_message_id;
+    messageEntity.edited_timestamp = new Date(edited_time || event_data.edited_time).getTime();
 
-    return message_et;
+    return messageEntity;
   }
 
   /**
@@ -316,9 +314,9 @@ z.conversation.EventMapper = class EventMapper {
    * @returns {PingMessage} Ping message entity
    */
   _map_event_ping({data: event_data}) {
-    const message_et = new z.entity.PingMessage();
-    message_et.nonce = event_data.nonce;
-    return message_et;
+    const messageEntity = new z.entity.PingMessage();
+    messageEntity.nonce = event_data.nonce;
+    return messageEntity;
   }
 
   /**
@@ -329,9 +327,9 @@ z.conversation.EventMapper = class EventMapper {
    * @returns {RenameMessage} Rename message entity
    */
   _map_event_rename({data: event_data}) {
-    const message_et = new z.entity.RenameMessage();
-    message_et.name = event_data.name;
-    return message_et;
+    const messageEntity = new z.entity.RenameMessage();
+    messageEntity.name = event_data.name;
+    return messageEntity;
   }
 
   /**
@@ -342,10 +340,10 @@ z.conversation.EventMapper = class EventMapper {
    * @returns {MemberMessage} Member message entity
    */
   _map_event_team_member_leave(event) {
-    const message_et = this._map_event_member_leave(event);
+    const messageEntity = this._map_event_member_leave(event);
     const event_data = event.data;
-    message_et.name(event_data.name || z.l10n.text(z.string.conversation_someone));
-    return message_et;
+    messageEntity.name(event_data.name || z.l10n.text(z.string.conversation_someone));
+    return messageEntity;
   }
 
   /**
@@ -356,14 +354,14 @@ z.conversation.EventMapper = class EventMapper {
    * @returns {DecryptErrorMessage} Decrypt error message entity
    */
   _map_event_unable_to_decrypt({error_code}) {
-    const message_et = new z.entity.DecryptErrorMessage();
+    const messageEntity = new z.entity.DecryptErrorMessage();
 
     if (error_code) {
-      message_et.error_code = error_code.split(' ')[0];
-      message_et.client_id = error_code.substring(message_et.error_code.length + 1).replace(/[()]/g, '');
+      messageEntity.error_code = error_code.split(' ')[0];
+      messageEntity.client_id = error_code.substring(messageEntity.error_code.length + 1).replace(/[()]/g, '');
     }
 
-    return message_et;
+    return messageEntity;
   }
 
   /**
@@ -374,12 +372,12 @@ z.conversation.EventMapper = class EventMapper {
    * @returns {VerificationMessage} Verification message entity
    */
   _map_event_verification({data: event_data}) {
-    const message_et = new z.entity.VerificationMessage();
+    const messageEntity = new z.entity.VerificationMessage();
 
-    message_et.user_ids(event_data.user_ids);
-    message_et.verification_message_type = event_data.type;
+    messageEntity.user_ids(event_data.user_ids);
+    messageEntity.verification_message_type = event_data.type;
 
-    return message_et;
+    return messageEntity;
   }
   /**
    * Maps JSON data of conversation.voice-channel-activate message into message entity
@@ -387,12 +385,12 @@ z.conversation.EventMapper = class EventMapper {
    * @returns {CallMessage} Call message entity
    */
   _map_event_voice_channel_activate() {
-    const message_et = new z.entity.CallMessage();
+    const messageEntity = new z.entity.CallMessage();
 
-    message_et.call_message_type = z.message.CALL_MESSAGE_TYPE.ACTIVATED;
-    message_et.visible(false);
+    messageEntity.call_message_type = z.message.CALL_MESSAGE_TYPE.ACTIVATED;
+    messageEntity.visible(false);
 
-    return message_et;
+    return messageEntity;
   }
 
   /**
@@ -403,13 +401,13 @@ z.conversation.EventMapper = class EventMapper {
    * @returns {CallMessage} Call message entity
    */
   _map_event_voice_channel_deactivate({data: event_data}) {
-    const message_et = new z.entity.CallMessage();
+    const messageEntity = new z.entity.CallMessage();
 
-    message_et.call_message_type = z.message.CALL_MESSAGE_TYPE.DEACTIVATED;
-    message_et.finished_reason = event_data.reason;
-    message_et.visible(message_et.finished_reason === z.calling.enum.TERMINATION_REASON.MISSED);
+    messageEntity.call_message_type = z.message.CALL_MESSAGE_TYPE.DEACTIVATED;
+    messageEntity.finished_reason = event_data.reason;
+    messageEntity.visible(messageEntity.finished_reason === z.calling.enum.TERMINATION_REASON.MISSED);
 
-    return message_et;
+    return messageEntity;
   }
 
   //##############################################################################
@@ -427,42 +425,42 @@ z.conversation.EventMapper = class EventMapper {
     const {conversation: conversation_id, data: event_data} = event;
     const {content_length, content_type, id, info, meta, status} = event_data;
 
-    const asset_et = new z.entity.File(id);
+    const assetEntity = new z.entity.File(id);
 
-    asset_et.correlation_id = info.correlation_id;
-    asset_et.conversation_id = conversation_id;
+    assetEntity.correlation_id = info.correlation_id;
+    assetEntity.conversation_id = conversation_id;
 
     // original
-    asset_et.file_size = content_length;
-    asset_et.file_type = content_type;
-    asset_et.file_name = info.name;
-    asset_et.meta = meta;
+    assetEntity.file_size = content_length;
+    assetEntity.file_type = content_type;
+    assetEntity.file_name = info.name;
+    assetEntity.meta = meta;
 
     // remote data - full
     const {key, otr_key, sha256, token} = event_data;
     if (key) {
-      asset_et.original_resource(z.assets.AssetRemoteData.v3(key, otr_key, sha256, token));
+      assetEntity.original_resource(z.assets.AssetRemoteData.v3(key, otr_key, sha256, token));
     } else {
-      asset_et.original_resource(z.assets.AssetRemoteData.v2(conversation_id, id, otr_key, sha256));
+      assetEntity.original_resource(z.assets.AssetRemoteData.v2(conversation_id, id, otr_key, sha256));
     }
 
     // remote data - preview
     const {preview_id, preview_key, preview_otr_key, preview_sha256, preview_token} = event_data;
     if (preview_otr_key) {
       if (preview_key) {
-        asset_et.preview_resource(
+        assetEntity.preview_resource(
           z.assets.AssetRemoteData.v3(preview_key, preview_otr_key, preview_sha256, preview_token, true)
         );
       } else {
-        asset_et.preview_resource(
+        assetEntity.preview_resource(
           z.assets.AssetRemoteData.v2(conversation_id, preview_id, preview_otr_key, preview_sha256, true)
         );
       }
     }
 
-    asset_et.status(status || z.assets.AssetTransferState.UPLOADING);
+    assetEntity.status(status || z.assets.AssetTransferState.UPLOADING);
 
-    return asset_et;
+    return assetEntity;
   }
 
   /**
@@ -522,12 +520,12 @@ z.conversation.EventMapper = class EventMapper {
    */
   _map_asset_text(event_data) {
     const {id, content, message, nonce, previews} = event_data;
-    const asset_et = new z.entity.Text(id, content || message);
+    const assetEntity = new z.entity.Text(id, content || message);
 
-    asset_et.nonce = nonce;
-    asset_et.previews(this._map_asset_link_previews(previews));
+    assetEntity.nonce = nonce;
+    assetEntity.previews(this._map_asset_link_previews(previews));
 
-    return asset_et;
+    return assetEntity;
   }
 
   /**
@@ -535,32 +533,32 @@ z.conversation.EventMapper = class EventMapper {
    *
    * @private
    * @param {Object} event - Asset data received as JSON
-   * @param {boolean} should_create_dummy_image - Create a dummy image
+   * @param {boolean} shouldCreateDummyImage - Create a dummy image
    * @returns {z.entity.MediumImage} Medium image asset entity
    */
-  _map_asset_image(event, should_create_dummy_image) {
+  _map_asset_image(event, shouldCreateDummyImage) {
     const {data: event_data, conversation: conversation_id} = event;
     const {content_length, content_type, id: asset_id, info} = event_data;
-    const asset_et = new z.entity.MediumImage(asset_id);
+    const assetEntity = new z.entity.MediumImage(asset_id);
 
-    asset_et.file_size = content_length;
-    asset_et.file_type = content_type;
-    asset_et.width = info.width;
-    asset_et.height = info.height;
-    asset_et.ratio = asset_et.height / asset_et.width;
+    assetEntity.file_size = content_length;
+    assetEntity.file_type = content_type;
+    assetEntity.width = info.width;
+    assetEntity.height = info.height;
+    assetEntity.ratio = assetEntity.height / assetEntity.width;
 
     const {key, otr_key, sha256, token} = event_data;
 
     if (key) {
-      asset_et.resource(z.assets.AssetRemoteData.v3(key, otr_key, sha256, token, true));
+      assetEntity.resource(z.assets.AssetRemoteData.v3(key, otr_key, sha256, token, true));
     } else {
-      asset_et.resource(z.assets.AssetRemoteData.v2(conversation_id, asset_id, otr_key, sha256, true));
+      assetEntity.resource(z.assets.AssetRemoteData.v2(conversation_id, asset_id, otr_key, sha256, true));
     }
 
-    if (should_create_dummy_image) {
-      asset_et.dummy_url = z.util.dummy_image(asset_et.width, asset_et.height);
+    if (shouldCreateDummyImage) {
+      assetEntity.dummy_url = z.util.dummy_image(assetEntity.width, assetEntity.height);
     }
 
-    return asset_et;
+    return assetEntity;
   }
 };

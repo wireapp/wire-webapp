@@ -23,12 +23,12 @@ window.z = window.z || {};
 window.z.conversation = z.conversation || {};
 
 z.conversation.ConversationCellState = (() => {
-  function is_alert(message_et) {
-    return message_et.is_ping() || (message_et.is_call() && message_et.was_missed());
+  function isAlert(messageEntity) {
+    return messageEntity.is_ping() || (messageEntity.is_call() && messageEntity.was_missed());
   }
 
-  function generate_activity_string(activities) {
-    const activity_strings = [];
+  function generateActivityString(activities) {
+    const activityStrings = [];
 
     for (const activity in activities) {
       if (activities.hasOwnProperty(activity)) {
@@ -37,23 +37,23 @@ z.conversation.ConversationCellState = (() => {
         switch (activity) {
           case 'message':
             if (count === 1) {
-              activity_strings.push(z.l10n.text(z.string.conversations_secondary_line_new_message, count));
+              activityStrings.push(z.l10n.text(z.string.conversations_secondary_line_new_message, count));
             } else if (count > 1) {
-              activity_strings.push(z.l10n.text(z.string.conversations_secondary_line_new_messages, count));
+              activityStrings.push(z.l10n.text(z.string.conversations_secondary_line_new_messages, count));
             }
             break;
           case 'ping':
             if (count === 1) {
-              activity_strings.push(z.l10n.text(z.string.conversations_secondary_line_ping, count));
+              activityStrings.push(z.l10n.text(z.string.conversations_secondary_line_ping, count));
             } else if (count > 1) {
-              activity_strings.push(z.l10n.text(z.string.conversations_secondary_line_pings, count));
+              activityStrings.push(z.l10n.text(z.string.conversations_secondary_line_pings, count));
             }
             break;
           case 'call':
             if (count === 1) {
-              activity_strings.push(z.l10n.text(z.string.conversations_secondary_line_missed_call, count));
+              activityStrings.push(z.l10n.text(z.string.conversations_secondary_line_missed_call, count));
             } else if (count > 1) {
-              activity_strings.push(z.l10n.text(z.string.conversations_secondary_line_missed_calls, count));
+              activityStrings.push(z.l10n.text(z.string.conversations_secondary_line_missed_calls, count));
             }
             break;
           default:
@@ -61,31 +61,31 @@ z.conversation.ConversationCellState = (() => {
       }
     }
 
-    return activity_strings.join(', ');
+    return activityStrings.join(', ');
   }
 
-  function accumulate_activity(conversation_et) {
-    const unread_events = conversation_et.unread_events();
+  function accumulateActivity(conversationEntity) {
+    const unreadEvents = conversationEntity.unread_events();
     const activities = {
       call: 0,
       message: 0,
       ping: 0,
     };
 
-    for (const message_et of unread_events) {
-      if (message_et.is_call() && message_et.was_missed()) {
+    for (const messageEntity of unreadEvents) {
+      if (messageEntity.is_call() && messageEntity.was_missed()) {
         activities.call = activities.call + 1;
-      } else if (message_et.is_ping()) {
+      } else if (messageEntity.is_ping()) {
         activities.ping = activities.ping + 1;
-      } else if (message_et.is_content()) {
+      } else if (messageEntity.is_content()) {
         activities.message = activities.message + 1;
       }
     }
 
-    return generate_activity_string(activities);
+    return generateActivityString(activities);
   }
 
-  const default_state = {
+  const defaultState = {
     description() {
       return '';
     },
@@ -94,26 +94,27 @@ z.conversation.ConversationCellState = (() => {
     },
   };
 
-  const empty_state = {
+  const emptyState = {
     description() {
       return z.l10n.text(z.string.conversations_empty_conversation_description);
     },
     icon() {
       return z.conversation.ConversationStatusIcon.NONE;
     },
-    match(conversation_et) {
-      return conversation_et.participating_user_ids().length === 0;
+    match(conversationEntity) {
+      return conversationEntity.participating_user_ids().length === 0;
     },
   };
 
-  const removed_state = {
-    description(conversation_et) {
-      const last_message_et = conversation_et.get_last_message();
-      const self_user_id = conversation_et.self.id;
+  const removedState = {
+    description(conversationEntity) {
+      const lastMessageEntity = conversationEntity.get_last_message();
+      const selfUserId = conversationEntity.self.id;
 
-      const is_removal_message = last_message_et && last_message_et.is_member() && last_message_et.is_member_removal();
-      if (is_removal_message && last_message_et.user_ids().includes(self_user_id)) {
-        if (last_message_et.user().id === self_user_id) {
+      const isRemovalMessage =
+        lastMessageEntity && lastMessageEntity.is_member() && lastMessageEntity.is_member_removal();
+      if (isRemovalMessage && lastMessageEntity.user_ids().includes(selfUserId)) {
+        if (lastMessageEntity.user().id === selfUserId) {
           return z.l10n.text(z.string.conversations_secondary_line_you_left);
         }
 
@@ -125,180 +126,185 @@ z.conversation.ConversationCellState = (() => {
     icon() {
       return z.conversation.ConversationStatusIcon.NONE;
     },
-    match(conversation_et) {
-      return conversation_et.removed_from_conversation();
+    match(conversationEntity) {
+      return conversationEntity.removed_from_conversation();
     },
   };
 
-  const muted_state = {
-    description(conversation_et) {
-      return accumulate_activity(conversation_et);
+  const mutedState = {
+    description(conversationEntity) {
+      return accumulateActivity(conversationEntity);
     },
     icon() {
       return z.conversation.ConversationStatusIcon.MUTED;
     },
-    match(conversation_et) {
-      return conversation_et.is_muted();
+    match(conversationEntity) {
+      return conversationEntity.is_muted();
     },
   };
 
-  const alert_state = {
-    description(conversation_et) {
-      return accumulate_activity(conversation_et);
+  const alertState = {
+    description(conversationEntity) {
+      return accumulateActivity(conversationEntity);
     },
-    icon(conversation_et) {
-      const last_alert = conversation_et.unread_events().find(is_alert);
-      if (last_alert.is_ping()) {
+    icon(conversationEntity) {
+      const lastAlert = conversationEntity.unread_events().find(isAlert);
+      if (lastAlert.is_ping()) {
         return z.conversation.ConversationStatusIcon.UNREAD_PING;
       }
-      if (last_alert.is_call() && last_alert.was_missed()) {
+      if (lastAlert.is_call() && lastAlert.was_missed()) {
         return z.conversation.ConversationStatusIcon.MISSED_CALL;
       }
     },
-    match(conversation_et) {
-      return conversation_et.unread_event_count() > 0 && conversation_et.unread_events().find(is_alert) !== undefined;
+    match(conversationEntity) {
+      return (
+        conversationEntity.unread_event_count() > 0 && conversationEntity.unread_events().find(isAlert) !== undefined
+      );
     },
   };
 
-  const group_activity_state = {
-    description(conversation_et) {
-      const last_message_et = conversation_et.get_last_message();
+  const groupActivityState = {
+    description(conversationEntity) {
+      const lastMessageEntity = conversationEntity.get_last_message();
 
-      if (last_message_et.is_member()) {
-        const user_count = last_message_et.user_ets().length;
+      if (lastMessageEntity.is_member()) {
+        const userCount = lastMessageEntity.user_ets().length;
 
-        if (last_message_et.is_member_join()) {
-          if (user_count === 1) {
-            if (!last_message_et.remote_user_ets().length) {
-              return z.l10n.text(z.string.conversations_secondary_line_person_added_you, last_message_et.user().name());
+        if (lastMessageEntity.is_member_join()) {
+          if (userCount === 1) {
+            if (!lastMessageEntity.remote_user_ets().length) {
+              return z.l10n.text(
+                z.string.conversations_secondary_line_person_added_you,
+                lastMessageEntity.user().name()
+              );
             }
 
-            const [remote_user_et] = last_message_et.remote_user_ets();
-            return z.l10n.text(z.string.conversations_secondary_line_person_added, remote_user_et.name());
+            const [remoteUserEntity] = lastMessageEntity.remote_user_ets();
+            return z.l10n.text(z.string.conversations_secondary_line_person_added, remoteUserEntity.name());
           }
 
-          if (user_count > 1) {
-            return z.l10n.text(z.string.conversations_secondary_line_people_added, user_count);
+          if (userCount > 1) {
+            return z.l10n.text(z.string.conversations_secondary_line_people_added, userCount);
           }
         }
 
-        if (last_message_et.is_member_removal()) {
-          if (user_count === 1) {
-            const [remote_user_et] = last_message_et.remote_user_ets();
-            if (remote_user_et === last_message_et.user()) {
-              return z.l10n.text(z.string.conversations_secondary_line_person_left, remote_user_et.name());
+        if (lastMessageEntity.is_member_removal()) {
+          if (userCount === 1) {
+            const [remoteUserEntity] = lastMessageEntity.remote_user_ets();
+            if (remoteUserEntity === lastMessageEntity.user()) {
+              return z.l10n.text(z.string.conversations_secondary_line_person_left, remoteUserEntity.name());
             }
 
-            return z.l10n.text(z.string.conversations_secondary_line_person_removed, remote_user_et.name());
+            return z.l10n.text(z.string.conversations_secondary_line_person_removed, remoteUserEntity.name());
           }
 
-          if (user_count > 1) {
-            return z.l10n.text(z.string.conversations_secondary_line_people_left, user_count);
+          if (userCount > 1) {
+            return z.l10n.text(z.string.conversations_secondary_line_people_left, userCount);
           }
         }
       }
 
-      if (last_message_et.is_system() && last_message_et.is_conversation_rename()) {
-        return z.l10n.text(z.string.conversations_secondary_line_renamed, last_message_et.user().name());
+      if (lastMessageEntity.is_system() && lastMessageEntity.is_conversation_rename()) {
+        return z.l10n.text(z.string.conversations_secondary_line_renamed, lastMessageEntity.user().name());
       }
     },
-    icon(conversation_et) {
-      const last_message_et = conversation_et.get_last_message();
-      if (last_message_et.is_member() && last_message_et.is_member_removal()) {
-        if (conversation_et.is_muted()) {
+    icon(conversationEntity) {
+      const lastMessageEntity = conversationEntity.get_last_message();
+      if (lastMessageEntity.is_member() && lastMessageEntity.is_member_removal()) {
+        if (conversationEntity.is_muted()) {
           return z.conversation.ConversationStatusIcon.MUTED;
         }
         return z.conversation.ConversationStatusIcon.UNREAD_MESSAGES;
       }
     },
-    match(conversation_et) {
-      const last_message_et = conversation_et.get_last_message();
-      const expected_message_type = last_message_et
-        ? last_message_et.is_member() || last_message_et.is_system()
+    match(conversationEntity) {
+      const lastMessageEntity = conversationEntity.get_last_message();
+      const expectedMessageType = lastMessageEntity
+        ? lastMessageEntity.is_member() || lastMessageEntity.is_system()
         : false;
-      return conversation_et.is_group() && conversation_et.unread_event_count() > 0 && expected_message_type;
+      return conversationEntity.is_group() && conversationEntity.unread_event_count() > 0 && expectedMessageType;
     },
   };
 
-  const unread_message_state = {
-    description(conversation_et) {
-      for (const message_et of conversation_et.unread_events()) {
-        let message_text;
+  const unreadMessageState = {
+    description(conversationEntity) {
+      for (const messageEntity of conversationEntity.unread_events()) {
+        let messageText;
 
-        if (message_et.is_ephemeral()) {
-          message_text = z.l10n.text(z.string.conversations_secondary_line_timed_message);
-        } else if (message_et.is_ping()) {
-          message_text = z.l10n.text(z.string.system_notification_ping);
-        } else if (message_et.has_asset_text()) {
-          message_text = message_et.get_first_asset().text;
-        } else if (message_et.has_asset()) {
-          const asset_et = message_et.get_first_asset();
+        if (messageEntity.is_ephemeral()) {
+          messageText = z.l10n.text(z.string.conversations_secondary_line_timed_message);
+        } else if (messageEntity.is_ping()) {
+          messageText = z.l10n.text(z.string.system_notification_ping);
+        } else if (messageEntity.has_asset_text()) {
+          messageText = messageEntity.get_first_asset().text;
+        } else if (messageEntity.has_asset()) {
+          const asset_et = messageEntity.get_first_asset();
           if (asset_et.status() === z.assets.AssetTransferState.UPLOADED) {
             if (asset_et.is_audio()) {
-              message_text = z.l10n.text(z.string.system_notification_shared_audio);
+              messageText = z.l10n.text(z.string.system_notification_shared_audio);
             } else if (asset_et.is_video()) {
-              message_text = z.l10n.text(z.string.system_notification_shared_video);
+              messageText = z.l10n.text(z.string.system_notification_shared_video);
             } else {
-              message_text = z.l10n.text(z.string.system_notification_shared_file);
+              messageText = z.l10n.text(z.string.system_notification_shared_file);
             }
           }
-        } else if (message_et.has_asset_location()) {
-          message_text = z.l10n.text(z.string.system_notification_shared_location);
-        } else if (message_et.has_asset_image()) {
-          message_text = z.l10n.text(z.string.system_notification_asset_add);
+        } else if (messageEntity.has_asset_location()) {
+          messageText = z.l10n.text(z.string.system_notification_shared_location);
+        } else if (messageEntity.has_asset_image()) {
+          messageText = z.l10n.text(z.string.system_notification_asset_add);
         }
 
-        if (message_text) {
-          if (conversation_et.is_group()) {
-            return `${message_et.sender_name()}: ${message_text}`;
+        if (messageText) {
+          if (conversationEntity.is_group()) {
+            return `${messageEntity.sender_name()}: ${messageText}`;
           }
 
-          return message_text;
+          return messageText;
         }
       }
     },
     icon() {
       return z.conversation.ConversationStatusIcon.UNREAD_MESSAGES;
     },
-    match(conversation_et) {
-      return conversation_et.unread_event_count() > 0;
+    match(conversationEntity) {
+      return conversationEntity.unread_event_count() > 0;
     },
   };
 
-  const user_name_state = {
-    description(conversation_et) {
-      const [user_et] = conversation_et.participating_user_ets();
-      const has_username = user_et && user_et.username();
-      return has_username ? `@${user_et.username()}` : '';
+  const userNameState = {
+    description(conversationEntity) {
+      const [userEntity] = conversationEntity.participating_user_ets();
+      const hasUsername = userEntity && userEntity.username();
+      return hasUsername ? `@${userEntity.username()}` : '';
     },
-    icon(conversation_et) {
-      if (conversation_et.is_request()) {
+    icon(conversationEntity) {
+      if (conversationEntity.is_request()) {
         return z.conversation.ConversationStatusIcon.PENDING_CONNECTION;
       }
     },
-    match(conversation_et) {
-      const last_message_et = conversation_et.get_last_message();
-      const is_member_join = last_message_et && last_message_et.is_member() && last_message_et.is_member_join();
-      return conversation_et.is_request() || (conversation_et.is_one2one() && is_member_join);
+    match(conversationEntity) {
+      const lastMessageEntity = conversationEntity.get_last_message();
+      const isMemberJoin = lastMessageEntity && lastMessageEntity.is_member() && lastMessageEntity.is_member_join();
+      return conversationEntity.is_request() || (conversationEntity.is_one2one() && isMemberJoin);
     },
   };
 
-  function _generate(conversation_et) {
+  function _generate(conversationEntity) {
     const states = [
-      empty_state,
-      removed_state,
-      muted_state,
-      alert_state,
-      group_activity_state,
-      unread_message_state,
-      user_name_state,
+      emptyState,
+      removedState,
+      mutedState,
+      alertState,
+      groupActivityState,
+      unreadMessageState,
+      userNameState,
     ];
-    const icon_state = states.find(state => state.match(conversation_et));
-    const description_state = states.find(state => state.match(conversation_et));
+    const iconState = states.find(state => state.match(conversationEntity));
+    const descriptionState = states.find(state => state.match(conversationEntity));
 
     return {
-      description: (description_state || default_state).description(conversation_et),
-      icon: (icon_state || default_state).icon(conversation_et),
+      description: (descriptionState || defaultState).description(conversationEntity),
+      icon: (iconState || defaultState).icon(conversationEntity),
     };
   }
 
