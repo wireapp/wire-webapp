@@ -68,13 +68,13 @@ z.event.EventRepository = class EventRepository {
 
     this.notificationHandlingState = ko.observable(z.event.NOTIFICATION_HANDLING_STATE.STREAM);
     this.notificationHandlingState.subscribe(handling_state => {
-      amplify.publish(z.event.WebApp.EVENT.notificationHandlingState, handling_state);
+      amplify.publish(z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, handling_state);
 
       const isHandlingWebSocket = handling_state === z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
       if (isHandlingWebSocket) {
         this._handleBufferedNotifications();
-        const wasHandlingRecovery = this.previousHandlingState === z.event.NOTIFICATION_HANDLING_STATE.RECOVERY;
-        if (wasHandlingRecovery) {
+        const previouslyHandlingRecovery = this.previousHandlingState === z.event.NOTIFICATION_HANDLING_STATE.RECOVERY;
+        if (previouslyHandlingRecovery) {
           amplify.publish(z.event.WebApp.WARNING.DISMISS, z.ViewModel.WarningType.CONNECTIVITY_RECOVERY);
         }
       }
@@ -630,10 +630,8 @@ z.event.EventRepository = class EventRepository {
             `Ignored '${mappedType}' in conversation '${conversationId}' from user '${mappedFrom}' with ID '${eventId}' previously used by user '${storedFrom}'`,
             event
           );
-          throw new z.event.EventError(
-            z.event.EventError.TYPE.VALIDATION_FAILED,
-            'Event validation failed: ID reused from other user'
-          );
+          const errorMessage = 'Event validation failed: ID reused from other user';
+          throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, errorMessage);
         }
 
         const mappedIsMessageAdd = mappedType === z.event.Client.CONVERSATION.MESSAGE_ADD;
@@ -644,10 +642,8 @@ z.event.EventRepository = class EventRepository {
             `Ignored '${mappedType}' in conversation '${conversationId}' from user '${mappedFrom}' with previously used ID '${eventId}'`,
             event
           );
-          throw new z.event.EventError(
-            z.event.EventError.TYPE.VALIDATION_FAILED,
-            'Event validation failed: ID reused from same user'
-          );
+          const errorMessage = 'Event validation failed: ID reused from same user';
+          throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, errorMessage);
         }
 
         const updatingLinkPreview = !!storedData.previews.length;
@@ -656,10 +652,8 @@ z.event.EventRepository = class EventRepository {
             `Ignored '${mappedType}' in conversation '${conversationId}' from user '${mappedFrom}' with ID '${eventId}' that previously contained link preview`,
             event
           );
-          throw new z.event.EventError(
-            z.event.EventError.TYPE.VALIDATION_FAILED,
-            'Event validation failed: ID of link preview reused'
-          );
+          const errorMessage = 'Event validation failed: ID of link preview reused';
+          throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, errorMessage);
         }
 
         const textContentMatches = mappedData.content === storedData.content;
@@ -668,10 +662,8 @@ z.event.EventRepository = class EventRepository {
             `Ignored '${mappedType}' in conversation '${conversationId}' from user '${mappedFrom}' with ID '${eventId}' not matching text content`,
             event
           );
-          throw new z.event.EventError(
-            z.event.EventError.TYPE.VALIDATION_FAILED,
-            'Event validation failed: ID of link preview reused'
-          );
+          const errorMessage = 'Event validation failed: ID of link preview reused';
+          throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, errorMessage);
         }
 
         // Only valid case for a duplicate message ID: First update to a text message matching the previous text content with a link preview
@@ -696,10 +688,8 @@ z.event.EventRepository = class EventRepository {
       const isIgnoredEvent = z.event.EventTypeHandling.IGNORE.includes(event.type);
       if (isIgnoredEvent) {
         this.logger.info(`Event ignored: '${event.type}'`, {event_json: JSON.stringify(event), event_object: event});
-        throw new z.event.EventError(
-          z.event.EventError.TYPE.VALIDATION_FAILED,
-          'Event validation failed: Type ignored'
-        );
+        const errorMessage = 'Event validation failed: Type ignored';
+        throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, errorMessage);
       }
 
       const eventFromStream = source === EventRepository.SOURCE.STREAM;
@@ -711,10 +701,8 @@ z.event.EventRepository = class EventRepository {
             event_json: JSON.stringify(event),
             event_object: event,
           });
-          throw new z.event.EventError(
-            z.event.EventError.TYPE.VALIDATION_FAILED,
-            'Event validation failed: Outdated timestamp'
-          );
+          const errorMessage = 'Event validation failed: Outdated timestamp';
+          throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, errorMessage);
         }
       }
 
