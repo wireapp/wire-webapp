@@ -1,9 +1,9 @@
 {
   "compilerOptions": {
-    "outDir": "dist/commonjs",
+    "outDir": "dist",
     "rootDir": "src/main",
     "strictPropertyInitialization": false
   },
-  "exclude": ["dist/commonjs", "node_modules"],
+  "exclude": ["dist", "node_modules"],
   "extends": "../../configs/tsconfig.json"
 }

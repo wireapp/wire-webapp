@@ -16,7 +16,7 @@
 // along with this program. If not, see http://www.gnu.org/licenses/.
 //
 
-const pkg = require('../../package.json');
+const pkg = require('../package.json');
 import {IncomingNotification} from '@wireapp/api-client/dist/commonjs/conversation/index';
 import {CryptographyService, GenericMessageType, PayloadBundle} from './crypto/root';
 import {Context, LoginData, PreKey} from '@wireapp/api-client/dist/commonjs/auth/index';
@@ -40,7 +40,7 @@ import {ConversationService} from './conversation/root';
 import Client = require('@wireapp/api-client');
 import EventEmitter = require('events');
 
-export default class Account extends EventEmitter {
+class Account extends EventEmitter {
   public static INCOMING = {
     TEXT_MESSAGE: 'Account.INCOMING.TEXT_MESSAGE',
   };
@@ -439,3 +439,5 @@ export default class Account extends EventEmitter {
       .then(() => this.client);
   }
 }
+
+export {Account};

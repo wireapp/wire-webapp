@@ -16,7 +16,7 @@
 // along with this program. If not, see http://www.gnu.org/licenses/.
 //
 
-import Account from './Account';
+import {Account} from './Account';
 import * as auth from './auth/root';
 import * as conversation from './conversation/root';
 import * as crypto from './crypto/root';

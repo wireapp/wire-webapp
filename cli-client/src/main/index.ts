@@ -10,7 +10,7 @@ import * as path from 'path';
 import APIClient = require('@wireapp/api-client');
 import {AxiosError} from 'axios';
 import {BackendErrorLabel} from '@wireapp/api-client/dist/commonjs/http/';
-import {PayloadBundle} from '@wireapp/core/dist/commonjs/crypto/root';
+import {PayloadBundle} from '@wireapp/core/dist/crypto/root';
 import {RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/';
 
 require('dotenv').config();
