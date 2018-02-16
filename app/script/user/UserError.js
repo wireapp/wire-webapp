@@ -56,13 +56,13 @@ z.user.UserError = class UserError extends Error {
 
   static get TYPE() {
     return {
-      INVALID_UPDATE: 'z.user.UserError.TYPE.INVALID_UPDATE',
-      PRE_KEY_NOT_FOUND: 'z.user.UserError.TYPE.PRE_KEY_NOT_FOUND',
-      REQUEST_FAILURE: 'z.user.UserError.TYPE.REQUEST_FAILURE',
-      UNKNOWN: 'z.user.UserError.TYPE.UNKNOWN',
-      USER_MISSING_EMAIL: 'z.user.UserError.TYPE.USER_MISSING_EMAIL',
-      USER_NOT_FOUND: 'z.user.UserError.TYPE.USER_NOT_FOUND',
-      USERNAME_TAKEN: 'z.user.UserError.TYPE.USERNAME_TAKEN',
+      INVALID_UPDATE: 'UserError.TYPE.INVALID_UPDATE',
+      PRE_KEY_NOT_FOUND: 'UserError.TYPE.PRE_KEY_NOT_FOUND',
+      REQUEST_FAILURE: 'UserError.TYPE.REQUEST_FAILURE',
+      UNKNOWN: 'UserError.TYPE.UNKNOWN',
+      USER_MISSING_EMAIL: 'UserError.TYPE.USER_MISSING_EMAIL',
+      USER_NOT_FOUND: 'UserError.TYPE.USER_NOT_FOUND',
+      USERNAME_TAKEN: 'UserError.TYPE.USERNAME_TAKEN',
     };
   }
 };
