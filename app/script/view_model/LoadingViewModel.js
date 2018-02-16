@@ -28,15 +28,17 @@ z.ViewModel.LoadingViewModel = class LoadingViewModel {
     this.loadingMessage = ko.observable('');
     this.loadingProgress = ko.observable(0);
 
+    this.elementId = elementId;
+
     this.loadingPercentage = ko.pureComputed(() => `${this.loadingProgress()}%`);
 
     amplify.subscribe(z.event.WebApp.APP.UPDATE_PROGRESS, this.updateProgress.bind(this));
 
-    ko.applyBindings(this, document.getElementById(elementId));
+    ko.applyBindings(this, document.getElementById(this.elementId));
   }
 
   removeFromView() {
-    $(`#${elementId}`).remove();
+    $(`#${this.elementId}`).remove();
     amplify.unsubscribeAll(z.event.WebApp.APP.UPDATE_PROGRESS);
   }
 
