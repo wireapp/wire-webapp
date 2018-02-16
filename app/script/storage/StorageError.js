@@ -28,40 +28,40 @@ z.storage.StorageError = class StorageError extends Error {
 
     this.name = this.constructor.name;
     this.stack = new Error().stack;
-    this.type = type || z.storage.StorageError.TYPE.UNKNOWN;
+    this.type = type || StorageError.TYPE.UNKNOWN;
 
     switch (this.type) {
-      case z.storage.StorageError.TYPE.DATA_STORE_NOT_FOUND:
+      case StorageError.TYPE.DATA_STORE_NOT_FOUND:
         this.message = 'Data store not found';
         break;
-      case z.storage.StorageError.TYPE.FAILED_TO_OPEN:
+      case StorageError.TYPE.FAILED_TO_OPEN:
         this.message = 'Failed to open database';
         break;
-      case z.storage.StorageError.TYPE.INVALID_TIMESTAMP:
+      case StorageError.TYPE.INVALID_TIMESTAMP:
         this.message = 'Invalid timestamp';
         break;
-      case z.storage.StorageError.TYPE.NO_CONVERSATION_ID:
+      case StorageError.TYPE.NO_CONVERSATION_ID:
         this.message = 'Missing conversation ID';
         break;
-      case z.storage.StorageError.TYPE.NO_DATA:
+      case StorageError.TYPE.NO_DATA:
         this.message = 'Storage value is undefined or null';
         break;
-      case z.storage.StorageError.TYPE.NO_SENDER_ID:
+      case StorageError.TYPE.NO_SENDER_ID:
         this.message = 'Missing sender ID';
         break;
-      case z.storage.StorageError.TYPE.NO_TIME:
+      case StorageError.TYPE.NO_TIME:
         this.message = 'Missing time';
         break;
-      case z.storage.StorageError.TYPE.NON_SEQUENTIAL_UPDATE:
+      case StorageError.TYPE.NON_SEQUENTIAL_UPDATE:
         this.message = 'Update is non sequential';
         break;
-      case z.storage.StorageError.TYPE.NOT_FOUND:
+      case StorageError.TYPE.NOT_FOUND:
         this.message = 'Record matching primary key was not found';
         break;
-      case z.storage.StorageError.TYPE.INVALID_TIME:
+      case StorageError.TYPE.INVALID_TIME:
         this.message = 'Event time needs to be ISO 8601';
         break;
-      case z.storage.StorageError.TYPE.SKIP_LOADING:
+      case StorageError.TYPE.SKIP_LOADING:
         this.message = 'Skipped loading of sessions and pre-keys';
         break;
       default:
@@ -71,18 +71,18 @@ z.storage.StorageError = class StorageError extends Error {
 
   static get TYPE() {
     return {
-      DATA_STORE_NOT_FOUND: 'z.storage.StorageError.TYPE.DATA_STORE_NOT_FOUND',
-      FAILED_TO_OPEN: 'z.storage.StorageError.TYPE.FAILED_TO_OPEN',
-      INVALID_TIME: 'z.storage.StorageError.TYPE.INVALID_TIME',
-      INVALID_TIMESTAMP: 'z.storage.StorageError.TYPE.INVALID_TIMESTAMP',
-      NO_CONVERSATION_ID: 'z.storage.StorageError.TYPE.NO_CONVERSATION_ID',
-      NO_DATA: 'z.storage.StorageError.TYPE.NO_DATA',
-      NO_SENDER_ID: 'z.storage.StorageError.TYPE.NO_SENDER_ID',
-      NO_TIME: 'z.storage.StorageError.TYPE.NO_TIME',
-      NON_SEQUENTIAL_UPDATE: 'z.storage.StorageError.TYPE.NON_SEQUENTIAL_UPDATE',
-      NOT_FOUND: 'z.storage.StorageError.TYPE.NOT_FOUND',
-      SKIP_LOADING: 'z.storage.StorageError:TYPE.SKIP_SESSIONS',
-      UNKNOWN: 'z.storage.StorageError.TYPE.UNKNOWN',
+      DATA_STORE_NOT_FOUND: 'StorageError.TYPE.DATA_STORE_NOT_FOUND',
+      FAILED_TO_OPEN: 'StorageError.TYPE.FAILED_TO_OPEN',
+      INVALID_TIME: 'StorageError.TYPE.INVALID_TIME',
+      INVALID_TIMESTAMP: 'StorageError.TYPE.INVALID_TIMESTAMP',
+      NO_CONVERSATION_ID: 'StorageError.TYPE.NO_CONVERSATION_ID',
+      NO_DATA: 'StorageError.TYPE.NO_DATA',
+      NO_SENDER_ID: 'StorageError.TYPE.NO_SENDER_ID',
+      NO_TIME: 'StorageError.TYPE.NO_TIME',
+      NON_SEQUENTIAL_UPDATE: 'StorageError.TYPE.NON_SEQUENTIAL_UPDATE',
+      NOT_FOUND: 'StorageError.TYPE.NOT_FOUND',
+      SKIP_LOADING: 'StorageError:TYPE.SKIP_SESSIONS',
+      UNKNOWN: 'StorageError.TYPE.UNKNOWN',
     };
   }
 };

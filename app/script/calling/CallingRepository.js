@@ -149,10 +149,8 @@ z.calling.CallingRepository = class CallingRepository {
     const {content: eventContent, time: eventDate, type: eventType} = event;
     const isCall = eventType === z.event.Client.CALL.E_CALL;
 
-    this.logger.info(`»» Call Event: '${eventType}' (Source: ${source})`, {
-      eventJson: JSON.stringify(event),
-      eventObject: event,
-    });
+    const logObject = {eventJson: JSON.stringify(event), eventObject: event};
+    this.logger.info(`»» Call Event: '${eventType}' (Source: ${source})`, logObject);
 
     if (isCall) {
       const isSupportedVersion = eventContent.version === z.calling.entities.CallMessage.CONFIG.VERSION;
