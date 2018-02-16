@@ -4,6 +4,7 @@
   "dependencies": {
     "@bower_components/amplify": "wireapp/amplify#v1.1.6",
     "@bower_components/antiscroll-2": "wireapp/antiscroll-2#1.3.1",
+    "@bower_components/bazinga64": "wireapp/bazinga64#5.0.3",
     "@bower_components/bytebuffer": "dcodeIO/ByteBuffer.js#~3",
     "@bower_components/cryptojs": "brix/crypto-js#3.1.9-1",
     "@bower_components/dexie": "dfahlander/Dexie.js#2.0.1",
@@ -185,6 +186,9 @@
     "@bower_components/antiscroll-2": {
       "css": "dist/antiscroll-2.css",
       "js": "dist/antiscroll-2.js"
+    },
+    "@bower_components/bazinga64": {
+      "js/": "dist/window/*.js"
     },
     "@bower_components/bytebuffer": {
       "js": "dist/ByteBufferAB.js"
