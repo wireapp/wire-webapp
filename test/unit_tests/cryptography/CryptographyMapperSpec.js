@@ -71,7 +71,6 @@ describe('z.cryptography.CryptographyMapper', () => {
           expect(event_json.data.content_length).toBe(original.size);
           expect(event_json.data.content_type).toBe(original.mime_type);
           expect(event_json.data.info.name).toBe(original.name);
-          expect(event_json.data.info.nonce).toBe(generic_message.message_id);
           done();
         })
         .catch(done.fail);
@@ -97,7 +96,6 @@ describe('z.cryptography.CryptographyMapper', () => {
           expect(event_json.data.content_length).toEqual(original_asset.size.toNumber());
           expect(event_json.data.content_type).toEqual(original_asset.mime_type);
           expect(event_json.data.info.name).toEqual(original_asset.name);
-          expect(event_json.data.info.nonce).toBe(generic_message.message_id);
           expect(event_json.data.meta.duration).toEqual(original_asset.audio.duration_in_millis / 1000);
           expect(event_json.data.meta.loudness).toEqual(
             new Uint8Array(original_asset.audio.normalized_loudness.toArrayBuffer())
@@ -351,7 +349,6 @@ describe('z.cryptography.CryptographyMapper', () => {
           expect(event_json.data.info.tag).toBe(image.tag);
           expect(event_json.data.info.width).toBe(image.width);
           expect(event_json.data.info.height).toBe(image.height);
-          expect(event_json.data.info.nonce).toBe(event.data.id);
           expect(event_json.data.info.public).toBeFalsy();
           done();
         })
@@ -391,7 +388,6 @@ describe('z.cryptography.CryptographyMapper', () => {
           expect(event_json.data.info.tag).toBe('medium');
           expect(event_json.data.info.width).toBe(image_meta_data.width);
           expect(event_json.data.info.height).toBe(image_meta_data.height);
-          expect(event_json.data.info.nonce).toBe(generic_message.message_id);
           done();
         })
         .catch(done.fail);
@@ -437,7 +433,6 @@ describe('z.cryptography.CryptographyMapper', () => {
           expect(event_json.data.info.tag).toBe(image.tag);
           expect(event_json.data.info.width).toBe(image.width);
           expect(event_json.data.info.height).toBe(image.height);
-          expect(event_json.data.info.nonce).toBeDefined();
           expect(event_json.data.info.public).toBeFalsy();
           done();
         })
@@ -471,7 +466,6 @@ describe('z.cryptography.CryptographyMapper', () => {
           expect(event_json.from).toBe(event.from);
           expect(event_json.time).toBe(event.time);
           expect(event_json.id).toBe(generic_message.message_id);
-          expect(event_json.data.nonce).toBe(generic_message.message_id);
           done();
         })
         .catch(done.fail);
@@ -536,7 +530,6 @@ describe('z.cryptography.CryptographyMapper', () => {
           expect(event_json.time).toBe(event.time);
           expect(event_json.id).toBe(generic_message.message_id);
           expect(event_json.data.content).toBe('Unit test');
-          expect(event_json.data.nonce).toBe(generic_message.message_id);
           done();
         })
         .catch(done.fail);
@@ -602,7 +595,6 @@ describe('z.cryptography.CryptographyMapper', () => {
           expect(event_json.from).toBe(event.from);
           expect(event_json.time).toBe(event.time);
           expect(event_json.id).toBe(generic_message_id);
-          expect(event_json.data.nonce).toBe(ping.message_id);
           done();
         })
         .catch(done.fail);
@@ -628,7 +620,6 @@ describe('z.cryptography.CryptographyMapper', () => {
           expect(event_json.data.location.latitude).toBe(generic_message.location.latitude);
           expect(event_json.data.location.name).toBe(generic_message.location.name);
           expect(event_json.data.location.zoom).toBe(generic_message.location.zoom);
-          expect(event_json.data.nonce).toBe(generic_message.message_id);
           done();
         })
         .catch(done.fail);

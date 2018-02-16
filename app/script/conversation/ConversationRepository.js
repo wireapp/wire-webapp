@@ -1972,7 +1972,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         }
 
         const optimistic_event = z.conversation.EventBuilder.buildMessageAdd(conversation_et, this.timeOffset);
-        return this.cryptography_repository.cryptography_mapper.mapGenericMessage(generic_message, optimistic_event);
+        return this.cryptography_repository.cryptographyMapper.mapGenericMessage(generic_message, optimistic_event);
       })
       .then(message_mapped => {
         if (z.event.EventTypeHandling.STORE.includes(message_mapped.type)) {

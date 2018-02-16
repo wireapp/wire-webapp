@@ -393,7 +393,7 @@ z.client.ClientRepository = class ClientRepository {
       value: cookieLabel,
     });
 
-    return this.cryptographyRepository.storage_repository.saveValue(indexedDbKey, cookieLabel);
+    return this.cryptographyRepository.storageRepository.saveValue(indexedDbKey, cookieLabel);
   }
 
   /**

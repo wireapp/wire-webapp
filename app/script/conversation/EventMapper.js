@@ -395,7 +395,7 @@ z.conversation.EventMapper = class EventMapper {
     const message_et = new z.entity.DecryptErrorMessage();
 
     if (error_code) {
-      message_et.errorCode = error_code.split(' ')[0];
+      message_et.error_code = error_code.split(' ')[0];
       message_et.client_id = error_code.substring(message_et.errorCode.length + 1).replace(/[()]/g, '');
     }
 
