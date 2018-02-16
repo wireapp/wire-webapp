@@ -263,11 +263,11 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
   }
 
   _mapEphemeral(genericMessage, event) {
-    const millis_as_number = genericMessage.ephemeral.expire_after_millis.toNumber();
+    const millisecondsAsNumber = genericMessage.ephemeral.expire_after_millis.toNumber();
     genericMessage.ephemeral.message_id = genericMessage.message_id;
 
     const embedded_message = this._mapGenericMessage(genericMessage.ephemeral, event);
-    embedded_message.ephemeral_expires = z.ephemeral.timings.mapToClosestTiming(millis_as_number);
+    embedded_message.ephemeral_expires = z.ephemeral.timings.mapToClosestTiming(millisecondsAsNumber);
 
     return embedded_message;
   }
@@ -289,10 +289,10 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
         }
 
         const cipherText = z.util.base64_to_array(eventData.data).buffer;
-        const keBytes = new Uint8Array(otrKey.toArrayBuffer()).buffer;
+        const keyBytes = new Uint8Array(otrKey.toArrayBuffer()).buffer;
         const referenceSha256 = new Uint8Array(sha256.toArrayBuffer()).buffer;
 
-        return z.assets.AssetCrypto.decryptAesAsset(cipherText, keBytes, referenceSha256);
+        return z.assets.AssetCrypto.decryptAesAsset(cipherText, keyBytes, referenceSha256);
       })
       .then(externalMessageBuffer => z.proto.GenericMessage.decode(externalMessageBuffer))
       .catch(error => {
