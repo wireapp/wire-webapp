@@ -349,9 +349,9 @@
   version "2.3.2"
   resolved "https://registry.yarnpkg.com/@types/tough-cookie/-/tough-cookie-2.3.2.tgz#e0d481d8bb282ad8a8c9e100ceb72c995fb5e709"
 
-"@wireapp/api-client@0.3.11":
-  version "0.3.11"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-0.3.11.tgz#e33d02ff077fa2e617192e7661595a6e9d04629d"
+"@wireapp/api-client@0.3.14":
+  version "0.3.14"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-0.3.14.tgz#6ec8ee3e6a279eca09a01eec7d1787f23f5c4819"
   dependencies:
     "@types/node" "9.4.6"
     "@types/spark-md5" "3.0.0"
@@ -370,26 +370,26 @@
   version "3.0.3"
   resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-3.0.3.tgz#8b228cdfd4b0fc7a7a16911824be285b45586d41"
 
-"@wireapp/core@2.0.0":
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-2.0.0.tgz#7a97c28eb29bb1ae8bc72daaba4f36d873c14d52"
+"@wireapp/core@2.0.4":
+  version "2.0.4"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-2.0.4.tgz#95ea4914104fcdbdf187a62f1ce1212f5afc7de0"
   dependencies:
     "@types/node" "9.4.6"
-    "@wireapp/api-client" "0.3.11"
-    "@wireapp/cryptobox" "8.0.0"
+    "@wireapp/api-client" "0.3.14"
+    "@wireapp/cryptobox" "8.0.1"
     "@wireapp/store-engine" "0.1.13"
     bazinga64 "5.0.3"
     protobufjs "6.8.4"
     pure-uuid "1.5.0"
 
-"@wireapp/cryptobox@8.0.0":
-  version "8.0.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-8.0.0.tgz#0bf5871aae4057932314b363209af9654a66f6d5"
+"@wireapp/cryptobox@8.0.1":
+  version "8.0.1"
+  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-8.0.1.tgz#bb2bb78f6acbaf1e5991c3e9828d3ca081bb0d21"
   dependencies:
     "@types/fs-extra" "5.0.0"
     "@types/node" "9.3.0"
     "@wireapp/lru-cache" "2.0.4"
-    "@wireapp/proteus" "7.0.0"
+    "@wireapp/proteus" "7.0.1"
     "@wireapp/store-engine" "0.1.13"
     dexie "2.0.1"
     fs-extra "5.0.0"
@@ -400,9 +400,9 @@
   dependencies:
     webpack "3.11.0"
 
-"@wireapp/proteus@7.0.0":
-  version "7.0.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/proteus/-/proteus-7.0.0.tgz#82a726b428e1a22209dc988cd824035e857b5913"
+"@wireapp/proteus@7.0.1":
+  version "7.0.1"
+  resolved "https://registry.yarnpkg.com/@wireapp/proteus/-/proteus-7.0.1.tgz#4e0c14ef7f8e1a88421368fc7f98c5aeca7eeda1"
   dependencies:
     "@types/chai" "4.1.2"
     "@types/ed2curve" "0.2.2"
