@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -110,6 +110,8 @@ z.string.ro.modal_button_send = 'Trimite';
 z.string.ro.modal_block_conversation_headline = 'Blochează pe {{user}}?';
 z.string.ro.modal_block_conversation_message = '{{user}} nu te va putea contacta sau adăuga la conversații de grup.';
 z.string.ro.modal_block_conversation_button = 'Blochează';
+z.string.ro.modal_bots_confirm_headline = 'Adaugă serviciul';
+z.string.ro.modal_bots_confirm_message = 'Sigur dorești să pornești o nouă conversație cu {{name}}?';
 z.string.ro.modal_bots_confirm_button = 'Confirmă';
 z.string.ro.modal_bots_unavailable_headline = 'Roboții nu sunt momentan disponibili';
 z.string.ro.modal_bots_unavailable_message = 'Mulțumim că ești interesat de roboți. Acest serviciu este momentan suspendat în timp ce lucrăm la următoarea versiune. Fii pe fază.';
@@ -167,6 +169,8 @@ z.string.ro.modal_not_connected_message_many = 'Unul din cei pe care i-ai select
 z.string.ro.modal_remove_device_button = 'Scoate dispozitivul';
 z.string.ro.modal_remove_device_headline = 'Scoate „{{device}}”';
 z.string.ro.modal_remove_device_message = 'Este necesară parola pentru a elimina acest dispozitiv.';
+z.string.ro.modalServiceUnavailableHeadline = 'Adăugarea serviciului nu este posibilă';
+z.string.ro.modalServiceUnavailableMessage = 'Acest serviciu este indisponibil momentan.';
 z.string.ro.modal_session_reset_headline = 'Sesiunea a fost resetată';
 z.string.ro.modal_session_reset_message_1 = 'Dacă problema nu este rezolvată,';
 z.string.ro.modal_session_reset_message_link = 'contactează-';
@@ -184,6 +188,7 @@ z.string.ro.conversation_you_nominative = 'tu';
 z.string.ro.conversation_you_dative = 'tu';
 z.string.ro.conversation_you_accusative = 'tu';
 
+z.string.ro.conversation_bot_user = 'Bot';
 z.string.ro.conversation_connection_accepted = 'Conectat';
 z.string.ro.conversation_connection_blocked = 'Blocat';
 z.string.ro.conversation_connection_cancel_request = 'Anulează cererea de conectare';
@@ -242,6 +247,10 @@ z.string.ro.conversation_send_pasted_file = 'A postat o imagine pe {{date}}';
 z.string.ro.conversation_someone = 'Cineva';
 z.string.ro.conversation_tweet_author = ' pe Twitter';
 
+z.string.ro.conversation_creation_preferences_action = 'Mai departe';
+z.string.ro.conversation_creation_participants_header = 'Adaugă persoane';
+z.string.ro.conversation_creation_participants_placeholder = 'Caută după nume';
+
 z.string.ro.collection_show_all = 'Arată toate {{number}}';
 z.string.ro.collection_section_links = 'Legături';
 z.string.ro.collection_section_images = 'Imagini';
@@ -258,7 +267,6 @@ z.string.ro.conversations_contacts = 'Contacte';
 z.string.ro.conversations_connection_request_many = '{{number}} persoane așteaptă';
 z.string.ro.conversations_connection_request_one = '1 persoană așteaptă';
 z.string.ro.conversations_empty_conversation = 'Conversație de grup';
-z.string.ro.conversations_empty_conversation_description = 'Toată lumea a plecat';
 z.string.ro.conversations_no_conversations = 'Nu sunt încă conversații';
 z.string.ro.conversations_popover_archive = 'Arhivă';
 z.string.ro.conversations_popover_block = 'Blochează';
@@ -307,8 +315,6 @@ z.string.ro.extensions_giphy_message = '{{tag}} • via giphy.com';
 z.string.ro.extensions_giphy_no_gifs = 'Ups, nu sunt gif-uri';
 z.string.ro.extensions_giphy_random = 'La întâmplare';
 
-z.string.ro.search_open = 'Deschide';
-z.string.ro.search_open_group = 'Creează grup';
 z.string.ro.people_confirm_label = 'Adaugă persoane în grup';
 z.string.ro.people_people = '{{number}} persoane';
 z.string.ro.people_search_placeholder = 'Caută după nume';
@@ -319,6 +325,8 @@ z.string.ro.people_invite_detail = 'Împărtășirea contactelor ne ajută să t
 z.string.ro.people_invite_button_contacts = 'Din Contacte';
 z.string.ro.people_invite_button_gmail = 'Din Gmail';
 z.string.ro.people_invite_headline = 'Invită prietenii';
+z.string.ro.people_service_confirm_button = 'Adaugă serviciu';
+z.string.ro.people_service_removal_button = 'Elimină serviciu';
 z.string.ro.people_services = 'Servicii';
 z.string.ro.people_share = 'Împărtășește contacte';
 z.string.ro.people_tabs_details = 'Detalii';
@@ -356,7 +364,8 @@ z.string.ro.people_remove_message = '{{user}} nu va mai putea trimite sau primi 
 z.string.ro.people_unblock_headline = 'Deblochează?';
 z.string.ro.people_unblock_message = '{{user}} te va putea contacta și adăuga din nou la conversații de grup.';
 
-z.string.ro.people_button_add = 'Adaugă persoane';
+z.string.ro.people_button_add = 'Adaugă';
+z.string.ro.people_button_add_people = 'Adaugă persoane';
 z.string.ro.people_button_block = 'Blochează';
 z.string.ro.people_button_cancel = 'Renunță';
 z.string.ro.people_button_connect = 'Conectare';
@@ -388,6 +397,7 @@ z.string.ro.preferences_about_terms_of_use = 'Termeni de folosire';
 z.string.ro.preferences_about_version = 'Versiune {{version}}';
 z.string.ro.preferences_about_website = 'Site web Wire';
 
+z.string.ro.preferences_account_avaibility_unset = 'Stabilește o stare';
 z.string.ro.preferences_account_create_team = 'Creează o echipă';
 z.string.ro.preferences_account_delete = 'Șterge contul';
 z.string.ro.preferences_account_log_out = 'Deconectare';
@@ -445,7 +455,6 @@ z.string.ro.preferences_options_notifications_obfuscate = 'Ascunde detaliile';
 z.string.ro.preferences_options_notifications_obfuscate_message = 'Arată expeditorul';
 z.string.ro.preferences_options_notifications_on = 'Arată expeditorul și mesajul';
 
-z.string.ro.search_group_hint = 'Mai încearcă sau alege persoanele cu care să creezi un grup';
 z.string.ro.search_connect = 'Conectare';
 z.string.ro.search_connections = 'Conexiuni';
 z.string.ro.search_contacts = 'Contacte';
@@ -458,6 +467,7 @@ z.string.ro.search_team_members = 'Membrii echipei';
 z.string.ro.search_top_people = 'Top persoane';
 z.string.ro.search_try_search = 'Caută oameni după\nnume sau nume utilizator';
 z.string.ro.search_no_contacts_on_wire = 'Nu ai contacte pe Wire.\nÎncearcă să găsește oameni după\nnume sau nume utilizator.';
+z.string.ro.search_member_invite = 'Invită oameni în echipă';
 z.string.ro.search_others = 'Conectare';
 
 z.string.ro.upload_google_headline = 'Caută persoane\ncu care să vorbești.';
@@ -490,33 +500,38 @@ z.string.ro.warning_permission_request_screen = '{{icon}} permite accesul la ecr
 z.string.ro.warning_tell_me_how = 'Spune-mi cum';
 
 z.string.ro.user_availability_available = 'Disponibil';
+z.string.ro.user_availability_away = 'Departe';
+z.string.ro.user_availability_busy = 'Ocupat';
 z.string.ro.user_availability_none = 'Niciunul';
 
-z.string.ro.system_notification_asset_add = 'A împărtășit o imagine';
-z.string.ro.system_notification_connection_accepted = 'A acceptat cererea de conectare a ta';
-z.string.ro.system_notification_connection_connected = 'Acum ești conectat';
-z.string.ro.system_notification_connection_request = 'Așteaptă conectarea';
-z.string.ro.system_notification_conversation_create = '{{user}} a început o conversație';
-z.string.ro.system_notification_conversation_rename = '{{user}} a redenumit conversația în {{name}}';
-z.string.ro.system_notification_member_join_many = '{{user}} a adăugat {{number}} persoane la conversație';
-z.string.ro.system_notification_member_join_one = '{{user1}} a adăugat pe {{user2}} la conversație';
-z.string.ro.system_notification_member_leave_removed_you = '{{user}} te-a scos din conversație';
-z.string.ro.system_notification_obfuscated = 'Ți-a trimis un mesaj';
-z.string.ro.system_notification_obfuscated_title = 'Cineva';
-z.string.ro.system_notification_ping = 'Pinguit';
-z.string.ro.system_notification_reaction = '{{reaction}} la mesajul tău';
-z.string.ro.system_notification_shared_audio = 'A împărtășit un mesaj audio';
-z.string.ro.system_notification_shared_file = 'A distribuit un fișier';
-z.string.ro.system_notification_shared_location = 'A distribuit o locație';
-z.string.ro.system_notification_shared_video = 'A distribuit un video';
-z.string.ro.system_notification_voice_channel_activate = 'Se sună';
-z.string.ro.system_notification_voice_channel_deactivate = 'Apel în curs';
+z.string.ro.notification_asset_add = 'A împărtășit o imagine';
+z.string.ro.notification_connection_accepted = 'A acceptat cererea de conectare a ta';
+z.string.ro.notification_connection_connected = 'Acum ești conectat';
+z.string.ro.notification_connection_request = 'Așteaptă conectarea';
+z.string.ro.notification_conversation_create = '{{user}} a început o conversație';
+z.string.ro.notification_conversation_rename = '{{user}} a redenumit conversația în {{name}}';
+z.string.ro.notification_member_join_many = '{{user}} a adăugat {{number}} persoane la conversație';
+z.string.ro.notification_member_join_one = '{{user1}} a adăugat pe {{user2}} la conversație';
+z.string.ro.notification_member_leave_removed_you = '{{user}} te-a scos din conversație';
+z.string.ro.notification_obfuscated = 'Ți-a trimis un mesaj';
+z.string.ro.notification_obfuscated_title = 'Cineva';
+z.string.ro.notification_ping = 'Pinguit';
+z.string.ro.notification_reaction = '{{reaction}} la mesajul tău';
+z.string.ro.notification_shared_audio = 'A împărtășit un mesaj audio';
+z.string.ro.notification_shared_file = 'A distribuit un fișier';
+z.string.ro.notification_shared_location = 'A distribuit o locație';
+z.string.ro.notification_shared_video = 'A distribuit un video';
+z.string.ro.notification_voice_channel_activate = 'Se sună';
+z.string.ro.notification_voice_channel_deactivate = 'Apel în curs';
 
 z.string.ro.tooltip_conversation_all_verified = 'Toate amprentele sunt verificate';
 z.string.ro.tooltip_conversation_call = 'Sună';
 z.string.ro.tooltip_conversation_ephemeral = 'Mesaj temporizat';
 z.string.ro.tooltip_conversation_file = 'Adaugă fișier';
 z.string.ro.tooltip_conversation_input_placeholder = 'Scrie un mesaj';
+z.string.ro.tooltip_conversation_input_placeholder_available = '{{user}} este disponibil';
+z.string.ro.tooltip_conversation_input_placeholder_away = '{{user}} este plecat';
+z.string.ro.tooltip_conversation_input_placeholder_busy = '{{user}} este ocupat';
 z.string.ro.tooltip_conversation_people = 'Persoane ({{shortcut}})';
 z.string.ro.tooltip_conversation_picture = 'Adaugă poză';
 z.string.ro.tooltip_conversation_ping = 'Ping ({{shortcut}})';
@@ -532,6 +547,7 @@ z.string.ro.tooltip_conversations_silence = 'Mutizează ({{shortcut}})';
 z.string.ro.tooltip_conversations_start = 'Începe conversația ({{shortcut}})';
 
 z.string.ro.tooltip_people_add = 'Adaugă persoane la conversație ({{shortcut}})';
+z.string.ro.tooltip_people_add_people = 'Adaugă persoane la conversație ({{shortcut}})';
 z.string.ro.tooltip_people_back = 'Înapoi';
 z.string.ro.tooltip_people_block = 'Blochează';
 z.string.ro.tooltip_people_connect = 'Conectare';

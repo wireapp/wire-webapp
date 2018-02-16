@@ -1,5 +1,5 @@
 <div id="participants-bubble" class="bubble">
-  <div id="participants" class="participants" data-bind="with: $root.participants, css: {'show-user': $root.participants.showUserProfile() || $root.participants.showServiceStates()}">
+  <div id="participants" class="participants" data-bind="with: $root.participants, css: {'show-participant': $root.participants.showParticipantProfile()}">
     <div class="participants-transition">
 
       <!-- ko if: stateParticipants() -->
@@ -47,27 +47,29 @@
           </div>
         </div>
 
-        <user-profile class="participants-user-profile" params="
-          conversation: conversation,
-          mode: z.components.UserProfile.MODE.PEOPLE,
-          user: selectedUser,
-          add_people: clickOnAddPeople,
-          block: clickToBlock,
-          close: clickOnMemberBack,
-          connect: clickToConnect,
-          pending: clickOnPending,
-          leave: clickToLeave,
-          profile: clickOnSelfProfile,
-          remove: clickToRemoveMember,
-          unblock: clickToUnblock
-        "></user-profile>
+        <!-- ko if: showUserState -->
+          <user-profile class="participants-user-profile" params="
+            add_people: clickOnAddPeople,
+            block: clickToBlock,
+            close: clickOnMemberBack,
+            connect: clickToConnect,
+            conversation: conversation,
+            leave: clickToLeave,
+            mode: z.components.UserProfile.MODE.PEOPLE,
+            pending: clickOnPending,
+            profile: clickOnSelfProfile,
+            remove: clickToRemoveMember,
+            unblock: clickToUnblock,
+            user: selectedParticipant
+          "></user-profile>
+        <!-- /ko -->
       <!-- /ko -->
 
       <!-- ko if: activeAddState() -->
         <div class="participants-search">
           <div class="participants-search-header">
             <div class="participants-search-header-row">
-              <user-input class="participants-search-header-list user-list-light" params="input: searchInput, selected: selectedUsers, placeholder: z.string.people_search_placeholder" spellcheck="false"></user-input>
+              <user-input class="participants-search-header-list user-list-light" params="input: searchInput, selected: selectedContacts, placeholder: z.string.people_search_placeholder" spellcheck="false"></user-input>
               <div class="participants-search-header-close icon-close icon-button" data-bind="click: clickOnCloseAdding, l10n_tooltip: z.string.tooltip_search_close" data-uie-name="do-close"></div>
             </div>
             <!-- ko if: showIntegrations() -->
@@ -80,7 +82,7 @@
           <div class="participants-search-content">
             <div class="participants-search-list" data-bind="antiscroll: shouldUpdateScrollbar">
               <!-- ko if: stateAddPeople() -->
-                <user-list class="user-list-light" params="user: users, filter: searchInput, selected: selectedUsers"></user-list>
+                <user-list class="user-list-light" params="user: contacts, filter: searchInput, selected: selectedContacts"></user-list>
               <!-- /ko -->
               <!-- ko if: stateAddService() -->
                 <service-list class="service-list-light" params="services: services, click: clickOnSelectService, isSearching: isSearching"></service-list>
@@ -88,9 +90,9 @@
             </div>
           </div>
           <!-- ko if: stateAddPeople() -->
-            <button class="participants-search-footer button button-full" data-bind="enable: selectedUsers().length > 0, click: clickToAddMembers" data-uie-name="do-create">
+            <button class="participants-search-footer button button-full" data-bind="enable: selectedContacts().length > 0, click: clickToAddMembers" data-uie-name="do-create">
               <span class="icon-people-add participants-search-icon"></span>
-              <span data-bind="l10n_text: searchActionText"></span>
+              <span data-bind="l10n_text: z.string.people_confirm_label"></span>
             </button>
           <!-- /ko -->
         </div>
@@ -116,7 +118,7 @@
                   <div class="participants-service-profile-provider" data-bind="text: selectedService().providerName()" data-uie-name="status-service-provider"></div>
                 </div>
               </div>
-              <div class="participants-service-profile-description" data-bind="text: selectedService().description" data-uie-name=status-service-description"></div>
+              <div class="participants-service-profile-description" data-bind="text: selectedService().description" data-uie-name="status-service-description"></div>
             </div>
             <!-- ko if: stateServiceConfirmation() || showServiceRemove() -->
               <div class="participants-service-profile-footer">

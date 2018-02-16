@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,10 +31,16 @@ z.util.check_indexed_db = function() {
   }
 
   if (z.util.Environment.browser.firefox) {
-    let db;
+    let dbOpenRequest;
 
     try {
-      db = window.indexedDB.open('test');
+      dbOpenRequest = window.indexedDB.open('test');
+      dbOpenRequest.onerror = event => {
+        if (dbOpenRequest.error) {
+          event.preventDefault();
+          return Promise.reject(new z.auth.AuthError(z.auth.AuthError.TYPE.PRIVATE_MODE));
+        }
+      };
     } catch (error) {
       return Promise.reject(new z.auth.AuthError(z.auth.AuthError.TYPE.PRIVATE_MODE));
     }
@@ -47,7 +53,7 @@ z.util.check_indexed_db = function() {
       const interval_id = window.setInterval(() => {
         current_attempt = current_attempt + 1;
 
-        if (db.readyState === 'done' && !db.result) {
+        if (dbOpenRequest.readyState === 'done' && !dbOpenRequest.result) {
           window.clearInterval(interval_id);
           return reject(new z.auth.AuthError(z.auth.AuthError.TYPE.PRIVATE_MODE));
         }
@@ -282,7 +288,7 @@ z.util.strip_data_uri = function(string) {
  * @returns {UInt8Array} Typed array
  */
 z.util.base64_to_array = function(base64) {
-  return sodium.from_base64(z.util.strip_data_uri(base64));
+  return bazinga64.Decoder.fromBase64(z.util.strip_data_uri(base64)).asBytes;
 };
 
 /**
@@ -291,7 +297,7 @@ z.util.base64_to_array = function(base64) {
  * @returns {string} Base64-encoded string
  */
 z.util.array_to_base64 = function(array) {
-  return sodium.to_base64(new Uint8Array(array), true);
+  return bazinga64.Encoder.toBase64(new Uint8Array(array), true).asString;
 };
 
 /**

@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -110,6 +110,8 @@ z.string.nl.modal_button_send = 'Stuur';
 z.string.nl.modal_block_conversation_headline = '{{user}} blokkeren?';
 z.string.nl.modal_block_conversation_message = '{{user}} zal niet in staat zijn je te contacteren of toe te voegen aan een groepsgesprek.';
 z.string.nl.modal_block_conversation_button = 'Blokkeren';
+z.string.nl.modal_bots_confirm_headline = 'Service toevoegen';
+z.string.nl.modal_bots_confirm_message = 'Weet je zeker dat je een nieuw gesprek met {{name}} wil beginnen?';
 z.string.nl.modal_bots_confirm_button = 'Bevestig';
 z.string.nl.modal_bots_unavailable_headline = 'Bots zijn nu niet beschikbaar';
 z.string.nl.modal_bots_unavailable_message = 'Dank je voor je intress voor bots. De service is nu gestopt, terwijl we nu werken aan een volgende versie.';
@@ -167,6 +169,8 @@ z.string.nl.modal_not_connected_message_many = 'Een van de mensen die je hebt ge
 z.string.nl.modal_remove_device_button = 'Verwijder apparaat';
 z.string.nl.modal_remove_device_headline = 'Verwijder "{{device}}"';
 z.string.nl.modal_remove_device_message = 'Je wachtwoord is nodig om dit apparaat te verwijderen.';
+z.string.nl.modalServiceUnavailableHeadline = 'Toevoegen van de service niet mogelijk';
+z.string.nl.modalServiceUnavailableMessage = 'De service is op dit moment niet beschikbaar.';
 z.string.nl.modal_session_reset_headline = 'De sessie is gereset';
 z.string.nl.modal_session_reset_message_1 = 'Als het probleem niet is opgelost, ';
 z.string.nl.modal_session_reset_message_link = 'contact';
@@ -184,6 +188,7 @@ z.string.nl.conversation_you_nominative = 'jij';
 z.string.nl.conversation_you_dative = 'jij';
 z.string.nl.conversation_you_accusative = 'jij';
 
+z.string.nl.conversation_bot_user = 'Bot';
 z.string.nl.conversation_connection_accepted = 'Verbonden';
 z.string.nl.conversation_connection_blocked = 'Geblokkeerd';
 z.string.nl.conversation_connection_cancel_request = 'Stop verzoek tot connectie';
@@ -242,6 +247,9 @@ z.string.nl.conversation_send_pasted_file = 'Afbeelding geplakt op {{date}}';
 z.string.nl.conversation_someone = 'Iemand';
 z.string.nl.conversation_tweet_author = ' op Twitter';
 
+z.string.nl.conversation_creation_preferences_action = 'Volgende';
+z.string.nl.conversation_creation_participants_placeholder = 'Zoeken op naam';
+
 z.string.nl.collection_show_all = 'Toon alle {{number}}';
 z.string.nl.collection_section_links = 'Links';
 z.string.nl.collection_section_images = 'Afbeeldingen';
@@ -258,7 +266,6 @@ z.string.nl.conversations_contacts = 'Contacten';
 z.string.nl.conversations_connection_request_many = '{{number}} personen wachten';
 z.string.nl.conversations_connection_request_one = '1 persoon wacht';
 z.string.nl.conversations_empty_conversation = 'Groepsgesprek';
-z.string.nl.conversations_empty_conversation_description = 'Verlaten door iedereen';
 z.string.nl.conversations_no_conversations = 'Nog geen gesprekken';
 z.string.nl.conversations_popover_archive = 'Archiveren';
 z.string.nl.conversations_popover_block = 'Blokkeren';
@@ -307,8 +314,6 @@ z.string.nl.extensions_giphy_message = '{{tag}} • via giphy.com';
 z.string.nl.extensions_giphy_no_gifs = 'Oeps, geen gifjes';
 z.string.nl.extensions_giphy_random = 'Random';
 
-z.string.nl.search_open = 'Openen';
-z.string.nl.search_open_group = 'Groep aanmaken';
 z.string.nl.people_confirm_label = 'Voeg Personen aan Groep toe';
 z.string.nl.people_people = '{{number}} mensen';
 z.string.nl.people_search_placeholder = 'Zoeken op naam';
@@ -319,6 +324,8 @@ z.string.nl.people_invite_detail = 'Het delen van je contacten helpt je om met a
 z.string.nl.people_invite_button_contacts = 'Van contacten';
 z.string.nl.people_invite_button_gmail = 'Van Gmail';
 z.string.nl.people_invite_headline = 'Nodig je vrienden uit';
+z.string.nl.people_service_confirm_button = 'Service toevoegen';
+z.string.nl.people_service_removal_button = 'Service verwijderen';
 z.string.nl.people_services = 'Services';
 z.string.nl.people_share = 'Contacten delen';
 z.string.nl.people_tabs_details = 'Beschrijving';
@@ -356,7 +363,8 @@ z.string.nl.people_remove_message = '{{user}} zal geen berichten kunnen versture
 z.string.nl.people_unblock_headline = 'Deblokkeer?';
 z.string.nl.people_unblock_message = '{{user}} zal weer in staat zijn je te contacteren en je toe te voegen aan een groepsgesprek.';
 
-z.string.nl.people_button_add = 'Contacten toevoegen';
+z.string.nl.people_button_add = 'Toevoegen';
+z.string.nl.people_button_add_people = 'Contacten toevoegen';
 z.string.nl.people_button_block = 'Blokkeren';
 z.string.nl.people_button_cancel = 'Annuleer';
 z.string.nl.people_button_connect = 'Verbind';
@@ -446,7 +454,6 @@ z.string.nl.preferences_options_notifications_obfuscate = 'Details verbergen';
 z.string.nl.preferences_options_notifications_obfuscate_message = 'Toon zender';
 z.string.nl.preferences_options_notifications_on = 'Toon verzender en bericht';
 
-z.string.nl.search_group_hint = 'Type verder of kies meer mensen om een groep aan te maken';
 z.string.nl.search_connect = 'Verbind';
 z.string.nl.search_connections = 'Contacten';
 z.string.nl.search_contacts = 'Contacten';
@@ -459,6 +466,7 @@ z.string.nl.search_team_members = 'Teamleden';
 z.string.nl.search_top_people = 'Frequente personen';
 z.string.nl.search_try_search = 'Vind mensen met hun \nnaam of gebruikersnaam';
 z.string.nl.search_no_contacts_on_wire = 'Je hebt geen contacten op Wire\nProbeer mensen te vinden met hun\nnaam of gebruikersnaam.';
+z.string.nl.search_member_invite = 'Nodig andere mensen uit voor het team';
 z.string.nl.search_others = 'Verbind';
 
 z.string.nl.upload_google_headline = 'Zoek mensen \nom mee te praten.';
@@ -495,25 +503,25 @@ z.string.nl.user_availability_away = 'Afwezig';
 z.string.nl.user_availability_busy = 'Bezet';
 z.string.nl.user_availability_none = 'Geen';
 
-z.string.nl.system_notification_asset_add = 'Deelde een foto';
-z.string.nl.system_notification_connection_accepted = 'Accepteer connectie aanvraag';
-z.string.nl.system_notification_connection_connected = 'Zijn nu verbonden';
-z.string.nl.system_notification_connection_request = 'Wil met jou verbinden';
-z.string.nl.system_notification_conversation_create = '{{user}} is een gesprek begonnen';
-z.string.nl.system_notification_conversation_rename = '{{user}} heeft het gesprek naar {{name}} hernoemd';
-z.string.nl.system_notification_member_join_many = '{{user}} heeft {{number}} mensen aan het gesprek toegevoegd';
-z.string.nl.system_notification_member_join_one = '{{user1}} heeft {{user2}} aan het gesprek toegevoegd';
-z.string.nl.system_notification_member_leave_removed_you = '{{user}} verwijderde je uit dit gesprek';
-z.string.nl.system_notification_obfuscated = 'Stuurde je een bericht';
-z.string.nl.system_notification_obfuscated_title = 'Iemand';
-z.string.nl.system_notification_ping = 'Gepinged';
-z.string.nl.system_notification_reaction = '{{reaction}} je bericht';
-z.string.nl.system_notification_shared_audio = 'Deelde een audio bericht';
-z.string.nl.system_notification_shared_file = 'Deelde een bestand';
-z.string.nl.system_notification_shared_location = 'Deel een locatie';
-z.string.nl.system_notification_shared_video = 'Deelde een video';
-z.string.nl.system_notification_voice_channel_activate = 'Bellen';
-z.string.nl.system_notification_voice_channel_deactivate = 'Heeft gebeld';
+z.string.nl.notification_asset_add = 'Deelde een foto';
+z.string.nl.notification_connection_accepted = 'Accepteer connectie aanvraag';
+z.string.nl.notification_connection_connected = 'Zijn nu verbonden';
+z.string.nl.notification_connection_request = 'Wil met jou verbinden';
+z.string.nl.notification_conversation_create = '{{user}} is een gesprek begonnen';
+z.string.nl.notification_conversation_rename = '{{user}} heeft het gesprek naar {{name}} hernoemd';
+z.string.nl.notification_member_join_many = '{{user}} heeft {{number}} mensen aan het gesprek toegevoegd';
+z.string.nl.notification_member_join_one = '{{user1}} heeft {{user2}} aan het gesprek toegevoegd';
+z.string.nl.notification_member_leave_removed_you = '{{user}} verwijderde je uit dit gesprek';
+z.string.nl.notification_obfuscated = 'Stuurde je een bericht';
+z.string.nl.notification_obfuscated_title = 'Iemand';
+z.string.nl.notification_ping = 'Gepinged';
+z.string.nl.notification_reaction = '{{reaction}} je bericht';
+z.string.nl.notification_shared_audio = 'Deelde een audio bericht';
+z.string.nl.notification_shared_file = 'Deelde een bestand';
+z.string.nl.notification_shared_location = 'Deel een locatie';
+z.string.nl.notification_shared_video = 'Deelde een video';
+z.string.nl.notification_voice_channel_activate = 'Bellen';
+z.string.nl.notification_voice_channel_deactivate = 'Heeft gebeld';
 
 z.string.nl.tooltip_conversation_all_verified = 'Alle vingerafdrukken zijn geverifieerd';
 z.string.nl.tooltip_conversation_call = 'Oproep';
@@ -538,6 +546,7 @@ z.string.nl.tooltip_conversations_silence = 'Dempen ({{shortcut}})';
 z.string.nl.tooltip_conversations_start = 'Start gesprek ({{shortcut}})';
 
 z.string.nl.tooltip_people_add = 'Mensen toevoegen aan het gesprek ({{shortcut}})';
+z.string.nl.tooltip_people_add_people = 'Mensen toevoegen aan het gesprek ({{shortcut}})';
 z.string.nl.tooltip_people_back = 'Vorige';
 z.string.nl.tooltip_people_block = 'Blokkeren';
 z.string.nl.tooltip_people_connect = 'Verbind';

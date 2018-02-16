@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -42,10 +42,9 @@ z.ViewModel.ModalType = {
   NEW_DEVICE: '.modal-new-device',
   NOT_CONNECTED: '.modal-not-connected',
   REMOVE_DEVICE: '.modal-remove-device',
-  SERVICE_DISABLED: '.modal-service-disabled',
+  SERVICE_UNAVAILABLE: '.modal-service-unavailable',
   SESSION_RESET: '.modal-session-reset',
   TOO_LONG_MESSAGE: '.modal-too-long-message',
-  TOO_MANY_BOTS: '.modal-too-many-bots',
   TOO_MANY_MEMBERS: '.modal-too-many-members',
   UPLOAD_PARALLEL: '.modal-asset-upload-parallel',
   UPLOAD_TOO_LARGE: '.modal-asset-upload-too-large',
@@ -248,7 +247,7 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
     let action_id;
     let message_id;
     const joined_names = z.util.StringUtil.capitalize_first_char(
-      z.util.LocalizerUtil.join_names(content.user_ets, z.string.Declension.NOMINATIVE)
+      z.util.LocalizerUtil.joinNames(content.user_ets, z.string.Declension.NOMINATIVE)
     );
 
     if (content.user_ets.length > 1) {

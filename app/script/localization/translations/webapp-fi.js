@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -240,6 +240,9 @@ z.string.fi.conversation_send_pasted_file = 'Liitetty kuva, {{date}}';
 z.string.fi.conversation_someone = 'Joku';
 z.string.fi.conversation_tweet_author = ' Twitterissä';
 
+z.string.fi.conversation_creation_preferences_action = 'Seuraava';
+z.string.fi.conversation_creation_participants_placeholder = 'Hae nimellä';
+
 z.string.fi.collection_show_all = 'Näytä kaikki {{number}}';
 z.string.fi.collection_section_links = 'Linkit';
 z.string.fi.collection_section_images = 'Kuvat';
@@ -256,7 +259,6 @@ z.string.fi.conversations_contacts = 'Yhteystiedot';
 z.string.fi.conversations_connection_request_many = '{{number}} ihmisiä odottaa';
 z.string.fi.conversations_connection_request_one = '1 ihminen odottaa';
 z.string.fi.conversations_empty_conversation = 'Ryhmäkeskustelu';
-z.string.fi.conversations_empty_conversation_description = 'Kaikki poistuivat';
 z.string.fi.conversations_no_conversations = 'Ei vielä keskusteluita';
 z.string.fi.conversations_popover_archive = 'Arkistoi';
 z.string.fi.conversations_popover_block = 'Estä';
@@ -305,8 +307,6 @@ z.string.fi.extensions_giphy_message = '{{tag}} • giphy.com:in kautta';
 z.string.fi.extensions_giphy_no_gifs = 'Upsista, ei giffejä';
 z.string.fi.extensions_giphy_random = 'Satunnainen';
 
-z.string.fi.search_open = 'Avaa';
-z.string.fi.search_open_group = 'Luo Ryhmä';
 z.string.fi.people_confirm_label = 'Lisää käyttäjiä ryhmään';
 z.string.fi.people_people = '{{number}} Ihmistä';
 z.string.fi.people_search_placeholder = 'Hae nimellä';
@@ -354,7 +354,8 @@ z.string.fi.people_remove_message = '{{user}} ei pysty lähettämään tai vasta
 z.string.fi.people_unblock_headline = 'Poista esto?';
 z.string.fi.people_unblock_message = '{{user}} pystyy jälleen ottamaan sinuun yhteyttä ja lisäämään sinut ryhmäkeskusteluihin.';
 
-z.string.fi.people_button_add = 'Lisää henkilöitä';
+z.string.fi.people_button_add = 'Lisää';
+z.string.fi.people_button_add_people = 'Lisää henkilöitä';
 z.string.fi.people_button_block = 'Estä';
 z.string.fi.people_button_cancel = 'Peruuta';
 z.string.fi.people_button_connect = 'Yhdistä';
@@ -443,7 +444,6 @@ z.string.fi.preferences_options_notifications_obfuscate = 'Piilota yksityiskohda
 z.string.fi.preferences_options_notifications_obfuscate_message = 'Näytä lähettäjä';
 z.string.fi.preferences_options_notifications_on = 'Näytä lähettäjä ja viesti';
 
-z.string.fi.search_group_hint = 'Jatka kirjoittamista tai valitse lisää ihmisiä luodaksesi ryhmän';
 z.string.fi.search_connect = 'Yhdistä';
 z.string.fi.search_connections = 'Yhteydet';
 z.string.fi.search_contacts = 'Yhteystiedot';
@@ -490,25 +490,25 @@ z.string.fi.warning_tell_me_how = 'Kerro miten';
 z.string.fi.user_availability_available = 'Saatavilla';
 z.string.fi.user_availability_none = 'Ei mitään';
 
-z.string.fi.system_notification_asset_add = 'Jakoi kuvan';
-z.string.fi.system_notification_connection_accepted = 'Hyväksyi yhteyspyyntösi';
-z.string.fi.system_notification_connection_connected = 'Olet nyt yhteydessä';
-z.string.fi.system_notification_connection_request = 'Haluaa luoda kontaktin';
-z.string.fi.system_notification_conversation_create = '{{user}} aloitti keskustelun';
-z.string.fi.system_notification_conversation_rename = '{{user}} nimesi keskustelun uudelleen {{name}}ksi';
-z.string.fi.system_notification_member_join_many = '{{user}} lisäsi {{number}} ihmistä keskusteluun';
-z.string.fi.system_notification_member_join_one = '{{user1}} lisäsi {{user2}}n keskusteluun';
-z.string.fi.system_notification_member_leave_removed_you = '{{user}} poisti sinut keskustelusta';
-z.string.fi.system_notification_obfuscated = 'Lähetti sinulle viestin';
-z.string.fi.system_notification_obfuscated_title = 'Joku';
-z.string.fi.system_notification_ping = 'Pinggasi';
-z.string.fi.system_notification_reaction = '{{reaction}} sinun viesti';
-z.string.fi.system_notification_shared_audio = 'Jakoi ääniviestin';
-z.string.fi.system_notification_shared_file = 'Jakoi tiedoston';
-z.string.fi.system_notification_shared_location = 'Jakoi sijainnin';
-z.string.fi.system_notification_shared_video = 'Jakoi videon';
-z.string.fi.system_notification_voice_channel_activate = 'Soittaa';
-z.string.fi.system_notification_voice_channel_deactivate = 'Soitti';
+z.string.fi.notification_asset_add = 'Jakoi kuvan';
+z.string.fi.notification_connection_accepted = 'Hyväksyi yhteyspyyntösi';
+z.string.fi.notification_connection_connected = 'Olet nyt yhteydessä';
+z.string.fi.notification_connection_request = 'Haluaa luoda kontaktin';
+z.string.fi.notification_conversation_create = '{{user}} aloitti keskustelun';
+z.string.fi.notification_conversation_rename = '{{user}} nimesi keskustelun uudelleen {{name}}ksi';
+z.string.fi.notification_member_join_many = '{{user}} lisäsi {{number}} ihmistä keskusteluun';
+z.string.fi.notification_member_join_one = '{{user1}} lisäsi {{user2}}n keskusteluun';
+z.string.fi.notification_member_leave_removed_you = '{{user}} poisti sinut keskustelusta';
+z.string.fi.notification_obfuscated = 'Lähetti sinulle viestin';
+z.string.fi.notification_obfuscated_title = 'Joku';
+z.string.fi.notification_ping = 'Pinggasi';
+z.string.fi.notification_reaction = '{{reaction}} sinun viesti';
+z.string.fi.notification_shared_audio = 'Jakoi ääniviestin';
+z.string.fi.notification_shared_file = 'Jakoi tiedoston';
+z.string.fi.notification_shared_location = 'Jakoi sijainnin';
+z.string.fi.notification_shared_video = 'Jakoi videon';
+z.string.fi.notification_voice_channel_activate = 'Soittaa';
+z.string.fi.notification_voice_channel_deactivate = 'Soitti';
 
 z.string.fi.tooltip_conversation_all_verified = 'Kaikki sormenjäljet on vahvistettu';
 z.string.fi.tooltip_conversation_call = 'Puhelu';

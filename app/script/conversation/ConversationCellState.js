@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -108,12 +108,13 @@ z.conversation.ConversationCellState = (() => {
 
   const removedState = {
     description(conversationEntity) {
-      const lastMessageEntity = conversationEntity.get_last_message();
+      const lastMessageEntity = conversationEntity.getLastMessage();
       const selfUserId = conversationEntity.self.id;
 
       const isRemovalMessage =
-        lastMessageEntity && lastMessageEntity.is_member() && lastMessageEntity.is_member_removal();
-      if (isRemovalMessage && lastMessageEntity.user_ids().includes(selfUserId)) {
+        lastMessageEntity && lastMessageEntity.is_member() && lastMessageEntity.isMemberRemoval();
+      const wasSelfRemoved = isRemovalMessage && lastMessageEntity.userIds().includes(selfUserId);
+      if (wasSelfRemoved) {
         if (lastMessageEntity.user().id === selfUserId) {
           return z.l10n.text(z.string.conversations_secondary_line_you_left);
         }
@@ -165,21 +166,21 @@ z.conversation.ConversationCellState = (() => {
 
   const groupActivityState = {
     description(conversationEntity) {
-      const lastMessageEntity = conversationEntity.get_last_message();
+      const lastMessageEntity = conversationEntity.getLastMessage();
 
       if (lastMessageEntity.is_member()) {
-        const userCount = lastMessageEntity.user_ets().length;
+        const userCount = lastMessageEntity.userEntities().length;
 
-        if (lastMessageEntity.is_member_join()) {
+        if (lastMessageEntity.isMemberJoin()) {
           if (userCount === 1) {
-            if (!lastMessageEntity.remote_user_ets().length) {
+            if (!lastMessageEntity.remoteUserEntities().length) {
               return z.l10n.text(
                 z.string.conversations_secondary_line_person_added_you,
                 lastMessageEntity.user().name()
               );
             }
 
-            const [remoteUserEntity] = lastMessageEntity.remote_user_ets();
+            const [remoteUserEntity] = lastMessageEntity.remoteUserEntities();
             return z.l10n.text(z.string.conversations_secondary_line_person_added, remoteUserEntity.name());
           }
 
@@ -188,9 +189,9 @@ z.conversation.ConversationCellState = (() => {
           }
         }
 
-        if (lastMessageEntity.is_member_removal()) {
+        if (lastMessageEntity.isMemberRemoval()) {
           if (userCount === 1) {
-            const [remoteUserEntity] = lastMessageEntity.remote_user_ets();
+            const [remoteUserEntity] = lastMessageEntity.remoteUserEntities();
             if (remoteUserEntity === lastMessageEntity.user()) {
               return z.l10n.text(z.string.conversations_secondary_line_person_left, remoteUserEntity.name());
             }
@@ -209,8 +210,8 @@ z.conversation.ConversationCellState = (() => {
       }
     },
     icon(conversationEntity) {
-      const lastMessageEntity = conversationEntity.get_last_message();
-      if (lastMessageEntity.is_member() && lastMessageEntity.is_member_removal()) {
+      const lastMessageEntity = conversationEntity.getLastMessage();
+      if (lastMessageEntity.is_member() && lastMessageEntity.isMemberRemoval()) {
         if (conversationEntity.is_muted()) {
           return z.conversation.ConversationStatusIcon.MUTED;
         }
@@ -218,7 +219,7 @@ z.conversation.ConversationCellState = (() => {
       }
     },
     match(conversationEntity) {
-      const lastMessageEntity = conversationEntity.get_last_message();
+      const lastMessageEntity = conversationEntity.getLastMessage();
       const expectedMessageType = lastMessageEntity
         ? lastMessageEntity.is_member() || lastMessageEntity.is_system()
         : false;
@@ -283,15 +284,14 @@ z.conversation.ConversationCellState = (() => {
       }
     },
     match(conversationEntity) {
-      const lastMessageEntity = conversationEntity.get_last_message();
-      const isMemberJoin = lastMessageEntity && lastMessageEntity.is_member() && lastMessageEntity.is_member_join();
+      const lastMessageEntity = conversationEntity.getLastMessage();
+      const isMemberJoin = lastMessageEntity && lastMessageEntity.is_member() && lastMessageEntity.isMemberJoin();
       return conversationEntity.is_request() || (conversationEntity.is_one2one() && isMemberJoin);
     },
   };
 
   function _generate(conversationEntity) {
     const states = [
-      emptyState,
       removedState,
       mutedState,
       alertState,

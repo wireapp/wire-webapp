@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -404,10 +404,10 @@ window.TestFactory.prototype.exposeCallingActors = function() {
 
 /**
  *
- * @returns {Promise<z.system_notification.SystemNotificationRepository>} The repository for system notifications.
+ * @returns {Promise<z.notification.NotificationRepository>} The repository for system notifications.
  */
-window.TestFactory.prototype.exposeSystemNotificationActors = function() {
-  this.logger.info('- exposeSystemNotificationActors');
+window.TestFactory.prototype.exposeNotificationActors = function() {
+  this.logger.info('- exposeNotificationActors');
   return Promise.resolve()
     .then(() => this.exposeConversationActors())
     .then(() => {
@@ -417,13 +417,13 @@ window.TestFactory.prototype.exposeSystemNotificationActors = function() {
     .then(() => {
       this.logger.info('✓ exposedCallingActors');
 
-      TestFactory.system_notification_repository = new z.system_notification.SystemNotificationRepository(
+      TestFactory.notification_repository = new z.notification.NotificationRepository(
         TestFactory.calling_repository,
         TestFactory.conversation_repository
       );
-      TestFactory.system_notification_repository.logger.level = this.settings.logging_level;
+      TestFactory.notification_repository.logger.level = this.settings.logging_level;
 
-      return TestFactory.system_notification_repository;
+      return TestFactory.notification_repository;
     });
 };
 

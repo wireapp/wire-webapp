@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -241,6 +241,9 @@ z.string.tr.conversation_send_pasted_file = 'Yapıştırılmış resim, {{date}}
 z.string.tr.conversation_someone = 'Birisi';
 z.string.tr.conversation_tweet_author = ' Twitter’da';
 
+z.string.tr.conversation_creation_preferences_action = 'İleri';
+z.string.tr.conversation_creation_participants_placeholder = 'İsme göre ara';
+
 z.string.tr.collection_show_all = '{{number}}’nun tümünü göster';
 z.string.tr.collection_section_links = 'Bağlantılar';
 z.string.tr.collection_section_images = 'Resimler';
@@ -257,7 +260,6 @@ z.string.tr.conversations_contacts = 'Kişiler';
 z.string.tr.conversations_connection_request_many = '{{number}} kişi bekliyor';
 z.string.tr.conversations_connection_request_one = 'Bir kişi bekliyor';
 z.string.tr.conversations_empty_conversation = 'Grup sohbeti';
-z.string.tr.conversations_empty_conversation_description = 'Herkes ayrıldı';
 z.string.tr.conversations_no_conversations = 'Hiç konuşma yok';
 z.string.tr.conversations_popover_archive = 'Arşivle';
 z.string.tr.conversations_popover_block = 'Engelle';
@@ -306,8 +308,6 @@ z.string.tr.extensions_giphy_message = '{{tag}} • giphy.com aracılığıyla';
 z.string.tr.extensions_giphy_no_gifs = 'Olamaz, hiç Gif yok';
 z.string.tr.extensions_giphy_random = 'Rastgele';
 
-z.string.tr.search_open = 'Aç';
-z.string.tr.search_open_group = 'Grup oluştur';
 z.string.tr.people_confirm_label = 'Gruba insanları ekle';
 z.string.tr.people_people = '{{number}} kişi';
 z.string.tr.people_search_placeholder = 'İsme göre ara';
@@ -355,7 +355,8 @@ z.string.tr.people_remove_message = '{{user}} bu konuşmaya mesaj gönderemeyece
 z.string.tr.people_unblock_headline = 'Engeli kaldır?';
 z.string.tr.people_unblock_message = '{{user}} sizinle tekrardan iletişim kurabilecek ve sizi grup konuşmalarına ekleyebilecek.';
 
-z.string.tr.people_button_add = 'Kişileri Ekle';
+z.string.tr.people_button_add = 'Ekle';
+z.string.tr.people_button_add_people = 'Kişileri Ekle';
 z.string.tr.people_button_block = 'Engelle';
 z.string.tr.people_button_cancel = 'İptal';
 z.string.tr.people_button_connect = 'Bağlan';
@@ -445,7 +446,6 @@ z.string.tr.preferences_options_notifications_obfuscate = 'Ayrıntıyı gizle';
 z.string.tr.preferences_options_notifications_obfuscate_message = 'Göndereni göster';
 z.string.tr.preferences_options_notifications_on = 'Göndereni ve mesajı göster';
 
-z.string.tr.search_group_hint = 'Yazmaya devam edin ya da bir grup oluşturmak için daha fazla kişi seçin';
 z.string.tr.search_connect = 'Bağlan';
 z.string.tr.search_connections = 'Bağlantılar';
 z.string.tr.search_contacts = 'Kişiler';
@@ -494,25 +494,25 @@ z.string.tr.user_availability_away = 'Uzakta';
 z.string.tr.user_availability_busy = 'Meşgul';
 z.string.tr.user_availability_none = 'Hiçbiri';
 
-z.string.tr.system_notification_asset_add = 'Bir resim paylaştı';
-z.string.tr.system_notification_connection_accepted = 'Bağlantı isteğinizi kabul etti';
-z.string.tr.system_notification_connection_connected = 'Şu anda bağlısınız';
-z.string.tr.system_notification_connection_request = 'Bağlanmak istiyor';
-z.string.tr.system_notification_conversation_create = '{{user}} bir konuşma başlattı';
-z.string.tr.system_notification_conversation_rename = '{{user}}, konuşma ismini {{name}} olarak değiştirdi';
-z.string.tr.system_notification_member_join_many = '{{user}}, konuşmaya {{number}} kişi ekledi';
-z.string.tr.system_notification_member_join_one = '{{user1}}, {{user2}}’i konuşmaya ekledi';
-z.string.tr.system_notification_member_leave_removed_you = '{{user}} sizi konuşmadan çıkardı';
-z.string.tr.system_notification_obfuscated = 'Size bir mesaj gönderdi';
-z.string.tr.system_notification_obfuscated_title = 'Birisi';
-z.string.tr.system_notification_ping = 'Pingledi';
-z.string.tr.system_notification_reaction = 'mesajınızı {{reaction}}';
-z.string.tr.system_notification_shared_audio = 'Bir sesli mesaj paylaştı';
-z.string.tr.system_notification_shared_file = 'Bir dosya paylaştı';
-z.string.tr.system_notification_shared_location = 'Bir konum paylaştı';
-z.string.tr.system_notification_shared_video = 'Bir video paylaştı';
-z.string.tr.system_notification_voice_channel_activate = 'Arıyor';
-z.string.tr.system_notification_voice_channel_deactivate = 'Aradı';
+z.string.tr.notification_asset_add = 'Bir resim paylaştı';
+z.string.tr.notification_connection_accepted = 'Bağlantı isteğinizi kabul etti';
+z.string.tr.notification_connection_connected = 'Şu anda bağlısınız';
+z.string.tr.notification_connection_request = 'Bağlanmak istiyor';
+z.string.tr.notification_conversation_create = '{{user}} bir konuşma başlattı';
+z.string.tr.notification_conversation_rename = '{{user}}, konuşma ismini {{name}} olarak değiştirdi';
+z.string.tr.notification_member_join_many = '{{user}}, konuşmaya {{number}} kişi ekledi';
+z.string.tr.notification_member_join_one = '{{user1}}, {{user2}}’i konuşmaya ekledi';
+z.string.tr.notification_member_leave_removed_you = '{{user}} sizi konuşmadan çıkardı';
+z.string.tr.notification_obfuscated = 'Size bir mesaj gönderdi';
+z.string.tr.notification_obfuscated_title = 'Birisi';
+z.string.tr.notification_ping = 'Pingledi';
+z.string.tr.notification_reaction = 'mesajınızı {{reaction}}';
+z.string.tr.notification_shared_audio = 'Bir sesli mesaj paylaştı';
+z.string.tr.notification_shared_file = 'Bir dosya paylaştı';
+z.string.tr.notification_shared_location = 'Bir konum paylaştı';
+z.string.tr.notification_shared_video = 'Bir video paylaştı';
+z.string.tr.notification_voice_channel_activate = 'Arıyor';
+z.string.tr.notification_voice_channel_deactivate = 'Aradı';
 
 z.string.tr.tooltip_conversation_all_verified = 'Tüm parmak izleri doğrulanmış';
 z.string.tr.tooltip_conversation_call = 'Ara';

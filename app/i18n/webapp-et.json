@@ -12,10 +12,10 @@
   "teamName.whatIsWireTeamsLink": "Mis on Wire meeskondadele?",
   "accountForm.namePlaceholder": "Nimi",
   "accountForm.emailTeamPlaceholder": "sina@sinufirma.ee",
-  "accountForm.emailPersonalPlaceholder": "",
+  "accountForm.emailPersonalPlaceholder": "sina@email.ee",
   "accountForm.passwordPlaceholder": "Parool (vähemalt 8 märki)",
   "accountForm.terms": "Ma nõustun <a {linkParams}>kasutustingimustega</a>",
-  "accountForm.nextButton": "Järgmine",
+  "accountForm.submitButton": "Järgmine",
   "createAccount.nextButton": "Järgmine",
   "invite.nextButton": "Järgmine",
   "createAccount.headLine": "Seadista oma konto",
@@ -52,6 +52,7 @@
   "BackendError.LABEL.OPERATION_DENIED": "Sul pole õigust",
   "BackendError.LABEL.UNAUTHORIZED": "Midagi läks valesti. Palun laadi leht uuesti ja proovi uuesti",
   "BackendError.LABEL.HANDLE_EXISTS": "See kasutajanimi on juba kasutusel",
+  "BackendError.LABEL.HANDLE_TOO_SHORT": "Palun sisestage vähemalt 2-tähemärgiline kasutajanimi",
   "BackendError.LABEL.INVALID_HANDLE": "See kasutajanimi on sobimatu",
   "BackendError.LABEL.INVALID_INVITATION_CODE": "Kutse on tühistatud või aegunud",
   "BackendError.LABEL.NO_OTHER_OWNER": "Viimast omanikku ei saa meeskonnast eemaldada",
@@ -62,6 +63,7 @@
   "BackendError.LABEL.EMAIL_EXISTS": "See e-posti aadress on juba kasutusel. <a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://support.wire.com/hc/articles/115004082129\">Lisateave</a>",
   "BackendError.unexpected": "Ootamatu tõrge ({code} {message})",
   "ValidationError.FIELD.NAME.PATTERN_MISMATCH": "Sisesta vähemalt 2-täheline nimi",
+  "ValidationError.FIELD.NAME.VALUE_MISSING": "Sisesta vähemalt 2-täheline nimi",
   "ValidationError.FIELD.PASSWORD.PATTERN_MISMATCH": "Sisesta vähemalt 8-märgiline parool",
   "ValidationError.FIELD.EMAIL.TYPE_MISMATCH": "Palun sisesta kehtiv e-posti aadress"
 }

@@ -60,11 +60,13 @@
                  data-bind="click: clicked_on_mute_audio, css: {'toggled': !self_stream_state.audio_send(), 'button-round-dark': !show_remote_participant()}"></div>
             <!-- ko if: show_toggle_screen() -->
               <div class="video-controls-button button-round button-round-md icon-screensharing"
-                   data-bind="click: clicked_on_share_screen, css: {'toggled': self_stream_state.screen_send(), 'button-round-dark': !show_remote_participant(), 'disabled': disable_toggle_screen()}"></div>
+                   data-bind="click: clicked_on_share_screen, css: {'toggled': self_stream_state.screen_send(), 'button-round-dark': !show_remote_participant(), 'disabled': disable_toggle_screen()}"
+                   data-uie-name="do-call-controls-toggle-screen"></div>
             <!-- /ko -->
             <!-- ko if: show_toggle_video() -->
               <div class="video-controls-button button-round button-round-md icon-video"
-                   data-bind="click: clicked_on_stop_video, css: {'toggled': self_stream_state.video_send(), 'button-round-dark': !show_remote_participant()}"></div>
+                   data-bind="click: clicked_on_stop_video, css: {'toggled': self_stream_state.video_send(), 'button-round-dark': !show_remote_participant()}"
+                   data-uie-name="do-call-controls-toggle-video"></div>
             <!-- /ko -->
             <div class="video-controls-button button-round button-round-md button-round-theme-red icon-end-call"
                  data-uie-name="do-call-controls-video-call-cancel"

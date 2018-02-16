@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,11 +36,13 @@ z.event.EventTypeHandling = {
     z.event.Backend.CONVERSATION.MEMBER_LEAVE,
     z.event.Backend.CONVERSATION.RENAME,
     z.event.Client.CONVERSATION.DELETE_EVERYWHERE,
+    z.event.Client.CONVERSATION.GROUP_CREATION,
     z.event.Client.CONVERSATION.INCOMING_MESSAGE_TOO_BIG,
     z.event.Client.CONVERSATION.KNOCK,
     z.event.Client.CONVERSATION.LOCATION,
     z.event.Client.CONVERSATION.MESSAGE_ADD,
     z.event.Client.CONVERSATION.MISSED_MESSAGES,
+    z.event.Client.CONVERSATION.ONE2ONE_CREATION,
     z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE,
     z.event.Client.CONVERSATION.UNABLE_TO_DECRYPT,
     z.event.Client.CONVERSATION.VERIFICATION,

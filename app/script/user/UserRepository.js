@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -495,15 +495,15 @@ z.user.UserRepository = class UserRepository {
 
         switch (connection_et.status()) {
           case z.user.ConnectionStatus.PENDING: {
-            message_et.member_message_type = z.message.SystemMessageType.CONNECTION_REQUEST;
+            message_et.memberMessageType = z.message.SystemMessageType.CONNECTION_REQUEST;
             break;
           }
 
           case z.user.ConnectionStatus.ACCEPTED: {
             if (previous_status === z.user.ConnectionStatus.SENT) {
-              message_et.member_message_type = z.message.SystemMessageType.CONNECTION_ACCEPTED;
+              message_et.memberMessageType = z.message.SystemMessageType.CONNECTION_ACCEPTED;
             } else {
-              message_et.member_message_type = z.message.SystemMessageType.CONNECTION_CONNECTED;
+              message_et.memberMessageType = z.message.SystemMessageType.CONNECTION_CONNECTED;
             }
             break;
           }
@@ -512,7 +512,7 @@ z.user.UserRepository = class UserRepository {
             break;
         }
 
-        amplify.publish(z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, connection_et, message_et);
+        amplify.publish(z.event.WebApp.NOTIFICATION.NOTIFY, message_et, connection_et);
       });
     }
   }
@@ -783,8 +783,9 @@ z.user.UserRepository = class UserRepository {
    * @returns {Array<z.entity.User>} Matching users
    */
   search_for_connected_users(query, is_handle) {
+    const excludedEmojis = Array.from(query).filter(char => EMOJI_UNICODE_RANGES.includes(char));
     return this.connected_users()
-      .filter(user_et => user_et.matches(query, is_handle))
+      .filter(user_et => user_et.matches(query, is_handle, excludedEmojis))
       .sort((user_a, user_b) => {
         if (is_handle) {
           return z.util.StringUtil.sort_by_priority(user_a.username(), user_b.username(), query);

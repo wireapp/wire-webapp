@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -96,7 +96,7 @@ z.broadcast.BroadcastRepository = class BroadcastRepository {
       .catch(error => {
         const isUnknownClient = error.label === z.service.BackendClientError.LABEL.UNKNOWN_CLIENT;
         if (isUnknownClient) {
-          this.clientRepository.remove_local_client();
+          this.clientRepository.removeLocalClient();
         }
 
         if (!error.missing) {

@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -71,6 +71,7 @@ export default class BackendError extends Error {
 
   static HANDLE_ERRORS = {
     HANDLE_EXISTS: 'handle-exists',
+    HANDLE_TOO_SHORT: 'handle-too-short', // Synthetic error label
     INVALID_HANDLE: 'invalid-handle',
   };
 

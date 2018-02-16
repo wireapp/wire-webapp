@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -240,6 +240,8 @@ z.string.sk.conversation_send_pasted_file = 'Vložený obrázok {{date}}';
 z.string.sk.conversation_someone = 'Niekto';
 z.string.sk.conversation_tweet_author = ' na Twitteri';
 
+z.string.sk.conversation_creation_participants_placeholder = 'Vyhľadať podľa mena';
+
 z.string.sk.collection_show_all = 'Zobraziť všetky {{number}}';
 z.string.sk.collection_section_links = 'Odkazy';
 z.string.sk.collection_section_images = 'Obrázky';
@@ -256,7 +258,6 @@ z.string.sk.conversations_contacts = 'Kontakty';
 z.string.sk.conversations_connection_request_many = '{{number}} ľudí čaká';
 z.string.sk.conversations_connection_request_one = '1 osoba čaká';
 z.string.sk.conversations_empty_conversation = 'Skupinová konverzácia';
-z.string.sk.conversations_empty_conversation_description = 'Všetci opustili rozhovor';
 z.string.sk.conversations_no_conversations = 'Zatiaľ žiadne konverzácie';
 z.string.sk.conversations_popover_archive = 'Archív';
 z.string.sk.conversations_popover_block = 'Blokovať';
@@ -305,8 +306,6 @@ z.string.sk.extensions_giphy_message = '{{tag}} • cez giphy.com';
 z.string.sk.extensions_giphy_no_gifs = 'Ej, žiadne gify';
 z.string.sk.extensions_giphy_random = 'Náhodný';
 
-z.string.sk.search_open = 'Otvoriť';
-z.string.sk.search_open_group = 'Vytvoriť skupinu';
 z.string.sk.people_confirm_label = 'Pridať ľudí do skupiny';
 z.string.sk.people_people = '{{number}} Ľudí';
 z.string.sk.people_search_placeholder = 'Vyhľadať podľa mena';
@@ -354,7 +353,8 @@ z.string.sk.people_remove_message = '{{user}} nebude môcť odosielať ani prij�
 z.string.sk.people_unblock_headline = 'Odblokovať?';
 z.string.sk.people_unblock_message = '{{user}} Vás bude môcť kontaktovať, alebo Vás pozvať do skupinového rozhovoru.';
 
-z.string.sk.people_button_add = 'Pridať ľudí';
+z.string.sk.people_button_add = 'Pridať';
+z.string.sk.people_button_add_people = 'Pridať ľudí';
 z.string.sk.people_button_block = 'Blokovať';
 z.string.sk.people_button_cancel = 'Zrušiť';
 z.string.sk.people_button_connect = 'Pripojiť';
@@ -443,7 +443,6 @@ z.string.sk.preferences_options_notifications_obfuscate = 'Skryť detaily';
 z.string.sk.preferences_options_notifications_obfuscate_message = 'Zobraziť odosielateľa';
 z.string.sk.preferences_options_notifications_on = 'Zobraziť odosielateľa a správu';
 
-z.string.sk.search_group_hint = 'Pokračujte v písaní, alebo vyberte viac ľudí pre vytvorenie skupiny';
 z.string.sk.search_connect = 'Pripojiť';
 z.string.sk.search_connections = 'Pripojenia';
 z.string.sk.search_contacts = 'Kontakty';
@@ -490,25 +489,25 @@ z.string.sk.warning_tell_me_how = 'Povedz mi, ako';
 z.string.sk.user_availability_available = 'Dostupné';
 z.string.sk.user_availability_none = 'Žiadne';
 
-z.string.sk.system_notification_asset_add = 'Zdieľať obrázok';
-z.string.sk.system_notification_connection_accepted = 'Prijal Vašu požiadavku na pripojenie';
-z.string.sk.system_notification_connection_connected = 'Teraz ste pripojení';
-z.string.sk.system_notification_connection_request = 'Chce sa pripojiť';
-z.string.sk.system_notification_conversation_create = '{{user}} začal rozhovor';
-z.string.sk.system_notification_conversation_rename = '{{user}} premenoval rozhovor na {{name}}';
-z.string.sk.system_notification_member_join_many = '{{user}} pridal {{number}} ľudí do rozhovoru';
-z.string.sk.system_notification_member_join_one = '{{user1}} pridal {{user2}} do rozhovoru';
-z.string.sk.system_notification_member_leave_removed_you = '{{user}} Vás odstránil z konverzácie';
-z.string.sk.system_notification_obfuscated = 'Poslal Vám správu';
-z.string.sk.system_notification_obfuscated_title = 'Niekto';
-z.string.sk.system_notification_ping = 'Pingnuté';
-z.string.sk.system_notification_reaction = '{{reaction}} Vašu správu';
-z.string.sk.system_notification_shared_audio = 'Zdieľal zvukovú správu';
-z.string.sk.system_notification_shared_file = 'Zdieľal súbor';
-z.string.sk.system_notification_shared_location = 'Zdieľal umiestnenie';
-z.string.sk.system_notification_shared_video = 'Zdieľal video';
-z.string.sk.system_notification_voice_channel_activate = 'Volá';
-z.string.sk.system_notification_voice_channel_deactivate = 'Volal';
+z.string.sk.notification_asset_add = 'Zdieľať obrázok';
+z.string.sk.notification_connection_accepted = 'Prijal Vašu požiadavku na pripojenie';
+z.string.sk.notification_connection_connected = 'Teraz ste pripojení';
+z.string.sk.notification_connection_request = 'Chce sa pripojiť';
+z.string.sk.notification_conversation_create = '{{user}} začal rozhovor';
+z.string.sk.notification_conversation_rename = '{{user}} premenoval rozhovor na {{name}}';
+z.string.sk.notification_member_join_many = '{{user}} pridal {{number}} ľudí do rozhovoru';
+z.string.sk.notification_member_join_one = '{{user1}} pridal {{user2}} do rozhovoru';
+z.string.sk.notification_member_leave_removed_you = '{{user}} Vás odstránil z konverzácie';
+z.string.sk.notification_obfuscated = 'Poslal Vám správu';
+z.string.sk.notification_obfuscated_title = 'Niekto';
+z.string.sk.notification_ping = 'Pingnuté';
+z.string.sk.notification_reaction = '{{reaction}} Vašu správu';
+z.string.sk.notification_shared_audio = 'Zdieľal zvukovú správu';
+z.string.sk.notification_shared_file = 'Zdieľal súbor';
+z.string.sk.notification_shared_location = 'Zdieľal umiestnenie';
+z.string.sk.notification_shared_video = 'Zdieľal video';
+z.string.sk.notification_voice_channel_activate = 'Volá';
+z.string.sk.notification_voice_channel_deactivate = 'Volal';
 
 z.string.sk.tooltip_conversation_all_verified = 'Všetky identifikátory sú overené';
 z.string.sk.tooltip_conversation_call = 'Volať';

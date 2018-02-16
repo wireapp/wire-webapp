@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -227,6 +227,8 @@ z.string.da.conversation_send_pasted_file = 'Indsatte billede d. {{date}}';
 z.string.da.conversation_someone = 'Nogen';
 z.string.da.conversation_tweet_author = ' på Twitter';
 
+z.string.da.conversation_creation_participants_placeholder = 'Søg ved navn';
+
 z.string.da.collection_show_all = 'Vis alle {{number}}';
 z.string.da.collection_section_links = 'Links';
 z.string.da.collection_section_images = 'Billeder';
@@ -243,7 +245,6 @@ z.string.da.conversations_contacts = 'Kontakter';
 z.string.da.conversations_connection_request_many = '{{number}} personer venter';
 z.string.da.conversations_connection_request_one = '1 person venter';
 z.string.da.conversations_empty_conversation = 'Gruppesamtale';
-z.string.da.conversations_empty_conversation_description = 'Alle forlod gruppen';
 z.string.da.conversations_no_conversations = 'Ingen samtaler';
 z.string.da.conversations_popover_archive = 'Arkivér';
 z.string.da.conversations_popover_block = 'Blokér';
@@ -284,8 +285,6 @@ z.string.da.extensions_giphy_message = '{{tag}} • via giphy.com';
 z.string.da.extensions_giphy_no_gifs = 'Ups, ingen gifs';
 z.string.da.extensions_giphy_random = 'Tilfældig';
 
-z.string.da.search_open = 'Åbn';
-z.string.da.search_open_group = 'Opret Gruppe';
 z.string.da.people_confirm_label = 'Tilføj personer til gruppe';
 z.string.da.people_people = '{{number}} Personer';
 z.string.da.people_search_placeholder = 'Søg ved navn';
@@ -333,7 +332,8 @@ z.string.da.people_remove_message = '{{user}} vil ikke være i stand til at send
 z.string.da.people_unblock_headline = 'Fjern Blokering?';
 z.string.da.people_unblock_message = '{{user}} vil igen kunne kontakte dig og tilføje dig til gruppesamtaler.';
 
-z.string.da.people_button_add = 'Tilføj personer';
+z.string.da.people_button_add = 'Tilføj';
+z.string.da.people_button_add_people = 'Tilføj personer';
 z.string.da.people_button_block = 'Blokér';
 z.string.da.people_button_cancel = 'Annuller';
 z.string.da.people_button_connect = 'Forbind';
@@ -418,7 +418,6 @@ z.string.da.preferences_options_notifications_obfuscate = 'Skjul detaljer';
 z.string.da.preferences_options_notifications_obfuscate_message = 'Vis afsender';
 z.string.da.preferences_options_notifications_on = 'Vis afsender og besked';
 
-z.string.da.search_group_hint = 'Bliv ved med at skrive eller vælg flere personer for at oprette en gruppe';
 z.string.da.search_connect = 'Forbind';
 z.string.da.search_connections = 'Forbindelser';
 z.string.da.search_contacts = 'Kontakter';
@@ -464,25 +463,25 @@ z.string.da.warning_tell_me_how = 'Fortæl mig hvordan';
 z.string.da.user_availability_available = 'Ledig';
 z.string.da.user_availability_none = 'Ingen';
 
-z.string.da.system_notification_asset_add = 'Delte et billede';
-z.string.da.system_notification_connection_accepted = 'Accepterede din anmodning om forbindelse';
-z.string.da.system_notification_connection_connected = 'Du er nu forbundet';
-z.string.da.system_notification_connection_request = 'Ønsker at forbinde';
-z.string.da.system_notification_conversation_create = '{{user}} startede en samtale';
-z.string.da.system_notification_conversation_rename = '{{user}} omdøbte samtalen til {{name}}';
-z.string.da.system_notification_member_join_many = '{{user}} tilføjede {{number}} personer til samtalen';
-z.string.da.system_notification_member_join_one = '{{user1}} tilføjede {{user2}} til samtalen';
-z.string.da.system_notification_member_leave_removed_you = '{{user}} har fjernet dig fra en samtale';
-z.string.da.system_notification_obfuscated = 'Sendte dig en besked';
-z.string.da.system_notification_obfuscated_title = 'Nogen';
-z.string.da.system_notification_ping = 'Pingede';
-z.string.da.system_notification_reaction = '{{reaction}} din besked';
-z.string.da.system_notification_shared_audio = 'Delte en lyd besked';
-z.string.da.system_notification_shared_file = 'Delte en fil';
-z.string.da.system_notification_shared_location = 'Delte en placering';
-z.string.da.system_notification_shared_video = 'Delte en video';
-z.string.da.system_notification_voice_channel_activate = 'Ringer';
-z.string.da.system_notification_voice_channel_deactivate = 'Ringede';
+z.string.da.notification_asset_add = 'Delte et billede';
+z.string.da.notification_connection_accepted = 'Accepterede din anmodning om forbindelse';
+z.string.da.notification_connection_connected = 'Du er nu forbundet';
+z.string.da.notification_connection_request = 'Ønsker at forbinde';
+z.string.da.notification_conversation_create = '{{user}} startede en samtale';
+z.string.da.notification_conversation_rename = '{{user}} omdøbte samtalen til {{name}}';
+z.string.da.notification_member_join_many = '{{user}} tilføjede {{number}} personer til samtalen';
+z.string.da.notification_member_join_one = '{{user1}} tilføjede {{user2}} til samtalen';
+z.string.da.notification_member_leave_removed_you = '{{user}} har fjernet dig fra en samtale';
+z.string.da.notification_obfuscated = 'Sendte dig en besked';
+z.string.da.notification_obfuscated_title = 'Nogen';
+z.string.da.notification_ping = 'Pingede';
+z.string.da.notification_reaction = '{{reaction}} din besked';
+z.string.da.notification_shared_audio = 'Delte en lyd besked';
+z.string.da.notification_shared_file = 'Delte en fil';
+z.string.da.notification_shared_location = 'Delte en placering';
+z.string.da.notification_shared_video = 'Delte en video';
+z.string.da.notification_voice_channel_activate = 'Ringer';
+z.string.da.notification_voice_channel_deactivate = 'Ringede';
 
 z.string.da.tooltip_conversation_all_verified = 'Alle fingeraftryk er bekræftede';
 z.string.da.tooltip_conversation_call = 'Ring op';

@@ -5,7 +5,7 @@
   "index.createTeam": "Vytvoriť tím",
   "index.createTeamFor": "",
   "index.loginInfo": "",
-  "index.login": "",
+  "index.login": "Prihlásenie",
   "teamName.headline": "",
   "teamName.subhead": "",
   "teamName.teamNamePlaceholder": "",
@@ -15,7 +15,7 @@
   "accountForm.emailPersonalPlaceholder": "",
   "accountForm.passwordPlaceholder": "Heslo (minimálne 8 znakov)",
   "accountForm.terms": "",
-  "accountForm.nextButton": "",
+  "accountForm.submitButton": "",
   "createAccount.nextButton": "",
   "invite.nextButton": "",
   "createAccount.headLine": "",
@@ -51,6 +51,7 @@
   "BackendError.LABEL.OPERATION_DENIED": "",
   "BackendError.LABEL.UNAUTHORIZED": "",
   "BackendError.LABEL.HANDLE_EXISTS": "",
+  "BackendError.LABEL.HANDLE_TOO_SHORT": "",
   "BackendError.LABEL.INVALID_HANDLE": "",
   "BackendError.LABEL.INVALID_INVITATION_CODE": "",
   "BackendError.LABEL.NO_OTHER_OWNER": "",
@@ -61,6 +62,7 @@
   "BackendError.LABEL.EMAIL_EXISTS": "",
   "BackendError.unexpected": "",
   "ValidationError.FIELD.NAME.PATTERN_MISMATCH": "Zadajte meno s minimálne 2 znakmi",
+  "ValidationError.FIELD.NAME.VALUE_MISSING": "Zadajte meno s minimálne 2 znakmi",
   "ValidationError.FIELD.PASSWORD.PATTERN_MISMATCH": "",
   "ValidationError.FIELD.EMAIL.TYPE_MISMATCH": ""
 }

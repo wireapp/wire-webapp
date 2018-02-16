@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,7 +43,7 @@
   transition-duration: @animation-timing-fast;
   // TODO: timing function
 
-  .show-user & {
+  .show-participant & {
     transform: translateX(-@bubble-transition_offset);
   }
 }
@@ -165,7 +165,7 @@
 }
 
 .participants-search-header {
-  padding: 16px 8px 0;
+  padding: 16px 8px 8px;
 }
 
 .participants-search-header-row {
@@ -236,6 +236,7 @@
   height: 44px;
   display: flex;
   padding: 0 8px;
+  margin-bottom: -8px;
   .participants-search-tab {
     flex-grow: 1;
     display: flex;

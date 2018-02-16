@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -235,6 +235,8 @@ z.string.it.conversation_send_pasted_file = 'Immagine incollata alle {{date}}';
 z.string.it.conversation_someone = 'Qualcuno';
 z.string.it.conversation_tweet_author = ' su Twitter';
 
+z.string.it.conversation_creation_participants_placeholder = 'Cerca per nome';
+
 z.string.it.collection_show_all = 'Mostra tutti i {{number}}';
 z.string.it.collection_section_links = 'Link';
 z.string.it.collection_section_images = 'Immagini';
@@ -251,7 +253,6 @@ z.string.it.conversations_contacts = 'Contatti';
 z.string.it.conversations_connection_request_many = '{{number}} persone in attesa';
 z.string.it.conversations_connection_request_one = '1 persona in attesa';
 z.string.it.conversations_empty_conversation = 'Conversazione di gruppo';
-z.string.it.conversations_empty_conversation_description = 'Tutti gli utenti hanno abbandonato';
 z.string.it.conversations_no_conversations = 'Nessuna conversazione';
 z.string.it.conversations_popover_archive = 'Archivia';
 z.string.it.conversations_popover_block = 'Blocca';
@@ -300,8 +301,6 @@ z.string.it.extensions_giphy_message = '{{tag}} • via giphy.com';
 z.string.it.extensions_giphy_no_gifs = 'Oops, nessuna gif';
 z.string.it.extensions_giphy_random = 'Scelta casuale';
 
-z.string.it.search_open = 'Apri';
-z.string.it.search_open_group = 'Crea gruppo';
 z.string.it.people_confirm_label = 'Aggiungi persone al gruppo';
 z.string.it.people_people = '{{number}} persone';
 z.string.it.people_search_placeholder = 'Cerca per nome';
@@ -349,7 +348,8 @@ z.string.it.people_remove_message = '{{user}} non sarà in grado di inviare o ri
 z.string.it.people_unblock_headline = 'Sblocca?';
 z.string.it.people_unblock_message = '{{user}} sarà in grado di contattarti e aggiungerti alle conversazioni di gruppo di nuovo.';
 
-z.string.it.people_button_add = 'Aggiungi persone';
+z.string.it.people_button_add = 'Aggiungi';
+z.string.it.people_button_add_people = 'Aggiungi persone';
 z.string.it.people_button_block = 'Blocca';
 z.string.it.people_button_cancel = 'Annulla';
 z.string.it.people_button_connect = 'Connetti';
@@ -437,7 +437,6 @@ z.string.it.preferences_options_notifications_obfuscate = 'Nascondi dettagli';
 z.string.it.preferences_options_notifications_obfuscate_message = 'Mostra mittente';
 z.string.it.preferences_options_notifications_on = 'Mostra mittente e messaggio';
 
-z.string.it.search_group_hint = 'Digita o scegli più persone per creare un gruppo';
 z.string.it.search_connect = 'Connetti';
 z.string.it.search_connections = 'Connessioni';
 z.string.it.search_contacts = 'Contatti';
@@ -484,25 +483,25 @@ z.string.it.warning_tell_me_how = 'Dimmi come';
 z.string.it.user_availability_available = 'Disponibile';
 z.string.it.user_availability_none = 'Nessuno';
 
-z.string.it.system_notification_asset_add = 'Ha condiviso un’immagine';
-z.string.it.system_notification_connection_accepted = 'Ha accettato la tua richiesta di connessione';
-z.string.it.system_notification_connection_connected = 'Siete connessi ora';
-z.string.it.system_notification_connection_request = 'Vuole connettersi';
-z.string.it.system_notification_conversation_create = '{{user}} ha iniziato una conversazione';
-z.string.it.system_notification_conversation_rename = '{{user}} ha rinominato la conversazione in {{name}}';
-z.string.it.system_notification_member_join_many = '{{user}} ha aggiunto {{number}} persone alla conversazione';
-z.string.it.system_notification_member_join_one = '{{user1}} ha aggiunto {{user2}} alla conversazione';
-z.string.it.system_notification_member_leave_removed_you = '{{user}} ti ha rimosso da una conversazione';
-z.string.it.system_notification_obfuscated = 'Ti ha inviato un messaggio';
-z.string.it.system_notification_obfuscated_title = 'Qualcuno';
-z.string.it.system_notification_ping = 'Ha fatto un trillo';
-z.string.it.system_notification_reaction = '{{reaction}} il tuo messaggio';
-z.string.it.system_notification_shared_audio = 'Ha condiviso un messaggio vocale';
-z.string.it.system_notification_shared_file = 'Ha condiviso un file';
-z.string.it.system_notification_shared_location = 'Ha condiviso una posizione';
-z.string.it.system_notification_shared_video = 'Ha condiviso un video';
-z.string.it.system_notification_voice_channel_activate = 'Chiamata in corso';
-z.string.it.system_notification_voice_channel_deactivate = 'Ha chamato';
+z.string.it.notification_asset_add = 'Ha condiviso un’immagine';
+z.string.it.notification_connection_accepted = 'Ha accettato la tua richiesta di connessione';
+z.string.it.notification_connection_connected = 'Siete connessi ora';
+z.string.it.notification_connection_request = 'Vuole connettersi';
+z.string.it.notification_conversation_create = '{{user}} ha iniziato una conversazione';
+z.string.it.notification_conversation_rename = '{{user}} ha rinominato la conversazione in {{name}}';
+z.string.it.notification_member_join_many = '{{user}} ha aggiunto {{number}} persone alla conversazione';
+z.string.it.notification_member_join_one = '{{user1}} ha aggiunto {{user2}} alla conversazione';
+z.string.it.notification_member_leave_removed_you = '{{user}} ti ha rimosso da una conversazione';
+z.string.it.notification_obfuscated = 'Ti ha inviato un messaggio';
+z.string.it.notification_obfuscated_title = 'Qualcuno';
+z.string.it.notification_ping = 'Ha fatto un trillo';
+z.string.it.notification_reaction = '{{reaction}} il tuo messaggio';
+z.string.it.notification_shared_audio = 'Ha condiviso un messaggio vocale';
+z.string.it.notification_shared_file = 'Ha condiviso un file';
+z.string.it.notification_shared_location = 'Ha condiviso una posizione';
+z.string.it.notification_shared_video = 'Ha condiviso un video';
+z.string.it.notification_voice_channel_activate = 'Chiamata in corso';
+z.string.it.notification_voice_channel_deactivate = 'Ha chamato';
 
 z.string.it.tooltip_conversation_all_verified = 'Tutte le impronte digitali sono state verificate';
 z.string.it.tooltip_conversation_call = 'Chiama';

@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -175,18 +175,11 @@ z.conversation.ConversationMapper = class ConversationMapper {
       conversationEntity.last_server_timestamp(initialTimestamp);
     }
 
-    // All users that are still active
-    if (others) {
-      conversationEntity.participating_user_ids(others);
-    } else {
-      const participating_user_ids = members.others
-        .filter(other => other.status === z.conversation.ConversationStatus.CURRENT_MEMBER)
-        .map(other => other.id);
+    // Active participants from database or backend payload
+    const participatingUserIds = others ? others : members.others.map(other => other.id);
+    conversationEntity.participating_user_ids(participatingUserIds);
 
-      conversationEntity.participating_user_ids(participating_user_ids);
-    }
-
-    // Data from IndexedDB or backend
+    // Team ID from database or backend payload
     const team_id = conversationData.team_id ? conversationData.team_id : conversationData.team;
     if (team_id) {
       conversationEntity.team_id = team_id;

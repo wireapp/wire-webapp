@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -231,6 +231,8 @@ z.string.sl.conversation_send_pasted_file = 'Prilepljena slika ob {{date}}';
 z.string.sl.conversation_someone = 'Nekdo';
 z.string.sl.conversation_tweet_author = ' na Twitterju';
 
+z.string.sl.conversation_creation_participants_placeholder = 'Iskanje po imenu';
+
 z.string.sl.collection_show_all = 'Prikaži vse {{number}}';
 z.string.sl.collection_section_links = 'Povezave';
 z.string.sl.collection_section_images = 'Slike';
@@ -247,7 +249,6 @@ z.string.sl.conversations_contacts = 'Stiki';
 z.string.sl.conversations_connection_request_many = '{{number}} ljudi, ki čakajo';
 z.string.sl.conversations_connection_request_one = '1 oseba čaka';
 z.string.sl.conversations_empty_conversation = 'Skupinski pogovor';
-z.string.sl.conversations_empty_conversation_description = 'Vsi so zapustili pogovor';
 z.string.sl.conversations_no_conversations = 'Še ni pogovorov';
 z.string.sl.conversations_popover_archive = 'Arhiviraj';
 z.string.sl.conversations_popover_block = 'Blokiraj';
@@ -296,8 +297,6 @@ z.string.sl.extensions_giphy_message = '{{tag}} • preko giphy.com';
 z.string.sl.extensions_giphy_no_gifs = 'Ups, ni najdenih gifov';
 z.string.sl.extensions_giphy_random = 'Naključno';
 
-z.string.sl.search_open = 'Odpri';
-z.string.sl.search_open_group = 'Ustvari skupino';
 z.string.sl.people_confirm_label = 'Dodaj osebe v skupino';
 z.string.sl.people_people = '{{number}} oseb';
 z.string.sl.people_search_placeholder = 'Iskanje po imenu';
@@ -345,7 +344,8 @@ z.string.sl.people_remove_message = '{{user}} ne bo mogel pošiljati ali prejeti
 z.string.sl.people_unblock_headline = 'Odblokiraj?';
 z.string.sl.people_unblock_message = '{{user}} vas ne bo mogel kontaktirati ali ponovno dodati v skupinske pogovore.';
 
-z.string.sl.people_button_add = 'Dodaj osebe';
+z.string.sl.people_button_add = 'Dodaj';
+z.string.sl.people_button_add_people = 'Dodaj osebe';
 z.string.sl.people_button_block = 'Blokiraj';
 z.string.sl.people_button_cancel = 'Prekliči';
 z.string.sl.people_button_connect = 'Poveži';
@@ -434,7 +434,6 @@ z.string.sl.preferences_options_notifications_obfuscate = 'Skrij podrobnosti';
 z.string.sl.preferences_options_notifications_obfuscate_message = 'Pokaži pošiljatelja';
 z.string.sl.preferences_options_notifications_on = 'Pokaži pošiljatelja in sporočilo';
 
-z.string.sl.search_group_hint = 'Nadaljujte s tipkanjem ali izberite več oseb za ustvaritev skupine';
 z.string.sl.search_connect = 'Poveži';
 z.string.sl.search_connections = 'Povezave';
 z.string.sl.search_contacts = 'Stiki';
@@ -481,25 +480,25 @@ z.string.sl.warning_tell_me_how = 'Povej mi kako';
 z.string.sl.user_availability_available = 'Na voljo';
 z.string.sl.user_availability_none = 'Nič';
 
-z.string.sl.system_notification_asset_add = 'Je delil(-a) sliko';
-z.string.sl.system_notification_connection_accepted = 'Je sprejel(-a) vašo zahtevo po povezavi';
-z.string.sl.system_notification_connection_connected = 'Zdaj ste povezani';
-z.string.sl.system_notification_connection_request = 'Si želi povezati';
-z.string.sl.system_notification_conversation_create = '{{user}} je začel(-a) pogovor';
-z.string.sl.system_notification_conversation_rename = '{{user}} je preimenoval(-a) pogovor v {{name}}';
-z.string.sl.system_notification_member_join_many = '{{user}} je dodal(-a) {{number}} oseb v pogovor';
-z.string.sl.system_notification_member_join_one = '{{user1}} je dodal(-a) {{user2}} v pogovor';
-z.string.sl.system_notification_member_leave_removed_you = '{{user}} te je odstranil(-a) iz pogovora';
-z.string.sl.system_notification_obfuscated = 'Vam je poslal(-a) sporočilo';
-z.string.sl.system_notification_obfuscated_title = 'Nekdo';
-z.string.sl.system_notification_ping = 'Je pingal(-a)';
-z.string.sl.system_notification_reaction = '{{reaction}} vaše sporočilo';
-z.string.sl.system_notification_shared_audio = 'Je delil(-a) zvočno sporočilo';
-z.string.sl.system_notification_shared_file = 'Je delil(-a) zbirko';
-z.string.sl.system_notification_shared_location = 'Je delil(-a) lokacijo';
-z.string.sl.system_notification_shared_video = 'Je delil(-a) video';
-z.string.sl.system_notification_voice_channel_activate = 'Klicanje';
-z.string.sl.system_notification_voice_channel_deactivate = 'Je klical(-a)';
+z.string.sl.notification_asset_add = 'Je delil(-a) sliko';
+z.string.sl.notification_connection_accepted = 'Je sprejel(-a) vašo zahtevo po povezavi';
+z.string.sl.notification_connection_connected = 'Zdaj ste povezani';
+z.string.sl.notification_connection_request = 'Si želi povezati';
+z.string.sl.notification_conversation_create = '{{user}} je začel(-a) pogovor';
+z.string.sl.notification_conversation_rename = '{{user}} je preimenoval(-a) pogovor v {{name}}';
+z.string.sl.notification_member_join_many = '{{user}} je dodal(-a) {{number}} oseb v pogovor';
+z.string.sl.notification_member_join_one = '{{user1}} je dodal(-a) {{user2}} v pogovor';
+z.string.sl.notification_member_leave_removed_you = '{{user}} te je odstranil(-a) iz pogovora';
+z.string.sl.notification_obfuscated = 'Vam je poslal(-a) sporočilo';
+z.string.sl.notification_obfuscated_title = 'Nekdo';
+z.string.sl.notification_ping = 'Je pingal(-a)';
+z.string.sl.notification_reaction = '{{reaction}} vaše sporočilo';
+z.string.sl.notification_shared_audio = 'Je delil(-a) zvočno sporočilo';
+z.string.sl.notification_shared_file = 'Je delil(-a) zbirko';
+z.string.sl.notification_shared_location = 'Je delil(-a) lokacijo';
+z.string.sl.notification_shared_video = 'Je delil(-a) video';
+z.string.sl.notification_voice_channel_activate = 'Klicanje';
+z.string.sl.notification_voice_channel_deactivate = 'Je klical(-a)';
 
 z.string.sl.tooltip_conversation_all_verified = 'Vsi prstni odtisi naprav so preverjeni';
 z.string.sl.tooltip_conversation_call = 'Klic';

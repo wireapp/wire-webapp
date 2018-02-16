@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -86,7 +86,7 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
     };
 
     return Promise.all(this._mapRecipients(recipients, _removeDeletedClient, _removeDeletedUser)).then(() => {
-      this.conversationRepository.verification_state_handler.on_client_removed(Object.keys(recipients));
+      this.conversationRepository.verification_state_handler.onClientRemoved(Object.keys(recipients));
       return payload;
     });
   }
@@ -118,7 +118,7 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
         return Promise.all(this._mapRecipients(recipients, _addMissingClient));
       })
       .then(() => {
-        this.conversationRepository.verification_state_handler.on_client_add(Object.keys(recipients));
+        this.conversationRepository.verification_state_handler.onClientAdd(Object.keys(recipients));
         return payload;
       });
   }
@@ -145,7 +145,8 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
     return this.conversationRepository
       .get_conversation_by_id(conversationId)
       .catch(error => {
-        if (error.type !== z.conversation.ConversationError.TYPE.NOT_FOUND) {
+        const isConversationNotFound = error.type === z.conversation.ConversationError.TYPE.CONVERSATION_NOT_FOUND;
+        if (!isConversationNotFound) {
           throw error;
         }
       })

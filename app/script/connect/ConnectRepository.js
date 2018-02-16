@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -96,9 +96,9 @@ z.connect.ConnectRepository = class ConnectRepository {
    * @returns {Promise} Resolves with encoded phone book data
    */
   _parseMacosContacts() {
-    return new Promise(resolve => {
+    return new Promise((resolve, reject) => {
       if (!window.wAddressBook) {
-        return resolve(undefined);
+        return reject(new z.connect.ConnectError(z.connect.ConnectError.TYPE.NOT_SUPPORTED));
       }
       const addressBook = window.wAddressBook;
       const phoneBook = new z.connect.PhoneBook();
