@@ -41,12 +41,12 @@ describe('LinkPreviewProtoBuilder', () => {
   });
 
   it('returns undefined if no data is given', () => {
-    const link_preview = z.links.LinkPreviewProtoBuilder.build_from_open_graph_data();
+    const link_preview = z.links.LinkPreviewProtoBuilder.buildFromOpenGraphData();
     expect(link_preview).not.toBeDefined();
   });
 
   it('returns undefined if data is an empty object', () => {
-    const link_preview = z.links.LinkPreviewProtoBuilder.build_from_open_graph_data({});
+    const link_preview = z.links.LinkPreviewProtoBuilder.buildFromOpenGraphData({});
     expect(link_preview).not.toBeDefined();
   });
 
@@ -54,14 +54,14 @@ describe('LinkPreviewProtoBuilder', () => {
     const url = 'wire.com';
     const mock = OpenGraphMocks.getWireMock();
     delete mock.title;
-    const link_preview = z.links.LinkPreviewProtoBuilder.build_from_open_graph_data(mock, url);
+    const link_preview = z.links.LinkPreviewProtoBuilder.buildFromOpenGraphData(mock, url);
     expect(link_preview).not.toBeDefined();
   });
 
   it('returns a link preview if type is "website" and title is present', () => {
     const url = 'wire.com';
     const mock = OpenGraphMocks.getWireMock();
-    const link_preview = z.links.LinkPreviewProtoBuilder.build_from_open_graph_data(mock, url);
+    const link_preview = z.links.LinkPreviewProtoBuilder.buildFromOpenGraphData(mock, url);
     compare_article_with_mock(url, 0, link_preview, mock);
   });
 
@@ -69,14 +69,14 @@ describe('LinkPreviewProtoBuilder', () => {
     const url = 'wire.com';
     const mock = OpenGraphMocks.getWireMock();
     delete mock.image;
-    const link_preview = z.links.LinkPreviewProtoBuilder.build_from_open_graph_data(mock, url);
+    const link_preview = z.links.LinkPreviewProtoBuilder.buildFromOpenGraphData(mock, url);
     compare_article_with_mock(url, 0, link_preview, mock);
   });
 
   it('returns a link preview if title is present and offset is given', () => {
     const url = 'wire.com';
     const mock = OpenGraphMocks.getWireMock();
-    const link_preview = z.links.LinkPreviewProtoBuilder.build_from_open_graph_data(mock, url, 12);
+    const link_preview = z.links.LinkPreviewProtoBuilder.buildFromOpenGraphData(mock, url, 12);
     compare_article_with_mock(url, 12, link_preview, mock);
   });
 
@@ -84,7 +84,7 @@ describe('LinkPreviewProtoBuilder', () => {
     const url = 'heise.de';
     const mock = OpenGraphMocks.getHeiseMock();
     delete mock.type;
-    const link_preview = z.links.LinkPreviewProtoBuilder.build_from_open_graph_data(mock, url);
+    const link_preview = z.links.LinkPreviewProtoBuilder.buildFromOpenGraphData(mock, url);
     compare_article_with_mock(url, 0, link_preview, mock);
   });
 
@@ -92,7 +92,7 @@ describe('LinkPreviewProtoBuilder', () => {
     const url = 'heise.de';
     const mock = OpenGraphMocks.getHeiseMock();
     delete mock.description;
-    const link_preview = z.links.LinkPreviewProtoBuilder.build_from_open_graph_data(mock, url);
+    const link_preview = z.links.LinkPreviewProtoBuilder.buildFromOpenGraphData(mock, url);
     compare_article_with_mock(url, 0, link_preview, mock);
   });
 
@@ -100,7 +100,7 @@ describe('LinkPreviewProtoBuilder', () => {
     const url = 'heise.de';
     const mock = OpenGraphMocks.getHeiseMock();
     mock.site_name = 'Twitter';
-    const link_preview = z.links.LinkPreviewProtoBuilder.build_from_open_graph_data(mock, url);
+    const link_preview = z.links.LinkPreviewProtoBuilder.buildFromOpenGraphData(mock, url);
     compare_article_with_mock(url, 0, link_preview, mock);
   });
 });

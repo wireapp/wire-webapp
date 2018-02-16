@@ -28,7 +28,7 @@ z.links.LinkPreviewHelpers = {
    * @param {string} text - Text to parse
    * @returns {boolean} Text contains only a link
    */
-  contains_only_link(text) {
+  containsOnlyLink(text) {
     text = text.trim();
     const urls = linkify.find(text, 'url');
     return urls.length === 1 && urls[0].value === text;
@@ -39,15 +39,14 @@ z.links.LinkPreviewHelpers = {
    * @param {string} text - Text to parse
    * @returns {Object} Containing link and its offset
    */
-  get_first_link_with_offset(text) {
-    const links = linkify.find(text, 'url');
-    const first_link = links[0];
+  getFirstLinkWithOffset(text) {
+    const [firstLink] = linkify.find(text, 'url');
 
-    if (first_link != null) {
-      const link_offset = text.indexOf(first_link.value);
+    if (firstLink) {
+      const linkOffset = text.indexOf(firstLink.value);
       return {
-        offset: link_offset,
-        url: first_link.value,
+        offset: linkOffset,
+        url: firstLink.value,
       };
     }
   },
