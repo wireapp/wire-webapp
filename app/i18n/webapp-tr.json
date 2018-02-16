@@ -51,6 +51,7 @@
   "BackendError.LABEL.OPERATION_DENIED": "İzniniz yok",
   "BackendError.LABEL.UNAUTHORIZED": "Bir şeyler ters gitti. Lütfen sayfayı yenileyin ve tekrar deneyin",
   "BackendError.LABEL.HANDLE_EXISTS": "Bu kullanıcı adı zaten alınmış",
+  "BackendError.LABEL.HANDLE_TOO_SHORT": "",
   "BackendError.LABEL.INVALID_HANDLE": "Bu kullanıcı adı geçersiz",
   "BackendError.LABEL.INVALID_INVITATION_CODE": "Davet geri çevrildi veya geçerliliğini yitirdi",
   "BackendError.LABEL.NO_OTHER_OWNER": "Son sahip takımdan silinemez",

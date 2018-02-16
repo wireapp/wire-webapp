@@ -51,6 +51,7 @@
   "BackendError.LABEL.OPERATION_DENIED": "Δεν έχετε άδεια",
   "BackendError.LABEL.UNAUTHORIZED": "Κάτι πήγε στραβά. Παρακαλώ ελέγξτε τα στοιχεία σας και προσπαθήστε ξανά",
   "BackendError.LABEL.HANDLE_EXISTS": "Το όνομα χρήστη χρησιμοποιείται ήδη",
+  "BackendError.LABEL.HANDLE_TOO_SHORT": "",
   "BackendError.LABEL.INVALID_HANDLE": "Αυτό το όνομα χρήστη δεν είναι έγκυρο",
   "BackendError.LABEL.INVALID_INVITATION_CODE": "Η πρόσκληση ανεκλήθη ή έλήξε",
   "BackendError.LABEL.NO_OTHER_OWNER": "",

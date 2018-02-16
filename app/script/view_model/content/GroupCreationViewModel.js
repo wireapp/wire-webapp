@@ -55,11 +55,7 @@ z.ViewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
     this.activateNext = ko.pureComputed(() => this.nameInput().length);
     this.contacts = ko.pureComputed(() => {
       if (this.showContacts()) {
-        if (this.teamRepository.isTeam()) {
-          return this.teamRepository.teamUsers();
-        }
-
-        return this.userRepository.connected_users();
+        return this.teamRepository.isTeam() ? this.teamRepository.teamUsers() : this.userRepository.connected_users();
       }
 
       return [];
@@ -98,7 +94,7 @@ z.ViewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
     });
 
     this.shouldUpdateScrollbar = ko
-      .computed(() => this.selectedContacts() && this.stateIsPreferences())
+      .computed(() => this.selectedContacts() && this.stateIsPreferences() && this.contacts())
       .extend({notify: 'always', rateLimit: 500});
 
     amplify.subscribe(z.event.WebApp.CONVERSATION.CREATE_GROUP, this.showCreateGroup.bind(this));
@@ -141,9 +137,8 @@ z.ViewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
         .createGroupConversation(this.selectedContacts(), this.nameInput())
         .then(conversationEntity => {
           amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.GROUP_CREATION_SUCCEEDED, {
-            conversation_name_length: this.nameInput().length,
-            conversation_size: this.selectedContacts().length + 1,
             method: this.method,
+            with_participants: !!this.selectedContacts().length,
           });
 
           this._hideModal();
@@ -163,7 +158,7 @@ z.ViewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
       const nameTooLong = trimmedNameInput.length > z.conversation.ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;
       const nameTooShort = !trimmedNameInput.length;
 
-      this.nameInput(this.nameInput().slice(0, z.conversation.ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH));
+      this.nameInput(trimmedNameInput.slice(0, z.conversation.ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH));
       if (nameTooLong) {
         return this.nameError(z.l10n.text(z.string.groupCreationPreferencesErrorNameLong));
       }

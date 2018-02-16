@@ -52,6 +52,7 @@
   "BackendError.LABEL.OPERATION_DENIED": "Nincs engedélyed",
   "BackendError.LABEL.UNAUTHORIZED": "Hiba történt. Töltsd újra az oldalt és próbáld újra",
   "BackendError.LABEL.HANDLE_EXISTS": "A felhasználónév már foglalt",
+  "BackendError.LABEL.HANDLE_TOO_SHORT": "Kérjük, legalább 2 karakterből álló nevet adj meg",
   "BackendError.LABEL.INVALID_HANDLE": "Ez a felhasználónév érvénytelen",
   "BackendError.LABEL.INVALID_INVITATION_CODE": "A meghívót már visszavonták vagy lejárt",
   "BackendError.LABEL.NO_OTHER_OWNER": "Az utolsó tulajdonos nem távolítható el a csapatból",

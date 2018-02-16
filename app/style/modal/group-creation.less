@@ -33,7 +33,6 @@
     margin: 0;
     overflow: hidden;
     width: 100%;
-    height: 412px;
     flex-grow: 1;
   }
 
@@ -85,11 +84,19 @@
     margin: 8px;
   }
 
-  user-list {
-    overflow-x: hidden;
-    .search-list-item {
-      align-items: center;
-      margin: 0 16px;
+  .group-creation-list-wrapper {
+    height: 100%;
+    position: absolute;
+    left: 16px;
+    right: -16px;
+    padding-right: 16px;
+    user-list {
+      margin-left: -16px;
+      overflow-x: hidden;
+      .search-list-item {
+        align-items: center;
+        margin: 0 16px;
+      }
     }
   }
 

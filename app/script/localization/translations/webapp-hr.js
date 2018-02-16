@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -266,8 +266,6 @@ z.string.hr.extensions_giphy_message = '• {{tag}} s giphy.com';
 z.string.hr.extensions_giphy_no_gifs = 'Ups, nema Gif-ova';
 z.string.hr.extensions_giphy_random = 'Nasumično';
 
-z.string.hr.search_open = 'Otvori';
-z.string.hr.search_open_group = 'Napravi grupu';
 z.string.hr.people_people = '{{people}} ljudi';
 z.string.hr.people_search_placeholder = 'Traži po imenu';
 z.string.hr.people_everyone_participates = 'Svi ljudi s kojima ste povezani su već u ovom razgovoru.';
@@ -311,7 +309,8 @@ z.string.hr.people_remove_message = '{{user}} neće moći slati ili primati poru
 
 z.string.hr.people_unblock_headline = 'Odblokirati?';
 
-z.string.hr.people_button_add = 'Dodaj osobe';
+z.string.hr.people_button_add = 'Dodaj';
+z.string.hr.people_button_add_people = 'Dodaj osobe';
 z.string.hr.people_button_block = 'Blokiraj';
 z.string.hr.people_button_cancel = 'Odustani';
 z.string.hr.people_button_connect = 'Poveži se';
@@ -392,7 +391,6 @@ z.string.hr.preferences_options_notifications_none = 'Isključi';
 z.string.hr.preferences_options_notifications_obfuscate = 'Sakrij detalje';
 z.string.hr.preferences_options_notifications_on = 'Prikaži pošiljatelja i poruku';
 
-z.string.hr.search_group_hint = 'Nastavi pisati ili odaberi više ljudi za stvaranje grupe';
 z.string.hr.search_connect = 'Poveži se';
 z.string.hr.search_connections = 'Veze';
 z.string.hr.search_contacts = 'Kontakti';

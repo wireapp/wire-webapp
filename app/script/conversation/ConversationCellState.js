@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -96,11 +96,12 @@ z.conversation.ConversationCellState = (() => {
 
   const removed_state = {
     description(conversation_et) {
-      const last_message_et = conversation_et.get_last_message();
+      const last_message_et = conversation_et.getLastMessage();
       const self_user_id = conversation_et.self.id;
 
-      const is_removal_message = last_message_et && last_message_et.is_member() && last_message_et.is_member_removal();
-      if (is_removal_message && last_message_et.user_ids().includes(self_user_id)) {
+      const is_removal_message = last_message_et && last_message_et.is_member() && last_message_et.isMemberRemoval();
+      const wasSelfRemoved = is_removal_message && last_message_et.userIds().includes(self_user_id);
+      if (wasSelfRemoved) {
         if (last_message_et.user().id === self_user_id) {
           return z.l10n.text(z.string.conversations_secondary_line_you_left);
         }
@@ -150,18 +151,18 @@ z.conversation.ConversationCellState = (() => {
 
   const group_activity_state = {
     description(conversation_et) {
-      const last_message_et = conversation_et.get_last_message();
+      const last_message_et = conversation_et.getLastMessage();
 
       if (last_message_et.is_member()) {
-        const user_count = last_message_et.user_ets().length;
+        const user_count = last_message_et.userEntities().length;
 
-        if (last_message_et.is_member_join()) {
+        if (last_message_et.isMemberJoin()) {
           if (user_count === 1) {
-            if (!last_message_et.remote_user_ets().length) {
+            if (!last_message_et.remoteUserEntities().length) {
               return z.l10n.text(z.string.conversations_secondary_line_person_added_you, last_message_et.user().name());
             }
 
-            const [remote_user_et] = last_message_et.remote_user_ets();
+            const [remote_user_et] = last_message_et.remoteUserEntities();
             return z.l10n.text(z.string.conversations_secondary_line_person_added, remote_user_et.name());
           }
 
@@ -170,9 +171,9 @@ z.conversation.ConversationCellState = (() => {
           }
         }
 
-        if (last_message_et.is_member_removal()) {
+        if (last_message_et.isMemberRemoval()) {
           if (user_count === 1) {
-            const [remote_user_et] = last_message_et.remote_user_ets();
+            const [remote_user_et] = last_message_et.remoteUserEntities();
             if (remote_user_et === last_message_et.user()) {
               return z.l10n.text(z.string.conversations_secondary_line_person_left, remote_user_et.name());
             }
@@ -191,8 +192,8 @@ z.conversation.ConversationCellState = (() => {
       }
     },
     icon(conversation_et) {
-      const last_message_et = conversation_et.get_last_message();
-      if (last_message_et.is_member() && last_message_et.is_member_removal()) {
+      const last_message_et = conversation_et.getLastMessage();
+      if (last_message_et.is_member() && last_message_et.isMemberRemoval()) {
         if (conversation_et.is_muted()) {
           return z.conversation.ConversationStatusIcon.MUTED;
         }
@@ -200,7 +201,7 @@ z.conversation.ConversationCellState = (() => {
       }
     },
     match(conversation_et) {
-      const last_message_et = conversation_et.get_last_message();
+      const last_message_et = conversation_et.getLastMessage();
       const expected_message_type = last_message_et
         ? last_message_et.is_member() || last_message_et.is_system()
         : false;
@@ -265,8 +266,8 @@ z.conversation.ConversationCellState = (() => {
       }
     },
     match(conversation_et) {
-      const last_message_et = conversation_et.get_last_message();
-      const is_member_join = last_message_et && last_message_et.is_member() && last_message_et.is_member_join();
+      const last_message_et = conversation_et.getLastMessage();
+      const is_member_join = last_message_et && last_message_et.is_member() && last_message_et.isMemberJoin();
       return conversation_et.is_request() || (conversation_et.is_one2one() && is_member_join);
     },
   };
