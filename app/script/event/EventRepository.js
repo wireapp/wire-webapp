@@ -149,7 +149,8 @@ z.event.EventRepository = class EventRepository {
 
     this.webSocketService.clientId = this.currentClient().id;
     this.webSocketService.connect(notification => {
-      if (this.notificationHandlingState() === z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET) {
+      const isHandlingWebSocket = this.notificationHandlingState() === z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
+      if (isHandlingWebSocket) {
         return this.notificationsQueue.push(notification);
       }
       this._bufferWebSocketNotification(notification);
