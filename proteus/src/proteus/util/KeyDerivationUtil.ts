@@ -52,7 +52,7 @@ const KeyDerivationUtil = {
     const salt_to_key = (received_salt: Uint8Array): Uint8Array => {
       const keybytes = sodium.crypto_auth_hmacsha256_KEYBYTES;
       if (received_salt.length > keybytes) {
-        return <Uint8Array>sodium.crypto_hash_sha256(received_salt);
+        return sodium.crypto_hash_sha256(received_salt);
       }
 
       const key = new Uint8Array(keybytes);
@@ -61,7 +61,7 @@ const KeyDerivationUtil = {
     };
 
     const extract = (received_salt: Uint8Array, received_input: Uint8Array): Uint8Array => {
-      return <Uint8Array>sodium.crypto_auth_hmacsha256(received_input, salt_to_key(received_salt));
+      return sodium.crypto_auth_hmacsha256(received_input, salt_to_key(received_salt));
     };
 
     const expand = (tag: Uint8Array, received_info: Uint8Array, received_length: number): Uint8Array => {
@@ -71,7 +71,7 @@ const KeyDerivationUtil = {
 
       for (let index = 0; index <= num_blocks - 1; index++) {
         const buf = ArrayUtil.concatenate_array_buffers([hmac, received_info, new Uint8Array([index + 1])]);
-        hmac = <Uint8Array>sodium.crypto_auth_hmacsha256(buf, tag);
+        hmac = sodium.crypto_auth_hmacsha256(buf, tag);
         result = ArrayUtil.concatenate_array_buffers([result, hmac]);
       }
 

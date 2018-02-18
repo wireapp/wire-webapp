@@ -29,12 +29,6 @@ import SecretKey from './SecretKey';
 
 import InputError from '../errors/InputError';
 
-export interface LibsodiumKeyPair {
-  publicKey: Uint8Array;
-  privateKey: Uint8Array;
-  keyType: string;
-}
-
 /** Construct an ephemeral key pair. */
 class KeyPair {
   public_key: PublicKey;
@@ -52,8 +46,8 @@ class KeyPair {
     const ed25519_key_pair = sodium.crypto_sign_keypair();
 
     const kp = ClassUtil.new_instance<KeyPair>(KeyPair);
-    kp.secret_key = KeyPair.prototype._construct_private_key(<LibsodiumKeyPair>ed25519_key_pair);
-    kp.public_key = KeyPair.prototype._construct_public_key(<LibsodiumKeyPair>ed25519_key_pair);
+    kp.secret_key = KeyPair.prototype._construct_private_key(ed25519_key_pair);
+    kp.public_key = KeyPair.prototype._construct_public_key(ed25519_key_pair);
 
     return kp;
   }
@@ -65,7 +59,7 @@ class KeyPair {
    * @returns Constructed private key
    * @see https://download.libsodium.org/doc/advanced/ed25519-curve25519.html
    */
-  private _construct_private_key(ed25519_key_pair: LibsodiumKeyPair): SecretKey {
+  private _construct_private_key(ed25519_key_pair: _sodium.KeyPair): SecretKey {
     const sk_ed25519 = ed25519_key_pair.privateKey;
     const sk_curve25519 = ed2curve.convertSecretKey(sk_ed25519);
     if (sk_curve25519) {
@@ -78,7 +72,7 @@ class KeyPair {
    * @param ed25519_key_pair Key pair based on Edwards-curve (Ed25519)
    * @returns Constructed public key
    */
-  private _construct_public_key(ed25519_key_pair: LibsodiumKeyPair): PublicKey {
+  private _construct_public_key(ed25519_key_pair: _sodium.KeyPair): PublicKey {
     const pk_ed25519 = ed25519_key_pair.publicKey;
     const pk_curve25519 = ed2curve.convertPublicKey(pk_ed25519);
     if (pk_curve25519) {

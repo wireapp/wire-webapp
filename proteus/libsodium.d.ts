@@ -1,9 +1,27 @@
+// Type definitions for libsodium-wrappers-sumo 0.7.3
+// Project: https://github.com/jedisct1/libsodium.js
+// Definitions by: Florian Keller <https://github.com/ffflorian>
+
 declare module 'libsodium-wrappers-sumo' {
-  type OutputFormat = 'uint8array' | 'text' | 'hex' | 'base64';
+  type Uint8ArrayOutputFormat = 'uint8array';
+  type StringOutputFormat = 'text' | 'hex' | 'base64';
+  type KeyType = 'curve25519' | 'ed25519' | 'x25519';
+
+  enum base64_variants {
+    ORIGINAL,
+    ORIGINAL_NO_PADDING,
+    URLSAFE,
+    URLSAFE_NO_PADDING,
+  }
 
   interface CryptoBox {
     ciphertext: Uint8Array;
     mac: Uint8Array;
+  }
+
+  interface StringCryptoBox {
+    ciphertext: string;
+    mac: string;
   }
 
   interface CryptoKX {
@@ -11,10 +29,21 @@ declare module 'libsodium-wrappers-sumo' {
     sharedTx: Uint8Array;
   }
 
+  interface StringCryptoKX {
+    sharedRx: string;
+    sharedTx: string;
+  }
+
   interface KeyPair {
-    privateKey: string | Uint8Array;
-    publicKey: string | Uint8Array;
-    keyType: 'curve25519' | 'ed25519' | 'x25519';
+    keyType: KeyType;
+    privateKey: Uint8Array;
+    publicKey: Uint8Array;
+  }
+
+  interface StringKeyPair {
+    keyType: KeyType;
+    privateKey: string;
+    publicKey: string;
   }
 
   interface SecretBox {
@@ -22,11 +51,9 @@ declare module 'libsodium-wrappers-sumo' {
     mac: Uint8Array;
   }
 
-  interface base64_variants {
-    ORIGINAL: 1 | 0;
-    ORIGINAL_NO_PADDING: 3 | 0;
-    URLSAFE: 5 | 0;
-    URLSAFE_NO_PADDING: 7 | 0;
+  interface StringSecretBox {
+    cipher: string;
+    mac: string;
   }
 
   interface generichash_state_address {
@@ -81,9 +108,6 @@ declare module 'libsodium-wrappers-sumo' {
   const crypto_box_SEALBYTES: number;
   const crypto_box_SECRETKEYBYTES: number;
   const crypto_box_SEEDBYTES: number;
-  const crypto_box_curve25519xchacha20poly1305_NONCEBYTES: number;
-  const crypto_box_curve25519xchacha20poly1305_PUBLICKEYBYTES: number;
-  const crypto_box_curve25519xchacha20poly1305_SECRETKEYBYTES: number;
   const crypto_core_hchacha20_CONSTBYTES: number;
   const crypto_core_hchacha20_INPUTBYTES: number;
   const crypto_core_hchacha20_KEYBYTES: number;
@@ -188,8 +212,16 @@ declare module 'libsodium-wrappers-sumo' {
     additional_data: string | Uint8Array | null,
     public_nonce: Uint8Array,
     key: Uint8Array,
-    outputFormat?: OutputFormat
-  ): string | Uint8Array;
+    outputFormat?: Uint8ArrayOutputFormat
+  ): Uint8Array;
+  function crypto_aead_chacha20poly1305_decrypt(
+    secret_nonce: string | Uint8Array | null,
+    ciphertext: string | Uint8Array,
+    additional_data: string | Uint8Array | null,
+    public_nonce: Uint8Array,
+    key: Uint8Array,
+    outputFormat: StringOutputFormat
+  ): string;
   function crypto_aead_chacha20poly1305_decrypt_detached(
     secret_nonce: string | Uint8Array | null,
     ciphertext: string | Uint8Array,
@@ -197,32 +229,65 @@ declare module 'libsodium-wrappers-sumo' {
     additional_data: string | Uint8Array | null,
     public_nonce: Uint8Array,
     key: Uint8Array,
-    outputFormat?: OutputFormat
-  ): string | Uint8Array;
+    outputFormat?: Uint8ArrayOutputFormat
+  ): Uint8Array;
+  function crypto_aead_chacha20poly1305_decrypt_detached(
+    secret_nonce: string | Uint8Array | null,
+    ciphertext: string | Uint8Array,
+    mac: Uint8Array,
+    additional_data: string | Uint8Array | null,
+    public_nonce: Uint8Array,
+    key: Uint8Array,
+    outputFormat: StringOutputFormat
+  ): string;
   function crypto_aead_chacha20poly1305_encrypt(
     message: string | Uint8Array,
     additional_data: string | Uint8Array | null,
     secret_nonce: string | Uint8Array | null,
     public_nonce: Uint8Array,
     key: Uint8Array,
-    outputFormat?: OutputFormat
-  ): string | Uint8Array;
+    outputFormat?: Uint8ArrayOutputFormat
+  ): Uint8Array;
+  function crypto_aead_chacha20poly1305_encrypt(
+    message: string | Uint8Array,
+    additional_data: string | Uint8Array | null,
+    secret_nonce: string | Uint8Array | null,
+    public_nonce: Uint8Array,
+    key: Uint8Array,
+    outputFormat: StringOutputFormat
+  ): string;
   function crypto_aead_chacha20poly1305_encrypt_detached(
     message: string | Uint8Array,
     additional_data: string | Uint8Array | null,
     secret_nonce: string | Uint8Array | null,
     public_nonce: Uint8Array,
     key: Uint8Array,
-    outputFormat?: OutputFormat
+    outputFormat?: Uint8ArrayOutputFormat
   ): CryptoBox;
+  function crypto_aead_chacha20poly1305_encrypt_detached(
+    message: string | Uint8Array,
+    additional_data: string | Uint8Array | null,
+    secret_nonce: string | Uint8Array | null,
+    public_nonce: Uint8Array,
+    key: Uint8Array,
+    outputFormat: StringOutputFormat
+  ): StringCryptoBox;
   function crypto_aead_chacha20poly1305_ietf_decrypt(
     secret_nonce: string | Uint8Array | null,
     ciphertext: string | Uint8Array,
     additional_data: string | Uint8Array | null,
     public_nonce: Uint8Array,
     key: Uint8Array,
-    outputFormat?: OutputFormat
-  ): string | Uint8Array;
+    outputFormat?: Uint8ArrayOutputFormat
+  ): Uint8Array;
+  function crypto_aead_chacha20poly1305_ietf_decrypt(
+    secret_nonce: string | Uint8Array | null,
+    ciphertext: string | Uint8Array,
+    additional_data: string | Uint8Array | null,
+    public_nonce: Uint8Array,
+    key: Uint8Array,
+    outputFormat: StringOutputFormat
+  ): string;
   function crypto_aead_chacha20poly1305_ietf_decrypt_detached(
     secret_nonce: string | Uint8Array | null,
     ciphertext: string | Uint8Array,
@@ -230,34 +295,69 @@ declare module 'libsodium-wrappers-sumo' {
     additional_data: string | Uint8Array | null,
     public_nonce: Uint8Array,
     key: Uint8Array,
-    outputFormat?: OutputFormat
-  ): string | Uint8Array;
+    outputFormat?: Uint8ArrayOutputFormat
+  ): Uint8Array;
+  function crypto_aead_chacha20poly1305_ietf_decrypt_detached(
+    secret_nonce: string | Uint8Array | null,
+    ciphertext: string | Uint8Array,
+    mac: Uint8Array,
+    additional_data: string | Uint8Array | null,
+    public_nonce: Uint8Array,
+    key: Uint8Array,
+    outputFormat: StringOutputFormat
+  ): string;
   function crypto_aead_chacha20poly1305_ietf_encrypt(
     message: string | Uint8Array,
     additional_data: string | Uint8Array | null,
     secret_nonce: string | Uint8Array | null,
     public_nonce: Uint8Array,
     key: Uint8Array,
-    outputFormat?: OutputFormat
-  ): string | Uint8Array;
+    outputFormat?: Uint8ArrayOutputFormat
+  ): Uint8Array;
+  function crypto_aead_chacha20poly1305_ietf_encrypt(
+    message: string | Uint8Array,
+    additional_data: string | Uint8Array | null,
+    secret_nonce: string | Uint8Array | null,
+    public_nonce: Uint8Array,
+    key: Uint8Array,
+    outputFormat: StringOutputFormat
+  ): string;
   function crypto_aead_chacha20poly1305_ietf_encrypt_detached(
     message: string | Uint8Array,
     additional_data: string | Uint8Array | null,
     secret_nonce: string | Uint8Array | null,
     public_nonce: Uint8Array,
     key: Uint8Array,
-    outputFormat?: OutputFormat
+    outputFormat?: Uint8ArrayOutputFormat
   ): CryptoBox;
-  function crypto_aead_chacha20poly1305_ietf_keygen(): string | Uint8Array;
-  function crypto_aead_chacha20poly1305_keygen(): string | Uint8Array;
+  function crypto_aead_chacha20poly1305_ietf_encrypt_detached(
+    message: string | Uint8Array,
+    additional_data: string | Uint8Array | null,
+    secret_nonce: string | Uint8Array | null,
+    public_nonce: Uint8Array,
+    key: Uint8Array,
+    outputFormat: StringOutputFormat
+  ): StringCryptoBox;
+  function crypto_aead_chacha20poly1305_ietf_keygen(outputFormat?: Uint8ArrayOutputFormat): Uint8Array;
+  function crypto_aead_chacha20poly1305_ietf_keygen(outputFormat: StringOutputFormat): string;
+  function crypto_aead_chacha20poly1305_keygen(outputFormat?: Uint8ArrayOutputFormat): Uint8Array;
+  function crypto_aead_chacha20poly1305_keygen(outputFormat: StringOutputFormat): string;
   function crypto_aead_xchacha20poly1305_ietf_decrypt(
     secret_nonce: string | Uint8Array | null,
     ciphertext: string | Uint8Array,
     additional_data: string | Uint8Array | null,
     public_nonce: Uint8Array,
     key: Uint8Array,
-    outputFormat?: OutputFormat
-  ): string | Uint8Array;
+    outputFormat?: Uint8ArrayOutputFormat
+  ): Uint8Array;
+  function crypto_aead_xchacha20poly1305_ietf_decrypt(
+    secret_nonce: string | Uint8Array | null,
+    ciphertext: string | Uint8Array,
+    additional_data: string | Uint8Array | null,
+    public_nonce: Uint8Array,
+    key: Uint8Array,
+    outputFormat: StringOutputFormat
+  ): string;
   function crypto_aead_xchacha20poly1305_ietf_decrypt_detached(
     secret_nonce: string | Uint8Array | null,
     ciphertext: string | Uint8Array,
@@ -265,166 +365,293 @@ declare module 'libsodium-wrappers-sumo' {
     additional_data: string | Uint8Array | null,
     public_nonce: Uint8Array,
     key: Uint8Array,
-    outputFormat?: OutputFormat
-  ): string | Uint8Array;
+    outputFormat?: Uint8ArrayOutputFormat
+  ): Uint8Array;
+  function crypto_aead_xchacha20poly1305_ietf_decrypt_detached(
+    secret_nonce: string | Uint8Array | null,
+    ciphertext: string | Uint8Array,
+    mac: Uint8Array,
+    additional_data: string | Uint8Array | null,
+    public_nonce: Uint8Array,
+    key: Uint8Array,
+    outputFormat: StringOutputFormat
+  ): string;
   function crypto_aead_xchacha20poly1305_ietf_encrypt(
     message: string | Uint8Array,
     additional_data: string | Uint8Array | null,
     secret_nonce: string | Uint8Array | null,
     public_nonce: Uint8Array,
     key: Uint8Array,
-    outputFormat?: OutputFormat
-  ): string | Uint8Array;
+    outputFormat?: Uint8ArrayOutputFormat
+  ): Uint8Array;
+  function crypto_aead_xchacha20poly1305_ietf_encrypt(
+    message: string | Uint8Array,
+    additional_data: string | Uint8Array | null,
+    secret_nonce: string | Uint8Array | null,
+    public_nonce: Uint8Array,
+    key: Uint8Array,
+    outputFormat: StringOutputFormat
+  ): string;
   function crypto_aead_xchacha20poly1305_ietf_encrypt_detached(
     message: string | Uint8Array,
     additional_data: string | Uint8Array | null,
     secret_nonce: string | Uint8Array | null,
     public_nonce: Uint8Array,
     key: Uint8Array,
-    outputFormat?: OutputFormat
+    outputFormat?: Uint8ArrayOutputFormat
   ): CryptoBox;
-  function crypto_aead_xchacha20poly1305_ietf_keygen(): string | Uint8Array;
-  function crypto_auth(message: string | Uint8Array, key: Uint8Array, outputFormat?: OutputFormat): string | Uint8Array;
+  function crypto_aead_xchacha20poly1305_ietf_encrypt_detached(
+    message: string | Uint8Array,
+    additional_data: string | Uint8Array | null,
+    secret_nonce: string | Uint8Array | null,
+    public_nonce: Uint8Array,
+    key: Uint8Array,
+    outputFormat: StringOutputFormat
+  ): StringCryptoBox;
+  function crypto_aead_xchacha20poly1305_ietf_keygen(outputFormat?: Uint8ArrayOutputFormat): Uint8Array;
+  function crypto_aead_xchacha20poly1305_ietf_keygen(outputFormat: StringOutputFormat): string;
+  function crypto_auth(
+    message: string | Uint8Array,
+    key: Uint8Array,
+    outputFormat?: Uint8ArrayOutputFormat
+  ): Uint8Array;
+  function crypto_auth(message: string | Uint8Array, key: Uint8Array, outputFormat: StringOutputFormat): string;
   function crypto_auth_hmacsha256(
     message: string | Uint8Array,
     key: Uint8Array,
-    outputFormat?: OutputFormat
-  ): string | Uint8Array;
-  function crypto_auth_hmacsha256_keygen(): string | Uint8Array;
+    outputFormat?: Uint8ArrayOutputFormat
+  ): Uint8Array;
+  function crypto_auth_hmacsha256(
+    message: string | Uint8Array,
+    key: Uint8Array,
+    outputFormat: StringOutputFormat
+  ): string;
+  function crypto_auth_hmacsha256_keygen(outputFormat?: Uint8ArrayOutputFormat): Uint8Array;
+  function crypto_auth_hmacsha256_keygen(outputFormat: StringOutputFormat): string;
   function crypto_auth_hmacsha256_verify(tag: Uint8Array, message: string | Uint8Array, key: Uint8Array): boolean;
   function crypto_auth_hmacsha512(
     message: string | Uint8Array,
     key: Uint8Array,
-    outputFormat?: OutputFormat
-  ): string | Uint8Array;
-  function crypto_auth_hmacsha512_keygen(): string | Uint8Array;
+    outputFormat?: Uint8ArrayOutputFormat
+  ): Uint8Array;
+  function crypto_auth_hmacsha512(
+    message: string | Uint8Array,
+    key: Uint8Array,
+    outputFormat: StringOutputFormat
+  ): string;
+  function crypto_auth_hmacsha512_keygen(outputFormat?: Uint8ArrayOutputFormat): Uint8Array;
+  function crypto_auth_hmacsha512_keygen(outputFormat: StringOutputFormat): string;
   function crypto_auth_hmacsha512_verify(tag: Uint8Array, message: string | Uint8Array, key: Uint8Array): boolean;
-  function crypto_auth_keygen(): string | Uint8Array;
+  function crypto_auth_keygen(outputFormat?: Uint8ArrayOutputFormat): Uint8Array;
+  function crypto_auth_keygen(outputFormat: StringOutputFormat): string;
   function crypto_auth_verify(tag: Uint8Array, message: string | Uint8Array, key: Uint8Array): boolean;
   function crypto_box_beforenm(
     publicKey: Uint8Array,
     privateKey: Uint8Array,
-    outputFormat?: OutputFormat
-  ): string | Uint8Array;
-  function crypto_box_curve25519xchacha20poly1305_keypair(): string | Uint8Array;
-  function crypto_box_curve25519xchacha20poly1305_seal(
-    message: string | Uint8Array,
-    publicKey: Uint8Array,
-    outputFormat?: OutputFormat
-  ): string | Uint8Array;
-  function crypto_box_curve25519xchacha20poly1305_seal_open(
-    ciphertext: string | Uint8Array,
-    publicKey: Uint8Array,
-    secretKey: Uint8Array,
-    outputFormat?: OutputFormat
-  ): string | Uint8Array;
+    outputFormat?: Uint8ArrayOutputFormat
+  ): Uint8Array;
+  function crypto_box_beforenm(publicKey: Uint8Array, privateKey: Uint8Array, outputFormat: StringOutputFormat): string;
   function crypto_box_detached(
     message: string | Uint8Array,
     nonce: Uint8Array,
     publicKey: Uint8Array,
     privateKey: Uint8Array,
-    outputFormat?: OutputFormat
+    outputFormat?: Uint8ArrayOutputFormat
   ): CryptoBox;
+  function crypto_box_detached(
+    message: string | Uint8Array,
+    nonce: Uint8Array,
+    publicKey: Uint8Array,
+    privateKey: Uint8Array,
+    outputFormat: StringOutputFormat
+  ): StringCryptoBox;
   function crypto_box_easy(
     message: string | Uint8Array,
     nonce: Uint8Array,
     publicKey: Uint8Array,
     privateKey: Uint8Array,
-    outputFormat?: OutputFormat
-  ): string | Uint8Array;
+    outputFormat?: Uint8ArrayOutputFormat
+  ): Uint8Array;
+  function crypto_box_easy(
+    message: string | Uint8Array,
+    nonce: Uint8Array,
+    publicKey: Uint8Array,
+    privateKey: Uint8Array,
+    outputFormat: StringOutputFormat
+  ): string;
   function crypto_box_easy_afternm(
     message: string | Uint8Array,
     nonce: Uint8Array,
     sharedKey: Uint8Array,
-    outputFormat?: OutputFormat
-  ): string | Uint8Array;
-  function crypto_box_keypair(): KeyPair;
+    outputFormat?: Uint8ArrayOutputFormat
+  ): Uint8Array;
+  function crypto_box_easy_afternm(
+    message: string | Uint8Array,
+    nonce: Uint8Array,
+    sharedKey: Uint8Array,
+    outputFormat: StringOutputFormat
+  ): string;
+  function crypto_box_keypair(outputFormat?: Uint8ArrayOutputFormat): KeyPair;
+  function crypto_box_keypair(outputFormat: StringOutputFormat): StringKeyPair;
   function crypto_box_open_detached(
     ciphertext: string | Uint8Array,
     mac: Uint8Array,
     nonce: Uint8Array,
     publicKey: Uint8Array,
     privateKey: Uint8Array,
-    outputFormat?: OutputFormat
-  ): string | Uint8Array;
+    outputFormat?: Uint8ArrayOutputFormat
+  ): Uint8Array;
+  function crypto_box_open_detached(
+    ciphertext: string | Uint8Array,
+    mac: Uint8Array,
+    nonce: Uint8Array,
+    publicKey: Uint8Array,
+    privateKey: Uint8Array,
+    outputFormat: StringOutputFormat
+  ): string;
   function crypto_box_open_easy(
     ciphertext: string | Uint8Array,
     nonce: Uint8Array,
     publicKey: Uint8Array,
     privateKey: Uint8Array,
-    outputFormat?: OutputFormat
-  ): string | Uint8Array;
+    outputFormat?: Uint8ArrayOutputFormat
+  ): Uint8Array;
+  function crypto_box_open_easy(
+    ciphertext: string | Uint8Array,
+    nonce: Uint8Array,
+    publicKey: Uint8Array,
+    privateKey: Uint8Array,
+    outputFormat: StringOutputFormat
+  ): string;
   function crypto_box_open_easy_afternm(
     ciphertext: string | Uint8Array,
     nonce: Uint8Array,
     sharedKey: Uint8Array,
-    outputFormat?: OutputFormat
-  ): string | Uint8Array;
+    outputFormat?: Uint8ArrayOutputFormat
+  ): Uint8Array;
+  function crypto_box_open_easy_afternm(
+    ciphertext: string | Uint8Array,
+    nonce: Uint8Array,
+    sharedKey: Uint8Array,
+    outputFormat: StringOutputFormat
+  ): string;
   function crypto_box_seal(
     message: string | Uint8Array,
     publicKey: Uint8Array,
-    outputFormat?: OutputFormat
-  ): string | Uint8Array;
+    outputFormat?: Uint8ArrayOutputFormat
+  ): Uint8Array;
+  function crypto_box_seal(
+    message: string | Uint8Array,
+    publicKey: Uint8Array,
+    outputFormat: StringOutputFormat
+  ): string;
   function crypto_box_seal_open(
     ciphertext: string | Uint8Array,
     publicKey: Uint8Array,
     privateKey: Uint8Array,
-    outputFormat?: OutputFormat
-  ): string | Uint8Array;
-  function crypto_box_seed_keypair(seed: Uint8Array, outputFormat?: OutputFormat): KeyPair;
+    outputFormat?: Uint8ArrayOutputFormat
+  ): Uint8Array;
+  function crypto_box_seal_open(
+    ciphertext: string | Uint8Array,
+    publicKey: Uint8Array,
+    privateKey: Uint8Array,
+    outputFormat: StringOutputFormat
+  ): string;
+  function crypto_box_seed_keypair(seed: Uint8Array, outputFormat?: Uint8ArrayOutputFormat): KeyPair;
+  function crypto_box_seed_keypair(seed: Uint8Array, outputFormat: StringOutputFormat): StringKeyPair;
   function crypto_generichash(
     hash_length: number,
     message: string | Uint8Array,
     key: string | Uint8Array | null,
-    outputFormat?: OutputFormat
-  ): string | Uint8Array;
+    outputFormat?: Uint8ArrayOutputFormat
+  ): Uint8Array;
+  function crypto_generichash(
+    hash_length: number,
+    message: string | Uint8Array,
+    key: string | Uint8Array | null,
+    outputFormat: StringOutputFormat
+  ): string;
   function crypto_generichash_final(
     state_address: generichash_state_address,
     hash_length: number,
-    outputFormat?: OutputFormat
-  ): string | Uint8Array;
+    outputFormat?: Uint8ArrayOutputFormat
+  ): Uint8Array;
+  function crypto_generichash_final(
+    state_address: generichash_state_address,
+    hash_length: number,
+    outputFormat: StringOutputFormat
+  ): string;
   function crypto_generichash_init(key: string | Uint8Array | null, hash_length: number): state_address;
-  function crypto_generichash_keygen(): string | Uint8Array;
+  function crypto_generichash_keygen(outputFormat?: Uint8ArrayOutputFormat): Uint8Array;
+  function crypto_generichash_keygen(outputFormat: StringOutputFormat): string;
   function crypto_generichash_update(
     state_address: generichash_state_address,
     message_chunk: string | Uint8Array
   ): void;
-  function crypto_hash(message: string | Uint8Array, outputFormat?: OutputFormat): string | Uint8Array;
-  function crypto_hash_sha256(message: string | Uint8Array, outputFormat?: OutputFormat): string | Uint8Array;
-  function crypto_hash_sha512(message: string | Uint8Array, outputFormat?: OutputFormat): string | Uint8Array;
+  function crypto_hash(message: string | Uint8Array, outputFormat?: Uint8ArrayOutputFormat): Uint8Array;
+  function crypto_hash(message: string | Uint8Array, outputFormat: StringOutputFormat): string;
+  function crypto_hash_sha256(message: string | Uint8Array, outputFormat?: Uint8ArrayOutputFormat): Uint8Array;
+  function crypto_hash_sha256(message: string | Uint8Array, outputFormat: StringOutputFormat): string;
+  function crypto_hash_sha512(message: string | Uint8Array, outputFormat?: Uint8ArrayOutputFormat): Uint8Array;
+  function crypto_hash_sha512(message: string | Uint8Array, outputFormat: StringOutputFormat): string;
   function crypto_kdf_derive_from_key(
     subkey_len: number,
     subkey_id: number,
     ctx: string,
     key: Uint8Array,
-    outputFormat?: OutputFormat
-  ): string | Uint8Array;
-  function crypto_kdf_keygen(): string | Uint8Array;
+    outputFormat?: Uint8ArrayOutputFormat
+  ): Uint8Array;
+  function crypto_kdf_derive_from_key(
+    subkey_len: number,
+    subkey_id: number,
+    ctx: string,
+    key: Uint8Array,
+    outputFormat: StringOutputFormat
+  ): string;
+  function crypto_kdf_keygen(outputFormat?: Uint8ArrayOutputFormat): Uint8Array;
+  function crypto_kdf_keygen(outputFormat: StringOutputFormat): string;
   function crypto_kx_client_session_keys(
     clientPublicKey: Uint8Array,
     clientSecretKey: Uint8Array,
     serverPublicKey: Uint8Array,
-    outputFormat?: OutputFormat
+    outputFormat?: Uint8ArrayOutputFormat
   ): CryptoKX;
-  function crypto_kx_keypair(): KeyPair;
-  function crypto_kx_seed_keypair(seed: Uint8Array, outputFormat?: OutputFormat): KeyPair;
+  function crypto_kx_client_session_keys(
+    clientPublicKey: Uint8Array,
+    clientSecretKey: Uint8Array,
+    serverPublicKey: Uint8Array,
+    outputFormat: StringOutputFormat
+  ): StringCryptoKX;
+  function crypto_kx_keypair(outputFormat?: Uint8ArrayOutputFormat): KeyPair;
+  function crypto_kx_keypair(outputFormat: StringOutputFormat): StringKeyPair;
+  function crypto_kx_seed_keypair(seed: Uint8Array, outputFormat?: Uint8ArrayOutputFormat): KeyPair;
+  function crypto_kx_seed_keypair(seed: Uint8Array, outputFormat: StringOutputFormat): StringKeyPair;
   function crypto_kx_server_session_keys(
     serverPublicKey: Uint8Array,
     serverSecretKey: Uint8Array,
     clientPublicKey: Uint8Array,
-    outputFormat?: OutputFormat
+    outputFormat?: Uint8ArrayOutputFormat
   ): CryptoKX;
+  function crypto_kx_server_session_keys(
+    serverPublicKey: Uint8Array,
+    serverSecretKey: Uint8Array,
+    clientPublicKey: Uint8Array,
+    outputFormat: StringOutputFormat
+  ): StringCryptoKX;
   function crypto_onetimeauth(
     message: string | Uint8Array,
     key: Uint8Array,
-    outputFormat?: OutputFormat
-  ): string | Uint8Array;
+    outputFormat?: Uint8ArrayOutputFormat
+  ): Uint8Array;
+  function crypto_onetimeauth(message: string | Uint8Array, key: Uint8Array, outputFormat: StringOutputFormat): string;
   function crypto_onetimeauth_final(
     state_address: onetimeauth_state_address,
-    outputFormat?: OutputFormat
-  ): string | Uint8Array;
+    outputFormat?: Uint8ArrayOutputFormat
+  ): Uint8Array;
+  function crypto_onetimeauth_final(state_address: onetimeauth_state_address, outputFormat: StringOutputFormat): string;
   function crypto_onetimeauth_init(key: string | Uint8Array | null): state_address;
-  function crypto_onetimeauth_keygen(): string | Uint8Array;
+  function crypto_onetimeauth_keygen(outputFormat?: Uint8ArrayOutputFormat): Uint8Array;
+  function crypto_onetimeauth_keygen(outputFormat: StringOutputFormat): string;
   function crypto_onetimeauth_update(
     state_address: onetimeauth_state_address,
     message_chunk: string | Uint8Array
@@ -437,16 +664,33 @@ declare module 'libsodium-wrappers-sumo' {
     opsLimit: number,
     memLimit: number,
     algorithm: number,
-    outputFormat?: OutputFormat
-  ): string | Uint8Array;
+    outputFormat?: Uint8ArrayOutputFormat
+  ): Uint8Array;
+  function crypto_pwhash(
+    keyLength: number,
+    password: string | Uint8Array,
+    salt: Uint8Array,
+    opsLimit: number,
+    memLimit: number,
+    algorithm: number,
+    outputFormat: StringOutputFormat
+  ): string;
   function crypto_pwhash_scryptsalsa208sha256(
     keyLength: number,
     password: string | Uint8Array,
     salt: Uint8Array,
     opsLimit: number,
     memLimit: number,
-    outputFormat?: OutputFormat
-  ): string | Uint8Array;
+    outputFormat?: Uint8ArrayOutputFormat
+  ): Uint8Array;
+  function crypto_pwhash_scryptsalsa208sha256(
+    keyLength: number,
+    password: string | Uint8Array,
+    salt: Uint8Array,
+    opsLimit: number,
+    memLimit: number,
+    outputFormat: StringOutputFormat
+  ): string;
   function crypto_pwhash_scryptsalsa208sha256_ll(
     password: string | Uint8Array,
     salt: string | Uint8Array,
@@ -454,171 +698,288 @@ declare module 'libsodium-wrappers-sumo' {
     r: number,
     p: number,
     keyLength: number,
-    outputFormat?: OutputFormat
-  ): string | Uint8Array;
+    outputFormat?: Uint8ArrayOutputFormat
+  ): Uint8Array;
+  function crypto_pwhash_scryptsalsa208sha256_ll(
+    password: string | Uint8Array,
+    salt: string | Uint8Array,
+    opsLimit: number,
+    r: number,
+    p: number,
+    keyLength: number,
+    outputFormat: StringOutputFormat
+  ): string;
   function crypto_pwhash_scryptsalsa208sha256_str(
     password: string | Uint8Array,
     opsLimit: number,
     memLimit: number
-  ): string | Uint8Array;
+  ): string;
   function crypto_pwhash_scryptsalsa208sha256_str_verify(
     hashed_password: string,
     password: string | Uint8Array
   ): boolean;
-  function crypto_pwhash_str(password: string | Uint8Array, opsLimit: number, memLimit: number): string | Uint8Array;
+  function crypto_pwhash_str(password: string | Uint8Array, opsLimit: number, memLimit: number): string;
   function crypto_pwhash_str_verify(hashed_password: string, password: string | Uint8Array): boolean;
   function crypto_scalarmult(
     privateKey: Uint8Array,
     publicKey: Uint8Array,
-    outputFormat?: OutputFormat
-  ): string | Uint8Array;
-  function crypto_scalarmult_base(privateKey: Uint8Array, outputFormat?: OutputFormat): string | Uint8Array;
+    outputFormat?: Uint8ArrayOutputFormat
+  ): Uint8Array;
+  function crypto_scalarmult(privateKey: Uint8Array, publicKey: Uint8Array, outputFormat: StringOutputFormat): string;
+  function crypto_scalarmult_base(privateKey: Uint8Array, outputFormat?: Uint8ArrayOutputFormat): Uint8Array;
+  function crypto_scalarmult_base(privateKey: Uint8Array, outputFormat: StringOutputFormat): string;
   function crypto_secretbox_detached(
     message: string | Uint8Array,
     nonce: Uint8Array,
     key: Uint8Array,
-    outputFormat?: OutputFormat
+    outputFormat?: Uint8ArrayOutputFormat
   ): SecretBox;
+  function crypto_secretbox_detached(
+    message: string | Uint8Array,
+    nonce: Uint8Array,
+    key: Uint8Array,
+    outputFormat: StringOutputFormat
+  ): StringSecretBox;
   function crypto_secretbox_easy(
     message: string | Uint8Array,
     nonce: Uint8Array,
     key: Uint8Array,
-    outputFormat?: OutputFormat
-  ): string | Uint8Array;
-  function crypto_secretbox_keygen(): string | Uint8Array;
+    outputFormat?: Uint8ArrayOutputFormat
+  ): Uint8Array;
+  function crypto_secretbox_easy(
+    message: string | Uint8Array,
+    nonce: Uint8Array,
+    key: Uint8Array,
+    outputFormat: StringOutputFormat
+  ): string;
+  function crypto_secretbox_keygen(outputFormat?: Uint8ArrayOutputFormat): Uint8Array;
+  function crypto_secretbox_keygen(outputFormat: StringOutputFormat): string;
   function crypto_secretbox_open_detached(
     ciphertext: string | Uint8Array,
     mac: Uint8Array,
     nonce: Uint8Array,
     key: Uint8Array,
-    outputFormat?: OutputFormat
-  ): string | Uint8Array;
+    outputFormat?: Uint8ArrayOutputFormat
+  ): Uint8Array;
+  function crypto_secretbox_open_detached(
+    ciphertext: string | Uint8Array,
+    mac: Uint8Array,
+    nonce: Uint8Array,
+    key: Uint8Array,
+    outputFormat: StringOutputFormat
+  ): string;
   function crypto_secretbox_open_easy(
     ciphertext: string | Uint8Array,
     nonce: Uint8Array,
     key: Uint8Array,
-    outputFormat?: OutputFormat
-  ): string | Uint8Array;
+    outputFormat?: Uint8ArrayOutputFormat
+  ): Uint8Array;
+  function crypto_secretbox_open_easy(
+    ciphertext: string | Uint8Array,
+    nonce: Uint8Array,
+    key: Uint8Array,
+    outputFormat: StringOutputFormat
+  ): string;
   function crypto_secretstream_xchacha20poly1305_init_pull(header: Uint8Array, key: Uint8Array): state_address;
   function crypto_secretstream_xchacha20poly1305_init_push(
     key: Uint8Array,
-    outputFormat?: OutputFormat
-  ): string | Uint8Array;
-  function crypto_secretstream_xchacha20poly1305_keygen(): string | Uint8Array;
+    outputFormat?: Uint8ArrayOutputFormat
+  ): Uint8Array;
+  function crypto_secretstream_xchacha20poly1305_init_push(key: Uint8Array, outputFormat: StringOutputFormat): string;
+  function crypto_secretstream_xchacha20poly1305_keygen(outputFormat?: Uint8ArrayOutputFormat): Uint8Array;
+  function crypto_secretstream_xchacha20poly1305_keygen(outputFormat: StringOutputFormat): string;
   function crypto_secretstream_xchacha20poly1305_pull(
     state_address: secretstream_xchacha20poly1305_state_address,
     cipher: string | Uint8Array,
     ad: string | Uint8Array | null,
-    outputFormat?: OutputFormat
-  ): string | Uint8Array;
+    outputFormat?: Uint8ArrayOutputFormat
+  ): Uint8Array;
+  function crypto_secretstream_xchacha20poly1305_pull(
+    state_address: secretstream_xchacha20poly1305_state_address,
+    cipher: string | Uint8Array,
+    ad: string | Uint8Array | null,
+    outputFormat: StringOutputFormat
+  ): string;
   function crypto_secretstream_xchacha20poly1305_push(
     state_address: secretstream_xchacha20poly1305_state_address,
     message_chunk: string | Uint8Array,
     ad: string | Uint8Array | null,
     tag: number,
-    outputFormat?: OutputFormat
-  ): string | Uint8Array;
+    outputFormat?: Uint8ArrayOutputFormat
+  ): Uint8Array;
+  function crypto_secretstream_xchacha20poly1305_push(
+    state_address: secretstream_xchacha20poly1305_state_address,
+    message_chunk: string | Uint8Array,
+    ad: string | Uint8Array | null,
+    tag: number,
+    outputFormat: StringOutputFormat
+  ): string;
   function crypto_secretstream_xchacha20poly1305_rekey(
     state_address: secretstream_xchacha20poly1305_state_address
   ): true;
   function crypto_shorthash(
     message: string | Uint8Array,
     key: Uint8Array,
-    outputFormat?: OutputFormat
-  ): string | Uint8Array;
-  function crypto_shorthash_keygen(): string | Uint8Array;
+    outputFormat?: Uint8ArrayOutputFormat
+  ): Uint8Array;
+  function crypto_shorthash(message: string | Uint8Array, key: Uint8Array, outputFormat: StringOutputFormat): string;
+  function crypto_shorthash_keygen(outputFormat?: Uint8ArrayOutputFormat): Uint8Array;
+  function crypto_shorthash_keygen(outputFormat: StringOutputFormat): string;
   function crypto_shorthash_siphashx24(
     message: string | Uint8Array,
     key: Uint8Array,
-    outputFormat?: OutputFormat
-  ): string | Uint8Array;
+    outputFormat?: Uint8ArrayOutputFormat
+  ): Uint8Array;
+  function crypto_shorthash_siphashx24(
+    message: string | Uint8Array,
+    key: Uint8Array,
+    outputFormat: StringOutputFormat
+  ): string;
   function crypto_sign(
     message: string | Uint8Array,
     privateKey: Uint8Array,
-    outputFormat?: OutputFormat
-  ): string | Uint8Array;
+    outputFormat?: Uint8ArrayOutputFormat
+  ): Uint8Array;
+  function crypto_sign(message: string | Uint8Array, privateKey: Uint8Array, outputFormat: StringOutputFormat): string;
   function crypto_sign_detached(
     message: string | Uint8Array,
     privateKey: Uint8Array,
-    outputFormat?: OutputFormat
-  ): string | Uint8Array;
-  function crypto_sign_ed25519_pk_to_curve25519(edPk: Uint8Array, outputFormat?: OutputFormat): string | Uint8Array;
-  function crypto_sign_ed25519_sk_to_curve25519(edSk: Uint8Array, outputFormat?: OutputFormat): string | Uint8Array;
-  function crypto_sign_ed25519_sk_to_pk(privateKey: Uint8Array, outputFormat?: OutputFormat): string | Uint8Array;
-  function crypto_sign_ed25519_sk_to_seed(privateKey: Uint8Array, outputFormat?: OutputFormat): string | Uint8Array;
+    outputFormat?: Uint8ArrayOutputFormat
+  ): Uint8Array;
+  function crypto_sign_detached(
+    message: string | Uint8Array,
+    privateKey: Uint8Array,
+    outputFormat: StringOutputFormat
+  ): string;
+  function crypto_sign_ed25519_pk_to_curve25519(edPk: Uint8Array, outputFormat?: Uint8ArrayOutputFormat): Uint8Array;
+  function crypto_sign_ed25519_pk_to_curve25519(edPk: Uint8Array, outputFormat: StringOutputFormat): string;
+  function crypto_sign_ed25519_sk_to_curve25519(edSk: Uint8Array, outputFormat?: Uint8ArrayOutputFormat): Uint8Array;
+  function crypto_sign_ed25519_sk_to_curve25519(edSk: Uint8Array, outputFormat: StringOutputFormat): string;
+  function crypto_sign_ed25519_sk_to_pk(privateKey: Uint8Array, outputFormat?: Uint8ArrayOutputFormat): Uint8Array;
+  function crypto_sign_ed25519_sk_to_pk(privateKey: Uint8Array, outputFormat: StringOutputFormat): string;
+  function crypto_sign_ed25519_sk_to_seed(privateKey: Uint8Array, outputFormat?: Uint8ArrayOutputFormat): Uint8Array;
+  function crypto_sign_ed25519_sk_to_seed(privateKey: Uint8Array, outputFormat: StringOutputFormat): string;
   function crypto_sign_final_create(
     state_address: sign_state_address,
     privateKey: Uint8Array,
-    outputFormat?: OutputFormat
-  ): string | Uint8Array;
+    outputFormat?: Uint8ArrayOutputFormat
+  ): Uint8Array;
+  function crypto_sign_final_create(
+    state_address: sign_state_address,
+    privateKey: Uint8Array,
+    outputFormat: StringOutputFormat
+  ): string;
   function crypto_sign_final_verify(
     state_address: sign_state_address,
     signature: Uint8Array,
     publicKey: Uint8Array
   ): boolean;
   function crypto_sign_init(): state_address;
-  function crypto_sign_keypair(): KeyPair;
+  function crypto_sign_keypair(outputFormat?: Uint8ArrayOutputFormat): KeyPair;
+  function crypto_sign_keypair(outputFormat: StringOutputFormat): StringKeyPair;
   function crypto_sign_open(
     signedMessage: string | Uint8Array,
     publicKey: Uint8Array,
-    outputFormat?: OutputFormat
-  ): string | Uint8Array;
-  function crypto_sign_seed_keypair(seed: Uint8Array, outputFormat?: OutputFormat): KeyPair;
+    outputFormat?: Uint8ArrayOutputFormat
+  ): Uint8Array;
+  function crypto_sign_open(
+    signedMessage: string | Uint8Array,
+    publicKey: Uint8Array,
+    outputFormat: StringOutputFormat
+  ): string;
+  function crypto_sign_seed_keypair(seed: Uint8Array, outputFormat?: Uint8ArrayOutputFormat): KeyPair;
+  function crypto_sign_seed_keypair(seed: Uint8Array, outputFormat: StringOutputFormat): StringKeyPair;
   function crypto_sign_update(state_address: sign_state_address, message_chunk: string | Uint8Array): void;
   function crypto_sign_verify_detached(
     signature: Uint8Array,
     message: string | Uint8Array,
     publicKey: Uint8Array
   ): boolean;
-  function crypto_stream_chacha20(
-    outLength: number,
-    key: Uint8Array,
-    nonce: Uint8Array,
-    outputFormat?: OutputFormat
-  ): string | Uint8Array;
   function crypto_stream_chacha20_ietf_xor(
     input_message: string | Uint8Array,
     nonce: Uint8Array,
     key: Uint8Array,
-    outputFormat?: OutputFormat
-  ): string | Uint8Array;
+    outputFormat?: Uint8ArrayOutputFormat
+  ): Uint8Array;
+  function crypto_stream_chacha20_ietf_xor(
+    input_message: string | Uint8Array,
+    nonce: Uint8Array,
+    key: Uint8Array,
+    outputFormat: StringOutputFormat
+  ): string;
   function crypto_stream_chacha20_ietf_xor_ic(
     input_message: string | Uint8Array,
     nonce: Uint8Array,
     nonce_increment: number,
     key: Uint8Array,
-    outputFormat?: OutputFormat
-  ): string | Uint8Array;
-  function crypto_stream_chacha20_keygen(): string | Uint8Array;
+    outputFormat?: Uint8ArrayOutputFormat
+  ): Uint8Array;
+  function crypto_stream_chacha20_ietf_xor_ic(
+    input_message: string | Uint8Array,
+    nonce: Uint8Array,
+    nonce_increment: number,
+    key: Uint8Array,
+    outputFormat: StringOutputFormat
+  ): string;
+  function crypto_stream_chacha20_keygen(outputFormat?: Uint8ArrayOutputFormat): Uint8Array;
+  function crypto_stream_chacha20_keygen(outputFormat: StringOutputFormat): string;
   function crypto_stream_chacha20_xor(
     input_message: string | Uint8Array,
     nonce: Uint8Array,
     key: Uint8Array,
-    outputFormat?: OutputFormat
-  ): string | Uint8Array;
+    outputFormat?: Uint8ArrayOutputFormat
+  ): Uint8Array;
+  function crypto_stream_chacha20_xor(
+    input_message: string | Uint8Array,
+    nonce: Uint8Array,
+    key: Uint8Array,
+    outputFormat: StringOutputFormat
+  ): string;
   function crypto_stream_chacha20_xor_ic(
     input_message: string | Uint8Array,
     nonce: Uint8Array,
     nonce_increment: number,
     key: Uint8Array,
-    outputFormat?: OutputFormat
-  ): string | Uint8Array;
-  function crypto_stream_keygen(): string | Uint8Array;
-  function crypto_stream_xchacha20_keygen(): string | Uint8Array;
+    outputFormat?: Uint8ArrayOutputFormat
+  ): Uint8Array;
+  function crypto_stream_chacha20_xor_ic(
+    input_message: string | Uint8Array,
+    nonce: Uint8Array,
+    nonce_increment: number,
+    key: Uint8Array,
+    outputFormat: StringOutputFormat
+  ): string;
+  function crypto_stream_keygen(outputFormat?: Uint8ArrayOutputFormat): Uint8Array;
+  function crypto_stream_keygen(outputFormat: StringOutputFormat): string;
+  function crypto_stream_xchacha20_keygen(outputFormat?: Uint8ArrayOutputFormat): Uint8Array;
+  function crypto_stream_xchacha20_keygen(outputFormat: StringOutputFormat): string;
   function crypto_stream_xchacha20_xor(
     input_message: string | Uint8Array,
     nonce: Uint8Array,
     key: Uint8Array,
-    outputFormat?: OutputFormat
-  ): string | Uint8Array;
+    outputFormat?: Uint8ArrayOutputFormat
+  ): Uint8Array;
+  function crypto_stream_xchacha20_xor(
+    input_message: string | Uint8Array,
+    nonce: Uint8Array,
+    key: Uint8Array,
+    outputFormat: StringOutputFormat
+  ): string;
   function crypto_stream_xchacha20_xor_ic(
     input_message: string | Uint8Array,
     nonce: Uint8Array,
     nonce_increment: number,
     key: Uint8Array,
-    outputFormat?: OutputFormat
-  ): string | Uint8Array;
-  function from_base64(input: string, variant: number): Uint8Array;
+    outputFormat?: Uint8ArrayOutputFormat
+  ): Uint8Array;
+  function crypto_stream_xchacha20_xor_ic(
+    input_message: string | Uint8Array,
+    nonce: Uint8Array,
+    nonce_increment: number,
+    key: Uint8Array,
+    outputFormat: StringOutputFormat
+  ): string;
+  function from_base64(input: string, variant: base64_variants): Uint8Array;
   function from_hex(input: string): string;
   function from_string(str: string): Uint8Array;
   function increment(bytes: Uint8Array): void;
@@ -626,20 +987,22 @@ declare module 'libsodium-wrappers-sumo' {
   function memcmp(b1: Uint8Array, b2: Uint8Array): boolean;
   function memzero(bytes: Uint8Array): void;
   function pad(buf: Uint8Array, blocksize: number): Uint8Array;
-  function randombytes_buf(length: number, outputFormat?: OutputFormat): string | Uint8Array;
+  function randombytes_buf(length: number, outputFormat?: Uint8ArrayOutputFormat): Uint8Array;
+  function randombytes_buf(length: number, outputFormat: StringOutputFormat): string;
   function randombytes_buf_deterministic(
     length: number,
     seed: Uint8Array,
-    outputFormat?: OutputFormat
-  ): string | Uint8Array;
+    outputFormat?: Uint8ArrayOutputFormat
+  ): Uint8Array;
+  function randombytes_buf_deterministic(length: number, seed: Uint8Array, outputFormat: StringOutputFormat): string;
   function randombytes_close(): void;
   function randombytes_random(): number;
   function randombytes_set_implementation(implementation: Uint8Array): void;
   function randombytes_stir(): void;
   function randombytes_uniform(upper_bound: number): number;
   function ready(): Promise<void>;
-  function sodium_version_string(): string | Uint8Array;
-  function to_base64(input: string | Uint8Array, variant: number): string;
+  function sodium_version_string(): string;
+  function to_base64(input: string | Uint8Array, variant: base64_variants): string;
   function to_hex(input: string | Uint8Array): string;
   function to_string(bytes: Uint8Array): string;
   function unpad(buf: Uint8Array, blocksize: number): Uint8Array;

@@ -46,7 +46,7 @@ class CipherKey {
       plaintext = new Uint8Array(plaintext);
     }
 
-    return <Uint8Array>sodium.crypto_stream_chacha20_xor(plaintext, nonce, this.key, 'uint8array');
+    return sodium.crypto_stream_chacha20_xor(plaintext, nonce, this.key, 'uint8array');
   }
 
   decrypt(ciphertext: Uint8Array, nonce: Uint8Array): Uint8Array {

@@ -22,9 +22,9 @@ import * as sodium from 'libsodium-wrappers-sumo';
 const MemoryUtil = {
   zeroize(object: Uint8Array | ArrayBuffer | {[index: string]: any} | undefined): void {
     if (object instanceof Uint8Array) {
-      sodium.memzero(<Uint8Array>object);
+      sodium.memzero(object);
     } else if (object instanceof ArrayBuffer) {
-      sodium.memzero(new Uint8Array(<ArrayBuffer>object));
+      sodium.memzero(new Uint8Array(object));
     } else if (typeof object === 'object') {
       Object.keys(object)
         .map(key => object[key])
