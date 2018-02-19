@@ -136,7 +136,7 @@
     "sinon": "4.3.0",
     "style-loader": "0.20.2",
     "uglify-js": "3.3.11",
-    "uglifyjs-webpack-plugin": "1.1.8",
+    "uglifyjs-webpack-plugin": "1.2.0",
     "webpack": "3.11.0",
     "webpack-dev-server": "2.11.1"
   },
