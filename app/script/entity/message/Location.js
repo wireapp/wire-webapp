@@ -33,7 +33,7 @@ z.entity.Location = class Location extends z.entity.Asset {
     this.zoom = '';
 
     this.link_src = ko.pureComputed(() => {
-      return z.location.get_maps_url(this.latitude, this.longitude, this.name, this.zoom);
+      return z.location.getMapsUrl(this.latitude, this.longitude, this.name, this.zoom);
     });
   }
 };

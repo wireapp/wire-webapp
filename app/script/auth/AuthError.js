@@ -50,10 +50,10 @@ z.auth.AuthError = class AuthError extends Error {
 
   static get TYPE() {
     return {
-      COOKIES_DISABLED: 'z.auth.AuthError.TYPE.COOKIES_DISABLED',
-      INDEXED_DB_UNSUPPORTED: 'z.auth.AuthError.TYPE.INDEXED_DB_UNSUPPORTED',
-      MULTIPLE_TABS: 'z.auth.AuthError.TYPE.MULTIPLE_TABS',
-      PRIVATE_MODE: 'z.auth.AuthError.TYPE.PRIVATE_MODE',
+      COOKIES_DISABLED: 'AuthError.TYPE.COOKIES_DISABLED',
+      INDEXED_DB_UNSUPPORTED: 'AuthError.TYPE.INDEXED_DB_UNSUPPORTED',
+      MULTIPLE_TABS: 'AuthError.TYPE.MULTIPLE_TABS',
+      PRIVATE_MODE: 'AuthError.TYPE.PRIVATE_MODE',
     };
   }
 };

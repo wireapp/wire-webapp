@@ -27,18 +27,18 @@ z.audio.AudioError = class AudioError extends Error {
     super();
     this.name = this.constructor.name;
     this.stack = new Error().stack;
-    this.type = type || z.audio.AudioError.TYPE.UNKNOWN;
+    this.type = type || AudioError.TYPE.UNKNOWN;
     switch (this.type) {
-      case z.audio.AudioError.TYPE.ALREADY_PLAYING:
+      case AudioError.TYPE.ALREADY_PLAYING:
         this.message = 'Sound is already playing';
         break;
-      case z.audio.AudioError.TYPE.FAILED_TO_PLAY:
+      case AudioError.TYPE.FAILED_TO_PLAY:
         this.message = 'Failed to play sound';
         break;
-      case z.audio.AudioError.TYPE.IGNORED_SOUND:
+      case AudioError.TYPE.IGNORED_SOUND:
         this.message = 'Ignored request to play sound';
         break;
-      case z.audio.AudioError.TYPE.NOT_FOUND:
+      case AudioError.TYPE.NOT_FOUND:
         this.message = 'AudioElement or ID not found';
         break;
       default:
@@ -48,11 +48,11 @@ z.audio.AudioError = class AudioError extends Error {
 
   static get TYPE() {
     return {
-      ALREADY_PLAYING: 'z.audio.AudioError.TYPE.ALREADY_PLAYING',
-      FAILED_TO_PLAY: 'z.audio.AudioError.TYPE.FAILED_TO_PLAY',
-      IGNORED_SOUND: 'z.audio.AudioError.TYPE.IGNORED_SOUND',
-      NOT_FOUND: 'z.audio.AudioError.TYPE.NOT_FOUND',
-      UNKNOWN: 'z.audio.AudioError.TYPE.UNKNOWN',
+      ALREADY_PLAYING: 'AudioError.TYPE.ALREADY_PLAYING',
+      FAILED_TO_PLAY: 'AudioError.TYPE.FAILED_TO_PLAY',
+      IGNORED_SOUND: 'AudioError.TYPE.IGNORED_SOUND',
+      NOT_FOUND: 'AudioError.TYPE.NOT_FOUND',
+      UNKNOWN: 'AudioError.TYPE.UNKNOWN',
     };
   }
 };
