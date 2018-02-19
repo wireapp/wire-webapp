@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="8.0.4"></a>
+## [8.0.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/compare/@wireapp/cryptobox@8.0.3...@wireapp/cryptobox@8.0.4) (2018-02-19)
+
+
+### Bug Fixes
+
+* **cryptobox:** Queuing encryptions for multipe clients ([#280](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/issues/280)) ([d7dbd87](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/commit/d7dbd87))
+
+
+
+
 <a name="8.0.3"></a>
 ## [8.0.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/compare/@wireapp/cryptobox@8.0.2...@wireapp/cryptobox@8.0.3) (2018-02-19)
 

@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="7.0.4"></a>
+## [7.0.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/compare/@wireapp/proteus@7.0.3...@wireapp/proteus@7.0.4) (2018-02-19)
+
+
+### Bug Fixes
+
+* **cryptobox:** Queuing encryptions for multipe clients ([#280](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/issues/280)) ([d7dbd87](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/commit/d7dbd87))
+
+
+
+
 <a name="7.0.3"></a>
 ## [7.0.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/compare/@wireapp/proteus@7.0.2...@wireapp/proteus@7.0.3) (2018-02-19)
 
