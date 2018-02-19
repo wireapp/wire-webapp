@@ -31,11 +31,14 @@ class ClientList extends React.Component {
   };
 
   setSelectedClient = clientId => {
-    this.setState({...this.state, currentlySelectedClient: clientId});
+    if (this.state.currentlySelectedClient === clientId) {
+      this.setState({...this.state, currentlySelectedClient: null});
+    } else {
+      this.setState({...this.state, currentlySelectedClient: clientId});
+    }
   };
 
-  removeClient = (event, clientId, password) => {
-    event.preventDefault();
+  removeClient = (clientId, password) => {
     return this.props.doRemoveClient(clientId, password);
   };
 
@@ -57,12 +60,10 @@ class ClientList extends React.Component {
           <ClientItem
             key={client.id}
             selected={this.isSelectedClient(client.id)}
-            name={client.model}
-            fingerprint={client.id}
-            created={client.time}
-            error={this.isSelectedClient(client.id) && this.props.clientError}
+            client={client}
+            clientError={this.isSelectedClient(client.id) && this.props.clientError}
             onClick={event => this.setSelectedClient(client.id)}
-            onClientRemoval={(event, password) => this.removeClient(event, client.id, password)}
+            onClientRemoval={password => this.removeClient(client.id, password)}
           />
         ))}
       </ContainerXS>

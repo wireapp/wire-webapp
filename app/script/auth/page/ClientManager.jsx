@@ -43,12 +43,18 @@ class ClientManager extends React.Component {
           verticalCenter
           style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-around', minHeight: 428}}
         >
-          <H1 center>{'Remove a device'}</H1>
-          <Text center style={{marginBottom: '20px'}}>
+          <H1 center style={{marginTop: '140px'}}>
+            {'Remove a device'}
+          </H1>
+          <Text center style={{marginBottom: '42px'}}>
             {'Remove one of your other devices to start using Wire on this one.'}
           </Text>
           <ClientList />
-          <Link onClick={this.logout} style={{alignSelf: 'center'}} data-uie-name="go-sign-out">
+          <Link
+            onClick={this.logout}
+            style={{alignSelf: 'center', margin: '48px 0 80px 0'}}
+            data-uie-name="go-sign-out"
+          >
             {'Log out'}
           </Link>
         </ContainerXS>

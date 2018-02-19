@@ -21,6 +21,7 @@ import React from 'react';
 import {
   DeviceIcon,
   COLOR,
+  Form,
   Input,
   InputSubmitCombo,
   RoundIconButton,
@@ -31,72 +32,148 @@ import {
   Small,
   ErrorMessage,
 } from '@wireapp/react-ui-kit';
-import {parseError} from '../util/errorUtil';
+import {parseError, parseValidationErrors} from '../util/errorUtil';
+import ValidationError from '../module/action/ValidationError';
 
 class ClientItem extends React.Component {
-  state = {
-    password: null,
+  static initialState = {
+    password: '',
+    validPassword: true,
+    validationError: null,
   };
+  state = ClientItem.initialState;
 
-  formatFingerprint = (fingerprint = '') => fingerprint.toUpperCase().replace(/(..)/g, '$1 ');
+  formatId = (id = '?') => id.toUpperCase().replace(/(..)/g, '$1 ');
 
   formatDate = dateString =>
-    new Date(dateString).toLocaleString('en-US', {
-      day: 'numeric',
-      hour: 'numeric',
-      hour12: false,
-      minute: 'numeric',
-      month: 'short',
-      weekday: 'short',
-      year: 'numeric',
-    });
+    dateString
+      ? new Date(dateString).toLocaleString('en-US', {
+          day: 'numeric',
+          hour: 'numeric',
+          hour12: false,
+          minute: 'numeric',
+          month: 'short',
+          weekday: 'short',
+          year: 'numeric',
+        })
+      : '?';
+
+  formatName = (model, clazz) =>
+    model || (
+      <Text bold textTransform={'capitalize'}>
+        {clazz}
+      </Text>
+    ) ||
+    '?';
+
+  resetState = () => this.setState(ClientItem.initialState);
+
+  wrappedOnClick = event => {
+    this.resetState();
+    this.props.onClick(event);
+  };
+
+  handleSubmit = event => {
+    event.preventDefault();
+    if (this.props.isFetching) {
+      return;
+    }
+    let validationError = null;
+    if (!this.passwordInput.checkValidity()) {
+      validationError = ValidationError.handleValidationState(this.passwordInput.name, this.passwordInput.validity);
+    }
+    this.setState({validPassword: this.passwordInput.validity.valid, validationError});
+    return Promise.resolve(validationError)
+      .then(error => {
+        if (error) {
+          throw error;
+        }
+      })
+      .then(() => this.props.onClientRemoval(this.state.password))
+      .then(() =>
+        window.location.replace(`/${URLUtil.pathWithParams('login', `reason=login&persist=${this.state.persist}`)}`)
+      )
+      .catch(error => {
+        if (!error.label) {
+          throw error;
+        }
+      });
+  };
 
   render() {
-    const {selected, name, fingerprint, created} = this.props;
+    const {client, selected, clientError} = this.props;
+    const {validationError, validPassword, password} = this.state;
     return (
       <ContainerXS>
         <ContainerXS style={selected ? {backgroundColor: 'white', borderRadius: '10px'} : {}}>
           <ContainerXS
-            onClick={this.props.onClick}
-            style={{margin: '0px', padding: '5px 15px'}}
+            onClick={this.wrappedOnClick}
+            style={
+              selected
+                ? {cursor: 'pointer', margin: '16px 0 0 0', padding: '5px 16px 0 16px'}
+                : {cursor: 'pointer', margin: '0 0 0 0', padding: '5px 16px 0 16px'}
+            }
             data-uie-name="go-remove-device"
           >
             <div style={{display: 'flex', flexDirection: 'row'}}>
-              <div style={{flexBasis: '30px', margin: 'auto'}}>
+              <div style={{flexBasis: '32px', margin: 'auto'}}>
                 <DeviceIcon />
               </div>
               <div style={{flexGrow: 1}}>
                 <Text bold block>
-                  {name}
+                  {this.formatName(client.model, client.class)}
                 </Text>
-                <Small block data-uie-name="device-id">{`ID: ${this.formatFingerprint(fingerprint)}`}</Small>
-                <Small block>{this.formatDate(created)}</Small>
+                <Small block data-uie-name="device-id">{`ID: ${this.formatId(client.id)}`}</Small>
+                <Small block>{this.formatDate(client.time)}</Small>
               </div>
             </div>
-            <Line color={COLOR.GRAY} />
+            <Line color={COLOR.GRAY_LIGHTEN_72} style={{margin: '4px 0 0 0'}} />
           </ContainerXS>
           {selected && (
-            <ContainerXS style={{margin: '-15px 0 0 0', padding: '5px'}}>
-              <InputSubmitCombo style={{marginBottom: '0'}}>
-                <Input
-                  placeholder="Password"
-                  type="password"
-                  onChange={event => this.setState({...this.state, password: event.target.value})}
-                  data-uie-name="remove-device-password"
-                />
-                <RoundIconButton
-                  color={COLOR.RED}
-                  type="submit"
-                  icon={ICON_NAME.TRASH}
-                  formNoValidate
-                  onClick={event => this.props.onClientRemoval(event, this.state.password)}
-                  data-uie-name="do-remove-device"
-                />
-              </InputSubmitCombo>
+            <ContainerXS style={{margin: '-5px 0 0 0', padding: '5px'}}>
+              <Form>
+                <InputSubmitCombo style={{marginBottom: '0'}}>
+                  <Input
+                    name="password"
+                    placeholder="Password"
+                    type="password"
+                    innerRef={node => (this.passwordInput = node)}
+                    markInvalid={!validPassword}
+                    value={password}
+                    autoComplete="section-login password"
+                    maxLength="1024"
+                    minLength="8"
+                    pattern=".{8,1024}"
+                    required
+                    onChange={event =>
+                      this.setState({
+                        password: event.target.value,
+                        validPassword: true,
+                      })
+                    }
+                    data-uie-name="remove-device-password"
+                  />
+                  <RoundIconButton
+                    disabled={!password}
+                    color={COLOR.RED}
+                    type="submit"
+                    icon={ICON_NAME.TRASH}
+                    formNoValidate
+                    onClick={this.handleSubmit}
+                    data-uie-name="do-remove-device"
+                  />
+                </InputSubmitCombo>
+              </Form>
             </ContainerXS>
           )}
         </ContainerXS>
-        <ErrorMessage data-uie-name="error-message">{parseError(this.props.error)}</ErrorMessage>
+        {validationError ? (
+          <div style={{margin: '16px 0 0 0'}}>{parseValidationErrors(validationError)}</div>
+        ) : clientError ? (
+          <ErrorMessage style={{margin: '16px 0 0 0'}} data-uie-name="error-message">
+            {parseError(clientError)}
+          </ErrorMessage>
+        ) : null}
       </ContainerXS>
     );
   }
