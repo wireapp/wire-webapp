@@ -79,8 +79,9 @@ z.event.WebSocketService = class WebSocketService {
    * @returns {Promise} Resolves once the WebSocket connects
    */
   connect(onNotification) {
+    this.onNotification = onNotification;
+
     return new Promise((resolve, reject) => {
-      this.onNotification = onNotification;
       this.connectionUrl = `${this.client.web_socket_url}/await?access_token=${this.client.access_token}`;
       if (this.clientId) {
         this.connectionUrl = z.util.append_url_parameter(this.connectionUrl, `client=${this.clientId}`);
@@ -116,7 +117,7 @@ z.event.WebSocketService = class WebSocketService {
       this.socket.onmessage = event => {
         if (event.data instanceof Blob) {
           const blobReader = new FileReader();
-          blobReader.onload = () => on_notification(JSON.parse(blobReader.result));
+          blobReader.onload = () => onNotification(JSON.parse(blobReader.result));
           blobReader.readAsText(event.data);
         }
       };

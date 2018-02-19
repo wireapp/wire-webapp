@@ -977,18 +977,25 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
 
   clicked_on_manage_devices() {
     if (!this.device_modal) {
-      this.device_modal = new zeta.webapp.module.Modal('#modal-limit');
+      const hideCallback = $(document).off('keydown.deviceModal');
+      this.device_modal = new zeta.webapp.module.Modal('#modal-limit', hideCallback);
+      this.device_modal.autoclose = false;
     }
 
     if (this.device_modal.is_hidden()) {
       this.client_repository.getClientsForSelf();
+      $(document).on('keydown.deviceModal', keyboard_event => {
+        if (z.util.KeyboardUtil.isEscapeKey(keyboard_event)) {
+          this.device_modal.hide();
+        }
+      });
     }
 
-    this.device_modal.toggle();
+    this.device_modal.show();
   }
 
   close_model_manage_devices() {
-    this.device_modal.toggle();
+    this.device_modal.hide();
   }
 
   clicked_on_navigate_back() {
@@ -1801,7 +1808,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
       .create_cryptobox(this.storageService.db)
       .then(() => this.client_repository.registerClient(auto_login ? undefined : this.password()))
       .then(client_observable => {
-        this.event_repository.current_client = client_observable;
+        this.event_repository.currentClient = client_observable;
         return this.event_repository.initializeStreamState(client_observable().id);
       })
       .catch(error => {
