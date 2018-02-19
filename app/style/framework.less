@@ -39,9 +39,25 @@
     position: relative;
     flex: 1 1 auto;
   }
+
   .right-column {
     transform: scale(1, 1);
     overflow: hidden;
+  }
+}
+
+.app.app__panel {
+  .center-column {
+    &__overlay {
+      transition: opacity @animation-timing-fast @ease-in-out-quart;
+      background-color: rgba(0, 0, 0, 0.1);
+      display: none;
+      opacity: 0;
+    }
+    .conversation-input,
+    #conversation-titlebar {
+      width: 100%;
+    }
   }
 
   &.app--panel-open {
@@ -49,24 +65,18 @@
     }
 
     .center-column__overlay {
-      background-color: rgba(0, 0, 0, 0.1);
-      display: none;
-      opacity: 0;
-      transition: opacity @animation-timing-fast @ease-in-out-quart;
+      display: block;
+      opacity: 1;
     }
 
     .right-column {
-      position: relative;
+      position: absolute;
+      right: 0;
     }
 
     @media (min-width: 1000px) {
-      .center-column__overlay {
-        display: block;
-        opacity: 1;
-      }
       .right-column {
-        position: absolute;
-        right: 0;
+        position: relative;
       }
     }
   }
