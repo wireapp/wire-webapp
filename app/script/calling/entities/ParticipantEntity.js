@@ -23,12 +23,12 @@ window.z = window.z || {};
 window.z.calling = z.calling || {};
 window.z.calling.entities = z.calling.entities || {};
 
-z.calling.entities.Participant = class Participant {
+z.calling.entities.ParticipantEntity = class ParticipantEntity {
   /**
    * Construct a new participant.
    *
-   * @class z.calling.entities.Participant
-   * @param {Call} callEntity - Call entity
+   * @class z.calling.entities.ParticipantEntity
+   * @param {z.calling.entities.CallEntity} callEntity - Call entity
    * @param {z.entity.User} user - User entity to base the participant on
    * @param {CallSetupTimings} timings - Timing statistics of call setup steps
    */
@@ -38,7 +38,7 @@ z.calling.entities.Participant = class Participant {
     this.id = this.user.id;
     this.sessionId = undefined;
 
-    this.logger = new z.util.Logger(`z.calling.entities.Participant (${this.id})`, z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger(`z.calling.entities.ParticipantEntity (${this.id})`, z.config.LOGGER.OPTIONS);
 
     this.isConnected = ko.observable(false);
     this.panning = ko.observable(0.0);
@@ -50,7 +50,7 @@ z.calling.entities.Participant = class Participant {
       videoSend: ko.observable(false),
     };
 
-    this.flowEntity = new z.calling.entities.Flow(this.callEntity, this, timings);
+    this.flowEntity = new z.calling.entities.FlowEntity(this.callEntity, this, timings);
 
     this.isConnected.subscribe(isConnected => {
       if (isConnected && !this.wasConnected) {
@@ -66,7 +66,7 @@ z.calling.entities.Participant = class Participant {
    */
   resetParticipant() {
     if (this.flowEntity) {
-      this.flowEntity.reset_flow();
+      this.flowEntity.resetFlow();
     }
   }
 
@@ -80,21 +80,17 @@ z.calling.entities.Participant = class Participant {
 
   /**
    * Update the participant state.
-   * @param {CallMessage} callMessageEntity - Call message to update state from.
+   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message to update state from.
    * @returns {Promise} Resolves when the state was updated
    */
   updateState(callMessageEntity) {
-    const {clientId, props, sdp: rtcSdp, sessionId} = callMessageEntity;
+    const {clientId, properties, sdp: rtcSdp, sessionId} = callMessageEntity;
 
-    return this.updateProperties(props).then(() => {
+    return this.updateProperties(properties).then(() => {
       this.sessionId = sessionId;
       this.flowEntity.setRemoteClientId(clientId);
 
-      if (rtcSdp) {
-        return this.flowEntity.saveRemoteSdp(callMessageEntity);
-      }
-
-      return false;
+      return rtcSdp ? this.flowEntity.saveRemoteSdp(callMessageEntity) : false;
     });
   }
 
@@ -109,22 +105,25 @@ z.calling.entities.Participant = class Participant {
         const {audiosend: audioSend, screensend: screenSend, videosend: videoSend} = properties;
 
         if (audioSend !== undefined) {
-          this.state.audioSend(audioSend === z.calling.enum.PROPERTY_STATE.TRUE);
+          const isAudioSend = audioSend === z.calling.enum.PROPERTY_STATE.TRUE;
+          this.state.audioSend(isAudioSend);
         }
 
         if (screenSend !== undefined) {
-          this.state.screenSend(screenSend === z.calling.enum.PROPERTY_STATE.TRUE);
+          const isScreenSend = screenSend === z.calling.enum.PROPERTY_STATE.TRUE;
+          this.state.screenSend(isScreenSend);
         }
 
         if (videoSend !== undefined) {
-          this.state.videoSend(videoSend === z.calling.enum.PROPERTY_STATE.TRUE);
+          const isVideoSend = videoSend === z.calling.enum.PROPERTY_STATE.TRUE;
+          this.state.videoSend(isVideoSend);
         }
       }
     });
   }
 
   /**
-   * Verifiy client IDs match.
+   * Verify client IDs match.
    * @param {string} clientId - Client ID to match with participant one
    * @returns {undefined} No return value
    */
@@ -132,13 +131,14 @@ z.calling.entities.Participant = class Participant {
     if (clientId) {
       const connectedClientId = this.flowEntity.remoteClientId;
 
-      if (connectedClientId && clientId !== connectedClientId) {
-        this.logger.warn(
-          `State change requested from '${clientId}' while we are connected to '${connectedClientId}'`,
-          this
-        );
+      const isExpectedId = clientId === connectedClientId;
+      const requestedByWrongSender = connectedClientId && !isExpectedId;
+      if (requestedByWrongSender) {
+        const logMessage = `State change requested from '${clientId}' while we are connected to '${connectedClientId}'`;
+        this.logger.warn(logMessage, this);
         throw new z.calling.CallError(z.calling.CallError.TYPE.WRONG_SENDER);
       }
+
       this.flowEntity.remoteClientId = clientId;
     } else {
       throw new z.calling.CallError(z.calling.CallError.TYPE.WRONG_SENDER, 'Sender ID missing');

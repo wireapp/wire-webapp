@@ -43,7 +43,7 @@ z.calling.SDPMapper = {
 
   /**
    * Map call setup message to RTCSessionDescription.
-   * @param {CallMessage} callMessageEntity - Call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.SETUP
+   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.SETUP
    * @returns {Promise} Resolves with a webRTC standard compliant RTCSessionDescription
    */
   mapCallMessageToObject(callMessageEntity) {
@@ -61,7 +61,7 @@ z.calling.SDPMapper = {
    *
    * @param {RTCSessionDescription} rtcSdp - Session Description Protocol to be rewritten
    * @param {z.calling.enum.SDP_SOURCE} [sdpSource=z.calling.enum.SDP_SOURCE.REMOTE] - Source of the SDP - local or remote
-   * @param {Flow} flowEntity - Flow entity
+   * @param {z.calling.entities.FlowEntity} flowEntity - Flow entity
    * @returns {Object} Object containing rewritten Session Description Protocol and number of ICE candidates
    */
   rewriteSdp(rtcSdp, sdpSource = z.calling.enum.SDP_SOURCE.REMOTE, flowEntity) {
@@ -69,7 +69,8 @@ z.calling.SDPMapper = {
       throw new z.calling.CallError(z.calling.CallError.TYPE.NOT_FOUND, 'Cannot rewrite undefined SDP');
     }
 
-    if (sdpSource === z.calling.enum.SDP_SOURCE.LOCAL) {
+    const isSourceLocal = sdpSource === z.calling.enum.SDP_SOURCE.LOCAL;
+    if (isSourceLocal) {
       rtcSdp.sdp = rtcSdp.sdp.replace('UDP/TLS/', '');
     }
 
@@ -80,7 +81,7 @@ z.calling.SDPMapper = {
       let outline = sdpLine;
 
       if (sdpLine.startsWith('t=')) {
-        if (sdpSource === z.calling.enum.SDP_SOURCE.LOCAL) {
+        if (isSourceLocal) {
           sdpLines.push(sdpLine);
 
           const browserString = `${z.util.Environment.browser.name} ${z.util.Environment.browser.version}`;
@@ -95,21 +96,20 @@ z.calling.SDPMapper = {
         }
       } else if (sdpLine.startsWith('a=candidate')) {
         iceCandidates.push(sdpLine);
-
-        // Remove once obsolete due to high uptake of clients based on AVS build 3.3.11 containing fix for AUDIO-1215
       } else if (sdpLine.startsWith('a=mid')) {
+        // Remove once obsolete due to high uptake of clients based on AVS build 3.3.11 containing fix for AUDIO-1215
         const isRemoteSdp = sdpSource === z.calling.enum.SDP_SOURCE.REMOTE;
         const isAnswer = rtcSdp.type === z.calling.rtc.SDP_TYPE.ANSWER;
 
         if (isRemoteSdp && isAnswer && z.util.Environment.browser.firefox) {
-          if (sdpLine === 'a=mid:data') {
+          const isSdpLineData = sdpLine === 'a=mid:data';
+          if (isSdpLineData) {
             outline = 'a=mid:sdparta_2';
           }
         }
-
-        // Code to nail in bit-rate and ptime settings for improved performance and experience
       } else if (sdpLine.startsWith('m=audio')) {
-        const isIceRestart = flowEntity.negotiation_mode() === z.calling.enum.SDP_NEGOTIATION_MODE.ICE_RESTART;
+        // Code to nail in bit-rate and ptime settings for improved performance and experience
+        const isIceRestart = flowEntity.negotiationMode() === z.calling.enum.SDP_NEGOTIATION_MODE.ICE_RESTART;
         const isLocalSdp = sdpSource === z.calling.enum.SDP_SOURCE.LOCAL;
 
         if (isIceRestart || (isLocalSdp && flowEntity.isGroup)) {
@@ -117,7 +117,7 @@ z.calling.SDPMapper = {
           outline = `b=AS:${z.calling.SDPMapper.CONFIG.AUDIO_BITRATE}`;
         }
       } else if (sdpLine.startsWith('a=rtpmap')) {
-        const isIceRestart = flowEntity.negotiation_mode() === z.calling.enum.SDP_NEGOTIATION_MODE.ICE_RESTART;
+        const isIceRestart = flowEntity.negotiationMode() === z.calling.enum.SDP_NEGOTIATION_MODE.ICE_RESTART;
         const isLocalSdp = sdpSource === z.calling.enum.SDP_SOURCE.LOCAL;
 
         if (isIceRestart || (isLocalSdp && flowEntity.isGroup)) {
@@ -126,10 +126,10 @@ z.calling.SDPMapper = {
             outline = `a=ptime:${z.calling.SDPMapper.CONFIG.AUDIO_PTIME}`;
           }
         }
-
-        // Workaround for incompatibility between Chrome 57 and AVS builds. Remove once update of clients with AVS 3.3.x is high enough.
       } else if (sdpLine.startsWith('a=fmtp')) {
-        if (sdpLine === 'a=fmtp:125 apt=100') {
+        // Workaround for incompatibility between Chrome 57 and AVS builds. Remove once update of clients with AVS 3.3.x is high enough.
+        const isAffectedCodec = sdpLine === 'a=fmtp:125 apt=100';
+        if (isAffectedCodec) {
           outline = 'a=fmtp:125 apt=96';
         }
       }
@@ -140,6 +140,6 @@ z.calling.SDPMapper = {
     });
 
     rtcSdp.sdp = sdpLines.join('\r\n');
-    return Promise.resolve({iceCandidates: iceCandidates, sdp: rtcSdp});
+    return Promise.resolve({iceCandidates, sdp: rtcSdp});
   },
 };

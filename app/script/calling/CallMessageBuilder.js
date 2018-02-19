@@ -22,54 +22,54 @@
 window.z = window.z || {};
 window.z.calling = z.calling || {};
 
-z.calling.CallMessageBuilder = (function() {
-  const _buildCallMessage = function(type, response, sessionId, additionalPayload) {
-    const callMessageEntity = new z.calling.entities.CallMessage(type, response, sessionId);
+z.calling.CallMessageBuilder = (() => {
+  const _buildCallMessage = (type, response, sessionId, additionalPayload) => {
+    const callMessageEntity = new z.calling.entities.CallMessageEntity(type, response, sessionId);
 
     if (additionalPayload) {
-      callMessageEntity.add_properties(additionalPayload);
+      callMessageEntity.addProperties(additionalPayload);
     }
 
     return callMessageEntity;
   };
 
-  const _buildCancel = function(response, sessionId, additionalPayload) {
+  const _buildCancel = (response, sessionId, additionalPayload) => {
     return _buildCallMessage(z.calling.enum.CALL_MESSAGE_TYPE.CANCEL, response, sessionId, additionalPayload);
   };
 
-  const _buildGroupCheck = function(response, sessionId, additionalPayload) {
+  const _buildGroupCheck = (response, sessionId, additionalPayload) => {
     return _buildCallMessage(z.calling.enum.CALL_MESSAGE_TYPE.GROUP_CHECK, response, sessionId, additionalPayload);
   };
 
-  const _buildGroupLeave = function(response, sessionId, additionalPayload) {
+  const _buildGroupLeave = (response, sessionId, additionalPayload) => {
     return _buildCallMessage(z.calling.enum.CALL_MESSAGE_TYPE.GROUP_LEAVE, response, sessionId, additionalPayload);
   };
 
-  const _buildGroupSetup = function(response, sessionId, additionalPayload) {
+  const _buildGroupSetup = (response, sessionId, additionalPayload) => {
     return _buildCallMessage(z.calling.enum.CALL_MESSAGE_TYPE.GROUP_SETUP, response, sessionId, additionalPayload);
   };
 
-  const _buildGroupStart = function(response, sessionId, additionalPayload) {
+  const _buildGroupStart = (response, sessionId, additionalPayload) => {
     return _buildCallMessage(z.calling.enum.CALL_MESSAGE_TYPE.GROUP_START, response, sessionId, additionalPayload);
   };
 
-  const _buildHangup = function(response, sessionId, additionalPayload) {
+  const _buildHangup = (response, sessionId, additionalPayload) => {
     return _buildCallMessage(z.calling.enum.CALL_MESSAGE_TYPE.HANGUP, response, sessionId, additionalPayload);
   };
 
-  const _buildPropSync = function(response, sessionId, additionalPayload) {
+  const _buildPropSync = (response, sessionId, additionalPayload) => {
     return _buildCallMessage(z.calling.enum.CALL_MESSAGE_TYPE.PROP_SYNC, response, sessionId, additionalPayload);
   };
 
-  const _buildReject = function(response, sessionId, additionalPayload) {
+  const _buildReject = (response, sessionId, additionalPayload) => {
     return _buildCallMessage(z.calling.enum.CALL_MESSAGE_TYPE.REJECT, response, sessionId, additionalPayload);
   };
 
-  const _buildSetup = function(response, sessionId, additionalPayload) {
+  const _buildSetup = (response, sessionId, additionalPayload) => {
     return _buildCallMessage(z.calling.enum.CALL_MESSAGE_TYPE.SETUP, response, sessionId, additionalPayload);
   };
 
-  const _buildUpdate = function(response, sessionId, additionalPayload) {
+  const _buildUpdate = (response, sessionId, additionalPayload) => {
     return _buildCallMessage(z.calling.enum.CALL_MESSAGE_TYPE.UPDATE, response, sessionId, additionalPayload);
   };
 
@@ -82,14 +82,8 @@ z.calling.CallMessageBuilder = (function() {
    * @param {string} [remoteClientId] - Optional ID of remote client
    * @returns {{conversationId: string, remoteClientId: string, remoteUserId: *, time: string, userId: string}} Additional payload
    */
-  const _createPayload = function(conversationId, selfUserId, remoteUserId, remoteClientId) {
-    return {
-      conversationId: conversationId,
-      remoteClientId: remoteClientId,
-      remoteUserId: remoteUserId,
-      time: new Date().toISOString(),
-      userId: selfUserId,
-    };
+  const _createPayload = (conversationId, selfUserId, remoteUserId, remoteClientId) => {
+    return {conversationId, remoteClientId, remoteUserId, time: new Date().toISOString(), userId: selfUserId};
   };
 
   /**
@@ -101,15 +95,11 @@ z.calling.CallMessageBuilder = (function() {
    * @param {Object} additionalPayload - Optional additional payload to be added
    * @returns {Object} call message props object
    */
-  const _createPayloadPropSync = function(selfState, payloadType, invert, additionalPayload) {
-    let payload;
+  const _createPayloadPropSync = (selfState, payloadType, invert, additionalPayload) => {
+    const payload = {};
 
     if (_.isBoolean(payloadType)) {
-      payload = {
-        props: {
-          videosend: `${payloadType}`,
-        },
-      };
+      payload.properties = {videosend: `${payloadType}`};
     } else {
       let audioSendState;
       let screenSendState;
@@ -121,11 +111,7 @@ z.calling.CallMessageBuilder = (function() {
 
           audioSendState = invert ? !audioSelfState() : audioSelfState();
 
-          payload = {
-            props: {
-              audiosend: `${audioSendState}`,
-            },
-          };
+          payload.properties = {audiosend: `${audioSendState}`};
           break;
         }
 
@@ -135,11 +121,9 @@ z.calling.CallMessageBuilder = (function() {
           screenSendState = invert ? !screenSelfState() : screenSelfState();
           videoSendState = invert ? z.calling.enum.PROPERTY_STATE.FALSE : videoSelfState();
 
-          payload = {
-            props: {
-              screensend: `${screenSendState}`,
-              videosend: `${videoSendState}`,
-            },
+          payload.properties = {
+            screensend: `${screenSendState}`,
+            videosend: `${videoSendState}`,
           };
           break;
         }
@@ -150,11 +134,9 @@ z.calling.CallMessageBuilder = (function() {
           screenSendState = invert ? z.calling.enum.PROPERTY_STATE.FALSE : screenSelfState();
           videoSendState = invert ? !videoSelfState() : videoSelfState();
 
-          payload = {
-            props: {
-              screensend: `${screenSendState}`,
-              videosend: `${videoSendState}`,
-            },
+          payload.properties = {
+            screensend: `${screenSendState}`,
+            videosend: `${videoSendState}`,
           };
           break;
         }
@@ -164,18 +146,15 @@ z.calling.CallMessageBuilder = (function() {
       }
     }
 
-    if (additionalPayload) {
-      payload = $.extend(payload, additionalPayload);
-    }
-    return payload;
+    return additionalPayload ? Object.assign(payload, additionalPayload) : payload;
   };
 
   return {
     buildCancel: _buildCancel,
-    buildGroupcheck: _buildGroupCheck,
-    buildGroupleave: _buildGroupLeave,
-    buildGroupsetup: _buildGroupSetup,
-    buildGroupstart: _buildGroupStart,
+    buildGroupCheck: _buildGroupCheck,
+    buildGroupLeave: _buildGroupLeave,
+    buildGroupSetup: _buildGroupSetup,
+    buildGroupStart: _buildGroupStart,
     buildHangup: _buildHangup,
     buildPropSync: _buildPropSync,
     buildReject: _buildReject,

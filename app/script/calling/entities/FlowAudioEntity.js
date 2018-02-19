@@ -23,12 +23,12 @@ window.z = window.z || {};
 window.z.calling = z.calling || {};
 window.z.calling.entities = z.calling.entities || {};
 
-z.calling.entities.FlowAudio = class FlowAudio {
+z.calling.entities.FlowAudioEntity = class FlowAudioEntity {
   /**
    * Create a new flow audio.
    *
-   * @class z.calling.entities.FlowAudio
-   * @param {z.entities.Flow} flowEntity - Flow entity
+   * @class z.calling.entities.FlowAudioEntity
+   * @param {z.calling.entities.FlowEntity} flowEntity - Flow entity
    * @param {MediaRepository} mediaRepository - Media repository
    */
   constructor(flowEntity, mediaRepository) {
@@ -36,7 +36,7 @@ z.calling.entities.FlowAudio = class FlowAudio {
 
     this.flowEntity = flowEntity;
     this.mediaRepository = mediaRepository;
-    this.logger = new z.util.Logger(`z.calling.FlowAudio (${this.flowEntity.id})`, z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger(`z.calling.entities.FlowAudio (${this.flowEntity.id})`, z.config.LOGGER.OPTIONS);
 
     this.audioContext = undefined;
 
@@ -77,11 +77,7 @@ z.calling.entities.FlowAudio = class FlowAudio {
    */
   setGainNode(isMuted) {
     if (this.gainNode) {
-      if (isMuted) {
-        this.gainNode.gain.value = 0;
-      } else {
-        this.gainNode.gain.value = 1;
-      }
+      this.gainNode.gain.value = isMuted ? 0 : 1;
       this.logger.debug(`Outgoing audio on flow muted '${isMuted}'`);
     }
   }
@@ -138,10 +134,8 @@ z.calling.entities.FlowAudio = class FlowAudio {
         this.panNode.connect(audioOutputDevice);
 
         Object.assign(mediaStream, audioOutputDevice.stream);
-        this.logger.debug(
-          `Wrapped audio stream to speaker to create stereo. Initial panning set to '${this.panning()}'.`,
-          mediaStream
-        );
+        const logMessage = `Wrapped audio stream to speaker for stereo. Initial panning set to '${this.panning()}'.`;
+        this.logger.debug(logMessage, mediaStream);
       }
     }
 
@@ -154,7 +148,7 @@ z.calling.entities.FlowAudio = class FlowAudio {
    */
   _getAudioContext() {
     if (!this.audioContext || this.audioContext.state === z.media.MediaRepository.AUDIO_CONTEXT_STATE.CLOSED) {
-      this.audioContext = this.mediaRepository._getAudioContext();
+      this.audioContext = this.mediaRepository.get_audio_context();
     }
     return this.audioContext;
   }

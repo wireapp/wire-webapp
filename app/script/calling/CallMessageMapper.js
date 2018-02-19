@@ -22,55 +22,45 @@
 window.z = window.z || {};
 window.z.calling = z.calling || {};
 
-z.calling.CallMessageMapper = (function() {
+z.calling.CallMessageMapper = {
   /**
    * Map incoming call message into entity.
    *
    * @private
    * @param {Object} event - Call event object
-   * @returns {CallMessage} Call message entity
+   * @returns {z.calling.entities.CallMessageEntity} Call message entity
    */
-  const _mapEvent = function(event) {
+  mapEvent(event) {
     const {content: callMessage, conversation: conversationId, from: userId, sender: clientId, time} = event;
 
-    const additionalProperties = {
-      clientId: clientId,
-      conversationId: conversationId,
-      time: time,
-      userId: userId,
-    };
+    const additionalProperties = {clientId, conversationId, time, userId};
 
     let content = undefined;
     switch (callMessage.type) {
       case z.calling.enum.CALL_MESSAGE_TYPE.GROUP_SETUP:
       case z.calling.enum.CALL_MESSAGE_TYPE.UPDATE: {
-        const {dest_clientid, dest_userid, props: properties, sdp} = callMessage;
-
-        content = {
-          dest_client_id: dest_clientid,
-          dest_user_id: dest_userid,
+        const {
+          dest_clientid: destinationClientId,
+          dest_user_id: destinationUserId,
           props: properties,
-          sdp: sdp,
-        };
+          sdp,
+        } = callMessage;
+
+        content = {destinationClientId, destinationUserId, properties, sdp};
         break;
       }
 
       case z.calling.enum.CALL_MESSAGE_TYPE.PROP_SYNC: {
         const {props: properties} = callMessage;
 
-        content = {
-          props: properties,
-        };
+        content = {properties};
         break;
       }
 
       case z.calling.enum.CALL_MESSAGE_TYPE.SETUP: {
         const {props: properties, sdp} = callMessage;
 
-        content = {
-          props: properties,
-          sdp: sdp,
-        };
+        content = {properties, sdp};
         break;
       }
 
@@ -80,18 +70,14 @@ z.calling.CallMessageMapper = (function() {
     }
 
     if (content) {
-      $.extend(additionalProperties, content);
+      Object.assign(additionalProperties, content);
     }
 
     const {type, resp: response, sessid: sessionId} = callMessage;
-    const callMessageEntity = new z.calling.entities.CallMessage(type, response, sessionId);
+    const callMessageEntity = new z.calling.entities.CallMessageEntity(type, response, sessionId);
 
-    callMessageEntity.add_properties(additionalProperties);
+    callMessageEntity.addProperties(additionalProperties);
 
     return callMessageEntity;
-  };
-
-  return {
-    mapEvent: _mapEvent,
-  };
-})();
+  },
+};
