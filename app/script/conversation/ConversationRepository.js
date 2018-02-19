@@ -2948,7 +2948,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
               conversationEntity.participating_user_ids.remove(userEntity.id);
 
               if (conversationEntity.call()) {
-                amplify.publish(z.event.WebApp.CALL.STATE.PARTICIPANT_LEFT, conversationEntity.id, userEntity.id);
+                amplify.publish(z.event.WebApp.CALL.STATE.REMOVE_PARTICIPANT, conversationEntity.id, userEntity.id);
               }
             });
 

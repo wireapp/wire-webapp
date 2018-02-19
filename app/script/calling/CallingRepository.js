@@ -126,7 +126,7 @@ z.calling.CallingRepository = class CallingRepository {
     amplify.subscribe(z.event.WebApp.CALL.STATE.JOIN, this.joinCall.bind(this));
     amplify.subscribe(z.event.WebApp.CALL.STATE.LEAVE, this.leaveCall.bind(this));
     amplify.subscribe(z.event.WebApp.CALL.STATE.REJECT, this.rejectCall.bind(this));
-    amplify.subscribe(z.event.WebApp.CALL.STATE.PARTICIPANT_LEFT, this.participantLeft.bind(this));
+    amplify.subscribe(z.event.WebApp.CALL.STATE.REMOVE_PARTICIPANT, this.removeParticipant.bind(this));
     amplify.subscribe(z.event.WebApp.CALL.STATE.TOGGLE, this.toggleState.bind(this));
     amplify.subscribe(z.event.WebApp.DEBUG.UPDATE_LAST_CALL_STATUS, this.storeFlowStatus.bind(this));
     amplify.subscribe(z.event.WebApp.EVENT.UPDATE_TIME_OFFSET, this.updateTimeOffset.bind(this));
@@ -903,15 +903,26 @@ z.calling.CallingRepository = class CallingRepository {
   /**
    * Remove a participant from an call if he was removed from the group.
    *
-   * @param {string} conversationId - ID of conversation for which the user should be removed from the call
+   * @param {z.calling.entities.CallEntity} callEntity - Call entity
    * @param {string} userId - ID of user to be removed
    * @returns {undefined} No return value
    */
-  participantLeft(conversationId, userId) {
-    const additionalPayload = z.calling.CallMessageBuilder.createPayload(conversationId, this.selfUserId(), userId);
-    const callMessageEntity = z.calling.CallMessageBuilder.buildGroupLeave(false, this.sessionId, additionalPayload);
+  participantLeft(callEntity, userId) {
+    callEntity
+      .getParticipantById(userId)
+      .then(() => {
+        const {id, sessionId} = callEntity;
+        const additionalPayload = z.calling.CallMessageBuilder.createPayload(id, this.selfUserId(), userId);
+        const callMessageEntity = z.calling.CallMessageBuilder.buildGroupLeave(false, sessionId, additionalPayload);
 
-    this._onGroupLeave(callMessageEntity, z.calling.enum.TERMINATION_REASON.MEMBER_LEAVE);
+        this._onGroupLeave(callMessageEntity, z.calling.enum.TERMINATION_REASON.MEMBER_LEAVE);
+      })
+      .catch(error => {
+        const isNotFound = error.type === z.calling.CallError.TYPE.NOT_FOUND;
+        if (!isNotFound) {
+          throw error;
+        }
+      });
   }
 
   /**
