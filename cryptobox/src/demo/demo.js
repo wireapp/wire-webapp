@@ -1,4 +1,4 @@
-const cryptobox = require('./commonjs/wire-webapp-cryptobox');
+const cryptobox = require('../../dist/commonjs/');
 const Logdown = require('logdown');
 
 const logger = new Logdown({alignOutput: true, prefix: 'Demo'});

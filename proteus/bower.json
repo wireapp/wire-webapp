@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "libsodium.js": "0.5.4",
+    "libsodium.js": "0.7.3",
     "wire-webapp-cbor": "2.1.2"
   },
   "license": "GPL-3.0",

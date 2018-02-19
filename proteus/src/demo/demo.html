@@ -5,13 +5,10 @@
     <meta charset="UTF-8" />
     <title>Demo</title>
     <link rel="shortcut icon" href="data:image/x-icon;" type="image/x-icon" />
-    <script src="../../bower_components/libsodium.js/dist/browsers-sumo/combined/sodium.js"></script>
-    <script src="../../bower_components/wire-webapp-cbor/dist/window/wire-webapp-cbor.js"></script>
-    <script src="../../dist/proteus.bundle.js"></script>
   </head>
   <body>
     <script>
-      (async () => {
+      const startDemo = async sodium => {
         const identity = await Proteus.keys.IdentityKeyPair.new();
         const fingerprint = identity.public_key.fingerprint();
         const serializedIdentity = identity.serialise();
@@ -19,7 +16,14 @@
         const messageFingerprint = `Identity Test (Fingerprint): ${fingerprint}`;
         const messageSerialization = `Identity Test (Serialization): ${encodedSerializedIdentity}`;
         document.write(`${messageFingerprint}<br/>${messageSerialization}`);
-      })();
+      };
+
+      window.sodium = {
+        onload: sodium => startDemo(sodium)
+      };
     </script>
+    <script src="../../bower_components/libsodium.js/dist/browsers-sumo/sodium.js"></script>
+    <script src="../../bower_components/wire-webapp-cbor/dist/window/wire-webapp-cbor.js"></script>
+    <script src="../../dist/proteus.bundle.js"></script>
   </body>
 </html>
