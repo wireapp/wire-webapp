@@ -40,8 +40,34 @@
     flex: 1 1 auto;
   }
   .right-column {
-    background-color: @graphite;
-    width: 0;
-    overflow-x: hidden;
+    transform: scale(1, 1);
+    overflow: hidden;
+  }
+
+  &.app--panel-open {
+    .center-column {
+    }
+
+    .center-column__overlay {
+      background-color: rgba(0, 0, 0, 0.1);
+      display: none;
+      opacity: 0;
+      transition: opacity @animation-timing-fast @ease-in-out-quart;
+    }
+
+    .right-column {
+      position: relative;
+    }
+
+    @media (min-width: 1000px) {
+      .center-column__overlay {
+        display: block;
+        opacity: 1;
+      }
+      .right-column {
+        position: absolute;
+        right: 0;
+      }
+    }
   }
 }
