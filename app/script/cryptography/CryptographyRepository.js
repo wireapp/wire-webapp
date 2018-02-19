@@ -305,7 +305,10 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
 
     const failedEncryption = eventData.text === CryptographyRepository.REMOTE_ENCRYPTION_FAILURE;
     if (failedEncryption) {
-      const decryptionError = new Proteus.errors.DecryptError.InvalidMessage('Sender failed to encrypt a message.');
+      const decryptionError = new Proteus.errors.DecryptError.InvalidMessage(
+        'Sender failed to encrypt a message.',
+        213
+      );
       return Promise.resolve(this._handleDecryptionFailure(decryptionError, event));
     }
 
