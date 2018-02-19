@@ -809,7 +809,7 @@ describe('Conversation', () => {
       const connection_et = user_connection_mapper.map_user_connection_from_json(payload_connection);
 
       const conversation_mapper = new z.conversation.ConversationMapper();
-      const new_conversation = conversation_mapper._create_conversation_et(payload_conversation);
+      const new_conversation = conversation_mapper._createConversationEntity(payload_conversation);
       new_conversation.connection(connection_et);
 
       expect(new_conversation.participating_user_ids().length).toBe(1);

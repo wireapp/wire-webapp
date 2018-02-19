@@ -33,14 +33,14 @@ z.conversation.ConversationServiceNoCompound = class ConversationServiceNoCompou
   /**
    * Get events with given category.
    *
-   * @param {string} conversation_id - ID of conversation to add users to
+   * @param {string} conversationId - ID of conversation to add users to
    * @param {z.message.MessageCategory} category - Will be used as lower bound
    * @returns {Promise} Resolves with matching events
    */
-  load_events_with_category_from_db(conversation_id, category) {
+  load_events_with_category_from_db(conversationId, category) {
     return this.storageService.db[z.storage.StorageService.OBJECT_STORE.EVENTS]
       .where('conversation')
-      .equals(conversation_id)
+      .equals(conversationId)
       .sortBy('time')
       .then(records => records.filter(record => record.category >= category));
   }
@@ -48,35 +48,35 @@ z.conversation.ConversationServiceNoCompound = class ConversationServiceNoCompou
   /**
    * Load conversation events. Start and end are not included. Events are always sorted beginning with the newest timestamp.
    *
-   * @param {string} conversation_id - ID of conversation
-   * @param {Date} [lower_bound=new Date(0)] - Starting from this timestamp
-   * @param {Date} [upper_bound=new Date()] - Stop when reaching timestamp
+   * @param {string} conversationId - ID of conversation
+   * @param {Date} [lowerBound=new Date(0)] - Starting from this timestamp
+   * @param {Date} [upperBound=new Date()] - Stop when reaching timestamp
    * @param {number} limit - Amount of events to load
    * @returns {Promise} Resolves with the retrieved records
    */
-  load_preceding_events_from_db(conversation_id, lower_bound = new Date(0), upper_bound = new Date(), limit) {
-    if (!_.isDate(lower_bound) || !_.isDate(upper_bound)) {
+  load_preceding_events_from_db(conversationId, lowerBound = new Date(0), upperBound = new Date(), limit) {
+    if (!_.isDate(lowerBound) || !_.isDate(upperBound)) {
       throw new Error(
-        `Lower bound (${typeof lower_bound}) and upper bound (${typeof upper_bound}) must be of type 'Date'.`
+        `Lower bound (${typeof lowerBound}) and upper bound (${typeof upperBound}) must be of type 'Date'.`
       );
-    } else if (lower_bound.getTime() > upper_bound.getTime()) {
+    } else if (lowerBound.getTime() > upperBound.getTime()) {
       throw new Error(
-        `Lower bound (${lower_bound.getTime()}) cannot be greater than upper bound (${upper_bound.getTime()}).`
+        `Lower bound (${lowerBound.getTime()}) cannot be greater than upper bound (${upperBound.getTime()}).`
       );
     }
 
-    lower_bound = lower_bound.getTime();
-    upper_bound = upper_bound.getTime();
+    lowerBound = lowerBound.getTime();
+    upperBound = upperBound.getTime();
 
     return this.storageService.db[z.storage.StorageService.OBJECT_STORE.EVENTS]
       .where('conversation')
-      .equals(conversation_id)
+      .equals(conversationId)
       .reverse()
       .sortBy('time')
       .then(records => {
         return records.filter(record => {
           const timestamp = new Date(record.time).getTime();
-          return timestamp >= lower_bound && timestamp < upper_bound;
+          return timestamp >= lowerBound && timestamp < upperBound;
         });
       })
       .then(records => records.slice(0, limit));

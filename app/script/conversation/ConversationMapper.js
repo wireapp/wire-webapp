@@ -37,7 +37,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
    * @returns {Array<Conversation>} Mapped conversation entities
    */
   map_conversations(conversations = [undefined], timestamp = 1) {
-    return conversations.map((conversation, index) => this._create_conversation_et(conversation, timestamp + index));
+    return conversations.map((conversation, index) => this._createConversationEntity(conversation, timestamp + index));
   }
 
   /**
@@ -46,37 +46,37 @@ z.conversation.ConversationMapper = class ConversationMapper {
    * @example data: {"name":"ThisIsMyNewConversationName"}
    * @todo make utility?
    *
-   * @param {Conversation} conversation_et - Conversation to be updated
-   * @param {Object} conversation_data - Conversation data
+   * @param {Conversation} conversationEntity - Conversation to be updated
+   * @param {Object} conversationData - Conversation data
    * @returns {Conversation} Updated conversation entity
    */
-  update_properties(conversation_et, conversation_data) {
-    for (const key in conversation_data) {
-      if (key !== 'id' && conversation_et.hasOwnProperty(key)) {
-        const value = conversation_data[key];
+  updateProperties(conversationEntity, conversationData) {
+    for (const key in conversationData) {
+      if (key !== 'id' && conversationEntity.hasOwnProperty(key)) {
+        const value = conversationData[key];
 
         if (value !== undefined) {
-          if (ko.isObservable(conversation_et[key])) {
-            conversation_et[key](value);
+          if (ko.isObservable(conversationEntity[key])) {
+            conversationEntity[key](value);
           } else {
-            conversation_et[key] = value;
+            conversationEntity[key] = value;
           }
         }
       }
     }
 
-    return conversation_et;
+    return conversationEntity;
   }
 
   /**
    * Update the membership properties of a conversation.
    *
-   * @param {Conversation} conversation_et - Conversation to be updated
-   * @param {Object} self_state - Conversation self data
+   * @param {Conversation} conversationEntity - Conversation to be updated
+   * @param {Object} selfState - Conversation self data
    * @returns {Conversation} Updated conversation entity
    */
-  update_self_status(conversation_et, self_state) {
-    if (conversation_et) {
+  update_self_status(conversationEntity, selfState) {
+    if (conversationEntity) {
       // Database states
       const {
         archived_timestamp,
@@ -88,62 +88,62 @@ z.conversation.ConversationMapper = class ConversationMapper {
         muted_timestamp,
         status,
         verification_state,
-      } = self_state;
+      } = selfState;
 
       if (archived_timestamp) {
-        conversation_et.set_timestamp(archived_timestamp, z.conversation.TIMESTAMP_TYPE.ARCHIVED);
-        conversation_et.archived_state(self_state.archived_state);
+        conversationEntity.set_timestamp(archived_timestamp, z.conversation.TIMESTAMP_TYPE.ARCHIVED);
+        conversationEntity.archived_state(selfState.archived_state);
       }
 
       if (cleared_timestamp) {
-        conversation_et.set_timestamp(cleared_timestamp, z.conversation.TIMESTAMP_TYPE.CLEARED);
+        conversationEntity.set_timestamp(cleared_timestamp, z.conversation.TIMESTAMP_TYPE.CLEARED);
       }
 
       if (ephemeral_timer !== undefined) {
-        conversation_et.ephemeral_timer(ephemeral_timer);
+        conversationEntity.ephemeral_timer(ephemeral_timer);
       }
 
       if (last_event_timestamp) {
-        conversation_et.set_timestamp(last_event_timestamp, z.conversation.TIMESTAMP_TYPE.LAST_EVENT);
+        conversationEntity.set_timestamp(last_event_timestamp, z.conversation.TIMESTAMP_TYPE.LAST_EVENT);
       }
 
       if (last_read_timestamp) {
-        conversation_et.set_timestamp(last_read_timestamp, z.conversation.TIMESTAMP_TYPE.LAST_READ);
+        conversationEntity.set_timestamp(last_read_timestamp, z.conversation.TIMESTAMP_TYPE.LAST_READ);
       }
 
       if (last_server_timestamp) {
-        conversation_et.set_timestamp(last_server_timestamp, z.conversation.TIMESTAMP_TYPE.LAST_SERVER);
+        conversationEntity.set_timestamp(last_server_timestamp, z.conversation.TIMESTAMP_TYPE.LAST_SERVER);
       }
 
       if (muted_timestamp) {
-        conversation_et.set_timestamp(muted_timestamp, z.conversation.TIMESTAMP_TYPE.MUTED);
-        conversation_et.muted_state(self_state.muted_state);
+        conversationEntity.set_timestamp(muted_timestamp, z.conversation.TIMESTAMP_TYPE.MUTED);
+        conversationEntity.muted_state(selfState.muted_state);
       }
 
       if (status !== undefined) {
-        conversation_et.status(status);
+        conversationEntity.status(status);
       }
 
       if (verification_state !== undefined) {
-        conversation_et.verification_state(verification_state);
+        conversationEntity.verification_state(verification_state);
       }
 
       // Backend states
-      const {otr_archived, otr_muted} = self_state;
+      const {otr_archived, otr_muted} = selfState;
 
       if (otr_archived !== undefined) {
-        const otr_archived_timestamp = new Date(self_state.otr_archived_ref).getTime();
-        conversation_et.set_timestamp(otr_archived_timestamp, z.conversation.TIMESTAMP_TYPE.ARCHIVED);
-        conversation_et.archived_state(otr_archived);
+        const otr_archived_timestamp = new Date(selfState.otr_archived_ref).getTime();
+        conversationEntity.set_timestamp(otr_archived_timestamp, z.conversation.TIMESTAMP_TYPE.ARCHIVED);
+        conversationEntity.archived_state(otr_archived);
       }
 
       if (otr_muted !== undefined) {
-        const otr_muted_timestamp = new Date(self_state.otr_muted_ref).getTime();
-        conversation_et.set_timestamp(otr_muted_timestamp, z.conversation.TIMESTAMP_TYPE.MUTED);
-        conversation_et.muted_state(otr_muted);
+        const otr_muted_timestamp = new Date(selfState.otr_muted_ref).getTime();
+        conversationEntity.set_timestamp(otr_muted_timestamp, z.conversation.TIMESTAMP_TYPE.MUTED);
+        conversationEntity.muted_state(otr_muted);
       }
 
-      return conversation_et;
+      return conversationEntity;
     }
   }
 
@@ -151,45 +151,45 @@ z.conversation.ConversationMapper = class ConversationMapper {
    * Creates a conversation entity from backend JSON data.
    *
    * @private
-   * @param {Object} conversation_data - Either locally stored or backend data
-   * @param {number} [initial_timestamp] - Initial timestamp for conversation in milliseconds
+   * @param {Object} conversationData - Either locally stored or backend data
+   * @param {number} [initialTimestamp] - Initial timestamp for conversation in milliseconds
    * @returns {Conversation} Mapped conversation entity
    */
-  _create_conversation_et(conversation_data, initial_timestamp) {
-    if (conversation_data === undefined || !Object.keys(conversation_data).length) {
+  _createConversationEntity(conversationData, initialTimestamp) {
+    if (conversationData === undefined || !Object.keys(conversationData).length) {
       throw new Error('Cannot create conversation entity without data');
     }
 
-    const {creator, id, members, name, others, type} = conversation_data;
-    let conversation_et = new z.entity.Conversation(id);
+    const {creator, id, members, name, others, type} = conversationData;
+    let conversationEntity = new z.entity.Conversation(id);
 
-    conversation_et.creator = creator;
-    conversation_et.type(type);
-    conversation_et.name(name ? name : '');
+    conversationEntity.creator = creator;
+    conversationEntity.type(type);
+    conversationEntity.name(name ? name : '');
 
-    const self_state = members ? members.self : conversation_data;
-    conversation_et = this.update_self_status(conversation_et, self_state);
+    const selfState = members ? members.self : conversationData;
+    conversationEntity = this.update_self_status(conversationEntity, selfState);
 
-    if (!conversation_et.last_event_timestamp() && initial_timestamp) {
-      conversation_et.last_event_timestamp(initial_timestamp);
-      conversation_et.last_server_timestamp(initial_timestamp);
+    if (!conversationEntity.last_event_timestamp() && initialTimestamp) {
+      conversationEntity.last_event_timestamp(initialTimestamp);
+      conversationEntity.last_server_timestamp(initialTimestamp);
     }
 
     // Active participants from database or backend payload
     const participatingUserIds = others ? others : members.others.map(other => other.id);
-    conversation_et.participating_user_ids(participatingUserIds);
+    conversationEntity.participating_user_ids(participatingUserIds);
 
     // Team ID from database or backend payload
-    const team_id = conversation_data.team_id ? conversation_data.team_id : conversation_data.team;
+    const team_id = conversationData.team_id ? conversationData.team_id : conversationData.team;
     if (team_id) {
-      conversation_et.team_id = team_id;
+      conversationEntity.team_id = team_id;
     }
 
-    if (conversation_data.is_guest) {
-      conversation_et.is_guest(conversation_data.is_guest);
+    if (conversationData.is_guest) {
+      conversationEntity.is_guest(conversationData.is_guest);
     }
 
-    return conversation_et;
+    return conversationEntity;
   }
 
   /**
