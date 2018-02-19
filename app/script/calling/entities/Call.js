@@ -50,13 +50,13 @@ z.calling.entities.Call = class Call {
     this.sessionId = sessionId;
     this.callingRepository = callingRepository;
 
-    const {id: conversationId, isGroup} = conversationEntity;
+    const {id: conversation_id, is_group} = conversationEntity;
     const {mediaStreamHandler, mediaRepository, selfState, telemetry, userRepository} = this.callingRepository;
 
-    this.logger = new z.util.Logger(`z.calling.entities.Call (${conversationId})`, z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger(`z.calling.entities.Call (${conversation_id})`, z.config.LOGGER.OPTIONS);
 
     // IDs and references
-    this.id = conversationId;
+    this.id = conversation_id;
     this.timings = undefined;
 
     this.mediaRepository = mediaRepository;
@@ -74,7 +74,7 @@ z.calling.entities.Call = class Call {
     this.terminationReason = undefined;
 
     this.isConnected = ko.observable(false);
-    this.isGroup = isGroup();
+    this.isGroup = is_group();
 
     this.selfClientJoined = ko.observable(false);
     this.selfUserJoined = ko.observable(false);
@@ -242,7 +242,7 @@ z.calling.entities.Call = class Call {
    */
   deleteCall() {
     this.state(z.calling.enum.CALL_STATE.ENDED);
-    this.resetCall();
+    this._resetCall();
   }
 
   /**
@@ -651,7 +651,7 @@ z.calling.entities.Call = class Call {
    * @private
    * @returns {undefined} No return value
    */
-  updateRemoteState() {
+  _updateRemoteState() {
     let mediaTypeChanged = false;
 
     this.participants().forEach(({state}) => {
@@ -683,10 +683,10 @@ z.calling.entities.Call = class Call {
    */
   addOrUpdateParticipant(userId, negotiate, callMessageEntity) {
     return this.getParticipantById(userId)
-      .then(() => this.updateParticipant(userId, negotiate, callMessageEntity))
+      .then(() => this._updateParticipant(userId, negotiate, callMessageEntity))
       .catch(error => {
         if (error.type === z.calling.CallError.TYPE.NOT_FOUND) {
-          return this.addParticipant(userId, negotiate, callMessageEntity);
+          return this._addParticipant(userId, negotiate, callMessageEntity);
         }
 
         throw error;
@@ -712,7 +712,7 @@ z.calling.entities.Call = class Call {
         this.interruptedParticipants.remove(participantEntity);
         this.participants.remove(participantEntity);
 
-        this.updateRemoteState();
+        this._updateRemoteState();
         this.callingRepository.mediaElementHandler.removeMediaElement(userId);
 
         if (this.selfClientJoined()) {
@@ -785,7 +785,7 @@ z.calling.entities.Call = class Call {
       participantEntity.resetParticipant();
       this.interruptedParticipants.remove(participantEntity);
 
-      this.updateRemoteState();
+      this._updateRemoteState();
       this.callingRepository.mediaElementHandler.removeMediaElement(userId);
     });
   }
@@ -797,7 +797,7 @@ z.calling.entities.Call = class Call {
    * @param {CallMessage} callMessageEntity - Call message entity
    * @returns {Promise} Resolves with the Call entity if verification passed
    */
-  verifySessionId(callMessageEntity) {
+  _verifySessionId(callMessageEntity) {
     const {userId, sessionId} = callMessageEntity;
 
     if (sessionId === this.sessionId) {
@@ -821,7 +821,7 @@ z.calling.entities.Call = class Call {
    * @param {CallMessage} [callMessageEntity] - Call message entity for participant change
    * @returns {Promise} Resolves with the added participant
    */
-  addParticipant(userId, negotiate, callMessageEntity) {
+  _addParticipant(userId, negotiate, callMessageEntity) {
     return this.getParticipantById(userId).catch(error => {
       if (error.type !== z.calling.CallError.TYPE.NOT_FOUND) {
         throw error;
@@ -833,7 +833,7 @@ z.calling.entities.Call = class Call {
         this.participants.push(participantEntity);
 
         this.logger.info(`Adding call participant '${user_et.name()}'`, participantEntity);
-        return this.updateParticipant_state(participantEntity, negotiate, callMessageEntity);
+        return this._updateParticipantState(participantEntity, negotiate, callMessageEntity);
       });
     });
   }
@@ -846,7 +846,7 @@ z.calling.entities.Call = class Call {
    * @param {CallMessage} callMessageEntity - Call message to update user with
    * @returns {Promise} Resolves with the updated participant
    */
-  updateParticipant(userId, negotiate, callMessageEntity) {
+  _updateParticipant(userId, negotiate, callMessageEntity) {
     return this.getParticipantById(userId).then(participantEntity => {
       if (callMessageEntity) {
         const {clientId} = callMessageEntity;
@@ -857,7 +857,7 @@ z.calling.entities.Call = class Call {
       }
 
       this.logger.info(`Updating call participant '${participantEntity.user.name()}'`, callMessageEntity);
-      return this.updateParticipant_state(participantEntity, negotiate, callMessageEntity);
+      return this._updateParticipantState(participantEntity, negotiate, callMessageEntity);
     });
   }
 
@@ -869,17 +869,17 @@ z.calling.entities.Call = class Call {
    * @param {CallMessage} [callMessageEntity] - Call message to update user with
    * @returns {Promise} Resolves with the updated participant
    */
-  updateParticipant_state(participantEntity, negotiate, callMessageEntity) {
-    const update_promise = callMessageEntity
+  _updateParticipantState(participantEntity, negotiate, callMessageEntity) {
+    const updatePromise = callMessageEntity
       ? participantEntity.update_state(callMessageEntity)
       : Promise.resolve(false);
 
-    return update_promise.then(skip_negotiation => {
-      if (skip_negotiation) {
+    return updatePromise.then(skipNegotiation => {
+      if (skipNegotiation) {
         negotiate = false;
       }
 
-      this.updateRemoteState();
+      this._updateRemoteState();
 
       if (negotiate) {
         participantEntity.start_negotiation();
@@ -929,7 +929,7 @@ z.calling.entities.Call = class Call {
    * @param {number} total - Number of users
    * @returns {number} Panning in the range of -1 to 1 with -1 on the left
    */
-  calculatePanning(index, total) {
+  _calculatePanning(index, total) {
     if (total === 1) {
       return 0.0;
     }
@@ -949,12 +949,12 @@ z.calling.entities.Call = class Call {
    *
    * @returns {undefined} No return value
    */
-  sortParticipantsByPanning() {
+  _sortParticipantsByPanning() {
     if (this.participants().length >= 2) {
       this.participants()
-        .sort((participantA, participantB) => participantA.user.joaatHash - participantB.user.joaatHash)
+        .sort((participantA, participantB) => participantA.user.joaat_hash - participantB.user.joaat_hash)
         .forEach((participantEntity, index) => {
-          const panning = this.calculatePanning(index, this.participants().length);
+          const panning = this._calculatePanning(index, this.participants().length);
 
           this.logger.debug(`Panning for '${participantEntity.user.name()}' recalculated to '${panning}'`);
           participantEntity.panning(panning);
@@ -977,7 +977,7 @@ z.calling.entities.Call = class Call {
    * @private
    * @returns {undefined} No return value
    */
-  resetCall() {
+  _resetCall() {
     this.setSelfState(false);
     this.isConnected(false);
     this.sessionId = undefined;

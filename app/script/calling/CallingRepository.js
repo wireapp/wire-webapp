@@ -86,7 +86,7 @@ z.calling.CallingRepository = class CallingRepository {
     this.mediaDevicesHandler = this.mediaRepository.devices_handler;
     this.mediaStreamHandler = this.mediaRepository.stream_handler;
     this.mediaElementHandler = this.mediaRepository.element_handler;
-    this.remote_media_streams = this.mediaRepository.stream_handler.remote_media_streams;
+    this.remoteMediaStreams = this.mediaRepository.stream_handler.remote_media_streams;
     this.selfStreamState = this.mediaRepository.stream_handler.self_stream_state;
 
     this.selfState = this.mediaStreamHandler.self_stream_state;

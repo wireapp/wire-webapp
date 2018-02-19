@@ -47,8 +47,8 @@ z.calling.CallMessageMapper = (function() {
         const {dest_clientid, dest_userid, props: properties, sdp} = callMessage;
 
         content = {
-          destClientId: dest_clientid,
-          destUserId: dest_userid,
+          dest_client_id: dest_clientid,
+          dest_user_id: dest_userid,
           props: properties,
           sdp: sdp,
         };

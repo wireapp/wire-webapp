@@ -63,7 +63,7 @@ z.calling.entities.CallMessage = class CallMessage {
    * @returns {{version: string, resp: boolean, sessid: string, type: z.calling.enum.CALL_MESSAGE_TYPE}} - JSON representation of call message
    */
   toJSON() {
-    const jsonPayload = {
+    const json_payload = {
       resp: this.response,
       sessid: this.sessionId,
       type: this.type,
@@ -78,9 +78,9 @@ z.calling.entities.CallMessage = class CallMessage {
     ];
 
     if (extendedMessageTypes.includes(this.type)) {
-      jsonPayload.props = this.props;
+      json_payload.props = this.props;
       if (this.type !== z.calling.enum.CALL_MESSAGE_TYPE.PROP_SYNC) {
-        jsonPayload.sdp = this.sdp;
+        json_payload.sdp = this.sdp;
       }
     }
 
@@ -91,11 +91,11 @@ z.calling.entities.CallMessage = class CallMessage {
     ];
 
     if (targetedMessageTypes.includes(this.type)) {
-      jsonPayload.destClientid = this.remoteClientId;
-      jsonPayload.destUserid = this.remoteUserId;
+      json_payload.dest_clientid = this.remote_client_id;
+      json_payload.dest_userid = this.remote_user_id;
     }
 
-    return jsonPayload;
+    return json_payload;
   }
 
   /**

@@ -23,11 +23,11 @@
 
 describe('z.calling.entities.CallMessage', () => {
   describe('_create_session_id', () => {
-    const callMessageEt = new z.calling.entities.CallMessage();
+    const callMessageEntity = new z.calling.entities.CallMessage();
 
     it('always returns an alphanumeric string of length four', () => {
       _.range(100).map(() => {
-        expect(callMessageEt._create_session_id()).toMatch(/(\w|\d){4}/);
+        expect(callMessageEntity._create_session_id()).toMatch(/(\w|\d){4}/);
       });
     });
   });

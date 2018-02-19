@@ -62,7 +62,7 @@ z.calling.entities.FlowAudio = class FlowAudio {
    */
   hookup(isActive) {
     if (isActive) {
-      return this.hookupAudio();
+      return this._hookupAudio();
     }
 
     if (this.audioSource) {
@@ -103,13 +103,13 @@ z.calling.entities.FlowAudio = class FlowAudio {
    * @returns {MediaStream} Wrapped MediaStream
    */
   wrapAudioInputStream(mediaStream) {
-    const audioContext = this.getAudioContext();
+    const audioContext = this._getAudioContext();
 
     if (audioContext) {
       this.audioSource = audioContext.createMediaStreamSource(mediaStream);
       this.gainNode = audioContext.createGain();
       this.audioRemote = audioContext.createMediaStreamDestination();
-      this.hookupAudio();
+      this._hookupAudio();
 
       Object.assign(mediaStream, this.audioRemote.stream);
       this.logger.debug('Wrapped audio stream from microphone', mediaStream);
@@ -125,7 +125,7 @@ z.calling.entities.FlowAudio = class FlowAudio {
    */
   wrapAudioOutputStream(mediaStream) {
     if (z.util.Environment.browser.firefox) {
-      const audioContext = this.getAudioContext();
+      const audioContext = this._getAudioContext();
 
       if (audioContext) {
         const remoteSource = audioContext.createMediaStreamSource(mediaStream);
@@ -152,9 +152,9 @@ z.calling.entities.FlowAudio = class FlowAudio {
    * Get running AudioContext.
    * @returns {AudioContext} Active AudioContext
    */
-  getAudioContext() {
+  _getAudioContext() {
     if (!this.audioContext || this.audioContext.state === z.media.MediaRepository.AUDIO_CONTEXT_STATE.CLOSED) {
-      this.audioContext = this.mediaRepository.getAudioContext();
+      this.audioContext = this.mediaRepository._getAudioContext();
     }
     return this.audioContext;
   }
@@ -164,7 +164,7 @@ z.calling.entities.FlowAudio = class FlowAudio {
    * @private
    * @returns {undefined} No return value
    */
-  hookupAudio() {
+  _hookupAudio() {
     if (this.audioSource && this.gainNode) {
       this.audioSource.connect(this.gainNode);
       this.gainNode.connect(this.audioRemote);
