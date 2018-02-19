@@ -151,7 +151,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
       data.info.tag = 'medium';
     }
 
-    if (uploaded) {
+    if (uploaded !== null) {
       data = Object.assign(data, {
         key: uploaded.asset_id,
         otr_key: new Uint8Array(uploaded.otr_key.toArrayBuffer()),
@@ -161,17 +161,14 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
       });
     }
 
-    if (notUploaded) {
+    if (notUploaded !== null) {
       data = Object.assign(data, {
         reason: notUploaded,
         status: z.assets.AssetTransferState.UPLOAD_FAILED,
       });
     }
 
-    return {
-      data,
-      type: z.event.Client.CONVERSATION.ASSET_ADD,
-    };
+    return {data, type: z.event.Client.CONVERSATION.ASSET_ADD};
   }
 
   _mapAssetMetaData(original) {

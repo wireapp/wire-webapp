@@ -396,7 +396,7 @@ z.conversation.EventMapper = class EventMapper {
 
     if (error_code) {
       message_et.error_code = error_code.split(' ')[0];
-      message_et.client_id = error_code.substring(message_et.errorCode.length + 1).replace(/[()]/g, '');
+      message_et.client_id = error_code.substring(message_et.error_code.length + 1).replace(/[()]/g, '');
     }
 
     return message_et;
