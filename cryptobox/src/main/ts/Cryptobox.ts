@@ -9,6 +9,7 @@ import InvalidPreKeyFormatError from './InvalidPreKeyFormatError';
 import {ReadOnlyStore} from './store/root';
 import LRUCache from '@wireapp/lru-cache';
 import EventEmitter = require('events');
+import PQueue = require('p-queue');
 const logdown = require('logdown');
 
 export interface SessionFromMessageTuple extends Array<CryptoboxSession | Uint8Array> {
@@ -31,6 +32,7 @@ class Cryptobox extends EventEmitter {
   });
   private minimumAmountOfPreKeys: number;
   private pk_store: ReadOnlyStore;
+  private queue: PQueue = new PQueue({concurrency: 1});
   private store: CryptoboxCRUDStore;
 
   public lastResortPreKey: ProteusKeys.PreKey | undefined;
@@ -137,7 +139,7 @@ class Cryptobox extends EventEmitter {
     return this.refill_prekeys().then(() => {
       const ids: Array<string> = this.cachedPreKeys.map(preKey => preKey.key_id.toString());
       this.logger.log(
-        `Initialized Cryptobox with a total amount of "${this.cachedPreKeys.length}" PreKeys (${ids.join(', ')}).`,
+        `Initialized Cryptobox with a total amount of "${this.cachedPreKeys.length}" PreKey(s) (${ids.join(', ')}).`,
         this.cachedPreKeys
       );
       return this.cachedPreKeys.sort((a, b) => a.key_id - b.key_id);
@@ -241,7 +243,9 @@ class Cryptobox extends EventEmitter {
       try {
         bundle = ProteusKeys.PreKeyBundle.deserialise(pre_key_bundle);
       } catch (error) {
-        throw new InvalidPreKeyFormatError(`PreKey bundle for session "${session_id}" has an unsupported format.`);
+        throw new InvalidPreKeyFormatError(
+          `PreKey bundle for session "${session_id}" has an unsupported format: ${error.message}`
+        );
       }
 
       if (this.identity) {
@@ -296,8 +300,6 @@ class Cryptobox extends EventEmitter {
   }
 
   private session_cleanup(session: CryptoboxSession): Promise<CryptoboxSession> {
-    // TODO: Check if the code should be reverted to:
-    // const preKeyDeletionPromises = this.pk_store.prekeys.map((pk: ProteusKeys.PreKey) =>
     return this.pk_store
       .get_prekeys()
       .then((pks: ProteusKeys.PreKey[]) => {
@@ -367,24 +369,26 @@ class Cryptobox extends EventEmitter {
     let encryptedBuffer: ArrayBuffer;
     let loadedSession: CryptoboxSession;
 
-    return Promise.resolve()
-      .then(() => {
-        if (pre_key_bundle) {
-          return this.session_from_prekey(session_id, pre_key_bundle);
-        }
+    return this.queue.add(() => {
+      return Promise.resolve()
+        .then(() => {
+          if (pre_key_bundle) {
+            return this.session_from_prekey(session_id, pre_key_bundle);
+          }
 
-        return this.session_load(session_id);
-      })
-      .then((session: CryptoboxSession) => {
-        loadedSession = session;
-        return loadedSession.encrypt(payload);
-      })
-      .then((encrypted: ArrayBuffer) => {
-        encryptedBuffer = encrypted;
-        // TODO: This should be "update_session"
-        return this.session_update(loadedSession);
-      })
-      .then(() => encryptedBuffer);
+          return this.session_load(session_id);
+        })
+        .then((session: CryptoboxSession) => {
+          loadedSession = session;
+          return loadedSession.encrypt(payload);
+        })
+        .then((encrypted: ArrayBuffer) => {
+          encryptedBuffer = encrypted;
+          // TODO: This should be "update_session"
+          return this.session_update(loadedSession);
+        })
+        .then(() => encryptedBuffer);
+    });
   }
 
   public decrypt(session_id: string, ciphertext: ArrayBuffer): Promise<Uint8Array> {
@@ -396,33 +400,35 @@ class Cryptobox extends EventEmitter {
       return Promise.reject(new DecryptionError('Cannot decrypt an empty ArrayBuffer.'));
     }
 
-    return (
-      this.session_load(session_id)
-        .catch(() => this.session_from_message(session_id, ciphertext))
-        // TODO: "value" can be of type CryptoboxSession | Array[CryptoboxSession, Uint8Array]
-        .then((value: any) => {
-          let decrypted_message: Uint8Array;
+    return this.queue.add(() => {
+      return (
+        this.session_load(session_id)
+          .catch(() => this.session_from_message(session_id, ciphertext))
+          // TODO: "value" can be of type CryptoboxSession | Array[CryptoboxSession, Uint8Array]
+          .then((value: any) => {
+            let decrypted_message: Uint8Array;
 
-          if (value[0] !== undefined) {
-            [session, decrypted_message] = value;
-            this.publish_session_id(session);
-            is_new_session = true;
-            return decrypted_message;
-          }
+            if (value[0] !== undefined) {
+              [session, decrypted_message] = value;
+              this.publish_session_id(session);
+              is_new_session = true;
+              return decrypted_message;
+            }
 
-          session = value;
-          return session.decrypt(ciphertext);
-        })
-        .then(decrypted_message => {
-          message = decrypted_message;
-          if (is_new_session) {
-            return this.session_save(session);
-          }
+            session = value;
+            return session.decrypt(ciphertext);
+          })
+          .then(decrypted_message => {
+            message = decrypted_message;
+            if (is_new_session) {
+              return this.session_save(session);
+            }
 
-          return this.session_update(session);
-        })
-        .then(() => message)
-    );
+            return this.session_update(session);
+          })
+          .then(() => message)
+      );
+    });
   }
 }
 

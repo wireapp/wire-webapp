@@ -3,5 +3,5 @@
   "random": true,
   "spec_dir": "test",
   "spec_files": ["**/*Spec.common.js", "**/*Spec.node.js"],
-  "stopSpecOnExpectationFailure": true
+  "stopSpecOnExpectationFailure": false
 }

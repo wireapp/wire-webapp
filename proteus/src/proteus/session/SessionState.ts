@@ -193,7 +193,9 @@ class SessionState {
 
       if (!envelope.verify(mks.mac_key)) {
         throw new (<any>DecryptError).InvalidSignature(
-          `Envelope verification failed for message with counters in sync at '${msg.counter}'`,
+          `Envelope verification failed for message with counters in sync at '${
+            msg.counter
+          }'. The received message was possibly encrypted for another client.`,
           DecryptError.CODE.CASE_206
         );
       }
