@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@ z.entity.Text = class Text extends z.entity.Asset {
         return false;
       }
       const has_link_previews = this.previews().length > 0;
-      return !has_link_previews || (has_link_previews && !z.links.LinkPreviewHelpers.contains_only_link(this.text));
+      return !has_link_previews || (has_link_previews && !z.links.LinkPreviewHelpers.containsOnlyLink(this.text));
     });
   }
 

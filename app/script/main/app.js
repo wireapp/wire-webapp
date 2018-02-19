@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -99,11 +99,11 @@ z.main.App = class App {
       repositories.cryptography
     );
     repositories.event = new z.event.EventRepository(
-      this.service.web_socket,
       this.service.notification,
+      this.service.web_socket,
+      this.service.conversation,
       repositories.cryptography,
-      repositories.user,
-      this.service.conversation
+      repositories.user
     );
     repositories.properties = new z.properties.PropertiesRepository(this.service.properties);
     repositories.connect = new z.connect.ConnectRepository(
@@ -284,7 +284,7 @@ z.main.App = class App {
       .then(() => this._check_single_instance())
       .then(() => this._load_access_token())
       .then(() => {
-        this.view.loading.update_progress(2.5);
+        this.view.loading.updateProgress(2.5);
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
         return Promise.all([
           this._get_user_self(),
@@ -294,31 +294,31 @@ z.main.App = class App {
         ]);
       })
       .then(([self_user_et]) => {
-        this.view.loading.update_progress(5, z.string.init_received_self_user);
+        this.view.loading.updateProgress(5, z.string.init_received_self_user);
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.RECEIVED_SELF_USER);
         this.repository.client.init(self_user_et);
         this.repository.properties.init(self_user_et);
         return this.repository.client.getValidLocalClient();
       })
       .then(client_observable => {
-        this.view.loading.update_progress(7.5, z.string.init_validated_client);
+        this.view.loading.updateProgress(7.5, z.string.init_validated_client);
 
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.VALIDATED_CLIENT);
         this.telemetry.add_statistic(z.telemetry.app_init.AppInitStatisticsValue.CLIENT_TYPE, client_observable().type);
 
         this.repository.cryptography.current_client = client_observable;
-        this.repository.event.current_client = client_observable;
+        this.repository.event.currentClient = client_observable;
         return this.repository.cryptography.load_cryptobox(this.service.storage.db);
       })
       .then(() => {
-        this.view.loading.update_progress(10);
+        this.view.loading.updateProgress(10);
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
-        this.repository.event.connect_web_socket();
+        this.repository.event.connectWebSocket();
 
         return Promise.all([this.repository.conversation.get_conversations(), this.repository.user.get_connections()]);
       })
       .then(([conversation_ets, connection_ets]) => {
-        this.view.loading.update_progress(25, z.string.init_received_user_data);
+        this.view.loading.updateProgress(25, z.string.init_received_user_data);
 
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.RECEIVED_USER_DATA);
         this.telemetry.add_statistic(
@@ -338,7 +338,7 @@ z.main.App = class App {
         return this.repository.team.getTeam();
       })
       .then(() => this.repository.user.loadUsers())
-      .then(() => this.repository.event.initialize_from_stream())
+      .then(() => this.repository.event.initializeFromStream())
       .then(notifications_count => {
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
         this.telemetry.add_statistic(
@@ -351,13 +351,13 @@ z.main.App = class App {
         return this.repository.conversation.initialize_conversations();
       })
       .then(() => {
-        this.view.loading.update_progress(97.5, z.string.init_updated_from_notifications);
+        this.view.loading.updateProgress(97.5, z.string.init_updated_from_notifications);
 
         this._watch_online_status();
         return this.repository.client.getClientsForSelf();
       })
       .then(client_ets => {
-        this.view.loading.update_progress(99);
+        this.view.loading.updateProgress(99);
 
         this.telemetry.add_statistic(z.telemetry.app_init.AppInitStatisticsValue.CLIENTS, client_ets.length);
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.APP_PRE_LOADED);
@@ -408,7 +408,7 @@ z.main.App = class App {
       .then(() => {
         amplify.publish(z.event.WebApp.WARNING.DISMISS, z.ViewModel.WarningType.NO_INTERNET);
         amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.CONNECTIVITY_RECONNECT);
-        this.repository.event.reconnect_web_socket(z.event.WebSocketService.CHANGE_TRIGGER.ONLINE);
+        this.repository.event.reconnectWebSocket(z.event.WebSocketService.CHANGE_TRIGGER.ONLINE);
       });
   }
 
@@ -418,7 +418,7 @@ z.main.App = class App {
    */
   on_internet_connection_lost() {
     this.logger.warn('Internet connection lost');
-    this.repository.event.disconnect_web_socket(z.event.WebSocketService.CHANGE_TRIGGER.OFFLINE);
+    this.repository.event.disconnectWebSocket(z.event.WebSocketService.CHANGE_TRIGGER.OFFLINE);
     amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.NO_INTERNET);
   }
 
@@ -615,7 +615,7 @@ z.main.App = class App {
 
     window.setTimeout(() => this.repository.notification.checkPermission(), App.CONFIG.NOTIFICATION_CHECK);
 
-    $('#loading-screen').remove();
+    this.view.loading.removeFromView();
     $('#wire-main').attr('data-uie-value', 'is-loaded');
   }
 
@@ -626,7 +626,7 @@ z.main.App = class App {
   _subscribe_to_unload_events() {
     $(window).on('beforeunload', () => {
       this.logger.info("'window.onbeforeunload' was triggered, so we will disconnect from the backend.");
-      this.repository.event.disconnect_web_socket(z.event.WebSocketService.CHANGE_TRIGGER.PAGE_NAVIGATION);
+      this.repository.event.disconnectWebSocket(z.event.WebSocketService.CHANGE_TRIGGER.PAGE_NAVIGATION);
     });
 
     $(window).on('unload', () => {
@@ -661,7 +661,7 @@ z.main.App = class App {
   logout(sign_out_reason, clear_data = false) {
     const _logout = () => {
       // Disconnect from our backend, end tracking and clear cached data
-      this.repository.event.disconnect_web_socket(z.event.WebSocketService.CHANGE_TRIGGER.LOGOUT);
+      this.repository.event.disconnectWebSocket(z.event.WebSocketService.CHANGE_TRIGGER.LOGOUT);
 
       // Clear Local Storage (but don't delete the cookie label if you were logged in with a permanent client)
       const do_not_delete = [z.storage.StorageKey.AUTH.SHOW_LOGIN];

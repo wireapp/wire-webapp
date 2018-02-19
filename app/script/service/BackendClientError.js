@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -45,6 +45,7 @@ z.service.BackendClientError = class BackendClientError extends Error {
       BAD_REQUEST: 'bad-request',
       BLACKLISTED_EMAIL: 'blacklisted-email',
       BLACKLISTED_PHONE: 'blacklisted-phone',
+      CLIENT_ERROR: 'client-error',
       CONNECTIVITY_PROBLEM: 'connectivity-problem',
       INVALID_CREDENTIALS: 'invalid-credentials',
       INVALID_EMAIL: 'invalid-email',

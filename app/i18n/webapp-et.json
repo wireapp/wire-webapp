@@ -52,6 +52,7 @@
   "BackendError.LABEL.OPERATION_DENIED": "Sul pole õigust",
   "BackendError.LABEL.UNAUTHORIZED": "Midagi läks valesti. Palun laadi leht uuesti ja proovi uuesti",
   "BackendError.LABEL.HANDLE_EXISTS": "See kasutajanimi on juba kasutusel",
+  "BackendError.LABEL.HANDLE_TOO_SHORT": "Palun sisestage vähemalt 2-tähemärgiline kasutajanimi",
   "BackendError.LABEL.INVALID_HANDLE": "See kasutajanimi on sobimatu",
   "BackendError.LABEL.INVALID_INVITATION_CODE": "Kutse on tühistatud või aegunud",
   "BackendError.LABEL.NO_OTHER_OWNER": "Viimast omanikku ei saa meeskonnast eemaldada",

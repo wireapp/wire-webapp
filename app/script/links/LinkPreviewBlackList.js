@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,12 +22,10 @@
 window.z = window.z || {};
 window.z.links = z.links || {};
 
-z.links.LinkPreviewBlackList = (function() {
+z.links.LinkPreviewBlackList = (() => {
   const BLACKLIST = ['soundcloud', 'spotify', 'youtu[.]?be', 'vimeo'];
 
   return {
-    is_blacklisted(url) {
-      return new RegExp(BLACKLIST.join('|')).test(url);
-    },
+    isBlacklisted: url => RegExp(BLACKLIST.join('|')).test(url),
   };
 })();

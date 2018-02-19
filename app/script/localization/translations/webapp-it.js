@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -301,8 +301,6 @@ z.string.it.extensions_giphy_message = '{{tag}} • via giphy.com';
 z.string.it.extensions_giphy_no_gifs = 'Oops, nessuna gif';
 z.string.it.extensions_giphy_random = 'Scelta casuale';
 
-z.string.it.search_open = 'Apri';
-z.string.it.search_open_group = 'Crea gruppo';
 z.string.it.people_confirm_label = 'Aggiungi persone al gruppo';
 z.string.it.people_people = '{{number}} persone';
 z.string.it.people_search_placeholder = 'Cerca per nome';
@@ -350,7 +348,8 @@ z.string.it.people_remove_message = '{{user}} non sarà in grado di inviare o ri
 z.string.it.people_unblock_headline = 'Sblocca?';
 z.string.it.people_unblock_message = '{{user}} sarà in grado di contattarti e aggiungerti alle conversazioni di gruppo di nuovo.';
 
-z.string.it.people_button_add = 'Aggiungi persone';
+z.string.it.people_button_add = 'Aggiungi';
+z.string.it.people_button_add_people = 'Aggiungi persone';
 z.string.it.people_button_block = 'Blocca';
 z.string.it.people_button_cancel = 'Annulla';
 z.string.it.people_button_connect = 'Connetti';
@@ -438,7 +437,6 @@ z.string.it.preferences_options_notifications_obfuscate = 'Nascondi dettagli';
 z.string.it.preferences_options_notifications_obfuscate_message = 'Mostra mittente';
 z.string.it.preferences_options_notifications_on = 'Mostra mittente e messaggio';
 
-z.string.it.search_group_hint = 'Digita o scegli più persone per creare un gruppo';
 z.string.it.search_connect = 'Connetti';
 z.string.it.search_connections = 'Connessioni';
 z.string.it.search_contacts = 'Contatti';

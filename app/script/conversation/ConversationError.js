@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -46,9 +46,6 @@ z.conversation.ConversationError = class ConversationError extends Error {
       case ConversationError.TYPE.NO_CONVERSATION_ID:
         this.message = 'Conversation ID is not defined';
         break;
-      case ConversationError.TYPE.NOT_FOUND:
-        this.message = 'Conversation not found';
-        break;
       case ConversationError.TYPE.REQUEST_FAILED:
         this.message = 'Conversation related backend request failed';
         break;
@@ -68,17 +65,16 @@ z.conversation.ConversationError = class ConversationError extends Error {
 
   static get TYPE() {
     return {
-      CONVERSATION_NOT_FOUND: 'z.conversation.ConversationError.TYPE.CONVERSATION_NOT_FOUND',
-      DEGRADED_CONVERSATION_CANCELLATION: 'z.conversation.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION',
-      MESSAGE_NOT_FOUND: 'z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND',
-      NO_CHANGES: 'z.conversation.ConversationError.TYPE.NO_CHANGES',
-      NO_CONVERSATION_ID: 'z.conversation.ConversationError.TYPE.NO_CONVERSATION_ID',
-      NOT_FOUND: 'z.conversation.ConversationError.TYPE.NOT_FOUND',
-      REQUEST_FAILURE: 'z.conversation.ConversationError.TYPE.REQUEST_FAILURE',
-      UNKNOWN: 'z.conversation.ConversationError.TYPE.UNKNOWN',
-      WRONG_CONVERSATION: 'z.conversation.ConversationError.TYPE.WRONG_CONVERSATION',
-      WRONG_TYPE: 'z.conversation.ConversationError.TYPE.WRONG_TYPE',
-      WRONG_USER: 'z.conversation.ConversationError.TYPE.WRONG_USER',
+      CONVERSATION_NOT_FOUND: 'ConversationError.TYPE.CONVERSATION_NOT_FOUND',
+      DEGRADED_CONVERSATION_CANCELLATION: 'ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION',
+      MESSAGE_NOT_FOUND: 'ConversationError.TYPE.MESSAGE_NOT_FOUND',
+      NO_CHANGES: 'ConversationError.TYPE.NO_CHANGES',
+      NO_CONVERSATION_ID: 'ConversationError.TYPE.NO_CONVERSATION_ID',
+      REQUEST_FAILURE: 'ConversationError.TYPE.REQUEST_FAILURE',
+      UNKNOWN: 'ConversationError.TYPE.UNKNOWN',
+      WRONG_CONVERSATION: 'ConversationError.TYPE.WRONG_CONVERSATION',
+      WRONG_TYPE: 'ConversationError.TYPE.WRONG_TYPE',
+      WRONG_USER: 'ConversationError.TYPE.WRONG_USER',
     };
   }
 };

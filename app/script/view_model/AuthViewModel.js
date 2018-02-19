@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -79,8 +79,9 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     this.notification_service = new z.event.NotificationService(this.auth.client, this.storageService);
     this.web_socket_service = new z.event.WebSocketService(this.auth.client);
     this.event_repository = new z.event.EventRepository(
-      this.web_socket_service,
       this.notification_service,
+      this.web_socket_service,
+      undefined,
       this.cryptography_repository,
       this.user_repository
     );
@@ -994,18 +995,25 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
 
   clicked_on_manage_devices() {
     if (!this.device_modal) {
-      this.device_modal = new zeta.webapp.module.Modal('#modal-limit');
+      const hideCallback = $(document).off('keydown.deviceModal');
+      this.device_modal = new zeta.webapp.module.Modal('#modal-limit', hideCallback);
+      this.device_modal.autoclose = false;
     }
 
     if (this.device_modal.is_hidden()) {
       this.client_repository.getClientsForSelf();
+      $(document).on('keydown.deviceModal', keyboard_event => {
+        if (z.util.KeyboardUtil.isEscapeKey(keyboard_event)) {
+          this.device_modal.hide();
+        }
+      });
     }
 
-    this.device_modal.toggle();
+    this.device_modal.show();
   }
 
   close_model_manage_devices() {
-    this.device_modal.toggle();
+    this.device_modal.hide();
   }
 
   clicked_on_navigate_back() {
@@ -1818,8 +1826,8 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
       .create_cryptobox(this.storageService.db)
       .then(() => this.client_repository.registerClient(auto_login ? undefined : this.password()))
       .then(client_observable => {
-        this.event_repository.current_client = client_observable;
-        return this.event_repository.initialize_stream_state(client_observable().id);
+        this.event_repository.currentClient = client_observable;
+        return this.event_repository.initializeStreamState(client_observable().id);
       })
       .catch(error => {
         if (error.code === z.service.BackendClientError.STATUS_CODE.NOT_FOUND) {

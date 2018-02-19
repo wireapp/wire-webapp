@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -73,7 +73,7 @@ z.calling.CallingRepository = class CallingRepository {
       }
     });
 
-    this.time_offset = 0;
+    this.timeOffset = 0;
 
     this.calling_config = undefined;
     this.calling_config_timeout = undefined;
@@ -149,10 +149,8 @@ z.calling.CallingRepository = class CallingRepository {
     const {content: event_content, time: event_date, type: event_type} = event;
     const is_call = event_type === z.event.Client.CALL.E_CALL;
 
-    this.logger.info(`»» Call Event: '${event_type}' (Source: ${source})`, {
-      event_json: JSON.stringify(event),
-      event_object: event,
-    });
+    const logObject = {eventJson: JSON.stringify(event), eventObject: event};
+    this.logger.info(`»» Call Event: '${event_type}' (Source: ${source})`, logObject);
 
     if (is_call) {
       const is_supported_version = event_content.version === z.calling.entities.CallMessage.CONFIG.VERSION;
@@ -1141,7 +1139,7 @@ z.calling.CallingRepository = class CallingRepository {
    * @returns {undefined} No return value
    */
   inject_activate_event(call_message_et, source) {
-    const activate_event = z.conversation.EventBuilder.build_voice_channel_activate(call_message_et);
+    const activate_event = z.conversation.EventBuilder.buildVoiceChannelActivate(call_message_et);
     amplify.publish(z.event.WebApp.EVENT.INJECT, activate_event, source);
   }
 
@@ -1153,10 +1151,10 @@ z.calling.CallingRepository = class CallingRepository {
    * @returns {undefined} No return value
    */
   inject_deactivate_event(call_message_et, source, reason) {
-    const deactivate_event = z.conversation.EventBuilder.build_voice_channel_deactivate(
+    const deactivate_event = z.conversation.EventBuilder.buildVoiceChannelDeactivate(
       call_message_et,
       reason,
-      this.time_offset
+      this.timeOffset
     );
     amplify.publish(z.event.WebApp.EVENT.INJECT, deactivate_event, source);
   }
@@ -1167,7 +1165,7 @@ z.calling.CallingRepository = class CallingRepository {
    * @returns {undefined} No return value
    */
   update_time_offset(time_offset) {
-    this.time_offset = time_offset;
+    this.timeOffset = time_offset;
   }
 
   //##############################################################################

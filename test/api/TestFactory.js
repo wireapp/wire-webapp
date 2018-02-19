@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -199,14 +199,14 @@ window.TestFactory.prototype.exposeEventActors = function() {
       TestFactory.conversation_service.logger.level = this.settings.logging_level;
 
       TestFactory.event_repository = new z.event.EventRepository(
-        TestFactory.web_socket_service,
         TestFactory.notification_service,
+        TestFactory.web_socket_service,
+        TestFactory.conversation_service,
         TestFactory.cryptography_repository,
-        undefined,
-        TestFactory.conversation_service
+        undefined
       );
       TestFactory.event_repository.logger.level = this.settings.logging_level;
-      TestFactory.event_repository.current_client = ko.observable(TestFactory.cryptography_repository.current_client());
+      TestFactory.event_repository.currentClient = ko.observable(TestFactory.cryptography_repository.current_client());
 
       return TestFactory.event_repository;
     });

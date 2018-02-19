@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -102,10 +102,8 @@ z.user.UserRepository = class UserRepository {
   on_user_event(event_json, source) {
     const {type} = event_json;
 
-    this.logger.info(`»» User Event: '${type}' (Source: ${source})`, {
-      event_json: JSON.stringify(event_json),
-      event_object: event_json,
-    });
+    const logObject = {eventJson: JSON.stringify(event_json), eventObject: event_json};
+    this.logger.info(`»» User Event: '${type}' (Source: ${source})`, logObject);
 
     switch (type) {
       case z.event.Backend.USER.CONNECTION:
@@ -495,15 +493,15 @@ z.user.UserRepository = class UserRepository {
 
         switch (connection_et.status()) {
           case z.user.ConnectionStatus.PENDING: {
-            message_et.member_message_type = z.message.SystemMessageType.CONNECTION_REQUEST;
+            message_et.memberMessageType = z.message.SystemMessageType.CONNECTION_REQUEST;
             break;
           }
 
           case z.user.ConnectionStatus.ACCEPTED: {
             if (previous_status === z.user.ConnectionStatus.SENT) {
-              message_et.member_message_type = z.message.SystemMessageType.CONNECTION_ACCEPTED;
+              message_et.memberMessageType = z.message.SystemMessageType.CONNECTION_ACCEPTED;
             } else {
-              message_et.member_message_type = z.message.SystemMessageType.CONNECTION_CONNECTED;
+              message_et.memberMessageType = z.message.SystemMessageType.CONNECTION_CONNECTED;
             }
             break;
           }

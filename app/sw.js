@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  *
  */
 
-((global) => {
+(global => {
   'use strict';
 
   importScripts('/worker/sw-toolbox.js');
@@ -33,21 +33,25 @@
   global.toolbox.router.default = global.toolbox.networkOnly;
   global.toolbox.router.get(/forceCaching=true/, global.cacheLRU, {
     cache: {
-      name: CURRENT_CACHES.asset,
       maxEntries: ASSET_CACHE_MAX_ITEMS,
+      name: CURRENT_CACHES.asset,
     },
   });
 
   global.addEventListener('install', event => event.waitUntil(global.skipWaiting()));
   global.addEventListener('activate', event => {
-    const expectedCacheNames = Object.keys(CURRENT_CACHES).map((key) => CURRENT_CACHES[key]);
+    const expectedCacheNames = Object.keys(CURRENT_CACHES).map(key => CURRENT_CACHES[key]);
 
-    return event.waitUntil(caches.keys().then((cacheNames) => {
-      return Promise.all(cacheNames.map((cacheName) => {
-        if (!expectedCacheNames.includes(cacheName)) {
-          return caches.delete(cacheName)
-        }
-      })).then(() => global.clients.claim());
-    }));
+    return event.waitUntil(
+      caches.keys().then(cacheNames => {
+        return Promise.all(
+          cacheNames.map(cacheName => {
+            if (!expectedCacheNames.includes(cacheName)) {
+              return caches.delete(cacheName);
+            }
+          })
+        ).then(() => global.clients.claim());
+      })
+    );
   });
 })(self);

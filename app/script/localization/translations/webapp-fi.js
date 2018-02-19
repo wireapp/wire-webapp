@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -307,8 +307,6 @@ z.string.fi.extensions_giphy_message = '{{tag}} • giphy.com:in kautta';
 z.string.fi.extensions_giphy_no_gifs = 'Upsista, ei giffejä';
 z.string.fi.extensions_giphy_random = 'Satunnainen';
 
-z.string.fi.search_open = 'Avaa';
-z.string.fi.search_open_group = 'Luo Ryhmä';
 z.string.fi.people_confirm_label = 'Lisää käyttäjiä ryhmään';
 z.string.fi.people_people = '{{number}} Ihmistä';
 z.string.fi.people_search_placeholder = 'Hae nimellä';
@@ -356,7 +354,8 @@ z.string.fi.people_remove_message = '{{user}} ei pysty lähettämään tai vasta
 z.string.fi.people_unblock_headline = 'Poista esto?';
 z.string.fi.people_unblock_message = '{{user}} pystyy jälleen ottamaan sinuun yhteyttä ja lisäämään sinut ryhmäkeskusteluihin.';
 
-z.string.fi.people_button_add = 'Lisää henkilöitä';
+z.string.fi.people_button_add = 'Lisää';
+z.string.fi.people_button_add_people = 'Lisää henkilöitä';
 z.string.fi.people_button_block = 'Estä';
 z.string.fi.people_button_cancel = 'Peruuta';
 z.string.fi.people_button_connect = 'Yhdistä';
@@ -445,7 +444,6 @@ z.string.fi.preferences_options_notifications_obfuscate = 'Piilota yksityiskohda
 z.string.fi.preferences_options_notifications_obfuscate_message = 'Näytä lähettäjä';
 z.string.fi.preferences_options_notifications_on = 'Näytä lähettäjä ja viesti';
 
-z.string.fi.search_group_hint = 'Jatka kirjoittamista tai valitse lisää ihmisiä luodaksesi ryhmän';
 z.string.fi.search_connect = 'Yhdistä';
 z.string.fi.search_connections = 'Yhteydet';
 z.string.fi.search_contacts = 'Yhteystiedot';

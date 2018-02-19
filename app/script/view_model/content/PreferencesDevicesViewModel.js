@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -74,9 +74,9 @@ z.ViewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewMo
   }
 
   _update_device_location(location) {
-    z.location.get_location(location.lat, location.lon).then(retrieved_location => {
+    z.location.getLocation(location.lat, location.lon).then(retrieved_location => {
       if (retrieved_location) {
-        this._update_activation_location(`${retrieved_location.place}, ${retrieved_location.country_code}`);
+        this._update_activation_location(`${retrieved_location.place}, ${retrieved_location.countryCode}`);
       }
     });
   }

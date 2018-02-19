@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -247,9 +247,14 @@ z.string.lt.conversation_send_pasted_file = 'Paveikslas įdėtas {{date}}';
 z.string.lt.conversation_someone = 'Kažkas';
 z.string.lt.conversation_tweet_author = ' socialiniame tinkle Twitter';
 
-z.string.lt.conversation_creation_preferences_action = 'Kitas';
-z.string.lt.conversation_creation_participants_header = 'Pridėti žmonių';
-z.string.lt.conversation_creation_participants_placeholder = 'Ieškokite pagal vardą';
+z.string.lt.groupCreationPreferencesAction = 'Kitas';
+z.string.lt.groupCreationPreferencesHeader = 'Kurti susirašinėjimą';
+z.string.lt.groupCreationPreferencesPlaceholder = 'Susirašinėjimo pavadinimas';
+z.string.lt.groupCreationParticipantsActionCreate = 'Kurti';
+z.string.lt.groupCreationParticipantsActionSkip = 'Praleisti';
+z.string.lt.groupCreationParticipantsHeader = 'Pridėti žmonių';
+z.string.lt.groupCreationParticipantsHeaderWithCounter = 'Pridėti žmonių ({{number}})';
+z.string.lt.groupCreationParticipantsPlaceholder = 'Ieškokite pagal vardą';
 
 z.string.lt.collection_show_all = 'Rodyti visus {{number}}';
 z.string.lt.collection_section_links = 'Nuorodos';
@@ -315,8 +320,6 @@ z.string.lt.extensions_giphy_message = '{{tag}} • per giphy.com';
 z.string.lt.extensions_giphy_no_gifs = 'Oi, nėra gif';
 z.string.lt.extensions_giphy_random = 'Atsitiktinis';
 
-z.string.lt.search_open = 'Atverti';
-z.string.lt.search_open_group = 'Sukurti grupę';
 z.string.lt.people_confirm_label = 'Pridėti žmones į grupę';
 z.string.lt.people_people = '{{number}} žmonių';
 z.string.lt.people_search_placeholder = 'Ieškokite pagal vardą';
@@ -367,7 +370,7 @@ z.string.lt.people_remove_message = '{{user}} negalės siųsti ir gauti žinutes
 z.string.lt.people_unblock_headline = 'Atblokuoti?';
 z.string.lt.people_unblock_message = '{{user}} galės ir vėl su jumis susisiekti ar pridėti jus į grupės pokalbius.';
 
-z.string.lt.people_button_add = 'Pridėti žmones';
+z.string.lt.people_button_add = 'Pridėti';
 z.string.lt.people_button_add_people = 'Pridėti žmonių';
 z.string.lt.people_button_block = 'Užblokuoti';
 z.string.lt.people_button_cancel = 'Atsisakyti';
@@ -449,6 +452,7 @@ z.string.lt.preferences_options_data = 'Naudojimosi ir strigčių ataskaitos';
 z.string.lt.preferences_options_data_checkbox = 'Naudojimosi ir strigčių ataskaitos';
 z.string.lt.preferences_options_data_detail = 'Pagerinkite „Wire“ siųsdami anoniminę informaciją.';
 z.string.lt.preferences_options_popular = 'Pagal populiarias užklausas';
+z.string.lt.preferences_options_emoji_replace_detail = ':-) → {{icon}}';
 z.string.lt.preferences_options_emoji_replace_checkbox = 'Pakeisti rašomus jaustukus jausmaženkliais';
 z.string.lt.preferences_options_previews_send_checkbox = 'Rodyti jūsų siunčiamų nuorodų peržiūras';
 z.string.lt.preferences_options_previews_send_detail = 'Kitų žmonių siunčiamų nuorodų peržiūros vis dar gali būti rodomos.';
@@ -458,7 +462,6 @@ z.string.lt.preferences_options_notifications_obfuscate = 'Slėpti išsamesnę i
 z.string.lt.preferences_options_notifications_obfuscate_message = 'Rodyti siuntėją';
 z.string.lt.preferences_options_notifications_on = 'Rodyti siuntėją ir žinutę';
 
-z.string.lt.search_group_hint = 'Tęskite rašymą arba, norėdami sukurti grupę, pasirinkite daugiau žmonių';
 z.string.lt.search_connect = 'Užmegzti kontaktą';
 z.string.lt.search_connections = 'Kontaktai';
 z.string.lt.search_contacts = 'Kontaktai';

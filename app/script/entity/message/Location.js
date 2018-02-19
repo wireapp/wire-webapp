@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ z.entity.Location = class Location extends z.entity.Asset {
     this.zoom = '';
 
     this.link_src = ko.pureComputed(() => {
-      return z.location.get_maps_url(this.latitude, this.longitude, this.name, this.zoom);
+      return z.location.getMapsUrl(this.latitude, this.longitude, this.name, this.zoom);
     });
   }
 };

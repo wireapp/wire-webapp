@@ -51,6 +51,7 @@
   "BackendError.LABEL.OPERATION_DENIED": "Nie posiadasz uprawnień",
   "BackendError.LABEL.UNAUTHORIZED": "",
   "BackendError.LABEL.HANDLE_EXISTS": "Ta nazwa użytkownika jest już zajęta",
+  "BackendError.LABEL.HANDLE_TOO_SHORT": "",
   "BackendError.LABEL.INVALID_HANDLE": "Nazwa użytkownika jest nieprawidłowa",
   "BackendError.LABEL.INVALID_INVITATION_CODE": "Zaproszenia zostały wycofane lub wygasły",
   "BackendError.LABEL.NO_OTHER_OWNER": "",

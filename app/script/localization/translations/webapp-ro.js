@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -315,8 +315,6 @@ z.string.ro.extensions_giphy_message = '{{tag}} • via giphy.com';
 z.string.ro.extensions_giphy_no_gifs = 'Ups, nu sunt gif-uri';
 z.string.ro.extensions_giphy_random = 'La întâmplare';
 
-z.string.ro.search_open = 'Deschide';
-z.string.ro.search_open_group = 'Creează grup';
 z.string.ro.people_confirm_label = 'Adaugă persoane în grup';
 z.string.ro.people_people = '{{number}} persoane';
 z.string.ro.people_search_placeholder = 'Caută după nume';
@@ -366,7 +364,7 @@ z.string.ro.people_remove_message = '{{user}} nu va mai putea trimite sau primi 
 z.string.ro.people_unblock_headline = 'Deblochează?';
 z.string.ro.people_unblock_message = '{{user}} te va putea contacta și adăuga din nou la conversații de grup.';
 
-z.string.ro.people_button_add = 'Adaugă persoane';
+z.string.ro.people_button_add = 'Adaugă';
 z.string.ro.people_button_add_people = 'Adaugă persoane';
 z.string.ro.people_button_block = 'Blochează';
 z.string.ro.people_button_cancel = 'Renunță';
@@ -457,7 +455,6 @@ z.string.ro.preferences_options_notifications_obfuscate = 'Ascunde detaliile';
 z.string.ro.preferences_options_notifications_obfuscate_message = 'Arată expeditorul';
 z.string.ro.preferences_options_notifications_on = 'Arată expeditorul și mesajul';
 
-z.string.ro.search_group_hint = 'Mai încearcă sau alege persoanele cu care să creezi un grup';
 z.string.ro.search_connect = 'Conectare';
 z.string.ro.search_connections = 'Conexiuni';
 z.string.ro.search_contacts = 'Contacte';

@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@ z.string.de.wire_windows = 'Wire für Windows';
 z.string.de.wire_linux = 'Wire für Linux';
 z.string.de.nonexistent_user = 'Gelöschte Person';
 z.string.de.and = 'und';
+z.string.de.enumerationAnd = ' und ';
 
 z.string.de.alert_upload_file_format = 'Das Bild kann nicht verwendet werden. Bitte wähle eine PNG- oder JPEG-Datei.';
 z.string.de.alert_upload_too_small = 'Das Bild kann nicht verwendet werden. Bitte wähle ein Bild mit mindestens 320 x 320 Pixeln.';
@@ -193,6 +194,9 @@ z.string.de.conversation_connection_accepted = 'Hinzugefügt';
 z.string.de.conversation_connection_blocked = 'Blockiert';
 z.string.de.conversation_connection_cancel_request = 'Kontaktanfrage abbrechen';
 z.string.de.conversation_create = ' hat eine Unterhaltung mit {{users}} begonnen';
+z.string.de.conversationCreateName = '{{user}} hat die Unterhaltung begonnen';
+z.string.de.conversationCreateNameYou = '{{user}} hast die Unterhaltung begonnen';
+z.string.de.conversationCreateWith = 'mit {{users}}';
 z.string.de.conversation_create_you = ' hast eine Unterhaltung mit {{users}} begonnen';
 z.string.de.conversation_device_started_using_one = ' benutzt';
 z.string.de.conversation_device_started_using_many = ' benutzen';
@@ -202,7 +206,7 @@ z.string.de.conversation_device_user_devices = ' {{users}} Geräte';
 z.string.de.conversation_device_new_device_one = ' ein neues Gerät';
 z.string.de.conversation_device_new_device_many = ' neue Geräte';
 z.string.de.conversation_device_new_people_joined = 'Neue Personen beigetreten.';
-z.string.de.conversation_device_new_people_joined_verify = 'Überprüfe Geräte';
+z.string.de.conversation_device_new_people_joined_verify = ' Überprüfe Geräte';
 z.string.de.conversation_just_now = 'Gerade eben';
 z.string.de.conversation_location_link = 'Zeige Standort';
 z.string.de.conversation_member_join = ' hat {{users}} hinzugefügt';
@@ -323,8 +327,6 @@ z.string.de.extensions_giphy_message = '{{tag}} • über giphy.com';
 z.string.de.extensions_giphy_no_gifs = 'Ups, kein GIF';
 z.string.de.extensions_giphy_random = 'Zufällig';
 
-z.string.de.search_open = 'Öffnen';
-z.string.de.search_open_group = 'Unterhaltung erstellen';
 z.string.de.people_confirm_label = 'Personen zur Gruppe hinzufügen';
 z.string.de.people_people = '{{number}} Personen';
 z.string.de.people_search_placeholder = 'Nach Namen suchen';
@@ -467,10 +469,10 @@ z.string.de.preferences_options_notifications_obfuscate = 'Details verbergen';
 z.string.de.preferences_options_notifications_obfuscate_message = 'Absendername zeigen';
 z.string.de.preferences_options_notifications_on = 'Zeige Absendername und Nachricht';
 
-z.string.de.search_group_hint = 'Tippe weiter oder wähle weitere Kontakte aus, um eine Gruppe zu erstellen';
 z.string.de.search_connect = 'Vorschläge';
 z.string.de.search_connections = 'Kontakte';
 z.string.de.search_contacts = 'Kontakte';
+z.string.de.searchCreateGroup = 'Erstelle eine Gruppe';
 z.string.de.search_groups = 'Gruppen';
 z.string.de.search_people = 'Kontakte';
 z.string.de.search_placeholder = 'Name oder Benutzername suchen';
