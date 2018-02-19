@@ -27,13 +27,9 @@ import * as AuthAction from '../module/action/AuthAction';
 import {connect} from 'react-redux';
 
 class ClientManager extends React.Component {
-  componentWillMount = () => {
-    this.props.doGetAllClients();
-  };
+  componentWillMount = () => this.props.doGetAllClients();
 
-  logout = () => {
-    this.props.doLogout();
-  };
+  logout = () => this.props.doLogout();
 
   render() {
     return (
