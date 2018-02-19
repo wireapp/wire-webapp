@@ -126,10 +126,10 @@ class CodeInput extends React.PureComponent {
     event.target.select();
   }
 
-  forceSelectionPreventDefault(event) {
+  forceSelectionPreventDefault = event => {
     this.forceSelection(event);
     event.preventDefault();
-  }
+  };
 
   render() {
     const {values} = this.state;
