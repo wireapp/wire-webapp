@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="2.0.10"></a>
+## [2.0.10](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.0.9...@wireapp/core@2.0.10) (2018-02-19)
+
+
+### Bug Fixes
+
+* **cryptobox:** Queuing encryptions for multipe clients ([#280](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/280)) ([d7dbd87](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/d7dbd87))
+
+
+
+
 <a name="2.0.9"></a>
 ## [2.0.9](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.0.8...@wireapp/core@2.0.9) (2018-02-19)
 
