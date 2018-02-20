@@ -526,19 +526,6 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
   }
 
   /**
-   * Track context menu click
-   * @param {z.entity.Message} message_et - Message
-   * @returns {undefined} No return value
-   */
-  _track_context_menu(message_et) {
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.SELECTED_MESSAGE, {
-      context: 'single',
-      conversation_type: z.tracking.helpers.get_conversation_type(this.conversation()),
-      type: z.tracking.helpers.get_message_type(message_et),
-    });
-  }
-
-  /**
    * Shows detail image view.
    *
    * @param {z.entity.Message} message_et - Message with asset to be displayed
@@ -652,8 +639,6 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
 
   on_context_menu_click(message_et, event) {
     const entries = [];
-
-    this._track_context_menu(message_et);
 
     if (message_et.is_downloadable() && !message_et.is_ephemeral()) {
       entries.push({

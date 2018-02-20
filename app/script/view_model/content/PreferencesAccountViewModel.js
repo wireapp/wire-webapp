@@ -134,10 +134,6 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     z.ui.AvailabilityContextMenu.show(event, 'settings', 'preferences-account-availability-menu');
   }
 
-  click_on_username() {
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.EDITED_USERNAME);
-  }
-
   change_username(username, event) {
     const entered_username = event.target.value;
     const normalized_username = entered_username.toLowerCase().replace(/[^a-z0-9_]/g, '');
@@ -161,10 +157,6 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
         if (this.entered_username() === this.submitted_username()) {
           this.username_error(null);
           this.username_saved(true);
-
-          amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.SET_USERNAME, {
-            length: normalized_username.length,
-          });
 
           event.target.blur();
           window.setTimeout(() => {
@@ -226,17 +218,11 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   click_on_change_picture(files) {
     const [new_user_picture] = Array.from(files);
 
-    this.set_picture(new_user_picture)
-      .then(() => {
-        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.PROFILE_PICTURE_CHANGED, {
-          source: 'fromPhotoLibrary',
-        });
-      })
-      .catch(error => {
-        if (error.type !== z.user.UserError.TYPE.INVALID_UPDATE) {
-          throw error;
-        }
-      });
+    this.set_picture(new_user_picture).catch(error => {
+      if (error.type !== z.user.UserError.TYPE.INVALID_UPDATE) {
+        throw error;
+      }
+    });
   }
 
   click_on_delete_account() {
@@ -263,7 +249,6 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
   click_on_reset_password() {
     z.util.safe_window_open(z.util.URLUtil.build_url(z.util.URLUtil.TYPE.ACCOUNT, z.config.URL_PATH.PASSWORD_RESET));
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.PASSWORD_RESET, {value: 'fromProfile'});
   }
 
   set_picture(new_user_picture) {

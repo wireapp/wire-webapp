@@ -131,9 +131,6 @@ z.ViewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
   click_on_delete() {
     amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.DELETE_MESSAGE, {
       action: () => {
-        if (this.source === 'collection') {
-          this._track_item_action(this.conversation_et(), 'delete_for_me', 'image');
-        }
         this.conversation_repository.delete_message(this.conversation_et(), this.message_et());
         this.image_modal.hide();
       },
@@ -184,16 +181,5 @@ z.ViewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
       this.message_et(z.util.ArrayUtil.iterate_item(this.items(), this.message_et(), true));
       this._load_image();
     }
-  }
-
-  _track_item_action(conversation_et, is_liked, type) {
-    const like_action = is_liked ? 'unlike' : 'like';
-
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.COLLECTION.DID_ITEM_ACTION, {
-      action: like_action,
-      conversation_type: z.tracking.helpers.get_conversation_type(conversation_et),
-      type: type,
-      with_service: conversation_et.isWithBot(),
-    });
   }
 };

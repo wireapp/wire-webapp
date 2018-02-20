@@ -34,22 +34,7 @@ z.ViewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
 
     this.option_audio = ko.observable();
     this.option_audio.subscribe(audio_preference => {
-      const tracking_value = (() => {
-        switch (audio_preference) {
-          case z.audio.AudioPreference.ALL:
-            return 'alwaysPlay';
-          case z.audio.AudioPreference.SOME:
-            return 'firstMessageOnly';
-          case z.audio.AudioPreference.NONE:
-            return 'neverPlay';
-          default:
-        }
-      })();
-
       this.propertiesRepository.savePreference(z.properties.PROPERTIES_TYPE.SOUND_ALERTS, audio_preference);
-      amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SOUND_SETTINGS_CHANGED, {
-        value: tracking_value,
-      });
     });
 
     this.option_emoji_replace_inline = ko.observable();

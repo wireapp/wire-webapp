@@ -452,17 +452,11 @@ z.client.ClientRepository = class ClientRepository {
       .then(() => this.deleteClientFromDb(this.selfUser().id, clientId))
       .then(() => {
         this.selfUser().remove_client(clientId);
-        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.REMOVED_DEVICE, {
-          outcome: 'success',
-        });
         amplify.publish(z.event.WebApp.USER.CLIENT_REMOVED, this.selfUser().id, clientId);
         return this.clients();
       })
       .catch(error => {
         this.logger.error(`Unable to delete client '${clientId}': ${error.message}`, error);
-        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.REMOVED_DEVICE, {
-          outcome: 'fail',
-        });
 
         const isForbidden = z.service.BackendClientError.STATUS_CODE.FORBIDDEN;
         const error_type = isForbidden

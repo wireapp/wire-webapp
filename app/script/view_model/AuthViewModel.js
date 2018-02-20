@@ -223,7 +223,6 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     this.previousHash = undefined;
 
     this._init_base();
-    this._track_app_launch();
     $(`.${this.elementId}`).show();
     $('.auth-page-container').css({display: 'flex'});
   }
@@ -824,7 +823,6 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
   }
 
   clicked_on_password() {
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.PASSWORD_RESET, {value: 'fromSignIn'});
     z.util.safe_window_open(z.util.URLUtil.build_url(z.util.URLUtil.TYPE.ACCOUNT, z.config.URL_PATH.PASSWORD_RESET));
   }
 
@@ -861,7 +859,6 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
   }
 
   clicked_on_wire_link() {
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.NAVIGATION.OPENED_WIRE_WEBSITE);
     const path = z.l10n.text(z.string.url_website_root);
     z.util.safe_window_open(z.util.URLUtil.build_url(z.util.URLUtil.TYPE.WEBSITE, path));
   }
@@ -1057,9 +1054,6 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     };
 
     this.switch_ui(switch_params);
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ACCOUNT.OPENED_LOGIN, {
-      context: this.visible_method(),
-    });
   }
 
   _show_account_password() {
@@ -1071,9 +1065,6 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     };
 
     this.switch_ui(switch_params);
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ACCOUNT.OPENED_LOGIN, {
-      context: z.auth.AuthView.TYPE.EMAIL,
-    });
   }
 
   _show_account_phone() {
@@ -1085,9 +1076,6 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     };
 
     this.switch_ui(switch_params);
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ACCOUNT.OPENED_LOGIN, {
-      context: z.auth.AuthView.TYPE.PHONE,
-    });
   }
 
   _show_blocked_cookies() {
@@ -1841,21 +1829,6 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
           window.location.hash = z.auth.AuthView.MODE.ACCOUNT_LOGIN;
         }
       });
-  }
-
-  /**
-   * Track app launch for Localytics
-   * @private
-   * @returns {undefined} No return value
-   */
-  _track_app_launch() {
-    let mechanism = 'direct';
-    if (document.referrer.startsWith('https://wire.com/verify/')) {
-      mechanism = 'email_verify';
-    } else if (document.referrer.startsWith('https://wire.com/forgot/')) {
-      mechanism = 'password_reset';
-    }
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.APP_LAUNCH, {mechanism});
   }
 };
 

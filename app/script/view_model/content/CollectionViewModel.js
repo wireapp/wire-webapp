@@ -70,10 +70,6 @@ z.ViewModel.content.CollectionViewModel = class CollectionViewModel {
     this.search_input(input || '');
   }
 
-  on_result() {
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.COLLECTION.ENTERED_SEARCH);
-  }
-
   item_added(message_et) {
     if (this.conversation_et().id === message_et.conversation_id) {
       this._populate_items([message_et]);
@@ -100,8 +96,7 @@ z.ViewModel.content.CollectionViewModel = class CollectionViewModel {
 
       this.conversation_repository
         .get_events_for_category(conversation_et, z.message.MessageCategory.LINK_PREVIEW)
-        .then(message_ets => this._populate_items(message_ets))
-        .then(() => this._track_opened_collection(conversation_et, this.no_items_found()));
+        .then(message_ets => this._populate_items(message_ets));
     }
   }
 
@@ -126,7 +121,6 @@ z.ViewModel.content.CollectionViewModel = class CollectionViewModel {
   }
 
   click_on_message(message_et) {
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.COLLECTION.SELECTED_SEARCH_RESULT);
     amplify.publish(z.event.WebApp.CONVERSATION.SHOW, this.conversation_et(), message_et);
   }
 
@@ -141,23 +135,5 @@ z.ViewModel.content.CollectionViewModel = class CollectionViewModel {
 
   click_on_image(message_et) {
     amplify.publish(z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW, message_et, this.images(), 'collection');
-    this._track_opened_item(this.conversation_et(), 'image');
-  }
-
-  _track_opened_collection(conversation_et, is_empty) {
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.COLLECTION.OPENED_COLLECTIONS, {
-      conversation_type: z.tracking.helpers.get_conversation_type(conversation_et),
-      is_empty: is_empty,
-      with_search_result: false,
-      with_service: conversation_et.isWithBot(),
-    });
-  }
-
-  _track_opened_item(conversation_et, type) {
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.COLLECTION.OPENED_ITEM, {
-      conversation_type: z.tracking.helpers.get_conversation_type(conversation_et),
-      type: type,
-      with_service: conversation_et.isWithBot(),
-    });
   }
 };
