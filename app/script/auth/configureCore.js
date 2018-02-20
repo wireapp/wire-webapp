@@ -17,20 +17,8 @@
  *
  */
 
-import * as Environment from './Environment';
-import APIClient from '@wireapp/api-client';
-import {StoreEngine} from '@wireapp/store-engine';
+import {Account} from '@wireapp/core';
 
-const BACKEND = Environment.onEnvironment(
-  APIClient.BACKEND.STAGING,
-  APIClient.BACKEND.STAGING,
-  APIClient.BACKEND.PRODUCTION
-);
+export const configureCore = apiClient => new Account(apiClient);
 
-export const configureClient = () =>
-  new APIClient({
-    store: new StoreEngine.MemoryEngine('wire-webapp'),
-    urls: BACKEND,
-  });
-
-export default configureClient;
+export default configureCore;
