@@ -23,7 +23,7 @@ class Config {
   constructor(
     public store: CRUDEngine = new MemoryEngine(),
     public urls: {
-      name?: string;
+      name: string;
       rest: string;
       ws: string;
     } = Backend.PRODUCTION

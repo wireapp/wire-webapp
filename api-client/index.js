@@ -53,7 +53,7 @@ Promise.resolve()
     return apiClient.login(login);
   })
   .then(context => {
-    console.log(`Got self user with ID "${context.userID}".`);
+    console.log(`Got self user with ID "${context.userId}".`);
     return apiClient.user.api.getUsers({handles: ['webappbot']});
   })
   .then(userData => {

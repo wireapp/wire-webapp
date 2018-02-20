@@ -79,7 +79,7 @@ describe('Client', () => {
           return client.init();
         })
         .then(context => {
-          expect(context.userID).toBe(accessTokenData.user);
+          expect(context.userId).toBe(accessTokenData.user);
           expect(client.accessTokenStore.accessToken).toBe(accessTokenData);
           done();
         })
@@ -163,7 +163,7 @@ describe('Client', () => {
     it('creates a context from a successful login', done => {
       const client = new Client();
       client.login(loginData).then(context => {
-        expect(context.userID).toBe(accessTokenData.user);
+        expect(context.userId).toBe(accessTokenData.user);
         expect(client.accessTokenStore.accessToken.access_token).toBe(accessTokenData.access_token);
         done();
       });
@@ -199,7 +199,7 @@ describe('Client', () => {
       client
         .login(loginData)
         .then(context => {
-          expect(context.userID).toBe(accessTokenData.user);
+          expect(context.userId).toBe(accessTokenData.user);
           // Overwrite access token
           client.accessTokenStore.accessToken.access_token = undefined;
           // Make a backend call
@@ -256,7 +256,7 @@ describe('Client', () => {
       client
         .register(registerData)
         .then(context => {
-          expect(context.userID).toBe(registerData.id);
+          expect(context.userId).toBe(registerData.id);
           expect(client.accessTokenStore.accessToken.access_token).toBe(accessTokenData.access_token);
           done();
         })
