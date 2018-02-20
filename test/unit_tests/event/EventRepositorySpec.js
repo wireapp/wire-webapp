@@ -315,7 +315,7 @@ describe('Event Repository', () => {
         from: '532af01e-1e24-4366-aacf-33b67d4ee376',
         time: '2016-08-09T12:58:49.485Z',
         error: 'Offset is outside the bounds of the DataView (17cd13b4b2a3a98)',
-        error_code: '1778 (17cd13b4b2a3a98)',
+        errorCode: '1778 (17cd13b4b2a3a98)',
       };
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
 

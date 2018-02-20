@@ -197,7 +197,6 @@ z.conversation.EventMapper = class EventMapper {
       messageEntity.assets.push(this._map_asset_file(event));
     }
 
-    messageEntity.nonce = eventData.info.nonce;
     return messageEntity;
   }
 
