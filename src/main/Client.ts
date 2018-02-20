@@ -21,7 +21,7 @@ import {AccessTokenData, AuthAPI, Context, LoginData, RegisterData} from './auth
 import {AccessTokenStore} from './auth/';
 import {AssetAPI} from './asset/';
 import {Backend} from './env';
-import {ClientAPI} from './client/';
+import {ClientAPI, ClientType} from './client/';
 import {ConnectionAPI} from './connection/';
 import {ConversationAPI} from './conversation/';
 import {GiphyAPI} from './giphy/';
@@ -33,6 +33,7 @@ import {UserAPI} from './user/';
 import {WebSocketClient} from './tcp/';
 
 class Client {
+  private STORE_NAME_PREFIX: string = 'wire';
   // APIs
   public asset: {api: AssetAPI};
   public auth: {api: AuthAPI};
@@ -123,27 +124,35 @@ class Client {
 
   public init(): Promise<Context> {
     let context: Context;
+    let accessToken: AccessTokenData;
     return this.accessTokenStore
       .init()
       .then((accessToken: AccessTokenData | undefined) => (accessToken ? accessToken : this.auth.api.postAccess()))
-      .then((accessToken: AccessTokenData) => {
-        context = this.createContext(accessToken.user);
-        return accessToken;
+      .then((createdAccessToken: AccessTokenData) => {
+        context = this.createContext(createdAccessToken.user);
+        accessToken = createdAccessToken;
       })
-      .then((accessToken: AccessTokenData) => this.accessTokenStore.updateToken(accessToken))
+      .then(() => this.initEngine(context))
+      .then(() => this.accessTokenStore.updateToken(accessToken))
       .then(() => context);
   }
 
   public login(loginData: LoginData): Promise<Context> {
     let context: Context;
+    let accessToken: AccessTokenData;
     return Promise.resolve()
       .then(() => this.context && this.logout())
       .then(() => this.auth.api.postLogin(loginData))
-      .then((accessToken: AccessTokenData) => {
-        context = this.createContext(accessToken.user);
-        return accessToken;
+      .then((createdAccessToken: AccessTokenData) => {
+        context = this.createContext(
+          createdAccessToken.user,
+          undefined,
+          loginData.persist ? ClientType.PERMANENT : ClientType.TEMPORARY
+        );
+        accessToken = createdAccessToken;
       })
-      .then((accessToken: AccessTokenData) => this.accessTokenStore.updateToken(accessToken))
+      .then(() => this.initEngine(context))
+      .then(() => this.accessTokenStore.updateToken(accessToken))
       .then(() => context);
   }
 
@@ -165,20 +174,29 @@ class Client {
   }
 
   public connect(): Promise<WebSocketClient> {
-    return this.transport.ws.connect(this.context!.clientID);
+    return this.transport.ws.connect(this.context!.clientId);
   }
 
-  private createContext(userID: string): Context {
+  private createContext(userId: string, clientId?: string, clientType?: ClientType): Context {
     if (this.context) {
-      throw new Error(`There is already a context with user ID '${userID}'.`);
+      throw new Error(`There is already a context with user ID '${userId}'.`);
     }
 
-    this.context = new Context(userID);
+    this.context = new Context(userId, clientId, clientType);
     return this.context;
   }
 
   public disconnect(reason?: string): void {
     this.transport.ws.disconnect(reason);
+  }
+
+  private async initEngine(context: Context) {
+    await this.config.store.init(
+      `${this.STORE_NAME_PREFIX}@${this.config.urls.name}@${context.userId}${
+        context.clientType ? `@${context.clientType}` : ''
+      }`
+    );
+    return this.config.store;
   }
 }
 

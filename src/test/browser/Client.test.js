@@ -33,7 +33,7 @@ describe('Client', () => {
       };
       const dataBuffer = new TextEncoder('utf-8').encode('{}').buffer;
       const message = new MessageEvent('message', {data: dataBuffer});
-      apiClient.context = new Context('userID', undefined);
+      apiClient.context = new Context('userId', undefined);
       apiClient.accessTokenStore.accessToken = accessTokenData;
       const promise = apiClient.connect();
       apiClient.transport.ws.socket.onopen(message);

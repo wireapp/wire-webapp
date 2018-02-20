@@ -33,13 +33,11 @@ class AccessTokenStore extends EventEmitter {
   }
 
   public async delete(): Promise<void> {
-    await this.engine.init('wire');
     return this.engine.delete(AUTH_TABLE_NAME, AUTH_ACCESS_TOKEN_KEY).then(() => (this.accessToken = undefined));
   }
 
   public async updateToken(accessToken: AccessTokenData): Promise<AccessTokenData> {
     if (this.accessToken !== accessToken) {
-      await this.engine.init('wire');
       return this.engine
         .delete(AUTH_TABLE_NAME, AUTH_ACCESS_TOKEN_KEY)
         .then(() => this.engine.create(AUTH_TABLE_NAME, AUTH_ACCESS_TOKEN_KEY, accessToken))
