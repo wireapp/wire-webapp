@@ -24,20 +24,24 @@ const Proteus = require('@wireapp/proteus');
 const crypto = require('../../../../../dist/crypto/root');
 const {MemoryEngine} = require('@wireapp/store-engine').StoreEngine;
 
+async function createEngine(storeName) {
+  const engine = new MemoryEngine();
+  await engine.init(storeName);
+  return engine;
+}
+
 describe('CryptographyService', () => {
   let cryptographyService;
   let aliceLastResortPreKey;
   let bob;
 
-  beforeEach(done => {
-    cryptographyService = new crypto.CryptographyService(new MemoryEngine('alice'));
+  beforeEach(async done => {
+    cryptographyService = new crypto.CryptographyService(await createEngine('wire'));
     cryptographyService.cryptobox
       .create()
-      .then(preKeys => {
+      .then(async preKeys => {
         aliceLastResortPreKey = preKeys.filter(preKey => preKey.key_id === Proteus.keys.PreKey.MAX_PREKEY_ID)[0];
-        const storageEngine = new MemoryEngine('bob');
-        const cryptoboxStore = new cryptobox.store.CryptoboxCRUDStore(storageEngine);
-        bob = new cryptobox.Cryptobox(cryptoboxStore);
+        bob = new cryptobox.Cryptobox(new cryptobox.store.CryptoboxCRUDStore(await createEngine('wire')));
         return bob.create();
       })
       .then(done);

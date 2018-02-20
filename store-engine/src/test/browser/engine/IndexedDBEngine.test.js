@@ -17,21 +17,21 @@
  *
  */
 
-import Dexie from 'dexie';
 import {StoreEngine} from '@wireapp/store-engine';
 
 describe('StoreEngine.IndexedDBEngine', () => {
-  const DATABASE_NAME = 'database-name';
+  const STORE_NAME = 'database-name';
   const TABLE_NAME = 'the-simpsons';
 
   let engine = undefined;
 
-  beforeEach(() => {
-    const db = new Dexie(DATABASE_NAME);
+  beforeEach(async done => {
+    engine = new StoreEngine.IndexedDBEngine();
+    const db = await engine.init(STORE_NAME);
     db.version(1).stores({
       'the-simpsons': ',firstName,lastName',
     });
-    engine = new StoreEngine.IndexedDBEngine(db);
+    done();
   });
 
   afterEach(() => {
@@ -39,7 +39,7 @@ describe('StoreEngine.IndexedDBEngine', () => {
       engine.db.close();
     }
 
-    window.indexedDB.deleteDatabase(DATABASE_NAME);
+    window.indexedDB.deleteDatabase(STORE_NAME);
   });
 
   describe('"create"', () => {

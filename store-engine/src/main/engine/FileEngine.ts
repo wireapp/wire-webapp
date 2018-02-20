@@ -4,14 +4,15 @@ import path = require('path');
 import {PathValidationError, RecordAlreadyExistsError, RecordNotFoundError, RecordTypeError} from './error';
 
 export default class FileEngine implements CRUDEngine {
-  constructor(
-    public storeName: string,
-    private options: {fileExtension: string} = {
-      fileExtension: '.dat',
-    }
-  ) {
+  public storeName: string = '';
+  private options: {fileExtension: string} = {
+    fileExtension: '.dat',
+  };
+
+  init(storeName: string, options: {fileExtension: string}): Promise<any> {
     this.storeName = path.normalize(storeName);
-    this.options = options;
+    this.options = {...this.options, ...options};
+    return Promise.resolve(storeName);
   }
 
   private resolvePath(tableName: string, primaryKey?: string): Promise<string> {

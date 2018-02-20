@@ -20,12 +20,16 @@
 import {StoreEngine} from '@wireapp/store-engine';
 
 describe('StoreEngine.LocalStorageEngine', () => {
-  const DATABASE_NAME = 'database-name';
+  const STORE_NAME = 'database-name';
   const TABLE_NAME = 'the-simpsons';
 
   let engine = undefined;
 
-  beforeEach(() => (engine = new StoreEngine.LocalStorageEngine(DATABASE_NAME)));
+  beforeEach(async done => {
+    engine = new StoreEngine.LocalStorageEngine();
+    await engine.init(STORE_NAME);
+    done();
+  });
 
   afterEach(() => window.localStorage.clear());
 

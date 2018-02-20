@@ -29,13 +29,15 @@ const {FileEngine} = require('@wireapp/store-engine/dist/commonjs/engine');
 // gulp test_node --file "node/store/CryptoboxCRUDStoreSpec.node.js"
 describe('cryptobox.store.CryptoboxCRUDStore', () => {
   let storagePath = '';
-  let engine = new FileEngine(storagePath);
-  let fileStore = new cryptobox.store.CryptoboxCRUDStore(engine);
+  let engine = undefined;
+  let fileStore = undefined;
 
-  beforeEach(() => {
+  beforeEach(async done => {
     storagePath = fs.mkdtempSync(path.normalize(`${__dirname}/test`));
-    engine = new FileEngine(storagePath);
+    engine = new FileEngine();
+    await engine.init(storagePath);
     fileStore = new cryptobox.store.CryptoboxCRUDStore(engine);
+    done();
   });
 
   afterEach(done =>

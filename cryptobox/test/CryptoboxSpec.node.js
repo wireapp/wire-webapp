@@ -24,22 +24,28 @@ describe('cryptobox.Cryptobox', () => {
   const Proteus = require('@wireapp/proteus');
   const {MemoryEngine} = require('@wireapp/store-engine').StoreEngine;
 
+  async function createCryptobox(storeName) {
+    const engine = new MemoryEngine();
+    await engine.init(storeName);
+    return new cryptobox.Cryptobox(new cryptobox.store.CryptoboxCRUDStore(engine));
+  }
+
   describe('"encrypt / decrypt"', () => {
     it('encrypts messages for multiple clients and decrypts', async done => {
-      const alice = new cryptobox.Cryptobox(new cryptobox.store.CryptoboxCRUDStore(new MemoryEngine('alice')));
+      const alice = await createCryptobox('alice');
       const text = 'Hello, World!';
 
       expect(alice.cachedPreKeys.length).toBe(0);
       await alice.create();
       expect(alice.cachedPreKeys.length).toBe(1);
 
-      const bob = new cryptobox.Cryptobox(new cryptobox.store.CryptoboxCRUDStore(new MemoryEngine('bob')));
+      const bob = await createCryptobox('bob');
       await bob.create();
 
-      const eve = new cryptobox.Cryptobox(new cryptobox.store.CryptoboxCRUDStore(new MemoryEngine('eve')));
+      const eve = await createCryptobox('eve');
       await eve.create();
 
-      const mallory = new cryptobox.Cryptobox(new cryptobox.store.CryptoboxCRUDStore(new MemoryEngine('mallory')));
+      const mallory = await createCryptobox('mallory');
       await mallory.create();
 
       const bobBundle = Proteus.keys.PreKeyBundle.new(bob.identity.public_key, bob.cachedPreKeys[0]);

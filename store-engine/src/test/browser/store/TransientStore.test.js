@@ -20,16 +20,18 @@
 import {Store, StoreEngine} from '@wireapp/store-engine';
 
 describe('store.TransientStore', () => {
-  const DATABASE_NAME = 'database-name';
+  const STORE_NAME = 'database-name';
   const TABLE_NAME = 'table-name';
 
   let engine = undefined;
   let store = undefined;
 
-  beforeEach(done => {
-    engine = new StoreEngine.LocalStorageEngine(DATABASE_NAME);
+  beforeEach(async done => {
+    engine = new StoreEngine.LocalStorageEngine();
+    await engine.init(STORE_NAME);
     store = new Store.TransientStore(engine);
-    store.init(TABLE_NAME).then(done);
+    await store.init(TABLE_NAME);
+    done();
   });
 
   afterEach(() => {
@@ -141,7 +143,7 @@ describe('store.TransientStore', () => {
       ];
 
       for (const item of items) {
-        window.localStorage.setItem(`${DATABASE_NAME}@${TABLE_NAME}@${item.payload.token}`, JSON.stringify(item));
+        window.localStorage.setItem(`${STORE_NAME}@${TABLE_NAME}@${item.payload.token}`, JSON.stringify(item));
       }
 
       store

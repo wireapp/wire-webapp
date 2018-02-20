@@ -20,12 +20,16 @@
 const {StoreEngine} = require('@wireapp/store-engine');
 
 describe('StoreEngine.MemoryEngine', () => {
-  const DATABASE_NAME = 'database-name';
+  const STORE_NAME = 'database-name';
   const TABLE_NAME = 'the-simpsons';
 
   let engine = undefined;
 
-  beforeEach(() => (engine = new StoreEngine.MemoryEngine(DATABASE_NAME)));
+  beforeEach(async done => {
+    engine = new StoreEngine.MemoryEngine();
+    await engine.init(STORE_NAME);
+    done();
+  });
 
   describe('"create"', () => {
     it('creates a serialized database record.', done => {

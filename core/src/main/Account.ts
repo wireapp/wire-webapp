@@ -329,6 +329,7 @@ class Account extends EventEmitter {
       .then((root: Root) => {
         this.protocolBuffers.GenericMessage = root.lookup('GenericMessage');
         this.protocolBuffers.Text = root.lookup('Text');
+        return this.apiClient.config.store.init('wire');
       })
       .then(() => {
         const crypto: CryptographyService = new CryptographyService(this.apiClient.config.store);

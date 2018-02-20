@@ -28,26 +28,29 @@ class AccessTokenStore extends EventEmitter {
     ACCESS_TOKEN_REFRESH: 'AccessTokenStore.TOPIC.ACCESS_TOKEN_REFRESH',
   };
 
-  constructor(private tokenStore: CRUDEngine) {
+  constructor(private engine: CRUDEngine) {
     super();
   }
 
-  public delete(): Promise<void> {
-    return this.tokenStore.delete(AUTH_TABLE_NAME, AUTH_ACCESS_TOKEN_KEY).then(() => (this.accessToken = undefined));
+  public async delete(): Promise<void> {
+    await this.engine.init('wire');
+    return this.engine.delete(AUTH_TABLE_NAME, AUTH_ACCESS_TOKEN_KEY).then(() => (this.accessToken = undefined));
   }
 
-  public updateToken(accessToken: AccessTokenData): Promise<AccessTokenData> {
+  public async updateToken(accessToken: AccessTokenData): Promise<AccessTokenData> {
     if (this.accessToken !== accessToken) {
-      return this.tokenStore
+      await this.engine.init('wire');
+      return this.engine
         .delete(AUTH_TABLE_NAME, AUTH_ACCESS_TOKEN_KEY)
-        .then(() => this.tokenStore.create(AUTH_TABLE_NAME, AUTH_ACCESS_TOKEN_KEY, accessToken))
+        .then(() => this.engine.create(AUTH_TABLE_NAME, AUTH_ACCESS_TOKEN_KEY, accessToken))
         .then(() => (this.accessToken = accessToken));
     }
     return Promise.resolve(this.accessToken);
   }
 
-  public init(): Promise<AccessTokenData | undefined> {
-    return this.tokenStore
+  public async init(): Promise<AccessTokenData | undefined> {
+    await this.engine.init('wire');
+    return this.engine
       .read<AccessTokenData>(AUTH_TABLE_NAME, AUTH_ACCESS_TOKEN_KEY)
       .catch((error: Error) => {
         if (error.name === RecordNotFoundError.name) {

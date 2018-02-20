@@ -2,7 +2,12 @@ import CRUDEngine from './CRUDEngine';
 import {RecordAlreadyExistsError, RecordNotFoundError, RecordTypeError} from './error';
 
 export default class LocalStorageEngine implements CRUDEngine {
-  constructor(public storeName: string) {}
+  public storeName: string = '';
+
+  init(storeName: string): Promise<any> {
+    this.storeName = storeName;
+    return Promise.resolve();
+  }
 
   public create<T>(tableName: string, primaryKey: string, entity: T): Promise<string> {
     if (entity) {

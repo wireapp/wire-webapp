@@ -2,10 +2,13 @@ import CRUDEngine from './CRUDEngine';
 import {RecordAlreadyExistsError, RecordNotFoundError, RecordTypeError} from './error';
 
 export default class MemoryEngine implements CRUDEngine {
+  public storeName: string = '';
   private stores: {[index: string]: {[index: string]: any}} = {};
 
-  constructor(public storeName: string) {
-    this.stores[storeName] = {};
+  init(storeName: string): Promise<any> {
+    this.storeName = storeName;
+    this.stores[this.storeName] = this.stores[this.storeName] || {};
+    return Promise.resolve();
   }
 
   private prepareTable(tableName: string) {

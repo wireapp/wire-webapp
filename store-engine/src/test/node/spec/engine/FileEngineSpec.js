@@ -28,7 +28,11 @@ describe('StoreEngine.FileEngine', () => {
   const TEST_DIRECTORY = path.join(process.cwd(), '.tmp', DATABASE_NAME);
   let engine = undefined;
 
-  beforeEach(() => (engine = new StoreEngine.FileEngine(TEST_DIRECTORY)));
+  beforeEach(async done => {
+    engine = new StoreEngine.FileEngine();
+    await engine.init(TEST_DIRECTORY);
+    done();
+  });
 
   afterEach(done =>
     fs
@@ -132,8 +136,8 @@ describe('StoreEngine.FileEngine', () => {
       });
     });
 
-    it('does not work when non-printable characters are being used in the store name', done => {
-      engine = new StoreEngine.FileEngine(path.join(process.cwd(), '.tmp', 'wrong\t'));
+    it('does not work when non-printable characters are being used in the store name', async done => {
+      await engine.init(path.join(process.cwd(), '.tmp', 'wrong\t'));
 
       const PRIMARY_KEY = 'primary-key';
 
