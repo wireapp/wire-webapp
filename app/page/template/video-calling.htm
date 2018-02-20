@@ -16,7 +16,7 @@
         <!-- /ko -->
         <!-- ko if: show_remote_participant() -->
           <div class="video-element-remote-participant">
-            <!-- ko ifnot: videod_call().is_group -->
+            <!-- ko ifnot: videod_call().isGroup -->
               <participant-avatar class="video-element-remote-participant avatar-no-badge"
                            params="participant: remote_user(), size: z.components.ParticipantAvatar.SIZE.X_LARGE"></participant-avatar>
             <!-- /ko -->
@@ -44,8 +44,8 @@
           <div id="video-title" class="video-title"
                data-bind="css: {'hide-controls-hidden': !show_remote_participant() && !is_choosing_screen(),
                                 'video-element-dark': show_remote_participant()}">
-            <div class="video-remote-name" data-bind="text: videod_call().conversation_et.display_name()"></div>
-            <div class="video-timer label-xs" data-bind="text: z.util.format_seconds(videod_call().duration_time())"></div>
+            <div class="video-remote-name" data-bind="text: videod_call().conversationEntity.display_name()"></div>
+            <div class="video-timer label-xs" data-bind="text: z.util.format_seconds(videod_call().durationTime())"></div>
           </div>
         <!-- /ko -->
 
@@ -57,15 +57,15 @@
                  data-bind="click: clicked_on_minimize, css: {'button-round-dark': !show_remote_participant()}"></div>
             <div class="video-controls-button button-round button-round-md icon-mute"
                  data-uie-name="do-call-controls-video-call-mute"
-                 data-bind="click: clicked_on_mute_audio, css: {'toggled': !self_stream_state.audio_send(), 'button-round-dark': !show_remote_participant()}"></div>
+                 data-bind="click: clicked_on_mute_audio, css: {'toggled': !self_stream_state.audioSend(), 'button-round-dark': !show_remote_participant()}"></div>
             <!-- ko if: show_toggle_screen() -->
               <div class="video-controls-button button-round button-round-md icon-screensharing"
-                   data-bind="click: clicked_on_share_screen, css: {'toggled': self_stream_state.screen_send(), 'button-round-dark': !show_remote_participant(), 'disabled': disable_toggle_screen()}"
+                   data-bind="click: clicked_on_share_screen, css: {'toggled': self_stream_state.screenSend(), 'button-round-dark': !show_remote_participant(), 'disabled': disable_toggle_screen()}"
                    data-uie-name="do-call-controls-toggle-screen"></div>
             <!-- /ko -->
             <!-- ko if: show_toggle_video() -->
               <div class="video-controls-button button-round button-round-md icon-video"
-                   data-bind="click: clicked_on_stop_video, css: {'toggled': self_stream_state.video_send(), 'button-round-dark': !show_remote_participant()}"
+                   data-bind="click: clicked_on_stop_video, css: {'toggled': self_stream_state.videoSend(), 'button-round-dark': !show_remote_participant()}"
                    data-uie-name="do-call-controls-toggle-video"></div>
             <!-- /ko -->
             <div class="video-controls-button button-round button-round-md button-round-theme-red icon-end-call"
@@ -81,7 +81,7 @@
         <!-- ko if: show_local_video() -->
           <video class="video-element"
                  autoplay
-                 data-bind="css: {'mirror': !self_stream_state.screen_send()},
+                 data-bind="css: {'mirror': !self_stream_state.screenSend()},
                             mute_media_element: local_video_stream(),
                             source_stream: local_video_stream()"></video>
         <!-- /ko -->

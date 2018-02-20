@@ -23,7 +23,7 @@ window.z = window.z || {};
 window.z.calling = z.calling || {};
 window.z.calling.entities = z.calling.entities || {};
 
-z.calling.entities.CallMessage = class CallMessage {
+z.calling.entities.CallMessageEntity = class CallMessageEntity {
   static get CONFIG() {
     return {
       SESSION_ID_LENGTH: 4,
@@ -34,7 +34,7 @@ z.calling.entities.CallMessage = class CallMessage {
   /**
    * Construct a new call message entity.
    *
-   * @class z.calling.entities.CallMessage
+   * @class z.calling.entities.CallMessageEntity
    * @param {z.calling.enum.CALL_MESSAGE_TYPE} type - Type of call message
    * @param {boolean} [response=false] - Is message a response, defaults to false
    * @param {string} sessionId - Optional session ID
@@ -42,7 +42,7 @@ z.calling.entities.CallMessage = class CallMessage {
   constructor(type, response = false, sessionId) {
     this.type = type;
     this.response = response;
-    this.sessionId = sessionId || this._create_session_id();
+    this.sessionId = sessionId || this._createSessionId();
   }
 
   /**
@@ -67,7 +67,7 @@ z.calling.entities.CallMessage = class CallMessage {
       resp: this.response,
       sessid: this.sessionId,
       type: this.type,
-      version: CallMessage.CONFIG.VERSION,
+      version: CallMessageEntity.CONFIG.VERSION,
     };
 
     const extendedMessageTypes = [
@@ -78,8 +78,9 @@ z.calling.entities.CallMessage = class CallMessage {
     ];
 
     if (extendedMessageTypes.includes(this.type)) {
-      json_payload.props = this.props;
-      if (this.type !== z.calling.enum.CALL_MESSAGE_TYPE.PROP_SYNC) {
+      json_payload.props = this.properties;
+      const isTypePropSync = this.type === z.calling.enum.CALL_MESSAGE_TYPE.PROP_SYNC;
+      if (!isTypePropSync) {
         json_payload.sdp = this.sdp;
       }
     }
@@ -90,9 +91,10 @@ z.calling.entities.CallMessage = class CallMessage {
       z.calling.enum.CALL_MESSAGE_TYPE.UPDATE,
     ];
 
-    if (targetedMessageTypes.includes(this.type)) {
-      json_payload.dest_clientid = this.remote_client_id;
-      json_payload.dest_userid = this.remote_user_id;
+    const isTargetedMessageType = targetedMessageTypes.includes(this.type);
+    if (isTargetedMessageType) {
+      json_payload.dest_clientid = this.remoteClientId;
+      json_payload.dest_userid = this.remoteUserId;
     }
 
     return json_payload;
@@ -109,10 +111,10 @@ z.calling.entities.CallMessage = class CallMessage {
   /**
    * Create a session ID.
    * @private
-   * @returns {string} Random char session ID of length CallMessage.CONFIG.SESSION_ID_LENGTH
+   * @returns {string} Random char session ID of length CallMessageEntity.CONFIG.SESSION_ID_LENGTH
    */
-  _create_session_id() {
-    return _.range(CallMessage.CONFIG.SESSION_ID_LENGTH)
+  _createSessionId() {
+    return _.range(CallMessageEntity.CONFIG.SESSION_ID_LENGTH)
       .map(() => z.util.StringUtil.get_random_character())
       .join('');
   }

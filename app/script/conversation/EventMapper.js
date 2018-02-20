@@ -422,7 +422,7 @@ z.conversation.EventMapper = class EventMapper {
   /**
    * Maps JSON data of conversation.voice-channel-activate message into message entity
    * @private
-   * @returns {CallMessage} Call message entity
+   * @returns {z.calling.entities.CallMessageEntity} Call message entity
    */
   _map_event_voice_channel_activate() {
     const message_et = new z.entity.CallMessage();
@@ -438,7 +438,7 @@ z.conversation.EventMapper = class EventMapper {
    *
    * @private
    * @param {Object} event_data - Message data
-   * @returns {CallMessage} Call message entity
+   * @returns {z.calling.entities.CallMessageEntity} Call message entity
    */
   _map_event_voice_channel_deactivate({data: event_data}) {
     const message_et = new z.entity.CallMessage();

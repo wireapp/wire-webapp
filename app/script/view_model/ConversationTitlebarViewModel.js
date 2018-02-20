@@ -37,9 +37,9 @@ z.ViewModel.ConversationTitlebarViewModel = class ConversationTitlebarViewModel 
 
     this.conversation_et = this.conversation_repository.active_conversation;
 
-    this.joined_call = this.calling_repository.joined_call;
-    this.remote_media_streams = this.calling_repository.remote_media_streams;
-    this.self_stream_state = this.calling_repository.self_stream_state;
+    this.joined_call = this.calling_repository.joinedCall;
+    this.remote_media_streams = this.calling_repository.remoteMediaStreams;
+    this.self_stream_state = this.calling_repository.selfStreamState;
 
     this.has_call = ko.pureComputed(() => {
       if (!this.conversation_et() || !this.joined_call()) {
@@ -62,9 +62,9 @@ z.ViewModel.ConversationTitlebarViewModel = class ConversationTitlebarViewModel 
         return false;
       }
 
-      const has_local_video = this.self_stream_state.video_send() || this.self_stream_state.screen_send();
+      const has_local_video = this.self_stream_state.videoSend() || this.self_stream_state.screenSend();
       const has_remote_video =
-        (this.joined_call().is_remote_screen_send() || this.joined_call().is_remote_video_send()) &&
+        (this.joined_call().isRemoteScreenSend() || this.joined_call().isRemoteVideoSend()) &&
         this.remote_media_streams.video();
       return this.has_ongoing_call() && this.multitasking.is_minimized() && has_local_video && !has_remote_video;
     });
