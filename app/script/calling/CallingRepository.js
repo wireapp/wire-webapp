@@ -907,7 +907,7 @@ z.calling.CallingRepository = class CallingRepository {
    * @param {string} userId - ID of user to be removed
    * @returns {undefined} No return value
    */
-  participantLeft(callEntity, userId) {
+  removeParticipant(callEntity, userId) {
     callEntity
       .getParticipantById(userId)
       .then(() => {
