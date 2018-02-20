@@ -30,7 +30,7 @@ window.z.ViewModel = z.ViewModel || {};
  * @todo Remove all jquery selectors
  */
 z.ViewModel.MessageListViewModel = class MessageListViewModel {
-  constructor(element_id, conversation_repository, user_repository) {
+  constructor(mainViewModel, repositories) {
     this._on_message_add = this._on_message_add.bind(this);
     this.click_on_cancel_request = this.click_on_cancel_request.bind(this);
     this.click_on_like = this.click_on_like.bind(this);
@@ -41,8 +41,8 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
     this.on_session_reset_click = this.on_session_reset_click.bind(this);
     this.should_hide_user_avatar = this.should_hide_user_avatar.bind(this);
 
-    this.conversation_repository = conversation_repository;
-    this.user_repository = user_repository;
+    this.conversation_repository = repositories.conversation;
+    this.user_repository = repositories.user;
     this.logger = new z.util.Logger('z.ViewModel.MessageListViewModel', z.config.LOGGER.OPTIONS);
 
     this.conversation = ko.observable(new z.entity.Conversation());

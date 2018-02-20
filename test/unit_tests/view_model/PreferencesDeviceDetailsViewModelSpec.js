@@ -29,12 +29,11 @@ describe('z.ViewModel.content.PreferencesDeviceDetailsViewModel', () => {
     testFactory
       .exposeConversationActors()
       .then(() => {
-        viewModel = new z.ViewModel.content.PreferencesDeviceDetailsViewModel(
-          'preferences-devices',
-          TestFactory.client_repository,
-          TestFactory.conversation_repository,
-          TestFactory.cryptography_repository
-        );
+        viewModel = new z.ViewModel.content.PreferencesDeviceDetailsViewModel(undefined, {
+          client: TestFactory.client_repository,
+          conversation: TestFactory.conversation_repository,
+          cryptography: TestFactory.cryptography_repository,
+        });
         done();
       })
       .catch(done.fail);

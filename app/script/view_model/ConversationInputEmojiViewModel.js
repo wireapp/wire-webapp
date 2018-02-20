@@ -94,7 +94,7 @@ const EMOJI_INLINE_REPLACEMENT = [
 const EMOJI_INLINE_MAX_LENGTH = Math.max(...EMOJI_INLINE_REPLACEMENT.map(item => item.shortcut.length));
 
 z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewModel {
-  constructor(properties_repository) {
+  constructor(repositories) {
     this.remove_emoji_popup = this.remove_emoji_popup.bind(this);
     this.updated_emoji_replace_preference = this.updated_emoji_replace_preference.bind(this);
 
@@ -107,7 +107,7 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
     this.emoji_start_pos = -1;
     this.emoji_usage_count = z.util.StorageUtil.get_value(z.storage.StorageKey.CONVERSATION.EMOJI_USAGE_COUNT) || {};
 
-    this.should_replace_inline_emoji = properties_repository.getPreference(
+    this.should_replace_inline_emoji = repositories.properties.getPreference(
       z.properties.PROPERTIES_TYPE.EMOJI.REPLACE_INLINE
     );
 

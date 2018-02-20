@@ -57,14 +57,15 @@ z.ViewModel.MODAL_CONSENT_TYPE = {
 };
 
 z.ViewModel.ModalsViewModel = class ModalsViewModel {
-  constructor(element_id) {
+  constructor() {
     this.logger = new z.util.Logger('z.ViewModel.ModalsViewModel', z.config.LOGGER.OPTIONS);
+    this.elementId = 'modals';
 
     this.modals = {};
 
     amplify.subscribe(z.event.WebApp.WARNING.MODAL, this.show_modal.bind(this));
 
-    ko.applyBindings(this, document.getElementById(element_id));
+    ko.applyBindings(this, document.getElementById(this.elementId));
   }
 
   /**

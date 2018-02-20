@@ -23,8 +23,9 @@ window.z = window.z || {};
 window.z.ViewModel = z.ViewModel || {};
 
 z.ViewModel.LoadingViewModel = class LoadingViewModel {
-  constructor(element_id, user_repository) {
-    this.user_repository = user_repository;
+  constructor(mainViewModel, repositories) {
+    this.elementId = 'loading-screen';
+    this.user_repository = repositories.user;
     this.loading_message = ko.observable('');
     this.loading_progress = ko.observable(0);
 
@@ -34,7 +35,7 @@ z.ViewModel.LoadingViewModel = class LoadingViewModel {
 
     amplify.subscribe(z.event.WebApp.APP.UPDATE_PROGRESS, this.update_progress.bind(this));
 
-    ko.applyBindings(this, document.getElementById(element_id));
+    ko.applyBindings(this, document.getElementById(this.elementId));
   }
 
   update_progress(progress = 0, message_locator, replace_content) {

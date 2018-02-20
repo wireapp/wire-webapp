@@ -60,7 +60,8 @@ z.ViewModel.WarningsViewModel = class WarningsViewModel {
     };
   }
 
-  constructor(element_id) {
+  constructor() {
+    this.elementId = 'warnings';
     this.logger = new z.util.Logger('z.ViewModel.WarningsViewModel', z.config.LOGGER.OPTIONS);
 
     // Array of warning banners
@@ -111,7 +112,7 @@ z.ViewModel.WarningsViewModel = class WarningsViewModel {
     amplify.subscribe(z.event.WebApp.WARNING.SHOW, this.show_warning.bind(this));
     amplify.subscribe(z.event.WebApp.WARNING.DISMISS, this.dismiss_warning.bind(this));
 
-    ko.applyBindings(this, document.getElementById(element_id));
+    ko.applyBindings(this, document.getElementById(this.elementId));
   }
 
   /**

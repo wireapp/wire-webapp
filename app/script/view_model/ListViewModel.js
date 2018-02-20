@@ -21,48 +21,25 @@
 
 window.z = window.z || {};
 window.z.ViewModel = z.ViewModel || {};
-window.z.ViewModel.list = z.ViewModel.list || {};
 
-z.ViewModel.list.ListViewModel = class ListViewModel {
+z.ViewModel.ListViewModel = class ListViewModel {
   /**
-   * View model for the list.
+   * View model for the list column.
    *
    * @param {string} element_id - HTML selector
-   * @param {z.ViewModel.ContentViewModel} content_view_model - Content view model
-   * @param {z.calling.CallingRepository} calling_repository - Calling repository
-   * @param {z.connect.ConnectRepository} connect_repository - Connect repository
-   * @param {z.conversation.ConversationRepository} conversation_repository - Conversation repository
-   * @param {z.integration.IntegrationRepository} integrationRepository - Integration repository
-   * @param {z.search.SearchRepository} search_repository - Search repository
-   * @param {z.properties.PropertiesRepository} properties_repository - Properties repository
-   * @param {z.team.TeamRepository} team_repository - Team repository
+   * @param {z.ViewModel.MainViewModel} mainViewModel - Main view model
+   * @param {Object} repositories - Object containing all the repositories
    */
-  constructor(
-    element_id,
-    content_view_model,
-    calling_repository,
-    connect_repository,
-    conversation_repository,
-    integrationRepository,
-    search_repository,
-    properties_repository,
-    team_repository
-  ) {
+  constructor(element_id, mainViewModel, repositories) {
     this.switch_list = this.switch_list.bind(this);
     this.on_context_menu = this.on_context_menu.bind(this);
 
-    this.content_view_model = content_view_model;
+    this.content_view_model = mainViewModel.content;
 
     // Repositories
-    this.calling_repository = calling_repository;
-    this.connect_repository = connect_repository;
-    this.conversation_repository = conversation_repository;
-    this.integrationRepository = integrationRepository;
-    this.search_repository = search_repository;
-    this.propertiesRepository = properties_repository;
-    this.team_repository = team_repository;
-    this.user_repository = this.conversation_repository.user_repository;
-    this.logger = new z.util.Logger('z.ViewModel.list.ListViewModel', z.config.LOGGER.OPTIONS);
+    this.conversation_repository = repositories.conversation;
+    this.user_repository = repositories.user;
+    this.logger = new z.util.Logger('z.ViewModel.ListViewModel', z.config.LOGGER.OPTIONS);
 
     // State
     this.list_state = ko.observable(z.ViewModel.list.LIST_STATE.CONVERSATIONS);
@@ -71,35 +48,11 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
     this.webapp_loaded = ko.observable(false);
 
     // Nested view models
-    /* eslint-disable no-multi-spaces */
-    this.archive = new z.ViewModel.list.ArchiveViewModel('archive', this, this.conversation_repository);
-    this.conversations = new z.ViewModel.list.ConversationListViewModel(
-      'conversations',
-      this,
-      this.content_view_model,
-      this.calling_repository,
-      this.conversation_repository,
-      this.team_repository,
-      this.user_repository
-    );
-    this.preferences = new z.ViewModel.list.PreferencesListViewModel('preferences', this, this.content_view_model);
-    this.start_ui = new z.ViewModel.list.StartUIViewModel(
-      'start-ui',
-      this,
-      this.connect_repository,
-      this.conversation_repository,
-      this.integrationRepository,
-      this.propertiesRepository,
-      this.search_repository,
-      this.team_repository,
-      this.user_repository
-    );
-    this.takeover = new z.ViewModel.list.TakeoverViewModel(
-      'takeover',
-      this.conversation_repository,
-      this.user_repository
-    );
-    /* eslint-enable no-multi-spaces */
+    this.archive = new z.ViewModel.list.ArchiveViewModel(mainViewModel, repositories);
+    this.conversations = new z.ViewModel.list.ConversationListViewModel(mainViewModel, repositories);
+    this.preferences = new z.ViewModel.list.PreferencesListViewModel(mainViewModel);
+    this.start_ui = new z.ViewModel.list.StartUIViewModel(mainViewModel, repositories);
+    this.takeover = new z.ViewModel.list.TakeoverViewModel(mainViewModel, repositories);
 
     this.self_user_picture = ko.pureComputed(() => {
       if (this.webapp_loaded() && this.user_repository.self()) {

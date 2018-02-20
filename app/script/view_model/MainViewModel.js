@@ -23,12 +23,33 @@ window.z = window.z || {};
 window.z.ViewModel = z.ViewModel || {};
 
 z.ViewModel.MainViewModel = class MainViewModel {
-  constructor(element_id, user_repository) {
-    this.user_repository = user_repository;
+  constructor(repositories) {
+    this.closePanel = this.closePanel.bind(this);
+    this.openPanel = this.openPanel.bind(this);
+    this.resize = this.resize.bind(this);
+    this.togglePanel = this.togglePanel.bind(this);
+
+    this.elementId = 'wire-main';
+    this.user_repository = repositories.user;
     this.logger = new z.util.Logger('z.ViewModel.MainViewModel', z.config.LOGGER.OPTIONS);
 
     this.user = this.user_repository.self;
     this.duration = 100;
+
+    this.isPanelOpen = ko.observable(false);
+
+    this.content = new z.ViewModel.ContentViewModel(this, repositories);
+    this.details = new z.ViewModel.DetailsViewModel(this, repositories);
+    this.list = new z.ViewModel.ListViewModel(this, repositories);
+
+    this.modals = new z.ViewModel.ModalsViewModel();
+    this.lightbox = new z.ViewModel.ImageDetailViewViewModel(this, repositories);
+    this.loading = new z.ViewModel.LoadingViewModel(this, repositories);
+    this.title = new z.ViewModel.WindowTitleViewModel(this, repositories);
+    this.warnings = new z.ViewModel.WarningsViewModel();
+
+    // backwards compatibility
+    this.conversation_list = this.list.conversations;
 
     this.main_classes = ko.pureComputed(() => {
       if (this.user()) {
@@ -38,12 +59,6 @@ z.ViewModel.MainViewModel = class MainViewModel {
     });
 
     ko.applyBindings(this, document.getElementById(element_id));
-
-    this.isPanelOpen = ko.observable(false);
-    this.togglePanel = this.togglePanel.bind(this);
-    this.openPanel = this.openPanel.bind(this);
-    this.closePanel = this.closePanel.bind(this);
-    this.togglePanel = this.togglePanel.bind(this);
   }
 
   openPanel() {

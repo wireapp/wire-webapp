@@ -26,14 +26,11 @@ window.z.ViewModel.list = z.ViewModel.list || {};
 z.ViewModel.list.PreferencesListViewModel = class PreferencesListViewModel {
   /**
    * View model for the preferences list.
-   *
-   * @param {string} element_id - HTML selector
-   * @param {z.ViewModel.list.ListViewModel} list_view_model - List view model
-   * @param {z.ViewModel.content.ContentViewModel} content_view_model - Content view model
+   * @param {z.ViewModel.ListViewModel} mainViewModel - Main view model
    */
-  constructor(element_id, list_view_model, content_view_model) {
-    this.list_view_model = list_view_model;
-    this.content_view_model = content_view_model;
+  constructor(mainViewModel) {
+    this.list_view_model = mainViewModel.list;
+    this.content_view_model = mainViewModel.content;
     this.logger = new z.util.Logger('z.ViewModel.list.PreferencesListViewModel', z.config.LOGGER.OPTIONS);
 
     this.preferences_state = this.content_view_model.content_state;

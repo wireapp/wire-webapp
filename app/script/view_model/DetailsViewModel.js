@@ -21,18 +21,21 @@
 
 window.z = window.z || {};
 window.z.ViewModel = z.ViewModel || {};
-window.z.ViewModel.content = z.ViewModel.content || {};
 
-z.ViewModel.content.PreferencesAboutViewModel = class PreferencesAboutViewModel {
+z.ViewModel.DetailsViewModel = class DetailsViewModel {
+  /**
+   * View model for the details column.
+   * @param {z.ViewModel.MainViewModel} mainViewModel - Main view model
+   * @param {Object} repositories - Object containing all repositories
+   */
   constructor(mainViewModel, repositories) {
-    this.logger = new z.util.Logger('z.ViewModel.content.PreferencesAboutViewModel', z.config.LOGGER.OPTIONS);
+    this.elementId = 'right-column';
+    this.logger = new z.util.Logger('z.ViewModel.details.DetailsViewModel', z.config.LOGGER.OPTIONS);
 
-    this.userRepository = repositories.user;
-    this.selfUser = this.userRepository.self;
-  }
+    // Nested view models
+    this.participants = new z.ViewModel.details.ParticipantsViewModel(mainViewModel, repositories);
+    this.guestOptions = new z.ViewModel.details.GuestOptionsViewModel(mainViewModel, repositories);
 
-  clickOnToU() {
-    const path = `${z.config.URL_PATH.TERMS_OF_USE}${this.selfUser().is_team_member() ? 'teams' : 'personal'}/`;
-    z.util.safe_window_open(z.util.URLUtil.build_url(z.util.URLUtil.TYPE.WEBSITE, path));
+    ko.applyBindings(this, document.getElementById(this.elementId));
   }
 };

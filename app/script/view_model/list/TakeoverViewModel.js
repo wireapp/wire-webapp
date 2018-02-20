@@ -26,14 +26,12 @@ window.z.ViewModel.list = z.ViewModel.list || {};
 z.ViewModel.list.TakeoverViewModel = class TakeoverViewModel {
   /**
    * View model for the username takeover screen.
-   *
-   * @param {string} element_id - HTML selector
-   * @param {z.conversation.ConversationRepository} conversation_repository - Conversation repository
-   * @param {z.user.UserRepository} user_repository - User repository
+   * @param {z.ViewModel.MainViewModel} mainViewModel - Main view model
+   * @param {Object} repositories - Object containing all repositories
    */
-  constructor(element_id, conversation_repository, user_repository) {
-    this.conversation_repository = conversation_repository;
-    this.user_repository = user_repository;
+  constructor(mainViewModel, repositories) {
+    this.conversation_repository = repositories.conversation;
+    this.user_repository = repositories.user;
     this.logger = new z.util.Logger('z.ViewModel.list.TakeoverViewModel', z.config.LOGGER.OPTIONS);
 
     this.self_user = this.user_repository.self;

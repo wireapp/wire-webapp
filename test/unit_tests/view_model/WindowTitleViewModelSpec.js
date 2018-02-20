@@ -32,9 +32,11 @@ describe('z.ViewModel.WindowTitleViewModel', () => {
       .then(conversation_repository => {
         const content_state = ko.observable(z.ViewModel.content.CONTENT_STATE.CONVERSATION);
         title_view_model = new z.ViewModel.WindowTitleViewModel(
-          content_state,
-          conversation_repository,
-          TestFactory.user_repository
+          {content: {content_state}},
+          {
+            conversation: conversation_repository,
+            user: TestFactory.user_repository,
+          }
         );
         done();
       })

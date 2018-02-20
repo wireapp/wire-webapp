@@ -21,18 +21,8 @@
 
 window.z = window.z || {};
 window.z.ViewModel = z.ViewModel || {};
-window.z.ViewModel.content = z.ViewModel.content || {};
+window.z.ViewModel.details = z.ViewModel.details || {};
 
-z.ViewModel.content.PreferencesAboutViewModel = class PreferencesAboutViewModel {
-  constructor(mainViewModel, repositories) {
-    this.logger = new z.util.Logger('z.ViewModel.content.PreferencesAboutViewModel', z.config.LOGGER.OPTIONS);
-
-    this.userRepository = repositories.user;
-    this.selfUser = this.userRepository.self;
-  }
-
-  clickOnToU() {
-    const path = `${z.config.URL_PATH.TERMS_OF_USE}${this.selfUser().is_team_member() ? 'teams' : 'personal'}/`;
-    z.util.safe_window_open(z.util.URLUtil.build_url(z.util.URLUtil.TYPE.WEBSITE, path));
-  }
+z.ViewModel.details.GuestOptionsViewModel = class GuestOptionsViewModel {
+  constructor() {}
 };

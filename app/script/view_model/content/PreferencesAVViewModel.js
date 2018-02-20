@@ -24,11 +24,11 @@ window.z.ViewModel = z.ViewModel || {};
 window.z.ViewModel.content = z.ViewModel.content || {};
 
 z.ViewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
-  constructor(element_id, media_repository) {
+  constructor(mainViewModel, repositories) {
     this.initiate_devices = this.initiate_devices.bind(this);
     this.release_devices = this.release_devices.bind(this);
 
-    this.media_repository = media_repository;
+    this.media_repository = repositories.media;
     this.logger = new z.util.Logger('z.ViewModel.content.PreferencesAVViewModel', z.config.LOGGER.OPTIONS);
 
     this.media_devices_handler = this.media_repository.devices_handler;

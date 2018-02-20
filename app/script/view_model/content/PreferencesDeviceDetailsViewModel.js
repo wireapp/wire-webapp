@@ -32,10 +32,10 @@ z.ViewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
     };
   }
 
-  constructor(element_id, client_repository, conversation_repository, cryptography_repository) {
-    this.client_repository = client_repository;
-    this.conversation_repository = conversation_repository;
-    this.cryptography_repository = cryptography_repository;
+  constructor(mainViewModel, repositories) {
+    this.client_repository = repositories.client;
+    this.conversation_repository = repositories.conversation;
+    this.cryptography_repository = repositories.cryptography;
     this.logger = new z.util.Logger('z.ViewModel.content.PreferencesDeviceDetailsViewModel', z.config.LOGGER.OPTIONS);
 
     this.self_user = this.client_repository.selfUser;

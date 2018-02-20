@@ -25,7 +25,7 @@ window.z.ViewModel.content = z.ViewModel.content || {};
 
 // Parent: z.ViewModel.ContentViewModel
 z.ViewModel.content.CollectionViewModel = class CollectionViewModel {
-  constructor(element_id, conversation_repository, collection_details) {
+  constructor(mainViewModel, repositories) {
     this.added_to_view = this.added_to_view.bind(this);
     this.click_on_message = this.click_on_message.bind(this);
     this.item_added = this.item_added.bind(this);
@@ -35,8 +35,8 @@ z.ViewModel.content.CollectionViewModel = class CollectionViewModel {
     this.search_in_conversation = this.search_in_conversation.bind(this);
     this.set_conversation = this.set_conversation.bind(this);
 
-    this.conversation_repository = conversation_repository;
-    this.collection_details = collection_details;
+    this.collection_details = mainViewModel.collection_details;
+    this.conversation_repository = repositories.conversation;
     this.logger = new z.util.Logger('z.ViewModel.CollectionViewModel', z.config.LOGGER.OPTIONS);
 
     this.conversation_et = ko.observable();

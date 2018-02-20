@@ -70,8 +70,6 @@ z.main.App = class App {
   // Instantiation
   //##############################################################################
 
-  /* eslint-disable no-multi-spaces */
-
   /**
    * Create all app repositories.
    * @returns {Object} All repositories
@@ -210,49 +208,8 @@ z.main.App = class App {
    * @returns {Object} All view models
    */
   _setup_view_models() {
-    const view_models = {};
-
-    view_models.main = new z.ViewModel.MainViewModel('wire-main', this.repository.user);
-    view_models.content = new z.ViewModel.content.ContentViewModel(
-      'center-column',
-      this.repository.calling,
-      this.repository.client,
-      this.repository.conversation,
-      this.repository.integration,
-      this.repository.media,
-      this.repository.properties,
-      this.repository.search,
-      this.repository.team
-    );
-    view_models.list = new z.ViewModel.list.ListViewModel(
-      'left-column',
-      view_models.content,
-      this.repository.calling,
-      this.repository.connect,
-      this.repository.conversation,
-      this.repository.integration,
-      this.repository.search,
-      this.repository.properties,
-      this.repository.team
-    );
-    view_models.title = new z.ViewModel.WindowTitleViewModel(
-      view_models.content.content_state,
-      this.repository.conversation,
-      this.repository.user
-    );
-    view_models.lightbox = new z.ViewModel.ImageDetailViewViewModel('detail-view', this.repository.conversation);
-    view_models.warnings = new z.ViewModel.WarningsViewModel('warnings');
-    view_models.modals = new z.ViewModel.ModalsViewModel('modals');
-
-    view_models.loading = new z.ViewModel.LoadingViewModel('loading-screen', this.repository.user);
-
-    // backwards compatibility
-    view_models.conversation_list = view_models.list.conversations;
-
-    return view_models;
+    return new z.ViewModel.MainViewModel(this.repository);
   }
-
-  /* eslint-enable no-multi-spaces */
 
   /**
    * Subscribe to amplify events.

@@ -35,27 +35,10 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
    * View model for the start UI.
    * @class z.ViewModel.list.StartUIViewModel
    *
-   * @param {string} elementId - HTML selector
-   * @param {z.ViewModel.list.ListViewModel} listViewModel - List view model
-   * @param {z.connect.ConnectRepository} connectRepository - Connect repository
-   * @param {z.conversation.ConversationRepository} conversationRepository - Conversation repository
-   * @param {z.integration.IntegrationRepository} integrationRepository - Integration repository
-   * @param {z.properties.PropertiesRepository} propertiesRepository - Properties repository
-   * @param {z.search.SearchRepository} searchRepository - Search repository
-   * @param {z.team.TeamRepository} teamRepository - Team repository
-   * @param {z.user.UserRepository} userRepository - User repository
+   * @param {z.ViewModel.MainViewModel} mainViewModel - Main view model
+   * @param {Object} repositories - Object containing all repositories
    */
-  constructor(
-    elementId,
-    listViewModel,
-    connectRepository,
-    conversationRepository,
-    integrationRepository,
-    propertiesRepository,
-    searchRepository,
-    teamRepository,
-    userRepository
-  ) {
+  constructor(mainViewModel, repositories) {
     this.clickOnClose = this.clickOnClose.bind(this);
     this.clickOnContact = this.clickOnContact.bind(this);
     this.clickOnConversation = this.clickOnConversation.bind(this);
@@ -71,14 +54,14 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
 
     this.handleSearchInput = this.handleSearchInput.bind(this);
 
-    this.listViewModel = listViewModel;
-    this.connectRepository = connectRepository;
-    this.conversationRepository = conversationRepository;
-    this.integrationRepository = integrationRepository;
-    this.propertiesRepository = propertiesRepository;
-    this.searchRepository = searchRepository;
-    this.teamRepository = teamRepository;
-    this.userRepository = userRepository;
+    this.listViewModel = mainViewModel.list;
+    this.connectRepository = repositories.connect;
+    this.conversationRepository = repositories.conversation;
+    this.integrationRepository = repositories.integration;
+    this.propertiesRepository = repositories.properties;
+    this.searchRepository = repositories.search;
+    this.teamRepository = repositories.team;
+    this.userRepository = repositories.user;
     this.logger = new z.util.Logger('z.ViewModel.list.StartUIViewModel', z.config.LOGGER.OPTIONS);
 
     this.selfUser = this.userRepository.self;

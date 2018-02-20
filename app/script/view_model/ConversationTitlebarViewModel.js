@@ -24,12 +24,12 @@ window.z.ViewModel = z.ViewModel || {};
 
 // Parent: z.ViewModel.ConversationTitlebarViewModel
 z.ViewModel.ConversationTitlebarViewModel = class ConversationTitlebarViewModel {
-  constructor(element_id, calling_repository, conversation_repository, multitasking) {
+  constructor(mainViewModel, repositories) {
     this.added_to_view = this.added_to_view.bind(this);
 
-    this.calling_repository = calling_repository;
-    this.conversation_repository = conversation_repository;
-    this.multitasking = multitasking;
+    this.calling_repository = repositories.calling;
+    this.conversation_repository = repositories.conversation;
+    this.multitasking = mainViewModel.content.multitasking;
     this.logger = new z.util.Logger('z.ViewModel.ConversationTitlebarViewModel', z.config.LOGGER.OPTIONS);
 
     // TODO remove the titlebar for now to ensure that buttons are clickable in macOS wrappers

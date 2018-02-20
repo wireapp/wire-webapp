@@ -23,14 +23,14 @@ window.z = window.z || {};
 window.z.ViewModel = z.ViewModel || {};
 
 z.ViewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
-  constructor(element_id, conversation_repository) {
+  constructor(mainViewModel, repositories) {
     this.before_hide_callback = this.before_hide_callback.bind(this);
     this.hide_callback = this.hide_callback.bind(this);
     this.message_added = this.message_added.bind(this);
     this.message_removed = this.message_removed.bind(this);
 
-    this.element_id = element_id;
-    this.conversation_repository = conversation_repository;
+    this.elementId = 'detail-view';
+    this.conversation_repository = repositories.conversation;
     this.source = undefined;
 
     this.image_modal = undefined;
@@ -50,7 +50,7 @@ z.ViewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
 
     amplify.subscribe(z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW, this.show.bind(this));
 
-    ko.applyBindings(this, document.getElementById(this.element_id));
+    ko.applyBindings(this, document.getElementById(this.elementId));
   }
 
   before_hide_callback() {

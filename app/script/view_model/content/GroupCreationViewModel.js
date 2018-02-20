@@ -31,15 +31,14 @@ z.ViewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
     };
   }
 
-  constructor(elementId, conversationRepository, teamRepository, userRepository) {
+  constructor(mainViewModel, repositories) {
     this.logger = new z.util.Logger('z.ViewModel.content.GroupCreationViewModel', z.config.LOGGER.OPTIONS);
 
     this.clickOnCreate = this.clickOnCreate.bind(this);
 
-    this.elementId = elementId;
-    this.conversationRepository = conversationRepository;
-    this.teamRepository = teamRepository;
-    this.userRepository = userRepository;
+    this.conversationRepository = repositories.conversation;
+    this.teamRepository = repositories.team;
+    this.userRepository = repositories.user;
 
     this.modal = undefined;
     this.state = ko.observable(GroupCreationViewModel.STATE.DEFAULT);

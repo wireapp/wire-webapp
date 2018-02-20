@@ -39,13 +39,12 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
 
   /**
    * View model for the auth page.
-   *
-   * @param {string} element_id - CSS class of the element where this view should be applied to (like "auth-page")
    * @param {z.main.Auth} auth - App authentication
    */
-  constructor(element_id, auth) {
+  constructor(auth) {
     this.click_on_remove_device_submit = this.click_on_remove_device_submit.bind(this);
 
+    this.elementId = 'auth-page';
     this.auth = auth;
     this.logger = new z.util.Logger('z.ViewModel.AuthViewModel', z.config.LOGGER.OPTIONS);
 
@@ -218,14 +217,14 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
       $('html').addClass('development');
     }
 
-    ko.applyBindings(this, document.getElementById(element_id));
+    ko.applyBindings(this, document.getElementById(this.elementId));
 
     this.tabsCheckIntervalId = undefined;
     this.previousHash = undefined;
 
     this._init_base();
     this._track_app_launch();
-    $(`.${element_id}`).show();
+    $(`.${this.elementId}`).show();
     $('.auth-page-container').css({display: 'flex'});
   }
 
@@ -1862,7 +1861,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
 
 $(() => {
   if ($('.auth-page').length) {
-    wire.auth.view = new z.ViewModel.AuthViewModel('auth-page', wire.auth);
+    wire.auth.view = new z.ViewModel.AuthViewModel(wire.auth);
   }
 });
 

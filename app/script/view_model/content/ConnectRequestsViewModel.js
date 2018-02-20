@@ -26,15 +26,15 @@ window.z.ViewModel.content = z.ViewModel.content || {};
 z.ViewModel.content.ConnectRequestsViewModel = class ConnectRequestsViewModel {
   /**
    * View model for connection requests.
-   * @param {string} element_id - HTML selector
-   * @param {z.user.UserRepository} user_repository - User repository
+   * @param {z.ViewModel.MainViewModel} mainViewModel - Main view model
+   * @param {Object} repositories - Object containing all repositories
    */
-  constructor(element_id, user_repository) {
+  constructor(mainViewModel, repositories) {
     this.after_render = this.after_render.bind(this);
     this.click_on_accept = this.click_on_accept.bind(this);
     this.click_on_ignore = this.click_on_ignore.bind(this);
 
-    this.user_repository = user_repository;
+    this.user_repository = repositories.user;
     this.logger = new z.util.Logger('z.ViewModel.content.ConnectRequestsViewModel', z.config.LOGGER.OPTIONS);
 
     this.connect_requests = this.user_repository.connect_requests;

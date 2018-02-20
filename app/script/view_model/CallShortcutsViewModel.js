@@ -27,11 +27,11 @@ window.z.ViewModel = z.ViewModel || {};
  * @todo Move functionality elsewhere and remove
  */
 z.ViewModel.CallShortcutsViewModel = class CallShortcutsViewModel {
-  constructor(calling_repository) {
+  constructor(mainViewModel, repositories) {
     this.on_mute_call = this.on_mute_call.bind(this);
     this.on_reject_call = this.on_reject_call.bind(this);
 
-    this.calling_repository = calling_repository;
+    this.calling_repository = repositories.calling;
     this.logger = new z.util.Logger('z.ViewModel.CallShortcutsViewModel', z.config.LOGGER.OPTIONS);
 
     this.joined_call = this.calling_repository.joined_call;

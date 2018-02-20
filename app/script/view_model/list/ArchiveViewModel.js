@@ -26,18 +26,16 @@ window.z.ViewModel.list = z.ViewModel.list || {};
 z.ViewModel.list.ArchiveViewModel = class ArchiveViewModel {
   /**
    * View model for the archive.
-   *
-   * @param {string} elementId - HTML selector
-   * @param {z.ViewModel.list.ListViewModel} listViewModel - List view model
-   * @param {z.conversation.ConversationRepository} conversationRepository - Conversation repository
+   * @param {z.ViewModel.MainViewModel} mainViewModel - Main view model
+   * @param {Object} repositories - Object containing all repositories
    */
-  constructor(elementId, listViewModel, conversationRepository) {
+  constructor(mainViewModel, repositories) {
     this.clickOnConversation = this.clickOnConversation.bind(this);
     this.clickOnClose = this.clickOnClose.bind(this);
     this.updateList = this.updateList.bind(this);
 
-    this.listViewModel = listViewModel;
-    this.conversationRepository = conversationRepository;
+    this.listViewModel = mainViewModel.list;
+    this.conversationRepository = repositories.conversation;
     this.logger = new z.util.Logger('z.ViewModel.list.ArchiveViewModel', z.config.LOGGER.OPTIONS);
 
     this.archivedConversations = this.conversationRepository.conversations_archived;

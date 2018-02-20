@@ -23,23 +23,17 @@ window.z = window.z || {};
 window.z.ViewModel = z.ViewModel || {};
 
 z.ViewModel.VideoCallingViewModel = class VideoCallingViewModel {
-  constructor(
-    element_id,
-    calling_repository,
-    conversation_repository,
-    media_repository,
-    user_repository,
-    multitasking
-  ) {
+  constructor(mainViewModel, repositories) {
     this.clicked_on_cancel_screen = this.clicked_on_cancel_screen.bind(this);
     this.clicked_on_choose_screen = this.clicked_on_choose_screen.bind(this);
     this.choose_shared_screen = this.choose_shared_screen.bind(this);
 
-    this.calling_repository = calling_repository;
-    this.conversation_repository = conversation_repository;
-    this.media_repository = media_repository;
-    this.user_repository = user_repository;
-    this.multitasking = multitasking;
+    this.elementId = 'video-calling';
+    this.calling_repository = repositories.calling;
+    this.conversation_repository = repositories.conversation;
+    this.media_repository = repositories.media;
+    this.user_repository = repositories.user;
+    this.multitasking = mainViewModel.content.multitasking;
     this.logger = new z.util.Logger('z.ViewModel.VideoCallingViewModel', z.config.LOGGER.OPTIONS);
 
     this.self_user = this.user_repository.self;
@@ -242,7 +236,7 @@ z.ViewModel.VideoCallingViewModel = class VideoCallingViewModel {
 
     amplify.subscribe(z.event.WebApp.CALL.MEDIA.CHOOSE_SCREEN, this.choose_shared_screen);
 
-    ko.applyBindings(this, document.getElementById(element_id));
+    ko.applyBindings(this, document.getElementById(this.elementId));
   }
 
   choose_shared_screen(conversation_id) {

@@ -24,11 +24,11 @@ window.z.ViewModel = z.ViewModel || {};
 window.z.ViewModel.content = z.ViewModel.content || {};
 
 z.ViewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewModel {
-  constructor(element_id, properties_repository, team_repository) {
+  constructor(mainViewModel, repositories) {
     this.logger = new z.util.Logger('z.ViewModel.content.PreferencesOptionsViewModel', z.config.LOGGER.OPTIONS);
 
-    this.propertiesRepository = properties_repository;
-    this.team_repository = team_repository;
+    this.propertiesRepository = repositories.properties;
+    this.team_repository = repositories.team;
 
     this.is_team = this.team_repository.isTeam;
 

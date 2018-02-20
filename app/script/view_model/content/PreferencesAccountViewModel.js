@@ -28,16 +28,16 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     return 750 * 2;
   }
 
-  constructor(element_id, client_repository, team_repository, user_repository) {
+  constructor(mainViewModel, repositories) {
     this.change_accent_color = this.change_accent_color.bind(this);
     this.check_new_clients = this.check_new_clients.bind(this);
     this.removed_from_view = this.removed_from_view.bind(this);
 
     this.logger = new z.util.Logger('z.ViewModel.content.PreferencesAccountViewModel', z.config.LOGGER.OPTIONS);
 
-    this.client_repository = client_repository;
-    this.team_repository = team_repository;
-    this.user_repository = user_repository;
+    this.client_repository = repositories.client;
+    this.team_repository = repositories.team;
+    this.user_repository = repositories.user;
 
     this.self_user = this.user_repository.self;
     this.new_clients = ko.observableArray([]);

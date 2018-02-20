@@ -26,33 +26,19 @@ window.z.ViewModel.list = z.ViewModel.list || {};
 z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
   /**
    * View model for conversation list.
-   *
-   * @param {string} element_id - HTML selector
-   * @param {z.ViewModel.list.ListViewModel} list_view_model - List view model
-   * @param {z.ViewModel.ContentViewModel} content_view_model - Content view model
-   * @param {z.calling.CallingRepository} calling_repository - Calling repository
-   * @param {z.conversation.ConversationRepository} conversation_repository - Conversation repository
-   * @param {z.team.TeamRepository} team_repository - Team repository
-   * @param {z.user.UserRepository} user_repository - User repository
+   * @param {z.ViewModel.ListViewModel} mainViewModel - Main view model
+   * @param {Object} repositories - Object containing all repositories
    */
-  constructor(
-    element_id,
-    list_view_model,
-    content_view_model,
-    calling_repository,
-    conversation_repository,
-    team_repository,
-    user_repository
-  ) {
+  constructor(mainViewModel, repositories) {
     this.click_on_conversation = this.click_on_conversation.bind(this);
     this.is_selected_conversation = this.is_selected_conversation.bind(this);
 
-    this.list_view_model = list_view_model;
-    this.content_view_model = content_view_model;
-    this.calling_repository = calling_repository;
-    this.conversation_repository = conversation_repository;
-    this.team_repository = team_repository;
-    this.user_repository = user_repository;
+    this.list_view_model = mainViewModel.list;
+    this.content_view_model = mainViewModel.content;
+    this.calling_repository = repositories.calling;
+    this.conversation_repository = repositories.conversation;
+    this.team_repository = repositories.team;
+    this.user_repository = repositories.user;
     this.logger = new z.util.Logger('z.ViewModel.list.ConversationListViewModel', z.config.LOGGER.OPTIONS);
 
     this.show_calls = ko.observable(false);
