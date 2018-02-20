@@ -34,5 +34,5 @@
     "test:longrunning": "jasmine --config=spec/support/jasmine.longrunning.json"
   },
   "types": "dist/index.d.ts",
-  "version": "7.0.5"
+  "version": "7.0.6"
 }
