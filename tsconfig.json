@@ -5,5 +5,5 @@
     "strictPropertyInitialization": false
   },
   "exclude": ["dist", "node_modules"],
-  "extends": "../../configs/tsconfig.json"
+  "extends": "../../tsconfig.json"
 }
