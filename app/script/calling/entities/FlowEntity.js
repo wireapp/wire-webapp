@@ -47,10 +47,11 @@ z.calling.entities.FlowEntity = class FlowEntity {
 
     this.callEntity = callEntity;
     this.participantEntity = participantEntity;
-    this.logger = new z.util.Logger(`z.calling.entities.FlowEntity (${this.participantEntity.id})`, z.config.LOGGER.OPTIONS);
 
     this.id = this.participantEntity.id;
     this.conversationId = this.callEntity.id;
+
+    this.logger = new z.util.Logger(`z.calling.entities.FlowEntity (${this.id})`, z.config.LOGGER.OPTIONS);
 
     // States
     this.isAnswer = ko.observable(false);
@@ -431,7 +432,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
       this.signalingState(this.peerConnection.signalingState);
 
       const logMessage = `PeerConnection with '${this.remoteUser.name()}' created - isAnswer '${this.isAnswer()}'`;
-      this.logger.debug(logMessage,pcConfiguration);
+      this.logger.debug(logMessage, pcConfiguration);
 
       this.peerConnection.onaddstream = this._onAddStream.bind(this);
       this.peerConnection.ontrack = this._onTrack.bind(this);
@@ -767,7 +768,9 @@ z.calling.entities.FlowEntity = class FlowEntity {
           }
         }
 
-        const logMessage = `Sending local '${localSdp.type}' SDP containing '${iceCandidates.length}' ICE candidates for flow with '${this.remoteUser.name()}'\n${this.localSdp().sdp}`;
+        const logMessage = `Sending local '${localSdp.type}' SDP containing '${
+          iceCandidates.length
+        }' ICE candidates for flow with '${this.remoteUser.name()}'\n${this.localSdp().sdp}`;
         this.logger.debug(logMessage);
 
         this.shouldSendLocalSdp(false);
@@ -882,7 +885,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
     this.logger.info(`Creating '${rctSdp.type}' successful`, rctSdp);
 
     z.calling.SDPMapper.rewriteSdp(rctSdp, z.calling.enum.SDP_SOURCE.LOCAL, this).then(({sdp: localSdp}) => {
-      this.localSdp(localSdp)
+      this.localSdp(localSdp);
     });
   }
 
@@ -1156,7 +1159,6 @@ z.calling.entities.FlowEntity = class FlowEntity {
           stream: mediaStream,
           videoTracks: mediaStream.getVideoTracks(),
         });
-
       }
     } else {
       throw new Error('Failed to add MediaStream: Provided MediaStream undefined');
@@ -1342,7 +1344,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
       const mediaStream = this.mediaStream().clone();
 
       z.media.MediaStreamHandler.get_media_tracks(newMediaStream, mediaType).forEach(mediaStreamTrack => {
-        mediaStream.addTrack(mediaStreamTrack)
+        mediaStream.addTrack(mediaStreamTrack);
       });
 
       return new z.media.MediaStreamInfo(z.media.MediaStreamSource.LOCAL, 'self', mediaStream);
