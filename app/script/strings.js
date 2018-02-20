@@ -353,3 +353,25 @@ export const loginStrings = defineMessages({
     defaultMessage: 'This is a public computer',
   },
 });
+
+export const clientManagerStrings = defineMessages({
+  headline: {
+    id: 'clientManager.headline',
+    defaultMessage: 'Remove a device',
+  },
+  subhead: {
+    id: 'clientManager.subhead',
+    defaultMessage: 'Remove one of your other devices to start using Wire on this one.',
+  },
+  logout: {
+    id: 'clientManager.logout',
+    defaultMessage: 'Log out',
+  },
+});
+
+export const clientItemStrings = defineMessages({
+  passwordPlaceholder: {
+    id: 'clientItem.passwordPlaceholder',
+    defaultMessage: 'Password',
+  },
+});

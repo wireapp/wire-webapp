@@ -25,6 +25,7 @@ import * as ClientAction from '../module/action/ClientAction';
 import ClientList from '../component/ClientList';
 import * as AuthAction from '../module/action/AuthAction';
 import {connect} from 'react-redux';
+import {clientManagerStrings} from '../../strings';
 
 class ClientManager extends React.Component {
   componentWillMount = () => this.props.doGetAllClients();
@@ -32,6 +33,7 @@ class ClientManager extends React.Component {
   logout = () => this.props.doLogout();
 
   render() {
+    const {intl: {formatMessage: _}} = this.props;
     return (
       <Page>
         <ContainerXS
@@ -40,10 +42,10 @@ class ClientManager extends React.Component {
           style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-around', minHeight: 428}}
         >
           <H1 center style={{marginTop: '140px'}}>
-            {'Remove a device'}
+            {_(clientManagerStrings.headline)}
           </H1>
           <Text center style={{marginBottom: '42px'}}>
-            {'Remove one of your other devices to start using Wire on this one.'}
+            {_(clientManagerStrings.subhead)}
           </Text>
           <ClientList />
           <Link
@@ -51,7 +53,7 @@ class ClientManager extends React.Component {
             style={{alignSelf: 'center', margin: '48px 0 80px 0'}}
             data-uie-name="go-sign-out"
           >
-            {'Log out'}
+            {_(clientManagerStrings.logout)}
           </Link>
         </ContainerXS>
       </Page>

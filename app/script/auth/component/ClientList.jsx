@@ -38,9 +38,7 @@ class ClientList extends React.Component {
     }
   };
 
-  removeClient = (clientId, password) => {
-    return this.props.doRemoveClient(clientId, password);
-  };
+  removeClient = (clientId, password) => this.props.doRemoveClient(clientId, password);
 
   isSelectedClient = clientId => clientId === this.state.currentlySelectedClient;
 

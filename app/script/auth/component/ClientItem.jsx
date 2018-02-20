@@ -34,6 +34,8 @@ import {
 } from '@wireapp/react-ui-kit';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 import ValidationError from '../module/action/ValidationError';
+import {clientItemStrings} from '../../strings';
+import {injectIntl} from 'react-intl';
 
 class ClientItem extends React.Component {
   static initialState = {
@@ -101,7 +103,7 @@ class ClientItem extends React.Component {
   };
 
   render() {
-    const {client, selected, clientError} = this.props;
+    const {client, selected, clientError, intl: {formatMessage: _}} = this.props;
     const {validationError, validPassword, password} = this.state;
     return (
       <ContainerXS>
@@ -135,7 +137,7 @@ class ClientItem extends React.Component {
                 <InputSubmitCombo style={{marginBottom: '0'}}>
                   <Input
                     name="password"
-                    placeholder="Password"
+                    placeholder={_(clientItemStrings.passwordPlaceholder)}
                     type="password"
                     innerRef={node => (this.passwordInput = node)}
                     markInvalid={!validPassword}
@@ -167,9 +169,9 @@ class ClientItem extends React.Component {
             </ContainerXS>
           )}
         </ContainerXS>
-        {validationError ? (
+        {validationError && selected ? (
           <div style={{margin: '16px 0 0 0'}}>{parseValidationErrors(validationError)}</div>
-        ) : clientError ? (
+        ) : clientError && selected ? (
           <ErrorMessage style={{margin: '16px 0 0 0'}} data-uie-name="error-message">
             {parseError(clientError)}
           </ErrorMessage>
@@ -179,4 +181,4 @@ class ClientItem extends React.Component {
   }
 }
 
-export default ClientItem;
+export default injectIntl(ClientItem);
