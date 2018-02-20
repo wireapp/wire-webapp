@@ -1549,11 +1549,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Send asset upload failed message to specified conversation.
    *
    * @param {Conversation} conversation_et - Conversation that should receive the file
-   * @param {string} nonce - ID of the metadata message
+   * @param {string} messageId - ID of the metadata message
    * @param {z.assets.AssetUploadFailedReason} [reason=z.assets.AssetUploadFailedReason.FAILED] - Cause for the failed upload (optional)
    * @returns {Promise} Resolves when the asset failure was sent
    */
-  send_asset_upload_failed(conversation_et, nonce, reason = z.assets.AssetUploadFailedReason.FAILED) {
+  send_asset_upload_failed(conversation_et, messageId, reason = z.assets.AssetUploadFailedReason.FAILED) {
     const reason_proto =
       reason === z.assets.AssetUploadFailedReason.CANCELLED
         ? z.proto.Asset.NotUploaded.CANCELLED
@@ -1561,7 +1561,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const asset = new z.proto.Asset();
     asset.set('not_uploaded', reason_proto);
 
-    const generic_message = new z.proto.GenericMessage(nonce);
+    const generic_message = new z.proto.GenericMessage(messageId);
     generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, asset);
 
     return this._send_and_inject_generic_message(conversation_et, generic_message);
@@ -1972,7 +1972,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         }
 
         const optimistic_event = z.conversation.EventBuilder.buildMessageAdd(conversation_et, this.timeOffset);
-        return this.cryptography_repository.cryptography_mapper.map_generic_message(generic_message, optimistic_event);
+        return this.cryptography_repository.cryptographyMapper.mapGenericMessage(generic_message, optimistic_event);
       })
       .then(message_mapped => {
         if (z.event.EventTypeHandling.STORE.includes(message_mapped.type)) {
@@ -2056,13 +2056,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
         const externalMessage = new z.proto.External(new Uint8Array(keyBytes), new Uint8Array(sha256));
         genericMessageExternal.set('external', externalMessage);
 
-        return this.cryptography_repository
-          .encrypt_generic_message(recipients, genericMessageExternal)
-          .then(payload => {
-            payload.data = z.util.array_to_base64(cipherText);
-            payload.native_push = nativePush;
-            return this._sendEncryptedMessage(conversationId, genericMessage, payload, preconditionOption);
-          });
+        return this.cryptography_repository.encryptGenericMessage(recipients, genericMessageExternal).then(payload => {
+          payload.data = z.util.array_to_base64(cipherText);
+          payload.native_push = nativePush;
+          return this._sendEncryptedMessage(conversationId, genericMessage, payload, preconditionOption);
+        });
       })
       .catch(error => {
         this.logger.info('Failed sending external message', error);
@@ -2095,7 +2093,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           );
         }
 
-        return this.cryptography_repository.encrypt_generic_message(recipients, genericMessage).then(payload => {
+        return this.cryptography_repository.encryptGenericMessage(recipients, genericMessage).then(payload => {
           payload.native_push = nativePush;
           return this._sendEncryptedMessage(conversationId, genericMessage, payload, preconditionOption);
         });
@@ -2443,9 +2441,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return this.conversation_service.update_message_in_db(message_et, {
           data: {
             content_type: asset.file_type,
-            info: {
-              nonce: message_et.nonce,
-            },
             meta: {},
           },
           ephemeral_expires: true,
@@ -2466,7 +2461,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
           data: {
             info: {
               height: asset.height,
-              nonce: message_et.nonce,
               tag: 'medium',
               width: asset.width,
             },
@@ -2499,7 +2493,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return this.conversation_service.update_message_in_db(message_et, {
           data: {
             content: obfuscated_asset.text,
-            nonce: obfuscated_asset.id,
             previews: obfuscated_previews,
           },
           ephemeral_expires: true,

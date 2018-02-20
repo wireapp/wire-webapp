@@ -107,7 +107,7 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
     this.logger.debug(`Message is missing clients of '${Object.keys(recipients).length}' users`, recipients);
 
     return this.cryptographyRepository
-      .encrypt_generic_message(recipients, genericMessage, payload)
+      .encryptGenericMessage(recipients, genericMessage, payload)
       .then(updatedPayload => {
         payload = updatedPayload;
 
