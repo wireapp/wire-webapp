@@ -341,9 +341,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
   }
 
   _mapKnock() {
-    return {
-      type: z.event.Client.CONVERSATION.KNOCK,
-    };
+    return {type: z.event.Client.CONVERSATION.KNOCK};
   }
 
   _mapLastRead(lastRead) {
