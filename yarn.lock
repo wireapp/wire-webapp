@@ -3826,12 +3826,12 @@ file-entry-cache@^2.0.0:
     flat-cache "^1.2.1"
     object-assign "^4.0.1"
 
-file-loader@1.1.6:
-  version "1.1.6"
-  resolved "https://registry.yarnpkg.com/file-loader/-/file-loader-1.1.6.tgz#7b9a8f2c58f00a77fddf49e940f7ac978a3ea0e8"
+file-loader@1.1.7:
+  version "1.1.7"
+  resolved "https://registry.yarnpkg.com/file-loader/-/file-loader-1.1.7.tgz#0a3ad0fe81695feeed6f2dac324fce500c30f0a0"
   dependencies:
     loader-utils "^1.0.2"
-    schema-utils "^0.3.0"
+    schema-utils "^0.4.5"
 
 file-sync-cmp@^0.1.0:
   version "0.1.1"
@@ -8909,6 +8909,13 @@ schema-utils@^0.4.0, schema-utils@^0.4.2, schema-utils@^0.4.3:
   dependencies:
     ajv "^5.0.0"
     ajv-keywords "^2.1.0"
+
+schema-utils@^0.4.5:
+  version "0.4.5"
+  resolved "https://registry.yarnpkg.com/schema-utils/-/schema-utils-0.4.5.tgz#21836f0608aac17b78f9e3e24daff14a5ca13a3e"
+  dependencies:
+    ajv "^6.1.0"
+    ajv-keywords "^3.1.0"
 
 script-loader@0.7.2:
   version "0.7.2"
