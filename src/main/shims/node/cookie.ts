@@ -25,13 +25,14 @@ import {RecordNotFoundError} from '@wireapp/store-engine/dist/commonjs/engine/er
 
 const COOKIE_NAME: string = 'zuid';
 
-const loadExistingCookie = (
+const loadExistingCookie = async (
   engine: CRUDEngine
 ): Promise<{
   expiration: string;
   isExpired: boolean;
   zuid: string;
 }> => {
+  await engine.init('wire');
   return engine
     .read<{
       expiration: string;

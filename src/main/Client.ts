@@ -122,19 +122,29 @@ class Client {
   }
 
   public init(): Promise<Context> {
+    let context: Context;
     return this.accessTokenStore
       .init()
       .then((accessToken: AccessTokenData | undefined) => (accessToken ? accessToken : this.auth.api.postAccess()))
+      .then((accessToken: AccessTokenData) => {
+        context = this.createContext(accessToken.user);
+        return accessToken;
+      })
       .then((accessToken: AccessTokenData) => this.accessTokenStore.updateToken(accessToken))
-      .then((accessToken: AccessTokenData) => this.createContext(accessToken.user));
+      .then(() => context);
   }
 
   public login(loginData: LoginData): Promise<Context> {
+    let context: Context;
     return Promise.resolve()
       .then(() => this.context && this.logout())
       .then(() => this.auth.api.postLogin(loginData))
+      .then((accessToken: AccessTokenData) => {
+        context = this.createContext(accessToken.user);
+        return accessToken;
+      })
       .then((accessToken: AccessTokenData) => this.accessTokenStore.updateToken(accessToken))
-      .then((accessToken: AccessTokenData) => this.createContext(accessToken.user));
+      .then(() => context);
   }
 
   public register(userAccount: RegisterData): Promise<Context> {

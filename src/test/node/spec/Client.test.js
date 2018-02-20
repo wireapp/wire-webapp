@@ -41,26 +41,26 @@ describe('Client', () => {
       const client = new Client();
       expect(client.transport.http.baseURL).toBe(Client.BACKEND.PRODUCTION.rest);
       expect(client.transport.ws.baseURL).toBe(Client.BACKEND.PRODUCTION.ws);
-      expect(client.transport.http.accessTokenStore.tokenStore).toBeDefined();
+      expect(client.transport.http.accessTokenStore.engine).toBeDefined();
     });
 
     it('constructs StoreEngine when only the URLs is provided', () => {
       const client = new Client({urls: Client.BACKEND.PRODUCTION});
       expect(client.transport.http.baseURL).toBe(Client.BACKEND.PRODUCTION.rest);
       expect(client.transport.ws.baseURL).toBe(Client.BACKEND.PRODUCTION.ws);
-      expect(client.transport.http.accessTokenStore.tokenStore).toBeDefined();
+      expect(client.transport.http.accessTokenStore.engine).toBeDefined();
     });
 
     it('constructs URLs when only the StoreEngine is provided', () => {
       const client = new Client({store: new MemoryEngine('wire-test')});
       expect(client.transport.http.baseURL).toBe(Client.BACKEND.PRODUCTION.rest);
       expect(client.transport.ws.baseURL).toBe(Client.BACKEND.PRODUCTION.ws);
-      expect(client.transport.http.accessTokenStore.tokenStore).toBeDefined();
+      expect(client.transport.http.accessTokenStore.engine).toBeDefined();
     });
   });
 
   describe('"init"', () => {
-    it('loads an access token from the storage by default', done => {
+    it('loads an access token from the storage by default', async done => {
       const client = new Client();
       const PRIMARY_KEY = AUTH_ACCESS_TOKEN_KEY;
       accessTokenData = {
@@ -70,7 +70,9 @@ describe('Client', () => {
         user: 'aaf9a833-ef30-4c22-86a0-9adc8a15b3b4',
       };
 
-      client.accessTokenStore.tokenStore
+      await client.accessTokenStore.engine.init('wire');
+
+      client.accessTokenStore.engine
         .create(AUTH_TABLE_NAME, PRIMARY_KEY, accessTokenData)
         .then(primaryKey => {
           expect(primaryKey).toBe(PRIMARY_KEY);
