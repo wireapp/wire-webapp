@@ -1602,7 +1602,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Send call message in specified conversation.
    *
    * @param {Conversation} conversation_et - Conversation to send call message to
-   * @param {CallMessage} call_message_et - Content for call message
+   * @param {z.calling.entities.CallMessageEntity} call_message_et - Content for call message
    * @param {Object} recipients - Contains the intended receiving users and clients
    * @param {Array<string>|boolean} precondition_option - Optional level that backend checks for missing clients
    * @returns {Promise} Resolves when the confirmation was sent
@@ -1611,7 +1611,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
     generic_message.set(
       z.cryptography.GENERIC_MESSAGE_TYPE.CALLING,
-      new z.proto.Calling(call_message_et.to_content_string())
+      new z.proto.Calling(call_message_et.toContentString())
     );
 
     return this.sending_queue
@@ -2941,7 +2941,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
               conversationEntity.participating_user_ids.remove(userEntity.id);
 
               if (conversationEntity.call()) {
-                amplify.publish(z.event.WebApp.CALL.STATE.PARTICIPANT_LEFT, conversationEntity.id, userEntity.id);
+                amplify.publish(z.event.WebApp.CALL.STATE.REMOVE_PARTICIPANT, conversationEntity.id, userEntity.id);
               }
             });
 
@@ -3552,7 +3552,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @private
    * @param {Conversation} conversation_et - Conversation entity
    * @param {z.proto.GenericMessage} generic_message - Protobuf message
-   * @param {CallMessage} call_message_et - Optional call message
+   * @param {z.calling.entities.CallMessageEntity} call_message_et - Optional call message
    * @returns {undefined} No return value
    */
   _track_completed_media_action(conversation_et, generic_message, call_message_et) {
@@ -3580,7 +3580,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       }
 
       case 'calling': {
-        const {props: properties} = call_message_et;
+        const {properties} = call_message_et;
         action_type = properties.videosend === z.calling.enum.PROPERTY_STATE.TRUE ? 'video_call' : 'audio_call';
         break;
       }

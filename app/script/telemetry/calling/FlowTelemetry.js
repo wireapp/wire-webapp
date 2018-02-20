@@ -29,7 +29,7 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
    *
    * @param {string} id - Flow ID
    * @param {string} remote_user_id - Remote user ID
-   * @param {z.calling.Call} call_et - Call entity
+   * @param {z.calling.entities.CallEntity} call_et - Call entity
    * @param {CallSetupTimings} timings - Timings of call setup steps
    */
   constructor(id, remote_user_id, call_et, timings) {
@@ -71,7 +71,7 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
         flow_id: this.id,
         id: this.call_et.id,
         is_answer: this.is_answer,
-        session_id: this.call_et.session_id,
+        session_id: this.call_et.sessionId,
       },
       telemetry: {
         timings: this.get_timings(),
@@ -172,7 +172,7 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
 
   /**
    * Log the flow to the browser console.
-   * @param {Participant} participant_et - Call participant
+   * @param {z.calling.entities.ParticipantEntity} participant_et - Call participant
    * @returns {undefined} No return value
    */
   log_status(participant_et) {

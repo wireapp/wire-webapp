@@ -63,16 +63,15 @@ z.ViewModel.VideoCallingViewModel = class VideoCallingViewModel {
     this.number_of_video_devices = ko.observable(0);
 
     this.calls = this.calling_repository.calls;
-    this.joined_call = this.calling_repository.joined_call;
+    this.joined_call = this.calling_repository.joinedCall;
 
     this.videod_call = ko.pureComputed(() => {
       for (const call_et of this.calls()) {
         const is_active = z.calling.enum.CALL_STATE_GROUP.IS_ACTIVE.includes(call_et.state());
         const self_video_send =
-          (call_et.self_client_joined() && this.self_stream_state.screen_send()) || this.self_stream_state.video_send();
+          (call_et.selfClientJoined() && this.self_stream_state.screenSend()) || this.self_stream_state.videoSend();
         const remote_video_send =
-          (call_et.is_remote_screen_send() || call_et.is_remote_video_send()) &&
-          !call_et.is_ongoing_on_another_client();
+          (call_et.isRemoteScreenSend() || call_et.isRemoteVideoSend()) && !call_et.isOngoingOnAnotherClient();
         const is_videod = self_video_send || remote_video_send || this.is_choosing_screen();
 
         if (is_active && is_videod) {
@@ -89,11 +88,11 @@ z.ViewModel.VideoCallingViewModel = class VideoCallingViewModel {
 
     this.overlay_icon_class = ko.pureComputed(() => {
       if (this.is_ongoing()) {
-        if (!this.self_stream_state.audio_send()) {
+        if (!this.self_stream_state.audioSend()) {
           return 'icon-mute';
         }
 
-        if (!this.self_stream_state.screen_send() && !this.self_stream_state.video_send()) {
+        if (!this.self_stream_state.screenSend() && !this.self_stream_state.videoSend()) {
           return 'icon-video-off';
         }
       }
@@ -119,8 +118,8 @@ z.ViewModel.VideoCallingViewModel = class VideoCallingViewModel {
     this.show_local_video = ko.pureComputed(() => {
       if (this.videod_call()) {
         const is_visible =
-          this.self_stream_state.screen_send() ||
-          this.self_stream_state.video_send() ||
+          this.self_stream_state.screenSend() ||
+          this.self_stream_state.videoSend() ||
           this.videod_call().state() !== z.calling.enum.CALL_STATE.ONGOING;
         return is_visible && this.local_video_stream();
       }
@@ -136,7 +135,7 @@ z.ViewModel.VideoCallingViewModel = class VideoCallingViewModel {
     this.show_remote_video = ko.pureComputed(() => {
       if (this.joined_call()) {
         const is_visible =
-          (this.joined_call().is_remote_screen_send() || this.joined_call().is_remote_video_send()) &&
+          (this.joined_call().isRemoteScreenSend() || this.joined_call().isRemoteVideoSend()) &&
           this.remote_video_stream();
         return this.is_ongoing() && is_visible;
       }
@@ -146,14 +145,14 @@ z.ViewModel.VideoCallingViewModel = class VideoCallingViewModel {
       const is_visible =
         this.local_video_stream() &&
         this.available_devices.video_input().length > 1 &&
-        this.self_stream_state.video_send();
+        this.self_stream_state.videoSend();
       return this.is_ongoing() && is_visible;
     });
     this.show_switch_screen = ko.pureComputed(() => {
       const is_visible =
         this.local_video_stream() &&
         this.available_devices.screen_input().length > 1 &&
-        this.self_stream_state.screen_send();
+        this.self_stream_state.screenSend();
       return this.is_ongoing() && is_visible;
     });
 
@@ -164,13 +163,13 @@ z.ViewModel.VideoCallingViewModel = class VideoCallingViewModel {
     });
     this.show_toggle_video = ko.pureComputed(() => {
       if (this.joined_call()) {
-        return this.joined_call().conversation_et.is_one2one();
+        return this.joined_call().conversationEntity.is_one2one();
       }
     });
-    this.show_toggle_screen = ko.pureComputed(() => z.calling.CallingRepository.supports_screen_sharing);
+    this.show_toggle_screen = ko.pureComputed(() => z.calling.CallingRepository.supportsScreenSharing);
     this.disable_toggle_screen = ko.pureComputed(() => {
       if (this.joined_call()) {
-        return this.joined_call().is_remote_screen_send();
+        return this.joined_call().isRemoteScreenSend();
       }
     });
 
@@ -197,18 +196,12 @@ z.ViewModel.VideoCallingViewModel = class VideoCallingViewModel {
     });
 
     this.available_devices.screen_input.subscribe(media_devices => {
-      if (_.isArray(media_devices)) {
-        this.number_of_screen_devices(media_devices.length);
-      } else {
-        this.number_of_screen_devices(0);
-      }
+      const numberOfDevices = _.isArray(media_devices) ? media_devices.length : 0;
+      this.number_of_screen_devices(numberOfDevices);
     });
     this.available_devices.video_input.subscribe(media_devices => {
-      if (_.isArray(media_devices)) {
-        this.number_of_video_devices(media_devices.length);
-      } else {
-        this.number_of_video_devices(0);
-      }
+      const numberOfDevices = _.isArray(media_devices) ? media_devices.length : 0;
+      this.number_of_video_devices(numberOfDevices);
     });
     this.show_remote_participant.subscribe(show_remote_participant => {
       if (this.minimize_timeout) {
@@ -247,7 +240,7 @@ z.ViewModel.VideoCallingViewModel = class VideoCallingViewModel {
 
   choose_shared_screen(conversation_id) {
     if (!this.disable_toggle_screen()) {
-      if (this.self_stream_state.screen_send() || z.util.Environment.browser.firefox) {
+      if (this.self_stream_state.screenSend() || z.util.Environment.browser.firefox) {
         amplify.publish(z.event.WebApp.CALL.MEDIA.TOGGLE, conversation_id, z.media.MediaType.SCREEN);
       } else if (z.util.Environment.desktop) {
         this.media_repository.devices_handler
@@ -257,7 +250,7 @@ z.ViewModel.VideoCallingViewModel = class VideoCallingViewModel {
               conversation_type: this.joined_call().is_group
                 ? z.tracking.attribute.ConversationType.GROUP
                 : z.tracking.attribute.ConversationType.ONE_TO_ONE,
-              kind_of_call_when_sharing: this.joined_call().is_remote_video_send() ? 'video' : 'audio',
+              kind_of_call_when_sharing: this.joined_call().isRemoteVideoSend() ? 'video' : 'audio',
               num_screens: screen_sources.length,
             });
 

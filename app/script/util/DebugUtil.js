@@ -196,7 +196,7 @@ z.util.DebugUtil = class DebugUtil {
    * @returns {undefined} No return value
    */
   log_call_messages() {
-    this.calling_repository.print_log();
+    this.calling_repository.printLog();
   }
 
   log_connection_status() {
