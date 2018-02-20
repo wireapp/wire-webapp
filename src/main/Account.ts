@@ -343,7 +343,7 @@ class Account extends EventEmitter {
 
   private initClient(context: Context, loginData: LoginData): Promise<RegisteredClient> {
     this.context = context;
-    this.service.conversation.setClientID(<string>this.context.clientID);
+    this.service.conversation.setClientID(<string>this.context.clientId);
     return this.service.crypto.loadClient().catch(error => {
       if (error instanceof RecordNotFoundError) {
         return this.registerClient(loginData);
@@ -377,14 +377,14 @@ class Account extends EventEmitter {
       .then((context: Context) => {
         if (initClient) {
           return this.initClient(context, loginData).then(client => {
-            this.apiClient.context.clientID = client.id;
+            this.apiClient.context.clientId = client.id;
           });
         }
         return undefined;
       })
       .then(() => {
         this.context = this.apiClient.context;
-        this.service.conversation.setClientID(<string>this.context.clientID);
+        this.service.conversation.setClientID(<string>this.context.clientId);
         return this.context;
       });
   }
