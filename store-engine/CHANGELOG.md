@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="0.1.15"></a>
+## [0.1.15](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/compare/@wireapp/store-engine@0.1.14...@wireapp/store-engine@0.1.15) (2018-02-20)
+
+
+
+
+**Note:** Version bump only for package @wireapp/store-engine
+
 <a name="0.1.14"></a>
 ## [0.1.14](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/compare/@wireapp/store-engine@0.1.13...@wireapp/store-engine@0.1.14) (2018-02-20)
 
