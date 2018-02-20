@@ -236,8 +236,7 @@ window.TestFactory.prototype.exposeUserActors = function() {
         TestFactory.user_service,
         TestFactory.asset_service,
         TestFactory.search_service,
-        TestFactory.client_repository,
-        TestFactory.cryptography_repository
+        TestFactory.client_repository
       );
       TestFactory.user_repository.logger.level = this.settings.logging_level;
       TestFactory.user_repository.save_user(TestFactory.client_repository.selfUser(), true);

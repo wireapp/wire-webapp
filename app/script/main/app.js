@@ -95,8 +95,7 @@ z.main.App = class App {
       this.service.user,
       this.service.asset,
       this.service.search,
-      repositories.client,
-      repositories.cryptography
+      repositories.client
     );
     repositories.event = new z.event.EventRepository(
       this.service.notification,
