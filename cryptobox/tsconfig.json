@@ -7,5 +7,5 @@
     "target": "ES5"
   },
   "exclude": ["bower_components", "dist", "node_modules"],
-  "extends": "../../configs/tsconfig.json"
+  "extends": "../../tsconfig.json"
 }

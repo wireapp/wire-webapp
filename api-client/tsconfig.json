@@ -4,5 +4,5 @@
     "rootDir": "src/main"
   },
   "exclude": ["dist/commonjs", "node_modules"],
-  "extends": "../../configs/tsconfig.json"
+  "extends": "../../tsconfig.json"
 }
