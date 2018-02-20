@@ -92,14 +92,6 @@ z.tracking.EventName = {
     OPENED_TERMS: 'navigation.opened_terms',
     OPENED_WIRE_WEBSITE: 'navigation.opened_wire_website',
   },
-  ONBOARDING: {
-    ADDED_PHOTO: 'onboarding.added_photo',
-    GENERATED_USERNAME: 'onboarding.generated_username',
-    KEPT_GENERATED_USERNAME: 'onboarding.kept_generated_username',
-    OPENED_USERNAME_FAQ: 'onboarding.opened_username_faq',
-    OPENED_USERNAME_SETTINGS: 'onboarding.opened_username_settings',
-    SEEN_USERNAME_SCREEN: 'onboarding.seen_username_screen',
-  },
   PASSWORD_RESET: 'resetPassword',
   PROFILE_PICTURE_CHANGED: 'changedProfilePicture',
   REGISTRATION: {
