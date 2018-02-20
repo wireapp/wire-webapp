@@ -2056,13 +2056,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
         const externalMessage = new z.proto.External(new Uint8Array(keyBytes), new Uint8Array(sha256));
         genericMessageExternal.set('external', externalMessage);
 
-        return this.cryptography_repository
-          .encrypt_generic_message(recipients, genericMessageExternal)
-          .then(payload => {
-            payload.data = z.util.array_to_base64(cipherText);
-            payload.native_push = nativePush;
-            return this._sendEncryptedMessage(conversationId, genericMessage, payload, preconditionOption);
-          });
+        return this.cryptography_repository.encryptGenericMessage(recipients, genericMessageExternal).then(payload => {
+          payload.data = z.util.array_to_base64(cipherText);
+          payload.native_push = nativePush;
+          return this._sendEncryptedMessage(conversationId, genericMessage, payload, preconditionOption);
+        });
       })
       .catch(error => {
         this.logger.info('Failed sending external message', error);
@@ -2095,7 +2093,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           );
         }
 
-        return this.cryptography_repository.encrypt_generic_message(recipients, genericMessage).then(payload => {
+        return this.cryptography_repository.encryptGenericMessage(recipients, genericMessage).then(payload => {
           payload.native_push = nativePush;
           return this._sendEncryptedMessage(conversationId, genericMessage, payload, preconditionOption);
         });
