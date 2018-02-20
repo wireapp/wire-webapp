@@ -2,7 +2,7 @@
   "compilerOptions": {
     "noImplicitAny": true,
     "outDir": "dist",
-    "rootDir": "src/proteus",
+    "rootDir": "src/main",
     "target": "ES6"
   },
   "exclude": ["bower_components", "node_modules", "dist"],
