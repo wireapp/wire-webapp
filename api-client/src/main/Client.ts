@@ -16,8 +16,8 @@
 // along with this program. If not, see http://www.gnu.org/licenses/.
 //
 
-import {Config} from './Config';
-import {AccessTokenData, AuthAPI, Context, LoginData, RegisterData} from './auth';
+import {Config, SchemaCallbackFunction} from './Config';
+import {AccessTokenData, AuthAPI, Context, LoginData, RegisterData, AUTH_TABLE_NAME} from './auth';
 import {AccessTokenStore} from './auth/';
 import {AssetAPI} from './asset/';
 import {Backend} from './env';
@@ -65,7 +65,7 @@ class Client {
   public VERSION: string;
 
   constructor(public config: Config = new Config()) {
-    this.config = new Config(config.store, config.urls);
+    this.config = new Config(config.store, config.urls, config.schemaCallback);
     this.accessTokenStore = new AccessTokenStore(this.config.store);
 
     const httpClient = new HttpClient(this.config.urls.rest, this.accessTokenStore);
@@ -191,11 +191,22 @@ class Client {
   }
 
   private async initEngine(context: Context) {
-    await this.config.store.init(
+    const db = await this.config.store.init(
       `${this.STORE_NAME_PREFIX}@${this.config.urls.name}@${context.userId}${
         context.clientType ? `@${context.clientType}` : ''
       }`
     );
+    const isDexieStore = db && db.constructor.name === 'Dexie';
+    const isSchemalessStore = db && Object.keys(db._dbSchema).length === 0;
+    if (isDexieStore && isSchemalessStore) {
+      if (this.config.schemaCallback) {
+        this.config.schemaCallback(db);
+      } else {
+        db.version(1).stores({
+          [AUTH_TABLE_NAME]: '',
+        });
+      }
+    }
     return this.config.store;
   }
 }

@@ -10,6 +10,7 @@ import * as path from 'path';
 import APIClient = require('@wireapp/api-client');
 import {AxiosError} from 'axios';
 import {BackendErrorLabel} from '@wireapp/api-client/dist/commonjs/http/';
+import {Config} from '@wireapp/api-client/dist/commonjs/Config';
 import {PayloadBundle} from '@wireapp/core/dist/crypto/root';
 import {RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/';
 
@@ -34,10 +35,7 @@ const conversationID = program.conversation || process.env.WIRE_CONVERSATION_ID;
 const directory = path.join(os.homedir(), '.wire-cli', loginData.email);
 const storeEngine = new StoreEngine.FileEngine(directory, {fileExtension: '.json'});
 
-const apiClient: APIClient = new APIClient({
-  urls: APIClient.BACKEND.PRODUCTION,
-  store: storeEngine,
-});
+const apiClient: APIClient = new APIClient(new Config(storeEngine, APIClient.BACKEND.PRODUCTION));
 
 const account = new Account(apiClient);
 

@@ -52,10 +52,23 @@ describe('Client', () => {
     });
 
     it('constructs URLs when only the StoreEngine is provided', () => {
-      const client = new Client({store: new MemoryEngine('wire-test')});
+      const client = new Client({store: new MemoryEngine()});
       expect(client.transport.http.baseURL).toBe(Client.BACKEND.PRODUCTION.rest);
       expect(client.transport.ws.baseURL).toBe(Client.BACKEND.PRODUCTION.ws);
       expect(client.transport.http.accessTokenStore.engine).toBeDefined();
+    });
+
+    it('constructs schema callback when provided', () => {
+      const schemaCallback = db => {
+        db.version(1).stores({
+          [AUTH_TABLE_NAME]: '',
+        });
+      };
+      const client = new Client({
+        schemaCallback,
+        store: new MemoryEngine(),
+      });
+      expect(client.config.schemaCallback).toBe(schemaCallback);
     });
   });
 

@@ -17,7 +17,10 @@
 //
 
 import {Backend} from './env';
+import {Dexie} from 'dexie';
 import {CRUDEngine, MemoryEngine} from '@wireapp/store-engine/dist/commonjs/engine';
+
+type SchemaCallbackFunction = (db: Dexie) => void;
 
 class Config {
   constructor(
@@ -26,8 +29,9 @@ class Config {
       name: string;
       rest: string;
       ws: string;
-    } = Backend.PRODUCTION
+    } = Backend.PRODUCTION,
+    public schemaCallback?: SchemaCallbackFunction
   ) {}
 }
 
-export {Config};
+export {Config, SchemaCallbackFunction};
