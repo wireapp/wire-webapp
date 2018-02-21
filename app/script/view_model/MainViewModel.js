@@ -29,17 +29,16 @@ z.viewModel.MainViewModel = class MainViewModel {
     this.togglePanel = this.togglePanel.bind(this);
 
     this.elementId = 'wire-main';
-    this.user_repository = repositories.user;
+    this.userRepository = repositories.user;
     this.logger = new z.util.Logger('z.viewModel.MainViewModel', z.config.LOGGER.OPTIONS);
 
-    this.user = this.user_repository.self;
-    this.duration = 100;
+    this.selfUser = this.userRepository.self;
 
     this.isPanelOpen = ko.observable(false);
 
     this.content = new z.viewModel.ContentViewModel(this, repositories);
-    this.panel = new z.viewModel.PanelViewModel(this, repositories);
     this.list = new z.viewModel.ListViewModel(this, repositories);
+    this.panel = new z.viewModel.PanelViewModel(this, repositories);
 
     this.modals = new z.viewModel.ModalsViewModel();
     this.lightbox = new z.viewModel.ImageDetailViewViewModel(this, repositories);
@@ -48,13 +47,10 @@ z.viewModel.MainViewModel = class MainViewModel {
     this.title = new z.viewModel.WindowTitleViewModel(this, repositories);
     this.warnings = new z.viewModel.WarningsViewModel();
 
-    // backwards compatibility
-    this.conversation_list = this.list.conversations;
-
-    this.main_classes = ko.pureComputed(() => {
-      if (this.user()) {
+    this.mainClasses = ko.pureComputed(() => {
+      if (this.selfUser()) {
         // deprecated - still used on input control hover
-        return `main-accent-color-${this.user().accent_id()} ${this.user().accent_theme()} show`;
+        return `main-accent-color-${this.selfUser().accent_id()} ${this.selfUser().accent_theme()} show`;
       }
     });
 

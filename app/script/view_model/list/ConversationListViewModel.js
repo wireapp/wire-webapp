@@ -26,15 +26,17 @@ window.z.viewModel.list = z.viewModel.list || {};
 z.viewModel.list.ConversationListViewModel = class ConversationListViewModel {
   /**
    * View model for conversation list.
-   * @param {z.viewModel.ListViewModel} mainViewModel - Main view model
+   *
+   * @param {z.viewModel.MainViewModel} mainViewModel - Main view model
+   * @param {z.viewModel.ListViewModel} listViewModel - List view model
    * @param {Object} repositories - Object containing all repositories
    */
-  constructor(mainViewModel, repositories) {
+  constructor(mainViewModel, listViewModel, repositories) {
     this.click_on_conversation = this.click_on_conversation.bind(this);
     this.is_selected_conversation = this.is_selected_conversation.bind(this);
 
-    this.list_view_model = mainViewModel.list;
     this.content_view_model = mainViewModel.content;
+    this.list_view_model = listViewModel;
     this.calling_repository = repositories.calling;
     this.conversation_repository = repositories.conversation;
     this.team_repository = repositories.team;
@@ -43,7 +45,7 @@ z.viewModel.list.ConversationListViewModel = class ConversationListViewModel {
 
     this.show_calls = ko.observable(false);
 
-    this.content_state = this.content_view_model.content_state;
+    this.content_state = this.content_view_model.contentState;
     this.selected_conversation = ko.observable();
 
     this.is_team = this.team_repository.isTeam;
@@ -110,12 +112,12 @@ z.viewModel.list.ConversationListViewModel = class ConversationListViewModel {
   }
 
   click_on_connect_requests() {
-    this.content_view_model.switch_content(z.viewModel.content.CONTENT_STATE.CONNECTION_REQUESTS);
+    this.content_view_model.switchContent(z.viewModel.content.CONTENT_STATE.CONNECTION_REQUESTS);
   }
 
   click_on_conversation(conversation_et) {
     if (!this.is_selected_conversation(conversation_et)) {
-      this.content_view_model.show_conversation(conversation_et);
+      this.content_view_model.showConversation(conversation_et);
     }
   }
 

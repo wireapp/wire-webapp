@@ -24,17 +24,19 @@ window.z.viewModel = z.viewModel || {};
 window.z.viewModel.content = z.viewModel.content || {};
 
 // Parent: z.viewModel.ContentViewModel
-z.viewModel.content.ConversationInputViewModel = class ConversationInputViewModel {
-  constructor(mainViewModel, repositories) {
+z.viewModel.content.InputBarViewModel = class InputBarViewModel {
+  constructor(mainViewModel, contentViewModel, repositories) {
     this.added_to_view = this.added_to_view.bind(this);
     this.on_drop_files = this.on_drop_files.bind(this);
     this.on_paste_files = this.on_paste_files.bind(this);
     this.on_window_click = this.on_window_click.bind(this);
     this.show_separator = this.show_separator.bind(this);
 
+    this.emojiInput = contentViewModel.emojiInput;
+
     this.conversation_repository = repositories.conversation;
     this.user_repository = repositories.user;
-    this.logger = new z.util.Logger('z.viewModel.content.ConversationInputViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger('z.viewModel.content.InputBarViewModel', z.config.LOGGER.OPTIONS);
 
     this.conversation_et = this.conversation_repository.active_conversation;
     this.conversation_et.subscribe(() => {
@@ -163,8 +165,6 @@ z.viewModel.content.ConversationInputViewModel = class ConversationInputViewMode
     $(window)
       .blur(() => this.browser_has_focus(false))
       .focus(() => this.browser_has_focus(true));
-
-    this.conversation_input_emoji = new z.viewModel.content.ConversationInputEmojiViewModel(repositories);
 
     this._init_subscriptions();
   }
@@ -391,11 +391,11 @@ z.viewModel.content.ConversationInputViewModel = class ConversationInputViewMode
   }
 
   on_input_key_up(data, keyboard_event) {
-    this.conversation_input_emoji.on_input_key_up(data, keyboard_event);
+    this.emojiInput.on_input_key_up(data, keyboard_event);
   }
 
   on_input_key_down(data, keyboard_event) {
-    if (!this.conversation_input_emoji.on_input_key_down(data, keyboard_event)) {
+    if (!this.emojiInput.on_input_key_down(data, keyboard_event)) {
       switch (keyboard_event.key) {
         case z.util.KeyboardUtil.KEY.ARROW_UP: {
           if (!this.input().length) {
@@ -443,7 +443,7 @@ z.viewModel.content.ConversationInputViewModel = class ConversationInputViewMode
   }
 
   cancel_edit() {
-    this.conversation_input_emoji.remove_emoji_popup();
+    this.emojiInput.remove_emoji_popup();
     if (this.edit_message_et()) {
       this.edit_message_et().is_editing(false);
     }
@@ -462,7 +462,7 @@ z.viewModel.content.ConversationInputViewModel = class ConversationInputViewMode
    * Returns the full localized unit string.
    *
    * @param {number} number - Number to localize
-   * @param {string} unit - Unit if type 's', 'm', 'd', 'h'
+   * @param {string} unit - Unit of type 's', 'm', 'd', 'h'
    * @returns {string} Localized unit string
    */
   _get_localized_unit_string(number, unit) {

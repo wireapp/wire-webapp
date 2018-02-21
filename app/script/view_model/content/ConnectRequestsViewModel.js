@@ -26,22 +26,22 @@ window.z.viewModel.content = z.viewModel.content || {};
 z.viewModel.content.ConnectRequestsViewModel = class ConnectRequestsViewModel {
   /**
    * View model for connection requests.
+   *
    * @param {z.viewModel.MainViewModel} mainViewModel - Main view model
+   * @param {z.viewModel.ContentViewModel} contentViewModel - Content view model
    * @param {Object} repositories - Object containing all repositories
    */
-  constructor(mainViewModel, repositories) {
-    this.after_render = this.after_render.bind(this);
-    this.click_on_accept = this.click_on_accept.bind(this);
-    this.click_on_ignore = this.click_on_ignore.bind(this);
+  constructor(mainViewModel, contentViewModel, repositories) {
+    this.afterRender = this.afterRender.bind(this);
+    this.clickOnAccept = this.clickOnAccept.bind(this);
+    this.clickOnIgnore = this.clickOnIgnore.bind(this);
 
-    this.user_repository = repositories.user;
+    this.userRepository = repositories.user;
     this.logger = new z.util.Logger('z.viewModel.content.ConnectRequestsViewModel', z.config.LOGGER.OPTIONS);
 
-    this.connect_requests = this.user_repository.connect_requests;
+    this.connectRequests = this.userRepository.connect_requests;
 
-    this.should_update_scrollbar = ko
-      .computed(() => this.connect_requests())
-      .extend({notify: 'always', rateLimit: 500});
+    this.shouldUpdateScrollbar = ko.computed(() => this.connectRequests()).extend({notify: 'always', rateLimit: 500});
   }
 
   /**
@@ -50,27 +50,28 @@ z.viewModel.content.ConnectRequestsViewModel = class ConnectRequestsViewModel {
    * @param {z.entity.User} request - Rendered connection request
    * @returns {undefined} No return value
    */
-  after_render(elements, request) {
-    if (z.util.ArrayUtil.is_last_item(this.connect_requests(), request)) {
+  afterRender(elements, request) {
+    if (z.util.ArrayUtil.is_last_item(this.connectRequests(), request)) {
       window.requestAnimationFrame(() => $('.connect-requests').scroll_to_bottom());
     }
   }
 
   /**
    * Click on accept.
-   * @param {z.entity.User} user_et - User to accept connection request from
+   * @param {z.entity.User} userEntity - User to accept connection request from
    * @returns {undefined} No return value
    */
-  click_on_accept(user_et) {
-    this.user_repository.accept_connection_request(user_et, this.connect_requests().length === 1);
+  clickOnAccept(userEntity) {
+    const showConversation = this.connectRequests().length === 1;
+    this.userRepository.accept_connection_request(userEntity, showConversation);
   }
 
   /**
    * Click on ignore.
-   * @param {z.entity.User} user_et - User to ignore connection request from
+   * @param {z.entity.User} userEntity - User to ignore connection request from
    * @returns {undefined} No return value
    */
-  click_on_ignore(user_et) {
-    this.user_repository.ignore_connection_request(user_et);
+  clickOnIgnore(userEntity) {
+    this.userRepository.ignore_connection_request(userEntity);
   }
 };

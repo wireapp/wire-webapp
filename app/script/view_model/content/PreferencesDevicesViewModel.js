@@ -24,12 +24,12 @@ window.z.viewModel = z.viewModel || {};
 window.z.viewModel.content = z.viewModel.content || {};
 
 z.viewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewModel {
-  constructor(mainViewModel, repositories) {
+  constructor(mainViewModel, contentViewModel, repositories) {
     this.click_on_remove_device = this.click_on_remove_device.bind(this);
     this.click_on_show_device = this.click_on_show_device.bind(this);
     this.update_device_info = this.update_device_info.bind(this);
 
-    this.preferences_device_details = mainViewModel.preferences_device_details;
+    this.preferences_device_details = contentViewModel.preferencesDeviceDetails;
     this.client_repository = repositories.client;
     this.conversation_repository = repositories.conversation;
     this.cryptography_repository = repositories.cryptography;

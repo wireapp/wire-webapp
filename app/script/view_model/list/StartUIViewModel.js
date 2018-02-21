@@ -36,9 +36,10 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
    * @class z.viewModel.list.StartUIViewModel
    *
    * @param {z.viewModel.MainViewModel} mainViewModel - Main view model
+   * @param {z.viewModel.ListViewModel} listViewModel - List view model
    * @param {Object} repositories - Object containing all repositories
    */
-  constructor(mainViewModel, repositories) {
+  constructor(mainViewModel, listViewModel, repositories) {
     this.clickOnClose = this.clickOnClose.bind(this);
     this.clickOnContact = this.clickOnContact.bind(this);
     this.clickOnConversation = this.clickOnConversation.bind(this);
@@ -54,7 +55,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
 
     this.handleSearchInput = this.handleSearchInput.bind(this);
 
-    this.listViewModel = mainViewModel.list;
+    this.listViewModel = listViewModel;
     this.connectRepository = repositories.connect;
     this.conversationRepository = repositories.conversation;
     this.integrationRepository = repositories.integration;

@@ -47,11 +47,11 @@ z.viewModel.ListViewModel = class ListViewModel {
     this.webapp_loaded = ko.observable(false);
 
     // Nested view models
-    this.archive = new z.viewModel.list.ArchiveViewModel(mainViewModel, repositories);
-    this.conversations = new z.viewModel.list.ConversationListViewModel(mainViewModel, repositories);
-    this.preferences = new z.viewModel.list.PreferencesListViewModel(mainViewModel);
-    this.start_ui = new z.viewModel.list.StartUIViewModel(mainViewModel, repositories);
-    this.takeover = new z.viewModel.list.TakeoverViewModel(mainViewModel, repositories);
+    this.archive = new z.viewModel.list.ArchiveViewModel(mainViewModel, this, repositories);
+    this.conversations = new z.viewModel.list.ConversationListViewModel(mainViewModel, this, repositories);
+    this.preferences = new z.viewModel.list.PreferencesListViewModel(mainViewModel, this);
+    this.start_ui = new z.viewModel.list.StartUIViewModel(mainViewModel, this, repositories);
+    this.takeover = new z.viewModel.list.TakeoverViewModel(mainViewModel, this, repositories);
 
     this.self_user_picture = ko.pureComputed(() => {
       if (this.webapp_loaded() && this.user_repository.self()) {
@@ -122,7 +122,7 @@ z.viewModel.ListViewModel = class ListViewModel {
 
   _iterate_active_conversation(reverse) {
     const is_connection_request_state =
-      this.content_view_model.content_state() === z.viewModel.content.CONTENT_STATE.CONNECTION_REQUESTS;
+      this.content_view_model.contentState() === z.viewModel.content.CONTENT_STATE.CONNECTION_REQUESTS;
     const active_conversation_item = is_connection_request_state
       ? z.viewModel.content.CONTENT_STATE.CONNECTION_REQUESTS
       : this.conversation_repository.active_conversation();
@@ -133,14 +133,14 @@ z.viewModel.ListViewModel = class ListViewModel {
     );
 
     if (next_conversation_item === z.viewModel.content.CONTENT_STATE.CONNECTION_REQUESTS) {
-      this.content_view_model.switch_content(z.viewModel.content.CONTENT_STATE.CONNECTION_REQUESTS);
+      this.content_view_model.switchContent(z.viewModel.content.CONTENT_STATE.CONNECTION_REQUESTS);
     } else if (next_conversation_item) {
       amplify.publish(z.event.WebApp.CONVERSATION.SHOW, next_conversation_item);
     }
   }
 
   _iterate_active_preference(reverse) {
-    let active_preference = this.content_view_model.content_state();
+    let active_preference = this.content_view_model.contentState();
 
     if (active_preference === z.viewModel.content.CONTENT_STATE.PREFERENCES_DEVICE_DETAILS) {
       active_preference = z.viewModel.content.CONTENT_STATE.DEVICES;
@@ -149,13 +149,13 @@ z.viewModel.ListViewModel = class ListViewModel {
     const next_preference = z.util.ArrayUtil.iterate_item(this.visible_list_items(), active_preference, reverse);
 
     if (next_preference) {
-      this.content_view_model.switch_content(next_preference);
+      this.content_view_model.switchContent(next_preference);
     }
   }
 
   open_preferences_account() {
     this.switch_list(z.viewModel.list.LIST_STATE.PREFERENCES);
-    this.content_view_model.switch_content(z.viewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT);
+    this.content_view_model.switchContent(z.viewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT);
   }
 
   open_preferences_devices(device_et) {
@@ -163,10 +163,10 @@ z.viewModel.ListViewModel = class ListViewModel {
 
     if (device_et) {
       this.content_view_model.preferences_device_details.device(device_et);
-      return this.content_view_model.switch_content(z.viewModel.content.CONTENT_STATE.PREFERENCES_DEVICE_DETAILS);
+      return this.content_view_model.switchContent(z.viewModel.content.CONTENT_STATE.PREFERENCES_DEVICE_DETAILS);
     }
 
-    return this.content_view_model.switch_content(z.viewModel.content.CONTENT_STATE.PREFERENCES_DEVICES);
+    return this.content_view_model.switchContent(z.viewModel.content.CONTENT_STATE.PREFERENCES_DEVICES);
   }
 
   open_start_ui() {
@@ -210,7 +210,7 @@ z.viewModel.ListViewModel = class ListViewModel {
         break;
       default:
         if (respect_last_state) {
-          this.content_view_model.switch_previous_content();
+          this.content_view_model.switchPreviousContent();
         }
     }
   }

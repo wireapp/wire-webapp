@@ -54,13 +54,13 @@
       <!-- /ko -->
 
       <!-- ko if: top_warning() === z.viewModel.WarningType.NOT_FOUND_CAMERA -->
-      <div class="warning-bar warning-bar-feature bg-theme">
-        <div class="warning-bar-message">
-          <span data-bind="l10n_text: z.string.warning_not_found_camera"></span>&nbsp;
-          <a class="warning-bar-link" rel="nofollow noopener noreferrer" target="_blank" data-bind="l10n_href: {support: z.config.SUPPORT.ID.DEVICE_NOT_FOUND}, l10n_text: z.string.warning_learn_more"></a>
+        <div class="warning-bar warning-bar-feature bg-theme">
+          <div class="warning-bar-message">
+            <span data-bind="l10n_text: z.string.warning_not_found_camera"></span>&nbsp;
+            <a class="warning-bar-link" rel="nofollow noopener noreferrer" target="_blank" data-bind="l10n_href: {support: z.config.SUPPORT.ID.DEVICE_NOT_FOUND}, l10n_text: z.string.warning_learn_more"></a>
+          </div>
+          <span class="warning-bar-close icon-close button-round button-round-dark" data-bind="click: close_warning"></span>
         </div>
-        <span class="warning-bar-close icon-close button-round button-round-dark" data-bind="click: close_warning"></span>
-      </div>
       <!-- /ko -->
 
       <!-- ko if: top_warning() === z.viewModel.WarningType.NOT_FOUND_MICROPHONE -->

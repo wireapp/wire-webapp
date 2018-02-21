@@ -411,7 +411,7 @@ describe('ConversationService', () => {
     });
   });
 
-  describe('search_in_conversation', () => {
+  describe('get_active_conversations_from_db', () => {
     let events = undefined;
 
     beforeEach(() => {

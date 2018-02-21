@@ -24,92 +24,96 @@ window.z.viewModel = z.viewModel || {};
 
 z.viewModel.WindowTitleViewModel = class WindowTitleViewModel {
   constructor(mainViewModel, repositories) {
-    this.content_state = mainViewModel.content.content_state;
-    this.conversation_repository = repositories.conversation_repository;
-    this.user_repository = repositories.user;
+    this.initiateTitleUpdates = this.initiateTitleUpdates.bind(this);
+
+    this.contentState = mainViewModel.content.contentState;
+    this.conversationRepository = repositories.conversation;
+    this.userRepository = repositories.user;
     this.logger = new z.util.Logger('z.viewModel.WindowTitleViewModel', z.config.LOGGER.OPTIONS);
 
-    this.update_window_title = ko.observable(false);
+    this.updateWindowTitle = ko.observable(false);
 
-    amplify.subscribe(z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, this.set_update_state.bind(this));
-    amplify.subscribe(z.event.WebApp.LIFECYCLE.LOADED, this.initiate_title_updates.bind(this));
+    amplify.subscribe(z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, this.setUpdateState.bind(this));
+    amplify.subscribe(z.event.WebApp.LIFECYCLE.LOADED, this.initiateTitleUpdates);
   }
 
-  initiate_title_updates() {
+  initiateTitleUpdates() {
+    amplify.unsubscribe(z.event.WebApp.LIFECYCLE.LOADED, this.initiateTitleUpdates);
+
     this.logger.info('Starting to update window title');
-    this.update_window_title(true);
+    this.updateWindowTitle(true);
 
     ko
       .computed(() => {
-        if (this.update_window_title()) {
-          let window_title = '';
-          let number_of_unread_conversations = 0;
-          const number_of_requests = this.user_repository.connect_requests().length;
+        if (this.updateWindowTitle()) {
+          let specificTitle = '';
+          let unreadConversations = 0;
+          const connectionRequests = this.userRepository.connect_requests().length;
 
-          this.conversation_repository.conversations_unarchived().forEach(conversation_et => {
-            const is_ignored = conversation_et.is_request() || conversation_et.is_muted();
-            if (conversation_et.unread_message_count() && !is_ignored) {
-              number_of_unread_conversations++;
+          this.conversationRepository.conversations_unarchived().forEach(conversationEntity => {
+            const isIgnored = conversationEntity.is_request() || conversationEntity.is_muted();
+            if (conversationEntity.unread_message_count() && !isIgnored) {
+              unreadConversations++;
             }
           });
 
-          this.conversation_repository.conversations_calls().forEach(conversation_et => {
-            if (conversation_et.has_joinable_call()) {
-              number_of_unread_conversations++;
+          this.conversationRepository.conversations_calls().forEach(conversationEntity => {
+            if (conversationEntity.has_joinable_call()) {
+              unreadConversations++;
             }
           });
 
-          const badge_count = number_of_requests + number_of_unread_conversations;
-          if (badge_count > 0) {
-            window_title = `(${badge_count}) · `;
+          const unreadCount = connectionRequests + unreadConversations;
+          if (unreadCount > 0) {
+            specificTitle = `(${unreadCount}) · `;
           }
 
-          amplify.publish(z.event.WebApp.LIFECYCLE.UNREAD_COUNT, badge_count);
+          amplify.publish(z.event.WebApp.LIFECYCLE.UNREAD_COUNT, unreadCount);
 
-          switch (this.content_state()) {
+          switch (this.contentState()) {
             case z.viewModel.content.CONTENT_STATE.CONNECTION_REQUESTS: {
-              if (number_of_requests > 1) {
-                window_title += z.l10n.text(z.string.conversations_connection_request_many, number_of_requests);
-              } else {
-                window_title += z.l10n.text(z.string.conversations_connection_request_one);
-              }
+              const multipleRequests = connectionRequests > 1;
+              const stringId = multipleRequests
+                ? z.string.conversations_connection_request_many
+                : z.string.conversations_connection_request_one;
+              specificTitle += z.l10n.text(stringId, connectionRequests);
               break;
             }
 
             case z.viewModel.content.CONTENT_STATE.CONVERSATION: {
-              if (this.conversation_repository.active_conversation()) {
-                window_title += this.conversation_repository.active_conversation().display_name();
+              if (this.conversationRepository.active_conversation()) {
+                specificTitle += this.conversationRepository.active_conversation().display_name();
               }
               break;
             }
 
             case z.viewModel.content.CONTENT_STATE.PREFERENCES_ABOUT: {
-              window_title += z.l10n.text(z.string.preferences_about);
+              specificTitle += z.l10n.text(z.string.preferences_about);
               break;
             }
 
             case z.viewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT: {
-              window_title += z.l10n.text(z.string.preferences_account);
+              specificTitle += z.l10n.text(z.string.preferences_account);
               break;
             }
 
             case z.viewModel.content.CONTENT_STATE.PREFERENCES_AV: {
-              window_title += z.l10n.text(z.string.preferences_av);
+              specificTitle += z.l10n.text(z.string.preferences_av);
               break;
             }
 
             case z.viewModel.content.CONTENT_STATE.PREFERENCES_DEVICE_DETAILS: {
-              window_title += z.l10n.text(z.string.preferences_device_details);
+              specificTitle += z.l10n.text(z.string.preferences_device_details);
               break;
             }
 
             case z.viewModel.content.CONTENT_STATE.PREFERENCES_DEVICES: {
-              window_title += z.l10n.text(z.string.preferences_devices);
+              specificTitle += z.l10n.text(z.string.preferences_devices);
               break;
             }
 
             case z.viewModel.content.CONTENT_STATE.PREFERENCES_OPTIONS: {
-              window_title += z.l10n.text(z.string.preferences_options);
+              specificTitle += z.l10n.text(z.string.preferences_options);
               break;
             }
 
@@ -117,23 +121,20 @@ z.viewModel.WindowTitleViewModel = class WindowTitleViewModel {
               break;
           }
 
-          if (window_title !== '' && !window_title.endsWith(' ')) {
-            window_title += ' · ';
-          }
-          window_title += z.l10n.text(z.string.wire);
-
-          window.document.title = window_title;
+          const isTitleSet = specificTitle !== '' && !specificTitle.endsWith(' ');
+          window.document.title = `${specificTitle}${isTitleSet ? ' · ' : ''}${z.l10n.text(z.string.wire)}`;
         }
       })
       .extend({rateLimit: 250});
   }
 
-  set_update_state(handling_notifications) {
-    const update_window_title = handling_notifications === z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
+  setUpdateState(handlingNotifications) {
+    const updateWindowTitle = handlingNotifications === z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
 
-    if (this.update_window_title() !== update_window_title) {
-      this.update_window_title(update_window_title);
-      this.logger.debug(`Set window title update state to '${this.update_window_title()}'`);
+    const updateUnchanged = this.updateWindowTitle() === updateWindowTitle;
+    if (!updateUnchanged) {
+      this.updateWindowTitle(updateWindowTitle);
+      this.logger.debug(`Set window title update state to '${this.updateWindowTitle()}'`);
     }
   }
 };

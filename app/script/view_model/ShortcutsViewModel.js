@@ -24,30 +24,27 @@ window.z.viewModel = z.viewModel || {};
 
 z.viewModel.ShortcutsViewModel = class ShortcutsViewModel {
   constructor(mainViewModel, repositories) {
-    this.on_mute_call = this.on_mute_call.bind(this);
-    this.on_reject_call = this.on_reject_call.bind(this);
+    this.onMuteCall = this.onMuteCall.bind(this);
+    this.onRejectCall = this.onRejectCall.bind(this);
 
-    this.calling_repository = repositories.calling;
+    this.callingRepository = repositories.calling;
     this.logger = new z.util.Logger('z.viewModel.ShortcutsViewModel', z.config.LOGGER.OPTIONS);
 
-    this.joined_call = this.calling_repository.joinedCall;
-
-    this.joined_call.subscribe(call_et => {
-      this._update_shortcut_subscription(call_et);
-    });
+    this.joinedCall = this.callingRepository.joinedCall;
+    this.joinedCall.subscribe(callEntity => this._update_shortcut_subscription(callEntity));
   }
 
-  _update_shortcut_subscription(call_et) {
-    this._unsubscribe_shortcuts();
+  _update_shortcut_subscription(callEntity) {
+    this._unsubscribeShortcuts();
 
-    if (call_et) {
-      switch (call_et.state()) {
+    if (callEntity) {
+      switch (callEntity.state()) {
         case z.calling.enum.CALL_STATE.ONGOING:
         case z.calling.enum.CALL_STATE.OUTGOING:
-          this._subscribe_shortcuts_outgoing_ongoing();
+          this._subscribeOutgoingOrOngoingCall();
           break;
         case z.calling.enum.CALL_STATE.INCOMING:
-          this._subscribe_shortcuts_incoming();
+          this._subscribeIncomingCall();
           break;
         default:
           break;
@@ -55,28 +52,28 @@ z.viewModel.ShortcutsViewModel = class ShortcutsViewModel {
     }
   }
 
-  _subscribe_shortcuts_incoming() {
-    amplify.subscribe(z.event.WebApp.SHORTCUT.CALL_REJECT, this.on_reject_call);
+  _subscribeIncomingCall() {
+    amplify.subscribe(z.event.WebApp.SHORTCUT.CALL_REJECT, this.onRejectCall);
   }
 
-  _subscribe_shortcuts_outgoing_ongoing() {
-    amplify.subscribe(z.event.WebApp.SHORTCUT.CALL_MUTE, this.on_mute_call);
+  _subscribeOutgoingOrOngoingCall() {
+    amplify.subscribe(z.event.WebApp.SHORTCUT.CALL_MUTE, this.onMuteCall);
   }
 
-  _unsubscribe_shortcuts() {
-    amplify.unsubscribe(z.event.WebApp.SHORTCUT.CALL_MUTE, this.on_mute_call);
-    amplify.unsubscribe(z.event.WebApp.SHORTCUT.CALL_REJECT, this.on_reject_call);
+  _unsubscribeShortcuts() {
+    amplify.unsubscribe(z.event.WebApp.SHORTCUT.CALL_MUTE, this.onMuteCall);
+    amplify.unsubscribe(z.event.WebApp.SHORTCUT.CALL_REJECT, this.onRejectCall);
   }
 
-  on_mute_call() {
-    if (this.joined_call()) {
-      amplify.publish(z.event.WebApp.CALL.MEDIA.TOGGLE, this.joined_call().id, z.media.MediaType.AUDIO);
+  onMuteCall() {
+    if (this.joinedCall()) {
+      amplify.publish(z.event.WebApp.CALL.MEDIA.TOGGLE, this.joinedCall().id, z.media.MediaType.AUDIO);
     }
   }
 
-  on_reject_call() {
-    if (this.joined_call()) {
-      amplify.publish(z.event.WebApp.CALL.STATE.REJECT, this.joined_call().id);
+  onRejectCall() {
+    if (this.joinedCall()) {
+      amplify.publish(z.event.WebApp.CALL.STATE.REJECT, this.joinedCall().id);
     }
   }
 };

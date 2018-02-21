@@ -94,8 +94,8 @@ const EMOJI_INLINE_REPLACEMENT = [
 
 const EMOJI_INLINE_MAX_LENGTH = Math.max(...EMOJI_INLINE_REPLACEMENT.map(item => item.shortcut.length));
 
-z.viewModel.content.ConversationInputEmojiViewModel = class ConversationInputEmojiViewModel {
-  constructor(repositories) {
+z.viewModel.content.EmojiInputViewModel = class EmojiInputViewModel {
+  constructor(mainViewModel, contentViewModel, repositories) {
     this.remove_emoji_popup = this.remove_emoji_popup.bind(this);
     this.updated_emoji_replace_preference = this.updated_emoji_replace_preference.bind(this);
 

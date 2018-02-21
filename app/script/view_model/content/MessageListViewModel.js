@@ -31,7 +31,7 @@ window.z.viewModel.content = z.viewModel.content || {};
  * @todo Remove all jquery selectors
  */
 z.viewModel.content.MessageListViewModel = class MessageListViewModel {
-  constructor(mainViewModel, repositories) {
+  constructor(mainViewModel, contentViewModel, repositories) {
     this._on_message_add = this._on_message_add.bind(this);
     this.click_on_cancel_request = this.click_on_cancel_request.bind(this);
     this.click_on_like = this.click_on_like.bind(this);

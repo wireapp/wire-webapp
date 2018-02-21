@@ -33,8 +33,8 @@ z.viewModel.PanelViewModel = class PanelViewModel {
     this.logger = new z.util.Logger('z.viewModel.PanelViewModel', z.config.LOGGER.OPTIONS);
 
     // Nested view models
-    this.participants = new z.viewModel.panel.ParticipantsViewModel(mainViewModel, repositories);
-    this.guestOptions = new z.viewModel.panel.GuestOptionsViewModel(mainViewModel, repositories);
+    this.participants = new z.viewModel.panel.ParticipantsViewModel(mainViewModel, this, repositories);
+    this.guestOptions = new z.viewModel.panel.GuestOptionsViewModel(mainViewModel, this, repositories);
 
     ko.applyBindings(this, document.getElementById(this.elementId));
   }

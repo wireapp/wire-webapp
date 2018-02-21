@@ -23,7 +23,7 @@ window.z = window.z || {};
 window.z.viewModel.content = z.viewModel.content || {};
 
 z.viewModel.content.VideoCallingViewModel = class VideoCallingViewModel {
-  constructor(contentViewModel, repositories) {
+  constructor(mainViewModel, contentViewModel, repositories) {
     this.clicked_on_cancel_screen = this.clicked_on_cancel_screen.bind(this);
     this.clicked_on_choose_screen = this.clicked_on_choose_screen.bind(this);
     this.choose_shared_screen = this.choose_shared_screen.bind(this);
@@ -105,7 +105,7 @@ z.viewModel.content.VideoCallingViewModel = class VideoCallingViewModel {
     this.show_local = ko.pureComputed(() => {
       return (
         (this.show_local_video() || this.overlay_icon_class()) &&
-        !this.multitasking.is_minimized() &&
+        !this.multitasking.isMinimized() &&
         !this.is_choosing_screen()
       );
     });
@@ -123,7 +123,7 @@ z.viewModel.content.VideoCallingViewModel = class VideoCallingViewModel {
       return this.show_remote_video() || this.show_remote_participant() || this.is_choosing_screen();
     });
     this.show_remote_participant = ko.pureComputed(() => {
-      const is_visible = this.remote_user() && !this.multitasking.is_minimized() && !this.is_choosing_screen();
+      const is_visible = this.remote_user() && !this.multitasking.isMinimized() && !this.is_choosing_screen();
       return this.is_ongoing() && !this.show_remote_video() && is_visible;
     });
     this.show_remote_video = ko.pureComputed(() => {
@@ -152,7 +152,7 @@ z.viewModel.content.VideoCallingViewModel = class VideoCallingViewModel {
 
     this.show_controls = ko.pureComputed(() => {
       const is_visible =
-        this.show_remote_video() || (this.show_remote_participant() && !this.multitasking.is_minimized());
+        this.show_remote_video() || (this.show_remote_participant() && !this.multitasking.isMinimized());
       return this.is_ongoing() && is_visible;
     });
     this.show_toggle_video = ko.pureComputed(() => {
@@ -178,13 +178,13 @@ z.viewModel.content.VideoCallingViewModel = class VideoCallingViewModel {
             return this.logger.info(`Maximizing video call '${joined_call.id}' to full-screen`, joined_call);
           }
 
-          this.multitasking.is_minimized(true);
+          this.multitasking.isMinimized(true);
           this.logger.info(`Minimizing audio call '${joined_call.id}' from full-screen`, joined_call);
         }
       } else {
         this.visible_call_id = undefined;
-        this.multitasking.auto_minimize(true);
-        this.multitasking.is_minimized(false);
+        this.multitasking.autoMinimize(true);
+        this.multitasking.isMinimized(false);
         this.logger.info('Resetting full-screen calling to maximize');
       }
     });
@@ -205,7 +205,7 @@ z.viewModel.content.VideoCallingViewModel = class VideoCallingViewModel {
 
       if (
         show_remote_participant &&
-        this.multitasking.auto_minimize() &&
+        this.multitasking.autoMinimize() &&
         this.videod_call() &&
         !this.is_choosing_screen()
       ) {
@@ -218,7 +218,7 @@ z.viewModel.content.VideoCallingViewModel = class VideoCallingViewModel {
         );
         this.minimize_timeout = window.setTimeout(() => {
           if (!this.is_choosing_screen()) {
-            this.multitasking.is_minimized(true);
+            this.multitasking.isMinimized(true);
           }
           this.logger.info(
             `Minimizing call '${this.videod_call().id}' on timeout as remote user '${remote_user_name}' is not videod`
@@ -250,9 +250,9 @@ z.viewModel.content.VideoCallingViewModel = class VideoCallingViewModel {
 
             if (screen_sources.length > 1) {
               this.is_choosing_screen(true);
-              if (this.multitasking.is_minimized()) {
-                this.multitasking.reset_minimize(true);
-                this.multitasking.is_minimized(false);
+              if (this.multitasking.isMinimized()) {
+                this.multitasking.resetMinimize(true);
+                this.multitasking.isMinimized(false);
               }
             } else {
               amplify.publish(z.event.WebApp.CALL.MEDIA.TOGGLE, conversation_id, z.media.MediaType.SCREEN);
@@ -299,9 +299,9 @@ z.viewModel.content.VideoCallingViewModel = class VideoCallingViewModel {
     this.current_device_id.screen_input(screen_source.id);
     amplify.publish(z.event.WebApp.CALL.MEDIA.TOGGLE, this.joined_call().id, z.media.MediaType.SCREEN);
 
-    if (this.multitasking.reset_minimize()) {
-      this.multitasking.is_minimized(true);
-      this.multitasking.reset_minimize(false);
+    if (this.multitasking.resetMinimize()) {
+      this.multitasking.isMinimized(true);
+      this.multitasking.resetMinimize(false);
       this.logger.info(`Minimizing call '${this.joined_call().id}' on screen selection to return to previous state`);
     }
   }
@@ -321,12 +321,12 @@ z.viewModel.content.VideoCallingViewModel = class VideoCallingViewModel {
   }
 
   clicked_on_minimize() {
-    this.multitasking.is_minimized(true);
+    this.multitasking.isMinimized(true);
     this.logger.info(`Minimizing call '${this.videod_call().id}' on user click`);
   }
 
   clicked_on_maximize() {
-    this.multitasking.is_minimized(false);
+    this.multitasking.isMinimized(false);
     this.logger.info(`Maximizing call '${this.videod_call().id}' on user click`);
   }
 

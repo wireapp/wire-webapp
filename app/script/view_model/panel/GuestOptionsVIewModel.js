@@ -24,5 +24,5 @@ window.z.viewModel = z.viewModel || {};
 window.z.viewModel.panel = z.viewModel.panel || {};
 
 z.viewModel.panel.GuestOptionsViewModel = class GuestOptionsViewModel {
-  constructor() {}
+  constructor(mainViewModel, panelViewModel, repositories) {}
 };

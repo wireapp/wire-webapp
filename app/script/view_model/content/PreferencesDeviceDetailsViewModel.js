@@ -32,7 +32,7 @@ z.viewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
     };
   }
 
-  constructor(mainViewModel, repositories) {
+  constructor(mainViewModel, contentViewModel, repositories) {
     this.client_repository = repositories.client;
     this.conversation_repository = repositories.conversation;
     this.cryptography_repository = repositories.cryptography;

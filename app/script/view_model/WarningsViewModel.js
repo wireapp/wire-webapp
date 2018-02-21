@@ -66,13 +66,7 @@ z.viewModel.WarningsViewModel = class WarningsViewModel {
 
     // Array of warning banners
     this.warnings = ko.observableArray();
-    this.top_warning = ko.pureComputed(
-      () => {
-        return this.warnings()[this.warnings().length - 1];
-      },
-      this,
-      {deferEvaluation: true}
-    );
+    this.top_warning = ko.pureComputed(() => this.warnings()[this.warnings().length - 1]);
 
     this.warnings.subscribe(warnings => {
       let top_margin;
@@ -94,18 +88,14 @@ z.viewModel.WarningsViewModel = class WarningsViewModel {
     this.first_name = ko.observable();
 
     this.warning_dimmed = ko
-      .pureComputed(
-        () => {
-          for (const warning of this.warnings()) {
-            if (WarningsViewModel.CONFIG.DIMMED_MODES.includes(warning)) {
-              return true;
-            }
+      .pureComputed(() => {
+        for (const warning of this.warnings()) {
+          if (WarningsViewModel.CONFIG.DIMMED_MODES.includes(warning)) {
+            return true;
           }
-          return false;
-        },
-        this,
-        {deferEvaluation: true}
-      )
+        }
+        return false;
+      })
       .extend({rateLimit: 200});
 
     amplify.subscribe(z.event.WebApp.WARNING.SHOW, this.show_warning.bind(this));

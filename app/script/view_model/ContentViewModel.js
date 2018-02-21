@@ -24,106 +24,108 @@ window.z.viewModel = z.viewModel || {};
 
 z.viewModel.ContentViewModel = class ContentViewModel {
   constructor(mainViewModel, repositories) {
-    this.show_conversation = this.show_conversation.bind(this);
-    this.switch_content = this.switch_content.bind(this);
-    this.switch_previous_content = this.switch_previous_content.bind(this);
+    this.showConversation = this.showConversation.bind(this);
+    this.switchContent = this.switchContent.bind(this);
+    this.switchPreviousContent = this.switchPreviousContent.bind(this);
 
     this.elementId = 'center-column';
     this.mainViewModel = mainViewModel;
-    this.conversation_repository = repositories.conversation;
-    this.user_repository = repositories.user;
+    this.conversationRepository = repositories.conversation;
+    this.userRepository = repositories.user;
     this.logger = new z.util.Logger('z.viewModel.ContentViewModel', z.config.LOGGER.OPTIONS);
 
     // State
-    this.content_state = ko.observable(z.viewModel.content.CONTENT_STATE.WATERMARK);
+    this.contentState = ko.observable(z.viewModel.content.CONTENT_STATE.WATERMARK);
     this.multitasking = {
-      auto_minimize: ko.observable(true),
-      is_minimized: ko.observable(false),
-      reset_minimize: ko.observable(false),
+      autoMinimize: ko.observable(true),
+      isMinimized: ko.observable(false),
+      resetMinimize: ko.observable(false),
     };
 
     // Nested view models
-    this.collection_details = new z.viewModel.content.CollectionDetailsViewModel();
-    this.collection = new z.viewModel.content.CollectionViewModel(mainViewModel, repositories);
-    this.connect_requests = new z.viewModel.content.ConnectRequestsViewModel(mainViewModel, repositories);
-    this.conversation_input = new z.viewModel.content.ConversationInputViewModel(mainViewModel, repositories);
-    this.conversation_titlebar = new z.viewModel.content.ConversationTitlebarViewModel(this, repositories);
-    this.giphy = new z.viewModel.content.GiphyViewModel(mainViewModel, repositories);
-    this.groupCreation = new z.viewModel.content.GroupCreationViewModel(mainViewModel, repositories);
-    this.message_list = new z.viewModel.content.MessageListViewModel(mainViewModel, repositories);
-    this.video_calling = new z.viewModel.content.VideoCallingViewModel(this, repositories);
+    this.collectionDetails = new z.viewModel.content.CollectionDetailsViewModel();
+    this.collection = new z.viewModel.content.CollectionViewModel(mainViewModel, this, repositories);
+    this.connectRequests = new z.viewModel.content.ConnectRequestsViewModel(mainViewModel, this, repositories);
+    this.emojiInput = new z.viewModel.content.EmojiInputViewModel(mainViewModel, this, repositories);
+    this.giphy = new z.viewModel.content.GiphyViewModel(mainViewModel, this, repositories);
+    this.inputBar = new z.viewModel.content.InputBarViewModel(mainViewModel, this, repositories);
+    this.groupCreation = new z.viewModel.content.GroupCreationViewModel(mainViewModel, this, repositories);
+    this.messageList = new z.viewModel.content.MessageListViewModel(mainViewModel, this, repositories);
+    this.titleBar = new z.viewModel.content.TitleBarViewModel(mainViewModel, this, repositories);
+    this.videoCalling = new z.viewModel.content.VideoCallingViewModel(mainViewModel, this, repositories);
 
-    this.preferencesAbout = new z.viewModel.content.PreferencesAboutViewModel(mainViewModel, repositories);
-    this.preferences_account = new z.viewModel.content.PreferencesAccountViewModel(mainViewModel, repositories);
-    this.preferences_av = new z.viewModel.content.PreferencesAVViewModel(mainViewModel, repositories);
-    this.preferences_device_details = new z.viewModel.content.PreferencesDeviceDetailsViewModel(
+    this.preferencesAbout = new z.viewModel.content.PreferencesAboutViewModel(mainViewModel, this, repositories);
+    this.preferencesAccount = new z.viewModel.content.PreferencesAccountViewModel(mainViewModel, this, repositories);
+    this.preferencesAv = new z.viewModel.content.PreferencesAVViewModel(mainViewModel, this, repositories);
+    this.preferencesDeviceDetails = new z.viewModel.content.PreferencesDeviceDetailsViewModel(
       mainViewModel,
+      this,
       repositories
     );
-    this.preferences_devices = new z.viewModel.content.PreferencesDevicesViewModel(mainViewModel, repositories);
-    this.preferences_options = new z.viewModel.content.PreferencesOptionsViewModel(mainViewModel, repositories);
+    this.preferencesDevices = new z.viewModel.content.PreferencesDevicesViewModel(mainViewModel, this, repositories);
+    this.preferencesOptions = new z.viewModel.content.PreferencesOptionsViewModel(mainViewModel, this, repositories);
 
-    this.previous_state = undefined;
-    this.previous_conversation = undefined;
+    this.previousState = undefined;
+    this.previousConversation = undefined;
 
-    this.content_state.subscribe(content_state => {
-      switch (content_state) {
+    this.contentState.subscribe(contentState => {
+      switch (contentState) {
         case z.viewModel.content.CONTENT_STATE.CONVERSATION:
-          this.conversation_input.added_to_view();
-          this.conversation_titlebar.added_to_view();
+          this.inputBar.added_to_view();
+          this.titleBar.addedToView();
           break;
         case z.viewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT:
-          this.preferences_account.check_new_clients();
+          this.preferencesAccount.check_new_clients();
           break;
         case z.viewModel.content.CONTENT_STATE.PREFERENCES_AV:
-          this.preferences_av.initiate_devices();
+          this.preferencesAv.initiateDevices();
           break;
         case z.viewModel.content.CONTENT_STATE.PREFERENCES_DEVICES:
-          this.preferences_devices.update_device_info();
+          this.preferencesDevices.update_device_info();
           break;
         case z.viewModel.content.CONTENT_STATE.COLLECTION:
-          this.collection.set_conversation(this.previous_conversation);
+          this.collection.setConversation(this.previousConversation);
           break;
         default:
-          this.conversation_input.removed_from_view();
-          this.conversation_titlebar.removed_from_view();
+          this.inputBar.removed_from_view();
+          this.titleBar.removedFromView();
       }
     });
 
-    this.user_repository.connect_requests.subscribe(requests => {
-      const requests_state = this.content_state() === z.viewModel.content.CONTENT_STATE.CONNECTION_REQUESTS;
-      if (requests_state && !requests.length) {
-        this.show_conversation(this.conversation_repository.getMostRecentConversation());
+    this.userRepository.connect_requests.subscribe(requests => {
+      const isStateRequests = this.contentState() === z.viewModel.content.CONTENT_STATE.CONNECTION_REQUESTS;
+      if (isStateRequests && !requests.length) {
+        this.showConversation(this.conversationRepository.getMostRecentConversation());
       }
     });
 
-    this._init_subscriptions();
+    this._initSubscriptions();
 
     ko.applyBindings(this, document.getElementById(this.elementId));
   }
 
-  _init_subscriptions() {
-    amplify.subscribe(z.event.WebApp.CONTENT.SWITCH, this.switch_content.bind(this));
-    amplify.subscribe(z.event.WebApp.CONVERSATION.SHOW, this.show_conversation.bind(this));
-    amplify.subscribe(z.event.WebApp.LIST.SCROLL, this.conversation_input.show_separator);
-    amplify.subscribe(z.event.WebApp.WINDOW.RESIZE.HEIGHT, this.message_list.scroll_height);
+  _initSubscriptions() {
+    amplify.subscribe(z.event.WebApp.CONTENT.SWITCH, this.switchContent.bind(this));
+    amplify.subscribe(z.event.WebApp.CONVERSATION.SHOW, this.showConversation.bind(this));
+    amplify.subscribe(z.event.WebApp.LIST.SCROLL, this.inputBar.show_separator);
+    amplify.subscribe(z.event.WebApp.WINDOW.RESIZE.HEIGHT, this.messageList.scroll_height);
   }
 
   /**
    * Slide in specified content.
-   * @param {string} content_selector - DOM element to apply slide in animation
+   * @param {string} contentSelector - DOM element to apply slide in animation
    * @returns {undefined} No return value
    */
-  _shift_content(content_selector) {
-    const incoming_css_class = 'content-animation-incoming-horizontal-left';
+  _shiftContent(contentSelector) {
+    const incomingCssClass = 'content-animation-incoming-horizontal-left';
 
-    $(content_selector)
-      .removeClass(incoming_css_class)
+    $(contentSelector)
+      .removeClass(incomingCssClass)
       .off(z.util.alias.animationend)
-      .addClass(incoming_css_class)
+      .addClass(incomingCssClass)
       .one(z.util.alias.animationend, function() {
         $(this)
-          .removeClass(incoming_css_class)
+          .removeClass(incomingCssClass)
           .off(z.util.alias.animationend);
       });
   }
@@ -134,13 +136,13 @@ z.viewModel.ContentViewModel = class ContentViewModel {
    * @note If the conversation_et is not defined, it will open the incoming connection requests instead
    *  Conversation_et can also just be the conversation ID
    *
-   * @param {Conversation|string} conversation - Conversation entity or conversation ID
-   * @param {z.entity.Message} [messageEt] - Message to scroll to
+   * @param {z.entity.Conversation|string} conversation - Conversation entity or conversation ID
+   * @param {z.entity.Message} [messageEntity] - Message to scroll to
    * @returns {undefined} No return value
    */
-  show_conversation(conversation, messageEt) {
+  showConversation(conversation, messageEntity) {
     if (!conversation) {
-      return this.switch_content(z.viewModel.content.CONTENT_STATE.CONNECTION_REQUESTS);
+      return this.switchContent(z.viewModel.content.CONTENT_STATE.CONNECTION_REQUESTS);
     }
 
     const isConversation = typeof conversation === 'object' && conversation.id;
@@ -151,60 +153,64 @@ z.viewModel.ContentViewModel = class ContentViewModel {
 
     const conversationPromise = isConversation
       ? Promise.resolve(conversation)
-      : this.conversation_repository.get_conversation_by_id(conversation);
+      : this.conversationRepository.get_conversation_by_id(conversation);
 
-    conversationPromise.then(conversationEt => {
-      const isActiveConversation = conversationEt === this.conversation_repository.active_conversation();
-      const isConversationState = this.content_state() === z.viewModel.content.CONTENT_STATE.CONVERSATION;
+    conversationPromise.then(conversationEntity => {
+      const isActiveConversation = conversationEntity === this.conversationRepository.active_conversation();
+      const isConversationState = this.contentState() === z.viewModel.content.CONTENT_STATE.CONVERSATION;
 
-      if (conversationEt && isActiveConversation && isConversationState) {
+      if (conversationEntity && isActiveConversation && isConversationState) {
         return;
       }
 
-      this._release_content(this.content_state());
+      this._releaseContent(this.contentState());
 
-      this.content_state(z.viewModel.content.CONTENT_STATE.CONVERSATION);
-      this.conversation_repository.active_conversation(conversationEt);
-      this.message_list.change_conversation(conversationEt, messageEt).then(() => {
-        this._show_content(z.viewModel.content.CONTENT_STATE.CONVERSATION);
-        this.mainViewModel.details.participants.changeConversation(conversationEt);
-        this.previous_conversation = this.conversation_repository.active_conversation();
+      this.contentState(z.viewModel.content.CONTENT_STATE.CONVERSATION);
+      this.conversationRepository.active_conversation(conversationEntity);
+      this.messageList.change_conversation(conversationEntity, messageEntity).then(() => {
+        this._showContent(z.viewModel.content.CONTENT_STATE.CONVERSATION);
+        this.mainViewModel.panel.participants.changeConversation(conversationEntity);
+        this.previousConversation = this.conversationRepository.active_conversation();
       });
     });
   }
 
-  switch_content(new_content_state) {
-    if (this.content_state() !== new_content_state) {
-      this._release_content(new_content_state);
-      this._show_content(this._check_content_availability(new_content_state));
+  switchContent(newContentState) {
+    const stateUnchanged = newContentState === this.contentState();
+    if (!stateUnchanged) {
+      this._releaseContent(newContentState);
+      this._showContent(this._checkContentAvailability(newContentState));
     }
   }
 
-  switch_previous_content() {
-    if (this.previous_state !== this.content_state()) {
-      if (this.previous_state === z.viewModel.content.CONTENT_STATE.CONNECTION_REQUESTS) {
-        this.switch_content(z.viewModel.content.CONTENT_STATE.CONNECTION_REQUESTS);
+  switchPreviousContent() {
+    const stateUnchanged = this.previousState === this.contentState();
+    if (!stateUnchanged) {
+      const isStateRequests = this.previousState === z.viewModel.content.CONTENT_STATE.CONNECTION_REQUESTS;
+      if (isStateRequests) {
+        this.switchContent(z.viewModel.content.CONTENT_STATE.CONNECTION_REQUESTS);
       }
 
-      if (this.previous_conversation && !this.previous_conversation.is_archived()) {
-        return this.show_conversation(this.previous_conversation);
+      if (this.previousConversation && !this.previousConversation.is_archived()) {
+        return this.showConversation(this.previousConversation);
       }
 
-      return this.switch_content(z.viewModel.content.CONTENT_STATE.WATERMARK);
+      return this.switchContent(z.viewModel.content.CONTENT_STATE.WATERMARK);
     }
   }
 
-  _check_content_availability(content_state) {
-    if (content_state === z.viewModel.content.CONTENT_STATE.CONNECTION_REQUESTS) {
-      if (!this.user_repository.connect_requests().length) {
+  _checkContentAvailability(contentState) {
+    const isStateRequests = contentState === z.viewModel.content.CONTENT_STATE.CONNECTION_REQUESTS;
+    if (isStateRequests) {
+      if (!this.userRepository.connectRequests().length) {
         return z.viewModel.content.CONTENT_STATE.WATERMARK;
       }
     }
-    return content_state;
+    return contentState;
   }
 
-  _get_element_of_content(content_state) {
-    switch (content_state) {
+  _getElementOfContent(contentState) {
+    switch (contentState) {
       case z.viewModel.content.CONTENT_STATE.COLLECTION:
         return '.collection';
       case z.viewModel.content.CONTENT_STATE.COLLECTION_DETAILS:
@@ -230,30 +236,31 @@ z.viewModel.ContentViewModel = class ContentViewModel {
     }
   }
 
-  _release_content(new_content_state) {
-    this.previous_state = this.content_state();
+  _releaseContent(newContentState) {
+    this.previousState = this.contentState();
 
-    const conversation_state = this.previous_state === z.viewModel.content.CONTENT_STATE.CONVERSATION;
-    if (conversation_state) {
-      const collection_states = [
+    const isStateConversation = this.previousState === z.viewModel.content.CONTENT_STATE.CONVERSATION;
+    if (isStateConversation) {
+      const collectionStates = [
         z.viewModel.content.CONTENT_STATE.COLLECTION,
         z.viewModel.content.CONTENT_STATE.COLLECTION_DETAILS,
       ];
-      if (!collection_states.includes(new_content_state)) {
-        this.conversation_repository.active_conversation(null);
+      const isCollectionState = collectionStates.includes(newContentState);
+      if (!isCollectionState) {
+        this.conversationRepository.active_conversation(null);
       }
 
-      return this.message_list.release_conversation();
+      return this.messageList.release_conversation();
     }
 
-    const preferences_av_state = this.previous_state === z.viewModel.content.CONTENT_STATE.PREFERENCES_AV;
-    if (preferences_av_state) {
-      this.preferences_av.release_devices();
+    const isStatePreferencesAv = this.previousState === z.viewModel.content.CONTENT_STATE.PREFERENCES_AV;
+    if (isStatePreferencesAv) {
+      this.preferencesAv.release_devices();
     }
   }
 
-  _show_content(new_content_state) {
-    this.content_state(new_content_state);
-    return this._shift_content(this._get_element_of_content(new_content_state));
+  _showContent(newContentState) {
+    this.contentState(newContentState);
+    return this._shiftContent(this._getElementOfContent(newContentState));
   }
 };

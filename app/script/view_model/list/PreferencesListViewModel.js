@@ -27,13 +27,14 @@ z.viewModel.list.PreferencesListViewModel = class PreferencesListViewModel {
   /**
    * View model for the preferences list.
    * @param {z.viewModel.ListViewModel} mainViewModel - Main view model
+   * @param {z.viewModel.ListViewModel} listViewModel - List view model
    */
-  constructor(mainViewModel) {
-    this.list_view_model = mainViewModel.list;
+  constructor(mainViewModel, listViewModel) {
     this.content_view_model = mainViewModel.content;
+    this.list_view_model = listViewModel;
     this.logger = new z.util.Logger('z.viewModel.list.PreferencesListViewModel', z.config.LOGGER.OPTIONS);
 
-    this.preferences_state = this.content_view_model.content_state;
+    this.preferences_state = this.content_view_model.contentState;
     this.should_update_scrollbar = ko
       .computed(() => this.list_view_model.last_update())
       .extend({notify: 'always', rateLimit: 500});
@@ -63,22 +64,22 @@ z.viewModel.list.PreferencesListViewModel = class PreferencesListViewModel {
   }
 
   click_on_about() {
-    this.content_view_model.switch_content(z.viewModel.content.CONTENT_STATE.PREFERENCES_ABOUT);
+    this.content_view_model.switchContent(z.viewModel.content.CONTENT_STATE.PREFERENCES_ABOUT);
   }
 
   click_on_account() {
-    this.content_view_model.switch_content(z.viewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT);
+    this.content_view_model.switchContent(z.viewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT);
   }
 
   click_on_av() {
-    this.content_view_model.switch_content(z.viewModel.content.CONTENT_STATE.PREFERENCES_AV);
+    this.content_view_model.switchContent(z.viewModel.content.CONTENT_STATE.PREFERENCES_AV);
   }
 
   click_on_devices() {
-    this.content_view_model.switch_content(z.viewModel.content.CONTENT_STATE.PREFERENCES_DEVICES);
+    this.content_view_model.switchContent(z.viewModel.content.CONTENT_STATE.PREFERENCES_DEVICES);
   }
 
   click_on_options() {
-    this.content_view_model.switch_content(z.viewModel.content.CONTENT_STATE.PREFERENCES_OPTIONS);
+    this.content_view_model.switchContent(z.viewModel.content.CONTENT_STATE.PREFERENCES_OPTIONS);
   }
 };

@@ -24,8 +24,8 @@ window.z.viewModel = z.viewModel || {};
 window.z.viewModel.content = z.viewModel.content || {};
 
 z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
-  constructor(mainViewModel, repositories) {
-    this.initiate_devices = this.initiate_devices.bind(this);
+  constructor(mainViewModel, contentViewModel, repositories) {
+    this.initiateDevices = this.initiateDevices.bind(this);
     this.release_devices = this.release_devices.bind(this);
 
     this.media_repository = repositories.media;
@@ -62,7 +62,7 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
    * Initiate media devices.
    * @returns {undefined} No return value
    */
-  initiate_devices() {
+  initiateDevices() {
     this.is_visible = true;
 
     this._get_media_stream().then(media_stream => {

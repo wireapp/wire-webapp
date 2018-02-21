@@ -1,9 +1,9 @@
 <!--@formatter:off-->
 <div class="conversation-input"
-     data-bind="with: $root.conversation_input,
+     data-bind="with: $root.inputBar,
                 css: {
-                  'conversation-input-separator': $root.conversation_input.list_not_bottom(),
-                  'conversation-input-editing': $root.conversation_input.is_editing()
+                  'conversation-input-separator': $root.inputBar.list_not_bottom(),
+                  'conversation-input-editing': $root.inputBar.is_editing()
                 }">
 
   <!-- ko if: conversation_et() && !conversation_et().connection().is_outgoing_request() -->

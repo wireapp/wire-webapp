@@ -696,8 +696,8 @@ z.notification.NotificationRepository = class NotificationRepository {
     const inActiveConversation = conversationEntity
       ? this.conversationRepository.is_active_conversation(conversationEntity)
       : false;
-    const inConversationView = wire.app.view.content.content_state() === z.viewModel.content.CONTENT_STATE.CONVERSATION;
-    const inMaximizedCall = this.callingRepository.joinedCall() && !wire.app.view.content.multitasking.is_minimized();
+    const inConversationView = wire.app.view.content.contentState() === z.viewModel.content.CONTENT_STATE.CONVERSATION;
+    const inMaximizedCall = this.callingRepository.joinedCall() && !wire.app.view.content.multitasking.isMinimized();
 
     const activeConversation = document.hasFocus() && inConversationView && inActiveConversation && !inMaximizedCall;
     const messageFromSelf = messageEntity.user().is_me;
@@ -754,7 +754,7 @@ z.notification.NotificationRepository = class NotificationRepository {
     notification.onclick = () => {
       amplify.publish(z.event.WebApp.NOTIFICATION.CLICK);
       window.focus();
-      wire.app.view.content.multitasking.is_minimized(true);
+      wire.app.view.content.multitasking.isMinimized(true);
       notificationContent.trigger();
       this.logger.info(`Notification for message '${messageId} in conversation '${conversationId}' closed by click.`);
       notification.close();

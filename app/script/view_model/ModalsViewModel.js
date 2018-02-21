@@ -63,7 +63,7 @@ z.viewModel.ModalsViewModel = class ModalsViewModel {
 
     this.modals = {};
 
-    amplify.subscribe(z.event.WebApp.WARNING.MODAL, this.show_modal.bind(this));
+    amplify.subscribe(z.event.WebApp.WARNING.MODAL, this.showModal.bind(this));
 
     ko.applyBindings(this, document.getElementById(this.elementId));
   }
@@ -77,50 +77,50 @@ z.viewModel.ModalsViewModel = class ModalsViewModel {
    * @param {Function} options.action - Called when action in modal is triggered
    * @returns {undefined} No return value
    */
-  show_modal(type, options = {}) {
-    const action_element = $(type).find('.modal-action');
-    const message_element = $(type).find('.modal-text');
-    const title_element = $(type).find('.modal-title');
+  showModal(type, options = {}) {
+    const actionElement = $(type).find('.modal-action');
+    const messageElement = $(type).find('.modal-text');
+    const titleElement = $(type).find('.modal-title');
 
     switch (type) {
       case z.viewModel.ModalType.BLOCK:
-        this._show_modal_block(options.data, title_element, message_element);
+        this._showModalBlock(options.data, titleElement, messageElement);
         break;
       case z.viewModel.ModalType.BOTS_CONFIRM:
-        this._show_modal_bots_confirm(options.data, message_element);
+        this._showModalBotsConfirm(options.data, messageElement);
         break;
       case z.viewModel.ModalType.CALL_START_ANOTHER:
-        this._show_modal_call_start_another(options.data, title_element, message_element);
+        this._showModalCallStartAnother(options.data, titleElement, messageElement);
         break;
       case z.viewModel.ModalType.CLEAR:
-        type = this._show_modal_clear(options, type);
+        type = this._showModalClear(options, type);
         break;
       case z.viewModel.ModalType.CONNECTED_DEVICE:
-        this._show_modal_connected_device(options.data);
+        this._showModalConnectedDevice(options.data);
         break;
       case z.viewModel.ModalType.LEAVE:
-        this._show_modal_leave(options.data, title_element);
+        this._showModalLeave(options.data, titleElement);
         break;
       case z.viewModel.ModalType.NEW_DEVICE:
-        this._show_modal_new_device(options.data, title_element, message_element, action_element);
+        this._showModalNewDevice(options.data, titleElement, messageElement, actionElement);
         break;
       case z.viewModel.ModalType.NOT_CONNECTED:
-        this._show_modal_not_connected(options.data, message_element);
+        this._showModalNotConnected(options.data, messageElement);
         break;
       case z.viewModel.ModalType.REMOVE_DEVICE:
-        this._show_modal_remove_device(options.data, title_element);
+        this._showModalRemoveDevice(options.data, titleElement);
         break;
       case z.viewModel.ModalType.TOO_MANY_MEMBERS:
-        this._show_modal_too_many_members(options.data, message_element);
+        this._showModalTooManyMembers(options.data, messageElement);
         break;
       case z.viewModel.ModalType.UPLOAD_PARALLEL:
-        this._show_modal_upload_parallel(options.data, title_element);
+        this._showModalUploadParallel(options.data, titleElement);
         break;
       case z.viewModel.ModalType.UPLOAD_TOO_LARGE:
-        this._show_modal_upload_too_large(options.data, title_element);
+        this._showModalUploadTooLarge(options.data, titleElement);
         break;
       case z.viewModel.ModalType.TOO_LONG_MESSAGE:
-        this._show_modal_message_too_long(options.data, message_element);
+        this._showModalMessageTooLong(options.data, messageElement);
         break;
       default:
         this.logger.warn(`Modal of type '${type}' is not supported`);
@@ -185,13 +185,13 @@ z.viewModel.ModalsViewModel = class ModalsViewModel {
     modal.toggle();
   }
 
-  _show_modal_block(content, title_element, message_element) {
-    title_element.text(z.l10n.text(z.string.modal_block_conversation_headline, content));
-    message_element.text(z.l10n.text(z.string.modal_block_conversation_message, content));
+  _showModalBlock(content, titleElement, messageElement) {
+    titleElement.text(z.l10n.text(z.string.modal_block_conversation_headline, content));
+    messageElement.text(z.l10n.text(z.string.modal_block_conversation_message, content));
   }
 
-  _show_modal_bots_confirm(content, message_element) {
-    message_element.text(z.l10n.text(z.string.modal_bots_confirm_message, content));
+  _showModalBotsConfirm(content, messageElement) {
+    messageElement.text(z.l10n.text(z.string.modal_bots_confirm_message, content));
   }
 
   /**
@@ -200,113 +200,106 @@ z.viewModel.ModalsViewModel = class ModalsViewModel {
    * @note Modal supports z.calling.enum.CALL_STATE.INCOMING, z.calling.enum.CALL_STATE.ONGOING, z.calling.enum.CALL_STATE.OUTGOING
    * @private
    *
-   * @param {z.calling.enum.CALL_STATE} call_state - Current call state
-   * @param {jQuery} title_element - Title element
-   * @param {jQuery} message_element - Message element
+   * @param {z.calling.enum.CALL_STATE} callState - Current call state
+   * @param {jQuery} titleElement - Title element
+   * @param {jQuery} messageElement - Message element
    * @returns {undefined} No return value
    */
-  _show_modal_call_start_another(call_state, title_element, message_element) {
+  _showModalCallStartAnother(callState, titleElement, messageElement) {
     const action_element = $(z.viewModel.ModalType.CALL_START_ANOTHER).find('.modal-action');
 
-    action_element.text(z.l10n.text(z.string[`modal_call_second_${call_state}_action`]));
-    message_element.text(z.l10n.text(z.string[`modal_call_second_${call_state}_message`]));
-    return title_element.text(z.l10n.text(z.string[`modal_call_second_${call_state}_headline`]));
+    action_element.text(z.l10n.text(z.string[`modal_call_second_${callState}_action`]));
+    messageElement.text(z.l10n.text(z.string[`modal_call_second_${callState}_message`]));
+    titleElement.text(z.l10n.text(z.string[`modal_call_second_${callState}_headline`]));
   }
 
-  _show_modal_clear(options, type) {
+  _showModalClear(options, type) {
     if (options.conversation.is_group() && !options.conversation.removed_from_conversation()) {
       type = z.viewModel.ModalType.CLEAR_GROUP;
     }
 
-    const title_element = $(type).find('.modal-title');
-    title_element.text(z.l10n.text(z.string.modal_clear_conversation_headline));
+    const titleElement = $(type).find('.modal-title');
+    titleElement.text(z.l10n.text(z.string.modal_clear_conversation_headline));
 
     return type;
   }
 
-  _show_modal_connected_device(devices) {
-    const devices_element = $(z.viewModel.ModalType.CONNECTED_DEVICE).find('.modal-connected-devices');
+  _showModalConnectedDevice(devices) {
+    const devicesElement = $(z.viewModel.ModalType.CONNECTED_DEVICE).find('.modal-connected-devices');
 
-    devices_element.empty();
+    devicesElement.empty();
 
     devices.map(device => {
       $('<div>')
         .text(`${moment(device.time).format('MMMM Do YYYY, HH:mm')} - UTC`)
-        .appendTo(devices_element);
+        .appendTo(devicesElement);
 
       $('<div>')
         .text(`${z.l10n.text(z.string.modal_connected_device_from)} ${device.model}`)
-        .appendTo(devices_element);
+        .appendTo(devicesElement);
     });
   }
 
-  _show_modal_leave(content, title_element) {
-    title_element.text(z.l10n.text(z.string.modal_leave_conversation_headline, content));
+  _showModalLeave(content, titleElement) {
+    titleElement.text(z.l10n.text(z.string.modal_leave_conversation_headline, content));
   }
 
-  _show_modal_new_device(content, title_element, message_element, action_element) {
-    let action_id;
-    let message_id;
-    const joined_names = z.util.StringUtil.capitalize_first_char(
-      z.util.LocalizerUtil.joinNames(content.user_ets, z.string.Declension.NOMINATIVE)
-    );
+  _showModalNewDevice(content, titleElement, messageElement, action_element) {
+    let actionId;
+    let messageId;
+    const joinedNames = z.util.LocalizerUtil.joinNames(content.user_ets, z.string.Declension.NOMINATIVE);
+    const substitutions = z.util.StringUtil.capitalize_first_char(joinedNames);
 
+    let stringId;
     if (content.user_ets.length > 1) {
-      title_element.text(z.l10n.text(z.string.modal_new_device_headline_many, joined_names));
-    } else if (content.user_ets[0].is_me) {
-      title_element.text(z.l10n.text(z.string.modal_new_device_headline_you, joined_names));
+      stringId = z.string.modal_new_device_headline_many;
     } else {
-      title_element.text(z.l10n.text(z.string.modal_new_device_headline, joined_names));
+      const isSelfUser = content.user_ets[0].is_me;
+      stringId = isSelfUser ? z.string.modal_new_device_headline_you : z.string.modal_new_device_headline;
     }
+    titleElement.text(z.l10n.text(stringId, substitutions));
 
     switch (content.consent_type) {
       case z.viewModel.MODAL_CONSENT_TYPE.INCOMING_CALL:
-        message_id = z.string.modal_new_device_call_incoming;
-        action_id = z.string.modal_new_device_call_accept;
+        messageId = z.string.modal_new_device_call_incoming;
+        actionId = z.string.modal_new_device_call_accept;
         break;
       case z.viewModel.MODAL_CONSENT_TYPE.OUTGOING_CALL:
-        message_id = z.string.modal_new_device_call_outgoing;
-        action_id = z.string.modal_new_device_call_anyway;
+        messageId = z.string.modal_new_device_call_outgoing;
+        actionId = z.string.modal_new_device_call_anyway;
         break;
       default:
-        message_id = z.string.modal_new_device_message;
-        action_id = z.string.modal_new_device_send_anyway;
+        messageId = z.string.modal_new_device_message;
+        actionId = z.string.modal_new_device_send_anyway;
     }
 
-    message_element.text(z.l10n.text(message_id));
-    action_element.text(z.l10n.text(action_id));
+    messageElement.text(z.l10n.text(messageId));
+    action_element.text(z.l10n.text(actionId));
   }
 
-  _show_modal_not_connected(content, message_element) {
-    if (content) {
-      message_element.text(z.l10n.text(z.string.modal_not_connected_message_one, content));
-    } else {
-      message_element.text(z.l10n.text(z.string.modal_not_connected_message_many));
-    }
+  _showModalNotConnected(content, messageElement) {
+    const stringId = content ? z.string.modal_not_connected_message_one : z.string.modal_not_connected_message_many;
+    messageElement.text(z.l10n.text(stringId, content));
   }
 
-  _show_modal_remove_device(content, title_element) {
-    title_element.text(z.l10n.text(z.string.modal_remove_device_headline, content));
+  _showModalRemoveDevice(content, titleElement) {
+    titleElement.text(z.l10n.text(z.string.modal_remove_device_headline, content));
   }
 
-  _show_modal_too_many_members(content, message_element) {
-    message_element.text(
-      z.l10n.text(z.string.modal_too_many_members_message, {
-        number1: content.max,
-        number2: content.open_spots,
-      })
-    );
+  _showModalTooManyMembers(content, messageElement) {
+    const substitutions = {number1: content.max, number2: content.open_spots};
+    messageElement.text(z.l10n.text(z.string.modal_too_many_members_message, substitutions));
   }
 
-  _show_modal_upload_parallel(content, title_element) {
-    title_element.text(z.l10n.text(z.string.modal_uploads_parallel, content));
+  _showModalUploadParallel(content, titleElement) {
+    titleElement.text(z.l10n.text(z.string.modal_uploads_parallel, content));
   }
 
-  _show_modal_upload_too_large(content, title_element) {
-    title_element.text(z.l10n.text(z.string.conversation_asset_upload_too_large, content));
+  _showModalUploadTooLarge(content, titleElement) {
+    titleElement.text(z.l10n.text(z.string.conversation_asset_upload_too_large, content));
   }
 
-  _show_modal_message_too_long(content, message_element) {
-    message_element.text(z.l10n.text(z.string.modal_too_long_message, content));
+  _showModalMessageTooLong(content, messageElement) {
+    messageElement.text(z.l10n.text(z.string.modal_too_long_message, content));
   }
 };

@@ -41,7 +41,7 @@ z.viewModel.panel.ParticipantsViewModel = class ParticipantsViewModel {
     };
   }
 
-  constructor(mainViewModel, repositories) {
+  constructor(mainViewModel, panelViewModel, repositories) {
     this.clickOnAddPeople = this.clickOnAddPeople.bind(this);
     this.clickOnPending = this.clickOnPending.bind(this);
     this.clickOnMemberBack = this.clickOnMemberBack.bind(this);
@@ -373,6 +373,10 @@ z.viewModel.panel.ParticipantsViewModel = class ParticipantsViewModel {
         return this.showService(participantEntity);
       }
       this.selectedParticipant(participantEntity);
+    }
+
+    if (!this.mainViewModel.isPanelOpen()) {
+      this.mainViewModel.openPanel();
     }
   }
 

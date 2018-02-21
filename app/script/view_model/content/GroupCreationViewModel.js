@@ -32,7 +32,7 @@ z.viewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
     };
   }
 
-  constructor(mainViewModel, repositories) {
+  constructor(mainViewModel, contentViewModel, repositories) {
     this.logger = new z.util.Logger('z.viewModel.content.GroupCreationViewModel', z.config.LOGGER.OPTIONS);
 
     this.clickOnCreate = this.clickOnCreate.bind(this);

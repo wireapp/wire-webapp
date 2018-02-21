@@ -1,6 +1,6 @@
 <div id="wire-main"
      class="off"
-     data-bind="css: main_classes(), ignore_drop_file: true"
+     data-bind="css: mainClasses(), ignore_drop_file: true"
      data-uie-name="status-webapp"
      data-uie-value="is-loading">
   <!-- ko stopBinding: true -->
@@ -20,37 +20,37 @@
         <!-- /ko -->
       </div>
       <div id="center-column" class="center-column">
-        <!-- ko if: content_state() === z.viewModel.content.CONTENT_STATE.CONNECTION_REQUESTS -->
+        <!-- ko if: contentState() === z.viewModel.content.CONTENT_STATE.CONNECTION_REQUESTS -->
           #include('content/connect-requests.htm')
         <!-- /ko -->
-        <!-- ko if: content_state() === z.viewModel.content.CONTENT_STATE.CONVERSATION -->
+        <!-- ko if: contentState() === z.viewModel.content.CONTENT_STATE.CONVERSATION -->
           #include('content/conversation.htm')
         <!-- /ko -->
-        <!-- ko if: content_state() === z.viewModel.content.CONTENT_STATE.COLLECTION -->
+        <!-- ko if: contentState() === z.viewModel.content.CONTENT_STATE.COLLECTION -->
           #include('content/collection.htm')
         <!-- /ko -->
-        <!-- ko if: content_state() === z.viewModel.content.CONTENT_STATE.COLLECTION_DETAILS -->
+        <!-- ko if: contentState() === z.viewModel.content.CONTENT_STATE.COLLECTION_DETAILS -->
           #include('content/collection-details.htm')
         <!-- /ko -->
-        <!-- ko if: content_state() === z.viewModel.content.CONTENT_STATE.PREFERENCES_ABOUT -->
+        <!-- ko if: contentState() === z.viewModel.content.CONTENT_STATE.PREFERENCES_ABOUT -->
           #include('content/preferences-about.htm')
         <!-- /ko -->
-        <!-- ko if: content_state() === z.viewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT -->
+        <!-- ko if: contentState() === z.viewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT -->
           #include('content/preferences-account.htm')
         <!-- /ko -->
-        <!-- ko if: content_state() === z.viewModel.content.CONTENT_STATE.PREFERENCES_AV -->
+        <!-- ko if: contentState() === z.viewModel.content.CONTENT_STATE.PREFERENCES_AV -->
           #include('content/preferences-av.htm')
         <!-- /ko -->
-        <!-- ko if: content_state() === z.viewModel.content.CONTENT_STATE.PREFERENCES_DEVICE_DETAILS -->
+        <!-- ko if: contentState() === z.viewModel.content.CONTENT_STATE.PREFERENCES_DEVICE_DETAILS -->
           #include('content/preferences-device-details.htm')
         <!-- /ko -->
-        <!-- ko if: content_state() === z.viewModel.content.CONTENT_STATE.PREFERENCES_DEVICES -->
+        <!-- ko if: contentState() === z.viewModel.content.CONTENT_STATE.PREFERENCES_DEVICES -->
           #include('content/preferences-devices.htm')
         <!-- /ko -->
-        <!-- ko if: content_state() === z.viewModel.content.CONTENT_STATE.PREFERENCES_OPTIONS -->
+        <!-- ko if: contentState() === z.viewModel.content.CONTENT_STATE.PREFERENCES_OPTIONS -->
           #include('content/preferences-options.htm')
         <!-- /ko -->
-        <!-- ko if: content_state() === z.viewModel.content.CONTENT_STATE.WATERMARK -->
+        <!-- ko if: contentState() === z.viewModel.content.CONTENT_STATE.WATERMARK -->
           #include('content/watermark.htm')
         <!-- /ko -->
         #include('modal/group-creation.htm')
