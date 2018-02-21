@@ -138,7 +138,7 @@ z.entity.Conversation = class Conversation {
 
     // Calling
     this.call = ko.observable(undefined);
-    this.has_local_call = ko.pureComputed(() => !!this.call() && !this.call().is_ongoing_on_another_client());
+    this.has_local_call = ko.pureComputed(() => !!this.call() && !this.call().isOngoingOnAnotherClient());
     this.has_active_call = ko.pureComputed(() => {
       return this.has_local_call() ? !z.calling.enum.CALL_STATE_GROUP.IS_ENDED.includes(this.call().state()) : false;
     });

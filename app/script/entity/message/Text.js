@@ -26,7 +26,6 @@ z.entity.Text = class Text extends z.entity.Asset {
   constructor(id, text = '') {
     super(id);
     this.type = z.assets.AssetType.TEXT;
-    this.nonce = undefined;
 
     // Raw message text
     this.text = text;

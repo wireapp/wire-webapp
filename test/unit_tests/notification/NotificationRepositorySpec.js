@@ -216,7 +216,7 @@ describe('z.notification.NotificationRepository', () => {
     it('if the browser tab has focus and conversation is active', done => {
       TestFactory.conversation_repository.active_conversation(conversation_et);
       document.hasFocus = () => true;
-      TestFactory.calling_repository.joined_call = () => true;
+      TestFactory.calling_repository.joinedCall = () => true;
 
       TestFactory.notification_repository
         .notify(message_et, undefined, conversation_et)

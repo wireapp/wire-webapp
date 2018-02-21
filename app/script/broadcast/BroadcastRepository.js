@@ -49,7 +49,7 @@ z.broadcast.BroadcastRepository = class BroadcastRepository {
   broadcastGenericMessage(genericMessage) {
     return this.conversationRepository.sending_queue.push(() => {
       return this._createBroadcastRecipients()
-        .then(recipients => this.cryptographyRepository.encrypt_generic_message(recipients, genericMessage))
+        .then(recipients => this.cryptographyRepository.encryptGenericMessage(recipients, genericMessage))
         .then(payload => this._sendEncryptedMessage(genericMessage, payload));
     });
   }

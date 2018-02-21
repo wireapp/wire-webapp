@@ -22,55 +22,45 @@
 window.z = window.z || {};
 window.z.calling = z.calling || {};
 
-z.calling.CallMessageMapper = (function() {
+z.calling.CallMessageMapper = {
   /**
    * Map incoming call message into entity.
    *
    * @private
    * @param {Object} event - Call event object
-   * @returns {CallMessage} Call message entity
+   * @returns {z.calling.entities.CallMessageEntity} Call message entity
    */
-  const _map_event = function(event) {
-    const {content: call_message, conversation: conversation_id, from: user_id, sender: client_id, time} = event;
+  mapEvent(event) {
+    const {content: callMessage, conversation: conversationId, from: userId, sender: clientId, time} = event;
 
-    const additional_properties = {
-      client_id: client_id,
-      conversation_id: conversation_id,
-      time: time,
-      user_id: user_id,
-    };
+    const additionalProperties = {clientId, conversationId, time, userId};
 
     let content = undefined;
-    switch (call_message.type) {
+    switch (callMessage.type) {
       case z.calling.enum.CALL_MESSAGE_TYPE.GROUP_SETUP:
       case z.calling.enum.CALL_MESSAGE_TYPE.UPDATE: {
-        const {dest_clientid, dest_userid, props: properties, sdp} = call_message;
-
-        content = {
-          dest_client_id: dest_clientid,
-          dest_user_id: dest_userid,
+        const {
+          dest_clientid: destinationClientId,
+          dest_userid: destinationUserId,
           props: properties,
-          sdp: sdp,
-        };
+          sdp,
+        } = callMessage;
+
+        content = {destinationClientId, destinationUserId, properties, sdp};
         break;
       }
 
       case z.calling.enum.CALL_MESSAGE_TYPE.PROP_SYNC: {
-        const {props: properties} = call_message;
+        const {props: properties} = callMessage;
 
-        content = {
-          props: properties,
-        };
+        content = {properties};
         break;
       }
 
       case z.calling.enum.CALL_MESSAGE_TYPE.SETUP: {
-        const {props: properties, sdp} = call_message;
+        const {props: properties, sdp} = callMessage;
 
-        content = {
-          props: properties,
-          sdp: sdp,
-        };
+        content = {properties, sdp};
         break;
       }
 
@@ -80,18 +70,14 @@ z.calling.CallMessageMapper = (function() {
     }
 
     if (content) {
-      $.extend(additional_properties, content);
+      Object.assign(additionalProperties, content);
     }
 
-    const {type, resp: response, sessid: session_id} = call_message;
-    const call_message_et = new z.calling.entities.CallMessage(type, response, session_id);
+    const {type, resp: response, sessid: sessionId} = callMessage;
+    const callMessageEntity = new z.calling.entities.CallMessageEntity(type, response, sessionId);
 
-    call_message_et.add_properties(additional_properties);
+    callMessageEntity.addProperties(additionalProperties);
 
-    return call_message_et;
-  };
-
-  return {
-    map_event: _map_event,
-  };
-})();
+    return callMessageEntity;
+  },
+};

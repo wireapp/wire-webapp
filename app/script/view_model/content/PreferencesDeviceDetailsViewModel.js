@@ -83,7 +83,7 @@ z.viewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
   }
 
   _update_fingerprint() {
-    this.cryptography_repository.get_remote_fingerprint(this.self_user().id, this.device().id).then(fingerprint => {
+    this.cryptography_repository.getRemoteFingerprint(this.self_user().id, this.device().id).then(fingerprint => {
       this.fingerprint(z.util.zero_padding(fingerprint, 16).match(/.{1,2}/g));
     });
   }
