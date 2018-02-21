@@ -122,31 +122,34 @@ z.ViewModel.MainViewModel = class MainViewModel {
         }
       }
 
-      // this forces one layout repaint, so the new styles are applied and can be transitioned
-      panel.offsetHeight; // eslint-disable-line no-unused-expressions
-      panel.style.transition = 'transform .35s cubic-bezier(0.19, 1, 0.22, 1)';
-      overlay.style.transition = 'opacity .35s cubic-bezier(0.165, 0.84, 0.44, 1)';
-      titleBar.style.transition = input.style.transition = 'width .35s cubic-bezier(0.19, 1, 0.22, 1)';
+      // https://developer.mozilla.org/en-US/Firefox/Performance_best_practices_for_Firefox_fe_engineers
+      requestAnimationFrame(() =>
+        setTimeout(() => {
+          panel.style.transition = 'transform .35s cubic-bezier(0.19, 1, 0.22, 1)';
+          overlay.style.transition = 'opacity .35s cubic-bezier(0.165, 0.84, 0.44, 1)';
+          titleBar.style.transition = input.style.transition = 'width .35s cubic-bezier(0.19, 1, 0.22, 1)';
 
-      if (isPanelOpen) {
-        applyStyle(panel, panelCloseStyle(panelSize));
-        if (isNarrowScreen) {
-          applyStyle(overlay, {opacity: 0});
-        } else {
-          applyStyle(titleBar, {width: `${centerWidthClose}px`});
-          applyStyle(input, {width: `${centerWidthClose}px`});
-          // applyStyle(messageList, {transform: `scale(1, 1)`});
-        }
-      } else {
-        applyStyle(panel, panelOpenStyle(panelSize));
-        if (isNarrowScreen) {
-          applyStyle(overlay, {opacity: 1});
-        } else {
-          applyStyle(titleBar, {width: `${centerWidthOpen}px`});
-          applyStyle(input, {width: `${centerWidthOpen}px`});
-          // applyStyle(messageList, {transform: `scale(1, 1)`});
-        }
-      }
+          if (isPanelOpen) {
+            applyStyle(panel, panelCloseStyle(panelSize));
+            if (isNarrowScreen) {
+              applyStyle(overlay, {opacity: 0});
+            } else {
+              applyStyle(titleBar, {width: `${centerWidthClose}px`});
+              applyStyle(input, {width: `${centerWidthClose}px`});
+              // applyStyle(messageList, {transform: `scale(1, 1)`});
+            }
+          } else {
+            applyStyle(panel, panelOpenStyle(panelSize));
+            if (isNarrowScreen) {
+              applyStyle(overlay, {opacity: 1});
+            } else {
+              applyStyle(titleBar, {width: `${centerWidthOpen}px`});
+              applyStyle(input, {width: `${centerWidthOpen}px`});
+              // applyStyle(messageList, {transform: `scale(1, 1)`});
+            }
+          }
+        }, 0)
+      );
     });
   }
 };
