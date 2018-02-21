@@ -41,7 +41,7 @@ z.calling.CallMessageMapper = {
       case z.calling.enum.CALL_MESSAGE_TYPE.UPDATE: {
         const {
           dest_clientid: destinationClientId,
-          dest_user_id: destinationUserId,
+          dest_userid: destinationUserId,
           props: properties,
           sdp,
         } = callMessage;
