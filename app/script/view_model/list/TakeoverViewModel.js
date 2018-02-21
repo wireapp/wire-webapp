@@ -57,7 +57,7 @@ z.viewModel.list.TakeoverViewModel = class TakeoverViewModel {
         }
 
         if (this.userRepository.connect_requests().length) {
-          amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.content.CONTENT_STATE.CONNECTION_REQUESTS);
+          amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS);
         }
       })
       .catch(() => amplify.publish(z.event.WebApp.PREFERENCES.MANAGE_ACCOUNT))

@@ -129,7 +129,7 @@ z.viewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
   }
 
   click_on_delete() {
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalType.DELETE_MESSAGE, {
+    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.DELETE_MESSAGE, {
       action: () => {
         this.conversation_repository.delete_message(this.conversation_et(), this.message_et());
         this.image_modal.hide();
@@ -138,7 +138,7 @@ z.viewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
   }
 
   click_on_delete_for_everyone() {
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalType.DELETE_EVERYONE_MESSAGE, {
+    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.DELETE_EVERYONE_MESSAGE, {
       action: () => {
         if (this.source === 'collection') {
           this._track_item_action(this.conversation_et(), 'delete_for_everyone', 'image');

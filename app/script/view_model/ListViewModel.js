@@ -23,6 +23,20 @@ window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 
 z.viewModel.ListViewModel = class ListViewModel {
+  static get MODAL_TYPE() {
+    return {
+      TAKEOVER: 'ListViewModel.MODAL_TYPE.TAKEOVER',
+    };
+  }
+
+  static get STATE() {
+    return {
+      ARCHIVE: 'ListViewModel.STATE.ARCHIVE',
+      CONVERSATIONS: 'ListViewModel.STATE.CONVERSATIONS',
+      PREFERENCES: 'ListViewModel.STATE.PREFERENCES',
+      START_UI: 'ListViewModel.STATE.START_UI',
+    };
+  }
   /**
    * View model for the list column.
    * @param {z.viewModel.MainViewModel} mainViewModel - Main view model
@@ -41,9 +55,9 @@ z.viewModel.ListViewModel = class ListViewModel {
     this.logger = new z.util.Logger('z.viewModel.ListViewModel', z.config.LOGGER.OPTIONS);
 
     // State
-    this.list_state = ko.observable(z.viewModel.list.LIST_STATE.CONVERSATIONS);
+    this.state = ko.observable(ListViewModel.STATE.CONVERSATIONS);
     this.last_update = ko.observable();
-    this.list_modal = ko.observable();
+    this.modal = ko.observable();
     this.webapp_loaded = ko.observable(false);
 
     // Nested view models
@@ -60,23 +74,23 @@ z.viewModel.ListViewModel = class ListViewModel {
     });
 
     this.visible_list_items = ko.pureComputed(() => {
-      if (this.list_state() === z.viewModel.list.LIST_STATE.PREFERENCES) {
+      if (this.state() === ListViewModel.STATE.PREFERENCES) {
         const preference_items = [
-          z.viewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT,
-          z.viewModel.content.CONTENT_STATE.PREFERENCES_DEVICES,
-          z.viewModel.content.CONTENT_STATE.PREFERENCES_OPTIONS,
-          z.viewModel.content.CONTENT_STATE.PREFERENCES_AV,
+          z.viewModel.ContentViewModel.STATE.PREFERENCES_ACCOUNT,
+          z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICES,
+          z.viewModel.ContentViewModel.STATE.PREFERENCES_OPTIONS,
+          z.viewModel.ContentViewModel.STATE.PREFERENCES_AV,
         ];
 
         if (!z.util.Environment.desktop) {
-          preference_items.push(z.viewModel.content.CONTENT_STATE.PREFERENCES_ABOUT);
+          preference_items.push(z.viewModel.ContentViewModel.STATE.PREFERENCES_ABOUT);
         }
 
         return preference_items;
       }
 
       const has_connect_requests = this.user_repository.connect_requests().length;
-      const connect_requests = has_connect_requests ? z.viewModel.content.CONTENT_STATE.CONNECTION_REQUESTS : [];
+      const connect_requests = has_connect_requests ? z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS : [];
       return this.conversation_repository
         .conversations_calls()
         .concat(connect_requests, this.conversation_repository.conversations_unarchived());
@@ -89,7 +103,7 @@ z.viewModel.ListViewModel = class ListViewModel {
 
   _init_subscriptions() {
     amplify.subscribe(z.event.WebApp.CONVERSATION.SHOW, () =>
-      this.switch_list(z.viewModel.list.LIST_STATE.CONVERSATIONS, false)
+      this.switch_list(ListViewModel.STATE.CONVERSATIONS, false)
     );
     amplify.subscribe(z.event.WebApp.LIFECYCLE.LOADED, () => this.webapp_loaded(true));
     amplify.subscribe(z.event.WebApp.PREFERENCES.MANAGE_ACCOUNT, this.open_preferences_account.bind(this));
@@ -113,7 +127,7 @@ z.viewModel.ListViewModel = class ListViewModel {
   }
 
   _iterate_active_item(reverse = false) {
-    if (this.list_state() === z.viewModel.list.LIST_STATE.PREFERENCES) {
+    if (this.state() === ListViewModel.STATE.PREFERENCES) {
       return this._iterate_active_preference(reverse);
     }
 
@@ -122,9 +136,9 @@ z.viewModel.ListViewModel = class ListViewModel {
 
   _iterate_active_conversation(reverse) {
     const is_connection_request_state =
-      this.content_view_model.contentState() === z.viewModel.content.CONTENT_STATE.CONNECTION_REQUESTS;
+      this.content_view_model.state() === z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS;
     const active_conversation_item = is_connection_request_state
-      ? z.viewModel.content.CONTENT_STATE.CONNECTION_REQUESTS
+      ? z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS
       : this.conversation_repository.active_conversation();
     const next_conversation_item = z.util.ArrayUtil.iterate_item(
       this.visible_list_items(),
@@ -132,18 +146,18 @@ z.viewModel.ListViewModel = class ListViewModel {
       reverse
     );
 
-    if (next_conversation_item === z.viewModel.content.CONTENT_STATE.CONNECTION_REQUESTS) {
-      this.content_view_model.switchContent(z.viewModel.content.CONTENT_STATE.CONNECTION_REQUESTS);
+    if (next_conversation_item === z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS) {
+      this.content_view_model.switchContent(z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS);
     } else if (next_conversation_item) {
       amplify.publish(z.event.WebApp.CONVERSATION.SHOW, next_conversation_item);
     }
   }
 
   _iterate_active_preference(reverse) {
-    let active_preference = this.content_view_model.contentState();
+    let active_preference = this.content_view_model.state();
 
-    if (active_preference === z.viewModel.content.CONTENT_STATE.PREFERENCES_DEVICE_DETAILS) {
-      active_preference = z.viewModel.content.CONTENT_STATE.DEVICES;
+    if (active_preference === z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICE_DETAILS) {
+      active_preference = z.viewModel.ContentViewModel.STATE.DEVICES;
     }
 
     const next_preference = z.util.ArrayUtil.iterate_item(this.visible_list_items(), active_preference, reverse);
@@ -154,27 +168,27 @@ z.viewModel.ListViewModel = class ListViewModel {
   }
 
   open_preferences_account() {
-    this.switch_list(z.viewModel.list.LIST_STATE.PREFERENCES);
-    this.content_view_model.switchContent(z.viewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT);
+    this.switch_list(ListViewModel.STATE.PREFERENCES);
+    this.content_view_model.switchContent(z.viewModel.ContentViewModel.STATE.PREFERENCES_ACCOUNT);
   }
 
   open_preferences_devices(device_et) {
-    this.switch_list(z.viewModel.list.LIST_STATE.PREFERENCES);
+    this.switch_list(ListViewModel.STATE.PREFERENCES);
 
     if (device_et) {
       this.content_view_model.preferences_device_details.device(device_et);
-      return this.content_view_model.switchContent(z.viewModel.content.CONTENT_STATE.PREFERENCES_DEVICE_DETAILS);
+      return this.content_view_model.switchContent(z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICE_DETAILS);
     }
 
-    return this.content_view_model.switchContent(z.viewModel.content.CONTENT_STATE.PREFERENCES_DEVICES);
+    return this.content_view_model.switchContent(z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICES);
   }
 
   open_start_ui() {
-    this.switch_list(z.viewModel.list.LIST_STATE.START_UI);
+    this.switch_list(ListViewModel.STATE.START_UI);
   }
 
   switch_list(new_list_state, respect_last_state = true) {
-    if (this.list_state() !== new_list_state) {
+    if (this.state() !== new_list_state) {
       this._hide_list();
       this._update_list(new_list_state, respect_last_state);
       this._show_list(new_list_state);
@@ -182,31 +196,31 @@ z.viewModel.ListViewModel = class ListViewModel {
   }
 
   _hide_list() {
-    $(`#${this._get_element_id_of_list(this.list_state())}`).removeClass('left-list-is-visible');
+    $(`#${this._get_element_id_of_list(this.state())}`).removeClass('left-list-is-visible');
     $(document).off('keydown.list_view');
   }
 
   _show_list(new_list_state) {
     $(`#${this._get_element_id_of_list(new_list_state)}`).addClass('left-list-is-visible');
-    this.list_state(new_list_state);
+    this.state(new_list_state);
     this.last_update(Date.now());
     $(document).on('keydown.list_view', keyboard_event => {
       if (z.util.KeyboardUtil.isEscapeKey(keyboard_event)) {
-        this.switch_list(z.viewModel.list.LIST_STATE.CONVERSATIONS);
+        this.switch_list(ListViewModel.STATE.CONVERSATIONS);
       }
     });
   }
 
   _update_list(new_list_state, respect_last_state) {
     switch (new_list_state) {
-      case z.viewModel.list.LIST_STATE.ARCHIVE:
+      case ListViewModel.STATE.ARCHIVE:
         this.archive.updateList();
         break;
-      case z.viewModel.list.LIST_STATE.START_UI:
+      case ListViewModel.STATE.START_UI:
         this.start_ui.updateList();
         break;
-      case z.viewModel.list.LIST_STATE.PREFERENCES:
-        amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT);
+      case ListViewModel.STATE.PREFERENCES:
+        amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.PREFERENCES_ACCOUNT);
         break;
       default:
         if (respect_last_state) {
@@ -217,11 +231,11 @@ z.viewModel.ListViewModel = class ListViewModel {
 
   _get_element_id_of_list(list_state) {
     switch (list_state) {
-      case z.viewModel.list.LIST_STATE.ARCHIVE:
+      case ListViewModel.STATE.ARCHIVE:
         return 'archive';
-      case z.viewModel.list.LIST_STATE.PREFERENCES:
+      case ListViewModel.STATE.PREFERENCES:
         return 'preferences';
-      case z.viewModel.list.LIST_STATE.START_UI:
+      case ListViewModel.STATE.START_UI:
         return 'start-ui';
       default:
         return 'conversations';
@@ -229,11 +243,11 @@ z.viewModel.ListViewModel = class ListViewModel {
   }
 
   show_takeover() {
-    this.list_modal(z.viewModel.list.LIST_MODAL_TYPE.TAKEOVER);
+    this.modal(ListViewModel.MODAL_TYPE.TAKEOVER);
   }
 
   dismiss_takeover() {
-    this.list_modal(undefined);
+    this.modal(undefined);
   }
 
   //##############################################################################
@@ -322,7 +336,7 @@ z.viewModel.ListViewModel = class ListViewModel {
     const [user_et] = conversation_et.participating_user_ets();
 
     if (user_et) {
-      amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalType.BLOCK, {
+      amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.BLOCK, {
         action: () => {
           this.user_repository.block_user(user_et, next_conversation_et);
         },
@@ -340,7 +354,7 @@ z.viewModel.ListViewModel = class ListViewModel {
 
   click_on_clear_action(conversation_et = this.conversation_repository.active_conversation()) {
     if (conversation_et) {
-      amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalType.CLEAR, {
+      amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CLEAR, {
         action: (leave_conversation = false) => {
           this.conversation_repository.clear_conversation(conversation_et, leave_conversation);
         },
@@ -350,7 +364,7 @@ z.viewModel.ListViewModel = class ListViewModel {
   }
 
   click_on_leave_action(conversation_et) {
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalType.LEAVE, {
+    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.LEAVE, {
       action: () => this.conversation_repository.removeMember(conversation_et, this.user_repository.self().id),
       data: conversation_et.display_name(),
     });
@@ -365,13 +379,13 @@ z.viewModel.ListViewModel = class ListViewModel {
   click_on_unarchive_action(conversation_et) {
     this.conversation_repository.unarchive_conversation(conversation_et, 'manual un-archive').then(() => {
       if (!this.conversation_repository.conversations_archived().length) {
-        this.switch_list(z.viewModel.list.LIST_STATE.CONVERSATIONS);
+        this.switch_list(ListViewModel.STATE.CONVERSATIONS);
       }
     });
   }
 
   _get_next_conversation(conversation_et) {
-    const in_conversations = this.list_state() === z.viewModel.list.LIST_STATE.CONVERSATIONS;
+    const in_conversations = this.state() === ListViewModel.STATE.CONVERSATIONS;
     const is_active_conversation = this.conversation_repository.is_active_conversation(conversation_et);
 
     if (in_conversations && is_active_conversation) {

@@ -395,7 +395,7 @@ z.viewModel.panel.ParticipantsViewModel = class ParticipantsViewModel {
   }
 
   switchContent(contentState) {
-    const isConnectionRequests = contentState === z.viewModel.content.CONTENT_STATE.CONNECTION_REQUESTS;
+    const isConnectionRequests = contentState === z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS;
     if (isConnectionRequests) {
       // todo: what to do?
     }

@@ -77,11 +77,11 @@ z.viewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewMo
 
   click_on_show_device(device_et) {
     this.preferences_device_details.device(device_et);
-    amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.content.CONTENT_STATE.PREFERENCES_DEVICE_DETAILS);
+    amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICE_DETAILS);
   }
 
   click_on_remove_device(device_et, event) {
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalType.REMOVE_DEVICE, {
+    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.REMOVE_DEVICE, {
       action: password => {
         this.client_repository.deleteClient(device_et.id, password);
       },

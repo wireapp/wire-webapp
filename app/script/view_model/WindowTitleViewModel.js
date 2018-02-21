@@ -26,7 +26,7 @@ z.viewModel.WindowTitleViewModel = class WindowTitleViewModel {
   constructor(mainViewModel, repositories) {
     this.initiateTitleUpdates = this.initiateTitleUpdates.bind(this);
 
-    this.contentState = mainViewModel.content.contentState;
+    this.contentState = mainViewModel.content.state;
     this.conversationRepository = repositories.conversation;
     this.userRepository = repositories.user;
     this.logger = new z.util.Logger('z.viewModel.WindowTitleViewModel', z.config.LOGGER.OPTIONS);
@@ -71,7 +71,7 @@ z.viewModel.WindowTitleViewModel = class WindowTitleViewModel {
           amplify.publish(z.event.WebApp.LIFECYCLE.UNREAD_COUNT, unreadCount);
 
           switch (this.contentState()) {
-            case z.viewModel.content.CONTENT_STATE.CONNECTION_REQUESTS: {
+            case z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS: {
               const multipleRequests = connectionRequests > 1;
               const stringId = multipleRequests
                 ? z.string.conversations_connection_request_many
@@ -80,39 +80,39 @@ z.viewModel.WindowTitleViewModel = class WindowTitleViewModel {
               break;
             }
 
-            case z.viewModel.content.CONTENT_STATE.CONVERSATION: {
+            case z.viewModel.ContentViewModel.STATE.CONVERSATION: {
               if (this.conversationRepository.active_conversation()) {
                 specificTitle += this.conversationRepository.active_conversation().display_name();
               }
               break;
             }
 
-            case z.viewModel.content.CONTENT_STATE.PREFERENCES_ABOUT: {
+            case z.viewModel.ContentViewModel.STATE.PREFERENCES_ABOUT: {
               specificTitle += z.l10n.text(z.string.preferences_about);
               break;
             }
 
-            case z.viewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT: {
+            case z.viewModel.ContentViewModel.STATE.PREFERENCES_ACCOUNT: {
               specificTitle += z.l10n.text(z.string.preferences_account);
               break;
             }
 
-            case z.viewModel.content.CONTENT_STATE.PREFERENCES_AV: {
+            case z.viewModel.ContentViewModel.STATE.PREFERENCES_AV: {
               specificTitle += z.l10n.text(z.string.preferences_av);
               break;
             }
 
-            case z.viewModel.content.CONTENT_STATE.PREFERENCES_DEVICE_DETAILS: {
+            case z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICE_DETAILS: {
               specificTitle += z.l10n.text(z.string.preferences_device_details);
               break;
             }
 
-            case z.viewModel.content.CONTENT_STATE.PREFERENCES_DEVICES: {
+            case z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICES: {
               specificTitle += z.l10n.text(z.string.preferences_devices);
               break;
             }
 
-            case z.viewModel.content.CONTENT_STATE.PREFERENCES_OPTIONS: {
+            case z.viewModel.ContentViewModel.STATE.PREFERENCES_OPTIONS: {
               specificTitle += z.l10n.text(z.string.preferences_options);
               break;
             }

@@ -22,41 +22,40 @@
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 
-/**
- * Types for warning banners.
- */
-z.viewModel.WarningType = {
-  CONNECTIVITY_RECONNECT: 'connectivity_reconnect',
-  CONNECTIVITY_RECOVERY: 'connectivity_recovery',
-  DENIED_CAMERA: 'camera_access_denied',
-  DENIED_MICROPHONE: 'mic_access_denied',
-  DENIED_SCREEN: 'screen_access_denied',
-  LIFECYCLE_UPDATE: 'lifecycle_update',
-  NO_INTERNET: 'no_internet',
-  NOT_FOUND_CAMERA: 'not_found_camera',
-  NOT_FOUND_MICROPHONE: 'not_found_microphone',
-  REQUEST_CAMERA: 'request_camera',
-  REQUEST_MICROPHONE: 'request_microphone',
-  REQUEST_NOTIFICATION: 'request_notification',
-  REQUEST_SCREEN: 'request_screen',
-  UNSUPPORTED_INCOMING_CALL: 'unsupported_incoming_call',
-  UNSUPPORTED_OUTGOING_CALL: 'unsupported_outgoing_call',
-};
-
 z.viewModel.WarningsViewModel = class WarningsViewModel {
   static get CONFIG() {
     return {
       DIMMED_MODES: [
-        z.viewModel.WarningType.REQUEST_CAMERA,
-        z.viewModel.WarningType.REQUEST_MICROPHONE,
-        z.viewModel.WarningType.REQUEST_NOTIFICATION,
-        z.viewModel.WarningType.REQUEST_SCREEN,
+        WarningsViewModel.TYPE.REQUEST_CAMERA,
+        WarningsViewModel.TYPE.REQUEST_MICROPHONE,
+        WarningsViewModel.TYPE.REQUEST_NOTIFICATION,
+        WarningsViewModel.TYPE.REQUEST_SCREEN,
       ],
       MINI_MODES: [
-        z.viewModel.WarningType.CONNECTIVITY_RECONNECT,
-        z.viewModel.WarningType.LIFECYCLE_UPDATE,
-        z.viewModel.WarningType.NO_INTERNET,
+        WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT,
+        WarningsViewModel.TYPE.LIFECYCLE_UPDATE,
+        WarningsViewModel.TYPE.NO_INTERNET,
       ],
+    };
+  }
+
+  static get TYPE() {
+    return {
+      CONNECTIVITY_RECONNECT: 'connectivity_reconnect',
+      CONNECTIVITY_RECOVERY: 'connectivity_recovery',
+      DENIED_CAMERA: 'camera_access_denied',
+      DENIED_MICROPHONE: 'mic_access_denied',
+      DENIED_SCREEN: 'screen_access_denied',
+      LIFECYCLE_UPDATE: 'lifecycle_update',
+      NO_INTERNET: 'no_internet',
+      NOT_FOUND_CAMERA: 'not_found_camera',
+      NOT_FOUND_MICROPHONE: 'not_found_microphone',
+      REQUEST_CAMERA: 'request_camera',
+      REQUEST_MICROPHONE: 'request_microphone',
+      REQUEST_NOTIFICATION: 'request_notification',
+      REQUEST_SCREEN: 'request_screen',
+      UNSUPPORTED_INCOMING_CALL: 'unsupported_incoming_call',
+      UNSUPPORTED_OUTGOING_CALL: 'unsupported_outgoing_call',
     };
   }
 
@@ -74,7 +73,7 @@ z.viewModel.WarningsViewModel = class WarningsViewModel {
       const top_warning = warnings[warnings.length - 1];
       if (!warnings.length) {
         top_margin = '0';
-      } else if (top_warning === z.viewModel.WarningType.CONNECTIVITY_RECOVERY) {
+      } else if (top_warning === WarningsViewModel.TYPE.CONNECTIVITY_RECOVERY) {
         top_margin = '0';
       } else if (WarningsViewModel.CONFIG.MINI_MODES.includes(top_warning)) {
         top_margin = '32px';
@@ -114,14 +113,14 @@ z.viewModel.WarningsViewModel = class WarningsViewModel {
     this.dismiss_warning(warning_to_remove);
 
     switch (warning_to_remove) {
-      case z.viewModel.WarningType.REQUEST_MICROPHONE:
-        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalType.CALLING, {
+      case WarningsViewModel.TYPE.REQUEST_MICROPHONE:
+        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CALLING, {
           action() {
             z.util.safe_window_open(z.util.URLUtil.build_support_url(z.config.SUPPORT.ID.MICROPHONE_ACCESS_DENIED));
           },
         });
         break;
-      case z.viewModel.WarningType.REQUEST_NOTIFICATION:
+      case WarningsViewModel.TYPE.REQUEST_NOTIFICATION:
         // We block subsequent permission requests for notifications when the user ignores the request.
         amplify.publish(z.event.WebApp.NOTIFICATION.PERMISSION_STATE, z.notification.PermissionStatusState.IGNORED);
         break;
@@ -139,10 +138,10 @@ z.viewModel.WarningsViewModel = class WarningsViewModel {
 
   show_warning(type, info) {
     const is_connectivity_warning = [
-      z.viewModel.WarningType.CONNECTIVITY_RECONNECT,
-      z.viewModel.WarningType.NO_INTERNET,
+      WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT,
+      WarningsViewModel.TYPE.NO_INTERNET,
     ].includes(type);
-    const top_warning_is_not_lifecycle_update = this.top_warning() !== z.viewModel.WarningType.LIFECYCLE_UPDATE;
+    const top_warning_is_not_lifecycle_update = this.top_warning() !== WarningsViewModel.TYPE.LIFECYCLE_UPDATE;
     if (is_connectivity_warning && top_warning_is_not_lifecycle_update) {
       this.dismiss_warning(this.top_warning());
     }

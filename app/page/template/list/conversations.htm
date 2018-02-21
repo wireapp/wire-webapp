@@ -25,7 +25,7 @@
 
       <!-- ko if: show_connect_requests() -->
         <li class="conversation-list-cell"
-            data-bind="css: {'conversation-list-cell-active': contentState() === z.viewModel.content.CONTENT_STATE.CONNECTION_REQUESTS}">
+            data-bind="css: {'conversation-list-cell-active': contentState() === z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS}">
           <div class="conversation-list-cell-left">
             <!-- ko if: connect_requests().length > 1 -->
               <group-avatar params="users: connect_requests()"></group-avatar>
@@ -38,7 +38,7 @@
           </div>
           <div class="conversation-list-cell-center">
             <span class="conversation-list-cell-name"
-                  data-bind="click: click_on_connect_requests, text: connect_requests_text, css: {'text-theme': contentState() === z.viewModel.content.CONTENT_STATE.CONNECTION_REQUESTS}"
+                  data-bind="click: click_on_connect_requests, text: connect_requests_text, css: {'text-theme': contentState() === z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS}"
                   data-uie-name="item-pending-requests"></span>
           </div>
           <div class="conversation-list-cell-right">

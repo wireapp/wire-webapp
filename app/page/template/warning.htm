@@ -2,14 +2,14 @@
 
   <!-- ko if: warnings().length > 0-->
     <div class="warning" data-bind="css:{'warning-dimmed': warning_dimmed}">
-      <!-- ko if: top_warning() === z.viewModel.WarningType.REQUEST_CAMERA -->
+      <!-- ko if: top_warning() === z.viewModel.WarningsViewModel.TYPE.REQUEST_CAMERA -->
         <div class="warning-bar warning-bar-feature bg-theme">
           <div class="warning-bar-message" data-bind="l10n_html: {'id': z.string.warning_permission_request_camera, 'substitute': '<span class=\'warning-bar-icon icon-camera\'></span>'}"></div>
           <span class="warning-bar-close icon-close button-icon" data-bind="click: close_warning"></span>
         </div>
       <!-- /ko -->
 
-      <!-- ko if: top_warning() === z.viewModel.WarningType.DENIED_CAMERA -->
+      <!-- ko if: top_warning() === z.viewModel.WarningsViewModel.TYPE.DENIED_CAMERA -->
         <div class="warning-bar warning-bar-feature bg-theme">
           <div class="warning-bar-message">
             <span data-bind="l10n_text: z.string.warning_permission_denied_camera"></span>&nbsp;
@@ -19,14 +19,14 @@
         </div>
       <!-- /ko -->
 
-      <!-- ko if: top_warning() === z.viewModel.WarningType.REQUEST_MICROPHONE -->
+      <!-- ko if: top_warning() === z.viewModel.WarningsViewModel.TYPE.REQUEST_MICROPHONE -->
         <div class="warning-bar warning-bar-feature bg-theme">
           <div class="warning-bar-message" data-bind="l10n_html: {'id': z.string.warning_permission_request_microphone, 'substitute': '<span class=\'warning-bar-icon icon-microphone\'></span>'}"></div>
           <span class="warning-bar-close icon-close button-round button-round-dark" data-bind="click: close_warning"></span>
         </div>
       <!-- /ko -->
 
-      <!-- ko if: top_warning() === z.viewModel.WarningType.DENIED_MICROPHONE -->
+      <!-- ko if: top_warning() === z.viewModel.WarningsViewModel.TYPE.DENIED_MICROPHONE -->
         <div class="warning-bar warning-bar-feature bg-theme">
           <div class="warning-bar-message">
             <span data-bind="l10n_text: z.string.warning_permission_denied_microphone"></span>&nbsp;
@@ -36,14 +36,14 @@
         </div>
       <!-- /ko -->
 
-      <!-- ko if: top_warning() === z.viewModel.WarningType.REQUEST_SCREEN -->
+      <!-- ko if: top_warning() === z.viewModel.WarningsViewModel.TYPE.REQUEST_SCREEN -->
         <div class="warning-bar warning-bar-feature bg-theme">
           <div class="warning-bar-message" data-bind="l10n_html: {'id': z.string.warning_permission_request_screen, 'substitute': '<span class=\'warning-bar-icon icon-screensharing\'></span>'}"></div>
           <span class="warning-bar-close icon-close button-icon" data-bind="click: close_warning"></span>
         </div>
       <!-- /ko -->
 
-      <!-- ko if: top_warning() === z.viewModel.WarningType.DENIED_SCREEN -->
+      <!-- ko if: top_warning() === z.viewModel.WarningsViewModel.TYPE.DENIED_SCREEN -->
         <div class="warning-bar warning-bar-feature bg-theme">
           <div class="warning-bar-message">
             <span data-bind="l10n_text: z.string.warning_permission_denied_screen"></span>&nbsp;
@@ -53,7 +53,7 @@
         </div>
       <!-- /ko -->
 
-      <!-- ko if: top_warning() === z.viewModel.WarningType.NOT_FOUND_CAMERA -->
+      <!-- ko if: top_warning() === z.viewModel.WarningsViewModel.TYPE.NOT_FOUND_CAMERA -->
         <div class="warning-bar warning-bar-feature bg-theme">
           <div class="warning-bar-message">
             <span data-bind="l10n_text: z.string.warning_not_found_camera"></span>&nbsp;
@@ -63,7 +63,7 @@
         </div>
       <!-- /ko -->
 
-      <!-- ko if: top_warning() === z.viewModel.WarningType.NOT_FOUND_MICROPHONE -->
+      <!-- ko if: top_warning() === z.viewModel.WarningsViewModel.TYPE.NOT_FOUND_MICROPHONE -->
         <div class="warning-bar warning-bar-feature bg-theme">
           <div class="warning-bar-message">
             <span data-bind="l10n_text: z.string.warning_not_found_microphone"></span>&nbsp;
@@ -73,7 +73,7 @@
         </div>
       <!-- /ko -->
 
-      <!-- ko if: top_warning() === z.viewModel.WarningType.REQUEST_NOTIFICATION -->
+      <!-- ko if: top_warning() === z.viewModel.WarningsViewModel.TYPE.REQUEST_NOTIFICATION -->
         <div class="warning-bar warning-bar-feature bg-theme">
           <div class="warning-bar-message"
                data-bind="l10n_html: {'id': z.string.warning_permission_request_notification, 'substitute': '<span class=\'warning-bar-icon icon-envelope\'></span>'}"></div>
@@ -83,7 +83,7 @@
         </div>
       <!-- /ko -->
 
-      <!-- ko if: top_warning() === z.viewModel.WarningType.UNSUPPORTED_INCOMING_CALL -->
+      <!-- ko if: top_warning() === z.viewModel.WarningsViewModel.TYPE.UNSUPPORTED_INCOMING_CALL -->
         <div class="warning-bar warning-bar-feature bg-theme">
           <!-- ko ifnot: z.util.Environment.browser.chrome -->
             <div class="warning-bar-message"><span data-bind="l10n_text: {'id': z.string.warning_call_unsupported_incoming, substitute: z.util.escape_html(first_name())}"></span>&nbsp;<a class="warning-bar-link" rel="nofollow noopener noreferrer" target="_blank" data-bind="l10n_href: {support: z.config.SUPPORT.ID.CALLING}, l10n_text: z.string.warning_learn_more"></a></div>
@@ -103,7 +103,7 @@
         </div>
       <!-- /ko -->
 
-      <!-- ko if: top_warning() === z.viewModel.WarningType.UNSUPPORTED_OUTGOING_CALL -->
+      <!-- ko if: top_warning() === z.viewModel.WarningsViewModel.TYPE.UNSUPPORTED_OUTGOING_CALL -->
         <div class="warning-bar warning-bar-feature bg-theme">
           <!-- ko ifnot: z.util.Environment.browser.chrome -->
             <div class="warning-bar-message">
@@ -126,7 +126,7 @@
         </div>
       <!-- /ko -->
 
-      <!-- ko if: top_warning() === z.viewModel.WarningType.CONNECTIVITY_RECONNECT -->
+      <!-- ko if: top_warning() === z.viewModel.WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT -->
         <div class="warning-bar warning-bar-connection bg-theme">
           <div class="warning-bar-message">
             <span data-bind="l10n_text: z.string.warning_connectivity_connection_lost"></span>
@@ -137,17 +137,17 @@
         </div>
       <!-- /ko -->
 
-      <!-- ko if: top_warning() === z.viewModel.WarningType.CONNECTIVITY_RECOVERY -->
+      <!-- ko if: top_warning() === z.viewModel.WarningsViewModel.TYPE.CONNECTIVITY_RECOVERY -->
         <div class="warning-bar warning-bar-progress"></div>
       <!-- /ko -->
 
-      <!-- ko if: top_warning() === z.viewModel.WarningType.NO_INTERNET -->
+      <!-- ko if: top_warning() === z.viewModel.WarningsViewModel.TYPE.NO_INTERNET -->
         <div class="warning-bar warning-bar-connection bg-theme">
           <div class="warning-bar-message" data-bind="l10n_text: z.string.warning_connectivity_no_internet"></div>
         </div>
       <!-- /ko -->
 
-      <!-- ko if: top_warning() === z.viewModel.WarningType.LIFECYCLE_UPDATE -->
+      <!-- ko if: top_warning() === z.viewModel.WarningsViewModel.TYPE.LIFECYCLE_UPDATE -->
         <div class="warning-bar warning-bar-connection bg-theme">
           <div class="warning-bar-message">
             <span data-bind="l10n_text: z.string.warning_lifecycle_update"></span>&nbsp;

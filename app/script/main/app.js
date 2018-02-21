@@ -361,8 +361,8 @@ z.main.App = class App {
     this.auth.client
       .execute_on_connectivity(z.service.BackendClient.CONNECTIVITY_CHECK_TRIGGER.CONNECTION_REGAINED)
       .then(() => {
-        amplify.publish(z.event.WebApp.WARNING.DISMISS, z.viewModel.WarningType.NO_INTERNET);
-        amplify.publish(z.event.WebApp.WARNING.SHOW, z.viewModel.WarningType.CONNECTIVITY_RECONNECT);
+        amplify.publish(z.event.WebApp.WARNING.DISMISS, z.viewModel.WarningsViewModel.TYPE.NO_INTERNET);
+        amplify.publish(z.event.WebApp.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT);
         this.repository.event.reconnectWebSocket(z.event.WebSocketService.CHANGE_TRIGGER.ONLINE);
       });
   }
@@ -374,7 +374,7 @@ z.main.App = class App {
   on_internet_connection_lost() {
     this.logger.warn('Internet connection lost');
     this.repository.event.disconnectWebSocket(z.event.WebSocketService.CHANGE_TRIGGER.OFFLINE);
-    amplify.publish(z.event.WebApp.WARNING.SHOW, z.viewModel.WarningType.NO_INTERNET);
+    amplify.publish(z.event.WebApp.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.NO_INTERNET);
   }
 
   _app_init_failure(error, is_reload) {
@@ -565,7 +565,7 @@ z.main.App = class App {
     } else if (conversation_et) {
       amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversation_et);
     } else if (this.repository.user.connect_requests().length) {
-      amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.content.CONTENT_STATE.CONNECTION_REQUESTS);
+      amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS);
     }
 
     window.setTimeout(() => this.repository.notification.checkPermission(), App.CONFIG.NOTIFICATION_CHECK);
@@ -705,7 +705,7 @@ z.main.App = class App {
    */
   update(update_source) {
     this.update_source = update_source;
-    amplify.publish(z.event.WebApp.WARNING.SHOW, z.viewModel.WarningType.LIFECYCLE_UPDATE);
+    amplify.publish(z.event.WebApp.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.LIFECYCLE_UPDATE);
   }
 
   /**

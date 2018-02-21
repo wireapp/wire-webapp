@@ -130,7 +130,7 @@ z.viewModel.content.CollectionViewModel = class CollectionViewModel {
 
   clickOnSection(category, items) {
     this.collectionDetails.setConversation(this.conversationEntity(), category, [].concat(items));
-    amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.content.CONTENT_STATE.COLLECTION_DETAILS);
+    amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.COLLECTION_DETAILS);
   }
 
   clickOnImage(messageEntity) {

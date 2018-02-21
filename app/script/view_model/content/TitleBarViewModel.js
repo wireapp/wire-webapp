@@ -108,7 +108,7 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
   }
 
   clickOnCollectionButton() {
-    amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.content.CONTENT_STATE.COLLECTION);
+    amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.COLLECTION);
   }
 
   showDetails(addPeople) {

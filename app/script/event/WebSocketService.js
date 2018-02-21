@@ -173,7 +173,7 @@ z.event.WebSocketService = class WebSocketService {
    * @returns {undefined} No return value
    */
   reconnected() {
-    amplify.publish(z.event.WebApp.WARNING.DISMISS, z.viewModel.WarningType.CONNECTIVITY_RECONNECT);
+    amplify.publish(z.event.WebApp.WARNING.DISMISS, z.viewModel.WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT);
     this.logger.warn('Re-established WebSocket connection. Recovering from Notification Stream...');
     amplify.publish(z.event.WebApp.CONNECTION.ONLINE);
   }
@@ -196,7 +196,7 @@ z.event.WebSocketService = class WebSocketService {
     }
 
     if (reconnect) {
-      amplify.publish(z.event.WebApp.WARNING.SHOW, z.viewModel.WarningType.CONNECTIVITY_RECONNECT);
+      amplify.publish(z.event.WebApp.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT);
       this.reconnect(trigger);
     }
   }

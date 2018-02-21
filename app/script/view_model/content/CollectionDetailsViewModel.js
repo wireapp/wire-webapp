@@ -99,7 +99,7 @@ z.viewModel.content.CollectionDetailsViewModel = class CollectionDetailsViewMode
   }
 
   clickOnBackButton() {
-    amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.content.CONTENT_STATE.COLLECTION);
+    amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.COLLECTION);
   }
 
   clickOnImage(messageEntity) {

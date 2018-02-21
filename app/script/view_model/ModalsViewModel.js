@@ -22,41 +22,45 @@
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 
-z.viewModel.ModalType = {
-  BLOCK: '.modal-block',
-  BOTS_CONFIRM: '.modal-bots-confirm',
-  BOTS_UNAVAILABLE: '.modal-bots-unavailable',
-  CALL_EMPTY_CONVERSATION: '.modal-call-conversation-empty',
-  CALL_NO_VIDEO_IN_GROUP: '.modal-call-no-video-in-group',
-  CALL_START_ANOTHER: '.modal-call-second',
-  CALLING: '.modal-calling',
-  CLEAR: '.modal-clear',
-  CLEAR_GROUP: '.modal-clear-group',
-  CONNECTED_DEVICE: '.modal-connected-device',
-  CONTACTS: '.modal-contacts',
-  DELETE_ACCOUNT: '.modal-delete-account',
-  DELETE_EVERYONE_MESSAGE: '.modal-delete-message-everyone',
-  DELETE_MESSAGE: '.modal-delete-message',
-  LEAVE: '.modal-leave',
-  LOGOUT: '.modal-logout',
-  NEW_DEVICE: '.modal-new-device',
-  NOT_CONNECTED: '.modal-not-connected',
-  REMOVE_DEVICE: '.modal-remove-device',
-  SERVICE_UNAVAILABLE: '.modal-service-unavailable',
-  SESSION_RESET: '.modal-session-reset',
-  TOO_LONG_MESSAGE: '.modal-too-long-message',
-  TOO_MANY_MEMBERS: '.modal-too-many-members',
-  UPLOAD_PARALLEL: '.modal-asset-upload-parallel',
-  UPLOAD_TOO_LARGE: '.modal-asset-upload-too-large',
-};
-
-z.viewModel.MODAL_CONSENT_TYPE = {
-  INCOMING_CALL: 'incoming_call',
-  MESSAGE: 'message',
-  OUTGOING_CALL: 'outgoing_call',
-};
-
 z.viewModel.ModalsViewModel = class ModalsViewModel {
+  static get CONSENT_TYPE() {
+    return {
+      INCOMING_CALL: 'incoming_call',
+      MESSAGE: 'message',
+      OUTGOING_CALL: 'outgoing_call',
+    };
+  }
+
+  static get TYPE() {
+    return {
+      BLOCK: '.modal-block',
+      BOTS_CONFIRM: '.modal-bots-confirm',
+      BOTS_UNAVAILABLE: '.modal-bots-unavailable',
+      CALL_EMPTY_CONVERSATION: '.modal-call-conversation-empty',
+      CALL_NO_VIDEO_IN_GROUP: '.modal-call-no-video-in-group',
+      CALL_START_ANOTHER: '.modal-call-second',
+      CALLING: '.modal-calling',
+      CLEAR: '.modal-clear',
+      CLEAR_GROUP: '.modal-clear-group',
+      CONNECTED_DEVICE: '.modal-connected-device',
+      CONTACTS: '.modal-contacts',
+      DELETE_ACCOUNT: '.modal-delete-account',
+      DELETE_EVERYONE_MESSAGE: '.modal-delete-message-everyone',
+      DELETE_MESSAGE: '.modal-delete-message',
+      LEAVE: '.modal-leave',
+      LOGOUT: '.modal-logout',
+      NEW_DEVICE: '.modal-new-device',
+      NOT_CONNECTED: '.modal-not-connected',
+      REMOVE_DEVICE: '.modal-remove-device',
+      SERVICE_UNAVAILABLE: '.modal-service-unavailable',
+      SESSION_RESET: '.modal-session-reset',
+      TOO_LONG_MESSAGE: '.modal-too-long-message',
+      TOO_MANY_MEMBERS: '.modal-too-many-members',
+      UPLOAD_PARALLEL: '.modal-asset-upload-parallel',
+      UPLOAD_TOO_LARGE: '.modal-asset-upload-too-large',
+    };
+  }
+
   constructor() {
     this.logger = new z.util.Logger('z.viewModel.ModalsViewModel', z.config.LOGGER.OPTIONS);
     this.elementId = 'modals';
@@ -71,7 +75,7 @@ z.viewModel.ModalsViewModel = class ModalsViewModel {
   /**
    * Show modal
    *
-   * @param {z.viewModel.ModalType} type - Indicates which modal to show
+   * @param {ModalsViewModel.TYPE} type - Indicates which modal to show
    * @param {Object} [options={}] - Information to configure modal
    * @param {Object} options.data - Content needed for visualization on modal
    * @param {Function} options.action - Called when action in modal is triggered
@@ -83,43 +87,43 @@ z.viewModel.ModalsViewModel = class ModalsViewModel {
     const titleElement = $(type).find('.modal-title');
 
     switch (type) {
-      case z.viewModel.ModalType.BLOCK:
+      case ModalsViewModel.TYPE.BLOCK:
         this._showModalBlock(options.data, titleElement, messageElement);
         break;
-      case z.viewModel.ModalType.BOTS_CONFIRM:
+      case ModalsViewModel.TYPE.BOTS_CONFIRM:
         this._showModalBotsConfirm(options.data, messageElement);
         break;
-      case z.viewModel.ModalType.CALL_START_ANOTHER:
+      case ModalsViewModel.TYPE.CALL_START_ANOTHER:
         this._showModalCallStartAnother(options.data, titleElement, messageElement);
         break;
-      case z.viewModel.ModalType.CLEAR:
+      case ModalsViewModel.TYPE.CLEAR:
         type = this._showModalClear(options, type);
         break;
-      case z.viewModel.ModalType.CONNECTED_DEVICE:
+      case ModalsViewModel.TYPE.CONNECTED_DEVICE:
         this._showModalConnectedDevice(options.data);
         break;
-      case z.viewModel.ModalType.LEAVE:
+      case ModalsViewModel.TYPE.LEAVE:
         this._showModalLeave(options.data, titleElement);
         break;
-      case z.viewModel.ModalType.NEW_DEVICE:
+      case ModalsViewModel.TYPE.NEW_DEVICE:
         this._showModalNewDevice(options.data, titleElement, messageElement, actionElement);
         break;
-      case z.viewModel.ModalType.NOT_CONNECTED:
+      case ModalsViewModel.TYPE.NOT_CONNECTED:
         this._showModalNotConnected(options.data, messageElement);
         break;
-      case z.viewModel.ModalType.REMOVE_DEVICE:
+      case ModalsViewModel.TYPE.REMOVE_DEVICE:
         this._showModalRemoveDevice(options.data, titleElement);
         break;
-      case z.viewModel.ModalType.TOO_MANY_MEMBERS:
+      case ModalsViewModel.TYPE.TOO_MANY_MEMBERS:
         this._showModalTooManyMembers(options.data, messageElement);
         break;
-      case z.viewModel.ModalType.UPLOAD_PARALLEL:
+      case ModalsViewModel.TYPE.UPLOAD_PARALLEL:
         this._showModalUploadParallel(options.data, titleElement);
         break;
-      case z.viewModel.ModalType.UPLOAD_TOO_LARGE:
+      case ModalsViewModel.TYPE.UPLOAD_TOO_LARGE:
         this._showModalUploadTooLarge(options.data, titleElement);
         break;
-      case z.viewModel.ModalType.TOO_LONG_MESSAGE:
+      case ModalsViewModel.TYPE.TOO_LONG_MESSAGE:
         this._showModalMessageTooLong(options.data, messageElement);
         break;
       default:
@@ -206,7 +210,7 @@ z.viewModel.ModalsViewModel = class ModalsViewModel {
    * @returns {undefined} No return value
    */
   _showModalCallStartAnother(callState, titleElement, messageElement) {
-    const action_element = $(z.viewModel.ModalType.CALL_START_ANOTHER).find('.modal-action');
+    const action_element = $(ModalsViewModel.TYPE.CALL_START_ANOTHER).find('.modal-action');
 
     action_element.text(z.l10n.text(z.string[`modal_call_second_${callState}_action`]));
     messageElement.text(z.l10n.text(z.string[`modal_call_second_${callState}_message`]));
@@ -215,7 +219,7 @@ z.viewModel.ModalsViewModel = class ModalsViewModel {
 
   _showModalClear(options, type) {
     if (options.conversation.is_group() && !options.conversation.removed_from_conversation()) {
-      type = z.viewModel.ModalType.CLEAR_GROUP;
+      type = ModalsViewModel.TYPE.CLEAR_GROUP;
     }
 
     const titleElement = $(type).find('.modal-title');
@@ -225,7 +229,7 @@ z.viewModel.ModalsViewModel = class ModalsViewModel {
   }
 
   _showModalConnectedDevice(devices) {
-    const devicesElement = $(z.viewModel.ModalType.CONNECTED_DEVICE).find('.modal-connected-devices');
+    const devicesElement = $(ModalsViewModel.TYPE.CONNECTED_DEVICE).find('.modal-connected-devices');
 
     devicesElement.empty();
 
@@ -260,11 +264,11 @@ z.viewModel.ModalsViewModel = class ModalsViewModel {
     titleElement.text(z.l10n.text(stringId, substitutions));
 
     switch (content.consent_type) {
-      case z.viewModel.MODAL_CONSENT_TYPE.INCOMING_CALL:
+      case ModalsViewModel.CONSENT_TYPE.INCOMING_CALL:
         messageId = z.string.modal_new_device_call_incoming;
         actionId = z.string.modal_new_device_call_accept;
         break;
-      case z.viewModel.MODAL_CONSENT_TYPE.OUTGOING_CALL:
+      case ModalsViewModel.CONSENT_TYPE.OUTGOING_CALL:
         messageId = z.string.modal_new_device_call_outgoing;
         actionId = z.string.modal_new_device_call_anyway;
         break;

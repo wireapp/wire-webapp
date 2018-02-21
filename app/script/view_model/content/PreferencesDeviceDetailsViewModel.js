@@ -89,7 +89,7 @@ z.viewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
   }
 
   click_on_details_close() {
-    amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.content.CONTENT_STATE.PREFERENCES_DEVICES);
+    amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICES);
     this.device(null);
   }
 
@@ -116,7 +116,7 @@ z.viewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
   }
 
   click_on_remove_device() {
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalType.REMOVE_DEVICE, {
+    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.REMOVE_DEVICE, {
       action: password => {
         // @todo Add failure case ux WEBAPP-3570
         this.client_repository.deleteClient(this.device().id, password).then(() => {

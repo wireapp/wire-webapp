@@ -456,7 +456,7 @@ z.client.ClientRepository = class ClientRepository {
   logoutClient() {
     if (this.currentClient()) {
       if (this.currentClient().type === z.client.ClientType.PERMANENT) {
-        return amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalType.LOGOUT, {
+        return amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.LOGOUT, {
           action(clearData) {
             return amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SIGN_OUT_REASON.USER_REQUESTED, clearData);
           },

@@ -45,7 +45,7 @@ z.viewModel.list.ConversationListViewModel = class ConversationListViewModel {
 
     this.show_calls = ko.observable(false);
 
-    this.content_state = this.content_view_model.contentState;
+    this.content_state = this.content_view_model.state;
     this.selected_conversation = ko.observable();
 
     this.is_team = this.team_repository.isTeam;
@@ -112,7 +112,7 @@ z.viewModel.list.ConversationListViewModel = class ConversationListViewModel {
   }
 
   click_on_connect_requests() {
-    this.content_view_model.switchContent(z.viewModel.content.CONTENT_STATE.CONNECTION_REQUESTS);
+    this.content_view_model.switchContent(z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS);
   }
 
   click_on_conversation(conversation_et) {
@@ -141,9 +141,9 @@ z.viewModel.list.ConversationListViewModel = class ConversationListViewModel {
   is_selected_conversation(conversation_et) {
     const is_selected_conversation = this.conversation_repository.is_active_conversation(conversation_et);
     const is_selected_state = [
-      z.viewModel.content.CONTENT_STATE.COLLECTION,
-      z.viewModel.content.CONTENT_STATE.COLLECTION_DETAILS,
-      z.viewModel.content.CONTENT_STATE.CONVERSATION,
+      z.viewModel.ContentViewModel.STATE.COLLECTION,
+      z.viewModel.ContentViewModel.STATE.COLLECTION_DETAILS,
+      z.viewModel.ContentViewModel.STATE.CONVERSATION,
     ].includes(this.content_state());
 
     return is_selected_conversation && is_selected_state;
@@ -158,7 +158,7 @@ z.viewModel.list.ConversationListViewModel = class ConversationListViewModel {
   //##############################################################################
 
   click_on_archived_button() {
-    this.list_view_model.switch_list(z.viewModel.list.LIST_STATE.ARCHIVE);
+    this.list_view_model.switch_list(z.viewModel.ListViewModel.STATE.ARCHIVE);
   }
 
   click_on_preferences_button() {
@@ -166,7 +166,7 @@ z.viewModel.list.ConversationListViewModel = class ConversationListViewModel {
   }
 
   click_on_people_button() {
-    this.list_view_model.switch_list(z.viewModel.list.LIST_STATE.START_UI);
+    this.list_view_model.switch_list(z.viewModel.ListViewModel.STATE.START_UI);
   }
 
   //##############################################################################

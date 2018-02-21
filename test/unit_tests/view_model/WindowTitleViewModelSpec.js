@@ -33,7 +33,7 @@ describe('z.viewModel.WindowTitleViewModel', () => {
         title_view_model = new z.viewModel.WindowTitleViewModel(
           {
             content: {
-              contentState: ko.observable(z.viewModel.content.CONTENT_STATE.CONVERSATION),
+              contentState: ko.observable(z.viewModel.ContentViewModel.STATE.CONVERSATION),
             },
           },
           {
@@ -132,7 +132,7 @@ describe('z.viewModel.WindowTitleViewModel', () => {
     });
 
     it('sets the name when opening the preferences about page', () => {
-      title_view_model.contentState(z.viewModel.content.CONTENT_STATE.PREFERENCES_ABOUT);
+      title_view_model.contentState(z.viewModel.ContentViewModel.STATE.PREFERENCES_ABOUT);
 
       const expected_title = `${z.string.preferences_about} · ${suffix}`;
       title_view_model.initiateTitleUpdates();
@@ -140,7 +140,7 @@ describe('z.viewModel.WindowTitleViewModel', () => {
     });
 
     it('sets the name when opening the preferences account page', () => {
-      title_view_model.contentState(z.viewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT);
+      title_view_model.contentState(z.viewModel.ContentViewModel.STATE.PREFERENCES_ACCOUNT);
 
       const expected_title = `${z.string.preferences_account} · ${suffix}`;
       title_view_model.initiateTitleUpdates();
@@ -148,7 +148,7 @@ describe('z.viewModel.WindowTitleViewModel', () => {
     });
 
     it('sets the name when opening the preferences av page', () => {
-      title_view_model.contentState(z.viewModel.content.CONTENT_STATE.PREFERENCES_AV);
+      title_view_model.contentState(z.viewModel.ContentViewModel.STATE.PREFERENCES_AV);
 
       const expected_title = `${z.string.preferences_av} · ${suffix}`;
       title_view_model.initiateTitleUpdates();
@@ -156,7 +156,7 @@ describe('z.viewModel.WindowTitleViewModel', () => {
     });
 
     it('sets the name when opening the preferences device details page', () => {
-      title_view_model.contentState(z.viewModel.content.CONTENT_STATE.PREFERENCES_DEVICE_DETAILS);
+      title_view_model.contentState(z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICE_DETAILS);
 
       const expected_title = `${z.string.preferences_device_details} · ${suffix}`;
       title_view_model.initiateTitleUpdates();
@@ -164,7 +164,7 @@ describe('z.viewModel.WindowTitleViewModel', () => {
     });
 
     it('sets the name when opening the preferences devices page', () => {
-      title_view_model.contentState(z.viewModel.content.CONTENT_STATE.PREFERENCES_DEVICES);
+      title_view_model.contentState(z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICES);
 
       const expected_title = `${z.string.preferences_devices} · ${suffix}`;
       title_view_model.initiateTitleUpdates();
@@ -172,7 +172,7 @@ describe('z.viewModel.WindowTitleViewModel', () => {
     });
 
     it('sets the name when opening the preferences options page', () => {
-      title_view_model.contentState(z.viewModel.content.CONTENT_STATE.PREFERENCES_OPTIONS);
+      title_view_model.contentState(z.viewModel.ContentViewModel.STATE.PREFERENCES_OPTIONS);
 
       const expected_title = `${z.string.preferences_options} · ${suffix}`;
       title_view_model.initiateTitleUpdates();
@@ -180,7 +180,7 @@ describe('z.viewModel.WindowTitleViewModel', () => {
     });
 
     it('shows the number of connection requests when viewing the inbox', () => {
-      title_view_model.contentState(z.viewModel.content.CONTENT_STATE.CONNECTION_REQUESTS);
+      title_view_model.contentState(z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS);
 
       const pending_connection = new z.entity.Connection();
       pending_connection.status(z.user.ConnectionStatus.PENDING);

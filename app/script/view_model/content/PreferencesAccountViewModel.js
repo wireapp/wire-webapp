@@ -205,11 +205,11 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   check_new_clients() {
     if (this.new_clients().length) {
       amplify.publish(z.event.WebApp.SEARCH.BADGE.HIDE);
-      amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalType.CONNECTED_DEVICE, {
+      amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONNECTED_DEVICE, {
         close: () => this.new_clients.removeAll(),
         data: this.new_clients(),
         secondary() {
-          amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.content.CONTENT_STATE.PREFERENCES_DEVICES);
+          amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICES);
         },
       });
     }
@@ -226,7 +226,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   click_on_delete_account() {
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalType.DELETE_ACCOUNT, {
+    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.DELETE_ACCOUNT, {
       action: () => this.user_repository.delete_me(),
       data: this.self_user().email(),
     });

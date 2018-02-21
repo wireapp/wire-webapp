@@ -352,7 +352,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
     $('user-input input').blur();
 
     amplify.publish(z.event.WebApp.SEARCH.HIDE);
-    this.listViewModel.switch_list(z.viewModel.list.LIST_STATE.CONVERSATIONS);
+    this.listViewModel.switch_list(z.viewModel.ListViewModel.STATE.CONVERSATIONS);
 
     if (this.userBubble) {
       this.userBubble.hide();
@@ -530,7 +530,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
         if (!isNoContacts) {
           this.logger.error(`Importing contacts from '${source}' failed: ${error.message}`, error);
 
-          amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalType.CONTACTS, {
+          amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONTACTS, {
             action: () => this.importContacts(source),
           });
         }

@@ -399,7 +399,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     const reset_progress = () =>
       window.setTimeout(() => {
         message_et.is_resetting_session(false);
-        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalType.SESSION_RESET);
+        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.SESSION_RESET);
       }, z.motion.MotionDuration.LONG);
 
     message_et.is_resetting_session(true);
@@ -598,7 +598,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     if (message_et.is_deletable()) {
       entries.push({
         click: () => {
-          amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalType.DELETE_MESSAGE, {
+          amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.DELETE_MESSAGE, {
             action: () => this.conversation_repository.delete_message(this.conversation(), message_et),
           });
         },
@@ -613,7 +613,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     ) {
       entries.push({
         click: () => {
-          amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalType.DELETE_EVERYONE_MESSAGE, {
+          amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.DELETE_EVERYONE_MESSAGE, {
             action: () => this.conversation_repository.delete_message_everyone(this.conversation(), message_et),
           });
         },
