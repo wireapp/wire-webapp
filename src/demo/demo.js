@@ -17,14 +17,14 @@
  *
  */
 
+import {AUTH_TABLE_NAME, AccessTokenStore} from '@wireapp/api-client/dist/commonjs/auth/';
 import {Button, Form, Input} from '@wireapp/react-ui-kit/Form';
 import {COLOR, Logo} from '@wireapp/react-ui-kit/Identity';
 import {ContainerXS, Content, Header, StyledApp} from '@wireapp/react-ui-kit/Layout';
 import {H1, Link, Text} from '@wireapp/react-ui-kit/Text';
 import React, {Component} from 'react';
-import {AccessTokenStore} from '@wireapp/api-client/dist/commonjs/auth/';
 import Client from '@wireapp/api-client/dist/commonjs/Client';
-import {MemoryEngine} from '@wireapp/store-engine/dist/commonjs/engine';
+import {IndexedDBEngine} from '@wireapp/store-engine/dist/commonjs/engine';
 import ReactDOM from 'react-dom';
 import {WebSocketClient} from '@wireapp/api-client/dist/commonjs/tcp/';
 
@@ -86,8 +86,8 @@ class Auth extends Component {
                 display: 'flex',
               }}
             >
-              <Input onChange={this.onEmailChange} placeholder="Email" />
-              <Input onChange={this.onPasswordChange} type="password" placeholder="Password" />
+              <Input onChange={this.onEmailChange} placeholder="Email" name="username" />
+              <Input onChange={this.onPasswordChange} type="password" placeholder="Password" name="password" />
               <Button type="submit" backgroundColor={COLOR.GREEN} block>
                 {this.state.authenticated ? '😊' : 'Login'}
               </Button>
@@ -103,7 +103,15 @@ class Auth extends Component {
   }
 }
 window.onload = function() {
-  const config = {store: new MemoryEngine('wire-demo'), urls: BACKEND_ENV};
+  const config = {
+    schemaCallback: db => {
+      db.version(1).stores({
+        [AUTH_TABLE_NAME]: '',
+      });
+    },
+    store: new IndexedDBEngine(),
+    urls: BACKEND_ENV,
+  };
   const client = new Client(config);
   client.transport.ws.on(WebSocketClient.TOPIC.ON_MESSAGE, notification => {
     console.log('Received notification via WebSocket', notification);
