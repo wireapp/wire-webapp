@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="0.2.0"></a>
+# [0.2.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/compare/@wireapp/store-engine@0.1.15...@wireapp/store-engine@0.2.0) (2018-02-21)
+
+
+### Features
+
+* **store-engine:** Existing Dexie instance can be passed to "IndexedDBEngine" ([#290](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/issues/290)) ([08fa6aa](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/commit/08fa6aa))
+
+
+
+
 <a name="0.1.15"></a>
 ## [0.1.15](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/compare/@wireapp/store-engine@0.1.14...@wireapp/store-engine@0.1.15) (2018-02-20)
 
