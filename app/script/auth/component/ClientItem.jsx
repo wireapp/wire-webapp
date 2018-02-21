@@ -36,6 +36,7 @@ import {parseError, parseValidationErrors} from '../util/errorUtil';
 import ValidationError from '../module/action/ValidationError';
 import {clientItemStrings} from '../../strings';
 import {injectIntl} from 'react-intl';
+import * as URLUtil from '../util/urlUtil';
 
 class ClientItem extends React.Component {
   static initialState = {

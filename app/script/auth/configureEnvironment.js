@@ -33,6 +33,7 @@ import '../util/util';
 // Adding "window.z.util.Environment" which is required by "wire-desktop"
 import '../util/Environment';
 import '../util/URLUtil';
+import '../storage/StorageService';
 
 // Expose wire object in global namespace to satisfy wrapper check
 const configureEnvironment = () => (window.wire = {});

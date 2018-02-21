@@ -29,7 +29,11 @@ const BACKEND = Environment.onEnvironment(
 
 export const configureClient = () =>
   new APIClient({
-    store: new StoreEngine.MemoryEngine('wire-webapp'),
+    schemaCallback: db => {
+      const {schema, version} = window.z.storage.StorageService.SCHEMA;
+      db.version(version).stores(schema);
+    },
+    store: new StoreEngine.IndexedDBEngine(),
     urls: BACKEND,
   });
 
