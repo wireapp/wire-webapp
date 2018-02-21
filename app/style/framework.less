@@ -43,14 +43,19 @@
   .right-column {
     transform: scale(1, 1);
     overflow: hidden;
+    width: 0;
   }
 }
 
-.app.app__panel {
+.app {
   .center-column {
     &__overlay {
-      transition: opacity @animation-timing-fast @ease-in-out-quart;
       background-color: rgba(0, 0, 0, 0.1);
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
       display: none;
       opacity: 0;
     }
@@ -72,11 +77,15 @@
     .right-column {
       position: absolute;
       right: 0;
+      width: @right-width;
     }
 
     @media (min-width: 1000px) {
       .right-column {
         position: relative;
+      }
+      .center-column__overlay {
+        display: none;
       }
     }
   }

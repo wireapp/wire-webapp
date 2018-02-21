@@ -39,88 +39,136 @@ z.ViewModel.MainViewModel = class MainViewModel {
 
     ko.applyBindings(this, document.getElementById(element_id));
 
-    this.isLeftColumnOpen = ko.observable(true);
-    this.isRightColumnOpen = ko.observable(false);
-    this.resize = this.resize.bind(this);
+    this.isPanelOpen = ko.observable(false);
+    this.togglePanel = this.togglePanel.bind(this);
+    this.openPanel = this.openPanel.bind(this);
+    this.closePanel = this.closePanel.bind(this);
+    this.togglePanel = this.togglePanel.bind(this);
   }
 
-  openRightColumn() {
-    this.resize(document.querySelector('#left-column').clientWidth, 200);
-    this.isRightColumnOpen(true);
+  openPanel() {
+    return this.togglePanel('open');
   }
 
-  closeRightColumn() {
-    this.resize(document.querySelector('#left-column').clientWidth, 0);
-    this.isRightColumnOpen(false);
+  closePanel() {
+    return this.togglePanel('close');
   }
 
-  toggleRightColumn() {
-    if (this.isRightColumnOpen()) {
-      this.closeRightColumn();
-    } else {
-      this.openRightColumn();
+  togglePanel(forceState) {
+    const panelSize = 304;
+    const breakPoint = 1000;
+
+    const app = document.querySelector('#app');
+    const panel = document.querySelector('.right-column');
+
+    const isPanelOpen = app.classList.contains('app--panel-open');
+    if ((forceState === 'open' && isPanelOpen) || (forceState === 'close' && !isPanelOpen)) {
+      return Promise.resolve();
     }
-  }
 
-  resize(newWidthLeft, newWidthRight) {
-    const smoothStep = x => (x > 1 ? 1 : x < 0 ? 0 : x * x * (3 - 2 * x));
-    const lerp = (v1, v2, t) => v1 + (v2 - v1) * t;
-    const setStyle = (el, size) => (el.style.minWidth = el.style.flexBasis = `${size}px`);
+    const titleBar = document.querySelector('#conversation-titlebar');
+    const input = document.querySelector('.conversation-input');
+    // const messageList = document.querySelector('#message-list');
+    const overlay = document.querySelector('.center-column__overlay');
+    // messageList.style.transformOrigin = 'left';
 
-    const main = document.querySelector('#wire-main');
-    const leftColumn = document.querySelector('#left-column');
-    const centerColumn = document.querySelector('#center-column');
-    const rightColumn = document.querySelector('#right-column');
+    const isNarrowScreen = app.offsetWidth < breakPoint;
 
-    const oldWidthLeft = leftColumn.clientWidth;
-    const oldWidthCenter = centerColumn.clientWidth;
-    const oldWidthRight = rightColumn.clientWidth;
+    const centerWidthClose = app.offsetWidth - panelSize;
+    const centerWidthOpen = centerWidthClose - panelSize;
 
-    const newWidthCenter = main.clientWidth - newWidthLeft - newWidthRight;
+    return new Promise(resolve => {
+      panel.addEventListener('transitionend', () => {
+        clearStyles(panel, ['width', 'transform', 'position', 'right', 'transition']);
+        clearStyles(overlay, ['display', 'opacity', 'transition']);
+        clearStyles(titleBar, ['width', 'transition']);
+        clearStyles(input, ['width', 'transition']);
+        // clearStyles(messageList, ['width', 'transform', 'transition']);
 
-    const moveInLeft = oldWidthLeft === 0;
-    const moveOutLeft = newWidthLeft === 0;
+        if (isPanelOpen) {
+          app.classList.remove('app--panel-open');
+          this.isPanelOpen(false);
+        } else {
+          app.classList.add('app--panel-open');
+          this.isPanelOpen(true);
+        }
+        window.dispatchEvent(new Event('resize'));
+        resolve();
+      });
 
-    const moveInRight = oldWidthRight === 0;
-    const moveOutRight = newWidthRight === 0;
-
-    const scaleLeft0 = moveInLeft || moveOutLeft ? 1 : oldWidthLeft / newWidthLeft;
-    const scaleCenter0 = oldWidthCenter / newWidthCenter;
-    const scaleRight0 = moveInRight || moveOutRight ? 1 : oldWidthRight / newWidthRight;
-
-    const transLeft0 = moveInLeft ? -newWidthLeft : 0;
-    const transCenter0 = moveOutLeft ? 0 : oldWidthLeft - newWidthLeft;
-    const transRight0 = oldWidthCenter - newWidthCenter - (moveInLeft ? newWidthLeft : 0);
-
-    const trans1 = moveOutLeft ? -oldWidthLeft : 0;
-
-    leftColumn.style.transformOrigin = centerColumn.style.transformOrigin = rightColumn.style.transformOrigin = 'left';
-
-    setStyle(leftColumn, newWidthLeft || oldWidthLeft);
-    setStyle(centerColumn, newWidthCenter);
-    setStyle(rightColumn, newWidthRight || oldWidthRight);
-
-    const startTime = Date.now();
-    const duration = this.duration;
-    function animate() {
-      const currTime = Date.now() - startTime;
-      if (currTime < duration) {
-        requestAnimationFrame(animate);
+      if (isPanelOpen) {
+        applyStyle(panel, panelOpenStyle(panelSize));
+        if (isNarrowScreen) {
+          applyStyle(overlay, {opacity: 1});
+        } else {
+          applyStyle(titleBar, {width: `${centerWidthOpen}px`});
+          applyStyle(input, {width: `${centerWidthOpen}px`});
+          // applyStyle(messageList, {
+          //   width: `${centerWidthClose}px`,
+          //   transform: `scale(${centerWidthOpen / centerWidthClose}, 1)`,
+          // });
+        }
       } else {
-        leftColumn.style.transform = centerColumn.style.transform = rightColumn.style.transform = '';
-        centerColumn.style.minWidth = centerColumn.style.flexBasis = '';
-        setStyle(leftColumn, newWidthLeft);
-        setStyle(rightColumn, newWidthRight);
-        return;
+        applyStyle(panel, panelCloseStyle(panelSize));
+        if (isNarrowScreen) {
+          applyStyle(overlay, {display: 'block', opacity: 0});
+        } else {
+          applyStyle(titleBar, {width: `${centerWidthClose}px`});
+          applyStyle(input, {width: `${centerWidthClose}px`});
+          // applyStyle(messageList, {
+          //   width: `${centerWidthOpen}px`,
+          //   transform: `scale(${centerWidthClose / centerWidthOpen}, 1)`,
+          // });
+        }
       }
-      const step = smoothStep(currTime / duration);
-      leftColumn.style.transform = `scale(${lerp(scaleLeft0, 1, step)}, 1)
-      translateX(${lerp(transLeft0, trans1, step)}px)`;
-      centerColumn.style.transform = `scale(${lerp(scaleCenter0, 1, step)}, 1)
-      translateX(${lerp(transCenter0, trans1, step)}px)`;
-      rightColumn.style.transform = `scale(${lerp(scaleRight0, 1, step)}, 1)
-      translateX(${lerp(transRight0, trans1, step)}px)`;
-    }
-    animate();
+
+      // this forces one layout repaint, so the new styles are applied and can be transitioned
+      panel.offsetHeight; // eslint-disable-line no-unused-expressions
+      panel.style.transition = 'transform .35s cubic-bezier(0.19, 1, 0.22, 1)';
+      overlay.style.transition = 'opacity .35s cubic-bezier(0.165, 0.84, 0.44, 1)';
+      titleBar.style.transition = input.style.transition = 'width .35s cubic-bezier(0.19, 1, 0.22, 1)';
+
+      if (isPanelOpen) {
+        applyStyle(panel, panelCloseStyle(panelSize));
+        if (isNarrowScreen) {
+          applyStyle(overlay, {opacity: 0});
+        } else {
+          applyStyle(titleBar, {width: `${centerWidthClose}px`});
+          applyStyle(input, {width: `${centerWidthClose}px`});
+          // applyStyle(messageList, {transform: `scale(1, 1)`});
+        }
+      } else {
+        applyStyle(panel, panelOpenStyle(panelSize));
+        if (isNarrowScreen) {
+          applyStyle(overlay, {opacity: 1});
+        } else {
+          applyStyle(titleBar, {width: `${centerWidthOpen}px`});
+          applyStyle(input, {width: `${centerWidthOpen}px`});
+          // applyStyle(messageList, {transform: `scale(1, 1)`});
+        }
+      }
+    });
   }
 };
+
+function applyStyle(el, style) {
+  Object.keys(style).forEach(key => (el.style[key] = style[key]));
+}
+
+function clearStyles(el, styles) {
+  styles.forEach(key => (el.style[key] = ''));
+}
+
+const panelOpenStyle = panelSize => ({
+  position: 'absolute',
+  right: '0',
+  transform: `translateX(0px)`,
+  width: `${panelSize}px`,
+});
+
+const panelCloseStyle = panelSize => ({
+  position: 'absolute',
+  right: '0',
+  transform: `translateX(${panelSize}px)`,
+  width: `${panelSize}px`,
+});

@@ -451,7 +451,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
 
   toggleParticipantsSidebar(addPeople = false) {
     const mainView = wire.app.view.main;
-    const isOpen = mainView.isRightColumnOpen();
+    const isOpen = mainView.isPanelOpen();
     const toggleSidebar = () => {
       if (!isOpen) {
         this.resetView();
@@ -465,7 +465,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
 
       if (addPeople && !this.conversation().is_guest()) {
         if (!isOpen) {
-          mainView.openRightColumn();
+          mainView.openPanel();
           this.clickOnAddPeople();
           return;
         }
@@ -478,7 +478,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
         return this.clickOnAddPeople();
       }
 
-      return mainView.toggleRightColumn();
+      return mainView.togglePanel();
     };
     toggleSidebar();
   }
