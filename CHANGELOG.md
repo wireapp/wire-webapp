@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="0.4.0"></a>
+# [0.4.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@0.3.20...@wireapp/api-client@0.4.0) (2018-02-21)
+
+
+### Features
+
+* **api-client:** External schema definition config for IndexedDBEngine ([#289](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/289)) ([8b3ecb6](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/8b3ecb6))
+
+
+
+
 <a name="0.3.20"></a>
 ## [0.3.20](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@0.3.19...@wireapp/api-client@0.3.20) (2018-02-20)
 
