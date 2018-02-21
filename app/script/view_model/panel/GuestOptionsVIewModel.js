@@ -21,21 +21,8 @@
 
 window.z = window.z || {};
 window.z.ViewModel = z.ViewModel || {};
+window.z.ViewModel.panel = z.ViewModel.panel || {};
 
-z.ViewModel.DetailsViewModel = class DetailsViewModel {
-  /**
-   * View model for the details column.
-   * @param {z.ViewModel.MainViewModel} mainViewModel - Main view model
-   * @param {Object} repositories - Object containing all repositories
-   */
-  constructor(mainViewModel, repositories) {
-    this.elementId = 'right-column';
-    this.logger = new z.util.Logger('z.ViewModel.details.DetailsViewModel', z.config.LOGGER.OPTIONS);
-
-    // Nested view models
-    this.participants = new z.ViewModel.details.ParticipantsViewModel(mainViewModel, repositories);
-    this.guestOptions = new z.ViewModel.details.GuestOptionsViewModel(mainViewModel, repositories);
-
-    ko.applyBindings(this, document.getElementById(this.elementId));
-  }
+z.ViewModel.panel.GuestOptionsViewModel = class GuestOptionsViewModel {
+  constructor() {}
 };

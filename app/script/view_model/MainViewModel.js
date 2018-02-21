@@ -26,7 +26,6 @@ z.ViewModel.MainViewModel = class MainViewModel {
   constructor(repositories) {
     this.closePanel = this.closePanel.bind(this);
     this.openPanel = this.openPanel.bind(this);
-    this.resize = this.resize.bind(this);
     this.togglePanel = this.togglePanel.bind(this);
 
     this.elementId = 'wire-main';
@@ -39,7 +38,7 @@ z.ViewModel.MainViewModel = class MainViewModel {
     this.isPanelOpen = ko.observable(false);
 
     this.content = new z.ViewModel.ContentViewModel(this, repositories);
-    this.details = new z.ViewModel.DetailsViewModel(this, repositories);
+    this.panel = new z.ViewModel.PanelViewModel(this, repositories);
     this.list = new z.ViewModel.ListViewModel(this, repositories);
 
     this.modals = new z.ViewModel.ModalsViewModel();
@@ -58,7 +57,7 @@ z.ViewModel.MainViewModel = class MainViewModel {
       }
     });
 
-    ko.applyBindings(this, document.getElementById(element_id));
+    ko.applyBindings(this, document.getElementById(this.elementId));
   }
 
   openPanel() {

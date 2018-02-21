@@ -21,9 +21,9 @@
 
 window.z = window.z || {};
 window.z.ViewModel = z.ViewModel || {};
-window.z.ViewModel.details = z.ViewModel.details || {};
+window.z.ViewModel.panel = z.ViewModel.panel || {};
 
-z.ViewModel.details.ParticipantsViewModel = class ParticipantsViewModel {
+z.ViewModel.panel.ParticipantsViewModel = class ParticipantsViewModel {
   static get CONFIG() {
     return {
       ADD_STATES: [ParticipantsViewModel.STATE.ADD_PEOPLE, ParticipantsViewModel.STATE.ADD_SERVICE],
