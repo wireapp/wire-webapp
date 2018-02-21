@@ -7,7 +7,7 @@ module.exports = {
   devtool: 'cheap-module-source-map',
   entry: {
     'demo-bundle': `${__dirname}/src/demo/index.js`,
-    'test-bundle': `${__dirname}/src/test/browser/index.js`,
+    'test-bundle': `${__dirname}/src/main/index.test.browser.js`,
   },
   externals: {
     'fs-extra': '{}',
