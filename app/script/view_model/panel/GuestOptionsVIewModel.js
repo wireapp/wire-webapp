@@ -20,9 +20,9 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.ViewModel = z.ViewModel || {};
-window.z.ViewModel.panel = z.ViewModel.panel || {};
+window.z.viewModel = z.viewModel || {};
+window.z.viewModel.panel = z.viewModel.panel || {};
 
-z.ViewModel.panel.GuestOptionsViewModel = class GuestOptionsViewModel {
+z.viewModel.panel.GuestOptionsViewModel = class GuestOptionsViewModel {
   constructor() {}
 };

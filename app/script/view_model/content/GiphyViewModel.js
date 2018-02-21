@@ -20,9 +20,10 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.ViewModel = z.ViewModel || {};
+window.z.viewModel = z.viewModel || {};
+window.z.viewModel.content = z.viewModel.content || {};
 
-z.ViewModel.GiphyViewModel = class GiphyViewModel {
+z.viewModel.content.GiphyViewModel = class GiphyViewModel {
   static get CONFIG() {
     return {
       NUMBER_OF_GIFS: 6,
@@ -42,7 +43,7 @@ z.ViewModel.GiphyViewModel = class GiphyViewModel {
 
     this.conversation_repository = repositories.conversation;
     this.giphy_repository = repositories.giphy;
-    this.logger = new z.util.Logger('z.ViewModel.GiphyViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger('z.viewModel.content.GiphyViewModel', z.config.LOGGER.OPTIONS);
 
     this.modal = undefined;
     this.state = ko.observable(GiphyViewModel.STATE.DEFAULT);

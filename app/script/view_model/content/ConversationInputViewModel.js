@@ -20,10 +20,11 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.ViewModel = z.ViewModel || {};
+window.z.viewModel = z.viewModel || {};
+window.z.viewModel.content = z.viewModel.content || {};
 
-// Parent: z.ViewModel.ContentViewModel
-z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
+// Parent: z.viewModel.ContentViewModel
+z.viewModel.content.ConversationInputViewModel = class ConversationInputViewModel {
   constructor(mainViewModel, repositories) {
     this.added_to_view = this.added_to_view.bind(this);
     this.on_drop_files = this.on_drop_files.bind(this);
@@ -33,7 +34,7 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
 
     this.conversation_repository = repositories.conversation;
     this.user_repository = repositories.user;
-    this.logger = new z.util.Logger('z.ViewModel.ConversationInputViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger('z.viewModel.content.ConversationInputViewModel', z.config.LOGGER.OPTIONS);
 
     this.conversation_et = this.conversation_repository.active_conversation;
     this.conversation_et.subscribe(() => {
@@ -163,7 +164,7 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
       .blur(() => this.browser_has_focus(false))
       .focus(() => this.browser_has_focus(true));
 
-    this.conversation_input_emoji = new z.ViewModel.ConversationInputEmojiViewModel(repositories);
+    this.conversation_input_emoji = new z.viewModel.content.ConversationInputEmojiViewModel(repositories);
 
     this._init_subscriptions();
   }
@@ -269,7 +270,7 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
         if (file.size > z.config.MAXIMUM_ASSET_FILE_SIZE) {
           amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
           window.setTimeout(() => {
-            amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.UPLOAD_TOO_LARGE, {
+            amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalType.UPLOAD_TOO_LARGE, {
               data: z.util.format_bytes(z.config.MAXIMUM_ASSET_FILE_SIZE),
             });
           }, 200);
@@ -328,7 +329,7 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
     const is_hitting_upload_limit = pending_uploads + files.length > z.config.MAXIMUM_ASSET_UPLOADS;
 
     if (is_hitting_upload_limit) {
-      amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.UPLOAD_PARALLEL, {
+      amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalType.UPLOAD_PARALLEL, {
         data: z.config.MAXIMUM_ASSET_UPLOADS,
       });
     }
@@ -373,7 +374,7 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
     const message = z.util.StringUtil.trim_line_breaks(this.input());
 
     if (message.length > z.config.MAXIMUM_MESSAGE_LENGTH) {
-      amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.TOO_LONG_MESSAGE, {
+      amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalType.TOO_LONG_MESSAGE, {
         data: z.config.MAXIMUM_MESSAGE_LENGTH,
       });
       return;

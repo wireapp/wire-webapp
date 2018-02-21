@@ -21,7 +21,7 @@
 
 // grunt test_init && grunt test_run:view_model/PreferencesDeviceDetailsViewModel
 
-describe('z.ViewModel.content.PreferencesDeviceDetailsViewModel', () => {
+describe('z.viewModel.content.PreferencesDeviceDetailsViewModel', () => {
   const testFactory = new TestFactory();
   let viewModel;
 
@@ -29,7 +29,7 @@ describe('z.ViewModel.content.PreferencesDeviceDetailsViewModel', () => {
     testFactory
       .exposeConversationActors()
       .then(() => {
-        viewModel = new z.ViewModel.content.PreferencesDeviceDetailsViewModel(undefined, {
+        viewModel = new z.viewModel.content.PreferencesDeviceDetailsViewModel(undefined, {
           client: TestFactory.client_repository,
           conversation: TestFactory.conversation_repository,
           cryptography: TestFactory.cryptography_repository,

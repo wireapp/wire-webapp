@@ -20,17 +20,18 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.ViewModel = z.ViewModel || {};
+window.z.viewModel = z.viewModel || {};
+window.z.viewModel.content = z.viewModel.content || {};
 
-// Parent: z.ViewModel.ConversationTitlebarViewModel
-z.ViewModel.ConversationTitlebarViewModel = class ConversationTitlebarViewModel {
-  constructor(mainViewModel, repositories) {
+// Parent: z.viewModel.ContentViewModel
+z.viewModel.content.ConversationTitlebarViewModel = class ConversationTitlebarViewModel {
+  constructor(contentViewModel, repositories) {
     this.added_to_view = this.added_to_view.bind(this);
 
     this.calling_repository = repositories.calling;
     this.conversation_repository = repositories.conversation;
-    this.multitasking = mainViewModel.content.multitasking;
-    this.logger = new z.util.Logger('z.ViewModel.ConversationTitlebarViewModel', z.config.LOGGER.OPTIONS);
+    this.multitasking = contentViewModel.multitasking;
+    this.logger = new z.util.Logger('z.viewModel.content.ConversationTitlebarViewModel', z.config.LOGGER.OPTIONS);
 
     // TODO remove the titlebar for now to ensure that buttons are clickable in macOS wrappers
     window.setTimeout(() => $('.titlebar').remove(), 1000);
@@ -117,7 +118,7 @@ z.ViewModel.ConversationTitlebarViewModel = class ConversationTitlebarViewModel 
   }
 
   click_on_collection_button() {
-    amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.ViewModel.content.CONTENT_STATE.COLLECTION);
+    amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.content.CONTENT_STATE.COLLECTION);
   }
 
   show_participants(add_people) {

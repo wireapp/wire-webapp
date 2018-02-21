@@ -1028,7 +1028,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       case z.service.BackendClientError.LABEL.SERVER_ERROR:
       case z.service.BackendClientError.LABEL.SERVICE_DISABLED:
       case z.service.BackendClientError.LABEL.TOO_MANY_BOTS: {
-        amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.SERVICE_UNAVAILABLE);
+        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalType.SERVICE_UNAVAILABLE);
         break;
       }
 
@@ -1363,7 +1363,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   _handleTooManyMembersError(participants = 128) {
     const openSpots = ConversationRepository.CONFIG.GROUP.MAX_SIZE - participants;
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.TOO_MANY_MEMBERS, {
+    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalType.TOO_MANY_MEMBERS, {
       data: {
         max: ConversationRepository.CONFIG.GROUP.MAX_SIZE,
         open_spots: Math.max(0, openSpots),
@@ -1377,7 +1377,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     user_promise.then(user_et => {
       const username = user_et ? user_et.first_name() : undefined;
-      amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.NOT_CONNECTED, {
+      amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalType.NOT_CONNECTED, {
         data: username,
       });
     });
@@ -2166,8 +2166,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     const isCallingMessage = genericMessage.content === z.cryptography.GENERIC_MESSAGE_TYPE.CALLING;
     const consentType = isCallingMessage
-      ? z.ViewModel.MODAL_CONSENT_TYPE.OUTGOING_CALL
-      : z.ViewModel.MODAL_CONSENT_TYPE.MESSAGE;
+      ? z.viewModel.MODAL_CONSENT_TYPE.OUTGOING_CALL
+      : z.viewModel.MODAL_CONSENT_TYPE.MESSAGE;
     return this.grantMessage(conversationId, consentType, userIds);
   }
 
@@ -2188,7 +2188,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         }
 
         return this.user_repository.get_users_by_id(userIds).then(user_ets => {
-          amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.NEW_DEVICE, {
+          amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalType.NEW_DEVICE, {
             action() {
               sendAnyway = true;
               conversation_et.verification_state(z.conversation.ConversationVerificationState.UNVERIFIED);

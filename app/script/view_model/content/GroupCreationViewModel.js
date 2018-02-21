@@ -20,9 +20,10 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.ViewModel = z.ViewModel || {};
+window.z.viewModel = z.viewModel || {};
+window.z.viewModel.content = z.viewModel.content || {};
 
-z.ViewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
+z.viewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
   static get STATE() {
     return {
       DEFAULT: 'GroupCreationViewModel.STATE.DEFAULT',
@@ -32,7 +33,7 @@ z.ViewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
   }
 
   constructor(mainViewModel, repositories) {
-    this.logger = new z.util.Logger('z.ViewModel.content.GroupCreationViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger('z.viewModel.content.GroupCreationViewModel', z.config.LOGGER.OPTIONS);
 
     this.clickOnCreate = this.clickOnCreate.bind(this);
 

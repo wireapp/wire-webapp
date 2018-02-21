@@ -20,13 +20,13 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.ViewModel = z.ViewModel || {};
-window.z.ViewModel.list = z.ViewModel.list || {};
+window.z.viewModel = z.viewModel || {};
+window.z.viewModel.list = z.viewModel.list || {};
 
-z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
+z.viewModel.list.ConversationListViewModel = class ConversationListViewModel {
   /**
    * View model for conversation list.
-   * @param {z.ViewModel.ListViewModel} mainViewModel - Main view model
+   * @param {z.viewModel.ListViewModel} mainViewModel - Main view model
    * @param {Object} repositories - Object containing all repositories
    */
   constructor(mainViewModel, repositories) {
@@ -39,7 +39,7 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
     this.conversation_repository = repositories.conversation;
     this.team_repository = repositories.team;
     this.user_repository = repositories.user;
-    this.logger = new z.util.Logger('z.ViewModel.list.ConversationListViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger('z.viewModel.list.ConversationListViewModel', z.config.LOGGER.OPTIONS);
 
     this.show_calls = ko.observable(false);
 
@@ -110,7 +110,7 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
   }
 
   click_on_connect_requests() {
-    this.content_view_model.switch_content(z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS);
+    this.content_view_model.switch_content(z.viewModel.content.CONTENT_STATE.CONNECTION_REQUESTS);
   }
 
   click_on_conversation(conversation_et) {
@@ -139,9 +139,9 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
   is_selected_conversation(conversation_et) {
     const is_selected_conversation = this.conversation_repository.is_active_conversation(conversation_et);
     const is_selected_state = [
-      z.ViewModel.content.CONTENT_STATE.COLLECTION,
-      z.ViewModel.content.CONTENT_STATE.COLLECTION_DETAILS,
-      z.ViewModel.content.CONTENT_STATE.CONVERSATION,
+      z.viewModel.content.CONTENT_STATE.COLLECTION,
+      z.viewModel.content.CONTENT_STATE.COLLECTION_DETAILS,
+      z.viewModel.content.CONTENT_STATE.CONVERSATION,
     ].includes(this.content_state());
 
     return is_selected_conversation && is_selected_state;
@@ -156,7 +156,7 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
   //##############################################################################
 
   click_on_archived_button() {
-    this.list_view_model.switch_list(z.ViewModel.list.LIST_STATE.ARCHIVE);
+    this.list_view_model.switch_list(z.viewModel.list.LIST_STATE.ARCHIVE);
   }
 
   click_on_preferences_button() {
@@ -164,7 +164,7 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
   }
 
   click_on_people_button() {
-    this.list_view_model.switch_list(z.ViewModel.list.LIST_STATE.START_UI);
+    this.list_view_model.switch_list(z.viewModel.list.LIST_STATE.START_UI);
   }
 
   //##############################################################################

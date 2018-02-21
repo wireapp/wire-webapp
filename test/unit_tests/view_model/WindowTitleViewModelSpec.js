@@ -21,7 +21,7 @@
 
 // grunt test_init && grunt test_run:view_model/WindowTitleViewModel
 
-describe('z.ViewModel.WindowTitleViewModel', () => {
+describe('z.viewModel.WindowTitleViewModel', () => {
   const suffix = z.l10n.text(z.string.wire);
   const test_factory = new TestFactory();
   let title_view_model = undefined;
@@ -30,8 +30,8 @@ describe('z.ViewModel.WindowTitleViewModel', () => {
     test_factory
       .exposeConversationActors()
       .then(conversation_repository => {
-        const content_state = ko.observable(z.ViewModel.content.CONTENT_STATE.CONVERSATION);
-        title_view_model = new z.ViewModel.WindowTitleViewModel(
+        const content_state = ko.observable(z.viewModel.content.CONTENT_STATE.CONVERSATION);
+        title_view_model = new z.viewModel.WindowTitleViewModel(
           {content: {content_state}},
           {
             conversation: conversation_repository,
@@ -129,7 +129,7 @@ describe('z.ViewModel.WindowTitleViewModel', () => {
     });
 
     it('sets the name when opening the preferences about page', () => {
-      title_view_model.content_state(z.ViewModel.content.CONTENT_STATE.PREFERENCES_ABOUT);
+      title_view_model.content_state(z.viewModel.content.CONTENT_STATE.PREFERENCES_ABOUT);
 
       const expected_title = `${z.string.preferences_about} · ${suffix}`;
       title_view_model.initiate_title_updates();
@@ -137,7 +137,7 @@ describe('z.ViewModel.WindowTitleViewModel', () => {
     });
 
     it('sets the name when opening the preferences account page', () => {
-      title_view_model.content_state(z.ViewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT);
+      title_view_model.content_state(z.viewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT);
 
       const expected_title = `${z.string.preferences_account} · ${suffix}`;
       title_view_model.initiate_title_updates();
@@ -145,7 +145,7 @@ describe('z.ViewModel.WindowTitleViewModel', () => {
     });
 
     it('sets the name when opening the preferences av page', () => {
-      title_view_model.content_state(z.ViewModel.content.CONTENT_STATE.PREFERENCES_AV);
+      title_view_model.content_state(z.viewModel.content.CONTENT_STATE.PREFERENCES_AV);
 
       const expected_title = `${z.string.preferences_av} · ${suffix}`;
       title_view_model.initiate_title_updates();
@@ -153,7 +153,7 @@ describe('z.ViewModel.WindowTitleViewModel', () => {
     });
 
     it('sets the name when opening the preferences device details page', () => {
-      title_view_model.content_state(z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICE_DETAILS);
+      title_view_model.content_state(z.viewModel.content.CONTENT_STATE.PREFERENCES_DEVICE_DETAILS);
 
       const expected_title = `${z.string.preferences_device_details} · ${suffix}`;
       title_view_model.initiate_title_updates();
@@ -161,7 +161,7 @@ describe('z.ViewModel.WindowTitleViewModel', () => {
     });
 
     it('sets the name when opening the preferences devices page', () => {
-      title_view_model.content_state(z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES);
+      title_view_model.content_state(z.viewModel.content.CONTENT_STATE.PREFERENCES_DEVICES);
 
       const expected_title = `${z.string.preferences_devices} · ${suffix}`;
       title_view_model.initiate_title_updates();
@@ -169,7 +169,7 @@ describe('z.ViewModel.WindowTitleViewModel', () => {
     });
 
     it('sets the name when opening the preferences options page', () => {
-      title_view_model.content_state(z.ViewModel.content.CONTENT_STATE.PREFERENCES_OPTIONS);
+      title_view_model.content_state(z.viewModel.content.CONTENT_STATE.PREFERENCES_OPTIONS);
 
       const expected_title = `${z.string.preferences_options} · ${suffix}`;
       title_view_model.initiate_title_updates();
@@ -177,7 +177,7 @@ describe('z.ViewModel.WindowTitleViewModel', () => {
     });
 
     it('shows the number of connection requests when viewing the inbox', () => {
-      title_view_model.content_state(z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS);
+      title_view_model.content_state(z.viewModel.content.CONTENT_STATE.CONNECTION_REQUESTS);
 
       const pending_connection = new z.entity.Connection();
       pending_connection.status(z.user.ConnectionStatus.PENDING);

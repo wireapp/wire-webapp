@@ -20,12 +20,12 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.ViewModel = z.ViewModel || {};
+window.z.viewModel = z.viewModel || {};
 
 /**
  * Types for warning banners.
  */
-z.ViewModel.WarningType = {
+z.viewModel.WarningType = {
   CONNECTIVITY_RECONNECT: 'connectivity_reconnect',
   CONNECTIVITY_RECOVERY: 'connectivity_recovery',
   DENIED_CAMERA: 'camera_access_denied',
@@ -43,26 +43,26 @@ z.ViewModel.WarningType = {
   UNSUPPORTED_OUTGOING_CALL: 'unsupported_outgoing_call',
 };
 
-z.ViewModel.WarningsViewModel = class WarningsViewModel {
+z.viewModel.WarningsViewModel = class WarningsViewModel {
   static get CONFIG() {
     return {
       DIMMED_MODES: [
-        z.ViewModel.WarningType.REQUEST_CAMERA,
-        z.ViewModel.WarningType.REQUEST_MICROPHONE,
-        z.ViewModel.WarningType.REQUEST_NOTIFICATION,
-        z.ViewModel.WarningType.REQUEST_SCREEN,
+        z.viewModel.WarningType.REQUEST_CAMERA,
+        z.viewModel.WarningType.REQUEST_MICROPHONE,
+        z.viewModel.WarningType.REQUEST_NOTIFICATION,
+        z.viewModel.WarningType.REQUEST_SCREEN,
       ],
       MINI_MODES: [
-        z.ViewModel.WarningType.CONNECTIVITY_RECONNECT,
-        z.ViewModel.WarningType.LIFECYCLE_UPDATE,
-        z.ViewModel.WarningType.NO_INTERNET,
+        z.viewModel.WarningType.CONNECTIVITY_RECONNECT,
+        z.viewModel.WarningType.LIFECYCLE_UPDATE,
+        z.viewModel.WarningType.NO_INTERNET,
       ],
     };
   }
 
   constructor() {
     this.elementId = 'warnings';
-    this.logger = new z.util.Logger('z.ViewModel.WarningsViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger('z.viewModel.WarningsViewModel', z.config.LOGGER.OPTIONS);
 
     // Array of warning banners
     this.warnings = ko.observableArray();
@@ -80,7 +80,7 @@ z.ViewModel.WarningsViewModel = class WarningsViewModel {
       const top_warning = warnings[warnings.length - 1];
       if (!warnings.length) {
         top_margin = '0';
-      } else if (top_warning === z.ViewModel.WarningType.CONNECTIVITY_RECOVERY) {
+      } else if (top_warning === z.viewModel.WarningType.CONNECTIVITY_RECOVERY) {
         top_margin = '0';
       } else if (WarningsViewModel.CONFIG.MINI_MODES.includes(top_warning)) {
         top_margin = '32px';
@@ -125,14 +125,14 @@ z.ViewModel.WarningsViewModel = class WarningsViewModel {
     this.dismiss_warning(warning_to_remove);
 
     switch (warning_to_remove) {
-      case z.ViewModel.WarningType.REQUEST_MICROPHONE:
-        amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CALLING, {
+      case z.viewModel.WarningType.REQUEST_MICROPHONE:
+        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalType.CALLING, {
           action() {
             z.util.safe_window_open(z.util.URLUtil.build_support_url(z.config.SUPPORT.ID.MICROPHONE_ACCESS_DENIED));
           },
         });
         break;
-      case z.ViewModel.WarningType.REQUEST_NOTIFICATION:
+      case z.viewModel.WarningType.REQUEST_NOTIFICATION:
         // We block subsequent permission requests for notifications when the user ignores the request.
         amplify.publish(z.event.WebApp.NOTIFICATION.PERMISSION_STATE, z.notification.PermissionStatusState.IGNORED);
         break;
@@ -150,10 +150,10 @@ z.ViewModel.WarningsViewModel = class WarningsViewModel {
 
   show_warning(type, info) {
     const is_connectivity_warning = [
-      z.ViewModel.WarningType.CONNECTIVITY_RECONNECT,
-      z.ViewModel.WarningType.NO_INTERNET,
+      z.viewModel.WarningType.CONNECTIVITY_RECONNECT,
+      z.viewModel.WarningType.NO_INTERNET,
     ].includes(type);
-    const top_warning_is_not_lifecycle_update = this.top_warning() !== z.ViewModel.WarningType.LIFECYCLE_UPDATE;
+    const top_warning_is_not_lifecycle_update = this.top_warning() !== z.viewModel.WarningType.LIFECYCLE_UPDATE;
     if (is_connectivity_warning && top_warning_is_not_lifecycle_update) {
       this.dismiss_warning(this.top_warning());
     }

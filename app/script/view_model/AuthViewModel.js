@@ -20,10 +20,10 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.ViewModel = z.ViewModel || {};
+window.z.viewModel = z.viewModel || {};
 
 // @formatter:off
-z.ViewModel.AuthViewModel = class AuthViewModel {
+z.viewModel.AuthViewModel = class AuthViewModel {
   static get CONFIG() {
     return {
       FORWARDED_URL_PARAMETERS: [
@@ -46,7 +46,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
 
     this.elementId = 'auth-page';
     this.auth = auth;
-    this.logger = new z.util.Logger('z.ViewModel.AuthViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger('z.viewModel.AuthViewModel', z.config.LOGGER.OPTIONS);
 
     this.event_tracker = new z.tracking.EventTrackingRepository();
 
@@ -1834,7 +1834,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
 
 $(() => {
   if ($('.auth-page').length) {
-    wire.auth.view = new z.ViewModel.AuthViewModel(wire.auth);
+    wire.auth.view = new z.viewModel.AuthViewModel(wire.auth);
   }
 });
 

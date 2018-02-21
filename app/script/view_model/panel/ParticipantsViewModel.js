@@ -20,10 +20,10 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.ViewModel = z.ViewModel || {};
-window.z.ViewModel.panel = z.ViewModel.panel || {};
+window.z.viewModel = z.viewModel || {};
+window.z.viewModel.panel = z.viewModel.panel || {};
 
-z.ViewModel.panel.ParticipantsViewModel = class ParticipantsViewModel {
+z.viewModel.panel.ParticipantsViewModel = class ParticipantsViewModel {
   static get CONFIG() {
     return {
       ADD_STATES: [ParticipantsViewModel.STATE.ADD_PEOPLE, ParticipantsViewModel.STATE.ADD_SERVICE],
@@ -62,7 +62,7 @@ z.ViewModel.panel.ParticipantsViewModel = class ParticipantsViewModel {
     this.conversationRepository = repositories.conversation;
     this.integrationRepository = repositories.integration;
     this.teamRepository = repositories.team;
-    this.logger = new z.util.Logger('z.ViewModel.details.ParticipantsViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger('z.viewModel.details.ParticipantsViewModel', z.config.LOGGER.OPTIONS);
 
     this.state = ko.observable(ParticipantsViewModel.STATE.PARTICIPANTS);
     this.previousState = ko.observable(this.state());
@@ -391,7 +391,7 @@ z.ViewModel.panel.ParticipantsViewModel = class ParticipantsViewModel {
   }
 
   switchContent(contentState) {
-    const isConnectionRequests = contentState === z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS;
+    const isConnectionRequests = contentState === z.viewModel.content.CONTENT_STATE.CONNECTION_REQUESTS;
     if (isConnectionRequests) {
       // todo: what to do?
     }

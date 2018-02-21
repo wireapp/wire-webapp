@@ -20,19 +20,19 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.ViewModel = z.ViewModel || {};
-window.z.ViewModel.list = z.ViewModel.list || {};
+window.z.viewModel = z.viewModel || {};
+window.z.viewModel.list = z.viewModel.list || {};
 
-z.ViewModel.list.TakeoverViewModel = class TakeoverViewModel {
+z.viewModel.list.TakeoverViewModel = class TakeoverViewModel {
   /**
    * View model for the username takeover screen.
-   * @param {z.ViewModel.MainViewModel} mainViewModel - Main view model
+   * @param {z.viewModel.MainViewModel} mainViewModel - Main view model
    * @param {Object} repositories - Object containing all repositories
    */
   constructor(mainViewModel, repositories) {
     this.conversation_repository = repositories.conversation;
     this.userRepository = repositories.user;
-    this.logger = new z.util.Logger('z.ViewModel.list.TakeoverViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger('z.viewModel.list.TakeoverViewModel', z.config.LOGGER.OPTIONS);
 
     this.selfUser = this.userRepository.self;
 
@@ -55,7 +55,7 @@ z.ViewModel.list.TakeoverViewModel = class TakeoverViewModel {
         }
 
         if (this.userRepository.connect_requests().length) {
-          amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS);
+          amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.content.CONTENT_STATE.CONNECTION_REQUESTS);
         }
       })
       .catch(() => amplify.publish(z.event.WebApp.PREFERENCES.MANAGE_ACCOUNT))

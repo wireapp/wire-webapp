@@ -20,19 +20,15 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.ViewModel = z.ViewModel || {};
+window.z.viewModel = z.viewModel || {};
 
-/**
- * Last remainder of the CallBannerViewModel.
- * @todo Move functionality elsewhere and remove
- */
-z.ViewModel.CallShortcutsViewModel = class CallShortcutsViewModel {
+z.viewModel.ShortcutsViewModel = class ShortcutsViewModel {
   constructor(mainViewModel, repositories) {
     this.on_mute_call = this.on_mute_call.bind(this);
     this.on_reject_call = this.on_reject_call.bind(this);
 
     this.calling_repository = repositories.calling;
-    this.logger = new z.util.Logger('z.ViewModel.CallShortcutsViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger('z.viewModel.ShortcutsViewModel', z.config.LOGGER.OPTIONS);
 
     this.joined_call = this.calling_repository.joined_call;
 

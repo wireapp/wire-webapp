@@ -20,9 +20,9 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.ViewModel = z.ViewModel || {};
+window.z.viewModel = z.viewModel || {};
 
-z.ViewModel.ModalType = {
+z.viewModel.ModalType = {
   BLOCK: '.modal-block',
   BOTS_CONFIRM: '.modal-bots-confirm',
   BOTS_UNAVAILABLE: '.modal-bots-unavailable',
@@ -50,15 +50,15 @@ z.ViewModel.ModalType = {
   UPLOAD_TOO_LARGE: '.modal-asset-upload-too-large',
 };
 
-z.ViewModel.MODAL_CONSENT_TYPE = {
+z.viewModel.MODAL_CONSENT_TYPE = {
   INCOMING_CALL: 'incoming_call',
   MESSAGE: 'message',
   OUTGOING_CALL: 'outgoing_call',
 };
 
-z.ViewModel.ModalsViewModel = class ModalsViewModel {
+z.viewModel.ModalsViewModel = class ModalsViewModel {
   constructor() {
-    this.logger = new z.util.Logger('z.ViewModel.ModalsViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger('z.viewModel.ModalsViewModel', z.config.LOGGER.OPTIONS);
     this.elementId = 'modals';
 
     this.modals = {};
@@ -71,7 +71,7 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
   /**
    * Show modal
    *
-   * @param {z.ViewModel.ModalType} type - Indicates which modal to show
+   * @param {z.viewModel.ModalType} type - Indicates which modal to show
    * @param {Object} [options={}] - Information to configure modal
    * @param {Object} options.data - Content needed for visualization on modal
    * @param {Function} options.action - Called when action in modal is triggered
@@ -83,43 +83,43 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
     const title_element = $(type).find('.modal-title');
 
     switch (type) {
-      case z.ViewModel.ModalType.BLOCK:
+      case z.viewModel.ModalType.BLOCK:
         this._show_modal_block(options.data, title_element, message_element);
         break;
-      case z.ViewModel.ModalType.BOTS_CONFIRM:
+      case z.viewModel.ModalType.BOTS_CONFIRM:
         this._show_modal_bots_confirm(options.data, message_element);
         break;
-      case z.ViewModel.ModalType.CALL_START_ANOTHER:
+      case z.viewModel.ModalType.CALL_START_ANOTHER:
         this._show_modal_call_start_another(options.data, title_element, message_element);
         break;
-      case z.ViewModel.ModalType.CLEAR:
+      case z.viewModel.ModalType.CLEAR:
         type = this._show_modal_clear(options, type);
         break;
-      case z.ViewModel.ModalType.CONNECTED_DEVICE:
+      case z.viewModel.ModalType.CONNECTED_DEVICE:
         this._show_modal_connected_device(options.data);
         break;
-      case z.ViewModel.ModalType.LEAVE:
+      case z.viewModel.ModalType.LEAVE:
         this._show_modal_leave(options.data, title_element);
         break;
-      case z.ViewModel.ModalType.NEW_DEVICE:
+      case z.viewModel.ModalType.NEW_DEVICE:
         this._show_modal_new_device(options.data, title_element, message_element, action_element);
         break;
-      case z.ViewModel.ModalType.NOT_CONNECTED:
+      case z.viewModel.ModalType.NOT_CONNECTED:
         this._show_modal_not_connected(options.data, message_element);
         break;
-      case z.ViewModel.ModalType.REMOVE_DEVICE:
+      case z.viewModel.ModalType.REMOVE_DEVICE:
         this._show_modal_remove_device(options.data, title_element);
         break;
-      case z.ViewModel.ModalType.TOO_MANY_MEMBERS:
+      case z.viewModel.ModalType.TOO_MANY_MEMBERS:
         this._show_modal_too_many_members(options.data, message_element);
         break;
-      case z.ViewModel.ModalType.UPLOAD_PARALLEL:
+      case z.viewModel.ModalType.UPLOAD_PARALLEL:
         this._show_modal_upload_parallel(options.data, title_element);
         break;
-      case z.ViewModel.ModalType.UPLOAD_TOO_LARGE:
+      case z.viewModel.ModalType.UPLOAD_TOO_LARGE:
         this._show_modal_upload_too_large(options.data, title_element);
         break;
-      case z.ViewModel.ModalType.TOO_LONG_MESSAGE:
+      case z.viewModel.ModalType.TOO_LONG_MESSAGE:
         this._show_modal_message_too_long(options.data, message_element);
         break;
       default:
@@ -206,7 +206,7 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
    * @returns {undefined} No return value
    */
   _show_modal_call_start_another(call_state, title_element, message_element) {
-    const action_element = $(z.ViewModel.ModalType.CALL_START_ANOTHER).find('.modal-action');
+    const action_element = $(z.viewModel.ModalType.CALL_START_ANOTHER).find('.modal-action');
 
     action_element.text(z.l10n.text(z.string[`modal_call_second_${call_state}_action`]));
     message_element.text(z.l10n.text(z.string[`modal_call_second_${call_state}_message`]));
@@ -215,7 +215,7 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
 
   _show_modal_clear(options, type) {
     if (options.conversation.is_group() && !options.conversation.removed_from_conversation()) {
-      type = z.ViewModel.ModalType.CLEAR_GROUP;
+      type = z.viewModel.ModalType.CLEAR_GROUP;
     }
 
     const title_element = $(type).find('.modal-title');
@@ -225,7 +225,7 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
   }
 
   _show_modal_connected_device(devices) {
-    const devices_element = $(z.ViewModel.ModalType.CONNECTED_DEVICE).find('.modal-connected-devices');
+    const devices_element = $(z.viewModel.ModalType.CONNECTED_DEVICE).find('.modal-connected-devices');
 
     devices_element.empty();
 
@@ -260,11 +260,11 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
     }
 
     switch (content.consent_type) {
-      case z.ViewModel.MODAL_CONSENT_TYPE.INCOMING_CALL:
+      case z.viewModel.MODAL_CONSENT_TYPE.INCOMING_CALL:
         message_id = z.string.modal_new_device_call_incoming;
         action_id = z.string.modal_new_device_call_accept;
         break;
-      case z.ViewModel.MODAL_CONSENT_TYPE.OUTGOING_CALL:
+      case z.viewModel.MODAL_CONSENT_TYPE.OUTGOING_CALL:
         message_id = z.string.modal_new_device_call_outgoing;
         action_id = z.string.modal_new_device_call_anyway;
         break;

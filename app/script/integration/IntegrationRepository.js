@@ -85,7 +85,7 @@ z.integration.IntegrationRepository = class IntegrationRepository {
   addServiceFromParam(providerId, serviceId) {
     if (this.isTeam()) {
       this.getServiceById(providerId, serviceId).then(serviceEntity => {
-        amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.BOTS_CONFIRM, {
+        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalType.BOTS_CONFIRM, {
           action: () => this.createConversationWithService(serviceEntity, 'url_param'),
           data: serviceEntity.name,
         });
@@ -116,7 +116,7 @@ z.integration.IntegrationRepository = class IntegrationRepository {
         }
       })
       .catch(error => {
-        amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.BOTS_UNAVAILABLE);
+        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalType.BOTS_UNAVAILABLE);
         throw error;
       });
   }

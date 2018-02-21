@@ -20,10 +20,10 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.ViewModel = z.ViewModel || {};
-window.z.ViewModel.content = z.ViewModel.content || {};
+window.z.viewModel = z.viewModel || {};
+window.z.viewModel.content = z.viewModel.content || {};
 
-z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewModel {
+z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewModel {
   static get SAVED_ANIMATION_TIMEOUT() {
     return 750 * 2;
   }
@@ -33,7 +33,7 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.check_new_clients = this.check_new_clients.bind(this);
     this.removed_from_view = this.removed_from_view.bind(this);
 
-    this.logger = new z.util.Logger('z.ViewModel.content.PreferencesAccountViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger('z.viewModel.content.PreferencesAccountViewModel', z.config.LOGGER.OPTIONS);
 
     this.client_repository = repositories.client;
     this.team_repository = repositories.team;
@@ -205,11 +205,11 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   check_new_clients() {
     if (this.new_clients().length) {
       amplify.publish(z.event.WebApp.SEARCH.BADGE.HIDE);
-      amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CONNECTED_DEVICE, {
+      amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalType.CONNECTED_DEVICE, {
         close: () => this.new_clients.removeAll(),
         data: this.new_clients(),
         secondary() {
-          amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES);
+          amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.content.CONTENT_STATE.PREFERENCES_DEVICES);
         },
       });
     }
@@ -226,7 +226,7 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   click_on_delete_account() {
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.DELETE_ACCOUNT, {
+    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalType.DELETE_ACCOUNT, {
       action: () => this.user_repository.delete_me(),
       data: this.self_user().email(),
     });

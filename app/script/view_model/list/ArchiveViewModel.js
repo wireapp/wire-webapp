@@ -20,13 +20,13 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.ViewModel = z.ViewModel || {};
-window.z.ViewModel.list = z.ViewModel.list || {};
+window.z.viewModel = z.viewModel || {};
+window.z.viewModel.list = z.viewModel.list || {};
 
-z.ViewModel.list.ArchiveViewModel = class ArchiveViewModel {
+z.viewModel.list.ArchiveViewModel = class ArchiveViewModel {
   /**
    * View model for the archive.
-   * @param {z.ViewModel.MainViewModel} mainViewModel - Main view model
+   * @param {z.viewModel.MainViewModel} mainViewModel - Main view model
    * @param {Object} repositories - Object containing all repositories
    */
   constructor(mainViewModel, repositories) {
@@ -36,7 +36,7 @@ z.ViewModel.list.ArchiveViewModel = class ArchiveViewModel {
 
     this.listViewModel = mainViewModel.list;
     this.conversationRepository = repositories.conversation;
-    this.logger = new z.util.Logger('z.ViewModel.list.ArchiveViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger('z.viewModel.list.ArchiveViewModel', z.config.LOGGER.OPTIONS);
 
     this.archivedConversations = this.conversationRepository.conversations_archived;
 
@@ -47,12 +47,12 @@ z.ViewModel.list.ArchiveViewModel = class ArchiveViewModel {
 
   clickOnConversation(conversationEntity) {
     this.conversationRepository.unarchive_conversation(conversationEntity, 'opened conversation from archive');
-    this.listViewModel.switch_list(z.ViewModel.list.LIST_STATE.CONVERSATIONS);
+    this.listViewModel.switch_list(z.viewModel.list.LIST_STATE.CONVERSATIONS);
     amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity);
   }
 
   clickOnClose() {
-    this.listViewModel.switch_list(z.ViewModel.list.LIST_STATE.CONVERSATIONS);
+    this.listViewModel.switch_list(z.viewModel.list.LIST_STATE.CONVERSATIONS);
   }
 
   updateList() {

@@ -20,10 +20,10 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.ViewModel = z.ViewModel || {};
+window.z.viewModel = z.viewModel || {};
 
-z.ViewModel.ContentViewModel = class ContentViewModel {
-  constructor(elementId, mainViewModel, repositories) {
+z.viewModel.ContentViewModel = class ContentViewModel {
+  constructor(mainViewModel, repositories) {
     this.show_conversation = this.show_conversation.bind(this);
     this.switch_content = this.switch_content.bind(this);
     this.switch_previous_content = this.switch_previous_content.bind(this);
@@ -32,10 +32,10 @@ z.ViewModel.ContentViewModel = class ContentViewModel {
     this.mainViewModel = mainViewModel;
     this.conversation_repository = repositories.conversation;
     this.user_repository = repositories.user;
-    this.logger = new z.util.Logger('z.ViewModel.ContentViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger('z.viewModel.ContentViewModel', z.config.LOGGER.OPTIONS);
 
     // State
-    this.content_state = ko.observable(z.ViewModel.content.CONTENT_STATE.WATERMARK);
+    this.content_state = ko.observable(z.viewModel.content.CONTENT_STATE.WATERMARK);
     this.multitasking = {
       auto_minimize: ko.observable(true),
       is_minimized: ko.observable(false),
@@ -43,46 +43,45 @@ z.ViewModel.ContentViewModel = class ContentViewModel {
     };
 
     // Nested view models
-    this.call_shortcuts = new z.ViewModel.CallShortcutsViewModel(mainViewModel, repositories);
-    this.video_calling = new z.ViewModel.VideoCallingViewModel(mainViewModel, repositories);
-    this.collection_details = new z.ViewModel.content.CollectionDetailsViewModel();
-    this.collection = new z.ViewModel.content.CollectionViewModel(mainViewModel, repositories);
-    this.connect_requests = new z.ViewModel.content.ConnectRequestsViewModel(mainViewModel, repositories);
-    this.conversation_titlebar = new z.ViewModel.ConversationTitlebarViewModel(mainViewModel, repositories);
-    this.conversation_input = new z.ViewModel.ConversationInputViewModel(mainViewModel, repositories);
-    this.message_list = new z.ViewModel.MessageListViewModel(mainViewModel, repositories);
-    this.giphy = new z.ViewModel.GiphyViewModel(mainViewModel, repositories);
-    this.groupCreation = new z.ViewModel.content.GroupCreationViewModel(mainViewModel, repositories);
+    this.collection_details = new z.viewModel.content.CollectionDetailsViewModel();
+    this.collection = new z.viewModel.content.CollectionViewModel(mainViewModel, repositories);
+    this.connect_requests = new z.viewModel.content.ConnectRequestsViewModel(mainViewModel, repositories);
+    this.conversation_input = new z.viewModel.content.ConversationInputViewModel(mainViewModel, repositories);
+    this.conversation_titlebar = new z.viewModel.content.ConversationTitlebarViewModel(this, repositories);
+    this.giphy = new z.viewModel.content.GiphyViewModel(mainViewModel, repositories);
+    this.groupCreation = new z.viewModel.content.GroupCreationViewModel(mainViewModel, repositories);
+    this.message_list = new z.viewModel.content.MessageListViewModel(mainViewModel, repositories);
+    this.video_calling = new z.viewModel.content.VideoCallingViewModel(this, repositories);
 
-    this.preferencesAbout = new z.ViewModel.content.PreferencesAboutViewModel(mainViewModel, repositories);
-    this.preferences_account = new z.ViewModel.content.PreferencesAccountViewModel(mainViewModel, repositories);
-    this.preferences_av = new z.ViewModel.content.PreferencesAVViewModel(mainViewModel, repositories);
-    this.preferences_device_details = new z.ViewModel.content.PreferencesDeviceDetailsViewModel(
+    this.preferencesAbout = new z.viewModel.content.PreferencesAboutViewModel(mainViewModel, repositories);
+    this.preferences_account = new z.viewModel.content.PreferencesAccountViewModel(mainViewModel, repositories);
+    this.preferences_av = new z.viewModel.content.PreferencesAVViewModel(mainViewModel, repositories);
+    this.preferences_device_details = new z.viewModel.content.PreferencesDeviceDetailsViewModel(
       mainViewModel,
       repositories
     );
-    this.preferences_devices = new z.ViewModel.content.PreferencesDevicesViewModel(mainViewModel, repositories);
-    this.preferences_options = new z.ViewModel.content.PreferencesOptionsViewModel(mainViewModel, repositories);
+    this.preferences_devices = new z.viewModel.content.PreferencesDevicesViewModel(mainViewModel, repositories);
+    this.preferences_options = new z.viewModel.content.PreferencesOptionsViewModel(mainViewModel, repositories);
 
     this.previous_state = undefined;
     this.previous_conversation = undefined;
 
     this.content_state.subscribe(content_state => {
       switch (content_state) {
-        case z.ViewModel.content.CONTENT_STATE.CONVERSATION:
+        case z.viewModel.content.CONTENT_STATE.CONVERSATION:
           this.conversation_input.added_to_view();
           this.conversation_titlebar.added_to_view();
           break;
-        case z.ViewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT:
+        case z.viewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT:
           this.preferences_account.check_new_clients();
           break;
-        case z.ViewModel.content.CONTENT_STATE.PREFERENCES_AV:
+        case z.viewModel.content.CONTENT_STATE.PREFERENCES_AV:
           this.preferences_av.initiate_devices();
           break;
-        case z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES:
+        case z.viewModel.content.CONTENT_STATE.PREFERENCES_DEVICES:
           this.preferences_devices.update_device_info();
           break;
-        case z.ViewModel.content.CONTENT_STATE.COLLECTION:
+        case z.viewModel.content.CONTENT_STATE.COLLECTION:
           this.collection.set_conversation(this.previous_conversation);
           break;
         default:
@@ -92,7 +91,7 @@ z.ViewModel.ContentViewModel = class ContentViewModel {
     });
 
     this.user_repository.connect_requests.subscribe(requests => {
-      const requests_state = this.content_state() === z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS;
+      const requests_state = this.content_state() === z.viewModel.content.CONTENT_STATE.CONNECTION_REQUESTS;
       if (requests_state && !requests.length) {
         this.show_conversation(this.conversation_repository.getMostRecentConversation());
       }
@@ -141,7 +140,7 @@ z.ViewModel.ContentViewModel = class ContentViewModel {
    */
   show_conversation(conversation, messageEt) {
     if (!conversation) {
-      return this.switch_content(z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS);
+      return this.switch_content(z.viewModel.content.CONTENT_STATE.CONNECTION_REQUESTS);
     }
 
     const isConversation = typeof conversation === 'object' && conversation.id;
@@ -156,7 +155,7 @@ z.ViewModel.ContentViewModel = class ContentViewModel {
 
     conversationPromise.then(conversationEt => {
       const isActiveConversation = conversationEt === this.conversation_repository.active_conversation();
-      const isConversationState = this.content_state() === z.ViewModel.content.CONTENT_STATE.CONVERSATION;
+      const isConversationState = this.content_state() === z.viewModel.content.CONTENT_STATE.CONVERSATION;
 
       if (conversationEt && isActiveConversation && isConversationState) {
         return;
@@ -164,10 +163,10 @@ z.ViewModel.ContentViewModel = class ContentViewModel {
 
       this._release_content(this.content_state());
 
-      this.content_state(z.ViewModel.content.CONTENT_STATE.CONVERSATION);
+      this.content_state(z.viewModel.content.CONTENT_STATE.CONVERSATION);
       this.conversation_repository.active_conversation(conversationEt);
       this.message_list.change_conversation(conversationEt, messageEt).then(() => {
-        this._show_content(z.ViewModel.content.CONTENT_STATE.CONVERSATION);
+        this._show_content(z.viewModel.content.CONTENT_STATE.CONVERSATION);
         this.mainViewModel.details.participants.changeConversation(conversationEt);
         this.previous_conversation = this.conversation_repository.active_conversation();
       });
@@ -183,22 +182,22 @@ z.ViewModel.ContentViewModel = class ContentViewModel {
 
   switch_previous_content() {
     if (this.previous_state !== this.content_state()) {
-      if (this.previous_state === z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS) {
-        this.switch_content(z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS);
+      if (this.previous_state === z.viewModel.content.CONTENT_STATE.CONNECTION_REQUESTS) {
+        this.switch_content(z.viewModel.content.CONTENT_STATE.CONNECTION_REQUESTS);
       }
 
       if (this.previous_conversation && !this.previous_conversation.is_archived()) {
         return this.show_conversation(this.previous_conversation);
       }
 
-      return this.switch_content(z.ViewModel.content.CONTENT_STATE.WATERMARK);
+      return this.switch_content(z.viewModel.content.CONTENT_STATE.WATERMARK);
     }
   }
 
   _check_content_availability(content_state) {
-    if (content_state === z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS) {
+    if (content_state === z.viewModel.content.CONTENT_STATE.CONNECTION_REQUESTS) {
       if (!this.user_repository.connect_requests().length) {
-        return z.ViewModel.content.CONTENT_STATE.WATERMARK;
+        return z.viewModel.content.CONTENT_STATE.WATERMARK;
       }
     }
     return content_state;
@@ -206,25 +205,25 @@ z.ViewModel.ContentViewModel = class ContentViewModel {
 
   _get_element_of_content(content_state) {
     switch (content_state) {
-      case z.ViewModel.content.CONTENT_STATE.COLLECTION:
+      case z.viewModel.content.CONTENT_STATE.COLLECTION:
         return '.collection';
-      case z.ViewModel.content.CONTENT_STATE.COLLECTION_DETAILS:
+      case z.viewModel.content.CONTENT_STATE.COLLECTION_DETAILS:
         return '.collection-details';
-      case z.ViewModel.content.CONTENT_STATE.CONVERSATION:
+      case z.viewModel.content.CONTENT_STATE.CONVERSATION:
         return '.conversation';
-      case z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS:
+      case z.viewModel.content.CONTENT_STATE.CONNECTION_REQUESTS:
         return '.connect-requests';
-      case z.ViewModel.content.CONTENT_STATE.PREFERENCES_ABOUT:
+      case z.viewModel.content.CONTENT_STATE.PREFERENCES_ABOUT:
         return '.preferences-about';
-      case z.ViewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT:
+      case z.viewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT:
         return '.preferences-account';
-      case z.ViewModel.content.CONTENT_STATE.PREFERENCES_AV:
+      case z.viewModel.content.CONTENT_STATE.PREFERENCES_AV:
         return '.preferences-av';
-      case z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICE_DETAILS:
+      case z.viewModel.content.CONTENT_STATE.PREFERENCES_DEVICE_DETAILS:
         return '.preferences-device-details';
-      case z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES:
+      case z.viewModel.content.CONTENT_STATE.PREFERENCES_DEVICES:
         return '.preferences-devices';
-      case z.ViewModel.content.CONTENT_STATE.PREFERENCES_OPTIONS:
+      case z.viewModel.content.CONTENT_STATE.PREFERENCES_OPTIONS:
         return '.preferences-options';
       default:
         return '.watermark';
@@ -234,11 +233,11 @@ z.ViewModel.ContentViewModel = class ContentViewModel {
   _release_content(new_content_state) {
     this.previous_state = this.content_state();
 
-    const conversation_state = this.previous_state === z.ViewModel.content.CONTENT_STATE.CONVERSATION;
+    const conversation_state = this.previous_state === z.viewModel.content.CONTENT_STATE.CONVERSATION;
     if (conversation_state) {
       const collection_states = [
-        z.ViewModel.content.CONTENT_STATE.COLLECTION,
-        z.ViewModel.content.CONTENT_STATE.COLLECTION_DETAILS,
+        z.viewModel.content.CONTENT_STATE.COLLECTION,
+        z.viewModel.content.CONTENT_STATE.COLLECTION_DETAILS,
       ];
       if (!collection_states.includes(new_content_state)) {
         this.conversation_repository.active_conversation(null);
@@ -247,7 +246,7 @@ z.ViewModel.ContentViewModel = class ContentViewModel {
       return this.message_list.release_conversation();
     }
 
-    const preferences_av_state = this.previous_state === z.ViewModel.content.CONTENT_STATE.PREFERENCES_AV;
+    const preferences_av_state = this.previous_state === z.viewModel.content.CONTENT_STATE.PREFERENCES_AV;
     if (preferences_av_state) {
       this.preferences_av.release_devices();
     }

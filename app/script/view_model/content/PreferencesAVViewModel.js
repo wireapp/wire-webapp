@@ -20,16 +20,16 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.ViewModel = z.ViewModel || {};
-window.z.ViewModel.content = z.ViewModel.content || {};
+window.z.viewModel = z.viewModel || {};
+window.z.viewModel.content = z.viewModel.content || {};
 
-z.ViewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
+z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
   constructor(mainViewModel, repositories) {
     this.initiate_devices = this.initiate_devices.bind(this);
     this.release_devices = this.release_devices.bind(this);
 
     this.media_repository = repositories.media;
-    this.logger = new z.util.Logger('z.ViewModel.content.PreferencesAVViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger('z.viewModel.content.PreferencesAVViewModel', z.config.LOGGER.OPTIONS);
 
     this.media_devices_handler = this.media_repository.devices_handler;
     this.available_devices = this.media_devices_handler.available_devices;

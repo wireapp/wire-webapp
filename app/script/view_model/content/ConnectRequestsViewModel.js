@@ -20,13 +20,13 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.ViewModel = z.ViewModel || {};
-window.z.ViewModel.content = z.ViewModel.content || {};
+window.z.viewModel = z.viewModel || {};
+window.z.viewModel.content = z.viewModel.content || {};
 
-z.ViewModel.content.ConnectRequestsViewModel = class ConnectRequestsViewModel {
+z.viewModel.content.ConnectRequestsViewModel = class ConnectRequestsViewModel {
   /**
    * View model for connection requests.
-   * @param {z.ViewModel.MainViewModel} mainViewModel - Main view model
+   * @param {z.viewModel.MainViewModel} mainViewModel - Main view model
    * @param {Object} repositories - Object containing all repositories
    */
   constructor(mainViewModel, repositories) {
@@ -35,7 +35,7 @@ z.ViewModel.content.ConnectRequestsViewModel = class ConnectRequestsViewModel {
     this.click_on_ignore = this.click_on_ignore.bind(this);
 
     this.user_repository = repositories.user;
-    this.logger = new z.util.Logger('z.ViewModel.content.ConnectRequestsViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger('z.viewModel.content.ConnectRequestsViewModel', z.config.LOGGER.OPTIONS);
 
     this.connect_requests = this.user_repository.connect_requests;
 

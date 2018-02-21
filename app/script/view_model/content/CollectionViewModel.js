@@ -20,11 +20,11 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.ViewModel = z.ViewModel || {};
-window.z.ViewModel.content = z.ViewModel.content || {};
+window.z.viewModel = z.viewModel || {};
+window.z.viewModel.content = z.viewModel.content || {};
 
-// Parent: z.ViewModel.ContentViewModel
-z.ViewModel.content.CollectionViewModel = class CollectionViewModel {
+// Parent: z.viewModel.ContentViewModel
+z.viewModel.content.CollectionViewModel = class CollectionViewModel {
   constructor(mainViewModel, repositories) {
     this.added_to_view = this.added_to_view.bind(this);
     this.click_on_message = this.click_on_message.bind(this);
@@ -37,7 +37,7 @@ z.ViewModel.content.CollectionViewModel = class CollectionViewModel {
 
     this.collection_details = mainViewModel.collection_details;
     this.conversation_repository = repositories.conversation;
-    this.logger = new z.util.Logger('z.ViewModel.CollectionViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger('z.viewModel.CollectionViewModel', z.config.LOGGER.OPTIONS);
 
     this.conversation_et = ko.observable();
 
@@ -130,7 +130,7 @@ z.ViewModel.content.CollectionViewModel = class CollectionViewModel {
 
   click_on_section(category, items) {
     this.collection_details.set_conversation(this.conversation_et(), category, [].concat(items));
-    amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.ViewModel.content.CONTENT_STATE.COLLECTION_DETAILS);
+    amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.content.CONTENT_STATE.COLLECTION_DETAILS);
   }
 
   click_on_image(message_et) {

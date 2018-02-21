@@ -20,9 +20,9 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.ViewModel = z.ViewModel || {};
+window.z.viewModel = z.viewModel || {};
 
-z.ViewModel.MainViewModel = class MainViewModel {
+z.viewModel.MainViewModel = class MainViewModel {
   constructor(repositories) {
     this.closePanel = this.closePanel.bind(this);
     this.openPanel = this.openPanel.bind(this);
@@ -30,22 +30,23 @@ z.ViewModel.MainViewModel = class MainViewModel {
 
     this.elementId = 'wire-main';
     this.user_repository = repositories.user;
-    this.logger = new z.util.Logger('z.ViewModel.MainViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger('z.viewModel.MainViewModel', z.config.LOGGER.OPTIONS);
 
     this.user = this.user_repository.self;
     this.duration = 100;
 
     this.isPanelOpen = ko.observable(false);
 
-    this.content = new z.ViewModel.ContentViewModel(this, repositories);
-    this.panel = new z.ViewModel.PanelViewModel(this, repositories);
-    this.list = new z.ViewModel.ListViewModel(this, repositories);
+    this.content = new z.viewModel.ContentViewModel(this, repositories);
+    this.panel = new z.viewModel.PanelViewModel(this, repositories);
+    this.list = new z.viewModel.ListViewModel(this, repositories);
 
-    this.modals = new z.ViewModel.ModalsViewModel();
-    this.lightbox = new z.ViewModel.ImageDetailViewViewModel(this, repositories);
-    this.loading = new z.ViewModel.LoadingViewModel(this, repositories);
-    this.title = new z.ViewModel.WindowTitleViewModel(this, repositories);
-    this.warnings = new z.ViewModel.WarningsViewModel();
+    this.modals = new z.viewModel.ModalsViewModel();
+    this.lightbox = new z.viewModel.ImageDetailViewViewModel(this, repositories);
+    this.loading = new z.viewModel.LoadingViewModel(this, repositories);
+    this.shortcuts = new z.viewModel.ShortcutsViewModel(this, repositories);
+    this.title = new z.viewModel.WindowTitleViewModel(this, repositories);
+    this.warnings = new z.viewModel.WarningsViewModel();
 
     // backwards compatibility
     this.conversation_list = this.list.conversations;

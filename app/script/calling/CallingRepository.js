@@ -238,7 +238,7 @@ z.calling.CallingRepository = class CallingRepository {
         case z.calling.enum.CALL_MESSAGE_TYPE.SETUP: {
           this.inject_activate_event(call_message_et, source);
           this.user_repository.get_user_by_id(user_id).then(user_et => {
-            amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.UNSUPPORTED_INCOMING_CALL, {
+            amplify.publish(z.event.WebApp.WARNING.SHOW, z.viewModel.WarningType.UNSUPPORTED_INCOMING_CALL, {
               call_id: conversation_id,
               first_name: user_et.name(),
             });
@@ -247,7 +247,7 @@ z.calling.CallingRepository = class CallingRepository {
         }
 
         case z.calling.enum.CALL_MESSAGE_TYPE.CANCEL: {
-          amplify.publish(z.event.WebApp.WARNING.DISMISS, z.ViewModel.WarningType.UNSUPPORTED_INCOMING_CALL);
+          amplify.publish(z.event.WebApp.WARNING.DISMISS, z.viewModel.WarningType.UNSUPPORTED_INCOMING_CALL);
           break;
         }
 
@@ -539,7 +539,7 @@ z.calling.CallingRepository = class CallingRepository {
 
       if (!event_from_stream) {
         promises.push(
-          this.conversation_repository.grantMessage(conversation_id, z.ViewModel.MODAL_CONSENT_TYPE.INCOMING_CALL, [
+          this.conversation_repository.grantMessage(conversation_id, z.viewModel.MODAL_CONSENT_TYPE.INCOMING_CALL, [
             user_id,
           ])
         );
@@ -969,7 +969,7 @@ z.calling.CallingRepository = class CallingRepository {
 
       const is_video_call = media_type === z.media.MediaType.AUDIO_VIDEO;
       if (conversation_et.is_group() && is_video_call) {
-        amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CALL_NO_VIDEO_IN_GROUP);
+        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalType.CALL_NO_VIDEO_IN_GROUP);
       } else {
         this.join_call(conversation_et.id, media_type);
       }
@@ -985,13 +985,13 @@ z.calling.CallingRepository = class CallingRepository {
   _check_calling_support(conversation_id, call_state) {
     return this.conversation_repository.get_conversation_by_id(conversation_id).then(({participating_user_ids}) => {
       if (!participating_user_ids().length) {
-        amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CALL_EMPTY_CONVERSATION);
+        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalType.CALL_EMPTY_CONVERSATION);
         throw new z.calling.CallError(z.calling.CallError.TYPE.NOT_SUPPORTED);
       }
 
       const is_outgoing_call = call_state === z.calling.enum.CALL_STATE.OUTGOING;
       if (is_outgoing_call && !z.calling.CallingRepository.supports_calling) {
-        amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.UNSUPPORTED_OUTGOING_CALL);
+        amplify.publish(z.event.WebApp.WARNING.SHOW, z.viewModel.WarningType.UNSUPPORTED_OUTGOING_CALL);
         throw new z.calling.CallError(z.calling.CallError.TYPE.NOT_SUPPORTED);
       }
     });
@@ -1010,7 +1010,7 @@ z.calling.CallingRepository = class CallingRepository {
       const ongoing_call_id = this._self_participant_on_a_call();
 
       if (ongoing_call_id) {
-        amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CALL_START_ANOTHER, {
+        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalType.CALL_START_ANOTHER, {
           action() {
             amplify.publish(
               z.event.WebApp.CALL.STATE.LEAVE,

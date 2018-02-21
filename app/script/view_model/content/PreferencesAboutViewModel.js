@@ -20,12 +20,12 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.ViewModel = z.ViewModel || {};
-window.z.ViewModel.content = z.ViewModel.content || {};
+window.z.viewModel = z.viewModel || {};
+window.z.viewModel.content = z.viewModel.content || {};
 
-z.ViewModel.content.PreferencesAboutViewModel = class PreferencesAboutViewModel {
+z.viewModel.content.PreferencesAboutViewModel = class PreferencesAboutViewModel {
   constructor(mainViewModel, repositories) {
-    this.logger = new z.util.Logger('z.ViewModel.content.PreferencesAboutViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger('z.viewModel.content.PreferencesAboutViewModel', z.config.LOGGER.OPTIONS);
 
     this.userRepository = repositories.user;
     this.selfUser = this.userRepository.self;

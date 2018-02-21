@@ -20,21 +20,21 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.ViewModel = z.ViewModel || {};
+window.z.viewModel = z.viewModel || {};
 
-z.ViewModel.PanelViewModel = class PanelViewModel {
+z.viewModel.PanelViewModel = class PanelViewModel {
   /**
    * View model for the details column.
-   * @param {z.ViewModel.MainViewModel} mainViewModel - Main view model
+   * @param {z.viewModel.MainViewModel} mainViewModel - Main view model
    * @param {Object} repositories - Object containing all repositories
    */
   constructor(mainViewModel, repositories) {
     this.elementId = 'right-column';
-    this.logger = new z.util.Logger('z.ViewModel.PanelViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger('z.viewModel.PanelViewModel', z.config.LOGGER.OPTIONS);
 
     // Nested view models
-    this.participants = new z.ViewModel.panel.ParticipantsViewModel(mainViewModel, repositories);
-    this.guestOptions = new z.ViewModel.panel.GuestOptionsViewModel(mainViewModel, repositories);
+    this.participants = new z.viewModel.panel.ParticipantsViewModel(mainViewModel, repositories);
+    this.guestOptions = new z.viewModel.panel.GuestOptionsViewModel(mainViewModel, repositories);
 
     ko.applyBindings(this, document.getElementById(this.elementId));
   }

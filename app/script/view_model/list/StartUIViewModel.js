@@ -20,10 +20,10 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.ViewModel = z.ViewModel || {};
-window.z.ViewModel.list = z.ViewModel.list || {};
+window.z.viewModel = z.viewModel || {};
+window.z.viewModel.list = z.viewModel.list || {};
 
-z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
+z.viewModel.list.StartUIViewModel = class StartUIViewModel {
   static get STATE() {
     return {
       ADD_PEOPLE: 'StartUIViewModel.STATE.ADD_PEOPLE',
@@ -33,9 +33,9 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
 
   /**
    * View model for the start UI.
-   * @class z.ViewModel.list.StartUIViewModel
+   * @class z.viewModel.list.StartUIViewModel
    *
-   * @param {z.ViewModel.MainViewModel} mainViewModel - Main view model
+   * @param {z.viewModel.MainViewModel} mainViewModel - Main view model
    * @param {Object} repositories - Object containing all repositories
    */
   constructor(mainViewModel, repositories) {
@@ -62,7 +62,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     this.searchRepository = repositories.search;
     this.teamRepository = repositories.team;
     this.userRepository = repositories.user;
-    this.logger = new z.util.Logger('z.ViewModel.list.StartUIViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger('z.viewModel.list.StartUIViewModel', z.config.LOGGER.OPTIONS);
 
     this.selfUser = this.userRepository.self;
 
@@ -351,7 +351,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     $('user-input input').blur();
 
     amplify.publish(z.event.WebApp.SEARCH.HIDE);
-    this.listViewModel.switch_list(z.ViewModel.list.LIST_STATE.CONVERSATIONS);
+    this.listViewModel.switch_list(z.viewModel.list.LIST_STATE.CONVERSATIONS);
 
     if (this.userBubble) {
       this.userBubble.hide();
@@ -529,7 +529,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
         if (!isNoContacts) {
           this.logger.error(`Importing contacts from '${source}' failed: ${error.message}`, error);
 
-          amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CONTACTS, {
+          amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalType.CONTACTS, {
             action: () => this.importContacts(source),
           });
         }

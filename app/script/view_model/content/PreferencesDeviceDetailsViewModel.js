@@ -20,10 +20,10 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.ViewModel = z.ViewModel || {};
-window.z.ViewModel.content = z.ViewModel.content || {};
+window.z.viewModel = z.viewModel || {};
+window.z.viewModel.content = z.viewModel.content || {};
 
-z.ViewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceDetailsViewModel {
+z.viewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceDetailsViewModel {
   static get SESSION_RESET_STATE() {
     return {
       CONFIRMATION: 'confirmation',
@@ -36,14 +36,14 @@ z.ViewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
     this.client_repository = repositories.client;
     this.conversation_repository = repositories.conversation;
     this.cryptography_repository = repositories.cryptography;
-    this.logger = new z.util.Logger('z.ViewModel.content.PreferencesDeviceDetailsViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger('z.viewModel.content.PreferencesDeviceDetailsViewModel', z.config.LOGGER.OPTIONS);
 
     this.self_user = this.client_repository.selfUser;
 
     this.device = ko.observable();
     this.device.subscribe(device_et => {
       if (device_et) {
-        this.session_reset_state(z.ViewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.RESET);
+        this.session_reset_state(z.viewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.RESET);
         this.fingerprint([]);
         this._update_fingerprint();
         this._update_activation_location('?');
@@ -55,7 +55,7 @@ z.ViewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
     });
 
     this.session_reset_state = ko.observable(
-      z.ViewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.RESET
+      z.viewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.RESET
     );
     this.fingerprint = ko.observableArray([]);
 
@@ -89,34 +89,34 @@ z.ViewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
   }
 
   click_on_details_close() {
-    amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES);
+    amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.content.CONTENT_STATE.PREFERENCES_DEVICES);
     this.device(null);
   }
 
   click_on_reset_session() {
-    this.session_reset_state(z.ViewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.ONGOING);
+    this.session_reset_state(z.viewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.ONGOING);
 
     this.conversation_repository
       .reset_session(this.self_user().id, this.device().id, this.conversation_repository.self_conversation().id)
       .then(() => {
         window.setTimeout(() => {
           this.session_reset_state(
-            z.ViewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.CONFIRMATION
+            z.viewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.CONFIRMATION
           );
         }, z.motion.MotionDuration.LONG);
 
         window.setTimeout(() => {
-          this.session_reset_state(z.ViewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.RESET);
+          this.session_reset_state(z.viewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.RESET);
         }, 5000);
       })
       .catch(error => {
-        this.session_reset_state(z.ViewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.RESET);
+        this.session_reset_state(z.viewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.RESET);
         throw error;
       });
   }
 
   click_on_remove_device() {
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.REMOVE_DEVICE, {
+    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalType.REMOVE_DEVICE, {
       action: password => {
         // @todo Add failure case ux WEBAPP-3570
         this.client_repository.deleteClient(this.device().id, password).then(() => {

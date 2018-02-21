@@ -20,7 +20,8 @@
 'use strict';
 
 window.z = window.z || {};
-z.ViewModel = z.ViewModel || {};
+window.z.viewModel = z.viewModel || {};
+window.z.viewModel.content = z.viewModel.content || {};
 
 const EMOJI_LIST_LENGTH = 5;
 const EMOJI_LIST_OFFSET_LEFT = 8;
@@ -93,7 +94,7 @@ const EMOJI_INLINE_REPLACEMENT = [
 
 const EMOJI_INLINE_MAX_LENGTH = Math.max(...EMOJI_INLINE_REPLACEMENT.map(item => item.shortcut.length));
 
-z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewModel {
+z.viewModel.content.ConversationInputEmojiViewModel = class ConversationInputEmojiViewModel {
   constructor(repositories) {
     this.remove_emoji_popup = this.remove_emoji_popup.bind(this);
     this.updated_emoji_replace_preference = this.updated_emoji_replace_preference.bind(this);

@@ -20,14 +20,14 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.ViewModel = z.ViewModel || {};
+window.z.viewModel = z.viewModel || {};
 
-z.ViewModel.WindowTitleViewModel = class WindowTitleViewModel {
+z.viewModel.WindowTitleViewModel = class WindowTitleViewModel {
   constructor(mainViewModel, repositories) {
     this.content_state = mainViewModel.content.content_state;
     this.conversation_repository = repositories.conversation_repository;
     this.user_repository = repositories.user;
-    this.logger = new z.util.Logger('z.ViewModel.WindowTitleViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger('z.viewModel.WindowTitleViewModel', z.config.LOGGER.OPTIONS);
 
     this.update_window_title = ko.observable(false);
 
@@ -67,7 +67,7 @@ z.ViewModel.WindowTitleViewModel = class WindowTitleViewModel {
           amplify.publish(z.event.WebApp.LIFECYCLE.UNREAD_COUNT, badge_count);
 
           switch (this.content_state()) {
-            case z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS: {
+            case z.viewModel.content.CONTENT_STATE.CONNECTION_REQUESTS: {
               if (number_of_requests > 1) {
                 window_title += z.l10n.text(z.string.conversations_connection_request_many, number_of_requests);
               } else {
@@ -76,39 +76,39 @@ z.ViewModel.WindowTitleViewModel = class WindowTitleViewModel {
               break;
             }
 
-            case z.ViewModel.content.CONTENT_STATE.CONVERSATION: {
+            case z.viewModel.content.CONTENT_STATE.CONVERSATION: {
               if (this.conversation_repository.active_conversation()) {
                 window_title += this.conversation_repository.active_conversation().display_name();
               }
               break;
             }
 
-            case z.ViewModel.content.CONTENT_STATE.PREFERENCES_ABOUT: {
+            case z.viewModel.content.CONTENT_STATE.PREFERENCES_ABOUT: {
               window_title += z.l10n.text(z.string.preferences_about);
               break;
             }
 
-            case z.ViewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT: {
+            case z.viewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT: {
               window_title += z.l10n.text(z.string.preferences_account);
               break;
             }
 
-            case z.ViewModel.content.CONTENT_STATE.PREFERENCES_AV: {
+            case z.viewModel.content.CONTENT_STATE.PREFERENCES_AV: {
               window_title += z.l10n.text(z.string.preferences_av);
               break;
             }
 
-            case z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICE_DETAILS: {
+            case z.viewModel.content.CONTENT_STATE.PREFERENCES_DEVICE_DETAILS: {
               window_title += z.l10n.text(z.string.preferences_device_details);
               break;
             }
 
-            case z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES: {
+            case z.viewModel.content.CONTENT_STATE.PREFERENCES_DEVICES: {
               window_title += z.l10n.text(z.string.preferences_devices);
               break;
             }
 
-            case z.ViewModel.content.CONTENT_STATE.PREFERENCES_OPTIONS: {
+            case z.viewModel.content.CONTENT_STATE.PREFERENCES_OPTIONS: {
               window_title += z.l10n.text(z.string.preferences_options);
               break;
             }

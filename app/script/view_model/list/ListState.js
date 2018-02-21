@@ -20,12 +20,12 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.ViewModel = z.ViewModel || {};
-window.z.ViewModel.list = z.ViewModel.list || {};
+window.z.viewModel = z.viewModel || {};
+window.z.viewModel.list = z.viewModel.list || {};
 
-z.ViewModel.list.LIST_STATE = {
-  ARCHIVE: 'z.ViewModel.list.LIST_STATE.ARCHIVE',
-  CONVERSATIONS: 'z.ViewModel.list.LIST_STATE.CONVERSATIONS',
-  PREFERENCES: 'z.ViewModel.list.LIST_STATE.PREFERENCES',
-  START_UI: 'z.ViewModel.list.LIST_STATE.START_UI',
+z.viewModel.list.LIST_STATE = {
+  ARCHIVE: 'z.viewModel.list.LIST_STATE.ARCHIVE',
+  CONVERSATIONS: 'z.viewModel.list.LIST_STATE.CONVERSATIONS',
+  PREFERENCES: 'z.viewModel.list.LIST_STATE.PREFERENCES',
+  START_UI: 'z.viewModel.list.LIST_STATE.START_UI',
 };

@@ -14,50 +14,50 @@
             #include('list/preferences.htm')
             #include('list/start-ui.htm')
           <!-- /ko -->
-          <!-- ko if: list_modal() === z.ViewModel.list.LIST_MODAL_TYPE.TAKEOVER -->
+          <!-- ko if: list_modal() === z.viewModel.list.LIST_MODAL_TYPE.TAKEOVER -->
             #include('list/takeover.htm')
           <!-- /ko -->
         <!-- /ko -->
       </div>
       <div id="center-column" class="center-column">
-        <!-- ko if: content_state() === z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS -->
+        <!-- ko if: content_state() === z.viewModel.content.CONTENT_STATE.CONNECTION_REQUESTS -->
           #include('content/connect-requests.htm')
         <!-- /ko -->
-        <!-- ko if: content_state() === z.ViewModel.content.CONTENT_STATE.CONVERSATION -->
+        <!-- ko if: content_state() === z.viewModel.content.CONTENT_STATE.CONVERSATION -->
           #include('content/conversation.htm')
         <!-- /ko -->
-        <!-- ko if: content_state() === z.ViewModel.content.CONTENT_STATE.COLLECTION -->
+        <!-- ko if: content_state() === z.viewModel.content.CONTENT_STATE.COLLECTION -->
           #include('content/collection.htm')
         <!-- /ko -->
-        <!-- ko if: content_state() === z.ViewModel.content.CONTENT_STATE.COLLECTION_DETAILS -->
+        <!-- ko if: content_state() === z.viewModel.content.CONTENT_STATE.COLLECTION_DETAILS -->
           #include('content/collection-details.htm')
         <!-- /ko -->
-        <!-- ko if: content_state() === z.ViewModel.content.CONTENT_STATE.PREFERENCES_ABOUT -->
+        <!-- ko if: content_state() === z.viewModel.content.CONTENT_STATE.PREFERENCES_ABOUT -->
           #include('content/preferences-about.htm')
         <!-- /ko -->
-        <!-- ko if: content_state() === z.ViewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT -->
+        <!-- ko if: content_state() === z.viewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT -->
           #include('content/preferences-account.htm')
         <!-- /ko -->
-        <!-- ko if: content_state() === z.ViewModel.content.CONTENT_STATE.PREFERENCES_AV -->
+        <!-- ko if: content_state() === z.viewModel.content.CONTENT_STATE.PREFERENCES_AV -->
           #include('content/preferences-av.htm')
         <!-- /ko -->
-        <!-- ko if: content_state() === z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICE_DETAILS -->
+        <!-- ko if: content_state() === z.viewModel.content.CONTENT_STATE.PREFERENCES_DEVICE_DETAILS -->
           #include('content/preferences-device-details.htm')
         <!-- /ko -->
-        <!-- ko if: content_state() === z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES -->
+        <!-- ko if: content_state() === z.viewModel.content.CONTENT_STATE.PREFERENCES_DEVICES -->
           #include('content/preferences-devices.htm')
         <!-- /ko -->
-        <!-- ko if: content_state() === z.ViewModel.content.CONTENT_STATE.PREFERENCES_OPTIONS -->
+        <!-- ko if: content_state() === z.viewModel.content.CONTENT_STATE.PREFERENCES_OPTIONS -->
           #include('content/preferences-options.htm')
         <!-- /ko -->
-        <!-- ko if: content_state() === z.ViewModel.content.CONTENT_STATE.WATERMARK -->
+        <!-- ko if: content_state() === z.viewModel.content.CONTENT_STATE.WATERMARK -->
           #include('content/watermark.htm')
         <!-- /ko -->
         #include('modal/group-creation.htm')
         <div class="center-column__overlay"></div>
       </div>
       <div id="right-column" class="right-column">
-        #include('details/participants.htm')
+        #include('panel/participants.htm')
       </div>
     </div>
     #include('detail-view.htm')

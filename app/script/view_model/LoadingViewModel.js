@@ -20,9 +20,9 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.ViewModel = z.ViewModel || {};
+window.z.viewModel = z.viewModel || {};
 
-z.ViewModel.LoadingViewModel = class LoadingViewModel {
+z.viewModel.LoadingViewModel = class LoadingViewModel {
   constructor(mainViewModel, repositories) {
     this.elementId = 'loading-screen';
     this.user_repository = repositories.user;

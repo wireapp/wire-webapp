@@ -20,18 +20,18 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.ViewModel = z.ViewModel || {};
-window.z.ViewModel.content = z.ViewModel.content || {};
+window.z.viewModel = z.viewModel || {};
+window.z.viewModel.content = z.viewModel.content || {};
 
-// Parent: z.ViewModel.CollectionViewModel
-z.ViewModel.content.CollectionDetailsViewModel = class CollectionDetailsViewModel {
+// Parent: z.viewModel.CollectionViewModel
+z.viewModel.content.CollectionDetailsViewModel = class CollectionDetailsViewModel {
   constructor() {
     this.item_added = this.item_added.bind(this);
     this.item_removed = this.item_removed.bind(this);
     this.removed_from_view = this.removed_from_view.bind(this);
     this.set_conversation = this.set_conversation.bind(this);
 
-    this.logger = new z.util.Logger('z.ViewModel.CollectionDetailsViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger('z.viewModel.CollectionDetailsViewModel', z.config.LOGGER.OPTIONS);
 
     this.template = ko.observable();
     this.conversation_et = ko.observable();
@@ -92,7 +92,7 @@ z.ViewModel.content.CollectionDetailsViewModel = class CollectionDetailsViewMode
   }
 
   click_on_back_button() {
-    amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.ViewModel.content.CONTENT_STATE.COLLECTION);
+    amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.content.CONTENT_STATE.COLLECTION);
   }
 
   click_on_image(message_et) {
