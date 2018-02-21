@@ -95,8 +95,7 @@ z.main.App = class App {
       this.service.user,
       this.service.asset,
       this.service.search,
-      repositories.client,
-      repositories.cryptography
+      repositories.client
     );
     repositories.event = new z.event.EventRepository(
       this.service.notification,
@@ -284,7 +283,7 @@ z.main.App = class App {
       .then(() => this._check_single_instance())
       .then(() => this._load_access_token())
       .then(() => {
-        this.view.loading.update_progress(2.5);
+        this.view.loading.updateProgress(2.5);
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
         return Promise.all([
           this._get_user_self(),
@@ -294,31 +293,31 @@ z.main.App = class App {
         ]);
       })
       .then(([self_user_et]) => {
-        this.view.loading.update_progress(5, z.string.init_received_self_user);
+        this.view.loading.updateProgress(5, z.string.init_received_self_user);
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.RECEIVED_SELF_USER);
         this.repository.client.init(self_user_et);
         this.repository.properties.init(self_user_et);
         return this.repository.client.getValidLocalClient();
       })
       .then(client_observable => {
-        this.view.loading.update_progress(7.5, z.string.init_validated_client);
+        this.view.loading.updateProgress(7.5, z.string.init_validated_client);
 
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.VALIDATED_CLIENT);
         this.telemetry.add_statistic(z.telemetry.app_init.AppInitStatisticsValue.CLIENT_TYPE, client_observable().type);
 
-        this.repository.cryptography.current_client = client_observable;
+        this.repository.cryptography.currentClient = client_observable;
         this.repository.event.currentClient = client_observable;
-        return this.repository.cryptography.load_cryptobox(this.service.storage.db);
+        return this.repository.cryptography.loadCryptobox(this.service.storage.db);
       })
       .then(() => {
-        this.view.loading.update_progress(10);
+        this.view.loading.updateProgress(10);
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
         this.repository.event.connectWebSocket();
 
         return Promise.all([this.repository.conversation.get_conversations(), this.repository.user.get_connections()]);
       })
       .then(([conversation_ets, connection_ets]) => {
-        this.view.loading.update_progress(25, z.string.init_received_user_data);
+        this.view.loading.updateProgress(25, z.string.init_received_user_data);
 
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.RECEIVED_USER_DATA);
         this.telemetry.add_statistic(
@@ -351,13 +350,13 @@ z.main.App = class App {
         return this.repository.conversation.initialize_conversations();
       })
       .then(() => {
-        this.view.loading.update_progress(97.5, z.string.init_updated_from_notifications);
+        this.view.loading.updateProgress(97.5, z.string.init_updated_from_notifications);
 
         this._watch_online_status();
         return this.repository.client.getClientsForSelf();
       })
       .then(client_ets => {
-        this.view.loading.update_progress(99);
+        this.view.loading.updateProgress(99);
 
         this.telemetry.add_statistic(z.telemetry.app_init.AppInitStatisticsValue.CLIENTS, client_ets.length);
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.APP_PRE_LOADED);
@@ -378,7 +377,6 @@ z.main.App = class App {
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.UPDATED_CONVERSATIONS);
         this.repository.lifecycle.init();
         this.repository.audio.init(true);
-        this.repository.client.cleanupClientsAndSessions(true);
         this.repository.conversation.cleanup_conversations();
         this.logger.info('App fully loaded');
       })
@@ -615,7 +613,7 @@ z.main.App = class App {
 
     window.setTimeout(() => this.repository.notification.checkPermission(), App.CONFIG.NOTIFICATION_CHECK);
 
-    $('#loading-screen').remove();
+    this.view.loading.removeFromView();
     $('#wire-main').attr('data-uie-value', 'is-loaded');
   }
 
@@ -631,7 +629,7 @@ z.main.App = class App {
 
     $(window).on('unload', () => {
       this.logger.info("'window.unload' was triggered, so we will tear down calls.");
-      this.repository.calling.leave_call_on_unload();
+      this.repository.calling.leaveCallOnUnload();
       this.repository.storage.terminate('window.onunload');
       this.repository.notification.clearNotifications();
     });
@@ -812,7 +810,7 @@ z.main.App = class App {
    * @returns {undefined} No return value
    */
   report_call() {
-    this.repository.calling.report_call();
+    this.repository.calling.reportCall();
   }
 
   /**

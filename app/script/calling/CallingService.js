@@ -36,7 +36,7 @@ z.calling.CallingService = class CallingService {
    * Retrieves a calling config from the backend.
    * @returns {Promise} Resolves with call config information
    */
-  get_config() {
+  getConfig() {
     return this.client.send_request({
       cache: false,
       type: 'GET',

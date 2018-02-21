@@ -17,17 +17,17 @@
  *
  */
 
-// grunt test_init && grunt test_run:calling/entities/CallMessage
+// grunt test_init && grunt test_run:calling/entities/CallMessageEntity
 
 'use strict';
 
-describe('z.calling.entities.CallMessage', () => {
+describe('z.calling.entities.CallMessageEntity', () => {
   describe('_create_session_id', () => {
-    const call_message_et = new z.calling.entities.CallMessage();
+    const callMessageEntity = new z.calling.entities.CallMessageEntity();
 
     it('always returns an alphanumeric string of length four', () => {
       _.range(100).map(() => {
-        expect(call_message_et._create_session_id()).toMatch(/(\w|\d){4}/);
+        expect(callMessageEntity._createSessionId()).toMatch(/(\w|\d){4}/);
       });
     });
   });
