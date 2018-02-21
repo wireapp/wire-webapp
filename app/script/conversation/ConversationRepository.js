@@ -1150,7 +1150,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.logger.info(`Resetting session with client '${client_id}' of user '${user_id}'.`);
 
     return this.cryptography_repository
-      .delete_session(user_id, client_id)
+      .deleteSession(user_id, client_id)
       .then(session_id => {
         if (session_id) {
           this.logger.info(`Deleted session with client '${client_id}' of user '${user_id}'.`);
