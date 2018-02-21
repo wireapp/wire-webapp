@@ -21,7 +21,7 @@ import Dexie from 'dexie';
 import {StoreEngine} from '@wireapp/store-engine';
 
 describe('StoreEngine.IndexedDBEngine', () => {
-  const STORE_NAME = 'database-name';
+  const STORE_NAME = 'store-name';
 
   let engine = undefined;
 
@@ -55,8 +55,9 @@ describe('StoreEngine.IndexedDBEngine', () => {
         anotherProperty: 'not all properties needs to be indexed',
         name: 'Camilla',
       };
+      const name = 'MyDatabase';
 
-      const db = new Dexie('MyDatabase');
+      const db = new Dexie(name);
       db.version(1).stores({
         [TABLE_NAME]: ', name, age',
       });
@@ -68,6 +69,7 @@ describe('StoreEngine.IndexedDBEngine', () => {
         .create(TABLE_NAME, PRIMARY_KEY, entity)
         .then(primaryKey => {
           expect(primaryKey).toEqual(PRIMARY_KEY);
+          expect(engine.storeName).toBe(name);
           done();
         })
         .catch(done.fail);
