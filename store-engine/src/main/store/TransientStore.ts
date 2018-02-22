@@ -6,7 +6,7 @@ import {RecordAlreadyExistsError, RecordNotFoundError} from '../engine/error';
 
 export default class TransientStore extends EventEmitter {
   private bundles: {[index: string]: TransientBundle} = {};
-  private tableName: string;
+  private tableName: string = '';
 
   public static TOPIC = {
     EXPIRED: 'expired',
