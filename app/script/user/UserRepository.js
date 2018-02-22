@@ -41,13 +41,11 @@ z.user.UserRepository = class UserRepository {
    * @param {z.assets.AssetService} asset_service - Backend REST API asset service implementation
    * @param {z.search.SearchService} search_service - Backend REST API search service implementation
    * @param {z.client.ClientRepository} client_repository - Repository for all client interactions
-   * @param {z.cryptography.CryptographyRepository} cryptography_repository - Repository for all cryptography interactions
    */
-  constructor(user_service, asset_service, search_service, client_repository, cryptography_repository) {
+  constructor(user_service, asset_service, search_service, client_repository) {
     this.user_service = user_service;
     this.asset_service = asset_service;
     this.client_repository = client_repository;
-    this.cryptography_repository = cryptography_repository;
     this.logger = new z.util.Logger('z.user.UserRepository', z.config.LOGGER.OPTIONS);
 
     this.connection_mapper = new z.user.UserConnectionMapper();
@@ -102,10 +100,8 @@ z.user.UserRepository = class UserRepository {
   on_user_event(event_json, source) {
     const {type} = event_json;
 
-    this.logger.info(`»» User Event: '${type}' (Source: ${source})`, {
-      event_json: JSON.stringify(event_json),
-      event_object: event_json,
-    });
+    const logObject = {eventJson: JSON.stringify(event_json), eventObject: event_json};
+    this.logger.info(`»» User Event: '${type}' (Source: ${source})`, logObject);
 
     switch (type) {
       case z.event.Backend.USER.CONNECTION:

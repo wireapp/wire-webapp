@@ -53,12 +53,12 @@ z.connect.ConnectError = class ConnectError extends Error {
 
   static get TYPE() {
     return {
-      GOOGLE_CLIENT: 'z.connect.ConnectError.TYPE.GOOGLE_CLIENT',
-      GOOGLE_DOWNLOAD: 'z.connect.ConnectError.TYPE.GOOGLE_DOWNLOAD',
-      NO_CONTACTS: 'z.connect.ConnectError.TYPE.NO_CONTACTS',
-      NOT_SUPPORTED: 'z.connect.ConnectError.TYPE.NOT_SUPPORTED',
-      UNKNOWN: 'z.connect.ConnectError.TYPE.UNKNOWN',
-      UPLOAD: 'z.connect.ConnectError.TYPE.UPLOAD',
+      GOOGLE_CLIENT: 'ConnectError.TYPE.GOOGLE_CLIENT',
+      GOOGLE_DOWNLOAD: 'ConnectError.TYPE.GOOGLE_DOWNLOAD',
+      NO_CONTACTS: 'ConnectError.TYPE.NO_CONTACTS',
+      NOT_SUPPORTED: 'ConnectError.TYPE.NOT_SUPPORTED',
+      UNKNOWN: 'ConnectError.TYPE.UNKNOWN',
+      UPLOAD: 'ConnectError.TYPE.UPLOAD',
     };
   }
 };

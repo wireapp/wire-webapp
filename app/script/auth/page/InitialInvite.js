@@ -80,7 +80,7 @@ class InitialInvite extends React.PureComponent {
     if (!this.emailInput.checkValidity()) {
       this.setState({error: ValidationError.handleValidationState('email', this.emailInput.validity)});
     } else {
-      this.props.invite({email: this.emailInput.value});
+      this.props.invite({email: this.emailInput.value.trim()});
       this.setState({enteredEmail: ''});
       this.emailInput.value = '';
     }

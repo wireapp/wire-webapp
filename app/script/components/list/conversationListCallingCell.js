@@ -29,7 +29,7 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
     this.is_selected = params.is_selected;
 
     this.on_join_call = () => {
-      const media_type = this.call().is_remote_video_send() ? z.media.MediaType.AUDIO_VIDEO : z.media.MediaType.AUDIO;
+      const media_type = this.call().isRemoteVideoSend() ? z.media.MediaType.AUDIO_VIDEO : z.media.MediaType.AUDIO;
       amplify.publish(z.event.WebApp.CALL.STATE.JOIN, this.conversation.id, media_type);
     };
 
@@ -73,29 +73,29 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
       return displayed_user_ets;
     });
 
-    this.joined_call = this.calling_repository.joined_call;
+    this.joined_call = this.calling_repository.joinedCall;
 
-    this.self_stream_state = this.calling_repository.self_stream_state;
+    this.self_stream_state = this.calling_repository.selfStreamState;
 
-    this.show_screensharing_button = ko.pureComputed(() => z.calling.CallingRepository.supports_screen_sharing);
+    this.show_screensharing_button = ko.pureComputed(() => z.calling.CallingRepository.supportsScreenSharing);
     this.show_video_button = ko.pureComputed(() => {
       if (this.joined_call()) {
-        return this.joined_call().conversation_et.is_one2one();
+        return this.joined_call().conversationEntity.is_one2one();
       }
     });
     this.disable_toggle_screen = ko.pureComputed(() => {
       if (this.joined_call()) {
-        return this.joined_call().is_remote_screen_send();
+        return this.joined_call().isRemoteScreenSend();
       }
     });
 
     this.call_is_outgoing = ko.pureComputed(() => this.call().state() === z.calling.enum.CALL_STATE.OUTGOING);
     this.call_is_ongoing = ko.pureComputed(() => this.call().state() === z.calling.enum.CALL_STATE.ONGOING);
     this.call_is_incoming = ko.pureComputed(() => this.call().state() === z.calling.enum.CALL_STATE.INCOMING);
-    this.call_is_anwserable = ko.pureComputed(() => this.call_is_incoming() && !this.call().is_declined());
+    this.call_is_anwserable = ko.pureComputed(() => this.call_is_incoming() && !this.call().isDeclined());
 
     this.show_leave_button = ko.pureComputed(() => {
-      return this.call().self_user_joined();
+      return this.call().selfUserJoined();
     });
 
     this.show_decline_button = ko.pureComputed(() => {
@@ -103,23 +103,23 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
     });
 
     this.show_accept_button = ko.pureComputed(() => {
-      return this.call_is_anwserable() && !this.call().is_remote_video_send();
+      return this.call_is_anwserable() && !this.call().isRemoteVideoSend();
     });
 
     this.show_accept_video_button = ko.pureComputed(() => {
-      return this.call_is_anwserable() && this.call().is_remote_video_send();
+      return this.call_is_anwserable() && this.call().isRemoteVideoSend();
     });
 
     this.show_call_timer = ko.pureComputed(() => {
-      return this.call_is_ongoing() && this.call().self_user_joined();
+      return this.call_is_ongoing() && this.call().selfUserJoined();
     });
 
     this.show_join_button = ko.pureComputed(() => {
-      return (this.call_is_ongoing() && !this.call().self_user_joined()) || this.call().is_declined();
+      return (this.call_is_ongoing() && !this.call().selfUserJoined()) || this.call().isDeclined();
     });
 
     this.show_call_controls = ko.pureComputed(() => {
-      return this.call().self_user_joined();
+      return this.call().selfUserJoined();
     });
 
     this.on_participants_button_click = () => {
@@ -158,7 +158,7 @@ ko.components.register('conversation-list-calling-cell', {
           <span class="conversation-list-cell-description" data-bind="l10n_text: z.string.call_state_incoming" data-uie-name="call-label-incoming"></span>
         <!-- /ko -->
         <!-- ko if: show_call_timer -->
-          <span class="conversation-list-cell-description" data-bind="text: z.util.format_seconds(call().duration_time())" data-uie-name="call-duration"></span>
+          <span class="conversation-list-cell-description" data-bind="text: z.util.format_seconds(call().durationTime())" data-uie-name="call-duration"></span>
         <!-- /ko -->
       </div>
       <div class="conversation-list-cell-right">
@@ -184,17 +184,17 @@ ko.components.register('conversation-list-calling-cell', {
       <!-- ko if: show_participants_button -->
         <div class="conversation-list-calling-cell-controls-button cursor-pointer conversation-list-calling-cell-controls-on-call" data-bind="click: on_participants_button_click, text: participants_button_label, css: show_participants() ? 'cell-badge-light' : 'cell-badge-dark'" data-uie-name="do-toggle-participants"></div>
       <!-- /ko -->
-      <div class="conversation-list-calling-cell-controls-button icon-mute-small cursor-pointer" data-bind="click: on_toggle_audio, css: self_stream_state.audio_send() ? 'cell-badge-dark' : 'cell-badge-light'" data-uie-name="do-toggle-mute"></div>
+      <div class="conversation-list-calling-cell-controls-button icon-mute-small cursor-pointer" data-bind="click: on_toggle_audio, css: self_stream_state.audioSend() ? 'cell-badge-dark' : 'cell-badge-light'" data-uie-name="do-toggle-mute"></div>
       <!-- ko if: call_is_ongoing -->
         <!-- ko if: show_video_button() -->
-          <div class="conversation-list-calling-cell-controls-button icon-video cursor-pointer" data-bind="click: on_toggle_video, css: self_stream_state.video_send() ? 'cell-badge-light' : 'cell-badge-dark'" data-uie-name="do-toggle-video"></div>
+          <div class="conversation-list-calling-cell-controls-button icon-video cursor-pointer" data-bind="click: on_toggle_video, css: self_stream_state.videoSend() ? 'cell-badge-light' : 'cell-badge-dark'" data-uie-name="do-toggle-video"></div>
         <!-- /ko -->
         <!-- ko if: show_screensharing_button() -->
           <div data-uie-name="do-toggle-screenshare" class="conversation-list-calling-cell-controls-button icon-screensharing-small cursor-pointer"
                data-bind="click: on_toggle_screen, css: {
                 'disabled': disable_toggle_screen(),
-                'cell-badge-light': self_stream_state.screen_send(),
-                'cell-badge-dark': !self_stream_state.screen_send()
+                'cell-badge-light': self_stream_state.screenSend(),
+                'cell-badge-dark': !self_stream_state.screenSend()
                }">
           </div>
         <!-- /ko -->

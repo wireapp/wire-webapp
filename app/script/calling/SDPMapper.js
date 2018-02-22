@@ -30,26 +30,26 @@ z.calling.SDPMapper = {
 
   /**
    * Get the tool version that generated the SDP
-   * @param {string} sdp_string - Full SDP string
+   * @param {string} sdpString - Full SDP string
    * @returns {string} Tool version of SDP
    */
-  get_tool_version(sdp_string) {
-    for (const sdp_line of sdp_string.split('\r\n')) {
-      if (sdp_line.startsWith('a=tool')) {
-        return sdp_line.replace('a=tool:', '');
+  getToolVersion(sdpString) {
+    for (const sdpLine of sdpString.split('\r\n')) {
+      if (sdpLine.startsWith('a=tool')) {
+        return sdpLine.replace('a=tool:', '');
       }
     }
   },
 
   /**
    * Map call setup message to RTCSessionDescription.
-   * @param {CallMessage} call_message_et - Call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.SETUP
+   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.SETUP
    * @returns {Promise} Resolves with a webRTC standard compliant RTCSessionDescription
    */
-  map_call_message_to_object(call_message_et) {
-    const {response, sdp: sdp_string} = call_message_et;
+  mapCallMessageToObject(callMessageEntity) {
+    const {response, sdp: sdpString} = callMessageEntity;
     const sdp = {
-      sdp: sdp_string,
+      sdp: sdpString,
       type: response ? z.calling.rtc.SDP_TYPE.ANSWER : z.calling.rtc.SDP_TYPE.OFFER,
     };
 
@@ -59,87 +59,87 @@ z.calling.SDPMapper = {
   /**
    * Rewrite the SDP for compatibility reasons.
    *
-   * @param {RTCSessionDescription} rtc_sdp - Session Description Protocol to be rewritten
-   * @param {z.calling.enum.SDP_SOURCE} [sdp_source=z.calling.enum.SDP_SOURCE.REMOTE] - Source of the SDP - local or remote
-   * @param {Flow} flow_et - Flow entity
+   * @param {RTCSessionDescription} rtcSdp - Session Description Protocol to be rewritten
+   * @param {z.calling.enum.SDP_SOURCE} [sdpSource=z.calling.enum.SDP_SOURCE.REMOTE] - Source of the SDP - local or remote
+   * @param {z.calling.entities.FlowEntity} flowEntity - Flow entity
    * @returns {Object} Object containing rewritten Session Description Protocol and number of ICE candidates
    */
-  rewrite_sdp(rtc_sdp, sdp_source = z.calling.enum.SDP_SOURCE.REMOTE, flow_et) {
-    if (!rtc_sdp) {
+  rewriteSdp(rtcSdp, sdpSource = z.calling.enum.SDP_SOURCE.REMOTE, flowEntity) {
+    if (!rtcSdp) {
       throw new z.calling.CallError(z.calling.CallError.TYPE.NOT_FOUND, 'Cannot rewrite undefined SDP');
     }
 
-    if (sdp_source === z.calling.enum.SDP_SOURCE.LOCAL) {
-      rtc_sdp.sdp = rtc_sdp.sdp.replace('UDP/TLS/', '');
+    const isSourceLocal = sdpSource === z.calling.enum.SDP_SOURCE.LOCAL;
+    if (isSourceLocal) {
+      rtcSdp.sdp = rtcSdp.sdp.replace('UDP/TLS/', '');
     }
 
-    const sdp_lines = [];
-    const ice_candidates = [];
+    const sdpLines = [];
+    const iceCandidates = [];
 
-    rtc_sdp.sdp.split('\r\n').forEach(sdp_line => {
-      let outline = sdp_line;
+    rtcSdp.sdp.split('\r\n').forEach(sdpLine => {
+      let outline = sdpLine;
 
-      if (sdp_line.startsWith('t=')) {
-        if (sdp_source === z.calling.enum.SDP_SOURCE.LOCAL) {
-          sdp_lines.push(sdp_line);
+      if (sdpLine.startsWith('t=')) {
+        if (isSourceLocal) {
+          sdpLines.push(sdpLine);
 
-          const browser_string = `${z.util.Environment.browser.name} ${z.util.Environment.browser.version}`;
-          const webapp_version = z.util.Environment.version(false);
+          const browserString = `${z.util.Environment.browser.name} ${z.util.Environment.browser.version}`;
+          const webappVersion = z.util.Environment.version(false);
 
           if (z.util.Environment.desktop) {
-            const desktop_version = z.util.Environment.version(true);
-            outline = `a=tool:electron ${desktop_version} ${webapp_version} (${browser_string})`;
+            const desktopVersion = z.util.Environment.version(true);
+            outline = `a=tool:electron ${desktopVersion} ${webappVersion} (${browserString})`;
           } else {
-            outline = `a=tool:webapp ${webapp_version} (${browser_string})`;
+            outline = `a=tool:webapp ${webappVersion} (${browserString})`;
           }
         }
-      } else if (sdp_line.startsWith('a=candidate')) {
-        ice_candidates.push(sdp_line);
-
+      } else if (sdpLine.startsWith('a=candidate')) {
+        iceCandidates.push(sdpLine);
+      } else if (sdpLine.startsWith('a=mid')) {
         // Remove once obsolete due to high uptake of clients based on AVS build 3.3.11 containing fix for AUDIO-1215
-      } else if (sdp_line.startsWith('a=mid')) {
-        const is_remote_sdp = sdp_source === z.calling.enum.SDP_SOURCE.REMOTE;
-        const is_answer = rtc_sdp.type === z.calling.rtc.SDP_TYPE.ANSWER;
+        const isRemoteSdp = sdpSource === z.calling.enum.SDP_SOURCE.REMOTE;
+        const isAnswer = rtcSdp.type === z.calling.rtc.SDP_TYPE.ANSWER;
 
-        if (is_remote_sdp && is_answer && z.util.Environment.browser.firefox) {
-          if (sdp_line === 'a=mid:data') {
+        if (isRemoteSdp && isAnswer && z.util.Environment.browser.firefox) {
+          const isSdpLineData = sdpLine === 'a=mid:data';
+          if (isSdpLineData) {
             outline = 'a=mid:sdparta_2';
           }
         }
-
+      } else if (sdpLine.startsWith('m=audio')) {
         // Code to nail in bit-rate and ptime settings for improved performance and experience
-      } else if (sdp_line.startsWith('m=audio')) {
-        const is_ice_restart = flow_et.negotiation_mode() === z.calling.enum.SDP_NEGOTIATION_MODE.ICE_RESTART;
-        const is_local_sdp = sdp_source === z.calling.enum.SDP_SOURCE.LOCAL;
+        const isIceRestart = flowEntity.negotiationMode() === z.calling.enum.SDP_NEGOTIATION_MODE.ICE_RESTART;
+        const isLocalSdp = sdpSource === z.calling.enum.SDP_SOURCE.LOCAL;
 
-        if (is_ice_restart || (is_local_sdp && flow_et.is_group)) {
-          sdp_lines.push(sdp_line);
+        if (isIceRestart || (isLocalSdp && flowEntity.isGroup)) {
+          sdpLines.push(sdpLine);
           outline = `b=AS:${z.calling.SDPMapper.CONFIG.AUDIO_BITRATE}`;
         }
-      } else if (sdp_line.startsWith('a=rtpmap')) {
-        const is_ice_restart = flow_et.negotiation_mode() === z.calling.enum.SDP_NEGOTIATION_MODE.ICE_RESTART;
-        const is_local_sdp = sdp_source === z.calling.enum.SDP_SOURCE.LOCAL;
+      } else if (sdpLine.startsWith('a=rtpmap')) {
+        const isIceRestart = flowEntity.negotiationMode() === z.calling.enum.SDP_NEGOTIATION_MODE.ICE_RESTART;
+        const isLocalSdp = sdpSource === z.calling.enum.SDP_SOURCE.LOCAL;
 
-        if (is_ice_restart || (is_local_sdp && flow_et.is_group)) {
-          if (z.util.StringUtil.includes(sdp_line, 'opus')) {
-            sdp_lines.push(sdp_line);
+        if (isIceRestart || (isLocalSdp && flowEntity.isGroup)) {
+          if (z.util.StringUtil.includes(sdpLine, 'opus')) {
+            sdpLines.push(sdpLine);
             outline = `a=ptime:${z.calling.SDPMapper.CONFIG.AUDIO_PTIME}`;
           }
         }
-
+      } else if (sdpLine.startsWith('a=fmtp')) {
         // Workaround for incompatibility between Chrome 57 and AVS builds. Remove once update of clients with AVS 3.3.x is high enough.
-      } else if (sdp_line.startsWith('a=fmtp')) {
-        if (sdp_line === 'a=fmtp:125 apt=100') {
+        const isAffectedCodec = sdpLine === 'a=fmtp:125 apt=100';
+        if (isAffectedCodec) {
           outline = 'a=fmtp:125 apt=96';
         }
       }
 
       if (outline !== undefined) {
-        sdp_lines.push(outline);
+        sdpLines.push(outline);
       }
     });
 
-    rtc_sdp.sdp = sdp_lines.join('\r\n');
-    return Promise.resolve({ice_candidates: ice_candidates, sdp: rtc_sdp});
+    rtcSdp.sdp = sdpLines.join('\r\n');
+    return Promise.resolve({iceCandidates, sdp: rtcSdp});
   },
 };

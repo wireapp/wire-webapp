@@ -1086,8 +1086,6 @@ describe('ConversationRepository', () => {
       mixed_group.participating_user_ets.push(john);
       mixed_group.participating_user_ets.push(lara);
 
-      TestFactory.cryptography_repository.load_session = session_id => Promise.resolve(session_id);
-
       Promise.all([
         TestFactory.conversation_repository.save_conversation(dudes),
         TestFactory.conversation_repository.save_conversation(gals),

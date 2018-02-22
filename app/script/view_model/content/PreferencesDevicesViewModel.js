@@ -74,9 +74,9 @@ z.ViewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewMo
   }
 
   _update_device_location(location) {
-    z.location.get_location(location.lat, location.lon).then(retrieved_location => {
+    z.location.getLocation(location.lat, location.lon).then(retrieved_location => {
       if (retrieved_location) {
-        this._update_activation_location(`${retrieved_location.place}, ${retrieved_location.country_code}`);
+        this._update_activation_location(`${retrieved_location.place}, ${retrieved_location.countryCode}`);
       }
     });
   }
@@ -104,7 +104,7 @@ z.ViewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewMo
 
       this._update_activation_time(this.current_client().time);
       this.displayFingerPrint(
-        z.util.zero_padding(this.cryptography_repository.get_local_fingerprint(), 16).match(/.{1,2}/g)
+        z.util.zero_padding(this.cryptography_repository.getLocalFingerprint(), 16).match(/.{1,2}/g)
       );
     }
   }
