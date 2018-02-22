@@ -204,7 +204,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   /**
    * Create a group conversation.
-   * @note Supply at least 2 user IDs! Do not include the requestor
+   * @note Do not include the requestor among the users
    *
    * @param {Array<z.entity.User>} userEntities - Users (excluding the requestor) to be part of the conversation
    * @param {string} [groupName] - Name for the conversation
@@ -218,6 +218,14 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .then(response => this._onCreate({conversation: response.id, data: response}))
       .then(({conversationEntity}) => conversationEntity)
       .catch(error => this._handleConversationCreateError(error, userIds));
+  }
+
+  /**
+   * Create a guest room.
+   * @returns {Promise} Resolves with the conversation that was created
+   */
+  createGuestRoom() {
+    return this.createGroupConversation([], z.l10n.text(z.string.guestRoomConversationName));
   }
 
   /**
