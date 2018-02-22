@@ -109,17 +109,16 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
     this._loadAvatarPicture = () => {
       if (!this.avatarLoadingBlocked) {
         this.avatarLoadingBlocked = true;
-        if (this.participant.previewPictureResource()) {
-          this.participant
-            .previewPictureResource()
-            .get_object_url()
-            .then(url => {
-              const image = new Image();
-              image.src = url;
-              this.element.find('.avatar-image').html(image);
-              this.element.addClass('avatar-image-loaded avatar-loading-transition');
-              this.avatarLoadingBlocked = false;
-            });
+        const pictureResource = this.participant.previewPictureResource();
+        if (pictureResource) {
+          const isCached = pictureResource.downloadProgress() === 100;
+          pictureResource.get_object_url().then(url => {
+            const image = new Image();
+            image.src = url;
+            this.element.find('.avatar-image').html(image);
+            this.element.addClass(`avatar-image-loaded ${isCached ? '' : 'avatar-loading-transition'}`);
+            this.avatarLoadingBlocked = false;
+          });
         }
       }
     };
