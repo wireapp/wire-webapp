@@ -23,34 +23,40 @@ import {currentLanguage, currentCurrency} from '../../localeConfig';
 import {fetchSelf} from './SelfAction';
 import {setLocalStorage, LocalStorageKey} from './LocalStorageAction';
 
-export function doLogin(login) {
+export function doLogin(loginData) {
   return function(dispatch, getState, {core}) {
     dispatch(
       AuthActionCreator.startLogin({
-        email: login.email,
+        email: loginData.email,
         password: '******',
       })
     );
     return Promise.resolve()
       .then(() => dispatch(doSilentLogout()))
-      .then(() => core.login(login))
-      .then(() => {
-        const accessToken = core.apiClient.accessTokenStore.accessToken;
-        const expiresMillis = accessToken.expires_in * 1000;
-        const expireTimestamp = Date.now() + expiresMillis;
-        return Promise.all([
-          dispatch(setLocalStorage(LocalStorageKey.AUTH.PERSIST, login.persist)),
-          dispatch(setLocalStorage(LocalStorageKey.AUTH.ACCESS_TOKEN.EXPIRATION, expireTimestamp)),
-          dispatch(setLocalStorage(LocalStorageKey.AUTH.ACCESS_TOKEN.TTL, expiresMillis)),
-          dispatch(setLocalStorage(LocalStorageKey.AUTH.ACCESS_TOKEN.TYPE, accessToken.token_type)),
-          dispatch(setLocalStorage(LocalStorageKey.AUTH.ACCESS_TOKEN.VALUE, accessToken.access_token)),
-        ]);
-      })
+      .then(() => core.login(loginData))
+      .then(() => persistAuthData(loginData.persist, core, dispatch))
       .catch(error => {
+        const handledError = BackendError.handle(error);
+        if (handledError.label === BackendError.LABEL.TOO_MANY_CLIENTS) {
+          persistAuthData(loginData.persist, core, dispatch);
+        }
         dispatch(AuthActionCreator.failedLogin(error));
-        throw BackendError.handle(error);
+        throw handledError;
       });
   };
+}
+
+function persistAuthData(persist, core, dispatch) {
+  const accessToken = core.apiClient.accessTokenStore.accessToken;
+  const expiresMillis = accessToken.expires_in * 1000;
+  const expireTimestamp = Date.now() + expiresMillis;
+  return Promise.all([
+    dispatch(setLocalStorage(LocalStorageKey.AUTH.PERSIST, persist)),
+    dispatch(setLocalStorage(LocalStorageKey.AUTH.ACCESS_TOKEN.EXPIRATION, expireTimestamp)),
+    dispatch(setLocalStorage(LocalStorageKey.AUTH.ACCESS_TOKEN.TTL, expiresMillis)),
+    dispatch(setLocalStorage(LocalStorageKey.AUTH.ACCESS_TOKEN.TYPE, accessToken.token_type)),
+    dispatch(setLocalStorage(LocalStorageKey.AUTH.ACCESS_TOKEN.VALUE, accessToken.access_token)),
+  ]);
 }
 
 export function pushAccountRegistrationData(registration) {
