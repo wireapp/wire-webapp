@@ -11,7 +11,7 @@ export default class IndexedDBEngine implements CRUDEngine {
 
   constructor(private db?: DexieInstance) {}
 
-  init(storeName: string = 'wire'): Promise<any> {
+  init(storeName: string): Promise<any> {
     if (this.db) {
       this.storeName = this.db.name;
     } else {
