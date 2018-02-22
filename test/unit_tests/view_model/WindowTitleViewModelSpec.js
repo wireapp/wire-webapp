@@ -33,7 +33,7 @@ describe('z.viewModel.WindowTitleViewModel', () => {
         title_view_model = new z.viewModel.WindowTitleViewModel(
           {
             content: {
-              contentState: ko.observable(z.viewModel.ContentViewModel.STATE.CONVERSATION),
+              state: ko.observable(z.viewModel.ContentViewModel.STATE.CONVERSATION),
             },
           },
           {

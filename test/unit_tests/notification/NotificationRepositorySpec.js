@@ -82,10 +82,10 @@ describe('z.notification.NotificationRepository', () => {
           },
           view: {
             content: {
-              contentState: ko.observable(z.viewModel.ContentViewModel.STATE.CONVERSATION),
               multitasking: {
                 isMinimized: () => true,
               },
+              state: ko.observable(z.viewModel.ContentViewModel.STATE.CONVERSATION),
             },
           },
         };
