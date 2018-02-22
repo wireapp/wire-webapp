@@ -93,9 +93,7 @@ class ClientItem extends React.Component {
         }
       })
       .then(() => this.props.onClientRemoval(this.state.password))
-      .then(() =>
-        window.location.replace(`/${URLUtil.pathWithParams('login', `reason=login&persist=${this.state.persist}`)}`)
-      )
+      .then(() => window.location.replace(`/${URLUtil.pathWithParams('')}`))
       .catch(error => {
         if (!error.label) {
           throw error;
