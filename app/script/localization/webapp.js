@@ -303,6 +303,9 @@ z.string.groupCreationParticipantsHeader = 'Add people';
 z.string.groupCreationParticipantsHeaderWithCounter = 'Add people ({{number}})';
 z.string.groupCreationParticipantsPlaceholder = 'Search by name';
 
+// Guest room
+z.string.guestRoomConversationName = 'Guest room';
+
 // Collection
 z.string.collection_show_all = 'Show all {{number}}';
 z.string.collection_section_links = 'Links';
@@ -532,6 +535,7 @@ z.string.search_connect = 'Connect';
 z.string.search_connections = 'Connections';
 z.string.search_contacts = 'Contacts';
 z.string.searchCreateGroup = 'Create group';
+z.string.searchCreateGuestRoom = 'Create guest room';
 z.string.search_groups = 'Groups';
 z.string.search_people = 'People';
 z.string.search_placeholder = 'Search by name or username';

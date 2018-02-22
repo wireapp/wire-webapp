@@ -245,6 +245,12 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
     amplify.publish(z.event.WebApp.CONVERSATION.CREATE_GROUP, 'start_ui');
   }
 
+  clickOnCreateGuestRoom() {
+    this.conversationRepository.createGuestRoom().then(conversationEntity => {
+      amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity);
+    });
+  }
+
   clickOnInviteMember() {
     const path = `${z.config.URL_PATH.MANAGE_TEAM}?utm_source=client_landing&utm_term=desktop`;
     z.util.safe_window_open(z.util.URLUtil.build_url(z.util.URLUtil.TYPE.TEAM_SETTINGS, path));
