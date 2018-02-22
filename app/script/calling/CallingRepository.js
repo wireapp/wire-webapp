@@ -238,7 +238,7 @@ z.calling.CallingRepository = class CallingRepository {
         case z.calling.enum.CALL_MESSAGE_TYPE.SETUP: {
           this.injectActivateEvent(callMessageEntity, source);
           this.userRepository.get_user_by_id(userId).then(userEntity => {
-            const attributes = {first_name: userEntity.name()};
+            const attributes = {name: userEntity.name()};
             amplify.publish(
               z.event.WebApp.WARNING.SHOW,
               z.viewModel.WarningsViewModel.TYPE.UNSUPPORTED_INCOMING_CALL,
