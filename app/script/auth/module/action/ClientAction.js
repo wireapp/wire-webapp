@@ -19,6 +19,7 @@
 
 import BackendError from './BackendError';
 import * as ClientActionCreator from './creator/ClientActionCreator';
+import {getLocalStorage, LocalStorageKey} from './LocalStorageAction';
 
 export function doGetAllClients() {
   return function(dispatch, getState, {apiClient}) {
@@ -50,11 +51,12 @@ export function doCreateClient(password: string) {
   return function(dispatch, getState, {core}) {
     dispatch(ClientActionCreator.startCreateClient());
     return Promise.resolve()
-      .then(() =>
+      .then(() => dispatch(getLocalStorage(LocalStorageKey.AUTH.PERSIST)))
+      .then(persist =>
         core.registerClient(
           {
             password,
-            persist: true /* TODO: get persist value */,
+            persist: !!persist,
           },
           {
             model: `test`,

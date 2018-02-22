@@ -96,9 +96,7 @@ class Login extends React.PureComponent {
         }
         return this.props.doLogin(login);
       })
-      .then(() =>
-        window.location.replace(`/${URLUtil.pathWithParams('login', `reason=login&persist=${this.state.persist}`)}`)
-      )
+      .then(() => window.location.replace(`/${URLUtil.pathWithParams('')}`))
       .catch(error => {
         if (error.label === BackendError.LABEL.TOO_MANY_CLIENTS) {
           this.props.history.push(ROUTE.CLIENTS);

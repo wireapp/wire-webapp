@@ -34,7 +34,7 @@ const apiClient = configureClient();
 const core = configureCore(apiClient);
 const mixpanel = configureTracking();
 
-const store = configureStore({apiClient: core.apiClient, core, mixpanel});
+const store = configureStore({apiClient: core.apiClient, core, localStorage: window.localStorage, mixpanel});
 
 const Wrapper = Component => (
   <AppContainer>

@@ -21,6 +21,7 @@ import BackendError from './BackendError';
 import * as AuthActionCreator from './creator/AuthActionCreator';
 import {currentLanguage, currentCurrency} from '../../localeConfig';
 import {fetchSelf} from './SelfAction';
+import {setLocalStorage, LocalStorageKey} from './LocalStorageAction';
 
 export function doLogin(login) {
   return function(dispatch, getState, {core}) {
@@ -33,6 +34,18 @@ export function doLogin(login) {
     return Promise.resolve()
       .then(() => dispatch(doSilentLogout()))
       .then(() => core.login(login))
+      .then(() => {
+        const accessToken = core.apiClient.accessTokenStore.accessToken;
+        const expiresMillis = accessToken.expires_in * 1000;
+        const expireTimestamp = Date.now() + expiresMillis;
+        return Promise.all([
+          dispatch(setLocalStorage(LocalStorageKey.AUTH.PERSIST, login.persist)),
+          dispatch(setLocalStorage(LocalStorageKey.AUTH.ACCESS_TOKEN.EXPIRATION, expireTimestamp)),
+          dispatch(setLocalStorage(LocalStorageKey.AUTH.ACCESS_TOKEN.TTL, expiresMillis)),
+          dispatch(setLocalStorage(LocalStorageKey.AUTH.ACCESS_TOKEN.TYPE, accessToken.token_type)),
+          dispatch(setLocalStorage(LocalStorageKey.AUTH.ACCESS_TOKEN.VALUE, accessToken.access_token)),
+        ]);
+      })
       .catch(error => {
         dispatch(AuthActionCreator.failedLogin(error));
         throw BackendError.handle(error);
