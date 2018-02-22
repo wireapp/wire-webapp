@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="2.0.24"></a>
+## [2.0.24](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.0.23...@wireapp/core@2.0.24) (2018-02-22)
+
+
+### Bug Fixes
+
+* **core:** Remove init call from login function ([#291](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/291)) ([7c8c16d](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/7c8c16d))
+
+
+
+
 <a name="2.0.23"></a>
 ## [2.0.23](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.0.22...@wireapp/core@2.0.23) (2018-02-22)
 

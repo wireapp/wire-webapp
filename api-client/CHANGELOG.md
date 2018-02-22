@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="0.4.5"></a>
+## [0.4.5](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@0.4.4...@wireapp/api-client@0.4.5) (2018-02-22)
+
+
+### Bug Fixes
+
+* **core:** Remove init call from login function ([#291](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/291)) ([7c8c16d](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/7c8c16d))
+
+
+
+
 <a name="0.4.4"></a>
 ## [0.4.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@0.4.3...@wireapp/api-client@0.4.4) (2018-02-22)
 
