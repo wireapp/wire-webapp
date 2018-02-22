@@ -53,28 +53,28 @@ export = {
   },
 
   errors: {
-    ProteusError,
     DecodeError,
     DecryptError,
     InputError,
+    ProteusError,
   },
 
   keys: {
     IdentityKey,
     IdentityKeyPair,
     KeyPair,
+    PreKey,
     PreKeyAuth,
     PreKeyBundle,
-    PreKey,
     PublicKey,
     SecretKey,
   },
 
   message: {
-    Message,
     CipherMessage,
-    PreKeyMessage,
     Envelope,
+    Message,
+    PreKeyMessage,
     SessionTag,
   },
 

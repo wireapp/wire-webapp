@@ -45,17 +45,10 @@ class DecryptError extends ProteusError {
   }
 }
 
-class RemoteIdentityChanged extends DecryptError {
-  constructor(message = 'Remote identity changed', code: number) {
+class DuplicateMessage extends DecryptError {
+  constructor(message = 'Duplicate message', code: number) {
     super(message, code);
-    Object.setPrototypeOf(this, RemoteIdentityChanged.prototype);
-  }
-}
-
-class InvalidSignature extends DecryptError {
-  constructor(message = 'Invalid signature', code: number) {
-    super(message, code);
-    Object.setPrototypeOf(this, InvalidSignature.prototype);
+    Object.setPrototypeOf(this, DuplicateMessage.prototype);
   }
 }
 
@@ -66,17 +59,10 @@ class InvalidMessage extends DecryptError {
   }
 }
 
-class DuplicateMessage extends DecryptError {
-  constructor(message = 'Duplicate message', code: number) {
+class InvalidSignature extends DecryptError {
+  constructor(message = 'Invalid signature', code: number) {
     super(message, code);
-    Object.setPrototypeOf(this, DuplicateMessage.prototype);
-  }
-}
-
-class TooDistantFuture extends DecryptError {
-  constructor(message = 'Message is from too distant in the future', code: number) {
-    super(message, code);
-    Object.setPrototypeOf(this, TooDistantFuture.prototype);
+    Object.setPrototypeOf(this, InvalidSignature.prototype);
   }
 }
 
@@ -94,12 +80,34 @@ class PrekeyNotFound extends DecryptError {
   }
 }
 
+class RemoteIdentityChanged extends DecryptError {
+  constructor(message = 'Remote identity changed', code: number) {
+    super(message, code);
+    Object.setPrototypeOf(this, RemoteIdentityChanged.prototype);
+  }
+}
+
+class RemoteEncryptionError extends DecryptError {
+  constructor(message = 'Sending client failed to encrypt the message', code: number = DecryptError.CODE.CASE_213) {
+    super(message, code);
+    Object.setPrototypeOf(this, RemoteEncryptionError.prototype);
+  }
+}
+
+class TooDistantFuture extends DecryptError {
+  constructor(message = 'Message is from too distant in the future', code: number) {
+    super(message, code);
+    Object.setPrototypeOf(this, TooDistantFuture.prototype);
+  }
+}
+
 Object.assign(DecryptError, {
   DuplicateMessage,
   InvalidMessage,
   InvalidSignature,
   OutdatedMessage,
   PrekeyNotFound,
+  RemoteEncryptionError,
   RemoteIdentityChanged,
   TooDistantFuture,
 });
