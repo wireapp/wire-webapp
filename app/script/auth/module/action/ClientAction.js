@@ -57,7 +57,6 @@ export function doCreateClient(password: string) {
             persist: true /* TODO: get persist value */,
           },
           {
-            location: {lat: 52.53269, lon: 13.402315},
             model: `test`,
           }
         )
