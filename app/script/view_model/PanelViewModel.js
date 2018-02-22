@@ -21,18 +21,21 @@
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
-window.z.viewModel.content = z.viewModel.content || {};
 
-z.viewModel.content.PreferencesAboutViewModel = class PreferencesAboutViewModel {
-  constructor(mainViewModel, contentViewModel, repositories) {
-    this.logger = new z.util.Logger('z.viewModel.content.PreferencesAboutViewModel', z.config.LOGGER.OPTIONS);
+z.viewModel.PanelViewModel = class PanelViewModel {
+  /**
+   * View model for the details column.
+   * @param {z.viewModel.MainViewModel} mainViewModel - Main view model
+   * @param {Object} repositories - Object containing all repositories
+   */
+  constructor(mainViewModel, repositories) {
+    this.elementId = 'right-column';
+    this.logger = new z.util.Logger('z.viewModel.PanelViewModel', z.config.LOGGER.OPTIONS);
 
-    this.userRepository = repositories.user;
-    this.selfUser = this.userRepository.self;
-  }
+    // Nested view models
+    this.participants = new z.viewModel.panel.ParticipantsViewModel(mainViewModel, this, repositories);
+    this.guestOptions = new z.viewModel.panel.GuestOptionsViewModel(mainViewModel, this, repositories);
 
-  clickOnToU() {
-    const path = `${z.config.URL_PATH.TERMS_OF_USE}${this.selfUser().is_team_member() ? 'teams' : 'personal'}/`;
-    z.util.safe_window_open(z.util.URLUtil.build_url(z.util.URLUtil.TYPE.WEBSITE, path));
+    ko.applyBindings(this, document.getElementById(this.elementId));
   }
 };

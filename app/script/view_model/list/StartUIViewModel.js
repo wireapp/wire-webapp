@@ -20,10 +20,10 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.ViewModel = z.ViewModel || {};
-window.z.ViewModel.list = z.ViewModel.list || {};
+window.z.viewModel = z.viewModel || {};
+window.z.viewModel.list = z.viewModel.list || {};
 
-z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
+z.viewModel.list.StartUIViewModel = class StartUIViewModel {
   static get STATE() {
     return {
       ADD_PEOPLE: 'StartUIViewModel.STATE.ADD_PEOPLE',
@@ -33,29 +33,13 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
 
   /**
    * View model for the start UI.
-   * @class z.ViewModel.list.StartUIViewModel
+   * @class z.viewModel.list.StartUIViewModel
    *
-   * @param {string} elementId - HTML selector
-   * @param {z.ViewModel.list.ListViewModel} listViewModel - List view model
-   * @param {z.connect.ConnectRepository} connectRepository - Connect repository
-   * @param {z.conversation.ConversationRepository} conversationRepository - Conversation repository
-   * @param {z.integration.IntegrationRepository} integrationRepository - Integration repository
-   * @param {z.properties.PropertiesRepository} propertiesRepository - Properties repository
-   * @param {z.search.SearchRepository} searchRepository - Search repository
-   * @param {z.team.TeamRepository} teamRepository - Team repository
-   * @param {z.user.UserRepository} userRepository - User repository
+   * @param {z.viewModel.MainViewModel} mainViewModel - Main view model
+   * @param {z.viewModel.ListViewModel} listViewModel - List view model
+   * @param {Object} repositories - Object containing all repositories
    */
-  constructor(
-    elementId,
-    listViewModel,
-    connectRepository,
-    conversationRepository,
-    integrationRepository,
-    propertiesRepository,
-    searchRepository,
-    teamRepository,
-    userRepository
-  ) {
+  constructor(mainViewModel, listViewModel, repositories) {
     this.clickOnClose = this.clickOnClose.bind(this);
     this.clickOnContact = this.clickOnContact.bind(this);
     this.clickOnConversation = this.clickOnConversation.bind(this);
@@ -72,14 +56,14 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     this.handleSearchInput = this.handleSearchInput.bind(this);
 
     this.listViewModel = listViewModel;
-    this.connectRepository = connectRepository;
-    this.conversationRepository = conversationRepository;
-    this.integrationRepository = integrationRepository;
-    this.propertiesRepository = propertiesRepository;
-    this.searchRepository = searchRepository;
-    this.teamRepository = teamRepository;
-    this.userRepository = userRepository;
-    this.logger = new z.util.Logger('z.ViewModel.list.StartUIViewModel', z.config.LOGGER.OPTIONS);
+    this.connectRepository = repositories.connect;
+    this.conversationRepository = repositories.conversation;
+    this.integrationRepository = repositories.integration;
+    this.propertiesRepository = repositories.properties;
+    this.searchRepository = repositories.search;
+    this.teamRepository = repositories.team;
+    this.userRepository = repositories.user;
+    this.logger = new z.util.Logger('z.viewModel.list.StartUIViewModel', z.config.LOGGER.OPTIONS);
 
     this.selfUser = this.userRepository.self;
 
@@ -368,7 +352,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     $('user-input input').blur();
 
     amplify.publish(z.event.WebApp.SEARCH.HIDE);
-    this.listViewModel.switch_list(z.ViewModel.list.LIST_STATE.CONVERSATIONS);
+    this.listViewModel.switch_list(z.viewModel.ListViewModel.STATE.CONVERSATIONS);
 
     if (this.userBubble) {
       this.userBubble.hide();
@@ -546,7 +530,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
         if (!isNoContacts) {
           this.logger.error(`Importing contacts from '${source}' failed: ${error.message}`, error);
 
-          amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CONTACTS, {
+          amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONTACTS, {
             action: () => this.importContacts(source),
           });
         }

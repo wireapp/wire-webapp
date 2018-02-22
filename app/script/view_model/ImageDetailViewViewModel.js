@@ -20,17 +20,17 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.ViewModel = z.ViewModel || {};
+window.z.viewModel = z.viewModel || {};
 
-z.ViewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
-  constructor(element_id, conversation_repository) {
+z.viewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
+  constructor(mainViewModel, repositories) {
     this.before_hide_callback = this.before_hide_callback.bind(this);
     this.hide_callback = this.hide_callback.bind(this);
     this.message_added = this.message_added.bind(this);
     this.message_removed = this.message_removed.bind(this);
 
-    this.element_id = element_id;
-    this.conversation_repository = conversation_repository;
+    this.elementId = 'detail-view';
+    this.conversation_repository = repositories.conversation;
     this.source = undefined;
 
     this.image_modal = undefined;
@@ -50,7 +50,7 @@ z.ViewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
 
     amplify.subscribe(z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW, this.show.bind(this));
 
-    ko.applyBindings(this, document.getElementById(this.element_id));
+    ko.applyBindings(this, document.getElementById(this.elementId));
   }
 
   before_hide_callback() {
@@ -129,11 +129,8 @@ z.ViewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
   }
 
   click_on_delete() {
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.DELETE_MESSAGE, {
+    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.DELETE_MESSAGE, {
       action: () => {
-        if (this.source === 'collection') {
-          this._track_item_action(this.conversation_et(), 'delete_for_me', 'image');
-        }
         this.conversation_repository.delete_message(this.conversation_et(), this.message_et());
         this.image_modal.hide();
       },
@@ -141,7 +138,7 @@ z.ViewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
   }
 
   click_on_delete_for_everyone() {
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.DELETE_EVERYONE_MESSAGE, {
+    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.DELETE_EVERYONE_MESSAGE, {
       action: () => {
         if (this.source === 'collection') {
           this._track_item_action(this.conversation_et(), 'delete_for_everyone', 'image');
@@ -184,16 +181,5 @@ z.ViewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
       this.message_et(z.util.ArrayUtil.iterate_item(this.items(), this.message_et(), true));
       this._load_image();
     }
-  }
-
-  _track_item_action(conversation_et, is_liked, type) {
-    const like_action = is_liked ? 'unlike' : 'like';
-
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.COLLECTION.DID_ITEM_ACTION, {
-      action: like_action,
-      conversation_type: z.tracking.helpers.get_conversation_type(conversation_et),
-      type: type,
-      with_service: conversation_et.isWithBot(),
-    });
   }
 };

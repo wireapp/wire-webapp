@@ -941,21 +941,11 @@ z.user.UserRepository = class UserRepository {
       .then(valid_suggestions => {
         this.should_set_username = true;
         this.self().username(valid_suggestions[0]);
-
-        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ONBOARDING.GENERATED_USERNAME, {
-          num_of_attempts: 1,
-          outcome: 'success',
-        });
       })
       .catch(error => {
         if (error.code === z.service.BackendClientError.STATUS_CODE.NOT_FOUND) {
           this.should_set_username = false;
         }
-
-        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ONBOARDING.GENERATED_USERNAME, {
-          num_of_attempts: 1,
-          outcome: 'fail',
-        });
 
         throw error;
       });
@@ -1051,15 +1041,7 @@ z.user.UserRepository = class UserRepository {
    * @returns {undefined} No return value
    */
   set_default_picture() {
-    return z.util
-      .load_url_blob(z.config.UNSPLASH_URL)
-      .then(blob => this.change_picture(blob))
-      .then(() => {
-        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ONBOARDING.ADDED_PHOTO, {
-          outcome: 'success',
-          source: 'unsplash',
-        });
-      });
+    return z.util.load_url_blob(z.config.UNSPLASH_URL).then(blob => this.change_picture(blob));
   }
 
   map_guest_status(user_ets = this.users()) {

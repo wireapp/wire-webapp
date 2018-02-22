@@ -20,24 +20,24 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.ViewModel = z.ViewModel || {};
-window.z.ViewModel.content = z.ViewModel.content || {};
+window.z.viewModel = z.viewModel || {};
+window.z.viewModel.content = z.viewModel.content || {};
 
-z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewModel {
+z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewModel {
   static get SAVED_ANIMATION_TIMEOUT() {
     return 750 * 2;
   }
 
-  constructor(element_id, client_repository, team_repository, user_repository) {
+  constructor(mainViewModel, contentViewModel, repositories) {
     this.change_accent_color = this.change_accent_color.bind(this);
     this.check_new_clients = this.check_new_clients.bind(this);
     this.removed_from_view = this.removed_from_view.bind(this);
 
-    this.logger = new z.util.Logger('z.ViewModel.content.PreferencesAccountViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger('z.viewModel.content.PreferencesAccountViewModel', z.config.LOGGER.OPTIONS);
 
-    this.client_repository = client_repository;
-    this.team_repository = team_repository;
-    this.user_repository = user_repository;
+    this.client_repository = repositories.client;
+    this.team_repository = repositories.team;
+    this.user_repository = repositories.user;
 
     this.self_user = this.user_repository.self;
     this.new_clients = ko.observableArray([]);
@@ -134,10 +134,6 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     z.ui.AvailabilityContextMenu.show(event, 'settings', 'preferences-account-availability-menu');
   }
 
-  click_on_username() {
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.EDITED_USERNAME);
-  }
-
   change_username(username, event) {
     const entered_username = event.target.value;
     const normalized_username = entered_username.toLowerCase().replace(/[^a-z0-9_]/g, '');
@@ -161,10 +157,6 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
         if (this.entered_username() === this.submitted_username()) {
           this.username_error(null);
           this.username_saved(true);
-
-          amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.SET_USERNAME, {
-            length: normalized_username.length,
-          });
 
           event.target.blur();
           window.setTimeout(() => {
@@ -213,11 +205,11 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   check_new_clients() {
     if (this.new_clients().length) {
       amplify.publish(z.event.WebApp.SEARCH.BADGE.HIDE);
-      amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CONNECTED_DEVICE, {
+      amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONNECTED_DEVICE, {
         close: () => this.new_clients.removeAll(),
         data: this.new_clients(),
         secondary() {
-          amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES);
+          amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICES);
         },
       });
     }
@@ -226,21 +218,15 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   click_on_change_picture(files) {
     const [new_user_picture] = Array.from(files);
 
-    this.set_picture(new_user_picture)
-      .then(() => {
-        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.PROFILE_PICTURE_CHANGED, {
-          source: 'fromPhotoLibrary',
-        });
-      })
-      .catch(error => {
-        if (error.type !== z.user.UserError.TYPE.INVALID_UPDATE) {
-          throw error;
-        }
-      });
+    this.set_picture(new_user_picture).catch(error => {
+      if (error.type !== z.user.UserError.TYPE.INVALID_UPDATE) {
+        throw error;
+      }
+    });
   }
 
   click_on_delete_account() {
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.DELETE_ACCOUNT, {
+    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.DELETE_ACCOUNT, {
       action: () => this.user_repository.delete_me(),
       data: this.self_user().email(),
     });
@@ -263,7 +249,6 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
   click_on_reset_password() {
     z.util.safe_window_open(z.util.URLUtil.build_url(z.util.URLUtil.TYPE.ACCOUNT, z.config.URL_PATH.PASSWORD_RESET));
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.PASSWORD_RESET, {value: 'fromProfile'});
   }
 
   set_picture(new_user_picture) {

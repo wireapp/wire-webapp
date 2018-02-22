@@ -140,7 +140,7 @@ z.auth.AuthRepository = class AuthRepository {
 
           this.queueState(z.service.QUEUE_STATE.READY);
           this.logger.error(`Refreshing access token failed: '${type}'`, error);
-          amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.CONNECTIVITY_RECONNECT);
+          amplify.publish(z.event.WebApp.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT);
         });
     }
   }

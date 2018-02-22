@@ -1028,7 +1028,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       case z.service.BackendClientError.LABEL.SERVER_ERROR:
       case z.service.BackendClientError.LABEL.SERVICE_DISABLED:
       case z.service.BackendClientError.LABEL.TOO_MANY_BOTS: {
-        amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.SERVICE_UNAVAILABLE);
+        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.SERVICE_UNAVAILABLE);
         break;
       }
 
@@ -1363,7 +1363,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   _handleTooManyMembersError(participants = 128) {
     const openSpots = ConversationRepository.CONFIG.GROUP.MAX_SIZE - participants;
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.TOO_MANY_MEMBERS, {
+    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.TOO_MANY_MEMBERS, {
       data: {
         max: ConversationRepository.CONFIG.GROUP.MAX_SIZE,
         open_spots: Math.max(0, openSpots),
@@ -1377,7 +1377,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     user_promise.then(user_et => {
       const username = user_et ? user_et.first_name() : undefined;
-      amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.NOT_CONNECTED, {
+      amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.NOT_CONNECTED, {
         data: username,
       });
     });
@@ -1631,7 +1631,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         ];
 
         if (initiating_call_message.includes(call_message_et.type)) {
-          return this._track_completed_media_action(conversation_et, generic_message, call_message_et);
+          return this._track_contributed(conversation_et, generic_message, call_message_et);
         }
       })
       .catch(error => {
@@ -1789,7 +1789,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     return this._send_and_inject_generic_message(conversation_et, generic_message, false)
       .then(() => {
-        this._track_edit_message(conversation_et, original_message_et);
         if (z.util.Environment.desktop) {
           return this.send_link_preview(message, conversation_et, generic_message);
         }
@@ -1815,10 +1814,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       const reaction = message_et.is_liked() ? z.message.ReactionType.NONE : z.message.ReactionType.LIKE;
       message_et.is_liked(!message_et.is_liked());
 
-      window.setTimeout(() => {
-        this.send_reaction(conversation_et, message_et, reaction);
-        this._track_reaction(conversation_et, message_et, reaction, button);
-      }, 100);
+      window.setTimeout(() => this.send_reaction(conversation_et, message_et, reaction), 100);
     }
   }
 
@@ -1990,7 +1986,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
         return this.send_generic_message_to_conversation(conversation_et.id, generic_message)
           .then(payload => {
-            this._track_completed_media_action(conversation_et, generic_message);
+            this._track_contributed(conversation_et, generic_message);
 
             const backend_iso_date = sync_timestamp ? payload.time : '';
             return this._update_message_as_sent(conversation_et, message_stored, backend_iso_date);
@@ -2168,8 +2164,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     const isCallingMessage = genericMessage.content === z.cryptography.GENERIC_MESSAGE_TYPE.CALLING;
     const consentType = isCallingMessage
-      ? z.ViewModel.MODAL_CONSENT_TYPE.OUTGOING_CALL
-      : z.ViewModel.MODAL_CONSENT_TYPE.MESSAGE;
+      ? z.viewModel.ModalsViewModel.CONSENT_TYPE.OUTGOING_CALL
+      : z.viewModel.ModalsViewModel.CONSENT_TYPE.MESSAGE;
     return this.grantMessage(conversationId, consentType, userIds);
   }
 
@@ -2190,7 +2186,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         }
 
         return this.user_repository.get_users_by_id(userIds).then(user_ets => {
-          amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.NEW_DEVICE, {
+          amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.NEW_DEVICE, {
             action() {
               sendAnyway = true;
               conversation_et.verification_state(z.conversation.ConversationVerificationState.UNVERIFIED);
@@ -2268,17 +2264,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   upload_file(conversation_et, file) {
     let message_id;
-
     const upload_started = Date.now();
-    const tracking_data = {
-      size_bytes: file.size,
-      size_mb: z.util.bucket_values(file.size / 1024 / 1024, [0, 5, 10, 15, 20, 25]),
-      type: z.util.get_file_extension(file.name),
-    };
-
-    const conversation_type = z.tracking.helpers.get_conversation_type(conversation_et);
-    const initiatedAttributes = Object.assign(tracking_data, {conversation_type});
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_INITIATED, initiatedAttributes);
 
     return this.send_asset_metadata(conversation_et, file)
       .then(({id}) => {
@@ -2289,16 +2275,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .then(() => {
         const upload_duration = (Date.now() - upload_started) / 1000;
         this.logger.info(`Finished to upload asset for conversation'${conversation_et.id} in ${upload_duration}`);
-
-        const successAttributes = Object.assign(tracking_data, {time: upload_duration});
-        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_SUCCESSFUL, successAttributes);
       })
       .catch(error => {
         if (error.type === z.conversation.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION) {
           throw error;
         }
 
-        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_FAILED, tracking_data);
         this.logger.error(`Failed to upload asset for conversation '${conversation_et.id}': ${error.message}`, error);
         return this.get_message_in_conversation_by_id(conversation_et, message_id).then(message_et => {
           this.send_asset_upload_failed(conversation_et, message_et.id);
@@ -2331,7 +2313,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
           );
         });
       })
-      .then(() => this._track_delete_message(conversation_et, message_et, z.tracking.attribute.DeleteType.EVERYWHERE))
       .then(() => {
         amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, message_et.id);
         return this._delete_message_by_id(conversation_et, message_et.id);
@@ -2365,7 +2346,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
         return this.send_generic_message_to_conversation(this.self_conversation().id, generic_message);
       })
-      .then(() => this._track_delete_message(conversation_et, message_et, z.tracking.attribute.DeleteType.LOCAL))
       .then(() => {
         amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, message_et.id);
         return this._delete_message_by_id(conversation_et, message_et.id);
@@ -3555,7 +3535,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {z.calling.entities.CallMessageEntity} call_message_et - Optional call message
    * @returns {undefined} No return value
    */
-  _track_completed_media_action(conversation_et, generic_message, call_message_et) {
+  _track_contributed(conversation_et, generic_message, call_message_et) {
     let ephemeral_time;
     let message;
     let message_content_type;
@@ -3615,64 +3595,5 @@ z.conversation.ConversationRepository = class ConversationRepository {
         with_service: conversation_et.isWithBot(),
       });
     }
-  }
-
-  /**
-   * Track delete action.
-   *
-   * @private
-   * @param {Conversation} conversation_et - Conversation entity
-   * @param {Message} message_et - Message entity
-   * @param {z.tracking.attribute.DeleteType} method - Deletion method
-   * @returns {undefined} No return value
-   */
-  _track_delete_message(conversation_et, message_et, method) {
-    const seconds_since_message_creation = Math.round((Date.now() - message_et.timestamp()) / 1000);
-
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.DELETED_MESSAGE, {
-      conversation_type: z.tracking.helpers.get_conversation_type(conversation_et),
-      method: method,
-      time_elapsed: z.util.bucket_values(seconds_since_message_creation, [0, 60, 300, 600, 1800, 3600, 86400]),
-      time_elapsed_action: seconds_since_message_creation,
-      type: z.tracking.helpers.get_message_type(message_et),
-    });
-  }
-
-  /**
-   * Track edit action.
-   *
-   * @param {Conversation} conversation_et - Conversation entity
-   * @param {Message} message_et - Message that was edited
-   * @returns {undefined} No return value
-   */
-  _track_edit_message(conversation_et, message_et) {
-    const seconds_since_message_creation = Math.round((Date.now() - message_et.timestamp()) / 1000);
-
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.EDITED_MESSAGE, {
-      conversation_type: z.tracking.helpers.get_conversation_type(conversation_et),
-      time_elapsed: z.util.bucket_values(seconds_since_message_creation, [0, 60, 300, 600, 1800, 3600, 86400]),
-      time_elapsed_action: seconds_since_message_creation,
-    });
-  }
-
-  /**
-   * Track reaction action.
-   *
-   * @param {Conversation} conversation_et - Conversation entity
-   * @param {Message} message_et - Message that was reacted tp
-   * @param {z.message.ReactionType} reaction - Type of reaction
-   * @param {boolean} [button=true] - Button source of reaction
-   * @returns {undefined} No return value
-   */
-  _track_reaction(conversation_et, message_et, reaction, button = true) {
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.REACTED_TO_MESSAGE, {
-      action: reaction ? 'like' : 'unlike',
-      conversation_type: z.tracking.helpers.get_conversation_type(conversation_et),
-      method: button ? 'button' : 'menu',
-      reacted_to_last_message: conversation_et.getLastMessage() === message_et,
-      type: z.tracking.helpers.get_message_type(message_et),
-      user: message_et.user().is_me ? 'sender' : 'receiver',
-      with_service: conversation_et.isWithBot(),
-    });
   }
 };
