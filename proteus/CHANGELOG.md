@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="7.1.0"></a>
+# [7.1.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/compare/@wireapp/proteus@7.0.6...@wireapp/proteus@7.1.0) (2018-02-22)
+
+
+### Features
+
+* **proteus:** Exposing "RemoteEncryptionError" ([#294](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/issues/294)) ([320b4c8](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/commit/320b4c8))
+
+
+
+
 <a name="7.0.6"></a>
 ## [7.0.6](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/compare/@wireapp/proteus@7.0.5...@wireapp/proteus@7.0.6) (2018-02-20)
 
