@@ -242,12 +242,9 @@ z.main.App = class App {
       .then(() => {
         this.view.loading.updateProgress(2.5);
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
-        return Promise.all([
-          this._get_user_self(),
-          z.util.protobuf.load_protos(
-            `ext/proto/generic-message-proto/messages.proto?${z.util.Environment.version(false)}`
-          ),
-        ]);
+
+        const protoFile = `ext/proto/generic-message-proto/messages.proto?${z.util.Environment.version(false)}`;
+        return Promise.all([this._get_user_self(), z.util.protobuf.load_protos(protoFile)]);
       })
       .then(([self_user_et]) => {
         this.view.loading.updateProgress(5, z.string.init_received_self_user);
@@ -452,7 +449,7 @@ z.main.App = class App {
   /**
    * Check whether we need to set different user information (picture, username).
    * @param {z.entity.User} user_et - Self user entity
-   * @returns {undefined} No return value
+   * @returns {z.entity.User} Checked user entity
    */
   _check_user_information(user_et) {
     if (!user_et.mediumPictureResource()) {
@@ -461,6 +458,8 @@ z.main.App = class App {
     if (!user_et.username()) {
       this.repository.user.get_username_suggestion();
     }
+
+    return user_et;
   }
 
   /**
@@ -491,10 +490,8 @@ z.main.App = class App {
       if (!user_et.email() && !user_et.phone()) {
         throw new Error('User does not have a verified identity');
       }
-      return this.service.storage.init(user_et.id).then(() => {
-        this._check_user_information(user_et);
-        return user_et;
-      });
+
+      return this.service.storage.init(user_et.id).then(() => this._check_user_information(user_et));
     });
   }
 
