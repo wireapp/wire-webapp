@@ -24,18 +24,22 @@ window.z.components = z.components || {};
 
 z.components.DeviceToggleButton = class DeviceToggleButton {
   constructor(params) {
-    this.current_device_index = params.index;
-    this.number_of_devices = params.length;
-    this.icon_class = params.type === z.media.MediaDeviceType.VIDEO_INPUT ? 'icon-video' : 'icon-screensharing';
+    this.availableDevices = params.devices;
+    this.currentDeviceIndex = params.index;
+    this.iconClass = params.type === z.media.MediaDeviceType.VIDEO_INPUT ? 'icon-video' : 'icon-screensharing';
+
+    this.numberOfDevices = ko.pureComputed(() => {
+      return _.isArray(this.availableDevices()) ? this.availableDevices().length : 0;
+    });
   }
 };
 
 ko.components.register('device-toggle-button', {
   template: `
-    <div class="device-toggle-button-icon" data-bind="css: icon_class"></div>
+    <div class="device-toggle-button-icon" data-bind="css: iconClass"></div>
     <div class="device-toggle-button-indicator">
-      <!-- ko foreach: ko.utils.range(0, number_of_devices() - 1) -->
-        <span class="device-toggle-button-indicator-dot" data-bind="css: {'device-toggle-button-indicator-dot-active': $data == $parent.current_device_index()}"></span>
+      <!-- ko foreach: ko.utils.range(0, numberOfDevices() - 1) -->
+        <span class="device-toggle-button-indicator-dot" data-bind="css: {'device-toggle-button-indicator-dot-active': $data == $parent.currentDeviceIndex()}"></span>
       <!-- /ko -->
     </div>
   `,

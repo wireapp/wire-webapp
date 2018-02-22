@@ -45,6 +45,7 @@ z.viewModel.MainViewModel = class MainViewModel {
     this.loading = new z.viewModel.LoadingViewModel(this, repositories);
     this.shortcuts = new z.viewModel.ShortcutsViewModel(this, repositories);
     this.title = new z.viewModel.WindowTitleViewModel(this, repositories);
+    this.videoCalling = new z.viewModel.VideoCallingViewModel(this, repositories);
     this.warnings = new z.viewModel.WarningsViewModel();
 
     this.mainClasses = ko.pureComputed(() => {

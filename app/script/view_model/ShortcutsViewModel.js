@@ -31,10 +31,10 @@ z.viewModel.ShortcutsViewModel = class ShortcutsViewModel {
     this.logger = new z.util.Logger('z.viewModel.ShortcutsViewModel', z.config.LOGGER.OPTIONS);
 
     this.joinedCall = this.callingRepository.joinedCall;
-    this.joinedCall.subscribe(callEntity => this._update_shortcut_subscription(callEntity));
+    this.joinedCall.subscribe(callEntity => this._updateShortcutSubscription(callEntity));
   }
 
-  _update_shortcut_subscription(callEntity) {
+  _updateShortcutSubscription(callEntity) {
     this._unsubscribeShortcuts();
 
     if (callEntity) {
