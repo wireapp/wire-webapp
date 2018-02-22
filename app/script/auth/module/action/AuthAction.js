@@ -94,9 +94,9 @@ export function doRegisterPersonal(registration) {
 }
 
 export function doInit() {
-  return function(dispatch, getState, {core}) {
+  return function(dispatch, getState, {apiClient}) {
     dispatch(AuthActionCreator.startRefresh());
-    return core
+    return apiClient
       .init()
       .then(() => dispatch(AuthActionCreator.successfulRefresh(apiClient.accessTokenStore.accessToken)))
       .catch(error => dispatch(AuthActionCreator.failedRefresh(error)));

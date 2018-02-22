@@ -27,6 +27,10 @@ export const CLIENT_REMOVE_START = 'CLIENT_REMOVE_START';
 export const CLIENT_REMOVE_SUCCESS = 'CLIENT_REMOVE_SUCCESS';
 export const CLIENT_REMOVE_FAILED = 'CLIENT_REMOVE_FAILED';
 
+export const CLIENT_CREATE_START = 'CLIENT_CREATE_START';
+export const CLIENT_CREATE_SUCCESS = 'CLIENT_CREATE_SUCCESS';
+export const CLIENT_CREATE_FAILED = 'CLIENT_CREATE_FAILED';
+
 export const CLIENT_RESET_ERROR = 'CLIENT_RESET_ERROR';
 
 export const startGetAllClients = () => ({
@@ -56,6 +60,20 @@ export const successfulRemoveClient = deletedClientId => ({
 export const failedRemoveClient = error => ({
   payload: BackendError.handle(error),
   type: CLIENT_REMOVE_FAILED,
+});
+
+export const startCreateClient = params => ({
+  params,
+  type: CLIENT_CREATE_START,
+});
+
+export const successfulCreateClient = () => ({
+  type: CLIENT_CREATE_SUCCESS,
+});
+
+export const failedCreateClient = error => ({
+  payload: BackendError.handle(error),
+  type: CLIENT_CREATE_FAILED,
 });
 
 export const resetError = () => ({

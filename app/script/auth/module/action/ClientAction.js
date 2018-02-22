@@ -48,12 +48,23 @@ export function doRemoveClient(clientId: string, password: string) {
 
 export function doCreateClient(password: string) {
   return function(dispatch, getState, {core}) {
-    dispatch(ClientActionCreator.startRemoveClient());
+    dispatch(ClientActionCreator.startCreateClient());
     return Promise.resolve()
-      .then(() => core.deleteClient(clientId, password))
-      .then(clients => dispatch(ClientActionCreator.successfulRemoveClient(clientId)))
+      .then(() =>
+        core.registerClient(
+          {
+            password,
+            persist: true /* TODO: get persist value */,
+          },
+          {
+            location: {lat: 52.53269, lon: 13.402315},
+            model: `test`,
+          }
+        )
+      )
+      .then(clients => dispatch(ClientActionCreator.successfulCreateClient()))
       .catch(error => {
-        dispatch(ClientActionCreator.failedRemoveClient(error));
+        dispatch(ClientActionCreator.failedCreateClient(error));
         throw BackendError.handle(error);
       });
   };
