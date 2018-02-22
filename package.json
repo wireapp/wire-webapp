@@ -86,7 +86,7 @@
     "eslint-plugin-react": "7.7.0",
     "extract-loader": "1.0.2",
     "extract-text-webpack-plugin": "3.0.2",
-    "file-loader": "1.1.8",
+    "file-loader": "1.1.9",
     "grunt": "1.0.2",
     "grunt-aws-s3": "2.0.0",
     "grunt-cli": "1.2.0",
