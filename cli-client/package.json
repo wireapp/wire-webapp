@@ -3,7 +3,7 @@
     "wire-cli": "bin/node/index.js"
   },
   "dependencies": {
-    "@wireapp/core": "2.0.25",
+    "@wireapp/core": "2.0.26",
     "commander": "2.14.1",
     "dotenv": "5.0.0",
     "fs-extra": "5.0.0"

@@ -3,8 +3,7 @@
     "declaration": true,
     "lib": ["DOM", "ES7"],
     "outDir": "dist/commonjs",
-    "rootDir": "src/main",
-    "target": "ES5"
+    "rootDir": "src/main"
   },
   "exclude": ["bower_components", "dist", "node_modules"],
   "extends": "../../tsconfig.json"
