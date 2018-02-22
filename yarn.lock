@@ -353,16 +353,16 @@
   version "2.3.2"
   resolved "https://registry.yarnpkg.com/@types/tough-cookie/-/tough-cookie-2.3.2.tgz#e0d481d8bb282ad8a8c9e100ceb72c995fb5e709"
 
-"@wireapp/api-client@0.4.6":
-  version "0.4.6"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-0.4.6.tgz#4c0365827c129235a02321f5717509dccf52bd8c"
+"@wireapp/api-client@0.4.7":
+  version "0.4.7"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-0.4.7.tgz#242a066af999143e6d23d56201fc6d050f4cce18"
   dependencies:
     "@types/node" "9.4.6"
     "@types/spark-md5" "3.0.0"
     "@types/text-encoding" "0.0.32"
     "@types/tough-cookie" "2.3.2"
-    "@wireapp/queue-priority" "0.0.27"
-    "@wireapp/store-engine" "0.2.3"
+    "@wireapp/queue-priority" "0.0.28"
+    "@wireapp/store-engine" "0.2.4"
     axios "0.18.0"
     html5-websocket "2.0.2"
     logdown "3.2.3"
@@ -374,40 +374,40 @@
   version "3.0.3"
   resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-3.0.3.tgz#8b228cdfd4b0fc7a7a16911824be285b45586d41"
 
-"@wireapp/core@2.0.26":
-  version "2.0.26"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-2.0.26.tgz#2c9a0d60c6ce860b36e833763944bdadab389170"
+"@wireapp/core@2.0.27":
+  version "2.0.27"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-2.0.27.tgz#aa599aba26836469e385845705a03da3f776b757"
   dependencies:
     "@types/node" "9.4.6"
-    "@wireapp/api-client" "0.4.6"
-    "@wireapp/cryptobox" "8.0.13"
-    "@wireapp/store-engine" "0.2.3"
+    "@wireapp/api-client" "0.4.7"
+    "@wireapp/cryptobox" "8.0.14"
+    "@wireapp/store-engine" "0.2.4"
     bazinga64 "5.0.3"
     protobufjs "6.8.5"
     pure-uuid "1.5.0"
 
-"@wireapp/cryptobox@8.0.13":
-  version "8.0.13"
-  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-8.0.13.tgz#46a1a909709f442156e2d34f8ee46b9dc2b879c0"
+"@wireapp/cryptobox@8.0.14":
+  version "8.0.14"
+  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-8.0.14.tgz#589c83027ae9418b83c7deaa64e88a75a77ad592"
   dependencies:
     "@types/fs-extra" "5.0.0"
     "@types/node" "9.3.0"
-    "@wireapp/lru-cache" "2.0.5"
-    "@wireapp/proteus" "7.1.0"
-    "@wireapp/store-engine" "0.2.3"
+    "@wireapp/lru-cache" "2.0.6"
+    "@wireapp/proteus" "7.1.1"
+    "@wireapp/store-engine" "0.2.4"
     dexie "2.0.1"
     fs-extra "5.0.0"
     p-queue "2.3.0"
 
-"@wireapp/lru-cache@2.0.5":
-  version "2.0.5"
-  resolved "https://registry.yarnpkg.com/@wireapp/lru-cache/-/lru-cache-2.0.5.tgz#30f13c82a27851a5ff6e2cae51bbe54dbbffb23f"
+"@wireapp/lru-cache@2.0.6":
+  version "2.0.6"
+  resolved "https://registry.yarnpkg.com/@wireapp/lru-cache/-/lru-cache-2.0.6.tgz#473c48b9721bc99401804d5facbc231a07771e27"
   dependencies:
     webpack "3.11.0"
 
-"@wireapp/proteus@7.1.0":
-  version "7.1.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/proteus/-/proteus-7.1.0.tgz#e38733b3f7bd4006ee938879e98ff294aa7b1133"
+"@wireapp/proteus@7.1.1":
+  version "7.1.1"
+  resolved "https://registry.yarnpkg.com/@wireapp/proteus/-/proteus-7.1.1.tgz#47ba1922f05921df70f665b631d8499320e442c2"
   dependencies:
     "@types/chai" "4.1.2"
     "@types/ed2curve" "0.2.2"
@@ -416,9 +416,9 @@
     ed2curve "0.2.1"
     libsodium-wrappers-sumo "0.7.3"
 
-"@wireapp/queue-priority@0.0.27":
-  version "0.0.27"
-  resolved "https://registry.yarnpkg.com/@wireapp/queue-priority/-/queue-priority-0.0.27.tgz#332c08d66ba3429a8f4c5160a7404bf8c0f38eb6"
+"@wireapp/queue-priority@0.0.28":
+  version "0.0.28"
+  resolved "https://registry.yarnpkg.com/@wireapp/queue-priority/-/queue-priority-0.0.28.tgz#db7b7eb9eb54f66d43b758c09845094647bd17a6"
   dependencies:
     "@types/node" "9.4.6"
 
@@ -442,9 +442,9 @@
     dexie "1.5.1"
     fs-extra "4.0.1"
 
-"@wireapp/store-engine@0.2.3":
-  version "0.2.3"
-  resolved "https://registry.yarnpkg.com/@wireapp/store-engine/-/store-engine-0.2.3.tgz#bbea9c42d187fad05441ed34346c6fa396d61be3"
+"@wireapp/store-engine@0.2.4":
+  version "0.2.4"
+  resolved "https://registry.yarnpkg.com/@wireapp/store-engine/-/store-engine-0.2.4.tgz#31607e603d7ed7b60ce938ea58bd566c62a4a1dd"
   dependencies:
     "@types/node" "9.4.6"
     dexie "2.0.1"
