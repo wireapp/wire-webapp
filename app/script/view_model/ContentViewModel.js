@@ -68,7 +68,6 @@ z.viewModel.ContentViewModel = class ContentViewModel {
     this.groupCreation = new z.viewModel.content.GroupCreationViewModel(mainViewModel, this, repositories);
     this.messageList = new z.viewModel.content.MessageListViewModel(mainViewModel, this, repositories);
     this.titleBar = new z.viewModel.content.TitleBarViewModel(mainViewModel, this, repositories);
-    this.videoCalling = new z.viewModel.content.VideoCallingViewModel(mainViewModel, this, repositories);
 
     this.preferencesAbout = new z.viewModel.content.PreferencesAboutViewModel(mainViewModel, this, repositories);
     this.preferencesAccount = new z.viewModel.content.PreferencesAccountViewModel(mainViewModel, this, repositories);
