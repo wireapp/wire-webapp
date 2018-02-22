@@ -47,7 +47,6 @@ class AccessTokenStore extends EventEmitter {
   }
 
   public async init(): Promise<AccessTokenData | undefined> {
-    await this.engine.init('wire');
     return this.engine
       .read<AccessTokenData>(AUTH_TABLE_NAME, AUTH_ACCESS_TOKEN_KEY)
       .catch((error: Error) => {

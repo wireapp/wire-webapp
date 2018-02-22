@@ -31,6 +31,7 @@ import {MemberAPI, PaymentAPI, TeamAPI, TeamInvitationAPI} from './team/';
 import {SelfAPI} from './self/';
 import {UserAPI} from './user/';
 import {WebSocketClient} from './tcp/';
+import {User} from './user';
 
 class Client {
   private STORE_NAME_PREFIX: string = 'wire';
@@ -160,6 +161,8 @@ class Client {
     return Promise.resolve()
       .then(() => this.context && this.logout())
       .then(() => this.auth.api.postRegister(userAccount))
+      .then((user: User) => this.createContext(user.id))
+      .then((context: Context) => this.initEngine(context))
       .then(() => this.init());
   }
 
@@ -179,10 +182,11 @@ class Client {
 
   private createContext(userId: string, clientId?: string, clientType?: ClientType): Context {
     if (this.context) {
-      throw new Error(`There is already a context with user ID '${userId}'.`);
+      this.context = {...this.context, clientId, clientType};
+    } else {
+      this.context = new Context(userId, clientId, clientType);
     }
 
-    this.context = new Context(userId, clientId, clientType);
     return this.context;
   }
 
