@@ -158,7 +158,7 @@ z.client.ClientService = class ClientService {
    */
   loadClientFromDb(primaryKey) {
     return this.storageService.db[z.storage.StorageService.OBJECT_STORE.CLIENTS]
-      .where(':id')
+      .where('meta.primaryKey')
       .equals(primaryKey)
       .first()
       .then(clientRecord => {
