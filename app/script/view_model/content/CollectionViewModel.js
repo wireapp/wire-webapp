@@ -60,7 +60,7 @@ z.viewModel.content.CollectionViewModel = class CollectionViewModel {
   }
 
   searchInConversation(query) {
-    return this.conversation_repository.search_in_conversation(this.conversationEntity(), query);
+    return this.conversation_repository.searchInConversation(this.conversationEntity(), query);
   }
 
   onInputChange(input) {
