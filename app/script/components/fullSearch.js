@@ -55,7 +55,7 @@ z.components.FullSearch = class FullSearch {
     this.input = ko.observable();
     this.input.subscribe(
       _.debounce(searchQuery => {
-        searchQuery = query.trim();
+        searchQuery = searchQuery.trim();
 
         this.onInputChange(searchQuery);
 
