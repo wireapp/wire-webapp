@@ -370,9 +370,10 @@ z.viewModel.panel.ParticipantsViewModel = class ParticipantsViewModel {
     if (participantEntity) {
       this.groupMode(groupMode);
       if (participantEntity.isBot) {
-        return this.showService(participantEntity);
+        this.showService(participantEntity);
+      } else {
+        this.selectedParticipant(participantEntity);
       }
-      this.selectedParticipant(participantEntity);
     }
 
     if (!this.mainViewModel.isPanelOpen()) {
