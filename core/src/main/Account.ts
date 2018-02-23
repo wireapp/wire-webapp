@@ -431,7 +431,7 @@ class Account extends EventEmitter {
       .then((newClient: NewClient) => this.apiClient.client.api.postClient(newClient))
       .then((client: RegisteredClient) => {
         this.client = client;
-        return this.service.crypto.saveClient(client);
+        return this.service.crypto.saveClient(this.client);
       })
       .then(() => this.client);
   }
