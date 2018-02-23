@@ -217,7 +217,8 @@ z.viewModel.ContentViewModel = class ContentViewModel {
   _checkContentAvailability(state) {
     const isStateRequests = state === ContentViewModel.STATE.CONNECTION_REQUESTS;
     if (isStateRequests) {
-      if (!this.userRepository.connectRequests().length) {
+      const hasConnectRequests = !!this.userRepository.connect_requests().length;
+      if (!hasConnectRequests) {
         return ContentViewModel.STATE.WATERMARK;
       }
     }
