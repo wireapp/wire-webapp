@@ -260,10 +260,13 @@ z.viewModel.panel.ParticipantsViewModel = class ParticipantsViewModel {
     if (this.conversation().is_group()) {
       this.conversationRepository.addMembers(this.conversation(), this.selectedContacts());
     }
+    this.resetView();
   }
 
   clickToAddService() {
-    this.integrationRepository.addService(this.conversation(), this.selectedService(), 'conversation_details');
+    this.integrationRepository
+      .addService(this.conversation(), this.selectedService(), 'conversation_details')
+      .then(() => this.resetView());
   }
 
   clickToBlock(userEntity) {
@@ -291,7 +294,11 @@ z.viewModel.panel.ParticipantsViewModel = class ParticipantsViewModel {
     amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
 
     this.confirmDialog = $('#participants').confirm({
-      confirm: () => this.conversationRepository.removeMember(this.conversation(), this.userRepository.self().id),
+      confirm: () => {
+        this.conversationRepository
+          .removeMember(this.conversation(), this.userRepository.self().id)
+          .then(() => this.resetView());
+      },
       template: '#template-confirm-leave',
     });
   }
@@ -301,11 +308,7 @@ z.viewModel.panel.ParticipantsViewModel = class ParticipantsViewModel {
 
     this.confirmDialog = $('#participants').confirm({
       confirm: () => {
-        this.conversationRepository.removeMember(this.conversation(), userEntity.id).then(response => {
-          if (response) {
-            this.resetView();
-          }
-        });
+        this.conversationRepository.removeMember(this.conversation(), userEntity.id).then(() => this.resetView());
       },
       data: {
         user: userEntity,
