@@ -45,7 +45,7 @@ z.viewModel.list.ConversationListViewModel = class ConversationListViewModel {
 
     this.show_calls = ko.observable(false);
 
-    this.content_state = this.content_view_model.state;
+    this.contentState = this.content_view_model.state;
     this.selected_conversation = ko.observable();
 
     this.is_team = this.team_repository.isTeam;
@@ -144,7 +144,7 @@ z.viewModel.list.ConversationListViewModel = class ConversationListViewModel {
       z.viewModel.ContentViewModel.STATE.COLLECTION,
       z.viewModel.ContentViewModel.STATE.COLLECTION_DETAILS,
       z.viewModel.ContentViewModel.STATE.CONVERSATION,
-    ].includes(this.content_state());
+    ].includes(this.contentState());
 
     return is_selected_conversation && is_selected_state;
   }
