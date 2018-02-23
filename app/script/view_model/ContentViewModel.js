@@ -262,6 +262,10 @@ z.viewModel.ContentViewModel = class ContentViewModel {
         this.conversationRepository.active_conversation(null);
       }
 
+      if (this.mainViewModel.isPanelOpen()) {
+        this.mainViewModel.closePanel();
+      }
+
       return this.messageList.release_conversation();
     }
 
