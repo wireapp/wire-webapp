@@ -65,7 +65,10 @@ z.viewModel.panel.ParticipantsViewModel = class ParticipantsViewModel {
     this.logger = new z.util.Logger('z.viewModel.details.ParticipantsViewModel', z.config.LOGGER.OPTIONS);
 
     this.conversationEntity = this.conversationRepository.active_conversation;
-    this.conversationEntity.subscribe(() => this.resetView());
+    this.conversationEntity.subscribe(() => {
+      this.resetView();
+      this.renderParticipants(true);
+    });
 
     this.state = ko.observable(ParticipantsViewModel.STATE.PARTICIPANTS);
     this.previousState = ko.observable(this.state());
@@ -89,6 +92,12 @@ z.viewModel.panel.ParticipantsViewModel = class ParticipantsViewModel {
     this.isTeam = this.teamRepository.isTeam;
     this.team = this.teamRepository.team;
     this.teamUsers = this.teamRepository.teamUsers;
+    this.teamMembers = this.teamRepository.teamMembers;
+
+    this.isTeamOnly = ko.pureComputed(() => {
+      const conversationEntity = this.conversationEntity();
+      return conversationEntity && conversationEntity.accessState() === z.conversation.ACCESS_STATE.TEAM.TEAM_ONLY;
+    });
 
     this.renderParticipants = ko.observable(false);
 
@@ -127,10 +136,10 @@ z.viewModel.panel.ParticipantsViewModel = class ParticipantsViewModel {
 
     this.enableIntegrations = this.integrationRepository.enableIntegrations;
     this.showIntegrations = ko.pureComputed(() => {
-      const hasBotUser =
-        this.conversationEntity().firstUserEntity() && this.conversationEntity().firstUserEntity().isBot;
+      const firstUserEntity = this.conversationEntity().firstUserEntity();
+      const hasBotUser = firstUserEntity && firstUserEntity.isBot;
       const allowIntegrations = this.conversationEntity().is_group() || hasBotUser;
-      return this.enableIntegrations() && allowIntegrations;
+      return this.enableIntegrations() && allowIntegrations && !this.isTeamOnly();
     });
 
     // Confirm dialog reference
@@ -162,7 +171,9 @@ z.viewModel.panel.ParticipantsViewModel = class ParticipantsViewModel {
 
     this.selectedContacts = ko.observableArray([]);
     this.contacts = ko.pureComputed(() => {
-      const userEntities = this.isTeam() ? this.teamUsers() : this.userRepository.connected_users();
+      const userEntities = this.isTeam()
+        ? this.isTeamOnly() ? this.teamMembers() : this.teamUsers()
+        : this.userRepository.connected_users();
 
       return userEntities
         .filter(userEntity => !this.participants().find(participant => userEntity.id === participant.id))
