@@ -832,6 +832,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
     }
   }
 
+  joinConversationWithCode(key, code) {
+    return this.conversation_service.postConversationJoin(key, code).then(response => this._onCreate(response));
+  }
+
   /**
    * Maps user connection to the corresponding conversation.
    *

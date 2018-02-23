@@ -39,7 +39,7 @@ z.viewModel.panel.GuestOptionsViewModel = class GuestOptionsViewModel {
     this.hasAccessCode = ko.pureComputed(() => (this.isGuestRoom() ? !!this.conversationEntity().accessCode() : false));
 
     this.conversationEntity.subscribe(conversationEntity => {
-      if (this.isGuestRoom()) {
+      if (this.isGuestRoom() && !conversationEntity.accessCode()) {
         this.conversationRepository.stateHandler.getAccessCode(conversationEntity);
       }
     });
@@ -53,7 +53,13 @@ z.viewModel.panel.GuestOptionsViewModel = class GuestOptionsViewModel {
         ? z.conversation.ACCESS_STATE.TEAM.TEAM_ONLY
         : z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM;
 
-      return this.conversationRepository.stateHandler.changeAccessState(conversationEntity, accessState);
+      if (isGuestRoom) {
+        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.REMOVE_GUESTS, {
+          action: () => this.conversationRepository.stateHandler.changeAccessState(conversationEntity, accessState),
+        });
+      } else {
+        this.conversationRepository.stateHandler.changeAccessState(conversationEntity, accessState);
+      }
     }
   }
 
@@ -62,6 +68,8 @@ z.viewModel.panel.GuestOptionsViewModel = class GuestOptionsViewModel {
   }
 
   revokeAccessCode() {
-    return this.conversationRepository.stateHandler.revokeAccessCode(this.conversationEntity());
+    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.REVOKE_LINK, {
+      action: () => this.conversationRepository.stateHandler.revokeAccessCode(this.conversationEntity()),
+    });
   }
 };

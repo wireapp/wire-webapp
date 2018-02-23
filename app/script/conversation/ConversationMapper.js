@@ -265,6 +265,13 @@ z.conversation.ConversationMapper = class ConversationMapper {
     });
   }
 
+  mapAccessCode(conversationEntity, accessCode) {
+    const isTeamConversation = conversationEntity && conversationEntity.team_id;
+    if (isTeamConversation) {
+      conversationEntity.accessCode(accessCode.uri);
+    }
+  }
+
   mapAccessState(conversationEntity, accessModes, accessRole) {
     if (conversationEntity.team_id) {
       if (conversationEntity.is_one2one()) {

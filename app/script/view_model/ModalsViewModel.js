@@ -52,6 +52,8 @@ z.viewModel.ModalsViewModel = class ModalsViewModel {
       NEW_DEVICE: '.modal-new-device',
       NOT_CONNECTED: '.modal-not-connected',
       REMOVE_DEVICE: '.modal-remove-device',
+      REMOVE_GUESTS: '.modal-remove-guests',
+      REVOKE_LINK: '.modal-revoke-link',
       SERVICE_UNAVAILABLE: '.modal-service-unavailable',
       SESSION_RESET: '.modal-session-reset',
       TOO_LONG_MESSAGE: '.modal-too-long-message',
