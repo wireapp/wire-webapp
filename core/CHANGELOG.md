@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="2.0.28"></a>
+## [2.0.28](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.0.27...@wireapp/core@2.0.28) (2018-02-23)
+
+
+### Bug Fixes
+
+* **core:** Save client meta data after creation ([#297](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/297)) ([c029d2b](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/c029d2b))
+
+
+
+
 <a name="2.0.27"></a>
 ## [2.0.27](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.0.25...@wireapp/core@2.0.27) (2018-02-22)
 
