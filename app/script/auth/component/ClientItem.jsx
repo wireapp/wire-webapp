@@ -135,6 +135,7 @@ class ClientItem extends React.Component {
               <Form>
                 <InputSubmitCombo style={{marginBottom: '0'}}>
                   <Input
+                    autoFocus
                     name="password"
                     placeholder={_(clientItemStrings.passwordPlaceholder)}
                     type="password"
