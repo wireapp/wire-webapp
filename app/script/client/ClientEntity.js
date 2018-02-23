@@ -58,7 +58,7 @@ z.client.ClientEntity = class ClientEntity {
    * @returns {Object} Object containing the user ID & client ID
    */
   static dismantleUserClientId(id) {
-    const [userId, clientId] = (id ? id.split('@') : undefined) || [];
+    const [userId, clientId] = _.isString(id) ? id.split('@') : [];
     return {clientId, userId};
   }
 
