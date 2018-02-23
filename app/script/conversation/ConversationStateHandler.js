@@ -34,8 +34,9 @@ z.conversation.ConversationStateHandler = class ConversationStateHandler {
   }
 
   changeAccessState(conversationEntity, accessState) {
-    if (conversationEntity && conversationEntity.team_id) {
-      const isStateUnchanged = conversationEntity.accessState === accessState;
+    const isTeamConversation = conversationEntity && conversationEntity.team_id;
+    if (isTeamConversation) {
+      const isStateUnchanged = conversationEntity.accessState() === accessState;
 
       if (!isStateUnchanged) {
         let accessModes;
@@ -52,7 +53,9 @@ z.conversation.ConversationStateHandler = class ConversationStateHandler {
         }
 
         if (accessModes && accessRole) {
-          return this.conversationService.putConversationAccess(conversationEntity.id, accessModes, accessRole);
+          return this.conversationService
+            .putConversationAccess(conversationEntity.id, accessModes, accessRole)
+            .then(() => conversationEntity.accessState(accessState));
         }
       }
     }
@@ -60,15 +63,15 @@ z.conversation.ConversationStateHandler = class ConversationStateHandler {
     return Promise.reject(new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_CHANGE));
   }
 
-  getCode(conversationEntity) {
+  getAccessCode(conversationEntity) {
     this.conversationService.getConversationCode(conversationEntity.id);
   }
 
-  requestCode(conversationEntity) {
+  requestAccessCode(conversationEntity) {
     this.conversationService.postConversationCode(conversationEntity.id);
   }
 
-  revokeCode(conversationEntity) {
+  revokeAccessCode(conversationEntity) {
     this.conversationService.deleteConversationCode(conversationEntity.id);
   }
 };

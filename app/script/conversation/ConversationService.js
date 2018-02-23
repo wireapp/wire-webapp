@@ -51,7 +51,7 @@ z.conversation.ConversationService = class ConversationService {
    * @note Do not include yourself as the requestor
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/createGroupConversation
    *
-   * @param {Object} payload - Payload for group creation
+   * @param {Object} payload - Payload object for group creation
    * @returns {Promise} Resolves when the conversation was created
    */
   postConversations(payload) {

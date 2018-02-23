@@ -24,5 +24,44 @@ window.z.viewModel = z.viewModel || {};
 window.z.viewModel.panel = z.viewModel.panel || {};
 
 z.viewModel.panel.GuestOptionsViewModel = class GuestOptionsViewModel {
-  constructor(mainViewModel, panelViewModel, repositories) {}
+  constructor(mainViewModel, panelViewModel, repositories) {
+    this.conversationRepository = repositories.conversation;
+
+    this.conversationEntity = this.conversationRepository.active_conversation;
+
+    this.isTeamConversation = ko.pureComputed(() => this.conversationEntity() && !!this.conversationEntity().team_id);
+    this.isGuestRoom = ko.pureComputed(() => {
+      if (this.isTeamConversation()) {
+        return this.conversationEntity().accessState() === z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM;
+      }
+    });
+
+    this.hasAccessCode = ko.pureComputed(() => (this.isGuestRoom() ? !!this.conversationEntity().accessCode() : false));
+
+    this.conversationEntity.subscribe(conversationEntity => {
+      if (this.isGuestRoom()) {
+        this.conversationRepository.stateHandler.getAccessCode(conversationEntity);
+      }
+    });
+  }
+
+  toggleAccessState() {
+    const conversationEntity = this.conversationEntity();
+    if (conversationEntity.team_id) {
+      const isGuestRoom = conversationEntity.accessState() === z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM;
+      const accessState = isGuestRoom
+        ? z.conversation.ACCESS_STATE.TEAM.TEAM_ONLY
+        : z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM;
+
+      return this.conversationRepository.stateHandler.changeAccessState(conversationEntity, accessState);
+    }
+  }
+
+  requestAccessCode() {
+    return this.conversationRepository.stateHandler.requestAccessCode(this.conversationEntity());
+  }
+
+  revokeAccessCode() {
+    return this.conversationRepository.stateHandler.revokeAccessCode(this.conversationEntity());
+  }
 };
