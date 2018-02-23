@@ -33,6 +33,7 @@ z.entity.Conversation = class Conversation {
 
     this.logger = new z.util.Logger(`z.entity.Conversation (${this.id})`, z.config.LOGGER.OPTIONS);
 
+    this.accessState = ko.observable(z.conversation.ACCESS_STATE.UNKNOWN);
     this.creator = undefined;
     this.name = ko.observable();
     this.team_id = undefined;
