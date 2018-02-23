@@ -71,7 +71,7 @@ z.viewModel.ContentViewModel = class ContentViewModel {
 
     this.preferencesAbout = new z.viewModel.content.PreferencesAboutViewModel(mainViewModel, this, repositories);
     this.preferencesAccount = new z.viewModel.content.PreferencesAccountViewModel(mainViewModel, this, repositories);
-    this.preferencesAv = new z.viewModel.content.PreferencesAVViewModel(mainViewModel, this, repositories);
+    this.preferencesAV = new z.viewModel.content.PreferencesAVViewModel(mainViewModel, this, repositories);
     this.preferencesDeviceDetails = new z.viewModel.content.PreferencesDeviceDetailsViewModel(
       mainViewModel,
       this,
@@ -93,7 +93,7 @@ z.viewModel.ContentViewModel = class ContentViewModel {
           this.preferencesAccount.check_new_clients();
           break;
         case ContentViewModel.STATE.PREFERENCES_AV:
-          this.preferencesAv.initiateDevices();
+          this.preferencesAV.initiateDevices();
           break;
         case ContentViewModel.STATE.PREFERENCES_DEVICES:
           this.preferencesDevices.update_device_info();
@@ -268,7 +268,7 @@ z.viewModel.ContentViewModel = class ContentViewModel {
 
     const isStatePreferencesAv = this.previousState === ContentViewModel.STATE.PREFERENCES_AV;
     if (isStatePreferencesAv) {
-      this.preferencesAv.release_devices();
+      this.preferencesAV.release_devices();
     }
   }
 
