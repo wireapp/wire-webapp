@@ -103,10 +103,14 @@ export default class CryptographyService {
   }
 
   public saveClient(client: RegisteredClient): Promise<string> {
+    const clientWithMeta = {
+      ...client,
+      meta: {primary_key: store.CryptoboxCRUDStore.KEYS.LOCAL_IDENTITY, is_verified: true},
+    };
     return this.storeEngine.create(
       CryptographyService.STORES.CLIENTS,
       store.CryptoboxCRUDStore.KEYS.LOCAL_IDENTITY,
-      client
+      clientWithMeta
     );
   }
 }
