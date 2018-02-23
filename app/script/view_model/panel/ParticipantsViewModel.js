@@ -58,11 +58,14 @@ z.viewModel.panel.ParticipantsViewModel = class ParticipantsViewModel {
     this.elementId = 'participants';
     this.mainViewModel = mainViewModel;
 
-    this.userRepository = repositories.user;
     this.conversationRepository = repositories.conversation;
+    this.userRepository = repositories.user;
     this.integrationRepository = repositories.integration;
     this.teamRepository = repositories.team;
     this.logger = new z.util.Logger('z.viewModel.details.ParticipantsViewModel', z.config.LOGGER.OPTIONS);
+
+    this.conversationEntity = this.conversationRepository.active_conversation;
+    this.conversationEntity.subscribe(() => this.resetView());
 
     this.state = ko.observable(ParticipantsViewModel.STATE.PARTICIPANTS);
     this.previousState = ko.observable(this.state());
@@ -83,9 +86,6 @@ z.viewModel.panel.ParticipantsViewModel = class ParticipantsViewModel {
       return this.state() === ParticipantsViewModel.STATE.SERVICE_DETAILS;
     });
 
-    this.conversation = ko.observable(new z.entity.Conversation());
-    this.conversation.subscribe(() => this.renderParticipants(false));
-
     this.isTeam = this.teamRepository.isTeam;
     this.team = this.teamRepository.team;
     this.teamUsers = this.teamRepository.teamUsers;
@@ -102,31 +102,34 @@ z.viewModel.panel.ParticipantsViewModel = class ParticipantsViewModel {
     this.services = this.integrationRepository.services;
 
     ko.computed(() => {
-      const conversationEntity = this.conversation();
-      const sortedUserEntities = []
-        .concat(conversationEntity.participating_user_ets())
-        .sort((userA, userB) => z.util.StringUtil.sort_by_priority(userA.first_name(), userB.first_name()));
+      if (this.conversationEntity()) {
+        const conversationEntity = this.conversationEntity();
+        const sortedUserEntities = []
+          .concat(conversationEntity.participating_user_ets())
+          .sort((userA, userB) => z.util.StringUtil.sort_by_priority(userA.first_name(), userB.first_name()));
 
-      this.participants(sortedUserEntities);
-      this.serviceParticipants.removeAll();
-      this.verifiedParticipants.removeAll();
-      this.unverifiedParticipants.removeAll();
+        this.participants(sortedUserEntities);
+        this.serviceParticipants.removeAll();
+        this.verifiedParticipants.removeAll();
+        this.unverifiedParticipants.removeAll();
 
-      sortedUserEntities.map(userEntity => {
-        if (userEntity.isBot) {
-          return this.serviceParticipants.push(userEntity);
-        }
-        if (userEntity.is_verified()) {
-          return this.verifiedParticipants.push(userEntity);
-        }
-        this.unverifiedParticipants.push(userEntity);
-      });
+        sortedUserEntities.map(userEntity => {
+          if (userEntity.isBot) {
+            return this.serviceParticipants.push(userEntity);
+          }
+          if (userEntity.is_verified()) {
+            return this.verifiedParticipants.push(userEntity);
+          }
+          this.unverifiedParticipants.push(userEntity);
+        });
+      }
     });
 
     this.enableIntegrations = this.integrationRepository.enableIntegrations;
     this.showIntegrations = ko.pureComputed(() => {
-      const hasBotUser = this.conversation().firstUserEntity() && this.conversation().firstUserEntity().isBot;
-      const allowIntegrations = this.conversation().is_group() || hasBotUser;
+      const hasBotUser =
+        this.conversationEntity().firstUserEntity() && this.conversationEntity().firstUserEntity().isBot;
+      const allowIntegrations = this.conversationEntity().is_group() || hasBotUser;
       return this.enableIntegrations() && allowIntegrations;
     });
 
@@ -138,14 +141,14 @@ z.viewModel.panel.ParticipantsViewModel = class ParticipantsViewModel {
     this.selectedService = ko.observable(undefined);
 
     // Switch between div and input field to edit the conversation name
-    this.isEditable = ko.pureComputed(() => !this.conversation().removed_from_conversation());
+    this.isEditable = ko.pureComputed(() => !this.conversationEntity().removed_from_conversation());
     this.isEditing = ko.observable(false);
     this.isEditing.subscribe(value => {
       if (!value) {
         const name = $('.group-header .name span');
         return $('.group-header textarea').css('height', `${name.height()}px`);
       }
-      $('.group-header textarea').val(this.conversation().display_name());
+      $('.group-header textarea').val(this.conversationEntity().display_name());
     });
 
     // @todo create a viewmodel search?
@@ -187,7 +190,7 @@ z.viewModel.panel.ParticipantsViewModel = class ParticipantsViewModel {
       return false;
     });
     this.showServiceRemove = ko.pureComputed(() => {
-      return this.stateServiceDetails() && !this.conversation().is_guest() && this.selectedIsInConversation();
+      return this.stateServiceDetails() && !this.conversationEntity().is_guest() && this.selectedIsInConversation();
     });
 
     amplify.subscribe(z.event.WebApp.CONTENT.SWITCH, this.switchContent.bind(this));
@@ -195,13 +198,8 @@ z.viewModel.panel.ParticipantsViewModel = class ParticipantsViewModel {
     amplify.subscribe(z.event.WebApp.PEOPLE.TOGGLE, this.toggleParticipantsSidebar.bind(this));
   }
 
-  changeConversation(conversationEntity) {
-    this.conversation(conversationEntity);
-    this.resetView();
-  }
-
   clickOnAddPeople() {
-    if (this.conversation().is_group()) {
+    if (this.conversationEntity().is_group()) {
       this.state(ParticipantsViewModel.STATE.ADD_PEOPLE);
       return $('.participants-search').addClass('participants-search-show');
     }
@@ -257,15 +255,15 @@ z.viewModel.panel.ParticipantsViewModel = class ParticipantsViewModel {
   }
 
   clickToAddMembers() {
-    if (this.conversation().is_group()) {
-      this.conversationRepository.addMembers(this.conversation(), this.selectedContacts());
+    if (this.conversationEntity().is_group()) {
+      this.conversationRepository.addMembers(this.conversationEntity(), this.selectedContacts());
     }
     this.resetView();
   }
 
   clickToAddService() {
     this.integrationRepository
-      .addService(this.conversation(), this.selectedService(), 'conversation_details')
+      .addService(this.conversationEntity(), this.selectedService(), 'conversation_details')
       .then(() => this.resetView());
   }
 
@@ -274,7 +272,7 @@ z.viewModel.panel.ParticipantsViewModel = class ParticipantsViewModel {
 
     this.confirmDialog = $('#participants').confirm({
       confirm: () => {
-        const nextConversationEntity = this.conversationRepository.get_next_conversation(this.conversation());
+        const nextConversationEntity = this.conversationRepository.get_next_conversation(this.conversationEntity());
         this.userRepository.block_user(userEntity, nextConversationEntity);
       },
       data: {
@@ -296,7 +294,7 @@ z.viewModel.panel.ParticipantsViewModel = class ParticipantsViewModel {
     this.confirmDialog = $('#participants').confirm({
       confirm: () => {
         this.conversationRepository
-          .removeMember(this.conversation(), this.userRepository.self().id)
+          .removeMember(this.conversationEntity(), this.userRepository.self().id)
           .then(() => this.resetView());
       },
       template: '#template-confirm-leave',
@@ -308,7 +306,7 @@ z.viewModel.panel.ParticipantsViewModel = class ParticipantsViewModel {
 
     this.confirmDialog = $('#participants').confirm({
       confirm: () => {
-        this.conversationRepository.removeMember(this.conversation(), userEntity.id).then(() => this.resetView());
+        this.conversationRepository.removeMember(this.conversationEntity(), userEntity.id).then(() => this.resetView());
       },
       data: {
         user: userEntity,
@@ -318,7 +316,7 @@ z.viewModel.panel.ParticipantsViewModel = class ParticipantsViewModel {
   }
 
   clickToRemoveService() {
-    this.integrationRepository.removeService(this.conversation(), this.selectedParticipant()).then(response => {
+    this.integrationRepository.removeService(this.conversationEntity(), this.selectedParticipant()).then(response => {
       if (response && this.groupMode()) {
         this.resetView();
       }
@@ -341,7 +339,7 @@ z.viewModel.panel.ParticipantsViewModel = class ParticipantsViewModel {
   }
 
   renameConversation(data, event) {
-    const currentConversationName = this.conversation()
+    const currentConversationName = this.conversationEntity()
       .display_name()
       .trim();
     const newConversationName = z.util.StringUtil.remove_line_breaks(event.target.value.trim());
@@ -349,11 +347,12 @@ z.viewModel.panel.ParticipantsViewModel = class ParticipantsViewModel {
     if (newConversationName.length && newConversationName !== currentConversationName) {
       event.target.value = currentConversationName;
       this.isEditing(false);
-      this.conversationRepository.rename_conversation(this.conversation(), newConversationName);
+      this.conversationRepository.rename_conversation(this.conversationEntity(), newConversationName);
     }
   }
 
   resetView() {
+    this.renderParticipants(false);
     this.state(ParticipantsViewModel.STATE.PARTICIPANTS);
     this.selectedContacts.removeAll();
     this.searchInput('');
@@ -410,13 +409,13 @@ z.viewModel.panel.ParticipantsViewModel = class ParticipantsViewModel {
       this.resetView();
 
       const [userEntity] = this.participants();
-      const initialUser = userEntity && this.conversation().is_one2one() ? userEntity : undefined;
+      const initialUser = userEntity && this.conversationEntity().is_one2one() ? userEntity : undefined;
       this.selectedParticipant(initialUser);
 
       this.renderParticipants(true);
     }
 
-    if (addPeople && !this.conversation().is_guest()) {
+    if (addPeople && !this.conversationEntity().is_guest()) {
       if (!this.mainViewModel.isPanelOpen()) {
         this.mainViewModel.openPanel();
         return this.clickOnAddPeople();
