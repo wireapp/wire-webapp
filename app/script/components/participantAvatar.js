@@ -125,9 +125,11 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
     this._loadAvatarPicture = () => {
       if (!this.avatarLoadingBlocked) {
         this.avatarLoadingBlocked = true;
+
         const pictureResource = this.participant.previewPictureResource();
         if (pictureResource) {
           const isCached = pictureResource.downloadProgress() === 100;
+
           pictureResource.get_object_url().then(url => {
             const image = new Image();
             image.src = url;
