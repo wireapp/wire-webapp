@@ -54,6 +54,7 @@ module.exports = grunt => {
       api: 'docs/api',
       coverage: 'docs/coverage',
     },
+    npm: 'node_modules',
     temp: 'temp',
     test_: 'test',
     test: {
@@ -90,7 +91,7 @@ module.exports = grunt => {
 
   // Tasks
   grunt.loadTasks('grunt/tasks');
-  grunt.registerTask('default', ['prepare_dist', 'host']);
+  grunt.registerTask('default', ['prepare_dist', 'npmCopy', 'host']);
   grunt.registerTask('init', ['clean:temp', 'npmBower', 'scripts']);
 
   // Deploy to different environments
