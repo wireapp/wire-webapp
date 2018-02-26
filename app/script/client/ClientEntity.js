@@ -112,7 +112,7 @@ z.client.ClientEntity = class ClientEntity {
     delete jsonObject.meta.isVerified;
 
     jsonObject.meta.primary_key = jsonObject.meta.primaryKey;
-    delete jsonObject.meta.primary_key;
+    delete jsonObject.meta.primaryKey;
 
     return jsonObject;
   }

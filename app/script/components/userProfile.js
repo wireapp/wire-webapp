@@ -456,7 +456,7 @@ z.components.UserProfile = class UserProfile {
   }
 
   clickToToggleDeviceVerification() {
-    const toggleVerified = !this.selectedDevice().meta.is_verified();
+    const toggleVerified = !this.selectedDevice().meta.isVerified();
 
     this.clientRepository
       .verifyClient(this.userEntity().id, this.selectedDevice(), toggleVerified)
