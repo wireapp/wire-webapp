@@ -1,13 +1,15 @@
 const pkg = require('./package.json');
 const webpack = require('webpack');
 
+const projectName = pkg.name.replace('@wireapp/', '');
+
 module.exports = {
   devtool: 'source-map',
   entry: {
-    filename: `${__dirname}/${pkg.main}`,
+    [projectName]: `${__dirname}/${pkg.main}`,
+    [`${projectName}.test`]: `${__dirname}/src/main/index.test.browser.js`,
   },
   externals: {
-    dexie: 'Dexie',
     'fs-extra': '{}',
   },
   node: {
@@ -15,14 +17,9 @@ module.exports = {
     path: 'empty',
   },
   output: {
-    filename: `${pkg.name.substr(pkg.name.indexOf('/') + 1)}.bundle.js`,
-    library: 'core',
+    filename: '[name].bundle.js',
+    library: projectName,
     path: `${__dirname}/dist`,
-  },
-  performance: {
-    hints: 'warning',
-    maxAssetSize: 36000,
-    maxEntrypointSize: 36000,
   },
   plugins: [new webpack.BannerPlugin(`${pkg.name} v${pkg.version}`)],
 };

@@ -1,6 +1,8 @@
 import CRUDEngine from './CRUDEngine';
 import Dexie from 'dexie';
-import {RecordAlreadyExistsError, RecordNotFoundError, RecordTypeError} from './error';
+import RecordAlreadyExistsError from './error/RecordAlreadyExistsError';
+import RecordTypeError from './error/RecordTypeError';
+import RecordNotFoundError from './error/RecordNotFoundError';
 
 export interface DexieInstance extends Dexie {
   [index: string]: any;

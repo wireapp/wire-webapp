@@ -18,6 +18,7 @@
 
 const pkg = require('../package.json');
 import {IncomingNotification} from '@wireapp/api-client/dist/commonjs/conversation/index';
+import * as cryptobox from '@wireapp/cryptobox';
 import {CryptographyService, GenericMessageType, PayloadBundle} from './crypto/root';
 import {Context, LoginData, PreKey} from '@wireapp/api-client/dist/commonjs/auth/index';
 import {
@@ -33,7 +34,6 @@ import {
   RegisteredClient,
 } from '@wireapp/api-client/dist/commonjs/client/index';
 import {LoginSanitizer, ClientInfo} from './auth/root';
-import {RecordNotFoundError} from '@wireapp/store-engine/dist/commonjs/engine/error/index';
 import {Root} from 'protobufjs';
 import {WebSocketClient} from '@wireapp/api-client/dist/commonjs/tcp/index';
 import {ConversationService} from './conversation/root';
@@ -344,7 +344,8 @@ class Account extends EventEmitter {
     this.context = context;
     this.service.conversation.setClientID(<string>this.context.clientId);
     return this.service.crypto.loadClient().catch(error => {
-      if (error.constructor.name === 'RecordNotFoundError') {
+      // There was no client so we need to "create" and "register" a client
+      if (error instanceof cryptobox.error.CryptoboxError) {
         return this.registerClient(loginData);
       }
       throw error;
@@ -395,6 +396,7 @@ class Account extends EventEmitter {
     return this.apiClient.logout().then(() => this.resetContext());
   }
 
+  // TODO: Split functionality into "create" and "register" client
   public registerClient(
     loginData: LoginData,
     clientInfo: ClientInfo = {

@@ -30,7 +30,7 @@
     "clear": "rimraf dist",
     "dist": "yarn clear && yarn build",
     "test": "yarn dist && yarn test:node && yarn test:browser",
-    "test:browser": "webpack && karma start karma.conf.js",
+    "test:browser": "webpack && karma start",
     "test:node": "jasmine --config=jasmine.json"
   },
   "types": "./dist/commonjs/index.d.ts",
