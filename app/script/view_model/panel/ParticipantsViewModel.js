@@ -65,10 +65,7 @@ z.viewModel.panel.ParticipantsViewModel = class ParticipantsViewModel {
     this.logger = new z.util.Logger('z.viewModel.details.ParticipantsViewModel', z.config.LOGGER.OPTIONS);
 
     this.conversationEntity = this.conversationRepository.active_conversation;
-    this.conversationEntity.subscribe(() => {
-      this.resetView();
-      this.renderParticipants(true);
-    });
+    this.conversationEntity.subscribe(() => this.resetView());
 
     this.state = ko.observable(ParticipantsViewModel.STATE.PARTICIPANTS);
     this.previousState = ko.observable(this.state());
@@ -363,7 +360,6 @@ z.viewModel.panel.ParticipantsViewModel = class ParticipantsViewModel {
   }
 
   resetView() {
-    this.renderParticipants(false);
     this.state(ParticipantsViewModel.STATE.PARTICIPANTS);
     this.selectedContacts.removeAll();
     this.searchInput('');
