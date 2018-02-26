@@ -131,7 +131,7 @@ z.entity.User = class User {
       return initials.toUpperCase();
     });
 
-    this.username = ko.observable();
+    this.username = ko.observable('');
 
     this.previewPictureResource = ko.observable();
     this.mediumPictureResource = ko.observable();

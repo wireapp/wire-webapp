@@ -20,6 +20,7 @@
 participant-item {
   display: block;
   position: relative;
+
   &::after {
     background-color: currentColor;
     bottom: 0;
@@ -30,6 +31,7 @@ participant-item {
     position: absolute;
     right: 0;
   }
+
   .participant-item {
     cursor: pointer;
     overflow: hidden;
@@ -38,6 +40,7 @@ participant-item {
     height: 56px;
     margin: 0;
     padding-right: 16px;
+
     .participant-item-image {
       flex: 0 0 auto;
       height: @avatar-diameter-m;
@@ -47,6 +50,7 @@ participant-item {
       justify-content: center;
       width: 60px;
     }
+
     .participant-item-content {
       align-items: flex-start;
       justify-content: center;
@@ -58,15 +62,18 @@ participant-item {
       line-height: 16px;
       font-size: 14px;
       font-weight: 400;
+
       .participant-item-content-availability {
         .availability-state-label {
           .ellipsis;
         }
       }
+
       .participant-item-content-name {
         .ellipsis;
         width: 100%;
       }
+
       .participant-item-content-info {
         margin-top: 2px;
         display: flex;

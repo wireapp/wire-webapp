@@ -28,13 +28,7 @@ z.components.ParticipantItem = class ParticipantItem {
     this.isService = this.participant instanceof z.integration.ServiceEntity || this.participant.isBot;
     this.isUser = this.participant instanceof z.entity.User && !this.participant.isBot;
     this.selfUser = window.wire.app.repository.user.self;
-    this.contentInfo = '';
-    if (this.isUser && this.participant.username()) {
-      this.contentInfo = this.participant.username();
-    }
-    if (this.isService) {
-      this.contentInfo = this.participant.summary;
-    }
+    this.contentInfo = this.isService ? this.participant.summary : this.participant.username();
     this.mode = params.mode || z.components.UserList.MODE.DEFAULT;
     this.isDefaultMode = this.mode === z.components.UserList.MODE.DEFAULT;
     this.isOthersMode = this.mode === z.components.UserList.MODE.OTHERS;
