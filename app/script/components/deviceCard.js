@@ -78,7 +78,7 @@ z.components.DeviceCard = class DeviceCard {
 
 ko.components.register('device-card', {
   template: `
-    <div class="device-info" data-bind="click: onClickDevice,
+    <div class="device-info" data-bind="click: clickOnDevice,
       attr: {'data-uie-uid': id, 'data-uie-value': label, 'data-uie-name': dataUieName}">
       <!-- ko if: detailed -->
         <div class="label-xs device-label" data-bind="text: label"></div>
