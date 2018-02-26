@@ -71,7 +71,7 @@ z.viewModel.ContentViewModel = class ContentViewModel {
 
     this.preferencesAbout = new z.viewModel.content.PreferencesAboutViewModel(mainViewModel, this, repositories);
     this.preferencesAccount = new z.viewModel.content.PreferencesAccountViewModel(mainViewModel, this, repositories);
-    this.preferencesAv = new z.viewModel.content.PreferencesAVViewModel(mainViewModel, this, repositories);
+    this.preferencesAV = new z.viewModel.content.PreferencesAVViewModel(mainViewModel, this, repositories);
     this.preferencesDeviceDetails = new z.viewModel.content.PreferencesDeviceDetailsViewModel(
       mainViewModel,
       this,
@@ -93,10 +93,10 @@ z.viewModel.ContentViewModel = class ContentViewModel {
           this.preferencesAccount.check_new_clients();
           break;
         case ContentViewModel.STATE.PREFERENCES_AV:
-          this.preferencesAv.initiateDevices();
+          this.preferencesAV.initiateDevices();
           break;
         case ContentViewModel.STATE.PREFERENCES_DEVICES:
-          this.preferencesDevices.update_device_info();
+          this.preferencesDevices.updateDeviceInfo();
           break;
         case ContentViewModel.STATE.COLLECTION:
           this.collection.setConversation(this.previousConversation);
@@ -181,7 +181,11 @@ z.viewModel.ContentViewModel = class ContentViewModel {
       this._releaseContent(this.state());
 
       this.state(ContentViewModel.STATE.CONVERSATION);
-      this.conversationRepository.active_conversation(conversationEntity);
+
+      if (!isActiveConversation) {
+        this.conversationRepository.active_conversation(conversationEntity);
+      }
+
       this.messageList.change_conversation(conversationEntity, messageEntity).then(() => {
         this._showContent(ContentViewModel.STATE.CONVERSATION);
         this.mainViewModel.panel.participants.changeConversation(conversationEntity);
@@ -217,7 +221,8 @@ z.viewModel.ContentViewModel = class ContentViewModel {
   _checkContentAvailability(state) {
     const isStateRequests = state === ContentViewModel.STATE.CONNECTION_REQUESTS;
     if (isStateRequests) {
-      if (!this.userRepository.connectRequests().length) {
+      const hasConnectRequests = !!this.userRepository.connect_requests().length;
+      if (!hasConnectRequests) {
         return ContentViewModel.STATE.WATERMARK;
       }
     }
@@ -267,7 +272,7 @@ z.viewModel.ContentViewModel = class ContentViewModel {
 
     const isStatePreferencesAv = this.previousState === ContentViewModel.STATE.PREFERENCES_AV;
     if (isStatePreferencesAv) {
-      this.preferencesAv.release_devices();
+      this.preferencesAV.release_devices();
     }
   }
 

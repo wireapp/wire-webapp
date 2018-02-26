@@ -431,22 +431,22 @@ z.conversation.ConversationRepository = class ConversationRepository {
   /**
    * Search for given text in conversation.
    *
-   * @param {Conversation} conversation_et - Conversation entity
+   * @param {Conversation} conversationEntity - Conversation entity
    * @param {string} query - Query strings
    * @returns {Promise} Array of message entities
    */
-  search_in_conversation(conversation_et, query) {
-    if (query.length === 0) {
-      return Promise.resolve([]);
+  searchInConversation(conversationEntity, query) {
+    if (!query.length) {
+      return Promise.resolve({});
     }
 
     return this.conversation_service
-      .search_in_conversation(conversation_et.id, query)
+      .search_in_conversation(conversationEntity.id, query)
       .then(events => {
-        const message_ets = this.event_mapper.map_json_events(events, conversation_et);
-        return Promise.all(message_ets.map(message_et => this._updateMessageUserEntities(message_et)));
+        const messageEntities = this.event_mapper.map_json_events(events, conversationEntity);
+        return Promise.all(messageEntities.map(messageEntity => this._updateMessageUserEntities(messageEntity)));
       })
-      .then(message_ets => [message_ets, query]);
+      .then(messageEntities => ({messageEntities, query}));
   }
 
   /**
@@ -1710,7 +1710,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const message_id = generic_message.message_id;
 
     return this.link_repository
-      .get_link_preview_from_string(message)
+      .getLinkPreviewFromString(message)
       .then(link_preview => {
         if (link_preview) {
           switch (generic_message.content) {

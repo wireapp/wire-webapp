@@ -47,12 +47,17 @@ window.z.audio.AudioRepository = class AudioRepository {
     if (this.muted && !z.audio.AudioPlayingType.MUTED.includes(audioId)) {
       return Promise.reject(new z.audio.AudioError(z.audio.AudioError.TYPE.IGNORED_SOUND));
     }
-    if (this.audioPreference() === z.audio.AudioPreference.NONE && !z.audio.AudioPlayingType.NONE.includes(audioId)) {
+
+    const preferenceIsNone = this.audioPreference() === z.audio.AudioPreference.NONE;
+    if (preferenceIsNone && !z.audio.AudioPlayingType.NONE.includes(audioId)) {
       return Promise.reject(new z.audio.AudioError(z.audio.AudioError.TYPE.IGNORED_SOUND));
     }
-    if (this.audioPreference() === z.audio.AudioPreference.SOME && !z.audio.AudioPlayingType.SOME.includes(audioId)) {
+
+    const preferenceIsSome = this.audioPreference() === z.audio.AudioPreference.SOME;
+    if (preferenceIsSome && !z.audio.AudioPlayingType.SOME.includes(audioId)) {
       return Promise.reject(new z.audio.AudioError(z.audio.AudioError.TYPE.IGNORED_SOUND));
     }
+
     return Promise.resolve();
   }
 

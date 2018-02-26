@@ -153,7 +153,7 @@ z.string.modal_call_second_outgoing_message = 'You can only be in one call at a 
 z.string.modal_call_second_outgoing_action = 'Hang Up';
 // Clear a conversation
 z.string.modal_clear_conversation_headline = 'Delete content?';
-z.string.modal_clear_conversation_message = 'This will clear the conversation history and remove it from your list.';
+z.string.modal_clear_conversation_message = 'This will clear the conversation history on all your devices.';
 z.string.modal_clear_conversation_option = 'Also leave the conversation';
 z.string.modal_clear_conversation_button = 'Delete';
 // Connected device
@@ -251,6 +251,8 @@ z.string.conversation_just_now = 'Just now';
 z.string.conversation_location_link = 'Open Map';
 z.string.conversation_member_join = ' added {{users}}';
 z.string.conversation_member_join_you = ' added {{users}}';
+z.string.conversationMemberJoinSelf = ' joined';
+z.string.conversationMemberJoinSelfYou = ' joined';
 z.string.conversation_member_leave_left = ' left';
 z.string.conversation_member_leave_left_you = ' left';
 z.string.conversation_member_leave_removed = ' removed {{users}}';

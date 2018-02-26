@@ -13,7 +13,7 @@
     <div class="content-list-wrapper">
       <div class="content-list collection-list" data-bind="antiscroll: true">
 
-        <full-search params="search_provider: searchInConversation, change: onInputChange, message_click: clickOnMessage"></full-search>
+        <full-search params="search_provider: searchInConversation, change: onInputChange, click: clickOnMessage"></full-search>
 
         <!-- ko ifnot: searchInput().length -->
           <!-- ko if: images().length -->
