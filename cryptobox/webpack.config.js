@@ -7,6 +7,7 @@ module.exports = {
   devtool: 'source-map',
   entry: {
     [projectName]: `${__dirname}/${pkg.main}`,
+    [`${projectName}.test`]: `${__dirname}/test/index.test.browser.js`,
   },
   externals: {
     dexie: 'Dexie',

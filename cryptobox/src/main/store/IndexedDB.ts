@@ -4,6 +4,7 @@ import Dexie from 'dexie';
 const logdown = require('logdown');
 import CryptoboxStore from './CryptoboxStore';
 import {SerialisedRecord} from '../store/root';
+import {Decoder} from 'bazinga64';
 import {StoreEngine} from '@wireapp/store-engine';
 
 export interface DexieInstance extends Dexie {
@@ -129,7 +130,11 @@ class IndexedDB implements CryptoboxStore {
   public load_identity(): Promise<ProteusKeys.IdentityKeyPair | undefined> {
     return this.read<SerialisedRecord>(this.TABLE.LOCAL_IDENTITY, this.localIdentityKey)
       .then((record: SerialisedRecord) => {
-        return ProteusKeys.IdentityKeyPair.deserialise(record.serialised);
+        const payload =
+          typeof record.serialised === 'string'
+            ? Decoder.fromBase64(record.serialised).asBytes.buffer
+            : record.serialised;
+        return ProteusKeys.IdentityKeyPair.deserialise(payload);
       })
       .catch(function(error: Error) {
         if (error instanceof StoreEngine.error.RecordNotFoundError) {
@@ -142,7 +147,11 @@ class IndexedDB implements CryptoboxStore {
   public load_prekey(prekey_id: number): Promise<ProteusKeys.PreKey | undefined> {
     return this.read<SerialisedRecord>(this.TABLE.PRE_KEYS, prekey_id.toString())
       .then((record: SerialisedRecord) => {
-        return ProteusKeys.PreKey.deserialise(record.serialised);
+        const payload =
+          typeof record.serialised === 'string'
+            ? Decoder.fromBase64(record.serialised).asBytes.buffer
+            : record.serialised;
+        return ProteusKeys.PreKey.deserialise(payload);
       })
       .catch(function(error: Error) {
         if (error instanceof StoreEngine.error.RecordNotFoundError) {
@@ -159,14 +168,22 @@ class IndexedDB implements CryptoboxStore {
       })
       .then((records: any) => {
         return records.map((record: SerialisedRecord) => {
-          return ProteusKeys.PreKey.deserialise(record.serialised);
+          const payload =
+            typeof record.serialised === 'string'
+              ? Decoder.fromBase64(record.serialised).asBytes.buffer
+              : record.serialised;
+          return ProteusKeys.PreKey.deserialise(payload);
         });
       });
   }
 
   public read_session(identity: ProteusKeys.IdentityKeyPair, session_id: string): Promise<ProteusSession.Session> {
-    return this.read<SerialisedRecord>(this.TABLE.SESSIONS, session_id).then((payload: SerialisedRecord) => {
-      return ProteusSession.Session.deserialise(identity, payload.serialised);
+    return this.read<SerialisedRecord>(this.TABLE.SESSIONS, session_id).then((record: SerialisedRecord) => {
+      const payload =
+        typeof record.serialised === 'string'
+          ? Decoder.fromBase64(record.serialised).asBytes.buffer
+          : record.serialised;
+      return ProteusSession.Session.deserialise(identity, payload);
     });
   }
 

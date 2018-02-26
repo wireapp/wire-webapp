@@ -22,7 +22,8 @@ class CryptoboxCRUDStore implements CryptoboxStore {
   }
 
   private from_store(record: PersistedRecord): SerialisedRecord {
-    const decodedData: Buffer = Buffer.from(record.serialised, 'base64');
+    const decodedData: Buffer | ArrayBuffer =
+      typeof record.serialised === 'string' ? Buffer.from(record.serialised, 'base64') : <ArrayBuffer>record.serialised;
 
     return {
       created: record.created,
