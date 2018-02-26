@@ -26,21 +26,17 @@ window.z.viewModel.panel = z.viewModel.panel || {};
 z.viewModel.panel.GuestOptionsViewModel = class GuestOptionsViewModel {
   constructor(mainViewModel, panelViewModel, repositories) {
     this.conversationRepository = repositories.conversation;
+    this.stateHandler = this.conversationRepository.stateHandler;
 
     this.conversationEntity = this.conversationRepository.active_conversation;
 
-    this.isTeamConversation = ko.pureComputed(() => this.conversationEntity() && !!this.conversationEntity().team_id);
-    this.isGuestRoom = ko.pureComputed(() => {
-      if (this.isTeamConversation()) {
-        return this.conversationEntity().accessState() === z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM;
-      }
-    });
-
+    this.isGuestRoom = ko.pureComputed(() => this.conversationEntity() && this.conversationEntity().isGuestRoom());
+    this.isTeamOnly = ko.pureComputed(() => this.conversationEntity() && this.conversationEntity().isTeamOnly());
     this.hasAccessCode = ko.pureComputed(() => (this.isGuestRoom() ? !!this.conversationEntity().accessCode() : false));
 
     this.conversationEntity.subscribe(conversationEntity => {
-      if (this.isGuestRoom() && !conversationEntity.accessCode()) {
-        this.conversationRepository.stateHandler.getAccessCode(conversationEntity);
+      if (conversationEntity.isGuestRoom() && !conversationEntity.accessCode()) {
+        this.stateHandler.getAccessCode(conversationEntity);
       }
     });
   }
@@ -48,28 +44,32 @@ z.viewModel.panel.GuestOptionsViewModel = class GuestOptionsViewModel {
   toggleAccessState() {
     const conversationEntity = this.conversationEntity();
     if (conversationEntity.team_id) {
-      const isGuestRoom = conversationEntity.accessState() === z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM;
-      const accessState = isGuestRoom
-        ? z.conversation.ACCESS_STATE.TEAM.TEAM_ONLY
-        : z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM;
+      const newAccessState = this.isTeamOnly()
+        ? z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM
+        : z.conversation.ACCESS_STATE.TEAM.TEAM_ONLY;
 
-      if (isGuestRoom) {
-        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.REMOVE_GUESTS, {
-          action: () => this.conversationRepository.stateHandler.changeAccessState(conversationEntity, accessState),
-        });
+      if (this.isTeamOnly()) {
+        this.stateHandler.changeAccessState(conversationEntity, newAccessState);
       } else {
-        this.conversationRepository.stateHandler.changeAccessState(conversationEntity, accessState);
+        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.REMOVE_GUESTS, {
+          action: () => this.stateHandler.changeAccessState(conversationEntity, newAccessState),
+        });
       }
     }
   }
 
   requestAccessCode() {
-    return this.conversationRepository.stateHandler.requestAccessCode(this.conversationEntity());
+    // Handle conversations in legacy state
+    const accessStatePromise = this.isGuestRoom()
+      ? Promise.resolve()
+      : this.stateHandler.changeAccessState(this.conversationEntity(), z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM);
+
+    accessStatePromise.then(() => this.stateHandler.requestAccessCode(this.conversationEntity()));
   }
 
   revokeAccessCode() {
     amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.REVOKE_LINK, {
-      action: () => this.conversationRepository.stateHandler.revokeAccessCode(this.conversationEntity()),
+      action: () => this.stateHandler.revokeAccessCode(this.conversationEntity()),
     });
   }
 };

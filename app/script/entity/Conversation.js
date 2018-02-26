@@ -59,6 +59,9 @@ z.entity.Conversation = class Conversation {
     this.is_guest = ko.observable(false);
     this.is_managed = false;
 
+    this.isGuestRoom = ko.pureComputed(() => this.accessState() === z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM);
+    this.isTeamOnly = ko.pureComputed(() => this.accessState() === z.conversation.ACCESS_STATE.TEAM.TEAM_ONLY);
+
     this.is_group = ko.pureComputed(() => {
       const group_type = this.type() === z.conversation.ConversationType.REGULAR;
       const group_conversation = group_type;
