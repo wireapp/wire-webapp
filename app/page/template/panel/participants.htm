@@ -1,12 +1,12 @@
 <div id="participants" class="participants" data-bind="with: $root.participants, css: {'show-participant': $root.participants.showParticipantProfile()}">
   <div class="participants-transition">
 
-    <!-- ko if: stateParticipants() -->
+    <!-- ko if: stateParticipants() && conversationEntity() -->
       <div class="participants-group">
         <div class="participants-group-header">
           <div class="name popover-title">
-            <div data-bind="visible: !isEditing(), text: conversation().display_name(), click: clickToEdit, l10n_tooltip: z.string.tooltip_people_rename" data-uie-name="status-name"></div>
-            <textarea data-bind="visible: isEditing, value: conversation().display_name(), enter: renameConversation, hasFocus: isEditing, resize" maxlength="64" dir="auto" data-uie-name="enter-name"></textarea>
+            <div data-bind="visible: !isEditing(), text: conversationEntity().display_name(), click: clickToEdit, l10n_tooltip: z.string.tooltip_people_rename" data-uie-name="status-name"></div>
+            <textarea data-bind="visible: isEditing, value: conversationEntity().display_name(), enter: renameConversation, hasFocus: isEditing, resize" maxlength="64" dir="auto" data-uie-name="enter-name"></textarea>
           </div>
           <span class="edit icon-edit" data-bind="visible: isEditable() && !isEditing(), click: clickToEdit"></span>
           <div class="people popover-meta text-uppercase" data-bind="l10n_text: {'id': z.string.people_people, 'substitute': participants().length}"></div>
@@ -32,8 +32,8 @@
           <!-- /ko -->
         </div>
         <div class="participants-group-footer">
-          <!-- ko ifnot: conversation().removed_from_conversation()-->
-            <!-- ko ifnot: conversation().is_guest() -->
+          <!-- ko ifnot: conversationEntity().removed_from_conversation()-->
+            <!-- ko ifnot: conversationEntity().is_guest() -->
               <div class="button-icon pull-left" data-bind="click: clickOnAddPeople, attr:{'title': addPeopleTooltip}" data-uie-name="do-add-people">
                 <div class="button-icon icon-people-add"></div>
                 <label data-bind="l10n_text: addActionText"></label>
@@ -49,7 +49,7 @@
           add_people: clickOnAddPeople,
           block: clickToBlock,
           close: clickOnMemberBack,
-          conversation: conversation,
+          conversation: conversationEntity,
           leave: clickToLeave,
           mode: z.components.UserProfile.MODE.PEOPLE,
           pending: clickOnPending,

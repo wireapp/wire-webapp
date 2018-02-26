@@ -47,10 +47,8 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
     this.clickToAddService = this.clickToAddService.bind(this);
 
     this.clickToAcceptInvite = this.clickToAcceptInvite.bind(this);
-    this.clickToCancelRequest = this.clickToCancelRequest.bind(this);
     this.clickToIgnoreInvite = this.clickToIgnoreInvite.bind(this);
     this.clickToSendRequest = this.clickToSendRequest.bind(this);
-    this.clickToShowConversation = this.clickToShowConversation.bind(this);
     this.clickToUnblock = this.clickToUnblock.bind(this);
 
     this.handleSearchInput = this.handleSearchInput.bind(this);
@@ -258,6 +256,10 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
   }
 
   clickOnOther(userEntity, event) {
+    if (userEntity.is_outgoing_request()) {
+      return this.clickOnContact(userEntity);
+    }
+
     this.showServiceConversationList(false);
 
     const createBubble = elementId => {
@@ -412,12 +414,6 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
     this.userRepository.accept_connection_request(userEntity, true);
   }
 
-  clickToCancelRequest() {
-    if (this.userBubble) {
-      this.userBubble.hide();
-    }
-  }
-
   clickToIgnoreInvite(userEntity) {
     this.userRepository.ignore_connection_request(userEntity).then(() => {
       if (this.userBubble) {
@@ -427,10 +423,6 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
   }
 
   clickToSendRequest() {
-    this._closeList();
-  }
-
-  clickToShowConversation() {
     this._closeList();
   }
 

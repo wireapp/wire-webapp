@@ -141,6 +141,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.init_total = 0;
 
     this._init_subscriptions();
+
+    this.stateHandler = new z.conversation.ConversationStateHandler(this.conversation_service, this);
   }
 
   _init_state_updates() {
@@ -208,13 +210,50 @@ z.conversation.ConversationRepository = class ConversationRepository {
    *
    * @param {Array<z.entity.User>} userEntities - Users (excluding the requestor) to be part of the conversation
    * @param {string} [groupName] - Name for the conversation
+   * @param {string} [accessState] - State for conversation access
    * @returns {Promise} Resolves when the conversation was created
    */
-  createGroupConversation(userEntities, groupName) {
+  createGroupConversation(userEntities, groupName, accessState) {
     const userIds = userEntities.map(userEntity => userEntity.id);
+    const payload = {
+      name: groupName,
+      users: userIds,
+    };
+
+    if (this.team().id) {
+      payload.team = {
+        managed: false,
+        teamid: this.team().id,
+      };
+
+      if (accessState) {
+        let accessPayload;
+
+        switch (accessState) {
+          case z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM:
+            accessPayload = {
+              access: [z.conversation.ACCESS_MODE.INVITE, z.conversation.ACCESS_MODE.CODE],
+              access_role: z.conversation.ACCESS_ROLE.NON_VERIFIED,
+            };
+            break;
+          case z.conversation.ACCESS_STATE.TEAM.TEAM_ONLY:
+            accessPayload = {
+              access: [z.conversation.ACCESS_MODE.INVITE],
+              access_role: z.conversation.ACCESS_ROLE.TEAM,
+            };
+            break;
+          default:
+            break;
+        }
+
+        if (accessPayload) {
+          Object.assign(payload, accessPayload);
+        }
+      }
+    }
 
     return this.conversation_service
-      .postConversations(userIds, groupName, this.team().id)
+      .postConversations(payload)
       .then(response => this._onCreate({conversation: response.id, data: response}))
       .then(({conversationEntity}) => conversationEntity)
       .catch(error => this._handleConversationCreateError(error, userIds));
@@ -225,7 +264,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves with the conversation that was created
    */
   createGuestRoom() {
-    return this.createGroupConversation([], z.l10n.text(z.string.guestRoomConversationName));
+    const groupName = z.l10n.text(z.string.guestRoomConversationName);
+    return this.createGroupConversation([], groupName, z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM);
   }
 
   /**
@@ -791,6 +831,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
       this.logger.log(`Handling '${this.init_total}' additional messages on app start`);
       return new Promise((resolve, reject) => (this.init_promise = {reject_fn: reject, resolve_fn: resolve}));
     }
+  }
+
+  joinConversationWithCode(key, code) {
+    return this.conversation_service.postConversationJoin(key, code).then(response => this._onCreate(response));
   }
 
   /**

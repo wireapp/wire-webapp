@@ -203,6 +203,14 @@ z.string.modal_not_connected_message_many = 'One of the people you selected does
 z.string.modal_remove_device_button = 'Remove device';
 z.string.modal_remove_device_headline = 'Remove "{{device}}"';
 z.string.modal_remove_device_message = 'Your password is required to remove the device.';
+// Remove guests
+z.string.modalRemoveGuestsButton = 'Remove guests';
+z.string.modalRemoveGuestsHeadline = 'Turning off guest access?';
+z.string.modalRemoveGuestsMessage = 'Current guest will be removed from the conversation. New guests will not be allowed.';
+// Revoke link
+z.string.modalRevokeLinkButton = 'Revoke link';
+z.string.modalRevokeLinkHeadline = 'Revoking the link?';
+z.string.modalRevokeLinkMessage = 'New guests will not be able to join with this link. Current guests will still have access.';
 // Service unavailable
 z.string.modalServiceUnavailableHeadline = 'Adding service not possible';
 z.string.modalServiceUnavailableMessage = 'The service is unavailable a the moment.';

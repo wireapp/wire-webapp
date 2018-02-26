@@ -527,11 +527,23 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     return this.conversation().get_last_delivered_message() === message_et;
   }
 
-  click_on_cancel_request(message_et) {
-    const next_conversation_et = this.conversation_repository.get_next_conversation(
-      this.conversation_repository.active_conversation()
-    );
-    this.user_repository.cancel_connection_request(message_et.otherUser(), next_conversation_et);
+  click_on_cancel_request(messageEntity) {
+    const userEntity = messageEntity.otherUser();
+
+    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
+      action: () => {
+        const conversationEntity = this.conversation_repository.active_conversation();
+        const nextConversationEntity = this.conversation_repository.get_next_conversation(conversationEntity);
+
+        this.user_repository.cancel_connection_request(userEntity, nextConversationEntity);
+      },
+      text: {
+        action: z.l10n.text(z.string.people_button_yes),
+        message: z.l10n.text(z.string.people_cancel_request_message, userEntity.first_name()),
+        secondary: z.l10n.text(z.string.people_button_no),
+        title: z.l10n.text(z.string.people_cancel_request_headline),
+      },
+    });
   }
 
   click_on_like(message_et, button = true) {

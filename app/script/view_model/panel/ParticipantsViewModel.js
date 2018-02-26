@@ -58,11 +58,17 @@ z.viewModel.panel.ParticipantsViewModel = class ParticipantsViewModel {
     this.elementId = 'participants';
     this.mainViewModel = mainViewModel;
 
-    this.userRepository = repositories.user;
     this.conversationRepository = repositories.conversation;
+    this.userRepository = repositories.user;
     this.integrationRepository = repositories.integration;
     this.teamRepository = repositories.team;
     this.logger = new z.util.Logger('z.viewModel.details.ParticipantsViewModel', z.config.LOGGER.OPTIONS);
+
+    this.conversationEntity = this.conversationRepository.active_conversation;
+    this.conversationEntity.subscribe(() => {
+      this.resetView();
+      this.renderParticipants(true);
+    });
 
     this.state = ko.observable(ParticipantsViewModel.STATE.PARTICIPANTS);
     this.previousState = ko.observable(this.state());
@@ -83,11 +89,15 @@ z.viewModel.panel.ParticipantsViewModel = class ParticipantsViewModel {
       return this.state() === ParticipantsViewModel.STATE.SERVICE_DETAILS;
     });
 
-    this.conversation = ko.observable(new z.entity.Conversation());
-
     this.isTeam = this.teamRepository.isTeam;
     this.team = this.teamRepository.team;
     this.teamUsers = this.teamRepository.teamUsers;
+    this.teamMembers = this.teamRepository.teamMembers;
+
+    this.isTeamOnly = ko.pureComputed(() => {
+      const conversationEntity = this.conversationEntity();
+      return conversationEntity && conversationEntity.accessState() === z.conversation.ACCESS_STATE.TEAM.TEAM_ONLY;
+    });
 
     this.groupMode = ko.observable(false);
 
@@ -99,50 +109,50 @@ z.viewModel.panel.ParticipantsViewModel = class ParticipantsViewModel {
     this.services = this.integrationRepository.services;
 
     ko.computed(() => {
-      const conversationEntity = this.conversation();
-      const sortedUserEntities = []
-        .concat(conversationEntity.participating_user_ets())
-        .sort((userA, userB) => z.util.StringUtil.sort_by_priority(userA.first_name(), userB.first_name()));
+      if (this.conversationEntity()) {
+        const conversationEntity = this.conversationEntity();
+        const sortedUserEntities = []
+          .concat(conversationEntity.participating_user_ets())
+          .sort((userA, userB) => z.util.StringUtil.sort_by_priority(userA.first_name(), userB.first_name()));
 
-      this.participants(sortedUserEntities);
-      this.serviceParticipants.removeAll();
-      this.verifiedParticipants.removeAll();
-      this.unverifiedParticipants.removeAll();
+        this.participants(sortedUserEntities);
+        this.serviceParticipants.removeAll();
+        this.verifiedParticipants.removeAll();
+        this.unverifiedParticipants.removeAll();
 
-      sortedUserEntities.map(userEntity => {
-        if (userEntity.isBot) {
-          return this.serviceParticipants.push(userEntity);
-        }
-        if (userEntity.is_verified()) {
-          return this.verifiedParticipants.push(userEntity);
-        }
-        this.unverifiedParticipants.push(userEntity);
-      });
+        sortedUserEntities.map(userEntity => {
+          if (userEntity.isBot) {
+            return this.serviceParticipants.push(userEntity);
+          }
+          if (userEntity.is_verified()) {
+            return this.verifiedParticipants.push(userEntity);
+          }
+          this.unverifiedParticipants.push(userEntity);
+        });
+      }
     });
 
     this.enableIntegrations = this.integrationRepository.enableIntegrations;
     this.showIntegrations = ko.pureComputed(() => {
-      const hasBotUser = this.conversation().firstUserEntity() && this.conversation().firstUserEntity().isBot;
-      const allowIntegrations = this.conversation().is_group() || hasBotUser;
-      return this.enableIntegrations() && allowIntegrations;
+      const firstUserEntity = this.conversationEntity().firstUserEntity();
+      const hasBotUser = firstUserEntity && firstUserEntity.isBot;
+      const allowIntegrations = this.conversationEntity().is_group() || hasBotUser;
+      return this.enableIntegrations() && allowIntegrations && !this.isTeamOnly();
     });
-
-    // Confirm dialog reference
-    this.confirmDialog = undefined;
 
     // Selected group participant
     this.selectedParticipant = ko.observable(undefined);
     this.selectedService = ko.observable(undefined);
 
     // Switch between div and input field to edit the conversation name
-    this.isEditable = ko.pureComputed(() => !this.conversation().removed_from_conversation());
+    this.isEditable = ko.pureComputed(() => !this.conversationEntity().removed_from_conversation());
     this.isEditing = ko.observable(false);
     this.isEditing.subscribe(value => {
       if (!value) {
         const name = $('.group-header .name span');
         return $('.group-header textarea').css('height', `${name.height()}px`);
       }
-      $('.group-header textarea').val(this.conversation().display_name());
+      $('.group-header textarea').val(this.conversationEntity().display_name());
     });
 
     // @todo create a viewmodel search?
@@ -156,7 +166,9 @@ z.viewModel.panel.ParticipantsViewModel = class ParticipantsViewModel {
 
     this.selectedContacts = ko.observableArray([]);
     this.contacts = ko.pureComputed(() => {
-      const userEntities = this.isTeam() ? this.teamUsers() : this.userRepository.connected_users();
+      const userEntities = this.isTeam()
+        ? this.isTeamOnly() ? this.teamMembers() : this.teamUsers()
+        : this.userRepository.connected_users();
 
       return userEntities
         .filter(userEntity => !this.participants().find(participant => userEntity.id === participant.id))
@@ -184,20 +196,15 @@ z.viewModel.panel.ParticipantsViewModel = class ParticipantsViewModel {
       return false;
     });
     this.showServiceRemove = ko.pureComputed(() => {
-      return this.stateServiceDetails() && !this.conversation().is_guest() && this.selectedIsInConversation();
+      return this.stateServiceDetails() && !this.conversationEntity().is_guest() && this.selectedIsInConversation();
     });
 
     amplify.subscribe(z.event.WebApp.PEOPLE.SHOW, this.showParticipant);
     amplify.subscribe(z.event.WebApp.PEOPLE.TOGGLE, this.toggleParticipantsSidebar.bind(this));
   }
 
-  changeConversation(conversationEntity) {
-    this.conversation(conversationEntity);
-    this.resetView();
-  }
-
   clickOnAddPeople() {
-    if (this.conversation().is_group()) {
+    if (this.conversationEntity().is_group()) {
       this.state(ParticipantsViewModel.STATE.ADD_PEOPLE);
       return $('.participants-search').addClass('participants-search-show');
     }
@@ -211,13 +218,15 @@ z.viewModel.panel.ParticipantsViewModel = class ParticipantsViewModel {
   }
 
   clickOnPending(userEntity) {
-    this.confirmDialog = $('#participants').confirm({
-      cancel: () => this.userRepository.ignore_connection_request(userEntity),
-      confirm: () => this.userRepository.accept_connection_request(userEntity, true),
-      data: {
-        user: this.selectedParticipant(),
+    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
+      action: () => this.userRepository.accept_connection_request(userEntity, true),
+      secondary: () => this.userRepository.ignore_connection_request(userEntity),
+      text: {
+        action: z.l10n.text(z.string.people_button_connect),
+        message: z.l10n.text(z.string.people_connect_message, userEntity.first_name()),
+        secondary: z.l10n.text(z.string.people_button_ignore),
+        title: z.l10n.text(z.string.people_connect_headline),
       },
-      template: '#template-confirm-connect',
     });
   }
 
@@ -253,30 +262,30 @@ z.viewModel.panel.ParticipantsViewModel = class ParticipantsViewModel {
   }
 
   clickToAddMembers() {
-    if (this.conversation().is_group()) {
-      this.conversationRepository.addMembers(this.conversation(), this.selectedContacts());
+    if (this.conversationEntity().is_group()) {
+      this.conversationRepository.addMembers(this.conversationEntity(), this.selectedContacts());
     }
     this.resetView();
   }
 
   clickToAddService() {
     this.integrationRepository
-      .addService(this.conversation(), this.selectedService(), 'conversation_details')
+      .addService(this.conversationEntity(), this.selectedService(), 'conversation_details')
       .then(() => this.resetView());
   }
 
   clickToBlock(userEntity) {
     amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
-
-    this.confirmDialog = $('#participants').confirm({
-      confirm: () => {
-        const nextConversationEntity = this.conversationRepository.get_next_conversation(this.conversation());
+    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
+      action: () => {
+        const nextConversationEntity = this.conversationRepository.get_next_conversation(this.conversationEntity());
         this.userRepository.block_user(userEntity, nextConversationEntity);
       },
-      data: {
-        user: userEntity,
+      text: {
+        action: z.l10n.text(z.string.people_button_block),
+        message: z.l10n.text(z.string.people_block_message, userEntity.first_name()),
+        title: z.l10n.text(z.string.people_block_headline),
       },
-      template: '#template-confirm-block',
     });
   }
 
@@ -288,33 +297,36 @@ z.viewModel.panel.ParticipantsViewModel = class ParticipantsViewModel {
 
   clickToLeave() {
     amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
-
-    this.confirmDialog = $('#participants').confirm({
-      confirm: () => {
+    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
+      action: () => {
         this.conversationRepository
-          .removeMember(this.conversation(), this.userRepository.self().id)
+          .removeMember(this.conversationEntity(), this.userRepository.self().id)
           .then(() => this.resetView());
       },
-      template: '#template-confirm-leave',
+      text: {
+        action: z.l10n.text(z.string.people_button_leave),
+        message: z.l10n.text(z.string.people_leave_message),
+        title: z.l10n.text(z.string.people_leave_headline),
+      },
     });
   }
 
   clickToRemoveMember(userEntity) {
     amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
-
-    this.confirmDialog = $('#participants').confirm({
-      confirm: () => {
-        this.conversationRepository.removeMember(this.conversation(), userEntity.id).then(() => this.resetView());
+    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
+      action: () => {
+        this.conversationRepository.removeMember(this.conversationEntity(), userEntity.id).then(() => this.resetView());
       },
-      data: {
-        user: userEntity,
+      text: {
+        action: z.l10n.text(z.string.people_button_remove),
+        message: z.l10n.text(z.string.people_remove_message, userEntity.first_name()),
+        title: z.l10n.text(z.string.people_remove_headline),
       },
-      template: '#template-confirm-remove',
     });
   }
 
   clickToRemoveService() {
-    this.integrationRepository.removeService(this.conversation(), this.selectedParticipant()).then(response => {
+    this.integrationRepository.removeService(this.conversationEntity(), this.selectedParticipant()).then(response => {
       if (response && this.groupMode()) {
         this.resetView();
       }
@@ -322,22 +334,23 @@ z.viewModel.panel.ParticipantsViewModel = class ParticipantsViewModel {
   }
 
   clickToUnblock(userEntity) {
-    this.confirmDialog = $('#participants').confirm({
-      confirm: () => {
+    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
+      action: () => {
         this.userRepository
           .unblock_user(userEntity)
           .then(() => this.conversationRepository.get_1to1_conversation(userEntity))
           .then(conversationEntity => this.conversationRepository.update_participating_user_ets(conversationEntity));
       },
-      data: {
-        user: userEntity,
+      text: {
+        action: z.l10n.text(z.string.people_button_unblock),
+        message: z.l10n.text(z.string.people_unblock_message, userEntity.first_name()),
+        title: z.l10n.text(z.string.people_unblock_headline),
       },
-      template: '#template-confirm-unblock',
     });
   }
 
   renameConversation(data, event) {
-    const currentConversationName = this.conversation()
+    const currentConversationName = this.conversationEntity()
       .display_name()
       .trim();
     const newConversationName = z.util.StringUtil.remove_line_breaks(event.target.value.trim());
@@ -345,17 +358,15 @@ z.viewModel.panel.ParticipantsViewModel = class ParticipantsViewModel {
     if (newConversationName.length && newConversationName !== currentConversationName) {
       event.target.value = currentConversationName;
       this.isEditing(false);
-      this.conversationRepository.rename_conversation(this.conversation(), newConversationName);
+      this.conversationRepository.rename_conversation(this.conversationEntity(), newConversationName);
     }
   }
 
   resetView() {
+    this.renderParticipants(false);
     this.state(ParticipantsViewModel.STATE.PARTICIPANTS);
     this.selectedContacts.removeAll();
     this.searchInput('');
-    if (this.confirmDialog) {
-      this.confirmDialog.destroy();
-    }
     this.selectedParticipant(undefined);
   }
 
@@ -399,18 +410,17 @@ z.viewModel.panel.ParticipantsViewModel = class ParticipantsViewModel {
       this.resetView();
 
       const [userEntity] = this.participants();
-      const initialUser = userEntity && this.conversation().is_one2one() ? userEntity : undefined;
+      const initialUser = userEntity && this.conversationEntity().is_one2one() ? userEntity : undefined;
       this.selectedParticipant(initialUser);
     }
 
-    if (addPeople && !this.conversation().is_guest()) {
+    if (addPeople && !this.conversationEntity().is_guest()) {
       if (!this.mainViewModel.isPanelOpen()) {
         this.mainViewModel.openPanel();
         return this.clickOnAddPeople();
       }
 
-      const isConfirmingAction = this.confirmDialog && this.confirmDialog.is_visible();
-      if (this.stateAddPeople() || isConfirmingAction) {
+      if (this.stateAddPeople()) {
         return this.mainViewModel.closePanel();
       }
 
