@@ -24,7 +24,7 @@
   min-width: @screen-md-min;
   background-color: @app-bg;
 
-  .left {
+  .left-column {
     position: relative;
     flex: 0 0 auto;
     color: @left-color;
@@ -36,8 +36,58 @@
     }
   }
 
-  .right {
+  .center-column {
     position: relative;
     flex: 1 1 auto;
+  }
+
+  .right-column {
+    transform: scale(1, 1);
+    overflow: hidden;
+    width: 0;
+  }
+}
+
+.app {
+  .center-column {
+    &__overlay {
+      background-color: rgba(0, 0, 0, 0.1);
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+      display: none;
+      opacity: 0;
+    }
+    .conversation-input,
+    #conversation-titlebar {
+      width: 100%;
+    }
+  }
+
+  &.app--panel-open {
+    .center-column {
+    }
+
+    .center-column__overlay {
+      display: block;
+      opacity: 1;
+    }
+
+    .right-column {
+      position: absolute;
+      right: 0;
+      width: @right-width;
+    }
+
+    @media (min-width: 1000px) {
+      .right-column {
+        position: relative;
+      }
+      .center-column__overlay {
+        display: none;
+      }
+    }
   }
 }

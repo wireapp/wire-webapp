@@ -20,10 +20,10 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.ViewModel = z.ViewModel || {};
+window.z.viewModel = z.viewModel || {};
 
 // @formatter:off
-z.ViewModel.AuthViewModel = class AuthViewModel {
+z.viewModel.AuthViewModel = class AuthViewModel {
   static get CONFIG() {
     return {
       FORWARDED_URL_PARAMETERS: [
@@ -39,15 +39,14 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
 
   /**
    * View model for the auth page.
-   *
-   * @param {string} element_id - CSS class of the element where this view should be applied to (like "auth-page")
    * @param {z.main.Auth} auth - App authentication
    */
-  constructor(element_id, auth) {
+  constructor(auth) {
     this.click_on_remove_device_submit = this.click_on_remove_device_submit.bind(this);
 
+    this.elementId = 'auth-page';
     this.auth = auth;
-    this.logger = new z.util.Logger('z.ViewModel.AuthViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger('z.viewModel.AuthViewModel', z.config.LOGGER.OPTIONS);
 
     this.event_tracker = new z.tracking.EventTrackingRepository();
 
@@ -218,14 +217,13 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
       $('html').addClass('development');
     }
 
-    ko.applyBindings(this, document.getElementById(element_id));
+    ko.applyBindings(this, document.getElementById(this.elementId));
 
     this.tabsCheckIntervalId = undefined;
     this.previousHash = undefined;
 
     this._init_base();
-    this._track_app_launch();
-    $(`.${element_id}`).show();
+    $(`.${this.elementId}`).show();
     $('.auth-page-container').css({display: 'flex'});
   }
 
@@ -825,7 +823,6 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
   }
 
   clicked_on_password() {
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.PASSWORD_RESET, {value: 'fromSignIn'});
     z.util.safe_window_open(z.util.URLUtil.build_url(z.util.URLUtil.TYPE.ACCOUNT, z.config.URL_PATH.PASSWORD_RESET));
   }
 
@@ -862,7 +859,6 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
   }
 
   clicked_on_wire_link() {
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.NAVIGATION.OPENED_WIRE_WEBSITE);
     const path = z.l10n.text(z.string.url_website_root);
     z.util.safe_window_open(z.util.URLUtil.build_url(z.util.URLUtil.TYPE.WEBSITE, path));
   }
@@ -1065,9 +1061,6 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     };
 
     this.switch_ui(switch_params);
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ACCOUNT.OPENED_LOGIN, {
-      context: this.visible_method(),
-    });
   }
 
   _show_account_password() {
@@ -1079,9 +1072,6 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     };
 
     this.switch_ui(switch_params);
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ACCOUNT.OPENED_LOGIN, {
-      context: z.auth.AuthView.TYPE.EMAIL,
-    });
   }
 
   _show_account_phone() {
@@ -1093,9 +1083,6 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     };
 
     this.switch_ui(switch_params);
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ACCOUNT.OPENED_LOGIN, {
-      context: z.auth.AuthView.TYPE.PHONE,
-    });
   }
 
   _show_blocked_cookies() {
@@ -1850,26 +1837,11 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
         }
       });
   }
-
-  /**
-   * Track app launch for Localytics
-   * @private
-   * @returns {undefined} No return value
-   */
-  _track_app_launch() {
-    let mechanism = 'direct';
-    if (document.referrer.startsWith('https://wire.com/verify/')) {
-      mechanism = 'email_verify';
-    } else if (document.referrer.startsWith('https://wire.com/forgot/')) {
-      mechanism = 'password_reset';
-    }
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.APP_LAUNCH, {mechanism});
-  }
 };
 
 $(() => {
   if ($('.auth-page').length) {
-    wire.auth.view = new z.ViewModel.AuthViewModel('auth-page', wire.auth);
+    wire.auth.view = new z.viewModel.AuthViewModel(wire.auth);
   }
 });
 

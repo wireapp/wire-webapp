@@ -1,16 +1,15 @@
-<div id="conversation" class="conversation" data-bind="drop_file: $root.conversation_input.on_drop_files">
-  <!-- ko if: $root.conversation_repository.active_conversation() -->
-    <!-- ko ifnot: $root.conversation_repository.active_conversation().is_loaded() -->
+<div id="conversation" class="conversation" data-bind="drop_file: $root.inputBar.on_drop_files">
+  <!-- ko if: $root.conversationRepository.active_conversation() -->
+    <!-- ko ifnot: $root.conversationRepository.active_conversation().is_loaded() -->
       <div class="conversation-loading">
         <div class="icon-spinner spin text-theme"></div>
       </div>
     <!-- /ko -->
 
-    <!-- ko if: $root.conversation_repository.active_conversation().is_loaded() -->
-      #include('content/conversation/conversation-titlebar.htm')
+    <!-- ko if: $root.conversationRepository.active_conversation().is_loaded() -->
+      #include('content/conversation/title-bar.htm')
       #include('content/conversation/message-list.htm')
-      #include('content/conversation/conversation-input.htm')
-      #include('content/conversation/participants.htm')
+      #include('content/conversation/input-bar.htm')
       #include('modal/giphy.htm')
     <!-- /ko -->
   <!-- /ko -->

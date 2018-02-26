@@ -20,20 +20,20 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.ViewModel = z.ViewModel || {};
-window.z.ViewModel.content = z.ViewModel.content || {};
+window.z.viewModel = z.viewModel || {};
+window.z.viewModel.content = z.viewModel.content || {};
 
-z.ViewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewModel {
-  constructor(elementId, preferencesDeviceDetails, clientRepository, conversationRepository, cryptographyRepository) {
+z.viewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewModel {
+  constructor(mainViewModel, contentViewModel, repositories) {
     this.clickOnRemoveDevice = this.clickOnRemoveDevice.bind(this);
     this.clickOnShowDevice = this.clickOnShowDevice.bind(this);
     this.updateDeviceInfo = this.updateDeviceInfo.bind(this);
 
-    this.preferencesDeviceDetails = preferencesDeviceDetails;
-    this.clientRepository = clientRepository;
-    this.conversationRepository = conversationRepository;
-    this.cryptographyRepository = cryptographyRepository;
-    this.logger = new z.util.Logger('z.ViewModel.content.PreferencesDevicesViewModel', z.config.LOGGER.OPTIONS);
+    this.preferencesDeviceDetails = contentViewModel.preferencesDeviceDetails;
+    this.clientRepository = repositories.client;
+    this.conversationRepository = repositories.conversation;
+    this.cryptographyRepository = repositories.cryptography;
+    this.logger = new z.util.Logger('z.viewModel.content.PreferencesDevicesViewModel', z.config.LOGGER.OPTIONS);
 
     this.currentClient = this.clientRepository.currentClient;
     this.displayClientId = ko.pureComputed(() => (this.currentClient() ? this.currentClient().formatId() : []));
@@ -78,11 +78,11 @@ z.ViewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewMo
 
   clickOnShowDevice(clientEntity) {
     this.preferencesDeviceDetails.device(clientEntity);
-    amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICE_DETAILS);
+    amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICE_DETAILS);
   }
 
   clickOnRemoveDevice(clientEntity, event) {
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.REMOVE_DEVICE, {
+    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.WarningsViewModel.TYPE.REMOVE_DEVICE, {
       action: password => this.clientRepository.deleteClient(clientEntity.id, password),
       data: clientEntity.model,
     });

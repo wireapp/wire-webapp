@@ -20,15 +20,14 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.ViewModel = z.ViewModel || {};
+window.z.viewModel = z.viewModel || {};
 
-z.ViewModel.LoadingViewModel = class LoadingViewModel {
-  constructor(elementId, userRepository) {
-    this.userRepository = userRepository;
+z.viewModel.LoadingViewModel = class LoadingViewModel {
+  constructor(mainViewModel, repositories) {
+    this.elementId = 'loading-screen';
+    this.userRepository = repositories.user;
     this.loadingMessage = ko.observable('');
     this.loadingProgress = ko.observable(0);
-
-    this.elementId = elementId;
 
     this.loadingPercentage = ko.pureComputed(() => `${this.loadingProgress()}%`);
 
