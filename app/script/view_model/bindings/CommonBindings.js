@@ -510,6 +510,7 @@ ko.bindingHandlers.in_viewport = (function() {
   }, 300);
 
   window.addEventListener('scroll', notify_listeners, true);
+  notify_listeners();
 
   return {
     init(element, valueAccessor, allBindingsAccessor) {
@@ -518,13 +519,23 @@ ko.bindingHandlers.in_viewport = (function() {
         return (
           box.right >= 0 &&
           box.bottom >= 0 &&
-          box.left <= document.documentElement.clientWidth &&
+          (isChildOfRightPanel(dom_element) || box.left <= document.documentElement.clientWidth) &&
           box.top <= document.documentElement.clientHeight
         );
       }
 
       function _dispose() {
         z.util.ArrayUtil.remove_element(listeners, _check_element);
+      }
+
+      function isChildOfRightPanel(node) {
+        const rightPanel = document.querySelector('#right-column');
+        while ((node = node.parentNode) !== document.body) {
+          if (node === rightPanel) {
+            return true;
+          }
+        }
+        return false;
       }
 
       function _check_element(event) {
