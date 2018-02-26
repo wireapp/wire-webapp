@@ -163,13 +163,21 @@ z.viewModel.panel.ParticipantsViewModel = class ParticipantsViewModel {
 
     this.selectedContacts = ko.observableArray([]);
     this.contacts = ko.pureComputed(() => {
-      const userEntities = this.isTeam()
-        ? this.isTeamOnly() ? this.teamMembers() : this.teamUsers()
-        : this.userRepository.connected_users();
+      let userEntities = [];
 
-      return userEntities
-        .filter(userEntity => !this.participants().find(participant => userEntity.id === participant.id))
-        .sort((userA, userB) => z.util.StringUtil.sort_by_priority(userA.first_name(), userB.first_name()));
+      if (!this.isTeam()) {
+        userEntities = this.userRepository.connected_users();
+      }
+
+      if (this.isTeamOnly()) {
+        userEntities = this.teamMembers().sort((userA, userB) => {
+          return z.util.StringUtil.sort_by_priority(userA.first_name(), userB.first_name());
+        });
+      } else {
+        userEntities = this.teamUsers();
+      }
+
+      return userEntities.filter(userEntity => !this.participants().find(entity => userEntity.id === entity.id));
     });
 
     this.shouldUpdateScrollbar = ko
