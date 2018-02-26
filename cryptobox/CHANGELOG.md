@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="8.1.0"></a>
+# [8.1.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/compare/@wireapp/cryptobox@8.0.16...@wireapp/cryptobox@8.1.0) (2018-02-26)
+
+
+### Features
+
+* **cryptobox:** Supporting Base64-encoded records and ArrayBuffer records ([#304](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/issues/304)) ([2c1facf](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/commit/2c1facf))
+
+
+
+
 <a name="8.0.16"></a>
 ## [8.0.16](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/compare/@wireapp/cryptobox@8.0.15...@wireapp/cryptobox@8.0.16) (2018-02-26)
 
