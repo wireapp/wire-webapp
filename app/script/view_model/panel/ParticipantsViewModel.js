@@ -99,8 +99,6 @@ z.viewModel.panel.ParticipantsViewModel = class ParticipantsViewModel {
       return conversationEntity && conversationEntity.accessState() === z.conversation.ACCESS_STATE.TEAM.TEAM_ONLY;
     });
 
-    this.renderParticipants = ko.observable(false);
-
     this.groupMode = ko.observable(false);
 
     this.participants = ko.observableArray();
@@ -201,7 +199,6 @@ z.viewModel.panel.ParticipantsViewModel = class ParticipantsViewModel {
       return this.stateServiceDetails() && !this.conversationEntity().is_guest() && this.selectedIsInConversation();
     });
 
-    amplify.subscribe(z.event.WebApp.CONTENT.SWITCH, this.switchContent.bind(this));
     amplify.subscribe(z.event.WebApp.PEOPLE.SHOW, this.showParticipant);
     amplify.subscribe(z.event.WebApp.PEOPLE.TOGGLE, this.toggleParticipantsSidebar.bind(this));
   }
@@ -408,13 +405,6 @@ z.viewModel.panel.ParticipantsViewModel = class ParticipantsViewModel {
       .then(providerEntity => this.selectedService().providerName(providerEntity.name));
   }
 
-  switchContent(contentState) {
-    const isConnectionRequests = contentState === z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS;
-    if (isConnectionRequests) {
-      // todo: what to do?
-    }
-  }
-
   toggleParticipantsSidebar(addPeople = false) {
     if (!this.mainViewModel.isPanelOpen()) {
       this.resetView();
@@ -422,8 +412,6 @@ z.viewModel.panel.ParticipantsViewModel = class ParticipantsViewModel {
       const [userEntity] = this.participants();
       const initialUser = userEntity && this.conversationEntity().is_one2one() ? userEntity : undefined;
       this.selectedParticipant(initialUser);
-
-      this.renderParticipants(true);
     }
 
     if (addPeople && !this.conversationEntity().is_guest()) {

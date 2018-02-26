@@ -12,25 +12,23 @@
           <div class="people popover-meta text-uppercase" data-bind="l10n_text: {'id': z.string.people_people, 'substitute': participants().length}"></div>
         </div>
         <div class="participants-group-list">
-          <!-- ko if: renderParticipants -->
-            <user-list params="user: unverifiedParticipants, click: clickOnShowParticipant, mode: z.components.UserList.MODE.COMPACT" data-uie-name="list-unverified"></user-list>
-            <!-- ko if: verifiedParticipants().length -->
-              <div class="participants-group-list-separator">
-                <svg width="16" height="16">
-                  <use xlink:href="#icon-verified"></use>
-                </svg>
-                <span class="label-xs" data-bind="l10n_text: z.string.people_verified"></span>
-                <hr>
-              </div>
-              <user-list params="user: verifiedParticipants, click: clickOnShowParticipant, mode: z.components.UserList.MODE.COMPACT" data-uie-name="list-verified"></user-list>
-            <!-- /ko -->
-            <!-- ko if: serviceParticipants().length -->
-              <div class="participants-group-list-separator">
-                <span class="label-xs" data-bind="l10n_text: z.string.people_services"></span>
-                <hr>
-              </div>
-              <service-list params="services: serviceParticipants, click: clickOnShowParticipant, mode: z.components.ServiceList.MODE.COMPACT" data-uie-name="list-services"></service-list>
-            <!-- /ko -->
+          <user-list params="user: unverifiedParticipants, click: clickOnShowParticipant, mode: z.components.UserList.MODE.COMPACT" data-uie-name="list-unverified"></user-list>
+          <!-- ko if: verifiedParticipants().length -->
+            <div class="participants-group-list-separator">
+              <svg width="16" height="16">
+                <use xlink:href="#icon-verified"></use>
+              </svg>
+              <span class="label-xs" data-bind="l10n_text: z.string.people_verified"></span>
+              <hr>
+            </div>
+            <user-list params="user: verifiedParticipants, click: clickOnShowParticipant, mode: z.components.UserList.MODE.COMPACT" data-uie-name="list-verified"></user-list>
+          <!-- /ko -->
+          <!-- ko if: serviceParticipants().length -->
+            <div class="participants-group-list-separator">
+              <span class="label-xs" data-bind="l10n_text: z.string.people_services"></span>
+              <hr>
+            </div>
+            <service-list params="services: serviceParticipants, click: clickOnShowParticipant, mode: z.components.ServiceList.MODE.COMPACT" data-uie-name="list-services"></service-list>
           <!-- /ko -->
         </div>
         <div class="participants-group-footer">

@@ -383,10 +383,9 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
   /**
    * Triggered when user clicks on an avatar in the message list.
    * @param {z.entity.User} user_et - User entity of the selected user
-   * @param {DOMElement} element - Selected DOMElement
    * @returns {undefined} No return value
    */
-  on_message_user_click(user_et, element) {
+  on_message_user_click(user_et) {
     amplify.publish(z.event.WebApp.PEOPLE.SHOW, user_et);
   }
 
