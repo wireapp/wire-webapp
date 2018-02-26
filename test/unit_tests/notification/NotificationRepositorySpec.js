@@ -82,12 +82,10 @@ describe('z.notification.NotificationRepository', () => {
           },
           view: {
             content: {
-              content_state: ko.observable(z.ViewModel.content.CONTENT_STATE.CONVERSATION),
               multitasking: {
-                is_minimized() {
-                  return true;
-                },
+                isMinimized: () => true,
               },
+              state: ko.observable(z.viewModel.ContentViewModel.STATE.CONVERSATION),
             },
           },
         };
@@ -223,7 +221,7 @@ describe('z.notification.NotificationRepository', () => {
         .then(() => {
           expect(TestFactory.notification_repository._showNotification).not.toHaveBeenCalled();
 
-          window.wire.app.view.content.multitasking.is_minimized = () => false;
+          window.wire.app.view.content.multitasking.isMinimized = () => false;
 
           TestFactory.notification_repository.notify(message_et, undefined, conversation_et).then(() => {
             expect(TestFactory.notification_repository._showNotification).toHaveBeenCalledTimes(1);

@@ -551,7 +551,7 @@ z.notification.NotificationRepository = class NotificationRepository {
           return () => amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationId);
         case z.message.SystemMessageType.CONNECTION_REQUEST:
           return () => {
-            amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS);
+            amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS);
           };
         default:
           const message = `No notification trigger for message '${messageEntity.id} in '${conversationId}'.`;
@@ -647,12 +647,12 @@ z.notification.NotificationRepository = class NotificationRepository {
   // Request browser permission for notifications.
   _requestPermission() {
     return new Promise(resolve => {
-      amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.REQUEST_NOTIFICATION);
+      amplify.publish(z.event.WebApp.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.REQUEST_NOTIFICATION);
       // Note: The callback will be only triggered in Chrome.
       // If you ignore a permission request on Firefox, then the callback will not be triggered.
       if (window.Notification.requestPermission) {
         window.Notification.requestPermission(permissionState => {
-          amplify.publish(z.event.WebApp.WARNING.DISMISS, z.ViewModel.WarningType.REQUEST_NOTIFICATION);
+          amplify.publish(z.event.WebApp.WARNING.DISMISS, z.viewModel.WarningsViewModel.TYPE.REQUEST_NOTIFICATION);
           return this.setPermissionState(permissionState).then(resolve);
         });
       }
@@ -696,8 +696,8 @@ z.notification.NotificationRepository = class NotificationRepository {
     const inActiveConversation = conversationEntity
       ? this.conversationRepository.is_active_conversation(conversationEntity)
       : false;
-    const inConversationView = wire.app.view.content.content_state() === z.ViewModel.content.CONTENT_STATE.CONVERSATION;
-    const inMaximizedCall = this.callingRepository.joinedCall() && !wire.app.view.content.multitasking.is_minimized();
+    const inConversationView = wire.app.view.content.state() === z.viewModel.ContentViewModel.STATE.CONVERSATION;
+    const inMaximizedCall = this.callingRepository.joinedCall() && !wire.app.view.content.multitasking.isMinimized();
 
     const activeConversation = document.hasFocus() && inConversationView && inActiveConversation && !inMaximizedCall;
     const messageFromSelf = messageEntity.user().is_me;
@@ -754,7 +754,7 @@ z.notification.NotificationRepository = class NotificationRepository {
     notification.onclick = () => {
       amplify.publish(z.event.WebApp.NOTIFICATION.CLICK);
       window.focus();
-      wire.app.view.content.multitasking.is_minimized(true);
+      wire.app.view.content.multitasking.isMinimized(true);
       notificationContent.trigger();
       this.logger.info(`Notification for message '${messageId} in conversation '${conversationId}' closed by click.`);
       notification.close();

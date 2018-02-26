@@ -20,7 +20,8 @@
 'use strict';
 
 window.z = window.z || {};
-z.ViewModel = z.ViewModel || {};
+window.z.viewModel = z.viewModel || {};
+window.z.viewModel.content = z.viewModel.content || {};
 
 const EMOJI_LIST_LENGTH = 5;
 const EMOJI_LIST_OFFSET_LEFT = 8;
@@ -93,8 +94,8 @@ const EMOJI_INLINE_REPLACEMENT = [
 
 const EMOJI_INLINE_MAX_LENGTH = Math.max(...EMOJI_INLINE_REPLACEMENT.map(item => item.shortcut.length));
 
-z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewModel {
-  constructor(properties_repository) {
+z.viewModel.content.EmojiInputViewModel = class EmojiInputViewModel {
+  constructor(mainViewModel, contentViewModel, repositories) {
     this.remove_emoji_popup = this.remove_emoji_popup.bind(this);
     this.updated_emoji_replace_preference = this.updated_emoji_replace_preference.bind(this);
 
@@ -107,7 +108,7 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
     this.emoji_start_pos = -1;
     this.emoji_usage_count = z.util.StorageUtil.get_value(z.storage.StorageKey.CONVERSATION.EMOJI_USAGE_COUNT) || {};
 
-    this.should_replace_inline_emoji = properties_repository.getPreference(
+    this.should_replace_inline_emoji = repositories.properties.getPreference(
       z.properties.PROPERTIES_TYPE.EMOJI.REPLACE_INLINE
     );
 

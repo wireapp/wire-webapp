@@ -20,144 +20,120 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.ViewModel = z.ViewModel || {};
-window.z.ViewModel.content = z.ViewModel.content || {};
+window.z.viewModel = z.viewModel || {};
+window.z.viewModel.content = z.viewModel.content || {};
 
-// Parent: z.ViewModel.ContentViewModel
-z.ViewModel.content.CollectionViewModel = class CollectionViewModel {
-  constructor(element_id, conversation_repository, collection_details) {
-    this.added_to_view = this.added_to_view.bind(this);
-    this.click_on_message = this.click_on_message.bind(this);
-    this.item_added = this.item_added.bind(this);
-    this.item_removed = this.item_removed.bind(this);
-    this.on_input_change = this.on_input_change.bind(this);
-    this.removed_from_view = this.removed_from_view.bind(this);
-    this.search_in_conversation = this.search_in_conversation.bind(this);
-    this.set_conversation = this.set_conversation.bind(this);
+// Parent: z.viewModel.ContentViewModel
+z.viewModel.content.CollectionViewModel = class CollectionViewModel {
+  constructor(mainViewModel, contentViewModel, repositories) {
+    this.addedToView = this.addedToView.bind(this);
+    this.clickOnMessage = this.clickOnMessage.bind(this);
+    this.itemAdded = this.itemAdded.bind(this);
+    this.itemRemoved = this.itemRemoved.bind(this);
+    this.onInputChange = this.onInputChange.bind(this);
+    this.removedFromView = this.removedFromView.bind(this);
+    this.searchInConversation = this.searchInConversation.bind(this);
+    this.setConversation = this.setConversation.bind(this);
 
-    this.conversation_repository = conversation_repository;
-    this.collection_details = collection_details;
-    this.logger = new z.util.Logger('z.ViewModel.CollectionViewModel', z.config.LOGGER.OPTIONS);
+    this.collectionDetails = contentViewModel.collectionDetails;
+    this.conversation_repository = repositories.conversation;
+    this.logger = new z.util.Logger('z.viewModel.CollectionViewModel', z.config.LOGGER.OPTIONS);
 
-    this.conversation_et = ko.observable();
+    this.conversationEntity = ko.observable();
 
     this.audio = ko.observableArray().extend({rateLimit: 1});
     this.files = ko.observableArray().extend({rateLimit: 1});
     this.images = ko.observableArray().extend({rateLimit: 1});
     this.links = ko.observableArray().extend({rateLimit: 1});
 
-    this.search_input = ko.observable('');
-    this.no_items_found = ko.pureComputed(() => {
-      return this.images().length + this.files().length + this.links().length + this.audio().length === 0;
-    });
+    this.searchInput = ko.observable('');
   }
 
-  added_to_view() {
-    amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.ADDED, this.item_added);
-    amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, this.item_removed);
-    $(document).on('keydown.collection', keyboard_event => {
-      if (z.util.KeyboardUtil.isEscapeKey(keyboard_event)) {
-        amplify.publish(z.event.WebApp.CONVERSATION.SHOW, this.conversation_et());
+  addedToView() {
+    amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.ADDED, this.itemAdded);
+    amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, this.itemRemoved);
+    $(document).on('keydown.collection', keyboardEvent => {
+      if (z.util.KeyboardUtil.isEscapeKey(keyboardEvent)) {
+        amplify.publish(z.event.WebApp.CONVERSATION.SHOW, this.conversationEntity());
       }
     });
   }
 
-  search_in_conversation(query) {
-    return this.conversation_repository.search_in_conversation(this.conversation_et(), query);
+  searchInConversation(query) {
+    return this.conversation_repository.searchInConversation(this.conversationEntity(), query);
   }
 
-  on_input_change(input) {
-    this.search_input(input || '');
+  onInputChange(input) {
+    this.searchInput(input || '');
   }
 
-  on_result() {
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.COLLECTION.ENTERED_SEARCH);
-  }
-
-  item_added(message_et) {
-    if (this.conversation_et().id === message_et.conversation_id) {
-      this._populate_items([message_et]);
+  itemAdded(messageEntity) {
+    const isExpectedId = this.conversationEntity().id === messageEntity.conversation_id;
+    if (isExpectedId) {
+      this._populate_items([messageEntity]);
     }
   }
 
-  item_removed(removed_message_id) {
-    const _remove_item = message_et => message_et.id === removed_message_id;
-    [this.audio, this.files, this.images, this.links].forEach(array => array.remove(_remove_item));
+  itemRemoved(removedMessageId) {
+    const _removeItem = messageEntity => messageEntity.id === removedMessageId;
+    [this.audio, this.files, this.images, this.links].forEach(array => array.remove(_removeItem));
   }
 
-  removed_from_view() {
-    amplify.unsubscribe(z.event.WebApp.CONVERSATION.MESSAGE.ADDED, this.item_added);
-    amplify.unsubscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, this.item_removed);
+  removedFromView() {
+    amplify.unsubscribe(z.event.WebApp.CONVERSATION.MESSAGE.ADDED, this.itemAdded);
+    amplify.unsubscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, this.itemRemoved);
     $(document).off('keydown.collection');
-    this.conversation_et(null);
-    this.search_input('');
+    this.conversationEntity(null);
+    this.searchInput('');
     [this.images, this.files, this.links, this.audio].forEach(array => array.removeAll());
   }
 
-  set_conversation(conversation_et = this.conversation_repository.active_conversation()) {
-    if (conversation_et) {
-      this.conversation_et(conversation_et);
+  setConversation(conversationEntity = this.conversation_repository.active_conversation()) {
+    if (conversationEntity) {
+      this.conversationEntity(conversationEntity);
 
       this.conversation_repository
-        .get_events_for_category(conversation_et, z.message.MessageCategory.LINK_PREVIEW)
-        .then(message_ets => this._populate_items(message_ets))
-        .then(() => this._track_opened_collection(conversation_et, this.no_items_found()));
+        .get_events_for_category(conversationEntity, z.message.MessageCategory.LINK_PREVIEW)
+        .then(messageEntities => this._populate_items(messageEntities));
     }
   }
 
-  _populate_items(message_ets) {
-    message_ets.map(message_et => {
+  _populate_items(messageEntities) {
+    messageEntities.map(messageEntity => {
       // TODO: create binary map helper
-      if (
-        message_et.category & z.message.MessageCategory.IMAGE &&
-        !(message_et.category & z.message.MessageCategory.GIF)
-      ) {
-        this.images.push(message_et);
-      } else if (message_et.category & z.message.MessageCategory.FILE) {
-        if (message_et.get_first_asset().is_audio()) {
-          this.audio.push(message_et);
-        } else {
-          this.files.push(message_et);
-        }
-      } else if (message_et.category & z.message.MessageCategory.LINK_PREVIEW) {
-        this.links.push(message_et);
+      const isImage = messageEntity.category & z.message.MessageCategory.IMAGE;
+      const isGif = messageEntity.category & z.message.MessageCategory.GIF;
+      if (isImage && !isGif) {
+        return this.images.push(messageEntity);
+      }
+
+      const isFile = messageEntity.category & z.message.MessageCategory.FILE;
+      if (isFile) {
+        const isAudio = messageEntity.get_first_asset().is_audio();
+        return isAudio ? this.audio.push(messageEntity) : this.files.push(messageEntity);
+      }
+
+      const isLinkPreview = messageEntity.category & z.message.MessageCategory.LINK_PREVIEW;
+      if (isLinkPreview) {
+        this.links.push(messageEntity);
       }
     });
   }
 
-  click_on_message(message_et) {
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.COLLECTION.SELECTED_SEARCH_RESULT);
-    amplify.publish(z.event.WebApp.CONVERSATION.SHOW, this.conversation_et(), message_et);
+  clickOnMessage(messageEntity) {
+    amplify.publish(z.event.WebApp.CONVERSATION.SHOW, this.conversationEntity(), messageEntity);
   }
 
-  click_on_back_button() {
-    amplify.publish(z.event.WebApp.CONVERSATION.SHOW, this.conversation_et());
+  clickOnBackButton() {
+    amplify.publish(z.event.WebApp.CONVERSATION.SHOW, this.conversationEntity());
   }
 
-  click_on_section(category, items) {
-    this.collection_details.set_conversation(this.conversation_et(), category, [].concat(items));
-    amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.ViewModel.content.CONTENT_STATE.COLLECTION_DETAILS);
+  clickOnSection(category, items) {
+    this.collectionDetails.setConversation(this.conversationEntity(), category, [].concat(items));
+    amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.COLLECTION_DETAILS);
   }
 
-  click_on_image(message_et) {
-    amplify.publish(z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW, message_et, this.images(), 'collection');
-    this._track_opened_item(this.conversation_et(), 'image');
-  }
-
-  _track_opened_collection(conversation_et, is_empty) {
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.COLLECTION.OPENED_COLLECTIONS, {
-      conversation_type: z.tracking.helpers.get_conversation_type(conversation_et),
-      is_empty: is_empty,
-      with_search_result: false,
-      with_service: conversation_et.isWithBot(),
-    });
-  }
-
-  _track_opened_item(conversation_et, type) {
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.COLLECTION.OPENED_ITEM, {
-      conversation_type: z.tracking.helpers.get_conversation_type(conversation_et),
-      type: type,
-      with_service: conversation_et.isWithBot(),
-    });
+  clickOnImage(messageEntity) {
+    amplify.publish(z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW, messageEntity, this.images(), 'collection');
   }
 };

@@ -251,6 +251,8 @@ z.string.conversation_just_now = 'Just now';
 z.string.conversation_location_link = 'Open Map';
 z.string.conversation_member_join = ' added {{users}}';
 z.string.conversation_member_join_you = ' added {{users}}';
+z.string.conversationMemberJoinSelf = ' joined';
+z.string.conversationMemberJoinSelfYou = ' joined';
 z.string.conversation_member_leave_left = ' left';
 z.string.conversation_member_leave_left_you = ' left';
 z.string.conversation_member_leave_removed = ' removed {{users}}';
@@ -302,6 +304,9 @@ z.string.groupCreationParticipantsActionSkip = 'Skip';
 z.string.groupCreationParticipantsHeader = 'Add people';
 z.string.groupCreationParticipantsHeaderWithCounter = 'Add people ({{number}})';
 z.string.groupCreationParticipantsPlaceholder = 'Search by name';
+
+// Guest room
+z.string.guestRoomConversationName = 'Guest room';
 
 // Collection
 z.string.collection_show_all = 'Show all {{number}}';
@@ -532,6 +537,7 @@ z.string.search_connect = 'Connect';
 z.string.search_connections = 'Connections';
 z.string.search_contacts = 'Contacts';
 z.string.searchCreateGroup = 'Create group';
+z.string.searchCreateGuestRoom = 'Create guest room';
 z.string.search_groups = 'Groups';
 z.string.search_people = 'People';
 z.string.search_placeholder = 'Search by name or username';

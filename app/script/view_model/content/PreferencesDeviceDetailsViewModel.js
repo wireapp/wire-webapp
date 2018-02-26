@@ -20,10 +20,10 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.ViewModel = z.ViewModel || {};
-window.z.ViewModel.content = z.ViewModel.content || {};
+window.z.viewModel = z.viewModel || {};
+window.z.viewModel.content = z.viewModel.content || {};
 
-z.ViewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceDetailsViewModel {
+z.viewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceDetailsViewModel {
   static get SESSION_RESET_STATE() {
     return {
       CONFIRMATION: 'confirmation',
@@ -32,11 +32,11 @@ z.ViewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
     };
   }
 
-  constructor(elementId, clientRepository, conversationRepository, cryptographyRepository) {
-    this.clientRepository = clientRepository;
-    this.conversationRepository = conversationRepository;
-    this.cryptographyRepository = cryptographyRepository;
-    this.logger = new z.util.Logger('z.ViewModel.content.PreferencesDeviceDetailsViewModel', z.config.LOGGER.OPTIONS);
+  constructor(mainViewModel, contentViewModel, repositories) {
+    this.clientRepository = repositories.client;
+    this.conversationRepository = repositories.conversation;
+    this.cryptographyRepository = repositories.cryptography;
+    this.logger = new z.util.Logger('z.viewModel.content.PreferencesDeviceDetailsViewModel', z.config.LOGGER.OPTIONS);
 
     this.selfUser = this.clientRepository.selfUser;
 
@@ -94,7 +94,7 @@ z.ViewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
   }
 
   clickOnDetailsClose() {
-    amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES);
+    amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICES);
     this.device(null);
   }
 
@@ -121,7 +121,7 @@ z.ViewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
 
   clickOnRemoveDevice() {
     // @todo Add failure case ux WEBAPP-3570
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.REMOVE_DEVICE, {
+    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.WarningsViewModel.TYPE.REMOVE_DEVICE, {
       action: password => {
         this.clientRepository
           .deleteClient(this.device().id, password)

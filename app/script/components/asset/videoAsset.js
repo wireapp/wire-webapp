@@ -67,7 +67,6 @@ z.components.VideoAssetComponent = class VideoAssetComponent {
 
   on_loadedmetadata() {
     this.video_time(this.video_element.duration);
-    this._send_tracking_event();
   }
 
   on_timeupdate() {
@@ -106,15 +105,6 @@ z.components.VideoAssetComponent = class VideoAssetComponent {
 
   on_video_playing() {
     this.video_element.style.backgroundColor = '#000';
-  }
-
-  _send_tracking_event() {
-    const duration = Math.floor(this.video_element.duration);
-
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.PLAYED_VIDEO_MESSAGE, {
-      duration: z.util.bucket_values(duration, [0, 10, 30, 60, 300, 900, 1800]),
-      duration_actual: duration,
-    });
   }
 
   dispose() {
