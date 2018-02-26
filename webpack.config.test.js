@@ -22,14 +22,11 @@ const path = require('path');
 const prodConfig = require('./webpack.config.prod');
 const commonConfig = require('./webpack.config.common');
 
-// https://github.com/babel/babel-loader/issues/149
-const babelSettings = {
-  extends: path.join(__dirname, '/.babelrc'),
-};
-
 module.exports = Object.assign({}, prodConfig, {
-  devtool: false,
-  entry: false,
+  devtool: 'inline-source-map',
+  entry: Object.assign(prodConfig.entry, {
+    test: path.resolve(__dirname, 'test', 'index.test.js'),
+  }),
   externals: Object.assign(prodConfig.externals, {
     // These will help enable enzyme to work properly
     cheerio: 'window',
@@ -37,18 +34,6 @@ module.exports = Object.assign({}, prodConfig, {
     'react/lib/ExecutionEnvironment': true,
     'react/lib/ReactContext': true,
   }),
-  module: {
-    rules: [
-      {
-        test: /\.jsx?$/,
-        use: [
-          {
-            loader: `babel-loader?${JSON.stringify(babelSettings)}`,
-          },
-        ],
-      },
-    ],
-  },
   plugins: [
     ...commonConfig.plugins,
     new webpack.DefinePlugin({
