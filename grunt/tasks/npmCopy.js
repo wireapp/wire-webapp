@@ -23,14 +23,14 @@ module.exports = grunt =>
   grunt.registerTask('npmCopy', () => {
     const distPath = grunt.config('dir.dist');
 
-    const modules = {
+    const npmModules = {
       '@wireapp/cryptobox': ['dist/cryptobox.bundle.js'],
     };
 
-    Object.keys(modules).forEach(module => {
-      const moduleFiles = modules[module];
+    Object.keys(npmModules).forEach(module => {
+      const moduleFiles = npmModules[module];
       moduleFiles.forEach(file =>
-        grunt.file.copy(`node_modules/${module}/${modules[module]}`, `${distPath}/ext/js/${module}/${file}`)
+        grunt.file.copy(`node_modules/${module}/${npmModules[module]}`, `${distPath}/ext/js/${module}/${file}`)
       );
     });
   });
