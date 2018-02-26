@@ -96,7 +96,7 @@ z.viewModel.ContentViewModel = class ContentViewModel {
           this.preferencesAV.initiateDevices();
           break;
         case ContentViewModel.STATE.PREFERENCES_DEVICES:
-          this.preferencesDevices.update_device_info();
+          this.preferencesDevices.updateDeviceInfo();
           break;
         case ContentViewModel.STATE.COLLECTION:
           this.collection.setConversation(this.previousConversation);
