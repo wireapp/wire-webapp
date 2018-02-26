@@ -78,8 +78,8 @@ z.ViewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
     this.nameInput.subscribe(() => this.nameError(''));
     this.stateIsPreferences.subscribe(stateIsPreference => {
       if (stateIsPreference) {
-        return $(document).on('keydown.groupCreation', keyboard_event => {
-          if (z.util.KeyboardUtil.isEscapeKey(keyboard_event)) {
+        return $(document).on('keydown.groupCreation', keyboardEvent => {
+          if (z.util.KeyboardUtil.isEscapeKey(keyboardEvent)) {
             this._hideModal();
           }
         });
@@ -173,10 +173,6 @@ z.ViewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
 
       this.state(GroupCreationViewModel.STATE.PARTICIPANTS);
     }
-  }
-
-  _normalizeNameInput() {
-    return this.nameInput().trim();
   }
 
   _afterHideModal() {
