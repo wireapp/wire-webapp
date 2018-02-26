@@ -420,7 +420,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
       .encrypt(sessionId, genericMessage.toArrayBuffer())
       .then(cipherText => ({cipherText: z.util.array_to_base64(cipherText), sessionId}))
       .catch(error => {
-        if (error instanceof cryptobox.store.error.RecordNotFoundError) {
+        if (error.constructor.name === 'RecordNotFoundError') {
           this.logger.log(`Session '${sessionId}' needs to get initialized...`);
           return {sessionId};
         }
