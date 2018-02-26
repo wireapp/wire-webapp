@@ -31,7 +31,7 @@
  |
  */
 module.exports = {
-  files: ['dist/demo.js', 'index.html'],
+  files: ['dist/api-client.demo.bundle.js', 'index.html'],
   server: {
     directory: false,
   },

@@ -20,19 +20,19 @@
 const pkg = require('./package.json');
 const webpack = require('webpack');
 
-const repositoryName = 'wire-web-api-client';
+const projectName = pkg.name.replace('@wireapp/', '');
 const camelCasedRepositoryName = 'wireWebApiClient';
 
 module.exports = {
   entry: {
-    client: `${__dirname}/dist/commonjs/Client.js`,
+    [projectName]: `${__dirname}/${pkg.main}`,
   },
   externals: {
     dexie: 'Dexie',
     'fs-extra': '{}',
   },
   output: {
-    filename: `${repositoryName}.min.js`,
+    filename: `[name].bundle.js`,
     library: `${camelCasedRepositoryName}`,
     path: `${__dirname}/dist`,
   },

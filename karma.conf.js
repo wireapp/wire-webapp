@@ -17,7 +17,10 @@
  *
  */
 
+const pkg = require('./package.json');
+
 const dist = 'dist/';
+const projectName = pkg.name.replace('@wireapp/', '');
 
 const preprocessors = {};
 preprocessors['**/*.js'] = ['sourcemap'];
@@ -38,7 +41,7 @@ module.exports = function(config) {
         flags: ['--no-sandbox'],
       },
     },
-    files: [`${dist}test.js`],
+    files: [`${dist}${projectName}.test.bundle.js`],
     frameworks: ['jasmine'],
     logLevel: config.LOG_INFO,
     port: 9876,
