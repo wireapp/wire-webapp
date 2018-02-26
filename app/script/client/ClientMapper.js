@@ -49,7 +49,7 @@ z.client.ClientMapper = class ClientMapper {
     }
 
     if (clientPayload.meta) {
-      const {userId} = z.client.ClientEntity.dismantleUserClientId(clientPayload.meta.primaryKey);
+      const {userId} = z.client.ClientEntity.dismantleUserClientId(clientPayload.meta.primary_key);
 
       clientEntity.meta.isVerified(clientPayload.meta.is_verified);
       clientEntity.meta.primaryKey = clientPayload.meta.primary_key;
