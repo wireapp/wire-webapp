@@ -453,9 +453,9 @@ z.client.ClientRepository = class ClientRepository {
   }
 
   removeLocalClient() {
-    this.cryptographyRepository.storage_repository.deleteCryptographyStores().then(() => {
-      const isTemporaryClient = this.currentClient().isTemporary();
-      amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SIGN_OUT_REASON.CLIENT_REMOVED, isTemporaryClient);
+    this.cryptographyRepository.storageRepository.deleteCryptographyStores().then(() => {
+      const shouldClearData = this.currentClient().isTemporary();
+      amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SIGN_OUT_REASON.CLIENT_REMOVED, shouldClearData);
     });
   }
 

@@ -91,7 +91,6 @@ z.ViewModel.WarningsViewModel = class WarningsViewModel {
     });
 
     this.first_name = ko.observable();
-    this.call_id = undefined;
 
     this.warning_dimmed = ko
       .pureComputed(
@@ -160,7 +159,6 @@ z.ViewModel.WarningsViewModel = class WarningsViewModel {
     this.logger.warn(`Showing warning of type '${type}'`);
     if (info) {
       this.first_name(info.first_name);
-      this.call_id = info.call_id;
     }
     this.warnings.push(type);
   }

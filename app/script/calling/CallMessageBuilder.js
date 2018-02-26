@@ -22,139 +22,121 @@
 window.z = window.z || {};
 window.z.calling = z.calling || {};
 
-z.calling.CallMessageBuilder = (function() {
-  const _build_call_message = function(type, response, session_id, additional_payload) {
-    const call_message_et = new z.calling.entities.CallMessage(type, response, session_id);
+z.calling.CallMessageBuilder = (() => {
+  const _buildCallMessage = (type, response, sessionId, additionalPayload) => {
+    const callMessageEntity = new z.calling.entities.CallMessageEntity(type, response, sessionId);
 
-    if (additional_payload) {
-      call_message_et.add_properties(additional_payload);
+    if (additionalPayload) {
+      callMessageEntity.addProperties(additionalPayload);
     }
 
-    return call_message_et;
+    return callMessageEntity;
   };
 
-  const _build_cancel = function(response, session_id, additional_payload) {
-    return _build_call_message(z.calling.enum.CALL_MESSAGE_TYPE.CANCEL, response, session_id, additional_payload);
+  const _buildCancel = (response, sessionId, additionalPayload) => {
+    return _buildCallMessage(z.calling.enum.CALL_MESSAGE_TYPE.CANCEL, response, sessionId, additionalPayload);
   };
 
-  const _build_group_check = function(response, session_id, additional_payload) {
-    return _build_call_message(z.calling.enum.CALL_MESSAGE_TYPE.GROUP_CHECK, response, session_id, additional_payload);
+  const _buildGroupCheck = (response, sessionId, additionalPayload) => {
+    return _buildCallMessage(z.calling.enum.CALL_MESSAGE_TYPE.GROUP_CHECK, response, sessionId, additionalPayload);
   };
 
-  const _build_group_leave = function(response, session_id, additional_payload) {
-    return _build_call_message(z.calling.enum.CALL_MESSAGE_TYPE.GROUP_LEAVE, response, session_id, additional_payload);
+  const _buildGroupLeave = (response, sessionId, additionalPayload) => {
+    return _buildCallMessage(z.calling.enum.CALL_MESSAGE_TYPE.GROUP_LEAVE, response, sessionId, additionalPayload);
   };
 
-  const _build_group_setup = function(response, session_id, additional_payload) {
-    return _build_call_message(z.calling.enum.CALL_MESSAGE_TYPE.GROUP_SETUP, response, session_id, additional_payload);
+  const _buildGroupSetup = (response, sessionId, additionalPayload) => {
+    return _buildCallMessage(z.calling.enum.CALL_MESSAGE_TYPE.GROUP_SETUP, response, sessionId, additionalPayload);
   };
 
-  const _build_group_start = function(response, session_id, additional_payload) {
-    return _build_call_message(z.calling.enum.CALL_MESSAGE_TYPE.GROUP_START, response, session_id, additional_payload);
+  const _buildGroupStart = (response, sessionId, additionalPayload) => {
+    return _buildCallMessage(z.calling.enum.CALL_MESSAGE_TYPE.GROUP_START, response, sessionId, additionalPayload);
   };
 
-  const _build_hangup = function(response, session_id, additional_payload) {
-    return _build_call_message(z.calling.enum.CALL_MESSAGE_TYPE.HANGUP, response, session_id, additional_payload);
+  const _buildHangup = (response, sessionId, additionalPayload) => {
+    return _buildCallMessage(z.calling.enum.CALL_MESSAGE_TYPE.HANGUP, response, sessionId, additionalPayload);
   };
 
-  const _build_prop_sync = function(response, session_id, additional_payload) {
-    return _build_call_message(z.calling.enum.CALL_MESSAGE_TYPE.PROP_SYNC, response, session_id, additional_payload);
+  const _buildPropSync = (response, sessionId, additionalPayload) => {
+    return _buildCallMessage(z.calling.enum.CALL_MESSAGE_TYPE.PROP_SYNC, response, sessionId, additionalPayload);
   };
 
-  const _build_reject = function(response, session_id, additional_payload) {
-    return _build_call_message(z.calling.enum.CALL_MESSAGE_TYPE.REJECT, response, session_id, additional_payload);
+  const _buildReject = (response, sessionId, additionalPayload) => {
+    return _buildCallMessage(z.calling.enum.CALL_MESSAGE_TYPE.REJECT, response, sessionId, additionalPayload);
   };
 
-  const _build_setup = function(response, session_id, additional_payload) {
-    return _build_call_message(z.calling.enum.CALL_MESSAGE_TYPE.SETUP, response, session_id, additional_payload);
+  const _buildSetup = (response, sessionId, additionalPayload) => {
+    return _buildCallMessage(z.calling.enum.CALL_MESSAGE_TYPE.SETUP, response, sessionId, additionalPayload);
   };
 
-  const _build_update = function(response, session_id, additional_payload) {
-    return _build_call_message(z.calling.enum.CALL_MESSAGE_TYPE.UPDATE, response, session_id, additional_payload);
+  const _buildUpdate = (response, sessionId, additionalPayload) => {
+    return _buildCallMessage(z.calling.enum.CALL_MESSAGE_TYPE.UPDATE, response, sessionId, additionalPayload);
   };
 
   /**
    * Create additional payload.
    *
-   * @param {string} conversation_id - ID of conversation
-   * @param {string} self_user_id - ID of self user
-   * @param {string} [remote_user_id] - Optional ID of remote user
-   * @param {string} [remote_client_id] - Optional ID of remote client
-   * @returns {{conversation_id: string, remote_client_id: string, remote_user_id: *, time: string, user_id: string}} Additional payload
+   * @param {string} conversationId - ID of conversation
+   * @param {string} selfUserId - ID of self user
+   * @param {string} [remoteUserId] - Optional ID of remote user
+   * @param {string} [remoteClientId] - Optional ID of remote client
+   * @returns {{conversationId: string, remoteClientId: string, remoteUserId: *, time: string, userId: string}} Additional payload
    */
-  const _create_payload = function(conversation_id, self_user_id, remote_user_id, remote_client_id) {
-    return {
-      conversation_id: conversation_id,
-      remote_client_id: remote_client_id,
-      remote_user_id: remote_user_id,
-      time: new Date().toISOString(),
-      user_id: self_user_id,
-    };
+  const _createPayload = (conversationId, selfUserId, remoteUserId, remoteClientId) => {
+    return {conversationId, remoteClientId, remoteUserId, time: new Date().toISOString(), userId: selfUserId};
   };
 
   /**
    * Create properties payload for call events.
    *
-   * @param {Object} self_state - Current self state
-   * @param {z.media.MediaType|boolean} payload_type - Media type of property change or forced videosend state
+   * @param {Object} selfState - Current self state
+   * @param {z.media.MediaType|boolean} payloadType - Media type of property change or forced videosend state
    * @param {boolean} [invert=false] - Invert state
-   * @param {Object} additional_payload - Optional additional payload to be added
+   * @param {Object} additionalPayload - Optional additional payload to be added
    * @returns {Object} call message props object
    */
-  const _create_payload_prop_sync = function(self_state, payload_type, invert, additional_payload) {
-    let payload;
+  const _createPayloadPropSync = (selfState, payloadType, invert, additionalPayload) => {
+    const payload = {};
 
-    if (_.isBoolean(payload_type)) {
-      payload = {
-        props: {
-          videosend: `${payload_type}`,
-        },
-      };
+    if (_.isBoolean(payloadType)) {
+      payload.properties = {videosend: `${payloadType}`};
     } else {
-      let audio_send_state;
-      let screen_send_state;
-      let video_send_state = undefined;
+      let audioSendState;
+      let screenSendState;
+      let videoSendState = undefined;
 
-      switch (payload_type) {
+      switch (payloadType) {
         case z.media.MediaType.AUDIO: {
-          const {audio_send: audio_self_state} = self_state;
+          const {audioSend: audioSelfState} = selfState;
 
-          audio_send_state = invert ? !audio_self_state() : audio_self_state();
+          audioSendState = invert ? !audioSelfState() : audioSelfState();
 
-          payload = {
-            props: {
-              audiosend: `${audio_send_state}`,
-            },
-          };
+          payload.properties = {audiosend: `${audioSendState}`};
           break;
         }
 
         case z.media.MediaType.SCREEN: {
-          const {screen_send: screen_self_state, video_send: video_self_state} = self_state;
+          const {screenSend: screenSelfState, videoSend: videoSelfState} = selfState;
 
-          screen_send_state = invert ? !screen_self_state() : screen_self_state();
-          video_send_state = invert ? z.calling.enum.PROPERTY_STATE.FALSE : video_self_state();
+          screenSendState = invert ? !screenSelfState() : screenSelfState();
+          videoSendState = invert ? z.calling.enum.PROPERTY_STATE.FALSE : videoSelfState();
 
-          payload = {
-            props: {
-              screensend: `${screen_send_state}`,
-              videosend: `${video_send_state}`,
-            },
+          payload.properties = {
+            screensend: `${screenSendState}`,
+            videosend: `${videoSendState}`,
           };
           break;
         }
 
         case z.media.MediaType.VIDEO: {
-          const {screen_send: screen_self_state, video_send: video_self_state} = self_state;
+          const {screenSend: screenSelfState, videoSend: videoSelfState} = selfState;
 
-          screen_send_state = invert ? z.calling.enum.PROPERTY_STATE.FALSE : screen_self_state();
-          video_send_state = invert ? !video_self_state() : video_self_state();
+          screenSendState = invert ? z.calling.enum.PROPERTY_STATE.FALSE : screenSelfState();
+          videoSendState = invert ? !videoSelfState() : videoSelfState();
 
-          payload = {
-            props: {
-              screensend: `${screen_send_state}`,
-              videosend: `${video_send_state}`,
-            },
+          payload.properties = {
+            screensend: `${screenSendState}`,
+            videosend: `${videoSendState}`,
           };
           break;
         }
@@ -164,24 +146,21 @@ z.calling.CallMessageBuilder = (function() {
       }
     }
 
-    if (additional_payload) {
-      payload = $.extend(payload, additional_payload);
-    }
-    return payload;
+    return additionalPayload ? Object.assign(payload, additionalPayload) : payload;
   };
 
   return {
-    build_cancel: _build_cancel,
-    build_group_check: _build_group_check,
-    build_group_leave: _build_group_leave,
-    build_group_setup: _build_group_setup,
-    build_group_start: _build_group_start,
-    build_hangup: _build_hangup,
-    build_prop_sync: _build_prop_sync,
-    build_reject: _build_reject,
-    build_setup: _build_setup,
-    build_update: _build_update,
-    create_payload: _create_payload,
-    create_payload_prop_sync: _create_payload_prop_sync,
+    buildCancel: _buildCancel,
+    buildGroupCheck: _buildGroupCheck,
+    buildGroupLeave: _buildGroupLeave,
+    buildGroupSetup: _buildGroupSetup,
+    buildGroupStart: _buildGroupStart,
+    buildHangup: _buildHangup,
+    buildPropSync: _buildPropSync,
+    buildReject: _buildReject,
+    buildSetup: _buildSetup,
+    buildUpdate: _buildUpdate,
+    createPayload: _createPayload,
+    createPayloadPropSync: _createPayloadPropSync,
   };
 })();

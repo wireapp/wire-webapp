@@ -697,7 +697,7 @@ z.notification.NotificationRepository = class NotificationRepository {
       ? this.conversationRepository.is_active_conversation(conversationEntity)
       : false;
     const inConversationView = wire.app.view.content.content_state() === z.ViewModel.content.CONTENT_STATE.CONVERSATION;
-    const inMaximizedCall = this.callingRepository.joined_call() && !wire.app.view.content.multitasking.is_minimized();
+    const inMaximizedCall = this.callingRepository.joinedCall() && !wire.app.view.content.multitasking.is_minimized();
 
     const activeConversation = document.hasFocus() && inConversationView && inActiveConversation && !inMaximizedCall;
     const messageFromSelf = messageEntity.user().is_me;

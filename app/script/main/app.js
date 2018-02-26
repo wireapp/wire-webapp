@@ -95,8 +95,7 @@ z.main.App = class App {
       this.service.user,
       this.service.asset,
       this.service.search,
-      repositories.client,
-      repositories.cryptography
+      repositories.client
     );
     repositories.event = new z.event.EventRepository(
       this.service.notification,
@@ -630,7 +629,7 @@ z.main.App = class App {
 
     $(window).on('unload', () => {
       this.logger.info("'window.unload' was triggered, so we will tear down calls.");
-      this.repository.calling.leave_call_on_unload();
+      this.repository.calling.leaveCallOnUnload();
       this.repository.storage.terminate('window.onunload');
       this.repository.notification.clearNotifications();
     });
@@ -811,7 +810,7 @@ z.main.App = class App {
    * @returns {undefined} No return value
    */
   report_call() {
-    this.repository.calling.report_call();
+    this.repository.calling.reportCall();
   }
 
   /**
