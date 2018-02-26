@@ -214,9 +214,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when the conversation was created
    */
   createGroupConversation(userEntities, groupName, accessState) {
+    const userIds = userEntities.map(userEntity => userEntity.id);
     const payload = {
       name: groupName,
-      users: userEntities.map(userEntity => userEntity.id),
+      users: userIds,
     };
 
     if (this.team().id) {

@@ -142,9 +142,6 @@ z.viewModel.panel.ParticipantsViewModel = class ParticipantsViewModel {
       return this.enableIntegrations() && allowIntegrations && !this.isTeamOnly();
     });
 
-    // Confirm dialog reference
-    this.confirmDialog = undefined;
-
     // Selected group participant
     this.selectedParticipant = ko.observable(undefined);
     this.selectedService = ko.observable(undefined);
@@ -224,13 +221,15 @@ z.viewModel.panel.ParticipantsViewModel = class ParticipantsViewModel {
   }
 
   clickOnPending(userEntity) {
-    this.confirmDialog = $('#participants').confirm({
-      cancel: () => this.userRepository.ignore_connection_request(userEntity),
-      confirm: () => this.userRepository.accept_connection_request(userEntity, true),
-      data: {
-        user: this.selectedParticipant(),
+    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
+      action: () => this.userRepository.accept_connection_request(userEntity, true),
+      secondary: () => this.userRepository.ignore_connection_request(userEntity),
+      text: {
+        action: z.l10n.text(z.string.people_button_connect),
+        message: z.l10n.text(z.string.people_connect_message, userEntity.first_name()),
+        secondary: z.l10n.text(z.string.people_button_ignore),
+        title: z.l10n.text(z.string.people_connect_headline),
       },
-      template: '#template-confirm-connect',
     });
   }
 
@@ -280,16 +279,16 @@ z.viewModel.panel.ParticipantsViewModel = class ParticipantsViewModel {
 
   clickToBlock(userEntity) {
     amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
-
-    this.confirmDialog = $('#participants').confirm({
-      confirm: () => {
+    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
+      action: () => {
         const nextConversationEntity = this.conversationRepository.get_next_conversation(this.conversationEntity());
         this.userRepository.block_user(userEntity, nextConversationEntity);
       },
-      data: {
-        user: userEntity,
+      text: {
+        action: z.l10n.text(z.string.people_button_block),
+        message: z.l10n.text(z.string.people_block_message, userEntity.first_name()),
+        title: z.l10n.text(z.string.people_block_headline),
       },
-      template: '#template-confirm-block',
     });
   }
 
@@ -301,28 +300,31 @@ z.viewModel.panel.ParticipantsViewModel = class ParticipantsViewModel {
 
   clickToLeave() {
     amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
-
-    this.confirmDialog = $('#participants').confirm({
-      confirm: () => {
+    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
+      action: () => {
         this.conversationRepository
           .removeMember(this.conversationEntity(), this.userRepository.self().id)
           .then(() => this.resetView());
       },
-      template: '#template-confirm-leave',
+      text: {
+        action: z.l10n.text(z.string.people_button_leave),
+        message: z.l10n.text(z.string.people_leave_message),
+        title: z.l10n.text(z.string.people_leave_headline),
+      },
     });
   }
 
   clickToRemoveMember(userEntity) {
     amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
-
-    this.confirmDialog = $('#participants').confirm({
-      confirm: () => {
+    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
+      action: () => {
         this.conversationRepository.removeMember(this.conversationEntity(), userEntity.id).then(() => this.resetView());
       },
-      data: {
-        user: userEntity,
+      text: {
+        action: z.l10n.text(z.string.people_button_remove),
+        message: z.l10n.text(z.string.people_remove_message, userEntity.first_name()),
+        title: z.l10n.text(z.string.people_remove_headline),
       },
-      template: '#template-confirm-remove',
     });
   }
 
@@ -335,17 +337,18 @@ z.viewModel.panel.ParticipantsViewModel = class ParticipantsViewModel {
   }
 
   clickToUnblock(userEntity) {
-    this.confirmDialog = $('#participants').confirm({
-      confirm: () => {
+    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
+      action: () => {
         this.userRepository
           .unblock_user(userEntity)
           .then(() => this.conversationRepository.get_1to1_conversation(userEntity))
           .then(conversationEntity => this.conversationRepository.update_participating_user_ets(conversationEntity));
       },
-      data: {
-        user: userEntity,
+      text: {
+        action: z.l10n.text(z.string.people_button_unblock),
+        message: z.l10n.text(z.string.people_unblock_message, userEntity.first_name()),
+        title: z.l10n.text(z.string.people_unblock_headline),
       },
-      template: '#template-confirm-unblock',
     });
   }
 
@@ -367,9 +370,6 @@ z.viewModel.panel.ParticipantsViewModel = class ParticipantsViewModel {
     this.state(ParticipantsViewModel.STATE.PARTICIPANTS);
     this.selectedContacts.removeAll();
     this.searchInput('');
-    if (this.confirmDialog) {
-      this.confirmDialog.destroy();
-    }
     this.selectedParticipant(undefined);
   }
 
@@ -432,8 +432,7 @@ z.viewModel.panel.ParticipantsViewModel = class ParticipantsViewModel {
         return this.clickOnAddPeople();
       }
 
-      const isConfirmingAction = this.confirmDialog && this.confirmDialog.is_visible();
-      if (this.stateAddPeople() || isConfirmingAction) {
+      if (this.stateAddPeople()) {
         return this.mainViewModel.closePanel();
       }
 

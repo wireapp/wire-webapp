@@ -35,7 +35,7 @@ z.viewModel.panel.GuestOptionsViewModel = class GuestOptionsViewModel {
     this.hasAccessCode = ko.pureComputed(() => (this.isGuestRoom() ? !!this.conversationEntity().accessCode() : false));
 
     this.conversationEntity.subscribe(conversationEntity => {
-      if (conversationEntity.isGuestRoom() && !conversationEntity.accessCode()) {
+      if (conversationEntity && conversationEntity.isGuestRoom() && !conversationEntity.accessCode()) {
         this.stateHandler.getAccessCode(conversationEntity);
       }
     });

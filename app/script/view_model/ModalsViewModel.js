@@ -42,6 +42,7 @@ z.viewModel.ModalsViewModel = class ModalsViewModel {
       CALLING: '.modal-calling',
       CLEAR: '.modal-clear',
       CLEAR_GROUP: '.modal-clear-group',
+      CONFIRM: '.modal-confirm',
       CONNECTED_DEVICE: '.modal-connected-device',
       CONTACTS: '.modal-contacts',
       DELETE_ACCOUNT: '.modal-delete-account',
@@ -81,6 +82,8 @@ z.viewModel.ModalsViewModel = class ModalsViewModel {
    * @param {Object} [options={}] - Information to configure modal
    * @param {Object} options.data - Content needed for visualization on modal
    * @param {Function} options.action - Called when action in modal is triggered
+   * @param {boolean} [options.preventClose] - Set to true to disable autoclose behavior
+   * @param {Function} options.secondary - Called when secondary action in modal is triggered
    * @returns {undefined} No return value
    */
   showModal(type, options = {}) {
@@ -100,6 +103,9 @@ z.viewModel.ModalsViewModel = class ModalsViewModel {
         break;
       case ModalsViewModel.TYPE.CLEAR:
         type = this._showModalClear(options, type);
+        break;
+      case ModalsViewModel.TYPE.CONFIRM:
+        this._showModalConfirm(options.text, titleElement, messageElement, actionElement);
         break;
       case ModalsViewModel.TYPE.CONNECTED_DEVICE:
         this._showModalConnectedDevice(options.data);
@@ -188,6 +194,8 @@ z.viewModel.ModalsViewModel = class ModalsViewModel {
     if (!modal.is_shown()) {
       this.logger.info(`Show modal of type '${type}'`);
     }
+
+    modal.autoclose = Boolean(options.preventClose);
     modal.toggle();
   }
 
@@ -228,6 +236,18 @@ z.viewModel.ModalsViewModel = class ModalsViewModel {
     titleElement.text(z.l10n.text(z.string.modal_clear_conversation_headline));
 
     return type;
+  }
+
+  _showModalConfirm(text, titleElement, messageElement, actionElement) {
+    const secondaryElement = $(ModalsViewModel.TYPE.CONFIRM).find('.modal-secondary');
+    const {action: actionText, message: messageText, secondary, title: titleText} = text;
+
+    const secondaryText = secondary || z.l10n.text(z.string.people_button_cancel);
+
+    actionElement.text(actionText);
+    messageElement.text(messageText);
+    secondaryElement.text(secondaryText);
+    titleElement.text(titleText);
   }
 
   _showModalConnectedDevice(devices) {

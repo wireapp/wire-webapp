@@ -219,35 +219,20 @@ z.components.UserProfile = class UserProfile {
     this.clickToCancelRequest = () => {
       if (this.hasUser()) {
         amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
-
-        this.confirmDialog = this.element.confirm({
-          confirm: () => {
-            const shouldBlock = this.element.find('.checkbox input').is(':checked');
-            if (shouldBlock) {
-              this.userRepository.block_user(this.userEntity());
-            } else {
-              this.userRepository.cancel_connection_request(this.userEntity());
-            }
-
-            this.conversationRepository.get_1to1_conversation(this.userEntity()).then(conversationEntity => {
-              if (this.conversationRepository.is_active_conversation(conversationEntity)) {
-                amplify.publish(z.event.WebApp.CONVERSATION.PEOPLE.HIDE);
-
-                const nextConversationEntity = this.conversationRepository.get_next_conversation(conversationEntity);
-                window.setTimeout(() => {
-                  amplify.publish(z.event.WebApp.CONVERSATION.SHOW, nextConversationEntity);
-                }, z.motion.MotionDuration.LONG);
-              }
-            });
+        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
+          action: () => {
+            this.userRepository.cancel_connection_request(this.userEntity());
 
             if (typeof params.cancel_request === 'function') {
               params.cancel_request(this.userEntity());
             }
           },
-          data: {
-            user: this.userEntity(),
+          text: {
+            action: z.l10n.text(z.string.people_button_yes),
+            message: z.l10n.text(z.string.people_cancel_request_message, this.userEntity().first_name()),
+            secondary: z.l10n.text(z.string.people_button_no),
+            title: z.l10n.text(z.string.people_cancel_request_headline),
           },
-          template: '#template-confirm-cancel_request',
         });
       }
     };
@@ -431,9 +416,7 @@ z.components.UserProfile = class UserProfile {
   clickToSeeSelfFingerprint() {
     this.confirmDialog = $('#participants').confirm({
       data: {
-        click_on_show_my_devices() {
-          amplify.publish(z.event.WebApp.PREFERENCES.MANAGE_DEVICES);
-        },
+        click_on_show_my_devices: () => amplify.publish(z.event.WebApp.PREFERENCES.MANAGE_DEVICES),
         device: this.clientRepository.currentClient,
         fingerprint_local: this.fingerprintLocal,
       },

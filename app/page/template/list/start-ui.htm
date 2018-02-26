@@ -154,12 +154,10 @@
     <div id="start-ui-user-bubble" class="start-ui-user-bubble bubble" data-bind="css: additionalBubbleClasses">
       <!-- ko ifnot: userProfileIsService() -->
         <user-profile params="user: userProfile,
-                              open: clickToShowConversation,
                               accept: clickToAcceptInvite,
                               connect: clickToSendRequest,
                               ignore: clickToIgnoreInvite,
                               unblock: clickToUnblock,
-                              cancel_request: clickToCancelRequest
                               mode: z.components.UserProfile.MODE.SEARCH"></user-profile>
       <!-- /ko -->
 
