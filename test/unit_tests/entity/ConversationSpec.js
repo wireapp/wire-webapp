@@ -486,7 +486,7 @@ describe('Conversation', () => {
 
   describe('isVerified', () => {
     it('is not verified when nothing is set', () => {
-      expect(conversation_et.isVerified()).toBeFalsy();
+      expect(conversation_et.is_verified()).toBeFalsy();
     });
 
     it('is verified when self user has no remote clients', () => {
@@ -501,7 +501,7 @@ describe('Conversation', () => {
       user_et.devices.push(verified_client_et);
       conversation_et.participating_user_ets.push(user_et);
 
-      expect(conversation_et.isVerified()).toBeTruthy();
+      expect(conversation_et.is_verified()).toBeTruthy();
     });
 
     it('is not verified when participant has unverified device', () => {
@@ -523,7 +523,7 @@ describe('Conversation', () => {
 
       conversation_et.participating_user_ets.push(user_et, user_et_two);
 
-      expect(conversation_et.isVerified()).toBeFalsy();
+      expect(conversation_et.is_verified()).toBeFalsy();
     });
 
     it('is verified when all users are verified', () => {
@@ -544,7 +544,7 @@ describe('Conversation', () => {
 
       conversation_et.participating_user_ets.push(user_et, user_et_two);
 
-      expect(conversation_et.isVerified()).toBeTruthy();
+      expect(conversation_et.is_verified()).toBeTruthy();
     });
   });
 
