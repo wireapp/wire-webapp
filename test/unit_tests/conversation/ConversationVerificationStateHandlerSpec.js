@@ -95,7 +95,7 @@ describe('z.conversation.ConversationVerificationStateHandler', () => {
       state_handler.onClientAdd(user_b.id);
       expect(conversation_ab.verification_state()).toBe(z.conversation.ConversationVerificationState.DEGRADED);
       expect(conversation_b.verification_state()).toBe(z.conversation.ConversationVerificationState.DEGRADED);
-      expect(conversation_ab.is_verified()).toBeFalsy();
+      expect(conversation_ab.isVerified()).toBeFalsy();
       expect(z.conversation.EventBuilder.buildDegraded.calls.count()).toEqual(2);
     });
 
@@ -108,7 +108,7 @@ describe('z.conversation.ConversationVerificationStateHandler', () => {
 
       state_handler.onClientAdd(user_b.id);
       expect(conversation_ab.verification_state()).toBe(z.conversation.ConversationVerificationState.VERIFIED);
-      expect(conversation_ab.is_verified()).toBeTruthy();
+      expect(conversation_ab.isVerified()).toBeTruthy();
       expect(z.conversation.EventBuilder.buildAllVerified).not.toHaveBeenCalled();
     });
   });
@@ -176,7 +176,7 @@ describe('z.conversation.ConversationVerificationStateHandler', () => {
       state_handler.onMemberJoined(conversation_ab, new_user.id);
 
       expect(conversation_ab.verification_state()).toBe(z.conversation.ConversationVerificationState.DEGRADED);
-      expect(conversation_ab.is_verified()).toBeFalsy();
+      expect(conversation_ab.isVerified()).toBeFalsy();
       expect(z.conversation.EventBuilder.buildDegraded.calls.count()).toEqual(1);
     });
 
@@ -194,7 +194,7 @@ describe('z.conversation.ConversationVerificationStateHandler', () => {
       state_handler.onMemberJoined(conversation_ab, new_user.id);
 
       expect(conversation_ab.verification_state()).toBe(z.conversation.ConversationVerificationState.VERIFIED);
-      expect(conversation_ab.is_verified()).toBeTruthy();
+      expect(conversation_ab.isVerified()).toBeTruthy();
       expect(z.conversation.EventBuilder.buildDegraded).not.toHaveBeenCalled();
     });
   });
@@ -206,7 +206,7 @@ describe('z.conversation.ConversationVerificationStateHandler', () => {
       state_handler.onClientVerificationChanged(user_a.id, client_a.id);
       expect(conversation_ab.verification_state()).toBe(z.conversation.ConversationVerificationState.DEGRADED);
       expect(conversation_b.verification_state()).toBe(z.conversation.ConversationVerificationState.VERIFIED);
-      expect(conversation_ab.is_verified()).toBeFalsy();
+      expect(conversation_ab.isVerified()).toBeFalsy();
     });
   });
 });
