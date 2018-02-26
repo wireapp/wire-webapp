@@ -19,7 +19,7 @@
         <div class="preferences-devices-fingerprint-label" data-bind="l10n_text: z.string.preferences_devices_fingerprint"></div>
         <div class="preferences-devices-fingerprint" data-bind="foreach: fingerprint()"><span class="device-id-part" data-bind="text: $data"></span></div>
         <div class="preferences-devices-verification slider">
-          <input class="slider-input" type="checkbox" name="preferences_device_verification_toggle" id="preferences_device_verification" data-bind="checked: device().meta.is_verified">
+          <input class="slider-input" type="checkbox" name="preferences_device_verification_toggle" id="preferences_device_verification" data-bind="checked: device().meta.isVerified">
           <label class="button-label" for="preferences_device_verification" data-bind="click: toggleDeviceVerification, l10n_text: z.string.preferences_devices_verification" data-uie-name="do-verify"></label>
         </div>
         <div class="preferences-detail" data-bind="l10n_text: z.string.preferences_devices_fingerprint_detail"></div>
