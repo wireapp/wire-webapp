@@ -141,7 +141,9 @@
 // ----------------------------------------------------------------------------
 
 .participants-search {
-  .bubble-content();
+  display: flex;
+  flex-direction: column;
+  height: 440px;
   opacity: 0;
 }
 
@@ -175,7 +177,6 @@
   background-color: @app-bg;
   flex: 1 1 auto;
   position: relative;
-  padding-left: 16px;
 }
 
 .participants-search-footer {
@@ -194,10 +195,10 @@
 
 .participants-search-list {
   .full-screen();
-  left: 16px;
   font-weight: 300;
   overflow-x: hidden;
   overflow-y: scroll;
+  width: 320px;
   padding-right: 16px;
 
   .everyone-participates {
@@ -206,11 +207,6 @@
     line-height: 24px;
     margin: 106px 18px;
     white-space: pre;
-  }
-
-  user-list,
-  service-list {
-    margin-top: 16px;
   }
 }
 
