@@ -41,9 +41,9 @@ z.components.FullSearch = class FullSearch {
       }
     };
 
-    this.clickOnMessage = () => {
-      if (typeof params.message_click === 'function') {
-        params.message_click();
+    this.clickOnMessage = messageEntity => {
+      if (typeof params.click === 'function') {
+        params.click(messageEntity);
       }
     };
 
