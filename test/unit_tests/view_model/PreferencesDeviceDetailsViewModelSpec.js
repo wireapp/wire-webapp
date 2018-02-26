@@ -40,11 +40,11 @@ describe('z.ViewModel.content.PreferencesDeviceDetailsViewModel', () => {
       .catch(done.fail);
   });
 
-  describe('_update_activation_location', () => {
+  describe('_updateActivationLocation', () => {
     it('keeps the location as a pivot element', () => {
       const location = 'Paris, FR';
-      viewModel._update_activation_location(location);
-      const sanitizedText = viewModel.activated_in();
+      viewModel._updateActivationLocation(location);
+      const sanitizedText = viewModel.activationLocation();
       expect(sanitizedText[1].text).toBe(location);
     });
   });

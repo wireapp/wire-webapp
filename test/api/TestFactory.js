@@ -106,7 +106,8 @@ window.TestFactory.prototype.exposeCryptographyActors = function() {
     .then(() => {
       this.logger.info('✓ exposedStorageActors');
 
-      const currentClient = new z.client.ClientEntity({id: entities.clients.john_doe.permanent.id});
+      const currentClient = new z.client.ClientEntity(true);
+      currentClient.id = entities.clients.john_doe.permanent.id;
       TestFactory.cryptography_service = new z.cryptography.CryptographyService(this.client);
       TestFactory.cryptography_service.logger.level = this.settings.logging_level;
 

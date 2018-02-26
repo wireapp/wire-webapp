@@ -159,7 +159,7 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
           this.preferences_av.initiate_devices();
           break;
         case z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES:
-          this.preferences_devices.update_device_info();
+          this.preferences_devices.updateDeviceInfo();
           break;
         case z.ViewModel.content.CONTENT_STATE.COLLECTION:
           this.collection.set_conversation(this.previous_conversation);
