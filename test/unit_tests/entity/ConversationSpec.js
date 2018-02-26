@@ -484,7 +484,7 @@ describe('Conversation', () => {
     });
   });
 
-  describe('isVerified', () => {
+  describe('is_verified', () => {
     it('is not verified when nothing is set', () => {
       expect(conversation_et.is_verified()).toBeFalsy();
     });
