@@ -54,7 +54,6 @@ module.exports = grunt => {
       api: 'docs/api',
       coverage: 'docs/coverage',
     },
-    npm: 'node_modules',
     temp: 'temp',
     test_: 'test',
     test: {
