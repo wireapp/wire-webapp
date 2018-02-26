@@ -57,6 +57,7 @@ module.exports = grunt => {
     'less:dist',
     'postcss:distribution',
     'copy:dist',
+    'npmCopy',
     'copy:dist_audio',
     'copy:dist_favicon',
     'includereplace:dist_index',
