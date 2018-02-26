@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="1.0.3"></a>
+## 1.0.3 (2018-02-26)
+
+
+### Bug Fixes
+
+* **cryptobox:** Queuing encryptions for multipe clients ([#280](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/280)) ([d7dbd87](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/d7dbd87))
+
+
+
+
 <a name="1.0.2"></a>
 ## [1.0.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@1.0.1...@wireapp/react-ui-kit@1.0.2) (2018-02-19)
 
