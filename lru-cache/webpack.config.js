@@ -20,15 +20,17 @@
 const pkg = require('./package.json');
 const webpack = require('webpack');
 
+const projectName = pkg.name.replace('@wireapp/', '');
+
 module.exports = {
   devtool: 'source-map',
   entry: {
-    filename: `${__dirname}/dist/commonjs/LRUCache.js`,
+    [projectName]: `${__dirname}/${pkg.main}`,
   },
   output: {
-    filename: `LRUCache.js`,
+    filename: '[name].bundle.js',
     library: 'LRUCache',
-    path: `${__dirname}/dist/window`,
+    path: `${__dirname}/dist`,
   },
   plugins: [new webpack.BannerPlugin(`${pkg.name} v${pkg.version}`)],
   target: 'node',

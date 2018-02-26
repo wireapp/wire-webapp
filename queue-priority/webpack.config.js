@@ -17,18 +17,17 @@
  *
  */
 
+const pkg = require('./package.json');
+
+const projectName = pkg.name.replace('@wireapp/', '');
+
 module.exports = {
-  devServer: {
-    stats: {
-      chunks: false,
-    },
-  },
-  devtool: 'cheap-module-source-map',
+  devtool: 'source-map',
   entry: {
-    'test-bundle': `${__dirname}/src/test/browser/index.js`,
+    [`${projectName}.test`]: `${__dirname}/src/test/browser/index.js`,
   },
   output: {
-    filename: `[name].js`,
+    filename: '[name].bundle.js',
     path: `${__dirname}/dist`,
     publicPath: '/',
   },

@@ -17,8 +17,11 @@
  *
  */
 
+const pkg = require('./package.json');
 const path = require('path');
 const webpack = require('webpack');
+
+const projectName = pkg.name.replace('@wireapp/', '');
 
 module.exports = {
   devServer: {
@@ -29,11 +32,11 @@ module.exports = {
       chunks: false,
     },
   },
-  devtool: 'cheap-module-source-map',
+  devtool: 'source-map',
   entry: {
-    client: `${__dirname}/dist/commonjs/Client.js`,
-    demo: `${__dirname}/src/demo/demo.js`,
-    test: `${__dirname}/src/test/browser/index.js`,
+    [projectName]: `${__dirname}/${pkg.main}`,
+    [`${projectName}.demo`]: `${__dirname}/src/demo/demo.js`,
+    [`${projectName}.test`]: `${__dirname}/src/test/browser/index.js`,
   },
   externals: {
     'fs-extra': '{}',
@@ -41,7 +44,7 @@ module.exports = {
   module: {
     rules: [
       {
-        exclude: /(node_modules)/,
+        exclude: /node_modules/,
         test: /\.jsx?$/,
         use: [
           {
@@ -52,7 +55,8 @@ module.exports = {
     ],
   },
   output: {
-    filename: `dist/[name].js`,
+    filename: `[name].bundle.js`,
+    path: `${__dirname}/dist`,
     publicPath: '/',
   },
   plugins: [new webpack.HotModuleReplacementPlugin()],

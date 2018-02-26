@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <!-- Wire, Copyright (C) 2018 Wire Swiss GmbH -->
 <html>
+
   <head>
     <meta charset="UTF-8" />
     <title>Demo</title>
     <link rel="shortcut icon" href="data:image/x-icon;" type="image/x-icon" />
-    <script src="./dist/window/@wireapp/cbor.js"></script>
+    <script src="./dist/cbor.bundle.js"></script>
   </head>
+
   <body>
     <script>
       const payload = new Uint8Array([255, 18, 15, 34, 210, 168, 165, 188, 81, 33, 34, 40, 73, 61, 149, 198, 154, 54, 128, 76, 191, 161, 58, 176, 45, 75, 1, 33, 80, 157, 28, 89]);
@@ -40,4 +42,5 @@
       console.log(isEqual); // true
     </script>
   </body>
+
 </html>
