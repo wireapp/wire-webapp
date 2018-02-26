@@ -181,7 +181,11 @@ z.viewModel.ContentViewModel = class ContentViewModel {
       this._releaseContent(this.state());
 
       this.state(ContentViewModel.STATE.CONVERSATION);
-      this.conversationRepository.active_conversation(conversationEntity);
+
+      if (!isActiveConversation) {
+        this.conversationRepository.active_conversation(conversationEntity);
+      }
+
       this.messageList.change_conversation(conversationEntity, messageEntity).then(() => {
         this._showContent(ContentViewModel.STATE.CONVERSATION);
         this.mainViewModel.panel.participants.changeConversation(conversationEntity);
