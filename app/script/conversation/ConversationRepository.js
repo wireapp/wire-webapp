@@ -1754,7 +1754,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const message_id = generic_message.message_id;
 
     return this.link_repository
-      .get_link_preview_from_string(message)
+      .getLinkPreviewFromString(message)
       .then(link_preview => {
         if (link_preview) {
           switch (generic_message.content) {
