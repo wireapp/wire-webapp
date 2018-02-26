@@ -503,34 +503,36 @@ ko.bindingHandlers.in_viewport = (function() {
   const listeners = [];
 
   // listeners can be deleted during iteration
-  const notify_listeners = _.throttle(event => {
+  const notifyListeners = _.throttle(event => {
     for (let index = listeners.length; index--; ) {
       listeners[index](event);
     }
   }, 300);
 
-  window.addEventListener('scroll', notify_listeners, true);
+  window.addEventListener('scroll', notifyListeners, true);
+  notifyListeners();
 
   return {
     init(element, valueAccessor, allBindingsAccessor) {
-      function _in_view(dom_element) {
-        const box = dom_element.getBoundingClientRect();
+      function _inView(domElement) {
+        const box = domElement.getBoundingClientRect();
+        const isInRightPanel = document.querySelector('#right-column').contains(domElement);
         return (
           box.right >= 0 &&
           box.bottom >= 0 &&
-          box.left <= document.documentElement.clientWidth &&
+          (isInRightPanel || box.left <= document.documentElement.clientWidth) &&
           box.top <= document.documentElement.clientHeight
         );
       }
 
       function _dispose() {
-        z.util.ArrayUtil.remove_element(listeners, _check_element);
+        z.util.ArrayUtil.remove_element(listeners, _checkElement);
       }
 
-      function _check_element(event) {
-        const is_child = event ? event.target.contains(element) : true;
+      function _checkElement(event) {
+        const isChild = event ? event.target.contains(element) : true;
 
-        if (is_child && _in_view(element)) {
+        if (isChild && _inView(element)) {
           const callback = valueAccessor();
           const dispose = callback && callback();
 
@@ -540,8 +542,8 @@ ko.bindingHandlers.in_viewport = (function() {
         }
       }
 
-      listeners.push(_check_element);
-      window.setTimeout(_check_element, allBindingsAccessor.get('delay') || 0);
+      listeners.push(_checkElement);
+      window.setTimeout(_checkElement, allBindingsAccessor.get('delay') || 0);
 
       ko.utils.domNodeDisposal.addDisposeCallback(element, _dispose);
     },
