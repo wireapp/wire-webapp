@@ -54,11 +54,9 @@ z.ViewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
 
     this.activateNext = ko.pureComputed(() => this.nameInput().length);
     this.contacts = ko.pureComputed(() => {
-      if (this.showContacts()) {
-        return this.teamRepository.isTeam() ? this.teamRepository.teamUsers() : this.userRepository.connected_users();
-      }
-
-      return [];
+      return this.showContacts()
+        ? this.teamRepository.isTeam() ? this.teamRepository.teamUsers() : this.userRepository.connected_users()
+        : [];
     });
     this.participantsActionText = ko.pureComputed(() => {
       const stringSelector = this.selectedContacts().length
@@ -78,8 +76,8 @@ z.ViewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
     this.nameInput.subscribe(() => this.nameError(''));
     this.stateIsPreferences.subscribe(stateIsPreference => {
       if (stateIsPreference) {
-        return $(document).on('keydown.groupCreation', keyboard_event => {
-          if (z.util.KeyboardUtil.isEscapeKey(keyboard_event)) {
+        return $(document).on('keydown.groupCreation', keyboardEvent => {
+          if (z.util.KeyboardUtil.isEscapeKey(keyboardEvent)) {
             this._hideModal();
           }
         });
@@ -173,10 +171,6 @@ z.ViewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
 
       this.state(GroupCreationViewModel.STATE.PARTICIPANTS);
     }
-  }
-
-  _normalizeNameInput() {
-    return this.nameInput().trim();
   }
 
   _afterHideModal() {
