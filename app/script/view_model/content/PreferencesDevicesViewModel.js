@@ -24,88 +24,81 @@ window.z.ViewModel = z.ViewModel || {};
 window.z.ViewModel.content = z.ViewModel.content || {};
 
 z.ViewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewModel {
-  constructor(
-    element_id,
-    preferences_device_details,
-    client_repository,
-    conversation_repository,
-    cryptography_repository
-  ) {
-    this.click_on_remove_device = this.click_on_remove_device.bind(this);
-    this.click_on_show_device = this.click_on_show_device.bind(this);
-    this.update_device_info = this.update_device_info.bind(this);
+  constructor(elementId, preferencesDeviceDetails, clientRepository, conversationRepository, cryptographyRepository) {
+    this.clickOnRemoveDevice = this.clickOnRemoveDevice.bind(this);
+    this.clickOnShowDevice = this.clickOnShowDevice.bind(this);
+    this.updateDeviceInfo = this.updateDeviceInfo.bind(this);
 
-    this.preferences_device_details = preferences_device_details;
-    this.client_repository = client_repository;
-    this.conversation_repository = conversation_repository;
-    this.cryptography_repository = cryptography_repository;
+    this.preferencesDeviceDetails = preferencesDeviceDetails;
+    this.clientRepository = clientRepository;
+    this.conversationRepository = conversationRepository;
+    this.cryptographyRepository = cryptographyRepository;
     this.logger = new z.util.Logger('z.ViewModel.content.PreferencesDevicesViewModel', z.config.LOGGER.OPTIONS);
 
-    this.self_user = this.client_repository.self_user;
+    this.currentClient = this.clientRepository.currentClient;
+    this.displayClientId = ko.pureComputed(() => (this.currentClient() ? this.currentClient().formatId() : []));
 
-    this.current_client = this.client_repository.currentClient;
-    this.displayClientId = ko.pureComputed(() => (this.current_client() ? this.current_client().formatId() : []));
-
-    this.activated_in = ko.observable([]);
-    this.activated_on = ko.observable([]);
+    this.activationLocation = ko.observable([]);
+    this.activationDate = ko.observable([]);
     this.devices = ko.observableArray();
     this.displayFingerPrint = ko.observable();
 
-    this.should_update_scrollbar = ko.computed(() => this.devices()).extend({notify: 'always', rateLimit: 500});
+    this.shouldUpdateScrollbar = ko.computed(() => this.devices()).extend({notify: 'always', rateLimit: 500});
 
-    this._update_activation_location('?');
+    this._updateActivationLocation('?');
 
     // All clients except the current client
-    this.client_repository.clients.subscribe(client_ets => {
-      const devices = client_ets.filter(client_et => client_et.id !== this.current_client().id);
+    this.clientRepository.clients.subscribe(clientEntities => {
+      const devices = clientEntities.filter(clientEntity => clientEntity.id !== this.currentClient().id);
       this.devices(devices);
     });
   }
 
-  _update_activation_location(location, template = z.string.preferences_devices_activated_in) {
-    const sanitizedText = z.util.StringUtil.splitAtPivotElement(template, '{{location}}', location);
-    this.activated_in(sanitizedText);
-  }
-
-  _update_activation_time(time, template = z.string.preferences_devices_activated_on) {
+  _updateActivationDate(time, template = z.string.preferences_devices_activated_on) {
     const formattedTime = z.util.format_timestamp(time);
     const sanitizedText = z.util.StringUtil.splitAtPivotElement(template, '{{date}}', formattedTime);
-    this.activated_on(sanitizedText);
+    this.activationDate(sanitizedText);
   }
 
-  _update_device_location(location) {
-    z.location.getLocation(location.lat, location.lon).then(retrieved_location => {
-      if (retrieved_location) {
-        this._update_activation_location(`${retrieved_location.place}, ${retrieved_location.countryCode}`);
-      }
-    });
+  _updateActivationLocation(location, template = z.string.preferences_devices_activated_in) {
+    const sanitizedText = z.util.StringUtil.splitAtPivotElement(template, '{{location}}', location);
+    this.activationLocation(sanitizedText);
   }
 
-  click_on_show_device(device_et) {
-    this.preferences_device_details.device(device_et);
+  _updateLocation({lat: latitude, lon: longitude}) {
+    if (latitude && longitude) {
+      z.location.getLocation(latitude, longitude).then(mappedLocation => {
+        if (mappedLocation) {
+          const {countryCode, place} = mappedLocation;
+          this._updateActivationLocation(`${place}, ${countryCode}`);
+        }
+      });
+    }
+  }
+
+  clickOnShowDevice(clientEntity) {
+    this.preferencesDeviceDetails.device(clientEntity);
     amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICE_DETAILS);
   }
 
-  click_on_remove_device(device_et, event) {
+  clickOnRemoveDevice(clientEntity, event) {
     amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.REMOVE_DEVICE, {
-      action: password => {
-        this.client_repository.deleteClient(device_et.id, password);
-      },
-      data: device_et.model,
+      action: password => this.clientRepository.deleteClient(clientEntity.id, password),
+      data: clientEntity.model,
     });
     event.stopPropagation();
   }
 
-  update_device_info() {
-    if (this.current_client() && !this.displayFingerPrint()) {
-      if (this.current_client().location) {
-        this._update_device_location(this.current_client().location);
+  updateDeviceInfo() {
+    if (this.currentClient() && !this.displayFingerPrint()) {
+      const {location, time} = this.currentClient();
+      this._updateActivationDate(time);
+      if (location) {
+        this._updateLocation(location);
       }
 
-      this._update_activation_time(this.current_client().time);
-      this.displayFingerPrint(
-        z.util.zero_padding(this.cryptography_repository.getLocalFingerprint(), 16).match(/.{1,2}/g)
-      );
+      const paddedFingerPrint = z.util.zero_padding(this.cryptographyRepository.getLocalFingerprint(), 16);
+      this.displayFingerPrint(paddedFingerPrint.match(/.{1,2}/g) || []);
     }
   }
 };
