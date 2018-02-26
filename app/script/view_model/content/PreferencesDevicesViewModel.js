@@ -43,7 +43,7 @@ z.ViewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewMo
     this.devices = ko.observableArray();
     this.displayFingerPrint = ko.observable();
 
-    this.shouldUdateScrollbar = ko.computed(() => this.devices()).extend({notify: 'always', rateLimit: 500});
+    this.shouldUpdateScrollbar = ko.computed(() => this.devices()).extend({notify: 'always', rateLimit: 500});
 
     this._updateActivationLocation('?');
 
