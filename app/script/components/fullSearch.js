@@ -95,7 +95,7 @@ z.components.FullSearch = class FullSearch {
 
     const replaceRegex = z.search.FullTextSearch.getSearchRegex(input);
     const replaceFunction = match => {
-      messageEntity.matches_count += 1;
+      messageEntity.matchesCount += 1;
       return `<mark class='full-search-marked' data-uie-name='full-search-item-mark'>${match}</mark>`;
     };
 
