@@ -54,9 +54,11 @@ z.ViewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
 
     this.activateNext = ko.pureComputed(() => this.nameInput().length);
     this.contacts = ko.pureComputed(() => {
-      return this.showContacts()
-        ? this.teamRepository.isTeam() ? this.teamRepository.teamUsers() : this.userRepository.connected_users()
-        : [];
+      if (this.showContacts()) {
+        return this.teamRepository.isTeam() ? this.teamRepository.teamUsers() : this.userRepository.connected_users();
+      }
+
+      return [];
     });
     this.participantsActionText = ko.pureComputed(() => {
       const stringSelector = this.selectedContacts().length
