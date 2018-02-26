@@ -28,7 +28,7 @@ describe('z.client.ClientMapper', () => {
     it('can map a permanent client payload from the backend', () => {
       const clientPayload = entities.clients.john_doe.permanent;
 
-      const clientEntity = mapper.mapClient(clientPayload);
+      const clientEntity = mapper.mapClient(clientPayload, true);
 
       expect(clientEntity.address).toBe(clientPayload.address);
       expect(clientEntity.class).toBe(clientPayload.class);
@@ -37,7 +37,7 @@ describe('z.client.ClientMapper', () => {
       expect(clientEntity.label).toBe(clientPayload.label);
       expect(clientEntity.location.lat).toBe(clientPayload.location.lat);
       expect(clientEntity.location.lon).toBe(clientPayload.location.lon);
-      expect(clientEntity.meta.is_verified()).toBeFalsy();
+      expect(clientEntity.meta.isVerified()).toBeFalsy();
       expect(clientEntity.model).toBe(clientPayload.model);
       expect(clientEntity.time).toBe(clientPayload.time);
       expect(clientEntity.type).toBe(z.client.ClientType.PERMANENT);
@@ -49,7 +49,7 @@ describe('z.client.ClientMapper', () => {
     it('can map a temporary client payload from the backend', () => {
       const clientPayload = entities.clients.john_doe.temporary;
 
-      const clientEntity = mapper.mapClient(clientPayload);
+      const clientEntity = mapper.mapClient(clientPayload, true);
 
       expect(clientEntity.address).toBe(clientPayload.address);
       expect(clientEntity.class).toBe(clientPayload.class);
@@ -58,7 +58,7 @@ describe('z.client.ClientMapper', () => {
       expect(clientEntity.label).toBe(clientPayload.label);
       expect(clientEntity.location.lat).toBe(clientPayload.location.lat);
       expect(clientEntity.location.lon).toBe(clientPayload.location.lon);
-      expect(clientEntity.meta.is_verified()).toBeFalsy();
+      expect(clientEntity.meta.isVerified()).toBeFalsy();
       expect(clientEntity.model).toBe(clientPayload.model);
       expect(clientEntity.time).toBe(clientPayload.time);
       expect(clientEntity.type).toBe(z.client.ClientType.TEMPORARY);
@@ -70,11 +70,11 @@ describe('z.client.ClientMapper', () => {
     it('can map a remote client payload from the backend', () => {
       const clientPayload = entities.clients.jane_roe.plain;
 
-      const clientEntity = mapper.mapClient(clientPayload);
+      const clientEntity = mapper.mapClient(clientPayload, false);
 
       expect(clientEntity.id).toBe(clientPayload.id);
       expect(clientEntity.class).toBe(clientPayload.class);
-      expect(clientEntity.meta.is_verified()).toBeFalsy();
+      expect(clientEntity.meta.isVerified()).toBeFalsy();
       expect(clientEntity.isPermanent()).toBeFalsy();
       expect(clientEntity.isRemote()).toBeTruthy();
       expect(clientEntity.isTemporary()).toBeFalsy();
@@ -89,11 +89,11 @@ describe('z.client.ClientMapper', () => {
         },
       };
 
-      const clientEntity = mapper.mapClient(clientPayload);
+      const clientEntity = mapper.mapClient(clientPayload, false);
 
       expect(clientEntity.id).toBe(clientPayload.id);
       expect(clientEntity.class).toBe(clientPayload.class);
-      expect(clientEntity.meta.is_verified()).toBeTruthy();
+      expect(clientEntity.meta.isVerified()).toBeTruthy();
       expect(clientEntity.isPermanent()).toBeFalsy();
       expect(clientEntity.isRemote()).toBeTruthy();
       expect(clientEntity.isTemporary()).toBeFalsy();
@@ -108,7 +108,7 @@ describe('z.client.ClientMapper', () => {
         },
       };
 
-      const clientEntity = mapper.mapClient(clientPayload);
+      const clientEntity = mapper.mapClient(clientPayload, false);
       const clientJson = clientEntity.toJson();
 
       expect(clientJson).toEqual(clientPayload);
@@ -117,7 +117,7 @@ describe('z.client.ClientMapper', () => {
 
   describe('mapClients', () =>
     it('can map a multiple clients at once', () => {
-      const clientEntities = mapper.mapClients(payload.clients.get.many);
+      const clientEntities = mapper.mapClients(payload.clients.get.many, true);
       const [firstClientEntity, secondClientEntity] = clientEntities;
 
       expect(clientEntities.length).toBe(2);
@@ -129,7 +129,7 @@ describe('z.client.ClientMapper', () => {
 
   describe('updateClient', () => {
     it('can map changes into a client', () => {
-      const initialClientEntity = mapper.mapClient(entities.clients.john_doe.plain);
+      const initialClientEntity = mapper.mapClient(entities.clients.john_doe.plain, true);
       const clientPayload = entities.clients.john_doe.permanent;
 
       const {client: clientEntity, wasUpdated} = mapper.updateClient(initialClientEntity, clientPayload);
@@ -142,7 +142,7 @@ describe('z.client.ClientMapper', () => {
       expect(clientEntity.label).toBe(clientPayload.label);
       expect(clientEntity.location.lat).toBe(clientPayload.location.lat);
       expect(clientEntity.location.lon).toBe(clientPayload.location.lon);
-      expect(clientEntity.meta.is_verified()).toBeFalsy();
+      expect(clientEntity.meta.isVerified()).toBeFalsy();
       expect(clientEntity.model).toBe(clientPayload.model);
       expect(clientEntity.time).toBe(clientPayload.time);
       expect(clientEntity.type).toBe(z.client.ClientType.PERMANENT);
@@ -153,7 +153,7 @@ describe('z.client.ClientMapper', () => {
 
     it('does not change the client if there are no updates', () => {
       const clientPayload = entities.clients.john_doe.permanent;
-      const initialClientEntity = mapper.mapClient(clientPayload);
+      const initialClientEntity = mapper.mapClient(clientPayload, true);
 
       const {client: clientEntity, wasUpdated} = mapper.updateClient(initialClientEntity, clientPayload);
 
@@ -165,7 +165,7 @@ describe('z.client.ClientMapper', () => {
       expect(clientEntity.label).toBe(clientPayload.label);
       expect(clientEntity.location.lat).toBe(clientPayload.location.lat);
       expect(clientEntity.location.lon).toBe(clientPayload.location.lon);
-      expect(clientEntity.meta.is_verified()).toBeFalsy();
+      expect(clientEntity.meta.isVerified()).toBeFalsy();
       expect(clientEntity.model).toBe(clientPayload.model);
       expect(clientEntity.time).toBe(clientPayload.time);
       expect(clientEntity.type).toBe(z.client.ClientType.PERMANENT);

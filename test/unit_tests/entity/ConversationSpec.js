@@ -491,7 +491,7 @@ describe('Conversation', () => {
 
     it('is verified when self user has no remote clients', () => {
       const verified_client_et = new z.client.ClientEntity();
-      verified_client_et.meta.is_verified(true);
+      verified_client_et.meta.isVerified(true);
 
       const self_user_et = new z.entity.User();
       self_user_et.is_me = true;
@@ -507,7 +507,7 @@ describe('Conversation', () => {
     it('is not verified when participant has unverified device', () => {
       const unverified_client_et = new z.client.ClientEntity();
       const verified_client_et = new z.client.ClientEntity();
-      verified_client_et.meta.is_verified(true);
+      verified_client_et.meta.isVerified(true);
 
       const self_user_et = new z.entity.User();
       self_user_et.is_me = true;
@@ -528,7 +528,7 @@ describe('Conversation', () => {
 
     it('is verified when all users are verified', () => {
       const verified_client_et = new z.client.ClientEntity();
-      verified_client_et.meta.is_verified(true);
+      verified_client_et.meta.isVerified(true);
 
       const self_user_et = new z.entity.User();
       self_user_et.is_me = true;
