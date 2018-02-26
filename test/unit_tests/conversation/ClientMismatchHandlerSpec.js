@@ -84,7 +84,7 @@ describe('ClientMismatchHandler', () => {
     });
 
     it('should add missing clients to the payload', done => {
-      spyOn(TestFactory.user_repository, 'add_client_to_user').and.returnValue(Promise.resolve());
+      spyOn(TestFactory.user_repository, 'addClientToUser').and.returnValue(Promise.resolve());
       // TODO: Make this fake method available as a utility function for testing
       spyOn(TestFactory.cryptography_repository.cryptographyService, 'getUsersPreKeys').and.callFake(recipients => {
         return Promise.resolve().then(() => {

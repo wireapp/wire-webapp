@@ -131,7 +131,7 @@ z.entity.User = class User {
       return initials.toUpperCase();
     });
 
-    this.username = ko.observable();
+    this.username = ko.observable('');
 
     this.previewPictureResource = ko.observable();
     this.mediumPictureResource = ko.observable();
@@ -161,7 +161,7 @@ z.entity.User = class User {
       if (this.devices().length === 0 && !this.is_me) {
         return false;
       }
-      return this.devices().every(client_et => client_et.meta.is_verified());
+      return this.devices().every(client_et => client_et.meta.isVerified());
     });
 
     this.availability = ko.observable(z.user.AvailabilityType.NONE);

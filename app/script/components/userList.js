@@ -75,9 +75,9 @@ z.components.UserList = class UserList {
           const trimmedQuery = this.filter().trim();
           const isHandle = trimmedQuery.startsWith('@') && z.user.UserHandleGenerator.validate_handle(normalizedQuery);
           const excludedEmojis = Array.from(normalizedQuery).filter(char => EMOJI_UNICODE_RANGES.includes(char));
-          return this.userEntities().filter(userEntity =>
-            userEntity.matches(normalizedQuery, isHandle, excludedEmojis)
-          );
+          return this.userEntities().filter(userEntity => {
+            return userEntity.matches(normalizedQuery, isHandle, excludedEmojis);
+          });
         }
       }
       return this.userEntities();
@@ -96,64 +96,7 @@ z.components.UserList = class UserList {
 ko.components.register('user-list', {
   template: `
     <div class="search-list" data-bind="css: cssClasses(), foreach: {data: filteredUserEntities}">
-      <div class="search-list-item" data-bind="click: $parent.onUserClick, attr: {'data-uie-uid': $data.id, 'data-uie-value': $data.name(), 'data-uie-status': $data.connection().status()}" data-uie-name="item-user">
-        <!-- ko if: $parent.isCompactMode -->
-          <div class="search-list-item-image">
-            <participant-avatar params="participant: $data, selected: $parent.isSelected($data), size: z.components.ParticipantAvatar.SIZE.LARGE"></participant-avatar>
-            <!-- ko if: $data.is_guest() -->
-              <div class="search-list-item-image-guest-indicator-badge" data-bind="l10n_text: z.string.conversation_guest_indicator" data-uie-name="status-guest"></div>
-            <!-- /ko -->
-          </div>
-
-          <div class="search-list-item-content">
-            <!-- ko if: $parent.selfUser().is_team_member() -->
-              <availability-state class="search-list-item-content-availability search-list-item-content-name"
-                data-uie-name="status-availability-item"
-                params="availability: availability, label: first_name"></availability-state>
-            <!-- /ko -->
-
-            <!-- ko ifnot: $parent.selfUser().is_team_member() -->
-              <div class="search-list-item-content-name" data-bind="text: first_name"></div>
-            <!-- /ko -->
-          </div>
-        <!-- /ko -->
-
-        <!-- ko ifnot: $parent.isCompactMode -->
-          <div class="search-list-item-image">
-            <participant-avatar params="participant: $data, size: z.components.ParticipantAvatar.SIZE.SMALL"></participant-avatar>
-            <div class="search-list-item-image-overlay">
-              <div class="background"></div>
-              <div class="checkmark icon-check"></div>
-            </div>
-          </div>
-
-          <div class="search-list-item-content">
-            <!-- ko if: $parent.selfUser().is_team_member() -->
-              <availability-state class="search-list-item-content-availability search-list-item-content-name"
-                data-uie-name="status-availability"
-                params="availability: availability, label: name"></availability-state>
-            <!-- /ko -->
-
-            <!-- ko ifnot: $parent.selfUser().is_team_member() -->
-              <div class="search-list-item-content-name" data-bind="text: name"></div>
-            <!-- /ko -->
-            <div class="search-list-item-content-info">
-              <!-- ko if: $data.username() -->
-                <span class="search-list-item-content-username label-username label-username-notext" data-bind="text: $data.username"></span>
-              <!-- /ko -->
-            </div>
-          </div>
-
-          <!-- ko if: !$parent.isOthersMode && $data.is_guest() -->
-            <div class="search-list-item-guest-indicator" data-uie-name="status-guest">
-              <div class="search-list-item-guest-indicator-badge" data-bind="l10n_text: z.string.conversation_guest_indicator"></div>
-            </div>
-          <!-- /ko -->
-          <!-- ko if: $parent.isSelectEnabled -->
-            <div class="search-list-item-select icon-check" data-bind="css: {'selected': $parent.isSelected($data)}" data-uie-name="status-selected"></div>
-          <!-- /ko -->
-        <!-- /ko -->
-      </div>
+      <participant-item params="participant: $data, canSelect: $parent.isSelectEnabled, isSelected: $parent.isSelected($data)" data-bind="click: $parent.onUserClick"></participant-item>
     </div>
 
     <!-- ko if: typeof filter === 'function' -->

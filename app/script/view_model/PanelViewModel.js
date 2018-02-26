@@ -32,9 +32,18 @@ z.viewModel.PanelViewModel = class PanelViewModel {
     this.elementId = 'right-column';
     this.logger = new z.util.Logger('z.viewModel.PanelViewModel', z.config.LOGGER.OPTIONS);
 
+    this.mainViewModel = mainViewModel;
+
     // Nested view models
     this.participants = new z.viewModel.panel.ParticipantsViewModel(mainViewModel, this, repositories);
     this.guestOptions = new z.viewModel.panel.GuestOptionsViewModel(mainViewModel, this, repositories);
+
+    this.conversationEntity = repositories.conversation.active_conversation;
+    this.conversationEntity.subscribe(() => {
+      if (this.mainViewModel.isPanelOpen()) {
+        this.mainViewModel.closePanel();
+      }
+    });
 
     ko.applyBindings(this, document.getElementById(this.elementId));
   }
