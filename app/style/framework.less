@@ -39,19 +39,7 @@
   .center-column {
     position: relative;
     flex: 1 1 auto;
-  }
-
-  .right-column {
-    transform: scale(1, 1);
-    overflow: hidden;
-    width: 0;
-  }
-}
-
-.app {
-  .center-column {
     &__overlay {
-      background-color: rgba(0, 0, 0, 0.1);
       position: absolute;
       top: 0;
       left: 0;
@@ -66,13 +54,29 @@
     }
   }
 
-  &.app--panel-open {
-    .center-column {
+  .right-column {
+    background-color: #fff;
+    transform: scale(1, 1);
+    overflow: hidden;
+    width: 0;
+    box-shadow: 0 0 24px rgba(0, 0, 0, 0.08);
+    .right-panel-header {
+      height: @content-title-bar-height;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
     }
+  }
 
+  @media (min-width: 1000px) {
+    .right-column {
+      box-shadow: -1px 0 0 #eee;
+    }
+  }
+  &.app--panel-open {
     .center-column__overlay {
       display: block;
-      opacity: 1;
     }
 
     .right-column {

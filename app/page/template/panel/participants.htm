@@ -1,6 +1,9 @@
 <div id="participants" class="participants" data-bind="with: $root.participants, css: {'show-participant': $root.participants.showParticipantProfile()}">
+  <div class="right-panel-header">
+    <div></div>
+    <div class="right-panel-close icon-close icon-button"></div>
+  </div>
   <div class="participants-transition">
-
     <!-- ko if: stateParticipants() -->
       <div class="participants-group">
         <div class="participants-group-header">
@@ -13,7 +16,7 @@
         </div>
         <div class="participants-group-list">
           <!-- ko if: renderParticipants -->
-            <user-list params="user: unverifiedParticipants, click: clickOnShowParticipant, mode: z.components.UserList.MODE.COMPACT" data-uie-name="list-unverified"></user-list>
+            <user-list params="user: unverifiedParticipants, click: clickOnShowParticipant, mode: z.components.UserList.MODE.DEFAULT" data-uie-name="list-unverified"></user-list>
             <!-- ko if: verifiedParticipants().length -->
               <div class="participants-group-list-separator">
                 <svg width="16" height="16">

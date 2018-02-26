@@ -81,7 +81,6 @@ z.viewModel.MainViewModel = class MainViewModel {
     const titleBar = document.querySelector('#conversation-titlebar');
     const input = document.querySelector('.conversation-input');
     // const messageList = document.querySelector('#message-list');
-    const overlay = document.querySelector('.center-column__overlay');
     // messageList.style.transformOrigin = 'left';
 
     const isNarrowScreen = app.offsetWidth < breakPoint;
@@ -92,17 +91,21 @@ z.viewModel.MainViewModel = class MainViewModel {
     return new Promise(resolve => {
       panel.addEventListener('transitionend', () => {
         clearStyles(panel, ['width', 'transform', 'position', 'right', 'transition']);
-        clearStyles(overlay, ['display', 'opacity', 'transition']);
         clearStyles(titleBar, ['width', 'transition']);
         clearStyles(input, ['width', 'transition']);
         // clearStyles(messageList, ['width', 'transform', 'transition']);
-
+        const close = document.querySelector('.right-panel-close');
+        const overlay = document.querySelector('.center-column__overlay');
         if (isPanelOpen) {
           app.classList.remove('app--panel-open');
           this.isPanelOpen(false);
+          close.removeEventListener('click', this.togglePanel);
+          overlay.removeEventListener('click', this.togglePanel);
         } else {
           app.classList.add('app--panel-open');
           this.isPanelOpen(true);
+          close.addEventListener('click', this.togglePanel);
+          overlay.addEventListener('click', this.togglePanel);
         }
         window.dispatchEvent(new Event('resize'));
         resolve();
@@ -110,9 +113,7 @@ z.viewModel.MainViewModel = class MainViewModel {
 
       if (isPanelOpen) {
         applyStyle(panel, panelOpenStyle(panelSize));
-        if (isNarrowScreen) {
-          applyStyle(overlay, {opacity: 1});
-        } else {
+        if (!isNarrowScreen) {
           applyStyle(titleBar, {width: `${centerWidthOpen}px`});
           applyStyle(input, {width: `${centerWidthOpen}px`});
           // applyStyle(messageList, {
@@ -122,9 +123,7 @@ z.viewModel.MainViewModel = class MainViewModel {
         }
       } else {
         applyStyle(panel, panelCloseStyle(panelSize));
-        if (isNarrowScreen) {
-          applyStyle(overlay, {display: 'block', opacity: 0});
-        } else {
+        if (!isNarrowScreen) {
           applyStyle(titleBar, {width: `${centerWidthClose}px`});
           applyStyle(input, {width: `${centerWidthClose}px`});
           // applyStyle(messageList, {
@@ -138,23 +137,18 @@ z.viewModel.MainViewModel = class MainViewModel {
       requestAnimationFrame(() =>
         setTimeout(() => {
           panel.style.transition = 'transform .35s cubic-bezier(0.19, 1, 0.22, 1)';
-          overlay.style.transition = 'opacity .35s cubic-bezier(0.165, 0.84, 0.44, 1)';
           titleBar.style.transition = input.style.transition = 'width .35s cubic-bezier(0.19, 1, 0.22, 1)';
 
           if (isPanelOpen) {
             applyStyle(panel, panelCloseStyle(panelSize));
-            if (isNarrowScreen) {
-              applyStyle(overlay, {opacity: 0});
-            } else {
+            if (!isNarrowScreen) {
               applyStyle(titleBar, {width: `${centerWidthClose}px`});
               applyStyle(input, {width: `${centerWidthClose}px`});
               // applyStyle(messageList, {transform: `scale(1, 1)`});
             }
           } else {
             applyStyle(panel, panelOpenStyle(panelSize));
-            if (isNarrowScreen) {
-              applyStyle(overlay, {opacity: 1});
-            } else {
+            if (!isNarrowScreen) {
               applyStyle(titleBar, {width: `${centerWidthOpen}px`});
               applyStyle(input, {width: `${centerWidthOpen}px`});
               // applyStyle(messageList, {transform: `scale(1, 1)`});

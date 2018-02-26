@@ -39,9 +39,25 @@
 // ----------------------------------------------------------------------------
 // Group overview
 // ----------------------------------------------------------------------------
+.participants {
+  height: 100vh;
+  position: relative;
+}
+.participants-transition,
+.participants-group {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+.participants-transition {
+  top: @content-title-bar-height;
+}
 
 .participants-group {
-  .bubble-content();
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
 }
 
