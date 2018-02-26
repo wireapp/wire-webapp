@@ -233,7 +233,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           case z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM:
             accessPayload = {
               access: [z.conversation.ACCESS_MODE.INVITE, z.conversation.ACCESS_MODE.CODE],
-              access_role: z.conversation.ACCESS_ROLE.NON_VERIFIED,
+              access_role: z.conversation.ACCESS_ROLE.NON_ACTIVATED,
             };
             break;
           case z.conversation.ACCESS_STATE.TEAM.TEAM_ONLY:

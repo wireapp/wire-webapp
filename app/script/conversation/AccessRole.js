@@ -23,8 +23,8 @@ window.z = window.z || {};
 window.z.conversation = z.conversation || {};
 
 z.conversation.ACCESS_ROLE = {
-  NON_VERIFIED: 'non_verified',
+  ACTIVATED: 'activated',
+  NON_ACTIVATED: 'non_activated',
   PRIVATE: 'private',
   TEAM: 'team',
-  VERIFIED: 'verified',
 };

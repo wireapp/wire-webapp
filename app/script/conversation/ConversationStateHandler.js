@@ -59,7 +59,7 @@ z.conversation.ConversationStateHandler = class ConversationStateHandler {
         const changeToTeamOnly = accessState === z.conversation.ACCESS_STATE.TEAM.TEAM_ONLY;
         if (changeToGuestRoom) {
           accessModes = [z.conversation.ACCESS_MODE.INVITE, z.conversation.ACCESS_MODE.CODE];
-          accessRole = z.conversation.ACCESS_ROLE.NON_VERIFIED;
+          accessRole = z.conversation.ACCESS_ROLE.NON_ACTIVATED;
         } else if (changeToTeamOnly) {
           accessModes = [z.conversation.ACCESS_MODE.INVITE];
           accessRole = z.conversation.ACCESS_ROLE.TEAM;

@@ -288,7 +288,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
         return conversationEntity.accessState(z.conversation.ACCESS_STATE.TEAM.TEAM_ONLY);
       }
 
-      const isNonVerifiedRole = accessRole === z.conversation.ACCESS_ROLE.NON_VERIFIED;
+      const isNonVerifiedRole = accessRole === z.conversation.ACCESS_ROLE.NON_ACTIVATED;
 
       const includesCodeMode = accessModes.includes(z.conversation.ACCESS_MODE.CODE);
       const isExpectedModes = includesCodeMode && includesInviteMode && accessModes.length === 2;
