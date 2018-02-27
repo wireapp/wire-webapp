@@ -19,18 +19,29 @@
 
 'use strict';
 
+const chalk = require('chalk');
+const path = require('path');
+
 module.exports = grunt =>
   grunt.registerTask('npmCopy', () => {
-    const distPath = grunt.config('dir.dist');
+    const distPath = grunt.config('dir.app.ext');
 
     const npmModules = {
+      '@wireapp/cbor': ['dist/cbor.bundle.js'],
       '@wireapp/cryptobox': ['dist/cryptobox.bundle.js'],
+      '@wireapp/lru-cache': ['dist/lru-cache.bundle.js'],
+      '@wireapp/proteus': ['dist/proteus.bundle.js'],
     };
 
     Object.keys(npmModules).forEach(module => {
       const moduleFiles = npmModules[module];
-      moduleFiles.forEach(file =>
-        grunt.file.copy(`node_modules/${module}/${npmModules[module]}`, `${distPath}/ext/js/${module}/${file}`)
-      );
+      moduleFiles.forEach(file => {
+        const from = path.join('node_modules', module, file);
+        const to = path.join(distPath, 'js', module, file);
+        grunt.file.copy(from, to);
+        grunt.log.writeln(chalk`Copied file from "{blue ${from}}" to "{blue ${to}}".`);
+      });
     });
+
+    grunt.log.ok(chalk`Copied npm components from "{blue node_modules}" to "{blue ${distPath}}".`);
   });

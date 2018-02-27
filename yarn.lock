@@ -128,11 +128,11 @@
   version "3.4.1"
   resolved "https://codeload.github.com/knockout/knockout/tar.gz/7a83820efc96d47742e2f8c9b4fcd2459c81dd21"
 
-"@bower_components/libsodium.js@jedisct1/libsodium.js#0.5.4":
-  version "0.5.4"
-  resolved "https://codeload.github.com/jedisct1/libsodium.js/tar.gz/8b8319a38dcdbdd29a97f69a0807ca4993d1b304"
+"@bower_components/libsodium.js@jedisct1/libsodium.js#0.7.3":
+  version "0.7.3"
+  resolved "https://codeload.github.com/jedisct1/libsodium.js/tar.gz/ef2cc92f2388e37ebf714d37bfae85850ed302d4"
   dependencies:
-    libsodium "0.5.4"
+    libsodium "0.7.3"
 
 "@bower_components/linkifyjs@nfrasser/linkify-shim#2.1.5":
   version "0.0.0"
@@ -235,24 +235,6 @@
 "@bower_components/wire-theme@wireapp/wire-theme#1.0.6":
   version "1.0.6"
   resolved "https://codeload.github.com/wireapp/wire-theme/tar.gz/8fb3b63a55a0cf96be9ac4718df6225784d5577a"
-
-"@bower_components/wire-webapp-cbor@wireapp/wire-webapp-cbor#2.1.5":
-  version "2.1.5"
-  resolved "https://codeload.github.com/wireapp/wire-webapp-cbor/tar.gz/d00796b5340c087363790627f5683dcb9ce45c74"
-
-"@bower_components/wire-webapp-lru-cache@wireapp/wire-webapp-lru-cache#2.0.0":
-  version "2.0.0"
-  resolved "https://codeload.github.com/wireapp/wire-webapp-lru-cache/tar.gz/39ede33067020fa0238f74f393c6e128665cf32e"
-  dependencies:
-    webpack "^2.2.0-rc.0"
-
-"@bower_components/wire-webapp-proteus@wireapp/proteus.js#5.2.0":
-  version "5.2.0"
-  resolved "https://codeload.github.com/wireapp/proteus.js/tar.gz/97e584ca312db999daf5fbe7573f22ec0618914d"
-  dependencies:
-    ed2curve "0.2.1"
-    libsodium-wrappers-sumo "0.5.4"
-    wire-webapp-cbor "2.1.5"
 
 "@protobufjs/aspromise@^1.1.1", "@protobufjs/aspromise@^1.1.2":
   version "1.1.2"
@@ -372,49 +354,49 @@
     spark-md5 "3.0.0"
     tough-cookie "2.3.3"
 
-"@wireapp/cbor@3.0.4":
-  version "3.0.4"
-  resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-3.0.4.tgz#4ecf22561cda3051ff1d66f66ece3407dd7b8bcc"
+"@wireapp/cbor@3.0.5":
+  version "3.0.5"
+  resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-3.0.5.tgz#e31d4e66ded52259bbbf6b4f608f3491aaca17d9"
 
-"@wireapp/core@2.0.33":
-  version "2.0.33"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-2.0.33.tgz#e0550d3222549af5d1ebb061e593a6c104443a71"
+"@wireapp/core@2.0.34":
+  version "2.0.34"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-2.0.34.tgz#5cde1433fa89c31ea6c4de02e494547d6c42127e"
   dependencies:
     "@types/node" "9.4.6"
     "@wireapp/api-client" "0.4.11"
-    "@wireapp/cryptobox" "8.1.0"
+    "@wireapp/cryptobox" "8.1.1"
     "@wireapp/store-engine" "0.2.5"
     bazinga64 "5.0.3"
     protobufjs "6.8.5"
     pure-uuid "1.5.0"
 
-"@wireapp/cryptobox@8.1.0":
-  version "8.1.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-8.1.0.tgz#72228bf60d047635c2a5e831186cd97f085b8d25"
+"@wireapp/cryptobox@8.1.1":
+  version "8.1.1"
+  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-8.1.1.tgz#3f8ec7633868a1b0da9a665e6ee3640c1467f2e1"
   dependencies:
     "@types/fs-extra" "5.0.0"
     "@types/node" "9.3.0"
-    "@wireapp/lru-cache" "2.0.7"
-    "@wireapp/proteus" "7.1.2"
+    "@wireapp/lru-cache" "2.0.8"
+    "@wireapp/proteus" "7.1.3"
     "@wireapp/store-engine" "0.2.5"
     dexie "2.0.1"
     fs-extra "5.0.0"
     p-queue "2.3.0"
 
-"@wireapp/lru-cache@2.0.7":
-  version "2.0.7"
-  resolved "https://registry.yarnpkg.com/@wireapp/lru-cache/-/lru-cache-2.0.7.tgz#e73e6b1bdf5da9c99bf48552a1be861ff85fa9b8"
+"@wireapp/lru-cache@2.0.8":
+  version "2.0.8"
+  resolved "https://registry.yarnpkg.com/@wireapp/lru-cache/-/lru-cache-2.0.8.tgz#c0d5190170af9d240759f9978991a938e8f860b3"
   dependencies:
     webpack "3.11.0"
 
-"@wireapp/proteus@7.1.2":
-  version "7.1.2"
-  resolved "https://registry.yarnpkg.com/@wireapp/proteus/-/proteus-7.1.2.tgz#3de5b49d3969aa7a3da00df2f16a26103eb81378"
+"@wireapp/proteus@7.1.3":
+  version "7.1.3"
+  resolved "https://registry.yarnpkg.com/@wireapp/proteus/-/proteus-7.1.3.tgz#df3df2b60b492311f3e17867c37ff994dc267e4b"
   dependencies:
     "@types/chai" "4.1.2"
     "@types/ed2curve" "0.2.2"
     "@types/node" "9.4.6"
-    "@wireapp/cbor" "3.0.4"
+    "@wireapp/cbor" "3.0.5"
     ed2curve "0.2.1"
     libsodium-wrappers-sumo "0.7.3"
 
@@ -518,10 +500,6 @@ agent-base@2:
     extend "~3.0.0"
     semver "~5.0.1"
 
-ajv-keywords@^1.1.1:
-  version "1.5.1"
-  resolved "https://registry.yarnpkg.com/ajv-keywords/-/ajv-keywords-1.5.1.tgz#314dd0a4b3368fad3dfcdc54ede6171b886daf3c"
-
 ajv-keywords@^2.1.0:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/ajv-keywords/-/ajv-keywords-2.1.1.tgz#617997fc5f60576894c435f940d819e135b80762"
@@ -530,7 +508,7 @@ ajv-keywords@^3.1.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/ajv-keywords/-/ajv-keywords-3.1.0.tgz#ac2b27939c543e95d2c06e7f7f5c27be4aa543be"
 
-ajv@^4.7.0, ajv@^4.9.1:
+ajv@^4.9.1:
   version "4.11.8"
   resolved "https://registry.yarnpkg.com/ajv/-/ajv-4.11.8.tgz#82ffb02b29e662ae53bdc20af15947706739c536"
   dependencies:
@@ -3127,7 +3105,7 @@ engine.io@~3.1.0:
   optionalDependencies:
     uws "~0.14.4"
 
-enhanced-resolve@^3.3.0, enhanced-resolve@^3.4.0:
+enhanced-resolve@^3.4.0:
   version "3.4.1"
   resolved "https://registry.yarnpkg.com/enhanced-resolve/-/enhanced-resolve-3.4.1.tgz#0421e339fd71419b3da13d129b3979040230476e"
   dependencies:
@@ -5098,6 +5076,10 @@ is-fullwidth-code-point@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/is-fullwidth-code-point/-/is-fullwidth-code-point-2.0.0.tgz#a3b30a5c4f199183167aaab93beefae3ddfb654f"
 
+is-function@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/is-function/-/is-function-1.0.1.tgz#12cfb98b65b57dd3d193a3121f5f6e2f437602b5"
+
 is-generator-fn@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/is-generator-fn/-/is-generator-fn-1.0.0.tgz#969d49e1bb3329f6bb7f09089be26578b2ddd46a"
@@ -5795,19 +5777,9 @@ libqp@1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/libqp/-/libqp-1.1.0.tgz#f5e6e06ad74b794fb5b5b66988bf728ef1dedbe8"
 
-libsodium-sumo@0.5.4:
-  version "0.5.4"
-  resolved "https://registry.yarnpkg.com/libsodium-sumo/-/libsodium-sumo-0.5.4.tgz#08af4af945754ee9daf2de9d1385c9fc0e64cec0"
-
 libsodium-sumo@0.7.3:
   version "0.7.3"
   resolved "https://registry.yarnpkg.com/libsodium-sumo/-/libsodium-sumo-0.7.3.tgz#c38d99dc3b2c056870ca8f3ac8f1ecbb150ecbbf"
-
-libsodium-wrappers-sumo@0.5.4:
-  version "0.5.4"
-  resolved "https://registry.yarnpkg.com/libsodium-wrappers-sumo/-/libsodium-wrappers-sumo-0.5.4.tgz#ee69f6c960965e0d7d65cc4282c2fb33485d06a2"
-  dependencies:
-    libsodium-sumo "0.5.4"
 
 libsodium-wrappers-sumo@0.7.3:
   version "0.7.3"
@@ -5815,9 +5787,9 @@ libsodium-wrappers-sumo@0.7.3:
   dependencies:
     libsodium-sumo "0.7.3"
 
-libsodium@0.5.4:
-  version "0.5.4"
-  resolved "https://registry.yarnpkg.com/libsodium/-/libsodium-0.5.4.tgz#874413435ee40c512dd59ea6db9b75970f8aec02"
+libsodium@0.7.3:
+  version "0.7.3"
+  resolved "https://registry.yarnpkg.com/libsodium/-/libsodium-0.7.3.tgz#35faf57293ba5485049d5072d0e96feda12f1f35"
 
 lint-staged@7.0.0:
   version "7.0.0"
@@ -5937,15 +5909,6 @@ load-json-file@^4.0.0:
 loader-runner@^2.3.0:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/loader-runner/-/loader-runner-2.3.0.tgz#f482aea82d543e07921700d5a46ef26fdac6b8a2"
-
-loader-utils@^0.2.16:
-  version "0.2.17"
-  resolved "https://registry.yarnpkg.com/loader-utils/-/loader-utils-0.2.17.tgz#f86e6374d43205a6e6c60e9196f17c0299bfb348"
-  dependencies:
-    big.js "^3.1.3"
-    emojis-list "^2.0.0"
-    json5 "^0.5.0"
-    object-assign "^4.0.1"
 
 loader-utils@^1.0.2, loader-utils@^1.1.0:
   version "1.1.0"
@@ -9469,27 +9432,23 @@ strip-json-comments@~2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/strip-json-comments/-/strip-json-comments-2.0.1.tgz#3c531942e908c2697c0ec344858c286c7ca0a60a"
 
-styled-components@3.1.6:
-  version "3.1.6"
-  resolved "https://registry.yarnpkg.com/styled-components/-/styled-components-3.1.6.tgz#9c443146fa82c6659a9f64dd493bf2202480342e"
+styled-components@2.3.0:
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/styled-components/-/styled-components-2.3.0.tgz#d9cf4574e140fea6426e48632ed0ca4494537718"
   dependencies:
     buffer "^5.0.3"
     css-to-react-native "^2.0.3"
     fbjs "^0.8.9"
     hoist-non-react-statics "^1.2.0"
+    is-function "^1.0.1"
     is-plain-object "^2.0.1"
     prop-types "^15.5.4"
     stylis "^3.4.0"
-    stylis-rule-sheet "^0.0.7"
     supports-color "^3.2.3"
 
-styled-normalize@4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/styled-normalize/-/styled-normalize-4.0.0.tgz#18437c655bc0c42a18f8b5345f1c310cce775c18"
-
-stylis-rule-sheet@^0.0.7:
-  version "0.0.7"
-  resolved "https://registry.yarnpkg.com/stylis-rule-sheet/-/stylis-rule-sheet-0.0.7.tgz#5c51dc879141a61821c2094ba91d2cbcf2469c6c"
+styled-normalize@2.2.1:
+  version "2.2.1"
+  resolved "https://registry.yarnpkg.com/styled-normalize/-/styled-normalize-2.2.1.tgz#c93a007c0339a69e3254eeef8cb6a5a96e5ca4eb"
 
 stylis@^3.4.0:
   version "3.4.5"
@@ -9564,7 +9523,7 @@ table@^4.0.1:
     slice-ansi "1.0.0"
     string-width "^2.1.1"
 
-tapable@^0.2.7, tapable@~0.2.5:
+tapable@^0.2.7:
   version "0.2.8"
   resolved "https://registry.yarnpkg.com/tapable/-/tapable-0.2.8.tgz#99372a5c999bf2df160afc0d74bed4f47948cd22"
 
@@ -9803,7 +9762,7 @@ uglify-js@3.3.12:
     commander "~2.14.1"
     source-map "~0.6.1"
 
-uglify-js@^2.6, uglify-js@^2.8.27, uglify-js@^2.8.29:
+uglify-js@^2.6, uglify-js@^2.8.29:
   version "2.8.29"
   resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-2.8.29.tgz#29c5733148057bb4e1f75df35b7a9cb72e6a59dd"
   dependencies:
@@ -10069,7 +10028,7 @@ warning@^3.0.0:
   dependencies:
     loose-envify "^1.0.0"
 
-watchpack@^1.3.1, watchpack@^1.4.0:
+watchpack@^1.4.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/watchpack/-/watchpack-1.4.0.tgz#4a1472bcbb952bd0a9bb4036801f954dfb39faac"
   dependencies:
@@ -10163,32 +10122,6 @@ webpack@3.11.0:
     webpack-sources "^1.0.1"
     yargs "^8.0.2"
 
-webpack@^2.2.0-rc.0:
-  version "2.7.0"
-  resolved "https://registry.yarnpkg.com/webpack/-/webpack-2.7.0.tgz#b2a1226804373ffd3d03ea9c6bd525067034f6b1"
-  dependencies:
-    acorn "^5.0.0"
-    acorn-dynamic-import "^2.0.0"
-    ajv "^4.7.0"
-    ajv-keywords "^1.1.1"
-    async "^2.1.2"
-    enhanced-resolve "^3.3.0"
-    interpret "^1.0.0"
-    json-loader "^0.5.4"
-    json5 "^0.5.1"
-    loader-runner "^2.3.0"
-    loader-utils "^0.2.16"
-    memory-fs "~0.4.1"
-    mkdirp "~0.5.0"
-    node-libs-browser "^2.0.0"
-    source-map "^0.5.3"
-    supports-color "^3.1.0"
-    tapable "~0.2.5"
-    uglify-js "^2.8.27"
-    watchpack "^1.3.1"
-    webpack-sources "^1.0.1"
-    yargs "^6.0.0"
-
 websocket-driver@>=0.5.1:
   version "0.7.0"
   resolved "https://registry.yarnpkg.com/websocket-driver/-/websocket-driver-0.7.0.tgz#0caf9d2d755d93aee049d4bdd0d3fe2cca2a24eb"
@@ -10253,10 +10186,6 @@ window-size@0.1.0:
 window-size@^0.1.4:
   version "0.1.4"
   resolved "https://registry.yarnpkg.com/window-size/-/window-size-0.1.4.tgz#f8e1aa1ee5a53ec5bf151ffa09742a6ad7697876"
-
-wire-webapp-cbor@2.1.5:
-  version "2.1.5"
-  resolved "https://registry.yarnpkg.com/wire-webapp-cbor/-/wire-webapp-cbor-2.1.5.tgz#742912cb40b037dcc7125ce4c554ea2d6d398064"
 
 wordwrap@0.0.2:
   version "0.0.2"
@@ -10366,7 +10295,7 @@ yargs-parser@^7.0.0:
   dependencies:
     camelcase "^4.1.0"
 
-yargs@6.6.0, yargs@^6.0.0:
+yargs@6.6.0:
   version "6.6.0"
   resolved "https://registry.yarnpkg.com/yargs/-/yargs-6.6.0.tgz#782ec21ef403345f830a808ca3d513af56065208"
   dependencies:
