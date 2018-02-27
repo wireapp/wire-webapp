@@ -99,7 +99,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
 
         this.logger.log(`Received '${preKeys.length}' new PreKeys.`, serializedPreKeys);
         return this.cryptographyService.putClientPreKeys(this.currentClient().id, serializedPreKeys).then(() => {
-          this.logger.log(`Successfully uploaded '${serializedPreKeys.length}' PreKeys.`);
+          this.logger.log(`Successfully uploaded '${serializedPreKeys.length}' PreKeys.`, serializedPreKeys);
         });
       });
 

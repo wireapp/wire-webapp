@@ -87,13 +87,9 @@ z.assets.AssetCrypto = (() => {
 
   const _generateRandomBytes = length => {
     const getRandomValue = () => {
-      try {
-        const buffer = new Uint32Array(1);
-        window.crypto.getRandomValues(buffer);
-        return buffer[0] >>> 0;
-      } catch (error) {
-        throw `Secure random number generation failed: ${error}`;
-      }
+      const buffer = new Uint32Array(1);
+      window.crypto.getRandomValues(buffer);
+      return buffer[0] >>> 0;
     };
 
     const randomValues = new Uint32Array(length / 4).map(getRandomValue);
