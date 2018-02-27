@@ -150,7 +150,7 @@ describe('z.viewModel.WindowTitleViewModel', () => {
     it('sets the name when opening the preferences av page', () => {
       title_view_model.contentState(z.viewModel.ContentViewModel.STATE.PREFERENCES_AV);
 
-      const expected_title = `${z.string.preferencesAv} · ${suffix}`;
+      const expected_title = `${z.string.preferencesAV} · ${suffix}`;
       title_view_model.initiateTitleUpdates();
       expect(window.document.title).toBe(expected_title);
     });

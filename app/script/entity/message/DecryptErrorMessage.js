@@ -37,8 +37,8 @@ z.entity.DecryptErrorMessage = class DecryptErrorMessage extends z.entity.Messag
     this.caption = ko.pureComputed(() => {
       const content = `<span class='label-bold-xs'>${z.util.escape_html(this.user().first_name())}</span>`;
       const string_id = this.is_remote_identity_changed()
-        ? z.string.conversationUnableToDecrypt_2
-        : z.string.conversationUnableToDecrypt_1;
+        ? z.string.conversationUnableToDecrypt2
+        : z.string.conversationUnableToDecrypt1;
 
       return z.l10n.text(string_id, content);
     });

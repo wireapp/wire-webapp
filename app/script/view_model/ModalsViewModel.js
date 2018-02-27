@@ -212,9 +212,9 @@ z.viewModel.ModalsViewModel = class ModalsViewModel {
   _showModalCallStartAnother(callState, titleElement, messageElement) {
     const action_element = $(ModalsViewModel.TYPE.CALL_START_ANOTHER).find('.modal-action');
 
-    action_element.text(z.l10n.text(z.string[`modal_call_second_${callState}_action`]));
-    messageElement.text(z.l10n.text(z.string[`modal_call_second_${callState}_message`]));
-    titleElement.text(z.l10n.text(z.string[`modal_call_second_${callState}_headline`]));
+    action_element.text(z.l10n.text(z.string[`modalCallSecond${callState}Action`]));
+    messageElement.text(z.l10n.text(z.string[`modalCallSecond${callState}Message`]));
+    titleElement.text(z.l10n.text(z.string[`modalCallSecond${callState}Headline`]));
   }
 
   _showModalClear(options, type) {

@@ -98,7 +98,7 @@ z.viewModel.WindowTitleViewModel = class WindowTitleViewModel {
             }
 
             case z.viewModel.ContentViewModel.STATE.PREFERENCES_AV: {
-              specificTitle += z.l10n.text(z.string.preferencesAv);
+              specificTitle += z.l10n.text(z.string.preferencesAV);
               break;
             }
 

@@ -208,9 +208,9 @@ z.string.modalServiceUnavailableHeadline = 'Adding service not possible';
 z.string.modalServiceUnavailableMessage = 'The service is unavailable a the moment.';
 // Session Reset
 z.string.modalSessionResetHeadline = 'The session has been reset';
-z.string.modalSessionResetMessage_1 = 'If the problem is not resolved,';
+z.string.modalSessionResetMessage1 = 'If the problem is not resolved,';
 z.string.modalSessionResetMessageLink = 'contact';
-z.string.modalSessionResetMessage_2 = 'us.';
+z.string.modalSessionResetMessage2 = 'us.';
 // Too many members in conversation
 z.string.modalTooManyMembersHeadline = 'Full house';
 z.string.modalTooManyMembersMessage = 'Up to {{number1}} people can join a conversation. There is room for {{number2}} more people in here.';
@@ -269,8 +269,8 @@ z.string.conversationVerified = 'Verified';
 z.string.conversationVoiceChannelDeactivate = ' called';
 z.string.conversationVoiceChannelDeactivateYou = ' called';
 z.string.conversationYesterday = 'Yesterday';
-z.string.conversationUnableToDecrypt_1 = 'a message from {{user}} was not received.';
-z.string.conversationUnableToDecrypt_2 = '{{user}}´s device identity changed. Undelivered message.';
+z.string.conversationUnableToDecrypt1 = 'a message from {{user}} was not received.';
+z.string.conversationUnableToDecrypt2 = '{{user}}´s device identity changed. Undelivered message.';
 z.string.conversationUnableToDecryptLink = 'Why?';
 z.string.conversationUnableToDecryptErrorMessage = 'Error';
 z.string.conversationUnableToDecryptResetSession = 'Reset session';
@@ -458,7 +458,7 @@ z.string.peopleButtonYes = 'Yes';
 // Settings
 z.string.preferencesAbout = 'About';
 z.string.preferencesAccount = 'Account';
-z.string.preferencesAv = 'Audio / Video';
+z.string.preferencesAV = 'Audio / Video';
 z.string.preferencesDeviceDetails = 'Device Details';
 z.string.preferencesDevices = 'Devices';
 z.string.preferencesHeadline = 'Preferences';
@@ -485,10 +485,10 @@ z.string.preferencesAccountUsernameHint = 'At least 2 characters. a—z, 0—9 a
 z.string.preferencesAccountUsernameAvailable = 'Available';
 z.string.preferencesAccountUsernameErrorTaken = 'Already taken';
 
-z.string.preferencesAvCamera = 'Camera';
-z.string.preferencesAvMicrophone = 'Microphone';
-z.string.preferencesAvPermissionDetail = 'Enable from your browser Preferences';
-z.string.preferencesAvSpeakers = 'Speakers';
+z.string.preferencesAVCamera = 'Camera';
+z.string.preferencesAVMicrophone = 'Microphone';
+z.string.preferencesAVPermissionDetail = 'Enable from your browser Preferences';
+z.string.preferencesAVSpeakers = 'Speakers';
 
 z.string.preferencesDevicesActivatedIn = 'in {{location}}';
 z.string.preferencesDevicesActivatedOn = 'Activated on {{date}}';
