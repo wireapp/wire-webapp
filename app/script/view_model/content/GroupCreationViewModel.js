@@ -36,10 +36,12 @@ z.viewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
     this.logger = new z.util.Logger('z.viewModel.content.GroupCreationViewModel', z.config.LOGGER.OPTIONS);
 
     this.clickOnCreate = this.clickOnCreate.bind(this);
+    this.clickOnToggleGuestMode = this.clickOnToggleGuestMode.bind(this);
 
     this.conversationRepository = repositories.conversation;
     this.teamRepository = repositories.team;
     this.userRepository = repositories.user;
+    this.isTeam = this.teamRepository.isTeam;
 
     this.modal = undefined;
     this.state = ko.observable(GroupCreationViewModel.STATE.DEFAULT);
@@ -63,7 +65,7 @@ z.viewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
     this.activateNext = ko.pureComputed(() => this.nameInput().length);
     this.contacts = ko.pureComputed(() => {
       if (this.showContacts()) {
-        if (!this.teamRepository.isTeam()) {
+        if (!this.isTeam()) {
           return this.userRepository.connected_users();
         }
 
@@ -75,6 +77,7 @@ z.viewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
           .teamMembers()
           .sort((userA, userB) => z.util.StringUtil.sort_by_priority(userA.first_name(), userB.first_name()));
       }
+      return [];
     });
     this.participantsActionText = ko.pureComputed(() => {
       const stringSelector = this.selectedContacts().length
@@ -143,6 +146,12 @@ z.viewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
 
   clickOnClose() {
     this._hideModal();
+  }
+
+  clickOnToggleGuestMode() {
+    this.accessState(
+      this.isGuestRoom() ? z.conversation.ACCESS_STATE.TEAM.TEAM_ONLY : z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM
+    );
   }
 
   clickOnCreate() {
