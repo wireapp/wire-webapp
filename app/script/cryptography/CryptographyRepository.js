@@ -427,7 +427,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
 
         const message = `Failed encrypting '${genericMessage.content}' for session '${sessionId}': ${error.message}`;
         this.logger.warn(message, error);
-        return {cipherText: CryptographyRepository.REMOTE_ENCRYPTION_FAILURE, session_id};
+        return {cipherText: CryptographyRepository.REMOTE_ENCRYPTION_FAILURE, sessionId};
       });
   }
 
