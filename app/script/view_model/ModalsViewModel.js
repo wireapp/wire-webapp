@@ -190,12 +190,12 @@ z.viewModel.ModalsViewModel = class ModalsViewModel {
   }
 
   _showModalBlock(content, titleElement, messageElement) {
-    titleElement.text(z.l10n.text(z.string.modal_block_conversation_headline, content));
-    messageElement.text(z.l10n.text(z.string.modal_block_conversation_message, content));
+    titleElement.text(z.l10n.text(z.string.modalBlockConversationHeadline, content));
+    messageElement.text(z.l10n.text(z.string.modalBlockConversationMessage, content));
   }
 
   _showModalBotsConfirm(content, messageElement) {
-    messageElement.text(z.l10n.text(z.string.modal_bots_confirm_message, content));
+    messageElement.text(z.l10n.text(z.string.modalBotsConfirmMessage, content));
   }
 
   /**
@@ -223,7 +223,7 @@ z.viewModel.ModalsViewModel = class ModalsViewModel {
     }
 
     const titleElement = $(type).find('.modal-title');
-    titleElement.text(z.l10n.text(z.string.modal_clear_conversation_headline));
+    titleElement.text(z.l10n.text(z.string.modalClearConversationHeadline));
 
     return type;
   }
@@ -239,13 +239,13 @@ z.viewModel.ModalsViewModel = class ModalsViewModel {
         .appendTo(devicesElement);
 
       $('<div>')
-        .text(`${z.l10n.text(z.string.modal_connected_device_from)} ${device.model}`)
+        .text(`${z.l10n.text(z.string.modalConnectedDeviceFrom)} ${device.model}`)
         .appendTo(devicesElement);
     });
   }
 
   _showModalLeave(content, titleElement) {
-    titleElement.text(z.l10n.text(z.string.modal_leave_conversation_headline, content));
+    titleElement.text(z.l10n.text(z.string.modalLeaveConversationHeadline, content));
   }
 
   _showModalNewDevice(content, titleElement, messageElement, action_element) {
@@ -256,25 +256,25 @@ z.viewModel.ModalsViewModel = class ModalsViewModel {
 
     let stringId;
     if (content.user_ets.length > 1) {
-      stringId = z.string.modal_new_device_headline_many;
+      stringId = z.string.modalNewDeviceHeadlineMany;
     } else {
       const isSelfUser = content.user_ets[0].is_me;
-      stringId = isSelfUser ? z.string.modal_new_device_headline_you : z.string.modal_new_device_headline;
+      stringId = isSelfUser ? z.string.modalNewDeviceHeadlineYou : z.string.modalNewDeviceHeadline;
     }
     titleElement.text(z.l10n.text(stringId, substitutions));
 
     switch (content.consent_type) {
       case ModalsViewModel.CONSENT_TYPE.INCOMING_CALL:
-        messageId = z.string.modal_new_device_call_incoming;
-        actionId = z.string.modal_new_device_call_accept;
+        messageId = z.string.modalNewDeviceCallIncoming;
+        actionId = z.string.modalNewDeviceCallAccept;
         break;
       case ModalsViewModel.CONSENT_TYPE.OUTGOING_CALL:
-        messageId = z.string.modal_new_device_call_outgoing;
-        actionId = z.string.modal_new_device_call_anyway;
+        messageId = z.string.modalNewDeviceCallOutgoing;
+        actionId = z.string.modalNewDeviceCallAnyway;
         break;
       default:
-        messageId = z.string.modal_new_device_message;
-        actionId = z.string.modal_new_device_send_anyway;
+        messageId = z.string.modalNewDeviceMessage;
+        actionId = z.string.modalNewDeviceSendAnyway;
     }
 
     messageElement.text(z.l10n.text(messageId));
@@ -282,28 +282,28 @@ z.viewModel.ModalsViewModel = class ModalsViewModel {
   }
 
   _showModalNotConnected(content, messageElement) {
-    const stringId = content ? z.string.modal_not_connected_message_one : z.string.modal_not_connected_message_many;
+    const stringId = content ? z.string.modalNotConnectedMessageOne : z.string.modalNotConnectedMessageMany;
     messageElement.text(z.l10n.text(stringId, content));
   }
 
   _showModalRemoveDevice(content, titleElement) {
-    titleElement.text(z.l10n.text(z.string.modal_remove_device_headline, content));
+    titleElement.text(z.l10n.text(z.string.modalRemoveDeviceHeadline, content));
   }
 
   _showModalTooManyMembers(content, messageElement) {
     const substitutions = {number1: content.max, number2: content.open_spots};
-    messageElement.text(z.l10n.text(z.string.modal_too_many_members_message, substitutions));
+    messageElement.text(z.l10n.text(z.string.modalTooManyMembersMessage, substitutions));
   }
 
   _showModalUploadParallel(content, titleElement) {
-    titleElement.text(z.l10n.text(z.string.modal_uploads_parallel, content));
+    titleElement.text(z.l10n.text(z.string.modalUploadsParallel, content));
   }
 
   _showModalUploadTooLarge(content, titleElement) {
-    titleElement.text(z.l10n.text(z.string.conversation_asset_upload_too_large, content));
+    titleElement.text(z.l10n.text(z.string.conversationAssetUploadTooLarge, content));
   }
 
   _showModalMessageTooLong(content, messageElement) {
-    messageElement.text(z.l10n.text(z.string.modal_too_long_message, content));
+    messageElement.text(z.l10n.text(z.string.modalTooLongMessage, content));
   }
 };

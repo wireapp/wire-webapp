@@ -81,11 +81,11 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
             return z.l10n.text(z.string.conversationCreateWith, this._generateNameString(z.string.Declension.DATIVE));
           }
           if (this.user().is_me) {
-            return z.l10n.text(z.string.conversation_create_you, this._generateNameString());
+            return z.l10n.text(z.string.conversationCreateYou, this._generateNameString());
           }
-          return z.l10n.text(z.string.conversation_create, this._generateNameString(z.string.Declension.DATIVE));
+          return z.l10n.text(z.string.conversationCreate, this._generateNameString(z.string.Declension.DATIVE));
         case z.message.SystemMessageType.CONVERSATION_RESUME:
-          return z.l10n.text(z.string.conversation_resume, this._generateNameString(z.string.Declension.DATIVE));
+          return z.l10n.text(z.string.conversationResume, this._generateNameString(z.string.Declension.DATIVE));
         default:
           break;
       }
@@ -95,14 +95,14 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
           const senderLeft = this.otherUser().id === this.user().id;
           if (senderLeft) {
             const userLeftStringId = this.user().is_me
-              ? z.string.conversation_member_leave_left_you
-              : z.string.conversation_member_leave_left;
+              ? z.string.conversationMemberLeaveLeftYou
+              : z.string.conversationMemberLeaveLeft;
             return z.l10n.text(userLeftStringId);
           }
 
           const userRemovedStringId = this.user().is_me
-            ? z.string.conversation_member_leave_removed_you
-            : z.string.conversation_member_leave_removed;
+            ? z.string.conversationMemberLeaveRemovedYou
+            : z.string.conversationMemberLeaveRemoved;
           return z.l10n.text(userRemovedStringId, this._generateNameString());
         case z.event.Backend.CONVERSATION.MEMBER_JOIN:
           const senderJoined = this.otherUser().id === this.user().id;
@@ -114,12 +114,12 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
           }
 
           const userJoinedStringId = this.user().is_me
-            ? z.string.conversation_member_join_you
-            : z.string.conversation_member_join;
+            ? z.string.conversationMemberJoinYou
+            : z.string.conversationMemberJoin;
 
           return z.l10n.text(userJoinedStringId, this._generateNameString());
         case z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE:
-          return z.l10n.text(z.string.conversation_team_leave);
+          return z.l10n.text(z.string.conversationTeamLeave);
         default:
           break;
       }
@@ -151,7 +151,7 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
   _getCaptionConnection(userEntity) {
     if (userEntity) {
       if (userEntity.is_blocked()) {
-        return z.l10n.text(z.string.conversation_connection_blocked);
+        return z.l10n.text(z.string.conversationConnectionBlocked);
       }
 
       if (userEntity.is_outgoing_request()) {
@@ -159,7 +159,7 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
       }
     }
 
-    return z.l10n.text(z.string.conversation_connection_accepted);
+    return z.l10n.text(z.string.conversationConnectionAccepted);
   }
 
   isConnection() {

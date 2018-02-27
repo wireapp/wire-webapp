@@ -479,7 +479,7 @@ z.event.EventRepository = class EventRepository {
       };
       const progress = this.notificationsHandled / this.notificationsTotal * 50 + 25;
 
-      amplify.publish(z.event.WebApp.APP.UPDATE_PROGRESS, progress, z.string.init_decryption, content);
+      amplify.publish(z.event.WebApp.APP.UPDATE_PROGRESS, progress, z.string.initDecryption, content);
     }
   }
 

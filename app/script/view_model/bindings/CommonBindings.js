@@ -408,7 +408,7 @@ ko.bindingHandlers.relative_timestamp = (function() {
     const current_day = date.local().format('YYMMDD');
 
     if (moment().diff(date, 'minutes') < 2) {
-      return $(element).text(z.l10n.text(z.string.conversation_just_now));
+      return $(element).text(z.l10n.text(z.string.conversationJustNow));
     }
 
     if (moment().diff(date, 'minutes') < 60) {
@@ -420,7 +420,7 @@ ko.bindingHandlers.relative_timestamp = (function() {
     }
 
     if (current_day === yesterday) {
-      return $(element).text(`${z.l10n.text(z.string.conversation_yesterday)} ${date.local().format('HH:mm')}`);
+      return $(element).text(`${z.l10n.text(z.string.conversationYesterday)} ${date.local().format('HH:mm')}`);
     }
 
     if (moment().diff(date, 'days') < 7) {
