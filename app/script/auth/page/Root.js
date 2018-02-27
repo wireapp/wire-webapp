@@ -25,6 +25,7 @@ import InitialInvite from './InitialInvite';
 import TeamName from './TeamName';
 import CreateAccount from './CreateAccount';
 import CreatePersonalAccount from './CreatePersonalAccount';
+import ConversationJoin from './ConversationJoin';
 import ChooseHandle from './ChooseHandle';
 import Verify from './Verify';
 import {IntlProvider, addLocaleData} from 'react-intl';
@@ -49,6 +50,7 @@ const Root = ({language}) => (
         <Content>
           <Switch>
             <Route exact path={ROUTE.INDEX} component={Index} />
+            <Route path={ROUTE.CONVERSATION_JOIN} component={ConversationJoin} />
             <Route path={ROUTE.CREATE_TEAM} component={TeamName} />
             <Route path={ROUTE.CREATE_TEAM_ACCOUNT} component={CreateAccount} />
             <Route path={ROUTE.CREATE_ACCOUNT} component={CreatePersonalAccount} />

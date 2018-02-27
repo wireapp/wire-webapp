@@ -17,21 +17,23 @@
  *
  */
 
-import {onEnvironment} from './Environment';
+import BackendError from '../BackendError';
 
-const stagingWebsite = 'https://wire-website-staging.zinfra.io';
+export const CONVERSATION_CODE_CHECK_START = 'CONVERSATION_CODE_CHECK_START';
+export const CONVERSATION_CODE_CHECK_SUCCESS = 'CONVERSATION_CODE_CHECK_SUCCESS';
+export const CONVERSATION_CODE_CHECK_FAILED = 'CONVERSATION_CODE_CHECK_FAILED';
 
-export default {
-  CHOOSE_HANDLE: '/choosehandle',
-  CONVERSATION_JOIN: '/conversation-join',
-  CREATE_ACCOUNT: '/createaccount',
-  CREATE_TEAM: '/createteam',
-  CREATE_TEAM_ACCOUNT: '/createteamaccount',
-  INDEX: '/',
-  INITIAL_INVITE: '/teaminvite',
-  INVITE: '/invite',
-  LOGIN: '/login',
-  PERSONAL_INVITE: '/personalinvite',
-  VERIFY: '/verify',
-  WIRE_ROOT: onEnvironment(stagingWebsite, stagingWebsite, 'https://wire.com'),
-};
+export const startConversationCodeCheck = params => ({
+  params,
+  type: CONVERSATION_CODE_CHECK_START,
+});
+
+export const successfulConversationCodeCheck = data => ({
+  payload: data,
+  type: CONVERSATION_CODE_CHECK_SUCCESS,
+});
+
+export const failedConversationCodeCheck = error => ({
+  payload: BackendError.handle(error),
+  type: CONVERSATION_CODE_CHECK_FAILED,
+});

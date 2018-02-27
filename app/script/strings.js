@@ -179,6 +179,41 @@ export const chooseHandleStrings = defineMessages({
   },
 });
 
+export const conversationJoinStrings = defineMessages({
+  headerText: {
+    id: 'conversationJoin.headerText',
+    defaultMessage: 'The most secure collaboration platform.',
+  },
+  headline: {
+    id: 'conversationJoin.headline',
+    defaultMessage: 'You have been invited to join a Wire guest room.',
+  },
+  subhead: {
+    id: 'conversationJoin.subhead',
+    defaultMessage: 'Encrypted group messaging and conference calls. No account necessary.',
+  },
+  namePlaceholder: {
+    id: 'conversationJoin.namePlaceholder',
+    defaultMessage: 'Your name',
+  },
+  hasAccount: {
+    id: 'conversationJoin.hasAccount',
+    defaultMessage: 'Already have an account?',
+  },
+  loginLink: {
+    id: 'conversationJoin.loginLink',
+    defaultMessage: 'Log in',
+  },
+  acceptTou: {
+    id: 'conversationJoin.acceptTou',
+    defaultMessage: 'By continuing you accept the Wire',
+  },
+  touLink: {
+    id: 'conversationJoin.touLink',
+    defaultMessage: 'Terms of Use',
+  },
+});
+
 export const errorHandlerStrings = defineMessages({
   [BackendError.LABEL.ACCESS_DENIED]: {
     id: 'BackendError.LABEL.ACCESS_DENIED',
