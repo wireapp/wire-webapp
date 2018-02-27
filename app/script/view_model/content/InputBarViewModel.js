@@ -355,7 +355,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   }
 
   on_window_click(event) {
-    if (!$(event.target).closest('.conversation-input').length) {
+    if (!$(event.target).closest('.conversation-input-bar').length) {
       this.cancel_edit();
     }
   }
