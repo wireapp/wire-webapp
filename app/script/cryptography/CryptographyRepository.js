@@ -413,7 +413,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
    * @private
    * @param {string} sessionId - ID of session to encrypt for
    * @param {z.proto.GenericMessage} genericMessage - ProtoBuffer message
-   * @returns {Object} Contains session ID and encrypted message as BASE64 encoded string
+   * @returns {Object} Contains session ID and encrypted message as base64 encoded string
    */
   _encryptPayloadForSession(sessionId, genericMessage) {
     return this.cryptobox
