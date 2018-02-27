@@ -17,9 +17,13 @@
  *
  */
 
+/* eslint-disable no-magic-numbers */
+
+const {StoreEngine} = require('@wireapp/store-engine');
+const cryptobox = typeof window === 'object' ? window.cryptobox : require('@wireapp/cryptobox');
+const Proteus = typeof window === 'object' ? window.Proteus : require('@wireapp/proteus');
+
 describe('cryptobox.CryptoboxSession', () => {
-  const cryptobox = typeof window === 'object' ? window.cryptobox : require('@wireapp/cryptobox');
-  const Proteus = typeof window === 'object' ? window.Proteus : require('@wireapp/proteus');
   let sodium = undefined;
 
   beforeAll(async done => {
@@ -154,6 +158,43 @@ describe('cryptobox.CryptoboxSession', () => {
           })
           .catch(done.fail);
       });
+    });
+  });
+
+  describe('Session reset', () => {
+    it('throws an error when a session is broken', async done => {
+      const aliceEngine = new StoreEngine.MemoryEngine();
+      await aliceEngine.init('store-alice');
+
+      const bobEngine = new StoreEngine.MemoryEngine();
+      await bobEngine.init('store-bob');
+
+      const alice = new cryptobox.Cryptobox(new cryptobox.store.CryptoboxCRUDStore(aliceEngine), 5);
+      await alice.create();
+
+      const bob = new cryptobox.Cryptobox(new cryptobox.store.CryptoboxCRUDStore(bobEngine), 5);
+      await bob.create();
+
+      const preKeyBundle = await bob.get_serialized_standard_prekeys();
+
+      const deserialisedBundle = sodium.from_base64(preKeyBundle[1].key, sodium.base64_variants.ORIGINAL);
+
+      const message = 'Hello Bob!';
+      const ciphertext = await alice.encrypt('alice-to-bob', message, deserialisedBundle.buffer);
+      const decrypted = await bob.decrypt('bob-to-alice', ciphertext);
+      expect(sodium.to_string(decrypted)).toBe(message);
+
+      const deletedSessionId = await alice.session_delete('alice-to-bob');
+      expect(deletedSessionId).toBe('alice-to-bob');
+
+      try {
+        await alice.encrypt('alice-to-bob', `I'm back!`);
+      } catch (error) {
+        expect(error).toEqual(jasmine.any(StoreEngine.error.RecordNotFoundError));
+        expect(error.code).toBe(2);
+      }
+
+      done();
     });
   });
 });
