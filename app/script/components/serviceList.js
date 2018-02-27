@@ -65,7 +65,7 @@ ko.components.register('service-list', {
       </div>
     </div>
     <!-- ko if: isSearching() && !services().length -->
-      <div class="no-results" data-bind="l10n_text: z.string.people_no_matches"></div>
+      <div class="no-results" data-bind="l10n_text: z.string.peopleNoMatches"></div>
     <!-- /ko -->
   `,
   viewModel: z.components.ServiceList,

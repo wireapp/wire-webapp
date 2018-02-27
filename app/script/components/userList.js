@@ -101,7 +101,7 @@ ko.components.register('user-list', {
           <div class="search-list-item-image">
             <participant-avatar params="participant: $data, selected: $parent.isSelected($data), size: z.components.ParticipantAvatar.SIZE.LARGE"></participant-avatar>
             <!-- ko if: $data.is_guest() -->
-              <div class="search-list-item-image-guest-indicator-badge" data-bind="l10n_text: z.string.conversation_guest_indicator" data-uie-name="status-guest"></div>
+              <div class="search-list-item-image-guest-indicator-badge" data-bind="l10n_text: z.string.conversationGuestIndicator" data-uie-name="status-guest"></div>
             <!-- /ko -->
           </div>
 
@@ -146,7 +146,7 @@ ko.components.register('user-list', {
 
           <!-- ko if: !$parent.isOthersMode && $data.is_guest() -->
             <div class="search-list-item-guest-indicator" data-uie-name="status-guest">
-              <div class="search-list-item-guest-indicator-badge" data-bind="l10n_text: z.string.conversation_guest_indicator"></div>
+              <div class="search-list-item-guest-indicator-badge" data-bind="l10n_text: z.string.conversationGuestIndicator"></div>
             </div>
           <!-- /ko -->
           <!-- ko if: $parent.isSelectEnabled -->
@@ -158,11 +158,11 @@ ko.components.register('user-list', {
 
     <!-- ko if: typeof filter === 'function' -->
       <!-- ko if: userEntities().length === 0 -->
-        <div class="no-results" data-bind="l10n_text: z.string.people_everyone_participates"></div>
+        <div class="no-results" data-bind="l10n_text: z.string.peopleEveryoneParticipates"></div>
       <!-- /ko -->
 
       <!-- ko if: userEntities().length > 0 && filteredUserEntities().length === 0 -->
-        <div class="no-results" data-bind="l10n_text: z.string.people_no_matches" data-uie-name="status-no-matches"></div>
+        <div class="no-results" data-bind="l10n_text: z.string.peopleNoMatches" data-uie-name="status-no-matches"></div>
       <!-- /ko -->
     <!-- /ko -->
   `,
