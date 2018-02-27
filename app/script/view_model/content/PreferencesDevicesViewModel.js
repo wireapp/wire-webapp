@@ -82,7 +82,7 @@ z.viewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewMo
   }
 
   clickOnRemoveDevice(clientEntity, event) {
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.WarningsViewModel.TYPE.REMOVE_DEVICE, {
+    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.REMOVE_DEVICE, {
       action: password => this.clientRepository.deleteClient(clientEntity.id, password),
       data: clientEntity.model,
     });
