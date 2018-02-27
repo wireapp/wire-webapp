@@ -9,7 +9,7 @@
     "typescript": "2.6.2"
   },
   "files": [
-    "dist/commonjs/"
+    "dist"
   ],
   "license": "GPL-3.0",
   "main": "dist/commonjs/LRUCache.js",

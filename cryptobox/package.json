@@ -13,6 +13,7 @@
   "devDependencies": {
     "@types/p-queue": "2.3.1",
     "browser-sync": "2.23.6",
+    "cpx": "1.5.0",
     "cross-env": "5.1.3",
     "gulp": "3.9.1",
     "gulp-babel": "7.0.1",
@@ -45,9 +46,10 @@
   "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox",
   "scripts": {
     "build": "gulp install && yarn build:node && yarn build:browser",
-    "build:browser": "webpack --progress",
+    "copy:browser": "cpx ../cbor/dist/cbor.bundle.js dist/lib/dynamic",
+    "build:browser": "yarn copy:browser && webpack --progress",
     "build:node": "tsc",
-    "clear": "rimraf dist/commonjs && rimraf dist/lib",
+    "clear": "rimraf dist/commonjs dist/lib",
     "dist": "yarn clear && yarn build",
     "test": "yarn dist && yarn test:node && yarn test:browser",
     "test:browser": "webpack && karma start",
