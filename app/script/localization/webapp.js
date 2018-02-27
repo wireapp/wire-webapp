@@ -315,6 +315,8 @@ z.string.groupCreationParticipantsPlaceholder = 'Search by name';
 
 // Guest room
 z.string.guestRoomConversationName = 'Guest room';
+z.string.guestRoomToggleName = 'Allow guests';
+z.string.guestRoomToggleInfo = 'Open this conversation to people outside your team.';
 
 // Collection
 z.string.collection_show_all = 'Show all {{number}}';
