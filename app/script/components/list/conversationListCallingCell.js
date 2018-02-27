@@ -59,7 +59,7 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
 
     this.users = ko.pureComputed(() => this.conversation.participating_user_ets());
     this.call = ko.pureComputed(() => this.conversation.call());
-    this.callParticipants = ko.pureComputed(() => {
+    this.call_participants = ko.pureComputed(() => {
       return this.call()
         .participants()
         .map(participant_et => participant_et.user);
@@ -68,8 +68,8 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
     const MAX_DISPLAYED_PARTICIPANTS = 9;
     this.call_participants_rest = ko.observable(0);
     this.call_participants_displayed = ko.pureComputed(() => {
-      const displayed_user_ets = this.callParticipants().slice(0, MAX_DISPLAYED_PARTICIPANTS);
-      this.call_participants_rest(this.callParticipants().length - displayed_user_ets.length);
+      const displayed_user_ets = this.call_participants().slice(0, MAX_DISPLAYED_PARTICIPANTS);
+      this.call_participants_rest(this.call_participants().length - displayed_user_ets.length);
       return displayed_user_ets;
     });
 
@@ -127,7 +127,7 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
     };
 
     this.participants_button_label = ko.pureComputed(() => {
-      return z.l10n.text(z.string.callParticipants, this.callParticipants().length);
+      return z.l10n.text(z.string.callParticipants, this.call_participants().length);
     });
 
     this.show_participants_button = ko.pureComputed(() => {
