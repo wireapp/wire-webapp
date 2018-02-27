@@ -53,7 +53,7 @@ z.viewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
     this.participantsInput = ko.observable('');
 
     this.accessState = ko.observable(z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM);
-    this.isGuestRoom = ko.pureComputed(z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM);
+    this.isGuestRoom = ko.pureComputed(() => this.accessState() === z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM);
     this.isGuestRoom.subscribe(isGuestRoom => {
       if (!isGuestRoom) {
         this.selectedContacts().filter(userEntity => userEntity.is_team_member());
@@ -199,7 +199,7 @@ z.viewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
     this.participantsInput('');
     this.selectedContacts([]);
     this.state(GroupCreationViewModel.STATE.DEFAULT);
-    this.accessState(z.conversation.ACCESS_STATE.TEAM.TEAM_ONLY);
+    this.accessState(z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM);
   }
 
   _hideModal() {
