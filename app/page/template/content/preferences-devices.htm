@@ -25,10 +25,10 @@
             <div class="preferences-devices-card" data-bind="click: $parent.clickOnShowDevice">
               <div class="preferences-devices-card-data">
                 <svg class="preferences-devices-card-icon" data-bind="attr: {'data-uie-value': id}" data-uie-name="device-id">
-                  <!-- ko if: meta.is_verified()-->
+                  <!-- ko if: meta.isVerified()-->
                     <use xlink:href="#icon-verified" data-uie-name="user-device-verified"></use>
                   <!-- /ko -->
-                  <!-- ko ifnot: meta.is_verified()-->
+                  <!-- ko ifnot: meta.isVerified()-->
                     <use xlink:href="#icon-not-verified" data-uie-name="user-device-not-verified"></use>
                   <!-- /ko -->
                 </svg>

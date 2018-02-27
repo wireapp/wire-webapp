@@ -133,7 +133,7 @@ z.viewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
   }
 
   toggleDeviceVerification() {
-    const toggleVerified = !this.device().meta.is_verified();
+    const toggleVerified = !this.device().meta.isVerified();
     this.clientRepository.verifyClient(this.selfUser().id, this.device(), toggleVerified);
   }
 };

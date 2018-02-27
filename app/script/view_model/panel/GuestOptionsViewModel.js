@@ -24,5 +24,52 @@ window.z.viewModel = z.viewModel || {};
 window.z.viewModel.panel = z.viewModel.panel || {};
 
 z.viewModel.panel.GuestOptionsViewModel = class GuestOptionsViewModel {
-  constructor(mainViewModel, panelViewModel, repositories) {}
+  constructor(mainViewModel, panelViewModel, repositories) {
+    this.conversationRepository = repositories.conversation;
+    this.stateHandler = this.conversationRepository.stateHandler;
+
+    this.conversationEntity = this.conversationRepository.active_conversation;
+
+    this.isGuestRoom = ko.pureComputed(() => this.conversationEntity() && this.conversationEntity().isGuestRoom());
+    this.isTeamOnly = ko.pureComputed(() => this.conversationEntity() && this.conversationEntity().isTeamOnly());
+    this.hasAccessCode = ko.pureComputed(() => (this.isGuestRoom() ? !!this.conversationEntity().accessCode() : false));
+
+    this.conversationEntity.subscribe(conversationEntity => {
+      if (conversationEntity && conversationEntity.isGuestRoom() && !conversationEntity.accessCode()) {
+        this.stateHandler.getAccessCode(conversationEntity);
+      }
+    });
+  }
+
+  toggleAccessState() {
+    const conversationEntity = this.conversationEntity();
+    if (conversationEntity.team_id) {
+      const newAccessState = this.isTeamOnly()
+        ? z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM
+        : z.conversation.ACCESS_STATE.TEAM.TEAM_ONLY;
+
+      if (this.isTeamOnly()) {
+        this.stateHandler.changeAccessState(conversationEntity, newAccessState);
+      } else {
+        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.REMOVE_GUESTS, {
+          action: () => this.stateHandler.changeAccessState(conversationEntity, newAccessState),
+        });
+      }
+    }
+  }
+
+  requestAccessCode() {
+    // Handle conversations in legacy state
+    const accessStatePromise = this.isGuestRoom()
+      ? Promise.resolve()
+      : this.stateHandler.changeAccessState(this.conversationEntity(), z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM);
+
+    accessStatePromise.then(() => this.stateHandler.requestAccessCode(this.conversationEntity()));
+  }
+
+  revokeAccessCode() {
+    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.REVOKE_LINK, {
+      action: () => this.stateHandler.revokeAccessCode(this.conversationEntity()),
+    });
+  }
 };
