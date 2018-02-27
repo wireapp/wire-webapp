@@ -457,7 +457,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
     // Session is broken, let's see what's really causing it...
     if (isInvalidMessage || isInvalidSignature) {
       this.logger.error(
-        `Session with user '${remoteUserId}' (${remoteClientId}) is broken.\nReset the session and for possible fix.`
+        `Session with user '${remoteUserId}' (${remoteClientId}) is broken.\nReset the session for possible fix.`
       );
     } else if (isRemoteIdentityChanged) {
       this.logger.error(`Remote identity of client '${remoteClientId}' from user '${remoteUserId}' changed`);
