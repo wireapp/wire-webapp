@@ -376,7 +376,7 @@ z.conversation.EventMapper = class EventMapper {
   _mapEventTeamMemberLeave(event) {
     const messageEntity = this._mapEventMemberLeave(event);
     const eventData = event.data;
-    messageEntity.name(eventData.name || z.l10n.text(z.string.conversation_someone));
+    messageEntity.name(eventData.name || z.l10n.text(z.string.conversationSomeone));
     return messageEntity;
   }
 

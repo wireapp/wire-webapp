@@ -2,7 +2,7 @@
   <!-- ko if: conversationEntity() -->
     <div class="conversation-titlebar-library">
       <span class="conversation-titlebar-icon button-icon-large icon-search"
-            data-bind="click: clickOnCollectionButton, l10n_tooltip: z.string.tooltip_conversation_search"
+            data-bind="click: clickOnCollectionButton, l10n_tooltip: z.string.tooltipConversationSearch"
             data-uie-name="do-collections"></span>
     </div>
 
@@ -24,12 +24,12 @@
       <div class="conversation-titlebar-icons">
         <!-- ko ifnot: conversationEntity().is_group() -->
           <span class="conversation-titlebar-icon button-icon-large icon-video"
-                data-bind="click: clickOnVideoButton, l10n_tooltip: z.string.tooltip_conversation_video_call"
+                data-bind="click: clickOnVideoButton, l10n_tooltip: z.string.tooltipConversationVideoCall"
                 data-uie-name="do-video-call">
           </span>
         <!-- /ko -->
         <span class="conversation-titlebar-icon button-icon-large icon-call"
-              data-bind="click: clickOnCallButton, l10n_tooltip: z.string.tooltip_conversation_call"
+              data-bind="click: clickOnCallButton, l10n_tooltip: z.string.tooltipConversationCall"
               data-uie-name="do-call">
         </span>
       </div>
