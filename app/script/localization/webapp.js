@@ -418,55 +418,55 @@ z.string.extensionsGiphyMessage = '{{tag}} • via giphy.com';
 z.string.extensionsGiphyNoGifs = 'Oops, no gifs';
 z.string.extensionsGiphyRandom = 'Random';
 
-// People View
-z.string.peopleConfirmLabel = 'Add people to group';
-z.string.peoplePeople = '{{number}} People';
-z.string.peopleSearchPlaceholder = 'Search by name';
-z.string.peopleEveryoneParticipates = 'Everyone you’re\nconnected to is already in\nthis conversation.';
-z.string.peopleNoMatches = 'No matching results.\nTry entering a different name.';
-z.string.peopleInvite = 'Invite people to join Wire';
-z.string.peopleInviteDetail = 'Sharing your contacts helps you connect with others. We anonymize all the information and do not share it with anyone else.';
-z.string.peopleInviteButtonContacts = 'From Contacts';
-z.string.peopleInviteButtonGmail = 'From Gmail';
-z.string.peopleInviteHeadline = 'Bring your friends';
-z.string.peopleServiceConfirmButton = 'Add service';
-z.string.peopleServiceRemovalButton = 'Remove service';
-z.string.peopleServiceNewConversation = 'Create a new conversation';
-z.string.peopleServices = 'Services';
-z.string.peopleShare = 'Share Contacts';
-z.string.peopleTabsDetails = 'Details';
-z.string.peopleTabsDevices = 'Devices';
-z.string.peopleTabsDevicesHeadline = 'Wire gives every device a unique fingerprint. Compare them with {{user}} and verify your conversation.';
-z.string.peopleTabsDevicesLearnMore = 'Learn more';
-z.string.peopleTabsDevicesWhyVerify = 'Why verify conversation?';
-z.string.peopleTabsNoDevicesHeadline = '{{user}} is using an old version of Wire. No devices are shown here.';
-z.string.peopleTabsDeviceDetailAllMyDevices = 'Show all my devices';
-z.string.peopleTabsDeviceDetailDeviceFingerprint = 'Device fingerprint';
-z.string.peopleTabsDeviceDetailHeadline = 'Verify that this matches the fingerprint shown on {{html1}}{{user}}’s device{{html2}}.';
-z.string.peopleTabsDeviceDetailHowTo = 'How do I do that?';
-z.string.peopleTabsDeviceDetailResetSession = 'Reset session';
-z.string.peopleTabsDeviceDetailShowMyDevice = 'Show my device fingerprint';
-z.string.peopleTabsDeviceDetailVerify = 'Verified';
-z.string.peopleTabsPeople = 'People';
-z.string.peopleTabsServices = 'Services';
-z.string.peopleVerified = 'Verified';
+// Panel
+// Panel: Add participants
+z.string.addParticipantsConfirmLabel = 'Add people to group';
+z.string.addParticipantsEveryoneParticipates = 'Everyone you’re\nconnected to is already in\nthis conversation.';
+z.string.addParticipantsNoMatches = 'No matching results.\nTry entering a different name.';
+z.string.addParticipantsSearchPlaceholder = 'Search by name';
+z.string.addParticipantsServiceConfirmButton = 'Add service';
+z.string.addParticipantsTabsPeople = 'People';
+z.string.addParticipantsTabsServices = 'Services';
 
-// Button labels for the actions
-z.string.peopleButtonAdd = 'Add';
-z.string.peopleButtonAddPeople = 'Add people';
-z.string.peopleButtonBlock = 'Block';
-z.string.peopleButtonCancel = 'Cancel';
-z.string.peopleButtonConnect = 'Connect';
-z.string.peopleButtonCreate = 'Create group';
-z.string.peopleButtonIgnore = 'Ignore';
-z.string.peopleButtonLeave = 'Leave';
-z.string.peopleButtonOpen = 'Open Conversation';
-z.string.peopleButtonPending = 'Pending';
-z.string.peopleButtonProfile = 'Profile';
-z.string.peopleButtonRemove = 'Remove';
-z.string.peopleButtonUnblock = 'Unblock';
-z.string.peopleButtonNo = 'No';
-z.string.peopleButtonYes = 'Yes';
+// Panel: Conversation details
+z.string.conversationDetailsParticipants = '{{number}} People';
+z.string.conversationDetailsAdd = 'Add';
+z.string.conversationDetailsAddParticipants = 'Add people';
+z.string.conversationDetailsCreateGroup = 'Create group';
+z.string.conversationDetailsServices = 'Services';
+
+// Panel: Guest options
+
+// Panel: Group participant
+z.string.groupParticiapntServiceRemovalButton = 'Remove service';
+
+// User profile actions
+z.string.userProfileButtonCancel = 'Cancel';
+z.string.userProfileButtonConnect = 'Connect';
+z.string.userProfileButtonCreate = 'Create group';
+z.string.userProfileButtonIgnore = 'Ignore';
+z.string.userProfileButtonOpen = 'Open Conversation';
+z.string.userProfileButtonPending = 'Pending';
+z.string.userProfileButtonProfile = 'Profile';
+z.string.userProfileButtonUnblock = 'Unblock';
+z.string.userProfileButtonYes = 'Yes';
+
+z.string.userProfileTabsDetails = 'Details';
+z.string.userProfileTabsDevices = 'Devices';
+
+z.string.userProfileDevicesHeadline = 'Wire gives every device a unique fingerprint. Compare them with {{user}} and verify your conversation.';
+z.string.userProfileDevicesLearnMore = 'Learn more';
+z.string.userProfileDevicesWhyVerify = 'Why verify conversation?';
+z.string.userProfileDeviceDetailHeadline = 'Verify that this matches the fingerprint shown on {{html1}}{{user}}’s device{{html2}}.';
+z.string.userProfileDeviceDetailHowTo = 'How do I do that?';
+z.string.userProfileDeviceDetailShowMyDevice = 'Show my device fingerprint';
+z.string.userProfileDeviceDetailVerify = 'Verified';
+z.string.userProfileNoDevicesHeadline = '{{user}} is using an old version of Wire. No devices are shown here.';
+z.string.userProfileDeviceDetailResetSession = 'Reset session';
+
+// Confirmation views
+z.string.confirmDeviceAllMyDevices = 'Show all my devices';
+z.string.confirmDeviceFingerprint = 'Device fingerprint';
 
 // Settings
 z.string.preferencesAbout = 'About';
@@ -554,6 +554,7 @@ z.string.searchCreateGuestRoom = 'Create guest room';
 z.string.searchGroups = 'Groups';
 z.string.searchPeople = 'People';
 z.string.searchPlaceholder = 'Search by name or username';
+z.string.searchServicePlaceholder = 'Search by name';
 z.string.searchServices = 'Services';
 z.string.searchTeamGroups = 'Team conversations';
 z.string.searchTeamMembers = 'Team members';
@@ -562,6 +563,16 @@ z.string.searchTrySearch = 'Find people by\nname or username';
 z.string.searchNoContactsOnWire = 'You have no contacts on Wire.\nTry finding people by\nname or username.';
 z.string.searchMemberInvite = 'Invite people to join the team';
 z.string.searchOthers = 'Connect';
+
+z.string.searchInvite = 'Invite people to join Wire';
+z.string.searchInviteDetail = 'Sharing your contacts helps you connect with others. We anonymize all the information and do not share it with anyone else.';
+z.string.searchInviteButtonContacts = 'From Contacts';
+z.string.searchInviteButtonGmail = 'From Gmail';
+z.string.searchInviteHeadline = 'Bring your friends';
+z.string.searchInviteShare = 'Share Contacts';
+
+z.string.searchServiceNewConversation = 'Create a new conversation';
+z.string.searchServiceConfirmButton = 'Add service';
 
 // Google contacts upload
 z.string.uploadGoogleHeadline = 'Find people\nto talk to.';

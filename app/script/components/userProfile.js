@@ -148,16 +148,16 @@ z.components.UserProfile = class UserProfile {
     this.addPeopleTooltip = z.l10n.text(z.string.tooltipPeopleAdd, shortcut);
 
     this.deviceHeadline = ko.pureComputed(() => {
-      return z.l10n.text(z.string.peopleTabsDevicesHeadline, this.userEntity().first_name());
+      return z.l10n.text(z.string.userProfileDevicesHeadline, this.userEntity().first_name());
     });
 
     this.noDeviceHeadline = ko.pureComputed(() => {
-      return z.l10n.text(z.string.peopleTabsNoDevicesHeadline, this.userEntity().first_name());
+      return z.l10n.text(z.string.userProfileNoDevicesHeadline, this.userEntity().first_name());
     });
 
     this.detailMessage = ko.pureComputed(() => {
       const substitution = {user: z.util.escape_html(this.userEntity().first_name())};
-      const text = z.l10n.text(z.string.peopleTabsDeviceDetailHeadline, substitution);
+      const text = z.l10n.text(z.string.userProfileDeviceDetailHeadline, substitution);
 
       const textWithHtmlTags = new RegExp('\\{\\{[^\\}]+\\}\\}[^\\{]+\\{\\{[^\\}]+\\}\\}');
       const textWithinHtmlTags = new RegExp('\\{\\{[^\\}]+\\}\\}', 'gm');

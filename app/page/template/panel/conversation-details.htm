@@ -13,23 +13,14 @@
             <textarea data-bind="visible: isEditing, value: conversationEntity().display_name(), enter: renameConversation, hasFocus: isEditing, resize" maxlength="64" dir="auto" data-uie-name="enter-name"></textarea>
           </div>
           <span class="edit icon-edit" data-bind="visible: isEditable() && !isEditing(), click: clickToEdit"></span>
-          <div class="people popover-meta text-uppercase" data-bind="l10n_text: {'id': z.string.peoplePeople, 'substitute': participants().length}"></div>
+          <div class="people popover-meta text-uppercase" data-bind="l10n_text: {'id': z.string.conversationDetailsParticipants, 'substitute': participants().length}"></div>
         </div>
         <div class="participants-group-list">
-          <user-list params="user: unverifiedParticipants, click: clickOnShowParticipant, mode: z.components.UserList.MODE.DEFAULT" data-uie-name="list-unverified"></user-list>
-          <!-- ko if: verifiedParticipants().length -->
-            <div class="participants-group-list-separator">
-              <svg width="16" height="16">
-                <use xlink:href="#icon-verified"></use>
-              </svg>
-              <span class="label-xs" data-bind="l10n_text: z.string.peopleVerified"></span>
-              <hr>
-            </div>
-            <user-list params="user: verifiedParticipants, click: clickOnShowParticipant, mode: z.components.UserList.MODE.DEFAULT" data-uie-name="list-verified"></user-list>
+          <user-list params="user: participants, click: clickOnShowParticipant, mode: z.components.UserList.MODE.DEFAULT" data-uie-name="list-unverified"></user-list>
           <!-- /ko -->
           <!-- ko if: serviceParticipants().length -->
             <div class="participants-group-list-separator">
-              <span class="label-xs" data-bind="l10n_text: z.string.peopleServices"></span>
+              <span class="label-xs" data-bind="l10n_text: z.string.conversationDetailsServices"></span>
               <hr>
             </div>
             <service-list params="services: serviceParticipants, click: clickOnShowParticipant, mode: z.components.ServiceList.MODE.DEFAULT" data-uie-name="list-services"></service-list>
@@ -69,13 +60,13 @@
       <div class="participants-search">
         <div class="participants-search-header">
           <div class="participants-search-header-row">
-            <user-input class="participants-search-header-list user-list-light" params="input: searchInput, selected: selectedContacts, placeholder: z.string.peopleSearchPlaceholder" spellcheck="false"></user-input>
+            <user-input class="participants-search-header-list user-list-light" params="input: searchInput, selected: selectedContacts, placeholder: z.string.addParticipantsSearchPlaceholder" spellcheck="false"></user-input>
             <div class="participants-search-header-close icon-close icon-button" data-bind="click: clickOnCloseAdding, l10n_tooltip: z.string.tooltipSearchClose" data-uie-name="do-close"></div>
           </div>
           <!-- ko if: showIntegrations() -->
             <div class="participants-search-tabs">
-              <div class="participants-search-tab" data-bind="css: {'active': stateAddPeople}, click: clickOnAddPeople, l10n_text: z.string.peopleTabsPeople" data-uie-name="do-add-people"></div>
-              <div class="participants-search-tab" data-bind="css: {'active': stateAddService}, click: clickOnAddService, l10n_text: z.string.peopleTabsServices" data-uie-name="do-add-services"></div>
+              <div class="participants-search-tab" data-bind="css: {'active': stateAddPeople}, click: clickOnAddPeople, l10n_text: z.string.addParticipantsTabsPeople" data-uie-name="do-add-people"></div>
+              <div class="participants-search-tab" data-bind="css: {'active': stateAddService}, click: clickOnAddService, l10n_text: z.string.addParticipantsTabsServices" data-uie-name="do-add-services"></div>
             </div >
           <!-- /ko -->
         </div >
@@ -92,7 +83,7 @@
         <!-- ko if: stateAddPeople() -->
           <button class="participants-search-footer button button-full" data-bind="enable: selectedContacts().length > 0, click: clickToAddMembers" data-uie-name="do-create">
             <span class="icon-people-add participants-search-icon"></span>
-            <span data-bind="l10n_text: z.string.peopleConfirmLabel"></span>
+            <span data-bind="l10n_text: z.string.addParticipantsConfirmLabel"></span>
           </button>
         <!-- /ko -->
       </div>
@@ -123,10 +114,10 @@
           <!-- ko if: stateServiceConfirmation() || showServiceRemove() -->
             <div class="participants-service-profile-footer">
               <!-- ko if: stateServiceConfirmation() -->
-                <button class="participants-service-profile-button" data-bind="click: clickToAddService, l10n_text: z.string.peopleServiceConfirmButton" data-uie-name="do-service-confirm"></button>
+                <button class="participants-service-profile-button" data-bind="click: clickToAddService, l10n_text: z.string.addParticipantsServiceConfirmButton" data-uie-name="do-service-confirm"></button>
               <!-- /ko -->
               <!-- ko if: showServiceRemove() -->
-                <button class="participants-service-profile-button button-theme-red" data-bind="click: clickToRemoveService, l10n_text: z.string.peopleServiceRemovalButton" data-uie-name="do-service-remove"></button>
+                <button class="participants-service-profile-button button-theme-red" data-bind="click: clickToRemoveService, l10n_text: z.string.groupParticipantServiceRemovalButton" data-uie-name="do-service-remove"></button>
               <!-- /ko -->
             </div>
           <!-- /ko -->
