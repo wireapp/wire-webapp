@@ -376,9 +376,9 @@
   version "2.3.2"
   resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-2.3.2.tgz#e2944384680f3625df99c750404292a359969415"
 
-"@wireapp/cbor@3.0.3":
-  version "3.0.3"
-  resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-3.0.3.tgz#8b228cdfd4b0fc7a7a16911824be285b45586d41"
+"@wireapp/cbor@3.0.4":
+  version "3.0.4"
+  resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-3.0.4.tgz#4ecf22561cda3051ff1d66f66ece3407dd7b8bcc"
 
 "@wireapp/core@0.0.32":
   version "0.0.32"
@@ -403,14 +403,14 @@
     dexie "2.0.1"
     fs-extra "5.0.0"
 
-"@wireapp/cryptobox@8.0.15":
-  version "8.0.15"
-  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-8.0.15.tgz#d4242fc5f19f322bce0b277b2f9428a24b86f4b1"
+"@wireapp/cryptobox@8.1.0":
+  version "8.1.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-8.1.0.tgz#72228bf60d047635c2a5e831186cd97f085b8d25"
   dependencies:
     "@types/fs-extra" "5.0.0"
     "@types/node" "9.3.0"
-    "@wireapp/lru-cache" "2.0.6"
-    "@wireapp/proteus" "7.1.1"
+    "@wireapp/lru-cache" "2.0.7"
+    "@wireapp/proteus" "7.1.2"
     "@wireapp/store-engine" "0.2.5"
     dexie "2.0.1"
     fs-extra "5.0.0"
@@ -422,9 +422,9 @@
   dependencies:
     webpack "3.10.0"
 
-"@wireapp/lru-cache@2.0.6":
-  version "2.0.6"
-  resolved "https://registry.yarnpkg.com/@wireapp/lru-cache/-/lru-cache-2.0.6.tgz#473c48b9721bc99401804d5facbc231a07771e27"
+"@wireapp/lru-cache@2.0.7":
+  version "2.0.7"
+  resolved "https://registry.yarnpkg.com/@wireapp/lru-cache/-/lru-cache-2.0.7.tgz#e73e6b1bdf5da9c99bf48552a1be861ff85fa9b8"
   dependencies:
     webpack "3.11.0"
 
@@ -436,14 +436,14 @@
     ed2curve "0.2.1"
     libsodium-wrappers-sumo "0.5.4"
 
-"@wireapp/proteus@7.1.1":
-  version "7.1.1"
-  resolved "https://registry.yarnpkg.com/@wireapp/proteus/-/proteus-7.1.1.tgz#47ba1922f05921df70f665b631d8499320e442c2"
+"@wireapp/proteus@7.1.2":
+  version "7.1.2"
+  resolved "https://registry.yarnpkg.com/@wireapp/proteus/-/proteus-7.1.2.tgz#3de5b49d3969aa7a3da00df2f16a26103eb81378"
   dependencies:
     "@types/chai" "4.1.2"
     "@types/ed2curve" "0.2.2"
     "@types/node" "9.4.6"
-    "@wireapp/cbor" "3.0.3"
+    "@wireapp/cbor" "3.0.4"
     ed2curve "0.2.1"
     libsodium-wrappers-sumo "0.7.3"
 
