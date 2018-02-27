@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="0.3.0"></a>
+# [0.3.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/compare/@wireapp/store-engine@0.2.5...@wireapp/store-engine@0.3.0) (2018-02-27)
+
+
+### Features
+
+* **store-engine:** Add error codes ([#315](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/issues/315)) ([b9b5a8a](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/commit/b9b5a8a))
+
+
+
+
 <a name="0.2.5"></a>
 ## [0.2.5](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/compare/@wireapp/store-engine@0.2.4...@wireapp/store-engine@0.2.5) (2018-02-26)
 
