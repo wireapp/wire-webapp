@@ -145,19 +145,19 @@ z.components.UserProfile = class UserProfile {
     });
 
     const shortcut = z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.ADD_PEOPLE);
-    this.addPeopleTooltip = z.l10n.text(z.string.tooltip_people_add, shortcut);
+    this.addPeopleTooltip = z.l10n.text(z.string.tooltipPeopleAdd, shortcut);
 
     this.deviceHeadline = ko.pureComputed(() => {
-      return z.l10n.text(z.string.people_tabs_devices_headline, this.userEntity().first_name());
+      return z.l10n.text(z.string.peopleTabsDevicesHeadline, this.userEntity().first_name());
     });
 
     this.noDeviceHeadline = ko.pureComputed(() => {
-      return z.l10n.text(z.string.people_tabs_no_devices_headline, this.userEntity().first_name());
+      return z.l10n.text(z.string.peopleTabsNoDevicesHeadline, this.userEntity().first_name());
     });
 
     this.detailMessage = ko.pureComputed(() => {
       const substitution = {user: z.util.escape_html(this.userEntity().first_name())};
-      const text = z.l10n.text(z.string.people_tabs_device_detail_headline, substitution);
+      const text = z.l10n.text(z.string.peopleTabsDeviceDetailHeadline, substitution);
 
       const textWithHtmlTags = new RegExp('\\{\\{[^\\}]+\\}\\}[^\\{]+\\{\\{[^\\}]+\\}\\}');
       const textWithinHtmlTags = new RegExp('\\{\\{[^\\}]+\\}\\}', 'gm');

@@ -176,7 +176,7 @@ z.viewModel.ListViewModel = class ListViewModel {
     this.switch_list(ListViewModel.STATE.PREFERENCES);
 
     if (device_et) {
-      this.content_view_model.preferences_device_details.device(device_et);
+      this.content_view_model.preferencesDeviceDetails.device(device_et);
       return this.content_view_model.switchContent(z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICE_DETAILS);
     }
 
@@ -261,12 +261,12 @@ z.viewModel.ListViewModel = class ListViewModel {
     const canToggleMute = !conversationEntity.is_request() && !conversationEntity.removed_from_conversation();
     if (canToggleMute) {
       const silenceShortcut = z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.SILENCE);
-      const notifyTooltip = z.l10n.text(z.string.tooltip_conversations_notify, silenceShortcut);
-      const silence_tooltip = z.l10n.text(z.string.tooltip_conversations_silence, silenceShortcut);
+      const notifyTooltip = z.l10n.text(z.string.tooltipConversationsNotify, silenceShortcut);
+      const silence_tooltip = z.l10n.text(z.string.tooltipConversationsSilence, silenceShortcut);
 
       const labelStringId = conversationEntity.is_muted()
-        ? z.string.conversations_popover_notify
-        : z.string.conversations_popover_silence;
+        ? z.string.conversationsPopoverNotify
+        : z.string.conversationsPopoverSilence;
       title = conversationEntity.is_muted() ? notifyTooltip : silence_tooltip;
       entries.push({
         click: () => this.clickToToggleMute(conversationEntity),
@@ -278,22 +278,22 @@ z.viewModel.ListViewModel = class ListViewModel {
     if (conversationEntity.is_archived()) {
       entries.push({
         click: () => this.clickToUnarchive(conversationEntity),
-        label: z.l10n.text(z.string.conversations_popover_unarchive),
+        label: z.l10n.text(z.string.conversationsPopoverUnarchive),
       });
     } else {
       const shortcut = z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.ARCHIVE);
 
       entries.push({
         click: () => this.clickToArchive(conversationEntity),
-        label: z.l10n.text(z.string.conversations_popover_archive),
-        title: z.l10n.text(z.string.tooltip_conversations_archive, shortcut),
+        label: z.l10n.text(z.string.conversationsPopoverArchive),
+        title: z.l10n.text(z.string.tooltipConversationsArchive, shortcut),
       });
     }
 
     if (conversationEntity.is_request()) {
       entries.push({
         click: () => this.clickToCancelRequest(conversationEntity),
-        label: z.l10n.text(z.string.conversations_popover_cancel),
+        label: z.l10n.text(z.string.conversationsPopoverCancel),
       });
     }
 
@@ -301,7 +301,7 @@ z.viewModel.ListViewModel = class ListViewModel {
     if (canClear) {
       entries.push({
         click: () => this.clickToClear(conversationEntity),
-        label: z.l10n.text(z.string.conversations_popover_clear),
+        label: z.l10n.text(z.string.conversationsPopoverClear),
       });
     }
 
@@ -312,7 +312,7 @@ z.viewModel.ListViewModel = class ListViewModel {
       if (canBlock) {
         entries.push({
           click: () => this.clickToBlock(conversationEntity),
-          label: z.l10n.text(z.string.conversations_popover_block),
+          label: z.l10n.text(z.string.conversationsPopoverBlock),
         });
       }
     }
@@ -321,7 +321,7 @@ z.viewModel.ListViewModel = class ListViewModel {
     if (canLeave) {
       entries.push({
         click: () => this.clickToLeave(conversationEntity),
-        label: z.l10n.text(z.string.conversations_popover_leave),
+        label: z.l10n.text(z.string.conversationsPopoverLeave),
       });
     }
 

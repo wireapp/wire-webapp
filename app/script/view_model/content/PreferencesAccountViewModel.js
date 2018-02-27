@@ -49,7 +49,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
       const noStatusSet = this.availability() === z.user.AvailabilityType.NONE;
       if (noStatusSet) {
-        label = z.l10n.text(z.string.preferences_account_avaibility_unset);
+        label = z.l10n.text(z.string.preferencesAccountAvaibilityUnset);
       }
 
       return label;
@@ -64,7 +64,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.is_team_manager = ko.pureComputed(() => this.is_team() && this.self_user().is_team_manager());
     this.team = this.team_repository.team;
     this.team_name = ko.pureComputed(() =>
-      z.l10n.text(z.string.preferences_account_team, this.team_repository.teamName())
+      z.l10n.text(z.string.preferencesAccountTeam, this.team_repository.teamName())
     );
 
     this.name_saved = ko.observable();
@@ -237,7 +237,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   click_on_create() {
-    const path = `${z.l10n.text(z.string.url_website_create_team)}?pk_campaign=client&pk_kwd=desktop`;
+    const path = `${z.l10n.text(z.string.urlWebsiteCreateTeam)}?pk_campaign=client&pk_kwd=desktop`;
     z.util.safe_window_open(z.util.URLUtil.build_url(z.util.URLUtil.TYPE.WEBSITE, path));
   }
 

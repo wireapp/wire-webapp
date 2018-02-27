@@ -58,7 +58,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
         }
 
         const date = moment(blob.lastModifiedDate).format('MMMM Do YYYY, h:mm:ss a');
-        this.pasted_file_name(z.l10n.text(z.string.conversation_send_pasted_file, date));
+        this.pasted_file_name(z.l10n.text(z.string.conversationSendPastedFile, date));
       } else {
         this.pasted_file_preview_url(null);
         this.pasted_file_name(null);
@@ -135,31 +135,31 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       return false;
     });
 
-    this.file_tooltip = z.l10n.text(z.string.tooltip_conversation_file);
+    this.file_tooltip = z.l10n.text(z.string.tooltipConversationFile);
     this.input_placeholder = ko.pureComputed(() => {
       if (this.show_availability_tooltip()) {
         const userEntity = this.conversation_et().firstUserEntity();
 
         switch (userEntity.availability()) {
           case z.user.AvailabilityType.AVAILABLE:
-            return z.l10n.text(z.string.tooltip_conversation_input_placeholder_available, userEntity.first_name());
+            return z.l10n.text(z.string.tooltipConversationInputPlaceholderAvailable, userEntity.first_name());
           case z.user.AvailabilityType.AWAY:
-            return z.l10n.text(z.string.tooltip_conversation_input_placeholder_away, userEntity.first_name());
+            return z.l10n.text(z.string.tooltipConversationInputPlaceholderAway, userEntity.first_name());
           case z.user.AvailabilityType.BUSY:
-            return z.l10n.text(z.string.tooltip_conversation_input_placeholder_busy, userEntity.first_name());
+            return z.l10n.text(z.string.tooltipConversationInputPlaceholderBusy, userEntity.first_name());
         }
       }
 
       if (this.conversation_et().ephemeral_timer()) {
-        return z.l10n.text(z.string.tooltip_conversation_ephemeral);
+        return z.l10n.text(z.string.tooltipConversationEphemeral);
       }
-      return z.l10n.text(z.string.tooltip_conversation_input_placeholder);
+      return z.l10n.text(z.string.tooltipConversationInputPlaceholder);
     });
     this.ping_tooltip = z.l10n.text(
-      z.string.tooltip_conversation_ping,
+      z.string.tooltipConversationPing,
       z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.PING)
     );
-    this.picture_tooltip = z.l10n.text(z.string.tooltip_conversation_picture);
+    this.picture_tooltip = z.l10n.text(z.string.tooltipConversationPicture);
     this.ping_disabled = ko.observable(false);
 
     $(window)
@@ -468,23 +468,23 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   _get_localized_unit_string(number, unit) {
     if (unit === 's') {
       if (number === 1) {
-        return z.l10n.text(z.string.ephememal_units_second);
+        return z.l10n.text(z.string.ephememalUnitsSecond);
       }
-      return z.l10n.text(z.string.ephememal_units_seconds);
+      return z.l10n.text(z.string.ephememalUnitsSeconds);
     }
 
     if (unit === 'm') {
       if (number === 1) {
-        return z.l10n.text(z.string.ephememal_units_minute);
+        return z.l10n.text(z.string.ephememalUnitsMinute);
       }
-      return z.l10n.text(z.string.ephememal_units_minutes);
+      return z.l10n.text(z.string.ephememalUnitsMinutes);
     }
 
     if (unit === 'd') {
       if (number === 1) {
-        return z.l10n.text(z.string.ephememal_units_day);
+        return z.l10n.text(z.string.ephememalUnitsDay);
       }
-      return z.l10n.text(z.string.ephememal_units_days);
+      return z.l10n.text(z.string.ephememalUnitsDays);
     }
   }
 
@@ -498,7 +498,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     const entries = [
       {
         click: () => this.set_ephemeral_timer(0),
-        label: z.l10n.text(z.string.ephememal_units_none),
+        label: z.l10n.text(z.string.ephememalUnitsNone),
       },
     ].concat(
       z.ephemeral.timings.getValues().map(milliseconds => {

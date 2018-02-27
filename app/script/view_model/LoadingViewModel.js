@@ -50,13 +50,13 @@ z.viewModel.LoadingViewModel = class LoadingViewModel {
       let updatedLoadingMessage;
 
       switch (messageLocator) {
-        case z.string.init_received_self_user: {
+        case z.string.initReceivedSelfUser: {
           updatedLoadingMessage = z.l10n.text(messageLocator, this.userRepository.self().first_name());
           break;
         }
 
-        case z.string.init_decryption:
-        case z.string.init_events: {
+        case z.string.initDecryption:
+        case z.string.initEvents: {
           if (z.util.Environment.frontend.is_production()) {
             updatedLoadingMessage = z.l10n.text(messageLocator);
             break;
@@ -67,7 +67,7 @@ z.viewModel.LoadingViewModel = class LoadingViewModel {
             number2: replaceContent.total,
           };
 
-          const handlingProgress = z.l10n.text(z.string.init_progress, substitutes);
+          const handlingProgress = z.l10n.text(z.string.initProgress, substitutes);
           updatedLoadingMessage = `${z.l10n.text(messageLocator)}${handlingProgress}`;
           break;
         }

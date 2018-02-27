@@ -22,22 +22,23 @@
 window.z = window.z || {};
 window.z.components = z.components || {};
 
-z.components.LocationAssetComponent = class LocationAssetComponent {
-  /**
-   * Construct a new audio asset.
-   * @param {Object} params - Component parameters
-   * @param {z.entity.Location} params.asset - Location asset
-   */
+z.components.GuestModeToggle = class GuestModeToggle {
   constructor(params) {
-    this.asset = params.asset;
+    this.isChecked = params.isChecked;
+    this.onToggle = params.onToggle;
   }
 };
 
-ko.components.register('location-asset', {
+ko.components.register('guest-mode-toggle', {
   template: `
-    <div class="location-asset-icon icon-location"></div>
-    <div class="location-asset-title" data-bind="text: asset.name" data-uie-name="location-name"></div>
-    <a target="_blank" rel="nofollow noopener noreferrer" class="label-xs text-theme" data-bind="attr: {href: asset.link_src}, l10n_text: z.string.conversationLocationLink"></a>
+    <div class="guest-mode-toggle-row">
+      <div data-bind="text: z.string.guestRoomToggleName"></div>
+      <div class="slider">
+        <input class="slider-input" type="checkbox" name="toggle" id="toggle" data-bind="checked: isChecked">
+        <label class="button-label" for="toggle" data-bind="click: onToggle"></label>
+      </div>
+    </div>
+    <div class="guest-mode-toggle-info" data-bind="text: z.string.guestRoomToggleInfo"></div>
   `,
-  viewModel: z.components.LocationAssetComponent,
+  viewModel: z.components.GuestModeToggle,
 });

@@ -17,20 +17,21 @@
  *
  */
 
-'use strict';
+guest-mode-toggle {
+  display: flex;
+  flex-direction: column;
 
-window.z = window.z || {};
-window.z.entity = z.entity || {};
-
-z.entity.DeleteMessage = class DeleteMessage extends z.entity.Message {
-  constructor() {
-    super();
-
-    this.super_type = z.message.SuperType.DELETE;
-    this.deleted_timestamp = null;
-
-    this.display_deleted_timestamp = () => {
-      return z.l10n.text(z.string.conversationDeleteTimestamp, moment(this.deleted_timestamp).format('HH:mm'));
-    };
+  .guest-mode-toggle-row {
+    font-size: 16px;
+    display: flex;
+    justify-content: space-between;
+    height: 36px;
+    border-bottom: 1px solid fade(@graphite-dark, 8%);
   }
-};
+
+  .guest-mode-toggle-info {
+    margin-top: 16px;
+    font-size: 12px;
+    color: fade(@graphite-dark, 40%);
+  }
+}

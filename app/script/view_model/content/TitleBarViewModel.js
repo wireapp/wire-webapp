@@ -74,7 +74,7 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
     });
 
     const shortcut = z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.PEOPLE);
-    this.peopleTooltip = z.l10n.text(z.string.tooltip_conversation_people, shortcut);
+    this.peopleTooltip = z.l10n.text(z.string.tooltipConversationPeople, shortcut);
   }
 
   addedToView() {

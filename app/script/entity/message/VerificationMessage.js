@@ -42,23 +42,23 @@ z.entity.VerificationMessage = class VerificationMessage extends z.entity.Messag
 
     this.caption_started_using = ko.pureComputed(() => {
       if (this.userIds().length > 1) {
-        return z.l10n.text(z.string.conversation_device_started_using_many);
+        return z.l10n.text(z.string.conversationDeviceStartedUsingMany);
       }
-      return z.l10n.text(z.string.conversation_device_started_using_one);
+      return z.l10n.text(z.string.conversationDeviceStartedUsingOne);
     });
 
     this.caption_new_device = ko.pureComputed(() => {
       if (this.userIds().length > 1) {
-        return z.l10n.text(z.string.conversation_device_new_device_many);
+        return z.l10n.text(z.string.conversationDeviceNewDeviceMany);
       }
-      return z.l10n.text(z.string.conversation_device_new_device_one);
+      return z.l10n.text(z.string.conversationDeviceNewDeviceOne);
     });
 
     this.caption_unverified_device = ko.pureComputed(() => {
       if (this.is_self_device()) {
-        return z.l10n.text(z.string.conversation_device_your_devices);
+        return z.l10n.text(z.string.conversationDeviceYourDevices);
       }
-      return z.l10n.text(z.string.conversation_device_user_devices, this.userEntities()[0].first_name());
+      return z.l10n.text(z.string.conversationDeviceUserDevices, this.userEntities()[0].first_name());
     });
   }
 

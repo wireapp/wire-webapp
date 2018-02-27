@@ -58,9 +58,9 @@ z.viewModel.list.ConversationListViewModel = class ConversationListViewModel {
     this.connect_requests_text = ko.pureComputed(() => {
       const number_of_requests = this.connect_requests().length;
       if (number_of_requests > 1) {
-        return z.l10n.text(z.string.conversations_connection_request_many, number_of_requests);
+        return z.l10n.text(z.string.conversationsConnectionRequestMany, number_of_requests);
       }
-      return z.l10n.text(z.string.conversations_connection_request_one);
+      return z.l10n.text(z.string.conversationsConnectionRequestOne);
     });
 
     this.conversations_calls = this.conversation_repository.conversations_calls;
@@ -92,11 +92,11 @@ z.viewModel.list.ConversationListViewModel = class ConversationListViewModel {
     });
 
     this.archive_tooltip = ko.pureComputed(() => {
-      return z.l10n.text(z.string.tooltip_conversations_archived, this.conversations_archived().length);
+      return z.l10n.text(z.string.tooltipConversationsArchived, this.conversations_archived().length);
     });
 
     this.start_tooltip = z.l10n.text(
-      z.string.tooltip_conversations_start,
+      z.string.tooltipConversationsStart,
       z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.START)
     );
 

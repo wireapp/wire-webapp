@@ -148,20 +148,20 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
 
     this.inviteHint = ko.pureComputed(() => {
       const metaKey = z.util.Environment.os.mac
-        ? z.l10n.text(z.string.invite_meta_key_mac)
-        : z.l10n.text(z.string.invite_meta_key_pc);
+        ? z.l10n.text(z.string.inviteMetaKeyMac)
+        : z.l10n.text(z.string.inviteMetaKeyPc);
 
       if (this.inviteMessageSelected()) {
-        return z.l10n.text(z.string.invite_hint_selected, metaKey);
+        return z.l10n.text(z.string.inviteHintSelected, metaKey);
       }
-      return z.l10n.text(z.string.invite_hint_unselected, metaKey);
+      return z.l10n.text(z.string.inviteHintUnselected, metaKey);
     });
     this.inviteMessage = ko.pureComputed(() => {
       if (this.selfUser()) {
         const username = this.selfUser().username();
         return username
-          ? z.l10n.text(z.string.invite_message, `@${username}`)
-          : z.l10n.text(z.string.invite_message_no_email);
+          ? z.l10n.text(z.string.inviteMessage, `@${username}`)
+          : z.l10n.text(z.string.inviteMessageNoEmail);
       }
       return '';
     });
