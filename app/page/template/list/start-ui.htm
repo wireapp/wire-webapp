@@ -48,10 +48,22 @@
                 <li class="left-list-item left-list-item-clickable" data-bind="click: clickOnCreateGroup" data-uie-name="go-create-group">
                   <div class="left-column">
                     <svg width="16" height="16" viewBox="0 0 16 16">
-                      <path fill="#fff" d="M8 4a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 12a2 2 0 1 1 0-4 2 2 0 0 1 0 4zM2 7a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm12 0a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0-6a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"></path>
+                      <path d="M8 4a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 12a2 2 0 1 1 0-4 2 2 0 0 1 0 4zM2 7a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm12 0a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0-6a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"></path>
                     </svg>
                   </div>
                   <div class="center-column" data-bind="l10n_text: z.string.searchCreateGroup"></div>
+                </li>
+              </ul>
+            <!-- /ko -->
+            <!-- ko if: isTeam() -->
+              <ul class="start-ui-create-guest-room left-list-items">
+                <li class="left-list-item left-list-item-clickable" data-bind="click: clickOnCreateGuestRoom" data-uie-name="do-create-guest-room">
+                  <div class="left-column">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16">
+                      <path d="M5 1a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3c0-1.1.9-2 2-2h3zm.5 1a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1h-3zM7 9a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm-2 1a2 2 0 0 0-2 2v1h8v-1a2 2 0 0 0-2-2H5z"></path>
+                    </svg>
+                  </div>
+                  <div class="center-column" data-bind="l10n_text: z.string.searchCreateGuestRoom"></div>
                 </li>
               </ul>
             <!-- /ko -->

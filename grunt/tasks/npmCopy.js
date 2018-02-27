@@ -19,13 +19,18 @@
 
 'use strict';
 
-window.z = window.z || {};
-window.z.ViewModel = z.ViewModel || {};
-window.z.ViewModel.list = z.ViewModel.list || {};
+module.exports = grunt =>
+  grunt.registerTask('npmCopy', () => {
+    const distPath = grunt.config('dir.dist');
 
-z.ViewModel.list.LIST_STATE = {
-  ARCHIVE: 'z.ViewModel.list.LIST_STATE.ARCHIVE',
-  CONVERSATIONS: 'z.ViewModel.list.LIST_STATE.CONVERSATIONS',
-  PREFERENCES: 'z.ViewModel.list.LIST_STATE.PREFERENCES',
-  START_UI: 'z.ViewModel.list.LIST_STATE.START_UI',
-};
+    const npmModules = {
+      '@wireapp/cryptobox': ['dist/cryptobox.bundle.js'],
+    };
+
+    Object.keys(npmModules).forEach(module => {
+      const moduleFiles = npmModules[module];
+      moduleFiles.forEach(file =>
+        grunt.file.copy(`node_modules/${module}/${npmModules[module]}`, `${distPath}/ext/js/${module}/${file}`)
+      );
+    });
+  });

@@ -20,7 +20,8 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.ViewModel = z.ViewModel || {};
+window.z.viewModel = z.viewModel || {};
+window.z.viewModel.content = z.viewModel.content || {};
 
 /**
  * Message list rendering view model.
@@ -29,8 +30,8 @@ window.z.ViewModel = z.ViewModel || {};
  * @todo Get rid of the participants dependencies whenever bubble implementation has changed
  * @todo Remove all jquery selectors
  */
-z.ViewModel.MessageListViewModel = class MessageListViewModel {
-  constructor(element_id, conversation_repository, user_repository) {
+z.viewModel.content.MessageListViewModel = class MessageListViewModel {
+  constructor(mainViewModel, contentViewModel, repositories) {
     this._on_message_add = this._on_message_add.bind(this);
     this.click_on_cancel_request = this.click_on_cancel_request.bind(this);
     this.click_on_like = this.click_on_like.bind(this);
@@ -41,9 +42,9 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
     this.on_session_reset_click = this.on_session_reset_click.bind(this);
     this.should_hide_user_avatar = this.should_hide_user_avatar.bind(this);
 
-    this.conversation_repository = conversation_repository;
-    this.user_repository = user_repository;
-    this.logger = new z.util.Logger('z.ViewModel.MessageListViewModel', z.config.LOGGER.OPTIONS);
+    this.conversation_repository = repositories.conversation;
+    this.user_repository = repositories.user;
+    this.logger = new z.util.Logger('z.viewModel.content.MessageListViewModel', z.config.LOGGER.OPTIONS);
 
     this.conversation = ko.observable(new z.entity.Conversation());
     this.center_messages = ko.pureComputed(() => {
@@ -70,10 +71,6 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
 
     // Store message subscription id
     this.messages_subscription = undefined;
-
-    // Last open bubble
-    this.participant_bubble = undefined;
-    this.participant_bubble_last_id = undefined;
 
     this.viewport_changed = ko.observable(false);
     this.viewport_changed.extend({rateLimit: 100});
@@ -137,7 +134,6 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
         }
       });
 
-    amplify.subscribe(z.event.WebApp.CONVERSATION.PEOPLE.HIDE, this.hide_bubble.bind(this));
     amplify.subscribe(z.event.WebApp.CONVERSATION.INPUT.CLICK, this.on_conversation_input_click.bind(this));
   }
 
@@ -387,70 +383,10 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
   /**
    * Triggered when user clicks on an avatar in the message list.
    * @param {z.entity.User} user_et - User entity of the selected user
-   * @param {DOMElement} element - Selected DOMElement
    * @returns {undefined} No return value
    */
-  on_message_user_click(user_et, element) {
-    const BUBBLE_HEIGHT = 440;
-    const MESSAGE_LIST_MIN_HEIGHT = 400;
-    const list_height = $('.message-list').height();
-    const element_rect = element.getBoundingClientRect();
-    const element_distance_top = element_rect.top;
-    const element_distance_bottom = list_height - element_rect.top - element_rect.height;
-    const largest_distance = Math.max(element_distance_top, element_distance_bottom);
-    const difference = BUBBLE_HEIGHT - largest_distance;
-
-    const create_bubble = element_id => {
-      wire.app.view.content.participants.resetView();
-      this.participant_bubble_last_id = element_id;
-      this.participant_bubble = new zeta.webapp.module.Bubble({
-        host_selector: `#${element_id}`,
-        modal: true,
-        on_hide: () => {
-          this.participant_bubble = undefined;
-          this.participant_bubble_last_id = undefined;
-        },
-        on_show() {
-          amplify.publish(z.event.WebApp.PEOPLE.SHOW, user_et);
-        },
-        scroll_selector: '.messages-wrap',
-      });
-      this.participant_bubble.toggle();
-    };
-
-    const show_bubble = () => {
-      if (wire.app.view.content.participants.confirmDialog) {
-        wire.app.view.content.participants.confirmDialog.destroy();
-      }
-
-      // We clicked on the same bubble
-      if (this.participant_bubble && this.participant_bubble_last_id === element.id) {
-        this.participant_bubble.toggle();
-        return;
-      }
-
-      // Dismiss old bubble and wait with creating the new one when another bubble is open
-      const bubble = wire.app.view.content.participants.participants_bubble;
-      if (this.participant_bubble || (bubble && bubble.is_visible())) {
-        if (this.participant_bubble) {
-          this.participant_bubble.hide();
-        }
-        window.setTimeout(() => {
-          create_bubble(element.id);
-        }, z.motion.MotionDuration.LONG);
-      } else {
-        create_bubble(element.id);
-      }
-    };
-
-    if (difference > 0 && list_height > MESSAGE_LIST_MIN_HEIGHT) {
-      if (largest_distance === element_distance_top) {
-        return this.scroll_by(-difference, show_bubble);
-      }
-      return this.scroll_by(difference, show_bubble);
-    }
-
-    show_bubble();
+  on_message_user_click(user_et) {
+    amplify.publish(z.event.WebApp.PEOPLE.SHOW, user_et);
   }
 
   /**
@@ -462,7 +398,7 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
     const reset_progress = () =>
       window.setTimeout(() => {
         message_et.is_resetting_session(false);
-        amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.SESSION_RESET);
+        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.SESSION_RESET);
       }, z.motion.MotionDuration.LONG);
 
     message_et.is_resetting_session(true);
@@ -470,16 +406,6 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
       .reset_session(message_et.from, message_et.client_id, this.conversation().id)
       .then(() => reset_progress())
       .catch(() => reset_progress());
-  }
-
-  /**
-   * Hides participant bubble.
-   * @returns {undefined} No return value
-   */
-  hide_bubble() {
-    if (this.participant_bubble) {
-      this.participant_bubble.hide();
-    }
   }
 
   /**
@@ -523,19 +449,6 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
       default:
         break;
     }
-  }
-
-  /**
-   * Track context menu click
-   * @param {z.entity.Message} message_et - Message
-   * @returns {undefined} No return value
-   */
-  _track_context_menu(message_et) {
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.SELECTED_MESSAGE, {
-      context: 'single',
-      conversation_type: z.tracking.helpers.get_conversation_type(this.conversation()),
-      type: z.tracking.helpers.get_message_type(message_et),
-    });
   }
 
   /**
@@ -653,8 +566,6 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
   on_context_menu_click(message_et, event) {
     const entries = [];
 
-    this._track_context_menu(message_et);
-
     if (message_et.is_downloadable() && !message_et.is_ephemeral()) {
       entries.push({
         click: () => message_et.download(),
@@ -686,7 +597,7 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
     if (message_et.is_deletable()) {
       entries.push({
         click: () => {
-          amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.DELETE_MESSAGE, {
+          amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.DELETE_MESSAGE, {
             action: () => this.conversation_repository.delete_message(this.conversation(), message_et),
           });
         },
@@ -701,7 +612,7 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
     ) {
       entries.push({
         click: () => {
-          amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.DELETE_EVERYONE_MESSAGE, {
+          amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.DELETE_EVERYONE_MESSAGE, {
             action: () => this.conversation_repository.delete_message_everyone(this.conversation(), message_et),
           });
         },

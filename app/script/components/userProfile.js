@@ -64,7 +64,7 @@ z.components.UserProfile = class UserProfile {
 
     this.selfUser = this.userRepository.self;
 
-    this.hasUser = ko.pureComputed(() => typeof this.userEntity === 'function' && this.userEntity());
+    this.hasUser = ko.pureComputed(() => typeof this.userEntity === 'function' && Boolean(this.userEntity()));
 
     this.isTeam = ko.pureComputed(() => this.selfUser().is_team_member());
 
@@ -456,7 +456,7 @@ z.components.UserProfile = class UserProfile {
   }
 
   clickToToggleDeviceVerification() {
-    const toggleVerified = !this.selectedDevice().meta.is_verified();
+    const toggleVerified = !this.selectedDevice().meta.isVerified();
 
     this.clientRepository
       .verifyClient(this.userEntity().id, this.selectedDevice(), toggleVerified)

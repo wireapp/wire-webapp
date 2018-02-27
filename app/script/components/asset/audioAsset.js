@@ -63,10 +63,6 @@ z.components.AudioAssetComponent = class AudioAssetComponent {
     this.on_pause_button_clicked = this.on_pause_button_clicked.bind(this);
   }
 
-  on_loadedmetadata() {
-    this._send_tracking_event();
-  }
-
   on_timeupdate() {
     this.audio_time(this.audio_element.currentTime);
   }
@@ -88,16 +84,6 @@ z.components.AudioAssetComponent = class AudioAssetComponent {
     }
   }
 
-  _send_tracking_event() {
-    const duration = Math.floor(this.audio_element.duration);
-
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.PLAYED_AUDIO_MESSAGE, {
-      duration: z.util.bucket_values(duration, [0, 10, 30, 60, 300, 900, 1800]),
-      duration_actual: duration,
-      type: z.util.get_file_extension(this.asset.file_name),
-    });
-  }
-
   dispose() {
     window.URL.revokeObjectURL(this.audio_src());
   }
@@ -105,7 +91,7 @@ z.components.AudioAssetComponent = class AudioAssetComponent {
 
 ko.components.register('audio-asset', {
   template: `
-    <audio data-bind="attr: {src: audio_src}, event: {loadedmetadata: on_loadedmetadata, timeupdate: on_timeupdate}"></audio>
+    <audio data-bind="attr: {src: audio_src}, event: {timeupdate: on_timeupdate}"></audio>
     <!-- ko ifnot: expired() -->
       <!-- ko if: header -->
         <asset-header params="message: message"></asset-header>

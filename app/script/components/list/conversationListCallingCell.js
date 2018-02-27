@@ -83,7 +83,7 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
         return this.joined_call().conversationEntity.is_one2one();
       }
     });
-    this.disable_toggle_screen = ko.pureComputed(() => {
+    this.disableToggleScreen = ko.pureComputed(() => {
       if (this.joined_call()) {
         return this.joined_call().isRemoteScreenSend();
       }

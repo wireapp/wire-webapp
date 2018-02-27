@@ -1,4 +1,4 @@
-<div id="preferences-account" class="preferences-page preferences-account" data-bind="with: $root.preferences_account, removed_from_view: $root.preferences_account.removed_from_view">
+<div id="preferences-account" class="preferences-page preferences-account" data-bind="with: $root.preferencesAccount, removed_from_view: $root.preferencesAccount.removed_from_view">
   <div class="preferences-titlebar" data-bind="l10n_text: z.string.preferences_account"></div>
   <div class="preferences-content-wrapper">
     <div class="preferences-content" data-bind="antiscroll">
@@ -24,7 +24,7 @@
             <span class="preferences-account-username-atsign">@</span>
             <input class="preferences-account-username preferences-account-input"
                    id="username" type="text"
-                   data-bind="textInput: username, event: {input: verify_username, keypress: check_username_input, blur: reset_username_input}, click: click_on_username, enter: change_username, hasFocus: should_focus_username()"
+                   data-bind="textInput: username, event: {input: verify_username, keypress: check_username_input, blur: reset_username_input}, enter: change_username, hasFocus: should_focus_username()"
                    data-uie-name="enter-username"
                    maxlength="21"
                    spellcheck="false"

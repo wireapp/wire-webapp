@@ -20,9 +20,9 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.ViewModel = z.ViewModel || {};
-window.z.ViewModel.list = z.ViewModel.list || {};
+window.z.viewModel = z.viewModel || {};
+window.z.viewModel.panel = z.viewModel.panel || {};
 
-z.ViewModel.list.LIST_MODAL_TYPE = {
-  TAKEOVER: 'z.ViewModel.list.LIST_MODAL_TYPE.TAKEOVER',
+z.viewModel.panel.GuestOptionsViewModel = class GuestOptionsViewModel {
+  constructor(mainViewModel, panelViewModel, repositories) {}
 };

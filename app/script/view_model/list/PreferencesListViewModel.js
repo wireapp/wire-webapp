@@ -20,68 +20,66 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.ViewModel = z.ViewModel || {};
-window.z.ViewModel.list = z.ViewModel.list || {};
+window.z.viewModel = z.viewModel || {};
+window.z.viewModel.list = z.viewModel.list || {};
 
-z.ViewModel.list.PreferencesListViewModel = class PreferencesListViewModel {
+z.viewModel.list.PreferencesListViewModel = class PreferencesListViewModel {
   /**
    * View model for the preferences list.
-   *
-   * @param {string} element_id - HTML selector
-   * @param {z.ViewModel.list.ListViewModel} list_view_model - List view model
-   * @param {z.ViewModel.content.ContentViewModel} content_view_model - Content view model
+   * @param {z.viewModel.ListViewModel} mainViewModel - Main view model
+   * @param {z.viewModel.ListViewModel} listViewModel - List view model
    */
-  constructor(element_id, list_view_model, content_view_model) {
-    this.list_view_model = list_view_model;
-    this.content_view_model = content_view_model;
-    this.logger = new z.util.Logger('z.ViewModel.list.PreferencesListViewModel', z.config.LOGGER.OPTIONS);
+  constructor(mainViewModel, listViewModel) {
+    this.content_view_model = mainViewModel.content;
+    this.list_view_model = listViewModel;
+    this.logger = new z.util.Logger('z.viewModel.list.PreferencesListViewModel', z.config.LOGGER.OPTIONS);
 
-    this.preferences_state = this.content_view_model.content_state;
+    this.preferences_state = this.content_view_model.state;
     this.should_update_scrollbar = ko
       .computed(() => this.list_view_model.last_update())
       .extend({notify: 'always', rateLimit: 500});
 
     this.selected_about = ko.pureComputed(
-      () => this.preferences_state() === z.ViewModel.content.CONTENT_STATE.PREFERENCES_ABOUT
+      () => this.preferences_state() === z.viewModel.ContentViewModel.STATE.PREFERENCES_ABOUT
     );
     this.selected_account = ko.pureComputed(
-      () => this.preferences_state() === z.ViewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT
+      () => this.preferences_state() === z.viewModel.ContentViewModel.STATE.PREFERENCES_ACCOUNT
     );
     this.selected_av = ko.pureComputed(
-      () => this.preferences_state() === z.ViewModel.content.CONTENT_STATE.PREFERENCES_AV
+      () => this.preferences_state() === z.viewModel.ContentViewModel.STATE.PREFERENCES_AV
     );
     this.selected_devices = ko.pureComputed(() =>
       [
-        z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICE_DETAILS,
-        z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES,
+        z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICE_DETAILS,
+        z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICES,
       ].includes(this.preferences_state())
     );
     this.selected_options = ko.pureComputed(
-      () => this.preferences_state() === z.ViewModel.content.CONTENT_STATE.PREFERENCES_OPTIONS
+      () => this.preferences_state() === z.viewModel.ContentViewModel.STATE.PREFERENCES_OPTIONS
     );
   }
 
   click_on_close_preferences() {
-    this.list_view_model.switch_list(z.ViewModel.list.LIST_STATE.CONVERSATIONS);
+    this.list_view_model.switch_list(z.viewModel.ListViewModel.STATE.CONVERSATIONS);
   }
 
   click_on_about() {
-    this.content_view_model.switch_content(z.ViewModel.content.CONTENT_STATE.PREFERENCES_ABOUT);
+    this.content_view_model.switchContent(z.viewModel.ContentViewModel.STATE.PREFERENCES_ABOUT);
   }
 
   click_on_account() {
-    this.content_view_model.switch_content(z.ViewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT);
+    this.content_view_model.switchContent(z.viewModel.ContentViewModel.STATE.PREFERENCES_ACCOUNT);
   }
 
   click_on_av() {
-    this.content_view_model.switch_content(z.ViewModel.content.CONTENT_STATE.PREFERENCES_AV);
+    this.content_view_model.switchContent(z.viewModel.ContentViewModel.STATE.PREFERENCES_AV);
   }
 
   click_on_devices() {
-    this.content_view_model.switch_content(z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES);
+    this.content_view_model.switchContent(z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICES);
   }
 
   click_on_options() {
-    this.content_view_model.switch_content(z.ViewModel.content.CONTENT_STATE.PREFERENCES_OPTIONS);
+    this.content_view_model.switchContent(z.viewModel.ContentViewModel.STATE.PREFERENCES_OPTIONS);
   }
 };

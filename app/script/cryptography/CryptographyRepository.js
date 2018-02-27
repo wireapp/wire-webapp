@@ -105,7 +105,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
 
       this.cryptobox.on(cryptobox.Cryptobox.TOPIC.NEW_SESSION, sessionId => {
         const {userId, clientId} = z.client.ClientEntity.dismantleUserClientId(sessionId);
-        amplify.publish(z.event.WebApp.CLIENT.ADD, userId, new z.client.ClientEntity({id: clientId}));
+        amplify.publish(z.event.WebApp.CLIENT.ADD, userId, {id: clientId});
       });
     });
   }
@@ -420,7 +420,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
       .encrypt(sessionId, genericMessage.toArrayBuffer())
       .then(cipherText => ({cipherText: z.util.array_to_base64(cipherText), sessionId}))
       .catch(error => {
-        if (error instanceof cryptobox.store.error.RecordNotFoundError) {
+        if (error.constructor.name === 'RecordNotFoundError') {
           this.logger.log(`Session '${sessionId}' needs to get initialized...`);
           return {sessionId};
         }

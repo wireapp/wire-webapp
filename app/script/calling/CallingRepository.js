@@ -238,14 +238,18 @@ z.calling.CallingRepository = class CallingRepository {
         case z.calling.enum.CALL_MESSAGE_TYPE.SETUP: {
           this.injectActivateEvent(callMessageEntity, source);
           this.userRepository.get_user_by_id(userId).then(userEntity => {
-            const attributes = {first_name: userEntity.name()};
-            amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.UNSUPPORTED_INCOMING_CALL, attributes);
+            const attributes = {name: userEntity.name()};
+            amplify.publish(
+              z.event.WebApp.WARNING.SHOW,
+              z.viewModel.WarningsViewModel.TYPE.UNSUPPORTED_INCOMING_CALL,
+              attributes
+            );
           });
           break;
         }
 
         case z.calling.enum.CALL_MESSAGE_TYPE.CANCEL: {
-          amplify.publish(z.event.WebApp.WARNING.DISMISS, z.ViewModel.WarningType.UNSUPPORTED_INCOMING_CALL);
+          amplify.publish(z.event.WebApp.WARNING.DISMISS, z.viewModel.WarningsViewModel.TYPE.UNSUPPORTED_INCOMING_CALL);
           break;
         }
 
@@ -542,7 +546,7 @@ z.calling.CallingRepository = class CallingRepository {
       const promises = [this._createIncomingCall(callMessageEntity, source, silentCall)];
 
       if (!eventFromStream) {
-        const consentType = z.ViewModel.MODAL_CONSENT_TYPE.INCOMING_CALL;
+        const consentType = z.viewModel.ModalsViewModel.CONSENT_TYPE.INCOMING_CALL;
         const grantMessagePromise = this.conversationRepository.grantMessage(conversationId, consentType, [userId]);
         promises.push(grantMessagePromise);
       }
@@ -991,7 +995,7 @@ z.calling.CallingRepository = class CallingRepository {
 
       const isVideoCall = mediaType === z.media.MediaType.AUDIO_VIDEO;
       if (conversationEntity.is_group() && isVideoCall) {
-        amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CALL_NO_VIDEO_IN_GROUP);
+        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CALL_NO_VIDEO_IN_GROUP);
       } else {
         this.joinCall(conversationEntity.id, mediaType);
       }
@@ -1007,13 +1011,13 @@ z.calling.CallingRepository = class CallingRepository {
   _checkCallingSupport(conversationId, callState) {
     return this.conversationRepository.get_conversation_by_id(conversationId).then(({participating_user_ids}) => {
       if (!participating_user_ids().length) {
-        amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CALL_EMPTY_CONVERSATION);
+        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CALL_EMPTY_CONVERSATION);
         throw new z.calling.CallError(z.calling.CallError.TYPE.NOT_SUPPORTED);
       }
 
       const isOutgoingCall = callState === z.calling.enum.CALL_STATE.OUTGOING;
       if (isOutgoingCall && !z.calling.CallingRepository.supportsCalling) {
-        amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.UNSUPPORTED_OUTGOING_CALL);
+        amplify.publish(z.event.WebApp.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.UNSUPPORTED_OUTGOING_CALL);
         throw new z.calling.CallError(z.calling.CallError.TYPE.NOT_SUPPORTED);
       }
     });
@@ -1034,7 +1038,7 @@ z.calling.CallingRepository = class CallingRepository {
       if (!ongoingCallId) {
         resolve();
       } else {
-        amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CALL_START_ANOTHER, {
+        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CALL_START_ANOTHER, {
           action() {
             amplify.publish(
               z.event.WebApp.CALL.STATE.LEAVE,

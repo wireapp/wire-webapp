@@ -240,17 +240,6 @@
   version "2.1.5"
   resolved "https://codeload.github.com/wireapp/wire-webapp-cbor/tar.gz/d00796b5340c087363790627f5683dcb9ce45c74"
 
-"@bower_components/wire-webapp-cryptobox@wireapp/wire-webapp-cryptobox#6.2.0":
-  version "6.2.0"
-  resolved "https://codeload.github.com/wireapp/wire-webapp-cryptobox/tar.gz/8692e797347c96deab8f853adbb01d3a408ac9be"
-  dependencies:
-    "@wireapp/store-engine" "0.1.0"
-    dexie "1.5.1"
-    fs-extra "3.0.1"
-    rimraf "2.6.1"
-    wire-webapp-lru-cache "2.0.0"
-    wire-webapp-proteus "5.2.0"
-
 "@bower_components/wire-webapp-lru-cache@wireapp/wire-webapp-lru-cache#2.0.0":
   version "2.0.0"
   resolved "https://codeload.github.com/wireapp/wire-webapp-lru-cache/tar.gz/39ede33067020fa0238f74f393c6e128665cf32e"
@@ -338,10 +327,6 @@
   version "9.4.6"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-9.4.6.tgz#d8176d864ee48753d053783e4e463aec86b8d82e"
 
-"@types/node@8.0.24":
-  version "8.0.24"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-8.0.24.tgz#06c580084d9add1fb40c1510ef0b448961246fb1"
-
 "@types/node@9.3.0":
   version "9.3.0"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-9.3.0.tgz#3a129cda7c4e5df2409702626892cb4b96546dd5"
@@ -391,6 +376,10 @@
   version "3.0.3"
   resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-3.0.3.tgz#8b228cdfd4b0fc7a7a16911824be285b45586d41"
 
+"@wireapp/cbor@3.0.4":
+  version "3.0.4"
+  resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-3.0.4.tgz#4ecf22561cda3051ff1d66f66ece3407dd7b8bcc"
+
 "@wireapp/core@2.0.30":
   version "2.0.30"
   resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-2.0.30.tgz#dae6ef4db6415da38ecbf7f5da0edb3907b682eb"
@@ -416,9 +405,28 @@
     fs-extra "5.0.0"
     p-queue "2.3.0"
 
+"@wireapp/cryptobox@8.1.0":
+  version "8.1.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-8.1.0.tgz#72228bf60d047635c2a5e831186cd97f085b8d25"
+  dependencies:
+    "@types/fs-extra" "5.0.0"
+    "@types/node" "9.3.0"
+    "@wireapp/lru-cache" "2.0.7"
+    "@wireapp/proteus" "7.1.2"
+    "@wireapp/store-engine" "0.2.5"
+    dexie "2.0.1"
+    fs-extra "5.0.0"
+    p-queue "2.3.0"
+
 "@wireapp/lru-cache@2.0.6":
   version "2.0.6"
   resolved "https://registry.yarnpkg.com/@wireapp/lru-cache/-/lru-cache-2.0.6.tgz#473c48b9721bc99401804d5facbc231a07771e27"
+  dependencies:
+    webpack "3.11.0"
+
+"@wireapp/lru-cache@2.0.7":
+  version "2.0.7"
+  resolved "https://registry.yarnpkg.com/@wireapp/lru-cache/-/lru-cache-2.0.7.tgz#e73e6b1bdf5da9c99bf48552a1be861ff85fa9b8"
   dependencies:
     webpack "3.11.0"
 
@@ -430,6 +438,17 @@
     "@types/ed2curve" "0.2.2"
     "@types/node" "9.4.6"
     "@wireapp/cbor" "3.0.3"
+    ed2curve "0.2.1"
+    libsodium-wrappers-sumo "0.7.3"
+
+"@wireapp/proteus@7.1.2":
+  version "7.1.2"
+  resolved "https://registry.yarnpkg.com/@wireapp/proteus/-/proteus-7.1.2.tgz#3de5b49d3969aa7a3da00df2f16a26103eb81378"
+  dependencies:
+    "@types/chai" "4.1.2"
+    "@types/ed2curve" "0.2.2"
+    "@types/node" "9.4.6"
+    "@wireapp/cbor" "3.0.4"
     ed2curve "0.2.1"
     libsodium-wrappers-sumo "0.7.3"
 
@@ -450,14 +469,6 @@
     recompose "0.26.0"
     styled-components "3.1.6"
     styled-normalize "4.0.0"
-
-"@wireapp/store-engine@0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/store-engine/-/store-engine-0.1.0.tgz#ee6e6212e2303f1fcbb6d245570c5c150e5097eb"
-  dependencies:
-    "@types/node" "8.0.24"
-    dexie "1.5.1"
-    fs-extra "4.0.1"
 
 "@wireapp/store-engine@0.2.5":
   version "0.2.5"
@@ -2934,10 +2945,6 @@ detective@^4.0.0:
     acorn "^5.2.1"
     defined "^1.0.0"
 
-dexie@1.5.1:
-  version "1.5.1"
-  resolved "https://registry.yarnpkg.com/dexie/-/dexie-1.5.1.tgz#ac3ad5a0ebaf7e6e42760db58710418d4a756624"
-
 dexie@2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/dexie/-/dexie-2.0.1.tgz#a6dc4e607461c4da5f934621917a2a8939a18e97"
@@ -3946,22 +3953,6 @@ fs-access@^1.0.0:
   resolved "https://registry.yarnpkg.com/fs-access/-/fs-access-1.0.1.tgz#d6a87f262271cefebec30c553407fb995da8777a"
   dependencies:
     null-check "^1.0.0"
-
-fs-extra@3.0.1:
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/fs-extra/-/fs-extra-3.0.1.tgz#3794f378c58b342ea7dbbb23095109c4b3b62291"
-  dependencies:
-    graceful-fs "^4.1.2"
-    jsonfile "^3.0.0"
-    universalify "^0.1.0"
-
-fs-extra@4.0.1:
-  version "4.0.1"
-  resolved "https://registry.yarnpkg.com/fs-extra/-/fs-extra-4.0.1.tgz#7fc0c6c8957f983f57f306a24e5b9ddd8d0dd880"
-  dependencies:
-    graceful-fs "^4.1.2"
-    jsonfile "^3.0.0"
-    universalify "^0.1.0"
 
 fs-extra@4.0.2:
   version "4.0.2"
@@ -5636,12 +5627,6 @@ json3@^3.3.2:
 json5@^0.5.0, json5@^0.5.1:
   version "0.5.1"
   resolved "https://registry.yarnpkg.com/json5/-/json5-0.5.1.tgz#1eade7acc012034ad84e2396767ead9fa5495821"
-
-jsonfile@^3.0.0:
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/jsonfile/-/jsonfile-3.0.1.tgz#a5ecc6f65f53f662c4415c7675a0331d0992ec66"
-  optionalDependencies:
-    graceful-fs "^4.1.6"
 
 jsonfile@^4.0.0:
   version "4.0.0"
@@ -8767,12 +8752,6 @@ rimraf@2, rimraf@^2.2.8, rimraf@^2.5.1, rimraf@^2.5.2, rimraf@^2.5.4, rimraf@^2.
   dependencies:
     glob "^7.0.5"
 
-rimraf@2.6.1:
-  version "2.6.1"
-  resolved "https://registry.yarnpkg.com/rimraf/-/rimraf-2.6.1.tgz#c2338ec643df7a1b7fe5c54fa86f57428a55f33d"
-  dependencies:
-    glob "^7.0.5"
-
 rimraf@~2.2.8:
   version "2.2.8"
   resolved "https://registry.yarnpkg.com/rimraf/-/rimraf-2.2.8.tgz#e439be2aaee327321952730f99a8929e4fc50582"
@@ -10312,20 +10291,6 @@ window-size@^0.1.4:
 wire-webapp-cbor@2.1.5:
   version "2.1.5"
   resolved "https://registry.yarnpkg.com/wire-webapp-cbor/-/wire-webapp-cbor-2.1.5.tgz#742912cb40b037dcc7125ce4c554ea2d6d398064"
-
-wire-webapp-lru-cache@2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/wire-webapp-lru-cache/-/wire-webapp-lru-cache-2.0.0.tgz#38b2463a67b14028bd26295ac5bfe9a734eec3cc"
-  dependencies:
-    webpack "^2.2.0-rc.0"
-
-wire-webapp-proteus@5.2.0:
-  version "5.2.0"
-  resolved "https://registry.yarnpkg.com/wire-webapp-proteus/-/wire-webapp-proteus-5.2.0.tgz#213927b0b057e37f8f4c06229d7a31d93adeb372"
-  dependencies:
-    ed2curve "0.2.1"
-    libsodium-wrappers-sumo "0.5.4"
-    wire-webapp-cbor "2.1.5"
 
 wordwrap@0.0.2:
   version "0.0.2"

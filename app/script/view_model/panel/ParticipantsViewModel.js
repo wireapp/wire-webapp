@@ -20,9 +20,10 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.ViewModel = z.ViewModel || {};
+window.z.viewModel = z.viewModel || {};
+window.z.viewModel.panel = z.viewModel.panel || {};
 
-z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
+z.viewModel.panel.ParticipantsViewModel = class ParticipantsViewModel {
   static get CONFIG() {
     return {
       ADD_STATES: [ParticipantsViewModel.STATE.ADD_PEOPLE, ParticipantsViewModel.STATE.ADD_SERVICE],
@@ -40,7 +41,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     };
   }
 
-  constructor(elementId, conversationRepository, integrationRepository, teamRepository, userRepository) {
+  constructor(mainViewModel, panelViewModel, repositories) {
     this.clickOnAddPeople = this.clickOnAddPeople.bind(this);
     this.clickOnPending = this.clickOnPending.bind(this);
     this.clickOnMemberBack = this.clickOnMemberBack.bind(this);
@@ -48,47 +49,45 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.clickOnShowParticipant = this.clickOnShowParticipant.bind(this);
     this.clickToAddService = this.clickToAddService.bind(this);
     this.clickToBlock = this.clickToBlock.bind(this);
-    this.clickToConnect = this.clickToConnect.bind(this);
     this.clickToLeave = this.clickToLeave.bind(this);
     this.clickToRemoveMember = this.clickToRemoveMember.bind(this);
     this.clickToRemoveService = this.clickToRemoveService.bind(this);
     this.clickToUnblock = this.clickToUnblock.bind(this);
     this.showParticipant = this.showParticipant.bind(this);
 
-    this.elementId = elementId;
-    this.userRepository = userRepository;
-    this.conversationRepository = conversationRepository;
-    this.integrationRepository = integrationRepository;
-    this.teamRepository = teamRepository;
-    this.logger = new z.util.Logger('z.ViewModel.ParticipantsViewModel', z.config.LOGGER.OPTIONS);
+    this.elementId = 'participants';
+    this.mainViewModel = mainViewModel;
+
+    this.userRepository = repositories.user;
+    this.conversationRepository = repositories.conversation;
+    this.integrationRepository = repositories.integration;
+    this.teamRepository = repositories.team;
+    this.logger = new z.util.Logger('z.viewModel.details.ParticipantsViewModel', z.config.LOGGER.OPTIONS);
 
     this.state = ko.observable(ParticipantsViewModel.STATE.PARTICIPANTS);
     this.previousState = ko.observable(this.state());
     this.state.subscribe(oldState => this.previousState(oldState), null, 'beforeChange');
 
     this.activeAddState = ko.pureComputed(() => ParticipantsViewModel.CONFIG.ADD_STATES.includes(this.state()));
-    this.activeServiceState = ko.pureComputed(() => ParticipantsViewModel.CONFIG.SERVICE_STATES.includes(this.state()));
-
-    this.stateAddPeople = ko.pureComputed(() => this.state() === z.ViewModel.ParticipantsViewModel.STATE.ADD_PEOPLE);
-    this.stateAddService = ko.pureComputed(() => this.state() === z.ViewModel.ParticipantsViewModel.STATE.ADD_SERVICE);
-    this.stateParticipants = ko.pureComputed(() => {
-      return this.state() === z.ViewModel.ParticipantsViewModel.STATE.PARTICIPANTS;
+    this.activeServiceState = ko.pureComputed(() => {
+      return ParticipantsViewModel.CONFIG.SERVICE_STATES.includes(this.state());
     });
+
+    this.stateAddPeople = ko.pureComputed(() => this.state() === ParticipantsViewModel.STATE.ADD_PEOPLE);
+    this.stateAddService = ko.pureComputed(() => this.state() === ParticipantsViewModel.STATE.ADD_SERVICE);
+    this.stateParticipants = ko.pureComputed(() => this.state() === ParticipantsViewModel.STATE.PARTICIPANTS);
     this.stateServiceConfirmation = ko.pureComputed(() => {
-      return this.state() === z.ViewModel.ParticipantsViewModel.STATE.SERVICE_CONFIRMATION;
+      return this.state() === ParticipantsViewModel.STATE.SERVICE_CONFIRMATION;
     });
     this.stateServiceDetails = ko.pureComputed(() => {
-      return this.state() === z.ViewModel.ParticipantsViewModel.STATE.SERVICE_DETAILS;
+      return this.state() === ParticipantsViewModel.STATE.SERVICE_DETAILS;
     });
 
     this.conversation = ko.observable(new z.entity.Conversation());
-    this.conversation.subscribe(() => this.renderParticipants(false));
 
     this.isTeam = this.teamRepository.isTeam;
     this.team = this.teamRepository.team;
     this.teamUsers = this.teamRepository.teamUsers;
-
-    this.renderParticipants = ko.observable(false);
 
     this.groupMode = ko.observable(false);
 
@@ -146,13 +145,6 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
       $('.group-header textarea').val(this.conversation().display_name());
     });
 
-    this.participantsBubble = new zeta.webapp.module.Bubble({
-      host_selector: '#show-participants',
-      modal: true,
-      on_hide: () => this.resetView(),
-      scroll_selector: '.messages-wrap',
-    });
-
     // @todo create a viewmodel search?
     this.addActionText = ko.pureComputed(() => {
       return this.showIntegrations() ? z.string.people_button_add : z.string.people_button_add_people;
@@ -195,13 +187,11 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
       return this.stateServiceDetails() && !this.conversation().is_guest() && this.selectedIsInConversation();
     });
 
-    amplify.subscribe(z.event.WebApp.CONTENT.SWITCH, this.switchContent.bind(this));
     amplify.subscribe(z.event.WebApp.PEOPLE.SHOW, this.showParticipant);
-    amplify.subscribe(z.event.WebApp.PEOPLE.TOGGLE, this.toggleParticipantsBubble.bind(this));
+    amplify.subscribe(z.event.WebApp.PEOPLE.TOGGLE, this.toggleParticipantsSidebar.bind(this));
   }
 
   changeConversation(conversationEntity) {
-    this.participantsBubble.hide();
     this.conversation(conversationEntity);
     this.resetView();
   }
@@ -213,7 +203,6 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     }
 
     amplify.publish(z.event.WebApp.CONVERSATION.CREATE_GROUP, 'conversation_details', this.selectedParticipant());
-    this.participantsBubble.hide();
   }
 
   clickOnAddService() {
@@ -222,11 +211,9 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
   }
 
   clickOnPending(userEntity) {
-    const onSuccess = () => this.participantsBubble.hide();
-
     this.confirmDialog = $('#participants').confirm({
-      cancel: () => this.userRepository.ignore_connection_request(userEntity).then(() => onSuccess()),
-      confirm: () => this.userRepository.accept_connection_request(userEntity, true).then(() => onSuccess()),
+      cancel: () => this.userRepository.ignore_connection_request(userEntity),
+      confirm: () => this.userRepository.accept_connection_request(userEntity, true),
       data: {
         user: this.selectedParticipant(),
       },
@@ -269,12 +256,13 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     if (this.conversation().is_group()) {
       this.conversationRepository.addMembers(this.conversation(), this.selectedContacts());
     }
-    this.participantsBubble.hide();
+    this.resetView();
   }
 
   clickToAddService() {
-    this.integrationRepository.addService(this.conversation(), this.selectedService(), 'conversation_details');
-    this.participantsBubble.hide();
+    this.integrationRepository
+      .addService(this.conversation(), this.selectedService(), 'conversation_details')
+      .then(() => this.resetView());
   }
 
   clickToBlock(userEntity) {
@@ -283,8 +271,6 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.confirmDialog = $('#participants').confirm({
       confirm: () => {
         const nextConversationEntity = this.conversationRepository.get_next_conversation(this.conversation());
-
-        this.participantsBubble.hide();
         this.userRepository.block_user(userEntity, nextConversationEntity);
       },
       data: {
@@ -292,10 +278,6 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
       },
       template: '#template-confirm-block',
     });
-  }
-
-  clickToConnect(userEntity) {
-    this.participantsBubble.hide();
   }
 
   clickToEdit() {
@@ -309,8 +291,9 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
 
     this.confirmDialog = $('#participants').confirm({
       confirm: () => {
-        this.participantsBubble.hide();
-        this.conversationRepository.removeMember(this.conversation(), this.userRepository.self().id);
+        this.conversationRepository
+          .removeMember(this.conversation(), this.userRepository.self().id)
+          .then(() => this.resetView());
       },
       template: '#template-confirm-leave',
     });
@@ -321,11 +304,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
 
     this.confirmDialog = $('#participants').confirm({
       confirm: () => {
-        this.conversationRepository.removeMember(this.conversation(), userEntity.id).then(response => {
-          if (response) {
-            this.resetView();
-          }
-        });
+        this.conversationRepository.removeMember(this.conversation(), userEntity.id).then(() => this.resetView());
       },
       data: {
         user: userEntity,
@@ -336,11 +315,8 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
 
   clickToRemoveService() {
     this.integrationRepository.removeService(this.conversation(), this.selectedParticipant()).then(response => {
-      if (response) {
-        if (this.groupMode()) {
-          return this.resetView();
-        }
-        this.participantsBubble.hide();
+      if (response && this.groupMode()) {
+        this.resetView();
       }
     });
   }
@@ -350,10 +326,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
       confirm: () => {
         this.userRepository
           .unblock_user(userEntity)
-          .then(() => {
-            this.participantsBubble.hide();
-            return this.conversationRepository.get_1to1_conversation(userEntity);
-          })
+          .then(() => this.conversationRepository.get_1to1_conversation(userEntity))
           .then(conversationEntity => this.conversationRepository.update_participating_user_ets(conversationEntity));
       },
       data: {
@@ -396,9 +369,14 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     if (participantEntity) {
       this.groupMode(groupMode);
       if (participantEntity.isBot) {
-        return this.showService(participantEntity);
+        this.showService(participantEntity);
+      } else {
+        this.selectedParticipant(participantEntity);
       }
-      this.selectedParticipant(participantEntity);
+    }
+
+    if (!this.mainViewModel.isPanelOpen()) {
+      this.mainViewModel.openPanel();
     }
   }
 
@@ -416,43 +394,29 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
       .then(providerEntity => this.selectedService().providerName(providerEntity.name));
   }
 
-  switchContent(contentState) {
-    const isConnectionRequests = contentState === z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS;
-    if (isConnectionRequests) {
-      this.participantsBubble.hide();
+  toggleParticipantsSidebar(addPeople = false) {
+    if (!this.mainViewModel.isPanelOpen()) {
+      this.resetView();
+
+      const [userEntity] = this.participants();
+      const initialUser = userEntity && this.conversation().is_one2one() ? userEntity : undefined;
+      this.selectedParticipant(initialUser);
     }
-  }
 
-  toggleParticipantsBubble(addPeople = false) {
-    const toggleBubble = () => {
-      if (!this.participantsBubble.is_visible()) {
-        this.resetView();
-
-        const [userEntity] = this.participants();
-        const initialUser = userEntity && this.conversation().is_one2one() ? userEntity : undefined;
-        this.selectedParticipant(initialUser);
-
-        this.renderParticipants(true);
-      }
-
-      if (addPeople && !this.conversation().is_guest()) {
-        if (!this.participantsBubble.is_visible()) {
-          return this.participantsBubble.show().then(() => this.clickOnAddPeople());
-        }
-
-        const isConfirmingAction = this.confirmDialog && this.confirmDialog.is_visible();
-        if (this.stateAddPeople() || isConfirmingAction) {
-          return this.participantsBubble.hide();
-        }
-
+    if (addPeople && !this.conversation().is_guest()) {
+      if (!this.mainViewModel.isPanelOpen()) {
+        this.mainViewModel.openPanel();
         return this.clickOnAddPeople();
       }
 
-      return this.participantsBubble.toggle();
-    };
+      const isConfirmingAction = this.confirmDialog && this.confirmDialog.is_visible();
+      if (this.stateAddPeople() || isConfirmingAction) {
+        return this.mainViewModel.closePanel();
+      }
 
-    const bubble = wire.app.view.content.message_list.participant_bubble;
-    const timeout = bubble && bubble.is_visible() ? z.motion.MotionDuration.LONG : 0;
-    window.setTimeout(() => toggleBubble(), timeout);
+      return this.clickOnAddPeople();
+    }
+
+    this.mainViewModel.togglePanel();
   }
 };

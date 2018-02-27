@@ -105,6 +105,14 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
             : z.string.conversation_member_leave_removed;
           return z.l10n.text(userRemovedStringId, this._generateNameString());
         case z.event.Backend.CONVERSATION.MEMBER_JOIN:
+          const senderJoined = this.otherUser().id === this.user().id;
+          if (senderJoined) {
+            const userJoinedStringId = this.user().is_me
+              ? z.string.conversationMemberJoinSelfYou
+              : z.string.conversationMemberJoinSelf;
+            return z.l10n.text(userJoinedStringId);
+          }
+
           const userJoinedStringId = this.user().is_me
             ? z.string.conversation_member_join_you
             : z.string.conversation_member_join;

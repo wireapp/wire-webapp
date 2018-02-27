@@ -82,7 +82,7 @@ z.user.UserRepository = class UserRepository {
       amplify.publish(z.event.WebApp.ANALYTICS.SUPER_PROPERTY, z.tracking.SuperProperty.CONTACTS, number_of_contacts);
     });
 
-    amplify.subscribe(z.event.WebApp.CLIENT.ADD, this.add_client_to_user.bind(this));
+    amplify.subscribe(z.event.WebApp.CLIENT.ADD, this.addClientToUser.bind(this));
     amplify.subscribe(z.event.WebApp.CLIENT.REMOVE, this.remove_client_from_user.bind(this));
     amplify.subscribe(z.event.WebApp.CLIENT.UPDATE, this.update_clients_from_user.bind(this));
     amplify.subscribe(z.event.WebApp.USER.SET_AVAILABILITY, this.setAvailability.bind(this));
@@ -515,20 +515,21 @@ z.user.UserRepository = class UserRepository {
 
   /**
    * Saves a new client for the first time to the database and adds it to a user's entity.
-   * @param {string} user_id - ID of user
-   * @param {string} client_et - Client which should get deleted
+   * @param {string} userId - ID of user
+   * @param {Object} clientPayload - Payload of client which should be added to user
    * @returns {Promise} Promise that resolves when a client and its session have been deleted
    */
-  add_client_to_user(user_id, client_et) {
-    return this.get_user_by_id(user_id).then(user_et => {
-      if (!user_et.add_client(client_et)) {
+  addClientToUser(userId, clientPayload) {
+    return this.get_user_by_id(userId).then(userEntity => {
+      const clientEntity = this.client_repository.clientMapper.mapClient(clientPayload, userEntity.is_me);
+      if (!userEntity.add_client(clientEntity)) {
         return;
       }
 
-      return this.client_repository.saveClientInDb(user_id, client_et.toJson()).then(() => {
-        amplify.publish(z.event.WebApp.USER.CLIENT_ADDED, user_id, client_et);
-        if (user_et.is_me) {
-          amplify.publish(z.event.WebApp.CLIENT.ADD_OWN_CLIENT, user_id, client_et);
+      return this.client_repository.saveClientInDb(userId, clientEntity.toJson()).then(() => {
+        amplify.publish(z.event.WebApp.USER.CLIENT_ADDED, userId, clientEntity);
+        if (userEntity.is_me) {
+          amplify.publish(z.event.WebApp.CLIENT.ADD_OWN_CLIENT, userId, clientEntity);
         }
       });
     });
@@ -941,21 +942,11 @@ z.user.UserRepository = class UserRepository {
       .then(valid_suggestions => {
         this.should_set_username = true;
         this.self().username(valid_suggestions[0]);
-
-        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ONBOARDING.GENERATED_USERNAME, {
-          num_of_attempts: 1,
-          outcome: 'success',
-        });
       })
       .catch(error => {
         if (error.code === z.service.BackendClientError.STATUS_CODE.NOT_FOUND) {
           this.should_set_username = false;
         }
-
-        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ONBOARDING.GENERATED_USERNAME, {
-          num_of_attempts: 1,
-          outcome: 'fail',
-        });
 
         throw error;
       });
@@ -1051,15 +1042,7 @@ z.user.UserRepository = class UserRepository {
    * @returns {undefined} No return value
    */
   set_default_picture() {
-    return z.util
-      .load_url_blob(z.config.UNSPLASH_URL)
-      .then(blob => this.change_picture(blob))
-      .then(() => {
-        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ONBOARDING.ADDED_PHOTO, {
-          outcome: 'success',
-          source: 'unsplash',
-        });
-      });
+    return z.util.load_url_blob(z.config.UNSPLASH_URL).then(blob => this.change_picture(blob));
   }
 
   map_guest_status(user_ets = this.users()) {
