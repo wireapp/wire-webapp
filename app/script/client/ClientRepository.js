@@ -458,10 +458,16 @@ z.client.ClientRepository = class ClientRepository {
   logoutClient() {
     if (this.currentClient()) {
       if (this.currentClient().type === z.client.ClientType.PERMANENT) {
-        return amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.LOGOUT, {
-          action(clearData) {
+        return amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.OPTION, {
+          action: clearData => {
             return amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SIGN_OUT_REASON.USER_REQUESTED, clearData);
           },
+          text: {
+            action: z.l10n.text(z.string.modalAccountLogoutAction),
+            option: z.l10n.text(z.string.modalAccountLogoutOption),
+            title: z.l10n.text(z.string.modalAccountLogoutHeadline),
+          },
+          warning: false,
         });
       }
       return this.deleteTemporaryClient().then(() =>

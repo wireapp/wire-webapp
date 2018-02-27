@@ -268,13 +268,9 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     if (!this._is_hitting_upload_limit(files)) {
       for (const file of [...files]) {
         if (file.size > z.config.MAXIMUM_ASSET_FILE_SIZE) {
-          amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
-          window.setTimeout(() => {
-            amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.UPLOAD_TOO_LARGE, {
-              data: z.util.format_bytes(z.config.MAXIMUM_ASSET_FILE_SIZE),
-            });
-          }, 200);
-          return;
+          const fileSize = z.util.format_bytes(z.config.MAXIMUM_ASSET_FILE_SIZE);
+          const options = {text: {message: z.l10n.text(z.string.modalAssetTooLargeMessage, fileSize)}};
+          return amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, options);
         }
       }
 
@@ -317,11 +313,11 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   }
 
   _show_upload_warning(image) {
-    const string_id = image.type === 'image/gif' ? z.string.alert_gif_too_large : z.string.alert_upload_too_large;
-    const warning_text = z.l10n.text(string_id, z.config.MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024);
+    const isGif = image.type === 'image/gif';
+    const stringId = isGif ? z.string.modalGifTooLargeMessage : z.string.modalPictureTooLargeMessage;
 
-    amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
-    window.setTimeout(() => window.alert(warning_text), 200);
+    const modalOptions = {text: {message: z.l10n.text(stringId, z.config.MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024)}};
+    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
   }
 
   _is_hitting_upload_limit(files) {
@@ -329,8 +325,10 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     const is_hitting_upload_limit = pending_uploads + files.length > z.config.MAXIMUM_ASSET_UPLOADS;
 
     if (is_hitting_upload_limit) {
-      amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.UPLOAD_PARALLEL, {
-        data: z.config.MAXIMUM_ASSET_UPLOADS,
+      amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, {
+        text: {
+          message: z.l10n.text(z.string.modalAssetParallelUploadsMessage, z.config.MAXIMUM_ASSET_UPLOADS),
+        },
       });
     }
 
@@ -374,10 +372,12 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     const message = z.util.StringUtil.trim_line_breaks(this.input());
 
     if (message.length > z.config.MAXIMUM_MESSAGE_LENGTH) {
-      amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.TOO_LONG_MESSAGE, {
-        data: z.config.MAXIMUM_MESSAGE_LENGTH,
+      return amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, {
+        text: {
+          message: z.l10n.text(z.string.modalConversationMessageTooLongMessage, z.config.MAXIMUM_MESSAGE_LENGTH),
+          title: z.l10n.text(z.string.modalConversationMessageTooLongHeadline),
+        },
       });
-      return;
     }
 
     if (this.is_editing()) {

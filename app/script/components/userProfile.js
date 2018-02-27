@@ -218,7 +218,6 @@ z.components.UserProfile = class UserProfile {
 
     this.clickToCancelRequest = () => {
       if (this.hasUser()) {
-        amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
         amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
           action: () => {
             this.userRepository.cancel_connection_request(this.userEntity());
@@ -228,10 +227,10 @@ z.components.UserProfile = class UserProfile {
             }
           },
           text: {
-            action: z.l10n.text(z.string.people_button_yes),
-            message: z.l10n.text(z.string.people_cancel_request_message, this.userEntity().first_name()),
-            secondary: z.l10n.text(z.string.people_button_no),
-            title: z.l10n.text(z.string.people_cancel_request_headline),
+            action: z.l10n.text(z.string.modalConnectCancelAction),
+            message: z.l10n.text(z.string.modalConnectCancelMessage, this.userEntity().first_name()),
+            secondary: z.l10n.text(z.string.modalConnectCancelSecondary),
+            title: z.l10n.text(z.string.modalConnectCancelHeadline),
           },
         });
       }

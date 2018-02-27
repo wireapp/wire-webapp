@@ -51,8 +51,13 @@ z.viewModel.panel.GuestOptionsViewModel = class GuestOptionsViewModel {
       if (this.isTeamOnly()) {
         this.stateHandler.changeAccessState(conversationEntity, newAccessState);
       } else {
-        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.REMOVE_GUESTS, {
+        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
           action: () => this.stateHandler.changeAccessState(conversationEntity, newAccessState),
+          text: {
+            action: z.l10n.text(z.string.modalConversationRemoveGuestsAction),
+            message: z.l10n.text(z.string.modalConversationRemoveGuestsMessage),
+            title: z.l10n.text(z.string.modalConversationRemoveGuestsHeadline),
+          },
         });
       }
     }
@@ -68,8 +73,13 @@ z.viewModel.panel.GuestOptionsViewModel = class GuestOptionsViewModel {
   }
 
   revokeAccessCode() {
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.REVOKE_LINK, {
+    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
       action: () => this.stateHandler.revokeAccessCode(this.conversationEntity()),
+      text: {
+        action: z.l10n.text(z.string.modalConversationRevokeLinkAction),
+        message: z.l10n.text(z.string.modalConversationRevokeLinkHeadline),
+        title: z.l10n.text(z.string.modalConversationRevokeLinkMessage),
+      },
     });
   }
 };

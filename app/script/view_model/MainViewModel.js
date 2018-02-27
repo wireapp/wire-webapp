@@ -78,8 +78,8 @@ z.viewModel.MainViewModel = class MainViewModel {
       return Promise.resolve();
     }
 
-    const titleBar = document.querySelector('#conversation-titlebar');
-    const input = document.querySelector('.conversation-input');
+    const titleBar = document.querySelector('#conversation-title-bar');
+    const input = document.querySelector('.conversation-input-bar');
     // const messageList = document.querySelector('#message-list');
     // messageList.style.transformOrigin = 'left';
 

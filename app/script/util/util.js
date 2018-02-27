@@ -210,7 +210,7 @@ z.util.trim_file_extension = function(filename) {
 /**
  * Format bytes into a human readable string.
  * @param {number} bytes - bytes to format
- * @param {number} decimals - Number of decimals to keep
+ * @param {number} [decimals] - Number of decimals to keep
  * @returns {string} Bytes as a human readable string
  */
 z.util.format_bytes = function(bytes, decimals) {

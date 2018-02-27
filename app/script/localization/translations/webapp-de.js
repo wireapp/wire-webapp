@@ -148,9 +148,6 @@ z.string.de.modal_delete_everyone_headline = 'Für alle löschen?';
 z.string.de.modal_delete_everyone_message = 'Dies kann nicht rückgängig gemacht werden.';
 z.string.de.modal_too_long_headline = 'Nachricht zu lang';
 z.string.de.modal_too_long_message = 'Du kannst Nachrichten mit bis zu {{number}} Zeichen senden.';
-z.string.de.modal_leave_conversation_headline = 'Unterhaltung "{{user}}" verlassen?';
-z.string.de.modal_leave_conversation_message = 'Die Personen werden benachrichtigt und die Unterhaltung aus deiner Liste entfernt.';
-z.string.de.modal_leave_conversation_button = 'Verlassen';
 z.string.de.modal_logout_headline = 'Daten löschen?';
 z.string.de.modal_logout_message = 'Deine persönlichen Daten und Unterhaltungen vollständig von diesem Gerät entfernen.';
 z.string.de.modal_logout_button = 'Abmelden';
@@ -370,7 +367,7 @@ z.string.de.people_connect_message = '{{user}} wird zu deinen Kontakten hinzugef
 z.string.de.people_cancel_request_headline = 'Kontaktanfrage abbrechen?';
 z.string.de.people_cancel_request_message = 'Ziehe die Kontaktanfrage an {{user}} zurück.';
 
-z.string.de.people_leave_headline = 'Unterhaltung verlassen?';
+z.string.de.people_leave_headline = 'Unterhaltung "{{user}}" verlassen?';
 z.string.de.people_leave_message = 'Du wirst keine Nachrichten in dieser Unterhaltung senden oder empfangen können.';
 
 z.string.de.people_remove_headline = 'Entfernen?';

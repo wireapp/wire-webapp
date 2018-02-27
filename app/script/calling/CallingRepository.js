@@ -546,7 +546,7 @@ z.calling.CallingRepository = class CallingRepository {
       const promises = [this._createIncomingCall(callMessageEntity, source, silentCall)];
 
       if (!eventFromStream) {
-        const consentType = z.viewModel.ModalsViewModel.CONSENT_TYPE.INCOMING_CALL;
+        const consentType = z.conversation.ConversationRepository.CONSENT_TYPE.INCOMING_CALL;
         const grantMessagePromise = this.conversationRepository.grantMessage(conversationId, consentType, [userId]);
         promises.push(grantMessagePromise);
       }
@@ -995,7 +995,12 @@ z.calling.CallingRepository = class CallingRepository {
 
       const isVideoCall = mediaType === z.media.MediaType.AUDIO_VIDEO;
       if (conversationEntity.is_group() && isVideoCall) {
-        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CALL_NO_VIDEO_IN_GROUP);
+        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, {
+          text: {
+            message: z.l10n.text(z.string.modalCallNoGroupVideoMessage),
+            title: z.l10n.text(z.string.modalCallNoGroupVideoHeadline),
+          },
+        });
       } else {
         this.joinCall(conversationEntity.id, mediaType);
       }
@@ -1011,7 +1016,12 @@ z.calling.CallingRepository = class CallingRepository {
   _checkCallingSupport(conversationId, callState) {
     return this.conversationRepository.get_conversation_by_id(conversationId).then(({participating_user_ids}) => {
       if (!participating_user_ids().length) {
-        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CALL_EMPTY_CONVERSATION);
+        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, {
+          text: {
+            message: z.l10n.text(z.string.modalCallEmptyConversationMessage),
+            title: z.l10n.text(z.string.modalCallEmptyConversationHeadline),
+          },
+        });
         throw new z.calling.CallError(z.calling.CallError.TYPE.NOT_SUPPORTED);
       }
 
@@ -1038,22 +1048,47 @@ z.calling.CallingRepository = class CallingRepository {
       if (!ongoingCallId) {
         resolve();
       } else {
-        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CALL_START_ANOTHER, {
-          action() {
-            amplify.publish(
-              z.event.WebApp.CALL.STATE.LEAVE,
-              ongoingCallId,
-              z.calling.enum.TERMINATION_REASON.CONCURRENT_CALL
-            );
+        let actionStringId;
+        let messageStringId;
+        let titleStringId;
+
+        switch (callState) {
+          case z.calling.enum.CALL_STATE.INCOMING:
+            actionStringId = z.string.modalCallSecondIncomingAction;
+            messageStringId = z.string.modalCallSecondIncomingHeadline;
+            titleStringId = z.string.modalCallSecondIncomingHeadline;
+            break;
+          case z.calling.enum.CALL_STATE.ONGOING:
+            actionStringId = z.string.modalCallSecondOngoingAction;
+            messageStringId = z.string.modalCallSecondOngoingHeadline;
+            titleStringId = z.string.modalCallSecondOngoingHeadline;
+            break;
+          case z.calling.enum.CALL_STATE.OUTGOING:
+            actionStringId = z.string.modalCallSecondOutgoingAction;
+            messageStringId = z.string.modalCallSecondOutgoingHeadline;
+            titleStringId = z.string.modalCallSecondOutgoingHeadline;
+            break;
+          default:
+            break;
+        }
+
+        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
+          action: () => {
+            const terminationReason = z.calling.enum.TERMINATION_REASON.CONCURRENT_CALL;
+            amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, ongoingCallId, terminationReason);
             window.setTimeout(resolve, 1000);
           },
-          close() {
+          close: () => {
             const isIncomingCall = callState === z.calling.enum.CALL_STATE.INCOMING;
             if (isIncomingCall) {
               amplify.publish(z.event.WebApp.CALL.STATE.REJECT, newCallId);
             }
           },
-          data: callState,
+          text: {
+            action: z.l10n.text(actionStringId),
+            message: z.l10n.text(messageStringId),
+            title: z.l10n.text(titleStringId),
+          },
         });
         this.logger.warn(`You cannot join a second call while calling in conversation '${ongoingCallId}'.`);
       }

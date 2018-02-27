@@ -538,10 +538,10 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
         this.user_repository.cancel_connection_request(userEntity, nextConversationEntity);
       },
       text: {
-        action: z.l10n.text(z.string.people_button_yes),
-        message: z.l10n.text(z.string.people_cancel_request_message, userEntity.first_name()),
-        secondary: z.l10n.text(z.string.people_button_no),
-        title: z.l10n.text(z.string.people_cancel_request_headline),
+        action: z.l10n.text(z.string.modalConnectCancelAction),
+        message: z.l10n.text(z.string.modalConnectCancelMessage, userEntity.first_name()),
+        secondary: z.l10n.text(z.string.modalConnectCancelSecondary),
+        title: z.l10n.text(z.string.modalConnectCancelHeadline),
       },
     });
   }
@@ -609,8 +609,13 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     if (message_et.is_deletable()) {
       entries.push({
         click: () => {
-          amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.DELETE_MESSAGE, {
+          amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
             action: () => this.conversation_repository.delete_message(this.conversation(), message_et),
+            text: {
+              action: z.l10n.text(z.string.modalConversationDeleteMessageAction),
+              message: z.l10n.text(z.string.modalConversationDeleteMessageMessage),
+              title: z.l10n.text(z.string.modalConversationDeleteMessageHeadline),
+            },
           });
         },
         label: z.string.conversation_context_menu_delete,
@@ -624,8 +629,13 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     ) {
       entries.push({
         click: () => {
-          amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.DELETE_EVERYONE_MESSAGE, {
+          amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
             action: () => this.conversation_repository.delete_message_everyone(this.conversation(), message_et),
+            text: {
+              action: z.l10n.text(z.string.modalConversationDeleteMessageEveryoneAction),
+              message: z.l10n.text(z.string.modalConversationDeleteMessageEveryoneMessage),
+              title: z.l10n.text(z.string.modalConversationDeleteMessageEveryoneHeadline),
+            },
           });
         },
         label: z.string.conversation_context_menu_delete_everyone,

@@ -27,12 +27,6 @@ z.string.nonexistent_user = 'Deleted User';
 z.string.and = 'and';
 z.string.enumerationAnd = ', and ';
 
-// Alert view when trying to set a profile image that's too small
-z.string.alert_upload_file_format = 'Can’t use this picture.\nPlease choose a PNG or JPEG file.';
-z.string.alert_upload_too_small = 'Can’t use this picture.\nPlease choose a picture that’s at least 320 x 320 px.';
-z.string.alert_upload_too_large = 'This picture is too large.\nYou can upload files up to {{number}} MB.';
-z.string.alert_gif_too_large = 'Animation is too large.\nMaximum size is {{number}} MB.';
-
 // Auth
 // Authentication: ACCOUNT section
 z.string.auth_account_country_code = 'Country Code';
@@ -117,113 +111,147 @@ z.string.call_join = 'Join';
 z.string.call_choose_shared_screen = 'Choose a screen to share';
 z.string.call_participants = '{{number}} on call';
 
-// Warnings
-z.string.modal_button_cancel = 'Cancel';
-z.string.modal_button_ok = 'Ok';
-z.string.modal_button_send = 'Send';
+// Modals
+// Modals type defaults
+z.string.modalAcknowledgeAction = 'Ok';
+z.string.modalAcknowledgeHeadline = 'Something went wrong';
+z.string.modalConfirmSecondary = 'Cancel';
+z.string.modalOptionSecondary = 'Cancel';
 
-// Block a user
-z.string.modal_block_conversation_headline = 'Block {{user}}?';
-z.string.modal_block_conversation_message = '{{user}} won’t be able to contact you or add you to group conversations.';
-z.string.modal_block_conversation_button = 'Block';
-// Bots confirm
-z.string.modal_bots_confirm_headline = 'Add Service';
-z.string.modal_bots_confirm_message = 'Are you sure you want to start a new conversation with {{name}}?';
-z.string.modal_bots_confirm_button = 'Confirm';
-// Bots unavailable
-z.string.modal_bots_unavailable_headline = 'Bots currently unavailable';
-z.string.modal_bots_unavailable_message = 'Thank you for your interest in bots. The service is currently suspended while we work on the next version. Stay tuned.';
-// Cannot create the call because there is nobody to call (conversation_empty)
-z.string.modal_call_conversation_empty_headline = 'No one to call';
-z.string.modal_call_conversation_empty_message = 'There is no one left here.';
-// Cannot video call in group conversations
-z.string.modal_call_no_video_in_group_headline = 'No video calls in groups';
-z.string.modal_call_no_video_in_group_message = 'Video calls are not available in group conversations.';
-// Second incoming call
-z.string.modal_call_second_incoming_headline = 'Answer call?';
-z.string.modal_call_second_incoming_message = 'Your current call will end.';
-z.string.modal_call_second_incoming_action = 'Answer';
-// Second ongoing call
-z.string.modal_call_second_ongoing_headline = 'Hang up call on another device?';
-z.string.modal_call_second_ongoing_message = 'You can only be in one call at a time.';
-z.string.modal_call_second_ongoing_action = 'Hang Up';
-// Second outgoing call
-z.string.modal_call_second_outgoing_headline = 'Hang up current call?';
-z.string.modal_call_second_outgoing_message = 'You can only be in one call at a time.';
-z.string.modal_call_second_outgoing_action = 'Hang Up';
-// Clear a conversation
-z.string.modal_clear_conversation_headline = 'Delete content?';
-z.string.modal_clear_conversation_message = 'This will clear the conversation history on all your devices.';
-z.string.modal_clear_conversation_option = 'Also leave the conversation';
-z.string.modal_clear_conversation_button = 'Delete';
-// Connected device
-z.string.modal_connected_device_headline = 'Your account was used on:';
-z.string.modal_connected_device_from = 'From:';
-z.string.modal_connected_device_message = 'If you didn’t do this, remove the device and reset your password.';
-z.string.modal_connected_device_manage_devices = 'manage devices';
-// Delete account
-z.string.modal_delete_account_action = 'Delete';
-z.string.modal_delete_account_headline = 'Delete account';
-z.string.modal_delete_account_message = 'We will send a message via email or SMS. Follow the link to permanently delete your account.';
-// Delete message
-z.string.modal_delete_button = 'Delete';
-z.string.modal_delete_headline = 'Delete only for me?';
-z.string.modal_delete_message = 'This cannot be undone.';
-// Delete message
-z.string.modal_delete_everyone_button = 'Delete';
-z.string.modal_delete_everyone_headline = 'Delete for everyone?';
-z.string.modal_delete_everyone_message = 'This cannot be undone.';
-// Too long message
-z.string.modal_too_long_headline = 'Message too long';
-z.string.modal_too_long_message = 'You can send messages up to {{number}} characters long.';
-// Leave a conversation
-z.string.modal_leave_conversation_headline = 'Leave "{{name}}" conversation?';
-z.string.modal_leave_conversation_message = 'The participants will be notified and the conversation removed from your list.';
-z.string.modal_leave_conversation_button = 'Leave';
-// Logout
-z.string.modal_logout_headline = 'Clear Data?';
-z.string.modal_logout_message = 'Delete all your personal information and conversations on this device.';
-z.string.modal_logout_button = 'Log out';
-// New device
-z.string.modal_new_device_headline = '{{user}} started using a new device';
-z.string.modal_new_device_headline_many = '{{users}} started using new devices';
-z.string.modal_new_device_headline_you = '{{user}} started using a new device';
-z.string.modal_new_device_message = 'Do you still want to send your messages?';
-z.string.modal_new_device_call_accept = 'Accept call';
-z.string.modal_new_device_call_anyway = 'Call anyway';
-z.string.modal_new_device_call_incoming = 'Do you still want to accept the call?';
-z.string.modal_new_device_call_outgoing = 'Do you still want to place the call?';
-z.string.modal_new_device_show_device = 'show device';
-z.string.modal_new_device_send_anyway = 'send anyway';
-// Not connected
-z.string.modal_not_connected_headline = 'No one added to conversation';
-z.string.modal_not_connected_message_one = '{{name}} does not want to be added to conversations.';
-z.string.modal_not_connected_message_many = 'One of the people you selected does not want to be added to conversations.';
-// Remove device
-z.string.modal_remove_device_button = 'Remove device';
-z.string.modal_remove_device_headline = 'Remove "{{device}}"';
-z.string.modal_remove_device_message = 'Your password is required to remove the device.';
-// Remove guests
-z.string.modalRemoveGuestsButton = 'Remove guests';
-z.string.modalRemoveGuestsHeadline = 'Turning off guest access?';
-z.string.modalRemoveGuestsMessage = 'Current guest will be removed from the conversation. New guests will not be allowed.';
-// Revoke link
-z.string.modalRevokeLinkButton = 'Revoke link';
-z.string.modalRevokeLinkHeadline = 'Revoking the link?';
-z.string.modalRevokeLinkMessage = 'New guests will not be able to join with this link. Current guests will still have access.';
-// Service unavailable
+// Modals content
+z.string.modalAccountDeletionAction = 'Delete';
+z.string.modalAccountDeletionHeadline = 'Delete account';
+z.string.modalAccountDeletionMessage = 'We will send a message via email or SMS. Follow the link to permanently delete your account.';
+
+z.string.modalAccountLogoutAction = 'Log out';
+z.string.modalAccountLogoutHeadline = 'Clear Data?';
+z.string.modalAccountLogoutOption = 'Delete all your personal information and conversations on this device.';
+
+z.string.modalAccountNewDevicesSecondary = 'Manage devices';
+z.string.modalAccountNewDevicesHeadline = 'Your account was used on:';
+z.string.modalAccountNewDevicesFrom = 'From:';
+z.string.modalAccountNewDevicesMessage = 'If you didn’t do this, remove the device and reset your password.';
+
+z.string.modalAccountRemoveDeviceAction = 'Remove device';
+z.string.modalAccountRemoveDeviceHeadline = 'Remove "{{device}}"';
+z.string.modalAccountRemoveDeviceMessage = 'Your password is required to remove the device.';
+z.string.modalAccountRemoveDevicePlaceholder = 'Password';
+
+z.string.modalAssetTooLargeMessage = 'You can send files up to {{number}}';
+z.string.modalAssetParallelUploadsMessage = 'You can send up to {{number}} files at once.';
+
+z.string.modalCallEmptyConversationHeadline = 'No one to call';
+z.string.modalCallEmptyConversationMessage = 'There is no one left here.';
+
+z.string.modalCallNoGroupVideoHeadline = 'No video calls in groups';
+z.string.modalCallNoGroupVideoMessage = 'Video calls are not available in group conversations.';
+
+z.string.modalCallNoMicrophoneAction = 'Tell me how';
+z.string.modalCallNoMicrophoneMessage = 'Your browser needs access to the microphone to make calls.';
+z.string.modalCallNoMicrophoneHeadline = 'Can’t call without microphone';
+
+z.string.modalCallSecondIncomingAction = 'Answer';
+z.string.modalCallSecondIncomingHeadline = 'Answer call?';
+z.string.modalCallSecondIncomingMessage = 'Your current call will end.';
+
+z.string.modalCallSecondOngoingAction = 'Hang Up';
+z.string.modalCallSecondOngoingHeadline = 'Hang up call on another device?';
+z.string.modalCallSecondOngoingMessage = 'You can only be in one call at a time.';
+
+z.string.modalCallSecondOutgoingAction = 'Hang Up';
+z.string.modalCallSecondOutgoingHeadline = 'Hang up current call?';
+z.string.modalCallSecondOutgoingMessage = 'You can only be in one call at a time.';
+
+z.string.modalConnectCancelAction = 'Yes';
+z.string.modalConnectCancelHeadline = 'Cancel Request?';
+z.string.modalConnectCancelMessage = 'Remove connection request to {{user}}.';
+z.string.modalConnectCancelSecondary = 'No';
+
+z.string.modalConnectAcceptAction = 'Connect';
+z.string.modalConnectAcceptHeadline = 'Accept?';
+z.string.modalConnectAcceptMessage = 'This will connect you and open the conversation with {{user}}.';
+z.string.modalConnectAcceptSecondary = 'Ignore';
+
+z.string.modalConversationAddBotAction = 'Confirm';
+z.string.modalConversationAddBotHeadline = 'Add Service';
+z.string.modalConversationAddBotMessage = 'Are you sure you want to start a new conversation with {{name}}?';
+
+z.string.modalConversationClearAction = 'Delete';
+z.string.modalConversationClearHeadline = 'Delete content?';
+z.string.modalConversationClearMessage = 'This will clear the conversation history on all your devices.';
+z.string.modalConversationClearOption = 'Also leave the conversation';
+
+z.string.modalConversationDeleteMessageAction = 'Delete';
+z.string.modalConversationDeleteMessageHeadline = 'Delete only for me?';
+z.string.modalConversationDeleteMessageMessage = 'This cannot be undone.';
+
+z.string.modalConversationDeleteMessageEveryoneAction = 'Delete';
+z.string.modalConversationDeleteMessageEveryoneHeadline = 'Delete for everyone?';
+z.string.modalConversationDeleteMessageEveryoneMessage = 'This cannot be undone.';
+
+z.string.modalConversationLeaveAction = 'Leave';
+z.string.modalConversationLeaveHeadline = 'Leave {{name}} conversation?';
+z.string.modalConversationLeaveMessage = 'You won’t be able to send or receive messages in this conversation.';
+
+z.string.modalConversationMessageTooLongHeadline = 'Message too long';
+z.string.modalConversationMessageTooLongMessage = 'You can send messages up to {{number}} characters long.';
+
+z.string.modalConversationNewDeviceAction = 'Send anyway';
+z.string.modalConversationNewDeviceHeadlineOne = '{{user}} started using a new device';
+z.string.modalConversationNewDeviceHeadlineMany = '{{users}} started using new devices';
+z.string.modalConversationNewDeviceHeadlineYou = '{{user}} started using a new device';
+z.string.modalConversationNewDeviceIncomingCallAction = 'Accept call';
+z.string.modalConversationNewDeviceIncomingCallMessage = 'Do you still want to accept the call?';
+z.string.modalConversationNewDeviceMessage = 'Do you still want to send your messages?';
+z.string.modalConversationNewDeviceOutgoingCallAction = 'Call anyway';
+z.string.modalConversationNewDeviceOutgoingCallMessage = 'Do you still want to place the call?';
+
+z.string.modalConversationNotConnectedHeadline = 'No one added to conversation';
+z.string.modalConversationNotConnectedMessageOne = '{{name}} does not want to be added to conversations.';
+z.string.modalConversationNotConnectedMessageMany = 'One of the people you selected does not want to be added to conversations.';
+
+z.string.modalConversationRemoveAction = 'Remove';
+z.string.modalConversationRemoveHeadline = 'Remove?';
+z.string.modalConversationRemoveMessage = '{{user}} won’t be able to send or receive messages in this conversation.';
+
+z.string.modalConversationRemoveGuestsAction = 'Remove guests';
+z.string.modalConversationRemoveGuestsHeadline = 'Turning off guest access?';
+z.string.modalConversationRemoveGuestsMessage = 'Current guest will be removed from the conversation. New guests will not be allowed.';
+
+z.string.modalConversationRevokeLinkAction = 'Revoke link';
+z.string.modalConversationRevokeLinkHeadline = 'Revoking the link?';
+z.string.modalConversationRevokeLinkMessage = 'New guests will not be able to join with this link. Current guests will still have access.';
+
+z.string.modalConversationTooManyMembersHeadline = 'Full house';
+z.string.modalConversationTooManyMembersMessage = 'Up to {{number1}} people can join a conversation. There is room for {{number2}} more people in here.';
+
+z.string.modalGifTooLargeMessage = 'Animation is too large.\nMaximum size is {{number}} MB.';
+
+z.string.modalIntegrationUnavailableHeadline = 'Bots currently unavailable';
+z.string.modalIntegrationUnavailableMessage = 'Thank you for your interest in bots. The service is currently suspended while we work on the next version. Stay tuned.';
+
+z.string.modalPictureFileFormatMessage = 'Can’t use this picture.\nPlease choose a PNG or JPEG file.';
+z.string.modalPictureTooLargeMessage = 'This picture is too large.\nYou can upload files up to {{number}} MB.';
+z.string.modalPictureTooSmallMessage = 'Can’t use this picture.\nPlease choose a picture that’s at least 320 x 320 px.';
+
 z.string.modalServiceUnavailableHeadline = 'Adding service not possible';
 z.string.modalServiceUnavailableMessage = 'The service is unavailable a the moment.';
-// Session Reset
-z.string.modal_session_reset_headline = 'The session has been reset';
-z.string.modal_session_reset_message_1 = 'If the problem is not resolved,';
-z.string.modal_session_reset_message_link = 'contact';
-z.string.modal_session_reset_message_2 = 'us.';
-// Too many members in conversation
-z.string.modal_too_many_members_headline = 'Full house';
-z.string.modal_too_many_members_message = 'Up to {{number1}} people can join a conversation. There is room for {{number2}} more people in here.';
-// Parallel uploads
-z.string.modal_uploads_parallel = 'You can send up to {{number}} files at once.';
+
+z.string.modalSessionResetHeadline = 'The session has been reset';
+z.string.modalSessionResetMessage1 = 'If the problem is not resolved,';
+z.string.modalSessionResetMessageLink = 'contact';
+z.string.modalSessionResetMessage2 = 'us.';
+
+z.string.modalUploadContactsAction = 'Try again';
+z.string.modalUploadContactsMessage = 'We did not receive your information. Please try importing your contacts again.';
+
+z.string.modalUserBlockAction = 'Block';
+z.string.modalUserBlockHeadline = 'Block {{user}}?';
+z.string.modalUserBlockMessage = '{{user}} won’t be able to contact you or add you to group conversations.';
+
+z.string.modalUserUnblockAction = 'Unblock';
+z.string.modalUserUnblockHeadline = 'Unblock?';
+z.string.modalUserUnblockMessage = '{{user}} will be able to contact you and add you to group conversations again.';
 
 // Connection requests
 z.string.connection_request_connect = 'Connect';
@@ -286,7 +314,6 @@ z.string.conversation_missed_messages = 'You haven’t used this device for a wh
 z.string.conversation_asset_uploading = 'Uploading…';
 z.string.conversation_asset_downloading = 'Downloading…';
 z.string.conversation_asset_upload_failed = 'Upload Failed';
-z.string.conversation_asset_upload_too_large = 'You can send files up to {{number}}';
 z.string.conversation_playback_error = 'Unable to play';
 z.string.conversation_context_menu_edit = 'Edit';
 z.string.conversation_context_menu_delete = 'Delete for Me';
@@ -422,30 +449,6 @@ z.string.people_tabs_people = 'People';
 z.string.people_tabs_services = 'Services';
 z.string.people_verified = 'Verified';
 
-// Block user
-z.string.people_block_headline = 'Block?';
-z.string.people_block_message = '{{user}} won’t be able to contact you or add you to group conversations.';
-
-// Accept a pending connection dialogue
-z.string.people_connect_headline = 'Accept?';
-z.string.people_connect_message = 'This will connect you and open the conversation with {{user}}.';
-
-// Cancel a pending request
-z.string.people_cancel_request_headline = 'Cancel Request?';
-z.string.people_cancel_request_message = 'Remove connection request to {{user}}.';
-
-// Leave the conversation dialogue
-z.string.people_leave_headline = 'Leave the conversation?';
-z.string.people_leave_message = 'You won’t be able to send or receive messages in this conversation.';
-
-// Remove from conversation dialogue
-z.string.people_remove_headline = 'Remove?';
-z.string.people_remove_message = '{{user}} won’t be able to send or receive messages in this conversation.';
-
-// Unblock user
-z.string.people_unblock_headline = 'Unblock?';
-z.string.people_unblock_message = '{{user}} will be able to contact you and add you to group conversations again.';
-
 // Button labels for the actions
 z.string.people_button_add = 'Add';
 z.string.people_button_add_people = 'Add people';
@@ -559,11 +562,8 @@ z.string.search_member_invite = 'Invite people to join the team';
 z.string.search_others = 'Connect';
 
 // Google contacts upload
-z.string.upload_google_headline = 'Find people\nto talk to.';
+z.string.upload_google_headline = 'Find people to talk to.';
 z.string.upload_google_message = 'We use your contact data to connect you with others. We anonymize all information and do not share it with anyone else.';
-z.string.upload_google_headline_error = 'Something\nwent wrong.';
-z.string.upload_google_message_error = 'We did not receive your information. Please try importing your contacts again.';
-z.string.upload_google_button_again = 'Try again';
 
 // URLs & Warnings: Permission requests & permission callbacks
 z.string.url_support_root = '/';
@@ -573,8 +573,6 @@ z.string.url_webapp_root = '/';
 z.string.url_website_root = '/';
 z.string.url_website_create_team = '/create-team/';
 z.string.url_website_privacy = '/privacy';
-z.string.warning_call_detail = 'Your browser needs access to the microphone to make calls.';
-z.string.warning_call_headline = 'Can’t call without microphone';
 z.string.warning_call_unsupported_incoming = '{{user}} is calling. Your browser doesn’t support calls.';
 z.string.warning_call_unsupported_outgoing = 'You cannot call because your browser doesn’t support calls.';
 z.string.warning_call_issues = 'This version of Wire can not participate in the call. Please use';
@@ -594,7 +592,6 @@ z.string.warning_permission_request_camera = '{{icon}} Allow access to camera';
 z.string.warning_permission_request_microphone = '{{icon}} Allow access to microphone';
 z.string.warning_permission_request_notification = '{{icon}} Allow notifications';
 z.string.warning_permission_request_screen = '{{icon}} Allow access to screen';
-z.string.warning_tell_me_how = 'Tell me how';
 
 // User Availability
 z.string.user_availability_available = 'Available';

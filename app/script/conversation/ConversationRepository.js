@@ -35,6 +35,14 @@ z.conversation.ConversationRepository = class ConversationRepository {
     };
   }
 
+  static get CONSENT_TYPE() {
+    return {
+      INCOMING_CALL: 'incoming_call',
+      MESSAGE: 'message',
+      OUTGOING_CALL: 'outgoing_call',
+    };
+  }
+
   /**
    * Construct a new Conversation Repository.
    *
@@ -1080,7 +1088,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
       case z.service.BackendClientError.LABEL.SERVER_ERROR:
       case z.service.BackendClientError.LABEL.SERVICE_DISABLED:
       case z.service.BackendClientError.LABEL.TOO_MANY_BOTS: {
-        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.SERVICE_UNAVAILABLE);
+        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, {
+          text: {
+            message: z.l10n.text(z.string.modalServiceUnavailableMessage),
+            title: z.l10n.text(z.string.modalServiceUnavailableHeadline),
+          },
+        });
         break;
       }
 
@@ -1415,22 +1428,31 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   _handleTooManyMembersError(participants = 128) {
     const openSpots = ConversationRepository.CONFIG.GROUP.MAX_SIZE - participants;
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.TOO_MANY_MEMBERS, {
-      data: {
-        max: ConversationRepository.CONFIG.GROUP.MAX_SIZE,
-        open_spots: Math.max(0, openSpots),
+    const substitutions = {number1: ConversationRepository.CONFIG.GROUP.MAX_SIZE, number2: Math.max(0, openSpots)};
+
+    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, {
+      text: {
+        message: z.l10n.text(z.string.modalConversationTooManyMembersMessage, substitutions),
+        title: z.l10n.text(z.string.modalConversationTooManyMembersHeadline),
       },
     });
   }
 
   _handleUsersNotConnected(userIds = []) {
     const [userID] = userIds;
-    const user_promise = userIds.length === 1 ? this.user_repository.get_user_by_id(userID) : Promise.resolve();
+    const userPromise = userIds.length === 1 ? this.user_repository.get_user_by_id(userID) : Promise.resolve();
 
-    user_promise.then(user_et => {
-      const username = user_et ? user_et.first_name() : undefined;
-      amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.NOT_CONNECTED, {
-        data: username,
+    userPromise.then(userEntity => {
+      const username = userEntity ? userEntity.first_name() : undefined;
+      const messageStringId = username
+        ? z.string.modalConversationNotConnectedMessageOne
+        : z.string.modalConversationNotConnectedMessageMany;
+
+      amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, {
+        text: {
+          message: z.l10n.text(messageStringId, username),
+          title: z.l10n.text(z.string.modalConversationNotConnectedHeadline),
+        },
       });
     });
   }
@@ -2216,8 +2238,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     const isCallingMessage = genericMessage.content === z.cryptography.GENERIC_MESSAGE_TYPE.CALLING;
     const consentType = isCallingMessage
-      ? z.viewModel.ModalsViewModel.CONSENT_TYPE.OUTGOING_CALL
-      : z.viewModel.ModalsViewModel.CONSENT_TYPE.MESSAGE;
+      ? ConversationRepository.CONSENT_TYPE.OUTGOING_CALL
+      : ConversationRepository.CONSENT_TYPE.MESSAGE;
     return this.grantMessage(conversationId, consentType, userIds);
   }
 
@@ -2234,18 +2256,49 @@ z.conversation.ConversationRepository = class ConversationRepository {
         let sendAnyway = false;
 
         if (!userIds) {
-          userIds = conversation_et.get_users_with_unverified_clients().map(user_et => user_et.id);
+          userIds = conversation_et.get_users_with_unverified_clients().map(userEntity => userEntity.id);
         }
 
-        return this.user_repository.get_users_by_id(userIds).then(user_ets => {
-          amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.NEW_DEVICE, {
-            action() {
+        return this.user_repository.get_users_by_id(userIds).then(userEntities => {
+          let actionStringId;
+          let messageStringId;
+          let titleStringId;
+
+          const hasMultipleUsers = userEntities > 1;
+          if (hasMultipleUsers) {
+            titleStringId = z.string.modalConversationNewDeviceHeadlineMany;
+          } else {
+            const [userEntity] = userEntities;
+            titleStringId = userEntity.is_me
+              ? z.string.modalConversationNewDeviceHeadlineYou
+              : z.string.modalConversationNewDeviceHeadlineOne;
+          }
+          const userNames = z.util.LocalizerUtil.joinNames(userEntities, z.string.Declension.NOMINATIVE);
+          const titleSubstitutions = z.util.StringUtil.capitalize_first_char(userNames);
+
+          switch (consentType) {
+            case ConversationRepository.CONSENT_TYPE.INCOMING_CALL:
+              actionStringId = z.string.modalConversationNewDeviceIncomingCallAction;
+              messageStringId = z.string.modalConversationNewDeviceIncomingCallMessage;
+              break;
+            case ConversationRepository.CONSENT_TYPE.OUTGOING_CALL:
+              actionStringId = z.string.modalConversationNewDeviceOutgoingCallAction;
+              messageStringId = z.string.modalConversationNewDeviceOutgoingCallMessage;
+              break;
+            default:
+              actionStringId = z.string.modalConversationNewDeviceMessage;
+              messageStringId = z.string.modalConversationNewDeviceAction;
+              break;
+          }
+
+          amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
+            action: () => {
               sendAnyway = true;
               conversation_et.verification_state(z.conversation.ConversationVerificationState.UNVERIFIED);
 
               resolve(true);
             },
-            close() {
+            close: () => {
               if (!sendAnyway) {
                 reject(
                   new z.conversation.ConversationError(
@@ -2254,9 +2307,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
                 );
               }
             },
-            data: {
-              consent_type: consentType,
-              user_ets: user_ets,
+            text: {
+              action: z.l10n.text(actionStringId),
+              message: z.l10n.text(messageStringId),
+              title: z.l10n.text(titleStringId, titleSubstitutions),
             },
           });
         });
