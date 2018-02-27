@@ -31,15 +31,15 @@
         <!-- /ko -->
       </div>
       <div class="gif-container-error" data-bind="visible: state() === 'error'">
-        <span class="gif-container-error-message" data-bind="l10n_text: z.string.extensions_giphy_no_gifs"></span>
+        <span class="gif-container-error-message" data-bind="l10n_text: z.string.extensionsGiphyNoGifs"></span>
       </div>
     </div>
     <div class="giphy-modal-footer modal-footer">
       <div class="button button-inverted"
-           data-bind="click: on_try_another, l10n_text: z.string.extensions_giphy_button_more, css: {'button-disabled': gifs().length === 0}"
+           data-bind="click: on_try_another, l10n_text: z.string.extensionsGiphyButtonMore, css: {'button-disabled': gifs().length === 0}"
            data-uie-name="do-try-another"></div>
       <div class="button"
-           data-bind="click: on_send, l10n_text: z.string.extensions_giphy_button_ok, css: {'button-disabled': !selected_gif()}"
+           data-bind="click: on_send, l10n_text: z.string.extensionsGiphyButtonOk, css: {'button-disabled': !selected_gif()}"
            data-uie-name="do-send-gif"></div>
     </div>
   </div>
