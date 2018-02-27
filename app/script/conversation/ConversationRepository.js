@@ -1088,12 +1088,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
       case z.service.BackendClientError.LABEL.SERVER_ERROR:
       case z.service.BackendClientError.LABEL.SERVICE_DISABLED:
       case z.service.BackendClientError.LABEL.TOO_MANY_BOTS: {
-        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, {
-          text: {
-            message: z.l10n.text(z.string.modalServiceUnavailableMessage),
-            title: z.l10n.text(z.string.modalServiceUnavailableHeadline),
-          },
-        });
+        const messageText = z.l10n.text(z.string.modalServiceUnavailableMessage);
+        const titleText = z.l10n.text(z.string.modalServiceUnavailableHeadline);
+        this._showModal(messageText, titleText);
         break;
       }
 
@@ -1430,12 +1427,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const openSpots = ConversationRepository.CONFIG.GROUP.MAX_SIZE - participants;
     const substitutions = {number1: ConversationRepository.CONFIG.GROUP.MAX_SIZE, number2: Math.max(0, openSpots)};
 
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, {
-      text: {
-        message: z.l10n.text(z.string.modalConversationTooManyMembersMessage, substitutions),
-        title: z.l10n.text(z.string.modalConversationTooManyMembersHeadline),
-      },
-    });
+    const messageText = z.l10n.text(z.string.modalConversationTooManyMembersMessage, substitutions);
+    const titleText = z.l10n.text(z.string.modalConversationTooManyMembersHeadline);
+    this._showModal(messageText, titleText);
   }
 
   _handleUsersNotConnected(userIds = []) {
@@ -1448,12 +1442,18 @@ z.conversation.ConversationRepository = class ConversationRepository {
         ? z.string.modalConversationNotConnectedMessageOne
         : z.string.modalConversationNotConnectedMessageMany;
 
-      amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, {
-        text: {
-          message: z.l10n.text(messageStringId, username),
-          title: z.l10n.text(z.string.modalConversationNotConnectedHeadline),
-        },
-      });
+      const messageText = z.l10n.text(messageStringId, username);
+      const titleText = z.l10n.text(z.string.modalConversationNotConnectedHeadline);
+      this._showModal(messageText, titleText);
+    });
+  }
+
+  _showModal(messageText, titleText) {
+    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, {
+      text: {
+        message: messageText,
+        title: titleText,
+      },
     });
   }
 

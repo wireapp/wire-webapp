@@ -1,5 +1,4 @@
 <div id="modals">
-
   <div class="modal modal-account-new-devices" data-uie-name="modal-account-new-devices">
     <div class="modal-content">
       <div class="modal-header">
@@ -13,69 +12,6 @@
       <div class="modal-footer">
         <div class="modal-secondary button button-medium button-full button-inverted" data-bind="l10n_text: z.string.modalAccountNewDevicesSecondary" data-uie-name="go-manage-devices"></div>
         <div class="modal-close button button-medium button-full" data-bind="l10n_text: z.string.modalAcknowledgeAction" data-uie-name="do-ok"></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal modal-acknowledge" data-uie-name="modal-acknowledge">
-    <div class="modal-content">
-      <div class="modal-header">
-        <div class="modal-close icon-close icon-button pull-right"></div>
-        <div class="modal-title"></div>
-      </div>
-      <div class="modal-text"></div>
-      <div class="modal-footer">
-        <div class="modal-action button button-medium button-fluid" data-uie-name="do-acknowledge"></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal modal-confirm" data-uie-name="modal-confirm">
-    <div class="modal-content">
-      <div class="modal-header">
-        <div class="modal-close icon-close icon-button pull-right"></div>
-        <div class="modal-title"></div>
-      </div>
-      <div class="modal-text"></div>
-      <div class="modal-footer">
-        <div class="modal-secondary button button-medium button-full button-inverted" data-uie-name="do-secondary"></div>
-        <div class="modal-action button button-medium button-full" data-uie-name="do-confirm"></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal modal-confirm-option" data-uie-name="modal-confirm-option">
-    <div class="modal-content">
-      <div class="modal-header">
-        <div class="modal-close icon-close icon-button pull-right"></div>
-        <div class="modal-title"></div>
-      </div>
-      <div class="modal-text"></div>
-      <div class="modal-option">
-        <div class="checkbox text-theme">
-          <input class="modal-checkbox" type="checkbox" id="clear-data-checkbox" data-uie-name="do-clear-data">
-          <label class="label-xs" for="clear-data-checkbox">
-            <span class="modal-option-text text-graphite-dark"></span>
-          </label>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <div class="modal-close button button-medium button-full button-inverted" data-uie-name="do-cancel"></div>
-        <div class="modal-action button button-medium button-full" data-uie-name="do-confirm"></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal modal-remove-device" data-uie-name="modal-remove-device">
-    <div class="modal-content">
-      <div class="modal-header">
-        <div class="modal-close icon-close icon-button pull-right"></div>
-        <div class="modal-title"></div>
-      </div>
-      <div class="modal-text" data-bind="l10n_text: z.string.modalAccountRemoveDeviceMessage"></div>
-      <input class="modal-input" type="password" data-bind="l10n_placeholder: z.string.modalAccountRemoveDevicePlaceholder"/>
-      <div class="modal-footer">
-        <div class="modal-action button button-medium button-full" data-bind="l10n_text: z.string.modalAccountRemoveDeviceAction" data-uie-name="do-delete"></div>
       </div>
     </div>
   </div>
@@ -95,4 +31,66 @@
     </div>
   </div>
 
+  <div class="modal modal-template-acknowledge" data-uie-name="modal-template-acknowledge">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-close icon-close icon-button pull-right"></div>
+        <div class="modal-title"></div>
+      </div>
+      <div class="modal-text"></div>
+      <div class="modal-footer">
+        <div class="modal-action button button-medium button-fluid" data-uie-name="do-action"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal modal-template-confirm" data-uie-name="modal-template-confirm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-close icon-close icon-button pull-right"></div>
+        <div class="modal-title"></div>
+      </div>
+      <div class="modal-text"></div>
+      <div class="modal-footer">
+        <div class="modal-secondary button button-medium button-full button-inverted" data-uie-name="do-secondary"></div>
+        <div class="modal-action button button-medium button-full" data-uie-name="do-action"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal modal-template-input" data-uie-name="modal-template-input">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-close icon-close icon-button pull-right"></div>
+        <div class="modal-title"></div>
+      </div>
+      <div class="modal-text"></div>
+      <input class="modal-input" type="password"/>
+      <div class="modal-footer">
+        <div class="modal-action button button-medium button-full" data-uie-name="do-action"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal modal-template-option" data-uie-name="modal-template-option">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-close icon-close icon-button pull-right"></div>
+        <div class="modal-title"></div>
+      </div>
+      <div class="modal-text"></div>
+      <div class="modal-option">
+        <div class="checkbox text-theme">
+          <input class="modal-checkbox" type="checkbox" id="clear-data-checkbox" data-uie-name="do-clear-data">
+          <label class="label-xs" for="clear-data-checkbox">
+            <span class="modal-option-text text-graphite-dark"></span>
+          </label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div class="modal-secondary button button-medium button-full button-inverted" data-uie-name="do-secondary"></div>
+        <div class="modal-action button button-medium button-full" data-uie-name="do-action"></div>
+      </div>
+    </div>
+  </div>
 </div>

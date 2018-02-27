@@ -995,12 +995,7 @@ z.calling.CallingRepository = class CallingRepository {
 
       const isVideoCall = mediaType === z.media.MediaType.AUDIO_VIDEO;
       if (conversationEntity.is_group() && isVideoCall) {
-        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, {
-          text: {
-            message: z.l10n.text(z.string.modalCallNoGroupVideoMessage),
-            title: z.l10n.text(z.string.modalCallNoGroupVideoHeadline),
-          },
-        });
+        this._showModal(z.string.modalCallNoGroupVideoMessage, z.string.modalCallNoGroupVideoHeadline);
       } else {
         this.joinCall(conversationEntity.id, mediaType);
       }
@@ -1016,12 +1011,7 @@ z.calling.CallingRepository = class CallingRepository {
   _checkCallingSupport(conversationId, callState) {
     return this.conversationRepository.get_conversation_by_id(conversationId).then(({participating_user_ids}) => {
       if (!participating_user_ids().length) {
-        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, {
-          text: {
-            message: z.l10n.text(z.string.modalCallEmptyConversationMessage),
-            title: z.l10n.text(z.string.modalCallEmptyConversationHeadline),
-          },
-        });
+        this._showModal(z.string.modalCallEmptyConversationMessage, z.string.modalCallEmptyConversationHeadline);
         throw new z.calling.CallError(z.calling.CallError.TYPE.NOT_SUPPORTED);
       }
 
@@ -1092,6 +1082,15 @@ z.calling.CallingRepository = class CallingRepository {
         });
         this.logger.warn(`You cannot join a second call while calling in conversation '${ongoingCallId}'.`);
       }
+    });
+  }
+
+  _showModal(messageStringId, titleStringId) {
+    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, {
+      text: {
+        message: z.l10n.text(messageStringId),
+        title: z.l10n.text(titleStringId),
+      },
     });
   }
 

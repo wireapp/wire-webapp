@@ -46,6 +46,10 @@ z.viewModel.panel.GroupParticipantViewModel = class GroupParticipantViewModel {
     this.showServiceStates = ko.pureComputed(() => this.activeServiceState() && this.selectedService());
     this.showUserState = ko.pureComputed(() => this.stateParticipants() && this.selectedParticipant());
     this.showParticipantProfile = ko.pureComputed(() => this.showServiceStates() || this.showUserState());
+
+    this.showServiceRemove = ko.pureComputed(() => {
+      return this.stateServiceDetails() && !this.conversationEntity().is_guest() && this.selectedIsInConversation();
+    });
   }
 
   clickOnSelfProfile() {

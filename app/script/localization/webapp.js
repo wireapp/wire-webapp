@@ -429,10 +429,22 @@ z.string.addParticipantsTabsPeople = 'People';
 z.string.addParticipantsTabsServices = 'Services';
 
 // Panel: Conversation details
-z.string.conversationDetailsParticipants = '{{number}} People';
-z.string.conversationDetailsAdd = 'Add';
-z.string.conversationDetailsAddParticipants = 'Add people';
-z.string.conversationDetailsCreateGroup = 'Create group';
+z.string.conversationDetailsActionArchive = 'Archive';
+z.string.conversationDetailsActionAdd = 'Add';
+z.string.conversationDetailsActionAddParticipants = 'Add people';
+z.string.conversationDetailsActionBlock = 'Block';
+z.string.conversationDetailsActionCancelRequest = 'Cancel request';
+z.string.conversationDetailsActionClear = 'Delete content';
+z.string.conversationDetailsActionCreateGroup = 'Create group';
+z.string.conversationDetailsActionGuestOptions = 'Guest options';
+z.string.conversationDetailsActionLeave = 'Leave';
+z.string.conversationDetailsGuestsOff = 'Off';
+z.string.conversationDetailsGuestsOn = 'On';
+z.string.conversationDetailsParticipantsServicesOne = 'Service';
+z.string.conversationDetailsParticipantsServicesMany = 'Services';
+z.string.conversationDetailsParticipantsUsersOne = 'Person';
+z.string.conversationDetailsParticipantsUsersMany = 'People';
+z.string.conversationDetailsPeople = 'People';
 z.string.conversationDetailsServices = 'Services';
 
 // Panel: Guest options

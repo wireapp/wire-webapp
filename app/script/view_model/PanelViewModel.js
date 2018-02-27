@@ -41,16 +41,12 @@ z.viewModel.PanelViewModel = class PanelViewModel {
   constructor(mainViewModel, repositories) {
     this.elementId = 'right-column';
     this.conversationRepository = repositories.conversation;
+    this.integrationRepository = repositories.integration;
+    this.teamRepository = repositories.team;
     this.mainViewModel = mainViewModel;
     this.logger = new z.util.Logger('z.viewModel.PanelViewModel', z.config.LOGGER.OPTIONS);
 
     this.state = ko.observable(PanelViewModel.STATE.CONVERSATION_DETAILS);
-
-    // Nested view models
-    this.addParticipants = new z.viewModel.panel.AppParticipantsViewModel(mainViewModel, this, repositories);
-    this.conversationDetails = new z.viewModel.panel.ConversationDetailsViewModel(mainViewModel, this, repositories);
-    this.groupParticipant = new z.viewModel.panel.GroupParticipantViewModel(mainViewModel, this, repositories);
-    this.guestOptions = new z.viewModel.panel.GuestOptionsViewModel(mainViewModel, this, repositories);
 
     this.conversationEntity = repositories.conversation.active_conversation;
     this.conversationEntity.subscribe(() => {
@@ -59,8 +55,24 @@ z.viewModel.PanelViewModel = class PanelViewModel {
       }
     });
 
+    this.isTeamOnly = ko.pureComputed(() => this.conversationEntity() && this.conversationEntity.isTeamOnly());
+
+    this.enableIntegrations = this.integrationRepository.enableIntegrations;
+    this.showIntegrations = ko.pureComputed(() => {
+      const firstUserEntity = this.conversationEntity().firstUserEntity();
+      const hasBotUser = firstUserEntity && firstUserEntity.isBot;
+      const allowIntegrations = this.conversationEntity().is_group() || hasBotUser;
+      return this.enableIntegrations() && allowIntegrations && !this.isTeamOnly();
+    });
+
     amplify.subscribe(z.event.WebApp.PEOPLE.TOGGLE, this.togglePanel.bind(this));
     amplify.subscribe(z.event.WebApp.PEOPLE.SHOW, this.showParticipant);
+
+    // Nested view models
+    this.addParticipants = new z.viewModel.panel.AppParticipantsViewModel(mainViewModel, this, repositories);
+    this.conversationDetails = new z.viewModel.panel.ConversationDetailsViewModel(mainViewModel, this, repositories);
+    this.groupParticipant = new z.viewModel.panel.GroupParticipantViewModel(mainViewModel, this, repositories);
+    this.guestOptions = new z.viewModel.panel.GuestOptionsViewModel(mainViewModel, this, repositories);
 
     ko.applyBindings(this, document.getElementById(this.elementId));
   }

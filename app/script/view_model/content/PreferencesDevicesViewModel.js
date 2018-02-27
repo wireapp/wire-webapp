@@ -82,14 +82,7 @@ z.viewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewMo
   }
 
   clickOnRemoveDevice(clientEntity, event) {
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.REMOVE_DEVICE, {
-      action: password => {
-        this.clientRepository
-          .deleteClient(clientEntity.id, password)
-          .catch(error => amplify.subscribe(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT));
-      },
-      data: clientEntity.model,
-    });
+    this.clientRepository.removeSelfClient(clientEntity);
     event.stopPropagation();
   }
 

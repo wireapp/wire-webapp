@@ -26,10 +26,10 @@ z.viewModel.ModalsViewModel = class ModalsViewModel {
   static get TYPE() {
     return {
       ACCOUNT_NEW_DEVICES: '.modal-account-new-devices',
-      ACKNOWLEDGE: '.modal-acknowledge',
-      CONFIRM: '.modal-confirm',
-      OPTION: '.modal-confirm-option',
-      REMOVE_DEVICE: '.modal-remove-device',
+      ACKNOWLEDGE: '.modal-template-acknowledge',
+      CONFIRM: '.modal-template-confirm',
+      INPUT: '.modal-template-input',
+      OPTION: '.modal-template-option',
       SESSION_RESET: '.modal-session-reset',
     };
   }
@@ -71,11 +71,11 @@ z.viewModel.ModalsViewModel = class ModalsViewModel {
       case ModalsViewModel.TYPE.CONFIRM:
         this._showModalConfirm(options, titleElement, messageElement, actionElement);
         break;
+      case ModalsViewModel.TYPE.INPUT:
+        this._showModalInput(options, titleElement, messageElement, actionElement);
+        break;
       case ModalsViewModel.TYPE.OPTION:
         this._showModalOption(options, titleElement, messageElement, actionElement);
-        break;
-      case ModalsViewModel.TYPE.REMOVE_DEVICE:
-        this._showModalRemoveDevice(options.data, titleElement);
         break;
       default:
         this.logger.warn(`Modal of type '${type}' is not supported`);
@@ -187,7 +187,7 @@ z.viewModel.ModalsViewModel = class ModalsViewModel {
   }
 
   _showModalOption(options, titleElement, messageElement, actionElement) {
-    const secondaryElement = $(ModalsViewModel.TYPE.CONFIRM).find('.modal-secondary');
+    const secondaryElement = $(ModalsViewModel.TYPE.OPTION).find('.modal-secondary');
     const optionElement = $(ModalsViewModel.TYPE.OPTION).find('.modal-option-text');
     const {action: actionText, message: messageText, option: optionText, secondary, title: titleText} = options.text;
 
@@ -204,7 +204,17 @@ z.viewModel.ModalsViewModel = class ModalsViewModel {
     }
   }
 
-  _showModalRemoveDevice(content, titleElement) {
-    titleElement.text(z.l10n.text(z.string.modalAccountRemoveDeviceHeadline, content));
+  _showModalInput(options, titleElement, messageElement, actionElement) {
+    const inputElement = $(ModalsViewModel.TYPE.INPUT).find('.modal-input');
+    const {action: actionText, input: inputText, message: messageText, title: titleText} = options.text;
+
+    actionElement.text(actionText || '');
+    messageElement.text(messageText || '');
+    inputElement.attr('placeholder', inputText || '');
+    titleElement.text(titleText || '');
+
+    if (options.warning !== false) {
+      amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
+    }
   }
 };

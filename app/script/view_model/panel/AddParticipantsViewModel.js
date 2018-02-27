@@ -27,10 +27,6 @@ z.viewModel.panel.AppParticipantsViewModel = class AppParticipantsViewModel {
   static get CONFIG() {
     return {
       ADD_STATES: [AppParticipantsViewModel.STATE.ADD_PEOPLE, AppParticipantsViewModel.STATE.ADD_SERVICE],
-      SERVICE_STATES: [
-        AppParticipantsViewModel.STATE.SERVICE_CONFIRMATION,
-        AppParticipantsViewModel.STATE.SERVICE_DETAILS,
-      ],
     };
   }
 
@@ -38,42 +34,31 @@ z.viewModel.panel.AppParticipantsViewModel = class AppParticipantsViewModel {
     return {
       ADD_PEOPLE: 'AppParticipantsViewModel.STATE.ADD_PEOPLE',
       ADD_SERVICE: 'AppParticipantsViewModel.STATE.ADD_SERVICE',
-      SERVICE_CONFIRMATION: 'AppParticipantsViewModel.STATE.SERVICE_CONFIRMATION',
-      SERVICE_DETAILS: 'AppParticipantsViewModel.STATE.SERVICE_DETAILS',
+      CONFIRMATION: 'AppParticipantsViewModel.STATE.CONFIRMATION',
     };
   }
 
   constructor(mainViewModel, panelViewModel, repositories) {
+    this.panelViewModel = panelViewModel;
+
     this.conversationRepository = repositories.conversation;
     this.integrationRepository = repositories.integration;
     this.teamRepository = repositories.team;
     this.userRepository = repositories.user;
+
     this.logger = new z.util.Logger('z.viewModel.panel.AppParticipantsViewModel', z.config.LOGGER.OPTIONS);
 
     this.conversationEntity = this.conversationRepository.active_conversation;
 
-    this.activeAddState = ko.pureComputed(() => AppParticipantsViewModel.CONFIG.ADD_STATES.includes(this.state()));
-    this.activeServiceState = ko.pureComputed(() => {
-      return AppParticipantsViewModel.CONFIG.SERVICE_STATES.includes(this.state());
-    });
+    this.state = ko.observable(AppParticipantsViewModel.STATE.ADD_PEOPLE);
 
+    this.activeAddState = ko.pureComputed(() => AppParticipantsViewModel.CONFIG.ADD_STATES.includes(this.state()));
     this.stateAddPeople = ko.pureComputed(() => this.state() === AppParticipantsViewModel.STATE.ADD_PEOPLE);
     this.stateAddService = ko.pureComputed(() => this.state() === AppParticipantsViewModel.STATE.ADD_SERVICE);
-    this.stateParticipants = ko.pureComputed(() => this.state() === AppParticipantsViewModel.STATE.PARTICIPANTS);
-    this.stateServiceConfirmation = ko.pureComputed(() => {
-      return this.state() === AppParticipantsViewModel.STATE.SERVICE_CONFIRMATION;
-    });
-    this.stateServiceDetails = ko.pureComputed(() => {
-      return this.state() === AppParticipantsViewModel.STATE.SERVICE_DETAILS;
-    });
 
-    this.enableIntegrations = this.integrationRepository.enableIntegrations;
-    this.showIntegrations = ko.pureComputed(() => {
-      const firstUserEntity = this.conversationEntity().firstUserEntity();
-      const hasBotUser = firstUserEntity && firstUserEntity.isBot;
-      const allowIntegrations = this.conversationEntity().is_group() || hasBotUser;
-      return this.enableIntegrations() && allowIntegrations && !this.isTeamOnly();
-    });
+    this.stateConfirmation = ko.pureComputed(() => this.state() === AppParticipantsViewModel.STATE.CONFIRMATION);
+
+    this.showIntegrations = this.panelViewModel.showIntegrations;
 
     this.searchInput = ko.observable('');
     this.searchInput.subscribe(searchInput => this.searchServices(searchInput));
@@ -101,32 +86,27 @@ z.viewModel.panel.AppParticipantsViewModel = class AppParticipantsViewModel {
     });
 
     this.isTeam = this.teamRepository.isTeam;
-    this.team = this.teamRepository.team;
     this.teamUsers = this.teamRepository.teamUsers;
     this.teamMembers = this.teamRepository.teamMembers;
 
     this.isTeamOnly = ko.pureComputed(() => this.conversationEntity() && this.conversationEntity.isTeamOnly());
 
     this.services = this.integrationRepository.services;
-
-    this.showServiceRemove = ko.pureComputed(() => {
-      return this.stateServiceDetails() && !this.conversationEntity().is_guest() && this.selectedIsInConversation();
-    });
   }
 
   clickOnAddService() {
-    this.state(ConversationDetailsViewModel.STATE.ADD_SERVICE);
+    this.state(AppParticipantsViewModel.STATE.ADD_SERVICE);
     this.searchServices(this.searchInput());
   }
 
-  clickOnCloseAdding() {
+  clickOnClose() {
+    this.panelViewModel.switchState(z.viewModel.PanelViewModel.STATE.CONVERSATION_DETAILS);
     this.resetView();
   }
 
   clickOnSelectService(serviceEntity) {
-    this.groupMode(true);
     this.selectedService(serviceEntity);
-    this.state(ConversationDetailsViewModel.STATE.SERVICE_CONFIRMATION);
+    this.state(AppParticipantsViewModel.STATE.CONFIRMATION);
 
     this.integrationRepository.getProviderNameForService(serviceEntity);
   }
@@ -145,19 +125,9 @@ z.viewModel.panel.AppParticipantsViewModel = class AppParticipantsViewModel {
   }
 
   resetView() {
-    this.state(ConversationDetailsViewModel.STATE.PARTICIPANTS);
+    this.state(AppParticipantsViewModel.STATE.ADD_PEOPLE);
     this.selectedContacts.removeAll();
     this.searchInput('');
-    this.selectedParticipant(undefined);
-  }
-
-  clickOnCreateGroup() {
-    if (this.conversationEntity().is_group()) {
-      this.state(ConversationDetailsViewModel.STATE.ADD_PEOPLE);
-      return $('.participants-search').addClass('participants-search-show');
-    }
-
-    amplify.publish(z.event.WebApp.CONVERSATION.CREATE_GROUP, 'conversation_details', this.selectedParticipant());
   }
 
   searchServices(query) {
