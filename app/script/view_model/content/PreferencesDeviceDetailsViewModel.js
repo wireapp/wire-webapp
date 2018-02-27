@@ -62,14 +62,14 @@ z.viewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
   }
 
   _updateActivationLocation(location) {
-    const stringTemplate = z.string.preferences_devices_activated_in;
+    const stringTemplate = z.string.preferencesDevicesActivatedIn;
     const sanitizedText = z.util.StringUtil.splitAtPivotElement(stringTemplate, '{{location}}', location);
     this.activationLocation(sanitizedText);
   }
 
   _updateActivationTime(time) {
     const formattedTime = z.util.format_timestamp(time);
-    const stringTemplate = z.string.preferences_devices_activated_on;
+    const stringTemplate = z.string.preferencesDevicesActivatedOn;
     const sanitizedText = z.util.StringUtil.splitAtPivotElement(stringTemplate, '{{date}}', formattedTime);
     this.activationDate(sanitizedText);
   }

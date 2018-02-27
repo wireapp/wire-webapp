@@ -154,7 +154,7 @@ z.viewModel.panel.ParticipantsViewModel = class ParticipantsViewModel {
 
     // @todo create a viewmodel search?
     this.addActionText = ko.pureComputed(() => {
-      return this.showIntegrations() ? z.string.people_button_add : z.string.people_button_add_people;
+      return this.showIntegrations() ? z.string.peopleButtonAdd : z.string.peopleButtonAddPeople;
     });
 
     this.searchInput = ko.observable('');
@@ -186,7 +186,7 @@ z.viewModel.panel.ParticipantsViewModel = class ParticipantsViewModel {
 
     const shortcut = z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.ADD_PEOPLE);
     this.addPeopleTooltip = ko.pureComputed(() => {
-      const identifier = this.showIntegrations() ? z.string.tooltip_people_add : z.string.tooltip_people_add_people;
+      const identifier = this.showIntegrations() ? z.string.tooltipPeopleAdd : z.string.tooltipPeopleAddPeople;
       return z.l10n.text(identifier, shortcut);
     });
 

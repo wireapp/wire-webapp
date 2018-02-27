@@ -54,13 +54,13 @@ z.viewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewMo
     });
   }
 
-  _updateActivationDate(time, template = z.string.preferences_devices_activated_on) {
+  _updateActivationDate(time, template = z.string.preferencesDevicesActivatedOn) {
     const formattedTime = z.util.format_timestamp(time);
     const sanitizedText = z.util.StringUtil.splitAtPivotElement(template, '{{date}}', formattedTime);
     this.activationDate(sanitizedText);
   }
 
-  _updateActivationLocation(location, template = z.string.preferences_devices_activated_in) {
+  _updateActivationLocation(location, template = z.string.preferencesDevicesActivatedIn) {
     const sanitizedText = z.util.StringUtil.splitAtPivotElement(template, '{{location}}', location);
     this.activationLocation(sanitizedText);
   }
