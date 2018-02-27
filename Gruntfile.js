@@ -91,7 +91,7 @@ module.exports = grunt => {
   // Tasks
   grunt.loadTasks('grunt/tasks');
   grunt.registerTask('default', ['prepare_dist', 'host']);
-  grunt.registerTask('init', ['clean:temp', 'npmBower', 'scripts']);
+  grunt.registerTask('init', ['clean:temp', 'npmBower', 'npmCopy', 'scripts']);
 
   // Deploy to different environments
   grunt.registerTask('app_deploy', ['gitinfo', 'aws_deploy']);
