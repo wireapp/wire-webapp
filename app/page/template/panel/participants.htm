@@ -1,4 +1,8 @@
 <div id="participants" class="participants" data-bind="with: $root.participants, css: {'show-participant': $root.participants.showParticipantProfile()}">
+  <div class="right-panel-header">
+    <div></div>
+    <div class="right-panel-close icon-close icon-button"></div>
+  </div>
   <div class="participants-transition">
 
     <!-- ko if: stateParticipants() && conversationEntity() -->
@@ -12,7 +16,7 @@
           <div class="people popover-meta text-uppercase" data-bind="l10n_text: {'id': z.string.people_people, 'substitute': participants().length}"></div>
         </div>
         <div class="participants-group-list">
-          <user-list params="user: unverifiedParticipants, click: clickOnShowParticipant, mode: z.components.UserList.MODE.COMPACT" data-uie-name="list-unverified"></user-list>
+          <user-list params="user: unverifiedParticipants, click: clickOnShowParticipant, mode: z.components.UserList.MODE.DEFAULT" data-uie-name="list-unverified"></user-list>
           <!-- ko if: verifiedParticipants().length -->
             <div class="participants-group-list-separator">
               <svg width="16" height="16">
@@ -21,14 +25,14 @@
               <span class="label-xs" data-bind="l10n_text: z.string.people_verified"></span>
               <hr>
             </div>
-            <user-list params="user: verifiedParticipants, click: clickOnShowParticipant, mode: z.components.UserList.MODE.COMPACT" data-uie-name="list-verified"></user-list>
+            <user-list params="user: verifiedParticipants, click: clickOnShowParticipant, mode: z.components.UserList.MODE.DEFAULT" data-uie-name="list-verified"></user-list>
           <!-- /ko -->
           <!-- ko if: serviceParticipants().length -->
             <div class="participants-group-list-separator">
               <span class="label-xs" data-bind="l10n_text: z.string.people_services"></span>
               <hr>
             </div>
-            <service-list params="services: serviceParticipants, click: clickOnShowParticipant, mode: z.components.ServiceList.MODE.COMPACT" data-uie-name="list-services"></service-list>
+            <service-list params="services: serviceParticipants, click: clickOnShowParticipant, mode: z.components.ServiceList.MODE.DEFAULT" data-uie-name="list-services"></service-list>
           <!-- /ko -->
         </div>
         <div class="participants-group-footer">
