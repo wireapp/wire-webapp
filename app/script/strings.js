@@ -180,10 +180,6 @@ export const chooseHandleStrings = defineMessages({
 });
 
 export const conversationJoinStrings = defineMessages({
-  headerText: {
-    id: 'conversationJoin.headerText',
-    defaultMessage: 'The most secure collaboration platform.',
-  },
   headline: {
     id: 'conversationJoin.headline',
     defaultMessage: 'You have been invited to join a Wire guest room.',

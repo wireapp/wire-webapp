@@ -20,7 +20,7 @@
 import {Container, Header, Footer, Content} from '@wireapp/react-ui-kit/Layout';
 import {Form, Button, InputSubmitCombo, Input, RoundIconButton, ErrorMessage} from '@wireapp/react-ui-kit/Form';
 import {Logo} from '@wireapp/react-ui-kit/Identity';
-import {H1, H2, Text, Link, Small} from '@wireapp/react-ui-kit/Text';
+import {H1, H2, Link, Small} from '@wireapp/react-ui-kit/Text';
 import {conversationJoinStrings} from '../../strings';
 import {connect} from 'react-redux';
 import {COLOR} from '@wireapp/react-ui-kit/Identity';
@@ -113,35 +113,29 @@ class ConversationJoin extends Component {
   renderExistentAccount = () => {
     const {intl: {formatMessage: _}} = this.props;
     return (
-      <div>
-        <Content style={{flex: '1', marginTop: '20px', width: '520px'}}>
-          <Container verticalCenter>
-            <H1 style={{fontWeight: 500}} color={COLOR.GRAY}>
-              {_(conversationJoinStrings.headline)}
-            </H1>
-            <H2>{_(conversationJoinStrings.existentAccountSubhead)}</H2>
-            <Button onClick={this.onOpenWireClick}>{_(conversationJoinStrings.existentAccountOpenButton)}</Button>
-          </Container>
-        </Content>
-        <Footer style={{justifyContent: 'flex-end', marginBottom: '30px'}}>
-          <Small block>
-            <Link
-              onClick={() => this.setState({...this.state, forceNewAccount: true})}
-              textTransform={'none'}
-              data-uie-name="go-join"
-            >
-              {_(conversationJoinStrings.existentAccountJoinWithoutLink)}
-            </Link>
-            {` ${_(conversationJoinStrings.existentAccountJoinWithoutText)}`}
-          </Small>
-          <Small block>
-            {`${_(conversationJoinStrings.acceptTou)} `}
-            <Link href={`${ROUTE.WIRE_ROOT}/legal/terms/personal`} textTransform={'none'} data-uie-name="go-tou">
-              {_(conversationJoinStrings.touLink)}
-            </Link>
-          </Small>
-        </Footer>
-      </div>
+      <Container verticalCenter>
+        <H1 style={{fontWeight: 500}} color={COLOR.GRAY}>
+          {_(conversationJoinStrings.headline)}
+        </H1>
+        <H2>{_(conversationJoinStrings.existentAccountSubhead)}</H2>
+        <Button onClick={this.onOpenWireClick}>{_(conversationJoinStrings.existentAccountOpenButton)}</Button>
+        <Small block>
+          {`${_(conversationJoinStrings.acceptTou)} `}
+          <Link href={`${ROUTE.WIRE_ROOT}/legal/terms/personal`} textTransform={'none'} data-uie-name="go-tou">
+            {_(conversationJoinStrings.touLink)}
+          </Link>
+        </Small>
+        <Small block>
+          <Link
+            onClick={() => this.setState({...this.state, forceNewAccount: true})}
+            textTransform={'none'}
+            data-uie-name="go-join"
+          >
+            {_(conversationJoinStrings.existentAccountJoinWithoutLink)}
+          </Link>
+          {` ${_(conversationJoinStrings.existentAccountJoinWithoutText)}`}
+        </Small>
+      </Container>
     );
   };
 
@@ -149,90 +143,78 @@ class ConversationJoin extends Component {
     const {intl: {formatMessage: _}} = this.props;
     const {enteredName, isValidName, error} = this.state;
     return (
-      <div>
-        <Content style={{flex: '1', marginTop: '20px', width: '520px'}}>
-          <Container verticalCenter>
-            <H1 style={{fontWeight: 500}} color={COLOR.GRAY}>
-              {_(conversationJoinStrings.headline)}
-            </H1>
-            <H2>{_(conversationJoinStrings.subhead)}</H2>
-            <Form style={{marginTop: 30}}>
-              <InputSubmitCombo>
-                <Input
-                  name="name"
-                  autoComplete="username"
-                  value={enteredName}
-                  innerRef={node => (this.nameInput = node)}
-                  onChange={event => {
-                    this.resetErrors();
-                    this.setState({enteredName: event.target.value});
-                  }}
-                  placeholder={_(conversationJoinStrings.namePlaceholder)}
-                  autoFocus
-                  maxLength="64"
-                  minLength="2"
-                  pattern=".{2,64}"
-                  required
-                  data-uie-name="enter-name"
-                />
-                <RoundIconButton
-                  disabled={!enteredName || !isValidName}
-                  type="submit"
-                  formNoValidate
-                  onClick={this.handleSubmit}
-                  data-uie-name="do-next"
-                />
-              </InputSubmitCombo>
-              <ErrorMessage data-uie-name="error-message">
-                {error ? parseValidationErrors(error) : parseError(this.props.error)}
-              </ErrorMessage>
-            </Form>
-          </Container>
-        </Content>
-        <Footer style={{justifyContent: 'flex-end', marginBottom: '30px'}}>
-          <Small block>
-            {`${_(conversationJoinStrings.hasAccount)} `}
-            <Link onClick={this.onLoginClick} textTransform={'none'} data-uie-name="go-login">
-              {_(conversationJoinStrings.loginLink)}
-            </Link>
-          </Small>
-          <Small block>
-            {`${_(conversationJoinStrings.acceptTou)} `}
-            <Link href={`${ROUTE.WIRE_ROOT}/legal/terms/personal`} textTransform={'none'} data-uie-name="go-tou">
-              {_(conversationJoinStrings.touLink)}
-            </Link>
-          </Small>
-        </Footer>
-      </div>
+      <Container verticalCenter>
+        <H1 style={{fontWeight: 500}} color={COLOR.GRAY}>
+          {_(conversationJoinStrings.headline)}
+        </H1>
+        <H2>{_(conversationJoinStrings.subhead)}</H2>
+        <Form style={{marginTop: 30}}>
+          <InputSubmitCombo>
+            <Input
+              name="name"
+              autoComplete="username"
+              value={enteredName}
+              innerRef={node => (this.nameInput = node)}
+              onChange={event => {
+                this.resetErrors();
+                this.setState({enteredName: event.target.value});
+              }}
+              placeholder={_(conversationJoinStrings.namePlaceholder)}
+              autoFocus
+              maxLength="64"
+              minLength="2"
+              pattern=".{2,64}"
+              required
+              data-uie-name="enter-name"
+            />
+            <RoundIconButton
+              disabled={!enteredName || !isValidName}
+              type="submit"
+              formNoValidate
+              onClick={this.handleSubmit}
+              data-uie-name="do-next"
+            />
+          </InputSubmitCombo>
+          <ErrorMessage data-uie-name="error-message">
+            {error ? parseValidationErrors(error) : parseError(this.props.error)}
+          </ErrorMessage>
+        </Form>
+        <Small block>
+          {`${_(conversationJoinStrings.acceptTou)} `}
+          <Link href={`${ROUTE.WIRE_ROOT}/legal/terms/personal`} textTransform={'none'} data-uie-name="go-tou">
+            {_(conversationJoinStrings.touLink)}
+          </Link>
+        </Small>
+        <Small block>
+          {`${_(conversationJoinStrings.hasAccount)} `}
+          <Link onClick={this.onLoginClick} textTransform={'none'} data-uie-name="go-login">
+            {_(conversationJoinStrings.loginLink)}
+          </Link>
+        </Small>
+      </Container>
     );
   };
 
   renderInvalidLink = () => {
     const {intl: {formatMessage: _}} = this.props;
     return (
-      <div>
-        <Content style={{flex: '1', marginTop: '20px', width: '520px'}}>
-          <Container verticalCenter>
-            <H1 style={{fontWeight: 500}} color={COLOR.GRAY}>
-              {_(conversationJoinStrings.invalidHeadline)}
-            </H1>
-            <H2>{_(conversationJoinStrings.invalidSubhead)}</H2>
-          </Container>
-        </Content>
-        <Footer style={{justifyContent: 'flex-end', marginBottom: '30px'}}>
-          <Small block>
-            <Link to={ROUTE.INDEX} component={RRLink} textTransform={'none'} data-uie-name="go-register">
-              {_(conversationJoinStrings.invalidCreateAccountLink)}
-            </Link>
-            {` ${_(conversationJoinStrings.invalidCreateAccountText)}`}
-          </Small>
-        </Footer>
-      </div>
+      <Container verticalCenter>
+        <H1 style={{fontWeight: 500}} color={COLOR.GRAY}>
+          {_(conversationJoinStrings.invalidHeadline)}
+        </H1>
+        <H2>{_(conversationJoinStrings.invalidSubhead)}</H2>
+        <Small block>
+          <Link to={ROUTE.INDEX} component={RRLink} textTransform={'none'} data-uie-name="go-register">
+            {_(conversationJoinStrings.invalidCreateAccountLink)}
+          </Link>
+          {` ${_(conversationJoinStrings.invalidCreateAccountText)}`}
+        </Small>
+      </Container>
     );
   };
 
   render() {
-    const {isAuthenticated, intl: {formatMessage: _}} = this.props;
+    const {isAuthenticated} = this.props;
     const {isValidLink} = this.state;
     return (
       <Container
@@ -245,11 +227,15 @@ class ConversationJoin extends Component {
       >
         <Header>
           <Logo width={72} />
-          <Text bold>{_(conversationJoinStrings.headerText)}</Text>
         </Header>
-        {isValidLink
-          ? !isAuthenticated || this.state.forceNewAccount ? this.renderNewAnonAccount() : this.renderExistentAccount()
-          : this.renderInvalidLink()}
+        <Content style={{flex: '1', marginTop: '20px', width: '520px'}}>
+          {isValidLink
+            ? !isAuthenticated || this.state.forceNewAccount
+              ? this.renderNewAnonAccount()
+              : this.renderExistentAccount()
+            : this.renderInvalidLink()}
+        </Content>
+        <Footer style={{justifyContent: 'flex-end', marginBottom: '30px'}}>footer</Footer>
       </Container>
     );
   }
