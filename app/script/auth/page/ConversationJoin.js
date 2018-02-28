@@ -27,6 +27,7 @@ import {COLOR} from '@wireapp/react-ui-kit/Identity';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 import * as ConversationAction from '../module/action/ConversationAction';
 import * as AuthSelector from '../module/selector/AuthSelector';
+import ValidationError from '../module/action/ValidationError';
 import * as AuthAction from '../module/action/AuthAction';
 import {injectIntl} from 'react-intl';
 import ROUTE from '../route';
@@ -43,8 +44,10 @@ class ConversationJoin extends Component {
     conversationCode: null,
     conversationKey: null,
     enteredName: '',
+    error: null,
     forceNewAccount: false,
-    validLink: true,
+    isValidLink: true,
+    isValidName: true,
   };
 
   componentDidMount() {
@@ -65,7 +68,7 @@ class ConversationJoin extends Component {
       .catch(error => {
         this.setState({
           ...this.state,
-          validLink: false,
+          isValidLink: false,
         });
       });
   }
@@ -88,12 +91,24 @@ class ConversationJoin extends Component {
 
   handleSubmit = event => {
     event.preventDefault();
-    this.props
-      .doRegisterWireless({name: this.state.enteredName})
-      .then(() => this.props.doJoinConversationByCode(this.state.conversationKey, this.state.conversationCode))
-      .then(() => this.openWebapp('reason=registration'))
-      .catch(error => console.error('Failed to create wireless account', error));
+    this.nameInput.value = this.nameInput.value.trim();
+    if (!this.nameInput.checkValidity()) {
+      this.setState({
+        error: ValidationError.handleValidationState('name', this.nameInput.validity),
+        isValidName: false,
+      });
+    } else {
+      Promise.resolve(this.nameInput.value)
+        .then(name => name.trim())
+        .then(name => doRegisterWireless({name}))
+        .then(() => this.props.doJoinConversationByCode(this.state.conversationKey, this.state.conversationCode))
+        .then(() => this.openWebapp('reason=registration'))
+        .catch(error => console.error('Failed to create wireless account', error));
+    }
+    this.nameInput.focus();
   };
+
+  resetErrors = () => this.setState({error: null, isValidName: true});
 
   renderExistentAccount = () => {
     const {intl: {formatMessage: _}} = this.props;
@@ -132,7 +147,7 @@ class ConversationJoin extends Component {
 
   renderNewAnonAccount = () => {
     const {intl: {formatMessage: _}} = this.props;
-    const {enteredName, error} = this.state;
+    const {enteredName, isValidName, error} = this.state;
     return (
       <div>
         <Content style={{flex: '1', marginTop: '20px', width: '520px'}}>
@@ -144,21 +159,24 @@ class ConversationJoin extends Component {
             <Form style={{marginTop: 30}}>
               <InputSubmitCombo>
                 <Input
+                  name="name"
+                  autoComplete="username"
                   value={enteredName}
-                  innerRef={node => (this.teamNameInput = node)}
+                  innerRef={node => (this.nameInput = node)}
                   onChange={event => {
+                    this.resetErrors();
                     this.setState({enteredName: event.target.value});
                   }}
                   placeholder={_(conversationJoinStrings.namePlaceholder)}
-                  pattern=".{2,256}"
-                  maxLength="256"
-                  minLength="2"
-                  required
                   autoFocus
+                  maxLength="64"
+                  minLength="2"
+                  pattern=".{2,64}"
+                  required
                   data-uie-name="enter-name"
                 />
                 <RoundIconButton
-                  disabled={!enteredName}
+                  disabled={!enteredName || !isValidName}
                   type="submit"
                   formNoValidate
                   onClick={this.handleSubmit}
@@ -215,7 +233,7 @@ class ConversationJoin extends Component {
 
   render() {
     const {isAuthenticated, intl: {formatMessage: _}} = this.props;
-    const {validLink} = this.state;
+    const {isValidLink} = this.state;
     return (
       <Container
         style={{
@@ -229,7 +247,7 @@ class ConversationJoin extends Component {
           <Logo width={72} />
           <Text bold>{_(conversationJoinStrings.headerText)}</Text>
         </Header>
-        {validLink
+        {isValidLink
           ? !isAuthenticated || this.state.forceNewAccount ? this.renderNewAnonAccount() : this.renderExistentAccount()
           : this.renderInvalidLink()}
       </Container>
