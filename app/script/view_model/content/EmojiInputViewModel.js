@@ -99,7 +99,7 @@ z.viewModel.content.EmojiInputViewModel = class EmojiInputViewModel {
     this.remove_emoji_popup = this.remove_emoji_popup.bind(this);
     this.updated_emoji_replace_preference = this.updated_emoji_replace_preference.bind(this);
 
-    const emoji_div_class = 'conversation-input-emoji-list';
+    const emoji_div_class = 'conversation-input-bar-emoji-list';
 
     this.emoji_list = [];
     this.emoji_dict = {};
@@ -115,7 +115,7 @@ z.viewModel.content.EmojiInputViewModel = class EmojiInputViewModel {
     $(document).on('click', `.${emoji_div_class}`, event => {
       const clicked = $(event.target);
       const emoji_line = clicked.hasClass('emoji') ? clicked : clicked.closest('.emoji');
-      const input = $('#conversation-input-text')[0];
+      const [input] = $('#conversation-input-bar-text');
       this._enter_emoji_popup_line(input, emoji_line);
       return false;
     });

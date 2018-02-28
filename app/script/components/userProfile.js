@@ -148,16 +148,16 @@ z.components.UserProfile = class UserProfile {
     this.addPeopleTooltip = z.l10n.text(z.string.tooltipPeopleAdd, shortcut);
 
     this.deviceHeadline = ko.pureComputed(() => {
-      return z.l10n.text(z.string.peopleTabsDevicesHeadline, this.userEntity().first_name());
+      return z.l10n.text(z.string.userProfileDevicesHeadline, this.userEntity().first_name());
     });
 
     this.noDeviceHeadline = ko.pureComputed(() => {
-      return z.l10n.text(z.string.peopleTabsNoDevicesHeadline, this.userEntity().first_name());
+      return z.l10n.text(z.string.userProfileNoDevicesHeadline, this.userEntity().first_name());
     });
 
     this.detailMessage = ko.pureComputed(() => {
       const substitution = {user: z.util.escape_html(this.userEntity().first_name())};
-      const text = z.l10n.text(z.string.peopleTabsDeviceDetailHeadline, substitution);
+      const text = z.l10n.text(z.string.userProfileDeviceDetailHeadline, substitution);
 
       const textWithHtmlTags = new RegExp('\\{\\{[^\\}]+\\}\\}[^\\{]+\\{\\{[^\\}]+\\}\\}');
       const textWithinHtmlTags = new RegExp('\\{\\{[^\\}]+\\}\\}', 'gm');
@@ -218,7 +218,6 @@ z.components.UserProfile = class UserProfile {
 
     this.clickToCancelRequest = () => {
       if (this.hasUser()) {
-        amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
         amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
           action: () => {
             this.userRepository.cancel_connection_request(this.userEntity());
@@ -228,10 +227,10 @@ z.components.UserProfile = class UserProfile {
             }
           },
           text: {
-            action: z.l10n.text(z.string.people_button_yes),
-            message: z.l10n.text(z.string.people_cancel_request_message, this.userEntity().first_name()),
-            secondary: z.l10n.text(z.string.people_button_no),
-            title: z.l10n.text(z.string.people_cancel_request_headline),
+            action: z.l10n.text(z.string.modalConnectCancelAction),
+            message: z.l10n.text(z.string.modalConnectCancelMessage, this.userEntity().first_name()),
+            secondary: z.l10n.text(z.string.modalConnectCancelSecondary),
+            title: z.l10n.text(z.string.modalConnectCancelHeadline),
           },
         });
       }

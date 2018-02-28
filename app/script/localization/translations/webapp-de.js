@@ -25,11 +25,6 @@ z.string.de.nonexistentUser = 'Gelöschte Person';
 z.string.de.and = 'und';
 z.string.de.enumerationAnd = ' und';
 
-z.string.de.alertUploadFileFormat = 'Das Bild kann nicht verwendet werden. Bitte wähle eine PNG- oder JPEG-Datei.';
-z.string.de.alertUploadTooSmall = 'Das Bild kann nicht verwendet werden. Bitte wähle ein Bild mit mindestens 320 x 320 Pixeln.';
-z.string.de.alertUploadTooLarge = 'Das Bild ist zu groß. Du kannst Dateien bis zu {{number}} MB hochladen.';
-z.string.de.alertGifTooLarge = 'Das GIF ist zu groß. Die maximale Größe beträgt {{number}} MB.';
-
 z.string.de.authAccountCountryCode = 'Landesvorwahl';
 z.string.de.authAccountDeletion = 'Du wurdest abgemeldet, da dein Benutzerkonto gelöscht wurde.';
 z.string.de.authAccountExpiration = 'Du wurdest abgemeldet, da deine Session abgelaufen ist. Bitte melde dich erneut an.';

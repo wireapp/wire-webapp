@@ -528,8 +528,12 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
         if (!isNoContacts) {
           this.logger.error(`Importing contacts from '${source}' failed: ${error.message}`, error);
 
-          amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONTACTS, {
+          amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, {
             action: () => this.importContacts(source),
+            text: {
+              action: z.l10n.text(z.string.modalUploadContactsAction),
+              message: z.l10n.text(z.string.modalUploadContactsMessage),
+            },
           });
         }
       })

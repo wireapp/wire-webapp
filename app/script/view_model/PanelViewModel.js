@@ -23,6 +23,16 @@ window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 
 z.viewModel.PanelViewModel = class PanelViewModel {
+  static get STATE() {
+    return {
+      ADD_PARTICIPANTS: 'PanelViewModel.STATE.ADD_PARTICIPANTS',
+      CONVERSATION_DETAILS: 'PanelViewModel.STATE.CONVERSATION_DETAILS',
+      GROUP_PARTICIPANT: 'PanelViewModel.STATE.GROUP_PARTICIPANT',
+      GUEST_OPTIONS: 'PanelViewModel.STATE.GUEST_OPTIONS',
+      PARTICIPANT_DEVICES: 'PanelViewModel.STATE.DEVICES',
+    };
+  }
+
   /**
    * View model for the details column.
    * @param {z.viewModel.MainViewModel} mainViewModel - Main view model
@@ -30,13 +40,13 @@ z.viewModel.PanelViewModel = class PanelViewModel {
    */
   constructor(mainViewModel, repositories) {
     this.elementId = 'right-column';
+    this.conversationRepository = repositories.conversation;
+    this.integrationRepository = repositories.integration;
+    this.teamRepository = repositories.team;
+    this.mainViewModel = mainViewModel;
     this.logger = new z.util.Logger('z.viewModel.PanelViewModel', z.config.LOGGER.OPTIONS);
 
-    this.mainViewModel = mainViewModel;
-
-    // Nested view models
-    this.participants = new z.viewModel.panel.ParticipantsViewModel(mainViewModel, this, repositories);
-    this.guestOptions = new z.viewModel.panel.GuestOptionsViewModel(mainViewModel, this, repositories);
+    this.state = ko.observable(PanelViewModel.STATE.CONVERSATION_DETAILS);
 
     this.conversationEntity = repositories.conversation.active_conversation;
     this.conversationEntity.subscribe(() => {
@@ -45,6 +55,68 @@ z.viewModel.PanelViewModel = class PanelViewModel {
       }
     });
 
+    this.isTeamOnly = ko.pureComputed(() => this.conversationEntity() && this.conversationEntity.isTeamOnly());
+
+    this.enableIntegrations = this.integrationRepository.enableIntegrations;
+    this.showIntegrations = ko.pureComputed(() => {
+      const firstUserEntity = this.conversationEntity().firstUserEntity();
+      const hasBotUser = firstUserEntity && firstUserEntity.isBot;
+      const allowIntegrations = this.conversationEntity().is_group() || hasBotUser;
+      return this.enableIntegrations() && allowIntegrations && !this.isTeamOnly();
+    });
+
+    amplify.subscribe(z.event.WebApp.PEOPLE.TOGGLE, this.togglePanel.bind(this));
+    amplify.subscribe(z.event.WebApp.PEOPLE.SHOW, this.showParticipant);
+
+    // Nested view models
+    this.addParticipants = new z.viewModel.panel.AppParticipantsViewModel(mainViewModel, this, repositories);
+    this.conversationDetails = new z.viewModel.panel.ConversationDetailsViewModel(mainViewModel, this, repositories);
+    this.groupParticipant = new z.viewModel.panel.GroupParticipantViewModel(mainViewModel, this, repositories);
+    this.guestOptions = new z.viewModel.panel.GuestOptionsViewModel(mainViewModel, this, repositories);
+
     ko.applyBindings(this, document.getElementById(this.elementId));
+  }
+
+  showGroupParticipant(userEntity) {
+    this.groupParticipant.showGroupParticipant(userEntity);
+    this.switchState(PanelViewModel.STATE.GROUP_PARTICIPANT);
+  }
+
+  showParticipant(userEntity) {
+    if (this.mainViewModel.isPanelOpen()) {
+      if (this.conversationEntity().is_one2one()) {
+        if (userEntity.is_me) {
+        }
+      }
+    }
+
+    this.switchState(PanelViewModel.STATE.GROUP_PARTICIPANT);
+  }
+
+  switchState(newState) {
+    const stateUnchanged = newState === this.state();
+    if (!stateUnchanged) {
+      this.state(newState);
+    }
+  }
+
+  togglePanel(addPeople = false) {
+    if (addPeople && !this.conversationEntity().is_guest()) {
+      const isStateAddParticipants = this.state() === PanelViewModel.STATE.ADD_PARTICIPANTS;
+      if (isStateAddParticipants && this.mainViewModel.isPanelOpen()) {
+        return this.mainViewModel.closePanel();
+      }
+
+      this.switchState(PanelViewModel.STATE.ADD_PARTICIPANTS);
+      return this.mainViewModel.openPanel();
+    }
+
+    const isStateConversationDetails = this.state() === PanelViewModel.STATE.CONVERSATION_DETAILS;
+    if (isStateConversationDetails && this.mainViewModel.isPanelOpen()) {
+      return this.mainViewModel.closePanel();
+    }
+
+    this.switchState(PanelViewModel.STATE.CONVERSATION_DETAILS);
+    return this.mainViewModel.openPanel();
   }
 };

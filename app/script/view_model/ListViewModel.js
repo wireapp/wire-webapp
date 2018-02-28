@@ -113,9 +113,9 @@ z.viewModel.ListViewModel = class ListViewModel {
     amplify.subscribe(z.event.WebApp.SHORTCUT.PREV, this.go_to_previous.bind(this));
     amplify.subscribe(z.event.WebApp.TAKEOVER.SHOW, this.show_takeover.bind(this));
     amplify.subscribe(z.event.WebApp.TAKEOVER.DISMISS, this.dismiss_takeover.bind(this));
-    amplify.subscribe(z.event.WebApp.SHORTCUT.ARCHIVE, this.click_on_archive_action.bind(this));
-    amplify.subscribe(z.event.WebApp.SHORTCUT.DELETE, this.click_on_clear_action.bind(this));
-    amplify.subscribe(z.event.WebApp.SHORTCUT.SILENCE, this.click_on_mute_action.bind(this));
+    amplify.subscribe(z.event.WebApp.SHORTCUT.ARCHIVE, this.clickToArchive.bind(this));
+    amplify.subscribe(z.event.WebApp.SHORTCUT.DELETE, this.clickToClear.bind(this));
+    amplify.subscribe(z.event.WebApp.SHORTCUT.SILENCE, this.clickToToggleMute.bind(this));
   }
 
   go_to_next() {
@@ -254,68 +254,73 @@ z.viewModel.ListViewModel = class ListViewModel {
   // Context menu
   //##############################################################################
 
-  on_context_menu(conversation_et, event) {
-    let label;
+  on_context_menu(conversationEntity, event) {
     let title;
     const entries = [];
 
-    if (!conversation_et.is_request() && !conversation_et.removed_from_conversation()) {
-      const silence_shortcut = z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.SILENCE);
-      const notify_tooltip = z.l10n.text(z.string.tooltipConversationsNotify, silence_shortcut);
-      const silence_tooltip = z.l10n.text(z.string.tooltipConversationsSilence, silence_shortcut);
+    const canToggleMute = !conversationEntity.is_request() && !conversationEntity.removed_from_conversation();
+    if (canToggleMute) {
+      const silenceShortcut = z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.SILENCE);
+      const notifyTooltip = z.l10n.text(z.string.tooltipConversationsNotify, silenceShortcut);
+      const silence_tooltip = z.l10n.text(z.string.tooltipConversationsSilence, silenceShortcut);
 
-      label = conversation_et.is_muted() ? z.string.conversationsPopoverNotify : z.string.conversationsPopoverSilence;
-      title = conversation_et.is_muted() ? notify_tooltip : silence_tooltip;
+      const labelStringId = conversationEntity.is_muted()
+        ? z.string.conversationsPopoverNotify
+        : z.string.conversationsPopoverSilence;
+      title = conversationEntity.is_muted() ? notifyTooltip : silence_tooltip;
       entries.push({
-        click: () => this.click_on_mute_action(conversation_et),
-        label: z.l10n.text(label),
+        click: () => this.clickToToggleMute(conversationEntity),
+        label: z.l10n.text(labelStringId),
         title: title,
       });
     }
 
-    if (conversation_et.is_archived()) {
+    if (conversationEntity.is_archived()) {
       entries.push({
-        click: () => this.click_on_unarchive_action(conversation_et),
+        click: () => this.clickToUnarchive(conversationEntity),
         label: z.l10n.text(z.string.conversationsPopoverUnarchive),
       });
     } else {
       const shortcut = z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.ARCHIVE);
 
       entries.push({
-        click: () => this.click_on_archive_action(conversation_et),
+        click: () => this.clickToArchive(conversationEntity),
         label: z.l10n.text(z.string.conversationsPopoverArchive),
         title: z.l10n.text(z.string.tooltipConversationsArchive, shortcut),
       });
     }
 
-    if (conversation_et.is_request()) {
+    if (conversationEntity.is_request()) {
       entries.push({
-        click: () => this.click_on_cancel_action(conversation_et),
+        click: () => this.clickToCancelRequest(conversationEntity),
         label: z.l10n.text(z.string.conversationsPopoverCancel),
       });
     }
 
-    if (!conversation_et.is_request() && !conversation_et.is_cleared()) {
+    const canClear = !conversationEntity.is_request() && !conversationEntity.is_cleared();
+    if (canClear) {
       entries.push({
-        click: () => this.click_on_clear_action(conversation_et),
+        click: () => this.clickToClear(conversationEntity),
         label: z.l10n.text(z.string.conversationsPopoverClear),
       });
     }
 
-    if (!conversation_et.is_group()) {
-      const [user_et] = conversation_et.participating_user_ets();
+    if (!conversationEntity.is_group()) {
+      const userEntity = conversationEntity.firstUserEntity();
+      const canBlock = userEntity && (userEntity.is_connected() || userEntity.is_request());
 
-      if (user_et && (user_et.is_connected() || user_et.is_request())) {
+      if (canBlock) {
         entries.push({
-          click: () => this.click_on_block_action(conversation_et),
+          click: () => this.clickToBlock(conversationEntity),
           label: z.l10n.text(z.string.conversationsPopoverBlock),
         });
       }
     }
 
-    if (conversation_et.is_group() && !conversation_et.removed_from_conversation()) {
+    const canLeave = conversationEntity.is_group() && !conversationEntity.removed_from_conversation();
+    if (canLeave) {
       entries.push({
-        click: () => this.click_on_leave_action(conversation_et),
+        click: () => this.clickToLeave(conversationEntity),
         label: z.l10n.text(z.string.conversationsPopoverLeave),
       });
     }
@@ -323,71 +328,101 @@ z.viewModel.ListViewModel = class ListViewModel {
     z.ui.Context.from(event, entries, 'conversation-list-options-menu');
   }
 
-  click_on_archive_action(conversation_et = this.conversation_repository.active_conversation()) {
-    if (conversation_et) {
-      this.conversation_repository.archive_conversation(conversation_et);
+  clickToArchive(conversationEntity = this.conversation_repository.active_conversation()) {
+    if (conversationEntity) {
+      this.conversation_repository.archive_conversation(conversationEntity);
     }
   }
 
-  click_on_block_action(conversation_et) {
-    const next_conversation_et = this._get_next_conversation(conversation_et);
-    const [user_et] = conversation_et.participating_user_ets();
+  clickToBlock(conversationEntity) {
+    const nextConversationEntity = this._getNextConversation(conversationEntity);
+    const userEntity = conversationEntity.firstUserEntity();
 
-    if (user_et) {
-      amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.BLOCK, {
+    if (userEntity) {
+      amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
         action: () => {
-          this.user_repository.block_user(user_et, next_conversation_et);
+          this.user_repository.block_user(userEntity, nextConversationEntity);
         },
-        data: user_et.first_name(),
+        text: {
+          action: z.l10n.text(z.string.modalUserBlockAction),
+          message: z.l10n.text(z.string.modalUserBlockMessage, userEntity.first_name()),
+          title: z.l10n.text(z.string.modalUserBlockHeadline),
+        },
       });
     }
   }
 
-  click_on_cancel_action(conversation_et) {
-    const next_conversation_et = this._get_next_conversation(conversation_et);
-    const [user_et] = conversation_et.participating_user_ets();
+  clickToCancelRequest(conversationEntity) {
+    const nextConversationEntity = this._getNextConversation(conversationEntity);
+    const userEntity = conversationEntity.firstUserEntity();
 
-    this.user_repository.cancel_connection_request(user_et, next_conversation_et);
-  }
-
-  click_on_clear_action(conversation_et = this.conversation_repository.active_conversation()) {
-    if (conversation_et) {
-      amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CLEAR, {
-        action: (leave_conversation = false) => {
-          this.conversation_repository.clear_conversation(conversation_et, leave_conversation);
+    if (userEntity) {
+      amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
+        action: () => this.user_repository.cancel_connection_request(userEntity, nextConversationEntity),
+        text: {
+          action: z.l10n.text(z.string.modalConnectCancelAction),
+          message: z.l10n.text(z.string.modalConnectCancelMessage, userEntity.first_name()),
+          secondary: z.l10n.text(z.string.modalConnectCancelSecondary),
+          title: z.l10n.text(z.string.modalConnectCancelHeadline),
         },
-        conversation: conversation_et,
       });
     }
   }
 
-  click_on_leave_action(conversation_et) {
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.LEAVE, {
-      action: () => this.conversation_repository.removeMember(conversation_et, this.user_repository.self().id),
-      data: conversation_et.display_name(),
+  clickToClear(conversationEntity = this.conversation_repository.active_conversation()) {
+    if (conversationEntity) {
+      const canLeaveConversation = conversationEntity.is_group() && !conversationEntity.removed_from_conversation();
+      const modalType = canLeaveConversation
+        ? z.viewModel.ModalsViewModel.TYPE.OPTION
+        : z.viewModel.ModalsViewModel.TYPE.CONFIRM;
+
+      amplify.publish(z.event.WebApp.WARNING.MODAL, modalType, {
+        action: (leaveConversation = false) => {
+          this.conversation_repository.clear_conversation(conversationEntity, leaveConversation);
+        },
+        text: {
+          action: z.l10n.text(z.string.modalConversationClearAction),
+          message: z.l10n.text(z.string.modalConversationClearMessage),
+          option: z.l10n.text(z.string.modalConversationClearOption),
+          title: z.l10n.text(z.string.modalConversationClearHeadline),
+        },
+      });
+    }
+  }
+
+  clickToLeave(conversationEntity) {
+    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
+      action: () => {
+        this.conversation_repository.removeMember(conversationEntity, this.user_repository.self().id);
+      },
+      text: {
+        action: z.l10n.text(z.string.modalConversationLeaveAction),
+        message: z.l10n.text(z.string.modalConversationLeaveMessage),
+        title: z.l10n.text(z.string.modalConversationLeaveHeadline, conversationEntity.display_name()),
+      },
     });
   }
 
-  click_on_mute_action(conversation_et = this.conversation_repository.active_conversation()) {
-    if (conversation_et) {
-      this.conversation_repository.toggle_silence_conversation(conversation_et);
+  clickToToggleMute(conversationEntity = this.conversation_repository.active_conversation()) {
+    if (conversationEntity) {
+      this.conversation_repository.toggle_silence_conversation(conversationEntity);
     }
   }
 
-  click_on_unarchive_action(conversation_et) {
-    this.conversation_repository.unarchive_conversation(conversation_et, 'manual un-archive').then(() => {
+  clickToUnarchive(conversationEntity) {
+    this.conversation_repository.unarchive_conversation(conversationEntity, 'manual un-archive').then(() => {
       if (!this.conversation_repository.conversations_archived().length) {
         this.switch_list(ListViewModel.STATE.CONVERSATIONS);
       }
     });
   }
 
-  _get_next_conversation(conversation_et) {
-    const in_conversations = this.state() === ListViewModel.STATE.CONVERSATIONS;
-    const is_active_conversation = this.conversation_repository.is_active_conversation(conversation_et);
+  _getNextConversation(conversationEntity) {
+    const isStateConversations = this.state() === ListViewModel.STATE.CONVERSATIONS;
+    const isActiveConversation = this.conversation_repository.is_active_conversation(conversationEntity);
 
-    if (in_conversations && is_active_conversation) {
-      return this.conversation_repository.get_next_conversation(conversation_et);
+    if (isStateConversations && isActiveConversation) {
+      return this.conversation_repository.get_next_conversation(conversationEntity);
     }
   }
 };

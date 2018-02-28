@@ -458,10 +458,16 @@ z.client.ClientRepository = class ClientRepository {
   logoutClient() {
     if (this.currentClient()) {
       if (this.currentClient().type === z.client.ClientType.PERMANENT) {
-        return amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.LOGOUT, {
-          action(clearData) {
+        return amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.OPTION, {
+          action: clearData => {
             return amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SIGN_OUT_REASON.USER_REQUESTED, clearData);
           },
+          text: {
+            action: z.l10n.text(z.string.modalAccountLogoutAction),
+            option: z.l10n.text(z.string.modalAccountLogoutOption),
+            title: z.l10n.text(z.string.modalAccountLogoutHeadline),
+          },
+          warning: false,
         });
       }
       return this.deleteTemporaryClient().then(() =>
@@ -481,6 +487,24 @@ z.client.ClientRepository = class ClientRepository {
     return this.cryptographyRepository
       .deleteSession(userId, clientId)
       .then(() => this.deleteClientFromDb(userId, clientId));
+  }
+
+  removeSelfClient(clientEntity) {
+    // @todo Add failure case ux WEBAPP-3570
+    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.INPUT, {
+      action: password => {
+        this.deleteClient(clientEntity.id, password).catch(error => {
+          amplify.subscribe(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
+        });
+      },
+      text: {
+        action: z.l10n.text(z.string.modalAccountRemoveDeviceAction),
+        input: z.l10n.text(z.string.modalAccountRemoveDevicePlaceholder),
+        message: z.l10n.text(z.string.modalAccountRemoveDeviceMessage),
+        title: z.l10n.text(z.string.modalAccountRemoveDeviceHeadline, clientEntity.model),
+      },
+      warning: false,
+    });
   }
 
   /**

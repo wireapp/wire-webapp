@@ -1,0 +1,88 @@
+<div id="conversation-details" class="conversation-details" data-bind="with: $root.conversationDetails">
+  <!-- ko if: hasConversation -->
+    <div class="right-panel-header">
+      <!-- ko if: !conversationEntity().is_request() && !conversationEntity().removed_from_conversation() -->
+        <div class="icon-button icon-mute" data-bind="click: clickToToggleMute"></div>
+      <!-- /ko -->
+      <div class="right-panel-close icon-close icon-button"></div>
+    </div>
+    <div class="right-panel-content">
+      <div class="conversation-details-name">
+        <!-- ko if: isNameEditable() -->
+          <div data-bind="visible: !isEditingName(), text: conversationEntity().display_name(), click: clickToEditGroupName, l10n_tooltip: z.string.tooltipPeopleRename" data-uie-name="status-name"></div>
+          <textarea data-bind="visible: isEditingName, value: conversationEntity().display_name(), enter: renameConversation, hasFocus: isEditingName, resize" maxlength="64" dir="auto" data-uie-name="enter-name"></textarea>
+        <!-- /ko -->
+        <!-- ko ifnot: isNameEditable() -->
+          <div data-bind="text: conversationEntity().display_name()" data-uie-name="status-name"></div>
+        <!-- /ko -->
+        <!-- ko if: conversationEntity().is_group() -->
+          <div>
+            <!-- ko if: userParticipants().length -->
+              <div data-bind="text: userParticipants().length"></div>
+              <div data-bind="l10n_text: participantsUserText"></div>
+            <!-- /ko -->
+            <!-- ko if: serviceParticipants().length -->
+              <div data-bind="text: serviceParticipants().length"></div>
+              <div data-bind="l10n_text: participantsServiceText"></div>
+            <!-- /ko -->
+          </div>
+        <!-- /ko -->
+      </div>
+
+      <!-- ko if: isActiveParticipant() -->
+        <div class="conversation-details-top-actions">
+          <!-- ko if: conversationEntity().is_group() -->
+            <div class="button-icon pull-left" data-bind="click: clickOnAddParticipants, attr:{'title': addPeopleTooltip}" data-uie-name="go-add-people">
+              <div class="button-icon icon-people-add"></div>
+              <label data-bind="l10n_text: addActionText"></label>
+            </div>
+          <!-- /ko -->
+
+          <!-- ko if: conversationEntity().is_one2one() -->
+            <div data-bind="click: clickOnCreateGroup, l10n_text: z.string.conversationDetailsActionCreateGroup" data-uie-name="go-create-group"></div>
+          <!-- /ko -->
+
+          <!-- ko if: conversationEntity().team_id -->
+            <div data-bind="click: clickOnGuestOptions" data-uie-name="go-guest-options">
+              <div data-bind="l10n_text: z.string.conversationDetailsActionGuestOptions"></div>
+              <div data-bind="l10n_text: guestOptionsText"></div>
+            </div>
+          <!-- /ko -->
+        </div>
+      <!-- /ko -->
+
+      <div class="conversation-details-participants">
+        <!-- ko if: conversationEntity().is_group() -->
+          <!-- ko if: userParticipants().length -->
+            <div data-bind="text: z.string.conversationDetailsPeople"></div>
+            <user-list params="user: userParticipants, click: clickOnShowParticipant" data-uie-name="list-users"></user-list>
+          <!-- /ko -->
+
+          <!-- ko if: serviceParticipants().length -->
+            <div data-bind="text: z.string.conversationDetailsServices"></div>
+            <service-list params="services: serviceParticipants, click: clickOnShowParticipant" data-uie-name="list-services"></service-list>
+          <!-- /ko -->
+        <!-- /ko -->
+        <!-- ko if: conversationEntity().is_one2one() -->
+          <participant-avatar params="participant: conversationEntity().firstUserEntity(), size: z.components.ParticipantAvatar.SIZE.X_LARGE"></participant-avatar>
+        <!-- /ko -->
+      </div>
+
+      <div class="conversation-details-bottom-actions">
+        <div data-bind="click: clickToArchive, l10n_text: z.string.conversationDetailsActionArchive"></div>
+        <!-- ko if: conversationEntity().is_request() -->
+          <div data-bind="click: clickToCancelRequest, l10n_text: z.string.conversationDetailsActionCancelRequest"></div>
+        <!-- /ko -->
+        <!-- ko if: !conversationEntity().is_request() && !conversationEntity().is_cleared() -->
+          <div data-bind="click: clickToClear, l10n_text: z.string.conversationDetailsActionClear"></div>
+        <!-- /ko -->
+        <!-- ko if: !conversationEntity().is_group() && (conversationEntity().firstUserEntity().is_connected() || conversationEntity().firstUserEntity().is_request()) -->
+        <div data-bind="click: clickToBlock, l10n_text: z.string.conversationDetailsActionBlock"></div>
+        <!-- /ko -->
+        <!-- ko if: conversationEntity().is_group() && !conversationEntity().removed_from_conversation() -->
+          <div data-bind="click: clickToLeave, l10n_text: z.string.conversationDetailsActionLeave"></div>
+        <!-- /ko -->
+      </div>
+    </div>
+  <!-- /ko -->
+</div>

@@ -124,20 +124,20 @@
   <!-- ko if: showNoContacts() -->
     <div class="start-ui-import-container">
       <div>
-        <h1 class="start-ui-import-headline" data-bind="l10n_text: z.string.peopleInviteHeadline"></h1>
+        <h1 class="start-ui-import-headline" data-bind="l10n_text: z.string.searchInviteHeadline"></h1>
         <!-- ko if: window.wAddressBook -->
           <div class="start-ui-import-buttons" data-bind="click: clickOnImportContacts" data-uie-name="from-contacts">
             <div class="start-ui-import-buttons-icon icon-contacts"></div>
-            <span class="label-bold-xs" data-bind="l10n_text: z.string.peopleInviteButtonContacts"></span>
+            <span class="label-bold-xs" data-bind="l10n_text: z.string.searchInviteButtonContacts"></span>
           </div>
         <!-- /ko -->
         <div class="start-ui-import-buttons" data-bind="click: clickOnImportGmail" data-uie-name="from-gmail">
           <svg class="start-ui-import-buttons-icon">
             <use xlink:href="#icon-gmail"></use>
           </svg>
-          <span class="label-bold-xs" data-bind="l10n_text: z.string.peopleInviteButtonGmail"></span>
+          <span class="label-bold-xs" data-bind="l10n_text: z.string.searchInviteButtonGmail"></span>
         </div>
-        <div class="start-ui-import-detail" data-bind="l10n_text: z.string.peopleInviteDetail"></div>
+        <div class="start-ui-import-detail" data-bind="l10n_text: z.string.searchInviteDetail"></div>
       </div>
     </div>
   <!-- /ko -->
@@ -145,7 +145,7 @@
   <!-- ko if: showInvitePeople() -->
     <div class="start-ui-import" id="invite-button" data-bind="click: clickToShowInviteBubble" data-bubble="#invite-bubble" data-placement="top">
       <span class="icon-invite start-ui-import-icon"></span>
-      <span data-bind="l10n_text: z.string.peopleInvite"></span>
+      <span data-bind="l10n_text: z.string.searchInvite"></span>
     </div>
   <!-- /ko -->
 
@@ -180,12 +180,12 @@
 
           <!-- ko if: showServiceConversationList() -->
             <div class="start-ui-service-conversations">
-              <user-input class="start-ui-service-conversations-input user-list-light" params="input: searchConversationInput, placeholder: z.string.peopleSearchPlaceholder" spellcheck="false" data-uie-name="enter-conversations"></user-input>
+              <user-input class="start-ui-service-conversations-input user-list-light" params="input: searchConversationInput, placeholder: z.string.searchServicePlaceholder" spellcheck="false" data-uie-name="enter-conversations"></user-input>
               <div class="start-ui-service-conversation-list-wrapper">
                 <div class="start-ui-service-conversations-list" data-bind="antiscroll: shouldUpdateServiceScrollbar">
                   <div class="start-ui-service-conversations-create" data-bind="click: clickToCreateServiceConversation" data-uie-name="do-create-conversation">
                     <div class="icon-plus"></div>
-                    <div class="start-ui-service-conversations-create-text" data-bind="text: z.string.peopleServiceNewConversation"></div>
+                    <div class="start-ui-service-conversations-create-text" data-bind="text: z.string.searchServiceNewConversation"></div>
                   </div>
                   <!-- ko foreach: serviceConversations() -->
                     <conversation-list-cell params="conversation: $data" data-bind="click: $parent.clickToAddService" data-uie-name="item-conversation"></conversation-list-cell>
@@ -197,7 +197,7 @@
 
           <!-- ko ifnot: showServiceConversationList() -->
             <div class="start-ui-service-footer">
-              <button class="start-ui-service-button" data-bind="click: clickOnAddService, l10n_text: z.string.peopleServiceConfirmButton" data-uie-name="do-service-confirm"></button>
+              <button class="start-ui-service-button" data-bind="click: clickOnAddService, l10n_text: z.string.searchServiceConfirmButton" data-uie-name="do-service-confirm"></button>
             </div>
           <!-- /ko -->
         </div>
@@ -218,29 +218,29 @@
           </div>
           <div class="invite-footer" data-bind="text: inviteHint"></div>
         </div>
-        <div class="invite-bubble-button" data-bind="click: clickToCloseGenericInvite, l10n_text: z.string.peopleShare" data-uie-name="go-import-form"></div>
+        <div class="invite-bubble-button" data-bind="click: clickToCloseGenericInvite, l10n_text: z.string.searchInviteShare" data-uie-name="go-import-form"></div>
       <!-- /ko -->
 
       <!-- ko ifnot: showInviteForm() -->
         <div class="invite-bubble-link">
           <div class="invite-content">
-            <h1 class="invite-header" data-bind="l10n_text: z.string.peopleInviteHeadline"></h1>
+            <h1 class="invite-header" data-bind="l10n_text: z.string.searchInviteHeadline"></h1>
             <!-- ko if: window.wAddressBook -->
               <div class="start-ui-import-buttons" data-bind="click: clickOnImportContacts" data-uie-name="do-contacts-import">
                 <div class="start-ui-import-buttons-icon icon-contacts"></div>
-                <span class="label-bold-xs" data-bind="l10n_text: z.string.peopleInviteButtonContacts"></span>
+                <span class="label-bold-xs" data-bind="l10n_text: z.string.searchInviteButtonContacts"></span>
               </div>
             <!-- /ko -->
             <div class="start-ui-import-buttons" data-bind="click: clickOnImportGmail" data-uie-name="do-google-import">
               <svg class="start-ui-import-buttons-icon">
                 <use xlink:href="#icon-gmail"></use>
               </svg>
-              <span class="label-bold-xs" data-bind="l10n_text: z.string.peopleInviteButtonGmail"></span>
+              <span class="label-bold-xs" data-bind="l10n_text: z.string.searchInviteButtonGmail"></span>
             </div>
-            <div class="start-ui-import-detail" data-bind="l10n_text: z.string.peopleInviteDetail"></div>
+            <div class="start-ui-import-detail" data-bind="l10n_text: z.string.searchInviteDetail"></div>
           </div>
         </div>
-        <div class="invite-bubble-button" data-bind="click: clickToShowGenericInvite, l10n_text: z.string.peopleInvite" data-uie-name="go-invite-form"></div>
+        <div class="invite-bubble-button" data-bind="click: clickToShowGenericInvite, l10n_text: z.string.searchInvite" data-uie-name="go-invite-form"></div>
       <!-- /ko -->
     </div>
   </div>

@@ -141,19 +141,29 @@ z.viewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
   }
 
   clickOnDelete() {
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.DELETE_MESSAGE, {
+    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
       action: () => {
         this.conversationRepository.delete_message(this.conversationEntity(), this.messageEntity());
         this.imageModal.hide();
+      },
+      text: {
+        action: z.l10n.text(z.string.modalConversationDeleteMessageAction),
+        message: z.l10n.text(z.string.modalConversationDeleteMessageMessage),
+        title: z.l10n.text(z.string.modalConversationDeleteMessageHeadline),
       },
     });
   }
 
   clickOnDeleteForEveryone() {
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.DELETE_EVERYONE_MESSAGE, {
+    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
       action: () => {
         this.conversationRepository.delete_message_everyone(this.conversationEntity(), this.messageEntity());
         this.imageModal.hide();
+      },
+      text: {
+        action: z.l10n.text(z.string.modalConversationDeleteMessageEveryoneAction),
+        message: z.l10n.text(z.string.modalConversationDeleteMessageEveryoneMessage),
+        title: z.l10n.text(z.string.modalConversationDeleteMessageEveryoneHeadline),
       },
     });
   }
