@@ -1,0 +1,72 @@
+.conversation-details {
+  .right-panel-mute {
+    path {
+      fill: @graphite-dark;
+    }
+
+    &--active {
+      path {
+        fill: @w-blue;
+      }
+    }
+  }
+
+  &__header {
+    padding: 8px 16px;
+  }
+
+  &__name {
+    font-size: 20px;
+    font-weight: @font-weight-bold;
+    display: flex;
+    min-height: 24px;
+    border: none;
+    padding: 0;
+
+    &__icon {
+      opacity: 0;
+      transition: opacity @animation-timing-faster @ease-in-quart;
+      margin-left: 11px;
+
+      svg {
+        height: 12px;
+        width: 12px;
+      }
+
+      path {
+        fill: fade(@graphite-dark, 56%);
+      }
+    }
+
+    &:hover > &__icon {
+      opacity: 1;
+    }
+  }
+
+  &__participant_count {
+    margin-top: 8px;
+    font-size: 11px;
+    text-transform: uppercase;
+    font-weight: @font-weight-bold;
+
+    &__text {
+      color: @graphite;
+    }
+
+    &__number:nth-of-type(2) {
+      margin-left: 8px;
+    }
+  }
+
+  &__list-head {
+    padding: 8px 16px;
+    color: @graphite;
+    font-size: 11px;
+    text-transform: uppercase;
+    font-weight: @font-weight-bold;
+  }
+
+  &__guest-options {
+    margin: 16px;
+  }
+}

@@ -40,7 +40,7 @@ z.components.ParticipantItem = class ParticipantItem {
 
 ko.components.register('participant-item', {
   template: `
-    <div class="participant-item" data-bind="attr: isUser ? { 'data-uie-name': 'item-user', 'data-uie-uid': participant.id, 'data-uie-value': participant.name(), 'data-uie-status': participant.connection().status()} : {'data-uie-name': 'item-service'}">
+    <div class="participant-item" data-bind="attr: { 'data-uie-name': isUser ? 'item-user' : 'item-service'}">
       <div class="participant-item-image">
         <participant-avatar params="participant: participant, size: z.components.ParticipantAvatar.SIZE.SMALL"></participant-avatar>
       </div>
@@ -62,12 +62,13 @@ ko.components.register('participant-item', {
         </div>
       </div>
 
+      <!-- ko if: isUser -->
+      <div data-uie-name="status-verified">
+      </div>
+      <!-- /ko -->
+
       <!-- ko if: isUser && !isOthersMode && participant.is_guest() -->
-        <div class="participant-item-guest-indicator" data-uie-name="status-guest">
-          <svg width="14" height="16" viewBox="0 0 14 16">
-            <path d="M5 1a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3c0-1.1.9-2 2-2h3zm.5 1a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1h-3zM7 9a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm-2 1a2 2 0 0 0-2 2v1h8v-1a2 2 0 0 0-2-2H5z"/>
-          </svg>
-        </div>
+        <guest-icon class="participant-item-guest-indicator" data-uie-name="status-guest"></guest-icon>
       <!-- /ko -->
       <!-- ko if: canSelect -->
         <div class="search-list-item-select icon-check" data-bind="css: {'selected': isSelected}" data-uie-name="status-selected"></div>
