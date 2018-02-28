@@ -192,6 +192,38 @@ export const conversationJoinStrings = defineMessages({
     id: 'conversationJoin.subhead',
     defaultMessage: 'Encrypted group messaging and conference calls. No account necessary.',
   },
+  existentAccountSubhead: {
+    id: 'conversationJoin.subheadExistentAccount',
+    defaultMessage: 'Guest rooms let you have conversations with people who are not on your team.',
+  },
+  existentAccountOpenButton: {
+    id: 'conversationJoin.buttonExistentAccountOpen',
+    defaultMessage: 'Open in Wire',
+  },
+  existentAccountJoinWithoutLink: {
+    id: 'conversationJoin.existentAccountJoinWithoutLink',
+    defaultMessage: 'Join the conversation',
+  },
+  existentAccountJoinWithoutText: {
+    id: 'conversationJoin.existentAccountJoinWithoutText',
+    defaultMessage: 'without an account.',
+  },
+  invalidHeadline: {
+    id: 'conversationJoin.invalidHeadline',
+    defaultMessage: 'This Wire guest room is now closed.',
+  },
+  invalidSubhead: {
+    id: 'conversationJoin.invalidSubhead',
+    defaultMessage: 'Ask the person who invited you how to join.',
+  },
+  invalidCreateAccountLink: {
+    id: 'conversationJoin.invalidCreateAccountLink',
+    defaultMessage: 'Create an account',
+  },
+  invalidCreateAccountText: {
+    id: 'conversationJoin.invalidCreateAccountText',
+    defaultMessage: 'for group messaging and conference calls.',
+  },
   namePlaceholder: {
     id: 'conversationJoin.namePlaceholder',
     defaultMessage: 'Your name',
