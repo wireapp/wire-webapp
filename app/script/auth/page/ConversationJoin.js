@@ -121,7 +121,7 @@ class ConversationJoin extends Component {
           </Small>
           <Small block>
             {`${_(conversationJoinStrings.acceptTou)} `}
-            <Link href={'/terms'} textTransform={'none'} data-uie-name="go-tou">
+            <Link href={`${ROUTE.WIRE_ROOT}/legal/terms/personal`} textTransform={'none'} data-uie-name="go-tou">
               {_(conversationJoinStrings.touLink)}
             </Link>
           </Small>
