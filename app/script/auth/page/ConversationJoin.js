@@ -100,7 +100,7 @@ class ConversationJoin extends Component {
     } else {
       Promise.resolve(this.nameInput.value)
         .then(name => name.trim())
-        .then(name => doRegisterWireless({name}))
+        .then(name => this.props.doRegisterWireless({name}))
         .then(() => this.props.doJoinConversationByCode(this.state.conversationKey, this.state.conversationCode))
         .then(() => this.openWebapp('reason=registration'))
         .catch(error => console.error('Failed to create wireless account', error));
