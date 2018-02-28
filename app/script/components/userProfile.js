@@ -64,7 +64,7 @@ z.components.UserProfile = class UserProfile {
 
     this.selfUser = this.userRepository.self;
 
-    this.hasUser = ko.pureComputed(() => typeof this.userEntity === 'function' && Boolean(this.userEntity()));
+    this.hasUser = ko.pureComputed(() => typeof this.userEntity === 'function' && !!this.userEntity());
 
     this.isTeam = ko.pureComputed(() => this.selfUser().is_team_member());
 
