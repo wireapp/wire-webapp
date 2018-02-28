@@ -448,18 +448,24 @@ z.main.App = class App {
 
   /**
    * Check whether we need to set different user information (picture, username).
-   * @param {z.entity.User} user_et - Self user entity
+   * @param {z.entity.User} userEntity - Self user entity
    * @returns {z.entity.User} Checked user entity
    */
-  _check_user_information(user_et) {
-    if (!user_et.mediumPictureResource()) {
-      this.repository.user.set_default_picture();
-    }
-    if (!user_et.username()) {
-      this.repository.user.get_username_suggestion();
+  _check_user_information(userEntity) {
+    const hasEmailAddress = userEntity.email();
+    const hasPhoneNumber = userEntity.phone();
+    const isActivatedUser = hasEmailAddress || hasPhoneNumber;
+
+    if (isActivatedUser) {
+      if (!userEntity.mediumPictureResource()) {
+        this.repository.user.set_default_picture();
+      }
+      if (!userEntity.username()) {
+        this.repository.user.get_username_suggestion();
+      }
     }
 
-    return user_et;
+    return userEntity;
   }
 
   /**
@@ -485,13 +491,20 @@ z.main.App = class App {
    * @returns {Promise<z.entity.User>} Resolves with the self user entity
    */
   _get_user_self() {
-    return this.repository.user.get_me().then(user_et => {
-      this.logger.info(`Loaded self user with ID '${user_et.id}'`);
-      if (!user_et.email() && !user_et.phone()) {
-        throw new Error('User does not have a verified identity');
+    return this.repository.user.get_me().then(userEntity => {
+      this.logger.info(`Loaded self user with ID '${userEntity.id}'`);
+
+      const hasEmailAddress = userEntity.email();
+      const hasPhoneNumber = userEntity.phone();
+      const isActivatedUser = hasEmailAddress || hasPhoneNumber;
+
+      if (!isActivatedUser) {
+        this.logger.info('User does not have an activated identity and seems to be wireless');
+        // How to verify a wireless user?
+        //throw new Error('User does not have an activated identity');
       }
 
-      return this.service.storage.init(user_et.id).then(() => this._check_user_information(user_et));
+      return this.service.storage.init(userEntity.id).then(() => this._check_user_information(userEntity));
     });
   }
 
