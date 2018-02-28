@@ -226,7 +226,7 @@ class ConversationJoin extends Component {
         }}
       >
         <Header>
-          <Logo width={72} />
+          <Logo width={72} style={{marginLeft: '20px'}} />
         </Header>
         <Content style={{flex: '1', marginTop: '20px', width: '520px'}}>
           {isValidLink
@@ -235,7 +235,10 @@ class ConversationJoin extends Component {
               : this.renderExistentAccount()
             : this.renderInvalidLink()}
         </Content>
-        <Footer style={{justifyContent: 'flex-end', marginBottom: '30px'}}>footer</Footer>
+        <Footer style={{justifyContent: 'flex-end', marginBottom: '50px', marginLeft: '20px'}}>
+          <Link href={'wire.com'}>WIRE.COM</Link>
+          <Small> ・ © Wire Swiss GmbH</Small>
+        </Footer>
       </Container>
     );
   }
