@@ -17,6 +17,8 @@
  *
  */
 
+'use=szigorú';
+
 z.string.hu.wire = 'Wire';
 z.string.hu.wireMacos = 'Wire MacOS-hez';
 z.string.hu.wireWindows = 'Wire Windowshoz';
@@ -25,6 +27,7 @@ z.string.hu.nonexistentUser = 'Törölt felhasználó';
 z.string.hu.and = 'és';
 z.string.hu.enumerationAnd = 'és ';
 
+//=Alkalmazás betöltése
 z.string.hu.alertUploadFileFormat = 'Ezt a képet nem használhatod.\nPNG vagy JPEG fájlt válassz.';
 z.string.hu.alertUploadTooSmall = 'Ezt a képet nem használhatod.\nVálassz egy képet, ami legalább 320 x 320 px méretű.';
 z.string.hu.alertUploadTooLarge = 'A kép mérete túl nagy.\nMaximum {{number}} MB méretű fájlt tudsz feltölteni.';

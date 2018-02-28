@@ -25,6 +25,7 @@ z.string.et.nonexistentUser = 'Kustutatud kasutaja';
 z.string.et.and = 'ja';
 z.string.et.enumerationAnd = ' ja ';
 
+//=Rakenduse laadimine
 z.string.et.alertUploadFileFormat = 'Seda pilti ei saa kasutada.\nPalun vali PNG või JPEG fail.';
 z.string.et.alertUploadTooSmall = 'Seda pilti ei saa kasutada.\nPalun vali pilt, mis on vähemalt 320x320 pikslit.';
 z.string.et.alertUploadTooLarge = 'See pilt on liiga suur.\nSa võid üles laadida faile suurusega kuni {{number}} MB.';
