@@ -1752,13 +1752,15 @@ z.viewModel.AuthViewModel = class AuthViewModel {
   _get_self_user() {
     return this.user_repository
       .get_me()
-      .then(user_et => {
-        this.self_user(user_et);
+      .then(userEntity => {
+        this.self_user(userEntity);
         this.logger.info(`Retrieved self user: ${this.self_user().id}`);
         this.pending_server_request(false);
 
-        const has_email = this.self_user().email();
-        if (!has_email) {
+        const hasEmailAddress = this.self_user().email();
+        const hasPhoneNumber = this.self_user().phone();
+        const isIncompletePhoneUser = hasPhoneNumber && !hasEmailAddress;
+        if (isIncompletePhoneUser) {
           this._set_hash(z.auth.AuthView.MODE.VERIFY_ACCOUNT);
           throw new z.user.UserError(z.user.UserError.TYPE.USER_MISSING_EMAIL);
         }
