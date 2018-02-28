@@ -18,7 +18,7 @@
  */
 
 import {Container, Header, Footer, Content} from '@wireapp/react-ui-kit/Layout';
-import {Form, InputSubmitCombo, Input, RoundIconButton, ErrorMessage} from '@wireapp/react-ui-kit/Form';
+import {Form, Button, InputSubmitCombo, Input, RoundIconButton, ErrorMessage} from '@wireapp/react-ui-kit/Form';
 import {Logo} from '@wireapp/react-ui-kit/Identity';
 import {H1, H2, Text, Link, Small} from '@wireapp/react-ui-kit/Text';
 import {conversationJoinStrings} from '../../strings';
@@ -26,6 +26,7 @@ import {connect} from 'react-redux';
 import {COLOR} from '@wireapp/react-ui-kit/Identity';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 import * as ConversationAction from '../module/action/ConversationAction';
+import * as AuthSelector from '../module/selector/AuthSelector';
 import * as AuthAction from '../module/action/AuthAction';
 import {injectIntl} from 'react-intl';
 import ROUTE from '../route';
@@ -50,7 +51,8 @@ class ConversationJoin extends Component {
     const conversationKey = params.get(CONVERSATION_KEY);
 
     this.props
-      .doCheckConversationCode(conversationKey, conversationCode)
+      .doInit()
+      .then(() => this.props.doCheckConversationCode(conversationKey, conversationCode))
       .then(() =>
         this.setState({
           ...this.state,
@@ -80,9 +82,123 @@ class ConversationJoin extends Component {
       .catch(error => console.error('Failed to create wireless account', error));
   };
 
-  render() {
+  renderExistentAccount = () => {
+    const {intl: {formatMessage: _}} = this.props;
+    return (
+      <div>
+        <Content style={{flex: '1', marginTop: '20px', width: '520px'}}>
+          <Container verticalCenter>
+            <H1 style={{fontWeight: 500}} color={COLOR.GRAY}>
+              {_(conversationJoinStrings.headline)}
+            </H1>
+            <H2>{_(conversationJoinStrings.existentAccountSubhead)}</H2>
+            <Button>{_(conversationJoinStrings.existentAccountOpenButton)}</Button>
+          </Container>
+        </Content>
+        <Footer style={{justifyContent: 'flex-end', marginBottom: '30px'}}>
+          <Small block>
+            <Link href={'/register'} textTransform={'none'} data-uie-name="go-join">
+              {_(conversationJoinStrings.existentAccountJoinWithoutLink)}
+            </Link>
+            {` ${_(conversationJoinStrings.existentAccountJoinWithoutText)}`}
+          </Small>
+          <Small block>
+            {`${_(conversationJoinStrings.acceptTou)} `}
+            <Link href={'/terms'} textTransform={'none'} data-uie-name="go-tou">
+              {_(conversationJoinStrings.touLink)}
+            </Link>
+          </Small>
+        </Footer>
+      </div>
+    );
+  };
+
+  renderValidLink = () => {
     const {intl: {formatMessage: _}} = this.props;
     const {enteredName, error} = this.state;
+    return (
+      <div>
+        <Content style={{flex: '1', marginTop: '20px', width: '520px'}}>
+          <Container verticalCenter>
+            <H1 style={{fontWeight: 500}} color={COLOR.GRAY}>
+              {_(conversationJoinStrings.headline)}
+            </H1>
+            <H2>{_(conversationJoinStrings.subhead)}</H2>
+            <Form style={{marginTop: 30}}>
+              <InputSubmitCombo>
+                <Input
+                  value={enteredName}
+                  innerRef={node => (this.teamNameInput = node)}
+                  onChange={event => {
+                    this.setState({enteredName: event.target.value});
+                  }}
+                  placeholder={_(conversationJoinStrings.namePlaceholder)}
+                  pattern=".{2,256}"
+                  maxLength="256"
+                  minLength="2"
+                  required
+                  autoFocus
+                  data-uie-name="enter-name"
+                />
+                <RoundIconButton
+                  disabled={!enteredName}
+                  type="submit"
+                  formNoValidate
+                  onClick={this.handleSubmit}
+                  data-uie-name="do-next"
+                />
+              </InputSubmitCombo>
+              <ErrorMessage data-uie-name="error-message">
+                {error ? parseValidationErrors(error) : parseError(this.props.error)}
+              </ErrorMessage>
+            </Form>
+          </Container>
+        </Content>
+        <Footer style={{justifyContent: 'flex-end', marginBottom: '30px'}}>
+          <Small block>
+            {`${_(conversationJoinStrings.hasAccount)} `}
+            <Link href={'/login'} textTransform={'none'} data-uie-name="go-login">
+              {_(conversationJoinStrings.loginLink)}
+            </Link>
+          </Small>
+          <Small block>
+            {`${_(conversationJoinStrings.acceptTou)} `}
+            <Link href={'/terms'} textTransform={'none'} data-uie-name="go-tou">
+              {_(conversationJoinStrings.touLink)}
+            </Link>
+          </Small>
+        </Footer>
+      </div>
+    );
+  };
+
+  renderInvalidLink = () => {
+    const {intl: {formatMessage: _}} = this.props;
+    return (
+      <div>
+        <Content style={{flex: '1', marginTop: '20px', width: '520px'}}>
+          <Container verticalCenter>
+            <H1 style={{fontWeight: 500}} color={COLOR.GRAY}>
+              {_(conversationJoinStrings.invalidHeadline)}
+            </H1>
+            <H2>{_(conversationJoinStrings.invalidSubhead)}</H2>
+          </Container>
+        </Content>
+        <Footer style={{justifyContent: 'flex-end', marginBottom: '30px'}}>
+          <Small block>
+            <Link href={'/register'} textTransform={'none'} data-uie-name="go-register">
+              {_(conversationJoinStrings.invalidCreateAccountLink)}
+            </Link>
+            {` ${_(conversationJoinStrings.invalidCreateAccountText)}`}
+          </Small>
+        </Footer>
+      </div>
+    );
+  };
+
+  render() {
+    const {isAuthenticated, intl: {formatMessage: _}} = this.props;
+    const {validLink} = this.state;
     return (
       <Container
         style={{
@@ -96,76 +212,9 @@ class ConversationJoin extends Component {
           <Logo width={72} />
           <Text bold>{_(conversationJoinStrings.headerText)}</Text>
         </Header>
-        <Content style={{flex: '1', marginTop: '20px', width: '520px'}}>
-          {this.state.validLink ? (
-            <Container verticalCenter>
-              <H1 style={{fontWeight: 500}} color={COLOR.GRAY}>
-                {_(conversationJoinStrings.headline)}
-              </H1>
-              <H2>{_(conversationJoinStrings.subhead)}</H2>
-              <Form style={{marginTop: 30}}>
-                <InputSubmitCombo>
-                  <Input
-                    value={enteredName}
-                    innerRef={node => (this.teamNameInput = node)}
-                    onChange={event => {
-                      this.setState({enteredName: event.target.value});
-                    }}
-                    placeholder={_(conversationJoinStrings.namePlaceholder)}
-                    pattern=".{2,256}"
-                    maxLength="256"
-                    minLength="2"
-                    required
-                    autoFocus
-                    data-uie-name="enter-name"
-                  />
-                  <RoundIconButton
-                    disabled={!enteredName}
-                    type="submit"
-                    formNoValidate
-                    onClick={this.handleSubmit}
-                    data-uie-name="do-next"
-                  />
-                </InputSubmitCombo>
-                <ErrorMessage data-uie-name="error-message">
-                  {error ? parseValidationErrors(error) : parseError(this.props.error)}
-                </ErrorMessage>
-              </Form>
-            </Container>
-          ) : (
-            <Container verticalCenter>
-              <H1 style={{fontWeight: 500}} color={COLOR.GRAY}>
-                {'This Wire guest room is now closed.'}
-              </H1>
-              <H2>{'Ask the person who invited you how to join.'}</H2>
-            </Container>
-          )}
-        </Content>
-        <Footer style={{justifyContent: 'flex-end', marginBottom: '30px'}}>
-          {this.state.validLink ? (
-            <div>
-              <Small block>
-                {`${_(conversationJoinStrings.hasAccount)} `}
-                <Link href={'/login'} textTransform={'none'} data-uie-name="go-login">
-                  {_(conversationJoinStrings.loginLink)}
-                </Link>
-              </Small>
-              <Small block>
-                {`${_(conversationJoinStrings.acceptTou)} `}
-                <Link href={'/terms'} textTransform={'none'} data-uie-name="go-tou">
-                  {_(conversationJoinStrings.touLink)}
-                </Link>
-              </Small>
-            </div>
-          ) : (
-            <Small block>
-              <Link href={'/register'} textTransform={'none'} data-uie-name="go-register">
-                {'Create an account'}
-              </Link>
-              {' for group messaging and conference calls.'}
-            </Small>
-          )}
-        </Footer>
+        {validLink
+          ? isAuthenticated ? this.renderExistentAccount() : this.renderValidLink()
+          : this.renderInvalidLink()}
       </Container>
     );
   }
@@ -175,7 +224,7 @@ export default withRouter(
   injectIntl(
     connect(
       state => ({
-        lala: '',
+        isAuthenticated: AuthSelector.isAuthenticated(state),
       }),
       {...ConversationAction, ...AuthAction}
     )(ConversationJoin)
