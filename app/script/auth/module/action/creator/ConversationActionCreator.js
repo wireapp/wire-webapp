@@ -23,17 +23,35 @@ export const CONVERSATION_CODE_CHECK_START = 'CONVERSATION_CODE_CHECK_START';
 export const CONVERSATION_CODE_CHECK_SUCCESS = 'CONVERSATION_CODE_CHECK_SUCCESS';
 export const CONVERSATION_CODE_CHECK_FAILED = 'CONVERSATION_CODE_CHECK_FAILED';
 
+export const CONVERSATION_CODE_JOIN_START = 'CONVERSATION_CODE_JOIN_START';
+export const CONVERSATION_CODE_JOIN_SUCCESS = 'CONVERSATION_CODE_JOIN_SUCCESS';
+export const CONVERSATION_CODE_JOIN_FAILED = 'CONVERSATION_CODE_JOIN_FAILED';
+
 export const startConversationCodeCheck = params => ({
   params,
   type: CONVERSATION_CODE_CHECK_START,
 });
 
-export const successfulConversationCodeCheck = data => ({
-  payload: data,
+export const successfulConversationCodeCheck = () => ({
   type: CONVERSATION_CODE_CHECK_SUCCESS,
 });
 
 export const failedConversationCodeCheck = error => ({
   payload: BackendError.handle(error),
   type: CONVERSATION_CODE_CHECK_FAILED,
+});
+
+export const startJoinConversationByCode = params => ({
+  params,
+  type: CONVERSATION_CODE_JOIN_START,
+});
+
+export const successfulJoinConversationByCode = data => ({
+  payload: data,
+  type: CONVERSATION_CODE_JOIN_SUCCESS,
+});
+
+export const failedJoinConversationByCode = error => ({
+  payload: BackendError.handle(error),
+  type: CONVERSATION_CODE_JOIN_FAILED,
 });

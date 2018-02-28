@@ -33,3 +33,19 @@ export function doCheckConversationCode(key, code, uri) {
       });
   };
 }
+
+export function doJoinConversationByCode(key, code, uri) {
+  const params = [...arguments];
+  return function(dispatch, getState, {apiClient}) {
+    dispatch(ConversationActionCreator.startJoinConversationByCode(params));
+    return Promise.resolve()
+      .then(() => apiClient.conversation.api.postJoinByCode({code, key, uri}))
+      .then(conversationEvent =>
+        dispatch(ConversationActionCreator.successfulJoinConversationByCode(conversationEvent))
+      )
+      .catch(error => {
+        dispatch(ConversationActionCreator.failedJoinConversationByCode(error));
+        throw BackendError.handle(error);
+      });
+  };
+}

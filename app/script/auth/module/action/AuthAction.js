@@ -97,6 +97,26 @@ export function doRegisterPersonal(registration) {
   };
 }
 
+export function doRegisterWireless(registration) {
+  return function(dispatch, getState, {apiClient}) {
+    registration.locale = currentLanguage();
+    registration.name = registration.name.trim();
+    dispatch(
+      AuthActionCreator.startRegisterWireless({
+        locale: registration.locale,
+        name: registration.name,
+      })
+    );
+    return Promise.resolve()
+      .then(() => apiClient.register(registration))
+      .then(createdAccount => dispatch(AuthActionCreator.successfulRegisterWireless(createdAccount)))
+      .catch(error => {
+        dispatch(AuthActionCreator.failedRegisterWireless(error));
+        throw BackendError.handle(error);
+      });
+  };
+}
+
 export function doInit() {
   return function(dispatch, getState, {apiClient}) {
     dispatch(AuthActionCreator.startRefresh());
