@@ -27,5 +27,5 @@
     "types": "jsdoc --verbose --pedantic --configure jsdoc.json src/ && node replace.js"
   },
   "types": "dist/types.d.ts",
-  "version": "3.0.5"
+  "version": "3.0.6"
 }
