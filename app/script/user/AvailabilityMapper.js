@@ -26,13 +26,13 @@ z.user.AvailabilityMapper = (() => {
   const nameFromType = availabilityType => {
     switch (availabilityType) {
       case z.user.AvailabilityType.AVAILABLE:
-        return z.l10n.text(z.string.user_availability_available);
+        return z.l10n.text(z.string.userAvailabilityAvailable);
       case z.user.AvailabilityType.AWAY:
-        return z.l10n.text(z.string.user_availability_away);
+        return z.l10n.text(z.string.userAvailabilityAway);
       case z.user.AvailabilityType.BUSY:
-        return z.l10n.text(z.string.user_availability_busy);
+        return z.l10n.text(z.string.userAvailabilityBusy);
       case z.user.AvailabilityType.NONE:
-        return z.l10n.text(z.string.user_availability_none);
+        return z.l10n.text(z.string.userAvailabilityNone);
       default:
         throw new z.user.UserError(z.user.UserError.TYPE.INVALID_UPDATE);
     }

@@ -49,7 +49,7 @@ class InitialInvite extends React.PureComponent {
   onInviteDone = () => {
     const {invites} = this.props;
     const nextLocation = pathWithParams('/login', 'reason=registration');
-    const invited = Boolean(invites.length);
+    const invited = !!invites.length;
     return this.props
       .trackEvent({
         attributes: {invited, invites: invites.length},
