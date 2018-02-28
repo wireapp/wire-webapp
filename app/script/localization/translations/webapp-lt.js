@@ -25,6 +25,7 @@ z.string.lt.nonexistentUser = 'Ištrintas naudotojas';
 z.string.lt.and = 'ir';
 z.string.lt.enumerationAnd = ', ir ';
 
+//=Įkeliama
 z.string.lt.alertUploadFileFormat = 'Neįmanoma naudoti šio paveikslėlio.\nPasirinkite PNG arba JPEG failą.';
 z.string.lt.alertUploadTooSmall = 'Neįmanoma naudoti šio paveikslėlio.\nPasirinkite paveikslėlį, kuris būtų bent 320 x 320 pikselių.';
 z.string.lt.alertUploadTooLarge = 'Šis paveikslas yra per didelis.\nJūs galite įkelti failus iki {{number}} MB.';

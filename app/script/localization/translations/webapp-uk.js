@@ -17,6 +17,7 @@
  *
  */
 
+z.string.uk.wire = 'Wire';
 z.string.uk.wireMacos = 'Wire для macOS';
 z.string.uk.wireWindows = 'Wire для Windows';
 z.string.uk.wireLinux = 'Wire для Linux';
@@ -24,6 +25,7 @@ z.string.uk.nonexistentUser = 'Видалений користувач';
 z.string.uk.and = 'і';
 z.string.uk.enumerationAnd = ', і ';
 
+//=Додаток завантажується
 z.string.uk.alertUploadFileFormat = 'Не вдалося застосувати дану картинку.\nБудь ласка, оберіть файл в форматі PNG або JPEG.';
 z.string.uk.alertUploadTooSmall = 'Не вдалося застосувати дану картинку.\nБудь ласка, оберіть файл роздільною здатністю не менше 320 x 320 пікселів.';
 z.string.uk.alertUploadTooLarge = 'Не вдалося застосувати дану картинку.\nВи можете завантажувати файли розміром до {{number}} МБ.';
