@@ -39,6 +39,7 @@ z.viewModel.panel.AppParticipantsViewModel = class AppParticipantsViewModel {
   }
 
   constructor(mainViewModel, panelViewModel, repositories) {
+    this.mainViewModel = mainViewModel;
     this.panelViewModel = panelViewModel;
 
     this.conversationRepository = repositories.conversation;
@@ -65,6 +66,8 @@ z.viewModel.panel.AppParticipantsViewModel = class AppParticipantsViewModel {
     this.isSearching = ko.pureComputed(() => this.searchInput().length);
 
     this.selectedContacts = ko.observableArray([]);
+    this.selectedService = ko.observable();
+
     this.contacts = ko.pureComputed(() => {
       let userEntities = [];
 
@@ -99,9 +102,13 @@ z.viewModel.panel.AppParticipantsViewModel = class AppParticipantsViewModel {
     this.searchServices(this.searchInput());
   }
 
+  clickOnBack() {
+    this._switchToConversationDetails();
+  }
+
   clickOnClose() {
-    this.panelViewModel.switchState(z.viewModel.PanelViewModel.STATE.CONVERSATION_DETAILS);
-    this.resetView();
+    this.mainViewModel.closePanel();
+    this._resetView();
   }
 
   clickOnSelectService(serviceEntity) {
@@ -112,27 +119,30 @@ z.viewModel.panel.AppParticipantsViewModel = class AppParticipantsViewModel {
   }
 
   clickToAddMembers() {
-    if (this.conversationEntity().is_group()) {
-      this.conversationRepository.addMembers(this.conversationEntity(), this.selectedContacts());
-    }
-    this.resetView();
+    this.conversationRepository.addMembers(this.conversationEntity(), this.selectedContacts());
+    this._switchToConversationDetails();
   }
 
   clickToAddService() {
-    this.integrationRepository
-      .addService(this.conversationEntity(), this.selectedService(), 'conversation_details')
-      .then(() => this.resetView());
-  }
-
-  resetView() {
-    this.state(AppParticipantsViewModel.STATE.ADD_PEOPLE);
-    this.selectedContacts.removeAll();
-    this.searchInput('');
+    this.integrationRepository.addService(this.conversationEntity(), this.selectedService(), 'conversation_details');
+    this._switchToConversationDetails();
   }
 
   searchServices(query) {
     if (this.stateAddService()) {
       this.integrationRepository.searchForServices(query, this.searchInput);
     }
+  }
+
+  _resetView() {
+    this.state(AppParticipantsViewModel.STATE.ADD_PEOPLE);
+    this.selectedContacts.removeAll();
+    this.selectedService(undefined);
+    this.searchInput('');
+  }
+
+  _switchToConversationDetails() {
+    this.panelViewModel.switchState(z.viewModel.PanelViewModel.STATE.CONVERSATION_DETAILS);
+    this._resetView();
   }
 };
