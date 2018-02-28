@@ -235,7 +235,7 @@ class ConversationJoin extends Component {
               : this.renderExistentAccount()
             : this.renderInvalidLink()}
         </Content>
-        <Footer style={{justifyContent: 'flex-end', marginBottom: '50px', marginLeft: '20px'}}>
+        <Footer style={{justifyContent: 'flex-end', margin: '20px 0 50px 20px'}}>
           <Link href={'wire.com'}>WIRE.COM</Link>
           <Small> ・ © Wire Swiss GmbH</Small>
         </Footer>
