@@ -65,6 +65,7 @@ module.exports = {
     expand: true,
     options: {
       globals: {
+        cssDest: '../../../deploy',
         dest: '_deploy',
       },
       includesDir: '<%= dir.app.page %>/template',
@@ -133,6 +134,7 @@ module.exports = {
     expand: true,
     options: {
       globals: {
+        cssDest: '../../../dist',
         dest: '_dist',
       },
       includesDir: '<%= dir.app.page %>/template',
@@ -201,6 +203,7 @@ module.exports = {
     expand: true,
     options: {
       globals: {
+        cssDest: '../../../deploy',
         dest: '_prod',
       },
       includesDir: '<%= dir.app.page %>/template',
