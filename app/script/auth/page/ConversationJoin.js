@@ -31,6 +31,7 @@ import {injectIntl} from 'react-intl';
 import ROUTE from '../route';
 import {withRouter} from 'react-router';
 import React, {Component} from 'react';
+import {pathWithParams} from '../util/urlUtil';
 
 const CONVERSATION_CODE = 'code';
 const CONVERSATION_KEY = 'key';
