@@ -33,6 +33,7 @@ import ROUTE from '../route';
 import {withRouter} from 'react-router';
 import React, {Component} from 'react';
 import {pathWithParams} from '../util/urlUtil';
+import {Link as RRLink} from 'react-router-dom';
 
 const CONVERSATION_CODE = 'code';
 const CONVERSATION_KEY = 'key';
@@ -42,6 +43,7 @@ class ConversationJoin extends Component {
     conversationCode: null,
     conversationKey: null,
     enteredName: '',
+    forceNewAccount: false,
     validLink: true,
   };
 
@@ -68,16 +70,20 @@ class ConversationJoin extends Component {
       });
   }
 
+  openWebapp = params => {
+    const link = document.createElement('a');
+    link.href = pathWithParams(ROUTE.LOGIN, params);
+    document.body.appendChild(link); // workaround for Firefox
+    link.click();
+  };
+
+  onLoginClick = () => this.openWebapp('mode=login');
+
   onOpenWireClick = () => {
     this.props
       .doJoinConversationByCode(this.state.conversationKey, this.state.conversationCode)
-      .then(() => {
-        const link = document.createElement('a');
-        link.href = pathWithParams(ROUTE.LOGIN, 'mode=login');
-        document.body.appendChild(link); // workaround for Firefox
-        link.click();
-      })
-      .catch(error => console.error('Failed to create wireless account', error));
+      .then(() => this.openWebapp('mode=login'))
+      .catch(error => console.error('Failed to join conversation with existing account', error));
   };
 
   handleSubmit = event => {
@@ -85,12 +91,7 @@ class ConversationJoin extends Component {
     this.props
       .doRegisterWireless({name: this.state.enteredName})
       .then(() => this.props.doJoinConversationByCode(this.state.conversationKey, this.state.conversationCode))
-      .then(() => {
-        const link = document.createElement('a');
-        link.href = pathWithParams(ROUTE.LOGIN, 'reason=registration');
-        document.body.appendChild(link); // workaround for Firefox
-        link.click();
-      })
+      .then(() => this.openWebapp('reason=registration'))
       .catch(error => console.error('Failed to create wireless account', error));
   };
 
@@ -109,7 +110,11 @@ class ConversationJoin extends Component {
         </Content>
         <Footer style={{justifyContent: 'flex-end', marginBottom: '30px'}}>
           <Small block>
-            <Link href={'/register'} textTransform={'none'} data-uie-name="go-join">
+            <Link
+              onClick={() => this.setState({...this.state, forceNewAccount: true})}
+              textTransform={'none'}
+              data-uie-name="go-join"
+            >
               {_(conversationJoinStrings.existentAccountJoinWithoutLink)}
             </Link>
             {` ${_(conversationJoinStrings.existentAccountJoinWithoutText)}`}
@@ -125,7 +130,7 @@ class ConversationJoin extends Component {
     );
   };
 
-  renderValidLink = () => {
+  renderNewAnonAccount = () => {
     const {intl: {formatMessage: _}} = this.props;
     const {enteredName, error} = this.state;
     return (
@@ -169,13 +174,13 @@ class ConversationJoin extends Component {
         <Footer style={{justifyContent: 'flex-end', marginBottom: '30px'}}>
           <Small block>
             {`${_(conversationJoinStrings.hasAccount)} `}
-            <Link href={'/login'} textTransform={'none'} data-uie-name="go-login">
+            <Link onClick={this.onLoginClick} textTransform={'none'} data-uie-name="go-login">
               {_(conversationJoinStrings.loginLink)}
             </Link>
           </Small>
           <Small block>
             {`${_(conversationJoinStrings.acceptTou)} `}
-            <Link href={'/terms'} textTransform={'none'} data-uie-name="go-tou">
+            <Link href={`${ROUTE.WIRE_ROOT}/legal/terms/personal`} textTransform={'none'} data-uie-name="go-tou">
               {_(conversationJoinStrings.touLink)}
             </Link>
           </Small>
@@ -198,7 +203,7 @@ class ConversationJoin extends Component {
         </Content>
         <Footer style={{justifyContent: 'flex-end', marginBottom: '30px'}}>
           <Small block>
-            <Link href={'/register'} textTransform={'none'} data-uie-name="go-register">
+            <Link to={ROUTE.INDEX} component={RRLink} textTransform={'none'} data-uie-name="go-register">
               {_(conversationJoinStrings.invalidCreateAccountLink)}
             </Link>
             {` ${_(conversationJoinStrings.invalidCreateAccountText)}`}
@@ -225,7 +230,7 @@ class ConversationJoin extends Component {
           <Text bold>{_(conversationJoinStrings.headerText)}</Text>
         </Header>
         {validLink
-          ? isAuthenticated ? this.renderExistentAccount() : this.renderValidLink()
+          ? !isAuthenticated || this.state.forceNewAccount ? this.renderNewAnonAccount() : this.renderExistentAccount()
           : this.renderInvalidLink()}
       </Container>
     );
