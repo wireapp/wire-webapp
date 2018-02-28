@@ -68,6 +68,18 @@ class ConversationJoin extends Component {
       });
   }
 
+  onOpenWireClick = () => {
+    this.props
+      .doJoinConversationByCode(this.state.conversationKey, this.state.conversationCode)
+      .then(() => {
+        const link = document.createElement('a');
+        link.href = pathWithParams(ROUTE.LOGIN, 'mode=login');
+        document.body.appendChild(link); // workaround for Firefox
+        link.click();
+      })
+      .catch(error => console.error('Failed to create wireless account', error));
+  };
+
   handleSubmit = event => {
     event.preventDefault();
     this.props
@@ -92,7 +104,7 @@ class ConversationJoin extends Component {
               {_(conversationJoinStrings.headline)}
             </H1>
             <H2>{_(conversationJoinStrings.existentAccountSubhead)}</H2>
-            <Button>{_(conversationJoinStrings.existentAccountOpenButton)}</Button>
+            <Button onClick={this.onOpenWireClick}>{_(conversationJoinStrings.existentAccountOpenButton)}</Button>
           </Container>
         </Content>
         <Footer style={{justifyContent: 'flex-end', marginBottom: '30px'}}>
