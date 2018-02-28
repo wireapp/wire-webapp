@@ -70,7 +70,11 @@ z.conversation.ConversationStateHandler = class ConversationStateHandler {
             .putConversationAccess(conversationEntity.id, accessModes, accessRole)
             .then(() => conversationEntity.accessState(accessState))
             .catch(() => {
-              // show something went wrong error
+              const messageStringId = changeToGuestRoom
+                ? z.string.modalConversationGuestOptionsAllowGuestMessage
+                : z.string.modalConversationGuestOptionsDisableGuestMessage;
+
+              this._showModal(messageStringId);
             });
         }
       }
@@ -84,9 +88,7 @@ z.conversation.ConversationStateHandler = class ConversationStateHandler {
     this.conversationService
       .getConversationCode(conversationEntity.id)
       .then(response => this.conversationMapper.mapAccessCode(conversationEntity, response))
-      .catch(() => {
-        // show something went wrong error
-      });
+      .catch(() => this._showModal(z.string.modalConversationGuestOptionsGetCodeMessage));
   }
 
   requestAccessCode(conversationEntity) {
@@ -96,18 +98,14 @@ z.conversation.ConversationStateHandler = class ConversationStateHandler {
         const accessCode = response.data || response;
         this.conversationMapper.mapAccessCode(conversationEntity, accessCode);
       })
-      .catch(() => {
-        // show something went wrong error
-      });
+      .catch(() => this._showModal(z.string.modalConversationGuestOptionsRequestCodeMessage));
   }
 
   revokeAccessCode(conversationEntity) {
     this.conversationService
       .deleteConversationCode(conversationEntity.id)
       .then(() => conversationEntity.accessCode(undefined))
-      .catch(() => {
-        // show something went wrong error
-      });
+      .catch(() => this._showModal(z.string.modalConversationGuestOptionsRevokeCodeMessage));
   }
 
   /**
@@ -150,5 +148,10 @@ z.conversation.ConversationStateHandler = class ConversationStateHandler {
           }
         });
     }
+  }
+
+  _showModal(messageStringId) {
+    const modalOptions = {text: {message: z.l10n.text(messageStringId)}};
+    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
   }
 };
