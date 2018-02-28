@@ -19,22 +19,6 @@
 
 'use strict';
 
-ko.components.register('guest-icon', {
-  template: `
-  <svg width="14" height="16" viewBox="0 0 14 16">
-    <path d="M5 1a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3c0-1.1.9-2 2-2h3zm.5 1a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1h-3zM7 9a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm-2 1a2 2 0 0 0-2 2v1h8v-1a2 2 0 0 0-2-2H5z"></path>
-  </svg>
-  `,
-});
-
-ko.components.register('group-icon', {
-  template: `
-  <svg width="16" height="16" viewBox="0 0 16 16">
-    <path d="M8 4a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 12a2 2 0 1 1 0-4 2 2 0 0 1 0 4zM2 7a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm12 0a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0-6a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"></path>
-  </svg>
-  `,
-});
-
 ko.components.register('add-participants-icon', {
   template: `
   <svg width="16" height="16" viewBox="0 0 16 16">
@@ -51,26 +35,10 @@ ko.components.register('archive-icon', {
   `,
 });
 
-ko.components.register('delete-icon', {
+ko.components.register('arrow-left-icon', {
   template: `
   <svg width="14" height="16" viewBox="0 0 14 16">
-    <path d="M5 2a2 2 0 1 1 4 0h4a1 1 0 0 1 1 1v1H0V3a1 1 0 0 1 1-1h4zM1 6h12l-.8 8c-.11 1.1-1.09 2-2.2 2H4c-1.1 0-2.09-.89-2.2-2L1 6zm5.5 2v5.54h1V8h-1z"></path>
-  </svg>
-  `,
-});
-
-ko.components.register('leave-icon', {
-  template: `
-  <svg width="16" height="16" viewBox="0 0 16 16">
-    <path id="a" d="M2 14h7v2H0V0h9v2H2v12zm3-7v2h7v4l4-5-4-5v4H5z"></path>
-  </svg>
-  `,
-});
-
-ko.components.register('mute-icon', {
-  template: `
-  <svg width="16" height="16" viewBox="0 0 16 16">
-    <path d="M2.2 10.74l1.74-7.5h.04C4.23 1.4 5.93 0 8 0c2.07 0 3.77 1.4 4.02 3.23h.04l.15.68 1.8-1.23.84-.57L16 3.75l-.83.57-13.18 9-.84.57L0 12.25l.83-.57 1.38-.94zM6.86 12h7.23l-.98-4.26L6.85 12zm3.18 2c0 1.1-.91 2-2.03 2-1.12 0-2.03-.9-2.03-2h4.06z"></path>
+      <path d="M4.83 9l5.24 5.24-1.41 1.41L1 8 8.66.34l1.41 1.41L4.83 7H15v2z"></path>
   </svg>
   `,
 });
@@ -91,10 +59,18 @@ ko.components.register('close-icon', {
   `,
 });
 
-ko.components.register('arrow-left-icon', {
+ko.components.register('delete-icon', {
   template: `
   <svg width="14" height="16" viewBox="0 0 14 16">
-      <path d="M4.83 9l5.24 5.24-1.41 1.41L1 8 8.66.34l1.41 1.41L4.83 7H15v2z"></path>
+    <path d="M5 2a2 2 0 1 1 4 0h4a1 1 0 0 1 1 1v1H0V3a1 1 0 0 1 1-1h4zM1 6h12l-.8 8c-.11 1.1-1.09 2-2.2 2H4c-1.1 0-2.09-.89-2.2-2L1 6zm5.5 2v5.54h1V8h-1z"></path>
+  </svg>
+  `,
+});
+
+ko.components.register('disclose-icon', {
+  template: `
+  <svg width="5" height="8" viewBox="0 0 5 8">
+    <path d="M0 .92L.94 0 5 4 .94 8 0 7.08 3.13 4z"></path>
   </svg>
   `,
 });
@@ -107,10 +83,34 @@ ko.components.register('edit-icon', {
   `,
 });
 
-ko.components.register('disclose-icon', {
+ko.components.register('group-icon', {
   template: `
-  <svg width="5" height="8" viewBox="0 0 5 8">
-    <path d="M0 .92L.94 0 5 4 .94 8 0 7.08 3.13 4z"></path>
+  <svg width="16" height="16" viewBox="0 0 16 16">
+    <path d="M8 4a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 12a2 2 0 1 1 0-4 2 2 0 0 1 0 4zM2 7a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm12 0a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0-6a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"></path>
+  </svg>
+  `,
+});
+
+ko.components.register('guest-icon', {
+  template: `
+  <svg width="14" height="16" viewBox="0 0 14 16">
+    <path d="M5 1a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3c0-1.1.9-2 2-2h3zm.5 1a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1h-3zM7 9a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm-2 1a2 2 0 0 0-2 2v1h8v-1a2 2 0 0 0-2-2H5z"></path>
+  </svg>
+  `,
+});
+
+ko.components.register('leave-icon', {
+  template: `
+  <svg width="16" height="16" viewBox="0 0 16 16">
+    <path id="a" d="M2 14h7v2H0V0h9v2H2v12zm3-7v2h7v4l4-5-4-5v4H5z"></path>
+  </svg>
+  `,
+});
+
+ko.components.register('mute-icon', {
+  template: `
+  <svg width="16" height="16" viewBox="0 0 16 16">
+    <path d="M2.2 10.74l1.74-7.5h.04C4.23 1.4 5.93 0 8 0c2.07 0 3.77 1.4 4.02 3.23h.04l.15.68 1.8-1.23.84-.57L16 3.75l-.83.57-13.18 9-.84.57L0 12.25l.83-.57 1.38-.94zM6.86 12h7.23l-.98-4.26L6.85 12zm3.18 2c0 1.1-.91 2-2.03 2-1.12 0-2.03-.9-2.03-2h4.06z"></path>
   </svg>
   `,
 });

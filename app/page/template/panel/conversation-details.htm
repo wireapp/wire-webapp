@@ -89,20 +89,20 @@
         <!-- /ko -->
         <!-- ko if: !conversationEntity().is_request() && !conversationEntity().is_cleared() -->
           <div class="panel__action-item"  data-bind="click: clickToClear" data-uie-name="do-clear">
-              <delete-icon class="panel__action-item__icon"></delete-icon>
-              <div class="panel__action-item__text" data-bind="l10n_text: z.string.conversationDetailsActionClear"></div>
+            <delete-icon class="panel__action-item__icon"></delete-icon>
+            <div class="panel__action-item__text" data-bind="l10n_text: z.string.conversationDetailsActionClear"></div>
           </div>
         <!-- /ko -->
         <!-- ko if: !conversationEntity().is_group() && (conversationEntity().firstUserEntity().is_connected() || conversationEntity().firstUserEntity().is_request()) -->
           <div class="panel__action-item"  data-bind="click: clickToBlock" data-uie-name="do-block">
-              <block-icon class="panel__action-item__icon"></block-icon>
+            <block-icon class="panel__action-item__icon"></block-icon>
             <div class="panel__action-item__text" data-bind="l10n_text: z.string.conversationDetailsActionBlock"></div>
           </div>
         <!-- /ko -->
         <!-- ko if: conversationEntity().is_group() && !conversationEntity().removed_from_conversation() -->
           <div class="panel__action-item"  data-bind="click: clickToLeave" data-uie-name="do-leave">
-              <leave-icon class="panel__action-item__icon"></leave-icon>
-              <div class="panel__action-item__text" data-bind="l10n_text: z.string.conversationDetailsActionLeave"></div>
+            <leave-icon class="panel__action-item__icon"></leave-icon>
+            <div class="panel__action-item__text" data-bind="l10n_text: z.string.conversationDetailsActionLeave"></div>
           </div>
         <!-- /ko -->
       </div>
