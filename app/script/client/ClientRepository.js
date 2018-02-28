@@ -457,22 +457,25 @@ z.client.ClientRepository = class ClientRepository {
 
   logoutClient() {
     if (this.currentClient()) {
-      if (this.currentClient().type === z.client.ClientType.PERMANENT) {
-        return amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.OPTION, {
-          action: clearData => {
-            return amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SIGN_OUT_REASON.USER_REQUESTED, clearData);
-          },
-          text: {
-            action: z.l10n.text(z.string.modalAccountLogoutAction),
-            option: z.l10n.text(z.string.modalAccountLogoutOption),
-            title: z.l10n.text(z.string.modalAccountLogoutHeadline),
-          },
-          warning: false,
-        });
+      const isTemporaryClient = this.currentClient().type === z.client.ClientType.TEMPORARY;
+      if (isTemporaryClient) {
+        return this.deleteTemporaryClient().then(() =>
+          amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SIGN_OUT_REASON.USER_REQUESTED, true)
+        );
       }
-      return this.deleteTemporaryClient().then(() =>
-        amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SIGN_OUT_REASON.USER_REQUESTED, true)
-      );
+
+      amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.OPTION, {
+        action: clearData => {
+          return amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SIGN_OUT_REASON.USER_REQUESTED, clearData);
+        },
+        preventClose: true,
+        text: {
+          action: z.l10n.text(z.string.modalAccountLogoutAction),
+          option: z.l10n.text(z.string.modalAccountLogoutOption),
+          title: z.l10n.text(z.string.modalAccountLogoutHeadline),
+        },
+        warning: false,
+      });
     }
   }
 
@@ -497,6 +500,7 @@ z.client.ClientRepository = class ClientRepository {
           amplify.subscribe(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
         });
       },
+      preventClose: true,
       text: {
         action: z.l10n.text(z.string.modalAccountRemoveDeviceAction),
         input: z.l10n.text(z.string.modalAccountRemoveDevicePlaceholder),

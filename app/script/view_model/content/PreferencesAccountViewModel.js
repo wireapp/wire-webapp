@@ -208,6 +208,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
       amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACCOUNT_NEW_DEVICES, {
         close: () => this.new_clients.removeAll(),
         data: this.new_clients(),
+        preventClose: true,
         secondary: () => {
           amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICES);
         },
