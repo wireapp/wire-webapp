@@ -25,6 +25,7 @@ z.string.fr.nonexistentUser = 'Utilisateur supprimé';
 z.string.fr.and = 'et';
 z.string.fr.enumerationAnd = ', et ';
 
+//=L'application se charge
 z.string.fr.alertUploadFileFormat = 'Cette image ne peut être utilisée. Veuillez choisir un fichier PNG ou JPEG.';
 z.string.fr.alertUploadTooSmall = 'Cette image ne peut être utilisée. Veuillez choisir une image qui mesure au moins 320 x 320 pixels.';
 z.string.fr.alertUploadTooLarge = 'Cette image est trop lourde. Vous pouvez envoyer des fichiers allant jusqu’à {{number}} Mo.';
