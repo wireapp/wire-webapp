@@ -222,6 +222,12 @@ z.string.modalConversationRevokeLinkAction = 'Revoke link';
 z.string.modalConversationRevokeLinkHeadline = 'Revoking the link?';
 z.string.modalConversationRevokeLinkMessage = 'New guests will not be able to join with this link. Current guests will still have access.';
 
+z.string.modalConversationGuestOptionsAllowGuestMessage = 'Could not allow guests. Please try again.';
+z.string.modalConversationGuestOptionsDisableGuestMessage = 'Could not remove guests. Please try again.';
+z.string.modalConversationGuestOptionsGetCodeMessage = 'Could not get access code.';
+z.string.modalConversationGuestOptionsRequestCodeMessage = 'Could not request access code. Please try again.';
+z.string.modalConversationGuestOptionsRevokeCodeMessage = 'Could not revoke access code. Please try again.';
+
 z.string.modalConversationTooManyMembersHeadline = 'Full house';
 z.string.modalConversationTooManyMembersMessage = 'Up to {{number1}} people can join a conversation. There is room for {{number2}} more people in here.';
 

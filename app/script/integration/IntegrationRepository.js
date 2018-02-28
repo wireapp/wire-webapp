@@ -87,6 +87,7 @@ z.integration.IntegrationRepository = class IntegrationRepository {
       this.getServiceById(providerId, serviceId).then(serviceEntity => {
         amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
           action: () => this.createConversationWithService(serviceEntity, 'url_param'),
+          preventClose: true,
           text: {
             action: z.l10n.text(z.string.modalConversationAddBotAction),
             message: z.l10n.text(z.string.modalConversationAddBotMessage, serviceEntity.name),

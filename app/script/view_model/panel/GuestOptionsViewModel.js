@@ -39,6 +39,8 @@ z.viewModel.panel.GuestOptionsViewModel = class GuestOptionsViewModel {
         this.stateHandler.getAccessCode(conversationEntity);
       }
     });
+
+    this.requestOngoing = ko.observable(false);
   }
 
   toggleAccessState() {
@@ -48,18 +50,29 @@ z.viewModel.panel.GuestOptionsViewModel = class GuestOptionsViewModel {
         ? z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM
         : z.conversation.ACCESS_STATE.TEAM.TEAM_ONLY;
 
+      const _changeAccessState = () => {
+        if (!this.requestOngoing()) {
+          this.requestOngoing(true);
+
+          this.stateHandler
+            .changeAccessState(conversationEntity, newAccessState)
+            .then(() => this.requestOngoing(false));
+        }
+      };
+
       if (this.isTeamOnly()) {
-        this.stateHandler.changeAccessState(conversationEntity, newAccessState);
-      } else {
-        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
-          action: () => this.stateHandler.changeAccessState(conversationEntity, newAccessState),
-          text: {
-            action: z.l10n.text(z.string.modalConversationRemoveGuestsAction),
-            message: z.l10n.text(z.string.modalConversationRemoveGuestsMessage),
-            title: z.l10n.text(z.string.modalConversationRemoveGuestsHeadline),
-          },
-        });
+        return _changeAccessState();
       }
+
+      amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
+        action: () => _changeAccessState(),
+        preventClose: true,
+        text: {
+          action: z.l10n.text(z.string.modalConversationRemoveGuestsAction),
+          message: z.l10n.text(z.string.modalConversationRemoveGuestsMessage),
+          title: z.l10n.text(z.string.modalConversationRemoveGuestsHeadline),
+        },
+      });
     }
   }
 
@@ -69,12 +82,25 @@ z.viewModel.panel.GuestOptionsViewModel = class GuestOptionsViewModel {
       ? Promise.resolve()
       : this.stateHandler.changeAccessState(this.conversationEntity(), z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM);
 
-    accessStatePromise.then(() => this.stateHandler.requestAccessCode(this.conversationEntity()));
+    accessStatePromise.then(() => {
+      if (!this.requestOngoing()) {
+        this.requestOngoing(true);
+
+        this.stateHandler.requestAccessCode(this.conversationEntity()).then(() => this.requestOngoing(false));
+      }
+    });
   }
 
   revokeAccessCode() {
     amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
-      action: () => this.stateHandler.revokeAccessCode(this.conversationEntity()),
+      action: () => {
+        if (!this.requestOngoing()) {
+          this.requestOngoing(true);
+
+          this.stateHandler.revokeAccessCode(this.conversationEntity()).then(() => this.requestOngoing(false));
+        }
+      },
+      preventClose: true,
       text: {
         action: z.l10n.text(z.string.modalConversationRevokeLinkAction),
         message: z.l10n.text(z.string.modalConversationRevokeLinkHeadline),
