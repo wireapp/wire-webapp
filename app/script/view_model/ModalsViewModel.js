@@ -81,6 +81,7 @@ z.viewModel.ModalsViewModel = class ModalsViewModel {
         this.logger.warn(`Modal of type '${type}' is not supported`);
     }
 
+    const {preventClose = false, action: actionFn, close: closeFn, secondary: secondaryFn} = options;
     const modal = new zeta.webapp.module.Modal(type, null, () => {
       $(type)
         .find('.modal-close')
@@ -96,8 +97,8 @@ z.viewModel.ModalsViewModel = class ModalsViewModel {
 
       modal.destroy();
 
-      if (typeof options.close === 'function') {
-        options.close();
+      if (typeof closeFn === 'function') {
+        closeFn();
       }
     });
 
@@ -109,8 +110,8 @@ z.viewModel.ModalsViewModel = class ModalsViewModel {
       .find('.modal-secondary')
       .click(() => {
         modal.hide(() => {
-          if (typeof options.secondary === 'function') {
-            options.secondary();
+          if (typeof secondaryFn === 'function') {
+            secondaryFn();
           }
         });
       });
@@ -118,17 +119,21 @@ z.viewModel.ModalsViewModel = class ModalsViewModel {
     $(type)
       .find('.modal-action')
       .click(() => {
-        const checkbox = $(type).find('.modal-checkbox');
-        const input = $(type).find('.modal-input');
+        if (typeof actionFn === 'function') {
+          const checkbox = $(type).find('.modal-checkbox');
+          const input = $(type).find('.modal-input');
 
-        if (checkbox.length) {
-          options.action(checkbox.is(':checked'));
-          checkbox.prop('checked', false);
-        } else if (input.length) {
-          options.action(input.val());
-          input.val('');
-        } else if (typeof options.action === 'function') {
-          options.action();
+          if (checkbox.length) {
+            actionFn(checkbox.is(':checked'));
+            return checkbox.prop('checked', false);
+          }
+
+          if (input.length) {
+            actionFn(input.val());
+            return input.val('');
+          }
+
+          actionFn();
         }
 
         modal.hide();
@@ -138,7 +143,7 @@ z.viewModel.ModalsViewModel = class ModalsViewModel {
       this.logger.info(`Show modal of type '${type}'`);
     }
 
-    modal.autoclose = Boolean(options.preventClose);
+    modal.autoclose = !preventClose;
     modal.toggle();
   }
 

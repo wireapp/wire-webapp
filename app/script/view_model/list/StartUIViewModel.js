@@ -196,7 +196,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
     this.userBubbleLastId = undefined;
 
     this.shouldUpdateScrollbar = ko
-      .computed(() => this.listViewModel.last_update())
+      .computed(() => this.listViewModel.lastUpdate())
       .extend({notify: 'always', rateLimit: 500});
 
     this.shouldUpdateServiceScrollbar = ko
@@ -360,7 +360,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
     $('user-input input').blur();
 
     amplify.publish(z.event.WebApp.SEARCH.HIDE);
-    this.listViewModel.switch_list(z.viewModel.ListViewModel.STATE.CONVERSATIONS);
+    this.listViewModel.switchList(z.viewModel.ListViewModel.STATE.CONVERSATIONS);
 
     if (this.userBubble) {
       this.userBubble.hide();

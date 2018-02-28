@@ -337,18 +337,3 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
     this.logger.info(`Remote video is in '${detectedVideoMode}' mode`);
   }
 };
-
-// http://stackoverflow.com/questions/28762211/unable-to-mute-html5-video-tag-in-firefox
-ko.bindingHandlers.mute_media_element = {
-  update(element, valueAccessor) {
-    if (valueAccessor()) {
-      element.muted = true;
-    }
-  },
-};
-
-ko.bindingHandlers.source_stream = {
-  update(element, valueAccessor) {
-    element.srcObject = valueAccessor();
-  },
-};
