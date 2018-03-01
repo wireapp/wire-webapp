@@ -27,10 +27,15 @@ z.viewModel.PanelViewModel = class PanelViewModel {
     return {
       ADD_PARTICIPANTS: 'PanelViewModel.STATE.ADD_PARTICIPANTS',
       CONVERSATION_DETAILS: 'PanelViewModel.STATE.CONVERSATION_DETAILS',
+      EMPTY: 'PanelViewModel.STATE.EMPTY',
       GROUP_PARTICIPANT: 'PanelViewModel.STATE.GROUP_PARTICIPANT',
       GUEST_OPTIONS: 'PanelViewModel.STATE.GUEST_OPTIONS',
       PARTICIPANT_DEVICES: 'PanelViewModel.STATE.DEVICES',
     };
+  }
+
+  static get CODE_STATES() {
+    return [z.viewModel.PanelViewModel.STATE.GUEST_OPTIONS, z.viewModel.PanelViewModel.STATE.CONVERSATION_DETAILS];
   }
 
   /**
@@ -46,7 +51,7 @@ z.viewModel.PanelViewModel = class PanelViewModel {
     this.mainViewModel = mainViewModel;
     this.logger = new z.util.Logger('z.viewModel.PanelViewModel', z.config.LOGGER.OPTIONS);
 
-    this.state = ko.observable(PanelViewModel.STATE.CONVERSATION_DETAILS);
+    this.state = ko.observable(PanelViewModel.STATE.EMPTY);
 
     this.conversationEntity = repositories.conversation.active_conversation;
     this.conversationEntity.subscribe(() => {
@@ -104,19 +109,26 @@ z.viewModel.PanelViewModel = class PanelViewModel {
     if (addPeople && !this.conversationEntity().is_guest()) {
       const isStateAddParticipants = this.state() === PanelViewModel.STATE.ADD_PARTICIPANTS;
       if (isStateAddParticipants && this.mainViewModel.isPanelOpen()) {
-        return this.mainViewModel.closePanel();
+        return this._closePanel();
       }
 
-      this.switchState(PanelViewModel.STATE.ADD_PARTICIPANTS);
-      return this.mainViewModel.openPanel();
+      return this._openPanel(PanelViewModel.STATE.ADD_PARTICIPANTS);
     }
 
     const isStateConversationDetails = this.state() === PanelViewModel.STATE.CONVERSATION_DETAILS;
     if (isStateConversationDetails && this.mainViewModel.isPanelOpen()) {
-      return this.mainViewModel.closePanel();
+      return this._closePanel();
     }
 
-    this.switchState(PanelViewModel.STATE.CONVERSATION_DETAILS);
-    return this.mainViewModel.openPanel();
+    return this._openPanel(PanelViewModel.STATE.CONVERSATION_DETAILS);
+  }
+
+  _closePanel() {
+    this.mainViewModel.closePanel().then(() => this.switchState(PanelViewModel.STATE.EMPTY));
+  }
+
+  _openPanel(newState) {
+    this.switchState(newState);
+    this.mainViewModel.openPanel();
   }
 };

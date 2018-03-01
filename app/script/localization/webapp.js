@@ -227,6 +227,7 @@ z.string.modalConversationGuestOptionsDisableGuestMessage = 'Could not remove gu
 z.string.modalConversationGuestOptionsGetCodeMessage = 'Could not get access code.';
 z.string.modalConversationGuestOptionsRequestCodeMessage = 'Could not request access code. Please try again.';
 z.string.modalConversationGuestOptionsRevokeCodeMessage = 'Could not revoke access code. Please try again.';
+z.string.modalConversationGuestOptionsToggleGuestsMessage = 'Could not change guests state.';
 
 z.string.modalConversationTooManyMembersHeadline = 'Full house';
 z.string.modalConversationTooManyMembersMessage = 'Up to {{number1}} people can join a conversation. There is room for {{number2}} more people in here.';
