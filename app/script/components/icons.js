@@ -67,6 +67,14 @@ ko.components.register('delete-icon', {
   `,
 });
 
+ko.components.register('devices-icon', {
+  template: `
+  <svg width="16" height="16" viewBox="0 0 16 16">
+    <path d="M11 0H1a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1h-3V1a1 1 0 0 0-1-1zm-1 5H9a1 1 0 0 0-1 1v8H2.5a.5.5 0 0 1-.5-.5v-11c0-.28.23-.5.5-.5h7c.28 0 .5.23.5.5V5zm-4 8a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm6 2a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"></path>
+  </svg>
+  `,
+});
+
 ko.components.register('disclose-icon', {
   template: `
   <svg width="5" height="8" viewBox="0 0 5 8">
@@ -111,14 +119,6 @@ ko.components.register('mute-icon', {
   template: `
   <svg width="16" height="16" viewBox="0 0 16 16">
     <path d="M2.2 10.74l1.74-7.5h.04C4.23 1.4 5.93 0 8 0c2.07 0 3.77 1.4 4.02 3.23h.04l.15.68 1.8-1.23.84-.57L16 3.75l-.83.57-13.18 9-.84.57L0 12.25l.83-.57 1.38-.94zM6.86 12h7.23l-.98-4.26L6.85 12zm3.18 2c0 1.1-.91 2-2.03 2-1.12 0-2.03-.9-2.03-2h4.06z"></path>
-  </svg>
-  `,
-});
-
-ko.components.register('devices-icon', {
-  template: `
-  <svg width="16" height="16" viewBox="0 0 16 16">
-    <path d="M11 0H1a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1h-3V1a1 1 0 0 0-1-1zm-1 5H9a1 1 0 0 0-1 1v8H2.5a.5.5 0 0 1-.5-.5v-11c0-.28.23-.5.5-.5h7c.28 0 .5.23.5.5V5zm-4 8a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm6 2a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"></path>
   </svg>
   `,
 });
