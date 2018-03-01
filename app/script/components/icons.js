@@ -115,6 +115,14 @@ ko.components.register('mute-icon', {
   `,
 });
 
+ko.components.register('devices-icon', {
+  template: `
+  <svg width="16" height="16" viewBox="0 0 16 16">
+    <path d="M11 0H1a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1h-3V1a1 1 0 0 0-1-1zm-1 5H9a1 1 0 0 0-1 1v8H2.5a.5.5 0 0 1-.5-.5v-11c0-.28.23-.5.5-.5h7c.28 0 .5.23.5.5V5zm-4 8a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm6 2a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"></path>
+  </svg>
+  `,
+});
+
 ko.components.register('verified-icon', {
   template: `
   <svg width="14" height="16" viewBox="0 0 14 16">

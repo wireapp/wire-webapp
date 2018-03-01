@@ -48,12 +48,12 @@ ko.components.register('participant-item', {
       <div class="participant-item-content">
         <!-- ko if: isUser && selfUser().is_team_member() -->
           <availability-state class="participant-item-content-availability participant-item-content-name"
-            data-uie-name="status-availability"
+            data-uie-name="status-name"
             params="availability: participant.availability, label: participant.name"></availability-state>
         <!-- /ko -->
 
         <!-- ko if: isService || !selfUser().is_team_member() -->
-          <div class="participant-item-content-name" data-bind="text: participant.name"></div>
+          <div class="participant-item-content-name" data-bind="text: participant.name" data-uie-name="status-name"></div>
         <!-- /ko -->
         <div class="participant-item-content-info">
           <!-- ko if: contentInfo -->
@@ -72,7 +72,8 @@ ko.components.register('participant-item', {
       <!-- ko if: canSelect -->
         <div class="search-list-item-select icon-check" data-bind="css: {'selected': isSelected}" data-uie-name="status-selected"></div>
       <!-- /ko -->
-</div>
+      <disclose-icon></disclose-icon>
+    </div>
   `,
   viewModel: z.components.ParticipantItem,
 });

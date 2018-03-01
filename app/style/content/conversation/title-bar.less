@@ -19,8 +19,7 @@
 
 .conversation-title-bar {
   align-items: center;
-  background-color: @app-bg;
-  border-bottom: 1px solid fade(@graphite, 12%);
+  background-color: #fff;
   display: flex;
   height: @content-title-bar-height;
   justify-content: center;
@@ -32,7 +31,7 @@
   .flex-center;
   cursor: pointer;
   display: flex;
-  max-width: 50%;
+  flex-grow: 1;
   height: 100%;
   padding: 0 16px;
 }
@@ -41,18 +40,12 @@
   align-items: center;
   display: flex;
   height: 100%;
-  position: absolute;
-  left: 0;
-  top: 0;
 }
 
 .conversation-title-bar-icons {
   align-items: center;
   display: flex;
   height: 100%;
-  position: absolute;
-  right: 0;
-  top: 0;
 }
 
 .conversation-title-bar-icon {

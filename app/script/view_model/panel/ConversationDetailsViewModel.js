@@ -46,6 +46,16 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
 
     this.hasConversation = ko.pureComputed(() => Boolean(this.conversationEntity()));
 
+    this.availabilityLabel = ko.pureComputed(() => {
+      if (this.conversationEntity() || this.conversationEntity().is_one2one()) {
+        const user = this.conversationEntity().firstUserEntity();
+        const availabilitySetToNone = user.availability() === z.user.AvailabilityType.NONE;
+        if (!availabilitySetToNone) {
+          return z.user.AvailabilityMapper.nameFromType(user.availability());
+        }
+      }
+    });
+
     ko.computed(() => {
       if (this.hasConversation()) {
         this.serviceParticipants.removeAll();
