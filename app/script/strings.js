@@ -208,6 +208,22 @@ export const conversationJoinStrings = defineMessages({
     defaultMessage:
       'This browser is not supported.<br />Download the latest version of <b>Google Chrome, Mozilla Firefox, Opera</b> or <b>Microsoft Edge.</b>',
   },
+  appAlreadyOpenModalHeadline: {
+    id: 'conversationJoin.appAlreadyOpenModalHeadline',
+    defaultMessage: 'Wire is already open in this browser',
+  },
+  appAlreadyOpenModalText: {
+    id: 'conversationJoin.appAlreadyOpenModalText',
+    defaultMessage: 'If you continue here, you will be logged out on the other tab.',
+  },
+  appAlreadyOpenModalCancelButton: {
+    id: 'conversationJoin.appAlreadyOpenModalCancelButton',
+    defaultMessage: 'Cancel',
+  },
+  appAlreadyOpenModalContinueButton: {
+    id: 'conversationJoin.appAlreadyOpenModalContinueButton',
+    defaultMessage: 'Continue',
+  },
   existentAccountSubhead: {
     id: 'conversationJoin.subheadExistentAccount',
     defaultMessage: 'Guest rooms let you have conversations with people who are not on your team.',

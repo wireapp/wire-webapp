@@ -439,9 +439,9 @@
   dependencies:
     "@types/node" "9.4.6"
 
-"@wireapp/react-ui-kit@1.0.5":
-  version "1.0.5"
-  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-1.0.5.tgz#80df1d6494eacb27f27ab27f12777e62f21f2049"
+"@wireapp/react-ui-kit@1.0.7":
+  version "1.0.7"
+  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-1.0.7.tgz#a682cea45ad9f02f0f8d7508f1f1b64e91793a1b"
   dependencies:
     color "3.0.0"
     gulp-concat "2.6.1"

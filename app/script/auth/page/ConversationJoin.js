@@ -270,14 +270,16 @@ class ConversationJoin extends Component {
         {isAppAlreadyOpen && (
           <Modal onClose={() => this.setState({...this.state, isAppAlreadyOpen: false})}>
             <Container style={{maxWidth: '400px'}}>
-              <H2>Wire is already open in this browser</H2>
-              <Text>If you continue here, you will be logged out on the other tab.</Text>
+              <H3 style={{fontWeight: '500'}}>{_(conversationJoinStrings.appAlreadyOpenModalHeadline)}</H3>
+              <Text>{_(conversationJoinStrings.appAlreadyOpenModalText)}</Text>
               <Columns style={{marginTop: '20px'}}>
                 <Column style={{textAlign: 'center'}}>
-                  <Button backgroundColor={COLOR.GRAY}>Cancel</Button>
+                  <Button backgroundColor={COLOR.GRAY}>
+                    {_(conversationJoinStrings.appAlreadyOpenModalCancelButton)}
+                  </Button>
                 </Column>
                 <Column style={{textAlign: 'center'}}>
-                  <Button>Continue</Button>
+                  <Button>{_(conversationJoinStrings.appAlreadyOpenModalContinueButton)}</Button>
                 </Column>
               </Columns>
             </Container>
