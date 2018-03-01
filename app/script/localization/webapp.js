@@ -347,6 +347,19 @@ z.string.groupCreationParticipantsHeader = 'Add people';
 z.string.groupCreationParticipantsHeaderWithCounter = 'Add people ({{number}})';
 z.string.groupCreationParticipantsPlaceholder = 'Search by name';
 
+z.string.groupParticipantActionBlock = 'Block';
+z.string.groupParticipantActionCancelRequest = 'Cancel request';
+z.string.groupParticipantActionDevices = 'Devices';
+z.string.groupParticipantActionIgnoreRequest = 'Ignore request';
+z.string.groupParticipantActionIncomingRequest = 'Accept request';
+z.string.groupParticipantActionLeave = 'Leave';
+z.string.groupParticipantActionOpenConversation = 'Open conversation';
+z.string.groupParticipantActionPending = 'Pending';
+z.string.groupParticipantActionRemove = 'Remove';
+z.string.groupParticipantActionSelfProfile = 'Profile';
+z.string.groupParticipantActionSendRequest = 'Connect';
+z.string.groupParticipantActionUnblock = 'Unblock';
+
 // Guest room
 z.string.guestRoomConversationName = 'Guest room';
 z.string.guestRoomToggleName = 'Allow guests';
@@ -444,6 +457,7 @@ z.string.conversationDetailsActionBlock = 'Block';
 z.string.conversationDetailsActionCancelRequest = 'Cancel request';
 z.string.conversationDetailsActionClear = 'Delete content';
 z.string.conversationDetailsActionCreateGroup = 'Create group';
+z.string.conversationDetailsActionDevices = 'Devices';
 z.string.conversationDetailsActionGuestOptions = 'Guest options';
 z.string.conversationDetailsActionLeave = 'Leave';
 z.string.conversationDetailsGuestsOff = 'Off';
@@ -458,6 +472,7 @@ z.string.conversationDetailsServices = 'Services';
 // Panel: Guest options
 
 // Panel: Group participant
+z.string.groupParticipantActionDevices = 'Devices';
 z.string.groupParticiapntServiceRemovalButton = 'Remove service';
 
 // User profile actions

@@ -42,9 +42,12 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     this.on_session_reset_click = this.on_session_reset_click.bind(this);
     this.should_hide_user_avatar = this.should_hide_user_avatar.bind(this);
 
+    this.mainViewModel = mainViewModel;
     this.conversation_repository = repositories.conversation;
     this.user_repository = repositories.user;
     this.logger = new z.util.Logger('z.viewModel.content.MessageListViewModel', z.config.LOGGER.OPTIONS);
+
+    this.actionsViewModel = this.mainViewModel.actions;
 
     this.conversation = ko.observable(new z.entity.Conversation());
     this.center_messages = ko.pureComputed(() => {
@@ -528,22 +531,9 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
   }
 
   click_on_cancel_request(messageEntity) {
-    const userEntity = messageEntity.otherUser();
-
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
-      action: () => {
-        const conversationEntity = this.conversation_repository.active_conversation();
-        const nextConversationEntity = this.conversation_repository.get_next_conversation(conversationEntity);
-
-        this.user_repository.cancel_connection_request(userEntity, nextConversationEntity);
-      },
-      text: {
-        action: z.l10n.text(z.string.modalConnectCancelAction),
-        message: z.l10n.text(z.string.modalConnectCancelMessage, userEntity.first_name()),
-        secondary: z.l10n.text(z.string.modalConnectCancelSecondary),
-        title: z.l10n.text(z.string.modalConnectCancelHeadline),
-      },
-    });
+    const conversationEntity = this.conversation_repository.active_conversation();
+    const nextConversationEntity = this.conversation_repository.get_next_conversation(conversationEntity);
+    this.actionsViewModel.cancelConnectionRequest(messageEntity.otherUser(), nextConversationEntity);
   }
 
   click_on_like(message_et, button = true) {
@@ -608,36 +598,16 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
 
     if (message_et.is_deletable()) {
       entries.push({
-        click: () => {
-          amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
-            action: () => this.conversation_repository.delete_message(this.conversation(), message_et),
-            text: {
-              action: z.l10n.text(z.string.modalConversationDeleteMessageAction),
-              message: z.l10n.text(z.string.modalConversationDeleteMessageMessage),
-              title: z.l10n.text(z.string.modalConversationDeleteMessageHeadline),
-            },
-          });
-        },
+        click: () => this.actionsViewModel.deleteMessage(this.conversation(), message_et),
         label: z.string.conversationContextMenuDelete,
       });
     }
 
-    if (
-      message_et.user().is_me &&
-      !this.conversation().removed_from_conversation() &&
-      message_et.status() !== z.message.StatusType.SENDING
-    ) {
+    const isSendingMessage = message_et.status() === z.message.StatusType.SENDING;
+    const canDelete = message_et.user().is_me && !this.conversation().removed_from_conversation() && !isSendingMessage;
+    if (canDelete) {
       entries.push({
-        click: () => {
-          amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
-            action: () => this.conversation_repository.delete_message_everyone(this.conversation(), message_et),
-            text: {
-              action: z.l10n.text(z.string.modalConversationDeleteMessageEveryoneAction),
-              message: z.l10n.text(z.string.modalConversationDeleteMessageEveryoneMessage),
-              title: z.l10n.text(z.string.modalConversationDeleteMessageEveryoneHeadline),
-            },
-          });
-        },
+        click: () => this.actionsViewModel.deleteMessageEveryone(this.conversation(), message_et),
         label: z.string.conversationContextMenuDeleteEveryone,
       });
     }

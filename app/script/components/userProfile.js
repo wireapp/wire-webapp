@@ -174,12 +174,6 @@ z.components.UserProfile = class UserProfile {
     });
 
     // Actions
-    this.clickOnAddPeople = () => {
-      if (this.hasUser() && typeof params.add_people === 'function') {
-        params.add_people(this.userEntity());
-      }
-    };
-
     this.clickOnClose = () => {
       if (typeof params.close === 'function') {
         this.renderAvatar(false);
@@ -194,45 +188,11 @@ z.components.UserProfile = class UserProfile {
           return params.pending(this.userEntity());
         }
       }
-
-      this.clickToOpenConversation();
-    };
-
-    this.clickOnShowProfile = () => {
-      if (this.hasUser() && typeof params.profile === 'function') {
-        params.profile(this.userEntity());
-      }
     };
 
     this.clickToAcceptInvite = () => {
       if (this.hasUser() && typeof params.accept === 'function') {
         params.accept(this.userEntity());
-      }
-    };
-
-    this.clickToBlock = () => {
-      if (this.hasUser() && typeof params.block === 'function') {
-        params.block(this.userEntity());
-      }
-    };
-
-    this.clickToCancelRequest = () => {
-      if (this.hasUser()) {
-        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
-          action: () => {
-            this.userRepository.cancel_connection_request(this.userEntity());
-
-            if (typeof params.cancel_request === 'function') {
-              params.cancel_request(this.userEntity());
-            }
-          },
-          text: {
-            action: z.l10n.text(z.string.modalConnectCancelAction),
-            message: z.l10n.text(z.string.modalConnectCancelMessage, this.userEntity().first_name()),
-            secondary: z.l10n.text(z.string.modalConnectCancelSecondary),
-            title: z.l10n.text(z.string.modalConnectCancelHeadline),
-          },
-        });
       }
     };
 
@@ -242,46 +202,8 @@ z.components.UserProfile = class UserProfile {
       }
     };
 
-    this.clickToLeaveConversation = () => {
-      if (this.hasUser() && typeof params.leave === 'function') {
-        params.leave(this.userEntity());
-      }
-    };
-
-    this.clickToOpenConversation = () => {
-      if (this.hasUser()) {
-        amplify.publish(z.event.WebApp.CONVERSATION.PEOPLE.HIDE);
-
-        this.conversationRepository.get_1to1_conversation(this.userEntity()).then(conversationEntity => {
-          if (conversationEntity.is_archived()) {
-            this.conversationRepository.unarchive_conversation(conversationEntity);
-          }
-
-          window.setTimeout(() => {
-            amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity);
-
-            if (typeof params.open === 'function') {
-              params.open(this.userEntity());
-            }
-          }, z.motion.MotionDuration.LONG);
-        });
-      }
-    };
-
-    this.clickToRemoveFromConversation = () => {
-      if (this.hasUser() && typeof params.remove === 'function') {
-        params.remove(this.userEntity());
-      }
-    };
-
     this.clickToSendRequest = () => {
-      if (this.hasUser()) {
-        this.userRepository
-          .create_connection(this.userEntity(), true)
-          .then(() => amplify.publish(z.event.WebApp.CONVERSATION.PEOPLE.HIDE));
-      }
-
-      if (typeof params.connect === 'function') {
+      if (this.hasUser() && typeof params.connect === 'function') {
         params.connect(this.userEntity());
       }
     };
