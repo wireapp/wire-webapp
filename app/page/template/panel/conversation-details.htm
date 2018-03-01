@@ -1,4 +1,4 @@
-<div id="conversation-details" class="panel_page panel__page__visible conversation-details" data-bind="with: $root.conversationDetails">
+<div id="conversation-details" class="panel__page panel__page--visible conversation-details" data-bind="with: $root.conversationDetails">
   <!-- ko if: isVisible() -->
     <div class="right-panel-header">
       <!-- ko if: !conversationEntity().is_request() && !conversationEntity().removed_from_conversation() -->
@@ -38,7 +38,7 @@
           <!-- ko if: conversationEntity().is_group() -->
             <div class="panel__action-item" data-bind="click: clickOnAddParticipants, attr:{'title': addPeopleTooltip}" data-uie-name="go-add-people">
               <add-participants-icon class="panel__action-item__icon"></add-participants-icon>
-              <div class="panel__action-item__text" data-bind="l10n_text: addActionText"></div>
+              <div class="panel__action-item__text" data-bind="l10n_text: z.string.conversationDetailsActionAddParticipants"></div>
             </div>
           <!-- /ko -->
 

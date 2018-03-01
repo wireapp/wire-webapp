@@ -50,16 +50,11 @@ z.viewModel.PanelViewModel = class PanelViewModel {
     this.mainViewModel = mainViewModel;
     this.logger = new z.util.Logger('z.viewModel.PanelViewModel', z.config.LOGGER.OPTIONS);
 
-    this.state = ko.observable(PanelViewModel.STATE.CONVERSATION_DETAILS);
-
     this.conversationEntity = repositories.conversation.active_conversation;
-    this.conversationEntity.subscribe(() => {
-      if (this.isVisible()) {
-        this.mainViewModel.closePanel();
-      }
-    });
+    this.enableIntegrations = this.integrationRepository.enableIntegrations;
 
     this.isVisible = ko.observable(false);
+    this.state = ko.observable(PanelViewModel.STATE.CONVERSATION_DETAILS);
 
     this.addParticipantsVisible = ko.pureComputed(() => this._isStateVisible(PanelViewModel.STATE.ADD_PARTICIPANTS));
     this.conversationDetailsVisible = ko.pureComputed(() => {
@@ -71,14 +66,22 @@ z.viewModel.PanelViewModel = class PanelViewModel {
       return this._isStateVisible(PanelViewModel.STATE.PARTICIPANT_DEVICES);
     });
 
-    this.isTeamOnly = ko.pureComputed(() => this.conversationEntity() && this.conversationEntity.isTeamOnly());
+    this.isGuestRoom = ko.pureComputed(() => this.conversationEntity() && this.conversationEntity().isGuestRoom());
+    this.isTeamOnly = ko.pureComputed(() => this.conversationEntity() && this.conversationEntity().isTeamOnly());
 
-    this.enableIntegrations = this.integrationRepository.enableIntegrations;
     this.showIntegrations = ko.pureComputed(() => {
-      const firstUserEntity = this.conversationEntity().firstUserEntity();
-      const hasBotUser = firstUserEntity && firstUserEntity.isBot;
-      const allowIntegrations = this.conversationEntity().is_group() || hasBotUser;
-      return this.enableIntegrations() && allowIntegrations && !this.isTeamOnly();
+      if (this.conversationEntity()) {
+        const firstUserEntity = this.conversationEntity().firstUserEntity();
+        const hasBotUser = firstUserEntity && firstUserEntity.isBot;
+        const allowIntegrations = this.conversationEntity().is_group() || hasBotUser;
+        return this.enableIntegrations() && allowIntegrations && !this.isTeamOnly();
+      }
+    });
+
+    this.conversationEntity.subscribe(() => {
+      if (this.isVisible()) {
+        this.mainViewModel.closePanel();
+      }
     });
 
     amplify.subscribe(z.event.WebApp.PEOPLE.TOGGLE, this.togglePanel.bind(this));
@@ -96,6 +99,10 @@ z.viewModel.PanelViewModel = class PanelViewModel {
   _isStateVisible(state) {
     const isStateVisible = this.state() === state;
     return isStateVisible && this.isVisible();
+  }
+
+  closePanel() {
+    return this.mainViewModel.closePanel().then(() => this.isVisible(false));
   }
 
   showGroupParticipant(userEntity) {
@@ -123,29 +130,27 @@ z.viewModel.PanelViewModel = class PanelViewModel {
   }
 
   togglePanel(addPeople = false) {
-    if (addPeople && !this.conversationEntity().is_guest()) {
+    const conversationEntity = this.conversationEntity();
+    const canAddPeople = conversationEntity
+      ? !conversationEntity.is_guest() && !conversationEntity.removed_from_conversation()
+      : false;
+
+    if (addPeople && canAddPeople) {
       if (this.addParticipantsVisible()) {
-        return this._closePanel();
+        return this.closePanel();
       }
 
-      return this._openPanel(PanelViewModel.STATE.ADD_PARTICIPANTS);
+      if (conversationEntity.is_group()) {
+        return this._openPanel(PanelViewModel.STATE.ADD_PARTICIPANTS);
+      }
+      return this.conversationDetails.clickOnCreateGroup();
     }
 
     if (this.conversationDetailsVisible()) {
-      return this._closePanel();
+      return this.closePanel();
     }
 
     return this._openPanel(PanelViewModel.STATE.CONVERSATION_DETAILS);
-  }
-
-  _closePanel() {
-    this.mainViewModel.closePanel().then(() => this.isVisible(false));
-  }
-
-  _openPanel(newState) {
-    this.switchState(newState);
-    this.isVisible(true);
-    this.mainViewModel.openPanel();
   }
 
   _getElementIdOfPanel(panelState) {
@@ -165,7 +170,13 @@ z.viewModel.PanelViewModel = class PanelViewModel {
 
   _hidePanel() {
     const panelStateElementId = this._getElementIdOfPanel(this.state());
-    $(`#${panelStateElementId}`).removeClass('panel__page__visible');
+    $(`#${panelStateElementId}`).removeClass('panel__page--visible');
+  }
+
+  _openPanel(newState) {
+    this.switchState(newState);
+    this.isVisible(true);
+    this.mainViewModel.openPanel();
   }
 
   _showPanel(newPanelState) {
@@ -173,7 +184,7 @@ z.viewModel.PanelViewModel = class PanelViewModel {
 
     const panelStateElementId = this._getElementIdOfPanel(newPanelState);
     if (panelStateElementId) {
-      $(`#${panelStateElementId}`).addClass('panel__page__visible');
+      $(`#${panelStateElementId}`).addClass('panel__page--visible');
     }
   }
 };

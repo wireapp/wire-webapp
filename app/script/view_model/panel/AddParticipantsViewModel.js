@@ -24,12 +24,6 @@ window.z.viewModel = z.viewModel || {};
 window.z.viewModel.panel = z.viewModel.panel || {};
 
 z.viewModel.panel.AppParticipantsViewModel = class AppParticipantsViewModel {
-  static get CONFIG() {
-    return {
-      ADD_STATES: [AppParticipantsViewModel.STATE.ADD_PEOPLE, AppParticipantsViewModel.STATE.ADD_SERVICE],
-    };
-  }
-
   static get STATE() {
     return {
       ADD_PEOPLE: 'AppParticipantsViewModel.STATE.ADD_PEOPLE',
@@ -39,7 +33,6 @@ z.viewModel.panel.AppParticipantsViewModel = class AppParticipantsViewModel {
   }
 
   constructor(mainViewModel, panelViewModel, repositories) {
-    this.mainViewModel = mainViewModel;
     this.panelViewModel = panelViewModel;
 
     this.conversationRepository = repositories.conversation;
@@ -51,6 +44,7 @@ z.viewModel.panel.AppParticipantsViewModel = class AppParticipantsViewModel {
 
     this.conversationEntity = this.conversationRepository.active_conversation;
     this.isTeam = this.teamRepository.isTeam;
+    this.isTeamOnly = this.panelViewModel.isTeamOnly;
     this.isVisible = this.panelViewModel.addParticipantsVisible;
     this.panelState = this.panelViewModel.panelState;
     this.services = this.integrationRepository.services;
@@ -63,14 +57,18 @@ z.viewModel.panel.AppParticipantsViewModel = class AppParticipantsViewModel {
     this.selectedService = ko.observable();
     this.state = ko.observable(AppParticipantsViewModel.STATE.ADD_PEOPLE);
 
-    this.activeAddState = ko.pureComputed(() => AppParticipantsViewModel.CONFIG.ADD_STATES.includes(this.state()));
-    this.stateAddPeople = ko.pureComputed(() => this.state() === AppParticipantsViewModel.STATE.ADD_PEOPLE);
-    this.stateAddService = ko.pureComputed(() => this.state() === AppParticipantsViewModel.STATE.ADD_SERVICE);
-
-    this.stateConfirmation = ko.pureComputed(() => this.state() === AppParticipantsViewModel.STATE.CONFIRMATION);
+    this.isAddState = ko.pureComputed(() => this.isStateAddPeople() || this.isStateAddService());
+    this.isStateAddPeople = ko.pureComputed(() => this.state() === AppParticipantsViewModel.STATE.ADD_PEOPLE);
+    this.isStateAddService = ko.pureComputed(() => this.state() === AppParticipantsViewModel.STATE.ADD_SERVICE);
+    this.isStateConfirmation = ko.pureComputed(() => this.state() === AppParticipantsViewModel.STATE.CONFIRMATION);
 
     this.contacts = ko.pureComputed(() => {
+      const conversationEntity = this.conversationEntity();
       let userEntities = [];
+
+      if (!conversationEntity) {
+        return userEntities;
+      }
 
       if (!this.isTeam()) {
         userEntities = this.userRepository.connected_users();
@@ -85,15 +83,22 @@ z.viewModel.panel.AppParticipantsViewModel = class AppParticipantsViewModel {
       }
 
       return userEntities.filter(userEntity => {
-        return !this.conversationEntity.participating_user_ids().find(id => userEntity.id === id);
+        return !conversationEntity.participating_user_ids().find(id => userEntity.id === id);
       });
     });
 
     this.isSearching = ko.pureComputed(() => this.searchInput().length);
-    this.isTeamOnly = ko.pureComputed(() => this.conversationEntity() && this.conversationEntity.isTeamOnly());
-
     this.participantsHeaderText = ko.pureComputed(() => 'Placeholder');
+
+    this.shouldUpdateScrollbar = ko
+      .computed(() => this.contacts() || this.searchInput())
+      .extend({notify: 'always', rateLimit: 500});
+
     this.searchInput.subscribe(searchInput => this.searchServices(searchInput));
+  }
+
+  clickOnAddPeople() {
+    this.state(AppParticipantsViewModel.STATE.ADD_PEOPLE);
   }
 
   clickOnAddService() {
@@ -106,8 +111,7 @@ z.viewModel.panel.AppParticipantsViewModel = class AppParticipantsViewModel {
   }
 
   clickOnClose() {
-    this.mainViewModel.closePanel();
-    this._resetView();
+    this.panelViewModel.closePanel().then(() => this._resetView());
   }
 
   clickOnSelectService(serviceEntity) {

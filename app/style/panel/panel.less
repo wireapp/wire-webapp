@@ -21,12 +21,12 @@
   overflow: hidden;
 
   &__page {
-    &.panel__page__visible {
-      opacity: 0;
+    &--visible {
+      opacity: 1;
     }
 
-    &:not(.panel__page__visible) {
-      opacity: 1;
+    &:not(&--visible) {
+      opacity: 0;
     }
   }
 
