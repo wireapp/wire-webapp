@@ -19,9 +19,11 @@
 
 import {onEnvironment} from './Environment';
 
+const WEBAPP_ENV = onEnvironment('http://localhost:8888', '', '');
+
 export default {
-  LOGIN: `${WEBAPP}/login`,
-  WEBAPP: onEnvironment('http://localhost:8888', '', ''),
+  LOGIN: `${WEBAPP_ENV}/login`,
+  WEBAPP: WEBAPP_ENV,
   WIRE_ROOT: onEnvironment(
     'https://wire-website-staging.zinfra.io',
     'https://wire-website-staging.zinfra.io',
