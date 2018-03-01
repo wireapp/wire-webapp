@@ -1,5 +1,9 @@
 <div  id="group-participant" class="group-participant" data-bind="with: $root.groupParticipant">
   <!-- ko if: isVisible() -->
+    <div>
+      <arrow-left-icon class="icon-button" data-bind="click: clickOnBack" data-uie-name="do-close"></arrow-left-icon>
+      <close-icon class="icon-button" data-bind="click: clickOnClose" data-uie-name="do-close"></close-icon>
+    </div>
     <div>Group participant view</div>
   <!-- /ko -->
 </div>

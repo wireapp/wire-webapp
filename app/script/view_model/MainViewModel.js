@@ -23,6 +23,22 @@ window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 
 z.viewModel.MainViewModel = class MainViewModel {
+  static get CONFIG() {
+    return {
+      PANEL: {
+        BREAKPOINT: 1000,
+        WIDTH: 304,
+      },
+    };
+  }
+
+  static get PANEL_STATE() {
+    return {
+      CLOSED: 'MainViewModel.PANEL_STATE.CLOSED',
+      OPEN: 'MainViewModel.PANEL_STATE.OPEN',
+    };
+  }
+
   constructor(repositories) {
     this.closePanel = this.closePanel.bind(this);
     this.openPanel = this.openPanel.bind(this);
@@ -59,52 +75,48 @@ z.viewModel.MainViewModel = class MainViewModel {
   }
 
   openPanel() {
-    return this.togglePanel('open');
+    return this.togglePanel(MainViewModel.PANEL_STATE.OPEN);
   }
 
   closePanel() {
-    return this.togglePanel('close');
+    return this.togglePanel(MainViewModel.PANEL_STATE.CLOSED);
   }
 
   togglePanel(forceState) {
-    const panelSize = 304;
-    const breakPoint = 1000;
-
     const app = document.querySelector('#app');
     const panel = document.querySelector('.right-column');
 
     const isPanelOpen = app.classList.contains('app--panel-open');
-    if ((forceState === 'open' && isPanelOpen) || (forceState === 'close' && !isPanelOpen)) {
+    const isAlreadyClosed = forceState === MainViewModel.PANEL_STATE.CLOSED && !isPanelOpen;
+    const isAlreadyOpen = forceState === MainViewModel.PANEL_STATE.OPEN && isPanelOpen;
+
+    const isInForcedState = isAlreadyClosed || isAlreadyOpen;
+    if (isInForcedState) {
       return Promise.resolve();
     }
 
     const titleBar = document.querySelector('#conversation-title-bar');
-    const input = document.querySelector('.conversation-input-bar');
-    // const messageList = document.querySelector('#message-list');
-    // messageList.style.transformOrigin = 'left';
+    const input = document.querySelector('#conversation-input-bar');
 
-    const isNarrowScreen = app.offsetWidth < breakPoint;
+    const isNarrowScreen = app.offsetWidth < MainViewModel.CONFIG.PANEL.BREAKPOINT;
 
-    const centerWidthClose = app.offsetWidth - panelSize;
-    const centerWidthOpen = centerWidthClose - panelSize;
+    const centerWidthClose = app.offsetWidth - MainViewModel.CONFIG.PANEL.WIDTH;
+    const centerWidthOpen = centerWidthClose - MainViewModel.CONFIG.PANEL.WIDTH;
 
     return new Promise(resolve => {
       panel.addEventListener('transitionend', () => {
-        clearStyles(panel, ['width', 'transform', 'position', 'right', 'transition']);
-        clearStyles(titleBar, ['width', 'transition']);
-        clearStyles(input, ['width', 'transition']);
-        // clearStyles(messageList, ['width', 'transform', 'transition']);
-        const close = document.querySelector('.right-panel-close');
+        this._clearStyles(panel, ['width', 'transform', 'position', 'right', 'transition']);
+        this._clearStyles(titleBar, ['width', 'transition']);
+        this._clearStyles(input, ['width', 'transition']);
+
         const overlay = document.querySelector('.center-column__overlay');
         if (isPanelOpen) {
           app.classList.remove('app--panel-open');
           this.isPanelOpen(false);
-          close.removeEventListener('click', this.togglePanel);
           overlay.removeEventListener('click', this.togglePanel);
         } else {
           app.classList.add('app--panel-open');
           this.isPanelOpen(true);
-          close.addEventListener('click', this.togglePanel);
           overlay.addEventListener('click', this.togglePanel);
         }
         window.dispatchEvent(new Event('resize'));
@@ -112,72 +124,68 @@ z.viewModel.MainViewModel = class MainViewModel {
       });
 
       if (isPanelOpen) {
-        applyStyle(panel, panelOpenStyle(panelSize));
+        this._applyStyle(panel, this._getOpenPanelStyle());
         if (!isNarrowScreen) {
-          applyStyle(titleBar, {width: `${centerWidthOpen}px`});
-          applyStyle(input, {width: `${centerWidthOpen}px`});
-          // applyStyle(messageList, {
-          //   width: `${centerWidthClose}px`,
-          //   transform: `scale(${centerWidthOpen / centerWidthClose}, 1)`,
-          // });
+          this._applyStyle(titleBar, {width: `${centerWidthOpen}px`});
+          this._applyStyle(input, {width: `${centerWidthOpen}px`});
         }
       } else {
-        applyStyle(panel, panelCloseStyle(panelSize));
+        this._applyStyle(panel, this._getClosedPanelStyle());
         if (!isNarrowScreen) {
-          applyStyle(titleBar, {width: `${centerWidthClose}px`});
-          applyStyle(input, {width: `${centerWidthClose}px`});
-          // applyStyle(messageList, {
-          //   width: `${centerWidthOpen}px`,
-          //   transform: `scale(${centerWidthClose / centerWidthOpen}, 1)`,
-          // });
+          this._applyStyle(titleBar, {width: `${centerWidthClose}px`});
+          this._applyStyle(input, {width: `${centerWidthClose}px`});
         }
       }
 
       // https://developer.mozilla.org/en-US/Firefox/Performance_best_practices_for_Firefox_fe_engineers
-      requestAnimationFrame(() =>
-        setTimeout(() => {
-          panel.style.transition = 'transform .35s cubic-bezier(0.19, 1, 0.22, 1)';
-          titleBar.style.transition = input.style.transition = 'width .35s cubic-bezier(0.19, 1, 0.22, 1)';
+      window.requestAnimationFrame(() =>
+        window.setTimeout(() => {
+          const transition = 'transform .35s cubic-bezier(0.19, 1, 0.22, 1)';
+          panel.style.transition = transition;
+          titleBar.style.transition = transition;
+          input.style.transition = transition;
 
           if (isPanelOpen) {
-            applyStyle(panel, panelCloseStyle(panelSize));
+            this._applyStyle(panel, this._getClosedPanelStyle());
             if (!isNarrowScreen) {
-              applyStyle(titleBar, {width: `${centerWidthClose}px`});
-              applyStyle(input, {width: `${centerWidthClose}px`});
-              // applyStyle(messageList, {transform: `scale(1, 1)`});
+              this._applyStyle(titleBar, {width: `${centerWidthClose}px`});
+              this._applyStyle(input, {width: `${centerWidthClose}px`});
             }
           } else {
-            applyStyle(panel, panelOpenStyle(panelSize));
+            this._applyStyle(panel, this._getOpenPanelStyle());
             if (!isNarrowScreen) {
-              applyStyle(titleBar, {width: `${centerWidthOpen}px`});
-              applyStyle(input, {width: `${centerWidthOpen}px`});
-              // applyStyle(messageList, {transform: `scale(1, 1)`});
+              this._applyStyle(titleBar, {width: `${centerWidthOpen}px`});
+              this._applyStyle(input, {width: `${centerWidthOpen}px`});
             }
           }
         }, 0)
       );
     });
   }
+
+  _applyStyle(element, style) {
+    Object.keys(style).forEach(key => (element.style[key] = style[key]));
+  }
+
+  _clearStyles(element, styles) {
+    styles.forEach(key => (element.style[key] = ''));
+  }
+
+  _getClosedPanelStyle() {
+    return {
+      position: 'absolute',
+      right: '0',
+      transform: `translateX(${MainViewModel.CONFIG.PANEL.WIDTH}px)`,
+      width: `${MainViewModel.CONFIG.PANEL.WIDTH}px`,
+    };
+  }
+
+  _getOpenPanelStyle() {
+    return {
+      position: 'absolute',
+      right: '0',
+      transform: `translateX(0px)`,
+      width: `${MainViewModel.CONFIG.PANEL.WIDTH}px`,
+    };
+  }
 };
-
-function applyStyle(el, style) {
-  Object.keys(style).forEach(key => (el.style[key] = style[key]));
-}
-
-function clearStyles(el, styles) {
-  styles.forEach(key => (el.style[key] = ''));
-}
-
-const panelOpenStyle = panelSize => ({
-  position: 'absolute',
-  right: '0',
-  transform: `translateX(0px)`,
-  width: `${panelSize}px`,
-});
-
-const panelCloseStyle = panelSize => ({
-  position: 'absolute',
-  right: '0',
-  transform: `translateX(${panelSize}px)`,
-  width: `${panelSize}px`,
-});

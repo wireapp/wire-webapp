@@ -1,5 +1,9 @@
 <div  id="guest-options" class="guest-options" data-bind="with: $root.guestOptions">
   <!-- ko if: isVisible() -->
+    <div>
+      <arrow-left-icon class="icon-button" data-bind="click: clickOnBack" data-uie-name="do-close"></arrow-left-icon>
+      <close-icon class="icon-button" data-bind="click: clickOnClose" data-uie-name="do-close"></close-icon>
+    </div>
     <div>Guest options view</div>
   <!-- /ko -->
 </div>

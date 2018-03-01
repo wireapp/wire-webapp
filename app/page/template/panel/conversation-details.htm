@@ -4,7 +4,7 @@
       <!-- ko if: !conversationEntity().is_request() && !conversationEntity().removed_from_conversation() -->
         <mute-icon class="right-panel-mute icon-button" data-bind="click: clickToToggleMute, css: {'right-panel-mute--active': conversationEntity().is_muted()} " data-uie-name="do-mute"></mute-icon>
       <!-- /ko -->
-      <close-icon class="right-panel-close icon-button" data-uie-name="do-close"></close-icon>
+      <close-icon class="right-panel-close icon-button" data-bind="click: clickOnClose" data-uie-name="do-close"></close-icon>
     </div>
     <div class="right-panel-content">
       <div class="conversation-details__header">

@@ -62,7 +62,7 @@ z.viewModel.PanelViewModel = class PanelViewModel {
     });
     this.groupParticipantVisible = ko.pureComputed(() => this._isStateVisible(PanelViewModel.STATE.GROUP_PARTICIPANT));
     this.guestOptionsVisible = ko.pureComputed(() => this._isStateVisible(PanelViewModel.STATE.GUEST_OPTIONS));
-    this.partcipantDevicesVisible = ko.pureComputed(() => {
+    this.participantDevicesVisible = ko.pureComputed(() => {
       return this._isStateVisible(PanelViewModel.STATE.PARTICIPANT_DEVICES);
     });
 

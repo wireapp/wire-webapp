@@ -1,14 +1,14 @@
 <div id="add-participants" class="add-participants" data-bind="with: $root.addParticipants">
   <!-- ko if: isVisible() -->
-    <div class="add-participants-header">
-      <div class="add-participants-header-block">
-        <span class="button-icon icon-back" data-bind="click: clickOnBack" data-uie-name="go-back"></span>
+    <div>
+      <div>
+        <arrow-left-icon class="icon-button" data-bind="click: clickOnBack" data-uie-name="do-close"></arrow-left-icon>
       </div>
-      <span class="add-participants-title" data-bind="text: participantsHeaderText" data-uie-name="status-people-selected"></span>
-      <div class="add-participants-header-block">
-        <span class="button-icon icon-close" data-bind="click: clickOnClose" data-uie-name="do-close"></span>
+      <span data-bind="text: headerText" data-uie-name="status-people-selected"></span>
+      <div>
+        <close-icon class="icon-button" data-bind="click: clickOnClose" data-uie-name="do-close"></close-icon>
       </div>
-      <user-input class="add-participants-search-list user-list-light" params="input: searchInput, selected: selectedContacts, placeholder: z.string.addParticipantsSearchPlaceholder" spellcheck="false"></user-input>
+      <user-input class="user-list-light" params="input: searchInput, selected: selectedContacts, placeholder: z.string.addParticipantsSearchPlaceholder" spellcheck="false"></user-input>
       <!-- ko if: showIntegrations() -->
         <div class="participants-search-tabs">
           <div class="participants-search-tab" data-bind="css: {'active': isStateAddPeople}, click: clickOnAddPeople, l10n_text: z.string.addParticipantsTabsPeople" data-uie-name="do-add-people"></div>
@@ -17,9 +17,9 @@
       <!-- /ko -->
     </div>
 
-    <div class="add-participants-content">
+    <div>
       <!-- ko if: isAddState() -->
-        <div class="add-participants-list" data-bind="antiscroll: shouldUpdateScrollbar">
+        <div data-bind="antiscroll: shouldUpdateScrollbar">
           <!-- ko if: isStateAddPeople() -->
             <user-list class="user-list-light" params="user: contacts, filter: searchInput, selected: selectedContacts"></user-list>
           <!-- /ko -->
@@ -30,10 +30,10 @@
       <!-- /ko -->
     </div>
 
-    <div class="add-participants-footer">
+    <div>
       <!-- ko if: isStateAddPeople() -->
-        <button class="participants-search-footer button button-full" data-bind="enable: selectedContacts().length > 0, click: clickToAddMembers" data-uie-name="do-create">
-          <span class="icon-people-add participants-search-icon"></span>
+        <button class="button button-full" data-bind="enable: selectedContacts().length > 0, click: clickToAddMembers" data-uie-name="do-create">
+          <span class="icon-people-add"></span>
           <span data-bind="l10n_text: z.string.addParticipantsConfirmLabel"></span>
         </button>
       <!-- /ko -->
