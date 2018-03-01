@@ -21,6 +21,7 @@ import * as TrackingAction from '../module/action/TrackingAction';
 import {getLanguage} from '../module/selector/LanguageSelector';
 import React, {Component} from 'react';
 import ROUTE from '../route';
+import EXTERNAL_ROUTE from '../externalRoute';
 import {Columns, Column, ContainerXS} from '@wireapp/react-ui-kit/Layout';
 import {connect} from 'react-redux';
 import {indexStrings} from '../../strings';
@@ -48,7 +49,7 @@ class Index extends Component {
   onLoginClick = () => {
     this.props.trackEvent({name: TrackingAction.EVENT_NAME.START.OPENED_LOGIN});
     const link = document.createElement('a');
-    link.href = pathWithParams(ROUTE.LOGIN, 'mode=login');
+    link.href = pathWithParams(EXTERNAL_ROUTE.LOGIN, 'mode=login');
     document.body.appendChild(link); // workaround for Firefox
     link.click();
   };
