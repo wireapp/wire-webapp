@@ -266,7 +266,7 @@ class ConversationJoin extends Component {
           <Small> &middot; {_(footerStrings.copy)}</Small>
         </Footer>
         {isAppAlreadyOpen && (
-          <Modal onClose={() => this.setState({...this.state, isModalOpen: false})}>
+          <Modal onClose={() => this.setState({...this.state, isAppAlreadyOpen: false})}>
             <Container style={{maxWidth: '400px'}}>
               <H2>Wire is already open in this browser</H2>
               <Text>If you continue here, you will be logged out on the other tab.</Text>
