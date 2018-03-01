@@ -34,6 +34,10 @@ import {
   Footer,
   Content,
   COLOR,
+  Columns,
+  Column,
+  Modal,
+  Text,
 } from '@wireapp/react-ui-kit';
 import {conversationJoinStrings} from '../../strings';
 import {footerStrings} from '../../strings';
@@ -49,9 +53,11 @@ import {withRouter} from 'react-router';
 import React, {Component} from 'react';
 import {pathWithParams} from '../util/urlUtil';
 import {Link as RRLink} from 'react-router-dom';
+import Cookies from 'js-cookie';
 
 const CONVERSATION_CODE = 'code';
 const CONVERSATION_KEY = 'key';
+const COOKIE_NAME_APP_OPENED = 'app_opened';
 
 class ConversationJoin extends Component {
   state = {
@@ -60,6 +66,7 @@ class ConversationJoin extends Component {
     enteredName: '',
     error: null,
     forceNewAccount: false,
+    isAppAlreadyOpen: !!Cookies.get(COOKIE_NAME_APP_OPENED),
     isValidLink: true,
     isValidName: true,
   };
@@ -234,7 +241,7 @@ class ConversationJoin extends Component {
 
   render() {
     const {isAuthenticated, intl: {formatMessage: _}} = this.props;
-    const {isValidLink} = this.state;
+    const {isAppAlreadyOpen, isValidLink} = this.state;
     return (
       <Container
         style={{
@@ -258,6 +265,22 @@ class ConversationJoin extends Component {
           <Link href={ROUTE.WIRE_ROOT}>{_(footerStrings.wireLink)}</Link>
           <Small> &middot; {_(footerStrings.copy)}</Small>
         </Footer>
+        {isAppAlreadyOpen && (
+          <Modal onClose={() => this.setState({...this.state, isModalOpen: false})}>
+            <Container style={{maxWidth: '400px'}}>
+              <H2>Wire is already open in this browser</H2>
+              <Text>If you continue here, you will be logged out on the other tab.</Text>
+              <Columns style={{marginTop: '20px'}}>
+                <Column style={{textAlign: 'center'}}>
+                  <Button backgroundColor={COLOR.GRAY}>Cancel</Button>
+                </Column>
+                <Column style={{textAlign: 'center'}}>
+                  <Button>Continue</Button>
+                </Column>
+              </Columns>
+            </Container>
+          </Modal>
+        )}
       </Container>
     );
   }
