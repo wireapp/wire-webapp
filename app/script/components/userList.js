@@ -47,6 +47,7 @@ z.components.UserList = class UserList {
     this.mode = params.mode || UserList.MODE.DEFAULT;
     this.userEntities = params.user;
     this.isSelectEnabled = typeof params.selected === 'function';
+    this.altStyle = params.altStyle;
 
     this.isCompactMode = this.mode === UserList.MODE.COMPACT;
     this.isDefaultMode = this.mode === UserList.MODE.DEFAULT;
@@ -96,7 +97,7 @@ z.components.UserList = class UserList {
 ko.components.register('user-list', {
   template: `
     <div class="search-list" data-bind="css: cssClasses(), foreach: {data: filteredUserEntities}">
-      <participant-item params="participant: $data, canSelect: $parent.isSelectEnabled, isSelected: $parent.isSelected($data)" data-bind="click: $parent.onUserClick"></participant-item>
+      <participant-item params="participant: $data, canSelect: $parent.isSelectEnabled, isSelected: $parent.isSelected($data)" data-bind="click: $parent.onUserClick, css: {'no-underline': $parent.altStyle, 'show-arrow': $parent.altStyle}"></participant-item>
     </div>
 
     <!-- ko if: typeof filter === 'function' -->

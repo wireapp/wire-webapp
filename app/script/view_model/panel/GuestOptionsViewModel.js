@@ -34,45 +34,23 @@ z.viewModel.panel.GuestOptionsViewModel = class GuestOptionsViewModel {
     this.isGuestRoom = this.panelViewModel.isGuestRoom;
     this.isTeamOnly = this.panelViewModel.isTeamOnly;
     this.isVisible = this.panelViewModel.guestOptionsVisible;
+    this.isGuestEnabled = ko.pureComputed(() => !this.isTeamOnly());
 
     this.hasAccessCode = ko.pureComputed(() => (this.isGuestRoom() ? !!this.conversationEntity().accessCode() : false));
     this.requestOngoing = ko.observable(false);
 
     this.conversationEntity.subscribe(conversationEntity => this._updateCode(this.isVisible(), conversationEntity));
     this.isVisible.subscribe(isVisible => this._updateCode(isVisible, this.conversationEntity()));
+
+    this.toggleAccessState = this.toggleAccessState.bind(this);
   }
 
-  toggleAccessState() {
-    const conversationEntity = this.conversationEntity();
-    if (conversationEntity.team_id) {
-      const newAccessState = this.isTeamOnly()
-        ? z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM
-        : z.conversation.ACCESS_STATE.TEAM.TEAM_ONLY;
+  clickOnBack() {
+    this.panelViewModel.switchState(z.viewModel.PanelViewModel.STATE.CONVERSATION_DETAILS);
+  }
 
-      const _changeAccessState = () => {
-        if (!this.requestOngoing()) {
-          this.requestOngoing(true);
-
-          this.stateHandler
-            .changeAccessState(conversationEntity, newAccessState)
-            .then(() => this.requestOngoing(false));
-        }
-      };
-
-      if (this.isTeamOnly()) {
-        return _changeAccessState();
-      }
-
-      amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
-        action: () => _changeAccessState(),
-        preventClose: true,
-        text: {
-          action: z.l10n.text(z.string.modalConversationRemoveGuestsAction),
-          message: z.l10n.text(z.string.modalConversationRemoveGuestsMessage),
-          title: z.l10n.text(z.string.modalConversationRemoveGuestsHeadline),
-        },
-      });
-    }
+  clickOnClose() {
+    this.panelViewModel.closePanel();
   }
 
   requestAccessCode() {
@@ -106,6 +84,39 @@ z.viewModel.panel.GuestOptionsViewModel = class GuestOptionsViewModel {
         title: z.l10n.text(z.string.modalConversationRevokeLinkMessage),
       },
     });
+  }
+
+  toggleAccessState() {
+    const conversationEntity = this.conversationEntity();
+    if (conversationEntity.team_id) {
+      const newAccessState = this.isTeamOnly()
+        ? z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM
+        : z.conversation.ACCESS_STATE.TEAM.TEAM_ONLY;
+
+      const _changeAccessState = () => {
+        if (!this.requestOngoing()) {
+          this.requestOngoing(true);
+
+          this.stateHandler
+            .changeAccessState(conversationEntity, newAccessState)
+            .then(() => this.requestOngoing(false));
+        }
+      };
+
+      if (this.isTeamOnly()) {
+        return _changeAccessState();
+      }
+
+      amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
+        action: () => _changeAccessState(),
+        preventClose: true,
+        text: {
+          action: z.l10n.text(z.string.modalConversationRemoveGuestsAction),
+          message: z.l10n.text(z.string.modalConversationRemoveGuestsMessage),
+          title: z.l10n.text(z.string.modalConversationRemoveGuestsHeadline),
+        },
+      });
+    }
   }
 
   _updateCode(isVisible, conversationEntity) {

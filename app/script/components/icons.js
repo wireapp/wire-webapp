@@ -59,10 +59,26 @@ ko.components.register('close-icon', {
   `,
 });
 
+ko.components.register('copy-icon', {
+  template: `
+  <svg width="16" height="16" viewBox="0 0 16 16">
+    <path d="M6 10h8V2H6v8zM5 0h10a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V1a1 1 0 0 1 1-1zM2 4v10h10v1a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h1z"></path>
+  </svg>
+  `,
+});
+
 ko.components.register('delete-icon', {
   template: `
   <svg width="14" height="16" viewBox="0 0 14 16">
     <path d="M5 2a2 2 0 1 1 4 0h4a1 1 0 0 1 1 1v1H0V3a1 1 0 0 1 1-1h4zM1 6h12l-.8 8c-.11 1.1-1.09 2-2.2 2H4c-1.1 0-2.09-.89-2.2-2L1 6zm5.5 2v5.54h1V8h-1z"></path>
+  </svg>
+  `,
+});
+
+ko.components.register('devices-icon', {
+  template: `
+  <svg width="16" height="16" viewBox="0 0 16 16">
+    <path d="M11 0H1a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1h-3V1a1 1 0 0 0-1-1zm-1 5H9a1 1 0 0 0-1 1v8H2.5a.5.5 0 0 1-.5-.5v-11c0-.28.23-.5.5-.5h7c.28 0 .5.23.5.5V5zm-4 8a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm6 2a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"></path>
   </svg>
   `,
 });
@@ -95,6 +111,14 @@ ko.components.register('guest-icon', {
   template: `
   <svg width="14" height="16" viewBox="0 0 14 16">
     <path d="M5 1a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3c0-1.1.9-2 2-2h3zm.5 1a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1h-3zM7 9a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm-2 1a2 2 0 0 0-2 2v1h8v-1a2 2 0 0 0-2-2H5z"></path>
+  </svg>
+  `,
+});
+
+ko.components.register('link-icon', {
+  template: `
+  <svg width="16" height="16" viewBox="0 0 16 16">
+    <path d="M5 3.25A5.79 5.79 0 0 1 10.213 0C13.409 0 16 2.574 16 5.75s-2.591 5.75-5.787 5.75A5.79 5.79 0 0 1 5 8.25h2.4a3.775 3.775 0 0 0 2.813 1.25c2.084 0 3.774-1.679 3.774-3.75 0-2.071-1.69-3.75-3.774-3.75A3.775 3.775 0 0 0 7.4 3.25H5zm6 4.5H8.6A3.775 3.775 0 0 0 5.787 6.5c-2.084 0-3.774 1.679-3.774 3.75 0 2.071 1.69 3.75 3.774 3.75A3.775 3.775 0 0 0 8.6 12.75H11A5.79 5.79 0 0 1 5.787 16C2.591 16 0 13.426 0 10.25S2.591 4.5 5.787 4.5A5.79 5.79 0 0 1 11 7.75z"></path>
   </svg>
   `,
 });

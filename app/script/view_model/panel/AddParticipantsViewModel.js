@@ -88,7 +88,12 @@ z.viewModel.panel.AppParticipantsViewModel = class AppParticipantsViewModel {
     });
 
     this.isSearching = ko.pureComputed(() => this.searchInput().length);
-    this.participantsHeaderText = ko.pureComputed(() => 'Placeholder');
+    this.headerText = ko.pureComputed(() => {
+      const stringSelector = this.selectedContacts().length
+        ? z.string.addParticipantsHeaderWithCounter
+        : z.string.addParticipantsHeader;
+      return z.l10n.text(stringSelector, {number: this.selectedContacts().length});
+    });
 
     this.shouldUpdateScrollbar = ko
       .computed(() => this.contacts() || this.searchInput())

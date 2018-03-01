@@ -48,6 +48,16 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
     this.hasConversation = ko.pureComputed(() => !!this.conversationEntity());
     this.isVisible = ko.pureComputed(() => this.hasConversation() && this.panelViewModel.conversationDetailsVisible());
 
+    this.availabilityLabel = ko.pureComputed(() => {
+      if (this.conversationEntity() || this.conversationEntity().is_one2one()) {
+        const user = this.conversationEntity().firstUserEntity();
+        const availabilitySetToNone = user.availability() === z.user.AvailabilityType.NONE;
+        if (!availabilitySetToNone) {
+          return z.user.AvailabilityMapper.nameFromType(user.availability());
+        }
+      }
+    });
+
     ko.computed(() => {
       if (this.hasConversation()) {
         this.serviceParticipants.removeAll();
@@ -112,6 +122,10 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
 
   clickOnAddParticipants() {
     this.panelViewModel.switchState(z.viewModel.PanelViewModel.STATE.ADD_PARTICIPANTS);
+  }
+
+  clickOnClose() {
+    this.panelViewModel.closePanel();
   }
 
   clickOnCreateGroup() {

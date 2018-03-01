@@ -37,6 +37,7 @@
     display: flex;
     align-items: center;
     cursor: pointer;
+    user-select: none;
 
     &__icon {
       width: 44px;
@@ -69,15 +70,22 @@
       }
     }
   }
-  .right-panel-title {
-    font-size: 12px;
-    font-weight: @font-weight-bold;
-    text-transform: uppercase;
-  }
 
-  .right-panel-close {
+  &__header {
+    height: @content-title-bar-height;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+
     path {
       fill: @graphite-dark;
+    }
+
+    &__title {
+      font-size: 12px;
+      font-weight: @font-weight-bold;
+      text-transform: uppercase;
     }
   }
 }

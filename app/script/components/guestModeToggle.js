@@ -35,7 +35,7 @@ ko.components.register('guest-mode-toggle', {
       <div data-bind="text: z.string.guestRoomToggleName"></div>
       <div class="slider">
         <input class="slider-input" type="checkbox" name="toggle" id="toggle" data-bind="checked: isChecked">
-        <label class="button-label" for="toggle" data-bind="click: onToggle, attr: {'data-uie-value': isChecked ? 'checked': 'unchecked'}" data-uie-name="do-allow-guests" ></label>
+        <label class="button-label" for="toggle" data-bind="click: onToggle, attr: {'data-uie-value': isChecked() ? 'checked': 'unchecked'}" data-uie-name="do-allow-guests" ></label>
       </div>
     </div>
     <div class="guest-mode-toggle-info" data-bind="text: z.string.guestRoomToggleInfo" data-uie-name="status-guest-toggle"></div>

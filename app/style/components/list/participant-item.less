@@ -21,15 +21,41 @@ participant-item {
   display: block;
   position: relative;
 
-  &::after {
+  &:not(.no-underline)::after {
+    content: '';
     background-color: currentColor;
     bottom: 0;
-    content: '';
     left: @left-list-item-left-width;
     height: 1px;
     opacity: 0.06;
     position: absolute;
     right: 0;
+  }
+
+  verified-icon,
+  guest-icon,
+  disclose-icon {
+    margin-left: 8px;
+    display: flex;
+  }
+
+  verified-icon + guest-icon {
+    margin-left: 16px;
+  }
+
+  guest-icon,
+  disclose-icon {
+    path {
+      fill: fade(@graphite-dark, 40%);
+    }
+  }
+
+  disclose-icon {
+    display: none;
+  }
+
+  &.show-arrow disclose-icon {
+    display: flex;
   }
 
   .participant-item {
