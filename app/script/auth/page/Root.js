@@ -33,6 +33,7 @@ import {connect} from 'react-redux';
 import de from 'react-intl/locale-data/de';
 import ROUTE from '../route';
 import SUPPORTED_LOCALE from '../supportedLocales';
+import WirelessUnsupportedBrowser from './WirelessUnsupportedBrowser';
 
 addLocaleData([...de]);
 
@@ -51,6 +52,7 @@ const Root = ({language}) => (
           <Switch>
             <Route exact path={ROUTE.INDEX} component={Index} />
             <Route path={ROUTE.CONVERSATION_JOIN} component={ConversationJoin} />
+            <Route path={ROUTE.UNSUPPORTED_JOIN} component={WirelessUnsupportedBrowser} />
             <Route path={ROUTE.CREATE_TEAM} component={TeamName} />
             <Route path={ROUTE.CREATE_TEAM_ACCOUNT} component={CreateAccount} />
             <Route path={ROUTE.CREATE_ACCOUNT} component={CreatePersonalAccount} />

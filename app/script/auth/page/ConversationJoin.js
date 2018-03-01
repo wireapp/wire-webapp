@@ -39,6 +39,7 @@ import {
   Modal,
   Text,
 } from '@wireapp/react-ui-kit';
+import {Redirect} from 'react-router';
 import {conversationJoinStrings} from '../../strings';
 import {footerStrings} from '../../strings';
 import {connect} from 'react-redux';
@@ -67,6 +68,7 @@ class ConversationJoin extends Component {
     error: null,
     forceNewAccount: false,
     isAppAlreadyOpen: !!Cookies.get(COOKIE_NAME_APP_OPENED),
+    isUnsupportedBrowser: false,
     isValidLink: true,
     isValidName: true,
   };
@@ -241,7 +243,7 @@ class ConversationJoin extends Component {
 
   render() {
     const {isAuthenticated, intl: {formatMessage: _}} = this.props;
-    const {isAppAlreadyOpen, isValidLink} = this.state;
+    const {isAppAlreadyOpen, isUnsupportedBrowser, isValidLink} = this.state;
     return (
       <Container
         style={{
@@ -281,6 +283,7 @@ class ConversationJoin extends Component {
             </Container>
           </Modal>
         )}
+        {isUnsupportedBrowser && <Redirect to={ROUTE.UNSUPPORTED_JOIN} />}
       </Container>
     );
   }
