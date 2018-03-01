@@ -28,6 +28,7 @@ import {H1, Text, Link} from '@wireapp/react-ui-kit/Text';
 import {COLOR} from '@wireapp/react-ui-kit/Identity';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 import {pathWithParams} from '../util/urlUtil';
+import ROUTE from '../route';
 import * as LanguageSelector from '../module/selector/LanguageSelector';
 import * as InviteSelector from '../module/selector/InviteSelector';
 import {invite} from '../module/action/InviteAction';
@@ -48,7 +49,7 @@ class InitialInvite extends React.PureComponent {
 
   onInviteDone = () => {
     const {invites} = this.props;
-    const nextLocation = pathWithParams('/login', 'reason=registration');
+    const nextLocation = pathWithParams(ROUTE.LOGIN, 'reason=registration');
     const invited = !!invites.length;
     return this.props
       .trackEvent({

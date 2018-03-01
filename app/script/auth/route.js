@@ -21,6 +21,8 @@ import {onEnvironment} from './Environment';
 
 const stagingWebsite = 'https://wire-website-staging.zinfra.io';
 
+const WEBAPP = onEnvironment('http://localhost:8888', '', ''); // TODO move to external routes
+
 export default {
   CHOOSE_HANDLE: '/choosehandle',
   CREATE_ACCOUNT: '/createaccount',
@@ -29,8 +31,8 @@ export default {
   INDEX: '/',
   INITIAL_INVITE: '/teaminvite',
   INVITE: '/invite',
-  LOGIN: '/login',
+  LOGIN: `${WEBAPP}/login`, // TODO move to external routes
   PERSONAL_INVITE: '/personalinvite',
   VERIFY: '/verify',
-  WIRE_ROOT: onEnvironment(stagingWebsite, stagingWebsite, 'https://wire.com'),
+  WIRE_ROOT: onEnvironment(stagingWebsite, stagingWebsite, 'https://wire.com'), // TODO move to external routes
 };
