@@ -454,6 +454,7 @@ z.string.conversationDetailsPeople = 'People';
 z.string.conversationDetailsServices = 'Services';
 
 // Panel: Guest options
+z.string.guestOptionsTitle = 'Guest options';
 
 // Panel: Group participant
 z.string.groupParticiapntServiceRemovalButton = 'Remove service';
