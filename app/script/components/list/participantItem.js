@@ -62,8 +62,8 @@ ko.components.register('participant-item', {
         </div>
       </div>
 
-      <!-- ko if: isUser -->
-        <div data-uie-name="status-verified"></div>
+      <!-- ko if: isUser && participant.is_verified() -->
+        <verified-icon></verified-icon>
       <!-- /ko -->
 
       <!-- ko if: isUser && !isOthersMode && participant.is_guest() -->

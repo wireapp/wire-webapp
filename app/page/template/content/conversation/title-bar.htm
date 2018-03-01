@@ -7,9 +7,7 @@
     </div>
 
     <!-- ko if: conversationEntity().verification_state() === z.conversation.ConversationVerificationState.VERIFIED -->
-      <svg class="conversation-verified-icon" width="16" height="16">
-        <use xlink:href="#icon-verified"></use>
-      </svg>
+      <verified-icon></verified-icon>
     <!-- /ko -->
 
     <div id="show-participants"
