@@ -181,7 +181,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
 
     this.renderAvatar = ko.observable(false);
     this.renderAvatarComputed = ko.computed(() => {
-      const hasUserId = Boolean(this.userProfile());
+      const hasUserId = !!this.userProfile();
 
       // swap value to re-render avatar
       this.renderAvatar(false);

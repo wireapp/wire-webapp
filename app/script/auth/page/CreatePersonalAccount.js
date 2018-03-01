@@ -28,6 +28,7 @@ import {Link as RRLink} from 'react-router-dom';
 import {withRouter} from 'react-router';
 import React from 'react';
 import ROUTE from '../route';
+import EXTERNAL_ROUTE from '../externalRoute';
 import AccountForm from '../component/AccountForm';
 import {trackNameWithContext, EVENT_CONTEXT, EVENT_NAME, FLOW_TO_CONTEXT} from '../module/action/TrackingAction';
 import {getAccount, getCurrentFlow, REGISTER_FLOW} from '../module/selector/AuthSelector';
@@ -58,7 +59,7 @@ class CreatePersonalAccount extends React.PureComponent {
       })
       .then(() => {
         const link = document.createElement('a');
-        link.href = pathWithParams(ROUTE.LOGIN, 'reason=registration');
+        link.href = pathWithParams(EXTERNAL_ROUTE.LOGIN, 'reason=registration');
         document.body.appendChild(link); // workaround for Firefox
         link.click();
       })
