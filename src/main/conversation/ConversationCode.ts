@@ -16,23 +16,10 @@
 // along with this program. If not, see http://www.gnu.org/licenses/.
 //
 
-export * from './ClientMismatch';
-export * from './Conversation';
-export * from './ConversationAPI';
-export * from './ConversationCode';
-export * from './ConversationIds';
-export * from './ConversationMembers';
-export * from './Conversations';
-export * from './ConversationUpdate';
-export * from './IncomingNotification';
-export * from './Invite';
-export * from './Member';
-export * from './MemberUpdate';
-export * from './NewConversation';
-export * from './NewOTRMessage';
-export * from './OtherMember';
-export * from './OTRClientMap';
-export * from './OTRRecipients';
-export * from './ServiceRef';
-export * from './Typing';
-export * from './UserClients';
+interface ConversationCode {
+  code: string;
+  key: string;
+  uri?: string;
+}
+
+export {ConversationCode};
