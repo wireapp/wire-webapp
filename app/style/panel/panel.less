@@ -18,6 +18,18 @@
  */
 
 .panel {
+  overflow: hidden;
+
+  &__page {
+    &.panel__page__visible {
+      opacity: 0;
+    }
+
+    &:not(.panel__page__visible) {
+      opacity: 1;
+    }
+  }
+
   &__action-item {
     height: 48px;
     border-bottom: 1px solid fade(@graphite-dark, 8%);

@@ -31,15 +31,14 @@ z.viewModel.panel.GuestOptionsViewModel = class GuestOptionsViewModel {
 
     this.conversationEntity = this.conversationRepository.active_conversation;
     this.panelState = this.panelViewModel.state;
+    this.isVisible = this.panelViewModel.guestOptionsVisible;
 
     this.isGuestRoom = ko.pureComputed(() => this.conversationEntity() && this.conversationEntity().isGuestRoom());
     this.isTeamOnly = ko.pureComputed(() => this.conversationEntity() && this.conversationEntity().isTeamOnly());
     this.hasAccessCode = ko.pureComputed(() => (this.isGuestRoom() ? !!this.conversationEntity().accessCode() : false));
 
-    this.codeVisible = ko.pureComputed(() => z.viewModel.PanelViewModel.CODE_STATES.includes(this.panelState()));
-
-    this.conversationEntity.subscribe(conversationEntity => this._updateCode(this.codeVisible(), conversationEntity));
-    this.codeVisible.subscribe(codeVisible => this._updateCode(codeVisible, this.conversationEntity()));
+    this.conversationEntity.subscribe(conversationEntity => this._updateCode(this.isVisible(), conversationEntity));
+    this.isVisible.subscribe(isVisible => this._updateCode(isVisible, this.conversationEntity()));
 
     this.requestOngoing = ko.observable(false);
   }

@@ -50,7 +50,17 @@ z.viewModel.panel.AppParticipantsViewModel = class AppParticipantsViewModel {
     this.logger = new z.util.Logger('z.viewModel.panel.AppParticipantsViewModel', z.config.LOGGER.OPTIONS);
 
     this.conversationEntity = this.conversationRepository.active_conversation;
+    this.isTeam = this.teamRepository.isTeam;
+    this.isVisible = this.panelViewModel.addParticipantsVisible;
+    this.panelState = this.panelViewModel.panelState;
+    this.services = this.integrationRepository.services;
+    this.showIntegrations = this.panelViewModel.showIntegrations;
+    this.teamUsers = this.teamRepository.teamUsers;
+    this.teamMembers = this.teamRepository.teamMembers;
 
+    this.searchInput = ko.observable('');
+    this.selectedContacts = ko.observableArray([]);
+    this.selectedService = ko.observable();
     this.state = ko.observable(AppParticipantsViewModel.STATE.ADD_PEOPLE);
 
     this.activeAddState = ko.pureComputed(() => AppParticipantsViewModel.CONFIG.ADD_STATES.includes(this.state()));
@@ -58,15 +68,6 @@ z.viewModel.panel.AppParticipantsViewModel = class AppParticipantsViewModel {
     this.stateAddService = ko.pureComputed(() => this.state() === AppParticipantsViewModel.STATE.ADD_SERVICE);
 
     this.stateConfirmation = ko.pureComputed(() => this.state() === AppParticipantsViewModel.STATE.CONFIRMATION);
-
-    this.showIntegrations = this.panelViewModel.showIntegrations;
-
-    this.searchInput = ko.observable('');
-    this.searchInput.subscribe(searchInput => this.searchServices(searchInput));
-    this.isSearching = ko.pureComputed(() => this.searchInput().length);
-
-    this.selectedContacts = ko.observableArray([]);
-    this.selectedService = ko.observable();
 
     this.contacts = ko.pureComputed(() => {
       let userEntities = [];
@@ -88,13 +89,11 @@ z.viewModel.panel.AppParticipantsViewModel = class AppParticipantsViewModel {
       });
     });
 
-    this.isTeam = this.teamRepository.isTeam;
-    this.teamUsers = this.teamRepository.teamUsers;
-    this.teamMembers = this.teamRepository.teamMembers;
-
+    this.isSearching = ko.pureComputed(() => this.searchInput().length);
     this.isTeamOnly = ko.pureComputed(() => this.conversationEntity() && this.conversationEntity.isTeamOnly());
 
-    this.services = this.integrationRepository.services;
+    this.participantsHeaderText = ko.pureComputed(() => 'Placeholder');
+    this.searchInput.subscribe(searchInput => this.searchServices(searchInput));
   }
 
   clickOnAddService() {

@@ -40,11 +40,13 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
     this.conversationEntity = this.conversationRepository.active_conversation;
     this.enableIntegrations = this.integrationRepository.enableIntegrations;
     this.isTeam = this.teamRepository.isTeam;
+    this.panelState = panelViewModel.state;
 
     this.serviceParticipants = ko.observableArray();
     this.userParticipants = ko.observableArray();
 
-    this.hasConversation = ko.pureComputed(() => Boolean(this.conversationEntity()));
+    this.hasConversation = ko.pureComputed(() => !!this.conversationEntity());
+    this.isVisible = ko.pureComputed(() => this.hasConversation() && this.panelViewModel.conversationDetailsVisible());
 
     ko.computed(() => {
       if (this.hasConversation()) {

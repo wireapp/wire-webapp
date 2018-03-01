@@ -1,5 +1,5 @@
-<div id="conversation-details" class="conversation-details" data-bind="with: $root.conversationDetails">
-  <!-- ko if: hasConversation -->
+<div id="conversation-details" class="panel_page panel__page__visible conversation-details" data-bind="with: $root.conversationDetails">
+  <!-- ko if: isVisible() -->
     <div class="right-panel-header">
       <!-- ko if: !conversationEntity().is_request() && !conversationEntity().removed_from_conversation() -->
         <mute-icon class="right-panel-mute icon-button" data-bind="click: clickToToggleMute, css: {'right-panel-mute--active': conversationEntity().is_muted()} " data-uie-name="do-mute"></mute-icon>

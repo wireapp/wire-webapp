@@ -27,7 +27,6 @@ z.viewModel.PanelViewModel = class PanelViewModel {
     return {
       ADD_PARTICIPANTS: 'PanelViewModel.STATE.ADD_PARTICIPANTS',
       CONVERSATION_DETAILS: 'PanelViewModel.STATE.CONVERSATION_DETAILS',
-      EMPTY: 'PanelViewModel.STATE.EMPTY',
       GROUP_PARTICIPANT: 'PanelViewModel.STATE.GROUP_PARTICIPANT',
       GUEST_OPTIONS: 'PanelViewModel.STATE.GUEST_OPTIONS',
       PARTICIPANT_DEVICES: 'PanelViewModel.STATE.DEVICES',
@@ -51,13 +50,25 @@ z.viewModel.PanelViewModel = class PanelViewModel {
     this.mainViewModel = mainViewModel;
     this.logger = new z.util.Logger('z.viewModel.PanelViewModel', z.config.LOGGER.OPTIONS);
 
-    this.state = ko.observable(PanelViewModel.STATE.EMPTY);
+    this.state = ko.observable(PanelViewModel.STATE.CONVERSATION_DETAILS);
 
     this.conversationEntity = repositories.conversation.active_conversation;
     this.conversationEntity.subscribe(() => {
-      if (this.mainViewModel.isPanelOpen()) {
+      if (this.isVisible()) {
         this.mainViewModel.closePanel();
       }
+    });
+
+    this.isVisible = ko.observable(false);
+
+    this.addParticipantsVisible = ko.pureComputed(() => this._isStateVisible(PanelViewModel.STATE.ADD_PARTICIPANTS));
+    this.conversationDetailsVisible = ko.pureComputed(() => {
+      return this._isStateVisible(PanelViewModel.STATE.CONVERSATION_DETAILS);
+    });
+    this.groupParticipantVisible = ko.pureComputed(() => this._isStateVisible(PanelViewModel.STATE.GROUP_PARTICIPANT));
+    this.guestOptionsVisible = ko.pureComputed(() => this._isStateVisible(PanelViewModel.STATE.GUEST_OPTIONS));
+    this.partcipantDevicesVisible = ko.pureComputed(() => {
+      return this._isStateVisible(PanelViewModel.STATE.PARTICIPANT_DEVICES);
     });
 
     this.isTeamOnly = ko.pureComputed(() => this.conversationEntity() && this.conversationEntity.isTeamOnly());
@@ -82,13 +93,18 @@ z.viewModel.PanelViewModel = class PanelViewModel {
     ko.applyBindings(this, document.getElementById(this.elementId));
   }
 
+  _isStateVisible(state) {
+    const isStateVisible = this.state() === state;
+    return isStateVisible && this.isVisible();
+  }
+
   showGroupParticipant(userEntity) {
     this.groupParticipant.showGroupParticipant(userEntity);
     this.switchState(PanelViewModel.STATE.GROUP_PARTICIPANT);
   }
 
   showParticipant(userEntity) {
-    if (this.mainViewModel.isPanelOpen()) {
+    if (this.isVisible()) {
       if (this.conversationEntity().is_one2one()) {
         if (userEntity.is_me) {
         }
@@ -101,22 +117,21 @@ z.viewModel.PanelViewModel = class PanelViewModel {
   switchState(newState) {
     const stateUnchanged = newState === this.state();
     if (!stateUnchanged) {
-      this.state(newState);
+      this._hidePanel();
+      this._showPanel(newState);
     }
   }
 
   togglePanel(addPeople = false) {
     if (addPeople && !this.conversationEntity().is_guest()) {
-      const isStateAddParticipants = this.state() === PanelViewModel.STATE.ADD_PARTICIPANTS;
-      if (isStateAddParticipants && this.mainViewModel.isPanelOpen()) {
+      if (this.addParticipantsVisible()) {
         return this._closePanel();
       }
 
       return this._openPanel(PanelViewModel.STATE.ADD_PARTICIPANTS);
     }
 
-    const isStateConversationDetails = this.state() === PanelViewModel.STATE.CONVERSATION_DETAILS;
-    if (isStateConversationDetails && this.mainViewModel.isPanelOpen()) {
+    if (this.conversationDetailsVisible()) {
       return this._closePanel();
     }
 
@@ -124,11 +139,41 @@ z.viewModel.PanelViewModel = class PanelViewModel {
   }
 
   _closePanel() {
-    this.mainViewModel.closePanel().then(() => this.switchState(PanelViewModel.STATE.EMPTY));
+    this.mainViewModel.closePanel().then(() => this.isVisible(false));
   }
 
   _openPanel(newState) {
     this.switchState(newState);
+    this.isVisible(true);
     this.mainViewModel.openPanel();
+  }
+
+  _getElementIdOfPanel(panelState) {
+    switch (panelState) {
+      case PanelViewModel.STATE.ADD_PARTICIPANTS:
+        return 'add-participants';
+      case PanelViewModel.STATE.GROUP_PARTICIPANT:
+        return 'group-participant';
+      case PanelViewModel.STATE.GUEST_OPTIONS:
+        return 'guest-options';
+      case PanelViewModel.STATE.PARTICIPANT_DEVICES:
+        return 'participant-devices';
+      default:
+        return 'conversation-details';
+    }
+  }
+
+  _hidePanel() {
+    const panelStateElementId = this._getElementIdOfPanel(this.state());
+    $(`#${panelStateElementId}`).removeClass('panel__page__visible');
+  }
+
+  _showPanel(newPanelState) {
+    this.state(newPanelState);
+
+    const panelStateElementId = this._getElementIdOfPanel(newPanelState);
+    if (panelStateElementId) {
+      $(`#${panelStateElementId}`).addClass('panel__page__visible');
+    }
   }
 };
