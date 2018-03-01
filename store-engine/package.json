@@ -25,7 +25,7 @@
   "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine",
   "scripts": {
     "build": "yarn build:node && yarn build:browser",
-    "build:browser": "exit 0",
+    "build:browser": "webpack --progress",
     "build:node": "tsc",
     "clear": "rimraf dist",
     "dist": "yarn clear && yarn build",

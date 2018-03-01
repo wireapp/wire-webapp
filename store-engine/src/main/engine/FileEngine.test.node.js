@@ -67,6 +67,17 @@ describe('StoreEngine.FileEngine', () => {
       it(description, done => testFunction(done, engine));
     });
 
+    it('accepts custom file extensions', async done => {
+      const options = {
+        fileExtension: '.json',
+      };
+      engine = new StoreEngine.FileEngine();
+      await engine.init(STORE_NAME, options);
+
+      expect(engine.options.fileExtension).toBe(options.fileExtension);
+      done();
+    });
+
     it('does not allow path traversal', done => {
       const PRIMARY_KEY = 'primary-key';
 

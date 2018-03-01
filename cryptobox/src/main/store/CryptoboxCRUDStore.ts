@@ -3,6 +3,7 @@ import * as ProteusSession from '@wireapp/proteus/dist/session/root';
 import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine/index';
 import {CryptoboxStore, PersistedRecord, SerialisedRecord} from '../store/root';
 import {StoreEngine} from '@wireapp/store-engine';
+import {Decoder, Encoder} from 'bazinga64';
 
 class CryptoboxCRUDStore implements CryptoboxStore {
   constructor(private engine: CRUDEngine) {}
@@ -21,25 +22,14 @@ class CryptoboxCRUDStore implements CryptoboxStore {
     };
   }
 
-  private from_store(record: PersistedRecord): SerialisedRecord {
-    const decodedData: Buffer | ArrayBuffer =
-      typeof record.serialised === 'string' ? Buffer.from(record.serialised, 'base64') : <ArrayBuffer>record.serialised;
-
-    return {
-      created: record.created,
-      id: record.id,
-      serialised: new Uint8Array(decodedData).buffer,
-      version: record.version,
-    };
+  private from_store(record: PersistedRecord): ArrayBuffer {
+    return typeof record.serialised === 'string'
+      ? Decoder.fromBase64(record.serialised).asBytes.buffer
+      : record.serialised;
   }
 
-  private to_store(record: SerialisedRecord): PersistedRecord {
-    return {
-      created: record.created,
-      id: record.id,
-      serialised: new Buffer(record.serialised).toString('base64'),
-      version: record.version,
-    };
+  private to_store(serialised: ArrayBuffer | string): string {
+    return Encoder.toBase64(serialised).asString;
   }
 
   public delete_all(): Promise<boolean> {
@@ -57,9 +47,9 @@ class CryptoboxCRUDStore implements CryptoboxStore {
   public load_identity(): Promise<ProteusKeys.IdentityKeyPair | undefined> {
     return this.engine
       .read<PersistedRecord>(CryptoboxCRUDStore.STORES.LOCAL_IDENTITY, CryptoboxCRUDStore.KEYS.LOCAL_IDENTITY)
-      .then((payload: PersistedRecord) => {
-        const record: SerialisedRecord = this.from_store(payload);
-        const identity: ProteusKeys.IdentityKeyPair = ProteusKeys.IdentityKeyPair.deserialise(record.serialised);
+      .then((record: PersistedRecord) => {
+        const payload = this.from_store(record);
+        const identity: ProteusKeys.IdentityKeyPair = ProteusKeys.IdentityKeyPair.deserialise(payload);
         return identity;
       })
       .catch((error: Error) => {
@@ -73,9 +63,9 @@ class CryptoboxCRUDStore implements CryptoboxStore {
   public load_prekey(prekey_id: number): Promise<ProteusKeys.PreKey | undefined> {
     return this.engine
       .read<PersistedRecord>(CryptoboxCRUDStore.STORES.PRE_KEYS, prekey_id.toString())
-      .then((payload: PersistedRecord) => {
-        const record: SerialisedRecord = this.from_store(payload);
-        return ProteusKeys.PreKey.deserialise(record.serialised);
+      .then((record: PersistedRecord) => {
+        const payload = this.from_store(record);
+        return ProteusKeys.PreKey.deserialise(payload);
       })
       .catch((error: Error) => {
         if (error instanceof StoreEngine.error.RecordNotFoundError) {
@@ -89,9 +79,9 @@ class CryptoboxCRUDStore implements CryptoboxStore {
     return this.engine.readAll(CryptoboxCRUDStore.STORES.PRE_KEYS).then((records: Array<any>) => {
       const preKeys: Array<ProteusKeys.PreKey> = [];
 
-      records.forEach((payload: PersistedRecord) => {
-        const record: SerialisedRecord = this.from_store(payload);
-        let preKey: ProteusKeys.PreKey = ProteusKeys.PreKey.deserialise(record.serialised);
+      records.forEach((record: PersistedRecord) => {
+        const payload = this.from_store(record);
+        let preKey: ProteusKeys.PreKey = ProteusKeys.PreKey.deserialise(payload);
         preKeys.push(preKey);
       });
 
@@ -100,15 +90,15 @@ class CryptoboxCRUDStore implements CryptoboxStore {
   }
 
   public save_identity(identity: ProteusKeys.IdentityKeyPair): Promise<ProteusKeys.IdentityKeyPair> {
-    const record: SerialisedRecord = new SerialisedRecord(identity.serialise(), CryptoboxCRUDStore.KEYS.LOCAL_IDENTITY);
-    const payload: PersistedRecord = this.to_store(record);
-    return this.engine.create(CryptoboxCRUDStore.STORES.LOCAL_IDENTITY, record.id, payload).then(() => identity);
+    const serialised = this.to_store(identity.serialise());
+    const payload: SerialisedRecord = new SerialisedRecord(serialised, CryptoboxCRUDStore.KEYS.LOCAL_IDENTITY);
+    return this.engine.create(CryptoboxCRUDStore.STORES.LOCAL_IDENTITY, payload.id, payload).then(() => identity);
   }
 
   public save_prekey(pre_key: ProteusKeys.PreKey): Promise<ProteusKeys.PreKey> {
-    const record: SerialisedRecord = new SerialisedRecord(pre_key.serialise(), pre_key.key_id.toString());
-    const payload: PersistedRecord = this.to_store(record);
-    return this.engine.create(CryptoboxCRUDStore.STORES.PRE_KEYS, record.id, payload).then(() => pre_key);
+    const serialised = this.to_store(pre_key.serialise());
+    const payload: SerialisedRecord = new SerialisedRecord(serialised, pre_key.key_id.toString());
+    return this.engine.create(CryptoboxCRUDStore.STORES.PRE_KEYS, payload.id, payload).then(() => pre_key);
   }
 
   public save_prekeys(pre_keys: ProteusKeys.PreKey[]): Promise<ProteusKeys.PreKey[]> {
@@ -117,25 +107,25 @@ class CryptoboxCRUDStore implements CryptoboxStore {
   }
 
   public create_session(session_id: string, session: ProteusSession.Session): Promise<ProteusSession.Session> {
-    const record: SerialisedRecord = new SerialisedRecord(session.serialise(), session_id);
-    const payload: PersistedRecord = this.to_store(record);
-    return this.engine.create(CryptoboxCRUDStore.STORES.SESSIONS, record.id, payload).then(() => session);
+    const serialised = this.to_store(session.serialise());
+    const payload: SerialisedRecord = new SerialisedRecord(serialised, session_id);
+    return this.engine.create(CryptoboxCRUDStore.STORES.SESSIONS, payload.id, payload).then(() => session);
   }
 
   public read_session(identity: ProteusKeys.IdentityKeyPair, session_id: string): Promise<ProteusSession.Session> {
     return this.engine
       .read<PersistedRecord>(CryptoboxCRUDStore.STORES.SESSIONS, session_id)
-      .then((payload: PersistedRecord) => {
-        const record: SerialisedRecord = this.from_store(payload);
-        return ProteusSession.Session.deserialise(identity, record.serialised);
+      .then((record: PersistedRecord) => {
+        const payload = this.from_store(record);
+        return ProteusSession.Session.deserialise(identity, payload);
       });
   }
 
   public update_session(session_id: string, session: ProteusSession.Session): Promise<ProteusSession.Session> {
-    const record: SerialisedRecord = new SerialisedRecord(session.serialise(), session_id);
-    const payload: PersistedRecord = this.to_store(record);
+    const serialised = this.to_store(session.serialise());
+    const payload: SerialisedRecord = new SerialisedRecord(serialised, session_id);
     return this.engine
-      .update(CryptoboxCRUDStore.STORES.SESSIONS, record.id, {serialised: payload.serialised})
+      .update(CryptoboxCRUDStore.STORES.SESSIONS, payload.id, {serialised: payload.serialised})
       .then(() => session);
   }
 

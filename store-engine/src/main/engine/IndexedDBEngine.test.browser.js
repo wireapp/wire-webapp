@@ -70,6 +70,8 @@ describe('StoreEngine.IndexedDBEngine', () => {
         .then(primaryKey => {
           expect(primaryKey).toEqual(PRIMARY_KEY);
           expect(engine.storeName).toBe(name);
+          expect(engine.db.name).toBe(name);
+          expect(Object.keys(engine.db._dbSchema).length).toBe(1);
           done();
         })
         .catch(done.fail);

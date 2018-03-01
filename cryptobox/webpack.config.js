@@ -30,6 +30,7 @@ module.exports = {
   },
   externals: {
     '@wireapp/cbor': 'CBOR',
+    '@wireapp/store-engine': 'StoreEngine',
     dexie: 'Dexie',
     'fs-extra': '{}',
     'libsodium-wrappers-sumo': 'sodium',

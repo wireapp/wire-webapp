@@ -8,6 +8,7 @@ module.exports = {
   entry: {
     [`${projectName}.demo`]: `${__dirname}/src/demo/index.js`,
     [`${projectName}.test`]: `${__dirname}/src/main/index.test.browser.js`,
+    [projectName]: `${__dirname}/${pkg.main}`,
   },
   externals: {
     'fs-extra': '{}',
@@ -17,6 +18,7 @@ module.exports = {
   },
   output: {
     filename: '[name].bundle.js',
+    library: 'StoreEngine',
     path: `${__dirname}/dist`,
     publicPath: '/',
   },

@@ -22,36 +22,48 @@
 const Proteus = require('@wireapp/proteus');
 const cryptobox = require('@wireapp/cryptobox');
 const LRUCache = require('@wireapp/lru-cache').default;
+const {StoreEngine} = require('@wireapp/store-engine');
 
 describe('cryptobox.store.IndexedDB', () => {
-  let storeName = 'wire@production@532af01e-1e24-4366-aacf-33b67d4ee376@temporary';
   let store = undefined;
+  const STORE_NAME = 'wire@production@532af01e-1e24-4366-aacf-33b67d4ee376@temporary';
 
-  beforeEach(() => (store = new cryptobox.store.IndexedDB(storeName)));
+  async function createStore(storeName) {
+    const engine = new StoreEngine.IndexedDBEngine();
+    await engine.init(storeName);
+    engine.db.version(1).stores({
+      keys: '',
+      prekeys: '',
+      sessions: '',
+    });
+    return new cryptobox.store.CryptoboxCRUDStore(engine);
+  }
 
-  afterEach(done => {
-    if (store) {
-      store
-        .delete_all()
-        .then(done)
-        .catch(done.fail);
-    }
-
-    window.indexedDB.deleteDatabase(storeName);
+  beforeEach(async done => {
+    store = await createStore(STORE_NAME);
+    done();
   });
 
+  afterEach(() => window.indexedDB.deleteDatabase('alice_db'));
+
   describe('Basic functionality', () => {
+    afterEach(() => {
+      window.indexedDB.deleteDatabase('alice_desktop');
+      window.indexedDB.deleteDatabase('bob_desktop');
+      window.indexedDB.deleteDatabase('bob_mobile');
+    });
+
     it('removes PreKeys from the storage (when a session gets established) and creates new PreKeys if needed.', async done => {
       const alice = {
         // PreKeys: ["65535", "0", "1"]
-        desktop: new cryptobox.Cryptobox(new cryptobox.store.IndexedDB('alice_desktop'), 3),
+        desktop: new cryptobox.Cryptobox(await createStore('alice_desktop'), 3),
       };
 
       const bob = {
         // PreKeys: ["65535"]
-        desktop: new cryptobox.Cryptobox(new cryptobox.store.IndexedDB('bob_desktop'), 1),
+        desktop: new cryptobox.Cryptobox(await createStore('bob_desktop'), 1),
         // PreKeys: ["65535"]
-        mobile: new cryptobox.Cryptobox(new cryptobox.store.IndexedDB('bob_mobile'), 1),
+        mobile: new cryptobox.Cryptobox(await createStore('bob_mobile'), 1),
       };
 
       spyOn(alice.desktop, 'publish_prekeys').and.callThrough();
@@ -91,61 +103,10 @@ describe('cryptobox.store.IndexedDB', () => {
       expect(alice.desktop.pk_store.prekeys.length).toBe(0);
       expect(alice.desktop.cachedSessions.size()).toBe(2);
       expect(alice.desktop.pk_store.release_prekeys.calls.count()).toBe(2);
-      expect(alice.desktop.publish_prekeys.calls.count()).toBe(2); // Published PreKey ID "3"
+      expect(alice.desktop.publish_prekeys.calls.count()).toBe(2);
       expect(await sodium.to_string(plaintext)).toBe(messageFromBob);
 
       done();
-    });
-  });
-
-  describe('"constructor"', () => {
-    it('works with a given Dexie instance', () => {
-      const schema = {
-        amplify: '',
-        clients: ', meta.primary_key',
-        conversation_events: ', conversation, time, type',
-        conversations: ', id, last_event_timestamp',
-        keys: '',
-        prekeys: '',
-        sessions: '',
-      };
-
-      const db = new Dexie(storeName);
-      db.version(7).stores(schema);
-
-      store = new cryptobox.store.IndexedDB(db);
-
-      expect(store.db.name).toBe(storeName);
-      expect(Object.keys(db._dbSchema).length).toBe(7);
-    });
-  });
-
-  describe('"create"', () => {
-    it("doesn't save null values", async done => {
-      const schema = {
-        amplify: '',
-        clients: ', meta.primary_key',
-        conversation_events: ', conversation, time, type',
-        conversations: ', id, last_event_timestamp',
-        keys: '',
-        prekeys: '',
-        sessions: '',
-      };
-
-      storeName = 'wire@production@532af01e-1e24-4366-aacf-33b67d4ee377@temporary';
-      const db = new Dexie(storeName);
-      db.version(1).stores(schema);
-
-      store = new cryptobox.store.IndexedDB(db);
-      expect(store.db.name).toBe(storeName);
-
-      try {
-        await store.create(name, 'sessions', null);
-        done.fail(new Error('Expected error'));
-      } catch (error) {
-        expect(error.name).toBe('RecordTypeError');
-        done();
-      }
     });
   });
 
@@ -162,7 +123,8 @@ describe('cryptobox.store.IndexedDB', () => {
       const proteusSession = await Proteus.session.Session.init_from_prekey(alice, bobPreKeyBundle);
       await store.create_session(sessionId, proteusSession);
 
-      const serialisedSession = await store.read(store.TABLE.SESSIONS, sessionId);
+      const tableName = cryptobox.store.CryptoboxCRUDStore.STORES.SESSIONS;
+      const serialisedSession = await store.engine.read(tableName, sessionId);
       expect(serialisedSession.created).toEqual(jasmine.any(Number));
       expect(serialisedSession.version).toEqual(cryptobox.Cryptobox.prototype.VERSION);
 
@@ -174,10 +136,12 @@ describe('cryptobox.store.IndexedDB', () => {
   });
 
   describe('"session_from_prekey"', () => {
-    it('saves and caches a valid session from a serialized PreKey bundle', async done => {
-      storeName = 'alice_db';
+    afterEach(() => {
+      window.indexedDB.deleteDatabase('alice_db');
+    });
 
-      const alice = new cryptobox.Cryptobox(new cryptobox.store.IndexedDB(storeName), 1);
+    it('saves and caches a valid session from a serialized PreKey bundle', async done => {
+      const alice = new cryptobox.Cryptobox(await createStore('alice_db'), 1);
       const sessionId = 'session_with_bob';
 
       const bob = await Proteus.keys.IdentityKeyPair.new();
@@ -200,7 +164,7 @@ describe('cryptobox.store.IndexedDB', () => {
     });
 
     it('reinforces a session from the indexedDB without cache', async done => {
-      const alice = new cryptobox.Cryptobox(new cryptobox.store.IndexedDB(storeName), 1);
+      const alice = new cryptobox.Cryptobox(store, 1);
       const sessionId = 'session_with_bob';
 
       try {

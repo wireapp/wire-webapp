@@ -22,10 +22,10 @@
 describe('cryptobox.Cryptobox', () => {
   const cryptobox = require('@wireapp/cryptobox');
   const Proteus = require('@wireapp/proteus');
-  const {MemoryEngine} = require('@wireapp/store-engine').StoreEngine;
+  const {StoreEngine} = require('@wireapp/store-engine');
 
   async function createCryptobox(storeName) {
-    const engine = new MemoryEngine();
+    const engine = new StoreEngine.MemoryEngine();
     await engine.init(storeName);
     return new cryptobox.Cryptobox(new cryptobox.store.CryptoboxCRUDStore(engine));
   }

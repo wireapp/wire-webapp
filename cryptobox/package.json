@@ -46,7 +46,7 @@
   "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox",
   "scripts": {
     "build": "gulp install && yarn build:node && yarn build:browser",
-    "copy:browser": "cpx ../cbor/dist/cbor.bundle.js dist/lib/dynamic",
+    "copy:browser": "cpx ../cbor/dist/cbor.bundle.js dist/lib/dynamic && cpx ../store-engine/dist/store-engine.bundle.js dist/lib/dynamic",
     "build:browser": "yarn copy:browser && webpack --progress",
     "build:node": "tsc",
     "clear": "rimraf dist/commonjs dist/lib",

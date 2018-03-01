@@ -31,6 +31,19 @@ module.exports = {
         done();
       });
   },
+  "doesn't save null values.": (done, engine) => {
+    const PRIMARY_KEY = 'primary-key';
+
+    const entity = undefined;
+
+    engine
+      .create(TABLE_NAME, PRIMARY_KEY, entity)
+      .then(() => done.fail(new Error('Method is supposed to throw an error.')))
+      .catch(error => {
+        expect(error).toEqual(jasmine.any(StoreEngine.error.RecordTypeError));
+        done();
+      });
+  },
   'throws an error when attempting to overwrite a record.': (done, engine) => {
     const PRIMARY_KEY = 'primary-key';
 
