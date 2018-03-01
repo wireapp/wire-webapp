@@ -80,19 +80,24 @@ z.conversation.ConversationStateHandler = class ConversationStateHandler {
       }
     }
 
-    // show something went wrong
-    return Promise.reject(new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_CHANGE));
+    this._showModal(z.string.modalConversationGuestOptionsToggleGuestsMessage);
+    return Promise.resolve();
   }
 
   getAccessCode(conversationEntity) {
-    this.conversationService
+    return this.conversationService
       .getConversationCode(conversationEntity.id)
       .then(response => this.conversationMapper.mapAccessCode(conversationEntity, response))
-      .catch(() => this._showModal(z.string.modalConversationGuestOptionsGetCodeMessage));
+      .catch(error => {
+        const isNotFound = error.code === z.service.BackendClientError.STATUS_CODE.NOT_FOUND;
+        if (!isNotFound) {
+          this._showModal(z.string.modalConversationGuestOptionsGetCodeMessage);
+        }
+      });
   }
 
   requestAccessCode(conversationEntity) {
-    this.conversationService
+    return this.conversationService
       .postConversationCode(conversationEntity.id)
       .then(response => {
         const accessCode = response.data || response;
@@ -102,7 +107,7 @@ z.conversation.ConversationStateHandler = class ConversationStateHandler {
   }
 
   revokeAccessCode(conversationEntity) {
-    this.conversationService
+    return this.conversationService
       .deleteConversationCode(conversationEntity.id)
       .then(() => conversationEntity.accessCode(undefined))
       .catch(() => this._showModal(z.string.modalConversationGuestOptionsRevokeCodeMessage));

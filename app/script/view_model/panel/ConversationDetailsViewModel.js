@@ -38,13 +38,15 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
     this.logger = new z.util.Logger('z.viewModel.panel.ConversationDetailsViewModel', z.config.LOGGER.OPTIONS);
 
     this.conversationEntity = this.conversationRepository.active_conversation;
-    this.enableIntegrations = this.integrationRepository.enableIntegrations;
     this.isTeam = this.teamRepository.isTeam;
+    this.isTeamOnly = this.panelViewModel.isTeamOnly;
+    this.showIntegrations = this.panelViewModel.showIntegrations;
 
     this.serviceParticipants = ko.observableArray();
     this.userParticipants = ko.observableArray();
 
-    this.hasConversation = ko.pureComputed(() => Boolean(this.conversationEntity()));
+    this.hasConversation = ko.pureComputed(() => !!this.conversationEntity());
+    this.isVisible = ko.pureComputed(() => this.hasConversation() && this.panelViewModel.conversationDetailsVisible());
 
     this.availabilityLabel = ko.pureComputed(() => {
       if (this.conversationEntity() || this.conversationEntity().is_one2one()) {
@@ -70,16 +72,6 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
             }
             this.userParticipants.push(userEntity);
           });
-      }
-    });
-
-    this.isTeamOnly = ko.pureComputed(() => this.conversationEntity() && this.conversationEntity().isTeamOnly());
-    this.showIntegrations = ko.pureComputed(() => {
-      if (this.hasConversation()) {
-        const firstUserEntity = this.conversationEntity().firstUserEntity();
-        const hasBotUser = firstUserEntity && firstUserEntity.isBot;
-        const allowIntegrations = this.conversationEntity().is_group() || hasBotUser;
-        return this.enableIntegrations() && allowIntegrations && !this.isTeamOnly();
       }
     });
 
@@ -119,18 +111,12 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
     this.guestOptionsText = ko.pureComputed(() => {
       return this.isTeamOnly() ? z.string.conversationDetailsGuestsOff : z.string.conversationDetailsGuestsOn;
     });
-    this.addActionText = ko.pureComputed(() => {
-      return this.showIntegrations()
-        ? z.string.conversationDetailsActionAdd
-        : z.string.conversationDetailsActionAddParticipants;
-    });
 
     this.shouldUpdateScrollbar = ko.computed(() => true).extend({notify: 'always', rateLimit: 500});
 
-    const shortcut = z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.ADD_PEOPLE);
+    const addPeopleshortcut = z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.ADD_PEOPLE);
     this.addPeopleTooltip = ko.pureComputed(() => {
-      const identifier = this.showIntegrations() ? z.string.tooltipPeopleAdd : z.string.tooltipPeopleAddPeople;
-      return z.l10n.text(identifier, shortcut);
+      return z.l10n.text(z.string.tooltipPeopleAddPeople, addPeopleshortcut);
     });
   }
 

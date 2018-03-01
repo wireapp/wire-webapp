@@ -1,5 +1,5 @@
-<div id="conversation-details" class="conversation-details" data-bind="with: $root.conversationDetails">
-  <!-- ko if: hasConversation -->
+<div id="conversation-details" class="panel__page panel__page--visible conversation-details" data-bind="with: $root.conversationDetails">
+  <!-- ko if: isVisible() -->
     <div class="right-panel-header">
       <!-- ko if: !conversationEntity().is_request() && !conversationEntity().removed_from_conversation() -->
         <mute-icon class="right-panel-mute icon-button" data-bind="click: clickToToggleMute, css: {'right-panel-mute--active': conversationEntity().is_muted()} " data-uie-name="do-mute"></mute-icon>
@@ -41,7 +41,7 @@
           <!-- ko if: conversationEntity().is_group() -->
             <div class="panel__action-item" data-bind="click: clickOnAddParticipants, attr:{'title': addPeopleTooltip}" data-uie-name="go-add-people">
               <add-participants-icon class="panel__action-item__icon"></add-participants-icon>
-              <div class="panel__action-item__text" data-bind="l10n_text: addActionText"></div>
+              <div class="panel__action-item__text" data-bind="l10n_text: z.string.conversationDetailsActionAddParticipants"></div>
             </div>
             <!-- ko if: conversationEntity().team_id -->
               <div class="panel__action-item conversation-details__guest-options" data-bind="click: clickOnGuestOptions" data-uie-name="go-guest-options">

@@ -25,22 +25,21 @@ window.z.viewModel.panel = z.viewModel.panel || {};
 
 z.viewModel.panel.GuestOptionsViewModel = class GuestOptionsViewModel {
   constructor(mainViewModel, panelViewModel, repositories) {
+    this.panelViewModel = panelViewModel;
     this.conversationRepository = repositories.conversation;
     this.stateHandler = this.conversationRepository.stateHandler;
 
     this.conversationEntity = this.conversationRepository.active_conversation;
+    this.panelState = this.panelViewModel.state;
+    this.isGuestRoom = this.panelViewModel.isGuestRoom;
+    this.isTeamOnly = this.panelViewModel.isTeamOnly;
+    this.isVisible = this.panelViewModel.guestOptionsVisible;
 
-    this.isGuestRoom = ko.pureComputed(() => this.conversationEntity() && this.conversationEntity().isGuestRoom());
-    this.isTeamOnly = ko.pureComputed(() => this.conversationEntity() && this.conversationEntity().isTeamOnly());
     this.hasAccessCode = ko.pureComputed(() => (this.isGuestRoom() ? !!this.conversationEntity().accessCode() : false));
-
-    this.conversationEntity.subscribe(conversationEntity => {
-      if (conversationEntity && conversationEntity.isGuestRoom() && !conversationEntity.accessCode()) {
-        this.stateHandler.getAccessCode(conversationEntity);
-      }
-    });
-
     this.requestOngoing = ko.observable(false);
+
+    this.conversationEntity.subscribe(conversationEntity => this._updateCode(this.isVisible(), conversationEntity));
+    this.isVisible.subscribe(isVisible => this._updateCode(isVisible, this.conversationEntity()));
   }
 
   toggleAccessState() {
@@ -107,5 +106,13 @@ z.viewModel.panel.GuestOptionsViewModel = class GuestOptionsViewModel {
         title: z.l10n.text(z.string.modalConversationRevokeLinkMessage),
       },
     });
+  }
+
+  _updateCode(isVisible, conversationEntity) {
+    const updateCode = conversationEntity && conversationEntity.isGuestRoom() && !conversationEntity.accessCode();
+    if (isVisible && updateCode) {
+      this.requestOngoing(true);
+      this.stateHandler.getAccessCode(conversationEntity).then(() => this.requestOngoing(false));
+    }
   }
 };
