@@ -27,9 +27,12 @@ const BACKEND = Environment.onEnvironment(
   APIClient.BACKEND.PRODUCTION
 );
 
+const store = new StoreEngine.MemoryEngine();
+store.init('wire-webapp');
+
 export const configureClient = () => {
   return new APIClient({
-    store: new StoreEngine.MemoryEngine('wire-webapp'),
+    store: store,
     urls: BACKEND,
   });
 };

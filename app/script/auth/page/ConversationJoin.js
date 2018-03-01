@@ -73,19 +73,22 @@ class ConversationJoin extends Component {
       });
   }
 
-  openWebapp = params => {
+  onLoginClick = () => {
     const link = document.createElement('a');
-    link.href = pathWithParams(ROUTE.LOGIN, params);
+    link.href = pathWithParams(ROUTE.LOGIN, 'mode=login');
     document.body.appendChild(link); // workaround for Firefox
     link.click();
   };
 
-  onLoginClick = () => this.openWebapp('mode=login');
-
   onOpenWireClick = () => {
     this.props
       .doJoinConversationByCode(this.state.conversationKey, this.state.conversationCode)
-      .then(() => this.openWebapp('mode=login'))
+      .then(() => {
+        const link = document.createElement('a');
+        link.href = pathWithParams('/');
+        document.body.appendChild(link); // workaround for Firefox
+        link.click();
+      })
       .catch(error => console.error('Failed to join conversation with existing account', error));
   };
 
@@ -236,7 +239,7 @@ class ConversationJoin extends Component {
             : this.renderInvalidLink()}
         </Content>
         <Footer style={{justifyContent: 'flex-end', margin: '20px 0 50px 20px'}}>
-          <Link href={'wire.com'}>WIRE.COM</Link>
+          <Link href={ROUTE.WIRE_ROOT}>WIRE.COM</Link>
           <Small> ・ © Wire Swiss GmbH</Small>
         </Footer>
       </Container>
