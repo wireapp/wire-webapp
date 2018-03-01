@@ -1,5 +1,9 @@
 <div  id="participant-devices" class="participant-devices" data-bind="with: $root.participantDevices">
   <!-- ko if: isVisible() -->
+    <div>
+      <arrow-left-icon class="icon-button" data-bind="click: clickOnBack" data-uie-name="do-close"></arrow-left-icon>
+      <close-icon class="icon-button" data-bind="click: clickOnClose" data-uie-name="do-close"></close-icon>
+    </div>
     <div>Participant devices view</div>
   <!-- /ko -->
 </div>

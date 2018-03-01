@@ -30,4 +30,12 @@ z.viewModel.panel.ParticipantDevicesViewModel = class ParticipantDevicesViewMode
 
     this.isVisible = this.panelViewModel.participantDevicesVisible;
   }
+
+  clickOnBack() {
+    this.panelViewModel.switchState(z.viewModel.PanelViewModel.STATE.CONVERSATION_DETAILS);
+  }
+
+  clickOnClose() {
+    this.panelViewModel.closePanel();
+  }
 };

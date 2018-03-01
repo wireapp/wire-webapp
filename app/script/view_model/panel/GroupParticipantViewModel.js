@@ -54,6 +54,14 @@ z.viewModel.panel.GroupParticipantViewModel = class GroupParticipantViewModel {
     });
   }
 
+  clickOnBack() {
+    this.panelViewModel.switchState(z.viewModel.PanelViewModel.STATE.CONVERSATION_DETAILS);
+  }
+
+  clickOnClose() {
+    this.panelViewModel.closePanel();
+  }
+
   clickOnSelfProfile() {
     amplify.publish(z.event.WebApp.PREFERENCES.MANAGE_ACCOUNT);
   }

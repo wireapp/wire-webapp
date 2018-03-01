@@ -114,6 +114,10 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
     this.panelViewModel.switchState(z.viewModel.PanelViewModel.STATE.ADD_PARTICIPANTS);
   }
 
+  clickOnClose() {
+    this.panelViewModel.closePanel();
+  }
+
   clickOnCreateGroup() {
     const userEntity = this.conversationEntity().firstUserEntity();
     amplify.publish(z.event.WebApp.CONVERSATION.CREATE_GROUP, 'conversation_details', userEntity);
