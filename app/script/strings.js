@@ -182,11 +182,11 @@ export const chooseHandleStrings = defineMessages({
 export const conversationJoinStrings = defineMessages({
   headline: {
     id: 'conversationJoin.headline',
-    defaultMessage: 'You have been invited to join a Wire guest room.',
+    defaultMessage: 'You have been invited <br />to join a <b style="color: black;">Wire guest room.</b>',
   },
   subhead: {
     id: 'conversationJoin.subhead',
-    defaultMessage: 'Encrypted group messaging and conference calls. No account necessary.',
+    defaultMessage: 'Encrypted group messaging and conference calls. <br />No account necessary.',
   },
   existentAccountSubhead: {
     id: 'conversationJoin.subheadExistentAccount',
@@ -206,7 +206,7 @@ export const conversationJoinStrings = defineMessages({
   },
   invalidHeadline: {
     id: 'conversationJoin.invalidHeadline',
-    defaultMessage: 'This Wire guest room is now closed.',
+    defaultMessage: 'This <b style="color: black;">Wire guest room</b><br />is now closed.',
   },
   invalidSubhead: {
     id: 'conversationJoin.invalidSubhead',

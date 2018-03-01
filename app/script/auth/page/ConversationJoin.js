@@ -20,7 +20,7 @@
 import {Container, Header, Footer, Content} from '@wireapp/react-ui-kit/Layout';
 import {Form, Button, InputSubmitCombo, Input, RoundIconButton, ErrorMessage} from '@wireapp/react-ui-kit/Form';
 import {Logo} from '@wireapp/react-ui-kit/Identity';
-import {H1, H2, Link, Small} from '@wireapp/react-ui-kit/Text';
+import {H2, H3, Link, Small} from '@wireapp/react-ui-kit/Text';
 import {conversationJoinStrings} from '../../strings';
 import {connect} from 'react-redux';
 import {COLOR} from '@wireapp/react-ui-kit/Identity';
@@ -29,7 +29,7 @@ import * as ConversationAction from '../module/action/ConversationAction';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import ValidationError from '../module/action/ValidationError';
 import * as AuthAction from '../module/action/AuthAction';
-import {injectIntl} from 'react-intl';
+import {injectIntl, FormattedHTMLMessage} from 'react-intl';
 import ROUTE from '../route';
 import {withRouter} from 'react-router';
 import React, {Component} from 'react';
@@ -117,10 +117,10 @@ class ConversationJoin extends Component {
     const {intl: {formatMessage: _}} = this.props;
     return (
       <Container verticalCenter>
-        <H1 style={{fontWeight: 500}} color={COLOR.GRAY}>
-          {_(conversationJoinStrings.headline)}
-        </H1>
-        <H2>{_(conversationJoinStrings.existentAccountSubhead)}</H2>
+        <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}} color={COLOR.GRAY}>
+          <FormattedHTMLMessage {...conversationJoinStrings.headline} />
+        </H2>
+        <H3 style={{marginTop: '10px'}}>{_(conversationJoinStrings.existentAccountSubhead)}</H3>
         <Button onClick={this.onOpenWireClick}>{_(conversationJoinStrings.existentAccountOpenButton)}</Button>
         <Small block>
           {`${_(conversationJoinStrings.acceptTou)} `}
@@ -147,10 +147,12 @@ class ConversationJoin extends Component {
     const {enteredName, isValidName, error} = this.state;
     return (
       <Container verticalCenter>
-        <H1 style={{fontWeight: 500}} color={COLOR.GRAY}>
-          {_(conversationJoinStrings.headline)}
-        </H1>
-        <H2>{_(conversationJoinStrings.subhead)}</H2>
+        <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}} color={COLOR.GRAY}>
+          <FormattedHTMLMessage {...conversationJoinStrings.headline} />
+        </H2>
+        <H3 style={{marginTop: '10px'}}>
+          <FormattedHTMLMessage {...conversationJoinStrings.subhead} />
+        </H3>
         <Form style={{marginTop: 30}}>
           <InputSubmitCombo>
             <Input
@@ -202,10 +204,10 @@ class ConversationJoin extends Component {
     const {intl: {formatMessage: _}} = this.props;
     return (
       <Container verticalCenter>
-        <H1 style={{fontWeight: 500}} color={COLOR.GRAY}>
-          {_(conversationJoinStrings.invalidHeadline)}
-        </H1>
-        <H2>{_(conversationJoinStrings.invalidSubhead)}</H2>
+        <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}} color={COLOR.GRAY}>
+          <FormattedHTMLMessage {...conversationJoinStrings.invalidHeadline} />
+        </H2>
+        <H3 style={{marginTop: '10px'}}>{_(conversationJoinStrings.invalidSubhead)}</H3>
         <Small block>
           <Link to={ROUTE.INDEX} component={RRLink} textTransform={'none'} data-uie-name="go-register">
             {_(conversationJoinStrings.invalidCreateAccountLink)}
@@ -228,19 +230,19 @@ class ConversationJoin extends Component {
           width: '100%',
         }}
       >
-        <Header>
-          <Logo width={72} style={{marginLeft: '20px'}} />
+        <Header style={{height: '40px', marginLeft: '8px', marginTop: '20px'}}>
+          <Logo width={72} />
         </Header>
-        <Content style={{flex: '1', marginTop: '20px', width: '520px'}}>
+        <Content style={{flex: '1', paddingLeft: '8px', width: '520px'}}>
           {isValidLink
             ? !isAuthenticated || this.state.forceNewAccount
               ? this.renderNewAnonAccount()
               : this.renderExistentAccount()
             : this.renderInvalidLink()}
         </Content>
-        <Footer style={{justifyContent: 'flex-end', margin: '20px 0 50px 20px'}}>
-          <Link href={ROUTE.WIRE_ROOT}>WIRE.COM</Link>
-          <Small> ・ © Wire Swiss GmbH</Small>
+        <Footer style={{height: '30px', justifyContent: 'flex-end', margin: '0 0 18px 8px'}}>
+          <Link href={ROUTE.WIRE_ROOT}>wire.com</Link>
+          <Small> &middot; © Wire Swiss GmbH</Small>
         </Footer>
       </Container>
     );
