@@ -127,6 +127,19 @@ describe('cryptobox.store.CryptoboxCRUDStore', () => {
     });
   });
 
+  describe('"save_identity"', () => {
+    it('saves the local identity', async done => {
+      const ikp = await Proteus.keys.IdentityKeyPair.new();
+      fileStore
+        .save_identity(ikp)
+        .then(identity => {
+          expect(identity.public_key.fingerprint()).toEqual(ikp.public_key.fingerprint());
+          done();
+        })
+        .catch(done.fail);
+    });
+  });
+
   describe('"save_prekeys"', () => {
     it('saves multiple PreKeys', async done => {
       try {
@@ -160,7 +173,7 @@ describe('cryptobox.store.CryptoboxCRUDStore', () => {
         expect(proteusSession.remote_identity.public_key.fingerprint()).toBe(bobIdentity.public_key.fingerprint());
         expect(proteusSession.version).toBe(1);
         proteusSession.version = 2;
-        proteusSession = await fileStore.update_session(sessionId, proteusSession);
+        await fileStore.update_session(sessionId, proteusSession);
         proteusSession = await fileStore.read_session(aliceIdentity, sessionId);
         expect(proteusSession.local_identity.public_key.fingerprint()).toBe(aliceIdentity.public_key.fingerprint());
         expect(proteusSession.remote_identity.public_key.fingerprint()).toBe(bobIdentity.public_key.fingerprint());

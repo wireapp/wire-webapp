@@ -81,15 +81,21 @@ describe('cryptobox.CryptoboxSession', () => {
     }
 
     beforeEach(async done => {
+      const aliceEngine = new StoreEngine.MemoryEngine();
+      await aliceEngine.init('cache');
+
       alice = {
-        cryptobox_store: new cryptobox.store.Cache(),
+        cryptobox_store: new cryptobox.store.CryptoboxCRUDStore(aliceEngine),
         identity: await Proteus.keys.IdentityKeyPair.new(),
       };
 
       alice.pre_key_store = new cryptobox.store.ReadOnlyStore(alice.cryptobox_store);
 
+      const bobEngine = new StoreEngine.MemoryEngine();
+      await bobEngine.init('cache');
+
       bob = {
-        cryptobox_store: new cryptobox.store.Cache(),
+        cryptobox_store: new cryptobox.store.CryptoboxCRUDStore(bobEngine),
         identity: await Proteus.keys.IdentityKeyPair.new(),
       };
 

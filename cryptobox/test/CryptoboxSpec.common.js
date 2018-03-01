@@ -19,11 +19,12 @@
 
 /* eslint no-magic-numbers: "off" */
 
-describe('cryptobox.Cryptobox', () => {
-  const cryptobox = typeof window === 'object' ? window.cryptobox : require('@wireapp/cryptobox');
-  const Proteus = typeof window === 'object' ? window.Proteus : require('@wireapp/proteus');
-  let sodium = undefined;
+const cryptobox = typeof window === 'object' ? window.cryptobox : require('@wireapp/cryptobox');
+const Proteus = typeof window === 'object' ? window.Proteus : require('@wireapp/proteus');
+const {StoreEngine} = require('@wireapp/store-engine');
 
+describe('cryptobox.Cryptobox', () => {
+  let sodium = undefined;
   let store = undefined;
 
   beforeAll(async done => {
@@ -38,8 +39,10 @@ describe('cryptobox.Cryptobox', () => {
     }
   });
 
-  beforeEach(() => {
-    store = new cryptobox.store.Cache();
+  beforeEach(async () => {
+    const engine = new StoreEngine.MemoryEngine();
+    await engine.init('cache');
+    store = new cryptobox.store.CryptoboxCRUDStore(engine);
   });
 
   describe('"decrypt"', () => {
@@ -277,12 +280,12 @@ describe('cryptobox.Cryptobox', () => {
 
     describe('"encrypt"', () => {
       it('saves the session after successful encryption', done => {
-        spyOn(box.store, 'create_session').and.callThrough();
+        spyOn(box.store, 'update_session').and.callThrough();
         box
           .encrypt(sessionIdUnique, 'Hello World.')
           .then(encryptedBuffer => {
             expect(encryptedBuffer).toBeDefined();
-            expect(box.store.create_session.calls.count()).toBe(1);
+            expect(box.store.update_session.calls.count()).toBe(1);
             done();
           })
           .catch(done.fail);

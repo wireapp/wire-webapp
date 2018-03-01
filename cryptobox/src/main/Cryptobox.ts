@@ -384,7 +384,6 @@ class Cryptobox extends EventEmitter {
         })
         .then((encrypted: ArrayBuffer) => {
           encryptedBuffer = encrypted;
-          // TODO: This should be "update_session"
           return this.session_update(loadedSession);
         })
         .then(() => encryptedBuffer);
