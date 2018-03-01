@@ -47,11 +47,13 @@ z.viewModel.ListViewModel = class ListViewModel {
     this.onContextMenu = this.onContextMenu.bind(this);
 
     this.elementId = 'left-column';
-    this.contentViewModel = mainViewModel.content;
-
-    // Repositories
+    this.mainViewModel = mainViewModel;
     this.conversationRepository = repositories.conversation;
     this.userRepository = repositories.user;
+
+    this.actionsViewModel = this.mainViewModel.actions;
+    this.contentViewModel = this.mainViewModel.content;
+
     this.logger = new z.util.Logger('z.viewModel.ListViewModel', z.config.LOGGER.OPTIONS);
 
     // State
@@ -59,13 +61,6 @@ z.viewModel.ListViewModel = class ListViewModel {
     this.lastUpdate = ko.observable();
     this.modal = ko.observable();
     this.webappLoaded = ko.observable(false);
-
-    // Nested view models
-    this.archive = new z.viewModel.list.ArchiveViewModel(mainViewModel, this, repositories);
-    this.conversations = new z.viewModel.list.ConversationListViewModel(mainViewModel, this, repositories);
-    this.preferences = new z.viewModel.list.PreferencesListViewModel(mainViewModel, this);
-    this.start_ui = new z.viewModel.list.StartUIViewModel(mainViewModel, this, repositories);
-    this.takeover = new z.viewModel.list.TakeoverViewModel(mainViewModel, this, repositories);
 
     this.selfUserPicture = ko.pureComputed(() => {
       if (this.webappLoaded() && this.userRepository.self()) {
@@ -96,6 +91,13 @@ z.viewModel.ListViewModel = class ListViewModel {
         .conversations_calls()
         .concat(states, this.conversationRepository.conversations_unarchived());
     });
+
+    // Nested view models
+    this.archive = new z.viewModel.list.ArchiveViewModel(mainViewModel, this, repositories);
+    this.conversations = new z.viewModel.list.ConversationListViewModel(mainViewModel, this, repositories);
+    this.preferences = new z.viewModel.list.PreferencesListViewModel(mainViewModel, this);
+    this.start_ui = new z.viewModel.list.StartUIViewModel(mainViewModel, this, repositories);
+    this.takeover = new z.viewModel.list.TakeoverViewModel(mainViewModel, this, repositories);
 
     this._initSubscriptions();
 
@@ -333,84 +335,29 @@ z.viewModel.ListViewModel = class ListViewModel {
   }
 
   clickToArchive(conversationEntity = this.conversationRepository.active_conversation()) {
-    if (conversationEntity) {
-      this.conversationRepository.archive_conversation(conversationEntity);
-    }
+    this.actionsViewModel.archiveConversation(conversationEntity);
   }
 
   clickToBlock(conversationEntity) {
     const nextConversationEntity = this._getNextConversation(conversationEntity);
-    const userEntity = conversationEntity.firstUserEntity();
-
-    if (userEntity) {
-      amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
-        action: () => {
-          this.userRepository.block_user(userEntity, nextConversationEntity);
-        },
-        text: {
-          action: z.l10n.text(z.string.modalUserBlockAction),
-          message: z.l10n.text(z.string.modalUserBlockMessage, userEntity.first_name()),
-          title: z.l10n.text(z.string.modalUserBlockHeadline),
-        },
-      });
-    }
+    this.actionsViewModel.blockUser(conversationEntity.firstUserEntity(), nextConversationEntity);
   }
 
   clickToCancelRequest(conversationEntity) {
     const nextConversationEntity = this._getNextConversation(conversationEntity);
-    const userEntity = conversationEntity.firstUserEntity();
-
-    if (userEntity) {
-      amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
-        action: () => this.userRepository.cancel_connection_request(userEntity, nextConversationEntity),
-        text: {
-          action: z.l10n.text(z.string.modalConnectCancelAction),
-          message: z.l10n.text(z.string.modalConnectCancelMessage, userEntity.first_name()),
-          secondary: z.l10n.text(z.string.modalConnectCancelSecondary),
-          title: z.l10n.text(z.string.modalConnectCancelHeadline),
-        },
-      });
-    }
+    this.actionsViewModel.cancelConnectionRequest(conversationEntity.firstUserEntity(), nextConversationEntity);
   }
 
   clickToClear(conversationEntity = this.conversationRepository.active_conversation()) {
-    if (conversationEntity) {
-      const canLeaveConversation = conversationEntity.is_group() && !conversationEntity.removed_from_conversation();
-      const modalType = canLeaveConversation
-        ? z.viewModel.ModalsViewModel.TYPE.OPTION
-        : z.viewModel.ModalsViewModel.TYPE.CONFIRM;
-
-      amplify.publish(z.event.WebApp.WARNING.MODAL, modalType, {
-        action: (leaveConversation = false) => {
-          this.conversationRepository.clear_conversation(conversationEntity, leaveConversation);
-        },
-        text: {
-          action: z.l10n.text(z.string.modalConversationClearAction),
-          message: z.l10n.text(z.string.modalConversationClearMessage),
-          option: z.l10n.text(z.string.modalConversationClearOption),
-          title: z.l10n.text(z.string.modalConversationClearHeadline),
-        },
-      });
-    }
+    this.actionsViewModel.clearConversation(conversationEntity);
   }
 
   clickToLeave(conversationEntity) {
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
-      action: () => {
-        this.conversationRepository.removeMember(conversationEntity, this.userRepository.self().id);
-      },
-      text: {
-        action: z.l10n.text(z.string.modalConversationLeaveAction),
-        message: z.l10n.text(z.string.modalConversationLeaveMessage),
-        title: z.l10n.text(z.string.modalConversationLeaveHeadline, conversationEntity.display_name()),
-      },
-    });
+    this.actionsViewModel.leaveConversation(conversationEntity);
   }
 
   clickToToggleMute(conversationEntity = this.conversationRepository.active_conversation()) {
-    if (conversationEntity) {
-      this.conversationRepository.toggle_silence_conversation(conversationEntity);
-    }
+    this.actionsViewModel.toggleMuteConversation(conversationEntity);
   }
 
   clickToUnarchive(conversationEntity) {

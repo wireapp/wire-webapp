@@ -43,6 +43,8 @@ z.viewModel.PanelViewModel = class PanelViewModel {
    * @param {Object} repositories - Object containing all repositories
    */
   constructor(mainViewModel, repositories) {
+    this.closePanelOnChange = this.closePanelOnChange.bind(this);
+
     this.elementId = 'right-column';
     this.conversationRepository = repositories.conversation;
     this.integrationRepository = repositories.integration;
@@ -55,6 +57,7 @@ z.viewModel.PanelViewModel = class PanelViewModel {
 
     this.isVisible = ko.observable(false);
     this.state = ko.observable(PanelViewModel.STATE.CONVERSATION_DETAILS);
+    this.previousState = undefined;
 
     this.addParticipantsVisible = ko.pureComputed(() => this._isStateVisible(PanelViewModel.STATE.ADD_PARTICIPANTS));
     this.conversationDetailsVisible = ko.pureComputed(() => {
@@ -78,11 +81,7 @@ z.viewModel.PanelViewModel = class PanelViewModel {
       }
     });
 
-    this.conversationEntity.subscribe(() => {
-      if (this.isVisible()) {
-        this.mainViewModel.closePanel();
-      }
-    });
+    this.conversationEntity.subscribe(this.closePanelOnChange, null, 'beforeChange');
 
     amplify.subscribe(z.event.WebApp.PEOPLE.TOGGLE, this.togglePanel.bind(this));
     amplify.subscribe(z.event.WebApp.PEOPLE.SHOW, this.showParticipant);
@@ -92,6 +91,7 @@ z.viewModel.PanelViewModel = class PanelViewModel {
     this.conversationDetails = new z.viewModel.panel.ConversationDetailsViewModel(mainViewModel, this, repositories);
     this.groupParticipant = new z.viewModel.panel.GroupParticipantViewModel(mainViewModel, this, repositories);
     this.guestOptions = new z.viewModel.panel.GuestOptionsViewModel(mainViewModel, this, repositories);
+    this.participantDevices = new z.viewModel.panel.ParticipantDevicesViewModel(mainViewModel, this, repositories);
 
     ko.applyBindings(this, document.getElementById(this.elementId));
   }
@@ -103,6 +103,12 @@ z.viewModel.PanelViewModel = class PanelViewModel {
 
   closePanel() {
     return this.mainViewModel.closePanel().then(() => this.isVisible(false));
+  }
+
+  closePanelOnChange() {
+    if (this.isVisible()) {
+      this.closePanel();
+    }
   }
 
   showGroupParticipant(userEntity) {
@@ -119,6 +125,11 @@ z.viewModel.PanelViewModel = class PanelViewModel {
     }
 
     this.switchState(PanelViewModel.STATE.GROUP_PARTICIPANT);
+  }
+
+  showParticipantDevices(userEntity) {
+    this.participantDevices.showParticipantDevices(userEntity);
+    this.switchState(PanelViewModel.STATE.PARTICIPANT_DEVICES);
   }
 
   switchState(newState) {
@@ -169,6 +180,8 @@ z.viewModel.PanelViewModel = class PanelViewModel {
   }
 
   _hidePanel() {
+    this.previousState = this.state();
+
     const panelStateElementId = this._getElementIdOfPanel(this.state());
     $(`#${panelStateElementId}`).removeClass('panel__page--visible');
   }

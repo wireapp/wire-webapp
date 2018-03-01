@@ -37,6 +37,7 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
     this.userRepository = repositories.user;
     this.logger = new z.util.Logger('z.viewModel.panel.ConversationDetailsViewModel', z.config.LOGGER.OPTIONS);
 
+    this.actionsViewModel = this.mainViewModel.actions;
     this.conversationEntity = this.conversationRepository.active_conversation;
     this.isTeam = this.teamRepository.isTeam;
     this.isTeamOnly = this.panelViewModel.isTeamOnly;
@@ -49,11 +50,12 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
     this.isVisible = ko.pureComputed(() => this.hasConversation() && this.panelViewModel.conversationDetailsVisible());
 
     this.availabilityLabel = ko.pureComputed(() => {
-      if (this.conversationEntity() || this.conversationEntity().is_one2one()) {
-        const user = this.conversationEntity().firstUserEntity();
-        const availabilitySetToNone = user.availability() === z.user.AvailabilityType.NONE;
+      if (this.isVisible() && this.isTeam() && this.conversationEntity().is_one2one()) {
+        const userEntity = this.conversationEntity().firstUserEntity();
+        const availabilitySetToNone = userEntity.availability() === z.user.AvailabilityType.NONE;
+
         if (!availabilitySetToNone) {
-          return z.user.AvailabilityMapper.nameFromType(user.availability());
+          return z.user.AvailabilityMapper.nameFromType(userEntity.availability());
         }
       }
     });
@@ -96,6 +98,29 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
       $('.group-header textarea').val(this.conversationEntity().display_name());
     });
 
+    this.showActionAddParticipants = ko.pureComputed(() => this.conversationEntity().is_group());
+    this.showActionBlock = ko.pureComputed(() => {
+      if (this.conversationEntity().is_one2one()) {
+        const userEntity = this.conversationEntity().firstUserEntity();
+        return userEntity.is_connected() || userEntity.is_request();
+      }
+    });
+    this.showActionCreateGroup = ko.pureComputed(() => this.conversationEntity().is_one2one());
+    this.showActionCancelRequest = ko.pureComputed(() => this.conversationEntity().is_request());
+    this.showActionClear = ko.pureComputed(() => {
+      return !this.conversationEntity().is_request() && !this.conversationEntity().is_cleared();
+    });
+    this.showActionDevices = ko.pureComputed(() => {
+      if (this.conversationEntity().is_one2one()) {
+        const userEntity = this.conversationEntity().firstUserEntity();
+        return userEntity.is_connected() || userEntity.is_team_member();
+      }
+    });
+    this.showActionGuestOptions = ko.pureComputed(() => this.conversationEntity().team_id);
+    this.showActionLeave = ko.pureComputed(() => {
+      return this.conversationEntity().is_group() && !this.conversationEntity().removed_from_conversation();
+    });
+
     this.participantsUserText = ko.pureComputed(() => {
       const hasMultipleParticipants = this.userParticipants().length > 1;
       return hasMultipleParticipants
@@ -114,9 +139,9 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
 
     this.shouldUpdateScrollbar = ko.computed(() => true).extend({notify: 'always', rateLimit: 500});
 
-    const addPeopleshortcut = z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.ADD_PEOPLE);
+    const addPeopleShortcut = z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.ADD_PEOPLE);
     this.addPeopleTooltip = ko.pureComputed(() => {
-      return z.l10n.text(z.string.tooltipPeopleAddPeople, addPeopleshortcut);
+      return z.l10n.text(z.string.tooltipPeopleAddPeople, addPeopleShortcut);
     });
   }
 
@@ -133,6 +158,11 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
     amplify.publish(z.event.WebApp.CONVERSATION.CREATE_GROUP, 'conversation_details', userEntity);
   }
 
+  clickOnDevices() {
+    const userEntity = this.conversationEntity().firstUserEntity();
+    this.panelViewModel.showParticipantDevices(userEntity);
+  }
+
   clickOnGuestOptions() {
     this.panelViewModel.switchState(z.viewModel.PanelViewModel.STATE.GUEST_OPTIONS);
   }
@@ -142,62 +172,21 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
   }
 
   clickToArchive() {
-    this.conversationRepository.archive_conversation(this.conversationEntity());
+    this.actionsViewModel.archiveConversation(this.conversationEntity());
   }
 
   clickToBlock() {
     const nextConversationEntity = this.conversationRepository.get_next_conversation(this.conversationEntity());
-    const userEntity = this.conversationEntity().firstUserEntity();
-
-    if (userEntity) {
-      amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
-        action: () => {
-          this.userRepository.block_user(userEntity, nextConversationEntity);
-        },
-        text: {
-          action: z.l10n.text(z.string.modalUserBlockAction),
-          message: z.l10n.text(z.string.modalUserBlockMessage, userEntity.first_name()),
-          title: z.l10n.text(z.string.modalUserBlockHeadline),
-        },
-      });
-    }
+    this.actionsViewModel.blockUser(this.conversationEntity().firstUserEntity(), nextConversationEntity);
   }
 
   clickToCancelRequest() {
     const nextConversationEntity = this.conversationRepository.get_next_conversation(this.conversationEntity());
-    const userEntity = this.conversationEntity().firstUserEntity();
-
-    if (userEntity) {
-      amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
-        action: () => this.userRepository.cancel_connection_request(userEntity, nextConversationEntity),
-        text: {
-          action: z.l10n.text(z.string.modalConnectCancelAction),
-          message: z.l10n.text(z.string.modalConnectCancelMessage, userEntity.first_name()),
-          secondary: z.l10n.text(z.string.modalConnectCancelSecondary),
-          title: z.l10n.text(z.string.modalConnectCancelHeadline),
-        },
-      });
-    }
+    this.actionsViewModel.cancelConnectionRequest(this.conversationEntity().firstUserEntity(), nextConversationEntity);
   }
 
   clickToClear() {
-    const conversationEntity = this.conversationEntity();
-    const canLeaveConversation = conversationEntity.is_group() && !conversationEntity.removed_from_conversation();
-    const modalType = canLeaveConversation
-      ? z.viewModel.ModalsViewModel.TYPE.OPTION
-      : z.viewModel.ModalsViewModel.TYPE.CONFIRM;
-
-    amplify.publish(z.event.WebApp.WARNING.MODAL, modalType, {
-      action: (leaveConversation = false) => {
-        this.conversationRepository.clear_conversation(conversationEntity, leaveConversation);
-      },
-      text: {
-        action: z.l10n.text(z.string.modalConversationClearAction),
-        message: z.l10n.text(z.string.modalConversationClearMessage),
-        option: z.l10n.text(z.string.modalConversationClearOption),
-        title: z.l10n.text(z.string.modalConversationClearHeadline),
-      },
-    });
+    this.actionsViewModel.clearConversation(this.conversationEntity());
   }
 
   clickToEditGroupName() {
@@ -207,20 +196,11 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
   }
 
   clickToLeave() {
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
-      action: () => {
-        this.conversationRepository.removeMember(this.conversationEntity(), this.userRepository.self().id);
-      },
-      text: {
-        action: z.l10n.text(z.string.modalConversationLeaveAction),
-        message: z.l10n.text(z.string.modalConversationLeaveMessage),
-        title: z.l10n.text(z.string.modalConversationLeaveHeadline, this.conversationEntity().display_name()),
-      },
-    });
+    this.actionsViewModel.leaveConversation(this.conversationEntity());
   }
 
   clickToToggleMute() {
-    this.conversationRepository.toggle_silence_conversation(this.conversationEntity());
+    this.actionsViewModel.toggleMuteConversation(this.conversationEntity());
   }
 
   renameConversation(data, event) {

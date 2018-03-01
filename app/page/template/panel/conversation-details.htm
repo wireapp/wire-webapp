@@ -38,12 +38,12 @@
 
       <!-- ko if: isActiveParticipant() -->
         <div class="conversation-details-top-actions">
-          <!-- ko if: conversationEntity().is_group() -->
+          <!-- ko if: showActionAddParticipants() -->
             <div class="panel__action-item" data-bind="click: clickOnAddParticipants, attr:{'title': addPeopleTooltip}" data-uie-name="go-add-people">
               <add-participants-icon class="panel__action-item__icon"></add-participants-icon>
               <div class="panel__action-item__text" data-bind="l10n_text: z.string.conversationDetailsActionAddParticipants"></div>
             </div>
-            <!-- ko if: conversationEntity().team_id -->
+            <!-- ko if: showActionGuestOptions() -->
               <div class="panel__action-item conversation-details__guest-options" data-bind="click: clickOnGuestOptions" data-uie-name="go-guest-options">
                 <guest-icon class="panel__action-item__icon"></guest-icon>
                 <div class="panel__action-item__text" data-bind="l10n_text: z.string.conversationDetailsActionGuestOptions"></div>
@@ -79,12 +79,14 @@
       </div>
 
       <div class="conversation-details-bottom-actions">
-        <!-- ko if: conversationEntity().is_one2one() -->
-          <div class="panel__action-item conversation-details__devices"  data-uie-name="go-devices">
+        <!-- ko if: showActionDevices() -->
+          <div class="panel__action-item conversation-details__devices" data-bind="click: clickOnDevices" data-uie-name="go-devices">
             <devices-icon class="panel__action-item__icon"></devices-icon>
-            <div class="panel__action-item__text" data-bind="l10n_text: z.string.userProfileTabsDevices"></div>
+            <div class="panel__action-item__text" data-bind="l10n_text: z.string.conversationDetailsActionDevices"></div>
             <disclose-icon></disclose-icon>
           </div>
+        <!-- /ko -->
+        <!-- ko if: showActionCreateGroup() -->
           <div class="panel__action-item"  data-bind="click: clickOnCreateGroup" data-uie-name="go-create-group">
             <group-icon class="panel__action-item__icon"></group-icon>
             <div class="panel__action-item__text" data-bind="l10n_text: z.string.conversationDetailsActionCreateGroup"></div>
@@ -94,25 +96,25 @@
           <archive-icon class="panel__action-item__icon"></archive-icon>
           <div class="panel__action-item__text" data-bind="l10n_text: z.string.conversationDetailsActionArchive"></div>
         </div>
-        <!-- ko if: conversationEntity().is_request() -->
+        <!-- ko if: showActionCancelRequest() -->
           <div class="panel__action-item"  data-bind="click: clickToCancelRequest" data-uie-name="do-cancel-request">
             <close-icon class="panel__action-item__icon"></close-icon>
             <div class="panel__action-item__text" data-bind="l10n_text: z.string.conversationDetailsActionCancelRequest"></div>
           </div>
         <!-- /ko -->
-        <!-- ko if: !conversationEntity().is_request() && !conversationEntity().is_cleared() -->
+        <!-- ko if: showActionClear() -->
           <div class="panel__action-item"  data-bind="click: clickToClear" data-uie-name="do-clear">
             <delete-icon class="panel__action-item__icon"></delete-icon>
             <div class="panel__action-item__text" data-bind="l10n_text: z.string.conversationDetailsActionClear"></div>
           </div>
         <!-- /ko -->
-        <!-- ko if: !conversationEntity().is_group() && conversationEntity().firstUserEntity() && (conversationEntity().firstUserEntity().is_connected() || conversationEntity().firstUserEntity().is_request()) -->
+        <!-- ko if: showActionBlock() -->
           <div class="panel__action-item"  data-bind="click: clickToBlock" data-uie-name="do-block">
             <block-icon class="panel__action-item__icon"></block-icon>
             <div class="panel__action-item__text" data-bind="l10n_text: z.string.conversationDetailsActionBlock"></div>
           </div>
         <!-- /ko -->
-        <!-- ko if: conversationEntity().is_group() && !conversationEntity().removed_from_conversation() -->
+        <!-- ko if: showActionLeave() -->
           <div class="panel__action-item"  data-bind="click: clickToLeave" data-uie-name="do-leave">
             <leave-icon class="panel__action-item__icon"></leave-icon>
             <div class="panel__action-item__text" data-bind="l10n_text: z.string.conversationDetailsActionLeave"></div>
