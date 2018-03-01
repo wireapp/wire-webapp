@@ -22,6 +22,7 @@ import {Form, Button, InputSubmitCombo, Input, RoundIconButton, ErrorMessage} fr
 import {Logo} from '@wireapp/react-ui-kit/Identity';
 import {H2, H3, Link, Small} from '@wireapp/react-ui-kit/Text';
 import {conversationJoinStrings} from '../../strings';
+import {footerStrings} from '../../strings';
 import {connect} from 'react-redux';
 import {COLOR} from '@wireapp/react-ui-kit/Identity';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
@@ -219,7 +220,7 @@ class ConversationJoin extends Component {
   };
 
   render() {
-    const {isAuthenticated} = this.props;
+    const {isAuthenticated, intl: {formatMessage: _}} = this.props;
     const {isValidLink} = this.state;
     return (
       <Container
@@ -241,8 +242,8 @@ class ConversationJoin extends Component {
             : this.renderInvalidLink()}
         </Content>
         <Footer style={{height: '30px', justifyContent: 'flex-end', margin: '0 0 18px 8px'}}>
-          <Link href={ROUTE.WIRE_ROOT}>wire.com</Link>
-          <Small> &middot; © Wire Swiss GmbH</Small>
+          <Link href={ROUTE.WIRE_ROOT}>{_(footerStrings.wireLink)}</Link>
+          <Small> &middot; {_(footerStrings.copy)}</Small>
         </Footer>
       </Container>
     );

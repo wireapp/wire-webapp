@@ -23,6 +23,17 @@ import ValidationError from './auth/module/action/ValidationError';
 
 /* eslint-disable sort-keys */
 
+export const footerStrings = defineMessages({
+  wireLink: {
+    id: 'footer.wireLink',
+    defaultMessage: 'wire.com',
+  },
+  copy: {
+    id: 'footer.copy',
+    defaultMessage: '© Wire Swiss GmbH',
+  },
+});
+
 export const indexStrings = defineMessages({
   claim: {
     id: 'index.claim',
