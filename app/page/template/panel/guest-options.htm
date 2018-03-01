@@ -1,10 +1,36 @@
-<div  id="guest-options" class="guest-options" data-bind="with: $root.guestOptions">
+<div id="guest-options" class="panel__page panel__page--visible guest-options" data-bind="with: $root.guestOptions">
   <!-- ko if: isVisible() -->
-    <div class="right-panel-header">
-      <arrow-left-icon class="icon-button" data-bind="click: clickOnBack" data-uie-name="do-close"></arrow-left-icon>
-      <div class="right-panel-title" data-bind="l10n-text: z.string.guestOptionsTitle"></div>
+    <div class="panel__header">
+      <arrow-left-icon class="icon-button" data-bind="click: clickOnBack" data-uie-name="do-close"></arrow-left-icon>        <div class="panel__header__title" data-bind="l10n_text: z.string.guestOptionsTitle"></div>
       <close-icon class="right-panel-close icon-button" data-bind="click: clickOnClose" data-uie-name="do-close"></close-icon>
     </div>
-    <guest-mode-toggle params="isChecked: isGuestRoom, onToggle: toggleAccessState"></guest-mode-toggle>
+    <div class="guest-options__content">
+      <guest-mode-toggle params="isChecked: isGuestEnabled, onToggle: toggleAccessState"></guest-mode-toggle>
+    </div>
+    <!-- ko if: isGuestEnabled -->
+      <div class="guest-options__info">
+        <div class="guest-options__info__head" data-bind="l10n_text: z.string.guestOptionsInfoHead">
+        </div>
+        <div data-bind="l10n_text: z.string.guestOptionsInfoText"></div>
+      </div>
+      <!-- ko ifnot: hasAccessCode -->
+        <div class="panel__action-item" data-bind="click: requestAccessCode">
+          <link-icon class="panel__action-item__icon"></link-icon>
+          <div class="panel__action-item__text" data-bind="l10n_text: z.string.guestOptionsCreateLink"></div>
+        </div>
+      <!-- /ko -->
+      <!-- ko if: hasAccessCode -->
+        <textarea disabled class="guest-options__link" data-bind="value: conversationEntity().accessCode()">
+          </textarea>
+        <div class="panel__action-item" data-bind="click: copyLink">
+          <copy-icon class="panel__action-item__icon"></copy-icon>
+          <div class="panel__action-item__text" data-bind="l10n_text: z.string.guestOptionsCopyLink"></div>
+        </div>
+        <div class="panel__action-item" data-bind="click: revokeAccessCode">
+          <close-icon class="panel__action-item__icon"></close-icon>
+          <div class="panel__action-item__text" data-bind="l10n_text: z.string.guestOptionsRevokeLink"></div>
+        </div>
+      <!-- /ko -->
+    <!-- /ko -->
   <!-- /ko -->
 </div>

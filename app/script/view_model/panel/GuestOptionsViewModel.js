@@ -43,6 +43,10 @@ z.viewModel.panel.GuestOptionsViewModel = class GuestOptionsViewModel {
     this.isVisible.subscribe(isVisible => this._updateCode(isVisible, this.conversationEntity()));
 
     this.toggleAccessState = this.toggleAccessState.bind(this);
+    this.clickOnBack = this.clickOnBack.bind(this);
+    this.clickOnClose = this.clickOnClose.bind(this);
+    this.requestAccessCode = this.requestAccessCode.bind(this);
+    this.revokeAccessCode = this.revokeAccessCode.bind(this);
   }
 
   clickOnBack() {
@@ -51,6 +55,14 @@ z.viewModel.panel.GuestOptionsViewModel = class GuestOptionsViewModel {
 
   clickOnClose() {
     this.panelViewModel.closePanel();
+  }
+
+  copyLink() {
+    const link = document.querySelector('.guest-options__link');
+    link.disabled = false;
+    link.select();
+    document.execCommand('copy');
+    link.disabled = true;
   }
 
   requestAccessCode() {

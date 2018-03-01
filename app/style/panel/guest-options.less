@@ -18,4 +18,35 @@
  */
 
 .guest-options {
+  &__content {
+    padding: 32px 16px 0;
+    guest-mode-toggle {
+      border-bottom: 1px solid fade(@graphite-dark, 8%);
+      padding-bottom: 24px;
+    }
+  }
+
+  &__info {
+    color: fade(@graphite-dark, 40%);
+    font-size: 12px;
+    font-weight: @font-weight-regular;
+    padding: 16px;
+
+    &__head {
+      color: fade(@graphite-dark, 56%);
+      font-weight: @font-weight-bold;
+      margin-bottom: 8px;
+    }
+  }
+
+  &__link {
+    border: none;
+    display: block;
+    font-size: 16px;
+    height: 112px;
+    padding: 16px;
+    resize: none;
+    width: 100%;
+    word-break: break-all;
+  }
 }
