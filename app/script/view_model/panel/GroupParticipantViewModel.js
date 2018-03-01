@@ -25,12 +25,14 @@ window.z.viewModel.panel = z.viewModel.panel || {};
 
 z.viewModel.panel.GroupParticipantViewModel = class GroupParticipantViewModel {
   constructor(mainViewModel, panelViewModel, repositories) {
+    this.panelViewModel = panelViewModel;
     this.conversationRepository = repositories.conversation;
     this.integrationRepository = repositories.integration;
     this.userRepository = repositories.user;
     this.logger = new z.util.Logger('z.viewModel.panel.GroupParticipantViewModel', z.config.LOGGER.OPTIONS);
 
     this.conversationEntity = this.conversationRepository.active_conversation;
+    this.isVisible = this.panelViewModel.groupParticipantVisible;
 
     // Selected group participant
     this.selectedParticipant = ko.observable(undefined);

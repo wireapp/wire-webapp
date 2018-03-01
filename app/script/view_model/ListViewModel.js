@@ -90,7 +90,7 @@ z.viewModel.ListViewModel = class ListViewModel {
         return preferenceItems;
       }
 
-      const hasConnectRequests = Boolean(this.userRepository.connect_requests().length);
+      const hasConnectRequests = !!this.userRepository.connect_requests().length;
       const states = hasConnectRequests ? z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS : [];
       return this.conversationRepository
         .conversations_calls()

@@ -25,6 +25,9 @@ window.z.viewModel.panel = z.viewModel.panel || {};
 
 z.viewModel.panel.ParticipantDevicesViewModel = class ParticipantDevicesViewModel {
   constructor(mainViewModel, panelViewModel, repositories) {
+    this.panelViewModel = panelViewModel;
     this.conversationRepository = repositories.conversation;
+
+    this.isVisible = this.panelViewModel.participantDevicesVisible;
   }
 };
