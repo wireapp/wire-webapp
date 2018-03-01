@@ -5,7 +5,7 @@
     "@wireapp/lru-cache": "2.0.9",
     "@wireapp/proteus": "7.1.4",
     "@wireapp/store-engine": "0.3.1",
-    "dexie": "2.0.1",
+    "dexie": "2.0.2",
     "fs-extra": "5.0.0",
     "p-queue": "2.3.0"
   },
