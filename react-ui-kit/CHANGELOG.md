@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="1.0.7"></a>
+## [1.0.7](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@1.0.6...@wireapp/react-ui-kit@1.0.7) (2018-03-01)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Reduce modal padding ([#326](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/326)) ([a52ffe3](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/a52ffe3))
+
+
+
+
 <a name="1.0.6"></a>
 ## [1.0.6](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@1.0.5...@wireapp/react-ui-kit@1.0.6) (2018-03-01)
 
