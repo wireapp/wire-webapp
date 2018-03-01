@@ -21,13 +21,23 @@ import * as TrackingAction from '../module/action/TrackingAction';
 import {getLanguage} from '../module/selector/LanguageSelector';
 import React, {Component} from 'react';
 import ROUTE from '../route';
-import {Columns, Column, ContainerXS} from '@wireapp/react-ui-kit/Layout';
+import {
+  Link,
+  Paragraph,
+  Text,
+  Bold,
+  ProfileIcon,
+  RoundContainer,
+  TeamIcon,
+  Logo,
+  COLOR,
+  Columns,
+  Column,
+  ContainerXS,
+} from '@wireapp/react-ui-kit';
 import {connect} from 'react-redux';
 import {indexStrings} from '../../strings';
 import {injectIntl} from 'react-intl';
-import {Logo, COLOR} from '@wireapp/react-ui-kit/Identity';
-import {ProfileIcon, RoundContainer, TeamIcon} from '@wireapp/react-ui-kit/Icon';
-import {Link, Paragraph, Text, Bold} from '@wireapp/react-ui-kit/Text';
 import {pathWithParams} from '../util/urlUtil';
 
 class Index extends Component {

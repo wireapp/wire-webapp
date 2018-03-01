@@ -18,7 +18,7 @@
  */
 
 import React from 'react';
-import {StyledApp, Content} from '@wireapp/react-ui-kit/Layout';
+import {StyledApp, Content} from '@wireapp/react-ui-kit';
 import {HashRouter as Router, Redirect, Route, Switch} from 'react-router-dom';
 import Index from './Index';
 import InitialInvite from './InitialInvite';

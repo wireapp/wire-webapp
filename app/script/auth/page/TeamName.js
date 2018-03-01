@@ -17,14 +17,25 @@
  *
  */
 
-import {Container, ContainerXS, Columns, Column} from '@wireapp/react-ui-kit/Layout';
-import {Form, InputSubmitCombo, Input, RoundIconButton, ErrorMessage} from '@wireapp/react-ui-kit/Form';
-import {H1, Text, Link} from '@wireapp/react-ui-kit/Text';
-import {ArrowIcon} from '@wireapp/react-ui-kit/Icon';
+import {
+  COLOR,
+  ArrowIcon,
+  H1,
+  Text,
+  Link,
+  Container,
+  ContainerXS,
+  Columns,
+  Column,
+  Form,
+  InputSubmitCombo,
+  Input,
+  RoundIconButton,
+  ErrorMessage,
+} from '@wireapp/react-ui-kit';
 import ROUTE from '../route';
 import {Link as RRLink} from 'react-router-dom';
 import {connect} from 'react-redux';
-import {COLOR} from '@wireapp/react-ui-kit/Identity';
 import {teamNameStrings} from '../../strings';
 import {injectIntl} from 'react-intl';
 import {withRouter} from 'react-router';

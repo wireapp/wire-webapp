@@ -17,14 +17,27 @@
  *
  */
 
-import {Container, Header, Footer, Content} from '@wireapp/react-ui-kit/Layout';
-import {Form, Button, InputSubmitCombo, Input, RoundIconButton, ErrorMessage} from '@wireapp/react-ui-kit/Form';
-import {Logo} from '@wireapp/react-ui-kit/Identity';
-import {H2, H3, Link, Small} from '@wireapp/react-ui-kit/Text';
+import {
+  H2,
+  H3,
+  Link,
+  Small,
+  Logo,
+  Form,
+  Button,
+  InputSubmitCombo,
+  Input,
+  RoundIconButton,
+  ErrorMessage,
+  Container,
+  Header,
+  Footer,
+  Content,
+  COLOR,
+} from '@wireapp/react-ui-kit';
 import {conversationJoinStrings} from '../../strings';
 import {footerStrings} from '../../strings';
 import {connect} from 'react-redux';
-import {COLOR} from '@wireapp/react-ui-kit/Identity';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 import * as ConversationAction from '../module/action/ConversationAction';
 import * as AuthSelector from '../module/selector/AuthSelector';
