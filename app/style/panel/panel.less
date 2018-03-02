@@ -21,8 +21,12 @@
   overflow: hidden;
 
   &__page {
+    display: flex;
+    flex-direction: column;
+
     &--visible {
       opacity: 1;
+      height: 100%;
     }
 
     &:not(&--visible) {
