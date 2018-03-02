@@ -99,8 +99,8 @@ z.viewModel.panel.GuestOptionsViewModel = class GuestOptionsViewModel {
       preventClose: true,
       text: {
         action: z.l10n.text(z.string.modalConversationRevokeLinkAction),
-        message: z.l10n.text(z.string.modalConversationRevokeLinkHeadline),
-        title: z.l10n.text(z.string.modalConversationRevokeLinkMessage),
+        message: z.l10n.text(z.string.modalConversationRevokeLinkMessage),
+        title: z.l10n.text(z.string.modalConversationRevokeLinkHeadline),
       },
     });
   }
