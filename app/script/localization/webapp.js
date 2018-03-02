@@ -347,19 +347,6 @@ z.string.groupCreationParticipantsHeader = 'Add people';
 z.string.groupCreationParticipantsHeaderWithCounter = 'Add people ({{number}})';
 z.string.groupCreationParticipantsPlaceholder = 'Search by name';
 
-z.string.groupParticipantActionBlock = 'Block';
-z.string.groupParticipantActionCancelRequest = 'Cancel request';
-z.string.groupParticipantActionDevices = 'Devices';
-z.string.groupParticipantActionIgnoreRequest = 'Ignore request';
-z.string.groupParticipantActionIncomingRequest = 'Accept request';
-z.string.groupParticipantActionLeave = 'Leave';
-z.string.groupParticipantActionOpenConversation = 'Open conversation';
-z.string.groupParticipantActionPending = 'Pending';
-z.string.groupParticipantActionRemove = 'Remove';
-z.string.groupParticipantActionSelfProfile = 'Profile';
-z.string.groupParticipantActionSendRequest = 'Connect';
-z.string.groupParticipantActionUnblock = 'Unblock';
-
 // Guest room
 z.string.guestRoomConversationName = 'Guest room';
 z.string.guestRoomToggleName = 'Allow guests';
@@ -453,15 +440,15 @@ z.string.addParticipantsTabsPeople = 'People';
 z.string.addParticipantsTabsServices = 'Services';
 
 // Panel: Conversation details
-z.string.conversationDetailsActionArchive = 'Archive';
+z.string.conversationDetailsActionArchive = 'Archive conversation';
 z.string.conversationDetailsActionAddParticipants = 'Add participants';
-z.string.conversationDetailsActionBlock = 'Block';
+z.string.conversationDetailsActionBlock = 'Block contact';
 z.string.conversationDetailsActionCancelRequest = 'Cancel request';
 z.string.conversationDetailsActionClear = 'Delete content';
 z.string.conversationDetailsActionCreateGroup = 'Create group';
 z.string.conversationDetailsActionDevices = 'Devices';
 z.string.conversationDetailsActionGuestOptions = 'Guest options';
-z.string.conversationDetailsActionLeave = 'Leave';
+z.string.conversationDetailsActionLeave = 'Leave group';
 z.string.conversationDetailsGuestsOff = 'Off';
 z.string.conversationDetailsGuestsOn = 'On';
 z.string.conversationDetailsParticipantsServicesOne = 'Service';
@@ -471,46 +458,53 @@ z.string.conversationDetailsParticipantsUsersMany = 'People';
 z.string.conversationDetailsPeople = 'People';
 z.string.conversationDetailsServices = 'Services';
 
+// Panel: Group participant
+z.string.groupParticipantActionBlock = 'Block contact';
+z.string.groupParticipantActionCancelRequest = 'Cancel request';
+z.string.groupParticipantActionDevices = 'Devices';
+z.string.groupParticipantActionIgnoreRequest = 'Ignore request';
+z.string.groupParticipantActionIncomingRequest = 'Accept request';
+z.string.groupParticipantActionLeave = 'Leave group';
+z.string.groupParticipantActionOpenConversation = 'Open conversation';
+z.string.groupParticipantActionPending = 'Pending';
+z.string.groupParticipantActionRemove = 'Remove from group';
+z.string.groupParticipantActionSelfProfile = 'Open profile';
+z.string.groupParticipantActionSendRequest = 'Connect';
+z.string.groupParticipantActionUnblock = 'Unblock contact';
+
 // Panel: Guest options
-z.string.guestOptionsCopyLink = 'Copy Link';
+z.string.guestOptionsCopyLink = 'Copy link';
 z.string.guestOptionsCopyLinkDone = 'Link copied!';
-z.string.guestOptionsCreateLink = 'Create Link';
+z.string.guestOptionsCreateLink = 'Create link';
 z.string.guestOptionsInfoHeader = 'Invite others with a link';
 z.string.guestOptionsInfoText = 'Anyone with the link can join the conversation for 24 hours, even if they don’t have Wire.';
-z.string.guestOptionsRevokeLink = 'Revoke Link';
+z.string.guestOptionsRevokeLink = 'Revoke link';
 z.string.guestOptionsTitle = 'Guest options';
 
 // Panel: Group participant
 z.string.groupParticipantActionDevices = 'Devices';
 z.string.groupParticiapntServiceRemovalButton = 'Remove service';
 
+// Panel: Participant devices
+z.string.participantDevicesDetailHeadline = 'Verify that this matches the fingerprint shown on {{html1}}{{user}}’s device{{html2}}.';
+z.string.participantDevicesDetailHowTo = 'How do I do that?';
+z.string.participantDevicesDetailResetSession = 'Reset session';
+z.string.participantDevicesDetailShowMyDevice = 'Show my device fingerprint';
+z.string.participantDevicesDetailVerify = 'Verified';
+
+z.string.participantDevicesHeader = 'Devices';
+z.string.participantDevicesHeadline = 'Wire gives every device a unique fingerprint. Compare them with {{user}} and verify your conversation.';
+z.string.participantDevicesLearnMore = 'Learn more';
+z.string.participantDevicesWhyVerify = 'Why verify conversation?';
+z.string.participantDevicesOutdatedClientMessage = '{{user}} is using an old version of Wire. No devices are shown here.';
+
+z.string.participantDevicesSelfAllDevices = 'Show all my devices';
+z.string.participantDevicesSelfFingerprint = 'Device fingerprint';
+
 // User profile actions
-z.string.userProfileButtonCancel = 'Cancel';
 z.string.userProfileButtonConnect = 'Connect';
-z.string.userProfileButtonCreate = 'Create group';
 z.string.userProfileButtonIgnore = 'Ignore';
-z.string.userProfileButtonOpen = 'Open Conversation';
-z.string.userProfileButtonPending = 'Pending';
-z.string.userProfileButtonProfile = 'Profile';
 z.string.userProfileButtonUnblock = 'Unblock';
-z.string.userProfileButtonYes = 'Yes';
-
-z.string.userProfileTabsDetails = 'Details';
-z.string.userProfileTabsDevices = 'Devices';
-
-z.string.userProfileDevicesHeadline = 'Wire gives every device a unique fingerprint. Compare them with {{user}} and verify your conversation.';
-z.string.userProfileDevicesLearnMore = 'Learn more';
-z.string.userProfileDevicesWhyVerify = 'Why verify conversation?';
-z.string.userProfileDeviceDetailHeadline = 'Verify that this matches the fingerprint shown on {{html1}}{{user}}’s device{{html2}}.';
-z.string.userProfileDeviceDetailHowTo = 'How do I do that?';
-z.string.userProfileDeviceDetailShowMyDevice = 'Show my device fingerprint';
-z.string.userProfileDeviceDetailVerify = 'Verified';
-z.string.userProfileNoDevicesHeadline = '{{user}} is using an old version of Wire. No devices are shown here.';
-z.string.userProfileDeviceDetailResetSession = 'Reset session';
-
-// Confirmation views
-z.string.confirmDeviceAllMyDevices = 'Show all my devices';
-z.string.confirmDeviceFingerprint = 'Device fingerprint';
 
 // Settings
 z.string.preferencesAbout = 'About';
@@ -701,16 +695,8 @@ z.string.tooltipConversationsPreferences = 'Open preferences';
 z.string.tooltipConversationsSilence = 'Mute ({{shortcut}})';
 z.string.tooltipConversationsStart = 'Start conversation ({{shortcut}})';
 
-z.string.tooltipPeopleAddPeople = 'Add participants to conversation ({{shortcut}})';
-z.string.tooltipPeopleBack = 'Back';
-z.string.tooltipPeopleBlock = 'Block';
-z.string.tooltipPeopleConnect = 'Connect';
-z.string.tooltipPeopleLeave = 'Leave conversation';
-z.string.tooltipPeopleOpen = 'Open conversation';
-z.string.tooltipPeopleProfile = 'Open your profile';
-z.string.tooltipPeopleRename = 'Change conversation name';
-z.string.tooltipPeopleRemove = 'Remove from conversation';
-z.string.tooltipPeopleUnblock = 'Unblock';
+z.string.tooltipConversationDetailsAddPeople = 'Add participants to conversation ({{shortcut}})';
+z.string.tooltipConversationDetailsRename = 'Change conversation name';
 
 z.string.tooltipPreferencesContactsGmail = 'Log in to your Gmail account to share contacts';
 z.string.tooltipPreferencesContactsMacos = 'Share all your contacts from the macOS Contacts app';
