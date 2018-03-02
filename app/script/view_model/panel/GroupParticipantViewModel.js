@@ -25,33 +25,73 @@ window.z.viewModel.panel = z.viewModel.panel || {};
 
 z.viewModel.panel.GroupParticipantViewModel = class GroupParticipantViewModel {
   constructor(mainViewModel, panelViewModel, repositories) {
+    this.mainViewModel = mainViewModel;
     this.panelViewModel = panelViewModel;
     this.conversationRepository = repositories.conversation;
     this.integrationRepository = repositories.integration;
     this.userRepository = repositories.user;
     this.logger = new z.util.Logger('z.viewModel.panel.GroupParticipantViewModel', z.config.LOGGER.OPTIONS);
 
+    this.actionsViewModel = this.mainViewModel.actionsViewModel;
     this.conversationEntity = this.conversationRepository.active_conversation;
-    this.isVisible = this.panelViewModel.groupParticipantVisible;
 
-    // Selected group participant
+    this.availabilityLabel = ko.pureComputed(() => {
+      if (this.isVisible() && this.selectedParticipant()) {
+        const availabilitySetToNone = this.selectedParticipant().availability() === z.user.AvailabilityType.NONE;
+        if (!availabilitySetToNone) {
+          return z.user.AvailabilityMapper.nameFromType(this.selectedParticipant().availability());
+        }
+      }
+    });
+
     this.selectedParticipant = ko.observable(undefined);
     this.selectedService = ko.observable(undefined);
 
+    this.isVisible = ko.pureComputed(() => this.panelViewModel.groupParticipantVisible() && this.selectedParticipant());
+
     this.selectedIsInConversation = ko.pureComputed(() => {
-      if (this.selectedParticipant()) {
-        return this.conversationEntity.participating_user_ids().some(id => this.selectedParticipant().id === id);
+      return this.isVisible()
+        ? this.conversationEntity()
+            .participating_user_ids()
+            .some(id => this.selectedParticipant().id === id)
+        : false;
+    });
+    this.selfIsActiveMember = ko.pureComputed(() => {
+      if (this.isVisible()) {
+        return !this.conversationEntity().removed_from_conversation() && !this.conversationEntity().is_guest();
       }
-      return false;
     });
 
-    this.showServiceStates = ko.pureComputed(() => this.activeServiceState() && this.selectedService());
-    this.showUserState = ko.pureComputed(() => this.stateParticipants() && this.selectedParticipant());
-    this.showParticipantProfile = ko.pureComputed(() => this.showServiceStates() || this.showUserState());
+    this.showService = ko.pureComputed(() => this.isVisible() && this.selectedParticipant().isBot);
+    this.showUser = ko.pureComputed(() => this.isVisible() && !this.selectedParticipant().isBot);
 
-    this.showServiceRemove = ko.pureComputed(() => {
-      return this.stateServiceDetails() && !this.conversationEntity().is_guest() && this.selectedIsInConversation();
+    this.showServiceRemove = ko.pureComputed(() => this.selfIsActiveMember() && this.selectedIsInConversation());
+
+    this.showActionsIncomingRequest = ko.pureComputed(() => this.selectedParticipant().is_incoming_request());
+    this.showActionsOutgoingRequest = ko.pureComputed(() => this.selectedParticipant().is_outgoing_request());
+
+    this.showActionBlock = ko.pureComputed(() => this.selectedParticipant().is_connected());
+    this.showActionDevices = ko.pureComputed(() => {
+      return this.selectedParticipant().is_connected() || this.selectedParticipant().is_team_member();
     });
+    this.showActionOpenConversation = ko.pureComputed(() => {
+      const isContact = this.selectedParticipant().is_connected() || this.selectedParticipant().is_team_member();
+      return this.selectedIsInConversation() && isContact;
+    });
+    this.showActionRemove = ko.pureComputed(() => {
+      const canRemove = !this.conversationEntity().removed_from_conversation() && !this.conversationEntity().is_guest();
+      return this.selectedIsInConversation() && canRemove;
+    });
+    this.showActionSelfProfile = ko.pureComputed(() => this.selectedParticipant().is_me);
+    this.showActionSendRequest = ko.pureComputed(() => {
+      const isNotConnectedUser = this.selectedParticipant().is_canceled() || this.selectedParticipant().is_unknown();
+      const canConnect = !this.selectedParticipant().is_team_member() && !this.selectedParticipant().isTemporaryGuest();
+      return isNotConnectedUser && canConnect;
+    });
+    this.showActionLeave = ko.pureComputed(() => {
+      return this.selectedParticipant().is_me && !this.conversationEntity.removed_from_conversation();
+    });
+    this.showActionUnblock = ko.pureComputed(() => this.selectedParticipant().is_blocked());
   }
 
   clickOnBack() {
@@ -62,93 +102,57 @@ z.viewModel.panel.GroupParticipantViewModel = class GroupParticipantViewModel {
     this.panelViewModel.closePanel();
   }
 
-  clickOnSelfProfile() {
+  clickOnDevices() {
+    this.panelViewModel.showParticipantDevices(this.selectedParticipant());
+  }
+
+  clickOnShowProfile() {
     amplify.publish(z.event.WebApp.PREFERENCES.MANAGE_ACCOUNT);
   }
 
-  clickOnMemberBack() {
-    this.resetView();
+  clickOnOpenConversation() {
+    this.actionsViewModel.open1to1Conversation(this.selectedParticipant());
   }
 
-  clickOnServiceBack() {
-    this.state(this.previousState());
-    this.selectedParticipant(undefined);
-    this.selectedService(undefined);
-    $('.participants-search').addClass('participants-search-show');
+  clickToAcceptRequest() {
+    this.actionsViewModel.acceptConnectionRequest(this.selectedParticipant(), true);
   }
 
-  clickOnPending(userEntity) {
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
-      action: () => this.userRepository.accept_connection_request(userEntity, true),
-      secondary: () => this.userRepository.ignore_connection_request(userEntity),
-      text: {
-        action: z.l10n.text(z.string.modalConnectAcceptAction),
-        message: z.l10n.text(z.string.modalConnectAcceptMessage, userEntity.first_name()),
-        secondary: z.l10n.text(z.string.modalConnectAcceptSecondary),
-        title: z.l10n.text(z.string.modalConnectAcceptHeadline),
-      },
-      warning: false,
-    });
+  clickToIgnoreRequest() {
+    this.actionsViewModel.ignoreConnectionRequest(this.selectedParticipant());
   }
 
-  clickToBlock(userEntity) {
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
-      action: () => {
-        const nextConversationEntity = this.conversationRepository.get_next_conversation(this.conversationEntity());
-        this.userRepository.block_user(userEntity, nextConversationEntity);
-      },
-      text: {
-        action: z.l10n.text(z.string.modalUserBlockAction),
-        message: z.l10n.text(z.string.modalUserBlockMessage, userEntity.first_name()),
-        title: z.l10n.text(z.string.modalUserBlockHeadline),
-      },
-    });
+  clickToBlock() {
+    const nextConversationEntity = this.conversationRepository.get_next_conversation(this.conversationEntity());
+    this.actionsViewModel.blockUser(this.selectedParticipant(), nextConversationEntity);
   }
 
-  clickToRemoveMember(userEntity) {
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
-      action: () => this.conversationRepository.removeMember(this.conversationEntity(), userEntity.id),
-      text: {
-        action: z.l10n.text(z.string.modalConversationRemoveAction),
-        message: z.l10n.text(z.string.modalConversationRemoveMessage, userEntity.first_name()),
-        title: z.l10n.text(z.string.modalConversationRemoveHeadline),
-      },
-    });
+  clickToLeave() {
+    this.actionsViewModel.leaveConversation(this.conversationEntity());
   }
 
-  clickToRemoveService() {
-    this.integrationRepository.removeService(this.conversationEntity(), this.selectedParticipant());
+  clickToRemove() {
+    this.actionsViewModel.removeFromConversation(this.conversationEntity(), this.selectedParticipant());
   }
 
-  clickToUnblock(userEntity) {
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
-      action: () => {
-        this.userRepository
-          .unblock_user(userEntity)
-          .then(() => this.conversationRepository.get_1to1_conversation(userEntity))
-          .then(conversationEntity => this.conversationRepository.update_participating_user_ets(conversationEntity));
-      },
-      text: {
-        action: z.l10n.text(z.string.modalUserUnblockAction),
-        message: z.l10n.text(z.string.modalUserUnblockMessage, userEntity.first_name()),
-        title: z.l10n.text(z.string.modalUserUnblockHeadline),
-      },
-    });
+  clickToSendRequest() {
+    this.actionsViewModel.sendConnectionRequest(this.selectedParticipant());
+  }
+
+  clickToUnblock() {
+    this.actionsViewModel.unblockUser(this.selectedParticipant(), false);
   }
 
   showGroupParticipant(userEntity) {
-    if (userEntity) {
-      if (userEntity.isBot) {
-        this.showService(userEntity);
-      } else {
-        this.selectedParticipant(userEntity);
-      }
+    this.selectedParticipant(userEntity);
+
+    if (userEntity.isBot) {
+      this._showService();
     }
   }
 
-  showService(userEntity) {
-    this.selectedParticipant(userEntity);
-    const {providerId, serviceId} = userEntity;
+  _showService() {
+    const {providerId, serviceId} = this.selectedParticipant();
 
     this.integrationRepository
       .getServiceById(providerId, serviceId)

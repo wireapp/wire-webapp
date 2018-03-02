@@ -30,7 +30,10 @@ z.viewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
     this.messageRemoved = this.messageRemoved.bind(this);
 
     this.elementId = 'detail-view';
+    this.mainViewModel = mainViewModel;
     this.conversationRepository = repositories.conversation;
+
+    this.actionsViewModel = this.mainViewModel.actions;
     this.source = undefined;
 
     this.imageModal = undefined;
@@ -141,31 +144,15 @@ z.viewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
   }
 
   clickOnDelete() {
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
-      action: () => {
-        this.conversationRepository.delete_message(this.conversationEntity(), this.messageEntity());
-        this.imageModal.hide();
-      },
-      text: {
-        action: z.l10n.text(z.string.modalConversationDeleteMessageAction),
-        message: z.l10n.text(z.string.modalConversationDeleteMessageMessage),
-        title: z.l10n.text(z.string.modalConversationDeleteMessageHeadline),
-      },
-    });
+    return this.actionsViewModel
+      .deleteMessage(this.conversationEntity(), this.messageEntity())
+      .then(() => this.imageModal.hide());
   }
 
   clickOnDeleteForEveryone() {
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
-      action: () => {
-        this.conversationRepository.delete_message_everyone(this.conversationEntity(), this.messageEntity());
-        this.imageModal.hide();
-      },
-      text: {
-        action: z.l10n.text(z.string.modalConversationDeleteMessageEveryoneAction),
-        message: z.l10n.text(z.string.modalConversationDeleteMessageEveryoneMessage),
-        title: z.l10n.text(z.string.modalConversationDeleteMessageEveryoneHeadline),
-      },
-    });
+    return this.actionsViewModel
+      .deleteMessageEveryone(this.conversationEntity(), this.messageEntity())
+      .then(() => this.imageModal.hide());
   }
 
   clickOnDownload() {

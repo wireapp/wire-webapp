@@ -28,14 +28,20 @@ z.viewModel.panel.ParticipantDevicesViewModel = class ParticipantDevicesViewMode
     this.panelViewModel = panelViewModel;
     this.conversationRepository = repositories.conversation;
 
-    this.isVisible = this.panelViewModel.participantDevicesVisible;
+    this.userEntity = ko.observable();
+
+    this.isVisible = ko.pureComputed(() => this.panelViewModel.participantDevicesVisible() && this.userEntity());
   }
 
   clickOnBack() {
-    this.panelViewModel.switchState(z.viewModel.PanelViewModel.STATE.CONVERSATION_DETAILS);
+    this.panelViewModel.switchState(this.panelViewModel.previousState);
   }
 
   clickOnClose() {
     this.panelViewModel.closePanel();
+  }
+
+  showParticipantDevices(userEntity) {
+    this.userEntity(userEntity);
   }
 };

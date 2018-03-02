@@ -39,9 +39,27 @@ z.viewModel.MainViewModel = class MainViewModel {
     };
   }
 
+  static get PANEL_STYLE() {
+    return {
+      CLOSED: {
+        position: 'absolute',
+        right: '0',
+        transform: `translateX(${MainViewModel.CONFIG.PANEL.WIDTH}px)`,
+        width: `${MainViewModel.CONFIG.PANEL.WIDTH}px`,
+      },
+      OPEN: {
+        position: 'absolute',
+        right: '0',
+        transform: `translateX(0px)`,
+        width: `${MainViewModel.CONFIG.PANEL.WIDTH}px`,
+      },
+    };
+  }
+
   constructor(repositories) {
     this.closePanel = this.closePanel.bind(this);
     this.closePanelImmediatly = this.closePanelImmediatly.bind(this);
+    this.closePanelOnClick = this.closePanelOnClick.bind(this);
     this.openPanel = this.openPanel.bind(this);
     this.togglePanel = this.togglePanel.bind(this);
 
@@ -52,6 +70,8 @@ z.viewModel.MainViewModel = class MainViewModel {
     this.selfUser = this.userRepository.self;
 
     this.isPanelOpen = ko.observable(false);
+
+    this.actions = new z.viewModel.ActionsViewModel(this, repositories);
 
     this.content = new z.viewModel.ContentViewModel(this, repositories);
     this.list = new z.viewModel.ListViewModel(this, repositories);
@@ -120,24 +140,24 @@ z.viewModel.MainViewModel = class MainViewModel {
         if (isPanelOpen) {
           app.classList.remove('app--panel-open');
           this.isPanelOpen(false);
-          overlay.removeEventListener('click', this.togglePanel);
+          overlay.removeEventListener('click', this.closePanelOnClick);
         } else {
           app.classList.add('app--panel-open');
           this.isPanelOpen(true);
-          overlay.addEventListener('click', this.togglePanel);
+          overlay.addEventListener('click', this.closePanelOnClick);
         }
         window.dispatchEvent(new Event('resize'));
         resolve();
       });
 
       if (isPanelOpen) {
-        this._applyStyle(panel, this._getOpenPanelStyle());
+        this._applyStyle(panel, MainViewModel.PANEL_STYLE.OPEN);
         if (!isNarrowScreen) {
           this._applyStyle(titleBar, {width: `${centerWidthOpen}px`});
           this._applyStyle(input, {width: `${centerWidthOpen}px`});
         }
       } else {
-        this._applyStyle(panel, this._getClosedPanelStyle());
+        this._applyStyle(panel, MainViewModel.PANEL_STYLE.CLOSED);
         if (!isNarrowScreen) {
           this._applyStyle(titleBar, {width: `${centerWidthClose}px`});
           this._applyStyle(input, {width: `${centerWidthClose}px`});
@@ -153,13 +173,13 @@ z.viewModel.MainViewModel = class MainViewModel {
           input.style.transition = widthTransition;
 
           if (isPanelOpen) {
-            this._applyStyle(panel, this._getClosedPanelStyle());
+            this._applyStyle(panel, MainViewModel.PANEL_STYLE.CLOSED);
             if (!isNarrowScreen) {
               this._applyStyle(titleBar, {width: `${centerWidthClose}px`});
               this._applyStyle(input, {width: `${centerWidthClose}px`});
             }
           } else {
-            this._applyStyle(panel, this._getOpenPanelStyle());
+            this._applyStyle(panel, MainViewModel.PANEL_STYLE.OPEN);
             if (!isNarrowScreen) {
               this._applyStyle(titleBar, {width: `${centerWidthOpen}px`});
               this._applyStyle(input, {width: `${centerWidthOpen}px`});
@@ -180,21 +200,7 @@ z.viewModel.MainViewModel = class MainViewModel {
     }
   }
 
-  _getClosedPanelStyle() {
-    return {
-      position: 'absolute',
-      right: '0',
-      transform: `translateX(${MainViewModel.CONFIG.PANEL.WIDTH}px)`,
-      width: `${MainViewModel.CONFIG.PANEL.WIDTH}px`,
-    };
-  }
-
-  _getOpenPanelStyle() {
-    return {
-      position: 'absolute',
-      right: '0',
-      transform: `translateX(0px)`,
-      width: `${MainViewModel.CONFIG.PANEL.WIDTH}px`,
-    };
+  closePanelOnClick() {
+    this.panel.closePanel();
   }
 };

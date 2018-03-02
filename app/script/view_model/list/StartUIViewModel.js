@@ -53,6 +53,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
 
     this.handleSearchInput = this.handleSearchInput.bind(this);
 
+    this.mainViewModel = mainViewModel;
     this.listViewModel = listViewModel;
     this.connectRepository = repositories.connect;
     this.conversationRepository = repositories.conversation;
@@ -62,6 +63,8 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
     this.teamRepository = repositories.team;
     this.userRepository = repositories.user;
     this.logger = new z.util.Logger('z.viewModel.list.StartUIViewModel', z.config.LOGGER.OPTIONS);
+
+    this.actionsViewModel = this.mainViewModel.actions;
 
     this.selfUser = this.userRepository.self;
 
@@ -220,23 +223,12 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
   }
 
   clickOnContact(userEntity) {
-    return this.conversationRepository.get_1to1_conversation(userEntity).then(conversationEntity => {
-      return this.clickOnConversation(conversationEntity);
-    });
+    return this.actionsViewModel.open1to1Conversation(userEntity);
   }
 
   clickOnConversation(conversationEntity) {
-    if (conversationEntity.is_archived()) {
-      this.conversationRepository.unarchive_conversation(conversationEntity, 'opened conversation from search');
-    }
-
-    if (conversationEntity.is_cleared()) {
-      conversationEntity.cleared_timestamp(0);
-    }
-
-    amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity);
+    this.actionsViewModel.openGroupConversation(conversationEntity);
     this._closeList();
-    return conversationEntity;
   }
 
   clickOnCreateGroup() {
@@ -411,24 +403,25 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
 
   clickToAcceptInvite(userEntity) {
     this._closeList();
-    this.userRepository.accept_connection_request(userEntity, true);
+    this.actionsViewModel.acceptConnectionRequest(userEntity, true);
   }
 
   clickToIgnoreInvite(userEntity) {
-    this.userRepository.ignore_connection_request(userEntity).then(() => {
+    this.actionsViewModel.ignoreConnectionRequest(userEntity).then(() => {
       if (this.userBubble) {
         this.userBubble.hide();
       }
     });
   }
 
-  clickToSendRequest() {
+  clickToSendRequest(userEntity) {
     this._closeList();
+    this.actionsViewModel.sendConnectionRequest(userEntity, true);
   }
 
   clickToUnblock(userEntity) {
     this._closeList();
-    this.userRepository.unblock_user(userEntity, true);
+    this.actionsViewModel.unblockUser(userEntity, true);
   }
 
   //##############################################################################
