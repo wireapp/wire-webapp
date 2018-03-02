@@ -46,6 +46,7 @@ import {connect} from 'react-redux';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 import * as ConversationAction from '../module/action/ConversationAction';
 import * as AuthSelector from '../module/selector/AuthSelector';
+import * as ConversationSelector from '../module/selector/ConversationSelector';
 import ValidationError from '../module/action/ValidationError';
 import * as AuthAction from '../module/action/AuthAction';
 import {injectIntl, FormattedHTMLMessage} from 'react-intl';
@@ -80,7 +81,7 @@ class ConversationJoin extends Component {
 
     this.props
       .doInit()
-      .then(() => this.props.doCheckConversationCode(conversationKey, conversationCode))
+      // .then(() => this.props.doCheckConversationCode(conversationKey, conversationCode))
       .then(() =>
         this.setState({
           ...this.state,
@@ -96,12 +97,14 @@ class ConversationJoin extends Component {
       });
   }
 
-  onLoginClick = () => {
+  openWebapp = params => {
     const link = document.createElement('a');
-    link.href = pathWithParams(ROUTE.LOGIN, 'mode=login');
+    link.href = pathWithParams(ROUTE.LOGIN, params);
     document.body.appendChild(link); // workaround for Firefox
     link.click();
   };
+
+  onLoginClick = () => this.openWebapp('mode=login');
 
   onOpenWireClick = () => {
     this.props
@@ -129,7 +132,7 @@ class ConversationJoin extends Component {
         .then(name => this.props.doRegisterWireless({name}))
         .then(() => this.props.doJoinConversationByCode(this.state.conversationKey, this.state.conversationCode))
         .then(() => this.openWebapp('reason=registration'))
-        .catch(error => console.error('Failed to create wireless account', error));
+        .catch(error => console.error('Failed to create or join with wireless account', error));
     }
     this.nameInput.focus();
   };
@@ -295,7 +298,9 @@ export default withRouter(
   injectIntl(
     connect(
       state => ({
+        error: ConversationSelector.getError(state),
         isAuthenticated: AuthSelector.isAuthenticated(state),
+        isFetching: ConversationSelector.isFetching(state),
       }),
       {...ConversationAction, ...AuthAction}
     )(ConversationJoin)

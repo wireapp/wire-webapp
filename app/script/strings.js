@@ -279,6 +279,18 @@ export const conversationJoinStrings = defineMessages({
 });
 
 export const errorHandlerStrings = defineMessages({
+  [BackendError.LABEL.CONVERSATION_CODE_NOT_FOUND]: {
+    id: 'BackendError.LABEL.CONVERSATION_CODE_NOT_FOUND',
+    defaultMessage: 'CONVERSATION_CODE_NOT_FOUND',
+  },
+  [BackendError.LABEL.CONVERSATION_NOT_FOUND]: {
+    id: 'BackendError.LABEL.CONVERSATION_NOT_FOUND',
+    defaultMessage: 'CONVERSATION_NOT_FOUND',
+  },
+  [BackendError.LABEL.CONVERSATION_TOO_MANY_MEMBERS]: {
+    id: 'BackendError.LABEL.CONVERSATION_TOO_MANY_MEMBERS',
+    defaultMessage: 'CONVERSATION_TOO_MANY_MEMBERS',
+  },
   [BackendError.LABEL.ACCESS_DENIED]: {
     id: 'BackendError.LABEL.ACCESS_DENIED',
     defaultMessage: 'Please verify your details and try again',
@@ -338,7 +350,11 @@ export const errorHandlerStrings = defineMessages({
   },
   [BackendError.LABEL.INVALID_OPERATION]: {
     id: 'BackendError.LABEL.INVALID_OPERATION',
-    defaultMessage: 'BackendError.LABEL.INVALID_OPERATION',
+    defaultMessage: 'Invalid operation',
+  },
+  [BackendError.LABEL.INVALID_PAYLOAD]: {
+    id: 'BackendError.LABEL.INVALID_PAYLOAD',
+    defaultMessage: 'Invalid input',
   },
   [BackendError.LABEL.NOT_FOUND]: {
     id: 'BackendError.LABEL.NOT_FOUND',
