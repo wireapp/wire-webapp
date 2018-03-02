@@ -19,16 +19,32 @@
 
 /* eslint no-magic-numbers: "off" */
 
-const Proteus = require('@wireapp/proteus');
 const cryptobox = require('@wireapp/cryptobox');
 const LRUCache = require('@wireapp/lru-cache').default;
+const Proteus = require('@wireapp/proteus');
+const UUID = require('pure-uuid');
 const {StoreEngine} = require('@wireapp/store-engine');
 
 describe('cryptobox.store.IndexedDB', () => {
-  let store = undefined;
-  const STORE_NAME = 'wire@production@532af01e-1e24-4366-aacf-33b67d4ee376@temporary';
+  let dexieInstances = [];
 
-  async function createStore(storeName) {
+  afterEach(async done => {
+    await Promise.all(dexieInstances.map(db => deleteDatabase(db)));
+    dexieInstances = [];
+    done();
+  });
+
+  async function deleteDatabase(db) {
+    db.close();
+    const dbName = db.name;
+    return new Promise((resolve, reject) => {
+      const DBDeleteRequest = window.indexedDB.deleteDatabase(dbName);
+      DBDeleteRequest.onerror = () => reject(new Error('Error deleting database.'));
+      DBDeleteRequest.onsuccess = event => resolve(event);
+    });
+  }
+
+  async function createEngine(storeName) {
     const engine = new StoreEngine.IndexedDBEngine();
     await engine.init(storeName);
     engine.db.version(1).stores({
@@ -36,34 +52,28 @@ describe('cryptobox.store.IndexedDB', () => {
       prekeys: '',
       sessions: '',
     });
+    return engine;
+  }
+
+  async function createStore() {
+    const dbName = new UUID(4);
+    const engine = await createEngine(dbName);
+    dexieInstances.push(engine.db);
     return new cryptobox.store.CryptoboxCRUDStore(engine);
   }
 
-  beforeEach(async done => {
-    store = await createStore(STORE_NAME);
-    done();
-  });
-
-  afterEach(() => window.indexedDB.deleteDatabase('alice_db'));
-
   describe('Basic functionality', () => {
-    afterEach(() => {
-      window.indexedDB.deleteDatabase('alice_desktop');
-      window.indexedDB.deleteDatabase('bob_desktop');
-      window.indexedDB.deleteDatabase('bob_mobile');
-    });
-
     it('removes PreKeys from the storage (when a session gets established) and creates new PreKeys if needed.', async done => {
       const alice = {
         // PreKeys: ["65535", "0", "1"]
-        desktop: new cryptobox.Cryptobox(await createStore('alice_desktop'), 3),
+        desktop: new cryptobox.Cryptobox(await createStore(), 3),
       };
 
       const bob = {
         // PreKeys: ["65535"]
-        desktop: new cryptobox.Cryptobox(await createStore('bob_desktop'), 1),
+        desktop: new cryptobox.Cryptobox(await createStore(), 1),
         // PreKeys: ["65535"]
-        mobile: new cryptobox.Cryptobox(await createStore('bob_mobile'), 1),
+        mobile: new cryptobox.Cryptobox(await createStore(), 1),
       };
 
       spyOn(alice.desktop, 'publish_prekeys').and.callThrough();
@@ -112,14 +122,14 @@ describe('cryptobox.store.IndexedDB', () => {
 
   describe('"create_session"', () => {
     it('saves a session with meta data', async done => {
-      const alice = await Proteus.keys.IdentityKeyPair.new();
+      const store = await createStore();
 
+      const alice = await Proteus.keys.IdentityKeyPair.new();
       const bob = await Proteus.keys.IdentityKeyPair.new();
       const preKey = await Proteus.keys.PreKey.new(Proteus.keys.PreKey.MAX_PREKEY_ID);
       const bobPreKeyBundle = await Proteus.keys.PreKeyBundle.new(bob.public_key, preKey);
 
       const sessionId = 'session_with_bob';
-
       const proteusSession = await Proteus.session.Session.init_from_prekey(alice, bobPreKeyBundle);
       await store.create_session(sessionId, proteusSession);
 
@@ -135,13 +145,39 @@ describe('cryptobox.store.IndexedDB', () => {
     });
   });
 
-  describe('"session_from_prekey"', () => {
-    afterEach(() => {
-      window.indexedDB.deleteDatabase('alice_db');
-    });
+  describe('"update_session"', () => {
+    it('updates an already persisted session', async done => {
+      const store = await createStore();
 
+      const aliceIdentity = await Proteus.keys.IdentityKeyPair.new();
+      const bobIdentity = await Proteus.keys.IdentityKeyPair.new();
+      const bobLastResortPreKey = await Proteus.keys.PreKey.new(Proteus.keys.PreKey.MAX_PREKEY_ID);
+      const bobPreKeyBundle = await Proteus.keys.PreKeyBundle.new(bobIdentity.public_key, bobLastResortPreKey);
+      const sessionId = 'my_session_with_bob';
+
+      let proteusSession = await Proteus.session.Session.init_from_prekey(aliceIdentity, bobPreKeyBundle);
+      await store.create_session(sessionId, proteusSession);
+
+      expect(proteusSession.local_identity.public_key.fingerprint()).toBe(aliceIdentity.public_key.fingerprint());
+      expect(proteusSession.remote_identity.public_key.fingerprint()).toBe(bobIdentity.public_key.fingerprint());
+      expect(proteusSession.version).toBe(1);
+      proteusSession.version = 2;
+
+      proteusSession = await store.update_session(sessionId, proteusSession);
+
+      expect(proteusSession.local_identity.public_key.fingerprint()).toBe(aliceIdentity.public_key.fingerprint());
+      expect(proteusSession.remote_identity.public_key.fingerprint()).toBe(bobIdentity.public_key.fingerprint());
+      expect(proteusSession.version).toBe(2);
+
+      done();
+    });
+  });
+
+  describe('"session_from_prekey"', () => {
     it('saves and caches a valid session from a serialized PreKey bundle', async done => {
-      const alice = new cryptobox.Cryptobox(await createStore('alice_db'), 1);
+      const store = await createStore();
+
+      const alice = new cryptobox.Cryptobox(store, 1);
       const sessionId = 'session_with_bob';
 
       const bob = await Proteus.keys.IdentityKeyPair.new();
@@ -164,53 +200,25 @@ describe('cryptobox.store.IndexedDB', () => {
     });
 
     it('reinforces a session from the indexedDB without cache', async done => {
+      const store = await createStore();
+
       const alice = new cryptobox.Cryptobox(store, 1);
       const sessionId = 'session_with_bob';
 
-      try {
-        const bob = await Proteus.keys.IdentityKeyPair.new();
-        const preKey = await Proteus.keys.PreKey.new(Proteus.keys.PreKey.MAX_PREKEY_ID);
-        const bobPreKeyBundle = await Proteus.keys.PreKeyBundle.new(bob.public_key, preKey);
+      const bob = await Proteus.keys.IdentityKeyPair.new();
+      const preKey = await Proteus.keys.PreKey.new(Proteus.keys.PreKey.MAX_PREKEY_ID);
+      const bobPreKeyBundle = await Proteus.keys.PreKeyBundle.new(bob.public_key, preKey);
 
-        const allPreKeys = await alice.create();
-        expect(allPreKeys.length).toBe(1);
+      const allPreKeys = await alice.create();
+      expect(allPreKeys.length).toBe(1);
 
-        let cryptoboxSession = await alice.session_from_prekey(sessionId, bobPreKeyBundle.serialise());
-        expect(cryptoboxSession.fingerprint_remote()).toBe(bob.public_key.fingerprint());
+      let cryptoboxSession = await alice.session_from_prekey(sessionId, bobPreKeyBundle.serialise());
+      expect(cryptoboxSession.fingerprint_remote()).toBe(bob.public_key.fingerprint());
 
-        alice.cachedSessions = new LRUCache(1);
+      alice.cachedSessions = new LRUCache(1);
 
-        cryptoboxSession = await alice.session_from_prekey(sessionId, bobPreKeyBundle.serialise());
-        expect(cryptoboxSession.fingerprint_remote()).toBe(bob.public_key.fingerprint());
-
-        done();
-      } catch (error) {
-        done.fail(error);
-      }
-    });
-  });
-
-  describe('"update_session"', () => {
-    it('updates an already persisted session', async done => {
-      const aliceIdentity = await Proteus.keys.IdentityKeyPair.new();
-      const bobIdentity = await Proteus.keys.IdentityKeyPair.new();
-      const bobLastResortPreKey = await Proteus.keys.PreKey.new(Proteus.keys.PreKey.MAX_PREKEY_ID);
-      const bobPreKeyBundle = await Proteus.keys.PreKeyBundle.new(bobIdentity.public_key, bobLastResortPreKey);
-      const sessionId = 'my_session_with_bob';
-
-      let proteusSession = await Proteus.session.Session.init_from_prekey(aliceIdentity, bobPreKeyBundle);
-      await store.create_session(sessionId, proteusSession);
-
-      expect(proteusSession.local_identity.public_key.fingerprint()).toBe(aliceIdentity.public_key.fingerprint());
-      expect(proteusSession.remote_identity.public_key.fingerprint()).toBe(bobIdentity.public_key.fingerprint());
-      expect(proteusSession.version).toBe(1);
-      proteusSession.version = 2;
-
-      proteusSession = await store.update_session(sessionId, proteusSession);
-
-      expect(proteusSession.local_identity.public_key.fingerprint()).toBe(aliceIdentity.public_key.fingerprint());
-      expect(proteusSession.remote_identity.public_key.fingerprint()).toBe(bobIdentity.public_key.fingerprint());
-      expect(proteusSession.version).toBe(2);
+      cryptoboxSession = await alice.session_from_prekey(sessionId, bobPreKeyBundle.serialise());
+      expect(cryptoboxSession.fingerprint_remote()).toBe(bob.public_key.fingerprint());
 
       done();
     });

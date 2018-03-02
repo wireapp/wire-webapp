@@ -31,6 +31,7 @@
     "karma-jasmine-diff-reporter": "1.1.1",
     "karma-sourcemap-loader": "0.3.7",
     "logdown": "3.2.3",
+    "pure-uuid": "1.5.0",
     "rimraf": "2.6.2",
     "run-sequence": "2.2.1",
     "typescript": "2.7.1",
