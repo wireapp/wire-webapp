@@ -663,6 +663,7 @@ z.string.notificationConnectionRequest = 'Wants to connect';
 z.string.notificationConversationCreate = '{{user}} started a conversation';
 z.string.notificationConversationRename = '{{user}} renamed the conversation to {{name}}';
 z.string.notificationMemberJoinMany = '{{user}} added {{number}} people to the conversation';
+z.string.notificationMemberJoinSelf = '{{user}} joined the conversation';
 z.string.notificationMemberJoinOne = '{{user1}} added {{user2}} to the conversation';
 z.string.notificationMemberLeaveRemovedYou = '{{user}} removed you from the conversation';
 z.string.notificationObfuscated = 'Sent you a message';
