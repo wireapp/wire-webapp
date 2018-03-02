@@ -408,6 +408,7 @@ z.string.conversationsSecondaryLinePersonLeft = '{{user}} left';
 z.string.conversationsSecondaryLinePersonRemoved = '{{user}} was removed';
 z.string.conversationsSecondaryLinePeopleAdded = '{{user}} people were added';
 z.string.conversationsSecondaryLinePersonAdded = '{{user}} was added';
+z.string.conversationsSecondaryLinePersonAddedSelf = '{{user}} joined';
 z.string.conversationsSecondaryLinePersonAddedYou = '{{user}} added you';
 z.string.conversationsSecondaryLineRenamed = '{{user}} renamed conversation';
 z.string.conversationsSecondaryLineTimedMessage = 'Timed message';

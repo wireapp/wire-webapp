@@ -163,6 +163,11 @@ z.conversation.ConversationCellState = (() => {
             }
 
             const [remote_user_et] = last_message_et.remoteUserEntities();
+            const userSelfJoined = remote_user_et.id == last_message_et.user().id;
+            if (userSelfJoined) {
+              return z.l10n.text(z.string.conversationsSecondaryLinePersonAddedSelf, remote_user_et.name());
+            }
+
             return z.l10n.text(z.string.conversationsSecondaryLinePersonAdded, remote_user_et.name());
           }
 
