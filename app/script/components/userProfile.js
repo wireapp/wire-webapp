@@ -23,43 +23,21 @@ window.z = window.z || {};
 window.z.components = z.components || {};
 
 z.components.UserProfile = class UserProfile {
-  static get DEVICE_MODE() {
-    return {
-      AVAILABLE: 'UserProfile.DEVICE_MODE.AVAILABLE',
-      NONE: 'UserProfile.DEVICE_MODE.NONE',
-      REQUESTING: 'UserProfile.DEVICE_MODE.REQUESTING',
-    };
-  }
-
   static get MODE() {
     return {
-      DEFAULT: 'UserProfile.MODE.DEFAULT',
-      PEOPLE: 'UserProfile.MODE.PEOPLE',
-      SEARCH: 'USerProfile.MODE.SEARCH',
-    };
-  }
-
-  static get TAB_MODE() {
-    return {
-      DETAILS: 'UserProfile.TAB_MODE.DETAILS',
-      DEVICES: 'UserProfile.TAB_MODE.DEVICES',
+      SEARCH: 'UserProfile.MODE.SEARCH',
     };
   }
 
   constructor(params, componentInfo) {
     this.dispose = this.dispose.bind(this);
-    this.clickOnDevice = this.clickOnDevice.bind(this);
 
     this.logger = new z.util.Logger('z.components.UserProfile', z.config.LOGGER.OPTIONS);
 
-    this.conversation = params.conversation;
-    this.mode = params.mode || UserProfile.MODE.DEFAULT;
+    this.mode = UserProfile.MODE.SEARCH;
     this.userEntity = params.user;
     this.element = $(componentInfo.element);
 
-    this.clientRepository = window.wire.app.repository.client;
-    this.conversationRepository = window.wire.app.repository.conversation;
-    this.cryptographyRepository = window.wire.app.repository.cryptography;
     this.userRepository = window.wire.app.repository.user;
 
     this.selfUser = this.userRepository.self;
@@ -75,102 +53,6 @@ z.components.UserProfile = class UserProfile {
           return z.user.AvailabilityMapper.nameFromType(this.userEntity().availability());
         }
       }
-    });
-
-    // Confirmation dialog
-    this.confirmDialog = undefined;
-
-    // Devices
-    this.devices = ko.observableArray();
-    this.selectedDevice = ko.observable();
-    this.fingerprintLocal = ko.observableArray([]);
-    this.fingerprintRemote = ko.observableArray([]);
-    this.isResettingSession = ko.observable(false);
-
-    this.deviceMode = ko.observable(UserProfile.DEVICE_MODE.REQUESTING);
-    this.deviceModeIsAvailable = ko.pureComputed(() => this.deviceMode() === UserProfile.DEVICE_MODE.AVAILABLE);
-    this.deviceModeIsNone = ko.pureComputed(() => this.deviceMode() === UserProfile.DEVICE_MODE.NONE);
-
-    // Tabs
-    this.tabMode = ko.observable(UserProfile.TAB_MODE.DETAILS);
-    this.tabModeIsDetails = ko.pureComputed(() => this.tabMode() === UserProfile.TAB_MODE.DETAILS);
-    this.tabModeIsDevices = ko.pureComputed(() => this.tabMode() === UserProfile.TAB_MODE.DEVICES);
-    this.tabModeIsDevices.subscribe(tabModeIsDevices => {
-      if (this.hasUser() && tabModeIsDevices) {
-        const userId = this.userEntity().id;
-        this.clientRepository
-          .getClientsByUserId(userId)
-          .then(clientEntities => {
-            const hasDevices = clientEntities.length > 0;
-            const deviceMode = hasDevices ? UserProfile.DEVICE_MODE.AVAILABLE : UserProfile.DEVICE_MODE.NONE;
-            this.deviceMode(deviceMode);
-          })
-          .catch(error => this.logger.error(`Unable to retrieve clients data for user '${user_id}': ${error}`));
-      }
-    });
-    this.tabModeActiveCSS = ko.pureComputed(() => {
-      if (this.tabModeIsDetails()) {
-        return 'user-profile-tab-active-details';
-      }
-      return 'user-profile-tab-active-devices';
-    });
-
-    // destroy confirm dialog when user changes
-    this.cleanupComputed = ko.computed(() => {
-      if (this.hasUser() && this.confirmDialog) {
-        this.confirmDialog.destroy();
-      }
-
-      this.deviceMode(UserProfile.DEVICE_MODE.REQUESTING);
-      this.tabMode(UserProfile.TAB_MODE.DETAILS);
-      this.selectedDevice(null);
-      this.fingerprintRemote([]);
-      this.isResettingSession(false);
-    });
-
-    this.showBackButton = ko.pureComputed(() => {
-      if (typeof this.conversation === 'function') {
-        return this.conversation().is_group();
-      }
-    });
-
-    this.selectedDeviceSubscription = this.selectedDevice.subscribe(() => {
-      if (this.selectedDevice()) {
-        this.fingerprintLocal(this._formatFingerprint(this.cryptographyRepository.getLocalFingerprint()));
-        this.fingerprintRemote([]);
-        this.cryptographyRepository
-          .getRemoteFingerprint(this.userEntity().id, this.selectedDevice().id)
-          .then(fingerprint => this.fingerprintRemote(this._formatFingerprint(fingerprint)));
-      }
-    });
-
-    const shortcut = z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.ADD_PEOPLE);
-    this.addPeopleTooltip = z.l10n.text(z.string.tooltipPeopleAdd, shortcut);
-
-    this.deviceHeadline = ko.pureComputed(() => {
-      return z.l10n.text(z.string.userProfileDevicesHeadline, this.userEntity().first_name());
-    });
-
-    this.noDeviceHeadline = ko.pureComputed(() => {
-      return z.l10n.text(z.string.userProfileNoDevicesHeadline, this.userEntity().first_name());
-    });
-
-    this.detailMessage = ko.pureComputed(() => {
-      const substitution = {user: z.util.escape_html(this.userEntity().first_name())};
-      const text = z.l10n.text(z.string.userProfileDeviceDetailHeadline, substitution);
-
-      const textWithHtmlTags = new RegExp('\\{\\{[^\\}]+\\}\\}[^\\{]+\\{\\{[^\\}]+\\}\\}');
-      const textWithinHtmlTags = new RegExp('\\{\\{[^\\}]+\\}\\}', 'gm');
-
-      const [pivot] = text.match(textWithHtmlTags) || [];
-      const sanitizedText = z.util.StringUtil.splitAtPivotElement(text, pivot, pivot);
-
-      return sanitizedText.map(element => {
-        if (element.isStyled) {
-          element.text = element.text.replace(textWithinHtmlTags, '');
-        }
-        return element;
-      });
     });
 
     // Actions
@@ -214,38 +96,6 @@ z.components.UserProfile = class UserProfile {
       }
     };
 
-    this.accentColor = ko.pureComputed(() => {
-      if (this.hasUser()) {
-        return `accent-color-${this.hasUser().accent_id()}`;
-      }
-      return '';
-    });
-
-    this.showGrayImage = ko.pureComputed(() => {
-      if (!this.hasUser()) {
-        return false;
-      }
-
-      return !this.hasUser().is_me && !this.hasUser().is_connected();
-    });
-
-    this.connectionIsNotEstablished = ko.pureComputed(() => {
-      if (this.hasUser()) {
-        return this.hasUser().is_request() || this.hasUser().is_ignored();
-      }
-    });
-
-    this.isUserRemovable = ko.pureComputed(() => {
-      if (!this.hasUser() || !this.conversation()) {
-        return false;
-      }
-
-      const participatingUserEntities = this.conversation().participating_user_ets();
-      const isSelfParticipant = !this.conversation().removed_from_conversation() && !this.conversation().is_guest();
-      const isUserParticipant = participatingUserEntities.includes(this.userEntity());
-      return isSelfParticipant && isUserParticipant;
-    });
-
     this.renderAvatar = ko.observable(false);
     this.renderAvatarComputed = ko.computed(() => {
       const hasUserId = this.hasUser();
@@ -257,56 +107,11 @@ z.components.UserProfile = class UserProfile {
 
     // footer
     this.getFooterTemplate = ko.pureComputed(() => {
-      if (!this.hasUser() || !this.tabModeIsDetails()) {
-        return 'user-profile-footer-empty';
-      }
-      const userEntity = this.userEntity();
+      if (this.hasUser()) {
+        const userEntity = this.userEntity();
 
-      // When used in conversation!
-      if (typeof this.conversation === 'function') {
-        const conversationEntity = this.conversation();
-
-        if (conversationEntity.is_one2one() || conversationEntity.is_request()) {
-          if (userEntity.is_me) {
-            return 'user-profile-footer-profile';
-          }
-
-          if (userEntity.is_connected() || userEntity.is_team_member()) {
-            return 'user-profile-footer-add-block';
-          }
-
-          if (userEntity.is_outgoing_request()) {
-            return 'user-profile-footer-pending';
-          }
-        } else if (conversationEntity.is_group()) {
-          if (userEntity.is_me) {
-            return 'user-profile-footer-profile-leave';
-          }
-
-          if (userEntity.is_connected() || userEntity.is_team_member()) {
-            return 'user-profile-footer-message-remove';
-          }
-
-          if (userEntity.is_unknown()) {
-            return 'user-profile-footer-connect-remove';
-          }
-
-          if (userEntity.is_ignored() || userEntity.is_request()) {
-            return 'user-profile-footer-pending-remove';
-          }
-
-          if (userEntity.is_blocked()) {
-            return 'user-profile-footer-unblock-remove';
-          }
-        }
-        // When used in Search!
-      } else {
         if (userEntity.is_blocked()) {
           return 'user-profile-footer-unblock';
-        }
-
-        if (userEntity.is_outgoing_request()) {
-          return 'user-profile-footer-pending';
         }
 
         if (userEntity.is_ignored() || userEntity.is_incoming_request()) {
@@ -322,63 +127,8 @@ z.components.UserProfile = class UserProfile {
     });
   }
 
-  _formatFingerprint(fingerprint) {
-    return z.util.zero_padding(fingerprint, 16).match(/.{1,2}/g) || [];
-  }
-
-  clickOnDevice(clientEntity) {
-    this.selectedDevice(clientEntity);
-  }
-
-  clickOnDeviceDetailBack() {
-    this.selectedDevice(null);
-  }
-
-  clickToSeeSelfFingerprint() {
-    this.confirmDialog = $('#participants').confirm({
-      data: {
-        click_on_show_my_devices: () => amplify.publish(z.event.WebApp.PREFERENCES.MANAGE_DEVICES),
-        device: this.clientRepository.currentClient,
-        fingerprint_local: this.fingerprintLocal,
-      },
-      template: '#template-confirm-my-fingerprint',
-    });
-  }
-
-  clickToResetSession() {
-    const reset_progress = () => {
-      window.setTimeout(() => {
-        this.isResettingSession(false);
-      }, z.motion.MotionDuration.LONG);
-    };
-
-    this.isResettingSession(true);
-    this.conversationRepository
-      .reset_session(this.userEntity().id, this.selectedDevice().id, this.conversation().id)
-      .then(() => reset_progress())
-      .catch(() => reset_progress());
-  }
-
-  clickToToggleDeviceVerification() {
-    const toggleVerified = !this.selectedDevice().meta.isVerified();
-
-    this.clientRepository
-      .verifyClient(this.userEntity().id, this.selectedDevice(), toggleVerified)
-      .catch(error => this.logger.warn(`Failed to toggle client verification: ${error.message}`));
-  }
-
-  clickOnTabDevices() {
-    this.tabMode(UserProfile.TAB_MODE.DEVICES);
-  }
-
-  clickOnTabDetails() {
-    this.tabMode(UserProfile.TAB_MODE.DETAILS);
-  }
-
   dispose() {
-    this.cleanupComputed.dispose();
     this.renderAvatarComputed.dispose();
-    this.selectedDeviceSubscription.dispose();
   }
 };
 

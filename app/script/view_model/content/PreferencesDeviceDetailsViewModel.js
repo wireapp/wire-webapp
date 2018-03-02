@@ -88,9 +88,9 @@ z.viewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
   _updateFingerprint() {
     this.fingerprint([]);
 
-    this.cryptographyRepository.getRemoteFingerprint(this.selfUser().id, this.device().id).then(fingerprint => {
-      this.fingerprint(z.util.zero_padding(fingerprint, 16).match(/.{1,2}/g));
-    });
+    this.cryptographyRepository
+      .getRemoteFingerprint(this.selfUser().id, this.device().id)
+      .then(fingerprint => this.fingerprint(fingerprint));
   }
 
   clickOnDetailsClose() {

@@ -1,9 +1,87 @@
-<div  id="participant-devices" class="participant-devices" data-bind="with: $root.participantDevices">
+<div id="participant-devices" class="panel__page participant-devices" data-bind="with: $root.participantDevices">
   <!-- ko if: isVisible() -->
-    <div>
-      <arrow-left-icon class="icon-button" data-bind="click: clickOnBack" data-uie-name="do-close"></arrow-left-icon>
+    <div class="panel__header">
+      <arrow-left-icon class="icon-button" data-bind="click: clickOnBack" data-uie-name="go-close"></arrow-left-icon>
+      <!-- ko if: !showDeviceDetails() && !showSelfFingerprint() -->
+        <span data-bind="text: z.string.participantDevicesHeader"></span>
+      <!-- /ko -->
+      <!-- ko if: showSelfFingerprint() -->
+        <span data-bind="text: z.string.participantDevicesSelfFingerprint"></span>
+      <!-- /ko -->
+      <!-- ko if: showDeviceDetails() -->
+        <!-- ko if: userEntity().is_me -->
+          <span data-bind="text: selectedClient().label || selectedClient().model"></span>
+        <!-- /ko -->
+        <!-- ko ifnot: userEntity().is_me -->
+          <span data-bind="text: z.util.StringUtil.capitalize_first_char(selectedClient().class)"></span>
+        <!-- /ko -->
+      <!-- /ko -->
       <close-icon class="icon-button" data-bind="click: clickOnClose" data-uie-name="do-close"></close-icon>
     </div>
-    <div>Participant devices view</div>
+
+    <div class="right-panel-content">
+      <!-- ko if: showDevicesFound() -->
+        <div>
+          <div data-bind="text: devicesHeadlineText"></div>
+          <a data-bind="attr: {href: z.util.URLUtil.build_url(z.util.URLUtil.TYPE.WEBSITE, z.config.URL_PATH.PRIVACY_WHY)}, l10n_text: z.string.participantDevicesWhyVerify" rel="nofollow noopener noreferrer" target="_blank" class="text-theme"></a>
+        </div>
+
+        <div data-bind="foreach: clientEntities()">
+          <div data-bind="click: $parent.clickOnDevice">
+            <svg width="16" height="16">
+              <!-- ko if: meta.isVerified()-->
+                <use data-uie-name="user-device-verified" xlink:href="#icon-verified"></use>
+              <!-- /ko -->
+              <!-- ko ifnot: meta.isVerified()-->
+                <use data-uie-name="user-device-not-verified" xlink:href="#icon-not-verified"></use>
+              <!-- /ko -->
+            </svg>
+            <device-card params="device: $data, click: $parent.clickOnDevice"></device-card>
+          </div>
+        </div>
+      <!-- /ko -->
+
+      <!-- ko if: showDevicesNotFound() -->
+        <div data-bind="text: noDevicesHeadlineText"></div>
+        <a data-bind="l10n_text: z.string.participantDevicesLearnMore, l10n_href: {type: z.util.URLUtil.TYPE.WEBSITE, path: z.string.urlWebsitePrivacy}" rel="nofollow noopener noreferrer" target="_blank" class="text-theme"></a>
+      <!-- /ko -->
+
+      <!-- ko if: showDeviceDetails() -->
+        <span class="button-label text-theme" data-bind="click: clickToShowSelfFingerprint, l10n_text: z.string.participantDevicesDetailShowMyDevice"></span>
+
+        <div>
+          <div data-bind="foreach: detailMessage"><span data-bind="css: {'highlight': $data.isStyled}, text: $data.text"></span></div>
+          <a data-bind="attr: {href: z.util.URLUtil.build_url(z.util.URLUtil.TYPE.WEBSITE, z.config.URL_PATH.PRIVACY_HOW)}, l10n_text: z.string.participantDevicesDetailHowTo" rel="nofollow noopener noreferrer" target="_blank" class="text-theme"></a>
+        </div>
+
+        <device-card class="" params="device: selectedClient()"></device-card>
+        <div class="participant-devices__fingerprint" data-bind="foreach: fingerprintRemote()"><span class="participant-devices__fingerprint__part" data-bind="text: $data"></span></div>
+
+        <div>
+          <div class="slider">
+            <input class="slider-input" type="checkbox" name="toggle" id="toggle" data-bind="checked: selectedClient().meta.isVerified">
+            <label class="button-label" for="toggle" data-bind="click: clickToToggleDeviceVerification, l10n_text: z.string.participantDevicesDetailVerify"></label>
+          </div>
+          <div>
+            <svg class="svg-theme spin"
+                 data-bind="style: {visibility : isResettingSession() ? 'visible' : 'hidden'}"
+                 width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" data-uie-name="status-loading">
+              <path class="fill-theme" d="M12.416 12.417c-2.374 2.375-6.28 2.33-8.72-.112-2.444-2.442-2.488-6.347-.113-8.72 1.658-1.66 4.12-2.18 6.343-1.394.477.17 1-.08 1.17-.557.167-.477-.083-1-.56-1.17C7.658-.552 4.453.124 2.286 2.29-.808 5.384-.75 10.448 2.4 13.6c3.15 3.152 8.216 3.21 11.312.113 2.165-2.166 2.84-5.37 1.824-8.25-.168-.476-.692-.726-1.17-.558-.476.17-.726.692-.557 1.17.784 2.222.265 4.684-1.394 6.342z"></path>
+            </svg>
+            <span class="button-label text-theme"
+                  data-bind="style: {visibility: !isResettingSession() ? 'visible' : 'hidden'},
+                             click: clickToResetSession, l10n_text: z.string.participantDevicesDetailResetSession"></span>
+          </div>
+        </div>
+      <!-- /ko -->
+
+      <!-- ko if: showSelfFingerprint()-->
+        <device-card params="device: selfClient()"></device-card>
+        <div class="participant-devices__fingerprint" data-bind="foreach: fingerprintLocal()"><span class="participant-devices__fingerprint__part" data-bind="text: $data"></span></div>
+        <div>
+          <span class="button-label text-theme" data-bind="click: clickOnShowSelfDevices, l10n_text: z.string.participantDevicesSelfAllDevices"></span>
+        </div>
+      <!-- /ko -->
+    </div>
   <!-- /ko -->
 </div>

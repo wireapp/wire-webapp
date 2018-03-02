@@ -17,34 +17,17 @@
  *
  */
 
-.confirm {
-  .full-screen();
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  background-color: fade(#fff, 98%);
-  border-radius: 4px;
-  opacity: 0;
-  padding: @bubble-inner-padding;
-}
+.panel {
+  .participant-devices {
+    &__fingerprint {
+      height: 72px;
+      margin-bottom: 16px;
+      font-family: monospace;
 
-.confirm-is-visible {
-  transition-property: opacity;
-  transition-duration: @animation-timing-slow;
-  transition-timing-function: @ease-out-quart;
-  opacity: 1;
-}
-
-.confirm-content {
-  line-height: @line-height-lg;
-
-  .headline {
-    font-weight: @font-weight-bold;
-    margin-bottom: 8px;
-  }
-
-  .message {
-    overflow: hidden;
-    text-overflow: ellipsis;
+      &__part:nth-child(12),
+      &__part:nth-child(23) {
+        margin-left: 0;
+      }
+    }
   }
 }
