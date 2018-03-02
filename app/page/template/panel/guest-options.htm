@@ -6,36 +6,38 @@
       <close-icon class="right-panel-close icon-button" data-bind="click: clickOnClose" data-uie-name="do-close"></close-icon>
     </div>
     <div class="guest-options__content">
-      <guest-mode-toggle params="isChecked: isGuestEnabled, onToggle: toggleAccessState"></guest-mode-toggle>
+      <guest-mode-toggle params="isChecked: isGuestEnabled(), onToggle: toggleAccessState"></guest-mode-toggle>
     </div>
-    <!-- ko if: isGuestEnabled -->
+    <!-- ko if: showLinkOptions() -->
       <div class="guest-options__info">
-        <div class="guest-options__info__head" data-bind="l10n_text: z.string.guestOptionsInfoHead"></div>
+        <div class="guest-options__info__head" data-bind="l10n_text: z.string.guestOptionsInfoHeader"></div>
         <div data-bind="l10n_text: z.string.guestOptionsInfoText"></div>
       </div>
-      <!-- ko ifnot: hasAccessCode -->
-        <div class="panel__action-item" data-bind="click: requestAccessCode">
-          <link-icon class="panel__action-item__icon"></link-icon>
-          <div class="panel__action-item__text" data-bind="l10n_text: z.string.guestOptionsCreateLink"></div>
-        </div>
-      <!-- /ko -->
-      <!-- ko if: hasAccessCode -->
+      <!-- ko if: hasAccessCode() -->
         <textarea disabled class="guest-options__link" data-bind="value: conversationEntity().accessCode()"></textarea>
+        <!-- ko if: isLinkCopied() -->
+          <div class="panel__action-item">
+            <check-icon class="panel__action-item__icon"></check-icon>
+            <div class="panel__action-item__text" data-bind="l10n_text: z.string.guestOptionsCopyLinkDone"></div>
+          </div>
+        <!-- /ko -->
+
         <!-- ko ifnot: isLinkCopied -->
           <div class="panel__action-item" data-bind="click: copyLink">
             <copy-icon class="panel__action-item__icon"></copy-icon>
             <div class="panel__action-item__text" data-bind="l10n_text: z.string.guestOptionsCopyLink"></div>
           </div>
         <!-- /ko -->
-        <!-- ko if: isLinkCopied -->
-          <div class="panel__action-item">
-            <check-icon class="panel__action-item__icon"></check-icon>
-            <div class="panel__action-item__text" data-bind="l10n_text: z.string.guestOptionsCopyLinkDone"></div>
-          </div>
-        <!-- /ko -->
         <div class="panel__action-item" data-bind="click: revokeAccessCode">
           <close-icon class="panel__action-item__icon"></close-icon>
           <div class="panel__action-item__text" data-bind="l10n_text: z.string.guestOptionsRevokeLink"></div>
+        </div>
+      <!-- /ko -->
+
+      <!-- ko ifnot: hasAccessCode() -->
+        <div class="panel__action-item" data-bind="click: requestAccessCode">
+          <link-icon class="panel__action-item__icon"></link-icon>
+          <div class="panel__action-item__text" data-bind="l10n_text: z.string.guestOptionsCreateLink"></div>
         </div>
       <!-- /ko -->
     <!-- /ko -->
