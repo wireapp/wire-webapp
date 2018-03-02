@@ -92,7 +92,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
   _init(database) {
     return Promise.resolve().then(() => {
       this.logger.info(`Initializing Cryptobox with database '${database.name}'...`);
-      this.cryptobox = new cryptobox.Cryptobox(new cryptobox.store.IndexedDB(database), 10);
+      this.cryptobox = new cryptobox.Cryptobox(new StoreEngine.IndexedDBEngine(database), 10);
 
       this.cryptobox.on(cryptobox.Cryptobox.TOPIC.NEW_PREKEYS, preKeys => {
         const serializedPreKeys = preKeys.map(preKey => this.cryptobox.serialize_prekey(preKey));
