@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="0.5.2"></a>
+## [0.5.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@0.5.1...@wireapp/api-client@0.5.2) (2018-03-02)
+
+
+### Bug Fixes
+
+* **api-client:** Use correct endpoint for conversations ([#328](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/328)) ([eded866](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/eded866))
+
+
+
+
 <a name="0.5.1"></a>
 ## [0.5.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@0.5.0...@wireapp/api-client@0.5.1) (2018-03-01)
 
