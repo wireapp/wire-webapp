@@ -32,7 +32,7 @@ z.viewModel.panel.GroupParticipantViewModel = class GroupParticipantViewModel {
     this.userRepository = repositories.user;
     this.logger = new z.util.Logger('z.viewModel.panel.GroupParticipantViewModel', z.config.LOGGER.OPTIONS);
 
-    this.actionsViewModel = this.mainViewModel.actionsViewModel;
+    this.actionsViewModel = this.mainViewModel.actions;
     this.conversationEntity = this.conversationRepository.active_conversation;
 
     this.availabilityLabel = ko.pureComputed(() => {
