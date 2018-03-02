@@ -43,7 +43,7 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
   }
 
   blockUser(userEntity, nextConversationEntity) {
-    if (userEntity && nextConversationEntity) {
+    if (userEntity) {
       amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
         action: () => this.userRepository.block_user(userEntity, nextConversationEntity),
         text: {
@@ -56,7 +56,7 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
   }
 
   cancelConnectionRequest(userEntity, nextConversationEntity) {
-    if (userEntity && nextConversationEntity) {
+    if (userEntity) {
       amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
         action: () => this.userRepository.cancel_connection_request(userEntity, nextConversationEntity),
         text: {
