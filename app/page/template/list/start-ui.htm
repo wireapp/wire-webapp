@@ -51,7 +51,7 @@
                 </li>
               </ul>
             <!-- /ko -->
-            <!-- ko if: isTeam() -->
+            <!-- ko if: showCreateGuestRoom() -->
               <ul class="start-ui-create-guest-room left-list-items">
                 <li class="left-list-item left-list-item-clickable" data-bind="click: clickOnCreateGuestRoom" data-uie-name="do-create-guest-room">
                   <guest-icon class="left-column"></guest-icon>
@@ -67,11 +67,11 @@
             <!-- /ko -->
             <!-- ko if: showContacts() -->
               <div class="start-ui-list-contacts" data-uie-name="status-contacts">
-                <!-- ko ifnot: isTeam() -->
-                  <span class="start-ui-list-header" data-bind="l10n_text: z.string.searchConnections"></span>
-                <!-- /ko -->
                 <!-- ko if: isTeam() -->
                   <span class="start-ui-list-header start-ui-list-header-contacts" data-bind="l10n_text: z.string.searchContacts"></span>
+                <!-- /ko -->
+                <!-- ko ifnot: isTeam() -->
+                  <span class="start-ui-list-header" data-bind="l10n_text: z.string.searchConnections"></span>
                 <!-- /ko -->
                 <user-list class="search-list-theme-black" params="user: contacts, click: clickOnContact"></user-list>
               </div>
