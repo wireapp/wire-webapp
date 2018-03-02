@@ -17,7 +17,7 @@
  *
  */
 
-import {Store, StoreEngine} from '@wireapp/store-engine';
+import {LocalStorageEngine, Store} from '@wireapp/store-engine';
 
 describe('store.TransientStore', () => {
   const STORE_NAME = 'database-name';
@@ -27,7 +27,7 @@ describe('store.TransientStore', () => {
   let store = undefined;
 
   beforeEach(async done => {
-    engine = new StoreEngine.LocalStorageEngine();
+    engine = new LocalStorageEngine();
     await engine.init(STORE_NAME);
     store = new Store.TransientStore(engine);
     await store.init(TABLE_NAME);

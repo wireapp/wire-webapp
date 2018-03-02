@@ -2,4 +2,4 @@ interface SerialisedUpdate {
   serialised: ArrayBuffer;
 }
 
-export default SerialisedUpdate;
+export {SerialisedUpdate};

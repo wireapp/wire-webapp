@@ -1,6 +1,6 @@
 const TABLE_NAME = 'the-simpsons';
 
-const {StoreEngine} = require('@wireapp/store-engine');
+const StoreEngine = require('@wireapp/store-engine');
 
 module.exports = {
   'creates a serialized database record.': (done, engine) => {

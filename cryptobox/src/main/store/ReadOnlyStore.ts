@@ -47,4 +47,4 @@ class ReadOnlyStore implements ProteusSession.PreKeyStore {
   }
 }
 
-export default ReadOnlyStore;
+export {ReadOnlyStore};

@@ -19,11 +19,11 @@
 
 /* eslint no-magic-numbers: "off" */
 
-const cryptobox = require('@wireapp/cryptobox');
+const {store: CryptoboxStore, Cryptobox} = require('@wireapp/cryptobox');
 const LRUCache = require('@wireapp/lru-cache').default;
 const Proteus = require('@wireapp/proteus');
 const UUID = require('pure-uuid');
-const {StoreEngine} = require('@wireapp/store-engine');
+const {IndexedDBEngine} = require('@wireapp/store-engine');
 
 describe('cryptobox.store.IndexedDB', () => {
   let dexieInstances = [];
@@ -45,7 +45,7 @@ describe('cryptobox.store.IndexedDB', () => {
   }
 
   async function createEngine(storeName) {
-    const engine = new StoreEngine.IndexedDBEngine();
+    const engine = new IndexedDBEngine();
     await engine.init(storeName);
     engine.db.version(1).stores({
       keys: '',
@@ -59,21 +59,21 @@ describe('cryptobox.store.IndexedDB', () => {
     const dbName = new UUID(4);
     const engine = await createEngine(dbName);
     dexieInstances.push(engine.db);
-    return new cryptobox.store.CryptoboxCRUDStore(engine);
+    return new CryptoboxStore.CryptoboxCRUDStore(engine);
   }
 
   describe('Basic functionality', () => {
     it('removes PreKeys from the storage (when a session gets established) and creates new PreKeys if needed.', async done => {
       const alice = {
         // PreKeys: ["65535", "0", "1"]
-        desktop: new cryptobox.Cryptobox(await createStore(), 3),
+        desktop: new Cryptobox((await createStore()).engine, 3),
       };
 
       const bob = {
         // PreKeys: ["65535"]
-        desktop: new cryptobox.Cryptobox(await createStore(), 1),
+        desktop: new Cryptobox((await createStore()).engine, 1),
         // PreKeys: ["65535"]
-        mobile: new cryptobox.Cryptobox(await createStore(), 1),
+        mobile: new Cryptobox((await createStore()).engine, 1),
       };
 
       spyOn(alice.desktop, 'publish_prekeys').and.callThrough();
@@ -133,10 +133,10 @@ describe('cryptobox.store.IndexedDB', () => {
       const proteusSession = await Proteus.session.Session.init_from_prekey(alice, bobPreKeyBundle);
       await store.create_session(sessionId, proteusSession);
 
-      const tableName = cryptobox.store.CryptoboxCRUDStore.STORES.SESSIONS;
+      const tableName = CryptoboxStore.CryptoboxCRUDStore.STORES.SESSIONS;
       const serialisedSession = await store.engine.read(tableName, sessionId);
       expect(serialisedSession.created).toEqual(jasmine.any(Number));
-      expect(serialisedSession.version).toEqual(cryptobox.Cryptobox.prototype.VERSION);
+      expect(serialisedSession.version).toEqual(Cryptobox.prototype.VERSION);
 
       const loadedSession = await store.read_session(alice, sessionId);
       expect(loadedSession.session_tag).toEqual(proteusSession.session_tag);
@@ -177,7 +177,7 @@ describe('cryptobox.store.IndexedDB', () => {
     it('saves and caches a valid session from a serialized PreKey bundle', async done => {
       const store = await createStore();
 
-      const alice = new cryptobox.Cryptobox(store, 1);
+      const alice = new Cryptobox(store.engine, 1);
       const sessionId = 'session_with_bob';
 
       const bob = await Proteus.keys.IdentityKeyPair.new();
@@ -202,7 +202,7 @@ describe('cryptobox.store.IndexedDB', () => {
     it('reinforces a session from the indexedDB without cache', async done => {
       const store = await createStore();
 
-      const alice = new cryptobox.Cryptobox(store, 1);
+      const alice = new Cryptobox(store.engine, 1);
       const sessionId = 'session_with_bob';
 
       const bob = await Proteus.keys.IdentityKeyPair.new();

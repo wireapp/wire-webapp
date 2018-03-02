@@ -22,12 +22,12 @@ Nowadays there are more and more storage possibilities and developers must be fa
 
 #### Engines
 
-| Engine             | Available in Browser | Available in Node.js | Description                                                                                                                |
-| :----------------- | :------------------: | :------------------: | :------------------------------------------------------------------------------------------------------------------------- |
-| FileEngine         |          ❌          |          ✔           | Rudimentary persistent store based on files. Very generic and easy to read.                                                |
-| IndexedDBEngine    |          ✔           |          ❌          | Persisent storage which handles significant amounts of structured data, including files/blobs. Enables very fast searches. |
-| MemoryEngine       |          ✔           |          ✔           | Transient store which loses data on application restart. Suitable for testing environments.                                |
-| LocalStorageEngine |          ✔           |          ❌          | Can save very small amount of data. Stored data is saved across browser sessions. Suitable for simple objects and strings. |
+| Engine             | Available in Browser | Available in Node.js | Description                                                                                                                 |
+| :----------------- | :------------------: | :------------------: | :-------------------------------------------------------------------------------------------------------------------------- |
+| FileEngine         |          🞫           |          ✓           | Rudimentary persistent store based on files. Very generic and easy to read.                                                 |
+| IndexedDBEngine    |          ✓           |          🞫           | Persistent storage which handles significant amounts of structured data, including files/blobs. Enables very fast searches. |
+| MemoryEngine       |          ✓           |          ✓           | Transient store which loses data on application restart. Suitable for testing environments.                                 |
+| LocalStorageEngine |          ✓           |          🞫           | Can save very small amount of data. Stored data is saved across browser sessions. Suitable for simple objects and strings.  |
 
 #### Stores
 
@@ -36,9 +36,9 @@ With an engine you can build a store which has special capabilities like a timeo
 **Using a TransientStore**
 
 ```javascript
-const {Store, StoreEngine} = require('@wireapp/store-engine');
+const {Store, LocalStorageEngine} = require('@wireapp/store-engine');
 
-const engine = new StoreEngine.LocalStorageEngine('my-favorite-actors');
+const engine = new LocalStorageEngine('my-favorite-actors');
 const store = new Store.TransientStore(engine);
 
 store

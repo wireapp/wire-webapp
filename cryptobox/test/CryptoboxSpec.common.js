@@ -21,11 +21,11 @@
 
 const cryptobox = typeof window === 'object' ? window.cryptobox : require('@wireapp/cryptobox');
 const Proteus = typeof window === 'object' ? window.Proteus : require('@wireapp/proteus');
-const {StoreEngine} = require('@wireapp/store-engine');
+const {MemoryEngine} = require('@wireapp/store-engine');
 
 describe('cryptobox.Cryptobox', () => {
   let sodium = undefined;
-  let store = undefined;
+  let engine = undefined;
 
   beforeAll(async done => {
     if (typeof window === 'object') {
@@ -39,15 +39,15 @@ describe('cryptobox.Cryptobox', () => {
     }
   });
 
-  beforeEach(async () => {
-    const engine = new StoreEngine.MemoryEngine();
+  beforeEach(async done => {
+    engine = new MemoryEngine();
     await engine.init('cache');
-    store = new cryptobox.store.CryptoboxCRUDStore(engine);
+    done();
   });
 
   describe('"decrypt"', () => {
     it("doesn't decrypt empty ArrayBuffers", done => {
-      const box = new cryptobox.Cryptobox(store);
+      const box = new cryptobox.Cryptobox(engine);
       const sessionId = 'sessionWithBob';
       box
         .decrypt(sessionId, new ArrayBuffer(0))
@@ -61,18 +61,18 @@ describe('cryptobox.Cryptobox', () => {
 
   describe('"create"', () => {
     it('initializes a Cryptobox with a new identity and the last resort PreKey and saves these', done => {
-      const box = new cryptobox.Cryptobox(store);
+      const box = new cryptobox.Cryptobox(engine);
 
       box
         .create()
         .then(() => {
           expect(box.identity).toBeDefined();
-          return store.load_identity();
+          return box.store.load_identity();
         })
         .then(identity => {
           expect(identity).toBeDefined();
           expect(identity.public_key.fingerprint()).toBeDefined();
-          return store.load_prekey(Proteus.keys.PreKey.MAX_PREKEY_ID);
+          return box.store.load_prekey(Proteus.keys.PreKey.MAX_PREKEY_ID);
         })
         .then(preKey => {
           expect(preKey.key_id).toBe(Proteus.keys.PreKey.MAX_PREKEY_ID);
@@ -82,7 +82,7 @@ describe('cryptobox.Cryptobox', () => {
     });
 
     it('initializes a Cryptobox with a defined amount of PreKeys (including the last resort PreKey)', done => {
-      const box = new cryptobox.Cryptobox(store, 10);
+      const box = new cryptobox.Cryptobox(engine, 10);
       box.create().then(() => {
         const preKeys = box.cachedPreKeys;
         const lastResortPreKey = preKeys.filter(preKey => preKey.key_id === Proteus.keys.PreKey.MAX_PREKEY_ID);
@@ -100,7 +100,7 @@ describe('cryptobox.Cryptobox', () => {
 
   describe('"load"', () => {
     it('initializes a Cryptobox with an existing identity and the last resort PreKey', done => {
-      let box = new cryptobox.Cryptobox(store, 4);
+      let box = new cryptobox.Cryptobox(engine, 4);
       let initialFingerPrint = undefined;
 
       box
@@ -115,7 +115,7 @@ describe('cryptobox.Cryptobox', () => {
 
           initialFingerPrint = identity.public_key.fingerprint();
 
-          box = new cryptobox.Cryptobox(store);
+          box = new cryptobox.Cryptobox(engine);
           expect(box.identity).not.toBeDefined();
           return box.load();
         })
@@ -127,21 +127,21 @@ describe('cryptobox.Cryptobox', () => {
     });
 
     it('fails to initialize a Cryptobox of which the identity is missing', done => {
-      let box = new cryptobox.Cryptobox(store);
+      let box = new cryptobox.Cryptobox(engine);
 
       box
         .create()
         .then(() => {
           expect(box.identity).toBeDefined();
-          return store.delete_all();
+          return box.store.delete_all();
         })
         .then(() => {
-          return store.load_identity();
+          return box.store.load_identity();
         })
         .then(identity => {
           expect(identity).not.toBeDefined();
 
-          box = new cryptobox.Cryptobox(store);
+          box = new cryptobox.Cryptobox(engine);
           expect(box.identity).not.toBeDefined();
           return box.load();
         })
@@ -153,21 +153,21 @@ describe('cryptobox.Cryptobox', () => {
     });
 
     it('fails to initialize a Cryptobox of which the last resort PreKey is missing', done => {
-      let box = new cryptobox.Cryptobox(store);
+      let box = new cryptobox.Cryptobox(engine);
 
       box
         .create()
         .then(() => {
           expect(box.identity).toBeDefined();
-          return store.delete_prekey(Proteus.keys.PreKey.MAX_PREKEY_ID);
+          return box.store.delete_prekey(Proteus.keys.PreKey.MAX_PREKEY_ID);
         })
         .then(() => {
-          return store.load_prekey(Proteus.keys.PreKey.MAX_PREKEY_ID);
+          return box.store.load_prekey(Proteus.keys.PreKey.MAX_PREKEY_ID);
         })
         .then(prekey => {
           expect(prekey).not.toBeDefined();
 
-          box = new cryptobox.Cryptobox(store);
+          box = new cryptobox.Cryptobox(engine);
           expect(box.identity).not.toBeDefined();
           return box.load();
         })
@@ -182,7 +182,7 @@ describe('cryptobox.Cryptobox', () => {
   describe('PreKeys', () => {
     describe('"serialize_prekey"', () => {
       it('generates a JSON format', async done => {
-        const box = new cryptobox.Cryptobox(store, 10);
+        const box = new cryptobox.Cryptobox(engine, 10);
         box.identity = await Proteus.keys.IdentityKeyPair.new();
         const preKeyId = 72;
         const preKey = await Proteus.keys.PreKey.new(preKeyId);
@@ -200,7 +200,7 @@ describe('cryptobox.Cryptobox', () => {
     const sessionIdUnique = 'unique_identifier';
 
     beforeEach(done => {
-      box = new cryptobox.Cryptobox(store);
+      box = new cryptobox.Cryptobox(engine);
       box
         .create()
         .then(async () => {

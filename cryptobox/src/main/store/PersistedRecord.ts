@@ -15,4 +15,4 @@ class PersistedRecord {
   }
 }
 
-export default PersistedRecord;
+export {PersistedRecord};

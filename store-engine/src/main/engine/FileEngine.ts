@@ -9,8 +9,10 @@ export default class FileEngine implements CRUDEngine {
     fileExtension: '.dat',
   };
 
-  init(storeName: string, options: {fileExtension: string}): Promise<any> {
-    this.storeName = path.normalize(storeName);
+  constructor(private baseDirectory: string = '') {}
+
+  init(storeName: string = '', options: {fileExtension: string}): Promise<any> {
+    this.storeName = path.normalize(path.join(this.baseDirectory, storeName));
     this.options = {...this.options, ...options};
     return Promise.resolve(storeName);
   }

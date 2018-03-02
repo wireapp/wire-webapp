@@ -19,15 +19,15 @@
 
 /* eslint no-magic-numbers: "off" */
 
-describe('cryptobox.Cryptobox', () => {
-  const cryptobox = require('@wireapp/cryptobox');
-  const Proteus = require('@wireapp/proteus');
-  const {StoreEngine} = require('@wireapp/store-engine');
+const Proteus = require('@wireapp/proteus');
+const {Cryptobox} = require('@wireapp/cryptobox');
+const {MemoryEngine} = require('@wireapp/store-engine');
 
+describe('Cryptobox', () => {
   async function createCryptobox(storeName) {
-    const engine = new StoreEngine.MemoryEngine();
+    const engine = new MemoryEngine();
     await engine.init(storeName);
-    return new cryptobox.Cryptobox(new cryptobox.store.CryptoboxCRUDStore(engine));
+    return new Cryptobox(engine);
   }
 
   describe('"encrypt / decrypt"', () => {

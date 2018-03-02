@@ -66,4 +66,4 @@ interface CryptoboxStore {
   delete_session(session_id: string): Promise<string>;
 }
 
-export default CryptoboxStore;
+export {CryptoboxStore};

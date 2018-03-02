@@ -17,7 +17,7 @@
  *
  */
 
-import {StoreEngine} from '@wireapp/store-engine';
+import {LocalStorageEngine} from '@wireapp/store-engine';
 
 describe('StoreEngine.LocalStorageEngine', () => {
   const STORE_NAME = 'store-name';
@@ -25,7 +25,7 @@ describe('StoreEngine.LocalStorageEngine', () => {
   let engine = undefined;
 
   beforeEach(async done => {
-    engine = new StoreEngine.LocalStorageEngine();
+    engine = new LocalStorageEngine();
     await engine.init(STORE_NAME);
     done();
   });

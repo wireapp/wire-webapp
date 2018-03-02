@@ -201,8 +201,8 @@ class Client {
       }`
     );
     const isDexieStore = db && db.constructor.name === 'Dexie';
-    const isSchemalessStore = db && Object.keys(db._dbSchema).length === 0;
-    if (isDexieStore && isSchemalessStore) {
+    const isSchemalessStore = isDexieStore && Object.keys(db._dbSchema).length === 0;
+    if (isSchemalessStore) {
       if (this.config.schemaCallback) {
         this.config.schemaCallback(db);
       } else {

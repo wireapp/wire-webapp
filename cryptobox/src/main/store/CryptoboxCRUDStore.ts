@@ -2,7 +2,7 @@ import * as ProteusKeys from '@wireapp/proteus/dist/keys/root';
 import * as ProteusSession from '@wireapp/proteus/dist/session/root';
 import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine/index';
 import {CryptoboxStore, PersistedRecord, SerialisedRecord} from '../store/root';
-import {StoreEngine} from '@wireapp/store-engine';
+import {error as StoreEngineError} from '@wireapp/store-engine';
 import {Decoder, Encoder} from 'bazinga64';
 
 class CryptoboxCRUDStore implements CryptoboxStore {
@@ -53,7 +53,7 @@ class CryptoboxCRUDStore implements CryptoboxStore {
         return identity;
       })
       .catch((error: Error) => {
-        if (error instanceof StoreEngine.error.RecordNotFoundError) {
+        if (error instanceof StoreEngineError.RecordNotFoundError) {
           return undefined;
         }
         throw error;
@@ -68,7 +68,7 @@ class CryptoboxCRUDStore implements CryptoboxStore {
         return ProteusKeys.PreKey.deserialise(payload);
       })
       .catch((error: Error) => {
-        if (error instanceof StoreEngine.error.RecordNotFoundError) {
+        if (error instanceof StoreEngineError.RecordNotFoundError) {
           return undefined;
         }
         throw error;
@@ -136,4 +136,4 @@ class CryptoboxCRUDStore implements CryptoboxStore {
   }
 }
 
-export default CryptoboxCRUDStore;
+export {CryptoboxCRUDStore};

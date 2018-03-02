@@ -15,4 +15,4 @@ class SerialisedRecord {
   }
 }
 
-export default SerialisedRecord;
+export {SerialisedRecord};

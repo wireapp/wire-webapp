@@ -19,9 +19,9 @@
 
 const fs = require('fs-extra');
 const path = require('path');
-const {StoreEngine} = require('@wireapp/store-engine');
+const {error: StoreEngineError, FileEngine} = require('@wireapp/store-engine');
 
-describe('StoreEngine.FileEngine', () => {
+describe('FileEngine', () => {
   const STORE_NAME = 'store-name';
   const TABLE_NAME = 'the-simpsons';
 
@@ -29,7 +29,7 @@ describe('StoreEngine.FileEngine', () => {
   let engine = undefined;
 
   beforeEach(async done => {
-    engine = new StoreEngine.FileEngine();
+    engine = new FileEngine();
     await engine.init(TEST_DIRECTORY);
     done();
   });
@@ -55,7 +55,7 @@ describe('StoreEngine.FileEngine', () => {
       ]).then(results => {
         for (error of results) {
           expect(error.name === 'PathValidationError').toBe(true);
-          expect(error.message).toBe(StoreEngine.error.PathValidationError.TYPE.PATH_TRAVERSAL);
+          expect(error.message).toBe(StoreEngineError.PathValidationError.TYPE.PATH_TRAVERSAL);
         }
         done();
       });
@@ -71,7 +71,7 @@ describe('StoreEngine.FileEngine', () => {
       const options = {
         fileExtension: '.json',
       };
-      engine = new StoreEngine.FileEngine();
+      engine = new FileEngine();
       await engine.init(STORE_NAME, options);
 
       expect(engine.options.fileExtension).toBe(options.fileExtension);
@@ -95,7 +95,7 @@ describe('StoreEngine.FileEngine', () => {
       ]).then(results => {
         for (error of results) {
           expect(error.name === 'PathValidationError').toBe(true);
-          expect(error.message).toBe(StoreEngine.error.PathValidationError.TYPE.PATH_TRAVERSAL);
+          expect(error.message).toBe(StoreEngineError.PathValidationError.TYPE.PATH_TRAVERSAL);
         }
         done();
       });
@@ -114,8 +114,8 @@ describe('StoreEngine.FileEngine', () => {
         .create(TABLE_NAME, PRIMARY_KEY, entity)
         .then(() => done.fail(new Error('Method is supposed to throw an error.')))
         .catch(error => {
-          expect(error.name).toBe(StoreEngine.error.PathValidationError.name);
-          expect(error.message).toBe(StoreEngine.error.PathValidationError.TYPE.INVALID_NAME);
+          expect(error.name).toBe(StoreEngineError.PathValidationError.name);
+          expect(error.message).toBe(StoreEngineError.PathValidationError.TYPE.INVALID_NAME);
           done();
         });
     });
@@ -139,7 +139,7 @@ describe('StoreEngine.FileEngine', () => {
       ]).then(results => {
         for (error of results) {
           expect(error.name === 'PathValidationError').toBe(true);
-          expect(error.message).toBe(StoreEngine.error.PathValidationError.TYPE.PATH_TRAVERSAL);
+          expect(error.message).toBe(StoreEngineError.PathValidationError.TYPE.PATH_TRAVERSAL);
         }
         done();
       });
@@ -159,7 +159,7 @@ describe('StoreEngine.FileEngine', () => {
       ]).then(results => {
         for (error of results) {
           expect(error.name === 'PathValidationError').toBe(true);
-          expect(error.message).toBe(StoreEngine.error.PathValidationError.TYPE.PATH_TRAVERSAL);
+          expect(error.message).toBe(StoreEngineError.PathValidationError.TYPE.PATH_TRAVERSAL);
         }
         done();
       });
@@ -184,7 +184,7 @@ describe('StoreEngine.FileEngine', () => {
       ]).then(results => {
         for (error of results) {
           expect(error.name === 'PathValidationError').toBe(true);
-          expect(error.message).toBe(StoreEngine.error.PathValidationError.TYPE.PATH_TRAVERSAL);
+          expect(error.message).toBe(StoreEngineError.PathValidationError.TYPE.PATH_TRAVERSAL);
         }
         done();
       });
@@ -204,7 +204,7 @@ describe('StoreEngine.FileEngine', () => {
       ]).then(results => {
         for (error of results) {
           expect(error.name === 'PathValidationError').toBe(true);
-          expect(error.message).toBe(StoreEngine.error.PathValidationError.TYPE.PATH_TRAVERSAL);
+          expect(error.message).toBe(StoreEngineError.PathValidationError.TYPE.PATH_TRAVERSAL);
         }
         done();
       });
