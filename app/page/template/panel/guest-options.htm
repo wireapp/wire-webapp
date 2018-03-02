@@ -21,10 +21,18 @@
       <!-- /ko -->
       <!-- ko if: hasAccessCode -->
         <textarea disabled class="guest-options__link" data-bind="value: conversationEntity().accessCode()"></textarea>
-        <div class="panel__action-item" data-bind="click: copyLink">
-          <copy-icon class="panel__action-item__icon"></copy-icon>
-          <div class="panel__action-item__text" data-bind="l10n_text: z.string.guestOptionsCopyLink"></div>
-        </div>
+        <!-- ko ifnot: linkCopied -->
+          <div class="panel__action-item" data-bind="click: copyLink">
+            <copy-icon class="panel__action-item__icon"></copy-icon>
+            <div class="panel__action-item__text" data-bind="l10n_text: z.string.guestOptionsCopyLink"></div>
+          </div>
+        <!-- /ko -->
+        <!-- ko if: linkCopied -->
+          <div class="panel__action-item">
+            <check-icon class="panel__action-item__icon"></check-icon>
+            <div class="panel__action-item__text" data-bind="l10n_text: z.string.guestOptionsCopyLinkDone"></div>
+          </div>
+        <!-- /ko -->
         <div class="panel__action-item" data-bind="click: revokeAccessCode">
           <close-icon class="panel__action-item__icon"></close-icon>
           <div class="panel__action-item__text" data-bind="l10n_text: z.string.guestOptionsRevokeLink"></div>
