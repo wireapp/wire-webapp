@@ -54,7 +54,7 @@ ko.components.register('block-icon', {
 ko.components.register('check-icon', {
   template: `
   <svg width="16" height="12" viewBox="0 0 16 12">
-    <path d="M5.7 11.9L16 1.4 14.6 0 5.7 9 1.4 4.8 0 6.2z"/>
+    <path d="M5.7 11.9L16 1.4 14.6 0 5.7 9 1.4 4.8 0 6.2z"></path>
   </svg>
   `,
 });
@@ -139,10 +139,34 @@ ko.components.register('leave-icon', {
   `,
 });
 
+ko.components.register('message-icon', {
+  template: `
+  <svg width="16" height="16" viewBox="0 0 16 16">
+  <path d="M9.8 13h.2a6 6 0 0 0 6-6V6a6 6 0 0 0-6-6H6a6 6 0 0 0-6 6v1a6 6 0 0 0 6 6h.2L8 16l1.8-3z"></path>
+  </svg>
+  `,
+});
+
+ko.components.register('minus-icon', {
+  template: `
+  <svg width="16" height="2" viewBox="0 0 16 2">
+    <path d="M0 0h16v2H0z"></path>
+  </svg>
+  `,
+});
+
 ko.components.register('mute-icon', {
   template: `
   <svg width="16" height="16" viewBox="0 0 16 16">
     <path d="M2.2 10.74l1.74-7.5h.04C4.23 1.4 5.93 0 8 0c2.07 0 3.77 1.4 4.02 3.23h.04l.15.68 1.8-1.23.84-.57L16 3.75l-.83.57-13.18 9-.84.57L0 12.25l.83-.57 1.38-.94zM6.86 12h7.23l-.98-4.26L6.85 12zm3.18 2c0 1.1-.91 2-2.03 2-1.12 0-2.03-.9-2.03-2h4.06z"></path>
+  </svg>
+  `,
+});
+
+ko.components.register('plus-icon', {
+  template: `
+  <svg width="16" height="16" viewBox="0 0 16 16">
+    <path d="M0 7v2h7v7h2V9h7V7H9V0H7v7z"/>
   </svg>
   `,
 });

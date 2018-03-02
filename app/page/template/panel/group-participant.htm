@@ -1,19 +1,27 @@
-<div  id="group-participant" class="group-participant" data-bind="with: $root.groupParticipant">
+<div id="group-participant" class="panel__page group-participant" data-bind="with: $root.groupParticipant">
   <!-- ko if: isVisible() -->
-    <div>
+    <div class="panel__header">
       <arrow-left-icon class="icon-button" data-bind="click: clickOnBack" data-uie-name="do-close"></arrow-left-icon>
       <close-icon class="icon-button" data-bind="click: clickOnClose" data-uie-name="do-close"></close-icon>
     </div>
-    <div>
+    <div class="right-panel-content">
       <!-- ko if: showUser() -->
-        <div data-bind="text: selectedParticipant().name()" data-uie-name="status-name"></div>
-        <div data-bind="text: selectedParticipant().username()"></div>
-        <participant-avatar params="participant: selectedParticipant(), size: z.components.ParticipantAvatar.SIZE.X_LARGE" data-uie-name="status-profile-picture"></participant-avatar>
-        <!-- if: isTeam() -->
-          <availability-state data-uie-name="status-availability"
-                          params="availability: selectedParticipant().availability(), label: availabilityLabel()">
-          </availability-state>
-        <!-- /ko -->
+        <div class="conversation-details__header">
+          <div class="conversation-details__name conversation-details__name--centered" data-bind="text: selectedParticipant().name()" data-uie-name="status-name"></div>
+          <!-- ko if: selectedParticipant().username() -->
+            <div class="conversation-details__user-name" data-bind="text: selectedParticipant().username()"></div>
+          <!-- /ko -->
+          <div class="conversation-details__participants">
+            <participant-avatar params="participant: selectedParticipant(), size: z.components.ParticipantAvatar.SIZE.X_LARGE" data-uie-name="status-profile-picture"></participant-avatar>
+            <!-- if: isTeam() -->
+              <availability-state
+                class="conversation-details__availability"
+                data-uie-name="status-availability"
+                params="availability: selectedParticipant().availability(), label: availabilityLabel()">
+              </availability-state>
+            <!-- /ko -->
+          </div>
+        </div>
         <div class="group-participant-bottom-actions">
           <!-- ko if: showActionDevices() -->
             <div class="panel__action-item conversation-details__devices" data-bind="click: clickOnDevices" data-uie-name="go-devices">
@@ -31,7 +39,7 @@
           <!-- /ko -->
           <!-- ko if: showActionOpenConversation() -->
             <div class="panel__action-item"  data-bind="click: clickOnOpenConversation" data-uie-name="go-conversation">
-              <close-icon class="panel__action-item__icon"></close-icon>
+              <message-icon class="panel__action-item__icon"></message-icon>
               <div class="panel__action-item__text" data-bind="l10n_text: z.string.groupParticipantActionOpenConversation"></div>
             </div>
           <!-- /ko -->
@@ -57,7 +65,7 @@
           <!-- /ko -->
           <!-- ko if: showActionSendRequest() -->
             <div class="panel__action-item"  data-bind="click: clickToSendRequest" data-uie-name="do-send-request">
-              <close-icon class="panel__action-item__icon"></close-icon>
+              <plus-icon class="panel__action-item__icon"></plus-icon>
               <div class="panel__action-item__text" data-bind="l10n_text: z.string.groupParticipantActionSendRequest"></div>
             </div>
           <!-- /ko -->
@@ -82,7 +90,7 @@
           <!-- /ko -->
           <!-- ko if: showActionRemove() -->
             <div class="panel__action-item"  data-bind="click: clickToRemove" data-uie-name="do-remove">
-              <leave-icon class="panel__action-item__icon"></leave-icon>
+              <minus-icon class="panel__action-item__icon"></minus-icon>
               <div class="panel__action-item__text" data-bind="l10n_text: z.string.groupParticipantActionRemove"></div>
             </div>
           <!-- /ko -->
@@ -90,13 +98,11 @@
       <!-- /ko -->
 
       <!-- ko if: showService() -->
-        <div>
-          <div>
+        <div class="conversation-details__header">
+          <div class="conversation-details__name conversation-details__name--centered" data-bind="text: selectedService().name" data-uie-name="status-service-name"></div>
+          <div class="conversation-details__user-name"  data-bind="text: selectedService().providerName()" data-uie-name="status-service-provider"></div>
+          <div class="conversation-details__participants">
             <participant-avatar params="participant: selectedService, size: z.components.ParticipantAvatar.SIZE.LARGE"></participant-avatar>
-            <div>
-              <div data-bind="text: selectedService().name" data-uie-name="status-service-name"></div>
-              <div data-bind="text: selectedService().providerName()" data-uie-name="status-service-provider"></div>
-            </div>
           </div>
           <div data-bind="text: selectedService().description" data-uie-name="status-service-description"></div>
         </div>
