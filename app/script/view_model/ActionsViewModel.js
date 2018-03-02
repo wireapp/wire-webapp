@@ -48,7 +48,7 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
         action: () => this.userRepository.block_user(userEntity, nextConversationEntity),
         text: {
           action: z.l10n.text(z.string.modalUserBlockAction),
-          message: z.l10n.text(z.string.modalUserBlockMessage),
+          message: z.l10n.text(z.string.modalUserBlockMessage, userEntity.first_name()),
           title: z.l10n.text(z.string.modalUserBlockHeadline, userEntity.first_name()),
         },
       });
