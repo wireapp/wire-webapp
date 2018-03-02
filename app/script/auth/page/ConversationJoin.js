@@ -56,6 +56,7 @@ import React, {Component} from 'react';
 import {pathWithParams} from '../util/urlUtil';
 import {Link as RRLink} from 'react-router-dom';
 import Cookies from 'js-cookie';
+import BackendError from '../module/action/BackendError';
 
 const CONVERSATION_CODE = 'code';
 const CONVERSATION_KEY = 'key';
@@ -81,7 +82,7 @@ class ConversationJoin extends Component {
 
     this.props
       .doInit()
-      // .then(() => this.props.doCheckConversationCode(conversationKey, conversationCode))
+      .then(() => this.props.doCheckConversationCode(conversationKey, conversationCode))
       .then(() =>
         this.setState({
           ...this.state,
@@ -107,15 +108,12 @@ class ConversationJoin extends Component {
   onLoginClick = () => this.openWebapp('mode=login');
 
   onOpenWireClick = () => {
-    this.props
-      .doJoinConversationByCode(this.state.conversationKey, this.state.conversationCode)
-      .then(() => {
-        const link = document.createElement('a');
-        link.href = pathWithParams('/');
-        document.body.appendChild(link); // workaround for Firefox
-        link.click();
-      })
-      .catch(error => console.error('Failed to join conversation with existing account', error));
+    this.props.doJoinConversationByCode(this.state.conversationKey, this.state.conversationCode).then(() => {
+      const link = document.createElement('a');
+      link.href = pathWithParams('/');
+      document.body.appendChild(link); // workaround for Firefox
+      link.click();
+    });
   };
 
   handleSubmit = event => {
@@ -131,11 +129,13 @@ class ConversationJoin extends Component {
         .then(name => name.trim())
         .then(name => this.props.doRegisterWireless({name}))
         .then(() => this.props.doJoinConversationByCode(this.state.conversationKey, this.state.conversationCode))
-        .then(() => this.openWebapp('reason=registration'))
-        .catch(error => console.error('Failed to create or join with wireless account', error));
+        .then(() => this.openWebapp('reason=registration'));
     }
     this.nameInput.focus();
   };
+
+  isConversationFullErrorPresent = error =>
+    error && error.label && error.is(BackendError.CONVERSATION_ERRORS.CONVERSATION_TOO_MANY_MEMBERS);
 
   resetErrors = () => this.setState({error: null, isValidName: true});
 
@@ -244,9 +244,41 @@ class ConversationJoin extends Component {
     );
   };
 
+  renderFullConversation = () => {
+    const {intl: {formatMessage: _}} = this.props;
+    return (
+      <Container verticalCenter>
+        <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}} color={COLOR.GRAY}>
+          <FormattedHTMLMessage {...conversationJoinStrings.fullConversationHeadline} />
+        </H2>
+        <H3 style={{marginTop: '10px'}}>{_(conversationJoinStrings.fullConversationSubhead)}</H3>
+      </Container>
+    );
+  };
+
+  renderAppAlreadyOpenModal = () => {
+    const {intl: {formatMessage: _}} = this.props;
+    return (
+      <Modal onClose={() => this.setState({...this.state, isAppAlreadyOpen: false})}>
+        <Container style={{maxWidth: '400px'}}>
+          <H3 style={{fontWeight: '500'}}>{_(conversationJoinStrings.appAlreadyOpenModalHeadline)}</H3>
+          <Text>{_(conversationJoinStrings.appAlreadyOpenModalText)}</Text>
+          <Columns style={{marginTop: '20px'}}>
+            <Column style={{textAlign: 'center'}}>
+              <Button backgroundColor={COLOR.GRAY}>{_(conversationJoinStrings.appAlreadyOpenModalCancelButton)}</Button>
+            </Column>
+            <Column style={{textAlign: 'center'}}>
+              <Button>{_(conversationJoinStrings.appAlreadyOpenModalContinueButton)}</Button>
+            </Column>
+          </Columns>
+        </Container>
+      </Modal>
+    );
+  };
+
   render() {
-    const {isAuthenticated, intl: {formatMessage: _}} = this.props;
-    const {isAppAlreadyOpen, isUnsupportedBrowser, isValidLink} = this.state;
+    const {error, isAuthenticated, intl: {formatMessage: _}} = this.props;
+    const {isAppAlreadyOpen, isUnsupportedBrowser, isValidLink, forceNewAccount} = this.state;
     return (
       <Container
         style={{
@@ -261,33 +293,16 @@ class ConversationJoin extends Component {
         </Header>
         <Content style={{flex: '1', paddingLeft: '8px', width: '520px'}}>
           {isValidLink
-            ? !isAuthenticated || this.state.forceNewAccount
-              ? this.renderNewAnonAccount()
-              : this.renderExistentAccount()
+            ? this.isConversationFullErrorPresent(error)
+              ? this.renderFullConversation()
+              : !isAuthenticated || forceNewAccount ? this.renderNewAnonAccount() : this.renderExistentAccount()
             : this.renderInvalidLink()}
         </Content>
         <Footer style={{height: '30px', justifyContent: 'flex-end', margin: '0 0 18px 8px'}}>
           <Link href={ROUTE.WIRE_ROOT}>{_(footerStrings.wireLink)}</Link>
           <Small> &middot; {_(footerStrings.copy)}</Small>
         </Footer>
-        {isAppAlreadyOpen && (
-          <Modal onClose={() => this.setState({...this.state, isAppAlreadyOpen: false})}>
-            <Container style={{maxWidth: '400px'}}>
-              <H3 style={{fontWeight: '500'}}>{_(conversationJoinStrings.appAlreadyOpenModalHeadline)}</H3>
-              <Text>{_(conversationJoinStrings.appAlreadyOpenModalText)}</Text>
-              <Columns style={{marginTop: '20px'}}>
-                <Column style={{textAlign: 'center'}}>
-                  <Button backgroundColor={COLOR.GRAY}>
-                    {_(conversationJoinStrings.appAlreadyOpenModalCancelButton)}
-                  </Button>
-                </Column>
-                <Column style={{textAlign: 'center'}}>
-                  <Button>{_(conversationJoinStrings.appAlreadyOpenModalContinueButton)}</Button>
-                </Column>
-              </Columns>
-            </Container>
-          </Modal>
-        )}
+        {isAppAlreadyOpen && this.renderAppAlreadyOpenModal()}
         {isUnsupportedBrowser && <Redirect to={ROUTE.UNSUPPORTED_JOIN} />}
       </Container>
     );

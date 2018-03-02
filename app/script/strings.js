@@ -256,6 +256,14 @@ export const conversationJoinStrings = defineMessages({
     id: 'conversationJoin.invalidCreateAccountText',
     defaultMessage: 'for group messaging and conference calls.',
   },
+  fullConversationHeadline: {
+    id: 'conversationJoin.fullConversationHeadline',
+    defaultMessage: 'This <b style="color: black;">Wire guest room</b><br />is full.',
+  },
+  fullConversationSubhead: {
+    id: 'conversationJoin.fullConversationSubhead',
+    defaultMessage: 'Talk to the person who invited you.',
+  },
   namePlaceholder: {
     id: 'conversationJoin.namePlaceholder',
     defaultMessage: 'Your name',
