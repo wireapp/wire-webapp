@@ -33,10 +33,6 @@ z.viewModel.PanelViewModel = class PanelViewModel {
     };
   }
 
-  static get CODE_STATES() {
-    return [z.viewModel.PanelViewModel.STATE.GUEST_OPTIONS, z.viewModel.PanelViewModel.STATE.CONVERSATION_DETAILS];
-  }
-
   /**
    * View model for the details column.
    * @param {z.viewModel.MainViewModel} mainViewModel - Main view model
