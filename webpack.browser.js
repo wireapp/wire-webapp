@@ -24,6 +24,7 @@ const projectName = pkg.name.replace('@wireapp/', '');
 const camelCasedRepositoryName = 'wireWebApiClient';
 
 module.exports = {
+  devtool: 'source-map',
   entry: {
     [projectName]: `${__dirname}/${pkg.main}`,
   },

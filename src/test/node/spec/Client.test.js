@@ -23,7 +23,7 @@ const nock = require('nock');
 const Client = require('@wireapp/api-client/dist/commonjs/Client');
 const {AUTH_ACCESS_TOKEN_KEY, AUTH_TABLE_NAME, AuthAPI} = require('@wireapp/api-client/dist/commonjs/auth/');
 const {UserAPI} = require('@wireapp/api-client/dist/commonjs/user/');
-const {MemoryEngine} = require('@wireapp/store-engine/dist/commonjs/engine/');
+const {MemoryEngine} = require('@wireapp/store-engine');
 
 describe('Client', () => {
   const baseURL = Client.BACKEND.PRODUCTION.rest;
