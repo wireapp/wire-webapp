@@ -1,5 +1,5 @@
 const {Account} = require('@wireapp/core');
-const {StoreEngine} = require('@wireapp/store-engine');
+const {IndexedDBEngine} = require('@wireapp/store-engine');
 const Client = require('@wireapp/api-client');
 
 describe('Account', () => {
@@ -13,7 +13,7 @@ describe('Account', () => {
     });
 
     it('creates a client of there is none', async done => {
-      const engine = new StoreEngine.IndexedDBEngine();
+      const engine = new IndexedDBEngine();
       const apiClient = new Client({
         schemaCallback: db => {
           db.version(1).stores({

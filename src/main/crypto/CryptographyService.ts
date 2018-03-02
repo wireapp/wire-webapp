@@ -15,7 +15,7 @@ export default class CryptographyService {
   public cryptobox: Cryptobox;
 
   constructor(private storeEngine: CRUDEngine) {
-    this.cryptobox = new Cryptobox(new store.CryptoboxCRUDStore(storeEngine));
+    this.cryptobox = new Cryptobox(storeEngine);
   }
 
   public createCryptobox(): Promise<Array<auth.PreKey>> {
