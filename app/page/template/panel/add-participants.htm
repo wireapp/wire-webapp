@@ -1,42 +1,43 @@
-<div id="add-participants" class="add-participants" data-bind="with: $root.addParticipants">
+<div id="add-participants" class="add-participants panel__page" data-bind="with: $root.addParticipants">
   <!-- ko if: isVisible() -->
-    <div>
-      <div>
-        <arrow-left-icon class="icon-button" data-bind="click: clickOnBack" data-uie-name="do-close"></arrow-left-icon>
-      </div>
-      <span data-bind="text: headerText" data-uie-name="status-people-selected"></span>
-      <div>
-        <close-icon class="icon-button" data-bind="click: clickOnClose" data-uie-name="do-close"></close-icon>
-      </div>
-      <user-input class="user-list-light" params="input: searchInput, selected: selectedContacts, placeholder: z.string.addParticipantsSearchPlaceholder" spellcheck="false"></user-input>
-      <!-- ko if: showIntegrations() -->
-        <div class="participants-search-tabs">
-          <div class="participants-search-tab" data-bind="css: {'active': isStateAddPeople}, click: clickOnAddPeople, l10n_text: z.string.addParticipantsTabsPeople" data-uie-name="do-add-people"></div>
-          <div class="participants-search-tab" data-bind="css: {'active': isStateAddService}, click: clickOnAddService, l10n_text: z.string.addParticipantsTabsServices" data-uie-name="do-add-services"></div>
-        </div>
-      <!-- /ko -->
-    </div>
+  <div class="panel__header">
+    <arrow-left-icon class="icon-button" data-bind="click: clickOnBack" data-uie-name="do-close"></arrow-left-icon>
+    <div class="panel__header__title" data-bind="text: headerText" data-uie-name="status-people-selected"></div>
+    <close-icon class="icon-button" data-bind="click: clickOnClose" data-uie-name="do-close"></close-icon>
+  </div>
+  <div class="add-participants__content">
+  <user-input class="user-list-light" params="input: searchInput, selected: selectedContacts, placeholder: z.string.addParticipantsSearchPlaceholder"
+    spellcheck="false"></user-input>
+  <!-- ko if: showIntegrations() -->
+  <div class="participants-search-tabs">
+    <div class="participants-search-tab" data-bind="css: {'active': isStateAddPeople}, click: clickOnAddPeople, l10n_text: z.string.addParticipantsTabsPeople"
+      data-uie-name="do-add-people"></div>
+    <div class="participants-search-tab" data-bind="css: {'active': isStateAddService}, click: clickOnAddService, l10n_text: z.string.addParticipantsTabsServices"
+      data-uie-name="do-add-services"></div>
+  </div>
+  <!-- /ko -->
 
-    <div>
-      <!-- ko if: isAddState() -->
-        <div data-bind="antiscroll: shouldUpdateScrollbar">
-          <!-- ko if: isStateAddPeople() -->
-            <user-list class="user-list-light" params="user: contacts, filter: searchInput, selected: selectedContacts"></user-list>
-          <!-- /ko -->
-          <!-- ko if: isStateAddService() -->
-            <service-list class="service-list-light" params="services: services, click: clickOnSelectService, isSearching: isSearching"></service-list>
-          <!-- /ko -->
-        </div>
-      <!-- /ko -->
-    </div>
 
+  <div class="add-participants__list">
+    <!-- ko if: isAddState() -->
     <div>
       <!-- ko if: isStateAddPeople() -->
-        <button class="button button-full" data-bind="enable: selectedContacts().length > 0, click: clickToAddMembers" data-uie-name="do-create">
-          <span class="icon-people-add"></span>
-          <span data-bind="l10n_text: z.string.addParticipantsConfirmLabel"></span>
-        </button>
+      <user-list class="user-list-light" params="user: contacts, filter: searchInput, selected: selectedContacts"></user-list>
+      <!-- /ko -->
+      <!-- ko if: isStateAddService() -->
+      <service-list class="service-list-light" params="services: services, click: clickOnSelectService, isSearching: isSearching"></service-list>
       <!-- /ko -->
     </div>
+    <!-- /ko -->
+  </div>
+
+    <!-- ko if: isStateAddPeople() -->
+    <div class="add-participants__footer">
+      <button class="button button-full" data-bind="enable: selectedContacts().length > 0, click: clickToAddMembers" data-uie-name="do-create">
+        <span data-bind="l10n_text: z.string.addParticipantsConfirmLabel"></span>
+      </button>
+    </div>
+    <!-- /ko -->
+  </div>
   <!-- /ko -->
 </div>

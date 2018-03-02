@@ -440,7 +440,7 @@ z.string.extensionsGiphyRandom = 'Random';
 
 // Panel
 // Panel: Add participants
-z.string.addParticipantsConfirmLabel = 'Add people to group';
+z.string.addParticipantsConfirmLabel = 'Add';
 z.string.addParticipantsEveryoneParticipates = 'Everyone you’re\nconnected to is already in\nthis conversation.';
 z.string.addParticipantsHeader = 'Add people';
 z.string.addParticipantsHeaderWithCounter = 'Add people ({{number}})';
