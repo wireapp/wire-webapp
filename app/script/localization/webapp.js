@@ -364,6 +364,7 @@ z.string.groupParticipantActionUnblock = 'Unblock';
 z.string.guestRoomConversationName = 'Guest room';
 z.string.guestRoomToggleName = 'Allow guests';
 z.string.guestRoomToggleInfo = 'Open this conversation to people outside your team.';
+z.string.guestRoomConversationBadge = 'Guests are present';
 
 // Collection
 z.string.collectionShowAll = 'Show all {{number}}';
