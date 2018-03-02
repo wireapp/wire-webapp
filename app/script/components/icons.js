@@ -51,6 +51,14 @@ ko.components.register('block-icon', {
   `,
 });
 
+ko.components.register('check-icon', {
+  template: `
+  <svg width="16" height="12" viewBox="0 0 16 12">
+    <path d="M5.7 11.9L16 1.4 14.6 0 5.7 9 1.4 4.8 0 6.2z"/>
+  </svg>
+  `,
+});
+
 ko.components.register('close-icon', {
   template: `
   <svg width="14" height="14" viewBox="0 0 14 14">

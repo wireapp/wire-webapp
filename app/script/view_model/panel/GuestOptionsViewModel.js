@@ -35,6 +35,7 @@ z.viewModel.panel.GuestOptionsViewModel = class GuestOptionsViewModel {
     this.isTeamOnly = this.panelViewModel.isTeamOnly;
     this.isVisible = this.panelViewModel.guestOptionsVisible;
     this.isGuestEnabled = ko.pureComputed(() => !this.isTeamOnly());
+    this.isLinkCopied = ko.observable(false);
 
     this.hasAccessCode = ko.pureComputed(() => (this.isGuestRoom() ? !!this.conversationEntity().accessCode() : false));
     this.requestOngoing = ko.observable(false);
@@ -47,6 +48,7 @@ z.viewModel.panel.GuestOptionsViewModel = class GuestOptionsViewModel {
     this.clickOnClose = this.clickOnClose.bind(this);
     this.requestAccessCode = this.requestAccessCode.bind(this);
     this.revokeAccessCode = this.revokeAccessCode.bind(this);
+    this.copyLink = this.copyLink.bind(this);
   }
 
   clickOnBack() {
@@ -63,6 +65,8 @@ z.viewModel.panel.GuestOptionsViewModel = class GuestOptionsViewModel {
     link.select();
     document.execCommand('copy');
     link.disabled = true;
+    this.isLinkCopied(true);
+    window.setTimeout(() => this.isLinkCopied(false), 2000);
   }
 
   requestAccessCode() {

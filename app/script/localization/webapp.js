@@ -471,6 +471,7 @@ z.string.conversationDetailsServices = 'Services';
 
 // Panel: Guest options
 z.string.guestOptionsCopyLink = 'Copy Link';
+z.string.guestOptionsCopyLinkDone = 'Link copied!';
 z.string.guestOptionsCreateLink = 'Create Link';
 z.string.guestOptionsInfoHead = 'Invite others with a link';
 z.string.guestOptionsInfoText = 'Anyone with the link can join the conversation for 24 hours, even if they don’t have Wire.';
