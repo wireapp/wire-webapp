@@ -135,7 +135,7 @@ class ConversationAPI {
         size: limit,
       },
       method: 'get',
-      url: `${ConversationAPI.URL.CONVERSATIONS}/ids`,
+      url: `${ConversationAPI.URL.CONVERSATIONS}`,
     };
 
     if (conversationId) {
