@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="8.1.8"></a>
+## [8.1.8](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/compare/@wireapp/cryptobox@8.1.7...@wireapp/cryptobox@8.1.8) (2018-03-02)
+
+
+### Bug Fixes
+
+* **cryptobox:** Repaired flaky IndexedDB tests ([#330](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/issues/330)) ([7dfa9ff](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/commit/7dfa9ff))
+
+
+
+
 <a name="8.1.7"></a>
 ## [8.1.7](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/compare/@wireapp/cryptobox@8.1.6...@wireapp/cryptobox@8.1.7) (2018-03-01)
 
