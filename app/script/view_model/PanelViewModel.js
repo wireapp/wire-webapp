@@ -107,7 +107,8 @@ z.viewModel.PanelViewModel = class PanelViewModel {
 
   closePanelOnChange() {
     if (this.isVisible()) {
-      this.closePanel();
+      this.mainViewModel.closePanelImmediatly();
+      this.isVisible(false);
     }
   }
 

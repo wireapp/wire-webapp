@@ -57,7 +57,11 @@ z.viewModel.MainViewModel = class MainViewModel {
   }
 
   constructor(repositories) {
+    this.closePanel = this.closePanel.bind(this);
+    this.closePanelImmediatly = this.closePanelImmediatly.bind(this);
     this.closePanelOnClick = this.closePanelOnClick.bind(this);
+    this.openPanel = this.openPanel.bind(this);
+    this.togglePanel = this.togglePanel.bind(this);
 
     this.elementId = 'wire-main';
     this.userRepository = repositories.user;
@@ -97,6 +101,12 @@ z.viewModel.MainViewModel = class MainViewModel {
 
   closePanel() {
     return this.togglePanel(MainViewModel.PANEL_STATE.CLOSED);
+  }
+
+  closePanelImmediatly() {
+    document.querySelector('.center-column__overlay').removeEventListener('click', this.togglePanel);
+    document.querySelector('#app').classList.remove('app--panel-open');
+    this.isPanelOpen(false);
   }
 
   togglePanel(forceState) {
@@ -157,10 +167,10 @@ z.viewModel.MainViewModel = class MainViewModel {
       // https://developer.mozilla.org/en-US/Firefox/Performance_best_practices_for_Firefox_fe_engineers
       window.requestAnimationFrame(() =>
         window.setTimeout(() => {
-          const transition = 'transform .35s cubic-bezier(0.19, 1, 0.22, 1)';
-          panel.style.transition = transition;
-          titleBar.style.transition = transition;
-          input.style.transition = transition;
+          panel.style.transition = 'transform .35s cubic-bezier(0.19, 1, 0.22, 1)';
+          const widthTransition = 'width .35s cubic-bezier(0.19, 1, 0.22, 1)';
+          titleBar.style.transition = widthTransition;
+          input.style.transition = widthTransition;
 
           if (isPanelOpen) {
             this._applyStyle(panel, MainViewModel.PANEL_STYLE.CLOSED);
@@ -185,7 +195,9 @@ z.viewModel.MainViewModel = class MainViewModel {
   }
 
   _clearStyles(element, styles) {
-    styles.forEach(key => (element.style[key] = ''));
+    if (element) {
+      styles.forEach(key => (element.style[key] = ''));
+    }
   }
 
   closePanelOnClick() {
