@@ -55,10 +55,12 @@
         </div>
 
         <device-card class="" params="device: selectedClient()"></device-card>
-        <div class="participant-devices__fingerprint" data-bind="foreach: fingerprintRemote()"><span class="participant-devices__fingerprint__part" data-bind="text: $data"></span></div>
+        <div class="participant-devices__fingerprint" data-bind="foreach: fingerprintRemote()" data-uie-name="status-fingerprint">
+          <span class="participant-devices__fingerprint__part" data-bind="text: $data"></span>
+        </div>
 
         <div>
-          <div class="slider">
+          <div class="slider" data-uie-name="do-toggle-verified">
             <input class="slider-input" type="checkbox" name="toggle" id="toggle" data-bind="checked: selectedClient().meta.isVerified">
             <label class="button-label" for="toggle" data-bind="click: clickToToggleDeviceVerification, l10n_text: z.string.participantDevicesDetailVerify"></label>
           </div>
@@ -70,7 +72,8 @@
             </svg>
             <span class="button-label text-theme"
                   data-bind="style: {visibility: !isResettingSession() ? 'visible' : 'hidden'},
-                             click: clickToResetSession, l10n_text: z.string.participantDevicesDetailResetSession"></span>
+                             click: clickToResetSession, l10n_text: z.string.participantDevicesDetailResetSession"
+                  data-uie-name="do-reset-session"></span>
           </div>
         </div>
       <!-- /ko -->
