@@ -36,7 +36,7 @@ z.viewModel.panel.GroupParticipantViewModel = class GroupParticipantViewModel {
     this.conversationEntity = this.conversationRepository.active_conversation;
 
     this.availabilityLabel = ko.pureComputed(() => {
-      if (this.isVisible() && this.selectedParticipant()) {
+      if (this.isVisible() && this.selectedParticipant() && !this.selectedParticipant().isBot) {
         const availabilitySetToNone = this.selectedParticipant().availability() === z.user.AvailabilityType.NONE;
         if (!availabilitySetToNone) {
           return z.user.AvailabilityMapper.nameFromType(this.selectedParticipant().availability());
@@ -45,7 +45,6 @@ z.viewModel.panel.GroupParticipantViewModel = class GroupParticipantViewModel {
     });
 
     this.selectedParticipant = ko.observable(undefined);
-    this.selectedService = ko.observable(undefined);
 
     this.isVisible = ko.pureComputed(() => this.panelViewModel.groupParticipantVisible() && this.selectedParticipant());
 
@@ -60,9 +59,6 @@ z.viewModel.panel.GroupParticipantViewModel = class GroupParticipantViewModel {
         return !this.conversationEntity().removed_from_conversation() && !this.conversationEntity().is_guest();
       }
     });
-
-    this.showService = ko.pureComputed(() => this.isVisible() && this.selectedParticipant().isBot);
-    this.showUser = ko.pureComputed(() => this.isVisible() && !this.selectedParticipant().isBot);
 
     this.showActionsIncomingRequest = ko.pureComputed(() => this.selectedParticipant().is_incoming_request());
     this.showActionsOutgoingRequest = ko.pureComputed(() => this.selectedParticipant().is_outgoing_request());
@@ -85,6 +81,7 @@ z.viewModel.panel.GroupParticipantViewModel = class GroupParticipantViewModel {
       return this.selectedParticipant().is_me && !this.conversationEntity.removed_from_conversation();
     });
     this.showActionUnblock = ko.pureComputed(() => this.selectedParticipant().is_blocked());
+    this.showGroupParticipant = this.showGroupParticipant.bind(this);
   }
 
   clickOnBack() {
@@ -137,22 +134,25 @@ z.viewModel.panel.GroupParticipantViewModel = class GroupParticipantViewModel {
   }
 
   showGroupParticipant(userEntity) {
-    this.selectedParticipant(userEntity);
-
+    this.selectedParticipant(null);
     if (userEntity.isBot) {
-      this._showService();
+      return this._showService(userEntity);
     }
+    this.selectedParticipant(userEntity);
   }
 
-  _showService() {
-    const {providerId, serviceId} = this.selectedParticipant();
+  _showService(userEntity) {
+    const {providerId, serviceId} = userEntity;
 
     this.integrationRepository
       .getServiceById(providerId, serviceId)
       .then(serviceEntity => {
-        this.selectedService(serviceEntity);
+        serviceEntity.isBot = true;
+        this.selectedParticipant(serviceEntity);
         return this.integrationRepository.getProviderById(providerId);
       })
-      .then(providerEntity => this.selectedService().providerName(providerEntity.name));
+      .then(providerEntity => {
+        this.selectedParticipant().providerName(providerEntity.name);
+      });
   }
 };

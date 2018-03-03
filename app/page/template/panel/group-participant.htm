@@ -5,7 +5,7 @@
       <close-icon class="icon-button" data-bind="click: clickOnClose" data-uie-name="do-close"></close-icon>
     </div>
     <div class="right-panel-content">
-      <!-- ko if: showUser() -->
+      <!-- ko ifnot: selectedParticipant().isBot -->
         <div class="conversation-details__header">
           <div class="conversation-details__name conversation-details__name--centered" data-bind="text: selectedParticipant().name()" data-uie-name="status-name"></div>
           <!-- ko if: selectedParticipant().username() -->
@@ -95,18 +95,19 @@
         </div>
       <!-- /ko -->
 
-      <!-- ko if: showService() -->
-        <div class="conversation-details__header">
-          <div class="conversation-details__name conversation-details__name--centered" data-bind="text: selectedService().name" data-uie-name="status-service-name"></div>
-          <div class="conversation-details__user-name"  data-bind="text: selectedService().providerName()" data-uie-name="status-service-provider"></div>
-          <div class="conversation-details__participants">
-            <participant-avatar params="participant: selectedService, size: z.components.ParticipantAvatar.SIZE.LARGE"></participant-avatar>
+      <!-- ko if: selectedParticipant().isBot -->
+        <div class="conversation-details__header conversation-details__header--service">
+          <participant-avatar params="participant: selectedParticipant, size: z.components.ParticipantAvatar.SIZE.LARGE"></participant-avatar>
+          <div class="conversation-details__service-details">
+            <div class="conversation-details__service-name" data-bind="text: selectedParticipant().name" data-uie-name="status-service-name"></div>
+            <div class="conversation-details__service-provider" data-bind="text: selectedParticipant().providerName()" data-uie-name="status-service-provider"></div>
           </div>
-          <div data-bind="text: selectedService().description" data-uie-name="status-service-description"></div>
         </div>
+        <div class="conversation-details__service-description" data-bind="text: selectedParticipant().description" data-uie-name="status-service-description"></div>
         <!-- ko if: showActionRemove() -->
-          <div>
-            <button class="button-theme-red" data-bind="click: clickToRemoveService, l10n_text: z.string.groupParticipantServiceRemovalButton" data-uie-name="do-service-remove"></button>
+          <div class="panel__action-item"  data-bind="click: clickToRemove" data-uie-name="do-remove">
+            <minus-icon class="panel__action-item__icon"></minus-icon>
+            <div class="panel__action-item__text" data-bind="l10n_text: z.string.groupParticipantActionRemove"></div>
           </div>
         <!-- /ko -->
       <!-- /ko -->

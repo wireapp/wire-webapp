@@ -63,7 +63,7 @@
           <!-- /ko -->
 
           <!-- ko if: serviceParticipants().length -->
-            <div data-bind="text: z.string.conversationDetailsServices"></div>
+            <div class="conversation-details__list-head" data-bind="text: z.string.conversationDetailsServices"></div>
             <service-list params="services: serviceParticipants, click: clickOnShowParticipant, altStyle: true" data-uie-name="list-services"></service-list>
           <!-- /ko -->
         <!-- /ko -->
