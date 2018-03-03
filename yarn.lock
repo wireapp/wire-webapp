@@ -162,9 +162,9 @@
   version "1.0.5"
   resolved "https://codeload.github.com/albeebe/phoneformat.js/tar.gz/6adb62e70153d9a5edb95f42deba144d6f914f37"
 
-"@bower_components/platform.js@bestiejs/platform.js#1.3.4":
-  version "1.3.4"
-  resolved "https://codeload.github.com/bestiejs/platform.js/tar.gz/dbddee14240800718d03b1a905e0538cf0ac4c45"
+"@bower_components/platform.js@bestiejs/platform.js#1.3.5":
+  version "1.3.5"
+  resolved "https://codeload.github.com/bestiejs/platform.js/tar.gz/b3f1c56de9d39ea4cd1ca8271155faceb1e93092"
 
 "@bower_components/poster-image@herrmannplatz/poster-image#1.1.1":
   version "1.1.0"
