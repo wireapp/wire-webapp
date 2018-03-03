@@ -114,14 +114,37 @@ z.viewModel.PanelViewModel = class PanelViewModel {
   }
 
   showParticipant(userEntity) {
+    const isSingleModeConversation = this.conversationEntity().is_one2one() || this.conversationEntity().is_request();
+
     if (this.isVisible()) {
-      if (this.conversationEntity().is_one2one()) {
+      if (isSingleModeConversation) {
         if (userEntity.is_me) {
+          const isStateGroupParticipant = this.state() === PanelViewModel.STATE.GROUP_PARTICIPANT;
+          if (isStateGroupParticipant) {
+            return this.closePanel();
+          }
+        } else {
+          const isStateConversationDetails = this.state() === PanelViewModel.STATE.CONVERSATION_DETAILS;
+          if (isStateConversationDetails) {
+            return this.closePanel();
+          }
         }
       }
+
+      const isVisibleGroupParticipant = userEntity.id === this.groupParticipant.selectedParticipant().id;
+      if (isVisibleGroupParticipant) {
+        return this.closePanel();
+      }
+
+      this.switchState(PanelViewModel.STATE.GROUP_PARTICIPANT);
     }
 
-    this.switchState(PanelViewModel.STATE.GROUP_PARTICIPANT);
+    if (isSingleModeConversation && !userEntity.is_me) {
+      return this._openPanel(PanelViewModel.STATE.CONVERSATION);
+    }
+
+    this.groupParticipant.showGroupParticipant(userEntity);
+    this._openPanel(PanelViewModel.STATE.GROUP_PARTICIPANT);
   }
 
   showParticipantDevices(userEntity) {
