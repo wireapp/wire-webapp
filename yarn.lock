@@ -199,9 +199,9 @@
   version "2.0.3"
   resolved "https://codeload.github.com/jerrybendy/url-search-params-polyfill/tar.gz/8e1973c0c42d00661b17a39fb486188a07e38eb8"
 
-"@bower_components/uuid@LiosK/UUID.js#3.5.3":
-  version "3.5.3"
-  resolved "https://codeload.github.com/LiosK/UUID.js/tar.gz/efa05273b7ab72315a952df0a332095abbedcd17"
+"@bower_components/uuid@LiosK/UUID.js#4.0.3":
+  version "4.0.3"
+  resolved "https://codeload.github.com/LiosK/UUID.js/tar.gz/900d6be34f52ac12f08770d3ad68416d54c71340"
 
 "@bower_components/webapp-module-bubble@wireapp/webapp-module-bubble#1.1.1":
   version "1.1.1"
