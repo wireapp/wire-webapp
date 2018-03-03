@@ -68,7 +68,12 @@ z.conversation.ConversationStateHandler = class ConversationStateHandler {
         if (accessModes && accessRole) {
           return this.conversationService
             .putConversationAccess(conversationEntity.id, accessModes, accessRole)
-            .then(() => conversationEntity.accessState(accessState))
+            .then(() => {
+              conversationEntity.accessState(accessState);
+
+              const attribute = {is_allow_guests: changeToGuestRoom};
+              amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.GUEST_ROOMS.ALLOW_GUESTS, attribute);
+            })
             .catch(() => {
               const messageStringId = changeToGuestRoom
                 ? z.string.modalConversationGuestOptionsAllowGuestMessage
@@ -102,6 +107,7 @@ z.conversation.ConversationStateHandler = class ConversationStateHandler {
       .then(response => {
         const accessCode = response.data || response;
         this.conversationMapper.mapAccessCode(conversationEntity, accessCode);
+        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.GUEST_ROOMS.LINK_CREATED);
       })
       .catch(() => this._showModal(z.string.modalConversationGuestOptionsRequestCodeMessage));
   }
@@ -109,7 +115,10 @@ z.conversation.ConversationStateHandler = class ConversationStateHandler {
   revokeAccessCode(conversationEntity) {
     return this.conversationService
       .deleteConversationCode(conversationEntity.id)
-      .then(() => conversationEntity.accessCode(undefined))
+      .then(() => {
+        conversationEntity.accessCode(undefined);
+        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.GUEST_ROOMS.LINK_REVOKED);
+      })
       .catch(() => this._showModal(z.string.modalConversationGuestOptionsRevokeCodeMessage));
   }
 

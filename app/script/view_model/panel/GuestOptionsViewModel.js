@@ -69,6 +69,7 @@ z.viewModel.panel.GuestOptionsViewModel = class GuestOptionsViewModel {
     document.execCommand('copy');
     link.disabled = true;
     this.isLinkCopied(true);
+    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.GUEST_ROOMS.LINK_COPIED);
     window.setTimeout(() => this.isLinkCopied(false), 2000);
   }
 
