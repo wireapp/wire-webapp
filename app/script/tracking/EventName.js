@@ -48,12 +48,20 @@ z.tracking.EventName = {
   },
   CONTRIBUTED: 'contributed',
   CONVERSATION: {
+    ADD_PARTICIPANTS: 'conversation.add_participants',
     GROUP_CREATION_SUCCEEDED: 'conversation.group_creation_succeeded',
     OPENED_GROUP_CREATION: 'conversation.opened_group_creation',
     OPENED_SELECT_PARTICIPANTS: 'conversation.opened_select_participants',
   },
   E2EE: {
     FAILED_MESSAGE_DECRYPTION: 'e2ee.failed_message_decryption',
+  },
+  GUEST_ROOMS: {
+    ALLOW_GUESTS: 'guest_rooms.allow_guests',
+    GUEST_ROOM_CREATION: 'guest_rooms.guest_room_creation',
+    LINK_COPIED: 'guest_rooms.link_copied',
+    LINK_CREATED: 'guest_rooms.link_created',
+    LINK_REVOKED: 'guest_rooms.link_revoked',
   },
   INTEGRATION: {
     ADDED_SERVICE: 'integration.added_service',
