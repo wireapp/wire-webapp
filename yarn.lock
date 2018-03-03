@@ -142,9 +142,9 @@
   version "3.2.0"
   resolved "https://codeload.github.com/dcodeIO/Long.js/tar.gz/8cdc1f74ced4f771aa844f1cbc565b1d4c4451b8"
 
-"@bower_components/mixpanel@mixpanel/mixpanel-js#2.13.0":
-  version "2.13.0"
-  resolved "https://codeload.github.com/mixpanel/mixpanel-js/tar.gz/b0249b0547bf0ee7d39cde86c6953f2af59342d1"
+"@bower_components/mixpanel@mixpanel/mixpanel-js#2.18.0":
+  version "2.18.0"
+  resolved "https://codeload.github.com/mixpanel/mixpanel-js/tar.gz/96b4317ca8cfc8b232be81464eff6aae1177ce27"
 
 "@bower_components/moment@moment/moment#2.21.0":
   version "2.21.0"
