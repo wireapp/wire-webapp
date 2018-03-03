@@ -226,12 +226,11 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
   }
 
   clickOnContact(userEntity) {
-    return this.actionsViewModel.open1to1Conversation(userEntity);
+    return this.actionsViewModel.open1to1Conversation(userEntity).then(() => this._closeList());
   }
 
   clickOnConversation(conversationEntity) {
-    this.actionsViewModel.openGroupConversation(conversationEntity);
-    this._closeList();
+    return this.actionsViewModel.openGroupConversation(conversationEntity).then(() => this._closeList());
   }
 
   clickOnCreateGroup() {

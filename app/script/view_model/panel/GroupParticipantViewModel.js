@@ -63,7 +63,9 @@ z.viewModel.panel.GroupParticipantViewModel = class GroupParticipantViewModel {
     this.showActionsIncomingRequest = ko.pureComputed(() => this.selectedParticipant().is_incoming_request());
     this.showActionsOutgoingRequest = ko.pureComputed(() => this.selectedParticipant().is_outgoing_request());
 
-    this.showActionBlock = ko.pureComputed(() => this.selectedParticipant().is_connected());
+    this.showActionBlock = ko.pureComputed(() => {
+      return this.selectedParticipant().is_connected() || this.selectedParticipant().is_request();
+    });
     this.showActionDevices = ko.pureComputed(() => {
       return this.selectedParticipant().is_connected() || this.selectedParticipant().is_team_member();
     });

@@ -6,7 +6,7 @@
       <!-- /ko -->
       <close-icon class="right-panel-close icon-button" data-bind="click: clickOnClose" data-uie-name="do-close"></close-icon>
     </div>
-    <div class="right-panel-content">
+    <div class="panel__content">
       <div class="conversation-details__header">
         <!-- ko if: isNameEditable() -->
           <div class="conversation-details__name conversation-details__name--editable" data-bind="visible: !isEditingName(), click: clickToEditGroupName, l10n_tooltip: z.string.tooltipConversationDetailsRename" data-uie-name="status-name">
@@ -31,7 +31,7 @@
             <!-- /ko -->
           </div>
         <!-- /ko -->
-        <!-- ko if: conversationEntity().is_one2one() && userName() -->
+        <!-- ko if: isSingleUserMode() && userName() -->
           <div class="conversation-details__user-name" data-bind="text: userName()" data-uie-name="status-username"></div>
         <!-- /ko -->
       </div>
@@ -67,7 +67,7 @@
             <service-list params="services: serviceParticipants, click: clickOnShowParticipant, altStyle: true" data-uie-name="list-services"></service-list>
           <!-- /ko -->
         <!-- /ko -->
-        <!-- ko if: conversationEntity().is_one2one() && conversationEntity().firstUserEntity() -->
+        <!-- ko if: isSingleUserMode() && conversationEntity().firstUserEntity() -->
           <participant-avatar params="participant: conversationEntity().firstUserEntity(), size: z.components.ParticipantAvatar.SIZE.X_LARGE" data-uie-name="status-profile-picture"></participant-avatar>
           <!-- if: isTeam() -->
             <availability-state class="conversation-details__availability"
