@@ -240,6 +240,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
   clickOnCreateGuestRoom() {
     this.conversationRepository.createGuestRoom().then(conversationEntity => {
       amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity);
+      amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.GUEST_ROOMS.GUEST_ROOM_CREATION);
     });
   }
 

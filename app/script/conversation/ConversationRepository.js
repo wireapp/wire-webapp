@@ -3700,13 +3700,20 @@ z.conversation.ConversationRepository = class ConversationRepository {
     }
 
     if (action_type) {
-      amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONTRIBUTED, {
+      const attributes = {
         action: action_type,
         conversation_type: z.tracking.helpers.get_conversation_type(conversation_et),
         ephemeral_time: is_ephemeral ? ephemeral_time : undefined,
         is_ephemeral: is_ephemeral,
         with_service: conversation_et.isWithBot(),
-      });
+      };
+
+      const isTeamConversation = !!conversation_et.team_id;
+      if (isTeamConversation) {
+        Object.assign(attributes, z.tracking.helpers.getGuestAttributes(conversation_et));
+      }
+
+      amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONTRIBUTED, attributes);
     }
   }
 };

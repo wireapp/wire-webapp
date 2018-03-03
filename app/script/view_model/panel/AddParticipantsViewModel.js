@@ -127,7 +127,29 @@ z.viewModel.panel.AppParticipantsViewModel = class AppParticipantsViewModel {
   }
 
   clickToAddMembers() {
-    this.conversationRepository.addMembers(this.conversationEntity(), this.selectedContacts());
+    const conversationEntity = this.conversationEntity();
+    const userEntities = this.selectedContacts();
+
+    this.conversationRepository.addMembers(conversationEntity, userEntities).then(() => {
+      const attributes = {
+        method: 'create',
+        user_num: this.selectedContacts().length,
+      };
+
+      const isTeamConversation = !!this.conversationEntity().team_id;
+      if (isTeamConversation) {
+        const participants = z.tracking.helpers.getParticipantTypes(userEntities, false);
+
+        Object.assign(attributes, {
+          guest_num: participants.guests,
+          is_allow_guests: conversationEntity.isGuestRoom(),
+          temporary_guest_num: participants.temporaryGuests,
+          user_num: participants.users,
+        });
+      }
+
+      amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.ADD_PARTICIPANTS, attributes);
+    });
     this._switchToConversationDetails();
   }
 
