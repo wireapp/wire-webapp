@@ -195,9 +195,9 @@
   version "1.8.3"
   resolved "https://codeload.github.com/jashkenas/underscore/tar.gz/e4743ab712b8ab42ad4ccb48b155034d02394e4d"
 
-"@bower_components/url-search-params-polyfill@jerrybendy/url-search-params-polyfill#2.0.1":
-  version "2.0.1"
-  resolved "https://codeload.github.com/jerrybendy/url-search-params-polyfill/tar.gz/357fd6bfa30ffad3cf858884274eebcef45709ea"
+"@bower_components/url-search-params-polyfill@jerrybendy/url-search-params-polyfill#2.0.3":
+  version "2.0.3"
+  resolved "https://codeload.github.com/jerrybendy/url-search-params-polyfill/tar.gz/8e1973c0c42d00661b17a39fb486188a07e38eb8"
 
 "@bower_components/uuid@LiosK/UUID.js#3.5.3":
   version "3.5.3"
