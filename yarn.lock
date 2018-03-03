@@ -158,9 +158,9 @@
   version "1.0.6"
   resolved "https://codeload.github.com/nodeca/pako/tar.gz/893381abcafa10fa2081ce60dae7d4d8e873a658"
 
-"@bower_components/phone-format@albeebe/phoneformat.js#1.0.5":
-  version "1.0.4"
-  resolved "https://codeload.github.com/albeebe/phoneformat.js/tar.gz/83835548f5d3f2ba4da43edc53eb131dba11c2d7"
+"@bower_components/phone-format@albeebe/phoneformat.js#1.0.6":
+  version "1.0.5"
+  resolved "https://codeload.github.com/albeebe/phoneformat.js/tar.gz/6adb62e70153d9a5edb95f42deba144d6f914f37"
 
 "@bower_components/platform.js@bestiejs/platform.js#1.3.4":
   version "1.3.4"
