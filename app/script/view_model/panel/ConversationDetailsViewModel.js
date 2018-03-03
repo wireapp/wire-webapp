@@ -77,6 +77,11 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
       }
     });
 
+    this.isSingleUserMode = ko.pureComputed(() => {
+      if (this.hasConversation()) {
+        return this.conversationEntity().is_one2one() || this.conversationEntity().is_request();
+      }
+    });
     this.userName = ko.pureComputed(() => {
       if (this.hasConversation()) {
         const userEntity = this.conversationEntity().firstUserEntity();
@@ -107,7 +112,7 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
 
     this.showActionAddParticipants = ko.pureComputed(() => this.conversationEntity().is_group());
     this.showActionBlock = ko.pureComputed(() => {
-      if (this.conversationEntity().is_one2one()) {
+      if (this.isSingleUserMode()) {
         const userEntity = this.conversationEntity().firstUserEntity();
         return userEntity.is_connected() || userEntity.is_request();
       }
