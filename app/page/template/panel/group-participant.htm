@@ -30,10 +30,9 @@
               <disclose-icon></disclose-icon>
             </div>
           <!-- /ko -->
-
           <!-- ko if: showActionSelfProfile() -->
             <div class="panel__action-item"  data-bind="click: clickOnShowProfile" data-uie-name="go-profile">
-              <close-icon class="panel__action-item__icon"></close-icon>
+              <profile-icon class="panel__action-item__icon"></profile-icon>
               <div class="panel__action-item__text" data-bind="l10n_text: z.string.groupParticipantActionSelfProfile"></div>
             </div>
           <!-- /ko -->
@@ -45,7 +44,7 @@
           <!-- /ko -->
           <!-- ko if: showActionsIncomingRequest() -->
             <div class="panel__action-item"  data-bind="click: clickToAcceptRequest" data-uie-name="do-accept-request">
-              <close-icon class="panel__action-item__icon"></close-icon>
+              <check-icon class="panel__action-item__icon"></check-icon>
               <div class="panel__action-item__text" data-bind="l10n_text: z.string.groupParticipantActionIncomingRequest"></div>
             </div>
             <div class="panel__action-item"  data-bind="click: clickToIgnoreRequest" data-uie-name="do-ignore-request">
@@ -55,11 +54,11 @@
           <!-- /ko -->
           <!-- ko if: showActionsOutgoingRequest() -->
             <div class="panel__action-item"  data-bind="click: clickOnOpenConversation" data-uie-name="go-conversation">
-              <close-icon class="panel__action-item__icon"></close-icon>
+              <message-icon class="panel__action-item__icon"></message-icon>
               <div class="panel__action-item__text" data-bind="l10n_text: z.string.groupParticipantActionPending"></div>
             </div>
             <div class="panel__action-item"  data-bind="click: clickToCancelRequest" data-uie-name="do-cancel-request">
-              <close-icon class="panel__action-item__icon"></close-icon>
+              <undo-icon class="panel__action-item__icon"></undo-icon>
               <div class="panel__action-item__text" data-bind="l10n_text: z.string.groupParticipantActionCancelRequest"></div>
             </div>
           <!-- /ko -->
@@ -81,7 +80,6 @@
               <div class="panel__action-item__text" data-bind="l10n_text: z.string.groupParticipantActionUnblock"></div>
             </div>
           <!-- /ko -->
-
           <!-- ko if: showActionLeave() -->
             <div class="panel__action-item"  data-bind="click: clickToLeave" data-uie-name="do-leave">
               <leave-icon class="panel__action-item__icon"></leave-icon>
