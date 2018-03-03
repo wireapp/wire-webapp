@@ -120,9 +120,9 @@
   version "2.2.0"
   resolved "https://codeload.github.com/js-cookie/js-cookie/tar.gz/34f056cd261982828072b84a9bbdcd8c3d9931ad"
 
-"@bower_components/keyboardjs@RobertWHurst/KeyboardJS#2.3.4":
-  version "2.3.4"
-  resolved "https://codeload.github.com/RobertWHurst/KeyboardJS/tar.gz/d8fb78a1e25a585f934221d37ae7647edebf2f28"
+"@bower_components/keyboardjs@RobertWHurst/KeyboardJS#2.4.1":
+  version "2.4.1"
+  resolved "https://codeload.github.com/RobertWHurst/KeyboardJS/tar.gz/4fa305890b8a99a64a190a0f4d6572cbf8b6b8ab"
 
 "@bower_components/knockout@knockout/knockout#3.4.1":
   version "3.4.1"
