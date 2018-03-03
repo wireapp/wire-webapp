@@ -156,7 +156,9 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
   }
 
   openGroupConversation(conversationEntity) {
-    this._openConversation(conversationEntity);
+    if (conversationEntity) {
+      return Promise.resolve().then(() => this._openConversation(conversationEntity));
+    }
   }
 
   _openConversation(conversationEntity) {
