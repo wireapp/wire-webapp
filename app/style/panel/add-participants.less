@@ -17,19 +17,39 @@
  *
  */
 
-'use strict';
+.add-participants {
+  user-input {
+    margin: 8px;
+  }
 
-window.z = window.z || {};
-window.z.auth = z.auth || {};
+  .participants-search-tabs {
+    border-bottom: 1px solid #eee;
+    margin-bottom: 0;
 
-z.auth.URLParameter = {
-  BOT_PROVIDER: 'bot_provider',
-  BOT_SERVICE: 'bot_service',
-  ENVIRONMENT: 'env',
-  INTEGRATIONS: 'integrations',
-  LINKS: 'links',
-  LOCALE: 'hl',
-  MODE: 'mode',
-  REASON: 'reason',
-  TRACKING: 'tracking',
-};
+    .participants-search-tab {
+      margin-bottom: -1px;
+
+      &:first-child {
+        margin-left: 8px;
+      }
+
+      &:last-child {
+        margin-right: 8px;
+      }
+    }
+  }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+  }
+
+  &__list {
+    flex-grow: 1;
+  }
+
+  &__footer {
+    padding: 8px;
+  }
+}

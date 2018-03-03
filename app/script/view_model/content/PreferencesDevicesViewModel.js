@@ -41,7 +41,7 @@ z.viewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewMo
     this.activationLocation = ko.observable([]);
     this.activationDate = ko.observable([]);
     this.devices = ko.observableArray();
-    this.displayFingerPrint = ko.observable();
+    this.localFingerprint = ko.observableArray([]);
 
     this.shouldUpdateScrollbar = ko.computed(() => this.devices()).extend({notify: 'always', rateLimit: 500});
 
@@ -87,15 +87,14 @@ z.viewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewMo
   }
 
   updateDeviceInfo() {
-    if (this.currentClient() && !this.displayFingerPrint()) {
+    if (this.currentClient() && !this.localFingerprint().length) {
       const {location, time} = this.currentClient();
       this._updateActivationDate(time);
       if (location) {
         this._updateLocation(location);
       }
 
-      const paddedFingerPrint = z.util.zero_padding(this.cryptographyRepository.getLocalFingerprint(), 16);
-      this.displayFingerPrint(paddedFingerPrint.match(/.{1,2}/g) || []);
+      this.localFingerprint(this.cryptographyRepository.getLocalFingerprint());
     }
   }
 };

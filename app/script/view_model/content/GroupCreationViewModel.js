@@ -149,17 +149,21 @@ z.viewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
   }
 
   clickOnToggleGuestMode() {
-    this.accessState(
-      this.isGuestRoom() ? z.conversation.ACCESS_STATE.TEAM.TEAM_ONLY : z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM
-    );
+    const accessState = this.isGuestRoom()
+      ? z.conversation.ACCESS_STATE.TEAM.TEAM_ONLY
+      : z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM;
+
+    this.accessState(accessState);
   }
 
   clickOnCreate() {
     if (!this.isCreatingConversation) {
       this.isCreatingConversation = true;
 
+      const accessState = this.isTeam() ? this.accessState() : undefined;
+
       this.conversationRepository
-        .createGroupConversation(this.selectedContacts(), this.nameInput())
+        .createGroupConversation(this.selectedContacts(), this.nameInput(), accessState)
         .then(conversationEntity => {
           amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.GROUP_CREATION_SUCCEEDED, {
             method: this.method,

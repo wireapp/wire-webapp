@@ -9,7 +9,7 @@
         <div class="conversation-details__header">
           <div class="conversation-details__name conversation-details__name--centered" data-bind="text: selectedParticipant().name()" data-uie-name="status-name"></div>
           <!-- ko if: selectedParticipant().username() -->
-            <div class="conversation-details__user-name" data-bind="text: selectedParticipant().username()"></div>
+            <div class="conversation-details__user-name" data-bind="text: selectedParticipant().username()" data-uie-name="status-username"></div>
           <!-- /ko -->
           <div class="conversation-details__participants">
             <participant-avatar params="participant: selectedParticipant(), size: z.components.ParticipantAvatar.SIZE.X_LARGE" data-uie-name="status-profile-picture"></participant-avatar>
@@ -104,7 +104,7 @@
           </div>
           <div data-bind="text: selectedService().description" data-uie-name="status-service-description"></div>
         </div>
-        <!-- ko if: showServiceRemove() -->
+        <!-- ko if: showActionRemove() -->
           <div>
             <button class="button-theme-red" data-bind="click: clickToRemoveService, l10n_text: z.string.groupParticipantServiceRemovalButton" data-uie-name="do-service-remove"></button>
           </div>

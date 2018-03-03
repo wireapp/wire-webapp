@@ -123,17 +123,16 @@ z.viewModel.ModalsViewModel = class ModalsViewModel {
           const checkbox = $(type).find('.modal-checkbox');
           const input = $(type).find('.modal-input');
 
+          let parameter;
           if (checkbox.length) {
-            actionFn(checkbox.is(':checked'));
-            return checkbox.prop('checked', false);
+            parameter = checkbox.is(':checked');
+            checkbox.prop('checked', false);
+          } else if (input.length) {
+            parameter = input.val();
+            input.val('');
           }
 
-          if (input.length) {
-            actionFn(input.val());
-            return input.val('');
-          }
-
-          actionFn();
+          actionFn(parameter);
         }
 
         modal.hide();

@@ -77,6 +77,13 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
       }
     });
 
+    this.userName = ko.pureComputed(() => {
+      if (this.hasConversation()) {
+        const userEntity = this.conversationEntity().firstUserEntity();
+        return userEntity.username();
+      }
+    });
+
     this.isActiveParticipant = ko.pureComputed(() => {
       if (this.hasConversation()) {
         return !this.conversationEntity().removed_from_conversation() && !this.conversationEntity().is_guest();
@@ -141,7 +148,7 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
 
     const addPeopleShortcut = z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.ADD_PEOPLE);
     this.addPeopleTooltip = ko.pureComputed(() => {
-      return z.l10n.text(z.string.tooltipPeopleAddPeople, addPeopleShortcut);
+      return z.l10n.text(z.string.tooltipConversationDetailsAddPeople, addPeopleShortcut);
     });
   }
 

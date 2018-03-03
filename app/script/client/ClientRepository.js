@@ -323,10 +323,10 @@ z.client.ClientRepository = class ClientRepository {
    * @returns {Object} - Payload to register client with backend
    */
   _createRegistrationPayload(clientType, password, [lastResortKey, preKeys, signalingKeys]) {
-    let device_label = `${platform.os.family}`;
+    let deviceLabel = `${platform.os.family}`;
 
     if (platform.os.version) {
-      device_label += ` ${platform.os.version}`;
+      deviceLabel += ` ${platform.os.version}`;
     }
 
     let deviceModel = platform.name;
@@ -351,7 +351,7 @@ z.client.ClientRepository = class ClientRepository {
     return {
       class: 'desktop',
       cookie: this._getCookieLabelValue(this.selfUser().email() || this.selfUser().phone()),
-      label: device_label,
+      label: deviceLabel,
       lastkey: lastResortKey,
       model: deviceModel,
       password: password,

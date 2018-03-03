@@ -43,20 +43,20 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
   }
 
   blockUser(userEntity, nextConversationEntity) {
-    if (userEntity && nextConversationEntity) {
+    if (userEntity) {
       amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
         action: () => this.userRepository.block_user(userEntity, nextConversationEntity),
         text: {
           action: z.l10n.text(z.string.modalUserBlockAction),
           message: z.l10n.text(z.string.modalUserBlockMessage, userEntity.first_name()),
-          title: z.l10n.text(z.string.modalUserBlockHeadline),
+          title: z.l10n.text(z.string.modalUserBlockHeadline, userEntity.first_name()),
         },
       });
     }
   }
 
   cancelConnectionRequest(userEntity, nextConversationEntity) {
-    if (userEntity && nextConversationEntity) {
+    if (userEntity) {
       amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
         action: () => this.userRepository.cancel_connection_request(userEntity, nextConversationEntity),
         text: {

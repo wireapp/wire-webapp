@@ -19,17 +19,19 @@
 
 'use strict';
 
-window.z = window.z || {};
-window.z.auth = z.auth || {};
+// grunt test_init && grunt test_run:view_model/ParticipantDevicesViewModel
 
-z.auth.URLParameter = {
-  BOT_PROVIDER: 'bot_provider',
-  BOT_SERVICE: 'bot_service',
-  ENVIRONMENT: 'env',
-  INTEGRATIONS: 'integrations',
-  LINKS: 'links',
-  LOCALE: 'hl',
-  MODE: 'mode',
-  REASON: 'reason',
-  TRACKING: 'tracking',
-};
+describe('z.viewModel.panel.ParticipantDevicesViewModel', () => {
+  let viewModel;
+
+  beforeAll(() => {
+    viewModel = new z.viewModel.panel.ParticipantDevicesViewModel(undefined, undefined, {});
+  });
+
+  describe('detailMessage', () => {
+    it('returns message parts that can safely be rendered by a template engine', () => {
+      const fingerprintExplanation = viewModel.detailMessage();
+      expect(fingerprintExplanation.length).toBe(3);
+    });
+  });
+});

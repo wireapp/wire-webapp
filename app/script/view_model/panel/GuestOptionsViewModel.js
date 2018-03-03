@@ -30,15 +30,18 @@ z.viewModel.panel.GuestOptionsViewModel = class GuestOptionsViewModel {
     this.stateHandler = this.conversationRepository.stateHandler;
 
     this.conversationEntity = this.conversationRepository.active_conversation;
+    this.enableConversationLinks = this.conversationRepository.enableConversationLinks;
     this.panelState = this.panelViewModel.state;
     this.isGuestRoom = this.panelViewModel.isGuestRoom;
     this.isTeamOnly = this.panelViewModel.isTeamOnly;
     this.isVisible = this.panelViewModel.guestOptionsVisible;
-    this.isGuestEnabled = ko.pureComputed(() => !this.isTeamOnly());
+
     this.isLinkCopied = ko.observable(false);
+    this.requestOngoing = ko.observable(false);
 
     this.hasAccessCode = ko.pureComputed(() => (this.isGuestRoom() ? !!this.conversationEntity().accessCode() : false));
-    this.requestOngoing = ko.observable(false);
+    this.isGuestEnabled = ko.pureComputed(() => !this.isTeamOnly());
+    this.showLinkOptions = ko.pureComputed(() => this.enableConversationLinks() && this.isGuestEnabled());
 
     this.conversationEntity.subscribe(conversationEntity => this._updateCode(this.isVisible(), conversationEntity));
     this.isVisible.subscribe(isVisible => this._updateCode(isVisible, this.conversationEntity()));
@@ -96,8 +99,8 @@ z.viewModel.panel.GuestOptionsViewModel = class GuestOptionsViewModel {
       preventClose: true,
       text: {
         action: z.l10n.text(z.string.modalConversationRevokeLinkAction),
-        message: z.l10n.text(z.string.modalConversationRevokeLinkHeadline),
-        title: z.l10n.text(z.string.modalConversationRevokeLinkMessage),
+        message: z.l10n.text(z.string.modalConversationRevokeLinkMessage),
+        title: z.l10n.text(z.string.modalConversationRevokeLinkHeadline),
       },
     });
   }
@@ -137,7 +140,7 @@ z.viewModel.panel.GuestOptionsViewModel = class GuestOptionsViewModel {
 
   _updateCode(isVisible, conversationEntity) {
     const updateCode = conversationEntity && conversationEntity.isGuestRoom() && !conversationEntity.accessCode();
-    if (isVisible && updateCode) {
+    if (isVisible && updateCode && this.enableConversationLinks()) {
       this.requestOngoing(true);
       this.stateHandler.getAccessCode(conversationEntity).then(() => this.requestOngoing(false));
     }

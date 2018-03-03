@@ -137,7 +137,7 @@ z.viewModel.panel.AppParticipantsViewModel = class AppParticipantsViewModel {
   }
 
   searchServices(query) {
-    if (this.stateAddService()) {
+    if (this.isStateAddService()) {
       this.integrationRepository.searchForServices(query, this.searchInput);
     }
   }
