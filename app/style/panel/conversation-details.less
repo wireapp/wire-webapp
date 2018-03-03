@@ -32,6 +32,30 @@
 
   &__header {
     padding: 8px 16px;
+    &--service {
+      display: flex;
+    }
+  }
+
+  &__service-details {
+    margin-left: 16px;
+  }
+
+  &__service-name {
+    font-size: 24px;
+    font-weight: @font-weight-regular;
+  }
+
+  &__service-provider {
+    font-size: 12px;
+    font-weight: @font-weight-regular;
+    color: fade(@graphite-dark, 40%);
+  }
+
+  &__service-description {
+    padding: 16px;
+    font-size: 14px;
+    font-weight: @font-weight-light;
   }
 
   &__name {

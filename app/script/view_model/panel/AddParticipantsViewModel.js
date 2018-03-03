@@ -100,6 +100,7 @@ z.viewModel.panel.AppParticipantsViewModel = class AppParticipantsViewModel {
       .extend({notify: 'always', rateLimit: 500});
 
     this.searchInput.subscribe(searchInput => this.searchServices(searchInput));
+    this.clickOnSelectService = this.clickOnSelectService.bind(this);
   }
 
   clickOnAddPeople() {

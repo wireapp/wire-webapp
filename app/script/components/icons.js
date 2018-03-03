@@ -142,7 +142,7 @@ ko.components.register('leave-icon', {
 ko.components.register('message-icon', {
   template: `
   <svg width="16" height="16" viewBox="0 0 16 16">
-  <path d="M9.8 13h.2a6 6 0 0 0 6-6V6a6 6 0 0 0-6-6H6a6 6 0 0 0-6 6v1a6 6 0 0 0 6 6h.2L8 16l1.8-3z"></path>
+    <path d="M9.8 13h.2a6 6 0 0 0 6-6V6a6 6 0 0 0-6-6H6a6 6 0 0 0-6 6v1a6 6 0 0 0 6 6h.2L8 16l1.8-3z"></path>
   </svg>
   `,
 });
@@ -163,10 +163,34 @@ ko.components.register('mute-icon', {
   `,
 });
 
+ko.components.register('people-icon', {
+  template: `
+  <svg width="14" height="16" viewBox="0 0 14 16">
+    <path d="M10.6 10h.4a3 3 0 0 1 3 3v1.27a14.93 14.93 0 0 1-14 0V13a3 3 0 0 1 3-3h.4a6.97 6.97 0 0 0 7.2 0zM7 8a4 4 0 1 1 0-8 4 4 0 0 1 0 8z"></path>
+  </svg>
+  `,
+});
+
 ko.components.register('plus-icon', {
   template: `
   <svg width="16" height="16" viewBox="0 0 16 16">
-    <path d="M0 7v2h7v7h2V9h7V7H9V0H7v7z"/>
+    <path d="M0 7v2h7v7h2V9h7V7H9V0H7v7z"></path>
+  </svg>
+  `,
+});
+
+ko.components.register('profile-icon', {
+  template: `
+  <svg width="16" height="16" viewBox="0 0 16 16">
+    <path d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16zM2 8c0 1.5.56 2.88 1.47 3.94l.08-.46c.15-.82.93-1.48 1.76-1.48h5.38c.83 0 1.61.67 1.76 1.48l.08.46A6 6 0 1 0 2 8zm6 1a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"></path>
+  </svg>
+  `,
+});
+
+ko.components.register('undo-icon', {
+  template: `
+  <svg width="16" height="16" viewBox="0 0 16 16">
+    <path d="M2.3 2.3a8.3 8.3 0 0 1 4-2.1 8.2 8.2 0 0 1 7.4 2.1A8 8 0 1 1 .3 10h2a6.1 6.1 0 0 0 2.2 2.9A6 6 0 0 0 14 8a6 6 0 0 0-8.3-5.5c-.8.3-1.4.7-2 1.3L7 7H0V0l2.3 2.3z"></path>
   </svg>
   `,
 });

@@ -251,7 +251,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
   }
 
   clickOnOther(userEntity, event) {
-    if (userEntity.is_outgoing_request()) {
+    if (userEntity.is_outgoing_request && userEntity.is_outgoing_request()) {
       return this.clickOnContact(userEntity);
     }
 
