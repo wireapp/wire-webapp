@@ -88,10 +88,11 @@ z.viewModel.panel.GroupParticipantViewModel = class GroupParticipantViewModel {
 
   clickOnBack() {
     this.panelViewModel.switchState(z.viewModel.PanelViewModel.STATE.CONVERSATION_DETAILS);
+    this.selectedParticipant(undefined);
   }
 
   clickOnClose() {
-    this.panelViewModel.closePanel();
+    this.panelViewModel.closePanel().then(() => this.selectedParticipant(undefined));
   }
 
   clickOnDevices() {
@@ -136,7 +137,7 @@ z.viewModel.panel.GroupParticipantViewModel = class GroupParticipantViewModel {
   }
 
   showGroupParticipant(userEntity) {
-    this.selectedParticipant(null);
+    this.selectedParticipant(undefined);
     if (userEntity.isBot) {
       return this._showService(userEntity);
     }
@@ -153,8 +154,6 @@ z.viewModel.panel.GroupParticipantViewModel = class GroupParticipantViewModel {
         this.selectedParticipant(serviceEntity);
         return this.integrationRepository.getProviderById(providerId);
       })
-      .then(providerEntity => {
-        this.selectedParticipant().providerName(providerEntity.name);
-      });
+      .then(providerEntity => this.selectedParticipant().providerName(providerEntity.name));
   }
 };
