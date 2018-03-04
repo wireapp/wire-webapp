@@ -260,7 +260,7 @@ z.viewModel.ListViewModel = class ListViewModel {
     const entries = [];
 
     if (!conversation_et.is_request() && !conversation_et.removed_from_conversation()) {
-      const silence_shortcut = z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.SILENCE);
+      const silence_shortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.SILENCE);
       const notify_tooltip = z.l10n.text(z.string.tooltipConversationsNotify, silence_shortcut);
       const silence_tooltip = z.l10n.text(z.string.tooltipConversationsSilence, silence_shortcut);
 
@@ -279,7 +279,7 @@ z.viewModel.ListViewModel = class ListViewModel {
         label: z.l10n.text(z.string.conversationsPopoverUnarchive),
       });
     } else {
-      const shortcut = z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.ARCHIVE);
+      const shortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.ARCHIVE);
 
       entries.push({
         click: () => this.click_on_archive_action(conversation_et),

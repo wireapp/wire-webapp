@@ -30,20 +30,20 @@ z.ui.Context = (() => {
     window.addEventListener('resize', cleanup);
   }
 
-  function onKeyDown(keyboard_event) {
-    keyboard_event.preventDefault();
+  function onKeyDown(keyboardEvent) {
+    keyboardEvent.preventDefault();
 
-    if (z.util.KeyboardUtil.isEscapeKey(keyboard_event)) {
+    if (z.util.KeyboardUtil.isEscapeKey(keyboardEvent)) {
       return cleanup();
     }
 
     if (
-      z.util.KeyboardUtil.isOneOfKeys(keyboard_event, [
+      z.util.KeyboardUtil.isOneOfKeys(keyboardEvent, [
         z.util.KeyboardUtil.KEY.ARROW_UP,
         z.util.KeyboardUtil.KEY.ARROW_DOWN,
       ])
     ) {
-      return rotateItem(keyboard_event.key);
+      return rotateItem(keyboardEvent.key);
     }
 
     if (z.util.KeyboardUtil.isEnterKey(z.util.KeyboardUtil.KEY.ENTER)) {
@@ -140,8 +140,8 @@ z.ui.Context = (() => {
 
     cleanup();
 
-    const click_x = event.clientX;
-    const click_y = event.clientY;
+    const clickX = event.clientX;
+    const clickY = event.clientY;
 
     const windowWidth = window.innerWidth;
     const windowHeight = window.innerHeight;
@@ -153,8 +153,8 @@ z.ui.Context = (() => {
     const menuWidth = menu.offsetWidth;
     const menuHeight = menu.offsetHeight;
 
-    menu.style.left = `${windowWidth - click_x < menuWidth ? click_x - menuWidth : click_x}px`;
-    menu.style.top = `${windowHeight - click_y < menuHeight ? click_y - menuHeight : click_y}px`;
+    menu.style.left = `${windowWidth - clickX < menuWidth ? clickX - menuWidth : clickX}px`;
+    menu.style.top = `${windowHeight - clickY < menuHeight ? clickY - menuHeight : clickY}px`;
     menu.style.visibility = '';
 
     addListeners();

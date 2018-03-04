@@ -50,7 +50,7 @@ $.fn.confirm = function(config) {
 
   const confirm = parent.find('.confirm');
   const group = parent.find('.participants-group');
-  let is_visible = true;
+  let isVisible = true;
 
   const is_small = group.hasClass('small');
   if (is_small) {
@@ -67,7 +67,7 @@ $.fn.confirm = function(config) {
   window.requestAnimationFrame(() => confirm.addClass('confirm-is-visible'));
 
   this.destroy = function() {
-    is_visible = false;
+    isVisible = false;
     ko.cleanNode(confirm[0]);
 
     if (is_small) {
@@ -77,7 +77,7 @@ $.fn.confirm = function(config) {
     parent.find('.confirm').remove();
   };
 
-  this.is_visible = () => is_visible;
+  this.isVisible = () => isVisible;
 
   $('[data-action="cancel"]', confirm).click(() => {
     if (typeof config.cancel === 'function') {

@@ -39,14 +39,14 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
     this.media_stream_handler = this.media_repository.stream_handler;
     this.media_stream = this.media_stream_handler.local_media_stream;
 
-    this.is_visible = false;
+    this.isVisible = false;
 
     this.media_stream.subscribe(media_stream => {
       if (this.audio_interval) {
         this._release_audio_meter();
       }
 
-      if (this.is_visible && media_stream) {
+      if (this.isVisible && media_stream) {
         this._initiate_audio_meter(media_stream);
       }
     });
@@ -63,7 +63,7 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
    * @returns {undefined} No return value
    */
   initiateDevices() {
-    this.is_visible = true;
+    this.isVisible = true;
 
     this._get_media_stream().then(media_stream => {
       if (media_stream && !this.audio_interval) {
@@ -77,7 +77,7 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
    * @returns {undefined} No return value.
    */
   release_devices() {
-    this.is_visible = false;
+    this.isVisible = false;
     this._release_audio_meter();
     this._release_media_stream();
   }

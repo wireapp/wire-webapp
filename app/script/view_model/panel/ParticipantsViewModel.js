@@ -167,7 +167,7 @@ z.viewModel.panel.ParticipantsViewModel = class ParticipantsViewModel {
       .computed(() => this.services() && this.selectedContacts() && this.stateAddPeople() && this.stateAddService())
       .extend({notify: 'always', rateLimit: 500});
 
-    const shortcut = z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.ADD_PEOPLE);
+    const shortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.ADD_PEOPLE);
     this.addPeopleTooltip = ko.pureComputed(() => {
       const identifier = this.showIntegrations() ? z.string.tooltipPeopleAdd : z.string.tooltipPeopleAddPeople;
       return z.l10n.text(identifier, shortcut);
@@ -409,7 +409,7 @@ z.viewModel.panel.ParticipantsViewModel = class ParticipantsViewModel {
         return this.clickOnAddPeople();
       }
 
-      const isConfirmingAction = this.confirmDialog && this.confirmDialog.is_visible();
+      const isConfirmingAction = this.confirmDialog && this.confirmDialog.isVisible();
       if (this.stateAddPeople() || isConfirmingAction) {
         return this.mainViewModel.closePanel();
       }

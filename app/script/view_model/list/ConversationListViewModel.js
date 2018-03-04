@@ -97,7 +97,7 @@ z.viewModel.list.ConversationListViewModel = class ConversationListViewModel {
 
     this.start_tooltip = z.l10n.text(
       z.string.tooltipConversationsStart,
-      z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.START)
+      z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.START)
     );
 
     this.show_connect_requests = ko.pureComputed(() => this.connect_requests().length);
