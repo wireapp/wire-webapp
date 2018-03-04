@@ -40,6 +40,8 @@ z.viewModel.PanelViewModel = class PanelViewModel {
    */
   constructor(mainViewModel, repositories) {
     this.closePanelOnChange = this.closePanelOnChange.bind(this);
+    this.showParticipant = this.showParticipant.bind(this);
+    this.togglePanel = this.togglePanel.bind(this);
 
     this.elementId = 'right-column';
     this.conversationRepository = repositories.conversation;
@@ -79,7 +81,7 @@ z.viewModel.PanelViewModel = class PanelViewModel {
 
     this.conversationEntity.subscribe(this.closePanelOnChange, null, 'beforeChange');
 
-    amplify.subscribe(z.event.WebApp.PEOPLE.TOGGLE, this.togglePanel.bind(this));
+    amplify.subscribe(z.event.WebApp.PEOPLE.TOGGLE, this.togglePanel);
     amplify.subscribe(z.event.WebApp.PEOPLE.SHOW, this.showParticipant);
 
     // Nested view models
@@ -114,14 +116,36 @@ z.viewModel.PanelViewModel = class PanelViewModel {
   }
 
   showParticipant(userEntity) {
+    const isSingleModeConversation = this.conversationEntity().is_one2one() || this.conversationEntity().is_request();
+
     if (this.isVisible()) {
-      if (this.conversationEntity().is_one2one()) {
+      if (isSingleModeConversation) {
         if (userEntity.is_me) {
+          const isStateGroupParticipant = this.state() === PanelViewModel.STATE.GROUP_PARTICIPANT;
+          if (isStateGroupParticipant) {
+            return this.closePanel();
+          }
+        } else {
+          const isStateConversationDetails = this.state() === PanelViewModel.STATE.CONVERSATION_DETAILS;
+          if (isStateConversationDetails) {
+            return this.closePanel();
+          }
         }
       }
+
+      const selectedGroupParticipant = this.groupParticipant.selectedParticipant();
+      if (selectedGroupParticipant) {
+        const isVisibleGroupParticipant = userEntity.id === selectedGroupParticipant.id;
+        if (isVisibleGroupParticipant) {
+          return this.closePanel();
+        }
+      }
+    } else if (isSingleModeConversation && !userEntity.is_me) {
+      return this._openPanel(PanelViewModel.STATE.CONVERSATION);
     }
 
-    this.switchState(PanelViewModel.STATE.GROUP_PARTICIPANT);
+    this.groupParticipant.showGroupParticipant(userEntity);
+    this._openPanel(PanelViewModel.STATE.GROUP_PARTICIPANT);
   }
 
   showParticipantDevices(userEntity) {

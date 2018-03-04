@@ -165,14 +165,11 @@ z.viewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
       this.conversationRepository
         .createGroupConversation(this.selectedContacts(), this.nameInput(), accessState)
         .then(conversationEntity => {
-          amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.GROUP_CREATION_SUCCEEDED, {
-            method: this.method,
-            with_participants: !!this.selectedContacts().length,
-          });
-
           this._hideModal();
 
           amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity);
+
+          this._trackGroupCreation(conversationEntity);
         })
         .catch(error => {
           this.isCreatingConversation = false;
@@ -219,5 +216,46 @@ z.viewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
     if (this.modal) {
       this.modal.hide();
     }
+  }
+
+  _trackGroupCreation(conversationEntity) {
+    this._trackGroupCreationSucceeded(conversationEntity);
+    this._trackAddParticipants(conversationEntity);
+  }
+
+  _trackGroupCreationSucceeded(conversationEntity) {
+    const attributes = {
+      method: this.method,
+      with_participants: !!this.selectedContacts().length,
+    };
+
+    const isTeamConversation = !!conversationEntity.team_id;
+    if (isTeamConversation) {
+      attributes.is_allow_guests = !conversationEntity.isTeamOnly();
+    }
+
+    const eventName = z.tracking.EventName.CONVERSATION.GROUP_CREATION_SUCCEEDED;
+    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, eventName, attributes);
+  }
+
+  _trackAddParticipants(conversationEntity) {
+    const attributes = {
+      method: 'create',
+      user_num: conversationEntity.getNumberOfParticipants(),
+    };
+
+    const isTeamConversation = !!conversationEntity.team_id;
+    if (isTeamConversation) {
+      const participants = z.tracking.helpers.getParticipantTypes(conversationEntity.participating_user_ets(), true);
+
+      Object.assign(attributes, {
+        guest_num: participants.guests,
+        is_allow_guests: conversationEntity.isGuestRoom(),
+        temporary_guest_num: participants.temporaryGuests,
+        user_num: participants.users,
+      });
+    }
+
+    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.ADD_PARTICIPANTS, attributes);
   }
 };
