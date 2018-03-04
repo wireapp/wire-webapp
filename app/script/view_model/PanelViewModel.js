@@ -40,6 +40,8 @@ z.viewModel.PanelViewModel = class PanelViewModel {
    */
   constructor(mainViewModel, repositories) {
     this.closePanelOnChange = this.closePanelOnChange.bind(this);
+    this.showParticipant = this.showParticipant.bind(this);
+    this.togglePanel = this.togglePanel.bind(this);
 
     this.elementId = 'right-column';
     this.conversationRepository = repositories.conversation;
@@ -79,7 +81,7 @@ z.viewModel.PanelViewModel = class PanelViewModel {
 
     this.conversationEntity.subscribe(this.closePanelOnChange, null, 'beforeChange');
 
-    amplify.subscribe(z.event.WebApp.PEOPLE.TOGGLE, this.togglePanel.bind(this));
+    amplify.subscribe(z.event.WebApp.PEOPLE.TOGGLE, this.togglePanel);
     amplify.subscribe(z.event.WebApp.PEOPLE.SHOW, this.showParticipant);
 
     // Nested view models
@@ -131,15 +133,14 @@ z.viewModel.PanelViewModel = class PanelViewModel {
         }
       }
 
-      const isVisibleGroupParticipant = userEntity.id === this.groupParticipant.selectedParticipant().id;
-      if (isVisibleGroupParticipant) {
-        return this.closePanel();
+      const selectedGroupParticipant = this.groupParticipant.selectedParticipant();
+      if (selectedGroupParticipant) {
+        const isVisibleGroupParticipant = userEntity.id === selectedGroupParticipant.id;
+        if (isVisibleGroupParticipant) {
+          return this.closePanel();
+        }
       }
-
-      this.switchState(PanelViewModel.STATE.GROUP_PARTICIPANT);
-    }
-
-    if (isSingleModeConversation && !userEntity.is_me) {
+    } else if (isSingleModeConversation && !userEntity.is_me) {
       return this._openPanel(PanelViewModel.STATE.CONVERSATION);
     }
 
