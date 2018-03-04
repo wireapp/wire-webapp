@@ -26,6 +26,7 @@ z.components.GuestModeToggle = class GuestModeToggle {
   constructor(params) {
     this.isChecked = params.isChecked;
     this.onToggle = params.onToggle;
+    this.isDisabled = params.isDisabled;
   }
 };
 
@@ -33,7 +34,7 @@ ko.components.register('guest-mode-toggle', {
   template: `
     <div class="guest-mode-toggle-row">
       <div data-bind="text: z.string.guestRoomToggleName"></div>
-      <div class="slider">
+      <div class="slider" data-bind="css: {'disabled': isDisabled}">
         <input class="slider-input" type="checkbox" name="toggle" id="toggle" data-bind="checked: isChecked">
         <label class="button-label" for="toggle" data-bind="click: onToggle, attr: {'data-uie-value': isChecked() ? 'checked': 'unchecked'}" data-uie-name="do-allow-guests" ></label>
       </div>
