@@ -57,7 +57,7 @@ ko.components.register('participant-item', {
         <!-- /ko -->
         <div class="participant-item-content-info">
           <!-- ko if: contentInfo -->
-            <span class="participant-item-content-username label-username-notext" data-bind="text: contentInfo, css: {'label-username': isUser}"></span>
+            <span class="participant-item-content-username label-username-notext" data-bind="text: contentInfo, css: {'label-username': isUser}" data-uie-name="status-username"></span>
           <!-- /ko -->
         </div>
       </div>
