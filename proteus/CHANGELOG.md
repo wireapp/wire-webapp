@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="7.1.5"></a>
+## [7.1.5](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/compare/@wireapp/proteus@7.1.4...@wireapp/proteus@7.1.5) (2018-03-05)
+
+
+### Bug Fixes
+
+* **cryptobox,proteus:** Removed ReadOnlyStore ([#334](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/issues/334)) ([6e1b97d](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/commit/6e1b97d))
+
+
+
+
 <a name="7.1.4"></a>
 ## [7.1.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/compare/@wireapp/proteus@7.1.3...@wireapp/proteus@7.1.4) (2018-02-28)
 
