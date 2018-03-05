@@ -100,6 +100,9 @@ ko.components.register('device-card', {
         </div>
       <!-- /ko -->
     </div>
+    <!-- ko ifnot: detailed || !click-->
+      <disclose-icon></disclose-icon>
+    <!-- /ko -->
   `,
   viewModel: {
     createViewModel(params, componentInfo) {
