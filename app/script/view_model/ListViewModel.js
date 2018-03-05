@@ -96,7 +96,7 @@ z.viewModel.ListViewModel = class ListViewModel {
     this.archive = new z.viewModel.list.ArchiveViewModel(mainViewModel, this, repositories);
     this.conversations = new z.viewModel.list.ConversationListViewModel(mainViewModel, this, repositories);
     this.preferences = new z.viewModel.list.PreferencesListViewModel(mainViewModel, this);
-    this.start_ui = new z.viewModel.list.StartUIViewModel(mainViewModel, this, repositories);
+    this.start = new z.viewModel.list.StartUIViewModel(mainViewModel, this, repositories);
     this.takeover = new z.viewModel.list.TakeoverViewModel(mainViewModel, this, repositories);
 
     this._initSubscriptions();
@@ -198,6 +198,11 @@ z.viewModel.ListViewModel = class ListViewModel {
   }
 
   _hideList() {
+    const stateIsStartUI = this.state() === ListViewModel.STATE.START_UI;
+    if (stateIsStartUI) {
+      this.start.resetView();
+    }
+
     const listStateElementId = this._getElementIdOfList(this.state());
     $(`#${listStateElementId}`).removeClass('left-list-is-visible');
     $(document).off('keydown.listView');
@@ -223,7 +228,7 @@ z.viewModel.ListViewModel = class ListViewModel {
         this.archive.updateList();
         break;
       case ListViewModel.STATE.START_UI:
-        this.start_ui.updateList();
+        this.start.updateList();
         break;
       case ListViewModel.STATE.PREFERENCES:
         amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.PREFERENCES_ACCOUNT);
