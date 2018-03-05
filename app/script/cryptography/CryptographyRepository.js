@@ -338,7 +338,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
         return undefined;
       })
       .catch(error => {
-        const message = `Pre-key for user '${userId}' ('${clientId}') invalid. Skipping encryption:: ${error.message}`;
+        const message = `Pre-key for user '${userId}' ('${clientId}') invalid. Skipping encryption: ${error.message}`;
         this.logger.warn(message, error);
         return undefined;
       });
