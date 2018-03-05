@@ -24,6 +24,25 @@ const webpack = require('webpack');
 const srcScript = 'app/script/auth/';
 const serve = 'app/';
 
+class ProgressBar {
+  constructor(maxValue, itemLength, emptyItem = '▁', filledItem = '▆') {
+    this.maxValue = maxValue;
+    this.itemLength = itemLength;
+    this.chunks = [];
+    for (let i = 0; i < itemLength; i++) {
+      this.chunks[i] = emptyItem;
+    }
+  }
+
+  tick(value, msg) {
+    process.stdout.clearLine();
+    process.stdout.cursorTo(0);
+    process.stdout.write(`${msg} ${value}%${value === this.maxValue ? '\n' : ''}`);
+  }
+}
+
+const progress = new ProgressBar(100, 20);
+
 module.exports = Object.assign(commonConfig, {
   devServer: {
     clientLogLevel: 'warning',
@@ -45,5 +64,13 @@ module.exports = Object.assign(commonConfig, {
   output: Object.assign(commonConfig.output, {
     path: path.resolve(__dirname, serve),
   }),
-  plugins: [...commonConfig.plugins, new webpack.HotModuleReplacementPlugin(), new webpack.NamedModulesPlugin()],
+  plugins: [
+    ...commonConfig.plugins,
+    new webpack.HotModuleReplacementPlugin(),
+    new webpack.NamedModulesPlugin(),
+    new webpack.ProgressPlugin((percentage, msg) => {
+      percentage = parseInt(Math.round(percentage * Math.pow(10, 2)));
+      progress.tick(percentage, msg);
+    }),
+  ],
 });

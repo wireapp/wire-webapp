@@ -57,6 +57,7 @@ import {pathWithParams} from '../util/urlUtil';
 import {Link as RRLink} from 'react-router-dom';
 import Cookies from 'js-cookie';
 import BackendError from '../module/action/BackendError';
+import Runtime from '../Runtime';
 
 const CONVERSATION_CODE = 'code';
 const CONVERSATION_KEY = 'key';
@@ -70,7 +71,6 @@ class ConversationJoin extends Component {
     error: null,
     forceNewAccount: false,
     isAppAlreadyOpen: !!Cookies.get(COOKIE_NAME_APP_OPENED),
-    isUnsupportedBrowser: false,
     isValidLink: true,
     isValidName: true,
   };
@@ -278,7 +278,7 @@ class ConversationJoin extends Component {
 
   render() {
     const {error, isAuthenticated, intl: {formatMessage: _}} = this.props;
-    const {isAppAlreadyOpen, isUnsupportedBrowser, isValidLink, forceNewAccount} = this.state;
+    const {isAppAlreadyOpen, isValidLink, forceNewAccount} = this.state;
     return (
       <Container
         style={{
@@ -303,7 +303,7 @@ class ConversationJoin extends Component {
           <Small> &middot; {_(footerStrings.copy)}</Small>
         </Footer>
         {isAppAlreadyOpen && this.renderAppAlreadyOpenModal()}
-        {isUnsupportedBrowser && <Redirect to={ROUTE.UNSUPPORTED_JOIN} />}
+        {!new Runtime().isSupportedBrowser() && <Redirect to={ROUTE.UNSUPPORTED_JOIN} />}
       </Container>
     );
   }
