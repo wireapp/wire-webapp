@@ -439,10 +439,8 @@ z.string.extensionsGiphyRandom = 'Random';
 // Panel
 // Panel: Add participants
 z.string.addParticipantsConfirmLabel = 'Add';
-z.string.addParticipantsEveryoneParticipates = 'Everyone you’re\nconnected to is already in\nthis conversation.';
 z.string.addParticipantsHeader = 'Add people';
 z.string.addParticipantsHeaderWithCounter = 'Add people ({{number}})';
-z.string.addParticipantsNoMatches = 'No matching results.\nTry entering a different name.';
 z.string.addParticipantsSearchPlaceholder = 'Search by name';
 z.string.addParticipantsServiceConfirmButton = 'Add service';
 z.string.addParticipantsTabsPeople = 'People';
@@ -620,6 +618,10 @@ z.string.searchInviteShare = 'Share Contacts';
 
 z.string.searchServiceNewConversation = 'Create a new conversation';
 z.string.searchServiceConfirmButton = 'Add service';
+
+// Search list: User list & service list components
+z.string.searchListEveryoneParticipates = 'Everyone you’re\nconnected to is already in\nthis conversation.';
+z.string.searchListNoMatches = 'No matching results.\nTry entering a different name.';
 
 // Google contacts upload
 z.string.uploadGoogleHeadline = 'Find people\nto talk to.';
