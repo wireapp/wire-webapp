@@ -227,28 +227,28 @@ z.string.modalConversationRevokeLinkMessage = 'New guests will not be able to jo
 
 z.string.modalConversationGuestOptionsAllowGuestMessage = 'Could not allow guests. Please try again.';
 z.string.modalConversationGuestOptionsDisableGuestMessage = 'Could not remove guests. Please try again.';
-z.string.modalConversationGuestOptionsGetCodeMessage = 'Could not get access code.';
-z.string.modalConversationGuestOptionsRequestCodeMessage = 'Could not request access code. Please try again.';
-z.string.modalConversationGuestOptionsRevokeCodeMessage = 'Could not revoke access code. Please try again.';
+z.string.modalConversationGuestOptionsGetCodeMessage = 'Could not get access link.';
+z.string.modalConversationGuestOptionsRequestCodeMessage = 'Could not request access link. Please try again.';
+z.string.modalConversationGuestOptionsRevokeCodeMessage = 'Could not revoke access link. Please try again.';
 z.string.modalConversationGuestOptionsToggleGuestsMessage = 'Could not change guests state.';
 
 z.string.modalConversationTooManyMembersHeadline = 'Full house';
 z.string.modalConversationTooManyMembersMessage = 'Up to {{number1}} people can join a conversation. Currently there is only room for {{number2}} more people.';
 
-z.string.modalGifTooLargeHeadline = 'Selected animation is too large.';
+z.string.modalGifTooLargeHeadline = 'Selected animation is too large';
 z.string.modalGifTooLargeMessage = 'Maximum size is {{number}} MB.';
 
 z.string.modalIntegrationUnavailableHeadline = 'Bots currently unavailable';
 z.string.modalIntegrationUnavailableMessage = 'Thank you for your interest in bots. The service is currently suspended while we work on the next version. Stay tuned.';
 
-z.string.modalPictureFileFormatHeadline = 'Can’t use this picture.';
+z.string.modalPictureFileFormatHeadline = 'Can’t use this picture';
 z.string.modalPictureFileFormatMessage = 'Please choose a PNG or JPEG file.';
 
-z.string.modalPictureTooLargeHeadline = 'Selected picture is too large.';
-z.string.modalPictureTooLargeMessage = 'You use pictures up to {{number}} MB.';
+z.string.modalPictureTooLargeHeadline = 'Selected picture is too large';
+z.string.modalPictureTooLargeMessage = 'You can use pictures up to {{number}} MB.';
 
 z.string.modalPictureTooSmallMessage = 'Picture too small';
-z.string.modalPictureTooSmallMessage = 'Please choose a picture that’s at least 320 x 320 px.';
+z.string.modalPictureTooSmallMessage = 'Please choose a picture that is at least 320 x 320 px.';
 
 z.string.modalServiceUnavailableHeadline = 'Adding service not possible';
 z.string.modalServiceUnavailableMessage = 'The service is unavailable a the moment.';
