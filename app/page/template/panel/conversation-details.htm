@@ -10,7 +10,7 @@
       <div class="conversation-details__header">
         <!-- ko if: isNameEditable() -->
           <div class="conversation-details__name conversation-details__name--editable" data-bind="visible: !isEditingName(), click: clickToEditGroupName, l10n_tooltip: z.string.tooltipConversationDetailsRename" data-uie-name="status-name">
-            <div data-bind="text: conversationEntity().display_name()"></div>
+            <div class="conversation-details__name" data-bind="text: conversationEntity().display_name()"></div>
             <edit-icon class="conversation-details__name__icon"></edit-icon>
           </div>
           <textarea class="conversation-details__name" data-bind="visible: isEditingName, value: conversationEntity().display_name(), enter: renameConversation, hasFocus: isEditingName, resize" maxlength="64" dir="auto" data-uie-name="enter-name"></textarea>
