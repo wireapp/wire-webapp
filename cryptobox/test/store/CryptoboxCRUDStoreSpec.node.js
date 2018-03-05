@@ -128,47 +128,39 @@ describe('cryptobox.store.CryptoboxCRUDStore', () => {
 
   describe('"save_prekeys"', () => {
     it('saves multiple PreKeys', async done => {
-      try {
-        const preKeys = await Promise.all([
-          Proteus.keys.PreKey.new(0),
-          Proteus.keys.PreKey.new(Proteus.keys.PreKey.MAX_PREKEY_ID),
-        ]);
+      const preKeys = await Promise.all([
+        Proteus.keys.PreKey.new(0),
+        Proteus.keys.PreKey.new(Proteus.keys.PreKey.MAX_PREKEY_ID),
+      ]);
 
-        savedPreKeys = await fileStore.save_prekeys(preKeys);
-        expect(savedPreKeys.length).toBe(preKeys.length);
+      savedPreKeys = await fileStore.save_prekeys(preKeys);
+      expect(savedPreKeys.length).toBe(preKeys.length);
 
-        done();
-      } catch (error) {
-        done.fail(error);
-      }
+      done();
     });
   });
 
   describe('"update_session"', () => {
     it('updates an already persisted session', async done => {
-      try {
-        const aliceIdentity = await Proteus.keys.IdentityKeyPair.new();
-        const bobIdentity = await Proteus.keys.IdentityKeyPair.new();
-        const bobLastResortPreKey = await Proteus.keys.PreKey.new(Proteus.keys.PreKey.MAX_PREKEY_ID);
-        const bobPreKeyBundle = Proteus.keys.PreKeyBundle.new(bobIdentity.public_key, bobLastResortPreKey);
-        const sessionId = 'my_session_with_bob';
+      const aliceIdentity = await Proteus.keys.IdentityKeyPair.new();
+      const bobIdentity = await Proteus.keys.IdentityKeyPair.new();
+      const bobLastResortPreKey = await Proteus.keys.PreKey.new(Proteus.keys.PreKey.MAX_PREKEY_ID);
+      const bobPreKeyBundle = Proteus.keys.PreKeyBundle.new(bobIdentity.public_key, bobLastResortPreKey);
+      const sessionId = 'my_session_with_bob';
 
-        let proteusSession = await Proteus.session.Session.init_from_prekey(aliceIdentity, bobPreKeyBundle);
-        proteusSession = await fileStore.create_session(sessionId, proteusSession);
-        expect(proteusSession.local_identity.public_key.fingerprint()).toBe(aliceIdentity.public_key.fingerprint());
-        expect(proteusSession.remote_identity.public_key.fingerprint()).toBe(bobIdentity.public_key.fingerprint());
-        expect(proteusSession.version).toBe(1);
-        proteusSession.version = 2;
-        await fileStore.update_session(sessionId, proteusSession);
-        proteusSession = await fileStore.read_session(aliceIdentity, sessionId);
-        expect(proteusSession.local_identity.public_key.fingerprint()).toBe(aliceIdentity.public_key.fingerprint());
-        expect(proteusSession.remote_identity.public_key.fingerprint()).toBe(bobIdentity.public_key.fingerprint());
-        expect(proteusSession.version).toBe(2);
+      let proteusSession = await Proteus.session.Session.init_from_prekey(aliceIdentity, bobPreKeyBundle);
+      proteusSession = await fileStore.create_session(sessionId, proteusSession);
+      expect(proteusSession.local_identity.public_key.fingerprint()).toBe(aliceIdentity.public_key.fingerprint());
+      expect(proteusSession.remote_identity.public_key.fingerprint()).toBe(bobIdentity.public_key.fingerprint());
+      expect(proteusSession.version).toBe(1);
+      proteusSession.version = 2;
+      await fileStore.update_session(sessionId, proteusSession);
+      proteusSession = await fileStore.read_session(aliceIdentity, sessionId);
+      expect(proteusSession.local_identity.public_key.fingerprint()).toBe(aliceIdentity.public_key.fingerprint());
+      expect(proteusSession.remote_identity.public_key.fingerprint()).toBe(bobIdentity.public_key.fingerprint());
+      expect(proteusSession.version).toBe(2);
 
-        done();
-      } catch (error) {
-        done.fail(error);
-      }
+      done();
     });
   });
 

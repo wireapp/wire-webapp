@@ -134,10 +134,9 @@ export class Session {
           session._insert_session_state(pkmsg.message.session_tag, state);
 
           if (pkmsg.prekey_id < PreKey.MAX_PREKEY_ID) {
-            // TODO: Zeroize should be tested (and awaited) here!
-            MemoryUtil.zeroize(await prekey_store.get_prekey(pkmsg.prekey_id));
+            MemoryUtil.zeroize(await prekey_store.load_prekey(pkmsg.prekey_id));
             return prekey_store
-              .remove(pkmsg.prekey_id)
+              .delete_prekey(pkmsg.prekey_id)
               .then(() => resolve([session, plain]))
               .catch(error => {
                 reject(
@@ -155,7 +154,7 @@ export class Session {
   }
 
   private _new_state(pre_key_store: PreKeyStore, pre_key_message: PreKeyMessage): Promise<SessionState> {
-    return pre_key_store.get_prekey(pre_key_message.prekey_id).then(pre_key => {
+    return pre_key_store.load_prekey(pre_key_message.prekey_id).then(pre_key => {
       if (pre_key) {
         return SessionState.init_as_bob(
           this.local_identity,
@@ -276,8 +275,8 @@ export class Session {
 
             if (msg.prekey_id !== PreKey.MAX_PREKEY_ID) {
               // TODO: Zeroize should be tested (and awaited) here!
-              MemoryUtil.zeroize(await prekey_store.get_prekey(msg.prekey_id));
-              prekey_store.remove(msg.prekey_id);
+              MemoryUtil.zeroize(await prekey_store.load_prekey(msg.prekey_id));
+              prekey_store.delete_prekey(msg.prekey_id);
             }
 
             this._insert_session_state(msg.message.session_tag, state);

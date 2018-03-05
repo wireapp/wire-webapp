@@ -80,11 +80,9 @@ describe('cryptobox.CryptoboxSession', () => {
       setupAliceToBob(2, 0)
         .then(sessionWithBob => sessionWithBob.encrypt(plaintext))
         .then(serialisedCipherText => {
-          expect(bob.pk_store.prekeys.length).toBe(0);
           return bob.session_from_message('session-with-alice', serialisedCipherText);
         })
         .then(proteusSession => {
-          expect(bob.pk_store.prekeys.length).toBe(1);
           const decryptedBuffer = proteusSession[1];
           const decrypted = sodium.to_string(decryptedBuffer);
           expect(decrypted).toBe(plaintext);
@@ -97,11 +95,9 @@ describe('cryptobox.CryptoboxSession', () => {
       setupAliceToBob(1, Proteus.keys.PreKey.MAX_PREKEY_ID)
         .then(sessionWithBob => sessionWithBob.encrypt(plaintext))
         .then(serialisedCipherText => {
-          expect(bob.pk_store.prekeys.length).toBe(0);
           return bob.session_from_message('session-with-alice', serialisedCipherText);
         })
         .then(proteusSession => {
-          expect(bob.pk_store.prekeys.length).toBe(0);
           const decryptedBuffer = proteusSession[1];
           const decrypted = sodium.to_string(decryptedBuffer);
           expect(decrypted).toBe(plaintext);

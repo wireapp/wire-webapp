@@ -24,10 +24,10 @@ const {Cryptobox} = require('@wireapp/cryptobox');
 const {MemoryEngine} = require('@wireapp/store-engine');
 
 describe('Cryptobox', () => {
-  async function createCryptobox(storeName) {
+  async function createCryptobox(storeName, amountOfPreKeys = 1) {
     const engine = new MemoryEngine();
     await engine.init(storeName);
-    return new Cryptobox(engine);
+    return new Cryptobox(engine, amountOfPreKeys);
   }
 
   describe('"encrypt / decrypt"', () => {
@@ -35,22 +35,23 @@ describe('Cryptobox', () => {
       const alice = await createCryptobox('alice');
       const text = 'Hello, World!';
 
-      expect(alice.cachedPreKeys.length).toBe(0);
       await alice.create();
-      expect(alice.cachedPreKeys.length).toBe(1);
 
-      const bob = await createCryptobox('bob');
+      const bob = await createCryptobox('bob', 2);
       await bob.create();
 
-      const eve = await createCryptobox('eve');
+      const eve = await createCryptobox('eve', 2);
       await eve.create();
 
-      const mallory = await createCryptobox('mallory');
+      const mallory = await createCryptobox('mallory', 2);
       await mallory.create();
 
-      const bobBundle = Proteus.keys.PreKeyBundle.new(bob.identity.public_key, bob.cachedPreKeys[0]);
-      const eveBundle = Proteus.keys.PreKeyBundle.new(eve.identity.public_key, eve.cachedPreKeys[0]);
-      const malloryBundle = Proteus.keys.PreKeyBundle.new(mallory.identity.public_key, mallory.cachedPreKeys[0]);
+      const bobBundle = Proteus.keys.PreKeyBundle.new(bob.identity.public_key, await bob.store.load_prekey(0));
+      const eveBundle = Proteus.keys.PreKeyBundle.new(eve.identity.public_key, await eve.store.load_prekey(0));
+      const malloryBundle = Proteus.keys.PreKeyBundle.new(
+        mallory.identity.public_key,
+        await mallory.store.load_prekey(0)
+      );
 
       Promise.all([
         alice.encrypt('session-with-bob', text, bobBundle.serialise()),

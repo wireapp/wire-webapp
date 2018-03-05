@@ -29,14 +29,16 @@ class TestStore extends Proteus.session.PreKeyStore {
     this.prekeys = prekeys;
   }
 
-  get_prekey(prekey_id) {
+  load_prekey(prekey_id) {
     const matches = this.prekeys.filter(prekey => prekey.key_id === prekey_id);
     return Promise.resolve(matches[0]);
   }
 
-  remove(prekey_id) {
+  delete_prekey(prekey_id) {
     const matches = this.prekeys.filter(prekey => prekey.key_id === prekey_id);
-    return Promise.resolve().then(() => delete matches[0]);
+    return Promise.resolve()
+      .then(() => delete matches[0])
+      .then(() => prekey_id);
   }
 }
 
@@ -71,7 +73,7 @@ describe('LongRunning', () => {
         const pre_keys = [await Proteus.keys.PreKey.last_resort()];
         const bob_store = new TestStore(pre_keys);
 
-        const bob_prekey = await bob_store.get_prekey(Proteus.keys.PreKey.MAX_PREKEY_ID);
+        const bob_prekey = await bob_store.load_prekey(Proteus.keys.PreKey.MAX_PREKEY_ID);
         expect(bob_prekey.key_id).toBe(Proteus.keys.PreKey.MAX_PREKEY_ID);
 
         const bob_bundle = Proteus.keys.PreKeyBundle.new(bob_ident.public_key, bob_prekey);
@@ -160,7 +162,7 @@ describe('LongRunning', () => {
           const bob_ident = await Proteus.keys.IdentityKeyPair.new();
           const bob_store = new TestStore(await Proteus.keys.PreKey.generate_prekeys(0, 10));
 
-          const bob_prekey = await bob_store.get_prekey(0);
+          const bob_prekey = await bob_store.load_prekey(0);
           const bob_bundle = Proteus.keys.PreKeyBundle.new(bob_ident.public_key, bob_prekey);
 
           const alice = await Proteus.session.Session.init_from_prekey(alice_ident, bob_bundle);

@@ -1,14 +1,14 @@
 import * as ProteusMessage from '@wireapp/proteus/dist/message/root';
 import * as ProteusSession from '@wireapp/proteus/dist/session/root';
 import DecryptionError from './DecryptionError';
-import {ReadOnlyStore} from './store/root';
+import {CryptoboxCRUDStore} from './store/root';
 
 class CryptoboxSession {
   public id: string;
-  public pk_store: ReadOnlyStore;
+  public pk_store: CryptoboxCRUDStore;
   public session: ProteusSession.Session;
 
-  constructor(id: string, pk_store: ReadOnlyStore, session: ProteusSession.Session) {
+  constructor(id: string, pk_store: CryptoboxCRUDStore, session: ProteusSession.Session) {
     this.id = id;
     this.pk_store = pk_store;
     this.session = session;

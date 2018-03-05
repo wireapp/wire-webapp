@@ -62,64 +62,6 @@ describe('cryptobox.store.IndexedDB', () => {
     return new CryptoboxStore.CryptoboxCRUDStore(engine);
   }
 
-  describe('Basic functionality', () => {
-    it('removes PreKeys from the storage (when a session gets established) and creates new PreKeys if needed.', async done => {
-      const alice = {
-        // PreKeys: ["65535", "0", "1"]
-        desktop: new Cryptobox((await createStore()).engine, 3),
-      };
-
-      const bob = {
-        // PreKeys: ["65535"]
-        desktop: new Cryptobox((await createStore()).engine, 1),
-        // PreKeys: ["65535"]
-        mobile: new Cryptobox((await createStore()).engine, 1),
-      };
-
-      spyOn(alice.desktop, 'publish_prekeys').and.callThrough();
-      spyOn(alice.desktop.pk_store, 'release_prekeys').and.callThrough();
-
-      const messageFromBob = 'Hello Alice!';
-
-      await Promise.all([alice.desktop.create(), bob.desktop.create(), bob.mobile.create()]);
-      expect(alice.desktop.cachedPreKeys.length).toBe(3);
-      expect(bob.desktop.cachedPreKeys.length).toBe(1);
-      expect(bob.mobile.cachedPreKeys.length).toBe(1);
-
-      let prekey = await alice.desktop.store.load_prekey(0);
-      expect(prekey).toBeDefined();
-
-      // Bob sends a message (with PreKey material and ciphertext) to Alice's desktop client
-      let publicPreKeyBundle = await Proteus.keys.PreKeyBundle.new(alice.desktop.identity.public_key, prekey);
-      let ciphertext = await bob.desktop.encrypt('to_alice_desktop', messageFromBob, publicPreKeyBundle.serialise());
-      expect(alice.desktop.pk_store.prekeys.length).toBe(0);
-      expect(alice.desktop.publish_prekeys).not.toHaveBeenCalled();
-
-      let plaintext = await alice.desktop.decrypt('to_bob_desktop', ciphertext);
-      const expectedNewPreKeyId = 2;
-      expect(alice.desktop.pk_store.prekeys.length).toBe(0);
-      expect(alice.desktop.cachedSessions.size()).toBe(1);
-      expect(alice.desktop.pk_store.release_prekeys.calls.count()).toBe(1);
-      expect(alice.desktop.publish_prekeys.calls.count()).toBe(1);
-      expect(alice.desktop.cachedPreKeys[alice.desktop.cachedPreKeys.length - 1].key_id).toBe(expectedNewPreKeyId);
-      expect(sodium.to_string(plaintext)).toBe(messageFromBob);
-
-      prekey = await alice.desktop.store.load_prekey(expectedNewPreKeyId);
-      publicPreKeyBundle = await Proteus.keys.PreKeyBundle.new(alice.desktop.identity.public_key, prekey);
-      ciphertext = await bob.mobile.encrypt('to_alice_desktop', messageFromBob, publicPreKeyBundle.serialise());
-      expect(alice.desktop.pk_store.prekeys.length).toBe(0);
-
-      plaintext = await alice.desktop.decrypt('to_bob_mobile', ciphertext);
-      expect(alice.desktop.pk_store.prekeys.length).toBe(0);
-      expect(alice.desktop.cachedSessions.size()).toBe(2);
-      expect(alice.desktop.pk_store.release_prekeys.calls.count()).toBe(2);
-      expect(alice.desktop.publish_prekeys.calls.count()).toBe(2);
-      expect(await sodium.to_string(plaintext)).toBe(messageFromBob);
-
-      done();
-    });
-  });
-
   describe('"create_session"', () => {
     it('saves a session with meta data', async done => {
       const store = await createStore();
@@ -219,6 +161,54 @@ describe('cryptobox.store.IndexedDB', () => {
 
       cryptoboxSession = await alice.session_from_prekey(sessionId, bobPreKeyBundle.serialise());
       expect(cryptoboxSession.fingerprint_remote()).toBe(bob.public_key.fingerprint());
+
+      done();
+    });
+  });
+
+  describe('"refill_prekeys"', () => {
+    it('refills PreKeys after a successful decryption', async done => {
+      const aliceStore = await createStore();
+      const alice = new Cryptobox(aliceStore.engine, 10);
+
+      spyOn(alice, 'refill_prekeys').and.callThrough();
+      expect(alice.refill_prekeys).toHaveBeenCalledTimes(0);
+
+      const alicePreKeys = await alice.create();
+      expect(alicePreKeys.length).toBe(10);
+
+      expect(alicePreKeys[9].key_id).toBe(Proteus.keys.PreKey.MAX_PREKEY_ID);
+      expect(alice.refill_prekeys).toHaveBeenCalledTimes(1);
+
+      const bobStore = await createStore();
+      const bob = new Cryptobox(bobStore.engine, 7);
+
+      spyOn(bob, 'refill_prekeys').and.callThrough();
+      expect(bob.refill_prekeys).toHaveBeenCalledTimes(0);
+
+      const bobPreKeys = await bob.create();
+
+      expect(bobPreKeys.length).toBe(7);
+      expect(bob.refill_prekeys).toHaveBeenCalledTimes(1);
+
+      const sessionId = 'session_with_bob';
+      const preKey = await bob.store.load_prekey(3);
+
+      const bobBundle = await Proteus.keys.PreKeyBundle.new(bob.identity.public_key, preKey);
+
+      const cipherMessage = await alice.encrypt(sessionId, 'Hello Bob!', bobBundle.serialise());
+      expect((await bob.store.load_prekeys()).length).toBe(7);
+
+      expect(alice.refill_prekeys).toHaveBeenCalledTimes(1);
+      expect(bob.refill_prekeys).toHaveBeenCalledTimes(1);
+
+      expect((await bob.store.load_prekeys()).map(pk => pk.key_id)).toEqual([0, 1, 2, 3, 4, 5, 65535]);
+
+      await bob.decrypt(sessionId, cipherMessage);
+      expect(bob.refill_prekeys).toHaveBeenCalledTimes(2);
+
+      expect((await bob.store.load_prekeys()).length).toBe(7);
+      expect((await bob.store.load_prekeys()).map(pk => pk.key_id)).toEqual([0, 1, 2, 4, 5, 6, 65535]);
 
       done();
     });
