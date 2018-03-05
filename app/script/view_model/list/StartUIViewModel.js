@@ -335,6 +335,22 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
     }
   }
 
+  resetView() {
+    if (this.userBubble) {
+      this.userBubble.hide();
+    }
+
+    if (this.inviteBubble) {
+      this.inviteBubble.hide();
+    }
+
+    this.showMatches(false);
+    this.showSpinner(false);
+
+    this.state(StartUIViewModel.STATE.ADD_PEOPLE);
+    this.searchInput('');
+  }
+
   updateList(state = StartUIViewModel.STATE.ADD_PEOPLE) {
     this.showSpinner(false);
 
@@ -357,19 +373,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
     amplify.publish(z.event.WebApp.SEARCH.HIDE);
     this.listViewModel.switchList(z.viewModel.ListViewModel.STATE.CONVERSATIONS);
 
-    if (this.userBubble) {
-      this.userBubble.hide();
-    }
-
-    if (this.inviteBubble) {
-      this.inviteBubble.hide();
-    }
-
-    this.showMatches(false);
-    this.showSpinner(false);
-
-    this.state(StartUIViewModel.STATE.ADD_PEOPLE);
-    this.searchInput('');
+    this.resetView();
   }
 
   _updatePeopleList() {
