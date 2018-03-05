@@ -39,16 +39,20 @@
       <!-- ko if: isActiveParticipant() -->
         <div class="conversation-details-top-actions">
           <!-- ko if: showActionAddParticipants() -->
-            <div class="panel__action-item" data-bind="click: clickOnAddParticipants, attr:{'title': addPeopleTooltip}" data-uie-name="go-add-people">
-              <add-participants-icon class="panel__action-item__icon"></add-participants-icon>
-              <div class="panel__action-item__text" data-bind="l10n_text: z.string.conversationDetailsActionAddParticipants"></div>
+            <div class="conversation-details__participant-options">
+              <div class="panel__action-item" data-bind="click: clickOnAddParticipants, attr:{'title': addPeopleTooltip}" data-uie-name="go-add-people">
+                <add-participants-icon class="panel__action-item__icon"></add-participants-icon>
+                <div class="panel__action-item__text" data-bind="l10n_text: z.string.conversationDetailsActionAddParticipants"></div>
+              </div>
             </div>
             <!-- ko if: showActionGuestOptions() -->
-              <div class="panel__action-item conversation-details__guest-options" data-bind="click: clickOnGuestOptions" data-uie-name="go-guest-options">
-                <guest-icon class="panel__action-item__icon"></guest-icon>
-                <div class="panel__action-item__text" data-bind="l10n_text: z.string.conversationDetailsActionGuestOptions"></div>
-                <div class="panel__action-item__status" data-bind="l10n_text: guestOptionsText" data-uie-name="status-allow-guests"></div>
-                <disclose-icon></disclose-icon>
+              <div class="conversation-details__guest-options">
+                <div class="panel__action-item" data-bind="click: clickOnGuestOptions" data-uie-name="go-guest-options">
+                  <guest-icon class="panel__action-item__icon"></guest-icon>
+                  <div class="panel__action-item__text" data-bind="l10n_text: z.string.conversationDetailsActionGuestOptions"></div>
+                  <div class="panel__action-item__status" data-bind="l10n_text: guestOptionsText" data-uie-name="status-allow-guests"></div>
+                  <disclose-icon></disclose-icon>
+                </div>
               </div>
             <!-- /ko -->
           <!-- /ko -->

@@ -533,7 +533,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
   click_on_cancel_request(messageEntity) {
     const conversationEntity = this.conversation_repository.active_conversation();
     const nextConversationEntity = this.conversation_repository.get_next_conversation(conversationEntity);
-    this.actionsViewModel.cancelConnectionRequest(messageEntity.otherUser(), nextConversationEntity);
+    this.actionsViewModel.cancelConnectionRequest(messageEntity.otherUser(), true, nextConversationEntity);
   }
 
   click_on_like(message_et, button = true) {

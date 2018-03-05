@@ -27,15 +27,15 @@ device-card {
 
   &:not(.device-card-no-hover) {
     cursor: pointer;
+  }
 
-    &::after {
-      .icon-mixin('\e111', @icon-size-sm);
-      color: @graphite;
-      pointer-events: none;
-      position: absolute;
-      right: 0;
-      top: 50%;
-      transform: translateY(-50%) scale(0.5);
+  disclose-icon {
+    display: flex;
+    align-self: center;
+    height: 8px;
+
+    path {
+      fill: fade(@graphite-dark, 40%);
     }
   }
 }
