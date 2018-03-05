@@ -340,12 +340,18 @@ z.viewModel.ListViewModel = class ListViewModel {
 
   clickToBlock(conversationEntity) {
     const nextConversationEntity = this._getNextConversation(conversationEntity);
-    this.actionsViewModel.blockUser(conversationEntity.firstUserEntity(), nextConversationEntity);
+    const hideConversation = !!nextConversationEntity;
+    const userEntity = conversationEntity.firstUserEntity();
+
+    this.actionsViewModel.blockUser(userEntity, hideConversation, nextConversationEntity);
   }
 
   clickToCancelRequest(conversationEntity) {
     const nextConversationEntity = this._getNextConversation(conversationEntity);
-    this.actionsViewModel.cancelConnectionRequest(conversationEntity.firstUserEntity(), nextConversationEntity);
+    const hideConversation = !!nextConversationEntity;
+    const userEntity = conversationEntity.firstUserEntity();
+
+    this.actionsViewModel.cancelConnectionRequest(userEntity, hideConversation, nextConversationEntity);
   }
 
   clickToClear(conversationEntity = this.conversationRepository.active_conversation()) {

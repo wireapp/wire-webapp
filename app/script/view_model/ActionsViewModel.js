@@ -32,7 +32,7 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
 
   acceptConnectionRequest(userEntity, showConversation) {
     if (userEntity) {
-      return this.userRepository.accept_connection_request(userEntity, showConversation);
+      return this.userRepository.acceptConnectionRequest(userEntity, showConversation);
     }
   }
 
@@ -42,10 +42,10 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
     }
   }
 
-  blockUser(userEntity, nextConversationEntity) {
+  blockUser(userEntity, hideConversation, nextConversationEntity) {
     if (userEntity) {
       amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
-        action: () => this.userRepository.block_user(userEntity, nextConversationEntity),
+        action: () => this.userRepository.blockUser(userEntity, hideConversation, nextConversationEntity),
         text: {
           action: z.l10n.text(z.string.modalUserBlockAction),
           message: z.l10n.text(z.string.modalUserBlockMessage, userEntity.first_name()),
@@ -55,10 +55,10 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
     }
   }
 
-  cancelConnectionRequest(userEntity, nextConversationEntity) {
+  cancelConnectionRequest(userEntity, hideConversation, nextConversationEntity) {
     if (userEntity) {
       amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
-        action: () => this.userRepository.cancel_connection_request(userEntity, nextConversationEntity),
+        action: () => this.userRepository.cancelConnectionRequest(userEntity, hideConversation, nextConversationEntity),
         text: {
           action: z.l10n.text(z.string.modalConnectCancelAction),
           message: z.l10n.text(z.string.modalConnectCancelMessage, userEntity.first_name()),
@@ -128,7 +128,7 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
 
   ignoreConnectionRequest(userEntity) {
     if (userEntity) {
-      return this.userRepository.ignore_connection_request(userEntity);
+      return this.userRepository.ignoreConnectionRequest(userEntity);
     }
   }
 
@@ -192,7 +192,7 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
 
   sendConnectionRequest(userEntity, showConversation) {
     if (userEntity) {
-      return this.userRepository.create_connection(userEntity, showConversation);
+      return this.userRepository.createConnection(userEntity, showConversation);
     }
   }
 
@@ -207,7 +207,7 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
       amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
         action: () => {
           this.userRepository
-            .unblock_user(userEntity, showConversation)
+            .unblockUser(userEntity, showConversation)
             .then(() => this.conversationRepository.get_1to1_conversation(userEntity))
             .then(conversationEntity => this.conversationRepository.update_participating_user_ets(conversationEntity));
         },

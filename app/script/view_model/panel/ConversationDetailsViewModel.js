@@ -188,13 +188,17 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
   }
 
   clickToBlock() {
+    const userEntity = this.conversationEntity().firstUserEntity();
     const nextConversationEntity = this.conversationRepository.get_next_conversation(this.conversationEntity());
-    this.actionsViewModel.blockUser(this.conversationEntity().firstUserEntity(), nextConversationEntity);
+
+    this.actionsViewModel.blockUser(userEntity, true, nextConversationEntity);
   }
 
   clickToCancelRequest() {
+    const userEntity = this.conversationEntity().firstUserEntity();
     const nextConversationEntity = this.conversationRepository.get_next_conversation(this.conversationEntity());
-    this.actionsViewModel.cancelConnectionRequest(this.conversationEntity().firstUserEntity(), nextConversationEntity);
+
+    this.actionsViewModel.cancelConnectionRequest(userEntity, true, nextConversationEntity);
   }
 
   clickToClear() {
