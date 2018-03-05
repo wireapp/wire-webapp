@@ -269,7 +269,13 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       for (const file of [...files]) {
         if (file.size > z.config.MAXIMUM_ASSET_FILE_SIZE) {
           const fileSize = z.util.format_bytes(z.config.MAXIMUM_ASSET_FILE_SIZE);
-          const options = {text: {message: z.l10n.text(z.string.modalAssetTooLargeMessage, fileSize)}};
+          const options = {
+            text: {
+              message: z.l10n.text(z.string.modalAssetTooLargeMessage, fileSize),
+              title: z.l10n.text(z.string.modalAssetTooLargeHeadline),
+            },
+          };
+
           return amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, options);
         }
       }
@@ -314,9 +320,16 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
   _show_upload_warning(image) {
     const isGif = image.type === 'image/gif';
-    const stringId = isGif ? z.string.modalGifTooLargeMessage : z.string.modalPictureTooLargeMessage;
+    const messageStringId = isGif ? z.string.modalGifTooLargeMessage : z.string.modalPictureTooLargeMessage;
+    const titleStringId = isGif ? z.string.modalGifTooLargeHeadline : z.string.modalPictureTooLargeHeadline;
 
-    const modalOptions = {text: {message: z.l10n.text(stringId, z.config.MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024)}};
+    const modalOptions = {
+      text: {
+        message: z.l10n.text(messageStringId, z.config.MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024),
+        title: z.l10n.text(titleStringId),
+      },
+    };
+
     amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
   }
 
@@ -325,11 +338,14 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     const is_hitting_upload_limit = pending_uploads + files.length > z.config.MAXIMUM_ASSET_UPLOADS;
 
     if (is_hitting_upload_limit) {
-      amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, {
+      const modalOptions = {
         text: {
           message: z.l10n.text(z.string.modalAssetParallelUploadsMessage, z.config.MAXIMUM_ASSET_UPLOADS),
+          title: z.l10n.text(z.string.modalAssetParallelUploadsHeadline),
         },
-      });
+      };
+
+      amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
     }
 
     return is_hitting_upload_limit;
