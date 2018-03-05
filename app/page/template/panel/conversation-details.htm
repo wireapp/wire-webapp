@@ -13,7 +13,7 @@
             <div class="conversation-details__name" data-bind="text: conversationEntity().display_name()"></div>
             <edit-icon class="conversation-details__name__icon"></edit-icon>
           </div>
-          <textarea class="conversation-details__name" data-bind="visible: isEditingName, value: conversationEntity().display_name(), enter: renameConversation, hasFocus: isEditingName, resize" maxlength="64" dir="auto" data-uie-name="enter-name"></textarea>
+          <textarea class="conversation-details__name conversation-details__name--input" spellcheck="false" data-bind="visible: isEditingName, value: conversationEntity().display_name(), enter: renameConversation, hasFocus: isEditingName, resize" maxlength="64" dir="auto" data-uie-name="enter-name"></textarea>
         <!-- /ko -->
         <!-- ko ifnot: isNameEditable() -->
           <div class="conversation-details__name" data-bind="text: conversationEntity().display_name(), css: {'conversation-details__name--centered': conversationEntity().is_one2one}" data-uie-name="status-name"></div>
