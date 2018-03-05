@@ -358,26 +358,26 @@
   version "3.0.6"
   resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-3.0.6.tgz#2e5e76b7554f3d1dc8cc3b8bc1c074e7cdc49d78"
 
-"@wireapp/core@2.0.47":
-  version "2.0.47"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-2.0.47.tgz#beb879c7b1f1024e10ba8e8322e8244dbc0667e5"
+"@wireapp/core@2.0.49":
+  version "2.0.49"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-2.0.49.tgz#8990e4ec8e19274ddc266252df25f5e3075c3f82"
   dependencies:
     "@types/node" "9.4.6"
     "@wireapp/api-client" "0.5.3"
-    "@wireapp/cryptobox" "8.1.9"
+    "@wireapp/cryptobox" "8.1.11"
     "@wireapp/store-engine" "0.3.4"
     bazinga64 "5.0.3"
     protobufjs "6.8.6"
     pure-uuid "1.5.0"
 
-"@wireapp/cryptobox@8.1.9":
-  version "8.1.9"
-  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-8.1.9.tgz#2c0f6af4799f91df4e100992e6ae598e68c15a75"
+"@wireapp/cryptobox@8.1.11":
+  version "8.1.11"
+  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-8.1.11.tgz#96f3b16a87df198b95692560894feb16f06b2244"
   dependencies:
     "@types/fs-extra" "5.0.1"
     "@types/node" "9.3.0"
     "@wireapp/lru-cache" "2.0.9"
-    "@wireapp/proteus" "7.1.4"
+    "@wireapp/proteus" "7.1.5"
     "@wireapp/store-engine" "0.3.4"
     dexie "2.0.2"
     fs-extra "5.0.0"
@@ -389,9 +389,9 @@
   dependencies:
     webpack "3.11.0"
 
-"@wireapp/proteus@7.1.4":
-  version "7.1.4"
-  resolved "https://registry.yarnpkg.com/@wireapp/proteus/-/proteus-7.1.4.tgz#758ec17aa50c36ebe8ca4c517897bc7e819dc851"
+"@wireapp/proteus@7.1.5":
+  version "7.1.5"
+  resolved "https://registry.yarnpkg.com/@wireapp/proteus/-/proteus-7.1.5.tgz#acb8a969ccd20fbd8f55ad1324188c39016f16c7"
   dependencies:
     "@types/chai" "4.1.2"
     "@types/ed2curve" "0.2.2"
@@ -832,15 +832,15 @@ atob@^2.0.0:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/atob/-/atob-2.0.3.tgz#19c7a760473774468f20b2d2d03372ad7d4cbf5d"
 
-autoprefixer@8.0.0:
-  version "8.0.0"
-  resolved "https://registry.yarnpkg.com/autoprefixer/-/autoprefixer-8.0.0.tgz#c19e480f061013127c373df0b01cf46919943f74"
+autoprefixer@8.1.0:
+  version "8.1.0"
+  resolved "https://registry.yarnpkg.com/autoprefixer/-/autoprefixer-8.1.0.tgz#374cf35be1c0e8fce97408d876f95f66f5cb4641"
   dependencies:
-    browserslist "^3.0.0"
-    caniuse-lite "^1.0.30000808"
+    browserslist "^3.1.1"
+    caniuse-lite "^1.0.30000810"
     normalize-range "^0.1.2"
     num2fraction "^1.2.2"
-    postcss "^6.0.17"
+    postcss "^6.0.19"
     postcss-value-parser "^3.2.3"
 
 autoprefixer@^6.3.1:
@@ -1837,11 +1837,11 @@ browserslist@^2.0.0, browserslist@^2.1.2, browserslist@^2.5.1:
     caniuse-lite "^1.0.30000755"
     electron-to-chromium "^1.3.27"
 
-browserslist@^3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/browserslist/-/browserslist-3.0.0.tgz#5b41520c1a5ce6d0d2fe7c44bdf30e526b650403"
+browserslist@^3.1.1:
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/browserslist/-/browserslist-3.1.1.tgz#d380fc048bc3a33e60fb87dc135110ebaaa6320a"
   dependencies:
-    caniuse-lite "^1.0.30000807"
+    caniuse-lite "^1.0.30000809"
     electron-to-chromium "^1.3.33"
 
 buffer-crc32@^0.2.1:
@@ -2012,9 +2012,13 @@ caniuse-db@^1.0.30000529, caniuse-db@^1.0.30000634, caniuse-db@^1.0.30000639:
   version "1.0.30000756"
   resolved "https://registry.yarnpkg.com/caniuse-db/-/caniuse-db-1.0.30000756.tgz#e938a6b991630f30d2263dd3458beb65d362268b"
 
-caniuse-lite@^1.0.0, caniuse-lite@^1.0.30000748, caniuse-lite@^1.0.30000755, caniuse-lite@^1.0.30000807, caniuse-lite@^1.0.30000808:
+caniuse-lite@^1.0.0, caniuse-lite@^1.0.30000748, caniuse-lite@^1.0.30000755:
   version "1.0.30000808"
   resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30000808.tgz#7d759b5518529ea08b6705a19e70dbf401628ffc"
+
+caniuse-lite@^1.0.30000809, caniuse-lite@^1.0.30000810:
+  version "1.0.30000812"
+  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30000812.tgz#d173b686b49bc941fa18ff2e7e533048e20ed92c"
 
 caseless@~0.11.0:
   version "0.11.0"
@@ -3425,9 +3429,9 @@ eslint-visitor-keys@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/eslint-visitor-keys/-/eslint-visitor-keys-1.0.0.tgz#3f3180fb2e291017716acb4c9d6d5b5c34a6a81d"
 
-eslint@4.18.1:
-  version "4.18.1"
-  resolved "https://registry.yarnpkg.com/eslint/-/eslint-4.18.1.tgz#b9138440cb1e98b2f44a0d578c6ecf8eae6150b0"
+eslint@4.18.2:
+  version "4.18.2"
+  resolved "https://registry.yarnpkg.com/eslint/-/eslint-4.18.2.tgz#0f81267ad1012e7d2051e186a9004cc2267b8d45"
   dependencies:
     ajv "^5.3.0"
     babel-code-frame "^6.22.0"
@@ -3464,7 +3468,7 @@ eslint@4.18.1:
     semver "^5.3.0"
     strip-ansi "^4.0.0"
     strip-json-comments "~2.0.1"
-    table "^4.0.1"
+    table "4.0.2"
     text-table "~0.2.0"
 
 espree@^3.5.2:
@@ -7953,7 +7957,7 @@ postcss@^5.0.10, postcss@^5.0.11, postcss@^5.0.12, postcss@^5.0.13, postcss@^5.0
     source-map "^0.5.6"
     supports-color "^3.2.3"
 
-postcss@^6.0, postcss@^6.0.0, postcss@^6.0.1, postcss@^6.0.11, postcss@^6.0.13, postcss@^6.0.17, postcss@^6.0.19, postcss@^6.0.5, postcss@^6.0.6:
+postcss@^6.0, postcss@^6.0.0, postcss@^6.0.1, postcss@^6.0.11, postcss@^6.0.13, postcss@^6.0.19, postcss@^6.0.5, postcss@^6.0.6:
   version "6.0.19"
   resolved "https://registry.yarnpkg.com/postcss/-/postcss-6.0.19.tgz#76a78386f670b9d9494a655bf23ac012effd1555"
   dependencies:
@@ -9776,7 +9780,7 @@ syntax-error@^1.1.1:
   dependencies:
     acorn "^4.0.3"
 
-table@^4.0.1:
+table@4.0.2:
   version "4.0.2"
   resolved "https://registry.yarnpkg.com/table/-/table-4.0.2.tgz#a33447375391e766ad34d3486e6e2aedc84d2e36"
   dependencies:
@@ -10029,9 +10033,9 @@ uglify-es@^3.3.4:
     commander "~2.13.0"
     source-map "~0.6.1"
 
-uglify-js@3.3.12:
-  version "3.3.12"
-  resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-3.3.12.tgz#efd87c16a1f4c674a8a5ede571001ef634dcc883"
+uglify-js@3.3.13:
+  version "3.3.13"
+  resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-3.3.13.tgz#8a1a89eeb16e2d6a66b0db2b04cb871af3c669cf"
   dependencies:
     commander "~2.14.1"
     source-map "~0.6.1"
