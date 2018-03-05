@@ -233,7 +233,7 @@ z.string.modalConversationGuestOptionsRevokeCodeMessage = 'Could not revoke acce
 z.string.modalConversationGuestOptionsToggleGuestsMessage = 'Could not change guests state.';
 
 z.string.modalConversationTooManyMembersHeadline = 'Full house';
-z.string.modalConversationTooManyMembersMessage = 'Up to {{number1}} people can join a conversation. There is room for {{number2}} more people in here.';
+z.string.modalConversationTooManyMembersMessage = 'Up to {{number1}} people can join a conversation. Currently there is only room for {{number2}} more people.';
 
 z.string.modalGifTooLargeHeadline = 'Selected animation is too large.';
 z.string.modalGifTooLargeMessage = 'Maximum size is {{number}} MB.';
