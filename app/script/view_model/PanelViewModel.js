@@ -41,6 +41,7 @@ z.viewModel.PanelViewModel = class PanelViewModel {
   constructor(mainViewModel, repositories) {
     this.closePanelOnChange = this.closePanelOnChange.bind(this);
     this.showParticipant = this.showParticipant.bind(this);
+    this.switchContent = this.switchContent.bind(this);
     this.togglePanel = this.togglePanel.bind(this);
 
     this.elementId = 'right-column';
@@ -81,6 +82,7 @@ z.viewModel.PanelViewModel = class PanelViewModel {
 
     this.conversationEntity.subscribe(this.closePanelOnChange, null, 'beforeChange');
 
+    amplify.subscribe(z.event.WebApp.CONTENT.SWITCH, this.switchContent);
     amplify.subscribe(z.event.WebApp.PEOPLE.TOGGLE, this.togglePanel);
     amplify.subscribe(z.event.WebApp.PEOPLE.SHOW, this.showParticipant);
 
@@ -151,6 +153,13 @@ z.viewModel.PanelViewModel = class PanelViewModel {
   showParticipantDevices(userEntity) {
     this.participantDevices.showParticipantDevices(userEntity);
     this.switchState(PanelViewModel.STATE.PARTICIPANT_DEVICES);
+  }
+
+  switchContent(newContentState) {
+    const stateIsCollection = newContentState === z.viewModel.ContentViewModel.STATE.COLLECTION;
+    if (stateIsCollection) {
+      this.closePanelOnChange();
+    }
   }
 
   switchState(newState) {
