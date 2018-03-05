@@ -137,7 +137,10 @@ z.string.modalAccountRemoveDeviceHeadline = 'Remove "{{device}}"';
 z.string.modalAccountRemoveDeviceMessage = 'Your password is required to remove the device.';
 z.string.modalAccountRemoveDevicePlaceholder = 'Password';
 
+z.string.modalAssetTooLargeHeadline = 'File too large';
 z.string.modalAssetTooLargeMessage = 'You can send files up to {{number}}';
+
+z.string.modalAssetParallelUploadsHeadline = 'Too many files at once';
 z.string.modalAssetParallelUploadsMessage = 'You can send up to {{number}} files at once.';
 
 z.string.modalCallEmptyConversationHeadline = 'No one to call';
@@ -232,14 +235,20 @@ z.string.modalConversationGuestOptionsToggleGuestsMessage = 'Could not change gu
 z.string.modalConversationTooManyMembersHeadline = 'Full house';
 z.string.modalConversationTooManyMembersMessage = 'Up to {{number1}} people can join a conversation. There is room for {{number2}} more people in here.';
 
-z.string.modalGifTooLargeMessage = 'Animation is too large.\nMaximum size is {{number}} MB.';
+z.string.modalGifTooLargeHeadline = 'Selected animation is too large.';
+z.string.modalGifTooLargeMessage = 'Maximum size is {{number}} MB.';
 
 z.string.modalIntegrationUnavailableHeadline = 'Bots currently unavailable';
 z.string.modalIntegrationUnavailableMessage = 'Thank you for your interest in bots. The service is currently suspended while we work on the next version. Stay tuned.';
 
-z.string.modalPictureFileFormatMessage = 'Can’t use this picture.\nPlease choose a PNG or JPEG file.';
-z.string.modalPictureTooLargeMessage = 'This picture is too large.\nYou can upload files up to {{number}} MB.';
-z.string.modalPictureTooSmallMessage = 'Can’t use this picture.\nPlease choose a picture that’s at least 320 x 320 px.';
+z.string.modalPictureFileFormatHeadline = 'Can’t use this picture.';
+z.string.modalPictureFileFormatMessage = 'Please choose a PNG or JPEG file.';
+
+z.string.modalPictureTooLargeHeadline = 'Selected picture is too large.';
+z.string.modalPictureTooLargeMessage = 'You use pictures up to {{number}} MB.';
+
+z.string.modalPictureTooSmallMessage = 'Picture too small';
+z.string.modalPictureTooSmallMessage = 'Please choose a picture that’s at least 320 x 320 px.';
 
 z.string.modalServiceUnavailableHeadline = 'Adding service not possible';
 z.string.modalServiceUnavailableMessage = 'The service is unavailable a the moment.';
