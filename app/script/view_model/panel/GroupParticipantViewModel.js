@@ -130,7 +130,9 @@ z.viewModel.panel.GroupParticipantViewModel = class GroupParticipantViewModel {
   }
 
   clickToRemove() {
-    this.actionsViewModel.removeFromConversation(this.conversationEntity(), this.selectedParticipant());
+    this.actionsViewModel
+      .removeFromConversation(this.conversationEntity(), this.selectedParticipant())
+      .then(() => this.clickOnBack());
   }
 
   clickToSendRequest() {

@@ -179,13 +179,18 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
         return this.integrationRepository.removeService(conversationEntity, userEntity);
       }
 
-      amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
-        action: () => this.conversationRepository.removeMember(conversationEntity, userEntity.id),
-        text: {
-          action: z.l10n.text(z.string.modalConversationRemoveAction),
-          message: z.l10n.text(z.string.modalConversationRemoveMessage, userEntity.first_name()),
-          title: z.l10n.text(z.string.modalConversationRemoveHeadline),
-        },
+      return new Promise(resolve => {
+        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
+          action: () => {
+            this.conversationRepository.removeMember(conversationEntity, userEntity.id);
+            resolve();
+          },
+          text: {
+            action: z.l10n.text(z.string.modalConversationRemoveAction),
+            message: z.l10n.text(z.string.modalConversationRemoveMessage, userEntity.first_name()),
+            title: z.l10n.text(z.string.modalConversationRemoveHeadline),
+          },
+        });
       });
     }
   }
