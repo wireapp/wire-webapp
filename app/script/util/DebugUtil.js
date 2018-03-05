@@ -31,7 +31,7 @@ z.util.DebugUtil = class DebugUtil {
   }
 
   block_all_connections() {
-    const block_users = wire.app.repository.user.users().map(user_et => this.user_repository.block_user(user_et));
+    const block_users = wire.app.repository.user.users().map(user_et => this.user_repository.blockUser(user_et));
     return Promise.all(block_users);
   }
 
