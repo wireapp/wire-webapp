@@ -64,7 +64,7 @@
     "speakingurl": "14.0.1"
   },
   "devDependencies": {
-    "autoprefixer": "8.0.0",
+    "autoprefixer": "8.1.0",
     "babel-core": "6.26.0",
     "babel-eslint": "8.2.2",
     "babel-loader": "7.1.3",
