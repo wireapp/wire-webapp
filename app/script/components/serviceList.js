@@ -54,7 +54,7 @@ ko.components.register('service-list', {
       <participant-item params="participant: $data" data-bind="click: $parent.onClick, css: {'no-underline': $parent.altStyle, 'show-arrow': $parent.altStyle}"></participant-item>
     </div>
     <!-- ko if: isSearching() && !services().length -->
-      <div class="no-results" data-bind="l10n_text: z.string.peopleNoMatches"></div>
+      <div class="no-results" data-bind="l10n_text: z.string.searchListNoMatches"></div>
     <!-- /ko -->
   `,
   viewModel: z.components.ServiceList,
