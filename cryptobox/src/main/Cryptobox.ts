@@ -104,11 +104,12 @@ class Cryptobox extends EventEmitter {
       .load_identity()
       .then((identity: ProteusKeys.IdentityKeyPair | undefined) => {
         if (identity) {
+          this.identity = identity;
+
           this.logger.log(
             `Initialized Cryptobox with existing local identity. Fingerprint is "${identity.public_key.fingerprint()}".`,
             this.identity
           );
-          this.identity = identity;
 
           this.logger.log(`Loading PreKeys...`);
           return this.store.load_prekeys();
