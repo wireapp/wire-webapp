@@ -22,20 +22,42 @@
     margin: 8px;
   }
 
-  .participants-search-tabs {
-    border-bottom: 1px solid #eee;
+  &__tabs {
+    display: flex;
+    height: 44px;
+    padding: 0 8px;
     margin-bottom: 0;
+    border-bottom: 1px solid #eee;
+  }
 
-    .participants-search-tab {
-      margin-bottom: -1px;
+  &__tab {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
-      &:first-child {
-        margin-left: 8px;
-      }
+    color: @graphite-dark;
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
 
-      &:last-child {
-        margin-right: 8px;
-      }
+    border-bottom: 1px solid transparent;
+    cursor: pointer;
+    opacity: 0.56;
+    margin-bottom: -1px;
+
+    &--active {
+      border-bottom-color: fade(@graphite-dark, 40%);
+      opacity: 1;
+      cursor: default;
+    }
+
+    &:first-child {
+      margin-left: 8px;
+    }
+
+    &:last-child {
+      margin-right: 8px;
     }
   }
 

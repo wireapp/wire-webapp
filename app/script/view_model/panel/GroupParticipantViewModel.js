@@ -48,12 +48,16 @@ z.viewModel.panel.GroupParticipantViewModel = class GroupParticipantViewModel {
 
     this.isVisible = ko.pureComputed(() => this.panelViewModel.groupParticipantVisible() && this.selectedParticipant());
 
+    this.selectedIsConnected = ko.pureComputed(() => {
+      return this.selectedParticipant().is_connected() || this.selectedParticipant().is_team_member();
+    });
     this.selectedIsInConversation = ko.pureComputed(() => {
       if (this.isVisible()) {
         const participatingUserIds = this.conversationEntity().participating_user_ids();
         return participatingUserIds.some(id => this.selectedParticipant().id === id);
       }
     });
+
     this.selfIsActiveMember = ko.pureComputed(() => {
       if (this.isVisible()) {
         return !this.conversationEntity().removed_from_conversation() && !this.conversationEntity().is_guest();
@@ -66,11 +70,9 @@ z.viewModel.panel.GroupParticipantViewModel = class GroupParticipantViewModel {
     this.showActionBlock = ko.pureComputed(() => {
       return this.selectedParticipant().is_connected() || this.selectedParticipant().is_request();
     });
-    this.showActionDevices = ko.pureComputed(() => {
-      return this.selectedParticipant().is_connected() || this.selectedParticipant().is_team_member();
-    });
+    this.showActionDevices = ko.pureComputed(() => this.selectedIsConnected());
     this.showActionOpenConversation = ko.pureComputed(() => {
-      return this.selectedParticipant().is_connected() || this.selectedParticipant().is_team_member();
+      return this.selectedIsConnected() && !this.selectedParticipant().is_me;
     });
     this.showActionRemove = ko.pureComputed(() => this.selfIsActiveMember() && this.selectedIsInConversation());
     this.showActionSelfProfile = ko.pureComputed(() => this.selectedParticipant().is_me);
@@ -80,7 +82,7 @@ z.viewModel.panel.GroupParticipantViewModel = class GroupParticipantViewModel {
       return isNotConnectedUser && canConnect;
     });
     this.showActionLeave = ko.pureComputed(() => {
-      return this.selectedParticipant().is_me && !this.conversationEntity.removed_from_conversation();
+      return this.selectedParticipant().is_me && !this.conversationEntity().removed_from_conversation();
     });
     this.showActionUnblock = ko.pureComputed(() => this.selectedParticipant().is_blocked());
     this.showGroupParticipant = this.showGroupParticipant.bind(this);
