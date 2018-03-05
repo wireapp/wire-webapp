@@ -142,8 +142,10 @@ z.viewModel.PanelViewModel = class PanelViewModel {
           return this.closePanel();
         }
       }
-    } else if (isSingleModeConversation && !userEntity.is_me) {
-      return this._openPanel(PanelViewModel.STATE.CONVERSATION);
+    }
+
+    if (isSingleModeConversation && !userEntity.is_me) {
+      return this._openPanel(PanelViewModel.STATE.CONVERSATION_DETAILS);
     }
 
     this.groupParticipant.showGroupParticipant(userEntity);
