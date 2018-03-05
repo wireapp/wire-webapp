@@ -112,13 +112,11 @@ z.viewModel.panel.GroupParticipantViewModel = class GroupParticipantViewModel {
   }
 
   clickToBlock() {
-    const nextConversationEntity = this.conversationRepository.get_next_conversation(this.conversationEntity());
-    this.actionsViewModel.blockUser(this.selectedParticipant(), true, nextConversationEntity);
+    this.actionsViewModel.blockUser(this.selectedParticipant());
   }
 
-  clickToCancelRequest(conversationEntity) {
-    const nextConversationEntity = this.conversationRepository.get_next_conversation(conversationEntity);
-    this.actionsViewModel.cancelConnectionRequest(this.selectedParticipant(), true, nextConversationEntity);
+  clickToCancelRequest() {
+    this.actionsViewModel.cancelConnectionRequest(this.selectedParticipant());
   }
 
   clickToIgnoreRequest() {

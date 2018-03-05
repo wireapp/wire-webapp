@@ -344,17 +344,17 @@ z.viewModel.ListViewModel = class ListViewModel {
   }
 
   clickToBlock(conversationEntity) {
-    const nextConversationEntity = this._getNextConversation(conversationEntity);
-    const hideConversation = !!nextConversationEntity;
     const userEntity = conversationEntity.firstUserEntity();
+    const hideConversation = this._shouldHideConversation(conversationEntity);
+    const nextConversationEntity = this.conversationRepository.get_next_conversation(conversationEntity);
 
     this.actionsViewModel.blockUser(userEntity, hideConversation, nextConversationEntity);
   }
 
   clickToCancelRequest(conversationEntity) {
-    const nextConversationEntity = this._getNextConversation(conversationEntity);
-    const hideConversation = !!nextConversationEntity;
     const userEntity = conversationEntity.firstUserEntity();
+    const hideConversation = this._shouldHideConversation(conversationEntity);
+    const nextConversationEntity = this.conversationRepository.get_next_conversation(conversationEntity);
 
     this.actionsViewModel.cancelConnectionRequest(userEntity, hideConversation, nextConversationEntity);
   }
@@ -379,12 +379,10 @@ z.viewModel.ListViewModel = class ListViewModel {
     });
   }
 
-  _getNextConversation(conversationEntity) {
+  _shouldHideConversation(conversationEntity) {
     const isStateConversations = this.state() === ListViewModel.STATE.CONVERSATIONS;
     const isActiveConversation = this.conversationRepository.is_active_conversation(conversationEntity);
 
-    if (isStateConversations && isActiveConversation) {
-      return this.conversationRepository.get_next_conversation(conversationEntity);
-    }
+    return isStateConversations && isActiveConversation;
   }
 };
