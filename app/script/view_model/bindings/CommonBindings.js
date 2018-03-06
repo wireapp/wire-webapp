@@ -342,7 +342,7 @@ ko.bindingHandlers.newAntiscroll = {
     $element.antiscroll({
       autoHide: true,
       autoWrap: true,
-      debug: false,
+      debug: true,
       notHorizontal: true,
     });
 
@@ -351,7 +351,7 @@ ko.bindingHandlers.newAntiscroll = {
     const intervalId = window.setInterval(() => {
       if (element.scrollHeight !== scrollHeight) {
         scrollHeight = element.scrollHeight;
-        antiscroll.refresh();
+        antiscroll.rebuild();
       }
     }, 100);
 

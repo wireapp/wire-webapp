@@ -34,6 +34,19 @@
     }
   }
 
+  &__content {
+    overflow-x: hidden;
+    overflow-y: scroll;
+    position: absolute;
+    top: @content-title-bar-height;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    &__scroll {
+      width: 100%;
+    }
+  }
+
   &__action-item {
     height: 48px;
     border-bottom: 1px solid fade(@graphite-dark, 8%);
