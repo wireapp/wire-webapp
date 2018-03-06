@@ -21,7 +21,7 @@
           <!-- /ko -->
           <!-- ko ifnot: isNameEditable() -->
             <div class="conversation-details__name" data-bind="css: {'conversation-details__name--centered': conversationEntity().is_one2one}">
-              <div style="display:flex;flex-direction:row;">
+              <div class="conversation-details__flex-row">
                 <!-- ko if: isVerified() -->
                   <verified-icon class="conversation-details__name__verified-icon" data-uie-name="status-verified-conversation"></verified-icon>
                 <!-- /ko -->
