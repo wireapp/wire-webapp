@@ -184,7 +184,7 @@ z.viewModel.panel.ParticipantDevicesViewModel = class ParticipantDevicesViewMode
   resetView() {
     this.showSelfFingerprint(false);
     this.selectedClient(undefined);
-    this.deviceMode(ParticipantDevicesViewModel.STATE.REQUESTING);
+    this.deviceMode(ParticipantDevicesViewModel.MODE.REQUESTING);
 
     if (this.selectedClientSubscription) {
       this.selectedClientSubscription.dispose();
