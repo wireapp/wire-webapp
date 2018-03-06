@@ -2293,8 +2293,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
               messageStringId = z.string.modalConversationNewDeviceOutgoingCallMessage;
               break;
             default:
-              actionStringId = z.string.modalConversationNewDeviceMessage;
-              messageStringId = z.string.modalConversationNewDeviceAction;
+              actionStringId = z.string.modalConversationNewDeviceAction;
+              messageStringId = z.string.modalConversationNewDeviceMessage;
               break;
           }
 
