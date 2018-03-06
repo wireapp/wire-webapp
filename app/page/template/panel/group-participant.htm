@@ -45,7 +45,7 @@
               <div class="panel__action-item__text" data-bind="l10n_text: z.string.groupParticipantActionOpenConversation"></div>
             </div>
           <!-- /ko -->
-          <!-- ko if: showActionsIncomingRequest() -->
+          <!-- ko if: true || showActionsIncomingRequest() -->
             <div class="panel__action-item" data-bind="click: clickToAcceptRequest" data-uie-name="do-accept-request">
               <check-icon class="panel__action-item__icon"></check-icon>
               <div class="panel__action-item__text" data-bind="l10n_text: z.string.groupParticipantActionIncomingRequest"></div>
