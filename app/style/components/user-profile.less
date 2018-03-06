@@ -49,12 +49,6 @@ user-profile {
   text-align: center;
 }
 
-.user-profile-user-verified {
-  position: absolute;
-  top: 24px;
-  right: 18px;
-}
-
 .user-profile-details {
   align-items: center;
   display: flex;
@@ -64,28 +58,9 @@ user-profile {
   position: relative;
 }
 
-.user-profile-details-availability {
-  margin-top: 24px;
-  align-items: flex-end;
-
-  .availability-state-label {
-    .label-bold-xs();
-    display: inline-block;
-    line-height: 12px;
-  }
-}
-
 .user-profile-details-avatar {
   .square(@avatar-diameter-xl);
   position: relative;
-}
-
-.user-profile-details-guest-badge {
-  .guest-badge;
-  bottom: -10px;
-  left: 50%;
-  position: absolute;
-  transform: translateX(-50%);
 }
 
 .user-profile-footer {
@@ -120,17 +95,4 @@ user-profile {
     border-bottom-left-radius: 2px;
     border-bottom-right-radius: 2px;
   }
-}
-
-.user-profile-top-right-button {
-  position: absolute;
-  right: 18px;
-  top: 18px;
-}
-
-// common
-.user-profile-back-button {
-  position: absolute;
-  left: 18px;
-  top: 18px;
 }
