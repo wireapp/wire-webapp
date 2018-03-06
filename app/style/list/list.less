@@ -110,6 +110,17 @@
   position: relative;
   width: 100%;
 
+  &::after {
+    content: '';
+    background-color: currentColor;
+    bottom: 0;
+    left: @left-list-item-left-width;
+    height: 1px;
+    opacity: 0.06;
+    position: absolute;
+    right: 0;
+  }
+
   &.left-list-item-clickable {
     cursor: pointer;
   }
