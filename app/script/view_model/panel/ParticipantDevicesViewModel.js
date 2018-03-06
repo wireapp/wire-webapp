@@ -42,6 +42,7 @@ z.viewModel.panel.ParticipantDevicesViewModel = class ParticipantDevicesViewMode
     this.logger = new z.util.Logger('z.viewModel.panel.ParticipantDevicesViewModel', z.config.LOGGER.OPTIONS);
 
     this.conversationEntity = this.conversationRepository.active_conversation;
+    this.previousState = this.panelViewModel.previousState;
     this.selfClient = this.clientRepository.currentClient;
 
     this.deviceMode = ko.observable(ParticipantDevicesViewModel.MODE.REQUESTING);
@@ -128,7 +129,12 @@ z.viewModel.panel.ParticipantDevicesViewModel = class ParticipantDevicesViewMode
       return this.selectedClient(undefined);
     }
 
-    this.panelViewModel.switchState(this.panelViewModel.previousState);
+    const stateWasGroupParticipant = this.previousState() === z.viewModel.PanelViewModel.STATE.GROUP_PARTICIPANT;
+    if (stateWasGroupParticipant) {
+      return this.panelViewModel.showParticipant(this.userEntity());
+    }
+
+    this.panelViewModel.switchState(this.previousState());
   }
 
   clickOnClose() {
