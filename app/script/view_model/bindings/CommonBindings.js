@@ -333,35 +333,6 @@ ko.subscribable.fn.subscribe_once = function(handler, owner, event_name) {
  * Render antiscroll scrollbar.
  */
 
-ko.bindingHandlers.newAntiscroll = {
-  init(element) {
-    const $element = $(element);
-    const $parent = $element.parent();
-    let scrollHeight = element.scrollHeight;
-
-    $element.antiscroll({
-      autoHide: true,
-      autoWrap: true,
-      debug: true,
-      notHorizontal: true,
-    });
-
-    const antiscroll = $parent.data('antiscroll');
-
-    const intervalId = window.setInterval(() => {
-      if (element.scrollHeight !== scrollHeight) {
-        scrollHeight = element.scrollHeight;
-        antiscroll.rebuild();
-      }
-    }, 100);
-
-    ko.utils.domNodeDisposal.addDisposeCallback(element, () => {
-      window.clearInterval(intervalId);
-      antiscroll.destroy();
-    });
-  },
-};
-
 ko.bindingHandlers.antiscroll = {
   init(element, valueAccessor) {
     let trigger_subscription;

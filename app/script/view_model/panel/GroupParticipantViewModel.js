@@ -87,6 +87,9 @@ z.viewModel.panel.GroupParticipantViewModel = class GroupParticipantViewModel {
     });
     this.showActionUnblock = ko.pureComputed(() => this.selectedParticipant().is_blocked());
     this.showGroupParticipant = this.showGroupParticipant.bind(this);
+    this.shouldUpdateScrollbar = ko
+      .computed(() => this.selectedParticipant() && this.isVisible())
+      .extend({notify: 'always', rateLimit: 500});
   }
 
   clickOnBack() {

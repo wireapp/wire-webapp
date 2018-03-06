@@ -52,6 +52,9 @@ z.viewModel.panel.GuestOptionsViewModel = class GuestOptionsViewModel {
     this.requestAccessCode = this.requestAccessCode.bind(this);
     this.revokeAccessCode = this.revokeAccessCode.bind(this);
     this.copyLink = this.copyLink.bind(this);
+    this.shouldUpdateScrollbar = ko
+      .computed(() => this.isGuestEnabled() && this.hasAccessCode() && this.isVisible())
+      .extend({notify: 'always', rateLimit: 500});
   }
 
   clickOnBack() {

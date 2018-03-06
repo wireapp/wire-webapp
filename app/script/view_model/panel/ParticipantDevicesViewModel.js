@@ -118,6 +118,9 @@ z.viewModel.panel.ParticipantDevicesViewModel = class ParticipantDevicesViewMode
         }
       });
     });
+    this.shouldUpdateScrollbar = ko
+      .computed(() => this.clientEntities() && this.showDeviceDetails() && this.isVisible())
+      .extend({notify: 'always', rateLimit: 500});
   }
 
   clickOnBack() {

@@ -25,6 +25,7 @@
   &__tabs {
     display: flex;
     height: 44px;
+    min-height: 44px;
     padding: 0 8px;
     margin-bottom: 0;
     border-bottom: 1px solid #eee;
@@ -69,6 +70,9 @@
 
   &__list {
     flex-grow: 1;
+    & > .panel__content__scroll {
+      flex-grow: 1;
+    }
   }
 
   &__footer {

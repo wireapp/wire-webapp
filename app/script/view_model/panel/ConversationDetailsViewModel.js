@@ -149,7 +149,9 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
       return this.isTeamOnly() ? z.string.conversationDetailsGuestsOff : z.string.conversationDetailsGuestsOn;
     });
 
-    this.shouldUpdateScrollbar = ko.computed(() => true).extend({notify: 'always', rateLimit: 500});
+    this.shouldUpdateScrollbar = ko
+      .computed(() => this.serviceParticipants() && this.userParticipants() && this.isVisible())
+      .extend({notify: 'always', rateLimit: 500});
 
     const addPeopleShortcut = z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.ADD_PEOPLE);
     this.addPeopleTooltip = ko.pureComputed(() => {
