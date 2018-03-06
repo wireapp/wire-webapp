@@ -101,6 +101,12 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
       }
     });
 
+    this.isVerified = ko.pureComputed(() => {
+      if (this.hasConversation()) {
+        return this.conversationEntity().verification_state() === z.conversation.ConversationVerificationState.VERIFIED;
+      }
+    });
+
     this.isEditingName = ko.observable(false);
     this.isEditingName.subscribe(value => {
       if (!value) {
