@@ -784,8 +784,12 @@ z.main.App = class App {
 // Setting up the App
 //##############################################################################
 
-$(() => {
-  if ($('#wire-main-app').length !== 0) {
-    wire.app = new z.main.App(wire.auth);
-  }
+document.addEventListener('DOMContentLoaded', () => {
+  window.sodium = {
+    onload: () => {
+      if ($('#wire-main-app').length !== 0) {
+        wire.app = new z.main.App(wire.auth);
+      }
+    },
+  };
 });
