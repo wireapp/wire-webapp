@@ -38,6 +38,7 @@ import {
   ErrorMessage,
 } from '@wireapp/react-ui-kit';
 import ROUTE from '../route';
+import EXTERNAL_ROUTE from '../externalRoute';
 import {Link as RRLink} from 'react-router-dom';
 import {connect} from 'react-redux';
 import {injectIntl} from 'react-intl';
@@ -96,7 +97,7 @@ class Login extends React.PureComponent {
         }
         return this.props.doLogin(login);
       })
-      .then(() => window.location.replace(`/${URLUtil.pathWithParams('')}`))
+      .then(() => window.location.replace(URLUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP)))
       .catch(error => {
         if (error.label === BackendError.LABEL.TOO_MANY_CLIENTS) {
           this.props.history.push(ROUTE.CLIENTS);

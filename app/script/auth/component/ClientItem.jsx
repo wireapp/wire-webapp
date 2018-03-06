@@ -34,6 +34,7 @@ import {
 } from '@wireapp/react-ui-kit';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 import ValidationError from '../module/action/ValidationError';
+import EXTERNAL_ROUTE from '../externalRoute';
 import {clientItemStrings} from '../../strings';
 import {injectIntl} from 'react-intl';
 import * as URLUtil from '../util/urlUtil';
@@ -93,7 +94,7 @@ class ClientItem extends React.Component {
         }
       })
       .then(() => this.props.onClientRemoval(this.state.password))
-      .then(() => window.location.replace(`/${URLUtil.pathWithParams('')}`))
+      .then(() => window.location.replace(URLUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP)))
       .catch(error => {
         if (!error.label) {
           throw error;
