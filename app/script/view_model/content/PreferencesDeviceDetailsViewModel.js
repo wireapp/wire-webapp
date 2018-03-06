@@ -38,6 +38,7 @@ z.viewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
     this.cryptographyRepository = repositories.cryptography;
     this.logger = new z.util.Logger('z.viewModel.content.PreferencesDeviceDetailsViewModel', z.config.LOGGER.OPTIONS);
 
+    this.actionsViewModel = mainViewModel.actions;
     this.selfUser = this.clientRepository.selfUser;
 
     this.activationLocation = ko.observableArray([]);
@@ -120,7 +121,7 @@ z.viewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
   }
 
   clickOnRemoveDevice() {
-    this.clientRepository.removeSelfClient(this.device());
+    this.actionsViewModel.deleteClient(this.device());
   }
 
   toggleDeviceVerification() {

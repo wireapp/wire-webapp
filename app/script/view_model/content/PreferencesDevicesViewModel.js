@@ -29,12 +29,13 @@ z.viewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewMo
     this.clickOnShowDevice = this.clickOnShowDevice.bind(this);
     this.updateDeviceInfo = this.updateDeviceInfo.bind(this);
 
-    this.preferencesDeviceDetails = contentViewModel.preferencesDeviceDetails;
     this.clientRepository = repositories.client;
     this.conversationRepository = repositories.conversation;
     this.cryptographyRepository = repositories.cryptography;
     this.logger = new z.util.Logger('z.viewModel.content.PreferencesDevicesViewModel', z.config.LOGGER.OPTIONS);
 
+    this.actionsViewModel = mainViewModel.actions;
+    this.preferencesDeviceDetails = contentViewModel.preferencesDeviceDetails;
     this.currentClient = this.clientRepository.currentClient;
     this.displayClientId = ko.pureComputed(() => (this.currentClient() ? this.currentClient().formatId() : []));
 
@@ -82,7 +83,7 @@ z.viewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewMo
   }
 
   clickOnRemoveDevice(clientEntity, event) {
-    this.clientRepository.removeSelfClient(clientEntity);
+    this.actionsViewModel.deleteClient(clientEntity);
     event.stopPropagation();
   }
 
