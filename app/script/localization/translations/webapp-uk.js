@@ -26,11 +26,6 @@ z.string.uk.and = 'і';
 z.string.uk.enumerationAnd = ', і ';
 
 //=Додаток завантажується
-z.string.uk.alertUploadFileFormat = 'Не вдалося застосувати дану картинку.\nБудь ласка, оберіть файл в форматі PNG або JPEG.';
-z.string.uk.alertUploadTooSmall = 'Не вдалося застосувати дану картинку.\nБудь ласка, оберіть файл роздільною здатністю не менше 320 x 320 пікселів.';
-z.string.uk.alertUploadTooLarge = 'Не вдалося застосувати дану картинку.\nВи можете завантажувати файли розміром до {{number}} МБ.';
-z.string.uk.alertGifTooLarge = 'Файл анімації завеликий.\nМаксимальний розмір —  {{number}} МБ.';
-
 z.string.uk.authAccountCountryCode = 'Код країни';
 z.string.uk.authAccountDeletion = 'Ви вийшли, оскільки ваш акаунт було видалено.';
 z.string.uk.authAccountExpiration = 'Ви вийшли, оскільки термін дії вашої сесії завершився. Будь ласка, увійдіть ще раз.';
@@ -105,79 +100,127 @@ z.string.uk.callJoin = 'Приєднатись';
 z.string.uk.callChooseSharedScreen = 'Оберіть робочий стіл, скріншотами якого ви хочете поділитися';
 z.string.uk.callParticipants = '{{number}} учасників';
 
-z.string.uk.modalButtonCancel = 'Скасувати';
-z.string.uk.modalButtonOk = 'ОК';
-z.string.uk.modalButtonSend = 'Надіслати';
+z.string.uk.modalAcknowledgeAction = 'ОК';
+z.string.uk.modalConfirmSecondary = 'Скасувати';
+z.string.uk.modalOptionSecondary = 'Скасувати';
 
-z.string.uk.modalBlockConversationHeadline = 'Заблокувати {{user}}?';
-z.string.uk.modalBlockConversationMessage = '{{user}} не буде мати можливості зв’язатися з вами або додати вас до групових розмов.';
-z.string.uk.modalBlockConversationButton = 'Заблокувати';
-z.string.uk.modalBotsConfirmHeadline = 'Додати сервіс';
-z.string.uk.modalBotsConfirmMessage = 'Ви впевнені, що хочете почати нову розмову з {{name}}?';
-z.string.uk.modalBotsUnavailableHeadline = 'Боти в даний час недоступні';
-z.string.uk.modalBotsUnavailableMessage = 'Дякуємо вам за інтерес, проявлений до ботів. В даний час ця функціональність заморожена, але ми працюємо над тим, щоб активувати її в наступній версії. Слідкуйте за оновленнями.';
-z.string.uk.modalCallConversationEmptyHeadline = 'Нікому дзвонити';
-z.string.uk.modalCallConversationEmptyMessage = 'Тут більше нікого немає.';
-z.string.uk.modalCallNoVideoInGroupHeadline = 'Відеодзвінки в групах не підтримуються';
-z.string.uk.modalCallNoVideoInGroupMessage = 'Відеодзвінки недоступні в групових розмовах.';
+z.string.uk.modalAccountDeletionAction = 'Видалити';
+z.string.uk.modalAccountDeletionHeadline = 'Видалити акаунт';
+z.string.uk.modalAccountDeletionMessage = 'Ми надішлемо вам повідомлення електронною поштою або через SMS. Перейдіть за посиланням, щоб остаточно видалити свій акаунт.';
+
+z.string.uk.modalAccountLogoutAction = 'Вийти';
+z.string.uk.modalAccountLogoutHeadline = 'Очистити дані?';
+z.string.uk.modalAccountLogoutOption = 'Видалити всі ваші особисті дані та розмови на цьому пристрої.';
+
+z.string.uk.modalAccountNewDevicesSecondary = 'Керування пристроями';
+z.string.uk.modalAccountNewDevicesHeadline = 'Ваш акаунт використовується на:';
+z.string.uk.modalAccountNewDevicesFrom = 'Від:';
+z.string.uk.modalAccountNewDevicesMessage = 'Якщо ви не робили цього, видаліть пристрій і змініть пароль.';
+
+z.string.uk.modalAccountRemoveDeviceAction = 'Видалити пристрій';
+z.string.uk.modalAccountRemoveDeviceHeadline = 'Видалити "{{device}}"';
+z.string.uk.modalAccountRemoveDeviceMessage = 'Для видалення пристрою необхідно ввести ваш пароль.';
+z.string.uk.modalAccountRemoveDevicePlaceholder = 'Пароль';
+
+z.string.uk.modalAssetTooLargeMessage = 'Ви можете надсилати файли до {{number}}';
+
+z.string.uk.modalAssetParallelUploadsMessage = 'Ви можете надіслати до {{number}} файлів за один раз.';
+
+z.string.uk.modalCallEmptyConversationHeadline = 'Нікому дзвонити';
+z.string.uk.modalCallEmptyConversationMessage = 'Тут більше нікого немає.';
+
+z.string.uk.modalCallNoGroupVideoHeadline = 'Відеодзвінки в групах не підтримуються';
+z.string.uk.modalCallNoGroupVideoMessage = 'Відеодзвінки недоступні в групових розмовах.';
+
+z.string.uk.modalCallNoMicrophoneAction = 'Скажіть мені як';
+z.string.uk.modalCallNoMicrophoneMessage = 'Надайте вашому браузеру доступ до мікрофону, щоб робити дзвінки.';
+z.string.uk.modalCallNoMicrophoneHeadline = 'Неможливо здійснити дзвінок без доступу до мікрофону';
+
+z.string.uk.modalCallSecondIncomingAction = 'Відповісти';
 z.string.uk.modalCallSecondIncomingHeadline = 'Відповісти на дзвінок?';
 z.string.uk.modalCallSecondIncomingMessage = 'Поточний дзвінок буде завершено.';
-z.string.uk.modalCallSecondIncomingAction = 'Відповісти';
+
+z.string.uk.modalCallSecondOngoingAction = 'Завершити';
 z.string.uk.modalCallSecondOngoingHeadline = 'Припинити дзвінок на іншому пристрої?';
 z.string.uk.modalCallSecondOngoingMessage = 'Ви можете здійснювати тільки один дзвінок за один раз.';
-z.string.uk.modalCallSecondOngoingAction = 'Завершити';
+
+z.string.uk.modalCallSecondOutgoingAction = 'Завершити';
 z.string.uk.modalCallSecondOutgoingHeadline = 'Завершити поточний дзвінок?';
 z.string.uk.modalCallSecondOutgoingMessage = 'Ви можете здійснювати тільки один дзвінок за один раз.';
-z.string.uk.modalCallSecondOutgoingAction = 'Завершити';
-z.string.uk.modalClearConversationHeadline = 'Видалити вміст?';
-z.string.uk.modalClearConversationOption = 'Також вийти з розмови';
-z.string.uk.modalClearConversationButton = 'Видалити';
-z.string.uk.modalConnectedDeviceHeadline = 'Ваш акаунт використовується на:';
-z.string.uk.modalConnectedDeviceFrom = 'Від:';
-z.string.uk.modalConnectedDeviceMessage = 'Якщо ви не робили цього, видаліть пристрій і змініть пароль.';
-z.string.uk.modalConnectedDeviceManageDevices = 'Керування пристроями';
-z.string.uk.modalDeleteAccountAction = 'Видалити';
-z.string.uk.modalDeleteAccountHeadline = 'Видалити акаунт';
-z.string.uk.modalDeleteAccountMessage = 'Ми надішлемо вам повідомлення електронною поштою або через SMS. Перейдіть за посиланням, щоб остаточно видалити свій акаунт.';
-z.string.uk.modalDeleteButton = 'Видалити';
-z.string.uk.modalDeleteHeadline = 'Видалити тільки для мене?';
-z.string.uk.modalDeleteMessage = 'Цю дію неможливо скасувати.';
-z.string.uk.modalDeleteEveryoneButton = 'Видалити';
-z.string.uk.modalDeleteEveryoneHeadline = 'Видалити для всіх?';
-z.string.uk.modalDeleteEveryoneMessage = 'Цю дію неможливо скасувати.';
-z.string.uk.modalTooLongHeadline = 'Повідомлення занадто довге';
-z.string.uk.modalTooLongMessage = 'Можна надсилати повідомлення довжиною до {{number}} символів.';
-z.string.uk.modalLeaveConversationHeadline = 'Вийти з розмови "{{user}}"?';
-z.string.uk.modalLeaveConversationMessage = 'Учасники будуть повідомлені, і розмову буде видалено з вашого списку.';
-z.string.uk.modalLeaveConversationButton = 'Вийти з розмови';
-z.string.uk.modalLogoutHeadline = 'Очистити дані?';
-z.string.uk.modalLogoutMessage = 'Видалити всі ваші особисті дані та розмови на цьому пристрої.';
-z.string.uk.modalLogoutButton = 'Вийти';
-z.string.uk.modalNewDeviceHeadline = '{{user}} почав(-ла) використовувати новий пристрій';
-z.string.uk.modalNewDeviceHeadlineMany = '{{user}}s почали використовувати нові пристрої';
-z.string.uk.modalNewDeviceHeadlineYou = '{{user}} почав(-ла) використовувати новий пристрій';
-z.string.uk.modalNewDeviceMessage = 'Все одно надіслати ваші повідомлення?';
-z.string.uk.modalNewDeviceCallAccept = 'Прийняти виклик';
-z.string.uk.modalNewDeviceCallAnyway = 'Подзвонити все-одно';
-z.string.uk.modalNewDeviceCallIncoming = 'Ви все ще хочете прийняти дзвінок?';
-z.string.uk.modalNewDeviceCallOutgoing = 'Ви все ще хочете здійснити дзвінок?';
-z.string.uk.modalNewDeviceShowDevice = 'Показати пристрій';
-z.string.uk.modalNewDeviceSendAnyway = 'Все одно надіслати';
-z.string.uk.modalNotConnectedHeadline = 'Жоден контакт не був доданий до розмови';
-z.string.uk.modalNotConnectedMessageOne = '{{name}} не хоче, щоб його додавали до розмови.';
-z.string.uk.modalNotConnectedMessageMany = 'Один з контактів, яких ви вибрали, не хоче, щоб його додавали до розмови.';
-z.string.uk.modalRemoveDeviceButton = 'Видалити пристрій';
-z.string.uk.modalRemoveDeviceHeadline = 'Видалити "{{device}}"';
-z.string.uk.modalRemoveDeviceMessage = 'Для видалення пристрою необхідно ввести ваш пароль.';
+
+z.string.uk.modalConnectCancelAction = 'Так';
+z.string.uk.modalConnectCancelHeadline = 'Скасувати запит?';
+z.string.uk.modalConnectCancelMessage = 'Видалити запит на додавання {{user}} до контактів.';
+z.string.uk.modalConnectCancelSecondary = 'Ні';
+
+z.string.uk.modalConnectAcceptAction = 'Додати до контактів';
+z.string.uk.modalConnectAcceptHeadline = 'Прийняти?';
+z.string.uk.modalConnectAcceptMessage = 'Це додасть {{user}} до ваших контактів та відкриє розмову.';
+z.string.uk.modalConnectAcceptSecondary = 'Ігнорувати';
+
+z.string.uk.modalConversationAddBotHeadline = 'Додати сервіс';
+z.string.uk.modalConversationAddBotMessage = 'Ви впевнені, що хочете почати нову розмову з {{name}}?';
+
+z.string.uk.modalConversationClearAction = 'Видалити';
+z.string.uk.modalConversationClearHeadline = 'Видалити вміст?';
+z.string.uk.modalConversationClearOption = 'Також вийти з розмови';
+
+z.string.uk.modalConversationDeleteMessageAction = 'Видалити';
+z.string.uk.modalConversationDeleteMessageHeadline = 'Видалити тільки для мене?';
+z.string.uk.modalConversationDeleteMessageMessage = 'Цю дію неможливо скасувати.';
+
+z.string.uk.modalConversationDeleteMessageEveryoneAction = 'Видалити';
+z.string.uk.modalConversationDeleteMessageEveryoneHeadline = 'Видалити для всіх?';
+z.string.uk.modalConversationDeleteMessageEveryoneMessage = 'Цю дію неможливо скасувати.';
+
+z.string.uk.modalConversationLeaveAction = 'Вийти з розмови';
+z.string.uk.modalConversationLeaveMessage = 'Ви більше не зможете надсилати або отримувати повідомлення в цій розмові.';
+
+z.string.uk.modalConversationMessageTooLongHeadline = 'Повідомлення занадто довге';
+z.string.uk.modalConversationMessageTooLongMessage = 'Можна надсилати повідомлення довжиною до {{number}} символів.';
+
+z.string.uk.modalConversationNewDeviceHeadlineOne = '{{user}} почав(-ла) використовувати новий пристрій';
+z.string.uk.modalConversationNewDeviceHeadlineMany = '{{user}}s почали використовувати нові пристрої';
+z.string.uk.modalConversationNewDeviceHeadlineYou = '{{user}} почав(-ла) використовувати новий пристрій';
+z.string.uk.modalConversationNewDeviceIncomingCallAction = 'Прийняти виклик';
+z.string.uk.modalConversationNewDeviceIncomingCallMessage = 'Ви все ще хочете прийняти дзвінок?';
+z.string.uk.modalConversationNewDeviceMessage = 'Все одно надіслати ваші повідомлення?';
+z.string.uk.modalConversationNewDeviceOutgoingCallAction = 'Подзвонити все-одно';
+z.string.uk.modalConversationNewDeviceOutgoingCallMessage = 'Ви все ще хочете здійснити дзвінок?';
+
+z.string.uk.modalConversationNotConnectedHeadline = 'Жоден контакт не був доданий до розмови';
+z.string.uk.modalConversationNotConnectedMessageOne = '{{name}} не хоче, щоб його додавали до розмови.';
+z.string.uk.modalConversationNotConnectedMessageMany = 'Один з контактів, яких ви вибрали, не хоче, щоб його додавали до розмови.';
+
+z.string.uk.modalConversationRemoveAction = 'Видалити';
+z.string.uk.modalConversationRemoveHeadline = 'Видалити?';
+z.string.uk.modalConversationRemoveMessage = '{{user}} більше не зможе надсилати або отримувати повідомлення в цій розмові.';
+
+
+z.string.uk.modalConversationTooManyMembersHeadline = 'Голосовий канал переповнений';
+
+z.string.uk.modalIntegrationUnavailableHeadline = 'Боти в даний час недоступні';
+z.string.uk.modalIntegrationUnavailableMessage = 'Дякуємо вам за інтерес, проявлений до ботів. В даний час ця функціональність заморожена, але ми працюємо над тим, щоб активувати її в наступній версії. Слідкуйте за оновленнями.';
+
+
 z.string.uk.modalServiceUnavailableHeadline = 'Неможливо додати сервіс';
 z.string.uk.modalServiceUnavailableMessage = 'Даний сервіс наразі недоступний.';
+
 z.string.uk.modalSessionResetHeadline = 'Сесія була скинута';
 z.string.uk.modalSessionResetMessage1 = 'Якщо проблема не вирішена,';
 z.string.uk.modalSessionResetMessageLink = 'зв’яжіться';
 z.string.uk.modalSessionResetMessage2 = 'з нами.';
-z.string.uk.modalTooManyMembersHeadline = 'Голосовий канал переповнений';
-z.string.uk.modalTooManyMembersMessage = 'В розмові може бути до {{number1}} учасників. В даній розмові уже не вистачає місця для {{number}} учасників.';
-z.string.uk.modalUploadsParallel = 'Ви можете надіслати до {{number}} файлів за один раз.';
+
+z.string.uk.modalUploadContactsAction = 'Спробувати ще раз';
+z.string.uk.modalUploadContactsMessage = 'Ми не отримали вашу інформацію. Будь ласка, повторіть імпорт контактів.';
+
+z.string.uk.modalUserBlockAction = 'Заблокувати';
+z.string.uk.modalUserBlockHeadline = 'Заблокувати {{user}}?';
+z.string.uk.modalUserBlockMessage = '{{user}} не буде мати можливості зв’язатися з вами або додати вас до групових розмов.';
+
+z.string.uk.modalUserUnblockAction = 'Розблокувати';
+z.string.uk.modalUserUnblockHeadline = 'Розблокувати?';
+z.string.uk.modalUserUnblockMessage = '{{user}} не буде мати можливості зв’язатися з вами або додати вас до групових розмов.';
 
 z.string.uk.connectionRequestConnect = 'Додати до контактів';
 z.string.uk.connectionRequestIgnore = 'Ігнорувати';
@@ -204,12 +247,13 @@ z.string.uk.conversationDeviceYourDevices = ' ваші пристрої';
 z.string.uk.conversationDeviceUserDevices = ' пристрої {{user}}';
 z.string.uk.conversationDeviceNewDeviceOne = ' новий пристрій';
 z.string.uk.conversationDeviceNewDeviceMany = ' нові пристрої';
-z.string.uk.conversationDeviceNewPeopleJoined = 'приєдналися нові учасники.';
 z.string.uk.conversationDeviceNewPeopleJoinedVerify = ' верифікувати пристрої';
 z.string.uk.conversationJustNow = 'Щойно';
 z.string.uk.conversationLocationLink = 'Відкрити карту';
 z.string.uk.conversationMemberJoin = ' додав(-ла) {{users}}';
 z.string.uk.conversationMemberJoinYou = ' додав(-ла) {{users}}';
+z.string.uk.conversationMemberJoinSelf = ' приєднався(-лася)';
+z.string.uk.conversationMemberJoinSelfYou = ' приєднався(-лася)';
 z.string.uk.conversationMemberLeaveLeft = ' вийшов(-ла)';
 z.string.uk.conversationMemberLeaveLeftYou = ' вийшов(-ла)';
 z.string.uk.conversationMemberLeaveRemoved = ' видалив(-ла) {{users}}';
@@ -232,9 +276,9 @@ z.string.uk.conversationUnableToDecryptLink = 'Чому?';
 z.string.uk.conversationUnableToDecryptErrorMessage = 'Помилка';
 z.string.uk.conversationUnableToDecryptResetSession = 'Скидання сесії';
 z.string.uk.conversationMissedMessages = 'Ви не користувались цим простроєм протягом певного часу. Деякі повідомлення можуть не відображатися тут.';
+z.string.uk.conversationAssetUploading = 'Завантаження…';
 z.string.uk.conversationAssetDownloading = 'Скачування…';
 z.string.uk.conversationAssetUploadFailed = 'Не вдалося завантажити';
-z.string.uk.conversationAssetUploadTooLarge = 'Ви можете надсилати файли до {{number}}';
 z.string.uk.conversationPlaybackError = 'Неможливо відтворити';
 z.string.uk.conversationContextMenuEdit = 'Редагувати';
 z.string.uk.conversationContextMenuDelete = 'Видалити для мене';
@@ -249,14 +293,18 @@ z.string.uk.conversationSendPastedFile = 'Надіслав(-ла) зображе
 z.string.uk.conversationSomeone = 'Хтось';
 z.string.uk.conversationTweetAuthor = ' в Twitter';
 
+z.string.uk.groupCreationPreferencesAction = 'Далі';
 z.string.uk.groupCreationPreferencesErrorNameShort = 'Не менше 1 символу';
 z.string.uk.groupCreationPreferencesErrorNameLong = 'Занадто багато символів';
 z.string.uk.groupCreationPreferencesHeader = 'Нова група';
 z.string.uk.groupCreationPreferencesPlaceholder = 'Ім’я групи';
+z.string.uk.groupCreationParticipantsActionCreate = 'Готово';
 z.string.uk.groupCreationParticipantsActionSkip = 'Пропустити';
 z.string.uk.groupCreationParticipantsHeader = 'Додати учасників';
 z.string.uk.groupCreationParticipantsHeaderWithCounter = 'Додати учасників ({{number}})';
 z.string.uk.groupCreationParticipantsPlaceholder = 'Пошук за іменем';
+
+z.string.uk.guestRoomConversationName = 'Гостьова кімната';
 
 z.string.uk.collectionShowAll = 'Показати всі {{number}}';
 z.string.uk.collectionSectionLinks = 'Посилання';
@@ -308,6 +356,8 @@ z.string.uk.takeoverButtonKeep = 'Залишити цей';
 
 z.string.uk.inviteMetaKeyMac = 'Cmd';
 z.string.uk.inviteMetaKeyPc = 'Ctrl';
+z.string.uk.inviteHintSelected = 'Натисніть {{metaKey}} + C, щоб скопіювати';
+z.string.uk.inviteHintUnselected = 'Виділіть та натисніть {{metaKey}} + C';
 z.string.uk.inviteHeadline = 'Запросити людей в Wire';
 z.string.uk.inviteMessage = 'Я в Wire. Шукайте мене як {{username}} або відвідайте get.wire.com.';
 z.string.uk.inviteMessageNoEmail = 'Я уже в Wire. Відвідайте get.wire.com, щоб додати мене.';
@@ -320,71 +370,46 @@ z.string.uk.extensionsGiphyMessage = '{{tag}} • через giphy.com';
 z.string.uk.extensionsGiphyNoGifs = 'Упс, анімацій не знайдено';
 z.string.uk.extensionsGiphyRandom = 'Випадкова';
 
-z.string.uk.peopleConfirmLabel = 'Додати учасників до групи';
-z.string.uk.peoplePeople = '{{number}} учасників';
-z.string.uk.peopleSearchPlaceholder = 'Пошук за іменем';
-z.string.uk.peopleEveryoneParticipates = 'Всі ваші контакти\nуже присутні\nв даній групі.';
-z.string.uk.peopleNoMatches = 'Співпадіння відсутні.\nСпробуйте ввести інше ім’я.';
-z.string.uk.peopleInvite = 'Запросіть людей в Wire';
-z.string.uk.peopleInviteDetail = 'Поділившись контактами, ви зможете зв’язатись в Wire з людьми, з якими ви, можливо, знайомі. Вся інформація анонімна та не передається третім особам.';
-z.string.uk.peopleInviteButtonContacts = 'З контактів';
-z.string.uk.peopleInviteButtonGmail = 'З Gmail';
-z.string.uk.peopleInviteHeadline = 'Приведіть друзів';
-z.string.uk.peopleServiceConfirmButton = 'Додати сервіс';
-z.string.uk.peopleServiceRemovalButton = 'Видалити сервіс';
-z.string.uk.peopleServiceNewConversation = 'Розпочати нову розмову';
-z.string.uk.peopleServices = 'Сервіси';
-z.string.uk.peopleShare = 'Поділитись контактами';
-z.string.uk.peopleTabsDetails = 'Подробиці';
-z.string.uk.peopleTabsDevices = 'Пристрої';
-z.string.uk.peopleTabsDevicesHeadline = 'Wire присвоює кожному пристроєві унікальний ідентифікатор. Порівняйте його з ідентифікатором на пристрої контакту {{user}} та верифікуйте вашу розмову.';
-z.string.uk.peopleTabsDevicesLearnMore = 'Дізнатися більше';
-z.string.uk.peopleTabsDevicesWhyVerify = 'Навіщо верифікувати розмови?';
-z.string.uk.peopleTabsNoDevicesHeadline = '{{user}} використовує стару версію Wire, тому не показується жоден пристрій.';
-z.string.uk.peopleTabsDeviceDetailAllMyDevices = 'Показати всі мої пристрої';
-z.string.uk.peopleTabsDeviceDetailDeviceFingerprint = 'Ідентифікатор пристрою';
-z.string.uk.peopleTabsDeviceDetailHeadline = 'Переконайтеся, що цей ідентифікатор такий самий, як і ідентифікатор на пристрої, що належить {{html1}}{{user}}{{html2}}.';
-z.string.uk.peopleTabsDeviceDetailHowTo = 'Як це зробити?';
-z.string.uk.peopleTabsDeviceDetailResetSession = 'Скидання сесії';
-z.string.uk.peopleTabsDeviceDetailShowMyDevice = 'Показати ідентиф. мого пристрою';
-z.string.uk.peopleTabsDeviceDetailVerify = 'Верифікований';
-z.string.uk.peopleTabsPeople = 'Список контактів';
-z.string.uk.peopleTabsServices = 'Сервіси';
-z.string.uk.peopleVerified = 'Верифікований';
+z.string.uk.addParticipantsConfirmLabel = 'Додати';
+z.string.uk.addParticipantsHeader = 'Додати учасників';
+z.string.uk.addParticipantsHeaderWithCounter = 'Додати учасників ({{number}})';
+z.string.uk.addParticipantsSearchPlaceholder = 'Пошук за іменем';
+z.string.uk.addParticipantsServiceConfirmButton = 'Додати сервіс';
+z.string.uk.addParticipantsTabsPeople = 'Список контактів';
+z.string.uk.addParticipantsTabsServices = 'Сервіси';
 
-z.string.uk.peopleBlockHeadline = 'Заблокувати?';
-z.string.uk.peopleBlockMessage = '{{user}} не буде мати можливості зв’язатися з вами або додати вас до групових розмов.';
+z.string.uk.conversationDetailsActionCancelRequest = 'Скасувати запит';
+z.string.uk.conversationDetailsActionCreateGroup = 'Створити групу';
+z.string.uk.conversationDetailsActionDevices = 'Пристрої';
+z.string.uk.conversationDetailsGuestsOff = 'Вимкнений';
+z.string.uk.conversationDetailsParticipantsServicesMany = 'Сервіси';
+z.string.uk.conversationDetailsParticipantsUsersMany = 'Список контактів';
+z.string.uk.conversationDetailsPeople = 'Список контактів';
+z.string.uk.conversationDetailsServices = 'Сервіси';
 
-z.string.uk.peopleConnectHeadline = 'Прийняти?';
-z.string.uk.peopleConnectMessage = 'Це додасть {{user}} до ваших контактів та відкриє розмову.';
+z.string.uk.groupParticipantActionCancelRequest = 'Скасувати запит';
+z.string.uk.groupParticipantActionDevices = 'Пристрої';
+z.string.uk.groupParticipantActionPending = 'Очікує підтвердження';
+z.string.uk.groupParticipantActionSendRequest = 'Додати до контактів';
 
-z.string.uk.peopleCancelRequestHeadline = 'Скасувати запит?';
-z.string.uk.peopleCancelRequestMessage = 'Видалити запит на додавання {{user}} до контактів.';
+z.string.uk.participantDevicesDetailHeadline = 'Переконайтеся, що цей ідентифікатор такий самий, як і ідентифікатор на пристрої, що належить {{html1}}{{user}}{{html2}}.';
+z.string.uk.participantDevicesDetailHowTo = 'Як це зробити?';
+z.string.uk.participantDevicesDetailResetSession = 'Скидання сесії';
+z.string.uk.participantDevicesDetailShowMyDevice = 'Показати ідентиф. мого пристрою';
+z.string.uk.participantDevicesDetailVerify = 'Верифікований';
 
-z.string.uk.peopleLeaveHeadline = 'Вийти з розмови?';
-z.string.uk.peopleLeaveMessage = 'Ви більше не зможете надсилати або отримувати повідомлення в цій розмові.';
+z.string.uk.participantDevicesHeader = 'Пристрої';
+z.string.uk.participantDevicesHeadline = 'Wire присвоює кожному пристроєві унікальний ідентифікатор. Порівняйте його з ідентифікатором на пристрої контакту {{user}} та верифікуйте вашу розмову.';
+z.string.uk.participantDevicesLearnMore = 'Дізнатися більше';
+z.string.uk.participantDevicesWhyVerify = 'Навіщо верифікувати розмови?';
+z.string.uk.participantDevicesOutdatedClientMessage = '{{user}} використовує стару версію Wire, тому не показується жоден пристрій.';
 
-z.string.uk.peopleRemoveHeadline = 'Видалити?';
-z.string.uk.peopleRemoveMessage = '{{user}} більше не зможе надсилати або отримувати повідомлення в цій розмові.';
+z.string.uk.participantDevicesSelfAllDevices = 'Показати всі мої пристрої';
+z.string.uk.participantDevicesSelfFingerprint = 'Ідентифікатор пристрою';
 
-z.string.uk.peopleUnblockHeadline = 'Розблокувати?';
-z.string.uk.peopleUnblockMessage = '{{user}} не буде мати можливості зв’язатися з вами або додати вас до групових розмов.';
-
-z.string.uk.peopleButtonAdd = 'Додати';
-z.string.uk.peopleButtonAddPeople = 'Додати учасників';
-z.string.uk.peopleButtonBlock = 'Заблокувати';
-z.string.uk.peopleButtonCancel = 'Скасувати';
-z.string.uk.peopleButtonConnect = 'Додати до контактів';
-z.string.uk.peopleButtonCreate = 'Створити групу';
-z.string.uk.peopleButtonIgnore = 'Ігнорувати';
-z.string.uk.peopleButtonLeave = 'Вийти з розмови';
-z.string.uk.peopleButtonOpen = 'Відкрити розмову';
-z.string.uk.peopleButtonPending = 'Очікує підтвердження';
-z.string.uk.peopleButtonProfile = 'Профіль';
-z.string.uk.peopleButtonRemove = 'Видалити';
-z.string.uk.peopleButtonUnblock = 'Розблокувати';
-z.string.uk.peopleButtonNo = 'Ні';
-z.string.uk.peopleButtonYes = 'Так';
+z.string.uk.userProfileButtonConnect = 'Додати до контактів';
+z.string.uk.userProfileButtonIgnore = 'Ігнорувати';
+z.string.uk.userProfileButtonUnblock = 'Розблокувати';
 
 z.string.uk.preferencesAbout = 'Про програму';
 z.string.uk.preferencesAccount = 'Акаунт';
@@ -466,9 +491,11 @@ z.string.uk.searchConnect = 'Додати до контактів';
 z.string.uk.searchConnections = 'Контакти';
 z.string.uk.searchContacts = 'Контакти';
 z.string.uk.searchCreateGroup = 'Створити групу';
+z.string.uk.searchCreateGuestRoom = 'Створити гостьову кімнату';
 z.string.uk.searchGroups = 'Групи';
 z.string.uk.searchPeople = 'Список контактів';
 z.string.uk.searchPlaceholder = 'Пошук за іменем або ніком';
+z.string.uk.searchServicePlaceholder = 'Пошук за іменем';
 z.string.uk.searchServices = 'Сервіси';
 z.string.uk.searchTeamGroups = 'Розмови в команді';
 z.string.uk.searchTeamMembers = 'Учасники команди';
@@ -478,11 +505,21 @@ z.string.uk.searchNoContactsOnWire = 'У вас поки що немає кон�
 z.string.uk.searchMemberInvite = 'Запросіть колег приєднатися до команди';
 z.string.uk.searchOthers = 'Додати до контактів';
 
+z.string.uk.searchInvite = 'Запросіть людей в Wire';
+z.string.uk.searchInviteDetail = 'Поділившись контактами, ви зможете зв’язатись в Wire з людьми, з якими ви, можливо, знайомі. Вся інформація анонімна та не передається третім особам.';
+z.string.uk.searchInviteButtonContacts = 'З контактів';
+z.string.uk.searchInviteButtonGmail = 'З Gmail';
+z.string.uk.searchInviteHeadline = 'Приведіть друзів';
+z.string.uk.searchInviteShare = 'Поділитись контактами';
+
+z.string.uk.searchServiceNewConversation = 'Розпочати нову розмову';
+z.string.uk.searchServiceConfirmButton = 'Додати сервіс';
+
+z.string.uk.searchListEveryoneParticipates = 'Всі ваші контакти\nуже присутні\nв даній групі.';
+z.string.uk.searchListNoMatches = 'Співпадіння відсутні.\nСпробуйте ввести інше ім’я.';
+
 z.string.uk.uploadGoogleHeadline = 'Знайдіть людей,\nщоб порозмовляти.';
 z.string.uk.uploadGoogleMessage = 'Ми використовуємо дані про ваші контакти, щоб ви могли знайти людей, яких ви знаєте. Ми анонімізуємо всю інформацію та не передаємо її третім особам.';
-z.string.uk.uploadGoogleHeadlineError = 'Щось пішло\nне так.';
-z.string.uk.uploadGoogleMessageError = 'Ми не отримали вашу інформацію. Будь ласка, повторіть імпорт контактів.';
-z.string.uk.uploadGoogleButtonAgain = 'Спробувати ще раз';
 
 z.string.uk.urlSupportRoot = '/';
 z.string.uk.urlSupportArticles = '/hc/en-us/articles/';
@@ -491,8 +528,6 @@ z.string.uk.urlWebappRoot = '/';
 z.string.uk.urlWebsiteRoot = '/';
 z.string.uk.urlWebsiteCreateTeam = '/create-team/';
 z.string.uk.urlWebsitePrivacy = '/privacy';
-z.string.uk.warningCallDetail = 'Надайте вашому браузеру доступ до мікрофону, щоб робити дзвінки.';
-z.string.uk.warningCallHeadline = 'Неможливо здійснити дзвінок без доступу до мікрофону';
 z.string.uk.warningCallUnsupportedIncoming = '{{user}} дзвонить. Ваш браузер не підтримує дзвінки.';
 z.string.uk.warningCallUnsupportedOutgoing = 'Ви не можете подзвонити, тому що ваш браузер не підтримує дзвінків.';
 z.string.uk.warningCallIssues = 'Ця версія Wire не може брати участь у дзвінку. Будь ласка, використовуйте';
@@ -512,7 +547,6 @@ z.string.uk.warningPermissionRequestCamera = '{{icon}} Дозволити дос
 z.string.uk.warningPermissionRequestMicrophone = '{{icon}} Дозволити доступ до мікрофону';
 z.string.uk.warningPermissionRequestNotification = '{{icon}} Дозволити сповіщення';
 z.string.uk.warningPermissionRequestScreen = '{{icon}} Дозволити доступ до обміну скріншотами робочого столу';
-z.string.uk.warningTellMeHow = 'Скажіть мені як';
 
 z.string.uk.userAvailabilityAvailable = 'Доступний';
 z.string.uk.userAvailabilityAway = 'Не на місці';
@@ -561,14 +595,7 @@ z.string.uk.tooltipConversationsPreferences = 'Відкрити налаштув
 z.string.uk.tooltipConversationsSilence = 'Вимкнути звук ({{shortcut}})';
 z.string.uk.tooltipConversationsStart = 'Почати розмову ({{shortcut}})';
 
-z.string.uk.tooltipPeopleAdd = 'Додати учасників до розмови ({{shortcut}})';
-z.string.uk.tooltipPeopleBack = 'Назад';
-z.string.uk.tooltipPeopleBlock = 'Заблокувати';
-z.string.uk.tooltipPeopleConnect = 'Додати до контактів';
-z.string.uk.tooltipPeopleLeave = 'Вийти з розмови';
-z.string.uk.tooltipPeopleRename = 'Змінити ім’я розмови';
-z.string.uk.tooltipPeopleRemove = 'Видалити з розмови';
-z.string.uk.tooltipPeopleUnblock = 'Розблокувати';
+z.string.uk.tooltipConversationDetailsRename = 'Змінити ім’я розмови';
 
 z.string.uk.tooltipPreferencesContactsGmail = 'Увійдіть у свій обліковий запис Gmail, щоб поділитися контактами';
 z.string.uk.tooltipPreferencesContactsMacos = 'Поділіться вашими контактами з додатку Контакти для Mac OS';

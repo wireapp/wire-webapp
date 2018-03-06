@@ -23,11 +23,6 @@ z.string.cs.wireLinux = 'Wire pro Linux';
 z.string.cs.nonexistentUser = 'Smazaný uživatel';
 z.string.cs.and = 'a';
 
-z.string.cs.alertUploadFileFormat = 'Tento obrázek nelze použít.\nVyberte prosím PNG nebo JPEG soubor.';
-z.string.cs.alertUploadTooSmall = 'Tento obrázek nelze použít.\nVyberte prosím obrázek, který je veliký alespoň 320 x 320 px.';
-z.string.cs.alertUploadTooLarge = 'Tento obrázek je příliš veliký.\nMůžete nahrávat soubory až do velikosti {{number}} MB.';
-z.string.cs.alertGifTooLarge = 'Animace je příliš veliká.\nMaximální velikost je {{number}} MB.';
-
 z.string.cs.authAccountCountryCode = 'Kód země';
 z.string.cs.authAccountDeletion = 'Byli jste odhlášeni, protože váš účet byl smazán.';
 z.string.cs.authAccountExpiration = 'Byli jste odhlášeni, protože platnost relace vypršela. Přihlaste se znovu.';
@@ -101,75 +96,121 @@ z.string.cs.callJoin = 'Vstoupit';
 z.string.cs.callChooseSharedScreen = 'Vybrat obrazovku ke sdílení';
 z.string.cs.callParticipants = '{{number}} se účastní hovoru';
 
-z.string.cs.modalButtonCancel = 'Zrušit';
-z.string.cs.modalButtonOk = 'Ok';
-z.string.cs.modalButtonSend = 'Odeslat';
+z.string.cs.modalAcknowledgeAction = 'Ok';
+z.string.cs.modalConfirmSecondary = 'Zrušit';
+z.string.cs.modalOptionSecondary = 'Zrušit';
 
-z.string.cs.modalBlockConversationHeadline = 'Blokovat {{user}}?';
-z.string.cs.modalBlockConversationMessage = '{{user}} vás nebude moci kontaktovat nebo přizvat ke skupinové konverzaci.';
-z.string.cs.modalBlockConversationButton = 'Blokovat';
-z.string.cs.modalBotsUnavailableHeadline = 'Roboti jsou momentálně nedostupní';
-z.string.cs.modalBotsUnavailableMessage = 'Děkujeme vám za váš zájem o roboty. Služba je pozastavena, zatímco pracujeme na další verzi.';
-z.string.cs.modalCallConversationEmptyHeadline = 'Nikdo pro volání';
-z.string.cs.modalCallConversationEmptyMessage = 'Již zde nikdo jiný není.';
-z.string.cs.modalCallNoVideoInGroupHeadline = 'Žádné videohovory ve skupinách';
-z.string.cs.modalCallNoVideoInGroupMessage = 'Videohovory nejsou dostupné pro skupinové konverzace.';
+z.string.cs.modalAccountDeletionAction = 'Smazat';
+z.string.cs.modalAccountDeletionHeadline = 'Smazat účet';
+z.string.cs.modalAccountDeletionMessage = 'Obdržíte od nás zprávu přes email nebo SMS. Pro trvalé smazání svého účtu otevřete zaslaný odkaz.';
+
+z.string.cs.modalAccountLogoutAction = 'Odhlásit se';
+z.string.cs.modalAccountLogoutHeadline = 'Vyčistit data?';
+z.string.cs.modalAccountLogoutOption = 'Smazat všechny osobní informace a konverzace z tohoto přístroje.';
+
+z.string.cs.modalAccountNewDevicesSecondary = 'Spravovat přístroje';
+z.string.cs.modalAccountNewDevicesHeadline = 'Váš účet byl naposledy použit:';
+z.string.cs.modalAccountNewDevicesFrom = 'Od:';
+z.string.cs.modalAccountNewDevicesMessage = 'Pokud jste to nebyli vy sami, odeberte použité zařízení a změňte si heslo.';
+
+z.string.cs.modalAccountRemoveDeviceAction = 'Odstranit přístroj';
+z.string.cs.modalAccountRemoveDeviceHeadline = 'Odstranit "{{device}}"';
+z.string.cs.modalAccountRemoveDeviceMessage = 'Pro odstranění přístroje je vyžadováno heslo.';
+z.string.cs.modalAccountRemoveDevicePlaceholder = 'Heslo';
+
+z.string.cs.modalAssetTooLargeMessage = 'Můžete posílat soubory až do velikosti {{number}}';
+
+z.string.cs.modalAssetParallelUploadsMessage = 'Najednou můžete poslat až {{number}} souborů.';
+
+z.string.cs.modalCallEmptyConversationHeadline = 'Nikdo pro volání';
+z.string.cs.modalCallEmptyConversationMessage = 'Již zde nikdo jiný není.';
+
+z.string.cs.modalCallNoGroupVideoHeadline = 'Žádné videohovory ve skupinách';
+z.string.cs.modalCallNoGroupVideoMessage = 'Videohovory nejsou dostupné pro skupinové konverzace.';
+
+z.string.cs.modalCallNoMicrophoneAction = 'Jak na to';
+z.string.cs.modalCallNoMicrophoneMessage = 'Pro volání potřebuje prohlížeč přístup k mikrofonu.';
+z.string.cs.modalCallNoMicrophoneHeadline = 'Nelze volat bez mikrofonu';
+
+z.string.cs.modalCallSecondIncomingAction = 'Přijmout';
 z.string.cs.modalCallSecondIncomingHeadline = 'Přijmout hovor?';
 z.string.cs.modalCallSecondIncomingMessage = 'Aktuální hovor bude ukončen.';
-z.string.cs.modalCallSecondIncomingAction = 'Přijmout';
+
+z.string.cs.modalCallSecondOngoingAction = 'Zavěsit';
 z.string.cs.modalCallSecondOngoingHeadline = 'Zavěsit hovor na jiném zařízení?';
 z.string.cs.modalCallSecondOngoingMessage = 'V jednom okamžiku může být pouze v jednom hovoru.';
-z.string.cs.modalCallSecondOngoingAction = 'Zavěsit';
+
+z.string.cs.modalCallSecondOutgoingAction = 'Zavěsit';
 z.string.cs.modalCallSecondOutgoingHeadline = 'Zavěsit aktuální hovor?';
 z.string.cs.modalCallSecondOutgoingMessage = 'V jednom okamžiku může být pouze v jednom hovoru.';
-z.string.cs.modalCallSecondOutgoingAction = 'Zavěsit';
-z.string.cs.modalClearConversationHeadline = 'Vymazat obsah?';
-z.string.cs.modalClearConversationOption = 'Také opustit konverzaci';
-z.string.cs.modalClearConversationButton = 'Smazat';
-z.string.cs.modalConnectedDeviceHeadline = 'Váš účet byl naposledy použit:';
-z.string.cs.modalConnectedDeviceFrom = 'Od:';
-z.string.cs.modalConnectedDeviceMessage = 'Pokud jste to nebyli vy sami, odeberte použité zařízení a změňte si heslo.';
-z.string.cs.modalConnectedDeviceManageDevices = 'spravovat přístroje';
-z.string.cs.modalDeleteAccountAction = 'Smazat';
-z.string.cs.modalDeleteAccountHeadline = 'Smazat účet';
-z.string.cs.modalDeleteAccountMessage = 'Obdržíte od nás zprávu přes email nebo SMS. Pro trvalé smazání svého účtu otevřete zaslaný odkaz.';
-z.string.cs.modalDeleteButton = 'Smazat';
-z.string.cs.modalDeleteHeadline = 'Smazat pouze u mně?';
-z.string.cs.modalDeleteMessage = 'Tuto operaci nelze vrátit.';
-z.string.cs.modalDeleteEveryoneButton = 'Smazat';
-z.string.cs.modalDeleteEveryoneHeadline = 'Smazat pro všechny?';
-z.string.cs.modalDeleteEveryoneMessage = 'Tuto operaci nelze vrátit.';
-z.string.cs.modalTooLongHeadline = 'Zpráva je příliš dlouhá';
-z.string.cs.modalTooLongMessage = 'Můžete posílat zprávy dlouhé až {{number}} znaků.';
-z.string.cs.modalLeaveConversationHeadline = 'Opustit konverzaci "{{user}}"?';
-z.string.cs.modalLeaveConversationMessage = 'Účastníci budou informováni a konverzace bude odstraněna z vašeho seznamu.';
-z.string.cs.modalLeaveConversationButton = 'Odejít';
-z.string.cs.modalLogoutHeadline = 'Vyčistit data?';
-z.string.cs.modalLogoutMessage = 'Smazat všechny osobní informace a konverzace z tohoto přístroje.';
-z.string.cs.modalLogoutButton = 'Odhlásit se';
-z.string.cs.modalNewDeviceHeadline = '{{user}} začal(a) používat nové zařízení';
-z.string.cs.modalNewDeviceHeadlineMany = '{{users}} začali používat nové zařízení';
-z.string.cs.modalNewDeviceHeadlineYou = '{{user}} začal(a) používat nové zařízení';
-z.string.cs.modalNewDeviceMessage = 'Chcete přesto odeslat své zprávy?';
-z.string.cs.modalNewDeviceCallAccept = 'Přijmout volání';
-z.string.cs.modalNewDeviceCallAnyway = 'Přesto zavolat';
-z.string.cs.modalNewDeviceCallIncoming = 'Chcete přesto přijmout hovor?';
-z.string.cs.modalNewDeviceCallOutgoing = 'Chcete přesto volat?';
-z.string.cs.modalNewDeviceShowDevice = 'zobrazit přístroj';
-z.string.cs.modalNewDeviceSendAnyway = 'přesto odeslat';
-z.string.cs.modalNotConnectedHeadline = 'Do konverzace nebyl nikdo přidán';
-z.string.cs.modalNotConnectedMessageOne = '{{name}} nemá zájem být přidán(a) do konverzace.';
-z.string.cs.modalNotConnectedMessageMany = 'Jeden z lidí které jste vybrali nechce být přidán do konverzace.';
-z.string.cs.modalRemoveDeviceButton = 'Odstranit přístroj';
-z.string.cs.modalRemoveDeviceHeadline = 'Odstranit "{{device}}"';
-z.string.cs.modalRemoveDeviceMessage = 'Pro odstranění přístroje je vyžadováno heslo.';
+
+z.string.cs.modalConnectCancelAction = 'Ano';
+z.string.cs.modalConnectCancelHeadline = 'Zrušit požadavek?';
+z.string.cs.modalConnectCancelMessage = 'Odeberte požadavek na připojení s {{user}}.';
+z.string.cs.modalConnectCancelSecondary = 'Ne';
+
+z.string.cs.modalConnectAcceptAction = 'Připojit';
+z.string.cs.modalConnectAcceptHeadline = 'Přijmout?';
+z.string.cs.modalConnectAcceptMessage = 'Toto naváže spojení a otevře konverzaci s {{user}}.';
+z.string.cs.modalConnectAcceptSecondary = 'Ignorovat';
+
+z.string.cs.modalConversationClearAction = 'Smazat';
+z.string.cs.modalConversationClearHeadline = 'Vymazat obsah?';
+z.string.cs.modalConversationClearOption = 'Také opustit konverzaci';
+
+z.string.cs.modalConversationDeleteMessageAction = 'Smazat';
+z.string.cs.modalConversationDeleteMessageHeadline = 'Smazat pouze u mně?';
+z.string.cs.modalConversationDeleteMessageMessage = 'Tuto operaci nelze vrátit.';
+
+z.string.cs.modalConversationDeleteMessageEveryoneAction = 'Smazat';
+z.string.cs.modalConversationDeleteMessageEveryoneHeadline = 'Smazat pro všechny?';
+z.string.cs.modalConversationDeleteMessageEveryoneMessage = 'Tuto operaci nelze vrátit.';
+
+z.string.cs.modalConversationLeaveAction = 'Odejít';
+z.string.cs.modalConversationLeaveMessage = 'Nebudete moct odesílat ani přijímat zprávy v této konverzaci.';
+
+z.string.cs.modalConversationMessageTooLongHeadline = 'Zpráva je příliš dlouhá';
+z.string.cs.modalConversationMessageTooLongMessage = 'Můžete posílat zprávy dlouhé až {{number}} znaků.';
+
+z.string.cs.modalConversationNewDeviceHeadlineOne = '{{user}} začal(a) používat nové zařízení';
+z.string.cs.modalConversationNewDeviceHeadlineMany = '{{users}} začali používat nové zařízení';
+z.string.cs.modalConversationNewDeviceHeadlineYou = '{{user}} začal(a) používat nové zařízení';
+z.string.cs.modalConversationNewDeviceIncomingCallAction = 'Přijmout volání';
+z.string.cs.modalConversationNewDeviceIncomingCallMessage = 'Chcete přesto přijmout hovor?';
+z.string.cs.modalConversationNewDeviceMessage = 'Chcete přesto odeslat své zprávy?';
+z.string.cs.modalConversationNewDeviceOutgoingCallAction = 'Přesto zavolat';
+z.string.cs.modalConversationNewDeviceOutgoingCallMessage = 'Chcete přesto volat?';
+
+z.string.cs.modalConversationNotConnectedHeadline = 'Do konverzace nebyl nikdo přidán';
+z.string.cs.modalConversationNotConnectedMessageOne = '{{name}} nemá zájem být přidán(a) do konverzace.';
+z.string.cs.modalConversationNotConnectedMessageMany = 'Jeden z lidí které jste vybrali nechce být přidán do konverzace.';
+
+z.string.cs.modalConversationRemoveAction = 'Odstranit';
+z.string.cs.modalConversationRemoveHeadline = 'Odstranit?';
+z.string.cs.modalConversationRemoveMessage = '{{user}} nebude moci odesílat nebo přijímat zprávy v této konverzaci.';
+
+
+z.string.cs.modalConversationTooManyMembersHeadline = 'Přeplněné kupé';
+
+z.string.cs.modalIntegrationUnavailableHeadline = 'Roboti jsou momentálně nedostupní';
+z.string.cs.modalIntegrationUnavailableMessage = 'Děkujeme vám za váš zájem o roboty. Služba je pozastavena, zatímco pracujeme na další verzi.';
+
+
 z.string.cs.modalSessionResetHeadline = 'Sezení bylo zresetováno';
 z.string.cs.modalSessionResetMessage1 = 'Pokud problém není vyřešen,';
 z.string.cs.modalSessionResetMessageLink = 'kontaktujte';
 z.string.cs.modalSessionResetMessage2 = 'nás.';
-z.string.cs.modalTooManyMembersHeadline = 'Přeplněné kupé';
-z.string.cs.modalTooManyMembersMessage = 'Ke konverzaci se může připojit az {{number1}} účastníků. Je zde ještě místo pro {{number2}}.';
-z.string.cs.modalUploadsParallel = 'Najednou můžete poslat až {{number}} souborů.';
+
+z.string.cs.modalUploadContactsAction = 'Zkusit znovu';
+z.string.cs.modalUploadContactsMessage = 'Neobdrželi jsme vaše data. Zkuste prosím kontakty importovat znovu.';
+
+z.string.cs.modalUserBlockAction = 'Blokovat';
+z.string.cs.modalUserBlockHeadline = 'Blokovat {{user}}?';
+z.string.cs.modalUserBlockMessage = '{{user}} vás nebude moci kontaktovat nebo přizvat ke skupinové konverzaci.';
+
+z.string.cs.modalUserUnblockAction = 'Odblokovat';
+z.string.cs.modalUserUnblockHeadline = 'Odblokovat?';
+z.string.cs.modalUserUnblockMessage = '{{user}} vás nebude moci kontaktovat nebo přizvat ke skupinové konverzaci.';
 
 z.string.cs.connectionRequestConnect = 'Připojit';
 z.string.cs.connectionRequestIgnore = 'Ignorovat';
@@ -192,7 +233,6 @@ z.string.cs.conversationDeviceYourDevices = ' vaše přístroje';
 z.string.cs.conversationDeviceUserDevices = ' přístroje uživatele {{user}}';
 z.string.cs.conversationDeviceNewDeviceOne = ' nové zařízení';
 z.string.cs.conversationDeviceNewDeviceMany = ' nové zařízení';
-z.string.cs.conversationDeviceNewPeopleJoined = 'noví lidé se přípojili.';
 z.string.cs.conversationDeviceNewPeopleJoinedVerify = ' ověřit zařízení';
 z.string.cs.conversationJustNow = 'Právě teď';
 z.string.cs.conversationLocationLink = 'Otevřít mapu';
@@ -222,7 +262,6 @@ z.string.cs.conversationUnableToDecryptResetSession = 'Resetovat sezení';
 z.string.cs.conversationMissedMessages = 'Toto zařízení jste nějakou dobu nepoužíval(a). Některé zprávy se nemusí zobrazit.';
 z.string.cs.conversationAssetDownloading = 'Stahování…';
 z.string.cs.conversationAssetUploadFailed = 'Nahrání selhalo';
-z.string.cs.conversationAssetUploadTooLarge = 'Můžete posílat soubory až do velikosti {{number}}';
 z.string.cs.conversationPlaybackError = 'Nelze přehrát';
 z.string.cs.conversationContextMenuEdit = 'Upravit';
 z.string.cs.conversationContextMenuDelete = 'Odstranit pro mě';
@@ -302,67 +341,43 @@ z.string.cs.extensionsGiphyMessage = '{{tag}} • přes giphy.com';
 z.string.cs.extensionsGiphyNoGifs = 'Uups, žádné gify';
 z.string.cs.extensionsGiphyRandom = 'Náhodně';
 
-z.string.cs.peopleConfirmLabel = 'Přidat lidi do skupiny';
-z.string.cs.peoplePeople = '{{number}} lidí';
-z.string.cs.peopleSearchPlaceholder = 'Hledat podle jména';
-z.string.cs.peopleEveryoneParticipates = 'Všichni, které znáte\njsou již připojeni\nk této konverzaci.';
-z.string.cs.peopleNoMatches = 'Žádné odpovídající výsledky.\nZkuste jiné jméno.';
-z.string.cs.peopleInvite = 'Pozvat lidi do aplikace Wire';
-z.string.cs.peopleInviteDetail = 'Sdílením svých kontaktů si zjednodušíte propojení s ostatními. Všechny informace anonymizujeme a nikdy je neposkytujeme nikomu dalšímu.';
-z.string.cs.peopleInviteButtonContacts = 'Z kontaktů';
-z.string.cs.peopleInviteButtonGmail = 'Z Gmailu';
-z.string.cs.peopleInviteHeadline = 'Přiveďte své přátele';
-z.string.cs.peopleServices = 'Služby';
-z.string.cs.peopleShare = 'Sdílet kontakty';
-z.string.cs.peopleTabsDetails = 'Podrobnosti';
-z.string.cs.peopleTabsDevices = 'Přístroje';
-z.string.cs.peopleTabsDevicesHeadline = 'Wire přiřazuje každému přístroji jedinečný identifikátor. Porovnejte je s {{user}} a ověřte svou konverzaci.';
-z.string.cs.peopleTabsDevicesLearnMore = 'Dozvědět se více';
-z.string.cs.peopleTabsDevicesWhyVerify = 'Proč mám ověřovat konverzaci?';
-z.string.cs.peopleTabsNoDevicesHeadline = '{{user}} používá starší verzi aplikace Wire. Nejsou zde zobrazeny žádné přístroje.';
-z.string.cs.peopleTabsDeviceDetailAllMyDevices = 'Zobrazit všechny mé přístroje';
-z.string.cs.peopleTabsDeviceDetailDeviceFingerprint = 'Identifikátor přístoje';
-z.string.cs.peopleTabsDeviceDetailHeadline = 'Ověřte, že to odpovídá identifikátoru zobrazeném na {{html1}}uživatele {{user}}{{html2}}.';
-z.string.cs.peopleTabsDeviceDetailHowTo = 'Jak to mám udělat?';
-z.string.cs.peopleTabsDeviceDetailResetSession = 'Resetovat sezení';
-z.string.cs.peopleTabsDeviceDetailShowMyDevice = 'Zorazit identifikátor mého přístroje';
-z.string.cs.peopleTabsDeviceDetailVerify = 'Ověreno';
-z.string.cs.peopleTabsPeople = 'Kontakty';
-z.string.cs.peopleTabsServices = 'Služby';
-z.string.cs.peopleVerified = 'Ověreno';
+z.string.cs.addParticipantsConfirmLabel = 'Přidat';
+z.string.cs.addParticipantsSearchPlaceholder = 'Hledat podle jména';
+z.string.cs.addParticipantsTabsPeople = 'Kontakty';
+z.string.cs.addParticipantsTabsServices = 'Služby';
 
-z.string.cs.peopleBlockHeadline = 'Blokovat?';
-z.string.cs.peopleBlockMessage = '{{user}} vás nebude moci kontaktovat nebo přizvat ke skupinové konverzaci.';
+z.string.cs.conversationDetailsActionCancelRequest = 'Zrušit žádost';
+z.string.cs.conversationDetailsActionCreateGroup = 'Vytvořit skupinu';
+z.string.cs.conversationDetailsActionDevices = 'Přístroje';
+z.string.cs.conversationDetailsGuestsOff = 'Vypnout';
+z.string.cs.conversationDetailsParticipantsServicesMany = 'Služby';
+z.string.cs.conversationDetailsParticipantsUsersMany = 'Kontakty';
+z.string.cs.conversationDetailsPeople = 'Kontakty';
+z.string.cs.conversationDetailsServices = 'Služby';
 
-z.string.cs.peopleConnectHeadline = 'Přijmout?';
-z.string.cs.peopleConnectMessage = 'Toto naváže spojení a otevře konverzaci s {{user}}.';
+z.string.cs.groupParticipantActionCancelRequest = 'Zrušit žádost';
+z.string.cs.groupParticipantActionDevices = 'Přístroje';
+z.string.cs.groupParticipantActionPending = 'Nevyřízené';
+z.string.cs.groupParticipantActionSendRequest = 'Připojit';
 
-z.string.cs.peopleCancelRequestHeadline = 'Zrušit požadavek?';
-z.string.cs.peopleCancelRequestMessage = 'Odeberte požadavek na připojení s {{user}}.';
+z.string.cs.participantDevicesDetailHeadline = 'Ověřte, že to odpovídá identifikátoru zobrazeném na {{html1}}uživatele {{user}}{{html2}}.';
+z.string.cs.participantDevicesDetailHowTo = 'Jak to mám udělat?';
+z.string.cs.participantDevicesDetailResetSession = 'Resetovat sezení';
+z.string.cs.participantDevicesDetailShowMyDevice = 'Zorazit identifikátor mého přístroje';
+z.string.cs.participantDevicesDetailVerify = 'Ověreno';
 
-z.string.cs.peopleLeaveHeadline = 'Opustit konverzaci?';
-z.string.cs.peopleLeaveMessage = 'Nebudete moct odesílat ani přijímat zprávy v této konverzaci.';
+z.string.cs.participantDevicesHeader = 'Přístroje';
+z.string.cs.participantDevicesHeadline = 'Wire přiřazuje každému přístroji jedinečný identifikátor. Porovnejte je s {{user}} a ověřte svou konverzaci.';
+z.string.cs.participantDevicesLearnMore = 'Dozvědět se více';
+z.string.cs.participantDevicesWhyVerify = 'Proč mám ověřovat konverzaci?';
+z.string.cs.participantDevicesOutdatedClientMessage = '{{user}} používá starší verzi aplikace Wire. Nejsou zde zobrazeny žádné přístroje.';
 
-z.string.cs.peopleRemoveHeadline = 'Odstranit?';
-z.string.cs.peopleRemoveMessage = '{{user}} nebude moci odesílat nebo přijímat zprávy v této konverzaci.';
+z.string.cs.participantDevicesSelfAllDevices = 'Zobrazit všechny mé přístroje';
+z.string.cs.participantDevicesSelfFingerprint = 'Identifikátor přístoje';
 
-z.string.cs.peopleUnblockHeadline = 'Odblokovat?';
-z.string.cs.peopleUnblockMessage = '{{user}} vás nebude moci kontaktovat nebo přizvat ke skupinové konverzaci.';
-
-z.string.cs.peopleButtonAdd = 'Přidat';
-z.string.cs.peopleButtonBlock = 'Blokovat';
-z.string.cs.peopleButtonCancel = 'Zrušit';
-z.string.cs.peopleButtonConnect = 'Připojit';
-z.string.cs.peopleButtonCreate = 'Vytvořit skupinu';
-z.string.cs.peopleButtonIgnore = 'Ignorovat';
-z.string.cs.peopleButtonLeave = 'Odejít';
-z.string.cs.peopleButtonOpen = 'Otevřít konverzaci';
-z.string.cs.peopleButtonPending = 'Nevyřízené';
-z.string.cs.peopleButtonProfile = 'Profil';
-z.string.cs.peopleButtonRemove = 'Odstranit';
-z.string.cs.peopleButtonUnblock = 'Odblokovat';
-z.string.cs.peopleButtonNo = 'Ne';
-z.string.cs.peopleButtonYes = 'Ano';
+z.string.cs.userProfileButtonConnect = 'Připojit';
+z.string.cs.userProfileButtonIgnore = 'Ignorovat';
+z.string.cs.userProfileButtonUnblock = 'Odblokovat';
 
 z.string.cs.preferencesAbout = 'O aplikaci';
 z.string.cs.preferencesAccount = 'Účet';
@@ -444,6 +459,7 @@ z.string.cs.searchCreateGroup = 'Vytvořit skupinu';
 z.string.cs.searchGroups = 'Skupiny';
 z.string.cs.searchPeople = 'Kontakty';
 z.string.cs.searchPlaceholder = 'Hledat podle jméno nebo uživatelského jméno';
+z.string.cs.searchServicePlaceholder = 'Hledat podle jména';
 z.string.cs.searchServices = 'Služby';
 z.string.cs.searchTeamGroups = 'Týmové konverzace';
 z.string.cs.searchTeamMembers = 'Členové týmu';
@@ -452,14 +468,19 @@ z.string.cs.searchTrySearch = 'Vyhledávání osob podle\nvlastního nebo uživa
 z.string.cs.searchNoContactsOnWire = 'V aplikaci Wire nemáte žádné kontakty.\nZkuste vyhledat kontakty podle jména nebo\nuživatelského jména.';
 z.string.cs.searchOthers = 'Připojit';
 
+z.string.cs.searchInvite = 'Pozvat lidi do aplikace Wire';
+z.string.cs.searchInviteDetail = 'Sdílením svých kontaktů si zjednodušíte propojení s ostatními. Všechny informace anonymizujeme a nikdy je neposkytujeme nikomu dalšímu.';
+z.string.cs.searchInviteButtonContacts = 'Z kontaktů';
+z.string.cs.searchInviteButtonGmail = 'Z Gmailu';
+z.string.cs.searchInviteHeadline = 'Přiveďte své přátele';
+z.string.cs.searchInviteShare = 'Sdílet kontakty';
+
+z.string.cs.searchListEveryoneParticipates = 'Všichni, které znáte\njsou již připojeni\nk této konverzaci.';
+z.string.cs.searchListNoMatches = 'Žádné odpovídající výsledky.\nZkuste jiné jméno.';
+
 z.string.cs.uploadGoogleHeadline = 'Najít kontakty\npro konverzaci.';
 z.string.cs.uploadGoogleMessage = 'Vaše údaje o kontaktech používáme k propojení s ostatními uživateli. Všechny informace anonymizujeme a nesdílíme je s nikým dalším.';
-z.string.cs.uploadGoogleHeadlineError = 'Něco se\npokazilo.';
-z.string.cs.uploadGoogleMessageError = 'Neobdrželi jsme vaše data. Zkuste prosím kontakty importovat znovu.';
-z.string.cs.uploadGoogleButtonAgain = 'Zkusit znovu';
 
-z.string.cs.warningCallDetail = 'Pro volání potřebuje prohlížeč přístup k mikrofonu.';
-z.string.cs.warningCallHeadline = 'Nelze volat bez mikrofonu';
 z.string.cs.warningCallUnsupportedIncoming = 'Volá {{user}}. Tento prohlížeč nepodporuje volání.';
 z.string.cs.warningCallUnsupportedOutgoing = 'Nemůžete volat, protože prohlížeč nepodporuje volání.';
 z.string.cs.warningCallIssues = 'Tato verze aplikace Wire se nemůže účastnit volání. Použijte prosím';
@@ -479,7 +500,6 @@ z.string.cs.warningPermissionRequestCamera = '{{icon}} Povolit přístup ke kame
 z.string.cs.warningPermissionRequestMicrophone = '{{icon}} Povolit přístup k mikrofonu';
 z.string.cs.warningPermissionRequestNotification = '{{icon}} Povolit upozornění';
 z.string.cs.warningPermissionRequestScreen = '{{icon}} Povolit přístup k obrazovce';
-z.string.cs.warningTellMeHow = 'Jak na to';
 
 z.string.cs.userAvailabilityAvailable = 'Dostupný';
 z.string.cs.userAvailabilityNone = 'Žádné';
@@ -523,14 +543,7 @@ z.string.cs.tooltipConversationsPreferences = 'Otevřít předvolby';
 z.string.cs.tooltipConversationsSilence = 'Ztlumit ({{shortcut}})';
 z.string.cs.tooltipConversationsStart = 'Spustit konverzaci ({{shortcut}})';
 
-z.string.cs.tooltipPeopleAdd = 'Přidat kontakty ke konverzaci ({{shortcut}})';
-z.string.cs.tooltipPeopleBack = 'Zpět';
-z.string.cs.tooltipPeopleBlock = 'Blokovat';
-z.string.cs.tooltipPeopleConnect = 'Připojit';
-z.string.cs.tooltipPeopleLeave = 'Opustit konverzaci';
-z.string.cs.tooltipPeopleRename = 'Změnit název konverzace';
-z.string.cs.tooltipPeopleRemove = 'Odebrat z konverzace';
-z.string.cs.tooltipPeopleUnblock = 'Odblokovat';
+z.string.cs.tooltipConversationDetailsRename = 'Změnit název konverzace';
 
 z.string.cs.tooltipPreferencesContactsGmail = 'Přihlaste se ke svému Gmail účtu pro sdílení kontaktů';
 z.string.cs.tooltipPreferencesContactsMacos = 'Sdílejte všechny své kontakty z aplikace kontaktů systému macOS';

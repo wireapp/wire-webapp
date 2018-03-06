@@ -26,11 +26,6 @@ z.string.ru.and = 'и';
 z.string.ru.enumerationAnd = ', и ';
 
 //=Загрузка приложения
-z.string.ru.alertUploadFileFormat = 'Нельзя использовать это изображение.\nПожалуйста, выберите изображение в формате PNG или JPEG.';
-z.string.ru.alertUploadTooSmall = 'Нельзя использовать это изображение.\nПожалуйста, выберите изображение размером не менее 320×320 пикселей.';
-z.string.ru.alertUploadTooLarge = 'Это изображение слишком большое.\nВы можете загружать файлы размером до {{number}} МБ.';
-z.string.ru.alertGifTooLarge = 'Анимация слишком большая. \nМаксимальный размер {{number}} МБ.';
-
 z.string.ru.authAccountCountryCode = 'Код страны';
 z.string.ru.authAccountDeletion = 'Вы вышли из системы потому что ваша учётная запись была удалена.';
 z.string.ru.authAccountExpiration = 'Вы были отключены, потому что срок действия вашей сессии истек. Пожалуйста, войдите снова.';
@@ -105,81 +100,128 @@ z.string.ru.callJoin = 'Присоединиться';
 z.string.ru.callChooseSharedScreen = 'Выберите экран для демонстрации';
 z.string.ru.callParticipants = '{{number}} участвуют(ет) в звонке';
 
-z.string.ru.modalButtonCancel = 'Отменить';
-z.string.ru.modalButtonOk = 'OK';
-z.string.ru.modalButtonSend = 'Отправить';
+z.string.ru.modalAcknowledgeAction = 'OK';
+z.string.ru.modalConfirmSecondary = 'Отменить';
+z.string.ru.modalOptionSecondary = 'Отменить';
 
-z.string.ru.modalBlockConversationHeadline = 'Заблокировать {{user}}?';
-z.string.ru.modalBlockConversationMessage = '{{user}} больше не сможет связаться с вами или добавить вас в групповые разговоры.';
-z.string.ru.modalBlockConversationButton = 'Заблокировать';
-z.string.ru.modalBotsConfirmHeadline = 'Добавить службу';
-z.string.ru.modalBotsConfirmMessage = 'Вы действительно хотите начать новый разговор с {{name}}?';
-z.string.ru.modalBotsConfirmButton = 'Подтвердить';
-z.string.ru.modalBotsUnavailableHeadline = 'Боты в настоящее время недоступны';
-z.string.ru.modalBotsUnavailableMessage = 'Благодарим вас за интерес к ботам. В настоящее время сервис приостановлен, пока мы работаем над следующей версией. Следите за обновлениями.';
-z.string.ru.modalCallConversationEmptyHeadline = 'Некому звонить';
-z.string.ru.modalCallConversationEmptyMessage = 'Здесь никого не осталось.';
-z.string.ru.modalCallNoVideoInGroupHeadline = 'В группах нет видеозвонков';
-z.string.ru.modalCallNoVideoInGroupMessage = 'Видеозвонки недоступны в групповых беседах.';
+z.string.ru.modalAccountDeletionAction = 'Удалить';
+z.string.ru.modalAccountDeletionHeadline = 'Удалить аккаунт';
+z.string.ru.modalAccountDeletionMessage = 'Мы вышлем вам сообщение по электронной почте или SMS. Перейдите по ссылке, чтобы навсегда удалить свой аккаунт.';
+
+z.string.ru.modalAccountLogoutAction = 'Выход';
+z.string.ru.modalAccountLogoutHeadline = 'Удалить данные?';
+z.string.ru.modalAccountLogoutOption = 'Удалить все ваши личные данные и разговоры на этом устройстве.';
+
+z.string.ru.modalAccountNewDevicesSecondary = 'Управление устройствами';
+z.string.ru.modalAccountNewDevicesHeadline = 'Ваш аккаунт использовался:';
+z.string.ru.modalAccountNewDevicesFrom = 'Устройство:';
+z.string.ru.modalAccountNewDevicesMessage = 'Если это были не Вы, удалите устройство и измените ваш пароль.';
+
+z.string.ru.modalAccountRemoveDeviceAction = 'Удалить устройство';
+z.string.ru.modalAccountRemoveDeviceHeadline = 'Удалить "{{device}}"';
+z.string.ru.modalAccountRemoveDeviceMessage = 'Для удаления устройства требуется пароль.';
+z.string.ru.modalAccountRemoveDevicePlaceholder = 'Пароль';
+
+z.string.ru.modalAssetTooLargeMessage = 'Вы можете отправлять файлы размером до {{number}}';
+
+z.string.ru.modalAssetParallelUploadsMessage = 'Вы можете отправить до {{number}} файлов за раз.';
+
+z.string.ru.modalCallEmptyConversationHeadline = 'Некому звонить';
+z.string.ru.modalCallEmptyConversationMessage = 'Здесь никого не осталось.';
+
+z.string.ru.modalCallNoGroupVideoHeadline = 'В группах нет видеозвонков';
+z.string.ru.modalCallNoGroupVideoMessage = 'Видеозвонки недоступны в групповых беседах.';
+
+z.string.ru.modalCallNoMicrophoneAction = 'Скажите мне, как';
+z.string.ru.modalCallNoMicrophoneMessage = 'Вашему браузеру необходим доступ к микрофону для совершения звонков.';
+z.string.ru.modalCallNoMicrophoneHeadline = 'Невозможно позвонить без доступа к микрофону';
+
+z.string.ru.modalCallSecondIncomingAction = 'Ответить';
 z.string.ru.modalCallSecondIncomingHeadline = 'Ответить на звонок?';
 z.string.ru.modalCallSecondIncomingMessage = 'Ваш текущий звонок будет завершен.';
-z.string.ru.modalCallSecondIncomingAction = 'Ответить';
+
+z.string.ru.modalCallSecondOngoingAction = 'Завершить вызов';
 z.string.ru.modalCallSecondOngoingHeadline = 'Завершить звонок на другом устройстве?';
 z.string.ru.modalCallSecondOngoingMessage = 'Вы можете одновременно участвовать только в одном звонке.';
-z.string.ru.modalCallSecondOngoingAction = 'Завершить вызов';
+
+z.string.ru.modalCallSecondOutgoingAction = 'Завершить вызов';
 z.string.ru.modalCallSecondOutgoingHeadline = 'Завершить текущий звонок?';
 z.string.ru.modalCallSecondOutgoingMessage = 'Вы можете одновременно участвовать только в одном звонке.';
-z.string.ru.modalCallSecondOutgoingAction = 'Завершить вызов';
-z.string.ru.modalClearConversationHeadline = 'Удалить содержимое?';
-z.string.ru.modalClearConversationMessage = 'Это очистит историю разговоров на всех ваших устройствах.';
-z.string.ru.modalClearConversationOption = 'Также покинуть разговор';
-z.string.ru.modalClearConversationButton = 'Удалить';
-z.string.ru.modalConnectedDeviceHeadline = 'Ваш аккаунт использовался:';
-z.string.ru.modalConnectedDeviceFrom = 'Устройство:';
-z.string.ru.modalConnectedDeviceMessage = 'Если это были не Вы, удалите устройство и измените ваш пароль.';
-z.string.ru.modalConnectedDeviceManageDevices = 'Управление устройствами';
-z.string.ru.modalDeleteAccountAction = 'Удалить';
-z.string.ru.modalDeleteAccountHeadline = 'Удалить аккаунт';
-z.string.ru.modalDeleteAccountMessage = 'Мы вышлем вам сообщение по электронной почте или SMS. Перейдите по ссылке, чтобы навсегда удалить свой аккаунт.';
-z.string.ru.modalDeleteButton = 'Удалить';
-z.string.ru.modalDeleteHeadline = 'Удалить только для меня?';
-z.string.ru.modalDeleteMessage = 'Действие не может быть отменено.';
-z.string.ru.modalDeleteEveryoneButton = 'Удалить';
-z.string.ru.modalDeleteEveryoneHeadline = 'Удалить для всех?';
-z.string.ru.modalDeleteEveryoneMessage = 'Действие не может быть отменено.';
-z.string.ru.modalTooLongHeadline = 'Сообщение слишком длинное';
-z.string.ru.modalTooLongMessage = 'Вы можете отправлять сообщения длиной до {{number}} символов.';
-z.string.ru.modalLeaveConversationHeadline = 'Покинуть разговор "{{user}}"?';
-z.string.ru.modalLeaveConversationMessage = 'Участники будут уведомлены и разговор будет удален из вашего списка.';
-z.string.ru.modalLeaveConversationButton = 'Покинуть';
-z.string.ru.modalLogoutHeadline = 'Удалить данные?';
-z.string.ru.modalLogoutMessage = 'Удалить все ваши личные данные и разговоры на этом устройстве.';
-z.string.ru.modalLogoutButton = 'Выход';
-z.string.ru.modalNewDeviceHeadline = '{{user}} начал(а) использовать новое устройство';
-z.string.ru.modalNewDeviceHeadlineMany = '{{user}}s начали использовать новые устройства';
-z.string.ru.modalNewDeviceHeadlineYou = '{{user}} начал(а) использовать новое устройство';
-z.string.ru.modalNewDeviceMessage = 'Вы всё ещё хотите отправить ваши сообщения?';
-z.string.ru.modalNewDeviceCallAccept = 'Принять вызов';
-z.string.ru.modalNewDeviceCallAnyway = 'Всё равно позвонить';
-z.string.ru.modalNewDeviceCallIncoming = 'Вы действительно хотите принять вызов?';
-z.string.ru.modalNewDeviceCallOutgoing = 'Вы действительно хотите позвонить?';
-z.string.ru.modalNewDeviceShowDevice = 'показать устройство';
-z.string.ru.modalNewDeviceSendAnyway = 'отправить всё равно';
-z.string.ru.modalNotConnectedHeadline = 'В разговоре нет участников';
-z.string.ru.modalNotConnectedMessageOne = '{{name}} не хочет добавляться в разговоры.';
-z.string.ru.modalNotConnectedMessageMany = 'Один из выбранных контактов не хочет быть добавлен в разговор.';
-z.string.ru.modalRemoveDeviceButton = 'Удалить устройство';
-z.string.ru.modalRemoveDeviceHeadline = 'Удалить "{{device}}"';
-z.string.ru.modalRemoveDeviceMessage = 'Для удаления устройства требуется пароль.';
+
+z.string.ru.modalConnectCancelAction = 'Да';
+z.string.ru.modalConnectCancelHeadline = 'Отменить запрос?';
+z.string.ru.modalConnectCancelMessage = 'Удалить запрос на добавление {{user}}.';
+z.string.ru.modalConnectCancelSecondary = 'Нет';
+
+z.string.ru.modalConnectAcceptAction = 'Связаться';
+z.string.ru.modalConnectAcceptHeadline = 'Принять?';
+z.string.ru.modalConnectAcceptMessage = 'Это подключит вас и откроет разговор с {{user}}.';
+z.string.ru.modalConnectAcceptSecondary = 'Игнорировать';
+
+z.string.ru.modalConversationAddBotAction = 'Подтвердить';
+z.string.ru.modalConversationAddBotHeadline = 'Добавить службу';
+z.string.ru.modalConversationAddBotMessage = 'Вы действительно хотите начать новый разговор с {{name}}?';
+
+z.string.ru.modalConversationClearAction = 'Удалить';
+z.string.ru.modalConversationClearHeadline = 'Удалить содержимое?';
+z.string.ru.modalConversationClearOption = 'Также покинуть разговор';
+
+z.string.ru.modalConversationDeleteMessageAction = 'Удалить';
+z.string.ru.modalConversationDeleteMessageHeadline = 'Удалить только для меня?';
+z.string.ru.modalConversationDeleteMessageMessage = 'Действие не может быть отменено.';
+
+z.string.ru.modalConversationDeleteMessageEveryoneAction = 'Удалить';
+z.string.ru.modalConversationDeleteMessageEveryoneHeadline = 'Удалить для всех?';
+z.string.ru.modalConversationDeleteMessageEveryoneMessage = 'Действие не может быть отменено.';
+
+z.string.ru.modalConversationLeaveAction = 'Покинуть';
+z.string.ru.modalConversationLeaveMessage = 'Вы больше не сможете отправлять и получать сообщения в этом разговоре.';
+
+z.string.ru.modalConversationMessageTooLongHeadline = 'Сообщение слишком длинное';
+z.string.ru.modalConversationMessageTooLongMessage = 'Вы можете отправлять сообщения длиной до {{number}} символов.';
+
+z.string.ru.modalConversationNewDeviceHeadlineOne = '{{user}} начал(а) использовать новое устройство';
+z.string.ru.modalConversationNewDeviceHeadlineMany = '{{user}}s начали использовать новые устройства';
+z.string.ru.modalConversationNewDeviceHeadlineYou = '{{user}} начал(а) использовать новое устройство';
+z.string.ru.modalConversationNewDeviceIncomingCallAction = 'Принять вызов';
+z.string.ru.modalConversationNewDeviceIncomingCallMessage = 'Вы действительно хотите принять вызов?';
+z.string.ru.modalConversationNewDeviceMessage = 'Вы всё ещё хотите отправить ваши сообщения?';
+z.string.ru.modalConversationNewDeviceOutgoingCallAction = 'Всё равно позвонить';
+z.string.ru.modalConversationNewDeviceOutgoingCallMessage = 'Вы действительно хотите позвонить?';
+
+z.string.ru.modalConversationNotConnectedHeadline = 'В разговоре нет участников';
+z.string.ru.modalConversationNotConnectedMessageOne = '{{name}} не хочет добавляться в разговоры.';
+z.string.ru.modalConversationNotConnectedMessageMany = 'Один из выбранных контактов не хочет быть добавлен в разговор.';
+
+z.string.ru.modalConversationRemoveAction = 'Удалить';
+z.string.ru.modalConversationRemoveHeadline = 'Удалить?';
+z.string.ru.modalConversationRemoveMessage = '{{user}} больше не сможет отправлять и получать сообщения в этом разговоре.';
+
+
+z.string.ru.modalConversationTooManyMembersHeadline = 'Канал переполнен';
+
+z.string.ru.modalIntegrationUnavailableHeadline = 'Боты в настоящее время недоступны';
+z.string.ru.modalIntegrationUnavailableMessage = 'Благодарим вас за интерес к ботам. В настоящее время сервис приостановлен, пока мы работаем над следующей версией. Следите за обновлениями.';
+
+
 z.string.ru.modalServiceUnavailableHeadline = 'Добавление службы невозможно';
 z.string.ru.modalServiceUnavailableMessage = 'Эта служба недоступна в данный момент.';
+
 z.string.ru.modalSessionResetHeadline = 'Сессия была сброшена';
 z.string.ru.modalSessionResetMessage1 = 'Если проблема не решена,';
 z.string.ru.modalSessionResetMessageLink = 'cвяжитесь';
 z.string.ru.modalSessionResetMessage2 = 'с нами.';
-z.string.ru.modalTooManyMembersHeadline = 'Канал переполнен';
-z.string.ru.modalTooManyMembersMessage = 'К разговору может присоединиться до {{number1}} человек. Здесь хватит места еще для {{number2}} человек.';
-z.string.ru.modalUploadsParallel = 'Вы можете отправить до {{number}} файлов за раз.';
+
+z.string.ru.modalUploadContactsAction = 'Повторить';
+z.string.ru.modalUploadContactsMessage = 'Мы не получили вашу информацию. Пожалуйста, попробуйте импортировать ваши контакты еще раз.';
+
+z.string.ru.modalUserBlockAction = 'Заблокировать';
+z.string.ru.modalUserBlockHeadline = 'Заблокировать {{user}}?';
+z.string.ru.modalUserBlockMessage = '{{user}} больше не сможет связаться с вами или добавить вас в групповые разговоры.';
+
+z.string.ru.modalUserUnblockAction = 'Разблокировать';
+z.string.ru.modalUserUnblockHeadline = 'Разблокировать?';
+z.string.ru.modalUserUnblockMessage = '{{user}} вновь сможет связываться с вами и добавлять вас в групповые разговоры.';
 
 z.string.ru.connectionRequestConnect = 'Связаться';
 z.string.ru.connectionRequestIgnore = 'Игнорировать';
@@ -206,7 +248,6 @@ z.string.ru.conversationDeviceYourDevices = ' ваши устройства';
 z.string.ru.conversationDeviceUserDevices = 'Устройства, принадлежащие {{user}}';
 z.string.ru.conversationDeviceNewDeviceOne = ' новое устройство';
 z.string.ru.conversationDeviceNewDeviceMany = ' новые устройства';
-z.string.ru.conversationDeviceNewPeopleJoined = 'присоединились новые участники.';
 z.string.ru.conversationDeviceNewPeopleJoinedVerify = ' верифицируйте устройства';
 z.string.ru.conversationJustNow = 'Только что';
 z.string.ru.conversationLocationLink = 'Открыть карту';
@@ -239,7 +280,6 @@ z.string.ru.conversationMissedMessages = 'Вы не использовали э�
 z.string.ru.conversationAssetUploading = 'Загрузка…';
 z.string.ru.conversationAssetDownloading = 'Загрузка…';
 z.string.ru.conversationAssetUploadFailed = 'Ошибка отправки';
-z.string.ru.conversationAssetUploadTooLarge = 'Вы можете отправлять файлы размером до {{number}}';
 z.string.ru.conversationPlaybackError = 'Невозможно воспроизвести';
 z.string.ru.conversationContextMenuEdit = 'Редактировать';
 z.string.ru.conversationContextMenuDelete = 'Удалить для меня';
@@ -331,71 +371,46 @@ z.string.ru.extensionsGiphyMessage = '{{tag}} • через giphy.com';
 z.string.ru.extensionsGiphyNoGifs = 'Упс, нет GIF-ок';
 z.string.ru.extensionsGiphyRandom = 'Случайно';
 
-z.string.ru.peopleConfirmLabel = 'Добавить пользователей в группу';
-z.string.ru.peoplePeople = '{{number}} участника(ов)';
-z.string.ru.peopleSearchPlaceholder = 'Поиск по имени';
-z.string.ru.peopleEveryoneParticipates = 'Все ваши контакты \nуже участвуют\nв этом разговоре.';
-z.string.ru.peopleNoMatches = 'Совпадений не найдено.\nПопробуйте ввести другое имя.';
-z.string.ru.peopleInvite = 'Пригласите людей в Wire';
-z.string.ru.peopleInviteDetail = 'Предоставление доступа к вашим контактам поможет вам связаться с другими людьми. Вся информация анонимна, мы не предоставляем её третьим лицам.';
-z.string.ru.peopleInviteButtonContacts = 'Из контактов';
-z.string.ru.peopleInviteButtonGmail = 'Из Gmail';
-z.string.ru.peopleInviteHeadline = 'Приведите друзей';
-z.string.ru.peopleServiceConfirmButton = 'Добавить службу';
-z.string.ru.peopleServiceRemovalButton = 'Удалить службу';
-z.string.ru.peopleServiceNewConversation = 'Создать новый разговор';
-z.string.ru.peopleServices = 'Сервисы';
-z.string.ru.peopleShare = 'Поделиться контактами';
-z.string.ru.peopleTabsDetails = 'Подробнее';
-z.string.ru.peopleTabsDevices = 'Устройства';
-z.string.ru.peopleTabsDevicesHeadline = 'Wire дает каждому устройству уникальный отпечаток. Сравните их с {{user}}, чтобы верифицировать разговор.';
-z.string.ru.peopleTabsDevicesLearnMore = 'Подробнее';
-z.string.ru.peopleTabsDevicesWhyVerify = 'Зачем верифицировать разговоры?';
-z.string.ru.peopleTabsNoDevicesHeadline = '{{user}} использует устаревшую версию Wire. Устройства не отображаются.';
-z.string.ru.peopleTabsDeviceDetailAllMyDevices = 'Показать все мои устройства';
-z.string.ru.peopleTabsDeviceDetailDeviceFingerprint = 'Отпечаток устройства';
-z.string.ru.peopleTabsDeviceDetailHeadline = 'Убедитесь, что этот отпечаток соответствует отпечатку, показанному на устройстве {{html1}}{{user}}{{html2}}.';
-z.string.ru.peopleTabsDeviceDetailHowTo = 'Как это сделать?';
-z.string.ru.peopleTabsDeviceDetailResetSession = 'Сбросить сессию';
-z.string.ru.peopleTabsDeviceDetailShowMyDevice = 'Показать отпечаток моего устройства';
-z.string.ru.peopleTabsDeviceDetailVerify = 'Подтверждён';
-z.string.ru.peopleTabsPeople = 'Участники';
-z.string.ru.peopleTabsServices = 'Сервисы';
-z.string.ru.peopleVerified = 'Подтверждён';
+z.string.ru.addParticipantsConfirmLabel = 'Добавить';
+z.string.ru.addParticipantsHeader = 'Добавить людей';
+z.string.ru.addParticipantsHeaderWithCounter = 'Добавить людей ({{number}})';
+z.string.ru.addParticipantsSearchPlaceholder = 'Поиск по имени';
+z.string.ru.addParticipantsServiceConfirmButton = 'Добавить службу';
+z.string.ru.addParticipantsTabsPeople = 'Участники';
+z.string.ru.addParticipantsTabsServices = 'Сервисы';
 
-z.string.ru.peopleBlockHeadline = 'Заблокировать?';
-z.string.ru.peopleBlockMessage = '{{user}} больше не сможет связаться с вами или добавить вас в групповые разговоры.';
+z.string.ru.conversationDetailsActionCancelRequest = 'Отклонить запрос';
+z.string.ru.conversationDetailsActionCreateGroup = 'Создать группу';
+z.string.ru.conversationDetailsActionDevices = 'Устройства';
+z.string.ru.conversationDetailsGuestsOff = 'Выключен';
+z.string.ru.conversationDetailsParticipantsServicesMany = 'Сервисы';
+z.string.ru.conversationDetailsParticipantsUsersMany = 'Участники';
+z.string.ru.conversationDetailsPeople = 'Участники';
+z.string.ru.conversationDetailsServices = 'Сервисы';
 
-z.string.ru.peopleConnectHeadline = 'Принять?';
-z.string.ru.peopleConnectMessage = 'Это подключит вас и откроет разговор с {{user}}.';
+z.string.ru.groupParticipantActionCancelRequest = 'Отклонить запрос';
+z.string.ru.groupParticipantActionDevices = 'Устройства';
+z.string.ru.groupParticipantActionPending = 'Ожидает';
+z.string.ru.groupParticipantActionSendRequest = 'Связаться';
 
-z.string.ru.peopleCancelRequestHeadline = 'Отменить запрос?';
-z.string.ru.peopleCancelRequestMessage = 'Удалить запрос на добавление {{user}}.';
+z.string.ru.participantDevicesDetailHeadline = 'Убедитесь, что этот отпечаток соответствует отпечатку, показанному на устройстве {{html1}}{{user}}{{html2}}.';
+z.string.ru.participantDevicesDetailHowTo = 'Как это сделать?';
+z.string.ru.participantDevicesDetailResetSession = 'Сбросить сессию';
+z.string.ru.participantDevicesDetailShowMyDevice = 'Показать отпечаток моего устройства';
+z.string.ru.participantDevicesDetailVerify = 'Подтверждён';
 
-z.string.ru.peopleLeaveHeadline = 'Покинуть разговор?';
-z.string.ru.peopleLeaveMessage = 'Вы больше не сможете отправлять и получать сообщения в этом разговоре.';
+z.string.ru.participantDevicesHeader = 'Устройства';
+z.string.ru.participantDevicesHeadline = 'Wire дает каждому устройству уникальный отпечаток. Сравните их с {{user}}, чтобы верифицировать разговор.';
+z.string.ru.participantDevicesLearnMore = 'Подробнее';
+z.string.ru.participantDevicesWhyVerify = 'Зачем верифицировать разговоры?';
+z.string.ru.participantDevicesOutdatedClientMessage = '{{user}} использует устаревшую версию Wire. Устройства не отображаются.';
 
-z.string.ru.peopleRemoveHeadline = 'Удалить?';
-z.string.ru.peopleRemoveMessage = '{{user}} больше не сможет отправлять и получать сообщения в этом разговоре.';
+z.string.ru.participantDevicesSelfAllDevices = 'Показать все мои устройства';
+z.string.ru.participantDevicesSelfFingerprint = 'Отпечаток устройства';
 
-z.string.ru.peopleUnblockHeadline = 'Разблокировать?';
-z.string.ru.peopleUnblockMessage = '{{user}} вновь сможет связываться с вами и добавлять вас в групповые разговоры.';
-
-z.string.ru.peopleButtonAdd = 'Добавить';
-z.string.ru.peopleButtonAddPeople = 'Добавить людей';
-z.string.ru.peopleButtonBlock = 'Заблокировать';
-z.string.ru.peopleButtonCancel = 'Отменить';
-z.string.ru.peopleButtonConnect = 'Связаться';
-z.string.ru.peopleButtonCreate = 'Создать группу';
-z.string.ru.peopleButtonIgnore = 'Игнорировать';
-z.string.ru.peopleButtonLeave = 'Покинуть';
-z.string.ru.peopleButtonOpen = 'Открыть разговор';
-z.string.ru.peopleButtonPending = 'Ожидает';
-z.string.ru.peopleButtonProfile = 'Профиль';
-z.string.ru.peopleButtonRemove = 'Удалить';
-z.string.ru.peopleButtonUnblock = 'Разблокировать';
-z.string.ru.peopleButtonNo = 'Нет';
-z.string.ru.peopleButtonYes = 'Да';
+z.string.ru.userProfileButtonConnect = 'Связаться';
+z.string.ru.userProfileButtonIgnore = 'Игнорировать';
+z.string.ru.userProfileButtonUnblock = 'Разблокировать';
 
 z.string.ru.preferencesAbout = 'О программе';
 z.string.ru.preferencesAccount = 'Аккаунт';
@@ -481,6 +496,7 @@ z.string.ru.searchCreateGuestRoom = 'Создать гостевую комна�
 z.string.ru.searchGroups = 'Группы';
 z.string.ru.searchPeople = 'Участники';
 z.string.ru.searchPlaceholder = 'Поиск по имени или имени пользователя';
+z.string.ru.searchServicePlaceholder = 'Поиск по имени';
 z.string.ru.searchServices = 'Сервисы';
 z.string.ru.searchTeamGroups = 'Разговоры команды';
 z.string.ru.searchTeamMembers = 'Члены команды';
@@ -490,11 +506,21 @@ z.string.ru.searchNoContactsOnWire = 'У вас нет контактов в Wir
 z.string.ru.searchMemberInvite = 'Пригласите людей в команду';
 z.string.ru.searchOthers = 'Связаться';
 
+z.string.ru.searchInvite = 'Пригласите людей в Wire';
+z.string.ru.searchInviteDetail = 'Предоставление доступа к вашим контактам поможет вам связаться с другими людьми. Вся информация анонимна, мы не предоставляем её третьим лицам.';
+z.string.ru.searchInviteButtonContacts = 'Из контактов';
+z.string.ru.searchInviteButtonGmail = 'Из Gmail';
+z.string.ru.searchInviteHeadline = 'Приведите друзей';
+z.string.ru.searchInviteShare = 'Поделиться контактами';
+
+z.string.ru.searchServiceNewConversation = 'Создать новый разговор';
+z.string.ru.searchServiceConfirmButton = 'Добавить службу';
+
+z.string.ru.searchListEveryoneParticipates = 'Все ваши контакты \nуже участвуют\nв этом разговоре.';
+z.string.ru.searchListNoMatches = 'Совпадений не найдено.\nПопробуйте ввести другое имя.';
+
 z.string.ru.uploadGoogleHeadline = 'Найти людей,\nчтобы поговорить.';
 z.string.ru.uploadGoogleMessage = 'Мы используем ваши контактные данные, чтобы соединить вас с другими пользователями. Мы анонимизируем всю информацию и не делимся ей с кем-либо еще.';
-z.string.ru.uploadGoogleHeadlineError = 'Что-то \nпошло не так.';
-z.string.ru.uploadGoogleMessageError = 'Мы не получили вашу информацию. Пожалуйста, попробуйте импортировать ваши контакты еще раз.';
-z.string.ru.uploadGoogleButtonAgain = 'Повторить';
 
 z.string.ru.urlSupportRoot = '/';
 z.string.ru.urlSupportArticles = '/hc/ru/articles/';
@@ -503,8 +529,6 @@ z.string.ru.urlWebappRoot = '/';
 z.string.ru.urlWebsiteRoot = '/';
 z.string.ru.urlWebsiteCreateTeam = '/ru/create-team/';
 z.string.ru.urlWebsitePrivacy = '/ru/privacy';
-z.string.ru.warningCallDetail = 'Вашему браузеру необходим доступ к микрофону для совершения звонков.';
-z.string.ru.warningCallHeadline = 'Невозможно позвонить без доступа к микрофону';
 z.string.ru.warningCallUnsupportedIncoming = '{{user}} звонит. Ваш браузер не поддерживает звонки.';
 z.string.ru.warningCallUnsupportedOutgoing = 'Не удается совершить звонок, потому что ваш браузер не поддерживает звонки.';
 z.string.ru.warningCallIssues = 'Эта версия Wire не может участвовать в звонке. Пожалуйста, используйте';
@@ -524,7 +548,6 @@ z.string.ru.warningPermissionRequestCamera = '{{icon}} Разрешить дос
 z.string.ru.warningPermissionRequestMicrophone = '{{icon}} Разрешить доступ к микрофону';
 z.string.ru.warningPermissionRequestNotification = '{{icon}} Разрешить уведомления';
 z.string.ru.warningPermissionRequestScreen = '{{icon}} Разрешить доступ к экрану';
-z.string.ru.warningTellMeHow = 'Скажите мне, как';
 
 z.string.ru.userAvailabilityAvailable = 'Доступно';
 z.string.ru.userAvailabilityAway = 'Отошел';
@@ -573,17 +596,7 @@ z.string.ru.tooltipConversationsPreferences = 'Открыть настройки
 z.string.ru.tooltipConversationsSilence = 'Выключить звук ({{shortcut}})';
 z.string.ru.tooltipConversationsStart = 'Начать разговор ({{shortcut}})';
 
-z.string.ru.tooltipPeopleAdd = 'Добавить в разговор ({{shortcut}})';
-z.string.ru.tooltipPeopleAddPeople = 'Добавить людей в разговор ({{shortcut}})';
-z.string.ru.tooltipPeopleBack = 'Назад';
-z.string.ru.tooltipPeopleBlock = 'Заблокировать';
-z.string.ru.tooltipPeopleConnect = 'Связаться';
-z.string.ru.tooltipPeopleLeave = 'Покинуть разговор';
-z.string.ru.tooltipPeopleOpen = 'Открыть разговор';
-z.string.ru.tooltipPeopleProfile = 'Открыть свой профиль';
-z.string.ru.tooltipPeopleRename = 'Изменить название разговора';
-z.string.ru.tooltipPeopleRemove = 'Удалить из разговора';
-z.string.ru.tooltipPeopleUnblock = 'Разблокировать';
+z.string.ru.tooltipConversationDetailsRename = 'Изменить название разговора';
 
 z.string.ru.tooltipPreferencesContactsGmail = 'Войдите в свой аккаунт Gmail, чтобы поделиться контактами';
 z.string.ru.tooltipPreferencesContactsMacos = 'Поделиться всеми контактами из приложения macOS Контакты';
