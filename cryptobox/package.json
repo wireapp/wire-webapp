@@ -3,15 +3,14 @@
     "@types/fs-extra": "5.0.1",
     "@types/node": "9.3.0",
     "@wireapp/lru-cache": "2.0.9",
+    "@wireapp/priority-queue": "0.0.33",
     "@wireapp/proteus": "7.1.5",
     "@wireapp/store-engine": "0.3.4",
     "dexie": "2.0.2",
-    "fs-extra": "5.0.0",
-    "p-queue": "2.3.0"
+    "fs-extra": "5.0.0"
   },
   "description": "High-level API with persistent storage for Proteus.",
   "devDependencies": {
-    "@types/p-queue": "2.3.1",
     "browser-sync": "2.23.6",
     "cpx": "1.5.0",
     "cross-env": "5.1.3",

@@ -8,7 +8,7 @@ import InvalidPreKeyFormatError from './InvalidPreKeyFormatError';
 import {CryptoboxCRUDStore} from './store/root';
 import LRUCache from '@wireapp/lru-cache';
 import EventEmitter = require('events');
-import PQueue = require('p-queue');
+import {PriorityQueue} from '@wireapp/priority-queue';
 import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine/';
 const logdown = require('logdown');
 
@@ -30,7 +30,7 @@ class Cryptobox extends EventEmitter {
     markdown: false,
   });
   private minimumAmountOfPreKeys: number;
-  private queue: PQueue = new PQueue({concurrency: 1});
+  private queue: PriorityQueue = new PriorityQueue({maxRetries: 0});
   private store: CryptoboxCRUDStore;
 
   public lastResortPreKey: ProteusKeys.PreKey | undefined;
