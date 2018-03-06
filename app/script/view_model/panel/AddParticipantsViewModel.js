@@ -57,7 +57,12 @@ z.viewModel.panel.AppParticipantsViewModel = class AppParticipantsViewModel {
     this.selectedService = ko.observable();
     this.state = ko.observable(AppParticipantsViewModel.STATE.ADD_PEOPLE);
 
+    this.enableAddAction = ko.pureComputed(() => this.selectedContacts().length > 0 || this.selectedService());
+
     this.isAddState = ko.pureComputed(() => this.isStateAddPeople() || this.isStateAddService());
+    this.isConfirmAddingState = ko.pureComputed(() => this.isStateAddPeople() || this.isStateConfirmation());
+    this.isServiceState = ko.pureComputed(() => this.isStateAddService() || this.isStateConfirmation());
+
     this.isStateAddPeople = ko.pureComputed(() => this.state() === AppParticipantsViewModel.STATE.ADD_PEOPLE);
     this.isStateAddService = ko.pureComputed(() => this.state() === AppParticipantsViewModel.STATE.ADD_SERVICE);
     this.isStateConfirmation = ko.pureComputed(() => this.state() === AppParticipantsViewModel.STATE.CONFIRMATION);
@@ -127,7 +132,23 @@ z.viewModel.panel.AppParticipantsViewModel = class AppParticipantsViewModel {
     this.integrationRepository.getProviderNameForService(serviceEntity);
   }
 
-  clickToAddMembers() {
+  clickToAddParticipants() {
+    if (this.isStateConfirmation()) {
+      this._addService();
+    } else {
+      this._addMembers();
+    }
+
+    this._switchToConversationDetails();
+  }
+
+  searchServices(query) {
+    if (this.isStateAddService()) {
+      this.integrationRepository.searchForServices(query, this.searchInput);
+    }
+  }
+
+  _addMembers() {
     const conversationEntity = this.conversationEntity();
     const userEntities = this.selectedContacts();
 
@@ -151,18 +172,10 @@ z.viewModel.panel.AppParticipantsViewModel = class AppParticipantsViewModel {
 
       amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.ADD_PARTICIPANTS, attributes);
     });
-    this._switchToConversationDetails();
   }
 
-  clickToAddService() {
+  _addService() {
     this.integrationRepository.addService(this.conversationEntity(), this.selectedService(), 'conversation_details');
-    this._switchToConversationDetails();
-  }
-
-  searchServices(query) {
-    if (this.isStateAddService()) {
-      this.integrationRepository.searchForServices(query, this.searchInput);
-    }
   }
 
   _resetView() {

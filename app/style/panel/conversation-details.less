@@ -56,7 +56,13 @@
       resize: none;
     }
 
-    &__icon {
+    &__verified-icon {
+      flex-grow: 1;
+      margin: 0 8px;
+    }
+
+    &__edit-icon {
+      flex-grow: 1;
       opacity: 0;
       transition: opacity @animation-timing-faster @ease-in-quart;
       margin-left: 11px;
@@ -71,7 +77,7 @@
       }
     }
 
-    &:hover > &__icon {
+    &:hover > &__edit-icon {
       opacity: 1;
     }
   }
@@ -123,7 +129,7 @@
   }
 
   &__devices {
-    margin: 48px 16px 56px;
+    margin: 88px 0 56px;
   }
 
   &__participants {
