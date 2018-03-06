@@ -1,38 +1,3 @@
-<script type="text/html" id="user-profile-template">
-  <div class="user-profile-transition">
-    <!-- ko if: hasUser -->
-      <div class="user-profile-default">
-        <div class="user-profile-header">
-          <div class="name popover-title ellipsis" data-bind="text: userEntity().name(), attr: {'data-uie-uid': userEntity().id, 'data-uie-value': userEntity().name()}" data-uie-name="status-user"></div>
-          <div class="username popover-meta label-username" data-bind="text: userEntity().username(), attr: {'data-uie-value': userEntity().name()}" data-uie-name="status-username"></div>
-          <!-- ko if: userEntity().is_verified() -->
-            <svg class="user-profile-user-verified" width="16" height="16">
-              <use xlink:href="#icon-verified"></use>
-            </svg>
-          <!-- /ko -->
-        </div>
-
-        <div class="user-profile-details">
-          <!-- ko if: renderAvatar -->
-            <div class="user-profile-details-avatar">
-              <participant-avatar class="cursor-default" params="participant: userEntity, size: z.components.ParticipantAvatar.SIZE.X_LARGE" data-uie-name="status-profile-picture"></participant-avatar>
-            </div>
-          <!-- /ko -->
-          <!-- if: isTeam -->
-            <availability-state class="user-profile-details-availability"
-                                data-uie-name="status-availability"
-                                params="availability: userEntity().availability(), label: userAvailabilityLabel()">
-            </availability-state>
-          <!-- /ko -->
-        </div>
-        <div class="user-profile-footer">
-          <!-- ko template: {name: getFooterTemplate} --><!-- /ko -->
-        </div>
-      </div>
-    <!-- /ko -->
-  </div>
-</script>
-
 <script type="text/html" id="user-profile-footer-add">
   <div class="button-icon pull-left" data-bind="click: clickToSendRequest, l10n_tooltip: z.string.userProfileButtonConnect" data-uie-name="do-connect">
     <div class="button-icon icon-plus"></div>

@@ -23,37 +23,14 @@ window.z = window.z || {};
 window.z.components = z.components || {};
 
 z.components.UserProfile = class UserProfile {
-  static get MODE() {
-    return {
-      SEARCH: 'UserProfile.MODE.SEARCH',
-    };
-  }
-
-  constructor(params, componentInfo) {
+  constructor(params) {
     this.dispose = this.dispose.bind(this);
 
     this.logger = new z.util.Logger('z.components.UserProfile', z.config.LOGGER.OPTIONS);
 
-    this.mode = UserProfile.MODE.SEARCH;
     this.userEntity = params.user;
-    this.element = $(componentInfo.element);
-
-    this.userRepository = window.wire.app.repository.user;
-
-    this.selfUser = this.userRepository.self;
 
     this.hasUser = ko.pureComputed(() => typeof this.userEntity === 'function' && !!this.userEntity());
-
-    this.isTeam = ko.pureComputed(() => this.selfUser().is_team_member());
-
-    this.userAvailabilityLabel = ko.pureComputed(() => {
-      if (this.userEntity()) {
-        const availabilitySetToNone = this.userEntity().availability() === z.user.AvailabilityType.NONE;
-        if (!availabilitySetToNone) {
-          return z.user.AvailabilityMapper.nameFromType(this.userEntity().availability());
-        }
-      }
-    });
 
     // Actions
     this.clickOnClose = () => {
@@ -101,8 +78,10 @@ z.components.UserProfile = class UserProfile {
       const hasUserId = this.hasUser();
 
       // swap value to re-render avatar
-      this.renderAvatar(false);
-      window.setTimeout(() => this.renderAvatar(hasUserId), 0);
+      if (hasUserId) {
+        this.renderAvatar(false);
+        window.setTimeout(() => this.renderAvatar(hasUserId), 0);
+      }
     });
 
     // footer
@@ -133,12 +112,28 @@ z.components.UserProfile = class UserProfile {
 };
 
 ko.components.register('user-profile', {
-  template: {
-    element: 'user-profile-template',
-  },
-  viewModel: {
-    createViewModel(params, componentInfo) {
-      return new z.components.UserProfile(params, componentInfo);
-    },
-  },
+  template: `
+    <div class="user-profile-transition">
+      <!-- ko if: hasUser() -->
+        <div class="user-profile-default">
+          <div class="user-profile-header">
+            <div class="name popover-title ellipsis" data-bind="text: userEntity().name(), attr: {'data-uie-uid': userEntity().id, 'data-uie-value': userEntity().name()}" data-uie-name="status-user"></div>
+            <div class="username popover-meta label-username" data-bind="text: userEntity().username(), attr: {'data-uie-value': userEntity().name()}" data-uie-name="status-username"></div>
+          </div>
+
+          <div class="user-profile-details">
+            <!-- ko if: renderAvatar() -->
+              <div class="user-profile-details-avatar">
+                <participant-avatar class="cursor-default" params="participant: userEntity, size: z.components.ParticipantAvatar.SIZE.X_LARGE" data-uie-name="status-profile-picture"></participant-avatar>
+              </div>
+            <!-- /ko -->
+          </div>
+          <div class="user-profile-footer">
+            <!-- ko template: {name: getFooterTemplate} --><!-- /ko -->
+          </div>
+        </div>
+      <!-- /ko -->
+    </div>
+  `,
+  viewModel: z.components.UserProfile,
 });
