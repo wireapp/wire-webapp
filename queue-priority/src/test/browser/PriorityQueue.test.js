@@ -18,7 +18,7 @@
  *
  */
 
-import {Priority, PriorityQueue} from '../../../dist/commonjs/index';
+import {Priority, PriorityQueue} from '@wireapp/queue-priority';
 
 beforeAll(() => (jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000));
 

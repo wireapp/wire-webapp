@@ -18,8 +18,8 @@
 
 import Item from './Item';
 
-interface Config<P> {
-  comparator?: (a: Item<P>, b: Item<P>) => number;
+interface Config {
+  comparator?: (a: Item, b: Item) => number;
   maxRetries?: number;
   retryDelay?: number;
 }
