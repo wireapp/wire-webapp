@@ -411,7 +411,7 @@ z.string.de.addParticipantsHeader = 'Personen hinzufügen';
 z.string.de.addParticipantsHeaderWithCounter = 'Personen hinzufügen ({{number}})';
 z.string.de.addParticipantsSearchPlaceholder = 'Nach Namen suchen';
 z.string.de.addParticipantsServiceConfirmButton = 'Dienst hinzufügen';
-z.string.de.addParticipantsTabsPeople = 'Unterhaltungsübersicht';
+z.string.de.addParticipantsTabsPeople = 'Kontakte';
 z.string.de.addParticipantsTabsServices = 'Services';
 
 z.string.de.conversationDetailsActionArchive = 'Unterhaltung archivieren';
@@ -428,8 +428,8 @@ z.string.de.conversationDetailsGuestsOn = 'An';
 z.string.de.conversationDetailsParticipantsServicesOne = 'Dienst';
 z.string.de.conversationDetailsParticipantsServicesMany = 'Services';
 z.string.de.conversationDetailsParticipantsUsersOne = 'Person';
-z.string.de.conversationDetailsParticipantsUsersMany = 'Unterhaltungsübersicht';
-z.string.de.conversationDetailsPeople = 'Unterhaltungsübersicht';
+z.string.de.conversationDetailsParticipantsUsersMany = 'Personen';
+z.string.de.conversationDetailsPeople = 'Personen';
 z.string.de.conversationDetailsServices = 'Services';
 
 z.string.de.groupParticipantActionBlock = 'Kontakt blockieren';
