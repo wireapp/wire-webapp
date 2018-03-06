@@ -161,7 +161,7 @@ z.viewModel.panel.AppParticipantsViewModel = class AppParticipantsViewModel {
 
     this.conversationRepository.addMembers(conversationEntity, userEntities).then(() => {
       const attributes = {
-        method: 'create',
+        method: 'add',
         user_num: this.selectedContacts().length,
       };
 
