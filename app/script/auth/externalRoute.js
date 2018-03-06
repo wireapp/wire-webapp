@@ -19,7 +19,7 @@
 
 import {onEnvironment} from './Environment';
 
-const WEBAPP_ENV = onEnvironment('http://localhost:8888', '', '');
+const WEBAPP_ENV = onEnvironment('/app', '', '');
 
 export default {
   LOGIN: `${WEBAPP_ENV}/login`,
