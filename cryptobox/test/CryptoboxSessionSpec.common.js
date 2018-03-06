@@ -55,7 +55,7 @@ describe('cryptobox.CryptoboxSession', () => {
 
     // 1. Bob creates and "uploads" a PreKey, which can be "consumed" by Alice
     const preKey = await bob.get_prekey(bobPreKeyId);
-    const bobBundle = await Proteus.keys.PreKeyBundle.new(bob.identity.public_key, preKey);
+    const bobBundle = Proteus.keys.PreKeyBundle.new(bob.identity.public_key, preKey);
     // 2. Alice takes Bob's PreKey bundle to initiate a session
     const sessionWithBob = await alice.session_from_prekey('session-with-bob', bobBundle.serialise());
     return sessionWithBob;

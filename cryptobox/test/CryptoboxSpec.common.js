@@ -208,7 +208,7 @@ describe('cryptobox.Cryptobox', () => {
             prekey: await Proteus.keys.PreKey.new(Proteus.keys.PreKey.MAX_PREKEY_ID),
           };
 
-          bob.bundle = await Proteus.keys.PreKeyBundle.new(bob.identity.public_key, bob.prekey);
+          bob.bundle = Proteus.keys.PreKeyBundle.new(bob.identity.public_key, bob.prekey);
 
           return Proteus.session.Session.init_from_prekey(box.identity, bob.bundle);
         })

@@ -88,7 +88,7 @@ class Cryptobox extends EventEmitter {
       })
       .then((lastResortPreKey: ProteusKeys.PreKey) => {
         this.logger.log(`Created Last Resort PreKey with ID "${lastResortPreKey.key_id}".`, lastResortPreKey);
-        return this.init();
+        return this.init(false);
       });
   }
 
@@ -118,14 +118,14 @@ class Cryptobox extends EventEmitter {
 
           this.logger.log(`Loaded "${this.minimumAmountOfPreKeys - 1}" standard PreKeys...`);
 
-          return this.init();
+          return this.init(true);
         }
         throw new CryptoboxError('Failed to load last resort PreKey');
       });
   }
 
-  private init(): Promise<Array<ProteusKeys.PreKey>> {
-    return this.refill_prekeys()
+  private init(publishPrekeys?: boolean): Promise<Array<ProteusKeys.PreKey>> {
+    return this.refill_prekeys(publishPrekeys)
       .then(() => this.store.load_prekeys())
       .then(prekeys => prekeys.sort((a, b) => a.key_id - b.key_id));
   }
@@ -171,7 +171,7 @@ class Cryptobox extends EventEmitter {
    * This method returns all PreKeys available, respecting the minimum required amount of PreKeys.
    * If all available PreKeys don't meet the minimum PreKey amount, new PreKeys will be created.
    */
-  private refill_prekeys(): Promise<Array<ProteusKeys.PreKey>> {
+  private refill_prekeys(publishPrekeys: boolean = true): Promise<Array<ProteusKeys.PreKey>> {
     return this.store
       .load_prekeys()
       .then(prekeys => {
@@ -197,7 +197,9 @@ class Cryptobox extends EventEmitter {
             `Generated PreKeys from ID "${newPreKeys[0].key_id}" to ID "${newPreKeys[newPreKeys.length - 1].key_id}".`
           );
 
-          this.publish_prekeys(newPreKeys);
+          if (publishPrekeys) {
+            this.publish_prekeys(newPreKeys);
+          }
         }
         return newPreKeys;
       });
@@ -389,7 +391,7 @@ class Cryptobox extends EventEmitter {
 
             return this.session_update(session);
           })
-          .then(() => this.refill_prekeys())
+          .then(() => this.refill_prekeys(true))
           .then(() => message)
       );
     });
