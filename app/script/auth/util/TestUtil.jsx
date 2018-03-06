@@ -23,12 +23,12 @@ import React from 'react';
 import {HashRouter} from 'react-router-dom';
 import {IntlProvider} from 'react-intl';
 import {Provider} from 'react-redux';
-import {StoreEngine} from '@wireapp/store-engine';
+import {MemoryEngine} from '@wireapp/store-engine';
 import {mount} from 'enzyme';
 import thunk from 'redux-thunk';
 
 const apiClient = new Client({
-  store: new StoreEngine.MemoryEngine('test-execution'),
+  store: new MemoryEngine('test-execution'),
   urls: Client.BACKEND.STAGING,
 });
 

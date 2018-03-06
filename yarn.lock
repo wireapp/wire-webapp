@@ -337,9 +337,9 @@
   version "2.3.2"
   resolved "https://registry.yarnpkg.com/@types/tough-cookie/-/tough-cookie-2.3.2.tgz#e0d481d8bb282ad8a8c9e100ceb72c995fb5e709"
 
-"@wireapp/api-client@0.5.4":
-  version "0.5.4"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-0.5.4.tgz#519da84270296fb1a23e90ddbe90ce7e8fecfb3d"
+"@wireapp/api-client@0.5.5":
+  version "0.5.5"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-0.5.5.tgz#ebe541132d098ba7cd62295617cfb77c0f5dfd13"
   dependencies:
     "@types/node" "9.4.6"
     "@types/spark-md5" "3.0.0"
@@ -358,12 +358,12 @@
   version "3.0.6"
   resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-3.0.6.tgz#2e5e76b7554f3d1dc8cc3b8bc1c074e7cdc49d78"
 
-"@wireapp/core@2.0.51":
-  version "2.0.51"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-2.0.51.tgz#a8771a4c1b4270dffe970db1b38ce385141ee210"
+"@wireapp/core@2.0.52":
+  version "2.0.52"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-2.0.52.tgz#4df7c436c2f89f946f19ef33dfa274110add3b69"
   dependencies:
     "@types/node" "9.4.6"
-    "@wireapp/api-client" "0.5.4"
+    "@wireapp/api-client" "0.5.5"
     "@wireapp/cryptobox" "8.1.12"
     "@wireapp/store-engine" "0.3.4"
     bazinga64 "5.0.3"
