@@ -22,12 +22,16 @@
         <!-- ko if: conversationEntity().is_group() -->
           <div class="conversation-details__participant_count">
             <!-- ko if: userParticipants().length -->
-              <span class="conversation-details__participant_count__number" data-bind="text: userParticipants().length" data-uie-name="status-user-count"></span>
-              <span class="conversation-details__participant_count__text" data-bind="l10n_text: participantsUserText"></span>
+              <span class="conversation-details__participant_count__user">
+                <span class="conversation-details__participant_count__number" data-bind="text: userParticipants().length" data-uie-name="status-user-count"></span>
+                <span class="conversation-details__participant_count__text" data-bind="l10n_text: participantsUserText"></span>
+              </span>
             <!-- /ko -->
             <!-- ko if: serviceParticipants().length -->
-              <span class="conversation-details__participant_count__number" data-bind="text: serviceParticipants().length" data-uie-name="status-service-count"></span>
-              <span class="conversation-details__participant_count__text" data-bind="l10n_text: participantsServiceText"></span>
+              <span class="conversation-details__participant_count__service">
+                <span class="conversation-details__participant_count__number" data-bind="text: serviceParticipants().length" data-uie-name="status-service-count"></span>
+                <span class="conversation-details__participant_count__text" data-bind="l10n_text: participantsServiceText"></span>
+              </span>
             <!-- /ko -->
           </div>
         <!-- /ko -->
