@@ -18,7 +18,7 @@
  *
  */
 
-import {Priority, PriorityQueue} from '@wireapp/queue-priority';
+import {Priority, PriorityQueue} from '@wireapp/priority-queue';
 
 beforeAll(() => (jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000));
 

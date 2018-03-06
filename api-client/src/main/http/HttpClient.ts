@@ -20,7 +20,7 @@ import {AccessTokenData} from '../auth/AccessTokenData';
 import axios, {AxiosError, AxiosPromise, AxiosRequestConfig} from 'axios';
 import {AccessTokenStore, AuthAPI} from '../auth';
 import {ContentType} from '../http';
-import PriorityQueue from '@wireapp/queue-priority/dist/commonjs/PriorityQueue';
+import {PriorityQueue} from '@wireapp/priority-queue';
 const logdown = require('logdown');
 
 class HttpClient {

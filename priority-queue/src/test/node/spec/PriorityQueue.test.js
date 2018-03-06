@@ -18,7 +18,7 @@
  *
  */
 
-const {PriorityQueue} = require('@wireapp/queue-priority');
+const {PriorityQueue} = require('@wireapp/priority-queue');
 
 beforeAll(() => (jasmine.DEFAULT_TIMEOUT_INTERVAL = 5000));
 

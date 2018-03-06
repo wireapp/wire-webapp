@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "outDir": "dist/commonjs",
+    "outDir": "dist",
     "rootDir": "src/main"
   },
   "exclude": ["dist", "node_modules"],

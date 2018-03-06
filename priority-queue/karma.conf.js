@@ -39,7 +39,7 @@ module.exports = function(config) {
         flags: ['--no-sandbox'],
       },
     },
-    files: [`${dist}queue-priority.test.bundle.js`],
+    files: [`${dist}priority-queue.test.bundle.js`],
     frameworks: ['jasmine'],
     logLevel: config.LOG_INFO,
     port: 9876,
