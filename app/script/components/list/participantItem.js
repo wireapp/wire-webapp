@@ -40,7 +40,7 @@ z.components.ParticipantItem = class ParticipantItem {
 
 ko.components.register('participant-item', {
   template: `
-    <div class="participant-item" data-bind="attr: {'data-uie-name': isUser ? 'item-user' : 'item-service'}">
+    <div class="participant-item" data-bind="attr: {'data-uie-name': isUser ? 'item-user' : 'item-service', 'data-uie-value': participant.name}">
       <div class="participant-item-image">
         <participant-avatar params="participant: participant, size: z.components.ParticipantAvatar.SIZE.SMALL"></participant-avatar>
       </div>
