@@ -35,6 +35,14 @@ z.conversation.ConversationRepository = class ConversationRepository {
     };
   }
 
+  static get CONSENT_TYPE() {
+    return {
+      INCOMING_CALL: 'incoming_call',
+      MESSAGE: 'message',
+      OUTGOING_CALL: 'outgoing_call',
+    };
+  }
+
   /**
    * Construct a new Conversation Repository.
    *
@@ -140,7 +148,16 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.init_promise = undefined;
     this.init_total = 0;
 
+    this.supportConversationLinks = ko.observable();
+    this.enableConversationLinks = ko.pureComputed(() => {
+      const isBoolean = _.isBoolean(this.supportConversationLinks());
+      const isEnabled = isBoolean ? this.supportConversationLinks() : !z.util.Environment.frontend.is_production();
+      return this.isTeam() && isEnabled;
+    });
+
     this._init_subscriptions();
+
+    this.stateHandler = new z.conversation.ConversationStateHandler(this.conversation_service, this);
   }
 
   _init_state_updates() {
@@ -208,13 +225,50 @@ z.conversation.ConversationRepository = class ConversationRepository {
    *
    * @param {Array<z.entity.User>} userEntities - Users (excluding the requestor) to be part of the conversation
    * @param {string} [groupName] - Name for the conversation
+   * @param {string} [accessState] - State for conversation access
    * @returns {Promise} Resolves when the conversation was created
    */
-  createGroupConversation(userEntities, groupName) {
+  createGroupConversation(userEntities, groupName, accessState) {
     const userIds = userEntities.map(userEntity => userEntity.id);
+    const payload = {
+      name: groupName,
+      users: userIds,
+    };
+
+    if (this.team().id) {
+      payload.team = {
+        managed: false,
+        teamid: this.team().id,
+      };
+
+      if (accessState) {
+        let accessPayload;
+
+        switch (accessState) {
+          case z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM:
+            accessPayload = {
+              access: [z.conversation.ACCESS_MODE.INVITE, z.conversation.ACCESS_MODE.CODE],
+              access_role: z.conversation.ACCESS_ROLE.NON_ACTIVATED,
+            };
+            break;
+          case z.conversation.ACCESS_STATE.TEAM.TEAM_ONLY:
+            accessPayload = {
+              access: [z.conversation.ACCESS_MODE.INVITE],
+              access_role: z.conversation.ACCESS_ROLE.TEAM,
+            };
+            break;
+          default:
+            break;
+        }
+
+        if (accessPayload) {
+          Object.assign(payload, accessPayload);
+        }
+      }
+    }
 
     return this.conversation_service
-      .postConversations(userIds, groupName, this.team().id)
+      .postConversations(payload)
       .then(response => this._onCreate({conversation: response.id, data: response}))
       .then(({conversationEntity}) => conversationEntity)
       .catch(error => this._handleConversationCreateError(error, userIds));
@@ -225,7 +279,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves with the conversation that was created
    */
   createGuestRoom() {
-    return this.createGroupConversation([], z.l10n.text(z.string.guestRoomConversationName));
+    const groupName = z.l10n.text(z.string.guestRoomConversationName);
+    return this.createGroupConversation([], groupName, z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM);
   }
 
   /**
@@ -793,6 +848,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
     }
   }
 
+  joinConversationWithCode(key, code) {
+    return this.conversation_service.postConversationJoin(key, code).then(response => this._onCreate(response));
+  }
+
   /**
    * Maps user connection to the corresponding conversation.
    *
@@ -1036,7 +1095,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
       case z.service.BackendClientError.LABEL.SERVER_ERROR:
       case z.service.BackendClientError.LABEL.SERVICE_DISABLED:
       case z.service.BackendClientError.LABEL.TOO_MANY_BOTS: {
-        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.SERVICE_UNAVAILABLE);
+        const messageText = z.l10n.text(z.string.modalServiceUnavailableMessage);
+        const titleText = z.l10n.text(z.string.modalServiceUnavailableHeadline);
+        this._showModal(messageText, titleText);
         break;
       }
 
@@ -1371,23 +1432,35 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   _handleTooManyMembersError(participants = 128) {
     const openSpots = ConversationRepository.CONFIG.GROUP.MAX_SIZE - participants;
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.TOO_MANY_MEMBERS, {
-      data: {
-        max: ConversationRepository.CONFIG.GROUP.MAX_SIZE,
-        open_spots: Math.max(0, openSpots),
-      },
-    });
+    const substitutions = {number1: ConversationRepository.CONFIG.GROUP.MAX_SIZE, number2: Math.max(0, openSpots)};
+
+    const messageText = z.l10n.text(z.string.modalConversationTooManyMembersMessage, substitutions);
+    const titleText = z.l10n.text(z.string.modalConversationTooManyMembersHeadline);
+    this._showModal(messageText, titleText);
   }
 
   _handleUsersNotConnected(userIds = []) {
     const [userID] = userIds;
-    const user_promise = userIds.length === 1 ? this.user_repository.get_user_by_id(userID) : Promise.resolve();
+    const userPromise = userIds.length === 1 ? this.user_repository.get_user_by_id(userID) : Promise.resolve();
 
-    user_promise.then(user_et => {
-      const username = user_et ? user_et.first_name() : undefined;
-      amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.NOT_CONNECTED, {
-        data: username,
-      });
+    userPromise.then(userEntity => {
+      const username = userEntity ? userEntity.first_name() : undefined;
+      const messageStringId = username
+        ? z.string.modalConversationNotConnectedMessageOne
+        : z.string.modalConversationNotConnectedMessageMany;
+
+      const messageText = z.l10n.text(messageStringId, username);
+      const titleText = z.l10n.text(z.string.modalConversationNotConnectedHeadline);
+      this._showModal(messageText, titleText);
+    });
+  }
+
+  _showModal(messageText, titleText) {
+    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, {
+      text: {
+        message: messageText,
+        title: titleText,
+      },
     });
   }
 
@@ -2172,8 +2245,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     const isCallingMessage = genericMessage.content === z.cryptography.GENERIC_MESSAGE_TYPE.CALLING;
     const consentType = isCallingMessage
-      ? z.viewModel.ModalsViewModel.CONSENT_TYPE.OUTGOING_CALL
-      : z.viewModel.ModalsViewModel.CONSENT_TYPE.MESSAGE;
+      ? ConversationRepository.CONSENT_TYPE.OUTGOING_CALL
+      : ConversationRepository.CONSENT_TYPE.MESSAGE;
     return this.grantMessage(conversationId, consentType, userIds);
   }
 
@@ -2190,18 +2263,49 @@ z.conversation.ConversationRepository = class ConversationRepository {
         let sendAnyway = false;
 
         if (!userIds) {
-          userIds = conversation_et.get_users_with_unverified_clients().map(user_et => user_et.id);
+          userIds = conversation_et.get_users_with_unverified_clients().map(userEntity => userEntity.id);
         }
 
-        return this.user_repository.get_users_by_id(userIds).then(user_ets => {
-          amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.NEW_DEVICE, {
-            action() {
+        return this.user_repository.get_users_by_id(userIds).then(userEntities => {
+          let actionStringId;
+          let messageStringId;
+          let titleStringId;
+
+          const hasMultipleUsers = userEntities > 1;
+          if (hasMultipleUsers) {
+            titleStringId = z.string.modalConversationNewDeviceHeadlineMany;
+          } else {
+            const [userEntity] = userEntities;
+            titleStringId = userEntity.is_me
+              ? z.string.modalConversationNewDeviceHeadlineYou
+              : z.string.modalConversationNewDeviceHeadlineOne;
+          }
+          const userNames = z.util.LocalizerUtil.joinNames(userEntities, z.string.Declension.NOMINATIVE);
+          const titleSubstitutions = z.util.StringUtil.capitalize_first_char(userNames);
+
+          switch (consentType) {
+            case ConversationRepository.CONSENT_TYPE.INCOMING_CALL:
+              actionStringId = z.string.modalConversationNewDeviceIncomingCallAction;
+              messageStringId = z.string.modalConversationNewDeviceIncomingCallMessage;
+              break;
+            case ConversationRepository.CONSENT_TYPE.OUTGOING_CALL:
+              actionStringId = z.string.modalConversationNewDeviceOutgoingCallAction;
+              messageStringId = z.string.modalConversationNewDeviceOutgoingCallMessage;
+              break;
+            default:
+              actionStringId = z.string.modalConversationNewDeviceAction;
+              messageStringId = z.string.modalConversationNewDeviceMessage;
+              break;
+          }
+
+          amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
+            action: () => {
               sendAnyway = true;
               conversation_et.verification_state(z.conversation.ConversationVerificationState.UNVERIFIED);
 
               resolve(true);
             },
-            close() {
+            close: () => {
               if (!sendAnyway) {
                 reject(
                   new z.conversation.ConversationError(
@@ -2210,9 +2314,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
                 );
               }
             },
-            data: {
-              consent_type: consentType,
-              user_ets: user_ets,
+            text: {
+              action: z.l10n.text(actionStringId),
+              message: z.l10n.text(messageStringId),
+              title: z.l10n.text(titleStringId, titleSubstitutions),
             },
           });
         });
@@ -3595,13 +3700,20 @@ z.conversation.ConversationRepository = class ConversationRepository {
     }
 
     if (action_type) {
-      amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONTRIBUTED, {
+      const attributes = {
         action: action_type,
         conversation_type: z.tracking.helpers.get_conversation_type(conversation_et),
         ephemeral_time: is_ephemeral ? ephemeral_time : undefined,
         is_ephemeral: is_ephemeral,
         with_service: conversation_et.isWithBot(),
-      });
+      };
+
+      const isTeamConversation = !!conversation_et.team_id;
+      if (isTeamConversation) {
+        Object.assign(attributes, z.tracking.helpers.getGuestAttributes(conversation_et));
+      }
+
+      amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONTRIBUTED, attributes);
     }
   }
 };

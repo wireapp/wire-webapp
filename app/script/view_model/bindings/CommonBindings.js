@@ -338,6 +338,7 @@ ko.bindingHandlers.antiscroll = {
     $(element).antiscroll({
       autoHide: true,
       autoWrap: true,
+      debug: false,
       notHorizontal: true,
     });
 

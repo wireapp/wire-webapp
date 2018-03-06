@@ -497,6 +497,7 @@ z.main.App = class App {
 
   /**
    * Handle URL params.
+   * @private
    * @returns {undefined} Not return value
    */
   _handleUrlParams() {
@@ -509,7 +510,14 @@ z.main.App = class App {
 
     const supportIntegrations = z.util.get_url_parameter(z.auth.URLParameter.INTEGRATIONS);
     if (_.isBoolean(supportIntegrations)) {
+      this.logger.info(`Feature flag for integrations set to '${serviceId}'`);
       this.repository.integration.supportIntegrations(supportIntegrations);
+    }
+
+    const supportConversationLinks = z.util.get_url_parameter(z.auth.URLParameter.LINKS);
+    if (_.isBoolean(supportConversationLinks)) {
+      this.logger.info(`Feature flag for conversation links set to '${supportConversationLinks}'`);
+      this.repository.conversation.supportConversationLinks(supportConversationLinks);
     }
   }
 

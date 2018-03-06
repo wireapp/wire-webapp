@@ -188,7 +188,6 @@ z.viewModel.ContentViewModel = class ContentViewModel {
 
       this.messageList.change_conversation(conversationEntity, messageEntity).then(() => {
         this._showContent(ContentViewModel.STATE.CONVERSATION);
-        this.mainViewModel.panel.participants.changeConversation(conversationEntity);
         this.previousConversation = this.conversationRepository.active_conversation();
       });
     });

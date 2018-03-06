@@ -30,7 +30,10 @@ z.viewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
     this.messageRemoved = this.messageRemoved.bind(this);
 
     this.elementId = 'detail-view';
+    this.mainViewModel = mainViewModel;
     this.conversationRepository = repositories.conversation;
+
+    this.actionsViewModel = this.mainViewModel.actions;
     this.source = undefined;
 
     this.imageModal = undefined;
@@ -141,21 +144,15 @@ z.viewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
   }
 
   clickOnDelete() {
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.DELETE_MESSAGE, {
-      action: () => {
-        this.conversationRepository.delete_message(this.conversationEntity(), this.messageEntity());
-        this.imageModal.hide();
-      },
-    });
+    return this.actionsViewModel
+      .deleteMessage(this.conversationEntity(), this.messageEntity())
+      .then(() => this.imageModal.hide());
   }
 
   clickOnDeleteForEveryone() {
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.DELETE_EVERYONE_MESSAGE, {
-      action: () => {
-        this.conversationRepository.delete_message_everyone(this.conversationEntity(), this.messageEntity());
-        this.imageModal.hide();
-      },
-    });
+    return this.actionsViewModel
+      .deleteMessageEveryone(this.conversationEntity(), this.messageEntity())
+      .then(() => this.imageModal.hide());
   }
 
   clickOnDownload() {

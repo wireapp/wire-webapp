@@ -129,7 +129,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
    * @returns {string} Fingerprint of local identity public key
    */
   getLocalFingerprint() {
-    return this.cryptobox.identity.public_key.fingerprint();
+    return this._formatFingerprint(this.cryptobox.identity.public_key.fingerprint());
   }
 
   /**
@@ -139,7 +139,13 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
    * @returns {Promise} Resolves with the remote fingerprint
    */
   getRemoteFingerprint(userId, clientId) {
-    return this._loadSession(userId, clientId).then(cryptoboxSession => cryptoboxSession.fingerprint_remote());
+    return this._loadSession(userId, clientId).then(cryptoboxSession => {
+      return this._formatFingerprint(cryptoboxSession.fingerprint_remote());
+    });
+  }
+
+  _formatFingerprint(fingerprint) {
+    return z.util.zero_padding(fingerprint, 16).match(/.{1,2}/g) || [];
   }
 
   /**

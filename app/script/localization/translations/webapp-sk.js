@@ -24,11 +24,6 @@ z.string.sk.wireLinux = 'Wire pre Linux';
 z.string.sk.nonexistentUser = 'Odstránený používateľ';
 z.string.sk.and = 'a';
 
-z.string.sk.alertUploadFileFormat = 'Tento obrázok nie je možné použiť.\nVyberte prosím súbor PNG alebo JPG.';
-z.string.sk.alertUploadTooSmall = 'Tento obrázok nie je možné použiť.\nVyberte prosím obrázok minimálne 320 x 320 px.';
-z.string.sk.alertUploadTooLarge = 'Tento obrázok je príliš veľký. Môžete nahrať súbory maximálne {{number}} MB.';
-z.string.sk.alertGifTooLarge = 'Animácia je príliš veľká. Maximálna veľkosť je {{number}} MB.';
-
 z.string.sk.authAccountCountryCode = 'Kód krajiny';
 z.string.sk.authAccountDeletion = 'Boli ste odhlásení, pretože vaše konto bolo odstránené.';
 z.string.sk.authAccountExpiration = 'Boli ste odhlásení pretože vypršala platnosť Vášho sedenia. Prihláste sa prosím znova.';
@@ -102,75 +97,121 @@ z.string.sk.callJoin = 'Pripojiť';
 z.string.sk.callChooseSharedScreen = 'Vybrať obrazovku pre zdieľanie';
 z.string.sk.callParticipants = '{{number}} je dostupné';
 
-z.string.sk.modalButtonCancel = 'Zrušiť';
-z.string.sk.modalButtonOk = 'OK';
-z.string.sk.modalButtonSend = 'Poslať';
+z.string.sk.modalAcknowledgeAction = 'OK';
+z.string.sk.modalConfirmSecondary = 'Zrušiť';
+z.string.sk.modalOptionSecondary = 'Zrušiť';
 
-z.string.sk.modalBlockConversationHeadline = 'Blokovať {{user}}?';
-z.string.sk.modalBlockConversationMessage = '{{user}} Vás nebude môcť kontaktovať, alebo Vás pozvať do skupinového rozhovoru.';
-z.string.sk.modalBlockConversationButton = 'Blokovať';
-z.string.sk.modalBotsUnavailableHeadline = 'Boti sú momentálne nedostupní';
-z.string.sk.modalBotsUnavailableMessage = 'Ďakujeme o Váš záujem o Botov. Služba je momentálne pozastavená kvôli práci na novej verzii.';
-z.string.sk.modalCallConversationEmptyHeadline = 'Nie je koho zavolať';
-z.string.sk.modalCallConversationEmptyMessage = 'Už tu nikto nezostal.';
-z.string.sk.modalCallNoVideoInGroupHeadline = 'Žiadne video hovory v skupinách';
-z.string.sk.modalCallNoVideoInGroupMessage = 'Videohovory nie sú k dispozícii v skupinovom rozhovore.';
+z.string.sk.modalAccountDeletionAction = 'Zmazať';
+z.string.sk.modalAccountDeletionHeadline = 'Vymazať účet';
+z.string.sk.modalAccountDeletionMessage = 'Zašleme Vám e-mail, alebo SMS. Použite odkaz pre trvalé zmazanie Vášho účtu.';
+
+z.string.sk.modalAccountLogoutAction = 'Odhlásenie';
+z.string.sk.modalAccountLogoutHeadline = 'Vymazať údaje?';
+z.string.sk.modalAccountLogoutOption = 'Odstrániť všetky vaše osobné údaje a rozhovory na tomto zariadení.';
+
+z.string.sk.modalAccountNewDevicesSecondary = 'Správa zariadení';
+z.string.sk.modalAccountNewDevicesHeadline = 'Váš účet bol použitý:';
+z.string.sk.modalAccountNewDevicesFrom = 'Od:';
+z.string.sk.modalAccountNewDevicesMessage = 'Ak ste to neboli Vy, odpojte zariadenie a zmeňte si heslo.';
+
+z.string.sk.modalAccountRemoveDeviceAction = 'Odstrániť zariadenie';
+z.string.sk.modalAccountRemoveDeviceHeadline = 'Odstrániť "{{device}}"';
+z.string.sk.modalAccountRemoveDeviceMessage = 'Na odstránenie zariadenia je potrebné Vaše heslo.';
+z.string.sk.modalAccountRemoveDevicePlaceholder = 'Heslo';
+
+z.string.sk.modalAssetTooLargeMessage = 'Môžete posielať súbory až do {{number}}';
+
+z.string.sk.modalAssetParallelUploadsMessage = 'Súčasne môžete poslať až {{number}} súborov.';
+
+z.string.sk.modalCallEmptyConversationHeadline = 'Nie je koho zavolať';
+z.string.sk.modalCallEmptyConversationMessage = 'Už tu nikto nezostal.';
+
+z.string.sk.modalCallNoGroupVideoHeadline = 'Žiadne video hovory v skupinách';
+z.string.sk.modalCallNoGroupVideoMessage = 'Videohovory nie sú k dispozícii v skupinovom rozhovore.';
+
+z.string.sk.modalCallNoMicrophoneAction = 'Povedz mi, ako';
+z.string.sk.modalCallNoMicrophoneMessage = 'Pre volanie potrebuje Váš prehliadač prístup k mikrofónu.';
+z.string.sk.modalCallNoMicrophoneHeadline = 'Nemôžete volať bez mikrofónu';
+
+z.string.sk.modalCallSecondIncomingAction = 'Odpovedať';
 z.string.sk.modalCallSecondIncomingHeadline = 'Prijať hovor?';
 z.string.sk.modalCallSecondIncomingMessage = 'Váš aktuálny hovor sa ukončí.';
-z.string.sk.modalCallSecondIncomingAction = 'Odpovedať';
+
+z.string.sk.modalCallSecondOngoingAction = 'Ukončiť';
 z.string.sk.modalCallSecondOngoingHeadline = 'Ukončiť hovor na inom zariadení?';
 z.string.sk.modalCallSecondOngoingMessage = 'Súčasne môžete viesť len jeden hovor.';
-z.string.sk.modalCallSecondOngoingAction = 'Ukončiť';
+
+z.string.sk.modalCallSecondOutgoingAction = 'Ukončiť';
 z.string.sk.modalCallSecondOutgoingHeadline = 'Ukončiť aktuálny hovor?';
 z.string.sk.modalCallSecondOutgoingMessage = 'Súčasne môžete viesť len jeden hovor.';
-z.string.sk.modalCallSecondOutgoingAction = 'Ukončiť';
-z.string.sk.modalClearConversationHeadline = 'Vymazať obsah?';
-z.string.sk.modalClearConversationOption = 'Opustiť tiež rozhovor';
-z.string.sk.modalClearConversationButton = 'Zmazať';
-z.string.sk.modalConnectedDeviceHeadline = 'Váš účet bol použitý:';
-z.string.sk.modalConnectedDeviceFrom = 'Od:';
-z.string.sk.modalConnectedDeviceMessage = 'Ak ste to neboli Vy, odpojte zariadenie a zmeňte si heslo.';
-z.string.sk.modalConnectedDeviceManageDevices = 'správa zariadení';
-z.string.sk.modalDeleteAccountAction = 'Zmazať';
-z.string.sk.modalDeleteAccountHeadline = 'Vymazať účet';
-z.string.sk.modalDeleteAccountMessage = 'Zašleme Vám e-mail, alebo SMS. Použite odkaz pre trvalé zmazanie Vášho účtu.';
-z.string.sk.modalDeleteButton = 'Zmazať';
-z.string.sk.modalDeleteHeadline = 'Zmazať iba pre mňa?';
-z.string.sk.modalDeleteMessage = 'Táto akcia sa nedá vrátiť.';
-z.string.sk.modalDeleteEveryoneButton = 'Zmazať';
-z.string.sk.modalDeleteEveryoneHeadline = 'Zmazať pre všetkých?';
-z.string.sk.modalDeleteEveryoneMessage = 'Táto akcia sa nedá vrátiť.';
-z.string.sk.modalTooLongHeadline = 'Správa je príliš dlhá';
-z.string.sk.modalTooLongMessage = 'Môžete odosielať správy až do {{number}} znakov.';
-z.string.sk.modalLeaveConversationHeadline = 'Opustiť rozhovor s "{{user}}"?';
-z.string.sk.modalLeaveConversationMessage = 'Účastníci budú informovaní a rozhovor sa odstráni zo zoznamu.';
-z.string.sk.modalLeaveConversationButton = 'Opustiť';
-z.string.sk.modalLogoutHeadline = 'Vymazať údaje?';
-z.string.sk.modalLogoutMessage = 'Odstrániť všetky vaše osobné údaje a rozhovory na tomto zariadení.';
-z.string.sk.modalLogoutButton = 'Odhlásenie';
-z.string.sk.modalNewDeviceHeadline = '{{user}} začal používať nové zariadenie';
-z.string.sk.modalNewDeviceHeadlineMany = '{{user}}s začali používať nové zariadenie';
-z.string.sk.modalNewDeviceHeadlineYou = '{{user}} začal používať nové zariadenie';
-z.string.sk.modalNewDeviceMessage = 'Stále chcete odoslať Vaše správy?';
-z.string.sk.modalNewDeviceCallAccept = 'Prijať hovor';
-z.string.sk.modalNewDeviceCallAnyway = 'Aj tak zavolať';
-z.string.sk.modalNewDeviceCallIncoming = 'Stále chcete prijať hovor?';
-z.string.sk.modalNewDeviceCallOutgoing = 'Stále chcete zavolať?';
-z.string.sk.modalNewDeviceShowDevice = 'zobraziť zariadenie';
-z.string.sk.modalNewDeviceSendAnyway = 'napriek tomu odoslať';
-z.string.sk.modalNotConnectedHeadline = 'Nikto nebol pridaný do konverzácie';
-z.string.sk.modalNotConnectedMessageOne = '{{name}} nechce byť pridaný do konverzácií.';
-z.string.sk.modalNotConnectedMessageMany = 'Jeden z ľudí, ktorých ste vybrali, nechce byť pridaný do konverzácií.';
-z.string.sk.modalRemoveDeviceButton = 'Odstrániť zariadenie';
-z.string.sk.modalRemoveDeviceHeadline = 'Odstrániť "{{device}}"';
-z.string.sk.modalRemoveDeviceMessage = 'Na odstránenie zariadenia je potrebné Vaše heslo.';
+
+z.string.sk.modalConnectCancelAction = 'Áno';
+z.string.sk.modalConnectCancelHeadline = 'Zrušiť požiadavku?';
+z.string.sk.modalConnectCancelMessage = 'Odstrániť požiadavku na pripojenie k {{user}}.';
+z.string.sk.modalConnectCancelSecondary = 'Nie';
+
+z.string.sk.modalConnectAcceptAction = 'Pripojiť';
+z.string.sk.modalConnectAcceptHeadline = 'Prijať?';
+z.string.sk.modalConnectAcceptMessage = 'Toto Vás spojí a otvorí rozhovor s {{user}}.';
+z.string.sk.modalConnectAcceptSecondary = 'Ignorovať';
+
+z.string.sk.modalConversationClearAction = 'Zmazať';
+z.string.sk.modalConversationClearHeadline = 'Vymazať obsah?';
+z.string.sk.modalConversationClearOption = 'Opustiť tiež rozhovor';
+
+z.string.sk.modalConversationDeleteMessageAction = 'Zmazať';
+z.string.sk.modalConversationDeleteMessageHeadline = 'Zmazať iba pre mňa?';
+z.string.sk.modalConversationDeleteMessageMessage = 'Táto akcia sa nedá vrátiť.';
+
+z.string.sk.modalConversationDeleteMessageEveryoneAction = 'Zmazať';
+z.string.sk.modalConversationDeleteMessageEveryoneHeadline = 'Zmazať pre všetkých?';
+z.string.sk.modalConversationDeleteMessageEveryoneMessage = 'Táto akcia sa nedá vrátiť.';
+
+z.string.sk.modalConversationLeaveAction = 'Opustiť';
+z.string.sk.modalConversationLeaveMessage = 'Nebudete môcť odosielať ani prijímať správy v tomto rozhovore.';
+
+z.string.sk.modalConversationMessageTooLongHeadline = 'Správa je príliš dlhá';
+z.string.sk.modalConversationMessageTooLongMessage = 'Môžete odosielať správy až do {{number}} znakov.';
+
+z.string.sk.modalConversationNewDeviceHeadlineOne = '{{user}} začal používať nové zariadenie';
+z.string.sk.modalConversationNewDeviceHeadlineMany = '{{user}}s začali používať nové zariadenie';
+z.string.sk.modalConversationNewDeviceHeadlineYou = '{{user}} začal používať nové zariadenie';
+z.string.sk.modalConversationNewDeviceIncomingCallAction = 'Prijať hovor';
+z.string.sk.modalConversationNewDeviceIncomingCallMessage = 'Stále chcete prijať hovor?';
+z.string.sk.modalConversationNewDeviceMessage = 'Stále chcete odoslať Vaše správy?';
+z.string.sk.modalConversationNewDeviceOutgoingCallAction = 'Aj tak zavolať';
+z.string.sk.modalConversationNewDeviceOutgoingCallMessage = 'Stále chcete zavolať?';
+
+z.string.sk.modalConversationNotConnectedHeadline = 'Nikto nebol pridaný do konverzácie';
+z.string.sk.modalConversationNotConnectedMessageOne = '{{name}} nechce byť pridaný do konverzácií.';
+z.string.sk.modalConversationNotConnectedMessageMany = 'Jeden z ľudí, ktorých ste vybrali, nechce byť pridaný do konverzácií.';
+
+z.string.sk.modalConversationRemoveAction = 'Odstrániť';
+z.string.sk.modalConversationRemoveHeadline = 'Odstrániť?';
+z.string.sk.modalConversationRemoveMessage = '{{user}} nebude môcť odosielať ani prijímať správy v tomto rozhovore.';
+
+
+z.string.sk.modalConversationTooManyMembersHeadline = 'Priveľa účastníkov';
+
+z.string.sk.modalIntegrationUnavailableHeadline = 'Boti sú momentálne nedostupní';
+z.string.sk.modalIntegrationUnavailableMessage = 'Ďakujeme o Váš záujem o Botov. Služba je momentálne pozastavená kvôli práci na novej verzii.';
+
+
 z.string.sk.modalSessionResetHeadline = 'Relácia bola obnovená';
 z.string.sk.modalSessionResetMessage1 = 'Ak problém nebol vyriešený,';
 z.string.sk.modalSessionResetMessageLink = 'kontakt';
 z.string.sk.modalSessionResetMessage2 = 'nás.';
-z.string.sk.modalTooManyMembersHeadline = 'Priveľa účastníkov';
-z.string.sk.modalTooManyMembersMessage = 'Do rozhovoru sa môže zapojiť {{number1}} ľudí. ';
-z.string.sk.modalUploadsParallel = 'Súčasne môžete poslať až {{number}} súborov.';
+
+z.string.sk.modalUploadContactsAction = 'Skúsiť znova';
+z.string.sk.modalUploadContactsMessage = 'Neprijali sme Vaše informácie. Skúste prosím znovu importovať Vaše kontakty.';
+
+z.string.sk.modalUserBlockAction = 'Blokovať';
+z.string.sk.modalUserBlockHeadline = 'Blokovať {{user}}?';
+z.string.sk.modalUserBlockMessage = '{{user}} Vás nebude môcť kontaktovať, alebo Vás pozvať do skupinového rozhovoru.';
+
+z.string.sk.modalUserUnblockAction = 'Odblokovať';
+z.string.sk.modalUserUnblockHeadline = 'Odblokovať?';
+z.string.sk.modalUserUnblockMessage = '{{user}} Vás bude môcť kontaktovať, alebo Vás pozvať do skupinového rozhovoru.';
 
 z.string.sk.connectionRequestConnect = 'Pripojiť';
 z.string.sk.connectionRequestIgnore = 'Ignorovať';
@@ -193,7 +234,6 @@ z.string.sk.conversationDeviceYourDevices = ' Vaše zariadenia';
 z.string.sk.conversationDeviceUserDevices = ' {{user}}´s zariadenia';
 z.string.sk.conversationDeviceNewDeviceOne = ' nové zariadenie';
 z.string.sk.conversationDeviceNewDeviceMany = ' nové zariadenia';
-z.string.sk.conversationDeviceNewPeopleJoined = 'noví ľudia pripojení.';
 z.string.sk.conversationDeviceNewPeopleJoinedVerify = ' overiť zariadenia';
 z.string.sk.conversationJustNow = 'Práve teraz';
 z.string.sk.conversationLocationLink = 'Otvoriť mapu';
@@ -223,7 +263,6 @@ z.string.sk.conversationUnableToDecryptResetSession = 'Obnovenie spojenia';
 z.string.sk.conversationMissedMessages = 'Na chvíľu ste nepoužili toto zariadenie. Niektoré správy sa nemusia zobraziť.';
 z.string.sk.conversationAssetDownloading = 'Sťahovanie…';
 z.string.sk.conversationAssetUploadFailed = 'Nahrávanie zlyhalo';
-z.string.sk.conversationAssetUploadTooLarge = 'Môžete posielať súbory až do {{number}}';
 z.string.sk.conversationPlaybackError = 'Prehrávanie sa nepodarilo';
 z.string.sk.conversationContextMenuEdit = 'Upraviť';
 z.string.sk.conversationContextMenuDelete = 'Vymazať pre mňa';
@@ -302,67 +341,43 @@ z.string.sk.extensionsGiphyMessage = '{{tag}} • cez giphy.com';
 z.string.sk.extensionsGiphyNoGifs = 'Ej, žiadne gify';
 z.string.sk.extensionsGiphyRandom = 'Náhodný';
 
-z.string.sk.peopleConfirmLabel = 'Pridať ľudí do skupiny';
-z.string.sk.peoplePeople = '{{number}} Ľudí';
-z.string.sk.peopleSearchPlaceholder = 'Vyhľadať podľa mena';
-z.string.sk.peopleEveryoneParticipates = 'Všetci pripojení sú už v tomto rozhovore.';
-z.string.sk.peopleNoMatches = 'Žiadne výsledky. Skúste zadať iné meno.';
-z.string.sk.peopleInvite = 'Pozvať ľudí do Wire';
-z.string.sk.peopleInviteDetail = 'Zdieľanie kontaktov Vám pomôže spojiť sa s ostatnými. Anonymizujeme všetky informácie a nezdieľame ich s nikým iným.';
-z.string.sk.peopleInviteButtonContacts = 'Z kontaktov';
-z.string.sk.peopleInviteButtonGmail = 'Z Gmailu';
-z.string.sk.peopleInviteHeadline = 'Pozvať priateľov';
-z.string.sk.peopleServices = 'Služby';
-z.string.sk.peopleShare = 'Zdieľať kontakty';
-z.string.sk.peopleTabsDetails = 'Detaily';
-z.string.sk.peopleTabsDevices = 'Zariadenia';
-z.string.sk.peopleTabsDevicesHeadline = 'Wire dáva každému zariadeniu jedinečný identifikátor. Porovnajte ich s {{user}} a overte Vaše rozhovory.';
-z.string.sk.peopleTabsDevicesLearnMore = 'Zistiť viac';
-z.string.sk.peopleTabsDevicesWhyVerify = 'Prečo overiť rozhovor?';
-z.string.sk.peopleTabsNoDevicesHeadline = '{{user}} používa staršiu verziu Wire. Žiadne zariadenia sa tu nezobrazujú.';
-z.string.sk.peopleTabsDeviceDetailAllMyDevices = 'Zobraziť všetky moje zariadenia';
-z.string.sk.peopleTabsDeviceDetailDeviceFingerprint = 'Identifikátor zaradenia';
-z.string.sk.peopleTabsDeviceDetailHeadline = 'Overte, že to zodpovedá identifikátoru zobrazenému na {{html1}}zariadení {{user}}{{html2}}.';
-z.string.sk.peopleTabsDeviceDetailHowTo = 'Ako to urobiť?';
-z.string.sk.peopleTabsDeviceDetailResetSession = 'Obnovenie spojenia';
-z.string.sk.peopleTabsDeviceDetailShowMyDevice = 'Zobraziť identifikátor môjho zariadenia';
-z.string.sk.peopleTabsDeviceDetailVerify = 'Overený';
-z.string.sk.peopleTabsPeople = 'Ľudia';
-z.string.sk.peopleTabsServices = 'Služby';
-z.string.sk.peopleVerified = 'Overený';
+z.string.sk.addParticipantsConfirmLabel = 'Pridať';
+z.string.sk.addParticipantsSearchPlaceholder = 'Vyhľadať podľa mena';
+z.string.sk.addParticipantsTabsPeople = 'Ľudia';
+z.string.sk.addParticipantsTabsServices = 'Služby';
 
-z.string.sk.peopleBlockHeadline = 'Blokovať?';
-z.string.sk.peopleBlockMessage = '{{user}} Vás nebude môcť kontaktovať, alebo Vás pozvať do skupinového rozhovoru.';
+z.string.sk.conversationDetailsActionCancelRequest = 'Zrušiť požiadavku';
+z.string.sk.conversationDetailsActionCreateGroup = 'Vytvoriť skupinu';
+z.string.sk.conversationDetailsActionDevices = 'Zariadenia';
+z.string.sk.conversationDetailsGuestsOff = 'Vypnúť';
+z.string.sk.conversationDetailsParticipantsServicesMany = 'Služby';
+z.string.sk.conversationDetailsParticipantsUsersMany = 'Ľudia';
+z.string.sk.conversationDetailsPeople = 'Ľudia';
+z.string.sk.conversationDetailsServices = 'Služby';
 
-z.string.sk.peopleConnectHeadline = 'Prijať?';
-z.string.sk.peopleConnectMessage = 'Toto Vás spojí a otvorí rozhovor s {{user}}.';
+z.string.sk.groupParticipantActionCancelRequest = 'Zrušiť požiadavku';
+z.string.sk.groupParticipantActionDevices = 'Zariadenia';
+z.string.sk.groupParticipantActionPending = 'Čaká sa';
+z.string.sk.groupParticipantActionSendRequest = 'Pripojiť';
 
-z.string.sk.peopleCancelRequestHeadline = 'Zrušiť požiadavku?';
-z.string.sk.peopleCancelRequestMessage = 'Odstrániť požiadavku na pripojenie k {{user}}.';
+z.string.sk.participantDevicesDetailHeadline = 'Overte, že to zodpovedá identifikátoru zobrazenému na {{html1}}zariadení {{user}}{{html2}}.';
+z.string.sk.participantDevicesDetailHowTo = 'Ako to urobiť?';
+z.string.sk.participantDevicesDetailResetSession = 'Obnovenie spojenia';
+z.string.sk.participantDevicesDetailShowMyDevice = 'Zobraziť identifikátor môjho zariadenia';
+z.string.sk.participantDevicesDetailVerify = 'Overený';
 
-z.string.sk.peopleLeaveHeadline = 'Opustiť rozhovor?';
-z.string.sk.peopleLeaveMessage = 'Nebudete môcť odosielať ani prijímať správy v tomto rozhovore.';
+z.string.sk.participantDevicesHeader = 'Zariadenia';
+z.string.sk.participantDevicesHeadline = 'Wire dáva každému zariadeniu jedinečný identifikátor. Porovnajte ich s {{user}} a overte Vaše rozhovory.';
+z.string.sk.participantDevicesLearnMore = 'Zistiť viac';
+z.string.sk.participantDevicesWhyVerify = 'Prečo overiť rozhovor?';
+z.string.sk.participantDevicesOutdatedClientMessage = '{{user}} používa staršiu verziu Wire. Žiadne zariadenia sa tu nezobrazujú.';
 
-z.string.sk.peopleRemoveHeadline = 'Odstrániť?';
-z.string.sk.peopleRemoveMessage = '{{user}} nebude môcť odosielať ani prijímať správy v tomto rozhovore.';
+z.string.sk.participantDevicesSelfAllDevices = 'Zobraziť všetky moje zariadenia';
+z.string.sk.participantDevicesSelfFingerprint = 'Identifikátor zaradenia';
 
-z.string.sk.peopleUnblockHeadline = 'Odblokovať?';
-z.string.sk.peopleUnblockMessage = '{{user}} Vás bude môcť kontaktovať, alebo Vás pozvať do skupinového rozhovoru.';
-
-z.string.sk.peopleButtonAdd = 'Pridať';
-z.string.sk.peopleButtonBlock = 'Blokovať';
-z.string.sk.peopleButtonCancel = 'Zrušiť';
-z.string.sk.peopleButtonConnect = 'Pripojiť';
-z.string.sk.peopleButtonCreate = 'Vytvoriť skupinu';
-z.string.sk.peopleButtonIgnore = 'Ignorovať';
-z.string.sk.peopleButtonLeave = 'Opustiť';
-z.string.sk.peopleButtonOpen = 'Otvoriť rozhovor';
-z.string.sk.peopleButtonPending = 'Čaká sa';
-z.string.sk.peopleButtonProfile = 'Profil';
-z.string.sk.peopleButtonRemove = 'Odstrániť';
-z.string.sk.peopleButtonUnblock = 'Odblokovať';
-z.string.sk.peopleButtonNo = 'Nie';
-z.string.sk.peopleButtonYes = 'Áno';
+z.string.sk.userProfileButtonConnect = 'Pripojiť';
+z.string.sk.userProfileButtonIgnore = 'Ignorovať';
+z.string.sk.userProfileButtonUnblock = 'Odblokovať';
 
 z.string.sk.preferencesAbout = 'O aplikácií';
 z.string.sk.preferencesAccount = 'Účet';
@@ -445,6 +460,7 @@ z.string.sk.searchCreateGroup = 'Vytvoriť skupinu';
 z.string.sk.searchGroups = 'Skupiny';
 z.string.sk.searchPeople = 'Ľudia';
 z.string.sk.searchPlaceholder = 'Vyhľadať podľa mena, alebo užívateľského mena';
+z.string.sk.searchServicePlaceholder = 'Vyhľadať podľa mena';
 z.string.sk.searchServices = 'Služby';
 z.string.sk.searchTeamGroups = 'Tímové konverzácie';
 z.string.sk.searchTeamMembers = 'Členovia tímu';
@@ -453,14 +469,19 @@ z.string.sk.searchTrySearch = 'Nájsť ľudí podľa názvu, alebo užívateľsk
 z.string.sk.searchNoContactsOnWire = 'Nemáte žiadne kontakty Wire. Skúste nájsť ľudí podľa názvu alebo užívateľského mena.';
 z.string.sk.searchOthers = 'Pripojiť';
 
+z.string.sk.searchInvite = 'Pozvať ľudí do Wire';
+z.string.sk.searchInviteDetail = 'Zdieľanie kontaktov Vám pomôže spojiť sa s ostatnými. Anonymizujeme všetky informácie a nezdieľame ich s nikým iným.';
+z.string.sk.searchInviteButtonContacts = 'Z kontaktov';
+z.string.sk.searchInviteButtonGmail = 'Z Gmailu';
+z.string.sk.searchInviteHeadline = 'Pozvať priateľov';
+z.string.sk.searchInviteShare = 'Zdieľať kontakty';
+
+z.string.sk.searchListEveryoneParticipates = 'Všetci pripojení sú už v tomto rozhovore.';
+z.string.sk.searchListNoMatches = 'Žiadne výsledky. Skúste zadať iné meno.';
+
 z.string.sk.uploadGoogleHeadline = 'Nájsť ľudí\npre rozhovor.';
 z.string.sk.uploadGoogleMessage = 'Vaše údaje o kontaktoch používame na pripojenie k iným užívateľom. Všetky informácie anonymizujeme a nezdieľame ich s nikým iným.';
-z.string.sk.uploadGoogleHeadlineError = 'Niečo sa pokazilo.';
-z.string.sk.uploadGoogleMessageError = 'Neprijali sme Vaše informácie. Skúste prosím znovu importovať Vaše kontakty.';
-z.string.sk.uploadGoogleButtonAgain = 'Skúsiť znova';
 
-z.string.sk.warningCallDetail = 'Pre volanie potrebuje Váš prehliadač prístup k mikrofónu.';
-z.string.sk.warningCallHeadline = 'Nemôžete volať bez mikrofónu';
 z.string.sk.warningCallUnsupportedIncoming = 'Volá {{user}}. Váš prehliadač nepodporuje hovory.';
 z.string.sk.warningCallUnsupportedOutgoing = 'Nemôžete volať, pretože Váš prehliadač nepodporuje hovory.';
 z.string.sk.warningCallIssues = 'Táto verzia Wire sa nemôže zúčastniť volania. Prosím použite';
@@ -480,7 +501,6 @@ z.string.sk.warningPermissionRequestCamera = '{{icon}} Povoliť prístup ku kame
 z.string.sk.warningPermissionRequestMicrophone = '{{icon}} Povoliť prístup k mikrofónu';
 z.string.sk.warningPermissionRequestNotification = '{{icon}} Povoliť oznámenia';
 z.string.sk.warningPermissionRequestScreen = '{{icon}} Povoliť prístup k obrazovke';
-z.string.sk.warningTellMeHow = 'Povedz mi, ako';
 
 z.string.sk.userAvailabilityAvailable = 'Dostupné';
 z.string.sk.userAvailabilityNone = 'Žiadne';
@@ -524,14 +544,7 @@ z.string.sk.tooltipConversationsPreferences = 'Otvoriť predvoľby';
 z.string.sk.tooltipConversationsSilence = 'Stlmiť ({{shortcut}})';
 z.string.sk.tooltipConversationsStart = 'Začať rozhovor ({{shortcut}})';
 
-z.string.sk.tooltipPeopleAdd = 'Pridať ľudí do rozhovoru ({{shortcut}})';
-z.string.sk.tooltipPeopleBack = 'Späť';
-z.string.sk.tooltipPeopleBlock = 'Blokovať';
-z.string.sk.tooltipPeopleConnect = 'Pripojiť';
-z.string.sk.tooltipPeopleLeave = 'Opustiť rozhovor';
-z.string.sk.tooltipPeopleRename = 'Zmeniť názov rozhovoru';
-z.string.sk.tooltipPeopleRemove = 'Odstrániť z rozhovoru';
-z.string.sk.tooltipPeopleUnblock = 'Odblokovať';
+z.string.sk.tooltipConversationDetailsRename = 'Zmeniť názov rozhovoru';
 
 z.string.sk.tooltipPreferencesContactsGmail = 'Pre zdieľanie kontaktov sa prihláste do svojho Gmail účtu';
 z.string.sk.tooltipPreferencesContactsMacos = 'Zdieľať všetky svoje kontakty z aplikácie kontaktov systému macOS';

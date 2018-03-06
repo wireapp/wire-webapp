@@ -36,10 +36,12 @@ z.viewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
     this.logger = new z.util.Logger('z.viewModel.content.GroupCreationViewModel', z.config.LOGGER.OPTIONS);
 
     this.clickOnCreate = this.clickOnCreate.bind(this);
+    this.clickOnToggleGuestMode = this.clickOnToggleGuestMode.bind(this);
 
     this.conversationRepository = repositories.conversation;
     this.teamRepository = repositories.team;
     this.userRepository = repositories.user;
+    this.isTeam = this.teamRepository.isTeam;
 
     this.modal = undefined;
     this.state = ko.observable(GroupCreationViewModel.STATE.DEFAULT);
@@ -52,12 +54,29 @@ z.viewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
     this.showContacts = ko.observable(false);
     this.participantsInput = ko.observable('');
 
+    this.accessState = ko.observable(z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM);
+    this.isGuestRoom = ko.pureComputed(() => this.accessState() === z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM);
+    this.isGuestRoom.subscribe(isGuestRoom => {
+      if (!isGuestRoom) {
+        this.selectedContacts.remove(userEntity => !userEntity.is_team_member());
+      }
+    });
+
     this.activateNext = ko.pureComputed(() => this.nameInput().length);
     this.contacts = ko.pureComputed(() => {
       if (this.showContacts()) {
-        return this.teamRepository.isTeam() ? this.teamRepository.teamUsers() : this.userRepository.connected_users();
-      }
+        if (!this.isTeam()) {
+          return this.userRepository.connected_users();
+        }
 
+        if (this.isGuestRoom()) {
+          return this.userRepository.teamUsers();
+        }
+
+        return this.teamRepository
+          .teamMembers()
+          .sort((userA, userB) => z.util.StringUtil.sort_by_priority(userA.first_name(), userB.first_name()));
+      }
       return [];
     });
     this.participantsActionText = ko.pureComputed(() => {
@@ -129,21 +148,28 @@ z.viewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
     this._hideModal();
   }
 
+  clickOnToggleGuestMode() {
+    const accessState = this.isGuestRoom()
+      ? z.conversation.ACCESS_STATE.TEAM.TEAM_ONLY
+      : z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM;
+
+    this.accessState(accessState);
+  }
+
   clickOnCreate() {
     if (!this.isCreatingConversation) {
       this.isCreatingConversation = true;
 
-      this.conversationRepository
-        .createGroupConversation(this.selectedContacts(), this.nameInput())
-        .then(conversationEntity => {
-          amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.GROUP_CREATION_SUCCEEDED, {
-            method: this.method,
-            with_participants: !!this.selectedContacts().length,
-          });
+      const accessState = this.isTeam() ? this.accessState() : undefined;
 
+      this.conversationRepository
+        .createGroupConversation(this.selectedContacts(), this.nameInput(), accessState)
+        .then(conversationEntity => {
           this._hideModal();
 
           amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity);
+
+          this._trackGroupCreation(conversationEntity);
         })
         .catch(error => {
           this.isCreatingConversation = false;
@@ -183,11 +209,53 @@ z.viewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
     this.participantsInput('');
     this.selectedContacts([]);
     this.state(GroupCreationViewModel.STATE.DEFAULT);
+    this.accessState(z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM);
   }
 
   _hideModal() {
     if (this.modal) {
       this.modal.hide();
     }
+  }
+
+  _trackGroupCreation(conversationEntity) {
+    this._trackGroupCreationSucceeded(conversationEntity);
+    this._trackAddParticipants(conversationEntity);
+  }
+
+  _trackGroupCreationSucceeded(conversationEntity) {
+    const attributes = {
+      method: this.method,
+      with_participants: !!this.selectedContacts().length,
+    };
+
+    const isTeamConversation = !!conversationEntity.team_id;
+    if (isTeamConversation) {
+      attributes.is_allow_guests = !conversationEntity.isTeamOnly();
+    }
+
+    const eventName = z.tracking.EventName.CONVERSATION.GROUP_CREATION_SUCCEEDED;
+    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, eventName, attributes);
+  }
+
+  _trackAddParticipants(conversationEntity) {
+    const attributes = {
+      method: 'create',
+      user_num: conversationEntity.getNumberOfParticipants(),
+    };
+
+    const isTeamConversation = !!conversationEntity.team_id;
+    if (isTeamConversation) {
+      const participants = z.tracking.helpers.getParticipantTypes(conversationEntity.participating_user_ets(), true);
+
+      Object.assign(attributes, {
+        guest_num: participants.guests,
+        is_allow_guests: conversationEntity.isGuestRoom(),
+        temporary_guest_num: participants.temporaryGuests,
+        user_num: participants.users,
+      });
+    }
+
+    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.ADD_PARTICIPANTS, attributes);
   }
 };

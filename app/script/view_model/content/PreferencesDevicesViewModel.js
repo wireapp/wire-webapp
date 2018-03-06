@@ -29,19 +29,20 @@ z.viewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewMo
     this.clickOnShowDevice = this.clickOnShowDevice.bind(this);
     this.updateDeviceInfo = this.updateDeviceInfo.bind(this);
 
-    this.preferencesDeviceDetails = contentViewModel.preferencesDeviceDetails;
     this.clientRepository = repositories.client;
     this.conversationRepository = repositories.conversation;
     this.cryptographyRepository = repositories.cryptography;
     this.logger = new z.util.Logger('z.viewModel.content.PreferencesDevicesViewModel', z.config.LOGGER.OPTIONS);
 
+    this.actionsViewModel = mainViewModel.actions;
+    this.preferencesDeviceDetails = contentViewModel.preferencesDeviceDetails;
     this.currentClient = this.clientRepository.currentClient;
     this.displayClientId = ko.pureComputed(() => (this.currentClient() ? this.currentClient().formatId() : []));
 
     this.activationLocation = ko.observable([]);
     this.activationDate = ko.observable([]);
     this.devices = ko.observableArray();
-    this.displayFingerPrint = ko.observable();
+    this.localFingerprint = ko.observableArray([]);
 
     this.shouldUpdateScrollbar = ko.computed(() => this.devices()).extend({notify: 'always', rateLimit: 500});
 
@@ -82,23 +83,19 @@ z.viewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewMo
   }
 
   clickOnRemoveDevice(clientEntity, event) {
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.REMOVE_DEVICE, {
-      action: password => this.clientRepository.deleteClient(clientEntity.id, password),
-      data: clientEntity.model,
-    });
+    this.actionsViewModel.deleteClient(clientEntity);
     event.stopPropagation();
   }
 
   updateDeviceInfo() {
-    if (this.currentClient() && !this.displayFingerPrint()) {
+    if (this.currentClient() && !this.localFingerprint().length) {
       const {location, time} = this.currentClient();
       this._updateActivationDate(time);
       if (location) {
         this._updateLocation(location);
       }
 
-      const paddedFingerPrint = z.util.zero_padding(this.cryptographyRepository.getLocalFingerprint(), 16);
-      this.displayFingerPrint(paddedFingerPrint.match(/.{1,2}/g) || []);
+      this.localFingerprint(this.cryptographyRepository.getLocalFingerprint());
     }
   }
 };

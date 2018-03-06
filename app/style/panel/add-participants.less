@@ -1,0 +1,107 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+.add-participants {
+  user-input {
+    margin: 8px;
+  }
+
+  &__tabs {
+    display: flex;
+    height: 44px;
+    min-height: 44px;
+    padding: 0 8px;
+    margin-bottom: 0;
+    border-bottom: 1px solid #eee;
+  }
+
+  &__tab {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    color: @graphite-dark;
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+
+    border-bottom: 1px solid transparent;
+    cursor: pointer;
+    opacity: 0.56;
+    margin-bottom: -1px;
+
+    &--active {
+      border-bottom-color: fade(@graphite-dark, 40%);
+      opacity: 1;
+      cursor: default;
+    }
+
+    &:first-child {
+      margin-left: 8px;
+    }
+
+    &:last-child {
+      margin-right: 8px;
+    }
+  }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+  }
+
+  &__list {
+    flex-grow: 1;
+    & > .panel__content__scroll {
+      flex-grow: 1;
+    }
+  }
+
+  &__service-header {
+    padding: 8px 16px;
+    display: flex;
+  }
+
+  &__service-details {
+    margin-left: 16px;
+  }
+
+  &__service-name {
+    font-size: 24px;
+    font-weight: @font-weight-regular;
+  }
+
+  &__service-provider {
+    font-size: 12px;
+    font-weight: @font-weight-regular;
+    color: fade(@graphite-dark, 40%);
+  }
+
+  &__service-description {
+    padding: 16px;
+    font-size: 14px;
+    font-weight: @font-weight-light;
+  }
+
+  &__footer {
+    padding: 8px;
+  }
+}

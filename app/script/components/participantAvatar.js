@@ -39,8 +39,7 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
     this.isService = this.participant instanceof z.integration.ServiceEntity || this.participant.isBot;
     this.isUser = this.participant instanceof z.entity.User && !this.participant.isBot;
 
-    // TODO: real data as soon as the user object has them; disabled for now
-    this.isTemporaryGuest = this.isUser && false;
+    this.isTemporaryGuest = this.isUser && this.participant.isTemporaryGuest();
 
     if (this.isTemporaryGuest) {
       // TODO: real data from user (0 - 1)

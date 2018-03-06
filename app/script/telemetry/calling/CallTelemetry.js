@@ -133,6 +133,11 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
         attributes
       );
 
+      const isTeamConversation = !!conversationEntity.team_id;
+      if (isTeamConversation) {
+        attributes = Object.assign(attributes, z.tracking.helpers.getGuestAttributes(conversationEntity));
+      }
+
       if ([z.media.MediaType.AUDIO_VIDEO, z.media.MediaType.VIDEO].includes(this.media_type)) {
         event_name = event_name.replace('_call', '_video_call');
       }
@@ -192,6 +197,11 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
         remote_version: this.remote_version,
         with_service: conversationEntity.isWithBot(),
       };
+
+      const isTeamConversation = !!conversationEntity.team_id;
+      if (isTeamConversation) {
+        Object.assign(attributes, z.tracking.helpers.getGuestAttributes(conversationEntity));
+      }
 
       let event_name = z.tracking.EventName.CALLING.ENDED_CALL;
       if (this.media_type === z.media.MediaType.AUDIO_VIDEO) {
