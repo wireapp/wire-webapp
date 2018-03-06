@@ -383,8 +383,6 @@ z.string.nl.groupParticipantActionDevices = 'Apparaten';
 z.string.nl.groupParticipantActionPending = 'In behandeling';
 z.string.nl.groupParticipantActionSendRequest = 'Verbind';
 
-z.string.nl.groupParticiapntServiceRemovalButton = 'Service verwijderen';
-
 z.string.nl.participantDevicesDetailHeadline = 'Verifieer dat deze digitale vingerafdruk overeenkomt met {{html1}}{{user}}’s apparaat{{html2}}.';
 z.string.nl.participantDevicesDetailHowTo = 'Hoe doe ik dat?';
 z.string.nl.participantDevicesDetailResetSession = 'Reset session';

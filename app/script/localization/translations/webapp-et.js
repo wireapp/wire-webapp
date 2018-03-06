@@ -393,8 +393,6 @@ z.string.et.groupParticipantActionDevices = 'Seadmed';
 z.string.et.groupParticipantActionPending = 'Ootel';
 z.string.et.groupParticipantActionSendRequest = 'Ühendu';
 
-z.string.et.groupParticiapntServiceRemovalButton = 'Eemalda teenus';
-
 z.string.et.participantDevicesDetailHeadline = 'Veendu, et see vastab {{html1}}kasutaja {{user}} seadmel{{html2}} kuvatud sõrmejäljele.';
 z.string.et.participantDevicesDetailHowTo = 'Kuidas ma seda teen?';
 z.string.et.participantDevicesDetailResetSession = 'Lähtesta seanss';

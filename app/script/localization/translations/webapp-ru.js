@@ -393,8 +393,6 @@ z.string.ru.groupParticipantActionDevices = 'Устройства';
 z.string.ru.groupParticipantActionPending = 'Ожидает';
 z.string.ru.groupParticipantActionSendRequest = 'Связаться';
 
-z.string.ru.groupParticiapntServiceRemovalButton = 'Удалить службу';
-
 z.string.ru.participantDevicesDetailHeadline = 'Убедитесь, что этот отпечаток соответствует отпечатку, показанному на устройстве {{html1}}{{user}}{{html2}}.';
 z.string.ru.participantDevicesDetailHowTo = 'Как это сделать?';
 z.string.ru.participantDevicesDetailResetSession = 'Сбросить сессию';

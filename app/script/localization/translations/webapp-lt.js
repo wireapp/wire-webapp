@@ -393,8 +393,6 @@ z.string.lt.groupParticipantActionDevices = 'Įrenginiai';
 z.string.lt.groupParticipantActionPending = 'Laukia';
 z.string.lt.groupParticipantActionSendRequest = 'Užmegzti kontaktą';
 
-z.string.lt.groupParticiapntServiceRemovalButton = 'Išimti paslaugą';
-
 z.string.lt.participantDevicesDetailHeadline = 'Įsitikinkite, kad šis kontrolinis kodas yra toks pats, kaip ir įrenginyje, kurį naudoja {{html1}}{{user}}{{html2}}.';
 z.string.lt.participantDevicesDetailHowTo = 'Kaip tai padaryti?';
 z.string.lt.participantDevicesDetailResetSession = 'Atstatyti seansą';

@@ -453,8 +453,6 @@ z.string.de.guestOptionsInfoText = 'Jeder kann der Gruppe mit diesem Link für 2
 z.string.de.guestOptionsRevokeLink = 'Link widerrufen';
 z.string.de.guestOptionsTitle = 'Gast-Optionen';
 
-z.string.de.groupParticiapntServiceRemovalButton = 'Dienst entfernen';
-
 z.string.de.participantDevicesDetailHeadline = 'Überprüfe, ob dieser Fingerabdruck mit dem auf {{html1}}{{user}}s Gerät{{html2}} übereinstimmt.';
 z.string.de.participantDevicesDetailHowTo = 'Wie mache ich das?';
 z.string.de.participantDevicesDetailResetSession = 'Session zurücksetzen';

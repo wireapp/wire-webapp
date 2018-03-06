@@ -384,8 +384,6 @@ z.string.fr.groupParticipantActionDevices = 'Appareils';
 z.string.fr.groupParticipantActionPending = 'En attente';
 z.string.fr.groupParticipantActionSendRequest = 'Se connecter';
 
-z.string.fr.groupParticiapntServiceRemovalButton = 'Supprimer un service';
-
 z.string.fr.participantDevicesDetailHeadline = 'Vérifiez que cela correspond à l’empreinte affichée sur {{html1}}l’appareil de {{user}}{{html2}}.';
 z.string.fr.participantDevicesDetailHowTo = 'Comment faire ?';
 z.string.fr.participantDevicesDetailResetSession = 'Réinitialiser la session';

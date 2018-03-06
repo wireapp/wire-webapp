@@ -392,8 +392,6 @@ z.string.uk.groupParticipantActionDevices = 'Пристрої';
 z.string.uk.groupParticipantActionPending = 'Очікує підтвердження';
 z.string.uk.groupParticipantActionSendRequest = 'Додати до контактів';
 
-z.string.uk.groupParticiapntServiceRemovalButton = 'Видалити сервіс';
-
 z.string.uk.participantDevicesDetailHeadline = 'Переконайтеся, що цей ідентифікатор такий самий, як і ідентифікатор на пристрої, що належить {{html1}}{{user}}{{html2}}.';
 z.string.uk.participantDevicesDetailHowTo = 'Як це зробити?';
 z.string.uk.participantDevicesDetailResetSession = 'Скидання сесії';

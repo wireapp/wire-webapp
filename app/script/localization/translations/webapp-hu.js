@@ -388,8 +388,6 @@ z.string.hu.groupParticipantActionDevices = 'Eszközök';
 z.string.hu.groupParticipantActionPending = 'Függőben lévő';
 z.string.hu.groupParticipantActionSendRequest = 'Csatlakozás';
 
-z.string.hu.groupParticiapntServiceRemovalButton = 'Szolgáltatás eltávolítása';
-
 z.string.hu.participantDevicesDetailHeadline = 'Ellenőrizd, hogy ez egyezik-e {{html1}}{{user}} eszközén látható{{html2}} ujjlenyomattal.';
 z.string.hu.participantDevicesDetailHowTo = 'Hogyan csináljam?';
 z.string.hu.participantDevicesDetailResetSession = 'Munkamenet visszaállítása';

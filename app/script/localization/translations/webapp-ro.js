@@ -385,8 +385,6 @@ z.string.ro.groupParticipantActionDevices = 'Dispozitive';
 z.string.ro.groupParticipantActionPending = 'În așteptare';
 z.string.ro.groupParticipantActionSendRequest = 'Conectare';
 
-z.string.ro.groupParticiapntServiceRemovalButton = 'Elimină serviciu';
-
 z.string.ro.participantDevicesDetailHeadline = 'Verifică dacă aceasta se potrivește cu amprenta arătată în {{html1}}dispozitivul al lui {{user}}{{html2}}.';
 z.string.ro.participantDevicesDetailHowTo = 'Cum fac asta?';
 z.string.ro.participantDevicesDetailResetSession = 'Resetează sesiunea';
