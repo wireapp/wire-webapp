@@ -55,12 +55,9 @@
 <script src="/ext/js/linkifyjs/linkify-html.min.js"></script>
 <!-- Encryption: Base libraries (don't change the order) -->
 <script>
-window.sodium = {
-  onload: function(sodium) {
-    console.log('sodium loaded')
-    window.sodium = sodium;
+  window.sodium = {
+    onload: sodium => (window.sodium = sodium)
   }
-}
 </script>
 <script src="/ext/js/libsodium.js/sodium.js"></script>
 <script src="/ext/js/@wireapp/cbor/dist/cbor.bundle.js"></script>
