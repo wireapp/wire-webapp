@@ -1,10 +1,10 @@
 <div id="conversation-details" class="panel__page panel__page--visible conversation-details" data-bind="with: $root.conversationDetails">
   <!-- ko if: isVisible() -->
-    <div class="panel__header">
+    <div class="panel__header panel__header--reverse">
+      <close-icon class="right-panel-close icon-button" data-bind="click: clickOnClose" data-uie-name="do-close"></close-icon>
       <!-- ko if: !conversationEntity().is_request() && !conversationEntity().removed_from_conversation() -->
         <mute-icon class="right-panel-mute icon-button" data-bind="click: clickToToggleMute, css: {'right-panel-mute--active': conversationEntity().is_muted()} " data-uie-name="do-mute"></mute-icon>
       <!-- /ko -->
-      <close-icon class="right-panel-close icon-button" data-bind="click: clickOnClose" data-uie-name="do-close"></close-icon>
     </div>
     <div class="panel__content">
       <div class="conversation-details__header">
