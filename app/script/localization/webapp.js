@@ -488,10 +488,6 @@ z.string.guestOptionsInfoText = 'Anyone with the link can join the conversation 
 z.string.guestOptionsRevokeLink = 'Revoke link';
 z.string.guestOptionsTitle = 'Guest options';
 
-// Panel: Group participant
-z.string.groupParticipantActionDevices = 'Devices';
-z.string.groupParticiapntServiceRemovalButton = 'Remove service';
-
 // Panel: Participant devices
 z.string.participantDevicesDetailHeadline = 'Verify that this matches the fingerprint shown on {{html1}}{{user}}’s device{{html2}}.';
 z.string.participantDevicesDetailHowTo = 'How do I do that?';
