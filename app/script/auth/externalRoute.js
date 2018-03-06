@@ -17,18 +17,16 @@
  *
  */
 
+import {onEnvironment} from './Environment';
+
+const WEBAPP_ENV = onEnvironment('http://localhost:8888', '', '');
+
 export default {
-  CHOOSE_HANDLE: '/choosehandle',
-  CLIENTS: '/clients',
-  CREATE_ACCOUNT: '/createaccount',
-  CREATE_TEAM: '/createteam',
-  CREATE_TEAM_ACCOUNT: '/createteamaccount',
-  INDEX: '/',
-  INITIAL_INVITE: '/teaminvite',
-  INVITE: '/invite',
-  LOGIN: '/login',
-  PASSWORD_RESET: '/forgot',
-  PERSONAL_INVITE: '/personalinvite',
-  PHONE_LOGIN: '/login#phone',
-  VERIFY: '/verify',
+  LOGIN: `${WEBAPP_ENV}/login`,
+  WEBAPP: WEBAPP_ENV,
+  WIRE_ROOT: onEnvironment(
+    'https://wire-website-staging.zinfra.io',
+    'https://wire-website-staging.zinfra.io',
+    'https://wire.com'
+  ),
 };

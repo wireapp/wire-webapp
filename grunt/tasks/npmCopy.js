@@ -27,10 +27,11 @@ module.exports = grunt =>
     const distPath = grunt.config('dir.app.ext');
 
     const npmModules = {
-      '@wireapp/cbor': ['dist/cbor.bundle.js'],
-      '@wireapp/cryptobox': ['dist/cryptobox.bundle.js'],
-      '@wireapp/lru-cache': ['dist/lru-cache.bundle.js'],
-      '@wireapp/proteus': ['dist/proteus.bundle.js'],
+      '@wireapp/cbor': ['dist/cbor.bundle.js', 'dist/cbor.bundle.js.map'],
+      '@wireapp/cryptobox': ['dist/cryptobox.bundle.js', 'dist/cryptobox.bundle.js.map'],
+      '@wireapp/lru-cache': ['dist/lru-cache.bundle.js', 'dist/lru-cache.bundle.js.map'],
+      '@wireapp/proteus': ['dist/proteus.bundle.js', 'dist/proteus.bundle.js.map'],
+      '@wireapp/store-engine': ['dist/store-engine.bundle.js', 'dist/store-engine.bundle.js.map'],
     };
 
     Object.keys(npmModules).forEach(module => {

@@ -92,7 +92,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
   _init(database) {
     return Promise.resolve().then(() => {
       this.logger.info(`Initializing Cryptobox with database '${database.name}'...`);
-      this.cryptobox = new cryptobox.Cryptobox(new cryptobox.store.IndexedDB(database), 10);
+      this.cryptobox = new cryptobox.Cryptobox(new StoreEngine.IndexedDBEngine(database), 10);
 
       this.cryptobox.on(cryptobox.Cryptobox.TOPIC.NEW_PREKEYS, preKeys => {
         const serializedPreKeys = preKeys.map(preKey => this.cryptobox.serialize_prekey(preKey));
@@ -338,7 +338,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
         return undefined;
       })
       .catch(error => {
-        const message = `Pre-key for user '${userId}' ('${clientId}') invalid. Skipping encryption:: ${error.message}`;
+        const message = `Pre-key for user '${userId}' ('${clientId}') invalid. Skipping encryption: ${error.message}`;
         this.logger.warn(message, error);
         return undefined;
       });
@@ -413,14 +413,14 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
    * @private
    * @param {string} sessionId - ID of session to encrypt for
    * @param {z.proto.GenericMessage} genericMessage - ProtoBuffer message
-   * @returns {Object} Contains session ID and encrypted message as BASE64 encoded string
+   * @returns {Object} Contains session ID and encrypted message as base64 encoded string
    */
   _encryptPayloadForSession(sessionId, genericMessage) {
     return this.cryptobox
       .encrypt(sessionId, genericMessage.toArrayBuffer())
       .then(cipherText => ({cipherText: z.util.array_to_base64(cipherText), sessionId}))
       .catch(error => {
-        if (error.constructor.name === 'RecordNotFoundError') {
+        if (error instanceof StoreEngine.error.RecordNotFoundError) {
           this.logger.log(`Session '${sessionId}' needs to get initialized...`);
           return {sessionId};
         }
@@ -457,7 +457,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
     // Session is broken, let's see what's really causing it...
     if (isInvalidMessage || isInvalidSignature) {
       this.logger.error(
-        `Session with user '${remoteUserId}' (${remoteClientId}) is broken.\nReset the session and for possible fix.`
+        `Session with user '${remoteUserId}' (${remoteClientId}) is broken.\nReset the session for possible fix.`
       );
     } else if (isRemoteIdentityChanged) {
       this.logger.error(`Remote identity of client '${remoteClientId}' from user '${remoteUserId}' changed`);

@@ -98,7 +98,7 @@ def update_headers(response):
 
   csp_values = ';'.join([
     "default-src 'self'",
-    "connect-src 'self' blob: https://*.giphy.com https://apis.google.com https://www.google.com https://maps.googleapis.com https://api.mixpanel.com https://api.raygun.io https://*.unsplash.com https://wire.com https://*.wire.com wss://prod-nginz-ssl.wire.com https://*.zinfra.io wss://*.zinfra.io",
+    "connect-src 'self' blob: data: https://*.giphy.com https://apis.google.com https://www.google.com https://maps.googleapis.com https://api.mixpanel.com https://api.raygun.io https://*.unsplash.com https://wire.com https://*.wire.com wss://prod-nginz-ssl.wire.com https://*.zinfra.io wss://*.zinfra.io",
     "font-src 'self' data:",
     "frame-src 'self' https://accounts.google.com https://*.soundcloud.com https://*.spotify.com https://*.vimeo.com https://*.youtube-nocookie.com",
     "img-src 'self' blob: data: https://*.giphy.com https://1-ps.googleusercontent.com https://api.mixpanel.com https://*.wire.com https://*.cloudfront.net https://*.zinfra.io https://csi.gstatic.com",

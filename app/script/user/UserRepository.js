@@ -702,7 +702,7 @@ z.user.UserRepository = class UserRepository {
         return this.save_user(user_et, true);
       })
       .catch(error => {
-        this.logger.error(`Unable to load self user: ${error}`);
+        this.logger.error(`Unable to load self user: ${error}`, error);
         throw error;
       });
   }
@@ -886,7 +886,7 @@ z.user.UserRepository = class UserRepository {
 
       if (!matching_user_ids) {
         const user_et = new z.entity.User(user_id);
-        user_et.name(z.l10n.text(z.string.nonexistent_user));
+        user_et.name(z.l10n.text(z.string.nonexistentUser));
         user_ets.push(user_et);
       }
     }

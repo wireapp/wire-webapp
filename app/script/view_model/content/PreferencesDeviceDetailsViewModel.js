@@ -62,14 +62,14 @@ z.viewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
   }
 
   _updateActivationLocation(location) {
-    const stringTemplate = z.string.preferences_devices_activated_in;
+    const stringTemplate = z.string.preferencesDevicesActivatedIn;
     const sanitizedText = z.util.StringUtil.splitAtPivotElement(stringTemplate, '{{location}}', location);
     this.activationLocation(sanitizedText);
   }
 
   _updateActivationTime(time) {
     const formattedTime = z.util.format_timestamp(time);
-    const stringTemplate = z.string.preferences_devices_activated_on;
+    const stringTemplate = z.string.preferencesDevicesActivatedOn;
     const sanitizedText = z.util.StringUtil.splitAtPivotElement(stringTemplate, '{{date}}', formattedTime);
     this.activationDate(sanitizedText);
   }
@@ -121,7 +121,7 @@ z.viewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
 
   clickOnRemoveDevice() {
     // @todo Add failure case ux WEBAPP-3570
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.WarningsViewModel.TYPE.REMOVE_DEVICE, {
+    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.REMOVE_DEVICE, {
       action: password => {
         this.clientRepository
           .deleteClient(this.device().id, password)
