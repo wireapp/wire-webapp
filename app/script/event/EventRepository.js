@@ -75,7 +75,7 @@ z.event.EventRepository = class EventRepository {
         this._handleBufferedNotifications();
         const previouslyHandlingRecovery = this.previousHandlingState === z.event.NOTIFICATION_HANDLING_STATE.RECOVERY;
         if (previouslyHandlingRecovery) {
-          amplify.publish(z.event.WebApp.WARNING.DISMISS, z.ViewModel.WarningType.CONNECTIVITY_RECOVERY);
+          amplify.publish(z.event.WebApp.WARNING.DISMISS, z.viewModel.WarningsViewModel.TYPE.CONNECTIVITY_RECOVERY);
         }
       }
       this.previousHandlingState = handling_state;
@@ -339,7 +339,7 @@ z.event.EventRepository = class EventRepository {
    */
   recoverFromStream() {
     this.notificationHandlingState(z.event.NOTIFICATION_HANDLING_STATE.RECOVERY);
-    amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.CONNECTIVITY_RECOVERY);
+    amplify.publish(z.event.WebApp.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.CONNECTIVITY_RECOVERY);
 
     return this._updateFromStream(this._getLastKnownNotificationId())
       .then(numberOfNotifications => {
@@ -351,7 +351,7 @@ z.event.EventRepository = class EventRepository {
           this.logger.error(`Failed to recover from notification stream: ${error.message}`, error);
           this.notificationHandlingState(z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
           // @todo What do we do in this case?
-          amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.CONNECTIVITY_RECONNECT);
+          amplify.publish(z.event.WebApp.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT);
         }
       });
   }
@@ -479,7 +479,7 @@ z.event.EventRepository = class EventRepository {
       };
       const progress = this.notificationsHandled / this.notificationsTotal * 50 + 25;
 
-      amplify.publish(z.event.WebApp.APP.UPDATE_PROGRESS, progress, z.string.init_decryption, content);
+      amplify.publish(z.event.WebApp.APP.UPDATE_PROGRESS, progress, z.string.initDecryption, content);
     }
   }
 
@@ -710,7 +710,7 @@ z.event.EventRepository = class EventRepository {
    */
   _handleNotification({payload: events, id, transient}) {
     const source = transient !== undefined ? EventRepository.SOURCE.WEB_SOCKET : EventRepository.SOURCE.STREAM;
-    const isTransientEvent = Boolean(transient);
+    const isTransientEvent = !!transient;
     this.logger.info(`Handling notification '${id}' from '${source}' containing '${events.length}' events`, events);
 
     if (!events.length) {

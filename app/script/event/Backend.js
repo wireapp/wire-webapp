@@ -24,6 +24,9 @@ window.z.event = z.event || {};
 
 z.event.Backend = {
   CONVERSATION: {
+    ACCESS_UPDATE: 'conversation.access-update',
+    CODE_DELETE: 'conversation.code-delete',
+    CODE_UPDATE: 'conversation.code-update',
     CONNECT_REQUEST: 'conversation.connect-request',
     CREATE: 'conversation.create',
     MEMBER_JOIN: 'conversation.member-join',

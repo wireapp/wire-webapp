@@ -20,117 +20,120 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.ViewModel = z.ViewModel || {};
-window.z.ViewModel.content = z.ViewModel.content || {};
+window.z.viewModel = z.viewModel || {};
+window.z.viewModel.content = z.viewModel.content || {};
 
-// Parent: z.ViewModel.CollectionViewModel
-z.ViewModel.content.CollectionDetailsViewModel = class CollectionDetailsViewModel {
+// Parent: z.viewModel.ContentViewModel
+z.viewModel.content.CollectionDetailsViewModel = class CollectionDetailsViewModel {
   constructor() {
-    this.item_added = this.item_added.bind(this);
-    this.item_removed = this.item_removed.bind(this);
-    this.removed_from_view = this.removed_from_view.bind(this);
-    this.set_conversation = this.set_conversation.bind(this);
+    this.itemAdded = this.itemAdded.bind(this);
+    this.itemRemoved = this.itemRemoved.bind(this);
+    this.removedFromView = this.removedFromView.bind(this);
+    this.setConversation = this.setConversation.bind(this);
 
-    this.logger = new z.util.Logger('z.ViewModel.CollectionDetailsViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger('z.viewModel.CollectionDetailsViewModel', z.config.LOGGER.OPTIONS);
 
     this.template = ko.observable();
-    this.conversation_et = ko.observable();
+    this.conversationEntity = ko.observable();
 
     this.items = ko.observableArray();
 
-    this.last_message_timestamp = undefined;
+    this.lastMessageTimestamp = undefined;
   }
 
-  set_conversation(conversation_et, category, items) {
-    amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.ADDED, this.item_added);
-    amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, this.item_removed);
+  setConversation(conversationEntity, category, items) {
+    amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.ADDED, this.itemAdded);
+    amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, this.itemRemoved);
     this.template(category);
-    this.conversation_et(conversation_et);
+    this.conversationEntity(conversationEntity);
     z.util.ko_push_deferred(this.items, items);
   }
 
-  item_added(message_et) {
-    if (this.conversation_et().id === message_et.conversation_id) {
-      switch (this.category) {
-        case 'images':
-          if (
-            message_et.category & z.message.MessageCategory.IMAGE &&
-            !(message_et.category & z.message.MessageCategory.GIF)
-          ) {
-            this.items.push(message_et);
+  itemAdded(messageEntity) {
+    const isExpectedId = this.conversationEntity().id === messageEntity.conversation_id;
+    if (isExpectedId) {
+      switch (this.template()) {
+        case 'images': {
+          const isImage = messageEntity.category & z.message.MessageCategory.IMAGE;
+          const isGif = messageEntity.category & z.message.MessageCategory.GIF;
+          if (isImage && !isGif) {
+            this.items.push(messageEntity);
           }
           break;
-        case 'files':
-          if (message_et.category & z.message.MessageCategory.FILE) {
-            this.items.push(message_et);
+        }
+
+        case 'files': {
+          const isFile = messageEntity.category & z.message.MessageCategory.FILE;
+          if (isFile) {
+            this.items.push(messageEntity);
           }
           break;
+        }
+
         case 'links':
-          if (message_et.category & z.message.MessageCategory.LINK_PREVIEW) {
-            this.items.push(message_et);
+          const isLinkPreview = messageEntity.category & z.message.MessageCategory.LINK_PREVIEW;
+          if (isLinkPreview) {
+            this.items.push(messageEntity);
           }
           break;
+
         default:
           break;
       }
     }
   }
 
-  item_removed(removed_message_id) {
-    this.items.remove(message_et => message_et.id === removed_message_id);
+  itemRemoved(removedMessageId) {
+    this.items.remove(messageEntity => messageEntity.id === removedMessageId);
     if (!this.items().length) {
-      this.click_on_back_button();
+      this.clickOnBackButton();
     }
   }
 
-  removed_from_view() {
-    amplify.unsubscribe(z.event.WebApp.CONVERSATION.MESSAGE.ADDED, this.item_added);
-    amplify.unsubscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, this.item_removed);
-    this.last_message_timestamp = undefined;
-    this.conversation_et(null);
+  removedFromView() {
+    amplify.unsubscribe(z.event.WebApp.CONVERSATION.MESSAGE.ADDED, this.itemAdded);
+    amplify.unsubscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, this.itemRemoved);
+    this.lastMessageTimestamp = undefined;
+    this.conversationEntity(null);
     this.items.removeAll();
   }
 
-  click_on_back_button() {
-    amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.ViewModel.content.CONTENT_STATE.COLLECTION);
+  clickOnBackButton() {
+    amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.COLLECTION);
   }
 
-  click_on_image(message_et) {
-    amplify.publish(z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW, message_et, this.items(), 'collection');
+  clickOnImage(messageEntity) {
+    amplify.publish(z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW, messageEntity, this.items(), 'collection');
   }
 
-  should_show_header(message_et) {
-    if (!this.last_message_timestamp) {
-      this.last_message_timestamp = message_et.timestamp();
+  shouldShowHeader(messageEntity) {
+    if (!this.lastMessageTimestamp) {
+      this.lastMessageTimestamp = messageEntity.timestamp();
       return true;
     }
 
     // We passed today
-    if (
-      !moment(message_et.timestamp()).is_same_day(this.last_message_timestamp) &&
-      moment(this.last_message_timestamp).is_today()
-    ) {
-      this.last_message_timestamp = message_et.timestamp();
+    const isSameDay = moment(messageEntity.timestamp()).is_same_day(this.lastMessageTimestamp);
+    const wasToday = moment(this.lastMessageTimestamp).is_today();
+    if (!isSameDay && wasToday) {
+      this.lastMessageTimestamp = messageEntity.timestamp();
       return true;
     }
 
     // We passed the month
-    if (!moment(message_et.timestamp()).is_same_month(this.last_message_timestamp)) {
-      this.last_message_timestamp = message_et.timestamp();
+    const isSameMonth = moment(messageEntity.timestamp()).is_same_month(this.lastMessageTimestamp);
+    if (!isSameMonth) {
+      this.lastMessageTimestamp = messageEntity.timestamp();
       return true;
     }
   }
 
-  get_title_for_header(message_et) {
-    const message_date = moment(message_et.timestamp());
-    if (message_date.is_today()) {
-      return z.l10n.text(z.string.conversation_today);
+  getTitleForHeader(messageEntity) {
+    const messageDate = moment(messageEntity.timestamp());
+    if (messageDate.is_today()) {
+      return z.l10n.text(z.string.conversationToday);
     }
 
-    if (message_date.is_current_year()) {
-      return message_date.format('MMMM');
-    }
-
-    return message_date.format('MMMM Y');
+    return messageDate.is_current_year() ? messageDate.format('MMMM') : messageDate.format('MMMM Y');
   }
 };

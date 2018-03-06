@@ -298,14 +298,14 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
   _hide_permission_failed_hint(media_type) {
     switch (media_type) {
       case z.media.MediaType.AUDIO:
-        amplify.publish(z.event.WebApp.WARNING.DISMISS, z.ViewModel.WarningType.DENIED_MICROPHONE);
+        amplify.publish(z.event.WebApp.WARNING.DISMISS, z.viewModel.WarningsViewModel.TYPE.DENIED_MICROPHONE);
         break;
       case z.media.MediaType.SCREEN:
-        amplify.publish(z.event.WebApp.WARNING.DISMISS, z.ViewModel.WarningType.DENIED_SCREEN);
+        amplify.publish(z.event.WebApp.WARNING.DISMISS, z.viewModel.WarningsViewModel.TYPE.DENIED_SCREEN);
         break;
       case z.media.MediaType.AUDIO_VIDEO:
       case z.media.MediaType.VIDEO:
-        amplify.publish(z.event.WebApp.WARNING.DISMISS, z.ViewModel.WarningType.DENIED_CAMERA);
+        amplify.publish(z.event.WebApp.WARNING.DISMISS, z.viewModel.WarningsViewModel.TYPE.DENIED_CAMERA);
         break;
       default:
         throw new z.media.MediaError(z.media.MediaError.TYPE.UNHANDLED_MEDIA_TYPE);
@@ -326,14 +326,14 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
 
     switch (media_type) {
       case z.media.MediaType.AUDIO:
-        amplify.publish(z.event.WebApp.WARNING.DISMISS, z.ViewModel.WarningType.REQUEST_MICROPHONE);
+        amplify.publish(z.event.WebApp.WARNING.DISMISS, z.viewModel.WarningsViewModel.TYPE.REQUEST_MICROPHONE);
         break;
       case z.media.MediaType.SCREEN:
-        amplify.publish(z.event.WebApp.WARNING.DISMISS, z.ViewModel.WarningType.REQUEST_SCREEN);
+        amplify.publish(z.event.WebApp.WARNING.DISMISS, z.viewModel.WarningsViewModel.TYPE.REQUEST_SCREEN);
         break;
       case z.media.MediaType.AUDIO_VIDEO:
       case z.media.MediaType.VIDEO:
-        amplify.publish(z.event.WebApp.WARNING.DISMISS, z.ViewModel.WarningType.REQUEST_CAMERA);
+        amplify.publish(z.event.WebApp.WARNING.DISMISS, z.viewModel.WarningsViewModel.TYPE.REQUEST_CAMERA);
         break;
       default:
         throw new z.media.MediaError(z.media.MediaError.TYPE.UNHANDLED_MEDIA_TYPE);
@@ -425,9 +425,9 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
    */
   _show_device_not_found_hint(media_type, conversation_id) {
     if (media_type === z.media.MediaType.AUDIO) {
-      amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.NOT_FOUND_MICROPHONE);
+      amplify.publish(z.event.WebApp.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.NOT_FOUND_MICROPHONE);
     } else if (media_type === z.media.MediaType.VIDEO) {
-      amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.NOT_FOUND_CAMERA);
+      amplify.publish(z.event.WebApp.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.NOT_FOUND_CAMERA);
     }
 
     if (conversation_id) {
@@ -445,14 +445,14 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
   _show_permission_denied_hint(media_type) {
     switch (media_type) {
       case z.media.MediaType.AUDIO:
-        amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.DENIED_MICROPHONE);
+        amplify.publish(z.event.WebApp.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.DENIED_MICROPHONE);
         break;
       case z.media.MediaType.SCREEN:
-        amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.DENIED_SCREEN);
+        amplify.publish(z.event.WebApp.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.DENIED_SCREEN);
         break;
       case z.media.MediaType.AUDIO_VIDEO:
       case z.media.MediaType.VIDEO:
-        amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.DENIED_CAMERA);
+        amplify.publish(z.event.WebApp.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.DENIED_CAMERA);
         break;
       default:
         throw new z.media.MediaError(z.media.MediaError.TYPE.UNHANDLED_MEDIA_TYPE);
@@ -473,14 +473,14 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
 
     switch (media_type) {
       case z.media.MediaType.AUDIO:
-        amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.REQUEST_MICROPHONE);
+        amplify.publish(z.event.WebApp.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.REQUEST_MICROPHONE);
         break;
       case z.media.MediaType.SCREEN:
-        amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.REQUEST_SCREEN);
+        amplify.publish(z.event.WebApp.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.REQUEST_SCREEN);
         break;
       case z.media.MediaType.AUDIO_VIDEO:
       case z.media.MediaType.VIDEO:
-        amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.REQUEST_CAMERA);
+        amplify.publish(z.event.WebApp.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.REQUEST_CAMERA);
         break;
       default:
         throw new z.media.MediaError(z.media.MediaError.TYPE.UNHANDLED_MEDIA_TYPE);

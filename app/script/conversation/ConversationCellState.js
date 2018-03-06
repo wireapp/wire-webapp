@@ -37,23 +37,23 @@ z.conversation.ConversationCellState = (() => {
         switch (activity) {
           case 'message':
             if (count === 1) {
-              activity_strings.push(z.l10n.text(z.string.conversations_secondary_line_new_message, count));
+              activity_strings.push(z.l10n.text(z.string.conversationsSecondaryLineNewMessage, count));
             } else if (count > 1) {
-              activity_strings.push(z.l10n.text(z.string.conversations_secondary_line_new_messages, count));
+              activity_strings.push(z.l10n.text(z.string.conversationsSecondaryLineNewMessages, count));
             }
             break;
           case 'ping':
             if (count === 1) {
-              activity_strings.push(z.l10n.text(z.string.conversations_secondary_line_ping, count));
+              activity_strings.push(z.l10n.text(z.string.conversationsSecondaryLinePing, count));
             } else if (count > 1) {
-              activity_strings.push(z.l10n.text(z.string.conversations_secondary_line_pings, count));
+              activity_strings.push(z.l10n.text(z.string.conversationsSecondaryLinePings, count));
             }
             break;
           case 'call':
             if (count === 1) {
-              activity_strings.push(z.l10n.text(z.string.conversations_secondary_line_missed_call, count));
+              activity_strings.push(z.l10n.text(z.string.conversationsSecondaryLineMissedCall, count));
             } else if (count > 1) {
-              activity_strings.push(z.l10n.text(z.string.conversations_secondary_line_missed_calls, count));
+              activity_strings.push(z.l10n.text(z.string.conversationsSecondaryLineMissedCalls, count));
             }
             break;
           default:
@@ -103,10 +103,10 @@ z.conversation.ConversationCellState = (() => {
       const wasSelfRemoved = is_removal_message && last_message_et.userIds().includes(self_user_id);
       if (wasSelfRemoved) {
         if (last_message_et.user().id === self_user_id) {
-          return z.l10n.text(z.string.conversations_secondary_line_you_left);
+          return z.l10n.text(z.string.conversationsSecondaryLineYouLeft);
         }
 
-        return z.l10n.text(z.string.conversations_secondary_line_you_were_removed);
+        return z.l10n.text(z.string.conversationsSecondaryLineYouWereRemoved);
       }
 
       return '';
@@ -159,15 +159,20 @@ z.conversation.ConversationCellState = (() => {
         if (last_message_et.isMemberJoin()) {
           if (user_count === 1) {
             if (!last_message_et.remoteUserEntities().length) {
-              return z.l10n.text(z.string.conversations_secondary_line_person_added_you, last_message_et.user().name());
+              return z.l10n.text(z.string.conversationsSecondaryLinePersonAddedYou, last_message_et.user().name());
             }
 
             const [remote_user_et] = last_message_et.remoteUserEntities();
-            return z.l10n.text(z.string.conversations_secondary_line_person_added, remote_user_et.name());
+            const userSelfJoined = remote_user_et.id == last_message_et.user().id;
+            if (userSelfJoined) {
+              return z.l10n.text(z.string.conversationsSecondaryLinePersonAddedSelf, remote_user_et.name());
+            }
+
+            return z.l10n.text(z.string.conversationsSecondaryLinePersonAdded, remote_user_et.name());
           }
 
           if (user_count > 1) {
-            return z.l10n.text(z.string.conversations_secondary_line_people_added, user_count);
+            return z.l10n.text(z.string.conversationsSecondaryLinePeopleAdded, user_count);
           }
         }
 
@@ -175,20 +180,20 @@ z.conversation.ConversationCellState = (() => {
           if (user_count === 1) {
             const [remote_user_et] = last_message_et.remoteUserEntities();
             if (remote_user_et === last_message_et.user()) {
-              return z.l10n.text(z.string.conversations_secondary_line_person_left, remote_user_et.name());
+              return z.l10n.text(z.string.conversationsSecondaryLinePersonLeft, remote_user_et.name());
             }
 
-            return z.l10n.text(z.string.conversations_secondary_line_person_removed, remote_user_et.name());
+            return z.l10n.text(z.string.conversationsSecondaryLinePersonRemoved, remote_user_et.name());
           }
 
           if (user_count > 1) {
-            return z.l10n.text(z.string.conversations_secondary_line_people_left, user_count);
+            return z.l10n.text(z.string.conversationsSecondaryLinePeopleLeft, user_count);
           }
         }
       }
 
       if (last_message_et.is_system() && last_message_et.is_conversation_rename()) {
-        return z.l10n.text(z.string.conversations_secondary_line_renamed, last_message_et.user().name());
+        return z.l10n.text(z.string.conversationsSecondaryLineRenamed, last_message_et.user().name());
       }
     },
     icon(conversation_et) {
@@ -215,26 +220,26 @@ z.conversation.ConversationCellState = (() => {
         let message_text;
 
         if (message_et.is_ephemeral()) {
-          message_text = z.l10n.text(z.string.conversations_secondary_line_timed_message);
+          message_text = z.l10n.text(z.string.conversationsSecondaryLineTimedMessage);
         } else if (message_et.is_ping()) {
-          message_text = z.l10n.text(z.string.notification_ping);
+          message_text = z.l10n.text(z.string.notificationPing);
         } else if (message_et.has_asset_text()) {
           message_text = message_et.get_first_asset().text;
         } else if (message_et.has_asset()) {
           const asset_et = message_et.get_first_asset();
           if (asset_et.status() === z.assets.AssetTransferState.UPLOADED) {
             if (asset_et.is_audio()) {
-              message_text = z.l10n.text(z.string.notification_shared_audio);
+              message_text = z.l10n.text(z.string.notificationSharedAudio);
             } else if (asset_et.is_video()) {
-              message_text = z.l10n.text(z.string.notification_shared_video);
+              message_text = z.l10n.text(z.string.notificationSharedVideo);
             } else {
-              message_text = z.l10n.text(z.string.notification_shared_file);
+              message_text = z.l10n.text(z.string.notificationSharedFile);
             }
           }
         } else if (message_et.has_asset_location()) {
-          message_text = z.l10n.text(z.string.notification_shared_location);
+          message_text = z.l10n.text(z.string.notificationSharedLocation);
         } else if (message_et.has_asset_image()) {
-          message_text = z.l10n.text(z.string.notification_asset_add);
+          message_text = z.l10n.text(z.string.notificationAssetAdd);
         }
 
         if (message_text) {

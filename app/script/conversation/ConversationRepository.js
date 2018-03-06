@@ -35,6 +35,14 @@ z.conversation.ConversationRepository = class ConversationRepository {
     };
   }
 
+  static get CONSENT_TYPE() {
+    return {
+      INCOMING_CALL: 'incoming_call',
+      MESSAGE: 'message',
+      OUTGOING_CALL: 'outgoing_call',
+    };
+  }
+
   /**
    * Construct a new Conversation Repository.
    *
@@ -140,7 +148,16 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.init_promise = undefined;
     this.init_total = 0;
 
+    this.supportConversationLinks = ko.observable();
+    this.enableConversationLinks = ko.pureComputed(() => {
+      const isBoolean = _.isBoolean(this.supportConversationLinks());
+      const isEnabled = isBoolean ? this.supportConversationLinks() : !z.util.Environment.frontend.is_production();
+      return this.isTeam() && isEnabled;
+    });
+
     this._init_subscriptions();
+
+    this.stateHandler = new z.conversation.ConversationStateHandler(this.conversation_service, this);
   }
 
   _init_state_updates() {
@@ -204,20 +221,66 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   /**
    * Create a group conversation.
-   * @note Supply at least 2 user IDs! Do not include the requestor
+   * @note Do not include the requestor among the users
    *
    * @param {Array<z.entity.User>} userEntities - Users (excluding the requestor) to be part of the conversation
    * @param {string} [groupName] - Name for the conversation
+   * @param {string} [accessState] - State for conversation access
    * @returns {Promise} Resolves when the conversation was created
    */
-  createGroupConversation(userEntities, groupName) {
+  createGroupConversation(userEntities, groupName, accessState) {
     const userIds = userEntities.map(userEntity => userEntity.id);
+    const payload = {
+      name: groupName,
+      users: userIds,
+    };
+
+    if (this.team().id) {
+      payload.team = {
+        managed: false,
+        teamid: this.team().id,
+      };
+
+      if (accessState) {
+        let accessPayload;
+
+        switch (accessState) {
+          case z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM:
+            accessPayload = {
+              access: [z.conversation.ACCESS_MODE.INVITE, z.conversation.ACCESS_MODE.CODE],
+              access_role: z.conversation.ACCESS_ROLE.NON_ACTIVATED,
+            };
+            break;
+          case z.conversation.ACCESS_STATE.TEAM.TEAM_ONLY:
+            accessPayload = {
+              access: [z.conversation.ACCESS_MODE.INVITE],
+              access_role: z.conversation.ACCESS_ROLE.TEAM,
+            };
+            break;
+          default:
+            break;
+        }
+
+        if (accessPayload) {
+          Object.assign(payload, accessPayload);
+        }
+      }
+    }
 
     return this.conversation_service
-      .postConversations(userIds, groupName, this.team().id)
+      .postConversations(payload)
       .then(response => this._onCreate({conversation: response.id, data: response}))
       .then(({conversationEntity}) => conversationEntity)
       .catch(error => this._handleConversationCreateError(error, userIds));
+  }
+
+  /**
+   * Create a guest room.
+   * @returns {Promise} Resolves with the conversation that was created
+   */
+  createGuestRoom() {
+    const groupName = z.l10n.text(z.string.guestRoomConversationName);
+    return this.createGroupConversation([], groupName, z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM);
   }
 
   /**
@@ -423,22 +486,22 @@ z.conversation.ConversationRepository = class ConversationRepository {
   /**
    * Search for given text in conversation.
    *
-   * @param {Conversation} conversation_et - Conversation entity
+   * @param {Conversation} conversationEntity - Conversation entity
    * @param {string} query - Query strings
    * @returns {Promise} Array of message entities
    */
-  search_in_conversation(conversation_et, query) {
-    if (query.length === 0) {
-      return Promise.resolve([]);
+  searchInConversation(conversationEntity, query) {
+    if (!query.length) {
+      return Promise.resolve({});
     }
 
     return this.conversation_service
-      .search_in_conversation(conversation_et.id, query)
+      .search_in_conversation(conversationEntity.id, query)
       .then(events => {
-        const message_ets = this.event_mapper.map_json_events(events, conversation_et);
-        return Promise.all(message_ets.map(message_et => this._updateMessageUserEntities(message_et)));
+        const messageEntities = this.event_mapper.map_json_events(events, conversationEntity);
+        return Promise.all(messageEntities.map(messageEntity => this._updateMessageUserEntities(messageEntity)));
       })
-      .then(message_ets => [message_ets, query]);
+      .then(messageEntities => ({messageEntities, query}));
   }
 
   /**
@@ -785,6 +848,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
     }
   }
 
+  joinConversationWithCode(key, code) {
+    return this.conversation_service.postConversationJoin(key, code).then(response => this._onCreate(response));
+  }
+
   /**
    * Maps user connection to the corresponding conversation.
    *
@@ -1028,7 +1095,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
       case z.service.BackendClientError.LABEL.SERVER_ERROR:
       case z.service.BackendClientError.LABEL.SERVICE_DISABLED:
       case z.service.BackendClientError.LABEL.TOO_MANY_BOTS: {
-        amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.SERVICE_UNAVAILABLE);
+        const messageText = z.l10n.text(z.string.modalServiceUnavailableMessage);
+        const titleText = z.l10n.text(z.string.modalServiceUnavailableHeadline);
+        this._showModal(messageText, titleText);
         break;
       }
 
@@ -1179,11 +1248,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   send_gif(conversation_et, url, tag) {
     if (!tag) {
-      tag = z.l10n.text(z.string.extensions_giphy_random);
+      tag = z.l10n.text(z.string.extensionsGiphyRandom);
     }
 
     return z.util.load_url_blob(url).then(blob => {
-      this.send_text(z.l10n.text(z.string.extensions_giphy_message, tag), conversation_et);
+      this.send_text(z.l10n.text(z.string.extensionsGiphyMessage, tag), conversation_et);
       return this.upload_images(conversation_et, [blob]);
     });
   }
@@ -1363,23 +1432,35 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   _handleTooManyMembersError(participants = 128) {
     const openSpots = ConversationRepository.CONFIG.GROUP.MAX_SIZE - participants;
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.TOO_MANY_MEMBERS, {
-      data: {
-        max: ConversationRepository.CONFIG.GROUP.MAX_SIZE,
-        open_spots: Math.max(0, openSpots),
-      },
-    });
+    const substitutions = {number1: ConversationRepository.CONFIG.GROUP.MAX_SIZE, number2: Math.max(0, openSpots)};
+
+    const messageText = z.l10n.text(z.string.modalConversationTooManyMembersMessage, substitutions);
+    const titleText = z.l10n.text(z.string.modalConversationTooManyMembersHeadline);
+    this._showModal(messageText, titleText);
   }
 
   _handleUsersNotConnected(userIds = []) {
     const [userID] = userIds;
-    const user_promise = userIds.length === 1 ? this.user_repository.get_user_by_id(userID) : Promise.resolve();
+    const userPromise = userIds.length === 1 ? this.user_repository.get_user_by_id(userID) : Promise.resolve();
 
-    user_promise.then(user_et => {
-      const username = user_et ? user_et.first_name() : undefined;
-      amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.NOT_CONNECTED, {
-        data: username,
-      });
+    userPromise.then(userEntity => {
+      const username = userEntity ? userEntity.first_name() : undefined;
+      const messageStringId = username
+        ? z.string.modalConversationNotConnectedMessageOne
+        : z.string.modalConversationNotConnectedMessageMany;
+
+      const messageText = z.l10n.text(messageStringId, username);
+      const titleText = z.l10n.text(z.string.modalConversationNotConnectedHeadline);
+      this._showModal(messageText, titleText);
+    });
+  }
+
+  _showModal(messageText, titleText) {
+    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, {
+      text: {
+        message: messageText,
+        title: titleText,
+      },
     });
   }
 
@@ -1631,7 +1712,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         ];
 
         if (initiating_call_message.includes(call_message_et.type)) {
-          return this._track_completed_media_action(conversation_et, generic_message, call_message_et);
+          return this._track_contributed(conversation_et, generic_message, call_message_et);
         }
       })
       .catch(error => {
@@ -1789,7 +1870,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     return this._send_and_inject_generic_message(conversation_et, generic_message, false)
       .then(() => {
-        this._track_edit_message(conversation_et, original_message_et);
         if (z.util.Environment.desktop) {
           return this.send_link_preview(message, conversation_et, generic_message);
         }
@@ -1815,10 +1895,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       const reaction = message_et.is_liked() ? z.message.ReactionType.NONE : z.message.ReactionType.LIKE;
       message_et.is_liked(!message_et.is_liked());
 
-      window.setTimeout(() => {
-        this.send_reaction(conversation_et, message_et, reaction);
-        this._track_reaction(conversation_et, message_et, reaction, button);
-      }, 100);
+      window.setTimeout(() => this.send_reaction(conversation_et, message_et, reaction), 100);
     }
   }
 
@@ -1990,7 +2067,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
         return this.send_generic_message_to_conversation(conversation_et.id, generic_message)
           .then(payload => {
-            this._track_completed_media_action(conversation_et, generic_message);
+            this._track_contributed(conversation_et, generic_message);
 
             const backend_iso_date = sync_timestamp ? payload.time : '';
             return this._update_message_as_sent(conversation_et, message_stored, backend_iso_date);
@@ -2168,8 +2245,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     const isCallingMessage = genericMessage.content === z.cryptography.GENERIC_MESSAGE_TYPE.CALLING;
     const consentType = isCallingMessage
-      ? z.ViewModel.MODAL_CONSENT_TYPE.OUTGOING_CALL
-      : z.ViewModel.MODAL_CONSENT_TYPE.MESSAGE;
+      ? ConversationRepository.CONSENT_TYPE.OUTGOING_CALL
+      : ConversationRepository.CONSENT_TYPE.MESSAGE;
     return this.grantMessage(conversationId, consentType, userIds);
   }
 
@@ -2186,18 +2263,49 @@ z.conversation.ConversationRepository = class ConversationRepository {
         let sendAnyway = false;
 
         if (!userIds) {
-          userIds = conversation_et.get_users_with_unverified_clients().map(user_et => user_et.id);
+          userIds = conversation_et.get_users_with_unverified_clients().map(userEntity => userEntity.id);
         }
 
-        return this.user_repository.get_users_by_id(userIds).then(user_ets => {
-          amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.NEW_DEVICE, {
-            action() {
+        return this.user_repository.get_users_by_id(userIds).then(userEntities => {
+          let actionStringId;
+          let messageStringId;
+          let titleStringId;
+
+          const hasMultipleUsers = userEntities > 1;
+          if (hasMultipleUsers) {
+            titleStringId = z.string.modalConversationNewDeviceHeadlineMany;
+          } else {
+            const [userEntity] = userEntities;
+            titleStringId = userEntity.is_me
+              ? z.string.modalConversationNewDeviceHeadlineYou
+              : z.string.modalConversationNewDeviceHeadlineOne;
+          }
+          const userNames = z.util.LocalizerUtil.joinNames(userEntities, z.string.Declension.NOMINATIVE);
+          const titleSubstitutions = z.util.StringUtil.capitalize_first_char(userNames);
+
+          switch (consentType) {
+            case ConversationRepository.CONSENT_TYPE.INCOMING_CALL:
+              actionStringId = z.string.modalConversationNewDeviceIncomingCallAction;
+              messageStringId = z.string.modalConversationNewDeviceIncomingCallMessage;
+              break;
+            case ConversationRepository.CONSENT_TYPE.OUTGOING_CALL:
+              actionStringId = z.string.modalConversationNewDeviceOutgoingCallAction;
+              messageStringId = z.string.modalConversationNewDeviceOutgoingCallMessage;
+              break;
+            default:
+              actionStringId = z.string.modalConversationNewDeviceAction;
+              messageStringId = z.string.modalConversationNewDeviceMessage;
+              break;
+          }
+
+          amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
+            action: () => {
               sendAnyway = true;
               conversation_et.verification_state(z.conversation.ConversationVerificationState.UNVERIFIED);
 
               resolve(true);
             },
-            close() {
+            close: () => {
               if (!sendAnyway) {
                 reject(
                   new z.conversation.ConversationError(
@@ -2206,9 +2314,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
                 );
               }
             },
-            data: {
-              consent_type: consentType,
-              user_ets: user_ets,
+            text: {
+              action: z.l10n.text(actionStringId),
+              message: z.l10n.text(messageStringId),
+              title: z.l10n.text(titleStringId, titleSubstitutions),
             },
           });
         });
@@ -2268,17 +2377,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   upload_file(conversation_et, file) {
     let message_id;
-
     const upload_started = Date.now();
-    const tracking_data = {
-      size_bytes: file.size,
-      size_mb: z.util.bucket_values(file.size / 1024 / 1024, [0, 5, 10, 15, 20, 25]),
-      type: z.util.get_file_extension(file.name),
-    };
-
-    const conversation_type = z.tracking.helpers.get_conversation_type(conversation_et);
-    const initiatedAttributes = Object.assign(tracking_data, {conversation_type});
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_INITIATED, initiatedAttributes);
 
     return this.send_asset_metadata(conversation_et, file)
       .then(({id}) => {
@@ -2289,16 +2388,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .then(() => {
         const upload_duration = (Date.now() - upload_started) / 1000;
         this.logger.info(`Finished to upload asset for conversation'${conversation_et.id} in ${upload_duration}`);
-
-        const successAttributes = Object.assign(tracking_data, {time: upload_duration});
-        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_SUCCESSFUL, successAttributes);
       })
       .catch(error => {
         if (error.type === z.conversation.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION) {
           throw error;
         }
 
-        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_FAILED, tracking_data);
         this.logger.error(`Failed to upload asset for conversation '${conversation_et.id}': ${error.message}`, error);
         return this.get_message_in_conversation_by_id(conversation_et, message_id).then(message_et => {
           this.send_asset_upload_failed(conversation_et, message_et.id);
@@ -2331,7 +2426,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
           );
         });
       })
-      .then(() => this._track_delete_message(conversation_et, message_et, z.tracking.attribute.DeleteType.EVERYWHERE))
       .then(() => {
         amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, message_et.id);
         return this._delete_message_by_id(conversation_et, message_et.id);
@@ -2365,7 +2459,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
         return this.send_generic_message_to_conversation(this.self_conversation().id, generic_message);
       })
-      .then(() => this._track_delete_message(conversation_et, message_et, z.tracking.attribute.DeleteType.LOCAL))
       .then(() => {
         amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, message_et.id);
         return this._delete_message_by_id(conversation_et, message_et.id);
@@ -2693,7 +2786,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
               };
               const progress = this.init_handled / this.init_total * 20 + 75;
 
-              amplify.publish(z.event.WebApp.APP.UPDATE_PROGRESS, progress, z.string.init_events, content);
+              amplify.publish(z.event.WebApp.APP.UPDATE_PROGRESS, progress, z.string.initEvents, content);
             }
           }
 
@@ -3555,7 +3648,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {z.calling.entities.CallMessageEntity} call_message_et - Optional call message
    * @returns {undefined} No return value
    */
-  _track_completed_media_action(conversation_et, generic_message, call_message_et) {
+  _track_contributed(conversation_et, generic_message, call_message_et) {
     let ephemeral_time;
     let message;
     let message_content_type;
@@ -3607,72 +3700,20 @@ z.conversation.ConversationRepository = class ConversationRepository {
     }
 
     if (action_type) {
-      amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONTRIBUTED, {
+      const attributes = {
         action: action_type,
         conversation_type: z.tracking.helpers.get_conversation_type(conversation_et),
         ephemeral_time: is_ephemeral ? ephemeral_time : undefined,
         is_ephemeral: is_ephemeral,
         with_service: conversation_et.isWithBot(),
-      });
+      };
+
+      const isTeamConversation = !!conversation_et.team_id;
+      if (isTeamConversation) {
+        Object.assign(attributes, z.tracking.helpers.getGuestAttributes(conversation_et));
+      }
+
+      amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONTRIBUTED, attributes);
     }
-  }
-
-  /**
-   * Track delete action.
-   *
-   * @private
-   * @param {Conversation} conversation_et - Conversation entity
-   * @param {Message} message_et - Message entity
-   * @param {z.tracking.attribute.DeleteType} method - Deletion method
-   * @returns {undefined} No return value
-   */
-  _track_delete_message(conversation_et, message_et, method) {
-    const seconds_since_message_creation = Math.round((Date.now() - message_et.timestamp()) / 1000);
-
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.DELETED_MESSAGE, {
-      conversation_type: z.tracking.helpers.get_conversation_type(conversation_et),
-      method: method,
-      time_elapsed: z.util.bucket_values(seconds_since_message_creation, [0, 60, 300, 600, 1800, 3600, 86400]),
-      time_elapsed_action: seconds_since_message_creation,
-      type: z.tracking.helpers.get_message_type(message_et),
-    });
-  }
-
-  /**
-   * Track edit action.
-   *
-   * @param {Conversation} conversation_et - Conversation entity
-   * @param {Message} message_et - Message that was edited
-   * @returns {undefined} No return value
-   */
-  _track_edit_message(conversation_et, message_et) {
-    const seconds_since_message_creation = Math.round((Date.now() - message_et.timestamp()) / 1000);
-
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.EDITED_MESSAGE, {
-      conversation_type: z.tracking.helpers.get_conversation_type(conversation_et),
-      time_elapsed: z.util.bucket_values(seconds_since_message_creation, [0, 60, 300, 600, 1800, 3600, 86400]),
-      time_elapsed_action: seconds_since_message_creation,
-    });
-  }
-
-  /**
-   * Track reaction action.
-   *
-   * @param {Conversation} conversation_et - Conversation entity
-   * @param {Message} message_et - Message that was reacted tp
-   * @param {z.message.ReactionType} reaction - Type of reaction
-   * @param {boolean} [button=true] - Button source of reaction
-   * @returns {undefined} No return value
-   */
-  _track_reaction(conversation_et, message_et, reaction, button = true) {
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.REACTED_TO_MESSAGE, {
-      action: reaction ? 'like' : 'unlike',
-      conversation_type: z.tracking.helpers.get_conversation_type(conversation_et),
-      method: button ? 'button' : 'menu',
-      reacted_to_last_message: conversation_et.getLastMessage() === message_et,
-      type: z.tracking.helpers.get_message_type(message_et),
-      user: message_et.user().is_me ? 'sender' : 'receiver',
-      with_service: conversation_et.isWithBot(),
-    });
   }
 };

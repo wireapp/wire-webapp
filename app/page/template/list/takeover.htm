@@ -1,12 +1,12 @@
-<div id="takeover" class="takeover" data-bind="with: $root.takeover, added_to_view: $root.takeover.on_added_to_view">
+<div id="takeover" class="takeover" data-bind="with: $root.takeover">
   <div class="takeover-names">
     <span class="takeover-names-name" data-bind="text: name" data-uie-name="takeover-name"></span>
     <span class="takeover-names-username label-username" data-bind="text: username" data-uie-name="takeover-username"></span>
   </div>
   <div class="takeover-actions">
-    <span class="takeover-actions-sub" data-bind="l10n_text: z.string.takeover_sub"></span>
-    <a class="takeover-actions-link text-white" data-bind="attr: {href: z.util.URLUtil.build_url(z.util.URLUtil.TYPE.WEBSITE, z.config.URL_PATH.SUPPORT_USERNAME)}, click: on_link_click, l10n_text: z.string.takeover_link" rel="nofollow noopener noreferrer" target="_blank"></a>
-    <button class="button button-fluid" data-bind="click: choose_username, l10n_text: z.string.takeover_button_choose" data-uie-name="do-takeover-choose"></button>
-    <button class="button button-fluid button-inverted text-white" data-bind="click: keep_username, l10n_text: z.string.takeover_button_keep" data-uie-name="do-takeover-keep"></button>
+    <span class="takeover-actions-sub" data-bind="l10n_text: z.string.takeoverSub"></span>
+    <a class="takeover-actions-link text-white" data-bind="attr: {href: z.util.URLUtil.build_url(z.util.URLUtil.TYPE.WEBSITE, z.config.URL_PATH.SUPPORT_USERNAME)}, l10n_text: z.string.takeoverLink" rel="nofollow noopener noreferrer" target="_blank"></a>
+    <button class="button button-fluid" data-bind="click: chooseUsername, l10n_text: z.string.takeoverButtonChoose" data-uie-name="do-takeover-choose"></button>
+    <button class="button button-fluid button-inverted text-white" data-bind="click: keepUsername, l10n_text: z.string.takeoverButtonKeep" data-uie-name="do-takeover-keep"></button>
   </div>
 </div>

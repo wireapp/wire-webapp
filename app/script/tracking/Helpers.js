@@ -77,4 +77,40 @@ z.tracking.helpers = {
     }
     return z.tracking.attribute.PlatformType.BROWSER_APP;
   },
+
+  getGuestAttributes(conversationEntity) {
+    const isTeamConversation = !!conversationEntity.team_id;
+    if (isTeamConversation) {
+      const isAllowGuests = !conversationEntity.isTeamOnly();
+      const _getUserType = _conversationEntity => {
+        if (_conversationEntity.self.isTemporaryGuest()) {
+          return z.tracking.attribute.UserType.TEMPORARY_GUEST;
+        }
+
+        return _conversationEntity.is_guest()
+          ? z.tracking.attribute.UserType.GUEST
+          : z.tracking.attribute.UserType.USER;
+      };
+
+      return {
+        is_allow_guests: isAllowGuests,
+        user_type: _getUserType(conversationEntity),
+      };
+    }
+  },
+
+  getParticipantTypes(userEntities, countSelf) {
+    const initialValue = {guests: 0, temporaryGuests: 0, users: countSelf ? 1 : 0};
+    return userEntities.reduce((accumulator, userEntity) => {
+      if (userEntity.isTemporaryGuest()) {
+        accumulator.temporaryGuests = accumulator.temporaryGuests + 1;
+      } else if (userEntity.is_guest()) {
+        accumulator.guests = accumulator.guests + 1;
+      } else {
+        accumulator.users = accumulator.users + 1;
+      }
+
+      return accumulator;
+    }, initialValue);
+  },
 };

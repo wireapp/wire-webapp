@@ -20,41 +20,41 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.ViewModel = z.ViewModel || {};
-window.z.ViewModel.list = z.ViewModel.list || {};
+window.z.viewModel = z.viewModel || {};
+window.z.viewModel.list = z.viewModel.list || {};
 
-z.ViewModel.list.ArchiveViewModel = class ArchiveViewModel {
+z.viewModel.list.ArchiveViewModel = class ArchiveViewModel {
   /**
    * View model for the archive.
    *
-   * @param {string} elementId - HTML selector
-   * @param {z.ViewModel.list.ListViewModel} listViewModel - List view model
-   * @param {z.conversation.ConversationRepository} conversationRepository - Conversation repository
+   * @param {z.viewModel.MainViewModel} mainViewModel - Main view model
+   * @param {z.viewModel.ListViewModel} listViewModel - List view model
+   * @param {Object} repositories - Object containing all repositories
    */
-  constructor(elementId, listViewModel, conversationRepository) {
+  constructor(mainViewModel, listViewModel, repositories) {
     this.clickOnConversation = this.clickOnConversation.bind(this);
     this.clickOnClose = this.clickOnClose.bind(this);
     this.updateList = this.updateList.bind(this);
 
     this.listViewModel = listViewModel;
-    this.conversationRepository = conversationRepository;
-    this.logger = new z.util.Logger('z.ViewModel.list.ArchiveViewModel', z.config.LOGGER.OPTIONS);
+    this.conversationRepository = repositories.conversation;
+    this.logger = new z.util.Logger('z.viewModel.list.ArchiveViewModel', z.config.LOGGER.OPTIONS);
 
     this.archivedConversations = this.conversationRepository.conversations_archived;
 
     this.shouldUpdateScrollbar = ko
-      .computed(() => this.listViewModel.last_update())
+      .computed(() => this.listViewModel.lastUpdate())
       .extend({notify: 'always', rateLimit: 500});
   }
 
   clickOnConversation(conversationEntity) {
     this.conversationRepository.unarchive_conversation(conversationEntity, 'opened conversation from archive');
-    this.listViewModel.switch_list(z.ViewModel.list.LIST_STATE.CONVERSATIONS);
+    this.listViewModel.switchList(z.viewModel.ListViewModel.STATE.CONVERSATIONS);
     amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity);
   }
 
   clickOnClose() {
-    this.listViewModel.switch_list(z.ViewModel.list.LIST_STATE.CONVERSATIONS);
+    this.listViewModel.switchList(z.viewModel.ListViewModel.STATE.CONVERSATIONS);
   }
 
   updateList() {

@@ -35,6 +35,7 @@ z.components.ServiceList = class ServiceList {
     this.mode = params.mode || ServiceList.MODE.DEFAULT;
     this.onClick = params.click;
     this.services = params.services;
+    this.altStyle = params.altStyle;
 
     this.isCompactMode = this.mode === ServiceList.MODE.COMPACT;
     this.isDefaultMode = this.mode === ServiceList.MODE.DEFAULT;
@@ -50,22 +51,10 @@ z.components.ServiceList = class ServiceList {
 ko.components.register('service-list', {
   template: `
     <div class="search-list" data-bind="css: cssClasses(), foreach: services">
-      <div class="search-list-item" data-uie-name="item-service" data-bind="click: $parent.onClick">
-        <div class="search-list-item-image">
-          <participant-avatar params="participant: $data, size: $parent.avatarSize"></participant-avatar>
-        </div>
-        <div class="search-list-item-content">
-          <div class="search-list-item-content-name" data-bind="text: name" data-uie-name="status-content-name"></div>
-          <!-- ko ifnot: $parent.isCompactMode -->
-            <div class="search-list-item-content-info" data-uie-name="status-content-info">
-              <span class="search-list-item-content-username" data-bind="text: summary"></span>
-            </div>
-          <!-- /ko -->
-        </div>
-      </div>
+      <participant-item params="participant: $data" data-bind="click: $parent.onClick, css: {'no-underline': $parent.altStyle, 'show-arrow': $parent.altStyle}"></participant-item>
     </div>
     <!-- ko if: isSearching() && !services().length -->
-      <div class="no-results" data-bind="l10n_text: z.string.people_no_matches"></div>
+      <div class="no-results" data-bind="l10n_text: z.string.searchListNoMatches"></div>
     <!-- /ko -->
   `,
   viewModel: z.components.ServiceList,

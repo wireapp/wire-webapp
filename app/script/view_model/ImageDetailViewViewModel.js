@@ -20,78 +20,90 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.ViewModel = z.ViewModel || {};
+window.z.viewModel = z.viewModel || {};
 
-z.ViewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
-  constructor(element_id, conversation_repository) {
-    this.before_hide_callback = this.before_hide_callback.bind(this);
-    this.hide_callback = this.hide_callback.bind(this);
-    this.message_added = this.message_added.bind(this);
-    this.message_removed = this.message_removed.bind(this);
+z.viewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
+  constructor(mainViewModel, repositories) {
+    this.beforeHideCallback = this.beforeHideCallback.bind(this);
+    this.hideCallback = this.hideCallback.bind(this);
+    this.messageAdded = this.messageAdded.bind(this);
+    this.messageRemoved = this.messageRemoved.bind(this);
 
-    this.element_id = element_id;
-    this.conversation_repository = conversation_repository;
+    this.elementId = 'detail-view';
+    this.mainViewModel = mainViewModel;
+    this.conversationRepository = repositories.conversation;
+
+    this.actionsViewModel = this.mainViewModel.actions;
     this.source = undefined;
 
-    this.image_modal = undefined;
-    this.image_src = ko.observable();
-    this.image_visible = ko.observable(false);
+    this.imageModal = undefined;
+    this.imageSrc = ko.observable();
+    this.imageVisible = ko.observable(false);
 
-    this.conversation_et = ko.observable();
+    this.conversationEntity = ko.observable();
     this.items = ko.observableArray();
-    this.message_et = ko.observable();
-    this.message_et.subscribe(message_et => {
-      if (message_et) {
-        this.conversation_repository
-          .get_conversation_by_id(message_et.conversation_id)
-          .then(conversation_et => this.conversation_et(conversation_et));
+    this.messageEntity = ko.observable();
+    this.messageEntity.subscribe(messageEntity => {
+      if (messageEntity) {
+        const conversationId = messageEntity.conversation_id;
+        const isExpectedId = this.conversationEntity() ? conversationId === this.conversationEntity().id : false;
+        if (!isExpectedId) {
+          this.conversationRepository
+            .get_conversation_by_id(conversationId)
+            .then(conversationEntity => this.conversationEntity(conversationEntity));
+        }
       }
     });
 
     amplify.subscribe(z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW, this.show.bind(this));
 
-    ko.applyBindings(this, document.getElementById(this.element_id));
+    ko.applyBindings(this, document.getElementById(this.elementId));
   }
 
-  before_hide_callback() {
-    this.image_visible(false);
+  beforeHideCallback() {
+    this.imageVisible(false);
   }
 
-  hide_callback() {
+  hideCallback() {
     $(document).off('keydown.lightbox');
-    window.URL.revokeObjectURL(this.image_src());
-    this.image_src(undefined);
+    window.URL.revokeObjectURL(this.imageSrc());
+
+    this.imageSrc(undefined);
+    this.items.removeAll();
+    this.messageEntity(undefined);
     this.source = undefined;
-    amplify.unsubscribe(z.event.WebApp.CONVERSATION.MESSAGE.ADDED, this.message_added);
-    amplify.unsubscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, this.message_removed);
+
+    amplify.unsubscribe(z.event.WebApp.CONVERSATION.MESSAGE.ADDED, this.messageAdded);
+    amplify.unsubscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, this.messageRemoved);
   }
 
-  show(message_et, message_ets, source) {
-    this.items(message_ets);
-    this.message_et(message_et);
+  show(messageEntity, messageEntities, source) {
+    this.items(messageEntities);
+    this.messageEntity(messageEntity);
     this.source = source;
 
-    amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.ADDED, this.message_added);
-    amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, this.message_removed);
-    if (this.image_modal) {
-      this.image_modal.destroy();
-    }
-    this.image_modal = new zeta.webapp.module.Modal('#detail-view', this.hide_callback, this.before_hide_callback);
-    this.image_modal.show();
+    amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.ADDED, this.messageAdded);
+    amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, this.messageRemoved);
 
-    this._load_image();
-    $(document).on('keydown.lightbox', keyboard_event => {
-      switch (keyboard_event.key) {
+    if (!this.imageModal) {
+      this.imageModal = new zeta.webapp.module.Modal('#detail-view', this.hideCallback, this.beforeHideCallback);
+    }
+
+    this.imageModal.show();
+
+    this._loadImage();
+    $(document).on('keydown.lightbox', keyboardEvent => {
+      switch (keyboardEvent.key) {
         case z.util.KeyboardUtil.KEY.ESC:
-          this.click_on_close();
+          this.clickOnClose();
           break;
         case z.util.KeyboardUtil.KEY.ARROW_DOWN:
         case z.util.KeyboardUtil.KEY.ARROW_RIGHT:
-          this.click_on_show_next(this, keyboard_event);
+          this.clickOnShowNext(this, keyboardEvent);
           break;
         case z.util.KeyboardUtil.KEY.ARROW_LEFT:
         case z.util.KeyboardUtil.KEY.ARROW_UP:
-          this.click_on_show_previous(this, keyboard_event);
+          this.clickOnShowPrevious(this, keyboardEvent);
           break;
         default:
           break;
@@ -99,101 +111,75 @@ z.ViewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
     });
   }
 
-  message_added(message_et) {
-    if (message_et.conversation === this.conversation_et().id) {
-      this.items.push(message_et);
+  messageAdded(messageEntity) {
+    const isExpectedId = messageEntity.conversation === this.conversationEntity().id;
+    if (isExpectedId) {
+      this.items.push(messageEntity);
     }
   }
 
-  message_removed(removed_message_id) {
-    this.items.remove(message_et => message_et.id === removed_message_id);
-    if (this.message_et().id === removed_message_id) {
-      this.image_modal.hide();
+  messageRemoved(removedMessageId) {
+    const isExpectedId = this.messageEntity().id === removedMessageId;
+    if (isExpectedId) {
+      return this.imageModal.hide();
     }
+
+    this.items.remove(message_et => message_et.id === removedMessageId);
   }
 
-  _load_image() {
-    this.image_visible(false);
-    this.message_et()
+  _loadImage() {
+    this.imageVisible(false);
+    this.messageEntity()
       .get_first_asset()
       .resource()
       .load()
       .then(blob => {
-        this.image_src(window.URL.createObjectURL(blob));
-        this.image_visible(true);
+        this.imageSrc(window.URL.createObjectURL(blob));
+        this.imageVisible(true);
       });
   }
 
-  click_on_close() {
-    this.image_modal.hide();
+  clickOnClose() {
+    this.imageModal.hide();
   }
 
-  click_on_delete() {
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.DELETE_MESSAGE, {
-      action: () => {
-        if (this.source === 'collection') {
-          this._track_item_action(this.conversation_et(), 'delete_for_me', 'image');
-        }
-        this.conversation_repository.delete_message(this.conversation_et(), this.message_et());
-        this.image_modal.hide();
-      },
-    });
+  clickOnDelete() {
+    return this.actionsViewModel
+      .deleteMessage(this.conversationEntity(), this.messageEntity())
+      .then(() => this.imageModal.hide());
   }
 
-  click_on_delete_for_everyone() {
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.DELETE_EVERYONE_MESSAGE, {
-      action: () => {
-        if (this.source === 'collection') {
-          this._track_item_action(this.conversation_et(), 'delete_for_everyone', 'image');
-        }
-        this.conversation_repository.delete_message_everyone(this.conversation_et(), this.message_et());
-        this.image_modal.hide();
-      },
-    });
+  clickOnDeleteForEveryone() {
+    return this.actionsViewModel
+      .deleteMessageEveryone(this.conversationEntity(), this.messageEntity())
+      .then(() => this.imageModal.hide());
   }
 
-  click_on_download() {
-    if (this.source === 'collection') {
-      this._track_item_action(this.conversation_et(), 'download', 'image');
-    }
-    this.message_et().download();
+  clickOnDownload() {
+    this.messageEntity().download();
   }
 
-  click_on_like() {
-    if (this.source === 'collection') {
-      this._track_item_action(this.conversation_et(), this.message_et().is_liked(), 'image');
-    }
-    return this.conversation_repository.toggle_like(this.conversation_et(), this.message_et());
+  clickOnLike() {
+    this.conversationRepository.toggle_like(this.conversationEntity(), this.messageEntity());
   }
 
-  click_on_show_next(view_model, event) {
+  clickOnShowNext(imageDetailViewViewModel, event) {
     event.stopPropagation();
-    const next_messsage_et = z.util.ArrayUtil.iterate_item(this.items(), this.message_et());
+    const nextMessageEntity = z.util.ArrayUtil.iterate_item(this.items(), this.messageEntity());
 
-    if (next_messsage_et) {
-      this.message_et(next_messsage_et);
-      this._load_image();
+    if (nextMessageEntity) {
+      this.messageEntity(nextMessageEntity);
+      this._loadImage();
     }
   }
 
-  click_on_show_previous(view_model, event) {
+  clickOnShowPrevious(imageDetailViewViewModel, event) {
     event.stopPropagation();
-    const previous_message_et = z.util.ArrayUtil.iterate_item(this.items(), this.message_et(), true);
+    const previousMessageEntity = z.util.ArrayUtil.iterate_item(this.items(), this.messageEntity(), true);
 
-    if (previous_message_et) {
-      this.message_et(z.util.ArrayUtil.iterate_item(this.items(), this.message_et(), true));
-      this._load_image();
+    if (previousMessageEntity) {
+      this.messageEntity(z.util.ArrayUtil.iterate_item(this.items(), this.messageEntity(), true));
+      this._loadImage();
     }
-  }
-
-  _track_item_action(conversation_et, is_liked, type) {
-    const like_action = is_liked ? 'unlike' : 'like';
-
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.COLLECTION.DID_ITEM_ACTION, {
-      action: like_action,
-      conversation_type: z.tracking.helpers.get_conversation_type(conversation_et),
-      type: type,
-      with_service: conversation_et.isWithBot(),
-    });
   }
 };

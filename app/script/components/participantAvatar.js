@@ -39,6 +39,15 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
     this.isService = this.participant instanceof z.integration.ServiceEntity || this.participant.isBot;
     this.isUser = this.participant instanceof z.entity.User && !this.participant.isBot;
 
+    this.isTemporaryGuest = this.isUser && this.participant.isTemporaryGuest();
+
+    if (this.isTemporaryGuest) {
+      // TODO: real data from user (0 - 1)
+      const remainingTime = 0.66;
+      this.timerLength = 15.5 * Math.PI * 2;
+      this.timerOffset = this.timerLength * (remainingTime - 1);
+    }
+
     const avatarType = `${this.isUser ? 'user' : 'service'}-avatar`;
     this.delay = params.delay;
     this.size = params.size || ParticipantAvatar.SIZE.LARGE;
@@ -91,7 +100,13 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
     });
 
     this.cssClasses = ko.pureComputed(() => {
-      return this.isService ? 'accent-color-bot' : `accent-color-${this.participant.accent_id()} ${this.state()}`;
+      if (this.isService) {
+        return 'accent-color-bot';
+      }
+      if (this.isTemporaryGuest) {
+        return 'accent-color-temporary';
+      }
+      return `accent-color-${this.participant.accent_id()} ${this.state()}`;
     });
 
     this.onClick = (data, event) => {
@@ -109,17 +124,18 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
     this._loadAvatarPicture = () => {
       if (!this.avatarLoadingBlocked) {
         this.avatarLoadingBlocked = true;
-        if (this.participant.previewPictureResource()) {
-          this.participant
-            .previewPictureResource()
-            .get_object_url()
-            .then(url => {
-              const image = new Image();
-              image.src = url;
-              this.element.find('.avatar-image').html(image);
-              this.element.addClass('avatar-image-loaded avatar-loading-transition');
-              this.avatarLoadingBlocked = false;
-            });
+
+        const pictureResource = this.participant.previewPictureResource();
+        if (pictureResource) {
+          const isCached = pictureResource.downloadProgress() === 100;
+
+          pictureResource.get_object_url().then(url => {
+            const image = new Image();
+            image.src = url;
+            this.element.find('.avatar-image').html(image);
+            this.element.addClass(`avatar-image-loaded ${isCached ? '' : 'avatar-loading-transition'}`);
+            this.avatarLoadingBlocked = false;
+          });
         }
       }
     };
@@ -155,6 +171,13 @@ ko.components.register('participant-avatar', {
         <div class="avatar-badge"></div>
       <!-- /ko -->
       <div class="avatar-border"></div>
+      <!-- ko if: isTemporaryGuest -->
+        <svg class="avatar-temporary-guest-border" viewBox="0 0 32 32" data-bind="attr: {stroke: participant.accent_color}">
+          <circle cx="16" cy="16" r="15.5" stroke-width="1" transform="rotate(-90 16 16)" fill="none"
+             data-bind="attr: {'stroke-dasharray': timerLength, 'stroke-dashoffset': timerOffset}">
+          </circle>
+        </svg>
+      <!-- /ko -->
     </div>
     `,
   viewModel: {
