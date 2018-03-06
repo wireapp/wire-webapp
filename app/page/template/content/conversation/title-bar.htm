@@ -14,7 +14,7 @@
       <!-- ko if: conversationEntity().verification_state() === z.conversation.ConversationVerificationState.VERIFIED -->
         <verified-icon class="conversation-title-bar-name--verified"></verified-icon>
       <!-- /ko -->
-      <span class="conversation-title-bar-name-label label-bold-xs ellipsis" data-bind="text: conversationEntity().display_name()" data-uie-name="status-conversation-title-bar-label"></span>
+      <span class="conversation-title-bar-name-label" data-bind="text: conversationEntity().display_name()" data-uie-name="status-conversation-title-bar-label"></span>
     </div>
 
     <!-- ko if: showCallControls() -->
