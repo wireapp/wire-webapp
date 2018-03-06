@@ -34,6 +34,11 @@
     padding: 8px 16px;
   }
 
+  &__flex-row {
+    display: flex;
+    flex-direction: row;
+  }
+
   &__name {
     font-size: 20px;
     font-weight: @font-weight-bold;
@@ -57,8 +62,11 @@
     }
 
     &__verified-icon {
-      flex-grow: 1;
       margin: 0 8px;
+    }
+
+    &__verified-icon-right {
+      margin-left: 8px;
     }
 
     &__edit-icon {
