@@ -55,6 +55,7 @@ z.viewModel.PanelViewModel = class PanelViewModel {
     this.enableIntegrations = this.integrationRepository.enableIntegrations;
 
     this.isVisible = ko.observable(false);
+    this.exitingState = ko.observable(undefined);
     this.state = ko.observable(PanelViewModel.STATE.CONVERSATION_DETAILS);
     this.previousState = ko.observable();
 
@@ -98,7 +99,8 @@ z.viewModel.PanelViewModel = class PanelViewModel {
 
   _isStateVisible(state) {
     const isStateVisible = this.state() === state;
-    return isStateVisible && this.isVisible();
+    const isStateExiting = this.exitingState() === state;
+    return (isStateExiting || isStateVisible) && this.isVisible();
   }
 
   closePanel() {
@@ -145,11 +147,11 @@ z.viewModel.PanelViewModel = class PanelViewModel {
     }
 
     if (isSingleModeConversation && !userEntity.is_me) {
-      return this._openPanel(PanelViewModel.STATE.CONVERSATION_DETAILS);
+      return this.switchState(PanelViewModel.STATE.CONVERSATION_DETAILS, true);
     }
 
     this.groupParticipant.showGroupParticipant(userEntity);
-    this._openPanel(PanelViewModel.STATE.GROUP_PARTICIPANT);
+    this.switchState(PanelViewModel.STATE.GROUP_PARTICIPANT, true);
   }
 
   showParticipantDevices(userEntity) {
@@ -164,12 +166,31 @@ z.viewModel.PanelViewModel = class PanelViewModel {
     }
   }
 
-  switchState(newState) {
+  switchState(newState, fromLeft = false, skipTransition = false) {
     const stateUnchanged = newState === this.state();
-    if (!stateUnchanged) {
-      this._hidePanel();
-      this._showPanel(newState);
+
+    if (stateUnchanged) {
+      return;
     }
+
+    if (skipTransition) {
+      this._hidePanel(this.state());
+      this._showPanel(newState);
+      return;
+    }
+
+    this.exitingState(this.state());
+
+    const oldPanel = $(`#${this._getElementIdOfPanel(this.state())}`);
+    const newPanel = this._showPanel(newState);
+
+    newPanel.addClass(fromLeft ? 'panel__page--move-in--left' : 'panel__page--move-in--right');
+    oldPanel.addClass(fromLeft ? 'panel__page--move-out--left' : 'panel__page--move-out--right');
+
+    window.setTimeout(() => {
+      newPanel.removeClass('panel__page--move-in--left panel__page--move-in--right');
+      this._hidePanel(this.exitingState());
+    }, z.motion.MotionDuration.MEDIUM);
   }
 
   togglePanel(addPeople = false) {
@@ -211,8 +232,8 @@ z.viewModel.PanelViewModel = class PanelViewModel {
     }
   }
 
-  _hidePanel() {
-    switch (this.state()) {
+  _hidePanel(state) {
+    switch (state) {
       case PanelViewModel.STATE.ADD_PARTICIPANTS:
         this.addParticipants.resetView();
         break;
@@ -226,14 +247,17 @@ z.viewModel.PanelViewModel = class PanelViewModel {
         break;
     }
 
-    this.previousState(this.state());
+    this.previousState(state);
+    this.exitingState(undefined);
 
-    const panelStateElementId = this._getElementIdOfPanel(this.state());
-    $(`#${panelStateElementId}`).removeClass('panel__page--visible');
+    const panelStateElementId = this._getElementIdOfPanel(state);
+    const exitPanel = $(`#${panelStateElementId}`);
+    exitPanel.removeClass('panel__page--visible panel__page--move-out--left panel__page--move-out--right');
   }
 
   _openPanel(newState) {
-    this.switchState(newState);
+    this.exitingState(undefined);
+    this.switchState(newState, false, true);
     this.isVisible(true);
     this.mainViewModel.openPanel();
   }
@@ -243,7 +267,7 @@ z.viewModel.PanelViewModel = class PanelViewModel {
 
     const panelStateElementId = this._getElementIdOfPanel(newPanelState);
     if (panelStateElementId) {
-      $(`#${panelStateElementId}`).addClass('panel__page--visible');
+      return $(`#${panelStateElementId}`).addClass('panel__page--visible');
     }
   }
 };

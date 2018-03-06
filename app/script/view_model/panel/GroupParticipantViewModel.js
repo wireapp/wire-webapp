@@ -93,7 +93,7 @@ z.viewModel.panel.GroupParticipantViewModel = class GroupParticipantViewModel {
   }
 
   clickOnBack() {
-    this.panelViewModel.switchState(z.viewModel.PanelViewModel.STATE.CONVERSATION_DETAILS);
+    this.panelViewModel.switchState(z.viewModel.PanelViewModel.STATE.CONVERSATION_DETAILS, true);
   }
 
   clickOnClose() {

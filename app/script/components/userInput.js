@@ -35,6 +35,13 @@ z.components.UserInput = class UserInput {
     this.innerElement = $(this.element).find('.search-inner');
     this.inputElement = $(this.element).find('.search-input');
 
+    this.hasFocus = ko.observable(false);
+    if (params.focusDelay) {
+      window.setTimeout(() => this.hasFocus(true), params.focusDelay);
+    } else {
+      this.hasFocus(true);
+    }
+
     this.noSelectedUsers = ko.pureComputed(() => {
       return typeof this.selectedUsers !== 'function' || !this.selectedUsers().length;
     });
@@ -88,7 +95,7 @@ ko.components.register('user-input', {
             <!-- /ko -->
           <!-- /ko -->
           <input type="text" style="display:none" /> <!-- prevent chrome from autocomplete -->
-          <input autocomplete="off" maxlength="128" required spellcheck="false" class="search-input" type="text" data-bind="textInput: input, hasFocus: true, attr: {placeholder: placeholder}, css: {'search-input-show-placeholder': placeholder}, event: {keydown: onKeyDown}, enter: onEnter" data-uie-name="enter-users">
+          <input autocomplete="off" maxlength="128" required spellcheck="false" class="search-input" type="text" data-bind="textInput: input, hasFocus: hasFocus, attr: {placeholder: placeholder}, css: {'search-input-show-placeholder': placeholder}, event: {keydown: onKeyDown}, enter: onEnter" data-uie-name="enter-users">
         </div>
       </div>
     </div>
