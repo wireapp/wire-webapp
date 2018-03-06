@@ -102,14 +102,14 @@
       <!-- /ko -->
 
       <!-- ko if: selectedParticipant().isBot && selectedService() -->
-        <div class="group-participant__header--service">
+        <div class="group-participant__service-header">
           <participant-avatar params="participant: selectedService, size: z.components.ParticipantAvatar.SIZE.LARGE"></participant-avatar>
           <div class="group-participant__service-details">
             <div class="group-participant__service-name" data-bind="text: selectedService().name" data-uie-name="status-service-name"></div>
             <div class="group-participant__service-provider" data-bind="text: selectedService().providerName()" data-uie-name="status-service-provider"></div>
           </div>
         </div>
-        <div class="group-participant__service-description" data-bind="text: selectedParticipant().description" data-uie-name="status-service-description"></div>
+        <div class="group-participant__service-description" data-bind="text: selectedService().description" data-uie-name="status-service-description"></div>
         <!-- ko if: showActionRemove() -->
           <div class="panel__action-item"  data-bind="click: clickToRemove" data-uie-name="do-remove">
             <minus-icon class="panel__action-item__icon"></minus-icon>

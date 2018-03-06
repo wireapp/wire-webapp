@@ -10,7 +10,7 @@
       <!-- ko if: showIntegrations() -->
         <div class="add-participants__tabs">
           <div class="add-participants__tab" data-bind="css: {'add-participants__tab--active': isStateAddPeople}, click: clickOnAddPeople, l10n_text: z.string.addParticipantsTabsPeople" data-uie-name="do-add-people"></div>
-          <div class="add-participants__tab" data-bind="css: {'add-participants__tab--active': isStateAddService}, click: clickOnAddService, l10n_text: z.string.addParticipantsTabsServices" data-uie-name="do-add-services"></div>
+          <div class="add-participants__tab" data-bind="css: {'add-participants__tab--active': isServiceState}, click: clickOnAddService, l10n_text: z.string.addParticipantsTabsServices" data-uie-name="do-add-services"></div>
         </div>
       <!-- /ko -->
 
@@ -27,9 +27,20 @@
         <!-- /ko -->
       </div>
 
-      <!-- ko if: isStateAddPeople() -->
+      <!-- ko if: isStateConfirmation() -->
+        <div class="add-participants__service-header">
+          <participant-avatar params="participant: selectedService, size: z.components.ParticipantAvatar.SIZE.LARGE"></participant-avatar>
+          <div class="add-participants__service-details">
+            <div class="add-participants__service-name" data-bind="text: selectedService().name" data-uie-name="status-service-name"></div>
+            <div class="add-participants__service-provider" data-bind="text: selectedService().providerName()" data-uie-name="status-service-provider"></div>
+          </div>
+        </div>
+        <div class="add-participants__service-description" data-bind="text: selectedService().description" data-uie-name="status-service-description"></div>
+      <!-- /ko -->
+
+      <!-- ko if: isConfirmAddingState() -->
         <div class="add-participants__footer">
-          <button class="button button-full" data-bind="enable: selectedContacts().length > 0, click: clickToAddMembers" data-uie-name="do-create">
+          <button class="button button-full" data-bind="enable: enableAddAction, click: clickToAddParticipants" data-uie-name="do-create">
             <span data-bind="l10n_text: z.string.addParticipantsConfirmLabel"></span>
           </button>
         </div>
