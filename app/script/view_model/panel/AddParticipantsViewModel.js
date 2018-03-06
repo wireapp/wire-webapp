@@ -101,7 +101,7 @@ z.viewModel.panel.AppParticipantsViewModel = class AppParticipantsViewModel {
     });
 
     this.shouldUpdateScrollbar = ko
-      .computed(() => this.contacts() || this.searchInput())
+      .computed(() => (this.contacts() || this.searchInput()) && this.isVisible())
       .extend({notify: 'always', rateLimit: 500});
 
     this.searchInput.subscribe(searchInput => this.searchServices(searchInput));
