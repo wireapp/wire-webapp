@@ -131,23 +131,25 @@ z.viewModel.MainViewModel = class MainViewModel {
     const centerWidthOpen = centerWidthClose - MainViewModel.CONFIG.PANEL.WIDTH;
 
     return new Promise(resolve => {
-      panel.addEventListener('transitionend', () => {
-        this._clearStyles(panel, ['width', 'transform', 'position', 'right', 'transition']);
-        this._clearStyles(titleBar, ['width', 'transition']);
-        this._clearStyles(input, ['width', 'transition']);
+      panel.addEventListener('transitionend', event => {
+        if (event.target === panel) {
+          this._clearStyles(panel, ['width', 'transform', 'position', 'right', 'transition']);
+          this._clearStyles(titleBar, ['width', 'transition']);
+          this._clearStyles(input, ['width', 'transition']);
 
-        const overlay = document.querySelector('.center-column__overlay');
-        if (isPanelOpen) {
-          app.classList.remove('app--panel-open');
-          this.isPanelOpen(false);
-          overlay.removeEventListener('click', this.closePanelOnClick);
-        } else {
-          app.classList.add('app--panel-open');
-          this.isPanelOpen(true);
-          overlay.addEventListener('click', this.closePanelOnClick);
+          const overlay = document.querySelector('.center-column__overlay');
+          if (isPanelOpen) {
+            app.classList.remove('app--panel-open');
+            this.isPanelOpen(false);
+            overlay.removeEventListener('click', this.closePanelOnClick);
+          } else {
+            app.classList.add('app--panel-open');
+            this.isPanelOpen(true);
+            overlay.addEventListener('click', this.closePanelOnClick);
+          }
+          window.dispatchEvent(new Event('resize'));
+          resolve();
         }
-        window.dispatchEvent(new Event('resize'));
-        resolve();
       });
 
       if (isPanelOpen) {
