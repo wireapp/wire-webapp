@@ -29,7 +29,7 @@ describe('z.viewModel.content.PreferencesDeviceDetailsViewModel', () => {
     testFactory
       .exposeConversationActors()
       .then(() => {
-        viewModel = new z.viewModel.content.PreferencesDeviceDetailsViewModel(undefined, undefined, {
+        viewModel = new z.viewModel.content.PreferencesDeviceDetailsViewModel({}, undefined, {
           client: TestFactory.client_repository,
           conversation: TestFactory.conversation_repository,
           cryptography: TestFactory.cryptography_repository,

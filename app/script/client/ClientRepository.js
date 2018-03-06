@@ -323,10 +323,10 @@ z.client.ClientRepository = class ClientRepository {
    * @returns {Object} - Payload to register client with backend
    */
   _createRegistrationPayload(clientType, password, [lastResortKey, preKeys, signalingKeys]) {
-    let device_label = `${platform.os.family}`;
+    let deviceLabel = `${platform.os.family}`;
 
     if (platform.os.version) {
-      device_label += ` ${platform.os.version}`;
+      deviceLabel += ` ${platform.os.version}`;
     }
 
     let deviceModel = platform.name;
@@ -351,7 +351,7 @@ z.client.ClientRepository = class ClientRepository {
     return {
       class: 'desktop',
       cookie: this._getCookieLabelValue(this.selfUser().email() || this.selfUser().phone()),
-      label: device_label,
+      label: deviceLabel,
       lastkey: lastResortKey,
       model: deviceModel,
       password: password,
@@ -457,16 +457,25 @@ z.client.ClientRepository = class ClientRepository {
 
   logoutClient() {
     if (this.currentClient()) {
-      if (this.currentClient().type === z.client.ClientType.PERMANENT) {
-        return amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.LOGOUT, {
-          action(clearData) {
-            return amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SIGN_OUT_REASON.USER_REQUESTED, clearData);
-          },
-        });
+      const isTemporaryClient = this.currentClient().type === z.client.ClientType.TEMPORARY;
+      if (isTemporaryClient) {
+        return this.deleteTemporaryClient().then(() =>
+          amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SIGN_OUT_REASON.USER_REQUESTED, true)
+        );
       }
-      return this.deleteTemporaryClient().then(() =>
-        amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SIGN_OUT_REASON.USER_REQUESTED, true)
-      );
+
+      amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.OPTION, {
+        action: clearData => {
+          return amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SIGN_OUT_REASON.USER_REQUESTED, clearData);
+        },
+        preventClose: true,
+        text: {
+          action: z.l10n.text(z.string.modalAccountLogoutAction),
+          option: z.l10n.text(z.string.modalAccountLogoutOption),
+          title: z.l10n.text(z.string.modalAccountLogoutHeadline),
+        },
+        warning: false,
+      });
     }
   }
 

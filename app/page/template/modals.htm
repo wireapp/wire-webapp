@@ -1,311 +1,18 @@
 <div id="modals">
-
-  <div class="modal modal-asset-upload-parallel" data-uie-name="modal-asset-upload-parallel">
+  <div class="modal modal-account-new-devices" data-uie-name="modal-account-new-devices">
     <div class="modal-content">
       <div class="modal-header">
         <div class="modal-close icon-close icon-button pull-right"></div>
-        <div class="modal-title"></div>
+        <div class="modal-title" data-bind="l10n_text: z.string.modalAccountNewDevicesHeadline" data-uie-name="status-modal-title"></div>
       </div>
-      <div class="modal-text"></div>
-      <div class="modal-footer">
-        <div class="modal-close button button-medium button-full" data-bind="l10n_text: z.string.modalButtonOk" data-uie-name="do-close"></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal modal-asset-upload-too-large" data-uie-name="modal-asset-upload-too-large">
-    <div class="modal-content">
-      <div class="modal-header">
-        <div class="modal-close icon-close icon-button pull-right"></div>
-        <div class="modal-title"></div>
-      </div>
-      <div class="modal-text"></div>
-      <div class="modal-footer">
-        <div class="modal-close button button-medium button-full" data-bind="l10n_text: z.string.modalButtonOk" data-uie-name="do-close"></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal modal-too-long-message" data-uie-name="modal-too-long-message">
-    <div class="modal-content">
-      <div class="modal-header">
-        <div class="modal-close icon-close icon-button pull-right"></div>
-        <div class="modal-title" data-bind="l10n_text: z.string.modalTooLongHeadline"></div>
-      </div>
-      <div class="modal-text"></div>
-      <div class="modal-footer">
-        <div class="modal-close button button-medium button-full" data-bind="l10n_text: z.string.modalButtonOk" data-uie-name="do-close"></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal modal-delete-message" data-uie-name="modal-delete-message">
-    <div class="modal-content">
-      <div class="modal-header">
-        <div class="modal-close icon-close icon-button pull-right"></div>
-        <div class="modal-title" data-bind="l10n_text: z.string.modalDeleteHeadline"></div>
-      </div>
-      <div class="modal-text" data-bind="l10n_text: z.string.modalDeleteMessage"></div>
-      <div class="modal-footer">
-        <div class="modal-action button button-medium button-full" data-bind="l10n_text: z.string.modalDeleteButton" data-uie-name="do-delete"></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal modal-delete-message-everyone" data-uie-name="modal-delete-message-everyone">
-    <div class="modal-content">
-      <div class="modal-header">
-        <div class="modal-close icon-close icon-button pull-right"></div>
-        <div class="modal-title" data-bind="l10n_text: z.string.modalDeleteEveryoneHeadline"></div>
-      </div>
-      <div class="modal-text" data-bind="l10n_text: z.string.modalDeleteEveryoneMessage"></div>
-      <div class="modal-footer">
-        <div class="modal-action button button-medium button-full" data-bind="l10n_text: z.string.modalDeleteEveryoneButton" data-uie-name="do-delete-everyone"></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal modal-block" data-uie-name="modal-block">
-    <div class="modal-content">
-      <div class="modal-header">
-        <div class="modal-close icon-close icon-button pull-right"></div>
-        <div class="modal-title"></div>
-      </div>
-      <div class="modal-text"></div>
-      <div class="modal-footer">
-        <div class="modal-close button button-medium button-full button-inverted" data-bind="l10n_text: z.string.modalButtonCancel" data-uie-name="do-cancel"></div>
-        <div class="modal-action button button-medium button-full" data-bind="l10n_text: z.string.modalBlockConversationButton" data-uie-name="do-block"></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal modal-bots-confirm" data-uie-name="modal-bots-confirm">
-    <div class="modal-content">
-      <div class="modal-header">
-        <div class="modal-close icon-close icon-button pull-right"></div>
-        <div class="modal-title" data-bind="l10n_text: z.string.modalBotsConfirmHeadline"></div>
-      </div>
-      <div class="modal-text"></div>
-      <div class="modal-footer">
-        <div class="modal-close button button-medium button-full button-inverted" data-bind="l10n_text: z.string.modalButtonCancel" data-uie-name="do-cancel"></div>
-        <div class="modal-action button button-medium button-full" data-bind="l10n_text: z.string.modalBotsConfirmButton" data-uie-name="do-confirm"></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal modal-bots-unavailable" data-uie-name="modal-bots-unavailable">
-    <div class="modal-content">
-      <div class="modal-header">
-        <div class="modal-close icon-close icon-button pull-right"></div>
-        <div class="modal-title" data-bind="l10n_text: z.string.modalBotsUnavailableHeadline"></div>
-      </div>
-      <div class="modal-text" data-bind="l10n_text: z.string.modalBotsUnavailableMessage"></div>
-      <div class="modal-close button button-medium button-fluid" data-bind="l10n_text: z.string.modalButtonOk" data-uie-name="do-close"></div>
-    </div>
-  </div>
-
-  <div class="modal modal-call-conversation-empty" data-uie-name="modal-call-conversation-empty">
-    <div class="modal-content">
-      <div class="modal-header">
-        <div class="modal-close icon-close icon-button pull-right"></div>
-        <div class="modal-title" data-bind="l10n_text: z.string.modalCallConversationEmptyHeadline"></div>
-      </div>
-      <div class="modal-text" data-bind="l10n_text: z.string.modalCallConversationEmptyMessage"></div>
-      <div class="modal-close button button-medium button-fluid" data-bind="l10n_text: z.string.modalButtonOk" data-uie-name="do-close"></div>
-    </div>
-  </div>
-
-  <div class="modal modal-call-no-video-in-group" data-uie-name="modal-call-no-video-in-group">
-    <div class="modal-content">
-      <div class="modal-header">
-        <div class="modal-close icon-close icon-button pull-right"></div>
-        <div class="modal-title" data-bind="l10n_text: z.string.modalCallNoVideoInGroupHeadline"></div>
-      </div>
-      <div class="modal-text" data-bind="l10n_text: z.string.modalCallNoVideoInGroupMessage"></div>
-      <div class="modal-close button button-medium button-fluid" data-bind="l10n_text: z.string.modalButtonOk" data-uie-name="do-close"></div>
-    </div>
-  </div>
-
-  <div class="modal modal-call-second" data-uie-name="modal-call-second">
-    <div class="modal-content">
-      <div class="modal-header">
-        <div class="modal-close icon-close icon-button pull-right"></div>
-        <div class="modal-title"></div>
-      </div>
-      <div class="modal-text"></div>
-      <div class="modal-footer">
-        <div class="modal-close button button-medium button-full button-inverted" data-bind="l10n_text: z.string.modalButtonCancel" data-uie-name="do-cancel"></div>
-        <div class="modal-action button button-medium button-full" data-uie-name="do-second-call"></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal modal-calling" data-uie-name="modal-calling">
-    <div class="modal-content">
-      <div class="modal-header">
-        <div class="modal-close icon-close icon-button pull-right"></div>
-        <div class="modal-title" data-bind="l10n_text: z.string.warningCallHeadline"></div>
-      </div>
-      <div class="modal-text" data-bind="l10n_text: z.string.warningCallDetail"></div>
-      <div class="modal-action button button-medium button-fluid" data-bind="l10n_text: z.string.warningTellMeHow" data-uie-name="go-faq"></div>
-    </div>
-  </div>
-
-  <div class="modal modal-clear" data-uie-name="modal-delete">
-    <div class="modal-content">
-      <div class="modal-header">
-        <div class="modal-close icon-close icon-button pull-right"></div>
-        <div class="modal-title"></div>
-      </div>
-      <div class="modal-text" data-bind="l10n_text: z.string.modalClearConversationMessage"></div>
-      <div class="modal-footer">
-        <div class="modal-close button button-medium button-full button-inverted" data-bind="l10n_text: z.string.modalButtonCancel" data-uie-name="do-cancel"></div>
-        <div class="modal-action button button-medium button-full" data-bind="l10n_text: z.string.modalClearConversationButton" data-uie-name="do-delete"></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal modal-clear-group" data-uie-name="modal-delete-group">
-    <div class="modal-content">
-      <div class="modal-header">
-        <div class="modal-close icon-close icon-button pull-right"></div>
-        <div class="modal-title"></div>
-      </div>
-      <div class="modal-text" data-bind="l10n_text: z.string.modalClearConversationMessage"></div>
-      <div class="modal-option">
-        <label class="input-checkbox">
-          <input class="modal-checkbox" type="checkbox" data-uie-name="enter-leave-conversation">
-          <span class="modal-option-text" data-bind="l10n_text: z.string.modalClearConversationOption"></span>
-        </label>
+      <div class="modal-text" data-uie-name="status-modal-text">
+        <div class="modal-new-devices-list"></div>
+        <div data-bind="l10n_text: z.string.modalAccountNewDevicesMessage"></div>
       </div>
       <div class="modal-footer">
-        <div class="modal-close button button-medium button-full button-inverted" data-bind="l10n_text: z.string.modalButtonCancel" data-uie-name="do-cancel"></div>
-        <div class="modal-action button button-medium button-full" data-bind="l10n_text: z.string.modalClearConversationButton" data-uie-name="do-delete"></div>
+        <div class="modal-secondary button button-medium button-full button-inverted" data-bind="l10n_text: z.string.modalAccountNewDevicesSecondary" data-uie-name="go-manage-devices"></div>
+        <div class="modal-close button button-medium button-full" data-bind="l10n_text: z.string.modalAcknowledgeAction" data-uie-name="do-ok"></div>
       </div>
-    </div>
-  </div>
-
-  <div class="modal modal-contacts" data-uie-name="modal-contacts">
-    <div class="modal-content">
-      <div class="modal-header">
-        <div class="modal-close icon-close icon-button pull-right"></div>
-        <div class="modal-title" data-bind="l10n_text: z.string.uploadGoogleHeadlineError"></div>
-      </div>
-      <div class="modal-text" data-bind="l10n_text: z.string.uploadGoogleMessageError"></div>
-      <div class="modal-action button button-medium button-fluid" data-bind="l10n_text: z.string.uploadGoogleButtonAgain" data-uie-name="go-contacts-upload"></div>
-    </div>
-  </div>
-
-  <div class="modal modal-delete-account" data-uie-name="modal-delete-account">
-    <div class="modal-content">
-      <div class="modal-header">
-        <div class="modal-close icon-close icon-button pull-right"></div>
-        <div class="modal-title" data-bind="l10n_text: z.string.modalDeleteAccountHeadline"></div>
-      </div>
-      <div class="modal-text" data-bind="l10n_text: z.string.modalDeleteAccountMessage"></div>
-      <div class="modal-footer">
-        <div class="modal-close button button-medium button-full button-inverted" data-bind="l10n_text: z.string.modalButtonCancel" data-uie-name="do-cancel"></div>
-        <div class="modal-action button button-medium button-full" data-bind="l10n_text: z.string.modalDeleteAccountAction" data-uie-name="do-send"></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal modal-leave" data-uie-name="modal-leave">
-    <div class="modal-content">
-      <div class="modal-header">
-        <div class="modal-close icon-close icon-button pull-right"></div>
-        <div class="modal-title"></div>
-      </div>
-      <div class="modal-text" data-bind="l10n_text: z.string.modalLeaveConversationMessage"></div>
-      <div class="modal-footer">
-        <div class="modal-close button button-medium button-full button-inverted" data-bind="l10n_text:  z.string.modalButtonCancel" data-uie-name="do-cancel"></div>
-        <div class="modal-action button button-medium button-full" data-bind="l10n_text: z.string.modalLeaveConversationButton" data-uie-name="do-leave"></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal modal-logout" data-uie-name="modal-logout">
-    <div class="modal-content">
-      <div class="modal-header">
-        <div class="modal-close icon-close icon-button pull-right"></div>
-        <div class="modal-title" data-bind="l10n_text: z.string.modalLogoutHeadline"></div>
-      </div>
-      <div class="modal-logout-checkbox modal-option">
-        <div class="checkbox text-theme">
-          <input class="modal-checkbox" type="checkbox" id="clear-data-checkbox" data-uie-name="do-clear-data">
-          <label class="label-xs" for="clear-data-checkbox">
-            <span class="text-graphite-dark" data-bind="l10n_text: z.string.modalLogoutMessage"></span>
-          </label>
-        </div>
-      </div>
-      <div class="modal-action button button-medium button-fluid" data-bind="l10n_text: z.string.modalLogoutButton" data-uie-name="go-logout"></div>
-    </div>
-  </div>
-
-  <div class="modal modal-new-device" data-uie-name="modal-new-device">
-    <div class="modal-content">
-      <div class="modal-header">
-        <div class="modal-close icon-close icon-button pull-right"></div>
-        <div class="modal-title"></div>
-      </div>
-      <div class="modal-text" data-bind="l10n_text: z.string.modalNewDeviceMessage"></div>
-      <div class="modal-footer">
-        <div class="modal-secondary button button-medium button-full button-inverted" data-bind="l10n_text: z.string.modalButtonCancel" data-uie-name="go-show-device"></div>
-        <div class="modal-action button button-medium button-full" data-bind="l10n_text: z.string.modalNewDeviceSendAnyway" data-uie-name="do-send"></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal modal-not-connected" data-uie-name="modal-not-connected">
-    <div class="modal-content">
-      <div class="modal-header">
-        <div class="modal-close icon-close icon-button pull-right"></div>
-        <div class="modal-title" data-bind="l10n_text: z.string.modalNotConnectedHeadline"></div>
-      </div>
-      <div class="modal-text" data-bind="l10n_text: z.string.modalNotConnectedMessageMany"></div>
-      <div class="modal-close button button-medium button-fluid" data-bind="l10n_text: z.string.modalButtonOk" data-uie-name="do-close"></div>
-    </div>
-  </div>
-
-  <div class="modal modal-remove-device" data-uie-name="modal-remove-device">
-    <div class="modal-content">
-      <div class="modal-header">
-        <div class="modal-close icon-close icon-button pull-right"></div>
-        <div class="modal-title"></div>
-      </div>
-      <div class="modal-text" data-bind="l10n_text: z.string.modalRemoveDeviceMessage"></div>
-      <input class="modal-input" type="password" data-bind="l10n_placeholder: z.string.authPlaceholderPasswordPut"/>
-      <div class="modal-footer">
-        <div class="modal-action button button-medium button-full" data-bind="l10n_text: z.string.modalRemoveDeviceButton" data-uie-name="do-delete"></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal modal-connected-device" data-uie-name="modal-connected-device">
-    <div class="modal-content">
-      <div class="modal-header">
-        <div class="modal-close icon-close icon-button pull-right"></div>
-        <div class="modal-title" data-bind="l10n_text: z.string.modalConnectedDeviceHeadline"></div>
-      </div>
-      <div class="modal-text">
-        <div class="modal-connected-devices"></div>
-        <div data-bind="l10n_text: z.string.modalConnectedDeviceMessage"></div>
-      </div>
-      <div class="modal-footer">
-        <div class="modal-secondary button button-medium button-full button-inverted" data-bind="l10n_text: z.string.modalConnectedDeviceManageDevices" data-uie-name="go-manage-devices"></div>
-        <div class="modal-close button button-medium button-full" data-bind="l10n_text: z.string.modalButtonOk" data-uie-name="do-ok"></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal modal-service-unavailable" data-uie-name="modal-service-unavailable">
-    <div class="modal-content">
-      <div class="modal-header">
-        <div class="modal-close icon-close icon-button pull-right"></div>
-        <div class="modal-title" data-bind="l10n_text: z.string.modalServiceUnavailableHeadline"></div>
-      </div>
-      <div class="modal-text" data-bind="l10n_text: z.string.modalServiceUnavailableMessage"></div>
-      <div class="modal-close button button-medium button-fluid" data-bind="l10n_text: z.string.modalButtonOk" data-uie-name="do-close"></div>
     </div>
   </div>
 
@@ -313,26 +20,77 @@
     <div class="modal-content">
       <div class="modal-header">
         <div class="modal-close icon-close icon-button pull-right"></div>
-        <div class="modal-title" data-bind="l10n_text: z.string.modalSessionResetHeadline"></div>
+        <div class="modal-title" data-bind="l10n_text: z.string.modalSessionResetHeadline" data-uie-name="status-modal-title"></div>
       </div>
-      <div class="modal-text">
+      <div class="modal-text" data-uie-name="status-modal-text">
         <span data-bind="l10n_text: z.string.modalSessionResetMessage1"></span>
         <a data-bind="l10n_href: {support: z.config.SUPPORT.FORM.BUG}, l10n_text: z.string.modalSessionResetMessageLink" rel="nofollow noopener noreferrer" target="_blank"></a>
         <span data-bind="l10n_text: z.string.modalSessionResetMessage2"></span>
       </div>
-      <div class="modal-close button button-medium button-fluid" data-bind="l10n_text: z.string.modalButtonOk" data-uie-name="do-close"></div>
+      <div class="modal-close button button-medium button-fluid" data-bind="l10n_text: z.string.modalAcknowledgeAction" data-uie-name="do-close"></div>
     </div>
   </div>
 
-  <div class="modal modal-too-many-members" data-uie-name="modal-too-many-members">
+  <div class="modal modal-template-acknowledge" data-uie-name="modal-template-acknowledge">
     <div class="modal-content">
       <div class="modal-header">
-        <div class="modal-close icon-close icon-button pull-right"></div>
-        <div class="modal-title" data-bind="l10n_text: z.string.modalTooManyMembersHeadline"></div>
+        <div class="modal-close icon-close icon-button pull-right" data-uie-name="do-close"></div>
+        <div class="modal-title" data-uie-name="status-modal-title"></div>
       </div>
-      <div class="modal-text"></div>
-      <div class="modal-close button button-medium button-fluid" data-bind="l10n_text: z.string.modalButtonOk" data-uie-name="do-close"></div>
+      <div class="modal-text" data-uie-name="status-modal-text"></div>
+      <div class="modal-footer">
+        <div class="modal-action button button-medium button-fluid button-theme-red" data-uie-name="do-action"></div>
+      </div>
     </div>
   </div>
 
+  <div class="modal modal-template-confirm" data-uie-name="modal-template-confirm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-close icon-close icon-button pull-right" data-uie-name="do-close"></div>
+        <div class="modal-title" data-uie-name="status-modal-title"></div>
+      </div>
+      <div class="modal-text" data-uie-name="status-modal-text"></div>
+      <div class="modal-footer">
+        <div class="modal-secondary button button-medium button-full button-inverted" data-uie-name="do-secondary"></div>
+        <div class="modal-action button button-medium button-full" data-uie-name="do-action"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal modal-template-input" data-uie-name="modal-template-input">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-close icon-close icon-button pull-right" data-uie-name="do-close"></div>
+        <div class="modal-title" data-uie-name="status-modal-title"></div>
+      </div>
+      <div class="modal-text" data-uie-name="status-modal-text"></div>
+      <input class="modal-input" type="password"/>
+      <div class="modal-footer">
+        <div class="modal-action button button-medium button-full" data-uie-name="do-action"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal modal-template-option" data-uie-name="modal-template-option">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-close icon-close icon-button pull-right" data-uie-name="do-close"></div>
+        <div class="modal-title" data-uie-name="status-modal-title"></div>
+      </div>
+      <div class="modal-text" data-uie-name="status-modal-text"></div>
+      <div class="modal-option">
+        <div class="checkbox text-theme">
+          <input class="modal-checkbox" type="checkbox" id="clear-data-checkbox" data-uie-name="do-clear-data">
+          <label class="label-xs" for="clear-data-checkbox">
+            <span class="modal-option-text text-graphite-dark"></span>
+          </label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div class="modal-secondary button button-medium button-full button-inverted" data-uie-name="do-secondary"></div>
+        <div class="modal-action button button-medium button-full" data-uie-name="do-action"></div>
+      </div>
+    </div>
+  </div>
 </div>

@@ -13,7 +13,7 @@
           <div data-bind="foreach: activationLocation"><span data-bind="css: {'preferences-devices-activated-bold': $data.isStyled}, text: $data.text">?</span></div>
         </div>
         <div class="preferences-devices-fingerprint-label" data-bind="l10n_text: z.string.preferencesDevicesFingerprint"></div>
-        <div class="preferences-devices-fingerprint" data-bind="foreach: displayFingerPrint()"><span class="device-id-part" data-bind="text: $data"></span></div>
+        <div class="preferences-devices-fingerprint" data-bind="foreach: localFingerprint()"><span class="device-id-part" data-bind="text: $data"></span></div>
       </section>
 
       <hr class="preferences-devices-separator preferences-separator">

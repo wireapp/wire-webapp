@@ -32,7 +32,7 @@ z.viewModel.list.TakeoverViewModel = class TakeoverViewModel {
    * @param {Object} repositories - Object containing all repositories
    */
   constructor(mainViewModel, listViewModel, repositories) {
-    this.conversation_repository = repositories.conversation;
+    this.conversationRepository = repositories.conversation;
     this.userRepository = repositories.user;
     this.logger = new z.util.Logger('z.viewModel.list.TakeoverViewModel', z.config.LOGGER.OPTIONS);
 
@@ -51,7 +51,7 @@ z.viewModel.list.TakeoverViewModel = class TakeoverViewModel {
     this.userRepository
       .change_username(this.username())
       .then(() => {
-        const conversationEntity = this.conversation_repository.getMostRecentConversation();
+        const conversationEntity = this.conversationRepository.getMostRecentConversation();
         if (conversationEntity) {
           return amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity);
         }

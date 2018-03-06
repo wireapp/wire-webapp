@@ -38,6 +38,7 @@ z.viewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
     this.cryptographyRepository = repositories.cryptography;
     this.logger = new z.util.Logger('z.viewModel.content.PreferencesDeviceDetailsViewModel', z.config.LOGGER.OPTIONS);
 
+    this.actionsViewModel = mainViewModel.actions;
     this.selfUser = this.clientRepository.selfUser;
 
     this.activationLocation = ko.observableArray([]);
@@ -88,9 +89,9 @@ z.viewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
   _updateFingerprint() {
     this.fingerprint([]);
 
-    this.cryptographyRepository.getRemoteFingerprint(this.selfUser().id, this.device().id).then(fingerprint => {
-      this.fingerprint(z.util.zero_padding(fingerprint, 16).match(/.{1,2}/g));
-    });
+    this.cryptographyRepository
+      .getRemoteFingerprint(this.selfUser().id, this.device().id)
+      .then(fingerprint => this.fingerprint(fingerprint));
   }
 
   clickOnDetailsClose() {
@@ -120,16 +121,7 @@ z.viewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
   }
 
   clickOnRemoveDevice() {
-    // @todo Add failure case ux WEBAPP-3570
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.REMOVE_DEVICE, {
-      action: password => {
-        this.clientRepository
-          .deleteClient(this.device().id, password)
-          .then(() => this.clickOnDetailsClose())
-          .catch(error => amplify.subscribe(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT));
-      },
-      data: this.device().model,
-    });
+    this.actionsViewModel.deleteClient(this.device());
   }
 
   toggleDeviceVerification() {

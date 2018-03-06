@@ -23,11 +23,7 @@ z.string.ro.wireWindows = 'Wire pentru Windows';
 z.string.ro.wireLinux = 'Wire pentru Linux';
 z.string.ro.nonexistentUser = 'Utilizator șters';
 z.string.ro.and = 'și';
-
-z.string.ro.alertUploadFileFormat = 'Nu se poate folosi această imagine.\nTe rugăm să alegi un fișier PNG sau JPEG.';
-z.string.ro.alertUploadTooSmall = 'Nu se poate utiliza această imagine.\nTe rugăm să alegi o imagine de cel puțin 320 x 320 px.';
-z.string.ro.alertUploadTooLarge = 'Această imagine este prea mare.\nPoți încărca fișiere până la {{number}} MB.';
-z.string.ro.alertGifTooLarge = 'Animația este prea mare.\nMărimea maximă este {{number}} MB.';
+z.string.ro.enumerationAnd = ', și ';
 
 z.string.ro.authAccountCountryCode = 'Codul țării';
 z.string.ro.authAccountDeletion = 'Ai fost deconectat deoarece contul tău a fost șters.';
@@ -103,80 +99,128 @@ z.string.ro.callJoin = 'Alătură-te';
 z.string.ro.callChooseSharedScreen = 'Alege un ecran pentru a partaja';
 z.string.ro.callParticipants = '{{number}} în apel';
 
-z.string.ro.modalButtonCancel = 'Renunță';
-z.string.ro.modalButtonOk = 'Ok';
-z.string.ro.modalButtonSend = 'Trimite';
+z.string.ro.modalAcknowledgeAction = 'Ok';
+z.string.ro.modalConfirmSecondary = 'Renunță';
+z.string.ro.modalOptionSecondary = 'Renunță';
 
-z.string.ro.modalBlockConversationHeadline = 'Blochează pe {{user}}?';
-z.string.ro.modalBlockConversationMessage = '{{user}} nu te va putea contacta sau adăuga la conversații de grup.';
-z.string.ro.modalBlockConversationButton = 'Blochează';
-z.string.ro.modalBotsConfirmHeadline = 'Adaugă serviciul';
-z.string.ro.modalBotsConfirmMessage = 'Sigur dorești să pornești o nouă conversație cu {{name}}?';
-z.string.ro.modalBotsConfirmButton = 'Confirmă';
-z.string.ro.modalBotsUnavailableHeadline = 'Roboții nu sunt momentan disponibili';
-z.string.ro.modalBotsUnavailableMessage = 'Mulțumim că ești interesat de roboți. Acest serviciu este momentan suspendat în timp ce lucrăm la următoarea versiune. Fii pe fază.';
-z.string.ro.modalCallConversationEmptyHeadline = 'Nu ai pe cine apela';
-z.string.ro.modalCallConversationEmptyMessage = 'Nu a mai rămas nimeni aici.';
-z.string.ro.modalCallNoVideoInGroupHeadline = 'Nu poți face apeluri video în grupuri';
-z.string.ro.modalCallNoVideoInGroupMessage = 'Apelurile video nu sunt disponibile în conversațiile de grup.';
+z.string.ro.modalAccountDeletionAction = 'Șterge';
+z.string.ro.modalAccountDeletionHeadline = 'Șterge contul';
+z.string.ro.modalAccountDeletionMessage = 'Îți vom trimite un mesaj pe e-mail sau SMS. Urmează linkul pentru a șterge permanent contul tău.';
+
+z.string.ro.modalAccountLogoutAction = 'Deconectare';
+z.string.ro.modalAccountLogoutHeadline = 'Curăță datele?';
+z.string.ro.modalAccountLogoutOption = 'Șterge toate informațiile personale și conversațiile de pe acest dispozitiv.';
+
+z.string.ro.modalAccountNewDevicesSecondary = 'Gestionare dispozitive';
+z.string.ro.modalAccountNewDevicesHeadline = 'Contul tău a fost folosit în data de:';
+z.string.ro.modalAccountNewDevicesFrom = 'De la:';
+z.string.ro.modalAccountNewDevicesMessage = 'Dacă nu ai făcut asta, elimină dispozitivul și resetează parola.';
+
+z.string.ro.modalAccountRemoveDeviceAction = 'Scoate dispozitivul';
+z.string.ro.modalAccountRemoveDeviceHeadline = 'Scoate „{{device}}”';
+z.string.ro.modalAccountRemoveDeviceMessage = 'Este necesară parola pentru a elimina acest dispozitiv.';
+z.string.ro.modalAccountRemoveDevicePlaceholder = 'Parolă';
+
+z.string.ro.modalAssetTooLargeMessage = 'Poți trimite fișiere până la {{number}}';
+
+z.string.ro.modalAssetParallelUploadsMessage = 'Poți trimite maxim {{number}} fișiere simultan.';
+
+z.string.ro.modalCallEmptyConversationHeadline = 'Nu ai pe cine apela';
+z.string.ro.modalCallEmptyConversationMessage = 'Nu a mai rămas nimeni aici.';
+
+z.string.ro.modalCallNoGroupVideoHeadline = 'Nu poți face apeluri video în grupuri';
+z.string.ro.modalCallNoGroupVideoMessage = 'Apelurile video nu sunt disponibile în conversațiile de grup.';
+
+z.string.ro.modalCallNoMicrophoneAction = 'Spune-mi cum';
+z.string.ro.modalCallNoMicrophoneMessage = 'Browserul tău are nevoie de acces la microfon pentru a face apeluri.';
+z.string.ro.modalCallNoMicrophoneHeadline = 'Nu se poate apela fără microfon';
+
+z.string.ro.modalCallSecondIncomingAction = 'Răspunde';
 z.string.ro.modalCallSecondIncomingHeadline = 'Răspunde la apel?';
 z.string.ro.modalCallSecondIncomingMessage = 'Apelul curent se va termina.';
-z.string.ro.modalCallSecondIncomingAction = 'Răspunde';
+
+z.string.ro.modalCallSecondOngoingAction = 'Închide';
 z.string.ro.modalCallSecondOngoingHeadline = 'Închide apelul pe un alt dispozitiv?';
 z.string.ro.modalCallSecondOngoingMessage = 'Nu poți fi decât într-un singur apel la un moment dat.';
-z.string.ro.modalCallSecondOngoingAction = 'Închide';
+
+z.string.ro.modalCallSecondOutgoingAction = 'Închide';
 z.string.ro.modalCallSecondOutgoingHeadline = 'Închide apelul curent?';
 z.string.ro.modalCallSecondOutgoingMessage = 'Nu poți fi decât într-un singur apel la un moment dat.';
-z.string.ro.modalCallSecondOutgoingAction = 'Închide';
-z.string.ro.modalClearConversationHeadline = 'Ștergeți conținutul?';
-z.string.ro.modalClearConversationOption = 'Părăsește conversația';
-z.string.ro.modalClearConversationButton = 'Șterge';
-z.string.ro.modalConnectedDeviceHeadline = 'Contul tău a fost folosit în data de:';
-z.string.ro.modalConnectedDeviceFrom = 'De la:';
-z.string.ro.modalConnectedDeviceMessage = 'Dacă nu ai făcut asta, elimină dispozitivul și resetează parola.';
-z.string.ro.modalConnectedDeviceManageDevices = 'gestionare dispozitive';
-z.string.ro.modalDeleteAccountAction = 'Șterge';
-z.string.ro.modalDeleteAccountHeadline = 'Șterge contul';
-z.string.ro.modalDeleteAccountMessage = 'Îți vom trimite un mesaj pe e-mail sau SMS. Urmează linkul pentru a șterge permanent contul tău.';
-z.string.ro.modalDeleteButton = 'Șterge';
-z.string.ro.modalDeleteHeadline = 'Șterge doar pentru mine?';
-z.string.ro.modalDeleteMessage = 'Operațiunea nu poate fi anulată.';
-z.string.ro.modalDeleteEveryoneButton = 'Șterge';
-z.string.ro.modalDeleteEveryoneHeadline = 'Șterge pentru toată lumea?';
-z.string.ro.modalDeleteEveryoneMessage = 'Operațiunea nu poate fi anulată.';
-z.string.ro.modalTooLongHeadline = 'Mesajul este prea lung';
-z.string.ro.modalTooLongMessage = 'Nu poți trimite mesaje mai lungi de {{number}} caractere.';
-z.string.ro.modalLeaveConversationHeadline = 'Părăsește conversația cu „{{user}}”?';
-z.string.ro.modalLeaveConversationMessage = 'Participanții vor fi notificați și conversația va fi scoasă din lista ta.';
-z.string.ro.modalLeaveConversationButton = 'Ieși';
-z.string.ro.modalLogoutHeadline = 'Curăță datele?';
-z.string.ro.modalLogoutMessage = 'Șterge toate informațiile personale și conversațiile de pe acest dispozitiv.';
-z.string.ro.modalLogoutButton = 'Deconectare';
-z.string.ro.modalNewDeviceHeadline = '{{user}} a început să folosească un nou dispozitiv';
-z.string.ro.modalNewDeviceHeadlineMany = '{{user}}s au început să folosească dispozitive noi';
-z.string.ro.modalNewDeviceHeadlineYou = '{{user}} a început să folosească un nou dispozitiv';
-z.string.ro.modalNewDeviceMessage = 'Încă dorești să fie trimise mesajele?';
-z.string.ro.modalNewDeviceCallAccept = 'Acceptă apelul';
-z.string.ro.modalNewDeviceCallAnyway = 'Sună oricum';
-z.string.ro.modalNewDeviceCallIncoming = 'Încă mai dorești acest apel?';
-z.string.ro.modalNewDeviceCallOutgoing = 'Încă mai dorești să faci apelul?';
-z.string.ro.modalNewDeviceShowDevice = 'arată dispozitivul';
-z.string.ro.modalNewDeviceSendAnyway = 'trimite oricum';
-z.string.ro.modalNotConnectedHeadline = 'Nimeni nu a fost adăugat la conversație';
-z.string.ro.modalNotConnectedMessageOne = '{{name}} nu dorește să fie adăugat la conversații.';
-z.string.ro.modalNotConnectedMessageMany = 'Unul din cei pe care i-ai selectat nu dorește să fie adăugat la conversații.';
-z.string.ro.modalRemoveDeviceButton = 'Scoate dispozitivul';
-z.string.ro.modalRemoveDeviceHeadline = 'Scoate „{{device}}”';
-z.string.ro.modalRemoveDeviceMessage = 'Este necesară parola pentru a elimina acest dispozitiv.';
+
+z.string.ro.modalConnectCancelAction = 'Da';
+z.string.ro.modalConnectCancelHeadline = 'Anulează solicitarea?';
+z.string.ro.modalConnectCancelMessage = 'Șterge solicitarea de conectare cu {{user}}.';
+z.string.ro.modalConnectCancelSecondary = 'Nu';
+
+z.string.ro.modalConnectAcceptAction = 'Conectare';
+z.string.ro.modalConnectAcceptHeadline = 'Acceptă?';
+z.string.ro.modalConnectAcceptMessage = 'Aceasta te va conecta și va deschide o conversație cu {{user}}.';
+z.string.ro.modalConnectAcceptSecondary = 'Ignoră';
+
+z.string.ro.modalConversationAddBotAction = 'Confirmă';
+z.string.ro.modalConversationAddBotHeadline = 'Adaugă serviciul';
+z.string.ro.modalConversationAddBotMessage = 'Sigur dorești să pornești o nouă conversație cu {{name}}?';
+
+z.string.ro.modalConversationClearAction = 'Șterge';
+z.string.ro.modalConversationClearHeadline = 'Ștergeți conținutul?';
+z.string.ro.modalConversationClearOption = 'Părăsește conversația';
+
+z.string.ro.modalConversationDeleteMessageAction = 'Șterge';
+z.string.ro.modalConversationDeleteMessageHeadline = 'Șterge doar pentru mine?';
+z.string.ro.modalConversationDeleteMessageMessage = 'Operațiunea nu poate fi anulată.';
+
+z.string.ro.modalConversationDeleteMessageEveryoneAction = 'Șterge';
+z.string.ro.modalConversationDeleteMessageEveryoneHeadline = 'Șterge pentru toată lumea?';
+z.string.ro.modalConversationDeleteMessageEveryoneMessage = 'Operațiunea nu poate fi anulată.';
+
+z.string.ro.modalConversationLeaveAction = 'Ieși';
+z.string.ro.modalConversationLeaveMessage = 'Nu vei mai putea trimite sau primi mesaje în această conversație.';
+
+z.string.ro.modalConversationMessageTooLongHeadline = 'Mesajul este prea lung';
+z.string.ro.modalConversationMessageTooLongMessage = 'Nu poți trimite mesaje mai lungi de {{number}} caractere.';
+
+z.string.ro.modalConversationNewDeviceHeadlineOne = '{{user}} a început să folosească un nou dispozitiv';
+z.string.ro.modalConversationNewDeviceHeadlineMany = '{{user}}s au început să folosească dispozitive noi';
+z.string.ro.modalConversationNewDeviceHeadlineYou = '{{user}} a început să folosească un nou dispozitiv';
+z.string.ro.modalConversationNewDeviceIncomingCallAction = 'Acceptă apelul';
+z.string.ro.modalConversationNewDeviceIncomingCallMessage = 'Încă mai dorești acest apel?';
+z.string.ro.modalConversationNewDeviceMessage = 'Încă dorești să fie trimise mesajele?';
+z.string.ro.modalConversationNewDeviceOutgoingCallAction = 'Sună oricum';
+z.string.ro.modalConversationNewDeviceOutgoingCallMessage = 'Încă mai dorești să faci apelul?';
+
+z.string.ro.modalConversationNotConnectedHeadline = 'Nimeni nu a fost adăugat la conversație';
+z.string.ro.modalConversationNotConnectedMessageOne = '{{name}} nu dorește să fie adăugat la conversații.';
+z.string.ro.modalConversationNotConnectedMessageMany = 'Unul din cei pe care i-ai selectat nu dorește să fie adăugat la conversații.';
+
+z.string.ro.modalConversationRemoveAction = 'Șterge';
+z.string.ro.modalConversationRemoveHeadline = 'Șterge?';
+z.string.ro.modalConversationRemoveMessage = '{{user}} nu va mai putea trimite sau primi mesaje în această conversație.';
+
+
+z.string.ro.modalConversationTooManyMembersHeadline = 'Canalul este plin';
+
+z.string.ro.modalIntegrationUnavailableHeadline = 'Roboții nu sunt momentan disponibili';
+z.string.ro.modalIntegrationUnavailableMessage = 'Mulțumim că ești interesat de roboți. Acest serviciu este momentan suspendat în timp ce lucrăm la următoarea versiune. Fii pe fază.';
+
+
 z.string.ro.modalServiceUnavailableHeadline = 'Adăugarea serviciului nu este posibilă';
 z.string.ro.modalServiceUnavailableMessage = 'Acest serviciu este indisponibil momentan.';
+
 z.string.ro.modalSessionResetHeadline = 'Sesiunea a fost resetată';
 z.string.ro.modalSessionResetMessage1 = 'Dacă problema nu este rezolvată,';
 z.string.ro.modalSessionResetMessageLink = 'contactează-';
 z.string.ro.modalSessionResetMessage2 = 'ne.';
-z.string.ro.modalTooManyMembersHeadline = 'Canalul este plin';
-z.string.ro.modalTooManyMembersMessage = 'Maxim {{number1}} persoane se pot alătura conversației. Mai este loc pentru {{number2}} persoane aici.';
-z.string.ro.modalUploadsParallel = 'Poți trimite maxim {{number}} fișiere simultan.';
+
+z.string.ro.modalUploadContactsAction = 'Reîncearcă';
+z.string.ro.modalUploadContactsMessage = 'Nu am primit nicio informație. Încearcă importarea contactelor din nou.';
+
+z.string.ro.modalUserBlockAction = 'Blochează';
+z.string.ro.modalUserBlockHeadline = 'Blochează pe {{user}}?';
+z.string.ro.modalUserBlockMessage = '{{user}} nu te va putea contacta sau adăuga la conversații de grup.';
+
+z.string.ro.modalUserUnblockAction = 'Deblochează';
+z.string.ro.modalUserUnblockHeadline = 'Deblochează?';
+z.string.ro.modalUserUnblockMessage = '{{user}} te va putea contacta și adăuga din nou la conversații de grup.';
 
 z.string.ro.connectionRequestConnect = 'Conectare';
 z.string.ro.connectionRequestIgnore = 'Ignoră';
@@ -192,6 +236,9 @@ z.string.ro.conversationConnectionAccepted = 'Conectat';
 z.string.ro.conversationConnectionBlocked = 'Blocat';
 z.string.ro.conversationConnectionCancelRequest = 'Anulează cererea de conectare';
 z.string.ro.conversationCreate = 'a început o conversație cu {{users}}';
+z.string.ro.conversationCreateName = '{{user}} a început conversația';
+z.string.ro.conversationCreateNameYou = '{{user}} a început conversația';
+z.string.ro.conversationCreateWith = 'grosime {{users}}';
 z.string.ro.conversationCreateYou = 'a început o conversație cu {{users}}';
 z.string.ro.conversationDeviceStartedUsingOne = ' a început să folosească';
 z.string.ro.conversationDeviceStartedUsingMany = ' a început să folosească';
@@ -200,12 +247,13 @@ z.string.ro.conversationDeviceYourDevices = ' tale neverificate';
 z.string.ro.conversationDeviceUserDevices = ' dispozitivele lui {{user}}';
 z.string.ro.conversationDeviceNewDeviceOne = ' un nou dispozitiv';
 z.string.ro.conversationDeviceNewDeviceMany = ' dispozitive noi';
-z.string.ro.conversationDeviceNewPeopleJoined = 's-au mai alăturat persoane.';
 z.string.ro.conversationDeviceNewPeopleJoinedVerify = ' verifică dispozitivele';
 z.string.ro.conversationJustNow = 'Chiar acum';
 z.string.ro.conversationLocationLink = 'Deschide harta';
 z.string.ro.conversationMemberJoin = ' ai adăuga pe {{users}}';
 z.string.ro.conversationMemberJoinYou = ' ai adăuga pe {{users}}';
+z.string.ro.conversationMemberJoinSelf = ' s-a alăturat';
+z.string.ro.conversationMemberJoinSelfYou = ' s-a alăturat';
 z.string.ro.conversationMemberLeaveLeft = ' stânga';
 z.string.ro.conversationMemberLeaveLeftYou = ' stânga';
 z.string.ro.conversationMemberLeaveRemoved = ' ai șters pe {{users}}';
@@ -228,9 +276,9 @@ z.string.ro.conversationUnableToDecryptLink = 'De ce?';
 z.string.ro.conversationUnableToDecryptErrorMessage = 'Eroare';
 z.string.ro.conversationUnableToDecryptResetSession = 'Resetează sesiunea';
 z.string.ro.conversationMissedMessages = 'Nu ai folosit acest dispozitiv de ceva timp. Unele mesaje ar putea să nu apară aici.';
+z.string.ro.conversationAssetUploading = 'Se încarcă…';
 z.string.ro.conversationAssetDownloading = 'Se descarcă…';
 z.string.ro.conversationAssetUploadFailed = 'Încărcarea a eșuat';
-z.string.ro.conversationAssetUploadTooLarge = 'Poți trimite fișiere până la {{number}}';
 z.string.ro.conversationPlaybackError = 'Nu se poate reda';
 z.string.ro.conversationContextMenuEdit = 'Editează';
 z.string.ro.conversationContextMenuDelete = 'Șterge pentru mine';
@@ -246,6 +294,10 @@ z.string.ro.conversationSomeone = 'Cineva';
 z.string.ro.conversationTweetAuthor = ' pe Twitter';
 
 z.string.ro.groupCreationPreferencesAction = 'Mai departe';
+z.string.ro.groupCreationPreferencesErrorNameShort = 'Cel puțin un caracter';
+z.string.ro.groupCreationPreferencesErrorNameLong = 'Prea multe caractere';
+z.string.ro.groupCreationPreferencesHeader = 'Grup nou';
+z.string.ro.groupCreationPreferencesPlaceholder = 'Nume grup';
 z.string.ro.groupCreationParticipantsActionCreate = 'Gata';
 z.string.ro.groupCreationParticipantsHeader = 'Adaugă persoane';
 z.string.ro.groupCreationParticipantsPlaceholder = 'Caută după nume';
@@ -312,70 +364,45 @@ z.string.ro.extensionsGiphyMessage = '{{tag}} • via giphy.com';
 z.string.ro.extensionsGiphyNoGifs = 'Ups, nu sunt gif-uri';
 z.string.ro.extensionsGiphyRandom = 'La întâmplare';
 
-z.string.ro.peopleConfirmLabel = 'Adaugă persoane în grup';
-z.string.ro.peoplePeople = '{{number}} persoane';
-z.string.ro.peopleSearchPlaceholder = 'Caută după nume';
-z.string.ro.peopleEveryoneParticipates = 'Toată lumea cu care\nești conectat este deja\nîn această conversație.';
-z.string.ro.peopleNoMatches = 'Nu s-a găsit nimic.\nÎncearcă să scrii un alt nume.';
-z.string.ro.peopleInvite = 'Invită persoane pe Wire';
-z.string.ro.peopleInviteDetail = 'Împărtășirea contactelor ne ajută să te conectăm cu alții. Noi anonimizăm toate informațiile și nu le împărtășim cu terți.';
-z.string.ro.peopleInviteButtonContacts = 'Din Contacte';
-z.string.ro.peopleInviteButtonGmail = 'Din Gmail';
-z.string.ro.peopleInviteHeadline = 'Invită prietenii';
-z.string.ro.peopleServiceConfirmButton = 'Adaugă serviciu';
-z.string.ro.peopleServiceRemovalButton = 'Elimină serviciu';
-z.string.ro.peopleServices = 'Servicii';
-z.string.ro.peopleShare = 'Împărtășește contacte';
-z.string.ro.peopleTabsDetails = 'Detalii';
-z.string.ro.peopleTabsDevices = 'Dispozitive';
-z.string.ro.peopleTabsDevicesHeadline = 'Wire oferă fiecărui dispozitiv o amprentă unică. Compară amprentele cu {{user}} și verifică conversația.';
-z.string.ro.peopleTabsDevicesLearnMore = 'Află mai multe';
-z.string.ro.peopleTabsDevicesWhyVerify = 'De ce să verific această conversație?';
-z.string.ro.peopleTabsNoDevicesHeadline = '{{user}} folosește o versiune veche de Wire. Nu sunt afișate dispozitive.';
-z.string.ro.peopleTabsDeviceDetailAllMyDevices = 'Arată toate dispozitivele mele';
-z.string.ro.peopleTabsDeviceDetailDeviceFingerprint = 'Amprentă dispozitiv';
-z.string.ro.peopleTabsDeviceDetailHeadline = 'Verifică dacă aceasta se potrivește cu amprenta arătată în {{html1}}dispozitivul al lui {{user}}{{html2}}.';
-z.string.ro.peopleTabsDeviceDetailHowTo = 'Cum fac asta?';
-z.string.ro.peopleTabsDeviceDetailResetSession = 'Resetează sesiunea';
-z.string.ro.peopleTabsDeviceDetailShowMyDevice = 'Arată amprenta dispozitivului';
-z.string.ro.peopleTabsDeviceDetailVerify = 'Verificat';
-z.string.ro.peopleTabsPeople = 'Persoane';
-z.string.ro.peopleTabsServices = 'Servicii';
-z.string.ro.peopleVerified = 'Verificat';
+z.string.ro.addParticipantsConfirmLabel = 'Adaugă';
+z.string.ro.addParticipantsHeader = 'Adaugă persoane';
+z.string.ro.addParticipantsSearchPlaceholder = 'Caută după nume';
+z.string.ro.addParticipantsServiceConfirmButton = 'Adaugă serviciu';
+z.string.ro.addParticipantsTabsPeople = 'Persoane';
+z.string.ro.addParticipantsTabsServices = 'Servicii';
 
-z.string.ro.peopleBlockHeadline = 'Blochează?';
-z.string.ro.peopleBlockMessage = '{{user}} nu te va putea contacta sau adăuga la conversații de grup.';
+z.string.ro.conversationDetailsActionCancelRequest = 'Anulează cererea';
+z.string.ro.conversationDetailsActionCreateGroup = 'Creează grup';
+z.string.ro.conversationDetailsActionDevices = 'Dispozitive';
+z.string.ro.conversationDetailsGuestsOff = 'Închis';
+z.string.ro.conversationDetailsParticipantsServicesMany = 'Servicii';
+z.string.ro.conversationDetailsParticipantsUsersMany = 'Persoane';
+z.string.ro.conversationDetailsPeople = 'Persoane';
+z.string.ro.conversationDetailsServices = 'Servicii';
 
-z.string.ro.peopleConnectHeadline = 'Acceptă?';
-z.string.ro.peopleConnectMessage = 'Aceasta te va conecta și va deschide o conversație cu {{user}}.';
+z.string.ro.groupParticipantActionCancelRequest = 'Anulează cererea';
+z.string.ro.groupParticipantActionDevices = 'Dispozitive';
+z.string.ro.groupParticipantActionPending = 'În așteptare';
+z.string.ro.groupParticipantActionSendRequest = 'Conectare';
 
-z.string.ro.peopleCancelRequestHeadline = 'Anulează solicitarea?';
-z.string.ro.peopleCancelRequestMessage = 'Șterge solicitarea de conectare cu {{user}}.';
+z.string.ro.participantDevicesDetailHeadline = 'Verifică dacă aceasta se potrivește cu amprenta arătată în {{html1}}dispozitivul al lui {{user}}{{html2}}.';
+z.string.ro.participantDevicesDetailHowTo = 'Cum fac asta?';
+z.string.ro.participantDevicesDetailResetSession = 'Resetează sesiunea';
+z.string.ro.participantDevicesDetailShowMyDevice = 'Arată amprenta dispozitivului';
+z.string.ro.participantDevicesDetailVerify = 'Verificat';
 
-z.string.ro.peopleLeaveHeadline = 'Părăsește conversația?';
-z.string.ro.peopleLeaveMessage = 'Nu vei mai putea trimite sau primi mesaje în această conversație.';
+z.string.ro.participantDevicesHeader = 'Dispozitive';
+z.string.ro.participantDevicesHeadline = 'Wire oferă fiecărui dispozitiv o amprentă unică. Compară amprentele cu {{user}} și verifică conversația.';
+z.string.ro.participantDevicesLearnMore = 'Află mai multe';
+z.string.ro.participantDevicesWhyVerify = 'De ce să verific această conversație?';
+z.string.ro.participantDevicesOutdatedClientMessage = '{{user}} folosește o versiune veche de Wire. Nu sunt afișate dispozitive.';
 
-z.string.ro.peopleRemoveHeadline = 'Șterge?';
-z.string.ro.peopleRemoveMessage = '{{user}} nu va mai putea trimite sau primi mesaje în această conversație.';
+z.string.ro.participantDevicesSelfAllDevices = 'Arată toate dispozitivele mele';
+z.string.ro.participantDevicesSelfFingerprint = 'Amprentă dispozitiv';
 
-z.string.ro.peopleUnblockHeadline = 'Deblochează?';
-z.string.ro.peopleUnblockMessage = '{{user}} te va putea contacta și adăuga din nou la conversații de grup.';
-
-z.string.ro.peopleButtonAdd = 'Adaugă';
-z.string.ro.peopleButtonAddPeople = 'Adaugă persoane';
-z.string.ro.peopleButtonBlock = 'Blochează';
-z.string.ro.peopleButtonCancel = 'Renunță';
-z.string.ro.peopleButtonConnect = 'Conectare';
-z.string.ro.peopleButtonCreate = 'Creează grup';
-z.string.ro.peopleButtonIgnore = 'Ignoră';
-z.string.ro.peopleButtonLeave = 'Ieși';
-z.string.ro.peopleButtonOpen = 'Deschide conversația';
-z.string.ro.peopleButtonPending = 'În așteptare';
-z.string.ro.peopleButtonProfile = 'Profil';
-z.string.ro.peopleButtonRemove = 'Șterge';
-z.string.ro.peopleButtonUnblock = 'Deblochează';
-z.string.ro.peopleButtonNo = 'Nu';
-z.string.ro.peopleButtonYes = 'Da';
+z.string.ro.userProfileButtonConnect = 'Conectare';
+z.string.ro.userProfileButtonIgnore = 'Ignoră';
+z.string.ro.userProfileButtonUnblock = 'Deblochează';
 
 z.string.ro.preferencesAbout = 'Despre';
 z.string.ro.preferencesAccount = 'Cont';
@@ -459,6 +486,7 @@ z.string.ro.searchCreateGroup = 'Creează grup';
 z.string.ro.searchGroups = 'Grupuri';
 z.string.ro.searchPeople = 'Persoane';
 z.string.ro.searchPlaceholder = 'Caută după nume sau nume utilizator';
+z.string.ro.searchServicePlaceholder = 'Caută după nume';
 z.string.ro.searchServices = 'Servicii';
 z.string.ro.searchTeamGroups = 'Conversații de echipă';
 z.string.ro.searchTeamMembers = 'Membrii echipei';
@@ -468,14 +496,21 @@ z.string.ro.searchNoContactsOnWire = 'Nu ai contacte pe Wire.\nÎncearcă să g�
 z.string.ro.searchMemberInvite = 'Invită oameni în echipă';
 z.string.ro.searchOthers = 'Conectare';
 
+z.string.ro.searchInvite = 'Invită persoane pe Wire';
+z.string.ro.searchInviteDetail = 'Împărtășirea contactelor ne ajută să te conectăm cu alții. Noi anonimizăm toate informațiile și nu le împărtășim cu terți.';
+z.string.ro.searchInviteButtonContacts = 'Din Contacte';
+z.string.ro.searchInviteButtonGmail = 'Din Gmail';
+z.string.ro.searchInviteHeadline = 'Invită prietenii';
+z.string.ro.searchInviteShare = 'Împărtășește contacte';
+
+z.string.ro.searchServiceConfirmButton = 'Adaugă serviciu';
+
+z.string.ro.searchListEveryoneParticipates = 'Toată lumea cu care\nești conectat este deja\nîn această conversație.';
+z.string.ro.searchListNoMatches = 'Nu s-a găsit nimic.\nÎncearcă să scrii un alt nume.';
+
 z.string.ro.uploadGoogleHeadline = 'Caută persoane\ncu care să vorbești.';
 z.string.ro.uploadGoogleMessage = 'Vom folosi datele tale de contact pentru a te conecta cu alții. Vom anonimiza toate informațiile și nu le vom împărtăși cu altcineva.';
-z.string.ro.uploadGoogleHeadlineError = 'Ceva\na mers prost.';
-z.string.ro.uploadGoogleMessageError = 'Nu am primit nicio informație. Încearcă importarea contactelor din nou.';
-z.string.ro.uploadGoogleButtonAgain = 'Reîncearcă';
 
-z.string.ro.warningCallDetail = 'Browserul tău are nevoie de acces la microfon pentru a face apeluri.';
-z.string.ro.warningCallHeadline = 'Nu se poate apela fără microfon';
 z.string.ro.warningCallUnsupportedIncoming = '{{user}} te sună. Browserul tău nu suportă apelurile.';
 z.string.ro.warningCallUnsupportedOutgoing = 'Nu poți suna pentru că browserul tău nu suportă apelurile.';
 z.string.ro.warningCallIssues = 'Această versiune de Wire nu poate participa într-un apel. Te rugăm să folosești';
@@ -495,7 +530,6 @@ z.string.ro.warningPermissionRequestCamera = '{{icon}} permite accesul la camer�
 z.string.ro.warningPermissionRequestMicrophone = '{{icon}} permit accesul la microfon';
 z.string.ro.warningPermissionRequestNotification = '{{icon}} permite notificările';
 z.string.ro.warningPermissionRequestScreen = '{{icon}} permite accesul la ecran';
-z.string.ro.warningTellMeHow = 'Spune-mi cum';
 
 z.string.ro.userAvailabilityAvailable = 'Disponibil';
 z.string.ro.userAvailabilityAway = 'Departe';
@@ -544,14 +578,7 @@ z.string.ro.tooltipConversationsPreferences = 'Deschide preferințele';
 z.string.ro.tooltipConversationsSilence = 'Mutizează ({{shortcut}})';
 z.string.ro.tooltipConversationsStart = 'Începe conversația ({{shortcut}})';
 
-z.string.ro.tooltipPeopleAdd = 'Adaugă persoane la conversație ({{shortcut}})';
-z.string.ro.tooltipPeopleBack = 'Înapoi';
-z.string.ro.tooltipPeopleBlock = 'Blochează';
-z.string.ro.tooltipPeopleConnect = 'Conectare';
-z.string.ro.tooltipPeopleLeave = 'Părăsește conversația';
-z.string.ro.tooltipPeopleRename = 'Schimbă numele conversației';
-z.string.ro.tooltipPeopleRemove = 'Elimină din conversație';
-z.string.ro.tooltipPeopleUnblock = 'Deblochează';
+z.string.ro.tooltipConversationDetailsRename = 'Schimbă numele conversației';
 
 z.string.ro.tooltipPreferencesContactsGmail = 'Autentifică-te în conturile Gmail pentru a partaja contacte';
 z.string.ro.tooltipPreferencesContactsMacos = 'Partajează toate contactele de pe aplicația Contacts din macOS';

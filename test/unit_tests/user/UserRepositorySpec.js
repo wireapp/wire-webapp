@@ -59,7 +59,7 @@ describe('z.user.UserRepository', () => {
 
       it('sets the connection status to cancelled', done => {
         TestFactory.user_repository
-          .cancel_connection_request(user_et)
+          .cancelConnectionRequest(user_et)
           .then(() => {
             expect(TestFactory.user_repository._update_connection_status).toHaveBeenCalled();
             done();
@@ -72,7 +72,7 @@ describe('z.user.UserRepository', () => {
         amplify.subscribe(z.event.WebApp.CONVERSATION.SHOW, spy);
 
         TestFactory.user_repository
-          .cancel_connection_request(user_et, new z.entity.Conversation())
+          .cancelConnectionRequest(user_et, new z.entity.Conversation())
           .then(() => {
             expect(TestFactory.user_repository._update_connection_status).toHaveBeenCalled();
             expect(spy).toHaveBeenCalled();
