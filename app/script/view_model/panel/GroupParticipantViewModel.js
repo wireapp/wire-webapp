@@ -45,6 +45,7 @@ z.viewModel.panel.GroupParticipantViewModel = class GroupParticipantViewModel {
     });
 
     this.selectedParticipant = ko.observable(undefined);
+    this.selectedService = ko.observable(undefined);
 
     this.isVisible = ko.pureComputed(() => this.panelViewModel.groupParticipantVisible() && this.selectedParticipant());
 
@@ -90,11 +91,10 @@ z.viewModel.panel.GroupParticipantViewModel = class GroupParticipantViewModel {
 
   clickOnBack() {
     this.panelViewModel.switchState(z.viewModel.PanelViewModel.STATE.CONVERSATION_DETAILS);
-    this.selectedParticipant(undefined);
   }
 
   clickOnClose() {
-    this.panelViewModel.closePanel().then(() => this.selectedParticipant(undefined));
+    this.panelViewModel.closePanel().then(() => this.resetView());
   }
 
   clickOnDevices() {
@@ -132,7 +132,7 @@ z.viewModel.panel.GroupParticipantViewModel = class GroupParticipantViewModel {
   clickToRemove() {
     this.actionsViewModel
       .removeFromConversation(this.conversationEntity(), this.selectedParticipant())
-      .then(() => this.clickOnBack());
+      .then(() => this.panelViewModel.switchState(z.viewModel.PanelViewModel.STATE.CONVERSATION_DETAILS));
   }
 
   clickToSendRequest() {
@@ -143,12 +143,16 @@ z.viewModel.panel.GroupParticipantViewModel = class GroupParticipantViewModel {
     this.actionsViewModel.unblockUser(this.selectedParticipant(), false);
   }
 
-  showGroupParticipant(userEntity) {
+  resetView() {
     this.selectedParticipant(undefined);
-    if (userEntity.isBot) {
-      return this._showService(userEntity);
-    }
+    this.selectedService(undefined);
+  }
+
+  showGroupParticipant(userEntity) {
     this.selectedParticipant(userEntity);
+    if (userEntity.isBot) {
+      this._showService(userEntity);
+    }
   }
 
   _showService(userEntity) {
@@ -157,10 +161,9 @@ z.viewModel.panel.GroupParticipantViewModel = class GroupParticipantViewModel {
     this.integrationRepository
       .getServiceById(providerId, serviceId)
       .then(serviceEntity => {
-        serviceEntity.isBot = true;
-        this.selectedParticipant(serviceEntity);
+        this.selectedService(serviceEntity);
         return this.integrationRepository.getProviderById(providerId);
       })
-      .then(providerEntity => this.selectedParticipant().providerName(providerEntity.name));
+      .then(providerEntity => this.selectedService().providerName(providerEntity.name));
   }
 };
