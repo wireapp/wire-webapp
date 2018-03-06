@@ -29,7 +29,7 @@ class HttpClient {
     logger: console,
     markdown: false,
   });
-  private requestQueue: PriorityQueue<number>;
+  private requestQueue: PriorityQueue;
 
   constructor(private baseURL: string, public accessTokenStore: AccessTokenStore) {
     this.requestQueue = new PriorityQueue({
