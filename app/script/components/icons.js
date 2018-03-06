@@ -62,7 +62,7 @@ ko.components.register('check-icon', {
 ko.components.register('close-icon', {
   template: `
   <svg width="14" height="14" viewBox="0 0 14 14">
-    <path id="a" d="M1.41 13.31l5.25-5.24 5.24 5.24 1.41-1.41-5.24-5.24 5.24-5.25L11.9 0 6.66 5.24 1.41 0 0 1.41l5.24 5.25L0 11.9z"></path>
+    <path d="M1.41 13.31l5.25-5.24 5.24 5.24 1.41-1.41-5.24-5.24 5.24-5.25L11.9 0 6.66 5.24 1.41 0 0 1.41l5.24 5.25L0 11.9z"></path>
   </svg>
   `,
 });
@@ -134,7 +134,7 @@ ko.components.register('link-icon', {
 ko.components.register('leave-icon', {
   template: `
   <svg width="16" height="16" viewBox="0 0 16 16">
-    <path id="a" d="M2 14h7v2H0V0h9v2H2v12zm3-7v2h7v4l4-5-4-5v4H5z"></path>
+    <path d="M2 14h7v2H0V0h9v2H2v12zm3-7v2h7v4l4-5-4-5v4H5z"></path>
   </svg>
   `,
 });
