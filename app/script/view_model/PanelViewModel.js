@@ -212,9 +212,18 @@ z.viewModel.PanelViewModel = class PanelViewModel {
   }
 
   _hidePanel() {
-    const isStateGroupParticipant = this.state() === PanelViewModel.STATE.GROUP_PARTICIPANT;
-    if (isStateGroupParticipant) {
-      this.groupParticipant.resetView();
+    switch (this.state()) {
+      case PanelViewModel.STATE.ADD_PARTICIPANTS:
+        this.addParticipants.resetView();
+        break;
+      case PanelViewModel.STATE.GROUP_PARTICIPANT:
+        this.groupParticipant.resetView();
+        break;
+      case PanelViewModel.STATE.PARTICIPANT_DEVICES:
+        this.participantDevices.resetView();
+        break;
+      default:
+        break;
     }
 
     this.previousState(this.state());
