@@ -55,6 +55,7 @@ z.viewModel.PanelViewModel = class PanelViewModel {
     this.enableIntegrations = this.integrationRepository.enableIntegrations;
 
     this.isVisible = ko.observable(false);
+    this.exitingState = ko.observable(undefined);
     this.state = ko.observable(PanelViewModel.STATE.CONVERSATION_DETAILS);
     this.previousState = ko.observable();
 
@@ -98,7 +99,8 @@ z.viewModel.PanelViewModel = class PanelViewModel {
 
   _isStateVisible(state) {
     const isStateVisible = this.state() === state;
-    return isStateVisible && this.isVisible();
+    const isStateExiting = this.exitingState() === state;
+    return (isStateExiting || isStateVisible) && this.isVisible();
   }
 
   closePanel() {
@@ -165,10 +167,21 @@ z.viewModel.PanelViewModel = class PanelViewModel {
   }
 
   switchState(newState) {
-    const stateUnchanged = newState === this.state();
-    if (!stateUnchanged) {
-      this._hidePanel();
-      this._showPanel(newState);
+    const stateChanged = newState !== this.state();
+    if (stateChanged) {
+      this.exitingState(this.state());
+      const oldPanel = $(`#${this._getElementIdOfPanel(this.state())}`);
+      const newPanel = this._showPanel(newState);
+      if (newPanel) {
+        newPanel.addClass('panel__page--move-in');
+      }
+      oldPanel.addClass('panel__page--move-out');
+      window.setTimeout(() => {
+        if (newPanel) {
+          newPanel.removeClass('panel__page--move-in');
+        }
+        this._hidePanel(this.exitingState());
+      }, 1000);
     }
   }
 
@@ -211,8 +224,8 @@ z.viewModel.PanelViewModel = class PanelViewModel {
     }
   }
 
-  _hidePanel() {
-    switch (this.state()) {
+  _hidePanel(state) {
+    switch (state) {
       case PanelViewModel.STATE.ADD_PARTICIPANTS:
         this.addParticipants.resetView();
         break;
@@ -226,13 +239,15 @@ z.viewModel.PanelViewModel = class PanelViewModel {
         break;
     }
 
-    this.previousState(this.state());
+    this.previousState(state);
+    this.exitingState(undefined);
 
-    const panelStateElementId = this._getElementIdOfPanel(this.state());
-    $(`#${panelStateElementId}`).removeClass('panel__page--visible');
+    const panelStateElementId = this._getElementIdOfPanel(state);
+    $(`#${panelStateElementId}`).removeClass('panel__page--visible panel__page--move-out');
   }
 
   _openPanel(newState) {
+    this.exitingState(undefined);
     this.switchState(newState);
     this.isVisible(true);
     this.mainViewModel.openPanel();
@@ -243,7 +258,7 @@ z.viewModel.PanelViewModel = class PanelViewModel {
 
     const panelStateElementId = this._getElementIdOfPanel(newPanelState);
     if (panelStateElementId) {
-      $(`#${panelStateElementId}`).addClass('panel__page--visible');
+      return $(`#${panelStateElementId}`).add('panel__page--visible');
     }
   }
 };

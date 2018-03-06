@@ -23,6 +23,22 @@
   &__page {
     display: flex;
     flex-direction: column;
+    transform: translateX(0);
+
+    &--move-out,
+    &--move-in {
+      transition: transform 1s ease-in-out;
+      transform: translateX(-304px);
+    }
+
+    &--move-in {
+      opacity: 1;
+      height: 100%;
+      right: -304px;
+      width: 304px;
+      position: absolute;
+      top: 0;
+    }
 
     &--visible {
       opacity: 1;
