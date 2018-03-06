@@ -56,7 +56,7 @@ z.viewModel.PanelViewModel = class PanelViewModel {
 
     this.isVisible = ko.observable(false);
     this.state = ko.observable(PanelViewModel.STATE.CONVERSATION_DETAILS);
-    this.previousState = undefined;
+    this.previousState = ko.observable();
 
     this.addParticipantsVisible = ko.pureComputed(() => this._isStateVisible(PanelViewModel.STATE.ADD_PARTICIPANTS));
     this.conversationDetailsVisible = ko.pureComputed(() => {
@@ -212,7 +212,12 @@ z.viewModel.PanelViewModel = class PanelViewModel {
   }
 
   _hidePanel() {
-    this.previousState = this.state();
+    const isStateGroupParticipant = this.state() === PanelViewModel.STATE.GROUP_PARTICIPANT;
+    if (isStateGroupParticipant) {
+      this.groupParticipant.resetView();
+    }
+
+    this.previousState(this.state());
 
     const panelStateElementId = this._getElementIdOfPanel(this.state());
     $(`#${panelStateElementId}`).removeClass('panel__page--visible');
