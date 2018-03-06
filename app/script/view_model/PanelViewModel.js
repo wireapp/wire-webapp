@@ -167,27 +167,30 @@ z.viewModel.PanelViewModel = class PanelViewModel {
   }
 
   switchState(newState, fromLeft = false, skipTransition = false) {
-    const stateChanged = newState !== this.state();
-    if (stateChanged) {
-      if (skipTransition) {
-        this._hidePanel(this.state());
-        this._showPanel(newState);
-        return;
-      }
-      this.exitingState(this.state());
-      const oldPanel = $(`#${this._getElementIdOfPanel(this.state())}`);
-      const newPanel = this._showPanel(newState);
-      if (newPanel) {
-        newPanel.addClass(fromLeft ? 'panel__page--move-in--left' : 'panel__page--move-in--right');
-      }
-      oldPanel.addClass(fromLeft ? 'panel__page--move-out--left' : 'panel__page--move-out--right');
-      window.setTimeout(() => {
-        if (newPanel) {
-          newPanel.removeClass('panel__page--move-in--left panel__page--move-in--right');
-        }
-        this._hidePanel(this.exitingState());
-      }, 350);
+    const stateUnchanged = newState === this.state();
+
+    if (stateUnchanged) {
+      return;
     }
+
+    if (skipTransition) {
+      this._hidePanel(this.state());
+      this._showPanel(newState);
+      return;
+    }
+
+    this.exitingState(this.state());
+
+    const oldPanel = $(`#${this._getElementIdOfPanel(this.state())}`);
+    const newPanel = this._showPanel(newState);
+
+    newPanel.addClass(fromLeft ? 'panel__page--move-in--left' : 'panel__page--move-in--right');
+    oldPanel.addClass(fromLeft ? 'panel__page--move-out--left' : 'panel__page--move-out--right');
+
+    window.setTimeout(() => {
+      newPanel.removeClass('panel__page--move-in--left panel__page--move-in--right');
+      this._hidePanel(this.exitingState());
+    }, z.motion.MotionDuration.MEDIUM);
   }
 
   togglePanel(addPeople = false) {
@@ -248,9 +251,8 @@ z.viewModel.PanelViewModel = class PanelViewModel {
     this.exitingState(undefined);
 
     const panelStateElementId = this._getElementIdOfPanel(state);
-    $(`#${panelStateElementId}`).removeClass(
-      'panel__page--visible panel__page--move-out--left panel__page--move-out--right'
-    );
+    const exitPanel = $(`#${panelStateElementId}`);
+    exitPanel.removeClass('panel__page--visible panel__page--move-out--left panel__page--move-out--right');
   }
 
   _openPanel(newState) {

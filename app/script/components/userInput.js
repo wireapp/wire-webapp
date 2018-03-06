@@ -34,6 +34,7 @@ z.components.UserInput = class UserInput {
     this.element = componentInfo.element;
     this.innerElement = $(this.element).find('.search-inner');
     this.inputElement = $(this.element).find('.search-input');
+
     this.hasFocus = ko.observable(false);
     if (params.focusDelay) {
       window.setTimeout(() => this.hasFocus(true), params.focusDelay);
