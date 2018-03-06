@@ -17,14 +17,12 @@
       <div class="add-participants__list panel__content">
         <div class="panel__content__scroll" data-bind="antiscroll: shouldUpdateScrollbar">
           <!-- ko if: isAddState() -->
-            <div>
-              <!-- ko if: isStateAddPeople() -->
-                <user-list class="user-list-light" params="user: contacts, filter: searchInput, selected: selectedContacts"></user-list>
-              <!-- /ko -->
-              <!-- ko if: isStateAddService() -->
-                <service-list class="service-list-light" params="services: services, click: clickOnSelectService, isSearching: isSearching"></service-list>
-              <!-- /ko -->
-            </div>
+            <!-- ko if: isStateAddPeople() -->
+              <user-list class="user-list-light" params="user: contacts, filter: searchInput, selected: selectedContacts"></user-list>
+            <!-- /ko -->
+            <!-- ko if: isStateAddService() -->
+              <service-list class="service-list-light" params="services: services, click: clickOnSelectService, isSearching: isSearching"></service-list>
+            <!-- /ko -->
           <!-- /ko -->
         </div>
       </div>
