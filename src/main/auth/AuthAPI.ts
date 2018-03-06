@@ -21,7 +21,7 @@ import {User} from '../user';
 import {AccessTokenData, LoginData} from '../auth';
 import {AxiosPromise, AxiosRequestConfig, AxiosResponse} from 'axios';
 import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine';
-import {retrieveCookie, sendRequestWithCookie} from '../shims/node/cookie';
+import {sendRequestWithCookie} from '../shims/node/cookie';
 import {HttpClient} from '../http';
 
 class AuthAPI {
@@ -67,7 +67,7 @@ class AuthAPI {
     return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
   }
 
-  public postLogin(login: LoginData): Promise<AccessTokenData> {
+  public postLogin(login: LoginData): Promise<AxiosResponse<any>> {
     login.password = String(login.password);
     const config: AxiosRequestConfig = {
       data: login.email
@@ -87,8 +87,7 @@ class AuthAPI {
       withCredentials: true,
     };
 
-    // TODO: "retrieveCookie" will also save the cookie. At this point in time, a FileStoreEngine would be not initialized, which is a problem.
-    return this.client.sendJSON(config).then((response: AxiosResponse) => retrieveCookie(response, this.engine));
+    return this.client.sendJSON(config).then((response: AxiosResponse) => response);
   }
 
   public postLogout(): AxiosPromise {

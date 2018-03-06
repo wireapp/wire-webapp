@@ -20,6 +20,7 @@ import {Config} from './Config';
 import {AccessTokenData, AuthAPI, Context, LoginData, RegisterData, AUTH_TABLE_NAME} from './auth';
 import {AccessTokenStore} from './auth/';
 import {AssetAPI} from './asset/';
+import {AxiosResponse} from 'axios';
 import {Backend} from './env';
 import {ClientAPI, ClientType} from './client/';
 import {ConnectionAPI} from './connection/';
@@ -32,6 +33,7 @@ import {SelfAPI} from './self/';
 import {UserAPI} from './user/';
 import {WebSocketClient} from './tcp/';
 import {User} from './user';
+import {retrieveCookie} from './shims/node/cookie';
 
 class Client {
   private STORE_NAME_PREFIX: string = 'wire';
@@ -141,18 +143,22 @@ class Client {
   public login(loginData: LoginData): Promise<Context> {
     let context: Context;
     let accessToken: AccessTokenData;
+    let cookieResponse: AxiosResponse;
+
     return Promise.resolve()
       .then(() => this.context && this.logout())
       .then(() => this.auth.api.postLogin(loginData))
-      .then((createdAccessToken: AccessTokenData) => {
+      .then((response: AxiosResponse<any>) => {
+        cookieResponse = response;
+        accessToken = response.data;
         context = this.createContext(
-          createdAccessToken.user,
+          accessToken.user,
           undefined,
           loginData.persist ? ClientType.PERMANENT : ClientType.TEMPORARY
         );
-        accessToken = createdAccessToken;
       })
       .then(() => this.initEngine(context))
+      .then(() => retrieveCookie(cookieResponse, this.config.store))
       .then(() => this.accessTokenStore.updateToken(accessToken))
       .then(() => context);
   }
