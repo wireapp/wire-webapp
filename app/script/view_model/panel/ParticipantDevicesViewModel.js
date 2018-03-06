@@ -118,6 +118,9 @@ z.viewModel.panel.ParticipantDevicesViewModel = class ParticipantDevicesViewMode
         }
       });
     });
+    this.shouldUpdateScrollbar = ko
+      .computed(() => this.clientEntities() && this.showDeviceDetails() && this.isVisible())
+      .extend({notify: 'always', rateLimit: 500});
   }
 
   clickOnBack() {
@@ -138,7 +141,7 @@ z.viewModel.panel.ParticipantDevicesViewModel = class ParticipantDevicesViewMode
   }
 
   clickOnClose() {
-    this.panelViewModel.closePanel().then(() => this._resetView());
+    this.panelViewModel.closePanel().then(() => this.resetView());
   }
 
   clickOnDevice(clientEntity) {
@@ -178,7 +181,7 @@ z.viewModel.panel.ParticipantDevicesViewModel = class ParticipantDevicesViewMode
     this.userEntity(userEntity);
   }
 
-  _resetView() {
+  resetView() {
     this.showSelfFingerprint(false);
     this.selectedClient(undefined);
     this.deviceMode(ParticipantDevicesViewModel.STATE.REQUESTING);

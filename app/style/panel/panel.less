@@ -34,6 +34,17 @@
     }
   }
 
+  &__content {
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    &__scroll {
+      width: 100%;
+      overflow-x: hidden;
+      overflow-y: scroll;
+    }
+  }
+
   &__action-item {
     height: 48px;
     border-bottom: 1px solid fade(@graphite-dark, 8%);
@@ -78,6 +89,7 @@
 
   &__header {
     height: @content-title-bar-height;
+    min-height: @content-title-bar-height;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -91,6 +103,10 @@
       font-size: 12px;
       font-weight: @font-weight-bold;
       text-transform: uppercase;
+    }
+
+    &--reverse {
+      flex-direction: row-reverse;
     }
   }
 }

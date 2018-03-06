@@ -101,7 +101,7 @@ z.viewModel.panel.AppParticipantsViewModel = class AppParticipantsViewModel {
     });
 
     this.shouldUpdateScrollbar = ko
-      .computed(() => this.contacts() || this.searchInput())
+      .computed(() => (this.contacts() || this.searchInput()) && this.isVisible())
       .extend({notify: 'always', rateLimit: 500});
 
     this.searchInput.subscribe(searchInput => this.searchServices(searchInput));
@@ -122,7 +122,7 @@ z.viewModel.panel.AppParticipantsViewModel = class AppParticipantsViewModel {
   }
 
   clickOnClose() {
-    this.panelViewModel.closePanel().then(() => this._resetView());
+    this.panelViewModel.closePanel().then(() => this.resetView());
   }
 
   clickOnSelectService(serviceEntity) {
@@ -140,6 +140,13 @@ z.viewModel.panel.AppParticipantsViewModel = class AppParticipantsViewModel {
     }
 
     this._switchToConversationDetails();
+  }
+
+  resetView() {
+    this.state(AppParticipantsViewModel.STATE.ADD_PEOPLE);
+    this.selectedContacts.removeAll();
+    this.selectedService(undefined);
+    this.searchInput('');
   }
 
   searchServices(query) {
@@ -178,15 +185,8 @@ z.viewModel.panel.AppParticipantsViewModel = class AppParticipantsViewModel {
     this.integrationRepository.addService(this.conversationEntity(), this.selectedService(), 'conversation_details');
   }
 
-  _resetView() {
-    this.state(AppParticipantsViewModel.STATE.ADD_PEOPLE);
-    this.selectedContacts.removeAll();
-    this.selectedService(undefined);
-    this.searchInput('');
-  }
-
   _switchToConversationDetails() {
     this.panelViewModel.switchState(z.viewModel.PanelViewModel.STATE.CONVERSATION_DETAILS);
-    this._resetView();
+    this.resetView();
   }
 };
