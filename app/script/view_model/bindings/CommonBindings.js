@@ -332,7 +332,6 @@ ko.subscribable.fn.subscribe_once = function(handler, owner, event_name) {
 /**
  * Render antiscroll scrollbar.
  */
-
 ko.bindingHandlers.antiscroll = {
   init(element, valueAccessor) {
     let trigger_subscription;
