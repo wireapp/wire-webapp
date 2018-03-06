@@ -97,7 +97,7 @@ z.components.UserList = class UserList {
 ko.components.register('user-list', {
   template: `
     <div class="search-list" data-bind="css: cssClasses(), foreach: {data: filteredUserEntities}">
-      <participant-item params="participant: $data, canSelect: $parent.isSelectEnabled, isSelected: $parent.isSelected($data)" data-bind="click: $parent.onUserClick, css: {'no-underline': $parent.altStyle, 'show-arrow': $parent.altStyle}"></participant-item>
+      <participant-item params="participant: $data, canSelect: $parent.isSelectEnabled, isSelected: $parent.isSelected($data), mode: $parent.mode" data-bind="click: $parent.onUserClick, css: {'no-underline': $parent.altStyle, 'show-arrow': $parent.altStyle}"></participant-item>
     </div>
 
     <!-- ko if: typeof filter === 'function' -->

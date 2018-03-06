@@ -28,6 +28,13 @@
   &:not(left-list-is-visible) {
     .start-ui-transition-fadeout;
   }
+
+  group-list,
+  top-people {
+    & > div {
+      padding: 0 16px;
+    }
+  }
 }
 
 .start-ui-header {
@@ -106,10 +113,11 @@
 .start-ui-invite-people {
   position: relative;
   padding: 0;
-  margin: 0 0 -16px 0;
+  margin: 0;
   overflow: hidden;
   .left-list-item {
     height: 56px;
+    min-height: 56px;
     line-height: 56px;
   }
 
