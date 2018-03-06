@@ -25,19 +25,29 @@
     flex-direction: column;
     transform: translateX(0);
 
-    &--move-out,
-    &--move-in {
-      transition: transform 1s ease-in-out;
+    &--move-out--left,
+    &--move-in--left {
+      transition: transform @animation-timing-fast @ease-out-expo;
+      transform: translateX(304px);
+    }
+
+    &--move-out--right,
+    &--move-in--right {
+      transition: transform @animation-timing-fast @ease-out-expo;
       transform: translateX(-304px);
     }
 
-    &--move-in {
-      opacity: 1;
-      height: 100%;
-      right: -304px;
-      width: 304px;
+    &--move-in--left,
+    &--move-in--right {
       position: absolute;
+      width: 304px;
       top: 0;
+    }
+    &--move-in--left {
+      right: 304px;
+    }
+    &--move-in--right {
+      right: -304px;
     }
 
     &--visible {
