@@ -171,8 +171,8 @@ z.viewModel.PanelViewModel = class PanelViewModel {
       return this._openPanel(newState);
     }
 
-    const isStateUnchanged = newState === this.state();
-    if (isStateUnchanged) {
+    const isStateChange = newState !== this.state();
+    if (!isStateChange) {
       return;
     }
 
