@@ -17,43 +17,26 @@
  *
  */
 
-import React, {Component} from 'react';
+import React from 'react';
 import {connect} from 'react-redux';
 import {injectIntl} from 'react-intl';
-import Cookies from 'js-cookie';
 import {appAlreadyOpenStrings} from '../../strings';
+import * as CookieAction from '../module/action/CookieAction';
 // import {APP_INSTANCE_ID} from '../config';
-import {H3, Button, Container, COLOR, Columns, Column, Modal, Text} from '@wireapp/react-ui-kit';
+import {H3, Button, Container, Columns, Column, Modal, Text} from '@wireapp/react-ui-kit';
+import * as CookieSelector from '../module/selector/CookieSelector';
 
-const COOKIE_NAME_APP_OPENED = 'app_opened';
-
-class AppAlreadyOpen extends Component {
-  state = {
-    cookie: Cookies.get(COOKIE_NAME_APP_OPENED),
-    isAppAlreadyOpen: !!Cookies.get(COOKIE_NAME_APP_OPENED),
-  };
-
-  onClose = () => this.setState({...this.state, isAppAlreadyOpen: false});
-
-  onContinue = () => this.setState({...this.state, isAppAlreadyOpen: false});
-
-  onCancel = () => this.setState({...this.state, isAppAlreadyOpen: false});
-
+class AppAlreadyOpen extends React.Component {
+  onContinue = () => {};
   render = () => {
-    const {intl: {formatMessage: _}} = this.props;
-    const {isAppAlreadyOpen} = this.state;
+    const {isAppAlreadyOpen, intl: {formatMessage: _}} = this.props;
     return (
       isAppAlreadyOpen && (
-        <Modal onClose={this.onClose}>
+        <Modal>
           <Container style={{maxWidth: '400px'}}>
             <H3 style={{fontWeight: '500'}}>{_(appAlreadyOpenStrings.headline)}</H3>
             <Text>{_(appAlreadyOpenStrings.text)}</Text>
             <Columns style={{marginTop: '20px'}}>
-              <Column style={{textAlign: 'center'}}>
-                <Button onClick={this.onCancel} backgroundColor={COLOR.GRAY}>
-                  {_(appAlreadyOpenStrings.cancelButton)}
-                </Button>
-              </Column>
               <Column style={{textAlign: 'center'}}>
                 <Button onClick={this.onContinue}>{_(appAlreadyOpenStrings.continueButton)}</Button>
               </Column>
@@ -65,4 +48,11 @@ class AppAlreadyOpen extends Component {
   };
 }
 
-export default injectIntl(connect(state => ({}))(AppAlreadyOpen));
+export default injectIntl(
+  connect(
+    state => ({
+      isAppAlreadyOpen: CookieSelector.isAppAlreadyOpen(state),
+    }),
+    {...CookieAction}
+  )(AppAlreadyOpen)
+);

@@ -33,38 +33,48 @@ import {connect} from 'react-redux';
 import de from 'react-intl/locale-data/de';
 import ROUTE from '../route';
 import SUPPORTED_LOCALE from '../supportedLocales';
+import * as CookieAction from '../module/action/CookieAction';
 
 addLocaleData([...de]);
 
-function loadLanguage(language) {
-  if (SUPPORTED_LOCALE.includes(language)) {
-    return require(`../../../i18n/webapp-${language}.json`);
-  }
-  return {};
+class Root extends React.Component {
+  componentDidMount = () => this.props.startPolling();
+
+  componentWillUnmount = () => this.props.stopPolling();
+
+  loadLanguage = language => {
+    if (SUPPORTED_LOCALE.includes(language)) {
+      return require(`../../../i18n/webapp-${language}.json`);
+    }
+    return {};
+  };
+
+  render = () => {
+    const {language} = this.props;
+    return (
+      <IntlProvider locale={language} messages={this.loadLanguage(language)}>
+        <StyledApp>
+          <Router hashType="noslash">
+            <Content>
+              <Switch>
+                <Route exact path={ROUTE.INDEX} component={Index} />
+                <Route path={ROUTE.CONVERSATION_JOIN} component={ConversationJoin} />
+                <Route path={ROUTE.CREATE_TEAM} component={TeamName} />
+                <Route path={ROUTE.CREATE_TEAM_ACCOUNT} component={CreateAccount} />
+                <Route path={ROUTE.CREATE_ACCOUNT} component={CreatePersonalAccount} />
+                <Route path={`${ROUTE.INVITE}/:invitationCode`} component={CreatePersonalAccount} />
+                <Route path={ROUTE.INVITE} component={CreatePersonalAccount} />
+                <Route path={ROUTE.VERIFY} component={Verify} />
+                <Route path={ROUTE.INITIAL_INVITE} component={InitialInvite} />
+                <Route path={ROUTE.CHOOSE_HANDLE} component={ChooseHandle} />
+                <Redirect to={ROUTE.INDEX} />
+              </Switch>
+            </Content>
+          </Router>
+        </StyledApp>
+      </IntlProvider>
+    );
+  };
 }
 
-const Root = ({language}) => (
-  <IntlProvider locale={language} messages={loadLanguage(language)}>
-    <StyledApp>
-      <Router hashType="noslash">
-        <Content>
-          <Switch>
-            <Route exact path={ROUTE.INDEX} component={Index} />
-            <Route path={ROUTE.CONVERSATION_JOIN} component={ConversationJoin} />
-            <Route path={ROUTE.CREATE_TEAM} component={TeamName} />
-            <Route path={ROUTE.CREATE_TEAM_ACCOUNT} component={CreateAccount} />
-            <Route path={ROUTE.CREATE_ACCOUNT} component={CreatePersonalAccount} />
-            <Route path={`${ROUTE.INVITE}/:invitationCode`} component={CreatePersonalAccount} />
-            <Route path={ROUTE.INVITE} component={CreatePersonalAccount} />
-            <Route path={ROUTE.VERIFY} component={Verify} />
-            <Route path={ROUTE.INITIAL_INVITE} component={InitialInvite} />
-            <Route path={ROUTE.CHOOSE_HANDLE} component={ChooseHandle} />
-            <Redirect to={ROUTE.INDEX} />
-          </Switch>
-        </Content>
-      </Router>
-    </StyledApp>
-  </IntlProvider>
-);
-
-export default connect(({languageState}) => ({language: languageState.language}))(Root);
+export default connect(({languageState}) => ({language: languageState.language}), {...CookieAction})(Root);

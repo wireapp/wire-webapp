@@ -17,20 +17,8 @@
  *
  */
 
-import authReducer from './authReducer';
-import cookieReducer from './cookieReducer';
-import conversationReducer from './conversationReducer';
-import inviteReducer from './inviteReducer';
-import languageReducer from './languageReducer';
-import selfReducer from './selfReducer';
+export const COOKIE_NAME_APP_OPENED = 'app_opened';
 
-const reducers = {
-  authState: authReducer,
-  conversationState: conversationReducer,
-  cookieState: cookieReducer,
-  inviteState: inviteReducer,
-  languageState: languageReducer,
-  selfState: selfReducer,
-};
-
-export default reducers;
+export const isAppAlreadyOpen = state => !!state.cookieState.cookies[COOKIE_NAME_APP_OPENED];
+export const isFetching = state => state.cookieState.fetching;
+export const getError = state => state.cookieState.error;
