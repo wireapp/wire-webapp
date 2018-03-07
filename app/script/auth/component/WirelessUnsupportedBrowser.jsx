@@ -18,25 +18,33 @@
  */
 
 import {H2, H3, Container, COLOR} from '@wireapp/react-ui-kit';
-import {conversationJoinStrings} from '../../strings';
+import {unsupportedJoinStrings} from '../../strings';
 import WirelessContainer from './WirelessContainer';
 import {connect} from 'react-redux';
 import {injectIntl, FormattedHTMLMessage} from 'react-intl';
 import Runtime from '../Runtime';
 import React from 'react';
 
+const runtime = new Runtime();
+
 export const WirelessUnsupportedBrowser = ({children, intl: {formatMessage: _}}) =>
-  new Runtime().isSupportedBrowser() ? (
+  runtime.isSupportedBrowser() ? (
     children
   ) : (
     <WirelessContainer>
       <Container verticalCenter>
         <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}} color={COLOR.GRAY}>
-          <FormattedHTMLMessage {...conversationJoinStrings.unsupportedJoinHeadline} />
+          <FormattedHTMLMessage {...unsupportedJoinStrings.unsupportedJoinHeadline} />
         </H2>
-        <H3 style={{marginBottom: '10px'}}>
-          <FormattedHTMLMessage {...conversationJoinStrings.unsupportedJoinSubhead} />
-        </H3>
+        {runtime.isMobileOs() ? (
+          <H3 style={{marginBottom: '10px'}}>
+            <FormattedHTMLMessage {...unsupportedJoinStrings.unsupportedJoinMobileSubhead} />
+          </H3>
+        ) : (
+          <H3 style={{marginBottom: '10px'}}>
+            <FormattedHTMLMessage {...unsupportedJoinStrings.unsupportedJoinSubhead} />
+          </H3>
+        )}
       </Container>
     </WirelessContainer>
   );

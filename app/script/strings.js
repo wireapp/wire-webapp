@@ -209,15 +209,7 @@ export const appAlreadyOpenStrings = defineMessages({
   },
 });
 
-export const conversationJoinStrings = defineMessages({
-  headline: {
-    id: 'conversationJoin.headline',
-    defaultMessage: 'You have been invited <br />to join a <b style="color: black;">Wire guest room.</b>',
-  },
-  subhead: {
-    id: 'conversationJoin.subhead',
-    defaultMessage: 'Encrypted group messaging and conference calls. <br />No account necessary.',
-  },
+export const unsupportedJoinStrings = defineMessages({
   unsupportedJoinHeadline: {
     id: 'conversationJoin.unsupportedJoinHeadline',
     defaultMessage: 'You have been invited <br />to join a <b style="color: black;">Wire guest room.</b>',
@@ -226,6 +218,21 @@ export const conversationJoinStrings = defineMessages({
     id: 'conversationJoin.unsupportedJoinSubhead',
     defaultMessage:
       'This browser is not supported.<br />Download the latest version of <b>Google Chrome, Mozilla Firefox, Opera</b> or <b>Microsoft Edge.</b>',
+  },
+  unsupportedJoinMobileSubhead: {
+    id: 'conversationJoin.unsupportedJoinMobileSubhead',
+    defaultMessage: 'Open this link on your computer.',
+  },
+});
+
+export const conversationJoinStrings = defineMessages({
+  headline: {
+    id: 'conversationJoin.headline',
+    defaultMessage: 'You have been invited <br />to join a <b style="color: black;">Wire guest room.</b>',
+  },
+  subhead: {
+    id: 'conversationJoin.subhead',
+    defaultMessage: 'Encrypted group messaging and conference calls. <br />No account necessary.',
   },
   existentAccountSubhead: {
     id: 'conversationJoin.subheadExistentAccount',

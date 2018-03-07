@@ -95,6 +95,6 @@ export default class Runtime {
   isLinux = () => OS.DESKTOP.LINUX.includes(this.getOSFamily());
 
   isMobileOs = () => this.isAndroid() || this.isIOS();
-  isAndroid = () => OS.MOBLIE.ANDROID.includes(this.getOSFamily());
-  isIOS = () => OS.MOBLIE.IOS.includes(this.getOSFamily());
+  isAndroid = () => OS.MOBILE.ANDROID.includes(this.getOSFamily());
+  isIOS = () => OS.MOBILE.IOS.includes(this.getOSFamily());
 }
