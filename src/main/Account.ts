@@ -383,6 +383,9 @@ class Account extends EventEmitter {
       .then((context: Context) => {
         if (initClient) {
           return this.initClient(context, loginData).then(client => {
+            if (!this.apiClient.context) {
+              throw new Error('API client does not have a context.');
+            }
             this.apiClient.context.clientId = client.id;
           });
         }
@@ -391,6 +394,10 @@ class Account extends EventEmitter {
       .then(() => {
         if (!this.service) {
           throw new Error('Services are not set.');
+        }
+
+        if (!this.apiClient.context) {
+          throw new Error('API client does not have a context.');
         }
 
         this.context = this.apiClient.context;
