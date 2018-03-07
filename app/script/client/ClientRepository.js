@@ -565,23 +565,24 @@ z.client.ClientRepository = class ClientRepository {
 
     // Find clients in database
     return this.getClientByUserIdFromDb(userId)
-      .then(results => {
+      .then(clientsFromDatabase => {
         const promises = [];
 
-        for (const result of results) {
-          if (clientsFromBackend[result.id]) {
-            const {client, wasUpdated} = this.clientMapper.updateClient(result, clientsFromBackend[result.id]);
+        for (const databaseClient of clientsFromDatabase) {
+          const backendClient = clientsFromBackend[databaseClient.id];
+          if (backendClient) {
+            const {client, wasUpdated} = this.clientMapper.updateClient(databaseClient, backendClient);
 
-            delete clientsFromBackend[result.id];
+            delete clientsFromBackend[databaseClient.id];
 
-            if (this.currentClient() && this._isCurrentClient(userId, result.id)) {
-              this.logger.warn(`Removing duplicate self client '${result.id}' locally`);
-              this.removeClient(userId, result.id);
+            if (this.currentClient() && this._isCurrentClient(userId, databaseClient.id)) {
+              this.logger.warn(`Removing duplicate self client '${databaseClient.id}' locally`);
+              this.removeClient(userId, databaseClient.id);
             }
 
             // Locally known client changed on backend
             if (wasUpdated) {
-              this.logger.info(`Updating client '${result.id}' of user '${userId}' locally`);
+              this.logger.info(`Updating client '${databaseClient.id}' of user '${userId}' locally`);
               promises.push(this.saveClientInDb(userId, client));
               continue;
             }
@@ -592,8 +593,8 @@ z.client.ClientRepository = class ClientRepository {
           }
 
           // Locally known client deleted on backend
-          this.logger.warn(`Removing client '${result.id}' of user '${userId}' locally`);
-          this.removeClient(userId, result.id);
+          this.logger.warn(`Removing client '${databaseClient.id}' of user '${userId}' locally`);
+          this.removeClient(userId, databaseClient.id);
         }
 
         for (const clientId in clientsFromBackend) {
