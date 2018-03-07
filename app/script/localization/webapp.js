@@ -498,7 +498,7 @@ z.string.participantDevicesDetailVerify = 'Verified';
 z.string.participantDevicesHeader = 'Devices';
 z.string.participantDevicesHeadline = 'Wire gives every device a unique fingerprint. Compare them with {{user}} and verify your conversation.';
 z.string.participantDevicesLearnMore = 'Learn more';
-z.string.participantDevicesWhyVerify = 'Why verify conversation?';
+z.string.participantDevicesWhyVerify = 'Why verify conversations?';
 z.string.participantDevicesOutdatedClientMessage = '{{user}} is using an old version of Wire. No devices are shown here.';
 
 z.string.participantDevicesSelfAllDevices = 'Show all my devices';
