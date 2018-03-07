@@ -373,7 +373,7 @@ z.string.tr.participantDevicesDetailVerify = 'Doğrulanmış';
 z.string.tr.participantDevicesHeader = 'Cihazlar';
 z.string.tr.participantDevicesHeadline = 'Wire her cihaza eşsiz bir parmak izi verir. {{user}} ile karşılaştırın ve konuşmayı doğrulayın.';
 z.string.tr.participantDevicesLearnMore = 'Daha fazla bilgi';
-z.string.tr.participantDevicesWhyVerify = 'Neden konuşmayı doğrulamalıyız?';
+z.string.tr.participantDevicesWhyVerify = 'Neden konuşmaları doğrulamalıyız?';
 z.string.tr.participantDevicesOutdatedClientMessage = '{{user}}, Wire’ın eski bir versiyonunu kullanıyor. Hiçbir cihaz burada gösterilmiyor.';
 
 z.string.tr.participantDevicesSelfAllDevices = 'Tüm cihazlarımı göster';

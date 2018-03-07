@@ -393,7 +393,7 @@ z.string.fr.participantDevicesDetailVerify = 'Vérifié';
 z.string.fr.participantDevicesHeader = 'Appareils';
 z.string.fr.participantDevicesHeadline = 'Wire donne à chaque appareil une empreinte unique. Comparez-les avec {{user}} et vérifiez votre conversation.';
 z.string.fr.participantDevicesLearnMore = 'En savoir plus';
-z.string.fr.participantDevicesWhyVerify = 'Pourquoi vérifier une conversation ?';
+z.string.fr.participantDevicesWhyVerify = 'Pourquoi vérifier les conversations ?';
 z.string.fr.participantDevicesOutdatedClientMessage = '{{user}} utilise une ancienne version de Wire. Aucun appareil n’est affiché ici.';
 
 z.string.fr.participantDevicesSelfAllDevices = 'Afficher tous mes appareils';

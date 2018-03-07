@@ -373,7 +373,7 @@ z.string.es.participantDevicesDetailVerify = 'Verificado';
 z.string.es.participantDevicesHeader = 'Dispositivos';
 z.string.es.participantDevicesHeadline = 'Wire proporciona a cada dispositivo una huella digital única. Comparala con {{user}} y verifica tu conversación.';
 z.string.es.participantDevicesLearnMore = 'Aprender más';
-z.string.es.participantDevicesWhyVerify = '¿Por qué verificar la conversación?';
+z.string.es.participantDevicesWhyVerify = '¿Por qué verificar las conversaciones?';
 z.string.es.participantDevicesOutdatedClientMessage = '{{user}} está utilizando una versión antigua de Wire. No se muestran dispositivos aquí.';
 
 z.string.es.participantDevicesSelfAllDevices = 'Mostrar todos mis dispositivos';

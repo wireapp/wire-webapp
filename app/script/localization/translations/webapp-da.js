@@ -348,7 +348,7 @@ z.string.da.participantDevicesDetailVerify = 'Bekræftet';
 z.string.da.participantDevicesHeader = 'Enheder';
 z.string.da.participantDevicesHeadline = 'Wire giver hver enhed et unikt fingeraftryk. Sammenlign dem med {{user}} og bekræft din samtale.';
 z.string.da.participantDevicesLearnMore = 'Lær mere';
-z.string.da.participantDevicesWhyVerify = 'Hvorfor bekræfte samtale?';
+z.string.da.participantDevicesWhyVerify = 'Hvorfor verificere samtaler?';
 z.string.da.participantDevicesOutdatedClientMessage = '{{user}} bruger en gammel version af Wire. Ingen enheder er vist her.';
 
 z.string.da.participantDevicesSelfAllDevices = 'Vis alle mine enheder';

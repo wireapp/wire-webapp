@@ -392,7 +392,7 @@ z.string.nl.participantDevicesDetailVerify = 'Geverifieerd';
 z.string.nl.participantDevicesHeader = 'Apparaten';
 z.string.nl.participantDevicesHeadline = 'Wire geeft elk apparaat een unieke vingerafdruk. Vergelijk deze met {{user}} en verifieer het gesprek.';
 z.string.nl.participantDevicesLearnMore = 'Leer meer';
-z.string.nl.participantDevicesWhyVerify = 'Waarom een gesprek verifiëren?';
+z.string.nl.participantDevicesWhyVerify = 'Waarom gesprekken verifiëren?';
 z.string.nl.participantDevicesOutdatedClientMessage = '{{user}} gebruikt een oude versie van Wire. Er worden daarom geen apparaten getoond.';
 
 z.string.nl.participantDevicesSelfAllDevices = 'Toon al mijn apparaten';

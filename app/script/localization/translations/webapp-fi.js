@@ -372,7 +372,7 @@ z.string.fi.participantDevicesDetailVerify = 'Vahvistettu';
 z.string.fi.participantDevicesHeader = 'Laitteet';
 z.string.fi.participantDevicesHeadline = 'Wire antaa jokaiselle laitteelle yksilöllisen sormenjäljen. Vertaa niitä {{user}} kanssa ja vahvista keskustelusi.';
 z.string.fi.participantDevicesLearnMore = 'Lue lisää';
-z.string.fi.participantDevicesWhyVerify = 'Miksi vahvistaa keskustelu?';
+z.string.fi.participantDevicesWhyVerify = 'Miksi vahvistaa keskusteluja?';
 z.string.fi.participantDevicesOutdatedClientMessage = '{{user}} käyttää vanhaa Wire-versiota. Laitteita ei näytetä täällä.';
 
 z.string.fi.participantDevicesSelfAllDevices = 'Näytä kaikki laitteeni';

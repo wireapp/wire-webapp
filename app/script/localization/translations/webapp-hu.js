@@ -397,7 +397,7 @@ z.string.hu.participantDevicesDetailVerify = 'Ellenőrizve';
 z.string.hu.participantDevicesHeader = 'Eszközök';
 z.string.hu.participantDevicesHeadline = 'A Wire-ben minden eszköz egyedi ujjlenyomattal rendelkezik. Hasonlítsd össze ezt az ujjlenyomatot {{user}} partnerrel és ellenőrizd a beszélgetést.';
 z.string.hu.participantDevicesLearnMore = 'További információ';
-z.string.hu.participantDevicesWhyVerify = 'Miért ellenőrizd a beszélgetést?';
+z.string.hu.participantDevicesWhyVerify = 'Miért ellenőrizd a beszélgetéseket?';
 z.string.hu.participantDevicesOutdatedClientMessage = '{{user}} a Wire régi verzióját használja. Eszközei itt nem jeleníthetőek meg.';
 
 z.string.hu.participantDevicesSelfAllDevices = 'Összes saját eszköz mutatása';

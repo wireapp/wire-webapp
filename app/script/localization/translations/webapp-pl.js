@@ -372,7 +372,7 @@ z.string.pl.participantDevicesDetailVerify = 'Zweryfikowano';
 z.string.pl.participantDevicesHeader = 'Urządzenia';
 z.string.pl.participantDevicesHeadline = 'Wire nadaje każdemu urządzeniu unikatowy odcisk palca. Porównaj go z listą urządzeń użytkownika {{user}} i sprawdź swoje rozmowy.';
 z.string.pl.participantDevicesLearnMore = 'Więcej informacji';
-z.string.pl.participantDevicesWhyVerify = 'Czemu sprawdzać rozmowy?';
+z.string.pl.participantDevicesWhyVerify = 'Dlaczego weryfikować konwersacje?';
 z.string.pl.participantDevicesOutdatedClientMessage = '{{user}} używa starszej wersji Wire. Brak urządzeń do wyświetlenia.';
 
 z.string.pl.participantDevicesSelfAllDevices = 'Pokaż wszystkie moje urządzenia';
