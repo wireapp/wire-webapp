@@ -11,7 +11,7 @@ import {UserPreKeyBundleMap} from '@wireapp/api-client/dist/commonjs/user/index'
 import {CryptographyService} from '../crypto/root';
 
 export default class ConversationService {
-  private clientID: string;
+  private clientID: string = '';
 
   constructor(
     private apiClient: APIClient,
