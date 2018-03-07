@@ -2221,8 +2221,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return response;
       })
       .catch(error => {
-        if (error.label === z.service.BackendClientError.LABEL.UNKNOWN_CLIENT) {
-          this.client_repository.removeLocalClient();
+        const isUnknownClient = error.label === z.service.BackendClientError.LABEL.UNKNOWN_CLIENT;
+        if (isUnknownClient) {
+          return this.client_repository.removeLocalClient();
         }
 
         if (!error.missing) {

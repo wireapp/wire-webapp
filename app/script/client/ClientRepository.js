@@ -658,11 +658,13 @@ z.client.ClientRepository = class ClientRepository {
   onUserEvent(eventJson, source) {
     const {type} = eventJson;
 
-    if (type === z.event.Backend.USER.CLIENT_ADD) {
+    const isClientAdd = type === z.event.Backend.USER.CLIENT_ADD;
+    if (isClientAdd) {
       return this.onClientAdd(eventJson);
     }
 
-    if (type === z.event.Backend.USER.CLIENT_REMOVE) {
+    const isClientRemove = type === z.event.Backend.USER.CLIENT_REMOVE;
+    if (isClientRemove) {
       this.onClientRemove(eventJson);
     }
   }
@@ -674,7 +676,7 @@ z.client.ClientRepository = class ClientRepository {
    */
   onClientAdd(eventJson) {
     this.logger.info('Client of self user added', eventJson);
-    amplify.publish(z.event.WebApp.CLIENT.ADD, this.selfUser().id, eventJson.client);
+    amplify.publish(z.event.WebApp.CLIENT.ADD, this.selfUser().id, eventJson.client, true);
   }
 
   /**

@@ -247,7 +247,7 @@ z.string.modalPictureFileFormatMessage = 'Please choose a PNG or JPEG file.';
 z.string.modalPictureTooLargeHeadline = 'Selected picture is too large';
 z.string.modalPictureTooLargeMessage = 'You can use pictures up to {{number}} MB.';
 
-z.string.modalPictureTooSmallMessage = 'Picture too small';
+z.string.modalPictureTooSmallHeadline = 'Picture too small';
 z.string.modalPictureTooSmallMessage = 'Please choose a picture that is at least 320 x 320 px.';
 
 z.string.modalServiceUnavailableHeadline = 'Adding service not possible';

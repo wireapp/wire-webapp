@@ -105,7 +105,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
 
       this.cryptobox.on(cryptobox.Cryptobox.TOPIC.NEW_SESSION, sessionId => {
         const {userId, clientId} = z.client.ClientEntity.dismantleUserClientId(sessionId);
-        amplify.publish(z.event.WebApp.CLIENT.ADD, userId, {id: clientId});
+        amplify.publish(z.event.WebApp.CLIENT.ADD, userId, {id: clientId}, true);
       });
     });
   }

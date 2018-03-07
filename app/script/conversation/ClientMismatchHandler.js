@@ -104,6 +104,7 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
     if (!payload || _.isEmpty(recipients)) {
       return Promise.resolve(payload);
     }
+
     this.logger.debug(`Message is missing clients of '${Object.keys(recipients).length}' users`, recipients);
 
     return this.cryptographyRepository

@@ -517,23 +517,24 @@ z.user.UserRepository = class UserRepository {
 
   /**
    * Saves a new client for the first time to the database and adds it to a user's entity.
+   *
    * @param {string} userId - ID of user
    * @param {Object} clientPayload - Payload of client which should be added to user
+   * @param {boolean} publishClient - Publish new client
    * @returns {Promise} Promise that resolves when a client and its session have been deleted
    */
-  addClientToUser(userId, clientPayload) {
+  addClientToUser(userId, clientPayload, publishClient = false) {
     return this.get_user_by_id(userId).then(userEntity => {
       const clientEntity = this.client_repository.clientMapper.mapClient(clientPayload, userEntity.is_me);
-      if (!userEntity.add_client(clientEntity)) {
-        return;
-      }
+      const wasClientAdded = userEntity.add_client(clientEntity);
 
-      return this.client_repository.saveClientInDb(userId, clientEntity.toJson()).then(() => {
-        amplify.publish(z.event.WebApp.USER.CLIENT_ADDED, userId, clientEntity);
-        if (userEntity.is_me) {
-          amplify.publish(z.event.WebApp.CLIENT.ADD_OWN_CLIENT, userId, clientEntity);
-        }
-      });
+      if (wasClientAdded) {
+        return this.client_repository.saveClientInDb(userId, clientEntity.toJson()).then(() => {
+          if (publishClient) {
+            amplify.publish(z.event.WebApp.USER.CLIENT_ADDED, userId, clientEntity);
+          }
+        });
+      }
     });
   }
 

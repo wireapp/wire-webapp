@@ -41,19 +41,23 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
    */
   onClientVerificationChanged(userId) {
     this._getActiveConversations().forEach(conversationEntity => {
-      const stateChanged = this._checkChangeToVerified(conversationEntity);
-      if (!stateChanged) {
-        this._checkChangeToDegraded(conversationEntity, userId, z.message.VerificationMessageType.UNVERIFIED);
+      const isStateChange = this._checkChangeToVerified(conversationEntity);
+      if (!isStateChange) {
+        this._checkChangeToDegraded(conversationEntity, [userId], z.message.VerificationMessageType.UNVERIFIED);
       }
     });
   }
 
   /**
-   * Self user added a client or other participants added clients.
-   * @param {string|Array<string>} userIds - Can include self user ID
+   * Self user other participants added clients.
+   * @param {string|Array<string>} userIds - One or multiple user IDs (Can include self user ID)
    * @returns {undefined} No return value
    */
   onClientAdd(userIds) {
+    if (_.isString(userIds)) {
+      userIds = [userIds];
+    }
+
     this._getActiveConversations().forEach(conversationEntity => {
       this._checkChangeToDegraded(conversationEntity, userIds, z.message.VerificationMessageType.NEW_DEVICE);
     });
@@ -83,9 +87,9 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
    */
   onClientsUpdated(userId) {
     this._getActiveConversations().forEach(conversationEntity => {
-      const stateChanged = this._checkChangeToVerified(conversationEntity);
-      if (!stateChanged) {
-        this._checkChangeToDegraded(conversationEntity, userId, z.message.VerificationMessageType.NEW_DEVICE);
+      const isStateChange = this._checkChangeToVerified(conversationEntity);
+      if (!isStateChange) {
+        this._checkChangeToDegraded(conversationEntity, [userId], z.message.VerificationMessageType.NEW_DEVICE);
       }
     });
   }
@@ -93,14 +97,10 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
   /**
    * New member(s) joined the conversation
    * @param {z.entity.Conversation} conversationEntity - Changed conversation entity
-   * @param {string|Array<string>} userIds - IDs of added members
+   * @param {Array<string>} userIds - IDs of added members
    * @returns {undefined} No return value
    */
   onMemberJoined(conversationEntity, userIds) {
-    if (_.isString(userIds)) {
-      userIds = [userIds];
-    }
-
     this._checkChangeToDegraded(conversationEntity, userIds, z.message.VerificationMessageType.NEW_MEMBER);
   }
 
@@ -138,13 +138,10 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
    * @returns {boolean} True if state changed
    */
   _checkChangeToDegraded(conversationEntity, userIds, type) {
-    if (this._willChangeToDegraded(conversationEntity)) {
-      if (_.isString(userIds)) {
-        userIds = [userIds];
-      } else {
-        const userIdsInConversation = conversationEntity.participating_user_ids().concat(conversationEntity.self.id);
-        userIds = _.intersection(userIds, userIdsInConversation);
-      }
+    const isConversationDegraded = this._willChangeToDegraded(conversationEntity);
+    if (isConversationDegraded) {
+      const userIdsInConversation = conversationEntity.participating_user_ids().concat(conversationEntity.self.id);
+      userIds = _.intersection(userIds, userIdsInConversation);
 
       if (userIds.length) {
         const event = z.conversation.EventBuilder.buildDegraded(conversationEntity, userIds, type, this.timeOffset);
