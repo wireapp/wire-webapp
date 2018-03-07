@@ -1097,6 +1097,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       case z.service.BackendClientError.LABEL.TOO_MANY_BOTS: {
         const messageText = z.l10n.text(z.string.modalServiceUnavailableMessage);
         const titleText = z.l10n.text(z.string.modalServiceUnavailableHeadline);
+
         this._showModal(messageText, titleText);
         break;
       }

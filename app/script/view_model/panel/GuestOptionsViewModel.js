@@ -58,7 +58,7 @@ z.viewModel.panel.GuestOptionsViewModel = class GuestOptionsViewModel {
   }
 
   clickOnBack() {
-    this.panelViewModel.switchState(z.viewModel.PanelViewModel.STATE.CONVERSATION_DETAILS);
+    this.panelViewModel.switchState(z.viewModel.PanelViewModel.STATE.CONVERSATION_DETAILS, true);
   }
 
   clickOnClose() {
