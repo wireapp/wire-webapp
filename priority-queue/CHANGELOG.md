@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="0.1.0"></a>
+# [0.1.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/priority-queue/compare/@wireapp/priority-queue@0.0.33...@wireapp/priority-queue@0.1.0) (2018-03-07)
+
+
+### Features
+
+* **priority-queue:** Add convenience features (delete, deleteAll & label) ([#343](https://github.com/wireapp/wire-web-packages/tree/master/packages/priority-queue/issues/343)) ([4716980](https://github.com/wireapp/wire-web-packages/tree/master/packages/priority-queue/commit/4716980))
+
+
+
+
 <a name="0.0.33"></a>
 ## 0.0.33 (2018-03-06)
 
