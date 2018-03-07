@@ -22,7 +22,6 @@ import {
   H3,
   Link,
   Small,
-  Logo,
   Form,
   Button,
   InputSubmitCombo,
@@ -30,14 +29,9 @@ import {
   RoundIconButton,
   ErrorMessage,
   Container,
-  Header,
-  Footer,
-  Content,
   COLOR,
 } from '@wireapp/react-ui-kit';
-import {Redirect} from 'react-router';
 import {conversationJoinStrings} from '../../strings';
-import {footerStrings} from '../../strings';
 import {connect} from 'react-redux';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 import * as ConversationAction from '../module/action/ConversationAction';
@@ -52,8 +46,9 @@ import React, {Component} from 'react';
 import {pathWithParams} from '../util/urlUtil';
 import {Link as RRLink} from 'react-router-dom';
 import BackendError from '../module/action/BackendError';
-import Runtime from '../Runtime';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
+import WirelessUnsupportedBrowser from '../component/WirelessUnsupportedBrowser';
+import WirelessContainer from '../component/WirelessContainer';
 
 const CONVERSATION_CODE = 'code';
 const CONVERSATION_KEY = 'key';
@@ -251,34 +246,19 @@ class ConversationJoin extends Component {
   };
 
   render() {
-    const {error, isAuthenticated, intl: {formatMessage: _}} = this.props;
+    const {error, isAuthenticated} = this.props;
     const {isValidLink, forceNewAccount} = this.state;
     return (
-      <Container
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          minHeight: '100vh',
-          width: '100%',
-        }}
-      >
-        <Header style={{height: '40px', marginLeft: '8px', marginTop: '20px'}}>
-          <Logo width={72} />
-        </Header>
-        <Content style={{flex: '1', paddingLeft: '8px', width: '520px'}}>
+      <WirelessUnsupportedBrowser>
+        <WirelessContainer>
           {isValidLink
             ? this.isConversationFullErrorPresent(error)
               ? this.renderFullConversation()
               : !isAuthenticated || forceNewAccount ? this.renderNewAnonAccount() : this.renderExistentAccount()
             : this.renderInvalidLink()}
-        </Content>
-        <Footer style={{height: '30px', justifyContent: 'flex-end', margin: '0 0 18px 8px'}}>
-          <Link href={ROUTE.WIRE_ROOT}>{_(footerStrings.wireLink)}</Link>
-          <Small> &middot; {_(footerStrings.copy)}</Small>
-        </Footer>
-        <AppAlreadyOpen />
-        {!new Runtime().isSupportedBrowser() && <Redirect to={ROUTE.UNSUPPORTED_JOIN} />}
-      </Container>
+          <AppAlreadyOpen />
+        </WirelessContainer>
+      </WirelessUnsupportedBrowser>
     );
   }
 }

@@ -32,7 +32,6 @@ export default {
   INVITE: '/invite',
   LOGIN: '/login',
   PERSONAL_INVITE: '/personalinvite',
-  UNSUPPORTED_JOIN: '/join-unsupported',
   VERIFY: '/verify',
   WIRE_ROOT: onEnvironment(stagingWebsite, stagingWebsite, 'https://wire.com'),
 };
