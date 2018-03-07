@@ -54,8 +54,8 @@ z.viewModel.PanelViewModel = class PanelViewModel {
     this.conversationEntity = repositories.conversation.active_conversation;
     this.enableIntegrations = this.integrationRepository.enableIntegrations;
 
-    this.isVisible = ko.observable(false);
     this.isAnimating = ko.observable(false);
+    this.isVisible = ko.observable(false);
     this.exitingState = ko.observable(undefined);
     this.state = ko.observable(PanelViewModel.STATE.CONVERSATION_DETAILS);
     this.previousState = ko.observable();
