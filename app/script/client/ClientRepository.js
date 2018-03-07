@@ -569,20 +569,22 @@ z.client.ClientRepository = class ClientRepository {
         const promises = [];
 
         for (const databaseClient of clientsFromDatabase) {
-          const backendClient = clientsFromBackend[databaseClient.id];
+          const clientId = databaseClient.id;
+          const backendClient = clientsFromBackend[clientId];
+
           if (backendClient) {
             const {client, wasUpdated} = this.clientMapper.updateClient(databaseClient, backendClient);
 
-            delete clientsFromBackend[databaseClient.id];
+            delete clientsFromBackend[clientId];
 
-            if (this.currentClient() && this._isCurrentClient(userId, databaseClient.id)) {
-              this.logger.warn(`Removing duplicate self client '${databaseClient.id}' locally`);
-              this.removeClient(userId, databaseClient.id);
+            if (this.currentClient() && this._isCurrentClient(userId, clientId)) {
+              this.logger.warn(`Removing duplicate self client '${clientId}' locally`);
+              this.removeClient(userId, clientId);
             }
 
             // Locally known client changed on backend
             if (wasUpdated) {
-              this.logger.info(`Updating client '${databaseClient.id}' of user '${userId}' locally`);
+              this.logger.info(`Updating client '${clientId}' of user '${userId}' locally`);
               promises.push(this.saveClientInDb(userId, client));
               continue;
             }
@@ -593,8 +595,8 @@ z.client.ClientRepository = class ClientRepository {
           }
 
           // Locally known client deleted on backend
-          this.logger.warn(`Removing client '${databaseClient.id}' of user '${userId}' locally`);
-          this.removeClient(userId, databaseClient.id);
+          this.logger.warn(`Removing client '${clientId}' of user '${userId}' locally`);
+          this.removeClient(userId, clientId);
         }
 
         for (const clientId in clientsFromBackend) {
