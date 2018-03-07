@@ -127,13 +127,15 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
 
         const pictureResource = this.participant.previewPictureResource();
         if (pictureResource) {
+          const {LARGE, X_LARGE} = ParticipantAvatar.SIZE;
+          const isSmall = this.size !== LARGE && this.size !== X_LARGE;
           const isCached = pictureResource.downloadProgress() === 100;
 
           pictureResource.get_object_url().then(url => {
             const image = new Image();
             image.src = url;
             this.element.find('.avatar-image').html(image);
-            this.element.addClass(`avatar-image-loaded ${isCached ? '' : 'avatar-loading-transition'}`);
+            this.element.addClass(`avatar-image-loaded ${isCached && isSmall ? '' : 'avatar-loading-transition'}`);
             this.avatarLoadingBlocked = false;
           });
         }
