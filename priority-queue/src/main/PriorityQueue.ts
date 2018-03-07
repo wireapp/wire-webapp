@@ -21,7 +21,7 @@ import Item from './Item';
 import Priority from './Priority';
 
 export default class PriorityQueue {
-  private defaults = {
+  private config: Config = {
     comparator: (a: Item, b: Item): Priority => {
       if (a.priority === b.priority) {
         return a.timestamp - b.timestamp;
@@ -34,11 +34,11 @@ export default class PriorityQueue {
   public isPending: boolean = false;
   private queue: Array<Item> = [];
 
-  constructor(private config?: Config) {
-    this.config = Object.assign(this.defaults, config);
+  constructor(config?: Config) {
+    this.config = Object.assign(this.config, config);
   }
 
-  public add(thunkedPromise: any, priority: Priority = Priority.MEDIUM): Promise<any> {
+  public add(thunkedPromise: any, priority: Priority = Priority.MEDIUM, label?: string): Promise<any> {
     if (typeof thunkedPromise !== 'function') {
       thunkedPromise = () => thunkedPromise;
     }
@@ -46,23 +46,28 @@ export default class PriorityQueue {
     return new Promise((resolve, reject) => {
       const queueObject = new Item();
       queueObject.fn = thunkedPromise;
+      queueObject.label = label;
       queueObject.priority = priority;
       queueObject.reject = reject;
       queueObject.resolve = resolve;
-      queueObject.retry = this.config!.maxRetries;
+      queueObject.retry = Number(this.config.maxRetries) >= 0 ? Number(this.config.maxRetries) : queueObject.retry;
       queueObject.timestamp = Date.now() + this.size;
       this.queue.push(queueObject);
-      this.queue.sort(this.config!.comparator);
+      this.queue.sort(this.config.comparator);
       this.run();
     });
   }
 
-  public get all(): Array<Item> {
-    return this.queue;
+  public delete(label: string): void {
+    this.queue = this.queue.filter(item => item.label !== label);
   }
 
-  public get size(): number {
-    return this.queue.length;
+  public deleteAll(): void {
+    this.queue = [];
+  }
+
+  public get all(): Array<Item> {
+    return this.queue;
   }
 
   public get first(): Item {
@@ -71,6 +76,10 @@ export default class PriorityQueue {
 
   public get last(): Item {
     return this.queue[this.queue.length - 1];
+  }
+
+  public get size(): number {
+    return this.queue.length;
   }
 
   private resolveItems(): void {
@@ -84,10 +93,10 @@ export default class PriorityQueue {
         return {shouldContinue: true, wrappedResolve: () => queueObject.resolve(result)};
       })
       .catch((error: Error) => {
-        if (queueObject.retry! > 0) {
-          queueObject.retry! -= 1;
+        if (queueObject.retry > 0) {
+          queueObject.retry -= 1;
           // TODO: Implement configurable reconnection delay (and reconnection delay growth factor)
-          setTimeout(() => this.resolveItems(), this.config!.retryDelay || 1000);
+          setTimeout(() => this.resolveItems(), this.config.retryDelay || 1000);
           return {shouldContinue: false};
         } else {
           queueObject.reject(error);
