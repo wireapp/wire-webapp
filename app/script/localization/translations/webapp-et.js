@@ -402,7 +402,7 @@ z.string.et.participantDevicesDetailVerify = 'Kinnitatud';
 z.string.et.participantDevicesHeader = 'Seadmed';
 z.string.et.participantDevicesHeadline = 'Wire annab igale seadmele unikaalse sõrmejälje. Võrdle neid kasutajaga {{user}} ja kinnita oma vestlus.';
 z.string.et.participantDevicesLearnMore = 'Loe lähemalt';
-z.string.et.participantDevicesWhyVerify = 'Miks vestlust kinnitada?';
+z.string.et.participantDevicesWhyVerify = 'Miks vestluste turvalisust kontrollida?';
 z.string.et.participantDevicesOutdatedClientMessage = '{{user}} kasutab vana Wire’i versiooni. Seadmete kohta puudub info.';
 
 z.string.et.participantDevicesSelfAllDevices = 'Näita kõiki mu seadmeid';
