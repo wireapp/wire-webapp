@@ -225,7 +225,7 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
         this.mediaRepository.devices_handler
           .get_screen_sources()
           .then(screenSources => {
-            const conversationEntity = this.videodCall().conversationEntity;
+            const conversationEntity = this.joinedCall().conversationEntity;
 
             const attributes = {
               conversation_type: z.tracking.helpers.get_conversation_type(conversationEntity),
