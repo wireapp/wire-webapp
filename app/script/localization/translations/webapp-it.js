@@ -364,7 +364,7 @@ z.string.it.participantDevicesDetailVerify = 'Verificato';
 z.string.it.participantDevicesHeader = 'Dispositivi';
 z.string.it.participantDevicesHeadline = 'Wire dà un’impronta unica a ogni dispositivo. Confrontale con {{user}} e verifica la tua conversazione.';
 z.string.it.participantDevicesLearnMore = 'Ulteriori informazioni';
-z.string.it.participantDevicesWhyVerify = 'Perché verificare la conversazione?';
+z.string.it.participantDevicesWhyVerify = 'Perché verificare le conversazioni?';
 z.string.it.participantDevicesOutdatedClientMessage = '{{user}} sta utilizzando una vecchia versione di Wire. Nessun dispositivo da visualizzare qui.';
 
 z.string.it.participantDevicesSelfAllDevices = 'Mostra tutti i miei dispositivi';

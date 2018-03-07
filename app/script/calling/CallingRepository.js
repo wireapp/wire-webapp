@@ -238,12 +238,10 @@ z.calling.CallingRepository = class CallingRepository {
         case z.calling.enum.CALL_MESSAGE_TYPE.SETUP: {
           this.injectActivateEvent(callMessageEntity, source);
           this.userRepository.get_user_by_id(userId).then(userEntity => {
-            const attributes = {name: userEntity.name()};
-            amplify.publish(
-              z.event.WebApp.WARNING.SHOW,
-              z.viewModel.WarningsViewModel.TYPE.UNSUPPORTED_INCOMING_CALL,
-              attributes
-            );
+            const warningOptions = {name: userEntity.name()};
+            const warningType = z.viewModel.WarningsViewModel.TYPE.UNSUPPORTED_INCOMING_CALL;
+
+            amplify.publish(z.event.WebApp.WARNING.SHOW, warningType, warningOptions);
           });
           break;
         }
@@ -1420,8 +1418,8 @@ z.calling.CallingRepository = class CallingRepository {
    * @returns {undefined} No return value
    */
   setDebugState(isDebuggingEnabled) {
-    const stateUnchanged = this.debugEnabled === isDebuggingEnabled;
-    if (!stateUnchanged) {
+    const isStateChange = this.debugEnabled !== isDebuggingEnabled;
+    if (isStateChange) {
       this.debugEnabled = isDebuggingEnabled;
       this.logger.debug(`Debugging enabled state set to '${isDebuggingEnabled}'`);
       if (!isDebuggingEnabled) {

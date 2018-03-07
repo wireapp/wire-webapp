@@ -185,8 +185,8 @@ z.viewModel.ListViewModel = class ListViewModel {
   }
 
   switchList(newListState, respectLastState = true) {
-    const stateUnchanged = this.state() === newListState;
-    if (!stateUnchanged) {
+    const isStateChange = this.state() !== newListState;
+    if (isStateChange) {
       this._hideList();
       this._updateList(newListState, respectLastState);
       this._showList(newListState);

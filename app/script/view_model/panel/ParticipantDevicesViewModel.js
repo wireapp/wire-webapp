@@ -137,7 +137,7 @@ z.viewModel.panel.ParticipantDevicesViewModel = class ParticipantDevicesViewMode
       return this.panelViewModel.showParticipant(this.userEntity());
     }
 
-    this.panelViewModel.switchState(this.previousState());
+    this.panelViewModel.switchState(this.previousState(), true);
   }
 
   clickOnClose() {

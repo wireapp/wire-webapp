@@ -131,8 +131,8 @@ z.viewModel.WindowTitleViewModel = class WindowTitleViewModel {
   setUpdateState(handlingNotifications) {
     const updateWindowTitle = handlingNotifications === z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
 
-    const updateUnchanged = this.updateWindowTitle() === updateWindowTitle;
-    if (!updateUnchanged) {
+    const isStateChange = this.updateWindowTitle() !== updateWindowTitle;
+    if (isStateChange) {
       this.updateWindowTitle(updateWindowTitle);
       this.logger.debug(`Set window title update state to '${this.updateWindowTitle()}'`);
     }
