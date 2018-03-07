@@ -408,9 +408,9 @@ z.conversation.EventMapper = class EventMapper {
   _mapEventVerification({data: eventData}) {
     const messageEntity = new z.entity.VerificationMessage();
 
-    // Database can contain non-camelcased naming. For backwards compatibility reasons we handle both.
+    // Database can contain non-camelCased naming. For backwards compatibility reasons we handle both.
     messageEntity.userIds(eventData.userIds || eventData.user_ids);
-    messageEntity.verification_message_type = eventData.type;
+    messageEntity.verificationMessageType(eventData.type);
 
     return messageEntity;
   }
