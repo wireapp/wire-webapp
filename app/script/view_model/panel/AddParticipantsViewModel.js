@@ -186,7 +186,7 @@ z.viewModel.panel.AppParticipantsViewModel = class AppParticipantsViewModel {
   }
 
   _switchToConversationDetails() {
-    this.panelViewModel.switchState(z.viewModel.PanelViewModel.STATE.CONVERSATION_DETAILS, true);
+    this.panelViewModel.switchState(z.viewModel.PanelViewModel.STATE.CONVERSATION_DETAILS, false, true);
     this.resetView();
   }
 };

@@ -166,7 +166,7 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
   }
 
   clickOnAddParticipants() {
-    this.panelViewModel.switchState(z.viewModel.PanelViewModel.STATE.ADD_PARTICIPANTS);
+    this.panelViewModel.switchState(z.viewModel.PanelViewModel.STATE.ADD_PARTICIPANTS, false, true);
   }
 
   clickOnClose() {
