@@ -1418,8 +1418,8 @@ z.calling.CallingRepository = class CallingRepository {
    * @returns {undefined} No return value
    */
   setDebugState(isDebuggingEnabled) {
-    const stateUnchanged = this.debugEnabled === isDebuggingEnabled;
-    if (!stateUnchanged) {
+    const isStateChange = this.debugEnabled !== isDebuggingEnabled;
+    if (isStateChange) {
       this.debugEnabled = isDebuggingEnabled;
       this.logger.debug(`Debugging enabled state set to '${isDebuggingEnabled}'`);
       if (!isDebuggingEnabled) {
