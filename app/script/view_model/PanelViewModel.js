@@ -167,6 +167,10 @@ z.viewModel.PanelViewModel = class PanelViewModel {
   }
 
   switchState(newState, fromLeft = false, skipTransition = false) {
+    if (!this.isVisible()) {
+      return this._openPanel(newState);
+    }
+
     const stateUnchanged = newState === this.state();
 
     if (stateUnchanged) {
@@ -257,8 +261,8 @@ z.viewModel.PanelViewModel = class PanelViewModel {
 
   _openPanel(newState) {
     this.exitingState(undefined);
-    this.switchState(newState, false, true);
     this.isVisible(true);
+    this.switchState(newState, false, true);
     this.mainViewModel.openPanel();
   }
 
