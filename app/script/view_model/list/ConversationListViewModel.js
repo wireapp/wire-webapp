@@ -130,8 +130,8 @@ z.viewModel.list.ConversationListViewModel = class ConversationListViewModel {
   setShowCallsState(handlingNotifications) {
     const shouldShowCalls = handlingNotifications === z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
 
-    const stateUnchanged = this.showCalls() === shouldShowCalls;
-    if (!stateUnchanged) {
+    const isStateChange = this.showCalls() !== shouldShowCalls;
+    if (isStateChange) {
       this.showCalls(shouldShowCalls);
       this.logger.debug(`Set show calls state to: ${this.showCalls()}`);
     }
