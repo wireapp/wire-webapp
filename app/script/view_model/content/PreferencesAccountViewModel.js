@@ -74,8 +74,8 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   _init_subscriptions() {
-    amplify.subscribe(z.event.WebApp.CLIENT.ADD_OWN_CLIENT, this.on_client_add.bind(this));
-    amplify.subscribe(z.event.WebApp.CLIENT.REMOVE, this.on_client_remove.bind(this));
+    amplify.subscribe(z.event.WebApp.USER.CLIENT_ADDED, this.onClientAdd.bind(this));
+    amplify.subscribe(z.event.WebApp.USER.CLIENT_REMOVED, this.onClientRemove.bind(this));
   }
 
   removed_from_view() {
@@ -293,17 +293,20 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     return Promise.reject(new z.user.UserError(z.user.UserError.TYPE.INVALID_UPDATE));
   }
 
-  on_client_add(user_id, client_et) {
-    amplify.publish(z.event.WebApp.SEARCH.BADGE.SHOW);
-    this.new_clients.push(client_et);
+  onClientAdd(userId, clientEntity) {
+    const isSelfUser = userId === this.self_user().id;
+    if (isSelfUser) {
+      amplify.publish(z.event.WebApp.SEARCH.BADGE.SHOW);
+      this.new_clients.push(clientEntity);
+    }
   }
 
-  on_client_remove(user_id, client_id) {
-    if (user_id === this.self_user().id) {
-      this.new_clients().forEach(client_et => {
-        if (client_et.id === client_id && client_et.isPermanent()) {
-          this.new_clients.remove(client_et);
-        }
+  onClientRemove(userId, clientId) {
+    const isSelfUser = userId === this.self_user().id;
+    if (isSelfUser) {
+      this.new_clients.remove(clientEntity => {
+        const isExpectedId = clientEntity.id === clientId;
+        return isExpectedId && clientEntity.isPermanent();
       });
 
       if (!this.new_clients().length) {

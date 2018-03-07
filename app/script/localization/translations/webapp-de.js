@@ -232,6 +232,7 @@ z.string.de.modalPictureFileFormatMessage = 'Bitte wähle eine PNG- oder JPEG-Da
 z.string.de.modalPictureTooLargeHeadline = 'Ausgewähltes Bild zu groß';
 z.string.de.modalPictureTooLargeMessage = 'Du kannst Bilder mit bis zu {{number}} MB verwenden.';
 
+z.string.de.modalPictureTooSmallHeadline = 'Ausgewähltes Bild zu klein';
 z.string.de.modalPictureTooSmallMessage = 'Wähle ein Bild mit mindestens 320 × 320 Pixeln.';
 
 z.string.de.modalServiceUnavailableHeadline = 'Hinzufügen des Dienstes nicht möglich';
@@ -274,8 +275,8 @@ z.string.de.conversationCreateYou = ' hast eine Unterhaltung mit {{users}} begon
 z.string.de.conversationDeviceStartedUsingOne = ' benutzt';
 z.string.de.conversationDeviceStartedUsingMany = ' benutzen';
 z.string.de.conversationDeviceUnverified = ' hat die Überprüfung widerrufen für';
-z.string.de.conversationDeviceYourDevices = ' deine Geräte';
-z.string.de.conversationDeviceUserDevices = ' {{users}} Geräte';
+z.string.de.conversationDeviceYourDevices = ' eines deiner Geräte';
+z.string.de.conversationDeviceUserDevices = ' ein Gerät von {{user}}';
 z.string.de.conversationDeviceNewDeviceOne = ' ein neues Gerät';
 z.string.de.conversationDeviceNewDeviceMany = ' neue Geräte';
 z.string.de.conversationDeviceNewPeopleJoined = 'Neue Personen beigetreten.';
