@@ -168,7 +168,7 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
 
 ko.components.register('participant-avatar', {
   template: `
-    <div class="participant-avatar" data-bind="attr: {title: participant.name, 'data-uie-name': avatarType()}, css: cssClasses(), click: onClick, in_viewport: onInViewport, delay: delay">
+    <div class="participant-avatar" data-bind="attr: {title: participant().name, 'data-uie-name': avatarType()}, css: cssClasses(), click: onClick, in_viewport: onInViewport, delay: delay">
       <div class="avatar-background"></div>
       <!-- ko if: isUser -->
         <div class="avatar-initials" data-bind="text: initials()"></div>
