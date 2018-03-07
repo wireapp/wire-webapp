@@ -55,6 +55,7 @@ z.viewModel.PanelViewModel = class PanelViewModel {
     this.enableIntegrations = this.integrationRepository.enableIntegrations;
 
     this.isVisible = ko.observable(false);
+    this.isAnimating = ko.observable(false);
     this.exitingState = ko.observable(undefined);
     this.state = ko.observable(PanelViewModel.STATE.CONVERSATION_DETAILS);
     this.previousState = ko.observable();
@@ -104,7 +105,13 @@ z.viewModel.PanelViewModel = class PanelViewModel {
   }
 
   closePanel() {
-    return this.mainViewModel.closePanel().then(() => this.isVisible(false));
+    if (!this.isAnimating()) {
+      this.isAnimating(true);
+      return this.mainViewModel.closePanel().then(() => {
+        this.isAnimating(false);
+        this.isVisible(false);
+      });
+    }
   }
 
   closePanelOnChange() {
@@ -259,10 +266,13 @@ z.viewModel.PanelViewModel = class PanelViewModel {
   }
 
   _openPanel(newState) {
-    this.exitingState(undefined);
-    this.isVisible(true);
-    this.switchState(newState, false, true);
-    this.mainViewModel.openPanel();
+    if (!this.isAnimating()) {
+      this.isAnimating(true);
+      this.exitingState(undefined);
+      this.isVisible(true);
+      this.switchState(newState, false, true);
+      this.mainViewModel.openPanel().then(() => this.isAnimating(false));
+    }
   }
 
   _showPanel(newPanelState) {
