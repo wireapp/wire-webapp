@@ -45,10 +45,9 @@ class Account extends EventEmitter {
     TEXT_MESSAGE: 'Account.INCOMING.TEXT_MESSAGE',
   };
   private apiClient: Client;
-  private client: RegisteredClient;
-  public context: Context;
+  public context?: Context;
   private protocolBuffers: any = {};
-  public service: {conversation: ConversationService; crypto: CryptographyService};
+  public service?: {conversation: ConversationService; crypto: CryptographyService};
 
   constructor(apiClient: Client = new Client()) {
     super();
@@ -57,22 +56,28 @@ class Account extends EventEmitter {
 
   private decodeEvent(event: ConversationEvent): Promise<string> {
     return new Promise(resolve => {
+      if (!this.service) {
+        throw new Error('Services are not set.');
+      }
+
       switch (event.type) {
-        case ConversationEventType.OTR_MESSAGE_ADD:
+        case ConversationEventType.OTR_MESSAGE_ADD: {
           const otrMessage: OTRMessageAdd = event as OTRMessageAdd;
           const sessionId: string = this.service.crypto.constructSessionId(otrMessage.from, otrMessage.data.sender);
           const ciphertext: string = otrMessage.data.text;
           this.service.crypto.decrypt(sessionId, ciphertext).then((decryptedMessage: Uint8Array) => {
             const genericMessage = this.protocolBuffers.GenericMessage.decode(decryptedMessage);
             switch (genericMessage.content) {
-              case GenericMessageType.TEXT:
+              case GenericMessageType.TEXT: {
                 resolve(genericMessage.text.content);
                 break;
+              }
               default:
                 resolve(undefined);
             }
           });
           break;
+        }
       }
     });
   }
@@ -341,6 +346,10 @@ class Account extends EventEmitter {
   }
 
   private initClient(context: Context, loginData: LoginData): Promise<RegisteredClient> {
+    if (!this.service) {
+      throw new Error('Services are not set.');
+    }
+
     this.context = context;
     this.service.conversation.setClientID(<string>this.context.clientId);
     return this.service.crypto.loadClient().catch(error => {
@@ -380,6 +389,10 @@ class Account extends EventEmitter {
         return undefined;
       })
       .then(() => {
+        if (!this.service) {
+          throw new Error('Services are not set.');
+        }
+
         this.context = this.apiClient.context;
         this.service.conversation.setClientID(<string>this.context.clientId);
         return this.context;
@@ -387,7 +400,6 @@ class Account extends EventEmitter {
   }
 
   private resetContext(): void {
-    delete this.client;
     delete this.context;
     delete this.service;
   }
@@ -397,7 +409,7 @@ class Account extends EventEmitter {
   }
 
   // TODO: Split functionality into "create" and "register" client
-  public registerClient(
+  public async registerClient(
     loginData: LoginData,
     clientInfo: ClientInfo = {
       classification: ClientClassification.DESKTOP,
@@ -406,36 +418,36 @@ class Account extends EventEmitter {
       location: {lat: 52.53269, lon: 13.402315},
     }
   ): Promise<RegisteredClient> {
-    return this.service.crypto
-      .createCryptobox()
-      .then((serializedPreKeys: Array<PreKey>) => {
-        if (this.service.crypto.cryptobox.lastResortPreKey) {
-          const newClient: NewClient = {
-            class: clientInfo.classification,
-            cookie: clientInfo.cookieLabel,
-            lastkey: this.service.crypto.cryptobox.serialize_prekey(this.service.crypto.cryptobox.lastResortPreKey),
-            location: clientInfo.location,
-            password: String(loginData.password),
-            prekeys: serializedPreKeys,
-            model: clientInfo.model,
-            sigkeys: {
-              enckey: 'Wuec0oJi9/q9VsgOil9Ds4uhhYwBT+CAUrvi/S9vcz0=',
-              mackey: 'Wuec0oJi9/q9VsgOil9Ds4uhhYwBT+CAUrvi/S9vcz0=',
-            },
-            type: loginData.persist ? ClientType.PERMANENT : ClientType.TEMPORARY,
-          };
+    if (!this.service) {
+      throw new Error('Services are not set.');
+    }
 
-          return newClient;
-        } else {
-          throw new Error('Cryptobox got initialized without a last resort PreKey.');
-        }
-      })
-      .then((newClient: NewClient) => this.apiClient.client.api.postClient(newClient))
-      .then((client: RegisteredClient) => {
-        this.client = client;
-        return this.service.crypto.saveClient(this.client);
-      })
-      .then(() => this.client);
+    const serializedPreKeys: Array<PreKey> = await this.service.crypto.createCryptobox();
+
+    let newClient: NewClient;
+    if (this.service.crypto.cryptobox.lastResortPreKey) {
+      newClient = {
+        class: clientInfo.classification,
+        cookie: clientInfo.cookieLabel,
+        lastkey: this.service.crypto.cryptobox.serialize_prekey(this.service.crypto.cryptobox.lastResortPreKey),
+        location: clientInfo.location,
+        password: String(loginData.password),
+        prekeys: serializedPreKeys,
+        model: clientInfo.model,
+        sigkeys: {
+          enckey: 'Wuec0oJi9/q9VsgOil9Ds4uhhYwBT+CAUrvi/S9vcz0=',
+          mackey: 'Wuec0oJi9/q9VsgOil9Ds4uhhYwBT+CAUrvi/S9vcz0=',
+        },
+        type: loginData.persist ? ClientType.PERMANENT : ClientType.TEMPORARY,
+      };
+    } else {
+      throw new Error('Cryptobox got initialized without a last resort PreKey.');
+    }
+
+    const client = await this.apiClient.client.api.postClient(newClient);
+    await this.service.crypto.saveClient(client);
+
+    return client;
   }
 }
 
