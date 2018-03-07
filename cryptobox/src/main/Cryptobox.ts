@@ -17,6 +17,8 @@ export interface SessionFromMessageTuple extends Array<CryptoboxSession | Uint8A
   1: Uint8Array;
 }
 
+const VERSION = require('../../package.json').version;
+
 class Cryptobox extends EventEmitter {
   public static TOPIC = {
     NEW_PREKEYS: 'new-prekeys',
@@ -35,7 +37,7 @@ class Cryptobox extends EventEmitter {
 
   public lastResortPreKey: ProteusKeys.PreKey | undefined;
   public identity: ProteusKeys.IdentityKeyPair | undefined;
-  public VERSION: string = '';
+  public static VERSION: string = VERSION;
 
   constructor(engine: CRUDEngine, minimumAmountOfPreKeys: number = 1) {
     super();
@@ -80,14 +82,13 @@ class Cryptobox extends EventEmitter {
       .then((identity: ProteusKeys.IdentityKeyPair) => {
         this.identity = identity;
         this.logger.log(
-          `Initialized Cryptobox with new local identity. Fingerprint is "${identity.public_key.fingerprint()}".`,
-          this.identity
+          `Initialized Cryptobox with new local identity. Fingerprint is "${identity.public_key.fingerprint()}".`
         );
 
         return this.create_last_resort_prekey();
       })
       .then((lastResortPreKey: ProteusKeys.PreKey) => {
-        this.logger.log(`Created Last Resort PreKey with ID "${lastResortPreKey.key_id}".`, lastResortPreKey);
+        this.logger.log(`Created Last Resort PreKey with ID "${lastResortPreKey.key_id}".`);
         return this.init(false);
       });
   }
@@ -101,8 +102,7 @@ class Cryptobox extends EventEmitter {
           this.identity = identity;
 
           this.logger.log(
-            `Initialized Cryptobox with existing local identity. Fingerprint is "${identity.public_key.fingerprint()}".`,
-            this.identity
+            `Initialized Cryptobox with existing local identity. Fingerprint is "${identity.public_key.fingerprint()}".`
           );
 
           this.logger.log(`Loading PreKeys...`);
@@ -212,7 +212,7 @@ class Cryptobox extends EventEmitter {
         return ProteusKeys.IdentityKeyPair.new();
       })
       .then((identity: ProteusKeys.IdentityKeyPair) => {
-        this.logger.warn(`Cleaned cryptographic items prior to saving a new local identity.`, identity);
+        this.logger.warn(`Cleaned cryptographic items prior to saving a new local identity.`);
         return this.store.save_identity(identity);
       });
   }
@@ -397,8 +397,5 @@ class Cryptobox extends EventEmitter {
     });
   }
 }
-
-// Note: Path to "package.json" must be relative to the "commonjs" dist files
-Cryptobox.prototype.VERSION = require('../../package.json').version;
 
 export default Cryptobox;

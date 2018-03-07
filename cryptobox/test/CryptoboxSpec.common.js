@@ -93,7 +93,7 @@ describe('cryptobox.Cryptobox', () => {
     });
 
     it('returns the current version', () => {
-      expect(cryptobox.Cryptobox.prototype.VERSION).toBeDefined();
+      expect(cryptobox.Cryptobox.VERSION).toBeDefined();
     });
   });
 

@@ -78,7 +78,7 @@ describe('cryptobox.store.IndexedDB', () => {
       const tableName = CryptoboxStore.CryptoboxCRUDStore.STORES.SESSIONS;
       const serialisedSession = await store.engine.read(tableName, sessionId);
       expect(serialisedSession.created).toEqual(jasmine.any(Number));
-      expect(serialisedSession.version).toEqual(Cryptobox.prototype.VERSION);
+      expect(serialisedSession.version).toEqual(Cryptobox.VERSION);
 
       const loadedSession = await store.read_session(alice, sessionId);
       expect(loadedSession.session_tag).toEqual(proteusSession.session_tag);

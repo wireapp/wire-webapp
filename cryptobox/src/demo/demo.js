@@ -3,7 +3,7 @@ const {MemoryEngine} = require('@wireapp/store-engine');
 const Logdown = require('logdown');
 
 const logger = new Logdown('Demo', {alignOutput: true});
-logger.log(`Testing Cryptobox v${cryptobox.Cryptobox.prototype.VERSION}`);
+logger.log(`Testing Cryptobox v${cryptobox.Cryptobox.VERSION}`);
 
 (async () => {
   try {

@@ -11,7 +11,7 @@ class SerialisedRecord {
     this.created = Date.now();
     this.id = id;
     this.serialised = serialised;
-    this.version = Cryptobox.prototype.VERSION;
+    this.version = Cryptobox.VERSION;
   }
 }
 

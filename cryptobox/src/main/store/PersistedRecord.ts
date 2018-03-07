@@ -11,7 +11,7 @@ class PersistedRecord {
     this.created = Date.now();
     this.id = id;
     this.serialised = serialised; // For backward compatibility "serialised" can be an ArrayBuffer or Base64-encoded String.
-    this.version = Cryptobox.prototype.VERSION;
+    this.version = Cryptobox.VERSION;
   }
 }
 

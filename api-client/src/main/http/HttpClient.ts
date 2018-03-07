@@ -16,45 +16,53 @@
 // along with this program. If not, see http://www.gnu.org/licenses/.
 //
 
-import {AccessTokenData} from '../auth/AccessTokenData';
-import axios, {AxiosError, AxiosPromise, AxiosRequestConfig} from 'axios';
+import axios, {AxiosError, AxiosPromise, AxiosRequestConfig, AxiosResponse} from 'axios';
+import {AccessTokenData} from '../auth';
 import {AccessTokenStore, AuthAPI} from '../auth';
 import {ContentType} from '../http';
+import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine';
 import {PriorityQueue} from '@wireapp/priority-queue';
+import {sendRequestWithCookie} from '../shims/node/cookie';
+
 const logdown = require('logdown');
 
 class HttpClient {
-  private _authAPI: AuthAPI;
+  // private _authAPI: AuthAPI;
   private logger: any = logdown('@wireapp/api-client/http.HttpClient', {
     logger: console,
     markdown: false,
   });
   private requestQueue: PriorityQueue;
 
-  constructor(private baseURL: string, public accessTokenStore: AccessTokenStore) {
+  constructor(private baseURL: string, public accessTokenStore: AccessTokenStore, private engine: CRUDEngine) {
     this.requestQueue = new PriorityQueue({
       maxRetries: 0,
       retryDelay: 1000,
     });
 
+    // Log all failing HTTP requests
     axios.interceptors.response.use(undefined, (error: AxiosError) => {
       let backendResponse: string = '';
-      try {
-        backendResponse = JSON.stringify(error!.response!.data);
-      } finally {
-        this.logger.error(
-          `HTTP Error (${error!.response!.status}) on '${error!.response!.config.url}': ${
-            error.message
-          } (${backendResponse})`
-        );
+
+      if (error.response) {
+        try {
+          backendResponse = JSON.stringify(error.response.data);
+        } finally {
+          this.logger.error(
+            `HTTP Error (${error.response.status}) on '${error.response.config.url}': ${
+              error.message
+            } (${backendResponse})`
+          );
+        }
       }
+
       return Promise.reject(error);
     });
   }
 
-  set authAPI(authAPI: AuthAPI) {
-    this._authAPI = authAPI;
-  }
+  // set authAPI(authAPI: AuthAPI) {
+  //   this._authAPI = authAPI;
+  // }
 
   public createUrl(url: string) {
     return `${this.baseURL}${url}`;
@@ -94,9 +102,26 @@ class HttpClient {
       expiredAccessToken = this.accessTokenStore.accessToken;
     }
 
-    return this._authAPI
-      .postAccess(expiredAccessToken)
-      .then((accessToken: AccessTokenData) => this.accessTokenStore.updateToken(accessToken));
+    return this.postAccess(expiredAccessToken).then((accessToken: AccessTokenData) =>
+      this.accessTokenStore.updateToken(accessToken)
+    );
+  }
+
+  public postAccess(expiredAccessToken?: AccessTokenData): Promise<AccessTokenData> {
+    const config: AxiosRequestConfig = {
+      headers: {},
+      withCredentials: true,
+      method: 'post',
+      url: `${AuthAPI.URL.ACCESS}`,
+    };
+
+    if (expiredAccessToken) {
+      config.headers['Authorization'] = `${expiredAccessToken.token_type} ${decodeURIComponent(
+        expiredAccessToken.access_token
+      )}`;
+    }
+
+    return sendRequestWithCookie(this, config, this.engine).then((response: AxiosResponse) => response.data);
   }
 
   public sendRequest(config: AxiosRequestConfig, tokenAsParam: boolean = false): AxiosPromise {
