@@ -35,18 +35,18 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
   }
 
   constructor(params, componentInfo) {
-    if (typeof params.participant !== 'function') {
-      this.participant = ko.observable(params.participant);
-    } else {
-      this.participant = params.participant;
-    }
+    const isParticipantObservable = typeof params.participant === 'function';
+    this.participant = isParticipantObservable ? params.participant : ko.observable(params.participant);
 
-    this.isService = ko.pureComputed(
-      () => this.participant() instanceof z.integration.ServiceEntity || this.participant().isBot
-    );
-    this.isUser = ko.pureComputed(() => this.participant() instanceof z.entity.User && !this.participant().isBot);
+    this.isService = ko.pureComputed(() => {
+      return this.participant() instanceof z.integration.ServiceEntity || this.participant().isBot;
+    });
 
-    this.isTemporaryGuest = ko.pureComputed(() => this.isUser && this.participant().isTemporaryGuest());
+    this.isUser = ko.pureComputed(() => {
+      return this.participant() instanceof z.entity.User && !this.participant().isBot;
+    });
+
+    this.isTemporaryGuest = ko.pureComputed(() => this.isUser() && this.participant().isTemporaryGuest());
 
     if (this.isTemporaryGuest) {
       // TODO: real data from user (0 - 1)
@@ -157,9 +157,7 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
       }
     });
 
-    this.participant.subscribe(newP => {
-      this._loadAvatarPicture();
-    });
+    this.participant.subscribe(() => this._loadAvatarPicture());
   }
 
   dispose() {
