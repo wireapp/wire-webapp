@@ -329,7 +329,7 @@ z.string.hr.participantDevicesDetailVerify = 'Verificirano';
 z.string.hr.participantDevicesHeader = 'Uređaji';
 z.string.hr.participantDevicesHeadline = 'Wire daje svakom uređaju jedinstveni otisak. Usporedite otiske s {{user}} da bi verificirali razgovor.';
 z.string.hr.participantDevicesLearnMore = 'Saznaj više';
-z.string.hr.participantDevicesWhyVerify = 'Zašto verifikacija razgovora?';
+z.string.hr.participantDevicesWhyVerify = 'Zašto ovjeravati razgovore?';
 z.string.hr.participantDevicesOutdatedClientMessage = '{{user}} koristi staru verziju Wire. Nema novih uređaja.';
 
 z.string.hr.participantDevicesSelfAllDevices = 'Pokaži sve uređaje';
