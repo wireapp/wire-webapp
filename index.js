@@ -17,16 +17,17 @@
  *
  */
 
+// Try with: node demo.js -c "conversation-id" -e "mail@wire.com" -p "secret"
 const argv = require('optimist')
   .alias('c', 'conversation')
   .alias('e', 'email')
   .alias('h', 'handle')
   .alias('p', 'password').argv;
 
-const Client = require('./dist/commonjs/Client');
+const Client = require('@wireapp/api-client');
 const path = require('path');
-const {FileEngine} = require('@wireapp/store-engine/dist/commonjs/engine');
-const {WebSocketClient} = require('./dist/commonjs/tcp/');
+const {FileEngine} = require('@wireapp/store-engine');
+const {WebSocketClient} = require('@wireapp/api-client/dist/commonjs/tcp/');
 
 const login = {
   email: argv.email,
@@ -38,7 +39,7 @@ const login = {
 const storagePath = path.join(process.cwd(), '.tmp', login.email);
 
 const config = {
-  store: new FileEngine(storagePath, {fileExtension: '.json'}),
+  store: new FileEngine(storagePath),
 };
 
 const apiClient = new Client(config);

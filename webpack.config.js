@@ -64,5 +64,6 @@ module.exports = {
     alias: {
       '@wireapp/react-ui-kit': path.resolve(__dirname, '..', 'react-ui-kit', 'dist'),
     },
+    extensions: ['.js', '.jsx'],
   },
 };
