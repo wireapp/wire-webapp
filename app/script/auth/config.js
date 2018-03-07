@@ -16,4 +16,8 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+
+import UUID from 'uuid/v4';
+
 export const VERSION = window.VERSION || '0.0.0';
+export const APP_INSTANCE_ID = UUID();

@@ -34,10 +34,6 @@ import {
   Footer,
   Content,
   COLOR,
-  Columns,
-  Column,
-  Modal,
-  Text,
 } from '@wireapp/react-ui-kit';
 import {Redirect} from 'react-router';
 import {conversationJoinStrings} from '../../strings';
@@ -55,13 +51,12 @@ import {withRouter} from 'react-router';
 import React, {Component} from 'react';
 import {pathWithParams} from '../util/urlUtil';
 import {Link as RRLink} from 'react-router-dom';
-import Cookies from 'js-cookie';
 import BackendError from '../module/action/BackendError';
 import Runtime from '../Runtime';
+import AppAlreadyOpen from '../component/AppAlreadyOpen';
 
 const CONVERSATION_CODE = 'code';
 const CONVERSATION_KEY = 'key';
-const COOKIE_NAME_APP_OPENED = 'app_opened';
 
 class ConversationJoin extends Component {
   state = {
@@ -70,7 +65,6 @@ class ConversationJoin extends Component {
     enteredName: '',
     error: null,
     forceNewAccount: false,
-    isAppAlreadyOpen: !!Cookies.get(COOKIE_NAME_APP_OPENED),
     isValidLink: true,
     isValidName: true,
   };
@@ -256,29 +250,9 @@ class ConversationJoin extends Component {
     );
   };
 
-  renderAppAlreadyOpenModal = () => {
-    const {intl: {formatMessage: _}} = this.props;
-    return (
-      <Modal onClose={() => this.setState({...this.state, isAppAlreadyOpen: false})}>
-        <Container style={{maxWidth: '400px'}}>
-          <H3 style={{fontWeight: '500'}}>{_(conversationJoinStrings.appAlreadyOpenModalHeadline)}</H3>
-          <Text>{_(conversationJoinStrings.appAlreadyOpenModalText)}</Text>
-          <Columns style={{marginTop: '20px'}}>
-            <Column style={{textAlign: 'center'}}>
-              <Button backgroundColor={COLOR.GRAY}>{_(conversationJoinStrings.appAlreadyOpenModalCancelButton)}</Button>
-            </Column>
-            <Column style={{textAlign: 'center'}}>
-              <Button>{_(conversationJoinStrings.appAlreadyOpenModalContinueButton)}</Button>
-            </Column>
-          </Columns>
-        </Container>
-      </Modal>
-    );
-  };
-
   render() {
     const {error, isAuthenticated, intl: {formatMessage: _}} = this.props;
-    const {isAppAlreadyOpen, isValidLink, forceNewAccount} = this.state;
+    const {isValidLink, forceNewAccount} = this.state;
     return (
       <Container
         style={{
@@ -302,7 +276,7 @@ class ConversationJoin extends Component {
           <Link href={ROUTE.WIRE_ROOT}>{_(footerStrings.wireLink)}</Link>
           <Small> &middot; {_(footerStrings.copy)}</Small>
         </Footer>
-        {isAppAlreadyOpen && this.renderAppAlreadyOpenModal()}
+        <AppAlreadyOpen />
         {!new Runtime().isSupportedBrowser() && <Redirect to={ROUTE.UNSUPPORTED_JOIN} />}
       </Container>
     );

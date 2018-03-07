@@ -190,6 +190,25 @@ export const chooseHandleStrings = defineMessages({
   },
 });
 
+export const appAlreadyOpenStrings = defineMessages({
+  headline: {
+    id: 'appAlreadyOpenStrings.headline',
+    defaultMessage: 'Wire is already open in this browser',
+  },
+  text: {
+    id: 'appAlreadyOpenStrings.text',
+    defaultMessage: 'If you continue here, you will be logged out on the other tab.',
+  },
+  cancelButton: {
+    id: 'appAlreadyOpenStrings.cancelButton',
+    defaultMessage: 'Cancel',
+  },
+  continueButton: {
+    id: 'appAlreadyOpenStrings.continueButton',
+    defaultMessage: 'Continue',
+  },
+});
+
 export const conversationJoinStrings = defineMessages({
   headline: {
     id: 'conversationJoin.headline',
@@ -207,22 +226,6 @@ export const conversationJoinStrings = defineMessages({
     id: 'conversationJoin.unsupportedJoinSubhead',
     defaultMessage:
       'This browser is not supported.<br />Download the latest version of <b>Google Chrome, Mozilla Firefox, Opera</b> or <b>Microsoft Edge.</b>',
-  },
-  appAlreadyOpenModalHeadline: {
-    id: 'conversationJoin.appAlreadyOpenModalHeadline',
-    defaultMessage: 'Wire is already open in this browser',
-  },
-  appAlreadyOpenModalText: {
-    id: 'conversationJoin.appAlreadyOpenModalText',
-    defaultMessage: 'If you continue here, you will be logged out on the other tab.',
-  },
-  appAlreadyOpenModalCancelButton: {
-    id: 'conversationJoin.appAlreadyOpenModalCancelButton',
-    defaultMessage: 'Cancel',
-  },
-  appAlreadyOpenModalContinueButton: {
-    id: 'conversationJoin.appAlreadyOpenModalContinueButton',
-    defaultMessage: 'Continue',
   },
   existentAccountSubhead: {
     id: 'conversationJoin.subheadExistentAccount',
