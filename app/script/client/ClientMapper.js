@@ -81,7 +81,7 @@ z.client.ClientMapper = class ClientMapper {
     let containsUpdate = false;
 
     for (const member in updatePayload) {
-      const isDataChange = JSON.stringify(clientData[member]) === JSON.stringify(updatePayload[member]);
+      const isDataChange = JSON.stringify(clientData[member]) !== JSON.stringify(updatePayload[member]);
 
       if (isDataChange) {
         containsUpdate = true;
