@@ -35,11 +35,18 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
   }
 
   constructor(params, componentInfo) {
-    this.participant = ko.unwrap(params.participant);
-    this.isService = this.participant instanceof z.integration.ServiceEntity || this.participant.isBot;
-    this.isUser = this.participant instanceof z.entity.User && !this.participant.isBot;
+    if (typeof params.participant !== 'function') {
+      this.participant = ko.observable(params.participant);
+    } else {
+      this.participant = params.participant;
+    }
 
-    this.isTemporaryGuest = this.isUser && this.participant.isTemporaryGuest();
+    this.isService = ko.pureComputed(
+      () => this.participant() instanceof z.integration.ServiceEntity || this.participant().isBot
+    );
+    this.isUser = ko.pureComputed(() => this.participant() instanceof z.entity.User && !this.participant().isBot);
+
+    this.isTemporaryGuest = ko.pureComputed(() => this.isUser && this.participant().isTemporaryGuest());
 
     if (this.isTemporaryGuest) {
       // TODO: real data from user (0 - 1)
@@ -48,11 +55,11 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
       this.timerOffset = this.timerLength * (remainingTime - 1);
     }
 
-    const avatarType = `${this.isUser ? 'user' : 'service'}-avatar`;
+    this.avatarType = ko.pureComputed(() => `${this.isUser() ? 'user' : 'service'}-avatar`);
     this.delay = params.delay;
     this.size = params.size || ParticipantAvatar.SIZE.LARGE;
     this.element = $(componentInfo.element);
-    this.element.addClass(`${avatarType} ${this.size}`);
+    this.element.addClass(`${this.avatarType()} ${this.size}`);
 
     this.avatarLoadingBlocked = false;
     this.avatarEnteredViewport = false;
@@ -61,38 +68,36 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
 
     this.element.attr({
       id: z.util.create_random_uuid(),
-      'user-id': this.participant.id,
+      'user-id': this.participant().id,
     });
 
-    this.element.find('.participant-avatar').data('uie-name', avatarType);
-
     this.initials = ko.pureComputed(() => {
-      if (this.isService) {
+      if (this.isService()) {
         return '';
       }
       if (this.element.hasClass('avatar-xs')) {
-        return z.util.StringUtil.get_first_character(this.participant.initials());
+        return z.util.StringUtil.get_first_character(this.participant().initials());
       }
-      return this.participant.initials();
+      return this.participant().initials();
     });
 
     this.state = ko.pureComputed(() => {
       switch (true) {
-        case this.isService:
+        case this.isService():
           return '';
-        case this.participant.is_me:
+        case this.participant().is_me:
           return 'self';
         case typeof params.selected === 'function' && params.selected():
           return 'selected';
-        case this.participant.is_team_member():
+        case this.participant().is_team_member():
           return '';
-        case this.participant.is_blocked():
+        case this.participant().is_blocked():
           return 'blocked';
-        case this.participant.is_request():
+        case this.participant().is_request():
           return 'pending';
-        case this.participant.is_ignored():
+        case this.participant().is_ignored():
           return 'ignored';
-        case this.participant.is_canceled() || this.participant.is_unknown():
+        case this.participant().is_canceled() || this.participant().is_unknown():
           return 'unknown';
         default:
           return '';
@@ -100,13 +105,13 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
     });
 
     this.cssClasses = ko.pureComputed(() => {
-      if (this.isService) {
+      if (this.isService()) {
         return 'accent-color-bot';
       }
-      if (this.isTemporaryGuest) {
+      if (this.isTemporaryGuest()) {
         return 'accent-color-temporary';
       }
-      return `accent-color-${this.participant.accent_id()} ${this.state()}`;
+      return `accent-color-${this.participant().accent_id()} ${this.state()}`;
     });
 
     this.onClick = (data, event) => {
@@ -122,10 +127,12 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
     };
 
     this._loadAvatarPicture = () => {
+      this.element.find('.avatar-image').html('');
+      this.element.removeClass('avatar-image-loaded avatar-loading-transition');
       if (!this.avatarLoadingBlocked) {
         this.avatarLoadingBlocked = true;
 
-        const pictureResource = this.participant.previewPictureResource();
+        const pictureResource = this.participant().previewPictureResource();
         if (pictureResource) {
           const isCached = pictureResource.downloadProgress() === 100;
 
@@ -136,14 +143,20 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
             this.element.addClass(`avatar-image-loaded ${isCached ? '' : 'avatar-loading-transition'}`);
             this.avatarLoadingBlocked = false;
           });
+        } else {
+          this.avatarLoadingBlocked = false;
         }
       }
     };
 
-    this.picturePreviewSubscription = this.participant.previewPictureResource.subscribe(() => {
+    this.picturePreviewSubscription = this.participant().previewPictureResource.subscribe(() => {
       if (this.avatarEnteredViewport) {
         this._loadAvatarPicture();
       }
+    });
+
+    this.participant.subscribe(newP => {
+      this._loadAvatarPicture();
     });
   }
 
@@ -154,10 +167,10 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
 
 ko.components.register('participant-avatar', {
   template: `
-    <div class="participant-avatar" data-bind="attr: {title: participant.name}, css: cssClasses(), click: onClick, in_viewport: onInViewport, delay: delay">
+    <div class="participant-avatar" data-bind="attr: {title: participant.name, 'data-uie-name': avatarType()}, css: cssClasses(), click: onClick, in_viewport: onInViewport, delay: delay">
       <div class="avatar-background"></div>
       <!-- ko if: isUser -->
-        <div class="avatar-initials" data-bind="text: initials"></div>
+        <div class="avatar-initials" data-bind="text: initials()"></div>
       <!-- /ko -->
       <!-- ko if: isService -->
         <div class="avatar-service-placeholder">
