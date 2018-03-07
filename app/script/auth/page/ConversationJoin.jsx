@@ -132,6 +132,7 @@ class ConversationJoin extends Component {
     const {intl: {formatMessage: _}} = this.props;
     return (
       <Container verticalCenter>
+        <AppAlreadyOpen />
         <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}} color={COLOR.GRAY}>
           <FormattedHTMLMessage {...conversationJoinStrings.headline} />
         </H2>
@@ -162,6 +163,7 @@ class ConversationJoin extends Component {
     const {enteredName, isValidName, error} = this.state;
     return (
       <Container verticalCenter>
+        <AppAlreadyOpen />
         <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}} color={COLOR.GRAY}>
           <FormattedHTMLMessage {...conversationJoinStrings.headline} />
         </H2>
@@ -256,7 +258,6 @@ class ConversationJoin extends Component {
               ? this.renderFullConversation()
               : !isAuthenticated || forceNewAccount ? this.renderNewAnonAccount() : this.renderExistentAccount()
             : this.renderInvalidLink()}
-          <AppAlreadyOpen />
         </WirelessContainer>
       </WirelessUnsupportedBrowser>
     );
