@@ -157,10 +157,11 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
       }
     });
 
-    this.participant.subscribe(() => this._loadAvatarPicture());
+    this.participantSubscription = this.participant.subscribe(() => this._loadAvatarPicture());
   }
 
   dispose() {
+    this.participantSubscription.dispose();
     this.picturePreviewSubscription.dispose();
   }
 };
