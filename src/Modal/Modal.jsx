@@ -113,7 +113,7 @@ const Modal = ({children, fullscreen, onClose, onBackgroundClick}) => (
   <ModalWrapper>
     <ModalBody fullscreen={fullscreen}>
       <ModalContent>{children}</ModalContent>
-      <ModalClose onClick={onClose} data-uie-name="modal-close" />
+      {onClose !== noop && <ModalClose onClick={onClose} data-uie-name="modal-close" />}
     </ModalBody>
     {!fullscreen && (
       <ModalBackground
