@@ -50,7 +50,7 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
 
     this.remainingTimer = undefined;
     this.timerLength = 15.5 * Math.PI * 2;
-    this.timerOffset = ko.pureComputed();
+    this.timerOffset = ko.observable();
 
     this.isTemporaryGuest.subscribe(isTemporaryGuest => {
       if (this.remainingTimer) {
