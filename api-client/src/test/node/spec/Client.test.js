@@ -234,12 +234,22 @@ describe('Client', () => {
         .reply(200, undefined);
     });
 
-    it('can logout a user', done => {
+    it('can logout a user', async done => {
       const client = new Client();
-      client
-        .logout()
-        .then(done)
-        .catch(done.fail);
+
+      const context = client.createContext(
+        '3721e5d3-558d-45ac-b476-b4a64a8f74c1',
+        'dce3d529-51e6-40c2-9147-e091eef48e73',
+        'temporary'
+      );
+      await client.initEngine(context);
+
+      try {
+        await client.logout();
+        done();
+      } catch (error) {
+        done.fail(error);
+      }
     });
   });
 

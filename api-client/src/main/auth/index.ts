@@ -27,6 +27,7 @@ export * from './AccessTokenStore';
 export * from './AuthAPI';
 export * from './ClientPreKey';
 export * from './Context';
+export * from './Cookie';
 export * from './LoginData';
 export * from './PreKey';
 export * from './PreKeyBundle';

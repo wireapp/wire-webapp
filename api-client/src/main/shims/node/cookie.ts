@@ -16,75 +16,71 @@
 // along with this program. If not, see http://www.gnu.org/licenses/.
 //
 
-import {AUTH_TABLE_NAME, AUTH_COOKIE_KEY, AccessTokenData} from '../../auth';
+import {AccessTokenData, AUTH_COOKIE_KEY, AUTH_TABLE_NAME, Cookie} from '../../auth';
 import {AxiosPromise, AxiosRequestConfig, AxiosResponse} from 'axios';
-import {Cookie} from 'tough-cookie';
+import {Cookie as ToughCookie} from 'tough-cookie';
 import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine';
+import {error as StoreEngineError} from '@wireapp/store-engine';
 import {HttpClient} from '../../http';
-import {RecordNotFoundError} from '@wireapp/store-engine/dist/commonjs/engine/error';
 
 const COOKIE_NAME: string = 'zuid';
 
-const loadExistingCookie = async (
-  engine: CRUDEngine
-): Promise<{
+type PersistedCookie = {
   expiration: string;
-  isExpired: boolean;
   zuid: string;
-}> => {
-  await engine.init('wire');
+};
+
+const loadExistingCookie = async (engine: CRUDEngine): Promise<Cookie> => {
   return engine
-    .read<{
-      expiration: string;
-      isExpired: boolean;
-      zuid: string;
-    }>(AUTH_TABLE_NAME, AUTH_COOKIE_KEY)
+    .read<PersistedCookie>(AUTH_TABLE_NAME, AUTH_COOKIE_KEY)
     .catch(error => {
-      if (error.name === RecordNotFoundError.name) {
-        return {expiration: '0', isExpired: true, zuid: ''};
+      if (error instanceof StoreEngineError.RecordNotFoundError) {
+        return new Cookie('', '0');
       }
 
       throw error;
     })
-    .then((fileContent: {expiration: string; isExpired: boolean; zuid: string}) => {
+    .then((fileContent: PersistedCookie) => {
       return typeof fileContent === 'object'
-        ? {
-            isExpired: new Date() > new Date(fileContent.expiration),
-            ...fileContent,
-          }
-        : {
-            expiration: '0',
-            isExpired: true,
-            zuid: '',
-          };
+        ? new Cookie(fileContent.zuid, fileContent.expiration)
+        : new Cookie('', '0');
     });
 };
 
-const setInternalCookie = (zuid: string, expiration: Date, engine: CRUDEngine): Promise<string> =>
-  engine.create(AUTH_TABLE_NAME, AUTH_COOKIE_KEY, {zuid, expiration});
+const setInternalCookie = (cookie: Cookie, engine: CRUDEngine): Promise<string> => {
+  const entity: PersistedCookie = {expiration: cookie.expiration, zuid: cookie.zuid};
+  return engine.create(AUTH_TABLE_NAME, AUTH_COOKIE_KEY, entity).catch(error => {
+    if (error instanceof StoreEngineError.RecordAlreadyExistsError) {
+      return engine.update(AUTH_TABLE_NAME, AUTH_COOKIE_KEY, entity);
+    } else {
+      throw error;
+    }
+  });
+};
 
-export const retrieveCookie = (response: AxiosResponse, engine: CRUDEngine): Promise<AccessTokenData> => {
+export const retrieveCookie = async (response: AxiosResponse, engine: CRUDEngine): Promise<AccessTokenData> => {
   if (response.headers && response.headers['set-cookie']) {
-    const cookies = response.headers['set-cookie'].map(Cookie.parse);
+    const cookies = response.headers['set-cookie'].map(ToughCookie.parse);
     for (const cookie of cookies) {
-      // Don't store the cookie if it's on persist=false (don't have an expiration time set by the server)
+      // Don't store the cookie if persist=false (doesn't have an expiration time set by the server)
       if (cookie.key === COOKIE_NAME && String(cookie.expires) !== 'Infinity') {
-        return setInternalCookie(cookie.value, cookie.expires, engine).then(() => response.data);
+        await setInternalCookie(new Cookie(cookie.value, cookie.expires), engine);
+        break;
       }
     }
   }
 
-  return Promise.resolve(response.data);
+  return response.data;
 };
 
+// https://github.com/wearezeta/backend-api-docs/wiki/API-User-Authentication#token-refresh
 export const sendRequestWithCookie = (
   client: HttpClient,
   config: AxiosRequestConfig,
   engine: CRUDEngine
 ): AxiosPromise => {
-  return loadExistingCookie(engine).then((cookie: {expiration: string; zuid: string; isExpired: boolean}) => {
+  return loadExistingCookie(engine).then((cookie: Cookie) => {
     if (!cookie.isExpired) {
-      // https://github.com/wearezeta/backend-api-docs/wiki/API-User-Authentication#token-refresh
       config.headers = config.headers || {};
       config.headers['Cookie'] = `zuid=${cookie.zuid}`;
       config.withCredentials = true;
