@@ -92,6 +92,11 @@ z.viewModel.PanelViewModel = class PanelViewModel {
     this.addParticipants = new z.viewModel.panel.AppParticipantsViewModel(mainViewModel, this, repositories);
     this.conversationDetails = new z.viewModel.panel.ConversationDetailsViewModel(mainViewModel, this, repositories);
     this.groupParticipant = new z.viewModel.panel.GroupParticipantViewModel(mainViewModel, this, repositories);
+    this.groupParticipantService = new z.viewModel.panel.GroupParticipantServiceViewModel(
+      mainViewModel,
+      this,
+      repositories
+    );
     this.guestOptions = new z.viewModel.panel.GuestOptionsViewModel(mainViewModel, this, repositories);
     this.participantDevices = new z.viewModel.panel.ParticipantDevicesViewModel(mainViewModel, this, repositories);
 
