@@ -16,9 +16,14 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+import {APP_INSTANCE_ID} from '../../config';
 
 export const COOKIE_NAME_APP_OPENED = 'app_opened';
 
-export const isAppAlreadyOpen = state => !!state.cookieState.cookies[COOKIE_NAME_APP_OPENED];
+export const isAppAlreadyOpen = state => {
+  const selectedCookie = getCookies(state)[COOKIE_NAME_APP_OPENED];
+  return selectedCookie ? selectedCookie.appInstanceId !== APP_INSTANCE_ID : false;
+};
+export const getCookies = state => state.cookieState.cookies || [];
 export const isFetching = state => state.cookieState.fetching;
 export const getError = state => state.cookieState.error;

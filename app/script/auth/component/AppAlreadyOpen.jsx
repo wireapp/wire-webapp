@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,12 +22,16 @@ import {connect} from 'react-redux';
 import {injectIntl} from 'react-intl';
 import {appAlreadyOpenStrings} from '../../strings';
 import * as CookieAction from '../module/action/CookieAction';
-// import {APP_INSTANCE_ID} from '../config';
 import {H3, Button, Container, Columns, Column, Modal, Text} from '@wireapp/react-ui-kit';
 import * as CookieSelector from '../module/selector/CookieSelector';
+import {COOKIE_NAME_APP_OPENED} from '../module/selector/CookieSelector';
+import {APP_INSTANCE_ID} from '../config';
 
 class AppAlreadyOpen extends React.Component {
-  onContinue = () => {};
+  onContinue = () => {
+    this.props.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: APP_INSTANCE_ID});
+  };
+
   render = () => {
     const {isAppAlreadyOpen, intl: {formatMessage: _}} = this.props;
     return (

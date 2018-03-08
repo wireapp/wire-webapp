@@ -25,6 +25,10 @@ export const COOKIE_GET_START = 'COOKIE_GET_START';
 export const COOKIE_GET_SUCCESS = 'COOKIE_GET_SUCCESS';
 export const COOKIE_GET_FAILED = 'COOKIE_GET_FAILED';
 
+export const COOKIE_SET_START = 'COOKIE_SET_START';
+export const COOKIE_SET_SUCCESS = 'COOKIE_SET_SUCCESS';
+export const COOKIE_SET_FAILED = 'COOKIE_SET_FAILED';
+
 export const stopCookiePolling = ({name, timerId}) => ({
   payload: {name, timerId},
   type: COOKIE_POLLING_STOP,
@@ -36,7 +40,7 @@ export const startCookiePolling = ({name, timerId}) => ({
 });
 
 export const failedCookiePolling = error => ({
-  payload: BackendError.handle(error),
+  payload: error,
   type: COOKIE_POLLING_FAILED,
 });
 
@@ -46,6 +50,21 @@ export const successfulGetCookie = ({cookie, name}) => ({
 });
 
 export const failedGetCookie = error => ({
-  payload: BackendError.handle(error),
+  payload: error,
   type: COOKIE_GET_FAILED,
+});
+
+export const startSetCookie = ({cookie, name}) => ({
+  payload: {cookie, name},
+  type: COOKIE_SET_SUCCESS,
+});
+
+export const successfulSetCookie = ({cookie, name}) => ({
+  payload: {cookie, name},
+  type: COOKIE_SET_SUCCESS,
+});
+
+export const failedSetCookie = error => ({
+  payload: error,
+  type: COOKIE_SET_FAILED,
 });

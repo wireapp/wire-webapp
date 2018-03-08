@@ -18,16 +18,20 @@
  */
 
 import * as CookieActionCreator from './creator/CookieActionCreator';
-import {COOKIE_NAME_APP_OPENED} from '../selector/CookieSelector';
+import * as CookieSelector from '../selector/CookieSelector';
 
 const COOKIE_POLL_INTERVAL = 1000;
 
-export function startPolling(name = COOKIE_NAME_APP_OPENED, interval = COOKIE_POLL_INTERVAL) {
+export function startPolling(
+  name = CookieSelector.COOKIE_NAME_APP_OPENED,
+  interval = COOKIE_POLL_INTERVAL,
+  asJSON = true
+) {
   return function(dispatch, getState, {}) {
     return Promise.resolve()
       .then(() => {
         return setInterval(() => {
-          dispatch(getCookie(name));
+          dispatch(getCookie(name, asJSON));
         }, interval);
       })
       .then(timerId => dispatch(CookieActionCreator.startCookiePolling({name, timerId})))
@@ -35,7 +39,7 @@ export function startPolling(name = COOKIE_NAME_APP_OPENED, interval = COOKIE_PO
   };
 }
 
-export function stopChecking(name) {
+export function stopPolling(name) {
   return function(dispatch, getState, {}) {
     return Promise.resolve()
       .then(() => {
@@ -49,10 +53,23 @@ export function stopChecking(name) {
   };
 }
 
-export function getCookie(name) {
+export function getCookie(name, asJSON = false) {
   return function(dispatch, getState, {cookieStore}) {
-    return Promise.resolve(cookieStore.get(name))
-      .then(cookie => dispatch(CookieActionCreator.successfulGetCookie({cookie, name})))
+    return Promise.resolve(asJSON ? cookieStore.getJSON(name) : cookieStore.get(name))
+      .then(cookie => {
+        const previousCookie = CookieSelector.getCookies(getState())[name];
+        if (!(previousCookie && cookie && JSON.stringify(previousCookie) === JSON.stringify(cookie))) {
+          dispatch(CookieActionCreator.successfulGetCookie({cookie, name}));
+        }
+      })
       .catch(error => dispatch(CookieActionCreator.failedGetCookie(error)));
+  };
+}
+
+export function setCookie(name, value) {
+  return function(dispatch, getState, {cookieStore}) {
+    return Promise.resolve(cookieStore.set(name, value))
+      .then(cookie => dispatch(CookieActionCreator.successfulSetCookie({cookie, name})))
+      .catch(error => dispatch(CookieActionCreator.failedSetCookie(error)));
   };
 }
