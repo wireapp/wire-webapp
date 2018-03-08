@@ -2301,18 +2301,23 @@ z.conversation.ConversationRepository = class ConversationRepository {
             const titleSubstitutions = z.util.StringUtil.capitalize_first_char(userNames);
 
             switch (consentType) {
-              case ConversationRepository.CONSENT_TYPE.INCOMING_CALL:
+              case ConversationRepository.CONSENT_TYPE.INCOMING_CALL: {
                 actionStringId = z.string.modalConversationNewDeviceIncomingCallAction;
                 messageStringId = z.string.modalConversationNewDeviceIncomingCallMessage;
                 break;
-              case ConversationRepository.CONSENT_TYPE.OUTGOING_CALL:
+              }
+
+              case ConversationRepository.CONSENT_TYPE.OUTGOING_CALL: {
                 actionStringId = z.string.modalConversationNewDeviceOutgoingCallAction;
                 messageStringId = z.string.modalConversationNewDeviceOutgoingCallMessage;
                 break;
-              default:
+              }
+
+              default: {
                 actionStringId = z.string.modalConversationNewDeviceAction;
                 messageStringId = z.string.modalConversationNewDeviceMessage;
                 break;
+              }
             }
 
             amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
