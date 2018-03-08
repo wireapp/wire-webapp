@@ -186,7 +186,7 @@ z.client.ClientRepository = class ClientRepository {
   verifyClient(userId, clientEntity, isVerified) {
     return this.updateClientInDb(userId, clientEntity.id, {meta: {is_verified: isVerified}}).then(() => {
       clientEntity.meta.isVerified(isVerified);
-      return amplify.publish(z.event.WebApp.CLIENT.VERIFICATION_STATE_CHANGED, userId, clientEntity, isVerified);
+      amplify.publish(z.event.WebApp.CLIENT.VERIFICATION_STATE_CHANGED, userId, clientEntity, isVerified);
     });
   }
 

@@ -3062,11 +3062,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
       conversationEntity.status(z.conversation.ConversationStatus.PAST_MEMBER);
 
       if (conversationEntity.call()) {
-        amplify.publish(
-          z.event.WebApp.CALL.STATE.LEAVE,
-          conversationEntity.id,
-          z.calling.enum.TERMINATION_REASON.MEMBER_LEAVE
-        );
+        const reason = z.calling.enum.TERMINATION_REASON.MEMBER_LEAVE;
+        amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, conversationEntity.id, reason);
       }
     }
 
