@@ -360,6 +360,8 @@ z.string.groupCreationParticipantsPlaceholder = 'Search by name';
 z.string.guestRoomConversationName = 'Guest room';
 z.string.guestRoomToggleName = 'Allow guests';
 z.string.guestRoomToggleInfo = 'Open this conversation to people outside your team.';
+z.string.guestRoomToggleInfoLong = 'Open this conversation to people outside your team. You can always change it later.';
+
 z.string.guestRoomConversationBadge = 'Guests are present';
 
 // Collection
