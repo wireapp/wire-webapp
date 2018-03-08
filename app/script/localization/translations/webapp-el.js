@@ -370,7 +370,7 @@ z.string.el.participantDevicesDetailVerify = 'Επιβεβαιωμένο';
 z.string.el.participantDevicesHeader = 'Συσκευές';
 z.string.el.participantDevicesHeadline = 'Το Wire παρέχει σε κάθε συσκευή ένα μοναδικό αποτύπωμα. Συγκρίνετε τα με {{user}} και επαληθεύστε την συνομιλία σας.';
 z.string.el.participantDevicesLearnMore = 'Μάθετε περισσότερα';
-z.string.el.participantDevicesWhyVerify = 'Γιατί να επαληθεύσω την συνομιλία;';
+z.string.el.participantDevicesWhyVerify = 'Γιατί να επαληθεύσω τις συνομιλίες;';
 z.string.el.participantDevicesOutdatedClientMessage = '{{user}} χρησιμοποιεί μια παλιά έκδοση του Wire. Δεν εμφανίζονται εδώ συσκευές.';
 
 z.string.el.participantDevicesSelfAllDevices = 'Εμφάνιση όλων των συσκευών μου';

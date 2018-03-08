@@ -194,16 +194,16 @@ z.viewModel.ContentViewModel = class ContentViewModel {
   }
 
   switchContent(newContentState) {
-    const stateUnchanged = newContentState === this.state();
-    if (!stateUnchanged) {
+    const isStateChange = newContentState !== this.state();
+    if (isStateChange) {
       this._releaseContent(newContentState);
       this._showContent(this._checkContentAvailability(newContentState));
     }
   }
 
   switchPreviousContent() {
-    const stateUnchanged = this.previousState === this.state();
-    if (!stateUnchanged) {
+    const isStateChange = this.previousState !== this.state();
+    if (isStateChange) {
       const isStateRequests = this.previousState === ContentViewModel.STATE.CONNECTION_REQUESTS;
       if (isStateRequests) {
         this.switchContent(ContentViewModel.STATE.CONNECTION_REQUESTS);

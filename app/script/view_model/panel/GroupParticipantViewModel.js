@@ -152,9 +152,9 @@ z.viewModel.panel.GroupParticipantViewModel = class GroupParticipantViewModel {
   }
 
   showGroupParticipant(userEntity) {
-    this.selectedParticipant(userEntity);
-    if (userEntity.isBot) {
-      this._showService(userEntity);
+    this.selectedParticipant(ko.unwrap(userEntity));
+    if (this.selectedParticipant().isBot) {
+      this._showService(this.selectedParticipant());
     }
   }
 

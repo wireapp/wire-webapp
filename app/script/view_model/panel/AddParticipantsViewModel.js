@@ -157,12 +157,12 @@ z.viewModel.panel.AppParticipantsViewModel = class AppParticipantsViewModel {
 
   _addMembers() {
     const conversationEntity = this.conversationEntity();
-    const userEntities = this.selectedContacts();
+    const userEntities = this.selectedContacts().slice();
 
     this.conversationRepository.addMembers(conversationEntity, userEntities).then(() => {
       const attributes = {
         method: 'add',
-        user_num: this.selectedContacts().length,
+        user_num: userEntities.length,
       };
 
       const isTeamConversation = !!this.conversationEntity().team_id;
@@ -186,7 +186,7 @@ z.viewModel.panel.AppParticipantsViewModel = class AppParticipantsViewModel {
   }
 
   _switchToConversationDetails() {
-    this.panelViewModel.switchState(z.viewModel.PanelViewModel.STATE.CONVERSATION_DETAILS, true);
+    this.panelViewModel.switchState(z.viewModel.PanelViewModel.STATE.CONVERSATION_DETAILS, false, true);
     this.resetView();
   }
 };

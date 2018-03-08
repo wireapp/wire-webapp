@@ -23,16 +23,6 @@ window.z = window.z || {};
 window.z.conversation = z.conversation || {};
 
 z.conversation.ConversationStateHandler = class ConversationStateHandler {
-  static get CONFIG() {
-    return {
-      SUPPORTED_EVENTS: [
-        z.event.Backend.CONVERSATION.ACCESS_UPDATE,
-        z.event.Backend.CONVERSATION.CODE_DELETE,
-        z.event.Backend.CONVERSATION.CODE_UPDATE,
-      ],
-    };
-  }
-
   /**
    * Construct a new conversation state handler.
    * @param {ConversationService} conversationService - Service for conversation related backend interactions
@@ -42,16 +32,14 @@ z.conversation.ConversationStateHandler = class ConversationStateHandler {
     this.conversationService = conversationService;
     this.conversationRepository = conversationRepository;
     this.conversationMapper = this.conversationRepository.conversation_mapper;
-
-    amplify.subscribe(z.event.WebApp.CONVERSATION.EVENT_FROM_BACKEND, this.onConversationEvent.bind(this));
   }
 
   changeAccessState(conversationEntity, accessState) {
-    const isTeamConversation = conversationEntity && conversationEntity.team_id;
-    if (isTeamConversation) {
-      const isStateUnchanged = conversationEntity.accessState() === accessState;
+    const isConversationInTeam = conversationEntity && conversationEntity.inTeam();
+    if (isConversationInTeam) {
+      const isStateChange = conversationEntity.accessState() !== accessState;
 
-      if (!isStateUnchanged) {
+      if (isStateChange) {
         let accessModes;
         let accessRole;
 
@@ -135,33 +123,30 @@ z.conversation.ConversationStateHandler = class ConversationStateHandler {
     }
 
     const {conversation: conversationId, data: eventData, type} = eventJson;
-    const isSupportedEvent = ConversationStateHandler.CONFIG.SUPPORTED_EVENTS.includes(type);
 
-    if (isSupportedEvent) {
-      return this.conversationRepository
-        .get_conversation_by_id(conversationId)
-        .then(conversationEntity => {
-          switch (type) {
-            case z.event.Backend.CONVERSATION.ACCESS_UPDATE:
-              this.conversationMapper.mapAccessState(conversationEntity, eventData.access, eventData.access_role);
-              break;
-            case z.event.Backend.CONVERSATION.CODE_DELETE:
-              conversationEntity.accessCode(undefined);
-              break;
-            case z.event.Backend.CONVERSATION.CODE_UPDATE:
-              this.conversationMapper.mapAccessCode(conversationEntity, eventData);
-              break;
-            default:
-              break;
-          }
-        })
-        .catch(error => {
-          const isNotFound = error.type === z.conversation.ConversationError.TYPE.CONVERSATION_NOT_FOUND;
-          if (!isNotFound) {
-            throw error;
-          }
-        });
-    }
+    return this.conversationRepository
+      .get_conversation_by_id(conversationId)
+      .then(conversationEntity => {
+        switch (type) {
+          case z.event.Backend.CONVERSATION.ACCESS_UPDATE:
+            this.conversationMapper.mapAccessState(conversationEntity, eventData.access, eventData.access_role);
+            break;
+          case z.event.Backend.CONVERSATION.CODE_DELETE:
+            conversationEntity.accessCode(undefined);
+            break;
+          case z.event.Backend.CONVERSATION.CODE_UPDATE:
+            this.conversationMapper.mapAccessCode(conversationEntity, eventData);
+            break;
+          default:
+            break;
+        }
+      })
+      .catch(error => {
+        const isNotFound = error.type === z.conversation.ConversationError.TYPE.CONVERSATION_NOT_FOUND;
+        if (!isNotFound) {
+          throw error;
+        }
+      });
   }
 
   _showModal(messageStringId) {

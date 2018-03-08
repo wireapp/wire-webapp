@@ -32,6 +32,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
         MAX_NAME_LENGTH: 64,
         MAX_SIZE: 128,
       },
+      STATE_EVENTS: [
+        z.event.Backend.CONVERSATION.ACCESS_UPDATE,
+        z.event.Backend.CONVERSATION.CODE_DELETE,
+        z.event.Backend.CONVERSATION.CODE_UPDATE,
+      ],
     };
   }
 
@@ -188,7 +193,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   _init_subscriptions() {
     amplify.subscribe(z.event.WebApp.CONVERSATION.ASSET.CANCEL, this.cancel_asset_upload.bind(this));
-    amplify.subscribe(z.event.WebApp.CONVERSATION.EVENT_FROM_BACKEND, this.push_to_receiving_queue.bind(this));
+    amplify.subscribe(z.event.WebApp.CONVERSATION.EVENT_FROM_BACKEND, this.onConversationEvent.bind(this));
     amplify.subscribe(z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, this.timeout_ephemeral_message.bind(this));
     amplify.subscribe(z.event.WebApp.CONVERSATION.MAP_CONNECTION, this.map_connection.bind(this));
     amplify.subscribe(z.event.WebApp.CONVERSATION.MISSED_EVENTS, this.on_missed_events.bind(this));
@@ -2064,7 +2069,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.OUTGOING_PING);
         }
 
-        this.onConversationEvent(message_stored, z.event.EventRepository.SOURCE.INJECTED);
+        this._handleConversationEvent(message_stored, z.event.EventRepository.SOURCE.INJECTED);
 
         return this.send_generic_message_to_conversation(conversation_et.id, generic_message)
           .then(payload => {
@@ -2216,8 +2221,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return response;
       })
       .catch(error => {
-        if (error.label === z.service.BackendClientError.LABEL.UNKNOWN_CLIENT) {
-          this.client_repository.removeLocalClient();
+        const isUnknownClient = error.label === z.service.BackendClientError.LABEL.UNKNOWN_CLIENT;
+        if (isUnknownClient) {
+          return this.client_repository.removeLocalClient();
         }
 
         if (!error.missing) {
@@ -2648,14 +2654,26 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when event was handled
    */
   onConversationEvent(eventJson, eventSource = z.event.EventRepository.SOURCE.STREAM) {
+    const logObject = {eventJson: JSON.stringify(eventJson), eventObject: eventJson};
+    const logMessage = `»» Conversation Event: '${eventJson.type}' (Source: ${eventSource})`;
+    this.logger.info(logMessage, logObject);
+
+    const isStateEvent = ConversationRepository.CONFIG.STATE_EVENTS.includes(eventJson.type);
+    if (isStateEvent) {
+      return this.stateHandler.onConversationEvent(eventJson, source);
+    }
+
+    return this._pushToReceivingQueue(eventJson, eventSource);
+  }
+
+  _handleConversationEvent(eventJson, eventSource = z.event.EventRepository.SOURCE.STREAM) {
     if (!eventJson) {
       return Promise.reject(new Error('Conversation Repository Event Handling: Event missing'));
     }
 
     const {conversation, data: eventData, type} = eventJson;
     const conversationId = (eventData && eventData.conversationId) || conversation;
-    const logObject = {eventJson: JSON.stringify(eventJson), eventObject: eventJson};
-    this.logger.info(`»» Conversation Event: '${type}' (Source: ${eventSource})`, logObject);
+    this.logger.info(`Handling event '${type}' in conversation '${conversationId}' (Source: ${eventSource})`);
 
     const inSelfConversation = conversationId === this.self_conversation() && this.self_conversation().id;
     if (inSelfConversation) {
@@ -2754,31 +2772,18 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   /**
-   * Add missed events message to conversations.
-   * @returns {undefined} No return value
-   */
-  on_missed_events() {
-    this.filtered_conversations()
-      .filter(conversation_et => !conversation_et.removed_from_conversation())
-      .forEach(conversation_et => {
-        const missed_event = z.conversation.EventBuilder.buildMissed(conversation_et, this.timeOffset);
-        amplify.publish(z.event.WebApp.EVENT.INJECT, missed_event);
-      });
-  }
-
-  /**
    * Push to receiving queue.
-   * @param {Object} event_json - JSON data for event
+   * @param {Object} eventJson - JSON data for event
    * @param {z.event.EventRepository.SOURCE} source - Source of event
    * @returns {undefined} No return value
    */
-  push_to_receiving_queue(event_json, source) {
+  _pushToReceivingQueue(eventJson, source) {
     this.receiving_queue
-      .push(() => this.onConversationEvent(event_json, source))
+      .push(() => this._handleConversationEvent(eventJson, source))
       .then(() => {
         if (this.init_promise) {
-          const event_from_stream = source === z.event.EventRepository.SOURCE.STREAM;
-          if (event_from_stream) {
+          const eventFromStream = source === z.event.EventRepository.SOURCE.STREAM;
+          if (eventFromStream) {
             this.init_handled = this.init_handled + 1;
             if (this.init_handled % 5 === 0 || this.init_handled < 5) {
               const content = {
@@ -2791,7 +2796,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
             }
           }
 
-          if (!this.receiving_queue.get_length() || !event_from_stream) {
+          if (!this.receiving_queue.get_length() || !eventFromStream) {
             this.init_promise.resolve_fn();
             this.init_promise = undefined;
           }
@@ -2804,6 +2809,19 @@ z.conversation.ConversationRepository = class ConversationRepository {
         } else {
           throw error;
         }
+      });
+  }
+
+  /**
+   * Add missed events message to conversations.
+   * @returns {undefined} No return value
+   */
+  on_missed_events() {
+    this.filtered_conversations()
+      .filter(conversation_et => !conversation_et.removed_from_conversation())
+      .forEach(conversation_et => {
+        const missed_event = z.conversation.EventBuilder.buildMissed(conversation_et, this.timeOffset);
+        amplify.publish(z.event.WebApp.EVENT.INJECT, missed_event);
       });
   }
 

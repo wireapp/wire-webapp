@@ -360,7 +360,7 @@ z.string.sl.participantDevicesDetailVerify = 'Preverjena';
 z.string.sl.participantDevicesHeader = 'Naprave';
 z.string.sl.participantDevicesHeadline = 'Wire dodeli vsaki napravi edinstven prstni odtis. Primerjajte jih z {{user}} in preverite vaš pogovor.';
 z.string.sl.participantDevicesLearnMore = 'Nauči se več';
-z.string.sl.participantDevicesWhyVerify = 'Zakaj preveriti pogovor?';
+z.string.sl.participantDevicesWhyVerify = 'Zakaj preveriti pogovore?';
 z.string.sl.participantDevicesOutdatedClientMessage = '{{user}} uporablja starejšo različico Wire. Nobenih naprav tukaj ni prikazano.';
 
 z.string.sl.participantDevicesSelfAllDevices = 'Prikaži vse moje naprave';

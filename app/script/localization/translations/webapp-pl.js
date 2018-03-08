@@ -22,6 +22,7 @@ z.string.pl.wireWindows = 'Wire dla Windows';
 z.string.pl.wireLinux = 'Wire dla Linuksa';
 z.string.pl.nonexistentUser = 'Użytkownik usunięty';
 z.string.pl.and = 'oraz';
+z.string.pl.enumerationAnd = ', i ';
 
 z.string.pl.authAccountCountryCode = 'Kierunkowy kraju';
 z.string.pl.authAccountDeletion = 'Zostałeś wylogowany, ponieważ Twoje konto zostało usunięte.';
@@ -80,6 +81,7 @@ z.string.pl.authErrorNameShort = 'Wprowadź nazwę - musi mieć co najmniej 2 zn
 z.string.pl.authErrorOffline = 'Brak połączenia z Internetem';
 z.string.pl.authErrorPasswordShort = 'Wybierz hasło - musi mieć co najmniej 8 znaków.';
 z.string.pl.authErrorPasswordWrong = 'Niewłaściwe hasło, proszę spróbować ponownie.';
+z.string.pl.authErrorPending = 'Konto niezweryfikowane';
 z.string.pl.authErrorPhoneNumberBudget = 'Zbyt wiele prób logowania. Odczekaj chwilę i spróbuj ponownie.';
 z.string.pl.authErrorPhoneNumberForbidden = 'Przepraszamy. Ten numer telefonu został zabroniony.';
 z.string.pl.authErrorPhoneNumberInvalid = 'Nieprawidłowy numer telefonu';
@@ -97,6 +99,7 @@ z.string.pl.callChooseSharedScreen = 'Wybierz ekran do współdzielenia';
 z.string.pl.callParticipants = '{{number}} uczestników';
 
 z.string.pl.modalAcknowledgeAction = 'OK';
+z.string.pl.modalAcknowledgeHeadline = 'Coś poszło nie tak';
 z.string.pl.modalConfirmSecondary = 'Anuluj';
 z.string.pl.modalOptionSecondary = 'Anuluj';
 
@@ -118,8 +121,10 @@ z.string.pl.modalAccountRemoveDeviceHeadline = 'Usuń {{device}}';
 z.string.pl.modalAccountRemoveDeviceMessage = 'Aby usunąć to urządzenie wymagane jest hasło.';
 z.string.pl.modalAccountRemoveDevicePlaceholder = 'Hasło';
 
+z.string.pl.modalAssetTooLargeHeadline = 'Plik jest zbyt duży';
 z.string.pl.modalAssetTooLargeMessage = 'Plik jest za duży. Maksymalny rozmiar pliku to {{number}}';
 
+z.string.pl.modalAssetParallelUploadsHeadline = 'Za dużo plików naraz';
 z.string.pl.modalAssetParallelUploadsMessage = 'Jednorazowo możesz wysłać maksymalnie {{number}} plików.';
 
 z.string.pl.modalCallEmptyConversationHeadline = 'Brak rozmówcy';
@@ -155,9 +160,12 @@ z.string.pl.modalConnectAcceptMessage = 'Ta akcja doda użytkownika {{user}} do 
 z.string.pl.modalConnectAcceptSecondary = 'Ignoruj';
 
 z.string.pl.modalConversationAddBotAction = 'Potwierdź';
+z.string.pl.modalConversationAddBotHeadline = 'Dodaj usługę';
+z.string.pl.modalConversationAddBotMessage = 'Czy na pewno chcesz zacząć rozmowę z {{name}}?';
 
 z.string.pl.modalConversationClearAction = 'Usuń';
 z.string.pl.modalConversationClearHeadline = 'Usunąć zawartość?';
+z.string.pl.modalConversationClearMessage = 'To wyczyści historię rozmowy na wszystkich Twoich urządzeniach.';
 z.string.pl.modalConversationClearOption = 'Również opuść rozmowę';
 
 z.string.pl.modalConversationDeleteMessageAction = 'Usuń';
@@ -169,11 +177,13 @@ z.string.pl.modalConversationDeleteMessageEveryoneHeadline = 'Usunąć dla wszys
 z.string.pl.modalConversationDeleteMessageEveryoneMessage = 'Tego nie można cofnąć.';
 
 z.string.pl.modalConversationLeaveAction = 'Opuść';
+z.string.pl.modalConversationLeaveHeadline = 'Opuścić rozmowę {{name}}?';
 z.string.pl.modalConversationLeaveMessage = 'Nie będziesz mógł wysyłać ani odbierać wiadomości w tej rozmowie.';
 
 z.string.pl.modalConversationMessageTooLongHeadline = 'Wiadomość jest zbyt długa';
 z.string.pl.modalConversationMessageTooLongMessage = 'Możesz wysyłać wiadomości nie dłuższe niż {{number}} znaków.';
 
+z.string.pl.modalConversationNewDeviceAction = 'Wyślij mimo wszystko';
 z.string.pl.modalConversationNewDeviceHeadlineOne = '{{user}} zaczął korzystać z nowego urządzenia';
 z.string.pl.modalConversationNewDeviceHeadlineMany = '{{users}} zaczęli korzystać z nowych urządzeń';
 z.string.pl.modalConversationNewDeviceHeadlineYou = '{{user}} zaczął korzystać z nowego urządzenia';
@@ -191,6 +201,8 @@ z.string.pl.modalConversationRemoveAction = 'Usuń';
 z.string.pl.modalConversationRemoveHeadline = 'Usunąć?';
 z.string.pl.modalConversationRemoveMessage = '{{user}} nie będzie mógł wysyłać, ani odbierać wiadomości w tej rozmowie.';
 
+z.string.pl.modalConversationRemoveGuestsAction = 'Usuń gości';
+z.string.pl.modalConversationRemoveGuestsHeadline = 'Wyłączyć dostęp dla gości?';
 
 z.string.pl.modalConversationTooManyMembersHeadline = 'Zbyt wielu uczestników rozmowy';
 
@@ -372,7 +384,7 @@ z.string.pl.participantDevicesDetailVerify = 'Zweryfikowano';
 z.string.pl.participantDevicesHeader = 'Urządzenia';
 z.string.pl.participantDevicesHeadline = 'Wire nadaje każdemu urządzeniu unikatowy odcisk palca. Porównaj go z listą urządzeń użytkownika {{user}} i sprawdź swoje rozmowy.';
 z.string.pl.participantDevicesLearnMore = 'Więcej informacji';
-z.string.pl.participantDevicesWhyVerify = 'Czemu sprawdzać rozmowy?';
+z.string.pl.participantDevicesWhyVerify = 'Dlaczego weryfikować konwersacje?';
 z.string.pl.participantDevicesOutdatedClientMessage = '{{user}} używa starszej wersji Wire. Brak urządzeń do wyświetlenia.';
 
 z.string.pl.participantDevicesSelfAllDevices = 'Pokaż wszystkie moje urządzenia';

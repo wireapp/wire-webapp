@@ -232,6 +232,7 @@ z.string.de.modalPictureFileFormatMessage = 'Bitte wähle eine PNG- oder JPEG-Da
 z.string.de.modalPictureTooLargeHeadline = 'Ausgewähltes Bild zu groß';
 z.string.de.modalPictureTooLargeMessage = 'Du kannst Bilder mit bis zu {{number}} MB verwenden.';
 
+z.string.de.modalPictureTooSmallHeadline = 'Ausgewähltes Bild zu klein';
 z.string.de.modalPictureTooSmallMessage = 'Wähle ein Bild mit mindestens 320 × 320 Pixeln.';
 
 z.string.de.modalServiceUnavailableHeadline = 'Hinzufügen des Dienstes nicht möglich';
@@ -274,8 +275,8 @@ z.string.de.conversationCreateYou = ' hast eine Unterhaltung mit {{users}} begon
 z.string.de.conversationDeviceStartedUsingOne = ' benutzt';
 z.string.de.conversationDeviceStartedUsingMany = ' benutzen';
 z.string.de.conversationDeviceUnverified = ' hat die Überprüfung widerrufen für';
-z.string.de.conversationDeviceYourDevices = ' deine Geräte';
-z.string.de.conversationDeviceUserDevices = ' {{users}} Geräte';
+z.string.de.conversationDeviceYourDevices = ' eines deiner Geräte';
+z.string.de.conversationDeviceUserDevices = ' ein Gerät von {{user}}';
 z.string.de.conversationDeviceNewDeviceOne = ' ein neues Gerät';
 z.string.de.conversationDeviceNewDeviceMany = ' neue Geräte';
 z.string.de.conversationDeviceNewPeopleJoined = 'Neue Personen beigetreten.';
@@ -302,8 +303,8 @@ z.string.de.conversationVerified = 'Verifiziert';
 z.string.de.conversationVoiceChannelDeactivate = ' hat versucht anzurufen';
 z.string.de.conversationVoiceChannelDeactivateYou = ' hast versucht anzurufen';
 z.string.de.conversationYesterday = 'Gestern';
-z.string.de.conversationUnableToDecrypt1 = 'eine Nachricht von {{user}} wurde nicht empfangen.';
-z.string.de.conversationUnableToDecrypt2 = '{{users}} Geräte-Identität hat sich geändert. Nachricht kann nicht entschlüsselt werden.';
+z.string.de.conversationUnableToDecrypt1 = 'Eine Nachricht von {{user}} wurde nicht empfangen.';
+z.string.de.conversationUnableToDecrypt2 = '{{users}}s Geräte-Identität hat sich geändert. Nachricht kann nicht entschlüsselt werden.';
 z.string.de.conversationUnableToDecryptLink = 'Warum?';
 z.string.de.conversationUnableToDecryptErrorMessage = 'Fehler';
 z.string.de.conversationUnableToDecryptResetSession = 'Session zurücksetzen';
@@ -339,6 +340,8 @@ z.string.de.groupCreationParticipantsPlaceholder = 'Nach Namen suchen';
 z.string.de.guestRoomConversationName = 'Gästezimmer';
 z.string.de.guestRoomToggleName = 'Gäste zulassen';
 z.string.de.guestRoomToggleInfo = 'Öffne diese Unterhaltung für Personen außerhalb deines Teams.';
+z.string.de.guestRoomToggleInfoExtended = 'Öffne diese Unterhaltung für Personen außerhalb deines Teams. Dies kann jederzeit wieder geändert werden.';
+
 z.string.de.guestRoomConversationBadge = 'Gäste anwesend';
 
 z.string.de.collectionShowAll = 'Zeige alle {{number}}';

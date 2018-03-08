@@ -247,7 +247,7 @@ z.string.modalPictureFileFormatMessage = 'Please choose a PNG or JPEG file.';
 z.string.modalPictureTooLargeHeadline = 'Selected picture is too large';
 z.string.modalPictureTooLargeMessage = 'You can use pictures up to {{number}} MB.';
 
-z.string.modalPictureTooSmallMessage = 'Picture too small';
+z.string.modalPictureTooSmallHeadline = 'Picture too small';
 z.string.modalPictureTooSmallMessage = 'Please choose a picture that is at least 320 x 320 px.';
 
 z.string.modalServiceUnavailableHeadline = 'Adding service not possible';
@@ -321,7 +321,7 @@ z.string.conversationVerified = 'Verified';
 z.string.conversationVoiceChannelDeactivate = ' called';
 z.string.conversationVoiceChannelDeactivateYou = ' called';
 z.string.conversationYesterday = 'Yesterday';
-z.string.conversationUnableToDecrypt1 = 'a message from {{user}} was not received.';
+z.string.conversationUnableToDecrypt1 = 'A message from {{user}} was not received.';
 z.string.conversationUnableToDecrypt2 = '{{user}}´s device identity changed. Undelivered message.';
 z.string.conversationUnableToDecryptLink = 'Why?';
 z.string.conversationUnableToDecryptErrorMessage = 'Error';
@@ -360,6 +360,8 @@ z.string.groupCreationParticipantsPlaceholder = 'Search by name';
 z.string.guestRoomConversationName = 'Guest room';
 z.string.guestRoomToggleName = 'Allow guests';
 z.string.guestRoomToggleInfo = 'Open this conversation to people outside your team.';
+z.string.guestRoomToggleInfoExtended = 'Open this conversation to people outside your team. You can always change it later.';
+
 z.string.guestRoomConversationBadge = 'Guests are present';
 
 // Collection
@@ -498,7 +500,7 @@ z.string.participantDevicesDetailVerify = 'Verified';
 z.string.participantDevicesHeader = 'Devices';
 z.string.participantDevicesHeadline = 'Wire gives every device a unique fingerprint. Compare them with {{user}} and verify your conversation.';
 z.string.participantDevicesLearnMore = 'Learn more';
-z.string.participantDevicesWhyVerify = 'Why verify conversation?';
+z.string.participantDevicesWhyVerify = 'Why verify conversations?';
 z.string.participantDevicesOutdatedClientMessage = '{{user}} is using an old version of Wire. No devices are shown here.';
 
 z.string.participantDevicesSelfAllDevices = 'Show all my devices';

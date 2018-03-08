@@ -565,23 +565,26 @@ z.client.ClientRepository = class ClientRepository {
 
     // Find clients in database
     return this.getClientByUserIdFromDb(userId)
-      .then(results => {
+      .then(clientsFromDatabase => {
         const promises = [];
 
-        for (const result of results) {
-          if (clientsFromBackend[result.id]) {
-            const {client, wasUpdated} = this.clientMapper.updateClient(result, clientsFromBackend[result.id]);
+        for (const databaseClient of clientsFromDatabase) {
+          const clientId = databaseClient.id;
+          const backendClient = clientsFromBackend[clientId];
 
-            delete clientsFromBackend[result.id];
+          if (backendClient) {
+            const {client, wasUpdated} = this.clientMapper.updateClient(databaseClient, backendClient);
 
-            if (this.currentClient() && this._isCurrentClient(userId, result.id)) {
-              this.logger.warn(`Removing duplicate self client '${result.id}' locally`);
-              this.removeClient(userId, result.id);
+            delete clientsFromBackend[clientId];
+
+            if (this.currentClient() && this._isCurrentClient(userId, clientId)) {
+              this.logger.warn(`Removing duplicate self client '${clientId}' locally`);
+              this.removeClient(userId, clientId);
             }
 
             // Locally known client changed on backend
             if (wasUpdated) {
-              this.logger.info(`Updating client '${result.id}' of user '${userId}' locally`);
+              this.logger.info(`Updating client '${clientId}' of user '${userId}' locally`);
               promises.push(this.saveClientInDb(userId, client));
               continue;
             }
@@ -592,8 +595,8 @@ z.client.ClientRepository = class ClientRepository {
           }
 
           // Locally known client deleted on backend
-          this.logger.warn(`Removing client '${result.id}' of user '${userId}' locally`);
-          this.removeClient(userId, result.id);
+          this.logger.warn(`Removing client '${clientId}' of user '${userId}' locally`);
+          this.removeClient(userId, clientId);
         }
 
         for (const clientId in clientsFromBackend) {
@@ -655,11 +658,13 @@ z.client.ClientRepository = class ClientRepository {
   onUserEvent(eventJson, source) {
     const {type} = eventJson;
 
-    if (type === z.event.Backend.USER.CLIENT_ADD) {
+    const isClientAdd = type === z.event.Backend.USER.CLIENT_ADD;
+    if (isClientAdd) {
       return this.onClientAdd(eventJson);
     }
 
-    if (type === z.event.Backend.USER.CLIENT_REMOVE) {
+    const isClientRemove = type === z.event.Backend.USER.CLIENT_REMOVE;
+    if (isClientRemove) {
       this.onClientRemove(eventJson);
     }
   }
@@ -671,7 +676,7 @@ z.client.ClientRepository = class ClientRepository {
    */
   onClientAdd(eventJson) {
     this.logger.info('Client of self user added', eventJson);
-    amplify.publish(z.event.WebApp.CLIENT.ADD, this.selfUser().id, eventJson.client);
+    amplify.publish(z.event.WebApp.CLIENT.ADD, this.selfUser().id, eventJson.client, true);
   }
 
   /**
