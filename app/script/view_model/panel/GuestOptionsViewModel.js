@@ -111,7 +111,7 @@ z.viewModel.panel.GuestOptionsViewModel = class GuestOptionsViewModel {
 
   toggleAccessState() {
     const conversationEntity = this.conversationEntity();
-    if (conversationEntity.team_id && !conversationEntity.is_guest()) {
+    if (conversationEntity.inTeam()) {
       const newAccessState = this.isTeamOnly()
         ? z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM
         : z.conversation.ACCESS_STATE.TEAM.TEAM_ONLY;
