@@ -66,15 +66,16 @@ z.viewModel.panel.GuestOptionsViewModel = class GuestOptionsViewModel {
   }
 
   copyLink() {
-    if (!this.isLinkCopied) {
+    if (!this.isLinkCopied()) {
       const link = document.querySelector('.guest-options__link');
       link.disabled = false;
       link.select();
       document.execCommand('copy');
+      link.setSelectionRange(0, 0);
       link.disabled = true;
       this.isLinkCopied(true);
       amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.GUEST_ROOMS.LINK_COPIED);
-      window.setTimeout(() => this.isLinkCopied(false), 2000);
+      window.setTimeout(() => this.isLinkCopied(false), 1500);
     }
   }
 
