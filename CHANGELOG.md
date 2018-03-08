@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="0.5.13"></a>
+## [0.5.13](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@0.5.12...@wireapp/api-client@0.5.13) (2018-03-08)
+
+
+### Bug Fixes
+
+* **core:** Update cookie if it already exists ([#350](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/350)) ([1c0f339](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/1c0f339))
+
+
+
+
 <a name="0.5.12"></a>
 ## [0.5.12](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@0.5.11...@wireapp/api-client@0.5.12) (2018-03-08)
 
