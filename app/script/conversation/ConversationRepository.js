@@ -2294,9 +2294,20 @@ z.conversation.ConversationRepository = class ConversationRepository {
                   ? z.string.modalConversationNewDeviceHeadlineYou
                   : z.string.modalConversationNewDeviceHeadlineOne;
               } else {
-                const log = `Granting '${consentType}' message '${messageType}' in '${conversationId}' needs user ids`;
+                const log = `Granting message '${messageType}' in '${conversationId}' for '${consentType}'  needs ids`;
                 this.logger.error(log);
-                reject(new Error('Failed to grant outgoing message'));
+
+                const error = new Error('Failed to grant outgoing message');
+                const customData = {
+                  consentType,
+                  messageType,
+                  participants: conversationEntity.getNumberOfParticipants(false),
+                  verificationState,
+                };
+
+                Raygun.send(error, customData);
+
+                reject(error);
               }
             }
 
