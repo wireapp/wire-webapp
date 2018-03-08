@@ -34,13 +34,20 @@ import de from 'react-intl/locale-data/de';
 import ROUTE from '../route';
 import SUPPORTED_LOCALE from '../supportedLocales';
 import * as CookieAction from '../module/action/CookieAction';
+import * as CookieSelector from '../module/selector/CookieSelector';
+import {APP_INSTANCE_ID} from '../config';
 
 addLocaleData([...de]);
 
 class Root extends React.Component {
-  componentDidMount = () => this.props.startPolling();
-
-  componentWillUnmount = () => this.props.stopPolling();
+  componentDidMount = () => {
+    this.props.setCookieIfAbsent(CookieSelector.COOKIE_NAME_APP_OPENED, {appInstanceId: APP_INSTANCE_ID});
+    this.props.startPolling();
+    window.onbeforeunload = e => {
+      this.props.removeCookie(CookieSelector.COOKIE_NAME_APP_OPENED, APP_INSTANCE_ID);
+      this.props.stopPolling();
+    };
+  };
 
   loadLanguage = language => {
     if (SUPPORTED_LOCALE.includes(language)) {

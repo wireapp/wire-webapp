@@ -29,6 +29,10 @@ export const COOKIE_SET_START = 'COOKIE_SET_START';
 export const COOKIE_SET_SUCCESS = 'COOKIE_SET_SUCCESS';
 export const COOKIE_SET_FAILED = 'COOKIE_SET_FAILED';
 
+export const COOKIE_REMOVE_START = 'COOKIE_REMOVE_START';
+export const COOKIE_REMOVE_SUCCESS = 'COOKIE_REMOVE_SUCCESS';
+export const COOKIE_REMOVE_FAILED = 'COOKIE_REMOVE_FAILED';
+
 export const stopCookiePolling = ({name, timerId}) => ({
   payload: {name, timerId},
   type: COOKIE_POLLING_STOP,
@@ -67,4 +71,19 @@ export const successfulSetCookie = ({cookie, name}) => ({
 export const failedSetCookie = error => ({
   payload: error,
   type: COOKIE_SET_FAILED,
+});
+
+export const startRemoveCookie = ({cookie, name}) => ({
+  payload: {cookie, name},
+  type: COOKIE_REMOVE_SUCCESS,
+});
+
+export const successfulRemoveCookie = ({cookie, name}) => ({
+  payload: {cookie, name},
+  type: COOKIE_REMOVE_SUCCESS,
+});
+
+export const failedRemoveCookie = error => ({
+  payload: error,
+  type: COOKIE_REMOVE_FAILED,
 });

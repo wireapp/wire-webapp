@@ -66,10 +66,37 @@ export function getCookie(name, asJSON = false) {
   };
 }
 
+export function removeCookie(name, value) {
+  return function(dispatch, getState, {cookieStore}) {
+    return Promise.resolve()
+      .then(() => {
+        if (cookieStore.get(name).includes(value)) {
+          cookieStore.remove(name);
+          dispatch(CookieActionCreator.successfulRemoveCookie({cookie, name}));
+        }
+      })
+      .catch(error => dispatch(CookieActionCreator.failedRemoveCookie(error)));
+  };
+}
+
 export function setCookie(name, value) {
   return function(dispatch, getState, {cookieStore}) {
     return Promise.resolve(cookieStore.set(name, value))
-      .then(cookie => dispatch(CookieActionCreator.successfulSetCookie({cookie, name})))
+      .then(() => dispatch(CookieActionCreator.successfulSetCookie({cookie, name})))
+      .catch(error => dispatch(CookieActionCreator.failedSetCookie(error)));
+  };
+}
+
+export function setCookieIfAbsent(name, value) {
+  return function(dispatch, getState, {cookieStore}) {
+    return Promise.resolve()
+      .then(() => {
+        if (!cookieStore.get(name)) {
+          cookieStore.set(name, value);
+          const cookie = cookieStore.get(name);
+          dispatch(CookieActionCreator.successfulSetCookie({cookie, name}));
+        }
+      })
       .catch(error => dispatch(CookieActionCreator.failedSetCookie(error)));
   };
 }
