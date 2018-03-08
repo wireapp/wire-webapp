@@ -27,7 +27,7 @@ z.components.GuestModeToggle = class GuestModeToggle {
     this.isChecked = params.isChecked;
     this.onToggle = params.onToggle;
     this.isDisabled = params.isDisabled;
-    this.infoText = params.longInfo ? z.string.guestRoomToggleInfoLong : z.string.guestRoomToggleInfo;
+    this.infoText = params.extendedInfo ? z.string.guestRoomToggleInfoExtended : z.string.guestRoomToggleInfo;
   }
 };
 

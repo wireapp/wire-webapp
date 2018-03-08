@@ -340,6 +340,8 @@ z.string.de.groupCreationParticipantsPlaceholder = 'Nach Namen suchen';
 z.string.de.guestRoomConversationName = 'Gästezimmer';
 z.string.de.guestRoomToggleName = 'Gäste zulassen';
 z.string.de.guestRoomToggleInfo = 'Öffne diese Unterhaltung für Personen außerhalb deines Teams.';
+z.string.de.guestRoomToggleInfoExtended = 'Öffne diese Unterhaltung für Personen außerhalb deines Teams. Dies kann jederzeit wieder geändert werden.';
+
 z.string.de.guestRoomConversationBadge = 'Gäste anwesend';
 
 z.string.de.collectionShowAll = 'Zeige alle {{number}}';
