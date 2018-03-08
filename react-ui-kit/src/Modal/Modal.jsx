@@ -102,9 +102,9 @@ const ModalBackground = styled.div`
   left: 0px;
   height: 100vh;
   width: 100vw;
-  background: rgba(216, 216, 216, 0.4);
+  background: rgba(50, 54, 57, 0.4);
   z-index: 9998;
-  animation: ${backgroundFade} 2s linear;
+  animation: ${backgroundFade} 0.3s ease;
 `;
 
 const noop = () => {};
