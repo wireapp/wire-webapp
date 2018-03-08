@@ -35,8 +35,8 @@ z.conversation.ConversationStateHandler = class ConversationStateHandler {
   }
 
   changeAccessState(conversationEntity, accessState) {
-    const isTeamConversation = conversationEntity && conversationEntity.team_id;
-    if (isTeamConversation) {
+    const isConversationInTeam = conversationEntity && conversationEntity.inTeam();
+    if (isConversationInTeam) {
       const isStateChange = conversationEntity.accessState() !== accessState;
 
       if (isStateChange) {
