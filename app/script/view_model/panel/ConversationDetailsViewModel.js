@@ -134,7 +134,9 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
         return userEntity.is_connected() || userEntity.is_team_member();
       }
     });
-    this.showActionGuestOptions = ko.pureComputed(() => this.conversationEntity().team_id);
+    this.showActionGuestOptions = ko.pureComputed(() => {
+      return this.conversationEntity().team_id && !this.conversationEntity().is_guest();
+    });
     this.showActionLeave = ko.pureComputed(() => {
       return this.conversationEntity().is_group() && !this.conversationEntity().removed_from_conversation();
     });

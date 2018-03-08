@@ -557,7 +557,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
     const normalizedQuery = z.search.SearchRepository.normalizeQuery(query);
     const conversationsForServices = this.conversationRepository
       .get_groups_by_name(normalizedQuery, false)
-      .filter(conversationEntity => conversationEntity.team_id);
+      .filter(conversationEntity => conversationEntity.team_id && !conversationEntity.is_guest());
     this.serviceConversations(conversationsForServices);
   }
 
