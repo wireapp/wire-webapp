@@ -24,6 +24,12 @@ window.z.viewModel = z.viewModel || {};
 window.z.viewModel.panel = z.viewModel.panel || {};
 
 z.viewModel.panel.GuestOptionsViewModel = class GuestOptionsViewModel {
+  static get CONFIG() {
+    return {
+      CONFIRM_DURATION: 1500,
+    };
+  }
+
   constructor(mainViewModel, panelViewModel, repositories) {
     this.panelViewModel = panelViewModel;
     this.conversationRepository = repositories.conversation;
@@ -75,7 +81,7 @@ z.viewModel.panel.GuestOptionsViewModel = class GuestOptionsViewModel {
       link.disabled = true;
       this.isLinkCopied(true);
       amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.GUEST_ROOMS.LINK_COPIED);
-      window.setTimeout(() => this.isLinkCopied(false), 1500);
+      window.setTimeout(() => this.isLinkCopied(false), GuestOptionsViewModel.CONFIG.CONFIRM_DURATION);
     }
   }
 
