@@ -2235,7 +2235,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
           .onClientMismatch(error, conversationId, genericMessage, payload)
           .then(payloadWithMissingClients => {
             updatedPayload = payloadWithMissingClients;
-            return this._grantOutgoingMessage(conversationId, genericMessage, Object.keys(error.missing));
+
+            const userIds = Object.keys(error.missing);
+            return this._grantOutgoingMessage(conversationId, genericMessage, userIds);
           })
           .then(() => {
             this.logger.info(`Updated '${messageType}' message for conversation '${conversationId}'`, updatedPayload);
@@ -2254,12 +2256,13 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const consentType = isCallingMessage
       ? ConversationRepository.CONSENT_TYPE.OUTGOING_CALL
       : ConversationRepository.CONSENT_TYPE.MESSAGE;
+
     return this.grantMessage(conversationId, consentType, userIds, genericMessage.content);
   }
 
   grantMessage(conversationId, consentType, userIds, messageType) {
-    return this.get_conversation_by_id(conversationId).then(conversation_et => {
-      const verificationState = conversation_et.verification_state();
+    return this.get_conversation_by_id(conversationId).then(conversationEntity => {
+      const verificationState = conversationEntity.verification_state();
       const conversationDegraded = verificationState === z.conversation.ConversationVerificationState.DEGRADED;
 
       if (!conversationDegraded) {
@@ -2270,7 +2273,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         let sendAnyway = false;
 
         if (!userIds) {
-          userIds = conversation_et.get_users_with_unverified_clients().map(userEntity => userEntity.id);
+          userIds = conversationEntity.get_users_with_unverified_clients().map(userEntity => userEntity.id);
         }
 
         return this.user_repository
@@ -2323,7 +2326,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
             amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
               action: () => {
                 sendAnyway = true;
-                conversation_et.verification_state(z.conversation.ConversationVerificationState.UNVERIFIED);
+                conversationEntity.verification_state(z.conversation.ConversationVerificationState.UNVERIFIED);
 
                 resolve(true);
               },
