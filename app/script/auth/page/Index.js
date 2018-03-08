@@ -39,6 +39,7 @@ import {connect} from 'react-redux';
 import {indexStrings} from '../../strings';
 import {injectIntl} from 'react-intl';
 import {pathWithParams} from '../util/urlUtil';
+import Page from './Page';
 
 class Index extends Component {
   componentDidMount() {
@@ -66,45 +67,47 @@ class Index extends Component {
   render() {
     const {intl: {formatMessage: _}} = this.props;
     return (
-      <ContainerXS centerText verticalCenter>
-        <Logo scale={1.68} data-uie-name="ui-wire-logo" />
-        <Paragraph center>{_(indexStrings.claim)}</Paragraph>
-        <Columns style={{margin: '70px auto'}}>
-          <Column>
-            <Link onClick={this.onRegisterPersonalClick} data-uie-name="go-register-personal">
-              <RoundContainer style={{marginBottom: 12}}>
-                <ProfileIcon color={COLOR.WHITE} />
-              </RoundContainer>
-              <Bold fontSize="24px" color={COLOR.LINK}>
-                {_(indexStrings.createAccount)}
-              </Bold>
-              <br />
-              <Text light fontSize="16px" color={COLOR.LINK} style={{lineHeight: '36px'}}>
-                {_(indexStrings.createAccountFor)}
-              </Text>
-            </Link>
-          </Column>
-          <Column>
-            <Link onClick={this.onRegisterTeamClick} data-uie-name="go-register-team">
-              <RoundContainer color={COLOR.GREEN} style={{marginBottom: 12}}>
-                <TeamIcon color={COLOR.WHITE} />
-              </RoundContainer>
-              <Bold fontSize="24px" color={COLOR.LINK}>
-                {_(indexStrings.createTeam)}
-              </Bold>
-              <br />
-              <Text light fontSize="16px" color={COLOR.LINK} style={{lineHeight: '36px'}}>
-                {_(indexStrings.createTeamFor)}
-              </Text>
-            </Link>
-          </Column>
-        </Columns>
-        <Text>{_(indexStrings.loginInfo)}</Text>
-        <br />
-        <Link fontSize="24px" textTransform="none" onClick={this.onLoginClick} data-uie-name="go-login">
-          {_(indexStrings.login)}
-        </Link>
-      </ContainerXS>
+      <Page>
+        <ContainerXS centerText verticalCenter>
+          <Logo scale={1.68} data-uie-name="ui-wire-logo" />
+          <Paragraph center>{_(indexStrings.claim)}</Paragraph>
+          <Columns style={{margin: '70px auto'}}>
+            <Column>
+              <Link onClick={this.onRegisterPersonalClick} data-uie-name="go-register-personal">
+                <RoundContainer style={{marginBottom: 12}}>
+                  <ProfileIcon color={COLOR.WHITE} />
+                </RoundContainer>
+                <Bold fontSize="24px" color={COLOR.LINK}>
+                  {_(indexStrings.createAccount)}
+                </Bold>
+                <br />
+                <Text light fontSize="16px" color={COLOR.LINK} style={{lineHeight: '36px'}}>
+                  {_(indexStrings.createAccountFor)}
+                </Text>
+              </Link>
+            </Column>
+            <Column>
+              <Link onClick={this.onRegisterTeamClick} data-uie-name="go-register-team">
+                <RoundContainer color={COLOR.GREEN} style={{marginBottom: 12}}>
+                  <TeamIcon color={COLOR.WHITE} />
+                </RoundContainer>
+                <Bold fontSize="24px" color={COLOR.LINK}>
+                  {_(indexStrings.createTeam)}
+                </Bold>
+                <br />
+                <Text light fontSize="16px" color={COLOR.LINK} style={{lineHeight: '36px'}}>
+                  {_(indexStrings.createTeamFor)}
+                </Text>
+              </Link>
+            </Column>
+          </Columns>
+          <Text>{_(indexStrings.loginInfo)}</Text>
+          <br />
+          <Link fontSize="24px" textTransform="none" onClick={this.onLoginClick} data-uie-name="go-login">
+            {_(indexStrings.login)}
+          </Link>
+        </ContainerXS>
+      </Page>
     );
   }
 }

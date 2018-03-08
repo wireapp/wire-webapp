@@ -209,6 +209,18 @@ export const appAlreadyOpenStrings = defineMessages({
   },
 });
 
+export const unsupportedStrings = defineMessages({
+  headline: {
+    id: 'unsupported.unsupportedHeadline',
+    defaultMessage: 'This browser is not supported.',
+  },
+  subhead: {
+    id: 'unsupported.unsupportedSubhead',
+    defaultMessage:
+      'Download the latest version of <b>Google Chrome, Mozilla Firefox, Opera</b> or <b>Microsoft Edge.</b>',
+  },
+});
+
 export const unsupportedJoinStrings = defineMessages({
   unsupportedJoinHeadline: {
     id: 'conversationJoin.unsupportedJoinHeadline',
