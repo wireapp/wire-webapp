@@ -17,14 +17,14 @@
  *
  */
 
-import {Link, Small, Logo, Container, Header, Footer, Content} from '@wireapp/react-ui-kit';
+import {Link, Small, Logo, Header, Footer, Content} from '@wireapp/react-ui-kit';
 import {footerStrings} from '../../strings';
 import {injectIntl} from 'react-intl';
 import ROUTE from '../route';
 import React from 'react';
 
 export const WirelessContainer = ({children, intl: {formatMessage: _}}) => (
-  <Container
+  <div
     style={{
       display: 'flex',
       flexDirection: 'column',
@@ -35,12 +35,12 @@ export const WirelessContainer = ({children, intl: {formatMessage: _}}) => (
     <Header style={{height: '40px', marginLeft: '8px', marginTop: '20px'}}>
       <Logo width={72} />
     </Header>
-    <Content style={{flex: '1', paddingLeft: '8px', width: '520px'}}>{children}</Content>
+    <Content style={{flex: '1', paddingLeft: '8px', width: '100%'}}>{children}</Content>
     <Footer style={{height: '30px', justifyContent: 'flex-end', margin: '0 0 18px 8px'}}>
       <Link href={ROUTE.WIRE_ROOT}>{_(footerStrings.wireLink)}</Link>
       <Small> &middot; {_(footerStrings.copy)}</Small>
     </Footer>
-  </Container>
+  </div>
 );
 
 export default injectIntl(WirelessContainer);

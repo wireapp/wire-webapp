@@ -28,7 +28,7 @@ import {
   Input,
   RoundIconButton,
   ErrorMessage,
-  Container,
+  ContainerXS,
   COLOR,
 } from '@wireapp/react-ui-kit';
 import {conversationJoinStrings} from '../../strings';
@@ -131,7 +131,7 @@ class ConversationJoin extends Component {
   renderExistentAccount = () => {
     const {intl: {formatMessage: _}} = this.props;
     return (
-      <Container verticalCenter>
+      <ContainerXS style={{margin: 'auto 0'}}>
         <AppAlreadyOpen />
         <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}} color={COLOR.GRAY}>
           <FormattedHTMLMessage {...conversationJoinStrings.headline} />
@@ -154,7 +154,7 @@ class ConversationJoin extends Component {
           </Link>
           {` ${_(conversationJoinStrings.existentAccountJoinWithoutText)}`}
         </Small>
-      </Container>
+      </ContainerXS>
     );
   };
 
@@ -162,7 +162,7 @@ class ConversationJoin extends Component {
     const {intl: {formatMessage: _}} = this.props;
     const {enteredName, isValidName, error} = this.state;
     return (
-      <Container verticalCenter>
+      <ContainerXS style={{margin: 'auto 0'}}>
         <AppAlreadyOpen />
         <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}} color={COLOR.GRAY}>
           <FormattedHTMLMessage {...conversationJoinStrings.headline} />
@@ -213,14 +213,14 @@ class ConversationJoin extends Component {
             {_(conversationJoinStrings.loginLink)}
           </Link>
         </Small>
-      </Container>
+      </ContainerXS>
     );
   };
 
   renderInvalidLink = () => {
     const {intl: {formatMessage: _}} = this.props;
     return (
-      <Container verticalCenter>
+      <ContainerXS style={{margin: 'auto 0'}}>
         <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}} color={COLOR.GRAY}>
           <FormattedHTMLMessage {...conversationJoinStrings.invalidHeadline} />
         </H2>
@@ -231,19 +231,19 @@ class ConversationJoin extends Component {
           </Link>
           {` ${_(conversationJoinStrings.invalidCreateAccountText)}`}
         </Small>
-      </Container>
+      </ContainerXS>
     );
   };
 
   renderFullConversation = () => {
     const {intl: {formatMessage: _}} = this.props;
     return (
-      <Container verticalCenter>
+      <ContainerXS style={{margin: 'auto 0'}}>
         <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}} color={COLOR.GRAY}>
           <FormattedHTMLMessage {...conversationJoinStrings.fullConversationHeadline} />
         </H2>
         <H3 style={{marginTop: '10px'}}>{_(conversationJoinStrings.fullConversationSubhead)}</H3>
-      </Container>
+      </ContainerXS>
     );
   };
 

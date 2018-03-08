@@ -17,7 +17,7 @@
  *
  */
 
-import {H2, H3, Container, COLOR} from '@wireapp/react-ui-kit';
+import {H2, H3, ContainerXS, COLOR} from '@wireapp/react-ui-kit';
 import {unsupportedJoinStrings} from '../../strings';
 import WirelessContainer from './WirelessContainer';
 import {connect} from 'react-redux';
@@ -32,7 +32,7 @@ export const WirelessUnsupportedBrowser = ({children, intl: {formatMessage: _}})
     children
   ) : (
     <WirelessContainer>
-      <Container verticalCenter>
+      <ContainerXS style={{margin: 'auto 0'}}>
         <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}} color={COLOR.GRAY}>
           <FormattedHTMLMessage {...unsupportedJoinStrings.unsupportedJoinHeadline} />
         </H2>
@@ -45,7 +45,7 @@ export const WirelessUnsupportedBrowser = ({children, intl: {formatMessage: _}})
             <FormattedHTMLMessage {...unsupportedJoinStrings.unsupportedJoinSubhead} />
           </H3>
         )}
-      </Container>
+      </ContainerXS>
     </WirelessContainer>
   );
 
