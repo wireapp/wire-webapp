@@ -106,6 +106,28 @@
     cursor: pointer;
     user-select: none;
 
+    &--alternate {
+      @i__default {
+        opacity: 1;
+        transform: scale(1);
+      }
+      @i__alternative {
+        opacity: 0;
+        transform: scale(1.1);
+      }
+    }
+
+    &--show-alternative {
+      @i__default {
+        opacity: 0;
+        transform: scale(0.9);
+      }
+      @i__alternative {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
     &__icon {
       width: 40px;
       margin-left: 4px;
