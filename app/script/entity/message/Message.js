@@ -314,13 +314,13 @@ z.entity.Message = class Message {
 
     this.ephemeral_interval_id = window.setInterval(() => {
       this.ephemeral_remaining(this.ephemeral_expires() - Date.now());
-      return this.ephemeral_caption(z.util.format_time_remaining(this.ephemeral_remaining()));
+      this.ephemeral_caption(z.util.format_time_remaining(this.ephemeral_remaining()));
     }, 250);
 
-    return (this.ephemeral_timeout_id = window.setTimeout(() => {
+    this.ephemeral_timeout_id = window.setTimeout(() => {
       amplify.publish(z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, this);
-      return window.clearInterval(this.ephemeral_interval_id);
-    }, this.ephemeral_remaining()));
+      window.clearInterval(this.ephemeral_interval_id);
+    }, this.ephemeral_remaining());
   }
 
   /**

@@ -36,6 +36,15 @@ z.entity.User = class User {
     };
   }
 
+  static get CONFIG() {
+    return {
+      TEMPORARY_GUEST: {
+        EXPIRATION_INTERVAL: 60 * 1000,
+        LIFETIME: 24 * 60 * 60 * 1000,
+      },
+    };
+  }
+
   static get THEME() {
     return {
       BLUE: 'theme-blue',
@@ -166,6 +175,11 @@ z.entity.User = class User {
     });
 
     this.availability = ko.observable(z.user.AvailabilityType.NONE);
+
+    this.expirationTimestamp = ko.observable();
+    this.expirationRemaining = ko.observable();
+    this.expirationIntervalId = undefined;
+    this.isExpired = ko.observable(false);
   }
 
   subscribeToChanges() {
@@ -211,5 +225,24 @@ z.entity.User = class User {
       availability: this.availability(),
       id: this.id,
     };
+  }
+
+  setExpiration(timestamp) {
+    if (this.expirationIntervalId) {
+      window.clearInterval(this.expirationIntervalId);
+      this.expirationIntervalId = undefined;
+    }
+
+    this.expirationTimestamp(timestamp);
+    this.expirationRemaining(this.expirationTimestamp() - Date.now());
+
+    this.expirationIntervalId = window.setInterval(() => {
+      this.expirationRemaining(this.expirationTimestamp() - Date.now());
+    }, User.CONFIG.TEMPORARY_GUEST.EXPIRATION_INTERVAL);
+
+    window.setTimeout(() => {
+      this.isExpired(true);
+      window.clearInterval(this.expirationIntervalId);
+    }, this.expirationRemaining());
   }
 };
