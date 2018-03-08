@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="2.0.63"></a>
+## [2.0.63](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.0.62...@wireapp/core@2.0.63) (2018-03-08)
+
+
+### Bug Fixes
+
+* **core:** Update cookie if it already exists ([#350](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/350)) ([1c0f339](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/1c0f339))
+
+
+
+
 <a name="2.0.62"></a>
 ## [2.0.62](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.0.61...@wireapp/core@2.0.62) (2018-03-08)
 
