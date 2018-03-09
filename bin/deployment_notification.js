@@ -82,9 +82,8 @@ engine
     });
 
     account = new Account(client);
-    return account;
+    return account.listen(login);
   })
-  .listen(login)
   .then(() => account.service.conversation.sendTextMessage(content.conversationId, content.message))
   .then(() => process.exit(0))
   .catch(error => {
