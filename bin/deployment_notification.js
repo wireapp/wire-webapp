@@ -22,6 +22,7 @@ const path = require('path');
 
 const APIClient = require('@wireapp/api-client');
 const {Account} = require('@wireapp/core');
+const {FileEngine} = require('@wireapp/store-engine');
 
 const login = {
   email: process.env.WIRE_WEBAPP_BOT_EMAIL,
