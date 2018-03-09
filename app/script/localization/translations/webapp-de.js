@@ -25,6 +25,7 @@ z.string.de.nonexistentUser = 'Gelöschte Person';
 z.string.de.and = 'und';
 z.string.de.enumerationAnd = ' und ';
 
+z.string.de.authAccountClientDeletion  = 'Du wurdest abgemeldet, da dein Gerät gelöscht wurde.';
 z.string.de.authAccountCountryCode = 'Landesvorwahl';
 z.string.de.authAccountDeletion = 'Du wurdest abgemeldet, da dein Benutzerkonto gelöscht wurde.';
 z.string.de.authAccountExpiration = 'Du wurdest abgemeldet, da deine Session abgelaufen ist. Bitte melde dich erneut an.';
