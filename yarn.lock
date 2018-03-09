@@ -440,16 +440,16 @@
     ed2curve "0.2.1"
     libsodium-wrappers-sumo "0.7.3"
 
-"@wireapp/react-ui-kit@1.0.10":
-  version "1.0.10"
-  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-1.0.10.tgz#90aa3a92abfe8a4e9e7d4bd4233fa57d07d572d9"
+"@wireapp/react-ui-kit@1.0.11":
+  version "1.0.11"
+  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-1.0.11.tgz#e9838b7f9c60c08c22b5f06780bbc579ae11d7df"
   dependencies:
     color "3.0.0"
     gulp-concat "2.6.1"
     react "16.2.0"
     react-dom "16.2.0"
     recompose "0.26.0"
-    styled-components "3.2.0"
+    styled-components "3.2.1"
     styled-normalize "4.0.0"
 
 "@wireapp/store-engine@0.1.0":
@@ -9831,9 +9831,9 @@ style-loader@0.20.2:
     loader-utils "^1.1.0"
     schema-utils "^0.4.3"
 
-styled-components@3.2.0:
-  version "3.2.0"
-  resolved "https://registry.yarnpkg.com/styled-components/-/styled-components-3.2.0.tgz#5e063656783a66f6bf411153fcfe994572f3e848"
+styled-components@3.2.1:
+  version "3.2.1"
+  resolved "https://registry.yarnpkg.com/styled-components/-/styled-components-3.2.1.tgz#4f780c588829eb06624b686f9b793a10d04db139"
   dependencies:
     buffer "^5.0.3"
     css-to-react-native "^2.0.3"
