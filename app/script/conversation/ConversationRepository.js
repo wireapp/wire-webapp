@@ -2688,7 +2688,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     const isStateEvent = ConversationRepository.CONFIG.STATE_EVENTS.includes(eventJson.type);
     if (isStateEvent) {
-      return this.stateHandler.onConversationEvent(eventJson, source);
+      return this.stateHandler.onConversationEvent(eventJson, eventSource);
     }
 
     return this._pushToReceivingQueue(eventJson, eventSource);

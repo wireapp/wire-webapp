@@ -84,9 +84,7 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
       }
     });
     this.disableToggleScreen = ko.pureComputed(() => {
-      if (this.joined_call()) {
-        return this.joined_call().isRemoteScreenSend();
-      }
+      return this.joined_call() ? this.joined_call().isRemoteScreenSend() : true;
     });
 
     this.call_is_outgoing = ko.pureComputed(() => this.call().state() === z.calling.enum.CALL_STATE.OUTGOING);
