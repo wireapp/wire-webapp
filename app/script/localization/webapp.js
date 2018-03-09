@@ -29,6 +29,7 @@ z.string.enumerationAnd = ', and ';
 
 // Auth
 // Authentication: ACCOUNT section
+z.string.authAccountClientDeletion = 'You were signed out because your device was deleted.';
 z.string.authAccountCountryCode = 'Country Code';
 z.string.authAccountDeletion = 'You were signed out because your account was deleted.';
 z.string.authAccountExpiration = 'You were signed out because your session expired. Please log in again.';
