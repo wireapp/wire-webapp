@@ -1181,7 +1181,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       const hasResponse = response && response.event;
       const event = hasResponse
         ? response.event
-        : z.conversation.EventBuilder.buildMemberLeave(conversationEntity, userId, this.timeOffset);
+        : z.conversation.EventBuilder.buildMemberLeave(conversationEntity, userId, true, this.timeOffset);
 
       amplify.publish(z.event.WebApp.EVENT.INJECT, event, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
       return event;
@@ -1197,8 +1197,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   removeMember(conversationEntity, userId) {
     return this.conversation_service.deleteMembers(conversationEntity.id, userId).then(response => {
-      const event =
-        response || z.conversation.EventBuilder.buildMemberLeave(conversationEntity, userId, this.timeOffset);
+      const event = !!response
+        ? response
+        : z.conversation.EventBuilder.buildMemberLeave(conversationEntity, userId, true, this.timeOffset);
 
       amplify.publish(z.event.WebApp.EVENT.INJECT, event, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
       return event;
@@ -2260,7 +2261,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return this.grantMessage(conversationId, consentType, userIds, genericMessage.content);
   }
 
-  grantMessage(conversationId, consentType, userIds, messageType) {
+  grantMessage(conversationId, consentType, userIds, type) {
     return this.get_conversation_by_id(conversationId).then(conversationEntity => {
       const verificationState = conversationEntity.verification_state();
       const conversationDegraded = verificationState === z.conversation.ConversationVerificationState.DEGRADED;
@@ -2294,13 +2295,13 @@ z.conversation.ConversationRepository = class ConversationRepository {
                   ? z.string.modalConversationNewDeviceHeadlineYou
                   : z.string.modalConversationNewDeviceHeadlineOne;
               } else {
-                const log = `Granting message '${messageType}' in '${conversationId}' for '${consentType}'  needs ids`;
+                const log = `Granting message '${type}' in '${conversationId}' for '${consentType}' needs user ids`;
                 this.logger.error(log);
 
                 const error = new Error('Failed to grant outgoing message');
                 const customData = {
                   consentType,
-                  messageType,
+                  messageType: type,
                   participants: conversationEntity.getNumberOfParticipants(false),
                   verificationState,
                 };

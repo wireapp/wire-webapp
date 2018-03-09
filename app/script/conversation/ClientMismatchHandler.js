@@ -158,7 +158,7 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
         const _removeRedundantUser = userId => {
           if (conversationEntity && conversationEntity.is_group()) {
             const timeOffset = this.conversationRepository.timeOffset;
-            const event = z.conversation.EventBuilder.buildMemberLeave(conversationEntity, userId, timeOffset);
+            const event = z.conversation.EventBuilder.buildMemberLeave(conversationEntity, userId, false, timeOffset);
 
             amplify.publish(z.event.WebApp.EVENT.INJECT, event);
           }
