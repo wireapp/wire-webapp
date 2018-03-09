@@ -44,7 +44,7 @@
     "@bower_components/wire-webapp-lru-cache": "wireapp/wire-webapp-lru-cache#2.0.0",
     "@bower_components/wire-webapp-proteus": "wireapp/proteus.js#5.2.0",
     "@wireapp/core": "0.0.32",
-    "@wireapp/react-ui-kit": "0.0.30",
+    "@wireapp/react-ui-kit": "1.0.11",
     "babel-plugin-react-intl": "2.4.0",
     "babel-polyfill": "6.26.0",
     "intl": "1.2.5",
