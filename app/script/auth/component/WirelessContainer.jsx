@@ -40,7 +40,7 @@ export const WirelessContainer = ({
     {showCookiePolicyBanner && (
       <Header
         style={{
-          backgroundColor: '#faeed1',
+          backgroundColor: 'rgba(254, 191, 2, 0.2)',
           display: 'flex',
           height: '60px',
           margin: '0',
