@@ -37,12 +37,14 @@ class AppAlreadyOpen extends React.Component {
     return (
       isAppAlreadyOpen && (
         <Modal>
-          <Container style={{maxWidth: '400px'}}>
-            <H3 style={{fontWeight: '500'}}>{_(appAlreadyOpenStrings.headline)}</H3>
+          <Container style={{maxWidth: '320px'}}>
+            <H3 style={{fontWeight: '500', marginTop: '10px'}}>{_(appAlreadyOpenStrings.headline)}</H3>
             <Text>{_(appAlreadyOpenStrings.text)}</Text>
             <Columns style={{marginTop: '20px'}}>
               <Column style={{textAlign: 'center'}}>
-                <Button onClick={this.onContinue}>{_(appAlreadyOpenStrings.continueButton)}</Button>
+                <Button block onClick={this.onContinue} style={{marginBottom: '10px'}}>
+                  {_(appAlreadyOpenStrings.continueButton)}
+                </Button>
               </Column>
             </Columns>
           </Container>

@@ -217,7 +217,7 @@ export const unsupportedStrings = defineMessages({
   subhead: {
     id: 'unsupported.unsupportedSubhead',
     defaultMessage:
-      'Download the latest version of <b>Google Chrome, Mozilla Firefox, Opera</b> or <b>Microsoft Edge.</b>',
+      'Download the latest version of <b style="font-weight: 600">Google Chrome, Mozilla Firefox, Opera</b style="font-weight: 600"> or <b style="font-weight: 600">Microsoft Edge.</b>',
   },
 });
 
@@ -229,7 +229,7 @@ export const unsupportedJoinStrings = defineMessages({
   unsupportedJoinSubhead: {
     id: 'conversationJoin.unsupportedJoinSubhead',
     defaultMessage:
-      'This browser is not supported.<br />Download the latest version of <b>Google Chrome, Mozilla Firefox, Opera</b> or <b>Microsoft Edge.</b>',
+      '<p>This browser is not supported.</p>Download the latest version of <b style="font-weight: 600">Google Chrome, Mozilla Firefox, Opera</b> or <b  style="font-weight: 600">Microsoft Edge.</b>',
   },
   unsupportedJoinMobileSubhead: {
     id: 'conversationJoin.unsupportedJoinMobileSubhead',
