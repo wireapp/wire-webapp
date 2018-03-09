@@ -88,7 +88,7 @@ describe('Conversation Mapper', () => {
     });
   });
 
-  describe('update_properties', () => {
+  describe('updateProperties', () => {
     it('can update the properties of a conversation', () => {
       const creator_id = z.util.create_random_uuid();
       const conversation_et = conversation_mapper._create_conversation_et(payload.conversations.get.conversations[0]);
@@ -97,7 +97,7 @@ describe('Conversation Mapper', () => {
         id: 'd5a39ffb-6ce3-4cc8-9048-0123456789abc',
         name: 'New foo bar conversation name',
       };
-      const updated_conversation_et = conversation_mapper.update_properties(conversation_et, data);
+      const updated_conversation_et = conversation_mapper.updateProperties(conversation_et, data);
 
       expect(updated_conversation_et.name()).toBe(data.name);
       expect(updated_conversation_et.id).not.toBe(data.id);
