@@ -34,6 +34,13 @@ export const footerStrings = defineMessages({
   },
 });
 
+export const cookiePolicyStrings = defineMessages({
+  bannerText: {
+    id: 'cookiePolicyStrings.bannerText',
+    defaultMessage: '<Cookie Policy Placeholder>',
+  },
+});
+
 export const indexStrings = defineMessages({
   claim: {
     id: 'index.claim',

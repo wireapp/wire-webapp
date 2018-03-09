@@ -59,6 +59,7 @@ class ConversationJoin extends Component {
     forceNewAccount: false,
     isValidLink: true,
     isValidName: true,
+    showCookiePolicyBanner: true,
   };
 
   readAndUpdateParamsFromUrl = (nextProps = this.props) => {
@@ -254,7 +255,10 @@ class ConversationJoin extends Component {
     const {isValidLink, forceNewAccount} = this.state;
     return (
       <WirelessUnsupportedBrowser>
-        <WirelessContainer>
+        <WirelessContainer
+          showCookiePolicyBanner={this.state.showCookiePolicyBanner}
+          onCookiePolicyBannerClose={() => this.setState({...this.state, showCookiePolicyBanner: false})}
+        >
           {isValidLink
             ? this.isConversationFullErrorPresent(error)
               ? this.renderFullConversation()

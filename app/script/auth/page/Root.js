@@ -18,7 +18,7 @@
  */
 
 import React from 'react';
-import {StyledApp, Content} from '@wireapp/react-ui-kit';
+import {StyledApp} from '@wireapp/react-ui-kit';
 import {HashRouter as Router, Redirect, Route, Switch} from 'react-router-dom';
 import Index from './Index';
 import InitialInvite from './InitialInvite';
@@ -62,24 +62,22 @@ class Root extends React.Component {
       <IntlProvider locale={language} messages={this.loadLanguage(language)}>
         <StyledApp>
           <Router hashType="noslash">
-            <Content>
-              <Switch>
-                <Route exact path={ROUTE.INDEX} component={Index} />
-                <Route
-                  path={`${ROUTE.CONVERSATION_JOIN}/:conversationKey/:conversationCode`}
-                  component={ConversationJoin}
-                />
-                <Route path={ROUTE.CREATE_TEAM} component={TeamName} />
-                <Route path={ROUTE.CREATE_TEAM_ACCOUNT} component={CreateAccount} />
-                <Route path={ROUTE.CREATE_ACCOUNT} component={CreatePersonalAccount} />
-                <Route path={`${ROUTE.INVITE}/:invitationCode`} component={CreatePersonalAccount} />
-                <Route path={ROUTE.INVITE} component={CreatePersonalAccount} />
-                <Route path={ROUTE.VERIFY} component={Verify} />
-                <Route path={ROUTE.INITIAL_INVITE} component={InitialInvite} />
-                <Route path={ROUTE.CHOOSE_HANDLE} component={ChooseHandle} />
-                <Redirect to={ROUTE.INDEX} />
-              </Switch>
-            </Content>
+            <Switch>
+              <Route exact path={ROUTE.INDEX} component={Index} />
+              <Route
+                path={`${ROUTE.CONVERSATION_JOIN}/:conversationKey/:conversationCode`}
+                component={ConversationJoin}
+              />
+              <Route path={ROUTE.CREATE_TEAM} component={TeamName} />
+              <Route path={ROUTE.CREATE_TEAM_ACCOUNT} component={CreateAccount} />
+              <Route path={ROUTE.CREATE_ACCOUNT} component={CreatePersonalAccount} />
+              <Route path={`${ROUTE.INVITE}/:invitationCode`} component={CreatePersonalAccount} />
+              <Route path={ROUTE.INVITE} component={CreatePersonalAccount} />
+              <Route path={ROUTE.VERIFY} component={Verify} />
+              <Route path={ROUTE.INITIAL_INVITE} component={InitialInvite} />
+              <Route path={ROUTE.CHOOSE_HANDLE} component={ChooseHandle} />
+              <Redirect to={ROUTE.INDEX} />
+            </Switch>
           </Router>
         </StyledApp>
       </IntlProvider>

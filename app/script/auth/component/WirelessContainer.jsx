@@ -17,13 +17,18 @@
  *
  */
 
-import {Link, Small, Logo, Header, Footer, Content} from '@wireapp/react-ui-kit';
-import {footerStrings} from '../../strings';
+import {Link, Small, Logo, Header, Footer, Content, CloseIcon} from '@wireapp/react-ui-kit';
+import {footerStrings, cookiePolicyStrings} from '../../strings';
 import {injectIntl} from 'react-intl';
 import ROUTE from '../route';
 import React from 'react';
 
-export const WirelessContainer = ({children, intl: {formatMessage: _}}) => (
+export const WirelessContainer = ({
+  showCookiePolicyBanner,
+  onCookiePolicyBannerClose,
+  children,
+  intl: {formatMessage: _},
+}) => (
   <div
     style={{
       display: 'flex',
@@ -32,14 +37,31 @@ export const WirelessContainer = ({children, intl: {formatMessage: _}}) => (
       width: '100%',
     }}
   >
-    <Header style={{height: '40px', marginLeft: '8px', marginTop: '20px'}}>
-      <Logo width={72} />
-    </Header>
-    <Content style={{flex: '1', paddingLeft: '8px', width: '100%'}}>{children}</Content>
-    <Footer style={{height: '30px', justifyContent: 'flex-end', margin: '0 0 18px 8px'}}>
-      <Link href={ROUTE.WIRE_ROOT}>{_(footerStrings.wireLink)}</Link>
-      <Small> &middot; {_(footerStrings.copy)}</Small>
-    </Footer>
+    {showCookiePolicyBanner && (
+      <Header
+        style={{
+          backgroundColor: '#faeed1',
+          display: 'flex',
+          height: '60px',
+          margin: '0',
+        }}
+      >
+        <div style={{margin: 'auto'}}>{_(cookiePolicyStrings.bannerText)}</div>
+        <div onClick={onCookiePolicyBannerClose} style={{margin: '20px'}}>
+          <CloseIcon />
+        </div>
+      </Header>
+    )}
+    <Content>
+      <Header style={{height: '40px', marginLeft: '8px', marginTop: '20px'}}>
+        <Logo width={72} />
+      </Header>
+      <Content style={{flex: '1', paddingLeft: '8px', width: '100%'}}>{children}</Content>
+      <Footer style={{height: '30px', justifyContent: 'flex-end', margin: '0 0 18px 8px'}}>
+        <Link href={ROUTE.WIRE_ROOT}>{_(footerStrings.wireLink)}</Link>
+        <Small> &middot; {_(footerStrings.copy)}</Small>
+      </Footer>
+    </Content>
   </div>
 );
 
