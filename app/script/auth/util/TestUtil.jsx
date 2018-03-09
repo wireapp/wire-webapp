@@ -23,17 +23,21 @@ import React from 'react';
 import {HashRouter} from 'react-router-dom';
 import {IntlProvider} from 'react-intl';
 import {Provider} from 'react-redux';
-import {StoreEngine} from '@wireapp/store-engine';
+import StoreEngine from '@wireapp/store-engine';
 import {mount} from 'enzyme';
 import thunk from 'redux-thunk';
 
+const engine = new StoreEngine.MemoryEngine();
+engine.init('test-execution');
+
 const apiClient = new Client({
-  store: new StoreEngine.MemoryEngine('test-execution'),
+  store: engine,
   urls: Client.BACKEND.STAGING,
 });
 
 export const mockStore = (
   state = {
+    authState: {},
     languageState: {
       language: 'en',
     },
