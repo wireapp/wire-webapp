@@ -15,7 +15,7 @@
     "@bower_components/js-cookie": "js-cookie/js-cookie#2.2.0",
     "@bower_components/keyboardjs": "RobertWHurst/KeyboardJS#2.4.1",
     "@bower_components/knockout": "knockout/knockout#3.4.1",
-    "@bower_components/libsodium.js": "jedisct1/libsodium.js#0.5.4",
+    "@bower_components/libsodium.js": "jedisct1/libsodium.js#0.7.3",
     "@bower_components/linkifyjs": "nfrasser/linkify-shim#2.1.5",
     "@bower_components/long": "dcodeIO/Long.js#*",
     "@bower_components/mixpanel": "mixpanel/mixpanel-js#2.18.0",
@@ -39,11 +39,7 @@
     "@bower_components/webrtc-adapter": "webrtc/adapter#6.1.1",
     "@bower_components/wire-audio-files": "wireapp/wire-audio-files#1.1.1",
     "@bower_components/wire-theme": "wireapp/wire-theme#1.0.6",
-    "@bower_components/wire-webapp-cbor": "wireapp/wire-webapp-cbor#2.1.5",
-    "@bower_components/wire-webapp-cryptobox": "wireapp/wire-webapp-cryptobox#6.2.0",
-    "@bower_components/wire-webapp-lru-cache": "wireapp/wire-webapp-lru-cache#2.0.0",
-    "@bower_components/wire-webapp-proteus": "wireapp/proteus.js#5.2.0",
-    "@wireapp/core": "0.0.32",
+    "@wireapp/core": "2.0.67",
     "@wireapp/react-ui-kit": "0.0.30",
     "babel-plugin-react-intl": "2.4.0",
     "babel-polyfill": "6.26.0",
@@ -224,7 +220,7 @@
       "js": "dist/knockout.debug.js"
     },
     "@bower_components/libsodium.js": {
-      "js": "dist/browsers-sumo/combined/sodium.js"
+      "js": "dist/browsers-sumo/sodium.js"
     },
     "@bower_components/linkifyjs": {
       "js": "linkify{-html,}.min.js"
@@ -319,18 +315,6 @@
     },
     "@bower_components/wire-theme": {
       "less": "app/style/{wire-theme,variables,input}.less"
-    },
-    "@bower_components/wire-webapp-cbor": {
-      "js": "dist/window/*.js"
-    },
-    "@bower_components/wire-webapp-cryptobox": {
-      "js": "dist/window/*.js"
-    },
-    "@bower_components/wire-webapp-lru-cache": {
-      "js": "dist/window/*.js"
-    },
-    "@bower_components/wire-webapp-proteus": {
-      "js": "dist/window/*.js"
     }
   }
 }

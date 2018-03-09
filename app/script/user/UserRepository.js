@@ -705,7 +705,7 @@ z.user.UserRepository = class UserRepository {
         return this.save_user(user_et, true);
       })
       .catch(error => {
-        this.logger.error(`Unable to load self user: ${error}`);
+        this.logger.error(`Unable to load self user: ${error.message || error}`, [error]);
         throw error;
       });
   }

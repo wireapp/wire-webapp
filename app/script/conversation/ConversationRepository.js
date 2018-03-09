@@ -1924,7 +1924,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Sending a message to the remote end of a session reset.
    *
    * @note When we reset a session then we must inform the remote client about this action. It sends a ProtocolBuffer message
-   *  (which will not be rendered in the view)  to the remote client. This message only needs to be sent to the affected
+   *  (which will not be rendered in the view) to the remote client. This message only needs to be sent to the affected
    *  remote client, therefore we force the message sending.
    *
    * @param {string} user_id - User ID
