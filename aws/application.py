@@ -65,6 +65,13 @@ def login():
   ))
   return response
 
+@application.route('/join/')
+@main.latest_browser_required
+def join():
+  key = flask.request.args.get('key')
+  code = flask.request.args.get('code')
+  return flask.redirect('/auth/#join-conversation/{0}/{1}'.format(key, code))
+
 
 @application.route('/robots.txt')
 def robots_txt():
