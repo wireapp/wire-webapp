@@ -24,38 +24,50 @@ window.z.viewModel = z.viewModel || {};
 window.z.viewModel.content = z.viewModel.content || {};
 
 z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
+  static get CONFIG() {
+    return {
+      AUDIO_METER: {
+        FFT_SIZE: 1024,
+        INTERVAL: 100,
+        LEVEL_ADJUSTMENT: 0.075,
+        SMOOTHING_TIME_CONSTANT: 0.2,
+      },
+    };
+  }
+
   constructor(mainViewModel, contentViewModel, repositories) {
     this.initiateDevices = this.initiateDevices.bind(this);
-    this.release_devices = this.release_devices.bind(this);
+    this.releaseDevices = this.releaseDevices.bind(this);
 
-    this.media_repository = repositories.media;
+    this.mediaRepository = repositories.media;
     this.logger = new z.util.Logger('z.viewModel.content.PreferencesAVViewModel', z.config.LOGGER.OPTIONS);
 
-    this.media_devices_handler = this.media_repository.devices_handler;
-    this.available_devices = this.media_devices_handler.available_devices;
-    this.current_device_id = this.media_devices_handler.current_device_id;
+    this.devicesHandler = this.mediaRepository.devices_handler;
+    this.availableDevices = this.devicesHandler.available_devices;
+    this.currentDeviceId = this.devicesHandler.current_device_id;
 
-    this.constraints_handler = this.media_repository.constraints_handler;
-    this.media_stream_handler = this.media_repository.stream_handler;
-    this.media_stream = this.media_stream_handler.local_media_stream;
+    this.constraintsHandler = this.mediaRepository.constraints_handler;
+    this.streamHandler = this.mediaRepository.stream_handler;
+    this.mediaStream = this.streamHandler.local_media_stream;
 
     this.isVisible = false;
 
-    this.media_stream.subscribe(media_stream => {
-      if (this.audio_interval) {
-        this._release_audio_meter();
+    this.mediaStream.subscribe(mediaStream => {
+      if (this.audioInterval) {
+        this._releaseAudioMeter();
       }
 
-      if (this.isVisible && media_stream) {
-        this._initiate_audio_meter(media_stream);
+      if (this.isVisible && mediaStream) {
+        this._initiateAudioMeter(mediaStream);
       }
     });
 
-    this.audio_context = undefined;
-    this.audio_level = ko.observable(0);
-    this.audio_interval = undefined;
+    this.audioContext = undefined;
+    this.audioInterval = undefined;
+    this.audioLevel = ko.observable(0);
+    this.audioSource = undefined;
 
-    this.permission_denied = ko.observable(false);
+    this.permissionDenied = ko.observable(false);
   }
 
   /**
@@ -65,9 +77,9 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
   initiateDevices() {
     this.isVisible = true;
 
-    this._get_media_stream().then(media_stream => {
-      if (media_stream && !this.audio_interval) {
-        this._initiate_audio_meter(media_stream);
+    this._getMediaStream().then(mediaStream => {
+      if (mediaStream && !this.audioInterval) {
+        this._initiateAudioMeter(mediaStream);
       }
     });
   }
@@ -76,10 +88,10 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
    * Release media devices.
    * @returns {undefined} No return value.
    */
-  release_devices() {
+  releaseDevices() {
     this.isVisible = false;
-    this._release_audio_meter();
-    this._release_media_stream();
+    this._releaseAudioMeter();
+    this._releaseMediaStream();
   }
 
   /**
@@ -87,37 +99,40 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
    * @private
    * @returns {Promise} Resolves with a MediaStream
    */
-  _get_media_stream() {
-    if (this.media_stream() && this.media_stream_handler.local_media_type() === z.media.MediaType.VIDEO) {
-      return Promise.resolve(this.media_stream());
+  _getMediaStream() {
+    if (this.mediaStream() && this.streamHandler.local_media_type() === z.media.MediaType.VIDEO) {
+      return Promise.resolve(this.mediaStream());
     }
 
-    return this.constraints_handler
-      .get_media_stream_constraints(
-        this.available_devices.audio_input().length,
-        this.available_devices.video_input().length
-      )
-      .then(({media_stream_constraints, media_type}) => {
-        return this.media_stream_handler.request_media_stream(media_type, media_stream_constraints);
+    const requestAudio = !!this.availableDevices.audio_input().length;
+    const requestVideo = !!this.availableDevices.video_input().length;
+    return this.constraintsHandler
+      .get_media_stream_constraints(requestAudio, requestVideo)
+      .then(({media_stream_constraints, mediaType}) => {
+        return this.streamHandler.request_media_stream(mediaType, media_stream_constraints);
       })
-      .then(media_stream_info => {
-        if (this.available_devices.video_input().length) {
-          this.media_stream_handler.local_media_type(z.media.MediaType.VIDEO);
+      .then(mediaStreamInfo => {
+        if (this.availableDevices.video_input().length) {
+          this.streamHandler.local_media_type(z.media.MediaType.VIDEO);
         }
 
-        this.media_stream_handler.local_media_stream(media_stream_info.stream);
-        return this.media_stream_handler.local_media_stream();
+        this.streamHandler.local_media_stream(mediaStreamInfo.stream);
+        return this.streamHandler.local_media_stream();
       })
       .catch(error => {
         this.logger.error(`Requesting MediaStream failed: ${error.message}`, error);
-        if (
-          [z.media.MediaError.TYPE.MEDIA_STREAM_DEVICE, z.media.MediaError.TYPE.MEDIA_STREAM_PERMISSION].includes(
-            error.type
-          )
-        ) {
-          this.permission_denied(true);
+
+        const expectedErrors = [
+          z.media.MediaError.TYPE.MEDIA_STREAM_DEVICE,
+          z.media.MediaError.TYPE.MEDIA_STREAM_PERMISSION,
+        ];
+
+        const isExpectedError = expectedErrors.includes(error.type);
+        if (isExpectedError) {
+          this.permissionDenied(true);
           return false;
         }
+
         throw error;
       });
   }
@@ -126,45 +141,47 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
    * Initiate audio meter.
    *
    * @private
-   * @param {MediaStream} media_stream - MediaStream to measure audio levels on
+   * @param {MediaStream} mediaStream - MediaStream to measure audio levels on
    * @returns {undefined} No return value
    */
-  _initiate_audio_meter(media_stream) {
-    this.logger.info('Initiating new audio meter', media_stream);
-    this.audio_context = this.media_repository.get_audio_context();
+  _initiateAudioMeter(mediaStream) {
+    this.logger.info('Initiating new audio meter', mediaStream);
+    this.audioContext = this.mediaRepository.get_audio_context();
 
-    this.audio_analyser = this.audio_context.createAnalyser();
-    this.audio_analyser.fftSize = 1024;
-    this.audio_analyser.smoothingTimeConstant = 0.2;
-    this.audio_data_array = new Float32Array(this.audio_analyser.frequencyBinCount);
+    const audioAnalyser = this.audioContext.createAnalyser();
+    audioAnalyser.fftSize = PreferencesAVViewModel.CONFIG.AUDIO_METER.FFT_SIZE;
+    audioAnalyser.smoothingTimeConstant = PreferencesAVViewModel.CONFIG.AUDIO_METER.SMOOTHING_TIME_CONSTANT;
 
-    this.audio_interval = window.setInterval(() => {
-      this.audio_analyser.getFloatFrequencyData(this.audio_data_array);
+    const audioDataArray = new Float32Array(audioAnalyser.frequencyBinCount);
+
+    this.audioInterval = window.setInterval(() => {
+      audioAnalyser.getFloatFrequencyData(audioDataArray);
       let volume = 0;
+
       // Data is in the db range of -100 to -30, but can also be -Infinity. We normalize the value up to -50 to the range of 0, 1.
-      for (const data of this.audio_data_array) {
-        volume += Math.abs(Math.max(data, -100) + 100) / 50;
+      for (const dataPoint of audioDataArray) {
+        volume += Math.abs(Math.max(dataPoint, -100) + 100) / 50;
       }
 
-      const average_volume = volume / this.audio_data_array.length;
+      const averageVolume = volume / audioDataArray.length;
 
-      return this.audio_level(average_volume - 0.075);
-    }, 100);
+      this.audioLevel(averageVolume - PreferencesAVViewModel.CONFIG.AUDIO_METER.LEVEL_ADJUSTMENT);
+    }, PreferencesAVViewModel.CONFIG.AUDIO_METER.INTERVAL);
 
-    this.audio_source = this.audio_context.createMediaStreamSource(media_stream);
-    this.audio_source.connect(this.audio_analyser);
+    this.audioSource = this.audioContext.createMediaStreamSource(mediaStream);
+    this.audioSource.connect(audioAnalyser);
   }
 
-  _release_audio_meter() {
-    window.clearInterval(this.audio_interval);
-    this.audio_interval = undefined;
-    if (this.audio_source) {
-      this.audio_source.disconnect();
+  _releaseAudioMeter() {
+    window.clearInterval(this.audioInterval);
+    this.audioInterval = undefined;
+    if (this.audioSource) {
+      this.audioSource.disconnect();
     }
   }
 
-  _release_media_stream() {
-    this.media_stream_handler.reset_media_stream();
-    this.permission_denied(false);
+  _releaseMediaStream() {
+    this.streamHandler.reset_media_stream();
+    this.permissionDenied(false);
   }
 };

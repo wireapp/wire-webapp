@@ -51,7 +51,7 @@ z.media.MediaRepository = class MediaRepository {
     this.element_handler = new z.media.MediaElementHandler(this);
     this.stream_handler = new z.media.MediaStreamHandler(this);
 
-    this.audio_context = undefined;
+    this.audioContext = undefined;
   }
 
   /**
@@ -59,10 +59,10 @@ z.media.MediaRepository = class MediaRepository {
    * @returns {undefined} No return value
    */
   close_audio_context() {
-    if (this.audio_context && this.audio_context.state === MediaRepository.AUDIO_CONTEXT_STATE.RUNNING) {
-      this.audio_context.close().then(() => {
-        this.logger.info('Closed existing AudioContext', this.audio_context);
-        this.audio_context = undefined;
+    if (this.audioContext && this.audioContext.state === MediaRepository.AUDIO_CONTEXT_STATE.RUNNING) {
+      this.audioContext.close().then(() => {
+        this.logger.info('Closed existing AudioContext', this.audioContext);
+        this.audioContext = undefined;
       });
     }
   }
@@ -72,15 +72,15 @@ z.media.MediaRepository = class MediaRepository {
    * @returns {AudioContext} AudioContext
    */
   get_audio_context() {
-    if (this.audio_context && this.audio_context.state === MediaRepository.AUDIO_CONTEXT_STATE.RUNNING) {
-      this.logger.info('Reusing existing AudioContext', this.audio_context);
-      return this.audio_context;
+    if (this.audioContext && this.audioContext.state === MediaRepository.AUDIO_CONTEXT_STATE.RUNNING) {
+      this.logger.info('Reusing existing AudioContext', this.audioContext);
+      return this.audioContext;
     }
 
     if (window.AudioContext && window.AudioContext.prototype.createMediaStreamSource) {
-      this.audio_context = new window.AudioContext();
-      this.logger.info('Initialized a new AudioContext', this.audio_context);
-      return this.audio_context;
+      this.audioContext = new window.AudioContext();
+      this.logger.info('Initialized a new AudioContext', this.audioContext);
+      return this.audioContext;
     }
 
     this.logger.error('The flow audio cannot use the Web Audio API as it is unavailable.');

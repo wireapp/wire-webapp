@@ -271,7 +271,7 @@ z.viewModel.ContentViewModel = class ContentViewModel {
 
     const isStatePreferencesAv = this.previousState === ContentViewModel.STATE.PREFERENCES_AV;
     if (isStatePreferencesAv) {
-      this.preferencesAV.release_devices();
+      this.preferencesAV.releaseDevices();
     }
   }
 

@@ -118,7 +118,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
     return this.devices_handler
       .update_current_devices(video_send)
       .then(() => this.constraints_handler.get_media_stream_constraints(true, video_send))
-      .then(({media_stream_constraints}) => this.request_media_stream(media_type, media_stream_constraints))
+      .then(({streamConstraints}) => this.request_media_stream(media_type, streamConstraints))
       .then(media_stream_info => {
         this.self_stream_state.videoSend(video_send);
         if (video_send) {
@@ -206,9 +206,9 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
     }
 
     return constraints_promise
-      .then(({media_type, media_stream_constraints}) => {
-        return this.request_media_stream(media_type, media_stream_constraints).then(media_stream_info => {
-          this._set_self_stream_state(media_type);
+      .then(({mediaType, streamConstraints}) => {
+        return this.request_media_stream(mediaType, streamConstraints).then(media_stream_info => {
+          this._set_self_stream_state(mediaType);
           return this.replace_media_stream(media_stream_info);
         });
       })
