@@ -156,9 +156,7 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
     });
     this.showToggleScreen = ko.pureComputed(() => z.calling.CallingRepository.supportsScreenSharing);
     this.disableToggleScreen = ko.pureComputed(() => {
-      if (this.joinedCall()) {
-        return this.joinedCall().isRemoteScreenSend();
-      }
+      return this.joinedCall() ? this.joinedCall().isRemoteScreenSend() : true;
     });
 
     this.visibleCallId = undefined;
