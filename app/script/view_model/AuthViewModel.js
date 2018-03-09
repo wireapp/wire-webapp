@@ -296,6 +296,8 @@ z.viewModel.AuthViewModel = class AuthViewModel {
       case z.auth.SIGN_OUT_REASON.ACCOUNT_REGISTRATION:
         return this._login_from_teams();
       case z.auth.SIGN_OUT_REASON.CLIENT_REMOVED:
+        this.reason_info(z.l10n.text(z.string.authAccountClientDeletion));
+        break;
       case z.auth.SIGN_OUT_REASON.SESSION_EXPIRED:
         this.reason_info(z.l10n.text(z.string.authAccountExpiration));
         break;

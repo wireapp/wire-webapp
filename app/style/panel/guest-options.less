@@ -24,16 +24,16 @@
 
   &__info {
     border-top: 1px solid fade(@graphite-dark, 8%);
-    color: fade(@graphite-dark, 40%);
-    font-size: 12px;
-    font-weight: @font-weight-regular;
+    color: @graphite;
+    font-size: @font-size-xs;
+    line-height: @line-height-sm;
     margin: 24px 16px 16px;
     padding-top: 16px;
 
     &__head {
-      color: fade(@graphite-dark, 56%);
       font-weight: @font-weight-bold;
       margin-bottom: 8px;
+      text-transform: uppercase;
     }
   }
 
@@ -42,6 +42,7 @@
     display: block;
     font-size: 16px;
     height: 112px;
+    line-height: 24px;
     padding: 16px;
     resize: none;
     width: 100%;

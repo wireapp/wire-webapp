@@ -845,7 +845,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   initialize_conversations() {
     this._init_state_updates();
-    this.init_total = this.receiving_queue.get_length();
+    this.init_total = this.receiving_queue.getLength();
 
     if (this.init_total > 5) {
       this.logger.log(`Handling '${this.init_total}' additional messages on app start`);
@@ -1181,7 +1181,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       const hasResponse = response && response.event;
       const event = hasResponse
         ? response.event
-        : z.conversation.EventBuilder.buildMemberLeave(conversationEntity, userId, this.timeOffset);
+        : z.conversation.EventBuilder.buildMemberLeave(conversationEntity, userId, true, this.timeOffset);
 
       amplify.publish(z.event.WebApp.EVENT.INJECT, event, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
       return event;
@@ -1197,8 +1197,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   removeMember(conversationEntity, userId) {
     return this.conversation_service.deleteMembers(conversationEntity.id, userId).then(response => {
-      const event =
-        response || z.conversation.EventBuilder.buildMemberLeave(conversationEntity, userId, this.timeOffset);
+      const event = !!response
+        ? response
+        : z.conversation.EventBuilder.buildMemberLeave(conversationEntity, userId, true, this.timeOffset);
 
       amplify.publish(z.event.WebApp.EVENT.INJECT, event, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
       return event;
@@ -2235,7 +2236,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
           .onClientMismatch(error, conversationId, genericMessage, payload)
           .then(payloadWithMissingClients => {
             updatedPayload = payloadWithMissingClients;
-            return this._grantOutgoingMessage(conversationId, genericMessage, Object.keys(error.missing));
+
+            const userIds = Object.keys(error.missing);
+            return this._grantOutgoingMessage(conversationId, genericMessage, userIds);
           })
           .then(() => {
             this.logger.info(`Updated '${messageType}' message for conversation '${conversationId}'`, updatedPayload);
@@ -2254,13 +2257,14 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const consentType = isCallingMessage
       ? ConversationRepository.CONSENT_TYPE.OUTGOING_CALL
       : ConversationRepository.CONSENT_TYPE.MESSAGE;
-    return this.grantMessage(conversationId, consentType, userIds);
+
+    return this.grantMessage(conversationId, consentType, userIds, genericMessage.content);
   }
 
-  grantMessage(conversationId, consentType, userIds) {
-    return this.get_conversation_by_id(conversationId).then(conversation_et => {
-      const conversationDegraded =
-        conversation_et.verification_state() === z.conversation.ConversationVerificationState.DEGRADED;
+  grantMessage(conversationId, consentType, userIds, type) {
+    return this.get_conversation_by_id(conversationId).then(conversationEntity => {
+      const verificationState = conversationEntity.verification_state();
+      const conversationDegraded = verificationState === z.conversation.ConversationVerificationState.DEGRADED;
 
       if (!conversationDegraded) {
         return false;
@@ -2270,64 +2274,88 @@ z.conversation.ConversationRepository = class ConversationRepository {
         let sendAnyway = false;
 
         if (!userIds) {
-          userIds = conversation_et.get_users_with_unverified_clients().map(userEntity => userEntity.id);
+          userIds = conversationEntity.get_users_with_unverified_clients().map(userEntity => userEntity.id);
         }
 
-        return this.user_repository.get_users_by_id(userIds).then(userEntities => {
-          let actionStringId;
-          let messageStringId;
-          let titleStringId;
+        return this.user_repository
+          .get_users_by_id(userIds)
+          .then(userEntities => {
+            let actionStringId;
+            let messageStringId;
+            let titleStringId;
 
-          const hasMultipleUsers = userEntities > 1;
-          if (hasMultipleUsers) {
-            titleStringId = z.string.modalConversationNewDeviceHeadlineMany;
-          } else {
-            const [userEntity] = userEntities;
-            titleStringId = userEntity.is_me
-              ? z.string.modalConversationNewDeviceHeadlineYou
-              : z.string.modalConversationNewDeviceHeadlineOne;
-          }
-          const userNames = z.util.LocalizerUtil.joinNames(userEntities, z.string.Declension.NOMINATIVE);
-          const titleSubstitutions = z.util.StringUtil.capitalize_first_char(userNames);
+            const hasMultipleUsers = userEntities > 1;
+            if (hasMultipleUsers) {
+              titleStringId = z.string.modalConversationNewDeviceHeadlineMany;
+            } else {
+              const [userEntity] = userEntities;
 
-          switch (consentType) {
-            case ConversationRepository.CONSENT_TYPE.INCOMING_CALL:
-              actionStringId = z.string.modalConversationNewDeviceIncomingCallAction;
-              messageStringId = z.string.modalConversationNewDeviceIncomingCallMessage;
-              break;
-            case ConversationRepository.CONSENT_TYPE.OUTGOING_CALL:
-              actionStringId = z.string.modalConversationNewDeviceOutgoingCallAction;
-              messageStringId = z.string.modalConversationNewDeviceOutgoingCallMessage;
-              break;
-            default:
-              actionStringId = z.string.modalConversationNewDeviceAction;
-              messageStringId = z.string.modalConversationNewDeviceMessage;
-              break;
-          }
+              if (userEntity) {
+                titleStringId = userEntity.is_me
+                  ? z.string.modalConversationNewDeviceHeadlineYou
+                  : z.string.modalConversationNewDeviceHeadlineOne;
+              } else {
+                const log = `Granting message '${type}' in '${conversationId}' for '${consentType}' needs user ids`;
+                this.logger.error(log);
 
-          amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
-            action: () => {
-              sendAnyway = true;
-              conversation_et.verification_state(z.conversation.ConversationVerificationState.UNVERIFIED);
+                const error = new Error('Failed to grant outgoing message');
+                const customData = {
+                  consentType,
+                  messageType: type,
+                  participants: conversationEntity.getNumberOfParticipants(false),
+                  verificationState,
+                };
 
-              resolve(true);
-            },
-            close: () => {
-              if (!sendAnyway) {
-                reject(
-                  new z.conversation.ConversationError(
-                    z.conversation.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION
-                  )
-                );
+                Raygun.send(error, customData);
+
+                reject(error);
               }
-            },
-            text: {
-              action: z.l10n.text(actionStringId),
-              message: z.l10n.text(messageStringId),
-              title: z.l10n.text(titleStringId, titleSubstitutions),
-            },
-          });
-        });
+            }
+
+            const userNames = z.util.LocalizerUtil.joinNames(userEntities, z.string.Declension.NOMINATIVE);
+            const titleSubstitutions = z.util.StringUtil.capitalize_first_char(userNames);
+
+            switch (consentType) {
+              case ConversationRepository.CONSENT_TYPE.INCOMING_CALL: {
+                actionStringId = z.string.modalConversationNewDeviceIncomingCallAction;
+                messageStringId = z.string.modalConversationNewDeviceIncomingCallMessage;
+                break;
+              }
+
+              case ConversationRepository.CONSENT_TYPE.OUTGOING_CALL: {
+                actionStringId = z.string.modalConversationNewDeviceOutgoingCallAction;
+                messageStringId = z.string.modalConversationNewDeviceOutgoingCallMessage;
+                break;
+              }
+
+              default: {
+                actionStringId = z.string.modalConversationNewDeviceAction;
+                messageStringId = z.string.modalConversationNewDeviceMessage;
+                break;
+              }
+            }
+
+            amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
+              action: () => {
+                sendAnyway = true;
+                conversationEntity.verification_state(z.conversation.ConversationVerificationState.UNVERIFIED);
+
+                resolve(true);
+              },
+              close: () => {
+                if (!sendAnyway) {
+                  const errorType = z.conversation.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION;
+                  reject(new z.conversation.ConversationError(errorType));
+                }
+              },
+              text: {
+                action: z.l10n.text(actionStringId),
+                message: z.l10n.text(messageStringId),
+                title: z.l10n.text(titleStringId, titleSubstitutions),
+              },
+            });
+          })
+          .catch(reject);
       });
     });
   }
@@ -2660,7 +2688,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     const isStateEvent = ConversationRepository.CONFIG.STATE_EVENTS.includes(eventJson.type);
     if (isStateEvent) {
-      return this.stateHandler.onConversationEvent(eventJson, source);
+      return this.stateHandler.onConversationEvent(eventJson, eventSource);
     }
 
     return this._pushToReceivingQueue(eventJson, eventSource);
@@ -2796,7 +2824,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
             }
           }
 
-          if (!this.receiving_queue.get_length() || !eventFromStream) {
+          if (!this.receiving_queue.getLength() || !eventFromStream) {
             this.init_promise.resolve_fn();
             this.init_promise = undefined;
           }
@@ -3035,11 +3063,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
       conversationEntity.status(z.conversation.ConversationStatus.PAST_MEMBER);
 
       if (conversationEntity.call()) {
-        amplify.publish(
-          z.event.WebApp.CALL.STATE.LEAVE,
-          conversationEntity.id,
-          z.calling.enum.TERMINATION_REASON.MEMBER_LEAVE
-        );
+        const reason = z.calling.enum.TERMINATION_REASON.MEMBER_LEAVE;
+        amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, conversationEntity.id, reason);
       }
     }
 

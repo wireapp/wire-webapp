@@ -545,8 +545,8 @@ z.calling.CallingRepository = class CallingRepository {
 
       if (!eventFromStream) {
         const consentType = z.conversation.ConversationRepository.CONSENT_TYPE.INCOMING_CALL;
-        const grantMessagePromise = this.conversationRepository.grantMessage(conversationId, consentType, [userId]);
-        promises.push(grantMessagePromise);
+        const promise = this.conversationRepository.grantMessage(conversationId, consentType, [userId], 'call');
+        promises.push(promise);
       }
 
       Promise.all(promises)

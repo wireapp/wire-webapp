@@ -133,7 +133,7 @@ z.conversation.EventBuilder = {
       type: z.event.Client.CONVERSATION.INCOMING_MESSAGE_TOO_BIG,
     };
   },
-  buildMemberLeave(conversationEntity, userId, timeOffset) {
+  buildMemberLeave(conversationEntity, userId, removedBySelfUser, timeOffset) {
     const {id, self} = conversationEntity;
 
     return {
@@ -141,7 +141,7 @@ z.conversation.EventBuilder = {
       data: {
         user_ids: [userId],
       },
-      from: self.id,
+      from: removedBySelfUser ? self.id : userId,
       time: conversationEntity.get_next_iso_date(timeOffset),
       type: z.event.Backend.CONVERSATION.MEMBER_LEAVE,
     };

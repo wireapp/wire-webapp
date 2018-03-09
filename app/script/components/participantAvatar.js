@@ -48,12 +48,24 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
 
     this.isTemporaryGuest = ko.pureComputed(() => this.isUser() && this.participant().isTemporaryGuest());
 
-    if (this.isTemporaryGuest) {
-      // TODO: real data from user (0 - 1)
-      const remainingTime = 0.66;
-      this.timerLength = 15.5 * Math.PI * 2;
-      this.timerOffset = this.timerLength * (remainingTime - 1);
-    }
+    this.remainingTimer = undefined;
+    this.timerLength = 15.5 * Math.PI * 2;
+    this.timerOffset = ko.observable();
+
+    this.isTemporaryGuest.subscribe(isTemporaryGuest => {
+      if (this.remainingTimer) {
+        this.remainingTimer.dispose();
+        this.remainingTimer = undefined;
+      }
+
+      if (isTemporaryGuest) {
+        this.remainingTimer = ko.computed(() => {
+          const remainingTime = this.participant().expirationRemaining();
+          const normalizedRemainingTime = remainingTime / z.entity.User.CONFIG.TEMPORARY_GUEST.LIFETIME;
+          this.timerOffset(this.timerLength * (normalizedRemainingTime - 1));
+        });
+      }
+    });
 
     this.avatarType = ko.pureComputed(() => `${this.isUser() ? 'user' : 'service'}-avatar`);
     this.delay = params.delay;
@@ -185,7 +197,7 @@ ko.components.register('participant-avatar', {
         <div class="avatar-badge"></div>
       <!-- /ko -->
       <div class="avatar-border"></div>
-      <!-- ko if: isTemporaryGuest -->
+      <!-- ko if: isTemporaryGuest() -->
         <svg class="avatar-temporary-guest-border" viewBox="0 0 32 32" data-bind="attr: {stroke: participant.accent_color}">
           <circle cx="16" cy="16" r="15.5" stroke-width="1" transform="rotate(-90 16 16)" fill="none"
              data-bind="attr: {'stroke-dasharray': timerLength, 'stroke-dashoffset': timerOffset}">
