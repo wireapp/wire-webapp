@@ -192,7 +192,7 @@ ko.components.register('conversation-list-calling-cell', {
         <!-- ko if: show_screensharing_button() -->
           <div data-uie-name="do-toggle-screenshare" class="conversation-list-calling-cell-controls-button icon-screensharing-small cursor-pointer"
                data-bind="click: on_toggle_screen, css: {
-                'disabled': disable_toggle_screen(),
+                'disabled': disableToggleScreen(),
                 'cell-badge-light': self_stream_state.screenSend(),
                 'cell-badge-dark': !self_stream_state.screenSend()
                }">
