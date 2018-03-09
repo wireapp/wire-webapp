@@ -50,9 +50,6 @@ import AppAlreadyOpen from '../component/AppAlreadyOpen';
 import WirelessUnsupportedBrowser from '../component/WirelessUnsupportedBrowser';
 import WirelessContainer from '../component/WirelessContainer';
 
-const CONVERSATION_CODE = 'code';
-const CONVERSATION_KEY = 'key';
-
 class ConversationJoin extends Component {
   state = {
     conversationCode: null,
@@ -64,28 +61,33 @@ class ConversationJoin extends Component {
     isValidName: true,
   };
 
-  componentDidMount() {
-    const params = new URLSearchParams(this.props.location.search);
-    const conversationCode = params.get(CONVERSATION_CODE);
-    const conversationKey = params.get(CONVERSATION_KEY);
-
-    this.props
-      .doInit()
-      .then(() => this.props.doCheckConversationCode(conversationKey, conversationCode))
-      .then(() =>
-        this.setState({
-          ...this.state,
-          conversationCode: conversationCode,
-          conversationKey: conversationKey,
+  readAndUpdateParamsFromUrl = (nextProps = this.props) => {
+    const conversationCode = nextProps.match.params.conversationCode;
+    const conversationKey = nextProps.match.params.conversationKey;
+    if (conversationCode !== this.state.conversationCode || conversationKey !== this.state.conversationKey) {
+      this.props
+        .doInit()
+        .then(() => {
+          this.setState((state, props) => ({
+            ...state,
+            conversationCode,
+            conversationKey,
+            isValidLink: true,
+          }));
         })
-      )
-      .catch(error => {
-        this.setState({
-          ...this.state,
-          isValidLink: false,
+        .then(() => this.props.doCheckConversationCode(conversationKey, conversationCode))
+        .catch(error => {
+          this.setState((state, props) => ({
+            ...state,
+            isValidLink: false,
+          }));
         });
-      });
-  }
+    }
+  };
+
+  componentDidMount = () => this.readAndUpdateParamsFromUrl();
+
+  componentWillReceiveProps = nextProps => this.readAndUpdateParamsFromUrl(nextProps);
 
   openWebapp = params => {
     const link = document.createElement('a');

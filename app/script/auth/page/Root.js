@@ -65,7 +65,10 @@ class Root extends React.Component {
             <Content>
               <Switch>
                 <Route exact path={ROUTE.INDEX} component={Index} />
-                <Route path={ROUTE.CONVERSATION_JOIN} component={ConversationJoin} />
+                <Route
+                  path={`${ROUTE.CONVERSATION_JOIN}/:conversationKey/:conversationCode`}
+                  component={ConversationJoin}
+                />
                 <Route path={ROUTE.CREATE_TEAM} component={TeamName} />
                 <Route path={ROUTE.CREATE_TEAM_ACCOUNT} component={CreateAccount} />
                 <Route path={ROUTE.CREATE_ACCOUNT} component={CreatePersonalAccount} />
