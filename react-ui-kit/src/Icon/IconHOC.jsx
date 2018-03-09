@@ -28,8 +28,8 @@ const IconHOC = (svgBody, realWidth = 0, realHeight = 0) => {
       const heightScale = height ? height / realHeight : Infinity;
       newScale = Math.min(widthScale, heightScale);
     }
-    const newWidth = realWidth * newScale;
-    const newHeight = realHeight * newScale;
+    const newWidth = Math.ceil(realWidth * newScale);
+    const newHeight = Math.ceil(realHeight * newScale);
     return (
       <svg width={newWidth} height={newHeight} fill={color} viewBox={`0 0 ${realWidth} ${realHeight}`} {...props}>
         {typeof svgBody === 'function' ? svgBody(props) : svgBody}
