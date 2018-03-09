@@ -1036,7 +1036,7 @@ z.user.UserRepository = class UserRepository {
           .then(() => this.user_update({user: {assets: assets, id: this.self().id}}));
       })
       .catch(error => {
-        throw new Error(`Error during profile image upload: ${error.message}`);
+        throw new Error(`Error during profile image upload: ${error.message || error}`);
       });
   }
 
