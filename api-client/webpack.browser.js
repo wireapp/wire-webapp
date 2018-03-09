@@ -37,9 +37,6 @@ module.exports = {
     library: `${camelCasedRepositoryName}`,
     path: `${__dirname}/dist`,
   },
-  plugins: [
-    new webpack.optimize.UglifyJsPlugin({output: {comments: false}}),
-    new webpack.BannerPlugin(`${pkg.name} v${pkg.version}`),
-  ],
+  plugins: [new webpack.BannerPlugin(`${pkg.name} v${pkg.version}`)],
   target: 'web',
 };
