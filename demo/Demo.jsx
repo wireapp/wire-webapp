@@ -92,7 +92,7 @@ class Demo extends React.PureComponent {
           </Modal>
         )}
         <Header>
-          <Logo />
+          <Logo width={72} />
           <Loading />
           <Loading progress={0.33} />
           <Loading progress={0.66} />
