@@ -33,7 +33,7 @@ export const WirelessContainer = ({children, intl: {formatMessage: _}}) => (
     }}
   >
     <Header style={{height: '40px', marginLeft: '8px', marginTop: '20px'}}>
-      <Logo width={72} height={23} />
+      <Logo width={72} />
     </Header>
     <Content style={{flex: '1', paddingLeft: '8px', width: '100%'}}>{children}</Content>
     <Footer style={{height: '30px', justifyContent: 'flex-end', margin: '0 0 18px 8px'}}>
