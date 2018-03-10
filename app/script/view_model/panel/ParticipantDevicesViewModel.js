@@ -96,6 +96,8 @@ z.viewModel.panel.ParticipantDevicesViewModel = class ParticipantDevicesViewMode
 
     this.isVisible.subscribe(isVisible => {
       if (isVisible) {
+        const userId = this.userEntity().id;
+
         this.clientRepository
           .getClientsByUserId(this.userEntity().id)
           .then(clientEntities => {
@@ -105,7 +107,9 @@ z.viewModel.panel.ParticipantDevicesViewModel = class ParticipantDevicesViewMode
               : ParticipantDevicesViewModel.MODE.NOT_FOUND;
             this.deviceMode(deviceMode);
           })
-          .catch(error => this.logger.error(`Unable to retrieve clients for user '${this.userEntity().id}': ${error}`));
+          .catch(error => {
+            this.logger.error(`Unable to retrieve clients for user '${userId}': ${error.message || error}`);
+          });
       }
 
       this.selectedClientSubscription = this.selectedClient.subscribe(() => {
