@@ -171,7 +171,6 @@ z.viewModel.MainViewModel = class MainViewModel {
         }
       }
 
-      // https://developer.mozilla.org/en-US/Firefox/Performance_best_practices_for_Firefox_fe_engineers
       z.util.afterRender(() => {
         panel.style.transition = 'transform .35s cubic-bezier(0.19, 1, 0.22, 1)';
         const widthTransition = 'width .35s cubic-bezier(0.19, 1, 0.22, 1)';

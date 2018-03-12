@@ -773,9 +773,8 @@ z.util.format_time_remaining = function(time_remaining) {
 };
 
 z.util.afterRender = callback => {
-  window.requestAnimationFrame(() => {
-    window.setTimeout(callback, 0);
-  });
+  // https://developer.mozilla.org/en-US/Firefox/Performance_best_practices_for_Firefox_fe_engineers
+  window.requestAnimationFrame(() => window.setTimeout(callback, 0));
 };
 
 /**
