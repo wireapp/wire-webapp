@@ -206,7 +206,7 @@ z.string.modalConversationNewDeviceHeadlineMany = '{{users}} started using new d
 z.string.modalConversationNewDeviceHeadlineYou = '{{user}} started using a new device';
 z.string.modalConversationNewDeviceIncomingCallAction = 'Accept call';
 z.string.modalConversationNewDeviceIncomingCallMessage = 'Do you still want to accept the call?';
-z.string.modalConversationNewDeviceMessage = 'Do you still want to send your messages?';
+z.string.modalConversationNewDeviceMessage = 'Do you still want to send your message?';
 z.string.modalConversationNewDeviceOutgoingCallAction = 'Call anyway';
 z.string.modalConversationNewDeviceOutgoingCallMessage = 'Do you still want to place the call?';
 
