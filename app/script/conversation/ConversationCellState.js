@@ -43,7 +43,7 @@ z.conversation.ConversationCellState = (() => {
       } else if (messageEntity.is_ping()) {
         activities[ACTIVITY_TYPE.PING] += 1;
       } else if (messageEntity.is_content()) {
-        activities[ACTIVITY_TYPE.MESSAGE] = +1;
+        activities[ACTIVITY_TYPE.MESSAGE] += 1;
       }
     }
 
@@ -54,9 +54,7 @@ z.conversation.ConversationCellState = (() => {
     return Object.keys(activities)
       .map(activity => {
         const activityCount = activities[activity];
-        const hasActivity = activityCount >= 1;
-
-        if (hasActivity) {
+        if (activityCount) {
           const activityCountIsOne = activityCount === 1;
           let stringId = undefined;
 
