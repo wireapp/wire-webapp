@@ -178,9 +178,9 @@ window.z.audio.AudioRepository = class AudioRepository {
    * @returns {undefined}
    */
   _subscribeToAudioEvents() {
-    amplify.subscribe(z.event.WebApp.AUDIO.PLAY, this, this.play);
-    amplify.subscribe(z.event.WebApp.AUDIO.PLAY_IN_LOOP, this, this.loop);
-    amplify.subscribe(z.event.WebApp.AUDIO.STOP, this, this.stop);
+    amplify.subscribe(z.event.WebApp.AUDIO.PLAY, this.play.bind(this));
+    amplify.subscribe(z.event.WebApp.AUDIO.PLAY_IN_LOOP, this.loop.bind(this));
+    amplify.subscribe(z.event.WebApp.AUDIO.STOP, this.stop.bind(this));
   }
 
   /**
@@ -189,22 +189,9 @@ window.z.audio.AudioRepository = class AudioRepository {
    * @returns {undefined}
    */
   _subscribeToEvents() {
-    amplify.subscribe(z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, this, handlingNotifications => {
-      const updatedMutedState = handlingNotifications !== z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
-
-      if (this.muted !== updatedMutedState) {
-        this.muted = updatedMutedState;
-        this.logger.debug(`Set muted state to '${this.muted}'`);
-      }
-    });
-
-    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, this, properties => {
-      this.audioPreference(properties.settings.sound.alerts);
-    });
-
-    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.SOUND_ALERTS, this, audioPreference => {
-      this.audioPreference(audioPreference);
-    });
+    amplify.subscribe(z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, this.setMutedState.bind(this));
+    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, this.updatedProperties.bind(this));
+    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.SOUND_ALERTS, this.setAudioPreference.bind(this));
   }
 
   /**
@@ -249,6 +236,20 @@ window.z.audio.AudioRepository = class AudioRepository {
       });
   }
 
+  setAudioPreference(audioPreference) {
+    this.audioPreference(audioPreference);
+  }
+
+  setMutedState(handlingNotifications) {
+    const updatedMutedState = handlingNotifications !== z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
+
+    const isStateChange = this.muted !== updatedMutedState;
+    if (isStateChange) {
+      this.muted = updatedMutedState;
+      this.logger.debug(`Set muted state to '${this.muted}'`);
+    }
+  }
+
   /**
    * Stop playback of a sound.
    * @param {z.audio.AudioType} audioId - Sound identifier
@@ -270,5 +271,9 @@ window.z.audio.AudioRepository = class AudioRepository {
         this.logger.error(`Failed stopping sound '${audioId}': ${error.message}`);
         throw error;
       });
+  }
+
+  updatedProperties(properties) {
+    this.setAudioPreference(properties.settings.sound.alerts);
   }
 };
