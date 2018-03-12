@@ -772,6 +772,12 @@ z.util.format_time_remaining = function(time_remaining) {
   return title || '';
 };
 
+z.util.afterRender = callback => {
+  window.requestAnimationFrame(() => {
+    window.setTimeout(callback, 0);
+  });
+};
+
 /**
  * No operation
  * @returns {undefined}
