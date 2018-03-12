@@ -17,7 +17,7 @@
  *
  */
 
-import {Link, Small, Logo, Header, Footer, Content, CloseIcon, CheckIcon} from '@wireapp/react-ui-kit';
+import {Link, Small, Logo, Header, Footer, Content, CloseIcon} from '@wireapp/react-ui-kit';
 import {footerStrings, cookiePolicyStrings} from '../../strings';
 import {injectIntl, FormattedHTMLMessage} from 'react-intl';
 import EXTERNAL_ROUTE from '../externalRoute';
@@ -25,7 +25,6 @@ import React from 'react';
 
 export const WirelessContainer = ({
   showCookiePolicyBanner,
-  onCookiePolicyBannerAccept,
   onCookiePolicyBannerClose,
   children,
   intl: {formatMessage: _},
@@ -51,9 +50,6 @@ export const WirelessContainer = ({
           <Link href={EXTERNAL_ROUTE.WIRE_PRIVACY_POLICY} style={{fontSize: '16px'}} textTransform="none" bold={false}>
             <FormattedHTMLMessage style={{textAlign: 'center'}} {...cookiePolicyStrings.bannerText} />
           </Link>
-        </div>
-        <div onClick={onCookiePolicyBannerAccept} style={{margin: '20px'}}>
-          <CheckIcon />
         </div>
         <div onClick={onCookiePolicyBannerClose} style={{margin: '20px'}}>
           <CloseIcon />

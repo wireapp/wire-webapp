@@ -40,12 +40,10 @@ import * as ConversationSelector from '../module/selector/ConversationSelector';
 import ValidationError from '../module/action/ValidationError';
 import * as AuthAction from '../module/action/AuthAction';
 import {injectIntl, FormattedHTMLMessage} from 'react-intl';
-import ROUTE from '../route';
 import EXTERNAL_ROUTE from '../externalRoute';
 import {withRouter} from 'react-router';
 import React, {Component} from 'react';
 import {pathWithParams} from '../util/urlUtil';
-import {Link as RRLink} from 'react-router-dom';
 import BackendError from '../module/action/BackendError';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
 import WirelessUnsupportedBrowser from '../component/WirelessUnsupportedBrowser';
@@ -229,12 +227,6 @@ class ConversationJoin extends Component {
           <FormattedHTMLMessage {...conversationJoinStrings.invalidHeadline} />
         </H2>
         <H3 style={{marginTop: '10px'}}>{_(conversationJoinStrings.invalidSubhead)}</H3>
-        <Small block>
-          <Link to={ROUTE.INDEX} component={RRLink} textTransform={'none'} data-uie-name="go-register">
-            {_(conversationJoinStrings.invalidCreateAccountLink)}
-          </Link>
-          {` ${_(conversationJoinStrings.invalidCreateAccountText)}`}
-        </Small>
       </ContainerXS>
     );
   };

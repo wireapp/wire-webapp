@@ -37,7 +37,7 @@ export const footerStrings = defineMessages({
 export const cookiePolicyStrings = defineMessages({
   bannerText: {
     id: 'cookiePolicyStrings.bannerText',
-    defaultMessage: `We use cookies to ensure that we give you the best experience on our website. <br/>If you continue whitout changing your settings, we'll assume that you are happy to recieve all cookies on this website.`,
+    defaultMessage: `We use cookies to ensure that we give you the best experience on our website. By continuing to use the website, you agree to the use of cookies.<br/>Further information on cookies can be found in our <b>privacy policy</b>.`,
   },
 });
 
