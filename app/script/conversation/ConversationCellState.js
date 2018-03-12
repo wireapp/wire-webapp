@@ -39,11 +39,11 @@ z.conversation.ConversationCellState = (() => {
 
     for (const messageEntity of unreadEvents) {
       if (messageEntity.is_call() && messageEntity.was_missed()) {
-        activities[ACTIVITY_TYPE.CALL] = activities[ACTIVITY_TYPE.CALL] + 1;
+        activities[ACTIVITY_TYPE.CALL] += 1;
       } else if (messageEntity.is_ping()) {
-        activities[ACTIVITY_TYPE.PING] = [ACTIVITY_TYPE.PING] + 1;
+        activities[ACTIVITY_TYPE.PING] += 1;
       } else if (messageEntity.is_content()) {
-        activities[ACTIVITY_TYPE.MESSAGE] = activities[ACTIVITY_TYPE.MESSAGE] + 1;
+        activities[ACTIVITY_TYPE.MESSAGE] = +1;
       }
     }
 
@@ -51,45 +51,46 @@ z.conversation.ConversationCellState = (() => {
   };
 
   const _generateActivityString = activities => {
-    const activityStrings = [];
-
-    for (const activity in activities) {
-      if (activities.hasOwnProperty(activity)) {
+    return Object.keys(activities)
+      .map(activity => {
         const activityCount = activities[activity];
-
         const hasActivity = activityCount >= 1;
+
         if (hasActivity) {
           const activityCountIsOne = activityCount === 1;
           let stringId = undefined;
 
           switch (activity) {
-            case ACTIVITY_TYPE.CALL:
+            case ACTIVITY_TYPE.CALL: {
               stringId = activityCountIsOne
                 ? z.string.conversationsSecondaryLineMissedCall
                 : z.string.conversationsSecondaryLineMissedCalls;
               break;
-            case ACTIVITY_TYPE.MESSAGE:
+            }
+
+            case ACTIVITY_TYPE.MESSAGE: {
               stringId = activityCountIsOne
                 ? z.string.conversationsSecondaryLineNewMessage
                 : z.string.conversationsSecondaryLineNewMessages;
               break;
-            case ACTIVITY_TYPE.PING:
+            }
+
+            case ACTIVITY_TYPE.PING: {
               stringId = activityCountIsOne
                 ? z.string.conversationsSecondaryLinePing
                 : z.string.conversationsSecondaryLinePings;
               break;
+            }
+
             default:
-              break;
+              throw new z.conversation.ConversationError();
           }
 
-          if (stringId) {
-            activityStrings.push(z.l10n.text(stringId), activityCount);
-          }
+          return z.l10n.text(stringId, activityCount);
         }
-      }
-    }
-
-    return activityStrings.join(', ');
+      })
+      .filter(activityString => !!activityString)
+      .join(', ');
   };
 
   const _getStateAlert = {
@@ -110,7 +111,7 @@ z.conversation.ConversationCellState = (() => {
     },
     match: conversationEntity => {
       const hasUnreadEvents = conversationEntity.unread_event_count() > 0;
-      return hasUnreadEvents && !!conversationEntity.unread_events().find(_isAlert);
+      return hasUnreadEvents && conversationEntity.unread_events().some(_isAlert);
     },
   };
 
@@ -292,12 +293,11 @@ z.conversation.ConversationCellState = (() => {
         _getStateUnreadMessage,
         _getStateUserName,
       ];
-      const iconState = states.find(state => state.match(conversationEntity));
-      const descriptionState = states.find(state => state.match(conversationEntity));
+      const matchingState = states.find(state => state.match(conversationEntity)) || _getStateDefault;
 
       return {
-        description: (descriptionState || _getStateDefault).description(conversationEntity),
-        icon: (iconState || _getStateDefault).icon(conversationEntity),
+        description: matchingState.description(conversationEntity),
+        icon: matchingState.icon(conversationEntity),
       };
     },
   };
