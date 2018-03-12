@@ -99,7 +99,7 @@ z.viewModel.panel.ParticipantDevicesViewModel = class ParticipantDevicesViewMode
         const userId = this.userEntity().id;
 
         this.clientRepository
-          .getClientsByUserId(this.userEntity().id)
+          .getClientsByUserId(userId)
           .then(clientEntities => {
             const hasDevices = clientEntities.length > 0;
             const deviceMode = hasDevices
