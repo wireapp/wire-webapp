@@ -67,8 +67,7 @@ export const startLogin = params => ({
   type: LOGIN_START,
 });
 
-export const successfulLogin = authData => ({
-  payload: authData,
+export const successfulLogin = () => ({
   type: LOGIN_SUCCESS,
 });
 

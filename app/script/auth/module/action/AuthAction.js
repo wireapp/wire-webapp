@@ -19,6 +19,7 @@
 
 import BackendError from './BackendError';
 import * as AuthActionCreator from './creator/AuthActionCreator';
+import * as SelfAction from './SelfAction';
 import {currentLanguage, currentCurrency} from '../../localeConfig';
 import {fetchSelf} from './SelfAction';
 
@@ -37,6 +38,8 @@ export function doLogin(login) {
     return Promise.resolve()
       .then(() => dispatch(doSilentLogout()))
       .then(() => apiClient.login(login))
+      .then(() => dispatch(SelfAction.fetchSelf()))
+      .then(() => dispatch(AuthActionCreator.successfulLogin()))
       .catch(error => {
         dispatch(AuthActionCreator.failedLogin(error));
         throw BackendError.handle(error);
@@ -63,6 +66,7 @@ export function doRegisterTeam(registration) {
     return Promise.resolve()
       .then(() => dispatch(doSilentLogout()))
       .then(() => apiClient.register(registration))
+      .then(() => dispatch(SelfAction.fetchSelf()))
       .then(createdTeam => dispatch(AuthActionCreator.successfulRegisterTeam(createdTeam)))
       .catch(error => {
         dispatch(AuthActionCreator.failedRegisterTeam(error));
@@ -88,6 +92,7 @@ export function doRegisterPersonal(registration) {
     return Promise.resolve()
       .then(() => dispatch(doSilentLogout()))
       .then(() => apiClient.register(registration))
+      .then(() => dispatch(SelfAction.fetchSelf()))
       .then(createdAccount => dispatch(AuthActionCreator.successfulRegisterPersonal(createdAccount)))
       .then(() => dispatch(fetchSelf()))
       .catch(error => {
@@ -109,6 +114,7 @@ export function doRegisterWireless(registration) {
     );
     return Promise.resolve()
       .then(() => apiClient.register(registration))
+      .then(() => dispatch(SelfAction.fetchSelf()))
       .then(createdAccount => dispatch(AuthActionCreator.successfulRegisterWireless(createdAccount)))
       .catch(error => {
         dispatch(AuthActionCreator.failedRegisterWireless(error));
@@ -122,6 +128,7 @@ export function doInit() {
     dispatch(AuthActionCreator.startRefresh());
     return apiClient
       .init()
+      .then(() => dispatch(SelfAction.fetchSelf()))
       .then(() => dispatch(AuthActionCreator.successfulRefresh(apiClient.accessTokenStore.accessToken)))
       .catch(error => dispatch(AuthActionCreator.failedRefresh(error)));
   };

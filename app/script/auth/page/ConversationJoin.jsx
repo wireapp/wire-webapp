@@ -36,9 +36,11 @@ import {connect} from 'react-redux';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 import * as ConversationAction from '../module/action/ConversationAction';
 import * as AuthSelector from '../module/selector/AuthSelector';
+import * as SelfSelector from '../module/selector/SelfSelector';
 import * as ConversationSelector from '../module/selector/ConversationSelector';
 import ValidationError from '../module/action/ValidationError';
 import * as AuthAction from '../module/action/AuthAction';
+import * as StringUtil from '../util/stringUtil';
 import {injectIntl, FormattedHTMLMessage} from 'react-intl';
 import EXTERNAL_ROUTE from '../externalRoute';
 import {withRouter} from 'react-router';
@@ -131,12 +133,19 @@ class ConversationJoin extends Component {
   resetErrors = () => this.setState({error: null, isValidName: true});
 
   renderExistentAccount = () => {
-    const {intl: {formatMessage: _}} = this.props;
+    const {selfName, intl: {formatMessage: _}} = this.props;
     return (
       <ContainerXS style={{margin: 'auto 0'}}>
         <AppAlreadyOpen />
         <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}} color={COLOR.GRAY}>
-          <FormattedHTMLMessage {...conversationJoinStrings.headline} />
+          {selfName ? (
+            <FormattedHTMLMessage
+              {...conversationJoinStrings.existentAccountHeadline}
+              values={{name: StringUtil.capitalize(selfName)}}
+            />
+          ) : (
+            <FormattedHTMLMessage {...conversationJoinStrings.headline} />
+          )}
         </H2>
         <H3 style={{marginTop: '10px'}}>{_(conversationJoinStrings.existentAccountSubhead)}</H3>
         <Button onClick={this.onOpenWireClick}>{_(conversationJoinStrings.existentAccountOpenButton)}</Button>
@@ -270,6 +279,7 @@ export default withRouter(
         error: ConversationSelector.getError(state),
         isAuthenticated: AuthSelector.isAuthenticated(state),
         isFetching: ConversationSelector.isFetching(state),
+        selfName: SelfSelector.getSelfName(state),
       }),
       {...ConversationAction, ...AuthAction}
     )(ConversationJoin)

@@ -253,6 +253,10 @@ export const conversationJoinStrings = defineMessages({
     id: 'conversationJoin.subhead',
     defaultMessage: 'Encrypted group messaging and conference calls. <br />No account necessary.',
   },
+  existentAccountHeadline: {
+    id: 'conversationJoin.existentAccountHeadline',
+    defaultMessage: '{name}, you have been invited <br />to join a <b style="color: black;">Wire guest room.</b>',
+  },
   existentAccountSubhead: {
     id: 'conversationJoin.subheadExistentAccount',
     defaultMessage: 'Guest rooms let you have conversations with people who are not on your team.',
