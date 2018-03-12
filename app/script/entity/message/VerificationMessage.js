@@ -25,47 +25,66 @@ window.z.entity = z.entity || {};
 z.entity.VerificationMessage = class VerificationMessage extends z.entity.Message {
   constructor() {
     super();
+
     this.super_type = z.message.SuperType.VERIFICATION;
     this.affect_order(false);
-    this.verification_message_type = undefined;
+    this.verificationMessageType = ko.observable();
 
     this.userEntities = ko.observableArray();
     this.userIds = ko.observableArray();
 
-    this.is_self_device = ko.pureComputed(() => {
+    this.isSelfClient = ko.pureComputed(() => {
       return this.userIds().length === 1 && this.userIds()[0] === this.user().id;
     });
 
-    this.caption_user = ko.pureComputed(() => {
-      return z.util.LocalizerUtil.joinNames(this.userEntities(), z.string.Declension.NOMINATIVE);
+    this.isTypeNewDevice = ko.pureComputed(() => {
+      return this.verificationMessageType() === z.message.VerificationMessageType.NEW_DEVICE;
+    });
+    this.isTypeNewMember = ko.pureComputed(() => {
+      return this.verificationMessageType() === z.message.VerificationMessageType.NEW_MEMBER;
+    });
+    this.isTypeUnverified = ko.pureComputed(() => {
+      return this.verificationMessageType() === z.message.VerificationMessageType.UNVERIFIED;
+    });
+    this.isTypeVerified = ko.pureComputed(() => {
+      return this.verificationMessageType() === z.message.VerificationMessageType.VERIFIED;
     });
 
-    this.caption_started_using = ko.pureComputed(() => {
-      if (this.userIds().length > 1) {
-        return z.l10n.text(z.string.conversation_device_started_using_many);
-      }
-      return z.l10n.text(z.string.conversation_device_started_using_one);
+    this.captionUser = ko.pureComputed(() => {
+      const namesString = z.util.LocalizerUtil.joinNames(this.userEntities(), z.string.Declension.NOMINATIVE);
+      return z.util.StringUtil.capitalize_first_char(namesString);
     });
 
-    this.caption_new_device = ko.pureComputed(() => {
-      if (this.userIds().length > 1) {
-        return z.l10n.text(z.string.conversation_device_new_device_many);
-      }
-      return z.l10n.text(z.string.conversation_device_new_device_one);
+    this.captionStartedUsing = ko.pureComputed(() => {
+      const hasMultipleUsers = this.userIds().length > 1;
+      const stringId = hasMultipleUsers
+        ? z.string.conversationDeviceStartedUsingMany
+        : z.string.conversationDeviceStartedUsingOne;
+
+      return z.l10n.text(stringId);
     });
 
-    this.caption_unverified_device = ko.pureComputed(() => {
-      if (this.is_self_device()) {
-        return z.l10n.text(z.string.conversation_device_your_devices);
-      }
-      return z.l10n.text(z.string.conversation_device_user_devices, this.userEntities()[0].first_name());
+    this.captionNewDevice = ko.pureComputed(() => {
+      const hasMultipleUsers = this.userIds().length > 1;
+      const stringId = hasMultipleUsers
+        ? z.string.conversationDeviceNewDeviceMany
+        : z.string.conversationDeviceNewDeviceOne;
+
+      return z.l10n.text(stringId);
+    });
+
+    this.captionUnverifiedDevice = ko.pureComputed(() => {
+      const [firstUserEntity] = this.userEntities();
+      const stringId = this.isSelfClient()
+        ? z.string.conversationDeviceYourDevices
+        : z.string.conversationDeviceUserDevices;
+
+      return z.l10n.text(stringId, firstUserEntity.first_name());
     });
   }
 
-  click_on_device() {
-    if (this.is_self_device()) {
-      return amplify.publish(z.event.WebApp.PREFERENCES.MANAGE_DEVICES);
-    }
-    return amplify.publish(z.event.WebApp.SHORTCUT.PEOPLE);
+  clickOnDevice() {
+    const topic = this.isSelfClient() ? z.event.WebApp.PREFERENCES.MANAGE_DEVICES : z.event.WebApp.SHORTCUT.PEOPLE;
+    amplify.publish(topic);
   }
 };

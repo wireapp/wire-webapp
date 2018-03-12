@@ -20,24 +20,24 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.ViewModel = z.ViewModel || {};
-window.z.ViewModel.content = z.ViewModel.content || {};
+window.z.viewModel = z.viewModel || {};
+window.z.viewModel.content = z.viewModel.content || {};
 
-z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewModel {
+z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewModel {
   static get SAVED_ANIMATION_TIMEOUT() {
     return 750 * 2;
   }
 
-  constructor(element_id, client_repository, team_repository, user_repository) {
+  constructor(mainViewModel, contentViewModel, repositories) {
     this.change_accent_color = this.change_accent_color.bind(this);
     this.check_new_clients = this.check_new_clients.bind(this);
     this.removed_from_view = this.removed_from_view.bind(this);
 
-    this.logger = new z.util.Logger('z.ViewModel.content.PreferencesAccountViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger('z.viewModel.content.PreferencesAccountViewModel', z.config.LOGGER.OPTIONS);
 
-    this.client_repository = client_repository;
-    this.team_repository = team_repository;
-    this.user_repository = user_repository;
+    this.client_repository = repositories.client;
+    this.team_repository = repositories.team;
+    this.user_repository = repositories.user;
 
     this.self_user = this.user_repository.self;
     this.new_clients = ko.observableArray([]);
@@ -49,7 +49,7 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
       const noStatusSet = this.availability() === z.user.AvailabilityType.NONE;
       if (noStatusSet) {
-        label = z.l10n.text(z.string.preferences_account_avaibility_unset);
+        label = z.l10n.text(z.string.preferencesAccountAvaibilityUnset);
       }
 
       return label;
@@ -64,7 +64,7 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.is_team_manager = ko.pureComputed(() => this.is_team() && this.self_user().is_team_manager());
     this.team = this.team_repository.team;
     this.team_name = ko.pureComputed(() =>
-      z.l10n.text(z.string.preferences_account_team, this.team_repository.teamName())
+      z.l10n.text(z.string.preferencesAccountTeam, this.team_repository.teamName())
     );
 
     this.name_saved = ko.observable();
@@ -74,8 +74,8 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   _init_subscriptions() {
-    amplify.subscribe(z.event.WebApp.CLIENT.ADD_OWN_CLIENT, this.on_client_add.bind(this));
-    amplify.subscribe(z.event.WebApp.CLIENT.REMOVE, this.on_client_remove.bind(this));
+    amplify.subscribe(z.event.WebApp.USER.CLIENT_ADDED, this.onClientAdd.bind(this));
+    amplify.subscribe(z.event.WebApp.USER.CLIENT_REMOVED, this.onClientRemove.bind(this));
   }
 
   removed_from_view() {
@@ -134,10 +134,6 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     z.ui.AvailabilityContextMenu.show(event, 'settings', 'preferences-account-availability-menu');
   }
 
-  click_on_username() {
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.EDITED_USERNAME);
-  }
-
   change_username(username, event) {
     const entered_username = event.target.value;
     const normalized_username = entered_username.toLowerCase().replace(/[^a-z0-9_]/g, '');
@@ -161,10 +157,6 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
         if (this.entered_username() === this.submitted_username()) {
           this.username_error(null);
           this.username_saved(true);
-
-          amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.SET_USERNAME, {
-            length: normalized_username.length,
-          });
 
           event.target.blur();
           window.setTimeout(() => {
@@ -213,11 +205,12 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   check_new_clients() {
     if (this.new_clients().length) {
       amplify.publish(z.event.WebApp.SEARCH.BADGE.HIDE);
-      amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CONNECTED_DEVICE, {
+      amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACCOUNT_NEW_DEVICES, {
         close: () => this.new_clients.removeAll(),
         data: this.new_clients(),
-        secondary() {
-          amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES);
+        preventClose: true,
+        secondary: () => {
+          amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICES);
         },
       });
     }
@@ -226,28 +219,26 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   click_on_change_picture(files) {
     const [new_user_picture] = Array.from(files);
 
-    this.set_picture(new_user_picture)
-      .then(() => {
-        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.PROFILE_PICTURE_CHANGED, {
-          source: 'fromPhotoLibrary',
-        });
-      })
-      .catch(error => {
-        if (error.type !== z.user.UserError.TYPE.INVALID_UPDATE) {
-          throw error;
-        }
-      });
+    this.set_picture(new_user_picture).catch(error => {
+      if (error.type !== z.user.UserError.TYPE.INVALID_UPDATE) {
+        throw error;
+      }
+    });
   }
 
   click_on_delete_account() {
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.DELETE_ACCOUNT, {
+    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
       action: () => this.user_repository.delete_me(),
-      data: this.self_user().email(),
+      text: {
+        action: z.l10n.text(z.string.modalAccountDeletionAction),
+        message: z.l10n.text(z.string.modalAccountDeletionMessage),
+        title: z.l10n.text(z.string.modalAccountDeletionHeadline),
+      },
     });
   }
 
   click_on_create() {
-    const path = `${z.l10n.text(z.string.url_website_create_team)}?pk_campaign=client&pk_kwd=desktop`;
+    const path = `${z.l10n.text(z.string.urlWebsiteCreateTeam)}?pk_campaign=client&pk_kwd=desktop`;
     z.util.safe_window_open(z.util.URLUtil.build_url(z.util.URLUtil.TYPE.WEBSITE, path));
   }
 
@@ -263,17 +254,22 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
   click_on_reset_password() {
     z.util.safe_window_open(z.util.URLUtil.build_url(z.util.URLUtil.TYPE.ACCOUNT, z.config.URL_PATH.PASSWORD_RESET));
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.PASSWORD_RESET, {value: 'fromProfile'});
   }
 
   set_picture(new_user_picture) {
     if (new_user_picture.size > z.config.MAXIMUM_IMAGE_FILE_SIZE) {
       const maximum_size_in_mb = z.config.MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024;
-      return this._show_upload_warning(z.l10n.text(z.string.alert_upload_too_large, maximum_size_in_mb));
+      const messageString = z.l10n.text(z.string.modalPictureTooLargeMessage, maximum_size_in_mb);
+      const titleString = z.l10n.text(z.string.modalPictureTooLargeHeadline);
+
+      return this._show_upload_warning(titleString, messageString);
     }
 
     if (!z.config.SUPPORTED_PROFILE_IMAGE_TYPES.includes(new_user_picture.type)) {
-      return this._show_upload_warning(z.l10n.text(z.string.alert_upload_file_format));
+      const titleString = z.l10n.text(z.string.modalPictureFileFormatHeadline);
+      const messageString = z.l10n.text(z.string.modalPictureFileFormatMessage);
+
+      return this._show_upload_warning(titleString, messageString);
     }
 
     const min_height = z.user.UserRepository.CONFIG.MINIMUM_PICTURE_SIZE.HEIGHT;
@@ -284,29 +280,33 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
         return this.user_repository.change_picture(new_user_picture);
       }
 
-      return this._show_upload_warning(z.l10n.text(z.string.alert_upload_too_small));
+      const messageString = z.l10n.text(z.string.modalPictureTooSmallMessage);
+      const titleString = z.l10n.text(z.string.modalPictureTooSmallHeadline);
+      return this._show_upload_warning(titleString, messageString);
     });
   }
 
-  _show_upload_warning(warning) {
-    amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
-    window.setTimeout(() => {
-      window.alert(warning);
-    }, 200);
+  _show_upload_warning(title, message) {
+    const modalOptions = {text: {message, title}};
+    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
+
     return Promise.reject(new z.user.UserError(z.user.UserError.TYPE.INVALID_UPDATE));
   }
 
-  on_client_add(user_id, client_et) {
-    amplify.publish(z.event.WebApp.SEARCH.BADGE.SHOW);
-    this.new_clients.push(client_et);
+  onClientAdd(userId, clientEntity) {
+    const isSelfUser = userId === this.self_user().id;
+    if (isSelfUser) {
+      amplify.publish(z.event.WebApp.SEARCH.BADGE.SHOW);
+      this.new_clients.push(clientEntity);
+    }
   }
 
-  on_client_remove(user_id, client_id) {
-    if (user_id === this.self_user().id) {
-      this.new_clients().forEach(client_et => {
-        if (client_et.id === client_id && client_et.isPermanent()) {
-          this.new_clients.remove(client_et);
-        }
+  onClientRemove(userId, clientId) {
+    const isSelfUser = userId === this.self_user().id;
+    if (isSelfUser) {
+      this.new_clients.remove(clientEntity => {
+        const isExpectedId = clientEntity.id === clientId;
+        return isExpectedId && clientEntity.isPermanent();
       });
 
       if (!this.new_clients().length) {

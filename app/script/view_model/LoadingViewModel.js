@@ -20,60 +20,63 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.ViewModel = z.ViewModel || {};
+window.z.viewModel = z.viewModel || {};
 
-z.ViewModel.LoadingViewModel = class LoadingViewModel {
-  constructor(element_id, user_repository) {
-    this.user_repository = user_repository;
-    this.loading_message = ko.observable('');
-    this.loading_progress = ko.observable(0);
+z.viewModel.LoadingViewModel = class LoadingViewModel {
+  constructor(mainViewModel, repositories) {
+    this.elementId = 'loading-screen';
+    this.userRepository = repositories.user;
+    this.loadingMessage = ko.observable('');
+    this.loadingProgress = ko.observable(0);
 
-    this.loading_percentage = ko.pureComputed(() => {
-      return `${this.loading_progress()}%`;
-    });
+    this.loadingPercentage = ko.pureComputed(() => `${this.loadingProgress()}%`);
 
-    amplify.subscribe(z.event.WebApp.APP.UPDATE_PROGRESS, this.update_progress.bind(this));
+    amplify.subscribe(z.event.WebApp.APP.UPDATE_PROGRESS, this.updateProgress.bind(this));
 
-    ko.applyBindings(this, document.getElementById(element_id));
+    ko.applyBindings(this, document.getElementById(this.elementId));
   }
 
-  update_progress(progress = 0, message_locator, replace_content) {
-    if (progress > this.loading_progress()) {
-      this.loading_progress(progress);
-    } else {
-      this.loading_progress(this.loading_progress() + 0.01);
-    }
+  removeFromView() {
+    $(`#${this.elementId}`).remove();
+    amplify.unsubscribeAll(z.event.WebApp.APP.UPDATE_PROGRESS);
+  }
 
-    if (message_locator) {
-      let updated_loading_message;
+  updateProgress(progress = 0, messageLocator, replaceContent) {
+    const hasProgressIncreased = progress > this.loadingProgress();
+    progress = hasProgressIncreased ? progress : this.loadingProgress() + 0.01;
+    this.loadingProgress(progress);
 
-      switch (message_locator) {
-        case z.string.init_received_self_user: {
-          updated_loading_message = z.l10n.text(message_locator, this.user_repository.self().first_name());
+    if (messageLocator) {
+      let updatedLoadingMessage;
+
+      switch (messageLocator) {
+        case z.string.initReceivedSelfUser: {
+          updatedLoadingMessage = z.l10n.text(messageLocator, this.userRepository.self().first_name());
           break;
         }
 
-        case z.string.init_decryption:
-        case z.string.init_events: {
+        case z.string.initDecryption:
+        case z.string.initEvents: {
           if (z.util.Environment.frontend.is_production()) {
-            updated_loading_message = z.l10n.text(message_locator);
-          } else {
-            const substitutes = {
-              number1: replace_content.handled,
-              number2: replace_content.total,
-            };
-
-            const handling_progress = z.l10n.text(z.string.init_progress, substitutes);
-            updated_loading_message = `${z.l10n.text(message_locator)}${handling_progress}`;
+            updatedLoadingMessage = z.l10n.text(messageLocator);
+            break;
           }
+
+          const substitutes = {
+            number1: replaceContent.handled,
+            number2: replaceContent.total,
+          };
+
+          const handlingProgress = z.l10n.text(z.string.initProgress, substitutes);
+          updatedLoadingMessage = `${z.l10n.text(messageLocator)}${handlingProgress}`;
           break;
         }
 
         default:
-          updated_loading_message = z.l10n.text(message_locator);
+          updatedLoadingMessage = z.l10n.text(messageLocator);
       }
 
-      this.loading_message(updated_loading_message);
+      this.loadingMessage(updatedLoadingMessage);
     }
   }
 };

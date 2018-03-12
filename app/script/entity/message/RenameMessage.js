@@ -29,7 +29,7 @@ z.entity.RenameMessage = class RenameMessage extends z.entity.SystemMessage {
     this.system_message_type = z.message.SystemMessageType.CONVERSATION_RENAME;
 
     this.caption = ko.pureComputed(() => {
-      const identifier = this.user().is_me ? z.string.conversation_rename_you : z.string.conversation_rename;
+      const identifier = this.user().is_me ? z.string.conversationRenameYou : z.string.conversationRename;
       return z.l10n.text(identifier);
     });
   }

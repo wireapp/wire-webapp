@@ -63,9 +63,9 @@ z.conversation.EventBuilder = {
       type: z.event.Client.CONVERSATION.ASSET_ADD,
     };
   },
-  buildCalling(conversationEntity, eCallMessage, userId, clientId) {
+  buildCalling(conversationEntity, callMessage, userId, clientId) {
     return {
-      content: eCallMessage,
+      content: callMessage,
       conversation: conversationEntity.id,
       from: userId,
       sender: clientId,
@@ -133,7 +133,7 @@ z.conversation.EventBuilder = {
       type: z.event.Client.CONVERSATION.INCOMING_MESSAGE_TOO_BIG,
     };
   },
-  buildMemberLeave(conversationEntity, userId, timeOffset) {
+  buildMemberLeave(conversationEntity, userId, removedBySelfUser, timeOffset) {
     const {id, self} = conversationEntity;
 
     return {
@@ -141,7 +141,7 @@ z.conversation.EventBuilder = {
       data: {
         user_ids: [userId],
       },
-      from: self.id,
+      from: removedBySelfUser ? self.id : userId,
       time: conversationEntity.get_next_iso_date(timeOffset),
       type: z.event.Backend.CONVERSATION.MEMBER_LEAVE,
     };
@@ -196,7 +196,7 @@ z.conversation.EventBuilder = {
     };
   },
   buildVoiceChannelActivate(callMessageEntity) {
-    const {conversation_id: conversationId, user_id: userId, time} = callMessageEntity;
+    const {conversationId, userId, time} = callMessageEntity;
 
     return {
       conversation: conversationId,
@@ -208,11 +208,7 @@ z.conversation.EventBuilder = {
     };
   },
   buildVoiceChannelDeactivate(callMessageEntity, reason, timeOffset = 0) {
-    const {
-      conversation_id: conversationId,
-      user_id: userId,
-      time = new Date(Date.now() - timeOffset).toISOString(),
-    } = callMessageEntity;
+    const {conversationId, userId, time = new Date(Date.now() - timeOffset).toISOString()} = callMessageEntity;
 
     return {
       conversation: conversationId,

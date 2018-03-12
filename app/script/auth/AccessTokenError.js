@@ -49,11 +49,11 @@ z.auth.AccessTokenError = class AccessTokenError extends Error {
 
   static get TYPE() {
     return {
-      NOT_FOUND_IN_CACHE: 'z.auth.AccessTokenError.TYPE.NOT_FOUND_IN_CACHE',
-      REQUEST_FAILED: 'z.auth.AccessTokenError.TYPE.REQUEST_FAILED',
-      REQUEST_FORBIDDEN: 'z.auth.AccessTokenError.TYPE.REQUEST_FORBIDDEN',
-      RETRIES_EXCEEDED: 'z.auth.AccessTokenError.TYPE.RETRIES_EXCEEDED',
-      UNKNOWN: 'z.auth.AccessTokenError.TYPE.UNKNOWN',
+      NOT_FOUND_IN_CACHE: 'AccessTokenError.TYPE.NOT_FOUND_IN_CACHE',
+      REQUEST_FAILED: 'AccessTokenError.TYPE.REQUEST_FAILED',
+      REQUEST_FORBIDDEN: 'AccessTokenError.TYPE.REQUEST_FORBIDDEN',
+      RETRIES_EXCEEDED: 'AccessTokenError.TYPE.RETRIES_EXCEEDED',
+      UNKNOWN: 'AccessTokenError.TYPE.UNKNOWN',
     };
   }
 };

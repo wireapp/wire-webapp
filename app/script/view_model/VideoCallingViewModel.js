@@ -20,255 +20,233 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.ViewModel = z.ViewModel || {};
+window.z.viewModel = z.viewModel || {};
 
-z.ViewModel.VideoCallingViewModel = class VideoCallingViewModel {
-  constructor(
-    element_id,
-    calling_repository,
-    conversation_repository,
-    media_repository,
-    user_repository,
-    multitasking
-  ) {
-    this.clicked_on_cancel_screen = this.clicked_on_cancel_screen.bind(this);
-    this.clicked_on_choose_screen = this.clicked_on_choose_screen.bind(this);
-    this.choose_shared_screen = this.choose_shared_screen.bind(this);
+z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
+  static get CONFIG() {
+    return {
+      AUTO_MINIMIZE_TIMEOUT: 4 * 1000,
+      HIDE_CONTROLS_TIMEOUT: 4 * 1000,
+    };
+  }
 
-    this.calling_repository = calling_repository;
-    this.conversation_repository = conversation_repository;
-    this.media_repository = media_repository;
-    this.user_repository = user_repository;
-    this.multitasking = multitasking;
-    this.logger = new z.util.Logger('z.ViewModel.VideoCallingViewModel', z.config.LOGGER.OPTIONS);
+  constructor(mainViewModel, repositories) {
+    this.clickedOnCancelScreen = this.clickedOnCancelScreen.bind(this);
+    this.clickedOnChooseScreen = this.clickedOnChooseScreen.bind(this);
+    this.chooseSharedScreen = this.chooseSharedScreen.bind(this);
 
-    this.self_user = this.user_repository.self;
+    this.elementId = 'video-calling';
 
-    this.available_devices = this.media_repository.devices_handler.available_devices;
-    this.current_device_id = this.media_repository.devices_handler.current_device_id;
-    this.current_device_index = this.media_repository.devices_handler.current_device_index;
+    this.callingRepository = repositories.calling;
+    this.conversationRepository = repositories.conversation;
+    this.mediaRepository = repositories.media;
+    this.userRepository = repositories.user;
 
-    this.local_video_stream = this.media_repository.stream_handler.local_media_stream;
-    this.remote_video_stream = this.media_repository.stream_handler.remote_media_streams.video;
+    this.contentViewModel = mainViewModel.content;
+    this.multitasking = this.contentViewModel.multitasking;
+    this.logger = new z.util.Logger('z.viewModel.VideoCallingViewModel', z.config.LOGGER.OPTIONS);
 
-    this.self_stream_state = this.media_repository.stream_handler.self_stream_state;
+    this.selfUser = this.userRepository.self;
 
-    this.is_choosing_screen = ko.observable(false);
+    this.availableDevices = this.mediaRepository.devices_handler.available_devices;
+    this.currentDeviceId = this.mediaRepository.devices_handler.current_device_id;
+    this.currentDeviceIndex = this.mediaRepository.devices_handler.current_device_index;
 
-    this.minimize_timeout = undefined;
+    this.localVideoStream = this.mediaRepository.stream_handler.local_media_stream;
+    this.remoteVideoStream = this.mediaRepository.stream_handler.remote_media_streams.video;
 
-    this.remote_video_element_contain = ko.observable(false);
+    this.selfStreamState = this.mediaRepository.stream_handler.self_stream_state;
 
-    this.number_of_screen_devices = ko.observable(0);
-    this.number_of_video_devices = ko.observable(0);
+    this.isChoosingScreen = ko.observable(false);
 
-    this.calls = this.calling_repository.calls;
-    this.joined_call = this.calling_repository.joined_call;
+    this.minimizeTimeout = undefined;
 
-    this.videod_call = ko.pureComputed(() => {
-      for (const call_et of this.calls()) {
-        const is_active = z.calling.enum.CALL_STATE_GROUP.IS_ACTIVE.includes(call_et.state());
-        const self_video_send =
-          (call_et.self_client_joined() && this.self_stream_state.screen_send()) || this.self_stream_state.video_send();
-        const remote_video_send =
-          (call_et.is_remote_screen_send() || call_et.is_remote_video_send()) &&
-          !call_et.is_ongoing_on_another_client();
-        const is_videod = self_video_send || remote_video_send || this.is_choosing_screen();
+    this.remoteVideoElementContain = ko.observable(false);
 
-        if (is_active && is_videod) {
-          return call_et;
+    this.calls = this.callingRepository.calls;
+    this.joinedCall = this.callingRepository.joinedCall;
+
+    this.videodCall = ko.pureComputed(() => {
+      for (const callEntity of this.calls()) {
+        const isActiveCall = z.calling.enum.CALL_STATE_GROUP.IS_ACTIVE.includes(callEntity.state());
+        const selfScreenSend = callEntity.selfClientJoined() && this.selfStreamState.screenSend();
+        const selfVideoSend = selfScreenSend || this.selfStreamState.videoSend();
+        const remoteVideoState = callEntity.isRemoteScreenSend() || callEntity.isRemoteVideoSend();
+        const remoteVideoSend = remoteVideoState && !callEntity.isOngoingOnAnotherClient();
+        const isVideoCall = selfVideoSend || remoteVideoSend || this.isChoosingScreen();
+
+        if (isActiveCall && isVideoCall) {
+          return callEntity;
         }
       }
     });
 
-    this.is_ongoing = ko.pureComputed(() => {
-      if (this.joined_call()) {
-        return this.videod_call() && this.joined_call().state() === z.calling.enum.CALL_STATE.ONGOING;
-      }
+    this.isCallOngoing = ko.pureComputed(() => {
+      return this.joinedCall()
+        ? this.videodCall() && this.joinedCall().state() === z.calling.enum.CALL_STATE.ONGOING
+        : false;
     });
 
-    this.overlay_icon_class = ko.pureComputed(() => {
-      if (this.is_ongoing()) {
-        if (!this.self_stream_state.audio_send()) {
+    this.overlayIconClass = ko.pureComputed(() => {
+      if (this.isCallOngoing()) {
+        const isMuted = !this.selfStreamState.audioSend();
+        if (isMuted) {
           return 'icon-mute';
         }
 
-        if (!this.self_stream_state.screen_send() && !this.self_stream_state.video_send()) {
+        const isVideoDisabled = !this.selfStreamState.screenSend() && !this.selfStreamState.videoSend();
+        if (isVideoDisabled) {
           return 'icon-video-off';
         }
       }
     });
 
-    this.remote_user = ko.pureComputed(() => {
-      if (this.joined_call()) {
-        const [participant] = this.joined_call().participants();
+    this.remoteUser = ko.pureComputed(() => {
+      const [participantEntity] = this.joinedCall() ? this.joinedCall().participants() : [];
 
-        if (participant) {
-          return participant.user;
-        }
+      if (participantEntity) {
+        return participantEntity.user;
       }
     });
 
-    this.show_local = ko.pureComputed(() => {
-      return (
-        (this.show_local_video() || this.overlay_icon_class()) &&
-        !this.multitasking.is_minimized() &&
-        !this.is_choosing_screen()
-      );
+    this.showLocal = ko.pureComputed(() => {
+      const shouldShowLocal = this.showLocalVideo() || this.overlayIconClass();
+      return shouldShowLocal && !this.multitasking.isMinimized() && !this.isChoosingScreen();
     });
-    this.show_local_video = ko.pureComputed(() => {
-      if (this.videod_call()) {
-        const is_visible =
-          this.self_stream_state.screen_send() ||
-          this.self_stream_state.video_send() ||
-          this.videod_call().state() !== z.calling.enum.CALL_STATE.ONGOING;
-        return is_visible && this.local_video_stream();
+    this.showLocalVideo = ko.pureComputed(() => {
+      if (this.videodCall()) {
+        const localVideoState = this.selfStreamState.screenSend() || this.selfStreamState.videoSend();
+        const showLocalVideo = localVideoState || !this.isCallOngoing();
+        return showLocalVideo && this.localVideoStream();
       }
     });
 
-    this.show_remote = ko.pureComputed(() => {
-      return this.show_remote_video() || this.show_remote_participant() || this.is_choosing_screen();
+    this.showRemote = ko.pureComputed(() => {
+      return this.showRemoteVideo() || this.showRemoteParticipant() || this.isChoosingScreen();
     });
-    this.show_remote_participant = ko.pureComputed(() => {
-      const is_visible = this.remote_user() && !this.multitasking.is_minimized() && !this.is_choosing_screen();
-      return this.is_ongoing() && !this.show_remote_video() && is_visible;
+    this.showRemoteParticipant = ko.pureComputed(() => {
+      const showRemoteParticipant = this.remoteUser() && !this.multitasking.isMinimized() && !this.isChoosingScreen();
+      return showRemoteParticipant && this.isCallOngoing() && !this.showRemoteVideo();
     });
-    this.show_remote_video = ko.pureComputed(() => {
-      if (this.joined_call()) {
-        const is_visible =
-          (this.joined_call().is_remote_screen_send() || this.joined_call().is_remote_video_send()) &&
-          this.remote_video_stream();
-        return this.is_ongoing() && is_visible;
+    this.showRemoteVideo = ko.pureComputed(() => {
+      if (this.isCallOngoing()) {
+        const remoteVideoState = this.joinedCall().isRemoteScreenSend() || this.joinedCall().isRemoteVideoSend();
+        return remoteVideoState && this.remoteVideoStream();
       }
     });
 
-    this.show_switch_camera = ko.pureComputed(() => {
-      const is_visible =
-        this.local_video_stream() &&
-        this.available_devices.video_input().length > 1 &&
-        this.self_stream_state.video_send();
-      return this.is_ongoing() && is_visible;
+    this.showSwitchCamera = ko.pureComputed(() => {
+      const hasMultipleCameras = this.availableDevices.video_input().length > 1;
+      const isVisible = hasMultipleCameras && this.localVideoStream() && this.selfStreamState.videoSend();
+      return this.isCallOngoing() && isVisible;
     });
-    this.show_switch_screen = ko.pureComputed(() => {
-      const is_visible =
-        this.local_video_stream() &&
-        this.available_devices.screen_input().length > 1 &&
-        this.self_stream_state.screen_send();
-      return this.is_ongoing() && is_visible;
+    this.showSwitchScreen = ko.pureComputed(() => {
+      const hasMultipleCameras = this.availableDevices.screen_input().length > 1;
+      const isVisible = hasMultipleCameras && this.localVideoStream() && this.selfStreamState.screenSend();
+      return this.isCallOngoing() && isVisible;
     });
 
-    this.show_controls = ko.pureComputed(() => {
-      const is_visible =
-        this.show_remote_video() || (this.show_remote_participant() && !this.multitasking.is_minimized());
-      return this.is_ongoing() && is_visible;
+    this.showControls = ko.pureComputed(() => {
+      const isFullscreenEnabled = this.showRemoteParticipant() && !this.multitasking.isMinimized();
+      const isVisible = this.showRemoteVideo() || isFullscreenEnabled;
+      return this.isCallOngoing() && isVisible;
     });
-    this.show_toggle_video = ko.pureComputed(() => {
-      if (this.joined_call()) {
-        return this.joined_call().conversation_et.is_one2one();
-      }
+    this.showToggleVideo = ko.pureComputed(() => {
+      return this.joinedCall() ? this.joinedCall().conversationEntity.is_one2one() : false;
     });
-    this.show_toggle_screen = ko.pureComputed(() => z.calling.CallingRepository.supports_screen_sharing);
-    this.disable_toggle_screen = ko.pureComputed(() => {
-      if (this.joined_call()) {
-        return this.joined_call().is_remote_screen_send();
-      }
+    this.showToggleScreen = ko.pureComputed(() => z.calling.CallingRepository.supportsScreenSharing);
+    this.disableToggleScreen = ko.pureComputed(() => {
+      return this.joinedCall() ? this.joinedCall().isRemoteScreenSend() : true;
     });
 
-    this.visible_call_id = undefined;
-    this.joined_call.subscribe(joined_call => {
-      if (joined_call) {
-        if (this.visible_call_id !== joined_call.id) {
-          this.visible_call_id = joined_call.id;
+    this.visibleCallId = undefined;
+    this.joinedCall.subscribe(callEntity => {
+      if (callEntity) {
+        const isVisibleId = this.visibleCallId === callEntity.id;
+        if (!isVisibleId) {
+          this.visibleCallId = callEntity.id;
 
-          if (this.show_local_video() || this.show_remote_video()) {
-            this.multitasking.is_minimized(false);
-            return this.logger.info(`Maximizing video call '${joined_call.id}' to full-screen`, joined_call);
+          if (this.showLocalVideo() || this.showRemoteVideo()) {
+            this.multitasking.isMinimized(false);
+            return this.logger.info(`Maximizing video call '${callEntity.id}' to full-screen`, callEntity);
           }
 
-          this.multitasking.is_minimized(true);
-          this.logger.info(`Minimizing audio call '${joined_call.id}' from full-screen`, joined_call);
+          this.multitasking.isMinimized(true);
+          this.logger.info(`Minimizing audio call '${callEntity.id}' from full-screen`, callEntity);
         }
       } else {
-        this.visible_call_id = undefined;
-        this.multitasking.auto_minimize(true);
-        this.multitasking.is_minimized(false);
+        this.visibleCallId = undefined;
+        this.multitasking.autoMinimize(true);
+        this.multitasking.isMinimized(false);
         this.logger.info('Resetting full-screen calling to maximize');
       }
     });
 
-    this.available_devices.screen_input.subscribe(media_devices => {
-      if (_.isArray(media_devices)) {
-        this.number_of_screen_devices(media_devices.length);
-      } else {
-        this.number_of_screen_devices(0);
-      }
-    });
-    this.available_devices.video_input.subscribe(media_devices => {
-      if (_.isArray(media_devices)) {
-        this.number_of_video_devices(media_devices.length);
-      } else {
-        this.number_of_video_devices(0);
-      }
-    });
-    this.show_remote_participant.subscribe(show_remote_participant => {
-      if (this.minimize_timeout) {
-        window.clearTimeout(this.minimize_timeout);
-        this.minimize_timeout = undefined;
+    this.showRemoteParticipant.subscribe(showRemoteParticipant => {
+      if (this.minimizeTimeout) {
+        window.clearTimeout(this.minimizeTimeout);
+        this.minimizeTimeout = undefined;
       }
 
-      if (
-        show_remote_participant &&
-        this.multitasking.auto_minimize() &&
-        this.videod_call() &&
-        !this.is_choosing_screen()
-      ) {
-        const remote_user_name = this.remote_user() ? this.remote_user().name() : undefined;
+      const isVideoCall = showRemoteParticipant && this.videodCall();
+      const shouldAutoMinimize = isVideoCall && this.multitasking.autoMinimize() && !this.isChoosingScreen();
+      if (shouldAutoMinimize) {
+        const remoteUserName = this.remoteUser() ? this.remoteUser().name() : '';
 
-        this.logger.info(
-          `Scheduled minimizing call '${
-            this.videod_call().id
-          }' on timeout as remote user '${remote_user_name}' is not videod`
-        );
-        this.minimize_timeout = window.setTimeout(() => {
-          if (!this.is_choosing_screen()) {
-            this.multitasking.is_minimized(true);
+        const callId = this.videodCall().id;
+        const logMessage = `Scheduled minimizing call '${callId}' as remote user '${remoteUserName}' is not videod`;
+        this.logger.info(logMessage);
+        this.minimizeTimeout = window.setTimeout(() => {
+          if (!this.isChoosingScreen()) {
+            this.multitasking.isMinimized(true);
           }
-          this.logger.info(
-            `Minimizing call '${this.videod_call().id}' on timeout as remote user '${remote_user_name}' is not videod`
-          );
-        }, 4000);
+          const message = `Minimizing call '${callId}' on timeout as remote user '${remoteUserName}' is not videod`;
+          this.logger.info(message);
+        }, VideoCallingViewModel.CONFIG.AUTO_MINIMIZE_TIMEOUT);
       }
     });
 
-    amplify.subscribe(z.event.WebApp.CALL.MEDIA.CHOOSE_SCREEN, this.choose_shared_screen);
+    amplify.subscribe(z.event.WebApp.CALL.MEDIA.CHOOSE_SCREEN, this.chooseSharedScreen);
 
-    ko.applyBindings(this, document.getElementById(element_id));
+    ko.applyBindings(this, document.getElementById(this.elementId));
   }
 
-  choose_shared_screen(conversation_id) {
-    if (!this.disable_toggle_screen()) {
-      if (this.self_stream_state.screen_send() || z.util.Environment.browser.firefox) {
-        amplify.publish(z.event.WebApp.CALL.MEDIA.TOGGLE, conversation_id, z.media.MediaType.SCREEN);
-      } else if (z.util.Environment.desktop) {
-        this.media_repository.devices_handler
-          .get_screen_sources()
-          .then(screen_sources => {
-            amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CALLING.SHARED_SCREEN, {
-              conversation_type: this.joined_call().is_group
-                ? z.tracking.attribute.ConversationType.GROUP
-                : z.tracking.attribute.ConversationType.ONE_TO_ONE,
-              kind_of_call_when_sharing: this.joined_call().is_remote_video_send() ? 'video' : 'audio',
-              num_screens: screen_sources.length,
-            });
+  chooseSharedScreen(conversationId) {
+    if (!this.disableToggleScreen()) {
+      const skipScreenSelection = this.selfStreamState.screenSend() || z.util.Environment.browser.firefox;
+      if (skipScreenSelection) {
+        amplify.publish(z.event.WebApp.CALL.MEDIA.TOGGLE, conversationId, z.media.MediaType.SCREEN);
+        return;
+      }
 
-            if (screen_sources.length > 1) {
-              this.is_choosing_screen(true);
-              if (this.multitasking.is_minimized()) {
-                this.multitasking.reset_minimize(true);
-                this.multitasking.is_minimized(false);
+      if (z.util.Environment.desktop) {
+        this.mediaRepository.devices_handler
+          .get_screen_sources()
+          .then(screenSources => {
+            const conversationEntity = this.joinedCall().conversationEntity;
+
+            const attributes = {
+              conversation_type: z.tracking.helpers.get_conversation_type(conversationEntity),
+              kind_of_call_when_sharing: this.joinedCall().isRemoteVideoSend() ? 'video' : 'audio',
+              num_screens: screenSources.length,
+            };
+
+            const isTeamConversation = !!conversationEntity.team_id;
+            if (isTeamConversation) {
+              Object.assign(attributes, z.tracking.helpers.getGuestAttributes(conversationEntity));
+            }
+
+            amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CALLING.SHARED_SCREEN, attributes);
+
+            const hasMultipleScreens = screenSources.length > 1;
+            if (hasMultipleScreens) {
+              this.isChoosingScreen(true);
+              if (this.multitasking.isMinimized()) {
+                this.multitasking.resetMinimize(true);
+                this.multitasking.isMinimized(false);
               }
             } else {
-              amplify.publish(z.event.WebApp.CALL.MEDIA.TOGGLE, conversation_id, z.media.MediaType.SCREEN);
+              amplify.publish(z.event.WebApp.CALL.MEDIA.TOGGLE, conversationId, z.media.MediaType.SCREEN);
             }
           })
           .catch(error => {
@@ -278,108 +256,91 @@ z.ViewModel.VideoCallingViewModel = class VideoCallingViewModel {
     }
   }
 
-  clicked_on_cancel_screen() {
-    this.is_choosing_screen(false);
+  clickedOnCancelScreen() {
+    this.isChoosingScreen(false);
   }
 
-  clicked_on_leave_call() {
-    if (this.joined_call()) {
-      amplify.publish(
-        z.event.WebApp.CALL.STATE.LEAVE,
-        this.joined_call().id,
-        z.calling.enum.TERMINATION_REASON.SELF_USER
-      );
+  clickedOnLeaveCall() {
+    if (this.joinedCall()) {
+      const reason = z.calling.enum.TERMINATION_REASON.SELF_USER;
+      amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, this.joinedCall().id, reason);
     }
   }
 
-  clicked_on_mute_audio() {
-    if (this.joined_call()) {
-      amplify.publish(z.event.WebApp.CALL.MEDIA.TOGGLE, this.joined_call().id, z.media.MediaType.AUDIO);
+  clickedOnMuteAudio() {
+    if (this.joinedCall()) {
+      amplify.publish(z.event.WebApp.CALL.MEDIA.TOGGLE, this.joinedCall().id, z.media.MediaType.AUDIO);
     }
   }
 
-  clicked_on_share_screen() {
-    if (this.joined_call()) {
-      this.choose_shared_screen(this.joined_call().id);
+  clickedOnShareScreen() {
+    if (this.joinedCall()) {
+      this.chooseSharedScreen(this.joinedCall().id);
     }
   }
 
-  clicked_on_choose_screen(screen_source) {
-    this.current_device_id.screen_input('');
+  clickedOnChooseScreen(screenSource) {
+    this.currentDeviceId.screen_input('');
 
-    this.logger.info(`Selected '${screen_source.name}' for screen sharing`, screen_source);
-    this.is_choosing_screen(false);
-    this.current_device_id.screen_input(screen_source.id);
-    amplify.publish(z.event.WebApp.CALL.MEDIA.TOGGLE, this.joined_call().id, z.media.MediaType.SCREEN);
+    this.logger.info(`Selected '${screenSource.name}' for screen sharing`, screenSource);
+    this.isChoosingScreen(false);
+    this.currentDeviceId.screen_input(screenSource.id);
+    amplify.publish(z.event.WebApp.CALL.MEDIA.TOGGLE, this.joinedCall().id, z.media.MediaType.SCREEN);
 
-    if (this.multitasking.reset_minimize()) {
-      this.multitasking.is_minimized(true);
-      this.multitasking.reset_minimize(false);
-      this.logger.info(`Minimizing call '${this.joined_call().id}' on screen selection to return to previous state`);
+    if (this.multitasking.resetMinimize()) {
+      this.multitasking.isMinimized(true);
+      this.multitasking.resetMinimize(false);
+      this.logger.info(`Minimizing call '${this.joinedCall().id}' on screen selection to return to previous state`);
     }
   }
 
-  clicked_on_stop_video() {
-    if (this.joined_call()) {
-      amplify.publish(z.event.WebApp.CALL.MEDIA.TOGGLE, this.joined_call().id, z.media.MediaType.VIDEO);
+  clickedOnStopVideo() {
+    if (this.joinedCall()) {
+      amplify.publish(z.event.WebApp.CALL.MEDIA.TOGGLE, this.joinedCall().id, z.media.MediaType.VIDEO);
     }
   }
 
-  clicked_on_toggle_camera() {
-    this.media_repository.devices_handler.toggle_next_camera();
+  clickedOnToggleCamera() {
+    this.mediaRepository.devices_handler.toggle_next_camera();
   }
 
-  clicked_on_toggle_screen() {
-    this.media_repository.devices_handler.toggle_next_screen();
+  clickedOnToggleScreen() {
+    this.mediaRepository.devices_handler.toggle_next_screen();
   }
 
-  clicked_on_minimize() {
-    this.multitasking.is_minimized(true);
-    this.logger.info(`Minimizing call '${this.videod_call().id}' on user click`);
+  clickedOnMinimize() {
+    this.multitasking.isMinimized(true);
+    this.logger.info(`Minimizing call '${this.videodCall().id}' on user click`);
   }
 
-  clicked_on_maximize() {
-    this.multitasking.is_minimized(false);
-    this.logger.info(`Maximizing call '${this.videod_call().id}' on user click`);
+  clickedOnMaximize() {
+    this.multitasking.isMinimized(false);
+    this.logger.info(`Maximizing call '${this.videodCall().id}' on user click`);
   }
 
-  double_clicked_on_remote_video() {
-    this.remote_video_element_contain(!this.remote_video_element_contain());
-    this.logger.info(`Switched remote video object-fit. Contain is '${this.remote_video_element_contain()}'`);
+  doubleClickedOnRemoteVideo() {
+    this.remoteVideoElementContain(!this.remoteVideoElementContain());
+    this.logger.info(`Switched remote video object-fit. Contain is '${this.remoteVideoElementContain()}'`);
   }
 
   /**
    * Detect the aspect ratio of a MediaElement and set the video mode.
    *
-   * @param {VideoCallingViewModel} view_model - Video calling view model
-   * @param {HTMLVideoElement} media_element - Media element containing video
+   * @param {VideoCallingViewModel} videoCallingViewModel - Video calling view model
+   * @param {HTMLVideoElement} mediaElement - Media element containing video
    * @returns {undefined} No return value
    */
-  on_loadedmetadata(view_model, {target: media_element}) {
-    let detected_video_mode;
+  onLoadedMetadata(videoCallingViewModel, {target: mediaElement}) {
+    let detectedVideoMode;
 
-    if (media_element.videoHeight > media_element.videoWidth) {
-      this.remote_video_element_contain(true);
-      detected_video_mode = z.calling.enum.VIDEO_ORIENTATION.PORTRAIT;
+    const isPortraitStream = mediaElement.videoHeight > mediaElement.videoWidth;
+    if (isPortraitStream) {
+      this.remoteVideoElementContain(true);
+      detectedVideoMode = z.calling.enum.VIDEO_ORIENTATION.PORTRAIT;
     } else {
-      this.remote_video_element_contain(false);
-      detected_video_mode = z.calling.enum.VIDEO_ORIENTATION.LANDSCAPE;
+      this.remoteVideoElementContain(false);
+      detectedVideoMode = z.calling.enum.VIDEO_ORIENTATION.LANDSCAPE;
     }
-    this.logger.info(`Remote video is in '${detected_video_mode}' mode`);
+    this.logger.info(`Remote video is in '${detectedVideoMode}' mode`);
   }
-};
-
-// http://stackoverflow.com/questions/28762211/unable-to-mute-html5-video-tag-in-firefox
-ko.bindingHandlers.mute_media_element = {
-  update(element, valueAccessor) {
-    if (valueAccessor()) {
-      element.muted = true;
-    }
-  },
-};
-
-ko.bindingHandlers.source_stream = {
-  update(element, valueAccessor) {
-    element.srcObject = valueAccessor();
-  },
 };

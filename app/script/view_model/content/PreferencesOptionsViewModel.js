@@ -20,36 +20,21 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.ViewModel = z.ViewModel || {};
-window.z.ViewModel.content = z.ViewModel.content || {};
+window.z.viewModel = z.viewModel || {};
+window.z.viewModel.content = z.viewModel.content || {};
 
-z.ViewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewModel {
-  constructor(element_id, properties_repository, team_repository) {
-    this.logger = new z.util.Logger('z.ViewModel.content.PreferencesOptionsViewModel', z.config.LOGGER.OPTIONS);
+z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewModel {
+  constructor(mainViewModel, contentViewModel, repositories) {
+    this.logger = new z.util.Logger('z.viewModel.content.PreferencesOptionsViewModel', z.config.LOGGER.OPTIONS);
 
-    this.propertiesRepository = properties_repository;
-    this.team_repository = team_repository;
+    this.propertiesRepository = repositories.properties;
+    this.team_repository = repositories.team;
 
     this.is_team = this.team_repository.isTeam;
 
     this.option_audio = ko.observable();
     this.option_audio.subscribe(audio_preference => {
-      const tracking_value = (() => {
-        switch (audio_preference) {
-          case z.audio.AudioPreference.ALL:
-            return 'alwaysPlay';
-          case z.audio.AudioPreference.SOME:
-            return 'firstMessageOnly';
-          case z.audio.AudioPreference.NONE:
-            return 'neverPlay';
-          default:
-        }
-      })();
-
       this.propertiesRepository.savePreference(z.properties.PROPERTIES_TYPE.SOUND_ALERTS, audio_preference);
-      amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SOUND_SETTINGS_CHANGED, {
-        value: tracking_value,
-      });
     });
 
     this.option_emoji_replace_inline = ko.observable();

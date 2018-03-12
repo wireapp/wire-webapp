@@ -55,11 +55,11 @@ describe('z.conversation.ConversationVerificationStateHandler', () => {
         user_b = new z.entity.User(z.util.create_random_uuid());
 
         client_a = new z.client.ClientEntity();
-        client_a.meta.is_verified(true);
+        client_a.meta.isVerified(true);
         user_a.devices.push(client_a);
 
         client_b = new z.client.ClientEntity();
-        client_b.meta.is_verified(true);
+        client_b.meta.isVerified(true);
         user_b.devices.push(client_b);
 
         conversation_ab.self = user_self;
@@ -89,7 +89,7 @@ describe('z.conversation.ConversationVerificationStateHandler', () => {
       spyOn(z.conversation.EventBuilder, 'buildDegraded');
 
       const new_client_b = new z.client.ClientEntity();
-      new_client_b.meta.is_verified(false);
+      new_client_b.meta.isVerified(false);
       user_b.devices.push(new_client_b);
 
       state_handler.onClientAdd(user_b.id);
@@ -103,7 +103,7 @@ describe('z.conversation.ConversationVerificationStateHandler', () => {
       spyOn(z.conversation.EventBuilder, 'buildAllVerified');
 
       const new_client_b = new z.client.ClientEntity();
-      new_client_b.meta.is_verified(true);
+      new_client_b.meta.isVerified(true);
       user_b.devices.push(new_client_b);
 
       state_handler.onClientAdd(user_b.id);
@@ -119,7 +119,7 @@ describe('z.conversation.ConversationVerificationStateHandler', () => {
       spyOn(z.conversation.EventBuilder, 'buildAllVerified');
 
       const new_client = new z.client.ClientEntity();
-      new_client.meta.is_verified(false);
+      new_client.meta.isVerified(false);
       user_self.devices.push(new_client);
 
       state_handler.onClientAdd(user_self.id);
@@ -143,7 +143,7 @@ describe('z.conversation.ConversationVerificationStateHandler', () => {
       spyOn(z.conversation.EventBuilder, 'buildAllVerified');
 
       const new_client = new z.client.ClientEntity();
-      new_client.meta.is_verified(false);
+      new_client.meta.isVerified(false);
       user_self.devices.push(new_client);
 
       state_handler.onClientAdd(user_self.id);
@@ -167,13 +167,13 @@ describe('z.conversation.ConversationVerificationStateHandler', () => {
 
       const new_user = new z.entity.User(z.util.create_random_uuid());
       const new_client_b = new z.client.ClientEntity();
-      new_client_b.meta.is_verified(false);
+      new_client_b.meta.isVerified(false);
       new_user.devices.push(new_client_b);
 
       conversation_ab.participating_user_ids.push(new_user.id);
       conversation_ab.participating_user_ets.push(new_user);
 
-      state_handler.onMemberJoined(conversation_ab, new_user.id);
+      state_handler.onMemberJoined(conversation_ab, [new_user.id]);
 
       expect(conversation_ab.verification_state()).toBe(z.conversation.ConversationVerificationState.DEGRADED);
       expect(conversation_ab.is_verified()).toBeFalsy();
@@ -185,13 +185,13 @@ describe('z.conversation.ConversationVerificationStateHandler', () => {
 
       const new_user = new z.entity.User(z.util.create_random_uuid());
       const new_client_b = new z.client.ClientEntity();
-      new_client_b.meta.is_verified(true);
+      new_client_b.meta.isVerified(true);
       new_user.devices.push(new_client_b);
 
       conversation_ab.participating_user_ids.push(new_user.id);
       conversation_ab.participating_user_ets.push(new_user);
 
-      state_handler.onMemberJoined(conversation_ab, new_user.id);
+      state_handler.onMemberJoined(conversation_ab, [new_user.id]);
 
       expect(conversation_ab.verification_state()).toBe(z.conversation.ConversationVerificationState.VERIFIED);
       expect(conversation_ab.is_verified()).toBeTruthy();
@@ -201,7 +201,7 @@ describe('z.conversation.ConversationVerificationStateHandler', () => {
 
   describe('onClientVerificationChanged', () => {
     it('should change state to DEGRADED if user unverified client', () => {
-      client_a.meta.is_verified(false);
+      client_a.meta.isVerified(false);
 
       state_handler.onClientVerificationChanged(user_a.id, client_a.id);
       expect(conversation_ab.verification_state()).toBe(z.conversation.ConversationVerificationState.DEGRADED);

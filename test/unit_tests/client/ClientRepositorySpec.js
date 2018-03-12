@@ -189,14 +189,18 @@ describe('z.client.ClientRepository', () => {
     });
 
     it('returns true on Electron', () => {
-      TestFactory.client_repository.currentClient(new z.client.ClientEntity({type: z.client.ClientType.PERMANENT}));
+      const clientPayload = {type: z.client.ClientType.PERMANENT};
+      const clientEntity = TestFactory.client_repository.clientMapper.mapClient(clientPayload, true);
+      TestFactory.client_repository.currentClient(clientEntity);
       z.util.Environment.electron = true;
       const isPermanent = TestFactory.client_repository.isCurrentClientPermanent();
       expect(isPermanent).toBeTruthy();
     });
 
     it('returns true on Electron even if client is temporary', () => {
-      TestFactory.client_repository.currentClient(new z.client.ClientEntity({type: z.client.ClientType.TEMPORARY}));
+      const clientPayload = {type: z.client.ClientType.TEMPORARY};
+      const clientEntity = TestFactory.client_repository.clientMapper.mapClient(clientPayload, true);
+      TestFactory.client_repository.currentClient(clientEntity);
       z.util.Environment.electron = true;
       const isPermanent = TestFactory.client_repository.isCurrentClientPermanent();
       expect(isPermanent).toBeTruthy();
@@ -209,13 +213,17 @@ describe('z.client.ClientRepository', () => {
     });
 
     it('returns true if current client is permanent', () => {
-      TestFactory.client_repository.currentClient(new z.client.ClientEntity({type: z.client.ClientType.PERMANENT}));
+      const clientPayload = {type: z.client.ClientType.PERMANENT};
+      const clientEntity = TestFactory.client_repository.clientMapper.mapClient(clientPayload, true);
+      TestFactory.client_repository.currentClient(clientEntity);
       const isPermanent = TestFactory.client_repository.isCurrentClientPermanent();
       expect(isPermanent).toBeTruthy();
     });
 
     it('returns false if current client is temporary', () => {
-      TestFactory.client_repository.currentClient(new z.client.ClientEntity({type: z.client.ClientType.TEMPORARY}));
+      const clientPayload = {type: z.client.ClientType.TEMPORARY};
+      const clientEntity = TestFactory.client_repository.clientMapper.mapClient(clientPayload, true);
+      TestFactory.client_repository.currentClient(clientEntity);
       const isPermanent = TestFactory.client_repository.isCurrentClientPermanent();
       expect(isPermanent).toBeFalsy();
     });
@@ -232,20 +240,26 @@ describe('z.client.ClientRepository', () => {
     });
 
     it('returns true if user ID and client ID match', () => {
-      TestFactory.client_repository.currentClient(new z.client.ClientEntity({id: clientId}));
+      const clientEntity = new z.client.ClientEntity();
+      clientEntity.id = clientId;
+      TestFactory.client_repository.currentClient(clientEntity);
       TestFactory.client_repository.selfUser(new z.entity.User(userId));
       const result = TestFactory.client_repository._isCurrentClient(userId, clientId);
       expect(result).toBeTruthy();
     });
 
     it('returns false if only the user ID matches', () => {
-      TestFactory.client_repository.currentClient(new z.client.ClientEntity({id: clientId}));
+      const clientEntity = new z.client.ClientEntity();
+      clientEntity.id = clientId;
+      TestFactory.client_repository.currentClient(clientEntity);
       const result = TestFactory.client_repository._isCurrentClient(userId, 'ABCDE');
       expect(result).toBeFalsy();
     });
 
     it('returns false if only the client ID matches', () => {
-      TestFactory.client_repository.currentClient(new z.client.ClientEntity({id: clientId}));
+      const clientEntity = new z.client.ClientEntity();
+      clientEntity.id = clientId;
+      TestFactory.client_repository.currentClient(clientEntity);
       const result = TestFactory.client_repository._isCurrentClient('ABCDE', clientId);
       expect(result).toBeFalsy();
     });

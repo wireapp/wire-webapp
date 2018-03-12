@@ -70,8 +70,6 @@ z.main.App = class App {
   // Instantiation
   //##############################################################################
 
-  /* eslint-disable no-multi-spaces */
-
   /**
    * Create all app repositories.
    * @returns {Object} All repositories
@@ -95,15 +93,14 @@ z.main.App = class App {
       this.service.user,
       this.service.asset,
       this.service.search,
-      repositories.client,
-      repositories.cryptography
+      repositories.client
     );
     repositories.event = new z.event.EventRepository(
-      this.service.web_socket,
       this.service.notification,
+      this.service.web_socket,
+      this.service.conversation,
       repositories.cryptography,
-      repositories.user,
-      this.service.conversation
+      repositories.user
     );
     repositories.properties = new z.properties.PropertiesRepository(this.service.properties);
     repositories.connect = new z.connect.ConnectRepository(
@@ -210,49 +207,8 @@ z.main.App = class App {
    * @returns {Object} All view models
    */
   _setup_view_models() {
-    const view_models = {};
-
-    view_models.main = new z.ViewModel.MainViewModel('wire-main', this.repository.user);
-    view_models.content = new z.ViewModel.content.ContentViewModel(
-      'right',
-      this.repository.calling,
-      this.repository.client,
-      this.repository.conversation,
-      this.repository.integration,
-      this.repository.media,
-      this.repository.properties,
-      this.repository.search,
-      this.repository.team
-    );
-    view_models.list = new z.ViewModel.list.ListViewModel(
-      'left',
-      view_models.content,
-      this.repository.calling,
-      this.repository.connect,
-      this.repository.conversation,
-      this.repository.integration,
-      this.repository.search,
-      this.repository.properties,
-      this.repository.team
-    );
-    view_models.title = new z.ViewModel.WindowTitleViewModel(
-      view_models.content.content_state,
-      this.repository.conversation,
-      this.repository.user
-    );
-    view_models.lightbox = new z.ViewModel.ImageDetailViewViewModel('detail-view', this.repository.conversation);
-    view_models.warnings = new z.ViewModel.WarningsViewModel('warnings');
-    view_models.modals = new z.ViewModel.ModalsViewModel('modals');
-
-    view_models.loading = new z.ViewModel.LoadingViewModel('loading-screen', this.repository.user);
-
-    // backwards compatibility
-    view_models.conversation_list = view_models.list.conversations;
-
-    return view_models;
+    return new z.viewModel.MainViewModel(this.repository);
   }
-
-  /* eslint-enable no-multi-spaces */
 
   /**
    * Subscribe to amplify events.
@@ -284,41 +240,38 @@ z.main.App = class App {
       .then(() => this._check_single_instance())
       .then(() => this._load_access_token())
       .then(() => {
-        this.view.loading.update_progress(2.5);
+        this.view.loading.updateProgress(2.5);
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
-        return Promise.all([
-          this._get_user_self(),
-          z.util.protobuf.load_protos(
-            `ext/proto/generic-message-proto/messages.proto?${z.util.Environment.version(false)}`
-          ),
-        ]);
+
+        const protoFile = `ext/proto/generic-message-proto/messages.proto?${z.util.Environment.version(false)}`;
+        return Promise.all([this._get_user_self(), z.util.protobuf.load_protos(protoFile)]);
       })
       .then(([self_user_et]) => {
-        this.view.loading.update_progress(5, z.string.init_received_self_user);
+        this.view.loading.updateProgress(5, z.string.initReceivedSelfUser);
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.RECEIVED_SELF_USER);
         this.repository.client.init(self_user_et);
         this.repository.properties.init(self_user_et);
         return this.repository.client.getValidLocalClient();
       })
       .then(client_observable => {
-        this.view.loading.update_progress(7.5, z.string.init_validated_client);
+        this.view.loading.updateProgress(7.5, z.string.initValidatedClient);
 
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.VALIDATED_CLIENT);
         this.telemetry.add_statistic(z.telemetry.app_init.AppInitStatisticsValue.CLIENT_TYPE, client_observable().type);
 
-        this.repository.cryptography.current_client = client_observable;
-        this.repository.event.current_client = client_observable;
-        return this.repository.cryptography.load_cryptobox(this.service.storage.db);
+        this.repository.cryptography.currentClient = client_observable;
+        this.repository.event.currentClient = client_observable;
+        return this.repository.cryptography.loadCryptobox(this.service.storage.db);
       })
       .then(() => {
-        this.view.loading.update_progress(10);
+        this.view.loading.updateProgress(10);
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
-        this.repository.event.connect_web_socket();
+        this.repository.event.connectWebSocket();
 
         return Promise.all([this.repository.conversation.get_conversations(), this.repository.user.get_connections()]);
       })
       .then(([conversation_ets, connection_ets]) => {
-        this.view.loading.update_progress(25, z.string.init_received_user_data);
+        this.view.loading.updateProgress(25, z.string.initReceivedUserData);
 
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.RECEIVED_USER_DATA);
         this.telemetry.add_statistic(
@@ -338,7 +291,7 @@ z.main.App = class App {
         return this.repository.team.getTeam();
       })
       .then(() => this.repository.user.loadUsers())
-      .then(() => this.repository.event.initialize_from_stream())
+      .then(() => this.repository.event.initializeFromStream())
       .then(notifications_count => {
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
         this.telemetry.add_statistic(
@@ -351,13 +304,13 @@ z.main.App = class App {
         return this.repository.conversation.initialize_conversations();
       })
       .then(() => {
-        this.view.loading.update_progress(97.5, z.string.init_updated_from_notifications);
+        this.view.loading.updateProgress(97.5, z.string.initUpdatedFromNotifications);
 
         this._watch_online_status();
         return this.repository.client.getClientsForSelf();
       })
       .then(client_ets => {
-        this.view.loading.update_progress(99);
+        this.view.loading.updateProgress(99);
 
         this.telemetry.add_statistic(z.telemetry.app_init.AppInitStatisticsValue.CLIENTS, client_ets.length);
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.APP_PRE_LOADED);
@@ -378,7 +331,6 @@ z.main.App = class App {
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.UPDATED_CONVERSATIONS);
         this.repository.lifecycle.init();
         this.repository.audio.init(true);
-        this.repository.client.cleanupClientsAndSessions(true);
         this.repository.conversation.cleanup_conversations();
         this.logger.info('App fully loaded');
       })
@@ -406,9 +358,9 @@ z.main.App = class App {
     this.auth.client
       .execute_on_connectivity(z.service.BackendClient.CONNECTIVITY_CHECK_TRIGGER.CONNECTION_REGAINED)
       .then(() => {
-        amplify.publish(z.event.WebApp.WARNING.DISMISS, z.ViewModel.WarningType.NO_INTERNET);
-        amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.CONNECTIVITY_RECONNECT);
-        this.repository.event.reconnect_web_socket(z.event.WebSocketService.CHANGE_TRIGGER.ONLINE);
+        amplify.publish(z.event.WebApp.WARNING.DISMISS, z.viewModel.WarningsViewModel.TYPE.NO_INTERNET);
+        amplify.publish(z.event.WebApp.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT);
+        this.repository.event.reconnectWebSocket(z.event.WebSocketService.CHANGE_TRIGGER.ONLINE);
       });
   }
 
@@ -418,8 +370,8 @@ z.main.App = class App {
    */
   on_internet_connection_lost() {
     this.logger.warn('Internet connection lost');
-    this.repository.event.disconnect_web_socket(z.event.WebSocketService.CHANGE_TRIGGER.OFFLINE);
-    amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.NO_INTERNET);
+    this.repository.event.disconnectWebSocket(z.event.WebSocketService.CHANGE_TRIGGER.OFFLINE);
+    amplify.publish(z.event.WebApp.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.NO_INTERNET);
   }
 
   _app_init_failure(error, is_reload) {
@@ -497,7 +449,7 @@ z.main.App = class App {
   /**
    * Check whether we need to set different user information (picture, username).
    * @param {z.entity.User} user_et - Self user entity
-   * @returns {undefined} No return value
+   * @returns {z.entity.User} Checked user entity
    */
   _check_user_information(user_et) {
     if (!user_et.mediumPictureResource()) {
@@ -506,6 +458,8 @@ z.main.App = class App {
     if (!user_et.username()) {
       this.repository.user.get_username_suggestion();
     }
+
+    return user_et;
   }
 
   /**
@@ -536,15 +490,14 @@ z.main.App = class App {
       if (!user_et.email() && !user_et.phone()) {
         throw new Error('User does not have a verified identity');
       }
-      return this.service.storage.init(user_et.id).then(() => {
-        this._check_user_information(user_et);
-        return user_et;
-      });
+
+      return this.service.storage.init(user_et.id).then(() => this._check_user_information(user_et));
     });
   }
 
   /**
    * Handle URL params.
+   * @private
    * @returns {undefined} Not return value
    */
   _handleUrlParams() {
@@ -557,7 +510,14 @@ z.main.App = class App {
 
     const supportIntegrations = z.util.get_url_parameter(z.auth.URLParameter.INTEGRATIONS);
     if (_.isBoolean(supportIntegrations)) {
+      this.logger.info(`Feature flag for integrations set to '${serviceId}'`);
       this.repository.integration.supportIntegrations(supportIntegrations);
+    }
+
+    const supportConversationLinks = z.util.get_url_parameter(z.auth.URLParameter.LINKS);
+    if (_.isBoolean(supportConversationLinks)) {
+      this.logger.info(`Feature flag for conversation links set to '${supportConversationLinks}'`);
+      this.repository.conversation.supportConversationLinks(supportConversationLinks);
     }
   }
 
@@ -610,12 +570,12 @@ z.main.App = class App {
     } else if (conversation_et) {
       amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversation_et);
     } else if (this.repository.user.connect_requests().length) {
-      amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS);
+      amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS);
     }
 
     window.setTimeout(() => this.repository.notification.checkPermission(), App.CONFIG.NOTIFICATION_CHECK);
 
-    $('#loading-screen').remove();
+    this.view.loading.removeFromView();
     $('#wire-main').attr('data-uie-value', 'is-loaded');
   }
 
@@ -626,12 +586,12 @@ z.main.App = class App {
   _subscribe_to_unload_events() {
     $(window).on('beforeunload', () => {
       this.logger.info("'window.onbeforeunload' was triggered, so we will disconnect from the backend.");
-      this.repository.event.disconnect_web_socket(z.event.WebSocketService.CHANGE_TRIGGER.PAGE_NAVIGATION);
+      this.repository.event.disconnectWebSocket(z.event.WebSocketService.CHANGE_TRIGGER.PAGE_NAVIGATION);
     });
 
     $(window).on('unload', () => {
       this.logger.info("'window.unload' was triggered, so we will tear down calls.");
-      this.repository.calling.leave_call_on_unload();
+      this.repository.calling.leaveCallOnUnload();
       this.repository.storage.terminate('window.onunload');
       this.repository.notification.clearNotifications();
     });
@@ -661,7 +621,7 @@ z.main.App = class App {
   logout(sign_out_reason, clear_data = false) {
     const _logout = () => {
       // Disconnect from our backend, end tracking and clear cached data
-      this.repository.event.disconnect_web_socket(z.event.WebSocketService.CHANGE_TRIGGER.LOGOUT);
+      this.repository.event.disconnectWebSocket(z.event.WebSocketService.CHANGE_TRIGGER.LOGOUT);
 
       // Clear Local Storage (but don't delete the cookie label if you were logged in with a permanent client)
       const do_not_delete = [z.storage.StorageKey.AUTH.SHOW_LOGIN];
@@ -750,7 +710,7 @@ z.main.App = class App {
    */
   update(update_source) {
     this.update_source = update_source;
-    amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.LIFECYCLE_UPDATE);
+    amplify.publish(z.event.WebApp.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.LIFECYCLE_UPDATE);
   }
 
   /**
@@ -812,7 +772,7 @@ z.main.App = class App {
    * @returns {undefined} No return value
    */
   report_call() {
-    this.repository.calling.report_call();
+    this.repository.calling.reportCall();
   }
 
   /**

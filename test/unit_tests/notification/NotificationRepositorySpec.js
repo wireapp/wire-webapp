@@ -82,12 +82,10 @@ describe('z.notification.NotificationRepository', () => {
           },
           view: {
             content: {
-              content_state: ko.observable(z.ViewModel.content.CONTENT_STATE.CONVERSATION),
               multitasking: {
-                is_minimized() {
-                  return true;
-                },
+                isMinimized: () => true,
               },
+              state: ko.observable(z.viewModel.ContentViewModel.STATE.CONVERSATION),
             },
           },
         };
@@ -128,8 +126,8 @@ describe('z.notification.NotificationRepository', () => {
               expect(TestFactory.notification_repository._showNotification).toHaveBeenCalledTimes(1);
 
               const trigger = TestFactory.notification_repository._createTrigger(message_et, null, conversation_et);
-              notification_content.options.body = z.string.notification_obfuscated;
-              notification_content.title = z.string.notification_obfuscated_title;
+              notification_content.options.body = z.string.notificationObfuscated;
+              notification_content.title = z.string.notificationObfuscatedTitle;
               notification_content.trigger = trigger;
 
               const [firstResultArgs] = TestFactory.notification_repository._showNotification.calls.first().args;
@@ -153,11 +151,11 @@ describe('z.notification.NotificationRepository', () => {
                 const titleLength = z.notification.NotificationRepository.CONFIG.TITLE_LENGTH;
                 const titleText = `${message_et.user().first_name()} in ${conversation_et.display_name()}`;
 
-                notification_content.options.body = z.string.notification_obfuscated;
+                notification_content.options.body = z.string.notificationObfuscated;
                 notification_content.title = z.util.StringUtil.truncate(titleText, titleLength, false);
               } else {
-                notification_content.options.body = z.string.notification_obfuscated;
-                notification_content.title = z.string.notification_obfuscated_title;
+                notification_content.options.body = z.string.notificationObfuscated;
+                notification_content.title = z.string.notificationObfuscatedTitle;
               }
 
               const [firstResultArgs] = TestFactory.notification_repository._showNotification.calls.first().args;
@@ -216,14 +214,14 @@ describe('z.notification.NotificationRepository', () => {
     it('if the browser tab has focus and conversation is active', done => {
       TestFactory.conversation_repository.active_conversation(conversation_et);
       document.hasFocus = () => true;
-      TestFactory.calling_repository.joined_call = () => true;
+      TestFactory.calling_repository.joinedCall = () => true;
 
       TestFactory.notification_repository
         .notify(message_et, undefined, conversation_et)
         .then(() => {
           expect(TestFactory.notification_repository._showNotification).not.toHaveBeenCalled();
 
-          window.wire.app.view.content.multitasking.is_minimized = () => false;
+          window.wire.app.view.content.multitasking.isMinimized = () => false;
 
           TestFactory.notification_repository.notify(message_et, undefined, conversation_et).then(() => {
             expect(TestFactory.notification_repository._showNotification).toHaveBeenCalledTimes(1);
@@ -298,7 +296,7 @@ describe('z.notification.NotificationRepository', () => {
 
   describe('shows a well-formed call notification', () => {
     describe('for an incoming call', () => {
-      const expected_body = z.string.notification_voice_channel_activate;
+      const expected_body = z.string.notificationVoiceChannelActivate;
 
       beforeEach(() => {
         message_et = new z.entity.CallMessage();
@@ -317,7 +315,7 @@ describe('z.notification.NotificationRepository', () => {
     });
 
     describe('for a missed call', () => {
-      const expected_body = z.string.notification_voice_channel_deactivate;
+      const expected_body = z.string.notificationVoiceChannelDeactivate;
 
       beforeEach(() => {
         message_et = new z.entity.CallMessage();
@@ -377,7 +375,7 @@ describe('z.notification.NotificationRepository', () => {
     describe('for a picture', () => {
       beforeEach(() => {
         message_et.assets.push(new z.entity.MediumImage());
-        expected_body = z.string.notification_asset_add;
+        expected_body = z.string.notificationAssetAdd;
       });
 
       it('in a 1:1 conversation', done => {
@@ -405,7 +403,7 @@ describe('z.notification.NotificationRepository', () => {
     describe('for a location', () => {
       beforeEach(() => {
         message_et.assets.push(new z.entity.Location());
-        expected_body = z.string.notification_shared_location;
+        expected_body = z.string.notificationSharedLocation;
       });
 
       it('in a 1:1 conversation', done => {
@@ -598,27 +596,27 @@ describe('z.notification.NotificationRepository', () => {
       connection_et.status = 'pending';
       message_et.memberMessageType = z.message.SystemMessageType.CONNECTION_REQUEST;
 
-      const expected_body = z.string.notification_connection_request;
+      const expected_body = z.string.notificationConnectionRequest;
       verify_notification_system(done, conversation_et, message_et, expected_body, expected_title);
     });
 
     it('if your connection request was accepted', done => {
       message_et.memberMessageType = z.message.SystemMessageType.CONNECTION_ACCEPTED;
 
-      const expected_body = z.string.notification_connection_accepted;
+      const expected_body = z.string.notificationConnectionAccepted;
       verify_notification_system(done, conversation_et, message_et, expected_body, expected_title);
     });
 
     it('if you are automatically connected', done => {
       message_et.memberMessageType = z.message.SystemMessageType.CONNECTION_CONNECTED;
 
-      const expected_body = z.string.notification_connection_connected;
+      const expected_body = z.string.notificationConnectionConnected;
       verify_notification_system(done, conversation_et, message_et, expected_body, expected_title);
     });
   });
 
   describe('shows a well-formed ping notification', () => {
-    const expected_body = z.string.notification_ping;
+    const expected_body = z.string.notificationPing;
 
     beforeAll(() => {
       user_et = TestFactory.user_repository.user_mapper.map_user_from_object(payload.users.get.one[0]);

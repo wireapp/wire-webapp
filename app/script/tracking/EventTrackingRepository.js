@@ -40,34 +40,11 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
         API_KEY: MIXPANEL_TOKEN,
         CLIENT_TYPE: 'desktop',
         DISABLED_DOMAINS: ['localhost', 'zinfra.io'],
-        SUPPORTED_EVENTS: [
-          z.tracking.EventName.ACCOUNT.LOGGED_IN,
-          z.tracking.EventName.CALLING.ENDED_CALL,
-          z.tracking.EventName.CALLING.ENDED_VIDEO_CALL,
-          z.tracking.EventName.CALLING.ESTABLISHED_CALL,
-          z.tracking.EventName.CALLING.ESTABLISHED_VIDEO_CALL,
-          z.tracking.EventName.CALLING.INITIATED_CALL,
-          z.tracking.EventName.CALLING.INITIATED_VIDEO_CALL,
-          z.tracking.EventName.CALLING.JOINED_CALL,
-          z.tracking.EventName.CALLING.JOINED_VIDEO_CALL,
-          z.tracking.EventName.CALLING.RECEIVED_CALL,
-          z.tracking.EventName.CALLING.RECEIVED_VIDEO_CALL,
-          z.tracking.EventName.CALLING.SHARED_SCREEN,
-          z.tracking.EventName.CONTRIBUTED,
-          z.tracking.EventName.CONVERSATION.GROUP_CREATION_SUCCEEDED,
-          z.tracking.EventName.CONVERSATION.OPENED_GROUP_CREATION,
-          z.tracking.EventName.CONVERSATION.OPENED_SELECT_PARTICIPANTS,
-          z.tracking.EventName.E2EE.FAILED_MESSAGE_DECRYPTION,
-          z.tracking.EventName.INTEGRATION.ADDED_SERVICE,
-          z.tracking.EventName.INTEGRATION.REMOVED_SERVICE,
-          z.tracking.EventName.REGISTRATION.ENTERED_CREDENTIALS,
-          z.tracking.EventName.REGISTRATION.OPENED_EMAIL_SIGN_UP,
-          z.tracking.EventName.REGISTRATION.RESENT_EMAIL_VERIFICATION,
-          z.tracking.EventName.REGISTRATION.SUCCEEDED,
-          z.tracking.EventName.SETTINGS.CHANGED_STATUS,
-          z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM,
-          z.tracking.EventName.SETTINGS.OPTED_IN_TRACKING,
-          z.tracking.EventName.SETTINGS.OPTED_OUT_TRACKING,
+        DISABLED_EVENTS: [
+          z.tracking.EventName.CALLING.FAILED_REQUEST,
+          z.tracking.EventName.CALLING.FAILED_REQUESTING_MEDIA,
+          z.tracking.EventName.CALLING.FAILED_RTC,
+          z.tracking.EventName.TELEMETRY.APP_INITIALIZATION,
         ],
       },
     };
@@ -224,7 +201,8 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
       this.logger.info(`Tracking event '${event_name}' without attributes`);
     }
 
-    if (EventTrackingRepository.CONFIG.USER_ANALYTICS.SUPPORTED_EVENTS.includes(event_name)) {
+    const isDisabledEvent = EventTrackingRepository.CONFIG.USER_ANALYTICS.DISABLED_EVENTS.includes(event_name);
+    if (!isDisabledEvent) {
       this.mixpanel.track(event_name, attributes);
     }
   }

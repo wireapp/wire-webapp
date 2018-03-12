@@ -20,22 +20,189 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.ViewModel = z.ViewModel || {};
+window.z.viewModel = z.viewModel || {};
 
-z.ViewModel.MainViewModel = class MainViewModel {
-  constructor(element_id, user_repository) {
-    this.user_repository = user_repository;
-    this.logger = new z.util.Logger('z.ViewModel.MainViewModel', z.config.LOGGER.OPTIONS);
+z.viewModel.MainViewModel = class MainViewModel {
+  static get CONFIG() {
+    return {
+      PANEL: {
+        BREAKPOINT: 1000,
+        WIDTH: 304,
+      },
+    };
+  }
 
-    this.user = this.user_repository.self;
+  static get PANEL_STATE() {
+    return {
+      CLOSED: 'MainViewModel.PANEL_STATE.CLOSED',
+      OPEN: 'MainViewModel.PANEL_STATE.OPEN',
+    };
+  }
 
-    this.main_classes = ko.pureComputed(() => {
-      if (this.user()) {
+  static get PANEL_STYLE() {
+    return {
+      CLOSED: {
+        position: 'absolute',
+        right: '0',
+        transform: `translateX(${MainViewModel.CONFIG.PANEL.WIDTH}px)`,
+        width: `${MainViewModel.CONFIG.PANEL.WIDTH}px`,
+      },
+      OPEN: {
+        position: 'absolute',
+        right: '0',
+        transform: `translateX(0px)`,
+        width: `${MainViewModel.CONFIG.PANEL.WIDTH}px`,
+      },
+    };
+  }
+
+  constructor(repositories) {
+    this.closePanel = this.closePanel.bind(this);
+    this.closePanelImmediatly = this.closePanelImmediatly.bind(this);
+    this.closePanelOnClick = this.closePanelOnClick.bind(this);
+    this.openPanel = this.openPanel.bind(this);
+    this.togglePanel = this.togglePanel.bind(this);
+
+    this.elementId = 'wire-main';
+    this.userRepository = repositories.user;
+    this.logger = new z.util.Logger('z.viewModel.MainViewModel', z.config.LOGGER.OPTIONS);
+
+    this.selfUser = this.userRepository.self;
+
+    this.isPanelOpen = ko.observable(false);
+
+    this.actions = new z.viewModel.ActionsViewModel(this, repositories);
+
+    this.content = new z.viewModel.ContentViewModel(this, repositories);
+    this.list = new z.viewModel.ListViewModel(this, repositories);
+    this.panel = new z.viewModel.PanelViewModel(this, repositories);
+
+    this.modals = new z.viewModel.ModalsViewModel();
+    this.lightbox = new z.viewModel.ImageDetailViewViewModel(this, repositories);
+    this.loading = new z.viewModel.LoadingViewModel(this, repositories);
+    this.shortcuts = new z.viewModel.ShortcutsViewModel(this, repositories);
+    this.title = new z.viewModel.WindowTitleViewModel(this, repositories);
+    this.videoCalling = new z.viewModel.VideoCallingViewModel(this, repositories);
+    this.warnings = new z.viewModel.WarningsViewModel();
+
+    this.mainClasses = ko.pureComputed(() => {
+      if (this.selfUser()) {
         // deprecated - still used on input control hover
-        return `main-accent-color-${this.user().accent_id()} ${this.user().accent_theme()} show`;
+        return `main-accent-color-${this.selfUser().accent_id()} ${this.selfUser().accent_theme()} show`;
       }
     });
 
-    ko.applyBindings(this, document.getElementById(element_id));
+    ko.applyBindings(this, document.getElementById(this.elementId));
+  }
+
+  openPanel() {
+    return this.togglePanel(MainViewModel.PANEL_STATE.OPEN);
+  }
+
+  closePanel() {
+    return this.togglePanel(MainViewModel.PANEL_STATE.CLOSED);
+  }
+
+  closePanelImmediatly() {
+    document.querySelector('.center-column__overlay').removeEventListener('click', this.togglePanel);
+    document.querySelector('#app').classList.remove('app--panel-open');
+    this.isPanelOpen(false);
+  }
+
+  togglePanel(forceState) {
+    const app = document.querySelector('#app');
+    const panel = document.querySelector('.right-column');
+
+    const isPanelOpen = app.classList.contains('app--panel-open');
+    const isAlreadyClosed = forceState === MainViewModel.PANEL_STATE.CLOSED && !isPanelOpen;
+    const isAlreadyOpen = forceState === MainViewModel.PANEL_STATE.OPEN && isPanelOpen;
+
+    const isInForcedState = isAlreadyClosed || isAlreadyOpen;
+    if (isInForcedState) {
+      return Promise.resolve();
+    }
+
+    const titleBar = document.querySelector('#conversation-title-bar');
+    const input = document.querySelector('#conversation-input-bar');
+
+    const isNarrowScreen = app.offsetWidth < MainViewModel.CONFIG.PANEL.BREAKPOINT;
+
+    const centerWidthClose = app.offsetWidth - MainViewModel.CONFIG.PANEL.WIDTH;
+    const centerWidthOpen = centerWidthClose - MainViewModel.CONFIG.PANEL.WIDTH;
+
+    return new Promise(resolve => {
+      panel.addEventListener('transitionend', event => {
+        if (event.target === panel) {
+          this._clearStyles(panel, ['width', 'transform', 'position', 'right', 'transition']);
+          this._clearStyles(titleBar, ['width', 'transition']);
+          this._clearStyles(input, ['width', 'transition']);
+
+          const overlay = document.querySelector('.center-column__overlay');
+          if (isPanelOpen) {
+            app.classList.remove('app--panel-open');
+            this.isPanelOpen(false);
+            overlay.removeEventListener('click', this.closePanelOnClick);
+          } else {
+            app.classList.add('app--panel-open');
+            this.isPanelOpen(true);
+            overlay.addEventListener('click', this.closePanelOnClick);
+          }
+          window.dispatchEvent(new Event('resize'));
+          resolve();
+        }
+      });
+
+      if (isPanelOpen) {
+        this._applyStyle(panel, MainViewModel.PANEL_STYLE.OPEN);
+        if (!isNarrowScreen) {
+          this._applyStyle(titleBar, {width: `${centerWidthOpen}px`});
+          this._applyStyle(input, {width: `${centerWidthOpen}px`});
+        }
+      } else {
+        this._applyStyle(panel, MainViewModel.PANEL_STYLE.CLOSED);
+        if (!isNarrowScreen) {
+          this._applyStyle(titleBar, {width: `${centerWidthClose}px`});
+          this._applyStyle(input, {width: `${centerWidthClose}px`});
+        }
+      }
+
+      // https://developer.mozilla.org/en-US/Firefox/Performance_best_practices_for_Firefox_fe_engineers
+      window.requestAnimationFrame(() =>
+        window.setTimeout(() => {
+          panel.style.transition = 'transform .35s cubic-bezier(0.19, 1, 0.22, 1)';
+          const widthTransition = 'width .35s cubic-bezier(0.19, 1, 0.22, 1)';
+          titleBar.style.transition = widthTransition;
+          input.style.transition = widthTransition;
+
+          if (isPanelOpen) {
+            this._applyStyle(panel, MainViewModel.PANEL_STYLE.CLOSED);
+            if (!isNarrowScreen) {
+              this._applyStyle(titleBar, {width: `${centerWidthClose}px`});
+              this._applyStyle(input, {width: `${centerWidthClose}px`});
+            }
+          } else {
+            this._applyStyle(panel, MainViewModel.PANEL_STYLE.OPEN);
+            if (!isNarrowScreen) {
+              this._applyStyle(titleBar, {width: `${centerWidthOpen}px`});
+              this._applyStyle(input, {width: `${centerWidthOpen}px`});
+            }
+          }
+        }, 0)
+      );
+    });
+  }
+
+  _applyStyle(element, style) {
+    Object.keys(style).forEach(key => (element.style[key] = style[key]));
+  }
+
+  _clearStyles(element, styles) {
+    if (element) {
+      styles.forEach(key => (element.style[key] = ''));
+    }
+  }
+
+  closePanelOnClick() {
+    this.panel.closePanel();
   }
 };

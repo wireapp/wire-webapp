@@ -32,6 +32,7 @@ z.calling.enum.TERMINATION_REASON = {
   MEMBER_LEAVE: 'member_leave',
   MISSED: 'missed',
   OTHER_USER: 'other',
+  PAGE_NAVIGATION: 'page_navigation',
   RENEGOTIATION: 'renegotiation',
   SDP_FAILED: 'failed_sdp',
   SELF_USER: 'self',

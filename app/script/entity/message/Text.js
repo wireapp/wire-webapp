@@ -26,7 +26,6 @@ z.entity.Text = class Text extends z.entity.Asset {
   constructor(id, text = '') {
     super(id);
     this.type = z.assets.AssetType.TEXT;
-    this.nonce = undefined;
 
     // Raw message text
     this.text = text;
@@ -42,7 +41,7 @@ z.entity.Text = class Text extends z.entity.Asset {
         return false;
       }
       const has_link_previews = this.previews().length > 0;
-      return !has_link_previews || (has_link_previews && !z.links.LinkPreviewHelpers.contains_only_link(this.text));
+      return !has_link_previews || (has_link_previews && !z.links.LinkPreviewHelpers.containsOnlyLink(this.text));
     });
   }
 

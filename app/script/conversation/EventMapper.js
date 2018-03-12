@@ -37,7 +37,7 @@ z.conversation.EventMapper = class EventMapper {
    *
    * @param {Object} events - Event data
    * @param {Conversation} conversation_et - Conversation entity the events belong to
-   * @param {boolean} should_create_dummy_image - Create a dummy image
+   * @param {boolean} [should_create_dummy_image] - Create a dummy image
    * @returns {Array<Message>} Mapped message entities
    */
   map_json_events(events, conversation_et, should_create_dummy_image) {
@@ -96,7 +96,7 @@ z.conversation.EventMapper = class EventMapper {
         message_et = this._mapEventGroupCreation(event);
         break;
       case z.event.Client.CONVERSATION.KNOCK:
-        message_et = this._map_event_ping(event);
+        message_et = this._mapEventPing();
         break;
       case z.event.Client.CONVERSATION.LOCATION:
         message_et = this._map_event_location(event);
@@ -197,7 +197,6 @@ z.conversation.EventMapper = class EventMapper {
       messageEntity.assets.push(this._map_asset_file(event));
     }
 
-    messageEntity.nonce = eventData.info.nonce;
     return messageEntity;
   }
 
@@ -347,15 +346,11 @@ z.conversation.EventMapper = class EventMapper {
 
   /**
    * Maps JSON data of conversation.knock message into message entity
-   *
    * @private
-   * @param {Object} event_data - Message data
    * @returns {PingMessage} Ping message entity
    */
-  _map_event_ping({data: event_data}) {
-    const message_et = new z.entity.PingMessage();
-    message_et.nonce = event_data.nonce;
-    return message_et;
+  _mapEventPing() {
+    return new z.entity.PingMessage();
   }
 
   /**
@@ -381,7 +376,7 @@ z.conversation.EventMapper = class EventMapper {
   _mapEventTeamMemberLeave(event) {
     const messageEntity = this._mapEventMemberLeave(event);
     const eventData = event.data;
-    messageEntity.name(eventData.name || z.l10n.text(z.string.conversation_someone));
+    messageEntity.name(eventData.name || z.l10n.text(z.string.conversationSomeone));
     return messageEntity;
   }
 
@@ -413,16 +408,16 @@ z.conversation.EventMapper = class EventMapper {
   _mapEventVerification({data: eventData}) {
     const messageEntity = new z.entity.VerificationMessage();
 
-    // Database can contain non-camelcased naming. For backwards compatibility reasons we handle both.
+    // Database can contain non-camelCased naming. For backwards compatibility reasons we handle both.
     messageEntity.userIds(eventData.userIds || eventData.user_ids);
-    messageEntity.verification_message_type = eventData.type;
+    messageEntity.verificationMessageType(eventData.type);
 
     return messageEntity;
   }
   /**
    * Maps JSON data of conversation.voice-channel-activate message into message entity
    * @private
-   * @returns {CallMessage} Call message entity
+   * @returns {z.calling.entities.CallMessageEntity} Call message entity
    */
   _map_event_voice_channel_activate() {
     const message_et = new z.entity.CallMessage();
@@ -438,7 +433,7 @@ z.conversation.EventMapper = class EventMapper {
    *
    * @private
    * @param {Object} event_data - Message data
-   * @returns {CallMessage} Call message entity
+   * @returns {z.calling.entities.CallMessageEntity} Call message entity
    */
   _map_event_voice_channel_deactivate({data: event_data}) {
     const message_et = new z.entity.CallMessage();

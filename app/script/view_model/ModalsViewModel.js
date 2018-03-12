@@ -20,111 +20,68 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.ViewModel = z.ViewModel || {};
+window.z.viewModel = z.viewModel || {};
 
-z.ViewModel.ModalType = {
-  BLOCK: '.modal-block',
-  BOTS_CONFIRM: '.modal-bots-confirm',
-  BOTS_UNAVAILABLE: '.modal-bots-unavailable',
-  CALL_EMPTY_CONVERSATION: '.modal-call-conversation-empty',
-  CALL_NO_VIDEO_IN_GROUP: '.modal-call-no-video-in-group',
-  CALL_START_ANOTHER: '.modal-call-second',
-  CALLING: '.modal-calling',
-  CLEAR: '.modal-clear',
-  CLEAR_GROUP: '.modal-clear-group',
-  CONNECTED_DEVICE: '.modal-connected-device',
-  CONTACTS: '.modal-contacts',
-  DELETE_ACCOUNT: '.modal-delete-account',
-  DELETE_EVERYONE_MESSAGE: '.modal-delete-message-everyone',
-  DELETE_MESSAGE: '.modal-delete-message',
-  LEAVE: '.modal-leave',
-  LOGOUT: '.modal-logout',
-  NEW_DEVICE: '.modal-new-device',
-  NOT_CONNECTED: '.modal-not-connected',
-  REMOVE_DEVICE: '.modal-remove-device',
-  SERVICE_UNAVAILABLE: '.modal-service-unavailable',
-  SESSION_RESET: '.modal-session-reset',
-  TOO_LONG_MESSAGE: '.modal-too-long-message',
-  TOO_MANY_MEMBERS: '.modal-too-many-members',
-  UPLOAD_PARALLEL: '.modal-asset-upload-parallel',
-  UPLOAD_TOO_LARGE: '.modal-asset-upload-too-large',
-};
+z.viewModel.ModalsViewModel = class ModalsViewModel {
+  static get TYPE() {
+    return {
+      ACCOUNT_NEW_DEVICES: '.modal-account-new-devices',
+      ACKNOWLEDGE: '.modal-template-acknowledge',
+      CONFIRM: '.modal-template-confirm',
+      INPUT: '.modal-template-input',
+      OPTION: '.modal-template-option',
+      SESSION_RESET: '.modal-session-reset',
+    };
+  }
 
-z.ViewModel.MODAL_CONSENT_TYPE = {
-  INCOMING_CALL: 'incoming_call',
-  MESSAGE: 'message',
-  OUTGOING_CALL: 'outgoing_call',
-};
-
-z.ViewModel.ModalsViewModel = class ModalsViewModel {
-  constructor(element_id) {
-    this.logger = new z.util.Logger('z.ViewModel.ModalsViewModel', z.config.LOGGER.OPTIONS);
+  constructor() {
+    this.logger = new z.util.Logger('z.viewModel.ModalsViewModel', z.config.LOGGER.OPTIONS);
+    this.elementId = 'modals';
 
     this.modals = {};
 
-    amplify.subscribe(z.event.WebApp.WARNING.MODAL, this.show_modal.bind(this));
+    amplify.subscribe(z.event.WebApp.WARNING.MODAL, this.showModal.bind(this));
 
-    ko.applyBindings(this, document.getElementById(element_id));
+    ko.applyBindings(this, document.getElementById(this.elementId));
   }
 
   /**
    * Show modal
    *
-   * @param {z.ViewModel.ModalType} type - Indicates which modal to show
+   * @param {ModalsViewModel.TYPE} type - Indicates which modal to show
    * @param {Object} [options={}] - Information to configure modal
    * @param {Object} options.data - Content needed for visualization on modal
    * @param {Function} options.action - Called when action in modal is triggered
+   * @param {boolean} [options.preventClose] - Set to true to disable autoclose behavior
+   * @param {Function} options.secondary - Called when secondary action in modal is triggered
    * @returns {undefined} No return value
    */
-  show_modal(type, options = {}) {
-    const action_element = $(type).find('.modal-action');
-    const message_element = $(type).find('.modal-text');
-    const title_element = $(type).find('.modal-title');
+  showModal(type, options = {}) {
+    const actionElement = $(type).find('.modal-action');
+    const messageElement = $(type).find('.modal-text');
+    const titleElement = $(type).find('.modal-title');
 
     switch (type) {
-      case z.ViewModel.ModalType.BLOCK:
-        this._show_modal_block(options.data, title_element, message_element);
+      case ModalsViewModel.TYPE.ACCOUNT_NEW_DEVICES:
+        this._showModalAccountNewDevices(options.data);
         break;
-      case z.ViewModel.ModalType.BOTS_CONFIRM:
-        this._show_modal_bots_confirm(options.data, message_element);
+      case ModalsViewModel.TYPE.ACKNOWLEDGE:
+        this._showModalAcknowledge(options, titleElement, messageElement, actionElement);
         break;
-      case z.ViewModel.ModalType.CALL_START_ANOTHER:
-        this._show_modal_call_start_another(options.data, title_element, message_element);
+      case ModalsViewModel.TYPE.CONFIRM:
+        this._showModalConfirm(options, titleElement, messageElement, actionElement);
         break;
-      case z.ViewModel.ModalType.CLEAR:
-        type = this._show_modal_clear(options, type);
+      case ModalsViewModel.TYPE.INPUT:
+        this._showModalInput(options, titleElement, messageElement, actionElement);
         break;
-      case z.ViewModel.ModalType.CONNECTED_DEVICE:
-        this._show_modal_connected_device(options.data);
-        break;
-      case z.ViewModel.ModalType.LEAVE:
-        this._show_modal_leave(options.data, title_element);
-        break;
-      case z.ViewModel.ModalType.NEW_DEVICE:
-        this._show_modal_new_device(options.data, title_element, message_element, action_element);
-        break;
-      case z.ViewModel.ModalType.NOT_CONNECTED:
-        this._show_modal_not_connected(options.data, message_element);
-        break;
-      case z.ViewModel.ModalType.REMOVE_DEVICE:
-        this._show_modal_remove_device(options.data, title_element);
-        break;
-      case z.ViewModel.ModalType.TOO_MANY_MEMBERS:
-        this._show_modal_too_many_members(options.data, message_element);
-        break;
-      case z.ViewModel.ModalType.UPLOAD_PARALLEL:
-        this._show_modal_upload_parallel(options.data, title_element);
-        break;
-      case z.ViewModel.ModalType.UPLOAD_TOO_LARGE:
-        this._show_modal_upload_too_large(options.data, title_element);
-        break;
-      case z.ViewModel.ModalType.TOO_LONG_MESSAGE:
-        this._show_modal_message_too_long(options.data, message_element);
+      case ModalsViewModel.TYPE.OPTION:
+        this._showModalOption(options, titleElement, messageElement, actionElement);
         break;
       default:
         this.logger.warn(`Modal of type '${type}' is not supported`);
     }
 
+    const {preventClose = false, action: actionFn, close: closeFn, secondary: secondaryFn} = options;
     const modal = new zeta.webapp.module.Modal(type, null, () => {
       $(type)
         .find('.modal-close')
@@ -140,8 +97,8 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
 
       modal.destroy();
 
-      if (typeof options.close === 'function') {
-        options.close();
+      if (typeof closeFn === 'function') {
+        closeFn();
       }
     });
 
@@ -153,8 +110,8 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
       .find('.modal-secondary')
       .click(() => {
         modal.hide(() => {
-          if (typeof options.secondary === 'function') {
-            options.secondary();
+          if (typeof secondaryFn === 'function') {
+            secondaryFn();
           }
         });
       });
@@ -162,17 +119,20 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
     $(type)
       .find('.modal-action')
       .click(() => {
-        const checkbox = $(type).find('.modal-checkbox');
-        const input = $(type).find('.modal-input');
+        if (typeof actionFn === 'function') {
+          const checkbox = $(type).find('.modal-checkbox');
+          const input = $(type).find('.modal-input');
 
-        if (checkbox.length) {
-          options.action(checkbox.is(':checked'));
-          checkbox.prop('checked', false);
-        } else if (input.length) {
-          options.action(input.val());
-          input.val('');
-        } else if (typeof options.action === 'function') {
-          options.action();
+          let parameter;
+          if (checkbox.length) {
+            parameter = checkbox.is(':checked');
+            checkbox.prop('checked', false);
+          } else if (input.length) {
+            parameter = input.val();
+            input.val('');
+          }
+
+          actionFn(parameter);
         }
 
         modal.hide();
@@ -181,131 +141,84 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
     if (!modal.is_shown()) {
       this.logger.info(`Show modal of type '${type}'`);
     }
+
+    modal.autoclose = !preventClose;
     modal.toggle();
   }
 
-  _show_modal_block(content, title_element, message_element) {
-    title_element.text(z.l10n.text(z.string.modal_block_conversation_headline, content));
-    message_element.text(z.l10n.text(z.string.modal_block_conversation_message, content));
-  }
+  _showModalAcknowledge(options, titleElement, messageElement, actionElement) {
+    const {action: actionText, message: messageText, title: titleText} = options.text;
 
-  _show_modal_bots_confirm(content, message_element) {
-    message_element.text(z.l10n.text(z.string.modal_bots_confirm_message, content));
-  }
+    actionElement.text(actionText || z.l10n.text(z.string.modalAcknowledgeAction));
+    messageElement.text(messageText || '');
+    titleElement.text(titleText || z.l10n.text(z.string.modalAcknowledgeHeadline));
 
-  /**
-   * Show modal for second call.
-   *
-   * @note Modal supports z.calling.enum.CALL_STATE.INCOMING, z.calling.enum.CALL_STATE.ONGOING, z.calling.enum.CALL_STATE.OUTGOING
-   * @private
-   *
-   * @param {z.calling.enum.CALL_STATE} call_state - Current call state
-   * @param {jQuery} title_element - Title element
-   * @param {jQuery} message_element - Message element
-   * @returns {undefined} No return value
-   */
-  _show_modal_call_start_another(call_state, title_element, message_element) {
-    const action_element = $(z.ViewModel.ModalType.CALL_START_ANOTHER).find('.modal-action');
-
-    action_element.text(z.l10n.text(z.string[`modal_call_second_${call_state}_action`]));
-    message_element.text(z.l10n.text(z.string[`modal_call_second_${call_state}_message`]));
-    return title_element.text(z.l10n.text(z.string[`modal_call_second_${call_state}_headline`]));
-  }
-
-  _show_modal_clear(options, type) {
-    if (options.conversation.is_group() && !options.conversation.removed_from_conversation()) {
-      type = z.ViewModel.ModalType.CLEAR_GROUP;
+    if (options.warning !== false) {
+      amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
     }
-
-    const title_element = $(type).find('.modal-title');
-    title_element.text(z.l10n.text(z.string.modal_clear_conversation_headline));
-
-    return type;
   }
 
-  _show_modal_connected_device(devices) {
-    const devices_element = $(z.ViewModel.ModalType.CONNECTED_DEVICE).find('.modal-connected-devices');
+  _showModalConfirm(options, titleElement, messageElement, actionElement) {
+    const secondaryElement = $(ModalsViewModel.TYPE.CONFIRM).find('.modal-secondary');
+    const {action: actionText, message: messageText, secondary, title: titleText} = options.text;
 
-    devices_element.empty();
+    const secondaryText = secondary || z.l10n.text(z.string.modalConfirmSecondary);
+
+    actionElement.text(actionText || '');
+    messageElement.text(messageText || '');
+    secondaryElement.text(secondaryText);
+    titleElement.text(titleText || '');
+
+    if (options.warning !== false) {
+      amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
+    }
+  }
+
+  _showModalAccountNewDevices(devices) {
+    const devicesElement = $(ModalsViewModel.TYPE.ACCOUNT_NEW_DEVICES).find('.modal-new-devices-list');
+
+    devicesElement.empty();
 
     devices.map(device => {
       $('<div>')
         .text(`${moment(device.time).format('MMMM Do YYYY, HH:mm')} - UTC`)
-        .appendTo(devices_element);
+        .appendTo(devicesElement);
 
       $('<div>')
-        .text(`${z.l10n.text(z.string.modal_connected_device_from)} ${device.model}`)
-        .appendTo(devices_element);
+        .text(`${z.l10n.text(z.string.modalAccountNewDevicesFrom)} ${device.model}`)
+        .appendTo(devicesElement);
     });
   }
 
-  _show_modal_leave(content, title_element) {
-    title_element.text(z.l10n.text(z.string.modal_leave_conversation_headline, content));
-  }
+  _showModalOption(options, titleElement, messageElement, actionElement) {
+    const secondaryElement = $(ModalsViewModel.TYPE.OPTION).find('.modal-secondary');
+    const optionElement = $(ModalsViewModel.TYPE.OPTION).find('.modal-option-text');
+    const {action: actionText, message: messageText, option: optionText, secondary, title: titleText} = options.text;
 
-  _show_modal_new_device(content, title_element, message_element, action_element) {
-    let action_id;
-    let message_id;
-    const joined_names = z.util.StringUtil.capitalize_first_char(
-      z.util.LocalizerUtil.joinNames(content.user_ets, z.string.Declension.NOMINATIVE)
-    );
+    const secondaryText = secondary || z.l10n.text(z.string.modalOptionSecondary);
 
-    if (content.user_ets.length > 1) {
-      title_element.text(z.l10n.text(z.string.modal_new_device_headline_many, joined_names));
-    } else if (content.user_ets[0].is_me) {
-      title_element.text(z.l10n.text(z.string.modal_new_device_headline_you, joined_names));
-    } else {
-      title_element.text(z.l10n.text(z.string.modal_new_device_headline, joined_names));
-    }
+    actionElement.text(actionText || '');
+    messageElement.text(messageText || '');
+    optionElement.text(optionText || '');
+    secondaryElement.text(secondaryText);
+    titleElement.text(titleText || '');
 
-    switch (content.consent_type) {
-      case z.ViewModel.MODAL_CONSENT_TYPE.INCOMING_CALL:
-        message_id = z.string.modal_new_device_call_incoming;
-        action_id = z.string.modal_new_device_call_accept;
-        break;
-      case z.ViewModel.MODAL_CONSENT_TYPE.OUTGOING_CALL:
-        message_id = z.string.modal_new_device_call_outgoing;
-        action_id = z.string.modal_new_device_call_anyway;
-        break;
-      default:
-        message_id = z.string.modal_new_device_message;
-        action_id = z.string.modal_new_device_send_anyway;
-    }
-
-    message_element.text(z.l10n.text(message_id));
-    action_element.text(z.l10n.text(action_id));
-  }
-
-  _show_modal_not_connected(content, message_element) {
-    if (content) {
-      message_element.text(z.l10n.text(z.string.modal_not_connected_message_one, content));
-    } else {
-      message_element.text(z.l10n.text(z.string.modal_not_connected_message_many));
+    if (options.warning !== false) {
+      amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
     }
   }
 
-  _show_modal_remove_device(content, title_element) {
-    title_element.text(z.l10n.text(z.string.modal_remove_device_headline, content));
-  }
+  _showModalInput(options, titleElement, messageElement, actionElement) {
+    const inputElement = $(ModalsViewModel.TYPE.INPUT).find('.modal-input');
+    const {action: actionText, input: inputText, message: messageText, title: titleText} = options.text;
 
-  _show_modal_too_many_members(content, message_element) {
-    message_element.text(
-      z.l10n.text(z.string.modal_too_many_members_message, {
-        number1: content.max,
-        number2: content.open_spots,
-      })
-    );
-  }
+    actionElement.text(actionText || '');
+    messageElement.text(messageText || '');
+    inputElement.attr('placeholder', inputText || '');
+    titleElement.text(titleText || '');
 
-  _show_modal_upload_parallel(content, title_element) {
-    title_element.text(z.l10n.text(z.string.modal_uploads_parallel, content));
-  }
-
-  _show_modal_upload_too_large(content, title_element) {
-    title_element.text(z.l10n.text(z.string.conversation_asset_upload_too_large, content));
-  }
-
-  _show_modal_message_too_long(content, message_element) {
-    message_element.text(z.l10n.text(z.string.modal_too_long_message, content));
+    if (options.warning !== false) {
+      amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
+    }
   }
 };

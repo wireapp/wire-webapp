@@ -30,7 +30,6 @@ z.auth.AuthService = class AuthService {
       URL_ACCESS: '/access',
       URL_ACTIVATE: '/activate',
       URL_COOKIES: '/cookies',
-      URL_INVITATIONS: '/invitations',
       URL_LOGIN: '/login',
       URL_REGISTER: '/register',
     };

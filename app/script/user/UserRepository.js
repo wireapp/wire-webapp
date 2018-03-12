@@ -41,13 +41,11 @@ z.user.UserRepository = class UserRepository {
    * @param {z.assets.AssetService} asset_service - Backend REST API asset service implementation
    * @param {z.search.SearchService} search_service - Backend REST API search service implementation
    * @param {z.client.ClientRepository} client_repository - Repository for all client interactions
-   * @param {z.cryptography.CryptographyRepository} cryptography_repository - Repository for all cryptography interactions
    */
-  constructor(user_service, asset_service, search_service, client_repository, cryptography_repository) {
+  constructor(user_service, asset_service, search_service, client_repository) {
     this.user_service = user_service;
     this.asset_service = asset_service;
     this.client_repository = client_repository;
-    this.cryptography_repository = cryptography_repository;
     this.logger = new z.util.Logger('z.user.UserRepository', z.config.LOGGER.OPTIONS);
 
     this.connection_mapper = new z.user.UserConnectionMapper();
@@ -84,7 +82,7 @@ z.user.UserRepository = class UserRepository {
       amplify.publish(z.event.WebApp.ANALYTICS.SUPER_PROPERTY, z.tracking.SuperProperty.CONTACTS, number_of_contacts);
     });
 
-    amplify.subscribe(z.event.WebApp.CLIENT.ADD, this.add_client_to_user.bind(this));
+    amplify.subscribe(z.event.WebApp.CLIENT.ADD, this.addClientToUser.bind(this));
     amplify.subscribe(z.event.WebApp.CLIENT.REMOVE, this.remove_client_from_user.bind(this));
     amplify.subscribe(z.event.WebApp.CLIENT.UPDATE, this.update_clients_from_user.bind(this));
     amplify.subscribe(z.event.WebApp.USER.SET_AVAILABILITY, this.setAvailability.bind(this));
@@ -102,10 +100,8 @@ z.user.UserRepository = class UserRepository {
   on_user_event(event_json, source) {
     const {type} = event_json;
 
-    this.logger.info(`»» User Event: '${type}' (Source: ${source})`, {
-      event_json: JSON.stringify(event_json),
-      event_object: event_json,
-    });
+    const logObject = {eventJson: JSON.stringify(event_json), eventObject: event_json};
+    this.logger.info(`»» User Event: '${type}' (Source: ${source})`, logObject);
 
     switch (type) {
       case z.event.Backend.USER.CONNECTION:
@@ -231,25 +227,26 @@ z.user.UserRepository = class UserRepository {
 
   /**
    * Accept a connection request.
-   * @param {z.entity.User} user_et - User to update connection with
-   * @param {boolean} [show_conversation=false] - Show new conversation on success
+   * @param {z.entity.User} userEntity - User to update connection with
+   * @param {boolean} [showConversation=false] - Show new conversation on success
    * @returns {Promise} Promise that resolves when the connection request was accepted
    */
-  accept_connection_request(user_et, show_conversation = false) {
-    return this._update_connection_status(user_et, z.user.ConnectionStatus.ACCEPTED, show_conversation);
+  acceptConnectionRequest(userEntity, showConversation = false) {
+    return this._update_connection_status(userEntity, z.user.ConnectionStatus.ACCEPTED, showConversation);
   }
 
   /**
    * Block a user.
    *
-   * @param {z.entity.User} user_et - User to block
-   * @param {z.entity.Conversation} [next_conversation_et] - Optional conversation to be switched to
+   * @param {z.entity.User} userEntity - User to block
+   * @param {boolean} [hideConversation=false] - Hide current conversation
+   * @param {z.entity.Conversation} [nextConversationEntity] - Conversation to be switched to
    * @returns {Promise} Promise that resolves when the user was blocked
    */
-  block_user(user_et, next_conversation_et) {
-    return this._update_connection_status(user_et, z.user.ConnectionStatus.BLOCKED).then(() => {
-      if (next_conversation_et) {
-        amplify.publish(z.event.WebApp.CONVERSATION.SHOW, next_conversation_et);
+  blockUser(userEntity, hideConversation = false, nextConversationEntity) {
+    return this._update_connection_status(userEntity, z.user.ConnectionStatus.BLOCKED).then(() => {
+      if (hideConversation) {
+        amplify.publish(z.event.WebApp.CONVERSATION.SHOW, nextConversationEntity);
       }
     });
   }
@@ -257,14 +254,15 @@ z.user.UserRepository = class UserRepository {
   /**
    * Cancel a connection request.
    *
-   * @param {z.entity.User} user_et - User to cancel the sent connection request
-   * @param {z.entity.Conversation} [next_conversation_et] - Optional conversation to be switched to
+   * @param {z.entity.User} userEntity - User to cancel the sent connection request
+   * @param {boolean} [hideConversation=false] - Hide current conversation
+   * @param {z.entity.Conversation} [nextConversationEntity] - Conversation to be switched to
    * @returns {Promise} Promise that resolves when an outgoing connection request was cancelled
    */
-  cancel_connection_request(user_et, next_conversation_et) {
-    return this._update_connection_status(user_et, z.user.ConnectionStatus.CANCELLED).then(() => {
-      if (next_conversation_et) {
-        amplify.publish(z.event.WebApp.CONVERSATION.SHOW, next_conversation_et);
+  cancelConnectionRequest(userEntity, hideConversation = false, nextConversationEntity) {
+    return this._update_connection_status(userEntity, z.user.ConnectionStatus.CANCELLED).then(() => {
+      if (hideConversation) {
+        amplify.publish(z.event.WebApp.CONVERSATION.SHOW, nextConversationEntity);
       }
     });
   }
@@ -272,16 +270,16 @@ z.user.UserRepository = class UserRepository {
   /**
    * Create a connection request.
    *
-   * @param {z.entity.User} user_et - User to connect to
-   * @param {boolean} [show_conversation=false] - Should we open the new conversation
+   * @param {z.entity.User} userEntity - User to connect to
+   * @param {boolean} [showConversation=false] - Should we open the new conversation
    * @returns {Promise} Promise that resolves when the connection request was successfully created
    */
-  create_connection(user_et, show_conversation = false) {
+  createConnection(userEntity, showConversation = false) {
     return this.user_service
-      .create_connection(user_et.id, user_et.name())
-      .then(response => this.user_connection(response, z.event.EventRepository.SOURCE.INJECTED, show_conversation))
+      .create_connection(userEntity.id, userEntity.name())
+      .then(response => this.user_connection(response, z.event.EventRepository.SOURCE.INJECTED, showConversation))
       .catch(error => {
-        this.logger.error(`Failed to send connection request to user '${user_et.id}': ${error.message}`, error);
+        this.logger.error(`Failed to send connection request to user '${userEntity.id}': ${error.message}`, error);
       });
   }
 
@@ -349,21 +347,21 @@ z.user.UserRepository = class UserRepository {
 
   /**
    * Ignore connection request.
-   * @param {z.entity.User} user_et - User to ignore the connection request
+   * @param {z.entity.User} userEntity - User to ignore the connection request
    * @returns {Promise} Promise that resolves when an incoming connection request was ignored
    */
-  ignore_connection_request(user_et) {
-    return this._update_connection_status(user_et, z.user.ConnectionStatus.IGNORED);
+  ignoreConnectionRequest(userEntity) {
+    return this._update_connection_status(userEntity, z.user.ConnectionStatus.IGNORED);
   }
 
   /**
    * Unblock a user.
-   * @param {z.entity.User} user_et - User to unblock
-   * @param {boolean} [show_conversation=false] - Show new conversation on success
+   * @param {z.entity.User} userEntity - User to unblock
+   * @param {boolean} [showConversation=false] - Show new conversation on success
    * @returns {Promise} Promise that resolves when a user was unblocked
    */
-  unblock_user(user_et, show_conversation = true) {
-    return this._update_connection_status(user_et, z.user.ConnectionStatus.ACCEPTED, show_conversation);
+  unblockUser(userEntity, showConversation = true) {
+    return this._update_connection_status(userEntity, z.user.ConnectionStatus.ACCEPTED, showConversation);
   }
 
   /**
@@ -519,22 +517,24 @@ z.user.UserRepository = class UserRepository {
 
   /**
    * Saves a new client for the first time to the database and adds it to a user's entity.
-   * @param {string} user_id - ID of user
-   * @param {string} client_et - Client which should get deleted
+   *
+   * @param {string} userId - ID of user
+   * @param {Object} clientPayload - Payload of client which should be added to user
+   * @param {boolean} publishClient - Publish new client
    * @returns {Promise} Promise that resolves when a client and its session have been deleted
    */
-  add_client_to_user(user_id, client_et) {
-    return this.get_user_by_id(user_id).then(user_et => {
-      if (!user_et.add_client(client_et)) {
-        return;
-      }
+  addClientToUser(userId, clientPayload, publishClient = false) {
+    return this.get_user_by_id(userId).then(userEntity => {
+      const clientEntity = this.client_repository.clientMapper.mapClient(clientPayload, userEntity.is_me);
+      const wasClientAdded = userEntity.add_client(clientEntity);
 
-      return this.client_repository.saveClientInDb(user_id, client_et.toJson()).then(() => {
-        amplify.publish(z.event.WebApp.USER.CLIENT_ADDED, user_id, client_et);
-        if (user_et.is_me) {
-          amplify.publish(z.event.WebApp.CLIENT.ADD_OWN_CLIENT, user_id, client_et);
-        }
-      });
+      if (wasClientAdded) {
+        return this.client_repository.saveClientInDb(userId, clientEntity.toJson()).then(() => {
+          if (publishClient) {
+            amplify.publish(z.event.WebApp.USER.CLIENT_ADDED, userId, clientEntity);
+          }
+        });
+      }
     });
   }
 
@@ -889,7 +889,7 @@ z.user.UserRepository = class UserRepository {
 
       if (!matching_user_ids) {
         const user_et = new z.entity.User(user_id);
-        user_et.name(z.l10n.text(z.string.nonexistent_user));
+        user_et.name(z.l10n.text(z.string.nonexistentUser));
         user_ets.push(user_et);
       }
     }
@@ -945,21 +945,11 @@ z.user.UserRepository = class UserRepository {
       .then(valid_suggestions => {
         this.should_set_username = true;
         this.self().username(valid_suggestions[0]);
-
-        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ONBOARDING.GENERATED_USERNAME, {
-          num_of_attempts: 1,
-          outcome: 'success',
-        });
       })
       .catch(error => {
         if (error.code === z.service.BackendClientError.STATUS_CODE.NOT_FOUND) {
           this.should_set_username = false;
         }
-
-        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ONBOARDING.GENERATED_USERNAME, {
-          num_of_attempts: 1,
-          outcome: 'fail',
-        });
 
         throw error;
       });
@@ -1046,7 +1036,7 @@ z.user.UserRepository = class UserRepository {
           .then(() => this.user_update({user: {assets: assets, id: this.self().id}}));
       })
       .catch(error => {
-        throw new Error(`Error during profile image upload: ${error.message}`);
+        throw new Error(`Error during profile image upload: ${error.message || error}`);
       });
   }
 
@@ -1055,15 +1045,7 @@ z.user.UserRepository = class UserRepository {
    * @returns {undefined} No return value
    */
   set_default_picture() {
-    return z.util
-      .load_url_blob(z.config.UNSPLASH_URL)
-      .then(blob => this.change_picture(blob))
-      .then(() => {
-        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ONBOARDING.ADDED_PHOTO, {
-          outcome: 'success',
-          source: 'unsplash',
-        });
-      });
+    return z.util.load_url_blob(z.config.UNSPLASH_URL).then(blob => this.change_picture(blob));
   }
 
   map_guest_status(user_ets = this.users()) {

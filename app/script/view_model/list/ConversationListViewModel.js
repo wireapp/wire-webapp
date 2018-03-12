@@ -20,173 +20,153 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.ViewModel = z.ViewModel || {};
-window.z.ViewModel.list = z.ViewModel.list || {};
+window.z.viewModel = z.viewModel || {};
+window.z.viewModel.list = z.viewModel.list || {};
 
-z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
+z.viewModel.list.ConversationListViewModel = class ConversationListViewModel {
   /**
    * View model for conversation list.
    *
-   * @param {string} element_id - HTML selector
-   * @param {z.ViewModel.list.ListViewModel} list_view_model - List view model
-   * @param {z.ViewModel.ContentViewModel} content_view_model - Content view model
-   * @param {z.calling.CallingRepository} calling_repository - Calling repository
-   * @param {z.conversation.ConversationRepository} conversation_repository - Conversation repository
-   * @param {z.team.TeamRepository} team_repository - Team repository
-   * @param {z.user.UserRepository} user_repository - User repository
+   * @param {z.viewModel.MainViewModel} mainViewModel - Main view model
+   * @param {z.viewModel.ListViewModel} listViewModel - List view model
+   * @param {Object} repositories - Object containing all repositories
    */
-  constructor(
-    element_id,
-    list_view_model,
-    content_view_model,
-    calling_repository,
-    conversation_repository,
-    team_repository,
-    user_repository
-  ) {
-    this.click_on_conversation = this.click_on_conversation.bind(this);
-    this.is_selected_conversation = this.is_selected_conversation.bind(this);
+  constructor(mainViewModel, listViewModel, repositories) {
+    this.clickOnConversation = this.clickOnConversation.bind(this);
+    this.isSelectedConversation = this.isSelectedConversation.bind(this);
 
-    this.list_view_model = list_view_model;
-    this.content_view_model = content_view_model;
-    this.calling_repository = calling_repository;
-    this.conversation_repository = conversation_repository;
-    this.team_repository = team_repository;
-    this.user_repository = user_repository;
-    this.logger = new z.util.Logger('z.ViewModel.list.ConversationListViewModel', z.config.LOGGER.OPTIONS);
+    this.contentViewModel = mainViewModel.content;
+    this.listViewModel = listViewModel;
+    this.callingRepository = repositories.calling;
+    this.conversationRepository = repositories.conversation;
+    this.teamRepository = repositories.team;
+    this.user_repository = repositories.user;
+    this.logger = new z.util.Logger('z.viewModel.list.ConversationListViewModel', z.config.LOGGER.OPTIONS);
 
-    this.show_calls = ko.observable(false);
+    this.showCalls = ko.observable(false);
 
-    this.content_state = this.content_view_model.content_state;
-    this.selected_conversation = ko.observable();
+    this.contentState = this.contentViewModel.state;
+    this.selectedConversation = ko.observable();
 
-    this.is_team = this.team_repository.isTeam;
+    this.isTeam = this.teamRepository.isTeam;
 
-    this.self_user = ko.pureComputed(() => this.user_repository.self && this.user_repository.self());
-    this.selfAvailability = ko.pureComputed(() => this.self_user() && this.self_user().availability());
-    this.selfName = ko.pureComputed(() => this.self_user() && this.self_user().name());
+    this.selfUser = ko.pureComputed(() => this.user_repository.self && this.user_repository.self());
+    this.selfAvailability = ko.pureComputed(() => this.selfUser() && this.selfUser().availability());
+    this.selfUserName = ko.pureComputed(() => this.selfUser() && this.selfUser().name());
 
-    this.connect_requests = this.user_repository.connect_requests;
-    this.connect_requests_text = ko.pureComputed(() => {
-      const number_of_requests = this.connect_requests().length;
-      if (number_of_requests > 1) {
-        return z.l10n.text(z.string.conversations_connection_request_many, number_of_requests);
-      }
-      return z.l10n.text(z.string.conversations_connection_request_one);
+    this.connectRequests = this.user_repository.connect_requests;
+    this.connectRequestsText = ko.pureComputed(() => {
+      const hasMultipleRequests = this.connectRequests().length > 1;
+      const stringId = hasMultipleRequests
+        ? z.string.conversationsConnectionRequestMany
+        : z.string.conversationsConnectionRequestOne;
+
+      return z.l10n.text(stringId, this.connectRequests().length);
+    });
+    this.stateIsRequests = ko.pureComputed(() => {
+      return this.contentState() === z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS;
     });
 
-    this.conversations_calls = this.conversation_repository.conversations_calls;
-    this.conversations_archived = this.conversation_repository.conversations_archived;
-    this.conversations_unarchived = this.conversation_repository.conversations_unarchived;
+    this.callConversations = this.conversationRepository.conversations_calls;
+    this.archivedConversations = this.conversationRepository.conversations_archived;
+    this.unarchivedConversations = this.conversationRepository.conversations_unarchived;
 
     this.noConversations = ko.pureComputed(() => {
-      const noConversations = !this.conversations_unarchived().length && !this.conversations_calls().length;
-      return noConversations && !this.connect_requests().length;
+      const noConversations = !this.unarchivedConversations().length && !this.callConversations().length;
+      return noConversations && !this.connectRequests().length;
     });
 
-    this.webapp_is_loaded = ko.observable(false);
+    this.webappIsLoaded = ko.observable(false);
 
-    this.should_update_scrollbar = ko
+    this.shouldUpdateScrollbar = ko
       .computed(() => {
-        return (
-          this.webapp_is_loaded() ||
-          this.conversations_unarchived().length ||
-          this.connect_requests().length ||
-          this.conversations_calls().length
-        );
+        const numberOfConversations = this.unarchivedConversations().length + this.callConversations().length;
+        return this.webappIsLoaded() || numberOfConversations || this.connectRequests().length;
       })
       .extend({notify: 'always', rateLimit: 500});
 
-    this.active_conversation_id = ko.pureComputed(() => {
-      if (this.conversation_repository.active_conversation()) {
-        return this.conversation_repository.active_conversation().id;
+    this.activeConversationId = ko.pureComputed(() => {
+      if (this.conversationRepository.active_conversation()) {
+        return this.conversationRepository.active_conversation().id;
       }
     });
 
-    this.archive_tooltip = ko.pureComputed(() => {
-      return z.l10n.text(z.string.tooltip_conversations_archived, this.conversations_archived().length);
+    this.archiveTooltip = ko.pureComputed(() => {
+      return z.l10n.text(z.string.tooltipConversationsArchived, this.archivedConversations().length);
     });
 
-    this.start_tooltip = z.l10n.text(
-      z.string.tooltip_conversations_start,
-      z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.START)
-    );
+    const startShortcut = z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.START);
+    this.startTooltip = z.l10n.text(z.string.tooltipConversationsStart, startShortcut);
 
-    this.show_connect_requests = ko.pureComputed(() => this.connect_requests().length);
+    this.showConnectRequests = ko.pureComputed(() => this.connectRequests().length);
 
-    this.show_badge = ko.observable(false);
+    this.showBadge = ko.observable(false);
 
-    this._init_subscriptions();
+    this._initSubscriptions();
+  }
+
+  _initSubscriptions() {
+    amplify.subscribe(z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, this.setShowCallsState.bind(this));
+    amplify.subscribe(z.event.WebApp.LIFECYCLE.LOADED, this.onWebappLoaded.bind(this));
+    amplify.subscribe(z.event.WebApp.SHORTCUT.START, this.clickOnPeopleButton.bind(this));
+    amplify.subscribe(z.event.WebApp.SEARCH.BADGE.SHOW, () => this.showBadge(true));
+    amplify.subscribe(z.event.WebApp.SEARCH.BADGE.HIDE, () => this.showBadge(false));
   }
 
   clickOnAvailability(viewModel, event) {
     z.ui.AvailabilityContextMenu.show(event, 'list_header', 'left-list-availability-menu');
   }
 
-  click_on_connect_requests() {
-    this.content_view_model.switch_content(z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS);
+  clickOnConnectRequests() {
+    this.contentViewModel.switchContent(z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS);
   }
 
-  click_on_conversation(conversation_et) {
-    if (!this.is_selected_conversation(conversation_et)) {
-      this.content_view_model.show_conversation(conversation_et);
+  clickOnConversation(conversationEntity) {
+    if (!this.isSelectedConversation(conversationEntity)) {
+      this.contentViewModel.showConversation(conversationEntity);
     }
   }
 
-  set_show_calls_state(handling_notifications) {
-    const updated_show_calls_state = handling_notifications === z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
+  setShowCallsState(handlingNotifications) {
+    const shouldShowCalls = handlingNotifications === z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
 
-    if (this.show_calls !== updated_show_calls_state) {
-      this.show_calls(updated_show_calls_state);
-      this.logger.debug(`Set show calls state to: ${this.show_calls()}`);
+    const isStateChange = this.showCalls() !== shouldShowCalls;
+    if (isStateChange) {
+      this.showCalls(shouldShowCalls);
+      this.logger.debug(`Set show calls state to: ${this.showCalls()}`);
     }
   }
 
-  _init_subscriptions() {
-    amplify.subscribe(z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, this.set_show_calls_state.bind(this));
-    amplify.subscribe(z.event.WebApp.LIFECYCLE.LOADED, this.on_webapp_loaded.bind(this));
-    amplify.subscribe(z.event.WebApp.SHORTCUT.START, this.click_on_people_button.bind(this));
-    amplify.subscribe(z.event.WebApp.SEARCH.BADGE.SHOW, () => this.show_badge(true));
-    amplify.subscribe(z.event.WebApp.SEARCH.BADGE.HIDE, () => this.show_badge(false));
+  isSelectedConversation(conversationEntity) {
+    const expectedStates = [
+      z.viewModel.ContentViewModel.STATE.COLLECTION,
+      z.viewModel.ContentViewModel.STATE.COLLECTION_DETAILS,
+      z.viewModel.ContentViewModel.STATE.CONVERSATION,
+    ];
+
+    const isSelectedConversation = this.conversationRepository.is_active_conversation(conversationEntity);
+    const isExpectedState = expectedStates.includes(this.contentState());
+
+    return isSelectedConversation && isExpectedState;
   }
 
-  is_selected_conversation(conversation_et) {
-    const is_selected_conversation = this.conversation_repository.is_active_conversation(conversation_et);
-    const is_selected_state = [
-      z.ViewModel.content.CONTENT_STATE.COLLECTION,
-      z.ViewModel.content.CONTENT_STATE.COLLECTION_DETAILS,
-      z.ViewModel.content.CONTENT_STATE.CONVERSATION,
-    ].includes(this.content_state());
-
-    return is_selected_conversation && is_selected_state;
-  }
-
-  on_webapp_loaded() {
-    this.webapp_is_loaded(true);
+  onWebappLoaded() {
+    this.webappIsLoaded(true);
   }
 
   //##############################################################################
   // Footer actions
   //##############################################################################
 
-  click_on_archived_button() {
-    this.list_view_model.switch_list(z.ViewModel.list.LIST_STATE.ARCHIVE);
+  clickOnArchivedButton() {
+    this.listViewModel.switchList(z.viewModel.ListViewModel.STATE.ARCHIVE);
   }
 
-  click_on_preferences_button() {
+  clickOnPreferencesButton() {
     amplify.publish(z.event.WebApp.PREFERENCES.MANAGE_ACCOUNT);
   }
 
-  click_on_people_button() {
-    this.list_view_model.switch_list(z.ViewModel.list.LIST_STATE.START_UI);
-  }
-
-  //##############################################################################
-  // Legacy
-  //##############################################################################
-
-  click_on_clear_action() {
-    // desktop clients <= 2.13.2742 rely on that function.
-    amplify.publish(z.event.WebApp.SHORTCUT.DELETE);
+  clickOnPeopleButton() {
+    this.listViewModel.switchList(z.viewModel.ListViewModel.STATE.START_UI);
   }
 };

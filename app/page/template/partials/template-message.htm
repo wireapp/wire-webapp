@@ -1,34 +1,32 @@
 <script type="text/html" id="verification">
   <div class="message-header">
     <div class="message-header-icon">
-      <!-- ko if: message.verification_message_type === z.message.VerificationMessageType.VERIFIED -->
-        <svg width="16" height="16">
-          <use xlink:href="#icon-verified"></use>
-        </svg>
+      <!-- ko if: message.isTypeVerified() -->
+        <verified-icon></verified-icon>
       <!-- /ko -->
-      <!-- ko ifnot: message.verification_message_type === z.message.VerificationMessageType.VERIFIED -->
+      <!-- ko ifnot: message.isTypeVerified() -->
         <svg width="16" height="16">
           <use xlink:href="#icon-not-verified"></use>
         </svg>
       <!-- /ko -->
     </div>
     <div class="message-header-label">
-      <!-- ko if: message.verification_message_type === z.message.VerificationMessageType.VERIFIED -->
-        <span data-bind="l10n_text: z.string.tooltip_conversation_all_verified"></span>
+      <!-- ko if: message.isTypeVerified() -->
+        <span data-bind="l10n_text: z.string.tooltipConversationAllVerified"></span>
       <!-- /ko -->
-      <!-- ko if: message.verification_message_type === z.message.VerificationMessageType.UNVERIFIED -->
+      <!-- ko if: message.isTypeUnverified() -->
         <span class="message-header-sender-name" data-bind="text: message.sender_name()"></span>
-        <span class="ellipsis" data-bind="l10n_text: z.string.conversation_device_unverified"></span>
-        <span class="ellipsis text-theme" data-bind="click: click_on_device, text: message.caption_unverified_device" data-uie-name="go-devices"></span>
+        <span class="ellipsis" data-bind="l10n_text: z.string.conversationDeviceUnverified"></span>
+        <span class="ellipsis text-theme" data-bind="click: clickOnDevice, text: message.captionUnverifiedDevice" data-uie-name="go-devices"></span>
       <!-- /ko -->
-      <!-- ko if: message.verification_message_type === z.message.VerificationMessageType.NEW_DEVICE -->
-        <span class="message-header-sender-name" data-bind='text: message.caption_user'></span>
-        <span class="ellipsis" data-bind="text: message.caption_started_using"></span>
-        <span class="ellipsis text-theme" data-bind="click: click_on_device, text: message.caption_new_device" data-uie-name="go-devices"></span>
+      <!-- ko if: message.isTypeNewDevice() -->
+        <span class="message-header-plain-sender-name" data-bind='text: message.captionUser'></span>
+        <span class="ellipsis" data-bind="text: message.captionStartedUsing"></span>
+        <span class="ellipsis text-theme" data-bind="click: clickOnDevice, text: message.captionNewDevice" data-uie-name="go-devices"></span>
       <!-- /ko -->
-      <!-- ko if: message.verification_message_type === z.message.VerificationMessageType.NEW_MEMBER -->
-        <span class="ellipsis" data-bind="l10n_text: z.string.conversation_device_new_people_joined"></span>
-        <span class="ellipsis text-theme" data-bind="click: click_on_device, l10n_text: z.string.conversation_device_new_people_joined_verify" data-uie-name="go-devices"></span>
+      <!-- ko if: message.isTypeNewMember() -->
+        <span class="ellipsis" data-bind="l10n_text: z.string.conversationDeviceNewPeopleJoined"></span>
+        <span class="ellipsis text-theme" data-bind="click: clickOnDevice, l10n_text: z.string.conversationDeviceNewPeopleJoinedVerify" data-uie-name="go-devices"></span>
       <!-- /ko -->
       <hr class="message-header-line" />
     </div>
@@ -58,7 +56,7 @@
 <script type="text/html" id="delete">
   <div class="message-header">
     <div class="message-header-icon">
-      <participant-avatar class="sender-avatar" data-bubble="#participants-bubble" data-placement="vertical" params="participant: message.user(), click: $parent.on_message_user_click, size: z.components.ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
+      <participant-avatar class="sender-avatar" params="participant: message.user, click: $parent.on_message_user_click, size: z.components.ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
     </div>
     <div class="message-header-label">
       <span class="message-header-label-sender" data-bind='text: message.sender_name()'></span>
@@ -74,12 +72,12 @@
   <!-- ko if: !$parent.should_hide_user_avatar($data) -->
     <div class="message-header">
       <div class="message-header-icon">
-        <participant-avatar class="sender-avatar" data-bubble="#participants-bubble" data-placement="vertical" params="participant: message.user(), click: $parent.on_message_user_click, size: z.components.ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
+        <participant-avatar class="sender-avatar" params="participant: message.user, click: $parent.on_message_user_click, size: z.components.ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
       </div>
       <div class="message-header-label">
         <span class="message-header-label-sender" data-bind='css: message.accent_color(), text: message.user().first_name()' data-uie-name="sender-name"></span>
         <!-- ko if: message.user().isBot -->
-          <span class="message-header-label-service" data-bind="l10n_text: z.string.conversation_bot_user"></span>
+          <span class="message-header-label-service" data-bind="l10n_text: z.string.conversationBotUser"></span>
         <!-- /ko -->
         <!-- ko if: was_edited() -->
           <span class="message-header-label-icon icon-edit" data-bind="attr: {title: message.display_edited_timestamp()}"></span>
@@ -156,7 +154,7 @@
         <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp, 'data-uie-uid': message.id}"></time>
       <!-- /ko -->
       <!-- ko if: $parent.is_last_delivered_message(message) -->
-        <span class="message-status" data-bind="l10n_text: z.string.conversation_message_delivered"></span>
+        <span class="message-status" data-bind="l10n_text: z.string.conversationMessageDelivered"></span>
       <!-- /ko -->
       <!-- ko if: message.ephemeral_status() === z.message.EphemeralStatusType.ACTIVE -->
         <ephemeral-timer class="message-ephemeral-timer" data-bind="attr: {'title': message.ephemeral_caption()}" params="message: message"></ephemeral-timer>
@@ -181,31 +179,13 @@
       <!-- ko if: message.show_likes() -->
         <div class="message-footer-bottom" data-uie-name="message-liked-avatars">
           <!-- ko foreach: message.reactions_user_ets() -->
-            <participant-avatar data-bubble="#participants-bubble"
-                         data-placement="vertical"
-                         params="participant: $data, click: $parents[1].on_message_user_click, size: z.components.ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
+            <participant-avatar params="participant: $data, click: $parents[1].on_message_user_click, size: z.components.ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
           <!-- /ko -->
           <span class="message-footer-close-button icon-close" data-bind="click: function() { $data.show_likes(false) }"></span>
         </div>
       <!-- /ko -->
     </div>
   <!-- /ko -->
-</script>
-
-<script type="text/html" id="device">
-  <div class="message-header">
-    <div class="message-header-icon">
-      <svg width="16" height="16">
-        <use xlink:href="#icon-not-verified"></use>
-      </svg>
-    </div>
-    <div class="message-header-label">
-      <span class="message-header-sender-name" data-bind='text: message.sender_name()'></span>
-      <span class="ellipsis" data-bind="text: caption"></span>
-      <span class="ellipsis text-theme" data-bind="text: caption_device, click: click_on_device"></span>
-      <hr class="message-header-line" />
-    </div>
-  </div>
 </script>
 
 <script type="text/html" id="member">
@@ -215,11 +195,11 @@
       <span class="message-connected-username label-username" data-bind='text: otherUser().username()'></span>
       <participant-avatar class="message-connected-avatar avatar-no-badge cursor-default"
                    data-bind="css: {'avatar-no-badge': otherUser().is_outgoing_request()}"
-                   params="participant: otherUser(), size: z.components.ParticipantAvatar.SIZE.X_LARGE"></participant-avatar>
+                   params="participant: otherUser, size: z.components.ParticipantAvatar.SIZE.X_LARGE"></participant-avatar>
       <!-- ko if: otherUser().is_outgoing_request() -->
         <div class="message-connected-cancel text-theme"
              data-bind="click: $parent.click_on_cancel_request,
-                        l10n_text: z.string.conversation_connection_cancel_request"
+                        l10n_text: z.string.conversationConnectionCancelRequest"
              data-uie-name="do-cancel-request"></div>
       <!-- /ko -->
     </div>
@@ -254,16 +234,10 @@
       <div class="message-body">
         <!-- ko foreach: remoteUserEntities -->
           <!-- ko if: message.isGroupCreation() -->
-            <participant-avatar class="avatar-no-border"
-                         data-bubble="#participants-bubble"
-                         data-placement="vertical"
-                         params="participant: $data, click: $parents[1].on_message_user_click, size: z.components.ParticipantAvatar.SIZE.MEDIUM"></participant-avatar>
+            <participant-avatar class="avatar-no-border" params="participant: $data, click: $parents[1].on_message_user_click, size: z.components.ParticipantAvatar.SIZE.MEDIUM"></participant-avatar>
           <!-- /ko -->
           <!-- ko if: message.isMemberJoin() || message.isMemberLeave() -->
-            <participant-avatar data-bind="css: {'translucent': message.isMemberLeave()}"
-                         data-bubble="#participants-bubble"
-                         data-placement="vertical"
-                         params="participant: $data, click: $parents[1].on_message_user_click, size: z.components.ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
+            <participant-avatar data-bind="css: {'translucent': message.isMemberLeave()}" params="participant: $data, click: $parents[1].on_message_user_click, size: z.components.ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
           <!-- /ko -->
         <!-- /ko -->
       </div>
@@ -317,7 +291,7 @@
     <div class="message-header-label ellipsis">
       <span data-bind="html: caption"></span>
       <span>&nbsp;</span>
-      <a class="text-theme" data-bind="l10n_text: z.string.conversation_unable_to_decrypt_link, attr: {'href': link}" rel="nofollow noopener noreferrer" target="_blank"></a>
+      <a class="text-theme" data-bind="l10n_text: z.string.conversationUnableToDecryptLink, attr: {'href': link}" rel="nofollow noopener noreferrer" target="_blank"></a>
       <hr class="message-header-line" />
     </div>
   </div>
@@ -331,7 +305,7 @@
           <path class="fill-theme" d="M12.416 12.417c-2.374 2.375-6.28 2.33-8.72-.112-2.444-2.442-2.488-6.347-.113-8.72 1.658-1.66 4.12-2.18 6.343-1.394.477.17 1-.08 1.17-.557.167-.477-.083-1-.56-1.17C7.658-.552 4.453.124 2.286 2.29-.808 5.384-.75 10.448 2.4 13.6c3.15 3.152 8.216 3.21 11.312.113 2.165-2.166 2.84-5.37 1.824-8.25-.168-.476-.692-.726-1.17-.558-.476.17-.726.692-.557 1.17.784 2.222.265 4.684-1.394 6.342z"></path>
         </svg>
         <span class="message-header-decrypt-reset-session-action button-label text-theme"
-              data-bind="click: $parent.on_session_reset_click, l10n_text: z.string.conversation_unable_to_decrypt_reset_session, style : {visibility : !is_resetting_session() ? 'visible' : 'hidden'}"></span>
+              data-bind="click: $parent.on_session_reset_click, l10n_text: z.string.conversationUnableToDecryptResetSession, style : {visibility : !is_resetting_session() ? 'visible' : 'hidden'}"></span>
       </div>
       <!-- /ko -->
     </div>
@@ -343,7 +317,7 @@
     <div class="message-header-icon">
       <span class="icon-sysmsg-error text-red"></span>
     </div>
-    <div class="message-header-label" data-bind="l10n_text: z.string.conversation_missed_messages"></div>
+    <div class="message-header-label" data-bind="l10n_text: z.string.conversationMissedMessages"></div>
   </div>
 </script>
 

@@ -36,7 +36,7 @@ z.calling.CallingRepository = class CallingRepository {
    * Extended check for calling support of browser.
    * @returns {boolean} True if calling is supported
    */
-  static get supports_calling() {
+  static get supportsCalling() {
     return z.util.Environment.browser.supports.calling;
   }
 
@@ -44,94 +44,94 @@ z.calling.CallingRepository = class CallingRepository {
    * Extended check for screen sharing support of browser.
    * @returns {boolean} True if screen sharing is supported
    */
-  static get supports_screen_sharing() {
+  static get supportsScreenSharing() {
     return z.util.Environment.browser.supports.screen_sharing;
   }
 
   /**
    * Construct a new Calling repository.
    *
-   * @param {CallingService} calling_service -  Backend REST API calling service implementation
-   * @param {ClientRepository} client_repository - Repository for client interactions
-   * @param {ConversationRepository} conversation_repository -  Repository for conversation interactions
-   * @param {MediaRepository} media_repository -  Repository for media interactions
-   * @param {UserRepository} user_repository -  Repository for all user and connection interactions
+   * @param {CallingService} callingService -  Backend REST API calling service implementation
+   * @param {ClientRepository} clientRepository - Repository for client interactions
+   * @param {ConversationRepository} conversationRepository -  Repository for conversation interactions
+   * @param {MediaRepository} mediaRepository -  Repository for media interactions
+   * @param {UserRepository} userRepository -  Repository for all user and connection interactions
    */
-  constructor(calling_service, client_repository, conversation_repository, media_repository, user_repository) {
-    this.get_config = this.get_config.bind(this);
+  constructor(callingService, clientRepository, conversationRepository, mediaRepository, userRepository) {
+    this.getConfig = this.getConfig.bind(this);
 
-    this.calling_service = calling_service;
-    this.client_repository = client_repository;
-    this.conversation_repository = conversation_repository;
-    this.media_repository = media_repository;
-    this.user_repository = user_repository;
+    this.callingService = callingService;
+    this.clientRepository = clientRepository;
+    this.conversationRepository = conversationRepository;
+    this.mediaRepository = mediaRepository;
+    this.userRepository = userRepository;
     this.logger = new z.util.Logger('z.calling.CallingRepository', z.config.LOGGER.OPTIONS);
 
-    this.self_user_id = ko.pureComputed(() => {
-      if (this.user_repository.self()) {
-        return this.user_repository.self().id;
+    this.selfUserId = ko.pureComputed(() => {
+      if (this.userRepository.self()) {
+        return this.userRepository.self().id;
       }
     });
 
     this.timeOffset = 0;
 
-    this.calling_config = undefined;
-    this.calling_config_timeout = undefined;
+    this.callingConfig = undefined;
+    this.callingConfigTimeout = undefined;
 
     // Telemetry
     this.telemetry = new z.telemetry.calling.CallTelemetry();
-    this.message_log = [];
+    this.messageLog = [];
 
     // Media Handler
-    this.media_devices_handler = this.media_repository.devices_handler;
-    this.media_stream_handler = this.media_repository.stream_handler;
-    this.media_element_handler = this.media_repository.element_handler;
-    this.remote_media_streams = this.media_repository.stream_handler.remote_media_streams;
-    this.self_stream_state = this.media_repository.stream_handler.self_stream_state;
+    this.mediaDevicesHandler = this.mediaRepository.devices_handler;
+    this.mediaStreamHandler = this.mediaRepository.stream_handler;
+    this.mediaElementHandler = this.mediaRepository.element_handler;
+    this.remoteMediaStreams = this.mediaRepository.stream_handler.remote_media_streams;
+    this.selfStreamState = this.mediaRepository.stream_handler.self_stream_state;
 
-    this.self_state = this.media_stream_handler.self_stream_state;
+    this.selfState = this.mediaStreamHandler.self_stream_state;
 
     this.calls = ko.observableArray([]);
-    this.joined_call = ko.pureComputed(() => {
-      for (const call_et of this.calls()) {
-        if (call_et.self_client_joined()) {
-          return call_et;
+    this.joinedCall = ko.pureComputed(() => {
+      for (const callEntity of this.calls()) {
+        if (callEntity.selfClientJoined()) {
+          return callEntity;
         }
       }
     });
 
-    this.flow_status = undefined;
-    this.debug_enabled = false;
+    this.flowStatus = undefined;
+    this.debugEnabled = false;
 
-    this.share_call_states();
-    this.subscribe_to_events();
+    this.shareCallStates();
+    this.subscribeToEvents();
   }
   /**
    * Share call states with MediaRepository.
    * @returns {undefined} No return value
    */
-  share_call_states() {
-    this.media_repository.stream_handler.calls = this.calls;
-    this.media_repository.stream_handler.joined_call = this.joined_call;
+  shareCallStates() {
+    this.mediaRepository.stream_handler.calls = this.calls;
+    this.mediaRepository.stream_handler.joined_call = this.joinedCall;
   }
 
   /**
    * Subscribe to amplify topics.
    * @returns {undefined} No return value
    */
-  subscribe_to_events() {
-    amplify.subscribe(z.event.WebApp.CALL.EVENT_FROM_BACKEND, this.on_call_event.bind(this));
-    amplify.subscribe(z.event.WebApp.CALL.MEDIA.TOGGLE, this.toggle_media.bind(this));
-    amplify.subscribe(z.event.WebApp.CALL.STATE.DELETE, this.delete_call.bind(this));
-    amplify.subscribe(z.event.WebApp.CALL.STATE.JOIN, this.join_call.bind(this));
-    amplify.subscribe(z.event.WebApp.CALL.STATE.LEAVE, this.leave_call.bind(this));
-    amplify.subscribe(z.event.WebApp.CALL.STATE.REJECT, this.reject_call.bind(this));
-    amplify.subscribe(z.event.WebApp.CALL.STATE.PARTICIPANT_LEFT, this.participant_left.bind(this));
-    amplify.subscribe(z.event.WebApp.CALL.STATE.TOGGLE, this.toggle_state.bind(this));
-    amplify.subscribe(z.event.WebApp.DEBUG.UPDATE_LAST_CALL_STATUS, this.store_flow_status.bind(this));
-    amplify.subscribe(z.event.WebApp.EVENT.UPDATE_TIME_OFFSET, this.update_time_offset.bind(this));
-    amplify.subscribe(z.event.WebApp.LIFECYCLE.LOADED, this.get_config);
-    amplify.subscribe(z.util.Logger.prototype.LOG_ON_DEBUG, this.set_debug_state.bind(this));
+  subscribeToEvents() {
+    amplify.subscribe(z.event.WebApp.CALL.EVENT_FROM_BACKEND, this.onCallEvent.bind(this));
+    amplify.subscribe(z.event.WebApp.CALL.MEDIA.TOGGLE, this.toggleMedia.bind(this));
+    amplify.subscribe(z.event.WebApp.CALL.STATE.DELETE, this.deleteCall.bind(this));
+    amplify.subscribe(z.event.WebApp.CALL.STATE.JOIN, this.joinCall.bind(this));
+    amplify.subscribe(z.event.WebApp.CALL.STATE.LEAVE, this.leaveCall.bind(this));
+    amplify.subscribe(z.event.WebApp.CALL.STATE.REJECT, this.rejectCall.bind(this));
+    amplify.subscribe(z.event.WebApp.CALL.STATE.REMOVE_PARTICIPANT, this.removeParticipant.bind(this));
+    amplify.subscribe(z.event.WebApp.CALL.STATE.TOGGLE, this.toggleState.bind(this));
+    amplify.subscribe(z.event.WebApp.DEBUG.UPDATE_LAST_CALL_STATUS, this.storeFlowStatus.bind(this));
+    amplify.subscribe(z.event.WebApp.EVENT.UPDATE_TIME_OFFSET, this.updateTimeOffset.bind(this));
+    amplify.subscribe(z.event.WebApp.LIFECYCLE.LOADED, this.getConfig);
+    amplify.subscribe(z.util.Logger.prototype.LOG_ON_DEBUG, this.setDebugState.bind(this));
   }
 
   //##############################################################################
@@ -145,34 +145,32 @@ z.calling.CallingRepository = class CallingRepository {
    * @param {z.event.EventRepository.SOURCE} source - Source of event
    * @returns {undefined} No return value
    */
-  on_call_event(event, source) {
-    const {content: event_content, time: event_date, type: event_type} = event;
-    const is_call = event_type === z.event.Client.CALL.E_CALL;
+  onCallEvent(event, source) {
+    const {content: eventContent, time: eventDate, type: eventType} = event;
+    const isCall = eventType === z.event.Client.CALL.E_CALL;
 
-    this.logger.info(`»» Call Event: '${event_type}' (Source: ${source})`, {
-      event_json: JSON.stringify(event),
-      event_object: event,
-    });
+    const logObject = {eventJson: JSON.stringify(event), eventObject: event};
+    this.logger.info(`»» Call Event: '${eventType}' (Source: ${source})`, logObject);
 
-    if (is_call) {
-      const is_supported_version = event_content.version === z.calling.entities.CallMessage.CONFIG.VERSION;
-      if (!is_supported_version) {
+    if (isCall) {
+      const isSupportedVersion = eventContent.version === z.calling.entities.CallMessageEntity.CONFIG.VERSION;
+      if (!isSupportedVersion) {
         throw new z.calling.CallError(z.calling.CallError.TYPE.UNSUPPORTED_VERSION);
       }
 
-      const call_message_et = z.calling.CallMessageMapper.map_event(event);
-      this._log_message(false, call_message_et, event_date);
+      const callMessageEntity = z.calling.CallMessageMapper.mapEvent(event);
+      this._logMessage(false, callMessageEntity, eventDate);
 
-      this._validate_message_type(call_message_et)
-        .then(conversation_et => {
-          const is_backend_timestamp = source !== z.event.EventRepository.SOURCE.INJECTED;
-          conversation_et.update_timestamp_server(call_message_et.time, is_backend_timestamp);
+      this._validateMessageType(callMessageEntity)
+        .then(conversationEntity => {
+          const isBackendTimestamp = source !== z.event.EventRepository.SOURCE.INJECTED;
+          conversationEntity.update_timestamp_server(callMessageEntity.time, isBackendTimestamp);
         })
         .then(() => {
-          if (z.calling.CallingRepository.supports_calling) {
-            return this._on_call_event_in_supported_browsers(call_message_et, source);
+          if (z.calling.CallingRepository.supportsCalling) {
+            return this._onCallEventInSupportedBrowsers(callMessageEntity, source);
           }
-          this._on_call_event_in_unsupported_browsers(call_message_et, source);
+          this._onCallEventInUnsupportedBrowsers(callMessageEntity, source);
         });
     }
   }
@@ -181,46 +179,46 @@ z.calling.CallingRepository = class CallingRepository {
    * Call event handling for browsers supporting calling.
    *
    * @private
-   * @param {CallMessage} call_message_et - Mapped incoming call message entity
+   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Mapped incoming call message entity
    * @param {z.event.EventRepository.SOURCE} source - Source of event
    * @returns {undefined} No return value
    */
-  _on_call_event_in_supported_browsers(call_message_et, source) {
-    const message_type = call_message_et.type;
+  _onCallEventInSupportedBrowsers(callMessageEntity, source) {
+    const messageType = callMessageEntity.type;
 
-    switch (message_type) {
+    switch (messageType) {
       case z.calling.enum.CALL_MESSAGE_TYPE.CANCEL:
-        this._on_cancel(call_message_et, source);
+        this._onCancel(callMessageEntity, source);
         break;
       case z.calling.enum.CALL_MESSAGE_TYPE.GROUP_CHECK:
-        this._on_group_check(call_message_et, source);
+        this._onGroupCheck(callMessageEntity, source);
         break;
       case z.calling.enum.CALL_MESSAGE_TYPE.GROUP_LEAVE:
-        this._on_group_leave(call_message_et);
+        this._onGroupLeave(callMessageEntity);
         break;
       case z.calling.enum.CALL_MESSAGE_TYPE.GROUP_SETUP:
-        this._on_group_setup(call_message_et);
+        this._onGroupSetup(callMessageEntity);
         break;
       case z.calling.enum.CALL_MESSAGE_TYPE.GROUP_START:
-        this._on_group_start(call_message_et, source);
+        this._onGroupStart(callMessageEntity, source);
         break;
       case z.calling.enum.CALL_MESSAGE_TYPE.HANGUP:
-        this._on_hangup(call_message_et);
+        this._onHangup(callMessageEntity);
         break;
       case z.calling.enum.CALL_MESSAGE_TYPE.PROP_SYNC:
-        this._on_prop_sync(call_message_et);
+        this._onPropSync(callMessageEntity);
         break;
       case z.calling.enum.CALL_MESSAGE_TYPE.REJECT:
-        this._on_reject(call_message_et);
+        this._onReject(callMessageEntity);
         break;
       case z.calling.enum.CALL_MESSAGE_TYPE.SETUP:
-        this._on_setup(call_message_et, source);
+        this._onSetup(callMessageEntity, source);
         break;
       case z.calling.enum.CALL_MESSAGE_TYPE.UPDATE:
-        this._on_update(call_message_et);
+        this._onUpdate(callMessageEntity);
         break;
       default:
-        this.logger.warn(`Call event of unknown type '${message_type}' was ignored`, call_message_et);
+        this.logger.warn(`Call event of unknown type '${messageType}' was ignored`, callMessageEntity);
     }
   }
 
@@ -228,28 +226,28 @@ z.calling.CallingRepository = class CallingRepository {
    * Call event handling for browsers not supporting calling.
    *
    * @private
-   * @param {CallMessage} call_message_et - Mapped incoming call message entity
+   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Mapped incoming call message entity
    * @param {z.event.EventRepository.SOURCE} source - Source of event
    * @returns {undefined} No return value
    */
-  _on_call_event_in_unsupported_browsers(call_message_et, source) {
-    const {conversation_id, response, type, user_id} = call_message_et;
+  _onCallEventInUnsupportedBrowsers(callMessageEntity, source) {
+    const {response, type, userId} = callMessageEntity;
 
     if (!response) {
       switch (type) {
         case z.calling.enum.CALL_MESSAGE_TYPE.SETUP: {
-          this.inject_activate_event(call_message_et, source);
-          this.user_repository.get_user_by_id(user_id).then(user_et => {
-            amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.UNSUPPORTED_INCOMING_CALL, {
-              call_id: conversation_id,
-              first_name: user_et.name(),
-            });
+          this.injectActivateEvent(callMessageEntity, source);
+          this.userRepository.get_user_by_id(userId).then(userEntity => {
+            const warningOptions = {name: userEntity.name()};
+            const warningType = z.viewModel.WarningsViewModel.TYPE.UNSUPPORTED_INCOMING_CALL;
+
+            amplify.publish(z.event.WebApp.WARNING.SHOW, warningType, warningOptions);
           });
           break;
         }
 
         case z.calling.enum.CALL_MESSAGE_TYPE.CANCEL: {
-          amplify.publish(z.event.WebApp.WARNING.DISMISS, z.ViewModel.WarningType.UNSUPPORTED_INCOMING_CALL);
+          amplify.publish(z.event.WebApp.WARNING.DISMISS, z.viewModel.WarningsViewModel.TYPE.UNSUPPORTED_INCOMING_CALL);
           break;
         }
 
@@ -264,21 +262,24 @@ z.calling.CallingRepository = class CallingRepository {
    * Call cancel message handling.
    *
    * @private
-   * @param {CallMessage} call_message_et - Call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.CANCEL
+   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.CANCEL
    * @param {z.event.EventRepository.SOURCE} source - Source of event
    * @returns {undefined} No return value
    */
-  _on_cancel(call_message_et, source) {
-    const {client_id, conversation_id, response, user_id} = call_message_et;
+  _onCancel(callMessageEntity, source) {
+    const {clientId, conversationId, response, userId} = callMessageEntity;
 
     if (!response) {
-      this.get_call_by_id(conversation_id)
-        .then(call_et => call_et.verify_session_id(call_message_et))
-        .then(call_et => call_et.delete_participant(user_id, client_id, z.calling.enum.TERMINATION_REASON.OTHER_USER))
-        .then(call_et => call_et.deactivate_call(call_message_et, z.calling.enum.TERMINATION_REASON.OTHER_USER))
+      this.getCallById(conversationId)
+        .then(callEntity => callEntity.verifySessionId(callMessageEntity))
+        .then(callEntity => {
+          return callEntity.deleteParticipant(userId, clientId, z.calling.enum.TERMINATION_REASON.OTHER_USER);
+        })
+        .then(callEntity => callEntity.deactivateCall(callMessageEntity, z.calling.enum.TERMINATION_REASON.OTHER_USER))
         .catch(error => {
-          if (error.type !== z.calling.CallError.TYPE.NOT_FOUND) {
-            this.inject_deactivate_event(call_message_et, source);
+          const isNotFound = error.type === z.calling.CallError.TYPE.NOT_FOUND;
+          if (!isNotFound) {
+            this.injectDeactivateEvent(callMessageEntity, source);
             throw error;
           }
         });
@@ -289,124 +290,124 @@ z.calling.CallingRepository = class CallingRepository {
    * call group check message handling.
    *
    * @private
-   * @param {CallMessage} call_message_et - call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.GROUP_CHECK
+   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.GROUP_CHECK
    * @param {z.event.EventRepository.SOURCE} source - Source of event
    * @returns {undefined} No return value
    */
-  _on_group_check(call_message_et, source) {
-    this.get_call_by_id(call_message_et.conversation_id)
-      .then(call_et => call_et.schedule_group_check())
-      .catch(error => this._validate_incoming_call(call_message_et, source, error));
+  _onGroupCheck(callMessageEntity, source) {
+    this.getCallById(callMessageEntity.conversationId)
+      .then(callEntity => callEntity.scheduleGroupCheck())
+      .catch(error => this._validateIncomingCall(callMessageEntity, source, error));
   }
 
   /**
    * call group leave message handling.
    *
    * @private
-   * @param {CallMessage} call_message_et - call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.GROUP_LEAVE
-   * @param {z.calling.enum.TERMINATION_REASON} [termination_reason=z.calling.enum.TERMINATION_REASON.OTHER_USER] - Reason for participant to leave
+   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.GROUP_LEAVE
+   * @param {z.calling.enum.TERMINATION_REASON} [terminationReason=z.calling.enum.TERMINATION_REASON.OTHER_USER] - Reason for participant to leave
    * @returns {undefined} No return value
    */
-  _on_group_leave(call_message_et, termination_reason = z.calling.enum.TERMINATION_REASON.OTHER_USER) {
-    const {conversation_id, client_id, user_id} = call_message_et;
+  _onGroupLeave(callMessageEntity, terminationReason = z.calling.enum.TERMINATION_REASON.OTHER_USER) {
+    const {conversationId, clientId, userId} = callMessageEntity;
 
-    this.get_call_by_id(conversation_id)
-      .then(call_et => {
-        const is_outgoing = call_et.state() === z.calling.enum.CALL_STATE.OUTGOING;
-        if (is_outgoing) {
-          throw new z.calling.CallError(
-            z.calling.CallError.TYPE.WRONG_SENDER,
-            'Remote user tried to leave outgoing call'
-          );
+    this.getCallById(conversationId)
+      .then(callEntity => {
+        const isOutgoingCall = callEntity.state() === z.calling.enum.CALL_STATE.OUTGOING;
+        if (isOutgoingCall) {
+          throw new z.calling.CallError(z.calling.CallError.TYPE.WRONG_SENDER, 'Remote user leaving outgoing call');
         }
 
-        const is_self_user = user_id === this.self_user_id();
-        if (is_self_user) {
-          call_et.self_user_joined(false);
-          return call_et;
+        const isSelfUser = userId === this.selfUserId();
+        if (isSelfUser) {
+          callEntity.selfUserJoined(false);
+          return callEntity;
         }
 
-        return call_et.delete_participant(user_id, client_id, termination_reason);
+        return callEntity.deleteParticipant(userId, clientId, terminationReason);
       })
-      .then(call_et => call_et.participant_left(call_message_et, termination_reason))
-      .catch(this._throw_message_error);
+      .then(callEntity => callEntity.participantLeft(callMessageEntity, terminationReason))
+      .catch(this._throwMessageError);
   }
 
   /**
    * call group setup message handling.
    *
    * @private
-   * @param {CallMessage} call_message_et - call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.GROUP_SETUP
+   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.GROUP_SETUP
    * @returns {undefined} No return value
    */
-  _on_group_setup(call_message_et) {
-    const {conversation_id, response, user_id} = call_message_et;
+  _onGroupSetup(callMessageEntity) {
+    const {conversationId, response, userId} = callMessageEntity;
 
-    this.get_call_by_id(conversation_id)
-      .then(call_et => {
+    this.getCallById(conversationId)
+      .then(callEntity => {
         // @todo Grant message for ongoing call
 
-        this._validate_message_destination(call_et, call_message_et);
-        call_et.set_remote_version(call_message_et);
-        call_et.add_or_update_participant(user_id, response !== true, call_message_et);
+        this._validateMessageDestination(callEntity, callMessageEntity);
+        callEntity.setRemoteVersion(callMessageEntity);
+        const shouldNegotiate = response !== true;
+        return callEntity.addOrUpdateParticipant(userId, shouldNegotiate, callMessageEntity);
       })
-      .catch(this._throw_message_error);
+      .catch(this._throwMessageError);
   }
 
   /**
    * call group start message handling.
    *
    * @private
-   * @param {CallMessage} call_message_et - call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.GROUP_START
+   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.GROUP_START
    * @param {z.event.EventRepository.SOURCE} source - Source of event
    * @returns {undefined} No return value
    */
-  _on_group_start(call_message_et, source) {
-    const {conversation_id, user_id} = call_message_et;
+  _onGroupStart(callMessageEntity, source) {
+    const {conversationId, userId} = callMessageEntity;
 
-    this.get_call_by_id(conversation_id)
-      .then(call_et => {
+    this.getCallById(conversationId)
+      .then(callEntity => {
         // @todo Grant message for ongoing call
 
-        const is_self_user = user_id === this.self_user_id();
-        if (is_self_user && !call_et.self_client_joined()) {
-          call_et.self_user_joined(true);
-          call_et.was_connected = true;
-          return call_et.state(z.calling.enum.CALL_STATE.REJECTED);
+        const isSelfUser = userId === this.selfUserId();
+        if (isSelfUser && !callEntity.selfClientJoined()) {
+          callEntity.selfUserJoined(true);
+          callEntity.wasConnected = true;
+          return callEntity.state(z.calling.enum.CALL_STATE.REJECTED);
         }
 
-        if (call_et.state() === z.calling.enum.CALL_STATE.OUTGOING) {
-          call_et.state(z.calling.enum.CALL_STATE.CONNECTING);
+        const isOutgoingCall = callEntity.state() === z.calling.enum.CALL_STATE.OUTGOING;
+        if (isOutgoingCall) {
+          callEntity.state(z.calling.enum.CALL_STATE.CONNECTING);
         }
 
         // Add the correct participant, start negotiating
-        call_et.add_or_update_participant(user_id, call_et.self_client_joined(), call_message_et);
+        const shouldNegotiate = callEntity.selfClientJoined();
+        return callEntity.addOrUpdateParticipant(userId, shouldNegotiate, callMessageEntity);
       })
-      .catch(error => this._validate_incoming_call(call_message_et, source, error));
+      .catch(error => this._validateIncomingCall(callMessageEntity, source, error));
   }
 
   /**
    * call hangup message handling.
    *
    * @private
-   * @param {CallMessage} call_message_et - call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.HANGUP
-   * @param {z.calling.enum.TERMINATION_REASON} termination_reason - Reason for the participant to hangup
+   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.HANGUP
+   * @param {z.calling.enum.TERMINATION_REASON} terminationReason - Reason for the participant to hangup
    * @returns {undefined} No return value
    */
-  _on_hangup(call_message_et, termination_reason = z.calling.enum.TERMINATION_REASON.OTHER_USER) {
-    const {conversation_id, client_id, response, user_id} = call_message_et;
+  _onHangup(callMessageEntity, terminationReason = z.calling.enum.TERMINATION_REASON.OTHER_USER) {
+    const {conversationId, clientId, response, userId} = callMessageEntity;
 
     if (!response) {
-      this.get_call_by_id(conversation_id)
-        .then(call_et => call_et.verify_session_id(call_message_et))
-        .then(call_et => this._confirm_call_message(call_et, call_message_et))
-        .then(call_et => call_et.delete_participant(user_id, client_id, termination_reason))
-        .then(call_et => {
-          if (!call_et.is_group) {
-            call_et.deactivate_call(call_message_et, termination_reason);
+      this.getCallById(conversationId)
+        .then(callEntity => callEntity.verifySessionId(callMessageEntity))
+        .then(callEntity => this._confirmCallMessage(callEntity, callMessageEntity))
+        .then(callEntity => callEntity.deleteParticipant(userId, clientId, terminationReason))
+        .then(callEntity => {
+          if (!callEntity.isGroup) {
+            callEntity.deactivateCall(callMessageEntity, terminationReason);
           }
         })
-        .catch(this._throw_message_error);
+        .catch(this._throwMessageError);
     }
   }
 
@@ -414,92 +415,94 @@ z.calling.CallingRepository = class CallingRepository {
    * call prop-sync message handling.
    *
    * @private
-   * @param {CallMessage} call_message_et - call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.SETUP
+   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.SETUP
    * @returns {undefined} No return value
    */
-  _on_prop_sync(call_message_et) {
-    const {conversation_id, user_id} = call_message_et;
+  _onPropSync(callMessageEntity) {
+    const {conversationId, userId} = callMessageEntity;
 
-    this.get_call_by_id(conversation_id)
-      .then(call_et => call_et.verify_session_id(call_message_et))
-      .then(call_et => this._confirm_call_message(call_et, call_message_et))
-      .then(call_et => call_et.add_or_update_participant(user_id, false, call_message_et))
-      .catch(this._throw_message_error);
+    this.getCallById(conversationId)
+      .then(callEntity => callEntity.verifySessionId(callMessageEntity))
+      .then(callEntity => this._confirmCallMessage(callEntity, callMessageEntity))
+      .then(callEntity => callEntity.addOrUpdateParticipant(userId, false, callMessageEntity))
+      .catch(this._throwMessageError);
   }
 
   /**
    * call reject message handling.
    *
    * @private
-   * @param {CallMessage} call_message_et - call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.REJECT
+   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.REJECT
    * @returns {undefined} No return value
    */
-  _on_reject(call_message_et) {
-    const {conversation_id, user_id} = call_message_et;
+  _onReject(callMessageEntity) {
+    const {conversationId, userId} = callMessageEntity;
 
-    this.get_call_by_id(conversation_id)
-      .then(call_et => {
-        const is_self_user = user_id !== this.self_user_id();
-        if (!is_self_user) {
+    this.getCallById(conversationId)
+      .then(callEntity => {
+        const isSelfUser = userId !== this.selfUserId();
+        if (!isSelfUser) {
           throw new z.calling.CallError(z.calling.CallError.TYPE.WRONG_SENDER, 'Call rejected by wrong user');
         }
 
-        if (!call_et.self_client_joined()) {
-          this.logger.info(`Rejecting call in conversation '${conversation_id}'`, call_et);
-          call_et.state(z.calling.enum.CALL_STATE.REJECTED);
-          this.media_stream_handler.reset_media_stream();
+        if (!callEntity.selfClientJoined()) {
+          this.logger.info(`Rejecting call in conversation '${conversationId}'`, callEntity);
+          callEntity.state(z.calling.enum.CALL_STATE.REJECTED);
+          this.mediaStreamHandler.reset_media_stream();
         }
       })
-      .catch(this._throw_message_error);
+      .catch(this._throwMessageError);
   }
 
   /**
    * call setup message handling.
    *
    * @private
-   * @param {CallMessage} call_message_et - call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.SETUP
+   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.SETUP
    * @param {z.event.EventRepository.SOURCE} source - Source of event
    * @returns {undefined} No return value
    */
-  _on_setup(call_message_et, source) {
-    const {conversation_id, response, user_id} = call_message_et;
+  _onSetup(callMessageEntity, source) {
+    const {conversationId, response, userId} = callMessageEntity;
 
-    this.get_call_by_id(conversation_id)
-      .then(call_et => {
-        call_et.set_remote_version(call_message_et);
+    this.getCallById(conversationId)
+      .then(callEntity => {
+        callEntity.setRemoteVersion(callMessageEntity);
 
-        if (response && user_id === this.self_user_id()) {
-          const conversation_name = call_et.conversation_et.display_name();
-          this.logger.info(`Incoming call in conversation '${conversation_name}' accepted on other device`);
-          return this.delete_call(conversation_id);
+        const isSelfUser = userId === this.selfUserId();
+        if (response && isSelfUser) {
+          const conversationName = callEntity.conversationEntity.display_name();
+          this.logger.info(`Incoming call in conversation '${conversationName}' accepted on other device`);
+          return this.deleteCall(conversationId);
         }
 
-        return call_et.add_or_update_participant(user_id, response !== true, call_message_et).then(() => {
+        const shouldNegotiate = response !== true;
+        return callEntity.addOrUpdateParticipant(userId, shouldNegotiate, callMessageEntity).then(() => {
           if (response) {
-            call_et.state(z.calling.enum.CALL_STATE.CONNECTING);
+            callEntity.state(z.calling.enum.CALL_STATE.CONNECTING);
           }
         });
       })
-      .catch(error => this._validate_incoming_call(call_message_et, source, error));
+      .catch(error => this._validateIncomingCall(callMessageEntity, source, error));
   }
 
   /**
    * call setup message handling.
    *
    * @private
-   * @param {CallMessage} call_message_et - call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.SETUP
+   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.SETUP
    * @returns {undefined} No return value
    */
-  _on_update(call_message_et) {
-    const {conversation_id, user_id} = call_message_et;
+  _onUpdate(callMessageEntity) {
+    const {conversationId, userId} = callMessageEntity;
 
-    this.get_call_by_id(conversation_id)
-      .then(call_et => {
-        this._validate_message_destination(call_et, call_message_et);
-        return call_et.verify_session_id(call_message_et);
+    this.getCallById(conversationId)
+      .then(callEntity => {
+        this._validateMessageDestination(callEntity, callMessageEntity);
+        return callEntity.verifySessionId(callMessageEntity);
       })
-      .then(call_et => call_et.add_or_update_participant(user_id, false, call_message_et))
-      .catch(this._throw_message_error);
+      .then(callEntity => callEntity.addOrUpdateParticipant(userId, false, callMessageEntity))
+      .catch(this._throwMessageError);
   }
 
   /**
@@ -509,10 +512,11 @@ z.calling.CallingRepository = class CallingRepository {
    * @param {z.calling.CallError|Error} error - Error thrown during call message handling
    * @returns {undefined} No return value
    */
-  _throw_message_error(error) {
-    const expected_error_types = [z.calling.CallError.TYPE.MISTARGETED_MESSAGE, z.calling.CallError.TYPE.NOT_FOUND];
+  _throwMessageError(error) {
+    const expectedErrorTypes = [z.calling.CallError.TYPE.MISTARGETED_MESSAGE, z.calling.CallError.TYPE.NOT_FOUND];
+    const isExpectedError = expectedErrorTypes.includes(error.type);
 
-    if (!expected_error_types.includes(error.type)) {
+    if (!isExpectedError) {
       throw error;
     }
   }
@@ -520,62 +524,64 @@ z.calling.CallingRepository = class CallingRepository {
   /**
    * Verify validity of incoming call.
    *
-   * @param {CallMessage} call_message_et - call message to validate
+   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message to validate
    * @param {z.event.EventRepository.SOURCE} source - Source of event
    * @param {z.calling.CallError|Error} error - Error thrown during call message handling
    * @returns {undefined} No return value
    */
-  _validate_incoming_call(call_message_et, source, error) {
-    this._throw_message_error(error);
+  _validateIncomingCall(callMessageEntity, source, error) {
+    this._throwMessageError(error);
 
-    const {conversation_id, response, type, user_id} = call_message_et;
+    const {conversationId, response, type, userId} = callMessageEntity;
 
-    const is_group_check = type === z.calling.enum.CALL_MESSAGE_TYPE.GROUP_CHECK;
-    const is_self_user = user_id === this.self_user_id();
-    const valid_message = response === is_group_check;
+    const isTypeGroupCheck = type === z.calling.enum.CALL_MESSAGE_TYPE.GROUP_CHECK;
+    const isSelfUser = userId === this.selfUserId();
+    const validMessage = response === isTypeGroupCheck;
 
-    if (!is_self_user && valid_message) {
-      const event_from_stream = source === z.event.EventRepository.SOURCE.STREAM;
-      const silent_call = is_group_check || event_from_stream;
-      const promises = [this._create_incoming_call(call_message_et, source, silent_call)];
+    if (!isSelfUser && validMessage) {
+      const eventFromStream = source === z.event.EventRepository.SOURCE.STREAM;
+      const silentCall = isTypeGroupCheck || eventFromStream;
+      const promises = [this._createIncomingCall(callMessageEntity, source, silentCall)];
 
-      if (!event_from_stream) {
-        promises.push(
-          this.conversation_repository.grantMessage(conversation_id, z.ViewModel.MODAL_CONSENT_TYPE.INCOMING_CALL, [
-            user_id,
-          ])
-        );
+      if (!eventFromStream) {
+        const consentType = z.conversation.ConversationRepository.CONSENT_TYPE.INCOMING_CALL;
+        const promise = this.conversationRepository.grantMessage(conversationId, consentType, [userId], 'call');
+        promises.push(promise);
       }
 
       Promise.all(promises)
-        .then(([call_et, granted_call]) => {
-          if (granted_call) {
-            const media_type = call_et.is_remote_video_send() ? z.media.MediaType.AUDIO_VIDEO : z.media.MediaType.AUDIO;
-            this.join_call(conversation_id, media_type);
+        .then(([callEntity, grantedCall]) => {
+          if (grantedCall) {
+            const mediaType = callEntity.isRemoteVideoSend() ? z.media.MediaType.AUDIO_VIDEO : z.media.MediaType.AUDIO;
+            this.joinCall(conversationId, mediaType);
           }
         })
         .catch(_error => {
-          if (_error.type !== z.conversation.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION) {
+          const isDegraded = _error.type === z.conversation.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION;
+          if (!isDegraded) {
             throw _error;
           }
 
-          this.reject_call(conversation_id);
+          this.rejectCall(conversationId);
         });
     }
   }
 
   /**
    * Validate that content of call message is targeted at local client.
-   * @param {Call} call_et - Call the message belongs to
-   * @param {CallMessage} call_message_et - call message to validate
+   * @param {z.calling.entities.CallEntity} callEntity - Call the message belongs to
+   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message to validate
    * @returns {undefined} Resolves if the message is valid
    */
-  _validate_message_destination(call_et, call_message_et) {
-    if (call_et.is_group) {
-      const {dest_client_id, dest_user_id, type} = call_message_et;
+  _validateMessageDestination(callEntity, callMessageEntity) {
+    if (callEntity.isGroup) {
+      const {destinationClientId: clientId, destinationUserId: userId, type} = callMessageEntity;
 
-      if (dest_user_id !== this.self_user_id() || dest_client_id !== this.client_repository.currentClient().id) {
-        this.logger.log(`Ignored '${type}' call message for client '${dest_client_id}' of user '${dest_user_id}'`);
+      const isSelfUser = userId === this.selfUserId();
+      const isCurrentClient = clientId === this.clientRepository.currentClient().id;
+      const mistargetedMessage = !isSelfUser || !isCurrentClient;
+      if (mistargetedMessage) {
+        this.logger.log(`Ignored '${type}' call message for targeted at client '${clientId}' of user '${userId}'`);
         throw new z.calling.CallError(z.calling.CallError.TYPE.MISTARGETED_MESSAGE);
       }
     }
@@ -583,35 +589,35 @@ z.calling.CallingRepository = class CallingRepository {
 
   /**
    * Validate that type of call message matches conversation type.
-   * @param {CallMessage} call_message_et - call message to validate
+   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message to validate
    * @returns {Promise} Resolves if the message is valid
    */
-  _validate_message_type(call_message_et) {
-    const {conversation_id, type} = call_message_et;
+  _validateMessageType(callMessageEntity) {
+    const {conversationId, type} = callMessageEntity;
 
-    return this.conversation_repository.get_conversation_by_id(conversation_id).then(conversation_et => {
-      if (conversation_et.is_one2one()) {
-        const group_message_types = [
+    return this.conversationRepository.get_conversation_by_id(conversationId).then(conversationEntity => {
+      if (conversationEntity.is_one2one()) {
+        const groupMessageTypes = [
           z.calling.enum.CALL_MESSAGE_TYPE.GROUP_CHECK,
           z.calling.enum.CALL_MESSAGE_TYPE.GROUP_LEAVE,
           z.calling.enum.CALL_MESSAGE_TYPE.GROUP_SETUP,
           z.calling.enum.CALL_MESSAGE_TYPE.GROUP_START,
         ];
 
-        if (group_message_types.includes(type)) {
+        if (groupMessageTypes.includes(type)) {
           throw new z.calling.CallError(z.calling.CallError.TYPE.WRONG_CONVERSATION_TYPE);
         }
-      } else if (conversation_et.is_group()) {
-        const one2one_message_types = [z.calling.enum.CALL_MESSAGE_TYPE.SETUP];
+      } else if (conversationEntity.is_group()) {
+        const one2oneMessageTypes = [z.calling.enum.CALL_MESSAGE_TYPE.SETUP];
 
-        if (one2one_message_types.includes(type)) {
+        if (one2oneMessageTypes.includes(type)) {
           throw new z.calling.CallError(z.calling.CallError.TYPE.WRONG_CONVERSATION_TYPE);
         }
       } else {
         throw new z.calling.CallError(z.calling.CallError.TYPE.WRONG_CONVERSATION_TYPE);
       }
 
-      return conversation_et;
+      return conversationEntity;
     });
   }
 
@@ -622,104 +628,107 @@ z.calling.CallingRepository = class CallingRepository {
   /**
    * Send an call event.
    *
-   * @param {z.entity.Conversation} conversation_et - Conversation to send message in
-   * @param {CallMessage} call_message_et - call message entity
+   * @param {z.entity.Conversation} conversationEntity - Conversation to send message in
+   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity
    * @returns {Promise} Resolves when the event has been sent
    */
-  send_call_message(conversation_et, call_message_et) {
-    if (!_.isObject(call_message_et)) {
+  sendCallMessage(conversationEntity, callMessageEntity) {
+    if (!_.isObject(callMessageEntity)) {
       throw new z.calling.CallError(z.calling.CallError.TYPE.WRONG_PAYLOAD_FORMAT);
     }
 
-    const {conversation_id, remote_user_id, type} = call_message_et;
+    const {conversationId, remoteUserId, type} = callMessageEntity;
 
-    return this.get_call_by_id(conversation_id || conversation_et.id)
-      .then(call_et => {
+    return this.getCallById(conversationId || conversationEntity.id)
+      .then(callEntity => {
         if (!CallingRepository.CONFIG.DATA_CHANNEL_MESSAGE_TYPES.includes(type)) {
           throw new z.calling.CallError(z.calling.CallError.TYPE.NO_DATA_CHANNEL);
         }
 
-        return call_et.get_participant_by_id(remote_user_id);
+        return callEntity.getParticipantById(remoteUserId);
       })
-      .then(({flow_et}) => flow_et.send_message(call_message_et))
+      .then(({flowEntity}) => flowEntity.sendMessage(callMessageEntity))
       .catch(error => {
-        const expected_error_types = [z.calling.CallError.TYPE.NO_DATA_CHANNEL, z.calling.CallError.TYPE.NOT_FOUND];
+        const expectedErrorTypes = [z.calling.CallError.TYPE.NO_DATA_CHANNEL, z.calling.CallError.TYPE.NOT_FOUND];
+        const isExpectedError = expectedErrorTypes.includes(error.type);
 
-        if (!expected_error_types.includes(error.type)) {
+        if (!isExpectedError) {
           throw error;
         }
 
-        return this._limit_message_recipients(call_message_et).then(({precondition_option, recipients}) => {
-          if (type === z.calling.enum.CALL_MESSAGE_TYPE.HANGUP) {
-            call_message_et.type = z.calling.enum.CALL_MESSAGE_TYPE.CANCEL;
+        return this._limitMessageRecipients(callMessageEntity).then(({preconditionOption, recipients}) => {
+          const isTypeHangup = type === z.calling.enum.CALL_MESSAGE_TYPE.HANGUP;
+          if (isTypeHangup) {
+            callMessageEntity.type = z.calling.enum.CALL_MESSAGE_TYPE.CANCEL;
           }
 
-          return this.conversation_repository.send_e_call(
-            conversation_et,
-            call_message_et,
+          return this.conversationRepository.send_e_call(
+            conversationEntity,
+            callMessageEntity,
             recipients,
-            precondition_option
+            preconditionOption
           );
         });
       })
-      .then(() => this._log_message(true, call_message_et));
+      .then(() => this._logMessage(true, callMessageEntity));
   }
 
   /**
    *
    * @private
-   * @param {Call} call_et - Call entity
-   * @param {CallMessage} incoming_call_message_et - Incoming call message
+   * @param {z.calling.entities.CallEntity} callEntity - Call entity
+   * @param {z.calling.entities.CallMessageEntity} incomingCallMessageEntity - Incoming call message
    * @returns {Promise} Resolves with the call
    */
-  _confirm_call_message(call_et, incoming_call_message_et) {
-    const {response} = incoming_call_message_et;
+  _confirmCallMessage(callEntity, incomingCallMessageEntity) {
+    const {response} = incomingCallMessageEntity;
 
-    if (response || !call_et.self_client_joined()) {
-      return Promise.resolve(call_et);
+    if (response || !callEntity.selfClientJoined()) {
+      return Promise.resolve(callEntity);
     }
 
-    return call_et.confirm_message(incoming_call_message_et).then(() => call_et);
+    return callEntity.confirmMessage(incomingCallMessageEntity).then(() => callEntity);
   }
 
   /**
    * Limit the message recipients for a call message.
    *
    * @private
-   * @param {CallMessage} call_message_et - Call message to target at clients
+   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message to target at clients
    * @returns {Promise} Resolves with the client user map and precondition option
    */
-  _limit_message_recipients(call_message_et) {
-    const {remote_client_id, remote_user, remote_user_id, response, type} = call_message_et;
-    let recipients_promise;
+  _limitMessageRecipients(callMessageEntity) {
+    const {remoteClientId, remoteUser, remoteUserId, response, type} = callMessageEntity;
+    let recipientsPromise;
 
-    if (type === z.calling.enum.CALL_MESSAGE_TYPE.REJECT) {
-      recipients_promise = Promise.resolve({self_user_et: this.user_repository.self()});
-    } else if (remote_user) {
-      recipients_promise = Promise.resolve({remote_user_et: remote_user, self_user_et: this.user_repository.self()});
+    const isTypeReject = type === z.calling.enum.CALL_MESSAGE_TYPE.REJECT;
+    if (isTypeReject) {
+      recipientsPromise = Promise.resolve({selfUserEntity: this.userRepository.self()});
+    } else if (remoteUser) {
+      recipientsPromise = Promise.resolve({remoteUserEntity: remoteUser, selfUserEntity: this.userRepository.self()});
     } else {
-      recipients_promise = this.user_repository
-        .get_user_by_id(remote_user_id)
-        .then(remote_user_et => ({remote_user_et: remote_user_et, self_user_et: this.user_repository.self()}));
+      recipientsPromise = this.userRepository
+        .get_user_by_id(remoteUserId)
+        .then(remoteUserEntity => ({remoteUserEntity, selfUserEntity: this.userRepository.self()}));
     }
 
-    return recipients_promise.then(({remote_user_et, self_user_et}) => {
-      let precondition_option;
+    return recipientsPromise.then(({remoteUserEntity, selfUserEntity}) => {
+      let preconditionOption;
       let recipients;
 
       switch (type) {
         case z.calling.enum.CALL_MESSAGE_TYPE.CANCEL: {
           if (response) {
             // Send to remote client that initiated call
-            precondition_option = true;
+            preconditionOption = true;
             recipients = {
-              [remote_user_et.id]: [`${remote_client_id}`],
+              [remoteUserEntity.id]: [`${remoteClientId}`],
             };
           } else {
             // Send to all clients of remote user
-            precondition_option = [remote_user_et.id];
+            preconditionOption = [remoteUserEntity.id];
             recipients = {
-              [remote_user_et.id]: remote_user_et.devices().map(device => device.id),
+              [remoteUserEntity.id]: remoteUserEntity.devices().map(device => device.id),
             };
           }
           break;
@@ -730,10 +739,10 @@ z.calling.CallingRepository = class CallingRepository {
         case z.calling.enum.CALL_MESSAGE_TYPE.PROP_SYNC:
         case z.calling.enum.CALL_MESSAGE_TYPE.UPDATE: {
           // Send to remote client that call is connected with
-          if (remote_client_id) {
-            precondition_option = true;
+          if (remoteClientId) {
+            preconditionOption = true;
             recipients = {
-              [remote_user_et.id]: [`${remote_client_id}`],
+              [remoteUserEntity.id]: [`${remoteClientId}`],
             };
           }
           break;
@@ -741,9 +750,9 @@ z.calling.CallingRepository = class CallingRepository {
 
         case z.calling.enum.CALL_MESSAGE_TYPE.REJECT: {
           // Send to all clients of self user
-          precondition_option = [self_user_et.id];
+          preconditionOption = [selfUserEntity.id];
           recipients = {
-            [self_user_et.id]: self_user_et.devices().map(device => device.id),
+            [selfUserEntity.id]: selfUserEntity.devices().map(device => device.id),
           };
           break;
         }
@@ -751,16 +760,16 @@ z.calling.CallingRepository = class CallingRepository {
         case z.calling.enum.CALL_MESSAGE_TYPE.SETUP: {
           if (response) {
             // Send to remote client that initiated call and all clients of self user
-            precondition_option = [self_user_et.id];
+            preconditionOption = [selfUserEntity.id];
             recipients = {
-              [remote_user_et.id]: [`${remote_client_id}`],
-              [self_user_et.id]: self_user_et.devices().map(device => device.id),
+              [remoteUserEntity.id]: [`${remoteClientId}`],
+              [selfUserEntity.id]: selfUserEntity.devices().map(device => device.id),
             };
           } else {
             // Send to all clients of remote user
-            precondition_option = [remote_user_et.id];
+            preconditionOption = [remoteUserEntity.id];
             recipients = {
-              [remote_user_et.id]: remote_user_et.devices().map(device => device.id),
+              [remoteUserEntity.id]: remoteUserEntity.devices().map(device => device.id),
             };
           }
           break;
@@ -771,7 +780,7 @@ z.calling.CallingRepository = class CallingRepository {
         }
       }
 
-      return {precondition_option: precondition_option, recipients: recipients};
+      return {preconditionOption, recipients};
     });
   }
 
@@ -781,20 +790,21 @@ z.calling.CallingRepository = class CallingRepository {
 
   /**
    * Delete an call.
-   * @param {string} conversation_id - ID of conversation to delete call from
+   * @param {string} conversationId - ID of conversation to delete call from
    * @returns {undefined} No return value
    */
-  delete_call(conversation_id) {
-    this.get_call_by_id(conversation_id)
-      .then(call_et => {
-        this.logger.info(`Deleting call in conversation '${conversation_id}'`, call_et);
+  deleteCall(conversationId) {
+    this.getCallById(conversationId)
+      .then(callEntity => {
+        this.logger.info(`Deleting call in conversation '${conversationId}'`, callEntity);
 
-        call_et.delete_call();
-        this.calls.remove(call => call.id === conversation_id);
-        this.media_stream_handler.reset_media_stream();
+        callEntity.deleteCall();
+        this.calls.remove(call => call.id === conversationId);
+        this.mediaStreamHandler.reset_media_stream();
       })
       .catch(error => {
-        if (error.type !== z.calling.CallError.TYPE.NOT_FOUND) {
+        const isNotFound = error.type === z.calling.CallError.TYPE.NOT_FOUND;
+        if (!isNotFound) {
           throw error;
         }
       });
@@ -803,58 +813,60 @@ z.calling.CallingRepository = class CallingRepository {
   /**
    * Join a call.
    *
-   * @param {string} conversation_id - ID of conversation to join call in
-   * @param {z.media.MediaType} media_type - Media type for this call
+   * @param {string} conversationId - ID of conversation to join call in
+   * @param {z.media.MediaType} mediaType - Media type for this call
    * @returns {undefined} No return value
    */
-  join_call(conversation_id, media_type) {
-    this.get_call_by_id(conversation_id)
-      .then(call_et => ({call_et: call_et, call_state: call_et.state()}))
+  joinCall(conversationId, mediaType) {
+    this.getCallById(conversationId)
+      .then(callEntity => ({callEntity, callState: callEntity.state()}))
       .catch(error => {
-        if (error.type !== z.calling.CallError.TYPE.NOT_FOUND) {
+        const isNotFound = error.type === z.calling.CallError.TYPE.NOT_FOUND;
+        if (!isNotFound) {
           throw error;
         }
 
-        return {call_state: z.calling.enum.CALL_STATE.OUTGOING};
+        return {callState: z.calling.enum.CALL_STATE.OUTGOING};
       })
-      .then(({call_et, call_state}) => {
-        return this._check_calling_support(conversation_id, call_state)
-          .then(() => this._check_concurrent_joined_call(conversation_id, call_state))
+      .then(({callEntity, callState}) => {
+        return this._checkCallingSupport(conversationId, callState)
+          .then(() => this._checkConcurrentJoinedCall(conversationId, callState))
           .then(() => {
-            if (call_et) {
-              return call_et;
+            if (callEntity) {
+              return callEntity;
             }
 
-            const video_send = media_type === z.media.MediaType.AUDIO_VIDEO;
-            const prop_sync_payload = z.calling.CallMessageBuilder.create_payload_prop_sync(
-              this.self_state,
-              video_send,
+            const videoSend = mediaType === z.media.MediaType.AUDIO_VIDEO;
+            const propSyncPayload = z.calling.CallMessageBuilder.createPayloadPropSync(
+              this.selfState,
+              videoSend,
               false,
-              {conversation_id: conversation_id}
+              {conversationId}
             );
-            return this._create_outgoing_call(
-              z.calling.CallMessageBuilder.build_prop_sync(false, undefined, prop_sync_payload)
-            );
+            const callMessageEntity = z.calling.CallMessageBuilder.buildPropSync(false, undefined, propSyncPayload);
+            return this._createOutgoingCall(callMessageEntity);
           });
       })
-      .then(call_et => {
-        this.logger.info(`Joining call in conversation '${conversation_id}'`, call_et);
+      .then(callEntity => {
+        this.logger.info(`Joining call in conversation '${conversationId}'`, callEntity);
 
-        call_et.initiate_telemetry(media_type);
-        if (this.media_stream_handler.local_media_stream()) {
-          return call_et;
+        callEntity.initiateTelemetry(mediaType);
+        if (this.mediaStreamHandler.local_media_stream()) {
+          return callEntity;
         }
 
-        return this.media_stream_handler.initiate_media_stream(conversation_id, media_type).then(() => call_et);
+        return this.mediaStreamHandler.initiate_media_stream(conversationId, mediaType).then(() => callEntity);
       })
-      .then(call_et => {
-        call_et.timings.time_step(z.telemetry.calling.CallSetupSteps.STREAM_RECEIVED);
-        call_et.join_call();
+      .then(callEntity => {
+        callEntity.timings.time_step(z.telemetry.calling.CallSetupSteps.STREAM_RECEIVED);
+        callEntity.joinCall();
       })
       .catch(error => {
-        if (error.type !== z.calling.CallError.TYPE.NOT_SUPPORTED) {
-          this.delete_call(conversation_id);
-          if (!(error instanceof z.media.MediaError)) {
+        const isNotSupported = error.type === z.calling.CallError.TYPE.NOT_SUPPORTED;
+        if (!isNotSupported) {
+          this.deleteCall(conversationId);
+          const isMediaError = error instanceof z.media.MediaError;
+          if (!isMediaError) {
             throw error;
           }
         }
@@ -864,27 +876,27 @@ z.calling.CallingRepository = class CallingRepository {
   /**
    * User action to leave an call.
    *
-   * @param {string} conversation_id - ID of conversation to leave call in
-   * @param {z.calling.enum.TERMINATION_REASON} termination_reason - Reason for call termination
+   * @param {string} conversationId - ID of conversation to leave call in
+   * @param {z.calling.enum.TERMINATION_REASON} terminationReason - Reason for call termination
    * @returns {undefined} No return value
    */
-  leave_call(conversation_id, termination_reason) {
-    this.get_call_by_id(conversation_id)
-      .then(call_et => {
-        this.logger.info(
-          `Leaving call in conversation '${conversation_id}' triggered by '${termination_reason}'`,
-          call_et
-        );
+  leaveCall(conversationId, terminationReason) {
+    this.getCallById(conversationId)
+      .then(callEntity => {
+        const logMessage = `Leaving call in conversation '${conversationId}' triggered by '${terminationReason}'`;
+        this.logger.info(logMessage, callEntity);
 
-        if (call_et.state() !== z.calling.enum.CALL_STATE.ONGOING) {
-          termination_reason = undefined;
+        const isOngoingCall = callEntity.state() === z.calling.enum.CALL_STATE.ONGOING;
+        if (!isOngoingCall) {
+          terminationReason = undefined;
         }
 
-        this.media_stream_handler.release_media_stream();
-        call_et.leave_call(termination_reason);
+        this.mediaStreamHandler.release_media_stream();
+        callEntity.leaveCall(terminationReason);
       })
       .catch(error => {
-        if (error.type !== z.calling.CallError.TYPE.NOT_FOUND) {
+        const isNotFound = error.type === z.calling.CallError.TYPE.NOT_FOUND;
+        if (!isNotFound) {
           throw error;
         }
       });
@@ -893,35 +905,43 @@ z.calling.CallingRepository = class CallingRepository {
   /**
    * Remove a participant from an call if he was removed from the group.
    *
-   * @param {string} conversation_id - ID of conversation for which the user should be removed from the call
-   * @param {string} user_id - ID of user to be removed
+   * @param {z.calling.entities.CallEntity} callEntity - Call entity
+   * @param {string} userId - ID of user to be removed
    * @returns {undefined} No return value
    */
-  participant_left(conversation_id, user_id) {
-    const additional_payload = z.calling.CallMessageBuilder.create_payload(
-      conversation_id,
-      this.self_user_id(),
-      user_id
-    );
-    const call_message_et = z.calling.CallMessageBuilder.build_group_leave(false, this.session_id, additional_payload);
+  removeParticipant(callEntity, userId) {
+    callEntity
+      .getParticipantById(userId)
+      .then(() => {
+        const {id, sessionId} = callEntity;
+        const additionalPayload = z.calling.CallMessageBuilder.createPayload(id, this.selfUserId(), userId);
+        const callMessageEntity = z.calling.CallMessageBuilder.buildGroupLeave(false, sessionId, additionalPayload);
 
-    this._on_group_leave(call_message_et, z.calling.enum.TERMINATION_REASON.MEMBER_LEAVE);
+        this._onGroupLeave(callMessageEntity, z.calling.enum.TERMINATION_REASON.MEMBER_LEAVE);
+      })
+      .catch(error => {
+        const isNotFound = error.type === z.calling.CallError.TYPE.NOT_FOUND;
+        if (!isNotFound) {
+          throw error;
+        }
+      });
   }
 
   /**
    * User action to reject incoming call.
-   * @param {string} conversation_id - ID of conversation to ignore call in
+   * @param {string} conversationId - ID of conversation to ignore call in
    * @returns {undefined} No return value
    */
-  reject_call(conversation_id) {
-    this.get_call_by_id(conversation_id)
-      .then(call_et => {
-        this.logger.info(`Rejecting call in conversation '${conversation_id}'`, call_et);
+  rejectCall(conversationId) {
+    this.getCallById(conversationId)
+      .then(callEntity => {
+        this.logger.info(`Rejecting call in conversation '${conversationId}'`, callEntity);
 
-        call_et.reject_call();
+        callEntity.rejectCall();
       })
       .catch(error => {
-        if (error.type !== z.calling.CallError.TYPE.NOT_FOUND) {
+        const isNotFound = error.type === z.calling.CallError.TYPE.NOT_FOUND;
+        if (!isNotFound) {
           throw error;
         }
       });
@@ -930,27 +950,28 @@ z.calling.CallingRepository = class CallingRepository {
   /**
    * User action to toggle one of the media stats of an call.
    *
-   * @param {string} conversation_id - ID of conversation with call
-   * @param {z.media.MediaType} media_type - MediaType of requested change
+   * @param {string} conversationId - ID of conversation with call
+   * @param {z.media.MediaType} mediaType - MediaType of requested change
    * @returns {undefined} No return value
    */
-  toggle_media(conversation_id, media_type) {
-    this.get_call_by_id(conversation_id)
-      .then(call_et => call_et.toggle_media(media_type))
+  toggleMedia(conversationId, mediaType) {
+    this.getCallById(conversationId)
+      .then(callEntity => callEntity.toggleMedia(mediaType))
       .then(() => {
-        switch (media_type) {
+        switch (mediaType) {
           case z.media.MediaType.AUDIO:
-            return this.media_stream_handler.toggle_audio_send();
+            return this.mediaStreamHandler.toggle_audio_send();
           case z.media.MediaType.SCREEN:
-            return this.media_stream_handler.toggle_screen_send();
+            return this.mediaStreamHandler.toggle_screen_send();
           case z.media.MediaType.VIDEO:
-            return this.media_stream_handler.toggle_video_send();
+            return this.mediaStreamHandler.toggle_video_send();
           default:
             throw new z.media.MediaError(z.media.MediaError.TYPE.UNHANDLED_MEDIA_TYPE);
         }
       })
       .catch(error => {
-        if (error.type !== z.calling.CallError.TYPE.NOT_FOUND) {
+        const isNotFound = error.type === z.calling.CallError.TYPE.NOT_FOUND;
+        if (!isNotFound) {
           throw error;
         }
       });
@@ -959,41 +980,42 @@ z.calling.CallingRepository = class CallingRepository {
   /**
    * User action to toggle the call state.
    *
-   * @param {z.media.MediaType} media_type - Media type of call
-   * @param {Conversation} [conversation_et=this.conversation_repository.active_conversation()] - Conversation for which state will be toggled
+   * @param {z.media.MediaType} mediaType - Media type of call
+   * @param {Conversation} [conversationEntity=this.conversationRepository.active_conversation()] - Conversation for which state will be toggled
    * @returns {undefined} No return value
    */
-  toggle_state(media_type, conversation_et = this.conversation_repository.active_conversation()) {
-    if (conversation_et) {
-      if (conversation_et.id === this._self_client_on_a_call()) {
-        return this.leave_call(conversation_et.id);
+  toggleState(mediaType, conversationEntity = this.conversationRepository.active_conversation()) {
+    if (conversationEntity) {
+      const isActiveCall = conversationEntity.id === this._selfClientOnACall();
+      if (isActiveCall) {
+        return this.leaveCall(conversationEntity.id, z.calling.enum.TERMINATION_REASON.SELF_USER);
       }
 
-      const is_video_call = media_type === z.media.MediaType.AUDIO_VIDEO;
-      if (conversation_et.is_group() && is_video_call) {
-        amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CALL_NO_VIDEO_IN_GROUP);
+      const isVideoCall = mediaType === z.media.MediaType.AUDIO_VIDEO;
+      if (conversationEntity.is_group() && isVideoCall) {
+        this._showModal(z.string.modalCallNoGroupVideoMessage, z.string.modalCallNoGroupVideoHeadline);
       } else {
-        this.join_call(conversation_et.id, media_type);
+        this.joinCall(conversationEntity.id, mediaType);
       }
     }
   }
 
   /**
    * Check whether conversation supports calling.
-   * @param {string} conversation_id - ID of conversation to join call in
-   * @param {z.calling.enum.CALL_STATE} call_state - Current state of call
+   * @param {string} conversationId - ID of conversation to join call in
+   * @param {z.calling.enum.CALL_STATE} callState - Current state of call
    * @returns {Promise} Resolves when conversation supports calling
    */
-  _check_calling_support(conversation_id, call_state) {
-    return this.conversation_repository.get_conversation_by_id(conversation_id).then(({participating_user_ids}) => {
+  _checkCallingSupport(conversationId, callState) {
+    return this.conversationRepository.get_conversation_by_id(conversationId).then(({participating_user_ids}) => {
       if (!participating_user_ids().length) {
-        amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CALL_EMPTY_CONVERSATION);
+        this._showModal(z.string.modalCallEmptyConversationMessage, z.string.modalCallEmptyConversationHeadline);
         throw new z.calling.CallError(z.calling.CallError.TYPE.NOT_SUPPORTED);
       }
 
-      const is_outgoing_call = call_state === z.calling.enum.CALL_STATE.OUTGOING;
-      if (is_outgoing_call && !z.calling.CallingRepository.supports_calling) {
-        amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.UNSUPPORTED_OUTGOING_CALL);
+      const isOutgoingCall = callState === z.calling.enum.CALL_STATE.OUTGOING;
+      if (isOutgoingCall && !z.calling.CallingRepository.supportsCalling) {
+        amplify.publish(z.event.WebApp.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.UNSUPPORTED_OUTGOING_CALL);
         throw new z.calling.CallError(z.calling.CallError.TYPE.NOT_SUPPORTED);
       }
     });
@@ -1003,35 +1025,70 @@ z.calling.CallingRepository = class CallingRepository {
    * Check whether we are actively participating in a call.
    *
    * @private
-   * @param {string} new_call_id - Conversation ID of call about to be joined
-   * @param {z.calling.enum.CALL_STATE} call_state - Call state of new call
+   * @param {string} newCallId - Conversation ID of call about to be joined
+   * @param {z.calling.enum.CALL_STATE} callState - Call state of new call
    * @returns {Promise} Resolves when the new call was joined
    */
-  _check_concurrent_joined_call(new_call_id, call_state) {
+  _checkConcurrentJoinedCall(newCallId, callState) {
     return new Promise(resolve => {
-      const ongoing_call_id = this._self_participant_on_a_call();
+      const ongoingCallId = this._selfParticipantOnACall();
 
-      if (ongoing_call_id) {
-        amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CALL_START_ANOTHER, {
-          action() {
-            amplify.publish(
-              z.event.WebApp.CALL.STATE.LEAVE,
-              ongoing_call_id,
-              z.calling.enum.TERMINATION_REASON.CONCURRENT_CALL
-            );
+      if (!ongoingCallId) {
+        resolve();
+      } else {
+        let actionStringId;
+        let messageStringId;
+        let titleStringId;
+
+        switch (callState) {
+          case z.calling.enum.CALL_STATE.INCOMING:
+            actionStringId = z.string.modalCallSecondIncomingAction;
+            messageStringId = z.string.modalCallSecondIncomingHeadline;
+            titleStringId = z.string.modalCallSecondIncomingHeadline;
+            break;
+          case z.calling.enum.CALL_STATE.ONGOING:
+            actionStringId = z.string.modalCallSecondOngoingAction;
+            messageStringId = z.string.modalCallSecondOngoingHeadline;
+            titleStringId = z.string.modalCallSecondOngoingHeadline;
+            break;
+          case z.calling.enum.CALL_STATE.OUTGOING:
+            actionStringId = z.string.modalCallSecondOutgoingAction;
+            messageStringId = z.string.modalCallSecondOutgoingHeadline;
+            titleStringId = z.string.modalCallSecondOutgoingHeadline;
+            break;
+          default:
+            break;
+        }
+
+        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
+          action: () => {
+            const terminationReason = z.calling.enum.TERMINATION_REASON.CONCURRENT_CALL;
+            amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, ongoingCallId, terminationReason);
             window.setTimeout(resolve, 1000);
           },
-          close() {
-            if (call_state === z.calling.enum.CALL_STATE.INCOMING) {
-              amplify.publish(z.event.WebApp.CALL.STATE.REJECT, new_call_id);
+          close: () => {
+            const isIncomingCall = callState === z.calling.enum.CALL_STATE.INCOMING;
+            if (isIncomingCall) {
+              amplify.publish(z.event.WebApp.CALL.STATE.REJECT, newCallId);
             }
           },
-          data: call_state,
+          text: {
+            action: z.l10n.text(actionStringId),
+            message: z.l10n.text(messageStringId),
+            title: z.l10n.text(titleStringId),
+          },
         });
-        this.logger.warn(`You cannot join a second call while calling in conversation '${ongoing_call_id}'.`);
-      } else {
-        resolve();
+        this.logger.warn(`You cannot join a second call while calling in conversation '${ongoingCallId}'.`);
       }
+    });
+  }
+
+  _showModal(messageStringId, titleStringId) {
+    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, {
+      text: {
+        message: z.l10n.text(messageStringId),
+        title: z.l10n.text(titleStringId),
+      },
     });
   }
 
@@ -1043,19 +1100,19 @@ z.calling.CallingRepository = class CallingRepository {
    * Constructs a call entity.
    *
    * @private
-   * @param {CallMessage} call_message_et - Call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.SETUP
-   * @param {z.entity.User} creating_user_et - User that created call
+   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.SETUP
+   * @param {z.entity.User} creatingUserEntity - User that created call
    * @returns {Promise} Resolves with the new call entity
    */
-  _create_call(call_message_et, creating_user_et) {
-    const {conversation_id, session_id} = call_message_et;
+  _createCall(callMessageEntity, creatingUserEntity) {
+    const {conversationId, sessionId} = callMessageEntity;
 
-    return this.get_call_by_id(conversation_id).catch(() => {
-      return this.conversation_repository.get_conversation_by_id(conversation_id).then(conversation_et => {
-        const call_et = new z.calling.entities.Call(conversation_et, creating_user_et, session_id, this);
+    return this.getCallById(conversationId).catch(() => {
+      return this.conversationRepository.get_conversation_by_id(conversationId).then(conversationEntity => {
+        const callEntity = new z.calling.entities.CallEntity(conversationEntity, creatingUserEntity, sessionId, this);
 
-        this.calls.push(call_et);
-        return call_et;
+        this.calls.push(callEntity);
+        return callEntity;
       });
     });
   }
@@ -1064,43 +1121,46 @@ z.calling.CallingRepository = class CallingRepository {
    * Constructs an incoming call entity.
    *
    * @private
-   * @param {CallMessage} call_message_et - call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.SETUP
+   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.SETUP
    * @param {z.event.EventRepository.SOURCE} source - Source of event
    * @param {boolean} [silent=false] - Start call in rejected mode
    * @returns {Promise} Resolves with the new call entity
    */
-  _create_incoming_call(call_message_et, source, silent = false) {
-    const {conversation_id, props, user_id} = call_message_et;
+  _createIncomingCall(callMessageEntity, source, silent = false) {
+    const {conversationId, properties, userId} = callMessageEntity;
 
-    return this.user_repository
-      .get_user_by_id(user_id)
-      .then(remote_user_et => this._create_call(call_message_et, remote_user_et))
-      .then(call_et => {
-        const media_type = this._get_media_type_from_properties(props);
-        const conversation_name = call_et.conversation_et.display_name();
-        this.logger.info(`Incoming '${media_type}' call in conversation '${conversation_name}'`, call_et);
+    return this.userRepository
+      .get_user_by_id(userId)
+      .then(remoteUserEntity => this._createCall(callMessageEntity, remoteUserEntity))
+      .then(callEntity => {
+        const mediaType = this._getMediaTypeFromProperties(properties);
+        const conversationName = callEntity.conversationEntity.display_name();
+        this.logger.info(`Incoming '${mediaType}' call in conversation '${conversationName}'`, callEntity);
 
-        call_et.direction = z.calling.enum.CALL_STATE.INCOMING;
-        call_et.set_remote_version(call_message_et);
-        call_et.state(silent ? z.calling.enum.CALL_STATE.REJECTED : z.calling.enum.CALL_STATE.INCOMING);
+        callEntity.direction = z.calling.enum.CALL_STATE.INCOMING;
+        callEntity.setRemoteVersion(callMessageEntity);
 
-        return call_et.add_or_update_participant(user_id, false, call_message_et).then(() => {
-          this.telemetry.set_media_type(media_type);
-          this.telemetry.track_event(z.tracking.EventName.CALLING.RECEIVED_CALL, call_et);
-          this.inject_activate_event(call_message_et, source);
+        const callState = silent ? z.calling.enum.CALL_STATE.REJECTED : z.calling.enum.CALL_STATE.INCOMING;
+        callEntity.state(callState);
 
-          const event_from_web_socket = source === z.event.EventRepository.SOURCE.WEB_SOCKET;
-          if (event_from_web_socket && call_et.is_remote_video_send()) {
-            this.media_stream_handler.initiate_media_stream(call_et.id, z.media.MediaType.AUDIO_VIDEO);
+        return callEntity.addOrUpdateParticipant(userId, false, callMessageEntity).then(() => {
+          this.telemetry.set_media_type(mediaType);
+          this.telemetry.track_event(z.tracking.EventName.CALLING.RECEIVED_CALL, callEntity);
+          this.injectActivateEvent(callMessageEntity, source);
+
+          const eventFromWebSocket = source === z.event.EventRepository.SOURCE.WEB_SOCKET;
+          if (eventFromWebSocket && callEntity.isRemoteVideoSend()) {
+            this.mediaStreamHandler.initiate_media_stream(callEntity.id, z.media.MediaType.AUDIO_VIDEO);
           }
 
-          return call_et;
+          return callEntity;
         });
       })
       .catch(error => {
-        this.delete_call(conversation_id);
+        this.deleteCall(conversationId);
 
-        if (!(error instanceof z.media.MediaError)) {
+        const isMediaError = error instanceof z.media.MediaError;
+        if (!isMediaError) {
           throw error;
         }
       });
@@ -1110,23 +1170,23 @@ z.calling.CallingRepository = class CallingRepository {
    * Constructs an outgoing call entity.
    *
    * @private
-   * @param {CallMessage} call_message_et - call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.PROP_SYNC
+   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.PROP_SYNC
    * @returns {Promise} Resolves with the new call entity
    */
-  _create_outgoing_call(call_message_et) {
-    const {props} = call_message_et;
+  _createOutgoingCall(callMessageEntity) {
+    const {properties} = callMessageEntity;
 
-    return this._create_call(call_message_et, this.user_repository.self()).then(call_et => {
-      const media_type = this._get_media_type_from_properties(props);
-      const conversation_name = call_et.conversation_et.display_name();
-      this.logger.info(`Outgoing '${media_type}' call in conversation '${conversation_name}'`, call_et);
+    return this._createCall(callMessageEntity, this.userRepository.self()).then(callEntity => {
+      const mediaType = this._getMediaTypeFromProperties(properties);
+      const conversationName = callEntity.conversationEntity.display_name();
+      this.logger.info(`Outgoing '${mediaType}' call in conversation '${conversationName}'`, callEntity);
 
-      call_et.direction = z.calling.enum.CALL_STATE.OUTGOING;
-      call_et.state(z.calling.enum.CALL_STATE.OUTGOING);
+      callEntity.direction = z.calling.enum.CALL_STATE.OUTGOING;
+      callEntity.state(z.calling.enum.CALL_STATE.OUTGOING);
 
-      this.telemetry.set_media_type(media_type);
-      this.telemetry.track_event(z.tracking.EventName.CALLING.INITIATED_CALL, call_et);
-      return call_et;
+      this.telemetry.set_media_type(mediaType);
+      this.telemetry.track_event(z.tracking.EventName.CALLING.INITIATED_CALL, callEntity);
+      return callEntity;
     });
   }
 
@@ -1136,38 +1196,34 @@ z.calling.CallingRepository = class CallingRepository {
 
   /**
    * Inject a call activate event.
-   * @param {CallMessage} call_message_et - call message to create event from
+   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message to create event from
    * @param {z.event.EventRepository.SOURCE} source - Source of event
    * @returns {undefined} No return value
    */
-  inject_activate_event(call_message_et, source) {
-    const activate_event = z.conversation.EventBuilder.buildVoiceChannelActivate(call_message_et);
-    amplify.publish(z.event.WebApp.EVENT.INJECT, activate_event, source);
+  injectActivateEvent(callMessageEntity, source) {
+    const event = z.conversation.EventBuilder.buildVoiceChannelActivate(callMessageEntity);
+    amplify.publish(z.event.WebApp.EVENT.INJECT, event, source);
   }
 
   /**
    * Inject a call deactivate event.
-   * @param {CallMessage} call_message_et - Call message to create event from
+   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message to create event from
    * @param {z.event.EventRepository.SOURCE} source - Source of event
    * @param {z.calling.enum.TERMINATION_REASON} [reason] - Reason for call to end
    * @returns {undefined} No return value
    */
-  inject_deactivate_event(call_message_et, source, reason) {
-    const deactivate_event = z.conversation.EventBuilder.buildVoiceChannelDeactivate(
-      call_message_et,
-      reason,
-      this.timeOffset
-    );
-    amplify.publish(z.event.WebApp.EVENT.INJECT, deactivate_event, source);
+  injectDeactivateEvent(callMessageEntity, source, reason) {
+    const event = z.conversation.EventBuilder.buildVoiceChannelDeactivate(callMessageEntity, reason, this.timeOffset);
+    amplify.publish(z.event.WebApp.EVENT.INJECT, event, source);
   }
 
   /**
    * Update time offset.
-   * @param {number} time_offset - Approximate time different to backend in milliseconds
+   * @param {number} timeOffset - Approximate time different to backend in milliseconds
    * @returns {undefined} No return value
    */
-  update_time_offset(time_offset) {
-    this.timeOffset = time_offset;
+  updateTimeOffset(timeOffset) {
+    this.timeOffset = timeOffset;
   }
 
   //##############################################################################
@@ -1176,14 +1232,15 @@ z.calling.CallingRepository = class CallingRepository {
 
   /**
    * Get an call entity for a given conversation ID.
-   * @param {string} conversation_id - ID of Conversation of requested call
+   * @param {string} conversationId - ID of Conversation of requested call
    * @returns {Promise} Resolves with the call entity for conversation ID
    */
-  get_call_by_id(conversation_id) {
-    if (conversation_id) {
-      for (const call_et of this.calls()) {
-        if (call_et.id === conversation_id) {
-          return Promise.resolve(call_et);
+  getCallById(conversationId) {
+    if (conversationId) {
+      for (const callEntity of this.calls()) {
+        const isExpectedId = callEntity.id === conversationId;
+        if (isExpectedId) {
+          return Promise.resolve(callEntity);
         }
       }
 
@@ -1198,11 +1255,11 @@ z.calling.CallingRepository = class CallingRepository {
    * @note Should only used by "window.onbeforeunload".
    * @returns {undefined} No return value
    */
-  leave_call_on_unload() {
-    const conversation_id = this._self_client_on_a_call();
+  leaveCallOnUnload() {
+    const conversationId = this._selfClientOnACall();
 
-    if (conversation_id) {
-      this.leave_call(conversation_id);
+    if (conversationId) {
+      this.leaveCall(conversationId, z.calling.enum.TERMINATION_REASON.PAGE_NAVIGATION);
     }
   }
 
@@ -1211,12 +1268,9 @@ z.calling.CallingRepository = class CallingRepository {
    * @param {Object} properties - call event properties
    * @returns {z.media.MediaType} MediaType of call
    */
-  _get_media_type_from_properties(properties) {
-    if (properties && properties.videosend === z.calling.enum.PROPERTY_STATE.TRUE) {
-      return z.media.MediaType.VIDEO;
-    }
-
-    return z.media.MediaType.AUDIO;
+  _getMediaTypeFromProperties(properties) {
+    const isTypeVideo = properties && properties.videosend === z.calling.enum.PROPERTY_STATE.TRUE;
+    return isTypeVideo ? z.media.MediaType.VIDEO : z.media.MediaType.AUDIO;
   }
 
   /**
@@ -1224,10 +1278,10 @@ z.calling.CallingRepository = class CallingRepository {
    * @private
    * @returns {string|boolean} Conversation ID of call or false
    */
-  _self_client_on_a_call() {
-    for (const call_et of this.calls()) {
-      if (call_et.self_client_joined()) {
-        return call_et.id;
+  _selfClientOnACall() {
+    for (const callEntity of this.calls()) {
+      if (callEntity.selfClientJoined()) {
+        return callEntity.id;
       }
     }
 
@@ -1239,10 +1293,10 @@ z.calling.CallingRepository = class CallingRepository {
    * @private
    * @returns {string|boolean} Conversation ID of call or false
    */
-  _self_participant_on_a_call() {
-    for (const call_et of this.calls()) {
-      if (call_et.self_user_joined()) {
-        return call_et.id;
+  _selfParticipantOnACall() {
+    for (const callEntity of this.calls()) {
+      if (callEntity.selfUserJoined()) {
+        return callEntity.id;
       }
     }
 
@@ -1257,33 +1311,33 @@ z.calling.CallingRepository = class CallingRepository {
    * Get the current calling config.
    * @returns {Promise} Resolves with calling config
    */
-  get_config() {
-    if (this.calling_config) {
-      const is_expired_config = this.calling_config.expiration.getTime() < Date.now();
+  getConfig() {
+    if (this.callingConfig) {
+      const isExpiredConfig = this.callingConfig.expiration.getTime() < Date.now();
 
-      if (!is_expired_config) {
-        this.logger.debug('Returning local calling configuration. No update needed.', this.calling_config);
-        return Promise.resolve(this.calling_config);
+      if (!isExpiredConfig) {
+        this.logger.debug('Returning local calling configuration. No update needed.', this.callingConfig);
+        return Promise.resolve(this.callingConfig);
       }
 
-      this._clear_config();
+      this._clearConfig();
     }
 
-    return this._get_config_from_backend();
+    return this._getConfigFromBackend();
   }
 
-  _clear_config() {
-    if (this.calling_config) {
-      const expiration_date = this.calling_config.expiration.toISOString();
-      this.logger.debug(`Removing calling configuration with expiration of '${expiration_date}'`);
-      this.calling_config = undefined;
+  _clearConfig() {
+    if (this.callingConfig) {
+      const expirationDate = this.callingConfig.expiration.toISOString();
+      this.logger.debug(`Removing calling configuration with expiration of '${expirationDate}'`);
+      this.callingConfig = undefined;
     }
   }
 
-  _clear_config_timeout() {
-    if (this.calling_config_timeout) {
-      window.clearTimeout(this.calling_config_timeout);
-      this.calling_config_timeout = undefined;
+  _clearConfigTimeout() {
+    if (this.callingConfigTimeout) {
+      window.clearTimeout(this.callingConfigTimeout);
+      this.callingConfigTimeout = undefined;
     }
   }
 
@@ -1293,25 +1347,25 @@ z.calling.CallingRepository = class CallingRepository {
    * @private
    * @returns {Promise} Resolves with the updated calling config
    */
-  _get_config_from_backend() {
-    return this.calling_service.get_config().then(calling_config => {
-      if (calling_config) {
-        this._clear_config_timeout();
+  _getConfigFromBackend() {
+    return this.callingService.getConfig().then(callingConfig => {
+      if (callingConfig) {
+        this._clearConfigTimeout();
 
-        const ttl = calling_config.ttl * 0.9 || CallingRepository.CONFIG.DEFAULT_CONFIG_TTL;
+        const ttl = callingConfig.ttl * 0.9 || CallingRepository.CONFIG.DEFAULT_CONFIG_TTL;
         const timeout = Math.min(ttl, CallingRepository.CONFIG.DEFAULT_CONFIG_TTL) * 1000;
-        const expiration_date = new Date(Date.now() + timeout);
-        calling_config.expiration = expiration_date;
+        const expirationDate = new Date(Date.now() + timeout);
+        callingConfig.expiration = expirationDate;
 
-        this.logger.info(`Updated calling configuration expires on '${expiration_date.toISOString()}'`, calling_config);
-        this.calling_config = calling_config;
+        this.logger.info(`Updated calling configuration expires on '${expirationDate.toISOString()}'`, callingConfig);
+        this.callingConfig = callingConfig;
 
-        this.calling_config_timeout = window.setTimeout(() => {
-          this._clear_config();
-          this.get_config();
+        this.callingConfigTimeout = window.setTimeout(() => {
+          this._clearConfig();
+          this.getConfig();
         }, timeout);
 
-        return this.calling_config;
+        return this.callingConfig;
       }
     });
   }
@@ -1324,34 +1378,34 @@ z.calling.CallingRepository = class CallingRepository {
    * Print the call message log.
    * @returns {undefined} No return value
    */
-  print_log() {
-    this.logger.force_log(`Call message log contains '${this.message_log.length}' events`, this.message_log);
-    this.message_log.forEach(({date, log, message}) => {
+  printLog() {
+    this.logger.force_log(`Call message log contains '${this.messageLog.length}' events`, this.messageLog);
+    this.messageLog.forEach(({date, log, message}) => {
       this.logger.force_log(`${date} - ${log}`, message);
     });
   }
 
   /**
    * Report a call for call analysis.
-   * @param {string} conversation_id - ID of conversation
+   * @param {string} conversationId - ID of conversation
    * @returns {undefined} No return value
    */
-  report_call(conversation_id) {
-    this.get_call_by_id(conversation_id)
+  reportCall(conversationId) {
+    this.getCallById(conversationId)
       .catch(() => {
-        for (const call_et of this.calls()) {
-          if (!z.calling.enum.CALL_STATE_GROUP.IS_ENDED.includes(call_et.state())) {
-            return call_et;
+        for (const callEntity of this.calls()) {
+          if (!z.calling.enum.CALL_STATE_GROUP.IS_ENDED.includes(callEntity.state())) {
+            return callEntity;
           }
         }
       })
-      .then(call_et => {
-        if (call_et) {
-          return this._send_report(call_et.get_flows().map(flow_et => flow_et.report_status()));
+      .then(callEntity => {
+        if (callEntity) {
+          return this._sendReport(callEntity.getFlows().map(flowEntity => flowEntity.reportStatus()));
         }
 
-        if (this.flow_status) {
-          return this._send_report(this.flow_status);
+        if (this.flowStatus) {
+          return this._sendReport(this.flowStatus);
         }
 
         this.logger.warn('Could not find flows to report for call analysis');
@@ -1360,32 +1414,33 @@ z.calling.CallingRepository = class CallingRepository {
 
   /**
    * Set logging on adapter.js.
-   * @param {boolean} is_debugging_enabled - Updated debug state
+   * @param {boolean} isDebuggingEnabled - Updated debug state
    * @returns {undefined} No return value
    */
-  set_debug_state(is_debugging_enabled) {
-    if (this.debug_enabled !== is_debugging_enabled) {
-      this.debug_enabled = is_debugging_enabled;
-      this.logger.debug(`Debugging enabled state set to '${is_debugging_enabled}'`);
-      if (!is_debugging_enabled) {
-        this.message_log.length = 0;
+  setDebugState(isDebuggingEnabled) {
+    const isStateChange = this.debugEnabled !== isDebuggingEnabled;
+    if (isStateChange) {
+      this.debugEnabled = isDebuggingEnabled;
+      this.logger.debug(`Debugging enabled state set to '${isDebuggingEnabled}'`);
+      if (!isDebuggingEnabled) {
+        this.messageLog.length = 0;
       }
     }
 
     if (adapter) {
-      this.logger.debug(`Set logging for WebRTC Adapter: ${is_debugging_enabled}`);
-      adapter.disableLog = !is_debugging_enabled;
+      this.logger.debug(`Set logging for WebRTC Adapter: ${isDebuggingEnabled}`);
+      adapter.disableLog = !isDebuggingEnabled;
     }
   }
 
   /**
    * Store last flow status.
-   * @param {Object} flow_status - Status to store
+   * @param {Object} flowStatus - Status to store
    * @returns {undefined} No return value
    */
-  store_flow_status(flow_status) {
-    if (flow_status) {
-      this.flow_status = flow_status;
+  storeFlowStatus(flowStatus) {
+    if (flowStatus) {
+      this.flowStatus = flowStatus;
     }
   }
 
@@ -1393,43 +1448,39 @@ z.calling.CallingRepository = class CallingRepository {
    * Log call messages for debugging.
    *
    * @private
-   * @param {boolean} is_outgoing - Is message outgoing
-   * @param {CallMessage} call_message_et - Call message to be logged in the sequence
+   * @param {boolean} isOutgoing - Is message outgoing
+   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message to be logged in the sequence
    * @param {string} [date] - Date of message as ISO string
    * @returns {undefined} No return value
    */
-  _log_message(is_outgoing, call_message_et, date = new Date().toISOString()) {
-    while (this.message_log.length >= CallingRepository.CONFIG.MESSAGE_LOG_LENGTH) {
-      this.message_log.shift();
+  _logMessage(isOutgoing, callMessageEntity, date = new Date().toISOString()) {
+    while (this.messageLog.length >= CallingRepository.CONFIG.MESSAGE_LOG_LENGTH) {
+      this.messageLog.shift();
     }
 
-    const {conversation_id, dest_user_id, remote_user_id, response, type, user_id} = call_message_et;
+    const {conversationId, destinationUserId, remoteUserId, response, type, userId} = callMessageEntity;
 
-    let log_message;
-    if (is_outgoing) {
-      if (remote_user_id) {
-        log_message = `Sending '${type}' message (response: ${response}) to user '${remote_user_id}' in conversation '${conversation_id}'`;
+    let logMessage;
+    if (isOutgoing) {
+      if (remoteUserId) {
+        logMessage = `Sending '${type}' message (response: ${response}) to user '${remoteUserId}' in conversation '${conversationId}'`;
       } else {
-        log_message = `Sending '${type}' message (response: ${response}) to conversation '${conversation_id}'`;
+        logMessage = `Sending '${type}' message (response: ${response}) to conversation '${conversationId}'`;
       }
     } else {
-      if (dest_user_id && dest_user_id !== this.self_user_id()) {
+      const isSelfUser = destinationUserId === this.selfUserId();
+      if (destinationUserId && !isSelfUser) {
         return;
       }
 
-      log_message = `Received '${type}' message (response: ${response}) from user '${user_id}' in conversation '${conversation_id}'`;
+      logMessage = `Received '${type}' message (response: ${response}) from user '${userId}' in conversation '${conversationId}'`;
     }
 
-    this.logger.info(log_message, call_message_et);
+    this.logger.info(logMessage, callMessageEntity);
 
-    if (this.debug_enabled) {
-      const log_entry = {
-        date: date,
-        log: log_message,
-        message: call_message_et,
-      };
-
-      this.message_log.push(log_entry);
+    if (this.debugEnabled) {
+      const logEntry = {date, log: logMessage, message: callMessageEntity};
+      this.messageLog.push(logEntry);
     }
   }
 
@@ -1437,11 +1488,11 @@ z.calling.CallingRepository = class CallingRepository {
    * Send Raygun report.
    *
    * @private
-   * @param {Object} custom_data - Information to add to the call report
+   * @param {Object} customData - Information to add to the call report
    * @returns {undefined} No return value
    */
-  _send_report(custom_data) {
-    Raygun.send(new Error('Call failure report'), custom_data);
-    this.logger.debug(`Reported status of flow id '${custom_data.meta.flow_id}' for call analysis`, custom_data);
+  _sendReport(customData) {
+    Raygun.send(new Error('Call failure report'), customData);
+    this.logger.debug(`Reported status of flow id '${customData.meta.flowId}' for call analysis`, customData);
   }
 };

@@ -193,8 +193,8 @@ z.service.BackendClient = class BackendClient {
    */
   execute_request_queue() {
     this.queue_state(z.service.QUEUE_STATE.READY);
-    if (this.access_token && this.request_queue.get_length()) {
-      this.logger.info(`Executing '${this.request_queue.get_length()}' queued requests`);
+    if (this.access_token && this.request_queue.getLength()) {
+      this.logger.info(`Executing '${this.request_queue.getLength()}' queued requests`);
       this.request_queue.resume();
     }
   }

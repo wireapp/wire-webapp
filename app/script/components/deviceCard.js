@@ -23,54 +23,53 @@ window.z = window.z || {};
 window.z.components = z.components || {};
 
 z.components.DeviceCard = class DeviceCard {
-  constructor(params, component_info) {
+  constructor(params, componentInfo) {
     this.device = ko.unwrap(params.device) || {};
 
-    const {class: device_class, id, label, model} = this.device;
-    this.id = id || '';
+    const {class: deviceClass, id, label, location = {}, model} = this.device;
+    this.class = deviceClass || '?';
     this.formattedId = id ? this.device.formatId() : [];
+    this.id = id || '';
     this.label = label || '?';
-    this.model = model || device_class || '?'; // devices for other users will only provide the device class
-    this.class = device_class || '?';
+    this.model = model || deviceClass || '?'; // devices for other users will only provide the device class
 
-    this.current = params.current || false;
+    this.isCurrentClient = params.current || false;
     this.detailed = params.detailed || false;
     this.click = params.click;
 
-    this.data_uie_name = 'device-card-info';
-    if (this.current) {
-      this.data_uie_name += '-current';
-    }
+    this.dataUieName = `device-card-info${this.isCurrentClient ? '-current' : ''}`;
 
-    this.activated_in = ko.observable([]);
+    this.activationLocation = ko.observableArray([]);
 
-    this._update_activation_location('?');
-    this._update_location();
+    this._updateActivationLocation('?');
+    this._updateLocation(location);
 
     if (this.detailed || !this.click) {
-      $(component_info.element).addClass('device-card-no-hover');
+      $(componentInfo.element).addClass('device-card-no-hover');
     }
     if (this.detailed) {
-      $(component_info.element).addClass('device-card-detailed');
+      $(componentInfo.element).addClass('device-card-detailed');
     }
   }
 
-  on_click_device() {
+  clickOnDevice() {
     if (typeof this.click === 'function') {
       this.click(this.device);
     }
   }
 
-  _update_activation_location(location, template = z.string.preferences_devices_activated_in) {
-    const sanitizedText = z.util.StringUtil.splitAtPivotElement(template, '{{location}}', location);
-    this.activated_in(sanitizedText);
+  _updateActivationLocation(locationName) {
+    const stringTemplate = z.string.preferencesDevicesActivatedIn;
+    const sanitizedText = z.util.StringUtil.splitAtPivotElement(stringTemplate, '{{location}}', locationName);
+    this.activationLocation(sanitizedText);
   }
 
-  _update_location() {
-    if (this.device && this.device.location) {
-      z.location.get_location(this.device.location.lat, this.device.location.lon).then(retrieved_location => {
-        if (retrieved_location) {
-          this._update_activation_location(`${retrieved_location.place}, ${retrieved_location.country_code}`);
+  _updateLocation({lat: latitude, lon: longitude}) {
+    if (latitude && longitude) {
+      z.location.getLocation(latitude, longitude).then(mappedLocation => {
+        if (mappedLocation) {
+          const {countryCode, place} = mappedLocation;
+          this._updateActivationLocation(`${place}, ${countryCode}`);
         }
       });
     }
@@ -79,32 +78,35 @@ z.components.DeviceCard = class DeviceCard {
 
 ko.components.register('device-card', {
   template: `
-    <div class="device-info" data-bind="click: on_click_device,
-      attr: {'data-uie-uid': id, 'data-uie-value': label, 'data-uie-name': data_uie_name}">
+    <div class="device-info" data-bind="click: clickOnDevice,
+      attr: {'data-uie-uid': id, 'data-uie-value': label, 'data-uie-name': dataUieName}">
       <!-- ko if: detailed -->
         <div class="label-xs device-label" data-bind="text: label"></div>
         <div class="label-xs">
-          <span data-bind="l10n_text: z.string.preferences_devices_id"></span>
+          <span data-bind="l10n_text: z.string.preferencesDevicesId"></span>
           <span data-bind="foreach: formattedId" data-uie-name="device-id"><span class="device-id-part" data-bind="text: $data"></span></span>
         </div>
-        <div class="label-xs" data-bind="foreach: activated_in"><span data-bind="css: {'preferences-devices-activated-bold': $data.isStyled}, text: $data.text">?</span></div>
+        <div class="label-xs" data-bind="foreach: activationLocation"><span data-bind="css: {'preferences-devices-activated-bold': $data.isStyled}, text: $data.text">?</span></div>
         <div class="label-xs" data-bind="text: z.util.format_timestamp(device.time)"></div>
       <!-- /ko -->
       <!-- ko ifnot: detailed -->
         <div class="label-xs">
           <span class="device-model" data-bind="text: model"></span>
-          <span class="text-graphite-dark" data-bind="visible: current, l10n_text: z.string.auth_limit_devices_current"></span>
+          <span class="text-graphite-dark" data-bind="visible: isCurrentClient, l10n_text: z.string.authLimitDevicesCurrent"></span>
         </div>
         <div class="text-graphite-dark label-xs">
-          <span data-bind="l10n_text: z.string.preferences_devices_id"></span>
+          <span data-bind="l10n_text: z.string.preferencesDevicesId"></span>
           <span data-bind="foreach: formattedId" data-uie-name="device-id"><span class="device-id-part" data-bind="text: $data"></span></span>
         </div>
       <!-- /ko -->
     </div>
+    <!-- ko ifnot: detailed || !click-->
+      <disclose-icon></disclose-icon>
+    <!-- /ko -->
   `,
   viewModel: {
-    createViewModel(params, component_info) {
-      return new z.components.DeviceCard(params, component_info);
+    createViewModel(params, componentInfo) {
+      return new z.components.DeviceCard(params, componentInfo);
     },
   },
 });

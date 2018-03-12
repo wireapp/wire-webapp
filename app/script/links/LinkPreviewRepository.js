@@ -23,18 +23,18 @@ window.z = window.z || {};
 window.z.links = z.links || {};
 
 z.links.LinkPreviewRepository = class LinkPreviewRepository {
-  constructor(asset_service, properties_repository) {
-    this.get_link_preview_from_string = this.get_link_preview_from_string.bind(this);
-    this.updated_send_preference = this.updated_send_preference.bind(this);
+  constructor(assetService, propertiesRepository) {
+    this.getLinkPreviewFromString = this.getLinkPreviewFromString.bind(this);
+    this.updatedSendPreference = this.updatedSendPreference.bind(this);
 
-    this.asset_service = asset_service;
+    this.assetService = assetService;
     this.logger = new z.util.Logger('z.links.LinkPreviewRepository', z.config.LOGGER.OPTIONS);
 
-    this.should_send_previews = properties_repository.getPreference(z.properties.PROPERTIES_TYPE.PREVIEWS.SEND);
+    this.shouldSendPreviews = propertiesRepository.getPreference(z.properties.PROPERTIES_TYPE.PREVIEWS.SEND);
 
-    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.PREVIEWS.SEND, this.updated_send_preference);
+    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.PREVIEWS.SEND, this.updatedSendPreference);
     amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, properties => {
-      this.updated_send_preference(properties.settings.previews.send);
+      this.updatedSendPreference(properties.settings.previews.send);
     });
   }
 
@@ -45,14 +45,15 @@ z.links.LinkPreviewRepository = class LinkPreviewRepository {
    * @param {string} string - Input text to generate preview for
    * @returns {Promise} Resolves with link preview proto message
    */
-  get_link_preview_from_string(string) {
-    if (this.should_send_previews && z.util.Environment.desktop) {
+  getLinkPreviewFromString(string) {
+    if (this.shouldSendPreviews && z.util.Environment.desktop) {
       return Promise.resolve().then(() => {
-        const data = z.links.LinkPreviewHelpers.get_first_link_with_offset(string);
+        const linkData = z.links.LinkPreviewHelpers.getFirstLinkWithOffset(string);
 
-        if (data) {
-          return this.get_link_preview(data.url, data.offset).catch(error => {
-            if (!(error instanceof z.links.LinkPreviewError)) {
+        if (linkData) {
+          return this.getLinkPreview(linkData.url, linkData.offset).catch(error => {
+            const isLinkPreviewError = error instanceof z.links.LinkPreviewError;
+            if (!isLinkPreviewError) {
               throw error;
             }
           });
@@ -70,29 +71,31 @@ z.links.LinkPreviewRepository = class LinkPreviewRepository {
    * @param {number} [offset=0] - starting index of the link
    * @returns {Promise} Resolves with a link preview if generated
    */
-  get_link_preview(url, offset = 0) {
-    let open_graph_data;
+  getLinkPreview(url, offset = 0) {
+    let openGraphData;
 
     return Promise.resolve()
       .then(() => {
-        if (z.links.LinkPreviewBlackList.is_blacklisted(url)) {
+        if (z.links.LinkPreviewBlackList.isBlacklisted(url)) {
           throw new z.links.LinkPreviewError(z.links.LinkPreviewError.TYPE.BLACKLISTED);
         }
+
         if (window.openGraph) {
-          return this._fetch_open_graph_data(url);
+          return this._fetchOpenGraphData(url);
         }
+
         throw new z.links.LinkPreviewError(z.links.LinkPreviewError.TYPE.NOT_SUPPORTED);
       })
-      .then(data => {
-        open_graph_data = data;
-        if (open_graph_data) {
-          return z.links.LinkPreviewProtoBuilder.build_from_open_graph_data(open_graph_data, url, offset);
+      .then(fetchedData => {
+        if (fetchedData) {
+          openGraphData = fetchedData;
+          return z.links.LinkPreviewProtoBuilder.buildFromOpenGraphData(openGraphData, url, offset);
         }
         throw new z.links.LinkPreviewError(z.links.LinkPreviewError.TYPE.NO_DATA_AVAILABLE);
       })
-      .then(link_preview => {
-        if (link_preview) {
-          return this._fetch_preview_image(link_preview, open_graph_data.image);
+      .then(linkPreview => {
+        if (linkPreview) {
+          return this._fetchPreviewImage(linkPreview, openGraphData.image);
         }
         throw new z.links.LinkPreviewError(z.links.LinkPreviewError.TYPE.UNSUPPORTED_TYPE);
       });
@@ -100,32 +103,33 @@ z.links.LinkPreviewRepository = class LinkPreviewRepository {
 
   /**
    * Update the send link preview preference
-   * @param {boolean} previews_send_preference - Updated preference
+   * @param {boolean} sendPreviewsPreference - Updated preference
    * @returns {undefined} No return value
    */
-  updated_send_preference(previews_send_preference) {
-    this.should_send_previews = previews_send_preference;
+  updatedSendPreference(sendPreviewsPreference) {
+    this.shouldSendPreviews = sendPreviewsPreference;
   }
 
   /**
    * Fetch and upload open graph images.
    *
    * @private
-   * @param {z.proto.LinkPreview} link_preview - Link preview proto message
-   * @param {Object} [open_graph_image={}] - Open graph image URL
+   * @param {z.proto.LinkPreview} linkPreview - Link preview proto message
+   * @param {Object} [openGraphImage={}] - Open graph image URL
    * @returns {Promise} Resolves with the link preview proto message
    */
-  _fetch_preview_image(link_preview, open_graph_image = {}) {
-    if (open_graph_image.data) {
-      return this._upload_preview_image(open_graph_image.data)
+  _fetchPreviewImage(linkPreview, openGraphImage = {}) {
+    if (openGraphImage.data) {
+      return this._uploadPreviewImage(openGraphImage.data)
         .then(asset => {
-          link_preview.article.set('image', asset); // deprecated
-          link_preview.image.set('image', asset);
-          return link_preview;
+          linkPreview.article.set('image', asset); // deprecated
+          linkPreview.image.set('image', asset);
+          return linkPreview;
         })
-        .catch(() => link_preview);
+        .catch(() => linkPreview);
     }
-    return Promise.resolve(link_preview);
+
+    return Promise.resolve(linkPreview);
   }
 
   /**
@@ -135,18 +139,18 @@ z.links.LinkPreviewRepository = class LinkPreviewRepository {
    * @param {string} link - Link to fetch open graph data from
    * @returns {Promise} Resolves with the retrieved open graph data
    */
-  _fetch_open_graph_data(link) {
+  _fetchOpenGraphData(link) {
     return new Promise(resolve => {
       return window.openGraph(link, (error, data) => {
         if (error) {
-          resolve(undefined);
+          resolve();
         }
 
         if (data) {
-          data = Object.keys(data).reduce((filtered_data, key) => {
+          data = Object.keys(data).reduce((filteredData, key) => {
             const value = data[key];
-            filtered_data[key] = Array.isArray(value) ? value[0] : value;
-            return filtered_data;
+            filteredData[key] = Array.isArray(value) ? value[0] : value;
+            return filteredData;
           }, {});
         }
 
@@ -159,12 +163,12 @@ z.links.LinkPreviewRepository = class LinkPreviewRepository {
    * Upload open graph image as asset
    *
    * @private
-   * @param {string} data_URI - image data as base64 encoded data URI
+   * @param {string} dataUri - image data as base64 encoded data URI
    * @returns {Promise} Resolves with the uploaded asset
    */
-  _upload_preview_image(data_URI) {
-    return Promise.resolve(z.util.base64_to_blob(data_URI)).then(blob =>
-      this.asset_service.uploadImageAsset(blob, {public: true})
+  _uploadPreviewImage(dataUri) {
+    return Promise.resolve(z.util.base64_to_blob(dataUri)).then(blob =>
+      this.assetService.uploadImageAsset(blob, {public: true})
     );
   }
 };

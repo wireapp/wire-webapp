@@ -22,6 +22,7 @@ import {Form, InputSubmitCombo, Input, RoundIconButton, ErrorMessage} from '@wir
 import {H1, Text, Link} from '@wireapp/react-ui-kit/Text';
 import {ArrowIcon} from '@wireapp/react-ui-kit/Icon';
 import ROUTE from '../route';
+import EXTERNAL_ROUTE from '../externalRoute';
 import {Link as RRLink} from 'react-router-dom';
 import {connect} from 'react-redux';
 import {COLOR} from '@wireapp/react-ui-kit/Identity';
@@ -35,8 +36,6 @@ import {enterTeamCreationFlow} from '../module/action/creator/AuthActionCreator'
 import * as AuthSelector from '../module/selector/AuthSelector';
 import ValidationError from '../module/action/ValidationError';
 import React, {Component} from 'react';
-
-const wireTeamLink = `${ROUTE.WIRE_ROOT}/create-team/#features`;
 
 class TeamName extends Component {
   state = {
@@ -123,7 +122,11 @@ class TeamName extends Component {
                 </Form>
               </div>
               <div>
-                <Link href={wireTeamLink} target="_blank" data-uie-name="go-what-is">
+                <Link
+                  href={`${EXTERNAL_ROUTE.WIRE_ROOT}/create-team/#features`}
+                  target="_blank"
+                  data-uie-name="go-what-is"
+                >
                   {_(teamNameStrings.whatIsWireTeamsLink)}
                 </Link>
               </div>

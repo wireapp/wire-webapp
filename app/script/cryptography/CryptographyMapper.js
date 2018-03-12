@@ -33,87 +33,97 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
   /**
    * Maps a generic message into an event in JSON.
    *
-   * @param {z.proto.GenericMessage} generic_message - Received ProtoBuffer message
+   * @param {z.proto.GenericMessage} genericMessage - Received ProtoBuffer message
    * @param {JSON} event - Event of z.event.Backend.CONVERSATION.OTR-ASSET-ADD or z.event.Backend.CONVERSATION.OTR-MESSAGE-ADD
    * @returns {Promise} Resolves with the mapped event
    */
-  map_generic_message(generic_message, event) {
-    if (generic_message === undefined) {
-      return Promise.reject(
-        new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.NO_GENERIC_MESSAGE)
-      );
+  mapGenericMessage(genericMessage, event) {
+    if (!genericMessage) {
+      const error = new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.NO_GENERIC_MESSAGE);
+      return Promise.reject(error);
     }
+
     return Promise.resolve()
-      .then(() => (generic_message.external ? this._unwrap_external(generic_message.external, event) : generic_message))
-      .then(unwrapped_generic_message => {
-        return Promise.all([this._map_generic_message(unwrapped_generic_message, event), unwrapped_generic_message]);
-      })
-      .then(([specific_content, unwrapped_generic_message]) => {
-        return Object.assign(
-          {
-            conversation: event.conversation,
-            from: event.from,
-            id: unwrapped_generic_message.message_id,
-            status: event.status,
-            time: event.time,
-          },
-          specific_content
-        );
-      });
+      .then(() => (genericMessage.external ? this._unwrapExternal(genericMessage.external, event) : genericMessage))
+      .then(unwrappedGenericMessage => this._mapGenericMessage(unwrappedGenericMessage, event));
   }
 
-  _map_generic_message(generic_message, event) {
-    switch (generic_message.content) {
+  _mapGenericMessage(genericMessage, event) {
+    let specificContent;
+
+    switch (genericMessage.content) {
       case z.cryptography.GENERIC_MESSAGE_TYPE.ASSET:
-        return this._map_asset(generic_message.asset, generic_message.message_id);
+        specificContent = this._mapAsset(genericMessage.asset);
+        break;
       case z.cryptography.GENERIC_MESSAGE_TYPE.AVAILABILITY:
-        return this._mapAvailability(generic_message.availability);
+        specificContent = this._mapAvailability(genericMessage.availability);
+        break;
       case z.cryptography.GENERIC_MESSAGE_TYPE.CALLING:
-        return this._map_calling(generic_message.calling, event.data);
+        specificContent = this._mapCalling(genericMessage.calling, event.data);
+        break;
       case z.cryptography.GENERIC_MESSAGE_TYPE.CLEARED:
-        return this._mapCleared(generic_message.cleared);
+        specificContent = this._mapCleared(genericMessage.cleared);
+        break;
       case z.cryptography.GENERIC_MESSAGE_TYPE.CONFIRMATION:
-        return this._map_confirmation(generic_message.confirmation);
+        specificContent = this._mapConfirmation(genericMessage.confirmation);
+        break;
       case z.cryptography.GENERIC_MESSAGE_TYPE.DELETED:
-        return this._map_deleted(generic_message.deleted);
+        specificContent = this._mapDeleted(genericMessage.deleted);
+        break;
       case z.cryptography.GENERIC_MESSAGE_TYPE.EDITED:
-        return this._map_edited(generic_message.edited, generic_message.message_id);
+        specificContent = this._mapEdited(genericMessage.edited, genericMessage.message_id);
+        break;
       case z.cryptography.GENERIC_MESSAGE_TYPE.EPHEMERAL:
-        return this._map_ephemeral(generic_message, event);
+        specificContent = this._mapEphemeral(genericMessage, event);
+        break;
       case z.cryptography.GENERIC_MESSAGE_TYPE.HIDDEN:
-        return this._map_hidden(generic_message.hidden);
+        specificContent = this._mapHidden(genericMessage.hidden);
+        break;
       case z.cryptography.GENERIC_MESSAGE_TYPE.IMAGE:
-        return this._map_image(generic_message.image, event.data.id);
+        specificContent = this._mapImage(genericMessage.image, event.data.id);
+        break;
       case z.cryptography.GENERIC_MESSAGE_TYPE.KNOCK:
-        return this._map_knock(generic_message.knock, generic_message.message_id);
+        specificContent = this._mapKnock();
+        break;
       case z.cryptography.GENERIC_MESSAGE_TYPE.LAST_READ:
-        return this._mapLastRead(generic_message.lastRead);
+        specificContent = this._mapLastRead(genericMessage.lastRead);
+        break;
       case z.cryptography.GENERIC_MESSAGE_TYPE.LOCATION:
-        return this._map_location(generic_message.location, generic_message.message_id);
+        specificContent = this._mapLocation(genericMessage.location);
+        break;
       case z.cryptography.GENERIC_MESSAGE_TYPE.REACTION:
-        return this._map_reaction(generic_message.reaction);
+        specificContent = this._mapReaction(genericMessage.reaction);
+        break;
       case z.cryptography.GENERIC_MESSAGE_TYPE.TEXT:
-        return this._map_text(generic_message.text, generic_message.message_id);
+        specificContent = this._mapText(genericMessage.text);
+        break;
       default:
-        this.logger.debug(
-          `Skipped event '${generic_message.message_id}' of unhandled type '${generic_message.content}'`,
-          {event, generic_message}
-        );
+        const logMessage = `Skipped event '${genericMessage.message_id}' of unhandled type '${genericMessage.content}'`;
+        this.logger.debug(logMessage, {event, generic_message: genericMessage});
         throw new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.UNHANDLED_TYPE);
     }
+
+    const genericContent = {
+      conversation: event.conversation,
+      from: event.from,
+      id: genericMessage.message_id,
+      status: event.status,
+      time: event.time,
+    };
+
+    return Object.assign(genericContent, specificContent);
   }
 
-  _map_asset(asset, event_nonce) {
-    const {original, preview, uploaded, not_uploaded} = asset;
+  _mapAsset(asset) {
+    const {original, preview, uploaded, not_uploaded: notUploaded} = asset;
     let data = {};
 
-    if (original != null) {
+    if (original) {
       data = {
         content_length: original.size.toNumber(),
         content_type: original.mime_type,
         info: {
           name: original.name,
-          nonce: event_nonce,
         },
       };
 
@@ -121,12 +131,13 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
         data.info.height = original.image.height;
         data.info.width = original.image.width;
       } else {
-        data.meta = this._map_asset_meta_data(original);
+        data.meta = this._mapAssetMetaData(original);
       }
     }
 
-    if (preview != null) {
+    if (preview) {
       const {remote} = preview;
+
       data = Object.assign(data, {
         preview_key: remote.asset_id,
         preview_otr_key: new Uint8Array(remote.otr_key.toArrayBuffer()),
@@ -135,12 +146,12 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
       });
     }
 
-    const is_image = uploaded && uploaded.asset_id && original && original.image;
-    if (is_image) {
+    const isImage = uploaded && uploaded.asset_id && original && original.image;
+    if (isImage) {
       data.info.tag = 'medium';
     }
 
-    if (uploaded != null) {
+    if (uploaded !== null) {
       data = Object.assign(data, {
         key: uploaded.asset_id,
         otr_key: new Uint8Array(uploaded.otr_key.toArrayBuffer()),
@@ -150,26 +161,24 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
       });
     }
 
-    if (not_uploaded != null) {
+    if (notUploaded !== null) {
       data = Object.assign(data, {
-        reason: not_uploaded,
+        reason: notUploaded,
         status: z.assets.AssetTransferState.UPLOAD_FAILED,
       });
     }
 
-    return {
-      data,
-      type: z.event.Client.CONVERSATION.ASSET_ADD,
-    };
+    return {data, type: z.event.Client.CONVERSATION.ASSET_ADD};
   }
 
-  _map_asset_meta_data(original) {
+  _mapAssetMetaData(original) {
     if (original.audio) {
+      const normalizedLoudness = original.audio.normalized_loudness;
+      const loudnessArray = normalizedLoudness ? original.audio.normalized_loudness.toArrayBuffer() : [];
+
       return {
         duration: original.audio.duration_in_millis.toNumber() / 1000,
-        loudness: new Uint8Array(
-          original.audio.normalized_loudness !== null ? original.audio.normalized_loudness.toArrayBuffer() : []
-        ),
+        loudness: new Uint8Array(loudnessArray),
       };
     }
   }
@@ -197,10 +206,10 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
     };
   }
 
-  _map_calling(calling, event_data) {
+  _mapCalling(calling, eventData) {
     return {
       content: JSON.parse(calling.content),
-      sender: event_data.sender,
+      sender: eventData.sender,
       type: z.event.Client.CALL.E_CALL,
     };
   }
@@ -215,7 +224,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
     };
   }
 
-  _map_confirmation(confirmation) {
+  _mapConfirmation(confirmation) {
     return {
       data: {
         message_id: confirmation.first_message_id,
@@ -235,7 +244,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
     };
   }
 
-  _map_deleted(deleted) {
+  _mapDeleted(deleted) {
     return {
       data: {
         message_id: deleted.message_id,
@@ -244,17 +253,19 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
     };
   }
 
-  _map_edited(edited, event_id) {
-    const mapped = this._map_text(edited.text, event_id);
-    mapped.data.replacing_message_id = edited.replacing_message_id;
-    return mapped;
+  _mapEdited(edited, eventId) {
+    const mappedMessage = this._mapText(edited.text, eventId);
+    mappedMessage.data.replacing_message_id = edited.replacing_message_id;
+    return mappedMessage;
   }
 
-  _map_ephemeral(generic_message, event) {
-    const millis_as_number = generic_message.ephemeral.expire_after_millis.toNumber();
-    generic_message.ephemeral.message_id = generic_message.message_id;
-    const embedded_message = this._map_generic_message(generic_message.ephemeral, event);
-    embedded_message.ephemeral_expires = z.ephemeral.timings.mapToClosestTiming(millis_as_number);
+  _mapEphemeral(genericMessage, event) {
+    const millisecondsAsNumber = genericMessage.ephemeral.expire_after_millis.toNumber();
+    genericMessage.ephemeral.message_id = genericMessage.message_id;
+
+    const embedded_message = this._mapGenericMessage(genericMessage.ephemeral, event);
+    embedded_message.ephemeral_expires = z.ephemeral.timings.mapToClosestTiming(millisecondsAsNumber);
+
     return embedded_message;
   }
 
@@ -266,28 +277,28 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
    * @param {JSON} event - Backend event of type 'conversation.otr-message-add'
    * @returns {Promise} Resolves with generic message
    */
-  _unwrap_external(external, event) {
+  _unwrapExternal(external, event) {
     return Promise.resolve(external)
-      .then(({otr_key, sha256}) => {
-        const event_data = event.data;
-        if (!event_data.data || !otr_key || !sha256) {
+      .then(({otr_key: otrKey, sha256}) => {
+        const eventData = event.data;
+        if (!eventData.data || !otrKey || !sha256) {
           throw new Error('Not all expected properties defined');
         }
 
-        const cipher_text = z.util.base64_to_array(event_data.data).buffer;
-        const key_bytes = new Uint8Array(otr_key.toArrayBuffer()).buffer;
-        const reference_sha256 = new Uint8Array(external.sha256.toArrayBuffer()).buffer;
+        const cipherText = z.util.base64_to_array(eventData.data).buffer;
+        const keyBytes = new Uint8Array(otrKey.toArrayBuffer()).buffer;
+        const referenceSha256 = new Uint8Array(sha256.toArrayBuffer()).buffer;
 
-        return z.assets.AssetCrypto.decryptAesAsset(cipher_text, key_bytes, reference_sha256);
+        return z.assets.AssetCrypto.decryptAesAsset(cipherText, keyBytes, referenceSha256);
       })
-      .then(external_message_buffer => z.proto.GenericMessage.decode(external_message_buffer))
+      .then(externalMessageBuffer => z.proto.GenericMessage.decode(externalMessageBuffer))
       .catch(error => {
         this.logger.error(`Failed to unwrap external message: ${error.message}`, error);
         throw new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.BROKEN_EXTERNAL);
       });
   }
 
-  _map_hidden(hidden) {
+  _mapHidden(hidden) {
     return {
       data: {
         conversation_id: hidden.conversation_id,
@@ -297,42 +308,40 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
     };
   }
 
-  _map_image(image, event_id) {
-    if (image.tag === 'medium') {
-      return this._map_image_medium(image, event_id);
+  _mapImage(image, eventId) {
+    const isMediumImage = image.tag === 'medium';
+    if (isMediumImage) {
+      return this._mapImageMedium(image, eventId);
     }
+
     const error = new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.IGNORED_PREVIEW);
-    this.logger.info(`Skipped event '${event_id}': ${error.message}`);
+    this.logger.info(`Skipped event '${eventId}': ${error.message}`);
     throw error;
   }
 
-  _map_image_medium(image, event_id) {
-    event_id = event_id || z.util.create_random_uuid();
+  _mapImageMedium(image, eventId) {
+    // set ID even if asset id is missing
+    eventId = eventId || z.util.create_random_uuid();
+
     return {
       data: {
         content_length: image.size,
         content_type: image.mime_type,
-        id: event_id,
+        id: eventId,
         info: {
           height: image.height,
-          nonce: event_id || z.util.create_random_uuid(), // set nonce even if asset id is missing
           tag: image.tag,
           width: image.width,
         },
-        otr_key: new Uint8Array(image.otr_key !== null ? image.otr_key.toArrayBuffer() : []),
-        sha256: new Uint8Array(image.sha256 !== null ? image.sha256.toArrayBuffer() : []),
+        otr_key: new Uint8Array(image.otr_key ? image.otr_key.toArrayBuffer() : []),
+        sha256: new Uint8Array(image.sha256 ? image.sha256.toArrayBuffer() : []),
       },
       type: z.event.Client.CONVERSATION.ASSET_ADD,
     };
   }
 
-  _map_knock(knock, event_id) {
-    return {
-      data: {
-        nonce: event_id,
-      },
-      type: z.event.Client.CONVERSATION.KNOCK,
-    };
+  _mapKnock() {
+    return {type: z.event.Client.CONVERSATION.KNOCK};
   }
 
   _mapLastRead(lastRead) {
@@ -345,7 +354,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
     };
   }
 
-  _map_location(location, event_id) {
+  _mapLocation(location) {
     return {
       data: {
         location: {
@@ -354,13 +363,12 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
           name: location.name,
           zoom: location.zoom,
         },
-        nonce: event_id,
       },
       type: z.event.Client.CONVERSATION.LOCATION,
     };
   }
 
-  _map_reaction(reaction) {
+  _mapReaction(reaction) {
     return {
       data: {
         message_id: reaction.message_id,
@@ -370,11 +378,10 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
     };
   }
 
-  _map_text(text, event_id) {
+  _mapText(text) {
     return {
       data: {
         content: `${text.content}`,
-        nonce: event_id,
         previews: text.link_preview.map(preview => preview.encode64()),
       },
       type: z.event.Client.CONVERSATION.MESSAGE_ADD,

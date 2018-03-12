@@ -31,14 +31,14 @@ describe('z.links.LinkPreviewRepository', () => {
     window.openGraph = undefined;
   });
 
-  describe('get_link_preview', () => {
+  describe('getLinkPreview', () => {
     beforeEach(() => {
-      spyOn(link_preview_repository, '_fetch_open_graph_data').and.returnValue(Promise.resolve());
+      spyOn(link_preview_repository, '_fetchOpenGraphData').and.returnValue(Promise.resolve());
     });
 
     it('should reject if open graph lib is not available', done => {
       link_preview_repository
-        .get_link_preview()
+        .getLinkPreview()
         .then(done.fail)
         .catch(error => {
           expect(error.type).toBe(z.links.LinkPreviewError.TYPE.NOT_SUPPORTED);
@@ -50,10 +50,10 @@ describe('z.links.LinkPreviewRepository', () => {
       window.openGraph = {};
 
       link_preview_repository
-        .get_link_preview()
+        .getLinkPreview()
         .then(done.fail)
         .catch(error => {
-          expect(link_preview_repository._fetch_open_graph_data).toHaveBeenCalled();
+          expect(link_preview_repository._fetchOpenGraphData).toHaveBeenCalled();
           expect(error.type).toBe(z.links.LinkPreviewError.TYPE.NO_DATA_AVAILABLE);
           done();
         });
@@ -63,7 +63,7 @@ describe('z.links.LinkPreviewRepository', () => {
       window.openGraph = {};
 
       link_preview_repository
-        .get_link_preview('youtube.com')
+        .getLinkPreview('youtube.com')
         .then(done.fail)
         .catch(error => {
           expect(error.type).toBe(z.links.LinkPreviewError.TYPE.BLACKLISTED);

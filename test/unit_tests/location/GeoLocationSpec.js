@@ -24,7 +24,7 @@
 'use strict';
 
 describe('z.location', () => {
-  describe('get_location', () => {
+  describe('getLocation', () => {
     it('resolves a latitude & longitude via Google Maps API into a location name', done => {
       // prettier-ignore
       const locations = [{'address_components': [{'long_name': '2', 'short_name': '2', 'types': ['street_number']}, {'long_name': 'Alexanderstraße', 'short_name': 'Alexanderstraße', 'types': ['route']}, {'long_name': 'Mitte', 'short_name': 'Mitte', 'types': ['political', 'sublocality', 'sublocality_level_1']}, {'long_name': 'Berlin', 'short_name': 'Berlin', 'types': ['locality', 'political']}, {'long_name': 'Berlin', 'short_name': 'Berlin', 'types': ['administrative_area_level_1', 'political']}, {'long_name': 'Deutschland', 'short_name': 'DE', 'types': ['country', 'political']}, {'long_name': '10178', 'short_name': '10178', 'types': ['postal_code']}], 'formatted_address': 'Alexanderstraße 2, 10178 Berlin, Deutschland', 'geometry': {'location': {'lat': 52.523824, 'lng': 13.4145348}, 'location_type': 'ROOFTOP', 'viewport': {'northeast': {'lat': 52.52517298029149, 'lng': 13.4158837802915}, 'southwest': {'lat': 52.52247501970849, 'lng': 13.4131858197085}}}, 'place_id': 'ChIJ7xU9wx5OqEcRbjo-v63nALk', 'types': ['street_address']}, {'address_components': [{'long_name': 'Berlin (Alexanderplatz)', 'short_name': 'Berlin (Alexanderplatz)', 'types': ['bus_station', 'establishment', 'point_of_interest', 'transit_station']}, {'long_name': 'Mitte', 'short_name': 'Mitte', 'types': ['political', 'sublocality', 'sublocality_level_1']}, {'long_name': 'Berlin', 'short_name': 'Berlin', 'types': ['locality', 'political']}, {'long_name': 'Berlin', 'short_name': 'Berlin', 'types': ['administrative_area_level_1', 'political']}, {'long_name': 'Deutschland', 'short_name': 'DE', 'types': ['country', 'political']}, {'long_name': '10178', 'short_name': '10178', 'types': ['postal_code']}], 'formatted_address': 'Berlin (Alexanderplatz), 10178 Berlin, Deutschland', 'geometry': {'location': {'lat': 52.523198, 'lng': 13.414529}, 'location_type': 'APPROXIMATE', 'viewport': {'northeast': {'lat': 52.5245469802915, 'lng': 13.4158779802915}, 'southwest': {'lat': 52.5218490197085, 'lng': 13.4131800197085}}}, 'place_id': 'ChIJHTq-2R5OqEcRNJ0lG6qK3T4', 'types': ['bus_station', 'establishment', 'point_of_interest', 'transit_station']}, {'address_components': [{'long_name': 'Mitte', 'short_name': 'Mitte', 'types': ['political', 'sublocality', 'sublocality_level_2']}, {'long_name': 'Mitte', 'short_name': 'Mitte', 'types': ['political', 'sublocality', 'sublocality_level_1']}, {'long_name': 'Berlin', 'short_name': 'Berlin', 'types': ['locality', 'political']}, {'long_name': 'Berlin', 'short_name': 'Berlin', 'types': ['administrative_area_level_1', 'political']}, {'long_name': 'Deutschland', 'short_name': 'DE', 'types': ['country', 'political']}], 'formatted_address': 'Mitte, Berlin, Deutschland', 'geometry': {'bounds': {'northeast': {'lat': 52.5403962, 'lng': 13.4293586}, 'southwest': {'lat': 52.5040199, 'lng': 13.3658543}}, 'location': {'lat': 52.519444, 'lng': 13.406667}, 'location_type': 'APPROXIMATE', 'viewport': {'northeast': {'lat': 52.5403962, 'lng': 13.4293586}, 'southwest': {'lat': 52.5040199, 'lng': 13.3658543}}}, 'place_id': 'ChIJjw3Y6t9RqEcR8jUVWEcgISY', 'types': ['political', 'sublocality', 'sublocality_level_2']}, {'address_components': [{'long_name': 'Mitte', 'short_name': 'Mitte', 'types': ['political', 'sublocality', 'sublocality_level_1']}, {'long_name': 'Berlin', 'short_name': 'Berlin', 'types': ['locality', 'political']}, {'long_name': 'Berlin', 'short_name': 'Berlin', 'types': ['administrative_area_level_1', 'political']}, {'long_name': 'Deutschland', 'short_name': 'DE', 'types': ['country', 'political']}], 'formatted_address': 'Mitte, Berlin, Deutschland', 'geometry': {'bounds': {'northeast': {'lat': 52.5677268, 'lng': 13.4293586}, 'southwest': {'lat': 52.4987314, 'lng': 13.3015252}}, 'location': {'lat': 52.5306438, 'lng': 13.3830683}, 'location_type': 'APPROXIMATE', 'viewport': {'northeast': {'lat': 52.5677268, 'lng': 13.4293586}, 'southwest': {'lat': 52.4987314, 'lng': 13.3015252}}}, 'place_id': 'ChIJAUK8it1RqEcRwKtfW0YgIQU', 'types': ['political', 'sublocality', 'sublocality_level_1']}, {'address_components': [{'long_name': 'Berlin', 'short_name': 'Berlin', 'types': ['locality', 'political']}, {'long_name': 'Berlin', 'short_name': 'Berlin', 'types': ['administrative_area_level_1', 'political']}, {'long_name': 'Deutschland', 'short_name': 'DE', 'types': ['country', 'political']}], 'formatted_address': 'Berlin, Deutschland', 'geometry': {'bounds': {'northeast': {'lat': 52.6754542, 'lng': 13.7611176}, 'southwest': {'lat': 52.338234, 'lng': 13.088346}}, 'location': {'lat': 52.52000659999999, 'lng': 13.404954}, 'location_type': 'APPROXIMATE', 'viewport': {'northeast': {'lat': 52.6754542, 'lng': 13.7611175}, 'southwest': {'lat': 52.33962959999999, 'lng': 13.0911733}}}, 'place_id': 'ChIJAVkDPzdOqEcRcDteW0YgIQQ', 'types': ['locality', 'political']}, {'address_components': [{'long_name': '10178', 'short_name': '10178', 'types': ['postal_code']}, {'long_name': 'Berlin', 'short_name': 'Berlin', 'types': ['locality', 'political']}, {'long_name': 'Berlin', 'short_name': 'Berlin', 'types': ['administrative_area_level_1', 'political']}, {'long_name': 'Deutschland', 'short_name': 'DE', 'types': ['country', 'political']}], 'formatted_address': '10178 Berlin, Deutschland', 'geometry': {'bounds': {'northeast': {'lat': 52.528538, 'lng': 13.4296049}, 'southwest': {'lat': 52.5120099, 'lng': 13.3940579}}, 'location': {'lat': 52.5221879, 'lng': 13.4093313}, 'location_type': 'APPROXIMATE', 'viewport': {'northeast': {'lat': 52.528538, 'lng': 13.4296049}, 'southwest': {'lat': 52.5120099, 'lng': 13.3940579}}}, 'place_id': 'ChIJ85n72yFOqEcRIM89lUkgIRw', 'types': ['postal_code']}, {'address_components': [{'long_name': 'Berlin', 'short_name': 'Berlin', 'types': ['administrative_area_level_1', 'establishment', 'point_of_interest', 'political']}, {'long_name': 'Deutschland', 'short_name': 'DE', 'types': ['country', 'political']}], 'formatted_address': 'Berlin, Deutschland', 'geometry': {'bounds': {'northeast': {'lat': 52.6754542, 'lng': 13.7611176}, 'southwest': {'lat': 52.338234, 'lng': 13.088346}}, 'location': {'lat': 52.4938053, 'lng': 13.4552919}, 'location_type': 'APPROXIMATE', 'viewport': {'northeast': {'lat': 52.6754542, 'lng': 13.7611175}, 'southwest': {'lat': 52.33962959999999, 'lng': 13.0911733}}}, 'place_id': 'ChIJ8_KccStOqEcRhtFXjKWPuo0', 'types': ['administrative_area_level_1', 'establishment', 'point_of_interest', 'political']}, {'address_components': [{'long_name': 'Metropolregion Berlin/Brandenburg', 'short_name': 'Metropolregion Berlin/Brandenburg', 'types': ['political']}, {'long_name': 'Deutschland', 'short_name': 'DE', 'types': ['country', 'political']}], 'formatted_address': 'Metropolregion Berlin/Brandenburg, Deutschland', 'geometry': {'bounds': {'northeast': {'lat': 53.55898, 'lng': 14.7658261}, 'southwest': {'lat': 51.3590586, 'lng': 11.265727}}, 'location': {'lat': 52.268409, 'lng': 13.5287229}, 'location_type': 'APPROXIMATE', 'viewport': {'northeast': {'lat': 53.55898, 'lng': 14.765826}, 'southwest': {'lat': 51.3590586, 'lng': 11.265727}}}, 'place_id': 'ChIJZ4kamin3qEcRQ5VPQ7O8dWY', 'types': ['political']}, {'address_components': [{'long_name': 'Deutschland', 'short_name': 'DE', 'types': ['country', 'political']}], 'formatted_address': 'Deutschland', 'geometry': {'bounds': {'northeast': {'lat': 55.0815, 'lng': 15.0418962}, 'southwest': {'lat': 47.2701115, 'lng': 5.8663425}}, 'location': {'lat': 51.165691, 'lng': 10.451526}, 'location_type': 'APPROXIMATE', 'viewport': {'northeast': {'lat': 55.05812359999999, 'lng': 15.0418487}, 'southwest': {'lat': 47.2702482, 'lng': 5.8664874}}}, 'place_id': 'ChIJa76xwh5ymkcRW-WRjmtd6HU', 'types': ['country', 'political']}];
@@ -42,9 +42,9 @@ describe('z.location', () => {
       ]);
 
       z.location
-        .get_location(latitude, longitude)
+        .getLocation(latitude, longitude)
         .then(location => {
-          expect(location.country_code).toBe('DE');
+          expect(location.countryCode).toBe('DE');
           expect(location.place).toBe('Berlin');
           done();
         })
@@ -67,9 +67,9 @@ describe('z.location', () => {
       ]);
 
       z.location
-        .get_location(latitude, longitude)
+        .getLocation(latitude, longitude)
         .then(location => {
-          expect(location.country_code).toBe('&lt;script&gt;alert(&quot;malicious&quot;)&lt;/script&gt;');
+          expect(location.countryCode).toBe('&lt;script&gt;alert(&quot;malicious&quot;)&lt;/script&gt;');
           expect(location.place).toBe('Berlin');
           done();
         })
@@ -77,12 +77,12 @@ describe('z.location', () => {
     });
   });
 
-  describe('get_maps_url', () => {
+  describe('getMapsUrl', () => {
     it('should return the proper urls', () => {
-      expect(z.location.get_maps_url(52, 13)).toBe('https://google.com/maps/@52,13');
-      expect(z.location.get_maps_url(52, 13, null, 14)).toBe('https://google.com/maps/@52,13,14z');
-      expect(z.location.get_maps_url(52, 13, 'Berlin')).toBe('https://google.com/maps/place/Berlin/@52,13');
-      expect(z.location.get_maps_url(52, 13, 'Berlin', 14)).toBe('https://google.com/maps/place/Berlin/@52,13,14z');
+      expect(z.location.getMapsUrl(52, 13)).toBe('https://google.com/maps/@52,13');
+      expect(z.location.getMapsUrl(52, 13, null, 14)).toBe('https://google.com/maps/@52,13,14z');
+      expect(z.location.getMapsUrl(52, 13, 'Berlin')).toBe('https://google.com/maps/place/Berlin/@52,13');
+      expect(z.location.getMapsUrl(52, 13, 'Berlin', 14)).toBe('https://google.com/maps/place/Berlin/@52,13,14z');
     });
   });
 });

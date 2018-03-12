@@ -22,94 +22,110 @@
 window.z = window.z || {};
 window.z.components = z.components || {};
 
-z.components.FullSearchViewModel = class FullSearchViewModel {
+z.components.FullSearch = class FullSearch {
+  static get CONFIG() {
+    return {
+      MAX_OFFSET_INDEX: 30,
+      MAX_TEXT_LENGTH: 60,
+      MAX_VISIBLE_MESSAGES: 30,
+      PRE_MARKED_OFFSET: 20,
+    };
+  }
+
   constructor(params) {
-    this.search_provider = params.search_provider;
-    this.on_change = params.change;
-    this.on_result = params.result;
-    this.on_message_click = params.message_click;
+    this.searchProvider = params.search_provider;
 
-    this.message_ets = [];
-    this.message_ets_rendered = ko.observableArray();
-    this.number_of_message_to_render = 30;
+    this.onInputChange = query => {
+      if (typeof params.change === 'function') {
+        params.change(query);
+      }
+    };
 
-    this.show_no_results_text = ko.observable(false);
+    this.clickOnMessage = messageEntity => {
+      if (typeof params.click === 'function') {
+        params.click(messageEntity);
+      }
+    };
+
+    this.messageEntities = [];
+    this.visibleMessageEntities = ko.observableArray();
+
+    this.showNoResultsText = ko.observable(false);
 
     this.input = ko.observable();
     this.input.subscribe(
-      _.debounce(query => {
-        query = query.trim();
+      _.debounce(searchQuery => {
+        searchQuery = searchQuery.trim();
 
-        this.on_change(query);
+        this.onInputChange(searchQuery);
 
-        if (query.length < 2) {
-          this.message_ets = [];
-          this.message_ets_rendered([]);
-          this.show_no_results_text(false);
-          return;
+        const isQueryToShort = searchQuery.length < 2;
+        if (isQueryToShort) {
+          this.messageEntities = [];
+          this.visibleMessageEntities([]);
+          return this.showNoResultsText(false);
         }
 
-        this.search_provider(query).then(([message_ets, _query]) => {
-          if (_query === this.input().trim()) {
-            if (message_ets.length > 0) {
-              this.on_result();
-            }
-            this.show_no_results_text(message_ets.length === 0);
-            this.message_ets = message_ets;
-            this.message_ets_rendered(this.message_ets.splice(0, this.number_of_message_to_render));
+        this.searchProvider(searchQuery).then(({messageEntities, query}) => {
+          const isMatchingQuery = query === this.input().trim();
+          if (isMatchingQuery) {
+            this.showNoResultsText(messageEntities.length === 0);
+            this.messageEntities = messageEntities;
+            this.visibleMessageEntities(this.messageEntities.splice(0, FullSearch.CONFIG.MAX_VISIBLE_MESSAGES));
           }
         });
       }, 100)
     );
 
-    this.transform_text = message_et => {
-      const MAX_TEXT_LENGTH = 60;
-      const MAX_OFFSET_INDEX = 30;
-      const PRE_MARKED_OFFSET = 20;
-
-      const text = _.escape(message_et.get_first_asset().text);
-      const input = _.escape(this.input());
-
-      message_et.matches_count = 0;
-      let transformed_text = text.replace(z.search.FullTextSearch.getSearchRegex(input), match => {
-        message_et.matches_count += 1;
-        return `<mark class='full-search-marked' data-uie-name='full-search-item-mark'>${match}</mark>`;
-      });
-
-      const mark_offset = transformed_text.indexOf('<mark') - 1;
-      let slice_offset = mark_offset;
-
-      for (const index of _.range(mark_offset).reverse()) {
-        if (index < mark_offset - PRE_MARKED_OFFSET) {
-          break;
-        }
-
-        const char = transformed_text[index];
-
-        if (char === ' ') {
-          slice_offset = index + 1;
-        }
-      }
-
-      if (mark_offset > MAX_OFFSET_INDEX && text.length > MAX_TEXT_LENGTH) {
-        transformed_text = `…${transformed_text.slice(slice_offset)}`;
-      }
-
-      return transformed_text;
-    };
-
     // binding?
     $('.collection-list').on('scroll', event => {
-      if ($(event.currentTarget).is_scrolled_bottom() && this.message_ets.length) {
-        z.util.ko_array_push_all(
-          this.message_ets_rendered,
-          this.message_ets.splice(0, this.number_of_message_to_render)
-        );
+      const showAdditionalMessages = $(event.currentTarget).is_scrolled_bottom() && this.messageEntities.length;
+      if (showAdditionalMessages) {
+        const additionalMessageEntities = this.messageEntities.splice(0, FullSearch.CONFIG.MAX_VISIBLE_MESSAGES);
+        z.util.ko_array_push_all(this.visibleMessageEntities, additionalMessageEntities);
       }
     });
   }
 
-  on_dismiss_button_click() {
+  formatResult(messageEntity) {
+    const text = _.escape(messageEntity.get_first_asset().text);
+    const input = _.escape(this.input());
+
+    messageEntity.matchesCount = 0;
+
+    const replaceRegex = z.search.FullTextSearch.getSearchRegex(input);
+    const replaceFunction = match => {
+      messageEntity.matchesCount += 1;
+      return `<mark class='full-search-marked' data-uie-name='full-search-item-mark'>${match}</mark>`;
+    };
+
+    let transformedText = text.replace(replaceRegex, replaceFunction);
+
+    const markOffset = transformedText.indexOf('<mark') - 1;
+    let sliceOffset = markOffset;
+
+    for (const index of _.range(markOffset).reverse()) {
+      if (index < markOffset - FullSearch.CONFIG.PRE_MARKED_OFFSET) {
+        break;
+      }
+
+      const char = transformedText[index];
+      const isWhitespace = char === ' ';
+      if (isWhitespace) {
+        sliceOffset = index + 1;
+      }
+    }
+
+    const textTooLong = text.length > FullSearch.CONFIG.MAX_TEXT_LENGTH;
+    const offsetTooBig = markOffset > FullSearch.CONFIG.MAX_OFFSET_INDEX;
+    if (textTooLong && offsetTooBig) {
+      transformedText = `…${transformedText.slice(sliceOffset)}`;
+    }
+
+    return transformedText;
+  }
+
+  clickOnDismiss() {
     this.input('');
   }
 
@@ -123,28 +139,28 @@ ko.components.register('full-search', {
     <header class="full-search-header">
       <span class="full-search-header-icon icon-search"></span>
       <div class="full-search-header-input">
-        <input type="text" data-bind="hasFocus: true, l10n_placeholder: z.string.fullsearch_placeholder, textInput: input" data-uie-name="full-search-header-input"/>
-        <span class="button-icon icon-dismiss" data-bind="click: on_dismiss_button_click, visible: input()" data-uie-name="full-search-dismiss"></span>
+        <input type="text" data-bind="hasFocus: true, l10n_placeholder: z.string.fullsearchPlaceholder, textInput: input" data-uie-name="full-search-header-input"/>
+        <span class="button-icon icon-dismiss" data-bind="click: clickOnDismiss, visible: input()" data-uie-name="full-search-dismiss"></span>
       </div>
     </header>
-    <!-- ko if: show_no_results_text() -->
-      <div class="full-search-no-result" data-bind="l10n_text: z.string.fullsearch_no_results" data-uie-name="full-search-no-results"></div>
+    <!-- ko if: showNoResultsText() -->
+      <div class="full-search-no-result" data-bind="l10n_text: z.string.fullsearchNoResults" data-uie-name="full-search-no-results"></div>
     <!-- /ko -->
-    <div class="full-search-list" data-bind="foreach: {data: message_ets_rendered}" data-uie-name="full-search-list">
-      <div class="full-search-item" data-bind="click: $parent.on_message_click" data-uie-name="full-search-item">
+    <div class="full-search-list" data-bind="foreach: {data: visibleMessageEntities}" data-uie-name="full-search-list">
+      <div class="full-search-item" data-bind="click: $parent.clickOnMessage" data-uie-name="full-search-item">
         <div class="full-search-item-avatar">
-          <participant-avatar params="participant: user(), size: z.components.ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
+          <participant-avatar params="participant: user, size: z.components.ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
         </div>
         <div class="full-search-item-content">
-          <div class="full-search-item-content-text ellipsis" data-bind="html: $parent.transform_text($data)" data-uie-name="full-search-item-text"></div>
+          <div class="full-search-item-content-text ellipsis" data-bind="html: $parent.formatResult($data)" data-uie-name="full-search-item-text"></div>
           <div class="full-search-item-content-info">
             <span class="font-weight-bold" data-bind="text: user().first_name()" data-uie-name="full-search-item-sender"></span>
             <span data-bind="text: moment($data.timestamp()).format('MMMM D, YYYY')" data-uie-name="full-search-item-timestamp"></span>
           </div>
         </div>
-        <div class="badge" data-bind="text: matches_count, visible: matches_count > 1" data-uie-name="full-search-item-badge"></div>
+        <div class="badge" data-bind="text: matchesCount, visible: matchesCount > 1" data-uie-name="full-search-item-badge"></div>
       </div>
     </div>
   `,
-  viewModel: z.components.FullSearchViewModel,
+  viewModel: z.components.FullSearch,
 });

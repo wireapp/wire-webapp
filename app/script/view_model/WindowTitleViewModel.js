@@ -20,96 +20,100 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.ViewModel = z.ViewModel || {};
+window.z.viewModel = z.viewModel || {};
 
-z.ViewModel.WindowTitleViewModel = class WindowTitleViewModel {
-  constructor(content_state, conversation_repository, user_repository) {
-    this.content_state = content_state;
-    this.conversation_repository = conversation_repository;
-    this.user_repository = user_repository;
-    this.logger = new z.util.Logger('z.ViewModel.WindowTitleViewModel', z.config.LOGGER.OPTIONS);
+z.viewModel.WindowTitleViewModel = class WindowTitleViewModel {
+  constructor(mainViewModel, repositories) {
+    this.initiateTitleUpdates = this.initiateTitleUpdates.bind(this);
 
-    this.update_window_title = ko.observable(false);
+    this.contentState = mainViewModel.content.state;
+    this.conversationRepository = repositories.conversation;
+    this.userRepository = repositories.user;
+    this.logger = new z.util.Logger('z.viewModel.WindowTitleViewModel', z.config.LOGGER.OPTIONS);
 
-    amplify.subscribe(z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, this.set_update_state.bind(this));
-    amplify.subscribe(z.event.WebApp.LIFECYCLE.LOADED, this.initiate_title_updates.bind(this));
+    this.updateWindowTitle = ko.observable(false);
+
+    amplify.subscribe(z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, this.setUpdateState.bind(this));
+    amplify.subscribe(z.event.WebApp.LIFECYCLE.LOADED, this.initiateTitleUpdates);
   }
 
-  initiate_title_updates() {
+  initiateTitleUpdates() {
+    amplify.unsubscribe(z.event.WebApp.LIFECYCLE.LOADED, this.initiateTitleUpdates);
+
     this.logger.info('Starting to update window title');
-    this.update_window_title(true);
+    this.updateWindowTitle(true);
 
     ko
       .computed(() => {
-        if (this.update_window_title()) {
-          let window_title = '';
-          let number_of_unread_conversations = 0;
-          const number_of_requests = this.user_repository.connect_requests().length;
+        if (this.updateWindowTitle()) {
+          let specificTitle = '';
+          let unreadConversations = 0;
+          const connectionRequests = this.userRepository.connect_requests().length;
 
-          this.conversation_repository.conversations_unarchived().forEach(conversation_et => {
-            const is_ignored = conversation_et.is_request() || conversation_et.is_muted();
-            if (conversation_et.unread_message_count() && !is_ignored) {
-              number_of_unread_conversations++;
+          this.conversationRepository.conversations_unarchived().forEach(conversationEntity => {
+            const isIgnored = conversationEntity.is_request() || conversationEntity.is_muted();
+            if (conversationEntity.unread_message_count() && !isIgnored) {
+              unreadConversations++;
             }
           });
 
-          this.conversation_repository.conversations_calls().forEach(conversation_et => {
-            if (conversation_et.has_joinable_call()) {
-              number_of_unread_conversations++;
+          this.conversationRepository.conversations_calls().forEach(conversationEntity => {
+            if (conversationEntity.has_joinable_call()) {
+              unreadConversations++;
             }
           });
 
-          const badge_count = number_of_requests + number_of_unread_conversations;
-          if (badge_count > 0) {
-            window_title = `(${badge_count}) · `;
+          const unreadCount = connectionRequests + unreadConversations;
+          if (unreadCount > 0) {
+            specificTitle = `(${unreadCount}) · `;
           }
 
-          amplify.publish(z.event.WebApp.LIFECYCLE.UNREAD_COUNT, badge_count);
+          amplify.publish(z.event.WebApp.LIFECYCLE.UNREAD_COUNT, unreadCount);
 
-          switch (this.content_state()) {
-            case z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS: {
-              if (number_of_requests > 1) {
-                window_title += z.l10n.text(z.string.conversations_connection_request_many, number_of_requests);
-              } else {
-                window_title += z.l10n.text(z.string.conversations_connection_request_one);
+          switch (this.contentState()) {
+            case z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS: {
+              const multipleRequests = connectionRequests > 1;
+              const stringId = multipleRequests
+                ? z.string.conversationsConnectionRequestMany
+                : z.string.conversationsConnectionRequestOne;
+              specificTitle += z.l10n.text(stringId, connectionRequests);
+              break;
+            }
+
+            case z.viewModel.ContentViewModel.STATE.CONVERSATION: {
+              if (this.conversationRepository.active_conversation()) {
+                specificTitle += this.conversationRepository.active_conversation().display_name();
               }
               break;
             }
 
-            case z.ViewModel.content.CONTENT_STATE.CONVERSATION: {
-              if (this.conversation_repository.active_conversation()) {
-                window_title += this.conversation_repository.active_conversation().display_name();
-              }
+            case z.viewModel.ContentViewModel.STATE.PREFERENCES_ABOUT: {
+              specificTitle += z.l10n.text(z.string.preferencesAbout);
               break;
             }
 
-            case z.ViewModel.content.CONTENT_STATE.PREFERENCES_ABOUT: {
-              window_title += z.l10n.text(z.string.preferences_about);
+            case z.viewModel.ContentViewModel.STATE.PREFERENCES_ACCOUNT: {
+              specificTitle += z.l10n.text(z.string.preferencesAccount);
               break;
             }
 
-            case z.ViewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT: {
-              window_title += z.l10n.text(z.string.preferences_account);
+            case z.viewModel.ContentViewModel.STATE.PREFERENCES_AV: {
+              specificTitle += z.l10n.text(z.string.preferencesAV);
               break;
             }
 
-            case z.ViewModel.content.CONTENT_STATE.PREFERENCES_AV: {
-              window_title += z.l10n.text(z.string.preferences_av);
+            case z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICE_DETAILS: {
+              specificTitle += z.l10n.text(z.string.preferencesDeviceDetails);
               break;
             }
 
-            case z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICE_DETAILS: {
-              window_title += z.l10n.text(z.string.preferences_device_details);
+            case z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICES: {
+              specificTitle += z.l10n.text(z.string.preferencesDevices);
               break;
             }
 
-            case z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES: {
-              window_title += z.l10n.text(z.string.preferences_devices);
-              break;
-            }
-
-            case z.ViewModel.content.CONTENT_STATE.PREFERENCES_OPTIONS: {
-              window_title += z.l10n.text(z.string.preferences_options);
+            case z.viewModel.ContentViewModel.STATE.PREFERENCES_OPTIONS: {
+              specificTitle += z.l10n.text(z.string.preferencesOptions);
               break;
             }
 
@@ -117,23 +121,20 @@ z.ViewModel.WindowTitleViewModel = class WindowTitleViewModel {
               break;
           }
 
-          if (window_title !== '' && !window_title.endsWith(' ')) {
-            window_title += ' · ';
-          }
-          window_title += z.l10n.text(z.string.wire);
-
-          window.document.title = window_title;
+          const isTitleSet = specificTitle !== '' && !specificTitle.endsWith(' ');
+          window.document.title = `${specificTitle}${isTitleSet ? ' · ' : ''}${z.l10n.text(z.string.wire)}`;
         }
       })
       .extend({rateLimit: 250});
   }
 
-  set_update_state(handling_notifications) {
-    const update_window_title = handling_notifications === z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
+  setUpdateState(handlingNotifications) {
+    const updateWindowTitle = handlingNotifications === z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
 
-    if (this.update_window_title() !== update_window_title) {
-      this.update_window_title(update_window_title);
-      this.logger.debug(`Set window title update state to '${this.update_window_title()}'`);
+    const isStateChange = this.updateWindowTitle() !== updateWindowTitle;
+    if (isStateChange) {
+      this.updateWindowTitle(updateWindowTitle);
+      this.logger.debug(`Set window title update state to '${this.updateWindowTitle()}'`);
     }
   }
 };

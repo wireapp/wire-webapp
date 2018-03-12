@@ -20,92 +20,82 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.ViewModel = z.ViewModel || {};
-window.z.ViewModel.content = z.ViewModel.content || {};
+window.z.viewModel = z.viewModel || {};
+window.z.viewModel.content = z.viewModel.content || {};
 
-z.ViewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewModel {
-  constructor(
-    element_id,
-    preferences_device_details,
-    client_repository,
-    conversation_repository,
-    cryptography_repository
-  ) {
-    this.click_on_remove_device = this.click_on_remove_device.bind(this);
-    this.click_on_show_device = this.click_on_show_device.bind(this);
-    this.update_device_info = this.update_device_info.bind(this);
+z.viewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewModel {
+  constructor(mainViewModel, contentViewModel, repositories) {
+    this.clickOnRemoveDevice = this.clickOnRemoveDevice.bind(this);
+    this.clickOnShowDevice = this.clickOnShowDevice.bind(this);
+    this.updateDeviceInfo = this.updateDeviceInfo.bind(this);
 
-    this.preferences_device_details = preferences_device_details;
-    this.client_repository = client_repository;
-    this.conversation_repository = conversation_repository;
-    this.cryptography_repository = cryptography_repository;
-    this.logger = new z.util.Logger('z.ViewModel.content.PreferencesDevicesViewModel', z.config.LOGGER.OPTIONS);
+    this.clientRepository = repositories.client;
+    this.conversationRepository = repositories.conversation;
+    this.cryptographyRepository = repositories.cryptography;
+    this.logger = new z.util.Logger('z.viewModel.content.PreferencesDevicesViewModel', z.config.LOGGER.OPTIONS);
 
-    this.self_user = this.client_repository.self_user;
+    this.actionsViewModel = mainViewModel.actions;
+    this.preferencesDeviceDetails = contentViewModel.preferencesDeviceDetails;
+    this.currentClient = this.clientRepository.currentClient;
+    this.displayClientId = ko.pureComputed(() => (this.currentClient() ? this.currentClient().formatId() : []));
 
-    this.current_client = this.client_repository.currentClient;
-    this.displayClientId = ko.pureComputed(() => (this.current_client() ? this.current_client().formatId() : []));
-
-    this.activated_in = ko.observable([]);
-    this.activated_on = ko.observable([]);
+    this.activationLocation = ko.observable([]);
+    this.activationDate = ko.observable([]);
     this.devices = ko.observableArray();
-    this.displayFingerPrint = ko.observable();
+    this.localFingerprint = ko.observableArray([]);
 
-    this.should_update_scrollbar = ko.computed(() => this.devices()).extend({notify: 'always', rateLimit: 500});
+    this.shouldUpdateScrollbar = ko.computed(() => this.devices()).extend({notify: 'always', rateLimit: 500});
 
-    this._update_activation_location('?');
+    this._updateActivationLocation('?');
 
     // All clients except the current client
-    this.client_repository.clients.subscribe(client_ets => {
-      const devices = client_ets.filter(client_et => client_et.id !== this.current_client().id);
+    this.clientRepository.clients.subscribe(clientEntities => {
+      const devices = clientEntities.filter(clientEntity => clientEntity.id !== this.currentClient().id);
       this.devices(devices);
     });
   }
 
-  _update_activation_location(location, template = z.string.preferences_devices_activated_in) {
-    const sanitizedText = z.util.StringUtil.splitAtPivotElement(template, '{{location}}', location);
-    this.activated_in(sanitizedText);
-  }
-
-  _update_activation_time(time, template = z.string.preferences_devices_activated_on) {
+  _updateActivationDate(time, template = z.string.preferencesDevicesActivatedOn) {
     const formattedTime = z.util.format_timestamp(time);
     const sanitizedText = z.util.StringUtil.splitAtPivotElement(template, '{{date}}', formattedTime);
-    this.activated_on(sanitizedText);
+    this.activationDate(sanitizedText);
   }
 
-  _update_device_location(location) {
-    z.location.get_location(location.lat, location.lon).then(retrieved_location => {
-      if (retrieved_location) {
-        this._update_activation_location(`${retrieved_location.place}, ${retrieved_location.country_code}`);
-      }
-    });
+  _updateActivationLocation(location, template = z.string.preferencesDevicesActivatedIn) {
+    const sanitizedText = z.util.StringUtil.splitAtPivotElement(template, '{{location}}', location);
+    this.activationLocation(sanitizedText);
   }
 
-  click_on_show_device(device_et) {
-    this.preferences_device_details.device(device_et);
-    amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICE_DETAILS);
+  _updateLocation({lat: latitude, lon: longitude}) {
+    if (latitude && longitude) {
+      z.location.getLocation(latitude, longitude).then(mappedLocation => {
+        if (mappedLocation) {
+          const {countryCode, place} = mappedLocation;
+          this._updateActivationLocation(`${place}, ${countryCode}`);
+        }
+      });
+    }
   }
 
-  click_on_remove_device(device_et, event) {
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.REMOVE_DEVICE, {
-      action: password => {
-        this.client_repository.deleteClient(device_et.id, password);
-      },
-      data: device_et.model,
-    });
+  clickOnShowDevice(clientEntity) {
+    this.preferencesDeviceDetails.device(clientEntity);
+    amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICE_DETAILS);
+  }
+
+  clickOnRemoveDevice(clientEntity, event) {
+    this.actionsViewModel.deleteClient(clientEntity);
     event.stopPropagation();
   }
 
-  update_device_info() {
-    if (this.current_client() && !this.displayFingerPrint()) {
-      if (this.current_client().location) {
-        this._update_device_location(this.current_client().location);
+  updateDeviceInfo() {
+    if (this.currentClient() && !this.localFingerprint().length) {
+      const {location, time} = this.currentClient();
+      this._updateActivationDate(time);
+      if (location) {
+        this._updateLocation(location);
       }
 
-      this._update_activation_time(this.current_client().time);
-      this.displayFingerPrint(
-        z.util.zero_padding(this.cryptography_repository.get_local_fingerprint(), 16).match(/.{1,2}/g)
-      );
+      this.localFingerprint(this.cryptographyRepository.getLocalFingerprint());
     }
   }
 };

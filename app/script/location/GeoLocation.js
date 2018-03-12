@@ -22,31 +22,40 @@
 window.z = window.z || {};
 
 z.location = (() => {
-  const GOOGLE_GEOCODING_BASE_URL = 'https://maps.googleapis.com/maps/api/geocode/json';
   const API_KEY = 'AIzaSyCKxxKw5JBZ5zEFtoirtgnw8omvH7gWzfo';
-  const _parse_results = results => {
-    const res = {};
-    const [result] = results;
-    res.address = result.formatted_address;
-    res.lat = result.geometry.location.lat;
-    res.lng = result.geometry.location.lng;
-    for (const component of result.address_components) {
-      const name = component.long_name || component.short_name;
-      for (const type of component.types) {
-        res[type] = name;
-        if (type === 'country') {
-          res.country_code = component.short_name || '';
+  const GOOGLE_GEOCODE_BASE_URL = 'https://maps.googleapis.com/maps/api/geocode/json';
+
+  const _parseResults = ([{address_components: addressComponents, formatted_address: formattedAddress, geometry}]) => {
+    const locationResult = {
+      address: formattedAddress,
+      lat: geometry.location.lat,
+      lng: geometry.location.lng,
+    };
+
+    addressComponents.forEach(({long_name: longName, short_name: shortName, types}) => {
+      const name = longName || shortName;
+
+      types.forEach(type => {
+        locationResult[type] = name;
+        const isCountry = type === 'country';
+        if (isCountry) {
+          locationResult.countryCode = shortName || '';
         }
-      }
-    }
-    res.place =
-      res.locality ||
-      res.natural_feature ||
-      res.administrative_area_level_3 ||
-      res.administrative_area_level_2 ||
-      res.administrative_area_level_1;
-    delete (res.political != null);
-    return z.util.ObjectUtil.escape_properties(res);
+      });
+    });
+
+    const {
+      administrative_area_level_1: areaLevel1,
+      administrative_area_level_2: areaLevel2,
+      administrative_area_level_3: areaLevel3,
+      locality,
+      natural_feature: naturalFeature,
+    } = locationResult;
+
+    locationResult.place = locality || naturalFeature || areaLevel3 || areaLevel2 || areaLevel1;
+
+    delete locationResult.political;
+    return z.util.ObjectUtil.escape_properties(locationResult);
   };
 
   /**
@@ -55,19 +64,17 @@ z.location = (() => {
    * @param {number} longitude - Longitude of location
    * @returns {Promise} Resolves with the location information
    */
-  const get_location = (latitude, longitude) => {
+  const _getLocation = (latitude, longitude) => {
     return new Promise((resolve, reject) => {
       if (latitude == null || longitude == null) {
         reject(new Error('You need to specify latitude and longitude in order to retrieve the location'));
       }
-      $.ajax({
-        url: `${GOOGLE_GEOCODING_BASE_URL}?latlng=${latitude},${longitude}&key=${API_KEY}`,
-      })
+
+      const requestUrl = `${GOOGLE_GEOCODE_BASE_URL}?latlng=${latitude},${longitude}&key=${API_KEY}`;
+      $.ajax({url: requestUrl})
         .done(response => {
-          if (response.status === 'OK') {
-            return resolve(_parse_results(response.results));
-          }
-          return resolve();
+          const isStatusOk = response.status === 'OK';
+          return isStatusOk ? resolve(_parseResults(response.results)) : resolve();
         })
         .fail((jqXHR, textStatus, errorThrown) => reject(new Error(errorThrown)));
     });
@@ -76,27 +83,24 @@ z.location = (() => {
   /**
    * Return link to Google Maps
    *
-   * @param {number} lat - Latitude of location
-   * @param {number} lng - Longitude of location
+   * @param {number} latitude - Latitude of location
+   * @param {number} longitude - Longitude of location
    * @param {string} name - Name of location
    * @param {string} zoom - Map zoom level
    * @returns {string} URL to location in Google Maps
    */
-  const get_maps_url = (lat, lng, name, zoom) => {
-    let base_url;
-    base_url = 'https://google.com/maps/';
-    if (name != null) {
-      base_url += `place/${name}/`;
-    }
-    base_url += `@${lat},${lng}`;
-    if (zoom != null) {
-      base_url += `,${zoom}z`;
-    }
-    return base_url;
+  const _getMapsUrl = (latitude, longitude, name, zoom) => {
+    const baseUrl = 'https://google.com/maps/';
+
+    const nameParam = name ? `place/${name}/` : '';
+    const locationParam = `@${latitude},${longitude}`;
+    const zoomParam = zoom ? `,${zoom}z` : '';
+
+    return `${baseUrl}${nameParam}${locationParam}${zoomParam}`;
   };
 
   return {
-    get_location,
-    get_maps_url,
+    getLocation: _getLocation,
+    getMapsUrl: _getMapsUrl,
   };
 })();

@@ -20,98 +20,88 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.ViewModel = z.ViewModel || {};
+window.z.viewModel = z.viewModel || {};
 
-/**
- * Types for warning banners.
- */
-z.ViewModel.WarningType = {
-  CONNECTIVITY_RECONNECT: 'connectivity_reconnect',
-  CONNECTIVITY_RECOVERY: 'connectivity_recovery',
-  DENIED_CAMERA: 'camera_access_denied',
-  DENIED_MICROPHONE: 'mic_access_denied',
-  DENIED_SCREEN: 'screen_access_denied',
-  LIFECYCLE_UPDATE: 'lifecycle_update',
-  NO_INTERNET: 'no_internet',
-  NOT_FOUND_CAMERA: 'not_found_camera',
-  NOT_FOUND_MICROPHONE: 'not_found_microphone',
-  REQUEST_CAMERA: 'request_camera',
-  REQUEST_MICROPHONE: 'request_microphone',
-  REQUEST_NOTIFICATION: 'request_notification',
-  REQUEST_SCREEN: 'request_screen',
-  UNSUPPORTED_INCOMING_CALL: 'unsupported_incoming_call',
-  UNSUPPORTED_OUTGOING_CALL: 'unsupported_outgoing_call',
-};
-
-z.ViewModel.WarningsViewModel = class WarningsViewModel {
+z.viewModel.WarningsViewModel = class WarningsViewModel {
   static get CONFIG() {
     return {
       DIMMED_MODES: [
-        z.ViewModel.WarningType.REQUEST_CAMERA,
-        z.ViewModel.WarningType.REQUEST_MICROPHONE,
-        z.ViewModel.WarningType.REQUEST_NOTIFICATION,
-        z.ViewModel.WarningType.REQUEST_SCREEN,
+        WarningsViewModel.TYPE.REQUEST_CAMERA,
+        WarningsViewModel.TYPE.REQUEST_MICROPHONE,
+        WarningsViewModel.TYPE.REQUEST_NOTIFICATION,
+        WarningsViewModel.TYPE.REQUEST_SCREEN,
       ],
       MINI_MODES: [
-        z.ViewModel.WarningType.CONNECTIVITY_RECONNECT,
-        z.ViewModel.WarningType.LIFECYCLE_UPDATE,
-        z.ViewModel.WarningType.NO_INTERNET,
+        WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT,
+        WarningsViewModel.TYPE.LIFECYCLE_UPDATE,
+        WarningsViewModel.TYPE.NO_INTERNET,
       ],
     };
   }
 
-  constructor(element_id) {
-    this.logger = new z.util.Logger('z.ViewModel.WarningsViewModel', z.config.LOGGER.OPTIONS);
+  static get TYPE() {
+    return {
+      CONNECTIVITY_RECONNECT: 'connectivity_reconnect',
+      CONNECTIVITY_RECOVERY: 'connectivity_recovery',
+      DENIED_CAMERA: 'camera_access_denied',
+      DENIED_MICROPHONE: 'mic_access_denied',
+      DENIED_SCREEN: 'screen_access_denied',
+      LIFECYCLE_UPDATE: 'lifecycle_update',
+      NO_INTERNET: 'no_internet',
+      NOT_FOUND_CAMERA: 'not_found_camera',
+      NOT_FOUND_MICROPHONE: 'not_found_microphone',
+      REQUEST_CAMERA: 'request_camera',
+      REQUEST_MICROPHONE: 'request_microphone',
+      REQUEST_NOTIFICATION: 'request_notification',
+      REQUEST_SCREEN: 'request_screen',
+      UNSUPPORTED_INCOMING_CALL: 'unsupported_incoming_call',
+      UNSUPPORTED_OUTGOING_CALL: 'unsupported_outgoing_call',
+    };
+  }
+
+  constructor() {
+    this.elementId = 'warnings';
+    this.logger = new z.util.Logger('z.viewModel.WarningsViewModel', z.config.LOGGER.OPTIONS);
 
     // Array of warning banners
     this.warnings = ko.observableArray();
-    this.top_warning = ko.pureComputed(
-      () => {
-        return this.warnings()[this.warnings().length - 1];
-      },
-      this,
-      {deferEvaluation: true}
-    );
+    this.visibleWarning = ko.pureComputed(() => this.warnings()[this.warnings().length - 1]);
 
     this.warnings.subscribe(warnings => {
-      let top_margin;
+      let topMargin;
 
-      const top_warning = warnings[warnings.length - 1];
-      if (!warnings.length) {
-        top_margin = '0';
-      } else if (top_warning === z.ViewModel.WarningType.CONNECTIVITY_RECOVERY) {
-        top_margin = '0';
-      } else if (WarningsViewModel.CONFIG.MINI_MODES.includes(top_warning)) {
-        top_margin = '32px';
+      const visibleWarning = warnings[warnings.length - 1];
+      const isConnectivityRecovery = visibleWarning === WarningsViewModel.TYPE.CONNECTIVITY_RECOVERY;
+      const noMargin = !warnings.length || isConnectivityRecovery;
+      if (noMargin) {
+        topMargin = '0';
       } else {
-        top_margin = '64px';
+        const isMiniMode = WarningsViewModel.CONFIG.MINI_MODES.includes(visibleWarning);
+        topMargin = isMiniMode ? '32px' : '64px';
       }
-      $('#app').css({top: top_margin});
+
+      $('#app').css({top: topMargin});
       window.requestAnimationFrame(() => $(window).trigger('resize'));
     });
 
-    this.first_name = ko.observable();
-    this.call_id = undefined;
+    this.name = ko.observable();
 
-    this.warning_dimmed = ko
-      .pureComputed(
-        () => {
-          for (const warning of this.warnings()) {
-            if (WarningsViewModel.CONFIG.DIMMED_MODES.includes(warning)) {
-              return true;
-            }
+    this.warningDimmed = ko
+      .pureComputed(() => {
+        for (const warning of this.warnings()) {
+          const isDimmedMode = WarningsViewModel.CONFIG.DIMMED_MODES.includes(warning);
+          if (isDimmedMode) {
+            return true;
           }
-          return false;
-        },
-        this,
-        {deferEvaluation: true}
-      )
+        }
+        return false;
+      })
       .extend({rateLimit: 200});
 
-    amplify.subscribe(z.event.WebApp.WARNING.SHOW, this.show_warning.bind(this));
-    amplify.subscribe(z.event.WebApp.WARNING.DISMISS, this.dismiss_warning.bind(this));
+    amplify.subscribe(z.event.WebApp.WARNING.SHOW, this.showWarning.bind(this));
+    amplify.subscribe(z.event.WebApp.WARNING.DISMISS, this.dismissWarning.bind(this));
 
-    ko.applyBindings(this, document.getElementById(element_id));
+    ko.applyBindings(this, document.getElementById(this.elementId));
   }
 
   /**
@@ -119,19 +109,24 @@ z.ViewModel.WarningsViewModel = class WarningsViewModel {
    * @note Used to close a warning banner by clicking the close button
    * @returns {undefined} No return value
    */
-  close_warning() {
-    const warning_to_remove = this.top_warning();
-    this.dismiss_warning(warning_to_remove);
+  closeWarning() {
+    const warningToClose = this.visibleWarning();
+    this.dismissWarning(warningToClose);
 
-    switch (warning_to_remove) {
-      case z.ViewModel.WarningType.REQUEST_MICROPHONE:
-        amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CALLING, {
-          action() {
+    switch (warningToClose) {
+      case WarningsViewModel.TYPE.REQUEST_MICROPHONE:
+        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, {
+          action: () => {
             z.util.safe_window_open(z.util.URLUtil.build_support_url(z.config.SUPPORT.ID.MICROPHONE_ACCESS_DENIED));
+          },
+          text: {
+            action: z.l10n.text(z.string.modalCallNoMicrophoneAction),
+            message: z.l10n.text(z.string.modalCallNoMicrophoneMessage),
+            title: z.l10n.text(z.string.modalCallNoMicrophoneHeadline),
           },
         });
         break;
-      case z.ViewModel.WarningType.REQUEST_NOTIFICATION:
+      case WarningsViewModel.TYPE.REQUEST_NOTIFICATION:
         // We block subsequent permission requests for notifications when the user ignores the request.
         amplify.publish(z.event.WebApp.NOTIFICATION.PERMISSION_STATE, z.notification.PermissionStatusState.IGNORED);
         break;
@@ -140,27 +135,24 @@ z.ViewModel.WarningsViewModel = class WarningsViewModel {
     }
   }
 
-  dismiss_warning(type = this.top_warning()) {
-    const dismissed_warnings = this.warnings.remove(type);
-    if (dismissed_warnings.length) {
+  dismissWarning(type = this.visibleWarning()) {
+    const dismissedWarnings = this.warnings.remove(type);
+    if (dismissedWarnings.length) {
       this.logger.info(`Dismissed warning of type '${type}'`);
     }
   }
 
-  show_warning(type, info) {
-    const is_connectivity_warning = [
-      z.ViewModel.WarningType.CONNECTIVITY_RECONNECT,
-      z.ViewModel.WarningType.NO_INTERNET,
-    ].includes(type);
-    const top_warning_is_not_lifecycle_update = this.top_warning() !== z.ViewModel.WarningType.LIFECYCLE_UPDATE;
-    if (is_connectivity_warning && top_warning_is_not_lifecycle_update) {
-      this.dismiss_warning(this.top_warning());
+  showWarning(type, info) {
+    const connectivityTypes = [WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT, WarningsViewModel.TYPE.NO_INTERNET];
+    const isConnectivityWarning = connectivityTypes.includes(type);
+    const visibleWarningIsLifecycleUpdate = this.visibleWarning() === WarningsViewModel.TYPE.LIFECYCLE_UPDATE;
+    if (isConnectivityWarning && !visibleWarningIsLifecycleUpdate) {
+      this.dismissWarning(this.visibleWarning());
     }
 
     this.logger.warn(`Showing warning of type '${type}'`);
     if (info) {
-      this.first_name(info.first_name);
-      this.call_id = info.call_id;
+      this.name(info.name);
     }
     this.warnings.push(type);
   }

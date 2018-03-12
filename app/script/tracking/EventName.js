@@ -29,9 +29,7 @@ window.z.tracking = z.tracking || {};
 z.tracking.EventName = {
   ACCOUNT: {
     LOGGED_IN: 'account.logged_in',
-    OPENED_LOGIN: 'account.opened_login',
   },
-  APP_LAUNCH: 'appLaunch',
   CALLING: {
     ENDED_CALL: 'calling.ended_call',
     ENDED_VIDEO_CALL: 'calling.ended_video_call',
@@ -48,83 +46,34 @@ z.tracking.EventName = {
     RECEIVED_VIDEO_CALL: 'calling.received_video_call',
     SHARED_SCREEN: 'calling.shared_screen',
   },
-  COLLECTION: {
-    DID_ITEM_ACTION: 'collections.did_item_action',
-    ENTERED_SEARCH: 'collection.entered_search',
-    OPENED_COLLECTIONS: 'collections.opened_collections',
-    OPENED_ITEM: 'collections.opened_item',
-    SELECTED_SEARCH_RESULT: 'collection.selected_search_result',
-  },
   CONTRIBUTED: 'contributed',
   CONVERSATION: {
-    CHARACTER_LIMIT_REACHED: 'conversation.character_limit_reached',
-    DELETED_MESSAGE: 'conversation.deleted_message',
-    EDITED_MESSAGE: 'conversation.edited_message',
+    ADD_PARTICIPANTS: 'conversation.add_participants',
     GROUP_CREATION_SUCCEEDED: 'conversation.group_creation_succeeded',
     OPENED_GROUP_CREATION: 'conversation.opened_group_creation',
     OPENED_SELECT_PARTICIPANTS: 'conversation.opened_select_participants',
-    REACTED_TO_MESSAGE: 'conversation.reacted_to_message',
-    SELECTED_MESSAGE: 'conversation.selected_message',
   },
   E2EE: {
     FAILED_MESSAGE_DECRYPTION: 'e2ee.failed_message_decryption',
   },
-  FILE: {
-    DOWNLOAD_FAILED: 'file.failed_file_download',
-    DOWNLOAD_INITIATED: 'file.initiated_file_download',
-    DOWNLOAD_SUCCESSFUL: 'file.successfully_downloaded_file',
-    UPLOAD_CANCELLED: 'file.cancelled_file_upload',
-    UPLOAD_FAILED: 'file.failed_file_upload',
-    UPLOAD_INITIATED: 'file.initiated_file_upload',
-    UPLOAD_SUCCESSFUL: 'file.successfully_uploaded_file',
-    UPLOAD_TOO_BIG: 'file.attempted_too_big_file_upload',
+  GUEST_ROOMS: {
+    ALLOW_GUESTS: 'guest_rooms.allow_guests',
+    GUEST_ROOM_CREATION: 'guest_rooms.guest_room_creation',
+    LINK_COPIED: 'guest_rooms.link_copied',
+    LINK_CREATED: 'guest_rooms.link_created',
+    LINK_REVOKED: 'guest_rooms.link_revoked',
   },
-  IMAGE_SENT_ERROR: 'Image Sent Error',
   INTEGRATION: {
     ADDED_SERVICE: 'integration.added_service',
     REMOVED_SERVICE: 'integration.removed_service',
   },
-  MEDIA: {
-    PLAYED_AUDIO_MESSAGE: 'media.played_audio_message',
-    PLAYED_VIDEO_MESSAGE: 'media.played_video_message',
-  },
-  NAVIGATION: {
-    OPENED_TERMS: 'navigation.opened_terms',
-    OPENED_WIRE_WEBSITE: 'navigation.opened_wire_website',
-  },
-  ONBOARDING: {
-    ADDED_PHOTO: 'onboarding.added_photo',
-    GENERATED_USERNAME: 'onboarding.generated_username',
-    KEPT_GENERATED_USERNAME: 'onboarding.kept_generated_username',
-    OPENED_USERNAME_FAQ: 'onboarding.opened_username_faq',
-    OPENED_USERNAME_SETTINGS: 'onboarding.opened_username_settings',
-    SEEN_USERNAME_SCREEN: 'onboarding.seen_username_screen',
-  },
-  PASSWORD_RESET: 'resetPassword',
-  PROFILE_PICTURE_CHANGED: 'changedProfilePicture',
-  REGISTRATION: {
-    ENTERED_CREDENTIALS: 'registration.entered_credentials',
-    OPENED_EMAIL_SIGN_UP: 'registration.opened_email_signup',
-    RESENT_EMAIL_VERIFICATION: 'registration.resent_email_verification',
-    SUCCEEDED: 'registration.succeeded',
-  },
   SETTINGS: {
     CHANGED_STATUS: 'settings.changed_status',
-    EDITED_USERNAME: 'settings.edited_username',
     OPENED_MANAGE_TEAM: 'settings.opened_manage_team',
     OPTED_IN_TRACKING: 'settings.opted_in_tracking',
     OPTED_OUT_TRACKING: 'settings.opted_out_tracking',
-    REMOVED_DEVICE: 'settings.removed_device',
-    SET_USERNAME: 'settings.set_username',
-    VIEWED_DEVICE: 'settings.viewed_device',
   },
-  SOUND_SETTINGS_CHANGED: 'soundIntensityPreference',
   TELEMETRY: {
     APP_INITIALIZATION: 'telemetry.app_initialization',
   },
-  TRACKING: {
-    OPT_IN: 'settings.opted_in_tracking',
-    OPT_OUT: 'settings.opted_out_tracking',
-  },
-  UPLOADED_CONTACTS: 'uploadedContacts', // "source": "Gmail"
 };

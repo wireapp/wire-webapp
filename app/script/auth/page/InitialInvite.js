@@ -28,6 +28,7 @@ import {H1, Text, Link} from '@wireapp/react-ui-kit/Text';
 import {COLOR} from '@wireapp/react-ui-kit/Identity';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 import {pathWithParams} from '../util/urlUtil';
+import EXTERNAL_ROUTE from '../externalRoute';
 import * as LanguageSelector from '../module/selector/LanguageSelector';
 import * as InviteSelector from '../module/selector/InviteSelector';
 import {invite} from '../module/action/InviteAction';
@@ -48,8 +49,8 @@ class InitialInvite extends React.PureComponent {
 
   onInviteDone = () => {
     const {invites} = this.props;
-    const nextLocation = pathWithParams('/login', 'reason=registration');
-    const invited = Boolean(invites.length);
+    const nextLocation = pathWithParams(EXTERNAL_ROUTE.LOGIN, 'reason=registration');
+    const invited = !!invites.length;
     return this.props
       .trackEvent({
         attributes: {invited, invites: invites.length},
@@ -80,7 +81,7 @@ class InitialInvite extends React.PureComponent {
     if (!this.emailInput.checkValidity()) {
       this.setState({error: ValidationError.handleValidationState('email', this.emailInput.validity)});
     } else {
-      this.props.invite({email: this.emailInput.value});
+      this.props.invite({email: this.emailInput.value.trim()});
       this.setState({enteredEmail: ''});
       this.emailInput.value = '';
     }

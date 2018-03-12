@@ -106,7 +106,8 @@ window.TestFactory.prototype.exposeCryptographyActors = function() {
     .then(() => {
       this.logger.info('✓ exposedStorageActors');
 
-      const current_client = new z.client.ClientEntity({id: entities.clients.john_doe.permanent.id});
+      const currentClient = new z.client.ClientEntity(true);
+      currentClient.id = entities.clients.john_doe.permanent.id;
       TestFactory.cryptography_service = new z.cryptography.CryptographyService(this.client);
       TestFactory.cryptography_service.logger.level = this.settings.logging_level;
 
@@ -114,10 +115,10 @@ window.TestFactory.prototype.exposeCryptographyActors = function() {
         TestFactory.cryptography_service,
         TestFactory.storage_repository
       );
-      TestFactory.cryptography_repository.current_client = ko.observable(current_client);
+      TestFactory.cryptography_repository.currentClient = ko.observable(currentClient);
       TestFactory.cryptography_repository.logger.level = this.settings.logging_level;
 
-      return TestFactory.cryptography_repository.create_cryptobox(TestFactory.storage_service.db);
+      return TestFactory.cryptography_repository.createCryptobox(TestFactory.storage_service.db);
     })
     .then(() => TestFactory.cryptography_repository);
 };
@@ -168,8 +169,8 @@ window.TestFactory.prototype.exposeClientActors = function() {
         time: '2016-10-07T16:01:42.133Z',
         type: 'temporary',
       };
-      const current_client = new z.client.ClientEntity(payload);
-      TestFactory.client_repository.currentClient(current_client);
+      const currentClient = new z.client.ClientEntity(payload);
+      TestFactory.client_repository.currentClient(currentClient);
 
       return TestFactory.client_repository;
     });
@@ -199,14 +200,14 @@ window.TestFactory.prototype.exposeEventActors = function() {
       TestFactory.conversation_service.logger.level = this.settings.logging_level;
 
       TestFactory.event_repository = new z.event.EventRepository(
-        TestFactory.web_socket_service,
         TestFactory.notification_service,
+        TestFactory.web_socket_service,
+        TestFactory.conversation_service,
         TestFactory.cryptography_repository,
-        undefined,
-        TestFactory.conversation_service
+        undefined
       );
       TestFactory.event_repository.logger.level = this.settings.logging_level;
-      TestFactory.event_repository.current_client = ko.observable(TestFactory.cryptography_repository.current_client());
+      TestFactory.event_repository.currentClient = ko.observable(TestFactory.cryptography_repository.currentClient());
 
       return TestFactory.event_repository;
     });
@@ -236,8 +237,7 @@ window.TestFactory.prototype.exposeUserActors = function() {
         TestFactory.user_service,
         TestFactory.asset_service,
         TestFactory.search_service,
-        TestFactory.client_repository,
-        TestFactory.cryptography_repository
+        TestFactory.client_repository
       );
       TestFactory.user_repository.logger.level = this.settings.logging_level;
       TestFactory.user_repository.save_user(TestFactory.client_repository.selfUser(), true);

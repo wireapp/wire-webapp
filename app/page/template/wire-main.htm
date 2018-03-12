@@ -1,59 +1,67 @@
 <div id="wire-main"
      class="off"
-     data-bind="css: main_classes(), ignore_drop_file: true"
+     data-bind="css: mainClasses(), ignore_drop_file: true"
      data-uie-name="status-webapp"
      data-uie-value="is-loading">
   <!-- ko stopBinding: true -->
     <div id="app" class="app">
-      <div id="left" class="left">
+      <div id="left-column" class="left-column">
         #include('list/background.htm')
-        <!-- ko if: webapp_loaded -->
-          <!-- ko ifnot: list_modal() -->
+        <!-- ko if: webappLoaded -->
+          <!-- ko ifnot: modal() -->
             #include('list/archive.htm')
             #include('list/conversations.htm')
             #include('list/preferences.htm')
             #include('list/start-ui.htm')
           <!-- /ko -->
-          <!-- ko if: list_modal() === z.ViewModel.list.LIST_MODAL_TYPE.TAKEOVER -->
+          <!-- ko if: modal() === z.viewModel.ListViewModel.MODAL_TYPE.TAKEOVER -->
             #include('list/takeover.htm')
           <!-- /ko -->
         <!-- /ko -->
       </div>
-      <div id="right" class="right">
-        <!-- ko if: content_state() === z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS -->
+      <div id="center-column" class="center-column">
+        <!-- ko if: state() === z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS -->
           #include('content/connect-requests.htm')
         <!-- /ko -->
-        <!-- ko if: content_state() === z.ViewModel.content.CONTENT_STATE.CONVERSATION -->
+        <!-- ko if: state() === z.viewModel.ContentViewModel.STATE.CONVERSATION -->
           #include('content/conversation.htm')
         <!-- /ko -->
-        <!-- ko if: content_state() === z.ViewModel.content.CONTENT_STATE.COLLECTION -->
+        <!-- ko if: state() === z.viewModel.ContentViewModel.STATE.COLLECTION -->
           #include('content/collection.htm')
         <!-- /ko -->
-        <!-- ko if: content_state() === z.ViewModel.content.CONTENT_STATE.COLLECTION_DETAILS -->
+        <!-- ko if: state() === z.viewModel.ContentViewModel.STATE.COLLECTION_DETAILS -->
           #include('content/collection-details.htm')
         <!-- /ko -->
-        <!-- ko if: content_state() === z.ViewModel.content.CONTENT_STATE.PREFERENCES_ABOUT -->
+        <!-- ko if: state() === z.viewModel.ContentViewModel.STATE.PREFERENCES_ABOUT -->
           #include('content/preferences-about.htm')
         <!-- /ko -->
-        <!-- ko if: content_state() === z.ViewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT -->
+        <!-- ko if: state() === z.viewModel.ContentViewModel.STATE.PREFERENCES_ACCOUNT -->
           #include('content/preferences-account.htm')
         <!-- /ko -->
-        <!-- ko if: content_state() === z.ViewModel.content.CONTENT_STATE.PREFERENCES_AV -->
+        <!-- ko if: state() === z.viewModel.ContentViewModel.STATE.PREFERENCES_AV -->
           #include('content/preferences-av.htm')
         <!-- /ko -->
-        <!-- ko if: content_state() === z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICE_DETAILS -->
+        <!-- ko if: state() === z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICE_DETAILS -->
           #include('content/preferences-device-details.htm')
         <!-- /ko -->
-        <!-- ko if: content_state() === z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES -->
+        <!-- ko if: state() === z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICES -->
           #include('content/preferences-devices.htm')
         <!-- /ko -->
-        <!-- ko if: content_state() === z.ViewModel.content.CONTENT_STATE.PREFERENCES_OPTIONS -->
+        <!-- ko if: state() === z.viewModel.ContentViewModel.STATE.PREFERENCES_OPTIONS -->
           #include('content/preferences-options.htm')
         <!-- /ko -->
-        <!-- ko if: content_state() === z.ViewModel.content.CONTENT_STATE.WATERMARK -->
+        <!-- ko if: state() === z.viewModel.ContentViewModel.STATE.WATERMARK -->
           #include('content/watermark.htm')
         <!-- /ko -->
         #include('modal/group-creation.htm')
+        <div class="center-column__overlay"></div>
+      </div>
+      <div id="right-column" class="right-column">
+        #include('panel/conversation-details.htm')
+        #include('panel/add-participants.htm')
+        #include('panel/group-participant.htm')
+        #include('panel/guest-options.htm')
+        #include('panel/participant-devices.htm')
       </div>
     </div>
     #include('detail-view.htm')

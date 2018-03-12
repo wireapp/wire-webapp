@@ -92,9 +92,9 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
     };
 
     this.self_stream_state = {
-      audio_send: ko.observable(true),
-      screen_send: ko.observable(false),
-      video_send: ko.observable(false),
+      audioSend: ko.observable(true),
+      screenSend: ko.observable(false),
+      videoSend: ko.observable(false),
     };
 
     this.request_hint_timeout = undefined;
@@ -120,7 +120,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
       .then(() => this.constraints_handler.get_media_stream_constraints(true, video_send))
       .then(({media_stream_constraints}) => this.request_media_stream(media_type, media_stream_constraints))
       .then(media_stream_info => {
-        this.self_stream_state.video_send(video_send);
+        this.self_stream_state.videoSend(video_send);
         if (video_send) {
           this.local_media_type(z.media.MediaType.VIDEO);
         }
@@ -166,8 +166,8 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
       this._set_stream_state(media_stream_info);
       update_promise = Promise.all(
         this.joined_call()
-          .get_flows()
-          .map(flow_et => flow_et.update_media_stream(media_stream_info))
+          .getFlows()
+          .map(flow_et => flow_et.updateMediaStream(media_stream_info))
       );
     } else {
       update_promise = Promise.resolve([media_stream_info]);
@@ -298,14 +298,14 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
   _hide_permission_failed_hint(media_type) {
     switch (media_type) {
       case z.media.MediaType.AUDIO:
-        amplify.publish(z.event.WebApp.WARNING.DISMISS, z.ViewModel.WarningType.DENIED_MICROPHONE);
+        amplify.publish(z.event.WebApp.WARNING.DISMISS, z.viewModel.WarningsViewModel.TYPE.DENIED_MICROPHONE);
         break;
       case z.media.MediaType.SCREEN:
-        amplify.publish(z.event.WebApp.WARNING.DISMISS, z.ViewModel.WarningType.DENIED_SCREEN);
+        amplify.publish(z.event.WebApp.WARNING.DISMISS, z.viewModel.WarningsViewModel.TYPE.DENIED_SCREEN);
         break;
       case z.media.MediaType.AUDIO_VIDEO:
       case z.media.MediaType.VIDEO:
-        amplify.publish(z.event.WebApp.WARNING.DISMISS, z.ViewModel.WarningType.DENIED_CAMERA);
+        amplify.publish(z.event.WebApp.WARNING.DISMISS, z.viewModel.WarningsViewModel.TYPE.DENIED_CAMERA);
         break;
       default:
         throw new z.media.MediaError(z.media.MediaError.TYPE.UNHANDLED_MEDIA_TYPE);
@@ -326,14 +326,14 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
 
     switch (media_type) {
       case z.media.MediaType.AUDIO:
-        amplify.publish(z.event.WebApp.WARNING.DISMISS, z.ViewModel.WarningType.REQUEST_MICROPHONE);
+        amplify.publish(z.event.WebApp.WARNING.DISMISS, z.viewModel.WarningsViewModel.TYPE.REQUEST_MICROPHONE);
         break;
       case z.media.MediaType.SCREEN:
-        amplify.publish(z.event.WebApp.WARNING.DISMISS, z.ViewModel.WarningType.REQUEST_SCREEN);
+        amplify.publish(z.event.WebApp.WARNING.DISMISS, z.viewModel.WarningsViewModel.TYPE.REQUEST_SCREEN);
         break;
       case z.media.MediaType.AUDIO_VIDEO:
       case z.media.MediaType.VIDEO:
-        amplify.publish(z.event.WebApp.WARNING.DISMISS, z.ViewModel.WarningType.REQUEST_CAMERA);
+        amplify.publish(z.event.WebApp.WARNING.DISMISS, z.viewModel.WarningsViewModel.TYPE.REQUEST_CAMERA);
         break;
       default:
         throw new z.media.MediaError(z.media.MediaError.TYPE.UNHANDLED_MEDIA_TYPE);
@@ -425,9 +425,9 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
    */
   _show_device_not_found_hint(media_type, conversation_id) {
     if (media_type === z.media.MediaType.AUDIO) {
-      amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.NOT_FOUND_MICROPHONE);
+      amplify.publish(z.event.WebApp.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.NOT_FOUND_MICROPHONE);
     } else if (media_type === z.media.MediaType.VIDEO) {
-      amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.NOT_FOUND_CAMERA);
+      amplify.publish(z.event.WebApp.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.NOT_FOUND_CAMERA);
     }
 
     if (conversation_id) {
@@ -445,14 +445,14 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
   _show_permission_denied_hint(media_type) {
     switch (media_type) {
       case z.media.MediaType.AUDIO:
-        amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.DENIED_MICROPHONE);
+        amplify.publish(z.event.WebApp.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.DENIED_MICROPHONE);
         break;
       case z.media.MediaType.SCREEN:
-        amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.DENIED_SCREEN);
+        amplify.publish(z.event.WebApp.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.DENIED_SCREEN);
         break;
       case z.media.MediaType.AUDIO_VIDEO:
       case z.media.MediaType.VIDEO:
-        amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.DENIED_CAMERA);
+        amplify.publish(z.event.WebApp.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.DENIED_CAMERA);
         break;
       default:
         throw new z.media.MediaError(z.media.MediaError.TYPE.UNHANDLED_MEDIA_TYPE);
@@ -473,14 +473,14 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
 
     switch (media_type) {
       case z.media.MediaType.AUDIO:
-        amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.REQUEST_MICROPHONE);
+        amplify.publish(z.event.WebApp.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.REQUEST_MICROPHONE);
         break;
       case z.media.MediaType.SCREEN:
-        amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.REQUEST_SCREEN);
+        amplify.publish(z.event.WebApp.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.REQUEST_SCREEN);
         break;
       case z.media.MediaType.AUDIO_VIDEO:
       case z.media.MediaType.VIDEO:
-        amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.REQUEST_CAMERA);
+        amplify.publish(z.event.WebApp.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.REQUEST_CAMERA);
         break;
       default:
         throw new z.media.MediaError(z.media.MediaError.TYPE.UNHANDLED_MEDIA_TYPE);
@@ -525,9 +525,9 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
   needs_media_stream() {
     for (const call_et of this.calls()) {
       const is_incoming_video_call =
-        call_et.is_remote_video_send() && call_et.state() === z.calling.enum.CALL_STATE.INCOMING;
+        call_et.isRemoteVideoSend() && call_et.state() === z.calling.enum.CALL_STATE.INCOMING;
 
-      if (call_et.self_client_joined() || is_incoming_video_call) {
+      if (call_et.selfClientJoined() || is_incoming_video_call) {
         return true;
       }
     }
@@ -561,9 +561,9 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
 
   // Reset the enabled states of media types.
   reset_self_states() {
-    this.self_stream_state.audio_send(true);
-    this.self_stream_state.screen_send(false);
-    this.self_stream_state.video_send(false);
+    this.self_stream_state.audioSend(true);
+    this.self_stream_state.screenSend(false);
+    this.self_stream_state.videoSend(false);
     this.local_media_type(z.media.MediaType.AUDIO);
   }
 
@@ -584,16 +584,16 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
   _set_self_stream_state(media_type) {
     switch (media_type) {
       case z.media.MediaType.AUDIO:
-        this.self_stream_state.audio_send(true);
+        this.self_stream_state.audioSend(true);
         break;
       case z.media.MediaType.SCREEN:
-        this.self_stream_state.video_send(false);
-        this.self_stream_state.screen_send(true);
+        this.self_stream_state.videoSend(false);
+        this.self_stream_state.screenSend(true);
         this.local_media_type(z.media.MediaType.SCREEN);
         break;
       case z.media.MediaType.VIDEO:
-        this.self_stream_state.video_send(true);
-        this.self_stream_state.screen_send(false);
+        this.self_stream_state.videoSend(true);
+        this.self_stream_state.screenSend(false);
         this.local_media_type(z.media.MediaType.VIDEO);
         break;
       default:
@@ -613,7 +613,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
         media_stream_info.stream,
         z.media.MediaType.AUDIO
       );
-      audio_stream_track.enabled = this.self_stream_state.audio_send();
+      audio_stream_track.enabled = this.self_stream_state.audioSend();
     }
 
     if ([z.media.MediaType.AUDIO_VIDEO, z.media.MediaType.VIDEO].includes(media_stream_info.type)) {
@@ -621,7 +621,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
         media_stream_info.stream,
         z.media.MediaType.VIDEO
       );
-      video_stream_track.enabled = this.self_stream_state.screen_send() || this.self_stream_state.video_send();
+      video_stream_track.enabled = this.self_stream_state.screenSend() || this.self_stream_state.videoSend();
     }
   }
 
@@ -634,10 +634,10 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
     return this._toggle_stream_enabled(
       z.media.MediaType.AUDIO,
       this.local_media_stream(),
-      this.self_stream_state.audio_send
+      this.self_stream_state.audioSend
     ).then(audio_tracks => {
-      this.logger.info(`Microphone enabled: ${this.self_stream_state.audio_send()}`, audio_tracks);
-      this.self_stream_state.audio_send();
+      this.logger.info(`Microphone enabled: ${this.self_stream_state.audioSend()}`, audio_tracks);
+      this.self_stream_state.audioSend();
     });
   }
 
@@ -650,10 +650,10 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
     return this._toggle_stream_enabled(
       z.media.MediaType.VIDEO,
       this.local_media_stream(),
-      this.self_stream_state.screen_send
+      this.self_stream_state.screenSend
     ).then(video_tracks => {
-      this.logger.info(`Screen enabled: ${this.self_stream_state.screen_send()}`, video_tracks);
-      this.self_stream_state.screen_send();
+      this.logger.info(`Screen enabled: ${this.self_stream_state.screenSend()}`, video_tracks);
+      this.self_stream_state.screenSend();
     });
   }
 
@@ -666,10 +666,10 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
     return this._toggle_stream_enabled(
       z.media.MediaType.VIDEO,
       this.local_media_stream(),
-      this.self_stream_state.video_send
+      this.self_stream_state.videoSend
     ).then(video_tracks => {
-      this.logger.info(`Camera enabled: ${this.self_stream_state.video_send()}`, video_tracks);
-      this.self_stream_state.video_send();
+      this.logger.info(`Camera enabled: ${this.self_stream_state.videoSend()}`, video_tracks);
+      this.self_stream_state.videoSend();
     });
   }
 

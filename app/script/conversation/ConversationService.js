@@ -33,11 +33,11 @@ z.conversation.ConversationService = class ConversationService {
   /**
    * Construct a new Conversation Service.
    * @param {BackendClient} client - Client for the API calls
-   * @param {StorageService} storage_service - Service for all storage interactions
+   * @param {StorageService} storageService - Service for all storage interactions
    */
-  constructor(client, storage_service) {
+  constructor(client, storageService) {
     this.client = client;
-    this.storageService = storage_service;
+    this.storageService = storageService;
     this.logger = new z.util.Logger('z.conversation.ConversationService', z.config.LOGGER.OPTIONS);
   }
 
@@ -48,27 +48,13 @@ z.conversation.ConversationService = class ConversationService {
   /**
    * Create a group conversation.
    *
-   * @note Supply at least 2 user IDs! Do not include the requestor
+   * @note Do not include yourself as the requestor
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/createGroupConversation
    *
-   * @param {Array<string>} userIds - IDs of users (excluding the requestor) to be part of the conversation
-   * @param {string} [name] - User defined name for the Conversation
-   * @param {string} [teamId] - ID of team conversation belongs to
+   * @param {Object} payload - Payload object for group creation
    * @returns {Promise} Resolves when the conversation was created
    */
-  postConversations(userIds, name, teamId) {
-    const payload = {
-      name: name,
-      users: userIds,
-    };
-
-    if (teamId) {
-      payload.team = {
-        managed: false,
-        teamid: teamId,
-      };
-    }
-
+  postConversations(payload) {
     return this.client.send_json({
       data: payload,
       type: 'POST',
@@ -177,6 +163,92 @@ z.conversation.ConversationService = class ConversationService {
   }
 
   //##############################################################################
+  // Conversation access
+  //##############################################################################
+
+  /**
+   * Delete the conversation access code.
+   *
+   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/deleteConversationCode
+   * @param {string} conversationId - ID of conversation to delete access code for
+   * @returns {Promise} Resolves with the server response
+   */
+  deleteConversationCode(conversationId) {
+    return this.client.send_request({
+      type: 'DELETE',
+      url: this.client.create_url(`${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/code`),
+    });
+  }
+
+  /**
+   * Get the conversation access code.
+   *
+   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/getConversationCode
+   * @param {string} conversationId - ID of conversation to get access code for
+   * @returns {Promise} Resolves with the server response
+   */
+  getConversationCode(conversationId) {
+    return this.client.send_request({
+      type: 'GET',
+      url: this.client.create_url(`${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/code`),
+    });
+  }
+
+  /**
+   * Request a conversation access code.
+   *
+   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/createConversationCode
+   * @param {string} conversationId - ID of conversation to request access code for
+   * @returns {Promise} Resolves with the server response
+   */
+  postConversationCode(conversationId) {
+    return this.client.send_request({
+      type: 'POST',
+      url: this.client.create_url(`${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/code`),
+    });
+  }
+
+  /**
+   * Join a conversation using a code.
+   *
+   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/joinConversationByCode
+   * @param {string} key - Conversation identifier
+   * @param {string} code - Conversation access code
+   * @returns {Promise} Resolves with the server response
+   */
+  postConversationJoin(key, code) {
+    return this.client.send_json({
+      data: {
+        code: code,
+        key: key,
+      },
+      type: 'POST',
+      url: this.client.create_url(`${ConversationService.CONFIG.URL_CONVERSATIONS}/join`),
+    });
+  }
+
+  /**
+   * Update conversation access mode.
+   *
+   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/updateConversationAccess
+   *
+   * @param {string} conversationId - ID of conversation
+   * @param {Array<z.conversation.ACCESS_MODE>} accessModes - Conversation access mode
+   * @param {z.conversation.ACCESS_ROLE} accessRole - Conversation access role
+   * @returns {Promise} Resolves with the server response
+   */
+  putConversationAccess(conversationId, accessModes, accessRole) {
+    return this.client.send_json({
+      data: {
+        access: accessModes,
+        access_role: accessRole,
+      },
+      type: 'PUT',
+      url: this.client.create_url(`${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/access`),
+    });
+  }
+
+  //##############################################################################
   // Send events
   //##############################################################################
 
@@ -251,7 +323,7 @@ z.conversation.ConversationService = class ConversationService {
    * @param {Object} payload.recipients - Map with per-recipient data
    * @param {string} payload.sender - Client ID of the sender
    * @param {Array<string>|boolean} precondition_option - Level that backend checks for missing clients
-   * @returns {Promise} Promise that resolve when the message was sent
+   * @returns {Promise} Promise that resolves when the message was sent
    */
   post_encrypted_message(conversation_id, payload, precondition_option) {
     let url = this.client.create_url(`${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversation_id}/otr/messages`);

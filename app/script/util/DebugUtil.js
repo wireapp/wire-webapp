@@ -31,7 +31,7 @@ z.util.DebugUtil = class DebugUtil {
   }
 
   block_all_connections() {
-    const block_users = wire.app.repository.user.users().map(user_et => this.user_repository.block_user(user_et));
+    const block_users = wire.app.repository.user.users().map(user_et => this.user_repository.blockUser(user_et));
     return Promise.all(block_users);
   }
 
@@ -108,7 +108,7 @@ z.util.DebugUtil = class DebugUtil {
     };
 
     return wire.app.service.notification
-      .get_notifications(client_id, notification_id_since, 10000)
+      .getNotifications(client_id, notification_id_since, 10000)
       .then(_got_notifications);
   }
 
@@ -159,7 +159,7 @@ z.util.DebugUtil = class DebugUtil {
 
     const client_scope = remote_user_id === local_user_id ? undefined : local_client_id;
     return wire.app.service.notification
-      .get_notifications(client_scope, notification_id_since, 10000)
+      .getNotifications(client_scope, notification_id_since, 10000)
       .then(_got_notifications);
   }
 
@@ -196,7 +196,7 @@ z.util.DebugUtil = class DebugUtil {
    * @returns {undefined} No return value
    */
   log_call_messages() {
-    this.calling_repository.print_log();
+    this.calling_repository.printLog();
   }
 
   log_connection_status() {

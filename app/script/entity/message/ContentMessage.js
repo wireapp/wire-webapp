@@ -27,7 +27,6 @@ z.entity.ContentMessage = class ContentMessage extends z.entity.Message {
     super();
 
     this.assets = ko.observableArray([]);
-    this.nonce = null;
     this.super_type = z.message.SuperType.CONTENT;
     this.replacing_message_id = null;
     this.edited_timestamp = null;
@@ -41,7 +40,7 @@ z.entity.ContentMessage = class ContentMessage extends z.entity.Message {
     });
 
     this.display_edited_timestamp = () => {
-      return z.l10n.text(z.string.conversation_edit_timestamp, moment(this.edited_timestamp).format('HH:mm'));
+      return z.l10n.text(z.string.conversationEditTimestamp, moment(this.edited_timestamp).format('HH:mm'));
     };
 
     this.is_liked_provisional = ko.observable();
@@ -68,7 +67,7 @@ z.entity.ContentMessage = class ContentMessage extends z.entity.Message {
           .map(user_et => user_et.first_name())
           .join(', ');
       }
-      return z.l10n.text(z.string.conversation_likes_caption, this.reactions_user_ets().length);
+      return z.l10n.text(z.string.conversationLikesCaption, this.reactions_user_ets().length);
     });
   }
 

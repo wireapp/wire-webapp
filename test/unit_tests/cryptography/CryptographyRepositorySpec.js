@@ -32,7 +32,7 @@ describe('z.cryptography.CryptographyRepository', () => {
       .catch(done.fail);
   });
 
-  describe('encrypt_generic_message', () => {
+  describe('encryptGenericMessage', () => {
     let jane_roe = undefined;
     let john_doe = undefined;
 
@@ -54,7 +54,7 @@ describe('z.cryptography.CryptographyRepository', () => {
     });
 
     it('encrypts a generic message', done => {
-      spyOn(TestFactory.cryptography_service, 'get_users_pre_keys').and.callFake(recipients =>
+      spyOn(TestFactory.cryptography_service, 'getUsersPreKeys').and.callFake(recipients =>
         Promise.resolve().then(() => {
           const prekey_map = {};
 
@@ -86,7 +86,7 @@ describe('z.cryptography.CryptographyRepository', () => {
       recipients[jane_roe.id] = [jane_roe.clients.phone_id];
 
       TestFactory.cryptography_repository
-        .encrypt_generic_message(recipients, generic_message)
+        .encryptGenericMessage(recipients, generic_message)
         .then(payload => {
           expect(payload.recipients).toBeTruthy();
           expect(Object.keys(payload.recipients).length).toBe(2);
@@ -99,7 +99,7 @@ describe('z.cryptography.CryptographyRepository', () => {
     });
   });
 
-  describe('handle_encrypted_event', () => {
+  describe('handleEncryptedEvent', () => {
     it('detects a session reset request', done => {
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
       const event = {
@@ -112,7 +112,7 @@ describe('z.cryptography.CryptographyRepository', () => {
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
 
       TestFactory.cryptography_repository
-        .handle_encrypted_event(event)
+        .handleEncryptedEvent(event)
         .then(mapped_event => {
           expect(mapped_event.type).toBe(z.event.Client.CONVERSATION.UNABLE_TO_DECRYPT);
           done();
@@ -134,7 +134,7 @@ describe('z.cryptography.CryptographyRepository', () => {
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
 
       TestFactory.cryptography_repository
-        .handle_encrypted_event(event)
+        .handleEncryptedEvent(event)
         .then(mapped_event => {
           expect(mapped_event.type).toBe(z.event.Client.CONVERSATION.INCOMING_MESSAGE_TOO_BIG);
           done();
@@ -156,7 +156,7 @@ describe('z.cryptography.CryptographyRepository', () => {
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
 
       TestFactory.cryptography_repository
-        .handle_encrypted_event(event)
+        .handleEncryptedEvent(event)
         .then(mapped_event => {
           expect(mapped_event.type).toBe(z.event.Client.CONVERSATION.INCOMING_MESSAGE_TOO_BIG);
           done();

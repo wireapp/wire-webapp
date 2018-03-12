@@ -39,7 +39,7 @@ ko.components.register('choose-screen', {
         </div>
       <!-- /ko -->
     </div>
-    <div class="label-xs text-white" data-bind="l10n_text: z.string.call_choose_shared_screen"></div>
+    <div class="label-xs text-white" data-bind="l10n_text: z.string.callChooseSharedScreen"></div>
     <div id="choose-screen-controls" class="choose-screen-controls">
       <div class="choose-screen-controls-button button-round button-round-dark button-round-md icon-close"
            data-uie-name="do-choose-screen-cancel"

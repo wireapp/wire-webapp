@@ -43,6 +43,7 @@
   // 6. Prepend each line with `U+`.
   // 7. Join all lines with comma.
   // 8. Prepend the list with `U+200D` (zero width joiner) and `U+FE0F` (marker telling to render glyph as emoji).
+  // prettier-ignore
   unicode-range: U+200d, U+FE0F, U+1f004, U+1f0cf, U+1f170-1f171, U+1f17e, U+1f17f, U+1f18e, U+1f191-1f19a,
     U+1f1e6-1f1ff, U+1f201, U+1f201-1f202, U+1f21a, U+1f22f, U+1f232-1f236, U+1f232-1f23a, U+1f238-1f23a, U+1f250-1f251,
     U+1f300-1f320, U+1f321, U+1f324-1f32c, U+1f32d-1f32f, U+1f330-1f335, U+1f336, U+1f337-1f37c, U+1f37d, U+1f37e-1f37f,
@@ -154,6 +155,7 @@
 @left-bg: #1f1f1f;
 @left-color: #fff;
 @left-width: 304px;
+@right-width: 304px;
 
 // ----------------------------------------------------------------------------
 // Left list
@@ -199,8 +201,11 @@
 @z-index-level-6: 1000000;
 @z-index-level-7: 10000000;
 
+@z-index-badge: @z-index-level-2;
+@z-index-panel: @z-index-level-3;
 @z-index-bubble: @z-index-level-3;
 @z-index-modal: @z-index-level-4;
+@z-index-context: @z-index-level-7;
 @z-index-warnings: @z-index-level-7;
 
 // ----------------------------------------------------------------------------

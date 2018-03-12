@@ -1,0 +1,118 @@
+<!--@formatter:off-->
+<div id="conversation-input-bar"
+     class="conversation-input-bar"
+     data-bind="with: $root.inputBar,
+                css: {
+                  'conversation-input-bar-editing': $root.inputBar.is_editing()
+                }">
+
+  <!-- ko if: conversation_et() && !conversation_et().connection().is_outgoing_request() -->
+    <div class="controls-left">
+      <!-- ko if: input().length > 0 -->
+        <participant-avatar class="cursor-default" params="participant: self, size: z.components.ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
+      <!-- /ko -->
+    </div>
+
+    <!-- ko if: !conversation_et().removed_from_conversation() -->
+      <div class="controls-center">
+        <textarea id="conversation-input-bar-text"
+                  class="conversation-input-bar-text border-theme"
+                  data-bind="event: {'keydown': on_input_key_down, 'keyup': on_input_key_up},
+                             focus_on_keydown: true,
+                             css: {'ephemeral-input': has_ephemeral_timer() && !show_availability_tooltip()},
+                             enter: on_input_enter,
+                             hasFocus: blinking_cursor,
+                             textInput: input,
+                             resize: input,
+                             resize_callback: scroll_message_list,
+                             click: on_input_click,
+                             attr: {'placeholder': input_placeholder},
+                             paste_file: on_paste_files"
+                  data-uie-name="input-message"
+                  dir="auto">
+        </textarea>
+      </div>
+
+      <div class="controls-right" data-bind="css:{'text-ephemeral': has_ephemeral_timer()}">
+
+        <!-- ko ifnot: is_editing -->
+
+          <!-- ko if: show_giphy_button -->
+            <span class="controls-right-button button-icon-large"
+                  data-bind="click: toggle_extensions_menu, l10n_tooltip: z.string.extensionsBubbleButtonGif, css: has_ephemeral_timer() ? 'icon-gif-timed': 'icon-gif'"
+                  data-uie-name="do-giphy-popover">
+            </span>
+          <!-- /ko -->
+
+          <!-- ko if: input().length === 0 -->
+
+            <span id="conversation-input-bar-ephemeral"
+                  class="controls-right-button conversation-input-bar-ephemeral"
+                  data-bind="click: click_on_ephemeral_button, l10n_tooltip: z.string.tooltipConversationEphemeral"
+                  data-uie-name="do-set-ephemeral-timer">
+              <!-- ko if: has_ephemeral_timer() && conversation_et()-->
+                <div class="ephemeral-timer-button">
+                  <span class="ephemeral-timer-button-unit" data-bind="text: z.util.format_milliseconds_short(conversation_et().ephemeral_timer())[1]"></span>
+                  <span class="full-screen" data-bind="text: z.util.format_milliseconds_short(conversation_et().ephemeral_timer())[0]"></span>
+                </div>
+              <!-- /ko -->
+              <!-- ko ifnot: has_ephemeral_timer() -->
+                <span class="button-icon-large icon-hourglass"></span>
+              <!-- /ko -->
+            </span>
+
+            <label id="conversation-input-bar-photo"
+                   class="controls-right-button button-icon-large"
+                   data-bind="attr: {'title': picture_tooltip}, css: has_ephemeral_timer() ? 'icon-library-timed': 'icon-library'">
+              <input data-bind="file_select: upload_images" type="file" multiple="multiple"
+                     accept=".jpg-large, image/jpeg, image/png, image/bmp, image/gif" data-uie-name="do-share-image"/>
+            </label>
+
+            <label id="conversation-input-bar-files"
+                     class="controls-right-button button-icon-large"
+                     data-bind="attr: {'title': file_tooltip}, css: has_ephemeral_timer() ? 'icon-attachment-timed': 'icon-attachment'">
+              <input data-bind="file_select: upload_files" type="file" multiple="multiple"
+                       accept="*" data-uie-name="do-share-file"/>
+            </label>
+
+            <span class="controls-right-button button-icon-large"
+                  data-bind="click: ping, attr: {'title': ping_tooltip}, css:{'disabled': ping_disabled, 'icon-ping-timed': has_ephemeral_timer(), 'icon-ping': !has_ephemeral_timer()}"
+                  data-uie-name="do-ping">
+            </span>
+          <!-- /ko -->
+
+        <!-- /ko -->
+
+        <!-- ko if: is_editing -->
+
+          <span class="controls-right-button button-icon-large icon-close"
+                data-bind="click: cancel_edit"
+                data-uie-name="do-cancel-edit">
+          </span>
+
+        <!-- /ko -->
+
+      </div>
+    <!-- /ko -->
+  <!-- /ko -->
+
+  <!-- ko if: pasted_file() -->
+    <div class="conversation-input-bar-paste-modal">
+      <div class="controls-left"></div>
+      <div class="controls-center">
+        <!-- ko ifnot: pasted_file_preview_url() -->
+          <span class="conversation-input-bar-paste-icon icon-file"></span>
+        <!-- /ko -->
+        <!-- ko if: pasted_file_preview_url() -->
+          <img class="conversation-input-bar-paste-image conversation-input-bar-paste-icon" data-bind="attr: {'src': pasted_file_preview_url()}">
+        <!-- /ko -->
+        <span data-bind="text: pasted_file_name"></span>
+      </div>
+      <div class="controls-right">
+        <span class="conversation-input-bar-paste-cancel button-icon-large icon-close" data-bind="click: on_cancel_pasted_files"></span>
+        <span class="conversation-input-bar-paste-send bg-theme icon-send" data-bind="click: on_send_pasted_files"></span>
+      </div>
+    </div>
+  <!-- /ko -->
+</div>
+<!--@formatter:on-->

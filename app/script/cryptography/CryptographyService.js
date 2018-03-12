@@ -40,13 +40,28 @@ z.cryptography.CryptographyService = class CryptographyService {
   }
 
   /**
+   * Gets a pre-key for a client of a user.
+   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/getPrekey
+   *
+   * @param {string} userId - User ID
+   * @param {string} clientId - Client ID
+   * @returns {Promise} Resolves with a pre-key for given the client of the user
+   */
+  getUserPreKeyByIds(userId, clientId) {
+    return this.client.send_json({
+      type: 'GET',
+      url: this.client.create_url(`${CryptographyService.CONFIG.URL_USERS}/${userId}/prekeys/${clientId}`),
+    });
+  }
+
+  /**
    * Gets a pre-key for each client of a user client map.
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/getMultiPrekeyBundles
    *
    * @param {Object} recipients - User client map to request pre-keys for
    * @returns {Promise} Resolves with a pre-key for each client of the given map
    */
-  get_users_pre_keys(recipients) {
+  getUsersPreKeys(recipients) {
     return this.client.send_json({
       data: recipients,
       type: 'POST',
@@ -57,17 +72,17 @@ z.cryptography.CryptographyService = class CryptographyService {
   /**
    * Put pre-keys for client to be used by remote clients for session initialization.
    *
-   * @param {string} client_id - Local client ID
-   * @param {Array<string>} serialized_pre_keys - Additional pre-keys to be made available
+   * @param {string} clientId - Local client ID
+   * @param {Array<string>} serializedPreKeys - Additional pre-keys to be made available
    * @returns {Promise} Resolves once the pre-keys are accepted
    */
-  put_client_prekeys(client_id, serialized_pre_keys) {
+  putClientPreKeys(clientId, serializedPreKeys) {
     return this.client.send_json({
       data: {
-        prekeys: serialized_pre_keys,
+        prekeys: serializedPreKeys,
       },
       type: 'PUT',
-      url: this.client.create_url(`${CryptographyService.CONFIG.URL_CLIENTS}/${client_id}`),
+      url: this.client.create_url(`${CryptographyService.CONFIG.URL_CLIENTS}/${clientId}`),
     });
   }
 };

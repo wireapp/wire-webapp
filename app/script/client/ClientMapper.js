@@ -23,21 +23,37 @@ window.z = window.z || {};
 window.z.client = z.client || {};
 
 z.client.ClientMapper = class ClientMapper {
+  static get CONFIG() {
+    return {
+      CLIENT_PAYLOAD: ['class', 'id'],
+      SELF_CLIENT_PAYLOAD: ['address', 'cookie', 'label', 'location', 'model', 'time', 'type'],
+    };
+  }
+
   constructor() {}
 
   /**
    * Maps a JSON into a Client entity.
+   *
    * @param {Object} clientPayload - Client data
+   * @param {boolean} isSelfClient - Creating self client
    * @returns {z.client.ClientEntity} Mapped client entity
    */
-  mapClient(clientPayload) {
-    const clientEntity = new z.client.ClientEntity(clientPayload);
+  mapClient(clientPayload, isSelfClient) {
+    const clientEntity = new z.client.ClientEntity(isSelfClient);
+
+    ClientMapper.CONFIG.CLIENT_PAYLOAD.forEach(name => this._mapMember(clientEntity, clientPayload, name));
+
+    if (isSelfClient) {
+      ClientMapper.CONFIG.SELF_CLIENT_PAYLOAD.forEach(name => this._mapMember(clientEntity, clientPayload, name));
+    }
 
     if (clientPayload.meta) {
       const {userId} = z.client.ClientEntity.dismantleUserClientId(clientPayload.meta.primary_key);
-      clientEntity.meta.is_verified(clientPayload.meta.is_verified);
-      clientEntity.meta.primary_key = clientPayload.meta.primary_key;
-      clientEntity.meta.user_id = userId;
+
+      clientEntity.meta.isVerified(clientPayload.meta.is_verified);
+      clientEntity.meta.primaryKey = clientPayload.meta.primary_key;
+      clientEntity.meta.userId = userId;
     }
 
     return clientEntity;
@@ -45,11 +61,13 @@ z.client.ClientMapper = class ClientMapper {
 
   /**
    * Maps an object of client IDs with their payloads to client entities.
+   *
    * @param {Array<Object>} clientsPayload - Clients data
+   * @param {boolean} isSelfClient - Creating self client
    * @returns {Array<z.client.ClientEntity>} - Mapped client entities
    */
-  mapClients(clientsPayload) {
-    return clientsPayload.map(clientPayload => this.mapClient(clientPayload));
+  mapClients(clientsPayload, isSelfClient) {
+    return clientsPayload.map(clientPayload => this.mapClient(clientPayload, isSelfClient));
   }
 
   /**
@@ -63,12 +81,22 @@ z.client.ClientMapper = class ClientMapper {
     let containsUpdate = false;
 
     for (const member in updatePayload) {
-      if (JSON.stringify(clientData[member]) !== JSON.stringify(updatePayload[member])) {
+      const isDataChange = JSON.stringify(clientData[member]) !== JSON.stringify(updatePayload[member]);
+
+      if (isDataChange) {
         containsUpdate = true;
         clientData[member] = updatePayload[member];
       }
     }
 
     return {client: clientData, wasUpdated: containsUpdate};
+  }
+
+  _mapMember(clientEntity, clientPayload, memberName) {
+    const payloadValue = clientPayload[memberName];
+    const isMemberUndefined = payloadValue === undefined;
+    if (!isMemberUndefined) {
+      clientEntity[memberName] = payloadValue;
+    }
   }
 };

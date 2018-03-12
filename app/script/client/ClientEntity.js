@@ -29,24 +29,26 @@ z.client.ClientEntity = class ClientEntity {
     };
   }
 
-  constructor(payload = {}) {
+  constructor(isSelfClient = false) {
+    this.isSelfClient = isSelfClient;
+
     this.class = ClientEntity.CONFIG.DEFAULT_VALUE;
+    this.id = '';
 
-    if (payload.address) {
+    if (this.isSelfClient) {
+      this.address = '';
+      this.cookie = '';
       this.label = ClientEntity.CONFIG.DEFAULT_VALUE;
+      this.location = {};
       this.model = ClientEntity.CONFIG.DEFAULT_VALUE;
-    }
-
-    for (const property in payload) {
-      if (payload.hasOwnProperty(property) && payload[property] !== undefined) {
-        this[property] = payload[property];
-      }
+      this.time = ClientEntity.CONFIG.DEFAULT_VALUE;
+      this.type = z.client.ClientType.TEMPORARY;
     }
 
     // Metadata maintained by us
     this.meta = {
-      is_verified: ko.observable(false),
-      primary_key: undefined,
+      isVerified: ko.observable(false),
+      primaryKey: undefined,
     };
 
     this.session = {};
@@ -58,7 +60,7 @@ z.client.ClientEntity = class ClientEntity {
    * @returns {Object} Object containing the user ID & client ID
    */
   static dismantleUserClientId(id) {
-    const [userId, clientId] = (id ? id.split('@') : undefined) || [];
+    const [userId, clientId] = _.isString(id) ? id.split('@') : [];
     return {clientId, userId};
   }
 
@@ -97,14 +99,32 @@ z.client.ClientEntity = class ClientEntity {
    */
   toJson() {
     const jsonObject = JSON.parse(ko.toJSON(this));
+    delete jsonObject.isSelfClient;
     delete jsonObject.session;
 
-    for (const property in jsonObject) {
-      if (jsonObject.hasOwnProperty(property) && jsonObject[property] === ClientEntity.CONFIG.DEFAULT_VALUE) {
-        delete jsonObject[property];
-      }
+    z.client.ClientMapper.CONFIG.CLIENT_PAYLOAD.forEach(name => this._removeDefaultValues(jsonObject, name));
+
+    if (this.isSelfClient) {
+      z.client.ClientMapper.CONFIG.SELF_CLIENT_PAYLOAD.forEach(name => this._removeDefaultValues(jsonObject, name));
+    }
+
+    jsonObject.meta.is_verified = jsonObject.meta.isVerified;
+    delete jsonObject.meta.isVerified;
+
+    if (jsonObject.meta.primaryKey) {
+      jsonObject.meta.primary_key = jsonObject.meta.primaryKey;
+      delete jsonObject.meta.primaryKey;
     }
 
     return jsonObject;
+  }
+
+  _removeDefaultValues(jsonObject, memberName) {
+    if (jsonObject.hasOwnProperty(memberName)) {
+      const isDefaultValue = jsonObject[memberName] === ClientEntity.CONFIG.DEFAULT_VALUE;
+      if (isDefaultValue) {
+        jsonObject[memberName] = '';
+      }
+    }
   }
 };

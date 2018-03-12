@@ -1,39 +1,39 @@
 <div id="detail-view" class="modal detail-view">
-  <!-- ko if: message_et() && conversation_et() -->
-    <div class="detail-view-content modal-content-anim-close" data-bind="css: {'modal-content-anim-open': image_visible()}">
+  <!-- ko if: messageEntity() && conversationEntity() -->
+    <div class="detail-view-content modal-content-anim-close" data-bind="css: {'modal-content-anim-open': imageVisible()}">
       <header class="detail-view-header">
           <div class="text-center">
-            <div class="label-bold-xs" data-bind="text: message_et().sender_name(), attr: {'data-uie-uid': message_et().user().id, 'data-uie-value': message_et().user().name}" data-uie-name="fullscreen-picture-sender"></div>
-            <div class="label-xs" data-bind="text: moment(message_et().timestamp()).format('DD/MM/YYYY H:mm'), attr: {'data-timestamp': message_et().timestamp()}"></div>
+            <div class="label-bold-xs" data-bind="text: messageEntity().sender_name(), attr: {'data-uie-uid': messageEntity().user().id, 'data-uie-value': messageEntity().user().name}" data-uie-name="fullscreen-picture-sender"></div>
+            <div class="label-xs" data-bind="text: moment(messageEntity().timestamp()).format('DD/MM/YYYY H:mm'), attr: {'data-timestamp': messageEntity().timestamp()}"></div>
           </div>
-        <span class="detail-view-header-close-button icon-close icon-button" data-bind="click: click_on_close" data-uie-name="do-close-detail-view"></span>
+        <span class="detail-view-header-close-button icon-close icon-button" data-bind="click: clickOnClose" data-uie-name="do-close-detail-view"></span>
       </header>
-      <div class="detail-view-main" data-bind="click: click_on_close">
-        <img class="detail-view-image" data-bind="attr: {src: image_src()}" data-uie-name="status-picture"/>
+      <div class="detail-view-main" data-bind="click: clickOnClose">
+        <img class="detail-view-image" data-bind="attr: {src: imageSrc()}" data-uie-name="status-picture"/>
       </div>
       <footer class="detail-view-footer">
-        <!-- ko if: message_et().is_downloadable() && !message_et().is_ephemeral() -->
-          <span class="detail-view-action-button" data-bind="click: click_on_download" data-uie-name="do-download-fullscreen-picture">
+        <!-- ko if: messageEntity().is_downloadable() && !messageEntity().is_ephemeral() -->
+          <span class="detail-view-action-button" data-bind="click: clickOnDownload" data-uie-name="do-download-fullscreen-picture">
             <span class="icon-download"></span>
-            <span data-bind="l10n_text: z.string.conversation_context_menu_download"></span>
+            <span data-bind="l10n_text: z.string.conversationContextMenuDownload"></span>
           </span>
         <!-- /ko -->
-        <!-- ko if: message_et().is_reactable() && !conversation_et().removed_from_conversation() -->
-          <span class="detail-view-action-button" data-bind="click: click_on_like" data-uie-name="do-like-fullscreen-picture">
-            <span data-bind="css: message_et().is_liked() ? 'icon-liked text-red' : 'icon-like'"></span>
-            <span data-bind="l10n_text: z.string.conversation_context_menu_like"></span>
+        <!-- ko if: messageEntity().is_reactable() && !conversationEntity().removed_from_conversation() -->
+          <span class="detail-view-action-button" data-bind="click: clickOnLike" data-uie-name="do-like-fullscreen-picture">
+            <span data-bind="css: messageEntity().is_liked() ? 'icon-liked text-red' : 'icon-like'"></span>
+            <span data-bind="l10n_text: z.string.conversationContextMenuLike"></span>
           </span>
         <!-- /ko -->
-        <!-- ko if: message_et().is_deletable() -->
-          <span class="detail-view-action-button" data-bind="click: click_on_delete" data-uie-name="do-delete-fullscreen-picture">
+        <!-- ko if: messageEntity().is_deletable() -->
+          <span class="detail-view-action-button" data-bind="click: clickOnDelete" data-uie-name="do-delete-fullscreen-picture">
             <span class="icon-delete-for-me"></span>
-            <span data-bind="l10n_text: z.string.conversation_context_menu_delete"></span>
+            <span data-bind="l10n_text: z.string.conversationContextMenuDelete"></span>
           </span>
         <!-- /ko -->
-        <!-- ko if: message_et().user().is_me && message_et().status() !== z.message.StatusType.SENDING && !conversation_et().removed_from_conversation() -->
-          <span class="detail-view-action-button" data-bind="click: click_on_delete_for_everyone" data-uie-name="do-delete-everywhere-fullscreen-picture">
+        <!-- ko if: messageEntity().user().is_me && messageEntity().status() !== z.message.StatusType.SENDING && !conversationEntity().removed_from_conversation() -->
+          <span class="detail-view-action-button" data-bind="click: clickOnDeleteForEveryone" data-uie-name="do-delete-everywhere-fullscreen-picture">
             <span class="icon-delete-for-everyone"></span>
-            <span data-bind="l10n_text: z.string.conversation_context_menu_delete_everyone"></span>
+            <span data-bind="l10n_text: z.string.conversationContextMenuDeleteEveryone"></span>
           </span>
         <!-- /ko -->
       </footer>
