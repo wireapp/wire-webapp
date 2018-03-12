@@ -17,14 +17,15 @@
  *
  */
 
-import {Link, Small, Logo, Header, Footer, Content, CloseIcon} from '@wireapp/react-ui-kit';
+import {Link, Small, Logo, Header, Footer, Content, CloseIcon, CheckIcon} from '@wireapp/react-ui-kit';
 import {footerStrings, cookiePolicyStrings} from '../../strings';
-import {injectIntl} from 'react-intl';
-import ROUTE from '../route';
+import {injectIntl, FormattedHTMLMessage} from 'react-intl';
+import EXTERNAL_ROUTE from '../externalRoute';
 import React from 'react';
 
 export const WirelessContainer = ({
   showCookiePolicyBanner,
+  onCookiePolicyBannerAccept,
   onCookiePolicyBannerClose,
   children,
   intl: {formatMessage: _},
@@ -42,11 +43,18 @@ export const WirelessContainer = ({
         style={{
           backgroundColor: 'rgba(254, 191, 2, 0.2)',
           display: 'flex',
-          height: '60px',
+          height: 'auto',
           margin: '0',
         }}
       >
-        <div style={{margin: 'auto'}}>{_(cookiePolicyStrings.bannerText)}</div>
+        <div style={{margin: 'auto', margin: '0 10px', textAlign: 'center', width: '100%'}}>
+          <Link href={EXTERNAL_ROUTE.WIRE_PRIVACY_POLICY}>
+            <FormattedHTMLMessage style={{textAlign: 'center'}} {...cookiePolicyStrings.bannerText} />
+          </Link>
+        </div>
+        <div onClick={onCookiePolicyBannerAccept} style={{margin: '20px'}}>
+          <CheckIcon />
+        </div>
         <div onClick={onCookiePolicyBannerClose} style={{margin: '20px'}}>
           <CloseIcon />
         </div>
@@ -58,7 +66,7 @@ export const WirelessContainer = ({
       </Header>
       <Content style={{flex: '1', paddingLeft: '8px', width: '100%'}}>{children}</Content>
       <Footer style={{height: '30px', justifyContent: 'flex-end', margin: '0 0 18px 8px'}}>
-        <Link href={ROUTE.WIRE_ROOT}>{_(footerStrings.wireLink)}</Link>
+        <Link href={EXTERNAL_ROUTE.WIRE_ROOT}>{_(footerStrings.wireLink)}</Link>
         <Small> &middot; {_(footerStrings.copy)}</Small>
       </Footer>
     </Content>

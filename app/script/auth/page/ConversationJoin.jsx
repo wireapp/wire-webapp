@@ -41,6 +41,7 @@ import ValidationError from '../module/action/ValidationError';
 import * as AuthAction from '../module/action/AuthAction';
 import {injectIntl, FormattedHTMLMessage} from 'react-intl';
 import ROUTE from '../route';
+import EXTERNAL_ROUTE from '../externalRoute';
 import {withRouter} from 'react-router';
 import React, {Component} from 'react';
 import {pathWithParams} from '../util/urlUtil';
@@ -92,7 +93,7 @@ class ConversationJoin extends Component {
 
   openWebapp = params => {
     const link = document.createElement('a');
-    link.href = pathWithParams(ROUTE.LOGIN, params);
+    link.href = pathWithParams(EXTERNAL_ROUTE.LOGIN, params);
     document.body.appendChild(link); // workaround for Firefox
     link.click();
   };
@@ -143,7 +144,7 @@ class ConversationJoin extends Component {
         <Button onClick={this.onOpenWireClick}>{_(conversationJoinStrings.existentAccountOpenButton)}</Button>
         <Small block>
           {`${_(conversationJoinStrings.acceptTou)} `}
-          <Link href={`${ROUTE.WIRE_ROOT}/legal/terms/personal`} textTransform={'none'} data-uie-name="go-tou">
+          <Link href={EXTERNAL_ROUTE.WIRE_TERMS_PERSONAL} textTransform={'none'} data-uie-name="go-tou">
             {_(conversationJoinStrings.touLink)}
           </Link>
         </Small>
@@ -206,7 +207,7 @@ class ConversationJoin extends Component {
         </Form>
         <Small block>
           {`${_(conversationJoinStrings.acceptTou)} `}
-          <Link href={`${ROUTE.WIRE_ROOT}/legal/terms/personal`} textTransform={'none'} data-uie-name="go-tou">
+          <Link href={EXTERNAL_ROUTE.WIRE_TERMS_PERSONAL} textTransform={'none'} data-uie-name="go-tou">
             {_(conversationJoinStrings.touLink)}
           </Link>
         </Small>
