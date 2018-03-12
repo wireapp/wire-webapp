@@ -1,59 +1,59 @@
-<div id="conversation-titlebar" class="conversation-titlebar" data-bind="with: $root.titleBar">
+<div id="conversation-title-bar" class="conversation-title-bar" data-bind="with: $root.titleBar">
   <!-- ko if: conversationEntity() -->
-    <div class="conversation-titlebar-library">
-      <span class="conversation-titlebar-icon button-icon-large icon-search"
-            data-bind="click: clickOnCollectionButton, l10n_tooltip: z.string.tooltip_conversation_search"
+    <div class="conversation-title-bar-library">
+      <span class="conversation-title-bar-icon button-icon-large icon-search"
+            data-bind="click: clickOnCollectionButton, l10n_tooltip: z.string.tooltipConversationSearch"
             data-uie-name="do-collections"></span>
     </div>
-
-    <!-- ko if: conversationEntity().verification_state() === z.conversation.ConversationVerificationState.VERIFIED -->
-      <svg class="conversation-verified-icon" width="16" height="16">
-        <use xlink:href="#icon-verified"></use>
-      </svg>
-    <!-- /ko -->
 
     <div id="show-participants"
           data-bind="click: clickOnDetails, attr: {'title': peopleTooltip}"
           data-placement="bottom"
           data-uie-name="do-participants"
-          class="conversation-titlebar-name">
-      <span class="conversation-titlebar-name-label label-bold-xs ellipsis" data-bind="text: conversationEntity().display_name()" data-uie-name="status-conversation-titlebar-label"></span>
+          class="conversation-title-bar-name">
+      <!-- ko if: conversationEntity().verification_state() === z.conversation.ConversationVerificationState.VERIFIED -->
+        <verified-icon class="conversation-title-bar-name--verified"></verified-icon>
+      <!-- /ko -->
+      <span class="conversation-title-bar-name-label" data-bind="text: conversationEntity().display_name()" data-uie-name="status-conversation-title-bar-label"></span>
     </div>
 
     <!-- ko if: showCallControls() -->
-      <div class="conversation-titlebar-icons">
+      <div class="conversation-title-bar-icons">
         <!-- ko ifnot: conversationEntity().is_group() -->
-          <span class="conversation-titlebar-icon button-icon-large icon-video"
-                data-bind="click: clickOnVideoButton, l10n_tooltip: z.string.tooltip_conversation_video_call"
+          <span class="conversation-title-bar-icon button-icon-large icon-video"
+                data-bind="click: clickOnVideoButton, l10n_tooltip: z.string.tooltipConversationVideoCall"
                 data-uie-name="do-video-call">
           </span>
         <!-- /ko -->
-        <span class="conversation-titlebar-icon button-icon-large icon-call"
-              data-bind="click: clickOnCallButton, l10n_tooltip: z.string.tooltip_conversation_call"
+        <span class="conversation-title-bar-icon button-icon-large icon-call"
+              data-bind="click: clickOnCallButton, l10n_tooltip: z.string.tooltipConversationCall"
               data-uie-name="do-call">
         </span>
       </div>
     <!-- /ko -->
 
     <!-- ko if: hasOngoingCall() -->
-      <div class="conversation-titlebar-icons">
+      <div class="conversation-title-bar-icons">
         <!-- ko if: showMaximizeControl() -->
-          <span class="conversation-titlebar-icon button-icon-large icon-fullscreen"
+          <span class="conversation-title-bar-icon button-icon-large icon-fullscreen"
                 data-bind="click: clickOnMaximize"
                 data-uie-name="do-maximize-call">
           </span>
         <!-- /ko -->
         <!-- ko if: selfStreamState.screenSend() -->
-          <span class="conversation-titlebar-icon conversation-titlebar-icon-status button-icon-large icon-screensharing"
+          <span class="conversation-title-bar-icon conversation-title-bar-icon-status button-icon-large icon-screensharing"
             data-uie-name="status-self-screensharing">
           </span>
         <!-- /ko -->
         <!-- ko if: selfStreamState.videoSend() -->
-          <span class="conversation-titlebar-icon conversation-titlebar-icon-status button-icon-large icon-video"
+          <span class="conversation-title-bar-icon conversation-title-bar-icon-status button-icon-large icon-video"
                 data-uie-name="status-self-video">
           </span>
         <!-- /ko -->
       </div>
+    <!-- /ko -->
+    <!-- ko if: conversationEntity().is_group() && hasGuests() -->
+      <div class="conversation-title-bar-guest-badge" data-bind="l10n_text: z.string.guestRoomConversationBadge" data-uie-name="status-guest-badge"></div>
     <!-- /ko -->
   <!-- /ko -->
 </div>

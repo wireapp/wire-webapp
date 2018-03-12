@@ -58,7 +58,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
         }
 
         const date = moment(blob.lastModifiedDate).format('MMMM Do YYYY, h:mm:ss a');
-        this.pasted_file_name(z.l10n.text(z.string.conversation_send_pasted_file, date));
+        this.pasted_file_name(z.l10n.text(z.string.conversationSendPastedFile, date));
       } else {
         this.pasted_file_preview_url(null);
         this.pasted_file_name(null);
@@ -135,31 +135,31 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       return false;
     });
 
-    this.file_tooltip = z.l10n.text(z.string.tooltip_conversation_file);
+    this.file_tooltip = z.l10n.text(z.string.tooltipConversationFile);
     this.input_placeholder = ko.pureComputed(() => {
       if (this.show_availability_tooltip()) {
         const userEntity = this.conversation_et().firstUserEntity();
 
         switch (userEntity.availability()) {
           case z.user.AvailabilityType.AVAILABLE:
-            return z.l10n.text(z.string.tooltip_conversation_input_placeholder_available, userEntity.first_name());
+            return z.l10n.text(z.string.tooltipConversationInputPlaceholderAvailable, userEntity.first_name());
           case z.user.AvailabilityType.AWAY:
-            return z.l10n.text(z.string.tooltip_conversation_input_placeholder_away, userEntity.first_name());
+            return z.l10n.text(z.string.tooltipConversationInputPlaceholderAway, userEntity.first_name());
           case z.user.AvailabilityType.BUSY:
-            return z.l10n.text(z.string.tooltip_conversation_input_placeholder_busy, userEntity.first_name());
+            return z.l10n.text(z.string.tooltipConversationInputPlaceholderBusy, userEntity.first_name());
         }
       }
 
       if (this.conversation_et().ephemeral_timer()) {
-        return z.l10n.text(z.string.tooltip_conversation_ephemeral);
+        return z.l10n.text(z.string.tooltipConversationEphemeral);
       }
-      return z.l10n.text(z.string.tooltip_conversation_input_placeholder);
+      return z.l10n.text(z.string.tooltipConversationInputPlaceholder);
     });
     this.ping_tooltip = z.l10n.text(
-      z.string.tooltip_conversation_ping,
+      z.string.tooltipConversationPing,
       z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.PING)
     );
-    this.picture_tooltip = z.l10n.text(z.string.tooltip_conversation_picture);
+    this.picture_tooltip = z.l10n.text(z.string.tooltipConversationPicture);
     this.ping_disabled = ko.observable(false);
 
     $(window)
@@ -268,13 +268,15 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     if (!this._is_hitting_upload_limit(files)) {
       for (const file of [...files]) {
         if (file.size > z.config.MAXIMUM_ASSET_FILE_SIZE) {
-          amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
-          window.setTimeout(() => {
-            amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.UPLOAD_TOO_LARGE, {
-              data: z.util.format_bytes(z.config.MAXIMUM_ASSET_FILE_SIZE),
-            });
-          }, 200);
-          return;
+          const fileSize = z.util.format_bytes(z.config.MAXIMUM_ASSET_FILE_SIZE);
+          const options = {
+            text: {
+              message: z.l10n.text(z.string.modalAssetTooLargeMessage, fileSize),
+              title: z.l10n.text(z.string.modalAssetTooLargeHeadline),
+            },
+          };
+
+          return amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, options);
         }
       }
 
@@ -317,11 +319,18 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   }
 
   _show_upload_warning(image) {
-    const string_id = image.type === 'image/gif' ? z.string.alert_gif_too_large : z.string.alert_upload_too_large;
-    const warning_text = z.l10n.text(string_id, z.config.MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024);
+    const isGif = image.type === 'image/gif';
+    const messageStringId = isGif ? z.string.modalGifTooLargeMessage : z.string.modalPictureTooLargeMessage;
+    const titleStringId = isGif ? z.string.modalGifTooLargeHeadline : z.string.modalPictureTooLargeHeadline;
 
-    amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
-    window.setTimeout(() => window.alert(warning_text), 200);
+    const modalOptions = {
+      text: {
+        message: z.l10n.text(messageStringId, z.config.MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024),
+        title: z.l10n.text(titleStringId),
+      },
+    };
+
+    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
   }
 
   _is_hitting_upload_limit(files) {
@@ -329,9 +338,14 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     const is_hitting_upload_limit = pending_uploads + files.length > z.config.MAXIMUM_ASSET_UPLOADS;
 
     if (is_hitting_upload_limit) {
-      amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.UPLOAD_PARALLEL, {
-        data: z.config.MAXIMUM_ASSET_UPLOADS,
-      });
+      const modalOptions = {
+        text: {
+          message: z.l10n.text(z.string.modalAssetParallelUploadsMessage, z.config.MAXIMUM_ASSET_UPLOADS),
+          title: z.l10n.text(z.string.modalAssetParallelUploadsHeadline),
+        },
+      };
+
+      amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
     }
 
     return is_hitting_upload_limit;
@@ -355,7 +369,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   }
 
   on_window_click(event) {
-    if (!$(event.target).closest('.conversation-input').length) {
+    if (!$(event.target).closest('.conversation-input-bar').length) {
       this.cancel_edit();
     }
   }
@@ -374,10 +388,12 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     const message = z.util.StringUtil.trim_line_breaks(this.input());
 
     if (message.length > z.config.MAXIMUM_MESSAGE_LENGTH) {
-      amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.TOO_LONG_MESSAGE, {
-        data: z.config.MAXIMUM_MESSAGE_LENGTH,
+      return amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, {
+        text: {
+          message: z.l10n.text(z.string.modalConversationMessageTooLongMessage, z.config.MAXIMUM_MESSAGE_LENGTH),
+          title: z.l10n.text(z.string.modalConversationMessageTooLongHeadline),
+        },
       });
-      return;
     }
 
     if (this.is_editing()) {
@@ -468,23 +484,23 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   _get_localized_unit_string(number, unit) {
     if (unit === 's') {
       if (number === 1) {
-        return z.l10n.text(z.string.ephememal_units_second);
+        return z.l10n.text(z.string.ephememalUnitsSecond);
       }
-      return z.l10n.text(z.string.ephememal_units_seconds);
+      return z.l10n.text(z.string.ephememalUnitsSeconds);
     }
 
     if (unit === 'm') {
       if (number === 1) {
-        return z.l10n.text(z.string.ephememal_units_minute);
+        return z.l10n.text(z.string.ephememalUnitsMinute);
       }
-      return z.l10n.text(z.string.ephememal_units_minutes);
+      return z.l10n.text(z.string.ephememalUnitsMinutes);
     }
 
     if (unit === 'd') {
       if (number === 1) {
-        return z.l10n.text(z.string.ephememal_units_day);
+        return z.l10n.text(z.string.ephememalUnitsDay);
       }
-      return z.l10n.text(z.string.ephememal_units_days);
+      return z.l10n.text(z.string.ephememalUnitsDays);
     }
   }
 
@@ -498,7 +514,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     const entries = [
       {
         click: () => this.set_ephemeral_timer(0),
-        label: z.l10n.text(z.string.ephememal_units_none),
+        label: z.l10n.text(z.string.ephememalUnitsNone),
       },
     ].concat(
       z.ephemeral.timings.getValues().map(milliseconds => {

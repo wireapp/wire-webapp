@@ -17,7 +17,7 @@
  *
  */
 
-.conversation-input {
+.conversation-input-bar {
   display: flex;
   box-sizing: content-box;
   width: 100%;
@@ -26,16 +26,12 @@
   position: relative;
 }
 
-.conversation-input-editing {
+.conversation-input-bar-editing {
   background-color: fade(@w-yellow, 16%);
   transition: background-color @animation-timing-faster @ease-in-quad;
 }
 
-.conversation-input-separator {
-  border-top: 1px solid fade(@graphite, 12%);
-}
-
-.conversation-input-text {
+.conversation-input-bar-text {
   .accent-selection-color;
   .custom-scrollbar;
   .reset-textarea;
@@ -89,7 +85,7 @@
   margin-right: 12px;
 }
 
-.conversation-input-ephemeral {
+.conversation-input-bar-ephemeral {
   position: relative;
 }
 
@@ -136,7 +132,7 @@
   }
 }
 
-.conversation-input-paste-modal {
+.conversation-input-bar-paste-modal {
   .full-screen;
   display: flex;
   background-color: #fff;
@@ -147,17 +143,17 @@
   animation-fill-mode: forwards;
 }
 
-.conversation-input-paste-icon {
+.conversation-input-bar-paste-icon {
   color: @graphite;
   margin-right: 16px;
 }
 
-.conversation-input-paste-image {
+.conversation-input-bar-paste-image {
   .square(16px);
   object-fit: contain;
 }
 
-.conversation-input-paste-send {
+.conversation-input-bar-paste-send {
   .circle(32px);
   color: #fff;
   cursor: pointer;
@@ -166,11 +162,11 @@
   text-align: center;
 }
 
-.conversation-input-paste-cancel {
+.conversation-input-bar-paste-cancel {
   margin-right: 32px;
 }
 
-.conversation-input-emoji-list {
+.conversation-input-bar-emoji-list {
   background-color: #fff;
   border-radius: 4px;
   box-shadow: 0 0 1px 0 rgba(0, 0, 0, 0.08), 0 8px 24px 0 rgba(0, 0, 0, 0.16);
@@ -179,7 +175,7 @@
   font-weight: @font-weight-regular;
   line-height: @line-height-xl;
   position: fixed;
-  z-index: @z-index-level-7;
+  z-index: @z-index-context;
 
   .emoji {
     cursor: pointer;

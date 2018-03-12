@@ -11,14 +11,14 @@
                  data-bind="attr: {sinkId: currentDeviceId.audio_output()},
                             css: {'video-element-contain': remoteVideoElementContain()},
                             event: {loadedmetadata: onLoadedMetadata},
-                            mute_media_element: remoteVideoStream(),
-                            source_stream: remoteVideoStream()"></video>
+                            muteMediaElement: remoteVideoStream(),
+                            sourceStream: remoteVideoStream()"></video>
         <!-- /ko -->
         <!-- ko if: showRemoteParticipant() -->
           <div class="video-element-remote-participant">
             <!-- ko ifnot: videodCall().isGroup -->
               <participant-avatar class="video-element-remote-participant avatar-no-badge"
-                           params="participant: remoteUser(), size: z.components.ParticipantAvatar.SIZE.X_LARGE"></participant-avatar>
+                           params="participant: remoteUser, size: z.components.ParticipantAvatar.SIZE.X_LARGE"></participant-avatar>
             <!-- /ko -->
           </div>
         <!-- /ko -->
@@ -82,8 +82,8 @@
           <video class="video-element"
                  autoplay
                  data-bind="css: {'mirror': !selfStreamState.screenSend()},
-                            mute_media_element: localVideoStream(),
-                            source_stream: localVideoStream()"></video>
+                            muteMediaElement: localVideoStream(),
+                            sourceStream: localVideoStream()"></video>
         <!-- /ko -->
         <!-- ko if: overlayIconClass() -->
           <span class="video-element-overlay" data-bind="css: overlayIconClass()"></span>

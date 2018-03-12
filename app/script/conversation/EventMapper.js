@@ -376,7 +376,7 @@ z.conversation.EventMapper = class EventMapper {
   _mapEventTeamMemberLeave(event) {
     const messageEntity = this._mapEventMemberLeave(event);
     const eventData = event.data;
-    messageEntity.name(eventData.name || z.l10n.text(z.string.conversation_someone));
+    messageEntity.name(eventData.name || z.l10n.text(z.string.conversationSomeone));
     return messageEntity;
   }
 
@@ -408,9 +408,9 @@ z.conversation.EventMapper = class EventMapper {
   _mapEventVerification({data: eventData}) {
     const messageEntity = new z.entity.VerificationMessage();
 
-    // Database can contain non-camelcased naming. For backwards compatibility reasons we handle both.
+    // Database can contain non-camelCased naming. For backwards compatibility reasons we handle both.
     messageEntity.userIds(eventData.userIds || eventData.user_ids);
-    messageEntity.verification_message_type = eventData.type;
+    messageEntity.verificationMessageType(eventData.type);
 
     return messageEntity;
   }

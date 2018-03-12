@@ -52,7 +52,7 @@
   "BackendError.LABEL.OPERATION_DENIED": "Je hebt geen toestemming",
   "BackendError.LABEL.UNAUTHORIZED": "Er is iets misgegaan. Vernieuw de pagina (F5) en probeer opnieuw",
   "BackendError.LABEL.HANDLE_EXISTS": "Deze gebruikersnaam is al in gebruik",
-  "BackendError.LABEL.HANDLE_TOO_SHORT": "",
+  "BackendError.LABEL.HANDLE_TOO_SHORT": "Voer een gebruikersnaam in met een ten minste 2 tekens",
   "BackendError.LABEL.INVALID_HANDLE": "Deze gebruikersnaam is ongeldig",
   "BackendError.LABEL.INVALID_INVITATION_CODE": "Uitnodiging is ingetrokken of verlopen",
   "BackendError.LABEL.NO_OTHER_OWNER": "De laatste eigenaar kan niet verwijderd worden uit een team",

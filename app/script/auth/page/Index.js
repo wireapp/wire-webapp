@@ -35,6 +35,7 @@ import {
   Column,
   ContainerXS,
 } from '@wireapp/react-ui-kit';
+import EXTERNAL_ROUTE from '../externalRoute';
 import {connect} from 'react-redux';
 import {indexStrings} from '../../strings';
 import {injectIntl} from 'react-intl';
@@ -59,7 +60,7 @@ class Index extends Component {
   onLoginClick = () => {
     this.props.trackEvent({name: TrackingAction.EVENT_NAME.START.OPENED_LOGIN});
     const link = document.createElement('a');
-    link.href = pathWithParams(ROUTE.LOGIN, 'mode=login');
+    link.href = pathWithParams(EXTERNAL_ROUTE.LOGIN, 'mode=login');
     document.body.appendChild(link); // workaround for Firefox
     link.click();
   };

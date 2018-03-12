@@ -102,10 +102,10 @@ z.client.ClientEntity = class ClientEntity {
     delete jsonObject.isSelfClient;
     delete jsonObject.session;
 
-    z.client.ClientMapper.CONFIG.CLIENT_PAYLOAD.forEach(name => this._deleteDefaultValues(jsonObject, name));
+    z.client.ClientMapper.CONFIG.CLIENT_PAYLOAD.forEach(name => this._removeDefaultValues(jsonObject, name));
 
     if (this.isSelfClient) {
-      z.client.ClientMapper.CONFIG.SELF_CLIENT_PAYLOAD.forEach(name => this._deleteDefaultValues(jsonObject, name));
+      z.client.ClientMapper.CONFIG.SELF_CLIENT_PAYLOAD.forEach(name => this._removeDefaultValues(jsonObject, name));
     }
 
     jsonObject.meta.is_verified = jsonObject.meta.isVerified;
@@ -119,11 +119,11 @@ z.client.ClientEntity = class ClientEntity {
     return jsonObject;
   }
 
-  _deleteDefaultValues(jsonObject, memberName) {
+  _removeDefaultValues(jsonObject, memberName) {
     if (jsonObject.hasOwnProperty(memberName)) {
       const isDefaultValue = jsonObject[memberName] === ClientEntity.CONFIG.DEFAULT_VALUE;
       if (isDefaultValue) {
-        delete jsonObject[memberName];
+        jsonObject[memberName] = '';
       }
     }
   }

@@ -12,7 +12,6 @@
 <script src="/script/util/moment.js"></script>
 <script src="/script/util/NumberUtil.js"></script>
 <script src="/script/util/ObjectUtil.js"></script>
-<script src="/script/util/confirm.js"></script>
 <script src="/script/util/PromiseQueue.js"></script>
 <script src="/script/util/scroll-helpers.js"></script>
 <script src="/script/util/Statistics.js"></script>
@@ -81,6 +80,7 @@
 <script src="/script/tracking/attribute/DeleteType.js"></script>
 <script src="/script/tracking/attribute/MessageType.js"></script>
 <script src="/script/tracking/attribute/PlatformType.js"></script>
+<script src="/script/tracking/attribute/UserType.js"></script>
 <script src="/script/tracking/event/PictureTakenEvent.js"></script>
 <script src="/script/tracking/EventName.js"></script>
 <script src="/script/tracking/EventTrackingRepository.js"></script>
@@ -146,6 +146,9 @@
 <script src="/script/client/ClientService.js"></script>
 <script src="/script/client/ClientType.js"></script>
 <!-- Conversation -->
+<script src="/script/conversation/AccessMode.js"></script>
+<script src="/script/conversation/AccessRole.js"></script>
+<script src="/script/conversation/AccessState.js"></script>
 <script src="/script/conversation/ClientMismatchHandler.js"></script>
 <script src="/script/conversation/ConversationCellState.js"></script>
 <script src="/script/conversation/ConversationError.js"></script>
@@ -153,6 +156,7 @@
 <script src="/script/conversation/ConversationRepository.js"></script>
 <script src="/script/conversation/ConversationService.js"></script>
 <script src="/script/conversation/ConversationServiceNoCompound.js"></script>
+<script src="/script/conversation/ConversationStateHandler.js"></script>
 <script src="/script/conversation/ConversationStatus.js"></script>
 <script src="/script/conversation/ConversationStatusIcon.js"></script>
 <script src="/script/conversation/ConversationType.js"></script>
@@ -268,6 +272,7 @@
 <script src="/script/user/UserRepository.js"></script>
 <script src="/script/user/UserHandleGenerator.js"></script>
 <!-- View Models -->
+<script src="/script/view_model/ActionsViewModel.js"></script>
 <script src="/script/view_model/ImageDetailViewViewModel.js"></script>
 <script src="/script/view_model/LoadingViewModel.js"></script>
 <script src="/script/view_model/MainViewModel.js"></script>
@@ -282,6 +287,7 @@
 <script src="/script/view_model/bindings/ListBackgroundBindings.js"></script>
 <script src="/script/view_model/bindings/LocalizationBindings.js"></script>
 <script src="/script/view_model/bindings/MessageListBindings.js"></script>
+<script src="/script/view_model/bindings/VideoCallingBindings.js"></script>
 <!-- View Models: Content -->
 <script src="/script/view_model/ContentViewModel.js"></script>
 <script src="/script/view_model/content/CollectionDetailsViewModel.js"></script>
@@ -301,8 +307,11 @@
 <script src="/script/view_model/content/TitleBarViewModel.js"></script>
 <!-- View Models: Panel -->
 <script src="/script/view_model/PanelViewModel.js"></script>
-<script src="/script/view_model/panel/ParticipantsViewModel.js"></script>
+<script src="/script/view_model/panel/AddParticipantsViewModel.js"></script>
+<script src="/script/view_model/panel/ConversationDetailsViewModel.js"></script>
+<script src="/script/view_model/panel/GroupParticipantViewModel.js"></script>
 <script src="/script/view_model/panel/GuestOptionsViewModel.js"></script>
+<script src="/script/view_model/panel/ParticipantDevicesViewModel.js"></script>
 <!-- View Models: List -->
 <script src="/script/view_model/ListViewModel.js"></script>
 <script src="/script/view_model/list/ArchiveViewModel.js"></script>
@@ -324,9 +333,12 @@
 <script src="/script/components/serviceList.js"></script>
 <script src="/script/components/topPeople.js"></script>
 <script src="/script/components/participantAvatar.js"></script>
+<script src="/script/components/list/participantItem.js"></script>
 <script src="/script/components/userProfile.js"></script>
 <script src="/script/components/userInput.js"></script>
 <script src="/script/components/userList.js"></script>
+<script src="/script/components/guestModeToggle.js"></script>
+<script src="/script/components/icons.js"></script>
 <script src="/script/components/asset/assetHeader.js"></script>
 <script src="/script/components/asset/videoAsset.js"></script>
 <script src="/script/components/asset/audioAsset.js"></script>

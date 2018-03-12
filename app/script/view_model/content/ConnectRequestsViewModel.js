@@ -36,9 +36,11 @@ z.viewModel.content.ConnectRequestsViewModel = class ConnectRequestsViewModel {
     this.clickOnAccept = this.clickOnAccept.bind(this);
     this.clickOnIgnore = this.clickOnIgnore.bind(this);
 
+    this.mainViewModel = mainViewModel;
     this.userRepository = repositories.user;
     this.logger = new z.util.Logger('z.viewModel.content.ConnectRequestsViewModel', z.config.LOGGER.OPTIONS);
 
+    this.actionsViewModel = this.mainViewModel.actions;
     this.connectRequests = this.userRepository.connect_requests;
 
     this.shouldUpdateScrollbar = ko.computed(() => this.connectRequests()).extend({notify: 'always', rateLimit: 500});
@@ -63,7 +65,7 @@ z.viewModel.content.ConnectRequestsViewModel = class ConnectRequestsViewModel {
    */
   clickOnAccept(userEntity) {
     const showConversation = this.connectRequests().length === 1;
-    this.userRepository.accept_connection_request(userEntity, showConversation);
+    this.actionsViewModel.acceptConnectionRequest(userEntity, showConversation);
   }
 
   /**
@@ -72,6 +74,6 @@ z.viewModel.content.ConnectRequestsViewModel = class ConnectRequestsViewModel {
    * @returns {undefined} No return value
    */
   clickOnIgnore(userEntity) {
-    this.userRepository.ignore_connection_request(userEntity);
+    this.actionsViewModel.ignoreConnectionRequest(userEntity);
   }
 };

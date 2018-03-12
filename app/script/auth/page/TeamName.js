@@ -34,6 +34,7 @@ import {
   ErrorMessage,
 } from '@wireapp/react-ui-kit';
 import ROUTE from '../route';
+import EXTERNAL_ROUTE from '../externalRoute';
 import {Link as RRLink} from 'react-router-dom';
 import {connect} from 'react-redux';
 import {teamNameStrings} from '../../strings';
@@ -47,8 +48,6 @@ import * as AuthSelector from '../module/selector/AuthSelector';
 import ValidationError from '../module/action/ValidationError';
 import React, {Component} from 'react';
 import Page from './Page';
-
-const wireTeamLink = `${ROUTE.WIRE_ROOT}/create-team/#features`;
 
 class TeamName extends Component {
   state = {
@@ -136,7 +135,7 @@ class TeamName extends Component {
                   </Form>
                 </div>
                 <div>
-                  <Link href={wireTeamLink} target="_blank" data-uie-name="go-what-is">
+                  <Link href={EXTERNAL_ROUTE.WIRE_ROOT} target="_blank" data-uie-name="go-what-is">
                     {_(teamNameStrings.whatIsWireTeamsLink)}
                   </Link>
                 </div>

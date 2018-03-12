@@ -1,0 +1,113 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+participant-item {
+  display: block;
+  position: relative;
+
+  &:not(.no-underline)::after {
+    content: '';
+    background-color: currentColor;
+    bottom: 0;
+    left: @left-list-item-left-width;
+    height: 1px;
+    opacity: 0.06;
+    position: absolute;
+    right: 0;
+  }
+
+  verified-icon,
+  guest-icon,
+  disclose-icon {
+    margin-left: 12px;
+    display: flex;
+  }
+
+  verified-icon + guest-icon {
+    margin-left: 16px;
+  }
+
+  guest-icon {
+    opacity: 0.48;
+  }
+
+  disclose-icon {
+    opacity: 0.25;
+  }
+
+  disclose-icon {
+    display: none;
+  }
+
+  &.show-arrow disclose-icon {
+    display: flex;
+  }
+
+  .participant-item {
+    cursor: pointer;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    height: 56px;
+    margin: 0;
+    padding-right: 16px;
+
+    .participant-item-image {
+      flex: 0 0 auto;
+      height: @avatar-diameter-m;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 60px;
+    }
+
+    .participant-item-content {
+      align-items: flex-start;
+      justify-content: center;
+      display: flex;
+      flex-direction: column;
+      flex: 1 1;
+      height: @avatar-diameter-m;
+      min-width: 0; // this will ensure that ellipses is working
+      line-height: 16px;
+      font-size: 14px;
+      font-weight: 400;
+
+      .participant-item-content-availability {
+        .availability-state-label {
+          .ellipsis;
+        }
+      }
+
+      .participant-item-content-name {
+        .ellipsis;
+        width: 100%;
+      }
+
+      .participant-item-content-info {
+        margin-top: 2px;
+        display: flex;
+        font-size: 12px;
+        line-height: 16px;
+        opacity: 0.56;
+      }
+    }
+  }
+}

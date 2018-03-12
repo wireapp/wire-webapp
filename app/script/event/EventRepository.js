@@ -479,7 +479,7 @@ z.event.EventRepository = class EventRepository {
       };
       const progress = this.notificationsHandled / this.notificationsTotal * 50 + 25;
 
-      amplify.publish(z.event.WebApp.APP.UPDATE_PROGRESS, progress, z.string.init_decryption, content);
+      amplify.publish(z.event.WebApp.APP.UPDATE_PROGRESS, progress, z.string.initDecryption, content);
     }
   }
 
@@ -710,7 +710,7 @@ z.event.EventRepository = class EventRepository {
    */
   _handleNotification({payload: events, id, transient}) {
     const source = transient !== undefined ? EventRepository.SOURCE.WEB_SOCKET : EventRepository.SOURCE.STREAM;
-    const isTransientEvent = Boolean(transient);
+    const isTransientEvent = !!transient;
     this.logger.info(`Handling notification '${id}' from '${source}' containing '${events.length}' events`, events);
 
     if (!events.length) {

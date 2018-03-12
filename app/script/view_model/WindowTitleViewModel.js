@@ -74,8 +74,8 @@ z.viewModel.WindowTitleViewModel = class WindowTitleViewModel {
             case z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS: {
               const multipleRequests = connectionRequests > 1;
               const stringId = multipleRequests
-                ? z.string.conversations_connection_request_many
-                : z.string.conversations_connection_request_one;
+                ? z.string.conversationsConnectionRequestMany
+                : z.string.conversationsConnectionRequestOne;
               specificTitle += z.l10n.text(stringId, connectionRequests);
               break;
             }
@@ -88,32 +88,32 @@ z.viewModel.WindowTitleViewModel = class WindowTitleViewModel {
             }
 
             case z.viewModel.ContentViewModel.STATE.PREFERENCES_ABOUT: {
-              specificTitle += z.l10n.text(z.string.preferences_about);
+              specificTitle += z.l10n.text(z.string.preferencesAbout);
               break;
             }
 
             case z.viewModel.ContentViewModel.STATE.PREFERENCES_ACCOUNT: {
-              specificTitle += z.l10n.text(z.string.preferences_account);
+              specificTitle += z.l10n.text(z.string.preferencesAccount);
               break;
             }
 
             case z.viewModel.ContentViewModel.STATE.PREFERENCES_AV: {
-              specificTitle += z.l10n.text(z.string.preferences_av);
+              specificTitle += z.l10n.text(z.string.preferencesAV);
               break;
             }
 
             case z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICE_DETAILS: {
-              specificTitle += z.l10n.text(z.string.preferences_device_details);
+              specificTitle += z.l10n.text(z.string.preferencesDeviceDetails);
               break;
             }
 
             case z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICES: {
-              specificTitle += z.l10n.text(z.string.preferences_devices);
+              specificTitle += z.l10n.text(z.string.preferencesDevices);
               break;
             }
 
             case z.viewModel.ContentViewModel.STATE.PREFERENCES_OPTIONS: {
-              specificTitle += z.l10n.text(z.string.preferences_options);
+              specificTitle += z.l10n.text(z.string.preferencesOptions);
               break;
             }
 
@@ -131,8 +131,8 @@ z.viewModel.WindowTitleViewModel = class WindowTitleViewModel {
   setUpdateState(handlingNotifications) {
     const updateWindowTitle = handlingNotifications === z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
 
-    const updateUnchanged = this.updateWindowTitle() === updateWindowTitle;
-    if (!updateUnchanged) {
+    const isStateChange = this.updateWindowTitle() !== updateWindowTitle;
+    if (isStateChange) {
       this.updateWindowTitle(updateWindowTitle);
       this.logger.debug(`Set window title update state to '${this.updateWindowTitle()}'`);
     }

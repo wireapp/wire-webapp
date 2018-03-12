@@ -247,14 +247,14 @@ z.main.App = class App {
         return Promise.all([this._get_user_self(), z.util.protobuf.load_protos(protoFile)]);
       })
       .then(([self_user_et]) => {
-        this.view.loading.updateProgress(5, z.string.init_received_self_user);
+        this.view.loading.updateProgress(5, z.string.initReceivedSelfUser);
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.RECEIVED_SELF_USER);
         this.repository.client.init(self_user_et);
         this.repository.properties.init(self_user_et);
         return this.repository.client.getValidLocalClient();
       })
       .then(client_observable => {
-        this.view.loading.updateProgress(7.5, z.string.init_validated_client);
+        this.view.loading.updateProgress(7.5, z.string.initValidatedClient);
 
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.VALIDATED_CLIENT);
         this.telemetry.add_statistic(z.telemetry.app_init.AppInitStatisticsValue.CLIENT_TYPE, client_observable().type);
@@ -271,7 +271,7 @@ z.main.App = class App {
         return Promise.all([this.repository.conversation.get_conversations(), this.repository.user.get_connections()]);
       })
       .then(([conversation_ets, connection_ets]) => {
-        this.view.loading.updateProgress(25, z.string.init_received_user_data);
+        this.view.loading.updateProgress(25, z.string.initReceivedUserData);
 
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.RECEIVED_USER_DATA);
         this.telemetry.add_statistic(
@@ -304,7 +304,7 @@ z.main.App = class App {
         return this.repository.conversation.initialize_conversations();
       })
       .then(() => {
-        this.view.loading.updateProgress(97.5, z.string.init_updated_from_notifications);
+        this.view.loading.updateProgress(97.5, z.string.initUpdatedFromNotifications);
 
         this._watch_online_status();
         return this.repository.client.getClientsForSelf();
@@ -510,6 +510,7 @@ z.main.App = class App {
 
   /**
    * Handle URL params.
+   * @private
    * @returns {undefined} Not return value
    */
   _handleUrlParams() {
@@ -522,7 +523,14 @@ z.main.App = class App {
 
     const supportIntegrations = z.util.get_url_parameter(z.auth.URLParameter.INTEGRATIONS);
     if (_.isBoolean(supportIntegrations)) {
+      this.logger.info(`Feature flag for integrations set to '${serviceId}'`);
       this.repository.integration.supportIntegrations(supportIntegrations);
+    }
+
+    const supportConversationLinks = z.util.get_url_parameter(z.auth.URLParameter.LINKS);
+    if (_.isBoolean(supportConversationLinks)) {
+      this.logger.info(`Feature flag for conversation links set to '${supportConversationLinks}'`);
+      this.repository.conversation.supportConversationLinks(supportConversationLinks);
     }
   }
 

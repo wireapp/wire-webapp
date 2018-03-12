@@ -37,6 +37,7 @@ import {
 } from '@wireapp/react-ui-kit';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 import {pathWithParams} from '../util/urlUtil';
+import EXTERNAL_ROUTE from '../externalRoute';
 import * as LanguageSelector from '../module/selector/LanguageSelector';
 import * as InviteSelector from '../module/selector/InviteSelector';
 import {invite} from '../module/action/InviteAction';
@@ -57,8 +58,8 @@ class InitialInvite extends React.PureComponent {
 
   onInviteDone = () => {
     const {invites} = this.props;
-    const nextLocation = pathWithParams('/login', 'reason=registration');
-    const invited = Boolean(invites.length);
+    const nextLocation = pathWithParams(EXTERNAL_ROUTE.LOGIN, 'reason=registration');
+    const invited = !!invites.length;
     return this.props
       .trackEvent({
         attributes: {invited, invites: invites.length},

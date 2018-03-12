@@ -27,13 +27,14 @@ export const APP_ENVIRONMENT = getEnvironmentFromQuery();
 checkEnvironment();
 export function getEnvironmentFromQuery() {
   const isProductionHost = window.location.hostname.includes('wire.com');
+  const isLocalHost = window.location.hostname.includes('localhost');
   switch (getURLParameter('env')) {
     case 'staging':
       return STAGING;
     case 'prod':
       return PRODUCTION;
     default:
-      return isProductionHost ? PRODUCTION : STAGING;
+      return isProductionHost ? PRODUCTION : isLocalHost ? LOCAL : STAGING;
   }
 }
 

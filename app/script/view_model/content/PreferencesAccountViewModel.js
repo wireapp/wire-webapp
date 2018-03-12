@@ -49,7 +49,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
       const noStatusSet = this.availability() === z.user.AvailabilityType.NONE;
       if (noStatusSet) {
-        label = z.l10n.text(z.string.preferences_account_avaibility_unset);
+        label = z.l10n.text(z.string.preferencesAccountAvaibilityUnset);
       }
 
       return label;
@@ -64,7 +64,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.is_team_manager = ko.pureComputed(() => this.is_team() && this.self_user().is_team_manager());
     this.team = this.team_repository.team;
     this.team_name = ko.pureComputed(() =>
-      z.l10n.text(z.string.preferences_account_team, this.team_repository.teamName())
+      z.l10n.text(z.string.preferencesAccountTeam, this.team_repository.teamName())
     );
 
     this.name_saved = ko.observable();
@@ -74,8 +74,8 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   _init_subscriptions() {
-    amplify.subscribe(z.event.WebApp.CLIENT.ADD_OWN_CLIENT, this.on_client_add.bind(this));
-    amplify.subscribe(z.event.WebApp.CLIENT.REMOVE, this.on_client_remove.bind(this));
+    amplify.subscribe(z.event.WebApp.USER.CLIENT_ADDED, this.onClientAdd.bind(this));
+    amplify.subscribe(z.event.WebApp.USER.CLIENT_REMOVED, this.onClientRemove.bind(this));
   }
 
   removed_from_view() {
@@ -205,10 +205,11 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   check_new_clients() {
     if (this.new_clients().length) {
       amplify.publish(z.event.WebApp.SEARCH.BADGE.HIDE);
-      amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONNECTED_DEVICE, {
+      amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACCOUNT_NEW_DEVICES, {
         close: () => this.new_clients.removeAll(),
         data: this.new_clients(),
-        secondary() {
+        preventClose: true,
+        secondary: () => {
           amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICES);
         },
       });
@@ -226,14 +227,18 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   click_on_delete_account() {
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.DELETE_ACCOUNT, {
+    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
       action: () => this.user_repository.delete_me(),
-      data: this.self_user().email(),
+      text: {
+        action: z.l10n.text(z.string.modalAccountDeletionAction),
+        message: z.l10n.text(z.string.modalAccountDeletionMessage),
+        title: z.l10n.text(z.string.modalAccountDeletionHeadline),
+      },
     });
   }
 
   click_on_create() {
-    const path = `${z.l10n.text(z.string.url_website_create_team)}?pk_campaign=client&pk_kwd=desktop`;
+    const path = `${z.l10n.text(z.string.urlWebsiteCreateTeam)}?pk_campaign=client&pk_kwd=desktop`;
     z.util.safe_window_open(z.util.URLUtil.build_url(z.util.URLUtil.TYPE.WEBSITE, path));
   }
 
@@ -254,11 +259,17 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   set_picture(new_user_picture) {
     if (new_user_picture.size > z.config.MAXIMUM_IMAGE_FILE_SIZE) {
       const maximum_size_in_mb = z.config.MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024;
-      return this._show_upload_warning(z.l10n.text(z.string.alert_upload_too_large, maximum_size_in_mb));
+      const messageString = z.l10n.text(z.string.modalPictureTooLargeMessage, maximum_size_in_mb);
+      const titleString = z.l10n.text(z.string.modalPictureTooLargeHeadline);
+
+      return this._show_upload_warning(titleString, messageString);
     }
 
     if (!z.config.SUPPORTED_PROFILE_IMAGE_TYPES.includes(new_user_picture.type)) {
-      return this._show_upload_warning(z.l10n.text(z.string.alert_upload_file_format));
+      const titleString = z.l10n.text(z.string.modalPictureFileFormatHeadline);
+      const messageString = z.l10n.text(z.string.modalPictureFileFormatMessage);
+
+      return this._show_upload_warning(titleString, messageString);
     }
 
     const min_height = z.user.UserRepository.CONFIG.MINIMUM_PICTURE_SIZE.HEIGHT;
@@ -269,29 +280,33 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
         return this.user_repository.change_picture(new_user_picture);
       }
 
-      return this._show_upload_warning(z.l10n.text(z.string.alert_upload_too_small));
+      const messageString = z.l10n.text(z.string.modalPictureTooSmallMessage);
+      const titleString = z.l10n.text(z.string.modalPictureTooSmallHeadline);
+      return this._show_upload_warning(titleString, messageString);
     });
   }
 
-  _show_upload_warning(warning) {
-    amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
-    window.setTimeout(() => {
-      window.alert(warning);
-    }, 200);
+  _show_upload_warning(title, message) {
+    const modalOptions = {text: {message, title}};
+    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
+
     return Promise.reject(new z.user.UserError(z.user.UserError.TYPE.INVALID_UPDATE));
   }
 
-  on_client_add(user_id, client_et) {
-    amplify.publish(z.event.WebApp.SEARCH.BADGE.SHOW);
-    this.new_clients.push(client_et);
+  onClientAdd(userId, clientEntity) {
+    const isSelfUser = userId === this.self_user().id;
+    if (isSelfUser) {
+      amplify.publish(z.event.WebApp.SEARCH.BADGE.SHOW);
+      this.new_clients.push(clientEntity);
+    }
   }
 
-  on_client_remove(user_id, client_id) {
-    if (user_id === this.self_user().id) {
-      this.new_clients().forEach(client_et => {
-        if (client_et.id === client_id && client_et.isPermanent()) {
-          this.new_clients.remove(client_et);
-        }
+  onClientRemove(userId, clientId) {
+    const isSelfUser = userId === this.self_user().id;
+    if (isSelfUser) {
+      this.new_clients.remove(clientEntity => {
+        const isExpectedId = clientEntity.id === clientId;
+        return isExpectedId && clientEntity.isPermanent();
       });
 
       if (!this.new_clients().length) {
