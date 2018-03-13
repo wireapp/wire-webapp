@@ -58,7 +58,8 @@ export function getCookie(name, asJSON = false) {
     return Promise.resolve(asJSON ? cookieStore.getJSON(name) : cookieStore.get(name))
       .then(cookie => {
         const previousCookie = CookieSelector.getCookies(getState())[name];
-        if (!(previousCookie && cookie && JSON.stringify(previousCookie) === JSON.stringify(cookie))) {
+        const isCookieModified = JSON.stringify(previousCookie) !== JSON.stringify(cookie);
+        if (isCookieModified) {
           dispatch(CookieActionCreator.successfulGetCookie({cookie, name}));
         }
       })

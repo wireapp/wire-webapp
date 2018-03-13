@@ -57,7 +57,7 @@ class ConversationJoin extends Component {
     conversationKey: null,
     enteredName: '',
     error: null,
-    forceNewAccount: false,
+    forceNewTemporaryGuestAccount: false,
     isValidLink: true,
     isValidName: true,
     showCookiePolicyBanner: true,
@@ -127,12 +127,12 @@ class ConversationJoin extends Component {
     this.nameInput.focus();
   };
 
-  isConversationFullErrorPresent = error =>
+  isConversationFullError = error =>
     error && error.label && error.is(BackendError.CONVERSATION_ERRORS.CONVERSATION_TOO_MANY_MEMBERS);
 
   resetErrors = () => this.setState({error: null, isValidName: true});
 
-  renderExistentAccount = () => {
+  renderActivatedAccount = () => {
     const {selfName, intl: {formatMessage: _}} = this.props;
     return (
       <ContainerXS style={{margin: 'auto 0'}}>
@@ -157,7 +157,7 @@ class ConversationJoin extends Component {
         </Small>
         <Small block>
           <Link
-            onClick={() => this.setState({...this.state, forceNewAccount: true})}
+            onClick={() => this.setState({...this.state, forceNewTemporaryGuestAccount: true})}
             textTransform={'none'}
             data-uie-name="go-join"
           >
@@ -169,7 +169,7 @@ class ConversationJoin extends Component {
     );
   };
 
-  renderNewAnonAccount = () => {
+  renderTemporaryGuestAccount = () => {
     const {intl: {formatMessage: _}} = this.props;
     const {enteredName, isValidName, error} = this.state;
     return (
@@ -252,20 +252,28 @@ class ConversationJoin extends Component {
     );
   };
 
-  render() {
+  renderJoin = () => {
     const {error, isAuthenticated} = this.props;
-    const {isValidLink, forceNewAccount} = this.state;
+    const {isValidLink, forceNewTemporaryGuestAccount} = this.state;
+
+    if (!isValidLink) {
+      return this.renderInvalidLink();
+    }
+    if (this.isConversationFullError(error)) {
+      return this.renderFullConversation();
+    }
+    const renderTemporaryGuestAccountCreation = !isAuthenticated || forceNewTemporaryGuestAccount;
+    return renderTemporaryGuestAccountCreation ? this.renderTemporaryGuestAccount() : this.renderActivatedAccount();
+  };
+
+  render() {
     return (
       <WirelessUnsupportedBrowser>
         <WirelessContainer
           showCookiePolicyBanner={this.state.showCookiePolicyBanner}
           onCookiePolicyBannerClose={() => this.setState({...this.state, showCookiePolicyBanner: false})}
         >
-          {isValidLink
-            ? this.isConversationFullErrorPresent(error)
-              ? this.renderFullConversation()
-              : !isAuthenticated || forceNewAccount ? this.renderNewAnonAccount() : this.renderExistentAccount()
-            : this.renderInvalidLink()}
+          {this.renderJoin()}
         </WirelessContainer>
       </WirelessUnsupportedBrowser>
     );
