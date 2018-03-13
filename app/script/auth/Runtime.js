@@ -19,24 +19,6 @@
 
 import platform from 'platform';
 
-interface OS {
-  architecture: number;
-  family: string;
-  version: string;
-}
-
-export interface Platform {
-  product: string;
-  description: string;
-  layout: string;
-  manufacturer: string;
-  name: string;
-  prerelease: string;
-  ua: string;
-  version: string;
-  os: OS;
-}
-
 export const BROWSER = {
   CHROME: 'chrome',
   EDGE: 'edge',
@@ -66,8 +48,8 @@ export const SUPPORTED_BROWSERS = {
 };
 
 export default class Runtime {
-  getPlatform = (): Platform => platform;
-  getOS = (): OS => this.getPlatform().os;
+  getPlatform = () => platform;
+  getOS = () => this.getPlatform().os;
 
   getOSFamily = () => this.getOS().family.toLowerCase();
   getBrowserName = () => this.getPlatform().name.toLowerCase();
@@ -76,9 +58,7 @@ export default class Runtime {
 
   isSupportedBrowser = () => {
     return Object.entries(SUPPORTED_BROWSERS).some(([browser, version]) => {
-      if (this.getBrowserName() === browser && this.getMajorBrowserVersion() >= SUPPORTED_BROWSERS[browser]) {
-        return true;
-      }
+      return this.getBrowserName() === browser && this.getMajorBrowserVersion() >= version;
     });
   };
 

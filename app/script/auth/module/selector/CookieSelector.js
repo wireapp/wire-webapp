@@ -16,6 +16,7 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+
 import {APP_INSTANCE_ID} from '../../config';
 
 export const COOKIE_NAME_APP_OPENED = 'app_opened';

@@ -135,7 +135,7 @@ class TeamName extends Component {
                   </Form>
                 </div>
                 <div>
-                  <Link href={EXTERNAL_ROUTE.WIRE_ROOT} target="_blank" data-uie-name="go-what-is">
+                  <Link href={EXTERNAL_ROUTE.WIRE_WEBSITE} target="_blank" data-uie-name="go-what-is">
                     {_(teamNameStrings.whatIsWireTeamsLink)}
                   </Link>
                 </div>

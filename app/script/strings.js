@@ -206,10 +206,6 @@ export const appAlreadyOpenStrings = defineMessages({
     id: 'appAlreadyOpenStrings.text',
     defaultMessage: 'If you continue here, you will be logged out on the other tab.',
   },
-  cancelButton: {
-    id: 'appAlreadyOpenStrings.cancelButton',
-    defaultMessage: 'Cancel',
-  },
   continueButton: {
     id: 'appAlreadyOpenStrings.continueButton',
     defaultMessage: 'Continue',
