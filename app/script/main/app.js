@@ -58,7 +58,7 @@ z.main.App = class App {
     this.view = this._setup_view_models();
     this.util = this._setup_utils();
 
-    this.instanceId = '';
+    this.instanceId = z.util.create_random_uuid();
 
     this._subscribe_to_events();
 
@@ -552,30 +552,19 @@ z.main.App = class App {
    */
   _checkSingleInstanceOnInit() {
     if (!z.util.Environment.electron) {
-      return this._checkSingleInstanceCookie().then(() => this._setSingleInstanceCookie());
+      return this._setSingleInstanceCookie();
     }
 
     return Promise.resolve();
   }
 
   _checkSingleInstanceOnInterval() {
-    this._checkSingleInstanceCookie().catch(error => {
-      const isMultipleTabs = error.type === z.auth.AuthError.TYPE.MULTIPLE_TABS;
-      if (isMultipleTabs) {
-        return this._redirect_to_login(z.auth.SIGN_OUT_REASON.MULTIPLE_TABS);
-      }
+    const singleInstanceCookie = Cookies.getJSON(App.CONFIG.TABS_CHECK.COOKIE_NAME);
 
-      throw error;
-    });
-  }
-
-  _checkSingleInstanceCookie() {
-    const singleInstanceCookieSet = !!Cookies.get(App.CONFIG.TABS_CHECK.COOKIE_NAME);
-    if (singleInstanceCookieSet) {
-      return Promise.reject(new z.auth.AuthError(z.auth.AuthError.TYPE.MULTIPLE_TABS));
+    const shouldBlockTab = !singleInstanceCookie || singleInstanceCookie.appInstanceId !== this.instanceId;
+    if (shouldBlockTab) {
+      return this._redirect_to_login(z.auth.SIGN_OUT_REASON.MULTIPLE_TABS);
     }
-
-    return Promise.resolve();
   }
 
   /**
@@ -583,7 +572,11 @@ z.main.App = class App {
    * @returns {undefined} No return value
    */
   _setSingleInstanceCookie() {
-    this.instanceId = z.util.create_random_uuid();
+    const shouldBlockTab = !!Cookies.get(App.CONFIG.TABS_CHECK.COOKIE_NAME);
+    if (shouldBlockTab) {
+      return Promise.reject(new z.auth.AuthError(z.auth.AuthError.TYPE.MULTIPLE_TABS));
+    }
+
     const cookieData = {appInstanceId: this.instanceId};
     Cookies.set(App.CONFIG.TABS_CHECK.COOKIE_NAME, cookieData);
 

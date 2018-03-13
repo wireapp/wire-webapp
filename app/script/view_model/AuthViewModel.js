@@ -821,7 +821,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
   }
 
   clickOnHandover() {
-    Cookies.remove(z.main.App.CONFIG.COOKIES_CHECK.COOKIE_NAME);
+    Cookies.remove(z.main.App.CONFIG.TABS_CHECK.COOKIE_NAME);
     this._checkSingleInstance();
   }
 
