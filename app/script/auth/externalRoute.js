@@ -19,7 +19,7 @@
 
 import {onEnvironment} from './Environment';
 
-const WEBAPP_ENV = onEnvironment('http://localhost:8888', '', '');
+const WEBAPP_ENV = onEnvironment('/app', '', '');
 const WIRE_WEBSITE = onEnvironment(
   'https://wire-website-staging.zinfra.io',
   'https://wire-website-staging.zinfra.io',
