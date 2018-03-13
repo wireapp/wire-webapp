@@ -29,16 +29,13 @@ z.entity.CallMessage = class CallMessage extends z.entity.Message {
     this.call_message_type = '';
     this.finished_reason = '';
 
-    this.caption = ko.pureComputed(
-      () => {
-        if (this.user().is_me) {
-          return z.l10n.text(z.string.conversationVoiceChannelDeactivateYou);
-        }
-        return z.l10n.text(z.string.conversationVoiceChannelDeactivate);
-      },
-      this,
-      {deferEvaluation: true}
-    );
+    this.caption = ko.pureComputed(() => {
+      const stringId = this.user().is_me
+        ? z.string.conversationVoiceChannelDeactivateYou
+        : z.string.conversationVoiceChannelDeactivate;
+
+      return z.l10n.text(stringId);
+    });
   }
 
   /**

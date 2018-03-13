@@ -36,8 +36,7 @@ z.main.App = class App {
       NOTIFICATION_CHECK: 10 * 1000,
       TABS_CHECK: {
         COOKIE_NAME: 'app_opened',
-        COOKIE_TIMEOUT: 5 * 60 * 1000,
-        RENEWAL_THRESHOLD: 15 * 1000,
+        INTERVAL: 1000,
       },
     };
   }
@@ -58,6 +57,8 @@ z.main.App = class App {
     this.repository = this._setup_repositories();
     this.view = this._setup_view_models();
     this.util = this._setup_utils();
+
+    this.instanceId = z.util.create_random_uuid();
 
     this._subscribe_to_events();
 
@@ -237,7 +238,7 @@ z.main.App = class App {
   init_app(is_reload = this._is_reload()) {
     z.util
       .check_indexed_db()
-      .then(() => this._check_single_instance())
+      .then(() => this._checkSingleInstanceOnInit())
       .then(() => this._load_access_token())
       .then(() => {
         this.view.loading.updateProgress(2.5);
@@ -448,36 +449,24 @@ z.main.App = class App {
 
   /**
    * Check whether we need to set different user information (picture, username).
-   * @param {z.entity.User} user_et - Self user entity
+   * @param {z.entity.User} userEntity - Self user entity
    * @returns {z.entity.User} Checked user entity
    */
-  _check_user_information(user_et) {
-    if (!user_et.mediumPictureResource()) {
-      this.repository.user.set_default_picture();
-    }
-    if (!user_et.username()) {
-      this.repository.user.get_username_suggestion();
-    }
+  _check_user_information(userEntity) {
+    const hasEmailAddress = userEntity.email();
+    const hasPhoneNumber = userEntity.phone();
+    const isActivatedUser = hasEmailAddress || hasPhoneNumber;
 
-    return user_et;
-  }
-
-  /**
-   * Check that this is the single instance tab of the app.
-   * @returns {Promise} Resolves when page is the first tab
-   */
-  _check_single_instance() {
-    if (!z.util.Environment.electron) {
-      const cookie_name = App.CONFIG.TABS_CHECK.COOKIE_NAME;
-      if (Cookies.get(cookie_name)) {
-        return Promise.reject(new z.auth.AuthError(z.auth.AuthError.TYPE.MULTIPLE_TABS));
+    if (isActivatedUser) {
+      if (!userEntity.mediumPictureResource()) {
+        this.repository.user.set_default_picture();
       }
-
-      this._set_single_instance_cookie();
-      $(window).on('beforeunload', () => Cookies.remove(cookie_name));
+      if (!userEntity.username()) {
+        this.repository.user.get_username_suggestion();
+      }
     }
 
-    return Promise.resolve();
+    return userEntity;
   }
 
   /**
@@ -485,18 +474,28 @@ z.main.App = class App {
    * @returns {Promise<z.entity.User>} Resolves with the self user entity
    */
   _get_user_self() {
-    return this.repository.user.get_me().then(user_et => {
-      this.logger.info(`Loaded self user with ID '${user_et.id}'`);
-      if (!user_et.email() && !user_et.phone()) {
-        throw new Error('User does not have a verified identity');
+    return this.repository.user.getSelf().then(userEntity => {
+      this.logger.info(`Loaded self user with ID '${userEntity.id}'`);
+
+      const hasEmailAddress = userEntity.email();
+      const hasPhoneNumber = userEntity.phone();
+      const isActivatedUser = hasEmailAddress || hasPhoneNumber;
+
+      if (!isActivatedUser) {
+        this.logger.info('User does not have an activated identity and seems to be wireless');
+
+        if (!userEntity.isTemporaryGuest()) {
+          throw new Error('User does not have an activated identity');
+        }
       }
 
-      return this.service.storage.init(user_et.id).then(() => this._check_user_information(user_et));
+      return this.service.storage.init(userEntity.id).then(() => this._check_user_information(userEntity));
     });
   }
 
   /**
    * Handle URL params.
+   * @private
    * @returns {undefined} Not return value
    */
   _handleUrlParams() {
@@ -509,7 +508,14 @@ z.main.App = class App {
 
     const supportIntegrations = z.util.get_url_parameter(z.auth.URLParameter.INTEGRATIONS);
     if (_.isBoolean(supportIntegrations)) {
+      this.logger.info(`Feature flag for integrations set to '${serviceId}'`);
       this.repository.integration.supportIntegrations(supportIntegrations);
+    }
+
+    const supportConversationLinks = z.util.get_url_parameter(z.auth.URLParameter.LINKS);
+    if (_.isBoolean(supportConversationLinks)) {
+      this.logger.info(`Feature flag for conversation links set to '${supportConversationLinks}'`);
+      this.repository.conversation.supportConversationLinks(supportConversationLinks);
     }
   }
 
@@ -538,16 +544,57 @@ z.main.App = class App {
     return get_cached_token ? this.auth.repository.getCachedAccessToken() : this.auth.repository.getAccessToken();
   }
 
+  //##############################################################################
+  // Multiple tabs check
+  //##############################################################################
+
+  /**
+   * Check that this is the single instance tab of the app.
+   * @returns {Promise} Resolves when page is the first tab
+   */
+  _checkSingleInstanceOnInit() {
+    if (!z.util.Environment.electron) {
+      return this._setSingleInstanceCookie();
+    }
+
+    return Promise.resolve();
+  }
+
+  _checkSingleInstanceOnInterval() {
+    const singleInstanceCookie = Cookies.getJSON(App.CONFIG.TABS_CHECK.COOKIE_NAME);
+
+    const shouldBlockTab = !singleInstanceCookie || singleInstanceCookie.appInstanceId !== this.instanceId;
+    if (shouldBlockTab) {
+      return this._redirect_to_login(z.auth.SIGN_OUT_REASON.MULTIPLE_TABS);
+    }
+  }
+
   /**
    * Set the cookie to verify we are running a single instace tab.
    * @returns {undefined} No return value
    */
-  _set_single_instance_cookie() {
-    const cookie_timeout = new Date(Date.now() + App.CONFIG.TABS_CHECK.COOKIE_TIMEOUT);
-    Cookies.set(App.CONFIG.TABS_CHECK.COOKIE_NAME, true, {expires: cookie_timeout});
+  _setSingleInstanceCookie() {
+    const shouldBlockTab = !!Cookies.get(App.CONFIG.TABS_CHECK.COOKIE_NAME);
+    if (shouldBlockTab) {
+      return Promise.reject(new z.auth.AuthError(z.auth.AuthError.TYPE.MULTIPLE_TABS));
+    }
 
-    const renewal_timeout = App.CONFIG.TABS_CHECK.COOKIE_TIMEOUT - App.CONFIG.TABS_CHECK.RENEWAL_THRESHOLD;
-    window.setTimeout(() => this._set_single_instance_cookie(), renewal_timeout);
+    const cookieData = {appInstanceId: this.instanceId};
+    Cookies.set(App.CONFIG.TABS_CHECK.COOKIE_NAME, cookieData);
+
+    window.setInterval(() => this._checkSingleInstanceOnInterval(), App.CONFIG.TABS_CHECK.INTERVAL);
+    this._registerSingleInstanceCookieDeletion();
+  }
+
+  _registerSingleInstanceCookieDeletion() {
+    $(window).on('beforeunload', () => {
+      const singleInstanceCookie = Cookies.getJSON(App.CONFIG.TABS_CHECK.COOKIE_NAME);
+
+      const isOwnInstanceId = singleInstanceCookie && singleInstanceCookie.appInstanceId === this.instanceId;
+      if (isOwnInstanceId) {
+        Cookies.remove(App.CONFIG.TABS_CHECK.COOKIE_NAME);
+      }
+    });
   }
 
   /**

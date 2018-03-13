@@ -186,7 +186,7 @@ z.client.ClientRepository = class ClientRepository {
   verifyClient(userId, clientEntity, isVerified) {
     return this.updateClientInDb(userId, clientEntity.id, {meta: {is_verified: isVerified}}).then(() => {
       clientEntity.meta.isVerified(isVerified);
-      return amplify.publish(z.event.WebApp.CLIENT.VERIFICATION_STATE_CHANGED, userId, clientEntity, isVerified);
+      amplify.publish(z.event.WebApp.CLIENT.VERIFICATION_STATE_CHANGED, userId, clientEntity, isVerified);
     });
   }
 
@@ -229,7 +229,7 @@ z.client.ClientRepository = class ClientRepository {
    * @returns {string} Cookie label
    */
   constructCookieLabel(login, clientType = this._loadCurrentClientType()) {
-    const loginHash = z.util.murmurhash3(login, 42);
+    const loginHash = z.util.murmurhash3(login || this.selfUser().id, 42);
     return `webapp@${loginHash}@${clientType}@${Date.now()}`;
   }
 
@@ -240,7 +240,7 @@ z.client.ClientRepository = class ClientRepository {
    * @returns {string} Cookie label key
    */
   constructCookieLabelKey(login, clientType = this._loadCurrentClientType()) {
-    const loginHash = z.util.murmurhash3(login, 42);
+    const loginHash = z.util.murmurhash3(login || this.selfUser().id, 42);
     return `${z.storage.StorageKey.AUTH.COOKIE_LABEL}@${loginHash}@${clientType}`;
   }
 
@@ -323,10 +323,10 @@ z.client.ClientRepository = class ClientRepository {
    * @returns {Object} - Payload to register client with backend
    */
   _createRegistrationPayload(clientType, password, [lastResortKey, preKeys, signalingKeys]) {
-    let device_label = `${platform.os.family}`;
+    let deviceLabel = `${platform.os.family}`;
 
     if (platform.os.version) {
-      device_label += ` ${platform.os.version}`;
+      deviceLabel += ` ${platform.os.version}`;
     }
 
     let deviceModel = platform.name;
@@ -351,7 +351,7 @@ z.client.ClientRepository = class ClientRepository {
     return {
       class: 'desktop',
       cookie: this._getCookieLabelValue(this.selfUser().email() || this.selfUser().phone()),
-      label: device_label,
+      label: deviceLabel,
       lastkey: lastResortKey,
       model: deviceModel,
       password: password,
@@ -457,16 +457,25 @@ z.client.ClientRepository = class ClientRepository {
 
   logoutClient() {
     if (this.currentClient()) {
-      if (this.currentClient().type === z.client.ClientType.PERMANENT) {
-        return amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.LOGOUT, {
-          action(clearData) {
-            return amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SIGN_OUT_REASON.USER_REQUESTED, clearData);
-          },
-        });
+      const isTemporaryClient = this.currentClient().type === z.client.ClientType.TEMPORARY;
+      if (isTemporaryClient) {
+        return this.deleteTemporaryClient().then(() =>
+          amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SIGN_OUT_REASON.USER_REQUESTED, true)
+        );
       }
-      return this.deleteTemporaryClient().then(() =>
-        amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SIGN_OUT_REASON.USER_REQUESTED, true)
-      );
+
+      amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.OPTION, {
+        action: clearData => {
+          return amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SIGN_OUT_REASON.USER_REQUESTED, clearData);
+        },
+        preventClose: true,
+        text: {
+          action: z.l10n.text(z.string.modalAccountLogoutAction),
+          option: z.l10n.text(z.string.modalAccountLogoutOption),
+          title: z.l10n.text(z.string.modalAccountLogoutHeadline),
+        },
+        warning: false,
+      });
     }
   }
 
@@ -556,23 +565,26 @@ z.client.ClientRepository = class ClientRepository {
 
     // Find clients in database
     return this.getClientByUserIdFromDb(userId)
-      .then(results => {
+      .then(clientsFromDatabase => {
         const promises = [];
 
-        for (const result of results) {
-          if (clientsFromBackend[result.id]) {
-            const {client, wasUpdated} = this.clientMapper.updateClient(result, clientsFromBackend[result.id]);
+        for (const databaseClient of clientsFromDatabase) {
+          const clientId = databaseClient.id;
+          const backendClient = clientsFromBackend[clientId];
 
-            delete clientsFromBackend[result.id];
+          if (backendClient) {
+            const {client, wasUpdated} = this.clientMapper.updateClient(databaseClient, backendClient);
 
-            if (this.currentClient() && this._isCurrentClient(userId, result.id)) {
-              this.logger.warn(`Removing duplicate self client '${result.id}' locally`);
-              this.removeClient(userId, result.id);
+            delete clientsFromBackend[clientId];
+
+            if (this.currentClient() && this._isCurrentClient(userId, clientId)) {
+              this.logger.warn(`Removing duplicate self client '${clientId}' locally`);
+              this.removeClient(userId, clientId);
             }
 
             // Locally known client changed on backend
             if (wasUpdated) {
-              this.logger.info(`Updating client '${result.id}' of user '${userId}' locally`);
+              this.logger.info(`Updating client '${clientId}' of user '${userId}' locally`);
               promises.push(this.saveClientInDb(userId, client));
               continue;
             }
@@ -583,8 +595,8 @@ z.client.ClientRepository = class ClientRepository {
           }
 
           // Locally known client deleted on backend
-          this.logger.warn(`Removing client '${result.id}' of user '${userId}' locally`);
-          this.removeClient(userId, result.id);
+          this.logger.warn(`Removing client '${clientId}' of user '${userId}' locally`);
+          this.removeClient(userId, clientId);
         }
 
         for (const clientId in clientsFromBackend) {
@@ -646,11 +658,13 @@ z.client.ClientRepository = class ClientRepository {
   onUserEvent(eventJson, source) {
     const {type} = eventJson;
 
-    if (type === z.event.Backend.USER.CLIENT_ADD) {
+    const isClientAdd = type === z.event.Backend.USER.CLIENT_ADD;
+    if (isClientAdd) {
       return this.onClientAdd(eventJson);
     }
 
-    if (type === z.event.Backend.USER.CLIENT_REMOVE) {
+    const isClientRemove = type === z.event.Backend.USER.CLIENT_REMOVE;
+    if (isClientRemove) {
       this.onClientRemove(eventJson);
     }
   }
@@ -662,7 +676,7 @@ z.client.ClientRepository = class ClientRepository {
    */
   onClientAdd(eventJson) {
     this.logger.info('Client of self user added', eventJson);
-    amplify.publish(z.event.WebApp.CLIENT.ADD, this.selfUser().id, eventJson.client);
+    amplify.publish(z.event.WebApp.CLIENT.ADD, this.selfUser().id, eventJson.client, true);
   }
 
   /**

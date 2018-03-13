@@ -22,18 +22,18 @@ import {connect} from 'react-redux';
 import {injectIntl} from 'react-intl';
 import {inviteStrings} from '../../strings';
 import {
-  COLOR,
   H1,
   Text,
   Link,
+  COLOR,
   CheckIcon,
+  ContainerXS,
   InputSubmitCombo,
   Input,
   RoundIconButton,
   Form,
   ButtonLink,
   ErrorMessage,
-  ContainerXS,
 } from '@wireapp/react-ui-kit';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 import {pathWithParams} from '../util/urlUtil';

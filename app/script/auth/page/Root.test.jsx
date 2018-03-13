@@ -28,6 +28,7 @@ describe('Root', () => {
 
     beforeEach(() => {
       const state = {
+        authState: {},
         languageState: {
           language: 'en',
         },

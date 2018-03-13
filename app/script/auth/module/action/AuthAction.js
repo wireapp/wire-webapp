@@ -19,8 +19,8 @@
 
 import BackendError from './BackendError';
 import * as AuthActionCreator from './creator/AuthActionCreator';
+import * as SelfAction from './SelfAction';
 import {currentLanguage, currentCurrency} from '../../localeConfig';
-import {fetchSelf} from './SelfAction';
 import {setLocalStorage, LocalStorageKey} from './LocalStorageAction';
 
 export function doLogin(loginData) {
@@ -35,6 +35,8 @@ export function doLogin(loginData) {
       .then(() => dispatch(doSilentLogout()))
       .then(() => core.login(loginData))
       .then(() => persistAuthData(loginData.persist, core, dispatch))
+      .then(() => dispatch(SelfAction.fetchSelf()))
+      .then(() => dispatch(AuthActionCreator.successfulLogin()))
       .catch(error => {
         const handledError = BackendError.handle(error);
         if (handledError.label === BackendError.LABEL.TOO_MANY_CLIENTS) {
@@ -78,6 +80,7 @@ export function doRegisterTeam(registration) {
     return Promise.resolve()
       .then(() => dispatch(doSilentLogout()))
       .then(() => apiClient.register(registration))
+      .then(() => dispatch(SelfAction.fetchSelf()))
       .then(createdTeam => dispatch(AuthActionCreator.successfulRegisterTeam(createdTeam)))
       .catch(error => {
         dispatch(AuthActionCreator.failedRegisterTeam(error));
@@ -103,10 +106,31 @@ export function doRegisterPersonal(registration) {
     return Promise.resolve()
       .then(() => dispatch(doSilentLogout()))
       .then(() => apiClient.register(registration))
+      .then(() => dispatch(SelfAction.fetchSelf()))
       .then(createdAccount => dispatch(AuthActionCreator.successfulRegisterPersonal(createdAccount)))
-      .then(() => dispatch(fetchSelf()))
       .catch(error => {
         dispatch(AuthActionCreator.failedRegisterPersonal(error));
+        throw BackendError.handle(error);
+      });
+  };
+}
+
+export function doRegisterWireless(registration) {
+  return function(dispatch, getState, {apiClient}) {
+    registration.locale = currentLanguage();
+    registration.name = registration.name.trim();
+    dispatch(
+      AuthActionCreator.startRegisterWireless({
+        locale: registration.locale,
+        name: registration.name,
+      })
+    );
+    return Promise.resolve()
+      .then(() => apiClient.register(registration))
+      .then(() => dispatch(SelfAction.fetchSelf()))
+      .then(createdAccount => dispatch(AuthActionCreator.successfulRegisterWireless(createdAccount)))
+      .catch(error => {
+        dispatch(AuthActionCreator.failedRegisterWireless(error));
         throw BackendError.handle(error);
       });
   };
@@ -117,6 +141,7 @@ export function doInit() {
     dispatch(AuthActionCreator.startRefresh());
     return apiClient
       .init()
+      .then(() => dispatch(SelfAction.fetchSelf()))
       .then(() => dispatch(AuthActionCreator.successfulRefresh(apiClient.accessTokenStore.accessToken)))
       .catch(error => dispatch(AuthActionCreator.failedRefresh(error)));
   };

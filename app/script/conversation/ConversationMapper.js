@@ -189,6 +189,13 @@ z.conversation.ConversationMapper = class ConversationMapper {
       conversation_et.is_guest(conversation_data.is_guest);
     }
 
+    // Access related data
+    const accessModes = conversation_data.accessModes ? conversation_data.accessModes : conversation_data.access;
+    const accessRole = conversation_data.accessRole ? conversation_data.accessRole : conversation_data.access_role;
+    if (accessModes && accessRole) {
+      this.mapAccessState(conversation_et, accessModes, accessRole);
+    }
+
     return conversation_et;
   }
 
@@ -200,7 +207,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
    */
   merge_conversations(local, remote) {
     return remote.map((remote_conversation, index) => {
-      const {id, creator, members, name, team, type} = remote_conversation;
+      const {access, access_role, id, creator, members, name, team, type} = remote_conversation;
       let local_conversation = local.filter(conversation => conversation).find(conversation => conversation.id === id);
 
       if (!local_conversation) {
@@ -209,6 +216,8 @@ z.conversation.ConversationMapper = class ConversationMapper {
         };
       }
 
+      local_conversation.accessModes = access;
+      local_conversation.accessRole = access_role;
       local_conversation.creator = creator;
       local_conversation.name = name;
       local_conversation.status = members.self.status;
@@ -254,5 +263,51 @@ z.conversation.ConversationMapper = class ConversationMapper {
 
       return local_conversation;
     });
+  }
+
+  mapAccessCode(conversationEntity, accessCode) {
+    const isTeamConversation = conversationEntity && conversationEntity.team_id;
+    if (isTeamConversation) {
+      conversationEntity.accessCode(accessCode.uri);
+    }
+  }
+
+  mapAccessState(conversationEntity, accessModes, accessRole) {
+    if (conversationEntity.team_id) {
+      if (conversationEntity.is_one2one()) {
+        return conversationEntity.accessState(z.conversation.ACCESS_STATE.TEAM.ONE2ONE);
+      }
+
+      const isTeamRole = accessRole === z.conversation.ACCESS_ROLE.TEAM;
+
+      const includesInviteMode = accessModes.includes(z.conversation.ACCESS_MODE.INVITE);
+      const isInviteModeOnly = includesInviteMode && accessModes.length === 1;
+
+      const isTeamOnlyMode = isTeamRole && isInviteModeOnly;
+      if (isTeamOnlyMode) {
+        return conversationEntity.accessState(z.conversation.ACCESS_STATE.TEAM.TEAM_ONLY);
+      }
+
+      const isNonVerifiedRole = accessRole === z.conversation.ACCESS_ROLE.NON_ACTIVATED;
+
+      const includesCodeMode = accessModes.includes(z.conversation.ACCESS_MODE.CODE);
+      const isExpectedModes = includesCodeMode && includesInviteMode && accessModes.length === 2;
+
+      const isGuestRoomMode = isNonVerifiedRole && isExpectedModes;
+      if (isGuestRoomMode) {
+        return conversationEntity.accessState(z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM);
+      }
+
+      return conversationEntity.accessState(z.conversation.ACCESS_STATE.TEAM.LEGACY);
+    }
+
+    if (conversationEntity.is_self()) {
+      return conversationEntity.accessState(z.conversation.ACCESS_STATE.SELF);
+    }
+
+    const personalAccessState = conversationEntity.is_group()
+      ? z.conversation.ACCESS_STATE.PERSONAL.GROUP
+      : z.conversation.ACCESS_STATE.PERSONAL.ONE2ONE;
+    return conversationEntity.accessState(personalAccessState);
   }
 };

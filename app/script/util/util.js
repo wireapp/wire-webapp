@@ -210,7 +210,7 @@ z.util.trim_file_extension = function(filename) {
 /**
  * Format bytes into a human readable string.
  * @param {number} bytes - bytes to format
- * @param {number} decimals - Number of decimals to keep
+ * @param {number} [decimals] - Number of decimals to keep
  * @returns {string} Bytes as a human readable string
  */
 z.util.format_bytes = function(bytes, decimals) {
@@ -770,6 +770,11 @@ z.util.format_time_remaining = function(time_remaining) {
   }
 
   return title || '';
+};
+
+z.util.afterRender = callback => {
+  // https://developer.mozilla.org/en-US/Firefox/Performance_best_practices_for_Firefox_fe_engineers
+  window.requestAnimationFrame(() => window.setTimeout(callback, 0));
 };
 
 /**

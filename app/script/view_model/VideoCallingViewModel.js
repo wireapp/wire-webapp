@@ -156,9 +156,7 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
     });
     this.showToggleScreen = ko.pureComputed(() => z.calling.CallingRepository.supportsScreenSharing);
     this.disableToggleScreen = ko.pureComputed(() => {
-      if (this.joinedCall()) {
-        return this.joinedCall().isRemoteScreenSend();
-      }
+      return this.joinedCall() ? this.joinedCall().isRemoteScreenSend() : true;
     });
 
     this.visibleCallId = undefined;
@@ -225,11 +223,20 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
         this.mediaRepository.devices_handler
           .get_screen_sources()
           .then(screenSources => {
-            amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CALLING.SHARED_SCREEN, {
-              conversation_type: z.tracking.helpers.get_conversation_type(this.videodCall().conversationEntity),
+            const conversationEntity = this.joinedCall().conversationEntity;
+
+            const attributes = {
+              conversation_type: z.tracking.helpers.get_conversation_type(conversationEntity),
               kind_of_call_when_sharing: this.joinedCall().isRemoteVideoSend() ? 'video' : 'audio',
               num_screens: screenSources.length,
-            });
+            };
+
+            const isTeamConversation = !!conversationEntity.team_id;
+            if (isTeamConversation) {
+              Object.assign(attributes, z.tracking.helpers.getGuestAttributes(conversationEntity));
+            }
+
+            amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CALLING.SHARED_SCREEN, attributes);
 
             const hasMultipleScreens = screenSources.length > 1;
             if (hasMultipleScreens) {
@@ -336,19 +343,4 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
     }
     this.logger.info(`Remote video is in '${detectedVideoMode}' mode`);
   }
-};
-
-// http://stackoverflow.com/questions/28762211/unable-to-mute-html5-video-tag-in-firefox
-ko.bindingHandlers.mute_media_element = {
-  update(element, valueAccessor) {
-    if (valueAccessor()) {
-      element.muted = true;
-    }
-  },
-};
-
-ko.bindingHandlers.source_stream = {
-  update(element, valueAccessor) {
-    element.srcObject = valueAccessor();
-  },
 };

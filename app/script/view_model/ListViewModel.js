@@ -43,39 +43,35 @@ z.viewModel.ListViewModel = class ListViewModel {
    * @param {Object} repositories - Object containing all the repositories
    */
   constructor(mainViewModel, repositories) {
-    this.switch_list = this.switch_list.bind(this);
-    this.on_context_menu = this.on_context_menu.bind(this);
+    this.switchList = this.switchList.bind(this);
+    this.onContextMenu = this.onContextMenu.bind(this);
 
     this.elementId = 'left-column';
-    this.content_view_model = mainViewModel.content;
+    this.mainViewModel = mainViewModel;
+    this.conversationRepository = repositories.conversation;
+    this.userRepository = repositories.user;
 
-    // Repositories
-    this.conversation_repository = repositories.conversation;
-    this.user_repository = repositories.user;
+    this.actionsViewModel = this.mainViewModel.actions;
+    this.contentViewModel = this.mainViewModel.content;
+
     this.logger = new z.util.Logger('z.viewModel.ListViewModel', z.config.LOGGER.OPTIONS);
 
     // State
     this.state = ko.observable(ListViewModel.STATE.CONVERSATIONS);
-    this.last_update = ko.observable();
+    this.lastUpdate = ko.observable();
     this.modal = ko.observable();
-    this.webapp_loaded = ko.observable(false);
+    this.webappLoaded = ko.observable(false);
 
-    // Nested view models
-    this.archive = new z.viewModel.list.ArchiveViewModel(mainViewModel, this, repositories);
-    this.conversations = new z.viewModel.list.ConversationListViewModel(mainViewModel, this, repositories);
-    this.preferences = new z.viewModel.list.PreferencesListViewModel(mainViewModel, this);
-    this.start_ui = new z.viewModel.list.StartUIViewModel(mainViewModel, this, repositories);
-    this.takeover = new z.viewModel.list.TakeoverViewModel(mainViewModel, this, repositories);
-
-    this.self_user_picture = ko.pureComputed(() => {
-      if (this.webapp_loaded() && this.user_repository.self()) {
-        return this.user_repository.self().mediumPictureResource();
+    this.selfUserPicture = ko.pureComputed(() => {
+      if (this.webappLoaded() && this.userRepository.self()) {
+        return this.userRepository.self().mediumPictureResource();
       }
     });
 
-    this.visible_list_items = ko.pureComputed(() => {
-      if (this.state() === ListViewModel.STATE.PREFERENCES) {
-        const preference_items = [
+    this.visibleListItems = ko.pureComputed(() => {
+      const isStatePreferences = this.state() === ListViewModel.STATE.PREFERENCES;
+      if (isStatePreferences) {
+        const preferenceItems = [
           z.viewModel.ContentViewModel.STATE.PREFERENCES_ACCOUNT,
           z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICES,
           z.viewModel.ContentViewModel.STATE.PREFERENCES_OPTIONS,
@@ -83,154 +79,169 @@ z.viewModel.ListViewModel = class ListViewModel {
         ];
 
         if (!z.util.Environment.desktop) {
-          preference_items.push(z.viewModel.ContentViewModel.STATE.PREFERENCES_ABOUT);
+          preferenceItems.push(z.viewModel.ContentViewModel.STATE.PREFERENCES_ABOUT);
         }
 
-        return preference_items;
+        return preferenceItems;
       }
 
-      const has_connect_requests = this.user_repository.connect_requests().length;
-      const connect_requests = has_connect_requests ? z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS : [];
-      return this.conversation_repository
+      const hasConnectRequests = !!this.userRepository.connect_requests().length;
+      const states = hasConnectRequests ? z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS : [];
+      return this.conversationRepository
         .conversations_calls()
-        .concat(connect_requests, this.conversation_repository.conversations_unarchived());
+        .concat(states, this.conversationRepository.conversations_unarchived());
     });
 
-    this._init_subscriptions();
+    // Nested view models
+    this.archive = new z.viewModel.list.ArchiveViewModel(mainViewModel, this, repositories);
+    this.conversations = new z.viewModel.list.ConversationListViewModel(mainViewModel, this, repositories);
+    this.preferences = new z.viewModel.list.PreferencesListViewModel(mainViewModel, this);
+    this.start = new z.viewModel.list.StartUIViewModel(mainViewModel, this, repositories);
+    this.takeover = new z.viewModel.list.TakeoverViewModel(mainViewModel, this, repositories);
+
+    this._initSubscriptions();
 
     ko.applyBindings(this, document.getElementById(this.elementId));
   }
 
-  _init_subscriptions() {
-    amplify.subscribe(z.event.WebApp.CONVERSATION.SHOW, () =>
-      this.switch_list(ListViewModel.STATE.CONVERSATIONS, false)
-    );
-    amplify.subscribe(z.event.WebApp.LIFECYCLE.LOADED, () => this.webapp_loaded(true));
-    amplify.subscribe(z.event.WebApp.PREFERENCES.MANAGE_ACCOUNT, this.open_preferences_account.bind(this));
-    amplify.subscribe(z.event.WebApp.PREFERENCES.MANAGE_DEVICES, this.open_preferences_devices.bind(this));
-    amplify.subscribe(z.event.WebApp.SEARCH.SHOW, this.open_start_ui.bind(this));
-    amplify.subscribe(z.event.WebApp.SHORTCUT.NEXT, this.go_to_next.bind(this));
-    amplify.subscribe(z.event.WebApp.SHORTCUT.PREV, this.go_to_previous.bind(this));
-    amplify.subscribe(z.event.WebApp.TAKEOVER.SHOW, this.show_takeover.bind(this));
-    amplify.subscribe(z.event.WebApp.TAKEOVER.DISMISS, this.dismiss_takeover.bind(this));
-    amplify.subscribe(z.event.WebApp.SHORTCUT.ARCHIVE, this.click_on_archive_action.bind(this));
-    amplify.subscribe(z.event.WebApp.SHORTCUT.DELETE, this.click_on_clear_action.bind(this));
-    amplify.subscribe(z.event.WebApp.SHORTCUT.SILENCE, this.click_on_mute_action.bind(this));
+  _initSubscriptions() {
+    amplify.subscribe(z.event.WebApp.CONVERSATION.SHOW, this.openConversations.bind(this));
+    amplify.subscribe(z.event.WebApp.LIFECYCLE.LOADED, () => this.webappLoaded(true));
+    amplify.subscribe(z.event.WebApp.PREFERENCES.MANAGE_ACCOUNT, this.openPreferencesAccount.bind(this));
+    amplify.subscribe(z.event.WebApp.PREFERENCES.MANAGE_DEVICES, this.openPreferencesDevices.bind(this));
+    amplify.subscribe(z.event.WebApp.SEARCH.SHOW, this.openStartUI.bind(this));
+    amplify.subscribe(z.event.WebApp.SHORTCUT.NEXT, this.goToNext.bind(this));
+    amplify.subscribe(z.event.WebApp.SHORTCUT.PREV, this.goToPrevious.bind(this));
+    amplify.subscribe(z.event.WebApp.TAKEOVER.SHOW, this.showTakeover.bind(this));
+    amplify.subscribe(z.event.WebApp.TAKEOVER.DISMISS, this.dismissTakeover.bind(this));
+    amplify.subscribe(z.event.WebApp.SHORTCUT.ARCHIVE, this.clickToArchive.bind(this));
+    amplify.subscribe(z.event.WebApp.SHORTCUT.DELETE, this.clickToClear.bind(this));
+    amplify.subscribe(z.event.WebApp.SHORTCUT.SILENCE, this.clickToToggleMute.bind(this));
   }
 
-  go_to_next() {
-    this._iterate_active_item(true);
+  goToNext() {
+    this._iterateActiveItem(true);
   }
 
-  go_to_previous() {
-    this._iterate_active_item(false);
+  goToPrevious() {
+    this._iterateActiveItem(false);
   }
 
-  _iterate_active_item(reverse = false) {
-    if (this.state() === ListViewModel.STATE.PREFERENCES) {
-      return this._iterate_active_preference(reverse);
-    }
-
-    this._iterate_active_conversation(reverse);
+  _iterateActiveItem(reverse = false) {
+    const isStatePreferences = this.state() === ListViewModel.STATE.PREFERENCES;
+    return isStatePreferences ? this._iterateActivePreference(reverse) : this._iterateActiveConversation(reverse);
   }
 
-  _iterate_active_conversation(reverse) {
-    const is_connection_request_state =
-      this.content_view_model.state() === z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS;
-    const active_conversation_item = is_connection_request_state
+  _iterateActiveConversation(reverse) {
+    const isStateRequests = this.contentViewModel.state() === z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS;
+    const activeConversationItem = isStateRequests
       ? z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS
-      : this.conversation_repository.active_conversation();
-    const next_conversation_item = z.util.ArrayUtil.iterate_item(
-      this.visible_list_items(),
-      active_conversation_item,
-      reverse
-    );
+      : this.conversationRepository.active_conversation();
 
-    if (next_conversation_item === z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS) {
-      this.content_view_model.switchContent(z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS);
-    } else if (next_conversation_item) {
-      amplify.publish(z.event.WebApp.CONVERSATION.SHOW, next_conversation_item);
+    const nextItem = z.util.ArrayUtil.iterate_item(this.visibleListItems(), activeConversationItem, reverse);
+
+    const isConnectionRequestItem = nextItem === z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS;
+    if (isConnectionRequestItem) {
+      return this.contentViewModel.switchContent(z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS);
+    }
+
+    if (nextItem) {
+      amplify.publish(z.event.WebApp.CONVERSATION.SHOW, nextItem);
     }
   }
 
-  _iterate_active_preference(reverse) {
-    let active_preference = this.content_view_model.state();
+  _iterateActivePreference(reverse) {
+    let activePreference = this.contentViewModel.state();
 
-    if (active_preference === z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICE_DETAILS) {
-      active_preference = z.viewModel.ContentViewModel.STATE.DEVICES;
+    const isDeviceDetails = activePreference === z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICE_DETAILS;
+    if (isDeviceDetails) {
+      activePreference = z.viewModel.ContentViewModel.STATE.DEVICES;
     }
 
-    const next_preference = z.util.ArrayUtil.iterate_item(this.visible_list_items(), active_preference, reverse);
-
-    if (next_preference) {
-      this.content_view_model.switchContent(next_preference);
-    }
-  }
-
-  open_preferences_account() {
-    this.switch_list(ListViewModel.STATE.PREFERENCES);
-    this.content_view_model.switchContent(z.viewModel.ContentViewModel.STATE.PREFERENCES_ACCOUNT);
-  }
-
-  open_preferences_devices(device_et) {
-    this.switch_list(ListViewModel.STATE.PREFERENCES);
-
-    if (device_et) {
-      this.content_view_model.preferencesDeviceDetails.device(device_et);
-      return this.content_view_model.switchContent(z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICE_DETAILS);
-    }
-
-    return this.content_view_model.switchContent(z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICES);
-  }
-
-  open_start_ui() {
-    this.switch_list(ListViewModel.STATE.START_UI);
-  }
-
-  switch_list(new_list_state, respect_last_state = true) {
-    if (this.state() !== new_list_state) {
-      this._hide_list();
-      this._update_list(new_list_state, respect_last_state);
-      this._show_list(new_list_state);
+    const nextPreference = z.util.ArrayUtil.iterate_item(this.visibleListItems(), activePreference, reverse);
+    if (nextPreference) {
+      this.contentViewModel.switchContent(nextPreference);
     }
   }
 
-  _hide_list() {
-    $(`#${this._get_element_id_of_list(this.state())}`).removeClass('left-list-is-visible');
-    $(document).off('keydown.list_view');
+  openPreferencesAccount() {
+    this.switchList(ListViewModel.STATE.PREFERENCES);
+    this.contentViewModel.switchContent(z.viewModel.ContentViewModel.STATE.PREFERENCES_ACCOUNT);
   }
 
-  _show_list(new_list_state) {
-    $(`#${this._get_element_id_of_list(new_list_state)}`).addClass('left-list-is-visible');
-    this.state(new_list_state);
-    this.last_update(Date.now());
-    $(document).on('keydown.list_view', keyboard_event => {
-      if (z.util.KeyboardUtil.isEscapeKey(keyboard_event)) {
-        this.switch_list(ListViewModel.STATE.CONVERSATIONS);
+  openPreferencesDevices(deviceEntity) {
+    this.switchList(ListViewModel.STATE.PREFERENCES);
+
+    if (deviceEntity) {
+      this.contentViewModel.preferencesDeviceDetails.device(deviceEntity);
+      return this.contentViewModel.switchContent(z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICE_DETAILS);
+    }
+
+    return this.contentViewModel.switchContent(z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICES);
+  }
+
+  openStartUI() {
+    this.switchList(ListViewModel.STATE.START_UI);
+  }
+
+  switchList(newListState, respectLastState = true) {
+    const isStateChange = this.state() !== newListState;
+    if (isStateChange) {
+      this._hideList();
+      this._updateList(newListState, respectLastState);
+      this._showList(newListState);
+    }
+  }
+
+  openConversations() {
+    this.switchList(ListViewModel.STATE.CONVERSATIONS, false);
+  }
+
+  _hideList() {
+    const stateIsStartUI = this.state() === ListViewModel.STATE.START_UI;
+    if (stateIsStartUI) {
+      this.start.resetView();
+    }
+
+    const listStateElementId = this._getElementIdOfList(this.state());
+    $(`#${listStateElementId}`).removeClass('left-list-is-visible');
+    $(document).off('keydown.listView');
+  }
+
+  _showList(newListState) {
+    const listStateElementId = this._getElementIdOfList(newListState);
+    $(`#${listStateElementId}`).addClass('left-list-is-visible');
+
+    this.state(newListState);
+    this.lastUpdate(Date.now());
+
+    $(document).on('keydown.listView', keyboardEvent => {
+      if (z.util.KeyboardUtil.isEscapeKey(keyboardEvent)) {
+        this.switchList(ListViewModel.STATE.CONVERSATIONS);
       }
     });
   }
 
-  _update_list(new_list_state, respect_last_state) {
-    switch (new_list_state) {
+  _updateList(newListState, respectLastState) {
+    switch (newListState) {
       case ListViewModel.STATE.ARCHIVE:
         this.archive.updateList();
         break;
       case ListViewModel.STATE.START_UI:
-        this.start_ui.updateList();
+        this.start.updateList();
         break;
       case ListViewModel.STATE.PREFERENCES:
         amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.PREFERENCES_ACCOUNT);
         break;
       default:
-        if (respect_last_state) {
-          this.content_view_model.switchPreviousContent();
+        if (respectLastState) {
+          this.contentViewModel.switchPreviousContent();
         }
     }
   }
 
-  _get_element_id_of_list(list_state) {
-    switch (list_state) {
+  _getElementIdOfList(listState) {
+    switch (listState) {
       case ListViewModel.STATE.ARCHIVE:
         return 'archive';
       case ListViewModel.STATE.PREFERENCES:
@@ -242,11 +253,11 @@ z.viewModel.ListViewModel = class ListViewModel {
     }
   }
 
-  show_takeover() {
+  showTakeover() {
     this.modal(ListViewModel.MODAL_TYPE.TAKEOVER);
   }
 
-  dismiss_takeover() {
+  dismissTakeover() {
     this.modal(undefined);
   }
 
@@ -254,68 +265,73 @@ z.viewModel.ListViewModel = class ListViewModel {
   // Context menu
   //##############################################################################
 
-  on_context_menu(conversation_et, event) {
-    let label;
+  onContextMenu(conversationEntity, event) {
     let title;
     const entries = [];
 
-    if (!conversation_et.is_request() && !conversation_et.removed_from_conversation()) {
-      const silence_shortcut = z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.SILENCE);
-      const notify_tooltip = z.l10n.text(z.string.tooltipConversationsNotify, silence_shortcut);
-      const silence_tooltip = z.l10n.text(z.string.tooltipConversationsSilence, silence_shortcut);
+    const canToggleMute = !conversationEntity.is_request() && !conversationEntity.removed_from_conversation();
+    if (canToggleMute) {
+      const silenceShortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.SILENCE);
+      const notifyTooltip = z.l10n.text(z.string.tooltipConversationsNotify, silenceShortcut);
+      const silenceTooltip = z.l10n.text(z.string.tooltipConversationsSilence, silenceShortcut);
 
-      label = conversation_et.is_muted() ? z.string.conversationsPopoverNotify : z.string.conversationsPopoverSilence;
-      title = conversation_et.is_muted() ? notify_tooltip : silence_tooltip;
+      const labelStringId = conversationEntity.is_muted()
+        ? z.string.conversationsPopoverNotify
+        : z.string.conversationsPopoverSilence;
+      title = conversationEntity.is_muted() ? notifyTooltip : silenceTooltip;
       entries.push({
-        click: () => this.click_on_mute_action(conversation_et),
-        label: z.l10n.text(label),
+        click: () => this.clickToToggleMute(conversationEntity),
+        label: z.l10n.text(labelStringId),
         title: title,
       });
     }
 
-    if (conversation_et.is_archived()) {
+    if (conversationEntity.is_archived()) {
       entries.push({
-        click: () => this.click_on_unarchive_action(conversation_et),
+        click: () => this.clickToUnarchive(conversationEntity),
         label: z.l10n.text(z.string.conversationsPopoverUnarchive),
       });
     } else {
-      const shortcut = z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.ARCHIVE);
+      const shortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.ARCHIVE);
 
       entries.push({
-        click: () => this.click_on_archive_action(conversation_et),
+        click: () => this.clickToArchive(conversationEntity),
         label: z.l10n.text(z.string.conversationsPopoverArchive),
         title: z.l10n.text(z.string.tooltipConversationsArchive, shortcut),
       });
     }
 
-    if (conversation_et.is_request()) {
+    if (conversationEntity.is_request()) {
       entries.push({
-        click: () => this.click_on_cancel_action(conversation_et),
+        click: () => this.clickToCancelRequest(conversationEntity),
         label: z.l10n.text(z.string.conversationsPopoverCancel),
       });
     }
 
-    if (!conversation_et.is_request() && !conversation_et.is_cleared()) {
+    const canClear = !conversationEntity.is_request() && !conversationEntity.is_cleared();
+    if (canClear) {
       entries.push({
-        click: () => this.click_on_clear_action(conversation_et),
+        click: () => this.clickToClear(conversationEntity),
         label: z.l10n.text(z.string.conversationsPopoverClear),
       });
     }
 
-    if (!conversation_et.is_group()) {
-      const [user_et] = conversation_et.participating_user_ets();
+    if (!conversationEntity.is_group()) {
+      const userEntity = conversationEntity.firstUserEntity();
+      const canBlock = userEntity && (userEntity.is_connected() || userEntity.is_request());
 
-      if (user_et && (user_et.is_connected() || user_et.is_request())) {
+      if (canBlock) {
         entries.push({
-          click: () => this.click_on_block_action(conversation_et),
+          click: () => this.clickToBlock(conversationEntity),
           label: z.l10n.text(z.string.conversationsPopoverBlock),
         });
       }
     }
 
-    if (conversation_et.is_group() && !conversation_et.removed_from_conversation()) {
+    const canLeave = conversationEntity.is_group() && !conversationEntity.removed_from_conversation();
+    if (canLeave) {
       entries.push({
-        click: () => this.click_on_leave_action(conversation_et),
+        click: () => this.clickToLeave(conversationEntity),
         label: z.l10n.text(z.string.conversationsPopoverLeave),
       });
     }
@@ -323,71 +339,50 @@ z.viewModel.ListViewModel = class ListViewModel {
     z.ui.Context.from(event, entries, 'conversation-list-options-menu');
   }
 
-  click_on_archive_action(conversation_et = this.conversation_repository.active_conversation()) {
-    if (conversation_et) {
-      this.conversation_repository.archive_conversation(conversation_et);
-    }
+  clickToArchive(conversationEntity = this.conversationRepository.active_conversation()) {
+    this.actionsViewModel.archiveConversation(conversationEntity);
   }
 
-  click_on_block_action(conversation_et) {
-    const next_conversation_et = this._get_next_conversation(conversation_et);
-    const [user_et] = conversation_et.participating_user_ets();
+  clickToBlock(conversationEntity) {
+    const userEntity = conversationEntity.firstUserEntity();
+    const hideConversation = this._shouldHideConversation(conversationEntity);
+    const nextConversationEntity = this.conversationRepository.get_next_conversation(conversationEntity);
 
-    if (user_et) {
-      amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.BLOCK, {
-        action: () => {
-          this.user_repository.block_user(user_et, next_conversation_et);
-        },
-        data: user_et.first_name(),
-      });
-    }
+    this.actionsViewModel.blockUser(userEntity, hideConversation, nextConversationEntity);
   }
 
-  click_on_cancel_action(conversation_et) {
-    const next_conversation_et = this._get_next_conversation(conversation_et);
-    const [user_et] = conversation_et.participating_user_ets();
+  clickToCancelRequest(conversationEntity) {
+    const userEntity = conversationEntity.firstUserEntity();
+    const hideConversation = this._shouldHideConversation(conversationEntity);
+    const nextConversationEntity = this.conversationRepository.get_next_conversation(conversationEntity);
 
-    this.user_repository.cancel_connection_request(user_et, next_conversation_et);
+    this.actionsViewModel.cancelConnectionRequest(userEntity, hideConversation, nextConversationEntity);
   }
 
-  click_on_clear_action(conversation_et = this.conversation_repository.active_conversation()) {
-    if (conversation_et) {
-      amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CLEAR, {
-        action: (leave_conversation = false) => {
-          this.conversation_repository.clear_conversation(conversation_et, leave_conversation);
-        },
-        conversation: conversation_et,
-      });
-    }
+  clickToClear(conversationEntity = this.conversationRepository.active_conversation()) {
+    this.actionsViewModel.clearConversation(conversationEntity);
   }
 
-  click_on_leave_action(conversation_et) {
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.LEAVE, {
-      action: () => this.conversation_repository.removeMember(conversation_et, this.user_repository.self().id),
-      data: conversation_et.display_name(),
-    });
+  clickToLeave(conversationEntity) {
+    this.actionsViewModel.leaveConversation(conversationEntity);
   }
 
-  click_on_mute_action(conversation_et = this.conversation_repository.active_conversation()) {
-    if (conversation_et) {
-      this.conversation_repository.toggle_silence_conversation(conversation_et);
-    }
+  clickToToggleMute(conversationEntity = this.conversationRepository.active_conversation()) {
+    this.actionsViewModel.toggleMuteConversation(conversationEntity);
   }
 
-  click_on_unarchive_action(conversation_et) {
-    this.conversation_repository.unarchive_conversation(conversation_et, 'manual un-archive').then(() => {
-      if (!this.conversation_repository.conversations_archived().length) {
-        this.switch_list(ListViewModel.STATE.CONVERSATIONS);
+  clickToUnarchive(conversationEntity) {
+    this.conversationRepository.unarchive_conversation(conversationEntity, 'manual un-archive').then(() => {
+      if (!this.conversationRepository.conversations_archived().length) {
+        this.switchList(ListViewModel.STATE.CONVERSATIONS);
       }
     });
   }
 
-  _get_next_conversation(conversation_et) {
-    const in_conversations = this.state() === ListViewModel.STATE.CONVERSATIONS;
-    const is_active_conversation = this.conversation_repository.is_active_conversation(conversation_et);
+  _shouldHideConversation(conversationEntity) {
+    const isStateConversations = this.state() === ListViewModel.STATE.CONVERSATIONS;
+    const isActiveConversation = this.conversationRepository.is_active_conversation(conversationEntity);
 
-    if (in_conversations && is_active_conversation) {
-      return this.conversation_repository.get_next_conversation(conversation_et);
-    }
+    return isStateConversations && isActiveConversation;
   }
 };

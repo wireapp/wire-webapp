@@ -58,7 +58,7 @@ class AccountForm extends PureComponent {
 
   createURLForToU = () => {
     const isPersonalFlow = this.props.currentFlow === AuthSelector.REGISTER_FLOW.PERSONAL;
-    return `${EXTERNAL_ROUTE.WIRE_ROOT}/legal/terms/${isPersonalFlow ? 'personal' : 'teams'}/`;
+    return `${EXTERNAL_ROUTE.WIRE_WEBSITE}/legal/terms/${isPersonalFlow ? 'personal' : 'teams'}/`;
   };
 
   handleSubmit = event => {

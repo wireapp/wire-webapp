@@ -21,12 +21,12 @@ import {chooseHandleStrings} from '../../strings';
 import {
   H1,
   Text,
+  ContainerXS,
   InputSubmitCombo,
   Input,
   RoundIconButton,
   Form,
   ErrorMessage,
-  ContainerXS,
 } from '@wireapp/react-ui-kit';
 import {injectIntl} from 'react-intl';
 import {parseError} from '../util/errorUtil';

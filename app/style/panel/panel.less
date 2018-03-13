@@ -1,0 +1,208 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+.panel {
+  overflow: hidden;
+
+  &__page {
+    display: flex;
+    flex-direction: column;
+
+    &--move-out--left,
+    &--move-out--right,
+    &--move-in--left,
+    &--move-in--right {
+      pointer-events: none;
+
+      .panel__header {
+        transition: opacity @animation-timing-fast @ease-out-quart;
+      }
+
+      .panel__content {
+        transition: transform @animation-timing-fast @ease-out-expo;
+      }
+    }
+
+    &--move-out--left,
+    &--move-in--left {
+      .panel__content {
+        transform: translateX(304px);
+      }
+    }
+
+    &--move-out--right,
+    &--move-in--right {
+      .panel__content {
+        transform: translateX(-304px);
+      }
+    }
+
+    &--move-in--left,
+    &--move-in--right {
+      position: absolute;
+      width: 304px;
+      top: 0;
+    }
+    &--move-out--left,
+    &--move-out--right {
+      .panel__header {
+        opacity: 0;
+      }
+    }
+
+    &--move-in--left .panel__content {
+      right: 304px;
+    }
+
+    &--move-in--right .panel__content {
+      right: -304px;
+    }
+
+    &--visible {
+      opacity: 1;
+      height: 100%;
+    }
+
+    &:not(&--visible) {
+      opacity: 0;
+    }
+  }
+
+  &__content {
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transform: translateX(0);
+
+    &__scroll {
+      width: 100%;
+      overflow-x: hidden;
+      overflow-y: scroll;
+    }
+  }
+
+  &__action-item {
+    height: 48px;
+    border-bottom: 1px solid fade(@graphite-dark, 8%);
+    margin: 0 16px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+
+    &--alternate {
+      display: block;
+      position: relative;
+      & > div {
+        position: absolute;
+        display: flex;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+      }
+    }
+
+    &--alternate &__default {
+      opacity: 1;
+      transform: translateX(0);
+      transition: all @animation-timing-fast @ease-out-expo;
+    }
+    &--alternate &__alternative {
+      opacity: 0;
+      transform: translateX(10px);
+      transition: all @animation-timing-fast @ease-out-expo;
+    }
+
+    &--show-alternative &__default {
+      opacity: 0;
+      transform: translateX(-10px);
+    }
+    &--show-alternative &__alternative {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    &__icon {
+      width: 40px;
+      margin-left: 4px;
+      display: flex;
+      path {
+        fill: @graphite-dark;
+      }
+    }
+
+    &__text,
+    &__status {
+      font-size: 14px;
+      font-weight: 400;
+    }
+
+    &__text {
+      flex-grow: 1;
+    }
+
+    &__status {
+      color: fade(@graphite-dark, 40%);
+      justify-self: flex-end;
+    }
+
+    disclose-icon {
+      display: flex;
+      margin-left: 12px;
+      path {
+        fill: fade(@graphite-dark, 40%);
+      }
+    }
+
+    &.disabled {
+      pointer-events: none;
+      opacity: 0.4;
+    }
+  }
+
+  &__header {
+    height: @content-title-bar-height;
+    min-height: @content-title-bar-height;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    opacity: 1;
+
+    & > .icon-button {
+      width: @content-title-bar-height;
+      height: @content-title-bar-height;
+      display: flex;
+      justify-content: center;
+    }
+
+    path {
+      fill: @graphite-dark;
+    }
+
+    &__title {
+      font-size: 12px;
+      font-weight: @font-weight-bold;
+      text-transform: uppercase;
+    }
+
+    &--reverse {
+      flex-direction: row-reverse;
+    }
+  }
+}

@@ -85,9 +85,15 @@ z.integration.IntegrationRepository = class IntegrationRepository {
   addServiceFromParam(providerId, serviceId) {
     if (this.isTeam()) {
       this.getServiceById(providerId, serviceId).then(serviceEntity => {
-        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.BOTS_CONFIRM, {
+        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
           action: () => this.createConversationWithService(serviceEntity, 'url_param'),
-          data: serviceEntity.name,
+          preventClose: true,
+          text: {
+            action: z.l10n.text(z.string.modalConversationAddBotAction),
+            message: z.l10n.text(z.string.modalConversationAddBotMessage, serviceEntity.name),
+            title: z.l10n.text(z.string.modalConversationAddBotHeadline),
+          },
+          warning: false,
         });
       });
     }
@@ -102,7 +108,7 @@ z.integration.IntegrationRepository = class IntegrationRepository {
    */
   createConversationWithService(serviceEntity, method) {
     return this.conversationRepository
-      .createGroupConversation([], serviceEntity.name)
+      .createGroupConversation([], serviceEntity.name, z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM)
       .then(conversationEntity => {
         if (conversationEntity) {
           return this.addService(conversationEntity, serviceEntity, method).then(() => conversationEntity);
@@ -116,7 +122,12 @@ z.integration.IntegrationRepository = class IntegrationRepository {
         }
       })
       .catch(error => {
-        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.BOTS_UNAVAILABLE);
+        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, {
+          text: {
+            message: z.l10n.text(z.string.modalIntegrationUnavailableMessage),
+            title: z.l10n.text(z.string.modalIntegrationUnavailableHeadline),
+          },
+        });
         throw error;
       });
   }

@@ -17,7 +17,7 @@
  *
  */
 
-import {H1, Link, Container, ContainerXS, Columns, Column, ArrowIcon, COLOR} from '@wireapp/react-ui-kit';
+import {H1, Link, COLOR, ArrowIcon, Container, ContainerXS, Columns, Column} from '@wireapp/react-ui-kit';
 import {createAccountStrings} from '../../strings';
 import {injectIntl} from 'react-intl';
 import {Link as RRLink} from 'react-router-dom';

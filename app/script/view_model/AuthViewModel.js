@@ -30,6 +30,8 @@ z.viewModel.AuthViewModel = class AuthViewModel {
         z.auth.URLParameter.BOT_PROVIDER,
         z.auth.URLParameter.BOT_SERVICE,
         z.auth.URLParameter.ENVIRONMENT,
+        z.auth.URLParameter.INTEGRATIONS,
+        z.auth.URLParameter.LINKS,
         z.auth.URLParameter.LOCALE,
         z.auth.URLParameter.TRACKING,
       ],
@@ -296,6 +298,8 @@ z.viewModel.AuthViewModel = class AuthViewModel {
       case z.auth.SIGN_OUT_REASON.ACCOUNT_REGISTRATION:
         return this._login_from_teams();
       case z.auth.SIGN_OUT_REASON.CLIENT_REMOVED:
+        this.reason_info(z.l10n.text(z.string.authAccountClientDeletion));
+        break;
       case z.auth.SIGN_OUT_REASON.SESSION_EXPIRED:
         this.reason_info(z.l10n.text(z.string.authAccountExpiration));
         break;
@@ -376,7 +380,8 @@ z.viewModel.AuthViewModel = class AuthViewModel {
         this._setTabsCheckInterval();
       }
 
-      if (Cookies.get(z.main.App.CONFIG.TABS_CHECK.COOKIE_NAME)) {
+      const hasTabsCheckCookie = !!Cookies.get(z.main.App.CONFIG.TABS_CHECK.COOKIE_NAME);
+      if (hasTabsCheckCookie) {
         const currentHash = this._get_hash();
 
         if (!this.previousHash) {
@@ -422,7 +427,8 @@ z.viewModel.AuthViewModel = class AuthViewModel {
           }
         })
         .catch(error => {
-          if (error.type !== z.auth.AuthError.TYPE.MULTIPLE_TABS) {
+          const isMultipleTabs = error.type === z.auth.AuthError.TYPE.MULTIPLE_TABS;
+          if (!isMultipleTabs) {
             throw error;
           }
         });
@@ -830,6 +836,11 @@ z.viewModel.AuthViewModel = class AuthViewModel {
 
   clicked_on_change_phone() {
     this._set_hash(z.auth.AuthView.MODE.ACCOUNT_PHONE);
+  }
+
+  clickOnHandover() {
+    Cookies.remove(z.main.App.CONFIG.TABS_CHECK.COOKIE_NAME);
+    this._checkSingleInstance();
   }
 
   clicked_on_login_password() {
@@ -1769,7 +1780,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
    */
   _get_self_user() {
     return this.user_repository
-      .get_me()
+      .getSelf()
       .then(userEntity => {
         this.self_user(userEntity);
         this.logger.info(`Retrieved self user: ${this.self_user().id}`);

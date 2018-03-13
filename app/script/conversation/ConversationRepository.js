@@ -32,6 +32,19 @@ z.conversation.ConversationRepository = class ConversationRepository {
         MAX_NAME_LENGTH: 64,
         MAX_SIZE: 128,
       },
+      STATE_EVENTS: [
+        z.event.Backend.CONVERSATION.ACCESS_UPDATE,
+        z.event.Backend.CONVERSATION.CODE_DELETE,
+        z.event.Backend.CONVERSATION.CODE_UPDATE,
+      ],
+    };
+  }
+
+  static get CONSENT_TYPE() {
+    return {
+      INCOMING_CALL: 'incoming_call',
+      MESSAGE: 'message',
+      OUTGOING_CALL: 'outgoing_call',
     };
   }
 
@@ -140,7 +153,16 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.init_promise = undefined;
     this.init_total = 0;
 
+    this.supportConversationLinks = ko.observable();
+    this.enableConversationLinks = ko.pureComputed(() => {
+      const isBoolean = _.isBoolean(this.supportConversationLinks());
+      const isEnabled = isBoolean ? this.supportConversationLinks() : !z.util.Environment.frontend.is_production();
+      return this.isTeam() && isEnabled;
+    });
+
     this._init_subscriptions();
+
+    this.stateHandler = new z.conversation.ConversationStateHandler(this.conversation_service, this);
   }
 
   _init_state_updates() {
@@ -171,7 +193,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   _init_subscriptions() {
     amplify.subscribe(z.event.WebApp.CONVERSATION.ASSET.CANCEL, this.cancel_asset_upload.bind(this));
-    amplify.subscribe(z.event.WebApp.CONVERSATION.EVENT_FROM_BACKEND, this.push_to_receiving_queue.bind(this));
+    amplify.subscribe(z.event.WebApp.CONVERSATION.EVENT_FROM_BACKEND, this.onConversationEvent.bind(this));
     amplify.subscribe(z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, this.timeout_ephemeral_message.bind(this));
     amplify.subscribe(z.event.WebApp.CONVERSATION.MAP_CONNECTION, this.map_connection.bind(this));
     amplify.subscribe(z.event.WebApp.CONVERSATION.MISSED_EVENTS, this.on_missed_events.bind(this));
@@ -208,13 +230,50 @@ z.conversation.ConversationRepository = class ConversationRepository {
    *
    * @param {Array<z.entity.User>} userEntities - Users (excluding the requestor) to be part of the conversation
    * @param {string} [groupName] - Name for the conversation
+   * @param {string} [accessState] - State for conversation access
    * @returns {Promise} Resolves when the conversation was created
    */
-  createGroupConversation(userEntities, groupName) {
+  createGroupConversation(userEntities, groupName, accessState) {
     const userIds = userEntities.map(userEntity => userEntity.id);
+    const payload = {
+      name: groupName,
+      users: userIds,
+    };
+
+    if (this.team().id) {
+      payload.team = {
+        managed: false,
+        teamid: this.team().id,
+      };
+
+      if (accessState) {
+        let accessPayload;
+
+        switch (accessState) {
+          case z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM:
+            accessPayload = {
+              access: [z.conversation.ACCESS_MODE.INVITE, z.conversation.ACCESS_MODE.CODE],
+              access_role: z.conversation.ACCESS_ROLE.NON_ACTIVATED,
+            };
+            break;
+          case z.conversation.ACCESS_STATE.TEAM.TEAM_ONLY:
+            accessPayload = {
+              access: [z.conversation.ACCESS_MODE.INVITE],
+              access_role: z.conversation.ACCESS_ROLE.TEAM,
+            };
+            break;
+          default:
+            break;
+        }
+
+        if (accessPayload) {
+          Object.assign(payload, accessPayload);
+        }
+      }
+    }
 
     return this.conversation_service
-      .postConversations(userIds, groupName, this.team().id)
+      .postConversations(payload)
       .then(response => this._onCreate({conversation: response.id, data: response}))
       .then(({conversationEntity}) => conversationEntity)
       .catch(error => this._handleConversationCreateError(error, userIds));
@@ -225,7 +284,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves with the conversation that was created
    */
   createGuestRoom() {
-    return this.createGroupConversation([], z.l10n.text(z.string.guestRoomConversationName));
+    const groupName = z.l10n.text(z.string.guestRoomConversationName);
+    return this.createGroupConversation([], groupName, z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM);
   }
 
   /**
@@ -785,12 +845,16 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   initialize_conversations() {
     this._init_state_updates();
-    this.init_total = this.receiving_queue.get_length();
+    this.init_total = this.receiving_queue.getLength();
 
     if (this.init_total > 5) {
       this.logger.log(`Handling '${this.init_total}' additional messages on app start`);
       return new Promise((resolve, reject) => (this.init_promise = {reject_fn: reject, resolve_fn: resolve}));
     }
+  }
+
+  joinConversationWithCode(key, code) {
+    return this.conversation_service.postConversationJoin(key, code).then(response => this._onCreate(response));
   }
 
   /**
@@ -1036,7 +1100,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
       case z.service.BackendClientError.LABEL.SERVER_ERROR:
       case z.service.BackendClientError.LABEL.SERVICE_DISABLED:
       case z.service.BackendClientError.LABEL.TOO_MANY_BOTS: {
-        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.SERVICE_UNAVAILABLE);
+        const messageText = z.l10n.text(z.string.modalServiceUnavailableMessage);
+        const titleText = z.l10n.text(z.string.modalServiceUnavailableHeadline);
+
+        this._showModal(messageText, titleText);
         break;
       }
 
@@ -1114,7 +1181,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       const hasResponse = response && response.event;
       const event = hasResponse
         ? response.event
-        : z.conversation.EventBuilder.buildMemberLeave(conversationEntity, userId, this.timeOffset);
+        : z.conversation.EventBuilder.buildMemberLeave(conversationEntity, userId, true, this.timeOffset);
 
       amplify.publish(z.event.WebApp.EVENT.INJECT, event, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
       return event;
@@ -1130,8 +1197,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   removeMember(conversationEntity, userId) {
     return this.conversation_service.deleteMembers(conversationEntity.id, userId).then(response => {
-      const event =
-        response || z.conversation.EventBuilder.buildMemberLeave(conversationEntity, userId, this.timeOffset);
+      const event = !!response
+        ? response
+        : z.conversation.EventBuilder.buildMemberLeave(conversationEntity, userId, true, this.timeOffset);
 
       amplify.publish(z.event.WebApp.EVENT.INJECT, event, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
       return event;
@@ -1371,23 +1439,35 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   _handleTooManyMembersError(participants = 128) {
     const openSpots = ConversationRepository.CONFIG.GROUP.MAX_SIZE - participants;
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.TOO_MANY_MEMBERS, {
-      data: {
-        max: ConversationRepository.CONFIG.GROUP.MAX_SIZE,
-        open_spots: Math.max(0, openSpots),
-      },
-    });
+    const substitutions = {number1: ConversationRepository.CONFIG.GROUP.MAX_SIZE, number2: Math.max(0, openSpots)};
+
+    const messageText = z.l10n.text(z.string.modalConversationTooManyMembersMessage, substitutions);
+    const titleText = z.l10n.text(z.string.modalConversationTooManyMembersHeadline);
+    this._showModal(messageText, titleText);
   }
 
   _handleUsersNotConnected(userIds = []) {
     const [userID] = userIds;
-    const user_promise = userIds.length === 1 ? this.user_repository.get_user_by_id(userID) : Promise.resolve();
+    const userPromise = userIds.length === 1 ? this.user_repository.get_user_by_id(userID) : Promise.resolve();
 
-    user_promise.then(user_et => {
-      const username = user_et ? user_et.first_name() : undefined;
-      amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.NOT_CONNECTED, {
-        data: username,
-      });
+    userPromise.then(userEntity => {
+      const username = userEntity ? userEntity.first_name() : undefined;
+      const messageStringId = username
+        ? z.string.modalConversationNotConnectedMessageOne
+        : z.string.modalConversationNotConnectedMessageMany;
+
+      const messageText = z.l10n.text(messageStringId, username);
+      const titleText = z.l10n.text(z.string.modalConversationNotConnectedHeadline);
+      this._showModal(messageText, titleText);
+    });
+  }
+
+  _showModal(messageText, titleText) {
+    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, {
+      text: {
+        message: messageText,
+        title: titleText,
+      },
     });
   }
 
@@ -1990,7 +2070,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.OUTGOING_PING);
         }
 
-        this.onConversationEvent(message_stored, z.event.EventRepository.SOURCE.INJECTED);
+        this._handleConversationEvent(message_stored, z.event.EventRepository.SOURCE.INJECTED);
 
         return this.send_generic_message_to_conversation(conversation_et.id, generic_message)
           .then(payload => {
@@ -2142,8 +2222,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return response;
       })
       .catch(error => {
-        if (error.label === z.service.BackendClientError.LABEL.UNKNOWN_CLIENT) {
-          this.client_repository.removeLocalClient();
+        const isUnknownClient = error.label === z.service.BackendClientError.LABEL.UNKNOWN_CLIENT;
+        if (isUnknownClient) {
+          return this.client_repository.removeLocalClient();
         }
 
         if (!error.missing) {
@@ -2155,7 +2236,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
           .onClientMismatch(error, conversationId, genericMessage, payload)
           .then(payloadWithMissingClients => {
             updatedPayload = payloadWithMissingClients;
-            return this._grantOutgoingMessage(conversationId, genericMessage, Object.keys(error.missing));
+
+            const userIds = Object.keys(error.missing);
+            return this._grantOutgoingMessage(conversationId, genericMessage, userIds);
           })
           .then(() => {
             this.logger.info(`Updated '${messageType}' message for conversation '${conversationId}'`, updatedPayload);
@@ -2172,15 +2255,16 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     const isCallingMessage = genericMessage.content === z.cryptography.GENERIC_MESSAGE_TYPE.CALLING;
     const consentType = isCallingMessage
-      ? z.viewModel.ModalsViewModel.CONSENT_TYPE.OUTGOING_CALL
-      : z.viewModel.ModalsViewModel.CONSENT_TYPE.MESSAGE;
-    return this.grantMessage(conversationId, consentType, userIds);
+      ? ConversationRepository.CONSENT_TYPE.OUTGOING_CALL
+      : ConversationRepository.CONSENT_TYPE.MESSAGE;
+
+    return this.grantMessage(conversationId, consentType, userIds, genericMessage.content);
   }
 
-  grantMessage(conversationId, consentType, userIds) {
-    return this.get_conversation_by_id(conversationId).then(conversation_et => {
-      const conversationDegraded =
-        conversation_et.verification_state() === z.conversation.ConversationVerificationState.DEGRADED;
+  grantMessage(conversationId, consentType, userIds, type) {
+    return this.get_conversation_by_id(conversationId).then(conversationEntity => {
+      const verificationState = conversationEntity.verification_state();
+      const conversationDegraded = verificationState === z.conversation.ConversationVerificationState.DEGRADED;
 
       if (!conversationDegraded) {
         return false;
@@ -2190,32 +2274,88 @@ z.conversation.ConversationRepository = class ConversationRepository {
         let sendAnyway = false;
 
         if (!userIds) {
-          userIds = conversation_et.get_users_with_unverified_clients().map(user_et => user_et.id);
+          userIds = conversationEntity.get_users_with_unverified_clients().map(userEntity => userEntity.id);
         }
 
-        return this.user_repository.get_users_by_id(userIds).then(user_ets => {
-          amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.NEW_DEVICE, {
-            action() {
-              sendAnyway = true;
-              conversation_et.verification_state(z.conversation.ConversationVerificationState.UNVERIFIED);
+        return this.user_repository
+          .get_users_by_id(userIds)
+          .then(userEntities => {
+            let actionStringId;
+            let messageStringId;
+            let titleStringId;
 
-              resolve(true);
-            },
-            close() {
-              if (!sendAnyway) {
-                reject(
-                  new z.conversation.ConversationError(
-                    z.conversation.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION
-                  )
-                );
+            const hasMultipleUsers = userEntities > 1;
+            if (hasMultipleUsers) {
+              titleStringId = z.string.modalConversationNewDeviceHeadlineMany;
+            } else {
+              const [userEntity] = userEntities;
+
+              if (userEntity) {
+                titleStringId = userEntity.is_me
+                  ? z.string.modalConversationNewDeviceHeadlineYou
+                  : z.string.modalConversationNewDeviceHeadlineOne;
+              } else {
+                const log = `Granting message '${type}' in '${conversationId}' for '${consentType}' needs user ids`;
+                this.logger.error(log);
+
+                const error = new Error('Failed to grant outgoing message');
+                const customData = {
+                  consentType,
+                  messageType: type,
+                  participants: conversationEntity.getNumberOfParticipants(false),
+                  verificationState,
+                };
+
+                Raygun.send(error, customData);
+
+                reject(error);
               }
-            },
-            data: {
-              consent_type: consentType,
-              user_ets: user_ets,
-            },
-          });
-        });
+            }
+
+            const userNames = z.util.LocalizerUtil.joinNames(userEntities, z.string.Declension.NOMINATIVE);
+            const titleSubstitutions = z.util.StringUtil.capitalize_first_char(userNames);
+
+            switch (consentType) {
+              case ConversationRepository.CONSENT_TYPE.INCOMING_CALL: {
+                actionStringId = z.string.modalConversationNewDeviceIncomingCallAction;
+                messageStringId = z.string.modalConversationNewDeviceIncomingCallMessage;
+                break;
+              }
+
+              case ConversationRepository.CONSENT_TYPE.OUTGOING_CALL: {
+                actionStringId = z.string.modalConversationNewDeviceOutgoingCallAction;
+                messageStringId = z.string.modalConversationNewDeviceOutgoingCallMessage;
+                break;
+              }
+
+              default: {
+                actionStringId = z.string.modalConversationNewDeviceAction;
+                messageStringId = z.string.modalConversationNewDeviceMessage;
+                break;
+              }
+            }
+
+            amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
+              action: () => {
+                sendAnyway = true;
+                conversationEntity.verification_state(z.conversation.ConversationVerificationState.UNVERIFIED);
+
+                resolve(true);
+              },
+              close: () => {
+                if (!sendAnyway) {
+                  const errorType = z.conversation.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION;
+                  reject(new z.conversation.ConversationError(errorType));
+                }
+              },
+              text: {
+                action: z.l10n.text(actionStringId),
+                message: z.l10n.text(messageStringId),
+                title: z.l10n.text(titleStringId, titleSubstitutions),
+              },
+            });
+          })
+          .catch(reject);
       });
     });
   }
@@ -2542,14 +2682,26 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when event was handled
    */
   onConversationEvent(eventJson, eventSource = z.event.EventRepository.SOURCE.STREAM) {
+    const logObject = {eventJson: JSON.stringify(eventJson), eventObject: eventJson};
+    const logMessage = `»» Conversation Event: '${eventJson.type}' (Source: ${eventSource})`;
+    this.logger.info(logMessage, logObject);
+
+    const isStateEvent = ConversationRepository.CONFIG.STATE_EVENTS.includes(eventJson.type);
+    if (isStateEvent) {
+      return this.stateHandler.onConversationEvent(eventJson, eventSource);
+    }
+
+    return this._pushToReceivingQueue(eventJson, eventSource);
+  }
+
+  _handleConversationEvent(eventJson, eventSource = z.event.EventRepository.SOURCE.STREAM) {
     if (!eventJson) {
       return Promise.reject(new Error('Conversation Repository Event Handling: Event missing'));
     }
 
     const {conversation, data: eventData, type} = eventJson;
     const conversationId = (eventData && eventData.conversationId) || conversation;
-    const logObject = {eventJson: JSON.stringify(eventJson), eventObject: eventJson};
-    this.logger.info(`»» Conversation Event: '${type}' (Source: ${eventSource})`, logObject);
+    this.logger.info(`Handling event '${type}' in conversation '${conversationId}' (Source: ${eventSource})`);
 
     const inSelfConversation = conversationId === this.self_conversation() && this.self_conversation().id;
     if (inSelfConversation) {
@@ -2648,31 +2800,18 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   /**
-   * Add missed events message to conversations.
-   * @returns {undefined} No return value
-   */
-  on_missed_events() {
-    this.filtered_conversations()
-      .filter(conversation_et => !conversation_et.removed_from_conversation())
-      .forEach(conversation_et => {
-        const missed_event = z.conversation.EventBuilder.buildMissed(conversation_et, this.timeOffset);
-        amplify.publish(z.event.WebApp.EVENT.INJECT, missed_event);
-      });
-  }
-
-  /**
    * Push to receiving queue.
-   * @param {Object} event_json - JSON data for event
+   * @param {Object} eventJson - JSON data for event
    * @param {z.event.EventRepository.SOURCE} source - Source of event
    * @returns {undefined} No return value
    */
-  push_to_receiving_queue(event_json, source) {
+  _pushToReceivingQueue(eventJson, source) {
     this.receiving_queue
-      .push(() => this.onConversationEvent(event_json, source))
+      .push(() => this._handleConversationEvent(eventJson, source))
       .then(() => {
         if (this.init_promise) {
-          const event_from_stream = source === z.event.EventRepository.SOURCE.STREAM;
-          if (event_from_stream) {
+          const eventFromStream = source === z.event.EventRepository.SOURCE.STREAM;
+          if (eventFromStream) {
             this.init_handled = this.init_handled + 1;
             if (this.init_handled % 5 === 0 || this.init_handled < 5) {
               const content = {
@@ -2685,7 +2824,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
             }
           }
 
-          if (!this.receiving_queue.get_length() || !event_from_stream) {
+          if (!this.receiving_queue.getLength() || !eventFromStream) {
             this.init_promise.resolve_fn();
             this.init_promise = undefined;
           }
@@ -2698,6 +2837,19 @@ z.conversation.ConversationRepository = class ConversationRepository {
         } else {
           throw error;
         }
+      });
+  }
+
+  /**
+   * Add missed events message to conversations.
+   * @returns {undefined} No return value
+   */
+  on_missed_events() {
+    this.filtered_conversations()
+      .filter(conversation_et => !conversation_et.removed_from_conversation())
+      .forEach(conversation_et => {
+        const missed_event = z.conversation.EventBuilder.buildMissed(conversation_et, this.timeOffset);
+        amplify.publish(z.event.WebApp.EVENT.INJECT, missed_event);
       });
   }
 
@@ -2911,11 +3063,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
       conversationEntity.status(z.conversation.ConversationStatus.PAST_MEMBER);
 
       if (conversationEntity.call()) {
-        amplify.publish(
-          z.event.WebApp.CALL.STATE.LEAVE,
-          conversationEntity.id,
-          z.calling.enum.TERMINATION_REASON.MEMBER_LEAVE
-        );
+        const reason = z.calling.enum.TERMINATION_REASON.MEMBER_LEAVE;
+        amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, conversationEntity.id, reason);
       }
     }
 
@@ -3595,13 +3744,20 @@ z.conversation.ConversationRepository = class ConversationRepository {
     }
 
     if (action_type) {
-      amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONTRIBUTED, {
+      const attributes = {
         action: action_type,
         conversation_type: z.tracking.helpers.get_conversation_type(conversation_et),
         ephemeral_time: is_ephemeral ? ephemeral_time : undefined,
         is_ephemeral: is_ephemeral,
         with_service: conversation_et.isWithBot(),
-      });
+      };
+
+      const isTeamConversation = !!conversation_et.team_id;
+      if (isTeamConversation) {
+        Object.assign(attributes, z.tracking.helpers.getGuestAttributes(conversation_et));
+      }
+
+      amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONTRIBUTED, attributes);
     }
   }
 };

@@ -23,11 +23,6 @@ z.string.da.wireLinux = 'Wire til Linux';
 z.string.da.nonexistentUser = 'Slet bruger';
 z.string.da.and = 'og';
 
-z.string.da.alertUploadFileFormat = 'Kan ikke anvende dette billede. Vælg venligst en PNG eller JPEG-fil.';
-z.string.da.alertUploadTooSmall = 'Kan ikke anvende dette billede. Vælg venligst et billede der er mindst 320 x 320 px.';
-z.string.da.alertUploadTooLarge = 'Dette billede er for stort. Du kan uploade filer op til {{number}} MB.';
-z.string.da.alertGifTooLarge = 'Animationen er for stor. Den maksimale størrelse er {{number}} MB.';
-
 z.string.da.authAccountCountryCode = 'Landekode';
 z.string.da.authAccountExpiration = 'Du er blevet logget af, da din session udløb. Log venligst ind igen.';
 z.string.da.authAccountPasswordForgot = 'Glemt adgangskode';
@@ -93,72 +88,118 @@ z.string.da.callAccept = 'Besvar';
 z.string.da.callJoin = 'Deltag';
 z.string.da.callChooseSharedScreen = 'Vælg en skærm som du vil dele';
 
-z.string.da.modalButtonCancel = 'Annuller';
-z.string.da.modalButtonOk = 'Ok';
-z.string.da.modalButtonSend = 'Send';
+z.string.da.modalAcknowledgeAction = 'Ok';
+z.string.da.modalConfirmSecondary = 'Annuller';
+z.string.da.modalOptionSecondary = 'Annuller';
 
-z.string.da.modalBlockConversationHeadline = 'Blokkér {{user}}?';
-z.string.da.modalBlockConversationMessage = '{{user}} vil ikke kunne kontakte dig eller tilføje dig til gruppesamtaler.';
-z.string.da.modalBlockConversationButton = 'Blokér';
-z.string.da.modalCallConversationEmptyHeadline = 'Ingen at ringe til';
-z.string.da.modalCallConversationEmptyMessage = 'Der er ingen tilbage her.';
-z.string.da.modalCallNoVideoInGroupHeadline = 'Ingen video opkald i grupper';
-z.string.da.modalCallNoVideoInGroupMessage = 'Video opkald er ikke tilgængelig i gruppe samtaler.';
+z.string.da.modalAccountDeletionAction = 'Slet';
+z.string.da.modalAccountDeletionHeadline = 'Slet konto';
+z.string.da.modalAccountDeletionMessage = 'Vi vil sende dig en besked via email eller SMS. Følg linket for at permanent slette din konto.';
+
+z.string.da.modalAccountLogoutAction = 'Log ud';
+z.string.da.modalAccountLogoutHeadline = 'Ryd Data?';
+z.string.da.modalAccountLogoutOption = 'Slet alle dine personlige informationer og samtaler på denne enhed.';
+
+z.string.da.modalAccountNewDevicesSecondary = 'Administrér enheder';
+z.string.da.modalAccountNewDevicesHeadline = 'Din konto blev brugt på:';
+z.string.da.modalAccountNewDevicesFrom = 'Fra:';
+z.string.da.modalAccountNewDevicesMessage = 'Hvis du ikke gjorde dette, slet enheden og nulstil din adgangskode.';
+
+z.string.da.modalAccountRemoveDeviceAction = 'Fjern enhed';
+z.string.da.modalAccountRemoveDeviceHeadline = 'Fjern "{{device}}"';
+z.string.da.modalAccountRemoveDeviceMessage = 'Din adgangskode er krævet for at fjerne denne enhed.';
+z.string.da.modalAccountRemoveDevicePlaceholder = 'Adgangskode';
+
+z.string.da.modalAssetTooLargeMessage = 'Du kan sende filer med størrelse op til {{number}}';
+
+z.string.da.modalAssetParallelUploadsMessage = 'Du kan sende op til {{number}} filer på én gang.';
+
+z.string.da.modalCallEmptyConversationHeadline = 'Ingen at ringe til';
+z.string.da.modalCallEmptyConversationMessage = 'Der er ingen tilbage her.';
+
+z.string.da.modalCallNoGroupVideoHeadline = 'Ingen video opkald i grupper';
+z.string.da.modalCallNoGroupVideoMessage = 'Video opkald er ikke tilgængelig i gruppe samtaler.';
+
+z.string.da.modalCallNoMicrophoneAction = 'Fortæl mig hvordan';
+z.string.da.modalCallNoMicrophoneMessage = 'Din browser skal have adgang til mikrofonen for at foretage opkald.';
+z.string.da.modalCallNoMicrophoneHeadline = 'Kan ikke ringe uden mikrofon';
+
+z.string.da.modalCallSecondIncomingAction = 'Besvar';
 z.string.da.modalCallSecondIncomingHeadline = 'Besvar opkald?';
 z.string.da.modalCallSecondIncomingMessage = 'Dit nuværende opkald vil afsluttes.';
-z.string.da.modalCallSecondIncomingAction = 'Besvar';
+
+z.string.da.modalCallSecondOngoingAction = 'Læg På';
 z.string.da.modalCallSecondOngoingHeadline = 'Læg på fra en anden enhed?';
 z.string.da.modalCallSecondOngoingMessage = 'Du kan kun være i et opkald af gangen.';
-z.string.da.modalCallSecondOngoingAction = 'Læg På';
+
+z.string.da.modalCallSecondOutgoingAction = 'Læg På';
 z.string.da.modalCallSecondOutgoingHeadline = 'Læg nuværende opkald på?';
 z.string.da.modalCallSecondOutgoingMessage = 'Du kan kun være i et opkald af gangen.';
-z.string.da.modalCallSecondOutgoingAction = 'Læg På';
-z.string.da.modalClearConversationHeadline = 'Slet indhold?';
-z.string.da.modalClearConversationOption = 'Forlad også samtalen';
-z.string.da.modalClearConversationButton = 'Slet';
-z.string.da.modalConnectedDeviceHeadline = 'Din konto blev brugt på:';
-z.string.da.modalConnectedDeviceFrom = 'Fra:';
-z.string.da.modalConnectedDeviceMessage = 'Hvis du ikke gjorde dette, slet enheden og nulstil din adgangskode.';
-z.string.da.modalConnectedDeviceManageDevices = 'administrér enheder';
-z.string.da.modalDeleteAccountAction = 'Slet';
-z.string.da.modalDeleteAccountHeadline = 'Slet konto';
-z.string.da.modalDeleteAccountMessage = 'Vi vil sende dig en besked via email eller SMS. Følg linket for at permanent slette din konto.';
-z.string.da.modalDeleteButton = 'Slet';
-z.string.da.modalDeleteHeadline = 'Slet kun for mig?';
-z.string.da.modalDeleteMessage = 'Dette kan ikke fortrydes.';
-z.string.da.modalDeleteEveryoneButton = 'Slet';
-z.string.da.modalDeleteEveryoneHeadline = 'Slet for alle?';
-z.string.da.modalDeleteEveryoneMessage = 'Dette kan ikke fortrydes.';
-z.string.da.modalTooLongHeadline = 'Besked for lang';
-z.string.da.modalTooLongMessage = 'Du kan sende beskeder på op til {{number}} tegn.';
-z.string.da.modalLeaveConversationHeadline = 'Forlad "{{user}}" samtale?';
-z.string.da.modalLeaveConversationMessage = 'Deltagerne vil få besked og samtalen fjernet fra din liste.';
-z.string.da.modalLeaveConversationButton = 'Forlad';
-z.string.da.modalLogoutHeadline = 'Ryd Data?';
-z.string.da.modalLogoutMessage = 'Slet alle dine personlige informationer og samtaler på denne enhed.';
-z.string.da.modalLogoutButton = 'Log ud';
-z.string.da.modalNewDeviceHeadline = '{{user}} er begyndt at bruge en ny enhed';
-z.string.da.modalNewDeviceHeadlineMany = '{{user}}s er begyndt at bruge nye enheder';
-z.string.da.modalNewDeviceHeadlineYou = '{{user}} er begyndt at bruge en ny enhed';
-z.string.da.modalNewDeviceMessage = 'Vil du stadig sende dine beskeder?';
-z.string.da.modalNewDeviceCallAccept = 'Besvar opkald';
-z.string.da.modalNewDeviceCallAnyway = 'Ring alligevel';
-z.string.da.modalNewDeviceCallIncoming = 'Vil du stadig besvare opkaldet?';
-z.string.da.modalNewDeviceCallOutgoing = 'Vil du stadig placere opkaldet?';
-z.string.da.modalNewDeviceShowDevice = 'vis enhed';
-z.string.da.modalNewDeviceSendAnyway = 'send alligevel';
-z.string.da.modalNotConnectedMessageOne = '{{name}} vil ikke tilføjes til samtalen.';
-z.string.da.modalNotConnectedMessageMany = 'En af de valgte personer vil ikke tilføjes til samtalen.';
-z.string.da.modalRemoveDeviceButton = 'Fjern enhed';
-z.string.da.modalRemoveDeviceHeadline = 'Fjern "{{device}}"';
-z.string.da.modalRemoveDeviceMessage = 'Din adgangskode er krævet for at fjerne denne enhed.';
+
+z.string.da.modalConnectCancelAction = 'Ja';
+z.string.da.modalConnectCancelHeadline = 'Annuller anmodning?';
+z.string.da.modalConnectCancelMessage = 'Fjern anmodning om forbindelse til {{user}}.';
+z.string.da.modalConnectCancelSecondary = 'Nej';
+
+z.string.da.modalConnectAcceptAction = 'Forbind';
+z.string.da.modalConnectAcceptHeadline = 'Acceptér?';
+z.string.da.modalConnectAcceptMessage = 'Dette vil forbinde jer og åbne en samtale med {{user}}.';
+z.string.da.modalConnectAcceptSecondary = 'Ignorér';
+
+z.string.da.modalConversationClearAction = 'Slet';
+z.string.da.modalConversationClearHeadline = 'Slet indhold?';
+z.string.da.modalConversationClearOption = 'Forlad også samtalen';
+
+z.string.da.modalConversationDeleteMessageAction = 'Slet';
+z.string.da.modalConversationDeleteMessageHeadline = 'Slet kun for mig?';
+z.string.da.modalConversationDeleteMessageMessage = 'Dette kan ikke fortrydes.';
+
+z.string.da.modalConversationDeleteMessageEveryoneAction = 'Slet';
+z.string.da.modalConversationDeleteMessageEveryoneHeadline = 'Slet for alle?';
+z.string.da.modalConversationDeleteMessageEveryoneMessage = 'Dette kan ikke fortrydes.';
+
+z.string.da.modalConversationLeaveAction = 'Forlad';
+z.string.da.modalConversationLeaveMessage = 'Du vil ikke være i stand til at sende og modtage beskeder i denne samtale.';
+
+z.string.da.modalConversationMessageTooLongHeadline = 'Besked for lang';
+z.string.da.modalConversationMessageTooLongMessage = 'Du kan sende beskeder på op til {{number}} tegn.';
+
+z.string.da.modalConversationNewDeviceHeadlineOne = '{{user}} er begyndt at bruge en ny enhed';
+z.string.da.modalConversationNewDeviceHeadlineMany = '{{user}}s er begyndt at bruge nye enheder';
+z.string.da.modalConversationNewDeviceHeadlineYou = '{{user}} er begyndt at bruge en ny enhed';
+z.string.da.modalConversationNewDeviceIncomingCallAction = 'Besvar opkald';
+z.string.da.modalConversationNewDeviceIncomingCallMessage = 'Vil du stadig besvare opkaldet?';
+z.string.da.modalConversationNewDeviceMessage = 'Vil du stadig sende dine beskeder?';
+z.string.da.modalConversationNewDeviceOutgoingCallAction = 'Ring alligevel';
+z.string.da.modalConversationNewDeviceOutgoingCallMessage = 'Vil du stadig placere opkaldet?';
+
+z.string.da.modalConversationNotConnectedMessageOne = '{{name}} vil ikke tilføjes til samtalen.';
+z.string.da.modalConversationNotConnectedMessageMany = 'En af de valgte personer vil ikke tilføjes til samtalen.';
+
+z.string.da.modalConversationRemoveAction = 'Fjern';
+z.string.da.modalConversationRemoveHeadline = 'Fjern?';
+z.string.da.modalConversationRemoveMessage = '{{user}} vil ikke være i stand til at sende eller modtage beskeder i denne samtale.';
+
+
+z.string.da.modalConversationTooManyMembersHeadline = 'Fuldt hus';
+
+
+
 z.string.da.modalSessionResetHeadline = 'Sessionen er blevet nulstillet';
 z.string.da.modalSessionResetMessage1 = 'Hvis problemet ikke er løst,';
 z.string.da.modalSessionResetMessageLink = 'kontakt';
 z.string.da.modalSessionResetMessage2 = 'os.';
-z.string.da.modalTooManyMembersHeadline = 'Fuldt hus';
-z.string.da.modalTooManyMembersMessage = 'Op til {{number1}} personer kan deltage i en samtale. Der er plads til {{number2}} personer mere herinde.';
-z.string.da.modalUploadsParallel = 'Du kan sende op til {{number}} filer på én gang.';
+
+z.string.da.modalUploadContactsAction = 'Prøv igen';
+z.string.da.modalUploadContactsMessage = 'Vi har ikke modtaget dine oplysninger. Venligst prøv at importere dine kontakter igen.';
+
+z.string.da.modalUserBlockAction = 'Blokér';
+z.string.da.modalUserBlockHeadline = 'Blokkér {{user}}?';
+z.string.da.modalUserBlockMessage = '{{user}} vil ikke kunne kontakte dig eller tilføje dig til gruppesamtaler.';
+
+z.string.da.modalUserUnblockAction = 'Fjern Blokering';
+z.string.da.modalUserUnblockHeadline = 'Fjern Blokering?';
+z.string.da.modalUserUnblockMessage = '{{user}} vil igen kunne kontakte dig og tilføje dig til gruppesamtaler.';
 
 z.string.da.connectionRequestConnect = 'Forbind';
 z.string.da.connectionRequestIgnore = 'Ignorér';
@@ -181,7 +222,6 @@ z.string.da.conversationDeviceYourDevices = ' dine enheder';
 z.string.da.conversationDeviceUserDevices = ' {{user}}’s enheder';
 z.string.da.conversationDeviceNewDeviceOne = ' en ny enhed';
 z.string.da.conversationDeviceNewDeviceMany = ' nye enheder';
-z.string.da.conversationDeviceNewPeopleJoined = 'nye personer deltager.';
 z.string.da.conversationDeviceNewPeopleJoinedVerify = ' verificer enheder';
 z.string.da.conversationJustNow = 'Lige nu';
 z.string.da.conversationLocationLink = 'Åben Kort';
@@ -210,7 +250,6 @@ z.string.da.conversationUnableToDecryptResetSession = 'Nulstil session';
 z.string.da.conversationMissedMessages = 'Du har ikke brugt denne enhed i et stykke tid. Nogle meddelelser vises måske ikke her.';
 z.string.da.conversationAssetDownloading = 'Downloader…';
 z.string.da.conversationAssetUploadFailed = 'Upload Mislykkedes';
-z.string.da.conversationAssetUploadTooLarge = 'Du kan sende filer med størrelse op til {{number}}';
 z.string.da.conversationPlaybackError = 'Ikke i stand til at afspille';
 z.string.da.conversationContextMenuEdit = 'Redigér';
 z.string.da.conversationContextMenuDelete = 'Slet for mig';
@@ -281,67 +320,43 @@ z.string.da.extensionsGiphyMessage = '{{tag}} • via giphy.com';
 z.string.da.extensionsGiphyNoGifs = 'Ups, ingen gifs';
 z.string.da.extensionsGiphyRandom = 'Tilfældig';
 
-z.string.da.peopleConfirmLabel = 'Tilføj personer til gruppe';
-z.string.da.peoplePeople = '{{number}} Personer';
-z.string.da.peopleSearchPlaceholder = 'Søg ved navn';
-z.string.da.peopleEveryoneParticipates = 'Alle du er \nforbundet med er allerede i \ndenne samtale.';
-z.string.da.peopleNoMatches = 'Ingen passende resultater.\nPrøv at indtaste et andet navn.';
-z.string.da.peopleInvite = 'Inviter personer til Wire';
-z.string.da.peopleInviteDetail = 'At dele dine kontakter hjælper med at forbinde til andre. Vi anonymiserer al information og deler det ikke med nogen andre.';
-z.string.da.peopleInviteButtonContacts = 'Fra Kontakter';
-z.string.da.peopleInviteButtonGmail = 'Fra Gmail';
-z.string.da.peopleInviteHeadline = 'Få dine venner med';
-z.string.da.peopleServices = 'Tjenester';
-z.string.da.peopleShare = 'Del Kontakter';
-z.string.da.peopleTabsDetails = 'Detaljer';
-z.string.da.peopleTabsDevices = 'Enheder';
-z.string.da.peopleTabsDevicesHeadline = 'Wire giver hver enhed et unikt fingeraftryk. Sammenlign dem med {{user}} og bekræft din samtale.';
-z.string.da.peopleTabsDevicesLearnMore = 'Lær mere';
-z.string.da.peopleTabsDevicesWhyVerify = 'Hvorfor bekræfte samtale?';
-z.string.da.peopleTabsNoDevicesHeadline = '{{user}} bruger en gammel version af Wire. Ingen enheder er vist her.';
-z.string.da.peopleTabsDeviceDetailAllMyDevices = 'Vis alle mine enheder';
-z.string.da.peopleTabsDeviceDetailDeviceFingerprint = 'Enheds fingeraftryk';
-z.string.da.peopleTabsDeviceDetailHeadline = 'Bekræft at dette passer med fingeraftrykket vist på {{html1}}{{user}}’s enhed{{html2}}.';
-z.string.da.peopleTabsDeviceDetailHowTo = 'Hvordan gør jeg det?';
-z.string.da.peopleTabsDeviceDetailResetSession = 'Nulstil session';
-z.string.da.peopleTabsDeviceDetailShowMyDevice = 'Vis min enheds fingeraftryk';
-z.string.da.peopleTabsDeviceDetailVerify = 'Bekræftet';
-z.string.da.peopleTabsPeople = 'Personer';
-z.string.da.peopleTabsServices = 'Tjenester';
-z.string.da.peopleVerified = 'Bekræftet';
+z.string.da.addParticipantsConfirmLabel = 'Tilføj';
+z.string.da.addParticipantsSearchPlaceholder = 'Søg ved navn';
+z.string.da.addParticipantsTabsPeople = 'Personer';
+z.string.da.addParticipantsTabsServices = 'Tjenester';
 
-z.string.da.peopleBlockHeadline = 'Blokér?';
-z.string.da.peopleBlockMessage = '{{user}} vil ikke kunne kontakte dig eller tilføje dig til gruppesamtaler.';
+z.string.da.conversationDetailsActionCancelRequest = 'Annuller anmodning';
+z.string.da.conversationDetailsActionCreateGroup = 'Opret gruppe';
+z.string.da.conversationDetailsActionDevices = 'Enheder';
+z.string.da.conversationDetailsGuestsOff = 'Slået Fra';
+z.string.da.conversationDetailsParticipantsServicesMany = 'Tjenester';
+z.string.da.conversationDetailsParticipantsUsersMany = 'Personer';
+z.string.da.conversationDetailsPeople = 'Personer';
+z.string.da.conversationDetailsServices = 'Tjenester';
 
-z.string.da.peopleConnectHeadline = 'Acceptér?';
-z.string.da.peopleConnectMessage = 'Dette vil forbinde jer og åbne en samtale med {{user}}.';
+z.string.da.groupParticipantActionCancelRequest = 'Annuller anmodning';
+z.string.da.groupParticipantActionDevices = 'Enheder';
+z.string.da.groupParticipantActionPending = 'Afventer';
+z.string.da.groupParticipantActionSendRequest = 'Forbind';
 
-z.string.da.peopleCancelRequestHeadline = 'Annuller anmodning?';
-z.string.da.peopleCancelRequestMessage = 'Fjern anmodning om forbindelse til {{user}}.';
+z.string.da.participantDevicesDetailHeadline = 'Bekræft at dette passer med fingeraftrykket vist på {{html1}}{{user}}’s enhed{{html2}}.';
+z.string.da.participantDevicesDetailHowTo = 'Hvordan gør jeg det?';
+z.string.da.participantDevicesDetailResetSession = 'Nulstil session';
+z.string.da.participantDevicesDetailShowMyDevice = 'Vis min enheds fingeraftryk';
+z.string.da.participantDevicesDetailVerify = 'Bekræftet';
 
-z.string.da.peopleLeaveHeadline = 'Forlad samtalen?';
-z.string.da.peopleLeaveMessage = 'Du vil ikke være i stand til at sende og modtage beskeder i denne samtale.';
+z.string.da.participantDevicesHeader = 'Enheder';
+z.string.da.participantDevicesHeadline = 'Wire giver hver enhed et unikt fingeraftryk. Sammenlign dem med {{user}} og bekræft din samtale.';
+z.string.da.participantDevicesLearnMore = 'Lær mere';
+z.string.da.participantDevicesWhyVerify = 'Hvorfor verificere samtaler?';
+z.string.da.participantDevicesOutdatedClientMessage = '{{user}} bruger en gammel version af Wire. Ingen enheder er vist her.';
 
-z.string.da.peopleRemoveHeadline = 'Fjern?';
-z.string.da.peopleRemoveMessage = '{{user}} vil ikke være i stand til at sende eller modtage beskeder i denne samtale.';
+z.string.da.participantDevicesSelfAllDevices = 'Vis alle mine enheder';
+z.string.da.participantDevicesSelfFingerprint = 'Enheds fingeraftryk';
 
-z.string.da.peopleUnblockHeadline = 'Fjern Blokering?';
-z.string.da.peopleUnblockMessage = '{{user}} vil igen kunne kontakte dig og tilføje dig til gruppesamtaler.';
-
-z.string.da.peopleButtonAdd = 'Tilføj';
-z.string.da.peopleButtonBlock = 'Blokér';
-z.string.da.peopleButtonCancel = 'Annuller';
-z.string.da.peopleButtonConnect = 'Forbind';
-z.string.da.peopleButtonCreate = 'Opret gruppe';
-z.string.da.peopleButtonIgnore = 'Ignorér';
-z.string.da.peopleButtonLeave = 'Forlad';
-z.string.da.peopleButtonOpen = 'Åben Samtale';
-z.string.da.peopleButtonPending = 'Afventer';
-z.string.da.peopleButtonProfile = 'Profil';
-z.string.da.peopleButtonRemove = 'Fjern';
-z.string.da.peopleButtonUnblock = 'Fjern Blokering';
-z.string.da.peopleButtonNo = 'Nej';
-z.string.da.peopleButtonYes = 'Ja';
+z.string.da.userProfileButtonConnect = 'Forbind';
+z.string.da.userProfileButtonIgnore = 'Ignorér';
+z.string.da.userProfileButtonUnblock = 'Fjern Blokering';
 
 z.string.da.preferencesAbout = 'Om';
 z.string.da.preferencesAccount = 'Konto';
@@ -420,6 +435,7 @@ z.string.da.searchCreateGroup = 'Opret gruppe';
 z.string.da.searchGroups = 'Grupper';
 z.string.da.searchPeople = 'Personer';
 z.string.da.searchPlaceholder = 'Søg på navn eller brugernavn';
+z.string.da.searchServicePlaceholder = 'Søg ved navn';
 z.string.da.searchServices = 'Tjenester';
 z.string.da.searchTeamMembers = 'Team medlemmer';
 z.string.da.searchTopPeople = 'Top personer';
@@ -427,14 +443,19 @@ z.string.da.searchTrySearch = 'Find personer ved navn eller Brugernavn';
 z.string.da.searchNoContactsOnWire = 'Du har ingen kontakter på Wire. Prøv at finde folk ved navn eller brugernavn.';
 z.string.da.searchOthers = 'Forbind';
 
+z.string.da.searchInvite = 'Inviter personer til Wire';
+z.string.da.searchInviteDetail = 'At dele dine kontakter hjælper med at forbinde til andre. Vi anonymiserer al information og deler det ikke med nogen andre.';
+z.string.da.searchInviteButtonContacts = 'Fra Kontakter';
+z.string.da.searchInviteButtonGmail = 'Fra Gmail';
+z.string.da.searchInviteHeadline = 'Få dine venner med';
+z.string.da.searchInviteShare = 'Del Kontakter';
+
+z.string.da.searchListEveryoneParticipates = 'Alle du er \nforbundet med er allerede i \ndenne samtale.';
+z.string.da.searchListNoMatches = 'Ingen passende resultater.\nPrøv at indtaste et andet navn.';
+
 z.string.da.uploadGoogleHeadline = 'Finde personer at snakke med.';
 z.string.da.uploadGoogleMessage = 'Vi bruger dine kontaktdata til at forbinde dig med andre. Vi anonymisere alle oplysninger og deler ikke det med alle andre.';
-z.string.da.uploadGoogleHeadlineError = 'Noget \ngik galt.';
-z.string.da.uploadGoogleMessageError = 'Vi har ikke modtaget dine oplysninger. Venligst prøv at importere dine kontakter igen.';
-z.string.da.uploadGoogleButtonAgain = 'Prøv igen';
 
-z.string.da.warningCallDetail = 'Din browser skal have adgang til mikrofonen for at foretage opkald.';
-z.string.da.warningCallHeadline = 'Kan ikke ringe uden mikrofon';
 z.string.da.warningCallUnsupportedIncoming = '{{user}} ringer. Din browser understøtter ikke opkald.';
 z.string.da.warningCallUnsupportedOutgoing = 'Du kan ikke ringe, fordi din browser ikke understøtter opkald.';
 z.string.da.warningCallIssues = 'Denne version af Wire kan ikke deltage i opkaldet. Brug venligst';
@@ -454,7 +475,6 @@ z.string.da.warningPermissionRequestCamera = '{{icon}} Tillad adgang til kamera'
 z.string.da.warningPermissionRequestMicrophone = '{{icon}} Tillad adgang til mikrofon';
 z.string.da.warningPermissionRequestNotification = '{{icon}} Tillad meddelelser';
 z.string.da.warningPermissionRequestScreen = '{{icon}} Tillad adgang til skærm';
-z.string.da.warningTellMeHow = 'Fortæl mig hvordan';
 
 z.string.da.userAvailabilityAvailable = 'Ledig';
 z.string.da.userAvailabilityNone = 'Ingen';
@@ -497,14 +517,7 @@ z.string.da.tooltipConversationsNotify = 'Unmute ({{shortcut}})';
 z.string.da.tooltipConversationsSilence = 'Mute ({{shortcut}})';
 z.string.da.tooltipConversationsStart = 'Start samtale ({{shortcut}})';
 
-z.string.da.tooltipPeopleAdd = 'Tilføj personer til samtalen ({{shortcut}})';
-z.string.da.tooltipPeopleBack = 'Tilbage';
-z.string.da.tooltipPeopleBlock = 'Blokér';
-z.string.da.tooltipPeopleConnect = 'Forbind';
-z.string.da.tooltipPeopleLeave = 'Forlad samtalen';
-z.string.da.tooltipPeopleRename = 'Ændre samtalens navn';
-z.string.da.tooltipPeopleRemove = 'Fjern fra samtale';
-z.string.da.tooltipPeopleUnblock = 'Fjern Blokering';
+z.string.da.tooltipConversationDetailsRename = 'Ændre samtalens navn';
 
 z.string.da.tooltipPreferencesContactsGmail = 'Log ind på din Gmail konto for at dele kontakter';
 z.string.da.tooltipPreferencesContactsMacos = 'Del alle dine kontakter fra macOS Kontakter app';

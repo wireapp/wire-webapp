@@ -157,7 +157,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     });
     this.ping_tooltip = z.l10n.text(
       z.string.tooltipConversationPing,
-      z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.PING)
+      z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.PING)
     );
     this.picture_tooltip = z.l10n.text(z.string.tooltipConversationPicture);
     this.ping_disabled = ko.observable(false);
@@ -268,13 +268,15 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     if (!this._is_hitting_upload_limit(files)) {
       for (const file of [...files]) {
         if (file.size > z.config.MAXIMUM_ASSET_FILE_SIZE) {
-          amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
-          window.setTimeout(() => {
-            amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.UPLOAD_TOO_LARGE, {
-              data: z.util.format_bytes(z.config.MAXIMUM_ASSET_FILE_SIZE),
-            });
-          }, 200);
-          return;
+          const fileSize = z.util.format_bytes(z.config.MAXIMUM_ASSET_FILE_SIZE);
+          const options = {
+            text: {
+              message: z.l10n.text(z.string.modalAssetTooLargeMessage, fileSize),
+              title: z.l10n.text(z.string.modalAssetTooLargeHeadline),
+            },
+          };
+
+          return amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, options);
         }
       }
 
@@ -317,11 +319,18 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   }
 
   _show_upload_warning(image) {
-    const string_id = image.type === 'image/gif' ? z.string.alertGifTooLarge : z.string.alertUploadTooLarge;
-    const warning_text = z.l10n.text(string_id, z.config.MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024);
+    const isGif = image.type === 'image/gif';
+    const messageStringId = isGif ? z.string.modalGifTooLargeMessage : z.string.modalPictureTooLargeMessage;
+    const titleStringId = isGif ? z.string.modalGifTooLargeHeadline : z.string.modalPictureTooLargeHeadline;
 
-    amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
-    window.setTimeout(() => window.alert(warning_text), 200);
+    const modalOptions = {
+      text: {
+        message: z.l10n.text(messageStringId, z.config.MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024),
+        title: z.l10n.text(titleStringId),
+      },
+    };
+
+    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
   }
 
   _is_hitting_upload_limit(files) {
@@ -329,9 +338,14 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     const is_hitting_upload_limit = pending_uploads + files.length > z.config.MAXIMUM_ASSET_UPLOADS;
 
     if (is_hitting_upload_limit) {
-      amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.UPLOAD_PARALLEL, {
-        data: z.config.MAXIMUM_ASSET_UPLOADS,
-      });
+      const modalOptions = {
+        text: {
+          message: z.l10n.text(z.string.modalAssetParallelUploadsMessage, z.config.MAXIMUM_ASSET_UPLOADS),
+          title: z.l10n.text(z.string.modalAssetParallelUploadsHeadline),
+        },
+      };
+
+      amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
     }
 
     return is_hitting_upload_limit;
@@ -355,7 +369,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   }
 
   on_window_click(event) {
-    if (!$(event.target).closest('.conversation-input').length) {
+    if (!$(event.target).closest('.conversation-input-bar').length) {
       this.cancel_edit();
     }
   }
@@ -374,10 +388,12 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     const message = z.util.StringUtil.trim_line_breaks(this.input());
 
     if (message.length > z.config.MAXIMUM_MESSAGE_LENGTH) {
-      amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.TOO_LONG_MESSAGE, {
-        data: z.config.MAXIMUM_MESSAGE_LENGTH,
+      return amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, {
+        text: {
+          message: z.l10n.text(z.string.modalConversationMessageTooLongMessage, z.config.MAXIMUM_MESSAGE_LENGTH),
+          title: z.l10n.text(z.string.modalConversationMessageTooLongHeadline),
+        },
       });
-      return;
     }
 
     if (this.is_editing()) {
