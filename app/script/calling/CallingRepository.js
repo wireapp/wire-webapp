@@ -905,19 +905,20 @@ z.calling.CallingRepository = class CallingRepository {
   /**
    * Remove a participant from an call if he was removed from the group.
    *
-   * @param {z.calling.entities.CallEntity} callEntity - Call entity
+   * @param {string} conversationId - ID of conversation
    * @param {string} userId - ID of user to be removed
    * @returns {undefined} No return value
    */
-  removeParticipant(callEntity, userId) {
-    callEntity
-      .getParticipantById(userId)
-      .then(() => {
-        const {id, sessionId} = callEntity;
-        const additionalPayload = z.calling.CallMessageBuilder.createPayload(id, this.selfUserId(), userId);
-        const callMessageEntity = z.calling.CallMessageBuilder.buildGroupLeave(false, sessionId, additionalPayload);
+  removeParticipant(conversationId, userId) {
+    this.getCallById(conversationId)
+      .then(callEntity => {
+        return callEntity.getParticipantById(userId).then(() => {
+          const {id, sessionId} = callEntity;
+          const additionalPayload = z.calling.CallMessageBuilder.createPayload(id, this.selfUserId(), userId);
+          const callMessageEntity = z.calling.CallMessageBuilder.buildGroupLeave(false, sessionId, additionalPayload);
 
-        this._onGroupLeave(callMessageEntity, z.calling.enum.TERMINATION_REASON.MEMBER_LEAVE);
+          this._onGroupLeave(callMessageEntity, z.calling.enum.TERMINATION_REASON.MEMBER_LEAVE);
+        });
       })
       .catch(error => {
         const isNotFound = error.type === z.calling.CallError.TYPE.NOT_FOUND;

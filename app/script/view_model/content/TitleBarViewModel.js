@@ -79,7 +79,7 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
       return !this.hasCall() && isSupportedConversation && isActiveConversation;
     });
 
-    const shortcut = z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.PEOPLE);
+    const shortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.PEOPLE);
     this.peopleTooltip = z.l10n.text(z.string.tooltipConversationPeople, shortcut);
   }
 

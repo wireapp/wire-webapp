@@ -89,6 +89,16 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
       }
     });
 
+    this.isGuest = ko.pureComputed(() => {
+      return (
+        this.hasConversation() &&
+        this.isSingleUserMode() &&
+        this.conversationEntity()
+          .firstUserEntity()
+          .is_guest()
+      );
+    });
+
     this.isActiveParticipant = ko.pureComputed(() => {
       if (this.hasConversation()) {
         return !this.conversationEntity().removed_from_conversation() && !this.conversationEntity().is_guest();
@@ -159,7 +169,7 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
       .computed(() => this.serviceParticipants() && this.userParticipants() && this.isVisible())
       .extend({notify: 'always', rateLimit: 500});
 
-    const addPeopleShortcut = z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.ADD_PEOPLE);
+    const addPeopleShortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.ADD_PEOPLE);
     this.addPeopleTooltip = ko.pureComputed(() => {
       return z.l10n.text(z.string.tooltipConversationDetailsAddPeople, addPeopleShortcut);
     });

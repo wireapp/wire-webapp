@@ -23,9 +23,9 @@ window.z = window.z || {};
 window.z.ui = z.ui || {};
 
 (function() {
-  const shortcut_map = {};
+  const shortcutMap = {};
 
-  shortcut_map[z.ui.ShortcutType.ADD_PEOPLE] = {
+  shortcutMap[z.ui.ShortcutType.ADD_PEOPLE] = {
     event: z.event.WebApp.SHORTCUT.ADD_PEOPLE,
     shortcut: {
       electron: {
@@ -40,7 +40,7 @@ window.z.ui = z.ui || {};
     },
   };
 
-  shortcut_map[z.ui.ShortcutType.ARCHIVE] = {
+  shortcutMap[z.ui.ShortcutType.ARCHIVE] = {
     event: z.event.WebApp.SHORTCUT.ARCHIVE,
     shortcut: {
       electron: {
@@ -55,7 +55,7 @@ window.z.ui = z.ui || {};
     },
   };
 
-  shortcut_map[z.ui.ShortcutType.CALL_REJECT] = {
+  shortcutMap[z.ui.ShortcutType.CALL_REJECT] = {
     event: z.event.WebApp.SHORTCUT.CALL_REJECT,
     shortcut: {
       electron: {
@@ -69,7 +69,7 @@ window.z.ui = z.ui || {};
     },
   };
 
-  shortcut_map[z.ui.ShortcutType.CALL_MUTE] = {
+  shortcutMap[z.ui.ShortcutType.CALL_MUTE] = {
     event: z.event.WebApp.SHORTCUT.CALL_MUTE,
     shortcut: {
       electron: {
@@ -83,7 +83,7 @@ window.z.ui = z.ui || {};
     },
   };
 
-  shortcut_map[z.ui.ShortcutType.PREV] = {
+  shortcutMap[z.ui.ShortcutType.PREV] = {
     event: z.event.WebApp.SHORTCUT.PREV,
     shortcut: {
       electron: {
@@ -98,7 +98,7 @@ window.z.ui = z.ui || {};
     },
   };
 
-  shortcut_map[z.ui.ShortcutType.NEXT] = {
+  shortcutMap[z.ui.ShortcutType.NEXT] = {
     event: z.event.WebApp.SHORTCUT.NEXT,
     shortcut: {
       electron: {
@@ -113,7 +113,7 @@ window.z.ui = z.ui || {};
     },
   };
 
-  shortcut_map[z.ui.ShortcutType.PING] = {
+  shortcutMap[z.ui.ShortcutType.PING] = {
     event: z.event.WebApp.SHORTCUT.PING,
     shortcut: {
       electron: {
@@ -128,7 +128,7 @@ window.z.ui = z.ui || {};
     },
   };
 
-  shortcut_map[z.ui.ShortcutType.PEOPLE] = {
+  shortcutMap[z.ui.ShortcutType.PEOPLE] = {
     event: z.event.WebApp.SHORTCUT.PEOPLE,
     shortcut: {
       electron: {
@@ -143,7 +143,7 @@ window.z.ui = z.ui || {};
     },
   };
 
-  shortcut_map[z.ui.ShortcutType.SILENCE] = {
+  shortcutMap[z.ui.ShortcutType.SILENCE] = {
     event: z.event.WebApp.SHORTCUT.SILENCE,
     shortcut: {
       electron: {
@@ -158,7 +158,7 @@ window.z.ui = z.ui || {};
     },
   };
 
-  shortcut_map[z.ui.ShortcutType.START] = {
+  shortcutMap[z.ui.ShortcutType.START] = {
     event: z.event.WebApp.SHORTCUT.START,
     shortcut: {
       electron: {
@@ -173,18 +173,18 @@ window.z.ui = z.ui || {};
     },
   };
 
-  function _register_event(platform_specific_shortcut, event) {
+  function _registerEvent(platformSpecificShortcut, event) {
     // bind also 'command + alt + n' for start shortcut
-    if (z.util.StringUtil.includes(platform_specific_shortcut, 'graveaccent')) {
-      const replaced_shortcut = platform_specific_shortcut.replace('graveaccent', 'n');
-      _register_event(replaced_shortcut, event);
+    if (z.util.StringUtil.includes(platformSpecificShortcut, 'graveaccent')) {
+      const replacedShortcut = platformSpecificShortcut.replace('graveaccent', 'n');
+      _registerEvent(replacedShortcut, event);
     }
 
-    return keyboardJS.on(platform_specific_shortcut, inputEvent => {
+    return keyboardJS.on(platformSpecificShortcut, inputEvent => {
       keyboardJS.releaseKey(inputEvent.keyCode);
 
       // hotfix WEBAPP-1916
-      if (z.util.StringUtil.includes(platform_specific_shortcut, 'command') && !inputEvent.metaKey) {
+      if (z.util.StringUtil.includes(platformSpecificShortcut, 'command') && !inputEvent.metaKey) {
         return;
       }
 
@@ -193,7 +193,7 @@ window.z.ui = z.ui || {};
     });
   }
 
-  function get_beautified_shortcut_mac(shortcut) {
+  function getBeautifiedShortcutMac(shortcut) {
     return shortcut
       .replace(/\+/g, '')
       .replace(/\s+/g, '')
@@ -206,7 +206,7 @@ window.z.ui = z.ui || {};
       .toUpperCase();
   }
 
-  function get_beautified_shortcut_win(shortcut) {
+  function getBeautifiedShortcutWin(shortcut) {
     return shortcut
       .replace('up', '↑')
       .replace('down', '↓')
@@ -214,39 +214,39 @@ window.z.ui = z.ui || {};
       .replace(/\w+/g, string => z.util.StringUtil.capitalize_first_char(string));
   }
 
-  function get_shortcut(shortcut_name) {
+  function getShortcut(shortcutName) {
     const platform = z.util.Environment.desktop ? 'electron' : 'webapp';
-    const platform_shortcuts = shortcut_map[shortcut_name].shortcut[platform];
-    return z.util.Environment.os.mac ? platform_shortcuts.macos : platform_shortcuts.pc;
+    const platformShortcuts = shortcutMap[shortcutName].shortcut[platform];
+    return z.util.Environment.os.mac ? platformShortcuts.macos : platformShortcuts.pc;
   }
 
-  function get_shortcut_tooltip(shortcut_name) {
-    const shortcut = get_shortcut(shortcut_name);
+  function getShortcutTooltip(shortcutName) {
+    const shortcut = getShortcut(shortcutName);
     if (shortcut) {
       if (z.util.Environment.os.mac) {
-        return get_beautified_shortcut_mac(shortcut);
+        return getBeautifiedShortcutMac(shortcut);
       }
-      return get_beautified_shortcut_win(shortcut);
+      return getBeautifiedShortcutWin(shortcut);
     }
   }
 
   function _init() {
-    for (const shortcut in shortcut_map) {
-      const data = shortcut_map[shortcut];
-      if (z.util.Environment.desktop && shortcut_map[shortcut].shortcut.electron.menu) {
+    for (const shortcut in shortcutMap) {
+      const data = shortcutMap[shortcut];
+      if (z.util.Environment.desktop && shortcutMap[shortcut].shortcut.electron.menu) {
         continue;
       }
-      _register_event(get_shortcut(shortcut), data.event);
+      _registerEvent(getShortcut(shortcut), data.event);
     }
   }
 
   _init();
 
   z.ui.Shortcut = {
-    get_beautified_shortcut_mac: get_beautified_shortcut_mac,
-    get_beautified_shortcut_win: get_beautified_shortcut_win,
-    get_shortcut: get_shortcut,
-    get_shortcut_tooltip: get_shortcut_tooltip,
-    shortcut_map: shortcut_map,
+    getBeautifiedShortcutMac: getBeautifiedShortcutMac,
+    getBeautifiedShortcutWin: getBeautifiedShortcutWin,
+    getShortcut: getShortcut,
+    getShortcutTooltip: getShortcutTooltip,
+    shortcutMap: shortcutMap,
   };
 })();

@@ -169,6 +169,11 @@
         fill: fade(@graphite-dark, 40%);
       }
     }
+
+    &.disabled {
+      pointer-events: none;
+      opacity: 0.4;
+    }
   }
 
   &__header {
@@ -177,8 +182,14 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 16px;
     opacity: 1;
+
+    & > .icon-button {
+      width: @content-title-bar-height;
+      height: @content-title-bar-height;
+      display: flex;
+      justify-content: center;
+    }
 
     path {
       fill: @graphite-dark;

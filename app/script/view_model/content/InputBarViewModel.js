@@ -157,7 +157,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     });
     this.ping_tooltip = z.l10n.text(
       z.string.tooltipConversationPing,
-      z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.PING)
+      z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.PING)
     );
     this.picture_tooltip = z.l10n.text(z.string.tooltipConversationPicture);
     this.ping_disabled = ko.observable(false);
