@@ -47,6 +47,9 @@ z.viewModel.panel.GroupParticipantViewModel = class GroupParticipantViewModel {
     this.selectedParticipant = ko.observable(undefined);
     this.selectedService = ko.observable(undefined);
 
+    this.isTeam = ko.pureComputed(() => this.selectedParticipant().is_team_member());
+    this.isGuest = ko.pureComputed(() => this.selectedParticipant().is_guest());
+
     this.isVisible = ko.pureComputed(() => this.panelViewModel.groupParticipantVisible() && this.selectedParticipant());
 
     this.selectedIsConnected = ko.pureComputed(() => {
