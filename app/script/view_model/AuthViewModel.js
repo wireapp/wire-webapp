@@ -378,7 +378,8 @@ z.viewModel.AuthViewModel = class AuthViewModel {
         this._setTabsCheckInterval();
       }
 
-      if (Cookies.get(z.main.App.CONFIG.TABS_CHECK.COOKIE_NAME)) {
+      const hasTabsCheckCookie = !!Cookies.get(z.main.App.CONFIG.TABS_CHECK.COOKIE_NAME);
+      if (hasTabsCheckCookie) {
         const currentHash = this._get_hash();
 
         if (!this.previousHash) {
@@ -424,7 +425,8 @@ z.viewModel.AuthViewModel = class AuthViewModel {
           }
         })
         .catch(error => {
-          if (error.type !== z.auth.AuthError.TYPE.MULTIPLE_TABS) {
+          const isMultipleTabs = error.type === z.auth.AuthError.TYPE.MULTIPLE_TABS;
+          if (!isMultipleTabs) {
             throw error;
           }
         });
@@ -816,6 +818,11 @@ z.viewModel.AuthViewModel = class AuthViewModel {
 
   clicked_on_change_phone() {
     this._set_hash(z.auth.AuthView.MODE.ACCOUNT_PHONE);
+  }
+
+  clickOnHandover() {
+    Cookies.remove(z.main.App.CONFIG.COOKIES_CHECK.COOKIE_NAME);
+    this._checkSingleInstance();
   }
 
   clicked_on_login_password() {

@@ -36,8 +36,7 @@ z.main.App = class App {
       NOTIFICATION_CHECK: 10 * 1000,
       TABS_CHECK: {
         COOKIE_NAME: 'app_opened',
-        COOKIE_TIMEOUT: 5 * 60 * 1000,
-        RENEWAL_THRESHOLD: 15 * 1000,
+        INTERVAL: 1000,
       },
     };
   }
@@ -58,6 +57,8 @@ z.main.App = class App {
     this.repository = this._setup_repositories();
     this.view = this._setup_view_models();
     this.util = this._setup_utils();
+
+    this.instanceId = '';
 
     this._subscribe_to_events();
 
@@ -237,7 +238,7 @@ z.main.App = class App {
   init_app(is_reload = this._is_reload()) {
     z.util
       .check_indexed_db()
-      .then(() => this._check_single_instance())
+      .then(() => this._checkSingleInstanceOnInit())
       .then(() => this._load_access_token())
       .then(() => {
         this.view.loading.updateProgress(2.5);
@@ -469,24 +470,6 @@ z.main.App = class App {
   }
 
   /**
-   * Check that this is the single instance tab of the app.
-   * @returns {Promise} Resolves when page is the first tab
-   */
-  _check_single_instance() {
-    if (!z.util.Environment.electron) {
-      const cookie_name = App.CONFIG.TABS_CHECK.COOKIE_NAME;
-      if (Cookies.get(cookie_name)) {
-        return Promise.reject(new z.auth.AuthError(z.auth.AuthError.TYPE.MULTIPLE_TABS));
-      }
-
-      this._set_single_instance_cookie();
-      $(window).on('beforeunload', () => Cookies.remove(cookie_name));
-    }
-
-    return Promise.resolve();
-  }
-
-  /**
    * Get the self user from the backend.
    * @returns {Promise<z.entity.User>} Resolves with the self user entity
    */
@@ -559,16 +542,64 @@ z.main.App = class App {
     return get_cached_token ? this.auth.repository.getCachedAccessToken() : this.auth.repository.getAccessToken();
   }
 
+  //##############################################################################
+  // Multiple tabs check
+  //##############################################################################
+
+  /**
+   * Check that this is the single instance tab of the app.
+   * @returns {Promise} Resolves when page is the first tab
+   */
+  _checkSingleInstanceOnInit() {
+    if (!z.util.Environment.electron) {
+      return this._checkSingleInstanceCookie().then(() => this._setSingleInstanceCookie());
+    }
+
+    return Promise.resolve();
+  }
+
+  _checkSingleInstanceOnInterval() {
+    this._checkSingleInstanceCookie().catch(error => {
+      const isMultipleTabs = error.type === z.auth.AuthError.TYPE.MULTIPLE_TABS;
+      if (isMultipleTabs) {
+        return this._redirect_to_login(z.auth.SIGN_OUT_REASON.MULTIPLE_TABS);
+      }
+
+      throw error;
+    });
+  }
+
+  _checkSingleInstanceCookie() {
+    const singleInstanceCookieSet = !!Cookies.get(App.CONFIG.TABS_CHECK.COOKIE_NAME);
+    if (singleInstanceCookieSet) {
+      return Promise.reject(new z.auth.AuthError(z.auth.AuthError.TYPE.MULTIPLE_TABS));
+    }
+
+    return Promise.resolve();
+  }
+
   /**
    * Set the cookie to verify we are running a single instace tab.
    * @returns {undefined} No return value
    */
-  _set_single_instance_cookie() {
-    const cookie_timeout = new Date(Date.now() + App.CONFIG.TABS_CHECK.COOKIE_TIMEOUT);
-    Cookies.set(App.CONFIG.TABS_CHECK.COOKIE_NAME, true, {expires: cookie_timeout});
+  _setSingleInstanceCookie() {
+    this.instanceId = z.util.create_random_uuid();
+    const cookieData = {appInstanceId: this.instanceId};
+    Cookies.set(App.CONFIG.TABS_CHECK.COOKIE_NAME, cookieData);
 
-    const renewal_timeout = App.CONFIG.TABS_CHECK.COOKIE_TIMEOUT - App.CONFIG.TABS_CHECK.RENEWAL_THRESHOLD;
-    window.setTimeout(() => this._set_single_instance_cookie(), renewal_timeout);
+    window.setInterval(() => this._checkSingleInstanceOnInterval(), App.CONFIG.TABS_CHECK.INTERVAL);
+    this._registerSingleInstanceCookieDeletion();
+  }
+
+  _registerSingleInstanceCookieDeletion() {
+    $(window).on('beforeunload', () => {
+      const singleInstanceCookie = Cookies.getJSON(App.CONFIG.TABS_CHECK.COOKIE_NAME);
+
+      const isOwnInstanceId = singleInstanceCookie && singleInstanceCookie.appInstanceId === this.instanceId;
+      if (isOwnInstanceId) {
+        Cookies.remove(App.CONFIG.TABS_CHECK.COOKIE_NAME);
+      }
+    });
   }
 
   /**
