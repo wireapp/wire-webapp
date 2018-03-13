@@ -7,9 +7,10 @@ import DecryptionError from './DecryptionError';
 import InvalidPreKeyFormatError from './InvalidPreKeyFormatError';
 import {CryptoboxCRUDStore} from './store/root';
 import LRUCache from '@wireapp/lru-cache';
-import EventEmitter = require('events');
 import {PriorityQueue} from '@wireapp/priority-queue';
 import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine/';
+import EventEmitter = require('events');
+
 const logdown = require('logdown');
 
 export interface SessionFromMessageTuple extends Array<CryptoboxSession | Uint8Array> {
@@ -32,7 +33,7 @@ class Cryptobox extends EventEmitter {
     markdown: false,
   });
   private minimumAmountOfPreKeys: number;
-  private queue: PriorityQueue = new PriorityQueue({maxRetries: 0});
+  private queues = new LRUCache(1000);
   private store: CryptoboxCRUDStore;
 
   public lastResortPreKey: ProteusKeys.PreKey | undefined;
@@ -58,6 +59,17 @@ class Cryptobox extends EventEmitter {
     this.logger.log(
       `Constructed Cryptobox. Minimum amount of PreKeys is "${minimumAmountOfPreKeys}". Storage engine is "${storageEngine}".`
     );
+  }
+
+  private get_session_queue(session_id: string): PriorityQueue {
+    let queue = <PriorityQueue | undefined>this.queues.get(session_id);
+
+    if (!queue) {
+      queue = new PriorityQueue({maxRetries: 0});
+      this.queues.set(session_id, queue);
+    }
+
+    return queue;
   }
 
   private save_session_in_cache(session: CryptoboxSession): CryptoboxSession {
@@ -335,7 +347,7 @@ class Cryptobox extends EventEmitter {
     let encryptedBuffer: ArrayBuffer;
     let loadedSession: CryptoboxSession;
 
-    return this.queue.add(() => {
+    return this.get_session_queue(session_id).add(() => {
       return Promise.resolve()
         .then(() => {
           if (pre_key_bundle) {
@@ -365,7 +377,7 @@ class Cryptobox extends EventEmitter {
       return Promise.reject(new DecryptionError('Cannot decrypt an empty ArrayBuffer.'));
     }
 
-    return this.queue.add(() => {
+    return this.get_session_queue(session_id).add(() => {
       return (
         this.session_load(session_id)
           .catch(() => this.session_from_message(session_id, ciphertext))

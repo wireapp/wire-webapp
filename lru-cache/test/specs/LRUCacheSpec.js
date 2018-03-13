@@ -48,13 +48,11 @@ describe('LRUCache', () => {
     });
   });
 
-  describe('"oldest"', () => {
-    it("returns the Node's value which was added first", () => {
+  describe('"get"', () => {
+    it('returns "undefined" if a value is not available', () => {
       const cache = new LRUCache(3);
-      cache.set('1', 'Apple');
-      cache.set('2', 'Orange');
-      cache.set('3', 'Tomato');
-      expect(cache.oldest()).toBe('Apple');
+      const value = cache.get('not-existing');
+      expect(value).toBe(undefined);
     });
   });
 
@@ -75,6 +73,16 @@ describe('LRUCache', () => {
       cache.set('2', 'Orange');
       cache.set('3', 'Tomato');
       expect(cache.latest()).toBe('Tomato');
+    });
+  });
+
+  describe('"oldest"', () => {
+    it("returns the Node's value which was added first", () => {
+      const cache = new LRUCache(3);
+      cache.set('1', 'Apple');
+      cache.set('2', 'Orange');
+      cache.set('3', 'Tomato');
+      expect(cache.oldest()).toBe('Apple');
     });
   });
 
