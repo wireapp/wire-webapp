@@ -127,7 +127,7 @@
     "react-hot-loader": "4.0.0",
     "redux-devtools-extension": "2.13.2",
     "redux-mock-store": "1.5.1",
-    "request": "2.83.0",
+    "request": "2.85.0",
     "sass-loader": "6.0.7",
     "script-loader": "0.7.2",
     "sinon": "4.4.4",
