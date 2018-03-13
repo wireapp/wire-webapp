@@ -89,6 +89,16 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
       }
     });
 
+    this.isGuest = ko.pureComputed(() => {
+      return (
+        this.hasConversation() &&
+        this.isSingleUserMode() &&
+        this.conversationEntity()
+          .firstUserEntity()
+          .is_guest()
+      );
+    });
+
     this.isActiveParticipant = ko.pureComputed(() => {
       if (this.hasConversation()) {
         return !this.conversationEntity().removed_from_conversation() && !this.conversationEntity().is_guest();
