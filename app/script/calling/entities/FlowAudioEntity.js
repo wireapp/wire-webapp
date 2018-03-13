@@ -36,7 +36,10 @@ z.calling.entities.FlowAudioEntity = class FlowAudioEntity {
 
     this.flowEntity = flowEntity;
     this.mediaRepository = mediaRepository;
-    this.logger = new z.util.Logger(`z.calling.entities.FlowAudio (${this.flowEntity.id})`, z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.CallingLogger(
+      `z.calling.entities.FlowAudio (${this.flowEntity.id})`,
+      z.config.LOGGER.OPTIONS
+    );
 
     this.audioContext = undefined;
 

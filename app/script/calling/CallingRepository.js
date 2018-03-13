@@ -27,7 +27,6 @@ z.calling.CallingRepository = class CallingRepository {
     return {
       DATA_CHANNEL_MESSAGE_TYPES: [z.calling.enum.CALL_MESSAGE_TYPE.HANGUP, z.calling.enum.CALL_MESSAGE_TYPE.PROP_SYNC],
       DEFAULT_CONFIG_TTL: 60 * 60, // 60 minutes in seconds
-      MESSAGE_LOG_LENGTH: 250,
       PROTOCOL_VERSION: '3.0',
     };
   }
@@ -65,7 +64,7 @@ z.calling.CallingRepository = class CallingRepository {
     this.conversationRepository = conversationRepository;
     this.mediaRepository = mediaRepository;
     this.userRepository = userRepository;
-    this.logger = new z.util.Logger('z.calling.CallingRepository', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.CallingLogger('z.calling.CallingRepository', z.config.LOGGER.OPTIONS);
 
     this.selfUserId = ko.pureComputed(() => {
       if (this.userRepository.self()) {
@@ -105,6 +104,7 @@ z.calling.CallingRepository = class CallingRepository {
 
     this.shareCallStates();
     this.subscribeToEvents();
+    this.setDebugState(true);
   }
   /**
    * Share call states with MediaRepository.
@@ -131,7 +131,6 @@ z.calling.CallingRepository = class CallingRepository {
     amplify.subscribe(z.event.WebApp.DEBUG.UPDATE_LAST_CALL_STATUS, this.storeFlowStatus.bind(this));
     amplify.subscribe(z.event.WebApp.EVENT.UPDATE_TIME_OFFSET, this.updateTimeOffset.bind(this));
     amplify.subscribe(z.event.WebApp.LIFECYCLE.LOADED, this.getConfig);
-    amplify.subscribe(z.util.Logger.prototype.LOG_ON_DEBUG, this.setDebugState.bind(this));
   }
 
   //##############################################################################
@@ -1419,18 +1418,9 @@ z.calling.CallingRepository = class CallingRepository {
    * @returns {undefined} No return value
    */
   setDebugState(isDebuggingEnabled) {
-    const isStateChange = this.debugEnabled !== isDebuggingEnabled;
-    if (isStateChange) {
-      this.debugEnabled = isDebuggingEnabled;
-      this.logger.debug(`Debugging enabled state set to '${isDebuggingEnabled}'`);
-      if (!isDebuggingEnabled) {
-        this.messageLog.length = 0;
-      }
-    }
-
-    if (adapter) {
+    if (window.adapter) {
       this.logger.debug(`Set logging for WebRTC Adapter: ${isDebuggingEnabled}`);
-      adapter.disableLog = !isDebuggingEnabled;
+      window.adapter.disableLog = !isDebuggingEnabled;
     }
   }
 
@@ -1455,10 +1445,6 @@ z.calling.CallingRepository = class CallingRepository {
    * @returns {undefined} No return value
    */
   _logMessage(isOutgoing, callMessageEntity, date = new Date().toISOString()) {
-    while (this.messageLog.length >= CallingRepository.CONFIG.MESSAGE_LOG_LENGTH) {
-      this.messageLog.shift();
-    }
-
     const {conversationId, destinationUserId, remoteUserId, response, type, userId} = callMessageEntity;
 
     let logMessage;
@@ -1478,11 +1464,6 @@ z.calling.CallingRepository = class CallingRepository {
     }
 
     this.logger.info(logMessage, callMessageEntity);
-
-    if (this.debugEnabled) {
-      const logEntry = {date, log: logMessage, message: callMessageEntity};
-      this.messageLog.push(logEntry);
-    }
   }
 
   /**
@@ -1495,5 +1476,18 @@ z.calling.CallingRepository = class CallingRepository {
   _sendReport(customData) {
     Raygun.send(new Error('Call failure report'), customData);
     this.logger.debug(`Reported status of flow id '${customData.meta.flowId}' for call analysis`, customData);
+  }
+
+  _saveReport() {
+    if (this.messageLog.length < 1) {
+      return false;
+    }
+
+    const blob = new Blob([this.messageLog.concat('\r\n')], {
+      type: 'text/plain;charset=utf-8',
+    });
+    const currentDate = new Date().toISOString().replace(' ', '-');
+    FileSaver.saveAs(blob, `CallLogs-${currentDate}.txt`);
+    return true;
   }
 };

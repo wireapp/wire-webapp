@@ -51,7 +51,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
     this.id = this.participantEntity.id;
     this.conversationId = this.callEntity.id;
 
-    this.logger = new z.util.Logger(`z.calling.entities.FlowEntity (${this.id})`, z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.CallingLogger(`z.calling.entities.FlowEntity (${this.id})`, z.config.LOGGER.OPTIONS);
 
     // States
     this.isAnswer = ko.observable(false);

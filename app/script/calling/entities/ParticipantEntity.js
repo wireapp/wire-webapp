@@ -38,7 +38,10 @@ z.calling.entities.ParticipantEntity = class ParticipantEntity {
     this.id = this.user.id;
     this.sessionId = undefined;
 
-    this.logger = new z.util.Logger(`z.calling.entities.ParticipantEntity (${this.id})`, z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.CallingLogger(
+      `z.calling.entities.ParticipantEntity (${this.id})`,
+      z.config.LOGGER.OPTIONS
+    );
 
     this.isConnected = ko.observable(false);
     this.panning = ko.observable(0.0);

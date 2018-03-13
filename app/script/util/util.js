@@ -779,6 +779,39 @@ z.util.afterRender = callback => {
 
 /**
  * No operation
- * @returns {undefined}
+ * @returns {void}
  */
 z.util.noop = function() {};
+
+/*
+ * Call Logging function
+ */
+z.util.CallingLog = [];
+z.util.CallingLogger = class CallingLogger extends z.util.Logger {
+  constructor(message, options) {
+    super(message, options);
+  }
+
+  static get CONFIG() {
+    return {
+      MESSAGE_LOG_LENGTH: 10000,
+    };
+  }
+
+  _log_to_memory(args) {
+    while (z.util.CallingLog.length >= CallingLogger.CONFIG.MESSAGE_LOG_LENGTH) {
+      z.util.CallingLog.shift();
+    }
+
+    const logEntry = {
+      date: new Date().toISOString(),
+      event: args,
+    };
+    z.util.CallingLog.push(logEntry);
+  }
+
+  _print_log(args) {
+    super._print_log(args);
+    this._log_to_memory(args);
+  }
+};
