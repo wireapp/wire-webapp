@@ -59,6 +59,10 @@ z.conversation.ConversationStateHandler = class ConversationStateHandler {
             .then(() => {
               conversationEntity.accessState(accessState);
 
+              if (changeToTeamOnly) {
+                conversationEntity.accessCode(undefined);
+              }
+
               const attribute = {is_allow_guests: changeToGuestRoom};
               amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.GUEST_ROOMS.ALLOW_GUESTS, attribute);
             })
