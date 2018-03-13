@@ -2386,7 +2386,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   upload_images(conversation_et, images) {
     if (this._can_upload_assets_to_conversation(conversation_et)) {
-      [...images].forEach(image => this.send_image_asset(conversation_et, image));
+      Array.from(images).forEach(image => this.send_image_asset(conversation_et, image));
     }
   }
 
@@ -2399,7 +2399,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   upload_files(conversation_et, files) {
     if (this._can_upload_assets_to_conversation(conversation_et)) {
-      [...files].forEach(file => this.upload_file(conversation_et, file));
+      Array.from(files).forEach(file => this.upload_file(conversation_et, file));
     }
   }
 

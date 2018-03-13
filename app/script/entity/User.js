@@ -159,9 +159,9 @@ z.entity.User = class User {
     this.isTemporaryGuest = ko.observable(false);
     this.is_team_member = ko.observable(false);
     this.team_role = ko.observable(z.team.TeamRole.ROLE.NONE);
-    this.is_team_manager = ko.pureComputed(() =>
-      [z.team.TeamRole.ROLE.ADMIN, z.team.TeamRole.ROLE.OWNER].includes(this.team_role())
-    );
+    this.isTeamManager = ko.pureComputed(() => {
+      return [z.team.TeamRole.ROLE.ADMIN, z.team.TeamRole.ROLE.OWNER].includes(this.team_role());
+    });
     this.isTeamOwner = ko.pureComputed(() => z.team.TeamRole.ROLE.OWNER === this.team_role());
 
     this.is_request = ko.pureComputed(() => this.connection().is_request());
