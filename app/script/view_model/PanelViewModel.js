@@ -267,11 +267,11 @@ z.viewModel.PanelViewModel = class PanelViewModel {
 
   _openPanel(newState) {
     if (!this.isAnimating()) {
-      const isVisible = this.isVisible();
+      const wasVisible = this.isVisible();
       this.isAnimating(true);
       this.exitingState(undefined);
       this.isVisible(true);
-      this.switchState(newState, true, !isVisible);
+      this.switchState(newState, true, !wasVisible);
       this.mainViewModel.openPanel().then(() => this.isAnimating(false));
     }
   }
