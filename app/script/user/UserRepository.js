@@ -215,7 +215,7 @@ z.user.UserRepository = class UserRepository {
     const is_self_user = user.id === this.self().id;
     const user_promise = is_self_user ? Promise.resolve(this.self()) : this.get_user_by_id(user.id);
     return user_promise.then(user_et => {
-      this.user_mapper.update_user_from_object(user_et, user);
+      this.user_mapper.updateUserFromObject(user_et, user);
 
       if (is_self_user) {
         amplify.publish(z.event.WebApp.TEAM.UPDATE_INFO);
@@ -705,7 +705,7 @@ z.user.UserRepository = class UserRepository {
         return this.save_user(user_et, true);
       })
       .catch(error => {
-        this.logger.error(`Unable to load self user: ${error}`);
+        this.logger.error(`Unable to load self user: ${error.message || error}`, [error]);
         throw error;
       });
   }
@@ -868,7 +868,7 @@ z.user.UserRepository = class UserRepository {
 
     return Promise.all([get_current_user(user_id), this.user_service.get_user_by_id(user_id)])
       .then(([current_user_et, updated_user_data]) =>
-        this.user_mapper.update_user_from_object(current_user_et, updated_user_data)
+        this.user_mapper.updateUserFromObject(current_user_et, updated_user_data)
       )
       .then(updated_user_et => {
         if (this.isTeam()) {
