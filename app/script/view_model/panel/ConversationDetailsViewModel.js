@@ -169,7 +169,7 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
       .computed(() => this.serviceParticipants() && this.userParticipants() && this.isVisible())
       .extend({notify: 'always', rateLimit: 500});
 
-    const addPeopleShortcut = z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.ADD_PEOPLE);
+    const addPeopleShortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.ADD_PEOPLE);
     this.addPeopleTooltip = ko.pureComputed(() => {
       return z.l10n.text(z.string.tooltipConversationDetailsAddPeople, addPeopleShortcut);
     });
