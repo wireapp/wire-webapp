@@ -241,6 +241,12 @@
           <!-- /ko -->
         <!-- /ko -->
       </div>
+      <!-- ko if: message.isGroupCreation() && $parent.showInvitePeople() -->
+        <div class="message-group-creation-header">
+          <div>People outside your team can join this conversation.</div>
+          <div class="message-group-creation-header-button" data-bind="click: $parent.clickOnInvitePeople">Invite people</div>
+        </div>
+      <!-- /ko -->
     <!-- /ko -->
   <!-- /ko -->
 </script>
