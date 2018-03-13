@@ -26,11 +26,6 @@ z.string.lt.and = 'ir';
 z.string.lt.enumerationAnd = ', ir ';
 
 //=Įkeliama
-z.string.lt.alertUploadFileFormat = 'Neįmanoma naudoti šio paveikslėlio.\nPasirinkite PNG arba JPEG failą.';
-z.string.lt.alertUploadTooSmall = 'Neįmanoma naudoti šio paveikslėlio.\nPasirinkite paveikslėlį, kuris būtų bent 320 x 320 pikselių.';
-z.string.lt.alertUploadTooLarge = 'Šis paveikslas yra per didelis.\nJūs galite įkelti failus iki {{number}} MB.';
-z.string.lt.alertGifTooLarge = 'Animacija yra per didelė.\nDidžiausias dydis yra {{number}} MB.';
-
 z.string.lt.authAccountCountryCode = 'Šalies kodas';
 z.string.lt.authAccountDeletion = 'Buvote atjungti, nes jūsų paskyra buvo ištrinta.';
 z.string.lt.authAccountExpiration = 'Buvote atjungti, nes baigėsi jūsų seansas. Prisijunkite dar kartą.';
@@ -105,80 +100,128 @@ z.string.lt.callJoin = 'Prisijungti';
 z.string.lt.callChooseSharedScreen = 'Pasirinkite ekraną, kurį bendrinti';
 z.string.lt.callParticipants = '{{number}} kalba';
 
-z.string.lt.modalButtonCancel = 'Atsisakyti';
-z.string.lt.modalButtonOk = 'Gerai';
-z.string.lt.modalButtonSend = 'Siųsti';
+z.string.lt.modalAcknowledgeAction = 'Gerai';
+z.string.lt.modalConfirmSecondary = 'Atsisakyti';
+z.string.lt.modalOptionSecondary = 'Atsisakyti';
 
-z.string.lt.modalBlockConversationHeadline = 'Užblokuoti {{user}}?';
-z.string.lt.modalBlockConversationMessage = '{{user}} negalės su jumis susisiekti ar pridėti jus į grupės pokalbius.';
-z.string.lt.modalBlockConversationButton = 'Užblokuoti';
-z.string.lt.modalBotsConfirmHeadline = 'Pridėti paslaugą';
-z.string.lt.modalBotsConfirmMessage = 'Ar tikrai norite pradėti susirašinėjimą su {{name}}?';
-z.string.lt.modalBotsConfirmButton = 'Patvirtinti';
-z.string.lt.modalBotsUnavailableHeadline = 'Šiuo metu robotai negalimi';
-z.string.lt.modalBotsUnavailableMessage = 'Dėkojame, kad domitės robotais. Paslauga šiuo metu yra pristabdyta tol, kol mes ruošiame kitą versiją. Sekite naujienas.';
-z.string.lt.modalCallConversationEmptyHeadline = 'Nėra kam skambinti';
-z.string.lt.modalCallConversationEmptyMessage = 'Čia daugiau nieko nėra.';
-z.string.lt.modalCallNoVideoInGroupHeadline = 'Vaizdo skambučiai grupėse nepalaikomi';
-z.string.lt.modalCallNoVideoInGroupMessage = 'Vaizdo skambučiai grupės pokalbiuose yra neprieinami.';
+z.string.lt.modalAccountDeletionAction = 'Ištrinti';
+z.string.lt.modalAccountDeletionHeadline = 'Ištrinti paskyrą';
+z.string.lt.modalAccountDeletionMessage = 'Mes išsiųsime jums pranešimą el. paštu arba SMS žinute. Pereikite nuorodos adresu, kad visiems laikams ištrintumėte savo paskyrą.';
+
+z.string.lt.modalAccountLogoutAction = 'Atsijungti';
+z.string.lt.modalAccountLogoutHeadline = 'Išvalyti duomenis?';
+z.string.lt.modalAccountLogoutOption = 'Ištrinti visą jūsų asmeninę informaciją ir pokalbius šiame įrenginyje.';
+
+z.string.lt.modalAccountNewDevicesSecondary = 'Tvarkyti įrenginius';
+z.string.lt.modalAccountNewDevicesHeadline = 'Jūsų paskyra buvo naudota:';
+z.string.lt.modalAccountNewDevicesFrom = 'Iš:';
+z.string.lt.modalAccountNewDevicesMessage = 'Jeigu jūs to nedarėte, pašalinkite įrenginį ir atstatykite savo slaptažodį.';
+
+z.string.lt.modalAccountRemoveDeviceAction = 'Šalinti įrenginį';
+z.string.lt.modalAccountRemoveDeviceHeadline = 'Šalinti "{{device}}"';
+z.string.lt.modalAccountRemoveDeviceMessage = 'Norint pašalinti įrenginį, reikalingas jūsų slaptažodis.';
+z.string.lt.modalAccountRemoveDevicePlaceholder = 'Slaptažodis';
+
+z.string.lt.modalAssetTooLargeMessage = 'Jūs galite siųsti failus iki {{number}}';
+
+z.string.lt.modalAssetParallelUploadsMessage = 'Jūs vienu metu galite siųsti iki {{number}} failų.';
+
+z.string.lt.modalCallEmptyConversationHeadline = 'Nėra kam skambinti';
+z.string.lt.modalCallEmptyConversationMessage = 'Čia daugiau nieko nėra.';
+
+z.string.lt.modalCallNoGroupVideoHeadline = 'Vaizdo skambučiai grupėse nepalaikomi';
+z.string.lt.modalCallNoGroupVideoMessage = 'Vaizdo skambučiai grupės pokalbiuose yra neprieinami.';
+
+z.string.lt.modalCallNoMicrophoneAction = 'Paaiškinkite kaip';
+z.string.lt.modalCallNoMicrophoneMessage = 'Norint skambinti, jūsų naršyklei reikia prieigos prie jūsų mikrofono.';
+z.string.lt.modalCallNoMicrophoneHeadline = 'Nepavyksta skambinti be mikrofono';
+
+z.string.lt.modalCallSecondIncomingAction = 'Atsiliepti';
 z.string.lt.modalCallSecondIncomingHeadline = 'Atsiliepti į skambutį?';
 z.string.lt.modalCallSecondIncomingMessage = 'Jūsų dabartinis skambutis bus užbaigtas.';
-z.string.lt.modalCallSecondIncomingAction = 'Atsiliepti';
+
+z.string.lt.modalCallSecondOngoingAction = 'Užbaigti';
 z.string.lt.modalCallSecondOngoingHeadline = 'Užbaigti skambutį kitame įrenginyje?';
 z.string.lt.modalCallSecondOngoingMessage = 'Jūs vienu metu galite dalyvauti tik viename skambutyje.';
-z.string.lt.modalCallSecondOngoingAction = 'Užbaigti';
+
+z.string.lt.modalCallSecondOutgoingAction = 'Užbaigti';
 z.string.lt.modalCallSecondOutgoingHeadline = 'Užbaigti esamą skambutį?';
 z.string.lt.modalCallSecondOutgoingMessage = 'Jūs vienu metu galite dalyvauti tik viename skambutyje.';
-z.string.lt.modalCallSecondOutgoingAction = 'Užbaigti';
-z.string.lt.modalClearConversationHeadline = 'Ištrinti turinį?';
-z.string.lt.modalClearConversationOption = 'Taip pat išeiti iš pokalbio';
-z.string.lt.modalClearConversationButton = 'Ištrinti';
-z.string.lt.modalConnectedDeviceHeadline = 'Jūsų paskyra buvo naudota:';
-z.string.lt.modalConnectedDeviceFrom = 'Iš:';
-z.string.lt.modalConnectedDeviceMessage = 'Jeigu jūs to nedarėte, pašalinkite įrenginį ir atstatykite savo slaptažodį.';
-z.string.lt.modalConnectedDeviceManageDevices = 'tvarkyti įrenginius';
-z.string.lt.modalDeleteAccountAction = 'Ištrinti';
-z.string.lt.modalDeleteAccountHeadline = 'Ištrinti paskyrą';
-z.string.lt.modalDeleteAccountMessage = 'Mes išsiųsime jums pranešimą el. paštu arba SMS žinute. Pereikite nuorodos adresu, kad visiems laikams ištrintumėte savo paskyrą.';
-z.string.lt.modalDeleteButton = 'Ištrinti';
-z.string.lt.modalDeleteHeadline = 'Ištrinti tik man?';
-z.string.lt.modalDeleteMessage = 'To negalima bus atšaukti.';
-z.string.lt.modalDeleteEveryoneButton = 'Ištrinti';
-z.string.lt.modalDeleteEveryoneHeadline = 'Ištrinti visiems?';
-z.string.lt.modalDeleteEveryoneMessage = 'To negalima bus atšaukti.';
-z.string.lt.modalTooLongHeadline = 'Žinutė pernelyg ilga';
-z.string.lt.modalTooLongMessage = 'Jūs galite siųsti žinutes iki {{number}} simbolių ilgio.';
-z.string.lt.modalLeaveConversationHeadline = 'Išeiti iš "{{user}}" pokalbio?';
-z.string.lt.modalLeaveConversationMessage = 'Dalyviams bus pranešta ir pokalbis bus pašalintas iš jūsų sąrašo.';
-z.string.lt.modalLeaveConversationButton = 'Išeiti';
-z.string.lt.modalLogoutHeadline = 'Išvalyti duomenis?';
-z.string.lt.modalLogoutMessage = 'Ištrinti visą jūsų asmeninę informaciją ir pokalbius šiame įrenginyje.';
-z.string.lt.modalLogoutButton = 'Atsijungti';
-z.string.lt.modalNewDeviceHeadline = '{{user}} pradėjo naudoti naują įrenginį';
-z.string.lt.modalNewDeviceHeadlineMany = '{{user}}s pradėjo naudoti naujus įrenginius';
-z.string.lt.modalNewDeviceHeadlineYou = '{{user}} pradėjo naudoti naują įrenginį';
-z.string.lt.modalNewDeviceMessage = 'Ar vis dar norite išsiųsti savo žinutes?';
-z.string.lt.modalNewDeviceCallAccept = 'Priimti skambutį';
-z.string.lt.modalNewDeviceCallAnyway = 'Vis tiek skambinti';
-z.string.lt.modalNewDeviceCallIncoming = 'Ar vis dar norite priimti skambutį?';
-z.string.lt.modalNewDeviceCallOutgoing = 'Ar vis dar norite atlikti skambutį?';
-z.string.lt.modalNewDeviceShowDevice = 'rodyti įrenginį';
-z.string.lt.modalNewDeviceSendAnyway = 'vis tiek išsiųsti';
-z.string.lt.modalNotConnectedHeadline = 'Susirašinėjime nieko nėra';
-z.string.lt.modalNotConnectedMessageOne = '{{name}} nenori būti susirašinėjimuose.';
-z.string.lt.modalNotConnectedMessageMany = 'Vienas iš pasirinktų žmonių nenori būti susirašinėjimuose.';
-z.string.lt.modalRemoveDeviceButton = 'Šalinti įrenginį';
-z.string.lt.modalRemoveDeviceHeadline = 'Šalinti "{{device}}"';
-z.string.lt.modalRemoveDeviceMessage = 'Norint pašalinti įrenginį, reikalingas jūsų slaptažodis.';
+
+z.string.lt.modalConnectCancelAction = 'Taip';
+z.string.lt.modalConnectCancelHeadline = 'Atsisakyti užklausos?';
+z.string.lt.modalConnectCancelMessage = 'Šalinti kontakto užmezgimo su {{user}} užklausą.';
+z.string.lt.modalConnectCancelSecondary = 'Ne';
+
+z.string.lt.modalConnectAcceptAction = 'Užmegzti kontaktą';
+z.string.lt.modalConnectAcceptHeadline = 'Priimti?';
+z.string.lt.modalConnectAcceptMessage = 'Tai užmegs kontaktą ir atvers pokalbį su {{user}}.';
+z.string.lt.modalConnectAcceptSecondary = 'Nepaisyti';
+
+z.string.lt.modalConversationAddBotAction = 'Patvirtinti';
+z.string.lt.modalConversationAddBotHeadline = 'Pridėti paslaugą';
+z.string.lt.modalConversationAddBotMessage = 'Ar tikrai norite pradėti susirašinėjimą su {{name}}?';
+
+z.string.lt.modalConversationClearAction = 'Ištrinti';
+z.string.lt.modalConversationClearHeadline = 'Ištrinti turinį?';
+z.string.lt.modalConversationClearOption = 'Taip pat išeiti iš pokalbio';
+
+z.string.lt.modalConversationDeleteMessageAction = 'Ištrinti';
+z.string.lt.modalConversationDeleteMessageHeadline = 'Ištrinti tik man?';
+z.string.lt.modalConversationDeleteMessageMessage = 'To negalima bus atšaukti.';
+
+z.string.lt.modalConversationDeleteMessageEveryoneAction = 'Ištrinti';
+z.string.lt.modalConversationDeleteMessageEveryoneHeadline = 'Ištrinti visiems?';
+z.string.lt.modalConversationDeleteMessageEveryoneMessage = 'To negalima bus atšaukti.';
+
+z.string.lt.modalConversationLeaveAction = 'Išeiti';
+z.string.lt.modalConversationLeaveMessage = 'Jūs daugiau nebegalėsite gauti ar siųsti žinutes šiame pokalbyje.';
+
+z.string.lt.modalConversationMessageTooLongHeadline = 'Žinutė pernelyg ilga';
+z.string.lt.modalConversationMessageTooLongMessage = 'Jūs galite siųsti žinutes iki {{number}} simbolių ilgio.';
+
+z.string.lt.modalConversationNewDeviceHeadlineOne = '{{user}} pradėjo naudoti naują įrenginį';
+z.string.lt.modalConversationNewDeviceHeadlineMany = '{{user}}s pradėjo naudoti naujus įrenginius';
+z.string.lt.modalConversationNewDeviceHeadlineYou = '{{user}} pradėjo naudoti naują įrenginį';
+z.string.lt.modalConversationNewDeviceIncomingCallAction = 'Priimti skambutį';
+z.string.lt.modalConversationNewDeviceIncomingCallMessage = 'Ar vis dar norite priimti skambutį?';
+z.string.lt.modalConversationNewDeviceMessage = 'Ar vis dar norite išsiųsti savo žinutes?';
+z.string.lt.modalConversationNewDeviceOutgoingCallAction = 'Vis tiek skambinti';
+z.string.lt.modalConversationNewDeviceOutgoingCallMessage = 'Ar vis dar norite atlikti skambutį?';
+
+z.string.lt.modalConversationNotConnectedHeadline = 'Susirašinėjime nieko nėra';
+z.string.lt.modalConversationNotConnectedMessageOne = '{{name}} nenori būti susirašinėjimuose.';
+z.string.lt.modalConversationNotConnectedMessageMany = 'Vienas iš pasirinktų žmonių nenori būti susirašinėjimuose.';
+
+z.string.lt.modalConversationRemoveAction = 'Šalinti';
+z.string.lt.modalConversationRemoveHeadline = 'Šalinti?';
+z.string.lt.modalConversationRemoveMessage = '{{user}} negalės siųsti ir gauti žinutes šiame pokalbyje.';
+
+
+z.string.lt.modalConversationTooManyMembersHeadline = 'Balso kanalas perpildytas';
+
+z.string.lt.modalIntegrationUnavailableHeadline = 'Šiuo metu robotai negalimi';
+z.string.lt.modalIntegrationUnavailableMessage = 'Dėkojame, kad domitės robotais. Paslauga šiuo metu yra pristabdyta tol, kol mes ruošiame kitą versiją. Sekite naujienas.';
+
+
 z.string.lt.modalServiceUnavailableHeadline = 'Paslaugos pridėjimas negalimas';
 z.string.lt.modalServiceUnavailableMessage = 'Paslauga šiuo metu negalima.';
+
 z.string.lt.modalSessionResetHeadline = 'Seansas buvo atstatytas';
 z.string.lt.modalSessionResetMessage1 = 'Jeigu problema neišspręsta,';
 z.string.lt.modalSessionResetMessageLink = 'susisiekite';
 z.string.lt.modalSessionResetMessage2 = 'su mumis.';
-z.string.lt.modalTooManyMembersHeadline = 'Balso kanalas perpildytas';
-z.string.lt.modalTooManyMembersMessage = 'Prie pokalbio gali prisijungti iki {{number1}} žmonių. Čia yra vietos tik dar {{number2}} žmonėms.';
-z.string.lt.modalUploadsParallel = 'Jūs vienu metu galite siųsti iki {{number}} failų.';
+
+z.string.lt.modalUploadContactsAction = 'Bandyti dar kartą';
+z.string.lt.modalUploadContactsMessage = 'Mes negavome jūsų informacijos. Bandykite importuoti savo kontaktus dar kartą.';
+
+z.string.lt.modalUserBlockAction = 'Užblokuoti';
+z.string.lt.modalUserBlockHeadline = 'Užblokuoti {{user}}?';
+z.string.lt.modalUserBlockMessage = '{{user}} negalės su jumis susisiekti ar pridėti jus į grupės pokalbius.';
+
+z.string.lt.modalUserUnblockAction = 'Atblokuoti';
+z.string.lt.modalUserUnblockHeadline = 'Atblokuoti?';
+z.string.lt.modalUserUnblockMessage = '{{user}} galės ir vėl su jumis susisiekti ar pridėti jus į grupės pokalbius.';
 
 z.string.lt.connectionRequestConnect = 'Užmegzti kontaktą';
 z.string.lt.connectionRequestIgnore = 'Nepaisyti';
@@ -205,12 +248,13 @@ z.string.lt.conversationDeviceYourDevices = ' savo įrenginių';
 z.string.lt.conversationDeviceUserDevices = ' {{user}} įrenginių';
 z.string.lt.conversationDeviceNewDeviceOne = ' naują įrenginį';
 z.string.lt.conversationDeviceNewDeviceMany = ' naujus įrenginius';
-z.string.lt.conversationDeviceNewPeopleJoined = 'prisijungė nauji žmonės.';
 z.string.lt.conversationDeviceNewPeopleJoinedVerify = ' patvirtinkite įrenginius';
 z.string.lt.conversationJustNow = 'Ką tik';
 z.string.lt.conversationLocationLink = 'Atverti žemėlapį';
 z.string.lt.conversationMemberJoin = ' pridėjo {{users}}';
 z.string.lt.conversationMemberJoinYou = ' pridėjo {{users}}';
+z.string.lt.conversationMemberJoinSelf = ' prisijungė';
+z.string.lt.conversationMemberJoinSelfYou = ' prisijungė';
 z.string.lt.conversationMemberLeaveLeft = ' išėjo';
 z.string.lt.conversationMemberLeaveLeftYou = ' išėjo';
 z.string.lt.conversationMemberLeaveRemoved = ' pašalino {{users}}';
@@ -233,9 +277,9 @@ z.string.lt.conversationUnableToDecryptLink = 'Kodėl?';
 z.string.lt.conversationUnableToDecryptErrorMessage = 'Klaida';
 z.string.lt.conversationUnableToDecryptResetSession = 'Atstatyti seansą';
 z.string.lt.conversationMissedMessages = 'Jūs kurį laiką nenaudojote šio įrenginio. Kai kurios žinutės čia gali neatsirasti.';
+z.string.lt.conversationAssetUploading = 'Įkeliama…';
 z.string.lt.conversationAssetDownloading = 'Atsiunčiama…';
 z.string.lt.conversationAssetUploadFailed = 'Įkėlimas nepavyko';
-z.string.lt.conversationAssetUploadTooLarge = 'Jūs galite siųsti failus iki {{number}}';
 z.string.lt.conversationPlaybackError = 'Nepavyko atkurti';
 z.string.lt.conversationContextMenuEdit = 'Taisyti';
 z.string.lt.conversationContextMenuDelete = 'Ištrinti man';
@@ -260,6 +304,8 @@ z.string.lt.groupCreationParticipantsActionSkip = 'Praleisti';
 z.string.lt.groupCreationParticipantsHeader = 'Pridėti žmonių';
 z.string.lt.groupCreationParticipantsHeaderWithCounter = 'Pridėti žmonių ({{number}})';
 z.string.lt.groupCreationParticipantsPlaceholder = 'Ieškokite pagal vardą';
+
+z.string.lt.guestRoomConversationName = 'Svečio kambarys';
 
 z.string.lt.collectionShowAll = 'Rodyti visus {{number}}';
 z.string.lt.collectionSectionLinks = 'Nuorodos';
@@ -311,6 +357,8 @@ z.string.lt.takeoverButtonKeep = 'Palikti šį';
 
 z.string.lt.inviteMetaKeyMac = 'Cmd';
 z.string.lt.inviteMetaKeyPc = 'Ctrl';
+z.string.lt.inviteHintSelected = 'Spustelėję {{metaKey}} ir C nukopijuosite';
+z.string.lt.inviteHintUnselected = 'Pažymėkite ir spustelėkite {{metaKey}} ir C';
 z.string.lt.inviteHeadline = 'Pakvieskite žmones į Wire';
 z.string.lt.inviteMessage = 'Aš naudoju Wire. Ieškokite manęs kaip {{username}} arba apsilankykite get.wire.com.';
 z.string.lt.inviteMessageNoEmail = 'Aš naudoju Wire. Apsilankyk get.wire.com , kad su manimi susisiektum.';
@@ -323,71 +371,46 @@ z.string.lt.extensionsGiphyMessage = '{{tag}} • per giphy.com';
 z.string.lt.extensionsGiphyNoGifs = 'Oi, nėra gif';
 z.string.lt.extensionsGiphyRandom = 'Atsitiktinis';
 
-z.string.lt.peopleConfirmLabel = 'Pridėti žmones į grupę';
-z.string.lt.peoplePeople = '{{number}} žmonių';
-z.string.lt.peopleSearchPlaceholder = 'Ieškokite pagal vardą';
-z.string.lt.peopleEveryoneParticipates = 'Visi, su kuo esate\nužmezgę kontaktą, jau yra\nšiame pokalbyje.';
-z.string.lt.peopleNoMatches = 'Nėra atitinkančių rezultatų.\nPabandykite įvesti kitą vardą.';
-z.string.lt.peopleInvite = 'Pakvieskite žmones į Wire';
-z.string.lt.peopleInviteDetail = 'Dalinimasis kontaktais padeda jums užmegzti kontaktą su kitais žmonėmis. Mes padarome visą informaciją anoniminę ir su niekuo ja nesidaliname.';
-z.string.lt.peopleInviteButtonContacts = 'Iš kontaktų';
-z.string.lt.peopleInviteButtonGmail = 'Iš Gmail';
-z.string.lt.peopleInviteHeadline = 'Pasikvieskite savo draugus';
-z.string.lt.peopleServiceConfirmButton = 'Pridėti paslaugą';
-z.string.lt.peopleServiceRemovalButton = 'Išimti paslaugą';
-z.string.lt.peopleServiceNewConversation = 'Kurti naują susirašinėjimą';
-z.string.lt.peopleServices = 'Paslaugos';
-z.string.lt.peopleShare = 'Dalintis kontaktais';
-z.string.lt.peopleTabsDetails = 'Išsamiau';
-z.string.lt.peopleTabsDevices = 'Įrenginiai';
-z.string.lt.peopleTabsDevicesHeadline = 'Wire kiekvienam įrenginiui suteikia unikalų kontrolinį kodą. Palyginkite juos su {{user}} ir patvirtinkite savo pokalbį.';
-z.string.lt.peopleTabsDevicesLearnMore = 'Sužinoti daugiau';
-z.string.lt.peopleTabsDevicesWhyVerify = 'Kam patvirtinti pokalbį?';
-z.string.lt.peopleTabsNoDevicesHeadline = '{{user}} naudoja seną Wire versiją. Čia nerodomi jokie įrenginiai.';
-z.string.lt.peopleTabsDeviceDetailAllMyDevices = 'Rodyti visus mano įrenginius';
-z.string.lt.peopleTabsDeviceDetailDeviceFingerprint = 'Įrenginio kontrolinis kodas';
-z.string.lt.peopleTabsDeviceDetailHeadline = 'Įsitikinkite, kad šis kontrolinis kodas yra toks pats, kaip ir įrenginyje, kurį naudoja {{html1}}{{user}}{{html2}}.';
-z.string.lt.peopleTabsDeviceDetailHowTo = 'Kaip tai padaryti?';
-z.string.lt.peopleTabsDeviceDetailResetSession = 'Atstatyti seansą';
-z.string.lt.peopleTabsDeviceDetailShowMyDevice = 'Rodyti mano įrenginio kontrolinį kodą';
-z.string.lt.peopleTabsDeviceDetailVerify = 'Patvirtintas';
-z.string.lt.peopleTabsPeople = 'Žmonės';
-z.string.lt.peopleTabsServices = 'Paslaugos';
-z.string.lt.peopleVerified = 'Patvirtintas';
+z.string.lt.addParticipantsConfirmLabel = 'Pridėti';
+z.string.lt.addParticipantsHeader = 'Pridėti žmonių';
+z.string.lt.addParticipantsHeaderWithCounter = 'Pridėti žmonių ({{number}})';
+z.string.lt.addParticipantsSearchPlaceholder = 'Ieškokite pagal vardą';
+z.string.lt.addParticipantsServiceConfirmButton = 'Pridėti paslaugą';
+z.string.lt.addParticipantsTabsPeople = 'Žmonės';
+z.string.lt.addParticipantsTabsServices = 'Paslaugos';
 
-z.string.lt.peopleBlockHeadline = 'Užblokuoti?';
-z.string.lt.peopleBlockMessage = '{{user}} negalės su jumis susisiekti ar pridėti jus į grupės pokalbius.';
+z.string.lt.conversationDetailsActionCancelRequest = 'Atsisakyti užklausos';
+z.string.lt.conversationDetailsActionCreateGroup = 'Sukurti grupę';
+z.string.lt.conversationDetailsActionDevices = 'Įrenginiai';
+z.string.lt.conversationDetailsGuestsOff = 'Išjungta';
+z.string.lt.conversationDetailsParticipantsServicesMany = 'Paslaugos';
+z.string.lt.conversationDetailsParticipantsUsersMany = 'Žmonės';
+z.string.lt.conversationDetailsPeople = 'Žmonės';
+z.string.lt.conversationDetailsServices = 'Paslaugos';
 
-z.string.lt.peopleConnectHeadline = 'Priimti?';
-z.string.lt.peopleConnectMessage = 'Tai užmegs kontaktą ir atvers pokalbį su {{user}}.';
+z.string.lt.groupParticipantActionCancelRequest = 'Atsisakyti užklausos';
+z.string.lt.groupParticipantActionDevices = 'Įrenginiai';
+z.string.lt.groupParticipantActionPending = 'Laukia';
+z.string.lt.groupParticipantActionSendRequest = 'Užmegzti kontaktą';
 
-z.string.lt.peopleCancelRequestHeadline = 'Atsisakyti užklausos?';
-z.string.lt.peopleCancelRequestMessage = 'Šalinti kontakto užmezgimo su {{user}} užklausą.';
+z.string.lt.participantDevicesDetailHeadline = 'Įsitikinkite, kad šis kontrolinis kodas yra toks pats, kaip ir įrenginyje, kurį naudoja {{html1}}{{user}}{{html2}}.';
+z.string.lt.participantDevicesDetailHowTo = 'Kaip tai padaryti?';
+z.string.lt.participantDevicesDetailResetSession = 'Atstatyti seansą';
+z.string.lt.participantDevicesDetailShowMyDevice = 'Rodyti mano įrenginio kontrolinį kodą';
+z.string.lt.participantDevicesDetailVerify = 'Patvirtintas';
 
-z.string.lt.peopleLeaveHeadline = 'Išeiti iš pokalbio?';
-z.string.lt.peopleLeaveMessage = 'Jūs daugiau nebegalėsite gauti ar siųsti žinutes šiame pokalbyje.';
+z.string.lt.participantDevicesHeader = 'Įrenginiai';
+z.string.lt.participantDevicesHeadline = 'Wire kiekvienam įrenginiui suteikia unikalų kontrolinį kodą. Palyginkite juos su {{user}} ir patvirtinkite savo pokalbį.';
+z.string.lt.participantDevicesLearnMore = 'Sužinoti daugiau';
+z.string.lt.participantDevicesWhyVerify = 'Kam patvirtinti pokalbį?';
+z.string.lt.participantDevicesOutdatedClientMessage = '{{user}} naudoja seną Wire versiją. Čia nerodomi jokie įrenginiai.';
 
-z.string.lt.peopleRemoveHeadline = 'Šalinti?';
-z.string.lt.peopleRemoveMessage = '{{user}} negalės siųsti ir gauti žinutes šiame pokalbyje.';
+z.string.lt.participantDevicesSelfAllDevices = 'Rodyti visus mano įrenginius';
+z.string.lt.participantDevicesSelfFingerprint = 'Įrenginio kontrolinis kodas';
 
-z.string.lt.peopleUnblockHeadline = 'Atblokuoti?';
-z.string.lt.peopleUnblockMessage = '{{user}} galės ir vėl su jumis susisiekti ar pridėti jus į grupės pokalbius.';
-
-z.string.lt.peopleButtonAdd = 'Pridėti';
-z.string.lt.peopleButtonAddPeople = 'Pridėti žmonių';
-z.string.lt.peopleButtonBlock = 'Užblokuoti';
-z.string.lt.peopleButtonCancel = 'Atsisakyti';
-z.string.lt.peopleButtonConnect = 'Užmegzti kontaktą';
-z.string.lt.peopleButtonCreate = 'Sukurti grupę';
-z.string.lt.peopleButtonIgnore = 'Nepaisyti';
-z.string.lt.peopleButtonLeave = 'Išeiti';
-z.string.lt.peopleButtonOpen = 'Atverti pokalbį';
-z.string.lt.peopleButtonPending = 'Laukia';
-z.string.lt.peopleButtonProfile = 'Profilis';
-z.string.lt.peopleButtonRemove = 'Šalinti';
-z.string.lt.peopleButtonUnblock = 'Atblokuoti';
-z.string.lt.peopleButtonNo = 'Ne';
-z.string.lt.peopleButtonYes = 'Taip';
+z.string.lt.userProfileButtonConnect = 'Užmegzti kontaktą';
+z.string.lt.userProfileButtonIgnore = 'Nepaisyti';
+z.string.lt.userProfileButtonUnblock = 'Atblokuoti';
 
 z.string.lt.preferencesAbout = 'Apie';
 z.string.lt.preferencesAccount = 'Paskyra';
@@ -469,9 +492,11 @@ z.string.lt.searchConnect = 'Užmegzti kontaktą';
 z.string.lt.searchConnections = 'Kontaktai';
 z.string.lt.searchContacts = 'Kontaktai';
 z.string.lt.searchCreateGroup = 'Sukurti grupę';
+z.string.lt.searchCreateGuestRoom = 'Kurti svečio kambarį';
 z.string.lt.searchGroups = 'Grupės';
 z.string.lt.searchPeople = 'Žmonės';
 z.string.lt.searchPlaceholder = 'Ieškokite pagal vardą ar naudotojo vardą';
+z.string.lt.searchServicePlaceholder = 'Ieškokite pagal vardą';
 z.string.lt.searchServices = 'Paslaugos';
 z.string.lt.searchTeamGroups = 'Komandos pokalbiai';
 z.string.lt.searchTeamMembers = 'Komandos dalyviai';
@@ -481,14 +506,22 @@ z.string.lt.searchNoContactsOnWire = 'Jūs neturite Wire kontaktų.\nPabandykite
 z.string.lt.searchMemberInvite = 'Kvieskite žmonių prisijungti prie komandos';
 z.string.lt.searchOthers = 'Užmegzti kontaktą';
 
+z.string.lt.searchInvite = 'Pakvieskite žmones į Wire';
+z.string.lt.searchInviteDetail = 'Dalinimasis kontaktais padeda jums užmegzti kontaktą su kitais žmonėmis. Mes padarome visą informaciją anoniminę ir su niekuo ja nesidaliname.';
+z.string.lt.searchInviteButtonContacts = 'Iš kontaktų';
+z.string.lt.searchInviteButtonGmail = 'Iš Gmail';
+z.string.lt.searchInviteHeadline = 'Pasikvieskite savo draugus';
+z.string.lt.searchInviteShare = 'Dalintis kontaktais';
+
+z.string.lt.searchServiceNewConversation = 'Kurti naują susirašinėjimą';
+z.string.lt.searchServiceConfirmButton = 'Pridėti paslaugą';
+
+z.string.lt.searchListEveryoneParticipates = 'Visi, su kuo esate\nužmezgę kontaktą, jau yra\nšiame pokalbyje.';
+z.string.lt.searchListNoMatches = 'Nėra atitinkančių rezultatų.\nPabandykite įvesti kitą vardą.';
+
 z.string.lt.uploadGoogleHeadline = 'Raskite žmones\nsu kuriais pasikalbėti.';
 z.string.lt.uploadGoogleMessage = 'Mes naudojame jūsų kontaktinius duomenis tam, kad padėtume jums užmegzti kontaktą su kitais. Mes padarome visą informaciją anoniminę ir su niekuo ja nesidaliname.';
-z.string.lt.uploadGoogleHeadlineError = 'Kažkas\nnutiko.';
-z.string.lt.uploadGoogleMessageError = 'Mes negavome jūsų informacijos. Bandykite importuoti savo kontaktus dar kartą.';
-z.string.lt.uploadGoogleButtonAgain = 'Bandyti dar kartą';
 
-z.string.lt.warningCallDetail = 'Norint skambinti, jūsų naršyklei reikia prieigos prie jūsų mikrofono.';
-z.string.lt.warningCallHeadline = 'Nepavyksta skambinti be mikrofono';
 z.string.lt.warningCallUnsupportedIncoming = 'Skambina {{user}}. Jūsų naršyklė nepalaiko skambučių.';
 z.string.lt.warningCallUnsupportedOutgoing = 'Jūs negalite skambinti, nes jūsų naršyklė nepalaiko skambučių.';
 z.string.lt.warningCallIssues = 'Ši „Wire“ versija negali dalyvauti pokalbyje. Naudokite';
@@ -508,7 +541,6 @@ z.string.lt.warningPermissionRequestCamera = '{{icon}} Leisti prieigą prie kame
 z.string.lt.warningPermissionRequestMicrophone = '{{icon}} Leisti prieigą prie mikrofono';
 z.string.lt.warningPermissionRequestNotification = '{{icon}} Leisti pranešimus';
 z.string.lt.warningPermissionRequestScreen = '{{icon}} Leisti prieigą prie ekrano';
-z.string.lt.warningTellMeHow = 'Paaiškinkite kaip';
 
 z.string.lt.userAvailabilityAvailable = 'Prieinamas';
 z.string.lt.userAvailabilityAway = 'Pasišalinęs';
@@ -557,14 +589,7 @@ z.string.lt.tooltipConversationsPreferences = 'Atverti nuostatas';
 z.string.lt.tooltipConversationsSilence = 'Išjungti pranešimus ({{shortcut}})';
 z.string.lt.tooltipConversationsStart = 'Pradėti pokalbį ({{shortcut}})';
 
-z.string.lt.tooltipPeopleAdd = 'Pridėti žmones į pokalbį ({{shortcut}})';
-z.string.lt.tooltipPeopleBack = 'Atgal';
-z.string.lt.tooltipPeopleBlock = 'Užblokuoti';
-z.string.lt.tooltipPeopleConnect = 'Užmegzti kontaktą';
-z.string.lt.tooltipPeopleLeave = 'Išeiti iš pokalbio';
-z.string.lt.tooltipPeopleRename = 'Pakeisti pokalbio pavadinimą';
-z.string.lt.tooltipPeopleRemove = 'Šalinti iš pokalbio';
-z.string.lt.tooltipPeopleUnblock = 'Atblokuoti';
+z.string.lt.tooltipConversationDetailsRename = 'Pakeisti pokalbio pavadinimą';
 
 z.string.lt.tooltipPreferencesContactsGmail = 'Prisijunkite prie savo Gmail paskyros, norėdami bendrinti kontaktus';
 z.string.lt.tooltipPreferencesContactsMacos = 'Bendrinti visus savo kontaktus iš macOS Kontaktų programos';

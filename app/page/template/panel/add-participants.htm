@@ -1,0 +1,50 @@
+<div id="add-participants" class="add-participants panel__page" data-bind="with: $root.addParticipants">
+  <!-- ko if: isVisible() -->
+    <div class="panel__header">
+      <arrow-left-icon class="icon-button" data-bind="click: clickOnBack" data-uie-name="go-back-add-participants"></arrow-left-icon>
+      <div class="panel__header__title" data-bind="text: headerText" data-uie-name="status-people-selected"></div>
+      <close-icon class="icon-button" data-bind="click: clickOnClose" data-uie-name="do-close"></close-icon>
+    </div>
+    <div class="add-participants__content">
+      <user-input class="user-list-light" params="input: searchInput, selected: selectedContacts, placeholder: z.string.addParticipantsSearchPlaceholder" spellcheck="false"></user-input>
+      <!-- ko if: showIntegrations() -->
+        <div class="add-participants__tabs">
+          <div class="add-participants__tab" data-bind="css: {'add-participants__tab--active': isStateAddPeople}, click: clickOnAddPeople, l10n_text: z.string.addParticipantsTabsPeople" data-uie-name="do-add-people"></div>
+          <div class="add-participants__tab" data-bind="css: {'add-participants__tab--active': isServiceState}, click: clickOnAddService, l10n_text: z.string.addParticipantsTabsServices" data-uie-name="do-add-services"></div>
+        </div>
+      <!-- /ko -->
+
+      <div class="add-participants__list panel__content">
+        <div class="panel__content__scroll" data-bind="antiscroll: shouldUpdateScrollbar">
+          <!-- ko if: isAddState() -->
+            <!-- ko if: isStateAddPeople() -->
+              <user-list class="user-list-light" params="user: contacts, filter: searchInput, selected: selectedContacts"></user-list>
+            <!-- /ko -->
+            <!-- ko if: isStateAddService() -->
+              <service-list class="service-list-light" params="services: services, click: clickOnSelectService, isSearching: isSearching"></service-list>
+            <!-- /ko -->
+          <!-- /ko -->
+        </div>
+      </div>
+
+      <!-- ko if: isStateConfirmation() -->
+        <div class="add-participants__service-header">
+          <participant-avatar params="participant: selectedService, size: z.components.ParticipantAvatar.SIZE.LARGE"></participant-avatar>
+          <div class="add-participants__service-details">
+            <div class="add-participants__service-name" data-bind="text: selectedService().name" data-uie-name="status-service-name"></div>
+            <div class="add-participants__service-provider" data-bind="text: selectedService().providerName()" data-uie-name="status-service-provider"></div>
+          </div>
+        </div>
+        <div class="add-participants__service-description" data-bind="text: selectedService().description" data-uie-name="status-service-description"></div>
+      <!-- /ko -->
+
+      <!-- ko if: isConfirmAddingState() -->
+        <div class="add-participants__footer">
+          <button class="button button-full" data-bind="enable: enableAddAction, click: clickToAddParticipants" data-uie-name="do-create">
+            <span data-bind="l10n_text: z.string.addParticipantsConfirmLabel"></span>
+          </button>
+        </div>
+      <!-- /ko -->
+    </div>
+  <!-- /ko -->
+</div>

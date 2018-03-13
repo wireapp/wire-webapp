@@ -28,11 +28,6 @@ z.string.hu.and = 'és';
 z.string.hu.enumerationAnd = 'és ';
 
 //=Alkalmazás betöltése
-z.string.hu.alertUploadFileFormat = 'Ezt a képet nem használhatod.\nPNG vagy JPEG fájlt válassz.';
-z.string.hu.alertUploadTooSmall = 'Ezt a képet nem használhatod.\nVálassz egy képet, ami legalább 320 x 320 px méretű.';
-z.string.hu.alertUploadTooLarge = 'A kép mérete túl nagy.\nMaximum {{number}} MB méretű fájlt tudsz feltölteni.';
-z.string.hu.alertGifTooLarge = 'Az Animáció mérete túl nagy.\nA maximális méret {{number}} MB.';
-
 z.string.hu.authAccountCountryCode = 'Országhívó-kód';
 z.string.hu.authAccountDeletion = 'Ki lettél jelentkeztetve, mert a felhasználói fiókodat törölték.';
 z.string.hu.authAccountExpiration = 'A munkamenet lejárt, ezért ki lettél jelentkeztetve. Kérjük, jelentkezz be újra.';
@@ -107,80 +102,159 @@ z.string.hu.callJoin = 'Csatlakozás';
 z.string.hu.callChooseSharedScreen = 'Válaszd ki a megosztandó képernyőt';
 z.string.hu.callParticipants = '{{number}} partner a vonalban';
 
-z.string.hu.modalButtonCancel = 'Mégsem';
-z.string.hu.modalButtonOk = 'Ok';
-z.string.hu.modalButtonSend = 'Küldés';
+z.string.hu.modalAcknowledgeAction = 'Ok';
+z.string.hu.modalAcknowledgeHeadline = 'Valami nem stimmel';
+z.string.hu.modalConfirmSecondary = 'Mégsem';
+z.string.hu.modalOptionSecondary = 'Mégsem';
 
-z.string.hu.modalBlockConversationHeadline = '{{user}} tiltása?';
-z.string.hu.modalBlockConversationMessage = '{{user}} nem tud majd kapcsolatba lépni veled, sem meghívni téged csoportos beszélgetésekbe.';
-z.string.hu.modalBlockConversationButton = 'Tiltás';
-z.string.hu.modalBotsConfirmHeadline = 'Új szolgáltatás';
-z.string.hu.modalBotsConfirmMessage = 'Biztos, hogy új beszélgetést szeretnél kezdeni {{name}} felhasználóval?';
-z.string.hu.modalBotsConfirmButton = 'Megerősítés';
-z.string.hu.modalBotsUnavailableHeadline = 'A botok jelenleg nem elérhetőek';
-z.string.hu.modalBotsUnavailableMessage = 'Köszönjük, hogy érdeklődsz a botokkal kapcsolatban. A szolgáltatást jelenleg felfüggesztettük, amíg a következő verzión dolgozunk. Hamarosan jelentkezünk.';
-z.string.hu.modalCallConversationEmptyHeadline = 'Senki sem hívható';
-z.string.hu.modalCallConversationEmptyMessage = 'Senki sem maradt itt.';
-z.string.hu.modalCallNoVideoInGroupHeadline = 'A csoportokban a videóhívás nem elérhető';
-z.string.hu.modalCallNoVideoInGroupMessage = 'Videohívások nem érhetők el a csoportos beszélgetésben.';
+z.string.hu.modalAccountDeletionAction = 'Törlés';
+z.string.hu.modalAccountDeletionHeadline = 'Fiók törlése';
+z.string.hu.modalAccountDeletionMessage = 'Küldünk egy e-mailt vagy SMS-t. Fiókod végleges törléséhez nyisd meg a kapott linket.';
+
+z.string.hu.modalAccountLogoutAction = 'Kijelentkezés';
+z.string.hu.modalAccountLogoutHeadline = 'Adatok törlése?';
+z.string.hu.modalAccountLogoutOption = 'Ez törli az összes személyes adatodat és beszélgetéseidet erről az eszközről.';
+
+z.string.hu.modalAccountNewDevicesSecondary = 'Eszközök kezelése';
+z.string.hu.modalAccountNewDevicesHeadline = 'Fiókod legutóbbi használata:';
+z.string.hu.modalAccountNewDevicesFrom = 'Eszköz:';
+z.string.hu.modalAccountNewDevicesMessage = 'Ha ezt nem te voltál, akkor töröld az eszközt, és állítsd alaphelyzetbe jelszavad.';
+
+z.string.hu.modalAccountRemoveDeviceAction = 'Eszköz eltávolítása';
+z.string.hu.modalAccountRemoveDeviceHeadline = '"{{device}}" eltávolítása';
+z.string.hu.modalAccountRemoveDeviceMessage = 'Az eszköz eltávolításához add meg a jelszavad.';
+z.string.hu.modalAccountRemoveDevicePlaceholder = 'Jelszó';
+
+z.string.hu.modalAssetTooLargeHeadline = 'A fájl túl nagy';
+z.string.hu.modalAssetTooLargeMessage = 'Maximum {{number}} méretű fájlokat küldhetsz';
+
+z.string.hu.modalAssetParallelUploadsHeadline = 'Egyszerre ez túl sok fájl';
+z.string.hu.modalAssetParallelUploadsMessage = 'Egyszerre {{number}} fájt küldhetsz.';
+
+z.string.hu.modalCallEmptyConversationHeadline = 'Senki sem hívható';
+z.string.hu.modalCallEmptyConversationMessage = 'Senki sem maradt itt.';
+
+z.string.hu.modalCallNoGroupVideoHeadline = 'A csoportokban a videóhívás nem elérhető';
+z.string.hu.modalCallNoGroupVideoMessage = 'Videohívások nem érhetők el a csoportos beszélgetésben.';
+
+z.string.hu.modalCallNoMicrophoneAction = 'Mit kell tennem';
+z.string.hu.modalCallNoMicrophoneMessage = 'A hívásokhoz a böngésződnek hozzá kell férnie a mikrofonodhoz.';
+z.string.hu.modalCallNoMicrophoneHeadline = 'Nem kezdeményezhetsz hívást mikrofon nélkül';
+
+z.string.hu.modalCallSecondIncomingAction = 'Fogadás';
 z.string.hu.modalCallSecondIncomingHeadline = 'Fogadod a hívást?';
 z.string.hu.modalCallSecondIncomingMessage = 'A folyamatban lévő hívás véget ért.';
-z.string.hu.modalCallSecondIncomingAction = 'Fogadás';
+
+z.string.hu.modalCallSecondOngoingAction = 'Hívás befejezése';
 z.string.hu.modalCallSecondOngoingHeadline = 'Bontsuk a hívást a másik eszközön?';
 z.string.hu.modalCallSecondOngoingMessage = 'Egyszerre csak egy hívásban vehetsz részt.';
-z.string.hu.modalCallSecondOngoingAction = 'Hívás befejezése';
+
+z.string.hu.modalCallSecondOutgoingAction = 'Hívás befejezése';
 z.string.hu.modalCallSecondOutgoingHeadline = 'Leteszed a folyamatban lévő hívást?';
 z.string.hu.modalCallSecondOutgoingMessage = 'Egyszerre csak egy hívásban vehetsz részt.';
-z.string.hu.modalCallSecondOutgoingAction = 'Hívás befejezése';
-z.string.hu.modalClearConversationHeadline = 'Törlöd a tartalmat?';
-z.string.hu.modalClearConversationOption = 'Kilépés a beszélgetésből is';
-z.string.hu.modalClearConversationButton = 'Törlés';
-z.string.hu.modalConnectedDeviceHeadline = 'Fiókod legutóbbi használata:';
-z.string.hu.modalConnectedDeviceFrom = 'Eszköz:';
-z.string.hu.modalConnectedDeviceMessage = 'Ha ezt nem te voltál, akkor töröld az eszközt, és állítsd alaphelyzetbe jelszavad.';
-z.string.hu.modalConnectedDeviceManageDevices = 'eszközök kezelése';
-z.string.hu.modalDeleteAccountAction = 'Törlés';
-z.string.hu.modalDeleteAccountHeadline = 'Fiók törlése';
-z.string.hu.modalDeleteAccountMessage = 'Küldünk egy e-mailt vagy SMS-t. Fiókod végleges törléséhez nyisd meg a kapott linket.';
-z.string.hu.modalDeleteButton = 'Törlés';
-z.string.hu.modalDeleteHeadline = 'Törlés csak nálam?';
-z.string.hu.modalDeleteMessage = 'Ezt a műveletet nem lehet visszavonni.';
-z.string.hu.modalDeleteEveryoneButton = 'Törlés';
-z.string.hu.modalDeleteEveryoneHeadline = 'Törlés minden résztvevőnél?';
-z.string.hu.modalDeleteEveryoneMessage = 'Ezt a műveletet nem lehet visszavonni.';
-z.string.hu.modalTooLongHeadline = 'Az üzenet túl hosszú';
-z.string.hu.modalTooLongMessage = 'Maximum {{number}} karakter hosszú üzenetet küldhetsz.';
-z.string.hu.modalLeaveConversationHeadline = 'Kilépsz ebből a beszélgetésből: "{{name}}"?';
-z.string.hu.modalLeaveConversationMessage = 'A résztvevők értesítést fognak kapni és a beszélgetést eltávolítjuk a listádból.';
-z.string.hu.modalLeaveConversationButton = 'Kilépés';
-z.string.hu.modalLogoutHeadline = 'Adatok törlése?';
-z.string.hu.modalLogoutMessage = 'Ez törli az összes személyes adatodat és beszélgetéseidet erről az eszközről.';
-z.string.hu.modalLogoutButton = 'Kijelentkezés';
-z.string.hu.modalNewDeviceHeadline = '{{user}} elkezdett használni egy új eszközt';
-z.string.hu.modalNewDeviceHeadlineMany = '{{users}} elkezdtek új eszközöket használni';
-z.string.hu.modalNewDeviceHeadlineYou = '{{user}} elkezdett használni egy új eszközt';
-z.string.hu.modalNewDeviceMessage = 'Biztos, hogy még mindig el szeretnéd küldeni az üzeneteidet?';
-z.string.hu.modalNewDeviceCallAccept = 'Hívás fogadása';
-z.string.hu.modalNewDeviceCallAnyway = 'Hívás mindenképpen';
-z.string.hu.modalNewDeviceCallIncoming = 'Biztos, hogy még mindig fogadni szeretnéd a hívást?';
-z.string.hu.modalNewDeviceCallOutgoing = 'Biztos, hogy még mindig kezdeményezni szeretnéd a hívást?';
-z.string.hu.modalNewDeviceShowDevice = 'eszköz mutatása';
-z.string.hu.modalNewDeviceSendAnyway = 'küldés mindenképpen';
-z.string.hu.modalNotConnectedHeadline = 'Senki nem lett hozzáadva a beszélgetéshez';
-z.string.hu.modalNotConnectedMessageOne = '{{name}} nem szeretne csatlakozni a beszélgetéshez.';
-z.string.hu.modalNotConnectedMessageMany = 'Az egyik kiválasztott partner nem szeretne csatlakozni a beszélgetéshez.';
-z.string.hu.modalRemoveDeviceButton = 'Eszköz eltávolítása';
-z.string.hu.modalRemoveDeviceHeadline = '"{{device}}" eltávolítása';
-z.string.hu.modalRemoveDeviceMessage = 'Az eszköz eltávolításához add meg a jelszavad.';
+
+z.string.hu.modalConnectCancelAction = 'Igen';
+z.string.hu.modalConnectCancelHeadline = 'Kérelem visszavonása?';
+z.string.hu.modalConnectCancelMessage = 'Visszavonod a csatlakozási kérelmet {{user}} partnerhez.';
+z.string.hu.modalConnectCancelSecondary = 'Nem';
+
+z.string.hu.modalConnectAcceptAction = 'Csatlakozás';
+z.string.hu.modalConnectAcceptHeadline = 'Elfogadod?';
+z.string.hu.modalConnectAcceptMessage = 'Ezzel csatlakozol és beszélgetést indítasz {{user}} partnerrel.';
+z.string.hu.modalConnectAcceptSecondary = 'Figyelmen kívül hagyás';
+
+z.string.hu.modalConversationAddBotAction = 'Megerősítés';
+z.string.hu.modalConversationAddBotHeadline = 'Új szolgáltatás';
+z.string.hu.modalConversationAddBotMessage = 'Biztos, hogy új beszélgetést szeretnél kezdeni {{name}} felhasználóval?';
+
+z.string.hu.modalConversationClearAction = 'Törlés';
+z.string.hu.modalConversationClearHeadline = 'Törlöd a tartalmat?';
+z.string.hu.modalConversationClearMessage = 'Ezzel törlöd a beszélgetés előzményét az összes eszközödről.';
+z.string.hu.modalConversationClearOption = 'Kilépés a beszélgetésből is';
+
+z.string.hu.modalConversationDeleteMessageAction = 'Törlés';
+z.string.hu.modalConversationDeleteMessageHeadline = 'Törlés csak nálam?';
+z.string.hu.modalConversationDeleteMessageMessage = 'Ezt a műveletet nem lehet visszavonni.';
+
+z.string.hu.modalConversationDeleteMessageEveryoneAction = 'Törlés';
+z.string.hu.modalConversationDeleteMessageEveryoneHeadline = 'Törlés minden résztvevőnél?';
+z.string.hu.modalConversationDeleteMessageEveryoneMessage = 'Ezt a műveletet nem lehet visszavonni.';
+
+z.string.hu.modalConversationLeaveAction = 'Kilépés';
+z.string.hu.modalConversationLeaveHeadline = 'Kilépsz ebből a beszélgetésből: "{{name}}"?';
+z.string.hu.modalConversationLeaveMessage = 'Ezután nem fogsz tudni üzeneteket küldeni és fogadni ebben a beszélgetésben.';
+
+z.string.hu.modalConversationMessageTooLongHeadline = 'Az üzenet túl hosszú';
+z.string.hu.modalConversationMessageTooLongMessage = 'Maximum {{number}} karakter hosszú üzenetet küldhetsz.';
+
+z.string.hu.modalConversationNewDeviceAction = 'Küldés mindenképpen';
+z.string.hu.modalConversationNewDeviceHeadlineOne = '{{user}} elkezdett használni egy új eszközt';
+z.string.hu.modalConversationNewDeviceHeadlineMany = '{{users}} elkezdtek új eszközöket használni';
+z.string.hu.modalConversationNewDeviceHeadlineYou = '{{user}} elkezdett használni egy új eszközt';
+z.string.hu.modalConversationNewDeviceIncomingCallAction = 'Hívás fogadása';
+z.string.hu.modalConversationNewDeviceIncomingCallMessage = 'Biztos, hogy még mindig fogadni szeretnéd a hívást?';
+z.string.hu.modalConversationNewDeviceMessage = 'Biztos, hogy még mindig el szeretnéd küldeni az üzeneteidet?';
+z.string.hu.modalConversationNewDeviceOutgoingCallAction = 'Hívás mindenképpen';
+z.string.hu.modalConversationNewDeviceOutgoingCallMessage = 'Biztos, hogy még mindig kezdeményezni szeretnéd a hívást?';
+
+z.string.hu.modalConversationNotConnectedHeadline = 'Senki nem lett hozzáadva a beszélgetéshez';
+z.string.hu.modalConversationNotConnectedMessageOne = '{{name}} nem szeretne csatlakozni a beszélgetéshez.';
+z.string.hu.modalConversationNotConnectedMessageMany = 'Az egyik kiválasztott partner nem szeretne csatlakozni a beszélgetéshez.';
+
+z.string.hu.modalConversationRemoveAction = 'Eltávolítás';
+z.string.hu.modalConversationRemoveHeadline = 'Törlöd?';
+z.string.hu.modalConversationRemoveMessage = '{{user}} nem fog tudni üzenetet küldeni és fogadni ebben a beszélgetésben.';
+
+z.string.hu.modalConversationRemoveGuestsAction = 'Vendégek eltávolítása';
+z.string.hu.modalConversationRemoveGuestsHeadline = 'Kikapcsolod a vendég hozzáférést?';
+z.string.hu.modalConversationRemoveGuestsMessage = 'A jelenlegi vendég el lesz távolítva a beszélgetésből. Új vendégek sem csatlakozhatnak.';
+
+z.string.hu.modalConversationRevokeLinkAction = 'Link visszavonása';
+z.string.hu.modalConversationRevokeLinkHeadline = 'Visszavonod a hivatkozást?';
+z.string.hu.modalConversationRevokeLinkMessage = 'Új vendégek nem tudnak ezzel a hivatkozással csatlakozni. A már meglévő vendégeknek továbbra is megmarad a hozzáférése.';
+
+z.string.hu.modalConversationGuestOptionsAllowGuestMessage = 'Nem sikerült engedélyezni a vendégeket. Kérjük, próbáld újra.';
+z.string.hu.modalConversationGuestOptionsDisableGuestMessage = 'Nem sikerült eltávolítani a vendégeket. Kérjük, próbáld újra.';
+z.string.hu.modalConversationGuestOptionsGetCodeMessage = 'Nem sikerült hozzáférési hivatkozást beszerezni.';
+z.string.hu.modalConversationGuestOptionsRequestCodeMessage = 'Nem sikerült hozzáférési hivatkozást igényelni. Kérjük, próbáld újra.';
+z.string.hu.modalConversationGuestOptionsRevokeCodeMessage = 'Nem sikerült visszavonni a hozzáférési hivatkozást. Kérjük, próbáld újra.';
+z.string.hu.modalConversationGuestOptionsToggleGuestsMessage = 'Nem sikerült megváltoztatni a vendég állapotát.';
+
+z.string.hu.modalConversationTooManyMembersHeadline = 'Telt ház';
+z.string.hu.modalConversationTooManyMembersMessage = 'Legfeljebb {{number1}} partner tud csatlakozni a beszélgetéshez. Még {{number2}} partner számára van hely.';
+
+z.string.hu.modalGifTooLargeHeadline = 'A kiválsztott animáció túl nagy';
+z.string.hu.modalGifTooLargeMessage = 'A maximális méret {{number}} MB lehet.';
+
+z.string.hu.modalIntegrationUnavailableHeadline = 'A botok jelenleg nem elérhetőek';
+z.string.hu.modalIntegrationUnavailableMessage = 'Köszönjük, hogy érdeklődsz a botokkal kapcsolatban. A szolgáltatást jelenleg felfüggesztettük, amíg a következő verzión dolgozunk. Hamarosan jelentkezünk.';
+
+z.string.hu.modalPictureFileFormatHeadline = 'Nem lehet ezt a képet használni';
+z.string.hu.modalPictureFileFormatMessage = 'Kérjük, PNG vagy JPEG képet használj.';
+
+z.string.hu.modalPictureTooLargeHeadline = 'A kiválasztott kép túl nagy';
+z.string.hu.modalPictureTooLargeMessage = 'Maximum {{number}} MB méretű képeket használhatsz.';
+
+z.string.hu.modalPictureTooSmallMessage = 'Kérjük, legalább 320 x 320 képpont méretű képet válassz.';
+
 z.string.hu.modalServiceUnavailableHeadline = 'Új szolgáltatás hozzáadása nem lehetséges';
 z.string.hu.modalServiceUnavailableMessage = 'A szolgáltatás jelenleg nem elérhető.';
+
 z.string.hu.modalSessionResetHeadline = 'A munkamenet alaphelyzetbe állítva';
 z.string.hu.modalSessionResetMessage1 = 'Ha a probléma továbbra is fennáll,';
 z.string.hu.modalSessionResetMessageLink = 'lépj kapcsolatba';
 z.string.hu.modalSessionResetMessage2 = 'velünk.';
-z.string.hu.modalTooManyMembersHeadline = 'Telt ház';
-z.string.hu.modalTooManyMembersMessage = 'Legfeljebb {{number1}} partner tud csatlakozni a beszélgetéshez. Még {{number2}} partner számára van hely.';
-z.string.hu.modalUploadsParallel = 'Egyszerre {{number}} fájt küldhetsz.';
+
+z.string.hu.modalUploadContactsAction = 'Újra próbálás';
+z.string.hu.modalUploadContactsMessage = 'Nem kaptuk meg az adataidat. Kérjük, próbáld meg újra a névjegyek importálását.';
+
+z.string.hu.modalUserBlockAction = 'Tiltás';
+z.string.hu.modalUserBlockHeadline = '{{user}} tiltása?';
+z.string.hu.modalUserBlockMessage = '{{user}} nem tud majd kapcsolatba lépni veled, sem meghívni téged csoportos beszélgetésekbe.';
+
+z.string.hu.modalUserUnblockAction = 'Tiltás feloldása';
+z.string.hu.modalUserUnblockHeadline = 'Feloldod a letiltást?';
+z.string.hu.modalUserUnblockMessage = '{{user}} újra kapcsolatba tud lépni veled és meg tud hívni téged csoportos beszélgetésekbe.';
 
 z.string.hu.connectionRequestConnect = 'Csatlakozás';
 z.string.hu.connectionRequestIgnore = 'Figyelmen kívül hagyás';
@@ -207,12 +281,14 @@ z.string.hu.conversationDeviceYourDevices = ' az egyik eszközödről';
 z.string.hu.conversationDeviceUserDevices = ' {{user}} egyik eszköze';
 z.string.hu.conversationDeviceNewDeviceOne = ' egy új eszközt';
 z.string.hu.conversationDeviceNewDeviceMany = ' új eszközöket';
-z.string.hu.conversationDeviceNewPeopleJoined = 'új partnerek csatlakoztak.';
+z.string.hu.conversationDeviceNewPeopleJoined = 'Új partnerek csatlakoztak.';
 z.string.hu.conversationDeviceNewPeopleJoinedVerify = ' eszközök ellenőrzése';
 z.string.hu.conversationJustNow = 'Épp most';
 z.string.hu.conversationLocationLink = 'Térkép megnyitása';
 z.string.hu.conversationMemberJoin = ' hozzáadta a következőket: {{users}}';
 z.string.hu.conversationMemberJoinYou = ' hozzáadta a következőket: {{users}}';
+z.string.hu.conversationMemberJoinSelf = ' csatlakozott';
+z.string.hu.conversationMemberJoinSelfYou = ' csatlakozott';
 z.string.hu.conversationMemberLeaveLeft = ' kilépett';
 z.string.hu.conversationMemberLeaveLeftYou = ' kilépett';
 z.string.hu.conversationMemberLeaveRemoved = ' eltávolította a következőket: {{users}}';
@@ -235,9 +311,9 @@ z.string.hu.conversationUnableToDecryptLink = 'Miért?';
 z.string.hu.conversationUnableToDecryptErrorMessage = 'Hiba';
 z.string.hu.conversationUnableToDecryptResetSession = 'Munkamenet visszaállítása';
 z.string.hu.conversationMissedMessages = 'Ezt a készüléket már nem használtad egy ideje, ezért nem biztos, hogy minden üzenet megjelenik itt.';
+z.string.hu.conversationAssetUploading = 'Feltöltés…';
 z.string.hu.conversationAssetDownloading = 'Letöltés…';
 z.string.hu.conversationAssetUploadFailed = 'A feltöltés sikertelen';
-z.string.hu.conversationAssetUploadTooLarge = 'Maximum {{number}} méretű fájlokat küldhetsz';
 z.string.hu.conversationPlaybackError = 'Nem lehet lejátszani';
 z.string.hu.conversationContextMenuEdit = 'Szerkesztés';
 z.string.hu.conversationContextMenuDelete = 'Törlés nálam';
@@ -262,6 +338,11 @@ z.string.hu.groupCreationParticipantsActionSkip = 'Kihagyás';
 z.string.hu.groupCreationParticipantsHeader = 'Partnerek hozzáadása';
 z.string.hu.groupCreationParticipantsHeaderWithCounter = 'Partnerek hozzáadása ({{number}})';
 z.string.hu.groupCreationParticipantsPlaceholder = 'Keresés név szerint';
+
+z.string.hu.guestRoomConversationName = 'Vendégszoba';
+z.string.hu.guestRoomToggleName = 'Vendégek engedélyezése';
+z.string.hu.guestRoomToggleInfo = 'Megnyitja a beszélgetést a csapatodon kívüli partnerek számára is.';
+z.string.hu.guestRoomConversationBadge = 'Vendégek is vannak itt';
 
 z.string.hu.collectionShowAll = 'Mind a(z) {{number}} mutatása';
 z.string.hu.collectionSectionLinks = 'Hivatkozások';
@@ -300,6 +381,7 @@ z.string.hu.conversationsSecondaryLinePersonLeft = '{{user}} kilépett';
 z.string.hu.conversationsSecondaryLinePersonRemoved = '{{user}} eltávolítva';
 z.string.hu.conversationsSecondaryLinePeopleAdded = '{{user}} hozzáadva';
 z.string.hu.conversationsSecondaryLinePersonAdded = '{{user}} hozzáadva';
+z.string.hu.conversationsSecondaryLinePersonAddedSelf = '{{user}} csatlakozott';
 z.string.hu.conversationsSecondaryLinePersonAddedYou = '{{user}} hozzáadott téged';
 z.string.hu.conversationsSecondaryLineRenamed = '{{user}} átnevezte a beszélgetést';
 z.string.hu.conversationsSecondaryLineTimedMessage = 'Időzített üzenet';
@@ -313,6 +395,8 @@ z.string.hu.takeoverButtonKeep = 'Tartsd meg ezt';
 
 z.string.hu.inviteMetaKeyMac = 'Cmd';
 z.string.hu.inviteMetaKeyPc = 'Ctrl';
+z.string.hu.inviteHintSelected = 'Nyomd meg a {{metaKey}} + C billentyűkombinációt a másoláshoz';
+z.string.hu.inviteHintUnselected = 'Jelöld ki a szöveget, majd nyomd meg a {{metaKey}} + C billentyűkombinációt';
 z.string.hu.inviteHeadline = 'Hívj meg másokat is a Wire-re';
 z.string.hu.inviteMessage = 'Fent vagyok a Wire-ön. Keress rá a felhasználónevemre: {{username}} vagy nyisd meg a get.wire.com weboldalt.';
 z.string.hu.inviteMessageNoEmail = 'Fent vagyok a Wire-ön. Látogass el a get.wire.com weboldalra és lépj kapcsolatba velem.';
@@ -325,71 +409,71 @@ z.string.hu.extensionsGiphyMessage = '{{tag}} • Forrás: giphy.com';
 z.string.hu.extensionsGiphyNoGifs = 'Hoppá, nincs gif';
 z.string.hu.extensionsGiphyRandom = 'Véletlenszerű';
 
-z.string.hu.peopleConfirmLabel = 'Partnerek hozzáadása a csoporthoz';
-z.string.hu.peoplePeople = '{{number}} Partner';
-z.string.hu.peopleSearchPlaceholder = 'Keresés név szerint';
-z.string.hu.peopleEveryoneParticipates = 'Az összes partnered, \nakivel felvetted a kapcsolatot,\nmár ebben a beszélgetésben van.';
-z.string.hu.peopleNoMatches = 'Nincs találat. \nPróbálj megy egy másik nevet.';
-z.string.hu.peopleInvite = 'Hívj meg másokat is a Wire-re';
-z.string.hu.peopleInviteDetail = 'Névjegyeid megosztása megkönnyíti, hogy kapcsolatba lépj másokkal. Az összes információt anonimizáljuk és nem osztjuk meg senki mással.';
-z.string.hu.peopleInviteButtonContacts = 'Névjegyekből';
-z.string.hu.peopleInviteButtonGmail = 'Gmail-ből';
-z.string.hu.peopleInviteHeadline = 'Hozd a barátaidat is';
-z.string.hu.peopleServiceConfirmButton = 'Új szolgáltatás';
-z.string.hu.peopleServiceRemovalButton = 'Szolgáltatás eltávolítása';
-z.string.hu.peopleServiceNewConversation = 'Új beszélgetés létrehozása';
-z.string.hu.peopleServices = 'Szolgáltatások';
-z.string.hu.peopleShare = 'Névjegyek megosztása';
-z.string.hu.peopleTabsDetails = 'Részletek';
-z.string.hu.peopleTabsDevices = 'Eszközök';
-z.string.hu.peopleTabsDevicesHeadline = 'A Wire-ben minden eszköz egyedi ujjlenyomattal rendelkezik. Hasonlítsd össze ezt az ujjlenyomatot {{user}} partnerrel és ellenőrizd a beszélgetést.';
-z.string.hu.peopleTabsDevicesLearnMore = 'További információ';
-z.string.hu.peopleTabsDevicesWhyVerify = 'Miért ellenőrizd a beszélgetést?';
-z.string.hu.peopleTabsNoDevicesHeadline = '{{user}} a Wire régi verzióját használja. Eszközei itt nem jeleníthetőek meg.';
-z.string.hu.peopleTabsDeviceDetailAllMyDevices = 'Összes saját eszköz mutatása';
-z.string.hu.peopleTabsDeviceDetailDeviceFingerprint = 'Eszköz ujjlenyomata';
-z.string.hu.peopleTabsDeviceDetailHeadline = 'Ellenőrizd, hogy ez egyezik-e {{html1}}{{user}} eszközén látható{{html2}} ujjlenyomattal.';
-z.string.hu.peopleTabsDeviceDetailHowTo = 'Hogyan csináljam?';
-z.string.hu.peopleTabsDeviceDetailResetSession = 'Munkamenet visszaállítása';
-z.string.hu.peopleTabsDeviceDetailShowMyDevice = 'Eszköz ujjlenyomatának megjelenítése';
-z.string.hu.peopleTabsDeviceDetailVerify = 'Ellenőrizve';
-z.string.hu.peopleTabsPeople = 'Partner';
-z.string.hu.peopleTabsServices = 'Szolgáltatások';
-z.string.hu.peopleVerified = 'Ellenőrizve';
+z.string.hu.addParticipantsConfirmLabel = 'Hozzáadás';
+z.string.hu.addParticipantsHeader = 'Partnerek hozzáadása';
+z.string.hu.addParticipantsHeaderWithCounter = 'Partnerek hozzáadása ({{number}})';
+z.string.hu.addParticipantsSearchPlaceholder = 'Keresés név szerint';
+z.string.hu.addParticipantsServiceConfirmButton = 'Új szolgáltatás';
+z.string.hu.addParticipantsTabsPeople = 'Partner';
+z.string.hu.addParticipantsTabsServices = 'Szolgáltatások';
 
-z.string.hu.peopleBlockHeadline = 'Letiltod?';
-z.string.hu.peopleBlockMessage = '{{user}} nem tud majd kapcsolatba lépni veled, sem meghívni téged csoportos beszélgetésekbe.';
+z.string.hu.conversationDetailsActionArchive = 'Beszélgetés archiválása';
+z.string.hu.conversationDetailsActionAddParticipants = 'Résztvevők hozzáadása';
+z.string.hu.conversationDetailsActionBlock = 'Partner tiltása';
+z.string.hu.conversationDetailsActionCancelRequest = 'Kérelem visszavonása';
+z.string.hu.conversationDetailsActionClear = 'Tartalom törlése';
+z.string.hu.conversationDetailsActionCreateGroup = 'Csoport létrehozása';
+z.string.hu.conversationDetailsActionDevices = 'Eszközök';
+z.string.hu.conversationDetailsActionGuestOptions = 'Vendég opciók';
+z.string.hu.conversationDetailsActionLeave = 'Kilépés a csoportból';
+z.string.hu.conversationDetailsGuestsOff = 'Kikapcsolva';
+z.string.hu.conversationDetailsGuestsOn = 'Be';
+z.string.hu.conversationDetailsParticipantsServicesOne = 'Szolgáltatás';
+z.string.hu.conversationDetailsParticipantsServicesMany = 'Szolgáltatások';
+z.string.hu.conversationDetailsParticipantsUsersOne = 'Személy';
+z.string.hu.conversationDetailsParticipantsUsersMany = 'Partner';
+z.string.hu.conversationDetailsPeople = 'Partner';
+z.string.hu.conversationDetailsServices = 'Szolgáltatások';
 
-z.string.hu.peopleConnectHeadline = 'Elfogadod?';
-z.string.hu.peopleConnectMessage = 'Ezzel csatlakozol és beszélgetést indítasz {{user}} partnerrel.';
+z.string.hu.groupParticipantActionBlock = 'Partner tiltása';
+z.string.hu.groupParticipantActionCancelRequest = 'Kérelem visszavonása';
+z.string.hu.groupParticipantActionDevices = 'Eszközök';
+z.string.hu.groupParticipantActionIgnoreRequest = 'Kérés figyelmen kívül hatása';
+z.string.hu.groupParticipantActionIncomingRequest = 'Kérés elfogadása';
+z.string.hu.groupParticipantActionLeave = 'Kilépés a csoportból';
+z.string.hu.groupParticipantActionOpenConversation = 'Beszélgetés megnyitása';
+z.string.hu.groupParticipantActionPending = 'Függőben lévő';
+z.string.hu.groupParticipantActionRemove = 'Eltávolítás a csoportból';
+z.string.hu.groupParticipantActionSelfProfile = 'Profil megnyitása';
+z.string.hu.groupParticipantActionSendRequest = 'Csatlakozás';
+z.string.hu.groupParticipantActionUnblock = 'Tiltás feloldása';
 
-z.string.hu.peopleCancelRequestHeadline = 'Kérelem visszavonása?';
-z.string.hu.peopleCancelRequestMessage = 'Visszavonod a csatlakozási kérelmet {{user}} partnerhez.';
+z.string.hu.guestOptionsCopyLink = 'Hivatkozás másolása';
+z.string.hu.guestOptionsCopyLinkDone = 'Hivatkozás másolva!';
+z.string.hu.guestOptionsCreateLink = 'Hivatkozás létrehozása';
+z.string.hu.guestOptionsInfoHeader = 'Hívj meg másokat egy hivatkozással';
+z.string.hu.guestOptionsInfoText = 'Bárki, akinek megvan ez a hivatkozás, csatlakozhat a beszélgetéshez 24 órán belül, akkor is, ha egyébként nincsenek a Wire-ön.';
+z.string.hu.guestOptionsRevokeLink = 'Link visszavonása';
+z.string.hu.guestOptionsTitle = 'Vendég opciók';
 
-z.string.hu.peopleLeaveHeadline = 'Kilépsz ebből a beszélgetésből?';
-z.string.hu.peopleLeaveMessage = 'Ezután nem fogsz tudni üzeneteket küldeni és fogadni ebben a beszélgetésben.';
+z.string.hu.participantDevicesDetailHeadline = 'Ellenőrizd, hogy ez egyezik-e {{html1}}{{user}} eszközén látható{{html2}} ujjlenyomattal.';
+z.string.hu.participantDevicesDetailHowTo = 'Hogyan csináljam?';
+z.string.hu.participantDevicesDetailResetSession = 'Munkamenet visszaállítása';
+z.string.hu.participantDevicesDetailShowMyDevice = 'Eszköz ujjlenyomatának megjelenítése';
+z.string.hu.participantDevicesDetailVerify = 'Ellenőrizve';
 
-z.string.hu.peopleRemoveHeadline = 'Törlöd?';
-z.string.hu.peopleRemoveMessage = '{{user}} nem fog tudni üzenetet küldeni és fogadni ebben a beszélgetésben.';
+z.string.hu.participantDevicesHeader = 'Eszközök';
+z.string.hu.participantDevicesHeadline = 'A Wire-ben minden eszköz egyedi ujjlenyomattal rendelkezik. Hasonlítsd össze ezt az ujjlenyomatot {{user}} partnerrel és ellenőrizd a beszélgetést.';
+z.string.hu.participantDevicesLearnMore = 'További információ';
+z.string.hu.participantDevicesWhyVerify = 'Miért ellenőrizd a beszélgetéseket?';
+z.string.hu.participantDevicesOutdatedClientMessage = '{{user}} a Wire régi verzióját használja. Eszközei itt nem jeleníthetőek meg.';
 
-z.string.hu.peopleUnblockHeadline = 'Feloldod a letiltást?';
-z.string.hu.peopleUnblockMessage = '{{user}} újra kapcsolatba tud lépni veled és meg tud hívni téged csoportos beszélgetésekbe.';
+z.string.hu.participantDevicesSelfAllDevices = 'Összes saját eszköz mutatása';
+z.string.hu.participantDevicesSelfFingerprint = 'Eszköz ujjlenyomata';
 
-z.string.hu.peopleButtonAdd = 'Hozzáadás';
-z.string.hu.peopleButtonAddPeople = 'Partnerek hozzáadása';
-z.string.hu.peopleButtonBlock = 'Tiltás';
-z.string.hu.peopleButtonCancel = 'Mégsem';
-z.string.hu.peopleButtonConnect = 'Csatlakozás';
-z.string.hu.peopleButtonCreate = 'Csoport létrehozása';
-z.string.hu.peopleButtonIgnore = 'Figyelmen kívül hagyás';
-z.string.hu.peopleButtonLeave = 'Kilépés';
-z.string.hu.peopleButtonOpen = 'Beszélgetés megnyitása';
-z.string.hu.peopleButtonPending = 'Függőben lévő';
-z.string.hu.peopleButtonProfile = 'Profil';
-z.string.hu.peopleButtonRemove = 'Eltávolítás';
-z.string.hu.peopleButtonUnblock = 'Tiltás feloldása';
-z.string.hu.peopleButtonNo = 'Nem';
-z.string.hu.peopleButtonYes = 'Igen';
+z.string.hu.userProfileButtonConnect = 'Csatlakozás';
+z.string.hu.userProfileButtonIgnore = 'Figyelmen kívül hagyás';
+z.string.hu.userProfileButtonUnblock = 'Tiltás feloldása';
 
 z.string.hu.preferencesAbout = 'Névjegy';
 z.string.hu.preferencesAccount = 'Fiók';
@@ -471,9 +555,11 @@ z.string.hu.searchConnect = 'Csatlakozás';
 z.string.hu.searchConnections = 'Kapcsolatok';
 z.string.hu.searchContacts = 'Névjegyek';
 z.string.hu.searchCreateGroup = 'Csoport létrehozása';
+z.string.hu.searchCreateGuestRoom = 'Vendégszoba létrehozása';
 z.string.hu.searchGroups = 'Csoportok';
 z.string.hu.searchPeople = 'Partner';
 z.string.hu.searchPlaceholder = 'Keresés név vagy felhasználónév alapján';
+z.string.hu.searchServicePlaceholder = 'Keresés név szerint';
 z.string.hu.searchServices = 'Szolgáltatások';
 z.string.hu.searchTeamGroups = 'Csapat beszélgetés';
 z.string.hu.searchTeamMembers = 'Csapattagok';
@@ -483,11 +569,21 @@ z.string.hu.searchNoContactsOnWire = 'Nincsenek névjegyeid a Wire-ön.\nPróbá
 z.string.hu.searchMemberInvite = 'Hívj meg másokat a csapatba';
 z.string.hu.searchOthers = 'Csatlakozás';
 
+z.string.hu.searchInvite = 'Hívj meg másokat is a Wire-re';
+z.string.hu.searchInviteDetail = 'Névjegyeid megosztása megkönnyíti, hogy kapcsolatba lépj másokkal. Az összes információt anonimizáljuk és nem osztjuk meg senki mással.';
+z.string.hu.searchInviteButtonContacts = 'Névjegyekből';
+z.string.hu.searchInviteButtonGmail = 'Gmail-ből';
+z.string.hu.searchInviteHeadline = 'Hozd a barátaidat is';
+z.string.hu.searchInviteShare = 'Névjegyek megosztása';
+
+z.string.hu.searchServiceNewConversation = 'Új beszélgetés létrehozása';
+z.string.hu.searchServiceConfirmButton = 'Új szolgáltatás';
+
+z.string.hu.searchListEveryoneParticipates = 'Az összes partnered, \nakivel felvetted a kapcsolatot,\nmár ebben a beszélgetésben van.';
+z.string.hu.searchListNoMatches = 'Nincs találat. \nPróbálj megy egy másik nevet.';
+
 z.string.hu.uploadGoogleHeadline = 'Keress partnereket\na Wire-ön.';
 z.string.hu.uploadGoogleMessage = 'A névjegyeid importálásával könnyebben kapcsolatba léphetsz másokkal. Minden információt anonimizálunk, és semmit nem osszuk meg senki mással.';
-z.string.hu.uploadGoogleHeadlineError = 'Valami nem stimmel.';
-z.string.hu.uploadGoogleMessageError = 'Nem kaptuk meg az adataidat. Kérjük, próbáld meg újra a névjegyek importálását.';
-z.string.hu.uploadGoogleButtonAgain = 'Újra próbálás';
 
 z.string.hu.urlSupportRoot = '/';
 z.string.hu.urlSupportArticles = '/hc/en-us/articles/';
@@ -496,8 +592,6 @@ z.string.hu.urlWebappRoot = '/';
 z.string.hu.urlWebsiteRoot = '/';
 z.string.hu.urlWebsiteCreateTeam = '/csapat-létrehozása/';
 z.string.hu.urlWebsitePrivacy = '/adatvédelem';
-z.string.hu.warningCallDetail = 'A hívásokhoz a böngésződnek hozzá kell férnie a mikrofonodhoz.';
-z.string.hu.warningCallHeadline = 'Nem kezdeményezhetsz hívást mikrofon nélkül';
 z.string.hu.warningCallUnsupportedIncoming = '{{user}} hív. Böngésződ nem támogatja a hanghívásokat.';
 z.string.hu.warningCallUnsupportedOutgoing = 'Nem kezdeményezhetsz hívást, mert böngésződ nem támogatja a hanghívásokat.';
 z.string.hu.warningCallIssues = 'Ezzel a Wire verzióval nem tudsz részt venni a hívásban. Kérjük, használd ezt:';
@@ -517,7 +611,6 @@ z.string.hu.warningPermissionRequestCamera = '{{icon}} Kamera hozzáférés enge
 z.string.hu.warningPermissionRequestMicrophone = '{{icon}} Mikrofon hozzáférés engedélyezése';
 z.string.hu.warningPermissionRequestNotification = '{{icon}} Értesítések engedélyezése';
 z.string.hu.warningPermissionRequestScreen = '{{icon}} Képernyőmegosztás engedélyezése';
-z.string.hu.warningTellMeHow = 'Mit kell tennem';
 
 z.string.hu.userAvailabilityAvailable = 'Elérhető';
 z.string.hu.userAvailabilityAway = 'Nincs a gépnél';
@@ -531,6 +624,7 @@ z.string.hu.notificationConnectionRequest = 'Szeretne csatlakozni';
 z.string.hu.notificationConversationCreate = '{{user}} beszélgetést indított';
 z.string.hu.notificationConversationRename = '{{user}} átnevezte a beszélgetést erre: {{name}}';
 z.string.hu.notificationMemberJoinMany = '{{user}} hozzáadott {{number}} partnert a beszélgetéshez';
+z.string.hu.notificationMemberJoinSelf = '{{user}} csatlakozott a beszélgetéshez';
 z.string.hu.notificationMemberJoinOne = '{{user1}} hozzáadta {{user2}} partnert a beszélgetéshez';
 z.string.hu.notificationMemberLeaveRemovedYou = '{{user}} eltávolított a beszélgetésből';
 z.string.hu.notificationObfuscated = 'Üzenetet küldött';
@@ -566,14 +660,8 @@ z.string.hu.tooltipConversationsPreferences = 'Beállítások megnyitása';
 z.string.hu.tooltipConversationsSilence = 'Némítás ({{shortcut}})';
 z.string.hu.tooltipConversationsStart = 'Beszélgetés megkezdése ({{shortcut}})';
 
-z.string.hu.tooltipPeopleAdd = 'Partnerek hozzáadása a beszélgetéshez ({{shortcut}})';
-z.string.hu.tooltipPeopleBack = 'Vissza';
-z.string.hu.tooltipPeopleBlock = 'Tiltás';
-z.string.hu.tooltipPeopleConnect = 'Csatlakozás';
-z.string.hu.tooltipPeopleLeave = 'Kilépés a beszélgetésből';
-z.string.hu.tooltipPeopleRename = 'Beszélgetés nevének megváltoztatása';
-z.string.hu.tooltipPeopleRemove = 'Eltávolítás a beszélgetésből';
-z.string.hu.tooltipPeopleUnblock = 'Tiltás feloldása';
+z.string.hu.tooltipConversationDetailsAddPeople = 'Résztvevők hozzáadása a beszélgetéshez ({{shortcut}})';
+z.string.hu.tooltipConversationDetailsRename = 'Beszélgetés nevének megváltoztatása';
 
 z.string.hu.tooltipPreferencesContactsGmail = 'Kapcsolataid megosztásához jelentkezz be Gmail fiókodba';
 z.string.hu.tooltipPreferencesContactsMacos = 'Oszd meg névjegyeidet a macOS Névjegyek alkalmazásából';

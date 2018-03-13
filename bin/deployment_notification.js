@@ -17,12 +17,17 @@
  *
  */
 
+const os = require('os');
+const path = require('path');
+
+const APIClient = require('@wireapp/api-client');
 const {Account} = require('@wireapp/core');
+const {FileEngine} = require('@wireapp/store-engine');
 
 const login = {
   email: process.env.WIRE_WEBAPP_BOT_EMAIL,
   password: process.env.WIRE_WEBAPP_BOT_PASSWORD,
-  persist: false,
+  persist: true,
 };
 
 const commit = {
@@ -64,10 +69,21 @@ content.message =
   `\r\n- Last commit from: ${commit.author}` +
   `\r\n- Last commit message: ${commit.message}`;
 
-const account = new Account();
+let account = undefined;
+const directory = path.join(os.homedir(), 'cryptobox');
 
-account
-  .listen(login)
+const engine = new FileEngine(directory);
+engine
+  .init('', {fileExtension: '.json'})
+  .then(() => {
+    const client = new APIClient({
+      store: engine,
+      urls: APIClient.BACKEND.PRODUCTION,
+    });
+
+    account = new Account(client);
+    return account.listen(login);
+  })
   .then(() => account.service.conversation.sendTextMessage(content.conversationId, content.message))
   .then(() => process.exit(0))
   .catch(error => {

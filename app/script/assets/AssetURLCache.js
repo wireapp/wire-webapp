@@ -23,7 +23,7 @@ window.z = window.z || {};
 window.z.assets = z.assets || {};
 
 z.assets.AssetURLCache = (() => {
-  const _lruCache = new LRUCache(100);
+  const _lruCache = new LRUCache.default(100);
 
   const _getUrl = identifier => _lruCache.get(identifier);
 

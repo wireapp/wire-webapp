@@ -1,0 +1,171 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+.conversation-details {
+  .right-panel-mute {
+    path {
+      fill: @graphite-dark;
+    }
+
+    &--active {
+      path {
+        fill: @w-blue;
+      }
+    }
+  }
+
+  &__header {
+    padding: 8px 16px;
+  }
+
+  &__flex-row {
+    display: flex;
+    flex-direction: row;
+  }
+
+  &__name {
+    font-size: 20px;
+    font-weight: @font-weight-bold;
+    display: flex;
+    min-height: 24px;
+    border: none;
+    padding: 0;
+    word-break: break-word;
+
+    &--centered {
+      margin-top: 24px;
+      justify-content: center;
+    }
+
+    &--input {
+      width: 250px;
+      height: auto;
+      border: 0;
+      outline: none;
+      resize: none;
+    }
+
+    &__verified-icon {
+      margin: 0 8px;
+    }
+
+    &__verified-icon-right {
+      margin-left: 8px;
+    }
+
+    &__edit-icon {
+      flex-grow: 1;
+      opacity: 0;
+      transition: opacity @animation-timing-faster @ease-in-quart;
+      margin-left: 11px;
+
+      svg {
+        height: 12px;
+        width: 12px;
+      }
+
+      path {
+        fill: fade(@graphite-dark, 56%);
+      }
+    }
+
+    &:hover > &__edit-icon {
+      opacity: 1;
+    }
+  }
+
+  &__participant_count {
+    margin-top: 8px;
+    font-size: 11px;
+    text-transform: uppercase;
+    font-weight: @font-weight-bold;
+
+    &__service {
+      margin-left: 8px;
+    }
+
+    &__text {
+      color: @graphite;
+    }
+  }
+
+  &__user-name {
+    font-size: 12px;
+    text-align: center;
+    font-weight: @font-weight-regular;
+    margin-top: 8px;
+
+    &::before {
+      content: '@';
+    }
+  }
+
+  &__list-head {
+    margin: 32px 16px 8px;
+    color: @graphite;
+    font-size: 11px;
+    text-transform: uppercase;
+    font-weight: @font-weight-bold;
+  }
+
+  &__participant-options {
+    margin: 32px 0 0;
+  }
+
+  &__guest-options {
+    margin: 16px 0 0;
+  }
+
+  &__bottom-actions {
+    margin-top: 32px;
+  }
+
+  &__devices {
+    margin: 88px 0 56px;
+  }
+
+  &__participants {
+    display: flex;
+    flex-direction: column;
+    & > participant-avatar {
+      margin: 24px auto;
+    }
+  }
+
+  &__guest-label {
+    display: flex;
+    justify-content: center;
+
+    path {
+      fill: @graphite-dark;
+    }
+
+    span {
+      margin-left: 8px;
+      font-size: 12px;
+    }
+  }
+
+  &__availability {
+    justify-content: center;
+    text-transform: uppercase;
+    font-size: 11px;
+    font-weight: @font-weight-bold;
+  }
+}

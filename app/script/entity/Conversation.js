@@ -33,6 +33,8 @@ z.entity.Conversation = class Conversation {
 
     this.logger = new z.util.Logger(`z.entity.Conversation (${this.id})`, z.config.LOGGER.OPTIONS);
 
+    this.accessState = ko.observable(z.conversation.ACCESS_STATE.UNKNOWN);
+    this.accessCode = ko.observable();
     this.creator = undefined;
     this.name = ko.observable();
     this.team_id = undefined;
@@ -56,6 +58,10 @@ z.entity.Conversation = class Conversation {
 
     this.is_guest = ko.observable(false);
     this.is_managed = false;
+
+    this.inTeam = ko.pureComputed(() => this.team_id && !this.is_guest());
+    this.isGuestRoom = ko.pureComputed(() => this.accessState() === z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM);
+    this.isTeamOnly = ko.pureComputed(() => this.accessState() === z.conversation.ACCESS_STATE.TEAM.TEAM_ONLY);
 
     this.is_group = ko.pureComputed(() => {
       const group_type = this.type() === z.conversation.ConversationType.REGULAR;

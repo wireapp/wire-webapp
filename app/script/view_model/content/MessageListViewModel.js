@@ -42,9 +42,12 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     this.on_session_reset_click = this.on_session_reset_click.bind(this);
     this.should_hide_user_avatar = this.should_hide_user_avatar.bind(this);
 
+    this.mainViewModel = mainViewModel;
     this.conversation_repository = repositories.conversation;
     this.user_repository = repositories.user;
     this.logger = new z.util.Logger('z.viewModel.content.MessageListViewModel', z.config.LOGGER.OPTIONS);
+
+    this.actionsViewModel = this.mainViewModel.actions;
 
     this.conversation = ko.observable(new z.entity.Conversation());
     this.center_messages = ko.pureComputed(() => {
@@ -527,11 +530,10 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     return this.conversation().get_last_delivered_message() === message_et;
   }
 
-  click_on_cancel_request(message_et) {
-    const next_conversation_et = this.conversation_repository.get_next_conversation(
-      this.conversation_repository.active_conversation()
-    );
-    this.user_repository.cancel_connection_request(message_et.otherUser(), next_conversation_et);
+  click_on_cancel_request(messageEntity) {
+    const conversationEntity = this.conversation_repository.active_conversation();
+    const nextConversationEntity = this.conversation_repository.get_next_conversation(conversationEntity);
+    this.actionsViewModel.cancelConnectionRequest(messageEntity.otherUser(), true, nextConversationEntity);
   }
 
   click_on_like(message_et, button = true) {
@@ -596,26 +598,16 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
 
     if (message_et.is_deletable()) {
       entries.push({
-        click: () => {
-          amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.DELETE_MESSAGE, {
-            action: () => this.conversation_repository.delete_message(this.conversation(), message_et),
-          });
-        },
+        click: () => this.actionsViewModel.deleteMessage(this.conversation(), message_et),
         label: z.string.conversationContextMenuDelete,
       });
     }
 
-    if (
-      message_et.user().is_me &&
-      !this.conversation().removed_from_conversation() &&
-      message_et.status() !== z.message.StatusType.SENDING
-    ) {
+    const isSendingMessage = message_et.status() === z.message.StatusType.SENDING;
+    const canDelete = message_et.user().is_me && !this.conversation().removed_from_conversation() && !isSendingMessage;
+    if (canDelete) {
       entries.push({
-        click: () => {
-          amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.DELETE_EVERYONE_MESSAGE, {
-            action: () => this.conversation_repository.delete_message_everyone(this.conversation(), message_et),
-          });
-        },
+        click: () => this.actionsViewModel.deleteMessageEveryone(this.conversation(), message_et),
         label: z.string.conversationContextMenuDeleteEveryone,
       });
     }

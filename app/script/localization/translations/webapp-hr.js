@@ -23,11 +23,6 @@ z.string.hr.wireLinux = 'Wire za Linux';
 z.string.hr.nonexistentUser = 'Izbrisani korisnik';
 z.string.hr.and = 'i';
 
-z.string.hr.alertUploadFileFormat = 'Ne možete koristiti ovu sliku. Molimo izaberite PNG ili JPEG datoteku.';
-z.string.hr.alertUploadTooSmall = 'Ne možete koristiti ovu sliku. Odaberite sliku koja je barem 320 x 320 px.';
-z.string.hr.alertUploadTooLarge = 'Ova slika je prevelika. Možete učitati datoteke do {{number}} MB.';
-z.string.hr.alertGifTooLarge = 'Animacija je prevelika. Maksimalne veličine je {{number}} MB.';
-
 z.string.hr.authAccountCountryCode = 'Pozivni broj';
 z.string.hr.authAccountExpiration = 'Odjavljeni ste jer je vaša sesija istekla. Molimo prijavite se ponovno.';
 z.string.hr.authAccountPasswordForgot = 'Zaboravljena lozinka';
@@ -92,69 +87,114 @@ z.string.hr.callAccept = 'Prihvati';
 z.string.hr.callJoin = 'Pridruži se';
 z.string.hr.callChooseSharedScreen = 'Odaberite zaslon za zajedničko korištenje';
 
-z.string.hr.modalButtonCancel = 'Odustani';
-z.string.hr.modalButtonOk = 'Ok';
-z.string.hr.modalButtonSend = 'Pošalji';
+z.string.hr.modalAcknowledgeAction = 'Ok';
+z.string.hr.modalConfirmSecondary = 'Odustani';
+z.string.hr.modalOptionSecondary = 'Odustani';
 
-z.string.hr.modalBlockConversationHeadline = 'Blokiraj {{user}}?';
-z.string.hr.modalBlockConversationMessage = '{{user}} neće biti u mogućnosti kontaktirati vas ili vas pozvati u grupnu konverzaciju.';
-z.string.hr.modalBlockConversationButton = 'Blokiraj';
-z.string.hr.modalCallConversationEmptyHeadline = 'Nemam koga zvati';
-z.string.hr.modalCallConversationEmptyMessage = 'Nema osoba u konverzaciji.';
-z.string.hr.modalCallNoVideoInGroupHeadline = 'Nema video poziva u grupama';
-z.string.hr.modalCallNoVideoInGroupMessage = 'Video pozivi nisu dostupni u grupnim razgovorima.';
+z.string.hr.modalAccountDeletionAction = 'Obriši';
+z.string.hr.modalAccountDeletionHeadline = 'Brisanje računa';
+z.string.hr.modalAccountDeletionMessage = 'Poslati ćemo Vam poslati poruku putem e-maila ili SMS-a. Slijedite link za trajno brisanje računa.';
+
+z.string.hr.modalAccountLogoutAction = 'Odjava';
+z.string.hr.modalAccountLogoutHeadline = 'Obriši podatke?';
+z.string.hr.modalAccountLogoutOption = 'Izbriši sve osobne informacije i razgovore na ovom uređaju.';
+
+z.string.hr.modalAccountNewDevicesSecondary = 'Upravljanje uređajima';
+z.string.hr.modalAccountNewDevicesHeadline = 'Vaš račun je korišten na:';
+z.string.hr.modalAccountNewDevicesFrom = 'Šalje:';
+z.string.hr.modalAccountNewDevicesMessage = 'Ako niste to učinili, uklonite uređaj i ponovno postavite lozinku.';
+
+z.string.hr.modalAccountRemoveDeviceAction = 'Uklanjanje uređaja';
+z.string.hr.modalAccountRemoveDeviceHeadline = 'Uklanjanje "{{device}}"';
+z.string.hr.modalAccountRemoveDeviceMessage = 'Lozinka potrebna za uklanjanje uređaja.';
+z.string.hr.modalAccountRemoveDevicePlaceholder = 'Lozinka';
+
+z.string.hr.modalAssetTooLargeMessage = 'Možete poslati datoteke do {{number}}';
+
+z.string.hr.modalAssetParallelUploadsMessage = 'Možete poslati {{number}} datoteke odjednom.';
+
+z.string.hr.modalCallEmptyConversationHeadline = 'Nemam koga zvati';
+z.string.hr.modalCallEmptyConversationMessage = 'Nema osoba u konverzaciji.';
+
+z.string.hr.modalCallNoGroupVideoHeadline = 'Nema video poziva u grupama';
+z.string.hr.modalCallNoGroupVideoMessage = 'Video pozivi nisu dostupni u grupnim razgovorima.';
+
+z.string.hr.modalCallNoMicrophoneAction = 'Recite mi kako';
+z.string.hr.modalCallNoMicrophoneMessage = 'Your browser needs access to the microphone to make calls.';
+z.string.hr.modalCallNoMicrophoneHeadline = 'Poziv nije moguć bez mikrofona';
+
+z.string.hr.modalCallSecondIncomingAction = 'Odgovori';
 z.string.hr.modalCallSecondIncomingHeadline = 'Odgovoriti na poziv?';
 z.string.hr.modalCallSecondIncomingMessage = 'Vaš trenutni poziv će završiti.';
-z.string.hr.modalCallSecondIncomingAction = 'Odgovori';
+
+z.string.hr.modalCallSecondOngoingAction = 'Poklopi';
 z.string.hr.modalCallSecondOngoingHeadline = 'Prekini poziv na drugom uređaju?';
 z.string.hr.modalCallSecondOngoingMessage = 'Možete biti u samo jednom pozivu u isto vrijeme.';
-z.string.hr.modalCallSecondOngoingAction = 'Poklopi';
+
+z.string.hr.modalCallSecondOutgoingAction = 'Poklopi';
 z.string.hr.modalCallSecondOutgoingHeadline = 'Prekinuti trenutni poziv?';
 z.string.hr.modalCallSecondOutgoingMessage = 'Možete biti u samo jednom pozivu u isto vrijeme.';
-z.string.hr.modalCallSecondOutgoingAction = 'Poklopi';
-z.string.hr.modalClearConversationHeadline = 'Izbrisati sadržaj?';
-z.string.hr.modalClearConversationOption = 'Također napusti razgovor';
-z.string.hr.modalClearConversationButton = 'Obriši';
-z.string.hr.modalConnectedDeviceHeadline = 'Vaš račun je korišten na:';
-z.string.hr.modalConnectedDeviceFrom = 'Šalje:';
-z.string.hr.modalConnectedDeviceMessage = 'Ako niste to učinili, uklonite uređaj i ponovno postavite lozinku.';
-z.string.hr.modalConnectedDeviceManageDevices = 'upravljanje uređajima';
-z.string.hr.modalDeleteAccountAction = 'Obriši';
-z.string.hr.modalDeleteAccountHeadline = 'Brisanje računa';
-z.string.hr.modalDeleteAccountMessage = 'Poslati ćemo Vam poslati poruku putem e-maila ili SMS-a. Slijedite link za trajno brisanje računa.';
-z.string.hr.modalDeleteButton = 'Obriši';
-z.string.hr.modalDeleteHeadline = 'Izbriši samo za mene?';
-z.string.hr.modalDeleteMessage = 'Ovo se ne može poništiti.';
-z.string.hr.modalDeleteEveryoneButton = 'Obriši';
-z.string.hr.modalDeleteEveryoneHeadline = 'Izbriši za sve?';
-z.string.hr.modalDeleteEveryoneMessage = 'Ovo se ne može poništiti.';
-z.string.hr.modalTooLongHeadline = 'Poruka preduga';
-z.string.hr.modalTooLongMessage = 'Možete slati poruke do {{number}} znakova.';
-z.string.hr.modalLeaveConversationHeadline = 'Napustiti razgovor "{{user}}"?';
-z.string.hr.modalLeaveConversationMessage = 'Sudionici će biti obaviješteni i razgovor uklonjen s Vašeg popisa.';
-z.string.hr.modalLeaveConversationButton = 'Izađi';
-z.string.hr.modalLogoutHeadline = 'Obriši podatke?';
-z.string.hr.modalLogoutMessage = 'Izbriši sve osobne informacije i razgovore na ovom uređaju.';
-z.string.hr.modalLogoutButton = 'Odjava';
-z.string.hr.modalNewDeviceHeadline = '{{user}} počeo koristiti novi uređaj';
-z.string.hr.modalNewDeviceHeadlineMany = '{{users}} je počeo/ počela koristiti nove uređaje';
-z.string.hr.modalNewDeviceHeadlineYou = '{{user}} počeo koristiti novi uređaj';
-z.string.hr.modalNewDeviceMessage = 'Još uvijek želite poslati poruku?';
-z.string.hr.modalNewDeviceCallAnyway = 'Svejedno iniciraj poziv';
-z.string.hr.modalNewDeviceShowDevice = 'prikaz uređaja';
-z.string.hr.modalNewDeviceSendAnyway = 'svejedno pošalji';
-z.string.hr.modalNotConnectedMessageOne = '{{name}} ne želi biti dodan/a razgovorima.';
-z.string.hr.modalNotConnectedMessageMany = 'Jedna od osoba koje ste odabrali ne želi biti dodana u razgovore.';
-z.string.hr.modalRemoveDeviceButton = 'Uklanjanje uređaja';
-z.string.hr.modalRemoveDeviceHeadline = 'Uklanjanje "{{device}}"';
-z.string.hr.modalRemoveDeviceMessage = 'Lozinka potrebna za uklanjanje uređaja.';
+
+z.string.hr.modalConnectCancelAction = 'Da';
+z.string.hr.modalConnectCancelHeadline = 'Poništiti zahtjev?';
+z.string.hr.modalConnectCancelMessage = 'Uklanjanje zahtjeva za povezivanje s {{user}}.';
+z.string.hr.modalConnectCancelSecondary = 'Ne';
+
+z.string.hr.modalConnectAcceptAction = 'Poveži se';
+z.string.hr.modalConnectAcceptHeadline = 'Prihvatiti?';
+z.string.hr.modalConnectAcceptMessage = 'Ovo će vas spojiti i otvoriti razgovor s {{user}}.';
+z.string.hr.modalConnectAcceptSecondary = 'Ignoriraj';
+
+z.string.hr.modalConversationClearAction = 'Obriši';
+z.string.hr.modalConversationClearHeadline = 'Izbrisati sadržaj?';
+z.string.hr.modalConversationClearOption = 'Također napusti razgovor';
+
+z.string.hr.modalConversationDeleteMessageAction = 'Obriši';
+z.string.hr.modalConversationDeleteMessageHeadline = 'Izbriši samo za mene?';
+z.string.hr.modalConversationDeleteMessageMessage = 'Ovo se ne može poništiti.';
+
+z.string.hr.modalConversationDeleteMessageEveryoneAction = 'Obriši';
+z.string.hr.modalConversationDeleteMessageEveryoneHeadline = 'Izbriši za sve?';
+z.string.hr.modalConversationDeleteMessageEveryoneMessage = 'Ovo se ne može poništiti.';
+
+z.string.hr.modalConversationLeaveAction = 'Izađi';
+z.string.hr.modalConversationLeaveMessage = 'Nećete moći slati ili primati poruke u ovom razgovoru.';
+
+z.string.hr.modalConversationMessageTooLongHeadline = 'Poruka preduga';
+z.string.hr.modalConversationMessageTooLongMessage = 'Možete slati poruke do {{number}} znakova.';
+
+z.string.hr.modalConversationNewDeviceHeadlineOne = '{{user}} počeo koristiti novi uređaj';
+z.string.hr.modalConversationNewDeviceHeadlineMany = '{{users}} je počeo/ počela koristiti nove uređaje';
+z.string.hr.modalConversationNewDeviceHeadlineYou = '{{user}} počeo koristiti novi uređaj';
+z.string.hr.modalConversationNewDeviceMessage = 'Još uvijek želite poslati poruku?';
+z.string.hr.modalConversationNewDeviceOutgoingCallAction = 'Svejedno iniciraj poziv';
+
+z.string.hr.modalConversationNotConnectedMessageOne = '{{name}} ne želi biti dodan/a razgovorima.';
+z.string.hr.modalConversationNotConnectedMessageMany = 'Jedna od osoba koje ste odabrali ne želi biti dodana u razgovore.';
+
+z.string.hr.modalConversationRemoveAction = 'Ukloni';
+z.string.hr.modalConversationRemoveHeadline = 'Ukloniti?';
+z.string.hr.modalConversationRemoveMessage = '{{user}} neće moći slati ili primati poruke u ovom razgovoru.';
+
+
+z.string.hr.modalConversationTooManyMembersHeadline = 'Puna kuća';
+
+
+
 z.string.hr.modalSessionResetHeadline = 'Sesija je resetirana';
 z.string.hr.modalSessionResetMessage1 = 'Ako problem nije razriješen,';
 z.string.hr.modalSessionResetMessageLink = 'kontaktirajte';
 z.string.hr.modalSessionResetMessage2 = 'nas.';
-z.string.hr.modalTooManyMembersHeadline = 'Puna kuća';
-z.string.hr.modalTooManyMembersMessage = 'Do {{number1}} ljudi može pristupiti razgovoru. Ima mjesta za još {{number2}} ljudi ovdje.';
-z.string.hr.modalUploadsParallel = 'Možete poslati {{number}} datoteke odjednom.';
+
+z.string.hr.modalUploadContactsAction = 'Pokušaj ponovno';
+z.string.hr.modalUploadContactsMessage = 'Nismo dobili podatke. Pokušajte ponovno uvesti svoje kontakte.';
+
+z.string.hr.modalUserBlockAction = 'Blokiraj';
+z.string.hr.modalUserBlockHeadline = 'Blokiraj {{user}}?';
+z.string.hr.modalUserBlockMessage = '{{user}} neće biti u mogućnosti kontaktirati vas ili vas pozvati u grupnu konverzaciju.';
+
+z.string.hr.modalUserUnblockAction = 'Odblokiraj';
+z.string.hr.modalUserUnblockHeadline = 'Odblokirati?';
 
 z.string.hr.connectionRequestConnect = 'Poveži se';
 z.string.hr.connectionRequestIgnore = 'Ignoriraj';
@@ -202,7 +242,6 @@ z.string.hr.conversationUnableToDecryptResetSession = 'Resetiraj sesiju';
 z.string.hr.conversationMissedMessages = 'Niste upotrebljavali ovaj uređaj neko vrijeme. Neke poruke možda neće biti vidljive na njemu.';
 z.string.hr.conversationAssetDownloading = 'Preuzimanje…';
 z.string.hr.conversationAssetUploadFailed = 'Prijenos neuspješan';
-z.string.hr.conversationAssetUploadTooLarge = 'Možete poslati datoteke do {{number}}';
 z.string.hr.conversationPlaybackError = 'Reprodukcija neuspješna';
 z.string.hr.conversationContextMenuEdit = 'Promjeni';
 z.string.hr.conversationContextMenuDelete = 'Brisanje poruke za mene';
@@ -262,63 +301,43 @@ z.string.hr.extensionsGiphyMessage = '• {{tag}} s giphy.com';
 z.string.hr.extensionsGiphyNoGifs = 'Ups, nema Gif-ova';
 z.string.hr.extensionsGiphyRandom = 'Nasumično';
 
-z.string.hr.peoplePeople = '{{people}} ljudi';
-z.string.hr.peopleSearchPlaceholder = 'Traži po imenu';
-z.string.hr.peopleEveryoneParticipates = 'Svi ljudi s kojima ste povezani su već u ovom razgovoru.';
-z.string.hr.peopleNoMatches = 'Nema odgovarajućih rezultata. Pokušajte unijeti drugačije ime.';
-z.string.hr.peopleInviteButtonContacts = 'Iz kontakata';
-z.string.hr.peopleInviteButtonGmail = 'Iz Gmaila';
-z.string.hr.peopleInviteHeadline = 'Pozovi prijatelje';
-z.string.hr.peopleServices = 'Usluge';
-z.string.hr.peopleShare = 'Podijeli kontakte';
-z.string.hr.peopleTabsDetails = 'Detalji';
-z.string.hr.peopleTabsDevices = 'Uređaji';
-z.string.hr.peopleTabsDevicesHeadline = 'Wire daje svakom uređaju jedinstveni otisak. Usporedite otiske s {{user}} da bi verificirali razgovor.';
-z.string.hr.peopleTabsDevicesLearnMore = 'Saznaj više';
-z.string.hr.peopleTabsDevicesWhyVerify = 'Zašto verifikacija razgovora?';
-z.string.hr.peopleTabsNoDevicesHeadline = '{{user}} koristi staru verziju Wire. Nema novih uređaja.';
-z.string.hr.peopleTabsDeviceDetailAllMyDevices = 'Pokaži sve uređaje';
-z.string.hr.peopleTabsDeviceDetailDeviceFingerprint = 'Otisak uređaja';
-z.string.hr.peopleTabsDeviceDetailHeadline = 'Provjerite da je otisak prikazan na {{html1}}{{user}}’s device{{html2}}.';
-z.string.hr.peopleTabsDeviceDetailHowTo = 'Kako to da učinim?';
-z.string.hr.peopleTabsDeviceDetailResetSession = 'Resetiraj sesiju';
-z.string.hr.peopleTabsDeviceDetailShowMyDevice = 'Pokaži otisak mog uređaja';
-z.string.hr.peopleTabsDeviceDetailVerify = 'Verificirano';
-z.string.hr.peopleTabsPeople = 'Kontakti';
-z.string.hr.peopleTabsServices = 'Usluge';
-z.string.hr.peopleVerified = 'Verificirano';
+z.string.hr.addParticipantsConfirmLabel = 'Dodaj';
+z.string.hr.addParticipantsSearchPlaceholder = 'Traži po imenu';
+z.string.hr.addParticipantsTabsPeople = 'Kontakti';
+z.string.hr.addParticipantsTabsServices = 'Usluge';
 
-z.string.hr.peopleBlockHeadline = 'Blokirati?';
-z.string.hr.peopleBlockMessage = '{{user}} neće biti u mogućnosti kontaktirati vas ili vas pozvati u grupnu konverzaciju.';
+z.string.hr.conversationDetailsActionCancelRequest = 'Poništi zahtjev';
+z.string.hr.conversationDetailsActionCreateGroup = 'Napravi grupu';
+z.string.hr.conversationDetailsActionDevices = 'Uređaji';
+z.string.hr.conversationDetailsGuestsOff = 'Isključi';
+z.string.hr.conversationDetailsParticipantsServicesMany = 'Usluge';
+z.string.hr.conversationDetailsParticipantsUsersMany = 'Kontakti';
+z.string.hr.conversationDetailsPeople = 'Kontakti';
+z.string.hr.conversationDetailsServices = 'Usluge';
 
-z.string.hr.peopleConnectHeadline = 'Prihvatiti?';
-z.string.hr.peopleConnectMessage = 'Ovo će vas spojiti i otvoriti razgovor s {{user}}.';
+z.string.hr.groupParticipantActionCancelRequest = 'Poništi zahtjev';
+z.string.hr.groupParticipantActionDevices = 'Uređaji';
+z.string.hr.groupParticipantActionPending = 'Na čekanju';
+z.string.hr.groupParticipantActionSendRequest = 'Poveži se';
 
-z.string.hr.peopleCancelRequestHeadline = 'Poništiti zahtjev?';
-z.string.hr.peopleCancelRequestMessage = 'Uklanjanje zahtjeva za povezivanje s {{user}}.';
+z.string.hr.participantDevicesDetailHeadline = 'Provjerite da je otisak prikazan na {{html1}}{{user}}’s device{{html2}}.';
+z.string.hr.participantDevicesDetailHowTo = 'Kako to da učinim?';
+z.string.hr.participantDevicesDetailResetSession = 'Resetiraj sesiju';
+z.string.hr.participantDevicesDetailShowMyDevice = 'Pokaži otisak mog uređaja';
+z.string.hr.participantDevicesDetailVerify = 'Verificirano';
 
-z.string.hr.peopleLeaveHeadline = 'Napustiti razgovor?';
-z.string.hr.peopleLeaveMessage = 'Nećete moći slati ili primati poruke u ovom razgovoru.';
+z.string.hr.participantDevicesHeader = 'Uređaji';
+z.string.hr.participantDevicesHeadline = 'Wire daje svakom uređaju jedinstveni otisak. Usporedite otiske s {{user}} da bi verificirali razgovor.';
+z.string.hr.participantDevicesLearnMore = 'Saznaj više';
+z.string.hr.participantDevicesWhyVerify = 'Zašto ovjeravati razgovore?';
+z.string.hr.participantDevicesOutdatedClientMessage = '{{user}} koristi staru verziju Wire. Nema novih uređaja.';
 
-z.string.hr.peopleRemoveHeadline = 'Ukloniti?';
-z.string.hr.peopleRemoveMessage = '{{user}} neće moći slati ili primati poruke u ovom razgovoru.';
+z.string.hr.participantDevicesSelfAllDevices = 'Pokaži sve uređaje';
+z.string.hr.participantDevicesSelfFingerprint = 'Otisak uređaja';
 
-z.string.hr.peopleUnblockHeadline = 'Odblokirati?';
-
-z.string.hr.peopleButtonAdd = 'Dodaj';
-z.string.hr.peopleButtonBlock = 'Blokiraj';
-z.string.hr.peopleButtonCancel = 'Odustani';
-z.string.hr.peopleButtonConnect = 'Poveži se';
-z.string.hr.peopleButtonCreate = 'Napravi grupu';
-z.string.hr.peopleButtonIgnore = 'Ignoriraj';
-z.string.hr.peopleButtonLeave = 'Izađi';
-z.string.hr.peopleButtonOpen = 'Otvori razgovor';
-z.string.hr.peopleButtonPending = 'Na čekanju';
-z.string.hr.peopleButtonProfile = 'Profil';
-z.string.hr.peopleButtonRemove = 'Ukloni';
-z.string.hr.peopleButtonUnblock = 'Odblokiraj';
-z.string.hr.peopleButtonNo = 'Ne';
-z.string.hr.peopleButtonYes = 'Da';
+z.string.hr.userProfileButtonConnect = 'Poveži se';
+z.string.hr.userProfileButtonIgnore = 'Ignoriraj';
+z.string.hr.userProfileButtonUnblock = 'Odblokiraj';
 
 z.string.hr.preferencesAbout = 'O programu';
 z.string.hr.preferencesAccount = 'Račun';
@@ -393,20 +412,24 @@ z.string.hr.searchCreateGroup = 'Napravi grupu';
 z.string.hr.searchGroups = 'Grupe';
 z.string.hr.searchPeople = 'Kontakti';
 z.string.hr.searchPlaceholder = 'Pretraži po imenu ili korisničkom imenu';
+z.string.hr.searchServicePlaceholder = 'Traži po imenu';
 z.string.hr.searchServices = 'Usluge';
 z.string.hr.searchTopPeople = 'Top veze';
 z.string.hr.searchTrySearch = 'Traženje ljudi po imenu ili korisničkom imenu';
 z.string.hr.searchNoContactsOnWire = 'Nemate veza na Wire. Pokušajte pronaći ljude po imenu ili korisničkom imenu.';
 z.string.hr.searchOthers = 'Poveži se';
 
+z.string.hr.searchInviteButtonContacts = 'Iz kontakata';
+z.string.hr.searchInviteButtonGmail = 'Iz Gmaila';
+z.string.hr.searchInviteHeadline = 'Pozovi prijatelje';
+z.string.hr.searchInviteShare = 'Podijeli kontakte';
+
+z.string.hr.searchListEveryoneParticipates = 'Svi ljudi s kojima ste povezani su već u ovom razgovoru.';
+z.string.hr.searchListNoMatches = 'Nema odgovarajućih rezultata. Pokušajte unijeti drugačije ime.';
+
 z.string.hr.uploadGoogleHeadline = 'Pronađi ljude za razgovor.';
 z.string.hr.uploadGoogleMessage = 'Mi koristimo vaše kontakt podatke za povezivanje s drugima. Sve informacije su anonimiziane i nisu dijeljene s drugima.';
-z.string.hr.uploadGoogleHeadlineError = 'Nešto je pogrešno.';
-z.string.hr.uploadGoogleMessageError = 'Nismo dobili podatke. Pokušajte ponovno uvesti svoje kontakte.';
-z.string.hr.uploadGoogleButtonAgain = 'Pokušaj ponovno';
 
-z.string.hr.warningCallDetail = 'Your browser needs access to the microphone to make calls.';
-z.string.hr.warningCallHeadline = 'Poziv nije moguć bez mikrofona';
 z.string.hr.warningCallUnsupportedIncoming = '{{user}} zove. Vaš preglednik ne podržava pozive.';
 z.string.hr.warningCallUnsupportedOutgoing = 'Poziv nije moguć jer vaš preglednik ne podržava pozive.';
 z.string.hr.warningCallIssues = 'Ova verzija Wire nema pozive. Molimo vas da koristite';
@@ -426,7 +449,6 @@ z.string.hr.warningPermissionRequestCamera = '{{icon}} dopusti pristup kameri';
 z.string.hr.warningPermissionRequestMicrophone = '{{icon}} dopusti pristup mikrofonu';
 z.string.hr.warningPermissionRequestNotification = '{{icon}} Dopusti notifikacije';
 z.string.hr.warningPermissionRequestScreen = '{{icon}} dopusti pristup zaslonu';
-z.string.hr.warningTellMeHow = 'Recite mi kako';
 
 z.string.hr.userAvailabilityAvailable = 'Dostupno';
 z.string.hr.userAvailabilityNone = 'Ništa';
@@ -468,14 +490,7 @@ z.string.hr.tooltipConversationsNotify = 'Uključi zvukove ({{shortcut}})';
 z.string.hr.tooltipConversationsSilence = 'Isključi zvukove ({{shortcut}})';
 z.string.hr.tooltipConversationsStart = 'Početak razgovora ({{shortcut}})';
 
-z.string.hr.tooltipPeopleAdd = 'Dodaj ljude u razgovor ({{shortcut}})';
-z.string.hr.tooltipPeopleBack = 'Natrag';
-z.string.hr.tooltipPeopleBlock = 'Blokiraj';
-z.string.hr.tooltipPeopleConnect = 'Poveži se';
-z.string.hr.tooltipPeopleLeave = 'Napusti razgovor';
-z.string.hr.tooltipPeopleRename = 'Promijeni naziv razgovora';
-z.string.hr.tooltipPeopleRemove = 'Ukloni iz razgovora';
-z.string.hr.tooltipPeopleUnblock = 'Odblokiraj';
+z.string.hr.tooltipConversationDetailsRename = 'Promijeni naziv razgovora';
 
 z.string.hr.tooltipPreferencesContactsGmail = 'Prijavite se na svoj Gmail račun za dijeljenje kontakata';
 z.string.hr.tooltipPreferencesContactsMacos = 'Podijelite sve svoje kontakte s macOS Contacts aplikacijom';

@@ -8,9 +8,9 @@
       <!-- ko foreach: archivedConversations -->
         <li>
           <conversation-list-cell
-            data-bind="click: $parent.clickOnConversation, event: {'contextmenu': $parent.listViewModel.on_context_menu}"
+            data-bind="click: $parent.clickOnConversation, event: {'contextmenu': $parent.listViewModel.onContextMenu}"
             data-uie-name="item-conversation-archived"
-            params="click: $parent.listViewModel.on_context_menu, conversation: $data">
+            params="click: $parent.listViewModel.onContextMenu, conversation: $data">
           </conversation-list-cell>
         </li>
       <!-- /ko -->

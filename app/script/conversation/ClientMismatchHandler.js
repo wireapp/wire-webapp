@@ -104,6 +104,7 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
     if (!payload || _.isEmpty(recipients)) {
       return Promise.resolve(payload);
     }
+
     this.logger.debug(`Message is missing clients of '${Object.keys(recipients).length}' users`, recipients);
 
     return this.cryptographyRepository
@@ -156,7 +157,10 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
 
         const _removeRedundantUser = userId => {
           if (conversationEntity && conversationEntity.is_group()) {
-            conversationEntity.participating_user_ids.remove(userId);
+            const timeOffset = this.conversationRepository.timeOffset;
+            const event = z.conversation.EventBuilder.buildMemberLeave(conversationEntity, userId, false, timeOffset);
+
+            amplify.publish(z.event.WebApp.EVENT.INJECT, event);
           }
 
           if (payload && !Object.keys(payload.recipients[userId]).length) {

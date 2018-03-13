@@ -69,7 +69,7 @@ ko.components.register('conversation-list-cell', {
       <div class="conversation-list-cell-right">
         <span class="conversation-list-cell-context-menu" data-bind="click: function(data, event) {on_click(conversation, event)}" data-uie-name="go-options"></span>
         <!-- ko if: cell_state().icon === z.conversation.ConversationStatusIcon.PENDING_CONNECTION -->
-          <span class="conversation-list-cell-badge cell-badge-light icon-pending" data-uie-name="status-pending"></span>
+          <span class="conversation-list-cell-badge cell-badge-dark icon-pending" data-uie-name="status-pending"></span>
         <!-- /ko -->
         <!-- ko if: cell_state().icon === z.conversation.ConversationStatusIcon.UNREAD_PING -->
           <span class="conversation-list-cell-badge cell-badge-light icon-ping" data-uie-name="status-ping"></span>

@@ -24,11 +24,6 @@ z.string.sl.wireLinux = 'Wire za Linux';
 z.string.sl.nonexistentUser = 'Izbrisan uporabnik';
 z.string.sl.and = 'in';
 
-z.string.sl.alertUploadFileFormat = 'Ne morete uporabiti te slike.\nProsimo izberite zbirko PNG ali JPEG.';
-z.string.sl.alertUploadTooSmall = 'Ne morete uporabiti te slike.\nProsimo izberite sliko, ki je vsaj 320 x 320 px.';
-z.string.sl.alertUploadTooLarge = 'Ta slika je prevelika. \nNaložite lahko zbirke do {{number}} MB.';
-z.string.sl.alertGifTooLarge = 'Animacija je prevelika. \nNajvečja velikost je {{number}} MB.';
-
 z.string.sl.authAccountCountryCode = 'Koda države';
 z.string.sl.authAccountExpiration = 'Ker je vaša seja potekla, ste bili odjavljeni. Prosimo prijavite se ponovno.';
 z.string.sl.authAccountPasswordForgot = 'Pozabljeno geslo';
@@ -98,72 +93,118 @@ z.string.sl.callAccept = 'Sprejmi';
 z.string.sl.callJoin = 'Pridruži';
 z.string.sl.callChooseSharedScreen = 'Izberite zaslon za deljenje';
 
-z.string.sl.modalButtonCancel = 'Prekliči';
-z.string.sl.modalButtonOk = 'V redu';
-z.string.sl.modalButtonSend = 'Pošlji';
+z.string.sl.modalAcknowledgeAction = 'V redu';
+z.string.sl.modalConfirmSecondary = 'Prekliči';
+z.string.sl.modalOptionSecondary = 'Prekliči';
 
-z.string.sl.modalBlockConversationHeadline = 'Blokiraj {{user}}?';
-z.string.sl.modalBlockConversationMessage = '{{user}} vas ne bo mogel kontaktirati ali dodati v skupinske pogovore.';
-z.string.sl.modalBlockConversationButton = 'Blokiraj';
-z.string.sl.modalCallConversationEmptyHeadline = 'Ni nikogar za klic';
-z.string.sl.modalCallConversationEmptyMessage = 'Nikogar ni več tukaj.';
-z.string.sl.modalCallNoVideoInGroupHeadline = 'Nobenih videoklicev v skupinah';
-z.string.sl.modalCallNoVideoInGroupMessage = 'Videoklici niso na voljo v skupinskih pogovorih.';
+z.string.sl.modalAccountDeletionAction = 'Izbriši';
+z.string.sl.modalAccountDeletionHeadline = 'Izbriši račun';
+z.string.sl.modalAccountDeletionMessage = 'Poslali bomo sporočilo preko e-pošte ali SMS. Sledite povezavi za trajni izbris vašega računa.';
+
+z.string.sl.modalAccountLogoutAction = 'Odjava';
+z.string.sl.modalAccountLogoutHeadline = 'Počisti podatke?';
+z.string.sl.modalAccountLogoutOption = 'Izbriši vse vaše osebne podatke in pogovore na tej napravi.';
+
+z.string.sl.modalAccountNewDevicesSecondary = 'Upravljanje naprav';
+z.string.sl.modalAccountNewDevicesHeadline = 'Vaš račun je bil uporabljen na:';
+z.string.sl.modalAccountNewDevicesFrom = 'Od:';
+z.string.sl.modalAccountNewDevicesMessage = 'Če tega niste storili, odstranite napravo in ponastavite vaše geslo.';
+
+z.string.sl.modalAccountRemoveDeviceAction = 'Odstrani napravo';
+z.string.sl.modalAccountRemoveDeviceHeadline = 'Odstrani "{{device}}"';
+z.string.sl.modalAccountRemoveDeviceMessage = 'Za odstranitev naprave je potrebno vaše geslo.';
+z.string.sl.modalAccountRemoveDevicePlaceholder = 'Geslo';
+
+z.string.sl.modalAssetTooLargeMessage = 'Lahko pošljete zbirke do {{number}}';
+
+z.string.sl.modalAssetParallelUploadsMessage = 'Lahko pošljete do {{number}} zbirk naenkrat.';
+
+z.string.sl.modalCallEmptyConversationHeadline = 'Ni nikogar za klic';
+z.string.sl.modalCallEmptyConversationMessage = 'Nikogar ni več tukaj.';
+
+z.string.sl.modalCallNoGroupVideoHeadline = 'Nobenih videoklicev v skupinah';
+z.string.sl.modalCallNoGroupVideoMessage = 'Videoklici niso na voljo v skupinskih pogovorih.';
+
+z.string.sl.modalCallNoMicrophoneAction = 'Povej mi kako';
+z.string.sl.modalCallNoMicrophoneMessage = 'Vaš brskalnik potrebuje dostop do mikrofona za klicanje.';
+z.string.sl.modalCallNoMicrophoneHeadline = 'Klic ni mogoč brez mikrofona';
+
+z.string.sl.modalCallSecondIncomingAction = 'Sprejmi';
 z.string.sl.modalCallSecondIncomingHeadline = 'Sprejmi klic?';
 z.string.sl.modalCallSecondIncomingMessage = 'Vaš trenuten klic se bo končal.';
-z.string.sl.modalCallSecondIncomingAction = 'Sprejmi';
+
+z.string.sl.modalCallSecondOngoingAction = 'Odloži';
 z.string.sl.modalCallSecondOngoingHeadline = 'Odloži klic na drugi napravi?';
 z.string.sl.modalCallSecondOngoingMessage = 'Naenkrat ste lahko samo v enem klicu.';
-z.string.sl.modalCallSecondOngoingAction = 'Odloži';
+
+z.string.sl.modalCallSecondOutgoingAction = 'Odloži';
 z.string.sl.modalCallSecondOutgoingHeadline = 'Odloži trenutni klic?';
 z.string.sl.modalCallSecondOutgoingMessage = 'Naenkrat ste lahko samo v enem klicu.';
-z.string.sl.modalCallSecondOutgoingAction = 'Odloži';
-z.string.sl.modalClearConversationHeadline = 'Izbriši vsebino?';
-z.string.sl.modalClearConversationOption = 'Tudi zapusti pogovor';
-z.string.sl.modalClearConversationButton = 'Izbriši';
-z.string.sl.modalConnectedDeviceHeadline = 'Vaš račun je bil uporabljen na:';
-z.string.sl.modalConnectedDeviceFrom = 'Od:';
-z.string.sl.modalConnectedDeviceMessage = 'Če tega niste storili, odstranite napravo in ponastavite vaše geslo.';
-z.string.sl.modalConnectedDeviceManageDevices = 'upravljanje naprav';
-z.string.sl.modalDeleteAccountAction = 'Izbriši';
-z.string.sl.modalDeleteAccountHeadline = 'Izbriši račun';
-z.string.sl.modalDeleteAccountMessage = 'Poslali bomo sporočilo preko e-pošte ali SMS. Sledite povezavi za trajni izbris vašega računa.';
-z.string.sl.modalDeleteButton = 'Izbriši';
-z.string.sl.modalDeleteHeadline = 'Izbriši le zame?';
-z.string.sl.modalDeleteMessage = 'To dejanje ne more biti razveljavljeno.';
-z.string.sl.modalDeleteEveryoneButton = 'Izbriši';
-z.string.sl.modalDeleteEveryoneHeadline = 'Izbriši za vse?';
-z.string.sl.modalDeleteEveryoneMessage = 'To dejanje ne more biti razveljavljeno.';
-z.string.sl.modalTooLongHeadline = 'Sporočilo je predolgo';
-z.string.sl.modalTooLongMessage = 'Lahko pošljete sporočila do {{number}} znakov.';
-z.string.sl.modalLeaveConversationHeadline = 'Zapusti pogovor "{{user}}"?';
-z.string.sl.modalLeaveConversationMessage = 'Udeleženci bodo obveščeni in pogovor bo odstranjen iz seznama.';
-z.string.sl.modalLeaveConversationButton = 'Zapusti';
-z.string.sl.modalLogoutHeadline = 'Počisti podatke?';
-z.string.sl.modalLogoutMessage = 'Izbriši vse vaše osebne podatke in pogovore na tej napravi.';
-z.string.sl.modalLogoutButton = 'Odjava';
-z.string.sl.modalNewDeviceHeadline = '{{user}} je začel(-a) z uporabo nove naprave';
-z.string.sl.modalNewDeviceHeadlineMany = '{{user}}s so začeli z uporabo novih naprav';
-z.string.sl.modalNewDeviceHeadlineYou = '{{user}} je začel(-a) z uporabo nove naprave';
-z.string.sl.modalNewDeviceMessage = 'Ali še vedno želite poslati vaša sporočila?';
-z.string.sl.modalNewDeviceCallAccept = 'Sprejmi klic';
-z.string.sl.modalNewDeviceCallAnyway = 'Vseeno pokliči';
-z.string.sl.modalNewDeviceCallIncoming = 'Ali še vedno želite sprejeti klic?';
-z.string.sl.modalNewDeviceCallOutgoing = 'Ali še vedno želite klicati?';
-z.string.sl.modalNewDeviceShowDevice = 'pokaži napravo';
-z.string.sl.modalNewDeviceSendAnyway = 'pošlji vseeno';
-z.string.sl.modalNotConnectedMessageOne = '{{name}} ne želi biti dodan k pogovorom.';
-z.string.sl.modalNotConnectedMessageMany = 'Ena izmed oseb, ki ste jo izbrali, ne želi biti dodana k pogovorom.';
-z.string.sl.modalRemoveDeviceButton = 'Odstrani napravo';
-z.string.sl.modalRemoveDeviceHeadline = 'Odstrani "{{device}}"';
-z.string.sl.modalRemoveDeviceMessage = 'Za odstranitev naprave je potrebno vaše geslo.';
+
+z.string.sl.modalConnectCancelAction = 'Da';
+z.string.sl.modalConnectCancelHeadline = 'Prekliči zahtevo?';
+z.string.sl.modalConnectCancelMessage = 'Odstrani zahtevo za povezavo do {{user}}.';
+z.string.sl.modalConnectCancelSecondary = 'Ne';
+
+z.string.sl.modalConnectAcceptAction = 'Poveži';
+z.string.sl.modalConnectAcceptHeadline = 'Sprejmi?';
+z.string.sl.modalConnectAcceptMessage = 'To vas bo povezalo in odprlo pogovor s/z {{user}}.';
+z.string.sl.modalConnectAcceptSecondary = 'Ignoriraj';
+
+z.string.sl.modalConversationClearAction = 'Izbriši';
+z.string.sl.modalConversationClearHeadline = 'Izbriši vsebino?';
+z.string.sl.modalConversationClearOption = 'Tudi zapusti pogovor';
+
+z.string.sl.modalConversationDeleteMessageAction = 'Izbriši';
+z.string.sl.modalConversationDeleteMessageHeadline = 'Izbriši le zame?';
+z.string.sl.modalConversationDeleteMessageMessage = 'To dejanje ne more biti razveljavljeno.';
+
+z.string.sl.modalConversationDeleteMessageEveryoneAction = 'Izbriši';
+z.string.sl.modalConversationDeleteMessageEveryoneHeadline = 'Izbriši za vse?';
+z.string.sl.modalConversationDeleteMessageEveryoneMessage = 'To dejanje ne more biti razveljavljeno.';
+
+z.string.sl.modalConversationLeaveAction = 'Zapusti';
+z.string.sl.modalConversationLeaveMessage = 'Ne boste mogli pošiljati ali prejeti sporočila v tem pogovoru.';
+
+z.string.sl.modalConversationMessageTooLongHeadline = 'Sporočilo je predolgo';
+z.string.sl.modalConversationMessageTooLongMessage = 'Lahko pošljete sporočila do {{number}} znakov.';
+
+z.string.sl.modalConversationNewDeviceHeadlineOne = '{{user}} je začel(-a) z uporabo nove naprave';
+z.string.sl.modalConversationNewDeviceHeadlineMany = '{{user}}s so začeli z uporabo novih naprav';
+z.string.sl.modalConversationNewDeviceHeadlineYou = '{{user}} je začel(-a) z uporabo nove naprave';
+z.string.sl.modalConversationNewDeviceIncomingCallAction = 'Sprejmi klic';
+z.string.sl.modalConversationNewDeviceIncomingCallMessage = 'Ali še vedno želite sprejeti klic?';
+z.string.sl.modalConversationNewDeviceMessage = 'Ali še vedno želite poslati vaša sporočila?';
+z.string.sl.modalConversationNewDeviceOutgoingCallAction = 'Vseeno pokliči';
+z.string.sl.modalConversationNewDeviceOutgoingCallMessage = 'Ali še vedno želite klicati?';
+
+z.string.sl.modalConversationNotConnectedMessageOne = '{{name}} ne želi biti dodan k pogovorom.';
+z.string.sl.modalConversationNotConnectedMessageMany = 'Ena izmed oseb, ki ste jo izbrali, ne želi biti dodana k pogovorom.';
+
+z.string.sl.modalConversationRemoveAction = 'Odstrani';
+z.string.sl.modalConversationRemoveHeadline = 'Odstrani?';
+z.string.sl.modalConversationRemoveMessage = '{{user}} ne bo mogel pošiljati ali prejeti sporočila v tem pogovoru.';
+
+
+z.string.sl.modalConversationTooManyMembersHeadline = 'Polna hiša';
+
+
+
 z.string.sl.modalSessionResetHeadline = 'Seja je bila ponastavljena';
 z.string.sl.modalSessionResetMessage1 = 'Če težave niste odpravili,';
 z.string.sl.modalSessionResetMessageLink = 'kontaktirajte';
 z.string.sl.modalSessionResetMessage2 = 'nas.';
-z.string.sl.modalTooManyMembersHeadline = 'Polna hiša';
-z.string.sl.modalTooManyMembersMessage = 'Do {{number1}} oseb se lahko pridruži pogovoru. Tukaj je prostora še za {{number2}} oseb.';
-z.string.sl.modalUploadsParallel = 'Lahko pošljete do {{number}} zbirk naenkrat.';
+
+z.string.sl.modalUploadContactsAction = 'Poskusite ponovno';
+z.string.sl.modalUploadContactsMessage = 'Nismo prejeli vaših podatkov. Prosimo poizkusite ponovno uvoziti stike.';
+
+z.string.sl.modalUserBlockAction = 'Blokiraj';
+z.string.sl.modalUserBlockHeadline = 'Blokiraj {{user}}?';
+z.string.sl.modalUserBlockMessage = '{{user}} vas ne bo mogel kontaktirati ali dodati v skupinske pogovore.';
+
+z.string.sl.modalUserUnblockAction = 'Odblokiraj';
+z.string.sl.modalUserUnblockHeadline = 'Odblokiraj?';
+z.string.sl.modalUserUnblockMessage = '{{user}} vas ne bo mogel kontaktirati ali ponovno dodati v skupinske pogovore.';
 
 z.string.sl.connectionRequestConnect = 'Poveži';
 z.string.sl.connectionRequestIgnore = 'Ignoriraj';
@@ -184,7 +225,6 @@ z.string.sl.conversationDeviceYourDevices = ' vaših naprav';
 z.string.sl.conversationDeviceUserDevices = ' Naprave od {{user}}';
 z.string.sl.conversationDeviceNewDeviceOne = ' nova naprava';
 z.string.sl.conversationDeviceNewDeviceMany = ' nove naprave';
-z.string.sl.conversationDeviceNewPeopleJoined = 'nove osebe so se pridružile.';
 z.string.sl.conversationDeviceNewPeopleJoinedVerify = ' preverite naprave';
 z.string.sl.conversationJustNow = 'Pravkar';
 z.string.sl.conversationLocationLink = 'Odpri zemljevid';
@@ -214,7 +254,6 @@ z.string.sl.conversationUnableToDecryptResetSession = 'Ponastavi sejo';
 z.string.sl.conversationMissedMessages = 'Te naprave nekaj časa niste uporabljali. Nekatera sporočila se morda tukaj ne bodo pojavila.';
 z.string.sl.conversationAssetDownloading = 'Prenašanje…';
 z.string.sl.conversationAssetUploadFailed = 'Nalaganje ni uspelo';
-z.string.sl.conversationAssetUploadTooLarge = 'Lahko pošljete zbirke do {{number}}';
 z.string.sl.conversationPlaybackError = 'Ni možno predvajati';
 z.string.sl.conversationContextMenuEdit = 'Uredi';
 z.string.sl.conversationContextMenuDelete = 'Izbriši zame';
@@ -293,67 +332,43 @@ z.string.sl.extensionsGiphyMessage = '{{tag}} • preko giphy.com';
 z.string.sl.extensionsGiphyNoGifs = 'Ups, ni najdenih gifov';
 z.string.sl.extensionsGiphyRandom = 'Naključno';
 
-z.string.sl.peopleConfirmLabel = 'Dodaj osebe v skupino';
-z.string.sl.peoplePeople = '{{number}} oseb';
-z.string.sl.peopleSearchPlaceholder = 'Iskanje po imenu';
-z.string.sl.peopleEveryoneParticipates = 'Vsi \ns katerimi ste povezani,\nso že v tem pogovoru.';
-z.string.sl.peopleNoMatches = 'Brez ujemanja rezultatov. \nPoizkusite vnesti drugo ime.';
-z.string.sl.peopleInvite = 'Povabi ostale osebe na Wire';
-z.string.sl.peopleInviteDetail = 'Deljenje vaših stikov pomaga pri povezovanju z drugimi. Vse informacije anonimiziramo in ne delimo z drugimi.';
-z.string.sl.peopleInviteButtonContacts = 'Iz imenika stikov';
-z.string.sl.peopleInviteButtonGmail = 'Iz Gmail';
-z.string.sl.peopleInviteHeadline = 'Pripeljite vaše prijatelje';
-z.string.sl.peopleServices = 'Storitve';
-z.string.sl.peopleShare = 'Deli Stike';
-z.string.sl.peopleTabsDetails = 'Podrobnosti';
-z.string.sl.peopleTabsDevices = 'Naprave';
-z.string.sl.peopleTabsDevicesHeadline = 'Wire dodeli vsaki napravi edinstven prstni odtis. Primerjajte jih z {{user}} in preverite vaš pogovor.';
-z.string.sl.peopleTabsDevicesLearnMore = 'Nauči se več';
-z.string.sl.peopleTabsDevicesWhyVerify = 'Zakaj preveriti pogovor?';
-z.string.sl.peopleTabsNoDevicesHeadline = '{{user}} uporablja starejšo različico Wire. Nobenih naprav tukaj ni prikazano.';
-z.string.sl.peopleTabsDeviceDetailAllMyDevices = 'Prikaži vse moje naprave';
-z.string.sl.peopleTabsDeviceDetailDeviceFingerprint = 'Prstni odtis naprave';
-z.string.sl.peopleTabsDeviceDetailHeadline = 'Preveri, da se to ujema s prstnim odtisom na {{html1}}napravi od {{user}}{{html2}}.';
-z.string.sl.peopleTabsDeviceDetailHowTo = 'Kako to storim?';
-z.string.sl.peopleTabsDeviceDetailResetSession = 'Ponastavi sejo';
-z.string.sl.peopleTabsDeviceDetailShowMyDevice = 'Prikaži prstni odtis moje naprave';
-z.string.sl.peopleTabsDeviceDetailVerify = 'Preverjena';
-z.string.sl.peopleTabsPeople = 'Osebe';
-z.string.sl.peopleTabsServices = 'Storitve';
-z.string.sl.peopleVerified = 'Preverjena';
+z.string.sl.addParticipantsConfirmLabel = 'Dodaj';
+z.string.sl.addParticipantsSearchPlaceholder = 'Iskanje po imenu';
+z.string.sl.addParticipantsTabsPeople = 'Osebe';
+z.string.sl.addParticipantsTabsServices = 'Storitve';
 
-z.string.sl.peopleBlockHeadline = 'Blokiraj?';
-z.string.sl.peopleBlockMessage = '{{user}} vas ne bo mogel kontaktirati ali dodati v skupinske pogovore.';
+z.string.sl.conversationDetailsActionCancelRequest = 'Prekliči prošnjo';
+z.string.sl.conversationDetailsActionCreateGroup = 'Ustvari skupino';
+z.string.sl.conversationDetailsActionDevices = 'Naprave';
+z.string.sl.conversationDetailsGuestsOff = 'Izklopljeno';
+z.string.sl.conversationDetailsParticipantsServicesMany = 'Storitve';
+z.string.sl.conversationDetailsParticipantsUsersMany = 'Osebe';
+z.string.sl.conversationDetailsPeople = 'Osebe';
+z.string.sl.conversationDetailsServices = 'Storitve';
 
-z.string.sl.peopleConnectHeadline = 'Sprejmi?';
-z.string.sl.peopleConnectMessage = 'To vas bo povezalo in odprlo pogovor s/z {{user}}.';
+z.string.sl.groupParticipantActionCancelRequest = 'Prekliči prošnjo';
+z.string.sl.groupParticipantActionDevices = 'Naprave';
+z.string.sl.groupParticipantActionPending = 'V teku';
+z.string.sl.groupParticipantActionSendRequest = 'Poveži';
 
-z.string.sl.peopleCancelRequestHeadline = 'Prekliči zahtevo?';
-z.string.sl.peopleCancelRequestMessage = 'Odstrani zahtevo za povezavo do {{user}}.';
+z.string.sl.participantDevicesDetailHeadline = 'Preveri, da se to ujema s prstnim odtisom na {{html1}}napravi od {{user}}{{html2}}.';
+z.string.sl.participantDevicesDetailHowTo = 'Kako to storim?';
+z.string.sl.participantDevicesDetailResetSession = 'Ponastavi sejo';
+z.string.sl.participantDevicesDetailShowMyDevice = 'Prikaži prstni odtis moje naprave';
+z.string.sl.participantDevicesDetailVerify = 'Preverjena';
 
-z.string.sl.peopleLeaveHeadline = 'Zapusti pogovor?';
-z.string.sl.peopleLeaveMessage = 'Ne boste mogli pošiljati ali prejeti sporočila v tem pogovoru.';
+z.string.sl.participantDevicesHeader = 'Naprave';
+z.string.sl.participantDevicesHeadline = 'Wire dodeli vsaki napravi edinstven prstni odtis. Primerjajte jih z {{user}} in preverite vaš pogovor.';
+z.string.sl.participantDevicesLearnMore = 'Nauči se več';
+z.string.sl.participantDevicesWhyVerify = 'Zakaj preveriti pogovore?';
+z.string.sl.participantDevicesOutdatedClientMessage = '{{user}} uporablja starejšo različico Wire. Nobenih naprav tukaj ni prikazano.';
 
-z.string.sl.peopleRemoveHeadline = 'Odstrani?';
-z.string.sl.peopleRemoveMessage = '{{user}} ne bo mogel pošiljati ali prejeti sporočila v tem pogovoru.';
+z.string.sl.participantDevicesSelfAllDevices = 'Prikaži vse moje naprave';
+z.string.sl.participantDevicesSelfFingerprint = 'Prstni odtis naprave';
 
-z.string.sl.peopleUnblockHeadline = 'Odblokiraj?';
-z.string.sl.peopleUnblockMessage = '{{user}} vas ne bo mogel kontaktirati ali ponovno dodati v skupinske pogovore.';
-
-z.string.sl.peopleButtonAdd = 'Dodaj';
-z.string.sl.peopleButtonBlock = 'Blokiraj';
-z.string.sl.peopleButtonCancel = 'Prekliči';
-z.string.sl.peopleButtonConnect = 'Poveži';
-z.string.sl.peopleButtonCreate = 'Ustvari skupino';
-z.string.sl.peopleButtonIgnore = 'Ignoriraj';
-z.string.sl.peopleButtonLeave = 'Zapusti';
-z.string.sl.peopleButtonOpen = 'Odpri pogovor';
-z.string.sl.peopleButtonPending = 'V teku';
-z.string.sl.peopleButtonProfile = 'Profil';
-z.string.sl.peopleButtonRemove = 'Odstrani';
-z.string.sl.peopleButtonUnblock = 'Odblokiraj';
-z.string.sl.peopleButtonNo = 'Ne';
-z.string.sl.peopleButtonYes = 'Da';
+z.string.sl.userProfileButtonConnect = 'Poveži';
+z.string.sl.userProfileButtonIgnore = 'Ignoriraj';
+z.string.sl.userProfileButtonUnblock = 'Odblokiraj';
 
 z.string.sl.preferencesAbout = 'O aplikaciji';
 z.string.sl.preferencesAccount = 'Račun';
@@ -436,6 +451,7 @@ z.string.sl.searchCreateGroup = 'Ustvari skupino';
 z.string.sl.searchGroups = 'Skupine';
 z.string.sl.searchPeople = 'Osebe';
 z.string.sl.searchPlaceholder = 'Iskanje po imenu ali uporabniškem imenu';
+z.string.sl.searchServicePlaceholder = 'Iskanje po imenu';
 z.string.sl.searchServices = 'Storitve';
 z.string.sl.searchTeamGroups = 'Ekipni pogovori';
 z.string.sl.searchTeamMembers = 'Člani ekipe';
@@ -444,14 +460,19 @@ z.string.sl.searchTrySearch = 'Najdi osebe po imenu ali uporabniškem imenu';
 z.string.sl.searchNoContactsOnWire = 'Nimate nobenih stikov na Wire.\nPoizkusite najti osebe po imenu\nali uporabniškem imenu.';
 z.string.sl.searchOthers = 'Poveži';
 
+z.string.sl.searchInvite = 'Povabi ostale osebe na Wire';
+z.string.sl.searchInviteDetail = 'Deljenje vaših stikov pomaga pri povezovanju z drugimi. Vse informacije anonimiziramo in ne delimo z drugimi.';
+z.string.sl.searchInviteButtonContacts = 'Iz imenika stikov';
+z.string.sl.searchInviteButtonGmail = 'Iz Gmail';
+z.string.sl.searchInviteHeadline = 'Pripeljite vaše prijatelje';
+z.string.sl.searchInviteShare = 'Deli Stike';
+
+z.string.sl.searchListEveryoneParticipates = 'Vsi \ns katerimi ste povezani,\nso že v tem pogovoru.';
+z.string.sl.searchListNoMatches = 'Brez ujemanja rezultatov. \nPoizkusite vnesti drugo ime.';
+
 z.string.sl.uploadGoogleHeadline = 'Poiščite osebe\nza pogovor.';
 z.string.sl.uploadGoogleMessage = 'Uporabljamo vaše podatke stikov pri povezovanju z drugimi. Vse informacije anonimiziramo in ne delimo z drugimi.';
-z.string.sl.uploadGoogleHeadlineError = 'Nekaj je\nšlo narobe.';
-z.string.sl.uploadGoogleMessageError = 'Nismo prejeli vaših podatkov. Prosimo poizkusite ponovno uvoziti stike.';
-z.string.sl.uploadGoogleButtonAgain = 'Poskusite ponovno';
 
-z.string.sl.warningCallDetail = 'Vaš brskalnik potrebuje dostop do mikrofona za klicanje.';
-z.string.sl.warningCallHeadline = 'Klic ni mogoč brez mikrofona';
 z.string.sl.warningCallUnsupportedIncoming = '{{user}} kliče. Vaš brskalnik ne podpira klicev.';
 z.string.sl.warningCallUnsupportedOutgoing = 'Ne morete klicati, ker vaš brskalnik ne podpira klicev.';
 z.string.sl.warningCallIssues = 'Ta različica Wire ne more sodelovati v klicu. Prosimo uporabite';
@@ -471,7 +492,6 @@ z.string.sl.warningPermissionRequestCamera = '{{icon}} Dovoli dostop do kamere';
 z.string.sl.warningPermissionRequestMicrophone = '{{icon}} Dovoli dostop do mikrofona';
 z.string.sl.warningPermissionRequestNotification = '{{icon}} Dovoli obvestila';
 z.string.sl.warningPermissionRequestScreen = '{{icon}} Dovoli dostop do zaslona';
-z.string.sl.warningTellMeHow = 'Povej mi kako';
 
 z.string.sl.userAvailabilityAvailable = 'Na voljo';
 z.string.sl.userAvailabilityNone = 'Nič';
@@ -515,14 +535,7 @@ z.string.sl.tooltipConversationsPreferences = 'Odpri nastavitve';
 z.string.sl.tooltipConversationsSilence = 'Utišaj ({{shortcut}})';
 z.string.sl.tooltipConversationsStart = 'Začni pogovor ({{shortcut}})';
 
-z.string.sl.tooltipPeopleAdd = 'Dodaj osebe v pogovor ({{shortcut}})';
-z.string.sl.tooltipPeopleBack = 'Nazaj';
-z.string.sl.tooltipPeopleBlock = 'Blokiraj';
-z.string.sl.tooltipPeopleConnect = 'Poveži';
-z.string.sl.tooltipPeopleLeave = 'Zapusti pogovor';
-z.string.sl.tooltipPeopleRename = 'Spremeni ime pogovora';
-z.string.sl.tooltipPeopleRemove = 'Odstrani iz pogovora';
-z.string.sl.tooltipPeopleUnblock = 'Odblokiraj';
+z.string.sl.tooltipConversationDetailsRename = 'Spremeni ime pogovora';
 
 z.string.sl.tooltipPreferencesContactsGmail = 'Prijavite se v vaš Gmail račun za deljenje stikov';
 z.string.sl.tooltipPreferencesContactsMacos = 'Deli vse vaše stike iz macOS aplikacije Contacts';

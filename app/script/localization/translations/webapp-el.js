@@ -23,11 +23,6 @@ z.string.el.wireLinux = 'Wire για Linux';
 z.string.el.nonexistentUser = 'Διεγραμμένος χρήστης';
 z.string.el.and = 'και';
 
-z.string.el.alertUploadFileFormat = 'Αδύνατη η χρήση αυτής της εικόνας. Παρακαλώ επιλέξτε ένα αρχείο PNG ή JPEG.';
-z.string.el.alertUploadTooSmall = 'Δεν μπορεί να χρησιμοποιηθεί η συγκεκριμένη εικόνα.\nΠαρακαλούμε επιλέξτε μια εικόνα η οποία να είναι τουλάχιστον 320 x 320 px.';
-z.string.el.alertUploadTooLarge = 'Αυτή η εικόνα είναι πολύ μεγάλη.\nΜπορείτε να ανεβάσετε αρχεία έως {{number}} MB.';
-z.string.el.alertGifTooLarge = 'Η κινούμενη εικόνα είναι πολύ μεγάλη.\nΤο μέγιστο μέγεθος είναι {{number}} MB.';
-
 z.string.el.authAccountCountryCode = 'Κωδικός Χώρας';
 z.string.el.authAccountDeletion = 'Αποσυνδεθήκατε, επειδή ο λογαριασμός έχει διαγραφεί.';
 z.string.el.authAccountExpiration = 'Αποσυνδεθήκατε διότι η περίοδος λειτουργίας σας έληξε. Παρακαλούμε συνδεθείτε ξανά.';
@@ -101,74 +96,121 @@ z.string.el.callJoin = 'Συμμετοχή';
 z.string.el.callChooseSharedScreen = 'Επιλέξτε μια οθόνη για κοινή χρήση';
 z.string.el.callParticipants = '{{number}} στο τηλεφώνημα';
 
-z.string.el.modalButtonCancel = 'Ακύρωση';
-z.string.el.modalButtonOk = 'Εντάξει';
-z.string.el.modalButtonSend = 'Αποστολή';
+z.string.el.modalAcknowledgeAction = 'Εντάξει';
+z.string.el.modalConfirmSecondary = 'Ακύρωση';
+z.string.el.modalOptionSecondary = 'Ακύρωση';
 
-z.string.el.modalBlockConversationHeadline = 'Αποκλεισμός {{user}};';
-z.string.el.modalBlockConversationMessage = '{{user}} δεν θα μπορέσει να επικοινωνήσει μαζί σας ή να σας προσθέσει σε ομαδικές συνομιλίες.';
-z.string.el.modalBlockConversationButton = 'Αποκλεισμός';
-z.string.el.modalBotsConfirmButton = 'Επιβεβαίωση';
-z.string.el.modalBotsUnavailableHeadline = 'Προσωρινά δεν είναι διαθέσιμο';
-z.string.el.modalCallConversationEmptyHeadline = 'Κανένας για κλήση';
-z.string.el.modalCallConversationEmptyMessage = 'Δεν υπάρχει κανένας εδώ.';
-z.string.el.modalCallNoVideoInGroupHeadline = 'Καμία βιντεοκλήση σε ομάδες';
-z.string.el.modalCallNoVideoInGroupMessage = 'Οι Βιντεοκλήσεις δεν είναι διαθέσιμες σε ομαδικές συνομιλίες.';
+z.string.el.modalAccountDeletionAction = 'Διαγραφή';
+z.string.el.modalAccountDeletionHeadline = 'Διαγραφή λογαριασμού';
+z.string.el.modalAccountDeletionMessage = 'Θα σας στείλουμε ένα μήνυμα μέσω email ή SMS. Πατήστε επάνω στον σύνδεσμο μας για να διαγράψετε τον λογαριασμό σας οριστικά.';
+
+z.string.el.modalAccountLogoutAction = 'Αποσύνδεση';
+z.string.el.modalAccountLogoutHeadline = 'Εκκαθάριση δεδομένων;';
+z.string.el.modalAccountLogoutOption = 'Διαγράψτε όλα τα προσωπικά σας στοιχεία και συνομιλίες από αυτή την συσκευή.';
+
+z.string.el.modalAccountNewDevicesSecondary = 'Διαχείριση συσκευών';
+z.string.el.modalAccountNewDevicesHeadline = 'Ο λογαριασμός σας χρησιμοποιήθηκε στις:';
+z.string.el.modalAccountNewDevicesFrom = 'Από:';
+z.string.el.modalAccountNewDevicesMessage = 'Εάν δεν το κάνατε αυτό, αφαιρέστε την συσκευή κι επαναφέρετε τον κωδικό σας.';
+
+z.string.el.modalAccountRemoveDeviceAction = 'Αφαίρεση συσκευής';
+z.string.el.modalAccountRemoveDeviceHeadline = 'Αφαίρεση "{{device}}"';
+z.string.el.modalAccountRemoveDeviceMessage = 'Απαιτείται ο κωδικός πρόσβασης σας για να αφαιρέσετε την συσκευή.';
+z.string.el.modalAccountRemoveDevicePlaceholder = 'Κωδικός Πρόσβασης';
+
+z.string.el.modalAssetTooLargeMessage = 'Μπορείτε να στείλετε αρχεία έως {{number}}';
+
+z.string.el.modalAssetParallelUploadsMessage = 'Μπορείτε να στείλετε μέχρι και {{number}} αρχεία ταυτόχρονα.';
+
+z.string.el.modalCallEmptyConversationHeadline = 'Κανένας για κλήση';
+z.string.el.modalCallEmptyConversationMessage = 'Δεν υπάρχει κανένας εδώ.';
+
+z.string.el.modalCallNoGroupVideoHeadline = 'Καμία βιντεοκλήση σε ομάδες';
+z.string.el.modalCallNoGroupVideoMessage = 'Οι Βιντεοκλήσεις δεν είναι διαθέσιμες σε ομαδικές συνομιλίες.';
+
+z.string.el.modalCallNoMicrophoneAction = 'Πείτε μας πως';
+z.string.el.modalCallNoMicrophoneMessage = 'Το πρόγραμμα περιήγησής σας χρειάζεται πρόσβαση στο μικρόφωνο για να κάνετε κλήσεις.';
+z.string.el.modalCallNoMicrophoneHeadline = 'Αδύνατη η κλήση χωρίς μικρόφωνο';
+
+z.string.el.modalCallSecondIncomingAction = 'Απάντηση';
 z.string.el.modalCallSecondIncomingHeadline = 'Απάντηση κλήσης;';
 z.string.el.modalCallSecondIncomingMessage = 'Η τρέχουσα κλήση σας θα τερματιστεί.';
-z.string.el.modalCallSecondIncomingAction = 'Απάντηση';
+
+z.string.el.modalCallSecondOngoingAction = 'Τερματισμός κλήσης';
 z.string.el.modalCallSecondOngoingHeadline = 'Τερματισμός κλήσης από άλλη συσκευή;';
 z.string.el.modalCallSecondOngoingMessage = 'Μπορείτε να είστε σε μία κλήση κάθε φορά.';
-z.string.el.modalCallSecondOngoingAction = 'Τερματισμός κλήσης';
+
+z.string.el.modalCallSecondOutgoingAction = 'Τερματισμός κλήσης';
 z.string.el.modalCallSecondOutgoingHeadline = 'Τερματισμός τρέχουσας κλήσης;';
 z.string.el.modalCallSecondOutgoingMessage = 'Μπορείτε να είστε σε μία κλήση κάθε φορά.';
-z.string.el.modalCallSecondOutgoingAction = 'Τερματισμός κλήσης';
-z.string.el.modalClearConversationHeadline = 'Διαγραφή περιεχομένου;';
-z.string.el.modalClearConversationOption = 'Επίσης θα αποχωρήσετε από την συνομιλία';
-z.string.el.modalClearConversationButton = 'Διαγραφή';
-z.string.el.modalConnectedDeviceHeadline = 'Ο λογαριασμός σας χρησιμοποιήθηκε στις:';
-z.string.el.modalConnectedDeviceFrom = 'Από:';
-z.string.el.modalConnectedDeviceMessage = 'Εάν δεν το κάνατε αυτό, αφαιρέστε την συσκευή κι επαναφέρετε τον κωδικό σας.';
-z.string.el.modalConnectedDeviceManageDevices = 'διαχείριση συσκευών';
-z.string.el.modalDeleteAccountAction = 'Διαγραφή';
-z.string.el.modalDeleteAccountHeadline = 'Διαγραφή λογαριασμού';
-z.string.el.modalDeleteAccountMessage = 'Θα σας στείλουμε ένα μήνυμα μέσω email ή SMS. Πατήστε επάνω στον σύνδεσμο μας για να διαγράψετε τον λογαριασμό σας οριστικά.';
-z.string.el.modalDeleteButton = 'Διαγραφή';
-z.string.el.modalDeleteHeadline = 'Διαγραφή μόνο για εμένα;';
-z.string.el.modalDeleteMessage = 'Αυτή η ενέργεια δεν μπορεί να αναιρεθεί.';
-z.string.el.modalDeleteEveryoneButton = 'Διαγραφή';
-z.string.el.modalDeleteEveryoneHeadline = 'Διαγραφή για όλους;';
-z.string.el.modalDeleteEveryoneMessage = 'Αυτή η ενέργεια δεν μπορεί να αναιρεθεί.';
-z.string.el.modalTooLongHeadline = 'Υπερμέγεθες μήνυμα';
-z.string.el.modalTooLongMessage = 'Μπορείτε να στείλετε μηνύματα έως {{number}} χαρακτήρες.';
-z.string.el.modalLeaveConversationHeadline = 'Αποχώρηση "{{name}}" από την συνομιλία;';
-z.string.el.modalLeaveConversationMessage = 'Οι συμμετέχοντες θα ειδοποιηθούν και η συνομιλία θα αφαιρεθεί από την λίστα σας';
-z.string.el.modalLeaveConversationButton = 'Αποχώρηση';
-z.string.el.modalLogoutHeadline = 'Εκκαθάριση δεδομένων;';
-z.string.el.modalLogoutMessage = 'Διαγράψτε όλα τα προσωπικά σας στοιχεία και συνομιλίες από αυτή την συσκευή.';
-z.string.el.modalLogoutButton = 'Αποσύνδεση';
-z.string.el.modalNewDeviceHeadline = '{{user}} ξεκίνησε την χρήση μίας νέας συσκευής';
-z.string.el.modalNewDeviceHeadlineMany = '{{users}} ξεκίνησε την χρήση νέων συσκευών';
-z.string.el.modalNewDeviceHeadlineYou = '{{user}} ξεκίνησε την χρήση μίας νέας συσκευής';
-z.string.el.modalNewDeviceMessage = 'Εξακολουθείτε να στέλνετε τα μηνύματα σας;';
-z.string.el.modalNewDeviceCallAccept = 'Απάντηση κλήσης';
-z.string.el.modalNewDeviceCallAnyway = 'Κλήση ούτως ή άλλως';
-z.string.el.modalNewDeviceCallIncoming = 'Είστε σίγουρος ότι θέλετε να δεχτείτε την κλήση;';
-z.string.el.modalNewDeviceCallOutgoing = 'Είστε σίγουρος ότι θέλετε να πραγματοποιήσετε την κλήση;';
-z.string.el.modalNewDeviceShowDevice = 'Εμφάνιση συσκευών';
-z.string.el.modalNewDeviceSendAnyway = 'αποστολή οπωσδήποτε';
-z.string.el.modalNotConnectedMessageOne = '{{name}} δεν επιθυμεί να προστεθεί στις συνομιλίες.';
-z.string.el.modalNotConnectedMessageMany = 'Ένα από τα άτομα που επιλέξατε δεν επιθυμεί να προστεθεί στις συνομιλίες.';
-z.string.el.modalRemoveDeviceButton = 'Αφαίρεση συσκευής';
-z.string.el.modalRemoveDeviceHeadline = 'Αφαίρεση "{{device}}"';
-z.string.el.modalRemoveDeviceMessage = 'Απαιτείται ο κωδικός πρόσβασης σας για να αφαιρέσετε την συσκευή.';
+
+z.string.el.modalConnectCancelAction = 'Ναι';
+z.string.el.modalConnectCancelHeadline = 'Ακύρωση Αιτήματος;';
+z.string.el.modalConnectCancelMessage = 'Κατάργηση αιτήματος σύνδεσης στον {{user}}.';
+z.string.el.modalConnectCancelSecondary = '’Οχι';
+
+z.string.el.modalConnectAcceptAction = 'Σύνδεση';
+z.string.el.modalConnectAcceptHeadline = 'Αποδοχή;';
+z.string.el.modalConnectAcceptMessage = 'Αυτό θα σας συνδέσει και θα ανοίξει συνομιλία με {{user}}.';
+z.string.el.modalConnectAcceptSecondary = 'Αγνόηση';
+
+z.string.el.modalConversationAddBotAction = 'Επιβεβαίωση';
+
+z.string.el.modalConversationClearAction = 'Διαγραφή';
+z.string.el.modalConversationClearHeadline = 'Διαγραφή περιεχομένου;';
+z.string.el.modalConversationClearOption = 'Επίσης θα αποχωρήσετε από την συνομιλία';
+
+z.string.el.modalConversationDeleteMessageAction = 'Διαγραφή';
+z.string.el.modalConversationDeleteMessageHeadline = 'Διαγραφή μόνο για εμένα;';
+z.string.el.modalConversationDeleteMessageMessage = 'Αυτή η ενέργεια δεν μπορεί να αναιρεθεί.';
+
+z.string.el.modalConversationDeleteMessageEveryoneAction = 'Διαγραφή';
+z.string.el.modalConversationDeleteMessageEveryoneHeadline = 'Διαγραφή για όλους;';
+z.string.el.modalConversationDeleteMessageEveryoneMessage = 'Αυτή η ενέργεια δεν μπορεί να αναιρεθεί.';
+
+z.string.el.modalConversationLeaveAction = 'Αποχώρηση';
+z.string.el.modalConversationLeaveMessage = 'Δεν θα μπορείτε να στέλνετε ή να λαμβάνετε μηνύματα σε αυτή την συνομιλία.';
+
+z.string.el.modalConversationMessageTooLongHeadline = 'Υπερμέγεθες μήνυμα';
+z.string.el.modalConversationMessageTooLongMessage = 'Μπορείτε να στείλετε μηνύματα έως {{number}} χαρακτήρες.';
+
+z.string.el.modalConversationNewDeviceHeadlineOne = '{{user}} ξεκίνησε την χρήση μίας νέας συσκευής';
+z.string.el.modalConversationNewDeviceHeadlineMany = '{{users}} ξεκίνησε την χρήση νέων συσκευών';
+z.string.el.modalConversationNewDeviceHeadlineYou = '{{user}} ξεκίνησε την χρήση μίας νέας συσκευής';
+z.string.el.modalConversationNewDeviceIncomingCallAction = 'Απάντηση κλήσης';
+z.string.el.modalConversationNewDeviceIncomingCallMessage = 'Είστε σίγουρος ότι θέλετε να δεχτείτε την κλήση;';
+z.string.el.modalConversationNewDeviceMessage = 'Εξακολουθείτε να στέλνετε τα μηνύματα σας;';
+z.string.el.modalConversationNewDeviceOutgoingCallAction = 'Κλήση ούτως ή άλλως';
+z.string.el.modalConversationNewDeviceOutgoingCallMessage = 'Είστε σίγουρος ότι θέλετε να πραγματοποιήσετε την κλήση;';
+
+z.string.el.modalConversationNotConnectedMessageOne = '{{name}} δεν επιθυμεί να προστεθεί στις συνομιλίες.';
+z.string.el.modalConversationNotConnectedMessageMany = 'Ένα από τα άτομα που επιλέξατε δεν επιθυμεί να προστεθεί στις συνομιλίες.';
+
+z.string.el.modalConversationRemoveAction = 'Αφαίρεση';
+z.string.el.modalConversationRemoveHeadline = 'Αφαίρεση;';
+z.string.el.modalConversationRemoveMessage = '{{user}} δεν θα μπορεί να στείλει ή να λάβει μηνύματα σε αυτή την συνομιλία.';
+
+
+z.string.el.modalConversationTooManyMembersHeadline = 'Full house';
+
+z.string.el.modalIntegrationUnavailableHeadline = 'Προσωρινά δεν είναι διαθέσιμο';
+
+
 z.string.el.modalSessionResetHeadline = 'Η περίοδος λειτουργίας σύνδεσης έχει επαναφερθεί';
 z.string.el.modalSessionResetMessage1 = 'Εάν το πρόβλημα δεν επιλυθεί,';
 z.string.el.modalSessionResetMessageLink = 'επαφή';
 z.string.el.modalSessionResetMessage2 = 'Εμάς.';
-z.string.el.modalTooManyMembersHeadline = 'Full house';
-z.string.el.modalTooManyMembersMessage = 'Μέχρι και {{number1}} άτομα μπορούν να συμμετάσχουν σε μια συνομιλία. Υπάρχει χώρος για {{number2}} επιπλέον άτομα εδώ.';
-z.string.el.modalUploadsParallel = 'Μπορείτε να στείλετε μέχρι και {{number}} αρχεία ταυτόχρονα.';
+
+z.string.el.modalUploadContactsAction = 'Προσπαθήστε ξανά';
+z.string.el.modalUploadContactsMessage = 'Δεν λάβαμε πληροφορίες σας. Παρακαλούμε προσπαθήστε ξανά να εισάγετε τις επαφές σας.';
+
+z.string.el.modalUserBlockAction = 'Αποκλεισμός';
+z.string.el.modalUserBlockHeadline = 'Αποκλεισμός {{user}};';
+z.string.el.modalUserBlockMessage = '{{user}} δεν θα μπορέσει να επικοινωνήσει μαζί σας ή να σας προσθέσει σε ομαδικές συνομιλίες.';
+
+z.string.el.modalUserUnblockAction = 'Άρση αποκλεισμού';
+z.string.el.modalUserUnblockHeadline = 'Άρση αποκλεισμού';
+z.string.el.modalUserUnblockMessage = '{{user}} θα μπορεί να επικοινωνήσει μαζί σας και να σας προσθέσει ξανά σε ομαδικές συνομιλίες.';
 
 z.string.el.connectionRequestConnect = 'Σύνδεση';
 z.string.el.connectionRequestIgnore = 'Αγνόηση';
@@ -191,7 +233,6 @@ z.string.el.conversationDeviceYourDevices = 'οι συσκευές σας';
 z.string.el.conversationDeviceUserDevices = ' {{user}}´ς συσκευές';
 z.string.el.conversationDeviceNewDeviceOne = 'μία νέα συσκευή';
 z.string.el.conversationDeviceNewDeviceMany = ' νέες συσκευές';
-z.string.el.conversationDeviceNewPeopleJoined = 'συνδέθηκαν νέα άτομα.';
 z.string.el.conversationDeviceNewPeopleJoinedVerify = 'επαληθευμένες συσκευές';
 z.string.el.conversationJustNow = 'Μόλις τώρα';
 z.string.el.conversationLocationLink = 'Άνοιγμα χάρτη';
@@ -221,7 +262,6 @@ z.string.el.conversationUnableToDecryptResetSession = 'Επαναφορά περ
 z.string.el.conversationMissedMessages = 'Δεν έχετε χρησιμοποιήσει αυτή την συσκευή για ένα χρονικό διάστημα. Ορισμένα μηνύματα ενδέχεται να μην εμφανίζονται εδώ.';
 z.string.el.conversationAssetDownloading = 'Γίνετε λήψη…';
 z.string.el.conversationAssetUploadFailed = 'Η Μεταφόρτωση Απέτυχε';
-z.string.el.conversationAssetUploadTooLarge = 'Μπορείτε να στείλετε αρχεία έως {{number}}';
 z.string.el.conversationPlaybackError = 'Αδύνατη η αναπαραγωγή';
 z.string.el.conversationContextMenuEdit = 'Eπεξεργασία';
 z.string.el.conversationContextMenuDelete = 'Διαγραφή για εμένα';
@@ -302,67 +342,43 @@ z.string.el.extensionsGiphyMessage = '{{tag}} • μέσω giphy.com';
 z.string.el.extensionsGiphyNoGifs = 'Ουπς! δεν υπάρχουν gifs';
 z.string.el.extensionsGiphyRandom = 'Τυχαία';
 
-z.string.el.peopleConfirmLabel = 'Προσθήκη ατόμων σε ομάδα';
-z.string.el.peoplePeople = '{{number}} Άτομα';
-z.string.el.peopleSearchPlaceholder = 'Αναζήτηση βάση ονόματος';
-z.string.el.peopleEveryoneParticipates = 'Όλοι όσοι συνδεθήκατε βρίσκεστε ήδη εντός της συνομιλίας.';
-z.string.el.peopleNoMatches = 'Δεν υπάρχουν σχετικά αποτελέσματα.\nΔοκιμάστε να εισάγετε ένα διαφορετικό όνομα.';
-z.string.el.peopleInvite = 'Πρόσκληση ατόμων για συμμετοχή στο Wire';
-z.string.el.peopleInviteDetail = 'Κάντε κοινή χρήση των επαφών σας για να μπορέσετε να συνδεθείτε με άλλους χρήστες.Κρατάμε ανώνυμες όλες σας τις πληροφορίες και δεν τις μοιραζόμαστε με κανέναν άλλον.';
-z.string.el.peopleInviteButtonContacts = 'Από τις Επαφές';
-z.string.el.peopleInviteButtonGmail = 'Από το Gmail';
-z.string.el.peopleInviteHeadline = 'Προτείνετε το στους φίλους σας';
-z.string.el.peopleServices = 'Υπηρεσίες';
-z.string.el.peopleShare = 'Κοινή χρήση Επαφών';
-z.string.el.peopleTabsDetails = 'Λεπτομέρειες';
-z.string.el.peopleTabsDevices = 'Συσκευές';
-z.string.el.peopleTabsDevicesHeadline = 'Το Wire παρέχει σε κάθε συσκευή ένα μοναδικό αποτύπωμα. Συγκρίνετε τα με {{user}} και επαληθεύστε την συνομιλία σας.';
-z.string.el.peopleTabsDevicesLearnMore = 'Μάθετε περισσότερα';
-z.string.el.peopleTabsDevicesWhyVerify = 'Γιατί να επαληθεύσω την συνομιλία;';
-z.string.el.peopleTabsNoDevicesHeadline = '{{user}} χρησιμοποιεί μια παλιά έκδοση του Wire. Δεν εμφανίζονται εδώ συσκευές.';
-z.string.el.peopleTabsDeviceDetailAllMyDevices = 'Εμφάνιση όλων των συσκευών μου';
-z.string.el.peopleTabsDeviceDetailDeviceFingerprint = 'Αποτυπώματα συσκευής';
-z.string.el.peopleTabsDeviceDetailHeadline = 'Βεβαιωθείτε ότι αυτό αντιστοιχεί στο αποτύπωμα που εμφανίζεται στην συσκευή {{html1}} {{user}} {{html2}}.';
-z.string.el.peopleTabsDeviceDetailHowTo = 'Πώς μπορώ να το κάνω;';
-z.string.el.peopleTabsDeviceDetailResetSession = 'Επαναφορά περιόδου σύνδεσης';
-z.string.el.peopleTabsDeviceDetailShowMyDevice = 'Προβολή αποτυπωμάτων της συσκευής μου';
-z.string.el.peopleTabsDeviceDetailVerify = 'Επιβεβαιωμένο';
-z.string.el.peopleTabsPeople = 'Άτομα';
-z.string.el.peopleTabsServices = 'Υπηρεσίες';
-z.string.el.peopleVerified = 'Επιβεβαιωμένο';
+z.string.el.addParticipantsConfirmLabel = 'Προσθήκη';
+z.string.el.addParticipantsSearchPlaceholder = 'Αναζήτηση βάση ονόματος';
+z.string.el.addParticipantsTabsPeople = 'Άτομα';
+z.string.el.addParticipantsTabsServices = 'Υπηρεσίες';
 
-z.string.el.peopleBlockHeadline = 'Αποκλεισμός;';
-z.string.el.peopleBlockMessage = '{{user}} δεν θα μπορέσει να επικοινωνήσει μαζί σας ή να σας προσθέσει σε ομαδικές συνομιλίες.';
+z.string.el.conversationDetailsActionCancelRequest = 'Ακύρωση αιτήματος';
+z.string.el.conversationDetailsActionCreateGroup = 'Δημιουργία ομάδας';
+z.string.el.conversationDetailsActionDevices = 'Συσκευές';
+z.string.el.conversationDetailsGuestsOff = 'Ανενεργό';
+z.string.el.conversationDetailsParticipantsServicesMany = 'Υπηρεσίες';
+z.string.el.conversationDetailsParticipantsUsersMany = 'Άτομα';
+z.string.el.conversationDetailsPeople = 'Άτομα';
+z.string.el.conversationDetailsServices = 'Υπηρεσίες';
 
-z.string.el.peopleConnectHeadline = 'Αποδοχή;';
-z.string.el.peopleConnectMessage = 'Αυτό θα σας συνδέσει και θα ανοίξει συνομιλία με {{user}}.';
+z.string.el.groupParticipantActionCancelRequest = 'Ακύρωση αιτήματος';
+z.string.el.groupParticipantActionDevices = 'Συσκευές';
+z.string.el.groupParticipantActionPending = 'Εκκρεμεί';
+z.string.el.groupParticipantActionSendRequest = 'Σύνδεση';
 
-z.string.el.peopleCancelRequestHeadline = 'Ακύρωση Αιτήματος;';
-z.string.el.peopleCancelRequestMessage = 'Κατάργηση αιτήματος σύνδεσης στον {{user}}.';
+z.string.el.participantDevicesDetailHeadline = 'Βεβαιωθείτε ότι αυτό αντιστοιχεί στο αποτύπωμα που εμφανίζεται στην συσκευή {{html1}} {{user}} {{html2}}.';
+z.string.el.participantDevicesDetailHowTo = 'Πώς μπορώ να το κάνω;';
+z.string.el.participantDevicesDetailResetSession = 'Επαναφορά περιόδου σύνδεσης';
+z.string.el.participantDevicesDetailShowMyDevice = 'Προβολή αποτυπωμάτων της συσκευής μου';
+z.string.el.participantDevicesDetailVerify = 'Επιβεβαιωμένο';
 
-z.string.el.peopleLeaveHeadline = 'Αποχώρηση από την συνομιλία;';
-z.string.el.peopleLeaveMessage = 'Δεν θα μπορείτε να στέλνετε ή να λαμβάνετε μηνύματα σε αυτή την συνομιλία.';
+z.string.el.participantDevicesHeader = 'Συσκευές';
+z.string.el.participantDevicesHeadline = 'Το Wire παρέχει σε κάθε συσκευή ένα μοναδικό αποτύπωμα. Συγκρίνετε τα με {{user}} και επαληθεύστε την συνομιλία σας.';
+z.string.el.participantDevicesLearnMore = 'Μάθετε περισσότερα';
+z.string.el.participantDevicesWhyVerify = 'Γιατί να επαληθεύσω τις συνομιλίες;';
+z.string.el.participantDevicesOutdatedClientMessage = '{{user}} χρησιμοποιεί μια παλιά έκδοση του Wire. Δεν εμφανίζονται εδώ συσκευές.';
 
-z.string.el.peopleRemoveHeadline = 'Αφαίρεση;';
-z.string.el.peopleRemoveMessage = '{{user}} δεν θα μπορεί να στείλει ή να λάβει μηνύματα σε αυτή την συνομιλία.';
+z.string.el.participantDevicesSelfAllDevices = 'Εμφάνιση όλων των συσκευών μου';
+z.string.el.participantDevicesSelfFingerprint = 'Αποτυπώματα συσκευής';
 
-z.string.el.peopleUnblockHeadline = 'Άρση αποκλεισμού';
-z.string.el.peopleUnblockMessage = '{{user}} θα μπορεί να επικοινωνήσει μαζί σας και να σας προσθέσει ξανά σε ομαδικές συνομιλίες.';
-
-z.string.el.peopleButtonAdd = 'Προσθήκη';
-z.string.el.peopleButtonBlock = 'Αποκλεισμός';
-z.string.el.peopleButtonCancel = 'Ακύρωση';
-z.string.el.peopleButtonConnect = 'Σύνδεση';
-z.string.el.peopleButtonCreate = 'Δημιουργία ομάδας';
-z.string.el.peopleButtonIgnore = 'Αγνόηση';
-z.string.el.peopleButtonLeave = 'Αποχώρηση';
-z.string.el.peopleButtonOpen = 'Ανοικτή Συνομιλία';
-z.string.el.peopleButtonPending = 'Εκκρεμεί';
-z.string.el.peopleButtonProfile = 'Ταυτότητα';
-z.string.el.peopleButtonRemove = 'Αφαίρεση';
-z.string.el.peopleButtonUnblock = 'Άρση αποκλεισμού';
-z.string.el.peopleButtonNo = '’Οχι';
-z.string.el.peopleButtonYes = 'Ναι';
+z.string.el.userProfileButtonConnect = 'Σύνδεση';
+z.string.el.userProfileButtonIgnore = 'Αγνόηση';
+z.string.el.userProfileButtonUnblock = 'Άρση αποκλεισμού';
 
 z.string.el.preferencesAbout = 'Περί';
 z.string.el.preferencesAccount = 'Λογαριασμός';
@@ -444,6 +460,7 @@ z.string.el.searchCreateGroup = 'Δημιουργία ομάδας';
 z.string.el.searchGroups = 'Ομάδες';
 z.string.el.searchPeople = 'Άτομα';
 z.string.el.searchPlaceholder = 'Αναζητηση ονοματος χρηστη';
+z.string.el.searchServicePlaceholder = 'Αναζήτηση βάση ονόματος';
 z.string.el.searchServices = 'Υπηρεσίες';
 z.string.el.searchTeamGroups = 'Συνομιλίες ομάδας';
 z.string.el.searchTeamMembers = 'Μέλη ομάδας';
@@ -452,14 +469,19 @@ z.string.el.searchTrySearch = 'Εύρεση ατόμων βάση ονόματο
 z.string.el.searchNoContactsOnWire = 'Δεν έχετε επαφές στο Wire. Προσπαθήστε να βρείτε άτομα με το όνομα ή το όνομα χρήστη τους.';
 z.string.el.searchOthers = 'Σύνδεση';
 
+z.string.el.searchInvite = 'Πρόσκληση ατόμων για συμμετοχή στο Wire';
+z.string.el.searchInviteDetail = 'Κάντε κοινή χρήση των επαφών σας για να μπορέσετε να συνδεθείτε με άλλους χρήστες.Κρατάμε ανώνυμες όλες σας τις πληροφορίες και δεν τις μοιραζόμαστε με κανέναν άλλον.';
+z.string.el.searchInviteButtonContacts = 'Από τις Επαφές';
+z.string.el.searchInviteButtonGmail = 'Από το Gmail';
+z.string.el.searchInviteHeadline = 'Προτείνετε το στους φίλους σας';
+z.string.el.searchInviteShare = 'Κοινή χρήση Επαφών';
+
+z.string.el.searchListEveryoneParticipates = 'Όλοι όσοι συνδεθήκατε βρίσκεστε ήδη εντός της συνομιλίας.';
+z.string.el.searchListNoMatches = 'Δεν υπάρχουν σχετικά αποτελέσματα.\nΔοκιμάστε να εισάγετε ένα διαφορετικό όνομα.';
+
 z.string.el.uploadGoogleHeadline = 'Εύρεση ατόμων για συνομιλία.';
 z.string.el.uploadGoogleMessage = 'Χρησιμοποιούμε τις επαφές σας για να συνδέεστε με άλλους. Κρατάμε όλες σας τις πληροφορίες ανώνυμες και δεν τις μοιραζόμαστε με κανέναν άλλον.';
-z.string.el.uploadGoogleHeadlineError = 'Κάτι πήγε στραβά.';
-z.string.el.uploadGoogleMessageError = 'Δεν λάβαμε πληροφορίες σας. Παρακαλούμε προσπαθήστε ξανά να εισάγετε τις επαφές σας.';
-z.string.el.uploadGoogleButtonAgain = 'Προσπαθήστε ξανά';
 
-z.string.el.warningCallDetail = 'Το πρόγραμμα περιήγησής σας χρειάζεται πρόσβαση στο μικρόφωνο για να κάνετε κλήσεις.';
-z.string.el.warningCallHeadline = 'Αδύνατη η κλήση χωρίς μικρόφωνο';
 z.string.el.warningCallUnsupportedIncoming = '{{user}} καλεί. Το πρόγραμμα περιήγησής σας δεν υποστηρίζει κλήσεις.';
 z.string.el.warningCallUnsupportedOutgoing = 'Δεν μπορείτε να καλέσετε, επειδή το πρόγραμμα περιήγησής σας δεν υποστηρίζει κλήσεις.';
 z.string.el.warningCallIssues = 'Αυτή η έκδοση του Wire δεν μπορεί να μετέχει στην κλήση. Παρακαλούμε χρησιμοποιήστε';
@@ -479,7 +501,6 @@ z.string.el.warningPermissionRequestCamera = '{{icon}} Να επιτρέπετα
 z.string.el.warningPermissionRequestMicrophone = '{{icon}} Να επιτρέπεται η πρόσβαση στο μικρόφωνο';
 z.string.el.warningPermissionRequestNotification = '{{icon}} Να επιτρέπονται οι ειδοποιήσεις';
 z.string.el.warningPermissionRequestScreen = '{{icon}} Να επιτρέπεται η πρόσβαση στην οθόνη';
-z.string.el.warningTellMeHow = 'Πείτε μας πως';
 
 z.string.el.userAvailabilityAvailable = 'Διαθέσιμο';
 z.string.el.userAvailabilityNone = 'Καθόλου';
@@ -523,14 +544,7 @@ z.string.el.tooltipConversationsPreferences = 'Ανοίξτε τις προτι�
 z.string.el.tooltipConversationsSilence = 'Σίγαση ({{shortcut}})';
 z.string.el.tooltipConversationsStart = 'Ξεκινήστε συνομιλία ({{shortcut}})';
 
-z.string.el.tooltipPeopleAdd = 'Προσθέστε άτομα σε συνομιλία ({{shortcut}})';
-z.string.el.tooltipPeopleBack = 'Πίσω';
-z.string.el.tooltipPeopleBlock = 'Αποκλεισμός';
-z.string.el.tooltipPeopleConnect = 'Σύνδεση';
-z.string.el.tooltipPeopleLeave = 'Αποχώρηση από την συζήτηση';
-z.string.el.tooltipPeopleRename = 'Αλλαγή ονόματος της συνομιλίας';
-z.string.el.tooltipPeopleRemove = 'Αφαίρεση από την συνομιλία';
-z.string.el.tooltipPeopleUnblock = 'Άρση αποκλεισμού';
+z.string.el.tooltipConversationDetailsRename = 'Αλλαγή ονόματος της συνομιλίας';
 
 z.string.el.tooltipPreferencesContactsGmail = 'Συνδεθείτε στον λογαριασμό Gmail σας για να κοινοποιήσετε τις επαφές';
 z.string.el.tooltipPreferencesContactsMacos = 'Κοινοποίηση όλων των επαφών σας από macOS της εφαρμογής Επαφές';

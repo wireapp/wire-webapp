@@ -49,6 +49,9 @@ z.conversation.ConversationError = class ConversationError extends Error {
       case ConversationError.TYPE.REQUEST_FAILED:
         this.message = 'Conversation related backend request failed';
         break;
+      case ConversationError.TYPE.WRONG_CHANGE:
+        this.message = 'Attempted unsupported change on conversation';
+        break;
       case ConversationError.TYPE.WRONG_CONVERSATION:
         this.message = 'Message was sent in the wrong conversation';
         break;
@@ -72,6 +75,7 @@ z.conversation.ConversationError = class ConversationError extends Error {
       NO_CONVERSATION_ID: 'ConversationError.TYPE.NO_CONVERSATION_ID',
       REQUEST_FAILURE: 'ConversationError.TYPE.REQUEST_FAILURE',
       UNKNOWN: 'ConversationError.TYPE.UNKNOWN',
+      WRONG_CHANGE: 'ConversationError.TYPE.WRONG_CHANGE',
       WRONG_CONVERSATION: 'ConversationError.TYPE.WRONG_CONVERSATION',
       WRONG_TYPE: 'ConversationError.TYPE.WRONG_TYPE',
       WRONG_USER: 'ConversationError.TYPE.WRONG_USER',

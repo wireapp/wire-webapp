@@ -29,10 +29,6 @@ user-profile {
   transition-property: transform;
   transition-duration: @animation-timing-fast;
   // TODO: timing function
-
-  &.user-profile-transition-push {
-    transform: translateX(-@bubble-transition_offset);
-  }
 }
 
 .user-profile-default {
@@ -40,19 +36,6 @@ user-profile {
   flex-direction: column;
   height: 100%;
   overflow: hidden;
-}
-
-.user-profile-device-detail {
-  position: absolute;
-  top: 0;
-  right: -@bubble-transition_offset;
-  width: 100%;
-  height: 100%;
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  line-height: @line-height-lg;
 }
 
 // user-profile-default
@@ -66,59 +49,6 @@ user-profile {
   text-align: center;
 }
 
-.user-profile-user-verified {
-  position: absolute;
-  top: 24px;
-  right: 18px;
-}
-
-.user-profile-tabs {
-  border-bottom: 1px solid @seperator-color;
-  color: @graphite;
-  cursor: pointer;
-  display: flex;
-  line-height: 40px;
-  position: relative;
-
-  &::after {
-    background-color: #fff;
-    border-right: 1px solid @seperator-color;
-    border-top: 1px solid @seperator-color;
-    bottom: 0;
-    content: ' ';
-    display: block;
-    height: 7px;
-    position: absolute;
-    transform: rotate(-45deg) translate(-50%, 25%);
-    width: 7px;
-  }
-
-  &.user-profile-tab-active-details {
-    &::after {
-      left: calc(100% * 0.25);
-    }
-    & .user-profile-tab:nth-child(1) {
-      color: @graphite-dark;
-    }
-  }
-
-  &.user-profile-tab-active-devices {
-    &::after {
-      left: calc(100% * 0.75);
-    }
-    & .user-profile-tab:nth-child(2) {
-      color: @graphite-dark;
-    }
-  }
-}
-
-.user-profile-tab {
-  .label-xs;
-  cursor: pointer;
-  text-align: center;
-  width: 50%;
-}
-
 .user-profile-details {
   align-items: center;
   display: flex;
@@ -128,73 +58,9 @@ user-profile {
   position: relative;
 }
 
-.user-profile-details-availability {
-  margin-top: 24px;
-  align-items: flex-end;
-
-  .availability-state-label {
-    .label-bold-xs();
-    display: inline-block;
-    line-height: 12px;
-  }
-}
-
 .user-profile-details-avatar {
   .square(@avatar-diameter-xl);
   position: relative;
-}
-
-.user-profile-details-guest-badge {
-  .guest-badge;
-  bottom: -10px;
-  left: 50%;
-  position: absolute;
-  transform: translateX(-50%);
-}
-
-.user-profile-devices {
-  flex: 1 1;
-  margin-right: -16px;
-  overflow-y: scroll;
-  padding-top: 16px;
-  padding-left: 16px;
-  padding-right: 32px;
-
-  // scroll borders thanks to http://lea.verou.me/2012/04/background-attachment-local/
-  background: linear-gradient(fade(#fff, 0%), #fff) 0 100%, linear-gradient(fade(#000, 8%), fade(#000, 8%)) 0 100%;
-  background-repeat: no-repeat;
-  background-size: 100% 25px, 100% 1px;
-  background-attachment: local, scroll;
-}
-
-.user-profile-device {
-  cursor: pointer;
-  padding-top: 16px;
-  padding-bottom: 16px;
-  padding-left: 40px;
-  position: relative;
-  width: 100%;
-
-  & + & {
-    border-top: 1px solid @seperator-color;
-  }
-
-  &:first-child {
-    margin-top: 8px;
-  }
-}
-
-.user-profile-device-verified {
-  position: absolute;
-  left: 8px;
-}
-
-.user-profile-contacts {
-  margin-top: 24px;
-}
-
-.user-profile-avatar + .user-profile-contacts[data-contacts='0'] {
-  margin-top: 0;
 }
 
 .user-profile-footer {
@@ -229,78 +95,4 @@ user-profile {
     border-bottom-left-radius: 2px;
     border-bottom-right-radius: 2px;
   }
-}
-
-.user-profile-device-message {
-  font-size: @font-size-xs;
-  line-height: @line-height-sm;
-  margin-left: 8px;
-  margin-right: 12px;
-}
-
-.user-profile-device-detail-message {
-  font-size: @font-size-xs;
-  line-height: @line-height-sm;
-  margin-right: 12px;
-}
-
-.user-profile-device-detail-highlight {
-  font-weight: @font-weight-bold;
-}
-
-.user-profile-my-device-button {
-  line-height: 28px;
-}
-
-.user-profile-device-detail-card {
-  margin-top: 16px;
-  margin-bottom: 16px !important;
-}
-
-.user-profile-device-detail-fingerprint {
-  height: 72px;
-  margin-bottom: 16px;
-  font-family: monospace;
-
-  .device-id-part:nth-child(12),
-  .device-id-part:nth-child(23) {
-    margin-left: 0;
-  }
-}
-
-.user-profile-device-detail-footer {
-  display: flex;
-  justify-content: space-between;
-}
-
-.user-profile-top-right-button {
-  position: absolute;
-  right: 18px;
-  top: 18px;
-}
-
-// my fingerprint
-.user-profile-my-fingerprint {
-  justify-content: flex-end !important;
-  line-height: 24px;
-}
-
-// common
-.user-profile-back-button {
-  position: absolute;
-  left: 18px;
-  top: 18px;
-}
-
-// reset session
-.user-profile-device-reset {
-  position: relative;
-}
-
-.user-profile-device-reset-spinner {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  margin-left: -8px;
-  margin-top: -8px;
 }

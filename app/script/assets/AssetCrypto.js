@@ -86,7 +86,13 @@ z.assets.AssetCrypto = (() => {
   };
 
   const _generateRandomBytes = length => {
-    const randomValues = new Uint32Array(length / 4).map(() => libsodium.getRandomValue());
+    const getRandomValue = () => {
+      const buffer = new Uint32Array(1);
+      window.crypto.getRandomValues(buffer);
+      return buffer[0] >>> 0;
+    };
+
+    const randomValues = new Uint32Array(length / 4).map(getRandomValue);
     const randomBytes = new Uint8Array(randomValues.buffer);
     if (randomBytes.length && !randomBytes.every(byte => byte === 0)) {
       return randomBytes;

@@ -92,20 +92,20 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
   _init(database) {
     return Promise.resolve().then(() => {
       this.logger.info(`Initializing Cryptobox with database '${database.name}'...`);
-      this.cryptobox = new cryptobox.Cryptobox(new cryptobox.store.IndexedDB(database), 10);
+      this.cryptobox = new cryptobox.Cryptobox(new StoreEngine.IndexedDBEngine(database), 10);
 
       this.cryptobox.on(cryptobox.Cryptobox.TOPIC.NEW_PREKEYS, preKeys => {
         const serializedPreKeys = preKeys.map(preKey => this.cryptobox.serialize_prekey(preKey));
 
         this.logger.log(`Received '${preKeys.length}' new PreKeys.`, serializedPreKeys);
         return this.cryptographyService.putClientPreKeys(this.currentClient().id, serializedPreKeys).then(() => {
-          this.logger.log(`Successfully uploaded '${serializedPreKeys.length}' PreKeys.`);
+          this.logger.log(`Successfully uploaded '${serializedPreKeys.length}' PreKeys.`, serializedPreKeys);
         });
       });
 
       this.cryptobox.on(cryptobox.Cryptobox.TOPIC.NEW_SESSION, sessionId => {
         const {userId, clientId} = z.client.ClientEntity.dismantleUserClientId(sessionId);
-        amplify.publish(z.event.WebApp.CLIENT.ADD, userId, {id: clientId});
+        amplify.publish(z.event.WebApp.CLIENT.ADD, userId, {id: clientId}, true);
       });
     });
   }
@@ -129,7 +129,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
    * @returns {string} Fingerprint of local identity public key
    */
   getLocalFingerprint() {
-    return this.cryptobox.identity.public_key.fingerprint();
+    return this._formatFingerprint(this.cryptobox.identity.public_key.fingerprint());
   }
 
   /**
@@ -139,7 +139,13 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
    * @returns {Promise} Resolves with the remote fingerprint
    */
   getRemoteFingerprint(userId, clientId) {
-    return this._loadSession(userId, clientId).then(cryptoboxSession => cryptoboxSession.fingerprint_remote());
+    return this._loadSession(userId, clientId).then(cryptoboxSession => {
+      return this._formatFingerprint(cryptoboxSession.fingerprint_remote());
+    });
+  }
+
+  _formatFingerprint(fingerprint) {
+    return z.util.zero_padding(fingerprint, 16).match(/.{1,2}/g) || [];
   }
 
   /**
@@ -338,7 +344,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
         return undefined;
       })
       .catch(error => {
-        const message = `Pre-key for user '${userId}' ('${clientId}') invalid. Skipping encryption:: ${error.message}`;
+        const message = `Pre-key for user '${userId}' ('${clientId}') invalid. Skipping encryption: ${error.message}`;
         this.logger.warn(message, error);
         return undefined;
       });
@@ -413,21 +419,21 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
    * @private
    * @param {string} sessionId - ID of session to encrypt for
    * @param {z.proto.GenericMessage} genericMessage - ProtoBuffer message
-   * @returns {Object} Contains session ID and encrypted message as BASE64 encoded string
+   * @returns {Object} Contains session ID and encrypted message as base64 encoded string
    */
   _encryptPayloadForSession(sessionId, genericMessage) {
     return this.cryptobox
       .encrypt(sessionId, genericMessage.toArrayBuffer())
       .then(cipherText => ({cipherText: z.util.array_to_base64(cipherText), sessionId}))
       .catch(error => {
-        if (error instanceof cryptobox.store.error.RecordNotFoundError) {
+        if (error instanceof StoreEngine.error.RecordNotFoundError) {
           this.logger.log(`Session '${sessionId}' needs to get initialized...`);
           return {sessionId};
         }
 
         const message = `Failed encrypting '${genericMessage.content}' for session '${sessionId}': ${error.message}`;
         this.logger.warn(message, error);
-        return {cipherText: CryptographyRepository.REMOTE_ENCRYPTION_FAILURE, session_id};
+        return {cipherText: CryptographyRepository.REMOTE_ENCRYPTION_FAILURE, sessionId};
       });
   }
 
@@ -457,7 +463,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
     // Session is broken, let's see what's really causing it...
     if (isInvalidMessage || isInvalidSignature) {
       this.logger.error(
-        `Session with user '${remoteUserId}' (${remoteClientId}) is broken.\nReset the session and for possible fix.`
+        `Session with user '${remoteUserId}' (${remoteClientId}) is broken.\nReset the session for possible fix.`
       );
     } else if (isRemoteIdentityChanged) {
       this.logger.error(`Remote identity of client '${remoteClientId}' from user '${remoteUserId}' changed`);

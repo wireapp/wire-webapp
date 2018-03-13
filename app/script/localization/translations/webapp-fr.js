@@ -26,11 +26,6 @@ z.string.fr.and = 'et';
 z.string.fr.enumerationAnd = ', et ';
 
 //=L'application se charge
-z.string.fr.alertUploadFileFormat = 'Cette image ne peut être utilisée. Veuillez choisir un fichier PNG ou JPEG.';
-z.string.fr.alertUploadTooSmall = 'Cette image ne peut être utilisée. Veuillez choisir une image qui mesure au moins 320 x 320 pixels.';
-z.string.fr.alertUploadTooLarge = 'Cette image est trop lourde. Vous pouvez envoyer des fichiers allant jusqu’à {{number}} Mo.';
-z.string.fr.alertGifTooLarge = 'L’animation est trop lourde. La taille maximale est de {{number}} Mo.';
-
 z.string.fr.authAccountCountryCode = 'Indicatif du pays';
 z.string.fr.authAccountDeletion = 'Vous avez été déconnecté car votre compte a été supprimé.';
 z.string.fr.authAccountExpiration = 'Vous avez été déconnecté car votre session a expirée. Veuillez vous reconnecter.';
@@ -105,80 +100,128 @@ z.string.fr.callJoin = 'Rejoindre';
 z.string.fr.callChooseSharedScreen = 'Choisissez un écran à partager';
 z.string.fr.callParticipants = '{{number}} sur l’appel';
 
-z.string.fr.modalButtonCancel = 'Annuler';
-z.string.fr.modalButtonOk = 'OK';
-z.string.fr.modalButtonSend = 'Envoyer';
+z.string.fr.modalAcknowledgeAction = 'OK';
+z.string.fr.modalConfirmSecondary = 'Annuler';
+z.string.fr.modalOptionSecondary = 'Annuler';
 
-z.string.fr.modalBlockConversationHeadline = 'Bloquer {{user}} ?';
-z.string.fr.modalBlockConversationMessage = '{{user}} ne pourra plus vous contacter ou vous ajouter à des conversations de groupe.';
-z.string.fr.modalBlockConversationButton = 'Bloquer';
-z.string.fr.modalBotsConfirmHeadline = 'Ajouter un service';
-z.string.fr.modalBotsConfirmMessage = 'Êtes-vous sûr de vouloir débuter une conversation avec {{name}} ?';
-z.string.fr.modalBotsConfirmButton = 'Confirmer';
-z.string.fr.modalBotsUnavailableHeadline = 'Les bots sont indisponibles pour le moment';
-z.string.fr.modalBotsUnavailableMessage = 'Merci de votre intérêt pour les bots. Ce service est actuellement désactivé pendant que nous travaillons sur la prochaine version. Restez à l’écoute.';
-z.string.fr.modalCallConversationEmptyHeadline = 'Personne à appeler';
-z.string.fr.modalCallConversationEmptyMessage = 'Il n’y a plus personne ici.';
-z.string.fr.modalCallNoVideoInGroupHeadline = 'Pas d’appel vidéo en groupe';
-z.string.fr.modalCallNoVideoInGroupMessage = 'Les appels vidéo ne sont pas disponibles dans les conversations de groupe.';
+z.string.fr.modalAccountDeletionAction = 'Supprimer';
+z.string.fr.modalAccountDeletionHeadline = 'Supprimer le compte';
+z.string.fr.modalAccountDeletionMessage = 'Nous allons envoyer un e-mail ou un SMS. Cliquez sur le lien pour supprimer définitivement votre compte.';
+
+z.string.fr.modalAccountLogoutAction = 'Se déconnecter';
+z.string.fr.modalAccountLogoutHeadline = 'Supprimer les données ?';
+z.string.fr.modalAccountLogoutOption = 'Supprime toutes vos informations personnelles et conversations de cet appareil.';
+
+z.string.fr.modalAccountNewDevicesSecondary = 'Gérer les appareils';
+z.string.fr.modalAccountNewDevicesHeadline = 'Votre compte a été utilisé le :';
+z.string.fr.modalAccountNewDevicesFrom = 'Depuis :';
+z.string.fr.modalAccountNewDevicesMessage = 'Si ce n’était pas vous, supprimez l’appareil et changez votre mot de passe.';
+
+z.string.fr.modalAccountRemoveDeviceAction = 'Supprimer l’appareil';
+z.string.fr.modalAccountRemoveDeviceHeadline = 'Supprimer "{{device}}"';
+z.string.fr.modalAccountRemoveDeviceMessage = 'Votre mot de passe est nécessaire pour supprimer l’appareil.';
+z.string.fr.modalAccountRemoveDevicePlaceholder = 'Mot de passe';
+
+z.string.fr.modalAssetTooLargeMessage = 'Vous pouvez envoyer des fichiers jusqu’à {{number}}';
+
+z.string.fr.modalAssetParallelUploadsMessage = 'Vous pouvez envoyer jusqu’à {{number}} fichiers à la fois.';
+
+z.string.fr.modalCallEmptyConversationHeadline = 'Personne à appeler';
+z.string.fr.modalCallEmptyConversationMessage = 'Il n’y a plus personne ici.';
+
+z.string.fr.modalCallNoGroupVideoHeadline = 'Pas d’appel vidéo en groupe';
+z.string.fr.modalCallNoGroupVideoMessage = 'Les appels vidéo ne sont pas disponibles dans les conversations de groupe.';
+
+z.string.fr.modalCallNoMicrophoneAction = 'Dites-moi comment faire';
+z.string.fr.modalCallNoMicrophoneMessage = 'Votre navigateur doit avoir accès au micro pour passer des appels.';
+z.string.fr.modalCallNoMicrophoneHeadline = 'Impossible d’appeler sans micro';
+
+z.string.fr.modalCallSecondIncomingAction = 'Répondre';
 z.string.fr.modalCallSecondIncomingHeadline = 'Répondre à l’appel ?';
 z.string.fr.modalCallSecondIncomingMessage = 'Votre appel en cours sera terminé.';
-z.string.fr.modalCallSecondIncomingAction = 'Répondre';
+
+z.string.fr.modalCallSecondOngoingAction = 'Raccrocher';
 z.string.fr.modalCallSecondOngoingHeadline = 'Raccrocher l’appel d’un autre appareil ?';
 z.string.fr.modalCallSecondOngoingMessage = 'Vous ne pouvez être que dans un appel à la fois.';
-z.string.fr.modalCallSecondOngoingAction = 'Raccrocher';
+
+z.string.fr.modalCallSecondOutgoingAction = 'Raccrocher';
 z.string.fr.modalCallSecondOutgoingHeadline = 'Raccrocher l’appel en cours ?';
 z.string.fr.modalCallSecondOutgoingMessage = 'Vous ne pouvez être que dans un appel à la fois.';
-z.string.fr.modalCallSecondOutgoingAction = 'Raccrocher';
-z.string.fr.modalClearConversationHeadline = 'Effacer le contenu ?';
-z.string.fr.modalClearConversationOption = 'Quitter aussi la conversation';
-z.string.fr.modalClearConversationButton = 'Supprimer';
-z.string.fr.modalConnectedDeviceHeadline = 'Votre compte a été utilisé le :';
-z.string.fr.modalConnectedDeviceFrom = 'Depuis :';
-z.string.fr.modalConnectedDeviceMessage = 'Si ce n’était pas vous, supprimez l’appareil et changez votre mot de passe.';
-z.string.fr.modalConnectedDeviceManageDevices = 'Gérer les appareils';
-z.string.fr.modalDeleteAccountAction = 'Supprimer';
-z.string.fr.modalDeleteAccountHeadline = 'Supprimer le compte';
-z.string.fr.modalDeleteAccountMessage = 'Nous allons envoyer un e-mail ou un SMS. Cliquez sur le lien pour supprimer définitivement votre compte.';
-z.string.fr.modalDeleteButton = 'Supprimer';
-z.string.fr.modalDeleteHeadline = 'Supprimer seulement pour moi ?';
-z.string.fr.modalDeleteMessage = 'Cela est irréversible.';
-z.string.fr.modalDeleteEveryoneButton = 'Supprimer';
-z.string.fr.modalDeleteEveryoneHeadline = 'Supprimer pour tout le monde ?';
-z.string.fr.modalDeleteEveryoneMessage = 'Cela est irréversible.';
-z.string.fr.modalTooLongHeadline = 'Message trop long';
-z.string.fr.modalTooLongMessage = 'Vous pouvez envoyer des messages de {{number}} caractères maximum.';
-z.string.fr.modalLeaveConversationHeadline = 'Quitter la conversation "{{name}}" ?';
-z.string.fr.modalLeaveConversationMessage = 'Les participants en seront notifiés et la conversation sera supprimée de votre liste.';
-z.string.fr.modalLeaveConversationButton = 'Quitter';
-z.string.fr.modalLogoutHeadline = 'Supprimer les données ?';
-z.string.fr.modalLogoutMessage = 'Supprime toutes vos informations personnelles et conversations de cet appareil.';
-z.string.fr.modalLogoutButton = 'Se déconnecter';
-z.string.fr.modalNewDeviceHeadline = '{{user}} utilise un nouvel appareil';
-z.string.fr.modalNewDeviceHeadlineMany = '{{users}} utilisent de nouveaux appareils';
-z.string.fr.modalNewDeviceHeadlineYou = '{{user}} utilise un nouvel appareil';
-z.string.fr.modalNewDeviceMessage = 'Voulez-vous toujours envoyer vos messages ?';
-z.string.fr.modalNewDeviceCallAccept = 'Décrocher';
-z.string.fr.modalNewDeviceCallAnyway = 'Appeler quand même';
-z.string.fr.modalNewDeviceCallIncoming = 'Voulez-vous quand même décrocher ?';
-z.string.fr.modalNewDeviceCallOutgoing = 'Voulez-vous quand même appeler ?';
-z.string.fr.modalNewDeviceShowDevice = 'afficher l’appareil';
-z.string.fr.modalNewDeviceSendAnyway = 'envoyer quand même';
-z.string.fr.modalNotConnectedHeadline = 'Personne n’a été ajouté à la conversation';
-z.string.fr.modalNotConnectedMessageOne = '{{name}} ne veut pas être ajouté aux conversations.';
-z.string.fr.modalNotConnectedMessageMany = 'Une des personnes sélectionnées ne veut pas être ajoutée aux conversations.';
-z.string.fr.modalRemoveDeviceButton = 'Supprimer l’appareil';
-z.string.fr.modalRemoveDeviceHeadline = 'Supprimer "{{device}}"';
-z.string.fr.modalRemoveDeviceMessage = 'Votre mot de passe est nécessaire pour supprimer l’appareil.';
+
+z.string.fr.modalConnectCancelAction = 'Oui';
+z.string.fr.modalConnectCancelHeadline = 'Annuler la demande ?';
+z.string.fr.modalConnectCancelMessage = 'Annuler la demande de connexion à {{user}}.';
+z.string.fr.modalConnectCancelSecondary = 'Non';
+
+z.string.fr.modalConnectAcceptAction = 'Se connecter';
+z.string.fr.modalConnectAcceptHeadline = 'Accepter ?';
+z.string.fr.modalConnectAcceptMessage = 'Cela vous connectera et ouvrira la conversation avec {{user}}.';
+z.string.fr.modalConnectAcceptSecondary = 'Ignorer';
+
+z.string.fr.modalConversationAddBotAction = 'Confirmer';
+z.string.fr.modalConversationAddBotHeadline = 'Ajouter un service';
+z.string.fr.modalConversationAddBotMessage = 'Êtes-vous sûr de vouloir débuter une conversation avec {{name}} ?';
+
+z.string.fr.modalConversationClearAction = 'Supprimer';
+z.string.fr.modalConversationClearHeadline = 'Effacer le contenu ?';
+z.string.fr.modalConversationClearOption = 'Quitter aussi la conversation';
+
+z.string.fr.modalConversationDeleteMessageAction = 'Supprimer';
+z.string.fr.modalConversationDeleteMessageHeadline = 'Supprimer seulement pour moi ?';
+z.string.fr.modalConversationDeleteMessageMessage = 'Cela est irréversible.';
+
+z.string.fr.modalConversationDeleteMessageEveryoneAction = 'Supprimer';
+z.string.fr.modalConversationDeleteMessageEveryoneHeadline = 'Supprimer pour tout le monde ?';
+z.string.fr.modalConversationDeleteMessageEveryoneMessage = 'Cela est irréversible.';
+
+z.string.fr.modalConversationLeaveAction = 'Quitter';
+z.string.fr.modalConversationLeaveMessage = 'Vous ne pourrez plus envoyer ou recevoir de messages dans cette conversation.';
+
+z.string.fr.modalConversationMessageTooLongHeadline = 'Message trop long';
+z.string.fr.modalConversationMessageTooLongMessage = 'Vous pouvez envoyer des messages de {{number}} caractères maximum.';
+
+z.string.fr.modalConversationNewDeviceHeadlineOne = '{{user}} utilise un nouvel appareil';
+z.string.fr.modalConversationNewDeviceHeadlineMany = '{{users}} utilisent de nouveaux appareils';
+z.string.fr.modalConversationNewDeviceHeadlineYou = '{{user}} utilise un nouvel appareil';
+z.string.fr.modalConversationNewDeviceIncomingCallAction = 'Décrocher';
+z.string.fr.modalConversationNewDeviceIncomingCallMessage = 'Voulez-vous quand même décrocher ?';
+z.string.fr.modalConversationNewDeviceMessage = 'Voulez-vous toujours envoyer vos messages ?';
+z.string.fr.modalConversationNewDeviceOutgoingCallAction = 'Appeler quand même';
+z.string.fr.modalConversationNewDeviceOutgoingCallMessage = 'Voulez-vous quand même appeler ?';
+
+z.string.fr.modalConversationNotConnectedHeadline = 'Personne n’a été ajouté à la conversation';
+z.string.fr.modalConversationNotConnectedMessageOne = '{{name}} ne veut pas être ajouté aux conversations.';
+z.string.fr.modalConversationNotConnectedMessageMany = 'Une des personnes sélectionnées ne veut pas être ajoutée aux conversations.';
+
+z.string.fr.modalConversationRemoveAction = 'Exclure';
+z.string.fr.modalConversationRemoveHeadline = 'Exclure ?';
+z.string.fr.modalConversationRemoveMessage = '{{user}} ne pourra plus envoyer ou recevoir de messages dans cette conversation.';
+
+
+z.string.fr.modalConversationTooManyMembersHeadline = 'Salle comble';
+
+z.string.fr.modalIntegrationUnavailableHeadline = 'Les bots sont indisponibles pour le moment';
+z.string.fr.modalIntegrationUnavailableMessage = 'Merci de votre intérêt pour les bots. Ce service est actuellement désactivé pendant que nous travaillons sur la prochaine version. Restez à l’écoute.';
+
+
 z.string.fr.modalServiceUnavailableHeadline = 'L’ajout du service est impossible';
 z.string.fr.modalServiceUnavailableMessage = 'Le service est temporairement indisponible.';
+
 z.string.fr.modalSessionResetHeadline = 'La session a été réinitialisée';
 z.string.fr.modalSessionResetMessage1 = 'Si le problème n’est pas résolu,';
 z.string.fr.modalSessionResetMessageLink = 'contactez';
 z.string.fr.modalSessionResetMessage2 = '-nous.';
-z.string.fr.modalTooManyMembersHeadline = 'Salle comble';
-z.string.fr.modalTooManyMembersMessage = 'Jusqu’à {{number1}} personne(s) peuvent se joindre à une conversation. Il y a encore de la place pour {{number2}} personne(s) ici.';
-z.string.fr.modalUploadsParallel = 'Vous pouvez envoyer jusqu’à {{number}} fichiers à la fois.';
+
+z.string.fr.modalUploadContactsAction = 'Réessayer';
+z.string.fr.modalUploadContactsMessage = 'Nous n’avons pas reçu votre information. Veuillez réessayer d’importer vos contacts.';
+
+z.string.fr.modalUserBlockAction = 'Bloquer';
+z.string.fr.modalUserBlockHeadline = 'Bloquer {{user}} ?';
+z.string.fr.modalUserBlockMessage = '{{user}} ne pourra plus vous contacter ou vous ajouter à des conversations de groupe.';
+
+z.string.fr.modalUserUnblockAction = 'Débloquer';
+z.string.fr.modalUserUnblockHeadline = 'Débloquer ?';
+z.string.fr.modalUserUnblockMessage = '{{user}} pourra de nouveau vous parler ou vous ajouter à des conversations de groupe.';
 
 z.string.fr.connectionRequestConnect = 'Se connecter';
 z.string.fr.connectionRequestIgnore = 'Ignorer';
@@ -205,7 +248,6 @@ z.string.fr.conversationDeviceYourDevices = ' de vos appareils';
 z.string.fr.conversationDeviceUserDevices = ' des appareils de {{user}}';
 z.string.fr.conversationDeviceNewDeviceOne = ' un nouvel appareil';
 z.string.fr.conversationDeviceNewDeviceMany = ' de nouveaux appareils';
-z.string.fr.conversationDeviceNewPeopleJoined = 'de nouvelles personnes sont arrivées.';
 z.string.fr.conversationDeviceNewPeopleJoinedVerify = ' vérifier les appareils';
 z.string.fr.conversationJustNow = 'À l’instant';
 z.string.fr.conversationLocationLink = 'Ouvrir la carte';
@@ -235,7 +277,6 @@ z.string.fr.conversationUnableToDecryptResetSession = 'Réinitialiser la session
 z.string.fr.conversationMissedMessages = 'Vous n’avez pas utilisé cet appareil depuis un moment. Il est possible que certains messages n’apparaissent pas ici.';
 z.string.fr.conversationAssetDownloading = 'Téléchargement en cours…';
 z.string.fr.conversationAssetUploadFailed = 'Échec de l’envoi';
-z.string.fr.conversationAssetUploadTooLarge = 'Vous pouvez envoyer des fichiers jusqu’à {{number}}';
 z.string.fr.conversationPlaybackError = 'Lecture impossible';
 z.string.fr.conversationContextMenuEdit = 'Édition';
 z.string.fr.conversationContextMenuDelete = 'Supprimer pour moi';
@@ -322,71 +363,45 @@ z.string.fr.extensionsGiphyMessage = '{{tag}} • via giphy.com';
 z.string.fr.extensionsGiphyNoGifs = 'Oups, pas de gif';
 z.string.fr.extensionsGiphyRandom = 'Au hasard';
 
-z.string.fr.peopleConfirmLabel = 'Ajouter des personnes au groupe';
-z.string.fr.peoplePeople = '{{number}} personne(s)';
-z.string.fr.peopleSearchPlaceholder = 'Rechercher par nom';
-z.string.fr.peopleEveryoneParticipates = 'Toutes les personnes\navec qui vous êtes connecté(e)\nsont déjà dans cette conversation.';
-z.string.fr.peopleNoMatches = 'Aucun résultat.\nEssayez avec un nom différent.';
-z.string.fr.peopleInvite = 'Invitez des personnes à rejoindre Wire';
-z.string.fr.peopleInviteDetail = 'Partager vos contacts vous permet de vous connecter à d’autres personnes. Nous anonymisons toutes les informations et ne les partageons avec personne d’autre.';
-z.string.fr.peopleInviteButtonContacts = 'Depuis vos contacts';
-z.string.fr.peopleInviteButtonGmail = 'Depuis Gmail';
-z.string.fr.peopleInviteHeadline = 'Invitez vos amis';
-z.string.fr.peopleServiceConfirmButton = 'Ajouter un service';
-z.string.fr.peopleServiceRemovalButton = 'Supprimer un service';
-z.string.fr.peopleServiceNewConversation = 'Créer une nouvelle conversation';
-z.string.fr.peopleServices = 'Services';
-z.string.fr.peopleShare = 'Partagez vos contacts';
-z.string.fr.peopleTabsDetails = 'Informations';
-z.string.fr.peopleTabsDevices = 'Appareils';
-z.string.fr.peopleTabsDevicesHeadline = 'Wire donne à chaque appareil une empreinte unique. Comparez-les avec {{user}} et vérifiez votre conversation.';
-z.string.fr.peopleTabsDevicesLearnMore = 'En savoir plus';
-z.string.fr.peopleTabsDevicesWhyVerify = 'Pourquoi vérifier une conversation ?';
-z.string.fr.peopleTabsNoDevicesHeadline = '{{user}} utilise une ancienne version de Wire. Aucun appareil n’est affiché ici.';
-z.string.fr.peopleTabsDeviceDetailAllMyDevices = 'Afficher tous mes appareils';
-z.string.fr.peopleTabsDeviceDetailDeviceFingerprint = 'Empreinte de l’appareil';
-z.string.fr.peopleTabsDeviceDetailHeadline = 'Vérifiez que cela correspond à l’empreinte affichée sur {{html1}}l’appareil de {{user}}{{html2}}.';
-z.string.fr.peopleTabsDeviceDetailHowTo = 'Comment faire ?';
-z.string.fr.peopleTabsDeviceDetailResetSession = 'Réinitialiser la session';
-z.string.fr.peopleTabsDeviceDetailShowMyDevice = 'Afficher l’empreinte de mon appareil';
-z.string.fr.peopleTabsDeviceDetailVerify = 'Vérifié';
-z.string.fr.peopleTabsPeople = 'Personnes';
-z.string.fr.peopleTabsServices = 'Services';
-z.string.fr.peopleVerified = 'Vérifié';
+z.string.fr.addParticipantsConfirmLabel = 'Ajouter';
+z.string.fr.addParticipantsHeader = 'Ajouter un contact';
+z.string.fr.addParticipantsSearchPlaceholder = 'Rechercher par nom';
+z.string.fr.addParticipantsServiceConfirmButton = 'Ajouter un service';
+z.string.fr.addParticipantsTabsPeople = 'Personnes';
+z.string.fr.addParticipantsTabsServices = 'Services';
 
-z.string.fr.peopleBlockHeadline = 'Bloquer ?';
-z.string.fr.peopleBlockMessage = '{{user}} ne pourra plus vous contacter ou vous ajouter à des conversations de groupe.';
+z.string.fr.conversationDetailsActionCancelRequest = 'Annuler la demande';
+z.string.fr.conversationDetailsActionCreateGroup = 'Créer un groupe';
+z.string.fr.conversationDetailsActionDevices = 'Appareils';
+z.string.fr.conversationDetailsGuestsOff = 'Désactiver';
+z.string.fr.conversationDetailsParticipantsServicesMany = 'Services';
+z.string.fr.conversationDetailsParticipantsUsersMany = 'Personnes';
+z.string.fr.conversationDetailsPeople = 'Personnes';
+z.string.fr.conversationDetailsServices = 'Services';
 
-z.string.fr.peopleConnectHeadline = 'Accepter ?';
-z.string.fr.peopleConnectMessage = 'Cela vous connectera et ouvrira la conversation avec {{user}}.';
+z.string.fr.groupParticipantActionCancelRequest = 'Annuler la demande';
+z.string.fr.groupParticipantActionDevices = 'Appareils';
+z.string.fr.groupParticipantActionPending = 'En attente';
+z.string.fr.groupParticipantActionSendRequest = 'Se connecter';
 
-z.string.fr.peopleCancelRequestHeadline = 'Annuler la demande ?';
-z.string.fr.peopleCancelRequestMessage = 'Annuler la demande de connexion à {{user}}.';
+z.string.fr.participantDevicesDetailHeadline = 'Vérifiez que cela correspond à l’empreinte affichée sur {{html1}}l’appareil de {{user}}{{html2}}.';
+z.string.fr.participantDevicesDetailHowTo = 'Comment faire ?';
+z.string.fr.participantDevicesDetailResetSession = 'Réinitialiser la session';
+z.string.fr.participantDevicesDetailShowMyDevice = 'Afficher l’empreinte de mon appareil';
+z.string.fr.participantDevicesDetailVerify = 'Vérifié';
 
-z.string.fr.peopleLeaveHeadline = 'Quitter la conversation ?';
-z.string.fr.peopleLeaveMessage = 'Vous ne pourrez plus envoyer ou recevoir de messages dans cette conversation.';
+z.string.fr.participantDevicesHeader = 'Appareils';
+z.string.fr.participantDevicesHeadline = 'Wire donne à chaque appareil une empreinte unique. Comparez-les avec {{user}} et vérifiez votre conversation.';
+z.string.fr.participantDevicesLearnMore = 'En savoir plus';
+z.string.fr.participantDevicesWhyVerify = 'Pourquoi vérifier les conversations ?';
+z.string.fr.participantDevicesOutdatedClientMessage = '{{user}} utilise une ancienne version de Wire. Aucun appareil n’est affiché ici.';
 
-z.string.fr.peopleRemoveHeadline = 'Exclure ?';
-z.string.fr.peopleRemoveMessage = '{{user}} ne pourra plus envoyer ou recevoir de messages dans cette conversation.';
+z.string.fr.participantDevicesSelfAllDevices = 'Afficher tous mes appareils';
+z.string.fr.participantDevicesSelfFingerprint = 'Empreinte de l’appareil';
 
-z.string.fr.peopleUnblockHeadline = 'Débloquer ?';
-z.string.fr.peopleUnblockMessage = '{{user}} pourra de nouveau vous parler ou vous ajouter à des conversations de groupe.';
-
-z.string.fr.peopleButtonAdd = 'Ajouter';
-z.string.fr.peopleButtonAddPeople = 'Ajouter un contact';
-z.string.fr.peopleButtonBlock = 'Bloquer';
-z.string.fr.peopleButtonCancel = 'Annuler';
-z.string.fr.peopleButtonConnect = 'Se connecter';
-z.string.fr.peopleButtonCreate = 'Créer un groupe';
-z.string.fr.peopleButtonIgnore = 'Ignorer';
-z.string.fr.peopleButtonLeave = 'Quitter';
-z.string.fr.peopleButtonOpen = 'Ouvrir la conversation';
-z.string.fr.peopleButtonPending = 'En attente';
-z.string.fr.peopleButtonProfile = 'Profil';
-z.string.fr.peopleButtonRemove = 'Exclure';
-z.string.fr.peopleButtonUnblock = 'Débloquer';
-z.string.fr.peopleButtonNo = 'Non';
-z.string.fr.peopleButtonYes = 'Oui';
+z.string.fr.userProfileButtonConnect = 'Se connecter';
+z.string.fr.userProfileButtonIgnore = 'Ignorer';
+z.string.fr.userProfileButtonUnblock = 'Débloquer';
 
 z.string.fr.preferencesAbout = 'À propos';
 z.string.fr.preferencesAccount = 'Compte';
@@ -471,6 +486,7 @@ z.string.fr.searchCreateGroup = 'Créer un groupe';
 z.string.fr.searchGroups = 'Groupes';
 z.string.fr.searchPeople = 'Personnes';
 z.string.fr.searchPlaceholder = 'Chercher par nom ou par identifiant';
+z.string.fr.searchServicePlaceholder = 'Rechercher par nom';
 z.string.fr.searchServices = 'Services';
 z.string.fr.searchTeamGroups = 'Conversations d’équipe';
 z.string.fr.searchTeamMembers = 'Membres de l’équipe';
@@ -480,18 +496,26 @@ z.string.fr.searchNoContactsOnWire = 'Vous n’avez pas de contacts sur Wire.\nE
 z.string.fr.searchMemberInvite = 'Inviter des personnes à rejoindre l’équipe';
 z.string.fr.searchOthers = 'Se connecter';
 
+z.string.fr.searchInvite = 'Invitez des personnes à rejoindre Wire';
+z.string.fr.searchInviteDetail = 'Partager vos contacts vous permet de vous connecter à d’autres personnes. Nous anonymisons toutes les informations et ne les partageons avec personne d’autre.';
+z.string.fr.searchInviteButtonContacts = 'Depuis vos contacts';
+z.string.fr.searchInviteButtonGmail = 'Depuis Gmail';
+z.string.fr.searchInviteHeadline = 'Invitez vos amis';
+z.string.fr.searchInviteShare = 'Partagez vos contacts';
+
+z.string.fr.searchServiceNewConversation = 'Créer une nouvelle conversation';
+z.string.fr.searchServiceConfirmButton = 'Ajouter un service';
+
+z.string.fr.searchListEveryoneParticipates = 'Toutes les personnes\navec qui vous êtes connecté(e)\nsont déjà dans cette conversation.';
+z.string.fr.searchListNoMatches = 'Aucun résultat.\nEssayez avec un nom différent.';
+
 z.string.fr.uploadGoogleHeadline = 'Trouvez des personnes\nà qui parler.';
 z.string.fr.uploadGoogleMessage = 'Nous utilisons les données de vos contacts afin de vous connecter à d’autres personnes. Nous anonymisons toutes les informations et ne les partageons avec personne d’autre.';
-z.string.fr.uploadGoogleHeadlineError = 'Une erreur\nest survenue.';
-z.string.fr.uploadGoogleMessageError = 'Nous n’avons pas reçu votre information. Veuillez réessayer d’importer vos contacts.';
-z.string.fr.uploadGoogleButtonAgain = 'Réessayer';
 
 z.string.fr.urlSupportRoot = '/';
 z.string.fr.urlWebappRoot = '/';
 z.string.fr.urlWebsiteRoot = '/';
 z.string.fr.urlWebsiteCreateTeam = '/create-team/';
-z.string.fr.warningCallDetail = 'Votre navigateur doit avoir accès au micro pour passer des appels.';
-z.string.fr.warningCallHeadline = 'Impossible d’appeler sans micro';
 z.string.fr.warningCallUnsupportedIncoming = '{{user}} vous appelle. Votre navigateur ne prend pas en charge les appels.';
 z.string.fr.warningCallUnsupportedOutgoing = 'Vous ne pouvez pas appeler parce que votre navigateur ne prend pas en charge les appels.';
 z.string.fr.warningCallIssues = 'Cette version de Wire ne peut pas participer à cet appel. Utilisez plutôt';
@@ -511,7 +535,6 @@ z.string.fr.warningPermissionRequestCamera = '{{icon}} Autoriser l’accès à l
 z.string.fr.warningPermissionRequestMicrophone = '{{icon}} Autoriser l’accès au micro';
 z.string.fr.warningPermissionRequestNotification = '{{icon}} Autoriser les notifications';
 z.string.fr.warningPermissionRequestScreen = '{{icon}} Autoriser l’accès à l’écran';
-z.string.fr.warningTellMeHow = 'Dites-moi comment faire';
 
 z.string.fr.userAvailabilityAvailable = 'Disponible';
 z.string.fr.userAvailabilityAway = 'Absent(e)';
@@ -560,14 +583,7 @@ z.string.fr.tooltipConversationsPreferences = 'Ouvrir les préférences';
 z.string.fr.tooltipConversationsSilence = 'Désactiver les notifications ({{shortcut}})';
 z.string.fr.tooltipConversationsStart = 'Commencer une conversation ({{shortcut}})';
 
-z.string.fr.tooltipPeopleAdd = 'Ajouter des personnes à la conversation ({{shortcut}})';
-z.string.fr.tooltipPeopleBack = 'Précédent';
-z.string.fr.tooltipPeopleBlock = 'Bloquer';
-z.string.fr.tooltipPeopleConnect = 'Se connecter';
-z.string.fr.tooltipPeopleLeave = 'Quitter la conversation';
-z.string.fr.tooltipPeopleRename = 'Changer le nom de la conversation';
-z.string.fr.tooltipPeopleRemove = 'Exclure de la conversation';
-z.string.fr.tooltipPeopleUnblock = 'Débloquer';
+z.string.fr.tooltipConversationDetailsRename = 'Changer le nom de la conversation';
 
 z.string.fr.tooltipPreferencesContactsGmail = 'Connectez-vous à votre compte Gmail pour importer des contacts';
 z.string.fr.tooltipPreferencesContactsMacos = 'Partagez tous vos contacts depuis l’application Contacts de macOS';

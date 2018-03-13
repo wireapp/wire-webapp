@@ -25,11 +25,6 @@ z.string.nl.nonexistentUser = 'Verwijderde gebruiker';
 z.string.nl.and = 'en';
 z.string.nl.enumerationAnd = ', en ';
 
-z.string.nl.alertUploadFileFormat = 'Kan deze afbeelding niet gebruiken.\nKies een PNG of JPEG bestand.';
-z.string.nl.alertUploadTooSmall = 'Kan deze afbeelding niet gebruiken.\nKies een afbeelding van tenminste 320 x 320 pixels.';
-z.string.nl.alertUploadTooLarge = 'Deze afbeelding is te groot.\nJe kunt bestanden uploaden tot {{number}} MB.';
-z.string.nl.alertGifTooLarge = 'Animatie is te groot.\nMaximale grootte is {{number}} MB.';
-
 z.string.nl.authAccountCountryCode = 'Landcode';
 z.string.nl.authAccountDeletion = 'Je bent uitgelogt omdat je account is verwijdert.';
 z.string.nl.authAccountExpiration = 'Je bent afgemeld omdat de sessie verlopen is. Log opnieuw in.';
@@ -104,80 +99,128 @@ z.string.nl.callJoin = 'Deelnemen';
 z.string.nl.callChooseSharedScreen = 'Kies een scherm om te delen';
 z.string.nl.callParticipants = '{{number}} bellen';
 
-z.string.nl.modalButtonCancel = 'Annuleer';
-z.string.nl.modalButtonOk = 'Ok';
-z.string.nl.modalButtonSend = 'Stuur';
+z.string.nl.modalAcknowledgeAction = 'Ok';
+z.string.nl.modalConfirmSecondary = 'Annuleer';
+z.string.nl.modalOptionSecondary = 'Annuleer';
 
-z.string.nl.modalBlockConversationHeadline = '{{user}} blokkeren?';
-z.string.nl.modalBlockConversationMessage = '{{user}} zal niet in staat zijn je te contacteren of toe te voegen aan een groepsgesprek.';
-z.string.nl.modalBlockConversationButton = 'Blokkeren';
-z.string.nl.modalBotsConfirmHeadline = 'Service toevoegen';
-z.string.nl.modalBotsConfirmMessage = 'Weet je zeker dat je een nieuw gesprek met {{name}} wil beginnen?';
-z.string.nl.modalBotsConfirmButton = 'Bevestig';
-z.string.nl.modalBotsUnavailableHeadline = 'Bots zijn nu niet beschikbaar';
-z.string.nl.modalBotsUnavailableMessage = 'Dank je voor je intress voor bots. De service is nu gestopt, terwijl we nu werken aan een volgende versie.';
-z.string.nl.modalCallConversationEmptyHeadline = 'Niemand om te bellen';
-z.string.nl.modalCallConversationEmptyMessage = 'Er is hier niemand meer.';
-z.string.nl.modalCallNoVideoInGroupHeadline = 'Geen video bellen in groepen';
-z.string.nl.modalCallNoVideoInGroupMessage = 'Video berichten zijn niet beschikbaar in groep gesprekken.';
+z.string.nl.modalAccountDeletionAction = 'Verwijderen';
+z.string.nl.modalAccountDeletionHeadline = 'Verwijder account';
+z.string.nl.modalAccountDeletionMessage = 'We vesturen je een bericht via email of SMS. Volg de instructies op in de link om je account te verwijderen.';
+
+z.string.nl.modalAccountLogoutAction = 'Uitloggen';
+z.string.nl.modalAccountLogoutHeadline = 'Gegevens wissen?';
+z.string.nl.modalAccountLogoutOption = 'Verwijder al je persoonlijke gegevens en gesprekken op dit apparaat.';
+
+z.string.nl.modalAccountNewDevicesSecondary = 'Beheer apparaten';
+z.string.nl.modalAccountNewDevicesHeadline = 'Je account werd gebruikt op:';
+z.string.nl.modalAccountNewDevicesFrom = 'Van:';
+z.string.nl.modalAccountNewDevicesMessage = 'Als je dit niet zelf was, verwijder dan het apparaat en stel je wachtwoord opnieuw in.';
+
+z.string.nl.modalAccountRemoveDeviceAction = 'Verwijder apparaat';
+z.string.nl.modalAccountRemoveDeviceHeadline = 'Verwijder "{{device}}"';
+z.string.nl.modalAccountRemoveDeviceMessage = 'Je wachtwoord is nodig om dit apparaat te verwijderen.';
+z.string.nl.modalAccountRemoveDevicePlaceholder = 'Wachtwoord';
+
+z.string.nl.modalAssetTooLargeMessage = 'U kunt bestanden versturen tot {{number}}';
+
+z.string.nl.modalAssetParallelUploadsMessage = 'Je kan tot {{number}} bestanden tegelijk versturen.';
+
+z.string.nl.modalCallEmptyConversationHeadline = 'Niemand om te bellen';
+z.string.nl.modalCallEmptyConversationMessage = 'Er is hier niemand meer.';
+
+z.string.nl.modalCallNoGroupVideoHeadline = 'Geen video bellen in groepen';
+z.string.nl.modalCallNoGroupVideoMessage = 'Video berichten zijn niet beschikbaar in groep gesprekken.';
+
+z.string.nl.modalCallNoMicrophoneAction = 'Vertel me meer';
+z.string.nl.modalCallNoMicrophoneMessage = 'Uw browser heeft toegang nodig tot de microfoon om te bellen.';
+z.string.nl.modalCallNoMicrophoneHeadline = 'Je kan niet bellen zonder microfoon';
+
+z.string.nl.modalCallSecondIncomingAction = 'Beantwoord';
 z.string.nl.modalCallSecondIncomingHeadline = 'Oproep beantwoorden?';
 z.string.nl.modalCallSecondIncomingMessage = 'Uw huidige gesprek zal worden beëindigd.';
-z.string.nl.modalCallSecondIncomingAction = 'Beantwoord';
+
+z.string.nl.modalCallSecondOngoingAction = 'Ophangen';
 z.string.nl.modalCallSecondOngoingHeadline = 'Hang gesprek op op andere apparaat?';
 z.string.nl.modalCallSecondOngoingMessage = 'Je kunt maar één gesprek tegelijk voeren.';
-z.string.nl.modalCallSecondOngoingAction = 'Ophangen';
+
+z.string.nl.modalCallSecondOutgoingAction = 'Ophangen';
 z.string.nl.modalCallSecondOutgoingHeadline = 'Huidige gesprek ophangen?';
 z.string.nl.modalCallSecondOutgoingMessage = 'Je kunt maar één gesprek tegelijk voeren.';
-z.string.nl.modalCallSecondOutgoingAction = 'Ophangen';
-z.string.nl.modalClearConversationHeadline = 'Inhoud verwijderen?';
-z.string.nl.modalClearConversationOption = 'Ook het gesprek verlaten';
-z.string.nl.modalClearConversationButton = 'Verwijderen';
-z.string.nl.modalConnectedDeviceHeadline = 'Je account werd gebruikt op:';
-z.string.nl.modalConnectedDeviceFrom = 'Van:';
-z.string.nl.modalConnectedDeviceMessage = 'Als je dit niet zelf was, verwijder dan het apparaat en stel je wachtwoord opnieuw in.';
-z.string.nl.modalConnectedDeviceManageDevices = 'apparaten beheren';
-z.string.nl.modalDeleteAccountAction = 'Verwijderen';
-z.string.nl.modalDeleteAccountHeadline = 'Verwijder account';
-z.string.nl.modalDeleteAccountMessage = 'We vesturen je een bericht via email of SMS. Volg de instructies op in de link om je account te verwijderen.';
-z.string.nl.modalDeleteButton = 'Verwijderen';
-z.string.nl.modalDeleteHeadline = 'Alleen voor mij verwijderen?';
-z.string.nl.modalDeleteMessage = 'Dit kan niet ongedaan gemaakt worden.';
-z.string.nl.modalDeleteEveryoneButton = 'Verwijderen';
-z.string.nl.modalDeleteEveryoneHeadline = 'Voor iedereen verwijderen?';
-z.string.nl.modalDeleteEveryoneMessage = 'Dit kan niet ongedaan gemaakt worden.';
-z.string.nl.modalTooLongHeadline = 'Bericht te lang';
-z.string.nl.modalTooLongMessage = 'Je kan berichten verzenden van maximaal {{number}} tekens.';
-z.string.nl.modalLeaveConversationHeadline = 'Gesprek "{{name}}" verlaten?';
-z.string.nl.modalLeaveConversationMessage = 'De deelnemers ontvangen een notificatie en het gesprek wordt uit je lijst verwijderd.';
-z.string.nl.modalLeaveConversationButton = 'Verlaten';
-z.string.nl.modalLogoutHeadline = 'Gegevens wissen?';
-z.string.nl.modalLogoutMessage = 'Verwijder al je persoonlijke gegevens en gesprekken op dit apparaat.';
-z.string.nl.modalLogoutButton = 'Uitloggen';
-z.string.nl.modalNewDeviceHeadline = '{{user}} gebruikt een nieuw apparaat';
-z.string.nl.modalNewDeviceHeadlineMany = '{{users}} gebruiken nieuwe apparaten';
-z.string.nl.modalNewDeviceHeadlineYou = '{{user}} gebruikt een nieuw apparaat';
-z.string.nl.modalNewDeviceMessage = 'Wil je het bericht nog steeds versturen?';
-z.string.nl.modalNewDeviceCallAccept = 'Gesprek aannemen';
-z.string.nl.modalNewDeviceCallAnyway = 'Toch bellen';
-z.string.nl.modalNewDeviceCallIncoming = 'Wil je het gesprek nog steeds accepteren?';
-z.string.nl.modalNewDeviceCallOutgoing = 'Wil je het gesprek nog steeds voeren?';
-z.string.nl.modalNewDeviceShowDevice = 'toon apparaat';
-z.string.nl.modalNewDeviceSendAnyway = 'toch verzenden';
-z.string.nl.modalNotConnectedHeadline = 'Niemand toegevoegd tot conversatie';
-z.string.nl.modalNotConnectedMessageOne = '{{name}} wil niet toegevoegd worden aan gesprekken.';
-z.string.nl.modalNotConnectedMessageMany = 'Een van de mensen die je hebt geselecteerd wil niet worden toegevoegd aan gesprekken.';
-z.string.nl.modalRemoveDeviceButton = 'Verwijder apparaat';
-z.string.nl.modalRemoveDeviceHeadline = 'Verwijder "{{device}}"';
-z.string.nl.modalRemoveDeviceMessage = 'Je wachtwoord is nodig om dit apparaat te verwijderen.';
+
+z.string.nl.modalConnectCancelAction = 'Ja';
+z.string.nl.modalConnectCancelHeadline = 'Verzoek annuleren?';
+z.string.nl.modalConnectCancelMessage = 'Verwijder verzoek aan {{user}}.';
+z.string.nl.modalConnectCancelSecondary = 'Nee';
+
+z.string.nl.modalConnectAcceptAction = 'Verbind';
+z.string.nl.modalConnectAcceptHeadline = 'Accepteren?';
+z.string.nl.modalConnectAcceptMessage = 'Dit zal een verbinding met {{user}} maken en een gesprek openen.';
+z.string.nl.modalConnectAcceptSecondary = 'Negeer';
+
+z.string.nl.modalConversationAddBotAction = 'Bevestig';
+z.string.nl.modalConversationAddBotHeadline = 'Service toevoegen';
+z.string.nl.modalConversationAddBotMessage = 'Weet je zeker dat je een nieuw gesprek met {{name}} wil beginnen?';
+
+z.string.nl.modalConversationClearAction = 'Verwijderen';
+z.string.nl.modalConversationClearHeadline = 'Inhoud verwijderen?';
+z.string.nl.modalConversationClearOption = 'Ook het gesprek verlaten';
+
+z.string.nl.modalConversationDeleteMessageAction = 'Verwijderen';
+z.string.nl.modalConversationDeleteMessageHeadline = 'Alleen voor mij verwijderen?';
+z.string.nl.modalConversationDeleteMessageMessage = 'Dit kan niet ongedaan gemaakt worden.';
+
+z.string.nl.modalConversationDeleteMessageEveryoneAction = 'Verwijderen';
+z.string.nl.modalConversationDeleteMessageEveryoneHeadline = 'Voor iedereen verwijderen?';
+z.string.nl.modalConversationDeleteMessageEveryoneMessage = 'Dit kan niet ongedaan gemaakt worden.';
+
+z.string.nl.modalConversationLeaveAction = 'Verlaten';
+z.string.nl.modalConversationLeaveMessage = 'Je zal niet in staat zijn om berichten in deze conversatie te verzenden of te ontvangen.';
+
+z.string.nl.modalConversationMessageTooLongHeadline = 'Bericht te lang';
+z.string.nl.modalConversationMessageTooLongMessage = 'Je kan berichten verzenden van maximaal {{number}} tekens.';
+
+z.string.nl.modalConversationNewDeviceHeadlineOne = '{{user}} gebruikt een nieuw apparaat';
+z.string.nl.modalConversationNewDeviceHeadlineMany = '{{users}} gebruiken nieuwe apparaten';
+z.string.nl.modalConversationNewDeviceHeadlineYou = '{{user}} gebruikt een nieuw apparaat';
+z.string.nl.modalConversationNewDeviceIncomingCallAction = 'Gesprek aannemen';
+z.string.nl.modalConversationNewDeviceIncomingCallMessage = 'Wil je het gesprek nog steeds accepteren?';
+z.string.nl.modalConversationNewDeviceMessage = 'Wil je het bericht nog steeds versturen?';
+z.string.nl.modalConversationNewDeviceOutgoingCallAction = 'Toch bellen';
+z.string.nl.modalConversationNewDeviceOutgoingCallMessage = 'Wil je het gesprek nog steeds voeren?';
+
+z.string.nl.modalConversationNotConnectedHeadline = 'Niemand toegevoegd tot conversatie';
+z.string.nl.modalConversationNotConnectedMessageOne = '{{name}} wil niet toegevoegd worden aan gesprekken.';
+z.string.nl.modalConversationNotConnectedMessageMany = 'Een van de mensen die je hebt geselecteerd wil niet worden toegevoegd aan gesprekken.';
+
+z.string.nl.modalConversationRemoveAction = 'Verwijderen';
+z.string.nl.modalConversationRemoveHeadline = 'Verwijder?';
+z.string.nl.modalConversationRemoveMessage = '{{user}} zal geen berichten kunnen versturen of ontvangen in dit gesprek.';
+
+
+z.string.nl.modalConversationTooManyMembersHeadline = 'Full house';
+
+z.string.nl.modalIntegrationUnavailableHeadline = 'Bots zijn nu niet beschikbaar';
+z.string.nl.modalIntegrationUnavailableMessage = 'Dank je voor je intress voor bots. De service is nu gestopt, terwijl we nu werken aan een volgende versie.';
+
+
 z.string.nl.modalServiceUnavailableHeadline = 'Toevoegen van de service niet mogelijk';
 z.string.nl.modalServiceUnavailableMessage = 'De service is op dit moment niet beschikbaar.';
+
 z.string.nl.modalSessionResetHeadline = 'De sessie is gereset';
 z.string.nl.modalSessionResetMessage1 = 'Als het probleem niet is opgelost, ';
 z.string.nl.modalSessionResetMessageLink = 'contact';
 z.string.nl.modalSessionResetMessage2 = 'ons.';
-z.string.nl.modalTooManyMembersHeadline = 'Full house';
-z.string.nl.modalTooManyMembersMessage = 'Maximaal {{number1}} mensen kunnen in een groepsgesprek. Er is nog ruimte voor {{number2}} mensen.';
-z.string.nl.modalUploadsParallel = 'Je kan tot {{number}} bestanden tegelijk versturen.';
+
+z.string.nl.modalUploadContactsAction = 'Probeer opnieuw';
+z.string.nl.modalUploadContactsMessage = 'We hebben geen informatie ontvangen. Probeer opnieuw je contacten te importeren.';
+
+z.string.nl.modalUserBlockAction = 'Blokkeren';
+z.string.nl.modalUserBlockHeadline = '{{user}} blokkeren?';
+z.string.nl.modalUserBlockMessage = '{{user}} zal niet in staat zijn je te contacteren of toe te voegen aan een groepsgesprek.';
+
+z.string.nl.modalUserUnblockAction = 'Deblokkeer';
+z.string.nl.modalUserUnblockHeadline = 'Deblokkeer?';
+z.string.nl.modalUserUnblockMessage = '{{user}} zal weer in staat zijn je te contacteren en je toe te voegen aan een groepsgesprek.';
 
 z.string.nl.connectionRequestConnect = 'Verbind';
 z.string.nl.connectionRequestIgnore = 'Negeer';
@@ -204,7 +247,6 @@ z.string.nl.conversationDeviceYourDevices = ' jou apparaten';
 z.string.nl.conversationDeviceUserDevices = '{{user}}´s apparaten';
 z.string.nl.conversationDeviceNewDeviceOne = ' een nieuw apparaat';
 z.string.nl.conversationDeviceNewDeviceMany = ' nieuw apparaaten';
-z.string.nl.conversationDeviceNewPeopleJoined = 'nieuwe mensen toegevoegd.';
 z.string.nl.conversationDeviceNewPeopleJoinedVerify = ' controleer apparaten';
 z.string.nl.conversationJustNow = 'Zojuist';
 z.string.nl.conversationLocationLink = 'Open kaart';
@@ -234,7 +276,6 @@ z.string.nl.conversationUnableToDecryptResetSession = 'Reset session';
 z.string.nl.conversationMissedMessages = 'Je hebt dit apparaat een tijdje niet gebruikt. Sommige berichten worden hier niet getoond.';
 z.string.nl.conversationAssetDownloading = 'Downloaden…';
 z.string.nl.conversationAssetUploadFailed = 'Uploaden mislukt';
-z.string.nl.conversationAssetUploadTooLarge = 'U kunt bestanden versturen tot {{number}}';
 z.string.nl.conversationPlaybackError = 'Niet in staat om te af te spelen';
 z.string.nl.conversationContextMenuEdit = 'Bewerken';
 z.string.nl.conversationContextMenuDelete = 'Verwijderen voor mij';
@@ -321,70 +362,45 @@ z.string.nl.extensionsGiphyMessage = '{{tag}} • via giphy.com';
 z.string.nl.extensionsGiphyNoGifs = 'Oeps, geen gifjes';
 z.string.nl.extensionsGiphyRandom = 'Random';
 
-z.string.nl.peopleConfirmLabel = 'Voeg Personen aan Groep toe';
-z.string.nl.peoplePeople = '{{number}} mensen';
-z.string.nl.peopleSearchPlaceholder = 'Zoeken op naam';
-z.string.nl.peopleEveryoneParticipates = 'Iedereen met wie je contact hebt zit al in dit gesprek.';
-z.string.nl.peopleNoMatches = 'Geen overeenkomende resultaten.\nProbeer een andere gebruikersnaam.';
-z.string.nl.peopleInvite = 'Nodig andere mensen uit voor Wire';
-z.string.nl.peopleInviteDetail = 'Het delen van je contacten helpt je om met anderen te verbinden. We anonimiseren alle informatie en delen deze niet met iemand anders.';
-z.string.nl.peopleInviteButtonContacts = 'Van contacten';
-z.string.nl.peopleInviteButtonGmail = 'Van Gmail';
-z.string.nl.peopleInviteHeadline = 'Nodig je vrienden uit';
-z.string.nl.peopleServiceConfirmButton = 'Service toevoegen';
-z.string.nl.peopleServiceRemovalButton = 'Service verwijderen';
-z.string.nl.peopleServices = 'Services';
-z.string.nl.peopleShare = 'Contacten delen';
-z.string.nl.peopleTabsDetails = 'Beschrijving';
-z.string.nl.peopleTabsDevices = 'Apparaten';
-z.string.nl.peopleTabsDevicesHeadline = 'Wire geeft elk apparaat een unieke vingerafdruk. Vergelijk deze met {{user}} en verifieer het gesprek.';
-z.string.nl.peopleTabsDevicesLearnMore = 'Leer meer';
-z.string.nl.peopleTabsDevicesWhyVerify = 'Waarom een gesprek verifiëren?';
-z.string.nl.peopleTabsNoDevicesHeadline = '{{user}} gebruikt een oude versie van Wire. Er worden daarom geen apparaten getoond.';
-z.string.nl.peopleTabsDeviceDetailAllMyDevices = 'Toon al mijn apparaten';
-z.string.nl.peopleTabsDeviceDetailDeviceFingerprint = 'Digitale vingerafdruk';
-z.string.nl.peopleTabsDeviceDetailHeadline = 'Verifieer dat deze digitale vingerafdruk overeenkomt met {{html1}}{{user}}’s apparaat{{html2}}.';
-z.string.nl.peopleTabsDeviceDetailHowTo = 'Hoe doe ik dat?';
-z.string.nl.peopleTabsDeviceDetailResetSession = 'Reset session';
-z.string.nl.peopleTabsDeviceDetailShowMyDevice = 'Toon de digitale vingerafdruk van mijn apparaat';
-z.string.nl.peopleTabsDeviceDetailVerify = 'Geverifieerd';
-z.string.nl.peopleTabsPeople = 'Deelnemers';
-z.string.nl.peopleTabsServices = 'Services';
-z.string.nl.peopleVerified = 'Geverifieerd';
+z.string.nl.addParticipantsConfirmLabel = 'Toevoegen';
+z.string.nl.addParticipantsHeader = 'Personen toevoegen';
+z.string.nl.addParticipantsSearchPlaceholder = 'Zoeken op naam';
+z.string.nl.addParticipantsServiceConfirmButton = 'Service toevoegen';
+z.string.nl.addParticipantsTabsPeople = 'Deelnemers';
+z.string.nl.addParticipantsTabsServices = 'Services';
 
-z.string.nl.peopleBlockHeadline = 'Blokkeren?';
-z.string.nl.peopleBlockMessage = '{{user}} zal niet in staat zijn je te contacteren of toe te voegen aan een groepsgesprek.';
+z.string.nl.conversationDetailsActionCancelRequest = 'Annuleer verzoek';
+z.string.nl.conversationDetailsActionCreateGroup = 'Maak groep';
+z.string.nl.conversationDetailsActionDevices = 'Apparaten';
+z.string.nl.conversationDetailsGuestsOff = 'Uit';
+z.string.nl.conversationDetailsParticipantsServicesMany = 'Services';
+z.string.nl.conversationDetailsParticipantsUsersMany = 'Deelnemers';
+z.string.nl.conversationDetailsPeople = 'Deelnemers';
+z.string.nl.conversationDetailsServices = 'Services';
 
-z.string.nl.peopleConnectHeadline = 'Accepteren?';
-z.string.nl.peopleConnectMessage = 'Dit zal een verbinding met {{user}} maken en een gesprek openen.';
+z.string.nl.groupParticipantActionCancelRequest = 'Annuleer verzoek';
+z.string.nl.groupParticipantActionDevices = 'Apparaten';
+z.string.nl.groupParticipantActionPending = 'In behandeling';
+z.string.nl.groupParticipantActionSendRequest = 'Verbind';
 
-z.string.nl.peopleCancelRequestHeadline = 'Verzoek annuleren?';
-z.string.nl.peopleCancelRequestMessage = 'Verwijder verzoek aan {{user}}.';
+z.string.nl.participantDevicesDetailHeadline = 'Verifieer dat deze digitale vingerafdruk overeenkomt met {{html1}}{{user}}’s apparaat{{html2}}.';
+z.string.nl.participantDevicesDetailHowTo = 'Hoe doe ik dat?';
+z.string.nl.participantDevicesDetailResetSession = 'Reset session';
+z.string.nl.participantDevicesDetailShowMyDevice = 'Toon de digitale vingerafdruk van mijn apparaat';
+z.string.nl.participantDevicesDetailVerify = 'Geverifieerd';
 
-z.string.nl.peopleLeaveHeadline = 'Verlaat het gesprek?';
-z.string.nl.peopleLeaveMessage = 'Je zal niet in staat zijn om berichten in deze conversatie te verzenden of te ontvangen.';
+z.string.nl.participantDevicesHeader = 'Apparaten';
+z.string.nl.participantDevicesHeadline = 'Wire geeft elk apparaat een unieke vingerafdruk. Vergelijk deze met {{user}} en verifieer het gesprek.';
+z.string.nl.participantDevicesLearnMore = 'Leer meer';
+z.string.nl.participantDevicesWhyVerify = 'Waarom gesprekken verifiëren?';
+z.string.nl.participantDevicesOutdatedClientMessage = '{{user}} gebruikt een oude versie van Wire. Er worden daarom geen apparaten getoond.';
 
-z.string.nl.peopleRemoveHeadline = 'Verwijder?';
-z.string.nl.peopleRemoveMessage = '{{user}} zal geen berichten kunnen versturen of ontvangen in dit gesprek.';
+z.string.nl.participantDevicesSelfAllDevices = 'Toon al mijn apparaten';
+z.string.nl.participantDevicesSelfFingerprint = 'Digitale vingerafdruk';
 
-z.string.nl.peopleUnblockHeadline = 'Deblokkeer?';
-z.string.nl.peopleUnblockMessage = '{{user}} zal weer in staat zijn je te contacteren en je toe te voegen aan een groepsgesprek.';
-
-z.string.nl.peopleButtonAdd = 'Toevoegen';
-z.string.nl.peopleButtonAddPeople = 'Personen toevoegen';
-z.string.nl.peopleButtonBlock = 'Blokkeren';
-z.string.nl.peopleButtonCancel = 'Annuleer';
-z.string.nl.peopleButtonConnect = 'Verbind';
-z.string.nl.peopleButtonCreate = 'Maak groep';
-z.string.nl.peopleButtonIgnore = 'Negeer';
-z.string.nl.peopleButtonLeave = 'Verlaten';
-z.string.nl.peopleButtonOpen = 'Open gesprek';
-z.string.nl.peopleButtonPending = 'In behandeling';
-z.string.nl.peopleButtonProfile = 'Profiel';
-z.string.nl.peopleButtonRemove = 'Verwijderen';
-z.string.nl.peopleButtonUnblock = 'Deblokkeer';
-z.string.nl.peopleButtonNo = 'Nee';
-z.string.nl.peopleButtonYes = 'Ja';
+z.string.nl.userProfileButtonConnect = 'Verbind';
+z.string.nl.userProfileButtonIgnore = 'Negeer';
+z.string.nl.userProfileButtonUnblock = 'Deblokkeer';
 
 z.string.nl.preferencesAbout = 'Over ons';
 z.string.nl.preferencesAccount = 'Profiel';
@@ -469,6 +485,7 @@ z.string.nl.searchCreateGroup = 'Maak groep';
 z.string.nl.searchGroups = 'Groepen';
 z.string.nl.searchPeople = 'Deelnemers';
 z.string.nl.searchPlaceholder = 'Zoek op naam of gebruikersnaam';
+z.string.nl.searchServicePlaceholder = 'Zoeken op naam';
 z.string.nl.searchServices = 'Services';
 z.string.nl.searchTeamGroups = 'Teamgesprekken';
 z.string.nl.searchTeamMembers = 'Teamleden';
@@ -478,14 +495,21 @@ z.string.nl.searchNoContactsOnWire = 'Je hebt geen contacten op Wire\nProbeer me
 z.string.nl.searchMemberInvite = 'Nodig andere mensen uit voor het team';
 z.string.nl.searchOthers = 'Verbind';
 
+z.string.nl.searchInvite = 'Nodig andere mensen uit voor Wire';
+z.string.nl.searchInviteDetail = 'Het delen van je contacten helpt je om met anderen te verbinden. We anonimiseren alle informatie en delen deze niet met iemand anders.';
+z.string.nl.searchInviteButtonContacts = 'Van contacten';
+z.string.nl.searchInviteButtonGmail = 'Van Gmail';
+z.string.nl.searchInviteHeadline = 'Nodig je vrienden uit';
+z.string.nl.searchInviteShare = 'Contacten delen';
+
+z.string.nl.searchServiceConfirmButton = 'Service toevoegen';
+
+z.string.nl.searchListEveryoneParticipates = 'Iedereen met wie je contact hebt zit al in dit gesprek.';
+z.string.nl.searchListNoMatches = 'Geen overeenkomende resultaten.\nProbeer een andere gebruikersnaam.';
+
 z.string.nl.uploadGoogleHeadline = 'Zoek mensen \nom mee te praten.';
 z.string.nl.uploadGoogleMessage = 'Dit helpt je om met anderen te verbinden. We anonimiseren alle informatie en delen deze niet met iemand anders.';
-z.string.nl.uploadGoogleHeadlineError = 'Er is iets \nfout gegaan.';
-z.string.nl.uploadGoogleMessageError = 'We hebben geen informatie ontvangen. Probeer opnieuw je contacten te importeren.';
-z.string.nl.uploadGoogleButtonAgain = 'Probeer opnieuw';
 
-z.string.nl.warningCallDetail = 'Uw browser heeft toegang nodig tot de microfoon om te bellen.';
-z.string.nl.warningCallHeadline = 'Je kan niet bellen zonder microfoon';
 z.string.nl.warningCallUnsupportedIncoming = '{{user}} belt, maar je browser ondersteund geen gesprekken.';
 z.string.nl.warningCallUnsupportedOutgoing = 'Je kan niet bellen omdat jou browser dit niet ondersteund.';
 z.string.nl.warningCallIssues = 'Deze versie kan niet deelnemen met het bellen. Gebruik alsjeblieft';
@@ -505,7 +529,6 @@ z.string.nl.warningPermissionRequestCamera = '{{icon}} Toegang tot camera toesta
 z.string.nl.warningPermissionRequestMicrophone = '{{icon}} Toegang tot de microfoon toestaan';
 z.string.nl.warningPermissionRequestNotification = '{{icon}} Meldingen toestaan';
 z.string.nl.warningPermissionRequestScreen = '{{icon}} Toegang tot scherm toestaan';
-z.string.nl.warningTellMeHow = 'Vertel me meer';
 
 z.string.nl.userAvailabilityAvailable = 'Beschikbaar';
 z.string.nl.userAvailabilityAway = 'Afwezig';
@@ -554,14 +577,7 @@ z.string.nl.tooltipConversationsPreferences = 'Open instelllingen';
 z.string.nl.tooltipConversationsSilence = 'Dempen ({{shortcut}})';
 z.string.nl.tooltipConversationsStart = 'Start gesprek ({{shortcut}})';
 
-z.string.nl.tooltipPeopleAdd = 'Mensen toevoegen aan het gesprek ({{shortcut}})';
-z.string.nl.tooltipPeopleBack = 'Vorige';
-z.string.nl.tooltipPeopleBlock = 'Blokkeren';
-z.string.nl.tooltipPeopleConnect = 'Verbind';
-z.string.nl.tooltipPeopleLeave = 'Verlaat gesprek';
-z.string.nl.tooltipPeopleRename = 'Verander gesprek naam';
-z.string.nl.tooltipPeopleRemove = 'Verwijder uit gesprek';
-z.string.nl.tooltipPeopleUnblock = 'Deblokkeer';
+z.string.nl.tooltipConversationDetailsRename = 'Verander gesprek naam';
 
 z.string.nl.tooltipPreferencesContactsGmail = 'Log in op je Gmail account om je contacten te delen';
 z.string.nl.tooltipPreferencesContactsMacos = 'Deel al je contacten van de macOS Contact app';

@@ -23,11 +23,6 @@ z.string.fi.wireLinux = 'Wire Linuxille';
 z.string.fi.nonexistentUser = 'Poistettu käyttäjä';
 z.string.fi.and = 'ja';
 
-z.string.fi.alertUploadFileFormat = 'Kuvaa ei voi käyttää. Valitse PNG- tai JPEG-tiedosto.';
-z.string.fi.alertUploadTooSmall = 'Kuvaa ei voi käyttää. Valitse kuva, jonka koko on vähintään 320 X 320 pikseliä.';
-z.string.fi.alertUploadTooLarge = 'Kuva on liian suuri. Voit ladata maksimissaan {{number}} MB kokoisia kuvia.';
-z.string.fi.alertGifTooLarge = 'Animaatio on liian suuri. Maksimi koko on {{number}} MB.';
-
 z.string.fi.authAccountCountryCode = 'Maakoodi';
 z.string.fi.authAccountDeletion = 'Sinut kirjattiin ulos, koska tilisi poistettiin.';
 z.string.fi.authAccountExpiration = 'Sinut kirjattiin ulos, koska istuntosi päättyi. Kirjaudu sisään uudelleen.';
@@ -101,76 +96,123 @@ z.string.fi.callJoin = 'Liity';
 z.string.fi.callChooseSharedScreen = 'Valitse näyttö jonka haluat jakaa';
 z.string.fi.callParticipants = '{{number}} puhelussa';
 
-z.string.fi.modalButtonCancel = 'Peruuta';
-z.string.fi.modalButtonOk = 'Ok';
-z.string.fi.modalButtonSend = 'Lähetä';
+z.string.fi.modalAcknowledgeAction = 'Ok';
+z.string.fi.modalConfirmSecondary = 'Peruuta';
+z.string.fi.modalOptionSecondary = 'Peruuta';
 
-z.string.fi.modalBlockConversationHeadline = 'Estä {{user}}?';
-z.string.fi.modalBlockConversationMessage = '{{user}} ei pysty ottamaan sinuun yhteyttä tai lisäämään sinua ryhmäkeskusteluihin.';
-z.string.fi.modalBlockConversationButton = 'Estä';
-z.string.fi.modalBotsConfirmButton = 'Vahvista';
-z.string.fi.modalBotsUnavailableHeadline = 'Botit eivät käytettävissä';
-z.string.fi.modalBotsUnavailableMessage = 'Kiitos mielenkiinnostasi botteihin. Tämä palvelu on väliaikaisesti pois käytöstä, koska työstämme seuraavaa versiota.';
-z.string.fi.modalCallConversationEmptyHeadline = 'Ei ketään kelle soittaa';
-z.string.fi.modalCallConversationEmptyMessage = 'Täällä ei ole ketään jäljellä.';
-z.string.fi.modalCallNoVideoInGroupHeadline = 'Ei videopuheluja ryhmissä';
-z.string.fi.modalCallNoVideoInGroupMessage = 'Videopuhelut eivät ole saatavilla ryhmäkeskusteluissa.';
+z.string.fi.modalAccountDeletionAction = 'Poista';
+z.string.fi.modalAccountDeletionHeadline = 'Poista tili';
+z.string.fi.modalAccountDeletionMessage = 'Lähetämme viestin sähköpostina tai tekstiviestinä. Paina viestissä olevaa linkkiä poistaaksesi tilisi lopullisesti.';
+
+z.string.fi.modalAccountLogoutAction = 'Kirjaudu ulos';
+z.string.fi.modalAccountLogoutHeadline = 'Tyhjennä tiedot?';
+z.string.fi.modalAccountLogoutOption = 'Poista kaikki henkilökohtaiset tiedot ja keskustelut tästä laitteesta.';
+
+z.string.fi.modalAccountNewDevicesSecondary = 'Hallitse laitteita';
+z.string.fi.modalAccountNewDevicesHeadline = 'Tiliäsi käytettiin:';
+z.string.fi.modalAccountNewDevicesFrom = 'Laite:';
+z.string.fi.modalAccountNewDevicesMessage = 'Jos et tehnyt tätä, poista laite ja vaihda salasanasi.';
+
+z.string.fi.modalAccountRemoveDeviceAction = 'Poista laite';
+z.string.fi.modalAccountRemoveDeviceHeadline = 'Poista "{{device}}"';
+z.string.fi.modalAccountRemoveDeviceMessage = 'Sinun täytyy kirjoittaa salasanasi poistaaksesi laitteen.';
+z.string.fi.modalAccountRemoveDevicePlaceholder = 'Salasana';
+
+z.string.fi.modalAssetTooLargeMessage = 'Voit lähettää maksimissaan {{number}} kokoisia tiedostoja';
+
+z.string.fi.modalAssetParallelUploadsMessage = 'Voit lähettää jopa {{number}} tiedostoa samaan aikaan.';
+
+z.string.fi.modalCallEmptyConversationHeadline = 'Ei ketään kelle soittaa';
+z.string.fi.modalCallEmptyConversationMessage = 'Täällä ei ole ketään jäljellä.';
+
+z.string.fi.modalCallNoGroupVideoHeadline = 'Ei videopuheluja ryhmissä';
+z.string.fi.modalCallNoGroupVideoMessage = 'Videopuhelut eivät ole saatavilla ryhmäkeskusteluissa.';
+
+z.string.fi.modalCallNoMicrophoneAction = 'Kerro miten';
+z.string.fi.modalCallNoMicrophoneMessage = 'Selaimellasi täytyy olla käyttöoikeus mikrofoniisi voidaksesi käydä puhelinkeskusteluja.';
+z.string.fi.modalCallNoMicrophoneHeadline = 'Et voi käydä puhelinkeskusteluja ilman mikrofonia';
+
+z.string.fi.modalCallSecondIncomingAction = 'Vastaa';
 z.string.fi.modalCallSecondIncomingHeadline = 'Vastaatko puheluun?';
 z.string.fi.modalCallSecondIncomingMessage = 'Sinun tämänhetkinen puhelu päättyy.';
-z.string.fi.modalCallSecondIncomingAction = 'Vastaa';
+
+z.string.fi.modalCallSecondOngoingAction = 'Katkaise puhelu';
 z.string.fi.modalCallSecondOngoingHeadline = 'Katkaise puhelu toisessa laitteessa?';
 z.string.fi.modalCallSecondOngoingMessage = 'Voit olla vain yhdessä puhelussa kerrallaan.';
-z.string.fi.modalCallSecondOngoingAction = 'Katkaise puhelu';
+
+z.string.fi.modalCallSecondOutgoingAction = 'Katkaise puhelu';
 z.string.fi.modalCallSecondOutgoingHeadline = 'Katkaise nykyinen puhelu?';
 z.string.fi.modalCallSecondOutgoingMessage = 'Voit olla vain yhdessä puhelussa kerrallaan.';
-z.string.fi.modalCallSecondOutgoingAction = 'Katkaise puhelu';
-z.string.fi.modalClearConversationHeadline = 'Poista sisältö?';
-z.string.fi.modalClearConversationOption = 'Poistu myös keskustelusta';
-z.string.fi.modalClearConversationButton = 'Poista';
-z.string.fi.modalConnectedDeviceHeadline = 'Tiliäsi käytettiin:';
-z.string.fi.modalConnectedDeviceFrom = 'Laite:';
-z.string.fi.modalConnectedDeviceMessage = 'Jos et tehnyt tätä, poista laite ja vaihda salasanasi.';
-z.string.fi.modalConnectedDeviceManageDevices = 'hallitse laitteita';
-z.string.fi.modalDeleteAccountAction = 'Poista';
-z.string.fi.modalDeleteAccountHeadline = 'Poista tili';
-z.string.fi.modalDeleteAccountMessage = 'Lähetämme viestin sähköpostina tai tekstiviestinä. Paina viestissä olevaa linkkiä poistaaksesi tilisi lopullisesti.';
-z.string.fi.modalDeleteButton = 'Poista';
-z.string.fi.modalDeleteHeadline = 'Poista ainoastaan minulta?';
-z.string.fi.modalDeleteMessage = 'Tätä ei voi perua.';
-z.string.fi.modalDeleteEveryoneButton = 'Poista';
-z.string.fi.modalDeleteEveryoneHeadline = 'Poista kaikilta?';
-z.string.fi.modalDeleteEveryoneMessage = 'Tätä ei voi perua.';
-z.string.fi.modalTooLongHeadline = 'Viesti on liian pitkä';
-z.string.fi.modalTooLongMessage = 'Voit lähettää viestejä joissa on maksimissaan {{number}} merkkiä.';
-z.string.fi.modalLeaveConversationHeadline = 'Poistu "{{user}}" -keskustelusta?';
-z.string.fi.modalLeaveConversationMessage = 'Osallistujille ilmoitetaan ja keskustelu poistetaan listastasi.';
-z.string.fi.modalLeaveConversationButton = 'Poistu';
-z.string.fi.modalLogoutHeadline = 'Tyhjennä tiedot?';
-z.string.fi.modalLogoutMessage = 'Poista kaikki henkilökohtaiset tiedot ja keskustelut tästä laitteesta.';
-z.string.fi.modalLogoutButton = 'Kirjaudu ulos';
-z.string.fi.modalNewDeviceHeadline = '{{user}} aloitti käyttämään uutta laitetta';
-z.string.fi.modalNewDeviceHeadlineMany = '{{users}} aloittivat käyttämään uusia laitteita';
-z.string.fi.modalNewDeviceHeadlineYou = '{{user}} aloitti käyttämään uutta laitetta';
-z.string.fi.modalNewDeviceMessage = 'Haluatko vielä silti lähettää viestisi?';
-z.string.fi.modalNewDeviceCallAccept = 'Vastaa puheluun';
-z.string.fi.modalNewDeviceCallAnyway = 'Soita kuitenkin';
-z.string.fi.modalNewDeviceCallIncoming = 'Haluatko silti vastata puheluun?';
-z.string.fi.modalNewDeviceCallOutgoing = 'Haluatko silti soittaa puhelun?';
-z.string.fi.modalNewDeviceShowDevice = 'näytä laite';
-z.string.fi.modalNewDeviceSendAnyway = 'lähetä siitä huolimatta';
-z.string.fi.modalNotConnectedHeadline = 'Ketään ei ole lisätty keskusteluun';
-z.string.fi.modalNotConnectedMessageOne = '{{name}} ei halua tulla lisätyksi keskusteluihin.';
-z.string.fi.modalNotConnectedMessageMany = 'Yksi valitsimistasi käyttäjistä ei halua tulla lisätyksi keskusteluihin.';
-z.string.fi.modalRemoveDeviceButton = 'Poista laite';
-z.string.fi.modalRemoveDeviceHeadline = 'Poista "{{device}}"';
-z.string.fi.modalRemoveDeviceMessage = 'Sinun täytyy kirjoittaa salasanasi poistaaksesi laitteen.';
+
+z.string.fi.modalConnectCancelAction = 'Kyllä';
+z.string.fi.modalConnectCancelHeadline = 'Peruuta pyyntö?';
+z.string.fi.modalConnectCancelMessage = 'Poista yhteyspyyntö {{user}}:lle.';
+z.string.fi.modalConnectCancelSecondary = 'Ei';
+
+z.string.fi.modalConnectAcceptAction = 'Yhdistä';
+z.string.fi.modalConnectAcceptHeadline = 'Hyväksy?';
+z.string.fi.modalConnectAcceptMessage = 'Tämä yhdistää teidät ja avaa keskustelun {{user}} kanssa.';
+z.string.fi.modalConnectAcceptSecondary = 'Hylkää';
+
+z.string.fi.modalConversationAddBotAction = 'Vahvista';
+
+z.string.fi.modalConversationClearAction = 'Poista';
+z.string.fi.modalConversationClearHeadline = 'Poista sisältö?';
+z.string.fi.modalConversationClearOption = 'Poistu myös keskustelusta';
+
+z.string.fi.modalConversationDeleteMessageAction = 'Poista';
+z.string.fi.modalConversationDeleteMessageHeadline = 'Poista ainoastaan minulta?';
+z.string.fi.modalConversationDeleteMessageMessage = 'Tätä ei voi perua.';
+
+z.string.fi.modalConversationDeleteMessageEveryoneAction = 'Poista';
+z.string.fi.modalConversationDeleteMessageEveryoneHeadline = 'Poista kaikilta?';
+z.string.fi.modalConversationDeleteMessageEveryoneMessage = 'Tätä ei voi perua.';
+
+z.string.fi.modalConversationLeaveAction = 'Poistu';
+z.string.fi.modalConversationLeaveMessage = 'Et pysty lähettämään tai vastaanottamaan viestejä tässä keskustelussa.';
+
+z.string.fi.modalConversationMessageTooLongHeadline = 'Viesti on liian pitkä';
+z.string.fi.modalConversationMessageTooLongMessage = 'Voit lähettää viestejä joissa on maksimissaan {{number}} merkkiä.';
+
+z.string.fi.modalConversationNewDeviceHeadlineOne = '{{user}} aloitti käyttämään uutta laitetta';
+z.string.fi.modalConversationNewDeviceHeadlineMany = '{{users}} aloittivat käyttämään uusia laitteita';
+z.string.fi.modalConversationNewDeviceHeadlineYou = '{{user}} aloitti käyttämään uutta laitetta';
+z.string.fi.modalConversationNewDeviceIncomingCallAction = 'Vastaa puheluun';
+z.string.fi.modalConversationNewDeviceIncomingCallMessage = 'Haluatko silti vastata puheluun?';
+z.string.fi.modalConversationNewDeviceMessage = 'Haluatko vielä silti lähettää viestisi?';
+z.string.fi.modalConversationNewDeviceOutgoingCallAction = 'Soita kuitenkin';
+z.string.fi.modalConversationNewDeviceOutgoingCallMessage = 'Haluatko silti soittaa puhelun?';
+
+z.string.fi.modalConversationNotConnectedHeadline = 'Ketään ei ole lisätty keskusteluun';
+z.string.fi.modalConversationNotConnectedMessageOne = '{{name}} ei halua tulla lisätyksi keskusteluihin.';
+z.string.fi.modalConversationNotConnectedMessageMany = 'Yksi valitsimistasi käyttäjistä ei halua tulla lisätyksi keskusteluihin.';
+
+z.string.fi.modalConversationRemoveAction = 'Poista';
+z.string.fi.modalConversationRemoveHeadline = 'Poista?';
+z.string.fi.modalConversationRemoveMessage = '{{user}} ei pysty lähettämään tai vastaanottamaan viestejä tässä keskustelussa.';
+
+
+z.string.fi.modalConversationTooManyMembersHeadline = 'Kaikki puhelukanavat varattuja';
+
+z.string.fi.modalIntegrationUnavailableHeadline = 'Botit eivät käytettävissä';
+z.string.fi.modalIntegrationUnavailableMessage = 'Kiitos mielenkiinnostasi botteihin. Tämä palvelu on väliaikaisesti pois käytöstä, koska työstämme seuraavaa versiota.';
+
+
 z.string.fi.modalSessionResetHeadline = 'Istunto on nollattu';
 z.string.fi.modalSessionResetMessage1 = 'Jos ongelma ei ole ratkennut';
 z.string.fi.modalSessionResetMessageLink = 'ota yhteys';
 z.string.fi.modalSessionResetMessage2 = 'meihin.';
-z.string.fi.modalTooManyMembersHeadline = 'Kaikki puhelukanavat varattuja';
-z.string.fi.modalTooManyMembersMessage = 'Maksimissaan {{number1}} henkilöä voi liittyä keskusteluun. Tässä keskustelussa on tilaa {{number2}} hengelle.';
-z.string.fi.modalUploadsParallel = 'Voit lähettää jopa {{number}} tiedostoa samaan aikaan.';
+
+z.string.fi.modalUploadContactsAction = 'Yritä uudelleen';
+z.string.fi.modalUploadContactsMessage = 'Emme vastaanottaneet tietojasi. Ole hyvä ja yritä tuoda kontaktisi uudelleen.';
+
+z.string.fi.modalUserBlockAction = 'Estä';
+z.string.fi.modalUserBlockHeadline = 'Estä {{user}}?';
+z.string.fi.modalUserBlockMessage = '{{user}} ei pysty ottamaan sinuun yhteyttä tai lisäämään sinua ryhmäkeskusteluihin.';
+
+z.string.fi.modalUserUnblockAction = 'Poista esto';
+z.string.fi.modalUserUnblockHeadline = 'Poista esto?';
+z.string.fi.modalUserUnblockMessage = '{{user}} pystyy jälleen ottamaan sinuun yhteyttä ja lisäämään sinut ryhmäkeskusteluihin.';
 
 z.string.fi.connectionRequestConnect = 'Yhdistä';
 z.string.fi.connectionRequestIgnore = 'Hylkää';
@@ -193,7 +235,6 @@ z.string.fi.conversationDeviceYourDevices = ' sinun laitteet';
 z.string.fi.conversationDeviceUserDevices = ' {{user}} n laitteet';
 z.string.fi.conversationDeviceNewDeviceOne = ' uutta laitetta';
 z.string.fi.conversationDeviceNewDeviceMany = ' uusia laitteita';
-z.string.fi.conversationDeviceNewPeopleJoined = 'uusia liittymisiä.';
 z.string.fi.conversationDeviceNewPeopleJoinedVerify = ' vahvista laitteet';
 z.string.fi.conversationJustNow = 'Juuri nyt';
 z.string.fi.conversationLocationLink = 'Avaa kartta';
@@ -223,7 +264,6 @@ z.string.fi.conversationUnableToDecryptResetSession = 'Nollaa istunto';
 z.string.fi.conversationMissedMessages = 'Et ole käyttänyt tätä laitetta pitkään aikaan. Jotkut viestit eivät saata näkyä täällä.';
 z.string.fi.conversationAssetDownloading = 'Ladataan…';
 z.string.fi.conversationAssetUploadFailed = 'Lähetys epäonnistui';
-z.string.fi.conversationAssetUploadTooLarge = 'Voit lähettää maksimissaan {{number}} kokoisia tiedostoja';
 z.string.fi.conversationPlaybackError = 'Toisto epäonnistui';
 z.string.fi.conversationContextMenuEdit = 'Muokkaa';
 z.string.fi.conversationContextMenuDelete = 'Poista minulta';
@@ -304,67 +344,43 @@ z.string.fi.extensionsGiphyMessage = '{{tag}} • giphy.com:in kautta';
 z.string.fi.extensionsGiphyNoGifs = 'Upsista, ei giffejä';
 z.string.fi.extensionsGiphyRandom = 'Satunnainen';
 
-z.string.fi.peopleConfirmLabel = 'Lisää käyttäjiä ryhmään';
-z.string.fi.peoplePeople = '{{number}} Ihmistä';
-z.string.fi.peopleSearchPlaceholder = 'Hae nimellä';
-z.string.fi.peopleEveryoneParticipates = 'Jokainen jonka kanssa olet yhdistetty on jo tässä keskustelussa.';
-z.string.fi.peopleNoMatches = 'Ei vastaavia tuloksia. Yritä toisella nimellä.';
-z.string.fi.peopleInvite = 'Kutsu henkilöitä Wireen';
-z.string.fi.peopleInviteDetail = 'Yhteystietojesi jakaminen auttaa sinua löytämään uusia kontakteja. Anonymisoimme kaiken tiedon ja emme jaa sitä ulkopuolisille.';
-z.string.fi.peopleInviteButtonContacts = 'Kontakteista';
-z.string.fi.peopleInviteButtonGmail = 'Gmailista';
-z.string.fi.peopleInviteHeadline = 'Kutsu kavereitasi';
-z.string.fi.peopleServices = 'Palvelut';
-z.string.fi.peopleShare = 'Jaa yhteystietoja';
-z.string.fi.peopleTabsDetails = 'Lisätietoja';
-z.string.fi.peopleTabsDevices = 'Laitteet';
-z.string.fi.peopleTabsDevicesHeadline = 'Wire antaa jokaiselle laitteelle yksilöllisen sormenjäljen. Vertaa niitä {{user}} kanssa ja vahvista keskustelusi.';
-z.string.fi.peopleTabsDevicesLearnMore = 'Lue lisää';
-z.string.fi.peopleTabsDevicesWhyVerify = 'Miksi vahvistaa keskustelu?';
-z.string.fi.peopleTabsNoDevicesHeadline = '{{user}} käyttää vanhaa Wire-versiota. Laitteita ei näytetä täällä.';
-z.string.fi.peopleTabsDeviceDetailAllMyDevices = 'Näytä kaikki laitteeni';
-z.string.fi.peopleTabsDeviceDetailDeviceFingerprint = 'Laitteen sormenjälki';
-z.string.fi.peopleTabsDeviceDetailHeadline = 'Vahvista että tämä vastaa sormenjälkeä joka näkyy {{html1}}{{user}}’s n laitteella{{html2}}.';
-z.string.fi.peopleTabsDeviceDetailHowTo = 'Miten teen sen?';
-z.string.fi.peopleTabsDeviceDetailResetSession = 'Nollaa istunto';
-z.string.fi.peopleTabsDeviceDetailShowMyDevice = 'Näytä laitteeni sormenjälki';
-z.string.fi.peopleTabsDeviceDetailVerify = 'Vahvistettu';
-z.string.fi.peopleTabsPeople = 'Ihmiset';
-z.string.fi.peopleTabsServices = 'Palvelut';
-z.string.fi.peopleVerified = 'Vahvistettu';
+z.string.fi.addParticipantsConfirmLabel = 'Lisää';
+z.string.fi.addParticipantsSearchPlaceholder = 'Hae nimellä';
+z.string.fi.addParticipantsTabsPeople = 'Ihmiset';
+z.string.fi.addParticipantsTabsServices = 'Palvelut';
 
-z.string.fi.peopleBlockHeadline = 'Estä?';
-z.string.fi.peopleBlockMessage = '{{user}} ei pysty ottamaan sinuun yhteyttä tai lisäämään sinua ryhmäkeskusteluihin.';
+z.string.fi.conversationDetailsActionCancelRequest = 'Peru pyyntö';
+z.string.fi.conversationDetailsActionCreateGroup = 'Luo ryhmä';
+z.string.fi.conversationDetailsActionDevices = 'Laitteet';
+z.string.fi.conversationDetailsGuestsOff = 'Pois päältä';
+z.string.fi.conversationDetailsParticipantsServicesMany = 'Palvelut';
+z.string.fi.conversationDetailsParticipantsUsersMany = 'Ihmiset';
+z.string.fi.conversationDetailsPeople = 'Ihmiset';
+z.string.fi.conversationDetailsServices = 'Palvelut';
 
-z.string.fi.peopleConnectHeadline = 'Hyväksy?';
-z.string.fi.peopleConnectMessage = 'Tämä yhdistää teidät ja avaa keskustelun {{user}} kanssa.';
+z.string.fi.groupParticipantActionCancelRequest = 'Peru pyyntö';
+z.string.fi.groupParticipantActionDevices = 'Laitteet';
+z.string.fi.groupParticipantActionPending = 'Odottaa';
+z.string.fi.groupParticipantActionSendRequest = 'Yhdistä';
 
-z.string.fi.peopleCancelRequestHeadline = 'Peruuta pyyntö?';
-z.string.fi.peopleCancelRequestMessage = 'Poista yhteyspyyntö {{user}}:lle.';
+z.string.fi.participantDevicesDetailHeadline = 'Vahvista että tämä vastaa sormenjälkeä joka näkyy {{html1}}{{user}}’s n laitteella{{html2}}.';
+z.string.fi.participantDevicesDetailHowTo = 'Miten teen sen?';
+z.string.fi.participantDevicesDetailResetSession = 'Nollaa istunto';
+z.string.fi.participantDevicesDetailShowMyDevice = 'Näytä laitteeni sormenjälki';
+z.string.fi.participantDevicesDetailVerify = 'Vahvistettu';
 
-z.string.fi.peopleLeaveHeadline = 'Poistu keskustelusta?';
-z.string.fi.peopleLeaveMessage = 'Et pysty lähettämään tai vastaanottamaan viestejä tässä keskustelussa.';
+z.string.fi.participantDevicesHeader = 'Laitteet';
+z.string.fi.participantDevicesHeadline = 'Wire antaa jokaiselle laitteelle yksilöllisen sormenjäljen. Vertaa niitä {{user}} kanssa ja vahvista keskustelusi.';
+z.string.fi.participantDevicesLearnMore = 'Lue lisää';
+z.string.fi.participantDevicesWhyVerify = 'Miksi vahvistaa keskusteluja?';
+z.string.fi.participantDevicesOutdatedClientMessage = '{{user}} käyttää vanhaa Wire-versiota. Laitteita ei näytetä täällä.';
 
-z.string.fi.peopleRemoveHeadline = 'Poista?';
-z.string.fi.peopleRemoveMessage = '{{user}} ei pysty lähettämään tai vastaanottamaan viestejä tässä keskustelussa.';
+z.string.fi.participantDevicesSelfAllDevices = 'Näytä kaikki laitteeni';
+z.string.fi.participantDevicesSelfFingerprint = 'Laitteen sormenjälki';
 
-z.string.fi.peopleUnblockHeadline = 'Poista esto?';
-z.string.fi.peopleUnblockMessage = '{{user}} pystyy jälleen ottamaan sinuun yhteyttä ja lisäämään sinut ryhmäkeskusteluihin.';
-
-z.string.fi.peopleButtonAdd = 'Lisää';
-z.string.fi.peopleButtonBlock = 'Estä';
-z.string.fi.peopleButtonCancel = 'Peruuta';
-z.string.fi.peopleButtonConnect = 'Yhdistä';
-z.string.fi.peopleButtonCreate = 'Luo ryhmä';
-z.string.fi.peopleButtonIgnore = 'Hylkää';
-z.string.fi.peopleButtonLeave = 'Poistu';
-z.string.fi.peopleButtonOpen = 'Avaa keskustelu';
-z.string.fi.peopleButtonPending = 'Odottaa';
-z.string.fi.peopleButtonProfile = 'Profiili';
-z.string.fi.peopleButtonRemove = 'Poista';
-z.string.fi.peopleButtonUnblock = 'Poista esto';
-z.string.fi.peopleButtonNo = 'Ei';
-z.string.fi.peopleButtonYes = 'Kyllä';
+z.string.fi.userProfileButtonConnect = 'Yhdistä';
+z.string.fi.userProfileButtonIgnore = 'Hylkää';
+z.string.fi.userProfileButtonUnblock = 'Poista esto';
 
 z.string.fi.preferencesAbout = 'Tietoja meistä';
 z.string.fi.preferencesAccount = 'Tili';
@@ -447,6 +463,7 @@ z.string.fi.searchCreateGroup = 'Luo ryhmä';
 z.string.fi.searchGroups = 'Ryhmät';
 z.string.fi.searchPeople = 'Ihmiset';
 z.string.fi.searchPlaceholder = 'Etsi nimellä tai käyttäjänimellä';
+z.string.fi.searchServicePlaceholder = 'Hae nimellä';
 z.string.fi.searchServices = 'Palvelut';
 z.string.fi.searchTeamGroups = 'Tiimikeskustelut';
 z.string.fi.searchTeamMembers = 'Tiimin jäsenet';
@@ -455,14 +472,19 @@ z.string.fi.searchTrySearch = 'Etsi käyttäjiä nimellä tai käyttäjänimell�
 z.string.fi.searchNoContactsOnWire = 'Sinulla ei ole kontakteja Wiressä. Yritä etsiä muita käyttäjiä nimellä tai käyttäjänimellä.';
 z.string.fi.searchOthers = 'Yhdistä';
 
+z.string.fi.searchInvite = 'Kutsu henkilöitä Wireen';
+z.string.fi.searchInviteDetail = 'Yhteystietojesi jakaminen auttaa sinua löytämään uusia kontakteja. Anonymisoimme kaiken tiedon ja emme jaa sitä ulkopuolisille.';
+z.string.fi.searchInviteButtonContacts = 'Kontakteista';
+z.string.fi.searchInviteButtonGmail = 'Gmailista';
+z.string.fi.searchInviteHeadline = 'Kutsu kavereitasi';
+z.string.fi.searchInviteShare = 'Jaa yhteystietoja';
+
+z.string.fi.searchListEveryoneParticipates = 'Jokainen jonka kanssa olet yhdistetty on jo tässä keskustelussa.';
+z.string.fi.searchListNoMatches = 'Ei vastaavia tuloksia. Yritä toisella nimellä.';
+
 z.string.fi.uploadGoogleHeadline = 'Etsi ihmisiä joiden kanssa jutella.';
 z.string.fi.uploadGoogleMessage = 'Käytämme sinun kontaktitietoja yhdistääksemme sinut muiden kanssa. Anonymisoimme kaiken tiedon ja emme jaa sitä ulkopuolisille.';
-z.string.fi.uploadGoogleHeadlineError = 'Jotain meni pieleen.';
-z.string.fi.uploadGoogleMessageError = 'Emme vastaanottaneet tietojasi. Ole hyvä ja yritä tuoda kontaktisi uudelleen.';
-z.string.fi.uploadGoogleButtonAgain = 'Yritä uudelleen';
 
-z.string.fi.warningCallDetail = 'Selaimellasi täytyy olla käyttöoikeus mikrofoniisi voidaksesi käydä puhelinkeskusteluja.';
-z.string.fi.warningCallHeadline = 'Et voi käydä puhelinkeskusteluja ilman mikrofonia';
 z.string.fi.warningCallUnsupportedIncoming = '{{user}} soittaa. Selaimesi ei tue puheluja.';
 z.string.fi.warningCallUnsupportedOutgoing = 'Et voi soittaa puhelua koska selaimesi ei tue puheluja.';
 z.string.fi.warningCallIssues = 'Tämä versio Wirestä ei pysty osallistumaan puheluun. Käytä';
@@ -482,7 +504,6 @@ z.string.fi.warningPermissionRequestCamera = '{{icon}} Anna käyttöoikeus kamer
 z.string.fi.warningPermissionRequestMicrophone = '{{icon}} Anna käyttöoikeus mikrofoniin';
 z.string.fi.warningPermissionRequestNotification = '{{icon}} Salli ilmoitukset';
 z.string.fi.warningPermissionRequestScreen = '{{icon}} Salli näytön käyttö';
-z.string.fi.warningTellMeHow = 'Kerro miten';
 
 z.string.fi.userAvailabilityAvailable = 'Saatavilla';
 z.string.fi.userAvailabilityNone = 'Ei mitään';
@@ -526,14 +547,7 @@ z.string.fi.tooltipConversationsPreferences = 'Avaa asetukset';
 z.string.fi.tooltipConversationsSilence = 'Mykistä ({{shortcut}})';
 z.string.fi.tooltipConversationsStart = 'Aloita keskustelu ({{shortcut}})';
 
-z.string.fi.tooltipPeopleAdd = 'Lisää henkilöitä keskusteluun ({{shortcut}})';
-z.string.fi.tooltipPeopleBack = 'Takaisin';
-z.string.fi.tooltipPeopleBlock = 'Estä';
-z.string.fi.tooltipPeopleConnect = 'Yhdistä';
-z.string.fi.tooltipPeopleLeave = 'Poistu keskustelusta';
-z.string.fi.tooltipPeopleRename = 'Muuta keskustelun nimeä';
-z.string.fi.tooltipPeopleRemove = 'Poista keskustelusta';
-z.string.fi.tooltipPeopleUnblock = 'Poista esto';
+z.string.fi.tooltipConversationDetailsRename = 'Muuta keskustelun nimeä';
 
 z.string.fi.tooltipPreferencesContactsGmail = 'Kirjaudu gmail-tilillesi jakaaksesi kontakteja';
 z.string.fi.tooltipPreferencesContactsMacos = 'Jaa kaikki yhteystietosi macOs Yhteystieto sovelluksesta';

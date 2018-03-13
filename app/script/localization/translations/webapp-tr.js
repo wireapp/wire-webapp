@@ -23,11 +23,6 @@ z.string.tr.wireLinux = 'Linux için Wire';
 z.string.tr.nonexistentUser = 'Silinmiş Kullanıcı';
 z.string.tr.and = 've';
 
-z.string.tr.alertUploadFileFormat = 'Bu fotoğrafı kullanamazsınız.\nLütfen PNG veya JPEG formatında bir dosya seçin.';
-z.string.tr.alertUploadTooSmall = 'Bu resmi kullanamazsınız.\nLütfen en az 320x320 piksellik bir resim seçin.';
-z.string.tr.alertUploadTooLarge = 'Bu resim çok büyük.\nEn fazla {{number}} MB’lık dosyalar yükleyebilirsiniz.';
-z.string.tr.alertGifTooLarge = 'Animasyon çok büyük.\nMaksimum dosya boyutu {{number}} MB.';
-
 z.string.tr.authAccountCountryCode = 'Ülke Kodu';
 z.string.tr.authAccountDeletion = 'Çıkış yaptınız çünkü hesabınız silinmiş.';
 z.string.tr.authAccountExpiration = 'Oturumunuzun süresi dolduğu için çıkış yapıldı. Lütfen tekrar giriş yapın.';
@@ -102,76 +97,123 @@ z.string.tr.callJoin = 'Katıl';
 z.string.tr.callChooseSharedScreen = 'Paylaşmak için bir ekran seçin';
 z.string.tr.callParticipants = '{{number}} çağrıda';
 
-z.string.tr.modalButtonCancel = 'İptal';
-z.string.tr.modalButtonOk = 'Tamam';
-z.string.tr.modalButtonSend = 'Gönder';
+z.string.tr.modalAcknowledgeAction = 'Tamam';
+z.string.tr.modalConfirmSecondary = 'İptal';
+z.string.tr.modalOptionSecondary = 'İptal';
 
-z.string.tr.modalBlockConversationHeadline = '{{user}} engellensin mi?';
-z.string.tr.modalBlockConversationMessage = '{{user}} sizinle iletişim kuramayacak ve sizi grup konuşmalarına ekleyemeyecek.';
-z.string.tr.modalBlockConversationButton = 'Engelle';
-z.string.tr.modalBotsConfirmButton = 'Onay';
-z.string.tr.modalBotsUnavailableHeadline = 'Botlar şuanda kullanılabilir değil';
-z.string.tr.modalBotsUnavailableMessage = 'Botlara ilginiz için teşekkür ederiz. Bir bir sonraki sürüm üzerinde çalışırken hizmet askıya alınmış. Beklemede kalın.';
-z.string.tr.modalCallConversationEmptyHeadline = 'Arayacak kimse yok';
-z.string.tr.modalCallConversationEmptyMessage = 'Burada kimse kalmadı.';
-z.string.tr.modalCallNoVideoInGroupHeadline = 'Gruplarda görüntülü konuşma yok';
-z.string.tr.modalCallNoVideoInGroupMessage = 'Görüntülü konuşma, grup konuşmalarında yapılamıyor.';
+z.string.tr.modalAccountDeletionAction = 'Sil';
+z.string.tr.modalAccountDeletionHeadline = 'Hesabı Sil';
+z.string.tr.modalAccountDeletionMessage = 'Size kısa mesaj veya e-posta aracılığıyla bir mesaj göndereceğiz. Mesajdaki bağlantıyı takip ederek hesabınızı kalıcı olarak silebilirsiniz.';
+
+z.string.tr.modalAccountLogoutAction = 'Çıkış yap';
+z.string.tr.modalAccountLogoutHeadline = 'Veriyi Temizle?';
+z.string.tr.modalAccountLogoutOption = 'Bu cihazdaki tüm kişisel bilgileriniz ve görüşme kayıtlarınızı silin.';
+
+z.string.tr.modalAccountNewDevicesSecondary = 'Cihazları yönet';
+z.string.tr.modalAccountNewDevicesHeadline = 'Hesabınız şurada kullanılmış:';
+z.string.tr.modalAccountNewDevicesFrom = 'Cihaz:';
+z.string.tr.modalAccountNewDevicesMessage = 'Eğer bunu yapan siz değilseniz, cihazı kaldırın ben şifrenizi sıfırlayın.';
+
+z.string.tr.modalAccountRemoveDeviceAction = 'Cihazı kaldır';
+z.string.tr.modalAccountRemoveDeviceHeadline = '"{{device}}" cihazını kaldır';
+z.string.tr.modalAccountRemoveDeviceMessage = 'Cihazı kaldırmak için şifreniz gereklidir.';
+z.string.tr.modalAccountRemoveDevicePlaceholder = 'Şifre';
+
+z.string.tr.modalAssetTooLargeMessage = 'En fazla {{number}} büyüklüğünde dosyalar gönderebilirsiniz';
+
+z.string.tr.modalAssetParallelUploadsMessage = 'Tek seferde en fazla {{number}} boyutunda dosya gönderebilirsiniz.';
+
+z.string.tr.modalCallEmptyConversationHeadline = 'Arayacak kimse yok';
+z.string.tr.modalCallEmptyConversationMessage = 'Burada kimse kalmadı.';
+
+z.string.tr.modalCallNoGroupVideoHeadline = 'Gruplarda görüntülü konuşma yok';
+z.string.tr.modalCallNoGroupVideoMessage = 'Görüntülü konuşma, grup konuşmalarında yapılamıyor.';
+
+z.string.tr.modalCallNoMicrophoneAction = 'Anlat bana';
+z.string.tr.modalCallNoMicrophoneMessage = 'Sesli aramalar yapmak için tarayıcınızın mikrofona erişim izni alması gerekir.';
+z.string.tr.modalCallNoMicrophoneHeadline = 'Mikrofon olmadan arama yapılamaz';
+
+z.string.tr.modalCallSecondIncomingAction = 'Cevapla';
 z.string.tr.modalCallSecondIncomingHeadline = 'Aramayı cevapla?';
 z.string.tr.modalCallSecondIncomingMessage = 'Mevcut aramanız sonlanacak.';
-z.string.tr.modalCallSecondIncomingAction = 'Cevapla';
+
+z.string.tr.modalCallSecondOngoingAction = 'Kapat';
 z.string.tr.modalCallSecondOngoingHeadline = 'Aramayı başka bir cihazda kapa?';
 z.string.tr.modalCallSecondOngoingMessage = 'Aynı anda tek bir aramada bulunabilirsiniz.';
-z.string.tr.modalCallSecondOngoingAction = 'Kapat';
+
+z.string.tr.modalCallSecondOutgoingAction = 'Kapat';
 z.string.tr.modalCallSecondOutgoingHeadline = 'Mevcut konuşmayı sonlandır?';
 z.string.tr.modalCallSecondOutgoingMessage = 'Aynı anda tek bir aramada bulunabilirsiniz.';
-z.string.tr.modalCallSecondOutgoingAction = 'Kapat';
-z.string.tr.modalClearConversationHeadline = 'İçerik silinsin?';
-z.string.tr.modalClearConversationOption = 'Ayrıca konuşmadan da ayrıl';
-z.string.tr.modalClearConversationButton = 'Sil';
-z.string.tr.modalConnectedDeviceHeadline = 'Hesabınız şurada kullanılmış:';
-z.string.tr.modalConnectedDeviceFrom = 'Cihaz:';
-z.string.tr.modalConnectedDeviceMessage = 'Eğer bunu yapan siz değilseniz, cihazı kaldırın ben şifrenizi sıfırlayın.';
-z.string.tr.modalConnectedDeviceManageDevices = 'cihazları yönet';
-z.string.tr.modalDeleteAccountAction = 'Sil';
-z.string.tr.modalDeleteAccountHeadline = 'Hesabı Sil';
-z.string.tr.modalDeleteAccountMessage = 'Size kısa mesaj veya e-posta aracılığıyla bir mesaj göndereceğiz. Mesajdaki bağlantıyı takip ederek hesabınızı kalıcı olarak silebilirsiniz.';
-z.string.tr.modalDeleteButton = 'Sil';
-z.string.tr.modalDeleteHeadline = 'Sadece benim için sil?';
-z.string.tr.modalDeleteMessage = 'Bu işlem geri alınamaz.';
-z.string.tr.modalDeleteEveryoneButton = 'Sil';
-z.string.tr.modalDeleteEveryoneHeadline = 'Herkes için sil?';
-z.string.tr.modalDeleteEveryoneMessage = 'Bu işlem geri alınamaz.';
-z.string.tr.modalTooLongHeadline = 'Mesaj çok uzun';
-z.string.tr.modalTooLongMessage = 'En fazla {{number}} karakterlik mesajlar gönderebilirsiniz.';
-z.string.tr.modalLeaveConversationHeadline = '"{{user}}" görüşmesinden ayrılınsın mı?';
-z.string.tr.modalLeaveConversationMessage = 'Katılımcılar bilgilendirilecek ve görüşme listenizden silinecek.';
-z.string.tr.modalLeaveConversationButton = 'Ayrıl';
-z.string.tr.modalLogoutHeadline = 'Veriyi Temizle?';
-z.string.tr.modalLogoutMessage = 'Bu cihazdaki tüm kişisel bilgileriniz ve görüşme kayıtlarınızı silin.';
-z.string.tr.modalLogoutButton = 'Çıkış yap';
-z.string.tr.modalNewDeviceHeadline = '{{user}} yeni bir cihaz kullanmaya başladı';
-z.string.tr.modalNewDeviceHeadlineMany = '{{user}}s yeni cihazlar kullanmaya başladılar';
-z.string.tr.modalNewDeviceHeadlineYou = '{{user}} yeni bir cihaz kullanmaya başladı';
-z.string.tr.modalNewDeviceMessage = 'Hâlâ mesajlarınızı göndermek istiyor musunuz?';
-z.string.tr.modalNewDeviceCallAccept = 'Aramayı kabul et';
-z.string.tr.modalNewDeviceCallAnyway = 'Yine de ara';
-z.string.tr.modalNewDeviceCallIncoming = 'Hala aramayı kabul etmek istiyor musunuz?';
-z.string.tr.modalNewDeviceCallOutgoing = 'Hala aramayı istiyor musunuz?';
-z.string.tr.modalNewDeviceShowDevice = 'cihazı göster';
-z.string.tr.modalNewDeviceSendAnyway = 'yine de gönder';
-z.string.tr.modalNotConnectedHeadline = 'Hiç kimseye konuşmaya katılmadı';
-z.string.tr.modalNotConnectedMessageOne = '{{name}} sohbetlere eklenmek istemiyor.';
-z.string.tr.modalNotConnectedMessageMany = 'Seçtiğin kişilerden biri sohbetlere eklenmek istemiyor.';
-z.string.tr.modalRemoveDeviceButton = 'Cihazı kaldır';
-z.string.tr.modalRemoveDeviceHeadline = '"{{device}}" cihazını kaldır';
-z.string.tr.modalRemoveDeviceMessage = 'Cihazı kaldırmak için şifreniz gereklidir.';
+
+z.string.tr.modalConnectCancelAction = 'Evet';
+z.string.tr.modalConnectCancelHeadline = 'İsteği İptal et?';
+z.string.tr.modalConnectCancelMessage = '{{user}}’e olan bağlantı isteğini iptal et.';
+z.string.tr.modalConnectCancelSecondary = 'Hayır';
+
+z.string.tr.modalConnectAcceptAction = 'Bağlan';
+z.string.tr.modalConnectAcceptHeadline = 'Kabul et?';
+z.string.tr.modalConnectAcceptMessage = 'Bu sizi {{user}} ile bağlayacak ve bir konuşma başlatacak.';
+z.string.tr.modalConnectAcceptSecondary = 'Görmezden gel';
+
+z.string.tr.modalConversationAddBotAction = 'Onay';
+
+z.string.tr.modalConversationClearAction = 'Sil';
+z.string.tr.modalConversationClearHeadline = 'İçerik silinsin?';
+z.string.tr.modalConversationClearOption = 'Ayrıca konuşmadan da ayrıl';
+
+z.string.tr.modalConversationDeleteMessageAction = 'Sil';
+z.string.tr.modalConversationDeleteMessageHeadline = 'Sadece benim için sil?';
+z.string.tr.modalConversationDeleteMessageMessage = 'Bu işlem geri alınamaz.';
+
+z.string.tr.modalConversationDeleteMessageEveryoneAction = 'Sil';
+z.string.tr.modalConversationDeleteMessageEveryoneHeadline = 'Herkes için sil?';
+z.string.tr.modalConversationDeleteMessageEveryoneMessage = 'Bu işlem geri alınamaz.';
+
+z.string.tr.modalConversationLeaveAction = 'Ayrıl';
+z.string.tr.modalConversationLeaveMessage = 'Bu konuşmada, artık mesaj gönderemeyecek ve mesaj alamayacaksınız.';
+
+z.string.tr.modalConversationMessageTooLongHeadline = 'Mesaj çok uzun';
+z.string.tr.modalConversationMessageTooLongMessage = 'En fazla {{number}} karakterlik mesajlar gönderebilirsiniz.';
+
+z.string.tr.modalConversationNewDeviceHeadlineOne = '{{user}} yeni bir cihaz kullanmaya başladı';
+z.string.tr.modalConversationNewDeviceHeadlineMany = '{{user}}s yeni cihazlar kullanmaya başladılar';
+z.string.tr.modalConversationNewDeviceHeadlineYou = '{{user}} yeni bir cihaz kullanmaya başladı';
+z.string.tr.modalConversationNewDeviceIncomingCallAction = 'Aramayı kabul et';
+z.string.tr.modalConversationNewDeviceIncomingCallMessage = 'Hala aramayı kabul etmek istiyor musunuz?';
+z.string.tr.modalConversationNewDeviceMessage = 'Hâlâ mesajlarınızı göndermek istiyor musunuz?';
+z.string.tr.modalConversationNewDeviceOutgoingCallAction = 'Yine de ara';
+z.string.tr.modalConversationNewDeviceOutgoingCallMessage = 'Hala aramayı istiyor musunuz?';
+
+z.string.tr.modalConversationNotConnectedHeadline = 'Hiç kimseye konuşmaya katılmadı';
+z.string.tr.modalConversationNotConnectedMessageOne = '{{name}} sohbetlere eklenmek istemiyor.';
+z.string.tr.modalConversationNotConnectedMessageMany = 'Seçtiğin kişilerden biri sohbetlere eklenmek istemiyor.';
+
+z.string.tr.modalConversationRemoveAction = 'Çıkart';
+z.string.tr.modalConversationRemoveHeadline = 'Çıkar?';
+z.string.tr.modalConversationRemoveMessage = '{{user}} bu konuşmaya mesaj gönderemeyecek ve bu konuşmadan mesaj alamayacak.';
+
+
+z.string.tr.modalConversationTooManyMembersHeadline = 'Dolup taşmış';
+
+z.string.tr.modalIntegrationUnavailableHeadline = 'Botlar şuanda kullanılabilir değil';
+z.string.tr.modalIntegrationUnavailableMessage = 'Botlara ilginiz için teşekkür ederiz. Bir bir sonraki sürüm üzerinde çalışırken hizmet askıya alınmış. Beklemede kalın.';
+
+
 z.string.tr.modalSessionResetHeadline = 'Oturum sıfırlandı';
 z.string.tr.modalSessionResetMessage1 = 'Eğer sorun çözülmemişse,';
 z.string.tr.modalSessionResetMessageLink = 'iletişime geç';
 z.string.tr.modalSessionResetMessage2 = 'biz.';
-z.string.tr.modalTooManyMembersHeadline = 'Dolup taşmış';
-z.string.tr.modalTooManyMembersMessage = 'Görüşmeye en fazla {{number1}} kişi katılabilir. Burada {{number2}} kişi için daha boş yer var.';
-z.string.tr.modalUploadsParallel = 'Tek seferde en fazla {{number}} boyutunda dosya gönderebilirsiniz.';
+
+z.string.tr.modalUploadContactsAction = 'Tekrar deneyin';
+z.string.tr.modalUploadContactsMessage = 'Bilgilerinzi alamadık. Lütfen kişileriniz yeniden içe aktarmayı deneyin.';
+
+z.string.tr.modalUserBlockAction = 'Engelle';
+z.string.tr.modalUserBlockHeadline = '{{user}} engellensin mi?';
+z.string.tr.modalUserBlockMessage = '{{user}} sizinle iletişim kuramayacak ve sizi grup konuşmalarına ekleyemeyecek.';
+
+z.string.tr.modalUserUnblockAction = 'Engeli kaldır';
+z.string.tr.modalUserUnblockHeadline = 'Engeli kaldır?';
+z.string.tr.modalUserUnblockMessage = '{{user}} sizinle tekrardan iletişim kurabilecek ve sizi grup konuşmalarına ekleyebilecek.';
 
 z.string.tr.connectionRequestConnect = 'Bağlan';
 z.string.tr.connectionRequestIgnore = 'Görmezden gel';
@@ -194,7 +236,6 @@ z.string.tr.conversationDeviceYourDevices = ' cihazların';
 z.string.tr.conversationDeviceUserDevices = ' {{user}} ’in cihazları';
 z.string.tr.conversationDeviceNewDeviceOne = ' yeni bir cihaz';
 z.string.tr.conversationDeviceNewDeviceMany = ' yeni cihazlar';
-z.string.tr.conversationDeviceNewPeopleJoined = 'yeni kişiler katıldı.';
 z.string.tr.conversationDeviceNewPeopleJoinedVerify = ' cihazları doğrula';
 z.string.tr.conversationJustNow = 'Şimdi';
 z.string.tr.conversationLocationLink = 'Haritayı Aç';
@@ -224,7 +265,6 @@ z.string.tr.conversationUnableToDecryptResetSession = 'Oturumu Sıfırla';
 z.string.tr.conversationMissedMessages = 'Bir süredir bu cihazı kullanmıyorsun. Bazı mesajlar gösterilmeyebilir.';
 z.string.tr.conversationAssetDownloading = 'İndiriliyor…';
 z.string.tr.conversationAssetUploadFailed = 'Karşıya Yükleme Başarısız';
-z.string.tr.conversationAssetUploadTooLarge = 'En fazla {{number}} büyüklüğünde dosyalar gönderebilirsiniz';
 z.string.tr.conversationPlaybackError = 'Oynatılamıyor';
 z.string.tr.conversationContextMenuEdit = 'Düzenle';
 z.string.tr.conversationContextMenuDelete = 'Benim için sil';
@@ -305,67 +345,43 @@ z.string.tr.extensionsGiphyMessage = '{{tag}} • giphy.com aracılığıyla';
 z.string.tr.extensionsGiphyNoGifs = 'Olamaz, hiç Gif yok';
 z.string.tr.extensionsGiphyRandom = 'Rastgele';
 
-z.string.tr.peopleConfirmLabel = 'Gruba insanları ekle';
-z.string.tr.peoplePeople = '{{number}} kişi';
-z.string.tr.peopleSearchPlaceholder = 'İsme göre ara';
-z.string.tr.peopleEveryoneParticipates = 'Bağlantıda olduğun herkes zaten bu görüşme içerisinde.';
-z.string.tr.peopleNoMatches = 'Eşleşen sonuç yok.\nBaşka bir isim girmeyi deneyin.';
-z.string.tr.peopleInvite = 'İnsanları Wire’a katılmaya davet edin';
-z.string.tr.peopleInviteDetail = 'Kişileriniz paylaşmak, başkalarıyla bağlanmanızı kolaylaştırır. Tüm bilgilerinizi gizler ve kimseyle paylaşmayız.';
-z.string.tr.peopleInviteButtonContacts = 'Kişilerden';
-z.string.tr.peopleInviteButtonGmail = 'Gmail’den';
-z.string.tr.peopleInviteHeadline = 'Arkadaşlarınızı getirin';
-z.string.tr.peopleServices = 'Servisler';
-z.string.tr.peopleShare = 'Kişileri Paylaş';
-z.string.tr.peopleTabsDetails = 'Detaylar';
-z.string.tr.peopleTabsDevices = 'Cihazlar';
-z.string.tr.peopleTabsDevicesHeadline = 'Wire her cihaza eşsiz bir parmak izi verir. {{user}} ile karşılaştırın ve konuşmayı doğrulayın.';
-z.string.tr.peopleTabsDevicesLearnMore = 'Daha fazla bilgi';
-z.string.tr.peopleTabsDevicesWhyVerify = 'Neden konuşmayı doğrulamalıyız?';
-z.string.tr.peopleTabsNoDevicesHeadline = '{{user}}, Wire’ın eski bir versiyonunu kullanıyor. Hiçbir cihaz burada gösterilmiyor.';
-z.string.tr.peopleTabsDeviceDetailAllMyDevices = 'Tüm cihazlarımı göster';
-z.string.tr.peopleTabsDeviceDetailDeviceFingerprint = 'Cihaz parmak izi';
-z.string.tr.peopleTabsDeviceDetailHeadline = 'Bunun {{html1}}{{user}}s’in aygıtında gösterilen{{html2}} parmak iziyle eşleştiğini doğrulayın.';
-z.string.tr.peopleTabsDeviceDetailHowTo = 'Bunu nasıl yapıyoruz?';
-z.string.tr.peopleTabsDeviceDetailResetSession = 'Oturumu Sıfırla';
-z.string.tr.peopleTabsDeviceDetailShowMyDevice = 'Cihaz parmak izimi göster';
-z.string.tr.peopleTabsDeviceDetailVerify = 'Doğrulanmış';
-z.string.tr.peopleTabsPeople = 'İnsanlar';
-z.string.tr.peopleTabsServices = 'Servisler';
-z.string.tr.peopleVerified = 'Doğrulanmış';
+z.string.tr.addParticipantsConfirmLabel = 'Ekle';
+z.string.tr.addParticipantsSearchPlaceholder = 'İsme göre ara';
+z.string.tr.addParticipantsTabsPeople = 'İnsanlar';
+z.string.tr.addParticipantsTabsServices = 'Servisler';
 
-z.string.tr.peopleBlockHeadline = 'Engelle?';
-z.string.tr.peopleBlockMessage = '{{user}} sizinle iletişim kuramayacak ve sizi grup konuşmalarına ekleyemeyecek.';
+z.string.tr.conversationDetailsActionCancelRequest = 'İsteği iptal et';
+z.string.tr.conversationDetailsActionCreateGroup = 'Grup oluştur';
+z.string.tr.conversationDetailsActionDevices = 'Cihazlar';
+z.string.tr.conversationDetailsGuestsOff = 'Yok';
+z.string.tr.conversationDetailsParticipantsServicesMany = 'Servisler';
+z.string.tr.conversationDetailsParticipantsUsersMany = 'İnsanlar';
+z.string.tr.conversationDetailsPeople = 'İnsanlar';
+z.string.tr.conversationDetailsServices = 'Servisler';
 
-z.string.tr.peopleConnectHeadline = 'Kabul et?';
-z.string.tr.peopleConnectMessage = 'Bu sizi {{user}} ile bağlayacak ve bir konuşma başlatacak.';
+z.string.tr.groupParticipantActionCancelRequest = 'İsteği iptal et';
+z.string.tr.groupParticipantActionDevices = 'Cihazlar';
+z.string.tr.groupParticipantActionPending = 'Beklemede';
+z.string.tr.groupParticipantActionSendRequest = 'Bağlan';
 
-z.string.tr.peopleCancelRequestHeadline = 'İsteği İptal et?';
-z.string.tr.peopleCancelRequestMessage = '{{user}}’e olan bağlantı isteğini iptal et.';
+z.string.tr.participantDevicesDetailHeadline = 'Bunun {{html1}}{{user}}s’in aygıtında gösterilen{{html2}} parmak iziyle eşleştiğini doğrulayın.';
+z.string.tr.participantDevicesDetailHowTo = 'Bunu nasıl yapıyoruz?';
+z.string.tr.participantDevicesDetailResetSession = 'Oturumu Sıfırla';
+z.string.tr.participantDevicesDetailShowMyDevice = 'Cihaz parmak izimi göster';
+z.string.tr.participantDevicesDetailVerify = 'Doğrulanmış';
 
-z.string.tr.peopleLeaveHeadline = 'Konuşmadan ayrıl?';
-z.string.tr.peopleLeaveMessage = 'Bu konuşmada, artık mesaj gönderemeyecek ve mesaj alamayacaksınız.';
+z.string.tr.participantDevicesHeader = 'Cihazlar';
+z.string.tr.participantDevicesHeadline = 'Wire her cihaza eşsiz bir parmak izi verir. {{user}} ile karşılaştırın ve konuşmayı doğrulayın.';
+z.string.tr.participantDevicesLearnMore = 'Daha fazla bilgi';
+z.string.tr.participantDevicesWhyVerify = 'Neden konuşmaları doğrulamalıyız?';
+z.string.tr.participantDevicesOutdatedClientMessage = '{{user}}, Wire’ın eski bir versiyonunu kullanıyor. Hiçbir cihaz burada gösterilmiyor.';
 
-z.string.tr.peopleRemoveHeadline = 'Çıkar?';
-z.string.tr.peopleRemoveMessage = '{{user}} bu konuşmaya mesaj gönderemeyecek ve bu konuşmadan mesaj alamayacak.';
+z.string.tr.participantDevicesSelfAllDevices = 'Tüm cihazlarımı göster';
+z.string.tr.participantDevicesSelfFingerprint = 'Cihaz parmak izi';
 
-z.string.tr.peopleUnblockHeadline = 'Engeli kaldır?';
-z.string.tr.peopleUnblockMessage = '{{user}} sizinle tekrardan iletişim kurabilecek ve sizi grup konuşmalarına ekleyebilecek.';
-
-z.string.tr.peopleButtonAdd = 'Ekle';
-z.string.tr.peopleButtonBlock = 'Engelle';
-z.string.tr.peopleButtonCancel = 'İptal';
-z.string.tr.peopleButtonConnect = 'Bağlan';
-z.string.tr.peopleButtonCreate = 'Grup oluştur';
-z.string.tr.peopleButtonIgnore = 'Görmezden gel';
-z.string.tr.peopleButtonLeave = 'Ayrıl';
-z.string.tr.peopleButtonOpen = 'Konuşma Başlat';
-z.string.tr.peopleButtonPending = 'Beklemede';
-z.string.tr.peopleButtonProfile = 'Profil';
-z.string.tr.peopleButtonRemove = 'Çıkart';
-z.string.tr.peopleButtonUnblock = 'Engeli kaldır';
-z.string.tr.peopleButtonNo = 'Hayır';
-z.string.tr.peopleButtonYes = 'Evet';
+z.string.tr.userProfileButtonConnect = 'Bağlan';
+z.string.tr.userProfileButtonIgnore = 'Görmezden gel';
+z.string.tr.userProfileButtonUnblock = 'Engeli kaldır';
 
 z.string.tr.preferencesAbout = 'Hakkında';
 z.string.tr.preferencesAccount = 'Hesap';
@@ -449,6 +465,7 @@ z.string.tr.searchCreateGroup = 'Grup oluştur';
 z.string.tr.searchGroups = 'Gruplar';
 z.string.tr.searchPeople = 'İnsanlar';
 z.string.tr.searchPlaceholder = 'İsim veya kullanıcı adına göre ara';
+z.string.tr.searchServicePlaceholder = 'İsme göre ara';
 z.string.tr.searchServices = 'Servisler';
 z.string.tr.searchTeamGroups = 'Takım Konuşmaları';
 z.string.tr.searchTeamMembers = 'Takım Üyeleri';
@@ -457,14 +474,19 @@ z.string.tr.searchTrySearch = 'İnsanları isimlerine veya kullanıcı adlarına
 z.string.tr.searchNoContactsOnWire = 'Wire’da hiç kişiniz yok. İnsanları isimlerine veya kullanıcı adlarına göre bulmayı deneyin.';
 z.string.tr.searchOthers = 'Bağlan';
 
+z.string.tr.searchInvite = 'İnsanları Wire’a katılmaya davet edin';
+z.string.tr.searchInviteDetail = 'Kişileriniz paylaşmak, başkalarıyla bağlanmanızı kolaylaştırır. Tüm bilgilerinizi gizler ve kimseyle paylaşmayız.';
+z.string.tr.searchInviteButtonContacts = 'Kişilerden';
+z.string.tr.searchInviteButtonGmail = 'Gmail’den';
+z.string.tr.searchInviteHeadline = 'Arkadaşlarınızı getirin';
+z.string.tr.searchInviteShare = 'Kişileri Paylaş';
+
+z.string.tr.searchListEveryoneParticipates = 'Bağlantıda olduğun herkes zaten bu görüşme içerisinde.';
+z.string.tr.searchListNoMatches = 'Eşleşen sonuç yok.\nBaşka bir isim girmeyi deneyin.';
+
 z.string.tr.uploadGoogleHeadline = 'Konuşmak için\ninsanları bul.';
 z.string.tr.uploadGoogleMessage = 'İletişim verilerinizi sizi başkalarıyla bağlayabilmek için kullanıyoruz. Tüm bilgilerinizi gizler ve kimseyle paylaşmayız.';
-z.string.tr.uploadGoogleHeadlineError = 'Bir şeyler \nyanlış gitti.';
-z.string.tr.uploadGoogleMessageError = 'Bilgilerinzi alamadık. Lütfen kişileriniz yeniden içe aktarmayı deneyin.';
-z.string.tr.uploadGoogleButtonAgain = 'Tekrar deneyin';
 
-z.string.tr.warningCallDetail = 'Sesli aramalar yapmak için tarayıcınızın mikrofona erişim izni alması gerekir.';
-z.string.tr.warningCallHeadline = 'Mikrofon olmadan arama yapılamaz';
 z.string.tr.warningCallUnsupportedIncoming = '{{user}} arıyor. Ancak tarayıcınız sesli aramaları desteklemiyor.';
 z.string.tr.warningCallUnsupportedOutgoing = 'Arama yapamazsınız çünkü tarayıcınız sesli aramaları desteklemiyor.';
 z.string.tr.warningCallIssues = 'Wire’ın bu versiyonu aramalara katılamaz. Lütfen kullanın';
@@ -484,7 +506,6 @@ z.string.tr.warningPermissionRequestCamera = '{{icon}} Kameraya erişime izin ve
 z.string.tr.warningPermissionRequestMicrophone = '{{icon}} Mikrofona erişime izin ver';
 z.string.tr.warningPermissionRequestNotification = '{{icon}} Bildirimlere izin ver';
 z.string.tr.warningPermissionRequestScreen = '{{icon}} Ekrana erişime izin ver';
-z.string.tr.warningTellMeHow = 'Anlat bana';
 
 z.string.tr.userAvailabilityAvailable = 'Alınabilir';
 z.string.tr.userAvailabilityAway = 'Uzakta';
@@ -533,14 +554,7 @@ z.string.tr.tooltipConversationsPreferences = 'Seçenekleri aç';
 z.string.tr.tooltipConversationsSilence = 'Sessize al ({{shortcut}})';
 z.string.tr.tooltipConversationsStart = 'Konuşma başlat ({{shortcut}})';
 
-z.string.tr.tooltipPeopleAdd = 'Konuşmaya birilerini ekle ({{shortcut}})';
-z.string.tr.tooltipPeopleBack = 'Geri';
-z.string.tr.tooltipPeopleBlock = 'Engelle';
-z.string.tr.tooltipPeopleConnect = 'Bağlan';
-z.string.tr.tooltipPeopleLeave = 'Konuşmadan ayrıl';
-z.string.tr.tooltipPeopleRename = 'Konuşma adını değiştir';
-z.string.tr.tooltipPeopleRemove = 'Konuşmadan çıkar';
-z.string.tr.tooltipPeopleUnblock = 'Engeli kaldır';
+z.string.tr.tooltipConversationDetailsRename = 'Konuşma adını değiştir';
 
 z.string.tr.tooltipPreferencesContactsGmail = 'Kişilerinizi paylaşmak için Gmail hesabınıza giriş yapınız';
 z.string.tr.tooltipPreferencesContactsMacos = 'MacOS Kişiler uygulaması aracılığıyla tüm kişilerinizi paylaşın';

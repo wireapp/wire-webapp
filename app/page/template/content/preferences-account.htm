@@ -52,7 +52,7 @@
         </div>
 
         <label class="preferences-account-picture-button" for="self-upload-file-input" data-bind="l10n_tooltip: z.string.tooltipPreferencesPicture">
-          <participant-avatar params="participant: self_user(), size: z.components.ParticipantAvatar.SIZE.X_LARGE"></participant-avatar>
+          <participant-avatar params="participant: self_user, size: z.components.ParticipantAvatar.SIZE.X_LARGE"></participant-avatar>
           <input id="self-upload-file-input"
                  type="file" accept="image/jpg,image/jpeg,image/png,image/bmp"
                  data-bind="file_select: click_on_change_picture"
