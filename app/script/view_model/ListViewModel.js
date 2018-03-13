@@ -271,14 +271,14 @@ z.viewModel.ListViewModel = class ListViewModel {
 
     const canToggleMute = !conversationEntity.is_request() && !conversationEntity.removed_from_conversation();
     if (canToggleMute) {
-      const silenceShortcut = z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.SILENCE);
+      const silenceShortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.SILENCE);
       const notifyTooltip = z.l10n.text(z.string.tooltipConversationsNotify, silenceShortcut);
-      const silence_tooltip = z.l10n.text(z.string.tooltipConversationsSilence, silenceShortcut);
+      const silenceTooltip = z.l10n.text(z.string.tooltipConversationsSilence, silenceShortcut);
 
       const labelStringId = conversationEntity.is_muted()
         ? z.string.conversationsPopoverNotify
         : z.string.conversationsPopoverSilence;
-      title = conversationEntity.is_muted() ? notifyTooltip : silence_tooltip;
+      title = conversationEntity.is_muted() ? notifyTooltip : silenceTooltip;
       entries.push({
         click: () => this.clickToToggleMute(conversationEntity),
         label: z.l10n.text(labelStringId),
@@ -292,7 +292,7 @@ z.viewModel.ListViewModel = class ListViewModel {
         label: z.l10n.text(z.string.conversationsPopoverUnarchive),
       });
     } else {
-      const shortcut = z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.ARCHIVE);
+      const shortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.ARCHIVE);
 
       entries.push({
         click: () => this.clickToArchive(conversationEntity),
