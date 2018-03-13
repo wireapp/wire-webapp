@@ -361,7 +361,7 @@ class Account extends EventEmitter {
     });
   }
 
-  public listen(loginData: LoginData, notificationHandler?: Function): Promise<WebSocketClient> {
+  public listen(loginData: LoginData, notificationHandler?: Function): Promise<Account> {
     return Promise.resolve()
       .then(() => (this.context ? this.context : this.login(loginData, true)))
       .then(() => {
@@ -373,7 +373,8 @@ class Account extends EventEmitter {
           this.apiClient.transport.ws.on(WebSocketClient.TOPIC.ON_MESSAGE, this.handleNotification.bind(this));
         }
         return this.apiClient.connect();
-      });
+      })
+      .then(() => this)
   }
 
   public login(loginData: LoginData, initClient: boolean = true): Promise<Context> {
