@@ -365,6 +365,9 @@ z.string.guestRoomToggleInfoExtended = 'Open this conversation to people outside
 
 z.string.guestRoomConversationBadge = 'Guests are present';
 
+z.string.guestRoomConversationHead = 'People outside your team can join this conversation.';
+z.string.guestRoomConversationButton = 'Invite people';
+
 // Collection
 z.string.collectionShowAll = 'Show all {{number}}';
 z.string.collectionSectionLinks = 'Links';

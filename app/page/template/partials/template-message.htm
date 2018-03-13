@@ -243,8 +243,8 @@
       </div>
       <!-- ko if: message.isGroupCreation() && $parent.showInvitePeople() -->
         <div class="message-group-creation-header">
-          <div>People outside your team can join this conversation.</div>
-          <div class="message-group-creation-header-button" data-bind="click: $parent.clickOnInvitePeople">Invite people</div>
+          <div data-bind="l10n_text: z.string.guestRoomConversationHead"></div>
+          <div class="message-group-creation-header-button" data-bind="click: $parent.clickOnInvitePeople, l10n_text: z.string.guestRoomConversationButton"></div>
         </div>
       <!-- /ko -->
     <!-- /ko -->
