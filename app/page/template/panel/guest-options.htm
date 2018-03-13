@@ -27,14 +27,14 @@
                 <div class="panel__action-item__text" data-bind="l10n_text: z.string.guestOptionsCopyLinkDone" data-uie-name="status-copy-link-done"></div>
               </div>
             </div>
-            <div class="panel__action-item" data-bind="click: revokeAccessCode">
+            <div class="panel__action-item" data-bind="click: revokeAccessCode, css:{'disabled': requestOngoing}">
               <close-icon class="panel__action-item__icon"></close-icon>
               <div class="panel__action-item__text" data-bind="l10n_text: z.string.guestOptionsRevokeLink" data-uie-name="do-revoke-link"></div>
             </div>
           <!-- /ko -->
 
           <!-- ko ifnot: hasAccessCode() -->
-            <div class="panel__action-item" data-bind="click: requestAccessCode">
+            <div class="panel__action-item" data-bind="click: requestAccessCode, css:{'disabled': requestOngoing}">
               <link-icon class="panel__action-item__icon"></link-icon>
               <div class="panel__action-item__text" data-bind="l10n_text: z.string.guestOptionsCreateLink" data-uie-name="do-create-link"></div>
             </div>
