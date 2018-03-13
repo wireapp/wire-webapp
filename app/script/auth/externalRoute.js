@@ -30,7 +30,7 @@ export default {
   LOGIN: `${WEBAPP_ENV}/login`,
   WEBAPP: WEBAPP_ENV,
   WIRE_PRIVACY_POLICY: `${WIRE_WEBSITE}/legal/#privacy`,
-  WIRE_ROOT: WIRE_WEBSITE,
   WIRE_TERMS_PERSONAL: `${WIRE_WEBSITE}/legal/terms/#personal`,
   WIRE_TERMS_TEAMS: `${WIRE_WEBSITE}/legal/terms/#teams`,
+  WIRE_WEBSITE,
 };

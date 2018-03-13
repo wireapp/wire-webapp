@@ -474,7 +474,7 @@ z.main.App = class App {
    * @returns {Promise<z.entity.User>} Resolves with the self user entity
    */
   _get_user_self() {
-    return this.repository.user.get_me().then(userEntity => {
+    return this.repository.user.getSelf().then(userEntity => {
       this.logger.info(`Loaded self user with ID '${userEntity.id}'`);
 
       const hasEmailAddress = userEntity.email();
@@ -483,8 +483,10 @@ z.main.App = class App {
 
       if (!isActivatedUser) {
         this.logger.info('User does not have an activated identity and seems to be wireless');
-        // How to verify a wireless user?
-        //throw new Error('User does not have an activated identity');
+
+        if (!userEntity.isTemporaryGuest()) {
+          throw new Error('User does not have an activated identity');
+        }
       }
 
       return this.service.storage.init(userEntity.id).then(() => this._check_user_information(userEntity));

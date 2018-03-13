@@ -43,17 +43,14 @@ class Root extends React.Component {
   componentDidMount = () => {
     this.props.setCookieIfAbsent(CookieSelector.COOKIE_NAME_APP_OPENED, {appInstanceId: APP_INSTANCE_ID});
     this.props.startPolling();
-    window.onbeforeunload = e => {
+    window.onbeforeunload = () => {
       this.props.removeCookie(CookieSelector.COOKIE_NAME_APP_OPENED, APP_INSTANCE_ID);
       this.props.stopPolling();
     };
   };
 
   loadLanguage = language => {
-    if (SUPPORTED_LOCALE.includes(language)) {
-      return require(`../../../i18n/webapp-${language}.json`);
-    }
-    return {};
+    return SUPPORTED_LOCALE.includes(language) ? require(`../../../i18n/webapp-${language}.json`) : {};
   };
 
   render = () => {

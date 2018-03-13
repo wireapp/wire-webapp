@@ -1762,7 +1762,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
    */
   _get_self_user() {
     return this.user_repository
-      .get_me()
+      .getSelf()
       .then(userEntity => {
         this.self_user(userEntity);
         this.logger.info(`Retrieved self user: ${this.self_user().id}`);

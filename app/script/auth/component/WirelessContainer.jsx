@@ -62,7 +62,7 @@ export const WirelessContainer = ({
       </Header>
       <Content style={{flex: '1', paddingLeft: '8px', width: '100%'}}>{children}</Content>
       <Footer style={{height: '30px', justifyContent: 'flex-end', margin: '0 0 18px 8px'}}>
-        <Link href={EXTERNAL_ROUTE.WIRE_ROOT}>{_(footerStrings.wireLink)}</Link>
+        <Link href={EXTERNAL_ROUTE.WIRE_WEBSITE}>{_(footerStrings.wireLink)}</Link>
         <Small> &middot; {_(footerStrings.copy)}</Small>
       </Footer>
     </Content>

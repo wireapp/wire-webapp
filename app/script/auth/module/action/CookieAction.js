@@ -29,11 +29,7 @@ export function startPolling(
 ) {
   return function(dispatch, getState, {}) {
     return Promise.resolve()
-      .then(() => {
-        return setInterval(() => {
-          dispatch(getCookie(name, asJSON));
-        }, interval);
-      })
+      .then(() => setInterval(() => dispatch(getCookie(name, asJSON)), interval))
       .then(timerId => dispatch(CookieActionCreator.startCookiePolling({name, timerId})))
       .catch(error => dispatch(CookieActionCreator.failedCookiePolling(error)));
   };
