@@ -43,6 +43,7 @@ z.string.authAccountSignInPhone = 'Phone';
 z.string.authBlockedCookies = 'Enable cookies to log in to Wire.';
 z.string.authBlockedDatabase = 'Wire needs access to local storage to display your messages. Local storage is not available in private mode.';
 z.string.authBlockedTabs = 'Wire is already open in another tab.';
+z.string.authBlockedTabsAction = 'Use this tab instead';
 
 // Authentication: VERIFY section
 z.string.authVerifyAccountAdd = 'Add';
