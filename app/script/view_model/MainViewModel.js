@@ -149,7 +149,8 @@ z.viewModel.MainViewModel = class MainViewModel {
           }
           window.dispatchEvent(new Event('resize'));
           z.util.afterRender(() => {
-            if (!isNarrowScreen && wire.app.view.content.messageList.should_scroll_to_bottom) {
+            const scrollToBottom = !isNarrowScreen && this.content.messageList.should_scroll_to_bottom;
+            if (scrollToBottom) {
               $('.messages-wrap').scroll_to_bottom();
             }
           });
