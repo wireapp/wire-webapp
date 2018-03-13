@@ -229,7 +229,7 @@ z.client.ClientRepository = class ClientRepository {
    * @returns {string} Cookie label
    */
   constructCookieLabel(login, clientType = this._loadCurrentClientType()) {
-    const loginHash = z.util.murmurhash3(login, 42);
+    const loginHash = z.util.murmurhash3(login || this.selfUser().id, 42);
     return `webapp@${loginHash}@${clientType}@${Date.now()}`;
   }
 
@@ -240,7 +240,7 @@ z.client.ClientRepository = class ClientRepository {
    * @returns {string} Cookie label key
    */
   constructCookieLabelKey(login, clientType = this._loadCurrentClientType()) {
-    const loginHash = z.util.murmurhash3(login, 42);
+    const loginHash = z.util.murmurhash3(login || this.selfUser().id, 42);
     return `${z.storage.StorageKey.AUTH.COOKIE_LABEL}@${loginHash}@${clientType}`;
   }
 

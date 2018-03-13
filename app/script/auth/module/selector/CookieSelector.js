@@ -17,15 +17,14 @@
  *
  */
 
-export default {
-  CHOOSE_HANDLE: '/choosehandle',
-  CONVERSATION_JOIN: '/join-conversation',
-  CREATE_ACCOUNT: '/createaccount',
-  CREATE_TEAM: '/createteam',
-  CREATE_TEAM_ACCOUNT: '/createteamaccount',
-  INDEX: '/',
-  INITIAL_INVITE: '/teaminvite',
-  INVITE: '/invite',
-  PERSONAL_INVITE: '/personalinvite',
-  VERIFY: '/verify',
+import {APP_INSTANCE_ID} from '../../config';
+
+export const COOKIE_NAME_APP_OPENED = 'app_opened';
+
+export const isAppAlreadyOpen = state => {
+  const selectedCookie = getCookies(state)[COOKIE_NAME_APP_OPENED];
+  return selectedCookie ? selectedCookie.appInstanceId !== APP_INSTANCE_ID : false;
 };
+export const getCookies = state => state.cookieState.cookies || [];
+export const isFetching = state => state.cookieState.fetching;
+export const getError = state => state.cookieState.error;

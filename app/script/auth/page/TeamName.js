@@ -17,15 +17,26 @@
  *
  */
 
-import {Container, ContainerXS, Columns, Column} from '@wireapp/react-ui-kit/Layout';
-import {Form, InputSubmitCombo, Input, RoundIconButton, ErrorMessage} from '@wireapp/react-ui-kit/Form';
-import {H1, Text, Link} from '@wireapp/react-ui-kit/Text';
-import {ArrowIcon} from '@wireapp/react-ui-kit/Icon';
+import {
+  COLOR,
+  ArrowIcon,
+  H1,
+  Text,
+  Link,
+  Container,
+  ContainerXS,
+  Columns,
+  Column,
+  Form,
+  InputSubmitCombo,
+  Input,
+  RoundIconButton,
+  ErrorMessage,
+} from '@wireapp/react-ui-kit';
 import ROUTE from '../route';
 import EXTERNAL_ROUTE from '../externalRoute';
 import {Link as RRLink} from 'react-router-dom';
 import {connect} from 'react-redux';
-import {COLOR} from '@wireapp/react-ui-kit/Identity';
 import {teamNameStrings} from '../../strings';
 import {injectIntl} from 'react-intl';
 import {withRouter} from 'react-router';
@@ -36,6 +47,7 @@ import {enterTeamCreationFlow} from '../module/action/creator/AuthActionCreator'
 import * as AuthSelector from '../module/selector/AuthSelector';
 import ValidationError from '../module/action/ValidationError';
 import React, {Component} from 'react';
+import Page from './Page';
 
 class TeamName extends Component {
   state = {
@@ -74,67 +86,65 @@ class TeamName extends Component {
     const {intl: {formatMessage: _}} = this.props;
     const {enteredTeamName, isValidTeamName, error} = this.state;
     return (
-      <Container centerText verticalCenter style={{width: '100%'}}>
-        <Columns>
-          <Column style={{display: 'flex'}}>
-            <div style={{margin: 'auto'}}>
-              <Link to={ROUTE.INDEX} component={RRLink} data-uie-name="go-register-team">
-                <ArrowIcon direction="left" color={COLOR.GRAY} />
-              </Link>
-            </div>
-          </Column>
-          <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>
-            <ContainerXS
-              centerText
-              style={{display: 'flex', flexDirection: 'column', height: 428, justifyContent: 'space-between'}}
-            >
-              <div>
-                <H1 center>{_(teamNameStrings.headline)}</H1>
-                <Text>{_(teamNameStrings.subhead)}</Text>
-                <Form style={{marginTop: 30}}>
-                  <InputSubmitCombo>
-                    <Input
-                      value={enteredTeamName}
-                      innerRef={node => (this.teamNameInput = node)}
-                      onChange={event => {
-                        this.resetErrors();
-                        this.setState({enteredTeamName: event.target.value});
-                      }}
-                      placeholder={_(teamNameStrings.teamNamePlaceholder)}
-                      pattern=".{2,256}"
-                      maxLength="256"
-                      minLength="2"
-                      required
-                      autoFocus
-                      data-uie-name="enter-team-name"
-                    />
-                    <RoundIconButton
-                      disabled={!enteredTeamName || !isValidTeamName}
-                      type="submit"
-                      formNoValidate
-                      onClick={this.handleSubmit}
-                      data-uie-name="do-next"
-                    />
-                  </InputSubmitCombo>
-                  <ErrorMessage data-uie-name="error-message">
-                    {error ? parseValidationErrors(error) : parseError(this.props.error)}
-                  </ErrorMessage>
-                </Form>
-              </div>
-              <div>
-                <Link
-                  href={`${EXTERNAL_ROUTE.WIRE_ROOT}/create-team/#features`}
-                  target="_blank"
-                  data-uie-name="go-what-is"
-                >
-                  {_(teamNameStrings.whatIsWireTeamsLink)}
+      <Page>
+        <Container centerText verticalCenter style={{width: '100%'}}>
+          <Columns>
+            <Column style={{display: 'flex'}}>
+              <div style={{margin: 'auto'}}>
+                <Link to={ROUTE.INDEX} component={RRLink} data-uie-name="go-register-team">
+                  <ArrowIcon direction="left" color={COLOR.GRAY} />
                 </Link>
               </div>
-            </ContainerXS>
-          </Column>
-          <Column />
-        </Columns>
-      </Container>
+            </Column>
+            <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>
+              <ContainerXS
+                centerText
+                style={{display: 'flex', flexDirection: 'column', height: 428, justifyContent: 'space-between'}}
+              >
+                <div>
+                  <H1 center>{_(teamNameStrings.headline)}</H1>
+                  <Text>{_(teamNameStrings.subhead)}</Text>
+                  <Form style={{marginTop: 30}}>
+                    <InputSubmitCombo>
+                      <Input
+                        value={enteredTeamName}
+                        innerRef={node => (this.teamNameInput = node)}
+                        onChange={event => {
+                          this.resetErrors();
+                          this.setState({enteredTeamName: event.target.value});
+                        }}
+                        placeholder={_(teamNameStrings.teamNamePlaceholder)}
+                        pattern=".{2,256}"
+                        maxLength="256"
+                        minLength="2"
+                        required
+                        autoFocus
+                        data-uie-name="enter-team-name"
+                      />
+                      <RoundIconButton
+                        disabled={!enteredTeamName || !isValidTeamName}
+                        type="submit"
+                        formNoValidate
+                        onClick={this.handleSubmit}
+                        data-uie-name="do-next"
+                      />
+                    </InputSubmitCombo>
+                    <ErrorMessage data-uie-name="error-message">
+                      {error ? parseValidationErrors(error) : parseError(this.props.error)}
+                    </ErrorMessage>
+                  </Form>
+                </div>
+                <div>
+                  <Link href={EXTERNAL_ROUTE.WIRE_WEBSITE} target="_blank" data-uie-name="go-what-is">
+                    {_(teamNameStrings.whatIsWireTeamsLink)}
+                  </Link>
+                </div>
+              </ContainerXS>
+            </Column>
+            <Column />
+          </Columns>
+        </Container>
+      </Page>
     );
   }
 }

@@ -17,15 +17,6 @@
  *
  */
 
-export default {
-  CHOOSE_HANDLE: '/choosehandle',
-  CONVERSATION_JOIN: '/join-conversation',
-  CREATE_ACCOUNT: '/createaccount',
-  CREATE_TEAM: '/createteam',
-  CREATE_TEAM_ACCOUNT: '/createteamaccount',
-  INDEX: '/',
-  INITIAL_INVITE: '/teaminvite',
-  INVITE: '/invite',
-  PERSONAL_INVITE: '/personalinvite',
-  VERIFY: '/verify',
-};
+export function capitalize(text: string): string {
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}

@@ -19,7 +19,7 @@
 
 import * as Environment from './Environment';
 import APIClient from '@wireapp/api-client';
-import {MemoryEngine} from '@wireapp/store-engine';
+import StoreEngine from '@wireapp/store-engine';
 
 const BACKEND = Environment.onEnvironment(
   APIClient.BACKEND.STAGING,
@@ -27,9 +27,12 @@ const BACKEND = Environment.onEnvironment(
   APIClient.BACKEND.PRODUCTION
 );
 
+const store = new StoreEngine.MemoryEngine();
+store.init('wire-webapp');
+
 export const configureClient = () => {
   return new APIClient({
-    store: new MemoryEngine('wire-webapp'),
+    store: store,
     urls: BACKEND,
   });
 };

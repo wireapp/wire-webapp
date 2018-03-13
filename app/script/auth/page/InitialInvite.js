@@ -21,11 +21,20 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {injectIntl} from 'react-intl';
 import {inviteStrings} from '../../strings';
-import {ContainerXS} from '@wireapp/react-ui-kit/Layout';
-import {InputSubmitCombo, Input, RoundIconButton, Form, ButtonLink, ErrorMessage} from '@wireapp/react-ui-kit/Form';
-import {CheckIcon} from '@wireapp/react-ui-kit/Icon';
-import {H1, Text, Link} from '@wireapp/react-ui-kit/Text';
-import {COLOR} from '@wireapp/react-ui-kit/Identity';
+import {
+  H1,
+  Text,
+  Link,
+  COLOR,
+  CheckIcon,
+  ContainerXS,
+  InputSubmitCombo,
+  Input,
+  RoundIconButton,
+  Form,
+  ButtonLink,
+  ErrorMessage,
+} from '@wireapp/react-ui-kit';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 import {pathWithParams} from '../util/urlUtil';
 import EXTERNAL_ROUTE from '../externalRoute';
