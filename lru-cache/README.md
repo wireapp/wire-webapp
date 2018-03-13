@@ -18,7 +18,7 @@ yarn add @wireapp/lru-cache
 
 **Browser**
 
-* [demo.html](./demo.html)
+* [demo.html](./src/demo/demo.html)
 
 **Node.js**
 
