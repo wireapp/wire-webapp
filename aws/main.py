@@ -67,7 +67,7 @@ def latest_browser_required(f):
   def decorated_function(*args, **kwargs):
     p = flask.request.path
     browser_check = p.endswith('/') or p.endswith('.html')
-    browser_check = browser_check and not p.startswith('/test/') and not p.startswith('/auth')
+    browser_check = browser_check and not p.startswith('/test/')
     if browser_check:
       try:
         agent = util.user_agent()

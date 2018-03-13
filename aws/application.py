@@ -47,7 +47,6 @@ def index():
 
 
 @application.route('/auth/')
-@main.latest_browser_required
 def auth():
   response = flask.make_response(flask.render_template(
     'auth/index.html',
@@ -66,7 +65,6 @@ def login():
   return response
 
 @application.route('/join/')
-@main.latest_browser_required
 def join():
   key = flask.request.args.get('key')
   code = flask.request.args.get('code')
