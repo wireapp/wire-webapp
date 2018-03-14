@@ -1473,7 +1473,7 @@ window.z.util = z.util || {};
      * @param {number} code - Country code
      * @returns {string} Returns the ISO standard country name of the most populated country with the matching country code
      */
-    get_country_by_code(code) {
+    getCountryByCode(code) {
       let countries = [];
 
       for (const country of COUNTRY_CODES) {
@@ -1494,7 +1494,7 @@ window.z.util = z.util || {};
      * @param {string} iso_name - ISO standard country name
      * @returns {number} Matching country code
      */
-    get_country_code(iso_name) {
+    getCountryCode(iso_name) {
       for (const country of COUNTRY_CODES) {
         if (country.iso === iso_name) {
           return country.code;

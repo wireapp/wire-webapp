@@ -22,27 +22,27 @@
 'use strict';
 
 describe('z.util.CountryCodes', () => {
-  describe('get_country_code', () => {
+  describe('getCountryCode', () => {
     it('returns the county code for an existing ISO name', () => {
-      expect(z.util.CountryCodes.get_country_code('DE')).toBe(49);
+      expect(z.util.CountryCodes.getCountryCode('DE')).toBe(49);
     });
 
     it('returns undefined for a non-existent ISO name', () => {
-      expect(z.util.CountryCodes.get_country_code('XY')).toBeUndefined();
+      expect(z.util.CountryCodes.getCountryCode('XY')).toBeUndefined();
     });
   });
 
-  describe('get_country_by_code', () => {
+  describe('getCountryByCode', () => {
     it('returns the most populated country for country code ', () => {
-      expect(z.util.CountryCodes.get_country_by_code(49)).toBe('DE');
+      expect(z.util.CountryCodes.getCountryByCode(49)).toBe('DE');
     });
 
     it('returns the most populated country for country code ', () => {
-      expect(z.util.CountryCodes.get_country_by_code(7)).toBe('RU');
+      expect(z.util.CountryCodes.getCountryByCode(7)).toBe('RU');
     });
 
     it('returns undefined for a non-existent country code', () => {
-      expect(z.util.CountryCodes.get_country_by_code(9999)).toBeUndefined();
+      expect(z.util.CountryCodes.getCountryByCode(9999)).toBeUndefined();
     });
   });
 });
