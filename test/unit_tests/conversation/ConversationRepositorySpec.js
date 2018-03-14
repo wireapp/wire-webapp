@@ -59,7 +59,7 @@ describe('ConversationRepository', () => {
 
   beforeAll(done => {
     z.util.protobuf
-      .load_protos('ext/proto/generic-message-proto/messages.proto')
+      .loadProtos('ext/proto/generic-message-proto/messages.proto')
       .then(done)
       .catch(done.fail);
   });

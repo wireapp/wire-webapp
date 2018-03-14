@@ -28,29 +28,29 @@ z.util.ObjectUtil = {
    * @param {Object} object - Base object
    * @returns {Object} Object copy with escaped properties
    */
-  escape_properties(object) {
-    return z.util.ObjectUtil.map_recursive(object, _.escape);
+  escapeProperties(object) {
+    return z.util.ObjectUtil.mapRecursive(object, _.escape);
   },
   /**
    * Creates an object copy and applies a mapping functions to all properties of that object.
    *
    * @param {Object} object - Base object
-   * @param {Function} mapping_function - Mapping function
+   * @param {Function} mappingFunction - Mapping function
    * @returns {Object} Object copy with mapped properties
    */
-  map_recursive(object, mapping_function) {
+  mapRecursive(object, mappingFunction) {
     if (typeof object !== 'object') {
-      return mapping_function(object);
+      return mappingFunction(object);
     }
 
-    const new_object = {};
+    const newObject = {};
 
     for (const property in object) {
       if (object.hasOwnProperty(property)) {
-        new_object[property] = z.util.ObjectUtil.map_recursive(object[property], mapping_function);
+        newObject[property] = z.util.ObjectUtil.mapRecursive(object[property], mappingFunction);
       }
     }
 
-    return new_object;
+    return newObject;
   },
 };
