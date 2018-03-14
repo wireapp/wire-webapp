@@ -414,16 +414,13 @@ z.calling.entities.FlowEntity = class FlowEntity {
       if (!isStateClosed) {
         this.peerConnection.close();
 
-        this.logger.info(
-          {
-            data: {
-              default: [this.remoteUser.name()],
-              obfuscated: [this.remoteUser.id],
-            },
-            message: z.util.format_string`Closing PeerConnection '${0}' successful`,
+        this.logger.info({
+          data: {
+            default: [this.remoteUser.name()],
+            obfuscated: [this.remoteUser.id],
           },
-          callEntity
-        );
+          message: z.util.format_string`Closing PeerConnection '${0}' successful`,
+        });
       }
     }
   }
@@ -801,17 +798,14 @@ z.calling.entities.FlowEntity = class FlowEntity {
           }
         }
 
-        this.logger.debug(
-          {
-            data: {
-              default: [localSdp.type, iceCandidates.length, this.remoteUser.name(), this.localSdp().sdp],
-              obfuscated: [localSdp.type, iceCandidates.length, this.remoteUser.id, this.localSdp().sdp],
-            },
-            message: z.util
-              .format_string`Sending local '${0}' SDP containing '${1}' ICE candidates for flow with '${2}'\n${3}`,
+        this.logger.debug({
+          data: {
+            default: [localSdp.type, iceCandidates.length, this.remoteUser.name(), this.localSdp().sdp],
+            obfuscated: [localSdp.type, iceCandidates.length, this.remoteUser.id, this.localSdp().sdp],
           },
-          callEntity
-        );
+          message: z.util
+            .format_string`Sending local '${0}' SDP containing '${1}' ICE candidates for flow with '${2}'\n${3}`,
+        });
 
         this.shouldSendLocalSdp(false);
 

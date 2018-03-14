@@ -41,14 +41,14 @@ z.telemetry.calling.CallLogger = class CallLogger extends z.util.Logger {
   _print_log(args) {
     // Use obfuscated format for call logs if possible
     const log = args[1];
-    if (typeof message === 'object') {
+    if (typeof log === 'object') {
       const {message, data} = log;
       if (typeof message === 'function' && typeof data === 'object') {
         this.logToMemory([args[0], message(...data.obfuscated)]);
+        args[1] = message(...data.default);
       }
-      args[1] = message(...data.default);
     } else {
-      this.logToMemory(args[0], log);
+      this.logToMemory([args[0], log]);
     }
     return super._print_log(args);
   }
