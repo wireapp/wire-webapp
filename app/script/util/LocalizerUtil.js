@@ -26,7 +26,7 @@ z.util.LocalizerUtil = {
   joinNames: (userEntities, declension = z.string.Declension.ACCUSATIVE) => {
     const firstNames = userEntities
       .map(userEntity => z.util.get_first_name(userEntity, declension))
-      .sort((userNameA, userNameB) => z.util.StringUtil.sort_by_priority(userNameA, userNameB));
+      .sort((userNameA, userNameB) => z.util.StringUtil.sortByPriority(userNameA, userNameB));
 
     const numberOfNames = firstNames.length;
     if (numberOfNames >= 2) {

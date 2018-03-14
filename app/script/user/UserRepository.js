@@ -66,7 +66,7 @@ z.user.UserRepository = class UserRepository {
       .pureComputed(() => {
         return this.users()
           .filter(user_et => user_et.is_connected())
-          .sort((user_a, user_b) => z.util.StringUtil.sort_by_priority(user_a.first_name(), user_b.first_name()));
+          .sort((user_a, user_b) => z.util.StringUtil.sortByPriority(user_a.first_name(), user_b.first_name()));
       })
       .extend({rateLimit: 1000});
 
@@ -788,9 +788,9 @@ z.user.UserRepository = class UserRepository {
       .filter(user_et => user_et.matches(query, is_handle, excludedEmojis))
       .sort((user_a, user_b) => {
         if (is_handle) {
-          return z.util.StringUtil.sort_by_priority(user_a.username(), user_b.username(), query);
+          return z.util.StringUtil.sortByPriority(user_a.username(), user_b.username(), query);
         }
-        return z.util.StringUtil.sort_by_priority(user_a.name(), user_b.name(), query);
+        return z.util.StringUtil.sortByPriority(user_a.name(), user_b.name(), query);
       });
   }
 

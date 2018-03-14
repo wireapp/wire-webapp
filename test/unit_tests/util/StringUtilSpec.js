@@ -22,25 +22,25 @@
 'use strict';
 
 describe('z.util.StringUtil', () => {
-  describe('compare_transliteration', () => {
+  describe('compareTransliteration', () => {
     it('René equals Rene', () => {
-      expect(z.util.StringUtil.compare_transliteration('René', 'Rene')).toBeTruthy();
+      expect(z.util.StringUtil.compareTransliteration('René', 'Rene')).toBeTruthy();
     });
 
     it('Παναγιώτα equals Panagiota', () => {
-      expect(z.util.StringUtil.compare_transliteration('Παναγιώτα', 'Panagiota')).toBeTruthy();
+      expect(z.util.StringUtil.compareTransliteration('Παναγιώτα', 'Panagiota')).toBeTruthy();
     });
 
     it('ΠΑΝΑΓΙΩΤΑ equals PANAGIOTA', () => {
-      expect(z.util.StringUtil.compare_transliteration('ΠΑΝΑΓΙΩΤΑ', 'PANAGIOTA')).toBeTruthy();
+      expect(z.util.StringUtil.compareTransliteration('ΠΑΝΑΓΙΩΤΑ', 'PANAGIOTA')).toBeTruthy();
     });
 
     it('Björn equals Bjoern', () => {
-      expect(z.util.StringUtil.compare_transliteration('Björn', 'Bjoern')).toBeTruthy();
+      expect(z.util.StringUtil.compareTransliteration('Björn', 'Bjoern')).toBeTruthy();
     });
 
     it('Bjørn equals Bjorn', () => {
-      expect(z.util.StringUtil.compare_transliteration('Bjørn', 'Bjorn')).toBeTruthy();
+      expect(z.util.StringUtil.compareTransliteration('Bjørn', 'Bjorn')).toBeTruthy();
     });
   });
 
@@ -50,9 +50,9 @@ describe('z.util.StringUtil', () => {
     });
   });
 
-  describe('get_random_character', () => {
+  describe('getRandomCharacter', () => {
     it('always returns an alphanumeric character', () => {
-      _.range(1000).map(() => expect(z.util.StringUtil.get_random_character()).toMatch(/(\w|\d){1}/));
+      _.range(1000).map(() => expect(z.util.StringUtil.getRandomCharacter()).toMatch(/(\w|\d){1}/));
     });
   });
 
@@ -103,24 +103,24 @@ describe('z.util.StringUtil', () => {
     });
   });
 
-  describe('remove_line_breaks', () => {
+  describe('removeLineBreaks', () => {
     it('removes all the line breaks', () => {
-      expect(z.util.StringUtil.remove_line_breaks('\nA\nB\nC\nD\n')).toBe('ABCD');
+      expect(z.util.StringUtil.removeLineBreaks('\nA\nB\nC\nD\n')).toBe('ABCD');
     });
   });
 
-  describe('sort_by_priority', () => {
+  describe('sortByPriority', () => {
     it('can sort strings', () => {
       const string_1 = 'a b';
       const string_2 = 'c d';
 
-      expect(z.util.StringUtil.sort_by_priority(string_1, string_2)).toEqual(-1);
-      expect(z.util.StringUtil.sort_by_priority(string_2, string_1)).toEqual(1);
-      expect(z.util.StringUtil.sort_by_priority(string_1, string_1)).toEqual(0);
-      expect(z.util.StringUtil.sort_by_priority(string_1, string_2, 'a')).toEqual(-1);
-      expect(z.util.StringUtil.sort_by_priority(string_1, string_2, 'c')).toEqual(1);
-      expect(z.util.StringUtil.sort_by_priority(string_1, string_2, 'A')).toEqual(-1);
-      expect(z.util.StringUtil.sort_by_priority(string_1, string_2, 'C')).toEqual(1);
+      expect(z.util.StringUtil.sortByPriority(string_1, string_2)).toEqual(-1);
+      expect(z.util.StringUtil.sortByPriority(string_2, string_1)).toEqual(1);
+      expect(z.util.StringUtil.sortByPriority(string_1, string_1)).toEqual(0);
+      expect(z.util.StringUtil.sortByPriority(string_1, string_2, 'a')).toEqual(-1);
+      expect(z.util.StringUtil.sortByPriority(string_1, string_2, 'c')).toEqual(1);
+      expect(z.util.StringUtil.sortByPriority(string_1, string_2, 'A')).toEqual(-1);
+      expect(z.util.StringUtil.sortByPriority(string_1, string_2, 'C')).toEqual(1);
     });
   });
 
@@ -196,28 +196,28 @@ describe('z.util.StringUtil', () => {
     });
   });
 
-  describe('starts_with', () => {
+  describe('startsWith', () => {
     const string = 'To be, or not to be, that is the question.';
 
     it('returns true for positive matches', () => {
-      expect(z.util.StringUtil.starts_with(string, 'To be')).toBeTruthy();
-      expect(z.util.StringUtil.starts_with(string, 'to be')).toBeTruthy();
+      expect(z.util.StringUtil.startsWith(string, 'To be')).toBeTruthy();
+      expect(z.util.StringUtil.startsWith(string, 'to be')).toBeTruthy();
     });
 
     it('returns false for no matches', () => {
-      expect(z.util.StringUtil.starts_with(string, 'not to be')).toBeFalsy();
+      expect(z.util.StringUtil.startsWith(string, 'not to be')).toBeFalsy();
     });
   });
 
-  describe('z.util.trim_line_breaks', () => {
+  describe('z.util.trimLineBreaks', () => {
     it('removes line breaks at the beginning and/or end', () => {
-      expect(z.util.StringUtil.trim_line_breaks('\n\n\n\n\nB\nC\nD')).toBe('B\nC\nD');
-      expect(z.util.StringUtil.trim_line_breaks('B\nC\nD\n\n\n\n\n')).toBe('B\nC\nD');
-      expect(z.util.StringUtil.trim_line_breaks('\n\n\n\nB\nC\n\n\n\n\n')).toBe('B\nC');
+      expect(z.util.StringUtil.trimLineBreaks('\n\n\n\n\nB\nC\nD')).toBe('B\nC\nD');
+      expect(z.util.StringUtil.trimLineBreaks('B\nC\nD\n\n\n\n\n')).toBe('B\nC\nD');
+      expect(z.util.StringUtil.trimLineBreaks('\n\n\n\nB\nC\n\n\n\n\n')).toBe('B\nC');
     });
 
     it('does not remove line breaks in between', () => {
-      expect(z.util.StringUtil.trim_line_breaks('A\nB\nC\nD')).toBe('A\nB\nC\nD');
+      expect(z.util.StringUtil.trimLineBreaks('A\nB\nC\nD')).toBe('A\nB\nC\nD');
     });
   });
 

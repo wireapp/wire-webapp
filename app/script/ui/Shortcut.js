@@ -211,7 +211,7 @@ window.z.ui = z.ui || {};
       .replace('up', '↑')
       .replace('down', '↓')
       .replace('graveaccent', 'n')
-      .replace(/\w+/g, string => z.util.StringUtil.capitalize_first_char(string));
+      .replace(/\w+/g, string => z.util.StringUtil.capitalizeFirstChar(string));
   }
 
   function getShortcut(shortcutName) {

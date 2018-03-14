@@ -689,22 +689,22 @@ z.conversation.ConversationRepository = class ConversationRepository {
         }
 
         if (is_handle) {
-          if (z.util.StringUtil.compare_transliteration(conversation_et.display_name(), `@${query}`)) {
+          if (z.util.StringUtil.compareTransliteration(conversation_et.display_name(), `@${query}`)) {
             return true;
           }
 
           for (const user_et of conversation_et.participating_user_ets()) {
-            if (z.util.StringUtil.starts_with(user_et.username(), query)) {
+            if (z.util.StringUtil.startsWith(user_et.username(), query)) {
               return true;
             }
           }
         } else {
-          if (z.util.StringUtil.compare_transliteration(conversation_et.display_name(), query)) {
+          if (z.util.StringUtil.compareTransliteration(conversation_et.display_name(), query)) {
             return true;
           }
 
           for (const user_et of conversation_et.participating_user_ets()) {
-            if (z.util.StringUtil.compare_transliteration(user_et.name(), query)) {
+            if (z.util.StringUtil.compareTransliteration(user_et.name(), query)) {
               return true;
             }
           }
@@ -712,7 +712,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return false;
       })
       .sort((conversation_a, conversation_b) => {
-        return z.util.StringUtil.sort_by_priority(conversation_a.display_name(), conversation_b.display_name(), query);
+        return z.util.StringUtil.sortByPriority(conversation_a.display_name(), conversation_b.display_name(), query);
       });
   }
 
@@ -2313,7 +2313,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
             }
 
             const userNames = z.util.LocalizerUtil.joinNames(userEntities, z.string.Declension.NOMINATIVE);
-            const titleSubstitutions = z.util.StringUtil.capitalize_first_char(userNames);
+            const titleSubstitutions = z.util.StringUtil.capitalizeFirstChar(userNames);
 
             switch (consentType) {
               case ConversationRepository.CONSENT_TYPE.INCOMING_CALL: {

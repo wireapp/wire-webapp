@@ -131,7 +131,7 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
         const groupCreationStringId = this.user().is_me
           ? z.string.conversationCreateNameYou
           : z.string.conversationCreateName;
-        return z.util.StringUtil.capitalize_first_char(z.l10n.text(groupCreationStringId, this.senderName()));
+        return z.util.StringUtil.capitalizeFirstChar(z.l10n.text(groupCreationStringId, this.senderName()));
       }
       return '';
     });

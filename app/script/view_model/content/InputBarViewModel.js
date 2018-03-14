@@ -385,7 +385,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       return this.on_send_pasted_files();
     }
 
-    const message = z.util.StringUtil.trim_line_breaks(this.input());
+    const message = z.util.StringUtil.trimLineBreaks(this.input());
 
     if (message.length > z.config.MAXIMUM_MESSAGE_LENGTH) {
       return amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, {

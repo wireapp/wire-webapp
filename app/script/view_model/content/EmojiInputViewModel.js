@@ -338,7 +338,7 @@ z.viewModel.content.EmojiInputViewModel = class EmojiInputViewModel {
         const usage_count_a = this._get_usage_count(emoji_a.name);
         const usage_count_b = this._get_usage_count(emoji_b.name);
         if (usage_count_a === usage_count_b) {
-          return z.util.StringUtil.sort_by_priority(emoji_a.name, emoji_b.name, query);
+          return z.util.StringUtil.sortByPriority(emoji_a.name, emoji_b.name, query);
         }
         return usage_count_b - usage_count_a;
       })

@@ -23,12 +23,12 @@ window.z = window.z || {};
 window.z.util = z.util || {};
 
 z.util.StringUtil = {
-  capitalize_first_char: function(string = '') {
+  capitalizeFirstChar: function(string = '') {
     return `${string.charAt(0).toUpperCase()}${string.substring(1)}`;
   },
-  compare_transliteration: function(name_a, name_b, excludedChars = []) {
+  compareTransliteration: function(nameA, nameB, excludedChars = []) {
     const options = {custom: excludedChars};
-    return z.util.StringUtil.includes(window.getSlug(name_a, options), window.getSlug(name_b, options));
+    return z.util.StringUtil.includes(window.getSlug(nameA, options), window.getSlug(nameB, options));
   },
   format: function() {
     let string = arguments[0];
@@ -40,21 +40,21 @@ z.util.StringUtil = {
 
     return string;
   },
-  get_first_character: function(string) {
+  getFirstCharacter: function(string) {
     return [...string][0];
   },
-  get_random_character: function() {
-    let char_index;
+  getRandomCharacter: function() {
+    let charIndex;
     while (
-      !z.util.NumberUtil.in_range(char_index, 1, 9) &&
-      !z.util.NumberUtil.in_range(char_index, 65, 90) &&
-      !z.util.NumberUtil.in_range(char_index, 97, 122)
+      !z.util.NumberUtil.in_range(charIndex, 1, 9) &&
+      !z.util.NumberUtil.in_range(charIndex, 65, 90) &&
+      !z.util.NumberUtil.in_range(charIndex, 97, 122)
     ) {
-      char_index = Math.floor(Math.random() * 122);
+      charIndex = Math.floor(Math.random() * 122);
     }
 
     // Returns random alphanumeric character [A-Z, a-z, 0-9]
-    return char_index <= 9 ? char_index : String.fromCharCode(char_index);
+    return charIndex <= 9 ? charIndex : String.fromCharCode(charIndex);
   },
   includes: function(string = '', query = '') {
     return string.toLowerCase().includes(query.toLowerCase());
@@ -99,30 +99,30 @@ z.util.StringUtil = {
 
     return obfuscated;
   },
-  remove_line_breaks: function(string = '') {
+  removeLineBreaks: function(string = '') {
     return string.replace(/(\r\n|\n|\r)/gm, '');
   },
-  sort_by_priority: function(string_a = '', string_b = '', query) {
-    string_a = string_a.toLowerCase();
-    string_b = string_b.toLowerCase();
+  sortByPriority: function(stringA = '', stringB = '', query) {
+    stringA = stringA.toLowerCase();
+    stringB = stringB.toLowerCase();
 
     if (query) {
-      if (z.util.StringUtil.starts_with(string_a, query)) {
-        if (!z.util.StringUtil.starts_with(string_b, query)) {
+      if (z.util.StringUtil.startsWith(stringA, query)) {
+        if (!z.util.StringUtil.startsWith(stringB, query)) {
           return -1;
         }
-      } else if (z.util.StringUtil.starts_with(string_b, query)) {
-        if (!z.util.StringUtil.starts_with(string_a, query)) {
+      } else if (z.util.StringUtil.startsWith(stringB, query)) {
+        if (!z.util.StringUtil.startsWith(stringA, query)) {
           return 1;
         }
       }
     }
 
-    if (string_a < string_b) {
+    if (stringA < stringB) {
       return -1;
     }
 
-    if (string_a > string_b) {
+    if (stringA > stringB) {
       return 1;
     }
 
@@ -152,19 +152,19 @@ z.util.StringUtil = {
       })
       .filter(item => item);
   },
-  starts_with: function(string = '', query) {
+  startsWith: function(string = '', query) {
     return string.toLowerCase().startsWith(query.toLowerCase());
   },
-  trim_line_breaks: function(string = '') {
+  trimLineBreaks: function(string = '') {
     return string.replace(/^\s+|\s+$/g, '');
   },
-  truncate: function(string, output_length, word_boundary = true) {
-    if (string.length > output_length) {
-      let trunc_index = output_length - 1;
-      if (word_boundary && string.lastIndexOf(' ', output_length - 1) > output_length - 25) {
-        trunc_index = string.lastIndexOf(' ', output_length - 1);
+  truncate: function(string, outputLength, wordBoundary = true) {
+    if (string.length > outputLength) {
+      let truncIndex = outputLength - 1;
+      if (wordBoundary && string.lastIndexOf(' ', outputLength - 1) > outputLength - 25) {
+        truncIndex = string.lastIndexOf(' ', outputLength - 1);
       }
-      string = `${string.substr(0, trunc_index)}…`;
+      string = `${string.substr(0, truncIndex)}…`;
     }
     return string;
   },

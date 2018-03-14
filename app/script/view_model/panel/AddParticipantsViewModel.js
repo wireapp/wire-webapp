@@ -81,7 +81,7 @@ z.viewModel.panel.AppParticipantsViewModel = class AppParticipantsViewModel {
 
       if (this.isTeamOnly()) {
         userEntities = this.teamMembers().sort((userA, userB) => {
-          return z.util.StringUtil.sort_by_priority(userA.first_name(), userB.first_name());
+          return z.util.StringUtil.sortByPriority(userA.first_name(), userB.first_name());
         });
       } else {
         userEntities = this.teamUsers();
