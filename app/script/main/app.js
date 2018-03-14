@@ -631,7 +631,13 @@ z.main.App = class App {
     $(window).on('unload', () => {
       this.logger.info("'window.unload' was triggered, so we will tear down calls.");
       this.repository.calling.leaveCallOnUnload();
-      this.repository.storage.terminate('window.onunload');
+
+      if (this.repository.user.self().isTemporaryGuest()) {
+        this.repository.storage.deleteDatabase();
+      } else {
+        this.repository.storage.terminate('window.onunload');
+      }
+
       this.repository.notification.clearNotifications();
     });
   }
