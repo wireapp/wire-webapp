@@ -136,7 +136,14 @@ z.calling.entities.FlowEntity = class FlowEntity {
     this.signalingState.subscribe(signalingState => {
       switch (signalingState) {
         case z.calling.rtc.SIGNALING_STATE.CLOSED: {
-          this.logger.info(`PeerConnection with '${this.remoteUser.name()}' was closed`);
+          this.logger.info({
+            data: {
+              default: [this.remoteUser.name()],
+              obfuscated: [this.remoteUser.id],
+            },
+            message: z.util.format_string`PeerConnection with '${0}' was closed`,
+          });
+
           this.callEntity.deleteParticipant(this.participantEntity.id, this.remoteClientId);
           break;
         }
@@ -325,8 +332,13 @@ z.calling.entities.FlowEntity = class FlowEntity {
    * @returns {undefined} No return value
    */
   startNegotiation(negotiationMode = z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT, mediaStream = this.mediaStream()) {
-    const log = `Start negotiating PeerConnection with '${this.remoteUser.name()}' triggered by '${negotiationMode}'`;
-    this.logger.info(log);
+    this.logger.info({
+      data: {
+        default: [this.remoteUser.name(), negotiationMode],
+        obfuscated: [this.remoteUser.id, negotiationMode],
+      },
+      message: z.util.format_string`Start negotiating PeerConnection with '${0}' triggered by '${1}'`,
+    });
 
     this._createPeerConnection().then(() => {
       this._addMediaStream(mediaStream);
@@ -401,7 +413,17 @@ z.calling.entities.FlowEntity = class FlowEntity {
       const isStateClosed = this.peerConnection.signalingState === z.calling.rtc.SIGNALING_STATE.CLOSED;
       if (!isStateClosed) {
         this.peerConnection.close();
-        this.logger.info(`Closing PeerConnection '${this.remoteUser.name()}' successful`);
+
+        this.logger.info(
+          {
+            data: {
+              default: [this.remoteUser.name()],
+              obfuscated: [this.remoteUser.id],
+            },
+            message: z.util.format_string`Closing PeerConnection '${0}' successful`,
+          },
+          callEntity
+        );
       }
     }
   }
@@ -434,8 +456,16 @@ z.calling.entities.FlowEntity = class FlowEntity {
       this.telemetry.time_step(z.telemetry.calling.CallSetupSteps.PEER_CONNECTION_CREATED);
       this.signalingState(this.peerConnection.signalingState);
 
-      const logMessage = `PeerConnection with '${this.remoteUser.name()}' created - isAnswer '${this.isAnswer()}'`;
-      this.logger.debug(logMessage, pcConfiguration);
+      this.logger.debug(
+        {
+          data: {
+            default: [this.remoteUser.name(), this.isAnswer()],
+            obfuscated: [this.remoteUser.id, this.isAnswer()],
+          },
+          message: z.util.format_string`PeerConnection with '${0}' created - isAnswer '${1}'`,
+        },
+        pcConfiguration
+      );
 
       this.peerConnection.onaddstream = this._onAddStream.bind(this);
       this.peerConnection.ontrack = this._onTrack.bind(this);
@@ -771,10 +801,17 @@ z.calling.entities.FlowEntity = class FlowEntity {
           }
         }
 
-        const logMessage = `Sending local '${localSdp.type}' SDP containing '${
-          iceCandidates.length
-        }' ICE candidates for flow with '${this.remoteUser.name()}'\n${this.localSdp().sdp}`;
-        this.logger.debug(logMessage);
+        this.logger.debug(
+          {
+            data: {
+              default: [localSdp.type, iceCandidates.length, this.remoteUser.name(), this.localSdp().sdp],
+              obfuscated: [localSdp.type, iceCandidates.length, this.remoteUser.id, this.localSdp().sdp],
+            },
+            message: z.util
+              .format_string`Sending local '${0}' SDP containing '${1}' ICE candidates for flow with '${2}'\n${3}`,
+          },
+          callEntity
+        );
 
         this.shouldSendLocalSdp(false);
 
@@ -851,7 +888,13 @@ z.calling.entities.FlowEntity = class FlowEntity {
    */
   _createSdpAnswer() {
     this.negotiationNeeded(false);
-    this.logger.debug(`Creating '${z.calling.rtc.SDP_TYPE.ANSWER}' for flow with '${this.remoteUser.name()}'`);
+    this.logger.debug({
+      data: {
+        default: [z.calling.rtc.SDP_TYPE.ANSWER, this.remoteUser.name()],
+        obfuscated: [z.calling.rtc.SDP_TYPE.ANSWER, this.remoteUser.id],
+      },
+      message: `Creating '${0}' for flow with '${1}'`,
+    });
 
     this.peerConnection
       .createAnswer()
@@ -912,7 +955,13 @@ z.calling.entities.FlowEntity = class FlowEntity {
      */
     const offerOptions = {iceRestart, voiceActivityDetection: true};
 
-    this.logger.debug(`Creating '${z.calling.rtc.SDP_TYPE.OFFER}' for flow with '${this.remoteUser.name()}'`);
+    this.logger.debug({
+      data: {
+        default: [z.calling.rtc.SDP_TYPE.OFFER, this.remoteUser.name()],
+        obfuscated: [z.calling.rtc.SDP_TYPE.OFFER, this.remoteUser.id],
+      },
+      message: `Creating '${0}' for flow with '${1}'`,
+    });
 
     this.peerConnection
       .createOffer(offerOptions)
@@ -1073,21 +1122,35 @@ z.calling.entities.FlowEntity = class FlowEntity {
    * @returns {boolean} False if we locally needed to switch sides
    */
   _solveCollidingStates(forceRenegotiation = false) {
-    const logMessage = `Solving state collision: Self user ID '${this.selfUserId}', remote user ID '${
-      this.remoteUserId
-    }', forceRenegotiation '${forceRenegotiation}'`;
-    this.logger.debug(logMessage);
+    this.logger.debug(
+      `Solving state collision: Self user ID '${this.selfUserId}', remote user ID '${
+        this.remoteUserId
+      }', forceRenegotiation '${forceRenegotiation}'`
+    );
 
     const selfUserIdLooses = this.selfUserId < this.remoteUserId;
     const shouldRenegotiate = selfUserIdLooses || forceRenegotiation;
     if (shouldRenegotiate) {
-      this.logger.warn(`We need to switch SDP state of flow with '${this.remoteUser.name()}' to answer.`);
+      this.logger.warn({
+        data: {
+          default: [this.remoteUser.name()],
+          obfuscated: [this.remoteUser.id],
+        },
+        message: z.util.format_string`We need to switch SDP state of flow with '${0}' to answer.`,
+      });
 
       this.restartNegotiation(z.calling.enum.SDP_NEGOTIATION_MODE.STATE_COLLISION, true);
       return forceRenegotiation || false;
     }
 
-    this.logger.warn(`Remote side '${this.remoteUser.name()}' needs to switch SDP state flow to answer.`);
+    this.logger.warn({
+      data: {
+        default: [this.remoteUser.name()],
+        obfuscated: [this.remoteUser.id],
+      },
+      message: z.util.format_string`Remote side '${0}' needs to switch SDP state flow to answer.`,
+    });
+
     return true;
   }
 

@@ -782,3 +782,15 @@ z.util.afterRender = callback => {
  * @returns {void}
  */
 z.util.noop = function() {};
+
+z.util.format_string = (strings, ...keys) => {
+  return (...values) => {
+    const dict = values[values.length - 1] || {};
+    const result = [strings[0]];
+    keys.forEach((key, i) => {
+      const value = Number.isInteger(key) ? values[key] : dict[key];
+      result.push(value, strings[i + 1]);
+    });
+    return result.join('');
+  };
+};

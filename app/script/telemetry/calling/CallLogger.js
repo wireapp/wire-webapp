@@ -13,9 +13,11 @@ z.telemetry.calling.CallLogger = class CallLogger extends z.util.Logger {
 
   getDebugType(number) {
     switch (number) {
+      case 0:
       case 300:
       case 400:
       case 500:
+        return 'VERBOSE';
       case 700:
         return 'DEBUG';
       case 800:
@@ -25,8 +27,6 @@ z.telemetry.calling.CallLogger = class CallLogger extends z.util.Logger {
       case 100:
         return 'ERROR';
     }
-
-    return '?';
   }
 
   logToMemory(args) {
@@ -39,7 +39,17 @@ z.telemetry.calling.CallLogger = class CallLogger extends z.util.Logger {
   }
 
   _print_log(args) {
-    this.logToMemory(args);
-    super._print_log(args);
+    // Use obfuscated format for call logs if possible
+    const log = args[1];
+    if (typeof message === 'object') {
+      const {message, data} = log;
+      if (typeof message === 'function' && typeof data === 'object') {
+        this.logToMemory([args[0], message(...data.obfuscated)]);
+      }
+      args[1] = message(...data.default);
+    } else {
+      this.logToMemory(args[0], log);
+    }
+    return super._print_log(args);
   }
 };

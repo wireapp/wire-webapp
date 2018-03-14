@@ -79,7 +79,6 @@ z.calling.CallingRepository = class CallingRepository {
 
     // Telemetry
     this.telemetry = new z.telemetry.calling.CallTelemetry();
-    this.messageLog = [];
 
     // Media Handler
     this.mediaDevicesHandler = this.mediaRepository.devices_handler;
@@ -1135,7 +1134,17 @@ z.calling.CallingRepository = class CallingRepository {
       .then(callEntity => {
         const mediaType = this._getMediaTypeFromProperties(properties);
         const conversationName = callEntity.conversationEntity.display_name();
-        this.logger.info(`Incoming '${mediaType}' call in conversation '${conversationName}'`, callEntity);
+
+        this.logger.info(
+          {
+            data: {
+              default: [mediaType, conversationName],
+              obfuscated: [mediaType, conversationId],
+            },
+            message: z.util.format_string`Incoming '${0}' call in conversation '${1}'`,
+          },
+          callEntity
+        );
 
         callEntity.direction = z.calling.enum.CALL_STATE.INCOMING;
         callEntity.setRemoteVersion(callMessageEntity);
@@ -1179,7 +1188,18 @@ z.calling.CallingRepository = class CallingRepository {
     return this._createCall(callMessageEntity, this.userRepository.self()).then(callEntity => {
       const mediaType = this._getMediaTypeFromProperties(properties);
       const conversationName = callEntity.conversationEntity.display_name();
-      this.logger.info(`Outgoing '${mediaType}' call in conversation '${conversationName}'`, callEntity);
+      const conversationId = callEntity.conversationEntity.id;
+
+      this.logger.info(
+        {
+          data: {
+            default: [mediaType, conversationName],
+            obfuscated: [mediaType, conversationId],
+          },
+          message: z.util.format_string`Outgoing '${0}' call in conversation '${1}'`,
+        },
+        callEntity
+      );
 
       callEntity.direction = z.calling.enum.CALL_STATE.OUTGOING;
       callEntity.state(z.calling.enum.CALL_STATE.OUTGOING);
@@ -1373,17 +1393,6 @@ z.calling.CallingRepository = class CallingRepository {
   //##############################################################################
   // Logging
   //##############################################################################
-
-  /**
-   * Print the call message log.
-   * @returns {undefined} No return value
-   */
-  printLog() {
-    this.logger.force_log(`Call message log contains '${this.messageLog.length}' events`, this.messageLog);
-    this.messageLog.forEach(({date, log, message}) => {
-      this.logger.force_log(`${date} - ${log}`, message);
-    });
-  }
 
   /**
    * Report a call for call analysis.
