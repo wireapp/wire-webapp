@@ -60,7 +60,7 @@ z.storage.StorageService = class StorageService {
    */
   init(userId = this.userId) {
     return new Promise((resolve, reject) => {
-      const isPermanent = z.util.StorageUtil.get_value(z.storage.StorageKey.AUTH.PERSIST);
+      const isPermanent = z.util.StorageUtil.getValue(z.storage.StorageKey.AUTH.PERSIST);
       const clientType = isPermanent ? z.client.ClientType.PERMANENT : z.client.ClientType.TEMPORARY;
 
       this.userId = userId;

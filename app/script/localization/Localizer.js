@@ -27,10 +27,10 @@ class Localizer {
     const DEFAULT_LOCALE = 'en';
     const query_param = z.util.get_url_parameter(z.auth.URLParameter.LOCALE);
     const current_browser_locale = navigator.language.substr(0, 2);
-    let stored_locale = z.util.StorageUtil.get_value(z.storage.StorageKey.LOCALIZATION.LOCALE);
+    let stored_locale = z.util.StorageUtil.getValue(z.storage.StorageKey.LOCALIZATION.LOCALE);
 
     if (query_param) {
-      stored_locale = z.util.StorageUtil.set_value(z.storage.StorageKey.LOCALIZATION.LOCALE, query_param);
+      stored_locale = z.util.StorageUtil.setValue(z.storage.StorageKey.LOCALIZATION.LOCALE, query_param);
     }
 
     this.locale = stored_locale || current_browser_locale || DEFAULT_LOCALE;

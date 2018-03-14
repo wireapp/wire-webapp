@@ -441,8 +441,8 @@ z.viewModel.AuthViewModel = class AuthViewModel {
   _login_from_teams() {
     this.pending_server_request(true);
 
-    z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.PERSIST, true);
-    z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.SHOW_LOGIN, true);
+    z.util.StorageUtil.setValue(z.storage.StorageKey.AUTH.PERSIST, true);
+    z.util.StorageUtil.setValue(z.storage.StorageKey.AUTH.SHOW_LOGIN, true);
 
     this.auth.repository
       .getAccessToken()

@@ -23,15 +23,15 @@ window.z = window.z || {};
 window.z.util = z.util || {};
 
 z.util.StorageUtil = {
-  get_value: function(key) {
+  getValue: function(key) {
     return amplify.store(key);
   },
-  reset_value: function(key) {
-    return z.util.StorageUtil.set_value(key, null);
+  resetValue: function(key) {
+    return z.util.StorageUtil.setValue(key, null);
   },
-  set_value: function(key, value, seconds_to_expire) {
-    if (seconds_to_expire) {
-      return amplify.store(key, value, {expires: seconds_to_expire * 1000});
+  setValue: function(key, value, secondsToExpire) {
+    if (secondsToExpire) {
+      return amplify.store(key, value, {expires: secondsToExpire * 1000});
     }
     return amplify.store(key, value);
   },

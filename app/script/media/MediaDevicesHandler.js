@@ -79,11 +79,9 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
    * @returns {undefined} No return value
    */
   _set_current_devices() {
-    this.current_device_id.audio_input(z.util.StorageUtil.get_value(z.media.MediaDeviceType.AUDIO_INPUT) || 'default');
-    this.current_device_id.audio_output(
-      z.util.StorageUtil.get_value(z.media.MediaDeviceType.AUDIO_OUTPUT) || 'default'
-    );
-    this.current_device_id.video_input(z.util.StorageUtil.get_value(z.media.MediaDeviceType.VIDEO_INPUT));
+    this.current_device_id.audio_input(z.util.StorageUtil.getValue(z.media.MediaDeviceType.AUDIO_INPUT) || 'default');
+    this.current_device_id.audio_output(z.util.StorageUtil.getValue(z.media.MediaDeviceType.AUDIO_OUTPUT) || 'default');
+    this.current_device_id.video_input(z.util.StorageUtil.getValue(z.media.MediaDeviceType.VIDEO_INPUT));
 
     if (!this.current_device_id.video_input() && this.available_devices.video_input().length) {
       const default_device_index = this.available_devices.video_input().length - 1;
@@ -137,7 +135,7 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
     });
 
     this.current_device_id.audio_input.subscribe(media_device_id => {
-      z.util.StorageUtil.set_value(z.media.MediaDeviceType.AUDIO_INPUT, media_device_id);
+      z.util.StorageUtil.setValue(z.media.MediaDeviceType.AUDIO_INPUT, media_device_id);
       if (media_device_id && this.media_repository.stream_handler.local_media_stream()) {
         this.media_repository.stream_handler.replace_input_source(z.media.MediaType.AUDIO);
         this._update_current_index_from_id(z.media.MediaDeviceType.AUDIO_INPUT, media_device_id);
@@ -145,7 +143,7 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
     });
 
     this.current_device_id.audio_output.subscribe(media_device_id => {
-      z.util.StorageUtil.set_value(z.media.MediaDeviceType.AUDIO_OUTPUT, media_device_id);
+      z.util.StorageUtil.setValue(z.media.MediaDeviceType.AUDIO_OUTPUT, media_device_id);
       if (media_device_id) {
         this.media_repository.element_handler.switch_media_element_output(media_device_id);
         this._update_current_index_from_id(z.media.MediaDeviceType.AUDIO_OUTPUT, media_device_id);
@@ -164,7 +162,7 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
     });
 
     this.current_device_id.video_input.subscribe(media_device_id => {
-      z.util.StorageUtil.set_value(z.media.MediaDeviceType.VIDEO_INPUT, media_device_id);
+      z.util.StorageUtil.setValue(z.media.MediaDeviceType.VIDEO_INPUT, media_device_id);
       if (
         media_device_id &&
         this.media_repository.stream_handler.local_media_stream() &&

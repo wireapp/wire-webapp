@@ -106,7 +106,7 @@ z.viewModel.content.EmojiInputViewModel = class EmojiInputViewModel {
 
     this.emoji_div = $(`<div class='${emoji_div_class}' />`);
     this.emoji_start_pos = -1;
-    this.emoji_usage_count = z.util.StorageUtil.get_value(z.storage.StorageKey.CONVERSATION.EMOJI_USAGE_COUNT) || {};
+    this.emoji_usage_count = z.util.StorageUtil.getValue(z.storage.StorageKey.CONVERSATION.EMOJI_USAGE_COUNT) || {};
 
     this.should_replace_inline_emoji = repositories.properties.getPreference(
       z.properties.PROPERTIES_TYPE.EMOJI.REPLACE_INLINE
@@ -450,7 +450,7 @@ z.viewModel.content.EmojiInputViewModel = class EmojiInputViewModel {
 
   _inc_usage_count(emoji_name) {
     this.emoji_usage_count[emoji_name] = this._get_usage_count(emoji_name) + 1;
-    z.util.StorageUtil.set_value(z.storage.StorageKey.CONVERSATION.EMOJI_USAGE_COUNT, this.emoji_usage_count);
+    z.util.StorageUtil.setValue(z.storage.StorageKey.CONVERSATION.EMOJI_USAGE_COUNT, this.emoji_usage_count);
   }
 
   _escape_regexp(str) {
