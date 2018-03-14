@@ -113,15 +113,15 @@ z.viewModel.content.CollectionDetailsViewModel = class CollectionDetailsViewMode
     }
 
     // We passed today
-    const isSameDay = moment(messageEntity.timestamp()).is_same_day(this.lastMessageTimestamp);
-    const wasToday = moment(this.lastMessageTimestamp).is_today();
+    const isSameDay = moment(messageEntity.timestamp()).isSameDay(this.lastMessageTimestamp);
+    const wasToday = moment(this.lastMessageTimestamp).isToday();
     if (!isSameDay && wasToday) {
       this.lastMessageTimestamp = messageEntity.timestamp();
       return true;
     }
 
     // We passed the month
-    const isSameMonth = moment(messageEntity.timestamp()).is_same_month(this.lastMessageTimestamp);
+    const isSameMonth = moment(messageEntity.timestamp()).isSameMonth(this.lastMessageTimestamp);
     if (!isSameMonth) {
       this.lastMessageTimestamp = messageEntity.timestamp();
       return true;
@@ -130,10 +130,10 @@ z.viewModel.content.CollectionDetailsViewModel = class CollectionDetailsViewMode
 
   getTitleForHeader(messageEntity) {
     const messageDate = moment(messageEntity.timestamp());
-    if (messageDate.is_today()) {
+    if (messageDate.isToday()) {
       return z.l10n.text(z.string.conversationToday);
     }
 
-    return messageDate.is_current_year() ? messageDate.format('MMMM') : messageDate.format('MMMM Y');
+    return messageDate.isCurrentYear() ? messageDate.format('MMMM') : messageDate.format('MMMM Y');
   }
 };
