@@ -37,7 +37,7 @@ z.util.Statistics = {
    * @param {number} [average] - Average value
    * @returns {undefined} Standard deviation
    */
-  standard_deviation: function(values, average) {
+  standardDeviation: function(values, average) {
     if (!average) {
       average = z.util.Statistics.average(values);
     }
