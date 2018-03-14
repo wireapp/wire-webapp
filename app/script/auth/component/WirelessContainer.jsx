@@ -47,11 +47,11 @@ export const WirelessContainer = ({
         }}
       >
         <div style={{margin: '16px 16px', textAlign: 'center', width: '100%'}}>
-          <Link href={EXTERNAL_ROUTE.WIRE_PRIVACY_POLICY} style={{fontSize: '16px'}} textTransform="none" bold={false}>
+          <Link href={EXTERNAL_ROUTE.WIRE_PRIVACY_POLICY} style={{fontSize: '16px'}} textTransform="none" bold={false} data-uie-name="go-privacy">
             <FormattedHTMLMessage style={{textAlign: 'center'}} {...cookiePolicyStrings.bannerText} />
           </Link>
         </div>
-        <div onClick={onCookiePolicyBannerClose} style={{margin: '20px'}}>
+        <div onClick={onCookiePolicyBannerClose} style={{margin: '20px'}} data-uie-name="do-close-cookie-banner">
           <CloseIcon />
         </div>
       </Header>
