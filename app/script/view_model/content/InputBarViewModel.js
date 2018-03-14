@@ -200,7 +200,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   }
 
   cancelMessageEditing() {
-    this.emojiInput.remove_emoji_popup();
+    this.emojiInput.removeEmojiPopup();
 
     if (this.editMessageEntity()) {
       this.editMessageEntity().isEditing(false);
@@ -335,7 +335,9 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   }
 
   onInputKeyDown(data, keyboardEvent) {
-    if (!this.emojiInput.on_input_key_down(data, keyboardEvent)) {
+    const inputHandledByEmoji = this.emojiInput.onInputKeyDown(data, keyboardEvent);
+
+    if (!inputHandledByEmoji) {
       switch (keyboardEvent.key) {
         case z.util.KeyboardUtil.KEY.ARROW_UP: {
           if (!this.input().length) {
@@ -371,7 +373,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   }
 
   onInputKeyUp(data, keyboardEvent) {
-    this.emojiInput.on_input_key_up(data, keyboardEvent);
+    this.emojiInput.onInputKeyUp(data, keyboardEvent);
   }
 
   removedFromView() {
