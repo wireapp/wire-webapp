@@ -23,170 +23,166 @@ window.z = window.z || {};
 window.z.util = z.util || {};
 
 z.util.DebugUtil = class DebugUtil {
-  constructor(calling_repository, conversation_repository, user_repository) {
-    this.calling_repository = calling_repository;
-    this.conversation_repository = conversation_repository;
-    this.user_repository = user_repository;
+  constructor(callingRepository, conversationRepository, userRepository) {
+    this.callingRepository = callingRepository;
+    this.conversationRepository = conversationRepository;
+    this.userRepository = userRepository;
     this.logger = new z.util.Logger('z.util.DebugUtil', z.config.LOGGER.OPTIONS);
   }
 
-  block_all_connections() {
-    const block_users = wire.app.repository.user.users().map(user_et => this.user_repository.blockUser(user_et));
-    return Promise.all(block_users);
+  blockAllConnections() {
+    const blockUsers = wire.app.repository.user.users().map(user_et => this.userRepository.blockUser(user_et));
+    return Promise.all(blockUsers);
   }
 
-  break_session(user_id, client_id) {
-    const session_id = `${user_id}@${client_id}`;
+  breakSession(userId, clientId) {
+    const sessionId = `${userId}@${clientId}`;
     return wire.app.repository.cryptography.cryptobox
-      .session_load(session_id)
-      .then(cryptobox_session => {
-        cryptobox_session.session.session_states = {};
+      .session_load(sessionId)
+      .then(cryptoboxSession => {
+        cryptoboxSession.session.session_states = {};
 
         const record = {
           created: Date.now(),
-          id: session_id,
-          serialised: cryptobox_session.session.serialise(),
+          id: sessionId,
+          serialised: cryptoboxSession.session.serialise(),
           version: 'broken_by_qa',
         };
 
         return wire.app.repository.storage.storageService.save(
           z.storage.StorageService.OBJECT_STORE.SESSIONS,
-          session_id,
+          sessionId,
           record
         );
       })
-      .then(() => this.logger.log(`Corrupted Session ID '${session_id}'`));
+      .then(() => this.logger.log(`Corrupted Session ID '${sessionId}'`));
   }
 
-  get_event_info(event) {
-    const debug_information = {event};
+  getEventInfo(event) {
+    const debugInformation = {event};
 
-    return this.conversation_repository
+    return this.conversationRepository
       .get_conversation_by_id(event.conversation)
       .then(conversation_et => {
-        debug_information.conversation = conversation_et;
-        return this.user_repository.get_user_by_id(event.from);
+        debugInformation.conversation = conversation_et;
+        return this.userRepository.get_user_by_id(event.from);
       })
       .then(user_et => {
-        debug_information.user = user_et;
-        const log_message = `Hey ${this.user_repository.self().name()}, this is for you:`;
-        this.logger.warn(log_message, debug_information);
-        this.logger.warn(`Conversation: ${debug_information.conversation.name()}`, debug_information.conversation);
-        this.logger.warn(`From: ${debug_information.user.name()}`, debug_information.user);
-        return debug_information;
+        debugInformation.user = user_et;
+        const logMessage = `Hey ${this.userRepository.self().name()}, this is for you:`;
+        this.logger.warn(logMessage, debugInformation);
+        this.logger.warn(`Conversation: ${debugInformation.conversation.name()}`, debugInformation.conversation);
+        this.logger.warn(`From: ${debugInformation.user.name()}`, debugInformation.user);
+        return debugInformation;
       });
   }
 
-  get_serialised_session(session_id) {
-    return wire.app.repository.storage.storageService.load('sessions', session_id).then(record => {
+  getSerialisedSession(sessionId) {
+    return wire.app.repository.storage.storageService.load('sessions', sessionId).then(record => {
       record.serialised = z.util.array_to_base64(record.serialised);
       return record;
     });
   }
 
-  get_serialised_identity() {
+  getSerialisedIdentity() {
     return wire.app.repository.storage.storageService.load('keys', 'local_identity').then(record => {
       record.serialised = z.util.array_to_base64(record.serialised);
       return record;
     });
   }
 
-  get_notification_from_stream(notification_id, notification_id_since) {
-    const client_id = wire.app.repository.client.current_client().id;
+  getNotificationFromStream(notificationId, notificationIdSince) {
+    const clientId = wire.app.repository.client.current_client().id;
 
-    const _got_notifications = ({has_more, notifications}) => {
-      const matching_notifications = notifications.filter(notification => notification.id === notification_id);
-      if (matching_notifications.length) {
-        return matching_notifications[0];
+    const _gotNotifications = ({hasMore, notifications}) => {
+      const matchingNotifications = notifications.filter(notification => notification.id === notificationId);
+      if (matchingNotifications.length) {
+        return matchingNotifications[0];
       }
 
-      if (has_more) {
-        const last_notification = notifications[notifications.length - 1];
-        return this.get_notification_from_stream(notification_id, last_notification.id);
+      if (hasMore) {
+        const lastNotification = notifications[notifications.length - 1];
+        return this.getNotificationFromStream(notificationId, lastNotification.id);
       }
-      this.logger.log(`Notification '${notification_id}' was not found in encrypted notification stream`);
+      this.logger.log(`Notification '${notificationId}' was not found in encrypted notification stream`);
     };
 
-    return wire.app.service.notification
-      .getNotifications(client_id, notification_id_since, 10000)
-      .then(_got_notifications);
+    return wire.app.service.notification.getNotifications(clientId, notificationIdSince, 10000).then(_gotNotifications);
   }
 
-  get_notifications_from_stream(remote_user_id, remote_client_id, matching_notifications = [], notification_id_since) {
-    const local_client_id = wire.app.repository.client.current_client().id;
-    const local_user_id = wire.app.repository.user.self().id;
+  getNotificationsFromStream(remoteUserId, remoteClientId, matchingNotifications = [], notificationIdSince) {
+    const localClientId = wire.app.repository.client.current_client().id;
+    const localUserId = wire.app.repository.user.self().id;
 
-    const _got_notifications = ({has_more, notifications}) => {
-      const additional_notifications = !remote_user_id
+    const _gotNotifications = ({hasMore, notifications}) => {
+      const additionalNotifications = !remoteUserId
         ? notifications
         : notifications.filter(notification => {
             const {payload} = notification;
             for (const {data, from} of payload) {
-              if (data && [local_user_id, remote_user_id].includes(from)) {
+              if (data && [localUserId, remoteUserId].includes(from)) {
                 const {sender, recipient} = data;
-                const incoming_event = sender === remote_client_id && recipient === local_client_id;
-                const outgoing_event = sender === local_client_id && recipient === remote_client_id;
+                const incoming_event = sender === remoteClientId && recipient === localClientId;
+                const outgoing_event = sender === localClientId && recipient === remoteClientId;
                 return incoming_event || outgoing_event;
               }
             }
             return false;
           });
 
-      matching_notifications = matching_notifications.concat(additional_notifications);
+      matchingNotifications = matchingNotifications.concat(additionalNotifications);
 
-      if (has_more) {
-        const last_notification = notifications[notifications.length - 1];
-        return this.get_notifications_from_stream(
-          remote_user_id,
-          remote_client_id,
-          matching_notifications,
-          last_notification.id
+      if (hasMore) {
+        const lastNotification = notifications[notifications.length - 1];
+        return this.getNotificationsFromStream(
+          remoteUserId,
+          remoteClientId,
+          matchingNotifications,
+          lastNotification.id
         );
       }
 
-      if (remote_user_id) {
+      if (remoteUserId) {
         this.logger.log(
-          `Found '${
-            matching_notifications.length
-          }' notifications between '${local_client_id}' and '${remote_client_id}'`,
-          matching_notifications
+          `Found '${matchingNotifications.length}' notifications between '${localClientId}' and '${remoteClientId}'`,
+          matchingNotifications
         );
       } else {
-        this.logger.log(`Found '${matching_notifications.length}' notifications`, matching_notifications);
+        this.logger.log(`Found '${matchingNotifications.length}' notifications`, matchingNotifications);
       }
-      return matching_notifications;
+      return matchingNotifications;
     };
 
-    const client_scope = remote_user_id === local_user_id ? undefined : local_client_id;
+    const clientScope = remoteUserId === localUserId ? undefined : localClientId;
     return wire.app.service.notification
-      .getNotifications(client_scope, notification_id_since, 10000)
-      .then(_got_notifications);
+      .getNotifications(clientScope, notificationIdSince, 10000)
+      .then(_gotNotifications);
   }
 
-  get_objects_for_decryption_errors(session_id, notification_id) {
+  getObjectsForDecryptionErrors(sessionId, notificationId) {
     return Promise.all([
-      this.get_notification_from_stream(notification_id.toLowerCase()),
-      this.get_serialised_identity(),
-      this.get_serialised_session(session_id.toLowerCase()),
-    ]).then(resolve_array => {
+      this.getNotificationFromStream(notificationId.toLowerCase()),
+      this.getSerialisedIdentity(),
+      this.getSerialisedSession(sessionId.toLowerCase()),
+    ]).then(resolveArray => {
       return JSON.stringify({
-        identity: resolve_array[1],
-        notification: resolve_array[0],
-        session: resolve_array[2],
+        identity: resolveArray[1],
+        notification: resolveArray[0],
+        session: resolveArray[2],
       });
     });
   }
 
-  get_info_for_client_decryption_errors(remote_user_id, remote_client_id) {
+  getInfoForClientDecryptionErrors(remoteUserId, remoteClientId) {
     return Promise.all([
-      this.get_notifications_from_stream(remote_user_id, remote_client_id),
-      this.get_serialised_identity(),
-      this.get_serialised_session(`${remote_user_id}@${remote_client_id}`),
-    ]).then(resolve_array => {
+      this.getNotificationsFromStream(remoteUserId, remoteClientId),
+      this.getSerialisedIdentity(),
+      this.getSerialisedSession(`${remoteUserId}@${remoteClientId}`),
+    ]).then(resolveArray => {
       return JSON.stringify({
-        identity: resolve_array[1],
-        notifications: resolve_array[0],
-        session: resolve_array[2],
+        identity: resolveArray[1],
+        notifications: resolveArray[0],
+        session: resolveArray[2],
       });
     });
   }
@@ -195,11 +191,11 @@ z.util.DebugUtil = class DebugUtil {
    * Print call log to console.
    * @returns {undefined} No return value
    */
-  log_call_messages() {
-    this.calling_repository.printLog();
+  logCallMessages() {
+    this.callingRepository.printLog();
   }
 
-  log_connection_status() {
+  logConnectionStatus() {
     this.logger.log('Online Status');
     this.logger.log(`-- Browser online: ${window.navigator.onLine}`);
     this.logger.log(`-- IndexedDB open: ${wire.app.repository.storage.storageService.db.isOpen()}`);
