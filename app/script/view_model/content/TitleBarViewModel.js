@@ -123,9 +123,7 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
   }
 
   onMouseup() {
-    if (this.isMoved && this.isDragged) {
-      this.preventPanelOpen = true;
-    }
+    this.preventPanelOpen = this.isMoved && this.isDragged;
     this.isMoved = false;
     this.isDragged = false;
   }
