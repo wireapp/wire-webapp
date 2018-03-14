@@ -731,7 +731,13 @@ z.calling.entities.CallEntity = class CallEntity {
           }
         }
 
-        this.logger.info(`Removed call participant '${participantEntity.user.name()}'`);
+        this.logger.info({
+          data: {
+            default: [participantEntity.user.name()],
+            obfuscated: [participantEntity.user.id],
+          },
+          message: `Removed call participant '${0}'`,
+        });
         return this;
       })
       .catch(error => {
@@ -829,7 +835,16 @@ z.calling.entities.CallEntity = class CallEntity {
 
         this.participants.push(participantEntity);
 
-        this.logger.info(`Adding call participant '${userEntity.name()}'`, participantEntity);
+        this.logger.info(
+          {
+            data: {
+              default: [userEntity.name()],
+              obfuscated: [userEntity.id],
+            },
+            message: z.util.format_string`Adding call participant '${0}'`,
+          },
+          participantEntity
+        );
         return this._updateParticipantState(participantEntity, negotiate, callMessageEntity);
       });
     });
@@ -849,7 +864,16 @@ z.calling.entities.CallEntity = class CallEntity {
         participantEntity.verifyClientId(callMessageEntity.clientId);
       }
 
-      this.logger.info(`Updating call participant '${participantEntity.user.name()}'`, callMessageEntity);
+      this.logger.info(
+        {
+          data: {
+            default: [participantEntity.user.name()],
+            obfuscated: [participantEntity.user.id],
+          },
+          message: z.util.format_string`Updating call participant '${0}'`,
+        },
+        callMessageEntity
+      );
       return this._updateParticipantState(participantEntity, negotiate, callMessageEntity);
     });
   }
@@ -949,7 +973,14 @@ z.calling.entities.CallEntity = class CallEntity {
         .forEach((participantEntity, index) => {
           const panning = this._calculatePanning(index, this.participants().length);
 
-          this.logger.debug(`Panning for '${participantEntity.user.name()}' recalculated to '${panning}'`);
+          this.logger.debug({
+            data: {
+              default: [participantEntity.user.name(), panning],
+              obfuscated: [participantEntity.user.id, panning],
+            },
+            message: z.util.format_string`Panning for '${0}' recalculated to '${1}'`,
+          });
+
           participantEntity.panning(panning);
         });
 
