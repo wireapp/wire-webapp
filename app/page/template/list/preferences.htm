@@ -1,36 +1,32 @@
 <div id="preferences" class="left-list left-list-preferences" data-bind="with: $root.preferences">
   <div class="left-list-header">
-    <span class="left-list-header-text" data-bind="l10n_text: z.string.preferences_headline"></span>
-    <span class="left-list-header-close-button button-icon-large icon-close" data-bind="click: click_on_close_preferences, l10n_tooltip: z.string.tooltip_search_close" data-uie-name="do-close-preferences"></span>
+    <span class="left-list-header-text" data-bind="l10n_text: z.string.preferencesHeadline"></span>
+    <span class="left-list-header-close-button button-icon-large icon-close" data-bind="click: clickOnClosePreferences, l10n_tooltip: z.string.tooltipSearchClose" data-uie-name="do-close-preferences"></span>
   </div>
   <div class="left-list-center">
     <ul class="left-list-items preferences-list-items">
-      <li class="left-list-item left-list-item-clickable" data-bind="click: click_on_account, css: {'text-theme': selected_account, 'svg-theme': selected_account}" data-uie-name="go-account">
-        <div class="left-column">
-            <svg width="16" height="16" viewBox="0 0 16 16">
-              <path class="fill-theme" d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16zM2 8c0 1.5.56 2.88 1.47 3.94l.08-.46c.15-.82.93-1.48 1.76-1.48h5.38c.83 0 1.61.67 1.76 1.48l.08.46A6 6 0 1 0 2 8zm6 1a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"></path>
-            </svg>
-        </div>
-        <div class="center-column" data-bind="l10n_text: z.string.preferences_account"></div>
+      <li class="left-list-item left-list-item-clickable" data-bind="click: clickOnAccount, css: {'text-theme': selectedAccount, 'svg-theme': selectedAccount}" data-uie-name="go-account">
+        <profile-icon class="left-column"></profile-icon>
+        <div class="center-column" data-bind="l10n_text: z.string.preferencesAccount"></div>
       </li>
-      <li class="left-list-item left-list-item-clickable" data-bind="click: click_on_devices, css: {'text-theme': selected_devices}" data-uie-name="go-devices">
-        <div class="left-column icon-devices"></div>
-        <div class="center-column" data-bind="l10n_text: z.string.preferences_devices"></div>
+      <li class="left-list-item left-list-item-clickable" data-bind="click: clickOnDevices, css: {'text-theme': selectedDevices}" data-uie-name="go-devices">
+        <devices-icon class="left-column"></devices-icon>
+        <div class="center-column" data-bind="l10n_text: z.string.preferencesDevices"></div>
       </li>
-      <li class="left-list-item left-list-item-clickable" data-bind="click: click_on_options, css: {'text-theme': selected_options}" data-uie-name="go-options">
+      <li class="left-list-item left-list-item-clickable" data-bind="click: clickOnOptions, css: {'text-theme': selectedOptions}" data-uie-name="go-options">
         <div class="left-column icon-options"></div>
-        <div class="center-column" data-bind="l10n_text: z.string.preferences_options"></div>
+        <div class="center-column" data-bind="l10n_text: z.string.preferencesOptions"></div>
       </li>
       <!-- ko if: z.calling.CallingRepository.supportsCalling -->
-        <li class="left-list-item left-list-item-clickable" data-bind="click: click_on_av, css: {'text-theme': selected_av}" data-uie-name="go-audio-video">
+        <li class="left-list-item left-list-item-clickable" data-bind="click: clickOnAV, css: {'text-theme': selectedAV}" data-uie-name="go-audio-video">
           <div class="left-column icon-av"></div>
-          <div class="center-column" data-bind="l10n_text: z.string.preferences_av"></div>
+          <div class="center-column" data-bind="l10n_text: z.string.preferencesAV"></div>
         </li>
       <!-- /ko -->
       <!-- ko ifnot: z.util.Environment.desktop -->
-        <li class="left-list-item left-list-item-clickable" data-bind="click: click_on_about, css: {'text-theme': selected_about}" data-uie-name="go-about">
+        <li class="left-list-item left-list-item-clickable" data-bind="click: clickOnAbout, css: {'text-theme': selectedAbout}" data-uie-name="go-about">
           <div class="left-column icon-wire"></div>
-          <div class="center-column" data-bind="l10n_text: z.string.preferences_about"></div>
+          <div class="center-column" data-bind="l10n_text: z.string.preferencesAbout"></div>
         </li>
       <!-- /ko -->
     </ul>

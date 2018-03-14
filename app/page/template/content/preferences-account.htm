@@ -1,5 +1,5 @@
 <div id="preferences-account" class="preferences-page preferences-account" data-bind="with: $root.preferencesAccount, removed_from_view: $root.preferencesAccount.removed_from_view">
-  <div class="preferences-titlebar" data-bind="l10n_text: z.string.preferences_account"></div>
+  <div class="preferences-titlebar" data-bind="l10n_text: z.string.preferencesAccount"></div>
   <div class="preferences-content-wrapper">
     <div class="preferences-content" data-bind="antiscroll">
       <section class="preferences-section preferences-section-account-profile">
@@ -7,7 +7,7 @@
           <div class="preferences-account-name-wrapper">
             <input class="preferences-account-name preferences-account-input"
                    id="name" type="text"
-                   data-bind="value: name, event: {blur: reset_name_input}, enter: change_name, l10n_placeholder: z.string.preferences_account_username_placeholder"
+                   data-bind="value: name, event: {blur: reset_name_input}, enter: change_name, l10n_placeholder: z.string.preferencesAccountUsernamePlaceholder"
                    data-uie-name="enter-name"
                    maxlength="64"
                    spellcheck="false" />
@@ -32,15 +32,15 @@
             <span class="preferences-account-input-icon" data-bind="css: username_saved() ? 'checkmark' : 'preferences-account-input-icon-edit'"></span>
             <!-- ko ifnot: username_error() -->
               <div class="preferences-account-username-hint text-graphite font-size-xs"
-                   data-bind="l10n_text: z.string.preferences_account_username_hint"></div>
+                   data-bind="l10n_text: z.string.preferencesAccountUsernameHint"></div>
             <!-- /ko -->
             <!-- ko if: username_error() === 'available' -->
               <div class="preferences-account-username-error font-size-xs"
-                   data-bind="l10n_text: z.string.preferences_account_username_available"></div>
+                   data-bind="l10n_text: z.string.preferencesAccountUsernameAvailable"></div>
             <!-- /ko -->
             <!-- ko if: username_error() === 'taken' -->
               <div class="preferences-account-username-error font-size-xs"
-                   data-bind="l10n_text: z.string.preferences_account_username_error_taken, css: {'text-red': submitted_username() === entered_username()}"></div>
+                   data-bind="l10n_text: z.string.preferencesAccountUsernameErrorTaken, css: {'text-red': submitted_username() === entered_username()}"></div>
             <!-- /ko -->
           </div>
           <!-- ko if: is_team() -->
@@ -51,8 +51,8 @@
           <accent-color-picker class="preferences-account-accent-color preferences-section-account-space-before" params="user: self_user(), selected: change_accent_color" data-uie-name="enter-accent-color"></accent-color-picker>
         </div>
 
-        <label class="preferences-account-picture-button" for="self-upload-file-input" data-bind="l10n_tooltip: z.string.tooltip_preferences_picture">
-          <participant-avatar params="participant: self_user(), size: z.components.ParticipantAvatar.SIZE.X_LARGE"></participant-avatar>
+        <label class="preferences-account-picture-button" for="self-upload-file-input" data-bind="l10n_tooltip: z.string.tooltipPreferencesPicture">
+          <participant-avatar params="participant: self_user, size: z.components.ParticipantAvatar.SIZE.X_LARGE"></participant-avatar>
           <input id="self-upload-file-input"
                  type="file" accept="image/jpg,image/jpeg,image/png,image/bmp"
                  data-bind="file_select: click_on_change_picture"
@@ -64,18 +64,18 @@
       <section class="preferences-section preferences-section-account-security">
         <hr class="preferences-separator">
         <!-- ko if: is_team_manager() -->
-          <div class="preferences-link text-theme" data-bind="click: click_on_manage, l10n_text: z.string.preferences_account_manage_team" data-uie-name="do-manage-team"></div>
+          <div class="preferences-link text-theme" data-bind="click: click_on_manage, l10n_text: z.string.preferencesAccountManageTeam" data-uie-name="do-manage-team"></div>
         <!-- /ko -->
-        <div class="preferences-link text-theme" data-bind="click: click_on_create, l10n_text: z.string.preferences_account_create_team" data-uie-name="do-create-team"></div>
-        <div class="preferences-link text-theme" data-bind="click: click_on_reset_password, l10n_text: z.string.preferences_account_reset_password, l10n_tooltip: z.string.tooltip_preferences_password" data-uie-name="do-reset-password"></div>
+        <div class="preferences-link text-theme" data-bind="click: click_on_create, l10n_text: z.string.preferencesAccountCreateTeam" data-uie-name="do-create-team"></div>
+        <div class="preferences-link text-theme" data-bind="click: click_on_reset_password, l10n_text: z.string.preferencesAccountResetPassword, l10n_tooltip: z.string.tooltipPreferencesPassword" data-uie-name="do-reset-password"></div>
         <!-- ko ifnot: is_team() -->
-          <div class="preferences-link text-theme" data-bind="click: click_on_delete_account, l10n_text: z.string.preferences_account_delete" data-uie-name="go-delete-account"></div>
+          <div class="preferences-link text-theme" data-bind="click: click_on_delete_account, l10n_text: z.string.preferencesAccountDelete" data-uie-name="go-delete-account"></div>
         <!-- /ko -->
       </section>
 
       <!-- ko ifnot: z.util.Environment.desktop -->
         <section class="preferences-section">
-          <div class="preferences-link text-theme" data-bind="click: click_on_logout, l10n_text: z.string.preferences_account_log_out" data-uie-name="do-logout"></div>
+          <div class="preferences-link text-theme" data-bind="click: click_on_logout, l10n_text: z.string.preferencesAccountLogOut" data-uie-name="do-logout"></div>
         </section>
       <!-- /ko -->
     </div>

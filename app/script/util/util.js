@@ -210,7 +210,7 @@ z.util.trim_file_extension = function(filename) {
 /**
  * Format bytes into a human readable string.
  * @param {number} bytes - bytes to format
- * @param {number} decimals - Number of decimals to keep
+ * @param {number} [decimals] - Number of decimals to keep
  * @returns {string} Bytes as a human readable string
  */
 z.util.format_bytes = function(bytes, decimals) {
@@ -696,11 +696,11 @@ z.util.get_unix_timestamp = function() {
 z.util.get_first_name = function(user_et, declension = z.string.Declension.NOMINATIVE) {
   if (user_et.is_me) {
     if (declension === z.string.Declension.NOMINATIVE) {
-      return z.l10n.text(z.string.conversation_you_nominative);
+      return z.l10n.text(z.string.conversationYouNominative);
     } else if (declension === z.string.Declension.DATIVE) {
-      return z.l10n.text(z.string.conversation_you_dative);
+      return z.l10n.text(z.string.conversationYouDative);
     } else if (declension === z.string.Declension.ACCUSATIVE) {
-      return z.l10n.text(z.string.conversation_you_accusative);
+      return z.l10n.text(z.string.conversationYouAccusative);
     }
   }
   return user_et.first_name();
@@ -750,28 +750,31 @@ z.util.format_time_remaining = function(time_remaining) {
 
   let title = '';
   if (moment_duration.asHours() === 1) {
-    title += `${moment_duration.hours()} ${z.l10n.text(z.string.ephememal_units_hour)}, `;
+    title += `${moment_duration.hours()} ${z.l10n.text(z.string.ephememalUnitsHour)}, `;
   } else if (moment_duration.asHours() > 1) {
-    title += `${moment_duration.hours()} ${z.l10n.text(z.string.ephememal_units_hours)}, `;
+    title += `${moment_duration.hours()} ${z.l10n.text(z.string.ephememalUnitsHours)}, `;
   }
 
   if (moment_duration.asMinutes() === 1) {
-    title += `${moment_duration.minutes()} ${z.l10n.text(z.string.ephememal_units_minute)} ${z.l10n.text(
-      z.string.and
-    )} `;
+    title += `${moment_duration.minutes()} ${z.l10n.text(z.string.ephememalUnitsMinute)} ${z.l10n.text(z.string.and)} `;
   } else if (moment_duration.asMinutes() > 1) {
-    title += `${moment_duration.minutes()} ${z.l10n.text(z.string.ephememal_units_minutes)} ${z.l10n.text(
+    title += `${moment_duration.minutes()} ${z.l10n.text(z.string.ephememalUnitsMinutes)} ${z.l10n.text(
       z.string.and
     )} `;
   }
 
   if (moment_duration.asSeconds() === 1) {
-    title += `${moment_duration.seconds()} ${z.l10n.text(z.string.ephememal_units_second)}`;
+    title += `${moment_duration.seconds()} ${z.l10n.text(z.string.ephememalUnitsSecond)}`;
   } else if (moment_duration.asSeconds() > 1) {
-    title += `${moment_duration.seconds()} ${z.l10n.text(z.string.ephememal_units_seconds)}`;
+    title += `${moment_duration.seconds()} ${z.l10n.text(z.string.ephememalUnitsSeconds)}`;
   }
 
   return title || '';
+};
+
+z.util.afterRender = callback => {
+  // https://developer.mozilla.org/en-US/Firefox/Performance_best_practices_for_Firefox_fe_engineers
+  window.requestAnimationFrame(() => window.setTimeout(callback, 0));
 };
 
 /**

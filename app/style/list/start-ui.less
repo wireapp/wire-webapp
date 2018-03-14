@@ -28,6 +28,13 @@
   &:not(left-list-is-visible) {
     .start-ui-transition-fadeout;
   }
+
+  group-list,
+  top-people {
+    & > div {
+      padding: 0 16px;
+    }
+  }
 }
 
 .start-ui-header {
@@ -62,8 +69,6 @@
   position: relative;
   overflow-y: scroll;
   overflow-x: hidden;
-  padding-left: 24px;
-  padding-right: 24px;
 }
 
 .start-ui-list-spinner {
@@ -108,19 +113,20 @@
 .start-ui-invite-people {
   position: relative;
   padding: 0;
-  margin: 0 0 -16px 0;
+  margin: 0;
   overflow: hidden;
   .left-list-item {
     height: 56px;
+    min-height: 56px;
     line-height: 56px;
   }
 
   .left-column {
-    width: 28px;
+    width: 60px;
   }
 
   .center-column {
-    margin-left: 16px;
+    margin-right: 16px;
   }
 }
 
@@ -152,7 +158,7 @@
   .label-bold-xs();
   display: block;
   line-height: 24px;
-  margin-bottom: 8px;
+  margin-left: 16px;
   margin-top: 24px;
 }
 

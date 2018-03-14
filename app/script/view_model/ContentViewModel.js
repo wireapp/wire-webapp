@@ -188,23 +188,22 @@ z.viewModel.ContentViewModel = class ContentViewModel {
 
       this.messageList.change_conversation(conversationEntity, messageEntity).then(() => {
         this._showContent(ContentViewModel.STATE.CONVERSATION);
-        this.mainViewModel.panel.participants.changeConversation(conversationEntity);
         this.previousConversation = this.conversationRepository.active_conversation();
       });
     });
   }
 
   switchContent(newContentState) {
-    const stateUnchanged = newContentState === this.state();
-    if (!stateUnchanged) {
+    const isStateChange = newContentState !== this.state();
+    if (isStateChange) {
       this._releaseContent(newContentState);
       this._showContent(this._checkContentAvailability(newContentState));
     }
   }
 
   switchPreviousContent() {
-    const stateUnchanged = this.previousState === this.state();
-    if (!stateUnchanged) {
+    const isStateChange = this.previousState !== this.state();
+    if (isStateChange) {
       const isStateRequests = this.previousState === ContentViewModel.STATE.CONNECTION_REQUESTS;
       if (isStateRequests) {
         this.switchContent(ContentViewModel.STATE.CONNECTION_REQUESTS);

@@ -173,7 +173,7 @@ describe('z.conversation.ConversationVerificationStateHandler', () => {
       conversation_ab.participating_user_ids.push(new_user.id);
       conversation_ab.participating_user_ets.push(new_user);
 
-      state_handler.onMemberJoined(conversation_ab, new_user.id);
+      state_handler.onMemberJoined(conversation_ab, [new_user.id]);
 
       expect(conversation_ab.verification_state()).toBe(z.conversation.ConversationVerificationState.DEGRADED);
       expect(conversation_ab.is_verified()).toBeFalsy();
@@ -191,7 +191,7 @@ describe('z.conversation.ConversationVerificationStateHandler', () => {
       conversation_ab.participating_user_ids.push(new_user.id);
       conversation_ab.participating_user_ets.push(new_user);
 
-      state_handler.onMemberJoined(conversation_ab, new_user.id);
+      state_handler.onMemberJoined(conversation_ab, [new_user.id]);
 
       expect(conversation_ab.verification_state()).toBe(z.conversation.ConversationVerificationState.VERIFIED);
       expect(conversation_ab.is_verified()).toBeTruthy();

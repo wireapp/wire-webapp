@@ -17,34 +17,35 @@
  *
  */
 
-.confirm {
-  .full-screen();
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  background-color: fade(#fff, 98%);
-  border-radius: 4px;
-  opacity: 0;
-  padding: @bubble-inner-padding;
-}
-
-.confirm-is-visible {
-  transition-property: opacity;
-  transition-duration: @animation-timing-slow;
-  transition-timing-function: @ease-out-quart;
-  opacity: 1;
-}
-
-.confirm-content {
-  line-height: @line-height-lg;
-
-  .headline {
-    font-weight: @font-weight-bold;
-    margin-bottom: 8px;
+.guest-options {
+  &__content {
+    padding: 32px 16px 0;
   }
 
-  .message {
-    overflow: hidden;
-    text-overflow: ellipsis;
+  &__info {
+    border-top: 1px solid fade(@graphite-dark, 8%);
+    color: @graphite;
+    font-size: @font-size-xs;
+    line-height: @line-height-sm;
+    margin: 24px 16px 16px;
+    padding-top: 16px;
+
+    &__head {
+      font-weight: @font-weight-bold;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+  }
+
+  &__link {
+    border: none;
+    display: block;
+    font-size: 16px;
+    height: 112px;
+    line-height: 24px;
+    padding: 16px;
+    resize: none;
+    width: 100%;
+    word-break: break-all;
   }
 }

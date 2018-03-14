@@ -131,7 +131,7 @@ z.viewModel.content.CollectionDetailsViewModel = class CollectionDetailsViewMode
   getTitleForHeader(messageEntity) {
     const messageDate = moment(messageEntity.timestamp());
     if (messageDate.is_today()) {
-      return z.l10n.text(z.string.conversation_today);
+      return z.l10n.text(z.string.conversationToday);
     }
 
     return messageDate.is_current_year() ? messageDate.format('MMMM') : messageDate.format('MMMM Y');

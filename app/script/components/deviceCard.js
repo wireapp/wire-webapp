@@ -59,7 +59,7 @@ z.components.DeviceCard = class DeviceCard {
   }
 
   _updateActivationLocation(locationName) {
-    const stringTemplate = z.string.preferences_devices_activated_in;
+    const stringTemplate = z.string.preferencesDevicesActivatedIn;
     const sanitizedText = z.util.StringUtil.splitAtPivotElement(stringTemplate, '{{location}}', locationName);
     this.activationLocation(sanitizedText);
   }
@@ -83,7 +83,7 @@ ko.components.register('device-card', {
       <!-- ko if: detailed -->
         <div class="label-xs device-label" data-bind="text: label"></div>
         <div class="label-xs">
-          <span data-bind="l10n_text: z.string.preferences_devices_id"></span>
+          <span data-bind="l10n_text: z.string.preferencesDevicesId"></span>
           <span data-bind="foreach: formattedId" data-uie-name="device-id"><span class="device-id-part" data-bind="text: $data"></span></span>
         </div>
         <div class="label-xs" data-bind="foreach: activationLocation"><span data-bind="css: {'preferences-devices-activated-bold': $data.isStyled}, text: $data.text">?</span></div>
@@ -92,14 +92,17 @@ ko.components.register('device-card', {
       <!-- ko ifnot: detailed -->
         <div class="label-xs">
           <span class="device-model" data-bind="text: model"></span>
-          <span class="text-graphite-dark" data-bind="visible: isCurrentClient, l10n_text: z.string.auth_limit_devices_current"></span>
+          <span class="text-graphite-dark" data-bind="visible: isCurrentClient, l10n_text: z.string.authLimitDevicesCurrent"></span>
         </div>
         <div class="text-graphite-dark label-xs">
-          <span data-bind="l10n_text: z.string.preferences_devices_id"></span>
+          <span data-bind="l10n_text: z.string.preferencesDevicesId"></span>
           <span data-bind="foreach: formattedId" data-uie-name="device-id"><span class="device-id-part" data-bind="text: $data"></span></span>
         </div>
       <!-- /ko -->
     </div>
+    <!-- ko ifnot: detailed || !click-->
+      <disclose-icon></disclose-icon>
+    <!-- /ko -->
   `,
   viewModel: {
     createViewModel(params, componentInfo) {

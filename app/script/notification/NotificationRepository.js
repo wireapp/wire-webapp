@@ -195,11 +195,11 @@ z.notification.NotificationRepository = class NotificationRepository {
    */
   _createBodyCall(messageEntity) {
     if (messageEntity.is_activation()) {
-      return z.l10n.text(z.string.notification_voice_channel_activate);
+      return z.l10n.text(z.string.notificationVoiceChannelActivate);
     }
 
     if (messageEntity.is_deactivation() && messageEntity.finished_reason === z.calling.enum.TERMINATION_REASON.MISSED) {
-      return z.l10n.text(z.string.notification_voice_channel_deactivate);
+      return z.l10n.text(z.string.notificationVoiceChannelDeactivate);
     }
   }
 
@@ -220,25 +220,25 @@ z.notification.NotificationRepository = class NotificationRepository {
     }
 
     if (messageEntity.has_asset_image()) {
-      return z.l10n.text(z.string.notification_asset_add);
+      return z.l10n.text(z.string.notificationAssetAdd);
     }
 
     if (messageEntity.has_asset_location()) {
-      return z.l10n.text(z.string.notification_shared_location);
+      return z.l10n.text(z.string.notificationSharedLocation);
     }
 
     if (messageEntity.has_asset()) {
       const [asset_et] = messageEntity.assets();
       if (asset_et.is_audio()) {
-        return z.l10n.text(z.string.notification_shared_audio);
+        return z.l10n.text(z.string.notificationSharedAudio);
       }
 
       if (asset_et.is_video()) {
-        return z.l10n.text(z.string.notification_shared_video);
+        return z.l10n.text(z.string.notificationSharedVideo);
       }
 
       if (asset_et.is_file()) {
-        return z.l10n.text(z.string.notification_shared_file);
+        return z.l10n.text(z.string.notificationSharedFile);
       }
     }
   }
@@ -252,7 +252,7 @@ z.notification.NotificationRepository = class NotificationRepository {
    */
   _createBodyConversationRename(messageEntity) {
     const substitutions = {name: messageEntity.name, user: messageEntity.user().first_name()};
-    return z.l10n.text(z.string.notification_conversation_rename, substitutions);
+    return z.l10n.text(z.string.notificationConversationRename, substitutions);
   }
 
   /**
@@ -267,13 +267,18 @@ z.notification.NotificationRepository = class NotificationRepository {
     if (updatedOneParticipant) {
       const [otherUserEntity] = messageEntity.userEntities();
       const nameOfJoinedUser = z.util.get_first_name(otherUserEntity, z.string.Declension.ACCUSATIVE);
-      const substitutions = {user1: messageEntity.user().first_name(), user2: nameOfJoinedUser};
 
-      return z.l10n.text(z.string.notification_member_join_one, substitutions);
+      const senderJoined = messageEntity.user().id === otherUserEntity.id;
+      if (senderJoined) {
+        return z.l10n.text(z.string.notificationMemberJoinSelf, nameOfJoinedUser);
+      }
+
+      const substitutions = {user1: messageEntity.user().first_name(), user2: nameOfJoinedUser};
+      return z.l10n.text(z.string.notificationMemberJoinOne, substitutions);
     }
 
     const substitutions = {number: messageEntity.userIds().length, user: messageEntity.user().first_name()};
-    return z.l10n.text(z.string.notification_member_join_many, substitutions);
+    return z.l10n.text(z.string.notificationMemberJoinMany, substitutions);
   }
 
   /**
@@ -287,7 +292,7 @@ z.notification.NotificationRepository = class NotificationRepository {
   _createBodyMemberLeave(messageEntity) {
     const updatedOneParticipant = messageEntity.userEntities().length === 1;
     if (updatedOneParticipant && !messageEntity.remoteUserEntities().length) {
-      return z.l10n.text(z.string.notification_member_leave_removed_you, messageEntity.user().first_name());
+      return z.l10n.text(z.string.notificationMemberLeaveRemovedYou, messageEntity.user().first_name());
     }
   }
 
@@ -315,13 +320,13 @@ z.notification.NotificationRepository = class NotificationRepository {
         }
         break;
       case z.message.SystemMessageType.CONNECTION_ACCEPTED:
-        return z.l10n.text(z.string.notification_connection_accepted);
+        return z.l10n.text(z.string.notificationConnectionAccepted);
       case z.message.SystemMessageType.CONNECTION_CONNECTED:
-        return z.l10n.text(z.string.notification_connection_connected);
+        return z.l10n.text(z.string.notificationConnectionConnected);
       case z.message.SystemMessageType.CONNECTION_REQUEST:
-        return z.l10n.text(z.string.notification_connection_request);
+        return z.l10n.text(z.string.notificationConnectionRequest);
       case z.message.SystemMessageType.CONVERSATION_CREATE:
-        return z.l10n.text(z.string.notification_conversation_create, messageEntity.user().first_name());
+        return z.l10n.text(z.string.notificationConversationCreate, messageEntity.user().first_name());
       default:
         const conversationId = this._getConversationId(connectionEntity, conversationEntity);
         const message = `No notification for '${messageEntity.id} in '${conversationId}'.`;
@@ -335,7 +340,7 @@ z.notification.NotificationRepository = class NotificationRepository {
    * @returns {string} Notification message body
    */
   _createBodyObfuscated() {
-    return z.l10n.text(z.string.notification_obfuscated);
+    return z.l10n.text(z.string.notificationObfuscated);
   }
 
   /**
@@ -344,7 +349,7 @@ z.notification.NotificationRepository = class NotificationRepository {
    * @returns {string} Notification message body
    */
   _createBodyPing() {
-    return z.l10n.text(z.string.notification_ping);
+    return z.l10n.text(z.string.notificationPing);
   }
 
   /**
@@ -354,7 +359,7 @@ z.notification.NotificationRepository = class NotificationRepository {
    * @returns {string} Notification message body
    */
   _createBodyReaction(messageEntity) {
-    return z.l10n.text(z.string.notification_reaction, messageEntity.reaction);
+    return z.l10n.text(z.string.notificationReaction, messageEntity.reaction);
   }
 
   /**
@@ -528,7 +533,7 @@ z.notification.NotificationRepository = class NotificationRepository {
    * @returns {string} Obfuscated notification message title
    */
   _createTitleObfuscated() {
-    const obfuscatedTitle = z.l10n.text(z.string.notification_obfuscated_title);
+    const obfuscatedTitle = z.l10n.text(z.string.notificationObfuscatedTitle);
     return z.util.StringUtil.truncate(obfuscatedTitle, NotificationRepository.CONFIG.TITLE_LENGTH, false);
   }
 

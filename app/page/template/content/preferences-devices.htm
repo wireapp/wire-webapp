@@ -1,26 +1,26 @@
 <div id="preferences-devices" class="preferences-page preferences-devices" data-bind="with: $root.preferencesDevices">
-  <div class="preferences-titlebar" data-bind="l10n_text: z.string.preferences_devices"></div>
+  <div class="preferences-titlebar" data-bind="l10n_text: z.string.preferencesDevices"></div>
   <div class="preferences-content-wrapper">
     <div class="preferences-content" data-bind="antiscroll: shouldUpdateScrollbar">
       <section class="preferences-section" data-uie-name="preferences-device-current">
-        <header class="preferences-header" data-bind="l10n_text: z.string.preferences_devices_current"></header>
+        <header class="preferences-header" data-bind="l10n_text: z.string.preferencesDevicesCurrent"></header>
         <div class="preferences-devices-model" data-bind="text: currentClient().model"></div>
-        <div class="preferences-devices-id"><span data-bind="l10n_text: z.string.preferences_devices_id"></span>
+        <div class="preferences-devices-id"><span data-bind="l10n_text: z.string.preferencesDevicesId"></span>
           <span data-bind="foreach: displayClientId()" data-uie-name="preferences-device-current-id"><span class="device-id-part" data-bind="text: $data"></span></span>
         </div>
         <div class="preferences-devices-activated">
           <div data-bind="foreach: activationDate"><span data-bind="css: {'preferences-devices-activated-bold': $data.isStyled}, text: $data.text">?</span></div>
           <div data-bind="foreach: activationLocation"><span data-bind="css: {'preferences-devices-activated-bold': $data.isStyled}, text: $data.text">?</span></div>
         </div>
-        <div class="preferences-devices-fingerprint-label" data-bind="l10n_text: z.string.preferences_devices_fingerprint"></div>
-        <div class="preferences-devices-fingerprint" data-bind="foreach: displayFingerPrint()"><span class="device-id-part" data-bind="text: $data"></span></div>
+        <div class="preferences-devices-fingerprint-label" data-bind="l10n_text: z.string.preferencesDevicesFingerprint"></div>
+        <div class="preferences-devices-fingerprint" data-bind="foreach: localFingerprint()"><span class="device-id-part" data-bind="text: $data"></span></div>
       </section>
 
       <hr class="preferences-devices-separator preferences-separator">
 
       <!-- ko if: devices().length > 0 -->
         <section class="preferences-section">
-          <header class="preferences-header" data-bind="l10n_text: z.string.preferences_devices_active"></header>
+          <header class="preferences-header" data-bind="l10n_text: z.string.preferencesDevicesActive"></header>
           <!-- ko foreach: devices -->
             <div class="preferences-devices-card" data-bind="click: $parent.clickOnShowDevice">
               <div class="preferences-devices-card-data">
@@ -35,7 +35,7 @@
                 <div class="preferences-devices-card-info">
                   <div class="preferences-devices-model" data-bind="text: model" data-uie-name="preferences-device-active-model"></div>
                   <div class="preferences-devices-id">
-                    <span data-bind="l10n_text: z.string.preferences_devices_id"></span>
+                    <span data-bind="l10n_text: z.string.preferencesDevicesId"></span>
                     <span data-bind="foreach: formatId()" data-uie-name="preferences-device-active-id"><span class="device-id-part" data-bind="text: $data"></span></span>
                   </div>
                 </div>
@@ -46,7 +46,7 @@
               </div>
             </div>
           <!-- /ko -->
-          <div class="preferences-detail" data-bind="l10n_text: z.string.preferences_devices_active_detail"></div>
+          <div class="preferences-detail" data-bind="l10n_text: z.string.preferencesDevicesActiveDetail"></div>
         </section>
       <!-- /ko -->
     </div>

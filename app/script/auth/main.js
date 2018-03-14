@@ -28,13 +28,15 @@ import configureEnvironment from './configureEnvironment';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Root from './page/Root';
+import CookieStore from 'js-cookie';
 
 configureEnvironment();
 const apiClient = configureClient();
 const core = new Account(apiClient);
 const mixpanel = configureTracking();
+const cookieStore = CookieStore;
 
-const store = configureStore({apiClient: core.apiClient, core, mixpanel});
+const store = configureStore({apiClient: core.apiClient, cookieStore, core, mixpanel});
 
 const Wrapper = Component => (
   <AppContainer>

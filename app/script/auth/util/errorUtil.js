@@ -19,7 +19,7 @@
 
 import {errorHandlerStrings, validationErrorStrings} from '../../strings';
 import {FormattedHTMLMessage} from 'react-intl';
-import {ErrorMessage} from '@wireapp/react-ui-kit/Form';
+import {ErrorMessage} from '@wireapp/react-ui-kit';
 import React from 'react';
 
 export function parseError(error) {

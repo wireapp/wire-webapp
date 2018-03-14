@@ -17,10 +17,9 @@
  *
  */
 
-.conversation-titlebar {
+.conversation-title-bar {
   align-items: center;
-  background-color: @app-bg;
-  border-bottom: 1px solid fade(@graphite, 12%);
+  background-color: #fff;
   display: flex;
   height: @content-title-bar-height;
   justify-content: center;
@@ -28,41 +27,53 @@
   width: 100%;
 }
 
-.conversation-titlebar-name {
-  .flex-center;
+.conversation-title-bar-name {
+  .ellipsis-nowrap();
+  .flex-center();
+  user-select: none;
   cursor: pointer;
   display: flex;
-  max-width: 50%;
+  flex-grow: 1;
   height: 100%;
-  padding: 0 16px;
+
+  &--verified {
+    margin: 4px 16px 0 0;
+  }
 }
 
-.conversation-titlebar-library {
+.conversation-title-bar-guest-badge {
+  .text-white();
+  position: absolute;
+  top: 56px;
+  z-index: @z-index-badge;
+  background-color: #95989a;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 16px;
+  border-radius: 6px;
+  box-shadow: 0px 2px 16px 0px fade(#000, 8%);
+}
+
+.conversation-title-bar-library {
   align-items: center;
   display: flex;
   height: 100%;
-  position: absolute;
-  left: 0;
-  top: 0;
 }
 
-.conversation-titlebar-icons {
+.conversation-title-bar-icons {
   align-items: center;
   display: flex;
   height: 100%;
-  position: absolute;
-  right: 0;
-  top: 0;
 }
 
-.conversation-titlebar-icon {
+.conversation-title-bar-icon {
   flex: 0 0 auto;
   margin-left: 12px;
   margin-right: 12px;
 }
 
-.conversation-titlebar-name-label {
-  margin-right: 8px;
+.conversation-title-bar-name-label {
+  .label-bold-xs();
 }
 
 @keyframes pulsate-animation {
@@ -71,12 +82,12 @@
   }
 }
 
-.conversation-titlebar-icon-status {
+.conversation-title-bar-icon-status {
   color: @w-red;
   cursor: default;
 }
 
-.conversation-titlebar-icon-status::before {
+.conversation-title-bar-icon-status::before {
   animation: pulsate-animation;
   animation-direction: alternate;
   animation-duration: @animation-timing-slower * 2;

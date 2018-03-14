@@ -51,7 +51,7 @@
   "BackendError.LABEL.OPERATION_DENIED": "У вас відсутні нобхідні права для доступу",
   "BackendError.LABEL.UNAUTHORIZED": "Щось пішло не так. Будь ласка, оновіть сторінку і спробуйте ще раз",
   "BackendError.LABEL.HANDLE_EXISTS": "Даний нік вже використовується",
-  "BackendError.LABEL.HANDLE_TOO_SHORT": "",
+  "BackendError.LABEL.HANDLE_TOO_SHORT": "Будь ласка, введіть ім'я користувача, яке містить принаймні 2 символи",
   "BackendError.LABEL.INVALID_HANDLE": "Даний нік невалідний",
   "BackendError.LABEL.INVALID_INVITATION_CODE": "Запрошення було відкликане через заканчення терміну його дії",
   "BackendError.LABEL.NO_OTHER_OWNER": "В команді мусить бути хоча б один власник",

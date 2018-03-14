@@ -84,9 +84,7 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
       }
     });
     this.disableToggleScreen = ko.pureComputed(() => {
-      if (this.joined_call()) {
-        return this.joined_call().isRemoteScreenSend();
-      }
+      return this.joined_call() ? this.joined_call().isRemoteScreenSend() : true;
     });
 
     this.call_is_outgoing = ko.pureComputed(() => this.call().state() === z.calling.enum.CALL_STATE.OUTGOING);
@@ -127,7 +125,7 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
     };
 
     this.participants_button_label = ko.pureComputed(() => {
-      return z.l10n.text(z.string.call_participants, this.call_participants().length);
+      return z.l10n.text(z.string.callParticipants, this.call_participants().length);
     });
 
     this.show_participants_button = ko.pureComputed(() => {
@@ -152,10 +150,10 @@ ko.components.register('conversation-list-calling-cell', {
       <div class="conversation-list-cell-center">
         <span class="conversation-list-cell-name" data-bind="text: conversation.display_name(), css: {'text-theme': is_selected(conversation)}"></span>
         <!-- ko if: call_is_outgoing -->
-          <span class="conversation-list-cell-description" data-bind="l10n_text: z.string.call_state_outgoing" data-uie-name="call-label-outgoing"></span>
+          <span class="conversation-list-cell-description" data-bind="l10n_text: z.string.callStateOutgoing" data-uie-name="call-label-outgoing"></span>
         <!-- /ko -->
         <!-- ko if: call_is_incoming -->
-          <span class="conversation-list-cell-description" data-bind="l10n_text: z.string.call_state_incoming" data-uie-name="call-label-incoming"></span>
+          <span class="conversation-list-cell-description" data-bind="l10n_text: z.string.callStateIncoming" data-uie-name="call-label-incoming"></span>
         <!-- /ko -->
         <!-- ko if: show_call_timer -->
           <span class="conversation-list-cell-description" data-bind="text: z.util.format_seconds(call().durationTime())" data-uie-name="call-duration"></span>
@@ -175,7 +173,7 @@ ko.components.register('conversation-list-calling-cell', {
           <div class="conversation-list-calling-cell-controls-button fill-green icon-video" data-bind="click: on_join_call" data-uie-name="do-call-controls-call-accept"></div>
         <!-- /ko -->
         <!-- ko if: show_join_button -->
-          <div class="conversation-list-calling-cell-controls-button conversation-list-calling-cell-controls-join-button" data-bind="click: on_join_call, l10n_text: z.string.call_join" data-uie-name="do-call-controls-call-join"></div>
+          <div class="conversation-list-calling-cell-controls-button conversation-list-calling-cell-controls-join-button" data-bind="click: on_join_call, l10n_text: z.string.callJoin" data-uie-name="do-call-controls-call-join"></div>
         <!-- /ko -->
       </div>
     </div>
@@ -192,7 +190,7 @@ ko.components.register('conversation-list-calling-cell', {
         <!-- ko if: show_screensharing_button() -->
           <div data-uie-name="do-toggle-screenshare" class="conversation-list-calling-cell-controls-button icon-screensharing-small cursor-pointer"
                data-bind="click: on_toggle_screen, css: {
-                'disabled': disable_toggle_screen(),
+                'disabled': disableToggleScreen(),
                 'cell-badge-light': self_stream_state.screenSend(),
                 'cell-badge-dark': !self_stream_state.screenSend()
                }">

@@ -479,7 +479,7 @@ z.event.EventRepository = class EventRepository {
       };
       const progress = this.notificationsHandled / this.notificationsTotal * 50 + 25;
 
-      amplify.publish(z.event.WebApp.APP.UPDATE_PROGRESS, progress, z.string.init_decryption, content);
+      amplify.publish(z.event.WebApp.APP.UPDATE_PROGRESS, progress, z.string.initDecryption, content);
     }
   }
 
@@ -560,17 +560,12 @@ z.event.EventRepository = class EventRepository {
   _handleEvent(event, source) {
     return this._handleEventValidation(event, source)
       .then(validatedEvent => {
-        if (z.event.EventTypeHandling.DECRYPT.includes(validatedEvent.type)) {
-          return this.cryptographyRepository.handleEncryptedEvent(event);
-        }
-        return event;
+        const decryptEvent = validatedEvent.type === z.event.Backend.CONVERSATION.OTR_MESSAGE_ADD;
+        return decryptEvent ? this.cryptographyRepository.handleEncryptedEvent(event) : event;
       })
       .then(mappedEvent => {
-        if (z.event.EventTypeHandling.STORE.includes(mappedEvent.type)) {
-          return this._handleEventSaving(mappedEvent, source);
-        }
-
-        return mappedEvent;
+        const saveEvent = z.event.EventTypeHandling.STORE.includes(mappedEvent.type);
+        return saveEvent ? this._handleEventSaving(mappedEvent, source) : mappedEvent;
       })
       .then(savedEvent => this._handleEventDistribution(savedEvent, source))
       .catch(error => {
@@ -710,7 +705,7 @@ z.event.EventRepository = class EventRepository {
    */
   _handleNotification({payload: events, id, transient}) {
     const source = transient !== undefined ? EventRepository.SOURCE.WEB_SOCKET : EventRepository.SOURCE.STREAM;
-    const isTransientEvent = Boolean(transient);
+    const isTransientEvent = !!transient;
     this.logger.info(`Handling notification '${id}' from '${source}' containing '${events.length}' events`, events);
 
     if (!events.length) {

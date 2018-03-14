@@ -24,12 +24,15 @@ window.z.event = z.event || {};
 
 z.event.Backend = {
   CONVERSATION: {
+    ACCESS_UPDATE: 'conversation.access-update',
+    CODE_DELETE: 'conversation.code-delete',
+    CODE_UPDATE: 'conversation.code-update',
     CONNECT_REQUEST: 'conversation.connect-request',
     CREATE: 'conversation.create',
+    DELETE: 'conversation.delete',
     MEMBER_JOIN: 'conversation.member-join',
     MEMBER_LEAVE: 'conversation.member-leave',
     MEMBER_UPDATE: 'conversation.member-update',
-    OTR_ASSET_ADD: 'conversation.otr-asset-add',
     OTR_MESSAGE_ADD: 'conversation.otr-message-add',
     RENAME: 'conversation.rename',
     TYPING: 'conversation.typing',

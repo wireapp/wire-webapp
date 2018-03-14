@@ -19,7 +19,7 @@
 
 import {connect} from 'react-redux';
 import {accountFormStrings} from '../../strings';
-import {Form, Input, InputBlock, Button, Checkbox, CheckboxLabel, ErrorMessage} from '@wireapp/react-ui-kit/Form';
+import {Form, Input, InputBlock, Button, Checkbox, CheckboxLabel, ErrorMessage} from '@wireapp/react-ui-kit';
 import {injectIntl, FormattedHTMLMessage} from 'react-intl';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 import * as AuthAction from '../module/action/AuthAction';
@@ -27,7 +27,7 @@ import * as AuthSelector from '../module/selector/AuthSelector';
 import * as UserAction from '../module/action/UserAction';
 import ValidationError from '../module/action/ValidationError';
 import React, {PureComponent} from 'react';
-import ROUTE from '../route';
+import EXTERNAL_ROUTE from '../externalRoute';
 import BackendError from '../module/action/BackendError';
 
 class AccountForm extends PureComponent {
@@ -58,7 +58,7 @@ class AccountForm extends PureComponent {
 
   createURLForToU = () => {
     const isPersonalFlow = this.props.currentFlow === AuthSelector.REGISTER_FLOW.PERSONAL;
-    return `${ROUTE.WIRE_ROOT}/legal/terms/${isPersonalFlow ? 'personal' : 'teams'}/`;
+    return `${EXTERNAL_ROUTE.WIRE_WEBSITE}/legal/terms/${isPersonalFlow ? 'personal' : 'teams'}/`;
   };
 
   handleSubmit = event => {

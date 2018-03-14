@@ -1,6 +1,7 @@
 <!-- Vendor libraries -->
 <script src="/ext/js/bazinga64/bazinga64.js"></script>
-<script src="/ext/js/wire-webapp-lru-cache/LRUCache.js"></script>
+<script src="/ext/js/@wireapp/lru-cache/dist/lru-cache.bundle.js"></script>
+<script src="/ext/js/@wireapp/store-engine/dist/store-engine.bundle.js"></script>
 <script src="/ext/js/jquery/jquery.js"></script>
 <script src="/ext/js/jquery-mousewheel/jquery.mousewheel.js"></script>
 <script src="/ext/js/url-search-params-polyfill/index.js"></script>
@@ -53,10 +54,15 @@
 <script src="/ext/js/linkifyjs/linkify.min.js"></script>
 <script src="/ext/js/linkifyjs/linkify-html.min.js"></script>
 <!-- Encryption: Base libraries (don't change the order) -->
+<script>
+  window.sodium = {
+    onload: sodium => (window.sodium = sodium)
+  }
+</script>
 <script src="/ext/js/libsodium.js/sodium.js"></script>
-<script src="/ext/js/wire-webapp-cbor/wire-webapp-cbor.js"></script>
-<script src="/ext/js/wire-webapp-proteus/proteus.js"></script>
-<script src="/ext/js/wire-webapp-cryptobox/wire-webapp-cryptobox.js"></script>
+<script src="/ext/js/@wireapp/cbor/dist/cbor.bundle.js"></script>
+<script src="/ext/js/@wireapp/proteus/dist/proteus.bundle.js"></script>
+<script src="/ext/js/@wireapp/cryptobox/dist/cryptobox.bundle.js"></script>
 <!-- Encryption: Protocol Buffers -->
 <script src="/ext/js/long/long.js"></script>
 <script src="/ext/js/bytebuffer/ByteBufferAB.js"></script>

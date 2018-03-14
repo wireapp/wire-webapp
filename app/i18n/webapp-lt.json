@@ -52,7 +52,7 @@
   "BackendError.LABEL.OPERATION_DENIED": "Jūs neturite leidimo",
   "BackendError.LABEL.UNAUTHORIZED": "Kažkas nutiko. Įkelkite puslapį iš naujo ir bandykite dar kartą",
   "BackendError.LABEL.HANDLE_EXISTS": "Šis naudotojo vardas jau užimtas",
-  "BackendError.LABEL.HANDLE_TOO_SHORT": "",
+  "BackendError.LABEL.HANDLE_TOO_SHORT": "Įrašykite naudotojo vardą, kuriame yra bent 2 simboliai",
   "BackendError.LABEL.INVALID_HANDLE": "Šis naudotojo vardas yra neteisingas",
   "BackendError.LABEL.INVALID_INVITATION_CODE": "Pakvietimas buvo panaikintas arba baigė galioti",
   "BackendError.LABEL.NO_OTHER_OWNER": "Paskutinis savininkas negali būti pašalintas iš komandos",

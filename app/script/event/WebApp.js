@@ -65,7 +65,6 @@ z.event.WebApp = {
   },
   CLIENT: {
     ADD: 'wire.webapp.user.client.add',
-    ADD_OWN_CLIENT: 'wire.webapp.user.client.new_own_client',
     REMOVE: 'wire.webapp.client.remove',
     UPDATE: 'wire.webapp.client.update',
     VERIFICATION_STATE_CHANGED: 'wire.webapp.client.verification_state_changed',
@@ -231,7 +230,7 @@ z.event.WebApp = {
   USER: {
     CLIENT_ADDED: 'wire.webapp.user.client_added',
     CLIENT_REMOVED: 'wire.webapp.user.client_removed',
-    CLIENTS_UPDATED: 'wire.webapp.user.clients_udpated',
+    CLIENTS_UPDATED: 'wire.webapp.user.clients_updated',
     EVENT_FROM_BACKEND: 'wire.webapp.user.event_from_backend',
     PERSIST: 'wire.webapp.user.persist',
     SET_AVAILABILITY: 'wire.webapp.user.set_availability',

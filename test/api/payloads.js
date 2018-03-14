@@ -170,7 +170,7 @@ entities.user = {
     accent_id: 1,
     picture: entities.picture,
     name: 'Jane Roe',
-    'handle:': 'jaro',
+    handle: 'jaro',
     id: '7025598b-ffac-4993-8a81-af3f35b7147f',
   },
 };

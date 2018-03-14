@@ -43,18 +43,18 @@ z.viewModel.list.ArchiveViewModel = class ArchiveViewModel {
     this.archivedConversations = this.conversationRepository.conversations_archived;
 
     this.shouldUpdateScrollbar = ko
-      .computed(() => this.listViewModel.last_update())
+      .computed(() => this.listViewModel.lastUpdate())
       .extend({notify: 'always', rateLimit: 500});
   }
 
   clickOnConversation(conversationEntity) {
     this.conversationRepository.unarchive_conversation(conversationEntity, 'opened conversation from archive');
-    this.listViewModel.switch_list(z.viewModel.ListViewModel.STATE.CONVERSATIONS);
+    this.listViewModel.switchList(z.viewModel.ListViewModel.STATE.CONVERSATIONS);
     amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity);
   }
 
   clickOnClose() {
-    this.listViewModel.switch_list(z.viewModel.ListViewModel.STATE.CONVERSATIONS);
+    this.listViewModel.switchList(z.viewModel.ListViewModel.STATE.CONVERSATIONS);
   }
 
   updateList() {

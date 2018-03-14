@@ -17,20 +17,15 @@
  *
  */
 
-import {onEnvironment} from './Environment';
-
-const stagingWebsite = 'https://wire-website-staging.zinfra.io';
-
 export default {
   CHOOSE_HANDLE: '/choosehandle',
+  CONVERSATION_JOIN: '/join-conversation',
   CREATE_ACCOUNT: '/createaccount',
   CREATE_TEAM: '/createteam',
   CREATE_TEAM_ACCOUNT: '/createteamaccount',
   INDEX: '/',
   INITIAL_INVITE: '/teaminvite',
   INVITE: '/invite',
-  LOGIN: '/login',
   PERSONAL_INVITE: '/personalinvite',
   VERIFY: '/verify',
-  WIRE_ROOT: onEnvironment(stagingWebsite, stagingWebsite, 'https://wire.com'),
 };

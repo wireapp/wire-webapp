@@ -1,82 +1,84 @@
 <div id="conversations" class="conversations left-list-is-visible" data-bind="with: $root.conversations">
   <div class="left-list-header">
-    <!-- ko if: is_team() -->
+    <!-- ko if: isTeam() -->
       <availability-state class="left-list-header-availability"
                           data-bind="click: clickOnAvailability"
                           data-uie-name="status-availability"
-                          params="availability: selfAvailability, label: selfName">
+                          params="availability: selfAvailability, label: selfUserName">
       </availability-state>
     <!-- /ko -->
-    <!-- ko ifnot: is_team() -->
-      <span class="left-list-header-text" data-bind="text: selfName" data-uie-name="status-name"></span>
+    <!-- ko ifnot: isTeam() -->
+      <span class="left-list-header-text" data-bind="text: selfUserName" data-uie-name="status-name"></span>
     <!-- /ko -->
   </div>
-  <!-- ko if: show_calls() -->
-    <!-- ko foreach: conversations_calls -->
+  <!-- ko if: showCalls() -->
+    <!-- ko foreach: callConversations -->
       <conversation-list-calling-cell
-        data-bind="click: $parent.click_on_conversation, event: {'contextmenu': $parent.list_view_model.on_context_menu}"
-        params="conversation: $data, is_selected: $parent.is_selected_conversation, calling_repository: $parent.calling_repository">
+        data-bind="click: $parent.clickOnConversation, event: {'contextmenu': $parent.listViewModel.onContextMenu}"
+        params="conversation: $data, is_selected: $parent.isSelectedConversation, calling_repository: $parent.callingRepository">
       </conversation-list-calling-cell>
     <!-- /ko -->
   <!-- /ko -->
   <div class="left-list-center">
-    <!-- ko if: conversations_unarchived().length > 0 || connect_requests().length > 0 -->
-      <ul class="left-list-items" data-bind="antiscroll: should_update_scrollbar, bordered_list: conversations_unarchived">
+    <!-- ko if: unarchivedConversations().length > 0 || showConnectRequests() -->
+      <ul class="left-list-items" data-bind="antiscroll: shouldUpdateScrollbar, bordered_list: unarchivedConversations">
 
-      <!-- ko if: show_connect_requests() -->
-        <li class="conversation-list-cell"
-            data-bind="css: {'conversation-list-cell-active': contentState() === z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS}">
+      <!-- ko if: showConnectRequests() -->
+        <li class="conversation-list-cell" data-bind="click: clickOnConnectRequests, css: {'conversation-list-cell-active': stateIsRequests()}">
           <div class="conversation-list-cell-left">
-            <!-- ko if: connect_requests().length > 1 -->
-              <group-avatar params="users: connect_requests()"></group-avatar>
+            <!-- ko if: connectRequests().length === 1 -->
+              <div class="avatar-halo">
+                <participant-avatar params="participant: connectRequests()[0], size: z.components.ParticipantAvatar.SIZE.SMALL"></participant-avatar>
+              </div>
             <!-- /ko -->
-            <!-- ko if: connect_requests().length === 1 -->
-            <div class="avatar-halo">
-              <participant-avatar params="participant: connect_requests()[0], size: z.components.ParticipantAvatar.SIZE.SMALL"></participant-avatar>
-            </div>
+
+            <!-- ko if: connectRequests().length > 1 -->
+              <group-avatar params="users: connectRequests()"></group-avatar>
             <!-- /ko -->
           </div>
+
           <div class="conversation-list-cell-center">
             <span class="conversation-list-cell-name"
-                  data-bind="click: click_on_connect_requests, text: connect_requests_text, css: {'text-theme': contentState() === z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS}"
+                  data-bind="text: connectRequestsText, css: {'text-theme': stateIsRequests()}"
                   data-uie-name="item-pending-requests"></span>
           </div>
+
           <div class="conversation-list-cell-right">
-            <span class="conversation-list-cell-badge cell-badge-light icon-pending" data-uie-name="status-pending"></span>
+            <span class="conversation-list-cell-badge cell-badge-dark icon-pending" data-uie-name="status-pending"></span>
           </div>
         </li>
       <!-- /ko -->
 
-      <!-- ko foreach: conversations_unarchived -->
+      <!-- ko foreach: unarchivedConversations -->
         <conversation-list-cell
-          data-bind="click: $parent.click_on_conversation, event: {'contextmenu': $parent.list_view_model.on_context_menu}"
+          data-bind="click: $parent.clickOnConversation, event: {'contextmenu': $parent.listViewModel.onContextMenu}"
           data-uie-name="item-conversation"
-          params="click: $parent.list_view_model.on_context_menu, conversation: $data, is_selected: $parent.is_selected_conversation">
+          params="click: $parent.listViewModel.onContextMenu, conversation: $data, is_selected: $parent.isSelectedConversation">
         </conversation-list-cell>
       <!-- /ko -->
     </ul>
     <!-- /ko -->
     <!-- ko if: noConversations() -->
-      <!-- ko if: conversations_archived().length === 0 -->
+      <!-- ko if: archivedConversations().length === 0 -->
         <div class="conversations-hint" data-uie-name="status-start-conversation-hint">
-          <div class="conversations-hint-text" data-bind="l10n_text: z.string.conversations_no_conversations"></div>
+          <div class="conversations-hint-text" data-bind="l10n_text: z.string.conversationsNoConversations"></div>
           <svg class="conversations-hint-arrow" width="16" height="53" viewBox="0 0 16 53">
             <path d="M13.9 43l1.414 1.414-7.657 7.657L0 44.414 1.414 43l5.24 5.24V0h2v48.246z" fill="#FFF" fill-rule="evenodd"/>
           </svg>
         </div>
       <!-- /ko -->
-      <!-- ko if: conversations_archived().length > 0 -->
-        <div class="conversations-all-archived" data-bind="l10n_text: z.string.conversations_all_archived"></div>
+      <!-- ko if: archivedConversations().length > 0 -->
+        <div class="conversations-all-archived" data-bind="l10n_text: z.string.conversationsAllArchived"></div>
       <!-- /ko -->
     <!-- /ko -->
   </div>
   <div class="conversations-footer">
-    <span class="button-icon-large icon-people" data-bind="attr: {title: start_tooltip}, click: click_on_people_button" data-uie-name="go-people"></span>
-    <!-- ko if: conversations_archived().length > 0 -->
-      <span class="button-icon-large icon-archive" data-bind="attr: {title: archive_tooltip}, click: click_on_archived_button" data-uie-name="go-archive"></span>
+    <span class="button-icon-large icon-people" data-bind="attr: {title: startTooltip}, click: clickOnPeopleButton" data-uie-name="go-people"></span>
+    <!-- ko if: archivedConversations().length > 0 -->
+      <span class="button-icon-large icon-archive" data-bind="attr: {title: archiveTooltip}, click: clickOnArchivedButton" data-uie-name="go-archive"></span>
     <!-- /ko -->
-    <span class="conversations-settings button-icon-large icon-settings" data-bind="click: click_on_preferences_button, l10n_tooltip: z.string.tooltip_conversations_preferences" data-uie-name="go-preferences">
-      <!-- ko if: show_badge() -->
+    <span class="conversations-settings button-icon-large icon-settings" data-bind="click: clickOnPreferencesButton, l10n_tooltip: z.string.tooltipConversationsPreferences" data-uie-name="go-preferences">
+      <!-- ko if: showBadge() -->
         <span class="conversations-settings-badge bg-theme"></span>
       <!-- /ko -->
     </span>

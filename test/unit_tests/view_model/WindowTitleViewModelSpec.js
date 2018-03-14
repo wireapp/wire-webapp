@@ -134,7 +134,7 @@ describe('z.viewModel.WindowTitleViewModel', () => {
     it('sets the name when opening the preferences about page', () => {
       title_view_model.contentState(z.viewModel.ContentViewModel.STATE.PREFERENCES_ABOUT);
 
-      const expected_title = `${z.string.preferences_about} · ${suffix}`;
+      const expected_title = `${z.string.preferencesAbout} · ${suffix}`;
       title_view_model.initiateTitleUpdates();
       expect(window.document.title).toBe(expected_title);
     });
@@ -142,7 +142,7 @@ describe('z.viewModel.WindowTitleViewModel', () => {
     it('sets the name when opening the preferences account page', () => {
       title_view_model.contentState(z.viewModel.ContentViewModel.STATE.PREFERENCES_ACCOUNT);
 
-      const expected_title = `${z.string.preferences_account} · ${suffix}`;
+      const expected_title = `${z.string.preferencesAccount} · ${suffix}`;
       title_view_model.initiateTitleUpdates();
       expect(window.document.title).toBe(expected_title);
     });
@@ -150,7 +150,7 @@ describe('z.viewModel.WindowTitleViewModel', () => {
     it('sets the name when opening the preferences av page', () => {
       title_view_model.contentState(z.viewModel.ContentViewModel.STATE.PREFERENCES_AV);
 
-      const expected_title = `${z.string.preferences_av} · ${suffix}`;
+      const expected_title = `${z.string.preferencesAV} · ${suffix}`;
       title_view_model.initiateTitleUpdates();
       expect(window.document.title).toBe(expected_title);
     });
@@ -158,7 +158,7 @@ describe('z.viewModel.WindowTitleViewModel', () => {
     it('sets the name when opening the preferences device details page', () => {
       title_view_model.contentState(z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICE_DETAILS);
 
-      const expected_title = `${z.string.preferences_device_details} · ${suffix}`;
+      const expected_title = `${z.string.preferencesDeviceDetails} · ${suffix}`;
       title_view_model.initiateTitleUpdates();
       expect(window.document.title).toBe(expected_title);
     });
@@ -166,7 +166,7 @@ describe('z.viewModel.WindowTitleViewModel', () => {
     it('sets the name when opening the preferences devices page', () => {
       title_view_model.contentState(z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICES);
 
-      const expected_title = `${z.string.preferences_devices} · ${suffix}`;
+      const expected_title = `${z.string.preferencesDevices} · ${suffix}`;
       title_view_model.initiateTitleUpdates();
       expect(window.document.title).toBe(expected_title);
     });
@@ -174,7 +174,7 @@ describe('z.viewModel.WindowTitleViewModel', () => {
     it('sets the name when opening the preferences options page', () => {
       title_view_model.contentState(z.viewModel.ContentViewModel.STATE.PREFERENCES_OPTIONS);
 
-      const expected_title = `${z.string.preferences_options} · ${suffix}`;
+      const expected_title = `${z.string.preferencesOptions} · ${suffix}`;
       title_view_model.initiateTitleUpdates();
       expect(window.document.title).toBe(expected_title);
     });
@@ -191,7 +191,7 @@ describe('z.viewModel.WindowTitleViewModel', () => {
       // Test one connect request message
       title_view_model.userRepository.users.push(user_et);
 
-      let message = z.l10n.text(z.string.conversations_connection_request_one);
+      let message = z.l10n.text(z.string.conversationsConnectionRequestOne);
       let waiting_people = title_view_model.userRepository.connect_requests().length;
 
       let expected_title = `(${waiting_people}) · ${message} · ${suffix}`;
@@ -205,7 +205,7 @@ describe('z.viewModel.WindowTitleViewModel', () => {
       title_view_model.userRepository.users.push(another_user_et);
       waiting_people = title_view_model.userRepository.connect_requests().length;
 
-      message = z.l10n.text(z.string.conversations_connection_request_many, waiting_people);
+      message = z.l10n.text(z.string.conversationsConnectionRequestMany, waiting_people);
 
       expected_title = `(${waiting_people}) · ${message} · ${suffix}`;
       title_view_model.initiateTitleUpdates();

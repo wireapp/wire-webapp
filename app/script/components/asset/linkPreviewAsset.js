@@ -80,7 +80,7 @@ ko.components.register('link-preview-asset', {
           <div class="link-preview-info-title" data-bind="text: preview.title, css: header ? 'link-preview-info-title-singleline' : 'link-preview-info-title-multiline'" data-uie-name="link-preview-title"></div>
           <div class="link-preview-info-link text-graphite" data-bind="attr: {title: preview.url}" data-uie-name="link-preview-tweet-author">
             <span class="font-weight-bold link-preview-info-title-singleline" data-bind="text: author"></span>
-            <span data-bind="l10n_text: z.string.conversation_tweet_author"></span>
+            <span data-bind="l10n_text: z.string.conversationTweetAuthor"></span>
           </div>
         <!-- /ko -->
         <!-- ko ifnot: is_tweet -->
