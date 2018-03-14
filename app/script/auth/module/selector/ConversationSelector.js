@@ -17,15 +17,5 @@
  *
  */
 
-export default {
-  CHOOSE_HANDLE: '/choosehandle',
-  CONVERSATION_JOIN: '/join-conversation',
-  CREATE_ACCOUNT: '/createaccount',
-  CREATE_TEAM: '/createteam',
-  CREATE_TEAM_ACCOUNT: '/createteamaccount',
-  INDEX: '/',
-  INITIAL_INVITE: '/teaminvite',
-  INVITE: '/invite',
-  PERSONAL_INVITE: '/personalinvite',
-  VERIFY: '/verify',
-};
+export const isFetching = state => state.conversationState.fetching;
+export const getError = state => state.conversationState.error;

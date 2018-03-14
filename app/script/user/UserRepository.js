@@ -697,12 +697,12 @@ z.user.UserRepository = class UserRepository {
    * Get self user from backend.
    * @returns {Promise} Promise that will resolve with the self user entity
    */
-  get_me() {
+  getSelf() {
     return this.user_service
       .get_own_user()
       .then(response => {
-        const user_et = this.user_mapper.map_self_user_from_object(response);
-        return this.save_user(user_et, true);
+        const userEntity = this.user_mapper.map_self_user_from_object(response);
+        return this.save_user(userEntity, true);
       })
       .catch(error => {
         this.logger.error(`Unable to load self user: ${error.message || error}`, [error]);

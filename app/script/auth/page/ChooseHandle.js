@@ -17,10 +17,17 @@
  *
  */
 
-import {ContainerXS} from '@wireapp/react-ui-kit/Layout';
 import {chooseHandleStrings} from '../../strings';
-import {InputSubmitCombo, Input, RoundIconButton, Form, ErrorMessage} from '@wireapp/react-ui-kit/Form';
-import {H1, Text} from '@wireapp/react-ui-kit/Text';
+import {
+  H1,
+  Text,
+  ContainerXS,
+  InputSubmitCombo,
+  Input,
+  RoundIconButton,
+  Form,
+  ErrorMessage,
+} from '@wireapp/react-ui-kit';
 import {injectIntl} from 'react-intl';
 import {parseError} from '../util/errorUtil';
 import EXTERNAL_ROUTE from '../externalRoute';

@@ -560,17 +560,12 @@ z.event.EventRepository = class EventRepository {
   _handleEvent(event, source) {
     return this._handleEventValidation(event, source)
       .then(validatedEvent => {
-        if (z.event.EventTypeHandling.DECRYPT.includes(validatedEvent.type)) {
-          return this.cryptographyRepository.handleEncryptedEvent(event);
-        }
-        return event;
+        const decryptEvent = validatedEvent.type === z.event.Backend.CONVERSATION.OTR_MESSAGE_ADD;
+        return decryptEvent ? this.cryptographyRepository.handleEncryptedEvent(event) : event;
       })
       .then(mappedEvent => {
-        if (z.event.EventTypeHandling.STORE.includes(mappedEvent.type)) {
-          return this._handleEventSaving(mappedEvent, source);
-        }
-
-        return mappedEvent;
+        const saveEvent = z.event.EventTypeHandling.STORE.includes(mappedEvent.type);
+        return saveEvent ? this._handleEventSaving(mappedEvent, source) : mappedEvent;
       })
       .then(savedEvent => this._handleEventDistribution(savedEvent, source))
       .catch(error => {
