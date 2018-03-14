@@ -108,30 +108,6 @@ z.viewModel.panel.GroupParticipantServiceViewModel = class GroupParticipantServi
     amplify.publish(z.event.WebApp.PREFERENCES.MANAGE_ACCOUNT);
   }
 
-  clickOnOpenConversation() {
-    this.actionsViewModel.open1to1Conversation(this.selectedParticipant());
-  }
-
-  clickToAcceptRequest() {
-    this.actionsViewModel.acceptConnectionRequest(this.selectedParticipant(), true);
-  }
-
-  clickToBlock() {
-    this.actionsViewModel.blockUser(this.selectedParticipant());
-  }
-
-  clickToCancelRequest() {
-    this.actionsViewModel.cancelConnectionRequest(this.selectedParticipant());
-  }
-
-  clickToIgnoreRequest() {
-    this.actionsViewModel.ignoreConnectionRequest(this.selectedParticipant());
-  }
-
-  clickToLeave() {
-    this.actionsViewModel.leaveConversation(this.conversationEntity());
-  }
-
   clickToRemove() {
     this.actionsViewModel
       .removeFromConversation(this.conversationEntity(), this.selectedParticipant())
