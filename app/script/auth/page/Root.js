@@ -29,6 +29,7 @@ import CreatePersonalAccount from './CreatePersonalAccount';
 import ConversationJoin from './ConversationJoin';
 import ChooseHandle from './ChooseHandle';
 import ClientManager from './ClientManager';
+import ConversationJoinInvalid from './ConversationJoinInvalid';
 import Verify from './Verify';
 import {IntlProvider, addLocaleData} from 'react-intl';
 import {connect} from 'react-redux';
@@ -64,7 +65,9 @@ class Root extends React.Component {
             <Switch>
               <Route exact path={ROUTE.INDEX} component={Index} />
               <Route path={ROUTE.CLIENTS} component={ClientManager} />
-              <Route path={ROUTE.LOGIN} component={Login} />
+              <Route path={`${ROUTE.LOGIN}/:conversationKey?/:conversationCode?`} component={Login} />
+              <Route path={ROUTE.CONVERSATION_JOIN_INVALID} component={ConversationJoinInvalid} />
+
               <Route
                 path={`${ROUTE.CONVERSATION_JOIN}/:conversationKey/:conversationCode`}
                 component={ConversationJoin}

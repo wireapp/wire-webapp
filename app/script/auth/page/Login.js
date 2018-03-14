@@ -43,20 +43,25 @@ import {Link as RRLink} from 'react-router-dom';
 import {connect} from 'react-redux';
 import {injectIntl} from 'react-intl';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
-import {doLogin} from '../module/action/AuthAction';
+import * as AuthAction from '../module/action/AuthAction';
 import * as AuthSelector from '../module/selector/AuthSelector';
+import * as ConversationAction from '../module/action/ConversationAction';
 import ValidationError from '../module/action/ValidationError';
 import {loginStrings} from '../../strings';
 import RuntimeUtil from '../util/RuntimeUtil';
 import * as URLUtil from '../util/urlUtil';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
 import BackendError from '../module/action/BackendError';
+import {Redirect} from 'react-router';
 
 class Login extends React.PureComponent {
   inputs = {};
 
   state = {
+    conversationCode: null,
+    conversationKey: null,
     email: '',
+    isValidLink: true,
     loginError: null,
     password: '',
     persist: true,
@@ -66,6 +71,37 @@ class Login extends React.PureComponent {
     },
     validationErrors: [],
   };
+
+  readAndUpdateParamsFromUrl = (nextProps = this.props) => {
+    const conversationCode = nextProps.match.params.conversationCode;
+    const conversationKey = nextProps.match.params.conversationKey;
+
+    const keyAndCodeExistent = conversationKey && conversationCode;
+    const keyOrCodeChanged =
+      conversationCode !== this.state.conversationCode || conversationKey !== this.state.conversationKey;
+    if (keyAndCodeExistent && keyOrCodeChanged) {
+      Promise.resolve()
+        .then(() => {
+          this.setState((state, props) => ({
+            ...state,
+            conversationCode,
+            conversationKey,
+            isValidLink: true,
+          }));
+        })
+        .then(() => this.props.doCheckConversationCode(conversationKey, conversationCode))
+        .catch(error => {
+          this.setState((state, props) => ({
+            ...state,
+            isValidLink: false,
+          }));
+        });
+    }
+  };
+
+  componentDidMount = () => this.readAndUpdateParamsFromUrl();
+
+  componentWillReceiveProps = nextProps => this.readAndUpdateParamsFromUrl(nextProps);
 
   handleSubmit = event => {
     event.preventDefault();
@@ -96,6 +132,10 @@ class Login extends React.PureComponent {
         } else {
           login.handle = email.replace('@', '');
         }
+
+        if (this.state.conversationCode && this.state.conversationKey) {
+          return this.props.doLoginAndJoin(login, this.state.conversationKey, this.state.conversationCode);
+        }
         return this.props.doLogin(login);
       })
       .then(() => window.location.replace(URLUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP)))
@@ -114,9 +154,10 @@ class Login extends React.PureComponent {
 
   render() {
     const {intl: {formatMessage: _}, loginError} = this.props;
-    const {email, password, persist, validInputs, validationErrors} = this.state;
+    const {isValidLink, email, password, persist, validInputs, validationErrors} = this.state;
     return (
       <Container centerText verticalCenter style={{width: '100%'}}>
+        {!isValidLink && <Redirect to={ROUTE.CONVERSATION_JOIN_INVALID} />}
         <AppAlreadyOpen />
         <Columns>
           <Column style={{display: 'flex'}}>
@@ -234,6 +275,6 @@ export default injectIntl(
       isFetching: AuthSelector.isFetching(state),
       loginError: AuthSelector.getError(state),
     }),
-    {doLogin}
+    {...AuthAction, ...ConversationAction}
   )(Login)
 );

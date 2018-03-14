@@ -36,6 +36,8 @@ module.exports = Object.assign(commonConfig, {
     overlay: true,
     proxy: {
       '/app': {pathRewrite: {'^/app': ''}, target: 'http://localhost:8888'},
+      '/audio': 'http://localhost:8888',
+      '/style': 'http://localhost:8888',
     },
     publicPath: '/',
     stats: {

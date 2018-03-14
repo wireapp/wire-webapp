@@ -41,6 +41,9 @@ import * as ConversationSelector from '../module/selector/ConversationSelector';
 import ValidationError from '../module/action/ValidationError';
 import * as AuthAction from '../module/action/AuthAction';
 import * as StringUtil from '../util/stringUtil';
+import {Redirect} from 'react-router';
+import {Link as RRLink} from 'react-router-dom';
+import ROUTE from '../route';
 import {injectIntl, FormattedHTMLMessage} from 'react-intl';
 import EXTERNAL_ROUTE from '../externalRoute';
 import {withRouter} from 'react-router';
@@ -66,7 +69,9 @@ class ConversationJoin extends Component {
   readAndUpdateParamsFromUrl = (nextProps = this.props) => {
     const conversationCode = nextProps.match.params.conversationCode;
     const conversationKey = nextProps.match.params.conversationKey;
-    if (conversationCode !== this.state.conversationCode || conversationKey !== this.state.conversationKey) {
+    const keyOrCodeChanged =
+      conversationCode !== this.state.conversationCode || conversationKey !== this.state.conversationKey;
+    if (keyOrCodeChanged) {
       this.props
         .doInit()
         .then(() => {
@@ -90,15 +95,6 @@ class ConversationJoin extends Component {
   componentDidMount = () => this.readAndUpdateParamsFromUrl();
 
   componentWillReceiveProps = nextProps => this.readAndUpdateParamsFromUrl(nextProps);
-
-  openWebapp = params => {
-    const link = document.createElement('a');
-    link.href = pathWithParams(EXTERNAL_ROUTE.LOGIN, params);
-    document.body.appendChild(link); // workaround for Firefox
-    link.click();
-  };
-
-  onLoginClick = () => this.openWebapp('mode=login');
 
   onOpenWireClick = () => {
     this.props.doJoinConversationByCode(this.state.conversationKey, this.state.conversationCode).then(() => {
@@ -220,22 +216,15 @@ class ConversationJoin extends Component {
         </Small>
         <Small block>
           {`${_(conversationJoinStrings.hasAccount)} `}
-          <Link onClick={this.onLoginClick} textTransform={'none'} data-uie-name="go-login">
+          <Link
+            component={RRLink}
+            to={`${ROUTE.LOGIN}/${this.state.conversationKey}/${this.state.conversationCode}`}
+            textTransform={'none'}
+            data-uie-name="go-login"
+          >
             {_(conversationJoinStrings.loginLink)}
           </Link>
         </Small>
-      </ContainerXS>
-    );
-  };
-
-  renderInvalidLink = () => {
-    const {intl: {formatMessage: _}} = this.props;
-    return (
-      <ContainerXS style={{margin: 'auto 0'}}>
-        <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}} color={COLOR.GRAY}>
-          <FormattedHTMLMessage {...conversationJoinStrings.invalidHeadline} />
-        </H2>
-        <H3 style={{marginTop: '10px'}}>{_(conversationJoinStrings.invalidSubhead)}</H3>
       </ContainerXS>
     );
   };
@@ -257,7 +246,7 @@ class ConversationJoin extends Component {
     const {isValidLink, forceNewTemporaryGuestAccount} = this.state;
 
     if (!isValidLink) {
-      return this.renderInvalidLink();
+      return <Redirect to={ROUTE.CONVERSATION_JOIN_INVALID} />;
     }
     if (this.isConversationFullError(error)) {
       return this.renderFullConversation();

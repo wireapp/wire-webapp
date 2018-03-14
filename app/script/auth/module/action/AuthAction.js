@@ -22,9 +22,21 @@ import * as AuthActionCreator from './creator/AuthActionCreator';
 import * as SelfAction from './SelfAction';
 import {currentLanguage, currentCurrency} from '../../localeConfig';
 import {setLocalStorage, LocalStorageKey} from './LocalStorageAction';
+import * as ConversationAction from './ConversationAction';
 
-export function doLogin(loginData) {
-  return function(dispatch, getState, {core}) {
+export const doLogin = loginData =>
+  doLoginPlain(loginData, dispatch => dispatch(doSilentLogout()), dispatch => dispatch(SelfAction.fetchSelf()));
+
+export const doLoginAndJoin = (loginData, key, code, uri) =>
+  doLoginPlain(
+    loginData,
+    dispatch => dispatch(doSilentLogout()),
+    dispatch => dispatch(ConversationAction.doJoinConversationByCode(key, code, uri))
+  );
+
+function doLoginPlain(loginData, onBeforeLogin, onAfterLogin) {
+  return function(dispatch, getState, global) {
+    const {core} = global;
     dispatch(
       AuthActionCreator.startLogin({
         email: loginData.email,
@@ -32,15 +44,17 @@ export function doLogin(loginData) {
       })
     );
     return Promise.resolve()
-      .then(() => dispatch(doSilentLogout()))
+      .then(() => onBeforeLogin(dispatch, getState, global))
       .then(() => core.login(loginData))
       .then(() => persistAuthData(loginData.persist, core, dispatch))
-      .then(() => dispatch(SelfAction.fetchSelf()))
+      .then(() => onAfterLogin(dispatch, getState, global))
       .then(() => dispatch(AuthActionCreator.successfulLogin()))
       .catch(error => {
         const handledError = BackendError.handle(error);
         if (handledError.label === BackendError.LABEL.TOO_MANY_CLIENTS) {
-          persistAuthData(loginData.persist, core, dispatch);
+          return Promise.resolve()
+            .then(() => persistAuthData(loginData.persist, core, dispatch))
+            .then(() => onAfterLogin(dispatch, getState, global));
         }
         dispatch(AuthActionCreator.failedLogin(error));
         throw handledError;
