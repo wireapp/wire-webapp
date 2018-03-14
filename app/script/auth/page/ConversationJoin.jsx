@@ -137,7 +137,7 @@ class ConversationJoin extends Component {
     return (
       <ContainerXS style={{margin: 'auto 0'}}>
         <AppAlreadyOpen />
-        <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}} color={COLOR.GRAY}>
+        <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}} color={COLOR.GRAY} data-uie-name="status-join-headline">
           {selfName ? (
             <FormattedHTMLMessage
               {...conversationJoinStrings.existentAccountHeadline}
@@ -148,7 +148,7 @@ class ConversationJoin extends Component {
           )}
         </H2>
         <H3 style={{marginTop: '10px'}}>{_(conversationJoinStrings.existentAccountSubhead)}</H3>
-        <Button onClick={this.onOpenWireClick}>{_(conversationJoinStrings.existentAccountOpenButton)}</Button>
+        <Button onClick={this.onOpenWireClick} data-uie-name="do-open">{_(conversationJoinStrings.existentAccountOpenButton)}</Button>
         <Small block>
           {`${_(conversationJoinStrings.acceptTou)} `}
           <Link href={EXTERNAL_ROUTE.WIRE_TERMS_PERSONAL} textTransform={'none'} data-uie-name="go-tou">
