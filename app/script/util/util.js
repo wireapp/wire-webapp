@@ -798,20 +798,35 @@ z.util.CallingLogger = class CallingLogger extends z.util.Logger {
     };
   }
 
+  _get_debug_type(number) {
+    switch (number) {
+      case 300:
+      case 400:
+      case 500:
+      case 700:
+        return 'DEBUG';
+      case 800:
+        return 'INFO';
+      case 900:
+        return 'WARNING';
+      case 100:
+        return 'ERROR';
+    }
+
+    return '?';
+  }
+
   _log_to_memory(args) {
     while (z.util.CallingLog.length >= CallingLogger.CONFIG.MESSAGE_LOG_LENGTH) {
       z.util.CallingLog.shift();
     }
 
-    const logEntry = {
-      date: new Date().toISOString(),
-      event: args,
-    };
-    z.util.CallingLog.push(logEntry);
+    const logMessage = `[${new Date().toISOString()}] (${this._get_debug_type(args[0]())}) ${args[1]}`;
+    z.util.CallingLog.push(logMessage);
   }
 
   _print_log(args) {
-    super._print_log(args);
     this._log_to_memory(args);
+    super._print_log(args);
   }
 };

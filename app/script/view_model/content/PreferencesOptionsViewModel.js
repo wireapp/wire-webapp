@@ -71,6 +71,19 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
     amplify.publish(z.event.WebApp.CONNECT.IMPORT_CONTACTS, z.connect.ConnectSource.ICLOUD);
   }
 
+  save_call_logs() {
+    if (z.util.CallingLog.length < 1) {
+      return false;
+    }
+
+    const blob = new Blob([z.util.CallingLog.join('\r\n')], {
+      type: 'text/plain;charset=utf-8',
+    });
+    const currentDate = new Date().toISOString().replace(' ', '-');
+
+    z.util.download_blob(blob, `CallLogs-${currentDate}.log`);
+  }
+
   update_properties(properties) {
     this.option_audio(properties.settings.sound.alerts);
     this.option_emoji_replace_inline(properties.settings.emoji.replace_inline);
