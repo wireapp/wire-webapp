@@ -49,6 +49,7 @@ import ValidationError from '../module/action/ValidationError';
 import {loginStrings} from '../../strings';
 import RuntimeUtil from '../util/RuntimeUtil';
 import * as URLUtil from '../util/urlUtil';
+import AppAlreadyOpen from '../component/AppAlreadyOpen';
 import BackendError from '../module/action/BackendError';
 
 class Login extends React.PureComponent {
@@ -116,6 +117,7 @@ class Login extends React.PureComponent {
     const {email, password, persist, validInputs, validationErrors} = this.state;
     return (
       <Container centerText verticalCenter style={{width: '100%'}}>
+        <AppAlreadyOpen />
         <Columns>
           <Column style={{display: 'flex'}}>
             <div style={{margin: 'auto'}}>
