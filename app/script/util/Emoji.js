@@ -44,10 +44,10 @@ const EMOJI_UNICODE_RANGE_REGEXP = new RegExp(`[${EMOJI_UNICODE_RANGES.join('')}
 
 z.util.emoji = {
   includes_only_emojies: function(text) {
-    const is_valid_string = string => _.isString(string) && string.length > 0;
-    const remove_emojies = string => string.replace(EMOJI_UNICODE_RANGE_REGEXP, '');
-    const remove_whitespace = string => string.replace(/\s+/g, '');
+    const isValidString = string => _.isString(string) && string.length > 0;
+    const removeEmojies = string => string.replace(EMOJI_UNICODE_RANGE_REGEXP, '');
+    const removeWhitespace = string => string.replace(/\s+/g, '');
 
-    return is_valid_string(text) && remove_emojies(remove_whitespace(text)).length === 0;
+    return isValidString(text) && removeEmojies(removeWhitespace(text)).length === 0;
   },
 };
