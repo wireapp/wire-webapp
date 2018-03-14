@@ -474,7 +474,7 @@ z.calling.entities.CallEntity = class CallEntity {
   _setSendGroupCheckTimeout() {
     const maximumTimeout = CallEntity.CONFIG.GROUP_CHECK_MAXIMUM_TIMEOUT;
     const minimumTimeout = CallEntity.CONFIG.GROUP_CHECK_MINIMUM_TIMEOUT;
-    const timeoutInSeconds = z.util.NumberUtil.get_random_number(minimumTimeout, maximumTimeout);
+    const timeoutInSeconds = z.util.NumberUtil.getRandomNumber(minimumTimeout, maximumTimeout);
 
     const timeout = timeoutInSeconds * 1000;
     this.groupCheckTimeoutId = window.setTimeout(() => this._onSendGroupCheckTimeout(timeoutInSeconds), timeout);

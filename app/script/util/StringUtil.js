@@ -46,9 +46,9 @@ z.util.StringUtil = {
   getRandomCharacter: function() {
     let charIndex;
     while (
-      !z.util.NumberUtil.in_range(charIndex, 1, 9) &&
-      !z.util.NumberUtil.in_range(charIndex, 65, 90) &&
-      !z.util.NumberUtil.in_range(charIndex, 97, 122)
+      !z.util.NumberUtil.inRange(charIndex, 1, 9) &&
+      !z.util.NumberUtil.inRange(charIndex, 65, 90) &&
+      !z.util.NumberUtil.inRange(charIndex, 97, 122)
     ) {
       charIndex = Math.floor(Math.random() * 122);
     }

@@ -139,7 +139,7 @@ z.assets.AssetMetaDataBuilder = (() => {
     const buckets = z.util.ArrayUtil.chunk(channel, bucketSize);
 
     const audioPreview = buckets.map(bucket => {
-      return z.util.NumberUtil.cap_to_byte(AMPLIFIER * z.util.NumberUtil.root_mean_square(bucket));
+      return z.util.NumberUtil.capToByte(AMPLIFIER * z.util.NumberUtil.rootMeanSquare(bucket));
     });
 
     return new Uint8Array(audioPreview);
