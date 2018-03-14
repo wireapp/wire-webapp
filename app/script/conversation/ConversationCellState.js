@@ -152,6 +152,10 @@ z.conversation.ConversationCellState = (() => {
               const [remoteUserEntity] = lastMessageEntity.remoteUserEntities();
 
               if (remoteUserEntity) {
+                if (lastMessageEntity.isTeamMemberLeave()) {
+                  return z.l10n.text(z.string.conversationsSecondaryLinePersonRemovedTeam, remoteUserEntity.name());
+                }
+
                 const userSelfLeft = remoteUserEntity.id === lastMessageEntity.user().id;
                 const stringId = userSelfLeft
                   ? z.string.conversationsSecondaryLinePersonLeft

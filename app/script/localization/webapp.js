@@ -409,6 +409,7 @@ z.string.conversationsSecondaryLinePings = '{{number}} pings';
 z.string.conversationsSecondaryLinePeopleLeft = '{{number}} people left';
 z.string.conversationsSecondaryLinePersonLeft = '{{user}} left';
 z.string.conversationsSecondaryLinePersonRemoved = '{{user}} was removed';
+z.string.conversationsSecondaryLinePersonRemovedTeam = '{{user}} was removed from the team';
 z.string.conversationsSecondaryLinePeopleAdded = '{{user}} people were added';
 z.string.conversationsSecondaryLinePersonAdded = '{{user}} was added';
 z.string.conversationsSecondaryLinePersonAddedSelf = '{{user}} joined';
