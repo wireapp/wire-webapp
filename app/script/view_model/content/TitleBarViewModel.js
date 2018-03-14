@@ -114,15 +114,15 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
     this.showDetails();
   }
 
-  onMousedown() {
+  onMouseDown() {
     this.isDragged = this.isMacDesktop;
   }
 
-  onMousemove() {
+  onMouseMove() {
     this.isMoved = this.isDragged;
   }
 
-  onMouseup() {
+  onMouseUp() {
     this.preventPanelOpen = this.isMoved && this.isDragged;
     this.isMoved = false;
     this.isDragged = false;
