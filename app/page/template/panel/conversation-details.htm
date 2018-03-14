@@ -89,7 +89,7 @@
           <!-- ko if: isSingleUserMode() && conversationEntity().firstUserEntity() -->
             <participant-avatar params="participant: conversationEntity().firstUserEntity, size: z.components.ParticipantAvatar.SIZE.X_LARGE" data-uie-name="status-profile-picture"></participant-avatar>
             <!-- ko if: isGuest() -->
-              <div class="conversation-details__guest-label">
+              <div class="conversation-details__guest-label" data-uie-name="status-guest">
                 <guest-icon></guest-icon>
                 <span data-bind="l10n_text: z.string.conversationGuestIndicator"></span>
               </div>
