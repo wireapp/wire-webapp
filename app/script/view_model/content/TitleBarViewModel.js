@@ -140,6 +140,5 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
     if (!this.preventPanelOpen) {
       amplify.publish(z.event.WebApp.PEOPLE.TOGGLE, addPeople);
     }
-    this.preventPanelOpen = false;
   }
 };
