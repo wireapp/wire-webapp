@@ -1,11 +1,14 @@
 <div id="giphy-modal" data-bind="with: $root.giphy" class="giphy-modal modal modal-large">
   <div class="modal-content">
     <div class="giphy-modal-header modal-header">
-      <!-- ko if: showGridButton() -->
+      <!-- ko if: state() === z.viewModel.content.GiphyViewModel.STATE.RESULT-->
         <span class="button-icon icon-grid" data-bind="click: clickOnGrid"></span>
       <!-- /ko -->
-      <!-- ko ifnot: showGridButton() -->
+      <!-- ko if: state() === z.viewModel.content.GiphyViewModel.STATE.RESULTS -->
         <span class="button-icon icon-back" data-bind="click: clickOnBack" data-uie-name="do-close"></span>
+      <!-- /ko -->
+      <!-- ko ifnot: [z.viewModel.content.GiphyViewModel.STATE.RESULT, z.viewModel.content.GiphyViewModel.STATE.RESULTS].includes(state()) -->
+        <span class="giphy-modal-header-button"></span>
       <!-- /ko -->
       <span class="label-xs" data-bind="text: query" data-uie-name="giphy-query"></span>
       <span class="button-icon icon-close pull-right" data-bind="click: clickOnClose" data-uie-name="do-close"></span>

@@ -33,9 +33,10 @@ z.viewModel.content.GiphyViewModel = class GiphyViewModel {
   static get STATE() {
     return {
       DEFAULT: '',
-      ERROR: 'error',
-      LOADING: 'loading',
-      RESULTS: 'results',
+      ERROR: 'GiphyViewModel.STATE.ERROR',
+      LOADING: 'GiphyViewModel.STATE.LOADING',
+      RESULT: 'GiphyViewModel.STATE.RESULT',
+      RESULTS: 'GiphyViewModel.STATE.RESULTS',
     };
   }
 
@@ -49,7 +50,6 @@ z.viewModel.content.GiphyViewModel = class GiphyViewModel {
     this.modal = undefined;
     this.state = ko.observable(GiphyViewModel.STATE.DEFAULT);
     this.query = ko.observable('');
-    this.showGridButton = ko.observable(true);
     this.sendingGiphyMessage = false;
 
     // GIF presented in the single GIF view
@@ -71,7 +71,7 @@ z.viewModel.content.GiphyViewModel = class GiphyViewModel {
   clickOnBack() {
     this.gifs([this.gif()]);
     this.selectedGif(this.gif());
-    this.showGridButton(true);
+    this.state(GiphyViewModel.STATE.RESULT);
   }
 
   clickOnClose() {
@@ -113,13 +113,11 @@ z.viewModel.content.GiphyViewModel = class GiphyViewModel {
 
   clickToSend() {
     if (this.selectedGif() && !this.sendingGiphyMessage) {
-      const conversation_et = this.conversationRepository.active_conversation();
+      const conversationEntity = this.conversationRepository.active_conversation();
       this.sendingGiphyMessage = true;
 
-      this.conversationRepository.send_gif(conversation_et, this.selectedGif().animated, this.query()).then(() => {
+      this.conversationRepository.send_gif(conversationEntity, this.selectedGif().animated, this.query()).then(() => {
         this.sendingGiphyMessage = false;
-        const event = new z.tracking.event.PictureTakenEvent('conversation', 'giphy', 'button');
-        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, event.name, event.attributes);
         amplify.publish(z.event.WebApp.EXTENSIONS.GIPHY.SEND);
       });
 
@@ -150,15 +148,14 @@ z.viewModel.content.GiphyViewModel = class GiphyViewModel {
     const isStateError = this.state() === GiphyViewModel.STATE.ERROR;
     if (!isStateError) {
       this._clearGifs();
-      this.showGridButton(true);
 
       this.giphyRepository
         .getRandomGif({tag: this.query()})
         .then(gif => {
           this.gif(gif);
-          this.gifs.push(this.gif());
+          this.gifs([this.gif()]);
           this.selectedGif(this.gif());
-          this.state(GiphyViewModel.STATE.RESULTS);
+          this.state(GiphyViewModel.STATE.RESULT);
         })
         .catch(error => {
           this.logger.error(`No gif found for query: ${this.query()}`, error);
@@ -171,7 +168,6 @@ z.viewModel.content.GiphyViewModel = class GiphyViewModel {
     const isStateError = this.state() === GiphyViewModel.STATE.ERROR;
     if (!isStateError) {
       this._clearGifs();
-      this.showGridButton(false);
 
       this.giphyRepository
         .getGifs({
