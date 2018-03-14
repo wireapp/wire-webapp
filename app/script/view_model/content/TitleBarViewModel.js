@@ -81,6 +81,11 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
 
     const shortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.PEOPLE);
     this.peopleTooltip = z.l10n.text(z.string.tooltipConversationPeople, shortcut);
+
+    this.isOsxDesktop = z.util.Environment.electron && z.util.Environment.os.mac;
+    this.isDragged = false;
+    this.isMoved = false;
+    this.preventPanelOpen = false;
   }
 
   addedToView() {
@@ -109,6 +114,22 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
     this.showDetails();
   }
 
+  onMousedown() {
+    this.isDragged = this.isOsxDesktop;
+  }
+
+  onMousemove() {
+    this.isMoved = this.isDragged;
+  }
+
+  onMouseup() {
+    if (this.isMoved && this.isDragged) {
+      this.preventPanelOpen = true;
+    }
+    this.isMoved = false;
+    this.isDragged = false;
+  }
+
   clickOnVideoButton() {
     amplify.publish(z.event.WebApp.CALL.STATE.TOGGLE, z.media.MediaType.AUDIO_VIDEO);
   }
@@ -118,6 +139,9 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
   }
 
   showDetails(addPeople) {
-    amplify.publish(z.event.WebApp.PEOPLE.TOGGLE, addPeople);
+    if (!this.preventPanelOpen) {
+      amplify.publish(z.event.WebApp.PEOPLE.TOGGLE, addPeople);
+    }
+    this.preventPanelOpen = false;
   }
 };
