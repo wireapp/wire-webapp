@@ -46,7 +46,14 @@ z.calling.entities.FlowAudioEntity = class FlowAudioEntity {
     // Panning
     this.panning = this.flowEntity.participantEntity.panning;
     this.panning.subscribe(updatedPanningValue => {
-      this.logger.debug(`Panning of ${this.flowEntity.remoteUser.name()} changed to '${updatedPanningValue}'`);
+      this.logger.debug({
+        data: {
+          default: [this.flowEntity.remoteUser.name(), updatedPanningValue],
+          obfuscated: [this.flowEntity.remoteUser.id, updatedPanningValue],
+        },
+        message: `Panning of ${0} changed to '${1}'`,
+      });
+
       this.setPan(updatedPanningValue);
     });
 
