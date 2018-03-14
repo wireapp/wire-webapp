@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="0.3.6"></a>
+## [0.3.6](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/compare/@wireapp/store-engine@0.3.5...@wireapp/store-engine@0.3.6) (2018-03-14)
+
+
+### Bug Fixes
+
+* **store-engine:** Use Dexie from window namespace to avoid errors with npm's "setimmediate" package ([#366](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/issues/366)) ([82e47b3](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/commit/82e47b3))
+
+
+
+
 <a name="0.3.5"></a>
 ## [0.3.5](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/compare/@wireapp/store-engine@0.3.4...@wireapp/store-engine@0.3.5) (2018-03-09)
 
