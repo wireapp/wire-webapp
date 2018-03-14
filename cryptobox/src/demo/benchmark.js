@@ -55,9 +55,7 @@ async function encryptBeforeDecrypt({alice, bob}, messageCount) {
   process.stdout.write(`Measuring encryption time for "${messageCount}" messages ... `);
   let startTime = process.hrtime();
   const encryptedMessages = await Promise.all(
-    numbers.map(
-      async value => await alice.encrypt(createSessionId(bob), `This is a long message with number ${value.toString()}`)
-    )
+    numbers.map(value => alice.encrypt(createSessionId(bob), `This is a long message with number ${value.toString()}`))
   );
   let stopTime = getTimeInSeconds(startTime);
   process.stdout.write('Done.\n');
@@ -117,17 +115,16 @@ async function pingPongWithMultipleSessions(messageCount) {
     await alice.store.load_prekey(Proteus.keys.PreKey.MAX_PREKEY_ID)
   );
 
-  const cryptoboxes = [];
-  const encryptions = [];
-
   process.stdout.write(`Measuring time for creating "${messageCount}" cryptoboxes ... `);
   let startTime = process.hrtime();
 
-  for (const number of numbers) {
-    const cryptobox = await createCryptobox(`cryptobox-${number}`, 1);
-    await cryptobox.create();
-    cryptoboxes.push(cryptobox);
-  }
+  const cryptoboxes = await Promise.all(
+    numbers.map(async number => {
+      const cryptobox = await createCryptobox(`cryptobox-${number}`, 1);
+      await cryptobox.create();
+      return cryptobox;
+    })
+  );
 
   let stopTime = getTimeInSeconds(startTime);
   process.stdout.write('Done.\n');
@@ -138,10 +135,9 @@ async function pingPongWithMultipleSessions(messageCount) {
   );
   startTime = process.hrtime();
 
-  for (const cryptobox of cryptoboxes) {
-    const cipherMessage = await cryptobox.encrypt(createSessionId(alice), 'Hello', aliceBundle.serialise());
-    encryptions.push(cipherMessage);
-  }
+  const encryptions = await Promise.all(
+    cryptoboxes.map(cryptobox => cryptobox.encrypt(createSessionId(alice), 'Hello', aliceBundle.serialise()))
+  );
 
   stopTime = getTimeInSeconds(startTime);
   process.stdout.write('Done.\n');
@@ -150,10 +146,7 @@ async function pingPongWithMultipleSessions(messageCount) {
   process.stdout.write(`Measuring time for decrypting "${messageCount}" messages in "${messageCount}" sessions ... `);
   startTime = process.hrtime();
 
-  for (let index = 0; index < encryptions.length; index++) {
-    const encrypted = encryptions[index];
-    await alice.decrypt(`session-${index}`, encrypted);
-  }
+  await Promise.all(encryptions.map((encrypted, index) => alice.decrypt(`session-${index}`, encrypted)));
 
   stopTime = getTimeInSeconds(startTime);
   process.stdout.write('Done.\n');
