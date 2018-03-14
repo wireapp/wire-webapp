@@ -22,10 +22,10 @@
 'use strict';
 
 describe('z.util.URLUtil', () => {
-  describe('"get_links_from_html"', () => {
+  describe('"getLinksFromHtml"', () => {
     it('returns an array of links from a given HTML markup', () => {
       const html = '<a href="https://www.google.com" target="_blank" rel="nofollow">https://www.google.com</a>';
-      const links = z.util.URLUtil.get_links_from_html(html);
+      const links = z.util.URLUtil.getLinksFromHtml(html);
       expect(links.length).toBe(1);
       const link = links[0];
       expect(link.href).toBe('https://www.google.com/');
@@ -33,29 +33,29 @@ describe('z.util.URLUtil', () => {
     });
 
     it('handles undefined and null values', () => {
-      let links = z.util.URLUtil.get_links_from_html(undefined);
+      let links = z.util.URLUtil.getLinksFromHtml(undefined);
       expect(links.length).toBe(0);
-      links = z.util.URLUtil.get_links_from_html(null);
+      links = z.util.URLUtil.getLinksFromHtml(null);
       expect(links.length).toBe(0);
     });
 
     it('always returns an array', () => {
       const html = '🦅🌾';
-      const links = z.util.URLUtil.get_links_from_html(html);
+      const links = z.util.URLUtil.getLinksFromHtml(html);
       expect(links.length).toBe(0);
     });
 
     it('returns an array of links from a given HTML markup with an anchor tag and plaintext', () => {
       const text =
         'Check this <a href="https://www.google.com" target="_blank" rel="nofollow">https://www.google.com</a>';
-      const links = z.util.URLUtil.get_links_from_html(text);
+      const links = z.util.URLUtil.getLinksFromHtml(text);
       expect(links.length).toBe(1);
     });
 
     it('returns an array of links from a given HTML markup with multiple anchor tags and plaintext', () => {
       const text =
         'My favorite websites are <a href="https://wire.com/" target="_blank" rel="nofollow noopener noreferrer">https://wire.com/</a> and <a href="https://stackoverflow.com" target="_blank" rel="nofollow noopener noreferrer">https://stackoverflow.com</a>';
-      const links = z.util.URLUtil.get_links_from_html(text);
+      const links = z.util.URLUtil.getLinksFromHtml(text);
       expect(links.length).toBe(2);
     });
   });

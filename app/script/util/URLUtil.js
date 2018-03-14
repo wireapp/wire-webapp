@@ -31,35 +31,35 @@ z.util.URLUtil = (() => {
     WEBSITE: 'TYPE.WEBSITE',
   };
 
-  const _get_domain = url_type => {
-    const is_production = _is_production_backend();
+  const _getDomain = urlType => {
+    const isProduction = _isProductionBackend();
 
-    switch (url_type) {
+    switch (urlType) {
       case TYPE.ACCOUNT:
-        return is_production ? z.config.URL.ACCOUNT.PRODUCTION : z.config.URL.ACCOUNT.STAGING;
+        return isProduction ? z.config.URL.ACCOUNT.PRODUCTION : z.config.URL.ACCOUNT.STAGING;
       case TYPE.SUPPORT:
         return z.config.URL.SUPPORT;
       case TYPE.TEAM_SETTINGS:
-        return is_production ? z.config.URL.TEAM_SETTINGS.PRODUCTION : z.config.URL.TEAM_SETTINGS.STAGING;
+        return isProduction ? z.config.URL.TEAM_SETTINGS.PRODUCTION : z.config.URL.TEAM_SETTINGS.STAGING;
       case TYPE.WEBAPP:
-        return is_production ? z.config.URL.WEBAPP.PRODUCTION : z.config.URL.WEBAPP.STAGING;
+        return isProduction ? z.config.URL.WEBAPP.PRODUCTION : z.config.URL.WEBAPP.STAGING;
       case TYPE.WEBSITE:
-        return is_production ? z.config.URL.WEBSITE.PRODUCTION : z.config.URL.WEBSITE.STAGING;
+        return isProduction ? z.config.URL.WEBSITE.PRODUCTION : z.config.URL.WEBSITE.STAGING;
       default:
         throw new Error('Unknown URL type');
     }
   };
 
-  const _is_production_backend = () => z.util.Environment.backend.current === z.service.BackendEnvironment.PRODUCTION;
+  const _isProductionBackend = () => z.util.Environment.backend.current === z.service.BackendEnvironment.PRODUCTION;
 
-  const _build_support_url = support_id => {
-    const url_path = _.isNumber(support_id) ? z.string.urlSupportArticles : z.string.urlSupportRequests;
-    return `${_get_domain(TYPE.SUPPORT)}${z.l10n.text(url_path)}${support_id}`;
+  const _buildSupportUrl = support_id => {
+    const urlPath = _.isNumber(support_id) ? z.string.urlSupportArticles : z.string.urlSupportRequests;
+    return `${_getDomain(TYPE.SUPPORT)}${z.l10n.text(urlPath)}${support_id}`;
   };
 
-  const _build_url = (type, path = '') => `${_get_domain(type)}${path && path.startsWith('/') ? path : ''}`;
+  const _buildUrl = (type, path = '') => `${_getDomain(type)}${path && path.startsWith('/') ? path : ''}`;
 
-  const _get_links_from_html = html => {
+  const _getLinksFromHtml = html => {
     if (!html) {
       return [];
     }
@@ -76,8 +76,8 @@ z.util.URLUtil = (() => {
 
   return {
     TYPE: TYPE,
-    build_support_url: _build_support_url,
-    build_url: _build_url,
-    get_links_from_html: _get_links_from_html,
+    buildSupportUrl: _buildSupportUrl,
+    buildUrl: _buildUrl,
+    getLinksFromHtml: _getLinksFromHtml,
   };
 })();
