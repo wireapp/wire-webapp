@@ -51,9 +51,6 @@ window.z.config = {
   // 25 megabyte upload limit (minus AES overhead)
   MAXIMUM_ASSET_FILE_SIZE: 25 * 1024 * 1024 - 32,
 
-  // Maximum of parallel uploads
-  MAXIMUM_ASSET_UPLOADS: 10,
-
   // 15 megabyte image upload limit
   MAXIMUM_IMAGE_FILE_SIZE: 15 * 1024 * 1024,
 

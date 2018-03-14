@@ -86,7 +86,7 @@ z.viewModel.ContentViewModel = class ContentViewModel {
     this.state.subscribe(state => {
       switch (state) {
         case ContentViewModel.STATE.CONVERSATION:
-          this.inputBar.added_to_view();
+          this.inputBar.addedToView();
           this.titleBar.addedToView();
           break;
         case ContentViewModel.STATE.PREFERENCES_ACCOUNT:
@@ -122,7 +122,6 @@ z.viewModel.ContentViewModel = class ContentViewModel {
   _initSubscriptions() {
     amplify.subscribe(z.event.WebApp.CONTENT.SWITCH, this.switchContent.bind(this));
     amplify.subscribe(z.event.WebApp.CONVERSATION.SHOW, this.showConversation.bind(this));
-    amplify.subscribe(z.event.WebApp.LIST.SCROLL, this.inputBar.show_separator);
     amplify.subscribe(z.event.WebApp.WINDOW.RESIZE.HEIGHT, this.messageList.scroll_height);
   }
 

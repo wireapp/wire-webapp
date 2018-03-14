@@ -38,6 +38,7 @@ z.viewModel.content.GiphyViewModel = class GiphyViewModel {
       RESULTS: 'results',
     };
   }
+
   constructor(mainViewModel, contentViewModel, repositories) {
     this.on_clicked_gif = this.on_clicked_gif.bind(this);
 

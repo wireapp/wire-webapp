@@ -251,25 +251,6 @@ z.util.format_seconds = function(duration) {
   return components.join(':');
 };
 
-/**
- * Format seconds into 15s, 2m.
- * @param {number} duration - duration to format in seconds
- * @returns {Array} First index holds the values, second index holds the unit format.
- */
-z.util.format_milliseconds_short = function(duration) {
-  const seconds = Math.floor(duration / 1000);
-  switch (false) {
-    case !(seconds < 60):
-      return [seconds, 's'];
-    case !(seconds < 60 * 60):
-      return [Math.floor(seconds / 60), 'm'];
-    case !(seconds < 60 * 60 * 24):
-      return [Math.floor(seconds / 60 / 60), 'h'];
-    default:
-      return [Math.floor(seconds / 60 / 60 / 24), 'd'];
-  }
-};
-
 z.util.get_content_type_from_data_url = function(data_url) {
   return data_url
     .split(',')[0]
