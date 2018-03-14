@@ -64,7 +64,7 @@ z.calling.CallingRepository = class CallingRepository {
     this.conversationRepository = conversationRepository;
     this.mediaRepository = mediaRepository;
     this.userRepository = userRepository;
-    this.logger = new z.util.CallingLogger('z.calling.CallingRepository', z.config.LOGGER.OPTIONS);
+    this.logger = new z.telemetry.calling.CallLogger('z.calling.CallingRepository', z.config.LOGGER.OPTIONS);
 
     this.selfUserId = ko.pureComputed(() => {
       if (this.userRepository.self()) {

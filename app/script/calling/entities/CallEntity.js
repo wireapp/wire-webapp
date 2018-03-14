@@ -53,7 +53,7 @@ z.calling.entities.CallEntity = class CallEntity {
     const {id: conversationId, is_group} = conversationEntity;
     const {mediaStreamHandler, mediaRepository, selfState, telemetry, userRepository} = this.callingRepository;
 
-    this.logger = new z.util.CallingLogger(
+    this.logger = new z.telemetry.calling.CallLogger(
       `z.calling.entities.CallEntity (${conversationId})`,
       z.config.LOGGER.OPTIONS
     );

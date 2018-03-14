@@ -38,7 +38,7 @@ z.calling.entities.ParticipantEntity = class ParticipantEntity {
     this.id = this.user.id;
     this.sessionId = undefined;
 
-    this.logger = new z.util.CallingLogger(
+    this.logger = new z.telemetry.calling.CallLogger(
       `z.calling.entities.ParticipantEntity (${this.id})`,
       z.config.LOGGER.OPTIONS
     );

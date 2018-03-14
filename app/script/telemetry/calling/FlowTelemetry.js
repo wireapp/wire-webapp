@@ -35,7 +35,10 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
   constructor(id, remote_user_id, call_et, timings) {
     this.remote_user_id = remote_user_id;
     this.call_et = call_et;
-    this.logger = new z.util.CallingLogger(`z.telemetry.calling.FlowTelemetry (${id})`, z.config.LOGGER.OPTIONS);
+    this.logger = new z.telemetry.calling.CallLogger(
+      `z.telemetry.calling.FlowTelemetry (${id})`,
+      z.config.LOGGER.OPTIONS
+    );
 
     this.id = id;
     this.is_answer = false;

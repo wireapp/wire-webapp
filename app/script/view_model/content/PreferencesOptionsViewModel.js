@@ -71,12 +71,12 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
     amplify.publish(z.event.WebApp.CONNECT.IMPORT_CONTACTS, z.connect.ConnectSource.ICLOUD);
   }
 
-  save_call_logs() {
-    if (z.util.CallingLog.length < 1) {
-      return false;
+  saveCallLogs() {
+    if (!z.telemetry.calling.CallLog.length) {
+      return;
     }
 
-    const blob = new Blob([z.util.CallingLog.join('\r\n')], {
+    const blob = new Blob([z.telemetry.calling.CallLog.join('\r\n')], {
       type: 'text/plain;charset=utf-8',
     });
     const currentDate = new Date().toISOString().replace(' ', '-');
