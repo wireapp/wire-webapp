@@ -39,8 +39,8 @@ z.components.LinkPreviewAssetComponent = class LinkPreviewAssetComponent {
     this.element = component_info.element;
 
     const is_type_tweet = this.preview.meta_data_type === z.links.LinkPreviewMetaDataType.TWEET;
-    this.is_tweet = is_type_tweet && z.util.ValidationUtil.urls.is_tweet(this.preview.url);
-    this.author = this.is_tweet ? this.preview.meta_data.author.substring(0, 20) : '';
+    this.isTweet = is_type_tweet && z.util.ValidationUtil.urls.isTweet(this.preview.url);
+    this.author = this.isTweet ? this.preview.meta_data.author.substring(0, 20) : '';
 
     this.on_link_preview_click = this.on_link_preview_click.bind(this);
 
@@ -76,14 +76,14 @@ ko.components.register('link-preview-asset', {
         <!-- ko if: header -->
           <asset-header class="link-preview-info-header" params="message: message_et"></asset-header>
         <!-- /ko -->
-        <!-- ko if: is_tweet -->
+        <!-- ko if: isTweet -->
           <div class="link-preview-info-title" data-bind="text: preview.title, css: header ? 'link-preview-info-title-singleline' : 'link-preview-info-title-multiline'" data-uie-name="link-preview-title"></div>
           <div class="link-preview-info-link text-graphite" data-bind="attr: {title: preview.url}" data-uie-name="link-preview-tweet-author">
             <span class="font-weight-bold link-preview-info-title-singleline" data-bind="text: author"></span>
             <span data-bind="l10n_text: z.string.conversationTweetAuthor"></span>
           </div>
         <!-- /ko -->
-        <!-- ko ifnot: is_tweet -->
+        <!-- ko ifnot: isTweet -->
           <div class="link-preview-info-title" data-bind="text: preview.title, css: header ? 'link-preview-info-title-singleline' : 'link-preview-info-title-multiline'" data-uie-name="link-preview-title"></div>
           <div class="link-preview-info-link text-graphite ellipsis" data-bind="text: z.util.naked_url(preview.url), attr: {title: preview.url}" data-uie-name="link-preview-url"></div>
         <!-- /ko -->

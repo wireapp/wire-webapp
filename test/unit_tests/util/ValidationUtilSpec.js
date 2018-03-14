@@ -86,72 +86,72 @@ describe('z.util.ValidationUtil', () => {
     });
   });
 
-  describe('"asset.retention_policy"', () => {
+  describe('"asset.retentionPolicy"', () => {
     it('detects retention numbers', () => {
-      expect(z.util.ValidationUtil.asset.retention_policy(1)).toBe(true);
-      expect(z.util.ValidationUtil.asset.retention_policy(2)).toBe(true);
-      expect(z.util.ValidationUtil.asset.retention_policy(3)).toBe(true);
+      expect(z.util.ValidationUtil.asset.retentionPolicy(1)).toBe(true);
+      expect(z.util.ValidationUtil.asset.retentionPolicy(2)).toBe(true);
+      expect(z.util.ValidationUtil.asset.retentionPolicy(3)).toBe(true);
     });
 
     it('detects invalid retention numbers', () => {
-      expect(z.util.ValidationUtil.asset.retention_policy(0)).toBe(false);
-      expect(z.util.ValidationUtil.asset.retention_policy(4)).toBe(false);
+      expect(z.util.ValidationUtil.asset.retentionPolicy(0)).toBe(false);
+      expect(z.util.ValidationUtil.asset.retentionPolicy(4)).toBe(false);
     });
   });
 
-  describe('"is_base64"', () => {
+  describe('"isBase64"', () => {
     it('detects a correct Base64-encoded string', () => {
       const encoded = 'SGVsbG8gV29ybGQh';
-      const actual = z.util.ValidationUtil.is_base64(encoded);
+      const actual = z.util.ValidationUtil.isBase64(encoded);
       expect(actual).toBe(true);
     });
 
     it('detects an incorrect Base64-encoded string', () => {
       const encoded = 'SGVsbG8gV29ybGQh==';
-      const actual = z.util.ValidationUtil.is_base64(encoded);
+      const actual = z.util.ValidationUtil.isBase64(encoded);
       expect(actual).toBe(false);
     });
   });
 
-  describe('"is_bearer_token"', () => {
+  describe('"isBearerToken"', () => {
     it('detects a correct Bearer Token', () => {
       const token = 'iJCRCjc8oROO-dkrkqCXOade997oa8Jhbz6awMUQPBQo80VenWqp_oNvfY6AnU5BxEsdDPOBfBP-uz_b0gAKBQ==';
-      const actual = z.util.ValidationUtil.is_bearer_token(token);
+      const actual = z.util.ValidationUtil.isBearerToken(token);
       expect(actual).toBe(true);
     });
 
     it('detects a incorrect Bearer Token', () => {
       const token = 'iJCRCjc8oROO-dkrkqCXOade997oa8Jhbz6awMUQPBQo80VenWqp_oNvfY6AnU5BxEsdDPOBfBP-uz_b0gAKBQ==.v=1';
-      const actual = z.util.ValidationUtil.is_bearer_token(token);
+      const actual = z.util.ValidationUtil.isBearerToken(token);
       expect(actual).toBe(false);
     });
   });
 
-  describe('"is_UUID"', () => {
+  describe('"isUUID"', () => {
     it('detects a correct UUID', () => {
       const uuid = UUID.genV4().hexString;
-      const actual = z.util.ValidationUtil.is_UUID(uuid);
+      const actual = z.util.ValidationUtil.isUUID(uuid);
       expect(actual).toBe(true);
     });
 
     it('detects a incorrect UUID', () => {
       const uuid = 'i-c-o-r-r-e-c-t';
-      const actual = z.util.ValidationUtil.is_UUID(uuid);
+      const actual = z.util.ValidationUtil.isUUID(uuid);
       expect(actual).toBe(false);
     });
   });
 
-  describe('"is_valid_api_path"', () => {
+  describe('"isValidApiPath"', () => {
     it('detects a valid API path', () => {
       const path = '/search/contacts';
-      const actual = z.util.ValidationUtil.is_valid_api_path(path);
+      const actual = z.util.ValidationUtil.isValidApiPath(path);
       expect(actual).toBe(true);
     });
 
     it('detects a invalid API path', done => {
       const path = '../../../search/contacts';
       try {
-        z.util.ValidationUtil.is_valid_api_path(path);
+        z.util.ValidationUtil.isValidApiPath(path);
       } catch (error) {
         expect(error).toEqual(jasmine.any(z.util.ValidationUtilError));
         return done();
@@ -161,7 +161,7 @@ describe('z.util.ValidationUtil', () => {
   });
 
   // See https://regex101.com/r/ixiPT0/7
-  describe('"urls.is_tweet"', () => {
+  describe('"urls.isTweet"', () => {
     it('detects invalid statuses', () => {
       const urls = [
         'http://twitter.com/',
@@ -175,7 +175,7 @@ describe('z.util.ValidationUtil', () => {
         'ftp://twitter.com/pwnsdx/status/899574902050758656',
       ];
       for (const url of urls) {
-        expect(z.util.ValidationUtil.urls.is_tweet(url)).toBe(false);
+        expect(z.util.ValidationUtil.urls.isTweet(url)).toBe(false);
       }
     });
 
@@ -187,20 +187,20 @@ describe('z.util.ValidationUtil', () => {
         'http://www.twitter.com/pwnsdx/status/899574902050758656',
       ];
       for (const url of urls) {
-        expect(z.util.ValidationUtil.urls.is_tweet(url)).toBe(true);
+        expect(z.util.ValidationUtil.urls.isTweet(url)).toBe(true);
       }
     });
     it('detects a valid status with "statues" in the url', () => {
       const urls = ['https://twitter.com/pwnsdx/statuses/899574902050758656'];
       for (const url of urls) {
-        expect(z.util.ValidationUtil.urls.is_tweet(url)).toBe(true);
+        expect(z.util.ValidationUtil.urls.isTweet(url)).toBe(true);
       }
     });
 
     it('detects a valid status when using moments', () => {
       const urls = ['https://twitter.com/i/moments/899675330595749888'];
       for (const url of urls) {
-        expect(z.util.ValidationUtil.urls.is_tweet(url)).toBe(true);
+        expect(z.util.ValidationUtil.urls.isTweet(url)).toBe(true);
       }
     });
 
@@ -211,14 +211,14 @@ describe('z.util.ValidationUtil', () => {
         'https://twitter.com/pwnsdx/status/899574902050758656?ref_src=twsrc%5Etfw&ref_url=https%3A%2F%2Fdiscover.twitter.com%2Ffirst-tweet',
       ];
       for (const url of urls) {
-        expect(z.util.ValidationUtil.urls.is_tweet(url)).toBe(true);
+        expect(z.util.ValidationUtil.urls.isTweet(url)).toBe(true);
       }
     });
 
     it('detects a valid status with a short id', () => {
       const urls = ['https://twitter.com/Twitter/status/145344012'];
       for (const url of urls) {
-        expect(z.util.ValidationUtil.urls.is_tweet(url)).toBe(true);
+        expect(z.util.ValidationUtil.urls.isTweet(url)).toBe(true);
       }
     });
 
@@ -228,7 +228,7 @@ describe('z.util.ValidationUtil', () => {
         'https://0.twitter.com/pwnsdx/status/899574902050758656',
       ];
       for (const url of urls) {
-        expect(z.util.ValidationUtil.urls.is_tweet(url)).toBe(true);
+        expect(z.util.ValidationUtil.urls.isTweet(url)).toBe(true);
       }
     });
   });
