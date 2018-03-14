@@ -82,7 +82,7 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
     const shortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.PEOPLE);
     this.peopleTooltip = z.l10n.text(z.string.tooltipConversationPeople, shortcut);
 
-    this.isOsxDesktop = z.util.Environment.electron && z.util.Environment.os.mac;
+    this.isMacDesktop = z.util.Environment.electron && z.util.Environment.os.mac;
     this.isDragged = false;
     this.isMoved = false;
     this.preventPanelOpen = false;
@@ -115,7 +115,7 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
   }
 
   onMousedown() {
-    this.isDragged = this.isOsxDesktop;
+    this.isDragged = this.isMacDesktop;
   }
 
   onMousemove() {
