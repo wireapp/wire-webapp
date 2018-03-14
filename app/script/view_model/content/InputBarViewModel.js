@@ -358,10 +358,10 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     }
 
     if ($('.messages-wrap').is_scrolled_bottom()) {
-      return $('.messages-wrap').scroll_to_bottom();
+      return $('.messages-wrap').scrollToBottom();
     }
 
-    return $('.messages-wrap').scroll_by(list_height_new - list_height_old);
+    return $('.messages-wrap').scrollBy(list_height_new - list_height_old);
   }
 
   show_separator(is_scrolled_bottom) {

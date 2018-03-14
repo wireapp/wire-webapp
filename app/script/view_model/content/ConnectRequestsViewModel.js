@@ -54,7 +54,7 @@ z.viewModel.content.ConnectRequestsViewModel = class ConnectRequestsViewModel {
    */
   afterRender(elements, request) {
     if (z.util.ArrayUtil.is_last_item(this.connectRequests(), request)) {
-      window.requestAnimationFrame(() => $('.connect-requests').scroll_to_bottom());
+      window.requestAnimationFrame(() => $('.connect-requests').scrollToBottom());
     }
   }
 

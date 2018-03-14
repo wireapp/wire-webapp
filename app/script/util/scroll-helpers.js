@@ -19,7 +19,7 @@
 
 'use strict';
 
-$.fn.scroll_end = function() {
+$.fn.scrollEnd = function() {
   const element = $(this).get(0);
   if (!element) {
     return;
@@ -27,7 +27,7 @@ $.fn.scroll_end = function() {
   return element.scrollHeight - element.clientHeight;
 };
 
-$.fn.scroll_to_bottom = function() {
+$.fn.scrollToBottom = function() {
   const $element = $(this);
   if ($element.length === 0) {
     return;
@@ -40,13 +40,13 @@ $.fn.scroll_to_bottom = function() {
   }, 200);
 };
 
-$.fn.scroll_by = function(distance) {
+$.fn.scrollBy = function(distance) {
   const $element = $(this);
   if ($element.length === 0) {
     return;
   }
-  const scroll_top = $element[0].scrollTop;
-  return $element.scrollTop(scroll_top + distance);
+  const scrollTop = $element[0].scrollTop;
+  return $element.scrollTop(scrollTop + distance);
 };
 
 $.fn.is_scrolled_bottom = function(offset) {
@@ -57,13 +57,13 @@ $.fn.is_scrolled_bottom = function(offset) {
   if ($element.length === 0) {
     return;
   }
-  const scroll_top = Math.ceil($element.scrollTop());
-  const scroll_height = $element[0].scrollHeight;
+  const scrollTop = Math.ceil($element.scrollTop());
+  const scrollHeight = $element[0].scrollHeight;
   const height = $element[0].clientHeight;
-  return scroll_top + height + offset >= scroll_height;
+  return scrollTop + height + offset >= scrollHeight;
 };
 
-$.fn.is_scrolled_top = function() {
+$.fn.isScrolledTop = function() {
   const $element = $(this);
   if ($element.length === 0) {
     return;
@@ -71,7 +71,7 @@ $.fn.is_scrolled_top = function() {
   return $element.scrollTop() === 0;
 };
 
-$.fn.is_scrollable = function() {
+$.fn.isScrollable = function() {
   const element = $(this).get(0);
   if (!element) {
     return;

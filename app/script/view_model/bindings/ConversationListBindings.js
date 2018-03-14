@@ -25,7 +25,7 @@ ko.bindingHandlers.bordered_list = (function() {
     if ($element) {
       window.requestAnimationFrame(() => {
         const list_column = $($element).parent();
-        if ($element.height() <= 0 || !$element.is_scrollable()) {
+        if ($element.height() <= 0 || !$element.isScrollable()) {
           return list_column.removeClass('left-list-center-border-bottom conversations-center-border-top');
         }
 
