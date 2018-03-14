@@ -211,7 +211,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
     this.posted_mode_verify = ko.pureComputed(() => this.posted_mode() === z.auth.AuthView.MODE.POSTED_VERIFY);
 
     // Debugging
-    if (z.util.Environment.frontend.is_localhost()) {
+    if (z.util.Environment.frontend.isLocalhost()) {
       const live_reload = document.createElement('script');
       live_reload.id = 'live_reload';
       live_reload.src = 'http://localhost:32123/livereload.js';

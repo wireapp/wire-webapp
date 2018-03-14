@@ -197,7 +197,7 @@ z.main.App = class App {
    */
   _setup_utils() {
     return {
-      debug: z.util.Environment.frontend.is_production()
+      debug: z.util.Environment.frontend.isProduction()
         ? undefined
         : new z.util.DebugUtil(this.repository.calling, this.repository.conversation, this.repository.user),
     };
@@ -537,9 +537,9 @@ z.main.App = class App {
    * @returns {Promise} Resolves with the access token
    */
   _load_access_token() {
-    const is_localhost = z.util.Environment.frontend.is_localhost();
+    const isLocalhost = z.util.Environment.frontend.isLocalhost();
     const is_redirect_from_auth = document.referrer.toLowerCase().includes('/auth');
-    const get_cached_token = is_localhost || is_redirect_from_auth;
+    const get_cached_token = isLocalhost || is_redirect_from_auth;
 
     return get_cached_token ? this.auth.repository.getCachedAccessToken() : this.auth.repository.getAccessToken();
   }
@@ -807,7 +807,7 @@ z.main.App = class App {
    * @returns {undefined} No return value
    */
   init_debugging() {
-    if (z.util.Environment.frontend.is_localhost()) {
+    if (z.util.Environment.frontend.isLocalhost()) {
       this._attach_live_reload();
     }
   }

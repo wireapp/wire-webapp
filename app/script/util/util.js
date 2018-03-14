@@ -23,7 +23,7 @@ window.z = window.z || {};
 window.z.util = z.util || {};
 
 z.util.check_indexed_db = function() {
-  if (!z.util.Environment.browser.supports.indexed_db) {
+  if (!z.util.Environment.browser.supports.indexedDb) {
     if (z.util.Environment.browser.edge) {
       return Promise.reject(new z.auth.AuthError(z.auth.AuthError.TYPE.PRIVATE_MODE));
     }

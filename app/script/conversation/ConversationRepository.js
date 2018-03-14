@@ -156,7 +156,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.supportConversationLinks = ko.observable();
     this.enableConversationLinks = ko.pureComputed(() => {
       const isBoolean = _.isBoolean(this.supportConversationLinks());
-      const isEnabled = isBoolean ? this.supportConversationLinks() : !z.util.Environment.frontend.is_production();
+      const isEnabled = isBoolean ? this.supportConversationLinks() : !z.util.Environment.frontend.isProduction();
       return this.isTeam() && isEnabled;
     });
 

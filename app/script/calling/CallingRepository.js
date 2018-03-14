@@ -45,7 +45,7 @@ z.calling.CallingRepository = class CallingRepository {
    * @returns {boolean} True if screen sharing is supported
    */
   static get supportsScreenSharing() {
-    return z.util.Environment.browser.supports.screen_sharing;
+    return z.util.Environment.browser.supports.screenSharing;
   }
 
   /**

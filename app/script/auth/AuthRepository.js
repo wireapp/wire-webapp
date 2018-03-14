@@ -132,7 +132,7 @@ z.auth.AuthRepository = class AuthRepository {
         .catch(error => {
           const {message, type} = error;
           const isRequestForbidden = type === z.auth.AccessTokenError.TYPE.REQUEST_FORBIDDEN;
-          if (isRequestForbidden || z.util.Environment.frontend.is_localhost()) {
+          if (isRequestForbidden || z.util.Environment.frontend.isLocalhost()) {
             this.logger.warn(`Session expired on access token refresh: ${message}`, error);
             Raygun.send(error);
             return amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SIGN_OUT_REASON.SESSION_EXPIRED, false);

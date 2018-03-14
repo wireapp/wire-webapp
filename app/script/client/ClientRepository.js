@@ -341,7 +341,7 @@ z.client.ClientRepository = class ClientRepository {
         identifier = z.string.wireLinux;
       }
       deviceModel = z.l10n.text(identifier);
-      if (!z.util.Environment.frontend.is_production()) {
+      if (!z.util.Environment.frontend.isProduction()) {
         deviceModel = `${deviceModel} (Internal)`;
       }
     } else if (clientType === z.client.ClientType.TEMPORARY) {

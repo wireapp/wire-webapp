@@ -45,39 +45,39 @@ window.z.util = z.util || {};
   };
 
   const _check = {
-    get_version: () => {
+    getVersion: () => {
       if (window.platform.version) {
         return window.parseInt(window.platform.version.split('.')[0], 10);
       }
     },
-    is_chrome() {
-      return window.platform.name === BROWSER_NAME.CHROME || this.is_electron();
+    isChrome() {
+      return window.platform.name === BROWSER_NAME.CHROME || this.isElectron();
     },
-    is_desktop() {
-      return this.is_electron() && window.platform.ua.includes(BROWSER_NAME.WIRE);
+    isDesktop() {
+      return this.isElectron() && window.platform.ua.includes(BROWSER_NAME.WIRE);
     },
-    is_edge: () => window.platform.name === BROWSER_NAME.EDGE,
-    is_electron: () => window.platform.name === BROWSER_NAME.ELECTRON,
-    is_firefox: () => window.platform.name === BROWSER_NAME.FIREFOX,
-    is_opera: () => window.platform.name === BROWSER_NAME.OPERA,
-    supports_audio_output_selection() {
-      return this.is_chrome();
+    isEdge: () => window.platform.name === BROWSER_NAME.EDGE,
+    isElectron: () => window.platform.name === BROWSER_NAME.ELECTRON,
+    isFirefox: () => window.platform.name === BROWSER_NAME.FIREFOX,
+    isOpera: () => window.platform.name === BROWSER_NAME.OPERA,
+    supportsAudioOutputSelection() {
+      return this.isChrome();
     },
-    supports_calling() {
-      if (!this.supports_media_devices()) {
+    supportsCalling() {
+      if (!this.supportsMediaDevices()) {
         return false;
       }
       if (window.WebSocket === undefined) {
         return false;
       }
-      if (this.is_edge()) {
+      if (this.isEdge()) {
         return false;
       }
-      return this.is_chrome() || this.is_firefox() || this.is_opera();
+      return this.isChrome() || this.isFirefox() || this.isOpera();
     },
-    supports_indexed_db: () => !!window.indexedDB,
-    supports_media_devices: () => !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia),
-    supports_notifications: () => {
+    supportsIndexedDb: () => !!window.indexedDB,
+    supportsMediaDevices: () => !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia),
+    supportsNotifications: () => {
       if (window.Notification === undefined) {
         return false;
       }
@@ -86,25 +86,25 @@ window.z.util = z.util || {};
       }
       return document.visibilityState !== undefined;
     },
-    supports_screen_sharing() {
+    supportsScreenSharing() {
       if (window.desktopCapturer) {
         return true;
       }
-      return this.is_firefox();
+      return this.isFirefox();
     },
   };
 
   const os = {
-    is_mac: () => window.platform.ua.includes(PLATFORM_NAME.MACINTOSH),
-    is_windows: () => window.platform.os.family.includes(PLATFORM_NAME.WINDOWS),
+    isMac: () => window.platform.ua.includes(PLATFORM_NAME.MACINTOSH),
+    isWindows: () => window.platform.os.family.includes(PLATFORM_NAME.WINDOWS),
   };
 
   // add body information
-  const os_css_class = os.is_mac() ? 'os-mac' : 'os-pc';
-  const platform_css_class = _check.is_electron() ? 'platform-electron' : 'platform-web';
-  document.body.classList.add(os_css_class, platform_css_class);
+  const osCssClass = os.isMac() ? 'os-mac' : 'os-pc';
+  const platformCssClass = _check.isElectron() ? 'platform-electron' : 'platform-web';
+  document.body.classList.add(osCssClass, platformCssClass);
 
-  const app_version = () => {
+  const appVersion = () => {
     const versionElement = document.head.querySelector("[property='wire:version']");
     if (versionElement && versionElement.hasAttribute('version')) {
       return versionElement.getAttribute('version').trim();
@@ -112,13 +112,13 @@ window.z.util = z.util || {};
     return '';
   };
 
-  const formatted_app_version = () => {
-    const [year, month, day, hour, minute] = app_version().split('-');
+  const formattedAppVersion = () => {
+    const [year, month, day, hour, minute] = appVersion().split('-');
     return `${year}.${month}.${day}.${hour}${minute}`;
   };
 
   z.util.Environment = {
-    _electron_version: user_agent => {
+    _electronVersion: user_agent => {
       const result = /(Wire|WireInternal)\/(\S+)/.exec(user_agent);
       // [match, app, version]
       return result ? result[2] : undefined;
@@ -127,47 +127,47 @@ window.z.util = z.util || {};
       current: undefined,
     },
     browser: {
-      chrome: _check.is_chrome(),
-      edge: _check.is_edge(),
-      firefox: _check.is_firefox(),
+      chrome: _check.isChrome(),
+      edge: _check.isEdge(),
+      firefox: _check.isFirefox(),
       name: window.platform.name,
-      opera: _check.is_opera(),
+      opera: _check.isOpera(),
       supports: {
-        audio_output_selection: _check.supports_audio_output_selection(),
-        calling: _check.supports_calling(),
-        indexed_db: _check.supports_indexed_db(),
-        media_devices: _check.supports_media_devices(),
-        notifications: _check.supports_notifications(),
-        screen_sharing: _check.supports_screen_sharing(),
+        audioOutputSelection: _check.supportsAudioOutputSelection(),
+        calling: _check.supportsCalling(),
+        indexedDb: _check.supportsIndexedDb(),
+        mediaDevices: _check.supportsMediaDevices(),
+        notifications: _check.supportsNotifications(),
+        screenSharing: _check.supportsScreenSharing(),
       },
-      version: _check.get_version(),
+      version: _check.getVersion(),
     },
-    desktop: _check.is_desktop(),
-    electron: _check.is_electron(),
+    desktop: _check.isDesktop(),
+    electron: _check.isElectron(),
     frontend: {
-      is_localhost: () => [APP_ENV.LOCALHOST, APP_ENV.VIRTUAL_HOST].includes(window.location.hostname),
-      is_production: () => [APP_ENV.PRODUCTION, APP_ENV.PROD_NEXT].includes(window.location.hostname),
+      isLocalhost: () => [APP_ENV.LOCALHOST, APP_ENV.VIRTUAL_HOST].includes(window.location.hostname),
+      isProduction: () => [APP_ENV.PRODUCTION, APP_ENV.PROD_NEXT].includes(window.location.hostname),
     },
     os: {
-      linux: !os.is_mac() && !os.is_windows(),
-      mac: os.is_mac(),
-      win: os.is_windows(),
+      linux: !os.isMac() && !os.isWindows(),
+      mac: os.isMac(),
+      win: os.isWindows(),
     },
-    version(show_wrapper_version = true, do_not_format = false) {
-      if (z.util.Environment.frontend.is_localhost()) {
+    version(showWrapperVersion = true, doNotFormat = false) {
+      if (z.util.Environment.frontend.isLocalhost()) {
         return 'dev';
       }
 
-      if (do_not_format) {
-        return app_version();
+      if (doNotFormat) {
+        return appVersion();
       }
 
-      const electron_version = this._electron_version(window.platform.ua);
-      if (electron_version && show_wrapper_version) {
-        return electron_version;
+      const electronVersion = this._electronVersion(window.platform.ua);
+      if (electronVersion && showWrapperVersion) {
+        return electronVersion;
       }
 
-      return formatted_app_version();
+      return formattedAppVersion();
     },
   };
 })();

@@ -27,7 +27,7 @@ z.auth.SIGN_OUT_REASON = {
   ACCOUNT_REGISTRATION: 'registration',
   APP_INIT: 'app_init',
   CLIENT_REMOVED: 'client_removed',
-  INDEXED_DB: 'indexed_db',
+  INDEXED_DB: 'indexedDb',
   MULTIPLE_TABS: 'multiple_tabs',
   NOT_SIGNED_IN: 'not_signed_in',
   SESSION_EXPIRED: 'expired',
