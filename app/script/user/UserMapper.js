@@ -91,7 +91,7 @@ z.user.UserMapper = class UserMapper {
     const isNewUser = userEntity.id === '' && userData.id !== '';
     if (isNewUser) {
       userEntity.id = userData.id;
-      userEntity.joaat_hash = z.util.Crypto.Hashing.joaat_hash(userData.id);
+      userEntity.joaatHash = z.util.Crypto.Hashing.joaatHash(userData.id);
     }
 
     const {

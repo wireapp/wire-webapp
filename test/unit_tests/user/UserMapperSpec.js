@@ -64,7 +64,7 @@ describe('User Mapper', () => {
       self_user_payload.accent_id = 0;
       const user_et = mapper.map_user_from_object(self_user_payload);
       expect(user_et.name()).toBe('John Doe');
-      expect(user_et.joaat_hash).toBe(526273169);
+      expect(user_et.joaatHash).toBe(526273169);
       expect(user_et.accent_id()).toBe(z.config.ACCENT_ID.BLUE);
     });
   });

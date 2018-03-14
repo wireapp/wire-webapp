@@ -62,7 +62,7 @@ z.entity.User = class User {
     this.is_me = false;
     this.isBot = false;
 
-    this.joaat_hash = -1;
+    this.joaatHash = -1;
 
     this.accent_id = ko.observable(z.config.ACCENT_ID.BLUE);
     this.accent_theme = ko.pureComputed(

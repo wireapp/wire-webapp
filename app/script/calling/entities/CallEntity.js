@@ -942,7 +942,7 @@ z.calling.entities.CallEntity = class CallEntity {
     const twoOrMoreParticipants = this.participants().length >= 2;
     if (twoOrMoreParticipants) {
       this.participants()
-        .sort((participantA, participantB) => participantA.user.joaat_hash - participantB.user.joaat_hash)
+        .sort((participantA, participantB) => participantA.user.joaatHash - participantB.user.joaatHash)
         .forEach((participantEntity, index) => {
           const panning = this._calculatePanning(index, this.participants().length);
 
