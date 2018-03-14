@@ -1477,17 +1477,4 @@ z.calling.CallingRepository = class CallingRepository {
     Raygun.send(new Error('Call failure report'), customData);
     this.logger.debug(`Reported status of flow id '${customData.meta.flowId}' for call analysis`, customData);
   }
-
-  _saveReport() {
-    if (this.messageLog.length < 1) {
-      return false;
-    }
-
-    const blob = new Blob([this.messageLog.concat('\r\n')], {
-      type: 'text/plain;charset=utf-8',
-    });
-    const currentDate = new Date().toISOString().replace(' ', '-');
-    FileSaver.saveAs(blob, `CallLogs-${currentDate}.txt`);
-    return true;
-  }
 };
