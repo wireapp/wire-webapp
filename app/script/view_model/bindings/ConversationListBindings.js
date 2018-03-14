@@ -29,7 +29,7 @@ ko.bindingHandlers.bordered_list = (function() {
           return list_column.removeClass('left-list-center-border-bottom conversations-center-border-top');
         }
 
-        list_column.toggleClass('left-list-center-border-top', !$element.is_scrolled_top());
+        list_column.toggleClass('left-list-center-border-top', !$element.isScrolledTop());
         list_column.toggleClass('left-list-center-border-bottom', !$element.is_scrolled_bottom());
       });
     }

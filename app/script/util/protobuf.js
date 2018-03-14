@@ -23,7 +23,7 @@ window.z = window.z || {};
 window.z.util = z.util || {};
 
 z.util.protobuf = {
-  load_protos: function(file) {
+  loadProtos: function(file) {
     return new Promise((resolve, reject) => {
       return dcodeIO.ProtoBuf.loadProtoFile(file, (error, builder) => {
         if (error) {
