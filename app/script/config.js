@@ -103,6 +103,7 @@ window.z.config = {
       STAGING: 'https://wire-admin-staging.zinfra.io',
     },
     WEBAPP: {
+      INTERNAL: 'https//wire-webapp-staging.wire.com',
       PRODUCTION: 'https://app.wire.com',
       STAGING: 'https://wire-webapp-staging.zinfra.io',
     },
