@@ -89,7 +89,7 @@ export function pushAccountRegistrationData(registration) {
 }
 
 export function doRegisterTeam(registration) {
-  return function(dispatch, getState, {apiClient}) {
+  return function(dispatch, getState, {apiClient, core}) {
     const isPermanentClient = true;
     registration.locale = currentLanguage();
     registration.name = registration.name.trim();
@@ -102,6 +102,7 @@ export function doRegisterTeam(registration) {
     return Promise.resolve()
       .then(() => dispatch(doSilentLogout()))
       .then(() => apiClient.register(registration, isPermanentClient))
+      .then(() => core.init())
       .then(() => persistAuthData(isPermanentClient, core, dispatch))
       .then(() => dispatch(ClientAction.doCreateClient()))
       .then(() => dispatch(SelfAction.fetchSelf()))
@@ -114,7 +115,7 @@ export function doRegisterTeam(registration) {
 }
 
 export function doRegisterPersonal(registration) {
-  return function(dispatch, getState, {apiClient}) {
+  return function(dispatch, getState, {apiClient, core}) {
     const isPermanentClient = true;
     registration.locale = currentLanguage();
     registration.name = registration.name.trim();
@@ -132,6 +133,7 @@ export function doRegisterPersonal(registration) {
       .then(() => dispatch(doSilentLogout()))
       .then(() => apiClient.register(registration, isPermanentClient))
       .then(() => persistAuthData(isPermanentClient, core, dispatch))
+      .then(() => core.init())
       .then(() => dispatch(ClientAction.doCreateClient()))
       .then(() => dispatch(SelfAction.fetchSelf()))
       .then(createdAccount => dispatch(AuthActionCreator.successfulRegisterPersonal(createdAccount)))
@@ -156,6 +158,7 @@ export function doRegisterWireless(registration) {
     return Promise.resolve()
       .then(() => apiClient.register(registration, isPermanentClient))
       .then(() => persistAuthData(isPermanentClient, core, dispatch))
+      .then(() => core.init())
       .then(() => dispatch(ClientAction.doCreateClient()))
       .then(() => dispatch(SelfAction.fetchSelf()))
       .then(createdAccount => dispatch(AuthActionCreator.successfulRegisterWireless(createdAccount)))
