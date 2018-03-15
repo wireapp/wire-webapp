@@ -47,7 +47,14 @@ export const WirelessContainer = ({
         }}
       >
         <div style={{margin: '16px 16px', textAlign: 'center', width: '100%'}}>
-          <Link href={EXTERNAL_ROUTE.WIRE_PRIVACY_POLICY} style={{fontSize: '16px'}} textTransform="none" bold={false} data-uie-name="go-privacy">
+          <Link
+            href={EXTERNAL_ROUTE.WIRE_PRIVACY_POLICY}
+            style={{fontSize: '16px'}}
+            target="_blank"
+            textTransform="none"
+            bold={false}
+            data-uie-name="go-privacy"
+          >
             <FormattedHTMLMessage style={{textAlign: 'center'}} {...cookiePolicyStrings.bannerText} />
           </Link>
         </div>
