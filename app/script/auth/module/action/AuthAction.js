@@ -52,7 +52,7 @@ function doLoginPlain(loginData, onBeforeLogin, onAfterLogin) {
       .catch(error => {
         const handledError = BackendError.handle(error);
         if (handledError.label === BackendError.LABEL.TOO_MANY_CLIENTS) {
-          return Promise.resolve()
+          Promise.resolve()
             .then(() => persistAuthData(loginData.persist, core, dispatch))
             .then(() => onAfterLogin(dispatch, getState, global));
         }
