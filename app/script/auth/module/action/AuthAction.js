@@ -23,6 +23,7 @@ import * as SelfAction from './SelfAction';
 import {currentLanguage, currentCurrency} from '../../localeConfig';
 import {setLocalStorage, LocalStorageKey} from './LocalStorageAction';
 import * as ConversationAction from './ConversationAction';
+import * as ClientAction from './ClientAction';
 
 export const doLogin = loginData =>
   doLoginPlain(loginData, dispatch => dispatch(doSilentLogout()), dispatch => dispatch(SelfAction.fetchSelf()));
@@ -45,7 +46,13 @@ function doLoginPlain(loginData, onBeforeLogin, onAfterLogin) {
     );
     return Promise.resolve()
       .then(() => onBeforeLogin(dispatch, getState, global))
-      .then(() => core.login(loginData))
+      .then(() =>
+        core.login(loginData, true, {
+          classification: 'desktop',
+          cookieLabel: 'default',
+          model: 'Chrome', // TODO read client info from platform.js
+        })
+      )
       .then(() => persistAuthData(loginData.persist, core, dispatch))
       .then(() => onAfterLogin(dispatch, getState, global))
       .then(() => dispatch(AuthActionCreator.successfulLogin()))
@@ -82,7 +89,8 @@ export function pushAccountRegistrationData(registration) {
 }
 
 export function doRegisterTeam(registration) {
-  return function(dispatch, getState, {apiClient}) {
+  return function(dispatch, getState, {apiClient, core}) {
+    const isPermanentClient = true;
     registration.locale = currentLanguage();
     registration.name = registration.name.trim();
     registration.email = registration.email.trim();
@@ -93,7 +101,10 @@ export function doRegisterTeam(registration) {
     dispatch(AuthActionCreator.startRegisterTeam({...registration, password: '******'}));
     return Promise.resolve()
       .then(() => dispatch(doSilentLogout()))
-      .then(() => apiClient.register(registration))
+      .then(() => apiClient.register(registration, isPermanentClient))
+      .then(() => core.init())
+      .then(() => persistAuthData(isPermanentClient, core, dispatch))
+      .then(() => dispatch(ClientAction.doCreateClient()))
       .then(() => dispatch(SelfAction.fetchSelf()))
       .then(createdTeam => dispatch(AuthActionCreator.successfulRegisterTeam(createdTeam)))
       .catch(error => {
@@ -104,7 +115,8 @@ export function doRegisterTeam(registration) {
 }
 
 export function doRegisterPersonal(registration) {
-  return function(dispatch, getState, {apiClient}) {
+  return function(dispatch, getState, {apiClient, core}) {
+    const isPermanentClient = true;
     registration.locale = currentLanguage();
     registration.name = registration.name.trim();
     registration.email = registration.email.trim();
@@ -119,7 +131,10 @@ export function doRegisterPersonal(registration) {
     );
     return Promise.resolve()
       .then(() => dispatch(doSilentLogout()))
-      .then(() => apiClient.register(registration))
+      .then(() => apiClient.register(registration, isPermanentClient))
+      .then(() => persistAuthData(isPermanentClient, core, dispatch))
+      .then(() => core.init())
+      .then(() => dispatch(ClientAction.doCreateClient()))
       .then(() => dispatch(SelfAction.fetchSelf()))
       .then(createdAccount => dispatch(AuthActionCreator.successfulRegisterPersonal(createdAccount)))
       .catch(error => {
@@ -130,7 +145,8 @@ export function doRegisterPersonal(registration) {
 }
 
 export function doRegisterWireless(registration) {
-  return function(dispatch, getState, {apiClient}) {
+  return function(dispatch, getState, {apiClient, core}) {
+    const isPermanentClient = false;
     registration.locale = currentLanguage();
     registration.name = registration.name.trim();
     dispatch(
@@ -140,7 +156,10 @@ export function doRegisterWireless(registration) {
       })
     );
     return Promise.resolve()
-      .then(() => apiClient.register(registration))
+      .then(() => apiClient.register(registration, isPermanentClient))
+      .then(() => persistAuthData(isPermanentClient, core, dispatch))
+      .then(() => core.init())
+      .then(() => dispatch(ClientAction.doCreateClient()))
       .then(() => dispatch(SelfAction.fetchSelf()))
       .then(createdAccount => dispatch(AuthActionCreator.successfulRegisterWireless(createdAccount)))
       .catch(error => {
