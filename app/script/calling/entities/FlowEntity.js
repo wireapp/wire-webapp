@@ -139,7 +139,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
           this.logger.info({
             data: {
               default: [this.remoteUser.name()],
-              obfuscated: [this.remoteUser.id],
+              obfuscated: [this.logger.obfuscate(this.remoteUser.id)],
             },
             message: z.util.format_string`PeerConnection with '${0}' was closed`,
           });
@@ -335,7 +335,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
     this.logger.info({
       data: {
         default: [this.remoteUser.name(), negotiationMode],
-        obfuscated: [this.remoteUser.id, negotiationMode],
+        obfuscated: [this.logger.obfuscate(this.remoteUser.id), negotiationMode],
       },
       message: z.util.format_string`Start negotiating PeerConnection with '${0}' triggered by '${1}'`,
     });
@@ -417,7 +417,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
         this.logger.info({
           data: {
             default: [this.remoteUser.name()],
-            obfuscated: [this.remoteUser.id],
+            obfuscated: [this.logger.obfuscate(this.remoteUser.id)],
           },
           message: z.util.format_string`Closing PeerConnection '${0}' successful`,
         });
@@ -457,7 +457,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
         {
           data: {
             default: [this.remoteUser.name(), this.isAnswer()],
-            obfuscated: [this.remoteUser.id, this.isAnswer()],
+            obfuscated: [this.logger.obfuscate(this.remoteUser.id), this.isAnswer()],
           },
           message: z.util.format_string`PeerConnection with '${0}' created - isAnswer '${1}'`,
         },
@@ -801,7 +801,12 @@ z.calling.entities.FlowEntity = class FlowEntity {
         this.logger.debug({
           data: {
             default: [localSdp.type, iceCandidates.length, this.remoteUser.name(), this.localSdp().sdp],
-            obfuscated: [localSdp.type, iceCandidates.length, this.remoteUser.id, this.localSdp().sdp],
+            obfuscated: [
+              localSdp.type,
+              iceCandidates.length,
+              this.logger.obfuscate(this.remoteUser.id),
+              this.logger.obfuscateSdp(this.localSdp().sdp, this.conversationId),
+            ],
           },
           message: z.util
             .format_string`Sending local '${0}' SDP containing '${1}' ICE candidates for flow with '${2}'\n${3}`,
@@ -1128,7 +1133,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
       this.logger.warn({
         data: {
           default: [this.remoteUser.name()],
-          obfuscated: [this.remoteUser.id],
+          obfuscated: [this.logger.obfuscate(this.remoteUser.id)],
         },
         message: z.util.format_string`We need to switch SDP state of flow with '${0}' to answer.`,
       });
@@ -1140,7 +1145,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
     this.logger.warn({
       data: {
         default: [this.remoteUser.name()],
-        obfuscated: [this.remoteUser.id],
+        obfuscated: [this.logger.obfuscate(this.remoteUser.id)],
       },
       message: z.util.format_string`Remote side '${0}' needs to switch SDP state flow to answer.`,
     });

@@ -734,7 +734,7 @@ z.calling.entities.CallEntity = class CallEntity {
         this.logger.info({
           data: {
             default: [participantEntity.user.name()],
-            obfuscated: [participantEntity.user.id],
+            obfuscated: [this.logger.obfuscate(participantEntity.user.id)],
           },
           message: z.util.format_string`Removed call participant '${0}'`,
         });
@@ -839,7 +839,7 @@ z.calling.entities.CallEntity = class CallEntity {
           {
             data: {
               default: [userEntity.name()],
-              obfuscated: [userEntity.id],
+              obfuscated: [this.logger.obfuscate(userEntity.id)],
             },
             message: z.util.format_string`Adding call participant '${0}'`,
           },
@@ -868,7 +868,7 @@ z.calling.entities.CallEntity = class CallEntity {
         {
           data: {
             default: [participantEntity.user.name()],
-            obfuscated: [participantEntity.user.id],
+            obfuscated: [this.logger.obfuscate(participantEntity.user.id)],
           },
           message: z.util.format_string`Updating call participant '${0}'`,
         },
@@ -976,7 +976,7 @@ z.calling.entities.CallEntity = class CallEntity {
           this.logger.debug({
             data: {
               default: [participantEntity.user.name(), panning],
-              obfuscated: [participantEntity.user.id, panning],
+              obfuscated: [this.logger.obfuscate(participantEntity.user.id), panning],
             },
             message: z.util.format_string`Panning for '${0}' recalculated to '${1}'`,
           });

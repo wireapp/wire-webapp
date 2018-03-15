@@ -49,7 +49,7 @@ z.calling.entities.FlowAudioEntity = class FlowAudioEntity {
       this.logger.debug({
         data: {
           default: [this.flowEntity.remoteUser.name(), updatedPanningValue],
-          obfuscated: [this.flowEntity.remoteUser.id, updatedPanningValue],
+          obfuscated: [this.logger.obfuscate(this.flowEntity.remoteUser.id), updatedPanningValue],
         },
         message: z.util.format_string`Panning of ${0} changed to '${1}'`,
       });
