@@ -30,62 +30,11 @@
         <div class="content">
           <div id="section-account" class="section">
             <div class="selector selector-mode">
-              <button class="button btn-mode btn-login" data-bind="l10n_text: z.string.authAccountSignIn"></button>
+              <button class="button btn-mode btn-login" data-bind="l10n_text: z.string.authAccountSignInPhone"></button>
             </div>
 
             <div id="form-account-login" class="form">
-              <div class="selector selector-method">
-                <div class="column">
-                  <button class="button btn-method btn-login-password"
-                          data-bind="click: clicked_on_login_password, css: {'disabled': disabled_by_animation}, l10n_text: z.string.authAccountSignInEmail"
-                          data-uie-name="go-sign-in-email"></button>
-                </div>
-                <div class="column">
-                  <button class="button btn-method btn-login-phone"
-                          data-bind="click: clicked_on_login_phone, css: {'disabled': disabled_by_animation}, l10n_text: z.string.authAccountSignInPhone"
-                          data-uie-name="go-sign-in-phone"></button>
-                </div>
-              </div>
-              <form id="login-method-password" class="method" data-bind="submit: login_password">
-                <div id="wire-login-username-container" class="form-control">
-                  <input class="input username" id="wire-login-username" type="text" spellcheck="false"
-                         data-bind="css: {'input-error': failed_validation_email}, event: {input: clear_error}, l10n_tooltip: z.string.authPlaceholderEmail, l10n_placeholder: z.string.authPlaceholderEmail, textInput: username"
-                         data-uie-name="enter-email">
-                </div>
-                <div id="wire-login-password-container" class="form-control">
-                  <input class="input password" id="wire-login-password" type="password"
-                         data-bind="css: {'input-error': failed_validation_password}, event: {input: clear_error_password}, l10n_tooltip: z.string.authPlaceholderPasswordPut, l10n_placeholder: z.string.authPlaceholderPasswordPut, textInput: password"
-                         data-uie-name="enter-password">
-                </div>
-                <ul class="error-list" data-uie-name="status-error">
-                  <!-- ko foreach: validation_errors -->
-                    <li class="error" data-bind="text: message"></li>
-                  <!-- /ko -->
-                </ul>
-                <div class="reason-info" data-bind="visible: reason_visible">
-                  <div data-bind="l10n_text: reason_info" data-uie-name="status-expired"></div>
-                </div>
-                <div id="wire-login-password-remember" data-bind="electron_remove">
-                  <div class="checkbox checkbox-remember">
-                    <input type="checkbox" id="checkbox-public-computer" data-bind="checked: is_public_computer" data-uie-name="enter-public-computer-sign-in">
-                    <label class="label-xs" for="checkbox-public-computer" data-bind="l10n_text: z.string.authAccountPublicComputer"></label>
-                  </div>
-                </div>
-                <div class="footer">
-                  <div class="column">
-                    <input id="wire-password-login" class="button button-white btn-action btn-sign-in-email" type="submit"
-                           data-bind="enable: can_login_password, l10n_input: z.string.authAccountSignIn"
-                           data-uie-name="do-sign-in">
-                  </div>
-                  <div class="column">
-                    <a class="auth-link-button"
-                       data-bind="click: clicked_on_password, l10n_text: z.string.authAccountPasswordForgot"
-                       data-uie-name="go-forgot-password">
-                    </a>
-                  </div>
-                </div>
-              </form>
-              <form id="login-method-phone" class="method" data-bind="submit: login_phone">
+              <form id="login-method-login" class="method" data-bind="submit: login_phone">
                 <div class="form-control input-select">
                   <select class="input phone" id="wire-login-country" name="select"
                           data-bind="event: {change: changed_country}, textInput: country"
@@ -150,7 +99,7 @@
               <div class="footer">
                 <div class="column">
                   <input id="wire-verify-account" class="button button-white btn-action" type="submit"
-                         data-bind="enable: can_login_password, l10n_input: z.string.authVerifyAccountAdd"
+                         data-bind="enable: can_verify_account, l10n_input: z.string.authVerifyAccountAdd"
                          data-uie-name="do-verify-account">
                 </div>
                 <div class="column">

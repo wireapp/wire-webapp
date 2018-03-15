@@ -29,15 +29,11 @@ z.string.enumerationAnd = ', and ';
 
 // Auth
 // Authentication: ACCOUNT section
-z.string.authAccountClientDeletion = 'You were signed out because your device was deleted.';
 z.string.authAccountCountryCode = 'Country Code';
-z.string.authAccountDeletion = 'You were signed out because your account was deleted.';
-z.string.authAccountExpiration = 'You were signed out because your session expired. Please log in again.';
 z.string.authAccountPasswordForgot = 'Forgot password';
 z.string.authAccountPublicComputer = 'This is a public computer';
 z.string.authAccountSignIn = 'Log in';
-z.string.authAccountSignInEmail = 'Email';
-z.string.authAccountSignInPhone = 'Phone';
+z.string.authAccountSignInPhone = 'Phone Log in';
 
 // Authentication: BLOCKED section
 z.string.authBlockedCookies = 'Enable cookies to log in to Wire.';
@@ -78,7 +74,6 @@ z.string.authPostedResendDetail = 'Check your email inbox and follow the instruc
 z.string.authPostedResendHeadline = 'You’ve got mail.';
 
 // Authentication: Misc
-z.string.authPlaceholderEmail = 'Email';
 z.string.authPlaceholderPasswordPut = 'Password';
 z.string.authPlaceholderPasswordSet = 'Password (at least 8 characters)';
 z.string.authPlaceholderPhone = 'Phone Number';
