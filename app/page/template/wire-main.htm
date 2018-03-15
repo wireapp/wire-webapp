@@ -17,6 +17,9 @@
           <!-- ko if: modal() === z.viewModel.ListViewModel.MODAL_TYPE.TAKEOVER -->
             #include('list/takeover.htm')
           <!-- /ko -->
+          <!-- ko if: modal() === z.viewModel.ListViewModel.MODAL_TYPE.TEMPORARY_GUEST -->
+            #include('list/temporary-guest.htm')
+          <!-- /ko -->
         <!-- /ko -->
       </div>
       <div id="center-column" class="center-column">

@@ -26,6 +26,7 @@ z.viewModel.ListViewModel = class ListViewModel {
   static get MODAL_TYPE() {
     return {
       TAKEOVER: 'ListViewModel.MODAL_TYPE.TAKEOVER',
+      TEMPORARY_GUEST: 'ListViewModal.MODAL_TYPE.TEMPORARY_GUEST',
     };
   }
 
@@ -53,6 +54,7 @@ z.viewModel.ListViewModel = class ListViewModel {
 
     this.actionsViewModel = this.mainViewModel.actions;
     this.contentViewModel = this.mainViewModel.content;
+    this.selfUser = this.userRepository.self;
 
     this.logger = new z.util.Logger('z.viewModel.ListViewModel', z.config.LOGGER.OPTIONS);
 
@@ -62,9 +64,10 @@ z.viewModel.ListViewModel = class ListViewModel {
     this.modal = ko.observable();
     this.webappLoaded = ko.observable(false);
 
+    this.isActivatedAccount = ko.pureComputed(() => this.selfUser() && !this.selfUser().isTemporaryGuest());
     this.selfUserPicture = ko.pureComputed(() => {
-      if (this.webappLoaded() && this.userRepository.self()) {
-        return this.userRepository.self().mediumPictureResource();
+      if (this.webappLoaded() && this.selfUser()) {
+        return this.selfUser().mediumPictureResource();
       }
     });
 
@@ -95,9 +98,10 @@ z.viewModel.ListViewModel = class ListViewModel {
     // Nested view models
     this.archive = new z.viewModel.list.ArchiveViewModel(mainViewModel, this, repositories);
     this.conversations = new z.viewModel.list.ConversationListViewModel(mainViewModel, this, repositories);
-    this.preferences = new z.viewModel.list.PreferencesListViewModel(mainViewModel, this);
+    this.preferences = new z.viewModel.list.PreferencesListViewModel(mainViewModel, this, repositories);
     this.start = new z.viewModel.list.StartUIViewModel(mainViewModel, this, repositories);
     this.takeover = new z.viewModel.list.TakeoverViewModel(mainViewModel, this, repositories);
+    this.temporaryGuest = new z.viewModel.list.TemporaryGuestViewModel(mainViewModel, this, repositories);
 
     this._initSubscriptions();
 
@@ -112,8 +116,6 @@ z.viewModel.ListViewModel = class ListViewModel {
     amplify.subscribe(z.event.WebApp.SEARCH.SHOW, this.openStartUI.bind(this));
     amplify.subscribe(z.event.WebApp.SHORTCUT.NEXT, this.goToNext.bind(this));
     amplify.subscribe(z.event.WebApp.SHORTCUT.PREV, this.goToPrevious.bind(this));
-    amplify.subscribe(z.event.WebApp.TAKEOVER.SHOW, this.showTakeover.bind(this));
-    amplify.subscribe(z.event.WebApp.TAKEOVER.DISMISS, this.dismissTakeover.bind(this));
     amplify.subscribe(z.event.WebApp.SHORTCUT.ARCHIVE, this.clickToArchive.bind(this));
     amplify.subscribe(z.event.WebApp.SHORTCUT.DELETE, this.clickToClear.bind(this));
     amplify.subscribe(z.event.WebApp.SHORTCUT.SILENCE, this.clickToToggleMute.bind(this));
@@ -155,7 +157,7 @@ z.viewModel.ListViewModel = class ListViewModel {
 
     const isDeviceDetails = activePreference === z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICE_DETAILS;
     if (isDeviceDetails) {
-      activePreference = z.viewModel.ContentViewModel.STATE.DEVICES;
+      activePreference = z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICES;
     }
 
     const nextPreference = z.util.ArrayUtil.iterate_item(this.visibleListItems(), activePreference, reverse);
@@ -165,6 +167,10 @@ z.viewModel.ListViewModel = class ListViewModel {
   }
 
   openPreferencesAccount() {
+    if (this.selfUser().isTemporaryGuest()) {
+      this.dismissModal();
+    }
+
     this.switchList(ListViewModel.STATE.PREFERENCES);
     this.contentViewModel.switchContent(z.viewModel.ContentViewModel.STATE.PREFERENCES_ACCOUNT);
   }
@@ -194,7 +200,9 @@ z.viewModel.ListViewModel = class ListViewModel {
   }
 
   openConversations() {
-    this.switchList(ListViewModel.STATE.CONVERSATIONS, false);
+    if (!this.selfUser().isTemporaryGuest()) {
+      this.switchList(ListViewModel.STATE.CONVERSATIONS, false);
+    }
   }
 
   _hideList() {
@@ -253,12 +261,19 @@ z.viewModel.ListViewModel = class ListViewModel {
     }
   }
 
+  dismissModal() {
+    this.modal(undefined);
+  }
+
   showTakeover() {
     this.modal(ListViewModel.MODAL_TYPE.TAKEOVER);
   }
 
-  dismissTakeover() {
-    this.modal(undefined);
+  showTemporaryGuest() {
+    this.state(ListViewModel.STATE.PREFERENCES);
+    this.modal(ListViewModel.MODAL_TYPE.TEMPORARY_GUEST);
+    const conversationEntity = this.conversationRepository.getMostRecentConversation();
+    amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity);
   }
 
   //##############################################################################

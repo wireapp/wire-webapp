@@ -23,45 +23,29 @@ window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 window.z.viewModel.list = z.viewModel.list || {};
 
-z.viewModel.list.TakeoverViewModel = class TakeoverViewModel {
+z.viewModel.list.TemporaryGuestViewModel = class TemporaryGuestViewModel {
   /**
-   * View model for the username takeover screen.
+   * View model for the temporary guest experience.
    *
    * @param {z.viewModel.MainViewModel} mainViewModel - Main view model
    * @param {z.viewModel.ListViewModel} listViewModel - List view model
    * @param {Object} repositories - Object containing all repositories
    */
   constructor(mainViewModel, listViewModel, repositories) {
-    this.listViewModel = listViewModel;
     this.conversationRepository = repositories.conversation;
     this.userRepository = repositories.user;
-    this.logger = new z.util.Logger('z.viewModel.list.TakeoverViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger('z.viewModel.list.TemporaryGuestViewModel', z.config.LOGGER.OPTIONS);
 
+    this.callConversations = this.conversationRepository.conversations_calls;
     this.selfUser = this.userRepository.self;
-
-    this.name = ko.pureComputed(() => (this.selfUser() ? this.selfUser().name() : ''));
-    this.username = ko.pureComputed(() => (this.selfUser() ? this.selfUser().username() : ''));
   }
 
-  chooseUsername() {
-    this.listViewModel.dismissModal();
-    window.requestAnimationFrame(() => amplify.publish(z.event.WebApp.PREFERENCES.MANAGE_ACCOUNT));
+  clickOnPreferencesButton() {
+    amplify.publish(z.event.WebApp.PREFERENCES.MANAGE_ACCOUNT);
   }
 
-  keepUsername() {
-    this.userRepository
-      .change_username(this.username())
-      .then(() => {
-        const conversationEntity = this.conversationRepository.getMostRecentConversation();
-        if (conversationEntity) {
-          return amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity);
-        }
-
-        if (this.userRepository.connect_requests().length) {
-          amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS);
-        }
-      })
-      .catch(() => amplify.publish(z.event.WebApp.PREFERENCES.MANAGE_ACCOUNT))
-      .then(() => this.listViewModel.dismissModal());
+  clickToCreateAccount() {
+    const path = `${z.l10n.text(z.string.urlWebsiteCreateTeam)}?pk_campaign=wireless&pk_kwd=desktop`;
+    z.util.safe_window_open(z.util.URLUtil.build_url(z.util.URLUtil.TYPE.WEBSITE, path));
   }
 };

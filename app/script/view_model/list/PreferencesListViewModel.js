@@ -28,13 +28,16 @@ z.viewModel.list.PreferencesListViewModel = class PreferencesListViewModel {
    * View model for the preferences list.
    * @param {z.viewModel.ListViewModel} mainViewModel - Main view model
    * @param {z.viewModel.ListViewModel} listViewModel - List view model
+   * @param {Object} repositories - Object containing all the repositories
    */
-  constructor(mainViewModel, listViewModel) {
+  constructor(mainViewModel, listViewModel, repositories) {
     this.contentViewModel = mainViewModel.content;
     this.listViewModel = listViewModel;
+    this.userRepository = repositories.user;
     this.logger = new z.util.Logger('z.viewModel.list.PreferencesListViewModel', z.config.LOGGER.OPTIONS);
 
     this.contentState = this.contentViewModel.state;
+    this.selfUser = this.userRepository.self;
 
     this.selectedAbout = ko.pureComputed(() => {
       return this.contentState() === z.viewModel.ContentViewModel.STATE.PREFERENCES_ABOUT;
@@ -58,6 +61,10 @@ z.viewModel.list.PreferencesListViewModel = class PreferencesListViewModel {
   }
 
   clickOnClosePreferences() {
+    if (this.selfUser().isTemporaryGuest()) {
+      return this.listViewModel.showTemporaryGuest();
+    }
+
     this.listViewModel.switchList(z.viewModel.ListViewModel.STATE.CONVERSATIONS);
   }
 

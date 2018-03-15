@@ -321,7 +321,7 @@ z.main.App = class App {
         return this._handleUrlParams();
       })
       .then(() => {
-        this._show_ui();
+        this._showInterface();
         this.telemetry.report();
         amplify.publish(z.event.WebApp.LIFECYCLE.LOADED);
         amplify.publish(z.event.WebApp.LOADED); // todo: deprecated - remove when user base of wrappers version >= 2.12 is large enough
@@ -596,13 +596,15 @@ z.main.App = class App {
    * Hide the loading spinner and show the application UI.
    * @returns {undefined} No return value
    */
-  _show_ui() {
-    const conversation_et = this.repository.conversation.getMostRecentConversation();
+  _showInterface() {
+    const conversationEntity = this.repository.conversation.getMostRecentConversation();
     this.logger.info('Showing application UI');
-    if (this.repository.user.should_change_username()) {
-      amplify.publish(z.event.WebApp.TAKEOVER.SHOW);
-    } else if (conversation_et) {
-      amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversation_et);
+    if (this.repository.user.self().isTemporaryGuest()) {
+      this.view.list.showTemporaryGuest();
+    } else if (this.repository.user.shouldChangeUsername()) {
+      this.view.list.showTakeover();
+    } else if (conversationEntity) {
+      amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity);
     } else if (this.repository.user.connect_requests().length) {
       amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS);
     }

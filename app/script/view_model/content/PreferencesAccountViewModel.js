@@ -80,6 +80,8 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.team = this.teamRepository.team;
     this.teamName = ko.pureComputed(() => z.l10n.text(z.string.preferencesAccountTeam, this.teamRepository.teamName()));
 
+    this.isActivatedAccount = ko.pureComputed(() => !this.selfUser().isTemporaryGuest());
+
     this._initSubscriptions();
   }
 
@@ -204,6 +206,19 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
         message: z.l10n.text(z.string.modalAccountDeletionMessage),
         title: z.l10n.text(z.string.modalAccountDeletionHeadline),
       },
+    });
+  }
+
+  clickOnLeaveGuestRoom() {
+    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
+      action: () => this.clientRepository.logoutClient(),
+      preventClose: true,
+      text: {
+        action: z.l10n.text(z.string.modalaccountLeaveGuestRoomAction),
+        message: z.l10n.text(z.string.modalaccountLeaveGuestRoomMessage),
+        title: z.l10n.text(z.string.modalaccountLeaveGuestRoomHeadline),
+      },
+      warning: false,
     });
   }
 
