@@ -23,7 +23,7 @@ import * as SelfAction from './SelfAction';
 import {currentLanguage, currentCurrency} from '../../localeConfig';
 import {setLocalStorage, LocalStorageKey} from './LocalStorageAction';
 import * as ConversationAction from './ConversationAction';
-import * as ClientAction from '../module/action/ClientAction';
+import * as ClientAction from './ClientAction';
 
 export const doLogin = loginData =>
   doLoginPlain(loginData, dispatch => dispatch(doSilentLogout()), dispatch => dispatch(SelfAction.fetchSelf()));
