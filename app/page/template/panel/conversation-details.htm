@@ -20,7 +20,7 @@
             <textarea class="conversation-details__name conversation-details__name--input" spellcheck="false" data-bind="visible: isEditingName, value: conversationEntity().display_name(), enter: renameConversation, hasFocus: isEditingName, resize" maxlength="64" dir="auto" data-uie-name="enter-name"></textarea>
           <!-- /ko -->
           <!-- ko ifnot: isNameEditable() -->
-            <div class="conversation-details__name" data-bind="css: {'conversation-details__name--centered': conversationEntity().is_one2one}">
+            <div class="conversation-details__name" data-bind="css: {'conversation-details__name--centered': conversationEntity().is_one2one() || conversationEntity().is_request()}">
               <div class="conversation-details__flex-row">
                 <!-- ko if: isVerified() -->
                   <verified-icon class="conversation-details__name__verified-icon" data-uie-name="status-verified-conversation"></verified-icon>
@@ -88,7 +88,13 @@
           <!-- /ko -->
           <!-- ko if: isSingleUserMode() && conversationEntity().firstUserEntity() -->
             <participant-avatar params="participant: conversationEntity().firstUserEntity, size: z.components.ParticipantAvatar.SIZE.X_LARGE" data-uie-name="status-profile-picture"></participant-avatar>
-            <!-- if: isTeam() -->
+            <!-- ko if: isGuest() -->
+              <div class="conversation-details__guest-label" data-uie-name="status-guest">
+                <guest-icon></guest-icon>
+                <span data-bind="l10n_text: z.string.conversationGuestIndicator"></span>
+              </div>
+            <!-- /ko -->
+            <!-- ko if: isTeam() -->
               <availability-state class="conversation-details__availability"
                 data-uie-name="status-availability"
                 params="availability: conversationEntity().firstUserEntity().availability(), label: availabilityLabel()">

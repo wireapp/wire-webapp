@@ -164,7 +164,7 @@ z.viewModel.PanelViewModel = class PanelViewModel {
     }
 
     this.groupParticipant.showGroupParticipant(userEntity);
-    this.switchState(PanelViewModel.STATE.GROUP_PARTICIPANT, true);
+    this.switchState(PanelViewModel.STATE.GROUP_PARTICIPANT, false);
   }
 
   showParticipantDevices(userEntity) {
@@ -273,10 +273,11 @@ z.viewModel.PanelViewModel = class PanelViewModel {
 
   _openPanel(newState) {
     if (!this.isAnimating()) {
+      const wasVisible = this.isVisible();
       this.isAnimating(true);
       this.exitingState(undefined);
       this.isVisible(true);
-      this.switchState(newState, false, true);
+      this.switchState(newState, true, !wasVisible);
       this.mainViewModel.openPanel().then(() => this.isAnimating(false));
     }
   }

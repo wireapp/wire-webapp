@@ -42,10 +42,8 @@ z.util.PromiseQueue = class PromiseQueue {
   constructor(options = {}) {
     const {concurrent = 1, name, paused = false, timeout = PromiseQueue.CONFIG.UNBLOCK_INTERVAL} = options;
 
-    this.logger = new z.util.Logger(
-      name ? `z.util.PromiseQueue (${name})` : 'z.util.PromiseQueue',
-      z.config.LOGGER.OPTIONS
-    );
+    const loggerName = name ? `z.util.PromiseQueue (${name})` : 'z.util.PromiseQueue';
+    this.logger = new z.util.Logger(loggerName, z.config.LOGGER.OPTIONS);
 
     this._blocked = false;
     this._concurrent = concurrent;
@@ -65,9 +63,9 @@ z.util.PromiseQueue = class PromiseQueue {
       return;
     }
 
-    const queue_entry = this._queue.shift();
-    if (queue_entry) {
-      this._clear_interval();
+    const queueEntry = this._queue.shift();
+    if (queueEntry) {
+      this._clearInterval();
 
       this._current = this._current + 1;
       if (this._current >= this._concurrent) {
@@ -76,23 +74,24 @@ z.util.PromiseQueue = class PromiseQueue {
 
       this._interval = window.setInterval(() => {
         if (!this._paused) {
-          this.logger.error('Promise queue failed, unblocking queue', this._queue);
+          const logObject = {pendingEntry: queueEntry, queueState: this._queue};
+          this.logger.error('Promise queue failed, unblocking queue', logObject);
           this.resume();
         }
       }, this._timeout);
 
-      queue_entry
+      queueEntry
         .fn()
         .catch(error => {
-          queue_entry.resolve_fn = undefined;
-          queue_entry.reject_fn(error);
+          queueEntry.resolveFn = undefined;
+          queueEntry.rejectFn(error);
         })
         .then(response => {
-          if (queue_entry.resolve_fn) {
-            queue_entry.resolve_fn(response);
+          if (queueEntry.resolveFn) {
+            queueEntry.resolveFn(response);
           }
 
-          this._clear_interval();
+          this._clearInterval();
 
           this._current = this._current - 1;
           if (this._current < this._concurrent) {
@@ -108,17 +107,17 @@ z.util.PromiseQueue = class PromiseQueue {
    * Get the number of queued functions.
    * @returns {number} Number of queued functions
    */
-  get_length() {
+  getLength() {
     return this._queue.length;
   }
 
   /**
    * Pause or resume the execution.
-   * @param {boolean} [should_pause=true] - Pause queue
+   * @param {boolean} [shouldPause=true] - Pause queue
    * @returns {z.util.PromiseQueue} PromiseQueue
    */
-  pause(should_pause = true) {
-    this._paused = should_pause;
+  pause(shouldPause = true) {
+    this._paused = shouldPause;
     if (!this._paused) {
       this.execute();
     }
@@ -133,13 +132,13 @@ z.util.PromiseQueue = class PromiseQueue {
    */
   push(fn) {
     return new Promise((resolve, reject) => {
-      const queue_entry = {
+      const queueEntry = {
         fn: fn,
-        reject_fn: reject,
-        resolve_fn: resolve,
+        rejectFn: reject,
+        resolveFn: resolve,
       };
 
-      this._queue.push(queue_entry);
+      this._queue.push(queueEntry);
       this.execute();
     });
   }
@@ -149,7 +148,7 @@ z.util.PromiseQueue = class PromiseQueue {
    * @returns {undefined} No return value
    */
   resume() {
-    this._clear_interval();
+    this._clearInterval();
     this._blocked = false;
     this.pause(false);
   }
@@ -161,18 +160,18 @@ z.util.PromiseQueue = class PromiseQueue {
    */
   unshift(fn) {
     return new Promise((resolve, reject) => {
-      const queue_entry = {
+      const queueEntry = {
         fn: fn,
-        reject_fn: reject,
-        resolve_fn: resolve,
+        rejectFn: reject,
+        resolveFn: resolve,
       };
 
-      this._queue.unshift(queue_entry);
+      this._queue.unshift(queueEntry);
       this.execute();
     });
   }
 
-  _clear_interval() {
+  _clearInterval() {
     if (this._interval) {
       window.clearInterval(this._interval);
       this._interval = undefined;

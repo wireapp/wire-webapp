@@ -18,10 +18,8 @@
  */
 
 import * as TrackingAction from '../module/action/TrackingAction';
-import {CodeInput, ErrorMessage} from '@wireapp/react-ui-kit/Form';
+import {H1, Text, Link, ContainerXS, CodeInput, ErrorMessage} from '@wireapp/react-ui-kit';
 import {connect} from 'react-redux';
-import {ContainerXS} from '@wireapp/react-ui-kit/Layout';
-import {H1, Text, Link} from '@wireapp/react-ui-kit/Text';
 import {injectIntl, FormattedHTMLMessage} from 'react-intl';
 import {Link as RRLink} from 'react-router-dom';
 import {parseError} from '../util/errorUtil';

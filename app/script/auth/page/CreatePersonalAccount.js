@@ -17,11 +17,8 @@
  *
  */
 
-import {ArrowIcon} from '@wireapp/react-ui-kit/Icon';
-import {COLOR} from '@wireapp/react-ui-kit/Identity';
-import {Container, ContainerXS, Columns, Column} from '@wireapp/react-ui-kit/Layout';
+import {H1, Link, COLOR, ArrowIcon, Container, ContainerXS, Columns, Column} from '@wireapp/react-ui-kit';
 import {createPersonalAccountStrings} from '../../strings';
-import {H1, Link} from '@wireapp/react-ui-kit/Text';
 import {injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {Link as RRLink} from 'react-router-dom';
@@ -35,6 +32,7 @@ import {getAccount, getCurrentFlow, REGISTER_FLOW} from '../module/selector/Auth
 import * as AuthActionCreator from '../module/action/creator/AuthActionCreator';
 import * as AuthAction from '../module/action/AuthAction';
 import {pathWithParams} from '../util/urlUtil';
+import Page from './Page';
 
 class CreatePersonalAccount extends React.PureComponent {
   componentDidMount() {
@@ -96,22 +94,26 @@ class CreatePersonalAccount extends React.PureComponent {
         />
       </ContainerXS>
     );
-    return currentFlow === REGISTER_FLOW.PERSONAL ? (
-      <Container centerText verticalCenter style={{width: '100%'}}>
-        <Columns>
-          <Column style={{display: 'flex'}}>
-            <div style={{margin: 'auto'}}>
-              <Link to={ROUTE.INDEX} component={RRLink} data-uie-name="go-index">
-                <ArrowIcon direction="left" color={COLOR.GRAY} />
-              </Link>
-            </div>
-          </Column>
-          <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>{pageContent}</Column>
-          <Column />
-        </Columns>
-      </Container>
-    ) : (
-      pageContent
+    return (
+      <Page>
+        {currentFlow === REGISTER_FLOW.PERSONAL ? (
+          <Container centerText verticalCenter style={{width: '100%'}}>
+            <Columns>
+              <Column style={{display: 'flex'}}>
+                <div style={{margin: 'auto'}}>
+                  <Link to={ROUTE.INDEX} component={RRLink} data-uie-name="go-index">
+                    <ArrowIcon direction="left" color={COLOR.GRAY} />
+                  </Link>
+                </div>
+              </Column>
+              <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>{pageContent}</Column>
+              <Column />
+            </Columns>
+          </Container>
+        ) : (
+          pageContent
+        )}
+      </Page>
     );
   }
 }

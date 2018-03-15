@@ -29,6 +29,7 @@ z.string.enumerationAnd = ', and ';
 
 // Auth
 // Authentication: ACCOUNT section
+z.string.authAccountClientDeletion = 'You were signed out because your device was deleted.';
 z.string.authAccountCountryCode = 'Country Code';
 z.string.authAccountDeletion = 'You were signed out because your account was deleted.';
 z.string.authAccountExpiration = 'You were signed out because your session expired. Please log in again.';
@@ -42,6 +43,7 @@ z.string.authAccountSignInPhone = 'Phone';
 z.string.authBlockedCookies = 'Enable cookies to log in to Wire.';
 z.string.authBlockedDatabase = 'Wire needs access to local storage to display your messages. Local storage is not available in private mode.';
 z.string.authBlockedTabs = 'Wire is already open in another tab.';
+z.string.authBlockedTabsAction = 'Use this tab instead';
 
 // Authentication: VERIFY section
 z.string.authVerifyAccountAdd = 'Add';
@@ -205,7 +207,7 @@ z.string.modalConversationNewDeviceHeadlineMany = '{{users}} started using new d
 z.string.modalConversationNewDeviceHeadlineYou = '{{user}} started using a new device';
 z.string.modalConversationNewDeviceIncomingCallAction = 'Accept call';
 z.string.modalConversationNewDeviceIncomingCallMessage = 'Do you still want to accept the call?';
-z.string.modalConversationNewDeviceMessage = 'Do you still want to send your messages?';
+z.string.modalConversationNewDeviceMessage = 'Do you still want to send your message?';
 z.string.modalConversationNewDeviceOutgoingCallAction = 'Call anyway';
 z.string.modalConversationNewDeviceOutgoingCallMessage = 'Do you still want to place the call?';
 
@@ -321,7 +323,7 @@ z.string.conversationVerified = 'Verified';
 z.string.conversationVoiceChannelDeactivate = ' called';
 z.string.conversationVoiceChannelDeactivateYou = ' called';
 z.string.conversationYesterday = 'Yesterday';
-z.string.conversationUnableToDecrypt1 = 'a message from {{user}} was not received.';
+z.string.conversationUnableToDecrypt1 = 'A message from {{user}} was not received.';
 z.string.conversationUnableToDecrypt2 = '{{user}}´s device identity changed. Undelivered message.';
 z.string.conversationUnableToDecryptLink = 'Why?';
 z.string.conversationUnableToDecryptErrorMessage = 'Error';
@@ -360,7 +362,12 @@ z.string.groupCreationParticipantsPlaceholder = 'Search by name';
 z.string.guestRoomConversationName = 'Guest room';
 z.string.guestRoomToggleName = 'Allow guests';
 z.string.guestRoomToggleInfo = 'Open this conversation to people outside your team.';
+z.string.guestRoomToggleInfoExtended = 'Open this conversation to people outside your team. You can always change it later.';
+
 z.string.guestRoomConversationBadge = 'Guests are present';
+
+z.string.guestRoomConversationHead = 'People outside your team can join this conversation.';
+z.string.guestRoomConversationButton = 'Invite people';
 
 // Collection
 z.string.collectionShowAll = 'Show all {{number}}';
@@ -402,6 +409,7 @@ z.string.conversationsSecondaryLinePings = '{{number}} pings';
 z.string.conversationsSecondaryLinePeopleLeft = '{{number}} people left';
 z.string.conversationsSecondaryLinePersonLeft = '{{user}} left';
 z.string.conversationsSecondaryLinePersonRemoved = '{{user}} was removed';
+z.string.conversationsSecondaryLinePersonRemovedTeam = '{{user}} was removed from the team';
 z.string.conversationsSecondaryLinePeopleAdded = '{{user}} people were added';
 z.string.conversationsSecondaryLinePersonAdded = '{{user}} was added';
 z.string.conversationsSecondaryLinePersonAddedSelf = '{{user}} joined';

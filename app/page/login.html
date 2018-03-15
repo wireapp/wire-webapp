@@ -291,8 +291,8 @@
                 <div class="auth-headline" data-bind="l10n_text: z.string.authPostedResendHeadline"></div>
                 <div class="auth-headline-sub posted-message-detail" data-bind="l10n_text: z.string.authPostedResendDetail"></div>
                 <div class="posted-action-detail" data-bind="l10n_text: z.string.authPostedResendAction"></div>
-                <div id="wire-verify" class="auth-text-link posted-link posted-action-link"
-                     data-bind="click: clicked_on_resend_verification, enabled: can_register, text: posted_text" ></div>
+                <span id="wire-verify" class="auth-text-link posted-link"
+                     data-bind="click: clicked_on_resend_verification, enabled: can_register, text: posted_text" ></span>
               </div>
             </div>
           </div>
@@ -306,7 +306,8 @@
                 <div class="auth-headline" data-bind="l10n_text: z.string.authBlockedDatabase"></div>
               </div>
               <div id="form-blocked-tabs" class="blocked-content" data-bind="visible: blocked_mode_tabs">
-                <div class="auth-headline" data-bind="l10n_text: z.string.authBlockedTabs"></div>
+                <div class="auth-headline blocked-headline" data-bind="l10n_text: z.string.authBlockedTabs"></div>
+                <span class="auth-text-link" data-bind="click: clickOnHandover, l10n_text: z.string.authBlockedTabsAction"></span>
               </div>
             </div>
           </div>

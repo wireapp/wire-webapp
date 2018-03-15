@@ -35,6 +35,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     this._on_message_add = this._on_message_add.bind(this);
     this.click_on_cancel_request = this.click_on_cancel_request.bind(this);
     this.click_on_like = this.click_on_like.bind(this);
+    this.clickOnInvitePeople = this.clickOnInvitePeople.bind(this);
     this.get_timestamp_class = this.get_timestamp_class.bind(this);
     this.is_last_delivered_message = this.is_last_delivered_message.bind(this);
     this.on_context_menu_click = this.on_context_menu_click.bind(this);
@@ -103,15 +104,12 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
         // https://github.com/jquery/api.jquery.com/issues/608
         const scroll_position = Math.ceil(element.scrollTop());
         const scroll_end = element.scroll_end();
-        let scrolled_bottom = false;
 
         if (scroll_position === 0) {
           this._pull_messages();
         }
 
         if (scroll_position >= scroll_end) {
-          scrolled_bottom = true;
-
           if (!this.conversation_reached_bottom) {
             this._push_messages();
           }
@@ -120,7 +118,6 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
         }
 
         this.should_scroll_to_bottom = scroll_position > scroll_end - z.config.SCROLL_TO_LAST_MESSAGE_THRESHOLD;
-        amplify.publish(z.event.WebApp.LIST.SCROLL, scrolled_bottom);
       }
     }, 100);
 
@@ -136,6 +133,15 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
           }, 1000);
         }
       });
+
+    this.showInvitePeople = ko.pureComputed(() => {
+      return (
+        !this.conversation().removed_from_conversation() &&
+        !this.conversation().is_guest() &&
+        this.conversation().inTeam() &&
+        this.conversation().isGuestRoom()
+      );
+    });
 
     amplify.subscribe(z.event.WebApp.CONVERSATION.INPUT.CLICK, this.on_conversation_input_click.bind(this));
   }
@@ -538,6 +544,10 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
 
   click_on_like(message_et, button = true) {
     this.conversation_repository.toggle_like(this.conversation(), message_et, button);
+  }
+
+  clickOnInvitePeople() {
+    this.mainViewModel.panel.switchState(z.viewModel.PanelViewModel.STATE.GUEST_OPTIONS);
   }
 
   /**

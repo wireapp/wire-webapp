@@ -17,27 +17,24 @@
           </div>
           <!-- ko if: hasAccessCode() -->
             <textarea disabled class="guest-options__link" data-bind="value: conversationEntity().accessCode()" data-uie-name="status-invite-link"></textarea>
-            <!-- ko if: isLinkCopied() -->
-              <div class="panel__action-item">
+            <div class="panel__action-item panel__action-item--alternate" data-bind="click: copyLink, css: {'panel__action-item--show-alternative': isLinkCopied}" data-uie-name="do-copy-link">
+              <div class="panel__action-item__default">
+                <copy-icon class="panel__action-item__icon"></copy-icon>
+                <div class="panel__action-item__text" data-bind="l10n_text: z.string.guestOptionsCopyLink"></div>
+              </div>
+              <div class="panel__action-item__alternative">
                 <check-icon class="panel__action-item__icon"></check-icon>
                 <div class="panel__action-item__text" data-bind="l10n_text: z.string.guestOptionsCopyLinkDone" data-uie-name="status-copy-link-done"></div>
               </div>
-            <!-- /ko -->
-
-            <!-- ko ifnot: isLinkCopied -->
-              <div class="panel__action-item" data-bind="click: copyLink">
-                <copy-icon class="panel__action-item__icon"></copy-icon>
-                <div class="panel__action-item__text" data-bind="l10n_text: z.string.guestOptionsCopyLink" data-uie-name="do-copy-link"></div>
-              </div>
-            <!-- /ko -->
-            <div class="panel__action-item" data-bind="click: revokeAccessCode">
+            </div>
+            <div class="panel__action-item" data-bind="click: revokeAccessCode, css:{'disabled': requestOngoing}">
               <close-icon class="panel__action-item__icon"></close-icon>
               <div class="panel__action-item__text" data-bind="l10n_text: z.string.guestOptionsRevokeLink" data-uie-name="do-revoke-link"></div>
             </div>
           <!-- /ko -->
 
           <!-- ko ifnot: hasAccessCode() -->
-            <div class="panel__action-item" data-bind="click: requestAccessCode">
+            <div class="panel__action-item" data-bind="click: requestAccessCode, css:{'disabled': requestOngoing}">
               <link-icon class="panel__action-item__icon"></link-icon>
               <div class="panel__action-item__text" data-bind="l10n_text: z.string.guestOptionsCreateLink" data-uie-name="do-create-link"></div>
             </div>

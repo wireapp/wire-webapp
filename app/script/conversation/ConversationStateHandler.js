@@ -35,8 +35,8 @@ z.conversation.ConversationStateHandler = class ConversationStateHandler {
   }
 
   changeAccessState(conversationEntity, accessState) {
-    const isTeamConversation = conversationEntity && conversationEntity.team_id;
-    if (isTeamConversation) {
+    const isConversationInTeam = conversationEntity && conversationEntity.inTeam();
+    if (isConversationInTeam) {
       const isStateChange = conversationEntity.accessState() !== accessState;
 
       if (isStateChange) {
@@ -58,6 +58,10 @@ z.conversation.ConversationStateHandler = class ConversationStateHandler {
             .putConversationAccess(conversationEntity.id, accessModes, accessRole)
             .then(() => {
               conversationEntity.accessState(accessState);
+
+              if (changeToTeamOnly) {
+                conversationEntity.accessCode(undefined);
+              }
 
               const attribute = {is_allow_guests: changeToGuestRoom};
               amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.GUEST_ROOMS.ALLOW_GUESTS, attribute);
