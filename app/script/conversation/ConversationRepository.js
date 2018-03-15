@@ -153,13 +153,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.init_promise = undefined;
     this.init_total = 0;
 
-    this.supportConversationLinks = ko.observable();
-    this.enableConversationLinks = ko.pureComputed(() => {
-      const isBoolean = _.isBoolean(this.supportConversationLinks());
-      const isEnabled = isBoolean ? this.supportConversationLinks() : !z.util.Environment.frontend.is_production();
-      return this.isTeam() && isEnabled;
-    });
-
     this._init_subscriptions();
 
     this.stateHandler = new z.conversation.ConversationStateHandler(this.conversation_service, this);
