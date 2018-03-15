@@ -51,7 +51,7 @@ z.calling.entities.FlowAudioEntity = class FlowAudioEntity {
           default: [this.flowEntity.remoteUser.name(), updatedPanningValue],
           obfuscated: [this.flowEntity.remoteUser.id, updatedPanningValue],
         },
-        message: `Panning of ${0} changed to '${1}'`,
+        message: z.util.format_string`Panning of ${0} changed to '${1}'`,
       });
 
       this.setPan(updatedPanningValue);

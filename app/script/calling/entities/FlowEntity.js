@@ -887,7 +887,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
         default: [z.calling.rtc.SDP_TYPE.ANSWER, this.remoteUser.name()],
         obfuscated: [z.calling.rtc.SDP_TYPE.ANSWER, this.remoteUser.id],
       },
-      message: `Creating '${0}' for flow with '${1}'`,
+      message: z.util.format_string`Creating '${0}' for flow with '${1}'`,
     });
 
     this.peerConnection
@@ -954,7 +954,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
         default: [z.calling.rtc.SDP_TYPE.OFFER, this.remoteUser.name()],
         obfuscated: [z.calling.rtc.SDP_TYPE.OFFER, this.remoteUser.id],
       },
-      message: `Creating '${0}' for flow with '${1}'`,
+      message: z.util.format_string`Creating '${0}' for flow with '${1}'`,
     });
 
     this.peerConnection

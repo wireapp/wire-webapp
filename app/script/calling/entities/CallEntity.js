@@ -736,7 +736,7 @@ z.calling.entities.CallEntity = class CallEntity {
             default: [participantEntity.user.name()],
             obfuscated: [participantEntity.user.id],
           },
-          message: `Removed call participant '${0}'`,
+          message: z.util.format_string`Removed call participant '${0}'`,
         });
         return this;
       })
