@@ -51,11 +51,11 @@ z.connect.ConnectRepository = class ConnectRepository {
    */
   _encodePhoneBook(phoneBook) {
     const {cards, self} = phoneBook;
-    self.forEach((contact, contactIndex) => (self[contactIndex] = z.util.encode_sha256_base64(contact)));
+    self.forEach((contact, contactIndex) => (self[contactIndex] = z.util.encodeSha256Base64(contact)));
 
     cards.forEach((card, cardIndex) => {
       card.contact.forEach((contact, contactIndex) => {
-        card.contact[contactIndex] = z.util.encode_sha256_base64(contact);
+        card.contact[contactIndex] = z.util.encodeSha256Base64(contact);
       });
       cards[cardIndex] = card;
     });

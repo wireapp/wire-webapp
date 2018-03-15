@@ -176,15 +176,15 @@ describe('z.util.encodeBase64', () => {
 
 describe('z.util.encode_base64_sha256', () => {
   it('encodes Base64 and SHA-256 empty string', () => {
-    expect(z.util.encode_sha256_base64('')).toBe('47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=');
+    expect(z.util.encodeSha256Base64('')).toBe('47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=');
   });
 
   it('encodes Base64 and SHA-256 text', () => {
-    expect(z.util.encode_sha256_base64('Hello, world!')).toBe('MV9b23bQeMQ7isAGTkoBZGErH853yGk0W/yUx1iU7dM=');
+    expect(z.util.encodeSha256Base64('Hello, world!')).toBe('MV9b23bQeMQ7isAGTkoBZGErH853yGk0W/yUx1iU7dM=');
   });
 
   it('encodes Base64 and SHA-256 symbols', () => {
-    expect(z.util.encode_sha256_base64('Hello, world!@#$%^&*()_+{}[]|<>,.?/~`"')).toBe(
+    expect(z.util.encodeSha256Base64('Hello, world!@#$%^&*()_+{}[]|<>,.?/~`"')).toBe(
       'lt/heVPfGQB07sONclI2TZBZHuIMH86noUEWEbahMw4='
     );
   });
