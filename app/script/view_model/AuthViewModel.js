@@ -31,7 +31,6 @@ z.viewModel.AuthViewModel = class AuthViewModel {
         z.auth.URLParameter.BOT_SERVICE,
         z.auth.URLParameter.ENVIRONMENT,
         z.auth.URLParameter.INTEGRATIONS,
-        z.auth.URLParameter.LINKS,
         z.auth.URLParameter.LOCALE,
         z.auth.URLParameter.TRACKING,
       ],

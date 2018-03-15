@@ -33,23 +33,24 @@ z.viewModel.content.GiphyViewModel = class GiphyViewModel {
   static get STATE() {
     return {
       DEFAULT: '',
-      ERROR: 'error',
-      LOADING: 'loading',
-      RESULTS: 'results',
+      ERROR: 'GiphyViewModel.STATE.ERROR',
+      LOADING: 'GiphyViewModel.STATE.LOADING',
+      RESULT: 'GiphyViewModel.STATE.RESULT',
+      RESULTS: 'GiphyViewModel.STATE.RESULTS',
     };
   }
-  constructor(mainViewModel, contentViewModel, repositories) {
-    this.on_clicked_gif = this.on_clicked_gif.bind(this);
 
-    this.conversation_repository = repositories.conversation;
-    this.giphy_repository = repositories.giphy;
+  constructor(mainViewModel, contentViewModel, repositories) {
+    this.clickToSelectGif = this.clickToSelectGif.bind(this);
+
+    this.conversationRepository = repositories.conversation;
+    this.giphyRepository = repositories.giphy;
     this.logger = new z.util.Logger('z.viewModel.content.GiphyViewModel', z.config.LOGGER.OPTIONS);
 
     this.modal = undefined;
     this.state = ko.observable(GiphyViewModel.STATE.DEFAULT);
     this.query = ko.observable('');
-    this.show_giphy_button = ko.observable(true);
-    this.sending_giphy_message = false;
+    this.sendingGiphyMessage = false;
 
     // GIF presented in the single GIF view
     this.gif = ko.observable();
@@ -58,66 +59,38 @@ z.viewModel.content.GiphyViewModel = class GiphyViewModel {
     this.gifs = ko.observableArray();
 
     // GIF selected by user or single GIF when in single GIF view
-    this.selected_gif = ko.observable();
+    this.selectedGif = ko.observable();
 
-    this._init_subscriptions();
+    this._initSubscriptions();
   }
 
-  _init_subscriptions() {
-    amplify.subscribe(z.event.WebApp.EXTENSIONS.GIPHY.SHOW, this.show_giphy.bind(this));
+  _initSubscriptions() {
+    amplify.subscribe(z.event.WebApp.EXTENSIONS.GIPHY.SHOW, this.showGiphy.bind(this));
   }
 
-  show_giphy() {
-    this.sending_giphy_message = false;
-    this.query(this.conversation_repository.active_conversation().input());
-    this.state(GiphyViewModel.STATE.DEFAULT);
-    this._get_random_gif();
-
-    if (!this.modal) {
-      this.modal = new zeta.webapp.module.Modal('#giphy-modal');
-    }
-
-    this.modal.show();
-  }
-
-  on_back() {
+  clickOnBack() {
     this.gifs([this.gif()]);
-    this.selected_gif(this.gif());
-    this.show_giphy_button(true);
+    this.selectedGif(this.gif());
+    this.state(GiphyViewModel.STATE.RESULT);
   }
 
-  on_try_another() {
-    this._get_random_gif();
-  }
-
-  on_giphy_button() {
-    this._get_random_gifs();
-  }
-
-  on_send() {
-    if (this.selected_gif() && !this.sending_giphy_message) {
-      const conversation_et = this.conversation_repository.active_conversation();
-      this.sending_giphy_message = true;
-
-      this.conversation_repository.send_gif(conversation_et, this.selected_gif().animated, this.query()).then(() => {
-        this.sending_giphy_message = false;
-        const event = new z.tracking.event.PictureTakenEvent('conversation', 'giphy', 'button');
-        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, event.name, event.attributes);
-        amplify.publish(z.event.WebApp.EXTENSIONS.GIPHY.SEND);
-      });
-
-      this.modal.hide();
-    }
-  }
-
-  on_close() {
+  clickOnClose() {
     this.modal.hide();
   }
 
-  on_clicked_gif(clicked_gif, event) {
-    if (this.gifs().length !== 1) {
-      const gif_item = $(event.currentTarget);
-      const gif_items = gif_item.parent().children();
+  clickOnTryAnother() {
+    this._getRandomGif();
+  }
+
+  clickOnGrid() {
+    this._getRandomGifs();
+  }
+
+  clickToSelectGif(clickedGif, event) {
+    const hasMultipleGifs = this.gifs().length !== 1;
+    if (hasMultipleGifs) {
+      const gifItem = $(event.currentTarget);
+      const gifItems = gifItem.parent().children();
 
       const remove_unselected = function() {
         $(this).removeClass('gif-container-item-unselected');
@@ -127,37 +100,62 @@ z.viewModel.content.GiphyViewModel = class GiphyViewModel {
         $(this).addClass('gif-container-item-unselected');
       };
 
-      if (this.selected_gif() === clicked_gif) {
-        gif_items.each(remove_unselected);
-        this.selected_gif(undefined);
+      if (this.selectedGif() === clickedGif) {
+        gifItems.each(remove_unselected);
+        this.selectedGif(undefined);
       } else {
-        gif_items.each(add_unselected);
-        remove_unselected.apply(gif_item);
-        this.selected_gif(clicked_gif);
+        gifItems.each(add_unselected);
+        remove_unselected.apply(gifItem);
+        this.selectedGif(clickedGif);
       }
     }
   }
 
-  _clear_gifs() {
+  clickToSend() {
+    if (this.selectedGif() && !this.sendingGiphyMessage) {
+      const conversationEntity = this.conversationRepository.active_conversation();
+      this.sendingGiphyMessage = true;
+
+      this.conversationRepository.send_gif(conversationEntity, this.selectedGif().animated, this.query()).then(() => {
+        this.sendingGiphyMessage = false;
+        amplify.publish(z.event.WebApp.EXTENSIONS.GIPHY.SEND);
+      });
+
+      this.modal.hide();
+    }
+  }
+
+  showGiphy() {
+    this.sendingGiphyMessage = false;
+    this.query(this.conversationRepository.active_conversation().input());
+    this.state(GiphyViewModel.STATE.DEFAULT);
+    this._getRandomGif();
+
+    if (!this.modal) {
+      this.modal = new zeta.webapp.module.Modal('#giphy-modal');
+    }
+
+    this.modal.show();
+  }
+
+  _clearGifs() {
     this.gifs.removeAll();
-    this.selected_gif(undefined);
+    this.selectedGif(undefined);
     this.state(GiphyViewModel.STATE.LOADING);
   }
 
-  _get_random_gif() {
-    if (this.state() !== GiphyViewModel.STATE.ERROR) {
-      this._clear_gifs();
-      this.show_giphy_button(true);
+  _getRandomGif() {
+    const isStateError = this.state() === GiphyViewModel.STATE.ERROR;
+    if (!isStateError) {
+      this._clearGifs();
 
-      this.giphy_repository
-        .getRandomGif({
-          tag: this.query(),
-        })
+      this.giphyRepository
+        .getRandomGif({tag: this.query()})
         .then(gif => {
           this.gif(gif);
-          this.gifs.push(this.gif());
-          this.selected_gif(this.gif());
-          this.state(GiphyViewModel.STATE.RESULTS);
+          this.gifs([this.gif()]);
+          this.selectedGif(this.gif());
+          this.state(GiphyViewModel.STATE.RESULT);
         })
         .catch(error => {
           this.logger.error(`No gif found for query: ${this.query()}`, error);
@@ -166,21 +164,23 @@ z.viewModel.content.GiphyViewModel = class GiphyViewModel {
     }
   }
 
-  _get_random_gifs() {
-    if (this.state() !== GiphyViewModel.STATE.ERROR) {
-      this._clear_gifs();
-      this.show_giphy_button(false);
+  _getRandomGifs() {
+    const isStateError = this.state() === GiphyViewModel.STATE.ERROR;
+    if (!isStateError) {
+      this._clearGifs();
 
-      this.giphy_repository
+      this.giphyRepository
         .getGifs({
           number: GiphyViewModel.CONFIG.NUMBER_OF_GIFS,
           query: this.query(),
         })
         .then(gifs => {
           this.gifs(gifs);
+
           if (gifs.length === 1) {
-            this.selected_gif(gifs[0]);
+            this.selectedGif(gifs[0]);
           }
+
           this.state(GiphyViewModel.STATE.RESULTS);
         })
         .catch(error => {

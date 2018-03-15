@@ -104,15 +104,12 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
         // https://github.com/jquery/api.jquery.com/issues/608
         const scroll_position = Math.ceil(element.scrollTop());
         const scroll_end = element.scroll_end();
-        let scrolled_bottom = false;
 
         if (scroll_position === 0) {
           this._pull_messages();
         }
 
         if (scroll_position >= scroll_end) {
-          scrolled_bottom = true;
-
           if (!this.conversation_reached_bottom) {
             this._push_messages();
           }
@@ -121,7 +118,6 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
         }
 
         this.should_scroll_to_bottom = scroll_position > scroll_end - z.config.SCROLL_TO_LAST_MESSAGE_THRESHOLD;
-        amplify.publish(z.event.WebApp.LIST.SCROLL, scrolled_bottom);
       }
     }, 100);
 

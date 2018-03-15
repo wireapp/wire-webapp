@@ -50,6 +50,7 @@ export const WirelessContainer = ({
           <Link
             href={EXTERNAL_ROUTE.WIRE_PRIVACY_POLICY}
             style={{fontSize: '16px'}}
+            target="_blank"
             textTransform="none"
             bold={false}
             data-uie-name="go-privacy"
