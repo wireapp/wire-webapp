@@ -511,12 +511,6 @@ z.main.App = class App {
       this.logger.info(`Feature flag for integrations set to '${serviceId}'`);
       this.repository.integration.supportIntegrations(supportIntegrations);
     }
-
-    const supportConversationLinks = z.util.get_url_parameter(z.auth.URLParameter.LINKS);
-    if (_.isBoolean(supportConversationLinks)) {
-      this.logger.info(`Feature flag for conversation links set to '${supportConversationLinks}'`);
-      this.repository.conversation.supportConversationLinks(supportConversationLinks);
-    }
   }
 
   /**
