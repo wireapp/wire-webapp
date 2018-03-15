@@ -281,7 +281,7 @@ window.z.user = z.user || {};
   }
 
   function get_random_word_combination() {
-    return `${z.util.ArrayUtil.random_element(RANDOM_WORDS_1)}${z.util.ArrayUtil.random_element(RANDOM_WORDS_2)}`;
+    return `${z.util.ArrayUtil.randomElement(RANDOM_WORDS_1)}${z.util.ArrayUtil.randomElement(RANDOM_WORDS_2)}`;
   }
 
   /**

@@ -25,13 +25,13 @@ window.z.util = z.util || {};
 z.util.ArrayUtil = {
   chunk(array, size) {
     const chunks = [];
-    const temp_array = Array.from(array);
-    while (temp_array.length) {
-      chunks.push(temp_array.splice(0, size));
+    const tempArray = Array.from(array);
+    while (tempArray.length) {
+      chunks.push(tempArray.splice(0, size));
     }
     return chunks;
   },
-  find_closest(array, value) {
+  findClosest(array, value) {
     let closest = array[0];
 
     array.forEach(current => {
@@ -42,29 +42,29 @@ z.util.ArrayUtil = {
 
     return closest;
   },
-  get_next_item(array, current_item, filter) {
-    const current_index = array.indexOf(current_item);
+  getNextItem(array, currentItem, filter) {
+    const currentIndex = array.indexOf(currentItem);
 
     // couldn't find the item
-    if (current_index === -1) {
+    if (currentIndex === -1) {
       return undefined;
     }
 
-    const next_index = current_index + 1;
+    const nextIndex = currentIndex + 1;
 
     // item is last item in the array
-    if (next_index === array.length && current_index > 0) {
-      return array[current_index - 1];
+    if (nextIndex === array.length && currentIndex > 0) {
+      return array[currentIndex - 1];
     }
 
-    if (next_index >= array.length) {
+    if (nextIndex >= array.length) {
       return undefined;
     }
 
-    for (let index = next_index; index <= array.length; index++) {
-      const next_item = array[index];
-      if (typeof filter !== 'function' || !!filter(next_item)) {
-        return next_item;
+    for (let index = nextIndex; index <= array.length; index++) {
+      const nextItem = array[index];
+      if (typeof filter !== 'function' || !!filter(nextItem)) {
+        return nextItem;
       }
     }
   },
@@ -76,48 +76,48 @@ z.util.ArrayUtil = {
    * @returns {Array<any>} new array with interpolated values
    */
   interpolate(array, length) {
-    const new_array = [];
+    const newArray = [];
     const scale_factor = (array.length - 1) / (length - 1);
 
-    new_array[0] = array[0];
-    new_array[length - 1] = array[array.length - 1];
+    newArray[0] = array[0];
+    newArray[length - 1] = array[array.length - 1];
 
     for (let index = 1; index < length - 1; index++) {
       const original_index = index * scale_factor;
       const before = Math.floor(original_index).toFixed();
       const after = Math.ceil(original_index).toFixed();
       const point = original_index - before;
-      new_array[index] = array[before] + (array[after] - array[before]) * point; // linear interpolation
+      newArray[index] = array[before] + (array[after] - array[before]) * point; // linear interpolation
     }
 
-    return new_array;
+    return newArray;
   },
-  is_last_item(array, item) {
+  isLastItem(array, item) {
     return array.indexOf(item) === array.length - 1;
   },
-  iterate_index(array, current_index, reverse = false) {
-    if (_.isArray(array) && array.length && _.isNumber(current_index)) {
+  iterateIndex(array, currentIndex, reverse = false) {
+    if (_.isArray(array) && array.length && _.isNumber(currentIndex)) {
       if (reverse) {
-        if (current_index === 0) {
+        if (currentIndex === 0) {
           return array.length - 1;
         }
 
-        return (current_index - 1) % array.length;
+        return (currentIndex - 1) % array.length;
       }
 
-      return (current_index + 1) % array.length;
+      return (currentIndex + 1) % array.length;
     }
   },
-  iterate_item(array, current_item, reverse = false) {
+  iterateItem(array, currentItem, reverse = false) {
     if (_.isArray(array) && array.length) {
-      const current_index = array.indexOf(current_item);
+      const currentIndex = array.indexOf(currentItem);
 
       // If item could not be found
-      if (current_index === -1) {
+      if (currentIndex === -1) {
         return;
       }
 
-      return array[z.util.ArrayUtil.iterate_index(array, current_index, reverse)];
+      return array[z.util.ArrayUtil.iterateIndex(array, currentIndex, reverse)];
     }
   },
   /**
@@ -125,7 +125,7 @@ z.util.ArrayUtil = {
    * @param {Array} array - source
    * @returns {Object} random element
    */
-  random_element(array = []) {
+  randomElement(array = []) {
     return array[Math.floor(Math.random() * array.length)];
   },
   /**
@@ -134,7 +134,7 @@ z.util.ArrayUtil = {
    * @param {Object} element - Element which should be removed
    * @returns {Array|undefined} containing the removed element
    */
-  remove_element(array = [], element) {
+  removeElement(array = [], element) {
     const index = array.indexOf(element);
     if (index > -1) {
       return array.splice(index, 1);

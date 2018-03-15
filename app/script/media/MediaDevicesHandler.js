@@ -266,7 +266,7 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
         this.current_device_id.video_input()
       );
       const next_device = this.available_devices.video_input()[
-        z.util.ArrayUtil.iterate_index(this.available_devices.video_input(), this.current_device_index.video_input()) ||
+        z.util.ArrayUtil.iterateIndex(this.available_devices.video_input(), this.current_device_index.video_input()) ||
           0
       ];
 
@@ -290,7 +290,7 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
         this.current_device_id.screen_input()
       );
       const next_device = this.available_devices.screen_input()[
-        z.util.ArrayUtil.iterate_index(
+        z.util.ArrayUtil.iterateIndex(
           this.available_devices.screen_input(),
           this.current_device_index.screen_input()
         ) || 0

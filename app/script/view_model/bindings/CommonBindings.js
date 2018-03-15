@@ -527,7 +527,7 @@ ko.bindingHandlers.in_viewport = (function() {
       }
 
       function _dispose() {
-        z.util.ArrayUtil.remove_element(listeners, _checkElement);
+        z.util.ArrayUtil.removeElement(listeners, _checkElement);
       }
 
       function _checkElement(event) {

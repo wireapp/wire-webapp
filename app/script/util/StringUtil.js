@@ -93,7 +93,7 @@ z.util.StringUtil = {
       if (character.match(/[\n\r\s]+/gi)) {
         obfuscated += character;
       } else {
-        obfuscated += z.util.ArrayUtil.random_element(alphabet);
+        obfuscated += z.util.ArrayUtil.randomElement(alphabet);
       }
     }
 

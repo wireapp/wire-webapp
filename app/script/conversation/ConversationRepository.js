@@ -738,7 +738,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Conversation} Next conversation
    */
   get_next_conversation(conversation_et) {
-    return z.util.ArrayUtil.get_next_item(this.conversations_unarchived(), conversation_et);
+    return z.util.ArrayUtil.getNextItem(this.conversations_unarchived(), conversation_et);
   }
 
   /**
