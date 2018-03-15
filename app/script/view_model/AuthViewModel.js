@@ -279,7 +279,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
   }
 
   _init_url_parameter() {
-    const mode = z.util.get_url_parameter(z.auth.URLParameter.MODE);
+    const mode = z.util.getUrlParameter(z.auth.URLParameter.MODE);
     if (mode) {
       const isExpectedMode = mode === z.auth.AuthView.MODE.ACCOUNT_LOGIN;
       if (isExpectedMode) {
@@ -288,7 +288,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
       }
     }
 
-    const reason = z.util.get_url_parameter(z.auth.URLParameter.REASON);
+    const reason = z.util.getUrlParameter(z.auth.URLParameter.REASON);
     switch (reason) {
       case z.auth.SIGN_OUT_REASON.ACCOUNT_DELETED:
         this.reason_info(z.l10n.text(z.string.authAccountDeletion));
@@ -717,7 +717,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
           password: this.password(),
         };
 
-        const phone = z.util.phone_number_to_e164(username, this.country() || navigator.language);
+        const phone = z.util.phoneNumberToE164(username, this.country() || navigator.language);
         if (z.util.is_valid_email(username)) {
           payload.email = username;
         } else if (z.util.is_valid_username(username)) {
@@ -1665,7 +1665,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
       return this._add_error(z.string.authErrorEmailMissing, z.auth.AuthView.TYPE.EMAIL);
     }
 
-    const phone = z.util.phone_number_to_e164(username, this.country() || navigator.language);
+    const phone = z.util.phoneNumberToE164(username, this.country() || navigator.language);
     if (
       !z.util.is_valid_email(username) &&
       !z.util.is_valid_username(username) &&

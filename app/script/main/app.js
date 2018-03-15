@@ -58,7 +58,7 @@ z.main.App = class App {
     this.view = this._setup_view_models();
     this.util = this._setup_utils();
 
-    this.instanceId = z.util.create_random_uuid();
+    this.instanceId = z.util.createRandomUuid();
 
     this._subscribe_to_events();
 
@@ -499,20 +499,20 @@ z.main.App = class App {
    * @returns {undefined} Not return value
    */
   _handleUrlParams() {
-    const providerId = z.util.get_url_parameter(z.auth.URLParameter.BOT_PROVIDER);
-    const serviceId = z.util.get_url_parameter(z.auth.URLParameter.BOT_SERVICE);
+    const providerId = z.util.getUrlParameter(z.auth.URLParameter.BOT_PROVIDER);
+    const serviceId = z.util.getUrlParameter(z.auth.URLParameter.BOT_SERVICE);
     if (providerId && serviceId) {
       this.logger.info(`Found bot conversation initialization params '${serviceId}'`);
       this.repository.integration.addServiceFromParam(providerId, serviceId);
     }
 
-    const supportIntegrations = z.util.get_url_parameter(z.auth.URLParameter.INTEGRATIONS);
+    const supportIntegrations = z.util.getUrlParameter(z.auth.URLParameter.INTEGRATIONS);
     if (_.isBoolean(supportIntegrations)) {
       this.logger.info(`Feature flag for integrations set to '${serviceId}'`);
       this.repository.integration.supportIntegrations(supportIntegrations);
     }
 
-    const supportConversationLinks = z.util.get_url_parameter(z.auth.URLParameter.LINKS);
+    const supportConversationLinks = z.util.getUrlParameter(z.auth.URLParameter.LINKS);
     if (_.isBoolean(supportConversationLinks)) {
       this.logger.info(`Feature flag for conversation links set to '${supportConversationLinks}'`);
       this.repository.conversation.supportConversationLinks(supportConversationLinks);

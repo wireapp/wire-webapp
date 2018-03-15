@@ -156,19 +156,19 @@ describe('z.util.render_message', () => {
   /* eslint-enable no-useless-escape */
 });
 
-describe('z.util.array_to_md5_base64', () => {
+describe('z.util.arrayToMd5Base64', () => {
   it('can convert typed array to base64', () => {
-    expect(z.util.array_to_md5_base64(new Uint8Array([8, 8]))).toBe('w+7NCDwPSCf1JgWbA7deTA==');
+    expect(z.util.arrayToMd5Base64(new Uint8Array([8, 8]))).toBe('w+7NCDwPSCf1JgWbA7deTA==');
   });
 });
 
-describe('z.util.encode_base64', () => {
+describe('z.util.encodeBase64', () => {
   it('encodes text', () => {
-    expect(z.util.encode_base64('Hello, world!')).toBe('SGVsbG8sIHdvcmxkIQ==');
+    expect(z.util.encodeBase64('Hello, world!')).toBe('SGVsbG8sIHdvcmxkIQ==');
   });
 
   it('encodes symbols', () => {
-    expect(z.util.encode_base64('Hello, world!@#$%^&*()_+{}[]|<>,.?/~`"')).toBe(
+    expect(z.util.encodeBase64('Hello, world!@#$%^&*()_+{}[]|<>,.?/~`"')).toBe(
       'SGVsbG8sIHdvcmxkIUAjJCVeJiooKV8re31bXXw8PiwuPy9+YCI='
     );
   });
@@ -190,94 +190,94 @@ describe('z.util.encode_base64_sha256', () => {
   });
 });
 
-describe('z.util.base64_to_blob', () => {
+describe('z.util.base64ToBlob', () => {
   it('encodes Base64 data URI to blob', () => {
-    const base64 = z.util.array_to_base64(new Uint8Array([1, 2, 3]));
+    const base64 = z.util.arrayToBase64(new Uint8Array([1, 2, 3]));
     const data_uri = `data:application/octet-binary;base64,${base64}`;
-    const blob = z.util.base64_to_blob(data_uri);
+    const blob = z.util.base64ToBlob(data_uri);
     expect(blob.type).toBe('application/octet-binary');
   });
 });
 
-describe('z.util.create_random_uuid', () => {
+describe('z.util.createRandomUuid', () => {
   it('has the expected format', () => {
-    expect(z.util.create_random_uuid().length).toBe(36);
-    expect(z.util.create_random_uuid().split('-').length).toBe(5);
-    expect(z.util.create_random_uuid()).not.toEqual(z.util.create_random_uuid());
+    expect(z.util.createRandomUuid().length).toBe(36);
+    expect(z.util.createRandomUuid().split('-').length).toBe(5);
+    expect(z.util.createRandomUuid()).not.toEqual(z.util.createRandomUuid());
   });
 });
 
-describe('z.util.format_bytes', () => {
+describe('z.util.formatBytes', () => {
   it('renders 0 bytes', () => {
-    expect(z.util.format_bytes(0)).toEqual('0B');
+    expect(z.util.formatBytes(0)).toEqual('0B');
   });
 
   it('renders 1KB', () => {
-    expect(z.util.format_bytes(1024)).toEqual('1KB');
+    expect(z.util.formatBytes(1024)).toEqual('1KB');
   });
 
   it('renders 25MB', () => {
-    expect(z.util.format_bytes(25 * 1024 * 1024)).toEqual('25MB');
+    expect(z.util.formatBytes(25 * 1024 * 1024)).toEqual('25MB');
   });
 
   it('renders 25GB', () => {
-    expect(z.util.format_bytes(25 * 1024 * 1024 * 1024)).toEqual('25GB');
+    expect(z.util.formatBytes(25 * 1024 * 1024 * 1024)).toEqual('25GB');
   });
 });
 
-describe('z.util.get_file_extension', () => {
+describe('z.util.getFileExtension', () => {
   it('returns common extensions', () => {
-    expect(z.util.get_file_extension('file.jpg')).toEqual('jpg');
-    expect(z.util.get_file_extension('file.png')).toEqual('png');
-    expect(z.util.get_file_extension('file.docx')).toEqual('docx');
-    expect(z.util.get_file_extension('file.exe')).toEqual('exe');
-    expect(z.util.get_file_extension('file.dmg')).toEqual('dmg');
+    expect(z.util.getFileExtension('file.jpg')).toEqual('jpg');
+    expect(z.util.getFileExtension('file.png')).toEqual('png');
+    expect(z.util.getFileExtension('file.docx')).toEqual('docx');
+    expect(z.util.getFileExtension('file.exe')).toEqual('exe');
+    expect(z.util.getFileExtension('file.dmg')).toEqual('dmg');
   });
 
   it('returns extensions for gzip compressed tar archives', () => {
-    expect(z.util.get_file_extension('archive.tar.gz')).toEqual('tar.gz');
+    expect(z.util.getFileExtension('archive.tar.gz')).toEqual('tar.gz');
   });
 
   it('returns an empty string if filename has no extension', () => {
-    expect(z.util.get_file_extension('image')).toEqual('');
+    expect(z.util.getFileExtension('image')).toEqual('');
   });
 
   it('returns extension jpg for image.jpg', () => {
-    expect(z.util.get_file_extension('path/to/image.jpg')).toEqual('jpg');
+    expect(z.util.getFileExtension('path/to/image.jpg')).toEqual('jpg');
   });
 
   it('does not return .tar.gz when it is not the file extension', () => {
-    expect(z.util.get_file_extension('path/to/image.tar.gz.jpg')).toEqual('jpg');
+    expect(z.util.getFileExtension('path/to/image.tar.gz.jpg')).toEqual('jpg');
   });
 });
 
-describe('z.util.trim_file_extension', () => {
+describe('z.util.trimFileExtension', () => {
   it('returns the filename without extension', () => {
-    expect(z.util.trim_file_extension('image.jpg')).toEqual('image');
+    expect(z.util.trimFileExtension('image.jpg')).toEqual('image');
   });
 
   it('returns the filename when there is no extension', () => {
-    expect(z.util.trim_file_extension('image')).toEqual('image');
+    expect(z.util.trimFileExtension('image')).toEqual('image');
   });
 
   it('returns the filename without extension or directory path', () => {
-    expect(z.util.trim_file_extension('foo/bar.exe')).toEqual('foo/bar');
+    expect(z.util.trimFileExtension('foo/bar.exe')).toEqual('foo/bar');
   });
 
   it('returns the filename without extension for .tar.gz', () => {
-    expect(z.util.trim_file_extension('archive.tar.gz')).toEqual('archive');
+    expect(z.util.trimFileExtension('archive.tar.gz')).toEqual('archive');
   });
 
   it('does not remove .tar.gz when it is not the file extension', () => {
-    expect(z.util.trim_file_extension('cool.tar.gz.jpg')).toEqual('cool.tar.gz');
+    expect(z.util.trimFileExtension('cool.tar.gz.jpg')).toEqual('cool.tar.gz');
   });
 
   it('returns an empty string for undefined', () => {
-    expect(z.util.trim_file_extension(undefined)).toEqual('');
+    expect(z.util.trimFileExtension(undefined)).toEqual('');
   });
 
   it('returns an empty string for an object', () => {
-    expect(z.util.trim_file_extension({})).toEqual('');
+    expect(z.util.trimFileExtension({})).toEqual('');
   });
 });
 
@@ -297,9 +297,9 @@ describe('z.util.ko_array_unshift_all', () => {
   });
 });
 
-describe('z.util.base64_to_array', () => {
+describe('z.util.base64ToArray', () => {
   it('can convert a gif', () => {
-    const actual = z.util.base64_to_array(
+    const actual = z.util.base64ToArray(
       'data:image/gif;base64,R0lGODlhLQAwAPQHAKQAAPz4+AQA4AQoKASA+Kx4WOSoiHwAAPwAALQAAPz8/NyYIExoaCxISMzo6Hx4eMzMzAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH/C05FVFNDQVBFMi4wAwEAAAAh+QQEDwD/ACwAAAAALQAwAAAE/1DJSau9OOvNu/9gKI5kaZ5oqq5s605DHL9XjNz3QMMD7us02w1ABAQCAGCrNwQcnsfAQbliEmVYLMsq9Hmpp8G1ly2DTYOpAWswHNuBQeFcihXasbZ7gJfT63drfHCDdn8kcoGDa3qCLnaNMgWTcy9xgX1aNHFyepqbYomUh1UJAj87FAOmBDikdTMSAwICra4VMnWyQDG0BL8EVLGvGUrGvsCxCsaIuzy0Ab/LPLKwaQcKT7PIwdjayidPU9vIMU9BtOnAtLy5KeTcAr1JMgzExTLp3AML/TH9Cwg0cAdiAIOD5IAFWyDO3JMFAxpIvAdDosVt66411BjjoL0PEVcfDMxXi52MbxsvghQ5ckCcdBEvHnDgYADNMisdtHQpo8EDjw0cTBFX81OHAQ+wxAlQUyRLjd+WgeNwRGnVGEFbijuAw0SUABSqJpXxY+oKTjOMplq7IwIAIfkEBQoAEQAsAAAIACwAJwAABf+gIo5kOQ4oaq5su6JIHA9ubSuwrNN3Tw46gDAQACB4vhsQIQQcDkQiAJl0LZ2pbLZaA2J14Bm3hZpqz6rxy5A1GIhuIqpAVePc7AE+oGfzDXR2PwVuKHt9A3+BdmkDBYR9bHiSgSlcPCpzhXOPdJmYVUiYkWiVJ6EiaTiOhJuOo6mXKAcicpydiwoHlnZPJwIEO4kivoIjvnzAOgQ8xcbHTwMJAssDT7TPLwPABN3M2V3c3nXgJdsCEN0Q5OUn297f7SvJ4uzyOAL53bz3CvT54uLdO8cNoL4zas4A9JYPhYB3KBgwsGelgUSJ21B0W8DRIccFzBo0oEhGpEmHwBZmXHN4bYGWUA+06LsWbdZKkyOTDHCAxhrNXT6jXZyoM2YKnEFrOljKEymJACOgmhgwEsWDodaY8ky6lV+tLikcIHVAU8jKrqp6RBnAoCoKnjTBrEpbS2oXtzmEeWVBRMkWhP2+lgsBACH5BAUKAA8ALAAABgAsACkAAAT/UMlJKx142M07x0iIYF5pKqCokmc7DSoQBMDqtjAC7PO816ObCQbIGDM1jdAzKKqeo+KS2Twei8pp5mXIGAIDQzfQxXRfrJKSFBa3wW5yV3xmZTtZzaDgFs/8cm0Fei9DEnYFfH10bQaJa2snGQdoZXuJg2ZpB1s3B58KYHxWZoMSn5RTp5+io16PAaiqFqwYmJgasrMbnwMCpKC7HWACBCoEd8IfCQLHycoWA8zO0FTFBNjI1UzX2c/bLwICAdhg4B++2drnG77d3+fE4tjw4O7i4mnsoff4xfXK+vn7B+0IGAIDB2o7ImQAg4cPByBcQPGXL4oL/kGMeGNAg48fXS+iWoBhwchfIEN2tCIAVa8BLg9YZOgCQ0pfMTHERAlS3xCHEDE4GDpUKFEHGDb6VOOxJwAHLnWiclDkZr0A7Y4gQIpKKicHI2gOi8YQChQUYlfaIWXkUKd9cONGAAAh+QQFCgALACwBAAYAKwAmAAAE/1DJSWsdeNjN+8ZIiGBeaYJiSposNaRAEABq274IoMuyTo+2Uy5DzNA0Qc8AgEupmEnlslhkIqOZycCQMQS23AAXw9WulBISmGvwggdidluzunKQi4ViUJi3ZX9xYAV5V3YfaUh8fX5tcgYFBYqKJxgHZmOLkV1nB1k2B6EKX31UZJISoZdRqaGkpV2bAaqsFqqvkZsaorUcoaYCA7y9HF8EKQTBxCfHIgIJh8sWA80hz9HSLgTb28HY2Wnc3d/ge3l5AsrlH+Le6+zd6u8Uxsnp5OAY6fvy89T8+84JHEiwoMEF9gCmO8iwoYKGECNKnEixosWLGDNq3HgxAMeOEws+SgzQwaNIgjIiAAAh+QQFCgARACwCAAYAKgAoAAAF/6AijmRpnmiqrmzLDjDszueA3LdM0zbu67uVDRAIAI6/oJBYDBwOR0BOiYpZrdApldTzeQfZwZZ7LcMAwO2gACsaDG6DVb4KvArywOA9CLzle3xjCmt5gX1/MG9sVDF6eIF8iQYFjIRiM5gyMZWVMYubmpkjfWtmiaIimC2aYo+fi2yrOqusMAcij52eaQcxVE+5MD4EAqvBg8F6BMTGIsiDCk++zDgCCWDQ0aQE3d3Gtdtc3t/h4sIQ3RACzucmA+Tg7iXL3+3zqjD29/Pw3uwAzSkpUwyggH0CeTBgoM8YOHb/2JXZMaBBA3gLMoLLuKAbDGMLF17MZGXBNHDTOl5KrGjRYsJ3LS9O83VrZsErDxLa4RKS4cyaP804eFmCpUsHSIdmm2b0YoycKHaSsuIgaNKqA3rmhDGSXg2qS4/MHBpTaRoSRehZUeDlp9mKUJVIveIFwZWu5yZeaRECACH5BAUPABAALAIACAAqACcAAAT/UMlJq7046807HyDojdeAnKdIriaKqusHBAFgA+8Qb8NBB4eg7bXDhI7HIUJXpLRcUBBu2ZwgryYpgFkdFAYBg4EmPhp63KYXVA6XB+JvuriGn91n+7c6CbDFZ4B6e3wSXgWIIYAGcoV9V4uEjo+KcSABkxV+iJwDCXOZCn4uAp+hFk8EpaA7IRVPCKoCXK4shmkDBLqyKr22hla5uwKzVsYkTDBgugHEyskxIUEKB8Kys9NBtU3awsTOPdNqtQPEw9/FXQxJs+Xn36wdIQ0EC/Yg9gvW6O0wHw0ABywIUi3cAX27rg1gwDDeK4brDIIgqE3AuQEAMzq0olFiuCPmTMCBaPCgwcZbRxw4GKCyWkaT8PyMJHlSARIHBHs4aACxZAiZIx08qGlTxESKGHnSpAHmyNAYKJAGNfnM34gQLpyCwXTqCFCik34UiQAAIfkEBQoAEQAsAgAIACoAJwAABf+gIo5kSQ4oaq5saw5IHKtuXcNyTtv8CAOBAGCo6xkHwGDgcBgCZkZbajptQqMsXG47sA6wWaoYBdiBfQVU0GBYG6bvWkBaeAcG7EGA/cbnzyd1en56fChsaYApd4J8b4YGBYkKZlIiKimSkimImF+URz6MY4afn6A9pl+jh4hppzSnPCkHIoyam2YHKYBMtig5BAKnvoAjvncEwcMixcbHTAPKMgIJXc7PJdIE3MKV2drd3MzgLHcQ3BAC5OUr2+Pf7QrJ4+zyPij19vfvwuvrsoyJ8fdPX0AwAxgwyDds2IB13f6JwTKgQQNpCzI6zLiAG4phChVePDJlAZMDDk9kdgRY0aLFg1lcXjy5CwXNA/6oPIA5T1vIhTRt3hwzwAHPFzKLOlgq9GTLlyl2mtM2xUFQpUt3/dyJYmSJOS+qXmsCgKZRmUZ5rQjydYqCLUHTdpV6BiylKVsQUPEqbyKVe/JCAAAh+QQFCgAPACwCAAYAKgAoAAAE/1DJSSsdeNjNu8VIiGBeWYJiSprsNKRAEABqy74IoMuyTo+2Uy5DzNA0wc4AgEupmEnlslhkIpMZlyFjCAwM28AWs3WtlBLSF7z2ssVbcHl13Vw1gwIbLOPD1wV4Lh5IdAV6e3JrBoeFhScYB2ZjeYeBZGcHWS0HnQpeelRkgRKdklEKpqChXI0BpqgVqpWWl6mnsRadogIDnrkcXgQpBL3AJ8MiAgl1xx/JIcvNzhcE1ta909Rp19ja2woDAdYBAsbgz9fZ6OnF5+wTwu7v8OED5vj06APz+d/H/PIJ/NeiSLh+AgUQwEPExgAGECEGXEAxmwCKCxQ+jMiA4IUGIGJB3ltgagEGkp0yDggpsiAVAaZ2+YqZzeCNlSHvxdQ001QvlmcgccTgoGhRokYdYBhaJ4AUoAAcxIxkygEToM2ccqCCQKkpqpocjLBJQasFLwadqEVgr+FZsxXcirLpth6qCAAh+QQFCgALACwBAAYAKwAmAAAE/1DJSesceNjN+8ZIiGBeaYJiSposNaRAEABq274IoMuyTo+2Uy5DzNA0Qc8AgEupmEnlslhkIqOZiyFjCAwM28AWs72slBLSF7z2ssVbcHl15VwHi0WBDZb14WsFGnlpJUh0BXt8cmsGiYeHJxgHZmMDiY9kZwdZNgefCl57VGSCEp+UUaefoqNcjwGoqhasGJiYGrKzG58DAqSgux1eAgQpBHXCdgkCx8nKFgPMztBSxQTYyNVK19nP2xcCAnl53+AKGN3a5x/i3uwWxO7r8OHi92fw8vfu5P7/AAMKXMCvIIGBCBMGSMiwocOHECNKnEixosWLExVgzChh4caGFAcCWPgYUEIEACH5BAUKABEALAAABgAsACkAAAX/oCKOZGmeaKqubOsqQxy/tBkjOD7U9Z3/O15r8AMYAwEAIihMERFGwOGARAKYTRtOKut2syci90fWgUuxq3c9O48Ghq7BgJwjYwVsFj6Pzel8AwFweW4wBX18gH2DBoV7QQMFiIqKcY47MjyRmZKJkpN5M216LEycf2yFpz0ibTCgqXicrpsxByJ3eKGTTAeaWVNvAgRAgiLChsKDxD8EQcmGClO/CQLOA9TSNgPEBN/P207e4KXirgICEN8Q5ucx5OHnJszk7u/p3sDzCvX54PLmdUv3LR/BNU3W/CsoAF63ZwMYMLjnpIFEid1ifFvAER7HBc8aNKCIYoDIk/CIZi2gBo/aAi89HnghSG2KjJomUdIY4IBNtpq/ftq8OHGnTBknRwKN4aBpz6RYAoyQamNkjAdEszntKfQA1325VnRxANVBTSMsv75yUSWiVaZdycBam4uq2Lc+jIFFgWTIF4T8wm4LAQA7'
     );
     /* eslint-disable comma-spacing */
@@ -3981,21 +3981,21 @@ describe('z.util.base64_to_array', () => {
   it('can convert array buffer back and forth', () => {
     const buffer = new ArrayBuffer(8);
     const array = new Uint8Array(buffer);
-    const buffer_encoded = z.util.array_to_base64(array);
-    const buffer_decoded = z.util.base64_to_array(buffer_encoded);
+    const buffer_encoded = z.util.arrayToBase64(array);
+    const buffer_decoded = z.util.base64ToArray(buffer_encoded);
     expect(buffer_decoded).toEqual(array);
   });
 });
 
-describe('z.util.strip_data_uri', () => {
+describe('z.util.stripDataUri', () => {
   it('can strip data uri', () => {
     const base64 = 'AAAAAAA';
-    const plain_text = z.util.strip_data_uri(base64);
-    const text_html = z.util.strip_data_uri(`data:text/html,${base64}`);
-    const base64_text_plain = z.util.strip_data_uri(`data:text/plain;base64,${base64}`);
-    const base64_gif = z.util.strip_data_uri(`data:image/gif;base64,${base64}`);
-    const base64_png = z.util.strip_data_uri(`data:image/png;base64,${base64}`);
-    const base64_jpg = z.util.strip_data_uri(`data:image/jpg;base64,${base64}`);
+    const plain_text = z.util.stripDataUri(base64);
+    const text_html = z.util.stripDataUri(`data:text/html,${base64}`);
+    const base64_text_plain = z.util.stripDataUri(`data:text/plain;base64,${base64}`);
+    const base64_gif = z.util.stripDataUri(`data:image/gif;base64,${base64}`);
+    const base64_png = z.util.stripDataUri(`data:image/png;base64,${base64}`);
+    const base64_jpg = z.util.stripDataUri(`data:image/jpg;base64,${base64}`);
     expect(plain_text).toBe(base64);
     expect(text_html).toBe(base64);
     expect(base64_text_plain).toBe(base64);
@@ -4005,27 +4005,27 @@ describe('z.util.strip_data_uri', () => {
   });
 });
 
-describe('z.util.phone_number_to_e164', () => {
+describe('z.util.phoneNumberToE164', () => {
   it('can convert a US number', () => {
-    expect(z.util.phone_number_to_e164('555-666-7777', 'US')).toBe('+15556667777');
+    expect(z.util.phoneNumberToE164('555-666-7777', 'US')).toBe('+15556667777');
   });
 
   it('can convert a GR number', () => {
-    expect(z.util.phone_number_to_e164('2310 863871', 'GR')).toBe('+302310863871');
+    expect(z.util.phoneNumberToE164('2310 863871', 'GR')).toBe('+302310863871');
   });
 
   it('can convert an unknown number', () => {
-    expect(z.util.phone_number_to_e164('2310 863871')).toBe('2310863871');
+    expect(z.util.phoneNumberToE164('2310 863871')).toBe('2310863871');
   });
 
   it('can convert an invalid number', () => {
-    expect(z.util.phone_number_to_e164('foo bar', 'earth')).toBe('');
+    expect(z.util.phoneNumberToE164('foo bar', 'earth')).toBe('');
   });
 });
 
-describe('z.util.get_content_type_from_data_url', () =>
+describe('z.util.getContentTypeFromDataUrl', () =>
   it('can extract the type of a an image', () => {
-    const actual = z.util.get_content_type_from_data_url(
+    const actual = z.util.getContentTypeFromDataUrl(
       'data:image/gif;base64,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'
     );
     expect(actual).toEqual('image/gif');
@@ -4147,36 +4147,36 @@ describe('z.util.appendUrlParameter', () => {
   });
 });
 
-describe('z.util.get_url_parameter', () => {
+describe('z.util.getUrlParameter', () => {
   it('get param with no arguments', () => {
-    expect(z.util.get_url_parameter('foo')).toBe(null);
+    expect(z.util.getUrlParameter('foo')).toBe(null);
   });
 });
 
 describe('z.util.forwardUrlParameter', () => {
   it('forwards existing URL parameters', () => {
-    z.util.get_url_parameter = function(parameter_value) {
+    z.util.getUrlParameter = function(parameter_value) {
       if (parameter_value === z.auth.URLParameter.TRACKING) {
         return true;
       }
     };
     expect(z.util.forwardUrlParameter('foo.com', z.auth.URLParameter.TRACKING)).toBe('foo.com?tracking=true');
 
-    z.util.get_url_parameter = function(parameter_value) {
+    z.util.getUrlParameter = function(parameter_value) {
       if (parameter_value === z.auth.URLParameter.TRACKING) {
         return false;
       }
     };
     expect(z.util.forwardUrlParameter('foo.com', z.auth.URLParameter.TRACKING)).toBe('foo.com?tracking=false');
 
-    z.util.get_url_parameter = function(parameter_value) {
+    z.util.getUrlParameter = function(parameter_value) {
       if (parameter_value === z.auth.URLParameter.TRACKING) {
         return 'bar';
       }
     };
     expect(z.util.forwardUrlParameter('foo.com', z.auth.URLParameter.TRACKING)).toBe('foo.com?tracking=bar');
 
-    z.util.get_url_parameter = function(parameter_value) {
+    z.util.getUrlParameter = function(parameter_value) {
       if (parameter_value === z.auth.URLParameter.TRACKING) {
         return null;
       }
@@ -4412,45 +4412,45 @@ describe('z.util.zero_padding', () => {
   });
 });
 
-describe('z.util.format_seconds', () => {
+describe('z.util.formatSeconds', () => {
   it('should format seconds', () => {
-    expect(z.util.format_seconds(50)).toBe('00:50');
+    expect(z.util.formatSeconds(50)).toBe('00:50');
   });
 
   it('should format minutes and seconds', () => {
-    expect(z.util.format_seconds(110)).toBe('01:50');
+    expect(z.util.formatSeconds(110)).toBe('01:50');
   });
 
   it('should format hours, minutes and seconds', () => {
-    expect(z.util.format_seconds(3630)).toBe('1:00:30');
+    expect(z.util.formatSeconds(3630)).toBe('1:00:30');
   });
 
   it('should format 0 seconds', () => {
-    expect(z.util.format_seconds(0)).toBe('00:00');
+    expect(z.util.formatSeconds(0)).toBe('00:00');
   });
 
   it('should format undefined as 00:00', () => {
-    expect(z.util.format_seconds()).toBe('00:00');
+    expect(z.util.formatSeconds()).toBe('00:00');
   });
 });
 
-describe('z.util.format_milliseconds_short', () => {
+describe('z.util.formatMillisecondsShort', () => {
   it('should format duration under 1 minute', () => {
-    expect(z.util.format_milliseconds_short(5000)).toEqual([5, 's']);
-    expect(z.util.format_milliseconds_short(15000)).toEqual([15, 's']);
+    expect(z.util.formatMillisecondsShort(5000)).toEqual([5, 's']);
+    expect(z.util.formatMillisecondsShort(15000)).toEqual([15, 's']);
   });
 
   it('should format duration over 1 minute', () => {
-    expect(z.util.format_milliseconds_short(60000)).toEqual([1, 'm']);
-    expect(z.util.format_milliseconds_short(900000)).toEqual([15, 'm']);
+    expect(z.util.formatMillisecondsShort(60000)).toEqual([1, 'm']);
+    expect(z.util.formatMillisecondsShort(900000)).toEqual([15, 'm']);
   });
 
   it('should format duration over 1 hour', () => {
-    expect(z.util.format_milliseconds_short(1000 * 60 * 60 * 3)).toEqual([3, 'h']);
+    expect(z.util.formatMillisecondsShort(1000 * 60 * 60 * 3)).toEqual([3, 'h']);
   });
 
   it('should format duration over 1 day', () => {
-    expect(z.util.format_milliseconds_short(1000 * 60 * 60 * 24 * 3)).toEqual([3, 'd']);
+    expect(z.util.formatMillisecondsShort(1000 * 60 * 60 * 24 * 3)).toEqual([3, 'd']);
   });
 });
 

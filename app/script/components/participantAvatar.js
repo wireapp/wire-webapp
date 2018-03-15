@@ -79,7 +79,7 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
     this.dispose = this.dispose.bind(this);
 
     this.element.attr({
-      id: z.util.create_random_uuid(),
+      id: z.util.createRandomUuid(),
       'user-id': this.participant().id,
     });
 

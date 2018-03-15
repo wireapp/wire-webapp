@@ -206,7 +206,7 @@ z.assets.AssetService = class AssetService {
       body += `--${BOUNDARY}\r\n`;
       body += 'Content-Type: application/octet-stream\r\n';
       body += `Content-length: ${assetData.length}\r\n`;
-      body += `Content-MD5: ${z.util.array_to_md5_base64(assetData)}\r\n`;
+      body += `Content-MD5: ${z.util.arrayToMd5Base64(assetData)}\r\n`;
       body += '\r\n';
       const footer = `\r\n--${BOUNDARY}--\r\n`;
 

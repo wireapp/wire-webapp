@@ -139,8 +139,8 @@ describe('User Mapper', () => {
       user_et.id = entities.user.john_doe.id;
       const data = {
         assets: [
-          {key: z.util.create_random_uuid(), size: 'preview', type: 'image'},
-          {key: z.util.create_random_uuid(), size: 'complete', type: 'image'},
+          {key: z.util.createRandomUuid(), size: 'preview', type: 'image'},
+          {key: z.util.createRandomUuid(), size: 'complete', type: 'image'},
         ],
         id: entities.user.john_doe.id,
         name: entities.user.jane_roe.name,

@@ -114,7 +114,7 @@ ko.components.register('audio-asset', {
           <!-- ko if: asset.status() !== z.assets.AssetTransferState.UPLOADING -->
             <span class="audio-controls-time label-xs"
                   data-uie-name="status-audio-time"
-                  data-bind="text: z.util.format_seconds(audio_time())">
+                  data-bind="text: z.util.formatSeconds(audio_time())">
             </span>
             <!-- ko if: show_loudness_preview -->
               <audio-seek-bar data-uie-name="status-audio-seekbar"

@@ -44,15 +44,15 @@ describe('z.conversation.ConversationVerificationStateHandler', () => {
         conversation_repository = _conversation_repository;
         state_handler = new z.conversation.ConversationVerificationStateHandler(conversation_repository);
 
-        conversation_ab = new z.entity.Conversation(z.util.create_random_uuid());
-        conversation_b = new z.entity.Conversation(z.util.create_random_uuid());
-        conversation_c = new z.entity.Conversation(z.util.create_random_uuid());
+        conversation_ab = new z.entity.Conversation(z.util.createRandomUuid());
+        conversation_b = new z.entity.Conversation(z.util.createRandomUuid());
+        conversation_c = new z.entity.Conversation(z.util.createRandomUuid());
 
-        user_self = new z.entity.User(z.util.create_random_uuid());
+        user_self = new z.entity.User(z.util.createRandomUuid());
         user_self.is_me = true;
 
-        user_a = new z.entity.User(z.util.create_random_uuid());
-        user_b = new z.entity.User(z.util.create_random_uuid());
+        user_a = new z.entity.User(z.util.createRandomUuid());
+        user_b = new z.entity.User(z.util.createRandomUuid());
 
         client_a = new z.client.ClientEntity();
         client_a.meta.isVerified(true);
@@ -165,7 +165,7 @@ describe('z.conversation.ConversationVerificationStateHandler', () => {
     it('should change state to DEGRADED if new user with unverified client was added to conversation', () => {
       spyOn(z.conversation.EventBuilder, 'buildDegraded');
 
-      const new_user = new z.entity.User(z.util.create_random_uuid());
+      const new_user = new z.entity.User(z.util.createRandomUuid());
       const new_client_b = new z.client.ClientEntity();
       new_client_b.meta.isVerified(false);
       new_user.devices.push(new_client_b);
@@ -183,7 +183,7 @@ describe('z.conversation.ConversationVerificationStateHandler', () => {
     it('should not change state if new user with verified client was added to conversation', () => {
       spyOn(z.conversation.EventBuilder, 'buildDegraded');
 
-      const new_user = new z.entity.User(z.util.create_random_uuid());
+      const new_user = new z.entity.User(z.util.createRandomUuid());
       const new_client_b = new z.client.ClientEntity();
       new_client_b.meta.isVerified(true);
       new_user.devices.push(new_client_b);

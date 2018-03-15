@@ -269,7 +269,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
   }
 
   _is_domain_allowed_for_tracking() {
-    if (!z.util.get_url_parameter(z.auth.URLParameter.TRACKING)) {
+    if (!z.util.getUrlParameter(z.auth.URLParameter.TRACKING)) {
       for (const domain of EventTrackingRepository.CONFIG.USER_ANALYTICS.DISABLED_DOMAINS) {
         if (z.util.StringUtil.includes(window.location.hostname, domain)) {
           this.logger.debug(`Tracking is disabled for domain '${window.location.hostname}'`);

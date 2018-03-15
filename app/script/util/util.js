@@ -142,14 +142,14 @@ z.util.appendUrlParameter = function(url, parameter) {
 };
 
 z.util.forwardUrlParameter = function(url, parameterName) {
-  const parameterValue = z.util.get_url_parameter(parameterName);
+  const parameterValue = z.util.getUrlParameter(parameterName);
   if (parameterValue != null) {
     return z.util.appendUrlParameter(url, `${parameterName}=${parameterValue}`);
   }
   return url;
 };
 
-z.util.get_url_parameter = function(name) {
+z.util.getUrlParameter = function(name) {
   const params = window.location.search.substring(1).split('&');
   for (const param of params) {
     let value = param.split('=');
@@ -178,7 +178,7 @@ z.util.get_url_parameter = function(name) {
  * @param {string} filename - filename including extension
  * @returns {string} File extension
  */
-z.util.get_file_extension = function(filename) {
+z.util.getFileExtension = function(filename) {
   if (!_.isString(filename) || !filename.includes('.')) {
     return '';
   }
@@ -195,7 +195,7 @@ z.util.get_file_extension = function(filename) {
  * @param {string} filename - filename including extension
  * @returns {string} New String without extension
  */
-z.util.trim_file_extension = function(filename) {
+z.util.trimFileExtension = function(filename) {
   if (_.isString(filename)) {
     if (filename.endsWith('.tar.gz')) {
       filename = filename.replace(/\.tar\.gz$/, '');
@@ -213,7 +213,7 @@ z.util.trim_file_extension = function(filename) {
  * @param {number} [decimals] - Number of decimals to keep
  * @returns {string} Bytes as a human readable string
  */
-z.util.format_bytes = function(bytes, decimals) {
+z.util.formatBytes = function(bytes, decimals) {
   if (bytes === 0) {
     return '0B';
   }
@@ -231,15 +231,15 @@ z.util.format_bytes = function(bytes, decimals) {
  * @returns {string}
  */
 
-z.util.format_seconds = function(duration) {
+z.util.formatSeconds = function(duration) {
   duration = Math.round(duration || 0);
 
   const hours = Math.floor(duration / (60 * 60));
 
-  const divisor_for_minutes = duration % (60 * 60);
-  const minutes = Math.floor(divisor_for_minutes / 60);
+  const divisorForMinutes = duration % (60 * 60);
+  const minutes = Math.floor(divisorForMinutes / 60);
 
-  const divisor_for_seconds = divisor_for_minutes % 60;
+  const divisor_for_seconds = divisorForMinutes % 60;
   const seconds = Math.ceil(divisor_for_seconds);
 
   const components = [z.util.zero_padding(minutes), z.util.zero_padding(seconds)];
@@ -256,7 +256,7 @@ z.util.format_seconds = function(duration) {
  * @param {number} duration - duration to format in seconds
  * @returns {Array} First index holds the values, second index holds the unit format.
  */
-z.util.format_milliseconds_short = function(duration) {
+z.util.formatMillisecondsShort = function(duration) {
   const seconds = Math.floor(duration / 1000);
   switch (false) {
     case !(seconds < 60):
@@ -270,14 +270,14 @@ z.util.format_milliseconds_short = function(duration) {
   }
 };
 
-z.util.get_content_type_from_data_url = function(data_url) {
+z.util.getContentTypeFromDataUrl = function(data_url) {
   return data_url
     .split(',')[0]
     .split(':')[1]
     .split(';')[0];
 };
 
-z.util.strip_data_uri = function(string) {
+z.util.stripDataUri = function(string) {
   return string.replace(/^data:.*,/, '');
 };
 
@@ -287,8 +287,8 @@ z.util.strip_data_uri = function(string) {
  * @param {string} base64 - base64 encoded string
  * @returns {UInt8Array} Typed array
  */
-z.util.base64_to_array = function(base64) {
-  return bazinga64.Decoder.fromBase64(z.util.strip_data_uri(base64)).asBytes;
+z.util.base64ToArray = function(base64) {
+  return bazinga64.Decoder.fromBase64(z.util.stripDataUri(base64)).asBytes;
 };
 
 /**
@@ -296,7 +296,7 @@ z.util.base64_to_array = function(base64) {
  * @param {ArrayBuffer|UInt8Array} array - raw binary data or bytes
  * @returns {string} Base64-encoded string
  */
-z.util.array_to_base64 = function(array) {
+z.util.arrayToBase64 = function(array) {
   return bazinga64.Encoder.toBase64(new Uint8Array(array), true).asString;
 };
 
@@ -305,9 +305,9 @@ z.util.array_to_base64 = function(array) {
  * @param {Uint8Array} array - Input array
  * @returns {string} MD5 hash
  */
-z.util.array_to_md5_base64 = function(array) {
-  const word_array = CryptoJS.lib.WordArray.create(array);
-  return CryptoJS.MD5(word_array).toString(CryptoJS.enc.Base64);
+z.util.arrayToMd5Base64 = function(array) {
+  const wordArray = CryptoJS.lib.WordArray.create(array);
+  return CryptoJS.MD5(wordArray).toString(CryptoJS.enc.Base64);
 };
 
 /**
@@ -316,10 +316,10 @@ z.util.array_to_md5_base64 = function(array) {
  * @returns {Blob} Binary output
  */
 
-z.util.base64_to_blob = function(base64) {
-  const mime_type = z.util.get_content_type_from_data_url(base64);
-  const bytes = z.util.base64_to_array(base64);
-  return new Blob([bytes], {type: mime_type});
+z.util.base64ToBlob = function(base64) {
+  const mimeType = z.util.getContentTypeFromDataUrl(base64);
+  const bytes = z.util.base64ToArray(base64);
+  return new Blob([bytes], {type: mimeType});
 };
 
 /**
@@ -329,7 +329,7 @@ z.util.base64_to_blob = function(base64) {
  * @returns {number} Timeout identifier
  */
 
-z.util.download_blob = function(blob, filename) {
+z.util.downloadBlob = function(blob, filename) {
   const url = window.URL.createObjectURL(blob);
   const link = document.createElement('a');
   document.body.appendChild(link);
@@ -345,11 +345,11 @@ z.util.download_blob = function(blob, filename) {
   }, 100);
 };
 
-z.util.phone_number_to_e164 = function(phone_number, country_code) {
-  return window.PhoneFormat.formatE164(`${country_code}`.toUpperCase(), `${phone_number}`);
+z.util.phoneNumberToE164 = function(phoneNumber, countryCode) {
+  return window.PhoneFormat.formatE164(`${countryCode}`.toUpperCase(), `${phoneNumber}`);
 };
 
-z.util.create_random_uuid = function() {
+z.util.createRandomUuid = function() {
   return UUID.genV4().hexString;
 };
 
@@ -359,17 +359,17 @@ z.util.create_random_uuid = function() {
  * @param {number} max - Maximum
  * @returns {number} Random integer
  */
-z.util.get_random_int = function(min, max) {
+z.util.getRandomInt = function(min, max) {
   min = Math.ceil(min);
   max = Math.floor(max);
   return Math.floor(Math.random() * (max - min) + min);
 };
 
-z.util.encode_base64 = function(text) {
+z.util.encodeBase64 = function(text) {
   return window.btoa(text);
 };
 
-z.util.encode_sha256_base64 = function(text) {
+z.util.encodeSha256Base64 = function(text) {
   return CryptoJS.SHA256(text).toString(CryptoJS.enc.Base64);
 };
 
@@ -609,10 +609,10 @@ z.util.is_valid_email = function(email) {
 /**
  * Checks if input has the format of an international phone number
  * @note Begins with + and contains only numbers
- * @param {string} phone_number - Input
+ * @param {string} phoneNumber - Input
  * @returns {boolean} True, if the input a phone number
  */
-z.util.is_valid_phone_number = function(phone_number) {
+z.util.is_valid_phone_number = function(phoneNumber) {
   let regular_expression;
 
   if (z.util.Environment.backend.current === z.service.BackendEnvironment.PRODUCTION) {
@@ -621,7 +621,7 @@ z.util.is_valid_phone_number = function(phone_number) {
     regular_expression = /^\+[0-9]\d{1,14}$/;
   }
 
-  return regular_expression.test(phone_number);
+  return regular_expression.test(phoneNumber);
 };
 
 z.util.is_valid_username = function(username) {

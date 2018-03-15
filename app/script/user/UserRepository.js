@@ -579,7 +579,7 @@ z.user.UserRepository = class UserRepository {
       this.logger.log(`Availability was again set to '${newAvailabilityValue}'`);
     }
 
-    const genericMessage = new z.proto.GenericMessage(z.util.create_random_uuid());
+    const genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
     const availabilityMessage = new z.proto.Availability(z.user.AvailabilityMapper.protoFromType(availability));
     genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.AVAILABILITY, availabilityMessage);
 

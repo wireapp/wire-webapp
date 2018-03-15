@@ -303,7 +303,7 @@ window.z.user = z.user || {};
    * @returns {string} String appended with random digits.
    */
   function append_random_digits(handle, additional_numbers) {
-    const random_digits = _.range(additional_numbers).map(() => z.util.get_random_int(1, 9));
+    const random_digits = _.range(additional_numbers).map(() => z.util.getRandomInt(1, 9));
     return `${handle}${random_digits.join('')}`;
   }
 

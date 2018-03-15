@@ -82,7 +82,7 @@ describe('ConversationServiceNoCompound', () => {
 
     it('returns undefined if no event with id is found', done => {
       conversation_service
-        .load_event_from_db(conversation_id, z.util.create_random_uuid())
+        .load_event_from_db(conversation_id, z.util.createRandomUuid())
         .then(message_et => {
           expect(message_et).not.toBeDefined();
           done();

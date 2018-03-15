@@ -42,13 +42,13 @@ describe('Event Mapper', () => {
   });
 
   beforeEach(() => {
-    conversation_et = new z.entity.Conversation(z.util.create_random_uuid());
+    conversation_et = new z.entity.Conversation(z.util.createRandomUuid());
     event_mapper = new z.conversation.EventMapper();
   });
 
   describe('map_json_event', () => {
     it('maps text messages without link previews', () => {
-      const event_id = z.util.create_random_uuid;
+      const event_id = z.util.createRandomUuid;
 
       const event = {
         conversation: conversation_et.id,
@@ -56,7 +56,7 @@ describe('Event Mapper', () => {
           content: 'foo',
           nonce: event_id,
         },
-        from: z.util.create_random_uuid,
+        from: z.util.createRandomUuid,
         id: event_id,
         time: new Date().toISOString(),
         type: z.event.Client.CONVERSATION.MESSAGE_ADD,
@@ -69,7 +69,7 @@ describe('Event Mapper', () => {
     });
 
     it('maps text messages with deprecated link preview format', () => {
-      const event_id = z.util.create_random_uuid;
+      const event_id = z.util.createRandomUuid;
 
       const article = new z.proto.Article('test.com', 'Test title', 'Test description');
       const link_preview = new z.proto.LinkPreview('test.com', 0, article);
@@ -81,7 +81,7 @@ describe('Event Mapper', () => {
           nonce: event_id,
           previews: [link_preview.encode64()],
         },
-        from: z.util.create_random_uuid,
+        from: z.util.createRandomUuid,
         id: event_id,
         time: new Date().toISOString(),
         type: z.event.Client.CONVERSATION.MESSAGE_ADD,
@@ -96,7 +96,7 @@ describe('Event Mapper', () => {
     });
 
     it('maps text messages with link preview', () => {
-      const event_id = z.util.create_random_uuid;
+      const event_id = z.util.createRandomUuid;
 
       const link_preview = new z.proto.LinkPreview(
         'test.com',
@@ -114,7 +114,7 @@ describe('Event Mapper', () => {
           nonce: event_id,
           previews: [link_preview.encode64()],
         },
-        from: z.util.create_random_uuid,
+        from: z.util.createRandomUuid,
         id: event_id,
         time: new Date().toISOString(),
         type: z.event.Client.CONVERSATION.MESSAGE_ADD,

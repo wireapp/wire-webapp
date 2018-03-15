@@ -78,7 +78,7 @@ describe('z.cryptography.CryptographyRepository', () => {
         })
       );
 
-      const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
+      const generic_message = new z.proto.GenericMessage(z.util.createRandomUuid());
       generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT, new z.proto.Text('Unit test'));
 
       const recipients = {};

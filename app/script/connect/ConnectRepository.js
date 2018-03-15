@@ -117,7 +117,7 @@ z.connect.ConnectRepository = class ConnectRepository {
               contact: [],
             };
 
-            numbers.forEach(number => card.contact.push(z.util.phone_number_to_e164(number, navigator.language)));
+            numbers.forEach(number => card.contact.push(z.util.phoneNumberToE164(number, navigator.language)));
 
             if (card.contact.length) {
               phoneBook.cards.push(card);

@@ -268,7 +268,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     if (!this._is_hitting_upload_limit(files)) {
       for (const file of [...files]) {
         if (file.size > z.config.MAXIMUM_ASSET_FILE_SIZE) {
-          const fileSize = z.util.format_bytes(z.config.MAXIMUM_ASSET_FILE_SIZE);
+          const fileSize = z.util.formatBytes(z.config.MAXIMUM_ASSET_FILE_SIZE);
           const options = {
             text: {
               message: z.l10n.text(z.string.modalAssetTooLargeMessage, fileSize),
@@ -518,7 +518,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       },
     ].concat(
       z.ephemeral.timings.getValues().map(milliseconds => {
-        const [number, unit] = z.util.format_milliseconds_short(milliseconds);
+        const [number, unit] = z.util.formatMillisecondsShort(milliseconds);
         const unit_locale = this._get_localized_unit_string(number, unit);
         return {
           click: () => this.set_ephemeral_timer(milliseconds),
