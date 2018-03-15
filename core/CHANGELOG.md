@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="2.0.78"></a>
+## [2.0.78](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.0.77...@wireapp/core@2.0.78) (2018-03-15)
+
+
+### Bug Fixes
+
+* Option to pass ClientInfo and ClientType ([#373](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/373)) ([d5e86af](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/d5e86af))
+
+
+
+
 <a name="2.0.77"></a>
 ## [2.0.77](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.0.76...@wireapp/core@2.0.77) (2018-03-15)
 
