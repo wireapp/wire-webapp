@@ -152,7 +152,7 @@
     "start": "grunt",
     "start:all": "concurrently \"yarn start:dev\" \"yarn start\"",
     "start:dev": "webpack-dev-server --config webpack.config.dev.js --open",
-    "test": "yarn test:assets && yarn test:scripts && grunt check && grunt test && yarn test:auth",
+    "test": "yarn test:assets && yarn test:scripts && grunt check && grunt test",
     "test:assets": "yarn prettier --list-different",
     "test:auth": "yarn bundle:test && karma start karma.conf.react.js",
     "test:scripts": "eslint -c .eslintrc.json --ignore-path .gitignore --ignore-path .eslintignore app/script/ test/ bin/ grunt/ *.{js,jsx}",
