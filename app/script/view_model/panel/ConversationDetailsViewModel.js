@@ -25,7 +25,8 @@ window.z.viewModel.panel = z.viewModel.panel || {};
 
 z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewModel {
   constructor(mainViewModel, panelViewModel, repositories) {
-    this.clickOnShowParticipant = this.clickOnShowParticipant.bind(this);
+    this.clickOnShowUser = this.clickOnShowUser.bind(this);
+    this.clickOnShowService = this.clickOnShowService.bind(this);
 
     this.elementId = 'conversation-details';
     this.mainViewModel = mainViewModel;
@@ -197,8 +198,11 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
     this.panelViewModel.switchState(z.viewModel.PanelViewModel.STATE.GUEST_OPTIONS);
   }
 
-  clickOnShowParticipant(userEntity) {
-    this.panelViewModel.showGroupParticipant(userEntity);
+  clickOnShowUser(userEntity) {
+    this.panelViewModel.showGroupParticipantUser(userEntity);
+  }
+  clickOnShowService(serviceEntity) {
+    this.panelViewModel.showGroupParticipantService(serviceEntity);
   }
 
   clickToArchive() {
