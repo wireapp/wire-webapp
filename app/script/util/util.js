@@ -22,7 +22,7 @@
 window.z = window.z || {};
 window.z.util = z.util || {};
 
-z.util.check_indexed_db = function() {
+z.util.checkIndexedDb = function() {
   if (!z.util.Environment.browser.supports.indexedDb) {
     if (z.util.Environment.browser.edge) {
       return Promise.reject(new z.auth.AuthError(z.auth.AuthError.TYPE.PRIVATE_MODE));
@@ -46,19 +46,19 @@ z.util.check_indexed_db = function() {
     }
 
     return new Promise((resolve, reject) => {
-      let current_attempt = 0;
+      let currentAttempt = 0;
       const interval = 10;
-      const max_retry = 50;
+      const maxRetry = 50;
 
       const interval_id = window.setInterval(() => {
-        current_attempt = current_attempt + 1;
+        currentAttempt = currentAttempt + 1;
 
         if (dbOpenRequest.readyState === 'done' && !dbOpenRequest.result) {
           window.clearInterval(interval_id);
           return reject(new z.auth.AuthError(z.auth.AuthError.TYPE.PRIVATE_MODE));
         }
 
-        if (current_attempt >= max_retry) {
+        if (currentAttempt >= maxRetry) {
           window.clearInterval(interval_id);
           resolve();
         }
@@ -69,15 +69,15 @@ z.util.check_indexed_db = function() {
   return Promise.resolve();
 };
 
-z.util.dummy_image = function(width, height) {
+z.util.dummyImage = function(width, height) {
   return `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 ${width} ${height}' width='${width}' height='${height}'></svg>`;
 };
 
-z.util.is_same_location = function(past_location, current_location) {
-  return past_location !== '' && current_location.startsWith(past_location);
+z.util.isSameLocation = function(pastLocation, currentLocation) {
+  return pastLocation !== '' && currentLocation.startsWith(pastLocation);
 };
 
-z.util.load_image = function(blob) {
+z.util.loadImage = function(blob) {
   return new Promise((resolve, reject) => {
     const object_url = window.URL.createObjectURL(blob);
     const img = new Image();
@@ -90,7 +90,7 @@ z.util.load_image = function(blob) {
   });
 };
 
-z.util.load_data_url = function(file) {
+z.util.loadDataUrl = function(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = function() {
@@ -101,7 +101,7 @@ z.util.load_data_url = function(file) {
   });
 };
 
-z.util.load_file_buffer = function(file) {
+z.util.loadFileBuffer = function(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = function() {
@@ -112,7 +112,7 @@ z.util.load_file_buffer = function(file) {
   });
 };
 
-z.util.load_url_buffer = (url, xhrAccessorFunction) => {
+z.util.loadUrlBuffer = (url, xhrAccessorFunction) => {
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     xhr.open('GET', url, true);
@@ -132,19 +132,19 @@ z.util.load_url_buffer = (url, xhrAccessorFunction) => {
   });
 };
 
-z.util.load_url_blob = url => {
-  return z.util.load_url_buffer(url).then(({buffer, mimeType}) => new Blob([new Uint8Array(buffer)], {type: mimeType}));
+z.util.loadUrlBlob = url => {
+  return z.util.loadUrlBuffer(url).then(({buffer, mimeType}) => new Blob([new Uint8Array(buffer)], {type: mimeType}));
 };
 
-z.util.append_url_parameter = function(url, parameter) {
+z.util.appendUrlParameter = function(url, parameter) {
   const separator = z.util.StringUtil.includes(url, '?') ? '&' : '?';
   return `${url}${separator}${parameter}`;
 };
 
-z.util.forward_url_parameter = function(url, parameter_name) {
-  const parameter_value = z.util.get_url_parameter(parameter_name);
-  if (parameter_value != null) {
-    return z.util.append_url_parameter(url, `${parameter_name}=${parameter_value}`);
+z.util.forwardUrlParameter = function(url, parameterName) {
+  const parameterValue = z.util.get_url_parameter(parameterName);
+  if (parameterValue != null) {
+    return z.util.appendUrlParameter(url, `${parameterName}=${parameterValue}`);
   }
   return url;
 };

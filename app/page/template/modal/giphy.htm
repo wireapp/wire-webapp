@@ -18,7 +18,7 @@
            data-bind="foreach: gifs, visible: state() === 'results', css: {'gif-container-grid': gifs().length > 1}">
         <!-- ko if: $parent.gifs().length === 1 -->
           <div class="gif-container-item"
-               data-bind="load_image: $data.animated, style: {backgroundImage: 'url(\'' + $data.static + '\')'}">
+               data-bind="loadImage: $data.animated, style: {backgroundImage: 'url(\'' + $data.static + '\')'}">
           </div>
         <!-- /ko -->
         <!-- ko if: $parent.gifs().length > 1 -->

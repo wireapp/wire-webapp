@@ -48,7 +48,7 @@ z.assets.AssetMetaDataBuilder = (() => {
 
   const _buildMetadataAudio = audioFile => {
     return z.util
-      .load_file_buffer(audioFile)
+      .loadFileBuffer(audioFile)
       .then(buffer => {
         const audioContext = new AudioContext();
         audioContext.close();

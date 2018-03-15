@@ -84,7 +84,7 @@ z.assets.AssetService = class AssetService {
    */
   uploadAsset(file, options, xhrAccessorFunction) {
     return z.util
-      .load_file_buffer(file)
+      .loadFileBuffer(file)
       .then(buffer => this._uploadAsset(buffer, options, xhrAccessorFunction))
       .then(({key, keyBytes, sha256, token}) => {
         const asset = new z.proto.Asset();
@@ -257,7 +257,7 @@ z.assets.AssetService = class AssetService {
    */
   _compressImageWithWorker(worker, image, filter) {
     return z.util
-      .load_file_buffer(image)
+      .loadFileBuffer(image)
       .then(buffer => {
         if (typeof filter === 'function' ? filter() : undefined) {
           return new Uint8Array(buffer);
@@ -266,7 +266,7 @@ z.assets.AssetService = class AssetService {
       })
       .then(compressedBytes => {
         return z.util
-          .load_image(new Blob([compressedBytes], {type: image.type}))
+          .loadImage(new Blob([compressedBytes], {type: image.type}))
           .then(compressedImage => ({compressedBytes, compressedImage}));
       });
   }

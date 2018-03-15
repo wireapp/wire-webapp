@@ -354,7 +354,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
    */
   _check_database(current_hash) {
     return z.util
-      .check_indexed_db()
+      .checkIndexedDb()
       .then(() => {
         if (current_hash === z.auth.AuthView.MODE.BLOCKED_DATABASE) {
           this._set_hash();
@@ -1698,7 +1698,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
    */
   _append_existing_parameters(url) {
     AuthViewModel.CONFIG.FORWARDED_URL_PARAMETERS.forEach(parameter_name => {
-      url = z.util.forward_url_parameter(url, parameter_name);
+      url = z.util.forwardUrlParameter(url, parameter_name);
     });
 
     return url;

@@ -173,7 +173,7 @@ z.team.TeamRepository = class TeamRepository {
       imagePromise
         .then(imageBlob => {
           if (imageBlob) {
-            return z.util.load_data_url(imageBlob);
+            return z.util.loadDataUrl(imageBlob);
           }
         })
         .then(imageDataUrl => {

@@ -4137,13 +4137,13 @@ describe('z.util.naked_url', () => {
   });
 });
 
-describe('z.util.append_url_parameter', () => {
+describe('z.util.appendUrlParameter', () => {
   it('append param with & when url contains param', () => {
-    expect(z.util.append_url_parameter('foo.com?bar=true', 'fum=true')).toBe('foo.com?bar=true&fum=true');
+    expect(z.util.appendUrlParameter('foo.com?bar=true', 'fum=true')).toBe('foo.com?bar=true&fum=true');
   });
 
   it('append param with ? when url contains param', () => {
-    expect(z.util.append_url_parameter('foo.com', 'fum=true')).toBe('foo.com?fum=true');
+    expect(z.util.appendUrlParameter('foo.com', 'fum=true')).toBe('foo.com?fum=true');
   });
 });
 
@@ -4153,35 +4153,35 @@ describe('z.util.get_url_parameter', () => {
   });
 });
 
-describe('z.util.forward_url_parameter', () => {
+describe('z.util.forwardUrlParameter', () => {
   it('forwards existing URL parameters', () => {
     z.util.get_url_parameter = function(parameter_value) {
       if (parameter_value === z.auth.URLParameter.TRACKING) {
         return true;
       }
     };
-    expect(z.util.forward_url_parameter('foo.com', z.auth.URLParameter.TRACKING)).toBe('foo.com?tracking=true');
+    expect(z.util.forwardUrlParameter('foo.com', z.auth.URLParameter.TRACKING)).toBe('foo.com?tracking=true');
 
     z.util.get_url_parameter = function(parameter_value) {
       if (parameter_value === z.auth.URLParameter.TRACKING) {
         return false;
       }
     };
-    expect(z.util.forward_url_parameter('foo.com', z.auth.URLParameter.TRACKING)).toBe('foo.com?tracking=false');
+    expect(z.util.forwardUrlParameter('foo.com', z.auth.URLParameter.TRACKING)).toBe('foo.com?tracking=false');
 
     z.util.get_url_parameter = function(parameter_value) {
       if (parameter_value === z.auth.URLParameter.TRACKING) {
         return 'bar';
       }
     };
-    expect(z.util.forward_url_parameter('foo.com', z.auth.URLParameter.TRACKING)).toBe('foo.com?tracking=bar');
+    expect(z.util.forwardUrlParameter('foo.com', z.auth.URLParameter.TRACKING)).toBe('foo.com?tracking=bar');
 
     z.util.get_url_parameter = function(parameter_value) {
       if (parameter_value === z.auth.URLParameter.TRACKING) {
         return null;
       }
     };
-    expect(z.util.forward_url_parameter('foo.com', z.auth.URLParameter.TRACKING)).toBe('foo.com');
+    expect(z.util.forwardUrlParameter('foo.com', z.auth.URLParameter.TRACKING)).toBe('foo.com');
   });
 });
 
@@ -4454,65 +4454,65 @@ describe('z.util.format_milliseconds_short', () => {
   });
 });
 
-describe('z.util.is_same_location', () => {
+describe('z.util.isSameLocation', () => {
   it('returns false if page was accessed directly', () => {
-    expect(z.util.is_same_location('', 'https://app.wire.com')).toBeFalsy();
+    expect(z.util.isSameLocation('', 'https://app.wire.com')).toBeFalsy();
   });
 
   it('returns false if page was accessed from https://wire.com', () => {
-    expect(z.util.is_same_location('https://wire.com', 'https://app.wire.com')).toBeFalsy();
+    expect(z.util.isSameLocation('https://wire.com', 'https://app.wire.com')).toBeFalsy();
   });
 
   it('returns false if page was accessed from https://wire.com/download', () => {
-    expect(z.util.is_same_location('https://wire.com/download', 'https://app.wire.com')).toBeFalsy();
+    expect(z.util.isSameLocation('https://wire.com/download', 'https://app.wire.com')).toBeFalsy();
   });
 
   it('returns false if page was accessed from https://get.wire.com', () => {
-    expect(z.util.is_same_location('https://get.wire.com', 'https://app.wire.com')).toBeFalsy();
+    expect(z.util.isSameLocation('https://get.wire.com', 'https://app.wire.com')).toBeFalsy();
   });
 
   it('returns false if page was accessed from an external link', () => {
-    expect(z.util.is_same_location('http://www.heise.de', 'https://app.wire.com')).toBeFalsy();
+    expect(z.util.isSameLocation('http://www.heise.de', 'https://app.wire.com')).toBeFalsy();
   });
 
   it('returns false if redirected from auth', () => {
-    expect(z.util.is_same_location('https://app.wire.com/auth', 'https://app.wire.com')).toBeFalsy();
+    expect(z.util.isSameLocation('https://app.wire.com/auth', 'https://app.wire.com')).toBeFalsy();
   });
 
   it('returns false if redirected from auth with parameter', () => {
     expect(
-      z.util.is_same_location('https://app.wire.com/auth/?env=staging', 'https://app.wire.com/?env=staging')
+      z.util.isSameLocation('https://app.wire.com/auth/?env=staging', 'https://app.wire.com/?env=staging')
     ).toBeFalsy();
   });
 
   it('returns false if redirected from auth with history hashtag', () => {
     expect(
-      z.util.is_same_location('https://app.wire.com/auth/#history', 'https://app.wire.com/?env=staging')
+      z.util.isSameLocation('https://app.wire.com/auth/#history', 'https://app.wire.com/?env=staging')
     ).toBeFalsy();
   });
 
   it('returns false if redirected from auth with login hashtag', () => {
     expect(
-      z.util.is_same_location('https://app.wire.com/auth/?env=staging#login', 'https://app.wire.com/?env=staging')
+      z.util.isSameLocation('https://app.wire.com/auth/?env=staging#login', 'https://app.wire.com/?env=staging')
     ).toBeFalsy();
   });
 
   it('returns false if redirected from auth with registration hashtag', () => {
     expect(
-      z.util.is_same_location('https://app.wire.com/auth/?env=staging#register', 'https://app.wire.com/?env=staging')
+      z.util.isSameLocation('https://app.wire.com/auth/?env=staging#register', 'https://app.wire.com/?env=staging')
     ).toBeFalsy();
   });
 
   it('returns true if auth with login hashtag was reloaded', () => {
-    expect(z.util.is_same_location('https://app.wire.com/auth/#register', 'https://app.wire.com/auth/')).toBeFalsy();
+    expect(z.util.isSameLocation('https://app.wire.com/auth/#register', 'https://app.wire.com/auth/')).toBeFalsy();
   });
 
   it('returns true if page was reloaded', () => {
-    expect(z.util.is_same_location('https://app.wire.com', 'https://app.wire.com')).toBeTruthy();
+    expect(z.util.isSameLocation('https://app.wire.com', 'https://app.wire.com')).toBeTruthy();
   });
 
   it('returns true if page was reloaded with parameters', () => {
-    expect(z.util.is_same_location('https://app.wire.com/?hl=de', 'https://app.wire.com/?hl=de')).toBeTruthy();
+    expect(z.util.isSameLocation('https://app.wire.com/?hl=de', 'https://app.wire.com/?hl=de')).toBeTruthy();
   });
 });
 

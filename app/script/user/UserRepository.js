@@ -1045,7 +1045,7 @@ z.user.UserRepository = class UserRepository {
    * @returns {undefined} No return value
    */
   set_default_picture() {
-    return z.util.load_url_blob(z.config.UNSPLASH_URL).then(blob => this.change_picture(blob));
+    return z.util.loadUrlBlob(z.config.UNSPLASH_URL).then(blob => this.change_picture(blob));
   }
 
   map_guest_status(user_ets = this.users()) {

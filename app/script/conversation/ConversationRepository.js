@@ -1258,7 +1258,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       tag = z.l10n.text(z.string.extensionsGiphyRandom);
     }
 
-    return z.util.load_url_blob(url).then(blob => {
+    return z.util.loadUrlBlob(url).then(blob => {
       this.send_text(z.l10n.text(z.string.extensionsGiphyMessage, tag), conversation_et);
       return this.upload_images(conversation_et, [blob]);
     });

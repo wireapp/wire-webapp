@@ -591,7 +591,7 @@ z.conversation.EventMapper = class EventMapper {
     }
 
     if (should_create_dummy_image) {
-      asset_et.dummy_url = z.util.dummy_image(asset_et.width, asset_et.height);
+      asset_et.dummy_url = z.util.dummyImage(asset_et.width, asset_et.height);
     }
 
     return asset_et;

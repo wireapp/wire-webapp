@@ -84,7 +84,7 @@ z.event.WebSocketService = class WebSocketService {
     return new Promise((resolve, reject) => {
       this.connectionUrl = `${this.client.web_socket_url}/await?access_token=${this.client.access_token}`;
       if (this.clientId) {
-        this.connectionUrl = z.util.append_url_parameter(this.connectionUrl, `client=${this.clientId}`);
+        this.connectionUrl = z.util.appendUrlParameter(this.connectionUrl, `client=${this.clientId}`);
       }
 
       const wrongSocketType = typeof this.socket === 'object';

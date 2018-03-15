@@ -259,7 +259,7 @@ ko.bindingHandlers.file_select = {
 /**
  * Wait for image to be loaded before applying as background image.
  */
-ko.bindingHandlers.load_image = {
+ko.bindingHandlers.loadImage = {
   init(element, valueAccessor) {
     const image_src = z.util.strip_url_wrapper(ko.unwrap(valueAccessor()));
     const image = new Image();
