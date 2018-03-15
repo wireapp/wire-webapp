@@ -373,11 +373,11 @@ z.util.encodeSha256Base64 = function(text) {
   return CryptoJS.SHA256(text).toString(CryptoJS.enc.Base64);
 };
 
-z.util.escape_html = function(html) {
+z.util.escapeHtml = function(html) {
   return _.escape(html);
 };
 
-z.util.escape_regex = function(string) {
+z.util.escapeRegex = function(string) {
   return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 };
 
@@ -386,8 +386,8 @@ z.util.alias = {
   animationend: 'transitionend animationend oAnimationEnd MSAnimationEnd mozAnimationEnd webkitAnimationEnd',
 };
 
-z.util.add_blank_targets = function(text_with_anchors) {
-  return `${text_with_anchors}`.replace(/rel="nofollow"/gi, 'target="_blank" rel="nofollow noopener noreferrer"');
+z.util.addBlankTargets = function(textWithAnchors) {
+  return `${textWithAnchors}`.replace(/rel="nofollow"/gi, 'target="_blank" rel="nofollow noopener noreferrer"');
 };
 
 /**
@@ -395,7 +395,7 @@ z.util.add_blank_targets = function(text_with_anchors) {
  * @param {string} url - URL you want to open in a new browser tab
  * @returns {undefined} No return value
  */
-z.util.add_http = function(url) {
+z.util.addHttp = function(url) {
   if (!url.match(/^http[s]?:\/\//i)) {
     url = `http://${url}`;
   }
@@ -410,20 +410,20 @@ z.util.add_http = function(url) {
  * @param {boolean} focus - True, if the new windows should get browser focus
  * @returns {Object} New window handle
  */
-z.util.safe_window_open = function(url, focus = true) {
-  const new_window = window.open(z.util.add_http(url));
+z.util.safeWindowOpen = function(url, focus = true) {
+  const newWindow = window.open(z.util.addHttp(url));
 
-  if (new_window) {
-    new_window.opener = null;
+  if (newWindow) {
+    newWindow.opener = null;
     if (focus) {
-      new_window.focus();
+      newWindow.focus();
     }
   }
 
-  return new_window;
+  return newWindow;
 };
 
-z.util.safe_mailto_open = function(event, email) {
+z.util.safeMailtoOpen = function(event, email) {
   event.preventDefault();
   event.stopPropagation();
 
@@ -431,9 +431,9 @@ z.util.safe_mailto_open = function(event, email) {
     return;
   }
 
-  const new_window = window.open(`mailto:${email}`);
-  if (new_window) {
-    window.setTimeout(() => new_window.close(), 10);
+  const newWindow = window.open(`mailto:${email}`);
+  if (newWindow) {
+    window.setTimeout(() => newWindow.close(), 10);
   }
 };
 

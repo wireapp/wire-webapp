@@ -834,7 +834,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
   }
 
   clicked_on_password() {
-    z.util.safe_window_open(z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.ACCOUNT, z.config.URL_PATH.PASSWORD_RESET));
+    z.util.safeWindowOpen(z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.ACCOUNT, z.config.URL_PATH.PASSWORD_RESET));
   }
 
   clicked_on_resend_code() {
@@ -871,7 +871,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
 
   clicked_on_wire_link() {
     const path = z.l10n.text(z.string.urlWebsiteRoot);
-    z.util.safe_window_open(z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.WEBSITE, path));
+    z.util.safeWindowOpen(z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.WEBSITE, path));
   }
 
   keydown_auth(keyboard_event) {

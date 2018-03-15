@@ -101,25 +101,25 @@ describe('z.util.render_message', () => {
 
   it('renders an email address', () => {
     const expected =
-      'send it over to <a href="mailto:hello@wire.com" onclick="z.util.safe_mailto_open(event, \'hello@wire.com\')">hello@wire.com</a>';
+      'send it over to <a href="mailto:hello@wire.com" onclick="z.util.safeMailtoOpen(event, \'hello@wire.com\')">hello@wire.com</a>';
     expect(z.util.render_message('send it over to hello@wire.com')).toBe(expected);
   });
 
   it('renders an email address with pluses', () => {
     const expected =
-      'send it over to <a href="mailto:hello+world@wire.com" onclick="z.util.safe_mailto_open(event, \'hello+world@wire.com\')">hello+world@wire.com</a>';
+      'send it over to <a href="mailto:hello+world@wire.com" onclick="z.util.safeMailtoOpen(event, \'hello+world@wire.com\')">hello+world@wire.com</a>';
     expect(z.util.render_message('send it over to hello+world@wire.com')).toBe(expected);
   });
 
   it('renders an email long domains', () => {
     const expected =
-      'send it over to <a href="mailto:janedoe@school.university.edu" onclick="z.util.safe_mailto_open(event, \'janedoe@school.university.edu\')">janedoe@school.university.edu</a>';
+      'send it over to <a href="mailto:janedoe@school.university.edu" onclick="z.util.safeMailtoOpen(event, \'janedoe@school.university.edu\')">janedoe@school.university.edu</a>';
     expect(z.util.render_message('send it over to janedoe@school.university.edu')).toBe(expected);
   });
 
   it('renders an email with multiple subdomains', () => {
     const expected =
-      'send it over to <a href="mailto:bla@foo.co.uk" onclick="z.util.safe_mailto_open(event, \'bla@foo.co.uk\')">bla@foo.co.uk</a>';
+      'send it over to <a href="mailto:bla@foo.co.uk" onclick="z.util.safeMailtoOpen(event, \'bla@foo.co.uk\')">bla@foo.co.uk</a>';
     expect(z.util.render_message('send it over to bla@foo.co.uk')).toBe(expected);
   });
 
@@ -4535,7 +4535,7 @@ describe('bucket_values', () => {
   });
 });
 
-describe('z.util.safe_window_open', () => {
+describe('z.util.safeWindowOpen', () => {
   let new_window = undefined;
   afterEach(() => {
     if (new_window) {
@@ -4544,21 +4544,21 @@ describe('z.util.safe_window_open', () => {
   });
 
   it("doesn't contain a reference to the opening tab", () => {
-    new_window = z.util.safe_window_open('https://wire.com/');
+    new_window = z.util.safeWindowOpen('https://wire.com/');
     expect(new_window.opener).toBeNull();
   });
 });
 
-describe('z.util.add_http', () => {
+describe('z.util.addHttp', () => {
   it('adds http if protocol is missing', () => {
-    expect(z.util.add_http('wire.com/')).toBe('http://wire.com/');
+    expect(z.util.addHttp('wire.com/')).toBe('http://wire.com/');
   });
 
   it('does not add http if present', () => {
-    expect(z.util.add_http('http://wire.com/')).toBe('http://wire.com/');
+    expect(z.util.addHttp('http://wire.com/')).toBe('http://wire.com/');
   });
 
   it('does not add https if present', () => {
-    expect(z.util.add_http('https://wire.com/')).toBe('https://wire.com/');
+    expect(z.util.addHttp('https://wire.com/')).toBe('https://wire.com/');
   });
 });
