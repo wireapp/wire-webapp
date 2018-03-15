@@ -102,7 +102,7 @@ z.viewModel.ContentViewModel = class ContentViewModel {
           this.collection.setConversation(this.previousConversation);
           break;
         default:
-          this.inputBar.removed_from_view();
+          this.inputBar.removedFromView();
           this.titleBar.removedFromView();
       }
     });
