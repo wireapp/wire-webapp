@@ -108,9 +108,7 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
     const requestVideo = !!this.availableDevices.video_input().length;
     return this.constraintsHandler
       .get_media_stream_constraints(requestAudio, requestVideo)
-      .then(({media_stream_constraints, mediaType}) => {
-        return this.streamHandler.request_media_stream(mediaType, media_stream_constraints);
-      })
+      .then(({mediaType, streamConstraints}) => this.streamHandler.request_media_stream(mediaType, streamConstraints))
       .then(mediaStreamInfo => {
         if (this.availableDevices.video_input().length) {
           this.streamHandler.local_media_type(z.media.MediaType.VIDEO);
