@@ -3,36 +3,36 @@
   <div class="preferences-content-wrapper">
     <div class="preferences-content" data-bind="antiscroll">
 
-      <!-- ko if: available_devices.audio_input().length -->
+      <!-- ko if: availableDevices.audio_input().length -->
         <section class="preferences-section">
           <header class="preferences-header preferences-av-header" data-bind="l10n_text: z.string.preferencesAVMicrophone"></header>
-          <!-- ko if: permission_denied() -->
+          <!-- ko if: permissionDenied() -->
             <div class="preferences-av-detail">
               <a rel="nofollow noopener noreferrer" target="_blank" data-bind="l10n_text: z.string.preferencesAVPermissionDetail, l10n_href: {support: z.config.SUPPORT.ID.DEVICE_ACCESS_DENIED}"></a>
             </div>
           <!-- /ko -->
-          <div class="preferences-option" data-bind="css: {'preferences-av-select-disabled': permission_denied}">
+          <div class="preferences-option" data-bind="css: {'preferences-av-select-disabled': permissionDenied}">
             <div class="preferences-option-icon preferences-av-select-icon">
               <div class="icon-microphone"></div>
             </div>
             <div class="input-select">
               <select class="preferences-av-select" name="select"
-                      data-bind="attr: {'disabled': available_devices.audio_input().length < 2 || permission_denied},
-                                 css: {'preferences-av-select-disabled': permission_denied},
-                                 options: available_devices.audio_input,
+                      data-bind="attr: {'disabled': availableDevices.audio_input().length < 2 || permissionDenied},
+                                 css: {'preferences-av-select-disabled': permissionDenied},
+                                 options: availableDevices.audio_input,
                                  optionsText: function(item) {return item.label || z.string.preferencesAVMicrophone},
                                  optionsValue: 'deviceId',
-                                 value: current_device_id.audio_input"
+                                 value: currentDevice_id.audio_input"
                       data-uie-name="enter-microphone">
               </select>
-              <label class="icon-down preferences-av-label" data-bind="visible: available_devices.audio_input().length >= 2"></label>
+              <label class="icon-down preferences-av-label" data-bind="visible: availableDevices.audio_input().length >= 2"></label>
             </div>
           </div>
-          <input-level class="preferences-av-meter text-theme" params="level: audio_level, disabled: permission_denied"></input-level>
+          <input-level class="preferences-av-meter text-theme" params="level: audioLevel, disabled: permissionDenied"></input-level>
         </section>
       <!-- /ko -->
 
-      <!-- ko if: available_devices.audio_output().length && z.util.Environment.browser.supports.audio_output_selection -->
+      <!-- ko if: availableDevices.audio_output().length && z.util.Environment.browser.supports.audio_output_selection -->
         <section class="preferences-section">
           <header class="preferences-header preferences-av-header" data-bind="l10n_text: z.string.preferencesAVSpeakers"></header>
           <div class="preferences-option">
@@ -41,49 +41,49 @@
             </div>
             <div class="input-select">
               <select class="preferences-av-select" name="select"
-                      data-bind="enabled: available_devices.audio_output().length >= 2,
-                                 options: available_devices.audio_output,
+                      data-bind="enabled: availableDevices.audio_output().length >= 2,
+                                 options: availableDevices.audio_output,
                                  optionsText: function(item) {return item.label || z.string.preferencesAVSpeakers},
                                  optionsValue: 'deviceId',
-                                 value: current_device_id.audio_output"
+                                 value: currentDeviceId.audio_output"
                       data-uie-name="enter-speaker">
               </select>
-              <label class="icon-down preferences-av-label" data-bind="visible: available_devices.audio_output().length >= 2"></label>
+              <label class="icon-down preferences-av-label" data-bind="visible: availableDevices.audio_output().length >= 2"></label>
             </div>
           </div>
         </section>
       <!-- /ko -->
 
-      <!-- ko if: available_devices.video_input().length -->
+      <!-- ko if: availableDevices.video_input().length -->
         <section class="preferences-section">
           <header class="preferences-header preferences-av-header" data-bind="l10n_text: z.string.preferencesAVCamera"></header>
-          <!-- ko if: permission_denied() -->
+          <!-- ko if: permissionDenied() -->
             <div class="preferences-av-detail">
               <a rel="nofollow noopener noreferrer" target="_blank" data-bind="l10n_text: z.string.preferencesAVPermissionDetail, l10n_href: {support: z.config.SUPPORT.ID.DEVICE_ACCESS_DENIED}"></a>
             </div>
           <!-- /ko -->
-          <div class="preferences-option" data-bind="css: {'preferences-av-select-disabled': permission_denied}">
+          <div class="preferences-option" data-bind="css: {'preferences-av-select-disabled': permissionDenied}">
             <div class="preferences-option-icon preferences-av-select-icon">
               <div class="icon-video"></div>
             </div>
             <div class="input-select">
               <select class="preferences-av-select" name="select"
-                      data-bind="attr: {'disabled': available_devices.audio_input().length < 2 || permission_denied},
-                                 css: {'preferences-av-select-disabled': permission_denied},
-                                 options: available_devices.video_input,
+                      data-bind="attr: {'disabled': availableDevices.audio_input().length < 2 || permissionDenied},
+                                 css: {'preferences-av-select-disabled': permissionDenied},
+                                 options: availableDevices.video_input,
                                  optionsText: function(item) {return item.label || z.string.preferencesAVCamera},
                                  optionsValue: 'deviceId',
-                                 value: current_device_id.video_input"
+                                 value: currentDeviceId.video_input"
                       data-uie-name="enter-camera">
               </select>
-              <label class="icon-down preferences-av-label" data-bind="visible: available_devices.video_input().length >= 2"></label>
+              <label class="icon-down preferences-av-label" data-bind="visible: availableDevices.video_input().length >= 2"></label>
             </div>
           </div>
           <video class="preferences-av-video"
                  autoplay
-                 data-bind="css: {'preferences-av-video-disabled': permission_denied},
-                            muteMediaElement: media_stream(),
-                            sourceStream: media_stream()">
+                 data-bind="css: {'preferences-av-video-disabled': permissionDenied},
+                            muteMediaElement: mediaStream(),
+                            sourceStream: mediaStream()">
           </video>
         </section>
       <!-- /ko -->

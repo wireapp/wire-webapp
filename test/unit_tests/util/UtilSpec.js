@@ -4434,26 +4434,6 @@ describe('z.util.format_seconds', () => {
   });
 });
 
-describe('z.util.format_milliseconds_short', () => {
-  it('should format duration under 1 minute', () => {
-    expect(z.util.format_milliseconds_short(5000)).toEqual([5, 's']);
-    expect(z.util.format_milliseconds_short(15000)).toEqual([15, 's']);
-  });
-
-  it('should format duration over 1 minute', () => {
-    expect(z.util.format_milliseconds_short(60000)).toEqual([1, 'm']);
-    expect(z.util.format_milliseconds_short(900000)).toEqual([15, 'm']);
-  });
-
-  it('should format duration over 1 hour', () => {
-    expect(z.util.format_milliseconds_short(1000 * 60 * 60 * 3)).toEqual([3, 'h']);
-  });
-
-  it('should format duration over 1 day', () => {
-    expect(z.util.format_milliseconds_short(1000 * 60 * 60 * 24 * 3)).toEqual([3, 'd']);
-  });
-});
-
 describe('z.util.is_same_location', () => {
   it('returns false if page was accessed directly', () => {
     expect(z.util.is_same_location('', 'https://app.wire.com')).toBeFalsy();
