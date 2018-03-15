@@ -165,11 +165,13 @@ class Client {
       .then(() => context);
   }
 
-  public register(userAccount: RegisterData): Promise<Context> {
+  public register(userAccount: RegisterData, persist: boolean = true): Promise<Context> {
     return Promise.resolve()
       .then(() => this.context && this.logout())
       .then(() => this.auth.api.postRegister(userAccount))
-      .then((user: User) => this.createContext(user.id))
+      .then((user: User) =>
+        this.createContext(user.id, undefined, persist ? ClientType.PERMANENT : ClientType.TEMPORARY)
+      )
       .then((context: Context) => this.initEngine(context))
       .then(() => this.init());
   }
