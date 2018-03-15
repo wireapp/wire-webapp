@@ -10,7 +10,7 @@ interface ClientInfo {
   classification: ClientClassification;
   cookieLabel: string;
   model: string;
-  location: Location;
+  location?: Location;
 }
 
 export {ClientInfo};

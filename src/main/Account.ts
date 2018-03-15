@@ -345,7 +345,7 @@ class Account extends EventEmitter {
       });
   }
 
-  private initClient(context: Context, loginData: LoginData): Promise<RegisteredClient> {
+  private initClient(context: Context, loginData: LoginData, clientInfo?: ClientInfo): Promise<RegisteredClient> {
     if (!this.service) {
       throw new Error('Services are not set.');
     }
@@ -355,7 +355,7 @@ class Account extends EventEmitter {
     return this.service.crypto.loadClient().catch(error => {
       // There was no client so we need to "create" and "register" a client
       if (error instanceof cryptobox.error.CryptoboxError) {
-        return this.registerClient(loginData);
+        return this.registerClient(loginData, clientInfo);
       }
       throw error;
     });
@@ -374,16 +374,16 @@ class Account extends EventEmitter {
         }
         return this.apiClient.connect();
       })
-      .then(() => this)
+      .then(() => this);
   }
 
-  public login(loginData: LoginData, initClient: boolean = true): Promise<Context> {
+  public login(loginData: LoginData, initClient: boolean = true, clientInfo?: ClientInfo): Promise<Context> {
     return this.init()
       .then(() => LoginSanitizer.removeNonPrintableCharacters(loginData))
       .then(() => this.apiClient.login(loginData))
       .then((context: Context) => {
         if (initClient) {
-          return this.initClient(context, loginData).then(client => {
+          return this.initClient(context, loginData, clientInfo).then(client => {
             if (!this.apiClient.context) {
               throw new Error('API client does not have a context.');
             }
@@ -423,7 +423,6 @@ class Account extends EventEmitter {
       classification: ClientClassification.DESKTOP,
       cookieLabel: 'default',
       model: `${pkg.name} v${pkg.version}`,
-      location: {lat: 52.53269, lon: 13.402315},
     }
   ): Promise<RegisteredClient> {
     if (!this.service) {
