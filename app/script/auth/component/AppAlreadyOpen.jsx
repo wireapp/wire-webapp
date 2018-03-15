@@ -37,7 +37,7 @@ class AppAlreadyOpen extends React.Component {
     return (
       isAppAlreadyOpen && (
         <Modal>
-          <Container style={{maxWidth: '320px'}}>
+          <Container style={{maxWidth: '320px'}} data-uie-name="modal-already-open">
             <H3 style={{fontWeight: '500', marginTop: '10px'}} data-uie-name="status-modal-title">
               {_(appAlreadyOpenStrings.headline)}
             </H3>
