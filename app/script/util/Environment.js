@@ -146,9 +146,9 @@ window.z.util = z.util || {};
     desktop: _check.is_desktop(),
     electron: _check.is_electron(),
     frontend: {
-      is_localhost: () => [APP_ENV.LOCALHOST, APP_ENV.VIRTUAL_HOST].includes(window.location.hostname),
-      is_production: () => [APP_ENV.PRODUCTION, APP_ENV.PROD_NEXT].includes(window.location.hostname),
       isInternal: () => window.location.hostname === APP_ENV.INTERNAL,
+      isLocalhost: () => [APP_ENV.LOCALHOST, APP_ENV.VIRTUAL_HOST].includes(window.location.hostname),
+      isProduction: () => [APP_ENV.PRODUCTION, APP_ENV.PROD_NEXT].includes(window.location.hostname),
     },
     os: {
       linux: !os.is_mac() && !os.is_windows(),
@@ -156,7 +156,7 @@ window.z.util = z.util || {};
       win: os.is_windows(),
     },
     version(show_wrapper_version = true, do_not_format = false) {
-      if (z.util.Environment.frontend.is_localhost()) {
+      if (z.util.Environment.frontend.isLocalhost()) {
         return 'dev';
       }
 
