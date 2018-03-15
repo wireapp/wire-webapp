@@ -19,18 +19,18 @@
 
 import {onEnvironment} from './Environment';
 
-const WEBAPP_ENV = onEnvironment('/app', '', '');
+const WEBAPP_ENV = onEnvironment('/app', '/', '/');
 const WIRE_WEBSITE = onEnvironment(
-  'https://wire-website-staging.zinfra.io',
-  'https://wire-website-staging.zinfra.io',
-  'https://wire.com'
+  'https://wire-website-staging.zinfra.io/',
+  'https://wire-website-staging.zinfra.io/',
+  'https://wire.com/'
 );
 
 export default {
-  LOGIN: `${WEBAPP_ENV}/login`,
+  LOGIN: `${WEBAPP_ENV}login`,
   WEBAPP: WEBAPP_ENV,
-  WIRE_PRIVACY_POLICY: `${WIRE_WEBSITE}/legal/#privacy`,
-  WIRE_TERMS_PERSONAL: `${WIRE_WEBSITE}/legal/terms/#personal`,
-  WIRE_TERMS_TEAMS: `${WIRE_WEBSITE}/legal/terms/#teams`,
+  WIRE_PRIVACY_POLICY: `${WIRE_WEBSITE}legal/#privacy`,
+  WIRE_TERMS_PERSONAL: `${WIRE_WEBSITE}legal/terms/#personal`,
+  WIRE_TERMS_TEAMS: `${WIRE_WEBSITE}legal/terms/#teams`,
   WIRE_WEBSITE,
 };
