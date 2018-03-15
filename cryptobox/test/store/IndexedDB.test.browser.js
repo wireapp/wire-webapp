@@ -81,7 +81,7 @@ describe('cryptobox.store.IndexedDB', () => {
       expect(serialisedSession.version).toEqual(Cryptobox.VERSION);
 
       const loadedSession = await store.read_session(alice, sessionId);
-      expect(loadedSession.session_tag).toEqual(proteusSession.session_tag);
+      expect(loadedSession.session_tag.tag).toEqual(proteusSession.session_tag.tag);
 
       done();
     });

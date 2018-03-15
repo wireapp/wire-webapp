@@ -38,7 +38,6 @@ module.exports = {
   output: {
     filename: '[name].bundle.js',
     library: 'Proteus',
-    libraryTarget: 'var',
     path: `${__dirname}/dist`,
   },
   plugins: [new webpack.BannerPlugin(`${pkg.name} v${pkg.version}`)],

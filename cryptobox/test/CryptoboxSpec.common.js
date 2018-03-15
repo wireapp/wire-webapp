@@ -27,6 +27,12 @@ describe('cryptobox.Cryptobox', () => {
   let sodium = undefined;
   let engine = undefined;
 
+  async function createCryptobox(storeName, amountOfPreKeys = 1) {
+    const memoryEngine = new MemoryEngine();
+    await memoryEngine.init(storeName);
+    return new cryptobox.Cryptobox(memoryEngine, amountOfPreKeys);
+  }
+
   beforeAll(async done => {
     if (typeof window === 'object') {
       sodium = window.sodium;
@@ -56,6 +62,31 @@ describe('cryptobox.Cryptobox', () => {
           expect(error).toEqual(jasmine.any(cryptobox.DecryptionError));
           done();
         });
+    });
+
+    it('throws a Proteus decryption error if you try to decrypt the same message twice', async () => {
+      const alice = await createCryptobox('alice');
+      await alice.create();
+
+      const bob = await createCryptobox('bob');
+      const bobsPreKeys = await bob.create();
+
+      const bobBundle = Proteus.keys.PreKeyBundle.new(bob.identity.public_key, bobsPreKeys[0]);
+
+      const plaintext = 'Hello, Bob!';
+      const ciphertext = await alice.encrypt('session-with-bob', plaintext, bobBundle.serialise());
+
+      const decrypted = await bob.decrypt('session-with-alice', ciphertext);
+      const decryptedText = sodium.to_string(decrypted);
+
+      expect(decryptedText).toBe(plaintext);
+
+      try {
+        await bob.decrypt('session-with-alice', ciphertext);
+      } catch (error) {
+        expect(error).toEqual(jasmine.any(Proteus.errors.DecryptError.DuplicateMessage));
+        expect(error.code).toBe(Proteus.errors.DecryptError.CODE.CASE_209);
+      }
     });
   });
 
