@@ -90,6 +90,7 @@ export function pushAccountRegistrationData(registration) {
 
 export function doRegisterTeam(registration) {
   return function(dispatch, getState, {apiClient}) {
+    const isPermanentClient = true;
     registration.locale = currentLanguage();
     registration.name = registration.name.trim();
     registration.email = registration.email.trim();
@@ -100,8 +101,8 @@ export function doRegisterTeam(registration) {
     dispatch(AuthActionCreator.startRegisterTeam({...registration, password: '******'}));
     return Promise.resolve()
       .then(() => dispatch(doSilentLogout()))
-      .then(() => apiClient.register(registration))
-      .then(() => persistAuthData(true, core, dispatch))
+      .then(() => apiClient.register(registration, isPermanentClient))
+      .then(() => persistAuthData(isPermanentClient, core, dispatch))
       .then(() => dispatch(ClientAction.doCreateClient()))
       .then(() => dispatch(SelfAction.fetchSelf()))
       .then(createdTeam => dispatch(AuthActionCreator.successfulRegisterTeam(createdTeam)))
@@ -114,6 +115,7 @@ export function doRegisterTeam(registration) {
 
 export function doRegisterPersonal(registration) {
   return function(dispatch, getState, {apiClient}) {
+    const isPermanentClient = true;
     registration.locale = currentLanguage();
     registration.name = registration.name.trim();
     registration.email = registration.email.trim();
@@ -128,8 +130,8 @@ export function doRegisterPersonal(registration) {
     );
     return Promise.resolve()
       .then(() => dispatch(doSilentLogout()))
-      .then(() => apiClient.register(registration))
-      .then(() => persistAuthData(true, core, dispatch))
+      .then(() => apiClient.register(registration, isPermanentClient))
+      .then(() => persistAuthData(isPermanentClient, core, dispatch))
       .then(() => dispatch(ClientAction.doCreateClient()))
       .then(() => dispatch(SelfAction.fetchSelf()))
       .then(createdAccount => dispatch(AuthActionCreator.successfulRegisterPersonal(createdAccount)))
@@ -142,6 +144,7 @@ export function doRegisterPersonal(registration) {
 
 export function doRegisterWireless(registration) {
   return function(dispatch, getState, {apiClient, core}) {
+    const isPermanentClient = false;
     registration.locale = currentLanguage();
     registration.name = registration.name.trim();
     dispatch(
@@ -151,8 +154,8 @@ export function doRegisterWireless(registration) {
       })
     );
     return Promise.resolve()
-      .then(() => apiClient.register(registration, false))
-      .then(() => persistAuthData(false, core, dispatch))
+      .then(() => apiClient.register(registration, isPermanentClient))
+      .then(() => persistAuthData(isPermanentClient, core, dispatch))
       .then(() => dispatch(ClientAction.doCreateClient()))
       .then(() => dispatch(SelfAction.fetchSelf()))
       .then(createdAccount => dispatch(AuthActionCreator.successfulRegisterWireless(createdAccount)))
