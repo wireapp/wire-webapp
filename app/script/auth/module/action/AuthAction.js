@@ -102,7 +102,7 @@ export function doRegisterTeam(registration) {
       .then(() => dispatch(doSilentLogout()))
       .then(() => apiClient.register(registration))
       .then(() => persistAuthData(true, core, dispatch))
-      .then(() => ClientAction.doCreateClient())
+      .then(() => dispatch(ClientAction.doCreateClient()))
       .then(() => dispatch(SelfAction.fetchSelf()))
       .then(createdTeam => dispatch(AuthActionCreator.successfulRegisterTeam(createdTeam)))
       .catch(error => {
@@ -130,7 +130,7 @@ export function doRegisterPersonal(registration) {
       .then(() => dispatch(doSilentLogout()))
       .then(() => apiClient.register(registration))
       .then(() => persistAuthData(true, core, dispatch))
-      .then(() => ClientAction.doCreateClient())
+      .then(() => dispatch(ClientAction.doCreateClient()))
       .then(() => dispatch(SelfAction.fetchSelf()))
       .then(createdAccount => dispatch(AuthActionCreator.successfulRegisterPersonal(createdAccount)))
       .catch(error => {
@@ -153,7 +153,7 @@ export function doRegisterWireless(registration) {
     return Promise.resolve()
       .then(() => apiClient.register(registration, false))
       .then(() => persistAuthData(false, core, dispatch))
-      .then(() => ClientAction.doCreateClient())
+      .then(() => dispatch(ClientAction.doCreateClient()))
       .then(() => dispatch(SelfAction.fetchSelf()))
       .then(createdAccount => dispatch(AuthActionCreator.successfulRegisterWireless(createdAccount)))
       .catch(error => {
