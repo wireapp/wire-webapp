@@ -70,6 +70,14 @@ z.telemetry.calling.CallLogger = class CallLogger extends z.util.Logger {
           decodedSdpMessage.media[index].candidates[indexCandidate].ip = this.obfuscate(
             `${conversationId}${this.removeBytesFromIp(decodedSdpMessage.media[index].candidates[indexCandidate].ip)}`
           );
+
+          if (typeof decodedSdpMessage.media[index].candidates[indexCandidate].raddr !== 'undefined') {
+            decodedSdpMessage.media[index].candidates[indexCandidate].raddr = this.obfuscate(
+              `${conversationId}${this.removeBytesFromIp(
+                decodedSdpMessage.media[index].candidates[indexCandidate].raddr
+              )}`
+            );
+          }
         }
       }
     }
