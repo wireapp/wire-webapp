@@ -18,6 +18,7 @@
  */
 
 const webpack = require('webpack');
+const path = require('path');
 const prodConfig = require('./webpack.config.prod');
 const commonConfig = require('./webpack.config.common');
 

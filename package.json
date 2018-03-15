@@ -154,7 +154,7 @@
     "start:dev": "webpack-dev-server --config webpack.config.dev.js --open",
     "test": "yarn test:assets && yarn test:scripts && grunt check && grunt test && yarn test:auth",
     "test:assets": "yarn prettier --list-different",
-    "test:auth": "karma start karma.conf.react.js",
+    "test:auth": "yarn bundle:test && karma start karma.conf.react.js",
     "test:scripts": "eslint -c .eslintrc.json --ignore-path .gitignore --ignore-path .eslintignore app/script/ test/ bin/ grunt/ *.{js,jsx}",
     "translate": "yarn translate:buildpot && yarn translate:download && yarn translate:postprocess && yarn translate:extractpo && yarn fix:config",
     "translate:buildpot": "rip json2pot \"temp/i18n/**/*.json\" -o \"temp/i18n/webapp.pot\"",
