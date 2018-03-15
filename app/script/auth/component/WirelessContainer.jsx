@@ -48,6 +48,7 @@ export const WirelessContainer = ({
       >
         <div style={{margin: '16px 16px', textAlign: 'center', width: '100%'}}>
           <Link
+            onClick={onCookiePolicyBannerClose}
             href={EXTERNAL_ROUTE.WIRE_PRIVACY_POLICY}
             style={{fontSize: '16px'}}
             target="_blank"
