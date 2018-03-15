@@ -197,7 +197,7 @@ z.main.App = class App {
    */
   _setup_utils() {
     return {
-      debug: z.util.Environment.frontend.is_production()
+      debug: z.util.Environment.frontend.isProduction()
         ? undefined
         : new z.util.DebugUtil(this.repository.calling, this.repository.conversation, this.repository.user),
     };
@@ -239,7 +239,7 @@ z.main.App = class App {
     z.util
       .check_indexed_db()
       .then(() => this._checkSingleInstanceOnInit())
-      .then(() => this._load_access_token())
+      .then(() => this._loadAccessToken())
       .then(() => {
         this.view.loading.updateProgress(2.5);
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
@@ -386,9 +386,9 @@ z.main.App = class App {
     const is_auth_error = error instanceof z.auth.AuthError;
     if (is_auth_error) {
       if (type === z.auth.AuthError.TYPE.MULTIPLE_TABS) {
-        return this._redirect_to_login(z.auth.SIGN_OUT_REASON.MULTIPLE_TABS);
+        return this._redirectToLogin(z.auth.SIGN_OUT_REASON.MULTIPLE_TABS);
       }
-      return this._redirect_to_login(z.auth.SIGN_OUT_REASON.INDEXED_DB);
+      return this._redirectToLogin(z.auth.SIGN_OUT_REASON.INDEXED_DB);
     }
 
     this.logger.debug(
@@ -403,7 +403,7 @@ z.main.App = class App {
       if (is_session_expired.includes(type)) {
         this.logger.error(`Session expired on page reload: ${message}`, error);
         Raygun.send(new Error('Session expired on page reload', error));
-        return this._redirect_to_login(z.auth.SIGN_OUT_REASON.SESSION_EXPIRED);
+        return this._redirectToLogin(z.auth.SIGN_OUT_REASON.SESSION_EXPIRED);
       }
 
       const is_access_token_error = error instanceof z.auth.AccessTokenError;
@@ -424,7 +424,7 @@ z.main.App = class App {
         case z.auth.AccessTokenError.TYPE.RETRIES_EXCEEDED:
         case z.auth.AccessTokenError.TYPE.REQUEST_FORBIDDEN: {
           this.logger.warn(`Redirecting to login: ${error.message}`, error);
-          return this._redirect_to_login(z.auth.SIGN_OUT_REASON.NOT_SIGNED_IN);
+          return this._redirectToLogin(z.auth.SIGN_OUT_REASON.NOT_SIGNED_IN);
         }
 
         default: {
@@ -530,12 +530,13 @@ z.main.App = class App {
    * Load the access token from cache or get one from the backend.
    * @returns {Promise} Resolves with the access token
    */
-  _load_access_token() {
-    const is_localhost = z.util.Environment.frontend.is_localhost();
-    const is_redirect_from_auth = document.referrer.toLowerCase().includes('/auth');
-    const get_cached_token = is_localhost || is_redirect_from_auth;
+  _loadAccessToken() {
+    const isLocalhost = z.util.Environment.frontend.isLocalhost();
+    const referrer = document.referrer.toLowerCase();
+    const isLoginRedirect = referrer.includes('/auth') || referrer.includes('/login');
+    const getCachedToken = isLocalhost || isLoginRedirect;
 
-    return get_cached_token ? this.auth.repository.getCachedAccessToken() : this.auth.repository.getAccessToken();
+    return getCachedToken ? this.auth.repository.getCachedAccessToken() : this.auth.repository.getAccessToken();
   }
 
   //##############################################################################
@@ -559,7 +560,7 @@ z.main.App = class App {
 
     const shouldBlockTab = !singleInstanceCookie || singleInstanceCookie.appInstanceId !== this.instanceId;
     if (shouldBlockTab) {
-      return this._redirect_to_login(z.auth.SIGN_OUT_REASON.MULTIPLE_TABS);
+      return this._redirectToLogin(z.auth.SIGN_OUT_REASON.MULTIPLE_TABS);
     }
   }
 
@@ -694,11 +695,11 @@ z.main.App = class App {
           .catch(error => this.logger.error('Failed to delete database before logout', error))
           .then(() => {
             amplify.publish(z.event.WebApp.LIFECYCLE.SIGNED_OUT, clear_data);
-            this._redirect_to_login(sign_out_reason);
+            this._redirectToLogin(sign_out_reason);
           });
       } else {
         amplify.publish(z.event.WebApp.LIFECYCLE.SIGNED_OUT, clear_data);
-        this._redirect_to_login(sign_out_reason);
+        this._redirectToLogin(sign_out_reason);
       }
     };
 
@@ -709,7 +710,7 @@ z.main.App = class App {
         .then(() => _logout())
         .catch(() => {
           amplify.publish(z.event.WebApp.LIFECYCLE.SIGNED_OUT, clear_data);
-          this._redirect_to_login(sign_out_reason);
+          this._redirectToLogin(sign_out_reason);
         });
     };
 
@@ -754,20 +755,20 @@ z.main.App = class App {
 
   /**
    * Redirect to the login page after internet connectivity has been verified.
-   * @param {z.auth.SIGN_OUT_REASON} sign_out_reason - Redirect triggered by session expiration
+   * @param {z.auth.SIGN_OUT_REASON} signOutReason - Redirect triggered by session expiration
    * @returns {undefined} No return value
    */
-  _redirect_to_login(sign_out_reason) {
-    this.logger.info(`Redirecting to login after connectivity verification. Reason: ${sign_out_reason}`);
+  _redirectToLogin(signOutReason) {
+    this.logger.info(`Redirecting to login after connectivity verification. Reason: ${signOutReason}`);
     this.auth.client
       .execute_on_connectivity(z.service.BackendClient.CONNECTIVITY_CHECK_TRIGGER.LOGIN_REDIRECT)
       .then(() => {
         const expectedSignOutReasons = [z.auth.SIGN_OUT_REASON.ACCOUNT_DELETED, z.auth.SIGN_OUT_REASON.NOT_SIGNED_IN];
-        const notSignedIn = expectedSignOutReasons.includes(sign_out_reason);
-        let url = `${notSignedIn ? '/auth/' : '/login/'}${location.search}`;
+        const notSignedIn = expectedSignOutReasons.includes(signOutReason);
+        let url = `/auth/${location.search}${notSignedIn ? '' : '#login'}`;
 
-        if (App.CONFIG.IMMEDIATE_SIGN_OUT_REASONS.includes(sign_out_reason)) {
-          url = z.util.append_url_parameter(url, `${z.auth.URLParameter.REASON}=${sign_out_reason}`);
+        if (App.CONFIG.IMMEDIATE_SIGN_OUT_REASONS.includes(signOutReason)) {
+          url = z.util.append_url_parameter(url, `${z.auth.URLParameter.REASON}=${signOutReason}`);
         }
 
         window.location.replace(url);
@@ -801,7 +802,7 @@ z.main.App = class App {
    * @returns {undefined} No return value
    */
   init_debugging() {
-    if (z.util.Environment.frontend.is_localhost()) {
+    if (z.util.Environment.frontend.isLocalhost()) {
       this._attach_live_reload();
     }
   }

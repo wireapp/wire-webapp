@@ -24,10 +24,10 @@ window.z.tracking = z.tracking || {};
 
 z.tracking.EventTrackingRepository = class EventTrackingRepository {
   static get CONFIG() {
-    const MIXPANEL_TOKEN = z.util.Environment.frontend.is_production()
+    const MIXPANEL_TOKEN = z.util.Environment.frontend.isProduction()
       ? 'c7dcb15893f14932b1c31b5fb33ff669'
       : '537da3b3bc07df1e420d07e2921a6f6f';
-    const RAYGUN_API_KEY = z.util.Environment.frontend.is_production()
+    const RAYGUN_API_KEY = z.util.Environment.frontend.isProduction()
       ? 'lAkLCPLx3ysnsXktajeHmw=='
       : '5hvAMmz8wTXaHBYqu2TFUQ==';
 
@@ -249,7 +249,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
         EventTrackingRepository.CONFIG.USER_ANALYTICS.API_KEY,
         {
           autotrack: false,
-          debug: !z.util.Environment.frontend.is_production(),
+          debug: !z.util.Environment.frontend.isProduction(),
           loaded: mixpanel => {
             mixpanel.register({
               $city: null,
@@ -357,7 +357,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
       ignoreAjaxError: true,
     };
 
-    options.debugMode = !z.util.Environment.frontend.is_production();
+    options.debugMode = !z.util.Environment.frontend.isProduction();
 
     Raygun.init(EventTrackingRepository.CONFIG.ERROR_REPORTING.API_KEY, options).attach();
     Raygun.disableAutoBreadcrumbs();
@@ -367,7 +367,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
     @note We cannot use our own version string as it has to be in a certain format
     @see https://github.com/MindscapeHQ/raygun4js#version-filtering
     */
-    if (!z.util.Environment.frontend.is_localhost()) {
+    if (!z.util.Environment.frontend.isLocalhost()) {
       Raygun.setVersion(z.util.Environment.version(false));
     }
     if (z.util.Environment.desktop) {
