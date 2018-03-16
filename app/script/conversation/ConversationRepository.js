@@ -1497,50 +1497,50 @@ z.conversation.ConversationRepository = class ConversationRepository {
   // Send encrypted events
   //##############################################################################
 
-  send_asset_remotedata(conversation_et, file, message_id) {
-    let generic_message;
+  send_asset_remotedata(conversationEntity, file, messageId) {
+    let genericMessage;
 
-    return this.get_message_in_conversation_by_id(conversation_et, message_id)
-      .then(message_et => {
-        const asset_et = message_et.get_first_asset();
+    return this.get_message_in_conversation_by_id(conversationEntity, messageId)
+      .then(messageEntity => {
+        const assetEntity = messageEntity.get_first_asset();
         const options = {
-          retention: this.asset_service.getAssetRetention(this.selfUser(), conversation_et),
+          retention: this.asset_service.getAssetRetention(this.selfUser(), conversationEntity),
         };
 
-        asset_et.uploaded_on_this_client(true);
+        assetEntity.uploaded_on_this_client(true);
         return this.asset_service.uploadAsset(file, options, xhr => {
-          xhr.upload.onprogress = event => asset_et.upload_progress(Math.round(event.loaded / event.total * 100));
-          asset_et.upload_cancel = () => xhr.abort();
+          xhr.upload.onprogress = event => assetEntity.upload_progress(Math.round(event.loaded / event.total * 100));
+          assetEntity.upload_cancel = () => xhr.abort();
         });
       })
       .then(asset => {
-        generic_message = new z.proto.GenericMessage(message_id);
-        generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, asset);
+        genericMessage = new z.proto.GenericMessage(messageId);
+        genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, asset);
 
-        if (conversation_et.ephemeral_timer()) {
-          generic_message = this._wrap_in_ephemeral_message(generic_message, conversation_et.ephemeral_timer());
+        if (conversationEntity.ephemeral_timer()) {
+          genericMessage = this._wrap_in_ephemeral_message(genericMessage, conversationEntity.ephemeral_timer());
         }
 
-        return this.send_generic_message_to_conversation(conversation_et.id, generic_message);
+        return this.send_generic_message_to_conversation(conversationEntity.id, genericMessage);
       })
       .then(payload => {
-        const {uploaded: asset_data} = conversation_et.ephemeral_timer()
-          ? generic_message.ephemeral.asset
-          : generic_message.asset;
+        const {uploaded: assetData} = conversationEntity.ephemeral_timer()
+          ? genericMessage.ephemeral.asset
+          : genericMessage.asset;
 
         const data = {
-          key: asset_data.asset_id,
-          otr_key: asset_data.otr_key,
-          sha256: asset_data.sha256,
-          token: asset_data.asset_token,
+          key: assetData.asset_id,
+          otr_key: assetData.otr_key,
+          sha256: assetData.sha256,
+          token: assetData.asset_token,
         };
 
-        const asset_add_event = z.conversation.EventBuilder.buildAssetAdd(conversation_et, data, this.timeOffset);
+        const assetAddEvent = z.conversation.EventBuilder.buildAssetAdd(conversationEntity, data, this.timeOffset);
 
-        asset_add_event.id = message_id;
-        asset_add_event.time = payload.time;
+        assetAddEvent.id = messageId;
+        assetAddEvent.time = payload.time;
 
-        return this._on_asset_upload_complete(conversation_et, asset_add_event);
+        return this._on_asset_upload_complete(conversationEntity, assetAddEvent);
       });
   }
 
