@@ -33,10 +33,16 @@ class ConversationJoinInvalid extends React.PureComponent {
       <WirelessUnsupportedBrowser>
         <WirelessContainer>
           <ContainerXS style={{margin: 'auto 0'}}>
-            <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}} color={COLOR.GRAY}>
+            <H2
+              style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}}
+              color={COLOR.GRAY}
+              data-uie-name="status-invalid-headline"
+            >
               <FormattedHTMLMessage {...conversationJoinStrings.invalidHeadline} />
             </H2>
-            <H3 style={{marginTop: '10px'}}>{_(conversationJoinStrings.invalidSubhead)}</H3>
+            <H3 style={{marginTop: '10px'}} data-uie-name="status-invalid-text">
+              {_(conversationJoinStrings.invalidSubhead)}
+            </H3>
           </ContainerXS>
         </WirelessContainer>
       </WirelessUnsupportedBrowser>

@@ -239,10 +239,16 @@ class ConversationJoin extends Component {
     const {intl: {formatMessage: _}} = this.props;
     return (
       <ContainerXS style={{margin: 'auto 0'}}>
-        <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}} color={COLOR.GRAY}>
+        <H2
+          style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}}
+          color={COLOR.GRAY}
+          data-uie-name="status-full-headline"
+        >
           <FormattedHTMLMessage {...conversationJoinStrings.fullConversationHeadline} />
         </H2>
-        <H3 style={{marginTop: '10px'}}>{_(conversationJoinStrings.fullConversationSubhead)}</H3>
+        <H3 style={{marginTop: '10px'}} data-uie-name="status-full-text">
+          {_(conversationJoinStrings.fullConversationSubhead)}
+        </H3>
       </ContainerXS>
     );
   };
