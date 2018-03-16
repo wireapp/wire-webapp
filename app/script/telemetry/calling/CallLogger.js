@@ -35,9 +35,9 @@ z.telemetry.calling.CallLogger = class CallLogger extends z.util.Logger {
       const originalSeedLength = seed.length;
       const keys = [21, 15, 7];
       for (let i = 0; i < originalSeedLength; ++i) {
-        seed = `${seed}${String.fromCharCode(keys[0] ^ seed.charCodeAt(i))}${String.fromCharCode(
-          keys[1] ^ seed.charCodeAt(i)
-        )}${String.fromCharCode(keys[2] ^ seed.charCodeAt(i))}`;
+        for (const key of keys) {
+          seed += String.fromCharCode(key ^ seed.charCodeAt(i));
+        }
       }
 
       // Generate a fake IP from that seed
