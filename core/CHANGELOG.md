@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="2.0.80"></a>
+## [2.0.80](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.0.79...@wireapp/core@2.0.80) (2018-03-16)
+
+
+### Bug Fixes
+
+* **core:** Validate local client with backend ([#376](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/376)) ([fbed7c0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/fbed7c0))
+
+
+
+
 <a name="2.0.79"></a>
 ## [2.0.79](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.0.78...@wireapp/core@2.0.79) (2018-03-16)
 
