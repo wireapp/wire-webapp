@@ -894,7 +894,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
   }
 
   clicked_on_navigate_back() {
-    const locationPath = this._append_existing_parameters('/auth/');
+    const locationPath = this._append_existing_parameters('/auth/#login');
     window.location.replace(locationPath);
   }
 
