@@ -116,13 +116,14 @@ class ClientItem extends React.Component {
                 : {cursor: 'pointer', margin: '0 0 0 0', padding: '5px 16px 0 16px'}
             }
             data-uie-name="go-remove-device"
+            data-uie-value={this.formatName(client.model, client.class)}
           >
             <div style={{display: 'flex', flexDirection: 'row'}}>
               <div style={{flexBasis: '32px', margin: 'auto'}}>
                 <DeviceIcon />
               </div>
               <div style={{flexGrow: 1}}>
-                <Text bold block>
+                <Text bold block data-uie-name="device-header-model">
                   {this.formatName(client.model, client.class)}
                 </Text>
                 <Small block data-uie-name="device-id">{`ID: ${this.formatId(client.id)}`}</Small>
