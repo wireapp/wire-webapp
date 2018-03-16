@@ -25,8 +25,8 @@ window.z.viewModel.panel = z.viewModel.panel || {};
 
 z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewModel {
   constructor(mainViewModel, panelViewModel, repositories) {
-    this.clickOnShowUser = this.clickOnShowUser.bind(this);
     this.clickOnShowService = this.clickOnShowService.bind(this);
+    this.clickOnShowUser = this.clickOnShowUser.bind(this);
 
     this.elementId = 'conversation-details';
     this.mainViewModel = mainViewModel;
