@@ -26,6 +26,7 @@ z.viewModel.PanelViewModel = class PanelViewModel {
   static get STATE() {
     return {
       ADD_PARTICIPANTS: 'PanelViewModel.STATE.ADD_PARTICIPANTS',
+      ADD_SERVICE: 'PanelViewModel.STATE.ADD_SERVICE',
       CONVERSATION_DETAILS: 'PanelViewModel.STATE.CONVERSATION_DETAILS',
       GROUP_PARTICIPANT_SERVICE: 'PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE',
       GROUP_PARTICIPANT_USER: 'PanelViewModel.STATE.GROUP_PARTICIPANT_USER',
@@ -68,8 +69,10 @@ z.viewModel.PanelViewModel = class PanelViewModel {
     this.groupParticipantUserVisible = ko.pureComputed(() =>
       this._isStateVisible(PanelViewModel.STATE.GROUP_PARTICIPANT_USER)
     );
-    this.groupParticipantServiceVisible = ko.pureComputed(() =>
-      this._isStateVisible(PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE)
+    this.groupParticipantServiceVisible = ko.pureComputed(
+      () =>
+        this._isStateVisible(PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE) ||
+        this._isStateVisible(PanelViewModel.STATE.ADD_SERVICE)
     );
     this.guestOptionsVisible = ko.pureComputed(() => this._isStateVisible(PanelViewModel.STATE.GUEST_OPTIONS));
     this.participantDevicesVisible = ko.pureComputed(() => {
@@ -95,7 +98,7 @@ z.viewModel.PanelViewModel = class PanelViewModel {
     amplify.subscribe(z.event.WebApp.PEOPLE.SHOW, this.showParticipant);
 
     // Nested view models
-    this.addParticipants = new z.viewModel.panel.AppParticipantsViewModel(mainViewModel, this, repositories);
+    this.addParticipants = new z.viewModel.panel.AddParticipantsViewModel(mainViewModel, this, repositories);
     this.conversationDetails = new z.viewModel.panel.ConversationDetailsViewModel(mainViewModel, this, repositories);
     this.groupParticipantUser = new z.viewModel.panel.GroupParticipantUserViewModel(mainViewModel, this, repositories);
     this.groupParticipantService = new z.viewModel.panel.GroupParticipantServiceViewModel(
@@ -132,6 +135,11 @@ z.viewModel.PanelViewModel = class PanelViewModel {
     }
   }
 
+  showAddService(serviceEntity) {
+    this.groupParticipantService.showGroupParticipant(serviceEntity);
+    this.switchState(PanelViewModel.STATE.ADD_SERVICE);
+  }
+
   showGroupParticipantUser(userEntity) {
     this.groupParticipantUser.showGroupParticipant(userEntity);
     this.switchState(PanelViewModel.STATE.GROUP_PARTICIPANT_USER);
@@ -142,12 +150,13 @@ z.viewModel.PanelViewModel = class PanelViewModel {
     this.switchState(PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE);
   }
 
-  showParticipant(userEntity) {
+  showParticipant(userEntity, fromLeft = false) {
     const isSingleModeConversation = this.conversationEntity().is_one2one() || this.conversationEntity().is_request();
+    const user = ko.unwrap(userEntity);
 
     if (this.isVisible()) {
       if (isSingleModeConversation) {
-        if (userEntity.is_me) {
+        if (user.is_me) {
           const isStateGroupParticipant = this.state() === PanelViewModel.STATE.GROUP_PARTICIPANT_USER;
           if (isStateGroupParticipant) {
             return this.closePanel();
@@ -161,9 +170,9 @@ z.viewModel.PanelViewModel = class PanelViewModel {
       }
 
       const selectedGroupParticipant =
-        this.groupParticipantUser.selectedParticipant() || this.groupParticipantService.selectedGroupParticipant();
+        this.groupParticipantUser.selectedParticipant() || this.groupParticipantService.selectedParticipant();
       if (selectedGroupParticipant) {
-        const isVisibleGroupParticipant = userEntity.id === selectedGroupParticipant.id;
+        const isVisibleGroupParticipant = user.id === selectedGroupParticipant.id;
         if (isVisibleGroupParticipant) {
           return this.closePanel();
         }
@@ -174,12 +183,12 @@ z.viewModel.PanelViewModel = class PanelViewModel {
       return this.switchState(PanelViewModel.STATE.CONVERSATION_DETAILS, true);
     }
 
-    if (userEntity.is_bot) {
+    if (user.isBot) {
       this.groupParticipantService.showGroupParticipant(userEntity);
       this.switchState(PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE, false);
     } else {
       this.groupParticipantUser.showGroupParticipant(userEntity);
-      this.switchState(PanelViewModel.STATE.GROUP_PARTICIPANT_USER, false);
+      this.switchState(PanelViewModel.STATE.GROUP_PARTICIPANT_USER, fromLeft);
     }
   }
 
@@ -206,7 +215,7 @@ z.viewModel.PanelViewModel = class PanelViewModel {
     }
 
     if (skipTransition) {
-      this._hidePanel(this.state());
+      this._hidePanel(this.state(), newState);
       this._showPanel(newState);
       return;
     }
@@ -221,7 +230,7 @@ z.viewModel.PanelViewModel = class PanelViewModel {
 
     window.setTimeout(() => {
       newPanel.removeClass('panel__page--move-in--left panel__page--move-in--right');
-      this._hidePanel(this.exitingState());
+      this._hidePanel(this.exitingState(), newState);
     }, z.motion.MotionDuration.MEDIUM);
   }
 
@@ -256,6 +265,7 @@ z.viewModel.PanelViewModel = class PanelViewModel {
       case PanelViewModel.STATE.GROUP_PARTICIPANT_USER:
         return 'group-participant-user';
       case PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE:
+      case PanelViewModel.STATE.ADD_SERVICE:
         return 'group-participant-service';
       case PanelViewModel.STATE.GUEST_OPTIONS:
         return 'guest-options';
@@ -266,10 +276,12 @@ z.viewModel.PanelViewModel = class PanelViewModel {
     }
   }
 
-  _hidePanel(state) {
+  _hidePanel(state, newState) {
     switch (state) {
       case PanelViewModel.STATE.ADD_PARTICIPANTS:
-        this.addParticipants.resetView();
+        if (newState !== PanelViewModel.STATE.ADD_SERVICE) {
+          this.addParticipants.resetView();
+        }
         break;
       case PanelViewModel.STATE.GROUP_PARTICIPANT_USER:
         this.groupParticipantUser.resetView();

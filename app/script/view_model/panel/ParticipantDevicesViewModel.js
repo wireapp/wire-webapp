@@ -124,7 +124,7 @@ z.viewModel.panel.ParticipantDevicesViewModel = class ParticipantDevicesViewMode
     });
     this.shouldUpdateScrollbar = ko
       .computed(() => this.clientEntities() && this.showDeviceDetails() && this.isVisible())
-      .extend({notify: 'always', rateLimit: 500});
+      .extend({notify: 'always', rateLimit: 0});
   }
 
   clickOnBack() {
@@ -136,9 +136,9 @@ z.viewModel.panel.ParticipantDevicesViewModel = class ParticipantDevicesViewMode
       return this.selectedClient(undefined);
     }
 
-    const stateWasGroupParticipant = this.previousState() === z.viewModel.PanelViewModel.STATE.GROUP_PARTICIPANT;
+    const stateWasGroupParticipant = this.previousState() === z.viewModel.PanelViewModel.STATE.GROUP_PARTICIPANT_USER;
     if (stateWasGroupParticipant) {
-      return this.panelViewModel.showParticipant(this.userEntity());
+      return this.panelViewModel.showParticipant(this.userEntity(), true);
     }
 
     this.panelViewModel.switchState(this.previousState(), true);

@@ -42,6 +42,10 @@ z.viewModel.panel.GroupParticipantServiceViewModel = class GroupParticipantServi
       () => this.panelViewModel.groupParticipantServiceVisible() && this.selectedParticipant()
     );
 
+    this.isAddMode = ko.pureComputed(() =>
+      this.panelViewModel._isStateVisible(z.viewModel.PanelViewModel.STATE.ADD_SERVICE)
+    );
+
     this.selectedIsInConversation = ko.pureComputed(() => {
       if (this.isVisible()) {
         const participatingUserIds = this.conversationEntity().participating_user_ids();
@@ -58,15 +62,25 @@ z.viewModel.panel.GroupParticipantServiceViewModel = class GroupParticipantServi
     this.showGroupParticipant = this.showGroupParticipant.bind(this);
     this.shouldUpdateScrollbar = ko
       .computed(() => this.selectedParticipant() && this.isVisible())
-      .extend({notify: 'always', rateLimit: 500});
+      .extend({notify: 'always', rateLimit: 0});
   }
 
   clickOnBack() {
-    this.panelViewModel.switchState(z.viewModel.PanelViewModel.STATE.CONVERSATION_DETAILS, true);
+    this.panelViewModel.switchState(
+      this.isAddMode()
+        ? z.viewModel.PanelViewModel.STATE.ADD_PARTICIPANTS
+        : z.viewModel.PanelViewModel.STATE.CONVERSATION_DETAILS,
+      true
+    );
   }
 
   clickOnClose() {
     this.panelViewModel.closePanel().then(() => this.resetView());
+  }
+
+  clickOnAdd() {
+    this.panelViewModel.addParticipants.clickToAddParticipants();
+    this.clickOnBack();
   }
 
   clickToRemove() {
@@ -80,13 +94,21 @@ z.viewModel.panel.GroupParticipantServiceViewModel = class GroupParticipantServi
     this.selectedService(undefined);
   }
 
-  showGroupParticipant(userEntity) {
-    this.selectedParticipant(ko.unwrap(userEntity));
+  showGroupParticipant(serviceEntity) {
+    this.selectedParticipant(ko.unwrap(serviceEntity));
     this._showService(this.selectedParticipant());
   }
 
-  _showService(userEntity) {
-    const {providerId, serviceId} = userEntity;
+  _showService(entity) {
+    if (entity instanceof z.integration.ServiceEntity) {
+      this.selectedService(entity);
+      this.integrationRepository
+        .getProviderById(entity.providerId)
+        .then(providerEntity => this.selectedService().providerName(providerEntity.name));
+      return;
+    }
+
+    const {providerId, serviceId} = entity;
 
     this.integrationRepository
       .getServiceById(providerId, serviceId)

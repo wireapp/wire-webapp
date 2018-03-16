@@ -24,8 +24,13 @@
         <!-- /ko -->
       </div>
     </div>
-    <!-- -->
+    <!-- ko if: isAddMode() -->
+      <div class="panel__footer">
+        <button class="button button-full" data-bind="click: clickOnAdd" data-uie-name="do-add-service">
+          <span data-bind="l10n_text: z.string.addParticipantsConfirmLabel"></span>
+        </button>
+      </div>
+    <!-- /ko -->
 
-    <!-- -->
   <!-- /ko -->
 </div>
