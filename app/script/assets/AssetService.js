@@ -42,8 +42,8 @@ z.assets.AssetService = class AssetService {
     return Promise.all([this._compressProfileImage(image), this._compressImage(image)])
       .then(([{compressedBytes: smallImageBytes}, {compressedBytes: mediumImageBytes}]) => {
         return Promise.all([
-          this.postAsset(smallImageBytes, {public: true}),
-          this.postAsset(mediumImageBytes, {public: true}),
+          this.postAsset(smallImageBytes, {public: true, retention: z.assets.AssetRetentionPolicy.ETERNAL}),
+          this.postAsset(mediumImageBytes, {public: true, retention: z.assets.AssetRetentionPolicy.ETERNAL}),
         ]);
       })
       .then(([smallCredentials, mediumCredentials]) => [smallCredentials.key, mediumCredentials.key]);

@@ -1739,8 +1739,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when the image was sent
    */
   send_image_asset(conversation_et, image) {
+    const options = {
+      retention: this.asset_service.getAssetRetention(this.selfUser(), conversation_et),
+    };
+
     return this.asset_service
-      .uploadImageAsset(image)
+      .uploadImageAsset(image, options)
       .then(asset => {
         let generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
         generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, asset);
