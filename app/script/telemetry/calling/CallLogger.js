@@ -24,15 +24,53 @@ z.telemetry.calling.CallLogger = class CallLogger extends z.util.Logger {
       .substr(0, CallLogger.CONFIG.OBFUSCATION_TRUNCATE_TO);
   }
 
+  obfuscateIp(ip, conversationId) {
+    ip = this.removeBytesFromIp(ip);
+    return this.generateFakeIpFromSeed(this.obfuscate(`${conversationId}${ip.slicedIp}`), ip.type);
+  }
+
+  generateFakeIpFromSeed(seed, type) {
+    if (type === 4) {
+      // Extend the 4 bytes seed to 16 bytes using XOR encryption with static keys
+      const originalSeedLength = seed.length;
+      const keys = [21, 15, 7];
+      for (let i = 0; i < originalSeedLength; ++i) {
+        seed = `${seed}${String.fromCharCode(keys[0] ^ seed.charCodeAt(i))}${String.fromCharCode(
+          keys[1] ^ seed.charCodeAt(i)
+        )}${String.fromCharCode(keys[2] ^ seed.charCodeAt(i))}`;
+      }
+
+      // Generate a fake IP from that seed
+      const fakeIp = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+      for (let i = 0; i < seed.length; i++) {
+        fakeIp[i % fakeIp.length] += seed.charCodeAt(i);
+      }
+      return fakeIp
+        .map(v => {
+          return (v % 10).toString(10);
+        })
+        .join('')
+        .match(/.{1,3}/g)
+        .join('.');
+    } else if (type === 6) {
+      const fakeIp = CryptoJS.MD5(seed).toString();
+      return fakeIp.match(/.{1,4}/g).join(':');
+    }
+  }
+
   removeBytesFromIp(ip) {
+    let charactersToKeep;
+    let type;
+
     ip = ip.replace(/[\.\:]/g, '');
 
-    let charactersToKeep;
     if (ip.length > 12) {
       // IPv6 - Without colons the maximum is 32 characters
+      type = 6;
       charactersToKeep = 12;
     } else {
       // IPv4 - Without dots the maximum is 12 characters
+      type = 4;
       charactersToKeep = 4;
       if (ip.length > 7) {
         charactersToKeep = 6;
@@ -42,7 +80,11 @@ z.telemetry.calling.CallLogger = class CallLogger extends z.util.Logger {
     }
 
     const mid = Math.round((ip.length + 1) / 2);
-    return ip.slice(mid - charactersToKeep / 2, mid + charactersToKeep / 2);
+
+    return {
+      slicedIp: ip.slice(mid - charactersToKeep / 2, mid + charactersToKeep / 2),
+      type,
+    };
   }
 
   obfuscateSdp(sdpMessage, conversationId) {
@@ -63,19 +105,27 @@ z.telemetry.calling.CallLogger = class CallLogger extends z.util.Logger {
         decodedSdpMessage.media[index].icePwd = 'X'.repeat(24);
       }
 
+      // Remove KASE public key (for receiving side)
+      if (typeof decodedSdpMessage.media[index].invalid !== 'undefined') {
+        for (const indexInvalid in decodedSdpMessage.media[index].invalid) {
+          if (decodedSdpMessage.media[index].invalid[indexInvalid].value.startsWith('x-KASEv1')) {
+            decodedSdpMessage.media[index].invalid[indexInvalid].value = 'x-KASEv1:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX';
+          }
+        }
+      }
+
       // Prevent recovery of original IPs
-      // Remove bytes from the IP, concatenate it with the conversation id and the current date of the week
+      // Remove bytes from the IP, concatenate it with the conversation id and the current date of the week then hash it
+      // and use that hash to derive a deterministic IP from it
       if (typeof decodedSdpMessage.media[index].candidates !== 'undefined') {
         for (const indexCandidate in decodedSdpMessage.media[index].candidates) {
-          decodedSdpMessage.media[index].candidates[indexCandidate].ip = this.obfuscate(
-            `${conversationId}${this.removeBytesFromIp(decodedSdpMessage.media[index].candidates[indexCandidate].ip)}`
+          decodedSdpMessage.media[index].candidates[indexCandidate].ip = this.obfuscateIp(
+            decodedSdpMessage.media[index].candidates[indexCandidate].ip
           );
 
           if (typeof decodedSdpMessage.media[index].candidates[indexCandidate].raddr !== 'undefined') {
-            decodedSdpMessage.media[index].candidates[indexCandidate].raddr = this.obfuscate(
-              `${conversationId}${this.removeBytesFromIp(
-                decodedSdpMessage.media[index].candidates[indexCandidate].raddr
-              )}`
+            decodedSdpMessage.media[index].candidates[indexCandidate].raddr = this.obfuscateIp(
+              decodedSdpMessage.media[index].candidates[indexCandidate].raddr
             );
           }
         }
