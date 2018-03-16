@@ -124,7 +124,7 @@ z.viewModel.panel.ParticipantDevicesViewModel = class ParticipantDevicesViewMode
     });
     this.shouldUpdateScrollbar = ko
       .computed(() => this.clientEntities() && this.showDeviceDetails() && this.isVisible())
-      .extend({notify: 'always', rateLimit: 0});
+      .extend({notify: 'always', rateLimit: {method: 'notifyWhenChangesStop', timeout: 0}});
   }
 
   clickOnBack() {

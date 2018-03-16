@@ -61,8 +61,8 @@ z.viewModel.panel.GroupParticipantServiceViewModel = class GroupParticipantServi
     this.showActionRemove = ko.pureComputed(() => this.selfIsActiveMember() && this.selectedIsInConversation());
     this.showGroupParticipant = this.showGroupParticipant.bind(this);
     this.shouldUpdateScrollbar = ko
-      .computed(() => this.selectedParticipant() && this.isVisible())
-      .extend({notify: 'always', rateLimit: 0});
+      .computed(() => this.selectedService() && this.isVisible())
+      .extend({notify: 'always', rateLimit: {method: 'notifyWhenChangesStop', timeout: 0}});
   }
 
   clickOnBack() {
