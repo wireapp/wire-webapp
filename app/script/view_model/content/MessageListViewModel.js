@@ -39,7 +39,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     this.get_timestamp_class = this.get_timestamp_class.bind(this);
     this.is_last_delivered_message = this.is_last_delivered_message.bind(this);
     this.on_context_menu_click = this.on_context_menu_click.bind(this);
-    this.on_message_user_click = this.on_message_user_click.bind(this);
+    this.onMessageUserClick = this.onMessageUserClick.bind(this);
     this.on_session_reset_click = this.on_session_reset_click.bind(this);
     this.should_hide_user_avatar = this.should_hide_user_avatar.bind(this);
 
@@ -394,7 +394,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
    * @param {z.entity.User} user_et - User entity of the selected user
    * @returns {undefined} No return value
    */
-  on_message_user_click(user_et) {
+  onMessageUserClick(user_et) {
     amplify.publish(z.event.WebApp.PEOPLE.SHOW, user_et);
   }
 
