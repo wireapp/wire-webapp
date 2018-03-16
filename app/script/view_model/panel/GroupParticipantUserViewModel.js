@@ -48,9 +48,9 @@ z.viewModel.panel.GroupParticipantUserViewModel = class GroupParticipantUserView
     this.isTeam = ko.pureComputed(() => this.selectedParticipant().is_team_member());
     this.isGuest = ko.pureComputed(() => this.selectedParticipant().is_guest());
 
-    this.isVisible = ko.pureComputed(
-      () => this.panelViewModel.groupParticipantUserVisible() && this.selectedParticipant()
-    );
+    this.isVisible = ko.pureComputed(() => {
+      return this.panelViewModel.groupParticipantUserVisible() && this.selectedParticipant();
+    });
 
     this.selectedIsConnected = ko.pureComputed(() => {
       return this.selectedParticipant().is_connected() || this.selectedParticipant().is_team_member();

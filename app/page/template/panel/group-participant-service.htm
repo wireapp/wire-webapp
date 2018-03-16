@@ -6,6 +6,7 @@
     </div>
     <div class="panel__content">
       <div class="panel__content__scroll" data-bind="antiscroll: shouldUpdateScrollbar">
+
         <!-- ko if: selectedService() -->
           <div class="group-participant__service-header">
             <participant-avatar params="participant: selectedService, size: z.components.ParticipantAvatar.SIZE.LARGE"></participant-avatar>
@@ -15,6 +16,7 @@
             </div>
           </div>
           <div class="group-participant__service-description" data-bind="text: selectedService().description" data-uie-name="status-service-description"></div>
+
           <!-- ko if: showActionRemove() -->
             <div class="panel__action-item" data-bind="click: clickToRemove" data-uie-name="do-remove">
               <minus-icon class="panel__action-item__icon"></minus-icon>
@@ -24,6 +26,7 @@
         <!-- /ko -->
       </div>
     </div>
+
     <!-- ko if: isAddMode() -->
       <div class="panel__footer">
         <button class="button button-full" data-bind="click: clickOnAdd" data-uie-name="do-add-service">
@@ -31,6 +34,5 @@
         </button>
       </div>
     <!-- /ko -->
-
   <!-- /ko -->
 </div>

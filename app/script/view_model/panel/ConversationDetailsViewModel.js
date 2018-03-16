@@ -201,6 +201,7 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
   clickOnShowUser(userEntity) {
     this.panelViewModel.showGroupParticipantUser(userEntity);
   }
+
   clickOnShowService(serviceEntity) {
     this.panelViewModel.showGroupParticipantService(serviceEntity);
   }

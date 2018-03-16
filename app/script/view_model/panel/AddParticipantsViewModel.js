@@ -58,9 +58,6 @@ z.viewModel.panel.AddParticipantsViewModel = class AddParticipantsViewModel {
 
     this.enableAddAction = ko.pureComputed(() => this.selectedContacts().length > 0);
 
-    this.isConfirmAddingState = ko.pureComputed(() => this.isStateAddPeople());
-    this.isServiceState = ko.pureComputed(() => this.isStateAddService());
-
     this.isStateAddPeople = ko.pureComputed(() => this.state() === AddParticipantsViewModel.STATE.ADD_PEOPLE);
     this.isStateAddService = ko.pureComputed(() => this.state() === AddParticipantsViewModel.STATE.ADD_SERVICE);
 

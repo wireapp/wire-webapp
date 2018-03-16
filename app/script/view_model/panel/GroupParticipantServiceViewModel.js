@@ -38,13 +38,13 @@ z.viewModel.panel.GroupParticipantServiceViewModel = class GroupParticipantServi
     this.selectedParticipant = ko.observable(undefined);
     this.selectedService = ko.observable(undefined);
 
-    this.isVisible = ko.pureComputed(
-      () => this.panelViewModel.groupParticipantServiceVisible() && this.selectedParticipant()
-    );
+    this.isVisible = ko.pureComputed(() => {
+      return this.panelViewModel.groupParticipantServiceVisible() && this.selectedParticipant();
+    });
 
-    this.isAddMode = ko.pureComputed(() =>
-      this.panelViewModel._isStateVisible(z.viewModel.PanelViewModel.STATE.ADD_SERVICE)
-    );
+    this.isAddMode = ko.pureComputed(() => {
+      return this.panelViewModel._isStateVisible(z.viewModel.PanelViewModel.STATE.ADD_SERVICE);
+    });
 
     this.selectedIsInConversation = ko.pureComputed(() => {
       if (this.isVisible()) {
@@ -66,12 +66,10 @@ z.viewModel.panel.GroupParticipantServiceViewModel = class GroupParticipantServi
   }
 
   clickOnBack() {
-    this.panelViewModel.switchState(
-      this.isAddMode()
-        ? z.viewModel.PanelViewModel.STATE.ADD_PARTICIPANTS
-        : z.viewModel.PanelViewModel.STATE.CONVERSATION_DETAILS,
-      true
-    );
+    const newState = this.isAddMode()
+      ? z.viewModel.PanelViewModel.STATE.ADD_PARTICIPANTS
+      : z.viewModel.PanelViewModel.STATE.CONVERSATION_DETAILS;
+    this.panelViewModel.switchState(newState, true);
   }
 
   clickOnClose() {

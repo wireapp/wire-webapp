@@ -66,14 +66,15 @@ z.viewModel.PanelViewModel = class PanelViewModel {
     this.conversationDetailsVisible = ko.pureComputed(() => {
       return this._isStateVisible(PanelViewModel.STATE.CONVERSATION_DETAILS);
     });
-    this.groupParticipantUserVisible = ko.pureComputed(() =>
-      this._isStateVisible(PanelViewModel.STATE.GROUP_PARTICIPANT_USER)
-    );
-    this.groupParticipantServiceVisible = ko.pureComputed(
-      () =>
+    this.groupParticipantUserVisible = ko.pureComputed(() => {
+      return this._isStateVisible(PanelViewModel.STATE.GROUP_PARTICIPANT_USER);
+    });
+    this.groupParticipantServiceVisible = ko.pureComputed(() => {
+      return (
         this._isStateVisible(PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE) ||
         this._isStateVisible(PanelViewModel.STATE.ADD_SERVICE)
-    );
+      );
+    });
     this.guestOptionsVisible = ko.pureComputed(() => this._isStateVisible(PanelViewModel.STATE.GUEST_OPTIONS));
     this.participantDevicesVisible = ko.pureComputed(() => {
       return this._isStateVisible(PanelViewModel.STATE.PARTICIPANT_DEVICES);
@@ -262,11 +263,11 @@ z.viewModel.PanelViewModel = class PanelViewModel {
     switch (panelState) {
       case PanelViewModel.STATE.ADD_PARTICIPANTS:
         return 'add-participants';
+      case PanelViewModel.STATE.ADD_SERVICE:
+      case PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE:
+        return 'group-participant-service';
       case PanelViewModel.STATE.GROUP_PARTICIPANT_USER:
         return 'group-participant-user';
-      case PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE:
-      case PanelViewModel.STATE.ADD_SERVICE:
-        return 'group-participant-service';
       case PanelViewModel.STATE.GUEST_OPTIONS:
         return 'guest-options';
       case PanelViewModel.STATE.PARTICIPANT_DEVICES:
