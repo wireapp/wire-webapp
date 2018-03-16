@@ -106,14 +106,7 @@ z.entity.Message = class Message {
    * @returns {boolean} Message contains any file type asset
    */
   has_asset() {
-    if (this.is_content()) {
-      for (const asset_et of this.assets()) {
-        if (asset_et.type === z.assets.AssetType.FILE) {
-          return true;
-        }
-      }
-    }
-    return false;
+    return this.is_content() ? this.assets().some(assetEntity => assetEntity.type === z.assets.AssetType.FILE) : false;
   }
 
   /**
@@ -121,14 +114,7 @@ z.entity.Message = class Message {
    * @returns {boolean} Message contains a file
    */
   has_asset_file() {
-    if (this.is_content()) {
-      for (const asset_et of this.assets()) {
-        if (asset_et.is_file()) {
-          return true;
-        }
-      }
-    }
-    return false;
+    return this.is_content() ? this.assets().some(assetEntity => assetEntity.is_file()) : false;
   }
 
   /**
@@ -136,14 +122,7 @@ z.entity.Message = class Message {
    * @returns {boolean} Message contains any image
    */
   has_asset_image() {
-    if (this.is_content()) {
-      for (const asset_et of this.assets()) {
-        if (asset_et.is_image()) {
-          return true;
-        }
-      }
-    }
-    return false;
+    return this.is_content() ? this.assets().some(assetEntity => assetEntity.is_image()) : false;
   }
 
   /**
@@ -151,14 +130,7 @@ z.entity.Message = class Message {
    * @returns {boolean} Message contains a location
    */
   has_asset_location() {
-    if (this.is_content()) {
-      for (const asset_et of this.assets()) {
-        if (asset_et.is_location()) {
-          return true;
-        }
-      }
-    }
-    return false;
+    return this.is_content() ? this.assets().some(assetEntity => assetEntity.is_location()) : false;
   }
 
   /**
@@ -166,14 +138,7 @@ z.entity.Message = class Message {
    * @returns {boolean} Message contains text
    */
   has_asset_text() {
-    if (this.is_content()) {
-      for (const asset_et of this.assets()) {
-        if (asset_et.is_text()) {
-          return true;
-        }
-      }
-    }
-    return false;
+    return this.is_content() ? this.assets().some(assetEntity => assetEntity.is_text()) : false;
   }
 
   /**
@@ -219,6 +184,16 @@ z.entity.Message = class Message {
     return false;
   }
 
+  isEdited() {
+    return this.is_content() && this.was_edited();
+  }
+
+  isLinkPreview() {
+    return (
+      this.has_asset_text() && this.assets().some(assetEntity => assetEntity.is_text() && assetEntity.previews().length)
+    );
+  }
+
   /**
    * Check if message is a member message.
    * @returns {boolean} Is message of type member
@@ -247,24 +222,16 @@ z.entity.Message = class Message {
    * Check if message is a e2ee message.
    * @returns {boolean} Is message of type system
    */
-  is_device() {
-    return this.super_type === z.message.SuperType.DEVICE;
-  }
-
-  /**
-   * Check if message is a e2ee message.
-   * @returns {boolean} Is message of type system
-   */
-  is_all_verified() {
-    return this.super_type === z.message.SuperType.ALL_VERIFIED;
-  }
-
-  /**
-   * Check if message is a e2ee message.
-   * @returns {boolean} Is message of type system
-   */
   is_unable_to_decrypt() {
     return this.super_type === z.message.SuperType.UNABLE_TO_DECRYPT;
+  }
+
+  /**
+   * Check if message is a e2ee message.
+   * @returns {boolean} Is message of type system
+   */
+  is_verification() {
+    return this.super_type === z.message.SuperType.VERIFICATION;
   }
 
   /**
