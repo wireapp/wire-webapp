@@ -36,7 +36,7 @@
     "@bower_components/webapp-module-logger": "wireapp/webapp-module-logger#1.1.1",
     "@bower_components/webapp-module-modal": "wireapp/webapp-module-modal#1.0.2",
     "@bower_components/webapp-module-namespace": "wireapp/webapp-module-namespace#1.0.2",
-    "@bower_components/webrtc-adapter": "webrtc/adapter#6.1.3",
+    "@bower_components/webrtc-adapter": "webrtc/adapter#6.1.4",
     "@bower_components/wire-audio-files": "wireapp/wire-audio-files#1.1.1",
     "@bower_components/wire-theme": "wireapp/wire-theme#1.0.6",
     "@wireapp/core": "2.0.78",
