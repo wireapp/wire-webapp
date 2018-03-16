@@ -61,6 +61,15 @@ z.viewModel.content.GiphyViewModel = class GiphyViewModel {
     // GIF selected by user or single GIF when in single GIF view
     this.selectedGif = ko.observable();
 
+    this.isStateError = ko.pureComputed(() => this.state() === GiphyViewModel.STATE.ERROR);
+    this.isStateLoading = ko.pureComputed(() => this.state() === GiphyViewModel.STATE.LOADING);
+    this.isStateResult = ko.pureComputed(() => this.state() === GiphyViewModel.STATE.RESULT);
+    this.isStateResults = ko.pureComputed(() => this.state() === GiphyViewModel.STATE.RESULTS);
+
+    this.isResultState = ko.pureComputed(() => {
+      return [GiphyViewModel.STATE.RESULT, GiphyViewModel.STATE.RESULTS].includes(this.state());
+    });
+
     this._initSubscriptions();
   }
 
