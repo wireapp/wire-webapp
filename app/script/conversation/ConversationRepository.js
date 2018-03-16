@@ -1734,29 +1734,32 @@ z.conversation.ConversationRepository = class ConversationRepository {
   /**
    * Sends image asset in specified conversation using v3 api.
    *
-   * @param {Conversation} conversation_et - Conversation to send image in
+   * @param {Conversation} conversationEntity - Conversation to send image in
    * @param {File|Blob} image - Image
    * @returns {Promise} Resolves when the image was sent
    */
-  send_image_asset(conversation_et, image) {
+  send_image_asset(conversationEntity, image) {
     const options = {
-      retention: this.asset_service.getAssetRetention(this.selfUser(), conversation_et),
+      retention: this.asset_service.getAssetRetention(this.selfUser(), conversationEntity),
     };
 
     return this.asset_service
       .uploadImageAsset(image, options)
       .then(asset => {
-        let generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
-        generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, asset);
+        let genericMessage = new z.proto.GenericMessage(z.util.create_random_uuid());
+        genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, asset);
 
-        if (conversation_et.ephemeral_timer()) {
-          generic_message = this._wrap_in_ephemeral_message(generic_message, conversation_et.ephemeral_timer());
+        if (conversationEntity.ephemeral_timer()) {
+          genericMessage = this._wrap_in_ephemeral_message(genericMessage, conversationEntity.ephemeral_timer());
         }
 
-        return this._send_and_inject_generic_message(conversation_et, generic_message);
+        return this._send_and_inject_generic_message(conversationEntity, genericMessage);
       })
       .catch(error => {
-        this.logger.error(`Failed to upload otr asset for conversation ${conversation_et.id}: ${error.message}`, error);
+        this.logger.error(
+          `Failed to upload otr asset for conversation ${conversationEntity.id}: ${error.message}`,
+          error
+        );
         throw error;
       });
   }
