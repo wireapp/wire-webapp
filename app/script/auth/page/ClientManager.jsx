@@ -44,7 +44,7 @@ class ClientManager extends React.Component {
           <H1 center style={{marginTop: '140px'}}>
             {_(clientManagerStrings.headline)}
           </H1>
-          <Text center style={{marginBottom: '42px'}}>
+          <Text center style={{marginBottom: '42px'}} data-uie-name="status-device-limit-info">
             {_(clientManagerStrings.subhead)}
           </Text>
           <ClientList />
