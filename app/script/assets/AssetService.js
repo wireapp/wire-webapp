@@ -173,6 +173,13 @@ z.assets.AssetService = class AssetService {
     });
   }
 
+  getAssetRetention(userEntity, conversationEntity) {
+    const isTeamMember = userEntity.is_team_member();
+    const isTeamConversation = conversationEntity.inTeam();
+    const isEternal = isTeamMember || isTeamConversation;
+    return isEternal ? z.assets.AssetRetentionPolicy.ETERNAL : z.assets.AssetRetentionPolicy.PERSISTENT;
+  }
+
   /**
    * Post assets.
    *

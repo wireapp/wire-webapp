@@ -1503,9 +1503,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return this.get_message_in_conversation_by_id(conversation_et, message_id)
       .then(message_et => {
         const asset_et = message_et.get_first_asset();
+        const options = {
+          retention: this.asset_service.getAssetRetention(this.selfUser(), conversation_et),
+        };
 
         asset_et.uploaded_on_this_client(true);
-        return this.asset_service.uploadAsset(file, null, xhr => {
+        return this.asset_service.uploadAsset(file, options, xhr => {
           xhr.upload.onprogress = event => asset_et.upload_progress(Math.round(event.loaded / event.total * 100));
           asset_et.upload_cancel = () => xhr.abort();
         });
@@ -1609,7 +1612,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
           throw Error('No image available');
         }
 
-        return this.asset_service.uploadAsset(imageBlob).then(uploadedImageAsset => {
+        const options = {
+          retention: this.asset_service.getAssetRetention(this.selfUser(), conversationEntity),
+        };
+
+        return this.asset_service.uploadAsset(imageBlob, options).then(uploadedImageAsset => {
           const asset = new z.proto.Asset();
           const assetPreview = new z.proto.Asset.Preview(imageBlob.type, imageBlob.size, uploadedImageAsset.uploaded);
           asset.set('preview', assetPreview);
