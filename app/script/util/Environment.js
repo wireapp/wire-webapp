@@ -24,6 +24,7 @@ window.z.util = z.util || {};
 
 (() => {
   const APP_ENV = {
+    INTERNAL: 'wire-webapp-staging.wire.com',
     LOCALHOST: 'localhost',
     PROD_NEXT: 'wire-webapp-prod-next.wire.com',
     PRODUCTION: 'app.wire.com',
@@ -147,6 +148,7 @@ window.z.util = z.util || {};
     frontend: {
       is_localhost: () => [APP_ENV.LOCALHOST, APP_ENV.VIRTUAL_HOST].includes(window.location.hostname),
       is_production: () => [APP_ENV.PRODUCTION, APP_ENV.PROD_NEXT].includes(window.location.hostname),
+      isInternal: () => window.location.hostname === APP_ENV.INTERNAL,
     },
     os: {
       linux: !os.is_mac() && !os.is_windows(),
