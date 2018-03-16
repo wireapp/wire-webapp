@@ -350,7 +350,7 @@ z.string.conversationTweetAuthor = ' on Twitter';
 z.string.groupCreationPreferencesAction = 'Next';
 z.string.groupCreationPreferencesErrorNameShort = 'At least 1 character';
 z.string.groupCreationPreferencesErrorNameLong = 'Too many characters';
-z.string.groupCreationPreferencesHeader = 'New group';
+z.string.groupCreationPreferencesHeader = 'Group name';
 z.string.groupCreationPreferencesPlaceholder = 'Group name';
 z.string.groupCreationParticipantsActionCreate = 'Done';
 z.string.groupCreationParticipantsActionSkip = 'Skip';
@@ -492,7 +492,7 @@ z.string.guestOptionsCopyLink = 'Copy link';
 z.string.guestOptionsCopyLinkDone = 'Link copied!';
 z.string.guestOptionsCreateLink = 'Create link';
 z.string.guestOptionsInfoHeader = 'Invite others with a link';
-z.string.guestOptionsInfoText = 'Anyone with the link can join the conversation for 24 hours, even if they don’t have Wire.';
+z.string.guestOptionsInfoText = 'Anyone with the link can join the conversation, even if they don’t have Wire.';
 z.string.guestOptionsRevokeLink = 'Revoke link';
 z.string.guestOptionsTitle = 'Guest options';
 
