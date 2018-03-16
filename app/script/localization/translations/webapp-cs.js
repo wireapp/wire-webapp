@@ -24,12 +24,9 @@ z.string.cs.nonexistentUser = 'Smazaný uživatel';
 z.string.cs.and = 'a';
 
 z.string.cs.authAccountCountryCode = 'Kód země';
-z.string.cs.authAccountDeletion = 'Byli jste odhlášeni, protože váš účet byl smazán.';
-z.string.cs.authAccountExpiration = 'Byli jste odhlášeni, protože platnost relace vypršela. Přihlaste se znovu.';
 z.string.cs.authAccountPasswordForgot = 'Zapomenuté heslo';
 z.string.cs.authAccountPublicComputer = 'Toto je veřejný počítač';
 z.string.cs.authAccountSignIn = 'Přihlásit se';
-z.string.cs.authAccountSignInEmail = 'Email';
 z.string.cs.authAccountSignInPhone = 'Telefon';
 
 z.string.cs.authBlockedCookies = 'Pro přihlášení k Wire povolte soubory cookie.';
@@ -64,7 +61,6 @@ z.string.cs.authPostedResendAction = 'Žádný email nedošel?';
 z.string.cs.authPostedResendDetail = 'Zkontrolujte doručenou poštu a postupujte dle instrukcí.';
 z.string.cs.authPostedResendHeadline = 'Přišel ti email.';
 
-z.string.cs.authPlaceholderEmail = 'Email';
 z.string.cs.authPlaceholderPasswordPut = 'Heslo';
 z.string.cs.authPlaceholderPasswordSet = 'Heslo (alespoň 8 znaků)';
 z.string.cs.authPlaceholderPhone = 'Telefonní číslo';
@@ -278,6 +274,7 @@ z.string.cs.conversationTweetAuthor = ' na Twittru';
 
 z.string.cs.groupCreationPreferencesAction = 'Další';
 z.string.cs.groupCreationParticipantsPlaceholder = 'Hledat podle jména';
+
 
 z.string.cs.collectionShowAll = 'Zobrazit všechny {{number}}';
 z.string.cs.collectionSectionLinks = 'Odkazy';

@@ -25,14 +25,10 @@ z.string.de.nonexistentUser = 'Gelöschte Person';
 z.string.de.and = 'und';
 z.string.de.enumerationAnd = ' und ';
 
-z.string.de.authAccountClientDeletion  = 'Du wurdest abgemeldet, da dein Gerät gelöscht wurde.';
 z.string.de.authAccountCountryCode = 'Landesvorwahl';
-z.string.de.authAccountDeletion = 'Du wurdest abgemeldet, da dein Benutzerkonto gelöscht wurde.';
-z.string.de.authAccountExpiration = 'Du wurdest abgemeldet, da deine Session abgelaufen ist. Bitte melde dich erneut an.';
 z.string.de.authAccountPasswordForgot = 'Passwort vergessen';
 z.string.de.authAccountPublicComputer = 'Dies ist ein öffentlicher Computer';
 z.string.de.authAccountSignIn = 'Login';
-z.string.de.authAccountSignInEmail = 'E-Mail';
 z.string.de.authAccountSignInPhone = 'Handy';
 
 z.string.de.authBlockedCookies = 'Aktiviere Cookies, um dich bei Wire einzuloggen.';
@@ -67,7 +63,6 @@ z.string.de.authPostedResendAction = 'E-Mail nicht erhalten?';
 z.string.de.authPostedResendDetail = 'Schaue in deinen Posteingang und folge den Anweisungen.';
 z.string.de.authPostedResendHeadline = 'Du hast Post.';
 
-z.string.de.authPlaceholderEmail = 'E-Mail';
 z.string.de.authPlaceholderPasswordPut = 'Passwort';
 z.string.de.authPlaceholderPasswordSet = 'Passwort (min. acht Zeichen)';
 z.string.de.authPlaceholderPhone = 'Telefonnummer';
@@ -341,7 +336,7 @@ z.string.de.groupCreationParticipantsPlaceholder = 'Nach Namen suchen';
 z.string.de.guestRoomConversationName = 'Gästezimmer';
 z.string.de.guestRoomToggleName = 'Gäste zulassen';
 z.string.de.guestRoomToggleInfo = 'Öffne diese Unterhaltung für Personen außerhalb deines Teams.';
-z.string.de.guestRoomToggleInfoExtended = 'Öffne diese Unterhaltung für Personen außerhalb deines Teams. Dies kann jederzeit wieder geändert werden.';
+z.string.de.guestRoomToggleInfoExtended = 'Öffne diese Unterhaltung für Personen außerhalb deines Teams. Diese Einstellung kann später jederzeit geändert werden.';
 
 z.string.de.guestRoomConversationBadge = 'Gäste anwesend';
 

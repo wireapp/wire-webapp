@@ -24,12 +24,9 @@ z.string.el.nonexistentUser = 'Διεγραμμένος χρήστης';
 z.string.el.and = 'και';
 
 z.string.el.authAccountCountryCode = 'Κωδικός Χώρας';
-z.string.el.authAccountDeletion = 'Αποσυνδεθήκατε, επειδή ο λογαριασμός έχει διαγραφεί.';
-z.string.el.authAccountExpiration = 'Αποσυνδεθήκατε διότι η περίοδος λειτουργίας σας έληξε. Παρακαλούμε συνδεθείτε ξανά.';
 z.string.el.authAccountPasswordForgot = 'Ξέχασα τον κωδικό πρόσβασης';
 z.string.el.authAccountPublicComputer = 'Αυτός είναι ένας δημόσιος υπολογιστής';
 z.string.el.authAccountSignIn = 'Σύνδεση';
-z.string.el.authAccountSignInEmail = 'Email';
 z.string.el.authAccountSignInPhone = 'Τηλεφωνο';
 
 z.string.el.authBlockedCookies = 'Ενεργοποιήστε τα cookies για να συνδεθείτε στο Wire.';
@@ -64,7 +61,6 @@ z.string.el.authPostedResendAction = 'Δεν εμφανίζεται το email;'
 z.string.el.authPostedResendDetail = 'Ελέγξτε τα email σας και ακολουθήστε τις οδηγίες που θα βρείτε.';
 z.string.el.authPostedResendHeadline = 'Έχετε μήνυμα.';
 
-z.string.el.authPlaceholderEmail = 'Email';
 z.string.el.authPlaceholderPasswordPut = 'Κωδικός Πρόσβασης';
 z.string.el.authPlaceholderPasswordSet = 'Κωδικος προσβασης (το λιγοτερο 8 χαρακτηρες)';
 z.string.el.authPlaceholderPhone = 'Αριθμός Κινητού Τηλεφώνου';
@@ -279,6 +275,7 @@ z.string.el.conversationTweetAuthor = ' στο Twitter';
 z.string.el.groupCreationPreferencesAction = 'Επόμενο';
 z.string.el.groupCreationParticipantsActionCreate = 'Έγινε';
 z.string.el.groupCreationParticipantsPlaceholder = 'Αναζήτηση βάση ονόματος';
+
 
 z.string.el.collectionShowAll = 'Προβολή όλων {{number}}';
 z.string.el.collectionSectionLinks = 'Σύνδεσμοι';

@@ -25,11 +25,9 @@ z.string.sl.nonexistentUser = 'Izbrisan uporabnik';
 z.string.sl.and = 'in';
 
 z.string.sl.authAccountCountryCode = 'Koda države';
-z.string.sl.authAccountExpiration = 'Ker je vaša seja potekla, ste bili odjavljeni. Prosimo prijavite se ponovno.';
 z.string.sl.authAccountPasswordForgot = 'Pozabljeno geslo';
 z.string.sl.authAccountPublicComputer = 'To je javni računalnik';
 z.string.sl.authAccountSignIn = 'Prijava';
-z.string.sl.authAccountSignInEmail = 'E-pošta';
 z.string.sl.authAccountSignInPhone = 'Telefon';
 
 z.string.sl.authBlockedDatabase = 'Wire potrebuje dostop do lokalnega pomnilnika za prikaz sporočil. Lokalni pomnilnik ni na voljo v privatnem načinu.';
@@ -63,7 +61,6 @@ z.string.sl.authPostedResendAction = 'E-pošta ni prispela?';
 z.string.sl.authPostedResendDetail = 'Preverite vašo e-pošto in sledite navodilom.';
 z.string.sl.authPostedResendHeadline = 'Imate pošto.';
 
-z.string.sl.authPlaceholderEmail = 'E-pošta';
 z.string.sl.authPlaceholderPasswordPut = 'Geslo';
 z.string.sl.authPlaceholderPasswordSet = 'Geslo (vsaj 8 znakov)';
 z.string.sl.authPlaceholderPhone = 'Telefonska številka';
@@ -269,6 +266,7 @@ z.string.sl.conversationSomeone = 'Nekdo';
 z.string.sl.conversationTweetAuthor = ' na Twitterju';
 
 z.string.sl.groupCreationParticipantsPlaceholder = 'Iskanje po imenu';
+
 
 z.string.sl.collectionShowAll = 'Prikaži vse {{number}}';
 z.string.sl.collectionSectionLinks = 'Povezave';

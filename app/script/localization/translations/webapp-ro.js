@@ -26,12 +26,9 @@ z.string.ro.and = 'și';
 z.string.ro.enumerationAnd = ', și ';
 
 z.string.ro.authAccountCountryCode = 'Codul țării';
-z.string.ro.authAccountDeletion = 'Ai fost deconectat deoarece contul tău a fost șters.';
-z.string.ro.authAccountExpiration = 'Ai fost scos din sesiune pentru că sesiunea ta a expirat. Te rugăm să te autentifici din nou.';
 z.string.ro.authAccountPasswordForgot = 'Am uitat parola';
 z.string.ro.authAccountPublicComputer = 'Acesta este un calculator public';
 z.string.ro.authAccountSignIn = 'Autentificare';
-z.string.ro.authAccountSignInEmail = 'E-mail';
 z.string.ro.authAccountSignInPhone = 'Telefon';
 
 z.string.ro.authBlockedCookies = 'Activează cookie-urile pentru intra în Wire.';
@@ -66,7 +63,6 @@ z.string.ro.authPostedResendAction = 'Nu a apărut nici un e-mail?';
 z.string.ro.authPostedResendDetail = 'Verifică e-mailul și urmează instrucțiunile.';
 z.string.ro.authPostedResendHeadline = 'Ai primit un mesaj.';
 
-z.string.ro.authPlaceholderEmail = 'E-mail';
 z.string.ro.authPlaceholderPasswordPut = 'Parolă';
 z.string.ro.authPlaceholderPasswordSet = 'Parolă (minim 8 caractere)';
 z.string.ro.authPlaceholderPhone = 'Număr de telefon';
@@ -301,6 +297,7 @@ z.string.ro.groupCreationPreferencesPlaceholder = 'Nume grup';
 z.string.ro.groupCreationParticipantsActionCreate = 'Gata';
 z.string.ro.groupCreationParticipantsHeader = 'Adaugă persoane';
 z.string.ro.groupCreationParticipantsPlaceholder = 'Caută după nume';
+
 
 z.string.ro.collectionShowAll = 'Arată toate {{number}}';
 z.string.ro.collectionSectionLinks = 'Legături';

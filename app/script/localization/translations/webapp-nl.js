@@ -26,12 +26,9 @@ z.string.nl.and = 'en';
 z.string.nl.enumerationAnd = ', en ';
 
 z.string.nl.authAccountCountryCode = 'Landcode';
-z.string.nl.authAccountDeletion = 'Je bent uitgelogt omdat je account is verwijdert.';
-z.string.nl.authAccountExpiration = 'Je bent afgemeld omdat de sessie verlopen is. Log opnieuw in.';
 z.string.nl.authAccountPasswordForgot = 'Wachtwoord vergeten';
 z.string.nl.authAccountPublicComputer = 'Dit is een publieke computer';
 z.string.nl.authAccountSignIn = 'Inloggen';
-z.string.nl.authAccountSignInEmail = 'E-mail';
 z.string.nl.authAccountSignInPhone = 'Telefoonnummer';
 
 z.string.nl.authBlockedCookies = 'Zet je cookies aan om in te loggen in Wire.';
@@ -66,7 +63,6 @@ z.string.nl.authPostedResendAction = 'Geen e-mail ontvangen?';
 z.string.nl.authPostedResendDetail = 'Controleer je inbox en volg de instructies.';
 z.string.nl.authPostedResendHeadline = 'Je hebt e-mail ontvangen.';
 
-z.string.nl.authPlaceholderEmail = 'E-mail';
 z.string.nl.authPlaceholderPasswordPut = 'Wachtwoord';
 z.string.nl.authPlaceholderPasswordSet = 'Wachtwoord (minimaal 8 tekens)';
 z.string.nl.authPlaceholderPhone = 'Telefoonnummer';
@@ -299,6 +295,7 @@ z.string.nl.groupCreationParticipantsActionCreate = 'Klaar';
 z.string.nl.groupCreationParticipantsActionSkip = 'Sla over';
 z.string.nl.groupCreationParticipantsHeader = 'Personen toevoegen';
 z.string.nl.groupCreationParticipantsPlaceholder = 'Zoeken op naam';
+
 
 z.string.nl.collectionShowAll = 'Toon alle {{number}}';
 z.string.nl.collectionSectionLinks = 'Links';

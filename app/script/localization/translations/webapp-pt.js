@@ -24,12 +24,9 @@ z.string.pt.nonexistentUser = 'Utilizador eliminado';
 z.string.pt.and = 'e';
 
 z.string.pt.authAccountCountryCode = 'Código de País';
-z.string.pt.authAccountDeletion = 'Foi desconectado porque a sua conta foi eliminada.';
-z.string.pt.authAccountExpiration = 'A sessão terminou por ter expirado. Inicie sessão novamente.';
 z.string.pt.authAccountPasswordForgot = 'Esqueci a palavra-passe';
 z.string.pt.authAccountPublicComputer = 'Este computador é publico';
 z.string.pt.authAccountSignIn = 'Iniciar sessão';
-z.string.pt.authAccountSignInEmail = 'E-mail';
 z.string.pt.authAccountSignInPhone = 'Telefone';
 
 z.string.pt.authBlockedCookies = 'Ative os cookies para iniciar sessão no Wire.';
@@ -64,7 +61,6 @@ z.string.pt.authPostedResendAction = 'Não chegou a mensagem?';
 z.string.pt.authPostedResendDetail = 'Verifique sua caixa de correio eletrónico e siga as instruções.';
 z.string.pt.authPostedResendHeadline = 'Recebeu email.';
 
-z.string.pt.authPlaceholderEmail = 'E-mail';
 z.string.pt.authPlaceholderPasswordPut = 'Palavra-passe';
 z.string.pt.authPlaceholderPasswordSet = 'Palavra-passe (pelo menos 8 caracteres)';
 z.string.pt.authPlaceholderPhone = 'Telefone';
@@ -282,6 +278,7 @@ z.string.pt.conversationTweetAuthor = ' no Twitter';
 z.string.pt.groupCreationPreferencesAction = 'Seguinte';
 z.string.pt.groupCreationParticipantsActionCreate = 'Pronto';
 z.string.pt.groupCreationParticipantsPlaceholder = 'Pesquisar por nome';
+
 
 z.string.pt.collectionShowAll = 'Mostrar todos os {{number}}';
 z.string.pt.collectionSectionLinks = 'Ligações';

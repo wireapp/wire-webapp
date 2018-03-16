@@ -25,12 +25,9 @@ z.string.pl.and = 'oraz';
 z.string.pl.enumerationAnd = ', i ';
 
 z.string.pl.authAccountCountryCode = 'Kierunkowy kraju';
-z.string.pl.authAccountDeletion = 'Zostałeś wylogowany, ponieważ Twoje konto zostało usunięte.';
-z.string.pl.authAccountExpiration = 'Zostałeś wylogowany ponieważ twoja sesja wygasła. Proszę zalogować się ponownie.';
 z.string.pl.authAccountPasswordForgot = 'Zapomniałem hasła';
 z.string.pl.authAccountPublicComputer = 'To jest komputer publiczny';
 z.string.pl.authAccountSignIn = 'Zaloguj się';
-z.string.pl.authAccountSignInEmail = 'Adres e-mail';
 z.string.pl.authAccountSignInPhone = 'Numer telefonu';
 
 z.string.pl.authBlockedCookies = 'Włącz ciasteczka do zalogowania się do Wire.';
@@ -65,7 +62,6 @@ z.string.pl.authPostedResendAction = 'Nie otrzymałeś e-maila?';
 z.string.pl.authPostedResendDetail = 'Sprawdź swoją skrzynkę e-mail i postępuj zgodnie z instrukcjami.';
 z.string.pl.authPostedResendHeadline = 'Masz wiadomość.';
 
-z.string.pl.authPlaceholderEmail = 'Adres e-mail';
 z.string.pl.authPlaceholderPasswordPut = 'Hasło';
 z.string.pl.authPlaceholderPasswordSet = 'Hasło (musi mieć przynajmniej 8 znaków)';
 z.string.pl.authPlaceholderPhone = 'Numer telefonu';
@@ -293,6 +289,7 @@ z.string.pl.conversationTweetAuthor = ' na Twitterze';
 z.string.pl.groupCreationPreferencesAction = 'Dalej';
 z.string.pl.groupCreationParticipantsActionCreate = 'Zakończono';
 z.string.pl.groupCreationParticipantsPlaceholder = 'Szukaj według nazwy';
+
 
 z.string.pl.collectionShowAll = 'Pokaż wszystkie {{number}}';
 z.string.pl.collectionSectionLinks = 'Linki';

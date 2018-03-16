@@ -27,12 +27,9 @@ z.string.fr.enumerationAnd = ', et ';
 
 //=L'application se charge
 z.string.fr.authAccountCountryCode = 'Indicatif du pays';
-z.string.fr.authAccountDeletion = 'Vous avez été déconnecté car votre compte a été supprimé.';
-z.string.fr.authAccountExpiration = 'Vous avez été déconnecté car votre session a expirée. Veuillez vous reconnecter.';
 z.string.fr.authAccountPasswordForgot = 'Mot de passe oublié';
 z.string.fr.authAccountPublicComputer = 'Cet ordinateur est public';
 z.string.fr.authAccountSignIn = 'Se connecter';
-z.string.fr.authAccountSignInEmail = 'E-mail';
 z.string.fr.authAccountSignInPhone = 'Téléphone';
 
 z.string.fr.authBlockedCookies = 'Autorisez les cookies pour vous connecter à Wire.';
@@ -67,7 +64,6 @@ z.string.fr.authPostedResendAction = 'Aucun e-mail à l’horizon ?';
 z.string.fr.authPostedResendDetail = 'Vérifiez votre boîte de réception et suivez les instructions.';
 z.string.fr.authPostedResendHeadline = 'Vous avez du courrier.';
 
-z.string.fr.authPlaceholderEmail = 'E-mail';
 z.string.fr.authPlaceholderPasswordPut = 'Mot de passe';
 z.string.fr.authPlaceholderPasswordSet = 'Mot de passe (8 caractères minimum)';
 z.string.fr.authPlaceholderPhone = 'Numéro de téléphone';
@@ -300,6 +296,7 @@ z.string.fr.groupCreationParticipantsActionCreate = 'Terminé';
 z.string.fr.groupCreationParticipantsActionSkip = 'Passer';
 z.string.fr.groupCreationParticipantsHeader = 'Ajouter un contact';
 z.string.fr.groupCreationParticipantsPlaceholder = 'Rechercher par nom';
+
 
 z.string.fr.collectionShowAll = 'Tout afficher ({{number}})';
 z.string.fr.collectionSectionLinks = 'Liens';

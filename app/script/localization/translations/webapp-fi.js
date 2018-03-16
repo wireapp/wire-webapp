@@ -24,12 +24,9 @@ z.string.fi.nonexistentUser = 'Poistettu käyttäjä';
 z.string.fi.and = 'ja';
 
 z.string.fi.authAccountCountryCode = 'Maakoodi';
-z.string.fi.authAccountDeletion = 'Sinut kirjattiin ulos, koska tilisi poistettiin.';
-z.string.fi.authAccountExpiration = 'Sinut kirjattiin ulos, koska istuntosi päättyi. Kirjaudu sisään uudelleen.';
 z.string.fi.authAccountPasswordForgot = 'Unohdin salasanani';
 z.string.fi.authAccountPublicComputer = 'Tämä on julkinen tietokone';
 z.string.fi.authAccountSignIn = 'Kirjaudu sisään';
-z.string.fi.authAccountSignInEmail = 'Sähköposti';
 z.string.fi.authAccountSignInPhone = 'Puhelinnumero';
 
 z.string.fi.authBlockedCookies = 'Salli evästeet kirjautuaksesi Wireen.';
@@ -64,7 +61,6 @@ z.string.fi.authPostedResendAction = 'Eikö sähköposti saavu perille?';
 z.string.fi.authPostedResendDetail = 'Tarkista sähköpostisi saapuneet-kansio ja seuraa ohjeita.';
 z.string.fi.authPostedResendHeadline = 'Sinulle on sähköpostia.';
 
-z.string.fi.authPlaceholderEmail = 'Sähköposti';
 z.string.fi.authPlaceholderPasswordPut = 'Salasana';
 z.string.fi.authPlaceholderPasswordSet = 'Salasana (vähintään 8 merkkiä pitkä)';
 z.string.fi.authPlaceholderPhone = 'Puhelinnumero';
@@ -256,7 +252,7 @@ z.string.fi.conversationVerified = 'Vahvistettu';
 z.string.fi.conversationVoiceChannelDeactivate = ' soitti';
 z.string.fi.conversationVoiceChannelDeactivateYou = ' soitti';
 z.string.fi.conversationYesterday = 'Eilen';
-z.string.fi.conversationUnableToDecrypt1 = '{{user}} n viesti ei tullut perille.';
+z.string.fi.conversationUnableToDecrypt1 = 'Käyttäjän {{user}} viesti ei tullut perille.';
 z.string.fi.conversationUnableToDecrypt2 = '{{user}} n laitteen identiteetti muuttui. Perilletoimittamaton viesti.';
 z.string.fi.conversationUnableToDecryptLink = 'Miksi?';
 z.string.fi.conversationUnableToDecryptErrorMessage = 'Virhe';
@@ -281,6 +277,7 @@ z.string.fi.conversationTweetAuthor = ' Twitterissä';
 z.string.fi.groupCreationPreferencesAction = 'Seuraava';
 z.string.fi.groupCreationParticipantsActionCreate = 'Valmis';
 z.string.fi.groupCreationParticipantsPlaceholder = 'Hae nimellä';
+
 
 z.string.fi.collectionShowAll = 'Näytä kaikki {{number}}';
 z.string.fi.collectionSectionLinks = 'Linkit';

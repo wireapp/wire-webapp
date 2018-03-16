@@ -27,12 +27,9 @@ z.string.lt.enumerationAnd = ', ir ';
 
 //=Įkeliama
 z.string.lt.authAccountCountryCode = 'Šalies kodas';
-z.string.lt.authAccountDeletion = 'Buvote atjungti, nes jūsų paskyra buvo ištrinta.';
-z.string.lt.authAccountExpiration = 'Buvote atjungti, nes baigėsi jūsų seansas. Prisijunkite dar kartą.';
 z.string.lt.authAccountPasswordForgot = 'Pamiršau slaptažodį';
 z.string.lt.authAccountPublicComputer = 'Tai yra viešas kompiuteris';
 z.string.lt.authAccountSignIn = 'Prisijungti';
-z.string.lt.authAccountSignInEmail = 'El. paštas';
 z.string.lt.authAccountSignInPhone = 'Telefonas';
 
 z.string.lt.authBlockedCookies = 'Aktyvuokite slapukus, kad galėtumėte prisijungti prie „Wire“.';
@@ -67,7 +64,6 @@ z.string.lt.authPostedResendAction = 'Negaunate el. laiško?';
 z.string.lt.authPostedResendDetail = 'Patikrinkite savo el. paštą ir sekite nurodymus.';
 z.string.lt.authPostedResendHeadline = 'Jūs gavote laišką.';
 
-z.string.lt.authPlaceholderEmail = 'El. paštas';
 z.string.lt.authPlaceholderPasswordPut = 'Slaptažodis';
 z.string.lt.authPlaceholderPasswordSet = 'Slaptažodis (bent 8 simboliai)';
 z.string.lt.authPlaceholderPhone = 'Telefono numeris';

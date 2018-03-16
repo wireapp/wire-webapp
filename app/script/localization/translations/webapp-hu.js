@@ -29,12 +29,9 @@ z.string.hu.enumerationAnd = 'és ';
 
 //=Alkalmazás betöltése
 z.string.hu.authAccountCountryCode = 'Országhívó-kód';
-z.string.hu.authAccountDeletion = 'Ki lettél jelentkeztetve, mert a felhasználói fiókodat törölték.';
-z.string.hu.authAccountExpiration = 'A munkamenet lejárt, ezért ki lettél jelentkeztetve. Kérjük, jelentkezz be újra.';
 z.string.hu.authAccountPasswordForgot = 'Elfelejtett jelszó';
 z.string.hu.authAccountPublicComputer = 'Ez egy nyilvános számítógép';
 z.string.hu.authAccountSignIn = 'Bejelentkezés';
-z.string.hu.authAccountSignInEmail = 'E-mail';
 z.string.hu.authAccountSignInPhone = 'Telefon';
 
 z.string.hu.authBlockedCookies = 'A bejelentkezéshez engedélyezni kell a böngésző-sütiket.';
@@ -69,7 +66,6 @@ z.string.hu.authPostedResendAction = 'Nem kaptál e-mailt?';
 z.string.hu.authPostedResendDetail = 'Ellenőrizd bejövő e-mailjeidet és kövesd az utasításokat.';
 z.string.hu.authPostedResendHeadline = 'Leveled érkezett.';
 
-z.string.hu.authPlaceholderEmail = 'E-mail';
 z.string.hu.authPlaceholderPasswordPut = 'Jelszó';
 z.string.hu.authPlaceholderPasswordSet = 'Jelszó (legalább 8 karakter)';
 z.string.hu.authPlaceholderPhone = 'Telefonszám';
@@ -235,6 +231,7 @@ z.string.hu.modalPictureFileFormatMessage = 'Kérjük, PNG vagy JPEG képet hasz
 z.string.hu.modalPictureTooLargeHeadline = 'A kiválasztott kép túl nagy';
 z.string.hu.modalPictureTooLargeMessage = 'Maximum {{number}} MB méretű képeket használhatsz.';
 
+z.string.hu.modalPictureTooSmallHeadline = 'A kép túl kicsi';
 z.string.hu.modalPictureTooSmallMessage = 'Kérjük, legalább 320 x 320 képpont méretű képet válassz.';
 
 z.string.hu.modalServiceUnavailableHeadline = 'Új szolgáltatás hozzáadása nem lehetséges';
@@ -305,7 +302,7 @@ z.string.hu.conversationVerified = 'Ellenőrizve';
 z.string.hu.conversationVoiceChannelDeactivate = ' hívást kezdeményezett';
 z.string.hu.conversationVoiceChannelDeactivateYou = ' hívást kezdeményezett';
 z.string.hu.conversationYesterday = 'Tegnap';
-z.string.hu.conversationUnableToDecrypt1 = 'egy üzenetet nem kaptál meg tőle: {{user}}.';
+z.string.hu.conversationUnableToDecrypt1 = 'Nem kaptál meg egy üzenetet tőle: {{user}}.';
 z.string.hu.conversationUnableToDecrypt2 = '{{user}} eszközének azonosítója megváltozott. Kézbesítetlen üzenet.';
 z.string.hu.conversationUnableToDecryptLink = 'Miért?';
 z.string.hu.conversationUnableToDecryptErrorMessage = 'Hiba';
@@ -342,6 +339,8 @@ z.string.hu.groupCreationParticipantsPlaceholder = 'Keresés név szerint';
 z.string.hu.guestRoomConversationName = 'Vendégszoba';
 z.string.hu.guestRoomToggleName = 'Vendégek engedélyezése';
 z.string.hu.guestRoomToggleInfo = 'Megnyitja a beszélgetést a csapatodon kívüli partnerek számára is.';
+z.string.hu.guestRoomToggleInfoExtended = 'A beszélgetés elérhető a csapaton kívüli embereknek is. Ezt később bármikor megváltoztathatod.';
+
 z.string.hu.guestRoomConversationBadge = 'Vendégek is vannak itt';
 
 z.string.hu.collectionShowAll = 'Mind a(z) {{number}} mutatása';

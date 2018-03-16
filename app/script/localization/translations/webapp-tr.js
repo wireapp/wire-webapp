@@ -24,12 +24,9 @@ z.string.tr.nonexistentUser = 'Silinmiş Kullanıcı';
 z.string.tr.and = 've';
 
 z.string.tr.authAccountCountryCode = 'Ülke Kodu';
-z.string.tr.authAccountDeletion = 'Çıkış yaptınız çünkü hesabınız silinmiş.';
-z.string.tr.authAccountExpiration = 'Oturumunuzun süresi dolduğu için çıkış yapıldı. Lütfen tekrar giriş yapın.';
 z.string.tr.authAccountPasswordForgot = 'Şifremi unuttum';
 z.string.tr.authAccountPublicComputer = 'Bu ortak bir bilgisayar';
 z.string.tr.authAccountSignIn = 'Giriş yap';
-z.string.tr.authAccountSignInEmail = 'E-posta';
 z.string.tr.authAccountSignInPhone = 'Telefon';
 
 z.string.tr.authBlockedCookies = 'Wire’a giriş yapabilmek için çerezleri etkinleştirin.';
@@ -64,7 +61,6 @@ z.string.tr.authPostedResendAction = 'E-posta gelmedi mi?';
 z.string.tr.authPostedResendDetail = 'E-posta gelen kutunuzu kontrol edin ve talimatları izleyin.';
 z.string.tr.authPostedResendHeadline = 'E-posta geldi.';
 
-z.string.tr.authPlaceholderEmail = 'E-posta';
 z.string.tr.authPlaceholderPasswordPut = 'Şifre';
 z.string.tr.authPlaceholderPasswordSet = 'Şifre (en az 8 karakter)';
 z.string.tr.authPlaceholderPhone = 'Telefon Numarası';
@@ -282,6 +278,7 @@ z.string.tr.conversationTweetAuthor = ' Twitter’da';
 z.string.tr.groupCreationPreferencesAction = 'İleri';
 z.string.tr.groupCreationParticipantsActionCreate = 'Yapıldı';
 z.string.tr.groupCreationParticipantsPlaceholder = 'İsme göre ara';
+
 
 z.string.tr.collectionShowAll = '{{number}}’nun tümünü göster';
 z.string.tr.collectionSectionLinks = 'Bağlantılar';

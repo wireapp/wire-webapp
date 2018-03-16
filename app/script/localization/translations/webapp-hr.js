@@ -24,10 +24,8 @@ z.string.hr.nonexistentUser = 'Izbrisani korisnik';
 z.string.hr.and = 'i';
 
 z.string.hr.authAccountCountryCode = 'Pozivni broj';
-z.string.hr.authAccountExpiration = 'Odjavljeni ste jer je vaša sesija istekla. Molimo prijavite se ponovno.';
 z.string.hr.authAccountPasswordForgot = 'Zaboravljena lozinka';
 z.string.hr.authAccountSignIn = 'Prijava';
-z.string.hr.authAccountSignInEmail = 'Email';
 z.string.hr.authAccountSignInPhone = 'Telefon';
 
 z.string.hr.authVerifyAccountAdd = 'Dodaj';
@@ -58,7 +56,6 @@ z.string.hr.authPostedResendAction = 'Email se ne pojavljuje?';
 z.string.hr.authPostedResendDetail = 'Provjerite svoj email sandučić i slijedite upute.';
 z.string.hr.authPostedResendHeadline = 'Imate poštu.';
 
-z.string.hr.authPlaceholderEmail = 'Email';
 z.string.hr.authPlaceholderPasswordPut = 'Lozinka';
 z.string.hr.authPlaceholderPasswordSet = 'Lozinka (najmanje 8 znakova)';
 z.string.hr.authPlaceholderPhone = 'Telefonski broj';
@@ -257,6 +254,7 @@ z.string.hr.conversationSomeone = 'Netko';
 z.string.hr.conversationTweetAuthor = ' na Twitteru';
 
 z.string.hr.groupCreationParticipantsPlaceholder = 'Traži po imenu';
+
 
 z.string.hr.collectionSectionLinks = 'Linkovi';
 z.string.hr.collectionSectionImages = 'Slike';

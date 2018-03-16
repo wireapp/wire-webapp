@@ -25,12 +25,9 @@ z.string.sk.nonexistentUser = 'Odstránený používateľ';
 z.string.sk.and = 'a';
 
 z.string.sk.authAccountCountryCode = 'Kód krajiny';
-z.string.sk.authAccountDeletion = 'Boli ste odhlásení, pretože vaše konto bolo odstránené.';
-z.string.sk.authAccountExpiration = 'Boli ste odhlásení pretože vypršala platnosť Vášho sedenia. Prihláste sa prosím znova.';
 z.string.sk.authAccountPasswordForgot = 'Zabudnuté heslo';
 z.string.sk.authAccountPublicComputer = 'Toto je verejný počítač';
 z.string.sk.authAccountSignIn = 'Prihlásenie';
-z.string.sk.authAccountSignInEmail = 'E-mail';
 z.string.sk.authAccountSignInPhone = 'Telefón';
 
 z.string.sk.authBlockedCookies = 'Povoľte cookies na prihlásenie k Wire.';
@@ -65,7 +62,6 @@ z.string.sk.authPostedResendAction = 'Žiadny e-mail sa nezobrazil?';
 z.string.sk.authPostedResendDetail = 'Skontrolujte Vašu e-mailovú schránku a postupujte podľa pokynov.';
 z.string.sk.authPostedResendHeadline = 'Máte e-mail.';
 
-z.string.sk.authPlaceholderEmail = 'E-mail';
 z.string.sk.authPlaceholderPasswordPut = 'Heslo';
 z.string.sk.authPlaceholderPasswordSet = 'Heslo (minimálne 8 znakov)';
 z.string.sk.authPlaceholderPhone = 'Telefónne číslo';
@@ -278,6 +274,7 @@ z.string.sk.conversationSomeone = 'Niekto';
 z.string.sk.conversationTweetAuthor = ' na Twitteri';
 
 z.string.sk.groupCreationParticipantsPlaceholder = 'Vyhľadať podľa mena';
+
 
 z.string.sk.collectionShowAll = 'Zobraziť všetky {{number}}';
 z.string.sk.collectionSectionLinks = 'Odkazy';

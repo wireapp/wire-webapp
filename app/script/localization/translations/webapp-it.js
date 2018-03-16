@@ -24,12 +24,9 @@ z.string.it.nonexistentUser = 'Elimina utente';
 z.string.it.and = 'e';
 
 z.string.it.authAccountCountryCode = 'Codice del paese';
-z.string.it.authAccountDeletion = 'Sei stato disconnesso perché il tuo account è stato eliminato.';
-z.string.it.authAccountExpiration = 'L’accesso è stato revocato perché la sessione è scaduta. Effettua il login nuovamente.';
 z.string.it.authAccountPasswordForgot = 'Ho dimenticato la password';
 z.string.it.authAccountPublicComputer = 'Questo computer è pubblico';
 z.string.it.authAccountSignIn = 'Accedi';
-z.string.it.authAccountSignInEmail = 'Email';
 z.string.it.authAccountSignInPhone = 'Telefono';
 
 z.string.it.authBlockedDatabase = 'Wire ha bisogno di accedere la memoria locale per visualizzare i messaggi. Archiviazione locale non è disponibile in modalità privata.';
@@ -63,7 +60,6 @@ z.string.it.authPostedResendAction = 'Non hai ricevuto nessuna email?';
 z.string.it.authPostedResendDetail = 'Verifica la tua casella di posta e segui le istruzioni.';
 z.string.it.authPostedResendHeadline = 'C’è posta per te.';
 
-z.string.it.authPlaceholderEmail = 'Email';
 z.string.it.authPlaceholderPasswordPut = 'Password';
 z.string.it.authPlaceholderPasswordSet = 'Password (almeno 8 caratteri)';
 z.string.it.authPlaceholderPhone = 'Numero di telefono';
@@ -273,6 +269,7 @@ z.string.it.conversationSomeone = 'Qualcuno';
 z.string.it.conversationTweetAuthor = ' su Twitter';
 
 z.string.it.groupCreationParticipantsPlaceholder = 'Cerca per nome';
+
 
 z.string.it.collectionShowAll = 'Mostra tutti i {{number}}';
 z.string.it.collectionSectionLinks = 'Link';

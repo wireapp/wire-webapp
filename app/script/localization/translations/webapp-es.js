@@ -22,14 +22,12 @@ z.string.es.wireWindows = 'Wire para Windows';
 z.string.es.wireLinux = 'Wire para Linux';
 z.string.es.nonexistentUser = 'Usuario Borrado';
 z.string.es.and = 'y';
+z.string.es.enumerationAnd = ', y ';
 
 z.string.es.authAccountCountryCode = 'Código de País';
-z.string.es.authAccountDeletion = 'Fue desconectado porque su cuenta fue borrada.';
-z.string.es.authAccountExpiration = 'Su sesión ha vencido. Entrar nuevamente.';
 z.string.es.authAccountPasswordForgot = 'Contraseña Olvidada';
 z.string.es.authAccountPublicComputer = 'Es un ordenador público';
 z.string.es.authAccountSignIn = 'Iniciar sesión';
-z.string.es.authAccountSignInEmail = 'Correo';
 z.string.es.authAccountSignInPhone = 'Teléfono';
 
 z.string.es.authBlockedCookies = 'Habilita las cookies para iniciar sesión.';
@@ -64,7 +62,6 @@ z.string.es.authPostedResendAction = '¿No aparece ningún correo electrónico?'
 z.string.es.authPostedResendDetail = 'Revise su buzón de correo electrónico y siga las instrucciones.';
 z.string.es.authPostedResendHeadline = 'Tiene un correo electrónico.';
 
-z.string.es.authPlaceholderEmail = 'Correo';
 z.string.es.authPlaceholderPasswordPut = 'Contraseña';
 z.string.es.authPlaceholderPasswordSet = 'Contraseña (mínimo 8 caracteres)';
 z.string.es.authPlaceholderPhone = 'Número de teléfono';
@@ -180,7 +177,7 @@ z.string.es.modalConversationNewDeviceHeadlineMany = '{{user}}s comenzaron a uti
 z.string.es.modalConversationNewDeviceHeadlineYou = '{{user}} comenzó a utilizar un dispositivo nuevo';
 z.string.es.modalConversationNewDeviceIncomingCallAction = '¿Acepta la llamada?';
 z.string.es.modalConversationNewDeviceIncomingCallMessage = '¿Desea aceptar la llamada?';
-z.string.es.modalConversationNewDeviceMessage = '¿Desea enviar su mensaje?';
+z.string.es.modalConversationNewDeviceMessage = '¿Aún quieres enviar tus mensajes?';
 z.string.es.modalConversationNewDeviceOutgoingCallAction = 'Llamar de todos modos';
 z.string.es.modalConversationNewDeviceOutgoingCallMessage = '¿Desea realizar la llamada?';
 
@@ -257,7 +254,7 @@ z.string.es.conversationVerified = 'Verificado';
 z.string.es.conversationVoiceChannelDeactivate = ' llamó';
 z.string.es.conversationVoiceChannelDeactivateYou = ' llamó';
 z.string.es.conversationYesterday = 'Ayer';
-z.string.es.conversationUnableToDecrypt1 = 'un mensaje de {{user}} no se recibió';
+z.string.es.conversationUnableToDecrypt1 = 'un mensaje de {{user}}} no se ha recibido.';
 z.string.es.conversationUnableToDecrypt2 = '{{user}}´s identidad de dispositivo cambiada. Mensaje no entregado.';
 z.string.es.conversationUnableToDecryptLink = '¿Por qué?';
 z.string.es.conversationUnableToDecryptErrorMessage = 'Error';
@@ -282,6 +279,7 @@ z.string.es.conversationTweetAuthor = ' en Twitter';
 z.string.es.groupCreationPreferencesAction = 'Siguiente';
 z.string.es.groupCreationParticipantsActionCreate = 'Listo';
 z.string.es.groupCreationParticipantsPlaceholder = 'Buscar por nombre';
+
 
 z.string.es.collectionShowAll = 'Mostrar los {{number}}';
 z.string.es.collectionSectionLinks = 'Enlaces';

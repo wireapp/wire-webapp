@@ -24,11 +24,9 @@ z.string.da.nonexistentUser = 'Slet bruger';
 z.string.da.and = 'og';
 
 z.string.da.authAccountCountryCode = 'Landekode';
-z.string.da.authAccountExpiration = 'Du er blevet logget af, da din session udløb. Log venligst ind igen.';
 z.string.da.authAccountPasswordForgot = 'Glemt adgangskode';
 z.string.da.authAccountPublicComputer = 'Dette er en offentlig computer';
 z.string.da.authAccountSignIn = 'Log ind';
-z.string.da.authAccountSignInEmail = 'Email';
 z.string.da.authAccountSignInPhone = 'Telefon';
 
 z.string.da.authVerifyAccountAdd = 'Tilføj';
@@ -59,7 +57,6 @@ z.string.da.authPostedResendAction = 'Ingen email modtaget?';
 z.string.da.authPostedResendDetail = 'Tjek din email indbakke og følg anvisningerne.';
 z.string.da.authPostedResendHeadline = 'Du har post.';
 
-z.string.da.authPlaceholderEmail = 'Email';
 z.string.da.authPlaceholderPasswordPut = 'Adgangskode';
 z.string.da.authPlaceholderPasswordSet = 'Adgangskode (mindst 8 tegn)';
 z.string.da.authPlaceholderPhone = 'Telefon Nummer';
@@ -265,6 +262,7 @@ z.string.da.conversationSomeone = 'Nogen';
 z.string.da.conversationTweetAuthor = ' på Twitter';
 
 z.string.da.groupCreationParticipantsPlaceholder = 'Søg ved navn';
+
 
 z.string.da.collectionShowAll = 'Vis alle {{number}}';
 z.string.da.collectionSectionLinks = 'Links';
