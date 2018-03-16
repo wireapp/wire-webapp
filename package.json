@@ -131,7 +131,7 @@
     "request": "2.85.0",
     "sass-loader": "6.0.7",
     "script-loader": "0.7.2",
-    "sinon": "4.4.5",
+    "sinon": "4.4.6",
     "style-loader": "0.20.3",
     "uglify-js": "3.3.15",
     "uglifyjs-webpack-plugin": "1.2.3",
