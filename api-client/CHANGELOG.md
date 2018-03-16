@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="0.6.0"></a>
+# [0.6.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@0.5.24...@wireapp/api-client@0.6.0) (2018-03-16)
+
+
+### Features
+
+* **api-client:** Implements notification API calls ([#377](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/377)) ([e581090](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/e581090))
+
+
+
+
 <a name="0.5.24"></a>
 ## [0.5.24](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@0.5.23...@wireapp/api-client@0.5.24) (2018-03-16)
 
