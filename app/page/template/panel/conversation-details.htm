@@ -78,12 +78,12 @@
           <!-- ko if: conversationEntity().is_group() -->
             <!-- ko if: userParticipants().length -->
               <div class="conversation-details__list-head" data-bind="text: z.string.conversationDetailsPeople"></div>
-              <user-list params="user: userParticipants, click: clickOnShowParticipant, altStyle: true" data-uie-name="list-users"></user-list>
+              <user-list params="user: userParticipants, click: clickOnShowUser, altStyle: true" data-uie-name="list-users"></user-list>
             <!-- /ko -->
 
             <!-- ko if: serviceParticipants().length -->
               <div class="conversation-details__list-head" data-bind="text: z.string.conversationDetailsServices"></div>
-              <service-list params="services: serviceParticipants, click: clickOnShowParticipant, altStyle: true" data-uie-name="list-services"></service-list>
+              <service-list params="services: serviceParticipants, click: clickOnShowService, altStyle: true" data-uie-name="list-services"></service-list>
             <!-- /ko -->
           <!-- /ko -->
           <!-- ko if: isSingleUserMode() && conversationEntity().firstUserEntity() -->
