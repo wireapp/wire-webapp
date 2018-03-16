@@ -26,11 +26,16 @@ import ClientList from '../component/ClientList';
 import * as AuthAction from '../module/action/AuthAction';
 import {connect} from 'react-redux';
 import {clientManagerStrings} from '../../strings';
+import ROUTE from '../route';
 
 class ClientManager extends React.Component {
   componentWillMount = () => this.props.doGetAllClients();
 
-  logout = () => this.props.doLogout();
+  logout = () =>
+    this.props
+      .doLogout()
+      .catch(() => {})
+      .then(() => this.props.history.push(ROUTE.LOGIN));
 
   render() {
     const {intl: {formatMessage: _}} = this.props;
