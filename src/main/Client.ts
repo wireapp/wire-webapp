@@ -28,6 +28,7 @@ import {ConversationAPI} from './conversation/';
 import {GiphyAPI} from './giphy/';
 import {HttpClient} from './http/';
 import {InvitationAPI} from './invitation/';
+import {NotificationAPI} from './notification/';
 import {MemberAPI, PaymentAPI, TeamAPI, TeamInvitationAPI} from './team/';
 import {SelfAPI} from './self/';
 import {UserAPI} from './user/';
@@ -47,6 +48,7 @@ class Client {
   public conversation: {api: ConversationAPI};
   public giphy: {api: GiphyAPI};
   public invitation: {api: InvitationAPI};
+  public notification: {api: NotificationAPI};
   public self: {api: SelfAPI};
   public teams: {
     team: {api?: TeamAPI};
@@ -100,6 +102,9 @@ class Client {
     };
     this.invitation = {
       api: new InvitationAPI(this.transport.http),
+    };
+    this.notification = {
+      api: new NotificationAPI(this.transport.http),
     };
     this.self = {
       api: new SelfAPI(this.transport.http),
