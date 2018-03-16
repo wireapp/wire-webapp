@@ -177,32 +177,32 @@ z.assets.AssetService = class AssetService {
    * Post assets.
    *
    * @param {Uint8Array} assetData - Asset data
-   * @param {Object} metadata - Asset metadata
-   * @param {boolean} [metadata.public] - Flag whether asset is public
-   * @param {z.assets.AssetRetentionPolicy} [metadata.retention] - Retention duration policy for asset
+   * @param {Object} options - Asset metadata
+   * @param {boolean} options.public - Flag whether asset is public
+   * @param {z.assets.AssetRetentionPolicy} options.retention - Retention duration policy for asset
    * @param {Function} [xhrAccessorFunction] - Function will get a reference to the underlying XMLHTTPRequest
    * @returns {Promise} Resolves when asset has been uploaded
    */
-  postAsset(assetData, metadata, xhrAccessorFunction) {
+  postAsset(assetData, options, xhrAccessorFunction) {
     return new Promise((resolve, reject) => {
       const BOUNDARY = 'frontier';
 
-      metadata = Object.assign(
+      options = Object.assign(
         {
           public: false,
           retention: z.assets.AssetRetentionPolicy.PERSISTENT,
         },
-        metadata
+        options
       );
 
-      metadata = JSON.stringify(metadata);
+      options = JSON.stringify(options);
 
       let body = '';
       body += `--${BOUNDARY}\r\n`;
       body += 'Content-Type: application/json; charset=utf-8\r\n';
-      body += `Content-length: ${metadata.length}\r\n`;
+      body += `Content-length: ${options.length}\r\n`;
       body += '\r\n';
-      body += `${metadata}\r\n`;
+      body += `${options}\r\n`;
       body += `--${BOUNDARY}\r\n`;
       body += 'Content-Type: application/octet-stream\r\n';
       body += `Content-length: ${assetData.length}\r\n`;
