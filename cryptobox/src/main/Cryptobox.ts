@@ -113,11 +113,10 @@ class Cryptobox extends EventEmitter {
         if (identity) {
           this.identity = identity;
 
-          this.logger.log(
-            `Initialized Cryptobox with existing local identity. Fingerprint is "${identity.public_key.fingerprint()}".`
-          );
-
+          this.logger.log('Initialized Cryptobox with existing local identity.');
+          this.logger.log(`Identity fingerprint is "${identity.public_key.fingerprint()}".`);
           this.logger.log(`Loading PreKeys...`);
+
           return this.store.load_prekeys();
         }
         throw new CryptoboxError('Failed to load local identity');
@@ -125,7 +124,7 @@ class Cryptobox extends EventEmitter {
       .then((preKeysFromStorage: Array<ProteusKeys.PreKey>) => {
         const lastResortPreKey = preKeysFromStorage.find(preKey => preKey.key_id === ProteusKeys.PreKey.MAX_PREKEY_ID);
         if (lastResortPreKey) {
-          this.logger.log(`Loaded Last Resort PreKey with ID "${lastResortPreKey.key_id}".`, lastResortPreKey);
+          this.logger.log(`Loaded Last Resort PreKey with ID "${lastResortPreKey.key_id}".`);
           this.lastResortPreKey = lastResortPreKey;
 
           this.logger.log(`Loaded "${this.minimumAmountOfPreKeys - 1}" standard PreKeys...`);
