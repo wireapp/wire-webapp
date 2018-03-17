@@ -1756,10 +1756,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return this._send_and_inject_generic_message(conversationEntity, genericMessage);
       })
       .catch(error => {
-        this.logger.error(
-          `Failed to upload otr asset for conversation ${conversationEntity.id}: ${error.message}`,
-          error
-        );
+        const message = `Failed to upload otr asset for conversation ${conversationEntity.id}: ${error.message}`;
+        this.logger.error(message, error);
         throw error;
       });
   }
