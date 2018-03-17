@@ -1,6 +1,7 @@
 interface CRUDEngine {
   storeName: string;
   init(storeName: string, ...args: any[]): Promise<any>;
+  // Returns PrimaryKey of saved Record
   create<T>(tableName: string, primaryKey: string, entity: T): Promise<string>;
   // TODO: Implement "createAll"
   delete(tableName: string, primaryKey: string): Promise<string>;

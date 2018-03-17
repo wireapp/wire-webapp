@@ -20,6 +20,7 @@ const pkg = require('../package.json');
 import {IncomingNotification} from '@wireapp/api-client/dist/commonjs/conversation/index';
 import * as cryptobox from '@wireapp/cryptobox';
 import {CryptographyService, GenericMessageType, PayloadBundle} from './crypto/root';
+import {NotificationService} from './notification/root';
 import {Context, LoginData, PreKey} from '@wireapp/api-client/dist/commonjs/auth/index';
 import {
   ConversationEvent,
@@ -48,7 +49,7 @@ class Account extends EventEmitter {
   private apiClient: Client;
   public context?: Context;
   private protocolBuffers: any = {};
-  public service?: {conversation: ConversationService; crypto: CryptographyService};
+  public service?: {conversation: ConversationService; crypto: CryptographyService; notification: NotificationService};
 
   constructor(apiClient: Client = new Client()) {
     super();
@@ -339,9 +340,11 @@ class Account extends EventEmitter {
       .then(() => {
         const crypto: CryptographyService = new CryptographyService(this.apiClient.config.store);
         const conversation: ConversationService = new ConversationService(this.apiClient, this.protocolBuffers, crypto);
+        const notification: NotificationService = new NotificationService(this.apiClient, this.apiClient.config.store);
         this.service = {
           conversation,
           crypto,
+          notification,
         };
       });
   }
@@ -465,6 +468,7 @@ class Account extends EventEmitter {
 
     const client = await this.apiClient.client.api.postClient(newClient);
     await this.service.crypto.saveClient(client);
+    await this.service.notification.initializeNotificationStream(client.id);
 
     return client;
   }
