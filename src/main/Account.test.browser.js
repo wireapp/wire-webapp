@@ -12,7 +12,7 @@ describe('Account', () => {
       }
     });
 
-    it('creates a client of there is none', async done => {
+    it('creates a client if there is none', async done => {
       const engine = new IndexedDBEngine();
       const apiClient = new Client({
         schemaCallback: db => {
