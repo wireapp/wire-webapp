@@ -77,6 +77,7 @@ class InitialInvite extends React.PureComponent {
         margin: '17px auto',
         padding: '0 24px 0 20px',
       }}
+      key={email}
     >
       <Text fontSize="14px" data-uie-name="item-pending-email">
         {email}
@@ -87,10 +88,11 @@ class InitialInvite extends React.PureComponent {
 
   handleSubmit = event => {
     event.preventDefault();
+    this.emailInput.value = this.emailInput.value.trim();
     if (!this.emailInput.checkValidity()) {
       this.setState({error: ValidationError.handleValidationState('email', this.emailInput.validity)});
     } else {
-      this.props.invite({email: this.emailInput.value.trim()});
+      this.props.invite({email: this.emailInput.value});
       this.setState({enteredEmail: ''});
       this.emailInput.value = '';
     }

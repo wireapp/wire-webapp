@@ -1497,47 +1497,50 @@ z.conversation.ConversationRepository = class ConversationRepository {
   // Send encrypted events
   //##############################################################################
 
-  send_asset_remotedata(conversation_et, file, message_id) {
-    let generic_message;
+  send_asset_remotedata(conversationEntity, file, messageId) {
+    let genericMessage;
 
-    return this.get_message_in_conversation_by_id(conversation_et, message_id)
-      .then(message_et => {
-        const asset_et = message_et.get_first_asset();
+    return this.get_message_in_conversation_by_id(conversationEntity, messageId)
+      .then(messageEntity => {
+        const assetEntity = messageEntity.get_first_asset();
+        const options = {
+          retention: this.asset_service.getAssetRetention(this.selfUser(), conversationEntity),
+        };
 
-        asset_et.uploaded_on_this_client(true);
-        return this.asset_service.uploadAsset(file, null, xhr => {
-          xhr.upload.onprogress = event => asset_et.upload_progress(Math.round(event.loaded / event.total * 100));
-          asset_et.upload_cancel = () => xhr.abort();
+        assetEntity.uploaded_on_this_client(true);
+        return this.asset_service.uploadAsset(file, options, xhr => {
+          xhr.upload.onprogress = event => assetEntity.upload_progress(Math.round(event.loaded / event.total * 100));
+          assetEntity.upload_cancel = () => xhr.abort();
         });
       })
       .then(asset => {
-        generic_message = new z.proto.GenericMessage(message_id);
-        generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, asset);
+        genericMessage = new z.proto.GenericMessage(messageId);
+        genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, asset);
 
-        if (conversation_et.ephemeral_timer()) {
-          generic_message = this._wrap_in_ephemeral_message(generic_message, conversation_et.ephemeral_timer());
+        if (conversationEntity.ephemeral_timer()) {
+          genericMessage = this._wrap_in_ephemeral_message(genericMessage, conversationEntity.ephemeral_timer());
         }
 
-        return this.send_generic_message_to_conversation(conversation_et.id, generic_message);
+        return this.send_generic_message_to_conversation(conversationEntity.id, genericMessage);
       })
       .then(payload => {
-        const {uploaded: asset_data} = conversation_et.ephemeral_timer()
-          ? generic_message.ephemeral.asset
-          : generic_message.asset;
+        const {uploaded: assetData} = conversationEntity.ephemeral_timer()
+          ? genericMessage.ephemeral.asset
+          : genericMessage.asset;
 
         const data = {
-          key: asset_data.asset_id,
-          otr_key: asset_data.otr_key,
-          sha256: asset_data.sha256,
-          token: asset_data.asset_token,
+          key: assetData.asset_id,
+          otr_key: assetData.otr_key,
+          sha256: assetData.sha256,
+          token: assetData.asset_token,
         };
 
-        const asset_add_event = z.conversation.EventBuilder.buildAssetAdd(conversation_et, data, this.timeOffset);
+        const assetAddEvent = z.conversation.EventBuilder.buildAssetAdd(conversationEntity, data, this.timeOffset);
 
-        asset_add_event.id = message_id;
-        asset_add_event.time = payload.time;
+        assetAddEvent.id = messageId;
+        assetAddEvent.time = payload.time;
 
-        return this._on_asset_upload_complete(conversation_et, asset_add_event);
+        return this._on_asset_upload_complete(conversationEntity, assetAddEvent);
       });
   }
 
@@ -1609,7 +1612,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
           throw Error('No image available');
         }
 
-        return this.asset_service.uploadAsset(imageBlob).then(uploadedImageAsset => {
+        const options = {
+          retention: this.asset_service.getAssetRetention(this.selfUser(), conversationEntity),
+        };
+
+        return this.asset_service.uploadAsset(imageBlob, options).then(uploadedImageAsset => {
           const asset = new z.proto.Asset();
           const assetPreview = new z.proto.Asset.Preview(imageBlob.type, imageBlob.size, uploadedImageAsset.uploaded);
           asset.set('preview', assetPreview);
@@ -1727,25 +1734,30 @@ z.conversation.ConversationRepository = class ConversationRepository {
   /**
    * Sends image asset in specified conversation using v3 api.
    *
-   * @param {Conversation} conversation_et - Conversation to send image in
+   * @param {Conversation} conversationEntity - Conversation to send image in
    * @param {File|Blob} image - Image
    * @returns {Promise} Resolves when the image was sent
    */
-  send_image_asset(conversation_et, image) {
-    return this.asset_service
-      .uploadImageAsset(image)
-      .then(asset => {
-        let generic_message = new z.proto.GenericMessage(z.util.createRandomUuid());
-        generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, asset);
+  send_image_asset(conversationEntity, image) {
+    const options = {
+      retention: this.asset_service.getAssetRetention(this.selfUser(), conversationEntity),
+    };
 
-        if (conversation_et.ephemeral_timer()) {
-          generic_message = this._wrap_in_ephemeral_message(generic_message, conversation_et.ephemeral_timer());
+    return this.asset_service
+      .uploadImageAsset(image, options)
+      .then(asset => {
+        let genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
+        genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, asset);
+
+        if (conversationEntity.ephemeral_timer()) {
+          genericMessage = this._wrap_in_ephemeral_message(genericMessage, conversationEntity.ephemeral_timer());
         }
 
-        return this._send_and_inject_generic_message(conversation_et, generic_message);
+        return this._send_and_inject_generic_message(conversationEntity, genericMessage);
       })
       .catch(error => {
-        this.logger.error(`Failed to upload otr asset for conversation ${conversation_et.id}: ${error.message}`, error);
+        const message = `Failed to upload otr asset for conversation ${conversationEntity.id}: ${error.message}`;
+        this.logger.error(message, error);
         throw error;
       });
   }

@@ -42,8 +42,8 @@ z.assets.AssetService = class AssetService {
     return Promise.all([this._compressProfileImage(image), this._compressImage(image)])
       .then(([{compressedBytes: smallImageBytes}, {compressedBytes: mediumImageBytes}]) => {
         return Promise.all([
-          this.postAsset(smallImageBytes, {public: true}),
-          this.postAsset(mediumImageBytes, {public: true}),
+          this.postAsset(smallImageBytes, {public: true, retention: z.assets.AssetRetentionPolicy.ETERNAL}),
+          this.postAsset(mediumImageBytes, {public: true, retention: z.assets.AssetRetentionPolicy.ETERNAL}),
         ]);
       })
       .then(([smallCredentials, mediumCredentials]) => [smallCredentials.key, mediumCredentials.key]);
@@ -173,36 +173,43 @@ z.assets.AssetService = class AssetService {
     });
   }
 
+  getAssetRetention(userEntity, conversationEntity) {
+    const isTeamMember = userEntity.is_team_member();
+    const isTeamConversation = conversationEntity.inTeam();
+    const isEternal = isTeamMember || isTeamConversation;
+    return isEternal ? z.assets.AssetRetentionPolicy.ETERNAL : z.assets.AssetRetentionPolicy.PERSISTENT;
+  }
+
   /**
    * Post assets.
    *
    * @param {Uint8Array} assetData - Asset data
-   * @param {Object} metadata - Asset metadata
-   * @param {boolean} [metadata.public] - Flag whether asset is public
-   * @param {z.assets.AssetRetentionPolicy} [metadata.retention] - Retention duration policy for asset
+   * @param {Object} options - Asset metadata
+   * @param {boolean} options.public - Flag whether asset is public
+   * @param {z.assets.AssetRetentionPolicy} options.retention - Retention duration policy for asset
    * @param {Function} [xhrAccessorFunction] - Function will get a reference to the underlying XMLHTTPRequest
    * @returns {Promise} Resolves when asset has been uploaded
    */
-  postAsset(assetData, metadata, xhrAccessorFunction) {
+  postAsset(assetData, options, xhrAccessorFunction) {
     return new Promise((resolve, reject) => {
       const BOUNDARY = 'frontier';
 
-      metadata = Object.assign(
+      options = Object.assign(
         {
           public: false,
           retention: z.assets.AssetRetentionPolicy.PERSISTENT,
         },
-        metadata
+        options
       );
 
-      metadata = JSON.stringify(metadata);
+      options = JSON.stringify(options);
 
       let body = '';
       body += `--${BOUNDARY}\r\n`;
       body += 'Content-Type: application/json; charset=utf-8\r\n';
-      body += `Content-length: ${metadata.length}\r\n`;
+      body += `Content-length: ${options.length}\r\n`;
       body += '\r\n';
-      body += `${metadata}\r\n`;
+      body += `${options}\r\n`;
       body += `--${BOUNDARY}\r\n`;
       body += 'Content-Type: application/octet-stream\r\n';
       body += `Content-length: ${assetData.length}\r\n`;
