@@ -46,7 +46,8 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
     this.remoteUserEntities = ko.pureComputed(() => {
       return this.userEntities()
         .filter(userEntity => !userEntity.is_me)
-        .map(userEntity => userEntity);
+        .map(userEntity => userEntity)
+        .sort((userA, userB) => z.util.StringUtil.sort_by_priority(userA.first_name(), userB.first_name()));
     });
 
     this.senderName = ko.pureComputed(() => {

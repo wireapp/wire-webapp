@@ -24,6 +24,7 @@ window.z.util = z.util || {};
 
 (() => {
   const APP_ENV = {
+    INTERNAL: 'wire-webapp-staging.wire.com',
     LOCALHOST: 'localhost',
     PROD_NEXT: 'wire-webapp-prod-next.wire.com',
     PRODUCTION: 'app.wire.com',
@@ -145,6 +146,7 @@ window.z.util = z.util || {};
     desktop: _check.isDesktop(),
     electron: _check.isElectron(),
     frontend: {
+      isInternal: () => window.location.hostname === APP_ENV.INTERNAL,
       isLocalhost: () => [APP_ENV.LOCALHOST, APP_ENV.VIRTUAL_HOST].includes(window.location.hostname),
       isProduction: () => [APP_ENV.PRODUCTION, APP_ENV.PROD_NEXT].includes(window.location.hostname),
     },

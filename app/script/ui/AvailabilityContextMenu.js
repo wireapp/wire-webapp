@@ -22,8 +22,8 @@
 window.z = window.z || {};
 window.z.ui = z.ui || {};
 
-z.ui.AvailabilityContextMenu = (() => {
-  const show = (event, method, elementName) => {
+z.ui.AvailabilityContextMenu = {
+  show: (event, method, elementName) => {
     const entries = [
       {
         click: () => amplify.publish(z.event.WebApp.USER.SET_AVAILABILITY, z.user.AvailabilityType.NONE, method),
@@ -48,9 +48,5 @@ z.ui.AvailabilityContextMenu = (() => {
     ];
 
     z.ui.Context.from(event, entries, elementName);
-  };
-
-  return {
-    show,
-  };
-})();
+  },
+};

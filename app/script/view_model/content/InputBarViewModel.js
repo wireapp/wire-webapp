@@ -25,369 +25,297 @@ window.z.viewModel.content = z.viewModel.content || {};
 
 // Parent: z.viewModel.ContentViewModel
 z.viewModel.content.InputBarViewModel = class InputBarViewModel {
+  static get CONFIG() {
+    return {
+      ASSETS: {
+        CONCURRENT_UPLOAD_LIMIT: 10,
+      },
+      GIPHY_TEXT_LENGTH: 256,
+      IMAGE: {
+        FILE_TYPES: ['image/bmp', 'image/jpeg', 'image/jpg', 'image/png', '.jpg-large'],
+      },
+      PING_TIMEOUT: 2000,
+    };
+  }
+
   constructor(mainViewModel, contentViewModel, repositories) {
-    this.added_to_view = this.added_to_view.bind(this);
-    this.on_drop_files = this.on_drop_files.bind(this);
-    this.on_paste_files = this.on_paste_files.bind(this);
-    this.on_window_click = this.on_window_click.bind(this);
-    this.show_separator = this.show_separator.bind(this);
+    this.addedToView = this.addedToView.bind(this);
+    this.clickToPing = this.clickToPing.bind(this);
+    this.onDropFiles = this.onDropFiles.bind(this);
+    this.onPasteFiles = this.onPasteFiles.bind(this);
+    this.onWindowClick = this.onWindowClick.bind(this);
 
     this.emojiInput = contentViewModel.emojiInput;
 
-    this.conversation_repository = repositories.conversation;
-    this.user_repository = repositories.user;
+    this.conversationRepository = repositories.conversation;
+    this.userRepository = repositories.user;
     this.logger = new z.util.Logger('z.viewModel.content.InputBarViewModel', z.config.LOGGER.OPTIONS);
 
-    this.conversation_et = this.conversation_repository.active_conversation;
-    this.conversation_et.subscribe(() => {
-      this.conversation_has_focus(true);
-      this.pasted_file(null);
-      this.cancel_edit();
-    });
+    this.conversationEntity = this.conversationRepository.active_conversation;
+    this.selfUser = this.userRepository.self;
 
-    this.self = this.user_repository.self;
-    this.list_not_bottom = ko.observable(true);
+    this.conversationHasFocus = ko.observable(true).extend({notify: 'always'});
 
-    this.pasted_file = ko.observable();
-    this.pasted_file_preview_url = ko.observable();
-    this.pasted_file_name = ko.observable();
-    this.pasted_file.subscribe(blob => {
-      if (blob) {
-        if (z.config.SUPPORTED_CONVERSATION_IMAGE_TYPES.includes(blob.type)) {
-          this.pasted_file_preview_url(URL.createObjectURL(blob));
-        }
+    this.editMessageEntity = ko.observable();
+    this.editInput = ko.observable('');
 
-        const date = moment(blob.lastModifiedDate).format('MMMM Do YYYY, h:mm:ss a');
-        this.pasted_file_name(z.l10n.text(z.string.conversationSendPastedFile, date));
-      } else {
-        this.pasted_file_preview_url(null);
-        this.pasted_file_name(null);
+    this.pastedFile = ko.observable();
+    this.pastedFilePreviewUrl = ko.observable();
+    this.pastedFileName = ko.observable();
+
+    this.pingDisabled = ko.observable(false);
+
+    this.ephemeralTimerText = ko.pureComputed(() => {
+      if (this.hasEphemeralTimer()) {
+        return z.util.TimeUtil.formatMilliseconds(this.conversationEntity().ephemeral_timer());
       }
+      return {};
     });
-
-    this.edit_message_et = ko.observable();
-    this.edit_input = ko.observable('');
-    this.is_editing = ko.pureComputed(() => this.edit_message_et() != null);
-
-    this.is_editing.subscribe(is_editing => {
-      if (is_editing) {
-        return window.addEventListener('click', this.on_window_click);
-      }
-      window.removeEventListener('click', this.on_window_click);
+    this.hasConversation = ko.pureComputed(() => !!this.conversationEntity());
+    this.hasEphemeralTimer = ko.pureComputed(() => {
+      return this.hasConversation() ? this.conversationEntity().ephemeral_timer() : false;
     });
-
-    this.has_ephemeral_timer = ko.pureComputed(() => {
-      if (this.conversation_et()) {
-        return this.conversation_et().ephemeral_timer();
-      }
-    });
-
-    this.conversation_has_focus = ko.observable(true).extend({notify: 'always'});
-    this.browser_has_focus = ko.observable(true);
-
-    this.blinking_cursor = ko
-      .pureComputed(() => this.is_editing() || this.conversation_has_focus())
-      .extend({notify: 'always'});
-
-    this.has_text_input = ko.pureComputed(() => {
-      if (this.conversation_et()) {
-        return this.conversation_et().input().length > 0;
-      }
-    });
-
-    this.show_giphy_button = ko.pureComputed(() => {
-      if (this.conversation_et()) {
-        return this.has_text_input() && this.conversation_et().input().length <= 256;
-      }
+    this.hasFocus = ko.pureComputed(() => this.isEditing() || this.conversationHasFocus()).extend({notify: 'always'});
+    this.hasTextInput = ko.pureComputed(() => {
+      return this.hasConversation() ? this.conversationEntity().input().length > 0 : false;
     });
 
     this.input = ko.pureComputed({
       read: () => {
-        if (this.is_editing()) {
-          return this.edit_input();
+        if (this.isEditing()) {
+          return this.editInput();
         }
 
-        if (this.conversation_et()) {
-          return this.conversation_et().input() || '';
+        if (this.hasConversation()) {
+          return this.conversationEntity().input() || '';
         }
 
         return '';
       },
       write: value => {
-        if (this.is_editing()) {
-          return this.edit_input(value);
+        if (this.isEditing()) {
+          return this.editInput(value);
         }
 
-        if (this.conversation_et()) {
-          this.conversation_et().input(value);
+        if (this.conversationEntity()) {
+          this.conversationEntity().input(value);
         }
       },
     });
 
-    this.show_availability_tooltip = ko.pureComputed(() => {
-      if (this.conversation_et() && this.conversation_et().firstUserEntity()) {
-        const isOne2OneConversation = this.conversation_et().is_one2one();
-        const firstUserEntity = this.conversation_et().firstUserEntity();
+    this.inputPlaceholder = ko.pureComputed(() => {
+      let stringId;
+
+      if (this.showAvailabilityTooltip()) {
+        const userEntity = this.conversationEntity().firstUserEntity();
+
+        switch (userEntity.availability()) {
+          case z.user.AvailabilityType.AVAILABLE:
+            stringId = z.string.tooltipConversationInputPlaceholderAvailable;
+            break;
+          case z.user.AvailabilityType.AWAY:
+            stringId = z.string.tooltipConversationInputPlaceholderAway;
+            break;
+          case z.user.AvailabilityType.BUSY:
+            stringId = z.string.tooltipConversationInputPlaceholderBusy;
+            break;
+        }
+
+        return z.l10n.text(stringId, userEntity.first_name());
+      }
+
+      stringId = this.conversationEntity().ephemeral_timer()
+        ? z.string.tooltipConversationEphemeral
+        : z.string.tooltipConversationInputPlaceholder;
+
+      return z.l10n.text(stringId);
+    });
+
+    this.isEditing = ko.pureComputed(() => !!this.editMessageEntity());
+
+    this.showAvailabilityTooltip = ko.pureComputed(() => {
+      if (this.hasConversation() && this.conversationEntity().firstUserEntity()) {
+        const isOne2OneConversation = this.conversationEntity().is_one2one();
+        const firstUserEntity = this.conversationEntity().firstUserEntity();
         const availabilityIsNone = firstUserEntity.availability() === z.user.AvailabilityType.NONE;
-        return this.self().is_team_member() && isOne2OneConversation && !availabilityIsNone;
+        return this.selfUser().is_team_member() && isOne2OneConversation && !availabilityIsNone;
       }
 
       return false;
     });
 
-    this.file_tooltip = z.l10n.text(z.string.tooltipConversationFile);
-    this.input_placeholder = ko.pureComputed(() => {
-      if (this.show_availability_tooltip()) {
-        const userEntity = this.conversation_et().firstUserEntity();
-
-        switch (userEntity.availability()) {
-          case z.user.AvailabilityType.AVAILABLE:
-            return z.l10n.text(z.string.tooltipConversationInputPlaceholderAvailable, userEntity.first_name());
-          case z.user.AvailabilityType.AWAY:
-            return z.l10n.text(z.string.tooltipConversationInputPlaceholderAway, userEntity.first_name());
-          case z.user.AvailabilityType.BUSY:
-            return z.l10n.text(z.string.tooltipConversationInputPlaceholderBusy, userEntity.first_name());
-        }
+    this.showGiphyButton = ko.pureComputed(() => {
+      if (this.hasConversation() && this.hasTextInput()) {
+        return this.conversationEntity().input().length <= InputBarViewModel.CONFIG.GIPHY_TEXT_LENGTH;
       }
-
-      if (this.conversation_et().ephemeral_timer()) {
-        return z.l10n.text(z.string.tooltipConversationEphemeral);
-      }
-      return z.l10n.text(z.string.tooltipConversationInputPlaceholder);
     });
-    this.ping_tooltip = z.l10n.text(
-      z.string.tooltipConversationPing,
-      z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.PING)
-    );
-    this.picture_tooltip = z.l10n.text(z.string.tooltipConversationPicture);
-    this.ping_disabled = ko.observable(false);
 
-    $(window)
-      .blur(() => this.browser_has_focus(false))
-      .focus(() => this.browser_has_focus(true));
+    const pingShortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.PING);
+    this.pingTooltip = z.l10n.text(z.string.tooltipConversationPing, pingShortcut);
+
+    this.conversationEntity.subscribe(() => {
+      this.conversationHasFocus(true);
+      this.pastedFile(null);
+      this.cancelMessageEditing();
+    });
+
+    this.isEditing.subscribe(isEditing => {
+      if (isEditing) {
+        return window.addEventListener('click', this.onWindowClick);
+      }
+
+      window.removeEventListener('click', this.onWindowClick);
+    });
+
+    this.pastedFile.subscribe(blob => {
+      if (blob) {
+        const isSupportedFileType = InputBarViewModel.CONFIG.IMAGE.FILE_TYPES.includes(blob.type);
+        if (isSupportedFileType) {
+          this.pastedFilePreviewUrl(URL.createObjectURL(blob));
+        }
+
+        const date = moment(blob.lastModifiedDate).format('MMMM Do YYYY, h:mm:ss a');
+        return this.pastedFileName(z.l10n.text(z.string.conversationSendPastedFile, date));
+      }
+
+      this.pastedFilePreviewUrl(null);
+      this.pastedFileName(null);
+    });
 
     this._init_subscriptions();
   }
 
   _init_subscriptions() {
-    amplify.subscribe(z.event.WebApp.SEARCH.SHOW, () => this.conversation_has_focus(false));
+    amplify.subscribe(z.event.WebApp.CONVERSATION.IMAGE.SEND, this.uploadImages.bind(this));
+    amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.EDIT, this.editMessage.bind(this));
+    amplify.subscribe(z.event.WebApp.EXTENSIONS.GIPHY.SEND, this.sendGiphy.bind(this));
+    amplify.subscribe(z.event.WebApp.SEARCH.SHOW, () => this.conversationHasFocus(false));
     amplify.subscribe(z.event.WebApp.SEARCH.HIDE, () =>
-      window.requestAnimationFrame(() => this.conversation_has_focus(true))
+      window.requestAnimationFrame(() => this.conversationHasFocus(true))
     );
-    amplify.subscribe(z.event.WebApp.EXTENSIONS.GIPHY.SEND, this.send_giphy.bind(this));
-    amplify.subscribe(z.event.WebApp.CONVERSATION.IMAGE.SEND, this.upload_images.bind(this));
-    amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.EDIT, this.edit_message.bind(this));
   }
 
-  added_to_view() {
-    window.setTimeout(() => {
-      amplify.subscribe(z.event.WebApp.SHORTCUT.PING, () => this.ping());
-    }, 50);
+  addedToView() {
+    amplify.subscribe(z.event.WebApp.SHORTCUT.PING, this.clickToPing);
   }
 
-  removed_from_view() {
-    amplify.unsubscribeAll(z.event.WebApp.SHORTCUT.PING);
+  cancelMessageEditing() {
+    this.emojiInput.removeEmojiPopup();
+
+    if (this.editMessageEntity()) {
+      this.editMessageEntity().isEditing(false);
+    }
+
+    this.editMessageEntity(undefined);
+    this.editInput('');
   }
 
-  toggle_extensions_menu() {
+  /**
+   * Click on ephemeral button
+   * @param {Object} data - Object
+   * @param {DOMEvent} event - Triggered event
+   * @returns {undefined} No return value
+   */
+  clickOnEphemeral(data, event) {
+    const entries = [
+      {
+        click: () => this.setEphemeralTimer(0),
+        label: z.l10n.text(z.string.ephememalUnitsNone),
+      },
+    ].concat(
+      z.ephemeral.timings.getValues().map(milliseconds => {
+        const {unit, value} = z.util.TimeUtil.formatMilliseconds(milliseconds);
+        const localizedUnit = this._getLocalizedUnitString(value, unit);
+
+        return {
+          click: () => this.setEphemeralTimer(milliseconds),
+          label: `${value} ${localizedUnit}`,
+        };
+      })
+    );
+
+    z.ui.Context.from(event, entries, 'ephemeral-options-menu');
+  }
+
+  clickToCancelPastedFile() {
+    this.pastedFile(null);
+  }
+
+  clickToShowGiphy() {
     amplify.publish(z.event.WebApp.EXTENSIONS.GIPHY.SHOW);
   }
 
-  ping() {
-    if (this.conversation_et() && !this.ping_disabled()) {
-      this.ping_disabled(true);
-      this.conversation_repository.send_knock(this.conversation_et()).then(() => {
-        window.setTimeout(() => {
-          this.ping_disabled(false);
-        }, 2000);
+  clickToPing() {
+    if (this.hasConversation() && !this.pingDisabled()) {
+      this.pingDisabled(true);
+      this.conversationRepository.send_knock(this.conversationEntity()).then(() => {
+        window.setTimeout(() => this.pingDisabled(false), InputBarViewModel.CONFIG.PING_TIMEOUT);
       });
     }
   }
 
-  send_giphy() {
-    if (this.conversation_et()) {
-      this.conversation_et().input('');
-    }
+  clickToSendPastedFile() {
+    const pastedFile = this.pastedFile();
+    this.onDropFiles([pastedFile]);
+    this.pastedFile(null);
   }
 
-  send_message(message) {
-    if (message.length > 0) {
-      this.conversation_repository.send_text_with_link_preview(message, this.conversation_et());
-    }
-  }
-
-  send_message_edit(message, message_et) {
-    this.cancel_edit();
-
-    if (!message.length) {
-      return this.conversation_repository.delete_message_everyone(this.conversation_et(), message_et);
-    }
-
-    if (message !== message_et.get_first_asset().text) {
-      this.conversation_repository.send_message_edit(message, message_et, this.conversation_et());
-    }
-  }
-
-  set_ephemeral_timer(millis) {
-    if (!millis) {
-      this.conversation_et().ephemeral_timer(false);
-      return this.logger.info(
-        `Ephemeral timer for conversation '${this.conversation_et().display_name()}' turned off.`
-      );
-    }
-
-    this.conversation_et().ephemeral_timer(millis);
-    this.logger.info(
-      `Ephemeral timer for conversation '${this.conversation_et().display_name()}' is now at '${this.conversation_et().ephemeral_timer()}'.`
-    );
-  }
-
-  /**
-   * Post images to a conversation.
-   * @param {Array|FileList} images - Images
-   * @returns {undefined} No return value
-   */
-  upload_images(images) {
-    if (!this._is_hitting_upload_limit(images)) {
-      for (const image of [...images]) {
-        if (image.size > z.config.MAXIMUM_IMAGE_FILE_SIZE) {
-          return this._show_upload_warning(image);
-        }
+  editMessage(messageEntity, inputElement) {
+    if (messageEntity && (messageEntity.is_editable() && messageEntity !== this.editMessageEntity())) {
+      this.cancelMessageEditing();
+      this.editMessageEntity(messageEntity);
+      this.editMessageEntity().isEditing(true);
+      this.input(this.editMessageEntity().get_first_asset().text);
+      if (inputElement) {
+        this._moveCursorToEnd(inputElement);
       }
-
-      this.conversation_repository.upload_images(this.conversation_et(), images);
     }
   }
 
-  /**
-   * Post files to a conversation.
-   * @param {Array|FileList} files - Images
-   * @returns {undefined} No return value
-   */
-  upload_files(files) {
-    if (!this._is_hitting_upload_limit(files)) {
-      for (const file of [...files]) {
-        if (file.size > z.config.MAXIMUM_ASSET_FILE_SIZE) {
-          const fileSize = z.util.formatBytes(z.config.MAXIMUM_ASSET_FILE_SIZE);
-          const options = {
-            text: {
-              message: z.l10n.text(z.string.modalAssetTooLargeMessage, fileSize),
-              title: z.l10n.text(z.string.modalAssetTooLargeHeadline),
-            },
-          };
-
-          return amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, options);
-        }
-      }
-
-      this.conversation_repository.upload_files(this.conversation_et(), files);
-    }
-  }
-
-  on_paste_files(pasted_files) {
-    this.pasted_file(pasted_files[0]);
-  }
-
-  on_send_pasted_files() {
-    const pasted_file = this.pasted_file();
-    this.on_drop_files([pasted_file]);
-    this.pasted_file(null);
-  }
-
-  on_cancel_pasted_files() {
-    this.pasted_file(null);
-  }
-
-  on_drop_files(dropped_files) {
+  onDropFiles(droppedFiles) {
     const images = [];
     const files = [];
 
-    if (!this._is_hitting_upload_limit(dropped_files)) {
-      for (const file of Array.from(dropped_files)) {
-        switch (true) {
-          case z.config.SUPPORTED_CONVERSATION_IMAGE_TYPES.includes(file.type):
-            images.push(file);
-            break;
-          default:
-            files.push(file);
+    if (!this._isHittingUploadLimit(droppedFiles)) {
+      Array.from(droppedFiles).forEach(file => {
+        const isSupportedImage = InputBarViewModel.CONFIG.IMAGE.FILE_TYPES.includes(file.type);
+        if (isSupportedImage) {
+          return images.push(file);
         }
-      }
+        files.push(file);
+      });
 
-      this.upload_images(images);
-      this.upload_files(files);
+      this.uploadImages(images);
+      this.uploadFiles(files);
     }
   }
 
-  _show_upload_warning(image) {
-    const isGif = image.type === 'image/gif';
-    const messageStringId = isGif ? z.string.modalGifTooLargeMessage : z.string.modalPictureTooLargeMessage;
-    const titleStringId = isGif ? z.string.modalGifTooLargeHeadline : z.string.modalPictureTooLargeHeadline;
-
-    const modalOptions = {
-      text: {
-        message: z.l10n.text(messageStringId, z.config.MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024),
-        title: z.l10n.text(titleStringId),
-      },
-    };
-
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
+  onPasteFiles(pastedFiles) {
+    const [pastedFile] = pastedFiles;
+    this.pastedFile(pastedFile);
   }
 
-  _is_hitting_upload_limit(files) {
-    const pending_uploads = this.conversation_repository.get_number_of_pending_uploads();
-    const is_hitting_upload_limit = pending_uploads + files.length > z.config.MAXIMUM_ASSET_UPLOADS;
-
-    if (is_hitting_upload_limit) {
-      const modalOptions = {
-        text: {
-          message: z.l10n.text(z.string.modalAssetParallelUploadsMessage, z.config.MAXIMUM_ASSET_UPLOADS),
-          title: z.l10n.text(z.string.modalAssetParallelUploadsHeadline),
-        },
-      };
-
-      amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
-    }
-
-    return is_hitting_upload_limit;
-  }
-
-  scroll_message_list(list_height_new, list_height_old) {
-    const antiscroll = $('.message-list').data('antiscroll');
-    if (antiscroll) {
-      antiscroll.rebuild();
-    }
-
-    if ($('.messages-wrap').is_scrolled_bottom()) {
-      return $('.messages-wrap').scrollToBottom();
-    }
-
-    return $('.messages-wrap').scrollBy(list_height_new - list_height_old);
-  }
-
-  show_separator(is_scrolled_bottom) {
-    this.list_not_bottom(!is_scrolled_bottom);
-  }
-
-  on_window_click(event) {
+  onWindowClick(event) {
     if (!$(event.target).closest('.conversation-input-bar').length) {
-      this.cancel_edit();
+      this.cancelMessageEditing();
     }
   }
 
-  on_input_click() {
-    if (!this.has_text_input()) {
+  onInputClick() {
+    if (!this.hasTextInput()) {
       amplify.publish(z.event.WebApp.CONVERSATION.INPUT.CLICK);
     }
   }
 
-  on_input_enter(data, event) {
-    if (this.pasted_file()) {
-      return this.on_send_pasted_files();
+  onInputEnter(data, event) {
+    if (this.pastedFile()) {
+      return this.onSendPastedFile();
     }
 
-    const message = z.util.StringUtil.trimLineBreaks(this.input());
+    const messageText = z.util.StringUtil.trimLineBreaks(this.input());
 
-    if (message.length > z.config.MAXIMUM_MESSAGE_LENGTH) {
+    const isMessageTextTooLong = messageText.length > z.config.MAXIMUM_MESSAGE_LENGTH;
+    if (isMessageTextTooLong) {
       return amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, {
         text: {
           message: z.l10n.text(z.string.modalConversationMessageTooLongMessage, z.config.MAXIMUM_MESSAGE_LENGTH),
@@ -396,44 +324,42 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       });
     }
 
-    if (this.is_editing()) {
-      this.send_message_edit(message, this.edit_message_et());
+    if (this.isEditing()) {
+      this.sendMessageEdit(messageText, this.editMessageEntity());
     } else {
-      this.send_message(message);
+      this.sendMessage(messageText);
     }
 
     this.input('');
     $(event.target).focus();
   }
 
-  on_input_key_up(data, keyboard_event) {
-    this.emojiInput.on_input_key_up(data, keyboard_event);
-  }
+  onInputKeyDown(data, keyboardEvent) {
+    const inputHandledByEmoji = this.emojiInput.onInputKeyDown(data, keyboardEvent);
 
-  on_input_key_down(data, keyboard_event) {
-    if (!this.emojiInput.on_input_key_down(data, keyboard_event)) {
-      switch (keyboard_event.key) {
+    if (!inputHandledByEmoji) {
+      switch (keyboardEvent.key) {
         case z.util.KeyboardUtil.KEY.ARROW_UP: {
           if (!this.input().length) {
-            this.edit_message(this.conversation_et().get_last_editable_message(), keyboard_event.target);
+            this.editMessage(this.conversationEntity().get_last_editable_message(), keyboardEvent.target);
           }
           break;
         }
 
         case z.util.KeyboardUtil.KEY.ESC: {
-          if (this.pasted_file()) {
-            this.pasted_file(null);
+          if (this.pastedFile()) {
+            this.pastedFile(null);
           } else {
-            this.cancel_edit();
+            this.cancelMessageEditing();
           }
           break;
         }
 
         case z.util.KeyboardUtil.KEY.ENTER: {
-          if (keyboard_event.altKey || keyboard_event.metaKey) {
-            z.util.KeyboardUtil.insertAtCaret(keyboard_event.target, '\n');
-            $(keyboard_event.target).change();
-            keyboard_event.preventDefault();
+          if (keyboardEvent.altKey || keyboardEvent.metaKey) {
+            z.util.KeyboardUtil.insertAtCaret(keyboardEvent.target, '\n');
+            $(keyboardEvent.target).change();
+            keyboardEvent.preventDefault();
           }
           break;
         }
@@ -446,87 +372,174 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     }
   }
 
-  edit_message(message_et, input_element) {
-    if (message_et && (message_et.is_editable() && message_et !== this.edit_message_et())) {
-      this.cancel_edit();
-      this.edit_message_et(message_et);
-      this.edit_message_et().is_editing(true);
-      this.input(this.edit_message_et().get_first_asset().text);
-      if (input_element) {
-        this._move_cursor_to_end(input_element);
+  onInputKeyUp(data, keyboardEvent) {
+    this.emojiInput.onInputKeyUp(data, keyboardEvent);
+  }
+
+  removedFromView() {
+    amplify.unsubscribeAll(z.event.WebApp.SHORTCUT.PING);
+  }
+
+  scrollMessageList(newListHeight, previousListHeight) {
+    const antiscroll = $('.message-list').data('antiscroll');
+    if (antiscroll) {
+      antiscroll.rebuild();
+    }
+
+    if ($('.messages-wrap').is_scrolled_bottom()) {
+      return $('.messages-wrap').scroll_to_bottom();
+    }
+
+    $('.messages-wrap').scroll_by(newListHeight - previousListHeight);
+  }
+
+  setEphemeralTimer(milliseconds) {
+    const conversationName = this.conversationEntity().display_name();
+
+    if (!milliseconds) {
+      this.conversationEntity().ephemeral_timer(false);
+      return this.logger.info(`Ephemeral timer for conversation '${conversationName}' turned off.`);
+    }
+
+    this.conversationEntity().ephemeral_timer(milliseconds);
+    this.logger.info(`Ephemeral timer for conversation '${conversationName}' is now at '${milliseconds}'.`);
+  }
+
+  sendGiphy() {
+    if (this.hasConversation()) {
+      this.conversationEntity().input('');
+    }
+  }
+
+  sendMessage(messageText) {
+    if (messageText.length) {
+      this.conversationRepository.send_text_with_link_preview(messageText, this.conversationEntity());
+    }
+  }
+
+  sendMessageEdit(messageText, messageEntity) {
+    this.cancelMessageEditing();
+
+    if (!messageText.length) {
+      return this.conversationRepository.delete_message_everyone(this.conversationEntity(), messageEntity);
+    }
+
+    const isTextChange = messageText !== messageEntity.get_first_asset().text;
+    if (isTextChange) {
+      this.conversationRepository.send_message_edit(messageText, messageEntity, this.conversationEntity());
+    }
+  }
+
+  /**
+   * Post images to a conversation.
+   * @param {Array|FileList} images - Images
+   * @returns {undefined} No return value
+   */
+  uploadImages(images) {
+    if (!this._isHittingUploadLimit(images)) {
+      for (const image of Array.from(images)) {
+        const isTooLarge = image.size > z.config.MAXIMUM_IMAGE_FILE_SIZE;
+        if (isTooLarge) {
+          return this._showUploadWarning(image);
+        }
       }
+
+      this.conversationRepository.upload_images(this.conversationEntity(), images);
     }
   }
 
-  cancel_edit() {
-    this.emojiInput.remove_emoji_popup();
-    if (this.edit_message_et()) {
-      this.edit_message_et().is_editing(false);
-    }
-    this.edit_message_et(undefined);
-    this.edit_input('');
-  }
+  /**
+   * Post files to a conversation.
+   * @param {Array|FileList} files - Images
+   * @returns {undefined} No return value
+   */
+  uploadFiles(files) {
+    if (!this._isHittingUploadLimit(files)) {
+      for (const file of Array.from(files)) {
+        const isTooLarge = file.size > z.config.MAXIMUM_ASSET_FILE_SIZE;
+        if (isTooLarge) {
+          const fileSize = z.util.format_bytes(z.config.MAXIMUM_ASSET_FILE_SIZE);
+          const options = {
+            text: {
+              message: z.l10n.text(z.string.modalAssetTooLargeMessage, fileSize),
+              title: z.l10n.text(z.string.modalAssetTooLargeHeadline),
+            },
+          };
 
-  _move_cursor_to_end(input_element) {
-    window.setTimeout(
-      () => (input_element.selectionStart = input_element.selectionEnd = input_element.value.length * 2),
-      0
-    );
+          return amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, options);
+        }
+      }
+
+      this.conversationRepository.upload_files(this.conversationEntity(), files);
+    }
   }
 
   /**
    * Returns the full localized unit string.
    *
-   * @param {number} number - Number to localize
+   * @private
+   * @param {number} value - Number to localize
    * @param {string} unit - Unit of type 's', 'm', 'd', 'h'
    * @returns {string} Localized unit string
    */
-  _get_localized_unit_string(number, unit) {
+  _getLocalizedUnitString(value, unit) {
+    let stringId;
+    const valueIs1 = value === 1;
+
     if (unit === 's') {
-      if (number === 1) {
-        return z.l10n.text(z.string.ephememalUnitsSecond);
-      }
-      return z.l10n.text(z.string.ephememalUnitsSeconds);
+      stringId = valueIs1 ? z.string.ephememalUnitsSecond : z.string.ephememalUnitsSeconds;
+      return z.l10n.text(stringId);
     }
 
     if (unit === 'm') {
-      if (number === 1) {
-        return z.l10n.text(z.string.ephememalUnitsMinute);
-      }
-      return z.l10n.text(z.string.ephememalUnitsMinutes);
+      stringId = valueIs1 ? z.string.ephememalUnitsMinute : z.string.ephememalUnitsMinutes;
+      return z.l10n.text(stringId);
     }
 
     if (unit === 'd') {
-      if (number === 1) {
-        return z.l10n.text(z.string.ephememalUnitsDay);
-      }
-      return z.l10n.text(z.string.ephememalUnitsDays);
+      stringId = valueIs1 ? z.string.ephememalUnitsDay : z.string.ephememalUnitsDays;
+      return z.l10n.text(stringId);
     }
   }
 
-  /**
-   * Click on ephemeral button
-   * @param {Object} data - Object
-   * @param {DOMEvent} event - Triggered event
-   * @returns {undefined} No return value
-   */
-  click_on_ephemeral_button(data, event) {
-    const entries = [
-      {
-        click: () => this.set_ephemeral_timer(0),
-        label: z.l10n.text(z.string.ephememalUnitsNone),
-      },
-    ].concat(
-      z.ephemeral.timings.getValues().map(milliseconds => {
-        const [number, unit] = z.util.formatMillisecondsShort(milliseconds);
-        const unit_locale = this._get_localized_unit_string(number, unit);
-        return {
-          click: () => this.set_ephemeral_timer(milliseconds),
-          label: `${number} ${unit_locale}`,
-        };
-      })
-    );
+  _isHittingUploadLimit(files) {
+    const concurrentUploadLimit = InputBarViewModel.CONFIG.ASSETS.CONCURRENT_UPLOAD_LIMIT;
+    const concurrentUploads = files.length + this.conversationRepository.get_number_of_pending_uploads();
+    const isHittingUploadLimit = concurrentUploads > InputBarViewModel.CONFIG.ASSETS.CONCURRENT_UPLOAD_LIMIT;
 
-    z.ui.Context.from(event, entries, 'ephemeral-options-menu');
+    if (isHittingUploadLimit) {
+      const modalOptions = {
+        text: {
+          message: z.l10n.text(z.string.modalAssetParallelUploadsMessage, concurrentUploadLimit),
+          title: z.l10n.text(z.string.modalAssetParallelUploadsHeadline),
+        },
+      };
+
+      amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
+    }
+
+    return isHittingUploadLimit;
+  }
+
+  _moveCursorToEnd(input_element) {
+    window.setTimeout(() => {
+      const newSelectionStart = (input_element.selectionEnd = input_element.value.length * 2);
+      input_element.selectionStart = newSelectionStart;
+    }, 0);
+  }
+
+  _showUploadWarning(image) {
+    const isGif = image.type === 'image/gif';
+    const messageStringId = isGif ? z.string.modalGifTooLargeMessage : z.string.modalPictureTooLargeMessage;
+    const titleStringId = isGif ? z.string.modalGifTooLargeHeadline : z.string.modalPictureTooLargeHeadline;
+
+    const modalOptions = {
+      text: {
+        message: z.l10n.text(messageStringId, z.config.MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024),
+        title: z.l10n.text(titleStringId),
+      },
+    };
+
+    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
   }
 };

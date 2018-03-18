@@ -25,7 +25,8 @@ window.z.viewModel.panel = z.viewModel.panel || {};
 
 z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewModel {
   constructor(mainViewModel, panelViewModel, repositories) {
-    this.clickOnShowParticipant = this.clickOnShowParticipant.bind(this);
+    this.clickOnShowService = this.clickOnShowService.bind(this);
+    this.clickOnShowUser = this.clickOnShowUser.bind(this);
 
     this.elementId = 'conversation-details';
     this.mainViewModel = mainViewModel;
@@ -167,7 +168,7 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
 
     this.shouldUpdateScrollbar = ko
       .computed(() => this.serviceParticipants() && this.userParticipants() && this.isVisible())
-      .extend({notify: 'always', rateLimit: 500});
+      .extend({notify: 'always', rateLimit: {method: 'notifyWhenChangesStop', timeout: 0}});
 
     const addPeopleShortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.ADD_PEOPLE);
     this.addPeopleTooltip = ko.pureComputed(() => {
@@ -197,8 +198,12 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
     this.panelViewModel.switchState(z.viewModel.PanelViewModel.STATE.GUEST_OPTIONS);
   }
 
-  clickOnShowParticipant(userEntity) {
-    this.panelViewModel.showGroupParticipant(userEntity);
+  clickOnShowUser(userEntity) {
+    this.panelViewModel.showGroupParticipantUser(userEntity);
+  }
+
+  clickOnShowService(serviceEntity) {
+    this.panelViewModel.showGroupParticipantService(serviceEntity);
   }
 
   clickToArchive() {
