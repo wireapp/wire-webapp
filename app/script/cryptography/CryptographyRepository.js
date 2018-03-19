@@ -145,7 +145,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
   }
 
   _formatFingerprint(fingerprint) {
-    return z.util.zero_padding(fingerprint, 16).match(/.{1,2}/g) || [];
+    return z.util.zeroPadding(fingerprint, 16).match(/.{1,2}/g) || [];
   }
 
   /**

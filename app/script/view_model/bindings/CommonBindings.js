@@ -261,7 +261,7 @@ ko.bindingHandlers.file_select = {
  */
 ko.bindingHandlers.loadImage = {
   init(element, valueAccessor) {
-    const image_src = z.util.strip_url_wrapper(ko.unwrap(valueAccessor()));
+    const image_src = z.util.stripUrlWrapper(ko.unwrap(valueAccessor()));
     const image = new Image();
     image.onload = () => (element.style.backgroundImage = `url(${image_src})`);
     image.src = image_src;

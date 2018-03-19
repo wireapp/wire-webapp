@@ -86,7 +86,7 @@ z.entity.Message = class Message {
 
     this.sender_name = ko.pureComputed(
       () => {
-        return z.util.get_first_name(this.user());
+        return z.util.getFirstName(this.user());
       },
       this,
       {deferEvaluation: true}
@@ -281,7 +281,7 @@ z.entity.Message = class Message {
 
     this.ephemeral_interval_id = window.setInterval(() => {
       this.ephemeral_remaining(this.ephemeral_expires() - Date.now());
-      this.ephemeral_caption(z.util.format_time_remaining(this.ephemeral_remaining()));
+      this.ephemeral_caption(z.util.formatTimeRemaining(this.ephemeral_remaining()));
     }, 250);
 
     this.ephemeral_timeout_id = window.setTimeout(() => {

@@ -63,7 +63,7 @@ z.auth.AuthRepository = class AuthRepository {
       .then(({cookies}) => {
         this.logger.force_log('Backend cookies:');
         cookies.forEach((cookie, index) => {
-          const expirationDate = z.util.format_timestamp(cookie.time, false);
+          const expirationDate = z.util.formatTimestamp(cookie.time, false);
           const log = `Label: ${cookie.label} | Type: ${cookie.type} |  Expiration: ${expirationDate}`;
           this.logger.force_log(`Cookie No. ${index + 1} | ${log}`);
         });
@@ -243,7 +243,7 @@ z.auth.AuthRepository = class AuthRepository {
    * @returns {undefined}
    */
   _logAccessTokenUpdate(accessTokenData, expirationTimestamp) {
-    const expirationDate = z.util.format_timestamp(expirationTimestamp, false);
+    const expirationDate = z.util.formatTimestamp(expirationTimestamp, false);
     this.logger.info(`Saved updated access token. It will expire on: ${expirationDate}`, accessTokenData);
   }
 
@@ -264,7 +264,7 @@ z.auth.AuthRepository = class AuthRepository {
     if (callbackTimestamp < Date.now()) {
       return this.renewAccessToken(AuthRepository.ACCESS_TOKEN_TRIGGER.IMMEDIATE);
     }
-    const refreshDate = z.util.format_timestamp(callbackTimestamp, false);
+    const refreshDate = z.util.formatTimestamp(callbackTimestamp, false);
     this.logger.info(`Scheduling next access token refresh for '${refreshDate}'`);
 
     this.accessTokenRefresh = window.setTimeout(() => {

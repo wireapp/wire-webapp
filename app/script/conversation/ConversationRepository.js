@@ -132,7 +132,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     });
 
     this.sorted_conversations = ko.pureComputed(() => {
-      return this.filtered_conversations().sort(z.util.sort_groups_by_last_event);
+      return this.filtered_conversations().sort(z.util.sortGroupsByLastEvent);
     });
 
     this.receiving_queue = new z.util.PromiseQueue({name: 'ConversationRepository.Receiving'});

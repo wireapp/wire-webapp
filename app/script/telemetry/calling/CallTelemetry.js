@@ -43,7 +43,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
    * @returns {Object} Containing all the sessions
    */
   log_sessions() {
-    const sorted_sessions = z.util.sort_object_by_keys(this.sessions, true);
+    const sorted_sessions = z.util.sortObjectByKeys(this.sessions, true);
 
     this.logger.force_log('Your last session IDs:');
     for (const session_id in sorted_sessions) {

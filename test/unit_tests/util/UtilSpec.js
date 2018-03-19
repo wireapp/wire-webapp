@@ -4029,18 +4029,18 @@ describe('z.util.getContentTypeFromDataUrl', () =>
     expect(actual).toEqual('image/gif');
   }));
 
-describe('z.util.is_iso_string', () => {
+describe('z.util.isIsoString', () => {
   it('validates date', () => {
-    expect(z.util.is_iso_string()).toBeFalsy();
-    expect(z.util.is_iso_string(new Date().getTime())).toBeFalsy();
-    expect(z.util.is_iso_string('2011-90-05T14:48:00.000Z')).toBeFalsy();
-    expect(z.util.is_iso_string('2011-10-05T14:48:00.000')).toBeFalsy();
-    expect(z.util.is_iso_string(new Date().toISOString())).toBeTruthy();
-    expect(z.util.is_iso_string('2011-10-05T14:48:00.000Z')).toBeTruthy();
+    expect(z.util.isIsoString()).toBeFalsy();
+    expect(z.util.isIsoString(new Date().getTime())).toBeFalsy();
+    expect(z.util.isIsoString('2011-90-05T14:48:00.000Z')).toBeFalsy();
+    expect(z.util.isIsoString('2011-10-05T14:48:00.000')).toBeFalsy();
+    expect(z.util.isIsoString(new Date().toISOString())).toBeTruthy();
+    expect(z.util.isIsoString('2011-10-05T14:48:00.000Z')).toBeTruthy();
   });
 });
 
-describe('z.util.sort_groups_by_last_event', () => {
+describe('z.util.sortGroupsByLastEvent', () => {
   it('finds out that Group A is more recent than Group B', () => {
     const groupA = new z.entity.Conversation();
     groupA.name('Latest');
@@ -4051,7 +4051,7 @@ describe('z.util.sort_groups_by_last_event', () => {
     groupB.last_event_timestamp(1414505766449);
 
     const groups = [groupA, groupB];
-    const [firstGroup, secondGroup] = groups.sort(z.util.sort_groups_by_last_event);
+    const [firstGroup, secondGroup] = groups.sort(z.util.sortGroupsByLastEvent);
 
     expect(firstGroup.name()).toEqual(groupA.name());
     expect(secondGroup.name()).toEqual(groupB.name());
@@ -4067,7 +4067,7 @@ describe('z.util.sort_groups_by_last_event', () => {
     groupB.last_event_timestamp(1414505857975);
 
     const groups = [groupA, groupB];
-    const [firstGroup, secondGroup] = groups.sort(z.util.sort_groups_by_last_event);
+    const [firstGroup, secondGroup] = groups.sort(z.util.sortGroupsByLastEvent);
 
     expect(firstGroup.name()).toEqual(groupB.name());
     expect(secondGroup.name()).toEqual(groupA.name());
@@ -4083,31 +4083,31 @@ describe('z.util.sort_groups_by_last_event', () => {
     groupB.name('Group B');
     groupB.last_event_timestamp(timestamp);
 
-    expect(z.util.sort_groups_by_last_event(groupA, groupB)).toEqual(0);
+    expect(z.util.sortGroupsByLastEvent(groupA, groupB)).toEqual(0);
 
     const groups = [groupA, groupB];
-    const [firstGroup, secondGroup] = groups.sort(z.util.sort_groups_by_last_event);
+    const [firstGroup, secondGroup] = groups.sort(z.util.sortGroupsByLastEvent);
 
     expect(firstGroup.name()).toEqual(groupA.name());
     expect(secondGroup.name()).toEqual(groupB.name());
   });
 });
 
-describe('z.util.strip_url_wrapper', () => {
+describe('z.util.stripUrlWrapper', () => {
   it('return the string without url wrapper (single quotes)', () => {
-    expect(z.util.strip_url_wrapper('url("/path/to/image/image.png")')).toBe('/path/to/image/image.png');
+    expect(z.util.stripUrlWrapper('url("/path/to/image/image.png")')).toBe('/path/to/image/image.png');
   });
 
   it('return the string without url wrapper (quotes)', () => {
-    expect(z.util.strip_url_wrapper('url("/path/to/image/image.png")')).toBe('/path/to/image/image.png');
+    expect(z.util.stripUrlWrapper('url("/path/to/image/image.png")')).toBe('/path/to/image/image.png');
   });
 
   it('return the string without url wrapper (without quotes)', () => {
-    expect(z.util.strip_url_wrapper('url(/path/to/image/image.png)')).toBe('/path/to/image/image.png');
+    expect(z.util.stripUrlWrapper('url(/path/to/image/image.png)')).toBe('/path/to/image/image.png');
   });
 });
 
-describe('z.util.naked_url', () => {
+describe('z.util.nakedUrl', () => {
   it('returns naked urls', () => {
     const expected_url = 'wire.com';
     const urls = [
@@ -4125,13 +4125,13 @@ describe('z.util.naked_url', () => {
       'wire.com/',
     ];
 
-    const all_urls_naked = urls.map(url => z.util.naked_url(url)).every(url => url === expected_url);
+    const all_urls_naked = urls.map(url => z.util.nakedUrl(url)).every(url => url === expected_url);
 
     expect(all_urls_naked).toBeTruthy();
   });
 
   it('returns empty string if url is not set', () => {
-    expect(z.util.naked_url()).toBe('');
+    expect(z.util.nakedUrl()).toBe('');
   });
 });
 
@@ -4380,33 +4380,33 @@ describe('z.util.print_devices_id', () => {
   });
 });
 
-describe('z.util.zero_padding', () => {
+describe('z.util.zeroPadding', () => {
   it('should add zero padding when string length is smaller then max', () => {
-    expect(z.util.zero_padding('1', 10)).toBe('0000000001');
+    expect(z.util.zeroPadding('1', 10)).toBe('0000000001');
   });
 
   it('returns string if max is smaller then string length', () => {
-    expect(z.util.zero_padding('1000000000', 8)).toBe('1000000000');
+    expect(z.util.zeroPadding('1000000000', 8)).toBe('1000000000');
   });
 
   it('returns string if max is equal string length', () => {
-    expect(z.util.zero_padding('1000000000', 10)).toBe('1000000000');
+    expect(z.util.zeroPadding('1000000000', 10)).toBe('1000000000');
   });
 
   it('should handle numbers', () => {
-    expect(z.util.zero_padding(42, 10)).toBe('0000000042');
+    expect(z.util.zeroPadding(42, 10)).toBe('0000000042');
   });
 
   it('can add one zero to 6', () => {
-    expect(z.util.zero_padding(6)).toEqual('06');
+    expect(z.util.zeroPadding(6)).toEqual('06');
   });
 
   it('can add 13 zeros to 6', () => {
-    expect(z.util.zero_padding(6, 14)).toEqual('00000000000006');
+    expect(z.util.zeroPadding(6, 14)).toEqual('00000000000006');
   });
 
   it('can transform 666 to a string', () => {
-    expect(z.util.zero_padding(666)).toEqual('666');
+    expect(z.util.zeroPadding(666)).toEqual('666');
   });
 });
 

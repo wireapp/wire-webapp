@@ -25,8 +25,8 @@ window.z.util = z.util || {};
 z.util.ValidationUtil = {
   // ToDo: Move z.util.is_valid_username here
   // ToDo: Move z.util.is_valid_phone_number here
-  // ToDo: Move z.util.is_iso_string here
-  // ToDo: Move z.util.is_valid_email here
+  // ToDo: Move z.util.isIsoString here
+  // ToDo: Move z.util.isValidEmail here
   // ToDo: Move z.util.isSameLocation here
   asset: {
     legacy: (assetId, conversationId) => {

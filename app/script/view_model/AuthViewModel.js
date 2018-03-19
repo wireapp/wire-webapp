@@ -717,7 +717,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
         };
 
         const phone = z.util.phoneNumberToE164(username, this.country() || navigator.language);
-        if (z.util.is_valid_email(username)) {
+        if (z.util.isValidEmail(username)) {
           payload.email = username;
         } else if (z.util.is_valid_username(username)) {
           payload.handle = username.replace('@', '');
@@ -1583,7 +1583,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
       return this._add_error(z.string.authErrorEmailMissing, z.auth.AuthView.TYPE.EMAIL);
     }
 
-    if (!z.util.is_valid_email(username)) {
+    if (!z.util.isValidEmail(username)) {
       this._add_error(z.string.authErrorEmailMalformed, z.auth.AuthView.TYPE.EMAIL);
     }
   }
@@ -1665,11 +1665,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
     }
 
     const phone = z.util.phoneNumberToE164(username, this.country() || navigator.language);
-    if (
-      !z.util.is_valid_email(username) &&
-      !z.util.is_valid_username(username) &&
-      !z.util.is_valid_phone_number(phone)
-    ) {
+    if (!z.util.isValidEmail(username) && !z.util.is_valid_username(username) && !z.util.is_valid_phone_number(phone)) {
       this._add_error(z.string.authErrorEmailMalformed, z.auth.AuthView.TYPE.EMAIL);
     }
   }

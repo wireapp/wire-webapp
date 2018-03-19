@@ -242,7 +242,7 @@ z.util.formatSeconds = function(duration) {
   const divisor_for_seconds = divisorForMinutes % 60;
   const seconds = Math.ceil(divisor_for_seconds);
 
-  const components = [z.util.zero_padding(minutes), z.util.zero_padding(seconds)];
+  const components = [z.util.zeroPadding(minutes), z.util.zeroPadding(seconds)];
 
   if (hours > 0) {
     components.unshift(hours);
@@ -408,7 +408,7 @@ z.util.safeMailtoOpen = function(event, email) {
   event.preventDefault();
   event.stopPropagation();
 
-  if (!z.util.is_valid_email(email)) {
+  if (!z.util.isValidEmail(email)) {
     return;
   }
 
@@ -491,9 +491,9 @@ z.util.koPushDeferred = function(target, src, number = 100, delay = 300) {
  * @param {number} length - Final output length
  * @returns {string} Input value with leading zeros (padding)
  */
-z.util.zero_padding = function(value, length = 2) {
+z.util.zeroPadding = function(value, length = 2) {
   if (value.toString().length < length) {
-    return z.util.zero_padding(`0${value}`, length);
+    return z.util.zeroPadding(`0${value}`, length);
   }
 
   return `${value}`;
@@ -503,14 +503,14 @@ z.util.zero_padding = function(value, length = 2) {
  * Human readable format of a timestamp.
  * @note: Not testable due to timezones :(
  * @param {number} timestamp - Timestamp
- * @param {boolean} long_format - True, if output should have leading numbers
+ * @param {boolean} longFormat - True, if output should have leading numbers
  * @returns {string} Human readable format of a timestamp.
  */
-z.util.format_timestamp = function(timestamp, long_format = true) {
+z.util.formatTimestamp = function(timestamp, longFormat = true) {
   const time = moment(timestamp);
   let format = 'DD.MM.YYYY (HH:mm:ss)';
 
-  if (long_format) {
+  if (longFormat) {
     format = moment().year() === time.year() ? 'ddd D MMM, HH:mm' : 'ddd D MMM YYYY, HH:mm';
   }
 
@@ -522,16 +522,16 @@ z.util.format_timestamp = function(timestamp, long_format = true) {
  * @param {string} date_string - String with data
  * @returns {boolean} True, if input string follows ISO 8601
  */
-z.util.is_iso_string = function(date_string) {
+z.util.isIsoString = function(date_string) {
   return /\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z)/.test(date_string);
 };
 
-z.util.sort_groups_by_last_event = (groupA, groupB) => {
+z.util.sortGroupsByLastEvent = (groupA, groupB) => {
   return groupB.last_event_timestamp() - groupA.last_event_timestamp();
 };
 
-z.util.sort_object_by_keys = function(object, reverse) {
-  const sorted_object = {};
+z.util.sortObjectByKeys = function(object, reverse) {
+  const sortedObject = {};
   const keys = Object.keys(object);
   keys.sort();
 
@@ -539,20 +539,20 @@ z.util.sort_object_by_keys = function(object, reverse) {
     for (let index = keys.length - 1; index >= 0; index--) {
       const key = keys[index];
       const value = object[key];
-      sorted_object[key] = value;
+      sortedObject[key] = value;
     }
   } else {
     for (const key of keys) {
       const value = object[key];
-      sorted_object[key] = value;
+      sortedObject[key] = value;
     }
   }
 
   // Returns a copy of an object, which is ordered by the keys of the original object.
-  return sorted_object;
+  return sortedObject;
 };
 
-z.util.strip_url_wrapper = function(url) {
+z.util.stripUrlWrapper = function(url) {
   /**
    * This will remove url(' and url(" from the beginning of the string.
    * It will also remove ") and ') from the end if present.
@@ -565,7 +565,7 @@ z.util.strip_url_wrapper = function(url) {
  * @param {string} url - URL
  * @returns {string} Plain URL
  */
-z.util.naked_url = function(url = '') {
+z.util.nakedUrl = function(url = '') {
   return url
     .toLowerCase()
     .replace(/.*?:\/\//, '') // remove protocol
@@ -573,16 +573,16 @@ z.util.naked_url = function(url = '') {
     .replace('www.', '');
 };
 
-z.util.validateProfileImageResolution = (file, min_width, min_height) => {
+z.util.validateProfileImageResolution = (file, minWidth, minHeight) => {
   return new Promise((resolve, reject) => {
     const image = new Image();
-    image.onload = () => resolve(image.width >= min_width && image.height >= min_height);
+    image.onload = () => resolve(image.width >= minWidth && image.height >= minHeight);
     image.onerror = () => reject(new Error('Failed to load profile picture for size validation'));
     image.src = window.URL.createObjectURL(file);
   });
 };
 
-z.util.is_valid_email = function(email) {
+z.util.isValidEmail = function(email) {
   const regExp = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   return regExp.test(email);
 };
@@ -692,7 +692,7 @@ z.util.print_devices_id = function(id) {
     return '';
   }
 
-  const id_with_padding = z.util.zero_padding(id, 16);
+  const id_with_padding = z.util.zeroPadding(id, 16);
   let prettified_id = '';
 
   for (const part of id_with_padding.match(/.{1,2}/g)) {
