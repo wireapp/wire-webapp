@@ -386,11 +386,11 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       antiscroll.rebuild();
     }
 
-    if ($('.messages-wrap').is_scrolled_bottom()) {
-      return $('.messages-wrap').scroll_to_bottom();
+    if ($('.messages-wrap').isScrolledBottom()) {
+      return $('.messages-wrap').scrollToBottom();
     }
 
-    $('.messages-wrap').scroll_by(newListHeight - previousListHeight);
+    $('.messages-wrap').scrollBy(newListHeight - previousListHeight);
   }
 
   setEphemeralTimer(milliseconds) {

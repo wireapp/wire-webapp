@@ -34,7 +34,7 @@ $.fn.scrollToBottom = function() {
   }
   $element.scrollTop($element[0].scrollHeight);
   return window.setTimeout(() => {
-    if (!$(this).is_scrolled_bottom()) {
+    if (!$(this).isScrolledBottom()) {
       return $element.scrollTop($element[0].scrollHeight);
     }
   }, 200);
@@ -49,7 +49,7 @@ $.fn.scrollBy = function(distance) {
   return $element.scrollTop(scrollTop + distance);
 };
 
-$.fn.is_scrolled_bottom = function(offset) {
+$.fn.isScrolledBottom = function(offset) {
   if (offset == null) {
     offset = 0;
   }

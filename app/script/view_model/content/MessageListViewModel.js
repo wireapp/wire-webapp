@@ -418,20 +418,6 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
   }
 
   /**
-   * Scrolls whole message list by given distance.
-   *
-   * @note Scrolling is animated with jQuery
-   * @param {number} distance - Distance by which the container is shifted
-   * @param {Function} callback - Executed when scroll animation is finished
-   * @returns {undefined} No return value
-   */
-  scrollBy(distance, callback) {
-    const current_scroll = $('.messages-wrap').scrollTop();
-    const new_scroll = current_scroll + distance;
-    $('.messages-wrap').animate({scrollTop: new_scroll}, 300, callback);
-  }
-
-  /**
    * Gets CSS class that will be applied to the message div in order to style.
    * @param {z.entity.Message} message - Message entity for generating css class
    * @returns {string} CSS class that is applied to the element

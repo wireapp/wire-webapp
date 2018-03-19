@@ -142,14 +142,12 @@ z.util.DebugUtil = class DebugUtil {
         );
       }
 
-      if (remoteUserId) {
-        this.logger.log(
-          `Found '${matchingNotifications.length}' notifications between '${localClientId}' and '${remoteClientId}'`,
-          matchingNotifications
-        );
-      } else {
-        this.logger.log(`Found '${matchingNotifications.length}' notifications`, matchingNotifications);
-      }
+      const logMessage = remoteUserId
+        ? `Found '${matchingNotifications.length}' notifications between '${localClientId}' and '${remoteClientId}'`
+        : `Found '${matchingNotifications.length}' notifications`;
+
+      this.logger.log(logMessage, matchingNotifications);
+
       return matchingNotifications;
     };
 

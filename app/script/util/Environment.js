@@ -47,43 +47,40 @@ window.z.util = z.util || {};
 
   const _check = {
     getVersion: () => (window.platform.version ? window.parseInt(window.platform.version.split('.')[0], 10) : null),
-    isChrome() {
-      return window.platform.name === BROWSER_NAME.CHROME || this.isElectron();
-    },
-    isDesktop() {
-      return this.isElectron() && window.platform.ua.includes(BROWSER_NAME.WIRE);
-    },
+    isChrome: () => window.platform.name === BROWSER_NAME.CHROME || this.isElectron(),
+    isDesktop: () => this.isElectron() && window.platform.ua.includes(BROWSER_NAME.WIRE),
     isEdge: () => window.platform.name === BROWSER_NAME.EDGE,
     isElectron: () => window.platform.name === BROWSER_NAME.ELECTRON,
     isFirefox: () => window.platform.name === BROWSER_NAME.FIREFOX,
     isOpera: () => window.platform.name === BROWSER_NAME.OPERA,
-    supportsAudioOutputSelection() {
-      return this.isChrome();
-    },
-    supportsCalling() {
+    supportsAudioOutputSelection: () => this.isChrome(),
+    supportsCalling: () => {
       if (!this.supportsMediaDevices()) {
         return false;
       }
+
       if (window.WebSocket === undefined) {
         return false;
       }
-      if (this.isEdge()) {
-        return false;
-      }
-      return this.isChrome() || this.isFirefox() || this.isOpera();
+
+      return this.isEdge() ? false : this.isChrome() || this.isFirefox() || this.isOpera();
     },
     supportsIndexedDb: () => !!window.indexedDB,
     supportsMediaDevices: () => !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia),
-    supportsNotifications: () =>
-      window.Notification === undefined
-        ? false
-        : window.Notification.requestPermission === undefined ? false : document.visibilityState !== undefined,
-    supportsScreenSharing() {
-      if (window.desktopCapturer) {
-        return true;
+    supportsNotifications: () => {
+      const notificationNotSupported = window.Notification === undefined;
+      if (notificationNotSupported) {
+        return false;
       }
-      return this.isFirefox();
+
+      const requestPermissionNotSupported = window.Notification.requestPermission === undefined;
+      if (requestPermissionNotSupported) {
+        return false;
+      }
+
+      return document.visibilityState !== undefined;
     },
+    supportsScreenSharing: () => (window.desktopCapturer ? true : this.isFirefox()),
   };
 
   const os = {

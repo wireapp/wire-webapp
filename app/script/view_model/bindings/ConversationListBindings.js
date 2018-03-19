@@ -30,7 +30,7 @@ ko.bindingHandlers.bordered_list = (function() {
         }
 
         list_column.toggleClass('left-list-center-border-top', !$element.isScrolledTop());
-        list_column.toggleClass('left-list-center-border-bottom', !$element.is_scrolled_bottom());
+        list_column.toggleClass('left-list-center-border-bottom', !$element.isScrolledBottom());
       });
     }
   }, 100);
