@@ -53,38 +53,20 @@ window.z.util = z.util || {};
     isElectron: () => window.platform.name === BROWSER_NAME.ELECTRON,
     isFirefox: () => window.platform.name === BROWSER_NAME.FIREFOX,
     isOpera: () => window.platform.name === BROWSER_NAME.OPERA,
-    supportsAudioOutputSelection() {
-      return this.isChrome();
-    },
-    supportsCalling() {
-      if (!this.supportsMediaDevices()) {
-        return false;
-      }
-      if (window.WebSocket === undefined) {
-        return false;
-      }
-      if (this.isEdge()) {
-        return false;
-      }
-      return this.isChrome() || this.isFirefox() || this.isOpera();
-    },
+    supportsAudioOutputSelection: () => this.isChrome(),
+    supportsCalling: () =>
+      !this.supportsMediaDevices()
+        ? false
+        : window.WebSocket === undefined
+          ? false
+          : this.isEdge() ? false : this.isChrome() || this.isFirefox() || this.isOpera(),
     supportsIndexedDb: () => !!window.indexedDB,
     supportsMediaDevices: () => !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia),
-    supportsNotifications: () => {
-      if (window.Notification === undefined) {
-        return false;
-      }
-      if (window.Notification.requestPermission === undefined) {
-        return false;
-      }
-      return document.visibilityState !== undefined;
-    },
-    supportsScreenSharing() {
-      if (window.desktopCapturer) {
-        return true;
-      }
-      return this.isFirefox();
-    },
+    supportsNotifications: () =>
+      window.Notification === undefined
+        ? false
+        : window.Notification.requestPermission === undefined ? false : document.visibilityState !== undefined,
+    supportsScreenSharing: () => (window.desktopCapturer ? true : this.isFirefox()),
   };
 
   const os = {
