@@ -55,9 +55,10 @@ export default class Runtime {
 
   getOSFamily = () => this.getOS().family.toLowerCase();
   getBrowserName = () => this.getPlatform().name.toLowerCase();
-  getBrowserVersion = () => this.getPlatform().version;
-  getMajorBrowserVersion = () => parseInt(this.getPlatform().version.split('.')[0]);
-  getMinorBrowserVersion = () => parseInt(this.getPlatform().version.split('.')[1]);
+  getBrowserVersion = () => {
+    const [majorVersion, minorVersion] = this.getPlatform().version.split('.');
+    return {major: parseInt(majorVersion, 10), major: parseInt(minorVersion, 10)};
+  };
 
   isSupportedBrowser = () => {
     const isFranz = this.isElectron() && this.getPlatform().ua.includes('Franz');
@@ -65,10 +66,11 @@ export default class Runtime {
       return false;
     }
 
-    return Object.entries(SUPPORTED_BROWSERS).some(([browser, version]) => {
+    return Object.entries(SUPPORTED_BROWSERS).some(([browser, supportedVersion]) => {
       const isSupportedBrowser = this.getBrowserName() === browser;
-      const isSupportedMajorVersion = this.getMajorBrowserVersion() >= version.major;
-      const isSupportedMinorVersion = this.getMinorBrowserVersion() >= version.minor;
+      const currentVersion = this.getBrowserVersion();
+      const isSupportedMajorVersion = currentVersion.major >= supportedVersion.major;
+      const isSupportedMinorVersion = currentVersion.minor >= supportedVersion.minor;
       return isSupportedBrowser && isSupportedMajorVersion && isSupportedMinorVersion;
     });
   };
