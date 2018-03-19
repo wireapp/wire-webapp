@@ -23,8 +23,8 @@ window.z = window.z || {};
 window.z.util = z.util || {};
 
 z.util.ValidationUtil = {
-  // ToDo: Move z.util.is_valid_username here
-  // ToDo: Move z.util.is_valid_phone_number here
+  // ToDo: Move z.util.isValidUsername here
+  // ToDo: Move z.util.isValidPhoneNumber here
   // ToDo: Move z.util.isIsoString here
   // ToDo: Move z.util.isValidEmail here
   // ToDo: Move z.util.isSameLocation here

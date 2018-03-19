@@ -67,7 +67,7 @@ z.entity.DecryptErrorMessage = class DecryptErrorMessage extends z.entity.Messag
       }
 
       if (this.client_id) {
-        parts.push(`ID: ${z.util.print_devices_id(this.client_id)}`);
+        parts.push(`ID: ${z.util.printDevicesId(this.client_id)}`);
       }
 
       if (parts.length) {

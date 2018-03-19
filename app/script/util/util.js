@@ -593,19 +593,19 @@ z.util.isValidEmail = function(email) {
  * @param {string} phoneNumber - Input
  * @returns {boolean} True, if the input a phone number
  */
-z.util.is_valid_phone_number = function(phoneNumber) {
-  let regular_expression;
+z.util.isValidPhoneNumber = function(phoneNumber) {
+  let regularExpression;
 
   if (z.util.Environment.backend.current === z.service.BackendEnvironment.PRODUCTION) {
-    regular_expression = /^\+[1-9]\d{1,14}$/;
+    regularExpression = /^\+[1-9]\d{1,14}$/;
   } else {
-    regular_expression = /^\+[0-9]\d{1,14}$/;
+    regularExpression = /^\+[0-9]\d{1,14}$/;
   }
 
-  return regular_expression.test(phoneNumber);
+  return regularExpression.test(phoneNumber);
 };
 
-z.util.is_valid_username = function(username) {
+z.util.isValidUsername = function(username) {
   if (username.startsWith('@')) {
     username = username.substring(1);
   }
@@ -670,12 +670,12 @@ z.util.murmurhash3 = function(key, seed) {
   return h1 >>> 0;
 };
 
-z.util.get_unix_timestamp = function() {
+z.util.getUnixTimestamp = function() {
   return Math.floor(Date.now() / 1000);
 };
 
-z.util.get_first_name = function(user_et, declension = z.string.Declension.NOMINATIVE) {
-  if (user_et.is_me) {
+z.util.getFirstName = function(userEt, declension = z.string.Declension.NOMINATIVE) {
+  if (userEt.is_me) {
     if (declension === z.string.Declension.NOMINATIVE) {
       return z.l10n.text(z.string.conversationYouNominative);
     } else if (declension === z.string.Declension.DATIVE) {
@@ -684,70 +684,68 @@ z.util.get_first_name = function(user_et, declension = z.string.Declension.NOMIN
       return z.l10n.text(z.string.conversationYouAccusative);
     }
   }
-  return user_et.first_name();
+  return userEt.first_name();
 };
 
-z.util.print_devices_id = function(id) {
+z.util.printDevicesId = function(id) {
   if (!id) {
     return '';
   }
 
-  const id_with_padding = z.util.zeroPadding(id, 16);
-  let prettified_id = '';
+  const idWithPadding = z.util.zeroPadding(id, 16);
+  let prettifiedId = '';
 
-  for (const part of id_with_padding.match(/.{1,2}/g)) {
-    prettified_id += `<span class='device-id-part'>${part}</span>`;
+  for (const part of idWithPadding.match(/.{1,2}/g)) {
+    prettifiedId += `<span class='device-id-part'>${part}</span>`;
   }
 
-  return prettified_id;
+  return prettifiedId;
 };
 
 /**
  * Returns bucket for given value based on the specified bucket limits
- * @example z.util.bucket_values(13, [0, 5, 10, 15, 20, 25]) will return '11-15')
+ * @example z.util.bucketValues(13, [0, 5, 10, 15, 20, 25]) will return '11-15')
  * @param {number} value - Numeric value
- * @param {Array<number>} bucket_limits - Array with numeric values that define the upper limit of the bucket
+ * @param {Array<number>} bucketLimits - Array with numeric values that define the upper limit of the bucket
  * @returns {string} Bucket
  */
-z.util.bucket_values = function(value, bucket_limits) {
-  if (value < bucket_limits[0] + 1) {
+z.util.bucketValues = function(value, bucketLimits) {
+  if (value < bucketLimits[0] + 1) {
     return '0';
   }
 
-  for (let index = 0; index < bucket_limits.length; index++) {
-    const limit = bucket_limits[index];
+  for (let index = 0; index < bucketLimits.length; index++) {
+    const limit = bucketLimits[index];
     if (value < limit + 1) {
-      const previous_limit = bucket_limits[index - 1];
+      const previous_limit = bucketLimits[index - 1];
       return `${previous_limit + 1}-${limit}`;
     }
   }
 
-  const last_limit = bucket_limits[bucket_limits.length - 1];
+  const last_limit = bucketLimits[bucketLimits.length - 1];
   return `${last_limit + 1}-`;
 };
 
-z.util.format_time_remaining = function(time_remaining) {
-  const moment_duration = moment.duration(time_remaining);
+z.util.formatTimeRemaining = function(timeRemaining) {
+  const momentDuration = moment.duration(timeRemaining);
 
   let title = '';
-  if (moment_duration.asHours() === 1) {
-    title += `${moment_duration.hours()} ${z.l10n.text(z.string.ephememalUnitsHour)}, `;
-  } else if (moment_duration.asHours() > 1) {
-    title += `${moment_duration.hours()} ${z.l10n.text(z.string.ephememalUnitsHours)}, `;
+  if (momentDuration.asHours() === 1) {
+    title += `${momentDuration.hours()} ${z.l10n.text(z.string.ephememalUnitsHour)}, `;
+  } else if (momentDuration.asHours() > 1) {
+    title += `${momentDuration.hours()} ${z.l10n.text(z.string.ephememalUnitsHours)}, `;
   }
 
-  if (moment_duration.asMinutes() === 1) {
-    title += `${moment_duration.minutes()} ${z.l10n.text(z.string.ephememalUnitsMinute)} ${z.l10n.text(z.string.and)} `;
-  } else if (moment_duration.asMinutes() > 1) {
-    title += `${moment_duration.minutes()} ${z.l10n.text(z.string.ephememalUnitsMinutes)} ${z.l10n.text(
-      z.string.and
-    )} `;
+  if (momentDuration.asMinutes() === 1) {
+    title += `${momentDuration.minutes()} ${z.l10n.text(z.string.ephememalUnitsMinute)} ${z.l10n.text(z.string.and)} `;
+  } else if (momentDuration.asMinutes() > 1) {
+    title += `${momentDuration.minutes()} ${z.l10n.text(z.string.ephememalUnitsMinutes)} ${z.l10n.text(z.string.and)} `;
   }
 
-  if (moment_duration.asSeconds() === 1) {
-    title += `${moment_duration.seconds()} ${z.l10n.text(z.string.ephememalUnitsSecond)}`;
-  } else if (moment_duration.asSeconds() > 1) {
-    title += `${moment_duration.seconds()} ${z.l10n.text(z.string.ephememalUnitsSeconds)}`;
+  if (momentDuration.asSeconds() === 1) {
+    title += `${momentDuration.seconds()} ${z.l10n.text(z.string.ephememalUnitsSecond)}`;
+  } else if (momentDuration.asSeconds() > 1) {
+    title += `${momentDuration.seconds()} ${z.l10n.text(z.string.ephememalUnitsSeconds)}`;
   }
 
   return title || '';

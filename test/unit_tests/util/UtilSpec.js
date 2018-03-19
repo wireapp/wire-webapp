@@ -4366,15 +4366,15 @@ describe('Markdown exceptions', () => {
   });
 });
 
-describe('z.util.print_devices_id', () => {
+describe('z.util.printDevicesId', () => {
   it('can print device id', () => {
-    expect(z.util.print_devices_id('66e66c79e8d1dea4')).toBe(
+    expect(z.util.printDevicesId('66e66c79e8d1dea4')).toBe(
       "<span class='device-id-part'>66</span><span class='device-id-part'>e6</span><span class='device-id-part'>6c</span><span class='device-id-part'>79</span><span class='device-id-part'>e8</span><span class='device-id-part'>d1</span><span class='device-id-part'>de</span><span class='device-id-part'>a4</span>"
     );
   });
 
   it('can print device id and apply padding', () => {
-    expect(z.util.print_devices_id('6e66c79e8d1dea4')).toBe(
+    expect(z.util.printDevicesId('6e66c79e8d1dea4')).toBe(
       "<span class='device-id-part'>06</span><span class='device-id-part'>e6</span><span class='device-id-part'>6c</span><span class='device-id-part'>79</span><span class='device-id-part'>e8</span><span class='device-id-part'>d1</span><span class='device-id-part'>de</span><span class='device-id-part'>a4</span>"
     );
   });
@@ -4494,22 +4494,22 @@ describe('z.util.is_same_location', () => {
   });
 });
 
-describe('bucket_values', () => {
+describe('bucketValues', () => {
   it('returns correct value for zero', () => {
-    expect(z.util.bucket_values(0, [0, 5, 10, 15, 20, 25])).toBe('0');
+    expect(z.util.bucketValues(0, [0, 5, 10, 15, 20, 25])).toBe('0');
   });
 
   it('returns the correct bucket if value is inside the given limits', () => {
-    expect(z.util.bucket_values(0.1, [0, 5, 10, 15, 20, 25])).toBe('0');
-    expect(z.util.bucket_values(1, [0, 5, 10, 15, 20, 25])).toBe('1-5');
-    expect(z.util.bucket_values(5.5, [0, 5, 10, 15, 20, 25])).toBe('1-5');
-    expect(z.util.bucket_values(13, [0, 5, 10, 15, 20, 25])).toBe('11-15');
-    expect(z.util.bucket_values(1023, [0, 100, 200, 500, 1000, 2000])).toBe('1001-2000');
+    expect(z.util.bucketValues(0.1, [0, 5, 10, 15, 20, 25])).toBe('0');
+    expect(z.util.bucketValues(1, [0, 5, 10, 15, 20, 25])).toBe('1-5');
+    expect(z.util.bucketValues(5.5, [0, 5, 10, 15, 20, 25])).toBe('1-5');
+    expect(z.util.bucketValues(13, [0, 5, 10, 15, 20, 25])).toBe('11-15');
+    expect(z.util.bucketValues(1023, [0, 100, 200, 500, 1000, 2000])).toBe('1001-2000');
   });
 
   it('returns the correct bucket if value is above the given limits', () => {
-    expect(z.util.bucket_values(100, [0, 5, 10, 15, 20, 25])).toBe('26-');
-    expect(z.util.bucket_values(10023, [0, 100, 200, 500, 1000, 2000])).toBe('2001-');
+    expect(z.util.bucketValues(100, [0, 5, 10, 15, 20, 25])).toBe('26-');
+    expect(z.util.bucketValues(10023, [0, 100, 200, 500, 1000, 2000])).toBe('2001-');
   });
 });
 
