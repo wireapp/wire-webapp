@@ -73,9 +73,8 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
       return;
     }
 
-    const blob = new Blob([z.telemetry.calling.CallLog.join('\r\n')], {
-      type: 'text/plain;charset=utf-8',
-    });
+    const callLog = [z.telemetry.calling.CallLog.join('\r\n')];
+    const blob = new Blob(callLog, {type: 'text/plain;charset=utf-8'});
     const currentDate = new Date().toISOString().replace(' ', '-');
 
     z.util.download_blob(blob, `CallLogs-${currentDate}.log`);
