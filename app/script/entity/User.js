@@ -176,8 +176,8 @@ z.entity.User = class User {
 
     this.availability = ko.observable(z.user.AvailabilityType.NONE);
 
-    this.expirationTimestamp = ko.observable();
     this.expirationRemaining = ko.observable();
+    this.expirationText = ko.observable();
     this.expirationIntervalId = undefined;
     this.isExpired = ko.observable(false);
   }
@@ -233,16 +233,34 @@ z.entity.User = class User {
       this.expirationIntervalId = undefined;
     }
 
-    this.expirationTimestamp(timestamp);
-    this.expirationRemaining(this.expirationTimestamp() - Date.now());
+    this.setRemaining(timestamp);
 
-    this.expirationIntervalId = window.setInterval(() => {
-      this.expirationRemaining(this.expirationTimestamp() - Date.now());
-    }, User.CONFIG.TEMPORARY_GUEST.EXPIRATION_INTERVAL);
+    const expirationInterval = User.CONFIG.TEMPORARY_GUEST.EXPIRATION_INTERVAL;
+    this.expirationIntervalId = window.setInterval(() => this.setRemaining(timestamp), expirationInterval);
 
     window.setTimeout(() => {
       this.isExpired(true);
       window.clearInterval(this.expirationIntervalId);
     }, this.expirationRemaining());
+  }
+
+  setRemaining(expirationTime) {
+    const remainingTime = expirationTime - Date.now();
+    const remainingMinutes = Math.ceil(remainingTime / (60 * 1000));
+
+    let timeLeftText = z.string.userRemainingTimeHours;
+    let timeValue = 0;
+
+    if (remainingMinutes <= 60) {
+      timeLeftText = z.string.userRemainingTimeMinutes;
+      timeValue = Math.ceil(remainingMinutes / 15) * 15;
+    } else if (remainingMinutes <= 90) {
+      timeValue = 1.5;
+    } else {
+      timeValue = Math.ceil(remainingMinutes / 60);
+    }
+
+    this.expirationRemaining(remainingTime);
+    this.expirationText(z.l10n.text(timeLeftText, timeValue));
   }
 };
