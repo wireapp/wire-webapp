@@ -46,7 +46,7 @@ z.viewModel.content.CollectionDetailsViewModel = class CollectionDetailsViewMode
     amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, this.itemRemoved);
     this.template(category);
     this.conversationEntity(conversationEntity);
-    z.util.ko_push_deferred(this.items, items);
+    z.util.koPushDeferred(this.items, items);
   }
 
   itemAdded(messageEntity) {

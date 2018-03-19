@@ -373,7 +373,7 @@ z.user.UserRepository = class UserRepository {
   update_user_connections(connection_ets, assign_clients = false) {
     return Promise.resolve()
       .then(() => {
-        z.util.ko_array_push_all(this.connections, connection_ets);
+        z.util.koArrayPushAll(this.connections, connection_ets);
         const user_ids = connection_ets.map(connection_et => connection_et.to);
 
         if (user_ids.length === 0) {
@@ -847,7 +847,7 @@ z.user.UserRepository = class UserRepository {
     const find_users = user_ets.map(user_et => _find_users(user_et));
 
     return Promise.all(find_users).then(resolve_array => {
-      z.util.ko_array_push_all(this.users, resolve_array.filter(user_et => user_et));
+      z.util.koArrayPushAll(this.users, resolve_array.filter(user_et => user_et));
       return user_ets;
     });
   }

@@ -992,7 +992,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {undefined} No return value
    */
   save_conversations(conversation_ets) {
-    z.util.ko_array_push_all(this.conversations, conversation_ets);
+    z.util.koArrayPushAll(this.conversations, conversation_ets);
   }
 
   /**

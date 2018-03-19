@@ -357,7 +357,7 @@ z.entity.Conversation = class Conversation {
       }
     }
 
-    z.util.ko_array_push_all(this.messages_unordered, message_ets);
+    z.util.koArrayPushAll(this.messages_unordered, message_ets);
   }
 
   get_last_known_timestamp(time_offset) {
@@ -413,7 +413,7 @@ z.entity.Conversation = class Conversation {
   prepend_messages(message_ets) {
     message_ets = message_ets.map(message_et => this._checkForDuplicate(message_et)).filter(message_et => message_et);
 
-    z.util.ko_array_unshift_all(this.messages_unordered, message_ets);
+    z.util.koArrayUnshiftAll(this.messages_unordered, message_ets);
   }
 
   /**

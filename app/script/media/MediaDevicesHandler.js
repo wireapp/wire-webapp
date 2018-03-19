@@ -209,9 +209,9 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
             }
           });
 
-          z.util.ko_array_push_all(this.available_devices.audio_input, audio_input_devices);
-          z.util.ko_array_push_all(this.available_devices.audio_output, audio_output_devices);
-          z.util.ko_array_push_all(this.available_devices.video_input, video_input_devices);
+          z.util.koArrayPushAll(this.available_devices.audio_input, audio_input_devices);
+          z.util.koArrayPushAll(this.available_devices.audio_output, audio_output_devices);
+          z.util.koArrayPushAll(this.available_devices.video_input, video_input_devices);
 
           this.logger.info('Updated MediaDevice list', mediaDevices);
           return mediaDevices;

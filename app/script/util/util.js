@@ -418,7 +418,7 @@ z.util.safeMailtoOpen = function(event, email) {
   }
 };
 
-z.util.get_last_characters = function(message, amount) {
+z.util.getLastCharacters = function(message, amount) {
   if (message.length < amount) {
     return false;
   }
@@ -426,16 +426,16 @@ z.util.get_last_characters = function(message, amount) {
   return message.substring(message.length - amount);
 };
 
-z.util.cut_last_characters = function(message, amount) {
+z.util.cutLastCharacters = function(message, amount) {
   return message.substring(0, message.length - amount);
 };
 
-z.util.markup_links = function(message) {
+z.util.markupLinks = function(message) {
   return message.replace(/<a\s+href=/gi, '<a target="_blank" rel="nofollow noopener noreferrer" href=');
 };
 
 // Note: We are using "Underscore.js" to escape HTML in the original message
-z.util.render_message = function(message) {
+z.util.renderMessage = function(message) {
   message = marked(message, {
     highlight: function(code) {
       return hljs.highlightAuto(code).value;
@@ -447,37 +447,37 @@ z.util.render_message = function(message) {
   message = message.replace(/\n/g, '<br />');
 
   // Remove <br /> if it is the last thing in a message
-  if (z.util.get_last_characters(message, '<br />'.length) === '<br />') {
-    message = z.util.cut_last_characters(message, '<br />'.length);
+  if (z.util.getLastCharacters(message, '<br />'.length) === '<br />') {
+    message = z.util.cutLastCharacters(message, '<br />'.length);
   }
 
   return message;
 };
 
-z.util.ko_array_push_all = function(ko_array, values_to_push) {
+z.util.koArrayPushAll = function(koArray, valuesToPush) {
   // append array to knockout observableArray
   // https://github.com/knockout/knockout/issues/416
-  const underlyingArray = ko_array();
-  ko_array.valueWillMutate();
-  ko.utils.arrayPushAll(underlyingArray, values_to_push);
-  return ko_array.valueHasMutated();
+  const underlyingArray = koArray();
+  koArray.valueWillMutate();
+  ko.utils.arrayPushAll(underlyingArray, valuesToPush);
+  return koArray.valueHasMutated();
 };
 
-z.util.ko_array_unshift_all = function(ko_array, values_to_shift) {
+z.util.koArrayUnshiftAll = function(koArray, valuesToShift) {
   // prepend array to knockout observableArray
-  const underlyingArray = ko_array();
-  ko_array.valueWillMutate();
-  Array.prototype.unshift.apply(underlyingArray, values_to_shift);
-  return ko_array.valueHasMutated();
+  const underlyingArray = koArray();
+  koArray.valueWillMutate();
+  Array.prototype.unshift.apply(underlyingArray, valuesToShift);
+  return koArray.valueHasMutated();
 };
 
-z.util.ko_push_deferred = function(target, src, number = 100, delay = 300) {
+z.util.koPushDeferred = function(target, src, number = 100, delay = 300) {
   // push array deferred to knockout observableArray
   let interval;
 
   return (interval = window.setInterval(() => {
     const chunk = src.splice(0, number);
-    z.util.ko_array_push_all(target, chunk);
+    z.util.koArrayPushAll(target, chunk);
 
     if (src.length === 0) {
       return window.clearInterval(interval);

@@ -82,7 +82,7 @@ z.components.FullSearch = class FullSearch {
       const showAdditionalMessages = $(event.currentTarget).is_scrolled_bottom() && this.messageEntities.length;
       if (showAdditionalMessages) {
         const additionalMessageEntities = this.messageEntities.splice(0, FullSearch.CONFIG.MAX_VISIBLE_MESSAGES);
-        z.util.ko_array_push_all(this.visibleMessageEntities, additionalMessageEntities);
+        z.util.koArrayPushAll(this.visibleMessageEntities, additionalMessageEntities);
       }
     });
   }

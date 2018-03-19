@@ -21,79 +21,79 @@
 
 'use strict';
 
-describe('z.util.render_message', () => {
+describe('z.util.renderMessage', () => {
   it('renders a normal link', () => {
     const expected =
       'Check this: <a href="http://www.wire.com/" target="_blank" rel="nofollow noopener noreferrer">http://www.wire.com/</a>';
-    expect(z.util.render_message('Check this: http://www.wire.com/')).toBe(expected);
+    expect(z.util.renderMessage('Check this: http://www.wire.com/')).toBe(expected);
   });
 
   it('renders a normal link without protocol', () => {
     const expected =
       'Check this: <a href="http://wire.com/about/" target="_blank" rel="nofollow noopener noreferrer">wire.com/about/</a>';
-    expect(z.util.render_message('Check this: wire.com/about/')).toBe(expected);
+    expect(z.util.renderMessage('Check this: wire.com/about/')).toBe(expected);
   });
 
   it('renders complicated image links', () => {
     const link =
       'http://static.err.ee/gridfs/95E91BE0D28DF7236BC00EE349284A451C05949C2D04E7857BC686E4394F1585.jpg?&amp;crop=(0,27,848,506.0960451977401)&amp;cropxunits=848&amp;cropyunits=595&amp;format=jpg&amp;quality=90&amp;width=752&amp;maxheight=42';
     const expected = `<a href="${link}" target="_blank" rel="nofollow noopener noreferrer">${link}</a>`;
-    expect(z.util.render_message(link)).toBe(expected);
+    expect(z.util.renderMessage(link)).toBe(expected);
   });
 
   it('renders URLs with underscores', () => {
     const link = 'http://en.wikipedia.org/wiki/Stormtrooper_(Star_Wars)';
     const expected = `Stormtroopers: <a href="${link}" target="_blank" rel="nofollow noopener noreferrer">${link}</a> !!!`;
-    expect(z.util.render_message(`Stormtroopers: ${link} !!!`)).toBe(expected);
+    expect(z.util.renderMessage(`Stormtroopers: ${link} !!!`)).toBe(expected);
   });
 
   it('renders links with multiple underscores', () => {
     const link =
       'https://www.nike.com/events-registration/event?id=6245&amp;languageLocale=de_de&amp;cp=EUNS_KW_DE_&amp;s_kwcid=AL!2799!3!46005237943!b!!g!!womens%20running';
     const expected = `<a href="${link}" target="_blank" rel="nofollow noopener noreferrer">${link}</a>`;
-    expect(z.util.render_message(link)).toBe(expected);
+    expect(z.util.renderMessage(link)).toBe(expected);
   });
 
   it('renders URLs without a trailing slash', () => {
     const link = 'http://www.underscore.com';
     const expected = `e.g. <a href="${link}" target="_blank" rel="nofollow noopener noreferrer">${link}</a>.`;
-    expect(z.util.render_message(`e.g. ${link}.`)).toBe(expected);
+    expect(z.util.renderMessage(`e.g. ${link}.`)).toBe(expected);
   });
 
   it('renders localhost links', () => {
     const link = 'http://localhost:8888/';
     const expected = `<a href="${link}" target="_blank" rel="nofollow noopener noreferrer">${link}</a>`;
-    expect(z.util.render_message(link)).toBe(expected);
+    expect(z.util.renderMessage(link)).toBe(expected);
   });
 
   it('renders links with IP addresses', () => {
     const link = 'http://192.168.10.44:8080//job/webapp_atomic_test/4290/cucumber-html-reports';
     const expected = `<a href="${link}" target="_blank" rel="nofollow noopener noreferrer">${link}</a>`;
-    expect(z.util.render_message(link)).toBe(expected);
+    expect(z.util.renderMessage(link)).toBe(expected);
   });
 
   it('renders URLs with @-signs correctly', () => {
     const link = 'https://www.mail-archive.com/debian-bugs-dist@lists.debian.org/msg1448956.html';
     const expected = `<a href="${link}" target="_blank" rel="nofollow noopener noreferrer">${link}</a>`;
-    expect(z.util.render_message(link)).toBe(expected);
+    expect(z.util.renderMessage(link)).toBe(expected);
   });
 
   it('renders URLs with @-signs and text correctly', () => {
     const link = 'https://t.facdn.net/22382738@400-1485204208.jpg';
     const expected = `Just click <a href="${link}" target="_blank" rel="nofollow noopener noreferrer">${link}</a> and download it`;
-    expect(z.util.render_message(`Just click ${link} and download it`)).toBe(expected);
+    expect(z.util.renderMessage(`Just click ${link} and download it`)).toBe(expected);
   });
 
   it('escapes links when they are posted as plain HTML', () => {
     const expected = '&lt;a href=&quot;javascript:alert(&#x27;ohoh!&#x27;)&quot;&gt;what?&lt;/a&gt;';
-    expect(z.util.render_message('<a href="javascript:alert(\'ohoh!\')">what?</a>')).toBe(expected);
+    expect(z.util.renderMessage('<a href="javascript:alert(\'ohoh!\')">what?</a>')).toBe(expected);
   });
 
   it('renders an escaped version of an xss attempt', () => {
     const expected =
       '<a href="http://wire.de/jaVasCript:/*-/*`/*\\`/*&#x27;/*&quot;/**/(/**/oNcliCk=alert())//%0D%0A%0d%0a//&lt;/stYle/&lt;/titLe/&lt;/teXtarEa/&lt;/scRipt/--!&gt;\\x3csVg/&lt;sVg/oNloAd=alert()//&gt;\\x3e" target="_blank" rel="nofollow noopener noreferrer">wire.de/jaVasCript:/*-/*`/*\\`/*&#x27;/*&quot;/**/(/**/oNcliCk=alert())//%0D%0A%0d%0a//&lt;/stYle/&lt;/titLe/&lt;/teXtarEa/&lt;/scRipt/--!&gt;\\x3csVg/&lt;sVg/oNloAd=alert()//&gt;\\x3e</a>';
     expect(
-      z.util.render_message(
+      z.util.renderMessage(
         'wire.de/jaVasCript:/*-/*`/*\\`/*\'/*"/**/(/**/oNcliCk=alert())//%0D%0A%0d%0a//</stYle/</titLe/</teXtarEa/</scRipt/--!>\\x3csVg/<sVg/oNloAd=alert()//>\\x3e'
       )
     ).toBe(expected);
@@ -102,56 +102,54 @@ describe('z.util.render_message', () => {
   it('renders an email address', () => {
     const expected =
       'send it over to <a href="mailto:hello@wire.com" onclick="z.util.safeMailtoOpen(event, \'hello@wire.com\')">hello@wire.com</a>';
-    expect(z.util.render_message('send it over to hello@wire.com')).toBe(expected);
+    expect(z.util.renderMessage('send it over to hello@wire.com')).toBe(expected);
   });
 
   it('renders an email address with pluses', () => {
     const expected =
       'send it over to <a href="mailto:hello+world@wire.com" onclick="z.util.safeMailtoOpen(event, \'hello+world@wire.com\')">hello+world@wire.com</a>';
-    expect(z.util.render_message('send it over to hello+world@wire.com')).toBe(expected);
+    expect(z.util.renderMessage('send it over to hello+world@wire.com')).toBe(expected);
   });
 
   it('renders an email long domains', () => {
     const expected =
       'send it over to <a href="mailto:janedoe@school.university.edu" onclick="z.util.safeMailtoOpen(event, \'janedoe@school.university.edu\')">janedoe@school.university.edu</a>';
-    expect(z.util.render_message('send it over to janedoe@school.university.edu')).toBe(expected);
+    expect(z.util.renderMessage('send it over to janedoe@school.university.edu')).toBe(expected);
   });
 
   it('renders an email with multiple subdomains', () => {
     const expected =
       'send it over to <a href="mailto:bla@foo.co.uk" onclick="z.util.safeMailtoOpen(event, \'bla@foo.co.uk\')">bla@foo.co.uk</a>';
-    expect(z.util.render_message('send it over to bla@foo.co.uk')).toBe(expected);
+    expect(z.util.renderMessage('send it over to bla@foo.co.uk')).toBe(expected);
   });
 
   // The tag "<br />" is preferred for compatibility sake.
   // @see http://stackoverflow.com/a/1946442/451634
   it('renders endlines to <br />', () => {
-    expect(z.util.render_message('Hello,\nworld!\nHow is it going?\n')).toBe(
-      'Hello,<br />world!<br />How is it going?'
-    );
+    expect(z.util.renderMessage('Hello,\nworld!\nHow is it going?\n')).toBe('Hello,<br />world!<br />How is it going?');
   });
 
   it('renders text with more than one newline in between', () => {
-    expect(z.util.render_message('Hello,\n\n\n\n\n\n\nworld!')).toBe(
+    expect(z.util.renderMessage('Hello,\n\n\n\n\n\n\nworld!')).toBe(
       'Hello,<br /><br /><br /><br /><br /><br /><br />world!'
     );
   });
 
   it('does not render URLs within <code> tags', () => {
-    expect(z.util.render_message('```Url url = new Url("wire.com");```')).toBe(
+    expect(z.util.renderMessage('```Url url = new Url("wire.com");```')).toBe(
       '<code>Url url = new Url(&quot;wire.com&quot;);</code>'
     );
   });
 
   it('does not render emails within <code> tags', () => {
-    expect(z.util.render_message('```this.isValid("opensource@wire.com")```')).toBe(
+    expect(z.util.renderMessage('```this.isValid("opensource@wire.com")```')).toBe(
       '<code>this.isValid(&quot;opensource@wire.com&quot;)</code>'
     );
   });
 
   it('renders an emoticon of someone shrugging', () => {
     /* eslint-disable no-useless-escape */
-    expect(z.util.render_message('¯_(ツ)_/¯')).toBe('¯_(ツ)_/¯');
+    expect(z.util.renderMessage('¯_(ツ)_/¯')).toBe('¯_(ツ)_/¯');
   });
   /* eslint-enable no-useless-escape */
 });
@@ -281,18 +279,18 @@ describe('z.util.trimFileExtension', () => {
   });
 });
 
-describe('z.util.ko_array_push_all', () => {
+describe('z.util.koArrayPushAll', () => {
   it('appends multiple items', () => {
     const actual = ko.observableArray([1, 2]);
-    z.util.ko_array_push_all(actual, [3, 4]);
+    z.util.koArrayPushAll(actual, [3, 4]);
     expect(actual()).toEqual([1, 2, 3, 4]);
   });
 });
 
-describe('z.util.ko_array_unshift_all', () => {
+describe('z.util.koArrayUnshiftAll', () => {
   it('prepends multiple items', () => {
     const actual = ko.observableArray([3, 4]);
-    z.util.ko_array_unshift_all(actual, [1, 2]);
+    z.util.koArrayUnshiftAll(actual, [1, 2]);
     expect(actual()).toEqual([1, 2, 3, 4]);
   });
 });
@@ -4187,88 +4185,88 @@ describe('z.util.forwardUrlParameter', () => {
 
 describe('Markdown for bold text', () => {
   it('renders bold text', () => {
-    expect(z.util.render_message('**bold text (not italic)**')).toBe('<strong>bold text (not italic)</strong>');
+    expect(z.util.renderMessage('**bold text (not italic)**')).toBe('<strong>bold text (not italic)</strong>');
   });
 
   it('renders a bold word within a sentence', () => {
-    expect(z.util.render_message('Markdown **just** rocks!')).toEqual('Markdown <strong>just</strong> rocks!');
+    expect(z.util.renderMessage('Markdown **just** rocks!')).toEqual('Markdown <strong>just</strong> rocks!');
   });
 
   it('renders bold text with italic words', () => {
-    expect(z.util.render_message('**bold text with *italic* !!**')).toBe(
+    expect(z.util.renderMessage('**bold text with *italic* !!**')).toBe(
       '<strong>bold text with <em>italic</em> !!</strong>'
     );
   });
 
   it('renders text which is partly bold and partly italic', () => {
-    expect(z.util.render_message('**part bold,** *part italic*')).toBe(
+    expect(z.util.renderMessage('**part bold,** *part italic*')).toBe(
       '<strong>part bold,</strong> <em>part italic</em>'
     );
   });
 
   it('renders mixed text with bold and italic words', () => {
-    expect(z.util.render_message('*italic* **bold** *italic* **bold**')).toBe(
+    expect(z.util.renderMessage('*italic* **bold** *italic* **bold**')).toBe(
       '<em>italic</em> <strong>bold</strong> <em>italic</em> <strong>bold</strong>'
     );
   });
 
   it('renders words which are just bold', () => {
-    expect(z.util.render_message('**A**')).toBe('<strong>A</strong>');
+    expect(z.util.renderMessage('**A**')).toBe('<strong>A</strong>');
   });
 });
 
 describe('Markdown for italic text', () => {
   it('renders italic text', () => {
-    expect(z.util.render_message('*This text is italic.*')).toBe('<em>This text is italic.</em>');
+    expect(z.util.renderMessage('*This text is italic.*')).toBe('<em>This text is italic.</em>');
   });
 
   it('renders partially italic text', () => {
-    expect(z.util.render_message('This text is *partially* italic')).toBe('This text is <em>partially</em> italic');
+    expect(z.util.renderMessage('This text is *partially* italic')).toBe('This text is <em>partially</em> italic');
   });
 
   it('renders text with multiple italic words', () => {
-    expect(z.util.render_message('This text has *two* *italic* bits')).toBe(
+    expect(z.util.renderMessage('This text has *two* *italic* bits')).toBe(
       'This text has <em>two</em> <em>italic</em> bits'
     );
   });
 
   it('renders italic text with bold words', () => {
-    expect(z.util.render_message('*italic text **with bold** *')).toBe(
+    expect(z.util.renderMessage('*italic text **with bold** *')).toBe(
       '<em>italic text <strong>with bold</strong> </em>'
     );
   });
 
   it('renders words which are bold-italic', () => {
-    expect(z.util.render_message('***A***')).toBe('<strong><em>A</em></strong>');
+    expect(z.util.renderMessage('***A***')).toBe('<strong><em>A</em></strong>');
   });
 });
 
 describe('Markdown for code snippets', () => {
   it('renders code blocks', () => {
-    expect(z.util.render_message("```console.log('A')```")).toEqual('<code>console.log(&#x27;A&#x27;)</code>');
+    expect(z.util.renderMessage("```console.log('A')```")).toEqual('<code>console.log(&#x27;A&#x27;)</code>');
   });
 
   it('can escape HTML in rendered code blocks', () => {
-    expect(z.util.render_message('```<b>Hello</b>```')).toEqual('<code>&lt;b&gt;Hello&lt;/b&gt;</code>');
+    expect(z.util.renderMessage('```<b>Hello</b>```')).toEqual('<code>&lt;b&gt;Hello&lt;/b&gt;</code>');
   });
 
   it('renders code within code spans', () => {
-    expect(z.util.render_message('This is `code`.')).toEqual('This is <code>code</code>.');
+    expect(z.util.renderMessage('This is `code`.')).toEqual('This is <code>code</code>.');
   });
 
   it('renders code within code blocks', () => {
-    expect(z.util.render_message('This is ```code```.')).toEqual('This is <code>code</code>.');
+    expect(z.util.renderMessage('This is ```code```.')).toEqual('This is <code>code</code>.');
   });
 
   it('doesn’t render code within a code span', () => {
-    expect(z.util.render_message('`com.ibm.icu`')).toEqual('<code>com.ibm.icu</code>');
+    expect(z.util.renderMessage('`com.ibm.icu`')).toEqual('<code>com.ibm.icu</code>');
   });
 
   it('doesn’t render links within code blocks', () => {
     const expected =
       '<pre><code class="lang-xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br />  <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>com.ibm.icu<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br />  <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>icu4j<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br />  <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>53.1<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span><br /><span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br /></code></pre>';
     expect(
-      z.util.render_message(
+      z.util.renderMessage(
         '```xml\n<dependency>\n  <groupId>com.ibm.icu</groupId>\n  <artifactId>icu4j</artifactId>\n  <version>53.1</version>\n</dependency>\n```'
       )
     ).toEqual(expected);
@@ -4278,7 +4276,7 @@ describe('Markdown for code snippets', () => {
     const expected =
       '<pre><code class="lang-ruby"><span class="hljs-built_in">require</span> <span class="hljs-string">\'redcarpet\'</span><br />markdown = Redcarpet.<span class="hljs-keyword">new</span>(<span class="hljs-string">"Hello World!"</span>)<br />puts markdown.to_html<br /></code></pre>';
     expect(
-      z.util.render_message(
+      z.util.renderMessage(
         '```ruby\nrequire \'redcarpet\'\nmarkdown = Redcarpet.new("Hello World!")\nputs markdown.to_html\n```'
       )
     ).toEqual(expected);
@@ -4288,7 +4286,7 @@ describe('Markdown for code snippets', () => {
     const expected =
       '<pre><code class="lang-js">$(<span class="hljs-built_in">document</span>).ready(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{<br />  $(<span class="hljs-string">\'pre code\'</span>).each(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">i, block</span>) </span>{<br />    hljs.highlightBlock(block);<br />  });<br />});<br /></code></pre>';
     expect(
-      z.util.render_message(
+      z.util.renderMessage(
         "```js\n$(document).ready(function() {\n  $('pre code').each(function(i, block) {\n    hljs.highlightBlock(block);\n  });\n});```"
       )
     ).toEqual(expected);
@@ -4298,7 +4296,7 @@ describe('Markdown for code snippets', () => {
     const expected =
       '<pre><code class="lang-coffeescript"><span class="hljs-comment"># <span class="hljs-doctag">TODO:</span> This is not a general utility:</span><br /><span class="hljs-comment"># It should be part of a view model as it\'s UI related.</span><br />  z.util.convert_timestamps = <span class="hljs-function">-&gt;</span><br />    <span class="hljs-keyword">if</span> $(<span class="hljs-string">\'time\'</span>).length &gt; <span class="hljs-number">0</span><br /><span class="hljs-function">      <span class="hljs-title">recalculate</span> = -&gt;</span><br /></code></pre>';
     expect(
-      z.util.render_message(
+      z.util.renderMessage(
         "```coffeescript\n# TODO: This is not a general utility:\n# It should be part of a view model as it's UI related.\n  z.util.convert_timestamps = ->\n    if $('time').length > 0\n      recalculate = ->```"
       )
     ).toEqual(expected);
@@ -4307,14 +4305,14 @@ describe('Markdown for code snippets', () => {
   it('renders escaped HTML code blocks', () => {
     const expected =
       '<pre><code class="lang-html">&lt;<span class="hljs-selector-tag">a</span> href=<span class="hljs-string">"javascript:wire.app.logout()"</span>&gt;This is <span class="hljs-selector-tag">a</span> trick&lt;/a&gt;<br /></code></pre>';
-    expect(z.util.render_message('```html\n<a href="javascript:wire.app.logout()">This is a trick</a>\n```')).toEqual(
+    expect(z.util.renderMessage('```html\n<a href="javascript:wire.app.logout()">This is a trick</a>\n```')).toEqual(
       expected
     );
   });
 
   it('renders escaped HTML code spans', () => {
     const expected = '<code>&lt;a href=&quot;javascript:wire.app.logout()&quot;&gt;This is a trick&lt;/a&gt;</code>';
-    expect(z.util.render_message('`<a href="javascript:wire.app.logout()">This is a trick</a>`')).toEqual(expected);
+    expect(z.util.renderMessage('`<a href="javascript:wire.app.logout()">This is a trick</a>`')).toEqual(expected);
   });
 });
 
@@ -4326,7 +4324,7 @@ describe('Markdown with mixed markups', () => {
     const expected = `This is <em>italic</em> and <strong>bold</strong> and <strong><em>bold-italic</em></strong> with a ${link_1} and ${link_2}.`;
 
     expect(
-      z.util.render_message(
+      z.util.renderMessage(
         'This is *italic* and **bold** and ***bold-italic*** with a www.link.com and www.anotherlink.net.'
       )
     ).toEqual(expected);
@@ -4335,15 +4333,15 @@ describe('Markdown with mixed markups', () => {
 
 describe('Ignored Markdown syntax', () => {
   it('only renders correct Markdown syntax', () => {
-    expect(z.util.render_message('This text is not italic.')).toBe('This text is not italic.');
+    expect(z.util.renderMessage('This text is not italic.')).toBe('This text is not italic.');
   });
 
   it('does not render bold text when there is only a single asterisk', () => {
-    expect(z.util.render_message('random *asterisk')).toBe('random *asterisk');
+    expect(z.util.renderMessage('random *asterisk')).toBe('random *asterisk');
   });
 
   it('does not render horizontal lines', () => {
-    expect(z.util.render_message('***\nNo horizontal lines\n***')).toBe(
+    expect(z.util.renderMessage('***\nNo horizontal lines\n***')).toBe(
       '<strong><em><br />No horizontal lines<br /></em></strong>'
     );
   });
@@ -4351,7 +4349,7 @@ describe('Ignored Markdown syntax', () => {
   it('does not render tables', () => {
     const input = 'First Header | Second Header\n------------ | -------------\nCell 1 | Cell 2';
     const expected = `First Header | Second Header<br />------------ | -------------<br />Cell 1 | Cell 2`;
-    expect(z.util.render_message(input)).toBe(expected);
+    expect(z.util.renderMessage(input)).toBe(expected);
   });
 });
 
@@ -4359,12 +4357,12 @@ describe('Ignored Markdown syntax', () => {
 describe('Markdown exceptions', () => {
   it('handles the URLs that start with : after the protocol', () => {
     const text = 'http://:';
-    expect(z.util.render_message(text)).toBe(text);
+    expect(z.util.renderMessage(text)).toBe(text);
   });
 
   it('does not render underscores to italic when they are within a sentence', () => {
     const text = 'calling__voice_channel__fulltitle';
-    expect(z.util.render_message(text)).toBe(text);
+    expect(z.util.renderMessage(text)).toBe(text);
   });
 });
 
