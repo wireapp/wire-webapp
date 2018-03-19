@@ -24,18 +24,18 @@
 describe('z.util.ValidationUtil', () => {
   describe('"asset.legacy"', () => {
     it('detects a valid asset below v3', () => {
-      const asset_id = z.util.createRandomUuid();
-      const conversation_id = z.util.createRandomUuid();
+      const assetId = z.util.createRandomUuid();
+      const conversationId = z.util.createRandomUuid();
 
-      const actual = z.util.ValidationUtil.asset.legacy(asset_id, conversation_id);
+      const actual = z.util.ValidationUtil.asset.legacy(assetId, conversationId);
       expect(actual).toBe(true);
     });
 
     it('detects an invalid asset below v3', done => {
-      const asset_id = z.util.createRandomUuid();
-      const conversation_id = 'e13f9940-819c-477b-9391-b04234ae84af"*';
+      const assetId = z.util.createRandomUuid();
+      const conversationId = 'e13f9940-819c-477b-9391-b04234ae84af"*';
       try {
-        z.util.ValidationUtil.asset.legacy(asset_id, conversation_id);
+        z.util.ValidationUtil.asset.legacy(assetId, conversationId);
       } catch (error) {
         expect(error).toEqual(jasmine.any(z.util.ValidationUtilError));
         return done();
@@ -45,26 +45,26 @@ describe('z.util.ValidationUtil', () => {
   });
 
   describe('"asset.v3"', () => {
-    it('detects a valid v3 asset (asset_key only)', () => {
-      const asset_key = `3-1-${z.util.createRandomUuid()}`;
+    it('detects a valid v3 asset (assetKey only)', () => {
+      const assetKey = `3-1-${z.util.createRandomUuid()}`;
 
-      const actual = z.util.ValidationUtil.asset.v3(asset_key);
+      const actual = z.util.ValidationUtil.asset.v3(assetKey);
       expect(actual).toBe(true);
     });
 
-    it('detects a valid v3 asset (asset_key & asset_token)', () => {
-      const asset_key = `3-1-${z.util.createRandomUuid()}`;
-      const asset_token = 'aV0TGxF3ugpawm3wAYPmew==';
+    it('detects a valid v3 asset (assetKey & assetToken)', () => {
+      const assetKey = `3-1-${z.util.createRandomUuid()}`;
+      const assetToken = 'aV0TGxF3ugpawm3wAYPmew==';
 
-      const actual = z.util.ValidationUtil.asset.v3(asset_key, asset_token);
+      const actual = z.util.ValidationUtil.asset.v3(assetKey, assetToken);
       expect(actual).toBe(true);
     });
 
-    it('detects an invalid v3 asset (asset_key)', done => {
-      const asset_key = `3-6-${z.util.createRandomUuid()}`;
+    it('detects an invalid v3 asset (assetKey)', done => {
+      const assetKey = `3-6-${z.util.createRandomUuid()}`;
 
       try {
-        z.util.ValidationUtil.asset.v3(asset_key);
+        z.util.ValidationUtil.asset.v3(assetKey);
       } catch (error) {
         expect(error).toEqual(jasmine.any(z.util.ValidationUtilError));
         return done();
@@ -72,12 +72,12 @@ describe('z.util.ValidationUtil', () => {
       done.fail('Detection failed');
     });
 
-    it('detects an invalid v3 asset (asset_token)', done => {
-      const asset_key = `3-1-${z.util.createRandomUuid()}`;
-      const asset_token = 'a3wAY4%$@#$@%)!@-pOe==';
+    it('detects an invalid v3 asset (assetToken)', done => {
+      const assetKey = `3-1-${z.util.createRandomUuid()}`;
+      const assetToken = 'a3wAY4%$@#$@%)!@-pOe==';
 
       try {
-        z.util.ValidationUtil.asset.v3(asset_key, asset_token);
+        z.util.ValidationUtil.asset.v3(assetKey, assetToken);
       } catch (error) {
         expect(error).toEqual(jasmine.any(z.util.ValidationUtilError));
         return done();

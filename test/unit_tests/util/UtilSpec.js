@@ -3979,27 +3979,27 @@ describe('z.util.base64ToArray', () => {
   it('can convert array buffer back and forth', () => {
     const buffer = new ArrayBuffer(8);
     const array = new Uint8Array(buffer);
-    const buffer_encoded = z.util.arrayToBase64(array);
-    const buffer_decoded = z.util.base64ToArray(buffer_encoded);
-    expect(buffer_decoded).toEqual(array);
+    const bufferEncoded = z.util.arrayToBase64(array);
+    const bufferDecoded = z.util.base64ToArray(bufferEncoded);
+    expect(bufferDecoded).toEqual(array);
   });
 });
 
 describe('z.util.stripDataUri', () => {
   it('can strip data uri', () => {
     const base64 = 'AAAAAAA';
-    const plain_text = z.util.stripDataUri(base64);
-    const text_html = z.util.stripDataUri(`data:text/html,${base64}`);
-    const base64_text_plain = z.util.stripDataUri(`data:text/plain;base64,${base64}`);
-    const base64_gif = z.util.stripDataUri(`data:image/gif;base64,${base64}`);
-    const base64_png = z.util.stripDataUri(`data:image/png;base64,${base64}`);
-    const base64_jpg = z.util.stripDataUri(`data:image/jpg;base64,${base64}`);
-    expect(plain_text).toBe(base64);
-    expect(text_html).toBe(base64);
-    expect(base64_text_plain).toBe(base64);
-    expect(base64_gif).toBe(base64);
-    expect(base64_png).toBe(base64);
-    expect(base64_jpg).toBe(base64);
+    const plainText = z.util.stripDataUri(base64);
+    const textHtml = z.util.stripDataUri(`data:text/html,${base64}`);
+    const base64TextPlain = z.util.stripDataUri(`data:text/plain;base64,${base64}`);
+    const base64Gif = z.util.stripDataUri(`data:image/gif;base64,${base64}`);
+    const base64Png = z.util.stripDataUri(`data:image/png;base64,${base64}`);
+    const base64Jpg = z.util.stripDataUri(`data:image/jpg;base64,${base64}`);
+    expect(plainText).toBe(base64);
+    expect(textHtml).toBe(base64);
+    expect(base64TextPlain).toBe(base64);
+    expect(base64Gif).toBe(base64);
+    expect(base64Png).toBe(base64);
+    expect(base64Jpg).toBe(base64);
   });
 });
 
@@ -4109,7 +4109,7 @@ describe('z.util.stripUrlWrapper', () => {
 
 describe('z.util.nakedUrl', () => {
   it('returns naked urls', () => {
-    const expected_url = 'wire.com';
+    const expectedUrl = 'wire.com';
     const urls = [
       'HTTPS://WWW.WIRE.COM/',
       'https://www.wire.com/',
@@ -4125,9 +4125,9 @@ describe('z.util.nakedUrl', () => {
       'wire.com/',
     ];
 
-    const all_urls_naked = urls.map(url => z.util.nakedUrl(url)).every(url => url === expected_url);
+    const allUrlsNaked = urls.map(url => z.util.nakedUrl(url)).every(url => url === expectedUrl);
 
-    expect(all_urls_naked).toBeTruthy();
+    expect(allUrlsNaked).toBeTruthy();
   });
 
   it('returns empty string if url is not set', () => {
@@ -4153,29 +4153,29 @@ describe('z.util.getUrlParameter', () => {
 
 describe('z.util.forwardUrlParameter', () => {
   it('forwards existing URL parameters', () => {
-    z.util.getUrlParameter = function(parameter_value) {
-      if (parameter_value === z.auth.URLParameter.TRACKING) {
+    z.util.getUrlParameter = function(parameterValue) {
+      if (parameterValue === z.auth.URLParameter.TRACKING) {
         return true;
       }
     };
     expect(z.util.forwardUrlParameter('foo.com', z.auth.URLParameter.TRACKING)).toBe('foo.com?tracking=true');
 
-    z.util.getUrlParameter = function(parameter_value) {
-      if (parameter_value === z.auth.URLParameter.TRACKING) {
+    z.util.getUrlParameter = function(parameterValue) {
+      if (parameterValue === z.auth.URLParameter.TRACKING) {
         return false;
       }
     };
     expect(z.util.forwardUrlParameter('foo.com', z.auth.URLParameter.TRACKING)).toBe('foo.com?tracking=false');
 
-    z.util.getUrlParameter = function(parameter_value) {
-      if (parameter_value === z.auth.URLParameter.TRACKING) {
+    z.util.getUrlParameter = function(parameterValue) {
+      if (parameterValue === z.auth.URLParameter.TRACKING) {
         return 'bar';
       }
     };
     expect(z.util.forwardUrlParameter('foo.com', z.auth.URLParameter.TRACKING)).toBe('foo.com?tracking=bar');
 
-    z.util.getUrlParameter = function(parameter_value) {
-      if (parameter_value === z.auth.URLParameter.TRACKING) {
+    z.util.getUrlParameter = function(parameterValue) {
+      if (parameterValue === z.auth.URLParameter.TRACKING) {
         return null;
       }
     };
