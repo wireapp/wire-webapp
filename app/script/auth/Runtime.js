@@ -57,7 +57,7 @@ export default class Runtime {
   getBrowserName = () => this.getPlatform().name.toLowerCase();
   getBrowserVersion = () => {
     const [majorVersion, minorVersion] = this.getPlatform().version.split('.');
-    return {major: parseInt(majorVersion, 10), major: parseInt(minorVersion, 10)};
+    return {major: parseInt(majorVersion, 10), minor: parseInt(minorVersion, 10)};
   };
 
   isSupportedBrowser = () => {
