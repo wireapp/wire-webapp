@@ -58,27 +58,27 @@ describe('z.util.ArrayUtil', () => {
   });
 
   describe('getNextItem', () => {
-    const first_item = 'a';
-    const second_item = 'b';
-    const third_item = 'c';
-    const unknown_item = 'd';
-    const array = [first_item, second_item, third_item];
-    const filter = item => item !== second_item;
+    const firstItem = 'a';
+    const secondItem = 'b';
+    const thirdItem = 'c';
+    const unknownItem = 'd';
+    const array = [firstItem, secondItem, thirdItem];
+    const filter = item => item !== secondItem;
 
     it('returns the second item when first item was given', () => {
-      expect(z.util.ArrayUtil.getNextItem(array, first_item)).toEqual(second_item);
+      expect(z.util.ArrayUtil.getNextItem(array, firstItem)).toEqual(secondItem);
     });
 
     it('returns the third item when first item was given and filter skips the second item', () => {
-      expect(z.util.ArrayUtil.getNextItem(array, first_item, filter)).toEqual(third_item);
+      expect(z.util.ArrayUtil.getNextItem(array, firstItem, filter)).toEqual(thirdItem);
     });
 
     it('returns the second item when last item was given', () => {
-      expect(z.util.ArrayUtil.getNextItem(array, third_item)).toEqual(second_item);
+      expect(z.util.ArrayUtil.getNextItem(array, thirdItem)).toEqual(secondItem);
     });
 
     it('returns undefined when item is not in the array', () => {
-      expect(z.util.ArrayUtil.getNextItem(array, unknown_item)).toBeUndefined();
+      expect(z.util.ArrayUtil.getNextItem(array, unknownItem)).toBeUndefined();
     });
   });
 
@@ -96,23 +96,23 @@ describe('z.util.ArrayUtil', () => {
   });
 
   describe('isLastItem', () => {
-    const first_item = 'a';
-    const second_item = 'b';
-    const third_item = 'c';
-    const unknown_item = 'd';
-    const array = [first_item, second_item, third_item];
+    const firstItem = 'a';
+    const secondItem = 'b';
+    const thirdItem = 'c';
+    const unknownItem = 'd';
+    const array = [firstItem, secondItem, thirdItem];
 
     it('returns true for the last item', () => {
-      expect(z.util.ArrayUtil.isLastItem(array, third_item)).toBeTruthy();
+      expect(z.util.ArrayUtil.isLastItem(array, thirdItem)).toBeTruthy();
     });
 
     it('returns false for any item that is not the last', () => {
-      expect(z.util.ArrayUtil.isLastItem(array, first_item)).toBeFalsy();
-      expect(z.util.ArrayUtil.isLastItem(array, second_item)).toBeFalsy();
+      expect(z.util.ArrayUtil.isLastItem(array, firstItem)).toBeFalsy();
+      expect(z.util.ArrayUtil.isLastItem(array, secondItem)).toBeFalsy();
     });
 
     it('returns false for an item that is not in the array', () => {
-      expect(z.util.ArrayUtil.isLastItem(array, unknown_item)).toBeFalsy();
+      expect(z.util.ArrayUtil.isLastItem(array, unknownItem)).toBeFalsy();
     });
   });
 
