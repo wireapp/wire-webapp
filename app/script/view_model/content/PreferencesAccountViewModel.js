@@ -131,7 +131,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
     this.submittedUsername(normalizedUsername);
     this.userRepository
-      .changeUsername(normalizedUsername)
+      .change_username(normalizedUsername)
       .then(() => {
         const isCurrentRequest = this.enteredUsername() === this.submittedUsername();
         if (isCurrentRequest) {
