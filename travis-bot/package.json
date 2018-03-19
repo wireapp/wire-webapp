@@ -27,7 +27,7 @@
     "build:node": "tsc",
     "clear": "rimraf dist",
     "dist": "yarn clear && yarn build",
-    "test": "exit 0"
+    "test": "yarn dist"
   },
   "types": "dist/index.d.ts",
   "version": "0.1.2"
