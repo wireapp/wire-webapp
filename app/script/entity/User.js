@@ -254,7 +254,7 @@ z.entity.User = class User {
 
     if (remainingMinutes <= 60) {
       timeLeftText = z.string.userRemainingTimeMinutes;
-      timeValue = remainingMinutes;
+      timeValue = Math.ceil(remainingMinutes / 15) * 15;
     } else if (remainingMinutes <= 90) {
       timeValue = 1.5;
     } else {
