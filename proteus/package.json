@@ -24,9 +24,10 @@
   "name": "@wireapp/proteus",
   "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus",
   "scripts": {
-    "build": "tsc",
+    "build:browser": "bower install && webpack --progress",
+    "build:node": "tsc",
     "clear": "rimraf dist",
-    "dist": "yarn clear && yarn build && bower install && webpack --progress",
+    "dist": "yarn clear && yarn build:node && yarn build:browser",
     "start": "node dist/index.js",
     "test": "yarn dist && yarn test:node",
     "test:all": "yarn test && yarn test:longrunning",

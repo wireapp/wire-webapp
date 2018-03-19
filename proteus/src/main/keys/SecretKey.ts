@@ -37,7 +37,7 @@ class SecretKey {
   }
 
   static new(sec_edward: Uint8Array, sec_curve: Uint8Array): SecretKey {
-    const sk = ClassUtil.new_instance<SecretKey>(SecretKey);
+    const sk = ClassUtil.new_instance(SecretKey);
 
     sk.sec_edward = sec_edward;
     sk.sec_curve = sec_curve;
@@ -74,7 +74,7 @@ class SecretKey {
   }
 
   static decode(decoder: CBOR.Decoder): SecretKey {
-    const self = ClassUtil.new_instance<SecretKey>(SecretKey);
+    const self = ClassUtil.new_instance(SecretKey);
 
     const nprops = decoder.object();
     for (let index = 0; index <= nprops - 1; index++) {

@@ -46,7 +46,7 @@ class PreKey {
   static async new(pre_key_id: number): Promise<PreKey> {
     this.validate_pre_key_id(pre_key_id);
 
-    const pk = ClassUtil.new_instance<PreKey>(PreKey);
+    const pk = ClassUtil.new_instance(PreKey);
 
     pk.version = 1;
     pk.key_id = pre_key_id;
@@ -111,7 +111,7 @@ class PreKey {
   }
 
   static decode(decoder: CBOR.Decoder): PreKey {
-    const self = ClassUtil.new_instance<PreKey>(PreKey);
+    const self = ClassUtil.new_instance(PreKey);
 
     const nprops = decoder.object();
     for (let index = 0; index <= nprops - 1; index++) {

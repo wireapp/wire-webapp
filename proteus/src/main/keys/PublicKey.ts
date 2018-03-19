@@ -34,7 +34,7 @@ class PublicKey {
   }
 
   static new(pub_edward: Uint8Array, pub_curve: Uint8Array): PublicKey {
-    const pk = ClassUtil.new_instance<PublicKey>(PublicKey);
+    const pk = ClassUtil.new_instance(PublicKey);
 
     pk.pub_edward = pub_edward;
     pk.pub_curve = pub_curve;
@@ -63,7 +63,7 @@ class PublicKey {
   }
 
   static decode(decoder: CBOR.Decoder): PublicKey {
-    const self = ClassUtil.new_instance<PublicKey>(PublicKey);
+    const self = ClassUtil.new_instance(PublicKey);
 
     const nprops = decoder.object();
     for (let index = 0; index <= nprops - 1; index++) {

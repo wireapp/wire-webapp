@@ -85,7 +85,7 @@ class SessionState {
     const [rok, chk] = rootkey.dh_ratchet(send_ratchet, bob_pkbundle.public_key);
     const send_chain = SendChain.new(<ChainKey>chk, send_ratchet);
 
-    const state = ClassUtil.new_instance<SessionState>(SessionState);
+    const state = ClassUtil.new_instance(SessionState);
     state.recv_chains = recv_chains;
     state.send_chain = send_chain;
     state.root_key = <RootKey>rok;
@@ -112,7 +112,7 @@ class SessionState {
     const chainkey = ChainKey.from_mac_key(derived_secrets.mac_key, 0);
     const send_chain = SendChain.new(chainkey, bob_prekey);
 
-    const state = ClassUtil.new_instance<SessionState>(SessionState);
+    const state = ClassUtil.new_instance(SessionState);
     state.recv_chains = [];
     state.send_chain = send_chain;
     state.root_key = rootkey;
@@ -248,7 +248,7 @@ class SessionState {
   }
 
   static decode(decoder: CBOR.Decoder): SessionState {
-    const self = ClassUtil.new_instance<SessionState>(SessionState);
+    const self = ClassUtil.new_instance(SessionState);
 
     const nprops = decoder.object();
     for (let index = 0; index <= nprops - 1; index++) {

@@ -40,7 +40,7 @@ class IdentityKeyPair {
   static async new(): Promise<IdentityKeyPair> {
     const key_pair = await KeyPair.new();
 
-    const ikp = ClassUtil.new_instance<IdentityKeyPair>(IdentityKeyPair);
+    const ikp = ClassUtil.new_instance(IdentityKeyPair);
     ikp.version = 1;
     ikp.secret_key = key_pair.secret_key;
     ikp.public_key = IdentityKey.new(key_pair.public_key);
@@ -70,7 +70,7 @@ class IdentityKeyPair {
   }
 
   static decode(decoder: CBOR.Decoder): IdentityKeyPair {
-    const self = ClassUtil.new_instance<IdentityKeyPair>(IdentityKeyPair);
+    const self = ClassUtil.new_instance(IdentityKeyPair);
 
     const nprops = decoder.object();
     for (let index = 0; index <= nprops - 1; index++) {

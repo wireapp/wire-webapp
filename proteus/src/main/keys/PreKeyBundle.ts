@@ -50,7 +50,7 @@ class PreKeyBundle {
   }
 
   static new(public_identity_key: IdentityKey, prekey: PreKey): PreKeyBundle {
-    const bundle = ClassUtil.new_instance<PreKeyBundle>(PreKeyBundle);
+    const bundle = ClassUtil.new_instance(PreKeyBundle);
 
     bundle.version = 1;
     bundle.prekey_id = prekey.key_id;
@@ -65,7 +65,7 @@ class PreKeyBundle {
     const ratchet_key = prekey.key_pair.public_key;
     const signature = identity_pair.secret_key.sign(ratchet_key.pub_edward);
 
-    const bundle = ClassUtil.new_instance<PreKeyBundle>(PreKeyBundle);
+    const bundle = ClassUtil.new_instance(PreKeyBundle);
 
     bundle.version = 1;
     bundle.prekey_id = prekey.key_id;
@@ -123,7 +123,7 @@ class PreKeyBundle {
   }
 
   static decode(decoder: CBOR.Decoder): PreKeyBundle {
-    const self = ClassUtil.new_instance<PreKeyBundle>(PreKeyBundle);
+    const self = ClassUtil.new_instance(PreKeyBundle);
 
     const nprops = decoder.object();
     for (let index = 0; index <= nprops - 1; index++) {

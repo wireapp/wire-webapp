@@ -22,9 +22,9 @@ export interface ParameterlessConstructor<T> {
 }
 
 const ClassUtil = {
-  new_instance<T>(_class: ParameterlessConstructor<T>): T {
+  new_instance<T>(proposedClass: ParameterlessConstructor<T>): T {
     try {
-      return new _class();
+      return new proposedClass();
     } catch (error) {
       return error._instance;
     }

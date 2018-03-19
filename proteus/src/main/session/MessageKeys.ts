@@ -37,7 +37,7 @@ class MessageKeys {
   }
 
   static new(cipher_key: CipherKey, mac_key: MacKey, counter: number): MessageKeys {
-    const mk = ClassUtil.new_instance<MessageKeys>(MessageKeys);
+    const mk = ClassUtil.new_instance(MessageKeys);
     mk.cipher_key = cipher_key;
     mk.mac_key = mac_key;
     mk.counter = counter;
@@ -69,7 +69,7 @@ class MessageKeys {
   }
 
   static decode(decoder: CBOR.Decoder): MessageKeys {
-    const self = ClassUtil.new_instance<MessageKeys>(MessageKeys);
+    const self = ClassUtil.new_instance(MessageKeys);
 
     const nprops = decoder.object();
     for (let index = 0; index <= nprops - 1; index++) {

@@ -50,7 +50,7 @@ class CipherMessage extends Message {
     ratchet_key: PublicKey,
     cipher_text: Uint8Array
   ): CipherMessage {
-    const cm = ClassUtil.new_instance<CipherMessage>(CipherMessage);
+    const cm = ClassUtil.new_instance(CipherMessage);
 
     cm.session_tag = session_tag;
     cm.counter = counter;

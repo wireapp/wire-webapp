@@ -35,7 +35,7 @@ class IdentityKey {
   }
 
   static new(public_key: PublicKey): IdentityKey {
-    const key = ClassUtil.new_instance<IdentityKey>(IdentityKey);
+    const key = ClassUtil.new_instance(IdentityKey);
     key.public_key = public_key;
     return key;
   }
@@ -51,7 +51,7 @@ class IdentityKey {
   }
 
   static decode(decoder: CBOR.Decoder): IdentityKey {
-    let public_key = ClassUtil.new_instance<PublicKey>(PublicKey);
+    let public_key = ClassUtil.new_instance(PublicKey);
 
     const nprops = decoder.object();
     for (let index = 0; index <= nprops - 1; index++) {

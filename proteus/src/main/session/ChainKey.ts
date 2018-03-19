@@ -36,14 +36,14 @@ class ChainKey {
   }
 
   static from_mac_key(key: MacKey, counter: number): ChainKey {
-    const ck = ClassUtil.new_instance<ChainKey>(ChainKey);
+    const ck = ClassUtil.new_instance(ChainKey);
     ck.key = key;
     ck.idx = counter;
     return ck;
   }
 
   next(): ChainKey {
-    const ck = ClassUtil.new_instance<ChainKey>(ChainKey);
+    const ck = ClassUtil.new_instance(ChainKey);
     ck.key = new MacKey(this.key.sign('1'));
     ck.idx = this.idx + 1;
     return ck;
@@ -64,7 +64,7 @@ class ChainKey {
   }
 
   static decode(decoder: CBOR.Decoder): ChainKey {
-    const self = ClassUtil.new_instance<ChainKey>(ChainKey);
+    const self = ClassUtil.new_instance(ChainKey);
 
     const nprops = decoder.object();
     for (let index = 0; index <= nprops - 1; index++) {

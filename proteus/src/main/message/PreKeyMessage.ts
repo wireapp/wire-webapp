@@ -44,7 +44,7 @@ class PreKeyMessage extends Message {
   }
 
   static new(prekey_id: number, base_key: PublicKey, identity_key: IdentityKey, message: CipherMessage): PreKeyMessage {
-    const pkm = ClassUtil.new_instance<PreKeyMessage>(PreKeyMessage);
+    const pkm = ClassUtil.new_instance(PreKeyMessage);
 
     pkm.prekey_id = prekey_id;
     pkm.base_key = base_key;

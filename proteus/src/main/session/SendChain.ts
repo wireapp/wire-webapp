@@ -35,7 +35,7 @@ class SendChain {
   }
 
   static new(chain_key: ChainKey, keypair: KeyPair): SendChain {
-    const sc = ClassUtil.new_instance<SendChain>(SendChain);
+    const sc = ClassUtil.new_instance(SendChain);
     sc.chain_key = chain_key;
     sc.ratchet_key = keypair;
     return sc;
@@ -50,7 +50,7 @@ class SendChain {
   }
 
   static decode(decoder: CBOR.Decoder): SendChain {
-    const self = ClassUtil.new_instance<SendChain>(SendChain);
+    const self = ClassUtil.new_instance(SendChain);
     const nprops = decoder.object();
     for (let index = 0; index <= nprops - 1; index++) {
       switch (decoder.u8()) {

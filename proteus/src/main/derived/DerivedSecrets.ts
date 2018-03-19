@@ -45,7 +45,7 @@ class DerivedSecrets {
 
     MemoryUtil.zeroize(output_key_material.buffer);
 
-    const ds = ClassUtil.new_instance<DerivedSecrets>(DerivedSecrets);
+    const ds = ClassUtil.new_instance(DerivedSecrets);
     ds.cipher_key = CipherKey.new(cipher_key);
     ds.mac_key = new MacKey(mac_key);
     return ds;

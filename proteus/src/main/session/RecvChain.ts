@@ -52,7 +52,7 @@ class RecvChain {
   }
 
   static new(chain_key: ChainKey, public_key: PublicKey): RecvChain {
-    const rc = ClassUtil.new_instance<RecvChain>(RecvChain);
+    const rc = ClassUtil.new_instance(RecvChain);
     rc.chain_key = chain_key;
     rc.ratchet_key = public_key;
     rc.message_keys = [];
@@ -149,7 +149,7 @@ class RecvChain {
   }
 
   static decode(decoder: CBOR.Decoder): RecvChain {
-    const self = ClassUtil.new_instance<RecvChain>(RecvChain);
+    const self = ClassUtil.new_instance(RecvChain);
 
     const nprops = decoder.object();
     for (let index = 0; index <= nprops - 1; index++) {

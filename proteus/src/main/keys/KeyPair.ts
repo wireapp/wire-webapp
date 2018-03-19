@@ -45,7 +45,7 @@ class KeyPair {
 
     const ed25519_key_pair = sodium.crypto_sign_keypair();
 
-    const kp = ClassUtil.new_instance<KeyPair>(KeyPair);
+    const kp = ClassUtil.new_instance(KeyPair);
     kp.secret_key = KeyPair.prototype._construct_private_key(ed25519_key_pair);
     kp.public_key = KeyPair.prototype._construct_public_key(ed25519_key_pair);
 
@@ -92,7 +92,7 @@ class KeyPair {
   }
 
   static decode(decoder: CBOR.Decoder): KeyPair {
-    const self = ClassUtil.new_instance<KeyPair>(KeyPair);
+    const self = ClassUtil.new_instance(KeyPair);
 
     const nprops = decoder.object();
     for (let index = 0; index <= nprops - 1; index++) {

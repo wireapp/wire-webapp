@@ -30,7 +30,7 @@ class CipherKey {
   }
 
   static new(key: Uint8Array): CipherKey {
-    const ck = ClassUtil.new_instance<CipherKey>(CipherKey);
+    const ck = ClassUtil.new_instance(CipherKey);
     ck.key = key;
     return ck;
   }
