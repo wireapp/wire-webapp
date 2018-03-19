@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="2.0.85"></a>
+## [2.0.85](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.0.84...@wireapp/core@2.0.85) (2018-03-19)
+
+
+### Bug Fixes
+
+* **core:** Update or create on initializeNotificationStream ([#380](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/380)) ([dc97c6e](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/dc97c6e))
+
+
+
+
 <a name="2.0.84"></a>
 ## [2.0.84](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.0.83...@wireapp/core@2.0.84) (2018-03-19)
 
