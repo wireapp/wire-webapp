@@ -142,11 +142,8 @@ z.util.appendUrlParameter = function(url, parameter) {
 };
 
 z.util.forwardUrlParameter = function(url, parameterName) {
-  const parameterValue = z.util.getUrlParameter(parameterName);
-  if (parameterValue != null) {
-    return z.util.appendUrlParameter(url, `${parameterName}=${parameterValue}`);
-  }
-  return url;
+  const hasValue = parameterValue != null;
+  return hasValue ? z.util.appendUrlParameter(url, `${parameterName}=${parameterValue}`) : url;
 };
 
 z.util.getUrlParameter = function(name) {
