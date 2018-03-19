@@ -1430,6 +1430,8 @@ z.calling.CallingRepository = class CallingRepository {
   _enableDebugging() {
     if (window.adapter) {
       window.adapter.disableLog = false;
+    } else {
+      this.logger.warn('WebRTC Adapter not found while trying to enable logging');
     }
   }
 
