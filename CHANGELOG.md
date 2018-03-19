@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="2.0.87"></a>
+## [2.0.87](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.0.86...@wireapp/core@2.0.87) (2018-03-19)
+
+
+### Bug Fixes
+
+* **core:** Get response status ([#386](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/386)) ([c432114](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/c432114))
+
+
+
+
 <a name="2.0.86"></a>
 ## [2.0.86](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.0.85...@wireapp/core@2.0.86) (2018-03-19)
 
