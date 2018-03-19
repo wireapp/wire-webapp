@@ -22,7 +22,7 @@
 window.z = window.z || {};
 window.z.util = z.util || {};
 
-(() => {
+z.util.Environment = (() => {
   const APP_ENV = {
     INTERNAL: 'wire-webapp-staging.wire.com',
     LOCALHOST: 'localhost',
@@ -45,103 +45,99 @@ window.z.util = z.util || {};
     WINDOWS: 'Win',
   };
 
-  const _check = {
-    getVersion: () => (window.platform.version ? window.parseInt(window.platform.version.split('.')[0], 10) : null),
-    isChrome: () => window.platform.name === BROWSER_NAME.CHROME || this.isElectron(),
-    isDesktop: () => this.isElectron() && window.platform.ua.includes(BROWSER_NAME.WIRE),
-    isEdge: () => window.platform.name === BROWSER_NAME.EDGE,
-    isElectron: () => window.platform.name === BROWSER_NAME.ELECTRON,
-    isFirefox: () => window.platform.name === BROWSER_NAME.FIREFOX,
-    isOpera: () => window.platform.name === BROWSER_NAME.OPERA,
-    supportsAudioOutputSelection: () => this.isChrome(),
-    supportsCalling: () => {
-      if (!this.supportsMediaDevices()) {
-        return false;
-      }
-
-      if (window.WebSocket === undefined) {
-        return false;
-      }
-
-      return this.isEdge() ? false : this.isChrome() || this.isFirefox() || this.isOpera();
-    },
-    supportsIndexedDb: () => !!window.indexedDB,
-    supportsMediaDevices: () => !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia),
-    supportsNotifications: () => {
-      const notificationNotSupported = window.Notification === undefined;
-      if (notificationNotSupported) {
-        return false;
-      }
-
-      const requestPermissionNotSupported = window.Notification.requestPermission === undefined;
-      if (requestPermissionNotSupported) {
-        return false;
-      }
-
-      return document.visibilityState !== undefined;
-    },
-    supportsScreenSharing: () => (window.desktopCapturer ? true : this.isFirefox()),
-  };
-
-  const os = {
-    isMac: () => window.platform.ua.includes(PLATFORM_NAME.MACINTOSH),
-    isWindows: () => window.platform.os.family.includes(PLATFORM_NAME.WINDOWS),
-  };
-
-  // add body information
-  const osCssClass = os.isMac() ? 'os-mac' : 'os-pc';
-  const platformCssClass = _check.isElectron() ? 'platform-electron' : 'platform-web';
-  document.body.classList.add(osCssClass, platformCssClass);
-
-  const appVersion = () => {
+  const _getAppVersion = () => {
     const versionElement = document.head.querySelector("[property='wire:version']");
-    if (versionElement && versionElement.hasAttribute('version')) {
-      return versionElement.getAttribute('version').trim();
-    }
-    return '';
+    const hasVersion = versionElement && versionElement.hasAttribute('version');
+    return hasVersion ? versionElement.getAttribute('version').trim() : '';
   };
 
-  const formattedAppVersion = () => {
-    const [year, month, day, hour, minute] = appVersion().split('-');
+  const _getElectronVersion = userAgent => {
+    // [match, app, version]
+    const [, , electronVersion] = /(Wire|WireInternal)\/(\S+)/.exec(userAgent) || [];
+    return electronVersion;
+  };
+
+  const _getFormattedAppVersion = () => {
+    const [year, month, day, hour, minute] = _getAppVersion().split('-');
     return `${year}.${month}.${day}.${hour}${minute}`;
   };
 
-  z.util.Environment = {
-    _electronVersion: user_agent => {
-      const result = /(Wire|WireInternal)\/(\S+)/.exec(user_agent);
-      // [match, app, version]
-      return result ? result[2] : undefined;
-    },
+  const _getVersion = () => {
+    const [majorVersion] = window.platform.version.split('.');
+    return window.parseInt(majorVersion, 10);
+  };
+
+  const _isChrome = () => window.platform.name === BROWSER_NAME.CHROME || _isElectron();
+  const _isDesktop = () => _isElectron() && window.platform.ua.includes(BROWSER_NAME.WIRE);
+  const _isEdge = () => window.platform.name === BROWSER_NAME.EDGE;
+  const _isElectron = () => window.platform.name === BROWSER_NAME.ELECTRON;
+  const _isFirefox = () => window.platform.name === BROWSER_NAME.FIREFOX;
+  const _isOpera = () => window.platform.name === BROWSER_NAME.OPERA;
+
+  const _isMac = () => window.platform.ua.includes(PLATFORM_NAME.MACINTOSH);
+  const _isWindows = () => window.platform.os.family.includes(PLATFORM_NAME.WINDOWS);
+
+  const _supportsAudioOutputSelection = () => _isChrome();
+  const _supportsCalling = () => {
+    if (!_supportsMediaDevices()) {
+      return false;
+    }
+
+    if (window.WebSocket === undefined) {
+      return false;
+    }
+
+    return _isEdge() ? false : _isChrome() || _isFirefox() || _isOpera();
+  };
+  const _supportsIndexedDb = () => !!window.indexedDB;
+  const _supportsMediaDevices = () => !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+  const _supportsNotifications = () => {
+    const notificationNotSupported = window.Notification === undefined;
+    if (notificationNotSupported) {
+      return false;
+    }
+
+    const requestPermissionNotSupported = window.Notification.requestPermission === undefined;
+    return requestPermissionNotSupported ? false : document.visibilityState !== undefined;
+  };
+  const _supportsScreenSharing = () => (window.desktopCapturer ? true : _isFirefox());
+
+  // add body information
+  const _osCssClass = _isMac() ? 'os-mac' : 'os-pc';
+  const _platformCssClass = _isElectron() ? 'platform-electron' : 'platform-web';
+  document.body.classList.add(_osCssClass, _platformCssClass);
+
+  return {
     backend: {
       current: undefined,
     },
     browser: {
-      chrome: _check.isChrome(),
-      edge: _check.isEdge(),
-      firefox: _check.isFirefox(),
+      chrome: _isChrome(),
+      edge: _isEdge(),
+      firefox: _isFirefox(),
       name: window.platform.name,
-      opera: _check.isOpera(),
+      opera: _isOpera(),
       supports: {
-        audioOutputSelection: _check.supportsAudioOutputSelection(),
-        calling: _check.supportsCalling(),
-        indexedDb: _check.supportsIndexedDb(),
-        mediaDevices: _check.supportsMediaDevices(),
-        notifications: _check.supportsNotifications(),
-        screenSharing: _check.supportsScreenSharing(),
+        audioOutputSelection: _supportsAudioOutputSelection(),
+        calling: _supportsCalling(),
+        indexedDb: _supportsIndexedDb(),
+        mediaDevices: _supportsMediaDevices(),
+        notifications: _supportsNotifications(),
+        screenSharing: _supportsScreenSharing(),
       },
-      version: _check.getVersion(),
+      version: _getVersion(),
     },
-    desktop: _check.isDesktop(),
-    electron: _check.isElectron(),
+    desktop: _isDesktop(),
+    electron: _isElectron(),
     frontend: {
       isInternal: () => window.location.hostname === APP_ENV.INTERNAL,
       isLocalhost: () => [APP_ENV.LOCALHOST, APP_ENV.VIRTUAL_HOST].includes(window.location.hostname),
       isProduction: () => [APP_ENV.PRODUCTION, APP_ENV.PROD_NEXT].includes(window.location.hostname),
     },
     os: {
-      linux: !os.isMac() && !os.isWindows(),
-      mac: os.isMac(),
-      win: os.isWindows(),
+      linux: !_isMac() && !_isWindows(),
+      mac: _isMac(),
+      win: _isWindows(),
     },
     version(showWrapperVersion = true, doNotFormat = false) {
       if (z.util.Environment.frontend.isLocalhost()) {
@@ -149,12 +145,12 @@ window.z.util = z.util || {};
       }
 
       if (doNotFormat) {
-        return appVersion();
+        return _getAppVersion();
       }
 
-      const electronVersion = this._electronVersion(window.platform.ua);
+      const electronVersion = _getElectronVersion(window.platform.ua);
       const showElectronVersion = electronVersion && showWrapperVersion;
-      return showElectronVersion ? electronVersion : formattedAppVersion();
+      return showElectronVersion ? electronVersion : _getFormattedAppVersion();
     },
   };
 })();
