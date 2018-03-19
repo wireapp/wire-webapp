@@ -125,6 +125,8 @@ module.exports = {
       '@wireapp/cryptobox/dist/cryptobox.bundle.js.map',
       '@wireapp/lru-cache/dist/lru-cache.bundle.js',
       '@wireapp/lru-cache/dist/lru-cache.bundle.js.map',
+      '@wireapp/priority-queue/dist/priority-queue.bundle.js',
+      '@wireapp/priority-queue/dist/priority-queue.bundle.js.map',
       '@wireapp/proteus/dist/proteus.bundle.js',
       '@wireapp/proteus/dist/proteus.bundle.js.map',
       '@wireapp/store-engine/dist/store-engine.bundle.js',

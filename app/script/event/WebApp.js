@@ -141,9 +141,6 @@ z.event.WebApp = {
     UNREAD_COUNT: 'wire.webapp.lifecycle.unread_count',
     UPDATE: 'wire.webapp.lifecycle.update',
   },
-  LIST: {
-    SCROLL: 'wire.webapp.list.scroll',
-  },
   LOADED: 'wire.webapp.loaded', // todo: deprecated - remove when user base of wrappers version >= 2.12 is large enough
   NOTIFICATION: {
     CLICK: 'wire.webapp.notification.click',

@@ -2,23 +2,23 @@
   <div class="preferences-titlebar" data-bind="l10n_text: z.string.preferencesOptions"></div>
   <div class="preferences-content-wrapper">
     <div class="preferences-content" data-bind="antiscroll">
-      <!-- ko ifnot: is_team()-->
+      <!-- ko ifnot: isTeam()-->
         <section class="preferences-section">
           <header class="preferences-header" data-bind="l10n_text: z.string.preferencesOptionsContacts"></header>
           <div class="preferences-option" data-uie-name="do-share-contacts">
-            <div class="preferences-option-icon preferences-option-pointer" data-bind="click: connect_google_contacts, l10n_tooltip: z.string.tooltipPreferencesContactsGmail">
+            <div class="preferences-option-icon preferences-option-pointer" data-bind="click: connectGoogleContacts, l10n_tooltip: z.string.tooltipPreferencesContactsGmail">
               <svg>
                 <use xlink:href="#icon-gmail"></use>
               </svg>
             </div>
-            <label class="preferences-option-label" data-bind="click: connect_google_contacts, l10n_text: z.string.preferencesOptionsContactsGmail, l10n_tooltip: z.string.tooltipPreferencesContactsGmail"></label>
+            <label class="preferences-option-label" data-bind="click: connectGoogleContacts, l10n_text: z.string.preferencesOptionsContactsGmail, l10n_tooltip: z.string.tooltipPreferencesContactsGmail"></label>
           </div>
           <!-- ko if: window.wAddressBook -->
             <div class="preferences-option" data-uie-name="do-share-osx-contacts">
-              <div class="preferences-option-icon preferences-option-pointer" data-bind="click: connect_macos_contacts, l10n_tooltip: z.string.tooltipPreferencesContactsMacos">
+              <div class="preferences-option-icon preferences-option-pointer" data-bind="click: connectMacOSContacts, l10n_tooltip: z.string.tooltipPreferencesContactsMacos">
                 <div class="icon-contacts"></div>
               </div>
-              <label class="preferences-option-label" data-bind="click: connect_macos_contacts, l10n_text: z.string.preferencesOptionsContactsMacos, l10n_tooltip: z.string.tooltipPreferencesContactsMacos"></label>
+              <label class="preferences-option-label" data-bind="click: connectMacOSContacts, l10n_text: z.string.preferencesOptionsContactsMacos, l10n_tooltip: z.string.tooltipPreferencesContactsMacos"></label>
             </div>
           <!-- /ko -->
           <div class="preferences-detail" data-bind="l10n_text: z.string.preferencesOptionsContactsDetail"></div>
@@ -29,20 +29,20 @@
         <header class="preferences-header" data-bind="l10n_text: z.string.preferencesOptionsAudio"></header>
         <div class="preferences-option">
           <div class="preferences-options-radio">
-            <input type="radio" id="preferences-options-audio-all" name="preferences-options-audio" value="all" data-bind="checked: option_audio">
+            <input type="radio" id="preferences-options-audio-all" name="preferences-options-audio" value="all" data-bind="checked: optionAudio">
             <label class="text-theme" for="preferences-options-audio-all">
               <span class="preferences-label" data-bind="l10n_text: z.string.preferencesOptionsAudioAll"></span>
-              <span class="preferences-hint" data-bind="visible: option_audio() === z.audio.AudioPreference.ALL"> · <span data-bind="l10n_text: z.string.preferencesOptionsAudioAllDetail"></span></span>
+              <span class="preferences-hint" data-bind="visible: optionAudio() === z.audio.AudioPreference.ALL"> · <span data-bind="l10n_text: z.string.preferencesOptionsAudioAllDetail"></span></span>
             </label>
-            <input type="radio" id="preferences-options-audio-some" name="preferences-options-audio" value="some" data-bind="checked: option_audio">
+            <input type="radio" id="preferences-options-audio-some" name="preferences-options-audio" value="some" data-bind="checked: optionAudio">
             <label class="text-theme" for="preferences-options-audio-some">
               <span class="preferences-label" data-bind="l10n_text: z.string.preferencesOptionsAudioSome"></span>
-              <span class="preferences-hint" data-bind="visible: option_audio() === z.audio.AudioPreference.SOME"> · <span data-bind="l10n_text: z.string.preferencesOptionsAudioSomeDetail"></span></span>
+              <span class="preferences-hint" data-bind="visible: optionAudio() === z.audio.AudioPreference.SOME"> · <span data-bind="l10n_text: z.string.preferencesOptionsAudioSomeDetail"></span></span>
             </label>
-            <input type="radio" id="preferences-options-audio-none" name="preferences-options-audio" value="none" data-bind="checked: option_audio">
+            <input type="radio" id="preferences-options-audio-none" name="preferences-options-audio" value="none" data-bind="checked: optionAudio">
             <label class="text-theme" for="preferences-options-audio-none">
               <span class="preferences-label" data-bind="l10n_text: z.string.preferencesOptionsAudioNone"></span>
-              <span class="preferences-hint" data-bind="visible: option_audio() === z.audio.AudioPreference.NONE"> · <span data-bind="l10n_text: z.string.preferencesOptionsAudioNoneDetail"></span></span>
+              <span class="preferences-hint" data-bind="visible: optionAudio() === z.audio.AudioPreference.NONE"> · <span data-bind="l10n_text: z.string.preferencesOptionsAudioNoneDetail"></span></span>
             </label>
           </div>
         </div>
@@ -51,19 +51,19 @@
       <section class="preferences-section">
         <header class="preferences-header" data-bind="l10n_text: z.string.preferencesOptionsNotifications"></header>
         <div class="preferences-options-radio">
-          <input type="radio" id="preferences-options-notification-on" name="preferences-options-notification" value="on" data-bind="checked: option_notifications">
+          <input type="radio" id="preferences-options-notification-on" name="preferences-options-notification" value="on" data-bind="checked: optionNotifications">
           <label class="text-theme" for="preferences-options-notification-on">
             <span class="preferences-label" data-bind="l10n_text: z.string.preferencesOptionsNotificationsOn"></span>
           </label>
-          <input type="radio" id="preferences-options-notification-obfuscate-message" name="preferences-options-notification" value="obfuscate-message" data-bind="checked: option_notifications">
+          <input type="radio" id="preferences-options-notification-obfuscate-message" name="preferences-options-notification" value="obfuscate-message" data-bind="checked: optionNotifications">
           <label class="text-theme" for="preferences-options-notification-obfuscate-message">
             <span class="preferences-label" data-bind="l10n_text: z.string.preferencesOptionsNotificationsObfuscateMessage"></span>
           </label>
-          <input type="radio" id="preferences-options-notification-obfuscate" name="preferences-options-notification" value="obfuscate" data-bind="checked: option_notifications">
+          <input type="radio" id="preferences-options-notification-obfuscate" name="preferences-options-notification" value="obfuscate" data-bind="checked: optionNotifications">
           <label class="text-theme" for="preferences-options-notification-obfuscate">
             <span class="preferences-label" data-bind="l10n_text: z.string.preferencesOptionsNotificationsObfuscate"></span>
           </label>
-          <input type="radio" id="preferences-options-notification-none" name="preferences-options-notification" value="none" data-bind="checked: option_notifications">
+          <input type="radio" id="preferences-options-notification-none" name="preferences-options-notification" value="none" data-bind="checked: optionNotifications">
           <label class="text-theme" for="preferences-options-notification-none">
             <span class="preferences-label" data-bind="l10n_text: z.string.preferencesOptionsNotificationsNone"></span>
           </label>
@@ -73,16 +73,16 @@
       <section class="preferences-section">
         <header class="preferences-header" data-bind="l10n_text: z.string.preferencesOptionsPopular"></header>
         <div class="preferences-option">
-          <div class="preferences-option-icon checkbox text-theme" data-bind="attr: {'data-uie-value': option_emoji_replace_inline}" data-uie-name="status-preference-emoji-replace">
-            <input type="checkbox" id="replace-inline-emoji-checkbox" data-bind="checked: option_emoji_replace_inline">
+          <div class="preferences-option-icon checkbox text-theme" data-bind="attr: {'data-uie-value': optionReplaceInlineEmoji}" data-uie-name="status-preference-emoji-replace">
+            <input type="checkbox" id="replace-inline-emoji-checkbox" data-bind="checked: optionReplaceInlineEmoji">
             <label class="preferences-options-checkbox-label" for="replace-inline-emoji-checkbox" data-bind="l10n_text: z.string.preferencesOptionsEmojiReplaceCheckbox"></label>
           </div>
         </div>
         <div class="preferences-detail preferences-detail-emoji" data-bind="l10n_html: {'id': z.string.preferencesOptionsEmojiReplaceDetail, 'substitute': '<span class=\'font-size-xs icon-emoji\'></span>'}"></div>
         <!-- ko if: z.util.Environment.desktop -->
           <div class="preferences-option preferences-options-multiple">
-            <div class="preferences-option-icon checkbox text-theme" data-bind="attr: {'data-uie-value': option_previews_send}" data-uie-name="status-preference-previews-send">
-              <input type="checkbox" id="send-preview-checkbox" data-bind="checked: option_previews_send">
+            <div class="preferences-option-icon checkbox text-theme" data-bind="attr: {'data-uie-value': optionSendPreviews}" data-uie-name="status-preference-previews-send">
+              <input type="checkbox" id="send-preview-checkbox" data-bind="checked: optionSendPreviews">
               <label class="preferences-options-checkbox-label" for="send-preview-checkbox" data-bind="l10n_text: z.string.preferencesOptionsPreviewsSendCheckbox"></label>
             </div>
           </div>
@@ -93,8 +93,8 @@
       <section class="preferences-section">
         <header class="preferences-header" data-bind="l10n_text: z.string.preferencesOptionsData"></header>
         <div class="preferences-option">
-          <div class="preferences-option-icon checkbox text-theme" data-bind="attr: {'data-uie-value': option_privacy}"  data-uie-name="status-preference-privacy">
-            <input type="checkbox" id="data-checkbox" data-bind="checked: option_privacy">
+          <div class="preferences-option-icon checkbox text-theme" data-bind="attr: {'data-uie-value': optionPrivacy}"  data-uie-name="status-preference-privacy">
+            <input type="checkbox" id="data-checkbox" data-bind="checked: optionPrivacy">
             <label class="preferences-options-checkbox-label" for="data-checkbox" data-bind="l10n_text: z.string.preferencesOptionsDataCheckbox"></label>
           </div>
         </div>

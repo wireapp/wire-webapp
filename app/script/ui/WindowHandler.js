@@ -41,20 +41,17 @@ z.ui.WindowHandler = class WindowHandler {
     this.height = $(window).height();
     this._listenToUnhandledPromiseRejection();
     this._listenToWindowResize();
+
     document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible') {
-        this.logger.info('Webapp is visible');
-        this.isVisible = true;
-      } else {
-        this.logger.info('Webapp is hidden');
-        this.isVisible = false;
-      }
+      const isVisible = document.visibilityState === 'visible';
+      this.logger.info(`Webapp is ${isVisible ? 'visible' : 'hidden'}`);
     });
+
     return this;
   }
 
   _listenToWindowResize() {
-    return $(window).on('resize', () => {
+    $(window).on('resize', () => {
       const currentHeight = $(window).height();
       const currentWidth = $(window).width();
 
@@ -65,19 +62,17 @@ z.ui.WindowHandler = class WindowHandler {
       amplify.publish(z.event.WebApp.WINDOW.RESIZE.HEIGHT, changeInHeight);
 
       this.width = currentWidth;
-      return (this.height = currentHeight);
+      this.height = currentHeight;
     });
   }
 
   _listenToUnhandledPromiseRejection() {
-    return $(window).on('unhandledrejection', event => {
+    $(window).on('unhandledrejection', event => {
       const promiseRejectionEvent = event.originalEvent;
-      const promiseError = promiseRejectionEvent.reason;
+      const error = promiseRejectionEvent.reason || {};
 
-      if (
-        promiseError &&
-        promiseError.type === z.conversation.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION
-      ) {
+      const isDegraded = error.type === z.conversation.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION;
+      if (isDegraded) {
         this.logger.log('User has canceled sending a message to a degraded conversation.');
         promiseRejectionEvent.preventDefault();
         promiseRejectionEvent.stopPropagation();

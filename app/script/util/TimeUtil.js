@@ -27,4 +27,24 @@ z.util.TimeUtil = {
     time_offset = _.isNumber(time_offset) ? time_offset : 0;
     return Date.now() - time_offset;
   },
+
+  /**
+   * Format seconds into 15s, 2m.
+   * @param {number} duration - Duration to format in seconds
+   * @returns {Object} Unit and value
+   */
+  formatMilliseconds: duration => {
+    const seconds = Math.floor(duration / 1000);
+
+    switch (false) {
+      case !(seconds < 60):
+        return {unit: 's', value: seconds};
+      case !(seconds < 60 * 60):
+        return {unit: 'm', value: Math.floor(seconds / 60)};
+      case !(seconds < 60 * 60 * 24):
+        return {unit: 'h', value: Math.floor(seconds / 60 / 60)};
+      default:
+        return {unit: 'd', value: Math.floor(seconds / 60 / 60 / 24)};
+    }
+  },
 };

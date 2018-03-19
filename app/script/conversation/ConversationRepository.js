@@ -153,13 +153,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.init_promise = undefined;
     this.init_total = 0;
 
-    this.supportConversationLinks = ko.observable();
-    this.enableConversationLinks = ko.pureComputed(() => {
-      const isBoolean = _.isBoolean(this.supportConversationLinks());
-      const isEnabled = isBoolean ? this.supportConversationLinks() : !z.util.Environment.frontend.is_production();
-      return this.isTeam() && isEnabled;
-    });
-
     this._init_subscriptions();
 
     this.stateHandler = new z.conversation.ConversationStateHandler(this.conversation_service, this);
@@ -2386,7 +2379,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   upload_images(conversation_et, images) {
     if (this._can_upload_assets_to_conversation(conversation_et)) {
-      [...images].forEach(image => this.send_image_asset(conversation_et, image));
+      Array.from(images).forEach(image => this.send_image_asset(conversation_et, image));
     }
   }
 
@@ -2399,7 +2392,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   upload_files(conversation_et, files) {
     if (this._can_upload_assets_to_conversation(conversation_et)) {
-      [...files].forEach(file => this.upload_file(conversation_et, file));
+      Array.from(files).forEach(file => this.upload_file(conversation_et, file));
     }
   }
 
