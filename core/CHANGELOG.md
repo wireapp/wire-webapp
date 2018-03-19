@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="2.0.86"></a>
+## [2.0.86](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.0.85...@wireapp/core@2.0.86) (2018-03-19)
+
+
+### Bug Fixes
+
+* **core:** Register new client on RecordNotFoundError while logging in ([#383](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/383)) ([66762dc](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/66762dc))
+
+
+
+
 <a name="2.0.85"></a>
 ## [2.0.85](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.0.84...@wireapp/core@2.0.85) (2018-03-19)
 
