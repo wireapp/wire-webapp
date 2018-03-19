@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="0.1.3"></a>
+## [0.1.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/travis-bot/compare/@wireapp/travis-bot@0.1.2...@wireapp/travis-bot@0.1.3) (2018-03-19)
+
+
+### Bug Fixes
+
+* **travis-bot:** Build before testing ([#385](https://github.com/wireapp/wire-web-packages/tree/master/packages/travis-bot/issues/385)) ([f3adbd7](https://github.com/wireapp/wire-web-packages/tree/master/packages/travis-bot/commit/f3adbd7))
+
+
+
+
 <a name="0.1.2"></a>
 ## [0.1.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/travis-bot/compare/@wireapp/travis-bot@0.1.0...@wireapp/travis-bot@0.1.2) (2018-03-19)
 
