@@ -99,11 +99,10 @@ z.calling.CallingRepository = class CallingRepository {
     });
 
     this.flowStatus = undefined;
-    this.debugEnabled = false;
 
     this.shareCallStates();
     this.subscribeToEvents();
-    this.setDebugState(true);
+    this._enableDebugging();
   }
   /**
    * Share call states with MediaRepository.
@@ -1426,13 +1425,14 @@ z.calling.CallingRepository = class CallingRepository {
 
   /**
    * Set logging on adapter.js.
-   * @param {boolean} isDebuggingEnabled - Updated debug state
    * @returns {undefined} No return value
    */
-  setDebugState(isDebuggingEnabled) {
+  _enableDebugging() {
     if (window.adapter) {
-      this.callLogger.debug(`Set logging for WebRTC Adapter: ${isDebuggingEnabled}`);
-      window.adapter.disableLog = !isDebuggingEnabled;
+      this.logger.debug(`Set logging for WebRTC Adapter`);
+      window.adapter.disableLog = false;
+    } else {
+      this.logger.debug(`WebRTC Adapter not found while trying to enable logging`);
     }
   }
 
