@@ -46,17 +46,9 @@ window.z.util = z.util || {};
   };
 
   const _check = {
-    getVersion: () => {
-      if (window.platform.version) {
-        return window.parseInt(window.platform.version.split('.')[0], 10);
-      }
-    },
-    isChrome() {
-      return window.platform.name === BROWSER_NAME.CHROME || this.isElectron();
-    },
-    isDesktop() {
-      return this.isElectron() && window.platform.ua.includes(BROWSER_NAME.WIRE);
-    },
+    getVersion: () => (window.platform.version ? window.parseInt(window.platform.version.split('.')[0], 10) : null),
+    isChrome: () => window.platform.name === BROWSER_NAME.CHROME || this.isElectron(),
+    isDesktop: () => this.isElectron() && window.platform.ua.includes(BROWSER_NAME.WIRE),
     isEdge: () => window.platform.name === BROWSER_NAME.EDGE,
     isElectron: () => window.platform.name === BROWSER_NAME.ELECTRON,
     isFirefox: () => window.platform.name === BROWSER_NAME.FIREFOX,
