@@ -370,7 +370,7 @@ class Account extends EventEmitter {
         // There was no client so we need to "create" and "register" a client
         const notFoundInDatabase =
           error instanceof cryptobox.error.CryptoboxError || error instanceof RecordNotFoundError;
-        const notFoundOnBackend = error.code === StatusCode.NOT_FOUND;
+        const notFoundOnBackend = error.response && error.response.status === StatusCode.NOT_FOUND;
         if (notFoundInDatabase || notFoundOnBackend) {
           return this.registerClient(loginData, clientInfo);
         }
