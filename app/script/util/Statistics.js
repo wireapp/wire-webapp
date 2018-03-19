@@ -31,24 +31,7 @@ z.util.Statistics = {
   average: function(values) {
     return (z.util.Statistics.sum(values) / values.length).toFixed(2);
   },
-  /**
-   * Calculates the standard deviation within an array.
-   * @param {Array<number>} values - Input values
-   * @param {number} [average] - Average value
-   * @returns {undefined} Standard deviation
-   */
-  standardDeviation: function(values, average) {
-    if (!average) {
-      average = z.util.Statistics.average(values);
-    }
 
-    const squared_deviations = values.map(value => {
-      const deviation = value - average;
-      return deviation * deviation;
-    });
-
-    return Math.sqrt(z.util.Statistics.average(squared_deviations)).toFixed(2);
-  },
   /**
    * Calculates the sum of all value within an array.
    * @param {Array<number>} values - Input values
