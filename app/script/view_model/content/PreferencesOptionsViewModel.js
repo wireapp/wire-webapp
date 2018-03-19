@@ -28,54 +28,51 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
     this.logger = new z.util.Logger('z.viewModel.content.PreferencesOptionsViewModel', z.config.LOGGER.OPTIONS);
 
     this.propertiesRepository = repositories.properties;
-    this.team_repository = repositories.team;
+    this.teamRepository = repositories.team;
 
-    this.is_team = this.team_repository.isTeam;
+    this.isTeam = this.teamRepository.isTeam;
 
-    this.option_audio = ko.observable();
-    this.option_audio.subscribe(audio_preference => {
-      this.propertiesRepository.savePreference(z.properties.PROPERTIES_TYPE.SOUND_ALERTS, audio_preference);
+    this.optionAudio = ko.observable();
+    this.optionAudio.subscribe(audioPreference => {
+      this.propertiesRepository.savePreference(z.properties.PROPERTIES_TYPE.SOUND_ALERTS, audioPreference);
     });
 
-    this.option_emoji_replace_inline = ko.observable();
-    this.option_emoji_replace_inline.subscribe(emoji_replace_inline_preference => {
-      this.propertiesRepository.savePreference(
-        z.properties.PROPERTIES_TYPE.EMOJI.REPLACE_INLINE,
-        emoji_replace_inline_preference
-      );
+    this.optionReplaceInlineEmoji = ko.observable();
+    this.optionReplaceInlineEmoji.subscribe(emojiPreference => {
+      this.propertiesRepository.savePreference(z.properties.PROPERTIES_TYPE.EMOJI.REPLACE_INLINE, emojiPreference);
     });
 
-    this.option_notifications = ko.observable();
-    this.option_notifications.subscribe(notifications_preference => {
-      this.propertiesRepository.savePreference(z.properties.PROPERTIES_TYPE.NOTIFICATIONS, notifications_preference);
+    this.optionNotifications = ko.observable();
+    this.optionNotifications.subscribe(notificationsPreference => {
+      this.propertiesRepository.savePreference(z.properties.PROPERTIES_TYPE.NOTIFICATIONS, notificationsPreference);
     });
 
-    this.option_previews_send = ko.observable();
-    this.option_previews_send.subscribe(previews_send_preference => {
-      this.propertiesRepository.savePreference(z.properties.PROPERTIES_TYPE.PREVIEWS.SEND, previews_send_preference);
+    this.optionSendPreviews = ko.observable();
+    this.optionSendPreviews.subscribe(sendPreviewsPreference => {
+      this.propertiesRepository.savePreference(z.properties.PROPERTIES_TYPE.PREVIEWS.SEND, sendPreviewsPreference);
     });
 
-    this.option_privacy = ko.observable();
-    this.option_privacy.subscribe(privacy_preference => {
-      this.propertiesRepository.savePreference(z.properties.PROPERTIES_TYPE.PRIVACY, privacy_preference);
+    this.optionPrivacy = ko.observable();
+    this.optionPrivacy.subscribe(privacyPreference => {
+      this.propertiesRepository.savePreference(z.properties.PROPERTIES_TYPE.PRIVACY, privacyPreference);
     });
 
-    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, this.update_properties.bind(this));
+    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, this.updateProperties.bind(this));
   }
 
-  connect_google_contacts() {
+  connectGoogleContacts() {
     amplify.publish(z.event.WebApp.CONNECT.IMPORT_CONTACTS, z.connect.ConnectSource.GMAIL);
   }
 
-  connect_macos_contacts() {
+  connectMacOSContacts() {
     amplify.publish(z.event.WebApp.CONNECT.IMPORT_CONTACTS, z.connect.ConnectSource.ICLOUD);
   }
 
-  update_properties(properties) {
-    this.option_audio(properties.settings.sound.alerts);
-    this.option_emoji_replace_inline(properties.settings.emoji.replace_inline);
-    this.option_previews_send(properties.settings.previews.send);
-    this.option_privacy(properties.settings.privacy.improve_wire);
-    this.option_notifications(properties.settings.notifications);
+  updateProperties(properties) {
+    this.optionAudio(properties.settings.sound.alerts);
+    this.optionReplaceInlineEmoji(properties.settings.emoji.replace_inline);
+    this.optionSendPreviews(properties.settings.previews.send);
+    this.optionPrivacy(properties.settings.privacy.improve_wire);
+    this.optionNotifications(properties.settings.notifications);
   }
 };

@@ -441,7 +441,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
     // Get error information
     const errorCode = error.code || CryptographyRepository.CONFIG.UNKNOWN_DECRYPTION_ERROR_CODE;
 
-    const {data: eventData, from: remoteUserId} = event;
+    const {data: eventData, from: remoteUserId, time: formattedTime} = event;
 
     const isDuplicateMessage = error instanceof Proteus.errors.DecryptError.DuplicateMessage;
     const isOutdatedMessage = error instanceof Proteus.errors.DecryptError.OutdatedMessage;
@@ -470,7 +470,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
     }
 
     this.logger.warn(
-      `Failed to decrypt event from user '${remoteUserId}' (${remoteClientId}).\nError Code: '${errorCode}'\nError Message: ${
+      `Failed to decrypt event from client '${remoteClientId}' of user '${remoteUserId}' (${formattedTime}).\nError Code: '${errorCode}'\nError Message: ${
         error.message
       }`,
       error

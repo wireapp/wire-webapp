@@ -43,7 +43,7 @@ module.exports = {
   module: {
     rules: [
       {
-        exclude: /(node_modules)/,
+        exclude: /node_modules/,
         test: /\.jsx?$/,
         use: [
           {
@@ -52,7 +52,7 @@ module.exports = {
         ],
       },
       {
-        exclude: /(node_modules)/,
+        exclude: /node_modules/,
         test: /style\.scss$/,
         // prettier-ignore
         use: extractSass.extract('css-loader?sourceMap!postcss-loader?sourceMap!sass-loader?sourceMap')

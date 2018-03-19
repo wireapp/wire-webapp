@@ -36,7 +36,6 @@ z.viewModel.panel.GuestOptionsViewModel = class GuestOptionsViewModel {
     this.stateHandler = this.conversationRepository.stateHandler;
 
     this.conversationEntity = this.conversationRepository.active_conversation;
-    this.enableConversationLinks = this.conversationRepository.enableConversationLinks;
     this.panelState = this.panelViewModel.state;
     this.isGuestRoom = this.panelViewModel.isGuestRoom;
     this.isTeamOnly = this.panelViewModel.isTeamOnly;
@@ -47,7 +46,7 @@ z.viewModel.panel.GuestOptionsViewModel = class GuestOptionsViewModel {
 
     this.hasAccessCode = ko.pureComputed(() => (this.isGuestRoom() ? !!this.conversationEntity().accessCode() : false));
     this.isGuestEnabled = ko.pureComputed(() => !this.isTeamOnly());
-    this.showLinkOptions = ko.pureComputed(() => this.enableConversationLinks() && this.isGuestEnabled());
+    this.showLinkOptions = ko.pureComputed(() => this.isGuestEnabled());
 
     this.conversationEntity.subscribe(conversationEntity => this._updateCode(this.isVisible(), conversationEntity));
     this.isVisible.subscribe(isVisible => this._updateCode(isVisible, this.conversationEntity()));
@@ -60,7 +59,7 @@ z.viewModel.panel.GuestOptionsViewModel = class GuestOptionsViewModel {
     this.copyLink = this.copyLink.bind(this);
     this.shouldUpdateScrollbar = ko
       .computed(() => this.isGuestEnabled() && this.hasAccessCode() && this.isVisible())
-      .extend({notify: 'always', rateLimit: 0});
+      .extend({notify: 'always', rateLimit: {method: 'notifyWhenChangesStop', timeout: 0}});
   }
 
   clickOnBack() {
@@ -153,7 +152,7 @@ z.viewModel.panel.GuestOptionsViewModel = class GuestOptionsViewModel {
 
   _updateCode(isVisible, conversationEntity) {
     const updateCode = conversationEntity && conversationEntity.isGuestRoom() && !conversationEntity.accessCode();
-    if (isVisible && updateCode && this.enableConversationLinks()) {
+    if (isVisible && updateCode) {
       this.requestOngoing(true);
       this.stateHandler.getAccessCode(conversationEntity).then(() => this.requestOngoing(false));
     }

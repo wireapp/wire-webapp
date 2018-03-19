@@ -31,7 +31,6 @@ z.viewModel.AuthViewModel = class AuthViewModel {
         z.auth.URLParameter.BOT_SERVICE,
         z.auth.URLParameter.ENVIRONMENT,
         z.auth.URLParameter.INTEGRATIONS,
-        z.auth.URLParameter.LINKS,
         z.auth.URLParameter.LOCALE,
         z.auth.URLParameter.TRACKING,
       ],
@@ -378,7 +377,8 @@ z.viewModel.AuthViewModel = class AuthViewModel {
         this._setTabsCheckInterval();
       }
 
-      if (Cookies.get(z.main.App.CONFIG.TABS_CHECK.COOKIE_NAME)) {
+      const hasTabsCheckCookie = !!Cookies.get(z.main.App.CONFIG.TABS_CHECK.COOKIE_NAME);
+      if (hasTabsCheckCookie) {
         const currentHash = this._get_hash();
 
         if (!this.previousHash) {
@@ -424,7 +424,8 @@ z.viewModel.AuthViewModel = class AuthViewModel {
           }
         })
         .catch(error => {
-          if (error.type !== z.auth.AuthError.TYPE.MULTIPLE_TABS) {
+          const isMultipleTabs = error.type === z.auth.AuthError.TYPE.MULTIPLE_TABS;
+          if (!isMultipleTabs) {
             throw error;
           }
         });
@@ -816,6 +817,11 @@ z.viewModel.AuthViewModel = class AuthViewModel {
 
   clicked_on_change_phone() {
     this._set_hash(z.auth.AuthView.MODE.ACCOUNT_PHONE);
+  }
+
+  clickOnHandover() {
+    Cookies.remove(z.main.App.CONFIG.TABS_CHECK.COOKIE_NAME);
+    this._checkSingleInstance();
   }
 
   clicked_on_login_password() {
@@ -1755,14 +1761,16 @@ z.viewModel.AuthViewModel = class AuthViewModel {
    */
   _get_self_user() {
     return this.user_repository
-      .get_me()
-      .then(user_et => {
-        this.self_user(user_et);
+      .getSelf()
+      .then(userEntity => {
+        this.self_user(userEntity);
         this.logger.info(`Retrieved self user: ${this.self_user().id}`);
         this.pending_server_request(false);
 
-        const has_email = this.self_user().email();
-        if (!has_email) {
+        const hasEmailAddress = this.self_user().email();
+        const hasPhoneNumber = this.self_user().phone();
+        const isIncompletePhoneUser = hasPhoneNumber && !hasEmailAddress;
+        if (isIncompletePhoneUser) {
           this._set_hash(z.auth.AuthView.MODE.VERIFY_ACCOUNT);
           throw new z.user.UserError(z.user.UserError.TYPE.USER_MISSING_EMAIL);
         }
