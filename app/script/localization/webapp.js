@@ -74,6 +74,7 @@ z.string.authPostedResendDetail = 'Check your email inbox and follow the instruc
 z.string.authPostedResendHeadline = 'You’ve got mail.';
 
 // Authentication: Misc
+z.string.authPlaceholderEmail = 'Email';
 z.string.authPlaceholderPasswordPut = 'Password';
 z.string.authPlaceholderPasswordSet = 'Password (at least 8 characters)';
 z.string.authPlaceholderPhone = 'Phone Number';
