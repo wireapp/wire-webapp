@@ -277,6 +277,8 @@ z.string.connectionRequestIgnore = 'Ignore';
 
 // Guests
 z.string.conversationGuestIndicator = 'Guest';
+z.string.userRemainingTimeHours = '{{time}}h left';
+z.string.userRemainingTimeMinutes = 'Less than {{time}}m left';
 
 // Conversation
 z.string.conversationYouNominative = 'you';
