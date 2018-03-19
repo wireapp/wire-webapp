@@ -24,21 +24,21 @@
 describe('EnvironmentSpec', () => {
   describe('z.util.Environment._electronVersion', () => {
     it('detects wrapper version for internal', () => {
-      const user_agent =
+      const userAgent =
         'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Electron/1.7.3 WireInternal/2.14.2744 Safari/537.36';
-      expect(z.util.Environment._electronVersion(user_agent)).toBe('2.14.2744');
+      expect(z.util.Environment._electronVersion(userAgent)).toBe('2.14.2744');
     });
 
     it('detects wrapper version for public', () => {
-      const user_agent =
+      const userAgent =
         'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Wire/2.13.2734 Chrome/56.0.2924.87 Electron/1.6.4 Safari/537.36';
-      expect(z.util.Environment._electronVersion(user_agent)).toBe('2.13.2734');
+      expect(z.util.Environment._electronVersion(userAgent)).toBe('2.13.2734');
     });
 
     it('return undefined if no version is present', () => {
-      const user_agent =
+      const userAgent =
         'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110';
-      expect(z.util.Environment._electronVersion(user_agent)).not.toBeDefined();
+      expect(z.util.Environment._electronVersion(userAgent)).not.toBeDefined();
     });
   });
 });

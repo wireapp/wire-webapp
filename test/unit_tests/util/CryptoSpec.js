@@ -39,9 +39,9 @@ describe('z.util.Crypto', () => {
     /* eslint-enable sort-keys */
 
     it('can calculate Jenkins’s one-at-a-time hash for a User ID', () => {
-      const user_id = '532af01e-1e24-4366-aacf-33b67d4ee376';
+      const userId = '532af01e-1e24-4366-aacf-33b67d4ee376';
 
-      const actual = z.util.Crypto.Hashing.joaatHash(user_id);
+      const actual = z.util.Crypto.Hashing.joaatHash(userId);
       const expected = window.parseInt('200a4836', 16);
 
       expect(actual).toBe(expected);
