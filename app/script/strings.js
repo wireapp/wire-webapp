@@ -232,7 +232,7 @@ export const unsupportedJoinStrings = defineMessages({
   unsupportedJoinSubhead: {
     id: 'conversationJoin.unsupportedJoinSubhead',
     defaultMessage:
-      '<p>This browser is not supported.</p>Download the latest version of <b style="font-weight: 600">Google Chrome, Mozilla Firefox, Opera</b> or <b  style="font-weight: 600">Microsoft Edge.</b>',
+      '<p>This browser is not supported.</p>Download the latest version of <b style="font-weight: 600">Google Chrome, Mozilla Firefox, Opera</b> or <b style="font-weight: 600">Microsoft Edge.</b>',
   },
   unsupportedJoinMobileSubhead: {
     id: 'conversationJoin.unsupportedJoinMobileSubhead',
