@@ -116,7 +116,7 @@ class ClientItem extends React.Component {
                 : {cursor: 'pointer', margin: '0 0 0 0', padding: '5px 16px 0 16px'}
             }
             data-uie-name="go-remove-device"
-            data-uie-value={`${client.model} ${client.class}`}
+            data-uie-value={client.model}
           >
             <div style={{display: 'flex', flexDirection: 'row'}}>
               <div style={{flexBasis: '32px', margin: 'auto'}}>
