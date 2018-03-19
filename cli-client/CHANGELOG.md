@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="1.2.0"></a>
+# [1.2.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/cli-client/compare/@wireapp/cli-client@1.1.68...@wireapp/cli-client@1.2.0) (2018-03-19)
+
+
+### Features
+
+* **travis-bot:** wire-travis-bot ([#369](https://github.com/wireapp/wire-web-packages/tree/master/packages/cli-client/issues/369)) ([28fb427](https://github.com/wireapp/wire-web-packages/tree/master/packages/cli-client/commit/28fb427))
+
+
+
+
 <a name="1.1.68"></a>
 ## [1.1.68](https://github.com/wireapp/wire-web-packages/tree/master/packages/cli-client/compare/@wireapp/cli-client@1.1.67...@wireapp/cli-client@1.1.68) (2018-03-19)
 
