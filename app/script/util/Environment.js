@@ -74,15 +74,10 @@ window.z.util = z.util || {};
     },
     supportsIndexedDb: () => !!window.indexedDB,
     supportsMediaDevices: () => !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia),
-    supportsNotifications: () => {
-      if (window.Notification === undefined) {
-        return false;
-      }
-      if (window.Notification.requestPermission === undefined) {
-        return false;
-      }
-      return document.visibilityState !== undefined;
-    },
+    supportsNotifications: () =>
+      window.Notification === undefined
+        ? false
+        : window.Notification.requestPermission === undefined ? false : document.visibilityState !== undefined,
     supportsScreenSharing() {
       if (window.desktopCapturer) {
         return true;
