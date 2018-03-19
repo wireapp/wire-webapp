@@ -41,6 +41,7 @@ import {ConversationService} from './conversation/root';
 import Client = require('@wireapp/api-client');
 import EventEmitter = require('events');
 import {StatusCode} from '@wireapp/api-client/dist/commonjs/http/index';
+import {RecordNotFoundError} from '@wireapp/store-engine/dist/commonjs/engine/error/index';
 
 class Account extends EventEmitter {
   public static INCOMING = {
@@ -367,7 +368,8 @@ class Account extends EventEmitter {
       })
       .catch(error => {
         // There was no client so we need to "create" and "register" a client
-        const notFoundInDatabase = error instanceof cryptobox.error.CryptoboxError;
+        const notFoundInDatabase =
+          error instanceof cryptobox.error.CryptoboxError || error instanceof RecordNotFoundError;
         const notFoundOnBackend = error.code === StatusCode.NOT_FOUND;
         if (notFoundInDatabase || notFoundOnBackend) {
           return this.registerClient(loginData, clientInfo);
