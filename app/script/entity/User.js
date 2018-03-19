@@ -235,9 +235,10 @@ z.entity.User = class User {
 
     this.setRemaining(timestamp);
 
-    this.expirationIntervalId = window.setInterval(() => {
-      this.setRemaining(timestamp);
-    }, User.CONFIG.TEMPORARY_GUEST.EXPIRATION_INTERVAL);
+    this.expirationIntervalId = window.setInterval(
+      () => this.setRemaining(timestamp),
+      User.CONFIG.TEMPORARY_GUEST.EXPIRATION_INTERVAL
+    );
 
     window.setTimeout(() => {
       this.isExpired(true);

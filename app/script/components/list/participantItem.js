@@ -29,15 +29,6 @@ z.components.ParticipantItem = class ParticipantItem {
     this.isUser = this.participant instanceof z.entity.User && !this.participant.isBot;
     this.selfUser = window.wire.app.repository.user.self;
     this.isTemporaryGuest = this.isUser && this.participant.isTemporaryGuest();
-    this.contentInfo = (participant => {
-      if (this.isService) {
-        return participant.summary;
-      }
-      if (this.isTemporaryGuest) {
-        return participant.expirationText;
-      }
-      return participant.username();
-    })(this.participant);
 
     this.mode = params.mode || z.components.UserList.MODE.DEFAULT;
     this.isDefaultMode = this.mode === z.components.UserList.MODE.DEFAULT;
@@ -45,6 +36,14 @@ z.components.ParticipantItem = class ParticipantItem {
 
     this.canSelect = params.canSelect;
     this.isSelected = params.isSelected;
+
+    if (this.isService) {
+      this.contentInfo = this.participant.summary;
+    } else if (this.isTemporaryGuest) {
+      this.contentInfo = this.participant.expirationText;
+    } else {
+      this.contentInfo = this.participant.username();
+    }
   }
 };
 
