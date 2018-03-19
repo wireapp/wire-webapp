@@ -4,32 +4,39 @@ z.telemetry.calling.CallLogger = class CallLogger extends z.util.Logger {
     super(message, options);
     this.message = message;
     this.options = options;
-    this.currentWeek = `${moment()
-      .startOf('week')
-      .toDate()}${moment()
-      .endOf('week')
-      .toDate()}`;
   }
 
   static get CONFIG() {
     return {
+      IPV4: /(([0-1]?[0-9]{1,2}\.)|(2[0-4][0-9]\.)|(25[0-5]\.)){3}(([0-1]?[0-9]{1,2})|(2[0-4][0-9])|(25[0-5]))/,
+      IPV6: /(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))/,
       MESSAGE_LOG_LENGTH: 10000,
-      OBFUSCATION_TRUNCATE_TO: 4,
+      OBFUSCATION_TRUNCATE_TO: 2,
     };
   }
 
   obfuscate(string) {
-    return CryptoJS.SHA256(`${string}${this.currentWeek}`)
-      .toString()
-      .substr(0, CallLogger.CONFIG.OBFUSCATION_TRUNCATE_TO);
+    //return CryptoJS.SHA256(`${string}${this.currentWeek}`)
+    //  .toString()
+    return string.substr(0, CallLogger.CONFIG.OBFUSCATION_TRUNCATE_TO);
   }
 
-  obfuscateIp(ip, conversationId) {
-    ip = this.removeBytesFromIp(ip);
-    return this.fakeIpGenerator(this.obfuscate(`${conversationId}${ip.slicedIp}`), ip.type);
+  obfuscateIp(ip) {
+    if (CallLogger.CONFIG.IPV4.test(ip)) {
+      // IPv4
+      ip = ip.split('.');
+      ip[ip.length - 1] = '0';
+      return ip.join('.');
+    } else if (CallLogger.CONFIG.IPV6.test(ip)) {
+      // IPv6
+      ip = ip.split(':').slice(0, 3);
+      return [...ip, '0000', '0000', '0000', '0000'].join(':');
+    }
+
+    return 'Unknown';
   }
 
-  fakeIpGenerator(seed, type) {
+  /*fakeIpGenerator(seed, type) {
     if (type === 4) {
       // Extend the 4 bytes seed to 16 bytes using XOR encryption with static keys
       const originalSeedLength = seed.length;
@@ -85,7 +92,7 @@ z.telemetry.calling.CallLogger = class CallLogger extends z.util.Logger {
       slicedIp: ip.slice(mid - charactersToKeep / 2, mid + charactersToKeep / 2),
       type,
     };
-  }
+  }*/
 
   obfuscateSdp(sdpMessage, conversationId) {
     const decodedSdpMessage = sdpTransform.parse(sdpMessage);
