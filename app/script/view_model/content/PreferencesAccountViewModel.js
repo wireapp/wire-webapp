@@ -102,7 +102,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
     const isValidName = newName.length >= z.user.UserRepository.CONFIG.MINIMUM_NAME_LENGTH;
     if (isValidName) {
-      this.userRepository.changeName(newName).then(() => {
+      this.userRepository.change_name(newName).then(() => {
         this.nameSaved(true);
         event.target.blur();
         window.setTimeout(() => this.nameSaved(false), PreferencesAccountViewModel.CONFIG.SAVE_ANIMATION_TIMEOUT);
