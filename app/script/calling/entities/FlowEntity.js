@@ -51,10 +51,8 @@ z.calling.entities.FlowEntity = class FlowEntity {
     this.id = this.participantEntity.id;
     this.conversationId = this.callEntity.id;
 
-    this.logger = new z.telemetry.calling.CallLogger(
-      `z.calling.entities.FlowEntity (${this.id})`,
-      z.config.LOGGER.OPTIONS
-    );
+    const name = `z.calling.entities.FlowEntity (${this.id})`;
+    this.callLogger = new z.telemetry.calling.CallLogger(name, z.config.LOGGER.OPTIONS);
 
     // States
     this.isAnswer = ko.observable(false);
@@ -136,12 +134,12 @@ z.calling.entities.FlowEntity = class FlowEntity {
     this.signalingState.subscribe(signalingState => {
       switch (signalingState) {
         case z.calling.rtc.SIGNALING_STATE.CLOSED: {
-          this.logger.info({
+          this.callLogger.info({
             data: {
               default: [this.remoteUser.name()],
-              obfuscated: [this.logger.obfuscate(this.remoteUser.id)],
+              obfuscated: [this.callLogger.obfuscate(this.remoteUser.id)],
             },
-            message: z.util.format_string`PeerConnection with '${0}' was closed`,
+            message: `PeerConnection with '{0}' was closed`,
           });
 
           this.callEntity.deleteParticipant(this.participantEntity.id, this.remoteClientId);
@@ -297,7 +295,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
    * @returns {undefined} No return value
    */
   restartNegotiation(negotiationMode, isAnswer, mediaStream) {
-    this.logger.info(`Negotiation restart triggered by '${negotiationMode}'`);
+    this.callLogger.info(`Negotiation restart triggered by '${negotiationMode}'`);
 
     this.clearTimeouts();
     this._closePeerConnection();
@@ -320,7 +318,13 @@ z.calling.entities.FlowEntity = class FlowEntity {
   setRemoteClientId(clientId) {
     if (!this.remoteClientId) {
       this.remoteClientId = clientId;
-      this.logger.info(`Identified remote client as '${clientId}'`);
+      this.callLogger.info({
+        data: {
+          default: [clientId],
+          obfuscated: [this.callLogger.obfuscate(clientId)],
+        },
+        message: `Identified remote client as '{0}'`,
+      });
     }
   }
 
@@ -332,12 +336,12 @@ z.calling.entities.FlowEntity = class FlowEntity {
    * @returns {undefined} No return value
    */
   startNegotiation(negotiationMode = z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT, mediaStream = this.mediaStream()) {
-    this.logger.info({
+    this.callLogger.info({
       data: {
         default: [this.remoteUser.name(), negotiationMode],
-        obfuscated: [this.logger.obfuscate(this.remoteUser.id), negotiationMode],
+        obfuscated: [this.callLogger.obfuscate(this.remoteUser.id), negotiationMode],
       },
-      message: z.util.format_string`Start negotiating PeerConnection with '${0}' triggered by '${1}'`,
+      message: `Start negotiating PeerConnection with '{0}' triggered by '{1}'`,
     });
 
     this._createPeerConnection().then(() => {
@@ -402,24 +406,24 @@ z.calling.entities.FlowEntity = class FlowEntity {
   _closePeerConnection() {
     if (this.peerConnection) {
       this.peerConnection.oniceconnectionstatechange = () => {
-        this.logger.log(this.logger.levels.OFF, 'State change ignored - ICE connection');
+        this.callLogger.log(this.callLogger.levels.OFF, 'State change ignored - ICE connection');
       };
 
       this.peerConnection.onsignalingstatechange = () => {
         const logMessage = `State change ignored - signaling state: ${this.peerConnection.signalingState}`;
-        this.logger.log(this.logger.levels.OFF, logMessage);
+        this.callLogger.log(this.callLogger.levels.OFF, logMessage);
       };
 
       const isStateClosed = this.peerConnection.signalingState === z.calling.rtc.SIGNALING_STATE.CLOSED;
       if (!isStateClosed) {
         this.peerConnection.close();
 
-        this.logger.info({
+        this.callLogger.info({
           data: {
             default: [this.remoteUser.name()],
-            obfuscated: [this.logger.obfuscate(this.remoteUser.id)],
+            obfuscated: [this.callLogger.obfuscate(this.remoteUser.id)],
           },
-          message: z.util.format_string`Closing PeerConnection '${0}' successful`,
+          message: `Closing PeerConnection '{0}' successful`,
         });
       }
     }
@@ -453,13 +457,13 @@ z.calling.entities.FlowEntity = class FlowEntity {
       this.telemetry.time_step(z.telemetry.calling.CallSetupSteps.PEER_CONNECTION_CREATED);
       this.signalingState(this.peerConnection.signalingState);
 
-      this.logger.debug(
+      this.callLogger.debug(
         {
           data: {
             default: [this.remoteUser.name(), this.isAnswer()],
-            obfuscated: [this.logger.obfuscate(this.remoteUser.id), this.isAnswer()],
+            obfuscated: [this.callLogger.obfuscate(this.remoteUser.id), this.isAnswer()],
           },
-          message: z.util.format_string`PeerConnection with '${0}' created - isAnswer '${1}'`,
+          message: `PeerConnection with '{0}' created - isAnswer '{1}'`,
         },
         pcConfiguration
       );
@@ -485,7 +489,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
    * @returns {undefined} No return value
    */
   _onAddStream({stream: mediaStream}) {
-    this.logger.info('Remote MediaStream added to PeerConnection', {
+    this.callLogger.info('Remote MediaStream added to PeerConnection', {
       audioTracks: mediaStream.getAudioTracks(),
       stream: mediaStream,
       videoTracks: mediaStream.getVideoTracks(),
@@ -516,7 +520,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
   _onIceCandidate({candidate: iceCandidate}) {
     if (!iceCandidate) {
       if (this.shouldSendLocalSdp()) {
-        this.logger.info('Generation of ICE candidates completed - sending SDP');
+        this.callLogger.info('Generation of ICE candidates completed - sending SDP');
         this.telemetry.time_step(z.telemetry.calling.CallSetupSteps.ICE_GATHERING_COMPLETED);
         this.sendLocalSdp();
       }
@@ -535,9 +539,15 @@ z.calling.entities.FlowEntity = class FlowEntity {
     const isEndingCall = endingCallStates.includes(this.callEntity.state());
 
     if (this.peerConnection || !isEndingCall) {
-      this.logger.info('State changed - ICE connection', event);
-      this.logger.log(this.logger.levels.LEVEL_1, `ICE connection state: ${this.peerConnection.iceConnectionState}`);
-      this.logger.log(this.logger.levels.LEVEL_1, `ICE gathering state: ${this.peerConnection.iceGatheringState}`);
+      this.callLogger.info('State changed - ICE connection', event);
+      this.callLogger.log(
+        this.callLogger.levels.LEVEL_1,
+        `ICE connection state: ${this.peerConnection.iceConnectionState}`
+      );
+      this.callLogger.log(
+        this.callLogger.levels.LEVEL_1,
+        `ICE gathering state: ${this.peerConnection.iceGatheringState}`
+      );
 
       this.gatheringState(this.peerConnection.iceGatheringState);
       this.connectionState(this.peerConnection.iceConnectionState);
@@ -552,7 +562,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
    * @returns {undefined} No return value
    */
   _onRemoveStream(event) {
-    this.logger.info('Remote MediaStream removed from PeerConnection', event);
+    this.callLogger.info('Remote MediaStream removed from PeerConnection', event);
   }
 
   /**
@@ -563,7 +573,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
    * @returns {undefined} No return value
    */
   _onSignalingStateChange(event) {
-    this.logger.info(`State changed - signaling state: ${this.peerConnection.signalingState}`, event);
+    this.callLogger.info(`State changed - signaling state: ${this.peerConnection.signalingState}`, event);
     this.signalingState(this.peerConnection.signalingState);
   }
 
@@ -575,7 +585,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
    * @returns {undefined} No return value
    */
   _onTrack(event) {
-    this.logger.info('Remote MediaStreamTrack added to PeerConnection', event);
+    this.callLogger.info('Remote MediaStreamTrack added to PeerConnection', event);
   }
 
   //##############################################################################
@@ -593,12 +603,20 @@ z.calling.entities.FlowEntity = class FlowEntity {
     if (this.dataChannel && this.dataChannelOpened) {
       try {
         this.dataChannel.send(callMessageEntity.toContentString());
-        const logMessage = `Sending '${type}' message to conversation '${conversationId}' via data channel`;
-        this.logger.info(logMessage, callMessageEntity.toJSON());
+        this.callLogger.info(
+          {
+            data: {
+              default: [type, conversationId],
+              obfuscated: [type, this.callLogger.obfuscate(conversationId)],
+            },
+            message: `Sending '{0}' message to conversation '{1}' via data channel`,
+          },
+          callMessageEntity.toJSON()
+        );
         return;
       } catch (error) {
         if (!response) {
-          this.logger.warn(`Failed to send calling message via data channel: ${error.name}`, error);
+          this.callLogger.warn(`Failed to send calling message via data channel: ${error.name}`, error);
           throw new z.calling.CallError(z.calling.CallError.TYPE.NO_DATA_CHANNEL);
         }
       }
@@ -669,7 +687,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
    * @returns {undefined} No return value
    */
   _onClose({target: dataChannel}) {
-    this.logger.info(`Data channel '${dataChannel.label}' was closed`, dataChannel);
+    this.callLogger.info(`Data channel '${dataChannel.label}' was closed`, dataChannel);
 
     if (this.dataChannel && this.dataChannel.readyState === z.calling.rtc.DATA_CHANNEL_STATE.CLOSED) {
       delete this.dataChannel;
@@ -703,7 +721,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
     const logMessage = response
       ? `Received confirmation for '${type}' message via data channel`
       : `Received '${type}' (response: ${response}) message via data channel`;
-    this.logger.debug(logMessage, callMessage);
+    this.callLogger.debug(logMessage, callMessage);
 
     const callEvent = z.conversation.EventBuilder.buildCalling(
       conversationEntity,
@@ -722,7 +740,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
    * @returns {undefined} No return value
    */
   _onOpen({target: dataChannel}) {
-    this.logger.info(`Data channel '${dataChannel.label}' was opened and can be used`, dataChannel);
+    this.callLogger.info(`Data channel '${dataChannel.label}' was opened and can be used`, dataChannel);
     this.dataChannelOpened = true;
   }
 
@@ -773,7 +791,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
         }
 
         this.remoteSdp(remoteSdp);
-        this.logger.debug(`Saved remote '${remoteSdp.type}' SDP`, this.remoteSdp());
+        this.callLogger.debug(`Saved remote '${remoteSdp.type}' SDP`, this.remoteSdp());
         return skipNegotiation;
       });
   }
@@ -793,23 +811,25 @@ z.calling.entities.FlowEntity = class FlowEntity {
         const isModeDefault = this.negotiationMode() === z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT;
         if (isModeDefault && sendingOnTimeout) {
           if (!this._containsRelayCandidate(iceCandidates)) {
-            this.logger.warn(`No relay ICE candidates in local SDP. Timeout reset\n${iceCandidates}`, iceCandidates);
+            this.callLogger.warn(
+              `No relay ICE candidates in local SDP. Timeout reset\n${iceCandidates}`,
+              iceCandidates
+            );
             return this._setSendSdpTimeout(false);
           }
         }
 
-        this.logger.debug({
+        this.callLogger.debug({
           data: {
             default: [localSdp.type, iceCandidates.length, this.remoteUser.name(), this.localSdp().sdp],
             obfuscated: [
               localSdp.type,
               iceCandidates.length,
-              this.logger.obfuscate(this.remoteUser.id),
-              this.logger.obfuscateSdp(this.localSdp().sdp, this.conversationId),
+              this.callLogger.obfuscate(this.remoteUser.id),
+              this.callLogger.obfuscateSdp(this.localSdp().sdp, this.conversationId),
             ],
           },
-          message: z.util
-            .format_string`Sending local '${0}' SDP containing '${1}' ICE candidates for flow with '${2}'\n${3}`,
+          message: `Sending local '{0}' SDP containing '{1}' ICE candidates for flow with '{2}'\n{3}`,
         });
 
         this.shouldSendLocalSdp(false);
@@ -830,7 +850,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
 
         return this.callEntity.sendCallMessage(callMessageEntity).then(() => {
           this.telemetry.time_step(z.telemetry.calling.CallSetupSteps.LOCAL_SDP_SEND);
-          this.logger.debug(`Sending local '${localSdp.type}' SDP successful`, this.localSdp());
+          this.callLogger.debug(`Sending local '${localSdp.type}' SDP successful`, this.localSdp());
         });
       })
       .catch(error => {
@@ -887,12 +907,12 @@ z.calling.entities.FlowEntity = class FlowEntity {
    */
   _createSdpAnswer() {
     this.negotiationNeeded(false);
-    this.logger.debug({
+    this.callLogger.debug({
       data: {
         default: [z.calling.rtc.SDP_TYPE.ANSWER, this.remoteUser.name()],
-        obfuscated: [z.calling.rtc.SDP_TYPE.ANSWER, this.remoteUser.id],
+        obfuscated: [z.calling.rtc.SDP_TYPE.ANSWER, this.callLogger.obfuscate(this.remoteUser.id)],
       },
-      message: z.util.format_string`Creating '${0}' for flow with '${1}'`,
+      message: `Creating '{0}' for flow with '{1}'`,
     });
 
     this.peerConnection
@@ -911,7 +931,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
    */
   _createSdpFailure(error, sdpType) {
     const {message, name} = error;
-    this.logger.error(`Creating '${sdpType}' failed: ${name} - ${message}`, error);
+    this.callLogger.error(`Creating '${sdpType}' failed: ${name} - ${message}`, error);
 
     const attributes = {cause: name, step: 'create_sdp', type: sdpType};
     this.callEntity.telemetry.track_event(z.tracking.EventName.CALLING.FAILED_RTC, undefined, attributes);
@@ -927,7 +947,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
    * @returns {undefined} No return value
    */
   _createSdpSuccess(rctSdp) {
-    this.logger.info(`Creating '${rctSdp.type}' successful`, rctSdp);
+    this.callLogger.info(`Creating '${rctSdp.type}' successful`, rctSdp);
 
     z.calling.SDPMapper.rewriteSdp(rctSdp, z.calling.enum.SDP_SOURCE.LOCAL, this).then(({sdp: localSdp}) => {
       this.localSdp(localSdp);
@@ -954,12 +974,12 @@ z.calling.entities.FlowEntity = class FlowEntity {
      */
     const offerOptions = {iceRestart, voiceActivityDetection: true};
 
-    this.logger.debug({
+    this.callLogger.debug({
       data: {
         default: [z.calling.rtc.SDP_TYPE.OFFER, this.remoteUser.name()],
-        obfuscated: [z.calling.rtc.SDP_TYPE.OFFER, this.remoteUser.id],
+        obfuscated: [z.calling.rtc.SDP_TYPE.OFFER, this.callLogger.obfuscate(this.remoteUser.id)],
       },
-      message: z.util.format_string`Creating '${0}' for flow with '${1}'`,
+      message: `Creating '{0}' for flow with '{1}'`,
     });
 
     this.peerConnection
@@ -998,12 +1018,12 @@ z.calling.entities.FlowEntity = class FlowEntity {
   _setLocalSdp() {
     this.sdpStateChanging(true);
     const localSdp = this.localSdp();
-    this.logger.debug(`Setting local '${localSdp.type}' SDP`, localSdp);
+    this.callLogger.debug(`Setting local '${localSdp.type}' SDP`, localSdp);
 
     this.peerConnection
       .setLocalDescription(localSdp)
       .then(() => {
-        this.logger.info(`Setting local '${localSdp.type}' SDP successful`, this.peerConnection.localDescription);
+        this.callLogger.info(`Setting local '${localSdp.type}' SDP successful`, this.peerConnection.localDescription);
         this.telemetry.time_step(z.telemetry.calling.CallSetupSteps.LOCAL_SDP_SET);
 
         this.shouldSetLocalSdp(false);
@@ -1021,12 +1041,15 @@ z.calling.entities.FlowEntity = class FlowEntity {
   _setRemoteSdp() {
     this.sdpStateChanging(false);
     const remoteSdp = this.remoteSdp();
-    this.logger.debug(`Setting remote '${remoteSdp.type}' SDP\n${remoteSdp.sdp}`, remoteSdp);
+    this.callLogger.debug(`Setting remote '${remoteSdp.type}' SDP\n${remoteSdp.sdp}`, remoteSdp);
 
     this.peerConnection
       .setRemoteDescription(remoteSdp)
       .then(() => {
-        this.logger.info(`Setting remote '${remoteSdp.type}' SDP successful`, this.peerConnection.remoteDescription);
+        this.callLogger.info(
+          `Setting remote '${remoteSdp.type}' SDP successful`,
+          this.peerConnection.remoteDescription
+        );
         this.telemetry.time_step(z.telemetry.calling.CallSetupSteps.REMOTE_SDP_SET);
 
         this.shouldSetRemoteSdp(false);
@@ -1056,7 +1079,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
       return this.sdpStateChanging(false);
     }
 
-    this.logger.error(`Setting ${sdpSource} '${sdpType}' SDP failed: ${name} - ${message}`, error);
+    this.callLogger.error(`Setting ${sdpSource} '${sdpType}' SDP failed: ${name} - ${message}`, error);
 
     const attributes = {cause: name, location: sdpSource, step: 'set_sdp', type: sdpType};
     this.callEntity.telemetry.track_event(z.tracking.EventName.CALLING.FAILED_RTC, undefined, attributes);
@@ -1071,7 +1094,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
    */
   _setNegotiationFailedTimeout() {
     this.negotiationTimeout = window.setTimeout(() => {
-      this.logger.info('Removing call participant on negotiation timeout');
+      this.callLogger.info('Removing call participant on negotiation timeout');
       this._removeParticipant(z.calling.enum.TERMINATION_REASON.RENEGOTIATION);
     }, FlowEntity.CONFIG.NEGOTIATION_FAILED_TIMEOUT);
   }
@@ -1103,7 +1126,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
   _setSendSdpTimeout(initialTimeout = true) {
     const timeout = initialTimeout ? FlowEntity.CONFIG.SDP_SEND_TIMEOUT : FlowEntity.CONFIG.SDP_SEND_TIMEOUT_RESET;
     this.sendSdpTimeout = window.setTimeout(() => {
-      this.logger.info('Sending local SDP on timeout');
+      this.callLogger.info('Sending local SDP on timeout');
       this.sendLocalSdp(true);
     }, timeout);
   }
@@ -1121,33 +1144,39 @@ z.calling.entities.FlowEntity = class FlowEntity {
    * @returns {boolean} False if we locally needed to switch sides
    */
   _solveCollidingStates(forceRenegotiation = false) {
-    this.logger.debug(
-      `Solving state collision: Self user ID '${this.selfUserId}', remote user ID '${
-        this.remoteUserId
-      }', forceRenegotiation '${forceRenegotiation}'`
-    );
+    this.callLogger.debug({
+      data: {
+        default: [this.selfUserId, this.remoteUserId, forceRenegotiation],
+        obfuscated: [
+          this.callLogger.obfuscate(this.selfUserId),
+          this.callLogger.obfuscate(this.remoteUserId),
+          forceRenegotiation,
+        ],
+      },
+      message: `Solving state collision: Self user ID '{0}', remote user ID '{1}', forceRenegotiation '{2}'`,
+    });
 
     const selfUserIdLooses = this.selfUserId < this.remoteUserId;
     const shouldRenegotiate = selfUserIdLooses || forceRenegotiation;
     if (shouldRenegotiate) {
-      this.logger.warn({
+      this.callLogger.warn({
         data: {
           default: [this.remoteUser.name()],
-          obfuscated: [this.logger.obfuscate(this.remoteUser.id)],
+          obfuscated: [this.callLogger.obfuscate(this.remoteUser.id)],
         },
-        message: z.util.format_string`We need to switch SDP state of flow with '${0}' to answer.`,
+        message: `We need to switch SDP state of flow with '{0}' to answer.`,
       });
 
       this.restartNegotiation(z.calling.enum.SDP_NEGOTIATION_MODE.STATE_COLLISION, true);
       return forceRenegotiation || false;
     }
 
-    this.logger.warn({
+    this.callLogger.warn({
       data: {
         default: [this.remoteUser.name()],
-        obfuscated: [this.logger.obfuscate(this.remoteUser.id)],
+        obfuscated: [this.callLogger.obfuscate(this.remoteUser.id)],
       },
-      message: z.util.format_string`Remote side '${0}' needs to switch SDP state flow to answer.`,
+      message: `Remote side '{0}' needs to switch SDP state flow to answer.`,
     });
 
     return true;
@@ -1186,7 +1215,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
 
       const isExpectedError = expectedErrorTypes.includes(type);
       if (isExpectedError) {
-        this.logger.debug(`Replacement of MediaStream and renegotiation necessary: ${message}`, error);
+        this.callLogger.debug(`Replacement of MediaStream and renegotiation necessary: ${message}`, error);
         return this._replaceMediaStream(mediaStreamInfo);
       }
       throw error;
@@ -1211,7 +1240,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
         mediaStream.getTracks().forEach(mediaStreamTrack => {
           this.peerConnection.addTrack(mediaStreamTrack, mediaStream);
 
-          this.logger.debug(`Added local '${mediaStreamTrack.kind}' MediaStreamTrack to PeerConnection`, {
+          this.callLogger.debug(`Added local '${mediaStreamTrack.kind}' MediaStreamTrack to PeerConnection`, {
             audioTracks: mediaStream.getAudioTracks(),
             stream: mediaStream,
             videoTracks: mediaStream.getVideoTracks(),
@@ -1219,7 +1248,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
         });
       } else {
         this.peerConnection.addStream(mediaStream);
-        this.logger.debug(`Added local '${mediaStream.type}' MediaStream to PeerConnection`, {
+        this.callLogger.debug(`Added local '${mediaStream.type}' MediaStream to PeerConnection`, {
           audioTracks: mediaStream.getAudioTracks(),
           stream: mediaStream,
           videoTracks: mediaStream.getVideoTracks(),
@@ -1272,12 +1301,12 @@ z.calling.entities.FlowEntity = class FlowEntity {
         const {stream: mediaStream} = upgradedMediaStreamInfo;
         upgradedMediaStreamInfo.replaced = true;
 
-        this.logger.info(`Upgraded the MediaStream to update '${mediaType}'`, mediaStream);
+        this.callLogger.info(`Upgraded the MediaStream to update '${mediaType}'`, mediaStream);
         this.restartNegotiation(z.calling.enum.SDP_NEGOTIATION_MODE.STREAM_CHANGE, false, mediaStream);
         return upgradedMediaStreamInfo;
       })
       .catch(error => {
-        this.logger.error(`Failed to replace local MediaStream: ${error.message}`, error);
+        this.callLogger.error(`Failed to replace local MediaStream: ${error.message}`, error);
         throw error;
       });
   }
@@ -1307,7 +1336,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
         rtpSender.replaceTrack(mediaStreamTrack);
       })
       .then(() => {
-        this.logger.debug(`Replaced the '${mediaType}' track`);
+        this.callLogger.debug(`Replaced the '${mediaType}' track`);
         return mediaStreamInfo;
       })
       .catch(error => {
@@ -1320,7 +1349,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
 
         const isExpectedError = expectedErrorTypes.includes(type);
         if (!isExpectedError) {
-          this.logger.error(`Failed to replace the '${mediaType}' track: ${name} - ${message}`, error);
+          this.callLogger.error(`Failed to replace the '${mediaType}' track: ${name} - ${message}`, error);
         }
         throw error;
       });
@@ -1341,7 +1370,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
       const isExpectedId = mediaStreamTrack.id === trackId;
       if (isExpectedId) {
         this.peerConnection.removeTrack(rtpSender);
-        this.logger.debug(`Removed local '${mediaType}' MediaStreamTrack from PeerConnection`);
+        this.callLogger.debug(`Removed local '${mediaType}' MediaStreamTrack from PeerConnection`);
         break;
       }
     }
@@ -1379,7 +1408,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
       const supportsRemoveStream = typeof this.peerConnection.removeStream === 'function';
       if (signalingStateNotClosed && supportsRemoveStream) {
         this.peerConnection.removeStream(mediaStream);
-        this.logger.debug(`Removed local '${mediaStream.type}' MediaStream from PeerConnection`, {
+        this.callLogger.debug(`Removed local '${mediaStream.type}' MediaStream from PeerConnection`, {
           audioTracks: mediaStream.getAudioTracks(),
           stream: mediaStream,
           videoTracks: mediaStream.getVideoTracks(),
@@ -1403,7 +1432,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
         this.mediaStream().removeTrack(mediaStreamTrack);
         mediaStreamTrack.stop();
         const mediaKind = mediaStreamTrack.kind;
-        this.logger.debug(`Stopping MediaStreamTrack of kind '${mediaKind}' successful`, mediaStreamTrack);
+        this.callLogger.debug(`Stopping MediaStreamTrack of kind '${mediaKind}' successful`, mediaStreamTrack);
       });
 
       const mediaStream = this.mediaStream().clone();
@@ -1441,7 +1470,13 @@ z.calling.entities.FlowEntity = class FlowEntity {
     }
 
     if (this.pcInitialized()) {
-      this.logger.debug(`Resetting flow with user '${this.remoteUser.id}'`);
+      this.callLogger.debug({
+        data: {
+          default: [this.remoteUser.id],
+          obfuscated: [this.callLogger.obfuscate(this.remoteUser.id)],
+        },
+        message: `Resetting flow with user '{0}'`,
+      });
       this.remoteClientId = undefined;
       this.telemetry.disconnected();
 

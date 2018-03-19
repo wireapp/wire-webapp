@@ -26,10 +26,10 @@ z.telemetry.calling.CallLogger = class CallLogger extends z.util.Logger {
 
   obfuscateIp(ip, conversationId) {
     ip = this.removeBytesFromIp(ip);
-    return this.generateFakeIpFromSeed(this.obfuscate(`${conversationId}${ip.slicedIp}`), ip.type);
+    return this.fakeIpGenerator(this.obfuscate(`${conversationId}${ip.slicedIp}`), ip.type);
   }
 
-  generateFakeIpFromSeed(seed, type) {
+  fakeIpGenerator(seed, type) {
     if (type === 4) {
       // Extend the 4 bytes seed to 16 bytes using XOR encryption with static keys
       const originalSeedLength = seed.length;
@@ -168,8 +168,8 @@ z.telemetry.calling.CallLogger = class CallLogger extends z.util.Logger {
     if (typeof log === 'object') {
       const {message, data} = log;
       if (typeof message === 'function' && typeof data === 'object') {
-        this.logToMemory([args[0], message(...data.obfuscated)]);
-        args[1] = message(...data.default);
+        this.logToMemory([args[0], z.util.StringUtil.format(message, ...data.obfuscated)]);
+        args[1] = z.util.StringUtil.format(message, ...data.default);
       }
     } else {
       this.logToMemory([args[0], log]);

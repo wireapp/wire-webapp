@@ -36,22 +36,20 @@ z.calling.entities.FlowAudioEntity = class FlowAudioEntity {
 
     this.flowEntity = flowEntity;
     this.mediaRepository = mediaRepository;
-    this.logger = new z.telemetry.calling.CallLogger(
-      `z.calling.entities.FlowAudio (${this.flowEntity.id})`,
-      z.config.LOGGER.OPTIONS
-    );
+    const name = `z.calling.entities.FlowAudio (${this.flowEntity.id})`;
+    this.callLogger = new z.telemetry.calling.CallLogger(name, z.config.LOGGER.OPTIONS);
 
     this.audioContext = undefined;
 
     // Panning
     this.panning = this.flowEntity.participantEntity.panning;
     this.panning.subscribe(updatedPanningValue => {
-      this.logger.debug({
+      this.callLogger.debug({
         data: {
           default: [this.flowEntity.remoteUser.name(), updatedPanningValue],
-          obfuscated: [this.logger.obfuscate(this.flowEntity.remoteUser.id), updatedPanningValue],
+          obfuscated: [this.callLogger.obfuscate(this.flowEntity.remoteUser.id), updatedPanningValue],
         },
-        message: z.util.format_string`Panning of ${0} changed to '${1}'`,
+        message: `Panning of {0} changed to '{1}'`,
       });
 
       this.setPan(updatedPanningValue);
@@ -88,7 +86,7 @@ z.calling.entities.FlowAudioEntity = class FlowAudioEntity {
   setGainNode(isMuted) {
     if (this.gainNode) {
       this.gainNode.gain.value = isMuted ? 0 : 1;
-      this.logger.debug(`Outgoing audio on flow muted '${isMuted}'`);
+      this.callLogger.debug(`Outgoing audio on flow muted '${isMuted}'`);
     }
   }
 
@@ -118,7 +116,7 @@ z.calling.entities.FlowAudioEntity = class FlowAudioEntity {
       this._hookupAudio();
 
       Object.assign(mediaStream, this.audioRemote.stream);
-      this.logger.debug('Wrapped audio stream from microphone', mediaStream);
+      this.callLogger.debug('Wrapped audio stream from microphone', mediaStream);
     }
 
     return mediaStream;
@@ -145,7 +143,7 @@ z.calling.entities.FlowAudioEntity = class FlowAudioEntity {
 
         Object.assign(mediaStream, audioOutputDevice.stream);
         const logMessage = `Wrapped audio stream to speaker for stereo. Initial panning set to '${this.panning()}'.`;
-        this.logger.debug(logMessage, mediaStream);
+        this.callLogger.debug(logMessage, mediaStream);
       }
     }
 

@@ -64,7 +64,7 @@ z.calling.CallingRepository = class CallingRepository {
     this.conversationRepository = conversationRepository;
     this.mediaRepository = mediaRepository;
     this.userRepository = userRepository;
-    this.logger = new z.telemetry.calling.CallLogger('z.calling.CallingRepository', z.config.LOGGER.OPTIONS);
+    this.callLogger = new z.telemetry.calling.CallLogger('z.calling.CallingRepository', z.config.LOGGER.OPTIONS);
 
     this.selfUserId = ko.pureComputed(() => {
       if (this.userRepository.self()) {
@@ -148,7 +148,7 @@ z.calling.CallingRepository = class CallingRepository {
     const isCall = eventType === z.event.Client.CALL.E_CALL;
 
     const logObject = {eventJson: JSON.stringify(event), eventObject: event};
-    this.logger.info(`»» Call Event: '${eventType}' (Source: ${source})`, logObject);
+    this.callLogger.info(`»» Call Event: '${eventType}' (Source: ${source})`, logObject);
 
     if (isCall) {
       const isSupportedVersion = eventContent.version === z.calling.entities.CallMessageEntity.CONFIG.VERSION;
@@ -216,7 +216,7 @@ z.calling.CallingRepository = class CallingRepository {
         this._onUpdate(callMessageEntity);
         break;
       default:
-        this.logger.warn(`Call event of unknown type '${messageType}' was ignored`, callMessageEntity);
+        this.callLogger.warn(`Call event of unknown type '${messageType}' was ignored`, callMessageEntity);
     }
   }
 
@@ -444,7 +444,7 @@ z.calling.CallingRepository = class CallingRepository {
         }
 
         if (!callEntity.selfClientJoined()) {
-          this.logger.info(`Rejecting call in conversation '${conversationId}'`, callEntity);
+          this.callLogger.info(`Rejecting call in conversation '${conversationId}'`, callEntity);
           callEntity.state(z.calling.enum.CALL_STATE.REJECTED);
           this.mediaStreamHandler.reset_media_stream();
         }
@@ -470,7 +470,7 @@ z.calling.CallingRepository = class CallingRepository {
         const isSelfUser = userId === this.selfUserId();
         if (response && isSelfUser) {
           const conversationName = callEntity.conversationEntity.display_name();
-          this.logger.info(`Incoming call in conversation '${conversationName}' accepted on other device`);
+          this.callLogger.info(`Incoming call in conversation '${conversationName}' accepted on other device`);
           return this.deleteCall(conversationId);
         }
 
@@ -579,7 +579,7 @@ z.calling.CallingRepository = class CallingRepository {
       const isCurrentClient = clientId === this.clientRepository.currentClient().id;
       const mistargetedMessage = !isSelfUser || !isCurrentClient;
       if (mistargetedMessage) {
-        this.logger.log(`Ignored '${type}' call message for targeted at client '${clientId}' of user '${userId}'`);
+        this.callLogger.log(`Ignored '${type}' call message for targeted at client '${clientId}' of user '${userId}'`);
         throw new z.calling.CallError(z.calling.CallError.TYPE.MISTARGETED_MESSAGE);
       }
     }
@@ -794,7 +794,7 @@ z.calling.CallingRepository = class CallingRepository {
   deleteCall(conversationId) {
     this.getCallById(conversationId)
       .then(callEntity => {
-        this.logger.info(`Deleting call in conversation '${conversationId}'`, callEntity);
+        this.callLogger.info(`Deleting call in conversation '${conversationId}'`, callEntity);
 
         callEntity.deleteCall();
         this.calls.remove(call => call.id === conversationId);
@@ -846,7 +846,7 @@ z.calling.CallingRepository = class CallingRepository {
           });
       })
       .then(callEntity => {
-        this.logger.info(`Joining call in conversation '${conversationId}'`, callEntity);
+        this.callLogger.info(`Joining call in conversation '${conversationId}'`, callEntity);
 
         callEntity.initiateTelemetry(mediaType);
         if (this.mediaStreamHandler.local_media_stream()) {
@@ -882,7 +882,7 @@ z.calling.CallingRepository = class CallingRepository {
     this.getCallById(conversationId)
       .then(callEntity => {
         const logMessage = `Leaving call in conversation '${conversationId}' triggered by '${terminationReason}'`;
-        this.logger.info(logMessage, callEntity);
+        this.callLogger.info(logMessage, callEntity);
 
         const isOngoingCall = callEntity.state() === z.calling.enum.CALL_STATE.ONGOING;
         if (!isOngoingCall) {
@@ -934,7 +934,7 @@ z.calling.CallingRepository = class CallingRepository {
   rejectCall(conversationId) {
     this.getCallById(conversationId)
       .then(callEntity => {
-        this.logger.info(`Rejecting call in conversation '${conversationId}'`, callEntity);
+        this.callLogger.info(`Rejecting call in conversation '${conversationId}'`, callEntity);
 
         callEntity.rejectCall();
       })
@@ -1077,7 +1077,7 @@ z.calling.CallingRepository = class CallingRepository {
             title: z.l10n.text(titleStringId),
           },
         });
-        this.logger.warn(`You cannot join a second call while calling in conversation '${ongoingCallId}'.`);
+        this.callLogger.warn(`You cannot join a second call while calling in conversation '${ongoingCallId}'.`);
       }
     });
   }
@@ -1135,13 +1135,13 @@ z.calling.CallingRepository = class CallingRepository {
         const mediaType = this._getMediaTypeFromProperties(properties);
         const conversationName = callEntity.conversationEntity.display_name();
 
-        this.logger.info(
+        this.callLogger.info(
           {
             data: {
               default: [mediaType, conversationName],
-              obfuscated: [mediaType, conversationId],
+              obfuscated: [mediaType, this.callLogger.obfuscate(conversationId)],
             },
-            message: z.util.format_string`Incoming '${0}' call in conversation '${1}'`,
+            message: `Incoming '{0}' call in conversation '{1}'`,
           },
           callEntity
         );
@@ -1190,13 +1190,13 @@ z.calling.CallingRepository = class CallingRepository {
       const conversationName = callEntity.conversationEntity.display_name();
       const conversationId = callEntity.conversationEntity.id;
 
-      this.logger.info(
+      this.callLogger.info(
         {
           data: {
             default: [mediaType, conversationName],
-            obfuscated: [mediaType, conversationId],
+            obfuscated: [mediaType, this.callLogger.obfuscate(conversationId)],
           },
-          message: z.util.format_string`Outgoing '${0}' call in conversation '${1}'`,
+          message: `Outgoing '{0}' call in conversation '{1}'`,
         },
         callEntity
       );
@@ -1336,7 +1336,7 @@ z.calling.CallingRepository = class CallingRepository {
       const isExpiredConfig = this.callingConfig.expiration.getTime() < Date.now();
 
       if (!isExpiredConfig) {
-        this.logger.debug('Returning local calling configuration. No update needed.', this.callingConfig);
+        this.callLogger.debug('Returning local calling configuration. No update needed.', this.callingConfig);
         return Promise.resolve(this.callingConfig);
       }
 
@@ -1349,7 +1349,7 @@ z.calling.CallingRepository = class CallingRepository {
   _clearConfig() {
     if (this.callingConfig) {
       const expirationDate = this.callingConfig.expiration.toISOString();
-      this.logger.debug(`Removing calling configuration with expiration of '${expirationDate}'`);
+      this.callLogger.debug(`Removing calling configuration with expiration of '${expirationDate}'`);
       this.callingConfig = undefined;
     }
   }
@@ -1377,7 +1377,10 @@ z.calling.CallingRepository = class CallingRepository {
         const expirationDate = new Date(Date.now() + timeout);
         callingConfig.expiration = expirationDate;
 
-        this.logger.info(`Updated calling configuration expires on '${expirationDate.toISOString()}'`, callingConfig);
+        this.callLogger.info(
+          `Updated calling configuration expires on '${expirationDate.toISOString()}'`,
+          callingConfig
+        );
         this.callingConfig = callingConfig;
 
         this.callingConfigTimeout = window.setTimeout(() => {
@@ -1417,7 +1420,7 @@ z.calling.CallingRepository = class CallingRepository {
           return this._sendReport(this.flowStatus);
         }
 
-        this.logger.warn('Could not find flows to report for call analysis');
+        this.callLogger.warn('Could not find flows to report for call analysis');
       });
   }
 
@@ -1428,7 +1431,7 @@ z.calling.CallingRepository = class CallingRepository {
    */
   setDebugState(isDebuggingEnabled) {
     if (window.adapter) {
-      this.logger.debug(`Set logging for WebRTC Adapter: ${isDebuggingEnabled}`);
+      this.callLogger.debug(`Set logging for WebRTC Adapter: ${isDebuggingEnabled}`);
       window.adapter.disableLog = !isDebuggingEnabled;
     }
   }
@@ -1459,9 +1462,26 @@ z.calling.CallingRepository = class CallingRepository {
     let logMessage;
     if (isOutgoing) {
       if (remoteUserId) {
-        logMessage = `Sending '${type}' message (response: ${response}) to user '${remoteUserId}' in conversation '${conversationId}'`;
+        logMessage = {
+          data: {
+            default: [type, response, remoteUserId, conversationId],
+            obfuscated: [
+              type,
+              response,
+              this.callLogger.obfuscate(remoteUserId),
+              this.callLogger.obfuscate(conversationId),
+            ],
+          },
+          message: `Sending '{0}' message (response: {1}) to user '{2}' in conversation '{3}'`,
+        };
       } else {
-        logMessage = `Sending '${type}' message (response: ${response}) to conversation '${conversationId}'`;
+        logMessage = {
+          data: {
+            default: [type, response, conversationId],
+            obfuscated: [type, response, this.callLogger.obfuscate(conversationId)],
+          },
+          message: `Sending '{0}' message (response: {1}) to conversation '{2}'`,
+        };
       }
     } else {
       const isSelfUser = destinationUserId === this.selfUserId();
@@ -1469,10 +1489,16 @@ z.calling.CallingRepository = class CallingRepository {
         return;
       }
 
-      logMessage = `Received '${type}' message (response: ${response}) from user '${userId}' in conversation '${conversationId}'`;
+      logMessage = {
+        data: {
+          default: [type, response, userId, conversationId],
+          obfuscated: [type, response, this.callLogger.obfuscate(userId), this.callLogger.obfuscate(conversationId)],
+        },
+        message: `Received '{0}' message (response: {1}) from user '{2}' in conversation '{3}'`,
+      };
     }
 
-    this.logger.info(logMessage, callMessageEntity);
+    this.callLogger.info(logMessage, callMessageEntity);
   }
 
   /**
@@ -1484,6 +1510,6 @@ z.calling.CallingRepository = class CallingRepository {
    */
   _sendReport(customData) {
     Raygun.send(new Error('Call failure report'), customData);
-    this.logger.debug(`Reported status of flow id '${customData.meta.flowId}' for call analysis`, customData);
+    this.callLogger.debug(`Reported status of flow id '${customData.meta.flowId}' for call analysis`, customData);
   }
 };

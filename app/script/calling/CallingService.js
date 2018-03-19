@@ -28,7 +28,6 @@ z.calling.CallingService = class CallingService {
    * @param {z.client.ClientEntity} clientEntity - Local client entity
    */
   constructor(clientEntity) {
-    this.logger = new z.telemetry.calling.CallLogger('z.calling.CallingService', z.config.LOGGER.OPTIONS);
     this.client = clientEntity;
   }
 
