@@ -1429,10 +1429,7 @@ z.calling.CallingRepository = class CallingRepository {
    */
   _enableDebugging() {
     if (window.adapter) {
-      this.logger.debug(`Set logging for WebRTC Adapter`);
       window.adapter.disableLog = false;
-    } else {
-      this.logger.debug(`WebRTC Adapter not found while trying to enable logging`);
     }
   }
 
