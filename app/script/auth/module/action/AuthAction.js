@@ -46,13 +46,7 @@ function doLoginPlain(loginData, onBeforeLogin, onAfterLogin) {
     );
     return Promise.resolve()
       .then(() => onBeforeLogin(dispatch, getState, global))
-      .then(() =>
-        core.login(loginData, true, {
-          classification: 'desktop',
-          cookieLabel: 'default',
-          model: 'Chrome', // TODO read client info from platform.js
-        })
-      )
+      .then(() => core.login(loginData, true, ClientAction.generateClientPayload(loginData.persist)))
       .then(() => persistAuthData(loginData.persist, core, dispatch))
       .then(() => onAfterLogin(dispatch, getState, global))
       .then(() => dispatch(AuthActionCreator.successfulLogin()))
