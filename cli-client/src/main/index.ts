@@ -10,7 +10,7 @@ import * as path from 'path';
 import {AxiosError} from 'axios';
 import {BackendErrorLabel} from '@wireapp/api-client/dist/commonjs/http/';
 import {Config} from '@wireapp/api-client/dist/commonjs/Config';
-import {PayloadBundle} from '@wireapp/core/dist/crypto/root';
+import {PayloadBundle} from '@wireapp/core/dist/cryptography/root';
 import {RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/';
 import APIClient = require('@wireapp/api-client');
 

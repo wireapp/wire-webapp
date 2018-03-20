@@ -17,14 +17,11 @@
  *
  */
 
-import {Account} from './Account';
-import * as auth from './auth/root';
-import * as conversation from './conversation/root';
-import * as cryptography from './cryptography/root';
+interface EncryptedAsset {
+  cipherText: Buffer;
+  keyBytes: Buffer;
+  /** The SHA-256 sum of `cipherText` */
+  sha256: Buffer;
+}
 
-export = {
-  Account,
-  auth,
-  conversation,
-  cryptography,
-};
+export default EncryptedAsset;

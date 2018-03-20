@@ -6,22 +6,21 @@ import PreKeyStore from '@wireapp/proteus/dist/session/PreKeyStore';
 import {error as StoreEngineError} from '@wireapp/store-engine';
 import {Decoder, Encoder} from 'bazinga64';
 
+export enum CRUDStoreKeys {
+  LOCAL_IDENTITY = 'local_identity',
+}
+
+export enum CrudStoreStores {
+  LOCAL_IDENTITY = 'keys',
+  PRE_KEYS = 'prekeys',
+  SESSIONS = 'sessions',
+}
+
 class CryptoboxCRUDStore implements PreKeyStore {
+  public static readonly KEYS = CRUDStoreKeys;
+  public static readonly STORES = CrudStoreStores;
+
   constructor(private engine: CRUDEngine) {}
-
-  static get KEYS() {
-    return {
-      LOCAL_IDENTITY: 'local_identity',
-    };
-  }
-
-  static get STORES() {
-    return {
-      LOCAL_IDENTITY: 'keys',
-      PRE_KEYS: 'prekeys',
-      SESSIONS: 'sessions',
-    };
-  }
 
   private from_store(record: PersistedRecord): ArrayBuffer {
     return typeof record.serialised === 'string'

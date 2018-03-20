@@ -17,14 +17,9 @@
  *
  */
 
-import {Account} from './Account';
-import * as auth from './auth/root';
-import * as conversation from './conversation/root';
-import * as cryptography from './cryptography/root';
+interface SessionPayloadBundle {
+  sessionId: string;
+  encryptedPayload: string;
+}
 
-export = {
-  Account,
-  auth,
-  conversation,
-  cryptography,
-};
+export default SessionPayloadBundle;

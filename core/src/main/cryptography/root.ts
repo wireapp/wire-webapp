@@ -17,14 +17,18 @@
  *
  */
 
-import {Account} from './Account';
-import * as auth from './auth/root';
-import * as conversation from './conversation/root';
-import * as cryptography from './cryptography/root';
+import CryptographyService from './CryptographyService';
+import CryptographyDatabaseRepository from './CryptographyDatabaseRepository';
+import GenericMessageType from './GenericMessageType';
+import PayloadBundle from './PayloadBundle';
+import SessionPayloadBundle from './SessionPayloadBundle';
+import EncryptedAsset from './EncryptedAsset';
 
-export = {
-  Account,
-  auth,
-  conversation,
-  cryptography,
+export {
+  CryptographyService,
+  CryptographyDatabaseRepository,
+  EncryptedAsset,
+  GenericMessageType,
+  PayloadBundle,
+  SessionPayloadBundle,
 };

@@ -17,14 +17,10 @@
  *
  */
 
-import {Account} from './Account';
-import * as auth from './auth/root';
-import * as conversation from './conversation/root';
-import * as cryptography from './cryptography/root';
+interface PayloadBundle {
+  content: string;
+  conversation: string;
+  from: string;
+}
 
-export = {
-  Account,
-  auth,
-  conversation,
-  cryptography,
-};
+export default PayloadBundle;

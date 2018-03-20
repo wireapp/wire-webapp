@@ -1,4 +1,7 @@
 {
+  "browser": {
+    "./dist/commonjs/cryptography/AssetCryptography.node": "./dist/commonjs/cryptography/AssetCryptography.browser.js"
+  },
   "dependencies": {
     "@types/node": "9.4.7",
     "@wireapp/api-client": "0.6.2",
