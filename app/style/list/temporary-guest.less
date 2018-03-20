@@ -6,10 +6,7 @@
   right: 0;
   display: flex;
   flex-direction: column;
-  background-color: @app-bg;
-  fill: @graphite-dark;
   font-weight: @font-weight-regular;
-  box-shadow: inset -1px 0 0 #eee;
 
   &__content {
     flex: 1;
@@ -20,7 +17,6 @@
     color: @graphite;
     font-size: 24px;
     line-height: 32px;
-    text-align: center;
     margin: 24px 0;
   }
 
@@ -42,6 +38,14 @@
     &__info-text {
       line-height: 16px;
       word-break: break-word;
+
+      &__time {
+        font-weight: @font-weight-bold;
+      }
+    }
+
+    &__preferences {
+      display: flex;
     }
   }
 }

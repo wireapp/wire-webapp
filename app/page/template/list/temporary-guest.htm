@@ -8,7 +8,10 @@
     <div class="temporary-guest__create-account" data-bind="click: clickToCreateAccount, l10n_text: z.string.temporaryGuestCta"></div>
   </div>
   <div class="temporary-guest__footer">
-    <span class="temporary-guest__footer__info-text" data-bind="l10n_text: z.string.temporaryGuestTimeRemaining"></span>
+    <span class="temporary-guest__footer__info-text">
+      <span class="temporary-guest__footer__info-text__time">time</span>
+      <span data-bind="l10n_text: z.string.temporaryGuestTimeRemaining"></span>
+    </span>
     <settings-icon  class="temporary-guest__footer__preferences" data-bind="click: clickOnPreferencesButton, l10n_tooltip: z.string.tooltipConversationsPreferences" data-uie-name="go-preferences"></settings-icon>
   </div>
 </div>

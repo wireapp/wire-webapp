@@ -5,16 +5,17 @@
      data-uie-value="is-loading">
   <!-- ko stopBinding: true -->
     <div id="app" class="app">
-      <div id="left-column" class="left-column">
-        #include('list/background.htm')
+      <div id="left-column" class="left-column" data-bind="css: {'left-column--white': mainViewModel.isTemporaryGuest}">
         <!-- ko if: webappLoaded -->
           <!-- ko ifnot: modal() -->
+            #include('list/background.htm')
             #include('list/archive.htm')
             #include('list/conversations.htm')
             #include('list/preferences.htm')
             #include('list/start-ui.htm')
           <!-- /ko -->
           <!-- ko if: modal() === z.viewModel.ListViewModel.MODAL_TYPE.TAKEOVER -->
+            #include('list/background.htm')
             #include('list/takeover.htm')
           <!-- /ko -->
           <!-- ko if: modal() === z.viewModel.ListViewModel.MODAL_TYPE.TEMPORARY_GUEST -->

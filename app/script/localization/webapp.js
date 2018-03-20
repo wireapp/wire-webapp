@@ -632,7 +632,7 @@ z.string.searchListNoMatches = 'No matching results.\nTry entering a different n
 // Temporary guest experience
 z.string.temporaryGuestCta = 'Create an account';
 z.string.temporaryGuestDescription = 'Secure your business with encrypted group messaging and conference calls.';
-z.string.temporaryGuestTimeRemaining = '{{time}} left in this guest room';
+z.string.temporaryGuestTimeRemaining = ' left in this guest room';
 
 z.string.temporaryGuestJoinMessage = 'This conversation will be available to you for 24 hours.';
 z.string.temporaryGuestJoinDescription = 'If you close or refresh this page, you will lose access.';
