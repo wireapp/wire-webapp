@@ -50,9 +50,9 @@ describe('z.util.StringUtil', () => {
     });
   });
 
-  describe('getRandomCharacter', () => {
+  describe('getRandomChar', () => {
     it('always returns an alphanumeric character', () => {
-      _.range(1000).map(() => expect(z.util.StringUtil.getRandomCharacter()).toMatch(/(\w|\d){1}/));
+      _.range(1000).map(() => expect(z.util.StringUtil.getRandomChar()).toMatch(/(\w|\d){1}/));
     });
   });
 

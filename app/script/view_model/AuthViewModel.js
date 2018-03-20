@@ -278,7 +278,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
   }
 
   _init_url_parameter() {
-    const mode = z.util.getUrlParameter(z.auth.URLParameter.MODE);
+    const mode = z.util.URLUtil.getParameter(z.auth.URLParameter.MODE);
     if (mode) {
       const isExpectedMode = mode === z.auth.AuthView.MODE.ACCOUNT_LOGIN;
       if (isExpectedMode) {
@@ -287,7 +287,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
       }
     }
 
-    const reason = z.util.getUrlParameter(z.auth.URLParameter.REASON);
+    const reason = z.util.URLUtil.getParameter(z.auth.URLParameter.REASON);
     switch (reason) {
       case z.auth.SIGN_OUT_REASON.ACCOUNT_DELETED:
         this.reason_info(z.l10n.text(z.string.authAccountDeletion));

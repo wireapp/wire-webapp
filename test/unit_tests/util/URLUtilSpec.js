@@ -33,17 +33,31 @@ describe('z.util.URLUtil', () => {
   });
 
   describe('forwardParameter', () => {
-    it('forwards existing URL parameters', () => {
-      z.util.URLUtil.getParameter = parameterValue => parameterValue === z.auth.URLParameter.TRACKING;
+    it('forwards existing URL parameter set to true', () => {
+      spyOn(z.util.URLUtil, 'getParameter').and.callFake(parameterValue => {
+        return parameterValue === z.auth.URLParameter.TRACKING;
+      });
       expect(z.util.URLUtil.forwardParameter('foo.com', z.auth.URLParameter.TRACKING)).toBe('foo.com?tracking=true');
+    });
 
-      z.util.URLUtil.getParameter = parameterValue => parameterValue !== z.auth.URLParameter.TRACKING;
+    it('forwards existing URL parameter set to false', () => {
+      spyOn(z.util.URLUtil, 'getParameter').and.callFake(parameterValue => {
+        return parameterValue !== z.auth.URLParameter.TRACKING;
+      });
       expect(z.util.URLUtil.forwardParameter('foo.com', z.auth.URLParameter.TRACKING)).toBe('foo.com?tracking=false');
+    });
 
-      z.util.URLUtil.getParameter = parameterValue => (parameterValue === z.auth.URLParameter.TRACKING ? 'bar' : false);
+    it('forwards existing URL parameter with string value', () => {
+      spyOn(z.util.URLUtil, 'getParameter').and.callFake(parameterValue => {
+        return parameterValue === z.auth.URLParameter.TRACKING ? 'bar' : false;
+      });
       expect(z.util.URLUtil.forwardParameter('foo.com', z.auth.URLParameter.TRACKING)).toBe('foo.com?tracking=bar');
+    });
 
-      z.util.URLUtil.getParameter = parameterValue => (parameterValue === z.auth.URLParameter.TRACKING ? null : true);
+    it('ignored non-existing URL parameters', () => {
+      spyOn(z.util.URLUtil, 'getParameter').and.callFake(parameterValue => {
+        return parameterValue === z.auth.URLParameter.TRACKING ? null : true;
+      });
       expect(z.util.URLUtil.forwardParameter('foo.com', z.auth.URLParameter.TRACKING)).toBe('foo.com');
     });
   });

@@ -312,30 +312,26 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
    */
   update_current_devices(video_send) {
     return this.get_media_devices().then(() => {
-      const _check_device = (media_type, device_type) => {
-        device_type = this._type_conversion(device_type);
+      const _check_device = (mediaType, deviceType) => {
+        deviceType = this._type_conversion(deviceType);
 
-        const device_id_observable = this.current_device_id[`${device_type}`];
-        const mediaDevices = this.available_devices[`${device_type}`]();
-        const {current_device: media_device} = this._get_current_device(mediaDevices, device_id_observable());
+        const deviceIdObservable = this.current_device_id[`${deviceType}`];
+        const mediaDevices = this.available_devices[`${deviceType}`]();
+        const {current_device: mediaDevice} = this._get_current_device(mediaDevices, deviceIdObservable());
 
-        if (!media_device) {
-          const [updated_device] = this.available_devices[`${device_type}`]();
+        if (!mediaDevice) {
+          const [updated_device] = this.available_devices[`${deviceType}`]();
 
           if (updated_device) {
-            this.logger.warn(
-              `Selected '${media_type}' device '${device_id_observable()}' not found and replaced by '${updated_device.label ||
-                updated_device.deviceId}'`,
-              mediaDevices
-            );
-            return device_id_observable(updated_device.deviceId);
+            const id = updated_device.label || updated_device.deviceId;
+            const log = `Selected '${mediaType}' device '${deviceIdObservable()}' not found and replaced by '${id}'`;
+            this.logger.warn(log, mediaDevices);
+            return deviceIdObservable(updated_device.deviceId);
           }
 
-          this.logger.warn(
-            `Selected '${media_type}' device '${device_id_observable()}' not found and reset'`,
-            mediaDevices
-          );
-          return device_id_observable('');
+          const logMessage = `Selected '${mediaType}' device '${deviceIdObservable()}' not found and reset'`;
+          this.logger.warn(logMessage, mediaDevices);
+          return deviceIdObservable('');
         }
       };
 

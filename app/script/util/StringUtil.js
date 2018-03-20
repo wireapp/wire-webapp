@@ -32,12 +32,12 @@ z.util.StringUtil = {
 
   cutLastChars: (string, length) => string.substring(0, string.length - length),
 
-  format: () => {
-    let string = arguments[0];
+  format: (...args) => {
+    let [string] = args;
 
-    for (let index = 0; index < arguments.length; ++index) {
+    for (let index = 0; index < args.length; ++index) {
       const reg = new RegExp(`\\{${index}\\}`, 'gm');
-      string = string.replace(reg, arguments[index + 1]);
+      string = string.replace(reg, args[index + 1]);
     }
 
     return string;

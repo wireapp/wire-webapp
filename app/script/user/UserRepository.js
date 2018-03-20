@@ -783,7 +783,7 @@ z.user.UserRepository = class UserRepository {
    * @returns {Array<z.entity.User>} Matching users
    */
   search_for_connected_users(query, is_handle) {
-    const excludedEmojis = Array.from(query).filter(char => EMOJI_UNICODE_RANGES.includes(char));
+    const excludedEmojis = Array.from(query).filter(char => z.util.EmojiUtil.UNICODE_RANGES.includes(char));
     return this.connected_users()
       .filter(user_et => user_et.matches(query, is_handle, excludedEmojis))
       .sort((user_a, user_b) => {

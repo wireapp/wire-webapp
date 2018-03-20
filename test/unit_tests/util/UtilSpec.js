@@ -4334,28 +4334,6 @@ describe('z.util.zeroPadding', () => {
   });
 });
 
-describe('z.util.formatSeconds', () => {
-  it('should format seconds', () => {
-    expect(z.util.formatSeconds(50)).toBe('00:50');
-  });
-
-  it('should format minutes and seconds', () => {
-    expect(z.util.formatSeconds(110)).toBe('01:50');
-  });
-
-  it('should format hours, minutes and seconds', () => {
-    expect(z.util.formatSeconds(3630)).toBe('1:00:30');
-  });
-
-  it('should format 0 seconds', () => {
-    expect(z.util.formatSeconds(0)).toBe('00:00');
-  });
-
-  it('should format undefined as 00:00', () => {
-    expect(z.util.formatSeconds()).toBe('00:00');
-  });
-});
-
 describe('z.util.is_same_location', () => {
   it('returns false if page was accessed directly', () => {
     expect(z.util.isSameLocation('', 'https://app.wire.com')).toBeFalsy();
