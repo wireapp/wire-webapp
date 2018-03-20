@@ -245,8 +245,11 @@ z.entity.User = class User {
   }
 
   setRemaining(expirationTime) {
-    const remainingTime = expirationTime - Date.now();
-    const remainingMinutes = Math.ceil(remainingTime / (60 * 1000));
+    const timeToMinutes = 60 * 1000;
+    const timeToHours = timeToMinutes * 60;
+
+    const remainingTime = Math.max(expirationTime - Date.now(), 0);
+    const remainingMinutes = Math.ceil(remainingTime / timeToMinutes);
 
     let timeLeftText = z.string.userRemainingTimeHours;
     let timeValue = 0;
@@ -254,13 +257,15 @@ z.entity.User = class User {
     if (remainingMinutes <= 60) {
       timeLeftText = z.string.userRemainingTimeMinutes;
       timeValue = Math.ceil(remainingMinutes / 15) * 15;
+      this.expirationRemaining(timeValue * timeToMinutes);
     } else if (remainingMinutes <= 90) {
       timeValue = 1.5;
+      this.expirationRemaining(timeValue * timeToHours);
     } else {
       timeValue = Math.ceil(remainingMinutes / 60);
+      this.expirationRemaining(timeValue * timeToHours);
     }
 
-    this.expirationRemaining(remainingTime);
     this.expirationText(z.l10n.text(timeLeftText, timeValue));
   }
 };
