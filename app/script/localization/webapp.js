@@ -273,6 +273,8 @@ z.string.connectionRequestIgnore = 'Ignore';
 
 // Guests
 z.string.conversationGuestIndicator = 'Guest';
+z.string.userRemainingTimeHours = '{{time}}h left';
+z.string.userRemainingTimeMinutes = 'Less than {{time}}m left';
 
 // Conversation
 z.string.conversationYouNominative = 'you';
@@ -488,7 +490,7 @@ z.string.guestOptionsCopyLink = 'Copy link';
 z.string.guestOptionsCopyLinkDone = 'Link copied!';
 z.string.guestOptionsCreateLink = 'Create link';
 z.string.guestOptionsInfoHeader = 'Invite others with a link';
-z.string.guestOptionsInfoText = 'Anyone with the link can join the conversation for 24 hours, even if they don’t have Wire.';
+z.string.guestOptionsInfoText = 'Anyone with the link can join the conversation, even if they don’t have Wire.';
 z.string.guestOptionsRevokeLink = 'Revoke link';
 z.string.guestOptionsTitle = 'Guest options';
 
