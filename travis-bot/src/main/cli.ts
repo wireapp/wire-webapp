@@ -49,18 +49,18 @@ const start = async (): Promise<TravisBot> => {
 
   const commitAuthor = await TravisBot.runCommand(`git log | grep Author: | cut -d' ' -f2- | uniq | head -n1`);
   let commitSummary = await TravisBot.runCommand('git log -1 --pretty=%s');
+  let changelog;
 
   if (TRAVIS_TAG) {
     const MAXIMUM_CHANGELOG_CHARS = 800;
 
     const previousGitTag = await TravisBot.runCommand(`git describe --abbrev=0 --tags ${TRAVIS_TAG}^`);
-    const changelog = await TravisBot.generateChangelog(
+
+    changelog = await TravisBot.generateChangelog(
       String(TRAVIS_REPO_SLUG),
       `${previousGitTag}..${TRAVIS_TAG}`,
       MAXIMUM_CHANGELOG_CHARS
     );
-
-    commitSummary += '\n\n' + changelog;
   }
 
   const loginData: LoginData = {
@@ -75,6 +75,7 @@ const start = async (): Promise<TravisBot> => {
       repositoryName: String(TRAVIS_REPO_SLUG),
       url: '',
     },
+    changelog,
     commit: {
       author: commitAuthor,
       branch: String(TRAVIS_BRANCH),

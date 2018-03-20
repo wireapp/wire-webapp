@@ -35,16 +35,17 @@ const logger = logdown('@wireapp/travis-bot/TravisBot', {
 });
 
 export interface MessageData {
+  build: {
+    number: string | number;
+    repositoryName: string;
+    url: string;
+  };
+  changelog?: string;
   commit: {
     author: string;
     branch: string;
     hash: string;
     message: string;
-  };
-  build: {
-    number: string | number;
-    repositoryName: string;
-    url: string;
   };
   conversationIds?: Array<string>;
 }
@@ -54,14 +55,20 @@ class TravisBot {
 
   get message(): string {
     const {build: {number: buildNumber, repositoryName}} = this.messageData;
-    const {commit: {branch, author, hash, message}} = this.messageData;
+    const {changelog, commit: {branch, author, hash, message}} = this.messageData;
 
-    return (
-      `**${repositoryName}: Travis build '${buildNumber}' finished on '${branch}' branch.** ᕦ(￣ ³￣)ᕤ\n` +
-      `- Last commit from: ${author}\n` +
-      `- Last commit message: ${message}\n` +
-      `- https://github.com/${repositoryName}/commit/${hash}`
-    );
+    let msg = `**${repositoryName}: Build '${buildNumber}' finished on '${branch}' branch.**\n`;
+
+    if (changelog) {
+      msg += `\n**Changelog:** \n\n` + changelog;
+    } else {
+      msg +=
+        `- Last commit from: ${author}\n` +
+        `- Last commit message: ${message}\n` +
+        `- https://github.com/${repositoryName}/commit/${hash}`;
+    }
+
+    return msg;
   }
 
   async start(): Promise<void> {
@@ -86,7 +93,7 @@ class TravisBot {
     await Promise.all(
       conversationIds.map(async id => {
         if (!account.service) {
-          throw new Error(`Account service is not set: ${account}`);
+          throw new Error(`Account service is not set. Account not listening?`);
         }
         if (id) {
           logger.info(`Sending message to conversation ${id} ...`);
@@ -99,15 +106,32 @@ class TravisBot {
   static async generateChangelog(repoSlug: string, gitTag: string, maximumChars?: number): Promise<string> {
     const headlines = new RegExp('^#+ (.*)$', 'gm');
     const listItems = new RegExp('^\\* (.*) \\(\\[.*$', 'gm');
+    const githubIssueLinks = new RegExp('\\[[^\\]]+\\]\\((https:[^)]+)\\)', 'gm');
+    const omittedMessage = '... (content omitted)';
 
     const changelog = await Changelog.generate({
       repoUrl: `https://github.com/${repoSlug}`,
       tag: gitTag,
     });
 
-    const styledChangelog = changelog.replace(headlines, '**$1**').replace(listItems, '– $1');
+    let styledChangelog = changelog
+      .replace(headlines, '**$1**')
+      .replace(listItems, '– $1')
+      .replace(githubIssueLinks, '$1');
 
-    return changelog.substring(0, maximumChars);
+    if (maximumChars && styledChangelog.length > maximumChars) {
+      styledChangelog = styledChangelog.substr(0, maximumChars - omittedMessage.length);
+
+      const indexOfLastDash = styledChangelog.lastIndexOf('–');
+
+      if (indexOfLastDash != -1) {
+        styledChangelog = styledChangelog.substr(0, indexOfLastDash);
+      }
+
+      styledChangelog += '\n' + omittedMessage;
+    }
+
+    return styledChangelog;
   }
 
   static async runCommand(command: string): Promise<string> {
