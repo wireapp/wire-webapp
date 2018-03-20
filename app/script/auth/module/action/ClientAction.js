@@ -22,6 +22,7 @@ import * as ClientActionCreator from './creator/ClientActionCreator';
 import {getLocalStorage, LocalStorageKey} from './LocalStorageAction';
 import Runtime from '../../Runtime';
 import * as Environment from '../../Environment';
+import * as StringUtil from '../../util/stringUtil';
 
 export function doGetAllClients() {
   return function(dispatch, getState, {apiClient}) {
@@ -75,7 +76,7 @@ export function generateClientPayload(persist) {
   const runtime = new Runtime();
 
   const deviceLabel = `${runtime.getOSFamily()}${runtime.getOS().version ? ` ${runtime.getOS().version}` : ''}`;
-  let deviceModel = runtime.getBrowserName();
+  let deviceModel = StringUtil.capitalize(runtime.getBrowserName());
 
   if (runtime.isElectron()) {
     if (runtime.isMacOS()) {
