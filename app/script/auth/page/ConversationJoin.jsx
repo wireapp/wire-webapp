@@ -60,6 +60,7 @@ class ConversationJoin extends Component {
     conversationKey: null,
     enteredName: '',
     error: null,
+    expiresIn: undefined,
     forceNewTemporaryGuestAccount: false,
     isValidLink: true,
     isValidName: true,
@@ -69,9 +70,14 @@ class ConversationJoin extends Component {
   readAndUpdateParamsFromUrl = (nextProps = this.props) => {
     const conversationCode = nextProps.match.params.conversationCode;
     const conversationKey = nextProps.match.params.conversationKey;
-    const keyOrCodeChanged =
-      conversationCode !== this.state.conversationCode || conversationKey !== this.state.conversationKey;
-    if (keyOrCodeChanged) {
+    const expiresIn = parseInt(nextProps.match.params.expiresIn, 10) || undefined;
+
+    const urlParamsChanged =
+      conversationCode !== this.state.conversationCode ||
+      conversationKey !== this.state.conversationKey ||
+      expiresIn !== this.state.expiresIn;
+
+    if (urlParamsChanged) {
       this.props
         .doInit()
         .then(() => {
@@ -79,6 +85,7 @@ class ConversationJoin extends Component {
             ...state,
             conversationCode,
             conversationKey,
+            expiresIn,
             isValidLink: true,
           }));
         })
@@ -116,7 +123,7 @@ class ConversationJoin extends Component {
     } else {
       Promise.resolve(this.nameInput.value)
         .then(name => name.trim())
-        .then(name => this.props.doRegisterWireless({name}))
+        .then(name => this.props.doRegisterWireless({expires_in: this.state.expiresIn, name}))
         .then(() => this.props.doJoinConversationByCode(this.state.conversationKey, this.state.conversationCode))
         .then(() => window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP)));
     }

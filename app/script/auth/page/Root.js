@@ -69,7 +69,7 @@ class Root extends React.Component {
               <Route path={ROUTE.CONVERSATION_JOIN_INVALID} component={ConversationJoinInvalid} />
 
               <Route
-                path={`${ROUTE.CONVERSATION_JOIN}/:conversationKey/:conversationCode`}
+                path={`${ROUTE.CONVERSATION_JOIN}/:conversationKey/:conversationCode/:expiresIn?`}
                 component={ConversationJoin}
               />
               <Route path={ROUTE.CREATE_TEAM} component={TeamName} />
