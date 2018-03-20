@@ -254,7 +254,7 @@ class ConversationJoin extends Component {
   };
 
   renderJoin = () => {
-    const {error, isAuthenticated} = this.props;
+    const {error, isAuthenticated, isTemporaryGuest} = this.props;
     const {isValidLink, forceNewTemporaryGuestAccount} = this.state;
 
     if (!isValidLink) {
@@ -263,7 +263,7 @@ class ConversationJoin extends Component {
     if (this.isConversationFullError(error)) {
       return this.renderFullConversation();
     }
-    const renderTemporaryGuestAccountCreation = !isAuthenticated || forceNewTemporaryGuestAccount;
+    const renderTemporaryGuestAccountCreation = !isAuthenticated || isTemporaryGuest || forceNewTemporaryGuestAccount;
     return renderTemporaryGuestAccountCreation ? this.renderTemporaryGuestAccount() : this.renderActivatedAccount();
   };
 
@@ -288,6 +288,7 @@ export default withRouter(
         error: ConversationSelector.getError(state),
         isAuthenticated: AuthSelector.isAuthenticated(state),
         isFetching: ConversationSelector.isFetching(state),
+        isTemporaryGuest: SelfSelector.isTemporaryGuest(state),
         selfName: SelfSelector.getSelfName(state),
       }),
       {...ConversationAction, ...AuthAction}
