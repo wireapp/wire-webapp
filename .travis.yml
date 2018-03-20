@@ -118,4 +118,4 @@ deploy:
       branch: prod
 
 after_deploy:
-  - node_modules/.bin/wire-travis-bot
+  - node_modules/.bin/wire-travis-bot "fa0daf62-d5dc-48d2-aa92-ad2e0adeff4c"
