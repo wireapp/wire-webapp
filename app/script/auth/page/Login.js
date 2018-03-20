@@ -143,6 +143,7 @@ class Login extends React.PureComponent {
         if (error.label === BackendError.LABEL.TOO_MANY_CLIENTS) {
           this.props.history.push(ROUTE.CLIENTS);
         } else {
+          this.setState({...this.state, validInputs: {...validInputs, email: false, password: false}});
           throw error;
         }
       });
