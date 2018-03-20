@@ -20,6 +20,9 @@
 import BackendError from './BackendError';
 import * as ClientActionCreator from './creator/ClientActionCreator';
 import {getLocalStorage, LocalStorageKey} from './LocalStorageAction';
+import Runtime from '../../Runtime';
+import * as Environment from '../../Environment';
+import * as StringUtil from '../../util/stringUtil';
 
 export function doGetAllClients() {
   return function(dispatch, getState, {apiClient}) {
@@ -58,9 +61,7 @@ export function doCreateClient(password: string) {
             password,
             persist: !!persist,
           },
-          {
-            model: `test`,
-          }
+          generateClientPayload(!!persist)
         )
       )
       .then(clients => dispatch(ClientActionCreator.successfulCreateClient()))
@@ -68,5 +69,33 @@ export function doCreateClient(password: string) {
         dispatch(ClientActionCreator.failedCreateClient(error));
         throw BackendError.handle(error);
       });
+  };
+}
+
+export function generateClientPayload(persist) {
+  const runtime = new Runtime();
+
+  const deviceLabel = `${runtime.getOSFamily()}${runtime.getOS().version ? ` ${runtime.getOS().version}` : ''}`;
+  let deviceModel = StringUtil.capitalize(runtime.getBrowserName());
+
+  if (runtime.isElectron()) {
+    if (runtime.isMacOS()) {
+      deviceModel = 'Wire macOS';
+    } else if (runtime.isWindows()) {
+      deviceModel = 'Wire Windows';
+    } else {
+      deviceModel = 'Wire Linux';
+    }
+    if (!Environment.isEnvironment(Environment.PRODUCTION)) {
+      deviceModel = `${deviceModel} (Internal)`;
+    }
+  } else if (!persist) {
+    deviceModel = `${deviceModel} (Temporary)`;
+  }
+
+  return {
+    classification: 'desktop',
+    label: deviceLabel,
+    model: deviceModel,
   };
 }
