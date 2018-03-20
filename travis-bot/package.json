@@ -5,7 +5,7 @@
   "dependencies": {
     "@types/generate-changelog": "1.7.0",
     "@types/node": "9.4.7",
-    "@wireapp/core": "2.0.75",
+    "@wireapp/core": "2.0.87",
     "generate-changelog": "1.7.0"
   },
   "description": "A Travis deployment notification bot.",
