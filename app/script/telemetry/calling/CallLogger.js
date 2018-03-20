@@ -4,6 +4,7 @@ z.telemetry.calling.CallLogger = class CallLogger extends z.util.Logger {
     super(message, options);
     this.message = message;
     this.options = options;
+    this.obfuscationMode = 'soft';
   }
 
   static get CONFIG() {
@@ -11,58 +12,62 @@ z.telemetry.calling.CallLogger = class CallLogger extends z.util.Logger {
       IPV4: /(([0-1]?[0-9]{1,2}\.)|(2[0-4][0-9]\.)|(25[0-5]\.)){3}(([0-1]?[0-9]{1,2})|(2[0-4][0-9])|(25[0-5]))/,
       IPV6: /(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))/,
       MESSAGE_LOG_LENGTH: 10000,
-      OBFUSCATION_TRUNCATE_TO: 2,
+      OBFUSCATION_TRUNCATE_TO: 4,
     };
   }
 
   obfuscate(string) {
-    //return CryptoJS.SHA256(`${string}${this.currentWeek}`)
-    //  .toString()
-    return string.substr(0, CallLogger.CONFIG.OBFUSCATION_TRUNCATE_TO);
+    if (this.obfuscationMode === 'soft') {
+      return string.substr(0, CallLogger.CONFIG.OBFUSCATION_TRUNCATE_TO);
+    } else if (this.obfuscationMode === 'hard') {
+      return CryptoJS.SHA256(string)
+        .toString()
+        .substr(0, CallLogger.CONFIG.OBFUSCATION_TRUNCATE_TO);
+    }
   }
 
   obfuscateIp(ip) {
-    if (CallLogger.CONFIG.IPV4.test(ip)) {
-      // IPv4
-      ip = ip.split('.');
-      ip[ip.length - 1] = '0';
-      return ip.join('.');
-    } else if (CallLogger.CONFIG.IPV6.test(ip)) {
-      // IPv6
-      ip = ip.split(':').slice(0, 3);
-      return [...ip, '0000', '0000', '0000', '0000'].join(':');
-    }
-
-    return 'Unknown';
-  }
-
-  /*fakeIpGenerator(seed, type) {
-    if (type === 4) {
-      // Extend the 4 bytes seed to 16 bytes using XOR encryption with static keys
-      const originalSeedLength = seed.length;
-      const keys = [21, 15, 7];
-      for (let i = 0; i < originalSeedLength; ++i) {
-        for (const key of keys) {
-          seed += String.fromCharCode(key ^ seed.charCodeAt(i));
+    if (this.obfuscationMode === 'soft') {
+      if (CallLogger.CONFIG.IPV4.test(ip)) {
+        // IPv4
+        ip = ip.split('.');
+        ip[ip.length - 1] = '0';
+        return ip.join('.');
+      } else if (CallLogger.CONFIG.IPV6.test(ip)) {
+        // IPv6
+        ip = ip.split(':').slice(0, 3);
+        return [...ip, '0000', '0000', '0000', '0000'].join(':');
+      }
+    } else if (this.obfuscationMode === 'hard') {
+      if (CallLogger.CONFIG.IPV4.test(ip)) {
+        // Extend the 4 bytes seed to 16 bytes using XOR encryption with static keys
+        const originalSeedLength = seed.length;
+        const keys = [21, 15, 7];
+        for (let i = 0; i < originalSeedLength; ++i) {
+          for (const key of keys) {
+            seed += String.fromCharCode(key ^ seed.charCodeAt(i));
+          }
         }
-      }
 
-      // Generate a fake IP from that seed
-      const fakeIp = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-      for (let i = 0; i < seed.length; i++) {
-        fakeIp[i % fakeIp.length] += seed.charCodeAt(i);
+        // Generate a fake IP from that seed
+        const fakeIp = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        for (let i = 0; i < seed.length; i++) {
+          fakeIp[i % fakeIp.length] += seed.charCodeAt(i);
+        }
+        return fakeIp
+          .map(v => {
+            return (v % 10).toString(10);
+          })
+          .join('')
+          .match(/.{1,3}/g)
+          .join('.');
+      } else if (CallLogger.CONFIG.IPV6.test(ip)) {
+        const fakeIp = CryptoJS.MD5(seed).toString();
+        return fakeIp.match(/.{1,4}/g).join(':');
       }
-      return fakeIp
-        .map(v => {
-          return (v % 10).toString(10);
-        })
-        .join('')
-        .match(/.{1,3}/g)
-        .join('.');
-    } else if (type === 6) {
-      const fakeIp = CryptoJS.MD5(seed).toString();
-      return fakeIp.match(/.{1,4}/g).join(':');
     }
+
+    return '[Unknown]';
   }
 
   removeBytesFromIp(ip) {
@@ -92,7 +97,7 @@ z.telemetry.calling.CallLogger = class CallLogger extends z.util.Logger {
       slicedIp: ip.slice(mid - charactersToKeep / 2, mid + charactersToKeep / 2),
       type,
     };
-  }*/
+  }
 
   obfuscateSdp(sdpMessage, conversationId) {
     const decodedSdpMessage = sdpTransform.parse(sdpMessage);
@@ -109,7 +114,7 @@ z.telemetry.calling.CallLogger = class CallLogger extends z.util.Logger {
 
       // Remove ice password
       if (typeof decodedSdpMessage.media[index].icePwd !== 'undefined') {
-        decodedSdpMessage.media[index].icePwd = 'X'.repeat(24);
+        decodedSdpMessage.media[index].icePwd = 'XXXXXXXXXXXXXXXXXXXXXXXX';
       }
 
       // Remove KASE public key (for receiving side)
@@ -174,7 +179,7 @@ z.telemetry.calling.CallLogger = class CallLogger extends z.util.Logger {
     const log = args[1];
     if (typeof log === 'object') {
       const {message, data} = log;
-      if (typeof message === 'function' && typeof data === 'object') {
+      if (typeof message === 'string' && typeof data === 'object') {
         this.logToMemory([args[0], z.util.StringUtil.format(message, ...data.obfuscated)]);
         args[1] = z.util.StringUtil.format(message, ...data.default);
       }
