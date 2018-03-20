@@ -57,7 +57,7 @@ class TravisBot {
     const {commit: {branch, author, hash, message}} = this.messageData;
 
     return (
-      `**${repositoryName}: Travis build '${buildNumber}' deployed on '${branch}' environment.** ᕦ(￣ ³￣)ᕤ\n` +
+      `**${repositoryName}: Travis build '${buildNumber}' finished on '${branch}' branch.** ᕦ(￣ ³￣)ᕤ\n` +
       `- Last commit from: ${author}\n` +
       `- Last commit message: ${message}\n` +
       `- https://github.com/${repositoryName}/commit/${hash}`
