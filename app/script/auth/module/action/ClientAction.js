@@ -94,7 +94,7 @@ export function generateClientPayload(persist) {
   }
 
   return {
-    class: 'desktop',
+    classification: 'desktop',
     label: deviceLabel,
     model: deviceModel,
   };
