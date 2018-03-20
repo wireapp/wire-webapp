@@ -365,10 +365,6 @@ z.util.alias = {
   animationend: 'transitionend animationend oAnimationEnd MSAnimationEnd mozAnimationEnd webkitAnimationEnd',
 };
 
-z.util.addBlankTargets = function(textWithAnchors) {
-  return `${textWithAnchors}`.replace(/rel="nofollow"/gi, 'target="_blank" rel="nofollow noopener noreferrer"');
-};
-
 /**
  * Adds http to given url if protocol missing
  * @param {string} url - URL you want to open in a new browser tab
@@ -426,10 +422,6 @@ z.util.getLastCharacters = function(message, amount) {
 
 z.util.cutLastCharacters = function(message, amount) {
   return message.substring(0, message.length - amount);
-};
-
-z.util.markupLinks = function(message) {
-  return message.replace(/<a\s+href=/gi, '<a target="_blank" rel="nofollow noopener noreferrer" href=');
 };
 
 // Note: We are using "Underscore.js" to escape HTML in the original message
