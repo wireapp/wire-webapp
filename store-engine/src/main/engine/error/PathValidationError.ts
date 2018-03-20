@@ -11,7 +11,7 @@ export default class PathValidationError extends Error {
     Object.setPrototypeOf(this, PathValidationError.prototype);
 
     this.message = message;
-    this.name = (<any>this).constructor.name;
+    this.name = this.constructor.name;
     this.stack = new Error().stack;
   }
 }

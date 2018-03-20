@@ -7,7 +7,7 @@ export default class RecordAlreadyExistsError extends Error {
 
     this.code = 1;
     this.message = message;
-    this.name = (<any>this).constructor.name;
+    this.name = this.constructor.name;
     this.stack = new Error().stack;
   }
 }

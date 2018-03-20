@@ -7,7 +7,7 @@ export default class RecordNotFoundError extends Error {
 
     this.code = 2;
     this.message = message;
-    this.name = (<any>this).constructor.name;
+    this.name = this.constructor.name;
     this.stack = new Error().stack;
   }
 }

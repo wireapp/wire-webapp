@@ -22,7 +22,7 @@ class ValidationError extends Error {
     Object.setPrototypeOf(this, ValidationError.prototype);
 
     this.message = message;
-    this.name = (<any>this).constructor.name;
+    this.name = this.constructor.name;
     this.stack = new Error().stack;
   }
 }

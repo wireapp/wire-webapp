@@ -7,7 +7,7 @@ export default class RecordTypeError extends Error {
 
     this.code = 3;
     this.message = message;
-    this.name = (<any>this).constructor.name;
+    this.name = this.constructor.name;
     this.stack = new Error().stack;
   }
 }
