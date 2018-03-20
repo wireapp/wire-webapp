@@ -21,7 +21,8 @@ import platform from 'platform';
 
 export const BROWSER = {
   CHROME: 'chrome',
-  EDGE: 'edge',
+  EDGE: 'microsoft edge',
+  ELECTRON: 'electron',
   FIREFOX: 'firefox',
   IE: 'ie',
   OPERA: 'opera',
@@ -41,10 +42,11 @@ export const OS = {
 };
 
 export const SUPPORTED_BROWSERS = {
-  [BROWSER.CHROME]: 56,
-  [BROWSER.FIREFOX]: 52,
-  [BROWSER.EDGE]: 14,
-  [BROWSER.OPERA]: 43,
+  [BROWSER.CHROME]: {major: 56, minor: 0},
+  [BROWSER.FIREFOX]: {major: 52, minor: 0},
+  [BROWSER.EDGE]: {major: 15, minor: 0},
+  [BROWSER.ELECTRON]: {major: 1, minor: 6},
+  [BROWSER.OPERA]: {major: 43, minor: 0},
 };
 
 export default class Runtime {
@@ -53,17 +55,29 @@ export default class Runtime {
 
   getOSFamily = () => this.getOS().family.toLowerCase();
   getBrowserName = () => this.getPlatform().name.toLowerCase();
-  getBrowserVersion = () => this.getPlatform().version;
-  getMajorBrowserVersion = () => parseInt(this.getPlatform().version.split('.')[0]);
+  getBrowserVersion = () => {
+    const [majorVersion, minorVersion] = this.getPlatform().version.split('.');
+    return {major: parseInt(majorVersion, 10), minor: parseInt(minorVersion, 10)};
+  };
 
   isSupportedBrowser = () => {
-    return Object.entries(SUPPORTED_BROWSERS).some(([browser, version]) => {
-      return this.getBrowserName() === browser && this.getMajorBrowserVersion() >= version;
+    const isFranz = this.isElectron() && this.getPlatform().ua.includes('Franz');
+    if (isFranz) {
+      return false;
+    }
+
+    return Object.entries(SUPPORTED_BROWSERS).some(([browser, supportedVersion]) => {
+      const isSupportedBrowser = this.getBrowserName() === browser;
+      const currentVersion = this.getBrowserVersion();
+      const isSupportedMajorVersion = currentVersion.major >= supportedVersion.major;
+      const isSupportedMinorVersion = currentVersion.minor >= supportedVersion.minor;
+      return isSupportedBrowser && isSupportedMajorVersion && isSupportedMinorVersion;
     });
   };
 
   isChrome = () => this.getBrowserName() === BROWSER.CHROME;
   isEdge = () => this.getBrowserName() === BROWSER.EDGE;
+  isElectron = () => this.getBrowserName() === BROWSER.ELECTRON;
   isFirefox = () => this.getBrowserName() === BROWSER.FIREFOX;
   isInternetExplorer = () => this.getBrowserName() === BROWSER.IE;
   isOpera = () => this.getBrowserName() === BROWSER.OPERA;
