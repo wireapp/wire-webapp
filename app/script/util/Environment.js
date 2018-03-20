@@ -129,6 +129,7 @@ z.util.Environment = (() => {
     },
     desktop: _isDesktop(),
     electron: _isElectron(),
+    electronVersion: _getElectronVersion,
     frontend: {
       isInternal: () => window.location.hostname === APP_ENV.INTERNAL,
       isLocalhost: () => [APP_ENV.LOCALHOST, APP_ENV.VIRTUAL_HOST].includes(window.location.hostname),
