@@ -35,18 +35,20 @@ z.util.ValidationUtil = {
       }
       return true;
     },
+
     retentionPolicy: string => {
       // Ensure the given asset is either eternal, persistent or volatile
       // https://github.com/wireapp/wire-server/blob/e97f7c882cad37e4ddd922d2e48fe0d71751fc5a/libs/cargohold-types/src/CargoHold/Types/V3.hs#L151
       return string > 0 && string < Object.keys(z.assets.AssetRetentionPolicy).length + 1;
     },
+
     v3: (assetKey, assetToken) => {
       if (!assetKey) {
         throw new z.util.ValidationUtilError('Asset key not defined');
       }
 
-      const SEPERATOR = '-';
-      const [version, type, ...uuid] = assetKey.split(SEPERATOR);
+      const SEPARATOR = '-';
+      const [version, type, ...uuid] = assetKey.split(SEPARATOR);
 
       if (version !== '3') {
         throw new z.util.ValidationUtilError('Invalid asset key (version)');
@@ -54,7 +56,7 @@ z.util.ValidationUtil = {
       if (!z.util.ValidationUtil.asset.retentionPolicy(type)) {
         throw new z.util.ValidationUtilError('Invalid asset key (type)');
       }
-      if (!z.util.ValidationUtil.isUUID(uuid.join(SEPERATOR))) {
+      if (!z.util.ValidationUtil.isUUID(uuid.join(SEPARATOR))) {
         throw new z.util.ValidationUtilError('Invalid asset key (UUID)');
       }
       if (assetToken && !z.util.ValidationUtil.isBearerToken(assetToken)) {
@@ -63,6 +65,7 @@ z.util.ValidationUtil = {
       return true;
     },
   },
+
   isBase64: string => {
     try {
       // Will raise a DOM exception if base64 string is invalid
@@ -72,26 +75,27 @@ z.util.ValidationUtil = {
     }
     return true;
   },
+
   isBearerToken: token => {
     // Since some special chars are allowed,
     // remember to always encode Bearer tokens
     // using encodeURIComponents afterwards!
     return /^[a-zA-Z0-9\-._~+/]+[=]{0,2}$/.test(token);
   },
-  isUUID: string => {
-    return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(string);
-  },
+
+  isUUID: string => /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(string),
+
   isValidApiPath: path => {
     if (!/^\/[a-zA-Z0-9\-_/,]+$/.test(path)) {
       throw new z.util.ValidationUtilError(`Non-compliant path creation attempt. Details: ${path}`);
     }
     return true;
   },
+
   urls: {
     isTweet: url => {
-      return /^http(?:s)?:\/\/(?:(?:www|mobile|0)\.)?twitter\.com\/(?:(?:\w{1,15})\/status(?:es|\/i)?|i\/moments)\/(?:\d{2,21})(?:(?:\?|\/).*)?$/.test(
-        url
-      );
+      const regex = /^http(?:s)?:\/\/(?:(?:www|mobile|0)\.)?twitter\.com\/(?:(?:\w{1,15})\/status(?:es|\/i)?|i\/moments)\/(?:\d{2,21})(?:(?:\?|\/).*)?$/;
+      return regex.test(url);
     },
   },
 };

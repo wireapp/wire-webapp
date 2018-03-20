@@ -640,7 +640,7 @@ z.event.EventRepository = class EventRepository {
 
         const updatingLinkPreview = !!storedData.previews.length;
         if (updatingLinkPreview) {
-          this.logger.warn(`${logMessage} ID of link preview  reused`, event);
+          this.logger.warn(`${logMessage} ID of link preview reused`, event);
           const errorMessage = 'Event validation failed: ID of link preview reused';
           throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, errorMessage);
         }

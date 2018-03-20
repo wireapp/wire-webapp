@@ -131,8 +131,8 @@ z.entity.User = class User {
     this.initials = ko.pureComputed(() => {
       let initials = '';
       if (this.first_name() && this.last_name()) {
-        const first = z.util.StringUtil.getFirstCharacter(this.first_name());
-        const last = z.util.StringUtil.getFirstCharacter(this.last_name());
+        const first = z.util.StringUtil.getFirstChar(this.first_name());
+        const last = z.util.StringUtil.getFirstCh(this.last_name());
         initials = `${first}${last}`;
       } else {
         initials = this.first_name().slice(0, 2);

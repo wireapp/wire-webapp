@@ -98,7 +98,7 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
         return '';
       }
       if (this.element.hasClass('avatar-xs')) {
-        return z.util.StringUtil.getFirstCharacter(this.participant().initials());
+        return z.util.StringUtil.getFirstChar(this.participant().initials());
       }
       return this.participant().initials();
     });

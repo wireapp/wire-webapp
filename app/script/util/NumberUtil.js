@@ -20,17 +20,16 @@
 'use strict';
 
 z.util.NumberUtil = {
-  capToByte: function(value) {
+  capToByte: value => {
     const MAX_VALUE = 255;
     return Math.min(Math.abs(parseInt(value * MAX_VALUE, 10)), MAX_VALUE);
   },
-  getRandomNumber: function(minimum, maximum) {
-    return Math.floor(Math.random() * (maximum - minimum + 1) + minimum);
-  },
-  inRange: function(value, lowerBound, upperBound) {
-    return value >= lowerBound && value <= upperBound;
-  },
-  rootMeanSquare: function(floatArray) {
+
+  getRandomNumber: (minimum, maximum) => Math.floor(Math.random() * (maximum - minimum + 1) + minimum),
+
+  inRange: (value, lowerBound, upperBound) => value >= lowerBound && value <= upperBound,
+
+  rootMeanSquare: floatArray => {
     const pow = floatArray.map(number => Math.pow(number, 2));
     const sum = pow.reduce((power, number) => power + number);
     return Math.sqrt(sum) / floatArray.length;

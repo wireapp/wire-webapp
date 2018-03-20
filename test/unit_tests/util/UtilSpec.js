@@ -4107,82 +4107,6 @@ describe('z.util.stripUrlWrapper', () => {
   });
 });
 
-describe('z.util.nakedUrl', () => {
-  it('returns naked urls', () => {
-    const expectedUrl = 'wire.com';
-    const urls = [
-      'HTTPS://WWW.WIRE.COM/',
-      'https://www.wire.com/',
-      'http://www.wire.com/',
-      'https://www.wire.com',
-      'http://www.wire.com',
-      'https://wire.com/',
-      'http://wire.com/',
-      'https://wire.com',
-      'http://wire.com',
-      'www.wire.com/',
-      'www.wire.com',
-      'wire.com/',
-    ];
-
-    const allUrlsNaked = urls.map(url => z.util.nakedUrl(url)).every(url => url === expectedUrl);
-
-    expect(allUrlsNaked).toBeTruthy();
-  });
-
-  it('returns empty string if url is not set', () => {
-    expect(z.util.nakedUrl()).toBe('');
-  });
-});
-
-describe('z.util.appendUrlParameter', () => {
-  it('append param with & when url contains param', () => {
-    expect(z.util.appendUrlParameter('foo.com?bar=true', 'fum=true')).toBe('foo.com?bar=true&fum=true');
-  });
-
-  it('append param with ? when url contains param', () => {
-    expect(z.util.appendUrlParameter('foo.com', 'fum=true')).toBe('foo.com?fum=true');
-  });
-});
-
-describe('z.util.getUrlParameter', () => {
-  it('get param with no arguments', () => {
-    expect(z.util.getUrlParameter('foo')).toBe(null);
-  });
-});
-
-describe('z.util.forwardUrlParameter', () => {
-  it('forwards existing URL parameters', () => {
-    z.util.getUrlParameter = function(parameterValue) {
-      if (parameterValue === z.auth.URLParameter.TRACKING) {
-        return true;
-      }
-    };
-    expect(z.util.forwardUrlParameter('foo.com', z.auth.URLParameter.TRACKING)).toBe('foo.com?tracking=true');
-
-    z.util.getUrlParameter = function(parameterValue) {
-      if (parameterValue === z.auth.URLParameter.TRACKING) {
-        return false;
-      }
-    };
-    expect(z.util.forwardUrlParameter('foo.com', z.auth.URLParameter.TRACKING)).toBe('foo.com?tracking=false');
-
-    z.util.getUrlParameter = function(parameterValue) {
-      if (parameterValue === z.auth.URLParameter.TRACKING) {
-        return 'bar';
-      }
-    };
-    expect(z.util.forwardUrlParameter('foo.com', z.auth.URLParameter.TRACKING)).toBe('foo.com?tracking=bar');
-
-    z.util.getUrlParameter = function(parameterValue) {
-      if (parameterValue === z.auth.URLParameter.TRACKING) {
-        return null;
-      }
-    };
-    expect(z.util.forwardUrlParameter('foo.com', z.auth.URLParameter.TRACKING)).toBe('foo.com');
-  });
-});
-
 describe('Markdown for bold text', () => {
   it('renders bold text', () => {
     expect(z.util.renderMessage('**bold text (not italic)**')).toBe('<strong>bold text (not italic)</strong>');
@@ -4524,19 +4448,5 @@ describe('z.util.safeWindowOpen', () => {
   it("doesn't contain a reference to the opening tab", () => {
     new_window = z.util.safeWindowOpen('https://wire.com/');
     expect(new_window.opener).toBeNull();
-  });
-});
-
-describe('z.util.addHttp', () => {
-  it('adds http if protocol is missing', () => {
-    expect(z.util.addHttp('wire.com/')).toBe('http://wire.com/');
-  });
-
-  it('does not add http if present', () => {
-    expect(z.util.addHttp('http://wire.com/')).toBe('http://wire.com/');
-  });
-
-  it('does not add https if present', () => {
-    expect(z.util.addHttp('https://wire.com/')).toBe('https://wire.com/');
   });
 });

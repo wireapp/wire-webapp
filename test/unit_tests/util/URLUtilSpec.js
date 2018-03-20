@@ -22,7 +22,59 @@
 'use strict';
 
 describe('z.util.URLUtil', () => {
-  describe('"getLinksFromHtml"', () => {
+  describe('appendParameter', () => {
+    it('append param with & when url contains param', () => {
+      expect(z.util.URLUtil.appendParameter('foo.com?bar=true', 'fum=true')).toBe('foo.com?bar=true&fum=true');
+    });
+
+    it('append param with ? when url contains param', () => {
+      expect(z.util.URLUtil.appendParameter('foo.com', 'fum=true')).toBe('foo.com?fum=true');
+    });
+  });
+
+  describe('forwardParameter', () => {
+    it('forwards existing URL parameters', () => {
+      z.util.URLUtil.getParameter = parameterValue => parameterValue === z.auth.URLParameter.TRACKING;
+      expect(z.util.URLUtil.forwardParameter('foo.com', z.auth.URLParameter.TRACKING)).toBe('foo.com?tracking=true');
+
+      z.util.URLUtil.getParameter = parameterValue => parameterValue !== z.auth.URLParameter.TRACKING;
+      expect(z.util.URLUtil.forwardParameter('foo.com', z.auth.URLParameter.TRACKING)).toBe('foo.com?tracking=false');
+
+      z.util.URLUtil.getParameter = parameterValue => (parameterValue === z.auth.URLParameter.TRACKING ? 'bar' : false);
+      expect(z.util.URLUtil.forwardParameter('foo.com', z.auth.URLParameter.TRACKING)).toBe('foo.com?tracking=bar');
+
+      z.util.URLUtil.getParameter = parameterValue => (parameterValue === z.auth.URLParameter.TRACKING ? null : true);
+      expect(z.util.URLUtil.forwardParameter('foo.com', z.auth.URLParameter.TRACKING)).toBe('foo.com');
+    });
+  });
+
+  describe('getDomainName', () => {
+    it('returns naked urls', () => {
+      const expectedUrl = 'wire.com';
+      const urls = [
+        'HTTPS://WWW.WIRE.COM/',
+        'https://www.wire.com/',
+        'http://www.wire.com/',
+        'https://www.wire.com',
+        'http://www.wire.com',
+        'https://wire.com/',
+        'http://wire.com/',
+        'https://wire.com',
+        'http://wire.com',
+        'www.wire.com/',
+        'www.wire.com',
+        'wire.com/',
+      ];
+
+      const allUrlsNaked = urls.map(url => z.util.URLUtil.getDomainName(url)).every(url => url === expectedUrl);
+
+      expect(allUrlsNaked).toBeTruthy();
+    });
+
+    it('returns empty string if url is not set', () => expect(z.util.URLUtil.getDomainName()).toBe(''));
+  });
+
+  describe('getLinksFromHtml', () => {
     it('returns an array of links from a given HTML markup', () => {
       const html = '<a href="https://www.google.com" target="_blank" rel="nofollow">https://www.google.com</a>';
       const links = z.util.URLUtil.getLinksFromHtml(html);
@@ -57,6 +109,23 @@ describe('z.util.URLUtil', () => {
         'My favorite websites are <a href="https://wire.com/" target="_blank" rel="nofollow noopener noreferrer">https://wire.com/</a> and <a href="https://stackoverflow.com" target="_blank" rel="nofollow noopener noreferrer">https://stackoverflow.com</a>';
       const links = z.util.URLUtil.getLinksFromHtml(text);
       expect(links.length).toBe(2);
+    });
+  });
+
+  describe('getParameter', () => {
+    it('get param with no arguments', () => {
+      expect(z.util.URLUtil.getParameter('foo')).toBe(null);
+    });
+  });
+
+  describe('prependProtocol', () => {
+    it('adds http if protocol is missing', () => {
+      expect(z.util.URLUtil.prependProtocol('wire.com/')).toBe('http://wire.com/');
+    });
+
+    it('does not add a protocol if present', () => {
+      expect(z.util.URLUtil.prependProtocol('http://wire.com/')).toBe('http://wire.com/');
+      expect(z.util.URLUtil.prependProtocol('https://wire.com/')).toBe('https://wire.com/');
     });
   });
 });

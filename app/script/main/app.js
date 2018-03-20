@@ -499,14 +499,14 @@ z.main.App = class App {
    * @returns {undefined} Not return value
    */
   _handleUrlParams() {
-    const providerId = z.util.getUrlParameter(z.auth.URLParameter.BOT_PROVIDER);
-    const serviceId = z.util.getUrlParameter(z.auth.URLParameter.BOT_SERVICE);
+    const providerId = z.util.URLUtil.getParameter(z.auth.URLParameter.BOT_PROVIDER);
+    const serviceId = z.util.URLUtil.getParameter(z.auth.URLParameter.BOT_SERVICE);
     if (providerId && serviceId) {
       this.logger.info(`Found bot conversation initialization params '${serviceId}'`);
       this.repository.integration.addServiceFromParam(providerId, serviceId);
     }
 
-    const supportIntegrations = z.util.getUrlParameter(z.auth.URLParameter.INTEGRATIONS);
+    const supportIntegrations = z.util.URLUtil.getParameter(z.auth.URLParameter.INTEGRATIONS);
     if (_.isBoolean(supportIntegrations)) {
       this.logger.info(`Feature flag for integrations set to '${serviceId}'`);
       this.repository.integration.supportIntegrations(supportIntegrations);
@@ -767,7 +767,7 @@ z.main.App = class App {
         let url = `${notSignedIn ? '/auth/' : '/login/'}${location.search}`;
 
         if (App.CONFIG.IMMEDIATE_SIGN_OUT_REASONS.includes(sign_out_reason)) {
-          url = z.util.appendUrlParameter(url, `${z.auth.URLParameter.REASON}=${sign_out_reason}`);
+          url = z.util.URLUtil.appendParameter(url, `${z.auth.URLParameter.REASON}=${sign_out_reason}`);
         }
 
         window.location.replace(url);

@@ -449,6 +449,10 @@ z.conversation.EventMapper = class EventMapper {
   // Asset mappers
   //##############################################################################
 
+  _createDummyImage(width, height) {
+    return `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 ${width} ${height}' width='${width}' height='${height}'></svg>`;
+  }
+
   /**
    * Maps JSON data of file asset into asset entity
    *
@@ -591,7 +595,7 @@ z.conversation.EventMapper = class EventMapper {
     }
 
     if (should_create_dummy_image) {
-      asset_et.dummy_url = z.util.dummyImage(asset_et.width, asset_et.height);
+      asset_et.dummy_url = this._createDummyImage(asset_et.width, asset_et.height);
     }
 
     return asset_et;

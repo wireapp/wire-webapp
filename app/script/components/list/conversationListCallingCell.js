@@ -156,7 +156,7 @@ ko.components.register('conversation-list-calling-cell', {
           <span class="conversation-list-cell-description" data-bind="l10n_text: z.string.callStateIncoming" data-uie-name="call-label-incoming"></span>
         <!-- /ko -->
         <!-- ko if: show_call_timer -->
-          <span class="conversation-list-cell-description" data-bind="text: z.util.formatSeconds(call().durationTime())" data-uie-name="call-duration"></span>
+          <span class="conversation-list-cell-description" data-bind="text: z.util.TimeUtil.formatSeconds(call().durationTime())" data-uie-name="call-duration"></span>
         <!-- /ko -->
       </div>
       <div class="conversation-list-cell-right">

@@ -28,9 +28,8 @@ z.util.ObjectUtil = {
    * @param {Object} object - Base object
    * @returns {Object} Object copy with escaped properties
    */
-  escapeProperties(object) {
-    return z.util.ObjectUtil.mapRecursive(object, _.escape);
-  },
+  escapeProperties: object => z.util.ObjectUtil.mapRecursive(object, _.escape),
+
   /**
    * Creates an object copy and applies a mapping functions to all properties of that object.
    *
@@ -38,7 +37,7 @@ z.util.ObjectUtil = {
    * @param {Function} mappingFunction - Mapping function
    * @returns {Object} Object copy with mapped properties
    */
-  mapRecursive(object, mappingFunction) {
+  mapRecursive: (object, mappingFunction) => {
     if (typeof object !== 'object') {
       return mappingFunction(object);
     }

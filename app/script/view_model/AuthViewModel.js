@@ -152,7 +152,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
     this.code_expiration_timestamp.subscribe(timestamp => {
       this.code_expiration_in(moment.unix(timestamp).fromNow());
       this.code_interval_id = window.setInterval(() => {
-        if (timestamp <= z.util.getUnixTimestamp()) {
+        if (timestamp <= z.util.TimeUtil.getUnixTimestamp()) {
           window.clearInterval(this.code_interval_id);
           return this.code_expiration_timestamp(0);
         }
@@ -171,7 +171,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
       return !this.disabled_by_animation() && this.country_code().length > 1 && this.phone_number().length;
     });
     this.can_resend_code = ko.pureComputed(() => {
-      return !this.disabled_by_animation() && this.code_expiration_timestamp() < z.util.getUnixTimestamp();
+      return !this.disabled_by_animation() && this.code_expiration_timestamp() < z.util.TimeUtil.getUnixTimestamp();
     });
     this.can_resend_verification = ko.pureComputed(() => !this.disabled_by_animation() && this.username().length);
     this.can_verify_password = ko.pureComputed(() => !this.disabled_by_animation() && this.password().length);
@@ -528,9 +528,9 @@ z.viewModel.AuthViewModel = class AuthViewModel {
       const _on_code_request_success = response => {
         window.clearInterval(this.code_interval_id);
         if (response.expires_in) {
-          this.code_expiration_timestamp(z.util.getUnixTimestamp() + response.expires_in);
+          this.code_expiration_timestamp(z.util.TimeUtil.getUnixTimestamp() + response.expires_in);
         } else if (!response.label) {
-          this.code_expiration_timestamp(z.util.getUnixTimestamp() + z.config.LOGIN_CODE_EXPIRATION);
+          this.code_expiration_timestamp(z.util.TimeUtil.getUnixTimestamp() + z.config.LOGIN_CODE_EXPIRATION);
         }
         this._set_hash(z.auth.AuthView.MODE.VERIFY_CODE);
         this.pending_server_request(false);
@@ -1693,7 +1693,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
    */
   _append_existing_parameters(url) {
     AuthViewModel.CONFIG.FORWARDED_URL_PARAMETERS.forEach(parameter_name => {
-      url = z.util.forwardUrlParameter(url, parameter_name);
+      url = z.util.URLUtil.forwardParameter(url, parameter_name);
     });
 
     return url;

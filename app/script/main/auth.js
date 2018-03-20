@@ -50,7 +50,7 @@ $(() => {
   const default_env = z.util.Environment.frontend.isProduction()
     ? z.service.BackendEnvironment.PRODUCTION
     : z.service.BackendEnvironment.STAGING;
-  const env = z.util.getUrlParameter(z.auth.URLParameter.ENVIRONMENT) || default_env;
+  const env = z.util.URLUtil.getParameter(z.auth.URLParameter.ENVIRONMENT) || default_env;
   let settings;
 
   if (env === z.service.BackendEnvironment.STAGING) {

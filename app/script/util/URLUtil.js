@@ -31,6 +31,24 @@ z.util.URLUtil = (() => {
     WEBSITE: 'TYPE.WEBSITE',
   };
 
+  const _appendParameter = (url, parameter) => {
+    const separator = z.util.StringUtil.includes(url, '?') ? '&' : '?';
+    return `${url}${separator}${parameter}`;
+  };
+
+  const _buildSupportUrl = support_id => {
+    const urlPath = _.isNumber(support_id) ? z.string.urlSupportArticles : z.string.urlSupportRequests;
+    return `${_getDomain(TYPE.SUPPORT)}${z.l10n.text(urlPath)}${support_id}`;
+  };
+
+  const _buildUrl = (type, path = '') => `${_getDomain(type)}${path && path.startsWith('/') ? path : ''}`;
+
+  const _forwardParameter = (url, parameterName) => {
+    const parameterValue = _getParameter(parameterName);
+    const hasValue = parameterValue != null;
+    return hasValue ? _appendParameter(url, `${parameterName}=${parameterValue}`) : url;
+  };
+
   const _getDomain = urlType => {
     const isProduction = _isProductionBackend();
 
@@ -50,14 +68,42 @@ z.util.URLUtil = (() => {
     }
   };
 
-  const _isProductionBackend = () => z.util.Environment.backend.current === z.service.BackendEnvironment.PRODUCTION;
-
-  const _buildSupportUrl = support_id => {
-    const urlPath = _.isNumber(support_id) ? z.string.urlSupportArticles : z.string.urlSupportRequests;
-    return `${_getDomain(TYPE.SUPPORT)}${z.l10n.text(urlPath)}${support_id}`;
+  /**
+   * Removes protocol, www and trailing slashes in the given url
+   * @param {string} url - URL
+   * @returns {string} Plain URL
+   */
+  const _getDomainName = (url = '') => {
+    return url
+      .toLowerCase()
+      .replace(/.*?:\/\//, '') // remove protocol
+      .replace(/\/$/, '') // remove trailing slash
+      .replace('www.', '');
   };
 
-  const _buildUrl = (type, path = '') => `${_getDomain(type)}${path && path.startsWith('/') ? path : ''}`;
+  const _getParameter = name => {
+    const params = window.location.search.substring(1).split('&');
+    for (const param of params) {
+      let value = param.split('=');
+      if (value[0] === name) {
+        if (value[1]) {
+          value = window.decodeURI(value[1]);
+
+          if (value === 'false') {
+            return false;
+          }
+
+          if (value === 'true') {
+            return true;
+          }
+
+          return value;
+        }
+        return true;
+      }
+    }
+    return null;
+  };
 
   const _getLinksFromHtml = html => {
     if (!html) {
@@ -74,10 +120,24 @@ z.util.URLUtil = (() => {
     return [];
   };
 
+  const _isProductionBackend = () => z.util.Environment.backend.current === z.service.BackendEnvironment.PRODUCTION;
+
+  /**
+   * Prepends http to given url if protocol missing
+   * @param {string} url - URL you want to open in a new browser tab
+   * @returns {undefined} No return value
+   */
+  const _prependProtocol = url => (!url.match(/^http[s]?:\/\//i) ? `http://${url}` : url);
+
   return {
     TYPE: TYPE,
+    appendParameter: _appendParameter,
     buildSupportUrl: _buildSupportUrl,
     buildUrl: _buildUrl,
+    forwardParameter: _forwardParameter,
+    getDomainName: _getDomainName,
     getLinksFromHtml: _getLinksFromHtml,
+    getParameter: _getParameter,
+    prependProtocol: _prependProtocol,
   };
 })();

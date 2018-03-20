@@ -23,16 +23,17 @@ window.z = window.z || {};
 window.z.util = z.util || {};
 
 z.util.ArrayUtil = {
-  chunk(array, size) {
+  chunk: (array, size) => {
     const chunks = [];
-    const tempArray = Array.from(array);
-    while (tempArray.length) {
-      chunks.push(tempArray.splice(0, size));
+    const temporaryArray = Array.from(array);
+    while (temporaryArray.length) {
+      chunks.push(temporaryArray.splice(0, size));
     }
     return chunks;
   },
-  findClosest(array, value) {
-    let closest = array[0];
+
+  findClosest: (array, value) => {
+    let [closest] = array;
 
     array.forEach(current => {
       if (value >= current) {
@@ -42,7 +43,8 @@ z.util.ArrayUtil = {
 
     return closest;
   },
-  getNextItem(array, currentItem, filter) {
+
+  getNextItem: (array, currentItem, filter) => {
     const currentIndex = array.indexOf(currentItem);
 
     // couldn't find the item
@@ -68,6 +70,7 @@ z.util.ArrayUtil = {
       }
     }
   },
+
   /**
    * Interpolates an array of numbers using linear interpolation
    *
@@ -75,7 +78,7 @@ z.util.ArrayUtil = {
    * @param {number} length - new length
    * @returns {Array<any>} new array with interpolated values
    */
-  interpolate(array, length) {
+  interpolate: (array, length) => {
     const newArray = [];
     const scale_factor = (array.length - 1) / (length - 1);
 
@@ -92,49 +95,44 @@ z.util.ArrayUtil = {
 
     return newArray;
   },
-  isLastItem(array, item) {
-    return array.indexOf(item) === array.length - 1;
-  },
-  iterateIndex(array, currentIndex, reverse = false) {
+
+  isLastItem: (array, item) => array.indexOf(item) === array.length - 1,
+
+  iterateIndex: (array, currentIndex, reverse = false) => {
     if (_.isArray(array) && array.length && _.isNumber(currentIndex)) {
       if (reverse) {
-        if (currentIndex === 0) {
-          return array.length - 1;
-        }
-
-        return (currentIndex - 1) % array.length;
+        const isZeroIndex = currentIndex === 0;
+        return isZeroIndex ? array.length - 1 : (currentIndex - 1) % array.length;
       }
 
       return (currentIndex + 1) % array.length;
     }
   },
-  iterateItem(array, currentItem, reverse = false) {
+
+  iterateItem: (array, currentItem, reverse = false) => {
     if (_.isArray(array) && array.length) {
       const currentIndex = array.indexOf(currentItem);
 
       // If item could not be found
-      if (currentIndex === -1) {
-        return;
-      }
-
-      return array[z.util.ArrayUtil.iterateIndex(array, currentIndex, reverse)];
+      const isNegativeIndex = currentIndex === -1;
+      return isNegativeIndex ? undefined : array[z.util.ArrayUtil.iterateIndex(array, currentIndex, reverse)];
     }
   },
+
   /**
    * Returns random element
    * @param {Array} array - source
    * @returns {Object} random element
    */
-  randomElement(array = []) {
-    return array[Math.floor(Math.random() * array.length)];
-  },
+  randomElement: (array = []) => array[Math.floor(Math.random() * array.length)],
+
   /**
    * Remove given element from array
    * @param {Array} array - source
    * @param {Object} element - Element which should be removed
    * @returns {Array|undefined} containing the removed element
    */
-  removeElement(array = [], element) {
+  removeElement: (array = [], element) => {
     const index = array.indexOf(element);
     if (index > -1) {
       return array.splice(index, 1);
