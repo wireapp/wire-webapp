@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="8.2.8"></a>
+## [8.2.8](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/compare/@wireapp/cryptobox@8.2.7...@wireapp/cryptobox@8.2.8) (2018-03-20)
+
+
+### Bug Fixes
+
+* **api-client,cryptobox,store-engine:** Simplify error constructors ([#384](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/issues/384)) ([fdbae30](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/commit/fdbae30))
+
+
+
+
 <a name="8.2.7"></a>
 ## [8.2.7](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/compare/@wireapp/cryptobox@8.2.6...@wireapp/cryptobox@8.2.7) (2018-03-19)
 

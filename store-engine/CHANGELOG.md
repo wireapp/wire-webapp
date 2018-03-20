@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="0.3.9"></a>
+## [0.3.9](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/compare/@wireapp/store-engine@0.3.8...@wireapp/store-engine@0.3.9) (2018-03-20)
+
+
+### Bug Fixes
+
+* **api-client,cryptobox,store-engine:** Simplify error constructors ([#384](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/issues/384)) ([fdbae30](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/commit/fdbae30))
+
+
+
+
 <a name="0.3.8"></a>
 ## [0.3.8](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/compare/@wireapp/store-engine@0.3.7...@wireapp/store-engine@0.3.8) (2018-03-17)
 
