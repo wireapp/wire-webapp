@@ -307,7 +307,7 @@
 
 "@types/node@*", "@types/node@9.4.7":
   version "9.4.7"
-  resolved "http://registry.npmjs.org/@types/node/-/node-9.4.7.tgz#57d81cd98719df2c9de118f2d5f3b1120dcd7275"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-9.4.7.tgz#57d81cd98719df2c9de118f2d5f3b1120dcd7275"
 
 "@types/node@^6.0.46":
   version "6.0.90"
@@ -319,7 +319,7 @@
 
 "@types/node@^8.9.4":
   version "8.9.5"
-  resolved "http://registry.npmjs.org/@types/node/-/node-8.9.5.tgz#162b864bc70be077e6db212b322754917929e976"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-8.9.5.tgz#162b864bc70be077e6db212b322754917929e976"
 
 "@types/spark-md5@3.0.0":
   version "3.0.0"
@@ -354,9 +354,9 @@
   version "3.0.7"
   resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-3.0.7.tgz#23dc15ab18986d74d7229572188ff140d6180abd"
 
-"@wireapp/core@2.0.86":
-  version "2.0.86"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-2.0.86.tgz#ef7d8fecbac56c515aeefce7f327a9dc264d971b"
+"@wireapp/core@2.0.87":
+  version "2.0.87"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-2.0.87.tgz#5c94a54f59dfe8e3e89e00dc160b7721cf77b599"
   dependencies:
     "@types/node" "9.4.7"
     "@wireapp/api-client" "0.6.1"
