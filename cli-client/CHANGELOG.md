@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="1.3.0"></a>
+# [1.3.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/cli-client/compare/@wireapp/cli-client@1.2.4...@wireapp/cli-client@1.3.0) (2018-03-20)
+
+
+### Features
+
+* **core:** Add support for generic messages ([#374](https://github.com/wireapp/wire-web-packages/tree/master/packages/cli-client/issues/374)) ([29aee69](https://github.com/wireapp/wire-web-packages/tree/master/packages/cli-client/commit/29aee69))
+
+
+
+
 <a name="1.2.4"></a>
 ## [1.2.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/cli-client/compare/@wireapp/cli-client@1.2.3...@wireapp/cli-client@1.2.4) (2018-03-20)
 

@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="8.3.0"></a>
+# [8.3.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/compare/@wireapp/cryptobox@8.2.9...@wireapp/cryptobox@8.3.0) (2018-03-20)
+
+
+### Features
+
+* **core:** Add support for generic messages ([#374](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/issues/374)) ([29aee69](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/commit/29aee69))
+
+
+
+
 <a name="8.2.9"></a>
 ## [8.2.9](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/compare/@wireapp/cryptobox@8.2.8...@wireapp/cryptobox@8.2.9) (2018-03-20)
 

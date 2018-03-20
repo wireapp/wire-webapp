@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="2.1.0"></a>
+# [2.1.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.0.89...@wireapp/core@2.1.0) (2018-03-20)
+
+
+### Features
+
+* **core:** Add support for generic messages ([#374](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/374)) ([29aee69](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/29aee69))
+
+
+
+
 <a name="2.0.89"></a>
 ## [2.0.89](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.0.88...@wireapp/core@2.0.89) (2018-03-20)
 
