@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2016 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,21 +17,10 @@
  *
  */
 
-/**
- * @class BaseError
- * @extends Error
- * @param {string} message
- * @returns {string}
- */
-module.exports = (function() {
-  const BaseError = function(message) {
-    this.name = this.constructor.name;
-    this.message = message;
-    this.stack = new Error().stack;
-  };
+import BaseError from './cbor/BaseError';
+import DecodeError from './cbor/DecodeError';
+import Decoder from './cbor/Decoder';
+import Encoder from './cbor/Encoder';
+import Type from './cbor/Type';
 
-  BaseError.prototype = new Error();
-  BaseError.prototype.constructor = BaseError;
-
-  return BaseError;
-})();
+export {DecodeError, BaseError, Decoder, Encoder, Type};

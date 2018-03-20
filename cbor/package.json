@@ -1,31 +1,33 @@
 {
   "description": "Implementation of Concise Binary Object Representation (CBOR) data format (RFC7049).",
   "devDependencies": {
+    "@types/node": "9.4.7",
     "coveralls": "3.0.0",
     "cross-env": "5.1.4",
     "istanbul": "0.4.5",
     "jasmine": "3.1.0",
-    "jsdoc": "3.5.5",
     "rimraf": "2.6.2",
-    "tsd-jsdoc": "dcodeio/tsd-jsdoc#fe76c4dc071b00bb549d3af7a3bad8c555999e81",
     "webpack": "3.11.0"
   },
   "files": [
-    "dist/",
-    "src/"
+    "dist"
   ],
   "license": "GPL-3.0",
-  "main": "src/cbor.js",
+  "main": "dist/index.js",
   "name": "@wireapp/cbor",
   "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/cbor",
   "scripts": {
+    "build:browser": "webpack --progress",
+    "build:node": "tsc",
+    "build": "yarn build:node && yarn build:browser",
     "clear": "rimraf dist",
     "coverage:html": "istanbul cover --report html jasmine",
     "coverage:lcov": "istanbul cover --report lcov jasmine",
-    "dist": "yarn clear && webpack && yarn types",
-    "test": "yarn dist && jasmine",
-    "types": "jsdoc --verbose --pedantic --configure jsdoc.json src/ && node replace.js"
+    "dist": "yarn clear && yarn build",
+    "test:browser": "exit 0",
+    "test:node": "jasmine",
+    "test": "yarn dist && yarn test:node && yarn test:browser"
   },
-  "types": "dist/types.d.ts",
+  "types": "dist/index.d.ts",
   "version": "3.0.7"
 }

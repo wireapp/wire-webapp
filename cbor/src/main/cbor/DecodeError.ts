@@ -17,20 +17,23 @@
  *
  */
 
-const fs = require('fs');
-const path = require('path');
-const file = path.resolve(__dirname, 'dist/types.d.ts');
-const regex = /^(declare class )/gm;
+import BaseError from './BaseError';
+import Type from './Type';
 
-fs.readFile(file, 'utf8', (err, content) => {
-  if (err !== null) {
-    throw err;
+class DecodeError extends BaseError {
+  static readonly INT_OVERFLOW = 'Integer overflow';
+  static readonly INVALID_TYPE = 'Invalid type';
+  static readonly TOO_LONG = 'Field too long';
+  static readonly TOO_NESTED = 'Object nested too deep';
+  static readonly UNEXPECTED_EOF = 'Unexpected end-of-buffer';
+  static readonly UNEXPECTED_TYPE = 'Unexpected type';
+
+  constructor(public message: string, public extra?: Array<Type>) {
+    super(message);
+
+    Object.setPrototypeOf(this, DecodeError.prototype);
+    this.extra = extra;
   }
-  if (content.match(regex)) {
-    fs.writeFile(file, content.replace(regex, 'export $1'), error => {
-      if (error !== null) {
-        throw error;
-      }
-    });
-  }
-});
+}
+
+export default DecodeError;

@@ -20,6 +20,7 @@
 /* eslint no-magic-numbers: "off" */
 
 const Proteus = require('@wireapp/proteus');
+const CBOR = require('@wireapp/cbor');
 
 describe('Envelope', () => {
   const mac_key = new Proteus.derived.MacKey(new Uint8Array(32).fill(1));
@@ -83,7 +84,7 @@ describe('Envelope', () => {
     try {
       Proteus.message.Envelope.deserialise(empty_buffer);
     } catch (error) {
-      expect(error instanceof RangeError).toBe(true);
+      expect(error instanceof CBOR.DecodeError).toBe(true);
     }
   });
 });

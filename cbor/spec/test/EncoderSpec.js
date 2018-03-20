@@ -19,7 +19,7 @@
 
 /* eslint no-magic-numbers: "off" */
 
-const CBOR = require('../../src/cbor');
+const CBOR = require('../../');
 
 describe('CBOR.Encoder', () => {
   const to_hex = bytes => {

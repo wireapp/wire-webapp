@@ -141,7 +141,7 @@ class PreKeyBundle {
           self.identity_key = IdentityKey.decode(decoder);
           break;
         case 4:
-          self.signature = <any>decoder.optional(() => new Uint8Array(decoder.bytes()));
+          self.signature = decoder.optional(() => new Uint8Array(decoder.bytes()));
           break;
         default:
           decoder.skip();

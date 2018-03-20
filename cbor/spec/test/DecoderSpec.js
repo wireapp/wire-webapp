@@ -19,7 +19,7 @@
 
 /* eslint no-magic-numbers: "off" */
 
-const CBOR = require('../../src/cbor');
+const CBOR = require('../../');
 
 describe('CBOR.Decoder', () => {
   const is_hex = str => typeof str === 'string' && /^[0-9a-f]+$/i.test(str) && str.length % 2 === 0;

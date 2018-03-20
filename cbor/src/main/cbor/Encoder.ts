@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2016 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,39 +19,26 @@
 
 /* eslint no-magic-numbers: "off" */
 
-const Types = require('./Types');
+import Type from './Type';
 
-/**
- * @class Encoder
- * @returns {Encoder} `this`
- */
 class Encoder {
+  private buffer: ArrayBuffer;
+  private view: DataView;
+
   constructor() {
     this.buffer = new ArrayBuffer(4);
     this.view = new DataView(this.buffer);
-    return this;
   }
 
-  /** @returns {ArrayBuffer} */
-  get_buffer() {
+  public get_buffer(): ArrayBuffer {
     return this.buffer.slice(0, this.view.byteOffset);
   }
 
-  /**
-   * @param {!number} need_nbytes
-   * @returns {number}
-   * @private
-   */
-  _new_buffer_length(need_nbytes) {
+  private _new_buffer_length(need_nbytes: number): number {
     return ~~Math.max(this.buffer.byteLength * 1.5, this.buffer.byteLength + need_nbytes);
   }
 
-  /**
-   * @param {!number} need_nbytes
-   * @returns {void}
-   * @private
-   */
-  _grow_buffer(need_nbytes) {
+  private _grow_buffer(need_nbytes: number): void {
     const new_len = this._new_buffer_length(need_nbytes);
     const new_buf = new ArrayBuffer(new_len);
     new Uint8Array(new_buf).set(new Uint8Array(this.buffer));
@@ -59,52 +46,25 @@ class Encoder {
     this.view = new DataView(this.buffer, this.view.byteOffset);
   }
 
-  /**
-   * @param {!number} bytes
-   * @returns {void}
-   * @private
-   */
-  _ensure(bytes) {
+  private _ensure(bytes: number): void {
     if (!(this.view.byteLength < bytes)) {
       return;
     }
     return this._grow_buffer(bytes);
   }
 
-  /**
-   * @param {!number} bytes
-   * @returns {void}
-   * @private
-   */
-  _advance(bytes) {
+  private _advance(bytes: number): void {
     this.view = new DataView(this.buffer, this.view.byteOffset + bytes);
   }
 
-  /**
-   * @callback closureCallback
-   */
-
-  /**
-   * @param {!number} bytes
-   * @param {!closureCallback} closure
-   * @returns {void}
-   * @private
-   */
-  _write(bytes, closure) {
+  private _write<T>(bytes: number, callback: () => T): void {
     this._ensure(bytes);
-    closure();
+    callback();
     return this._advance(bytes);
   }
 
-  /**
-   * @param {Types} type
-   * @param {!number} len
-   * @returns {void}
-   * @private
-   * @throws RangeError
-   */
-  _write_type_and_len(type, len) {
-    const major = Types.major(type) << 5;
+  private _write_type_and_len(type: Type, len: number): void {
+    const major = Type.major(type) << 5;
 
     if (0 <= len && len <= 23) {
       return this._u8(major | len);
@@ -128,39 +88,19 @@ class Encoder {
    * writer-like interface over our ArrayBuffer
    */
 
-  /**
-   * @param {!number} value
-   * @returns {void}
-   * @private
-   */
-  _u8(value) {
+  private _u8(value: number): void {
     return this._write(1, () => this.view.setUint8(0, value));
   }
 
-  /**
-   * @param {!number} value
-   * @returns {void}
-   * @private
-   */
-  _u16(value) {
+  private _u16(value: number): void {
     return this._write(2, () => this.view.setUint16(0, value));
   }
 
-  /**
-   * @param {!number} value
-   * @returns {void}
-   * @private
-   */
-  _u32(value) {
+  private _u32(value: number): void {
     return this._write(4, () => this.view.setUint32(0, value));
   }
 
-  /**
-   * @param {!number} value
-   * @returns {void}
-   * @private
-   */
-  _u64(value) {
+  private _u64(value: number): void {
     const low = value % Math.pow(2, 32);
     const high = (value - low) / Math.pow(2, 32);
     const w64 = () => {
@@ -170,34 +110,21 @@ class Encoder {
     return this._write(8, w64);
   }
 
-  /**
-   * @param {!number} value
-   * @returns {void}
-   * @private
-   */
-  _f32(value) {
+  private _f32(value: number): void {
     return this._write(4, () => this.view.setFloat32(0, value));
   }
 
-  /**
-   * @param {!number} value
-   * @returns {void}
-   * @private
-   */
-  _f64(value) {
+  private _f64(value: number): void {
     return this._write(8, () => this.view.setFloat64(0, value));
   }
 
-  /**
-   * @param {!Uint8Array} value
-   * @returns {void}
-   * @private
-   */
-  _bytes(value) {
+  private _bytes(value: ArrayBuffer | Uint8Array): void {
     const nbytes = value.byteLength;
 
     this._ensure(nbytes);
-    new Uint8Array(this.buffer, this.view.byteOffset).set(value);
+
+    new Uint8Array(this.buffer, this.view.byteOffset).set(<Uint8Array>value);
+
     return this._advance(nbytes);
   }
 
@@ -205,12 +132,7 @@ class Encoder {
    * public API
    */
 
-  /**
-   * @param {!number} value
-   * @returns {Encoder} `this`
-   * @throws RangeError
-   */
-  u8(value) {
+  public u8(value: number): Encoder {
     if (0 <= value && value <= 23) {
       this._u8(value);
     } else if (24 <= value && value <= 255) {
@@ -223,12 +145,7 @@ class Encoder {
     return this;
   }
 
-  /**
-   * @param {!number} value
-   * @returns {Encoder} `this`
-   * @throws RangeError
-   */
-  u16(value) {
+  public u16(value: number): Encoder {
     if (0 <= value && value <= 23) {
       this._u8(value);
     } else if (24 <= value && value <= 255) {
@@ -244,12 +161,7 @@ class Encoder {
     return this;
   }
 
-  /**
-   * @param {!number} value
-   * @returns {Encoder} `this`
-   * @throws RangeError
-   */
-  u32(value) {
+  public u32(value: number): Encoder {
     if (0 <= value && value <= 23) {
       this._u8(value);
     } else if (24 <= value && value <= 255) {
@@ -268,12 +180,7 @@ class Encoder {
     return this;
   }
 
-  /**
-   * @param {!number} value
-   * @returns {Encoder} `this`
-   * @throws RangeError
-   */
-  u64(value) {
+  public u64(value: number): Encoder {
     if (0 <= value && value <= 23) {
       this._u8(value);
     } else if (24 <= value && value <= 255) {
@@ -295,12 +202,7 @@ class Encoder {
     return this;
   }
 
-  /**
-   * @param {!number} value
-   * @returns {Encoder} `this`
-   * @throws RangeError
-   */
-  i8(value) {
+  public i8(value: number): Encoder {
     if (value >= 0) {
       this._u8(value);
       return this;
@@ -319,12 +221,7 @@ class Encoder {
     return this;
   }
 
-  /**
-   * @param {!number} value
-   * @returns {Encoder} `this`
-   * @throws RangeError
-   */
-  i16(value) {
+  public i16(value: number): Encoder {
     if (value >= 0) {
       this._u16(value);
       return this;
@@ -346,12 +243,7 @@ class Encoder {
     return this;
   }
 
-  /**
-   * @param {!number} value
-   * @returns {Encoder} `this`
-   * @throws RangeError
-   */
-  i32(value) {
+  public i32(value: number): Encoder {
     if (value >= 0) {
       this._u32(value);
       return this;
@@ -376,12 +268,7 @@ class Encoder {
     return this;
   }
 
-  /**
-   * @param {!number} value
-   * @returns {Encoder} `this`
-   * @throws RangeError
-   */
-  i64(value) {
+  public i64(value: number): Encoder {
     if (value >= 0) {
       this._u64(value);
       return this;
@@ -409,113 +296,79 @@ class Encoder {
     return this;
   }
 
-  /**
-   * @param {!number} value
-   * @returns {Encoder} `this`
-   */
-  f32(value) {
+  public f32(value: number): Encoder {
     this._u8(0xe0 | 26);
     this._f32(value);
     return this;
   }
 
-  /**
-   * @param {!number} value
-   * @returns {Encoder} `this`
-   */
-  f64(value) {
+  public f64(value: number): Encoder {
     this._u8(0xe0 | 27);
     this._f64(value);
     return this;
   }
 
-  /**
-   * @param {!number} value
-   * @returns {Encoder} `this`
-   */
-  bool(value) {
+  public bool(value: number): Encoder {
     this._u8(0xe0 | (value ? 21 : 20));
     return this;
   }
 
-  /**
-   * @param {!(ArrayBuffer|Uint8Array)} value
-   * @returns {Encoder} `this`
-   */
-  bytes(value) {
-    this._write_type_and_len(Types.BYTES, value.byteLength);
+  public bytes(value: ArrayBuffer | Uint8Array): Encoder {
+    this._write_type_and_len(Type.BYTES, value.byteLength);
     this._bytes(value);
 
     return this;
   }
 
-  /**
-   * @param {!number} value
-   * @returns {Encoder} `this`
-   */
-  text(value) {
+  public text(value: string): Encoder {
     // http://ecmanaut.blogspot.de/2006/07/encoding-decoding-utf8-in-javascript.html
     const utf8 = unescape(encodeURIComponent(value));
 
-    this._write_type_and_len(Types.TEXT, utf8.length);
+    this._write_type_and_len(Type.TEXT, utf8.length);
     this._bytes(new Uint8Array(utf8.split('').map(char => char.charCodeAt(0))));
 
     return this;
   }
 
-  /** @returns {Encoder} `this` */
-  null() {
+  public null(): Encoder {
     this._u8(0xe0 | 22);
     return this;
   }
 
-  /** @returns {Encoder} `this` */
-  undefined() {
+  public undefined(): Encoder {
     this._u8(0xe0 | 23);
     return this;
   }
 
-  /**
-   * @param {!number} len
-   * @returns {Encoder} `this`
-   */
-  array(len) {
-    this._write_type_and_len(Types.ARRAY, len);
+  public array(len: number): Encoder {
+    this._write_type_and_len(Type.ARRAY, len);
     return this;
   }
 
-  /** @returns {Encoder} `this` */
-  array_begin() {
+  public array_begin(): Encoder {
     this._u8(0x9f);
     return this;
   }
 
-  /** @returns {Encoder} `this` */
-  array_end() {
+  public array_end(): Encoder {
     this._u8(0xff);
     return this;
   }
 
-  /**
-   * @param {!number} len
-   * @returns {Encoder} `this`
-   */
-  object(len) {
-    this._write_type_and_len(Types.OBJECT, len);
+  public object(len: number): Encoder {
+    this._write_type_and_len(Type.OBJECT, len);
     return this;
   }
 
-  /** @returns {Encoder} `this` */
-  object_begin() {
+  public object_begin(): Encoder {
     this._u8(0xbf);
     return this;
   }
 
-  /** @returns {Encoder} `this` */
-  object_end() {
+  public object_end(): Encoder {
     this._u8(0xff);
     return this;
   }
 }
 
-module.exports = Encoder;
+export default Encoder;
