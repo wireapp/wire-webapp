@@ -86,7 +86,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
           return this.editInput();
         }
 
-        if (this.hasConversation()) {
+        if (this.conversationEntity()) {
           return this.conversationEntity().input() || '';
         }
 
@@ -340,7 +340,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     if (!inputHandledByEmoji) {
       switch (keyboardEvent.key) {
         case z.util.KeyboardUtil.KEY.ARROW_UP: {
-          if (!this.input().length) {
+          if (!z.util.KeyboardUtil.isFunctionKey(keyboardEvent) && !this.input().length) {
             this.editMessage(this.conversationEntity().get_last_editable_message(), keyboardEvent.target);
           }
           break;
