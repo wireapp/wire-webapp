@@ -17,14 +17,22 @@
  *
  */
 
-import {Account} from './Account';
-import * as auth from './auth/root';
-import * as conversation from './conversation/root';
-import * as cryptography from './cryptography/root';
+enum GenericMessageType {
+  ASSET = 'asset',
+  CALLING = 'calling',
+  CLEARED = 'cleared',
+  CLIENT_ACTION = 'clientAction',
+  CONFIRMATION = 'confirmation',
+  DELETED = 'deleted',
+  EDITED = 'edited',
+  EPHEMERAL = 'ephemeral',
+  HIDDEN = 'hidden',
+  IMAGE = 'image',
+  KNOCK = 'knock',
+  LAST_READ = 'lastRead',
+  LOCATION = 'location',
+  REACTION = 'reaction',
+  TEXT = 'text',
+}
 
-export = {
-  Account,
-  auth,
-  conversation,
-  cryptography,
-};
+export default GenericMessageType;

@@ -38,7 +38,7 @@ account.listen({
 
 ```typescript
 import {Account} from '@wireapp/core';
-import {PayloadBundle} from '@wireapp/core/dist/commonjs/crypto/';
+import {PayloadBundle} from '@wireapp/core/dist/commonjs/cryptography/';
 import {LoginData} from '@wireapp/api-client/dist/commonjs/auth/';
 
 const account: Account = new Account();

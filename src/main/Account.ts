@@ -1,25 +1,26 @@
-//
-// Wire
-// Copyright (C) 2018 Wire Swiss GmbH
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with this program. If not, see http://www.gnu.org/licenses/.
-//
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
 
 const pkg = require('../package.json');
 import {IncomingNotification} from '@wireapp/api-client/dist/commonjs/conversation/index';
 import * as cryptobox from '@wireapp/cryptobox';
-import {CryptographyService, GenericMessageType, PayloadBundle} from './crypto/root';
+import {CryptographyService, GenericMessageType, PayloadBundle} from './cryptography/root';
 import {NotificationService} from './notification/root';
 import {Context, LoginData, PreKey} from '@wireapp/api-client/dist/commonjs/auth/index';
 import {
@@ -50,7 +51,11 @@ class Account extends EventEmitter {
   private apiClient: Client;
   public context?: Context;
   private protocolBuffers: any = {};
-  public service?: {conversation: ConversationService; crypto: CryptographyService; notification: NotificationService};
+  public service?: {
+    conversation: ConversationService;
+    cryptography: CryptographyService;
+    notification: NotificationService;
+  };
 
   constructor(apiClient: Client = new Client()) {
     super();
@@ -66,9 +71,9 @@ class Account extends EventEmitter {
       switch (event.type) {
         case ConversationEventType.OTR_MESSAGE_ADD: {
           const otrMessage: OTRMessageAdd = event as OTRMessageAdd;
-          const sessionId: string = this.service.crypto.constructSessionId(otrMessage.from, otrMessage.data.sender);
+          const sessionId: string = CryptographyService.constructSessionId(otrMessage.from, otrMessage.data.sender);
           const ciphertext: string = otrMessage.data.text;
-          this.service.crypto.decrypt(sessionId, ciphertext).then((decryptedMessage: Uint8Array) => {
+          this.service.cryptography.decrypt(sessionId, ciphertext).then((decryptedMessage: Uint8Array) => {
             const genericMessage = this.protocolBuffers.GenericMessage.decode(decryptedMessage);
             switch (genericMessage.content) {
               case GenericMessageType.TEXT: {
@@ -335,17 +340,19 @@ class Account extends EventEmitter {
     };
     return Promise.resolve(Root.fromJSON(proto))
       .then((root: Root) => {
+        this.protocolBuffers.External = root.lookup('External');
         this.protocolBuffers.GenericMessage = root.lookup('GenericMessage');
         this.protocolBuffers.Text = root.lookup('Text');
       })
       .then(() => {
-        const crypto: CryptographyService = new CryptographyService(this.apiClient.config.store);
-        const conversation: ConversationService = new ConversationService(this.apiClient, this.protocolBuffers, crypto);
-        const notification: NotificationService = new NotificationService(this.apiClient, this.apiClient.config.store);
+        const cryptographyService = new CryptographyService(this.apiClient.config.store);
+        const conversationService = new ConversationService(this.apiClient, this.protocolBuffers, cryptographyService);
+        const notificationService = new NotificationService(this.apiClient, this.apiClient.config.store);
+
         this.service = {
-          conversation,
-          crypto,
-          notification,
+          conversation: conversationService,
+          cryptography: cryptographyService,
+          notification: notificationService,
         };
       });
   }
@@ -358,7 +365,7 @@ class Account extends EventEmitter {
     this.context = context;
     let loadedClient: RegisteredClient;
 
-    return this.service.crypto
+    return this.service.cryptography
       .loadClient()
       .then(client => (loadedClient = client))
       .then(() => this.apiClient.client.api.getClient(loadedClient.id))
@@ -446,14 +453,16 @@ class Account extends EventEmitter {
       throw new Error('Services are not set.');
     }
 
-    const serializedPreKeys: Array<PreKey> = await this.service.crypto.createCryptobox();
+    const serializedPreKeys: Array<PreKey> = await this.service.cryptography.createCryptobox();
 
     let newClient: NewClient;
-    if (this.service.crypto.cryptobox.lastResortPreKey) {
+    if (this.service.cryptography.cryptobox.lastResortPreKey) {
       newClient = {
         class: clientInfo.classification,
         cookie: clientInfo.cookieLabel,
-        lastkey: this.service.crypto.cryptobox.serialize_prekey(this.service.crypto.cryptobox.lastResortPreKey),
+        lastkey: this.service.cryptography.cryptobox.serialize_prekey(
+          this.service.cryptography.cryptobox.lastResortPreKey
+        ),
         location: clientInfo.location,
         password: String(loginData.password),
         prekeys: serializedPreKeys,
@@ -469,7 +478,7 @@ class Account extends EventEmitter {
     }
 
     const client = await this.apiClient.client.api.postClient(newClient);
-    await this.service.crypto.saveClient(client);
+    await this.service.cryptography.saveClient(client);
     await this.service.notification.initializeNotificationStream(client.id);
 
     return client;

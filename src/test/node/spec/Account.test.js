@@ -11,7 +11,7 @@ describe('Account', () => {
       await account.init();
 
       expect(account.service.conversation).toBeDefined();
-      expect(account.service.crypto).toBeDefined();
+      expect(account.service.cryptography).toBeDefined();
 
       const message = account.protocolBuffers.GenericMessage.create({
         messageId: '2d7cb6d8-118f-11e8-b642-0ed5f89f718b',

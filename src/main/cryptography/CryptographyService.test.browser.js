@@ -19,13 +19,11 @@
 
 /* eslint-disable no-magic-numbers */
 const bazinga64 = require('bazinga64');
-const crypto = require('crypto');
 const Proteus = require('@wireapp/proteus');
 const {Cryptobox} = require('@wireapp/cryptobox');
 const {CryptographyService} = require('@wireapp/core/dist/cryptography/root');
 const {MemoryEngine} = require('@wireapp/store-engine');
-const {promisify} = require('util');
-const {decryptAsset, encryptAsset} = require('@wireapp/core/dist/cryptography/AssetCryptography.node');
+const {decryptAsset, encryptAsset} = require('@wireapp/core/dist/cryptography/AssetCryptography.browser');
 
 async function createEngine(storeName) {
   const engine = new MemoryEngine();
@@ -149,7 +147,7 @@ describe('CryptographyService', () => {
   describe('"encryptAsset"', () => {
     it('encrypts and decrypts ArrayBuffer', async done => {
       const bytes = new Uint8Array(16);
-      await promisify(crypto.randomFill)(bytes);
+      window.crypto.getRandomValues(bytes);
       const byteBuffer = new Buffer(bytes);
 
       const encryptedAsset = await encryptAsset(byteBuffer);
@@ -161,7 +159,7 @@ describe('CryptographyService', () => {
 
     it('does not decrypt when the hash is missing', async done => {
       const bytes = new Uint8Array(16);
-      await promisify(crypto.randomFill)(bytes);
+      window.crypto.getRandomValues(bytes);
       const byteBuffer = new Buffer(bytes);
 
       const {cipherText, keyBytes} = await encryptAsset(byteBuffer);
@@ -176,7 +174,7 @@ describe('CryptographyService', () => {
 
     it('does not decrypt when hash is an empty array', async done => {
       const bytes = new Uint8Array(16);
-      await promisify(crypto.randomFill)(bytes);
+      window.crypto.getRandomValues(bytes);
       const byteBuffer = new Buffer(bytes);
 
       const {cipherText, keyBytes} = await encryptAsset(byteBuffer);
