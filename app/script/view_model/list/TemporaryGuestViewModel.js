@@ -47,8 +47,19 @@ z.viewModel.list.TemporaryGuestViewModel = class TemporaryGuestViewModel {
   }
 
   clickToCreateAccount() {
-    const path = `${z.l10n.text(z.string.urlWebsiteCreateTeam)}?pk_campaign=wireless&pk_kwd=desktop`;
-    z.util.safe_window_open(z.util.URLUtil.build_url(z.util.URLUtil.TYPE.WEBSITE, path));
+    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
+      action: () => {
+        const path = `${z.l10n.text(z.string.urlWebsiteCreateTeam)}?pk_campaign=wireless&pk_kwd=desktop`;
+        z.util.safe_window_open(z.util.URLUtil.build_url(z.util.URLUtil.TYPE.WEBSITE, path));
+      },
+      preventClose: true,
+      text: {
+        action: z.l10n.text(z.string.modalAccountCreateAction),
+        message: z.l10n.text(z.string.modalAccountCreateMessage),
+        title: z.l10n.text(z.string.modalAccountCreateHeadline),
+      },
+      warning: false,
+    });
   }
 
   isSelectedConversation() {

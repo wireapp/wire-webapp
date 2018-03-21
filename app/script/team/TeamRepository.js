@@ -67,20 +67,16 @@ z.team.TeamRepository = class TeamRepository {
   }
 
   getTeam() {
-    return this.teamService
-      .getTeams()
-      .then(({teams}) => {
-        if (teams.length) {
-          const [team] = teams;
-
-          if (team.binding) {
-            const teamEntity = this.teamMapper.mapTeamFromObject(team);
-            this.team(teamEntity);
-            return this.updateTeamMembers(teamEntity);
-          }
+    const teamPromise = this.selfUser().teamId ? this._getTeamById() : this._getBindingTeam();
+    return teamPromise
+      .then(teamData => {
+        if (teamData) {
+          const teamEntity = this.teamMapper.mapTeamFromObject(teamData);
+          this.team(teamEntity);
+          return this.updateTeamMembers(teamEntity);
         }
 
-        return this.team(new z.team.TeamEntity());
+        this.team(new z.team.TeamEntity());
       })
       .then(() => this.sendAccountInfo())
       .then(() => this.team());
@@ -156,10 +152,9 @@ z.team.TeamRepository = class TeamRepository {
     return this.teamUsers()
       .filter(userEntity => userEntity.matches(query, isHandle, excludedEmojis))
       .sort((userA, userB) => {
-        if (isHandle) {
-          return z.util.StringUtil.sort_by_priority(userA.username(), userB.username(), query);
-        }
-        return z.util.StringUtil.sort_by_priority(userA.name(), userB.name(), query);
+        return isHandle
+          ? z.util.StringUtil.sort_by_priority(userA.username(), userB.username(), query)
+          : z.util.StringUtil.sort_by_priority(userA.name(), userB.name(), query);
       });
   }
 
@@ -180,7 +175,7 @@ z.team.TeamRepository = class TeamRepository {
             name: this.teamName(),
             picture: imageDataUrl,
             teamID: this.team().id,
-            teamRole: this.selfUser().team_role(),
+            teamRole: this.selfUser().teamRole(),
             userID: this.selfUser().id,
           };
 
@@ -216,6 +211,19 @@ z.team.TeamRepository = class TeamRepository {
     if (!members().find(member => member.id === userEntity.id)) {
       members.push(userEntity);
     }
+  }
+
+  _getTeamById() {
+    return this.teamService.getTeamById(this.selfUser().teamId);
+  }
+
+  _getBindingTeam() {
+    return this.teamService.getTeams().then(({teams}) => {
+      const [team] = teams;
+      if (team && team.binding) {
+        return team;
+      }
+    });
   }
 
   _onDelete({team: teamId}) {

@@ -145,7 +145,7 @@ z.viewModel.panel.ParticipantDevicesViewModel = class ParticipantDevicesViewMode
   }
 
   clickOnClose() {
-    this.panelViewModel.closePanel().then(() => this.resetView());
+    this.panelViewModel.closePanel().then(didClose => didClose && this.resetView());
   }
 
   clickOnDevice(clientEntity) {

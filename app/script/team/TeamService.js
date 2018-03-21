@@ -39,6 +39,13 @@ z.team.TeamService = class TeamService {
     this.logger = new z.util.Logger('z.team.TeamService', z.config.LOGGER.OPTIONS);
   }
 
+  getTeamById(teamId) {
+    return this.client.send_request({
+      type: 'GET',
+      url: this.client.create_url(`${TeamService.URL.TEAMS}/${teamId}`),
+    });
+  }
+
   getTeamMember(teamId, userId) {
     return this.client.send_request({
       type: 'GET',

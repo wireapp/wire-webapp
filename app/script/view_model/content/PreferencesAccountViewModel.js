@@ -214,9 +214,9 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
       action: () => this.clientRepository.logoutClient(),
       preventClose: true,
       text: {
-        action: z.l10n.text(z.string.modalaccountLeaveGuestRoomAction),
-        message: z.l10n.text(z.string.modalaccountLeaveGuestRoomMessage),
-        title: z.l10n.text(z.string.modalaccountLeaveGuestRoomHeadline),
+        action: z.l10n.text(z.string.modalAccountLeaveGuestRoomAction),
+        message: z.l10n.text(z.string.modalAccountLeaveGuestRoomMessage),
+        title: z.l10n.text(z.string.modalAccountLeaveGuestRoomHeadline),
       },
       warning: false,
     });

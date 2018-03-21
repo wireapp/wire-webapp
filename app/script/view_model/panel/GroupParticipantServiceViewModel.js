@@ -53,14 +53,10 @@ z.viewModel.panel.GroupParticipantServiceViewModel = class GroupParticipantServi
       }
     });
 
-    this.selfIsActiveMember = ko.pureComputed(() => {
-      if (this.isVisible()) {
-        return !this.conversationEntity().removed_from_conversation() && !this.conversationEntity().is_guest();
-      }
+    this.selfIsActiveParticipant = ko.pureComputed(() => {
+      return this.isVisible() ? this.conversationEntity().isActiveParticipant() : false;
     });
-    this.showActionRemove = ko.pureComputed(
-      () => this.selfIsActiveMember() && this.selectedIsInConversation() && !this.mainViewModel.isTemporaryGuest()
-    );
+    this.showActionRemove = ko.pureComputed(() => this.selfIsActiveParticipant() && this.selectedIsInConversation());
     this.showGroupParticipant = this.showGroupParticipant.bind(this);
     this.shouldUpdateScrollbar = ko
       .computed(() => this.selectedService() && this.isVisible())
@@ -75,7 +71,7 @@ z.viewModel.panel.GroupParticipantServiceViewModel = class GroupParticipantServi
   }
 
   clickOnClose() {
-    this.panelViewModel.closePanel().then(() => this.resetView());
+    this.panelViewModel.closePanel().then(didClose => didClose && this.resetView());
   }
 
   clickOnAdd() {

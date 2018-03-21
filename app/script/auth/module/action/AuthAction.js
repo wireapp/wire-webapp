@@ -21,7 +21,7 @@ import BackendError from './BackendError';
 import * as AuthActionCreator from './creator/AuthActionCreator';
 import * as SelfAction from './SelfAction';
 import {currentLanguage, currentCurrency} from '../../localeConfig';
-import {setLocalStorage, LocalStorageKey} from './LocalStorageAction';
+import {deleteLocalStorage, setLocalStorage, LocalStorageKey} from './LocalStorageAction';
 import * as ConversationAction from './ConversationAction';
 import * as ClientAction from './ClientAction';
 
@@ -46,13 +46,7 @@ function doLoginPlain(loginData, onBeforeLogin, onAfterLogin) {
     );
     return Promise.resolve()
       .then(() => onBeforeLogin(dispatch, getState, global))
-      .then(() =>
-        core.login(loginData, true, {
-          classification: 'desktop',
-          cookieLabel: 'default',
-          model: 'Chrome', // TODO read client info from platform.js
-        })
-      )
+      .then(() => core.login(loginData, true, ClientAction.generateClientPayload(loginData.persist)))
       .then(() => persistAuthData(loginData.persist, core, dispatch))
       .then(() => onAfterLogin(dispatch, getState, global))
       .then(() => dispatch(AuthActionCreator.successfulLogin()))
@@ -185,6 +179,7 @@ export function doLogout() {
     dispatch(AuthActionCreator.startLogout());
     return core
       .logout()
+      .then(() => dispatch(deleteLocalStorage(LocalStorageKey.AUTH.ACCESS_TOKEN.VALUE)))
       .then(() => dispatch(AuthActionCreator.successfulLogout()))
       .catch(error => dispatch(AuthActionCreator.failedLogout(error)));
   };
