@@ -23,7 +23,11 @@ import {store as CryptoboxStore} from '@wireapp/cryptobox';
 import {MetaClient} from './CryptographyService';
 
 export enum DatabaseStores {
+  AMPLIFY = 'amplify',
   CLIENTS = 'clients',
+  KEYS = 'keys',
+  SESSIONS = 'sessions',
+  PRE_KEYS = 'prekeys',
 }
 
 class CryptographyDatabaseRepository {
@@ -41,6 +45,20 @@ class CryptographyDatabaseRepository {
 
   public saveClient(identity: CryptoboxStore.CRUDStoreKeys, client: MetaClient): Promise<string> {
     return this.storeEngine.create(CryptographyDatabaseRepository.STORES.CLIENTS, identity, client);
+  }
+
+  public deleteStores(): Promise<boolean[]> {
+    return Promise.all([
+      this.storeEngine.deleteAll(CryptographyDatabaseRepository.STORES.AMPLIFY),
+      this.storeEngine.deleteAll(CryptographyDatabaseRepository.STORES.CLIENTS),
+      this.storeEngine.deleteAll(CryptographyDatabaseRepository.STORES.KEYS),
+      this.storeEngine.deleteAll(CryptographyDatabaseRepository.STORES.SESSIONS),
+      this.storeEngine.deleteAll(CryptographyDatabaseRepository.STORES.PRE_KEYS),
+    ]);
+  }
+
+  public purgeDb(): Promise<void> {
+    return this.storeEngine.purge();
   }
 }
 
