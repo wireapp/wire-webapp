@@ -159,12 +159,6 @@ class ConversationJoin extends Component {
           {_(conversationJoinStrings.existentAccountOpenButton)}
         </Button>
         <Small block>
-          {`${_(conversationJoinStrings.acceptTou)} `}
-          <Link href={EXTERNAL_ROUTE.WIRE_TERMS_PERSONAL} textTransform={'none'} data-uie-name="go-tou">
-            {_(conversationJoinStrings.touLink)}
-          </Link>
-        </Small>
-        <Small block>
           <Link
             onClick={() => this.setState({...this.state, forceNewTemporaryGuestAccount: true})}
             textTransform={'none'}
@@ -221,12 +215,6 @@ class ConversationJoin extends Component {
             {error ? parseValidationErrors(error) : parseError(this.props.error)}
           </ErrorMessage>
         </Form>
-        <Small block>
-          {`${_(conversationJoinStrings.acceptTou)} `}
-          <Link href={EXTERNAL_ROUTE.WIRE_TERMS_PERSONAL} textTransform={'none'} data-uie-name="go-tou">
-            {_(conversationJoinStrings.touLink)}
-          </Link>
-        </Small>
         <Small block>
           {`${_(conversationJoinStrings.hasAccount)} `}
           <Link
