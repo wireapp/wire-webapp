@@ -65,5 +65,5 @@
     "watch": "webpack-dev-server --config webpack.config.js"
   },
   "types": "./dist/commonjs/Client.d.ts",
-  "version": "0.6.4"
+  "version": "0.6.5"
 }
