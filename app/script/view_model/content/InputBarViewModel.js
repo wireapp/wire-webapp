@@ -261,7 +261,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   }
 
   editMessage(messageEntity, inputElement) {
-    if (messageEntity && (messageEntity.is_editable() && messageEntity !== this.editMessageEntity())) {
+    if (messageEntity && messageEntity.is_editable() && messageEntity !== this.editMessageEntity()) {
       this.cancelMessageEditing();
       this.editMessageEntity(messageEntity);
       this.editMessageEntity().isEditing(true);
@@ -276,7 +276,8 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     const images = [];
     const files = [];
 
-    if (!this._isHittingUploadLimit(droppedFiles)) {
+    const tooManyConcurrentUploads = this._isHittingUploadLimit(droppedFiles);
+    if (!tooManyConcurrentUploads) {
       Array.from(droppedFiles).forEach(file => {
         const isSupportedImage = InputBarViewModel.CONFIG.IMAGE.FILE_TYPES.includes(file.type);
         if (isSupportedImage) {
