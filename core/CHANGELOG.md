@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="2.1.4"></a>
+## [2.1.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.1.3...@wireapp/core@2.1.4) (2018-03-21)
+
+
+### Bug Fixes
+
+* **core:** Init engine after purge ([#397](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/397)) ([d0ea5a2](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/d0ea5a2))
+
+
+
+
 <a name="2.1.3"></a>
 ## [2.1.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.1.2...@wireapp/core@2.1.3) (2018-03-21)
 
