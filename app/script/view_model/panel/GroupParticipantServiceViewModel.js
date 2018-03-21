@@ -73,7 +73,7 @@ z.viewModel.panel.GroupParticipantServiceViewModel = class GroupParticipantServi
   }
 
   clickOnClose() {
-    this.panelViewModel.closePanel().then(() => this.resetView());
+    this.panelViewModel.closePanel().then(didClose => didClose && this.resetView());
   }
 
   clickOnAdd() {

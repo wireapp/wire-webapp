@@ -101,7 +101,7 @@ z.viewModel.panel.GroupParticipantUserViewModel = class GroupParticipantUserView
   }
 
   clickOnClose() {
-    this.panelViewModel.closePanel().then(() => this.resetView());
+    this.panelViewModel.closePanel().then(didClose => didClose && this.resetView());
   }
 
   clickOnDevices() {
