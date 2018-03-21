@@ -128,8 +128,8 @@ z.media.MediaConstraintsHandler = class MediaConstraintsHandler {
       };
 
       return Promise.resolve({
-        media_stream_constraints: media_stream_constraints,
-        media_type: z.media.MediaType.SCREEN,
+        mediaType: z.media.MediaType.SCREEN,
+        streamConstraints: media_stream_constraints,
       });
     }
 
@@ -144,8 +144,8 @@ z.media.MediaConstraintsHandler = class MediaConstraintsHandler {
       };
 
       return Promise.resolve({
-        media_stream_constraints: media_stream_constraints,
-        media_type: z.media.MediaType.SCREEN,
+        mediaType: z.media.MediaType.SCREEN,
+        streamConstraints: media_stream_constraints,
       });
     }
 
