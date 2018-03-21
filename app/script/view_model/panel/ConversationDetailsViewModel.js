@@ -89,13 +89,11 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
     this.userName = ko.pureComputed(() => (this.firstParticipant() ? this.firstParticipant().username() : ''));
 
     this.isGuest = ko.pureComputed(() => {
-      return this.isSingleUserMode() && this.firstParticipant() && this.firstParticipant().is_guest();
+      return this.isSingleUserMode() && this.firstParticipant() && this.firstParticipant().isGuest();
     });
 
     this.isActiveParticipant = ko.pureComputed(() => {
-      if (this.hasConversation()) {
-        return !this.conversationEntity().removed_from_conversation() && !this.conversationEntity().is_guest();
-      }
+      return this.conversationEntity() ? this.conversationEntity().isActiveParticipant() : false;
     });
 
     this.isNameEditable = ko.pureComputed(() => {

@@ -767,7 +767,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       const with_expected_user = user_et.id === conversation_et.participating_user_ids()[0];
 
       if (with_expected_user) {
-        if (team_id && user_et.is_team_member()) {
+        if (team_id && user_et.isTeamMember()) {
           const active_1to1_conversation = conversation_et.is_one2one() && !conversation_et.removed_from_conversation();
           const in_team = team_id === conversation_et.team_id;
 
@@ -935,7 +935,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.filtered_conversations().forEach(conversation_et => this._mapGuestStatusSelf(conversation_et));
 
     if (this.isTeam()) {
-      this.selfUser().is_team_member(true);
+      this.selfUser().inTeam(true);
+      this.selfUser().isTeamMember(true);
     }
   }
 
@@ -943,7 +944,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const conversationTeamId = conversationEntity.team_id;
     const selfTeamId = this.team() && this.team().id;
     const isConversationGuest = !!(conversationTeamId && (!selfTeamId || selfTeamId !== conversationTeamId));
-    conversationEntity.is_guest(isConversationGuest);
+    conversationEntity.isGuest(isConversationGuest);
   }
 
   /**
