@@ -50,7 +50,7 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
     this.hasGuests = ko.pureComputed(() =>
       this.conversationEntity()
         .participating_user_ets()
-        .some(participant => participant.is_guest())
+        .some(userEntity => userEntity.isGuest())
     );
 
     this.hasOngoingCall = ko.computed(() => {

@@ -186,7 +186,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
     }
 
     if (conversation_data.is_guest) {
-      conversation_et.is_guest(conversation_data.is_guest);
+      conversation_et.isGuest(conversation_data.is_guest);
     }
 
     // Access related data
