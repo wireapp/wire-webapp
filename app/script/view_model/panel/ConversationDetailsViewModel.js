@@ -40,6 +40,7 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
 
     this.actionsViewModel = this.mainViewModel.actions;
     this.conversationEntity = this.conversationRepository.active_conversation;
+    this.isActivatedAccount = this.mainViewModel.isActivatedAccount;
     this.isTeam = this.teamRepository.isTeam;
     this.isTeamOnly = this.panelViewModel.isTeamOnly;
     this.showIntegrations = this.panelViewModel.showIntegrations;
@@ -98,11 +99,7 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
 
     this.isNameEditable = ko.pureComputed(() => {
       if (this.hasConversation()) {
-        return (
-          this.conversationEntity().is_group() &&
-          !this.conversationEntity().removed_from_conversation() &&
-          !this.mainViewModel.isTemporaryGuest()
-        );
+        return this.conversationEntity().is_group() && this.conversationEntity().isActiveParticipant();
       }
     });
 

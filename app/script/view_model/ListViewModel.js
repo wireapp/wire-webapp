@@ -55,6 +55,7 @@ z.viewModel.ListViewModel = class ListViewModel {
 
     this.actionsViewModel = this.mainViewModel.actions;
     this.contentViewModel = this.mainViewModel.content;
+    this.isActivatedAccount = this.mainViewModel.isActivatedAccount;
     this.selfUser = this.userRepository.self;
 
     this.logger = new z.util.Logger('z.viewModel.ListViewModel', z.config.LOGGER.OPTIONS);
@@ -65,7 +66,6 @@ z.viewModel.ListViewModel = class ListViewModel {
     this.modal = ko.observable();
     this.webappLoaded = ko.observable(false);
 
-    this.isActivatedAccount = ko.pureComputed(() => this.selfUser() && !this.selfUser().isTemporaryGuest());
     this.selfUserPicture = ko.pureComputed(() => {
       if (this.webappLoaded() && this.selfUser()) {
         return this.selfUser().mediumPictureResource();

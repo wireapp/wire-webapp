@@ -113,7 +113,7 @@
           </div>
         <!-- /ko -->
 
-        <!-- ko ifnot: mainViewModel.isTemporaryGuest -->
+        <!-- ko if: isActivatedAccount() -->
           <div class="conversation-details__bottom-actions">
             <!-- ko if: showActionCreateGroup() -->
               <div class="panel__action-item" data-bind="click: clickOnCreateGroup" data-uie-name="go-create-group">

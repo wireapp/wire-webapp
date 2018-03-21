@@ -45,7 +45,7 @@
           <disclose-icon></disclose-icon>
         </div>
 
-        <!-- ko ifnot: mainViewModel.isTemporaryGuest -->
+        <!-- ko if: isActivatedAccount() -->
           <div class="group-participant__bottom-actions">
             <!-- ko if: showActionSelfProfile() -->
               <div class="panel__action-item" data-bind="click: clickOnShowProfile" data-uie-name="go-profile">

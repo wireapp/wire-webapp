@@ -47,11 +47,14 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
     this.logger = new z.util.Logger('z.viewModel.content.PreferencesAccountViewModel', z.config.LOGGER.OPTIONS);
 
+    this.mainViewModel = mainViewModel;
     this.clientRepository = repositories.client;
     this.teamRepository = repositories.team;
     this.userRepository = repositories.user;
 
+    this.isActivatedAccount = this.mainViewModel.isActivatedAccount;
     this.selfUser = this.userRepository.self;
+
     this.newClients = ko.observableArray([]);
     this.name = ko.pureComputed(() => this.selfUser().name());
     this.availability = ko.pureComputed(() => this.selfUser().availability());
@@ -79,8 +82,6 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.isTeamManager = ko.pureComputed(() => this.isTeam() && this.selfUser().isTeamManager());
     this.team = this.teamRepository.team;
     this.teamName = ko.pureComputed(() => z.l10n.text(z.string.preferencesAccountTeam, this.teamRepository.teamName()));
-
-    this.isActivatedAccount = ko.pureComputed(() => !this.selfUser().isTemporaryGuest());
 
     this._initSubscriptions();
   }
