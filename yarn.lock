@@ -3779,9 +3779,9 @@ extglob@^2.0.4:
     snapdragon "^0.8.1"
     to-regex "^3.0.1"
 
-extract-loader@2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/extract-loader/-/extract-loader-2.0.0.tgz#3483fbe9b81b9b666199c9726ee383a81ac72932"
+extract-loader@2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/extract-loader/-/extract-loader-2.0.1.tgz#3dfa57d5922c0edbb6248490183ff8602e7cc92b"
   dependencies:
     loader-utils "^1.1.0"
 
