@@ -120,13 +120,16 @@ z.viewModel.PanelViewModel = class PanelViewModel {
   }
 
   closePanel() {
-    if (!this.isAnimating()) {
-      this.isAnimating(true);
-      return this.mainViewModel.closePanel().then(() => {
-        this.isAnimating(false);
-        this.isVisible(false);
-      });
+    if (this.isAnimating()) {
+      return Promise.resolve(false);
     }
+
+    this.isAnimating(true);
+    return this.mainViewModel.closePanel().then(() => {
+      this.isAnimating(false);
+      this.isVisible(false);
+      return true;
+    });
   }
 
   closePanelOnChange() {
