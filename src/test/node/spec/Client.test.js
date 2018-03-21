@@ -21,7 +21,7 @@
 const nock = require('nock');
 
 const Client = require('@wireapp/api-client/dist/commonjs/Client');
-const {AUTH_ACCESS_TOKEN_KEY, AUTH_TABLE_NAME, AuthAPI} = require('@wireapp/api-client/dist/commonjs/auth/');
+const {AUTH_TABLE_NAME, AuthAPI} = require('@wireapp/api-client/dist/commonjs/auth/');
 const {UserAPI} = require('@wireapp/api-client/dist/commonjs/user/');
 const {MemoryEngine} = require('@wireapp/store-engine');
 
@@ -69,34 +69,6 @@ describe('Client', () => {
         store: new MemoryEngine(),
       });
       expect(client.config.schemaCallback).toBe(schemaCallback);
-    });
-  });
-
-  describe('"init"', () => {
-    it('loads an access token from the storage by default', async done => {
-      const client = new Client();
-      const PRIMARY_KEY = AUTH_ACCESS_TOKEN_KEY;
-      accessTokenData = {
-        access_token: 'initial-access-token-data',
-        expires_in: 900,
-        token_type: 'Bearer',
-        user: 'aaf9a833-ef30-4c22-86a0-9adc8a15b3b4',
-      };
-
-      await client.accessTokenStore.engine.init('wire');
-
-      client.accessTokenStore.engine
-        .create(AUTH_TABLE_NAME, PRIMARY_KEY, accessTokenData)
-        .then(primaryKey => {
-          expect(primaryKey).toBe(PRIMARY_KEY);
-          return client.init();
-        })
-        .then(context => {
-          expect(context.userId).toBe(accessTokenData.user);
-          expect(client.accessTokenStore.accessToken).toBe(accessTokenData);
-          done();
-        })
-        .catch(done.fail);
     });
   });
 
