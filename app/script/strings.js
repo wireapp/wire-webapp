@@ -305,14 +305,6 @@ export const conversationJoinStrings = defineMessages({
     id: 'conversationJoin.loginLink',
     defaultMessage: 'Log in',
   },
-  acceptTou: {
-    id: 'conversationJoin.acceptTou',
-    defaultMessage: 'By continuing you accept the Wire',
-  },
-  touLink: {
-    id: 'conversationJoin.touLink',
-    defaultMessage: 'Terms of Use',
-  },
 });
 
 export const errorHandlerStrings = defineMessages({
