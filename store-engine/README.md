@@ -87,6 +87,14 @@ engine.deleteAll(TABLE_NAME).then(wasDeleted => {
 });
 ```
 
+#### purge
+
+```javascript
+engine.purge().then(() => {
+  console.log('The Simpson Universe has been deleted. Doh!');
+});
+```
+
 #### read
 
 ```javascript
