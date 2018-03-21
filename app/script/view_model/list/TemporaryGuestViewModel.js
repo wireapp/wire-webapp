@@ -34,6 +34,8 @@ z.viewModel.list.TemporaryGuestViewModel = class TemporaryGuestViewModel {
   constructor(mainViewModel, listViewModel, repositories) {
     this.conversationRepository = repositories.conversation;
     this.userRepository = repositories.user;
+    this.callingRepository = repositories.calling;
+
     this.logger = new z.util.Logger('z.viewModel.list.TemporaryGuestViewModel', z.config.LOGGER.OPTIONS);
 
     this.callConversations = this.conversationRepository.conversations_calls;
@@ -47,5 +49,9 @@ z.viewModel.list.TemporaryGuestViewModel = class TemporaryGuestViewModel {
   clickToCreateAccount() {
     const path = `${z.l10n.text(z.string.urlWebsiteCreateTeam)}?pk_campaign=wireless&pk_kwd=desktop`;
     z.util.safe_window_open(z.util.URLUtil.build_url(z.util.URLUtil.TYPE.WEBSITE, path));
+  }
+
+  isSelectedConversation() {
+    return true;
   }
 };

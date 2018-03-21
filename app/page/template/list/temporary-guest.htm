@@ -1,6 +1,6 @@
-<div id="temporary-guest" class="temporary-guest" data-bind="with: $root.temporaryGuest">
+<div id="temporary-guest" class="temporary-guest left-list left-list-is-visible" data-bind="with: $root.temporaryGuest">
   <!-- ko foreach: callConversations -->
-    <conversation-list-calling-cell params="conversation: $data, calling_repository: $parent.callingRepository"></conversation-list-calling-cell>
+    <conversation-list-calling-cell class="dark-bg" params="conversation: $data, calling_repository: $parent.callingRepository, is_selected: $parent.isSelectedConversation, temporaryUserStyle: true"></conversation-list-calling-cell>
   <!-- /ko -->
   <div class="temporary-guest__content">
     <wire-logo></wire-logo>

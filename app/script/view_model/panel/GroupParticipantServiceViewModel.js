@@ -58,7 +58,9 @@ z.viewModel.panel.GroupParticipantServiceViewModel = class GroupParticipantServi
         return !this.conversationEntity().removed_from_conversation() && !this.conversationEntity().is_guest();
       }
     });
-    this.showActionRemove = ko.pureComputed(() => this.selfIsActiveMember() && this.selectedIsInConversation());
+    this.showActionRemove = ko.pureComputed(
+      () => this.selfIsActiveMember() && this.selectedIsInConversation() && !this.mainViewModel.isTemporaryGuest()
+    );
     this.showGroupParticipant = this.showGroupParticipant.bind(this);
     this.shouldUpdateScrollbar = ko
       .computed(() => this.selectedService() && this.isVisible())

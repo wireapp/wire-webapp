@@ -36,6 +36,7 @@ z.viewModel.ListViewModel = class ListViewModel {
       CONVERSATIONS: 'ListViewModel.STATE.CONVERSATIONS',
       PREFERENCES: 'ListViewModel.STATE.PREFERENCES',
       START_UI: 'ListViewModel.STATE.START_UI',
+      TEMPORARY_GUEST: 'ListViewModel.STATE.TEMPORARY_GUEST',
     };
   }
   /**
@@ -167,7 +168,7 @@ z.viewModel.ListViewModel = class ListViewModel {
   }
 
   openPreferencesAccount() {
-    if (this.selfUser().isTemporaryGuest()) {
+    if (!this.selfUser().isTemporaryGuest()) {
       this.dismissModal();
     }
 
@@ -256,6 +257,8 @@ z.viewModel.ListViewModel = class ListViewModel {
         return 'preferences';
       case ListViewModel.STATE.START_UI:
         return 'start-ui';
+      case ListViewModel.STATE.TEMPORARY_GUEST:
+        return 'temporary-guest';
       default:
         return 'conversations';
     }
@@ -270,7 +273,7 @@ z.viewModel.ListViewModel = class ListViewModel {
   }
 
   showTemporaryGuest() {
-    this.state(ListViewModel.STATE.PREFERENCES);
+    this.switchList(ListViewModel.STATE.TEMPORARY_GUEST);
     this.modal(ListViewModel.MODAL_TYPE.TEMPORARY_GUEST);
     const conversationEntity = this.conversationRepository.getMostRecentConversation();
     amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity);

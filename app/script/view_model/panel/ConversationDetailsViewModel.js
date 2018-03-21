@@ -108,7 +108,11 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
 
     this.isNameEditable = ko.pureComputed(() => {
       if (this.hasConversation()) {
-        return this.conversationEntity().is_group() && !this.conversationEntity().removed_from_conversation();
+        return (
+          this.conversationEntity().is_group() &&
+          !this.conversationEntity().removed_from_conversation() &&
+          !this.mainViewModel.isTemporaryGuest()
+        );
       }
     });
 
@@ -139,12 +143,7 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
     this.showActionClear = ko.pureComputed(() => {
       return !this.conversationEntity().is_request() && !this.conversationEntity().is_cleared();
     });
-    this.showActionDevices = ko.pureComputed(() => {
-      if (this.conversationEntity().is_one2one()) {
-        const userEntity = this.conversationEntity().firstUserEntity();
-        return userEntity.is_connected() || userEntity.is_team_member();
-      }
-    });
+    this.showActionDevices = ko.pureComputed(() => this.conversationEntity().is_one2one());
     this.showActionGuestOptions = ko.pureComputed(() => this.conversationEntity().inTeam());
     this.showActionLeave = ko.pureComputed(() => {
       return this.conversationEntity().is_group() && !this.conversationEntity().removed_from_conversation();
