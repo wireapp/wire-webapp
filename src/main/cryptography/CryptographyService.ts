@@ -139,4 +139,12 @@ export default class CryptographyService {
 
     return this.database.saveClient(CryptoboxStore.CryptoboxCRUDStore.KEYS.LOCAL_IDENTITY, clientWithMeta);
   }
+
+  public purgeDb(): Promise<void> {
+    return this.database.purgeDb();
+  }
+
+  public deleteCryptographyStores(): Promise<boolean[]> {
+    return this.database.deleteStores();
+  }
 }

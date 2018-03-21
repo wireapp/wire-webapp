@@ -18,13 +18,10 @@
  */
 
 import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine/index';
+import {CryptographyDatabaseRepository} from '../cryptography/root';
 import {Notification} from '@wireapp/api-client/dist/commonjs/notification/index';
 
 export default class NotificationDatabaseRepository {
-  public static STORES = {
-    AMPLIFY: 'amplify',
-  };
-
   public static KEYS = {
     PRIMARY_KEY_LAST_EVENT: 'z.storage.StorageKey.EVENT.LAST_DATE',
     PRIMARY_KEY_LAST_NOTIFICATION: 'z.storage.StorageKey.NOTIFICATION.LAST_ID',
@@ -35,7 +32,7 @@ export default class NotificationDatabaseRepository {
   public getLastEventDate(): Promise<Date> {
     return this.storeEngine
       .read<{value: string}>(
-        NotificationDatabaseRepository.STORES.AMPLIFY,
+        CryptographyDatabaseRepository.STORES.AMPLIFY,
         NotificationDatabaseRepository.KEYS.PRIMARY_KEY_LAST_EVENT
       )
       .then(({value}) => new Date(value));
@@ -44,7 +41,7 @@ export default class NotificationDatabaseRepository {
   public updateLastEventDate(eventDate: Date): Promise<Date> {
     return this.storeEngine
       .update(
-        NotificationDatabaseRepository.STORES.AMPLIFY,
+        CryptographyDatabaseRepository.STORES.AMPLIFY,
         NotificationDatabaseRepository.KEYS.PRIMARY_KEY_LAST_EVENT,
         {value: eventDate.toISOString()}
       )
@@ -54,7 +51,7 @@ export default class NotificationDatabaseRepository {
   public createLastEventDate(eventDate: Date): Promise<Date> {
     return this.storeEngine
       .create(
-        NotificationDatabaseRepository.STORES.AMPLIFY,
+        CryptographyDatabaseRepository.STORES.AMPLIFY,
         NotificationDatabaseRepository.KEYS.PRIMARY_KEY_LAST_EVENT,
         {value: eventDate.toISOString()}
       )
@@ -64,7 +61,7 @@ export default class NotificationDatabaseRepository {
   public getLastNotificationId(): Promise<string> {
     return this.storeEngine
       .read<{value: string}>(
-        NotificationDatabaseRepository.STORES.AMPLIFY,
+        CryptographyDatabaseRepository.STORES.AMPLIFY,
         NotificationDatabaseRepository.KEYS.PRIMARY_KEY_LAST_NOTIFICATION
       )
       .then(({value}) => value);
@@ -73,7 +70,7 @@ export default class NotificationDatabaseRepository {
   public updateLastNotificationId(lastNotification: Notification): Promise<string> {
     return this.storeEngine
       .update(
-        NotificationDatabaseRepository.STORES.AMPLIFY,
+        CryptographyDatabaseRepository.STORES.AMPLIFY,
         NotificationDatabaseRepository.KEYS.PRIMARY_KEY_LAST_NOTIFICATION,
         {value: lastNotification.id}
       )
@@ -83,7 +80,7 @@ export default class NotificationDatabaseRepository {
   public createLastNotificationId(lastNotification: Notification): Promise<string> {
     return this.storeEngine
       .create(
-        NotificationDatabaseRepository.STORES.AMPLIFY,
+        CryptographyDatabaseRepository.STORES.AMPLIFY,
         NotificationDatabaseRepository.KEYS.PRIMARY_KEY_LAST_NOTIFICATION,
         {value: lastNotification.id}
       )

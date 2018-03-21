@@ -378,8 +378,17 @@ class Account extends EventEmitter {
         const notFoundInDatabase =
           error instanceof cryptobox.error.CryptoboxError || error instanceof RecordNotFoundError;
         const notFoundOnBackend = error.response && error.response.status === StatusCode.NOT_FOUND;
-        if (notFoundInDatabase || notFoundOnBackend) {
+        if (notFoundInDatabase) {
           return this.registerClient(loginData, clientInfo);
+        }
+        if (notFoundOnBackend) {
+          const shouldDeleteWholeDatabase = loadedClient.type === ClientType.TEMPORARY;
+          if (shouldDeleteWholeDatabase) {
+            return this.service!.cryptography.purgeDb().then(() => this.registerClient(loginData, clientInfo));
+          }
+          return this.service!.cryptography.deleteCryptographyStores().then(() =>
+            this.registerClient(loginData, clientInfo)
+          );
         }
         throw error;
       });
@@ -401,7 +410,11 @@ class Account extends EventEmitter {
       .then(() => this);
   }
 
-  public login(loginData: LoginData, initClient: boolean = true, clientInfo?: ClientInfo): Promise<Context> {
+  public login(
+    loginData: LoginData,
+    initClient: boolean = true,
+    clientInfo?: ClientInfo
+  ): Promise<Context | undefined> {
     return this.init()
       .then(() => LoginSanitizer.removeNonPrintableCharacters(loginData))
       .then(() => this.apiClient.login(loginData))
@@ -426,7 +439,7 @@ class Account extends EventEmitter {
         }
 
         this.context = this.apiClient.context;
-        this.service.conversation.setClientID(<string>this.context.clientId);
+        this.service.conversation.setClientID(<string>this.context!.clientId);
         return this.context;
       });
   }
