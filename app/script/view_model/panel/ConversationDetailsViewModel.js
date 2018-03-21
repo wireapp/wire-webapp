@@ -89,7 +89,7 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
     this.userName = ko.pureComputed(() => (this.firstParticipant() ? this.firstParticipant().username() : ''));
 
     this.isGuest = ko.pureComputed(() => {
-      return this.isSingleUserMode() && this.firstParticipant() && this.firstParticipant().is_guest();
+      return this.isSingleUserMode() && this.firstParticipant() && this.firstParticipant().isGuest();
     });
 
     this.isActiveParticipant = ko.pureComputed(() => {
