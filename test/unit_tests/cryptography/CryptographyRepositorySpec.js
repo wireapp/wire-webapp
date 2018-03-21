@@ -106,7 +106,31 @@ describe('z.cryptography.CryptographyRepository', () => {
 
     fit('detects duplicated messages', async done => {
       const database = TestFactory.storage_service.db;
-      await TestFactory.cryptography_repository.createCryptobox(database);
+      const preKeys = await TestFactory.cryptography_repository.createCryptobox(database);
+      const alice = TestFactory.cryptography_repository.cryptobox.identity;
+      expect(alice).toBeDefined();
+
+      const aliceBundle = Proteus.keys.PreKeyBundle.new(alice.public_key, preKeys[0]);
+
+      const bobEngine = new window.StoreEngine.MemoryEngine();
+      await bobEngine.init('bob');
+
+      const bob = new window.cryptobox.Cryptobox(bobEngine, 1);
+      await bob.create();
+
+      const message = 'Hello, Alice!';
+
+      const genericMessage = new z.proto.GenericMessage(z.util.create_random_uuid());
+      genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT, new z.proto.Text(message));
+
+      const cipherText = await bob.encrypt(
+        'session-with-alice',
+        genericMessage.toArrayBuffer(),
+        aliceBundle.serialise()
+      );
+      const encodedCiphertext = z.util.array_to_base64(cipherText);
+      expect(typeof encodedCiphertext).toBe('string');
+
       done();
     });
 
