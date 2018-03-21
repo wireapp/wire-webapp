@@ -20,7 +20,7 @@
             <textarea class="conversation-details__name conversation-details__name--input" spellcheck="false" data-bind="visible: isEditingName, value: conversationEntity().display_name(), enter: renameConversation, hasFocus: isEditingName, resize" maxlength="64" dir="auto" data-uie-name="enter-name"></textarea>
           <!-- /ko -->
           <!-- ko ifnot: isNameEditable() -->
-            <div class="conversation-details__name" data-bind="css: {'conversation-details__name--centered': conversationEntity().is_one2one() || conversationEntity().is_request()}">
+            <div class="conversation-details__name" data-bind="css: {'conversation-details__name--centered': isSingleUserMode()}">
               <div class="conversation-details__flex-row">
                 <!-- ko if: isVerified() -->
                   <verified-icon class="conversation-details__name__verified-icon" data-uie-name="status-verified-conversation"></verified-icon>
@@ -78,12 +78,12 @@
           <!-- ko if: conversationEntity().is_group() -->
             <!-- ko if: userParticipants().length -->
               <div class="conversation-details__list-head" data-bind="text: z.string.conversationDetailsPeople"></div>
-              <user-list params="user: userParticipants, click: clickOnShowParticipant, altStyle: true" data-uie-name="list-users"></user-list>
+              <user-list params="user: userParticipants, click: clickOnShowUser, altStyle: true" data-uie-name="list-users"></user-list>
             <!-- /ko -->
 
             <!-- ko if: serviceParticipants().length -->
               <div class="conversation-details__list-head" data-bind="text: z.string.conversationDetailsServices"></div>
-              <service-list params="services: serviceParticipants, click: clickOnShowParticipant, altStyle: true" data-uie-name="list-services"></service-list>
+              <service-list params="services: serviceParticipants, click: clickOnShowService, altStyle: true" data-uie-name="list-services"></service-list>
             <!-- /ko -->
           <!-- /ko -->
           <!-- ko if: isSingleUserMode() && conversationEntity().firstUserEntity() -->

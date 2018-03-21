@@ -30,25 +30,28 @@
     &--move-in--right {
       pointer-events: none;
 
-      .panel__header {
+      & > .panel__header {
         transition: opacity @animation-timing-fast @ease-out-quart;
       }
 
-      .panel__content {
+      & > .panel__content,
+      & > .panel__footer {
         transition: transform @animation-timing-fast @ease-out-expo;
       }
     }
 
     &--move-out--left,
     &--move-in--left {
-      .panel__content {
+      & > .panel__content,
+      & > .panel__footer {
         transform: translateX(304px);
       }
     }
 
     &--move-out--right,
     &--move-in--right {
-      .panel__content {
+      & > .panel__content,
+      & > .panel__footer {
         transform: translateX(-304px);
       }
     }
@@ -58,20 +61,30 @@
       position: absolute;
       width: 304px;
       top: 0;
+
+      & > .panel__header {
+        animation: @animation-timing-fast @ease-out-expo headerfadein;
+      }
     }
     &--move-out--left,
     &--move-out--right {
-      .panel__header {
+      & > .panel__header {
         opacity: 0;
       }
     }
 
-    &--move-in--left .panel__content {
-      right: 304px;
+    &--move-in--left {
+      & > .panel__content,
+      & > .panel__footer {
+        right: 304px;
+      }
     }
 
-    &--move-in--right .panel__content {
-      right: -304px;
+    &--move-in--right {
+      & > .panel__content,
+      & > .panel__footer {
+        right: -304px;
+      }
     }
 
     &--visible {
@@ -85,10 +98,12 @@
   }
 
   &__content {
+    position: relative;
     overflow: hidden;
     display: flex;
     flex-direction: column;
     transform: translateX(0);
+    flex-grow: 1;
 
     &__scroll {
       width: 100%;
@@ -196,7 +211,7 @@
     }
 
     &__title {
-      font-size: 12px;
+      font-size: 11px;
       font-weight: @font-weight-bold;
       text-transform: uppercase;
     }
@@ -204,5 +219,19 @@
     &--reverse {
       flex-direction: row-reverse;
     }
+  }
+
+  &__footer {
+    transform: translateX(0);
+    position: relative;
+  }
+}
+
+@keyframes headerfadein {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
   }
 }
