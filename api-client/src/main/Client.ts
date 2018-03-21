@@ -133,11 +133,8 @@ class Client {
   public init(): Promise<Context> {
     let context: Context;
     let accessToken: AccessTokenData;
-    return this.accessTokenStore
-      .init()
-      .then(
-        (accessToken: AccessTokenData | undefined) => (accessToken ? accessToken : this.transport.http.postAccess())
-      )
+    return this.transport.http
+      .postAccess()
       .then((createdAccessToken: AccessTokenData) => {
         context = this.createContext(createdAccessToken.user);
         accessToken = createdAccessToken;
