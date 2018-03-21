@@ -31,6 +31,13 @@
     fill: @left-color;
     width: @left-width;
 
+    &--white {
+      background-color: @app-bg;
+      color: @graphite-dark;
+      fill: @graphite-dark;
+      box-shadow: inset -1px 0 0 #eee;
+    }
+
     .team-mode & {
       width: @left-width + @teams-width;
     }

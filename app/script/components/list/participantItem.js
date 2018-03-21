@@ -28,13 +28,22 @@ z.components.ParticipantItem = class ParticipantItem {
     this.isService = this.participant instanceof z.integration.ServiceEntity || this.participant.isBot;
     this.isUser = this.participant instanceof z.entity.User && !this.participant.isBot;
     this.selfUser = window.wire.app.repository.user.self;
-    this.contentInfo = this.isService ? this.participant.summary : this.participant.username();
+    this.isTemporaryGuest = this.isUser && this.participant.isTemporaryGuest();
+
     this.mode = params.mode || z.components.UserList.MODE.DEFAULT;
     this.isDefaultMode = this.mode === z.components.UserList.MODE.DEFAULT;
     this.isOthersMode = this.mode === z.components.UserList.MODE.OTHERS;
 
     this.canSelect = params.canSelect;
     this.isSelected = params.isSelected;
+
+    if (this.isService) {
+      this.contentInfo = this.participant.summary;
+    } else if (this.isTemporaryGuest) {
+      this.contentInfo = this.participant.expirationText;
+    } else {
+      this.contentInfo = this.participant.username();
+    }
   }
 };
 
@@ -57,7 +66,7 @@ ko.components.register('participant-item', {
         <!-- /ko -->
         <div class="participant-item-content-info">
           <!-- ko if: contentInfo -->
-            <span class="participant-item-content-username label-username-notext" data-bind="text: contentInfo, css: {'label-username': isUser}" data-uie-name="status-username"></span>
+            <span class="participant-item-content-username label-username-notext" data-bind="text: contentInfo, css: {'label-username': isUser && !isTemporaryGuest}" data-uie-name="status-username"></span>
           <!-- /ko -->
         </div>
       </div>

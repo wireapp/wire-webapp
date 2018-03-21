@@ -32,7 +32,6 @@ participant-avatar {
   display: inline-block;
   transform: translateZ(0);
   user-select: none;
-  cursor: pointer;
 
   &.avatar-no-border {
     .avatar-border {
@@ -139,8 +138,8 @@ participant-avatar {
     .avatar-size(xxs);
   }
 
-  &.avatar-lg,
-  &.avatar-md {
+  &.avatar-l,
+  &.avatar-xl {
     .avatar-border {
       display: none;
     }
@@ -252,6 +251,11 @@ participant-avatar {
     border-radius: 50%;
   }
 }
+
+&.accent-color-temporary .avatar-initials {
+  color: @graphite-dark;
+}
+
 .avatar-temporary-guest-border {
   position: absolute;
 }

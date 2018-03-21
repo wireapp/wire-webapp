@@ -1,0 +1,55 @@
+.temporary-guest {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  font-weight: @font-weight-regular;
+
+  &__content {
+    flex: 1;
+    padding: 40px 32px;
+  }
+
+  &__description {
+    color: @graphite;
+    font-size: 24px;
+    line-height: 32px;
+    margin: 24px 0;
+  }
+
+  &__create-account {
+    color: @w-blue;
+    font-size: 14px;
+    cursor: pointer;
+  }
+
+  &__footer {
+    font-size: 14px;
+    height: @conversation-input-min-height;
+    color: @graphite-dark;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding: 0 16px 20px;
+
+    &__info-text {
+      line-height: 16px;
+      word-break: break-word;
+
+      &__time {
+        font-weight: @font-weight-bold;
+
+        &--urgent {
+          color: @w-red;
+        }
+      }
+    }
+
+    &__preferences {
+      display: flex;
+    }
+  }
+}

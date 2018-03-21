@@ -176,8 +176,10 @@ z.entity.User = class User {
 
     this.availability = ko.observable(z.user.AvailabilityType.NONE);
 
-    this.expirationTimestamp = ko.observable();
-    this.expirationRemaining = ko.observable();
+    this.expirationRemaining = ko.observable(0);
+    this.expirationText = ko.observable('');
+    this.expirationIsUrgent = ko.observable(false);
+    this.expirationRemainingText = ko.observable('');
     this.expirationIntervalId = undefined;
     this.isExpired = ko.observable(false);
   }
@@ -233,16 +235,42 @@ z.entity.User = class User {
       this.expirationIntervalId = undefined;
     }
 
-    this.expirationTimestamp(timestamp);
-    this.expirationRemaining(this.expirationTimestamp() - Date.now());
+    this.setRemaining(timestamp);
 
-    this.expirationIntervalId = window.setInterval(() => {
-      this.expirationRemaining(this.expirationTimestamp() - Date.now());
-    }, User.CONFIG.TEMPORARY_GUEST.EXPIRATION_INTERVAL);
+    const expirationInterval = User.CONFIG.TEMPORARY_GUEST.EXPIRATION_INTERVAL;
+    this.expirationIntervalId = window.setInterval(() => this.setRemaining(timestamp), expirationInterval);
 
     window.setTimeout(() => {
       this.isExpired(true);
       window.clearInterval(this.expirationIntervalId);
     }, this.expirationRemaining());
+  }
+
+  setRemaining(expirationTime) {
+    const timeToMinutes = 60 * 1000;
+    const timeToHours = timeToMinutes * 60;
+
+    const remainingTime = Math.max(expirationTime - Date.now(), 0);
+    const remainingMinutes = Math.ceil(remainingTime / timeToMinutes);
+
+    let timeLeftText = z.string.userRemainingTimeHours;
+    let timeValue = 0;
+
+    if (remainingMinutes <= 60) {
+      timeLeftText = z.string.userRemainingTimeMinutes;
+      timeValue = Math.ceil(remainingMinutes / 15) * 15;
+      this.expirationRemaining(timeValue * timeToMinutes);
+      this.expirationRemainingText(`${timeValue}m`);
+    } else if (remainingMinutes <= 90) {
+      timeValue = 1.5;
+      this.expirationRemaining(timeValue * timeToHours);
+      this.expirationRemainingText(`${timeValue}h`);
+    } else {
+      timeValue = Math.ceil(remainingMinutes / 60);
+      this.expirationRemaining(timeValue * timeToHours);
+      this.expirationRemainingText(`${timeValue}h`);
+    }
+    this.expirationIsUrgent(remainingMinutes < 120);
+    this.expirationText(z.l10n.text(timeLeftText, timeValue));
   }
 };

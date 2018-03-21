@@ -277,6 +277,8 @@ z.string.connectionRequestIgnore = 'Ignore';
 
 // Guests
 z.string.conversationGuestIndicator = 'Guest';
+z.string.userRemainingTimeHours = '{{time}}h left';
+z.string.userRemainingTimeMinutes = 'Less than {{time}}m left';
 
 // Conversation
 z.string.conversationYouNominative = 'you';
@@ -492,7 +494,7 @@ z.string.guestOptionsCopyLink = 'Copy link';
 z.string.guestOptionsCopyLinkDone = 'Link copied!';
 z.string.guestOptionsCreateLink = 'Create link';
 z.string.guestOptionsInfoHeader = 'Invite others with a link';
-z.string.guestOptionsInfoText = 'Anyone with the link can join the conversation for 24 hours, even if they don’t have Wire.';
+z.string.guestOptionsInfoText = 'Anyone with the link can join the conversation, even if they don’t have Wire.';
 z.string.guestOptionsRevokeLink = 'Revoke link';
 z.string.guestOptionsTitle = 'Guest options';
 
@@ -632,7 +634,7 @@ z.string.searchListNoMatches = 'No matching results.\nTry entering a different n
 // Temporary guest experience
 z.string.temporaryGuestCta = 'Create an account';
 z.string.temporaryGuestDescription = 'Secure your business with encrypted group messaging and conference calls.';
-z.string.temporaryGuestTimeRemaining = '{{time}} left in this guest room';
+z.string.temporaryGuestTimeRemaining = ' left in this guest room';
 
 z.string.temporaryGuestJoinMessage = 'This conversation will be available to you for 24 hours.';
 z.string.temporaryGuestJoinDescription = 'If you close or refresh this page, you will lose access.';
