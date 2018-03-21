@@ -52,11 +52,11 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
 
     this.availabilityLabel = ko.pureComputed(() => {
       if (this.isVisible() && this.isTeam() && this.conversationEntity().is_one2one()) {
-        const userEntity = this.conversationEntity().firstUserEntity();
-        const availabilitySetToNone = userEntity.availability() === z.user.AvailabilityType.NONE;
+        const userAvailability = this.firstParticipant() && this.firstParticipant().availability();
+        const availabilitySetToNone = userAvailability === z.user.AvailabilityType.NONE;
 
         if (!availabilitySetToNone) {
-          return z.user.AvailabilityMapper.nameFromType(userEntity.availability());
+          return z.user.AvailabilityMapper.nameFromType(userAvailability);
         }
       }
     });
@@ -78,26 +78,18 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
       }
     });
 
+    this.firstParticipant = ko.pureComputed(() => {
+      return this.conversationEntity() && this.conversationEntity().firstUserEntity();
+    });
     this.isSingleUserMode = ko.pureComputed(() => {
       if (this.hasConversation()) {
         return this.conversationEntity().is_one2one() || this.conversationEntity().is_request();
       }
     });
-    this.userName = ko.pureComputed(() => {
-      if (this.hasConversation()) {
-        const userEntity = this.conversationEntity().firstUserEntity();
-        return userEntity.username();
-      }
-    });
+    this.userName = ko.pureComputed(() => (this.firstParticipant() ? this.firstParticipant().username() : ''));
 
     this.isGuest = ko.pureComputed(() => {
-      return (
-        this.hasConversation() &&
-        this.isSingleUserMode() &&
-        this.conversationEntity()
-          .firstUserEntity()
-          .is_guest()
-      );
+      return this.isSingleUserMode() && this.firstParticipant() && this.firstParticipant().is_guest();
     });
 
     this.isActiveParticipant = ko.pureComputed(() => {
@@ -129,9 +121,8 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
 
     this.showActionAddParticipants = ko.pureComputed(() => this.conversationEntity().is_group());
     this.showActionBlock = ko.pureComputed(() => {
-      if (this.isSingleUserMode()) {
-        const userEntity = this.conversationEntity().firstUserEntity();
-        return userEntity.is_connected() || userEntity.is_request();
+      if (this.isSingleUserMode() && this.firstParticipant()) {
+        return this.firstParticipant().is_connected() || this.firstParticipant().is_request();
       }
     });
     this.showActionCreateGroup = ko.pureComputed(() => this.conversationEntity().is_one2one());
@@ -140,9 +131,8 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
       return !this.conversationEntity().is_request() && !this.conversationEntity().is_cleared();
     });
     this.showActionDevices = ko.pureComputed(() => {
-      if (this.conversationEntity().is_one2one()) {
-        const userEntity = this.conversationEntity().firstUserEntity();
-        return userEntity.is_connected() || userEntity.is_team_member();
+      if (this.conversationEntity().is_one2one() && this.firstParticipant()) {
+        return this.firstParticipant().is_connected() || this.firstParticipant().is_team_member();
       }
     });
     this.showActionGuestOptions = ko.pureComputed(() => this.conversationEntity().inTeam());
@@ -185,13 +175,11 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
   }
 
   clickOnCreateGroup() {
-    const userEntity = this.conversationEntity().firstUserEntity();
-    amplify.publish(z.event.WebApp.CONVERSATION.CREATE_GROUP, 'conversation_details', userEntity);
+    amplify.publish(z.event.WebApp.CONVERSATION.CREATE_GROUP, 'conversation_details', this.firstParticipant());
   }
 
   clickOnDevices() {
-    const userEntity = this.conversationEntity().firstUserEntity();
-    this.panelViewModel.showParticipantDevices(userEntity);
+    this.panelViewModel.showParticipantDevices(this.firstParticipant());
   }
 
   clickOnGuestOptions() {
