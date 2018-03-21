@@ -11,6 +11,11 @@ export default class MemoryEngine implements CRUDEngine {
     return Promise.resolve();
   }
 
+  purge(): Promise<void> {
+    delete this.stores[this.storeName];
+    return Promise.resolve();
+  }
+
   private prepareTable(tableName: string) {
     if (!this.stores[this.storeName][tableName]) {
       this.stores[this.storeName][tableName] = {};

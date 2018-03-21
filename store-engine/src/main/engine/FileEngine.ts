@@ -17,6 +17,10 @@ export default class FileEngine implements CRUDEngine {
     return Promise.resolve(storeName);
   }
 
+  purge(): Promise<void> {
+    return fs.rmdir(this.storeName);
+  }
+
   private resolvePath(tableName: string, primaryKey?: string): Promise<string> {
     const isPathTraversal = (...testPaths: string[]): boolean => {
       for (let testPath of testPaths) {

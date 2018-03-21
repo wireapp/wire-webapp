@@ -9,6 +9,11 @@ export default class LocalStorageEngine implements CRUDEngine {
     return Promise.resolve();
   }
 
+  purge(): Promise<void> {
+    window.localStorage.clear();
+    return Promise.resolve();
+  }
+
   public create<T>(tableName: string, primaryKey: string, entity: T): Promise<string> {
     if (entity) {
       const key: string = `${this.storeName}@${tableName}@${primaryKey}`;
