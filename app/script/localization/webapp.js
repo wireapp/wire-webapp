@@ -117,13 +117,17 @@ z.string.modalConfirmSecondary = 'Cancel';
 z.string.modalOptionSecondary = 'Cancel';
 
 // Modals content
+z.string.modalAccountCreateAction = 'OK';
+z.string.modalAccountCreateHeadline = 'Create an account?';
+z.string.modalAccountCreateMessage = 'By creating an account you will lose the conversation history in this guest room.';
+
 z.string.modalAccountDeletionAction = 'Delete';
 z.string.modalAccountDeletionHeadline = 'Delete account';
 z.string.modalAccountDeletionMessage = 'We will send a message via email or SMS. Follow the link to permanently delete your account.';
 
-z.string.modalaccountLeaveGuestRoomAction = 'Leave';
-z.string.modalaccountLeaveGuestRoomHeadline = 'Leave the guest room?';
-z.string.modalaccountLeaveGuestRoomMessage = 'Conversation history will be deleted. To keep it, create an account next time.';
+z.string.modalAccountLeaveGuestRoomAction = 'Leave';
+z.string.modalAccountLeaveGuestRoomHeadline = 'Leave the guest room?';
+z.string.modalAccountLeaveGuestRoomMessage = 'Conversation history will be deleted. To keep it, create an account next time.';
 
 z.string.modalAccountLogoutAction = 'Log out';
 z.string.modalAccountLogoutHeadline = 'Clear Data?';
@@ -541,7 +545,7 @@ z.string.preferencesAccountAvaibilityUnset = 'Set a status';
 z.string.preferencesAccountCreateTeam = 'Create a team';
 z.string.preferencesAccountDelete = 'Delete account';
 z.string.preferencesAccountLeaveGuestRoom = 'Leave the guest room';
-z.string.preferencesAccountLeaveGuestRoomDescription = 'You will no longer be able to access the messages in this conversation';
+z.string.preferencesAccountLeaveGuestRoomDescription = 'You will no longer be able to access the messages in this conversation.';
 z.string.preferencesAccountLogOut = 'Log out';
 z.string.preferencesAccountManageTeam = 'Manage team';
 z.string.preferencesAccountResetPassword = 'Reset password';

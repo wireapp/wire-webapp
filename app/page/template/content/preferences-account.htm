@@ -3,7 +3,7 @@
   <div class="preferences-content-wrapper">
     <div class="preferences-content" data-bind="antiscroll">
       <section class="preferences-section preferences-section-account-profile">
-        <div class="preferences-account-user-data">
+        <div class="preferences-account-user-data" data-bind="css: {'preferences-account-user-data-temporary': !isActivatedAccount()}">
           <!-- ko if: isActivatedAccount() -->
             <div class="preferences-account-name-wrapper">
               <input class="preferences-account-name preferences-account-input"
@@ -53,46 +53,53 @@
 
             <div class="preferences-account-mail" data-bind="text: selfUser().email()" data-uie-name="enter-email"></div>
             <div class="preferences-account-phone" data-bind="text: selfUser().phone()" data-uie-name="enter-phone"></div>
+            <accent-color-picker class="preferences-account-accent-color preferences-section-account-space-before" params="user: selfUser(), selected: changeAccentColor" data-uie-name="enter-accent-color"></accent-color-picker>
           <!-- /ko -->
 
           <!-- ko ifnot: isActivatedAccount() -->
             <div class="preferences-account-name-wrapper">
               <div class="preferences-account-name" data-bind="text: name" data-uie-name="status-name"></div>
             </div>
+            <hr class="preferences-separator">
+            <div class="preferences-link text-theme" data-bind="click: clickOnLeaveGuestRoom, l10n_text: z.string.preferencesAccountLeaveGuestRoom" data-uie-name="do-leave-guest-room"></div>
+            <div class="preferences-leave-disclaimer" data-bind="l10n_text: z.string.preferencesAccountLeaveGuestRoomDescription"></div>
           <!-- /ko -->
-
-          <accent-color-picker class="preferences-account-accent-color preferences-section-account-space-before" params="user: selfUser(), selected: changeAccentColor" data-uie-name="enter-accent-color"></accent-color-picker>
         </div>
 
-        <label class="preferences-account-picture-button" for="self-upload-file-input" data-bind="l10n_tooltip: z.string.tooltipPreferencesPicture">
-          <participant-avatar params="participant: selfUser, size: z.components.ParticipantAvatar.SIZE.X_LARGE"></participant-avatar>
-          <input id="self-upload-file-input"
-                 type="file"
-                 data-bind="attr: {accept: z.viewModel.content.PreferencesAccountViewModel.CONFIG.PROFILE_IMAGE.FILE_TYPES.join(',')}, file_select: clickOnChangePicture"
-                 data-uie-name="do-select-picture"/>
-          <span class="icon-camera"></span>
-        </label>
-      </section>
-
-      <section class="preferences-section preferences-section-account-security">
-        <hr class="preferences-separator">
-        <!-- ko if: isTeamManager() -->
-          <div class="preferences-link text-theme" data-bind="click: clickOnManage, l10n_text: z.string.preferencesAccountManageTeam" data-uie-name="do-manage-team"></div>
-        <!-- /ko -->
-
         <!-- ko if: isActivatedAccount() -->
-          <div class="preferences-link text-theme" data-bind="click: clickOnCreate, l10n_text: z.string.preferencesAccountCreateTeam" data-uie-name="do-create-team"></div>
-          <div class="preferences-link text-theme" data-bind="click: clickOnResetPassword, l10n_text: z.string.preferencesAccountResetPassword, l10n_tooltip: z.string.tooltipPreferencesPassword" data-uie-name="do-reset-password"></div>
-          <!-- ko ifnot: isTeam() -->
-            <div class="preferences-link text-theme" data-bind="click: clickOnDeleteAccount, l10n_text: z.string.preferencesAccountDelete" data-uie-name="go-delete-account"></div>
-          <!-- /ko -->
+          <label class="preferences-account-picture-button" for="self-upload-file-input" data-bind="l10n_tooltip: z.string.tooltipPreferencesPicture">
+            <participant-avatar params="participant: selfUser, size: z.components.ParticipantAvatar.SIZE.X_LARGE"></participant-avatar>
+            <input id="self-upload-file-input"
+                  type="file"
+                  data-bind="attr: {accept: z.viewModel.content.PreferencesAccountViewModel.CONFIG.PROFILE_IMAGE.FILE_TYPES.join(',')}, file_select: clickOnChangePicture"
+                  data-uie-name="do-select-picture"/>
+            <span class="icon-camera"></span>
+          </label>
         <!-- /ko -->
 
         <!-- ko ifnot: isActivatedAccount() -->
-          <div class="preferences-link text-theme" data-bind="click:clickOnLeaveGuestRoom, l10n_text: z.string.preferencesAccountLeaveGuestRoom" data-uie-name="do-leave-guest-room"></div>
-          <div data-bind="l10n_text: z.string.preferencesAccountLeaveGuestRoomDescription"></div>
+          <div>
+            <participant-avatar params="participant: selfUser, size: z.components.ParticipantAvatar.SIZE.X_LARGE"></participant-avatar>
+          </div>
         <!-- /ko -->
       </section>
+
+      <!-- ko if: isActivatedAccount() -->
+        <section class="preferences-section preferences-section-account-security">
+          <hr class="preferences-separator">
+
+          <!-- ko if: isTeamManager() -->
+            <div class="preferences-link text-theme" data-bind="click: clickOnManage, l10n_text: z.string.preferencesAccountManageTeam" data-uie-name="do-manage-team"></div>
+          <!-- /ko -->
+
+          <div class="preferences-link text-theme" data-bind="click: clickOnCreate, l10n_text: z.string.preferencesAccountCreateTeam" data-uie-name="do-create-team"></div>
+          <div class="preferences-link text-theme" data-bind="click: clickOnResetPassword, l10n_text: z.string.preferencesAccountResetPassword, l10n_tooltip: z.string.tooltipPreferencesPassword" data-uie-name="do-reset-password"></div>
+
+          <!-- ko ifnot: isTeam() -->
+            <div class="preferences-link text-theme" data-bind="click: clickOnDeleteAccount, l10n_text: z.string.preferencesAccountDelete" data-uie-name="go-delete-account"></div>
+          <!-- /ko -->
+        </section>
+      <!-- /ko -->
 
       <!-- ko if: isActivatedAccount() && !z.util.Environment.desktop -->
         <section class="preferences-section">

@@ -253,14 +253,14 @@
       <!-- /ko -->
       <!-- ko if: $parent.selfUser().isTemporaryGuest() -->
         <div class="message-group-creation-header">
-          <div data-bind="l10n_text: z.string.temporaryGuestJoinMessage"></div>
-          <div data-bind="l10n_text: z.string.temporaryGuestJoinDescription"></div>
+          <div class="message-group-creation-temporary-message" data-bind="l10n_text: z.string.temporaryGuestJoinMessage"></div>
+          <div class="message-group-creation-temporary-description" data-bind="l10n_text: z.string.temporaryGuestJoinDescription"></div>
         </div>
       <!-- /ko -->
     <!-- /ko -->
 
     <!-- ko if:  message.isMemberLeave() && message.user().is_me && $parent.selfUser().isTemporaryGuest() -->
-      <div data-bind="l10n_text: z.string.temporaryGuestLeaveDescription"></div>
+      <div class="message-group-creation-temporary-description" data-bind="l10n_text: z.string.temporaryGuestLeaveDescription"></div>
     <!-- /ko -->
   <!-- /ko -->
 </script>
