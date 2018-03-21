@@ -27,7 +27,7 @@
               </div>
             <!-- /ko -->
             <!-- ko if: isTemporaryGuest () -->
-              <div class="conversation-details__guest-expiration" data-bind="text: selectedParticipant().expirationText"></div>
+              <div class="conversation-details__guest-expiration" data-bind="text: selectedParticipant().expirationText" data-uie-name="status-expiration-text"></div>
             <!-- /ko -->
             <!-- ko if: isTeam() -->
               <availability-state
