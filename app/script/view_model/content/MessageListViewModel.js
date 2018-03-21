@@ -136,10 +136,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
 
     this.showInvitePeople = ko.pureComputed(() => {
       return (
-        !this.conversation().removed_from_conversation() &&
-        !this.conversation().is_guest() &&
-        this.conversation().inTeam() &&
-        this.conversation().isGuestRoom()
+        this.conversation().isActiveParticipant() && this.conversation().inTeam() && this.conversation().isGuestRoom()
       );
     });
 

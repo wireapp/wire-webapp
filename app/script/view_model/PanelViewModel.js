@@ -120,13 +120,16 @@ z.viewModel.PanelViewModel = class PanelViewModel {
   }
 
   closePanel() {
-    if (!this.isAnimating()) {
-      this.isAnimating(true);
-      return this.mainViewModel.closePanel().then(() => {
-        this.isAnimating(false);
-        this.isVisible(false);
-      });
+    if (this.isAnimating()) {
+      return Promise.resolve(false);
     }
+
+    this.isAnimating(true);
+    return this.mainViewModel.closePanel().then(() => {
+      this.isAnimating(false);
+      this.isVisible(false);
+      return true;
+    });
   }
 
   closePanelOnChange() {
@@ -236,20 +239,15 @@ z.viewModel.PanelViewModel = class PanelViewModel {
   }
 
   togglePanel(addPeople = false) {
-    const conversationEntity = this.conversationEntity();
-    const canAddPeople = conversationEntity
-      ? !conversationEntity.is_guest() && !conversationEntity.removed_from_conversation()
-      : false;
-
+    const canAddPeople = this.conversationEntity() && this.conversationEntity().isActiveParticipant();
     if (addPeople && canAddPeople) {
       if (this.addParticipantsVisible()) {
         return this.closePanel();
       }
 
-      if (conversationEntity.is_group()) {
-        return this._openPanel(PanelViewModel.STATE.ADD_PARTICIPANTS);
-      }
-      return this.conversationDetails.clickOnCreateGroup();
+      return this.conversationEntity().is_group()
+        ? this._openPanel(PanelViewModel.STATE.ADD_PARTICIPANTS)
+        : this.conversationDetails.clickOnCreateGroup();
     }
 
     if (this.conversationDetailsVisible()) {
@@ -279,20 +277,29 @@ z.viewModel.PanelViewModel = class PanelViewModel {
 
   _hidePanel(state, newState) {
     switch (state) {
-      case PanelViewModel.STATE.ADD_PARTICIPANTS:
-        if (newState !== PanelViewModel.STATE.ADD_SERVICE) {
+      case PanelViewModel.STATE.ADD_PARTICIPANTS: {
+        const isStateAddService = newState === PanelViewModel.STATE.ADD_SERVICE;
+        if (!isStateAddService) {
           this.addParticipants.resetView();
         }
         break;
-      case PanelViewModel.STATE.GROUP_PARTICIPANT_USER:
+      }
+
+      case PanelViewModel.STATE.GROUP_PARTICIPANT_USER: {
         this.groupParticipantUser.resetView();
         break;
-      case PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE:
+      }
+
+      case PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE: {
         this.groupParticipantService.resetView();
         break;
-      case PanelViewModel.STATE.PARTICIPANT_DEVICES:
+      }
+
+      case PanelViewModel.STATE.PARTICIPANT_DEVICES: {
         this.participantDevices.resetView();
         break;
+      }
+
       default:
         break;
     }
