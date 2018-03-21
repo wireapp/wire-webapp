@@ -378,13 +378,16 @@ class Account extends EventEmitter {
         const notFoundInDatabase =
           error instanceof cryptobox.error.CryptoboxError || error instanceof RecordNotFoundError;
         const notFoundOnBackend = error.response && error.response.status === StatusCode.NOT_FOUND;
+
         if (notFoundInDatabase) {
           return this.registerClient(loginData, clientInfo);
         }
         if (notFoundOnBackend) {
           const shouldDeleteWholeDatabase = loadedClient.type === ClientType.TEMPORARY;
           if (shouldDeleteWholeDatabase) {
-            return this.service!.cryptography.purgeDb().then(() => this.registerClient(loginData, clientInfo));
+            return this.service!.cryptography.purgeDb()
+              .then(() => this.apiClient.init())
+              .then(() => this.registerClient(loginData, clientInfo));
           }
           return this.service!.cryptography.deleteCryptographyStores().then(() =>
             this.registerClient(loginData, clientInfo)
