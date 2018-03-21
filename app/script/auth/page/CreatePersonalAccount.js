@@ -57,7 +57,7 @@ class CreatePersonalAccount extends React.PureComponent {
       })
       .then(() => {
         const link = document.createElement('a');
-        link.href = pathWithParams(EXTERNAL_ROUTE.LOGIN, 'reason=registration');
+        link.href = pathWithParams(EXTERNAL_ROUTE.WEBAPP);
         document.body.appendChild(link); // workaround for Firefox
         link.click();
       })
