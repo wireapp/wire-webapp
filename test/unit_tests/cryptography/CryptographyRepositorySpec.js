@@ -104,7 +104,7 @@ describe('z.cryptography.CryptographyRepository', () => {
       TestFactory.storage_repository.clearStores();
     });
 
-    fit('detects duplicated messages', async done => {
+    it('detects duplicated messages', async done => {
       const database = TestFactory.storage_service.db;
       const preKeys = await TestFactory.cryptography_repository.createCryptobox(database);
       const alice = TestFactory.cryptography_repository.cryptobox.identity;
@@ -118,10 +118,10 @@ describe('z.cryptography.CryptographyRepository', () => {
       const bob = new window.cryptobox.Cryptobox(bobEngine, 1);
       await bob.create();
 
-      const message = 'Hello, Alice!';
+      const plainText = 'Hello, Alice!';
 
       const genericMessage = new z.proto.GenericMessage(z.util.create_random_uuid());
-      genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT, new z.proto.Text(message));
+      genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT, new z.proto.Text(plainText));
 
       const cipherText = await bob.encrypt(
         'session-with-alice',
@@ -129,7 +129,17 @@ describe('z.cryptography.CryptographyRepository', () => {
         aliceBundle.serialise()
       );
       const encodedCiphertext = z.util.array_to_base64(cipherText);
-      expect(typeof encodedCiphertext).toBe('string');
+
+      const mockedEvent = {
+        data: {
+          text: encodedCiphertext,
+        },
+        from: z.util.create_random_uuid(),
+        id: z.util.create_random_uuid,
+      };
+
+      const decrypted = await TestFactory.cryptography_repository.handleEncryptedEvent(mockedEvent);
+      expect(decrypted.data.content).toBe(plainText);
 
       done();
     });
