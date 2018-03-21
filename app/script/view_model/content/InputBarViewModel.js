@@ -138,7 +138,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
         const isOne2OneConversation = this.conversationEntity().is_one2one();
         const firstUserEntity = this.conversationEntity().firstUserEntity();
         const availabilityIsNone = firstUserEntity.availability() === z.user.AvailabilityType.NONE;
-        return this.selfUser().is_team_member() && isOne2OneConversation && !availabilityIsNone;
+        return this.selfUser().inTeam() && isOne2OneConversation && !availabilityIsNone;
       }
 
       return false;
