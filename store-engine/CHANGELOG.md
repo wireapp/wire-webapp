@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="0.4.0"></a>
+# [0.4.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/compare/@wireapp/store-engine@0.3.9...@wireapp/store-engine@0.4.0) (2018-03-21)
+
+
+### Features
+
+* **store-engine:** Add "purge" to delete the database ([#393](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/issues/393)) ([37a0b10](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/commit/37a0b10))
+
+
+
+
 <a name="0.3.9"></a>
 ## [0.3.9](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/compare/@wireapp/store-engine@0.3.8...@wireapp/store-engine@0.3.9) (2018-03-20)
 
