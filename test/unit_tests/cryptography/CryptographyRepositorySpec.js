@@ -100,6 +100,16 @@ describe('z.cryptography.CryptographyRepository', () => {
   });
 
   describe('handleEncryptedEvent', () => {
+    afterEach(() => {
+      TestFactory.storage_repository.clearStores();
+    });
+
+    fit('detects duplicated messages', async done => {
+      const database = TestFactory.storage_service.db;
+      await TestFactory.cryptography_repository.createCryptobox(database);
+      done();
+    });
+
     it('detects a session reset request', done => {
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
       const event = {
@@ -120,7 +130,7 @@ describe('z.cryptography.CryptographyRepository', () => {
         .catch(done.fail);
     });
 
-    it('only accept reasonable sized payload (text key)', done => {
+    it('only accepts reasonable sized payloads (text key)', done => {
       // Length of this message is 1 320 024 while the maximum is 150% of 12 000 (18 000)
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
       const text = window.btoa(`https://wir${'\u0000\u0001\u0000\u000D\u0000A'.repeat(165000)}e.com/`);
@@ -142,7 +152,7 @@ describe('z.cryptography.CryptographyRepository', () => {
         .catch(done.fail);
     });
 
-    it('only accept reasonable sized payload (data key)', done => {
+    it('only accepts reasonable sized payloads (data key)', done => {
       // Length of this message is 1 320 024 while the maximum is 150% of 12 000 (18 000)
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
       const data = window.btoa(`https://wir${'\u0000\u0001\u0000\u000D\u0000A'.repeat(165000)}e.com/`);
