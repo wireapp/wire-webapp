@@ -8,12 +8,13 @@ z.telemetry.calling.CallLogger = class CallLogger extends z.util.Logger {
   }
 
   static get CONFIG() {
-    return {
-      IPV4: /(([0-1]?[0-9]{1,2}\.)|(2[0-4][0-9]\.)|(25[0-5]\.)){3}(([0-1]?[0-9]{1,2})|(2[0-4][0-9])|(25[0-5]))/,
-      IPV6: /(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))/,
-      MESSAGE_LOG_LENGTH: 10000,
-      OBFUSCATION_TRUNCATE_TO: 4,
-    };
+    return Object.assign(
+      {
+        IPV4: /(([0-1]?[0-9]{1,2}\.)|(2[0-4][0-9]\.)|(25[0-5]\.)){3}(([0-1]?[0-9]{1,2})|(2[0-4][0-9])|(25[0-5]))/,
+        IPV6: /(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))/,
+      },
+      window.z.config.TELEMETRY.CALLING
+    );
   }
 
   obfuscate(string) {
@@ -31,12 +32,12 @@ z.telemetry.calling.CallLogger = class CallLogger extends z.util.Logger {
       if (CallLogger.CONFIG.IPV4.test(ip)) {
         // IPv4
         ip = ip.split('.');
-        ip[ip.length - 1] = '0';
+        ip[ip.length - 1] = CallLogger.CONFIG.IPV4_OBFUSCATED_STRING;
         return ip.join('.');
       } else if (CallLogger.CONFIG.IPV6.test(ip)) {
         // IPv6
         ip = ip.split(':').slice(0, 3);
-        return [...ip, '0000', '0000', '0000', '0000'].join(':');
+        return [...ip, CallLogger.CONFIG.IPV6_OBFUSCATED_STRING].join(':');
       }
     } else if (this.obfuscationMode === 'hard') {
       if (CallLogger.CONFIG.IPV4.test(ip)) {
@@ -108,20 +109,20 @@ z.telemetry.calling.CallLogger = class CallLogger extends z.util.Logger {
         typeof decodedSdpMessage.media[index].fingerprint !== 'undefined' &&
         typeof decodedSdpMessage.media[index].fingerprint.hash !== 'undefined'
       ) {
-        decodedSdpMessage.media[index].fingerprint.hash =
-          'XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX';
+        decodedSdpMessage.media[index].fingerprint.hash = CallLogger.CONFIG.FINGERPRINT_OBFUSCATED_STRING;
       }
 
       // Remove ice password
       if (typeof decodedSdpMessage.media[index].icePwd !== 'undefined') {
-        decodedSdpMessage.media[index].icePwd = 'XXXXXXXXXXXXXXXXXXXXXXXX';
+        decodedSdpMessage.media[index].icePwd = CallLogger.CONFIG.ICE_PASSWORD_OBFUSCATED_STRING;
       }
 
       // Remove KASE public key (for receiving side)
       if (typeof decodedSdpMessage.media[index].invalid !== 'undefined') {
         for (const indexInvalid in decodedSdpMessage.media[index].invalid) {
           if (decodedSdpMessage.media[index].invalid[indexInvalid].value.startsWith('x-KASEv1')) {
-            decodedSdpMessage.media[index].invalid[indexInvalid].value = 'x-KASEv1:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX';
+            decodedSdpMessage.media[index].invalid[indexInvalid].value =
+              CallLogger.CONFIG.KASE_PUBLIC_KEY_OBFUSCATED_STRING;
           }
         }
       }
