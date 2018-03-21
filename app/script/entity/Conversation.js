@@ -56,10 +56,10 @@ z.entity.Conversation = class Conversation {
     this.firstUserEntity = ko.pureComputed(() => this.participating_user_ets()[0]);
     this.availabilityOfUser = ko.pureComputed(() => this.firstUserEntity() && this.firstUserEntity().availability());
 
-    this.is_guest = ko.observable(false);
+    this.isGuest = ko.observable(false);
     this.is_managed = false;
 
-    this.inTeam = ko.pureComputed(() => this.team_id && !this.is_guest());
+    this.inTeam = ko.pureComputed(() => this.team_id && !this.isGuest());
     this.isGuestRoom = ko.pureComputed(() => this.accessState() === z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM);
     this.isTeamOnly = ko.pureComputed(() => this.accessState() === z.conversation.ACCESS_STATE.TEAM.TEAM_ONLY);
 
@@ -116,9 +116,10 @@ z.entity.Conversation = class Conversation {
     });
 
     this.status = ko.observable(z.conversation.ConversationStatus.CURRENT_MEMBER);
-    this.removed_from_conversation = ko.pureComputed(
-      () => this.status() === z.conversation.ConversationStatus.PAST_MEMBER
-    );
+    this.removed_from_conversation = ko.pureComputed(() => {
+      return this.status() === z.conversation.ConversationStatus.PAST_MEMBER;
+    });
+    this.isActiveParticipant = ko.pureComputed(() => !this.removed_from_conversation() && !this.isGuest());
 
     this.removed_from_conversation.subscribe(is_removed => {
       if (!is_removed) {
@@ -243,7 +244,7 @@ z.entity.Conversation = class Conversation {
       this.archived_timestamp,
       this.cleared_timestamp,
       this.ephemeral_timer,
-      this.is_guest,
+      this.isGuest,
       this.last_event_timestamp,
       this.last_read_timestamp,
       this.last_server_timestamp,
@@ -636,7 +637,7 @@ z.entity.Conversation = class Conversation {
       cleared_timestamp: this.cleared_timestamp(),
       ephemeral_timer: this.ephemeral_timer(),
       id: this.id,
-      is_guest: this.is_guest(),
+      is_guest: this.isGuest(),
       is_managed: this.is_managed,
       last_event_timestamp: this.last_event_timestamp(),
       last_read_timestamp: this.last_read_timestamp(),

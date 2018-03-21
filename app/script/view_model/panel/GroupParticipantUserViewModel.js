@@ -45,8 +45,8 @@ z.viewModel.panel.GroupParticipantUserViewModel = class GroupParticipantUserView
 
     this.selectedParticipant = ko.observable(undefined);
 
-    this.isTeam = ko.pureComputed(() => this.selectedParticipant().is_team_member());
-    this.isGuest = ko.pureComputed(() => this.selectedParticipant().is_guest());
+    this.isTeam = ko.pureComputed(() => this.selectedParticipant().isTeamMember());
+    this.isGuest = ko.pureComputed(() => this.selectedParticipant().isGuest());
     this.isTemporaryGuest = ko.pureComputed(() => this.selectedParticipant().isTemporaryGuest());
 
     this.isVisible = ko.pureComputed(() => {
@@ -54,7 +54,7 @@ z.viewModel.panel.GroupParticipantUserViewModel = class GroupParticipantUserView
     });
 
     this.selectedIsConnected = ko.pureComputed(() => {
-      return this.selectedParticipant().is_connected() || this.selectedParticipant().is_team_member();
+      return this.selectedParticipant().is_connected() || this.selectedParticipant().isTeamMember();
     });
     this.selectedIsInConversation = ko.pureComputed(() => {
       if (this.isVisible()) {
@@ -63,10 +63,8 @@ z.viewModel.panel.GroupParticipantUserViewModel = class GroupParticipantUserView
       }
     });
 
-    this.selfIsActiveMember = ko.pureComputed(() => {
-      if (this.isVisible()) {
-        return !this.conversationEntity().removed_from_conversation() && !this.conversationEntity().is_guest();
-      }
+    this.selfIsActiveParticipant = ko.pureComputed(() => {
+      return this.isVisible() ? this.conversationEntity().isActiveParticipant() : false;
     });
 
     this.showActionsIncomingRequest = ko.pureComputed(() => this.selectedParticipant().is_incoming_request());
@@ -79,11 +77,11 @@ z.viewModel.panel.GroupParticipantUserViewModel = class GroupParticipantUserView
     this.showActionOpenConversation = ko.pureComputed(() => {
       return this.selectedIsConnected() && !this.selectedParticipant().is_me;
     });
-    this.showActionRemove = ko.pureComputed(() => this.selfIsActiveMember() && this.selectedIsInConversation());
+    this.showActionRemove = ko.pureComputed(() => this.selfIsActiveParticipant() && this.selectedIsInConversation());
     this.showActionSelfProfile = ko.pureComputed(() => this.selectedParticipant().is_me);
     this.showActionSendRequest = ko.pureComputed(() => {
       const isNotConnectedUser = this.selectedParticipant().is_canceled() || this.selectedParticipant().is_unknown();
-      const canConnect = !this.selectedParticipant().is_team_member() && !this.selectedParticipant().isTemporaryGuest();
+      const canConnect = !this.selectedParticipant().isTeamMember() && !this.selectedParticipant().isTemporaryGuest();
       return isNotConnectedUser && canConnect;
     });
     this.showActionLeave = ko.pureComputed(() => {

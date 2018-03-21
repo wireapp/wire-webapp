@@ -71,7 +71,7 @@ z.team.TeamMapper = class TeamMapper {
     if (permissions) {
       const teamRole = z.team.TeamRole.checkRole(permissions);
       this.logger.info(`Identified user '${userEntity.id}' as '${teamRole}'`, permissions);
-      userEntity.team_role(teamRole);
+      userEntity.teamRole(teamRole);
     }
   }
 
