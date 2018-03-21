@@ -111,7 +111,7 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
           return 'self';
         case typeof params.selected === 'function' && params.selected():
           return 'selected';
-        case this.participant().is_team_member():
+        case this.participant().isTeamMember():
           return '';
         case this.participant().is_blocked():
           return 'blocked';

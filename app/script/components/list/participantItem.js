@@ -55,13 +55,13 @@ ko.components.register('participant-item', {
       </div>
 
       <div class="participant-item-content">
-        <!-- ko if: isUser && selfUser().is_team_member() -->
+        <!-- ko if: isUser && selfUser().inTeam() -->
           <availability-state class="participant-item-content-availability participant-item-content-name"
             data-uie-name="status-name"
             params="availability: participant.availability, label: participant.name"></availability-state>
         <!-- /ko -->
 
-        <!-- ko if: isService || !selfUser().is_team_member() -->
+        <!-- ko if: isService || !selfUser().inTeam() -->
           <div class="participant-item-content-name" data-bind="text: participant.name" data-uie-name="status-name"></div>
         <!-- /ko -->
         <div class="participant-item-content-info">
@@ -75,7 +75,7 @@ ko.components.register('participant-item', {
         <verified-icon></verified-icon>
       <!-- /ko -->
 
-      <!-- ko if: isUser && !isOthersMode && participant.is_guest() -->
+      <!-- ko if: isUser && !isOthersMode && participant.isGuest() -->
         <guest-icon class="participant-item-guest-indicator" data-uie-name="status-guest"></guest-icon>
       <!-- /ko -->
       <!-- ko if: canSelect -->
