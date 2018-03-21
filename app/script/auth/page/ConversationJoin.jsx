@@ -125,7 +125,8 @@ class ConversationJoin extends Component {
         .then(name => name.trim())
         .then(name => this.props.doRegisterWireless({expires_in: this.state.expiresIn, name}))
         .then(() => this.props.doJoinConversationByCode(this.state.conversationKey, this.state.conversationCode))
-        .then(() => window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP)));
+        .then(() => window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP)))
+        .catch(error => this.props.doLogout());
     }
     this.nameInput.focus();
   };
