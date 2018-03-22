@@ -25,6 +25,7 @@ export default {
   CREATE_ACCOUNT: '/createaccount',
   CREATE_TEAM: '/createteam',
   CREATE_TEAM_ACCOUNT: '/createteamaccount',
+  HISTORY_INFO: '/historyinfo',
   INDEX: '/',
   INITIAL_INVITE: '/teaminvite',
   INVITE: '/invite',

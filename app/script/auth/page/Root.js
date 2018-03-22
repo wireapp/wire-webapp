@@ -31,6 +31,7 @@ import ChooseHandle from './ChooseHandle';
 import ClientManager from './ClientManager';
 import ConversationJoinInvalid from './ConversationJoinInvalid';
 import Verify from './Verify';
+import HistoryInfo from './HistoryInfo';
 import {IntlProvider, addLocaleData} from 'react-intl';
 import {connect} from 'react-redux';
 import de from 'react-intl/locale-data/de';
@@ -80,6 +81,7 @@ class Root extends React.Component {
               <Route path={ROUTE.VERIFY} component={Verify} />
               <Route path={ROUTE.INITIAL_INVITE} component={InitialInvite} />
               <Route path={ROUTE.CHOOSE_HANDLE} component={ChooseHandle} />
+              <Route path={ROUTE.HISTORY_INFO} component={HistoryInfo} />
               <Redirect to={ROUTE.INDEX} />
             </Switch>
           </Router>
