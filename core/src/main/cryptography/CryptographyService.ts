@@ -17,6 +17,7 @@
  *
  */
 
+import APIClient = require('@wireapp/api-client');
 import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine/index';
 import {Cryptobox, store as CryptoboxStore} from '@wireapp/cryptobox';
 import {Decoder, Encoder} from 'bazinga64';
@@ -24,8 +25,9 @@ import {RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/index';
 import {UserPreKeyBundleMap} from '@wireapp/api-client/dist/commonjs/user/index';
 import * as ProteusKeys from '@wireapp/proteus/dist/keys/root';
 import {PreKey as SerializedPreKey} from '@wireapp/api-client/dist/commonjs/auth/index';
-import {SessionPayloadBundle} from '../cryptography/root';
 import CryptographyDatabaseRepository from './CryptographyDatabaseRepository';
+import {SessionPayloadBundle} from '../cryptography/root';
+import {ClientService} from '../client/root';
 import {OTRRecipients} from '@wireapp/api-client/dist/commonjs/conversation/index';
 
 export interface MetaClient extends RegisteredClient {
@@ -39,7 +41,7 @@ export default class CryptographyService {
   public cryptobox: Cryptobox;
   private database: CryptographyDatabaseRepository;
 
-  constructor(private storeEngine: CRUDEngine) {
+  constructor(private apiClient: APIClient, private storeEngine: CRUDEngine, private clientService: ClientService) {
     this.cryptobox = new Cryptobox(this.storeEngine);
     this.database = new CryptographyDatabaseRepository(this.storeEngine);
   }
@@ -100,10 +102,6 @@ export default class CryptographyService {
     return recipients;
   }
 
-  public deleteClient(): Promise<string> {
-    return this.database.deleteClient(CryptoboxStore.CryptoboxCRUDStore.KEYS.LOCAL_IDENTITY);
-  }
-
   private async encryptPayloadForSession(
     sessionId: string,
     plainText: Uint8Array,
@@ -126,23 +124,9 @@ export default class CryptographyService {
     return {sessionId, encryptedPayload};
   }
 
-  public async loadClient(): Promise<RegisteredClient> {
+  public async loadLocalClient(): Promise<RegisteredClient> {
     const initialPreKeys: Array<ProteusKeys.PreKey> = await this.cryptobox.load();
-
-    return this.database.loadClient(CryptoboxStore.CryptoboxCRUDStore.KEYS.LOCAL_IDENTITY);
-  }
-
-  public saveClient(client: RegisteredClient): Promise<string> {
-    const clientWithMeta: MetaClient = {
-      ...client,
-      meta: {primary_key: CryptoboxStore.CryptoboxCRUDStore.KEYS.LOCAL_IDENTITY, is_verified: true},
-    };
-
-    return this.database.saveClient(CryptoboxStore.CryptoboxCRUDStore.KEYS.LOCAL_IDENTITY, clientWithMeta);
-  }
-
-  public purgeDb(): Promise<void> {
-    return this.database.purgeDb();
+    return this.clientService.getLocalClient();
   }
 
   public deleteCryptographyStores(): Promise<boolean[]> {

@@ -37,7 +37,7 @@ describe('CryptographyService', () => {
   let bob;
 
   beforeEach(async done => {
-    cryptography = new CryptographyService(await createEngine('wire'));
+    cryptography = new CryptographyService(undefined, await createEngine('wire'), undefined);
     cryptography.cryptobox
       .create()
       .then(async preKeys => {

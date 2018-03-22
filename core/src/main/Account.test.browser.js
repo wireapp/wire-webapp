@@ -62,6 +62,7 @@ describe('Account', () => {
 
       try {
         await account.init();
+        account.service.client.synchronizeClients = () => Promise.resolve();
         await apiClient.initEngine(context);
         storeName = engine.storeName;
         await account.initClient(context);

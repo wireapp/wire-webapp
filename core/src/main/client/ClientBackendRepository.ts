@@ -17,10 +17,13 @@
  *
  */
 
-import CryptographyService from './CryptographyService';
-import GenericMessageType from './GenericMessageType';
-import PayloadBundle from './PayloadBundle';
-import SessionPayloadBundle from './SessionPayloadBundle';
-import EncryptedAsset from './EncryptedAsset';
+import APIClient = require('@wireapp/api-client');
+import {RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/index';
 
-export {CryptographyService, EncryptedAsset, GenericMessageType, PayloadBundle, SessionPayloadBundle};
+export default class ClientBackendRepository {
+  constructor(private apiClient: APIClient) {}
+
+  public getClients(): Promise<RegisteredClient[]> {
+    return this.apiClient.client.api.getClients();
+  }
+}
