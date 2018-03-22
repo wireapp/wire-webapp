@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="2.1.11"></a>
+## [2.1.11](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.1.10...@wireapp/core@2.1.11) (2018-03-22)
+
+
+### Bug Fixes
+
+* **core:** Synchronize clients after client registration ([#405](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/405)) ([e85e0ea](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/e85e0ea))
+
+
+
+
 <a name="2.1.10"></a>
 ## [2.1.10](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.1.9...@wireapp/core@2.1.10) (2018-03-22)
 
