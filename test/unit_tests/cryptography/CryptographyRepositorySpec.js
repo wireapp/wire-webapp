@@ -135,7 +135,7 @@ describe('z.cryptography.CryptographyRepository', () => {
           text: encodedCipherText,
         },
         from: z.util.create_random_uuid(),
-        id: z.util.create_random_uuid,
+        id: z.util.create_random_uuid(),
       };
 
       const decrypted = await TestFactory.cryptography_repository.handleEncryptedEvent(mockedEvent);
