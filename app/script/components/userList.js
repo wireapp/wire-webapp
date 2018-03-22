@@ -75,7 +75,9 @@ z.components.UserList = class UserList {
         if (normalizedQuery) {
           const trimmedQuery = this.filter().trim();
           const isHandle = trimmedQuery.startsWith('@') && z.user.UserHandleGenerator.validate_handle(normalizedQuery);
-          const excludedEmojis = Array.from(normalizedQuery).filter(char => EMOJI_UNICODE_RANGES.includes(char));
+          const excludedEmojis = Array.from(normalizedQuery).filter(char => {
+            return z.util.EmojiUtil.UNICODE_RANGES.includes(char);
+          });
           return this.userEntities().filter(userEntity => {
             return userEntity.matches(normalizedQuery, isHandle, excludedEmojis);
           });

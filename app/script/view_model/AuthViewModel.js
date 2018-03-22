@@ -152,7 +152,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
     this.code_expiration_timestamp.subscribe(timestamp => {
       this.code_expiration_in(moment.unix(timestamp).fromNow());
       this.code_interval_id = window.setInterval(() => {
-        if (timestamp <= z.util.get_unix_timestamp()) {
+        if (timestamp <= z.util.TimeUtil.getUnixTimestamp()) {
           window.clearInterval(this.code_interval_id);
           return this.code_expiration_timestamp(0);
         }
@@ -171,7 +171,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
       return !this.disabled_by_animation() && this.country_code().length > 1 && this.phone_number().length;
     });
     this.can_resend_code = ko.pureComputed(() => {
-      return !this.disabled_by_animation() && this.code_expiration_timestamp() < z.util.get_unix_timestamp();
+      return !this.disabled_by_animation() && this.code_expiration_timestamp() < z.util.TimeUtil.getUnixTimestamp();
     });
     this.can_resend_verification = ko.pureComputed(() => !this.disabled_by_animation() && this.username().length);
     this.can_verify_password = ko.pureComputed(() => !this.disabled_by_animation() && this.password().length);
@@ -210,7 +210,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
     this.posted_mode_verify = ko.pureComputed(() => this.posted_mode() === z.auth.AuthView.MODE.POSTED_VERIFY);
 
     // Debugging
-    if (z.util.Environment.frontend.is_localhost()) {
+    if (z.util.Environment.frontend.isLocalhost()) {
       const live_reload = document.createElement('script');
       live_reload.id = 'live_reload';
       live_reload.src = 'http://localhost:32123/livereload.js';
@@ -237,7 +237,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
     this._init_page();
 
     // Select country based on location of user IP
-    this.country_code((z.util.CountryCodes.get_country_code($('[name=geoip]').attr('country')) || 1).toString());
+    this.country_code((z.util.CountryCodes.getCountryCode($('[name=geoip]').attr('country')) || 1).toString());
     this.changed_country_code();
 
     this.audio_repository.init();
@@ -278,7 +278,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
   }
 
   _init_url_parameter() {
-    const mode = z.util.get_url_parameter(z.auth.URLParameter.MODE);
+    const mode = z.util.URLUtil.getParameter(z.auth.URLParameter.MODE);
     if (mode) {
       const isExpectedMode = mode === z.auth.AuthView.MODE.ACCOUNT_LOGIN;
       if (isExpectedMode) {
@@ -287,7 +287,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
       }
     }
 
-    const reason = z.util.get_url_parameter(z.auth.URLParameter.REASON);
+    const reason = z.util.URLUtil.getParameter(z.auth.URLParameter.REASON);
     switch (reason) {
       case z.auth.SIGN_OUT_REASON.ACCOUNT_DELETED:
         this.reason_info(z.l10n.text(z.string.authAccountDeletion));
@@ -353,7 +353,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
    */
   _check_database(current_hash) {
     return z.util
-      .check_indexed_db()
+      .checkIndexedDb()
       .then(() => {
         if (current_hash === z.auth.AuthView.MODE.BLOCKED_DATABASE) {
           this._set_hash();
@@ -440,8 +440,8 @@ z.viewModel.AuthViewModel = class AuthViewModel {
   _login_from_teams() {
     this.pending_server_request(true);
 
-    z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.PERSIST, true);
-    z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.SHOW_LOGIN, true);
+    z.util.StorageUtil.setValue(z.storage.StorageKey.AUTH.PERSIST, true);
+    z.util.StorageUtil.setValue(z.storage.StorageKey.AUTH.SHOW_LOGIN, true);
 
     this.auth.repository
       .getAccessToken()
@@ -528,9 +528,9 @@ z.viewModel.AuthViewModel = class AuthViewModel {
       const _on_code_request_success = response => {
         window.clearInterval(this.code_interval_id);
         if (response.expires_in) {
-          this.code_expiration_timestamp(z.util.get_unix_timestamp() + response.expires_in);
+          this.code_expiration_timestamp(z.util.TimeUtil.getUnixTimestamp() + response.expires_in);
         } else if (!response.label) {
-          this.code_expiration_timestamp(z.util.get_unix_timestamp() + z.config.LOGIN_CODE_EXPIRATION);
+          this.code_expiration_timestamp(z.util.TimeUtil.getUnixTimestamp() + z.config.LOGIN_CODE_EXPIRATION);
         }
         this._set_hash(z.auth.AuthView.MODE.VERIFY_CODE);
         this.pending_server_request(false);
@@ -716,12 +716,12 @@ z.viewModel.AuthViewModel = class AuthViewModel {
           password: this.password(),
         };
 
-        const phone = z.util.phone_number_to_e164(username, this.country() || navigator.language);
-        if (z.util.is_valid_email(username)) {
+        const phone = z.util.phoneNumberToE164(username, this.country() || navigator.language);
+        if (z.util.isValidEmail(username)) {
           payload.email = username;
-        } else if (z.util.is_valid_username(username)) {
+        } else if (z.util.isValidUsername(username)) {
           payload.handle = username.replace('@', '');
-        } else if (z.util.is_valid_phone_number(phone)) {
+        } else if (z.util.isValidPhoneNumber(phone)) {
           payload.phone = phone;
         }
         break;
@@ -769,7 +769,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
     this.clear_error(z.auth.AuthView.TYPE.PHONE);
 
     const country = event ? event.currentTarget.value || undefined : this.country();
-    this.country_code(`+${z.util.CountryCodes.get_country_code(country)}`);
+    this.country_code(`+${z.util.CountryCodes.getCountryCode(country)}`);
     $('#wire-login-phone').focus();
   }
 
@@ -781,7 +781,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
 
     if (country_code) {
       this.country_code(`+${country_code}`);
-      country_iso = z.util.CountryCodes.get_country_by_code(country_code) || 'X1';
+      country_iso = z.util.CountryCodes.getCountryByCode(country_code) || 'X1';
     } else {
       this.country_code('');
       country_iso = 'X0';
@@ -833,7 +833,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
   }
 
   clicked_on_password() {
-    z.util.safe_window_open(z.util.URLUtil.build_url(z.util.URLUtil.TYPE.ACCOUNT, z.config.URL_PATH.PASSWORD_RESET));
+    z.util.safeWindowOpen(z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.ACCOUNT, z.config.URL_PATH.PASSWORD_RESET));
   }
 
   clicked_on_resend_code() {
@@ -870,7 +870,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
 
   clicked_on_wire_link() {
     const path = z.l10n.text(z.string.urlWebsiteRoot);
-    z.util.safe_window_open(z.util.URLUtil.build_url(z.util.URLUtil.TYPE.WEBSITE, path));
+    z.util.safeWindowOpen(z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.WEBSITE, path));
   }
 
   keydown_auth(keyboard_event) {
@@ -1583,7 +1583,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
       return this._add_error(z.string.authErrorEmailMissing, z.auth.AuthView.TYPE.EMAIL);
     }
 
-    if (!z.util.is_valid_email(username)) {
+    if (!z.util.isValidEmail(username)) {
       this._add_error(z.string.authErrorEmailMalformed, z.auth.AuthView.TYPE.EMAIL);
     }
   }
@@ -1645,7 +1645,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
    * @returns {undefined} No return value
    */
   _validate_phone() {
-    if (!z.util.is_valid_phone_number(this.phone_number_e164())) {
+    if (!z.util.isValidPhoneNumber(this.phone_number_e164())) {
       this._add_error(z.string.authErrorPhoneNumberInvalid, z.auth.AuthView.TYPE.PHONE);
     }
   }
@@ -1664,12 +1664,8 @@ z.viewModel.AuthViewModel = class AuthViewModel {
       return this._add_error(z.string.authErrorEmailMissing, z.auth.AuthView.TYPE.EMAIL);
     }
 
-    const phone = z.util.phone_number_to_e164(username, this.country() || navigator.language);
-    if (
-      !z.util.is_valid_email(username) &&
-      !z.util.is_valid_username(username) &&
-      !z.util.is_valid_phone_number(phone)
-    ) {
+    const phone = z.util.phoneNumberToE164(username, this.country() || navigator.language);
+    if (!z.util.isValidEmail(username) && !z.util.isValidUsername(username) && !z.util.isValidPhoneNumber(phone)) {
       this._add_error(z.string.authErrorEmailMalformed, z.auth.AuthView.TYPE.EMAIL);
     }
   }
@@ -1697,7 +1693,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
    */
   _append_existing_parameters(url) {
     AuthViewModel.CONFIG.FORWARDED_URL_PARAMETERS.forEach(parameter_name => {
-      url = z.util.forward_url_parameter(url, parameter_name);
+      url = z.util.URLUtil.forwardParameter(url, parameter_name);
     });
 
     return url;

@@ -42,7 +42,7 @@ z.team.TeamService = class TeamService {
   getTeamById(teamId) {
     return this.client.send_request({
       type: 'GET',
-      url: this.client.create_url(`TeamService.URL.TEAMS)/${teamId}`),
+      url: this.client.create_url(`${TeamService.URL.TEAMS}/${teamId}`),
     });
   }
 

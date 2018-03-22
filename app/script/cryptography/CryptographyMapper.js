@@ -285,7 +285,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
           throw new Error('Not all expected properties defined');
         }
 
-        const cipherText = z.util.base64_to_array(eventData.data).buffer;
+        const cipherText = z.util.base64ToArray(eventData.data).buffer;
         const keyBytes = new Uint8Array(otrKey.toArrayBuffer()).buffer;
         const referenceSha256 = new Uint8Array(sha256.toArrayBuffer()).buffer;
 
@@ -321,7 +321,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
 
   _mapImageMedium(image, eventId) {
     // set ID even if asset id is missing
-    eventId = eventId || z.util.create_random_uuid();
+    eventId = eventId || z.util.createRandomUuid();
 
     return {
       data: {

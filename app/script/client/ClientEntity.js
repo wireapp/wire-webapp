@@ -69,7 +69,7 @@ z.client.ClientEntity = class ClientEntity {
    * @returns {Array<string>} Client ID in pairs of two as an array
    */
   formatId() {
-    return z.util.zero_padding(this.id, 16).match(/.{1,2}/g);
+    return z.util.zeroPadding(this.id, 16).match(/.{1,2}/g);
   }
 
   /**

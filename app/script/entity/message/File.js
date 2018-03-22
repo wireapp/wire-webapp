@@ -122,7 +122,7 @@ z.entity.File = class File extends z.entity.Asset {
     const download_started = Date.now();
 
     return this.load()
-      .then(blob => z.util.download_blob(blob, this.file_name))
+      .then(blob => z.util.downloadBlob(blob, this.file_name))
       .then(() => {
         const download_duration = (Date.now() - download_started) / 1000;
         this.logger.info(`Downloaded asset in ${download_duration} seconds`);

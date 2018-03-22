@@ -132,7 +132,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     });
 
     this.sorted_conversations = ko.pureComputed(() => {
-      return this.filtered_conversations().sort(z.util.sort_groups_by_last_event);
+      return this.filtered_conversations().sort(z.util.sortGroupsByLastEvent);
     });
 
     this.receiving_queue = new z.util.PromiseQueue({name: 'ConversationRepository.Receiving'});
@@ -682,22 +682,22 @@ z.conversation.ConversationRepository = class ConversationRepository {
         }
 
         if (is_handle) {
-          if (z.util.StringUtil.compare_transliteration(conversation_et.display_name(), `@${query}`)) {
+          if (z.util.StringUtil.compareTransliteration(conversation_et.display_name(), `@${query}`)) {
             return true;
           }
 
           for (const user_et of conversation_et.participating_user_ets()) {
-            if (z.util.StringUtil.starts_with(user_et.username(), query)) {
+            if (z.util.StringUtil.startsWith(user_et.username(), query)) {
               return true;
             }
           }
         } else {
-          if (z.util.StringUtil.compare_transliteration(conversation_et.display_name(), query)) {
+          if (z.util.StringUtil.compareTransliteration(conversation_et.display_name(), query)) {
             return true;
           }
 
           for (const user_et of conversation_et.participating_user_ets()) {
-            if (z.util.StringUtil.compare_transliteration(user_et.name(), query)) {
+            if (z.util.StringUtil.compareTransliteration(user_et.name(), query)) {
               return true;
             }
           }
@@ -705,7 +705,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return false;
       })
       .sort((conversation_a, conversation_b) => {
-        return z.util.StringUtil.sort_by_priority(conversation_a.display_name(), conversation_b.display_name(), query);
+        return z.util.StringUtil.sortByPriority(conversation_a.display_name(), conversation_b.display_name(), query);
       });
   }
 
@@ -731,7 +731,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Conversation} Next conversation
    */
   get_next_conversation(conversation_et) {
-    return z.util.ArrayUtil.get_next_item(this.conversations_unarchived(), conversation_et);
+    return z.util.ArrayUtil.getNextItem(this.conversations_unarchived(), conversation_et);
   }
 
   /**
@@ -993,7 +993,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {undefined} No return value
    */
   save_conversations(conversation_ets) {
-    z.util.ko_array_push_all(this.conversations, conversation_ets);
+    z.util.koArrayPushAll(this.conversations, conversation_ets);
   }
 
   /**
@@ -1154,7 +1154,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     if (timestamp && conversation_et.set_timestamp(timestamp, z.conversation.TIMESTAMP_TYPE.CLEARED)) {
       const message_content = new z.proto.Cleared(conversation_et.id, timestamp);
-      const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
+      const generic_message = new z.proto.GenericMessage(z.util.createRandomUuid());
       generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.CLEARED, message_content);
 
       this.send_generic_message_to_conversation(this.self_conversation().id, generic_message).then(() =>
@@ -1252,7 +1252,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       tag = z.l10n.text(z.string.extensionsGiphyRandom);
     }
 
-    return z.util.load_url_blob(url).then(blob => {
+    return z.util.loadUrlBlob(url).then(blob => {
       this.send_text(z.l10n.text(z.string.extensionsGiphyMessage, tag), conversation_et);
       return this.upload_images(conversation_et, [blob]);
     });
@@ -1477,7 +1477,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     if (timestamp && conversation_et.set_timestamp(timestamp, z.conversation.TIMESTAMP_TYPE.LAST_READ)) {
       const message_content = new z.proto.LastRead(conversation_et.id, conversation_et.last_read_timestamp());
-      const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
+      const generic_message = new z.proto.GenericMessage(z.util.createRandomUuid());
       generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.LAST_READ, message_content);
 
       this.send_generic_message_to_conversation(this.self_conversation().id, generic_message)
@@ -1577,7 +1577,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return asset;
       })
       .then(asset => {
-        let generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
+        let generic_message = new z.proto.GenericMessage(z.util.createRandomUuid());
         generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, asset);
 
         if (conversation_et.ephemeral_timer()) {
@@ -1669,7 +1669,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       message_et.timestamp() >= Date.now() - ConversationRepository.CONFIG.CONFIRMATION_THRESHOLD;
 
     if (other_user_in_one2one && within_threshold && z.event.EventTypeHandling.CONFIRM.includes(message_et.type)) {
-      const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
+      const generic_message = new z.proto.GenericMessage(z.util.createRandomUuid());
       const confirmation = new z.proto.Confirmation(z.proto.Confirmation.Type.DELIVERED, message_et.id);
       generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.CONFIRMATION, confirmation);
 
@@ -1697,7 +1697,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when the confirmation was sent
    */
   send_e_call(conversation_et, call_message_et, recipients, precondition_option) {
-    const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
+    const generic_message = new z.proto.GenericMessage(z.util.createRandomUuid());
     generic_message.set(
       z.cryptography.GENERIC_MESSAGE_TYPE.CALLING,
       new z.proto.Calling(call_message_et.toContentString())
@@ -1747,7 +1747,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return this.asset_service
       .uploadImageAsset(image, options)
       .then(asset => {
-        let genericMessage = new z.proto.GenericMessage(z.util.create_random_uuid());
+        let genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
         genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, asset);
 
         if (conversationEntity.ephemeral_timer()) {
@@ -1769,7 +1769,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves after sending the knock
    */
   send_knock(conversation_et) {
-    let generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
+    let generic_message = new z.proto.GenericMessage(z.util.createRandomUuid());
     generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.KNOCK, new z.proto.Knock(false));
 
     if (conversation_et.ephemeral_timer()) {
@@ -1854,7 +1854,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves after sending the location
    */
   send_location(conversation_et, longitude, latitude, name, zoom) {
-    const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
+    const generic_message = new z.proto.GenericMessage(z.util.createRandomUuid());
     generic_message.set(
       z.cryptography.GENERIC_MESSAGE_TYPE.LOCATION,
       new z.proto.Location(longitude, latitude, name, zoom)
@@ -1875,7 +1875,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       return Promise.reject(new Error('Edited message equals original message'));
     }
 
-    const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
+    const generic_message = new z.proto.GenericMessage(z.util.createRandomUuid());
     generic_message.set(
       z.cryptography.GENERIC_MESSAGE_TYPE.EDITED,
       new z.proto.MessageEdit(original_message_et.id, new z.proto.Text(message))
@@ -1920,7 +1920,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves after sending the reaction
    */
   send_reaction(conversation_et, message_et, reaction) {
-    const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
+    const generic_message = new z.proto.GenericMessage(z.util.createRandomUuid());
     generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.REACTION, new z.proto.Reaction(reaction, message_et.id));
 
     return this._send_and_inject_generic_message(conversation_et, generic_message);
@@ -1939,7 +1939,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves after sending the session reset
    */
   send_session_reset(user_id, client_id, conversation_id) {
-    const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
+    const generic_message = new z.proto.GenericMessage(z.util.createRandomUuid());
     generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.CLIENT_ACTION, z.proto.ClientAction.RESET_SESSION);
 
     const recipients = {};
@@ -1964,7 +1964,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves after sending the message
    */
   send_text(message, conversation_et) {
-    let generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
+    let generic_message = new z.proto.GenericMessage(z.util.createRandomUuid());
     generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT, new z.proto.Text(message));
 
     if (conversation_et.ephemeral_timer()) {
@@ -2142,12 +2142,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     return z.assets.AssetCrypto.encryptAesAsset(genericMessage.toArrayBuffer())
       .then(({cipherText, keyBytes, sha256}) => {
-        const genericMessageExternal = new z.proto.GenericMessage(z.util.create_random_uuid());
+        const genericMessageExternal = new z.proto.GenericMessage(z.util.createRandomUuid());
         const externalMessage = new z.proto.External(new Uint8Array(keyBytes), new Uint8Array(sha256));
         genericMessageExternal.set('external', externalMessage);
 
         return this.cryptography_repository.encryptGenericMessage(recipients, genericMessageExternal).then(payload => {
-          payload.data = z.util.array_to_base64(cipherText);
+          payload.data = z.util.arrayToBase64(cipherText);
           payload.native_push = nativePush;
           return this._sendEncryptedMessage(conversationId, genericMessage, payload, preconditionOption);
         });
@@ -2319,7 +2319,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
             }
 
             const userNames = z.util.LocalizerUtil.joinNames(userEntities, z.string.Declension.NOMINATIVE);
-            const titleSubstitutions = z.util.StringUtil.capitalize_first_char(userNames);
+            const titleSubstitutions = z.util.StringUtil.capitalizeFirstChar(userNames);
 
             switch (consentType) {
               case ConversationRepository.CONSENT_TYPE.INCOMING_CALL: {
@@ -2458,7 +2458,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_USER);
         }
 
-        const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
+        const generic_message = new z.proto.GenericMessage(z.util.createRandomUuid());
         generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.DELETED, new z.proto.MessageDelete(message_et.id));
 
         return this.sending_queue.push(() => {
@@ -2492,7 +2492,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   delete_message(conversation_et, message_et) {
     return Promise.resolve()
       .then(() => {
-        const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
+        const generic_message = new z.proto.GenericMessage(z.util.createRandomUuid());
         generic_message.set(
           z.cryptography.GENERIC_MESSAGE_TYPE.HIDDEN,
           new z.proto.MessageHide(conversation_et.id, message_et.id)

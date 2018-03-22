@@ -90,6 +90,17 @@ z.assets.AssetRemoteData = class AssetRemoteData {
   }
 
   /**
+   * Get object url for asset remote data. URLs are cached in memory.
+   * @returns {Promise<string>} Object URL for asset
+   */
+  getObjectUrl() {
+    const objectUrl = z.assets.AssetURLCache.getUrl(this.identifier);
+    return objectUrl
+      ? Promise.resolve(objectUrl)
+      : this.load().then(blob => z.assets.AssetURLCache.setUrl(this.identifier, window.URL.createObjectURL(blob)));
+  }
+
+  /**
    * Loads and decrypts stored asset
    * @returns {Promise<Blob>} Resolves with the decrypted asset data
    */
@@ -104,34 +115,36 @@ z.assets.AssetRemoteData = class AssetRemoteData {
         }
         return buffer;
       })
-      .then(plaintext => new Blob([new Uint8Array(plaintext)], {mime_type: type}));
-  }
+      .then(plaintext => new Blob([new Uint8Array(plaintext)], {mime_type: type}))
+      .catch(error => {
+        const expectedErrors = [
+          z.service.BackendClientError.STATUS_CODE.NOT_FOUND.toString(),
+          z.service.BackendClientError.STATUS_CODE.INTERNAL_SERVER_ERROR.toString(),
+        ];
 
-  /**
-   * Get object url for asset remote data. URLs are cached in memory.
-   * @returns {Promise<string>} Object URL for asset
-   */
-  get_object_url() {
-    const object_url = z.assets.AssetURLCache.getUrl(this.identifier);
-    if (object_url) {
-      return Promise.resolve(object_url);
-    }
-
-    return this.load().then(blob => z.assets.AssetURLCache.setUrl(this.identifier, window.URL.createObjectURL(blob)));
+        const isExpectedError = expectedErrors.includes(error.message);
+        if (!isExpectedError) {
+          throw error;
+        }
+      });
   }
 
   _loadBuffer() {
     return this.generateUrl()
       .then(generatedUrl => {
-        return z.util.load_url_buffer(generatedUrl, xhr => {
+        return z.util.loadUrlBuffer(generatedUrl, xhr => {
           xhr.onprogress = event => this.downloadProgress(Math.round(event.loaded / event.total * 100));
           this.cancelDownload = () => xhr.abort.call(xhr);
         });
       })
       .catch(error => {
-        if (error instanceof z.util.ValidationUtilError) {
-          this.logger.error(`Failed to validate an asset URL (_load_buffer). Error: ${error.message}`);
-        }
+        const isValidationUtilError = error instanceof z.util.ValidationUtilError;
+        const message = isValidationUtilError
+          ? `Failed to validate an asset URL (_load_buffer): ${error.message}`
+          : `Failed to load asset: ${error.message || error}`;
+
+        this.logger.error(message);
+
         throw error;
       });
   }

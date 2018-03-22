@@ -26,7 +26,7 @@ describe('z.cryptography.CryptographyRepository', () => {
 
   beforeAll(done => {
     z.util.protobuf
-      .load_protos('ext/proto/generic-message-proto/messages.proto')
+      .loadProtos('ext/proto/generic-message-proto/messages.proto')
       .then(() => test_factory.exposeCryptographyActors())
       .then(done)
       .catch(done.fail);
@@ -78,7 +78,7 @@ describe('z.cryptography.CryptographyRepository', () => {
         })
       );
 
-      const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
+      const generic_message = new z.proto.GenericMessage(z.util.createRandomUuid());
       generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT, new z.proto.Text('Unit test'));
 
       const recipients = {};

@@ -41,4 +41,26 @@ describe('z.util.TimeUtil', () => {
       expect(z.util.TimeUtil.formatMilliseconds(1000 * 60 * 60 * 24 * 3)).toEqual({unit: 'd', value: 3});
     });
   });
+
+  describe('formatSeconds', () => {
+    it('should format seconds', () => {
+      expect(z.util.TimeUtil.formatSeconds(50)).toBe('00:50');
+    });
+
+    it('should format minutes and seconds', () => {
+      expect(z.util.TimeUtil.formatSeconds(110)).toBe('01:50');
+    });
+
+    it('should format hours, minutes and seconds', () => {
+      expect(z.util.TimeUtil.formatSeconds(3630)).toBe('1:00:30');
+    });
+
+    it('should format 0 seconds', () => {
+      expect(z.util.TimeUtil.formatSeconds(0)).toBe('00:00');
+    });
+
+    it('should format undefined as 00:00', () => {
+      expect(z.util.TimeUtil.formatSeconds()).toBe('00:00');
+    });
+  });
 });

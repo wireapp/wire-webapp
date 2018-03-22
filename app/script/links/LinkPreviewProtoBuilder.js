@@ -41,7 +41,7 @@ z.links.LinkPreviewProtoBuilder = {
         const article = new z.proto.Article(data.url, data.title, data.description); // deprecated format
         const linkPreview = new z.proto.LinkPreview(url, offset, article, data.url, data.title, data.description);
 
-        if (data.site_name === 'Twitter' && z.util.ValidationUtil.urls.is_tweet(data.url)) {
+        if (data.site_name === 'Twitter' && z.util.ValidationUtil.urls.isTweet(data.url)) {
           const author = data.title.replace('on Twitter', '').trim();
           const username = data.url.match(/com\/([^/]*)\//)[1];
           const tweet = new z.proto.Tweet(author, username);

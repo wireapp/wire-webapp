@@ -151,7 +151,7 @@ z.viewModel.MainViewModel = class MainViewModel {
           z.util.afterRender(() => {
             const scrollToBottom = !isNarrowScreen && this.content.messageList.should_scroll_to_bottom;
             if (scrollToBottom) {
-              $('.messages-wrap').scroll_to_bottom();
+              $('.messages-wrap').scrollToBottom();
             }
           });
           resolve();

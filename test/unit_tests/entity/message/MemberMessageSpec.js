@@ -30,42 +30,42 @@ describe('Message Entities', () => {
     });
 
     it('can return correct string for more then one users', () => {
-      const user_a = new z.entity.User(z.util.create_random_uuid());
+      const user_a = new z.entity.User(z.util.createRandomUuid());
       user_a.name('John');
       message_et.userEntities.push(user_a);
       expect(message_et._generateNameString()).toBe('John');
     });
 
     it('can return correct string for more then one users', () => {
-      const user_a = new z.entity.User(z.util.create_random_uuid());
+      const user_a = new z.entity.User(z.util.createRandomUuid());
       user_a.name('John');
-      const user_b = new z.entity.User(z.util.create_random_uuid());
+      const user_b = new z.entity.User(z.util.createRandomUuid());
       user_b.name('Jim');
       message_et.userEntities.push(user_a, user_b);
       expect(message_et._generateNameString()).toBe('Jim and John');
     });
 
     it('can return correct string for more then one users', () => {
-      const user_a = new z.entity.User(z.util.create_random_uuid());
+      const user_a = new z.entity.User(z.util.createRandomUuid());
       user_a.name('John');
-      const user_b = new z.entity.User(z.util.create_random_uuid());
+      const user_b = new z.entity.User(z.util.createRandomUuid());
       user_b.name('Jim');
-      const user_c = new z.entity.User(z.util.create_random_uuid());
+      const user_c = new z.entity.User(z.util.createRandomUuid());
       user_c.name('Jill');
       message_et.userEntities.push(user_a, user_b, user_c);
       expect(message_et._generateNameString()).toBe('Jill, Jim, and John');
     });
 
     it('can return correct string for more then one users without sender', () => {
-      const user_sender = new z.entity.User(z.util.create_random_uuid());
+      const user_sender = new z.entity.User(z.util.createRandomUuid());
       user_sender.name('Sender');
       message_et.user(user_sender);
 
-      const user_a = new z.entity.User(z.util.create_random_uuid());
+      const user_a = new z.entity.User(z.util.createRandomUuid());
       user_a.name('John');
-      const user_b = new z.entity.User(z.util.create_random_uuid());
+      const user_b = new z.entity.User(z.util.createRandomUuid());
       user_b.name('Jim');
-      const user_c = new z.entity.User(z.util.create_random_uuid());
+      const user_c = new z.entity.User(z.util.createRandomUuid());
       user_c.name('Jill');
       message_et.userEntities.push(user_sender, user_a, user_b, user_c);
       expect(message_et._generateNameString()).toBe('Jill, Jim, and John');

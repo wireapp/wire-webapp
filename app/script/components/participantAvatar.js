@@ -89,7 +89,7 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
     this.dispose = this.dispose.bind(this);
 
     this.element.attr({
-      id: z.util.create_random_uuid(),
+      id: z.util.createRandomUuid(),
       'user-id': this.participant().id,
     });
 
@@ -98,7 +98,7 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
         return '';
       }
       if (this.element.hasClass('avatar-xs')) {
-        return z.util.StringUtil.get_first_character(this.participant().initials());
+        return z.util.StringUtil.getFirstChar(this.participant().initials());
       }
       return this.participant().initials();
     });
@@ -156,11 +156,10 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
 
         const pictureResource = this.participant().previewPictureResource();
         if (pictureResource) {
-          const {LARGE, X_LARGE} = ParticipantAvatar.SIZE;
-          const isSmall = this.size !== LARGE && this.size !== X_LARGE;
+          const isSmall = this.size !== ParticipantAvatar.SIZE.LARGE && this.size !== ParticipantAvatar.SIZE.X_LARGE;
           const isCached = pictureResource.downloadProgress() === 100;
 
-          pictureResource.get_object_url().then(url => {
+          pictureResource.getObjectUrl().then(url => {
             const image = new Image();
             image.src = url;
             this.element.find('.avatar-image').html(image);

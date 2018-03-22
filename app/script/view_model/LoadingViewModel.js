@@ -57,7 +57,7 @@ z.viewModel.LoadingViewModel = class LoadingViewModel {
 
         case z.string.initDecryption:
         case z.string.initEvents: {
-          if (z.util.Environment.frontend.is_production()) {
+          if (z.util.Environment.frontend.isProduction()) {
             updatedLoadingMessage = z.l10n.text(messageLocator);
             break;
           }
