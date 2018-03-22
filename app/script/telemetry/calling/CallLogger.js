@@ -196,10 +196,10 @@ z.telemetry.calling.CallLogger = class CallLogger extends z.util.Logger {
         const obfuscatedMessage = z.util.StringUtil.format(message, ...data.obfuscated);
         args[1] = defaultMessage;
 
-        this.logToMemory(logLevel, obfuscatedMessage);
+        this.logToMemory(logLevel(), obfuscatedMessage);
       }
     } else {
-      this.logToMemory(logLevel, logMessage);
+      this.logToMemory(logLevel(), logMessage);
     }
     return super._print_log(args);
   }
