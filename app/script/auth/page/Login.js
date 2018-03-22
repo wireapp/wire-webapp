@@ -77,8 +77,9 @@ class Login extends React.PureComponent {
     const conversationKey = nextProps.match.params.conversationKey;
 
     const keyAndCodeExistent = conversationKey && conversationCode;
-    const keyOrCodeChanged =
-      conversationCode !== this.state.conversationCode || conversationKey !== this.state.conversationKey;
+    const keyChanged = conversationKey !== this.state.conversationKey;
+    const codeChanged = conversationCode !== this.state.conversationCode;
+    const keyOrCodeChanged = keyChanged || codeChanged;
     if (keyAndCodeExistent && keyOrCodeChanged) {
       Promise.resolve()
         .then(() => {
@@ -127,16 +128,16 @@ class Login extends React.PureComponent {
       .then(() => {
         const {email, password, persist} = this.state;
         const login = {password, persist};
-        if (email.indexOf('@') > 0) {
+        if (email.includes('@')) {
           login.email = email;
         } else {
           login.handle = email.replace('@', '');
         }
 
-        if (this.state.conversationCode && this.state.conversationKey) {
-          return this.props.doLoginAndJoin(login, this.state.conversationKey, this.state.conversationCode);
-        }
-        return this.props.doLogin(login);
+        const hasKeyAndCode = this.state.conversationKey && this.state.conversationCode;
+        return hasKeyAndCode
+          ? this.props.doLoginAndJoin(login, this.state.conversationKey, this.state.conversationCode)
+          : this.props.doLogin(login);
       })
       .then(() => window.location.replace(URLUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP)))
       .catch(error => {
@@ -256,7 +257,7 @@ class Login extends React.PureComponent {
                   </Link>
                 </Column>
                 <Column>
-                  <Link href={ROUTE.PHONE_LOGIN + window.location.search} data-uie-name="go-sign-in-phone">
+                  <Link href={EXTERNAL_ROUTE.PHONE_LOGIN + window.location.search} data-uie-name="go-sign-in-phone">
                     {_(loginStrings.phoneLogin)}
                   </Link>
                 </Column>
