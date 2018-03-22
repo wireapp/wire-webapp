@@ -35,7 +35,7 @@ z.entity.DecryptErrorMessage = class DecryptErrorMessage extends z.entity.Messag
     this.client_id = '';
 
     this.caption = ko.pureComputed(() => {
-      const content = `<span class='label-bold-xs'>${z.util.escape_html(this.user().first_name())}</span>`;
+      const content = `<span class='label-bold-xs'>${z.util.escapeHtml(this.user().first_name())}</span>`;
       const string_id = this.is_remote_identity_changed()
         ? z.string.conversationUnableToDecrypt2
         : z.string.conversationUnableToDecrypt1;
@@ -47,7 +47,7 @@ z.entity.DecryptErrorMessage = class DecryptErrorMessage extends z.entity.Messag
       const path = this.is_remote_identity_changed()
         ? z.config.URL_PATH.DECRYPT_ERROR_2
         : z.config.URL_PATH.DECRYPT_ERROR_1;
-      return z.util.URLUtil.build_url(z.util.URLUtil.TYPE.WEBSITE, path);
+      return z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.WEBSITE, path);
     });
 
     this.is_recoverable = ko.pureComputed(
@@ -67,7 +67,7 @@ z.entity.DecryptErrorMessage = class DecryptErrorMessage extends z.entity.Messag
       }
 
       if (this.client_id) {
-        parts.push(`ID: ${z.util.print_devices_id(this.client_id)}`);
+        parts.push(`ID: ${z.util.printDevicesId(this.client_id)}`);
       }
 
       if (parts.length) {

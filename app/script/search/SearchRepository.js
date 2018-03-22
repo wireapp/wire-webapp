@@ -90,15 +90,15 @@ z.search.SearchRepository = class SearchRepository {
       })
       .then(userEntities => {
         if (isHandle) {
-          userEntities = userEntities.filter(userEntity => z.util.StringUtil.starts_with(userEntity.username(), name));
+          userEntities = userEntities.filter(userEntity => z.util.StringUtil.startsWith(userEntity.username(), name));
         }
 
         return userEntities
           .sort((userA, userB) => {
             if (isHandle) {
-              return z.util.StringUtil.sort_by_priority(userA.username(), userB.username(), name);
+              return z.util.StringUtil.sortByPriority(userA.username(), userB.username(), name);
             }
-            return z.util.StringUtil.sort_by_priority(userA.name(), userB.name(), name);
+            return z.util.StringUtil.sortByPriority(userA.name(), userB.name(), name);
           })
           .slice(0, maxResults);
       });

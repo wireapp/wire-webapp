@@ -17,35 +17,35 @@
  *
  */
 
-// grunt test_init && grunt test_run:util/Emoji
+// grunt test_init && grunt test_run:util/EmojiUtil
 
 'use strict';
 
 describe('z.util.emoji', () => {
   describe('includes_only_emojies', () => {
     it('returns false for empty string', () => {
-      expect(z.util.emoji.includes_only_emojies('')).toBeFalsy();
+      expect(z.util.EmojiUtil.includesOnlyEmojies('')).toBeFalsy();
     });
 
     it('returns false for undefined', () => {
-      expect(z.util.emoji.includes_only_emojies('')).toBeFalsy();
+      expect(z.util.EmojiUtil.includesOnlyEmojies('')).toBeFalsy();
     });
 
     it('returns true for text containing only emojies (Miscellaneous Symbols)', () => {
-      expect(z.util.emoji.includes_only_emojies('☕')).toBeTruthy();
-      expect(z.util.emoji.includes_only_emojies('⛄')).toBeTruthy();
-      expect(z.util.emoji.includes_only_emojies('⚽')).toBeTruthy();
-      expect(z.util.emoji.includes_only_emojies('🇩🇰')).toBeTruthy();
-      expect(z.util.emoji.includes_only_emojies('🏌️‍♀️')).toBeTruthy();
+      expect(z.util.EmojiUtil.includesOnlyEmojies('☕')).toBeTruthy();
+      expect(z.util.EmojiUtil.includesOnlyEmojies('⛄')).toBeTruthy();
+      expect(z.util.EmojiUtil.includesOnlyEmojies('⚽')).toBeTruthy();
+      expect(z.util.EmojiUtil.includesOnlyEmojies('🇩🇰')).toBeTruthy();
+      expect(z.util.EmojiUtil.includesOnlyEmojies('🏌️‍♀️')).toBeTruthy();
     });
 
     it('returns true for text containing only emojies and whitespaces (Miscellaneous Symbols)', () => {
-      expect(z.util.emoji.includes_only_emojies('☕ ⚽')).toBeTruthy();
-      expect(z.util.emoji.includes_only_emojies('☕  ⚽')).toBeTruthy();
+      expect(z.util.EmojiUtil.includesOnlyEmojies('☕ ⚽')).toBeTruthy();
+      expect(z.util.EmojiUtil.includesOnlyEmojies('☕  ⚽')).toBeTruthy();
     });
 
     it('returns false for text containing only text and emojies', () => {
-      expect(z.util.emoji.includes_only_emojies('Hey 💩')).toBeFalsy();
+      expect(z.util.EmojiUtil.includesOnlyEmojies('Hey 💩')).toBeFalsy();
     });
   });
 });

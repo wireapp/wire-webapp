@@ -117,7 +117,7 @@ z.viewModel.WarningsViewModel = class WarningsViewModel {
       case WarningsViewModel.TYPE.REQUEST_MICROPHONE:
         amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, {
           action: () => {
-            z.util.safe_window_open(z.util.URLUtil.build_support_url(z.config.SUPPORT.ID.MICROPHONE_ACCESS_DENIED));
+            z.util.safeWindowOpen(z.util.URLUtil.buildSupportUrl(z.config.SUPPORT.ID.MICROPHONE_ACCESS_DENIED));
           },
           text: {
             action: z.l10n.text(z.string.modalCallNoMicrophoneAction),

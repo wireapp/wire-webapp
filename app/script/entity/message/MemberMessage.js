@@ -52,7 +52,7 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
 
     this.senderName = ko.pureComputed(() => {
       const isTeamMemberLeave = this.type === z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE;
-      return isTeamMemberLeave ? this.name() : z.util.get_first_name(this.user());
+      return isTeamMemberLeave ? this.name() : z.util.getFirstName(this.user());
     });
 
     this.showNamedCreation = ko.pureComputed(() => this.isConversationCreate() && this.name().length);
@@ -132,7 +132,7 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
         const groupCreationStringId = this.user().is_me
           ? z.string.conversationCreateNameYou
           : z.string.conversationCreateName;
-        return z.util.StringUtil.capitalize_first_char(z.l10n.text(groupCreationStringId, this.senderName()));
+        return z.util.StringUtil.capitalizeFirstChar(z.l10n.text(groupCreationStringId, this.senderName()));
       }
       return '';
     });

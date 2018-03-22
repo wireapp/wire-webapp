@@ -281,7 +281,7 @@ window.z.user = z.user || {};
   }
 
   function get_random_word_combination() {
-    return `${z.util.ArrayUtil.random_element(RANDOM_WORDS_1)}${z.util.ArrayUtil.random_element(RANDOM_WORDS_2)}`;
+    return `${z.util.ArrayUtil.randomElement(RANDOM_WORDS_1)}${z.util.ArrayUtil.randomElement(RANDOM_WORDS_2)}`;
   }
 
   /**
@@ -303,7 +303,7 @@ window.z.user = z.user || {};
    * @returns {string} String appended with random digits.
    */
   function append_random_digits(handle, additional_numbers) {
-    const random_digits = _.range(additional_numbers).map(() => z.util.get_random_int(1, 9));
+    const random_digits = _.range(additional_numbers).map(() => z.util.NumberUtil.getRandomNumber(1, 8));
     return `${handle}${random_digits.join('')}`;
   }
 

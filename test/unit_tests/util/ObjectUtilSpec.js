@@ -22,7 +22,7 @@
 'use strict';
 
 describe('z.util.ObjectUtil', () => {
-  describe('escape_properties', () => {
+  describe('escapeProperties', () => {
     it('escapes all properties of an object', () => {
       const object = {
         age: '<b>25</b>',
@@ -32,7 +32,7 @@ describe('z.util.ObjectUtil', () => {
         name: 'Lara',
       };
 
-      const escaped_object = z.util.ObjectUtil.escape_properties(object);
+      const escaped_object = z.util.ObjectUtil.escapeProperties(object);
 
       expect(escaped_object.age).toBe('&lt;b&gt;25&lt;/b&gt;');
       expect(escaped_object.favorite.place).toBe('&lt;b&gt;Berlin&lt;/b&gt;');

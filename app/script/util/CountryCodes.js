@@ -22,7 +22,7 @@
 window.z = window.z || {};
 window.z.util = z.util || {};
 
-(function() {
+z.util.CountryCodes = (() => {
   const COUNTRY_CODES = [
     {
       code: 93,
@@ -1466,14 +1466,14 @@ window.z.util = z.util || {};
     },
   ];
 
-  z.util.CountryCodes = {
+  return {
     COUNTRY_CODES: COUNTRY_CODES,
     /**
      * Get the country code matching to an ISO name
      * @param {number} code - Country code
      * @returns {string} Returns the ISO standard country name of the most populated country with the matching country code
      */
-    get_country_by_code(code) {
+    getCountryByCode: code => {
       let countries = [];
 
       for (const country of COUNTRY_CODES) {
@@ -1482,21 +1482,22 @@ window.z.util = z.util || {};
         }
       }
 
-      countries = countries.sort((country_a, country_b) => country_a.population - country_b.population);
+      countries = countries.sort((countryA, countryB) => countryA.population - countryB.population);
 
       const country = countries.pop();
       if (country) {
         return country.iso;
       }
     },
+
     /**
      * Get the country code matching an ISO name
-     * @param {string} iso_name - ISO standard country name
+     * @param {string} isoName - ISO standard country name
      * @returns {number} Matching country code
      */
-    get_country_code(iso_name) {
+    getCountryCode: isoName => {
       for (const country of COUNTRY_CODES) {
-        if (country.iso === iso_name) {
+        if (country.iso === isoName) {
           return country.code;
         }
       }

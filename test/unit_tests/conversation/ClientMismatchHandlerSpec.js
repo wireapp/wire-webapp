@@ -28,7 +28,7 @@ describe('ClientMismatchHandler', () => {
 
   beforeAll(done => {
     z.util.protobuf
-      .load_protos('ext/proto/generic-message-proto/messages.proto')
+      .loadProtos('ext/proto/generic-message-proto/messages.proto')
       .then(done)
       .catch(done.fail);
   });
@@ -37,7 +37,7 @@ describe('ClientMismatchHandler', () => {
     testFactory
       .exposeConversationActors()
       .then(conversationRepository => {
-        conversationEt = new z.entity.Conversation(z.util.create_random_uuid());
+        conversationEt = new z.entity.Conversation(z.util.createRandomUuid());
         return conversationRepository.save_conversation(conversationEt);
       })
       .then(done)
@@ -57,7 +57,7 @@ describe('ClientMismatchHandler', () => {
     let janeRoe = undefined;
 
     beforeAll(() => {
-      genericMessage = new z.proto.GenericMessage(z.util.create_random_uuid());
+      genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
       genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT, new z.proto.Text('Test'));
 
       johnDoe = {

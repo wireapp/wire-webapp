@@ -89,7 +89,7 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
     this.dispose = this.dispose.bind(this);
 
     this.element.attr({
-      id: z.util.create_random_uuid(),
+      id: z.util.createRandomUuid(),
       'user-id': this.participant().id,
     });
 
@@ -98,7 +98,7 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
         return '';
       }
       if (this.element.hasClass('avatar-xs')) {
-        return z.util.StringUtil.get_first_character(this.participant().initials());
+        return z.util.StringUtil.getFirstChar(this.participant().initials());
       }
       return this.participant().initials();
     });

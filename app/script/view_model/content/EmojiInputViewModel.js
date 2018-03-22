@@ -116,7 +116,7 @@ z.viewModel.content.EmojiInputViewModel = class EmojiInputViewModel {
 
     this.emojiDiv = $(`<div class='${EMOJI_DIV_CLASS}' />`);
     this.emojiStartPosition = -1;
-    this.emojiUsageCount = z.util.StorageUtil.get_value(z.storage.StorageKey.CONVERSATION.EMOJI_USAGE_COUNT) || {};
+    this.emojiUsageCount = z.util.StorageUtil.getValue(z.storage.StorageKey.CONVERSATION.EMOJI_USAGE_COUNT) || {};
 
     this.shouldReplaceEmoji = repositories.properties.getPreference(z.properties.PROPERTIES_TYPE.EMOJI.REPLACE_INLINE);
 
@@ -359,7 +359,7 @@ z.viewModel.content.EmojiInputViewModel = class EmojiInputViewModel {
 
         const sameUsageCount = usageCountA === usageCountB;
         if (sameUsageCount) {
-          return z.util.StringUtil.sort_by_priority(emojiA.name, emojiB.name, query);
+          return z.util.StringUtil.sortByPriority(emojiA.name, emojiB.name, query);
         }
         return usageCountB - usageCountA;
       })
@@ -474,7 +474,7 @@ z.viewModel.content.EmojiInputViewModel = class EmojiInputViewModel {
 
   _increaseUsageCount(emojiName) {
     this.emojiUsageCount[emojiName] = this._getUsageCount(emojiName) + 1;
-    z.util.StorageUtil.set_value(z.storage.StorageKey.CONVERSATION.EMOJI_USAGE_COUNT, this.emojiUsageCount);
+    z.util.StorageUtil.setValue(z.storage.StorageKey.CONVERSATION.EMOJI_USAGE_COUNT, this.emojiUsageCount);
   }
 
   _escapeRegexp(string) {
