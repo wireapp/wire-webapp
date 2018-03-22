@@ -142,9 +142,9 @@
   version "3.2.0"
   resolved "https://codeload.github.com/dcodeIO/Long.js/tar.gz/8cdc1f74ced4f771aa844f1cbc565b1d4c4451b8"
 
-"@bower_components/mixpanel@mixpanel/mixpanel-js#2.18.0":
-  version "2.18.0"
-  resolved "https://codeload.github.com/mixpanel/mixpanel-js/tar.gz/96b4317ca8cfc8b232be81464eff6aae1177ce27"
+"@bower_components/mixpanel@mixpanel/mixpanel-js#2.19.0":
+  version "2.19.0"
+  resolved "https://codeload.github.com/mixpanel/mixpanel-js/tar.gz/c548eade023d10c8fa015f8a93e4a20634502962"
 
 "@bower_components/moment@moment/moment#2.21.0":
   version "2.21.0"
@@ -6667,9 +6667,9 @@ mixin-object@^2.0.1:
     for-in "^0.1.3"
     is-extendable "^0.1.1"
 
-mixpanel-browser@2.18.0:
-  version "2.18.0"
-  resolved "https://registry.yarnpkg.com/mixpanel-browser/-/mixpanel-browser-2.18.0.tgz#8455cf1da4415077bfb6716b39f63d0200a749fd"
+mixpanel-browser@2.19.0:
+  version "2.19.0"
+  resolved "https://registry.yarnpkg.com/mixpanel-browser/-/mixpanel-browser-2.19.0.tgz#425a5c29f621b2050d2aa4ee121b73a4ccd6c3aa"
 
 mkdirp@0.5.x, "mkdirp@>=0.5 0", mkdirp@^0.5.0, mkdirp@^0.5.1, mkdirp@~0.5.0, mkdirp@~0.5.1:
   version "0.5.1"
