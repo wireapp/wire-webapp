@@ -56,7 +56,7 @@ z.viewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewMo
   }
 
   _updateActivationDate(time, template = z.string.preferencesDevicesActivatedOn) {
-    const formattedTime = z.util.formatTimestamp(time);
+    const formattedTime = z.util.TimeUtil.formatTimestamp(time);
     const sanitizedText = z.util.StringUtil.splitAtPivotElement(template, '{{date}}', formattedTime);
     this.activationDate(sanitizedText);
   }
