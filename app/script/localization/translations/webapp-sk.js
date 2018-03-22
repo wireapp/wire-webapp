@@ -62,6 +62,7 @@ z.string.sk.authPostedResendAction = 'Žiadny e-mail sa nezobrazil?';
 z.string.sk.authPostedResendDetail = 'Skontrolujte Vašu e-mailovú schránku a postupujte podľa pokynov.';
 z.string.sk.authPostedResendHeadline = 'Máte e-mail.';
 
+z.string.sk.authPlaceholderEmail = 'E-mail';
 z.string.sk.authPlaceholderPasswordPut = 'Heslo';
 z.string.sk.authPlaceholderPasswordSet = 'Heslo (minimálne 8 znakov)';
 z.string.sk.authPlaceholderPhone = 'Telefónne číslo';
@@ -97,9 +98,13 @@ z.string.sk.modalAcknowledgeAction = 'OK';
 z.string.sk.modalConfirmSecondary = 'Zrušiť';
 z.string.sk.modalOptionSecondary = 'Zrušiť';
 
+z.string.sk.modalAccountCreateAction = 'OK';
+
 z.string.sk.modalAccountDeletionAction = 'Zmazať';
 z.string.sk.modalAccountDeletionHeadline = 'Vymazať účet';
 z.string.sk.modalAccountDeletionMessage = 'Zašleme Vám e-mail, alebo SMS. Použite odkaz pre trvalé zmazanie Vášho účtu.';
+
+z.string.sk.modalAccountLeaveGuestRoomAction = 'Opustiť';
 
 z.string.sk.modalAccountLogoutAction = 'Odhlásenie';
 z.string.sk.modalAccountLogoutHeadline = 'Vymazať údaje?';
@@ -475,6 +480,7 @@ z.string.sk.searchInviteShare = 'Zdieľať kontakty';
 
 z.string.sk.searchListEveryoneParticipates = 'Všetci pripojení sú už v tomto rozhovore.';
 z.string.sk.searchListNoMatches = 'Žiadne výsledky. Skúste zadať iné meno.';
+
 
 z.string.sk.uploadGoogleHeadline = 'Nájsť ľudí\npre rozhovor.';
 z.string.sk.uploadGoogleMessage = 'Vaše údaje o kontaktoch používame na pripojenie k iným užívateľom. Všetky informácie anonymizujeme a nezdieľame ich s nikým iným.';

@@ -63,6 +63,7 @@ z.string.nl.authPostedResendAction = 'Geen e-mail ontvangen?';
 z.string.nl.authPostedResendDetail = 'Controleer je inbox en volg de instructies.';
 z.string.nl.authPostedResendHeadline = 'Je hebt e-mail ontvangen.';
 
+z.string.nl.authPlaceholderEmail = 'E-mail';
 z.string.nl.authPlaceholderPasswordPut = 'Wachtwoord';
 z.string.nl.authPlaceholderPasswordSet = 'Wachtwoord (minimaal 8 tekens)';
 z.string.nl.authPlaceholderPhone = 'Telefoonnummer';
@@ -99,9 +100,13 @@ z.string.nl.modalAcknowledgeAction = 'Ok';
 z.string.nl.modalConfirmSecondary = 'Annuleer';
 z.string.nl.modalOptionSecondary = 'Annuleer';
 
+z.string.nl.modalAccountCreateAction = 'OK';
+
 z.string.nl.modalAccountDeletionAction = 'Verwijderen';
 z.string.nl.modalAccountDeletionHeadline = 'Verwijder account';
 z.string.nl.modalAccountDeletionMessage = 'We vesturen je een bericht via email of SMS. Volg de instructies op in de link om je account te verwijderen.';
+
+z.string.nl.modalAccountLeaveGuestRoomAction = 'Verlaten';
 
 z.string.nl.modalAccountLogoutAction = 'Uitloggen';
 z.string.nl.modalAccountLogoutHeadline = 'Gegevens wissen?';
@@ -503,6 +508,7 @@ z.string.nl.searchServiceConfirmButton = 'Service toevoegen';
 
 z.string.nl.searchListEveryoneParticipates = 'Iedereen met wie je contact hebt zit al in dit gesprek.';
 z.string.nl.searchListNoMatches = 'Geen overeenkomende resultaten.\nProbeer een andere gebruikersnaam.';
+
 
 z.string.nl.uploadGoogleHeadline = 'Zoek mensen \nom mee te praten.';
 z.string.nl.uploadGoogleMessage = 'Dit helpt je om met anderen te verbinden. We anonimiseren alle informatie en delen deze niet met iemand anders.';

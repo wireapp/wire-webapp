@@ -60,8 +60,6 @@
   "conversationJoin.fullConversationHeadline": "",
   "conversationJoin.fullConversationSubhead": "",
   "conversationJoin.namePlaceholder": "",
-  "conversationJoin.acceptTou": "",
-  "conversationJoin.touLink": "",
   "BackendError.LABEL.CONVERSATION_CODE_NOT_FOUND": "",
   "BackendError.LABEL.CONVERSATION_NOT_FOUND": "",
   "BackendError.LABEL.CONVERSATION_TOO_MANY_MEMBERS": "",

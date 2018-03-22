@@ -29,11 +29,12 @@ z.string.de.authAccountCountryCode = 'Landesvorwahl';
 z.string.de.authAccountPasswordForgot = 'Passwort vergessen';
 z.string.de.authAccountPublicComputer = 'Dies ist ein öffentlicher Computer';
 z.string.de.authAccountSignIn = 'Login';
-z.string.de.authAccountSignInPhone = 'Handy';
+z.string.de.authAccountSignInPhone = 'Handy Login';
 
 z.string.de.authBlockedCookies = 'Aktiviere Cookies, um dich bei Wire einzuloggen.';
 z.string.de.authBlockedDatabase = 'Wire benötigt zum Anzeigen deiner Nachrichten Zugriff auf den lokalen Speicher. In Privaten Fenstern ist dieser nicht verfügbar.';
 z.string.de.authBlockedTabs = 'Wire ist bereits in einem anderen Tab geöffnet.';
+z.string.de.authBlockedTabsAction = 'Stattdessen diesen Tab verwenden';
 
 z.string.de.authVerifyAccountAdd = 'Hinzufügen';
 z.string.de.authVerifyAccountDetail = 'Hiermit kannst du Wire auf mehreren Geräten verwenden.';
@@ -63,6 +64,7 @@ z.string.de.authPostedResendAction = 'E-Mail nicht erhalten?';
 z.string.de.authPostedResendDetail = 'Schaue in deinen Posteingang und folge den Anweisungen.';
 z.string.de.authPostedResendHeadline = 'Du hast Post.';
 
+z.string.de.authPlaceholderEmail = 'E-Mail';
 z.string.de.authPlaceholderPasswordPut = 'Passwort';
 z.string.de.authPlaceholderPasswordSet = 'Passwort (min. acht Zeichen)';
 z.string.de.authPlaceholderPhone = 'Telefonnummer';
@@ -100,9 +102,13 @@ z.string.de.modalAcknowledgeHeadline = 'Fehler aufgetreten';
 z.string.de.modalConfirmSecondary = 'Abbrechen';
 z.string.de.modalOptionSecondary = 'Abbrechen';
 
+z.string.de.modalAccountCreateAction = 'Verstanden';
+
 z.string.de.modalAccountDeletionAction = 'Löschen';
 z.string.de.modalAccountDeletionHeadline = 'Benutzerkonto löschen';
 z.string.de.modalAccountDeletionMessage = 'In Kürze erhältst du eine Nachricht per E-Mail oder SMS. Folge dem Link darin, um dein Konto zu löschen.';
+
+z.string.de.modalAccountLeaveGuestRoomAction = 'Verlassen';
 
 z.string.de.modalAccountLogoutAction = 'Abmelden';
 z.string.de.modalAccountLogoutHeadline = 'Daten löschen?';
@@ -340,6 +346,9 @@ z.string.de.guestRoomToggleInfoExtended = 'Öffne diese Unterhaltung für Person
 
 z.string.de.guestRoomConversationBadge = 'Gäste anwesend';
 
+z.string.de.guestRoomConversationHead = 'Personen außerhalb deines Teams können an dieser Unterhaltung teilnehmen.';
+z.string.de.guestRoomConversationButton = 'Personen einladen';
+
 z.string.de.collectionShowAll = 'Zeige alle {{number}}';
 z.string.de.collectionSectionLinks = 'Links';
 z.string.de.collectionSectionImages = 'Bilder';
@@ -375,6 +384,7 @@ z.string.de.conversationsSecondaryLinePings = '{{number}} Ping';
 z.string.de.conversationsSecondaryLinePeopleLeft = '{{number}} Personen entfernt';
 z.string.de.conversationsSecondaryLinePersonLeft = '{{user}} hat die Unterhaltung verlassen';
 z.string.de.conversationsSecondaryLinePersonRemoved = '{{user}} wurde entfernt';
+z.string.de.conversationsSecondaryLinePersonRemovedTeam = '{{user}} wurde aus dem Team entfernt';
 z.string.de.conversationsSecondaryLinePeopleAdded = '{{user}} Personen wurden hinzugefügt';
 z.string.de.conversationsSecondaryLinePersonAdded = '{{user}} wurde hinzugefügt';
 z.string.de.conversationsSecondaryLinePersonAddedSelf = '{{user}} ist beigetreten';
@@ -577,6 +587,8 @@ z.string.de.searchServiceConfirmButton = 'Dienst hinzufügen';
 
 z.string.de.searchListEveryoneParticipates = 'Alle deine Kontakte\nsind bereits in\ndieser Unterhaltung.';
 z.string.de.searchListNoMatches = 'Kein passendes Ergebnis.\nSuche nach einen\nanderen Namen.';
+
+z.string.de.temporaryGuestCta = 'Erstelle ein Benutzerkonto';
 
 z.string.de.uploadGoogleHeadline = 'Finde Kontakte \nauf Wire.';
 z.string.de.uploadGoogleMessage = 'Wir verwenden deine Daten, um Kontakte für dich zu erstellen. Wir anonymisieren alle Informationen und teilen sie mit niemand anderem.';

@@ -63,6 +63,7 @@ z.string.ro.authPostedResendAction = 'Nu a apărut nici un e-mail?';
 z.string.ro.authPostedResendDetail = 'Verifică e-mailul și urmează instrucțiunile.';
 z.string.ro.authPostedResendHeadline = 'Ai primit un mesaj.';
 
+z.string.ro.authPlaceholderEmail = 'E-mail';
 z.string.ro.authPlaceholderPasswordPut = 'Parolă';
 z.string.ro.authPlaceholderPasswordSet = 'Parolă (minim 8 caractere)';
 z.string.ro.authPlaceholderPhone = 'Număr de telefon';
@@ -99,9 +100,13 @@ z.string.ro.modalAcknowledgeAction = 'Ok';
 z.string.ro.modalConfirmSecondary = 'Renunță';
 z.string.ro.modalOptionSecondary = 'Renunță';
 
+z.string.ro.modalAccountCreateAction = 'OK';
+
 z.string.ro.modalAccountDeletionAction = 'Șterge';
 z.string.ro.modalAccountDeletionHeadline = 'Șterge contul';
 z.string.ro.modalAccountDeletionMessage = 'Îți vom trimite un mesaj pe e-mail sau SMS. Urmează linkul pentru a șterge permanent contul tău.';
+
+z.string.ro.modalAccountLeaveGuestRoomAction = 'Ieși';
 
 z.string.ro.modalAccountLogoutAction = 'Deconectare';
 z.string.ro.modalAccountLogoutHeadline = 'Curăță datele?';
@@ -504,6 +509,7 @@ z.string.ro.searchServiceConfirmButton = 'Adaugă serviciu';
 
 z.string.ro.searchListEveryoneParticipates = 'Toată lumea cu care\nești conectat este deja\nîn această conversație.';
 z.string.ro.searchListNoMatches = 'Nu s-a găsit nimic.\nÎncearcă să scrii un alt nume.';
+
 
 z.string.ro.uploadGoogleHeadline = 'Caută persoane\ncu care să vorbești.';
 z.string.ro.uploadGoogleMessage = 'Vom folosi datele tale de contact pentru a te conecta cu alții. Vom anonimiza toate informațiile și nu le vom împărtăși cu altcineva.';

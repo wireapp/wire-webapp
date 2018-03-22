@@ -62,6 +62,7 @@ z.string.pl.authPostedResendAction = 'Nie otrzymałeś e-maila?';
 z.string.pl.authPostedResendDetail = 'Sprawdź swoją skrzynkę e-mail i postępuj zgodnie z instrukcjami.';
 z.string.pl.authPostedResendHeadline = 'Masz wiadomość.';
 
+z.string.pl.authPlaceholderEmail = 'Adres e-mail';
 z.string.pl.authPlaceholderPasswordPut = 'Hasło';
 z.string.pl.authPlaceholderPasswordSet = 'Hasło (musi mieć przynajmniej 8 znaków)';
 z.string.pl.authPlaceholderPhone = 'Numer telefonu';
@@ -99,9 +100,13 @@ z.string.pl.modalAcknowledgeHeadline = 'Coś poszło nie tak';
 z.string.pl.modalConfirmSecondary = 'Anuluj';
 z.string.pl.modalOptionSecondary = 'Anuluj';
 
+z.string.pl.modalAccountCreateAction = 'OK';
+
 z.string.pl.modalAccountDeletionAction = 'Usuń';
 z.string.pl.modalAccountDeletionHeadline = 'Usuń konto';
 z.string.pl.modalAccountDeletionMessage = 'Wyślemy wiadomość poprzez e-mail lub SMS. Proszę użyć tego odnośnika, żeby trwale usunąć konto.';
+
+z.string.pl.modalAccountLeaveGuestRoomAction = 'Opuść';
 
 z.string.pl.modalAccountLogoutAction = 'Wyloguj się';
 z.string.pl.modalAccountLogoutHeadline = 'Usunąć dane?';
@@ -490,6 +495,8 @@ z.string.pl.searchInviteShare = 'Udostępnij kontakty';
 
 z.string.pl.searchListEveryoneParticipates = 'Wszyscy, z którymi masz połączenie są już w tej konwersacji.';
 z.string.pl.searchListNoMatches = 'Brak wyników. Spróbuj wprowadzić inną nazwę.';
+
+z.string.pl.temporaryGuestCta = 'Utwórz konto';
 
 z.string.pl.uploadGoogleHeadline = 'Znajdź osoby do rozmowy.';
 z.string.pl.uploadGoogleMessage = 'Wykorzystujemy Twoje dane kontaktowe do łączenia Cię z innymi. Wszystkie informacje są anonimowe i nie dzielimy ich z nikim innym.';

@@ -61,6 +61,7 @@ z.string.sl.authPostedResendAction = 'E-pošta ni prispela?';
 z.string.sl.authPostedResendDetail = 'Preverite vašo e-pošto in sledite navodilom.';
 z.string.sl.authPostedResendHeadline = 'Imate pošto.';
 
+z.string.sl.authPlaceholderEmail = 'E-pošta';
 z.string.sl.authPlaceholderPasswordPut = 'Geslo';
 z.string.sl.authPlaceholderPasswordSet = 'Geslo (vsaj 8 znakov)';
 z.string.sl.authPlaceholderPhone = 'Telefonska številka';
@@ -94,9 +95,13 @@ z.string.sl.modalAcknowledgeAction = 'V redu';
 z.string.sl.modalConfirmSecondary = 'Prekliči';
 z.string.sl.modalOptionSecondary = 'Prekliči';
 
+z.string.sl.modalAccountCreateAction = 'V redu';
+
 z.string.sl.modalAccountDeletionAction = 'Izbriši';
 z.string.sl.modalAccountDeletionHeadline = 'Izbriši račun';
 z.string.sl.modalAccountDeletionMessage = 'Poslali bomo sporočilo preko e-pošte ali SMS. Sledite povezavi za trajni izbris vašega računa.';
+
+z.string.sl.modalAccountLeaveGuestRoomAction = 'Zapusti';
 
 z.string.sl.modalAccountLogoutAction = 'Odjava';
 z.string.sl.modalAccountLogoutHeadline = 'Počisti podatke?';
@@ -467,6 +472,7 @@ z.string.sl.searchInviteShare = 'Deli Stike';
 
 z.string.sl.searchListEveryoneParticipates = 'Vsi \ns katerimi ste povezani,\nso že v tem pogovoru.';
 z.string.sl.searchListNoMatches = 'Brez ujemanja rezultatov. \nPoizkusite vnesti drugo ime.';
+
 
 z.string.sl.uploadGoogleHeadline = 'Poiščite osebe\nza pogovor.';
 z.string.sl.uploadGoogleMessage = 'Uporabljamo vaše podatke stikov pri povezovanju z drugimi. Vse informacije anonimiziramo in ne delimo z drugimi.';

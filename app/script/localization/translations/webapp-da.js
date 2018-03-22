@@ -57,6 +57,7 @@ z.string.da.authPostedResendAction = 'Ingen email modtaget?';
 z.string.da.authPostedResendDetail = 'Tjek din email indbakke og følg anvisningerne.';
 z.string.da.authPostedResendHeadline = 'Du har post.';
 
+z.string.da.authPlaceholderEmail = 'Email';
 z.string.da.authPlaceholderPasswordPut = 'Adgangskode';
 z.string.da.authPlaceholderPasswordSet = 'Adgangskode (mindst 8 tegn)';
 z.string.da.authPlaceholderPhone = 'Telefon Nummer';
@@ -89,9 +90,13 @@ z.string.da.modalAcknowledgeAction = 'Ok';
 z.string.da.modalConfirmSecondary = 'Annuller';
 z.string.da.modalOptionSecondary = 'Annuller';
 
+z.string.da.modalAccountCreateAction = 'OK';
+
 z.string.da.modalAccountDeletionAction = 'Slet';
 z.string.da.modalAccountDeletionHeadline = 'Slet konto';
 z.string.da.modalAccountDeletionMessage = 'Vi vil sende dig en besked via email eller SMS. Følg linket for at permanent slette din konto.';
+
+z.string.da.modalAccountLeaveGuestRoomAction = 'Forlad';
 
 z.string.da.modalAccountLogoutAction = 'Log ud';
 z.string.da.modalAccountLogoutHeadline = 'Ryd Data?';
@@ -450,6 +455,7 @@ z.string.da.searchInviteShare = 'Del Kontakter';
 
 z.string.da.searchListEveryoneParticipates = 'Alle du er \nforbundet med er allerede i \ndenne samtale.';
 z.string.da.searchListNoMatches = 'Ingen passende resultater.\nPrøv at indtaste et andet navn.';
+
 
 z.string.da.uploadGoogleHeadline = 'Finde personer at snakke med.';
 z.string.da.uploadGoogleMessage = 'Vi bruger dine kontaktdata til at forbinde dig med andre. Vi anonymisere alle oplysninger og deler ikke det med alle andre.';

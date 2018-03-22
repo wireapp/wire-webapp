@@ -35,6 +35,7 @@ z.string.et.authAccountSignInPhone = 'Telefon';
 z.string.et.authBlockedCookies = 'Wire’i sisselogimiseks luba küpsised.';
 z.string.et.authBlockedDatabase = 'Wire vajab sõnumite kuvamiseks ligipääsu kohalikule hoidlale (local storage). Kohalik hoidla ei ole privaatrežiimis saadaval.';
 z.string.et.authBlockedTabs = 'Wire on juba teisel kaardil avatud.';
+z.string.et.authBlockedTabsAction = 'Kasuta hoopis seda kaarti';
 
 z.string.et.authVerifyAccountAdd = 'Lisa';
 z.string.et.authVerifyAccountDetail = 'See võimaldab kasutada Wire’i mitmes seadmes.';
@@ -64,6 +65,7 @@ z.string.et.authPostedResendAction = 'E-kiri ei saabu?';
 z.string.et.authPostedResendDetail = 'Kontrolli oma e-postkasti ja järgi kirjas olevaid juhiseid.';
 z.string.et.authPostedResendHeadline = 'Sulle tuli kiri.';
 
+z.string.et.authPlaceholderEmail = 'E-post';
 z.string.et.authPlaceholderPasswordPut = 'Parool';
 z.string.et.authPlaceholderPasswordSet = 'Parool (vähemalt 8 märki)';
 z.string.et.authPlaceholderPhone = 'Telefoninumber';
@@ -101,9 +103,13 @@ z.string.et.modalAcknowledgeHeadline = 'Midagi läks valesti';
 z.string.et.modalConfirmSecondary = 'Tühista';
 z.string.et.modalOptionSecondary = 'Tühista';
 
+z.string.et.modalAccountCreateAction = 'OK';
+
 z.string.et.modalAccountDeletionAction = 'Kustuta';
 z.string.et.modalAccountDeletionHeadline = 'Kustuta konto';
 z.string.et.modalAccountDeletionMessage = 'Me saadame sõnumi e-posti või SMSi kaudu. Järgi linki, et püsivalt oma konto kustutada.';
+
+z.string.et.modalAccountLeaveGuestRoomAction = 'Lahku';
 
 z.string.et.modalAccountLogoutAction = 'Logi välja';
 z.string.et.modalAccountLogoutHeadline = 'Tühjendad andmed?';
@@ -205,8 +211,20 @@ z.string.et.modalConversationRemoveGuestsMessage = 'Praegune külaline eemaldata
 
 z.string.et.modalConversationRevokeLinkAction = 'Tühista link';
 z.string.et.modalConversationRevokeLinkHeadline = 'Tühistad lingi?';
+z.string.et.modalConversationRevokeLinkMessage = 'Uued külalised ei saa selle lingi abil liituda. Praegustel külalistel on jätkuvalt ligipääs.';
+
+z.string.et.modalConversationGuestOptionsAllowGuestMessage = 'Külalisi ei saanud lubada. Palun proovi uuesti.';
+z.string.et.modalConversationGuestOptionsDisableGuestMessage = 'Külalisi ei saanud eemaldada. Palun proovi uuesti.';
+z.string.et.modalConversationGuestOptionsGetCodeMessage = 'Ligipääsulinki ei saadud.';
+z.string.et.modalConversationGuestOptionsRequestCodeMessage = 'Ligipääsulingi taotlemine ebaõnnestus. Palun proovi uuesti.';
+z.string.et.modalConversationGuestOptionsRevokeCodeMessage = 'Ligipääsulingi tühistamine ebaõnnestus. Palun proovi uuesti.';
+z.string.et.modalConversationGuestOptionsToggleGuestsMessage = 'Külaliste oleku muutumine ebaõnnestus.';
 
 z.string.et.modalConversationTooManyMembersHeadline = 'Täismaja';
+z.string.et.modalConversationTooManyMembersMessage = 'Vestlusega saavad liituda kuni {{number1}} inimest. Hetkel on ruumi veel {{number2}} inimesele.';
+
+z.string.et.modalGifTooLargeHeadline = 'Valitud animatsioon on liiga suur';
+z.string.et.modalGifTooLargeMessage = 'Maksimaalne suurus on {{number}} MB.';
 
 z.string.et.modalIntegrationUnavailableHeadline = 'Integratsioonide tugi puudub';
 z.string.et.modalIntegrationUnavailableMessage = 'Aitäh, et integratsioonide vastu huvi tunned. Ajutiselt vestlused integratsioone ei toeta.';
@@ -215,8 +233,10 @@ z.string.et.modalPictureFileFormatHeadline = 'Seda pilti ei saa kasutada';
 z.string.et.modalPictureFileFormatMessage = 'Palun vali PNG või JPEG fail.';
 
 z.string.et.modalPictureTooLargeHeadline = 'Valitud pilt on liiga suur';
+z.string.et.modalPictureTooLargeMessage = 'Sa saad kasutada pilte suurusega kuni {{number}} MB.';
 
 z.string.et.modalPictureTooSmallHeadline = 'Pilt on liiga väike';
+z.string.et.modalPictureTooSmallMessage = 'Palun vali pilt, mis on vähemalt 320 x 320 px suur.';
 
 z.string.et.modalServiceUnavailableHeadline = 'Teenuse lisamine pole võimalik';
 z.string.et.modalServiceUnavailableMessage = 'Teenus pole hetkel saadaval.';
@@ -327,6 +347,9 @@ z.string.et.guestRoomToggleInfoExtended = 'Ava see vestlus meeskonnast väljas o
 
 z.string.et.guestRoomConversationBadge = 'Kohal on külalisi';
 
+z.string.et.guestRoomConversationHead = 'Inimesed väljaspool sinu meeskonda saavad liituda selle vestlusega.';
+z.string.et.guestRoomConversationButton = 'Kutsu inimesi';
+
 z.string.et.collectionShowAll = 'Kuva kõik {{number}}';
 z.string.et.collectionSectionLinks = 'Lingid';
 z.string.et.collectionSectionImages = 'Pildid';
@@ -362,6 +385,7 @@ z.string.et.conversationsSecondaryLinePings = '{{number}} pingi';
 z.string.et.conversationsSecondaryLinePeopleLeft = '{{number}} inimest lahkusid';
 z.string.et.conversationsSecondaryLinePersonLeft = '{{user}} lahkus';
 z.string.et.conversationsSecondaryLinePersonRemoved = '{{user}} eemaldati';
+z.string.et.conversationsSecondaryLinePersonRemovedTeam = '{{user}} eemaldati meeskonnast';
 z.string.et.conversationsSecondaryLinePeopleAdded = '{{user}} inimest lisati';
 z.string.et.conversationsSecondaryLinePersonAdded = '{{user}} lisati';
 z.string.et.conversationsSecondaryLinePersonAddedSelf = '{{user}} liitus';
@@ -435,6 +459,7 @@ z.string.et.guestOptionsCopyLink = 'Kopeeri link';
 z.string.et.guestOptionsCopyLinkDone = 'Link kopeeritud!';
 z.string.et.guestOptionsCreateLink = 'Loo link';
 z.string.et.guestOptionsInfoHeader = 'Kutsu teisi lingi abil';
+z.string.et.guestOptionsInfoText = 'Igaüks saab liituda selle lingiga vestlusesse 24 tunniks, isegi kui neil pole Wire’i.';
 z.string.et.guestOptionsRevokeLink = 'Tühista link';
 z.string.et.guestOptionsTitle = 'Külaliste valikud';
 
@@ -564,6 +589,8 @@ z.string.et.searchServiceConfirmButton = 'Lisa teenus';
 z.string.et.searchListEveryoneParticipates = 'Kõik sinu\nkontaktid on juba\nselles vestluses.';
 z.string.et.searchListNoMatches = 'Sobivaid tulemusi ei leitud.\nProovi sisestada mõni muu nimi.';
 
+z.string.et.temporaryGuestCta = 'Loo konto';
+
 z.string.et.uploadGoogleHeadline = 'Otsi inimesi\nkellega rääkida.';
 z.string.et.uploadGoogleMessage = 'Me kasutame su kontakte, et ühendada sind teistega. Me muudame kogu info anonüümseks ja ei jaga seda kellegi teisega.';
 
@@ -642,6 +669,7 @@ z.string.et.tooltipConversationsPreferences = 'Ava eelistused';
 z.string.et.tooltipConversationsSilence = 'Vaigista ({{shortcut}})';
 z.string.et.tooltipConversationsStart = 'Alusta vestlust ({{shortcut}})';
 
+z.string.et.tooltipConversationDetailsAddPeople = 'Lisa vestlusesse osalejaid ({{shortcut}})';
 z.string.et.tooltipConversationDetailsRename = 'Muuda vestluse nime';
 
 z.string.et.tooltipPreferencesContactsGmail = 'Logi oma Gmaili kontosse sisse, et jagada kontakte';

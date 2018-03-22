@@ -30,11 +30,12 @@ z.string.uk.authAccountCountryCode = 'Код країни';
 z.string.uk.authAccountPasswordForgot = 'Забули пароль?';
 z.string.uk.authAccountPublicComputer = 'Це загальнодоступний комп’ютер';
 z.string.uk.authAccountSignIn = 'Увійти';
-z.string.uk.authAccountSignInPhone = 'Номер телефону';
+z.string.uk.authAccountSignInPhone = 'Вхід з номером телефону';
 
 z.string.uk.authBlockedCookies = 'Увімкніть файли cookie, щоб увійти в Wire.';
 z.string.uk.authBlockedDatabase = 'Wire потребує доступу до локальної бази даних для відображення повідомлень. Локальна база даних недоступна в приватному режимі.';
 z.string.uk.authBlockedTabs = 'Wire уже відкрито в іншій вкладці браузера.';
+z.string.uk.authBlockedTabsAction = 'Використовувати цю вкладку';
 
 z.string.uk.authVerifyAccountAdd = 'Додати';
 z.string.uk.authVerifyAccountDetail = 'Це дасть змогу використовувати Wire на різних пристроях.';
@@ -64,6 +65,7 @@ z.string.uk.authPostedResendAction = 'Не показується email?';
 z.string.uk.authPostedResendDetail = 'Перевірте вашу поштову скриньку і дотримуйтесь надісланих інструкцій.';
 z.string.uk.authPostedResendHeadline = 'Ви отримали нового листа.';
 
+z.string.uk.authPlaceholderEmail = 'Email';
 z.string.uk.authPlaceholderPasswordPut = 'Пароль';
 z.string.uk.authPlaceholderPasswordSet = 'Пароль (не менше 8 символів)';
 z.string.uk.authPlaceholderPhone = 'Номер телефону';
@@ -101,9 +103,13 @@ z.string.uk.modalAcknowledgeHeadline = 'Щось пішло не так';
 z.string.uk.modalConfirmSecondary = 'Скасувати';
 z.string.uk.modalOptionSecondary = 'Скасувати';
 
+z.string.uk.modalAccountCreateAction = 'OK';
+
 z.string.uk.modalAccountDeletionAction = 'Видалити';
 z.string.uk.modalAccountDeletionHeadline = 'Видалити акаунт';
 z.string.uk.modalAccountDeletionMessage = 'Ми надішлемо вам повідомлення електронною поштою або через SMS. Перейдіть за посиланням, щоб остаточно видалити свій акаунт.';
+
+z.string.uk.modalAccountLeaveGuestRoomAction = 'Вийти з розмови';
 
 z.string.uk.modalAccountLogoutAction = 'Вийти';
 z.string.uk.modalAccountLogoutHeadline = 'Очистити дані?';
@@ -341,6 +347,9 @@ z.string.uk.guestRoomToggleInfoExtended = 'Зробити розмову дос�
 
 z.string.uk.guestRoomConversationBadge = 'Присутні гості';
 
+z.string.uk.guestRoomConversationHead = 'Люди за межами вашої команди можуть приєднатися до цієї розмови.';
+z.string.uk.guestRoomConversationButton = 'Запросити людей';
+
 z.string.uk.collectionShowAll = 'Показати всі {{number}}';
 z.string.uk.collectionSectionLinks = 'Посилання';
 z.string.uk.collectionSectionImages = 'Картинки';
@@ -376,6 +385,7 @@ z.string.uk.conversationsSecondaryLinePings = '{{number}} пінгів';
 z.string.uk.conversationsSecondaryLinePeopleLeft = '{{number}} учасників вийшло';
 z.string.uk.conversationsSecondaryLinePersonLeft = '{{user}} вийшов(-ла)';
 z.string.uk.conversationsSecondaryLinePersonRemoved = '{{user}} був(-ла) видалений(-а)';
+z.string.uk.conversationsSecondaryLinePersonRemovedTeam = '{{user}} був(-ла) видалений(-а) з команди';
 z.string.uk.conversationsSecondaryLinePeopleAdded = '{{user}} учасників було додано';
 z.string.uk.conversationsSecondaryLinePersonAdded = '{{user}} був(-ла) доданий(-а)';
 z.string.uk.conversationsSecondaryLinePersonAddedSelf = '{{user}} приєднався(-лася)';
@@ -578,6 +588,7 @@ z.string.uk.searchServiceConfirmButton = 'Додати сервіс';
 
 z.string.uk.searchListEveryoneParticipates = 'Всі ваші контакти\nуже присутні\nв даній групі.';
 z.string.uk.searchListNoMatches = 'Співпадіння відсутні.\nСпробуйте ввести інше ім’я.';
+
 
 z.string.uk.uploadGoogleHeadline = 'Знайдіть людей,\nщоб порозмовляти.';
 z.string.uk.uploadGoogleMessage = 'Ми використовуємо дані про ваші контакти, щоб ви могли знайти людей, яких ви знаєте. Ми анонімізуємо всю інформацію та не передаємо її третім особам.';

@@ -61,6 +61,7 @@ z.string.pt.authPostedResendAction = 'Não chegou a mensagem?';
 z.string.pt.authPostedResendDetail = 'Verifique sua caixa de correio eletrónico e siga as instruções.';
 z.string.pt.authPostedResendHeadline = 'Recebeu email.';
 
+z.string.pt.authPlaceholderEmail = 'E-mail';
 z.string.pt.authPlaceholderPasswordPut = 'Palavra-passe';
 z.string.pt.authPlaceholderPasswordSet = 'Palavra-passe (pelo menos 8 caracteres)';
 z.string.pt.authPlaceholderPhone = 'Telefone';
@@ -97,9 +98,13 @@ z.string.pt.modalAcknowledgeAction = 'Ok';
 z.string.pt.modalConfirmSecondary = 'Cancelar';
 z.string.pt.modalOptionSecondary = 'Cancelar';
 
+z.string.pt.modalAccountCreateAction = 'OK';
+
 z.string.pt.modalAccountDeletionAction = 'Eliminar';
 z.string.pt.modalAccountDeletionHeadline = 'Eliminar conta';
 z.string.pt.modalAccountDeletionMessage = 'Será enviada uma mensagem ou SMS. Siga a ligação para apagar a conta de forma permanente.';
+
+z.string.pt.modalAccountLeaveGuestRoomAction = 'Sair';
 
 z.string.pt.modalAccountLogoutAction = 'Terminar sessão';
 z.string.pt.modalAccountLogoutHeadline = 'Limpar Dados?';
@@ -479,6 +484,7 @@ z.string.pt.searchInviteShare = 'Partilhar Contactos';
 
 z.string.pt.searchListEveryoneParticipates = 'Todas as pessoas a que está ligado já estão nesta conversa.';
 z.string.pt.searchListNoMatches = 'Sem resultados. Tente um nome diferente.';
+
 
 z.string.pt.uploadGoogleHeadline = 'Encontre pessoas para conversar.';
 z.string.pt.uploadGoogleMessage = 'Usamos seus dados de contacto para liga-lo aos outros. Nós anonimizamos toda a informação e não a partilhamos com outras entidades.';

@@ -64,6 +64,7 @@ z.string.fr.authPostedResendAction = 'Aucun e-mail à l’horizon ?';
 z.string.fr.authPostedResendDetail = 'Vérifiez votre boîte de réception et suivez les instructions.';
 z.string.fr.authPostedResendHeadline = 'Vous avez du courrier.';
 
+z.string.fr.authPlaceholderEmail = 'E-mail';
 z.string.fr.authPlaceholderPasswordPut = 'Mot de passe';
 z.string.fr.authPlaceholderPasswordSet = 'Mot de passe (8 caractères minimum)';
 z.string.fr.authPlaceholderPhone = 'Numéro de téléphone';
@@ -100,9 +101,13 @@ z.string.fr.modalAcknowledgeAction = 'OK';
 z.string.fr.modalConfirmSecondary = 'Annuler';
 z.string.fr.modalOptionSecondary = 'Annuler';
 
+z.string.fr.modalAccountCreateAction = 'OK';
+
 z.string.fr.modalAccountDeletionAction = 'Supprimer';
 z.string.fr.modalAccountDeletionHeadline = 'Supprimer le compte';
 z.string.fr.modalAccountDeletionMessage = 'Nous allons envoyer un e-mail ou un SMS. Cliquez sur le lien pour supprimer définitivement votre compte.';
+
+z.string.fr.modalAccountLeaveGuestRoomAction = 'Quitter';
 
 z.string.fr.modalAccountLogoutAction = 'Se déconnecter';
 z.string.fr.modalAccountLogoutHeadline = 'Supprimer les données ?';
@@ -505,6 +510,7 @@ z.string.fr.searchServiceConfirmButton = 'Ajouter un service';
 
 z.string.fr.searchListEveryoneParticipates = 'Toutes les personnes\navec qui vous êtes connecté(e)\nsont déjà dans cette conversation.';
 z.string.fr.searchListNoMatches = 'Aucun résultat.\nEssayez avec un nom différent.';
+
 
 z.string.fr.uploadGoogleHeadline = 'Trouvez des personnes\nà qui parler.';
 z.string.fr.uploadGoogleMessage = 'Nous utilisons les données de vos contacts afin de vous connecter à d’autres personnes. Nous anonymisons toutes les informations et ne les partageons avec personne d’autre.';

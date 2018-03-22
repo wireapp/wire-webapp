@@ -64,6 +64,7 @@ z.string.ru.authPostedResendAction = 'Не приходит письмо?';
 z.string.ru.authPostedResendDetail = 'Проверьте свой почтовый ящик и следуйте инструкциям.';
 z.string.ru.authPostedResendHeadline = 'Вам письмо.';
 
+z.string.ru.authPlaceholderEmail = 'Email';
 z.string.ru.authPlaceholderPasswordPut = 'Пароль';
 z.string.ru.authPlaceholderPasswordSet = 'Пароль (минимум 8 символов)';
 z.string.ru.authPlaceholderPhone = 'Номер телефона';
@@ -101,9 +102,13 @@ z.string.ru.modalAcknowledgeHeadline = 'Что-то пошло не так';
 z.string.ru.modalConfirmSecondary = 'Отменить';
 z.string.ru.modalOptionSecondary = 'Отменить';
 
+z.string.ru.modalAccountCreateAction = 'OK';
+
 z.string.ru.modalAccountDeletionAction = 'Удалить';
 z.string.ru.modalAccountDeletionHeadline = 'Удалить аккаунт';
 z.string.ru.modalAccountDeletionMessage = 'Мы вышлем вам сообщение по электронной почте или SMS. Перейдите по ссылке, чтобы навсегда удалить свой аккаунт.';
+
+z.string.ru.modalAccountLeaveGuestRoomAction = 'Покинуть';
 
 z.string.ru.modalAccountLogoutAction = 'Выход';
 z.string.ru.modalAccountLogoutHeadline = 'Удалить данные?';
@@ -340,6 +345,9 @@ z.string.ru.guestRoomToggleInfoExtended = 'Открыть этот разгов�
 
 z.string.ru.guestRoomConversationBadge = 'Присутствуют гости';
 
+z.string.ru.guestRoomConversationHead = 'Участники не из вашей команды смогут присоединиться к этому разговору.';
+z.string.ru.guestRoomConversationButton = 'Пригласить людей';
+
 z.string.ru.collectionShowAll = 'Показать все {{number}}';
 z.string.ru.collectionSectionLinks = 'Ссылки';
 z.string.ru.collectionSectionImages = 'Изображения';
@@ -375,6 +383,7 @@ z.string.ru.conversationsSecondaryLinePings = '{{number}} пинга';
 z.string.ru.conversationsSecondaryLinePeopleLeft = '{{number}} человек(а) покинули';
 z.string.ru.conversationsSecondaryLinePersonLeft = '{{user}} покинул разговор';
 z.string.ru.conversationsSecondaryLinePersonRemoved = '{{user}} был удален';
+z.string.ru.conversationsSecondaryLinePersonRemovedTeam = '{{user}} был удален из команды';
 z.string.ru.conversationsSecondaryLinePeopleAdded = '{{user}} человек были добавлены';
 z.string.ru.conversationsSecondaryLinePersonAdded = '{{user}} был добавлен';
 z.string.ru.conversationsSecondaryLinePersonAddedSelf = '{{user}} присоединился';
@@ -575,6 +584,8 @@ z.string.ru.searchServiceConfirmButton = 'Добавить службу';
 
 z.string.ru.searchListEveryoneParticipates = 'Все ваши контакты \nуже участвуют\nв этом разговоре.';
 z.string.ru.searchListNoMatches = 'Совпадений не найдено.\nПопробуйте ввести другое имя.';
+
+z.string.ru.temporaryGuestCta = 'Создать аккаунт';
 
 z.string.ru.uploadGoogleHeadline = 'Найти людей,\nчтобы поговорить.';
 z.string.ru.uploadGoogleMessage = 'Мы используем ваши контактные данные, чтобы соединить вас с другими пользователями. Мы анонимизируем всю информацию и не делимся ей с кем-либо еще.';

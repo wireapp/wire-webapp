@@ -61,6 +61,7 @@ z.string.cs.authPostedResendAction = 'Žádný email nedošel?';
 z.string.cs.authPostedResendDetail = 'Zkontrolujte doručenou poštu a postupujte dle instrukcí.';
 z.string.cs.authPostedResendHeadline = 'Přišel ti email.';
 
+z.string.cs.authPlaceholderEmail = 'Email';
 z.string.cs.authPlaceholderPasswordPut = 'Heslo';
 z.string.cs.authPlaceholderPasswordSet = 'Heslo (alespoň 8 znaků)';
 z.string.cs.authPlaceholderPhone = 'Telefonní číslo';
@@ -96,9 +97,13 @@ z.string.cs.modalAcknowledgeAction = 'Ok';
 z.string.cs.modalConfirmSecondary = 'Zrušit';
 z.string.cs.modalOptionSecondary = 'Zrušit';
 
+z.string.cs.modalAccountCreateAction = 'OK';
+
 z.string.cs.modalAccountDeletionAction = 'Smazat';
 z.string.cs.modalAccountDeletionHeadline = 'Smazat účet';
 z.string.cs.modalAccountDeletionMessage = 'Obdržíte od nás zprávu přes email nebo SMS. Pro trvalé smazání svého účtu otevřete zaslaný odkaz.';
+
+z.string.cs.modalAccountLeaveGuestRoomAction = 'Odejít';
 
 z.string.cs.modalAccountLogoutAction = 'Odhlásit se';
 z.string.cs.modalAccountLogoutHeadline = 'Vyčistit data?';
@@ -474,6 +479,7 @@ z.string.cs.searchInviteShare = 'Sdílet kontakty';
 
 z.string.cs.searchListEveryoneParticipates = 'Všichni, které znáte\njsou již připojeni\nk této konverzaci.';
 z.string.cs.searchListNoMatches = 'Žádné odpovídající výsledky.\nZkuste jiné jméno.';
+
 
 z.string.cs.uploadGoogleHeadline = 'Najít kontakty\npro konverzaci.';
 z.string.cs.uploadGoogleMessage = 'Vaše údaje o kontaktech používáme k propojení s ostatními uživateli. Všechny informace anonymizujeme a nesdílíme je s nikým dalším.';

@@ -66,6 +66,7 @@ z.string.hu.authPostedResendAction = 'Nem kaptál e-mailt?';
 z.string.hu.authPostedResendDetail = 'Ellenőrizd bejövő e-mailjeidet és kövesd az utasításokat.';
 z.string.hu.authPostedResendHeadline = 'Leveled érkezett.';
 
+z.string.hu.authPlaceholderEmail = 'E-mail';
 z.string.hu.authPlaceholderPasswordPut = 'Jelszó';
 z.string.hu.authPlaceholderPasswordSet = 'Jelszó (legalább 8 karakter)';
 z.string.hu.authPlaceholderPhone = 'Telefonszám';
@@ -103,9 +104,13 @@ z.string.hu.modalAcknowledgeHeadline = 'Valami nem stimmel';
 z.string.hu.modalConfirmSecondary = 'Mégsem';
 z.string.hu.modalOptionSecondary = 'Mégsem';
 
+z.string.hu.modalAccountCreateAction = 'OK';
+
 z.string.hu.modalAccountDeletionAction = 'Törlés';
 z.string.hu.modalAccountDeletionHeadline = 'Fiók törlése';
 z.string.hu.modalAccountDeletionMessage = 'Küldünk egy e-mailt vagy SMS-t. Fiókod végleges törléséhez nyisd meg a kapott linket.';
+
+z.string.hu.modalAccountLeaveGuestRoomAction = 'Kilépés';
 
 z.string.hu.modalAccountLogoutAction = 'Kijelentkezés';
 z.string.hu.modalAccountLogoutHeadline = 'Adatok törlése?';
@@ -580,6 +585,8 @@ z.string.hu.searchServiceConfirmButton = 'Új szolgáltatás';
 
 z.string.hu.searchListEveryoneParticipates = 'Az összes partnered, \nakivel felvetted a kapcsolatot,\nmár ebben a beszélgetésben van.';
 z.string.hu.searchListNoMatches = 'Nincs találat. \nPróbálj megy egy másik nevet.';
+
+z.string.hu.temporaryGuestCta = 'Fiók létrehozása';
 
 z.string.hu.uploadGoogleHeadline = 'Keress partnereket\na Wire-ön.';
 z.string.hu.uploadGoogleMessage = 'A névjegyeid importálásával könnyebben kapcsolatba léphetsz másokkal. Minden információt anonimizálunk, és semmit nem osszuk meg senki mással.';

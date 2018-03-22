@@ -62,6 +62,7 @@ z.string.es.authPostedResendAction = '¿No aparece ningún correo electrónico?'
 z.string.es.authPostedResendDetail = 'Revise su buzón de correo electrónico y siga las instrucciones.';
 z.string.es.authPostedResendHeadline = 'Tiene un correo electrónico.';
 
+z.string.es.authPlaceholderEmail = 'Correo';
 z.string.es.authPlaceholderPasswordPut = 'Contraseña';
 z.string.es.authPlaceholderPasswordSet = 'Contraseña (mínimo 8 caracteres)';
 z.string.es.authPlaceholderPhone = 'Número de teléfono';
@@ -98,9 +99,13 @@ z.string.es.modalAcknowledgeAction = 'OK';
 z.string.es.modalConfirmSecondary = 'Cancelar';
 z.string.es.modalOptionSecondary = 'Cancelar';
 
+z.string.es.modalAccountCreateAction = 'OK';
+
 z.string.es.modalAccountDeletionAction = 'Eliminar';
 z.string.es.modalAccountDeletionHeadline = 'Eliminar cuenta';
 z.string.es.modalAccountDeletionMessage = 'Enviaremos un mensaje por correo electrónico o SMS. Sigue el enlace para borrar permanentemente tu cuenta.';
+
+z.string.es.modalAccountLeaveGuestRoomAction = 'Abandonar';
 
 z.string.es.modalAccountLogoutAction = 'Cerrar sesión';
 z.string.es.modalAccountLogoutHeadline = '¿Borrar los Datos?';
@@ -481,6 +486,8 @@ z.string.es.searchInviteShare = 'Compartir contactos';
 
 z.string.es.searchListEveryoneParticipates = 'Todas las personas con quien estás conectado ya se encuentran en esta conversación.';
 z.string.es.searchListNoMatches = 'No hay resultados coincidentes. Intente con un nombre diferente.';
+
+z.string.es.temporaryGuestCta = 'Crear una cuenta';
 
 z.string.es.uploadGoogleHeadline = 'Buscar con quien hablar.';
 z.string.es.uploadGoogleMessage = 'Compartir tus contactos te ayuda a conectarte con otros. Toda la información es anónima y no será compartida con nadie más.';

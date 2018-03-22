@@ -61,6 +61,7 @@ z.string.tr.authPostedResendAction = 'E-posta gelmedi mi?';
 z.string.tr.authPostedResendDetail = 'E-posta gelen kutunuzu kontrol edin ve talimatları izleyin.';
 z.string.tr.authPostedResendHeadline = 'E-posta geldi.';
 
+z.string.tr.authPlaceholderEmail = 'E-posta';
 z.string.tr.authPlaceholderPasswordPut = 'Şifre';
 z.string.tr.authPlaceholderPasswordSet = 'Şifre (en az 8 karakter)';
 z.string.tr.authPlaceholderPhone = 'Telefon Numarası';
@@ -97,9 +98,13 @@ z.string.tr.modalAcknowledgeAction = 'Tamam';
 z.string.tr.modalConfirmSecondary = 'İptal';
 z.string.tr.modalOptionSecondary = 'İptal';
 
+z.string.tr.modalAccountCreateAction = 'TAMAM';
+
 z.string.tr.modalAccountDeletionAction = 'Sil';
 z.string.tr.modalAccountDeletionHeadline = 'Hesabı Sil';
 z.string.tr.modalAccountDeletionMessage = 'Size kısa mesaj veya e-posta aracılığıyla bir mesaj göndereceğiz. Mesajdaki bağlantıyı takip ederek hesabınızı kalıcı olarak silebilirsiniz.';
+
+z.string.tr.modalAccountLeaveGuestRoomAction = 'Ayrıl';
 
 z.string.tr.modalAccountLogoutAction = 'Çıkış yap';
 z.string.tr.modalAccountLogoutHeadline = 'Veriyi Temizle?';
@@ -480,6 +485,7 @@ z.string.tr.searchInviteShare = 'Kişileri Paylaş';
 
 z.string.tr.searchListEveryoneParticipates = 'Bağlantıda olduğun herkes zaten bu görüşme içerisinde.';
 z.string.tr.searchListNoMatches = 'Eşleşen sonuç yok.\nBaşka bir isim girmeyi deneyin.';
+
 
 z.string.tr.uploadGoogleHeadline = 'Konuşmak için\ninsanları bul.';
 z.string.tr.uploadGoogleMessage = 'İletişim verilerinizi sizi başkalarıyla bağlayabilmek için kullanıyoruz. Tüm bilgilerinizi gizler ve kimseyle paylaşmayız.';

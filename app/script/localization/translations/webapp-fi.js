@@ -61,6 +61,7 @@ z.string.fi.authPostedResendAction = 'Eikö sähköposti saavu perille?';
 z.string.fi.authPostedResendDetail = 'Tarkista sähköpostisi saapuneet-kansio ja seuraa ohjeita.';
 z.string.fi.authPostedResendHeadline = 'Sinulle on sähköpostia.';
 
+z.string.fi.authPlaceholderEmail = 'Sähköposti';
 z.string.fi.authPlaceholderPasswordPut = 'Salasana';
 z.string.fi.authPlaceholderPasswordSet = 'Salasana (vähintään 8 merkkiä pitkä)';
 z.string.fi.authPlaceholderPhone = 'Puhelinnumero';
@@ -96,9 +97,13 @@ z.string.fi.modalAcknowledgeAction = 'Ok';
 z.string.fi.modalConfirmSecondary = 'Peruuta';
 z.string.fi.modalOptionSecondary = 'Peruuta';
 
+z.string.fi.modalAccountCreateAction = 'OK';
+
 z.string.fi.modalAccountDeletionAction = 'Poista';
 z.string.fi.modalAccountDeletionHeadline = 'Poista tili';
 z.string.fi.modalAccountDeletionMessage = 'Lähetämme viestin sähköpostina tai tekstiviestinä. Paina viestissä olevaa linkkiä poistaaksesi tilisi lopullisesti.';
+
+z.string.fi.modalAccountLeaveGuestRoomAction = 'Poistu';
 
 z.string.fi.modalAccountLogoutAction = 'Kirjaudu ulos';
 z.string.fi.modalAccountLogoutHeadline = 'Tyhjennä tiedot?';
@@ -478,6 +483,7 @@ z.string.fi.searchInviteShare = 'Jaa yhteystietoja';
 
 z.string.fi.searchListEveryoneParticipates = 'Jokainen jonka kanssa olet yhdistetty on jo tässä keskustelussa.';
 z.string.fi.searchListNoMatches = 'Ei vastaavia tuloksia. Yritä toisella nimellä.';
+
 
 z.string.fi.uploadGoogleHeadline = 'Etsi ihmisiä joiden kanssa jutella.';
 z.string.fi.uploadGoogleMessage = 'Käytämme sinun kontaktitietoja yhdistääksemme sinut muiden kanssa. Anonymisoimme kaiken tiedon ja emme jaa sitä ulkopuolisille.';

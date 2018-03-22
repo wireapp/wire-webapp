@@ -56,6 +56,7 @@ z.string.hr.authPostedResendAction = 'Email se ne pojavljuje?';
 z.string.hr.authPostedResendDetail = 'Provjerite svoj email sandučić i slijedite upute.';
 z.string.hr.authPostedResendHeadline = 'Imate poštu.';
 
+z.string.hr.authPlaceholderEmail = 'Email';
 z.string.hr.authPlaceholderPasswordPut = 'Lozinka';
 z.string.hr.authPlaceholderPasswordSet = 'Lozinka (najmanje 8 znakova)';
 z.string.hr.authPlaceholderPhone = 'Telefonski broj';
@@ -88,9 +89,13 @@ z.string.hr.modalAcknowledgeAction = 'Ok';
 z.string.hr.modalConfirmSecondary = 'Odustani';
 z.string.hr.modalOptionSecondary = 'Odustani';
 
+z.string.hr.modalAccountCreateAction = 'U redu';
+
 z.string.hr.modalAccountDeletionAction = 'Obriši';
 z.string.hr.modalAccountDeletionHeadline = 'Brisanje računa';
 z.string.hr.modalAccountDeletionMessage = 'Poslati ćemo Vam poslati poruku putem e-maila ili SMS-a. Slijedite link za trajno brisanje računa.';
+
+z.string.hr.modalAccountLeaveGuestRoomAction = 'Izađi';
 
 z.string.hr.modalAccountLogoutAction = 'Odjava';
 z.string.hr.modalAccountLogoutHeadline = 'Obriši podatke?';
@@ -424,6 +429,7 @@ z.string.hr.searchInviteShare = 'Podijeli kontakte';
 
 z.string.hr.searchListEveryoneParticipates = 'Svi ljudi s kojima ste povezani su već u ovom razgovoru.';
 z.string.hr.searchListNoMatches = 'Nema odgovarajućih rezultata. Pokušajte unijeti drugačije ime.';
+
 
 z.string.hr.uploadGoogleHeadline = 'Pronađi ljude za razgovor.';
 z.string.hr.uploadGoogleMessage = 'Mi koristimo vaše kontakt podatke za povezivanje s drugima. Sve informacije su anonimiziane i nisu dijeljene s drugima.';

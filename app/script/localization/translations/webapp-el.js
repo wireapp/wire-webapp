@@ -61,6 +61,7 @@ z.string.el.authPostedResendAction = 'Δεν εμφανίζεται το email;'
 z.string.el.authPostedResendDetail = 'Ελέγξτε τα email σας και ακολουθήστε τις οδηγίες που θα βρείτε.';
 z.string.el.authPostedResendHeadline = 'Έχετε μήνυμα.';
 
+z.string.el.authPlaceholderEmail = 'Email';
 z.string.el.authPlaceholderPasswordPut = 'Κωδικός Πρόσβασης';
 z.string.el.authPlaceholderPasswordSet = 'Κωδικος προσβασης (το λιγοτερο 8 χαρακτηρες)';
 z.string.el.authPlaceholderPhone = 'Αριθμός Κινητού Τηλεφώνου';
@@ -96,9 +97,13 @@ z.string.el.modalAcknowledgeAction = 'Εντάξει';
 z.string.el.modalConfirmSecondary = 'Ακύρωση';
 z.string.el.modalOptionSecondary = 'Ακύρωση';
 
+z.string.el.modalAccountCreateAction = 'Εντάξει';
+
 z.string.el.modalAccountDeletionAction = 'Διαγραφή';
 z.string.el.modalAccountDeletionHeadline = 'Διαγραφή λογαριασμού';
 z.string.el.modalAccountDeletionMessage = 'Θα σας στείλουμε ένα μήνυμα μέσω email ή SMS. Πατήστε επάνω στον σύνδεσμο μας για να διαγράψετε τον λογαριασμό σας οριστικά.';
+
+z.string.el.modalAccountLeaveGuestRoomAction = 'Αποχώρηση';
 
 z.string.el.modalAccountLogoutAction = 'Αποσύνδεση';
 z.string.el.modalAccountLogoutHeadline = 'Εκκαθάριση δεδομένων;';
@@ -475,6 +480,7 @@ z.string.el.searchInviteShare = 'Κοινή χρήση Επαφών';
 
 z.string.el.searchListEveryoneParticipates = 'Όλοι όσοι συνδεθήκατε βρίσκεστε ήδη εντός της συνομιλίας.';
 z.string.el.searchListNoMatches = 'Δεν υπάρχουν σχετικά αποτελέσματα.\nΔοκιμάστε να εισάγετε ένα διαφορετικό όνομα.';
+
 
 z.string.el.uploadGoogleHeadline = 'Εύρεση ατόμων για συνομιλία.';
 z.string.el.uploadGoogleMessage = 'Χρησιμοποιούμε τις επαφές σας για να συνδέεστε με άλλους. Κρατάμε όλες σας τις πληροφορίες ανώνυμες και δεν τις μοιραζόμαστε με κανέναν άλλον.';
