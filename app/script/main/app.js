@@ -385,10 +385,11 @@ z.main.App = class App {
     const {message, type} = error;
     const is_auth_error = error instanceof z.auth.AuthError;
     if (is_auth_error) {
-      if (type === z.auth.AuthError.TYPE.MULTIPLE_TABS) {
-        return this._redirectToLogin(z.auth.SIGN_OUT_REASON.MULTIPLE_TABS);
-      }
-      return this._redirectToLogin(z.auth.SIGN_OUT_REASON.INDEXED_DB);
+      const isTypeMultipleTabs = type === z.auth.AuthError.TYPE.MULTIPLE_TABS;
+      const signOutReason = isTypeMultipleTabs
+        ? z.auth.SIGN_OUT_REASON.MULTIPLE_TABS
+        : z.auth.SIGN_OUT_REASON.INDEXED_DB;
+      return this._redirectToLogin(signOutReason);
     }
 
     this.logger.debug(
@@ -661,6 +662,11 @@ z.main.App = class App {
    * @returns {undefined} No return value
    */
   logout(signOutReason, clearData = false) {
+    const _redirectToLogin = () => {
+      amplify.publish(z.event.WebApp.LIFECYCLE.SIGNED_OUT, clearData);
+      this._redirectToLogin(signOutReason);
+    };
+
     const _logout = () => {
       // Disconnect from our backend, end tracking and clear cached data
       this.repository.event.disconnectWebSocket(z.event.WebSocketService.CHANGE_TRIGGER.LOGOUT);
@@ -693,18 +699,13 @@ z.main.App = class App {
       }
 
       // Clear IndexedDB
-      if (clearData) {
-        return this.repository.storage
-          .deleteDatabase()
-          .catch(error => this.logger.error('Failed to delete database before logout', error))
-          .then(() => {
-            amplify.publish(z.event.WebApp.LIFECYCLE.SIGNED_OUT, clearData);
-            this._redirectToLogin(signOutReason);
-          });
-      }
+      const clearDataPromise = clearData
+        ? this.repository.storage
+            .deleteDatabase()
+            .catch(error => this.logger.error('Failed to delete database before logout', error))
+        : Promise.resolve();
 
-      amplify.publish(z.event.WebApp.LIFECYCLE.SIGNED_OUT, clearData);
-      this._redirectToLogin(signOutReason);
+      return clearDataPromise.then(() => _redirectToLogin());
     };
 
     const _logoutOnBackend = () => {
@@ -712,10 +713,7 @@ z.main.App = class App {
       return this.auth.repository
         .logout()
         .then(() => _logout())
-        .catch(() => {
-          amplify.publish(z.event.WebApp.LIFECYCLE.SIGNED_OUT, clearData);
-          this._redirectToLogin(signOutReason);
-        });
+        .catch(() => _redirectToLogin());
     };
 
     if (App.CONFIG.IMMEDIATE_SIGN_OUT_REASONS.includes(signOutReason)) {
