@@ -1437,7 +1437,7 @@ z.calling.CallingRepository = class CallingRepository {
     if (window.adapter) {
       window.adapter.disableLog = false;
     } else {
-      this.logger.warn('WebRTC Adapter not found while trying to enable logging');
+      this.callLogger.warn('WebRTC Adapter not found while trying to enable logging');
     }
   }
 
