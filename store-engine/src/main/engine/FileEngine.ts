@@ -18,7 +18,7 @@ export default class FileEngine implements CRUDEngine {
   }
 
   purge(): Promise<void> {
-    return fs.rmdir(this.storeName);
+    return fs.remove(this.storeName);
   }
 
   private resolvePath(tableName: string, primaryKey?: string): Promise<string> {

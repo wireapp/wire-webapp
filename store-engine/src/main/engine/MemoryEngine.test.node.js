@@ -24,9 +24,14 @@ describe('StoreEngine.MemoryEngine', () => {
 
   let engine = undefined;
 
+  async function initEngine() {
+    const storeEngine = new MemoryEngine();
+    await storeEngine.init(STORE_NAME);
+    return storeEngine;
+  }
+
   beforeEach(async done => {
-    engine = new MemoryEngine();
-    await engine.init(STORE_NAME);
+    engine = await initEngine();
     done();
   });
 
@@ -45,6 +50,12 @@ describe('StoreEngine.MemoryEngine', () => {
   describe('"deleteAll"', () => {
     Object.entries(require('../../test/shared/deleteAll')).map(([description, testFunction]) => {
       it(description, done => testFunction(done, engine));
+    });
+  });
+
+  describe('"purge"', () => {
+    Object.entries(require('../../test/shared/purge')).map(([description, testFunction]) => {
+      it(description, done => testFunction(done, engine, initEngine));
     });
   });
 

@@ -24,11 +24,7 @@ export default class IndexedDBEngine implements CRUDEngine {
   }
 
   purge(): Promise<void> {
-    if (this.db) {
-      return this.db.delete();
-    } else {
-      return Dexie.delete(this.storeName);
-    }
+    return this.db ? this.db.delete() : Dexie.delete(this.storeName);
   }
 
   public create<T>(tableName: string, primaryKey: string, entity: T): Promise<string> {

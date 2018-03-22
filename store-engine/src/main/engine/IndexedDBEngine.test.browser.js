@@ -25,12 +25,17 @@ describe('StoreEngine.IndexedDBEngine', () => {
 
   let engine = undefined;
 
-  beforeEach(async done => {
-    engine = new IndexedDBEngine();
-    const db = await engine.init(STORE_NAME);
+  async function initEngine() {
+    const storeEngine = new IndexedDBEngine();
+    const db = await storeEngine.init(STORE_NAME);
     db.version(1).stores({
       'the-simpsons': ',firstName,lastName',
     });
+    return storeEngine;
+  }
+
+  beforeEach(async done => {
+    engine = await initEngine();
     done();
   });
 
@@ -87,6 +92,12 @@ describe('StoreEngine.IndexedDBEngine', () => {
   describe('"deleteAll"', () => {
     Object.entries(require('../../test/shared/deleteAll')).map(([description, testFunction]) => {
       it(description, done => testFunction(done, engine));
+    });
+  });
+
+  describe('"purge"', () => {
+    Object.entries(require('../../test/shared/purge')).map(([description, testFunction]) => {
+      it(description, done => testFunction(done, engine, initEngine));
     });
   });
 
