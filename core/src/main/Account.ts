@@ -18,6 +18,7 @@
  */
 
 const pkg = require('../package.json');
+const Logdown = require('logdown');
 import {IncomingNotification} from '@wireapp/api-client/dist/commonjs/conversation/index';
 import * as cryptobox from '@wireapp/cryptobox';
 import {CryptographyService, GenericMessageType, PayloadBundle} from './cryptography/root';
@@ -56,6 +57,10 @@ class Account extends EventEmitter {
     cryptography: CryptographyService;
     notification: NotificationService;
   };
+  private logger: any = Logdown('@wireapp/core/Account', {
+    logger: console,
+    markdown: false,
+  });
 
   constructor(apiClient: Client = new Client()) {
     super();
@@ -376,7 +381,10 @@ class Account extends EventEmitter {
       .catch(error => {
         // There was no client so we need to "create" and "register" a client
         const notFoundInDatabase =
-          error instanceof cryptobox.error.CryptoboxError || error instanceof RecordNotFoundError;
+          error instanceof cryptobox.error.CryptoboxError ||
+          error.constructor.name === 'CryptoboxError' ||
+          error instanceof RecordNotFoundError ||
+          error.constructor.name === 'RecordNotFoundError';
         const notFoundOnBackend = error.response && error.response.status === StatusCode.NOT_FOUND;
 
         if (notFoundInDatabase) {

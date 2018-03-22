@@ -8,6 +8,7 @@
     "@wireapp/cryptobox": "8.3.5",
     "@wireapp/store-engine": "0.5.0",
     "bazinga64": "5.0.3",
+    "logdown": "3.2.3",
     "protobufjs": "6.8.6",
     "pure-uuid": "1.5.0"
   },

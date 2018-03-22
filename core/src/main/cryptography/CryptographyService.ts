@@ -24,7 +24,8 @@ import {RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/index';
 import {UserPreKeyBundleMap} from '@wireapp/api-client/dist/commonjs/user/index';
 import * as ProteusKeys from '@wireapp/proteus/dist/keys/root';
 import {PreKey as SerializedPreKey} from '@wireapp/api-client/dist/commonjs/auth/index';
-import {CryptographyDatabaseRepository, SessionPayloadBundle} from '../cryptography/root';
+import {SessionPayloadBundle} from '../cryptography/root';
+import CryptographyDatabaseRepository from './CryptographyDatabaseRepository';
 import {OTRRecipients} from '@wireapp/api-client/dist/commonjs/conversation/index';
 
 export interface MetaClient extends RegisteredClient {
@@ -39,7 +40,7 @@ export default class CryptographyService {
   private database: CryptographyDatabaseRepository;
 
   constructor(private storeEngine: CRUDEngine) {
-    this.cryptobox = new Cryptobox(storeEngine);
+    this.cryptobox = new Cryptobox(this.storeEngine);
     this.database = new CryptographyDatabaseRepository(this.storeEngine);
   }
 
