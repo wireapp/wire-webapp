@@ -601,6 +601,9 @@ z.string.preferencesOptionsNotificationsNone = 'Off';
 z.string.preferencesOptionsNotificationsObfuscate = 'Hide details';
 z.string.preferencesOptionsNotificationsObfuscateMessage = 'Show sender';
 z.string.preferencesOptionsNotificationsOn = 'Show sender and message';
+z.string.preferencesOptionsCallLogs = 'Troubleshooting';
+z.string.preferencesOptionsCallLogsGet = 'Save the calling debug report';
+z.string.preferencesOptionsCallLogsDetail = 'This information helps Wire Support diagnose calling problems.';
 
 // Search
 z.string.searchConnect = 'Connect';

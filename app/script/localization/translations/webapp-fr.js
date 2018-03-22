@@ -480,6 +480,9 @@ z.string.fr.preferencesOptionsNotificationsNone = 'Désactiver';
 z.string.fr.preferencesOptionsNotificationsObfuscate = 'Masquer les détails';
 z.string.fr.preferencesOptionsNotificationsObfuscateMessage = 'Afficher l’expéditeur';
 z.string.fr.preferencesOptionsNotificationsOn = 'Afficher l’expéditeur et le message';
+z.string.fr.preferencesOptionsCallLogs = 'Dépannage';
+z.string.fr.preferencesOptionsCallLogsGet = 'Sauvegarder le rapport de débogage des appels';
+z.string.fr.preferencesOptionsCallLogsDetail = 'Cette information aide l’assistance de Wire à diagnostiquer les problèmes d’appel.';
 
 z.string.fr.searchConnect = 'Se connecter';
 z.string.fr.searchConnections = 'Contacts';

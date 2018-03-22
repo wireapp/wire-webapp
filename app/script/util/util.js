@@ -589,6 +589,6 @@ z.util.afterRender = callback => window.requestAnimationFrame(() => window.setTi
 
 /**
  * No operation
- * @returns {undefined}
+ * @returns {void}
  */
 z.util.noop = () => {};
