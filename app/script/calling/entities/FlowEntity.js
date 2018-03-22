@@ -811,15 +811,13 @@ z.calling.entities.FlowEntity = class FlowEntity {
         const isModeDefault = this.negotiationMode() === z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT;
         if (isModeDefault && sendingOnTimeout) {
           if (!this._containsRelayCandidate(iceCandidates)) {
-            this.callLogger.warn(
-              `No relay ICE candidates in local SDP. Timeout reset\n${iceCandidates}`,
-              iceCandidates
-            );
+            const logMessage = `No relay ICE candidates in local SDP. Timeout reset\n${iceCandidates}`;
+            this.callLogger.warn(logMessage, iceCandidates);
             return this._setSendSdpTimeout(false);
           }
         }
 
-        this.callLogger.debug({
+        const logMessage = {
           data: {
             default: [localSdp.type, iceCandidates.length, this.remoteUser.name(), this.localSdp().sdp],
             obfuscated: [
@@ -830,7 +828,8 @@ z.calling.entities.FlowEntity = class FlowEntity {
             ],
           },
           message: `Sending local '{0}' SDP containing '{1}' ICE candidates for flow with '{2}'\n{3}`,
-        });
+        };
+        this.callLogger.debug(logMessage);
 
         this.shouldSendLocalSdp(false);
 
@@ -907,13 +906,15 @@ z.calling.entities.FlowEntity = class FlowEntity {
    */
   _createSdpAnswer() {
     this.negotiationNeeded(false);
-    this.callLogger.debug({
+
+    const logMessage = {
       data: {
         default: [z.calling.rtc.SDP_TYPE.ANSWER, this.remoteUser.name()],
         obfuscated: [z.calling.rtc.SDP_TYPE.ANSWER, this.callLogger.obfuscate(this.remoteUser.id)],
       },
       message: `Creating '{0}' for flow with '{1}'`,
-    });
+    };
+    this.callLogger.debug(logMessage);
 
     this.peerConnection
       .createAnswer()
@@ -974,13 +975,14 @@ z.calling.entities.FlowEntity = class FlowEntity {
      */
     const offerOptions = {iceRestart, voiceActivityDetection: true};
 
-    this.callLogger.debug({
+    const logMessage = {
       data: {
         default: [z.calling.rtc.SDP_TYPE.OFFER, this.remoteUser.name()],
         obfuscated: [z.calling.rtc.SDP_TYPE.OFFER, this.callLogger.obfuscate(this.remoteUser.id)],
       },
       message: `Creating '{0}' for flow with '{1}'`,
-    });
+    };
+    this.callLogger.debug(logMessage);
 
     this.peerConnection
       .createOffer(offerOptions)
@@ -1142,7 +1144,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
    * @returns {boolean} False if we locally needed to switch sides
    */
   _solveCollidingStates(forceRenegotiation = false) {
-    this.callLogger.debug({
+    const logMessage = {
       data: {
         default: [this.selfUserId, this.remoteUserId, forceRenegotiation],
         obfuscated: [
@@ -1152,30 +1154,33 @@ z.calling.entities.FlowEntity = class FlowEntity {
         ],
       },
       message: `Solving state collision: Self user ID '{0}', remote user ID '{1}', forceRenegotiation '{2}'`,
-    });
+    };
+    this.callLogger.debug(logMessage);
 
     const selfUserIdLooses = this.selfUserId < this.remoteUserId;
     const shouldRenegotiate = selfUserIdLooses || forceRenegotiation;
     if (shouldRenegotiate) {
-      this.callLogger.warn({
+      const log = {
         data: {
           default: [this.remoteUser.name()],
           obfuscated: [this.callLogger.obfuscate(this.remoteUser.id)],
         },
         message: `We need to switch SDP state of flow with '{0}' to answer.`,
-      });
+      };
+      this.callLogger.warn(log);
 
       this.restartNegotiation(z.calling.enum.SDP_NEGOTIATION_MODE.STATE_COLLISION, true);
       return forceRenegotiation || false;
     }
 
-    this.callLogger.warn({
+    const log = {
       data: {
         default: [this.remoteUser.name()],
         obfuscated: [this.callLogger.obfuscate(this.remoteUser.id)],
       },
       message: `Remote side '{0}' needs to switch SDP state flow to answer.`,
-    });
+    };
+    this.callLogger.warn(log);
 
     return true;
   }
@@ -1468,13 +1473,15 @@ z.calling.entities.FlowEntity = class FlowEntity {
     }
 
     if (this.pcInitialized()) {
-      this.callLogger.debug({
+      const logMessage = {
         data: {
           default: [this.remoteUser.id],
           obfuscated: [this.callLogger.obfuscate(this.remoteUser.id)],
         },
         message: `Resetting flow with user '{0}'`,
-      });
+      };
+      this.callLogger.debug(logMessage);
+
       this.remoteClientId = undefined;
       this.telemetry.disconnected();
 

@@ -137,16 +137,14 @@ z.calling.entities.ParticipantEntity = class ParticipantEntity {
       const isExpectedId = clientId === connectedClientId;
       const requestedByWrongSender = connectedClientId && !isExpectedId;
       if (requestedByWrongSender) {
-        this.callLogger.warn(
-          {
-            data: {
-              default: [clientId, connectedClientId],
-              obfuscated: [this.callLogger.obfuscate(clientId), this.callLogger.obfuscate(connectedClientId)],
-            },
-            message: `State change requested from '{0}' while we are connected to '{1}'`,
+        const logMessage = {
+          data: {
+            default: [clientId, connectedClientId],
+            obfuscated: [this.callLogger.obfuscate(clientId), this.callLogger.obfuscate(connectedClientId)],
           },
-          this
-        );
+          message: `State change requested from '{0}' while we are connected to '{1}'`,
+        };
+        this.callLogger.warn(logMessage, this);
         throw new z.calling.CallError(z.calling.CallError.TYPE.WRONG_SENDER);
       }
 
