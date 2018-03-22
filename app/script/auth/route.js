@@ -31,6 +31,5 @@ export default {
   LOGIN: '/login',
   PASSWORD_RESET: '/forgot',
   PERSONAL_INVITE: '/personalinvite',
-  PHONE_LOGIN: '/login#phone',
   VERIFY: '/verify',
 };
