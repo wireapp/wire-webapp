@@ -64,7 +64,7 @@ describe('User Mapper', () => {
       self_user_payload.accent_id = 0;
       const user_et = mapper.map_user_from_object(self_user_payload);
       expect(user_et.name()).toBe('John Doe');
-      expect(user_et.joaat_hash).toBe(526273169);
+      expect(user_et.joaatHash).toBe(526273169);
       expect(user_et.accent_id()).toBe(z.config.ACCENT_ID.BLUE);
     });
   });
@@ -139,8 +139,8 @@ describe('User Mapper', () => {
       user_et.id = entities.user.john_doe.id;
       const data = {
         assets: [
-          {key: z.util.create_random_uuid(), size: 'preview', type: 'image'},
-          {key: z.util.create_random_uuid(), size: 'complete', type: 'image'},
+          {key: z.util.createRandomUuid(), size: 'preview', type: 'image'},
+          {key: z.util.createRandomUuid(), size: 'complete', type: 'image'},
         ],
         id: entities.user.john_doe.id,
         name: entities.user.jane_roe.name,

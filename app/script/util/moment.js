@@ -19,18 +19,18 @@
 
 'use strict';
 
-moment.fn.is_today = function() {
+moment.fn.isToday = function() {
   return this.isSame(new Date(), 'd');
 };
 
-moment.fn.is_current_year = function() {
+moment.fn.isCurrentYear = function() {
   return this.isSame(new Date(), 'y');
 };
 
-moment.fn.is_same_day = function(date) {
+moment.fn.isSameDay = function(date) {
   return this.isSame(date, 'd');
 };
 
-moment.fn.is_same_month = function(date) {
+moment.fn.isSameMonth = function(date) {
   return this.isSame(date, 'M');
 };

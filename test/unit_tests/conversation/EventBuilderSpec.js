@@ -27,10 +27,10 @@ describe('z.conversation.EventBuilder', () => {
   let self_user_et = undefined;
 
   beforeEach(() => {
-    self_user_et = new z.entity.User(z.util.create_random_uuid());
+    self_user_et = new z.entity.User(z.util.createRandomUuid());
     self_user_et.is_me = true;
 
-    conversation_et = new z.entity.Conversation(z.util.create_random_uuid());
+    conversation_et = new z.entity.Conversation(z.util.createRandomUuid());
     conversation_et.self = self_user_et;
 
     event_mapper = new z.conversation.EventMapper();
@@ -47,7 +47,7 @@ describe('z.conversation.EventBuilder', () => {
   });
 
   it('buildDegraded', () => {
-    const user_ids = [z.util.create_random_uuid()];
+    const user_ids = [z.util.createRandomUuid()];
     const event = z.conversation.EventBuilder.buildDegraded(
       conversation_et,
       user_ids,

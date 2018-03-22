@@ -145,7 +145,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
   }
 
   _formatFingerprint(fingerprint) {
-    return z.util.zero_padding(fingerprint, 16).match(/.{1,2}/g) || [];
+    return z.util.zeroPadding(fingerprint, 16).match(/.{1,2}/g) || [];
   }
 
   /**
@@ -337,7 +337,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
           this.logger.log(`Initializing session with user '${userId}' (${clientId}) with pre-key ID '${preKey.id}'.`);
           const sessionId = this._constructSessionId(userId, clientId);
 
-          return this.cryptobox.session_from_prekey(sessionId, z.util.base64_to_array(preKey.key).buffer);
+          return this.cryptobox.session_from_prekey(sessionId, z.util.base64ToArray(preKey.key).buffer);
         }
 
         this.logger.warn(`No pre-key for user '${userId}' ('${clientId}') found. The client might have been deleted.`);
@@ -406,7 +406,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
    */
   _decryptEvent(event) {
     const {data: eventData, from: userId} = event;
-    const cipherText = z.util.base64_to_array(eventData.text || eventData.key).buffer;
+    const cipherText = z.util.base64ToArray(eventData.text || eventData.key).buffer;
     const sessionId = this._constructSessionId(userId, eventData.sender);
 
     return this.cryptobox.decrypt(sessionId, cipherText).then(plaintext => z.proto.GenericMessage.decode(plaintext));
@@ -424,7 +424,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
   _encryptPayloadForSession(sessionId, genericMessage) {
     return this.cryptobox
       .encrypt(sessionId, genericMessage.toArrayBuffer())
-      .then(cipherText => ({cipherText: z.util.array_to_base64(cipherText), sessionId}))
+      .then(cipherText => ({cipherText: z.util.arrayToBase64(cipherText), sessionId}))
       .catch(error => {
         if (error instanceof StoreEngine.error.RecordNotFoundError) {
           this.logger.log(`Session '${sessionId}' needs to get initialized...`);

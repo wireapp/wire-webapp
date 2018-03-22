@@ -25,6 +25,12 @@ window.z.viewModel.content = z.viewModel.content || {};
 
 // Parent: z.viewModel.ContentViewModel
 z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
+  static get CONFIG() {
+    return {
+      DRAG_THRESHOLD: 2,
+    };
+  }
+
   constructor(mainViewModel, contentViewModel, repositories) {
     this.addedToView = this.addedToView.bind(this);
 
@@ -84,6 +90,8 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
 
     this.isMacDesktop = z.util.Environment.electron && z.util.Environment.os.mac;
     this.isDragged = false;
+    this.startX = 0;
+    this.startY = 0;
     this.isMoved = false;
     this.preventPanelOpen = false;
   }
@@ -114,16 +122,25 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
     this.showDetails();
   }
 
-  onMouseDown() {
-    this.isDragged = this.isMacDesktop;
+  onMouseDown(_, event) {
+    if (this.isMacDesktop) {
+      this.isDragged = true;
+      this.startX = event.screenX;
+      this.startY = event.screenY;
+    }
   }
 
-  onMouseMove() {
-    this.isMoved = this.isDragged;
+  onMouseMove(_, event) {
+    if (this.isDragged && !this.isMoved) {
+      const distanceX = Math.abs(event.screenX - this.startX);
+      const distanceY = Math.abs(event.screenY - this.startY);
+      this.isMoved =
+        distanceX > TitleBarViewModel.CONFIG.DRAG_THRESHOLD || distanceY > TitleBarViewModel.CONFIG.DRAG_THRESHOLD;
+    }
   }
 
   onMouseUp() {
-    this.preventPanelOpen = this.isMoved && this.isDragged;
+    this.preventPanelOpen = this.isMoved;
     this.isMoved = false;
     this.isDragged = false;
   }

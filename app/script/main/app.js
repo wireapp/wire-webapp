@@ -58,7 +58,7 @@ z.main.App = class App {
     this.view = this._setup_view_models();
     this.util = this._setup_utils();
 
-    this.instanceId = z.util.create_random_uuid();
+    this.instanceId = z.util.createRandomUuid();
 
     this._subscribe_to_events();
 
@@ -237,7 +237,7 @@ z.main.App = class App {
    */
   init_app(is_reload = this._is_reload()) {
     z.util
-      .check_indexed_db()
+      .checkIndexedDb()
       .then(() => this._checkSingleInstanceOnInit())
       .then(() => this._loadAccessToken())
       .then(() => {
@@ -245,7 +245,7 @@ z.main.App = class App {
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
 
         const protoFile = `ext/proto/generic-message-proto/messages.proto?${z.util.Environment.version(false)}`;
-        return Promise.all([this._get_user_self(), z.util.protobuf.load_protos(protoFile)]);
+        return Promise.all([this._get_user_self(), z.util.protobuf.loadProtos(protoFile)]);
       })
       .then(([self_user_et]) => {
         this.view.loading.updateProgress(5, z.string.initReceivedSelfUser);
@@ -500,14 +500,14 @@ z.main.App = class App {
    * @returns {undefined} Not return value
    */
   _handleUrlParams() {
-    const providerId = z.util.get_url_parameter(z.auth.URLParameter.BOT_PROVIDER);
-    const serviceId = z.util.get_url_parameter(z.auth.URLParameter.BOT_SERVICE);
+    const providerId = z.util.URLUtil.getParameter(z.auth.URLParameter.BOT_PROVIDER);
+    const serviceId = z.util.URLUtil.getParameter(z.auth.URLParameter.BOT_SERVICE);
     if (providerId && serviceId) {
       this.logger.info(`Found bot conversation initialization params '${serviceId}'`);
       this.repository.integration.addServiceFromParam(providerId, serviceId);
     }
 
-    const supportIntegrations = z.util.get_url_parameter(z.auth.URLParameter.INTEGRATIONS);
+    const supportIntegrations = z.util.URLUtil.getParameter(z.auth.URLParameter.INTEGRATIONS);
     if (_.isBoolean(supportIntegrations)) {
       this.logger.info(`Feature flag for integrations set to '${serviceId}'`);
       this.repository.integration.supportIntegrations(supportIntegrations);
@@ -520,7 +520,7 @@ z.main.App = class App {
    * @returns {boolean}  True if it is a page refresh
    */
   _is_reload() {
-    const is_reload = z.util.is_same_location(document.referrer, window.location.href);
+    const is_reload = z.util.isSameLocation(document.referrer, window.location.href);
     this.logger.debug(
       `App reload: '${is_reload}', Document referrer: '${document.referrer}', Location: '${window.location.href}'`
     );
@@ -778,7 +778,7 @@ z.main.App = class App {
         let url = `/auth/${location.search}${notSignedIn ? '' : '#login'}`;
 
         if (App.CONFIG.IMMEDIATE_SIGN_OUT_REASONS.includes(signOutReason)) {
-          url = z.util.append_url_parameter(url, `${z.auth.URLParameter.REASON}=${signOutReason}`);
+          url = z.util.URLUtil.appendParameter(url, `${z.auth.URLParameter.REASON}=${signOutReason}`);
         }
 
         window.location.replace(url);

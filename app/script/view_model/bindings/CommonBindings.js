@@ -250,9 +250,9 @@ ko.bindingHandlers.file_select = {
 /**
  * Wait for image to be loaded before applying as background image.
  */
-ko.bindingHandlers.load_image = {
+ko.bindingHandlers.loadImage = {
   init(element, valueAccessor) {
-    const image_src = z.util.strip_url_wrapper(ko.unwrap(valueAccessor()));
+    const image_src = z.util.stripUrlWrapper(ko.unwrap(valueAccessor()));
     const image = new Image();
     image.onload = () => (element.style.backgroundImage = `url(${image_src})`);
     image.src = image_src;
@@ -518,7 +518,7 @@ ko.bindingHandlers.in_viewport = (function() {
       }
 
       function _dispose() {
-        z.util.ArrayUtil.remove_element(listeners, _checkElement);
+        z.util.ArrayUtil.removeElement(listeners, _checkElement);
       }
 
       function _checkElement(event) {

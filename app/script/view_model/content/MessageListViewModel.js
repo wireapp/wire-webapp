@@ -87,7 +87,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
 
     // Check if the message container is to small and then pull new events
     this.on_mouse_wheel = _.throttle(event => {
-      const is_not_scrollable = !$(event.currentTarget).is_scrollable();
+      const is_not_scrollable = !$(event.currentTarget).isScrollable();
       const is_scrolling_up = event.deltaY > 0;
 
       if (is_not_scrollable && is_scrolling_up) {
@@ -104,13 +104,13 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
         // On some HDPI screen scrollTop returns a floating point number instead of an integer
         // https://github.com/jquery/api.jquery.com/issues/608
         const scroll_position = Math.ceil(element.scrollTop());
-        const scroll_end = element.scroll_end();
+        const scrollEnd = element.scrollEnd();
 
         if (scroll_position === 0) {
           this._pull_messages();
         }
 
-        if (scroll_position >= scroll_end) {
+        if (scroll_position >= scrollEnd) {
           if (!this.conversation_reached_bottom) {
             this._push_messages();
           }
@@ -118,7 +118,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
           this._mark_conversation_as_read_on_focus(this.conversation());
         }
 
-        this.should_scroll_to_bottom = scroll_position > scroll_end - z.config.SCROLL_TO_LAST_MESSAGE_THRESHOLD;
+        this.should_scroll_to_bottom = scroll_position > scrollEnd - z.config.SCROLL_TO_LAST_MESSAGE_THRESHOLD;
       }
     }, 100);
 
@@ -243,7 +243,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
 
         this.capture_scrolling_event = true;
 
-        if (messages_container.is_scrollable()) {
+        if (messages_container.isScrollable()) {
           const unread_message = $('.message-timestamp-unread');
 
           if (this.marked_message()) {
@@ -254,9 +254,9 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
               .parent()
               .position();
 
-            messages_container.scroll_by(unread_message_position.top);
+            messages_container.scrollBy(unread_message_position.top);
           } else {
-            messages_container.scroll_to_bottom();
+            messages_container.scrollToBottom();
           }
         } else {
           this.conversation_repository.mark_as_read(conversation_et);
@@ -298,14 +298,14 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
 
       // Scroll to bottom if self user send the message
       if (last_message.from === this.selfUser().id) {
-        window.requestAnimationFrame(() => messages_container.scroll_to_bottom());
+        window.requestAnimationFrame(() => messages_container.scrollToBottom());
         return;
       }
     }
 
     // Scroll to the end of the list if we are under a certain threshold
     if (this.should_scroll_to_bottom) {
-      window.requestAnimationFrame(() => messages_container.scroll_to_bottom());
+      window.requestAnimationFrame(() => messages_container.scrollToBottom());
 
       if (document.hasFocus()) {
         this.conversation_repository.mark_as_read(this.conversation());
@@ -313,7 +313,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     }
 
     // Mark as read when conversation is not scrollable
-    if (!messages_container.is_scrollable()) {
+    if (!messages_container.isScrollable()) {
       this._mark_conversation_as_read_on_focus(this.conversation());
     }
   }
@@ -368,23 +368,23 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
 
     if (message_element.length) {
       const message_list_element = $('.messages-wrap');
-      message_list_element.scroll_by(message_element.offset().top - message_list_element.height() / 2);
+      message_list_element.scrollBy(message_element.offset().top - message_list_element.height() / 2);
     }
   }
 
   scroll_height(change_in_height) {
-    $('.messages-wrap').scroll_by(change_in_height);
+    $('.messages-wrap').scrollBy(change_in_height);
   }
 
   on_conversation_input_click() {
     if (this.conversation_reached_bottom) {
-      return $('.messages-wrap').scroll_to_bottom();
+      return $('.messages-wrap').scrollToBottom();
     }
 
     this.conversation().remove_messages();
     this.conversation_repository
       .getPrecedingMessages(this.conversation())
-      .then(() => $('.messages-wrap').scroll_to_bottom());
+      .then(() => $('.messages-wrap').scrollToBottom());
   }
 
   /**
@@ -413,20 +413,6 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
       .reset_session(message_et.from, message_et.client_id, this.conversation().id)
       .then(() => reset_progress())
       .catch(() => reset_progress());
-  }
-
-  /**
-   * Scrolls whole message list by given distance.
-   *
-   * @note Scrolling is animated with jQuery
-   * @param {number} distance - Distance by which the container is shifted
-   * @param {Function} callback - Executed when scroll animation is finished
-   * @returns {undefined} No return value
-   */
-  scroll_by(distance, callback) {
-    const current_scroll = $('.messages-wrap').scrollTop();
-    const new_scroll = current_scroll + distance;
-    $('.messages-wrap').animate({scrollTop: new_scroll}, 300, callback);
   }
 
   /**

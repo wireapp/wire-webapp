@@ -31,35 +31,84 @@ z.util.URLUtil = (() => {
     WEBSITE: 'TYPE.WEBSITE',
   };
 
-  const _get_domain = url_type => {
-    const is_production = _is_production_backend();
+  const _appendParameter = (url, parameter) => {
+    const separator = z.util.StringUtil.includes(url, '?') ? '&' : '?';
+    return `${url}${separator}${parameter}`;
+  };
 
-    switch (url_type) {
+  const _buildSupportUrl = support_id => {
+    const urlPath = _.isNumber(support_id) ? z.string.urlSupportArticles : z.string.urlSupportRequests;
+    return `${_getDomain(TYPE.SUPPORT)}${z.l10n.text(urlPath)}${support_id}`;
+  };
+
+  const _buildUrl = (type, path = '') => `${_getDomain(type)}${path && path.startsWith('/') ? path : ''}`;
+
+  const _forwardParameter = (url, parameterName, locationSearch = window.location.search) => {
+    const parameterValue = _getParameter(parameterName, locationSearch);
+    const hasValue = parameterValue != null;
+    return hasValue ? _appendParameter(url, `${parameterName}=${parameterValue}`) : url;
+  };
+
+  const _getDomain = urlType => {
+    const isProduction = _isProductionBackend();
+
+    switch (urlType) {
       case TYPE.ACCOUNT:
-        return is_production ? z.config.URL.ACCOUNT.PRODUCTION : z.config.URL.ACCOUNT.STAGING;
+        return isProduction ? z.config.URL.ACCOUNT.PRODUCTION : z.config.URL.ACCOUNT.STAGING;
       case TYPE.SUPPORT:
         return z.config.URL.SUPPORT;
       case TYPE.TEAM_SETTINGS:
-        return is_production ? z.config.URL.TEAM_SETTINGS.PRODUCTION : z.config.URL.TEAM_SETTINGS.STAGING;
+        return isProduction ? z.config.URL.TEAM_SETTINGS.PRODUCTION : z.config.URL.TEAM_SETTINGS.STAGING;
       case TYPE.WEBAPP:
-        return is_production ? z.config.URL.WEBAPP.PRODUCTION : z.config.URL.WEBAPP.STAGING;
+        return isProduction ? z.config.URL.WEBAPP.PRODUCTION : z.config.URL.WEBAPP.STAGING;
       case TYPE.WEBSITE:
-        return is_production ? z.config.URL.WEBSITE.PRODUCTION : z.config.URL.WEBSITE.STAGING;
+        return isProduction ? z.config.URL.WEBSITE.PRODUCTION : z.config.URL.WEBSITE.STAGING;
       default:
         throw new Error('Unknown URL type');
     }
   };
 
-  const _is_production_backend = () => z.util.Environment.backend.current === z.service.BackendEnvironment.PRODUCTION;
-
-  const _build_support_url = support_id => {
-    const url_path = _.isNumber(support_id) ? z.string.urlSupportArticles : z.string.urlSupportRequests;
-    return `${_get_domain(TYPE.SUPPORT)}${z.l10n.text(url_path)}${support_id}`;
+  /**
+   * Removes protocol, www and trailing slashes in the given url
+   * @param {string} url - URL
+   * @returns {string} Plain URL
+   */
+  const _getDomainName = (url = '') => {
+    return url
+      .toLowerCase()
+      .replace(/.*?:\/\//, '') // remove protocol
+      .replace(/\/$/, '') // remove trailing slash
+      .replace('www.', '');
   };
 
-  const _build_url = (type, path = '') => `${_get_domain(type)}${path && path.startsWith('/') ? path : ''}`;
+  const _getParameter = (parameterName, locationSearch = window.location.search) => {
+    const searchParameters = locationSearch.substring(1).split('&');
+    for (const searchParam of searchParameters) {
+      const [parameter, value] = searchParam.split('=');
+      const isExpectedParameter = parameter === parameterName;
+      if (isExpectedParameter) {
+        if (value) {
+          const decodedValue = window.decodeURI(value);
 
-  const _get_links_from_html = html => {
+          if (decodedValue === 'false') {
+            return false;
+          }
+
+          if (decodedValue === 'true') {
+            return true;
+          }
+
+          return value;
+        }
+
+        return true;
+      }
+    }
+
+    return null;
+  };
+
+  const _getLinksFromHtml = html => {
     if (!html) {
       return [];
     }
@@ -67,17 +116,28 @@ z.util.URLUtil = (() => {
     const anchorTags = new RegExp(/<a[\s]+([^>]+)>((?:.(?!\<\/a\>))*.)<\/a>/, 'g');
     const links = html.match(anchorTags);
 
-    if (links && links.length) {
-      return links.map(element => $(element)[0]);
-    }
-
-    return [];
+    const hasLinks = links && links.length;
+    return hasLinks ? links.map(element => $(element)[0]) : [];
   };
+
+  const _isProductionBackend = () => z.util.Environment.backend.current === z.service.BackendEnvironment.PRODUCTION;
+
+  /**
+   * Prepends http to given url if protocol missing
+   * @param {string} url - URL you want to open in a new browser tab
+   * @returns {undefined} No return value
+   */
+  const _prependProtocol = url => (!url.match(/^http[s]?:\/\//i) ? `http://${url}` : url);
 
   return {
     TYPE: TYPE,
-    build_support_url: _build_support_url,
-    build_url: _build_url,
-    get_links_from_html: _get_links_from_html,
+    appendParameter: _appendParameter,
+    buildSupportUrl: _buildSupportUrl,
+    buildUrl: _buildUrl,
+    forwardParameter: _forwardParameter,
+    getDomainName: _getDomainName,
+    getLinksFromHtml: _getLinksFromHtml,
+    getParameter: _getParameter,
+    prependProtocol: _prependProtocol,
   };
 })();

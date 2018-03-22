@@ -66,7 +66,7 @@ z.user.UserRepository = class UserRepository {
       .pureComputed(() => {
         return this.users()
           .filter(user_et => user_et.is_connected())
-          .sort((user_a, user_b) => z.util.StringUtil.sort_by_priority(user_a.first_name(), user_b.first_name()));
+          .sort((user_a, user_b) => z.util.StringUtil.sortByPriority(user_a.first_name(), user_b.first_name()));
       })
       .extend({rateLimit: 1000});
 
@@ -373,7 +373,7 @@ z.user.UserRepository = class UserRepository {
   update_user_connections(connection_ets, assign_clients = false) {
     return Promise.resolve()
       .then(() => {
-        z.util.ko_array_push_all(this.connections, connection_ets);
+        z.util.koArrayPushAll(this.connections, connection_ets);
         const user_ids = connection_ets.map(connection_et => connection_et.to);
 
         if (user_ids.length === 0) {
@@ -579,7 +579,7 @@ z.user.UserRepository = class UserRepository {
       this.logger.log(`Availability was again set to '${newAvailabilityValue}'`);
     }
 
-    const genericMessage = new z.proto.GenericMessage(z.util.create_random_uuid());
+    const genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
     const availabilityMessage = new z.proto.Availability(z.user.AvailabilityMapper.protoFromType(availability));
     genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.AVAILABILITY, availabilityMessage);
 
@@ -783,14 +783,14 @@ z.user.UserRepository = class UserRepository {
    * @returns {Array<z.entity.User>} Matching users
    */
   search_for_connected_users(query, is_handle) {
-    const excludedEmojis = Array.from(query).filter(char => EMOJI_UNICODE_RANGES.includes(char));
+    const excludedEmojis = Array.from(query).filter(char => z.util.EmojiUtil.UNICODE_RANGES.includes(char));
     return this.connected_users()
       .filter(user_et => user_et.matches(query, is_handle, excludedEmojis))
       .sort((user_a, user_b) => {
         if (is_handle) {
-          return z.util.StringUtil.sort_by_priority(user_a.username(), user_b.username(), query);
+          return z.util.StringUtil.sortByPriority(user_a.username(), user_b.username(), query);
         }
-        return z.util.StringUtil.sort_by_priority(user_a.name(), user_b.name(), query);
+        return z.util.StringUtil.sortByPriority(user_a.name(), user_b.name(), query);
       });
   }
 
@@ -847,7 +847,7 @@ z.user.UserRepository = class UserRepository {
     const find_users = user_ets.map(user_et => _find_users(user_et));
 
     return Promise.all(find_users).then(resolve_array => {
-      z.util.ko_array_push_all(this.users, resolve_array.filter(user_et => user_et));
+      z.util.koArrayPushAll(this.users, resolve_array.filter(user_et => user_et));
       return user_ets;
     });
   }
@@ -1045,7 +1045,7 @@ z.user.UserRepository = class UserRepository {
    * @returns {undefined} No return value
    */
   set_default_picture() {
-    return z.util.load_url_blob(z.config.UNSPLASH_URL).then(blob => this.change_picture(blob));
+    return z.util.loadUrlBlob(z.config.UNSPLASH_URL).then(blob => this.change_picture(blob));
   }
 
   map_guest_status(user_ets = this.users()) {

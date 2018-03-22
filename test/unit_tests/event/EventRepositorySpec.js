@@ -65,8 +65,8 @@ describe('Event Repository', () => {
             resolve({
               has_more: false,
               notifications: [
-                {id: z.util.create_random_uuid(), payload: []},
-                {id: z.util.create_random_uuid(), payload: []},
+                {id: z.util.createRandomUuid(), payload: []},
+                {id: z.util.createRandomUuid(), payload: []},
               ],
             });
           }, 10);
@@ -74,7 +74,7 @@ describe('Event Repository', () => {
       });
 
       spyOn(TestFactory.notification_service, 'getNotificationsLast').and.returnValue(
-        Promise.resolve({id: z.util.create_random_uuid(), payload: []})
+        Promise.resolve({id: z.util.createRandomUuid(), payload: []})
       );
 
       spyOn(TestFactory.notification_service, 'getLastNotificationIdFromDb').and.callFake(() => {
@@ -108,9 +108,9 @@ describe('Event Repository', () => {
     });
 
     it('should buffer notifications when notification stream is not processed', () => {
-      last_notification_id = z.util.create_random_uuid();
+      last_notification_id = z.util.createRandomUuid();
       TestFactory.event_repository.connectWebSocket();
-      websocket_service_mock.publish({id: z.util.create_random_uuid(), payload: []});
+      websocket_service_mock.publish({id: z.util.createRandomUuid(), payload: []});
       expect(TestFactory.event_repository._bufferWebSocketNotification).toHaveBeenCalled();
       expect(TestFactory.event_repository._handleNotification).not.toHaveBeenCalled();
       expect(TestFactory.event_repository.notificationHandlingState()).toBe(z.event.NOTIFICATION_HANDLING_STATE.STREAM);
@@ -118,11 +118,11 @@ describe('Event Repository', () => {
     });
 
     it('should handle buffered notifications after notifications stream was processed', done => {
-      last_notification_id = z.util.create_random_uuid();
-      const last_published_notification_id = z.util.create_random_uuid();
+      last_notification_id = z.util.createRandomUuid();
+      const last_published_notification_id = z.util.createRandomUuid();
       TestFactory.event_repository.lastNotificationId(last_notification_id);
       TestFactory.event_repository.connectWebSocket();
-      websocket_service_mock.publish({id: z.util.create_random_uuid(), payload: []});
+      websocket_service_mock.publish({id: z.util.createRandomUuid(), payload: []});
 
       websocket_service_mock.publish({id: last_published_notification_id, payload: []});
       TestFactory.event_repository
@@ -144,12 +144,12 @@ describe('Event Repository', () => {
     last_notification_id = undefined;
 
     beforeEach(() => {
-      last_notification_id = z.util.create_random_uuid();
+      last_notification_id = z.util.createRandomUuid();
       TestFactory.event_repository.lastNotificationId(last_notification_id);
     });
 
     it('should not update last notification id if transient is true', done => {
-      const notification_payload = {id: z.util.create_random_uuid(), payload: [], transient: true};
+      const notification_payload = {id: z.util.createRandomUuid(), payload: [], transient: true};
 
       TestFactory.event_repository._handleNotification(notification_payload).then(() => {
         expect(TestFactory.event_repository.lastNotificationId()).toBe(last_notification_id);
@@ -158,7 +158,7 @@ describe('Event Repository', () => {
     });
 
     it('should update last notification id if transient is false', done => {
-      const notification_payload = {id: z.util.create_random_uuid(), payload: [], transient: false};
+      const notification_payload = {id: z.util.createRandomUuid(), payload: [], transient: false};
 
       TestFactory.event_repository._handleNotification(notification_payload).then(() => {
         expect(TestFactory.event_repository.lastNotificationId()).toBe(notification_payload.id);
@@ -167,7 +167,7 @@ describe('Event Repository', () => {
     });
 
     it('should update last notification id if transient is not present', done => {
-      const notification_payload = {id: z.util.create_random_uuid(), payload: []};
+      const notification_payload = {id: z.util.createRandomUuid(), payload: []};
 
       TestFactory.event_repository._handleNotification(notification_payload).then(() => {
         expect(TestFactory.event_repository.lastNotificationId()).toBe(notification_payload.id);
@@ -336,13 +336,13 @@ describe('Event Repository', () => {
 
     beforeEach(() => {
       event = {
-        conversation: z.util.create_random_uuid(),
+        conversation: z.util.createRandomUuid(),
         data: {
           content: 'Lorem Ipsum',
           previews: [],
         },
-        from: z.util.create_random_uuid(),
-        id: z.util.create_random_uuid(),
+        from: z.util.createRandomUuid(),
+        id: z.util.createRandomUuid(),
         time: new Date().toISOString(),
         type: z.event.Client.CONVERSATION.MESSAGE_ADD,
       };
@@ -366,7 +366,7 @@ describe('Event Repository', () => {
 
     it('ignores an event with an ID previously used by another user', done => {
       previously_stored_event = JSON.parse(JSON.stringify(event));
-      previously_stored_event.from = z.util.create_random_uuid();
+      previously_stored_event.from = z.util.createRandomUuid();
       spyOn(TestFactory.event_repository.conversationService, 'load_event_from_db').and.returnValue(
         Promise.resolve(previously_stored_event)
       );

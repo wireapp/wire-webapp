@@ -165,7 +165,7 @@ z.viewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
 
   clickOnShowNext(imageDetailViewViewModel, event) {
     event.stopPropagation();
-    const nextMessageEntity = z.util.ArrayUtil.iterate_item(this.items(), this.messageEntity());
+    const nextMessageEntity = z.util.ArrayUtil.iterateItem(this.items(), this.messageEntity());
 
     if (nextMessageEntity) {
       this.messageEntity(nextMessageEntity);
@@ -175,10 +175,10 @@ z.viewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
 
   clickOnShowPrevious(imageDetailViewViewModel, event) {
     event.stopPropagation();
-    const previousMessageEntity = z.util.ArrayUtil.iterate_item(this.items(), this.messageEntity(), true);
+    const previousMessageEntity = z.util.ArrayUtil.iterateItem(this.items(), this.messageEntity(), true);
 
     if (previousMessageEntity) {
-      this.messageEntity(z.util.ArrayUtil.iterate_item(this.items(), this.messageEntity(), true));
+      this.messageEntity(z.util.ArrayUtil.iterateItem(this.items(), this.messageEntity(), true));
       this._loadImage();
     }
   }

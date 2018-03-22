@@ -41,8 +41,8 @@ z.entity.Conversation = class Conversation {
     this.type = ko.observable();
 
     const inputStorageKey = `${z.storage.StorageKey.CONVERSATION.INPUT}|${this.id}`;
-    this.input = ko.observable(z.util.StorageUtil.get_value(inputStorageKey) || '');
-    this.input.subscribe(text => z.util.StorageUtil.set_value(inputStorageKey, text.trim()));
+    this.input = ko.observable(z.util.StorageUtil.getValue(inputStorageKey) || '');
+    this.input.subscribe(text => z.util.StorageUtil.setValue(inputStorageKey, text.trim()));
 
     this.is_loaded = ko.observable(false);
     this.is_pending = ko.observable(false);
@@ -358,21 +358,21 @@ z.entity.Conversation = class Conversation {
       }
     }
 
-    z.util.ko_array_push_all(this.messages_unordered, message_ets);
+    z.util.koArrayPushAll(this.messages_unordered, message_ets);
   }
 
   get_last_known_timestamp(time_offset) {
     const last_known_timestamp = Math.max(this.last_server_timestamp(), this.last_event_timestamp());
-    return last_known_timestamp || z.util.TimeUtil.adjust_current_timestamp(time_offset);
+    return last_known_timestamp || z.util.TimeUtil.adjustCurrentTimestamp(time_offset);
   }
 
   get_latest_timestamp(time_offset) {
-    const current_timestamp = z.util.TimeUtil.adjust_current_timestamp(Math.min(0, time_offset));
+    const current_timestamp = z.util.TimeUtil.adjustCurrentTimestamp(Math.min(0, time_offset));
     return Math.max(this.last_server_timestamp(), this.last_event_timestamp(), current_timestamp);
   }
 
   get_next_iso_date(time_offset) {
-    const current_timestamp = z.util.TimeUtil.adjust_current_timestamp(time_offset);
+    const current_timestamp = z.util.TimeUtil.adjustCurrentTimestamp(time_offset);
     const timestamp = Math.max(this.last_server_timestamp() + 1, current_timestamp);
     return new Date(timestamp).toISOString();
   }
@@ -414,7 +414,7 @@ z.entity.Conversation = class Conversation {
   prepend_messages(message_ets) {
     message_ets = message_ets.map(message_et => this._checkForDuplicate(message_et)).filter(message_et => message_et);
 
-    z.util.ko_array_unshift_all(this.messages_unordered, message_ets);
+    z.util.koArrayUnshiftAll(this.messages_unordered, message_ets);
   }
 
   /**

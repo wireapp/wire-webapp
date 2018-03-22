@@ -62,7 +62,7 @@ z.entity.User = class User {
     this.is_me = false;
     this.isBot = false;
 
-    this.joaat_hash = -1;
+    this.joaatHash = -1;
 
     this.accent_id = ko.observable(z.config.ACCENT_ID.BLUE);
     this.accent_theme = ko.pureComputed(
@@ -131,8 +131,8 @@ z.entity.User = class User {
     this.initials = ko.pureComputed(() => {
       let initials = '';
       if (this.first_name() && this.last_name()) {
-        const first = z.util.StringUtil.get_first_character(this.first_name());
-        const last = z.util.StringUtil.get_first_character(this.last_name());
+        const first = z.util.StringUtil.getFirstChar(this.first_name());
+        const last = z.util.StringUtil.getFirstChar(this.last_name());
         initials = `${first}${last}`;
       } else {
         initials = this.first_name().slice(0, 2);
@@ -219,9 +219,9 @@ z.entity.User = class User {
    */
   matches(query, is_handle, excludedChars = []) {
     if (is_handle) {
-      return z.util.StringUtil.starts_with(this.username(), query);
+      return z.util.StringUtil.startsWith(this.username(), query);
     }
-    return z.util.StringUtil.compare_transliteration(this.name(), query, excludedChars) || this.username() === query;
+    return z.util.StringUtil.compareTransliteration(this.name(), query, excludedChars) || this.username() === query;
   }
 
   serialize() {

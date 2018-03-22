@@ -63,7 +63,7 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
    * @returns {undefined} No return value
    */
   initialize_media_devices() {
-    if (!z.media.MediaRepository.supports_media_devices()) {
+    if (!z.media.MediaRepository.supportsMediaDevices()) {
       return;
     }
 
@@ -79,11 +79,9 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
    * @returns {undefined} No return value
    */
   _set_current_devices() {
-    this.current_device_id.audio_input(z.util.StorageUtil.get_value(z.media.MediaDeviceType.AUDIO_INPUT) || 'default');
-    this.current_device_id.audio_output(
-      z.util.StorageUtil.get_value(z.media.MediaDeviceType.AUDIO_OUTPUT) || 'default'
-    );
-    this.current_device_id.video_input(z.util.StorageUtil.get_value(z.media.MediaDeviceType.VIDEO_INPUT));
+    this.current_device_id.audio_input(z.util.StorageUtil.getValue(z.media.MediaDeviceType.AUDIO_INPUT) || 'default');
+    this.current_device_id.audio_output(z.util.StorageUtil.getValue(z.media.MediaDeviceType.AUDIO_OUTPUT) || 'default');
+    this.current_device_id.video_input(z.util.StorageUtil.getValue(z.media.MediaDeviceType.VIDEO_INPUT));
 
     if (!this.current_device_id.video_input() && this.available_devices.video_input().length) {
       const default_device_index = this.available_devices.video_input().length - 1;
@@ -112,32 +110,32 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
    * @returns {undefined} No return value
    */
   _subscribe_to_observables() {
-    this.available_devices.audio_input.subscribe(media_devices => {
-      if (media_devices.length) {
-        this._update_current_index_from_devices(z.media.MediaDeviceType.AUDIO_INPUT, media_devices);
+    this.available_devices.audio_input.subscribe(mediaDevices => {
+      if (mediaDevices.length) {
+        this._update_current_index_from_devices(z.media.MediaDeviceType.AUDIO_INPUT, mediaDevices);
       }
     });
 
-    this.available_devices.audio_output.subscribe(media_devices => {
-      if (media_devices.length) {
-        this._update_current_index_from_devices(z.media.MediaDeviceType.AUDIO_OUTPUT, media_devices);
+    this.available_devices.audio_output.subscribe(mediaDevices => {
+      if (mediaDevices.length) {
+        this._update_current_index_from_devices(z.media.MediaDeviceType.AUDIO_OUTPUT, mediaDevices);
       }
     });
 
-    this.available_devices.screen_input.subscribe(media_devices => {
-      if (media_devices.length) {
-        this._update_current_index_from_devices(z.media.MediaDeviceType.SCREEN_INPUT, media_devices);
+    this.available_devices.screen_input.subscribe(mediaDevices => {
+      if (mediaDevices.length) {
+        this._update_current_index_from_devices(z.media.MediaDeviceType.SCREEN_INPUT, mediaDevices);
       }
     });
 
-    this.available_devices.video_input.subscribe(media_devices => {
-      if (media_devices.length) {
-        this._update_current_index_from_devices(z.media.MediaDeviceType.VIDEO_INPUT, media_devices);
+    this.available_devices.video_input.subscribe(mediaDevices => {
+      if (mediaDevices.length) {
+        this._update_current_index_from_devices(z.media.MediaDeviceType.VIDEO_INPUT, mediaDevices);
       }
     });
 
     this.current_device_id.audio_input.subscribe(media_device_id => {
-      z.util.StorageUtil.set_value(z.media.MediaDeviceType.AUDIO_INPUT, media_device_id);
+      z.util.StorageUtil.setValue(z.media.MediaDeviceType.AUDIO_INPUT, media_device_id);
       if (media_device_id && this.media_repository.stream_handler.local_media_stream()) {
         this.media_repository.stream_handler.replace_input_source(z.media.MediaType.AUDIO);
         this._update_current_index_from_id(z.media.MediaDeviceType.AUDIO_INPUT, media_device_id);
@@ -145,7 +143,7 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
     });
 
     this.current_device_id.audio_output.subscribe(media_device_id => {
-      z.util.StorageUtil.set_value(z.media.MediaDeviceType.AUDIO_OUTPUT, media_device_id);
+      z.util.StorageUtil.setValue(z.media.MediaDeviceType.AUDIO_OUTPUT, media_device_id);
       if (media_device_id) {
         this.media_repository.element_handler.switch_media_element_output(media_device_id);
         this._update_current_index_from_id(z.media.MediaDeviceType.AUDIO_OUTPUT, media_device_id);
@@ -164,7 +162,7 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
     });
 
     this.current_device_id.video_input.subscribe(media_device_id => {
-      z.util.StorageUtil.set_value(z.media.MediaDeviceType.VIDEO_INPUT, media_device_id);
+      z.util.StorageUtil.setValue(z.media.MediaDeviceType.VIDEO_INPUT, media_device_id);
       if (
         media_device_id &&
         this.media_repository.stream_handler.local_media_stream() &&
@@ -187,15 +185,15 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
         this.logger.error(`Failed to update MediaDevice list: ${error.message}`, error);
         throw error;
       })
-      .then(media_devices => {
+      .then(mediaDevices => {
         this._remove_all_devices();
 
-        if (media_devices) {
+        if (mediaDevices) {
           const audio_input_devices = [];
           const audio_output_devices = [];
           const video_input_devices = [];
 
-          media_devices.forEach(media_device => {
+          mediaDevices.forEach(media_device => {
             switch (media_device.kind) {
               case z.media.MediaDeviceType.AUDIO_INPUT:
                 audio_input_devices.push(media_device);
@@ -211,12 +209,12 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
             }
           });
 
-          z.util.ko_array_push_all(this.available_devices.audio_input, audio_input_devices);
-          z.util.ko_array_push_all(this.available_devices.audio_output, audio_output_devices);
-          z.util.ko_array_push_all(this.available_devices.video_input, video_input_devices);
+          z.util.koArrayPushAll(this.available_devices.audio_input, audio_input_devices);
+          z.util.koArrayPushAll(this.available_devices.audio_output, audio_output_devices);
+          z.util.koArrayPushAll(this.available_devices.video_input, video_input_devices);
 
-          this.logger.info('Updated MediaDevice list', media_devices);
-          return media_devices;
+          this.logger.info('Updated MediaDevice list', mediaDevices);
+          return mediaDevices;
         }
         throw new z.media.MediaError(z.media.MediaError.TYPE.NO_MEDIA_DEVICES_FOUND);
       });
@@ -268,7 +266,7 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
         this.current_device_id.video_input()
       );
       const next_device = this.available_devices.video_input()[
-        z.util.ArrayUtil.iterate_index(this.available_devices.video_input(), this.current_device_index.video_input()) ||
+        z.util.ArrayUtil.iterateIndex(this.available_devices.video_input(), this.current_device_index.video_input()) ||
           0
       ];
 
@@ -292,7 +290,7 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
         this.current_device_id.screen_input()
       );
       const next_device = this.available_devices.screen_input()[
-        z.util.ArrayUtil.iterate_index(
+        z.util.ArrayUtil.iterateIndex(
           this.available_devices.screen_input(),
           this.current_device_index.screen_input()
         ) || 0
@@ -314,30 +312,26 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
    */
   update_current_devices(video_send) {
     return this.get_media_devices().then(() => {
-      const _check_device = (media_type, device_type) => {
-        device_type = this._type_conversion(device_type);
+      const _check_device = (mediaType, deviceType) => {
+        deviceType = this._type_conversion(deviceType);
 
-        const device_id_observable = this.current_device_id[`${device_type}`];
-        const media_devices = this.available_devices[`${device_type}`]();
-        const {current_device: media_device} = this._get_current_device(media_devices, device_id_observable());
+        const deviceIdObservable = this.current_device_id[`${deviceType}`];
+        const mediaDevices = this.available_devices[`${deviceType}`]();
+        const {current_device: mediaDevice} = this._get_current_device(mediaDevices, deviceIdObservable());
 
-        if (!media_device) {
-          const [updated_device] = this.available_devices[`${device_type}`]();
+        if (!mediaDevice) {
+          const [updated_device] = this.available_devices[`${deviceType}`]();
 
           if (updated_device) {
-            this.logger.warn(
-              `Selected '${media_type}' device '${device_id_observable()}' not found and replaced by '${updated_device.label ||
-                updated_device.deviceId}'`,
-              media_devices
-            );
-            return device_id_observable(updated_device.deviceId);
+            const id = updated_device.label || updated_device.deviceId;
+            const log = `Selected '${mediaType}' device '${deviceIdObservable()}' not found and replaced by '${id}'`;
+            this.logger.warn(log, mediaDevices);
+            return deviceIdObservable(updated_device.deviceId);
           }
 
-          this.logger.warn(
-            `Selected '${media_type}' device '${device_id_observable()}' not found and reset'`,
-            media_devices
-          );
-          return device_id_observable('');
+          const logMessage = `Selected '${mediaType}' device '${deviceIdObservable()}' not found and reset'`;
+          this.logger.warn(logMessage, mediaDevices);
+          return deviceIdObservable('');
         }
       };
 
@@ -351,12 +345,12 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
   /**
    * Get the currently selected MediaDevice.
    *
-   * @param {Array} media_devices - Array of MediaDevices
+   * @param {Array} mediaDevices - Array of MediaDevices
    * @param {string} current_device_id - ID of selected MediaDevice
    * @returns {Object} Selected MediaDevice and its array index
    */
-  _get_current_device(media_devices, current_device_id) {
-    for (const [index, media_device] of media_devices.entries()) {
+  _get_current_device(mediaDevices, current_device_id) {
+    for (const [index, media_device] of mediaDevices.entries()) {
       if (media_device.deviceId === current_device_id || media_device.id === current_device_id) {
         return {current_device: media_device, current_device_index: index};
       }
