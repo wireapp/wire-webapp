@@ -16,13 +16,9 @@
 // along with this program. If not, see http://www.gnu.org/licenses/.
 //
 
-import PreKey from './PreKey';
-import IdentityKey from './IdentityKey';
-import IdentityKeyPair from './IdentityKeyPair';
-import KeyPair from './KeyPair';
-import PreKeyBundle from './PreKeyBundle';
-import PreKeyAuth from './PreKeyAuth';
-import PublicKey from './PublicKey';
-import SecretKey from './SecretKey';
+import DecodeError from './DecodeError';
+import DecryptError from './DecryptError';
+import InputError from './InputError';
+import ProteusError from './ProteusError';
 
-export {IdentityKey, IdentityKeyPair, KeyPair, PreKey, PreKeyAuth, PreKeyBundle, PublicKey, SecretKey};
+export {DecodeError, DecryptError, InputError, ProteusError};

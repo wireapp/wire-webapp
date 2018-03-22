@@ -17,7 +17,9 @@
 //
 
 import ArrayUtil from './ArrayUtil';
+import ClassUtil from './ClassUtil';
 import KeyDerivationUtil from './KeyDerivationUtil';
 import MemoryUtil from './MemoryUtil';
+import RandomUtil from './RandomUtil';
 
-export {ArrayUtil, KeyDerivationUtil, MemoryUtil};
+export {ArrayUtil, ClassUtil, KeyDerivationUtil, MemoryUtil, RandomUtil};

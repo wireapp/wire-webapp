@@ -1,8 +1,7 @@
-import * as ProteusKeys from '@wireapp/proteus/dist/keys/root';
-import * as ProteusSession from '@wireapp/proteus/dist/session/root';
+import {keys as ProteusKeys} from '@wireapp/proteus';
+import {session as ProteusSession} from '@wireapp/proteus';
 import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine/index';
 import {PersistedRecord, SerialisedRecord} from '../store/root';
-import PreKeyStore from '@wireapp/proteus/dist/session/PreKeyStore';
 import {error as StoreEngineError} from '@wireapp/store-engine';
 import {Decoder, Encoder} from 'bazinga64';
 
@@ -16,7 +15,7 @@ export enum CrudStoreStores {
   SESSIONS = 'sessions',
 }
 
-class CryptoboxCRUDStore implements PreKeyStore {
+class CryptoboxCRUDStore implements ProteusSession.PreKeyStore {
   public static readonly KEYS = CRUDStoreKeys;
   public static readonly STORES = CrudStoreStores;
 

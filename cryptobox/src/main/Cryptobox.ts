@@ -1,6 +1,6 @@
-import * as ProteusKeys from '@wireapp/proteus/dist/keys/root';
-import * as ProteusMessage from '@wireapp/proteus/dist/message/root';
-import * as ProteusSession from '@wireapp/proteus/dist/session/root';
+import {keys as ProteusKeys} from '@wireapp/proteus';
+import {message as ProteusMessage} from '@wireapp/proteus';
+import {session as ProteusSession} from '@wireapp/proteus';
 import {CryptoboxError} from './error/root';
 import CryptoboxSession from './CryptoboxSession';
 import DecryptionError from './DecryptionError';

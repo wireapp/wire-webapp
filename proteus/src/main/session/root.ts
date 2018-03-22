@@ -23,5 +23,6 @@ import RecvChain from './RecvChain';
 import RootKey from './RootKey';
 import SendChain from './SendChain';
 import Session from './Session';
+import SessionState from './SessionState';
 
-export {ChainKey, MessageKeys, PreKeyStore, RecvChain, RootKey, SendChain, Session};
+export {ChainKey, MessageKeys, PreKeyStore, RecvChain, RootKey, SendChain, Session, SessionState};
