@@ -141,8 +141,11 @@ describe('z.cryptography.CryptographyRepository', () => {
       const decrypted = await TestFactory.cryptography_repository.handleEncryptedEvent(mockedEvent);
       expect(decrypted.data.content).toBe(plainText);
 
-      const unableToDecryptEvent = await TestFactory.cryptography_repository.handleEncryptedEvent(mockedEvent);
-      expect(unableToDecryptEvent.type).toBe(z.event.Client.CONVERSATION.UNABLE_TO_DECRYPT);
+      try {
+        await TestFactory.cryptography_repository.handleEncryptedEvent(mockedEvent);
+      } catch (error) {
+        expect(error.code).toBe(z.cryptography.CryptographyError.TYPE.UNHANDLED_TYPE);
+      }
 
       done();
     });
