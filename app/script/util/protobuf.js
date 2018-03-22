@@ -23,15 +23,16 @@ window.z = window.z || {};
 window.z.util = z.util || {};
 
 z.util.protobuf = {
-  load_protos: function(file) {
+  loadProtos: file => {
     return new Promise((resolve, reject) => {
-      return dcodeIO.ProtoBuf.loadProtoFile(file, (error, builder) => {
+      dcodeIO.ProtoBuf.loadProtoFile(file, (error, builder) => {
         if (error) {
           return reject(new Error(`Loading protocol buffer file failed: ${error.message}`));
         }
+
         z.proto = z.proto || {};
         _.extend(z.proto, builder.build());
-        return resolve();
+        resolve();
       });
     });
   },

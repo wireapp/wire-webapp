@@ -60,7 +60,7 @@ z.storage.StorageService = class StorageService {
    */
   init(userId = this.userId) {
     return new Promise((resolve, reject) => {
-      const isPermanent = z.util.StorageUtil.get_value(z.storage.StorageKey.AUTH.PERSIST);
+      const isPermanent = z.util.StorageUtil.getValue(z.storage.StorageKey.AUTH.PERSIST);
       const clientType = isPermanent ? z.client.ClientType.PERMANENT : z.client.ClientType.TEMPORARY;
 
       this.userId = userId;
@@ -268,13 +268,13 @@ z.storage.StorageService = class StorageService {
         .upgrade(transaction => {
           this.logger.warn('Database upgrade to version 12', transaction);
           transaction[StorageService.OBJECT_STORE.KEYS].toCollection().modify(record => {
-            return (record.serialised = z.util.base64_to_array(record.serialised).buffer);
+            return (record.serialised = z.util.base64ToArray(record.serialised).buffer);
           });
           transaction[StorageService.OBJECT_STORE.PRE_KEYS].toCollection().modify(record => {
-            return (record.serialised = z.util.base64_to_array(record.serialised).buffer);
+            return (record.serialised = z.util.base64ToArray(record.serialised).buffer);
           });
           transaction[StorageService.OBJECT_STORE.SESSIONS].toCollection().modify(record => {
-            return (record.serialised = z.util.base64_to_array(record.serialised).buffer);
+            return (record.serialised = z.util.base64ToArray(record.serialised).buffer);
           });
         });
       this.db

@@ -138,7 +138,7 @@ z.viewModel.ListViewModel = class ListViewModel {
       ? z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS
       : this.conversationRepository.active_conversation();
 
-    const nextItem = z.util.ArrayUtil.iterate_item(this.visibleListItems(), activeConversationItem, reverse);
+    const nextItem = z.util.ArrayUtil.iterateItem(this.visibleListItems(), activeConversationItem, reverse);
 
     const isConnectionRequestItem = nextItem === z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS;
     if (isConnectionRequestItem) {
@@ -158,7 +158,7 @@ z.viewModel.ListViewModel = class ListViewModel {
       activePreference = z.viewModel.ContentViewModel.STATE.DEVICES;
     }
 
-    const nextPreference = z.util.ArrayUtil.iterate_item(this.visibleListItems(), activePreference, reverse);
+    const nextPreference = z.util.ArrayUtil.iterateItem(this.visibleListItems(), activePreference, reverse);
     if (nextPreference) {
       this.contentViewModel.switchContent(nextPreference);
     }

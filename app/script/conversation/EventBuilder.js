@@ -32,7 +32,7 @@ z.conversation.EventBuilder = {
         userIds: conversationEntity.participating_user_ids(),
       },
       from: creatorId,
-      id: z.util.create_random_uuid(),
+      id: z.util.createRandomUuid(),
       time: new Date(timestamp).toISOString(),
       type: z.event.Client.CONVERSATION.ONE2ONE_CREATION,
     };
@@ -46,7 +46,7 @@ z.conversation.EventBuilder = {
         type: z.message.VerificationMessageType.VERIFIED,
       },
       from: self.id,
-      id: z.util.create_random_uuid(),
+      id: z.util.createRandomUuid(),
       time: conversationEntity.get_next_iso_date(timeOffset),
       type: z.event.Client.CONVERSATION.VERIFICATION,
     };
@@ -82,7 +82,7 @@ z.conversation.EventBuilder = {
         userIds: userIds,
       },
       from: self.id,
-      id: z.util.create_random_uuid(),
+      id: z.util.createRandomUuid(),
       time: conversationEntity.get_next_iso_date(timeOffset),
       type: z.event.Client.CONVERSATION.VERIFICATION,
     };
@@ -115,7 +115,7 @@ z.conversation.EventBuilder = {
         userIds: userIds,
       },
       from: creatorId,
-      id: z.util.create_random_uuid(),
+      id: z.util.createRandomUuid(),
       time: new Date(timestamp).toISOString(),
       type: z.event.Client.CONVERSATION.GROUP_CREATION,
     };
@@ -128,7 +128,7 @@ z.conversation.EventBuilder = {
       error: `${messageError.message} (${eventData.sender})`,
       error_code: `${errorCode} (${eventData.sender})`,
       from: from,
-      id: z.util.create_random_uuid(),
+      id: z.util.createRandomUuid(),
       time: time,
       type: z.event.Client.CONVERSATION.INCOMING_MESSAGE_TOO_BIG,
     };
@@ -164,7 +164,7 @@ z.conversation.EventBuilder = {
     return {
       conversation: id,
       from: self.id,
-      id: z.util.create_random_uuid(),
+      id: z.util.createRandomUuid(),
       time: conversationEntity.get_next_iso_date(timeOffset),
       type: z.event.Client.CONVERSATION.MISSED_MESSAGES,
     };
@@ -177,7 +177,7 @@ z.conversation.EventBuilder = {
         user_ids: [userEntity.id],
       },
       from: userEntity.id,
-      id: z.util.create_random_uuid(),
+      id: z.util.createRandomUuid(),
       time: isoDate,
       type: z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE,
     };
@@ -190,7 +190,7 @@ z.conversation.EventBuilder = {
       error: `${decryptionError.message} (${eventData.sender})`,
       error_code: `${errorCode} (${eventData.sender})`,
       from: from,
-      id: z.util.create_random_uuid(),
+      id: z.util.createRandomUuid(),
       time: time,
       type: z.event.Client.CONVERSATION.UNABLE_TO_DECRYPT,
     };
@@ -201,7 +201,7 @@ z.conversation.EventBuilder = {
     return {
       conversation: conversationId,
       from: userId,
-      id: z.util.create_random_uuid(),
+      id: z.util.createRandomUuid(),
       protocol_version: z.calling.CallingRepository.CONFIG.PROTOCOL_VERSION,
       time: time,
       type: z.event.Client.CONVERSATION.VOICE_CHANNEL_ACTIVATE,
@@ -216,7 +216,7 @@ z.conversation.EventBuilder = {
         reason: reason || z.calling.enum.TERMINATION_REASON.COMPLETED,
       },
       from: userId,
-      id: z.util.create_random_uuid(),
+      id: z.util.createRandomUuid(),
       protocol_version: z.calling.CallingRepository.CONFIG.PROTOCOL_VERSION,
       time: time,
       type: z.event.Client.CONVERSATION.VOICE_CHANNEL_DEACTIVATE,

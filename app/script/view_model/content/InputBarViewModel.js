@@ -307,7 +307,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       return this.sendPastedFile();
     }
 
-    const messageText = z.util.StringUtil.trim_line_breaks(this.input());
+    const messageText = z.util.StringUtil.trimLineBreaks(this.input());
 
     const isMessageTextTooLong = messageText.length > z.config.MAXIMUM_MESSAGE_LENGTH;
     if (isMessageTextTooLong) {
@@ -381,11 +381,11 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       antiscroll.rebuild();
     }
 
-    if ($('.messages-wrap').is_scrolled_bottom()) {
-      return $('.messages-wrap').scroll_to_bottom();
+    if ($('.messages-wrap').isScrolledBottom()) {
+      return $('.messages-wrap').scrollToBottom();
     }
 
-    $('.messages-wrap').scroll_by(newListHeight - previousListHeight);
+    $('.messages-wrap').scrollBy(newListHeight - previousListHeight);
   }
 
   setEphemeralTimer(milliseconds) {

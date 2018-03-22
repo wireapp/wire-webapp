@@ -84,7 +84,7 @@ z.assets.AssetService = class AssetService {
    */
   uploadAsset(file, options, xhrAccessorFunction) {
     return z.util
-      .load_file_buffer(file)
+      .loadFileBuffer(file)
       .then(buffer => this._uploadAsset(buffer, options, xhrAccessorFunction))
       .then(({key, keyBytes, sha256, token}) => {
         const asset = new z.proto.Asset();
@@ -217,7 +217,7 @@ z.assets.AssetService = class AssetService {
       body += `--${BOUNDARY}\r\n`;
       body += 'Content-Type: application/octet-stream\r\n';
       body += `Content-length: ${assetData.length}\r\n`;
-      body += `Content-MD5: ${z.util.array_to_md5_base64(assetData)}\r\n`;
+      body += `Content-MD5: ${z.util.arrayToMd5Base64(assetData)}\r\n`;
       body += '\r\n';
       const footer = `\r\n--${BOUNDARY}--\r\n`;
 
@@ -268,7 +268,7 @@ z.assets.AssetService = class AssetService {
    */
   _compressImageWithWorker(worker, image, filter) {
     return z.util
-      .load_file_buffer(image)
+      .loadFileBuffer(image)
       .then(buffer => {
         if (typeof filter === 'function' ? filter() : undefined) {
           return new Uint8Array(buffer);
@@ -277,7 +277,7 @@ z.assets.AssetService = class AssetService {
       })
       .then(compressedBytes => {
         return z.util
-          .load_image(new Blob([compressedBytes], {type: image.type}))
+          .loadImage(new Blob([compressedBytes], {type: image.type}))
           .then(compressedImage => ({compressedBytes, compressedImage}));
       });
   }

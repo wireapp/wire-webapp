@@ -55,7 +55,7 @@ z.location = (() => {
     locationResult.place = locality || naturalFeature || areaLevel3 || areaLevel2 || areaLevel1;
 
     delete locationResult.political;
-    return z.util.ObjectUtil.escape_properties(locationResult);
+    return z.util.ObjectUtil.escapeProperties(locationResult);
   };
 
   /**

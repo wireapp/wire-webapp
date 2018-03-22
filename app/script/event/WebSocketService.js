@@ -84,7 +84,7 @@ z.event.WebSocketService = class WebSocketService {
     return new Promise((resolve, reject) => {
       this.connectionUrl = `${this.client.web_socket_url}/await?access_token=${this.client.access_token}`;
       if (this.clientId) {
-        this.connectionUrl = z.util.append_url_parameter(this.connectionUrl, `client=${this.clientId}`);
+        this.connectionUrl = z.util.URLUtil.appendParameter(this.connectionUrl, `client=${this.clientId}`);
       }
 
       const wrongSocketType = typeof this.socket === 'object';
@@ -142,7 +142,7 @@ z.event.WebSocketService = class WebSocketService {
    * @returns {undefined} No return value
    */
   reconnect(trigger) {
-    if (!z.util.StorageUtil.get_value(z.storage.StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION)) {
+    if (!z.util.StorageUtil.getValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION)) {
       this.logger.info(`Access token has to be refreshed before reconnecting the WebSocket triggered by '${trigger}'`);
       this.pendingReconnectTrigger = trigger;
       return amplify.publish(

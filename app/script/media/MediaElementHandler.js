@@ -95,7 +95,7 @@ z.media.MediaElementHandler = class MediaElementHandler {
       media_element.dataset.flow_id = media_stream_info.flow_id;
       media_element.muted = false;
       media_element.setAttribute('autoplay', true);
-      if (z.util.Environment.browser.supports.audio_output_selection) {
+      if (z.util.Environment.browser.supports.audioOutputSelection) {
         this._set_media_element_output(media_element, this.current_device_id.audio_output());
       }
       return media_element;

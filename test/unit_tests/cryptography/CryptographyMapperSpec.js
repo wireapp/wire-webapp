@@ -29,11 +29,11 @@ describe('z.cryptography.CryptographyMapper', () => {
 
   beforeEach(() => {
     event = {
-      conversation: z.util.create_random_uuid(),
+      conversation: z.util.createRandomUuid(),
       data: {
-        id: z.util.create_random_uuid(),
+        id: z.util.createRandomUuid(),
       },
-      from: z.util.create_random_uuid(),
+      from: z.util.createRandomUuid(),
       time: new Date().toISOString(),
     };
   });
@@ -41,7 +41,7 @@ describe('z.cryptography.CryptographyMapper', () => {
   describe('"mapGenericMessage"', () => {
     beforeAll(done => {
       z.util.protobuf
-        .load_protos('ext/proto/generic-message-proto/messages.proto')
+        .loadProtos('ext/proto/generic-message-proto/messages.proto')
         .then(done)
         .catch(done.fail);
     });
@@ -56,7 +56,7 @@ describe('z.cryptography.CryptographyMapper', () => {
       const original_asset = new z.proto.Asset.Original(original.mime_type, original.size, original.name);
       const asset = new z.proto.Asset(original_asset);
 
-      const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
+      const generic_message = new z.proto.GenericMessage(z.util.createRandomUuid());
       generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, asset);
 
       mapper
@@ -81,7 +81,7 @@ describe('z.cryptography.CryptographyMapper', () => {
       const original_asset = new z.proto.Asset.Original('audio/mp3', 1024, 'foo.mp3', null, null, audio_meta_data);
       const asset = new z.proto.Asset(original_asset);
 
-      const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
+      const generic_message = new z.proto.GenericMessage(z.util.createRandomUuid());
       generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, asset);
 
       mapper
@@ -107,10 +107,10 @@ describe('z.cryptography.CryptographyMapper', () => {
 
     it('resolves with a mapped uploaded asset message', done => {
       const uploaded = {
-        key: z.util.create_random_uuid(),
+        key: z.util.createRandomUuid(),
         otr_key: new Uint8Array([1, 2]),
         sha256: new Uint8Array([3, 4]),
-        token: z.util.create_random_uuid(),
+        token: z.util.createRandomUuid(),
       };
 
       const uploaded_asset = new z.proto.Asset.RemoteData(
@@ -122,7 +122,7 @@ describe('z.cryptography.CryptographyMapper', () => {
       const asset = new z.proto.Asset();
       asset.set('uploaded', uploaded_asset);
 
-      const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
+      const generic_message = new z.proto.GenericMessage(z.util.createRandomUuid());
       generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, asset);
 
       mapper
@@ -147,7 +147,7 @@ describe('z.cryptography.CryptographyMapper', () => {
       const asset = new z.proto.Asset();
       asset.set('not_uploaded', z.proto.Asset.NotUploaded.CANCELLED);
 
-      const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
+      const generic_message = new z.proto.GenericMessage(z.util.createRandomUuid());
       generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, asset);
 
       mapper
@@ -169,7 +169,7 @@ describe('z.cryptography.CryptographyMapper', () => {
       const asset = new z.proto.Asset();
       asset.set('not_uploaded', z.proto.Asset.NotUploaded.FAILED);
 
-      const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
+      const generic_message = new z.proto.GenericMessage(z.util.createRandomUuid());
       generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, asset);
 
       mapper
@@ -203,7 +203,7 @@ describe('z.cryptography.CryptographyMapper', () => {
       const asset = new z.proto.Asset();
       asset.set('preview', preview_asset);
 
-      const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
+      const generic_message = new z.proto.GenericMessage(z.util.createRandomUuid());
       generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, asset);
 
       mapper
@@ -225,7 +225,7 @@ describe('z.cryptography.CryptographyMapper', () => {
     it('resolves with a mapped availability message', done => {
       const availability = new z.proto.Availability(z.proto.Availability.Type.AVAILABLE);
 
-      const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
+      const generic_message = new z.proto.GenericMessage(z.util.createRandomUuid());
       generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.AVAILABILITY, availability);
 
       mapper
@@ -245,8 +245,8 @@ describe('z.cryptography.CryptographyMapper', () => {
 
     it('resolves with a mapped cleared message', done => {
       const date = Date.now().toString();
-      const conversation_id = z.util.create_random_uuid();
-      const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
+      const conversation_id = z.util.createRandomUuid();
+      const generic_message = new z.proto.GenericMessage(z.util.createRandomUuid());
       generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.CLEARED, new z.proto.Cleared(conversation_id, date));
 
       mapper
@@ -266,9 +266,9 @@ describe('z.cryptography.CryptographyMapper', () => {
     });
 
     it('resolves with a mapped hidden message', done => {
-      const conversation_id = z.util.create_random_uuid();
-      const message_id = z.util.create_random_uuid();
-      const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
+      const conversation_id = z.util.createRandomUuid();
+      const message_id = z.util.createRandomUuid();
+      const generic_message = new z.proto.GenericMessage(z.util.createRandomUuid());
       generic_message.set(
         z.cryptography.GENERIC_MESSAGE_TYPE.HIDDEN,
         new z.proto.MessageHide(conversation_id, message_id)
@@ -291,8 +291,8 @@ describe('z.cryptography.CryptographyMapper', () => {
     });
 
     it('resolves with a mapped deleted message', done => {
-      const message_id = z.util.create_random_uuid();
-      const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
+      const message_id = z.util.createRandomUuid();
+      const generic_message = new z.proto.GenericMessage(z.util.createRandomUuid());
       generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.DELETED, new z.proto.MessageDelete(message_id));
 
       mapper
@@ -322,7 +322,7 @@ describe('z.cryptography.CryptographyMapper', () => {
         width: 640,
       };
 
-      const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
+      const generic_message = new z.proto.GenericMessage(z.util.createRandomUuid());
       const image_asset = new z.proto.ImageAsset(
         image.tag,
         image.width,
@@ -356,7 +356,7 @@ describe('z.cryptography.CryptographyMapper', () => {
     });
 
     it('resolves with a mapped medium image message when receiving v3', done => {
-      const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
+      const generic_message = new z.proto.GenericMessage(z.util.createRandomUuid());
 
       const image_meta_data = new z.proto.Asset.ImageMetaData(1280, 640);
       const original = new z.proto.Asset.Original('image/jpg', 1024, null, image_meta_data);
@@ -364,8 +364,8 @@ describe('z.cryptography.CryptographyMapper', () => {
       const remote_data = new z.proto.Asset.RemoteData();
       remote_data.set('otr_key', new Uint8Array([1, 2]));
       remote_data.set('sha256', new Uint8Array([3, 4]));
-      remote_data.set('asset_id', z.util.create_random_uuid());
-      remote_data.set('asset_token', z.util.create_random_uuid());
+      remote_data.set('asset_id', z.util.createRandomUuid());
+      remote_data.set('asset_token', z.util.createRandomUuid());
 
       const asset = new z.proto.Asset();
       asset.set('original', original);
@@ -404,7 +404,7 @@ describe('z.cryptography.CryptographyMapper', () => {
         width: 640,
       };
 
-      const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
+      const generic_message = new z.proto.GenericMessage(z.util.createRandomUuid());
       const image_asset = new z.proto.ImageAsset(
         image.tag,
         image.width,
@@ -440,7 +440,7 @@ describe('z.cryptography.CryptographyMapper', () => {
     });
 
     it('rejects with an error for a preview image message', done => {
-      const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
+      const generic_message = new z.proto.GenericMessage(z.util.createRandomUuid());
       generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.IMAGE, new z.proto.ImageAsset('preview'));
 
       mapper
@@ -454,7 +454,7 @@ describe('z.cryptography.CryptographyMapper', () => {
     });
 
     it('resolves with a mapped knock message', done => {
-      const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
+      const generic_message = new z.proto.GenericMessage(z.util.createRandomUuid());
       generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.KNOCK, new z.proto.Knock(false));
 
       mapper
@@ -473,8 +473,8 @@ describe('z.cryptography.CryptographyMapper', () => {
 
     it('resolves with a mapped last read message', done => {
       const date = Date.now().toString();
-      const conversation_id = z.util.create_random_uuid();
-      const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
+      const conversation_id = z.util.createRandomUuid();
+      const generic_message = new z.proto.GenericMessage(z.util.createRandomUuid());
       generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.LAST_READ, new z.proto.LastRead(conversation_id, date));
 
       mapper
@@ -494,7 +494,7 @@ describe('z.cryptography.CryptographyMapper', () => {
     });
 
     it('resolves with a mapped reaction message', done => {
-      const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
+      const generic_message = new z.proto.GenericMessage(z.util.createRandomUuid());
       generic_message.set(
         z.cryptography.GENERIC_MESSAGE_TYPE.REACTION,
         new z.proto.Reaction(z.message.ReactionType.LIKE, generic_message.message_id)
@@ -517,7 +517,7 @@ describe('z.cryptography.CryptographyMapper', () => {
     });
 
     it('resolves with a mapped text message', done => {
-      const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
+      const generic_message = new z.proto.GenericMessage(z.util.createRandomUuid());
       generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT, new z.proto.Text('Unit test'));
 
       mapper
@@ -548,7 +548,7 @@ describe('z.cryptography.CryptographyMapper', () => {
 
     it('can map a text wrapped inside an external message', done => {
       const plaintext = 'Test';
-      const generic_message_id = z.util.create_random_uuid();
+      const generic_message_id = z.util.createRandomUuid();
       const generic_message = new z.proto.GenericMessage(generic_message_id);
       generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT, new z.proto.Text(plaintext));
 
@@ -556,9 +556,9 @@ describe('z.cryptography.CryptographyMapper', () => {
         .then(({cipherText, keyBytes, sha256}) => {
           keyBytes = new Uint8Array(keyBytes);
           sha256 = new Uint8Array(sha256);
-          event.data.data = z.util.array_to_base64(cipherText);
+          event.data.data = z.util.arrayToBase64(cipherText);
 
-          const external_message = new z.proto.GenericMessage(z.util.create_random_uuid());
+          const external_message = new z.proto.GenericMessage(z.util.createRandomUuid());
           external_message.set('external', new z.proto.External(keyBytes, sha256));
 
           return mapper.mapGenericMessage(external_message, event);
@@ -574,7 +574,7 @@ describe('z.cryptography.CryptographyMapper', () => {
 
     it('can map a ping wrapped inside an external message', done => {
       let external_message = undefined;
-      const generic_message_id = z.util.create_random_uuid();
+      const generic_message_id = z.util.createRandomUuid();
       const ping = new z.proto.GenericMessage(generic_message_id);
       ping.set('knock', new z.proto.Knock(false));
 
@@ -582,9 +582,9 @@ describe('z.cryptography.CryptographyMapper', () => {
         .then(({cipherText, keyBytes, sha256}) => {
           keyBytes = new Uint8Array(keyBytes);
           sha256 = new Uint8Array(sha256);
-          event.data.data = z.util.array_to_base64(cipherText);
+          event.data.data = z.util.arrayToBase64(cipherText);
 
-          external_message = new z.proto.GenericMessage(z.util.create_random_uuid());
+          external_message = new z.proto.GenericMessage(z.util.createRandomUuid());
           external_message.set('external', new z.proto.External(keyBytes, sha256));
           return mapper.mapGenericMessage(external_message, event);
         })
@@ -601,7 +601,7 @@ describe('z.cryptography.CryptographyMapper', () => {
     });
 
     it('resolves with a mapped location message', done => {
-      const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
+      const generic_message = new z.proto.GenericMessage(z.util.createRandomUuid());
       generic_message.set(
         z.cryptography.GENERIC_MESSAGE_TYPE.LOCATION,
         new z.proto.Location(52.520645, 13.409779, 'Berlin', 1)
@@ -626,7 +626,7 @@ describe('z.cryptography.CryptographyMapper', () => {
     });
 
     it('resolves with a mapped reaction message', done => {
-      const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
+      const generic_message = new z.proto.GenericMessage(z.util.createRandomUuid());
       generic_message.set('reaction', new z.proto.Reaction(z.message.ReactionType.LIKE, generic_message.message_id));
 
       mapper
@@ -653,7 +653,7 @@ describe('z.cryptography.CryptographyMapper', () => {
         version: '3.0',
       };
 
-      const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
+      const generic_message = new z.proto.GenericMessage(z.util.createRandomUuid());
       generic_message.set(
         z.cryptography.GENERIC_MESSAGE_TYPE.CALLING,
         new z.proto.Calling(JSON.stringify(content_message))

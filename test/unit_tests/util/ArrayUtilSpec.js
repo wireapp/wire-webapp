@@ -57,28 +57,28 @@ describe('z.util.ArrayUtil', () => {
     });
   });
 
-  describe('get_next_item', () => {
-    const first_item = 'a';
-    const second_item = 'b';
-    const third_item = 'c';
-    const unknown_item = 'd';
-    const array = [first_item, second_item, third_item];
-    const filter = item => item !== second_item;
+  describe('getNextItem', () => {
+    const firstItem = 'a';
+    const secondItem = 'b';
+    const thirdItem = 'c';
+    const unknownItem = 'd';
+    const array = [firstItem, secondItem, thirdItem];
+    const filter = item => item !== secondItem;
 
     it('returns the second item when first item was given', () => {
-      expect(z.util.ArrayUtil.get_next_item(array, first_item)).toEqual(second_item);
+      expect(z.util.ArrayUtil.getNextItem(array, firstItem)).toEqual(secondItem);
     });
 
     it('returns the third item when first item was given and filter skips the second item', () => {
-      expect(z.util.ArrayUtil.get_next_item(array, first_item, filter)).toEqual(third_item);
+      expect(z.util.ArrayUtil.getNextItem(array, firstItem, filter)).toEqual(thirdItem);
     });
 
     it('returns the second item when last item was given', () => {
-      expect(z.util.ArrayUtil.get_next_item(array, third_item)).toEqual(second_item);
+      expect(z.util.ArrayUtil.getNextItem(array, thirdItem)).toEqual(secondItem);
     });
 
     it('returns undefined when item is not in the array', () => {
-      expect(z.util.ArrayUtil.get_next_item(array, unknown_item)).toBeUndefined();
+      expect(z.util.ArrayUtil.getNextItem(array, unknownItem)).toBeUndefined();
     });
   });
 
@@ -95,41 +95,41 @@ describe('z.util.ArrayUtil', () => {
     });
   });
 
-  describe('is_last_item', () => {
-    const first_item = 'a';
-    const second_item = 'b';
-    const third_item = 'c';
-    const unknown_item = 'd';
-    const array = [first_item, second_item, third_item];
+  describe('isLastItem', () => {
+    const firstItem = 'a';
+    const secondItem = 'b';
+    const thirdItem = 'c';
+    const unknownItem = 'd';
+    const array = [firstItem, secondItem, thirdItem];
 
     it('returns true for the last item', () => {
-      expect(z.util.ArrayUtil.is_last_item(array, third_item)).toBeTruthy();
+      expect(z.util.ArrayUtil.isLastItem(array, thirdItem)).toBeTruthy();
     });
 
     it('returns false for any item that is not the last', () => {
-      expect(z.util.ArrayUtil.is_last_item(array, first_item)).toBeFalsy();
-      expect(z.util.ArrayUtil.is_last_item(array, second_item)).toBeFalsy();
+      expect(z.util.ArrayUtil.isLastItem(array, firstItem)).toBeFalsy();
+      expect(z.util.ArrayUtil.isLastItem(array, secondItem)).toBeFalsy();
     });
 
     it('returns false for an item that is not in the array', () => {
-      expect(z.util.ArrayUtil.is_last_item(array, unknown_item)).toBeFalsy();
+      expect(z.util.ArrayUtil.isLastItem(array, unknownItem)).toBeFalsy();
     });
   });
 
-  describe('iterate_index', () => {
+  describe('iterateIndex', () => {
     it('returns undefined in case of wrong input parameters', () => {
-      expect(z.util.ArrayUtil.iterate_index('Test', 0)).toBe(undefined);
-      expect(z.util.ArrayUtil.iterate_index([1, 2, 3], 'Test')).toBe(undefined);
-      expect(z.util.ArrayUtil.iterate_index([], 0)).toBe(undefined);
+      expect(z.util.ArrayUtil.iterateIndex('Test', 0)).toBe(undefined);
+      expect(z.util.ArrayUtil.iterateIndex([1, 2, 3], 'Test')).toBe(undefined);
+      expect(z.util.ArrayUtil.iterateIndex([], 0)).toBe(undefined);
     });
 
     it('iterates through the array index', () => {
       const array = [1, 2, 3, 4, 5];
-      expect(z.util.ArrayUtil.iterate_index(array, 0)).toBe(1);
-      expect(z.util.ArrayUtil.iterate_index(array, 1)).toBe(2);
-      expect(z.util.ArrayUtil.iterate_index(array, 2)).toBe(3);
-      expect(z.util.ArrayUtil.iterate_index(array, 3)).toBe(4);
-      expect(z.util.ArrayUtil.iterate_index(array, 4)).toBe(0);
+      expect(z.util.ArrayUtil.iterateIndex(array, 0)).toBe(1);
+      expect(z.util.ArrayUtil.iterateIndex(array, 1)).toBe(2);
+      expect(z.util.ArrayUtil.iterateIndex(array, 2)).toBe(3);
+      expect(z.util.ArrayUtil.iterateIndex(array, 3)).toBe(4);
+      expect(z.util.ArrayUtil.iterateIndex(array, 4)).toBe(0);
     });
   });
 });

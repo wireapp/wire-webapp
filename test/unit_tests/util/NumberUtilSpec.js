@@ -22,17 +22,17 @@
 'use strict';
 
 describe('z.util.NumberUtil', () => {
-  describe('in_range', () => {
+  describe('inRange', () => {
     it('returns true for values inside the specified range', () => {
-      expect(z.util.NumberUtil.in_range(0, 0, 2)).toBeTruthy();
-      expect(z.util.NumberUtil.in_range(1, 0, 2)).toBeTruthy();
-      expect(z.util.NumberUtil.in_range(1, 0, 2)).toBeTruthy();
+      expect(z.util.NumberUtil.inRange(0, 0, 2)).toBeTruthy();
+      expect(z.util.NumberUtil.inRange(1, 0, 2)).toBeTruthy();
+      expect(z.util.NumberUtil.inRange(1, 0, 2)).toBeTruthy();
     });
 
     it('returns false for values outside the specified range', () => {
-      expect(z.util.NumberUtil.in_range(undefined, 0, 2)).toBeFalsy();
-      expect(z.util.NumberUtil.in_range(-1, 0, 2)).toBeFalsy();
-      expect(z.util.NumberUtil.in_range(3, 0, 2)).toBeFalsy();
+      expect(z.util.NumberUtil.inRange(undefined, 0, 2)).toBeFalsy();
+      expect(z.util.NumberUtil.inRange(-1, 0, 2)).toBeFalsy();
+      expect(z.util.NumberUtil.inRange(3, 0, 2)).toBeFalsy();
     });
   });
 });

@@ -21,79 +21,79 @@
 
 'use strict';
 
-describe('z.util.render_message', () => {
+describe('z.util.renderMessage', () => {
   it('renders a normal link', () => {
     const expected =
       'Check this: <a href="http://www.wire.com/" target="_blank" rel="nofollow noopener noreferrer">http://www.wire.com/</a>';
-    expect(z.util.render_message('Check this: http://www.wire.com/')).toBe(expected);
+    expect(z.util.renderMessage('Check this: http://www.wire.com/')).toBe(expected);
   });
 
   it('renders a normal link without protocol', () => {
     const expected =
       'Check this: <a href="http://wire.com/about/" target="_blank" rel="nofollow noopener noreferrer">wire.com/about/</a>';
-    expect(z.util.render_message('Check this: wire.com/about/')).toBe(expected);
+    expect(z.util.renderMessage('Check this: wire.com/about/')).toBe(expected);
   });
 
   it('renders complicated image links', () => {
     const link =
       'http://static.err.ee/gridfs/95E91BE0D28DF7236BC00EE349284A451C05949C2D04E7857BC686E4394F1585.jpg?&amp;crop=(0,27,848,506.0960451977401)&amp;cropxunits=848&amp;cropyunits=595&amp;format=jpg&amp;quality=90&amp;width=752&amp;maxheight=42';
     const expected = `<a href="${link}" target="_blank" rel="nofollow noopener noreferrer">${link}</a>`;
-    expect(z.util.render_message(link)).toBe(expected);
+    expect(z.util.renderMessage(link)).toBe(expected);
   });
 
   it('renders URLs with underscores', () => {
     const link = 'http://en.wikipedia.org/wiki/Stormtrooper_(Star_Wars)';
     const expected = `Stormtroopers: <a href="${link}" target="_blank" rel="nofollow noopener noreferrer">${link}</a> !!!`;
-    expect(z.util.render_message(`Stormtroopers: ${link} !!!`)).toBe(expected);
+    expect(z.util.renderMessage(`Stormtroopers: ${link} !!!`)).toBe(expected);
   });
 
   it('renders links with multiple underscores', () => {
     const link =
       'https://www.nike.com/events-registration/event?id=6245&amp;languageLocale=de_de&amp;cp=EUNS_KW_DE_&amp;s_kwcid=AL!2799!3!46005237943!b!!g!!womens%20running';
     const expected = `<a href="${link}" target="_blank" rel="nofollow noopener noreferrer">${link}</a>`;
-    expect(z.util.render_message(link)).toBe(expected);
+    expect(z.util.renderMessage(link)).toBe(expected);
   });
 
   it('renders URLs without a trailing slash', () => {
     const link = 'http://www.underscore.com';
     const expected = `e.g. <a href="${link}" target="_blank" rel="nofollow noopener noreferrer">${link}</a>.`;
-    expect(z.util.render_message(`e.g. ${link}.`)).toBe(expected);
+    expect(z.util.renderMessage(`e.g. ${link}.`)).toBe(expected);
   });
 
   it('renders localhost links', () => {
     const link = 'http://localhost:8888/';
     const expected = `<a href="${link}" target="_blank" rel="nofollow noopener noreferrer">${link}</a>`;
-    expect(z.util.render_message(link)).toBe(expected);
+    expect(z.util.renderMessage(link)).toBe(expected);
   });
 
   it('renders links with IP addresses', () => {
     const link = 'http://192.168.10.44:8080//job/webapp_atomic_test/4290/cucumber-html-reports';
     const expected = `<a href="${link}" target="_blank" rel="nofollow noopener noreferrer">${link}</a>`;
-    expect(z.util.render_message(link)).toBe(expected);
+    expect(z.util.renderMessage(link)).toBe(expected);
   });
 
   it('renders URLs with @-signs correctly', () => {
     const link = 'https://www.mail-archive.com/debian-bugs-dist@lists.debian.org/msg1448956.html';
     const expected = `<a href="${link}" target="_blank" rel="nofollow noopener noreferrer">${link}</a>`;
-    expect(z.util.render_message(link)).toBe(expected);
+    expect(z.util.renderMessage(link)).toBe(expected);
   });
 
   it('renders URLs with @-signs and text correctly', () => {
     const link = 'https://t.facdn.net/22382738@400-1485204208.jpg';
     const expected = `Just click <a href="${link}" target="_blank" rel="nofollow noopener noreferrer">${link}</a> and download it`;
-    expect(z.util.render_message(`Just click ${link} and download it`)).toBe(expected);
+    expect(z.util.renderMessage(`Just click ${link} and download it`)).toBe(expected);
   });
 
   it('escapes links when they are posted as plain HTML', () => {
     const expected = '&lt;a href=&quot;javascript:alert(&#x27;ohoh!&#x27;)&quot;&gt;what?&lt;/a&gt;';
-    expect(z.util.render_message('<a href="javascript:alert(\'ohoh!\')">what?</a>')).toBe(expected);
+    expect(z.util.renderMessage('<a href="javascript:alert(\'ohoh!\')">what?</a>')).toBe(expected);
   });
 
   it('renders an escaped version of an xss attempt', () => {
     const expected =
       '<a href="http://wire.de/jaVasCript:/*-/*`/*\\`/*&#x27;/*&quot;/**/(/**/oNcliCk=alert())//%0D%0A%0d%0a//&lt;/stYle/&lt;/titLe/&lt;/teXtarEa/&lt;/scRipt/--!&gt;\\x3csVg/&lt;sVg/oNloAd=alert()//&gt;\\x3e" target="_blank" rel="nofollow noopener noreferrer">wire.de/jaVasCript:/*-/*`/*\\`/*&#x27;/*&quot;/**/(/**/oNcliCk=alert())//%0D%0A%0d%0a//&lt;/stYle/&lt;/titLe/&lt;/teXtarEa/&lt;/scRipt/--!&gt;\\x3csVg/&lt;sVg/oNloAd=alert()//&gt;\\x3e</a>';
     expect(
-      z.util.render_message(
+      z.util.renderMessage(
         'wire.de/jaVasCript:/*-/*`/*\\`/*\'/*"/**/(/**/oNcliCk=alert())//%0D%0A%0d%0a//</stYle/</titLe/</teXtarEa/</scRipt/--!>\\x3csVg/<sVg/oNloAd=alert()//>\\x3e'
       )
     ).toBe(expected);
@@ -101,74 +101,72 @@ describe('z.util.render_message', () => {
 
   it('renders an email address', () => {
     const expected =
-      'send it over to <a href="mailto:hello@wire.com" onclick="z.util.safe_mailto_open(event, \'hello@wire.com\')">hello@wire.com</a>';
-    expect(z.util.render_message('send it over to hello@wire.com')).toBe(expected);
+      'send it over to <a href="mailto:hello@wire.com" onclick="z.util.safeMailtoOpen(event, \'hello@wire.com\')">hello@wire.com</a>';
+    expect(z.util.renderMessage('send it over to hello@wire.com')).toBe(expected);
   });
 
   it('renders an email address with pluses', () => {
     const expected =
-      'send it over to <a href="mailto:hello+world@wire.com" onclick="z.util.safe_mailto_open(event, \'hello+world@wire.com\')">hello+world@wire.com</a>';
-    expect(z.util.render_message('send it over to hello+world@wire.com')).toBe(expected);
+      'send it over to <a href="mailto:hello+world@wire.com" onclick="z.util.safeMailtoOpen(event, \'hello+world@wire.com\')">hello+world@wire.com</a>';
+    expect(z.util.renderMessage('send it over to hello+world@wire.com')).toBe(expected);
   });
 
   it('renders an email long domains', () => {
     const expected =
-      'send it over to <a href="mailto:janedoe@school.university.edu" onclick="z.util.safe_mailto_open(event, \'janedoe@school.university.edu\')">janedoe@school.university.edu</a>';
-    expect(z.util.render_message('send it over to janedoe@school.university.edu')).toBe(expected);
+      'send it over to <a href="mailto:janedoe@school.university.edu" onclick="z.util.safeMailtoOpen(event, \'janedoe@school.university.edu\')">janedoe@school.university.edu</a>';
+    expect(z.util.renderMessage('send it over to janedoe@school.university.edu')).toBe(expected);
   });
 
   it('renders an email with multiple subdomains', () => {
     const expected =
-      'send it over to <a href="mailto:bla@foo.co.uk" onclick="z.util.safe_mailto_open(event, \'bla@foo.co.uk\')">bla@foo.co.uk</a>';
-    expect(z.util.render_message('send it over to bla@foo.co.uk')).toBe(expected);
+      'send it over to <a href="mailto:bla@foo.co.uk" onclick="z.util.safeMailtoOpen(event, \'bla@foo.co.uk\')">bla@foo.co.uk</a>';
+    expect(z.util.renderMessage('send it over to bla@foo.co.uk')).toBe(expected);
   });
 
   // The tag "<br />" is preferred for compatibility sake.
   // @see http://stackoverflow.com/a/1946442/451634
   it('renders endlines to <br />', () => {
-    expect(z.util.render_message('Hello,\nworld!\nHow is it going?\n')).toBe(
-      'Hello,<br />world!<br />How is it going?'
-    );
+    expect(z.util.renderMessage('Hello,\nworld!\nHow is it going?\n')).toBe('Hello,<br />world!<br />How is it going?');
   });
 
   it('renders text with more than one newline in between', () => {
-    expect(z.util.render_message('Hello,\n\n\n\n\n\n\nworld!')).toBe(
+    expect(z.util.renderMessage('Hello,\n\n\n\n\n\n\nworld!')).toBe(
       'Hello,<br /><br /><br /><br /><br /><br /><br />world!'
     );
   });
 
   it('does not render URLs within <code> tags', () => {
-    expect(z.util.render_message('```Url url = new Url("wire.com");```')).toBe(
+    expect(z.util.renderMessage('```Url url = new Url("wire.com");```')).toBe(
       '<code>Url url = new Url(&quot;wire.com&quot;);</code>'
     );
   });
 
   it('does not render emails within <code> tags', () => {
-    expect(z.util.render_message('```this.isValid("opensource@wire.com")```')).toBe(
+    expect(z.util.renderMessage('```this.isValid("opensource@wire.com")```')).toBe(
       '<code>this.isValid(&quot;opensource@wire.com&quot;)</code>'
     );
   });
 
   it('renders an emoticon of someone shrugging', () => {
     /* eslint-disable no-useless-escape */
-    expect(z.util.render_message('¯_(ツ)_/¯')).toBe('¯_(ツ)_/¯');
+    expect(z.util.renderMessage('¯_(ツ)_/¯')).toBe('¯_(ツ)_/¯');
   });
   /* eslint-enable no-useless-escape */
 });
 
-describe('z.util.array_to_md5_base64', () => {
+describe('z.util.arrayToMd5Base64', () => {
   it('can convert typed array to base64', () => {
-    expect(z.util.array_to_md5_base64(new Uint8Array([8, 8]))).toBe('w+7NCDwPSCf1JgWbA7deTA==');
+    expect(z.util.arrayToMd5Base64(new Uint8Array([8, 8]))).toBe('w+7NCDwPSCf1JgWbA7deTA==');
   });
 });
 
-describe('z.util.encode_base64', () => {
+describe('z.util.encodeBase64', () => {
   it('encodes text', () => {
-    expect(z.util.encode_base64('Hello, world!')).toBe('SGVsbG8sIHdvcmxkIQ==');
+    expect(z.util.encodeBase64('Hello, world!')).toBe('SGVsbG8sIHdvcmxkIQ==');
   });
 
   it('encodes symbols', () => {
-    expect(z.util.encode_base64('Hello, world!@#$%^&*()_+{}[]|<>,.?/~`"')).toBe(
+    expect(z.util.encodeBase64('Hello, world!@#$%^&*()_+{}[]|<>,.?/~`"')).toBe(
       'SGVsbG8sIHdvcmxkIUAjJCVeJiooKV8re31bXXw8PiwuPy9+YCI='
     );
   });
@@ -176,130 +174,130 @@ describe('z.util.encode_base64', () => {
 
 describe('z.util.encode_base64_sha256', () => {
   it('encodes Base64 and SHA-256 empty string', () => {
-    expect(z.util.encode_sha256_base64('')).toBe('47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=');
+    expect(z.util.encodeSha256Base64('')).toBe('47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=');
   });
 
   it('encodes Base64 and SHA-256 text', () => {
-    expect(z.util.encode_sha256_base64('Hello, world!')).toBe('MV9b23bQeMQ7isAGTkoBZGErH853yGk0W/yUx1iU7dM=');
+    expect(z.util.encodeSha256Base64('Hello, world!')).toBe('MV9b23bQeMQ7isAGTkoBZGErH853yGk0W/yUx1iU7dM=');
   });
 
   it('encodes Base64 and SHA-256 symbols', () => {
-    expect(z.util.encode_sha256_base64('Hello, world!@#$%^&*()_+{}[]|<>,.?/~`"')).toBe(
+    expect(z.util.encodeSha256Base64('Hello, world!@#$%^&*()_+{}[]|<>,.?/~`"')).toBe(
       'lt/heVPfGQB07sONclI2TZBZHuIMH86noUEWEbahMw4='
     );
   });
 });
 
-describe('z.util.base64_to_blob', () => {
+describe('z.util.base64ToBlob', () => {
   it('encodes Base64 data URI to blob', () => {
-    const base64 = z.util.array_to_base64(new Uint8Array([1, 2, 3]));
+    const base64 = z.util.arrayToBase64(new Uint8Array([1, 2, 3]));
     const data_uri = `data:application/octet-binary;base64,${base64}`;
-    const blob = z.util.base64_to_blob(data_uri);
+    const blob = z.util.base64ToBlob(data_uri);
     expect(blob.type).toBe('application/octet-binary');
   });
 });
 
-describe('z.util.create_random_uuid', () => {
+describe('z.util.createRandomUuid', () => {
   it('has the expected format', () => {
-    expect(z.util.create_random_uuid().length).toBe(36);
-    expect(z.util.create_random_uuid().split('-').length).toBe(5);
-    expect(z.util.create_random_uuid()).not.toEqual(z.util.create_random_uuid());
+    expect(z.util.createRandomUuid().length).toBe(36);
+    expect(z.util.createRandomUuid().split('-').length).toBe(5);
+    expect(z.util.createRandomUuid()).not.toEqual(z.util.createRandomUuid());
   });
 });
 
-describe('z.util.format_bytes', () => {
+describe('z.util.formatBytes', () => {
   it('renders 0 bytes', () => {
-    expect(z.util.format_bytes(0)).toEqual('0B');
+    expect(z.util.formatBytes(0)).toEqual('0B');
   });
 
   it('renders 1KB', () => {
-    expect(z.util.format_bytes(1024)).toEqual('1KB');
+    expect(z.util.formatBytes(1024)).toEqual('1KB');
   });
 
   it('renders 25MB', () => {
-    expect(z.util.format_bytes(25 * 1024 * 1024)).toEqual('25MB');
+    expect(z.util.formatBytes(25 * 1024 * 1024)).toEqual('25MB');
   });
 
   it('renders 25GB', () => {
-    expect(z.util.format_bytes(25 * 1024 * 1024 * 1024)).toEqual('25GB');
+    expect(z.util.formatBytes(25 * 1024 * 1024 * 1024)).toEqual('25GB');
   });
 });
 
-describe('z.util.get_file_extension', () => {
+describe('z.util.getFileExtension', () => {
   it('returns common extensions', () => {
-    expect(z.util.get_file_extension('file.jpg')).toEqual('jpg');
-    expect(z.util.get_file_extension('file.png')).toEqual('png');
-    expect(z.util.get_file_extension('file.docx')).toEqual('docx');
-    expect(z.util.get_file_extension('file.exe')).toEqual('exe');
-    expect(z.util.get_file_extension('file.dmg')).toEqual('dmg');
+    expect(z.util.getFileExtension('file.jpg')).toEqual('jpg');
+    expect(z.util.getFileExtension('file.png')).toEqual('png');
+    expect(z.util.getFileExtension('file.docx')).toEqual('docx');
+    expect(z.util.getFileExtension('file.exe')).toEqual('exe');
+    expect(z.util.getFileExtension('file.dmg')).toEqual('dmg');
   });
 
   it('returns extensions for gzip compressed tar archives', () => {
-    expect(z.util.get_file_extension('archive.tar.gz')).toEqual('tar.gz');
+    expect(z.util.getFileExtension('archive.tar.gz')).toEqual('tar.gz');
   });
 
   it('returns an empty string if filename has no extension', () => {
-    expect(z.util.get_file_extension('image')).toEqual('');
+    expect(z.util.getFileExtension('image')).toEqual('');
   });
 
   it('returns extension jpg for image.jpg', () => {
-    expect(z.util.get_file_extension('path/to/image.jpg')).toEqual('jpg');
+    expect(z.util.getFileExtension('path/to/image.jpg')).toEqual('jpg');
   });
 
   it('does not return .tar.gz when it is not the file extension', () => {
-    expect(z.util.get_file_extension('path/to/image.tar.gz.jpg')).toEqual('jpg');
+    expect(z.util.getFileExtension('path/to/image.tar.gz.jpg')).toEqual('jpg');
   });
 });
 
-describe('z.util.trim_file_extension', () => {
+describe('z.util.trimFileExtension', () => {
   it('returns the filename without extension', () => {
-    expect(z.util.trim_file_extension('image.jpg')).toEqual('image');
+    expect(z.util.trimFileExtension('image.jpg')).toEqual('image');
   });
 
   it('returns the filename when there is no extension', () => {
-    expect(z.util.trim_file_extension('image')).toEqual('image');
+    expect(z.util.trimFileExtension('image')).toEqual('image');
   });
 
   it('returns the filename without extension or directory path', () => {
-    expect(z.util.trim_file_extension('foo/bar.exe')).toEqual('foo/bar');
+    expect(z.util.trimFileExtension('foo/bar.exe')).toEqual('foo/bar');
   });
 
   it('returns the filename without extension for .tar.gz', () => {
-    expect(z.util.trim_file_extension('archive.tar.gz')).toEqual('archive');
+    expect(z.util.trimFileExtension('archive.tar.gz')).toEqual('archive');
   });
 
   it('does not remove .tar.gz when it is not the file extension', () => {
-    expect(z.util.trim_file_extension('cool.tar.gz.jpg')).toEqual('cool.tar.gz');
+    expect(z.util.trimFileExtension('cool.tar.gz.jpg')).toEqual('cool.tar.gz');
   });
 
   it('returns an empty string for undefined', () => {
-    expect(z.util.trim_file_extension(undefined)).toEqual('');
+    expect(z.util.trimFileExtension(undefined)).toEqual('');
   });
 
   it('returns an empty string for an object', () => {
-    expect(z.util.trim_file_extension({})).toEqual('');
+    expect(z.util.trimFileExtension({})).toEqual('');
   });
 });
 
-describe('z.util.ko_array_push_all', () => {
+describe('z.util.koArrayPushAll', () => {
   it('appends multiple items', () => {
     const actual = ko.observableArray([1, 2]);
-    z.util.ko_array_push_all(actual, [3, 4]);
+    z.util.koArrayPushAll(actual, [3, 4]);
     expect(actual()).toEqual([1, 2, 3, 4]);
   });
 });
 
-describe('z.util.ko_array_unshift_all', () => {
+describe('z.util.koArrayUnshiftAll', () => {
   it('prepends multiple items', () => {
     const actual = ko.observableArray([3, 4]);
-    z.util.ko_array_unshift_all(actual, [1, 2]);
+    z.util.koArrayUnshiftAll(actual, [1, 2]);
     expect(actual()).toEqual([1, 2, 3, 4]);
   });
 });
 
-describe('z.util.base64_to_array', () => {
+describe('z.util.base64ToArray', () => {
   it('can convert a gif', () => {
-    const actual = z.util.base64_to_array(
+    const actual = z.util.base64ToArray(
       'data:image/gif;base64,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'
     );
     /* eslint-disable comma-spacing */
@@ -3981,68 +3979,68 @@ describe('z.util.base64_to_array', () => {
   it('can convert array buffer back and forth', () => {
     const buffer = new ArrayBuffer(8);
     const array = new Uint8Array(buffer);
-    const buffer_encoded = z.util.array_to_base64(array);
-    const buffer_decoded = z.util.base64_to_array(buffer_encoded);
-    expect(buffer_decoded).toEqual(array);
+    const bufferEncoded = z.util.arrayToBase64(array);
+    const bufferDecoded = z.util.base64ToArray(bufferEncoded);
+    expect(bufferDecoded).toEqual(array);
   });
 });
 
-describe('z.util.strip_data_uri', () => {
+describe('z.util.stripDataUri', () => {
   it('can strip data uri', () => {
     const base64 = 'AAAAAAA';
-    const plain_text = z.util.strip_data_uri(base64);
-    const text_html = z.util.strip_data_uri(`data:text/html,${base64}`);
-    const base64_text_plain = z.util.strip_data_uri(`data:text/plain;base64,${base64}`);
-    const base64_gif = z.util.strip_data_uri(`data:image/gif;base64,${base64}`);
-    const base64_png = z.util.strip_data_uri(`data:image/png;base64,${base64}`);
-    const base64_jpg = z.util.strip_data_uri(`data:image/jpg;base64,${base64}`);
-    expect(plain_text).toBe(base64);
-    expect(text_html).toBe(base64);
-    expect(base64_text_plain).toBe(base64);
-    expect(base64_gif).toBe(base64);
-    expect(base64_png).toBe(base64);
-    expect(base64_jpg).toBe(base64);
+    const plainText = z.util.stripDataUri(base64);
+    const textHtml = z.util.stripDataUri(`data:text/html,${base64}`);
+    const base64TextPlain = z.util.stripDataUri(`data:text/plain;base64,${base64}`);
+    const base64Gif = z.util.stripDataUri(`data:image/gif;base64,${base64}`);
+    const base64Png = z.util.stripDataUri(`data:image/png;base64,${base64}`);
+    const base64Jpg = z.util.stripDataUri(`data:image/jpg;base64,${base64}`);
+    expect(plainText).toBe(base64);
+    expect(textHtml).toBe(base64);
+    expect(base64TextPlain).toBe(base64);
+    expect(base64Gif).toBe(base64);
+    expect(base64Png).toBe(base64);
+    expect(base64Jpg).toBe(base64);
   });
 });
 
-describe('z.util.phone_number_to_e164', () => {
+describe('z.util.phoneNumberToE164', () => {
   it('can convert a US number', () => {
-    expect(z.util.phone_number_to_e164('555-666-7777', 'US')).toBe('+15556667777');
+    expect(z.util.phoneNumberToE164('555-666-7777', 'US')).toBe('+15556667777');
   });
 
   it('can convert a GR number', () => {
-    expect(z.util.phone_number_to_e164('2310 863871', 'GR')).toBe('+302310863871');
+    expect(z.util.phoneNumberToE164('2310 863871', 'GR')).toBe('+302310863871');
   });
 
   it('can convert an unknown number', () => {
-    expect(z.util.phone_number_to_e164('2310 863871')).toBe('2310863871');
+    expect(z.util.phoneNumberToE164('2310 863871')).toBe('2310863871');
   });
 
   it('can convert an invalid number', () => {
-    expect(z.util.phone_number_to_e164('foo bar', 'earth')).toBe('');
+    expect(z.util.phoneNumberToE164('foo bar', 'earth')).toBe('');
   });
 });
 
-describe('z.util.get_content_type_from_data_url', () =>
+describe('z.util.getContentTypeFromDataUrl', () =>
   it('can extract the type of a an image', () => {
-    const actual = z.util.get_content_type_from_data_url(
+    const actual = z.util.getContentTypeFromDataUrl(
       'data:image/gif;base64,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'
     );
     expect(actual).toEqual('image/gif');
   }));
 
-describe('z.util.is_iso_string', () => {
+describe('z.util.isIsoString', () => {
   it('validates date', () => {
-    expect(z.util.is_iso_string()).toBeFalsy();
-    expect(z.util.is_iso_string(new Date().getTime())).toBeFalsy();
-    expect(z.util.is_iso_string('2011-90-05T14:48:00.000Z')).toBeFalsy();
-    expect(z.util.is_iso_string('2011-10-05T14:48:00.000')).toBeFalsy();
-    expect(z.util.is_iso_string(new Date().toISOString())).toBeTruthy();
-    expect(z.util.is_iso_string('2011-10-05T14:48:00.000Z')).toBeTruthy();
+    expect(z.util.isIsoString()).toBeFalsy();
+    expect(z.util.isIsoString(new Date().getTime())).toBeFalsy();
+    expect(z.util.isIsoString('2011-90-05T14:48:00.000Z')).toBeFalsy();
+    expect(z.util.isIsoString('2011-10-05T14:48:00.000')).toBeFalsy();
+    expect(z.util.isIsoString(new Date().toISOString())).toBeTruthy();
+    expect(z.util.isIsoString('2011-10-05T14:48:00.000Z')).toBeTruthy();
   });
 });
 
-describe('z.util.sort_groups_by_last_event', () => {
+describe('z.util.sortGroupsByLastEvent', () => {
   it('finds out that Group A is more recent than Group B', () => {
     const groupA = new z.entity.Conversation();
     groupA.name('Latest');
@@ -4053,7 +4051,7 @@ describe('z.util.sort_groups_by_last_event', () => {
     groupB.last_event_timestamp(1414505766449);
 
     const groups = [groupA, groupB];
-    const [firstGroup, secondGroup] = groups.sort(z.util.sort_groups_by_last_event);
+    const [firstGroup, secondGroup] = groups.sort(z.util.sortGroupsByLastEvent);
 
     expect(firstGroup.name()).toEqual(groupA.name());
     expect(secondGroup.name()).toEqual(groupB.name());
@@ -4069,7 +4067,7 @@ describe('z.util.sort_groups_by_last_event', () => {
     groupB.last_event_timestamp(1414505857975);
 
     const groups = [groupA, groupB];
-    const [firstGroup, secondGroup] = groups.sort(z.util.sort_groups_by_last_event);
+    const [firstGroup, secondGroup] = groups.sort(z.util.sortGroupsByLastEvent);
 
     expect(firstGroup.name()).toEqual(groupB.name());
     expect(secondGroup.name()).toEqual(groupA.name());
@@ -4085,190 +4083,114 @@ describe('z.util.sort_groups_by_last_event', () => {
     groupB.name('Group B');
     groupB.last_event_timestamp(timestamp);
 
-    expect(z.util.sort_groups_by_last_event(groupA, groupB)).toEqual(0);
+    expect(z.util.sortGroupsByLastEvent(groupA, groupB)).toEqual(0);
 
     const groups = [groupA, groupB];
-    const [firstGroup, secondGroup] = groups.sort(z.util.sort_groups_by_last_event);
+    const [firstGroup, secondGroup] = groups.sort(z.util.sortGroupsByLastEvent);
 
     expect(firstGroup.name()).toEqual(groupA.name());
     expect(secondGroup.name()).toEqual(groupB.name());
   });
 });
 
-describe('z.util.strip_url_wrapper', () => {
+describe('z.util.stripUrlWrapper', () => {
   it('return the string without url wrapper (single quotes)', () => {
-    expect(z.util.strip_url_wrapper('url("/path/to/image/image.png")')).toBe('/path/to/image/image.png');
+    expect(z.util.stripUrlWrapper('url("/path/to/image/image.png")')).toBe('/path/to/image/image.png');
   });
 
   it('return the string without url wrapper (quotes)', () => {
-    expect(z.util.strip_url_wrapper('url("/path/to/image/image.png")')).toBe('/path/to/image/image.png');
+    expect(z.util.stripUrlWrapper('url("/path/to/image/image.png")')).toBe('/path/to/image/image.png');
   });
 
   it('return the string without url wrapper (without quotes)', () => {
-    expect(z.util.strip_url_wrapper('url(/path/to/image/image.png)')).toBe('/path/to/image/image.png');
-  });
-});
-
-describe('z.util.naked_url', () => {
-  it('returns naked urls', () => {
-    const expected_url = 'wire.com';
-    const urls = [
-      'HTTPS://WWW.WIRE.COM/',
-      'https://www.wire.com/',
-      'http://www.wire.com/',
-      'https://www.wire.com',
-      'http://www.wire.com',
-      'https://wire.com/',
-      'http://wire.com/',
-      'https://wire.com',
-      'http://wire.com',
-      'www.wire.com/',
-      'www.wire.com',
-      'wire.com/',
-    ];
-
-    const all_urls_naked = urls.map(url => z.util.naked_url(url)).every(url => url === expected_url);
-
-    expect(all_urls_naked).toBeTruthy();
-  });
-
-  it('returns empty string if url is not set', () => {
-    expect(z.util.naked_url()).toBe('');
-  });
-});
-
-describe('z.util.append_url_parameter', () => {
-  it('append param with & when url contains param', () => {
-    expect(z.util.append_url_parameter('foo.com?bar=true', 'fum=true')).toBe('foo.com?bar=true&fum=true');
-  });
-
-  it('append param with ? when url contains param', () => {
-    expect(z.util.append_url_parameter('foo.com', 'fum=true')).toBe('foo.com?fum=true');
-  });
-});
-
-describe('z.util.get_url_parameter', () => {
-  it('get param with no arguments', () => {
-    expect(z.util.get_url_parameter('foo')).toBe(null);
-  });
-});
-
-describe('z.util.forward_url_parameter', () => {
-  it('forwards existing URL parameters', () => {
-    z.util.get_url_parameter = function(parameter_value) {
-      if (parameter_value === z.auth.URLParameter.TRACKING) {
-        return true;
-      }
-    };
-    expect(z.util.forward_url_parameter('foo.com', z.auth.URLParameter.TRACKING)).toBe('foo.com?tracking=true');
-
-    z.util.get_url_parameter = function(parameter_value) {
-      if (parameter_value === z.auth.URLParameter.TRACKING) {
-        return false;
-      }
-    };
-    expect(z.util.forward_url_parameter('foo.com', z.auth.URLParameter.TRACKING)).toBe('foo.com?tracking=false');
-
-    z.util.get_url_parameter = function(parameter_value) {
-      if (parameter_value === z.auth.URLParameter.TRACKING) {
-        return 'bar';
-      }
-    };
-    expect(z.util.forward_url_parameter('foo.com', z.auth.URLParameter.TRACKING)).toBe('foo.com?tracking=bar');
-
-    z.util.get_url_parameter = function(parameter_value) {
-      if (parameter_value === z.auth.URLParameter.TRACKING) {
-        return null;
-      }
-    };
-    expect(z.util.forward_url_parameter('foo.com', z.auth.URLParameter.TRACKING)).toBe('foo.com');
+    expect(z.util.stripUrlWrapper('url(/path/to/image/image.png)')).toBe('/path/to/image/image.png');
   });
 });
 
 describe('Markdown for bold text', () => {
   it('renders bold text', () => {
-    expect(z.util.render_message('**bold text (not italic)**')).toBe('<strong>bold text (not italic)</strong>');
+    expect(z.util.renderMessage('**bold text (not italic)**')).toBe('<strong>bold text (not italic)</strong>');
   });
 
   it('renders a bold word within a sentence', () => {
-    expect(z.util.render_message('Markdown **just** rocks!')).toEqual('Markdown <strong>just</strong> rocks!');
+    expect(z.util.renderMessage('Markdown **just** rocks!')).toEqual('Markdown <strong>just</strong> rocks!');
   });
 
   it('renders bold text with italic words', () => {
-    expect(z.util.render_message('**bold text with *italic* !!**')).toBe(
+    expect(z.util.renderMessage('**bold text with *italic* !!**')).toBe(
       '<strong>bold text with <em>italic</em> !!</strong>'
     );
   });
 
   it('renders text which is partly bold and partly italic', () => {
-    expect(z.util.render_message('**part bold,** *part italic*')).toBe(
+    expect(z.util.renderMessage('**part bold,** *part italic*')).toBe(
       '<strong>part bold,</strong> <em>part italic</em>'
     );
   });
 
   it('renders mixed text with bold and italic words', () => {
-    expect(z.util.render_message('*italic* **bold** *italic* **bold**')).toBe(
+    expect(z.util.renderMessage('*italic* **bold** *italic* **bold**')).toBe(
       '<em>italic</em> <strong>bold</strong> <em>italic</em> <strong>bold</strong>'
     );
   });
 
   it('renders words which are just bold', () => {
-    expect(z.util.render_message('**A**')).toBe('<strong>A</strong>');
+    expect(z.util.renderMessage('**A**')).toBe('<strong>A</strong>');
   });
 });
 
 describe('Markdown for italic text', () => {
   it('renders italic text', () => {
-    expect(z.util.render_message('*This text is italic.*')).toBe('<em>This text is italic.</em>');
+    expect(z.util.renderMessage('*This text is italic.*')).toBe('<em>This text is italic.</em>');
   });
 
   it('renders partially italic text', () => {
-    expect(z.util.render_message('This text is *partially* italic')).toBe('This text is <em>partially</em> italic');
+    expect(z.util.renderMessage('This text is *partially* italic')).toBe('This text is <em>partially</em> italic');
   });
 
   it('renders text with multiple italic words', () => {
-    expect(z.util.render_message('This text has *two* *italic* bits')).toBe(
+    expect(z.util.renderMessage('This text has *two* *italic* bits')).toBe(
       'This text has <em>two</em> <em>italic</em> bits'
     );
   });
 
   it('renders italic text with bold words', () => {
-    expect(z.util.render_message('*italic text **with bold** *')).toBe(
+    expect(z.util.renderMessage('*italic text **with bold** *')).toBe(
       '<em>italic text <strong>with bold</strong> </em>'
     );
   });
 
   it('renders words which are bold-italic', () => {
-    expect(z.util.render_message('***A***')).toBe('<strong><em>A</em></strong>');
+    expect(z.util.renderMessage('***A***')).toBe('<strong><em>A</em></strong>');
   });
 });
 
 describe('Markdown for code snippets', () => {
   it('renders code blocks', () => {
-    expect(z.util.render_message("```console.log('A')```")).toEqual('<code>console.log(&#x27;A&#x27;)</code>');
+    expect(z.util.renderMessage("```console.log('A')```")).toEqual('<code>console.log(&#x27;A&#x27;)</code>');
   });
 
   it('can escape HTML in rendered code blocks', () => {
-    expect(z.util.render_message('```<b>Hello</b>```')).toEqual('<code>&lt;b&gt;Hello&lt;/b&gt;</code>');
+    expect(z.util.renderMessage('```<b>Hello</b>```')).toEqual('<code>&lt;b&gt;Hello&lt;/b&gt;</code>');
   });
 
   it('renders code within code spans', () => {
-    expect(z.util.render_message('This is `code`.')).toEqual('This is <code>code</code>.');
+    expect(z.util.renderMessage('This is `code`.')).toEqual('This is <code>code</code>.');
   });
 
   it('renders code within code blocks', () => {
-    expect(z.util.render_message('This is ```code```.')).toEqual('This is <code>code</code>.');
+    expect(z.util.renderMessage('This is ```code```.')).toEqual('This is <code>code</code>.');
   });
 
   it('doesn’t render code within a code span', () => {
-    expect(z.util.render_message('`com.ibm.icu`')).toEqual('<code>com.ibm.icu</code>');
+    expect(z.util.renderMessage('`com.ibm.icu`')).toEqual('<code>com.ibm.icu</code>');
   });
 
   it('doesn’t render links within code blocks', () => {
     const expected =
       '<pre><code class="lang-xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br />  <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>com.ibm.icu<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br />  <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>icu4j<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br />  <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>53.1<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span><br /><span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br /></code></pre>';
     expect(
-      z.util.render_message(
+      z.util.renderMessage(
         '```xml\n<dependency>\n  <groupId>com.ibm.icu</groupId>\n  <artifactId>icu4j</artifactId>\n  <version>53.1</version>\n</dependency>\n```'
       )
     ).toEqual(expected);
@@ -4278,7 +4200,7 @@ describe('Markdown for code snippets', () => {
     const expected =
       '<pre><code class="lang-ruby"><span class="hljs-built_in">require</span> <span class="hljs-string">\'redcarpet\'</span><br />markdown = Redcarpet.<span class="hljs-keyword">new</span>(<span class="hljs-string">"Hello World!"</span>)<br />puts markdown.to_html<br /></code></pre>';
     expect(
-      z.util.render_message(
+      z.util.renderMessage(
         '```ruby\nrequire \'redcarpet\'\nmarkdown = Redcarpet.new("Hello World!")\nputs markdown.to_html\n```'
       )
     ).toEqual(expected);
@@ -4288,7 +4210,7 @@ describe('Markdown for code snippets', () => {
     const expected =
       '<pre><code class="lang-js">$(<span class="hljs-built_in">document</span>).ready(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{<br />  $(<span class="hljs-string">\'pre code\'</span>).each(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">i, block</span>) </span>{<br />    hljs.highlightBlock(block);<br />  });<br />});<br /></code></pre>';
     expect(
-      z.util.render_message(
+      z.util.renderMessage(
         "```js\n$(document).ready(function() {\n  $('pre code').each(function(i, block) {\n    hljs.highlightBlock(block);\n  });\n});```"
       )
     ).toEqual(expected);
@@ -4298,7 +4220,7 @@ describe('Markdown for code snippets', () => {
     const expected =
       '<pre><code class="lang-coffeescript"><span class="hljs-comment"># <span class="hljs-doctag">TODO:</span> This is not a general utility:</span><br /><span class="hljs-comment"># It should be part of a view model as it\'s UI related.</span><br />  z.util.convert_timestamps = <span class="hljs-function">-&gt;</span><br />    <span class="hljs-keyword">if</span> $(<span class="hljs-string">\'time\'</span>).length &gt; <span class="hljs-number">0</span><br /><span class="hljs-function">      <span class="hljs-title">recalculate</span> = -&gt;</span><br /></code></pre>';
     expect(
-      z.util.render_message(
+      z.util.renderMessage(
         "```coffeescript\n# TODO: This is not a general utility:\n# It should be part of a view model as it's UI related.\n  z.util.convert_timestamps = ->\n    if $('time').length > 0\n      recalculate = ->```"
       )
     ).toEqual(expected);
@@ -4307,14 +4229,14 @@ describe('Markdown for code snippets', () => {
   it('renders escaped HTML code blocks', () => {
     const expected =
       '<pre><code class="lang-html">&lt;<span class="hljs-selector-tag">a</span> href=<span class="hljs-string">"javascript:wire.app.logout()"</span>&gt;This is <span class="hljs-selector-tag">a</span> trick&lt;/a&gt;<br /></code></pre>';
-    expect(z.util.render_message('```html\n<a href="javascript:wire.app.logout()">This is a trick</a>\n```')).toEqual(
+    expect(z.util.renderMessage('```html\n<a href="javascript:wire.app.logout()">This is a trick</a>\n```')).toEqual(
       expected
     );
   });
 
   it('renders escaped HTML code spans', () => {
     const expected = '<code>&lt;a href=&quot;javascript:wire.app.logout()&quot;&gt;This is a trick&lt;/a&gt;</code>';
-    expect(z.util.render_message('`<a href="javascript:wire.app.logout()">This is a trick</a>`')).toEqual(expected);
+    expect(z.util.renderMessage('`<a href="javascript:wire.app.logout()">This is a trick</a>`')).toEqual(expected);
   });
 });
 
@@ -4326,7 +4248,7 @@ describe('Markdown with mixed markups', () => {
     const expected = `This is <em>italic</em> and <strong>bold</strong> and <strong><em>bold-italic</em></strong> with a ${link_1} and ${link_2}.`;
 
     expect(
-      z.util.render_message(
+      z.util.renderMessage(
         'This is *italic* and **bold** and ***bold-italic*** with a www.link.com and www.anotherlink.net.'
       )
     ).toEqual(expected);
@@ -4335,15 +4257,15 @@ describe('Markdown with mixed markups', () => {
 
 describe('Ignored Markdown syntax', () => {
   it('only renders correct Markdown syntax', () => {
-    expect(z.util.render_message('This text is not italic.')).toBe('This text is not italic.');
+    expect(z.util.renderMessage('This text is not italic.')).toBe('This text is not italic.');
   });
 
   it('does not render bold text when there is only a single asterisk', () => {
-    expect(z.util.render_message('random *asterisk')).toBe('random *asterisk');
+    expect(z.util.renderMessage('random *asterisk')).toBe('random *asterisk');
   });
 
   it('does not render horizontal lines', () => {
-    expect(z.util.render_message('***\nNo horizontal lines\n***')).toBe(
+    expect(z.util.renderMessage('***\nNo horizontal lines\n***')).toBe(
       '<strong><em><br />No horizontal lines<br /></em></strong>'
     );
   });
@@ -4351,7 +4273,7 @@ describe('Ignored Markdown syntax', () => {
   it('does not render tables', () => {
     const input = 'First Header | Second Header\n------------ | -------------\nCell 1 | Cell 2';
     const expected = `First Header | Second Header<br />------------ | -------------<br />Cell 1 | Cell 2`;
-    expect(z.util.render_message(input)).toBe(expected);
+    expect(z.util.renderMessage(input)).toBe(expected);
   });
 });
 
@@ -4359,163 +4281,141 @@ describe('Ignored Markdown syntax', () => {
 describe('Markdown exceptions', () => {
   it('handles the URLs that start with : after the protocol', () => {
     const text = 'http://:';
-    expect(z.util.render_message(text)).toBe(text);
+    expect(z.util.renderMessage(text)).toBe(text);
   });
 
   it('does not render underscores to italic when they are within a sentence', () => {
     const text = 'calling__voice_channel__fulltitle';
-    expect(z.util.render_message(text)).toBe(text);
+    expect(z.util.renderMessage(text)).toBe(text);
   });
 });
 
-describe('z.util.print_devices_id', () => {
+describe('z.util.printDevicesId', () => {
   it('can print device id', () => {
-    expect(z.util.print_devices_id('66e66c79e8d1dea4')).toBe(
+    expect(z.util.printDevicesId('66e66c79e8d1dea4')).toBe(
       "<span class='device-id-part'>66</span><span class='device-id-part'>e6</span><span class='device-id-part'>6c</span><span class='device-id-part'>79</span><span class='device-id-part'>e8</span><span class='device-id-part'>d1</span><span class='device-id-part'>de</span><span class='device-id-part'>a4</span>"
     );
   });
 
   it('can print device id and apply padding', () => {
-    expect(z.util.print_devices_id('6e66c79e8d1dea4')).toBe(
+    expect(z.util.printDevicesId('6e66c79e8d1dea4')).toBe(
       "<span class='device-id-part'>06</span><span class='device-id-part'>e6</span><span class='device-id-part'>6c</span><span class='device-id-part'>79</span><span class='device-id-part'>e8</span><span class='device-id-part'>d1</span><span class='device-id-part'>de</span><span class='device-id-part'>a4</span>"
     );
   });
 });
 
-describe('z.util.zero_padding', () => {
+describe('z.util.zeroPadding', () => {
   it('should add zero padding when string length is smaller then max', () => {
-    expect(z.util.zero_padding('1', 10)).toBe('0000000001');
+    expect(z.util.zeroPadding('1', 10)).toBe('0000000001');
   });
 
   it('returns string if max is smaller then string length', () => {
-    expect(z.util.zero_padding('1000000000', 8)).toBe('1000000000');
+    expect(z.util.zeroPadding('1000000000', 8)).toBe('1000000000');
   });
 
   it('returns string if max is equal string length', () => {
-    expect(z.util.zero_padding('1000000000', 10)).toBe('1000000000');
+    expect(z.util.zeroPadding('1000000000', 10)).toBe('1000000000');
   });
 
   it('should handle numbers', () => {
-    expect(z.util.zero_padding(42, 10)).toBe('0000000042');
+    expect(z.util.zeroPadding(42, 10)).toBe('0000000042');
   });
 
   it('can add one zero to 6', () => {
-    expect(z.util.zero_padding(6)).toEqual('06');
+    expect(z.util.zeroPadding(6)).toEqual('06');
   });
 
   it('can add 13 zeros to 6', () => {
-    expect(z.util.zero_padding(6, 14)).toEqual('00000000000006');
+    expect(z.util.zeroPadding(6, 14)).toEqual('00000000000006');
   });
 
   it('can transform 666 to a string', () => {
-    expect(z.util.zero_padding(666)).toEqual('666');
-  });
-});
-
-describe('z.util.format_seconds', () => {
-  it('should format seconds', () => {
-    expect(z.util.format_seconds(50)).toBe('00:50');
-  });
-
-  it('should format minutes and seconds', () => {
-    expect(z.util.format_seconds(110)).toBe('01:50');
-  });
-
-  it('should format hours, minutes and seconds', () => {
-    expect(z.util.format_seconds(3630)).toBe('1:00:30');
-  });
-
-  it('should format 0 seconds', () => {
-    expect(z.util.format_seconds(0)).toBe('00:00');
-  });
-
-  it('should format undefined as 00:00', () => {
-    expect(z.util.format_seconds()).toBe('00:00');
+    expect(z.util.zeroPadding(666)).toEqual('666');
   });
 });
 
 describe('z.util.is_same_location', () => {
   it('returns false if page was accessed directly', () => {
-    expect(z.util.is_same_location('', 'https://app.wire.com')).toBeFalsy();
+    expect(z.util.isSameLocation('', 'https://app.wire.com')).toBeFalsy();
   });
 
   it('returns false if page was accessed from https://wire.com', () => {
-    expect(z.util.is_same_location('https://wire.com', 'https://app.wire.com')).toBeFalsy();
+    expect(z.util.isSameLocation('https://wire.com', 'https://app.wire.com')).toBeFalsy();
   });
 
   it('returns false if page was accessed from https://wire.com/download', () => {
-    expect(z.util.is_same_location('https://wire.com/download', 'https://app.wire.com')).toBeFalsy();
+    expect(z.util.isSameLocation('https://wire.com/download', 'https://app.wire.com')).toBeFalsy();
   });
 
   it('returns false if page was accessed from https://get.wire.com', () => {
-    expect(z.util.is_same_location('https://get.wire.com', 'https://app.wire.com')).toBeFalsy();
+    expect(z.util.isSameLocation('https://get.wire.com', 'https://app.wire.com')).toBeFalsy();
   });
 
   it('returns false if page was accessed from an external link', () => {
-    expect(z.util.is_same_location('http://www.heise.de', 'https://app.wire.com')).toBeFalsy();
+    expect(z.util.isSameLocation('http://www.heise.de', 'https://app.wire.com')).toBeFalsy();
   });
 
   it('returns false if redirected from auth', () => {
-    expect(z.util.is_same_location('https://app.wire.com/auth', 'https://app.wire.com')).toBeFalsy();
+    expect(z.util.isSameLocation('https://app.wire.com/auth', 'https://app.wire.com')).toBeFalsy();
   });
 
   it('returns false if redirected from auth with parameter', () => {
     expect(
-      z.util.is_same_location('https://app.wire.com/auth/?env=staging', 'https://app.wire.com/?env=staging')
+      z.util.isSameLocation('https://app.wire.com/auth/?env=staging', 'https://app.wire.com/?env=staging')
     ).toBeFalsy();
   });
 
   it('returns false if redirected from auth with history hashtag', () => {
     expect(
-      z.util.is_same_location('https://app.wire.com/auth/#history', 'https://app.wire.com/?env=staging')
+      z.util.isSameLocation('https://app.wire.com/auth/#history', 'https://app.wire.com/?env=staging')
     ).toBeFalsy();
   });
 
   it('returns false if redirected from auth with login hashtag', () => {
     expect(
-      z.util.is_same_location('https://app.wire.com/auth/?env=staging#login', 'https://app.wire.com/?env=staging')
+      z.util.isSameLocation('https://app.wire.com/auth/?env=staging#login', 'https://app.wire.com/?env=staging')
     ).toBeFalsy();
   });
 
   it('returns false if redirected from auth with registration hashtag', () => {
     expect(
-      z.util.is_same_location('https://app.wire.com/auth/?env=staging#register', 'https://app.wire.com/?env=staging')
+      z.util.isSameLocation('https://app.wire.com/auth/?env=staging#register', 'https://app.wire.com/?env=staging')
     ).toBeFalsy();
   });
 
   it('returns true if auth with login hashtag was reloaded', () => {
-    expect(z.util.is_same_location('https://app.wire.com/auth/#register', 'https://app.wire.com/auth/')).toBeFalsy();
+    expect(z.util.isSameLocation('https://app.wire.com/auth/#register', 'https://app.wire.com/auth/')).toBeFalsy();
   });
 
   it('returns true if page was reloaded', () => {
-    expect(z.util.is_same_location('https://app.wire.com', 'https://app.wire.com')).toBeTruthy();
+    expect(z.util.isSameLocation('https://app.wire.com', 'https://app.wire.com')).toBeTruthy();
   });
 
   it('returns true if page was reloaded with parameters', () => {
-    expect(z.util.is_same_location('https://app.wire.com/?hl=de', 'https://app.wire.com/?hl=de')).toBeTruthy();
+    expect(z.util.isSameLocation('https://app.wire.com/?hl=de', 'https://app.wire.com/?hl=de')).toBeTruthy();
   });
 });
 
-describe('bucket_values', () => {
+describe('bucketValues', () => {
   it('returns correct value for zero', () => {
-    expect(z.util.bucket_values(0, [0, 5, 10, 15, 20, 25])).toBe('0');
+    expect(z.util.bucketValues(0, [0, 5, 10, 15, 20, 25])).toBe('0');
   });
 
   it('returns the correct bucket if value is inside the given limits', () => {
-    expect(z.util.bucket_values(0.1, [0, 5, 10, 15, 20, 25])).toBe('0');
-    expect(z.util.bucket_values(1, [0, 5, 10, 15, 20, 25])).toBe('1-5');
-    expect(z.util.bucket_values(5.5, [0, 5, 10, 15, 20, 25])).toBe('1-5');
-    expect(z.util.bucket_values(13, [0, 5, 10, 15, 20, 25])).toBe('11-15');
-    expect(z.util.bucket_values(1023, [0, 100, 200, 500, 1000, 2000])).toBe('1001-2000');
+    expect(z.util.bucketValues(0.1, [0, 5, 10, 15, 20, 25])).toBe('0');
+    expect(z.util.bucketValues(1, [0, 5, 10, 15, 20, 25])).toBe('1-5');
+    expect(z.util.bucketValues(5.5, [0, 5, 10, 15, 20, 25])).toBe('1-5');
+    expect(z.util.bucketValues(13, [0, 5, 10, 15, 20, 25])).toBe('11-15');
+    expect(z.util.bucketValues(1023, [0, 100, 200, 500, 1000, 2000])).toBe('1001-2000');
   });
 
   it('returns the correct bucket if value is above the given limits', () => {
-    expect(z.util.bucket_values(100, [0, 5, 10, 15, 20, 25])).toBe('26-');
-    expect(z.util.bucket_values(10023, [0, 100, 200, 500, 1000, 2000])).toBe('2001-');
+    expect(z.util.bucketValues(100, [0, 5, 10, 15, 20, 25])).toBe('26-');
+    expect(z.util.bucketValues(10023, [0, 100, 200, 500, 1000, 2000])).toBe('2001-');
   });
 });
 
-describe('z.util.safe_window_open', () => {
+describe('z.util.safeWindowOpen', () => {
   let new_window = undefined;
   afterEach(() => {
     if (new_window) {
@@ -4524,21 +4424,7 @@ describe('z.util.safe_window_open', () => {
   });
 
   it("doesn't contain a reference to the opening tab", () => {
-    new_window = z.util.safe_window_open('https://wire.com/');
+    new_window = z.util.safeWindowOpen('https://wire.com/');
     expect(new_window.opener).toBeNull();
-  });
-});
-
-describe('z.util.add_http', () => {
-  it('adds http if protocol is missing', () => {
-    expect(z.util.add_http('wire.com/')).toBe('http://wire.com/');
-  });
-
-  it('does not add http if present', () => {
-    expect(z.util.add_http('http://wire.com/')).toBe('http://wire.com/');
-  });
-
-  it('does not add https if present', () => {
-    expect(z.util.add_http('https://wire.com/')).toBe('https://wire.com/');
   });
 });

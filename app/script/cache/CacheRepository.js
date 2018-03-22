@@ -52,7 +52,7 @@ z.cache.CacheRepository = class CacheRepository {
       const shouldBeDeleted = !protectedKeyPatterns.some(pattern => storedKey.startsWith(pattern));
 
       if (shouldBeDeleted) {
-        z.util.StorageUtil.reset_value(storedKey);
+        z.util.StorageUtil.resetValue(storedKey);
         deletedKeys.push(storedKey);
       }
     }
