@@ -142,9 +142,9 @@
   version "3.2.0"
   resolved "https://codeload.github.com/dcodeIO/Long.js/tar.gz/8cdc1f74ced4f771aa844f1cbc565b1d4c4451b8"
 
-"@bower_components/mixpanel@mixpanel/mixpanel-js#2.18.0":
-  version "2.18.0"
-  resolved "https://codeload.github.com/mixpanel/mixpanel-js/tar.gz/96b4317ca8cfc8b232be81464eff6aae1177ce27"
+"@bower_components/mixpanel@mixpanel/mixpanel-js#2.19.0":
+  version "2.19.0"
+  resolved "https://codeload.github.com/mixpanel/mixpanel-js/tar.gz/c548eade023d10c8fa015f8a93e4a20634502962"
 
 "@bower_components/moment@moment/moment#2.21.0":
   version "2.21.0"
@@ -301,6 +301,10 @@
   dependencies:
     "@types/node" "*"
 
+"@types/generate-changelog@1.7.0":
+  version "1.7.0"
+  resolved "https://registry.yarnpkg.com/@types/generate-changelog/-/generate-changelog-1.7.0.tgz#3857dd209247d6bed1c8b0832d1f04ea8081c6ba"
+
 "@types/long@^3.0.31", "@types/long@^3.0.32":
   version "3.0.32"
   resolved "https://registry.yarnpkg.com/@types/long/-/long-3.0.32.tgz#f4e5af31e9e9b196d8e5fca8a5e2e20aa3d60b69"
@@ -350,6 +354,23 @@
     spark-md5 "3.0.0"
     tough-cookie "2.3.4"
 
+"@wireapp/api-client@0.6.6":
+  version "0.6.6"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-0.6.6.tgz#106a5284aa73563aef3ad6ae878184038c8ef58a"
+  dependencies:
+    "@types/node" "9.4.7"
+    "@types/spark-md5" "3.0.0"
+    "@types/text-encoding" "0.0.32"
+    "@types/tough-cookie" "2.3.2"
+    "@wireapp/priority-queue" "0.1.3"
+    "@wireapp/store-engine" "0.4.2"
+    axios "0.18.0"
+    html5-websocket "2.0.2"
+    logdown "3.2.3"
+    reconnecting-websocket "3.2.2"
+    spark-md5 "3.0.0"
+    tough-cookie "2.3.4"
+
 "@wireapp/cbor@3.0.8":
   version "3.0.8"
   resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-3.0.8.tgz#09808cbbe1e195ae2807fd335a0f9e02fc0ccb66"
@@ -366,6 +387,18 @@
     protobufjs "6.8.6"
     pure-uuid "1.5.0"
 
+"@wireapp/core@2.1.7":
+  version "2.1.7"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-2.1.7.tgz#55fc699c054d7c6404df7483786e599f2f60ff8e"
+  dependencies:
+    "@types/node" "9.4.7"
+    "@wireapp/api-client" "0.6.6"
+    "@wireapp/cryptobox" "8.3.3"
+    "@wireapp/store-engine" "0.4.2"
+    bazinga64 "5.0.3"
+    protobufjs "6.8.6"
+    pure-uuid "1.5.0"
+
 "@wireapp/cryptobox@8.3.0":
   version "8.3.0"
   resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-8.3.0.tgz#4278d51580c313d33d575acf7dd5851f5ee18649"
@@ -376,6 +409,19 @@
     "@wireapp/priority-queue" "0.1.3"
     "@wireapp/proteus" "7.1.11"
     "@wireapp/store-engine" "0.3.9"
+    dexie "2.0.2"
+    fs-extra "5.0.0"
+
+"@wireapp/cryptobox@8.3.3":
+  version "8.3.3"
+  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-8.3.3.tgz#77be8764ea57d4e3498d413d9d33a87582b650ad"
+  dependencies:
+    "@types/fs-extra" "5.0.1"
+    "@types/node" "9.4.7"
+    "@wireapp/lru-cache" "2.1.0"
+    "@wireapp/priority-queue" "0.1.3"
+    "@wireapp/proteus" "7.1.11"
+    "@wireapp/store-engine" "0.4.2"
     dexie "2.0.2"
     fs-extra "5.0.0"
 
@@ -422,6 +468,23 @@
     "@types/node" "9.4.7"
     dexie "2.0.2"
     fs-extra "5.0.0"
+
+"@wireapp/store-engine@0.4.2":
+  version "0.4.2"
+  resolved "https://registry.yarnpkg.com/@wireapp/store-engine/-/store-engine-0.4.2.tgz#bceeb18274fb855e126527635c39912e5674b788"
+  dependencies:
+    "@types/node" "9.4.7"
+    dexie "2.0.2"
+    fs-extra "5.0.0"
+
+"@wireapp/travis-bot@0.1.9":
+  version "0.1.9"
+  resolved "https://registry.yarnpkg.com/@wireapp/travis-bot/-/travis-bot-0.1.9.tgz#7e5d6056f669e3036fb6a591171db55340cf1ec2"
+  dependencies:
+    "@types/generate-changelog" "1.7.0"
+    "@types/node" "9.4.7"
+    "@wireapp/core" "2.1.0"
+    generate-changelog "1.7.0"
 
 JSONStream@^1.0.3:
   version "1.3.2"
@@ -848,15 +911,15 @@ atob@^2.0.0:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/atob/-/atob-2.0.3.tgz#19c7a760473774468f20b2d2d03372ad7d4cbf5d"
 
-autoprefixer@8.1.0:
-  version "8.1.0"
-  resolved "https://registry.yarnpkg.com/autoprefixer/-/autoprefixer-8.1.0.tgz#374cf35be1c0e8fce97408d876f95f66f5cb4641"
+autoprefixer@8.2.0:
+  version "8.2.0"
+  resolved "https://registry.yarnpkg.com/autoprefixer/-/autoprefixer-8.2.0.tgz#1e49b611b31a5259b86b7a6b2b1b8faf091abe2a"
   dependencies:
-    browserslist "^3.1.1"
-    caniuse-lite "^1.0.30000810"
+    browserslist "^3.2.0"
+    caniuse-lite "^1.0.30000817"
     normalize-range "^0.1.2"
     num2fraction "^1.2.2"
-    postcss "^6.0.19"
+    postcss "^6.0.20"
     postcss-value-parser "^3.2.3"
 
 autoprefixer@^6.3.1:
@@ -1600,7 +1663,7 @@ block-stream@*:
   dependencies:
     inherits "~2.0.0"
 
-bluebird@^3.3.0, bluebird@^3.5.1:
+bluebird@^3.0.6, bluebird@^3.3.0, bluebird@^3.5.1:
   version "3.5.1"
   resolved "https://registry.yarnpkg.com/bluebird/-/bluebird-3.5.1.tgz#d9551f9de98f1fcda1e683d17ee91a0602ee2eb9"
 
@@ -1861,16 +1924,20 @@ browserslist@^2.0.0, browserslist@^2.1.2, browserslist@^2.5.1:
     caniuse-lite "^1.0.30000755"
     electron-to-chromium "^1.3.27"
 
-browserslist@^3.1.1:
-  version "3.1.2"
-  resolved "https://registry.yarnpkg.com/browserslist/-/browserslist-3.1.2.tgz#893f29399d640ed35fe06bacd7eb1d78609a47e5"
+browserslist@^3.2.0:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/browserslist/-/browserslist-3.2.0.tgz#3d4a99710c12101e4567c9aeedade49c958cb883"
   dependencies:
-    caniuse-lite "^1.0.30000813"
-    electron-to-chromium "^1.3.36"
+    caniuse-lite "^1.0.30000815"
+    electron-to-chromium "^1.3.39"
 
 buffer-crc32@^0.2.1:
   version "0.2.13"
   resolved "https://registry.yarnpkg.com/buffer-crc32/-/buffer-crc32-0.2.13.tgz#0d333e3f00eac50aa1454abd30ef8c2a5d9a7242"
+
+buffer-from@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/buffer-from/-/buffer-from-1.0.0.tgz#4cb8832d23612589b0406e9e2956c17f06fdf531"
 
 buffer-indexof@^1.0.0:
   version "1.1.1"
@@ -2047,9 +2114,9 @@ caniuse-lite@^1.0.0, caniuse-lite@^1.0.30000748, caniuse-lite@^1.0.30000755:
   version "1.0.30000808"
   resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30000808.tgz#7d759b5518529ea08b6705a19e70dbf401628ffc"
 
-caniuse-lite@^1.0.30000810, caniuse-lite@^1.0.30000813:
-  version "1.0.30000814"
-  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30000814.tgz#73eb6925ac2e54d495218f1ea0007da3940e488b"
+caniuse-lite@^1.0.30000815, caniuse-lite@^1.0.30000817:
+  version "1.0.30000819"
+  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30000819.tgz#aabee5fd15a080febab6ae5d30c9ea15f4c6d4e2"
 
 caseless@~0.11.0:
   version "0.11.0"
@@ -2472,10 +2539,19 @@ concat-stream@^1.4.1:
     readable-stream "^2.2.2"
     typedarray "^0.0.6"
 
-concat-stream@^1.5.0, concat-stream@^1.6.0:
+concat-stream@^1.5.0:
   version "1.6.1"
   resolved "https://registry.yarnpkg.com/concat-stream/-/concat-stream-1.6.1.tgz#261b8f518301f1d834e36342b9fea095d2620a26"
   dependencies:
+    inherits "^2.0.3"
+    readable-stream "^2.2.2"
+    typedarray "^0.0.6"
+
+concat-stream@^1.6.0:
+  version "1.6.2"
+  resolved "https://registry.yarnpkg.com/concat-stream/-/concat-stream-1.6.2.tgz#904bdf194cd3122fc675c77fc4ac3d4ff0fd1a34"
+  dependencies:
+    buffer-from "^1.0.0"
     inherits "^2.0.3"
     readable-stream "^2.2.2"
     typedarray "^0.0.6"
@@ -3180,9 +3256,9 @@ electron-to-chromium@^1.3.27:
   version "1.3.33"
   resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.33.tgz#bf00703d62a7c65238136578c352d6c5c042a545"
 
-electron-to-chromium@^1.3.36:
-  version "1.3.37"
-  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.37.tgz#4a92734e0044c8cf0b1553be57eae21a4c6e5fab"
+electron-to-chromium@^1.3.39:
+  version "1.3.40"
+  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.40.tgz#1fbd6d97befd72b8a6f921dc38d22413d2f6fddf"
 
 elegant-spinner@^1.0.1:
   version "1.0.1"
@@ -3492,9 +3568,9 @@ eslint-visitor-keys@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/eslint-visitor-keys/-/eslint-visitor-keys-1.0.0.tgz#3f3180fb2e291017716acb4c9d6d5b5c34a6a81d"
 
-eslint@4.19.0:
-  version "4.19.0"
-  resolved "https://registry.yarnpkg.com/eslint/-/eslint-4.19.0.tgz#9e900efb5506812ac374557034ef6f5c3642fc4c"
+eslint@4.19.1:
+  version "4.19.1"
+  resolved "https://registry.yarnpkg.com/eslint/-/eslint-4.19.1.tgz#32d1d653e1d90408854bfb296f076ec7e186a300"
   dependencies:
     ajv "^5.3.0"
     babel-code-frame "^6.22.0"
@@ -4161,6 +4237,14 @@ gaze@^1.0.0:
   dependencies:
     globule "^1.0.0"
 
+generate-changelog@1.7.0:
+  version "1.7.0"
+  resolved "https://registry.yarnpkg.com/generate-changelog/-/generate-changelog-1.7.0.tgz#e6321226207d5cbcfe24de39d7ffd65d51698596"
+  dependencies:
+    bluebird "^3.0.6"
+    commander "^2.9.0"
+    github-url-from-git "^1.4.0"
+
 generate-function@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/generate-function/-/generate-function-2.0.0.tgz#6858fe7c0969b7d4e9093337647ac79f60dfbe74"
@@ -4225,6 +4309,10 @@ gettext-parser@1.1.0:
 github-from-package@0.0.0:
   version "0.0.0"
   resolved "https://registry.yarnpkg.com/github-from-package/-/github-from-package-0.0.0.tgz#97fb5d96bfde8973313f20e8288ef9a167fa64ce"
+
+github-url-from-git@^1.4.0:
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/github-url-from-git/-/github-url-from-git-1.5.0.tgz#f985fedcc0a9aa579dc88d7aff068d55cc6251a0"
 
 glob-base@^0.3.0:
   version "0.3.0"
@@ -6579,9 +6667,9 @@ mixin-object@^2.0.1:
     for-in "^0.1.3"
     is-extendable "^0.1.1"
 
-mixpanel-browser@2.18.0:
-  version "2.18.0"
-  resolved "https://registry.yarnpkg.com/mixpanel-browser/-/mixpanel-browser-2.18.0.tgz#8455cf1da4415077bfb6716b39f63d0200a749fd"
+mixpanel-browser@2.19.0:
+  version "2.19.0"
+  resolved "https://registry.yarnpkg.com/mixpanel-browser/-/mixpanel-browser-2.19.0.tgz#425a5c29f621b2050d2aa4ee121b73a4ccd6c3aa"
 
 mkdirp@0.5.x, "mkdirp@>=0.5 0", mkdirp@^0.5.0, mkdirp@^0.5.1, mkdirp@~0.5.0, mkdirp@~0.5.1:
   version "0.5.1"
@@ -6712,8 +6800,8 @@ netmask@~1.0.4:
   resolved "https://registry.yarnpkg.com/netmask/-/netmask-1.0.6.tgz#20297e89d86f6f6400f250d9f4f6b4c1945fcd35"
 
 nise@^1.2.0:
-  version "1.3.1"
-  resolved "https://registry.yarnpkg.com/nise/-/nise-1.3.1.tgz#ae0008e270f1841602ee34af302037fa3d2fd3a8"
+  version "1.3.2"
+  resolved "https://registry.yarnpkg.com/nise/-/nise-1.3.2.tgz#fd6fd8dc040dfb3c0a45252feb6ff21832309b14"
   dependencies:
     "@sinonjs/formatio" "^2.0.0"
     just-extend "^1.1.27"
@@ -8014,7 +8102,7 @@ postcss@^5.0.10, postcss@^5.0.11, postcss@^5.0.12, postcss@^5.0.13, postcss@^5.0
     source-map "^0.5.6"
     supports-color "^3.2.3"
 
-postcss@^6.0, postcss@^6.0.0, postcss@^6.0.1, postcss@^6.0.11, postcss@^6.0.13, postcss@^6.0.19, postcss@^6.0.5, postcss@^6.0.6:
+postcss@^6.0, postcss@^6.0.0, postcss@^6.0.1, postcss@^6.0.11, postcss@^6.0.13, postcss@^6.0.19, postcss@^6.0.20, postcss@^6.0.5, postcss@^6.0.6:
   version "6.0.20"
   resolved "https://registry.yarnpkg.com/postcss/-/postcss-6.0.20.tgz#686107e743a12d5530cb68438c590d5b2bf72c3c"
   dependencies:
@@ -9307,9 +9395,9 @@ simple-swizzle@^0.2.2:
   dependencies:
     is-arrayish "^0.3.1"
 
-sinon@4.4.6:
-  version "4.4.6"
-  resolved "https://registry.yarnpkg.com/sinon/-/sinon-4.4.6.tgz#0b21ce56f1b11015749a82a3bbde2f46b78ec0e1"
+sinon@4.4.8:
+  version "4.4.8"
+  resolved "https://registry.yarnpkg.com/sinon/-/sinon-4.4.8.tgz#0479e0ccb8caa0d737ce9773c8d53d57d38f2d84"
   dependencies:
     "@sinonjs/formatio" "^2.0.0"
     diff "^3.1.0"

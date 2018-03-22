@@ -254,14 +254,8 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     }
   }
 
-  clickToSendPastedFile() {
-    const pastedFile = this.pastedFile();
-    this.onDropFiles([pastedFile]);
-    this.pastedFile(null);
-  }
-
   editMessage(messageEntity, inputElement) {
-    if (messageEntity && (messageEntity.is_editable() && messageEntity !== this.editMessageEntity())) {
+    if (messageEntity && messageEntity.is_editable() && messageEntity !== this.editMessageEntity()) {
       this.cancelMessageEditing();
       this.editMessageEntity(messageEntity);
       this.editMessageEntity().isEditing(true);
@@ -276,7 +270,8 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     const images = [];
     const files = [];
 
-    if (!this._isHittingUploadLimit(droppedFiles)) {
+    const tooManyConcurrentUploads = this._isHittingUploadLimit(droppedFiles);
+    if (!tooManyConcurrentUploads) {
       Array.from(droppedFiles).forEach(file => {
         const isSupportedImage = InputBarViewModel.CONFIG.IMAGE.FILE_TYPES.includes(file.type);
         if (isSupportedImage) {
@@ -309,7 +304,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
   onInputEnter(data, event) {
     if (this.pastedFile()) {
-      return this.onSendPastedFile();
+      return this.sendPastedFile();
     }
 
     const messageText = z.util.StringUtil.trim_line_breaks(this.input());
@@ -428,6 +423,11 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     if (isTextChange) {
       this.conversationRepository.send_message_edit(messageText, messageEntity, this.conversationEntity());
     }
+  }
+
+  sendPastedFile() {
+    this.onDropFiles([this.pastedFile()]);
+    this.pastedFile(null);
   }
 
   /**

@@ -152,10 +152,9 @@ z.team.TeamRepository = class TeamRepository {
     return this.teamUsers()
       .filter(userEntity => userEntity.matches(query, isHandle, excludedEmojis))
       .sort((userA, userB) => {
-        if (isHandle) {
-          return z.util.StringUtil.sort_by_priority(userA.username(), userB.username(), query);
-        }
-        return z.util.StringUtil.sort_by_priority(userA.name(), userB.name(), query);
+        return isHandle
+          ? z.util.StringUtil.sort_by_priority(userA.username(), userB.username(), query)
+          : z.util.StringUtil.sort_by_priority(userA.name(), userB.name(), query);
       });
   }
 
