@@ -385,10 +385,11 @@ z.main.App = class App {
     const {message, type} = error;
     const is_auth_error = error instanceof z.auth.AuthError;
     if (is_auth_error) {
-      if (type === z.auth.AuthError.TYPE.MULTIPLE_TABS) {
-        return this._redirectToLogin(z.auth.SIGN_OUT_REASON.MULTIPLE_TABS);
-      }
-      return this._redirectToLogin(z.auth.SIGN_OUT_REASON.INDEXED_DB);
+      const isTypeMultipleTabs = type === z.auth.AuthError.TYPE.MULTIPLE_TABS;
+      const signOutReason = isTypeMultipleTabs
+        ? z.auth.SIGN_OUT_REASON.MULTIPLE_TABS
+        : z.auth.SIGN_OUT_REASON.INDEXED_DB;
+      return this._redirectToLogin(signOutReason);
     }
 
     this.logger.debug(
@@ -656,76 +657,75 @@ z.main.App = class App {
   /**
    * Logs the user out on the backend and deletes cached data.
    *
-   * @param {z.auth.SIGN_OUT_REASON} sign_out_reason - Cause for logout
-   * @param {boolean} clear_data - Keep data in database
+   * @param {z.auth.SIGN_OUT_REASON} signOutReason - Cause for logout
+   * @param {boolean} clearData - Keep data in database
    * @returns {undefined} No return value
    */
-  logout(sign_out_reason, clear_data = false) {
+  logout(signOutReason, clearData = false) {
+    const _redirectToLogin = () => {
+      amplify.publish(z.event.WebApp.LIFECYCLE.SIGNED_OUT, clearData);
+      this._redirectToLogin(signOutReason);
+    };
+
     const _logout = () => {
       // Disconnect from our backend, end tracking and clear cached data
       this.repository.event.disconnectWebSocket(z.event.WebSocketService.CHANGE_TRIGGER.LOGOUT);
 
       // Clear Local Storage (but don't delete the cookie label if you were logged in with a permanent client)
-      const do_not_delete = [z.storage.StorageKey.AUTH.SHOW_LOGIN];
+      const keysToKeep = [z.storage.StorageKey.AUTH.SHOW_LOGIN];
 
-      if (this.repository.client.isCurrentClientPermanent() && !clear_data) {
-        do_not_delete.push(z.storage.StorageKey.AUTH.PERSIST);
+      const keepPermanentDatabase = this.repository.client.isCurrentClientPermanent() && !clearData;
+      if (keepPermanentDatabase) {
+        keysToKeep.push(z.storage.StorageKey.AUTH.PERSIST);
       }
 
       // @todo remove on next iteration
-      const self_user = this.repository.user.self();
-      if (self_user) {
-        const cookie_label_key = this.repository.client.constructCookieLabelKey(self_user.email() || self_user.phone());
+      const selfUser = this.repository.user.self();
+      if (selfUser) {
+        const cookieLabelKey = this.repository.client.constructCookieLabelKey(selfUser.email() || selfUser.phone());
 
-        Object.keys(amplify.store()).forEach(amplify_key => {
-          if (
-            !(amplify_key === cookie_label_key && clear_data) &&
-            z.util.StringUtil.includes(amplify_key, z.storage.StorageKey.AUTH.COOKIE_LABEL)
-          ) {
-            do_not_delete.push(amplify_key);
+        Object.keys(amplify.store()).forEach(keyInAmplifyStore => {
+          const isCookieLabelKey = keyInAmplifyStore === cookieLabelKey;
+          const deleteLabelKey = isCookieLabelKey && clearData;
+          const isCookieLabel = z.util.StringUtil.includes(keyInAmplifyStore, z.storage.StorageKey.AUTH.COOKIE_LABEL);
+
+          if (!deleteLabelKey && isCookieLabel) {
+            keysToKeep.push(keyInAmplifyStore);
           }
         });
 
-        const keep_conversation_input = sign_out_reason === z.auth.SIGN_OUT_REASON.SESSION_EXPIRED;
-        this.repository.cache.clearCache(keep_conversation_input, do_not_delete);
+        const keepConversationInput = signOutReason === z.auth.SIGN_OUT_REASON.SESSION_EXPIRED;
+        this.repository.cache.clearCache(keepConversationInput, keysToKeep);
       }
 
       // Clear IndexedDB
-      if (clear_data) {
-        this.repository.storage
-          .deleteDatabase()
-          .catch(error => this.logger.error('Failed to delete database before logout', error))
-          .then(() => {
-            amplify.publish(z.event.WebApp.LIFECYCLE.SIGNED_OUT, clear_data);
-            this._redirectToLogin(sign_out_reason);
-          });
-      } else {
-        amplify.publish(z.event.WebApp.LIFECYCLE.SIGNED_OUT, clear_data);
-        this._redirectToLogin(sign_out_reason);
-      }
+      const clearDataPromise = clearData
+        ? this.repository.storage
+            .deleteDatabase()
+            .catch(error => this.logger.error('Failed to delete database before logout', error))
+        : Promise.resolve();
+
+      return clearDataPromise.then(() => _redirectToLogin());
     };
 
-    const _logout_on_backend = () => {
-      this.logger.info(`Logout triggered by '${sign_out_reason}': Disconnecting user from the backend.`);
-      this.auth.repository
+    const _logoutOnBackend = () => {
+      this.logger.info(`Logout triggered by '${signOutReason}': Disconnecting user from the backend.`);
+      return this.auth.repository
         .logout()
         .then(() => _logout())
-        .catch(() => {
-          amplify.publish(z.event.WebApp.LIFECYCLE.SIGNED_OUT, clear_data);
-          this._redirectToLogin(sign_out_reason);
-        });
+        .catch(() => _redirectToLogin());
     };
 
-    if (App.CONFIG.IMMEDIATE_SIGN_OUT_REASONS.includes(sign_out_reason)) {
+    if (App.CONFIG.IMMEDIATE_SIGN_OUT_REASONS.includes(signOutReason)) {
       return _logout();
     }
 
     if (navigator.onLine) {
-      return _logout_on_backend();
+      return _logoutOnBackend();
     }
 
     this.logger.warn('No internet access. Continuing when internet connectivity regained.');
-    $(window).on('online', () => _logout_on_backend());
+    $(window).on('online', () => _logoutOnBackend());
   }
 
   /**
@@ -765,6 +765,14 @@ z.main.App = class App {
     this.auth.client
       .execute_on_connectivity(z.service.BackendClient.CONNECTIVITY_CHECK_TRIGGER.LOGIN_REDIRECT)
       .then(() => {
+        const isUserRequested = signOutReason === z.auth.SIGN_OUT_REASON.USER_REQUESTED;
+        const isLeavingGuestRoom = isUserRequested && this.repository.user.self().isTemporaryGuest();
+        if (isLeavingGuestRoom) {
+          const path = z.l10n.text(z.string.urlWebsiteRoot);
+          const url = z.util.URLUtil.build_url(z.util.URLUtil.TYPE.WEBSITE, path);
+          return window.location.replace(url);
+        }
+
         const expectedSignOutReasons = [z.auth.SIGN_OUT_REASON.ACCOUNT_DELETED, z.auth.SIGN_OUT_REASON.NOT_SIGNED_IN];
         const notSignedIn = expectedSignOutReasons.includes(signOutReason);
         let url = `/auth/${location.search}${notSignedIn ? '' : '#login'}`;

@@ -49,8 +49,8 @@ z.viewModel.list.TemporaryGuestViewModel = class TemporaryGuestViewModel {
   clickToCreateAccount() {
     amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
       action: () => {
-        const path = `${z.l10n.text(z.string.urlWebsiteCreateTeam)}?pk_campaign=wireless&pk_kwd=desktop`;
-        z.util.safe_window_open(z.util.URLUtil.build_url(z.util.URLUtil.TYPE.WEBSITE, path));
+        const url = `/auth/${location.search}`;
+        window.location.replace(url);
       },
       preventClose: true,
       text: {
