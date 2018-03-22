@@ -49,7 +49,7 @@ export default class NotificationService {
         return databaseLastEventDate;
       })
       .catch(error => {
-        if (error instanceof RecordNotFoundError) {
+        if (error instanceof RecordNotFoundError || error.constructor.name === 'RecordNotFoundError') {
           return this.database.createLastEventDate(eventDate);
         }
         throw error;

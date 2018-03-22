@@ -24,11 +24,4 @@ import PayloadBundle from './PayloadBundle';
 import SessionPayloadBundle from './SessionPayloadBundle';
 import EncryptedAsset from './EncryptedAsset';
 
-export {
-  CryptographyService,
-  CryptographyDatabaseRepository,
-  EncryptedAsset,
-  GenericMessageType,
-  PayloadBundle,
-  SessionPayloadBundle,
-};
+export {CryptographyService, EncryptedAsset, GenericMessageType, PayloadBundle, SessionPayloadBundle};

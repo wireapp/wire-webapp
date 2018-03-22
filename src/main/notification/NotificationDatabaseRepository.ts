@@ -18,7 +18,7 @@
  */
 
 import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine/index';
-import {CryptographyDatabaseRepository} from '../cryptography/root';
+import CryptographyDatabaseRepository from '../cryptography/CryptographyDatabaseRepository';
 import {Notification} from '@wireapp/api-client/dist/commonjs/notification/index';
 
 export default class NotificationDatabaseRepository {
