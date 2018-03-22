@@ -130,7 +130,7 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
     });
     this.showActionDevices = ko.pureComputed(() => {
       if (this.conversationEntity().is_one2one() && this.firstParticipant()) {
-        return this.firstParticipant().is_connected() || this.firstParticipant().is_team_member();
+        return this.firstParticipant().is_connected() || this.firstParticipant().isTeamMember();
       }
     });
     this.showActionGuestOptions = ko.pureComputed(() => this.conversationEntity().inTeam());
