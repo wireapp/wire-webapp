@@ -84,6 +84,8 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
 
     this.isMacDesktop = z.util.Environment.electron && z.util.Environment.os.mac;
     this.isDragged = false;
+    this.startX = 0;
+    this.startY = 0;
     this.isMoved = false;
     this.preventPanelOpen = false;
   }
@@ -114,16 +116,24 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
     this.showDetails();
   }
 
-  onMouseDown() {
-    this.isDragged = this.isMacDesktop;
+  onMouseDown(_, event) {
+    if (this.isMacDesktop) {
+      this.isDragged = true;
+      this.startX = event.screenX;
+      this.startY = event.screenY;
+    }
   }
 
-  onMouseMove() {
-    this.isMoved = this.isDragged;
+  onMouseMove(_, event) {
+    if (this.isDragged && !this.isMoved) {
+      const diffX = Math.abs(event.screenX - this.startX);
+      const diffY = Math.abs(event.screenY - this.startY);
+      this.isMoved = diffX > 2 || diffY > 2;
+    }
   }
 
   onMouseUp() {
-    this.preventPanelOpen = this.isMoved && this.isDragged;
+    this.preventPanelOpen = this.isMoved;
     this.isMoved = false;
     this.isDragged = false;
   }
