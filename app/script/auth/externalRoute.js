@@ -27,7 +27,7 @@ const WIRE_WEBSITE = onEnvironment(
 );
 
 export default {
-  LOGIN: `${WEBAPP_ENV}login`,
+  PHONE_LOGIN: `${WEBAPP_ENV}login`,
   WEBAPP: WEBAPP_ENV,
   WIRE_PRIVACY_POLICY: `${WIRE_WEBSITE}legal/#privacy`,
   WIRE_TEAM_FEATURES: `${WIRE_WEBSITE}create-team/#features`,

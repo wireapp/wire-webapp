@@ -268,19 +268,16 @@ z.viewModel.AuthViewModel = class AuthViewModel {
     if (mode) {
       const isExpectedMode = mode === z.auth.AuthView.MODE.ACCOUNT_LOGIN;
       if (isExpectedMode) {
-        this._set_hash(mode);
-        return;
+        return this._set_hash(mode);
       }
     }
 
     const reason = z.util.get_url_parameter(z.auth.URLParameter.REASON);
-    switch (reason) {
-      case z.auth.SIGN_OUT_REASON.ACCOUNT_LOGIN:
-        return this._loginFromAuth();
-      case z.auth.SIGN_OUT_REASON.ACCOUNT_REGISTRATION:
+    if (reason) {
+      const isReasonRegistration = reason === z.auth.SIGN_OUT_REASON.ACCOUNT_REGISTRATION;
+      if (isReasonRegistration) {
         return this._loginFromTeams();
-      default:
-        break;
+      }
     }
   }
 
@@ -415,22 +412,6 @@ z.viewModel.AuthViewModel = class AuthViewModel {
   //##############################################################################
   // Invitation Stuff
   //##############################################################################
-
-  _loginFromAuth() {
-    this.pending_server_request(true);
-
-    const persist = z.util.get_url_parameter(z.auth.URLParameter.PERSIST);
-    z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.PERSIST, persist);
-    z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.SHOW_LOGIN, true);
-
-    this.auth.repository
-      .getAccessToken()
-      .then(() => this._authentication_successful(true))
-      .catch(error => {
-        this.pending_server_request(false);
-        window.location.replace('/auth/#login');
-      });
-  }
 
   _loginFromTeams() {
     this.pending_server_request(true);

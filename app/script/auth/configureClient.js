@@ -27,8 +27,8 @@ const BACKEND = Environment.onEnvironment(
   APIClient.BACKEND.PRODUCTION
 );
 
-export const configureClient = () =>
-  new APIClient({
+export const configureClient = () => {
+  return new APIClient({
     schemaCallback: db => {
       const {schema, version} = window.z.storage.StorageService.SCHEMA;
       db.version(version).stores(schema);
@@ -36,5 +36,6 @@ export const configureClient = () =>
     store: new StoreEngine.IndexedDBEngine(),
     urls: BACKEND,
   });
+};
 
 export default configureClient;

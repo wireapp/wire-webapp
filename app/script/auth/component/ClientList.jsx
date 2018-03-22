@@ -31,11 +31,9 @@ class ClientList extends React.Component {
   };
 
   setSelectedClient = clientId => {
-    if (this.state.currentlySelectedClient === clientId) {
-      this.setState({...this.state, currentlySelectedClient: null});
-    } else {
-      this.setState({...this.state, currentlySelectedClient: clientId});
-    }
+    const isSelectedClient = this.state.currentlySelectedClient === clientId;
+    clientId = isSelectedClient ? null : clientId;
+    this.setState({...this.state, currentlySelectedClient: clientId});
   };
 
   removeClient = (clientId, password) => {

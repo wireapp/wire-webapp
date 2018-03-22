@@ -72,12 +72,12 @@ class ConversationJoin extends Component {
     const conversationKey = nextProps.match.params.conversationKey;
     const expiresIn = parseInt(nextProps.match.params.expiresIn, 10) || undefined;
 
-    const urlParamsChanged =
-      conversationCode !== this.state.conversationCode ||
-      conversationKey !== this.state.conversationKey ||
-      expiresIn !== this.state.expiresIn;
+    const codeParamChanged = conversationCode !== this.state.conversationCode;
+    const keyParamChanged = conversationKey !== this.state.conversationKey;
+    const expiresInParamChanged = expiresIn !== this.state.expiresIn;
+    const urlParamChanged = codeParamChanged || keyParamChanged || expiresInParamChanged;
 
-    if (urlParamsChanged) {
+    if (urlParamChanged) {
       this.props
         .doInit()
         .then(() => {
