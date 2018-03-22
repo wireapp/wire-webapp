@@ -186,4 +186,15 @@ export default class FileEngine implements CRUDEngine {
         .then(() => primaryKey);
     });
   }
+
+  public updateOrCreate(tableName: string, primaryKey: string, changes: Object): Promise<string> {
+    return this.update(tableName, primaryKey, changes)
+      .catch(error => {
+        if (error instanceof RecordNotFoundError) {
+          return this.create(tableName, primaryKey, changes);
+        }
+        throw error;
+      })
+      .then(() => primaryKey);
+  }
 }

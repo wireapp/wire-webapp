@@ -70,6 +70,16 @@ interface CRUDEngine {
    * @returns {Promise<string>} Resolves with the primary key of the updated record.
    */
   update(tableName: string, primaryKey: string, changes: Object): Promise<string>;
+
+  /**
+   * Updates a record with a set of properties.
+   * If the record doesn't exist, The record will be created automatically.
+   * @param {string} tableName - Table name
+   * @param {string} primaryKey - Primary key of record which should get updated.
+   * @param {Object} changes - Updated properties that should be saved for the record
+   * @returns {Promise<string>} Resolves with the primary key of the updated record.
+   */
+  updateOrCreate(tableName: string, primaryKey: string, changes: Object): Promise<string>;
 }
 
 export default CRUDEngine;

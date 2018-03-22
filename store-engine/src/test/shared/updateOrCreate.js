@@ -1,26 +1,24 @@
-const StoreEngine = require('@wireapp/store-engine');
-
 const TABLE_NAME = 'the-simpsons';
 
 module.exports = {
-  'fails if the record does not exist.': (done, engine) => {
+  'creates a record if it does not exist in the database.': (done, engine) => {
     const PRIMARY_KEY = 'primary-key';
 
-    const updates = {
-      age: 177,
-      size: {
-        height: 1080,
-        width: 1920,
-      },
+    const entity = {
+      name: 'Old monitor',
     };
 
+    const expectedAmountOfProperties = 1;
+
     engine
-      .update(TABLE_NAME, PRIMARY_KEY, updates)
-      .then(() => done.fail('Update on non-existing record should have failed'))
-      .catch(error => {
-        expect(error).toEqual(jasmine.any(StoreEngine.error.RecordNotFoundError));
+      .updateOrCreate(TABLE_NAME, PRIMARY_KEY, entity)
+      .then(primaryKey => engine.read(TABLE_NAME, primaryKey))
+      .then(updatedRecord => {
+        expect(updatedRecord.name).toBe(entity.name);
+        expect(Object.keys(updatedRecord).length).toBe(expectedAmountOfProperties);
         done();
-      });
+      })
+      .catch(done.fail);
   },
   'updates an existing database record.': (done, engine) => {
     const PRIMARY_KEY = 'primary-key';
@@ -41,7 +39,7 @@ module.exports = {
 
     engine
       .create(TABLE_NAME, PRIMARY_KEY, entity)
-      .then(() => engine.update(TABLE_NAME, PRIMARY_KEY, updates))
+      .then(() => engine.updateOrCreate(TABLE_NAME, PRIMARY_KEY, updates))
       .then(primaryKey => engine.read(TABLE_NAME, primaryKey))
       .then(updatedRecord => {
         expect(updatedRecord.name).toBe(entity.name);

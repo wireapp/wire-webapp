@@ -124,4 +124,10 @@ describe('StoreEngine.IndexedDBEngine', () => {
       it(description, done => testFunction(done, engine));
     });
   });
+
+  describe('"updateOrCreate"', () => {
+    Object.entries(require('../../test/shared/updateOrCreate')).map(([description, testFunction]) => {
+      it(description, done => testFunction(done, engine));
+    });
+  });
 });
