@@ -129,7 +129,6 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
     this.showActionClear = ko.pureComputed(() => {
       return !this.conversationEntity().is_request() && !this.conversationEntity().is_cleared();
     });
-    this.showActionDevices = ko.pureComputed(() => this.conversationEntity().is_one2one());
     this.showActionGuestOptions = ko.pureComputed(() => this.conversationEntity().inTeam());
     this.showActionLeave = ko.pureComputed(() => {
       return this.conversationEntity().is_group() && !this.conversationEntity().removed_from_conversation();
