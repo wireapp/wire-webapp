@@ -52,9 +52,10 @@ z.calling.entities.CallEntity = class CallEntity {
 
     const {id: conversationId, is_group} = conversationEntity;
     const {mediaStreamHandler, mediaRepository, selfState, telemetry, userRepository} = this.callingRepository;
+    this.messageLog = this.callingRepository.messageLog;
 
-    const name = `z.calling.entities.CallEntity (${conversationId})`;
-    this.callLogger = new z.telemetry.calling.CallLogger(name, z.config.LOGGER.OPTIONS);
+    const callLoggerName = `z.calling.entities.CallEntity (${conversationId})`;
+    this.callLogger = new z.telemetry.calling.CallLogger(callLoggerName, z.config.LOGGER.OPTIONS, this.messageLog);
 
     // IDs and references
     this.id = conversationId;
@@ -166,13 +167,14 @@ z.calling.entities.CallEntity = class CallEntity {
     });
 
     this.state.subscribe(state => {
-      this.callLogger.info({
+      const logMessage = {
         data: {
           default: [this.id, state],
           obfuscated: [this.callLogger.obfuscate(this.id), state],
         },
         message: `Call state '{0}' changed to '{1}'`,
-      });
+      };
+      this.callLogger.info(logMessage);
 
       this._clearStateTimeout();
 
@@ -735,13 +737,14 @@ z.calling.entities.CallEntity = class CallEntity {
           }
         }
 
-        this.callLogger.info({
+        const logMessage = {
           data: {
             default: [participantEntity.user.name()],
             obfuscated: [this.callLogger.obfuscate(participantEntity.user.id)],
           },
           message: `Removed call participant '{0}'`,
-        });
+        };
+        this.callLogger.info(logMessage);
         return this;
       })
       .catch(error => {
@@ -839,16 +842,14 @@ z.calling.entities.CallEntity = class CallEntity {
 
         this.participants.push(participantEntity);
 
-        this.callLogger.info(
-          {
-            data: {
-              default: [userEntity.name()],
-              obfuscated: [this.callLogger.obfuscate(userEntity.id)],
-            },
-            message: `Adding call participant '{0}'`,
+        const logMessage = {
+          data: {
+            default: [userEntity.name()],
+            obfuscated: [this.callLogger.obfuscate(userEntity.id)],
           },
-          participantEntity
-        );
+          message: `Adding call participant '{0}'`,
+        };
+        this.callLogger.info(logMessage, participantEntity);
         return this._updateParticipantState(participantEntity, negotiate, callMessageEntity);
       });
     });
@@ -868,16 +869,14 @@ z.calling.entities.CallEntity = class CallEntity {
         participantEntity.verifyClientId(callMessageEntity.clientId);
       }
 
-      this.callLogger.info(
-        {
-          data: {
-            default: [participantEntity.user.name()],
-            obfuscated: [this.callLogger.obfuscate(participantEntity.user.id)],
-          },
-          message: `Updating call participant '{0}'`,
+      const logMessage = {
+        data: {
+          default: [participantEntity.user.name()],
+          obfuscated: [this.callLogger.obfuscate(participantEntity.user.id)],
         },
-        callMessageEntity
-      );
+        message: `Updating call participant '{0}'`,
+      };
+      this.callLogger.info(logMessage, callMessageEntity);
       return this._updateParticipantState(participantEntity, negotiate, callMessageEntity);
     });
   }

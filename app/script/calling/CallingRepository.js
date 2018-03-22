@@ -64,7 +64,10 @@ z.calling.CallingRepository = class CallingRepository {
     this.conversationRepository = conversationRepository;
     this.mediaRepository = mediaRepository;
     this.userRepository = userRepository;
-    this.callLogger = new z.telemetry.calling.CallLogger('z.calling.CallingRepository', z.config.LOGGER.OPTIONS);
+
+    this.messageLog = [];
+    const callLoggerName = 'z.calling.CallingRepository';
+    this.callLogger = new z.telemetry.calling.CallLogger(callLoggerName, z.config.LOGGER.OPTIONS, this.messageLog);
 
     this.selfUserId = ko.pureComputed(() => {
       if (this.userRepository.self()) {
@@ -1134,16 +1137,14 @@ z.calling.CallingRepository = class CallingRepository {
         const mediaType = this._getMediaTypeFromProperties(properties);
         const conversationName = callEntity.conversationEntity.display_name();
 
-        this.callLogger.info(
-          {
-            data: {
-              default: [mediaType, conversationName],
-              obfuscated: [mediaType, this.callLogger.obfuscate(conversationId)],
-            },
-            message: `Incoming '{0}' call in conversation '{1}'`,
+        const logMessage = {
+          data: {
+            default: [mediaType, conversationName],
+            obfuscated: [mediaType, this.callLogger.obfuscate(conversationId)],
           },
-          callEntity
-        );
+          message: `Incoming '{0}' call in conversation '{1}'`,
+        };
+        this.callLogger.info(logMessage, callEntity);
 
         callEntity.direction = z.calling.enum.CALL_STATE.INCOMING;
         callEntity.setRemoteVersion(callMessageEntity);
@@ -1189,16 +1190,14 @@ z.calling.CallingRepository = class CallingRepository {
       const conversationName = callEntity.conversationEntity.display_name();
       const conversationId = callEntity.conversationEntity.id;
 
-      this.callLogger.info(
-        {
-          data: {
-            default: [mediaType, conversationName],
-            obfuscated: [mediaType, this.callLogger.obfuscate(conversationId)],
-          },
-          message: `Outgoing '{0}' call in conversation '{1}'`,
+      const logMessage = {
+        data: {
+          default: [mediaType, conversationName],
+          obfuscated: [mediaType, this.callLogger.obfuscate(conversationId)],
         },
-        callEntity
-      );
+        message: `Outgoing '{0}' call in conversation '{1}'`,
+      };
+      this.callLogger.info(logMessage, callEntity);
 
       callEntity.direction = z.calling.enum.CALL_STATE.OUTGOING;
       callEntity.state(z.calling.enum.CALL_STATE.OUTGOING);
@@ -1376,10 +1375,8 @@ z.calling.CallingRepository = class CallingRepository {
         const expirationDate = new Date(Date.now() + timeout);
         callingConfig.expiration = expirationDate;
 
-        this.callLogger.info(
-          `Updated calling configuration expires on '${expirationDate.toISOString()}'`,
-          callingConfig
-        );
+        const logMessage = `Updated calling configuration expires on '${expirationDate.toISOString()}'`;
+        this.callLogger.info(logMessage, callingConfig);
         this.callingConfig = callingConfig;
 
         this.callingConfigTimeout = window.setTimeout(() => {

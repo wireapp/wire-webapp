@@ -35,11 +35,13 @@ z.calling.entities.ParticipantEntity = class ParticipantEntity {
   constructor(callEntity, user, timings) {
     this.callEntity = callEntity;
     this.user = user;
+
     this.id = this.user.id;
+    this.messageLog = this.callEntity.messageLog;
     this.sessionId = undefined;
 
-    const name = `z.calling.entities.ParticipantEntity (${this.id})`;
-    this.callLogger = new z.telemetry.calling.CallLogger(name, z.config.LOGGER.OPTIONS);
+    const callLoggerName = `z.calling.entities.ParticipantEntity (${this.id})`;
+    this.callLogger = new z.telemetry.calling.CallLogger(callLoggerName, z.config.LOGGER.OPTIONS, this.messageLog);
 
     this.isConnected = ko.observable(false);
     this.panning = ko.observable(0.0);

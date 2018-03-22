@@ -90,20 +90,6 @@ window.z.config = {
 
   SUPPORTED_CONVERSATION_IMAGE_TYPES: ['.jpg-large', 'image/jpg', 'image/jpeg', 'image/png', 'image/bmp', 'image/gif'],
 
-  TELEMETRY: {
-    CALLING: {
-      FINGERPRINT_OBFUSCATED_STRING: Array.from({length: 32})
-        .fill('XX')
-        .join(':'),
-      ICE_PASSWORD_OBFUSCATED_STRING: 'X'.repeat(24),
-      IPV4_OBFUSCATED_STRING: 'X',
-      IPV6_OBFUSCATED_STRING: ['XXXX', 'XXXX', 'XXXX', 'XXXX'].join(':'),
-      KASE_PUBLIC_KEY_OBFUSCATED_STRING: `x-KASEv1:${'X'.repeat(32)}`,
-      MESSAGE_LOG_LENGTH: 10000,
-      OBFUSCATION_TRUNCATE_TO: 4,
-    },
-  },
-
   UNSPLASH_URL: 'https://source.unsplash.com/1200x1200/?landscape',
 
   URL: {

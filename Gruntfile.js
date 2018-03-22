@@ -120,12 +120,9 @@ module.exports = grunt => {
     const done = this.async();
 
     const compiler = webpack(require('./webpack.config.npm.js'));
+    const progress = new ProgressPlugin((percentage, message) => grunt.log.ok(`${~~(percentage * 100)}%`, message));
 
-    compiler.apply(
-      new ProgressPlugin((percentage, message) => {
-        grunt.log.ok(`${~~(percentage * 100)}%`, message);
-      })
-    );
+    compiler.apply(progress);
 
     compiler.run(error => {
       if (error) {

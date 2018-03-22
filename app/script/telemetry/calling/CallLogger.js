@@ -1,26 +1,46 @@
-z.telemetry.calling.CallLog = [];
 z.telemetry.calling.CallLogger = class CallLogger extends z.util.Logger {
-  constructor(message, options) {
-    super(message, options);
-    this.message = message;
-    this.options = options;
-    this.obfuscationMode = 'soft';
+  static get CONFIG() {
+    return {
+      MESSAGE_LOG_LENGTH: 10000,
+      OBFUSCATION_TRUNCATE_TO: 4,
+    };
   }
 
-  static get CONFIG() {
-    return Object.assign(
-      {
-        IPV4: /(([0-1]?[0-9]{1,2}\.)|(2[0-4][0-9]\.)|(25[0-5]\.)){3}(([0-1]?[0-9]{1,2})|(2[0-4][0-9])|(25[0-5]))/,
-        IPV6: /(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))/,
-      },
-      window.z.config.TELEMETRY.CALLING
-    );
+  static get OBFUSCATED() {
+    return {
+      FINGERPRINT: Array.from({length: 32})
+        .fill('XX')
+        .join(':'),
+      ICE_PASSWORD: 'X'.repeat(24),
+      IPV4: 'X',
+      IPV6: ['XXXX', 'XXXX', 'XXXX', 'XXXX'].join(':'),
+      KASE_PUBLIC_KEY: `x-KASEv1:${'X'.repeat(32)}`,
+    };
+  }
+
+  static get OBFUSCATION_MODE() {
+    return {
+      HARD: 'CallLogger.OBFUSCATION_MODE.HARD',
+      SOFT: 'CallLogger.OBFUSCATION_MODE.SOFT',
+    };
+  }
+
+  constructor(name, options, messageLog) {
+    super(name, options);
+
+    this.messageLog = messageLog;
+    this.name = name;
+    this.options = options;
+
+    this.obfuscationMode = CallLogger.OBFUSCATION_MODE.SOFT;
   }
 
   obfuscate(string) {
-    if (this.obfuscationMode === 'soft') {
+    if (this._isSoftObfuscationMode()) {
       return string.substr(0, CallLogger.CONFIG.OBFUSCATION_TRUNCATE_TO);
-    } else if (this.obfuscationMode === 'hard') {
+    }
+
+    if (this._isHardObfuscationMode()) {
       return CryptoJS.SHA256(string)
         .toString()
         .substr(0, CallLogger.CONFIG.OBFUSCATION_TRUNCATE_TO);
@@ -28,19 +48,29 @@ z.telemetry.calling.CallLogger = class CallLogger extends z.util.Logger {
   }
 
   obfuscateIp(ip) {
-    if (this.obfuscationMode === 'soft') {
-      if (CallLogger.CONFIG.IPV4.test(ip)) {
+    const ipVersion4Regex = /(([0-1]?[0-9]{1,2}\.)|(2[0-4][0-9]\.)|(25[0-5]\.)){3}(([0-1]?[0-9]{1,2})|(2[0-4][0-9])|(25[0-5]))/;
+    const ipVersion6Regex = /(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))/;
+
+    if (this._isSoftObfuscationMode()) {
+      const isIpVersion4 = ipVersion4Regex.test(ip);
+      if (isIpVersion4) {
         // IPv4
         ip = ip.split('.');
-        ip[ip.length - 1] = CallLogger.CONFIG.IPV4_OBFUSCATED_STRING;
+        ip[ip.length - 1] = CallLogger.OBFUSCATED.IPV4;
         return ip.join('.');
-      } else if (CallLogger.CONFIG.IPV6.test(ip)) {
+      }
+
+      const isIpVersion6 = ipVersion6Regex.test(ip);
+      if (isIpVersion6) {
         // IPv6
         ip = ip.split(':').slice(0, 3);
-        return [...ip, CallLogger.CONFIG.IPV6_OBFUSCATED_STRING].join(':');
+        return [...ip, CallLogger.OBFUSCATED.IPV6].join(':');
       }
-    } else if (this.obfuscationMode === 'hard') {
-      if (CallLogger.CONFIG.IPV4.test(ip)) {
+    }
+
+    if (this._isHardObfuscationMode()) {
+      const isIpVersion4 = ipVersion4Regex.test(ip);
+      if (isIpVersion4) {
         // Extend the 4 bytes seed to 16 bytes using XOR encryption with static keys
         const originalSeedLength = seed.length;
         const keys = [21, 15, 7];
@@ -55,14 +85,16 @@ z.telemetry.calling.CallLogger = class CallLogger extends z.util.Logger {
         for (let i = 0; i < seed.length; i++) {
           fakeIp[i % fakeIp.length] += seed.charCodeAt(i);
         }
+
         return fakeIp
-          .map(v => {
-            return (v % 10).toString(10);
-          })
+          .map(v => (v % 10).toString(10))
           .join('')
           .match(/.{1,3}/g)
           .join('.');
-      } else if (CallLogger.CONFIG.IPV6.test(ip)) {
+      }
+
+      const isIpVersion6 = ipVersion6Regex.test(ip);
+      if (isIpVersion6) {
         const fakeIp = CryptoJS.MD5(seed).toString();
         return fakeIp.match(/.{1,4}/g).join(':');
       }
@@ -71,58 +103,28 @@ z.telemetry.calling.CallLogger = class CallLogger extends z.util.Logger {
     return '[Unknown]';
   }
 
-  removeBytesFromIp(ip) {
-    let charactersToKeep;
-    let type;
-
-    ip = ip.replace(/[\.\:]/g, '');
-
-    if (ip.length > 12) {
-      // IPv6 - Without colons the maximum is 32 characters
-      type = 6;
-      charactersToKeep = 12;
-    } else {
-      // IPv4 - Without dots the maximum is 12 characters
-      type = 4;
-      charactersToKeep = 4;
-      if (ip.length > 7) {
-        charactersToKeep = 6;
-      } else if (ip.length > 6) {
-        charactersToKeep = 5;
-      }
-    }
-
-    const mid = Math.round((ip.length + 1) / 2);
-
-    return {
-      slicedIp: ip.slice(mid - charactersToKeep / 2, mid + charactersToKeep / 2),
-      type,
-    };
-  }
-
-  obfuscateSdp(sdpMessage, conversationId) {
-    const decodedSdpMessage = sdpTransform.parse(sdpMessage);
+  obfuscateSdp(sdpMessage) {
+    const decodedSdpMessage = window.sdpTransform.parse(sdpMessage);
 
     for (const index in decodedSdpMessage.media) {
       // Remove fingerprint
-      if (
-        typeof decodedSdpMessage.media[index].fingerprint !== 'undefined' &&
-        typeof decodedSdpMessage.media[index].fingerprint.hash !== 'undefined'
-      ) {
-        decodedSdpMessage.media[index].fingerprint.hash = CallLogger.CONFIG.FINGERPRINT_OBFUSCATED_STRING;
+      const isFingerprintDefined = !!decodedSdpMessage.media[index].fingerprint;
+      if (isFingerprintDefined && !!decodedSdpMessage.media[index].fingerprint.hash) {
+        decodedSdpMessage.media[index].fingerprint.hash = CallLogger.OBFUSCATED.FINGERPRINT;
       }
 
       // Remove ice password
-      if (typeof decodedSdpMessage.media[index].icePwd !== 'undefined') {
-        decodedSdpMessage.media[index].icePwd = CallLogger.CONFIG.ICE_PASSWORD_OBFUSCATED_STRING;
+      const isIcePasswordDefined = !!decodedSdpMessage.media[index].icePwd;
+      if (isIcePasswordDefined) {
+        decodedSdpMessage.media[index].icePwd = CallLogger.OBFUSCATED.ICE_PASSWORD;
       }
 
       // Remove KASE public key (for receiving side)
-      if (typeof decodedSdpMessage.media[index].invalid !== 'undefined') {
+      const isPublicKeyDefined = !!decodedSdpMessage.media[index].invalid;
+      if (isPublicKeyDefined) {
         for (const indexInvalid in decodedSdpMessage.media[index].invalid) {
           if (decodedSdpMessage.media[index].invalid[indexInvalid].value.startsWith('x-KASEv1')) {
-            decodedSdpMessage.media[index].invalid[indexInvalid].value =
-              CallLogger.CONFIG.KASE_PUBLIC_KEY_OBFUSCATED_STRING;
+            decodedSdpMessage.media[index].invalid[indexInvalid].value = CallLogger.OBFUSCATED.KASE_PUBLIC_KEY;
           }
         }
       }
@@ -130,22 +132,22 @@ z.telemetry.calling.CallLogger = class CallLogger extends z.util.Logger {
       // Prevent recovery of original IPs
       // Remove bytes from the IP, concatenate it with the conversation id and the current date of the week then hash it
       // and use that hash to derive a deterministic IP from it
-      if (typeof decodedSdpMessage.media[index].candidates !== 'undefined') {
+      const isCandidateDefined = !!decodedSdpMessage.media[index].candidates;
+      if (isCandidateDefined) {
         for (const indexCandidate in decodedSdpMessage.media[index].candidates) {
-          decodedSdpMessage.media[index].candidates[indexCandidate].ip = this.obfuscateIp(
-            decodedSdpMessage.media[index].candidates[indexCandidate].ip
-          );
+          const obfuscatedCandidateIp = this.obfuscateIp(decodedSdpMessage.media[index].candidates[indexCandidate].ip);
+          decodedSdpMessage.media[index].candidates[indexCandidate].ip = obfuscatedCandidateIp;
 
-          if (typeof decodedSdpMessage.media[index].candidates[indexCandidate].raddr !== 'undefined') {
-            decodedSdpMessage.media[index].candidates[indexCandidate].raddr = this.obfuscateIp(
-              decodedSdpMessage.media[index].candidates[indexCandidate].raddr
-            );
+          const isRaddrDefined = decodedSdpMessage.media[index].candidates[indexCandidate].raddr;
+          if (isRaddrDefined) {
+            const obfuscatedRaddrIp = this.obfuscateIp(decodedSdpMessage.media[index].candidates[indexCandidate].raddr);
+            decodedSdpMessage.media[index].candidates[indexCandidate].raddr = obfuscatedRaddrIp;
           }
         }
       }
     }
 
-    return sdpTransform.write(decodedSdpMessage);
+    return window.sdpTransform.write(decodedSdpMessage);
   }
 
   getDebugType(number) {
@@ -167,12 +169,20 @@ z.telemetry.calling.CallLogger = class CallLogger extends z.util.Logger {
   }
 
   logToMemory(args) {
-    while (z.telemetry.calling.CallLog.length >= CallLogger.CONFIG.MESSAGE_LOG_LENGTH) {
-      z.telemetry.calling.CallLog.shift();
+    while (this.messageLog.length >= CallLogger.CONFIG.MESSAGE_LOG_LENGTH) {
+      this.messageLog.shift();
     }
 
-    const logMessage = `[${new Date().toISOString()}] [${this.message}] (${this.getDebugType(args[0]())}) ${args[1]}`;
-    z.telemetry.calling.CallLog.push(logMessage);
+    const logMessage = `[${new Date().toISOString()}] [${this.name}] (${this.getDebugType(args[0]())}) ${args[1]}`;
+    this.messageLog.push(logMessage);
+  }
+
+  _isHardObfuscationMode() {
+    return this.obfuscationMode === CallLogger.OBFUSCATION_MODE.HARD;
+  }
+
+  _isSoftObfuscationMode() {
+    return this.obfuscationMode === CallLogger.OBFUSCATION_MODE.SOFT;
   }
 
   _print_log(args) {

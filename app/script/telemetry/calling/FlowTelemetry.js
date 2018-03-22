@@ -35,8 +35,7 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
   constructor(id, remote_user_id, call_et, timings) {
     this.remote_user_id = remote_user_id;
     this.call_et = call_et;
-    const name = `z.telemetry.calling.FlowTelemetry (${id})`;
-    this.callLogger = new z.telemetry.calling.CallLogger(name, z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger(`z.telemetry.calling.FlowTelemetry (${id})`, z.config.LOGGER.OPTIONS);
 
     this.id = id;
     this.is_answer = false;
@@ -123,7 +122,7 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
    */
   set_peer_connection(peer_connection) {
     this.peer_connection = peer_connection;
-    this.callLogger.debug('Set or updated PeerConnection for telemetry checks', this.peer_connection);
+    this.logger.debug('Set or updated PeerConnection for telemetry checks', this.peer_connection);
   }
 
   /**
@@ -177,18 +176,18 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
    * @returns {undefined} No return value
    */
   log_status(participant_et) {
-    this.callLogger.force_log(`-- ID: ${this.id}`);
+    this.logger.force_log(`-- ID: ${this.id}`);
 
     if (this.remote_user !== undefined) {
-      this.callLogger.force_log(`-- Remote user: ${participant_et.user.name()} (${participant_et.user.id})`);
+      this.logger.force_log(`-- Remote user: ${participant_et.user.name()} (${participant_et.user.id})`);
     }
 
-    this.callLogger.force_log(`-- User is connected: ${participant_et.is_connected()}`);
-    this.callLogger.force_log(`-- Flow is answer: ${this.is_answer}`);
+    this.logger.force_log(`-- User is connected: ${participant_et.is_connected()}`);
+    this.logger.force_log(`-- Flow is answer: ${this.is_answer}`);
 
     if (this.peer_connection) {
-      this.callLogger.force_log(`-- ICE connection: ${this.peer_connection.iceConnectionState}`);
-      this.callLogger.force_log(`-- ICE gathering: ${this.peer_connection.iceGatheringState}`);
+      this.logger.force_log(`-- ICE connection: ${this.peer_connection.iceConnectionState}`);
+      this.logger.force_log(`-- ICE gathering: ${this.peer_connection.iceGatheringState}`);
     }
   }
 
@@ -221,19 +220,19 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
       custom_data.payload = payload;
     }
 
-    this.callLogger.error(description, custom_data);
+    this.logger.error(description, custom_data);
     Raygun.send(raygun_error, custom_data);
   }
 
   report_status() {
     const custom_data = this.create_report();
-    this.callLogger.info('Created flow status for call failure report', custom_data);
+    this.logger.info('Created flow status for call failure report', custom_data);
     return custom_data;
   }
 
   report_timings() {
     const custom_data = this.timings.log();
     Raygun.send(new Error('Call setup step timings'), custom_data);
-    this.callLogger.info(`Reported setup step timings of flow id '${this.id}' for call analysis`, custom_data);
+    this.logger.info(`Reported setup step timings of flow id '${this.id}' for call analysis`, custom_data);
   }
 };

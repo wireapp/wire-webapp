@@ -26,7 +26,7 @@ window.z.telemetry.calling = z.telemetry.calling || {};
 // Call traces entity.
 z.telemetry.calling.CallTelemetry = class CallTelemetry {
   constructor() {
-    this.callLogger = new z.telemetry.calling.CallLogger('z.telemetry.calling.CallTelemetry', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger('z.telemetry.calling.CallTelemetry', z.config.LOGGER.OPTIONS);
 
     this.sessions = {};
     this.remote_version = undefined;
@@ -45,11 +45,11 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
   log_sessions() {
     const sorted_sessions = z.util.sort_object_by_keys(this.sessions, true);
 
-    this.callLogger.force_log('Your last session IDs:');
+    this.logger.force_log('Your last session IDs:');
     for (const session_id in sorted_sessions) {
       if (sorted_sessions.hasOwnProperty(session_id)) {
         const tracking_info = sorted_sessions[session_id];
-        this.callLogger.force_log(tracking_info.to_string());
+        this.logger.force_log(tracking_info.to_string());
       }
     }
 
@@ -89,7 +89,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
    */
   set_media_type(media_type = z.media.MediaType.AUDIO) {
     this.media_type = media_type;
-    this.callLogger.info(`Set media type to '${this.media_type}'`);
+    this.logger.info(`Set media type to '${this.media_type}'`);
   }
 
   /**
@@ -100,7 +100,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
   set_remote_version(remote_version) {
     if (this.remote_version !== remote_version) {
       this.remote_version = remote_version;
-      this.callLogger.info(`Identified remote call version as '${remote_version}'`);
+      this.logger.info(`Identified remote call version as '${remote_version}'`);
     }
   }
 
@@ -165,7 +165,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
     const duration = Math.floor((Date.now() - timerStart) / 1000);
 
     if (!window.isNaN(duration)) {
-      this.callLogger.info(`Call duration: ${duration} seconds.`, durationTime());
+      this.logger.info(`Call duration: ${duration} seconds.`, durationTime());
 
       let duration_bucket;
       if (duration <= 15) {
