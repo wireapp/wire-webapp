@@ -86,7 +86,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
    * Initialize the repository.
    *
    * @private
-   * @param {Object} database - Database object
+   * @param {Object} database - Dexie instance
    * @returns {Promise} Resolves after initialization
    */
   _init(database) {
@@ -292,7 +292,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
     const {data: eventData, from: userId, id} = event;
 
     if (!eventData) {
-      const logMessage = `Encrypted event with ID '${id}' from user ''${userId} does not contain it's data payload`;
+      const logMessage = `Encrypted event with ID '${id}' from user '${userId}' does not have a 'data' property.`;
       this.logger.error(logMessage, event);
 
       const error = new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.NO_DATA_CONTENT);
