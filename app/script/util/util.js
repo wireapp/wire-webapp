@@ -117,14 +117,16 @@ z.util.load_url_buffer = (url, xhrAccessorFunction) => {
     const xhr = new XMLHttpRequest();
     xhr.open('GET', url, true);
     xhr.responseType = 'arraybuffer';
+
     xhr.onload = () => {
       const isStatusOK = xhr.status === 200;
-      if (isStatusOK) {
-        return resolve({buffer: xhr.response, mimeType: xhr.getResponseHeader('content-type')});
-      }
-      return reject(new Error(`Requesting arraybuffer failed with status ${xhr.status}`));
+      return isStatusOK
+        ? resolve({buffer: xhr.response, mimeType: xhr.getResponseHeader('content-type')})
+        : reject(new Error(xhr.status));
     };
+
     xhr.onerror = reject;
+
     if (typeof xhrAccessorFunction === 'function') {
       xhrAccessorFunction(xhr);
     }

@@ -118,7 +118,4 @@ deploy:
       branch: prod
 
 after_deploy:
-  - "AUTHOR_OF_LAST_COMMIT=$(git log | grep Author: | cut -d' ' -f2- | uniq | head -n1)"
-  - "SUMMARY_OF_LAST_COMMIT=$(git log -1 --pretty=%s)"
-  - chmod ugo+x ./bin/deployment_notification.js
-  - node ./bin/deployment_notification.js "$AUTHOR_OF_LAST_COMMIT" "$SUMMARY_OF_LAST_COMMIT"
+  - npx wire-travis-bot "fa0daf62-d5dc-48d2-aa92-ad2e0adeff4c"

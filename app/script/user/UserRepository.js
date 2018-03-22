@@ -926,7 +926,7 @@ z.user.UserRepository = class UserRepository {
    * Whether the user needs to set a username.
    * @returns {boolean} True, if username should be changed.
    */
-  should_change_username() {
+  shouldChangeUsername() {
     return this.should_set_username;
   }
 
@@ -1054,8 +1054,8 @@ z.user.UserRepository = class UserRepository {
     user_ets.forEach(user_et => {
       if (!user_et.is_me) {
         const is_team_member = !!team_members.find(member => member.id === user_et.id);
-        user_et.is_guest(!is_team_member);
-        user_et.is_team_member(is_team_member);
+        user_et.isGuest(!is_team_member);
+        user_et.isTeamMember(is_team_member);
       }
     });
   }

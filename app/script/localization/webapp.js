@@ -117,9 +117,17 @@ z.string.modalConfirmSecondary = 'Cancel';
 z.string.modalOptionSecondary = 'Cancel';
 
 // Modals content
+z.string.modalAccountCreateAction = 'OK';
+z.string.modalAccountCreateHeadline = 'Create an account?';
+z.string.modalAccountCreateMessage = 'By creating an account you will lose the conversation history in this guest room.';
+
 z.string.modalAccountDeletionAction = 'Delete';
 z.string.modalAccountDeletionHeadline = 'Delete account';
 z.string.modalAccountDeletionMessage = 'We will send a message via email or SMS. Follow the link to permanently delete your account.';
+
+z.string.modalAccountLeaveGuestRoomAction = 'Leave';
+z.string.modalAccountLeaveGuestRoomHeadline = 'Leave the guest room?';
+z.string.modalAccountLeaveGuestRoomMessage = 'Conversation history will be deleted. To keep it, create an account next time.';
 
 z.string.modalAccountLogoutAction = 'Log out';
 z.string.modalAccountLogoutHeadline = 'Clear Data?';
@@ -273,6 +281,8 @@ z.string.connectionRequestIgnore = 'Ignore';
 
 // Guests
 z.string.conversationGuestIndicator = 'Guest';
+z.string.userRemainingTimeHours = '{{time}}h left';
+z.string.userRemainingTimeMinutes = 'Less than {{time}}m left';
 
 // Conversation
 z.string.conversationYouNominative = 'you';
@@ -488,7 +498,7 @@ z.string.guestOptionsCopyLink = 'Copy link';
 z.string.guestOptionsCopyLinkDone = 'Link copied!';
 z.string.guestOptionsCreateLink = 'Create link';
 z.string.guestOptionsInfoHeader = 'Invite others with a link';
-z.string.guestOptionsInfoText = 'Anyone with the link can join the conversation for 24 hours, even if they don’t have Wire.';
+z.string.guestOptionsInfoText = 'Anyone with the link can join the conversation, even if they don’t have Wire.';
 z.string.guestOptionsRevokeLink = 'Revoke link';
 z.string.guestOptionsTitle = 'Guest options';
 
@@ -534,6 +544,8 @@ z.string.preferencesAboutWebsite = 'Wire website';
 z.string.preferencesAccountAvaibilityUnset = 'Set a status';
 z.string.preferencesAccountCreateTeam = 'Create a team';
 z.string.preferencesAccountDelete = 'Delete account';
+z.string.preferencesAccountLeaveGuestRoom = 'Leave the guest room';
+z.string.preferencesAccountLeaveGuestRoomDescription = 'You will no longer be able to access the messages in this conversation.';
 z.string.preferencesAccountLogOut = 'Log out';
 z.string.preferencesAccountManageTeam = 'Manage team';
 z.string.preferencesAccountResetPassword = 'Reset password';
@@ -622,6 +634,17 @@ z.string.searchServiceConfirmButton = 'Add service';
 // Search list: User list & service list components
 z.string.searchListEveryoneParticipates = 'Everyone you’re\nconnected to is already in\nthis conversation.';
 z.string.searchListNoMatches = 'No matching results.\nTry entering a different name.';
+
+// Temporary guest experience
+z.string.temporaryGuestCta = 'Create an account';
+z.string.temporaryGuestDescription = 'Secure your business with encrypted group messaging and conference calls.';
+z.string.temporaryGuestTimeRemaining = ' left in this guest room';
+
+z.string.temporaryGuestJoinMessage = 'This conversation will be available to you for 24 hours.';
+z.string.temporaryGuestJoinDescription = 'If you close or refresh this page, you will lose access.';
+
+z.string.temporaryGuestLeaveMessage = ' are no longer part of this conversation.';
+z.string.temporaryGuestLeaveDescription = 'If you close or refresh this page, you will lose access to the conversation history.';
 
 // Google contacts upload
 z.string.uploadGoogleHeadline = 'Find people\nto talk to.';

@@ -1,6 +1,11 @@
 <div id="background" data-bind="switch_background: selfUserPicture">
-  <div class="background">
-    <div class="background-image"></div>
-    <div class="background-darken"></div>
-  </div>
+  <!-- ko if: isActivatedAccount() -->
+    <div class="background">
+      <div class="background-image"></div>
+      <div class="background-darken"></div>
+    </div>
+  <!-- /ko -->
+  <!-- ko ifnot: isActivatedAccount() -->
+    <div class="background--white"></div>
+  <!-- /ko -->
 </div>

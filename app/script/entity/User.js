@@ -155,14 +155,16 @@ z.entity.User = class User {
     this.is_outgoing_request = ko.pureComputed(() => this.connection().is_outgoing_request());
     this.is_unknown = ko.pureComputed(() => this.connection().is_unknown());
 
-    this.is_guest = ko.observable(false);
+    this.inTeam = ko.observable(false);
+    this.isGuest = ko.observable(false);
     this.isTemporaryGuest = ko.observable(false);
-    this.is_team_member = ko.observable(false);
-    this.team_role = ko.observable(z.team.TeamRole.ROLE.NONE);
+    this.isTeamMember = ko.observable(false);
+    this.teamRole = ko.observable(z.team.TeamRole.ROLE.NONE);
     this.isTeamManager = ko.pureComputed(() => {
-      return [z.team.TeamRole.ROLE.ADMIN, z.team.TeamRole.ROLE.OWNER].includes(this.team_role());
+      return [z.team.TeamRole.ROLE.ADMIN, z.team.TeamRole.ROLE.OWNER].includes(this.teamRole());
     });
-    this.isTeamOwner = ko.pureComputed(() => z.team.TeamRole.ROLE.OWNER === this.team_role());
+    this.isTeamOwner = ko.pureComputed(() => z.team.TeamRole.ROLE.OWNER === this.teamRole());
+    this.teamId = undefined;
 
     this.is_request = ko.pureComputed(() => this.connection().is_request());
 
@@ -176,8 +178,10 @@ z.entity.User = class User {
 
     this.availability = ko.observable(z.user.AvailabilityType.NONE);
 
-    this.expirationTimestamp = ko.observable();
-    this.expirationRemaining = ko.observable();
+    this.expirationRemaining = ko.observable(0);
+    this.expirationText = ko.observable('');
+    this.expirationIsUrgent = ko.observable(false);
+    this.expirationRemainingText = ko.observable('');
     this.expirationIntervalId = undefined;
     this.isExpired = ko.observable(false);
   }
@@ -233,16 +237,42 @@ z.entity.User = class User {
       this.expirationIntervalId = undefined;
     }
 
-    this.expirationTimestamp(timestamp);
-    this.expirationRemaining(this.expirationTimestamp() - Date.now());
+    this.setRemaining(timestamp);
 
-    this.expirationIntervalId = window.setInterval(() => {
-      this.expirationRemaining(this.expirationTimestamp() - Date.now());
-    }, User.CONFIG.TEMPORARY_GUEST.EXPIRATION_INTERVAL);
+    const expirationInterval = User.CONFIG.TEMPORARY_GUEST.EXPIRATION_INTERVAL;
+    this.expirationIntervalId = window.setInterval(() => this.setRemaining(timestamp), expirationInterval);
 
     window.setTimeout(() => {
       this.isExpired(true);
       window.clearInterval(this.expirationIntervalId);
     }, this.expirationRemaining());
+  }
+
+  setRemaining(expirationTime) {
+    const timeToMinutes = 60 * 1000;
+    const timeToHours = timeToMinutes * 60;
+
+    const remainingTime = Math.max(expirationTime - Date.now(), 0);
+    const remainingMinutes = Math.ceil(remainingTime / timeToMinutes);
+
+    let timeLeftText = z.string.userRemainingTimeHours;
+    let timeValue = 0;
+
+    if (remainingMinutes <= 60) {
+      timeLeftText = z.string.userRemainingTimeMinutes;
+      timeValue = Math.ceil(remainingMinutes / 15) * 15;
+      this.expirationRemaining(timeValue * timeToMinutes);
+      this.expirationRemainingText(`${timeValue}m`);
+    } else if (remainingMinutes <= 90) {
+      timeValue = 1.5;
+      this.expirationRemaining(timeValue * timeToHours);
+      this.expirationRemainingText(`${timeValue}h`);
+    } else {
+      timeValue = Math.ceil(remainingMinutes / 60);
+      this.expirationRemaining(timeValue * timeToHours);
+      this.expirationRemainingText(`${timeValue}h`);
+    }
+    this.expirationIsUrgent(remainingMinutes < 120);
+    this.expirationText(z.l10n.text(timeLeftText, timeValue));
   }
 };

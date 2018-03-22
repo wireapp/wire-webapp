@@ -27,10 +27,11 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
     this.conversation = params.conversation;
     this.calling_repository = params.calling_repository;
     this.is_selected = params.is_selected;
+    this.temporaryUserStyle = params.temporaryUserStyle;
 
     this.on_join_call = () => {
-      const media_type = this.call().isRemoteVideoSend() ? z.media.MediaType.AUDIO_VIDEO : z.media.MediaType.AUDIO;
-      amplify.publish(z.event.WebApp.CALL.STATE.JOIN, this.conversation.id, media_type);
+      const mediaType = this.call().isRemoteVideoSend() ? z.media.MediaType.AUDIO_VIDEO : z.media.MediaType.AUDIO;
+      amplify.publish(z.event.WebApp.CALL.STATE.JOIN, this.conversation.id, mediaType);
     };
 
     this.on_leave_call = () => {
@@ -139,16 +140,18 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
 ko.components.register('conversation-list-calling-cell', {
   template: `
     <div class="conversation-list-calling-cell conversation-list-cell" data-bind="attr: {'data-uie-uid': conversation.id, 'data-uie-value': conversation.display_name}, css: {'conversation-list-cell-active': is_selected(conversation)}" data-uie-name="item-call">
-      <div class="conversation-list-cell-left">
-        <!-- ko if: conversation.is_group() -->
-          <group-avatar class="conversation-list-cell-avatar-arrow" params="users: users(), conversation: conversation"></group-avatar>
-        <!-- /ko -->
-        <!-- ko if: !conversation.is_group() && users().length -->
-          <participant-avatar params="participant: users()[0], size: z.components.ParticipantAvatar.SIZE.SMALL"></participant-avatar>
-        <!-- /ko -->
-      </div>
-      <div class="conversation-list-cell-center">
-        <span class="conversation-list-cell-name" data-bind="text: conversation.display_name(), css: {'text-theme': is_selected(conversation)}"></span>
+      <!-- ko ifnot: temporaryUserStyle -->
+        <div class="conversation-list-cell-left">
+          <!-- ko if: conversation.is_group() -->
+            <group-avatar class="conversation-list-cell-avatar-arrow" params="users: users(), conversation: conversation"></group-avatar>
+          <!-- /ko -->
+          <!-- ko if: !conversation.is_group() && users().length -->
+            <participant-avatar params="participant: users()[0], size: z.components.ParticipantAvatar.SIZE.SMALL"></participant-avatar>
+          <!-- /ko -->
+        </div>
+      <!-- /ko -->
+      <div class="conversation-list-cell-center" data-bind="css: {'conversation-list-cell-center-no-left': temporaryUserStyle}">
+        <span class="conversation-list-cell-name" data-bind="text: conversation.display_name(), css: {'text-theme': is_selected(conversation) && !temporaryUserStyle}"></span>
         <!-- ko if: call_is_outgoing -->
           <span class="conversation-list-cell-description" data-bind="l10n_text: z.string.callStateOutgoing" data-uie-name="call-label-outgoing"></span>
         <!-- /ko -->

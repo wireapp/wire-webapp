@@ -60,6 +60,7 @@ class ConversationJoin extends Component {
     conversationKey: null,
     enteredName: '',
     error: null,
+    expiresIn: undefined,
     forceNewTemporaryGuestAccount: false,
     isValidLink: true,
     isValidName: true,
@@ -69,9 +70,14 @@ class ConversationJoin extends Component {
   readAndUpdateParamsFromUrl = (nextProps = this.props) => {
     const conversationCode = nextProps.match.params.conversationCode;
     const conversationKey = nextProps.match.params.conversationKey;
-    const keyOrCodeChanged =
-      conversationCode !== this.state.conversationCode || conversationKey !== this.state.conversationKey;
-    if (keyOrCodeChanged) {
+    const expiresIn = parseInt(nextProps.match.params.expiresIn, 10) || undefined;
+
+    const urlParamsChanged =
+      conversationCode !== this.state.conversationCode ||
+      conversationKey !== this.state.conversationKey ||
+      expiresIn !== this.state.expiresIn;
+
+    if (urlParamsChanged) {
       this.props
         .doInit()
         .then(() => {
@@ -79,6 +85,7 @@ class ConversationJoin extends Component {
             ...state,
             conversationCode,
             conversationKey,
+            expiresIn,
             isValidLink: true,
           }));
         })
@@ -116,9 +123,10 @@ class ConversationJoin extends Component {
     } else {
       Promise.resolve(this.nameInput.value)
         .then(name => name.trim())
-        .then(name => this.props.doRegisterWireless({name}))
+        .then(name => this.props.doRegisterWireless({expires_in: this.state.expiresIn, name}))
         .then(() => this.props.doJoinConversationByCode(this.state.conversationKey, this.state.conversationCode))
-        .then(() => window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP)));
+        .then(() => window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP)))
+        .catch(error => this.props.doLogout());
     }
     this.nameInput.focus();
   };
@@ -151,12 +159,6 @@ class ConversationJoin extends Component {
         <Button onClick={this.onOpenWireClick} data-uie-name="do-open">
           {_(conversationJoinStrings.existentAccountOpenButton)}
         </Button>
-        <Small block>
-          {`${_(conversationJoinStrings.acceptTou)} `}
-          <Link href={EXTERNAL_ROUTE.WIRE_TERMS_PERSONAL} textTransform={'none'} data-uie-name="go-tou">
-            {_(conversationJoinStrings.touLink)}
-          </Link>
-        </Small>
         <Small block>
           <Link
             onClick={() => this.setState({...this.state, forceNewTemporaryGuestAccount: true})}
@@ -215,12 +217,6 @@ class ConversationJoin extends Component {
           </ErrorMessage>
         </Form>
         <Small block>
-          {`${_(conversationJoinStrings.acceptTou)} `}
-          <Link href={EXTERNAL_ROUTE.WIRE_TERMS_PERSONAL} textTransform={'none'} data-uie-name="go-tou">
-            {_(conversationJoinStrings.touLink)}
-          </Link>
-        </Small>
-        <Small block>
           {`${_(conversationJoinStrings.hasAccount)} `}
           <Link
             component={RRLink}
@@ -254,7 +250,7 @@ class ConversationJoin extends Component {
   };
 
   renderJoin = () => {
-    const {error, isAuthenticated} = this.props;
+    const {error, isAuthenticated, isTemporaryGuest} = this.props;
     const {isValidLink, forceNewTemporaryGuestAccount} = this.state;
 
     if (!isValidLink) {
@@ -263,7 +259,7 @@ class ConversationJoin extends Component {
     if (this.isConversationFullError(error)) {
       return this.renderFullConversation();
     }
-    const renderTemporaryGuestAccountCreation = !isAuthenticated || forceNewTemporaryGuestAccount;
+    const renderTemporaryGuestAccountCreation = !isAuthenticated || isTemporaryGuest || forceNewTemporaryGuestAccount;
     return renderTemporaryGuestAccountCreation ? this.renderTemporaryGuestAccount() : this.renderActivatedAccount();
   };
 
@@ -288,6 +284,7 @@ export default withRouter(
         error: ConversationSelector.getError(state),
         isAuthenticated: AuthSelector.isAuthenticated(state),
         isFetching: ConversationSelector.isFetching(state),
+        isTemporaryGuest: SelfSelector.isTemporaryGuest(state),
         selfName: SelfSelector.getSelfName(state),
       }),
       {...ConversationAction, ...AuthAction}

@@ -34,6 +34,17 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
     };
   }
 
+  static get DIAMETER() {
+    return {
+      [ParticipantAvatar.SIZE.LARGE]: 72,
+      [ParticipantAvatar.SIZE.MEDIUM]: 40,
+      [ParticipantAvatar.SIZE.SMALL]: 28,
+      [ParticipantAvatar.SIZE.X_LARGE]: 200,
+      [ParticipantAvatar.SIZE.X_SMALL]: 24,
+      [ParticipantAvatar.SIZE.XX_SMALL]: 20,
+    };
+  }
+
   constructor(params, componentInfo) {
     const isParticipantObservable = typeof params.participant === 'function';
     this.participant = isParticipantObservable ? params.participant : ko.observable(params.participant);
@@ -49,29 +60,28 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
     this.isTemporaryGuest = ko.pureComputed(() => this.isUser() && this.participant().isTemporaryGuest());
 
     this.remainingTimer = undefined;
-    this.timerLength = 15.5 * Math.PI * 2;
-    this.timerOffset = ko.observable();
-
-    this.isTemporaryGuest.subscribe(isTemporaryGuest => {
-      if (this.remainingTimer) {
-        this.remainingTimer.dispose();
-        this.remainingTimer = undefined;
-      }
-
-      if (isTemporaryGuest) {
-        this.remainingTimer = ko.computed(() => {
-          const remainingTime = this.participant().expirationRemaining();
-          const normalizedRemainingTime = remainingTime / z.entity.User.CONFIG.TEMPORARY_GUEST.LIFETIME;
-          this.timerOffset(this.timerLength * (normalizedRemainingTime - 1));
-        });
-      }
-    });
 
     this.avatarType = ko.pureComputed(() => `${this.isUser() ? 'user' : 'service'}-avatar`);
     this.delay = params.delay;
     this.size = params.size || ParticipantAvatar.SIZE.LARGE;
     this.element = $(componentInfo.element);
     this.element.addClass(`${this.avatarType()} ${this.size}`);
+
+    const borderScale = 0.9916;
+    const finalBorderWidth = this.size === ParticipantAvatar.SIZE.X_LARGE ? 4 : 1;
+    this.borderWidth = finalBorderWidth / ParticipantAvatar.DIAMETER[this.size] * 32;
+    this.borderRadius = (16 - this.borderWidth / 2) * borderScale;
+    this.timerLength = this.borderRadius * Math.PI * 2;
+    this.timerOffset = ko.observable();
+
+    this.timerOffset = ko.pureComputed(() => {
+      if (this.isTemporaryGuest()) {
+        const remainingTime = this.participant().expirationRemaining();
+        const normalizedRemainingTime = remainingTime / z.entity.User.CONFIG.TEMPORARY_GUEST.LIFETIME;
+        return this.timerLength * (normalizedRemainingTime - 1);
+      }
+      return 0;
+    });
 
     this.avatarLoadingBlocked = false;
     this.avatarEnteredViewport = false;
@@ -101,7 +111,7 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
           return 'self';
         case typeof params.selected === 'function' && params.selected():
           return 'selected';
-        case this.participant().is_team_member():
+        case this.participant().isTeamMember():
           return '';
         case this.participant().is_blocked():
           return 'blocked';
@@ -146,11 +156,10 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
 
         const pictureResource = this.participant().previewPictureResource();
         if (pictureResource) {
-          const {LARGE, X_LARGE} = ParticipantAvatar.SIZE;
-          const isSmall = this.size !== LARGE && this.size !== X_LARGE;
+          const isSmall = this.size !== ParticipantAvatar.SIZE.LARGE && this.size !== ParticipantAvatar.SIZE.X_LARGE;
           const isCached = pictureResource.downloadProgress() === 100;
 
-          pictureResource.get_object_url().then(url => {
+          pictureResource.getObjectUrl().then(url => {
             const image = new Image();
             image.src = url;
             this.element.find('.avatar-image').html(image);
@@ -198,9 +207,9 @@ ko.components.register('participant-avatar', {
       <!-- /ko -->
       <div class="avatar-border"></div>
       <!-- ko if: isTemporaryGuest() -->
-        <svg class="avatar-temporary-guest-border" viewBox="0 0 32 32" data-bind="attr: {stroke: participant.accent_color}">
-          <circle cx="16" cy="16" r="15.5" stroke-width="1" transform="rotate(-90 16 16)" fill="none"
-             data-bind="attr: {'stroke-dasharray': timerLength, 'stroke-dashoffset': timerOffset}">
+        <svg class="avatar-temporary-guest-border" viewBox="0 0 32 32" data-bind="attr: {stroke: participant().accent_color()}">
+          <circle cx="16" cy="16" transform="rotate(-90 16 16)" fill="none"
+             data-bind="attr: {'stroke-dasharray': timerLength, 'stroke-dashoffset': timerOffset, 'r': borderRadius, 'stroke-width': borderWidth}">
           </circle>
         </svg>
       <!-- /ko -->
