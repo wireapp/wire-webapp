@@ -25,12 +25,9 @@ z.string.sk.nonexistentUser = 'Odstránený používateľ';
 z.string.sk.and = 'a';
 
 z.string.sk.authAccountCountryCode = 'Kód krajiny';
-z.string.sk.authAccountDeletion = 'Boli ste odhlásení, pretože vaše konto bolo odstránené.';
-z.string.sk.authAccountExpiration = 'Boli ste odhlásení pretože vypršala platnosť Vášho sedenia. Prihláste sa prosím znova.';
 z.string.sk.authAccountPasswordForgot = 'Zabudnuté heslo';
 z.string.sk.authAccountPublicComputer = 'Toto je verejný počítač';
 z.string.sk.authAccountSignIn = 'Prihlásenie';
-z.string.sk.authAccountSignInEmail = 'E-mail';
 z.string.sk.authAccountSignInPhone = 'Telefón';
 
 z.string.sk.authBlockedCookies = 'Povoľte cookies na prihlásenie k Wire.';
@@ -101,9 +98,13 @@ z.string.sk.modalAcknowledgeAction = 'OK';
 z.string.sk.modalConfirmSecondary = 'Zrušiť';
 z.string.sk.modalOptionSecondary = 'Zrušiť';
 
+z.string.sk.modalAccountCreateAction = 'OK';
+
 z.string.sk.modalAccountDeletionAction = 'Zmazať';
 z.string.sk.modalAccountDeletionHeadline = 'Vymazať účet';
 z.string.sk.modalAccountDeletionMessage = 'Zašleme Vám e-mail, alebo SMS. Použite odkaz pre trvalé zmazanie Vášho účtu.';
+
+z.string.sk.modalAccountLeaveGuestRoomAction = 'Opustiť';
 
 z.string.sk.modalAccountLogoutAction = 'Odhlásenie';
 z.string.sk.modalAccountLogoutHeadline = 'Vymazať údaje?';
@@ -278,6 +279,7 @@ z.string.sk.conversationSomeone = 'Niekto';
 z.string.sk.conversationTweetAuthor = ' na Twitteri';
 
 z.string.sk.groupCreationParticipantsPlaceholder = 'Vyhľadať podľa mena';
+
 
 z.string.sk.collectionShowAll = 'Zobraziť všetky {{number}}';
 z.string.sk.collectionSectionLinks = 'Odkazy';
@@ -478,6 +480,7 @@ z.string.sk.searchInviteShare = 'Zdieľať kontakty';
 
 z.string.sk.searchListEveryoneParticipates = 'Všetci pripojení sú už v tomto rozhovore.';
 z.string.sk.searchListNoMatches = 'Žiadne výsledky. Skúste zadať iné meno.';
+
 
 z.string.sk.uploadGoogleHeadline = 'Nájsť ľudí\npre rozhovor.';
 z.string.sk.uploadGoogleMessage = 'Vaše údaje o kontaktoch používame na pripojenie k iným užívateľom. Všetky informácie anonymizujeme a nezdieľame ich s nikým iným.';

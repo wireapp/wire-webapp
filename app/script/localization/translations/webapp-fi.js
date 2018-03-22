@@ -24,12 +24,9 @@ z.string.fi.nonexistentUser = 'Poistettu käyttäjä';
 z.string.fi.and = 'ja';
 
 z.string.fi.authAccountCountryCode = 'Maakoodi';
-z.string.fi.authAccountDeletion = 'Sinut kirjattiin ulos, koska tilisi poistettiin.';
-z.string.fi.authAccountExpiration = 'Sinut kirjattiin ulos, koska istuntosi päättyi. Kirjaudu sisään uudelleen.';
 z.string.fi.authAccountPasswordForgot = 'Unohdin salasanani';
 z.string.fi.authAccountPublicComputer = 'Tämä on julkinen tietokone';
 z.string.fi.authAccountSignIn = 'Kirjaudu sisään';
-z.string.fi.authAccountSignInEmail = 'Sähköposti';
 z.string.fi.authAccountSignInPhone = 'Puhelinnumero';
 
 z.string.fi.authBlockedCookies = 'Salli evästeet kirjautuaksesi Wireen.';
@@ -100,9 +97,13 @@ z.string.fi.modalAcknowledgeAction = 'Ok';
 z.string.fi.modalConfirmSecondary = 'Peruuta';
 z.string.fi.modalOptionSecondary = 'Peruuta';
 
+z.string.fi.modalAccountCreateAction = 'OK';
+
 z.string.fi.modalAccountDeletionAction = 'Poista';
 z.string.fi.modalAccountDeletionHeadline = 'Poista tili';
 z.string.fi.modalAccountDeletionMessage = 'Lähetämme viestin sähköpostina tai tekstiviestinä. Paina viestissä olevaa linkkiä poistaaksesi tilisi lopullisesti.';
+
+z.string.fi.modalAccountLeaveGuestRoomAction = 'Poistu';
 
 z.string.fi.modalAccountLogoutAction = 'Kirjaudu ulos';
 z.string.fi.modalAccountLogoutHeadline = 'Tyhjennä tiedot?';
@@ -256,7 +257,7 @@ z.string.fi.conversationVerified = 'Vahvistettu';
 z.string.fi.conversationVoiceChannelDeactivate = ' soitti';
 z.string.fi.conversationVoiceChannelDeactivateYou = ' soitti';
 z.string.fi.conversationYesterday = 'Eilen';
-z.string.fi.conversationUnableToDecrypt1 = '{{user}} n viesti ei tullut perille.';
+z.string.fi.conversationUnableToDecrypt1 = 'Käyttäjän {{user}} viesti ei tullut perille.';
 z.string.fi.conversationUnableToDecrypt2 = '{{user}} n laitteen identiteetti muuttui. Perilletoimittamaton viesti.';
 z.string.fi.conversationUnableToDecryptLink = 'Miksi?';
 z.string.fi.conversationUnableToDecryptErrorMessage = 'Virhe';
@@ -281,6 +282,7 @@ z.string.fi.conversationTweetAuthor = ' Twitterissä';
 z.string.fi.groupCreationPreferencesAction = 'Seuraava';
 z.string.fi.groupCreationParticipantsActionCreate = 'Valmis';
 z.string.fi.groupCreationParticipantsPlaceholder = 'Hae nimellä';
+
 
 z.string.fi.collectionShowAll = 'Näytä kaikki {{number}}';
 z.string.fi.collectionSectionLinks = 'Linkit';
@@ -481,6 +483,7 @@ z.string.fi.searchInviteShare = 'Jaa yhteystietoja';
 
 z.string.fi.searchListEveryoneParticipates = 'Jokainen jonka kanssa olet yhdistetty on jo tässä keskustelussa.';
 z.string.fi.searchListNoMatches = 'Ei vastaavia tuloksia. Yritä toisella nimellä.';
+
 
 z.string.fi.uploadGoogleHeadline = 'Etsi ihmisiä joiden kanssa jutella.';
 z.string.fi.uploadGoogleMessage = 'Käytämme sinun kontaktitietoja yhdistääksemme sinut muiden kanssa. Anonymisoimme kaiken tiedon ja emme jaa sitä ulkopuolisille.';

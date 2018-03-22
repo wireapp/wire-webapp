@@ -25,12 +25,9 @@ z.string.pl.and = 'oraz';
 z.string.pl.enumerationAnd = ', i ';
 
 z.string.pl.authAccountCountryCode = 'Kierunkowy kraju';
-z.string.pl.authAccountDeletion = 'Zostałeś wylogowany, ponieważ Twoje konto zostało usunięte.';
-z.string.pl.authAccountExpiration = 'Zostałeś wylogowany ponieważ twoja sesja wygasła. Proszę zalogować się ponownie.';
 z.string.pl.authAccountPasswordForgot = 'Zapomniałem hasła';
 z.string.pl.authAccountPublicComputer = 'To jest komputer publiczny';
 z.string.pl.authAccountSignIn = 'Zaloguj się';
-z.string.pl.authAccountSignInEmail = 'Adres e-mail';
 z.string.pl.authAccountSignInPhone = 'Numer telefonu';
 
 z.string.pl.authBlockedCookies = 'Włącz ciasteczka do zalogowania się do Wire.';
@@ -103,9 +100,13 @@ z.string.pl.modalAcknowledgeHeadline = 'Coś poszło nie tak';
 z.string.pl.modalConfirmSecondary = 'Anuluj';
 z.string.pl.modalOptionSecondary = 'Anuluj';
 
+z.string.pl.modalAccountCreateAction = 'OK';
+
 z.string.pl.modalAccountDeletionAction = 'Usuń';
 z.string.pl.modalAccountDeletionHeadline = 'Usuń konto';
 z.string.pl.modalAccountDeletionMessage = 'Wyślemy wiadomość poprzez e-mail lub SMS. Proszę użyć tego odnośnika, żeby trwale usunąć konto.';
+
+z.string.pl.modalAccountLeaveGuestRoomAction = 'Opuść';
 
 z.string.pl.modalAccountLogoutAction = 'Wyloguj się';
 z.string.pl.modalAccountLogoutHeadline = 'Usunąć dane?';
@@ -293,6 +294,7 @@ z.string.pl.conversationTweetAuthor = ' na Twitterze';
 z.string.pl.groupCreationPreferencesAction = 'Dalej';
 z.string.pl.groupCreationParticipantsActionCreate = 'Zakończono';
 z.string.pl.groupCreationParticipantsPlaceholder = 'Szukaj według nazwy';
+
 
 z.string.pl.collectionShowAll = 'Pokaż wszystkie {{number}}';
 z.string.pl.collectionSectionLinks = 'Linki';
@@ -493,6 +495,8 @@ z.string.pl.searchInviteShare = 'Udostępnij kontakty';
 
 z.string.pl.searchListEveryoneParticipates = 'Wszyscy, z którymi masz połączenie są już w tej konwersacji.';
 z.string.pl.searchListNoMatches = 'Brak wyników. Spróbuj wprowadzić inną nazwę.';
+
+z.string.pl.temporaryGuestCta = 'Utwórz konto';
 
 z.string.pl.uploadGoogleHeadline = 'Znajdź osoby do rozmowy.';
 z.string.pl.uploadGoogleMessage = 'Wykorzystujemy Twoje dane kontaktowe do łączenia Cię z innymi. Wszystkie informacje są anonimowe i nie dzielimy ich z nikim innym.';
