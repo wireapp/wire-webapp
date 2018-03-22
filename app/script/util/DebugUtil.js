@@ -74,7 +74,7 @@ z.util.DebugUtil = class DebugUtil {
     for (const table of tables) {
       const records = table.rows;
       for (const record of records) {
-        amplify.publish('z.event.WebApp.IMPORTEXPORT.EXPORT', table.name, record);
+        amplify.publish('z.event.WebApp.IMPORTEXPORT.EXPORT', table.name, JSON.stringify(record));
       }
     }
   }
