@@ -1,6 +1,6 @@
 {
   "bin": {
-    "wire-travis-bot": "./bin/wire-travis-bot.js"
+    "wire-travis-bot": "dist/cli.js"
   },
   "dependencies": {
     "@types/generate-changelog": "1.7.0",
@@ -15,7 +15,6 @@
     "typescript": "2.7.2"
   },
   "files": [
-    "bin",
     "dist"
   ],
   "license": "GPL-3.0",
