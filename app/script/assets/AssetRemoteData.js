@@ -110,19 +110,18 @@ z.assets.AssetRemoteData = class AssetRemoteData {
     return this._loadBuffer()
       .then(({buffer, mimeType}) => {
         type = mimeType;
-        if (this.otrKey && this.sha256) {
-          return z.assets.AssetCrypto.decryptAesAsset(buffer, this.otrKey.buffer, this.sha256.buffer);
-        }
-        return buffer;
+        const isEncryptedAsset = this.otrKey && this.sha256;
+        return isEncryptedAsset
+          ? z.assets.AssetCrypto.decryptAesAsset(buffer, this.otrKey.buffer, this.sha256.buffer)
+          : buffer;
       })
       .then(plaintext => new Blob([new Uint8Array(plaintext)], {mime_type: type}))
       .catch(error => {
-        const expectedErrors = [
-          z.service.BackendClientError.STATUS_CODE.NOT_FOUND.toString(),
-          z.service.BackendClientError.STATUS_CODE.INTERNAL_SERVER_ERROR.toString(),
-        ];
+        const errorMessage = error ? error.message : '';
+        const isAssetNotFound = errorMessage.endsWith(z.service.BackendClientError.STATUS_CODE.NOT_FOUND);
+        const isServerError = errorMessage.endsWith(z.service.BackendClientError.STATUS_CODE.INTERNAL_SERVER_ERROR);
 
-        const isExpectedError = expectedErrors.includes(error.message);
+        const isExpectedError = isAssetNotFound || isServerError;
         if (!isExpectedError) {
           throw error;
         }
