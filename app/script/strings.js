@@ -519,3 +519,30 @@ export const clientItemStrings = defineMessages({
     defaultMessage: 'Password',
   },
 });
+
+export const historyInfoStrings = defineMessages({
+  hasHistoryHeadline: {
+    id: 'historyInfo.hasHistoryHeadline',
+    defaultMessage: 'You’ve used Wire on this device before',
+  },
+  noHistoryHeadline: {
+    id: 'historyInfo.noHistoryHeadline',
+    defaultMessage: 'This is the first time you are using this device',
+  },
+  hasHistoryInfo: {
+    id: 'historyInfo.hasHistoryInfo',
+    defaultMessage: 'Messages sent in the meantime<br/>will not appear here.',
+  },
+  noHistoryInfo: {
+    id: 'historyInfo.noHistoryInfo',
+    defaultMessage: 'For security reasons,<br/>your history will not be displayed.',
+  },
+  learnMore: {
+    id: 'historyInfo.learnMore',
+    defaultMessage: 'Learn more',
+  },
+  ok: {
+    id: 'historyInfo.ok',
+    defaultMessage: 'OK',
+  },
+});
