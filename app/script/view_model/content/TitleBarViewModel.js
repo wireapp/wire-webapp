@@ -25,6 +25,12 @@ window.z.viewModel.content = z.viewModel.content || {};
 
 // Parent: z.viewModel.ContentViewModel
 z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
+  static get CONFIG() {
+    return {
+      DRAG_THRESHOLD: 2,
+    };
+  }
+
   constructor(mainViewModel, contentViewModel, repositories) {
     this.addedToView = this.addedToView.bind(this);
 
@@ -126,9 +132,10 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
 
   onMouseMove(_, event) {
     if (this.isDragged && !this.isMoved) {
-      const diffX = Math.abs(event.screenX - this.startX);
-      const diffY = Math.abs(event.screenY - this.startY);
-      this.isMoved = diffX > 2 || diffY > 2;
+      const distanceX = Math.abs(event.screenX - this.startX);
+      const distanceY = Math.abs(event.screenY - this.startY);
+      this.isMoved =
+        distanceX > TitleBarViewModel.CONFIG.DRAG_THRESHOLD || distanceY > TitleBarViewModel.CONFIG.DRAG_THRESHOLD;
     }
   }
 
