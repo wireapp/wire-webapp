@@ -168,7 +168,7 @@ z.viewModel.ListViewModel = class ListViewModel {
   }
 
   openPreferencesAccount() {
-    if (!this.selfUser().isTemporaryGuest()) {
+    if (this.isActivatedAccount()) {
       this.dismissModal();
     }
 
@@ -201,7 +201,7 @@ z.viewModel.ListViewModel = class ListViewModel {
   }
 
   openConversations() {
-    if (!this.selfUser().isTemporaryGuest()) {
+    if (this.isActivatedAccount()) {
       this.switchList(ListViewModel.STATE.CONVERSATIONS, false);
     }
   }
