@@ -120,7 +120,7 @@ describe('z.cryptography.CryptographyRepository', () => {
 
       const plainText = 'Hello, Alice!';
 
-      const genericMessage = new z.proto.GenericMessage(z.util.create_random_uuid());
+      const genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
       genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT, new z.proto.Text(plainText));
 
       const cipherText = await bob.encrypt(
@@ -128,14 +128,14 @@ describe('z.cryptography.CryptographyRepository', () => {
         genericMessage.toArrayBuffer(),
         aliceBundle.serialise()
       );
-      const encodedCipherText = z.util.array_to_base64(cipherText);
+      const encodedCipherText = z.util.arrayToBase64(cipherText);
 
       const mockedEvent = {
         data: {
           text: encodedCipherText,
         },
-        from: z.util.create_random_uuid(),
-        id: z.util.create_random_uuid(),
+        from: z.util.createRandomUuid(),
+        id: z.util.createRandomUuid(),
       };
 
       const decrypted = await TestFactory.cryptography_repository.handleEncryptedEvent(mockedEvent);
