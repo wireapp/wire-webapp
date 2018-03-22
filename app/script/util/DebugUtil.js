@@ -58,6 +58,20 @@ z.util.DebugUtil = class DebugUtil {
       .then(() => this.logger.log(`Corrupted Session ID '${sessionId}'`));
   }
 
+  // wire.app.util.debug.exportHistory()
+  exportHistory() {
+    const db = wire.app.repository.storage.storageService.db;
+    return db.transaction('r', db.tables, () => {
+      return Promise.all(
+        db.tables.map(table => {
+          return table.toArray().then(rows => {
+            return {rows, table: table.name};
+          });
+        })
+      );
+    });
+  }
+
   getEventInfo(event) {
     const debugInformation = {event};
 
