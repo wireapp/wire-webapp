@@ -116,7 +116,7 @@ z.viewModel.panel.AddParticipantsViewModel = class AddParticipantsViewModel {
   }
 
   clickOnClose() {
-    this.panelViewModel.closePanel().then(() => this.resetView());
+    this.panelViewModel.closePanel().then(didClose => didClose && this.resetView());
   }
 
   clickOnSelectService(serviceEntity) {

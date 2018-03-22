@@ -104,6 +104,7 @@ z.user.UserMapper = class UserMapper {
       phone,
       picture,
       service,
+      team,
     } = userData;
 
     if (accentId) {
@@ -143,6 +144,11 @@ z.user.UserMapper = class UserMapper {
       userEntity.isBot = true;
       userEntity.providerId = service.provider;
       userEntity.serviceId = service.id;
+    }
+
+    if (team) {
+      userEntity.inTeam(true);
+      userEntity.teamId = team;
     }
 
     return userEntity;

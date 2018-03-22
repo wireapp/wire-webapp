@@ -86,7 +86,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
           return this.editInput();
         }
 
-        if (this.hasConversation()) {
+        if (this.conversationEntity()) {
           return this.conversationEntity().input() || '';
         }
 
@@ -138,7 +138,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
         const isOne2OneConversation = this.conversationEntity().is_one2one();
         const firstUserEntity = this.conversationEntity().firstUserEntity();
         const availabilityIsNone = firstUserEntity.availability() === z.user.AvailabilityType.NONE;
-        return this.selfUser().is_team_member() && isOne2OneConversation && !availabilityIsNone;
+        return this.selfUser().inTeam() && isOne2OneConversation && !availabilityIsNone;
       }
 
       return false;
@@ -254,14 +254,8 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     }
   }
 
-  clickToSendPastedFile() {
-    const pastedFile = this.pastedFile();
-    this.onDropFiles([pastedFile]);
-    this.pastedFile(null);
-  }
-
   editMessage(messageEntity, inputElement) {
-    if (messageEntity && (messageEntity.is_editable() && messageEntity !== this.editMessageEntity())) {
+    if (messageEntity && messageEntity.is_editable() && messageEntity !== this.editMessageEntity()) {
       this.cancelMessageEditing();
       this.editMessageEntity(messageEntity);
       this.editMessageEntity().isEditing(true);
@@ -276,7 +270,8 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     const images = [];
     const files = [];
 
-    if (!this._isHittingUploadLimit(droppedFiles)) {
+    const tooManyConcurrentUploads = this._isHittingUploadLimit(droppedFiles);
+    if (!tooManyConcurrentUploads) {
       Array.from(droppedFiles).forEach(file => {
         const isSupportedImage = InputBarViewModel.CONFIG.IMAGE.FILE_TYPES.includes(file.type);
         if (isSupportedImage) {
@@ -309,7 +304,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
   onInputEnter(data, event) {
     if (this.pastedFile()) {
-      return this.onSendPastedFile();
+      return this.sendPastedFile();
     }
 
     const messageText = z.util.StringUtil.trimLineBreaks(this.input());
@@ -340,7 +335,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     if (!inputHandledByEmoji) {
       switch (keyboardEvent.key) {
         case z.util.KeyboardUtil.KEY.ARROW_UP: {
-          if (!this.input().length) {
+          if (!z.util.KeyboardUtil.isFunctionKey(keyboardEvent) && !this.input().length) {
             this.editMessage(this.conversationEntity().get_last_editable_message(), keyboardEvent.target);
           }
           break;
@@ -428,6 +423,11 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     if (isTextChange) {
       this.conversationRepository.send_message_edit(messageText, messageEntity, this.conversationEntity());
     }
+  }
+
+  sendPastedFile() {
+    this.onDropFiles([this.pastedFile()]);
+    this.pastedFile(null);
   }
 
   /**

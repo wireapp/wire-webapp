@@ -174,9 +174,13 @@ z.assets.AssetService = class AssetService {
   }
 
   getAssetRetention(userEntity, conversationEntity) {
-    const isTeamMember = userEntity.is_team_member();
+    const isTeamMember = userEntity.inTeam();
     const isTeamConversation = conversationEntity.inTeam();
-    const isEternal = isTeamMember || isTeamConversation;
+    const isTeamUserInConversation = conversationEntity
+      .participating_user_ets()
+      .some(conversationParticipant => conversationParticipant.inTeam());
+
+    const isEternal = isTeamMember || isTeamConversation || isTeamUserInConversation;
     return isEternal ? z.assets.AssetRetentionPolicy.ETERNAL : z.assets.AssetRetentionPolicy.PERSISTENT;
   }
 

@@ -21,8 +21,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background-image: linear-gradient(0deg, #2391d3, #68b3e0);
-  color: #fff;
+  background-color: @app-bg;
+  color: @graphite;
   position: absolute;
   height: 100%;
   width: 100%;
@@ -31,43 +31,42 @@
     white-space: pre;
     overflow: hidden;
     text-overflow: ellipsis;
-    color: #fff;
     font-size: @font-size-xs;
-    height: 12px;
-    margin-bottom: 16px;
+    height: 14px;
+    margin-bottom: 14px;
   }
 
   .progress-bar {
+    @light: fade(#000, 4%);
+    @dark: fade(#000, 8%);
+    @rotation: 127deg;
+    @size: 14px;
+    @rotatedSize: (abs(cos(@rotation)) + abs(sin(@rotation))) * @size;
+
     width: 256px;
     height: 4px;
     border: none;
     border-radius: 2px;
     -webkit-appearance: none;
-    background-color: fade(#000, 24%);
-    background-image: repeating-linear-gradient(
-      -45deg,
-      fade(#000, 32%),
-      fade(#000, 32%) 5px,
-      fade(#000, 8%) 4px,
-      fade(#000, 8%) 10px
-    );
-    background-size: 14px 14px;
+    background-image: linear-gradient(@rotation, @light, @light 5px, @dark 7px, @dark 12px, @light 14px);
     animation: move 0.5s linear infinite;
     overflow: hidden;
+    background-size: @rotatedSize 4px;
 
     > div {
       width: 0;
       height: 100%;
-      background-color: #fff;
+      background-color: @w-blue;
+      border-radius: 2px;
     }
-  }
-}
 
-@keyframes move {
-  0% {
-    background-position: 0 0;
-  }
-  100% {
-    background-position: 28px 0;
+    @keyframes move {
+      0% {
+        background-position: 0 0;
+      }
+      100% {
+        background-position: @rotatedSize 0;
+      }
+    }
   }
 }

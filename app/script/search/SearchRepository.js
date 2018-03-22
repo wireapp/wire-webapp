@@ -86,7 +86,7 @@ z.search.SearchRepository = class SearchRepository {
       })
       .then(userIds => this.userRepository.get_users_by_id(userIds))
       .then(userEntities => {
-        return userEntities.filter(userEntity => !userEntity.is_connected() && !userEntity.is_team_member());
+        return userEntities.filter(userEntity => !userEntity.is_connected() && !userEntity.isTeamMember());
       })
       .then(userEntities => {
         if (isHandle) {
