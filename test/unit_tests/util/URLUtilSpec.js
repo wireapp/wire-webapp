@@ -19,8 +19,6 @@
 
 // grunt test_init && grunt test_run:util/URLUtil
 
-'use strict';
-
 describe('z.util.URLUtil', () => {
   describe('appendParameter', () => {
     it('append param with & when url contains param', () => {
@@ -34,31 +32,23 @@ describe('z.util.URLUtil', () => {
 
   describe('forwardParameter', () => {
     it('forwards existing URL parameter set to true', () => {
-      spyOn(z.util.URLUtil, 'getParameter').and.callFake(parameterValue => {
-        return parameterValue === z.auth.URLParameter.TRACKING;
-      });
-      expect(z.util.URLUtil.forwardParameter('foo.com', z.auth.URLParameter.TRACKING)).toBe('foo.com?tracking=true');
+      const url = z.util.URLUtil.forwardParameter('foo.com', z.auth.URLParameter.TRACKING, '?tracking=true');
+      expect(url).toBe('foo.com?tracking=true');
     });
 
     it('forwards existing URL parameter set to false', () => {
-      spyOn(z.util.URLUtil, 'getParameter').and.callFake(parameterValue => {
-        return parameterValue !== z.auth.URLParameter.TRACKING;
-      });
-      expect(z.util.URLUtil.forwardParameter('foo.com', z.auth.URLParameter.TRACKING)).toBe('foo.com?tracking=false');
+      const url = z.util.URLUtil.forwardParameter('foo.com', z.auth.URLParameter.TRACKING, '?tracking=false');
+      expect(url).toBe('foo.com?tracking=false');
     });
 
     it('forwards existing URL parameter with string value', () => {
-      spyOn(z.util.URLUtil, 'getParameter').and.callFake(parameterValue => {
-        return parameterValue === z.auth.URLParameter.TRACKING ? 'bar' : false;
-      });
-      expect(z.util.URLUtil.forwardParameter('foo.com', z.auth.URLParameter.TRACKING)).toBe('foo.com?tracking=bar');
+      const url = z.util.URLUtil.forwardParameter('foo.com', z.auth.URLParameter.TRACKING, '?tracking=bar');
+      expect(url).toBe('foo.com?tracking=bar');
     });
 
     it('ignored non-existing URL parameters', () => {
-      spyOn(z.util.URLUtil, 'getParameter').and.callFake(parameterValue => {
-        return parameterValue === z.auth.URLParameter.TRACKING ? null : true;
-      });
-      expect(z.util.URLUtil.forwardParameter('foo.com', z.auth.URLParameter.TRACKING)).toBe('foo.com');
+      const url = z.util.URLUtil.forwardParameter('foo.com', z.auth.URLParameter.TRACKING, '?bot=bar');
+      expect(url).toBe('foo.com');
     });
   });
 

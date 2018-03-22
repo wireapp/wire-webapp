@@ -43,8 +43,8 @@ z.util.URLUtil = (() => {
 
   const _buildUrl = (type, path = '') => `${_getDomain(type)}${path && path.startsWith('/') ? path : ''}`;
 
-  const _forwardParameter = (url, parameterName) => {
-    const parameterValue = _getParameter(parameterName);
+  const _forwardParameter = (url, parameterName, locationSearch = window.location.search) => {
+    const parameterValue = _getParameter(parameterName, locationSearch);
     const hasValue = parameterValue != null;
     return hasValue ? _appendParameter(url, `${parameterName}=${parameterValue}`) : url;
   };
@@ -81,27 +81,30 @@ z.util.URLUtil = (() => {
       .replace('www.', '');
   };
 
-  const _getParameter = name => {
-    const params = window.location.search.substring(1).split('&');
-    for (const param of params) {
-      let value = param.split('=');
-      if (value[0] === name) {
-        if (value[1]) {
-          value = window.decodeURI(value[1]);
+  const _getParameter = (parameterName, locationSearch = window.location.search) => {
+    const searchParameters = locationSearch.substring(1).split('&');
+    for (const searchParam of searchParameters) {
+      const [parameter, value] = searchParam.split('=');
+      const isExpectedParameter = parameter === parameterName;
+      if (isExpectedParameter) {
+        if (value) {
+          const decodedValue = window.decodeURI(value);
 
-          if (value === 'false') {
+          if (decodedValue === 'false') {
             return false;
           }
 
-          if (value === 'true') {
+          if (decodedValue === 'true') {
             return true;
           }
 
           return value;
         }
+
         return true;
       }
     }
+
     return null;
   };
 
@@ -113,11 +116,8 @@ z.util.URLUtil = (() => {
     const anchorTags = new RegExp(/<a[\s]+([^>]+)>((?:.(?!\<\/a\>))*.)<\/a>/, 'g');
     const links = html.match(anchorTags);
 
-    if (links && links.length) {
-      return links.map(element => $(element)[0]);
-    }
-
-    return [];
+    const hasLinks = links && links.length;
+    return hasLinks ? links.map(element => $(element)[0]) : [];
   };
 
   const _isProductionBackend = () => z.util.Environment.backend.current === z.service.BackendEnvironment.PRODUCTION;
