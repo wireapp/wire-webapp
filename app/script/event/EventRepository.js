@@ -364,10 +364,9 @@ z.event.EventRepository = class EventRepository {
    * @returns {string} ID of last known notification
    */
   _getLastKnownNotificationId() {
-    if (this.notificationsQueue().length) {
-      return this.notificationsQueue()[this.notificationsQueue().length - 1].id;
-    }
-    return this.lastNotificationId();
+    return this.notificationsQueue().length
+      ? this.notificationsQueue()[this.notificationsQueue().length - 1].id
+      : this.lastNotificationId();
   }
 
   /**
@@ -524,11 +523,11 @@ z.event.EventRepository = class EventRepository {
   _distributeEvent(event, source) {
     const {conversation: conversationId, from: userId, type} = event;
 
-    if (conversationId && userId) {
-      this.logger.info(`Distributed '${type}' event for conversation '${conversationId}' from user '${userId}'`, event);
-    } else {
-      this.logger.info(`Distributed '${type}' event`, event);
-    }
+    const hasIds = conversationId && userId;
+    const logMessage = hasIds
+      ? `Distributed '${type}' event for conversation '${conversationId}' from user '${userId}'`
+      : `Distributed '${type}' event`;
+    this.logger.info(logMessage, event);
 
     const [category] = type.split('.');
     switch (category) {
