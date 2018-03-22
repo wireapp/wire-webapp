@@ -36,8 +36,8 @@ z.viewModel.list.PreferencesListViewModel = class PreferencesListViewModel {
     this.userRepository = repositories.user;
     this.logger = new z.util.Logger('z.viewModel.list.PreferencesListViewModel', z.config.LOGGER.OPTIONS);
 
-    this.contentState = this.contentViewModel.state;
     this.contentViewModel = this.mainViewModel.content;
+    this.contentState = this.contentViewModel.state;
     this.isActivatedAccount = this.mainViewModel.isActivatedAccount;
 
     this.selectedAbout = ko.pureComputed(() => {
