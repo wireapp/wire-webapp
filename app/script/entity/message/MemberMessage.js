@@ -75,24 +75,37 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
 
       switch (this.memberMessageType) {
         case z.message.SystemMessageType.CONNECTION_ACCEPTED:
-        case z.message.SystemMessageType.CONNECTION_REQUEST:
+        case z.message.SystemMessageType.CONNECTION_REQUEST: {
           return this._getCaptionConnection(this.otherUser());
-        case z.message.SystemMessageType.CONVERSATION_CREATE:
+        }
+
+        case z.message.SystemMessageType.CONVERSATION_CREATE: {
           if (this.name().length) {
             return z.l10n.text(z.string.conversationCreateWith, this._generateNameString(z.string.Declension.DATIVE));
           }
+
           if (this.user().is_me) {
             return z.l10n.text(z.string.conversationCreateYou, this._generateNameString());
           }
+
           return z.l10n.text(z.string.conversationCreate, this._generateNameString(z.string.Declension.DATIVE));
-        case z.message.SystemMessageType.CONVERSATION_RESUME:
+        }
+
+        case z.message.SystemMessageType.CONVERSATION_RESUME: {
           return z.l10n.text(z.string.conversationResume, this._generateNameString(z.string.Declension.DATIVE));
+        }
+
         default:
           break;
       }
 
       switch (this.type) {
-        case z.event.Backend.CONVERSATION.MEMBER_LEAVE:
+        case z.event.Backend.CONVERSATION.MEMBER_LEAVE: {
+          const temporaryGuestRemoval = this.user().is_me && this.user().isTemporaryGuest();
+          if (temporaryGuestRemoval) {
+            return z.string.text(z.string.temporaryGuestLeaveMessage);
+          }
+
           const senderLeft = this.otherUser().id === this.user().id;
           if (senderLeft) {
             const userLeftStringId = this.user().is_me
@@ -105,7 +118,9 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
             ? z.string.conversationMemberLeaveRemovedYou
             : z.string.conversationMemberLeaveRemoved;
           return z.l10n.text(userRemovedStringId, this._generateNameString());
-        case z.event.Backend.CONVERSATION.MEMBER_JOIN:
+        }
+
+        case z.event.Backend.CONVERSATION.MEMBER_JOIN: {
           const senderJoined = this.otherUser().id === this.user().id;
           if (senderJoined) {
             const userJoinedStringId = this.user().is_me
@@ -119,8 +134,12 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
             : z.string.conversationMemberJoin;
 
           return z.l10n.text(userJoinedStringId, this._generateNameString());
-        case z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE:
+        }
+
+        case z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE: {
           return z.l10n.text(z.string.conversationTeamLeave);
+        }
+
         default:
           break;
       }

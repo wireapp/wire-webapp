@@ -40,6 +40,7 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
 
     this.actionsViewModel = this.mainViewModel.actions;
     this.conversationEntity = this.conversationRepository.active_conversation;
+    this.isActivatedAccount = this.mainViewModel.isActivatedAccount;
     this.isTeam = this.teamRepository.isTeam;
     this.isTeamOnly = this.panelViewModel.isTeamOnly;
     this.showIntegrations = this.panelViewModel.showIntegrations;
@@ -98,7 +99,7 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
 
     this.isNameEditable = ko.pureComputed(() => {
       if (this.hasConversation()) {
-        return this.conversationEntity().is_group() && !this.conversationEntity().removed_from_conversation();
+        return this.conversationEntity().is_group() && this.conversationEntity().isActiveParticipant();
       }
     });
 
@@ -127,11 +128,6 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
     this.showActionCancelRequest = ko.pureComputed(() => this.conversationEntity().is_request());
     this.showActionClear = ko.pureComputed(() => {
       return !this.conversationEntity().is_request() && !this.conversationEntity().is_cleared();
-    });
-    this.showActionDevices = ko.pureComputed(() => {
-      if (this.conversationEntity().is_one2one() && this.firstParticipant()) {
-        return this.firstParticipant().is_connected() || this.firstParticipant().is_team_member();
-      }
     });
     this.showActionGuestOptions = ko.pureComputed(() => this.conversationEntity().inTeam());
     this.showActionLeave = ko.pureComputed(() => {

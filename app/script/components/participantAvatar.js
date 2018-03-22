@@ -60,17 +60,6 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
     this.isTemporaryGuest = ko.pureComputed(() => this.isUser() && this.participant().isTemporaryGuest());
 
     this.remainingTimer = undefined;
-    this.timerLength = 15.5 * Math.PI * 2;
-    this.timerOffset = ko.observable();
-
-    this.timerOffset = ko.pureComputed(() => {
-      if (this.isTemporaryGuest()) {
-        const remainingTime = this.participant().expirationRemaining();
-        const normalizedRemainingTime = remainingTime / z.entity.User.CONFIG.TEMPORARY_GUEST.LIFETIME;
-        return this.timerLength * (normalizedRemainingTime - 1);
-      }
-      return 0;
-    });
 
     this.avatarType = ko.pureComputed(() => `${this.isUser() ? 'user' : 'service'}-avatar`);
     this.delay = params.delay;
@@ -82,6 +71,17 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
     const finalBorderWidth = this.size === ParticipantAvatar.SIZE.X_LARGE ? 4 : 1;
     this.borderWidth = finalBorderWidth / ParticipantAvatar.DIAMETER[this.size] * 32;
     this.borderRadius = (16 - this.borderWidth / 2) * borderScale;
+    this.timerLength = this.borderRadius * Math.PI * 2;
+    this.timerOffset = ko.observable();
+
+    this.timerOffset = ko.pureComputed(() => {
+      if (this.isTemporaryGuest()) {
+        const remainingTime = this.participant().expirationRemaining();
+        const normalizedRemainingTime = remainingTime / z.entity.User.CONFIG.TEMPORARY_GUEST.LIFETIME;
+        return this.timerLength * (normalizedRemainingTime - 1);
+      }
+      return 0;
+    });
 
     this.avatarLoadingBlocked = false;
     this.avatarEnteredViewport = false;

@@ -107,7 +107,10 @@ class ClientItem extends React.Component {
     const {validationError, validPassword, password} = this.state;
     return (
       <ContainerXS>
-        <ContainerXS style={selected ? {backgroundColor: 'white', borderRadius: '10px'} : {}} data-uie-value={client.model}>
+        <ContainerXS
+          style={selected ? {backgroundColor: 'white', borderRadius: '10px'} : {}}
+          data-uie-value={client.model}
+        >
           <ContainerXS
             onClick={this.wrappedOnClick}
             style={

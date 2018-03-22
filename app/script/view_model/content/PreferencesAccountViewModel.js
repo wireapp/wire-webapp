@@ -47,11 +47,14 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
     this.logger = new z.util.Logger('z.viewModel.content.PreferencesAccountViewModel', z.config.LOGGER.OPTIONS);
 
+    this.mainViewModel = mainViewModel;
     this.clientRepository = repositories.client;
     this.teamRepository = repositories.team;
     this.userRepository = repositories.user;
 
+    this.isActivatedAccount = this.mainViewModel.isActivatedAccount;
     this.selfUser = this.userRepository.self;
+
     this.newClients = ko.observableArray([]);
     this.name = ko.pureComputed(() => this.selfUser().name());
     this.availability = ko.pureComputed(() => this.selfUser().availability());
@@ -204,6 +207,19 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
         message: z.l10n.text(z.string.modalAccountDeletionMessage),
         title: z.l10n.text(z.string.modalAccountDeletionHeadline),
       },
+    });
+  }
+
+  clickOnLeaveGuestRoom() {
+    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
+      action: () => this.clientRepository.logoutClient(),
+      preventClose: true,
+      text: {
+        action: z.l10n.text(z.string.modalAccountLeaveGuestRoomAction),
+        message: z.l10n.text(z.string.modalAccountLeaveGuestRoomMessage),
+        title: z.l10n.text(z.string.modalAccountLeaveGuestRoomHeadline),
+      },
+      warning: false,
     });
   }
 

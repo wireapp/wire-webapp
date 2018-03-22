@@ -23,6 +23,7 @@
 }
 
 .background,
+.background--white,
 .background-image,
 .background-darken {
   .full-screen;
@@ -34,6 +35,10 @@
   transition-duration: @animation-timing-slow;
   transition-timing-function: @ease-out-quart;
   background-color: fade(#000, 88%);
+
+  &--white {
+    background-color: @app-bg;
+  }
 }
 
 .background-image {
