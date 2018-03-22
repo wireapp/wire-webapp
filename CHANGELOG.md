@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="2.1.10"></a>
+## [2.1.10](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.1.9...@wireapp/core@2.1.10) (2018-03-22)
+
+
+### Bug Fixes
+
+* **core:** Check for Error constructor ([#406](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/406)) ([1e0ca42](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/1e0ca42))
+
+
+
+
 <a name="2.1.9"></a>
 ## [2.1.9](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.1.8...@wireapp/core@2.1.9) (2018-03-22)
 
