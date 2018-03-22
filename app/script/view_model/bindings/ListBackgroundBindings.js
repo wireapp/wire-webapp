@@ -19,28 +19,28 @@
 
 'use strict';
 
-ko.bindingHandlers.switch_background = (function() {
+ko.bindingHandlers.switchBackground = (() => {
   return {
     update(element, valueAccessor) {
-      const image_resource = ko.unwrap(valueAccessor());
+      const imageResource = ko.unwrap(valueAccessor());
 
-      if (image_resource) {
-        const background_images = $(element).find('.background');
-        const background_last = background_images.last();
-        const background_next = background_last.clone();
-        background_next.css({opacity: '0'});
-        background_next.insertAfter(background_last);
+      if (imageResource) {
+        const backgroundImages = $(element).find('.background');
+        const backgroundLast = backgroundImages.last();
+        const backgroundNext = backgroundLast.clone();
+        backgroundNext.css({opacity: '0'});
+        backgroundNext.insertAfter(backgroundLast);
 
-        image_resource
+        imageResource
           .load()
           .then(blob => {
-            background_next
-              .find('.background-image')
-              .css({'background-image': `url(${window.URL.createObjectURL(blob)})`});
+            if (blob) {
+              backgroundNext
+                .find('.background-image')
+                .css({'background-image': `url(${window.URL.createObjectURL(blob)})`});
+            }
           })
-          .then(() => {
-            background_next.css({opacity: '1'}).one(z.util.alias.animationend, background_last.remove);
-          });
+          .then(() => backgroundNext.css({opacity: '1'}).one(z.util.alias.animationend, backgroundLast.remove));
       }
     },
   };
