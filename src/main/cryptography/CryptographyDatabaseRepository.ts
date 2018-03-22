@@ -35,18 +35,6 @@ class CryptographyDatabaseRepository {
 
   constructor(private storeEngine: CRUDEngine) {}
 
-  public loadClient(identity: string): Promise<RegisteredClient> {
-    return this.storeEngine.read<RegisteredClient>(CryptographyDatabaseRepository.STORES.CLIENTS, identity);
-  }
-
-  public deleteClient(identity: CryptoboxStore.CRUDStoreKeys): Promise<string> {
-    return this.storeEngine.delete(CryptographyDatabaseRepository.STORES.CLIENTS, identity);
-  }
-
-  public saveClient(identity: CryptoboxStore.CRUDStoreKeys, client: MetaClient): Promise<string> {
-    return this.storeEngine.create(CryptographyDatabaseRepository.STORES.CLIENTS, identity, client);
-  }
-
   public deleteStores(): Promise<boolean[]> {
     return Promise.all([
       this.storeEngine.deleteAll(CryptographyDatabaseRepository.STORES.AMPLIFY),
@@ -55,10 +43,6 @@ class CryptographyDatabaseRepository {
       this.storeEngine.deleteAll(CryptographyDatabaseRepository.STORES.SESSIONS),
       this.storeEngine.deleteAll(CryptographyDatabaseRepository.STORES.PRE_KEYS),
     ]);
-  }
-
-  public purgeDb(): Promise<void> {
-    return this.storeEngine.purge();
   }
 }
 

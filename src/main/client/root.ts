@@ -17,10 +17,6 @@
  *
  */
 
-import CryptographyService from './CryptographyService';
-import GenericMessageType from './GenericMessageType';
-import PayloadBundle from './PayloadBundle';
-import SessionPayloadBundle from './SessionPayloadBundle';
-import EncryptedAsset from './EncryptedAsset';
+import ClientService from './ClientService';
 
-export {CryptographyService, EncryptedAsset, GenericMessageType, PayloadBundle, SessionPayloadBundle};
+export {ClientService};
