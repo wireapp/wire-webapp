@@ -128,11 +128,11 @@ describe('z.cryptography.CryptographyRepository', () => {
         genericMessage.toArrayBuffer(),
         aliceBundle.serialise()
       );
-      const encodedCiphertext = z.util.array_to_base64(cipherText);
+      const encodedCipherText = z.util.array_to_base64(cipherText);
 
       const mockedEvent = {
         data: {
-          text: encodedCiphertext,
+          text: encodedCipherText,
         },
         from: z.util.create_random_uuid(),
         id: z.util.create_random_uuid,
