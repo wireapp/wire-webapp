@@ -1394,6 +1394,15 @@ z.calling.CallingRepository = class CallingRepository {
   //##############################################################################
 
   /**
+   * Print the call message log.
+   * @returns {undefined} No return value
+   */
+  printLog() {
+    this.callLogger.force_log(`Call message log contains '${this.messageLog.length}' events`, this.messageLog);
+    this.messageLog.forEach(logMessage => this.callLogger.force_log(logMessage));
+  }
+
+  /**
    * Report a call for call analysis.
    * @param {string} conversationId - ID of conversation
    * @returns {undefined} No return value
