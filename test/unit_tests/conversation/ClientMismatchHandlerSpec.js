@@ -24,7 +24,7 @@
 describe('ClientMismatchHandler', () => {
   const testFactory = new TestFactory();
 
-  let conversationEt = undefined;
+  let conversationEntity = undefined;
 
   beforeAll(done => {
     z.util.protobuf
@@ -37,8 +37,8 @@ describe('ClientMismatchHandler', () => {
     testFactory
       .exposeConversationActors()
       .then(conversationRepository => {
-        conversationEt = new z.entity.Conversation(z.util.createRandomUuid());
-        return conversationRepository.save_conversation(conversationEt);
+        conversationEntity = new z.entity.Conversation(z.util.createRandomUuid());
+        return conversationRepository.save_conversation(conversationEntity);
       })
       .then(done)
       .catch(done.fail);
@@ -119,7 +119,7 @@ describe('ClientMismatchHandler', () => {
       };
 
       TestFactory.conversation_repository.clientMismatchHandler
-        .onClientMismatch(clientMismatch, conversationEt.id, genericMessage, payload)
+        .onClientMismatch(clientMismatch, genericMessage, payload, conversationEntity.id)
         .then(updatedPayload => {
           expect(Object.keys(updatedPayload.recipients).length).toBe(2);
           expect(Object.keys(updatedPayload.recipients[johnDoe.user_id]).length).toBe(1);
@@ -139,7 +139,7 @@ describe('ClientMismatchHandler', () => {
       };
 
       TestFactory.conversation_repository.clientMismatchHandler
-        .onClientMismatch(clientMismatch, conversationEt.id, genericMessage, payload)
+        .onClientMismatch(clientMismatch, genericMessage, payload, conversationEntity.id)
         .then(updatedPayload => {
           expect(TestFactory.user_repository.remove_client_from_user).toHaveBeenCalled();
           expect(Object.keys(updatedPayload.recipients).length).toBe(0);
@@ -159,7 +159,7 @@ describe('ClientMismatchHandler', () => {
       };
 
       TestFactory.conversation_repository.clientMismatchHandler
-        .onClientMismatch(clientMismatch, conversationEt.id, genericMessage, payload)
+        .onClientMismatch(clientMismatch, genericMessage, payload, conversationEntity.id)
         .then(updated_payload => {
           expect(TestFactory.user_repository.remove_client_from_user).not.toHaveBeenCalled();
           expect(Object.keys(updated_payload.recipients).length).toBe(0);
