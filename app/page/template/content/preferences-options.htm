@@ -2,7 +2,7 @@
   <div class="preferences-titlebar" data-bind="l10n_text: z.string.preferencesOptions"></div>
   <div class="preferences-content-wrapper">
     <div class="preferences-content" data-bind="antiscroll">
-      <!-- ko ifnot: isTeam()-->
+      <!-- ko if: isActivatedAccount && !isTeam()-->
         <section class="preferences-section">
           <header class="preferences-header" data-bind="l10n_text: z.string.preferencesOptionsContacts"></header>
           <div class="preferences-option" data-uie-name="do-share-contacts">
@@ -48,47 +48,49 @@
         </div>
       </section>
 
-      <section class="preferences-section">
-        <header class="preferences-header" data-bind="l10n_text: z.string.preferencesOptionsNotifications"></header>
-        <div class="preferences-options-radio">
-          <input type="radio" id="preferences-options-notification-on" name="preferences-options-notification" value="on" data-bind="checked: optionNotifications">
-          <label class="text-theme" for="preferences-options-notification-on">
-            <span class="preferences-label" data-bind="l10n_text: z.string.preferencesOptionsNotificationsOn"></span>
-          </label>
-          <input type="radio" id="preferences-options-notification-obfuscate-message" name="preferences-options-notification" value="obfuscate-message" data-bind="checked: optionNotifications">
-          <label class="text-theme" for="preferences-options-notification-obfuscate-message">
-            <span class="preferences-label" data-bind="l10n_text: z.string.preferencesOptionsNotificationsObfuscateMessage"></span>
-          </label>
-          <input type="radio" id="preferences-options-notification-obfuscate" name="preferences-options-notification" value="obfuscate" data-bind="checked: optionNotifications">
-          <label class="text-theme" for="preferences-options-notification-obfuscate">
-            <span class="preferences-label" data-bind="l10n_text: z.string.preferencesOptionsNotificationsObfuscate"></span>
-          </label>
-          <input type="radio" id="preferences-options-notification-none" name="preferences-options-notification" value="none" data-bind="checked: optionNotifications">
-          <label class="text-theme" for="preferences-options-notification-none">
-            <span class="preferences-label" data-bind="l10n_text: z.string.preferencesOptionsNotificationsNone"></span>
-          </label>
-        </div>
-      </section>
-
-      <section class="preferences-section">
-        <header class="preferences-header" data-bind="l10n_text: z.string.preferencesOptionsPopular"></header>
-        <div class="preferences-option">
-          <div class="preferences-option-icon checkbox text-theme" data-bind="attr: {'data-uie-value': optionReplaceInlineEmoji}" data-uie-name="status-preference-emoji-replace">
-            <input type="checkbox" id="replace-inline-emoji-checkbox" data-bind="checked: optionReplaceInlineEmoji">
-            <label class="preferences-options-checkbox-label" for="replace-inline-emoji-checkbox" data-bind="l10n_text: z.string.preferencesOptionsEmojiReplaceCheckbox"></label>
+      <!-- ko if: isActivatedAccount()-->
+        <section class="preferences-section">
+          <header class="preferences-header" data-bind="l10n_text: z.string.preferencesOptionsNotifications"></header>
+          <div class="preferences-options-radio">
+            <input type="radio" id="preferences-options-notification-on" name="preferences-options-notification" value="on" data-bind="checked: optionNotifications">
+            <label class="text-theme" for="preferences-options-notification-on">
+              <span class="preferences-label" data-bind="l10n_text: z.string.preferencesOptionsNotificationsOn"></span>
+            </label>
+            <input type="radio" id="preferences-options-notification-obfuscate-message" name="preferences-options-notification" value="obfuscate-message" data-bind="checked: optionNotifications">
+            <label class="text-theme" for="preferences-options-notification-obfuscate-message">
+              <span class="preferences-label" data-bind="l10n_text: z.string.preferencesOptionsNotificationsObfuscateMessage"></span>
+            </label>
+            <input type="radio" id="preferences-options-notification-obfuscate" name="preferences-options-notification" value="obfuscate" data-bind="checked: optionNotifications">
+            <label class="text-theme" for="preferences-options-notification-obfuscate">
+              <span class="preferences-label" data-bind="l10n_text: z.string.preferencesOptionsNotificationsObfuscate"></span>
+            </label>
+            <input type="radio" id="preferences-options-notification-none" name="preferences-options-notification" value="none" data-bind="checked: optionNotifications">
+            <label class="text-theme" for="preferences-options-notification-none">
+              <span class="preferences-label" data-bind="l10n_text: z.string.preferencesOptionsNotificationsNone"></span>
+            </label>
           </div>
-        </div>
-        <div class="preferences-detail preferences-detail-emoji" data-bind="l10n_html: {'id': z.string.preferencesOptionsEmojiReplaceDetail, 'substitute': '<span class=\'font-size-xs icon-emoji\'></span>'}"></div>
-        <!-- ko if: z.util.Environment.desktop -->
-          <div class="preferences-option preferences-options-multiple">
-            <div class="preferences-option-icon checkbox text-theme" data-bind="attr: {'data-uie-value': optionSendPreviews}" data-uie-name="status-preference-previews-send">
-              <input type="checkbox" id="send-preview-checkbox" data-bind="checked: optionSendPreviews">
-              <label class="preferences-options-checkbox-label" for="send-preview-checkbox" data-bind="l10n_text: z.string.preferencesOptionsPreviewsSendCheckbox"></label>
+        </section>
+
+        <section class="preferences-section">
+          <header class="preferences-header" data-bind="l10n_text: z.string.preferencesOptionsPopular"></header>
+          <div class="preferences-option">
+            <div class="preferences-option-icon checkbox text-theme" data-bind="attr: {'data-uie-value': optionReplaceInlineEmoji}" data-uie-name="status-preference-emoji-replace">
+              <input type="checkbox" id="replace-inline-emoji-checkbox" data-bind="checked: optionReplaceInlineEmoji">
+              <label class="preferences-options-checkbox-label" for="replace-inline-emoji-checkbox" data-bind="l10n_text: z.string.preferencesOptionsEmojiReplaceCheckbox"></label>
             </div>
           </div>
-          <div class="preferences-detail" data-bind="l10n_text: z.string.preferencesOptionsPreviewsSendDetail"></div>
-        <!-- /ko -->
-      </section>
+          <div class="preferences-detail preferences-detail-emoji" data-bind="l10n_html: {'id': z.string.preferencesOptionsEmojiReplaceDetail, 'substitute': '<span class=\'font-size-xs icon-emoji\'></span>'}"></div>
+          <!-- ko if: z.util.Environment.desktop -->
+            <div class="preferences-option preferences-options-multiple">
+              <div class="preferences-option-icon checkbox text-theme" data-bind="attr: {'data-uie-value': optionSendPreviews}" data-uie-name="status-preference-previews-send">
+                <input type="checkbox" id="send-preview-checkbox" data-bind="checked: optionSendPreviews">
+                <label class="preferences-options-checkbox-label" for="send-preview-checkbox" data-bind="l10n_text: z.string.preferencesOptionsPreviewsSendCheckbox"></label>
+              </div>
+            </div>
+            <div class="preferences-detail" data-bind="l10n_text: z.string.preferencesOptionsPreviewsSendDetail"></div>
+          <!-- /ko -->
+        </section>
+      <!-- /ko -->
 
       <section class="preferences-section">
         <header class="preferences-header" data-bind="l10n_text: z.string.preferencesOptionsData"></header>
