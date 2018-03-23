@@ -29,7 +29,6 @@
     "marked": true,
     "moment": true,
     "OpenGraphMocks": true,
-    "pako": true,
     "payload": true,
     "PhoneFormat": true,
     "platform": true,

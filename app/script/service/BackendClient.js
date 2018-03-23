@@ -229,10 +229,7 @@ z.service.BackendClient = class BackendClient {
   send_json(config) {
     const json_config = {
       contentType: 'application/json; charset=utf-8',
-      data: config.data ? pako.gzip(JSON.stringify(config.data)) : undefined,
-      headers: {
-        'Content-Encoding': 'gzip',
-      },
+      data: config.data ? JSON.stringify(config.data) : undefined,
       processData: false,
     };
 
