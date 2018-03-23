@@ -106,5 +106,11 @@
   "login.publicComputer": "Αυτός είναι ένας δημόσιος υπολογιστής",
   "clientManager.headline": "",
   "clientManager.subhead": "Αφαιρέστε μία από τις άλλες συσκευές σας για να αρχίσετε να χρησιμοποιείτε το Wire σε αυτήν.",
-  "clientManager.logout": "Αποσύνδεση"
+  "clientManager.logout": "Αποσύνδεση",
+  "historyInfo.hasHistoryHeadline": "",
+  "historyInfo.noHistoryHeadline": "",
+  "historyInfo.hasHistoryInfo": "",
+  "historyInfo.noHistoryInfo": "",
+  "historyInfo.learnMore": "Μάθετε περισσότερα",
+  "historyInfo.ok": "Εντάξει"
 }

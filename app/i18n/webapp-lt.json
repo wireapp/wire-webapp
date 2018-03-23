@@ -110,5 +110,11 @@
   "login.publicComputer": "Tai yra viešas kompiuteris",
   "clientManager.headline": "Pašalinti įrenginį",
   "clientManager.subhead": "Norėdami pradėti naudoti Wire šiame įrenginyje, pašalinkite vieną iš savo kitų įrenginių.",
-  "clientManager.logout": "Atsijungti"
+  "clientManager.logout": "Atsijungti",
+  "historyInfo.hasHistoryHeadline": "",
+  "historyInfo.noHistoryHeadline": "",
+  "historyInfo.hasHistoryInfo": "",
+  "historyInfo.noHistoryInfo": "",
+  "historyInfo.learnMore": "Sužinoti daugiau",
+  "historyInfo.ok": "GERAI"
 }

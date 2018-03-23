@@ -107,5 +107,11 @@
   "login.publicComputer": "Tämä on julkinen tietokone",
   "clientManager.headline": "",
   "clientManager.subhead": "Poista yksi laitteistasi aloittaaksesi Wiren käytön tässä laiteessa.",
-  "clientManager.logout": "Kirjaudu ulos"
+  "clientManager.logout": "Kirjaudu ulos",
+  "historyInfo.hasHistoryHeadline": "",
+  "historyInfo.noHistoryHeadline": "",
+  "historyInfo.hasHistoryInfo": "",
+  "historyInfo.noHistoryInfo": "",
+  "historyInfo.learnMore": "Lue lisää",
+  "historyInfo.ok": "OK"
 }

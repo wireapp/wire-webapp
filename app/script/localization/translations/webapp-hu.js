@@ -32,11 +32,12 @@ z.string.hu.authAccountCountryCode = 'Országhívó-kód';
 z.string.hu.authAccountPasswordForgot = 'Elfelejtett jelszó';
 z.string.hu.authAccountPublicComputer = 'Ez egy nyilvános számítógép';
 z.string.hu.authAccountSignIn = 'Bejelentkezés';
-z.string.hu.authAccountSignInPhone = 'Telefon';
+z.string.hu.authAccountSignInPhone = 'Telefonos bejelentkezés';
 
 z.string.hu.authBlockedCookies = 'A bejelentkezéshez engedélyezni kell a böngésző-sütiket.';
 z.string.hu.authBlockedDatabase = 'Az üzenetek megjelenítéséhez a Wire-nek el kell érnie a helyi tárhelyet. A böngésző privát módú használatakor a helyi tárhely nem áll rendelkezésre.';
 z.string.hu.authBlockedTabs = 'A Wire már nyitva van egy másik böngészőlapon.';
+z.string.hu.authBlockedTabsAction = 'Inkább használjuk ezt a fület';
 
 z.string.hu.authVerifyAccountAdd = 'Hozzáadás';
 z.string.hu.authVerifyAccountDetail = 'Ezáltal akár több eszközön is használhatod a Wire-t.';
@@ -105,12 +106,16 @@ z.string.hu.modalConfirmSecondary = 'Mégsem';
 z.string.hu.modalOptionSecondary = 'Mégsem';
 
 z.string.hu.modalAccountCreateAction = 'OK';
+z.string.hu.modalAccountCreateHeadline = 'Fiók létrehozása?';
+z.string.hu.modalAccountCreateMessage = 'Ha létrehozol egy fiókot, akkor elveszted a beszélgetés előzményit ebben a vendégszobában.';
 
 z.string.hu.modalAccountDeletionAction = 'Törlés';
 z.string.hu.modalAccountDeletionHeadline = 'Fiók törlése';
 z.string.hu.modalAccountDeletionMessage = 'Küldünk egy e-mailt vagy SMS-t. Fiókod végleges törléséhez nyisd meg a kapott linket.';
 
 z.string.hu.modalAccountLeaveGuestRoomAction = 'Kilépés';
+z.string.hu.modalAccountLeaveGuestRoomHeadline = 'Elhagyod a vendégszobát?';
+z.string.hu.modalAccountLeaveGuestRoomMessage = 'A beszélgetés előzményei törlődnek. Ha meg szeretnéd tartani, inkább legközelebb hozz létre egy fiókot.';
 
 z.string.hu.modalAccountLogoutAction = 'Kijelentkezés';
 z.string.hu.modalAccountLogoutHeadline = 'Adatok törlése?';
@@ -262,6 +267,8 @@ z.string.hu.connectionRequestConnect = 'Csatlakozás';
 z.string.hu.connectionRequestIgnore = 'Figyelmen kívül hagyás';
 
 z.string.hu.conversationGuestIndicator = 'Vendég';
+z.string.hu.userRemainingTimeHours = '{{time}} óra van hátra';
+z.string.hu.userRemainingTimeMinutes = 'Kevesebb mint {{time}} perc van hátra';
 
 z.string.hu.conversationYouNominative = 'te';
 z.string.hu.conversationYouDative = 'te';
@@ -348,6 +355,9 @@ z.string.hu.guestRoomToggleInfoExtended = 'A beszélgetés elérhető a csapaton
 
 z.string.hu.guestRoomConversationBadge = 'Vendégek is vannak itt';
 
+z.string.hu.guestRoomConversationHead = 'Csapatodon kívüli emberek is csatlakozhatnak ehhez a beszélgetéshez.';
+z.string.hu.guestRoomConversationButton = 'Partner meghívása';
+
 z.string.hu.collectionShowAll = 'Mind a(z) {{number}} mutatása';
 z.string.hu.collectionSectionLinks = 'Hivatkozások';
 z.string.hu.collectionSectionImages = 'Képek';
@@ -383,6 +393,7 @@ z.string.hu.conversationsSecondaryLinePings = '{{number}} kopogás';
 z.string.hu.conversationsSecondaryLinePeopleLeft = '{{number}} partner kilépett a beszélgetésből';
 z.string.hu.conversationsSecondaryLinePersonLeft = '{{user}} kilépett';
 z.string.hu.conversationsSecondaryLinePersonRemoved = '{{user}} eltávolítva';
+z.string.hu.conversationsSecondaryLinePersonRemovedTeam = '{{user}} el lett távolítva a csapatból';
 z.string.hu.conversationsSecondaryLinePeopleAdded = '{{user}} hozzáadva';
 z.string.hu.conversationsSecondaryLinePersonAdded = '{{user}} hozzáadva';
 z.string.hu.conversationsSecondaryLinePersonAddedSelf = '{{user}} csatlakozott';
@@ -499,6 +510,8 @@ z.string.hu.preferencesAboutWebsite = 'Wire weboldala';
 z.string.hu.preferencesAccountAvaibilityUnset = 'Állapot beállítása';
 z.string.hu.preferencesAccountCreateTeam = 'Csapat létrehozása';
 z.string.hu.preferencesAccountDelete = 'Fiók törlése';
+z.string.hu.preferencesAccountLeaveGuestRoom = 'Vendégszoba elhagyása';
+z.string.hu.preferencesAccountLeaveGuestRoomDescription = 'Ezután nem tudod elérni az ebben a beszélgetésben lévő üzeneteket.';
 z.string.hu.preferencesAccountLogOut = 'Kijelentkezés';
 z.string.hu.preferencesAccountManageTeam = 'Csapat kezelése';
 z.string.hu.preferencesAccountResetPassword = 'Jelszó visszaállítása';
@@ -587,6 +600,14 @@ z.string.hu.searchListEveryoneParticipates = 'Az összes partnered, \nakivel fel
 z.string.hu.searchListNoMatches = 'Nincs találat. \nPróbálj megy egy másik nevet.';
 
 z.string.hu.temporaryGuestCta = 'Fiók létrehozása';
+z.string.hu.temporaryGuestDescription = 'Tedd biztonságosabbá vállalkozásodat a csoportos üzenetek és beszélgetések titkosításával.';
+z.string.hu.temporaryGuestTimeRemaining = ' maradt ebben a vendégszobában';
+
+z.string.hu.temporaryGuestJoinMessage = 'Ez a beszélgetés 24 órán keresztül lesz elérhető.';
+z.string.hu.temporaryGuestJoinDescription = 'Ha bezárod vagy újratöltöd ezt az oldalt, akkor elveszted a hozzáférésed.';
+
+z.string.hu.temporaryGuestLeaveMessage = ' már nem részesei ennek a beszélgetésnek.';
+z.string.hu.temporaryGuestLeaveDescription = 'Ha bezárod vagy újratöltöd ezt az oldalt, akkor elveszted a hozzáférést a beszélgetés előzményeihez.';
 
 z.string.hu.uploadGoogleHeadline = 'Keress partnereket\na Wire-ön.';
 z.string.hu.uploadGoogleMessage = 'A névjegyeid importálásával könnyebben kapcsolatba léphetsz másokkal. Minden információt anonimizálunk, és semmit nem osszuk meg senki mással.';

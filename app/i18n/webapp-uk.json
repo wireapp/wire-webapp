@@ -107,5 +107,11 @@
   "login.publicComputer": "Це загальнодоступний комп’ютер",
   "clientManager.headline": "",
   "clientManager.subhead": "Видаліть один з ваших пристроїв, щоб почати використовувати Wire на цьому.",
-  "clientManager.logout": "Вийти"
+  "clientManager.logout": "Вийти",
+  "historyInfo.hasHistoryHeadline": "",
+  "historyInfo.noHistoryHeadline": "",
+  "historyInfo.hasHistoryInfo": "",
+  "historyInfo.noHistoryInfo": "",
+  "historyInfo.learnMore": "Дізнатися більше",
+  "historyInfo.ok": "OK"
 }

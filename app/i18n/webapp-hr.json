@@ -106,5 +106,11 @@
   "login.publicComputer": "",
   "clientManager.headline": "",
   "clientManager.subhead": "Uklonite jedan od Vaših ostalih uređaja kako bi ste počeli koristiti Wire na ovom.",
-  "clientManager.logout": "Odjava"
+  "clientManager.logout": "Odjava",
+  "historyInfo.hasHistoryHeadline": "",
+  "historyInfo.noHistoryHeadline": "",
+  "historyInfo.hasHistoryInfo": "",
+  "historyInfo.noHistoryInfo": "",
+  "historyInfo.learnMore": "Saznaj više",
+  "historyInfo.ok": "U redu"
 }

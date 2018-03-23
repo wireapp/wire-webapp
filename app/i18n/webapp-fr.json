@@ -107,5 +107,11 @@
   "login.publicComputer": "Cet ordinateur est public",
   "clientManager.headline": "",
   "clientManager.subhead": "Supprimez un de vos autres appareils pour commencer à utiliser Wire sur celui-ci.",
-  "clientManager.logout": "Se déconnecter"
+  "clientManager.logout": "Se déconnecter",
+  "historyInfo.hasHistoryHeadline": "",
+  "historyInfo.noHistoryHeadline": "",
+  "historyInfo.hasHistoryInfo": "",
+  "historyInfo.noHistoryInfo": "",
+  "historyInfo.learnMore": "En savoir plus",
+  "historyInfo.ok": "OK"
 }

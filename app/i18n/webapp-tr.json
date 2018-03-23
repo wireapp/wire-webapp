@@ -106,5 +106,11 @@
   "login.publicComputer": "Bu ortak bir bilgisayar",
   "clientManager.headline": "",
   "clientManager.subhead": "Bu cihazda Wire’ı kullanabilmek için diğer cihazlarınızdan birini kaldırınız.",
-  "clientManager.logout": "Çıkış yap"
+  "clientManager.logout": "Çıkış yap",
+  "historyInfo.hasHistoryHeadline": "",
+  "historyInfo.noHistoryHeadline": "",
+  "historyInfo.hasHistoryInfo": "",
+  "historyInfo.noHistoryInfo": "",
+  "historyInfo.learnMore": "Daha fazla bilgi",
+  "historyInfo.ok": "TAMAM"
 }

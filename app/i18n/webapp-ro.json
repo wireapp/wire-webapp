@@ -107,5 +107,11 @@
   "login.publicComputer": "Acesta este un calculator public",
   "clientManager.headline": "",
   "clientManager.subhead": "Șterge unul din celelalte dispozitive pentru a folosi Wire pe acesta.",
-  "clientManager.logout": "Deconectare"
+  "clientManager.logout": "Deconectare",
+  "historyInfo.hasHistoryHeadline": "",
+  "historyInfo.noHistoryHeadline": "",
+  "historyInfo.hasHistoryInfo": "",
+  "historyInfo.noHistoryInfo": "",
+  "historyInfo.learnMore": "Află mai multe",
+  "historyInfo.ok": "OK"
 }

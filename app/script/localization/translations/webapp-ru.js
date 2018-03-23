@@ -259,6 +259,8 @@ z.string.ru.connectionRequestConnect = 'Связаться';
 z.string.ru.connectionRequestIgnore = 'Игнорировать';
 
 z.string.ru.conversationGuestIndicator = 'Гость';
+z.string.ru.userRemainingTimeHours = 'Осталось {{time}} час.';
+z.string.ru.userRemainingTimeMinutes = 'Осталось менее {{time}} мин.';
 
 z.string.ru.conversationYouNominative = 'вы';
 z.string.ru.conversationYouDative = 'вы';
@@ -498,6 +500,7 @@ z.string.ru.preferencesAboutWebsite = 'Веб-сайт Wire';
 z.string.ru.preferencesAccountAvaibilityUnset = 'Установить статус';
 z.string.ru.preferencesAccountCreateTeam = 'Создать команду';
 z.string.ru.preferencesAccountDelete = 'Удалить аккаунт';
+z.string.ru.preferencesAccountLeaveGuestRoom = 'Покинуть гостевую комнату';
 z.string.ru.preferencesAccountLogOut = 'Выход';
 z.string.ru.preferencesAccountManageTeam = 'Управлять командой';
 z.string.ru.preferencesAccountResetPassword = 'Сбросить пароль';

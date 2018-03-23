@@ -107,5 +107,11 @@
   "login.publicComputer": "Dit is een publieke computer",
   "clientManager.headline": "",
   "clientManager.subhead": "Verwijder een van je andere apparaten om Wire op dit apparaat te gebruiken.",
-  "clientManager.logout": "Uitloggen"
+  "clientManager.logout": "Uitloggen",
+  "historyInfo.hasHistoryHeadline": "",
+  "historyInfo.noHistoryHeadline": "",
+  "historyInfo.hasHistoryInfo": "",
+  "historyInfo.noHistoryInfo": "",
+  "historyInfo.learnMore": "Leer meer",
+  "historyInfo.ok": "OK"
 }

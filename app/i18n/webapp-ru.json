@@ -109,5 +109,11 @@
   "login.publicComputer": "Это общедоступный компьютер",
   "clientManager.headline": "Удалить устройство",
   "clientManager.subhead": "Удалите одно из ваших устройств для того, чтобы начать использовать Wire на этом.",
-  "clientManager.logout": "Выход"
+  "clientManager.logout": "Выход",
+  "historyInfo.hasHistoryHeadline": "",
+  "historyInfo.noHistoryHeadline": "",
+  "historyInfo.hasHistoryInfo": "",
+  "historyInfo.noHistoryInfo": "",
+  "historyInfo.learnMore": "Подробнее",
+  "historyInfo.ok": "OK"
 }

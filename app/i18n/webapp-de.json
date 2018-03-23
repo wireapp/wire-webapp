@@ -48,7 +48,8 @@
     "Lade die neueste Version von <b style=\"font-weight: 600\">Google Chrome, Mozilla Firefox, Opera</b> oder <b style=\"font-weight: 600\">Microsoft Edge</b> herunter.",
   "conversationJoin.unsupportedJoinHeadline": "Du bist in ein <br /><b style=\"color: black;\">Wire Gästezimmer</b> eingeladen.",
   "conversationJoin.headline": "Du bist in ein <br /><b style=\"color: black;\">Wire Gästezimmer</b> eingeladen.",
-  "conversationJoin.unsupportedJoinSubhead": "",
+  "conversationJoin.unsupportedJoinSubhead":
+    "<p>Dieser Browser wird nicht unterstützt.</p>Lade die neueste Version von <b style=\"font-weight: 600\">Google Chrome, Mozilla Firefox, Opera</b> oder <b style=\"font-weight: 600\">Microsoft Edge</b> herunter.",
   "conversationJoin.unsupportedJoinMobileSubhead": "Öffne diesen Link auf deinem Computer.",
   "conversationJoin.subhead": "Verschlüsselte Gruppenkommunikation und Telefonkonferenzen. <br />Ein Benutzerkonto ist nicht erforderlich.",
   "conversationJoin.existentAccountHeadline": "{name}, du bist in ein <br /><b style=\"color: black;\">Wire Gästezimmer</b> eingeladen.",
@@ -110,5 +111,11 @@
   "login.publicComputer": "Dies ist ein öffentlicher Computer",
   "clientManager.headline": "Entferne ein Gerät",
   "clientManager.subhead": "Entferne eines deiner anderen Geräte, um Wire hier zu nutzen.",
-  "clientManager.logout": "Abmelden"
+  "clientManager.logout": "Abmelden",
+  "historyInfo.hasHistoryHeadline": "",
+  "historyInfo.noHistoryHeadline": "",
+  "historyInfo.hasHistoryInfo": "",
+  "historyInfo.noHistoryInfo": "",
+  "historyInfo.learnMore": "Erfahre mehr",
+  "historyInfo.ok": "Verstanden"
 }
