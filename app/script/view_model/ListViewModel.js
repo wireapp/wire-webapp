@@ -226,7 +226,10 @@ z.viewModel.ListViewModel = class ListViewModel {
 
     $(document).on('keydown.listView', keyboardEvent => {
       if (z.util.KeyboardUtil.isEscapeKey(keyboardEvent)) {
-        this.switchList(ListViewModel.STATE.CONVERSATIONS);
+        const newState = this.isActivatedAccount()
+          ? ListViewModel.STATE.CONVERSATIONS
+          : ListViewModel.STATE.TEMPORARY_GUEST;
+        this.switchList(newState);
       }
     });
   }
