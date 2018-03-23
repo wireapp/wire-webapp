@@ -17,17 +17,29 @@
  *
  */
 
+import {NotificationEvent} from '@wireapp/api-client/dist/commonjs/notification/index';
 import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine/index';
 import CryptographyDatabaseRepository from '../cryptography/CryptographyDatabaseRepository';
 import {Notification} from '@wireapp/api-client/dist/commonjs/notification/index';
 
+export enum DatabaseStores {
+  EVENTS = 'events',
+}
+
+export enum DatabaseKeys {
+  PRIMARY_KEY_LAST_EVENT = 'z.storage.StorageKey.EVENT.LAST_DATE',
+  PRIMARY_KEY_LAST_NOTIFICATION = 'z.storage.StorageKey.NOTIFICATION.LAST_ID',
+}
+
 export default class NotificationDatabaseRepository {
-  public static KEYS = {
-    PRIMARY_KEY_LAST_EVENT: 'z.storage.StorageKey.EVENT.LAST_DATE',
-    PRIMARY_KEY_LAST_NOTIFICATION: 'z.storage.StorageKey.NOTIFICATION.LAST_ID',
-  };
+  public static readonly STORES = DatabaseStores;
+  public static readonly KEYS = DatabaseKeys;
 
   constructor(private storeEngine: CRUDEngine) {}
+
+  public getNotificationEventList(): Promise<NotificationEvent[]> {
+    return this.storeEngine.readAll<NotificationEvent>(NotificationDatabaseRepository.STORES.EVENTS);
+  }
 
   public getLastEventDate(): Promise<Date> {
     return this.storeEngine

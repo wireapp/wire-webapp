@@ -17,6 +17,7 @@
  *
  */
 
+import {NotificationEvent} from '@wireapp/api-client/dist/commonjs/notification/index';
 import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine/index';
 import APIClient = require('@wireapp/api-client');
 import {Notification} from '@wireapp/api-client/dist/commonjs/notification/index';
@@ -37,6 +38,14 @@ export default class NotificationService {
     return this.setLastEventDate(new Date(0))
       .then(() => this.backend.getLastNotification(clientId))
       .then(notification => this.setLastNotificationId(notification));
+  }
+
+  public hasNotificationEvents(): Promise<boolean> {
+    return this.getNotificationEventList().then(notificationEvents => !!notificationEvents.length);
+  }
+
+  private getNotificationEventList(): Promise<NotificationEvent[]> {
+    return this.database.getNotificationEventList();
   }
 
   private setLastEventDate(eventDate: Date): Promise<Date> {
