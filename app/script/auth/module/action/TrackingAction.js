@@ -34,6 +34,7 @@ export const EVENT_NAME = {
     OPENED_TEAM_REGISTRATION: 'start.opened_team_registration',
   },
   TEAM: {
+    ADDED_TEAM_NAME: 'team.added_team_name',
     CREATED: 'team.created',
     FINISHED_INVITE_STEP: 'team.finished_invite_step',
     VERIFIED: 'team.verified',
