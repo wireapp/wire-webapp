@@ -59,24 +59,27 @@ z.util.DebugUtil = class DebugUtil {
   }
 
   // wire.app.util.debug.exportHistory()
-  async exportHistory() {
+  exportHistory() {
     const SUPPORTED_TABLES = ['events', 'users'];
     const db = wire.app.repository.storage.storageService.db;
 
-    const tables = await db.transaction('r', db.tables, () => {
-      return Promise.all(
-        db.tables
-          .filter(table => SUPPORTED_TABLES.includes(table.name))
-          .map(table => table.toArray().then(rows => ({name: table.name, rows})))
-      );
-    });
-
-    for (const table of tables) {
-      const records = table.rows;
-      for (const record of records) {
-        amplify.publish('z.event.WebApp.IMPORTEXPORT.EXPORT', table.name, JSON.stringify(record));
-      }
-    }
+    db
+      .transaction('r', db.tables, () => {
+        return Promise.all(
+          db.tables
+            .filter(table => SUPPORTED_TABLES.includes(table.name))
+            .map(table => table.toArray().then(rows => ({name: table.name, rows})))
+        );
+      })
+      .then(tables => {
+        for (const table of tables) {
+          const records = table.rows;
+          for (const record of records) {
+            amplify.publish('z.event.WebApp.IMPORTEXPORT.EXPORT.DATA', table.name, JSON.stringify(record));
+          }
+        }
+        amplify.publish('z.event.WebApp.IMPORTEXPORT.EXPORT.SENDER_DONE');
+      });
   }
 
   getEventInfo(event) {
