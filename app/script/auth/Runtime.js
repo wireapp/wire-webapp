@@ -70,7 +70,8 @@ export default class Runtime {
       const isSupportedBrowser = this.getBrowserName() === browser;
       const currentVersion = this.getBrowserVersion();
       const isSupportedMajorVersion = currentVersion.major >= supportedVersion.major;
-      const isSupportedMinorVersion = currentVersion.minor >= supportedVersion.minor;
+      const isHigherMajorVersion = currentVersion.major > supportedVersion.major;
+      const isSupportedMinorVersion = isHigherMajorVersion || currentVersion.minor >= supportedVersion.minor;
       return isSupportedBrowser && isSupportedMajorVersion && isSupportedMinorVersion;
     });
   };
