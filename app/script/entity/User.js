@@ -260,7 +260,8 @@ z.entity.User = class User {
 
     if (remainingMinutes <= 45) {
       timeLeftText = z.string.userRemainingTimeMinutes;
-      timeValue = Math.ceil(remainingMinutes / 15) * 15;
+      const remainingQuarters = Math.max(1, Math.ceil(remainingMinutes / 15));
+      timeValue = remainingQuarters * 15;
       this.expirationRemaining(timeValue * MILLISECONDS_IN_MINUTE);
       this.expirationRemainingText(`${timeValue}m`);
     } else {
@@ -269,6 +270,7 @@ z.entity.User = class User {
       this.expirationRemaining(timeValue * MILLISECONDS_IN_HOUR);
       this.expirationRemainingText(`${timeValue}h`);
     }
+
     this.expirationIsUrgent(remainingMinutes < 120);
     this.expirationText(z.l10n.text(timeLeftText, timeValue));
   }
