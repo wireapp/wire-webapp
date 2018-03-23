@@ -523,11 +523,11 @@ export const clientItemStrings = defineMessages({
 export const historyInfoStrings = defineMessages({
   hasHistoryHeadline: {
     id: 'historyInfo.hasHistoryHeadline',
-    defaultMessage: 'You’ve used Wire on this device before',
+    defaultMessage: 'You’ve used Wire on this device before.',
   },
   noHistoryHeadline: {
     id: 'historyInfo.noHistoryHeadline',
-    defaultMessage: 'This is the first time you are using this device',
+    defaultMessage: 'It’s the first time you’re using Wire on this device.',
   },
   hasHistoryInfo: {
     id: 'historyInfo.hasHistoryInfo',
@@ -535,7 +535,7 @@ export const historyInfoStrings = defineMessages({
   },
   noHistoryInfo: {
     id: 'historyInfo.noHistoryInfo',
-    defaultMessage: 'For security reasons,<br/>your history will not be displayed.',
+    defaultMessage: 'For privacy reasons,<br/>your conversation history will not appear here.',
   },
   learnMore: {
     id: 'historyInfo.learnMore',
