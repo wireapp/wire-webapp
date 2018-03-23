@@ -202,12 +202,9 @@ z.entity.Conversation = class Conversation {
           return this.name();
         }
 
-        const [user_et] = this.participating_user_ets();
-        if (user_et && user_et.name) {
-          return user_et.name();
-        }
-
-        return '…';
+        const [userEntity] = this.participating_user_ets();
+        const hasUser = userEntity && userEntity.name();
+        return hasUser ? userEntity.name() : '…';
       }
 
       if (this.is_group()) {
@@ -215,27 +212,28 @@ z.entity.Conversation = class Conversation {
           return this.name();
         }
 
-        if (this.participating_user_ets().length > 0) {
+        const hasUserEntities = !!this.participating_user_ets().length;
+        if (hasUserEntities) {
           const isJustBots = this.participating_user_ets().every(user_et => user_et.isBot);
-          return this.participating_user_ets()
+          const joinedNames = this.participating_user_ets()
             .filter(user_et => isJustBots || !user_et.isBot)
             .map(user_et => user_et.first_name())
             .join(', ');
+
+          const maxLength = z.conversation.ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;
+          return z.util.StringUtil.truncate(joinedNames, maxLength, false);
         }
 
-        if (this.participating_user_ids().length === 0) {
+        const hasUserIds = !!this.participating_user_ids().length;
+        if (!hasUserIds) {
           return z.l10n.text(z.string.conversationsEmptyConversation);
         }
-
-        return '…';
       }
 
       return this.name() || '…';
     });
 
-    this.persist_state = _.debounce(() => {
-      amplify.publish(z.event.WebApp.CONVERSATION.PERSIST_STATE, this);
-    }, 100);
+    this.persist_state = _.debounce(() => amplify.publish(z.event.WebApp.CONVERSATION.PERSIST_STATE, this), 100);
   }
 
   subscribe_to_state_updates() {
