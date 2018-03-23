@@ -46,8 +46,8 @@
   "unsupported.unsupportedHeadline": "Dieser Browser wird nicht unterstützt.",
   "unsupported.unsupportedSubhead":
     "Lade die neueste Version von <b style=\"font-weight: 600\">Google Chrome, Mozilla Firefox, Opera</b> oder <b style=\"font-weight: 600\">Microsoft Edge</b> herunter.",
-  "conversationJoin.unsupportedJoinHeadline": "Du bist in ein <br /><b style=\"color: black;\">Wire Gästezimmer</b> eingeladen.",
-  "conversationJoin.headline": "Du bist in ein <br /><b style=\"color: black;\">Wire Gästezimmer</b> eingeladen.",
+  "conversationJoin.unsupportedJoinHeadline": "Du bist in ein <b style=\"color: black;\">Wire Gästezimmer</b> <br />eingeladen.",
+  "conversationJoin.headline": "Du bist in ein <b style=\"color: black;\">Wire Gästezimmer</b> <br />eingeladen.",
   "conversationJoin.unsupportedJoinSubhead":
     "<p>Dieser Browser wird nicht unterstützt.</p>Lade die neueste Version von <b style=\"font-weight: 600\">Google Chrome, Mozilla Firefox, Opera</b> oder <b style=\"font-weight: 600\">Microsoft Edge</b> herunter.",
   "conversationJoin.unsupportedJoinMobileSubhead": "Öffne diesen Link auf deinem Computer.",
@@ -112,10 +112,10 @@
   "clientManager.headline": "Entferne ein Gerät",
   "clientManager.subhead": "Entferne eines deiner anderen Geräte, um Wire hier zu nutzen.",
   "clientManager.logout": "Abmelden",
-  "historyInfo.hasHistoryHeadline": "",
-  "historyInfo.noHistoryHeadline": "",
-  "historyInfo.hasHistoryInfo": "",
-  "historyInfo.noHistoryInfo": "",
+  "historyInfo.hasHistoryHeadline": "Du hast Wire auf diesem Gerät bereits früher genutzt",
+  "historyInfo.noHistoryHeadline": "Du benutzt Wire zum ersten Mal auf diesem Gerät",
+  "historyInfo.hasHistoryInfo": "Nachrichten, die in der Zwischenzeit<br/>gesendet wurden, werden nicht angezeigt.",
+  "historyInfo.noHistoryInfo": "Aus Datenschutzgründen wird dein<br/>bisheriger Gesprächsverlauf nicht angezeigt.",
   "historyInfo.learnMore": "Erfahre mehr",
   "historyInfo.ok": "Verstanden"
 }

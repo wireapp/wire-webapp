@@ -104,6 +104,8 @@ z.string.et.modalConfirmSecondary = 'Tühista';
 z.string.et.modalOptionSecondary = 'Tühista';
 
 z.string.et.modalAccountCreateAction = 'OK';
+z.string.et.modalAccountCreateHeadline = 'Lood konto?';
+z.string.et.modalAccountCreateMessage = 'Luues konto, kaotad sa vestlusajaloo selles külalistetoas.';
 
 z.string.et.modalAccountDeletionAction = 'Kustuta';
 z.string.et.modalAccountDeletionHeadline = 'Kustuta konto';
@@ -261,6 +263,7 @@ z.string.et.connectionRequestConnect = 'Ühendu';
 z.string.et.connectionRequestIgnore = 'Ignoreeri';
 
 z.string.et.conversationGuestIndicator = 'Külaline';
+z.string.et.userRemainingTimeHours = '{{time}}h jäänud';
 
 z.string.et.conversationYouNominative = 'sina';
 z.string.et.conversationYouDative = 'sina';
@@ -557,6 +560,7 @@ z.string.et.preferencesOptionsNotificationsNone = 'Väljas';
 z.string.et.preferencesOptionsNotificationsObfuscate = 'Peida üksikasjad';
 z.string.et.preferencesOptionsNotificationsObfuscateMessage = 'Kuva saatjat';
 z.string.et.preferencesOptionsNotificationsOn = 'Kuva saatjat ja sõnumit';
+z.string.et.preferencesOptionsCallLogs = 'Veaotsing';
 
 z.string.et.searchConnect = 'Ühendu';
 z.string.et.searchConnections = 'Ühendused';

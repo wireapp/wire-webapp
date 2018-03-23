@@ -564,6 +564,9 @@ z.string.de.preferencesOptionsNotificationsNone = 'Aus';
 z.string.de.preferencesOptionsNotificationsObfuscate = 'Details verbergen';
 z.string.de.preferencesOptionsNotificationsObfuscateMessage = 'Absendername zeigen';
 z.string.de.preferencesOptionsNotificationsOn = 'Zeige Absendername und Nachricht';
+z.string.de.preferencesOptionsCallLogs = 'Fehlerbehebung';
+z.string.de.preferencesOptionsCallLogsGet = 'Diagnose-Bericht zu Anrufen speichern';
+z.string.de.preferencesOptionsCallLogsDetail = 'Diese Informationen helfen uns Probleme bei Anrufen zu diagnostizieren.';
 
 z.string.de.searchConnect = 'Vorschläge';
 z.string.de.searchConnections = 'Kontakte';
