@@ -90,7 +90,7 @@ z.broadcast.BroadcastRepository = class BroadcastRepository {
     return this.broadcastService
       .postBroadcastMessage(payload, preconditionOption)
       .then(response => {
-        this.clientMismatchHandler.onClientMismatch(response, undefined);
+        this.clientMismatchHandler.onClientMismatch(response, genericMessage, payload, undefined);
         return response;
       })
       .catch(error => {
@@ -104,7 +104,7 @@ z.broadcast.BroadcastRepository = class BroadcastRepository {
         }
 
         return this.clientMismatchHandler
-          .onClientMismatch(error, undefined, genericMessage, payload)
+          .onClientMismatch(error, genericMessage, payload, undefined)
           .then(updatedPayload => {
             this.logger.info(`Updated '${messageType}' message as broadcast`, updatedPayload);
             return this._sendEncryptedMessage(genericMessage, updatedPayload, true);

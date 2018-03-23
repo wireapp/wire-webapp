@@ -155,12 +155,12 @@ z.viewModel.PanelViewModel = class PanelViewModel {
   }
 
   showParticipant(userEntity, fromLeft = false) {
+    userEntity = ko.unwrap(userEntity);
     const isSingleModeConversation = this.conversationEntity().is_one2one() || this.conversationEntity().is_request();
-    const user = ko.unwrap(userEntity);
 
     if (this.isVisible()) {
       if (isSingleModeConversation) {
-        if (user.is_me) {
+        if (userEntity.is_me) {
           const isStateGroupParticipant = this.state() === PanelViewModel.STATE.GROUP_PARTICIPANT_USER;
           if (isStateGroupParticipant) {
             return this.closePanel();
@@ -176,7 +176,7 @@ z.viewModel.PanelViewModel = class PanelViewModel {
       const selectedGroupParticipant =
         this.groupParticipantUser.selectedParticipant() || this.groupParticipantService.selectedParticipant();
       if (selectedGroupParticipant) {
-        const isVisibleGroupParticipant = user.id === selectedGroupParticipant.id;
+        const isVisibleGroupParticipant = userEntity.id === selectedGroupParticipant.id;
         if (isVisibleGroupParticipant) {
           return this.closePanel();
         }
@@ -187,7 +187,7 @@ z.viewModel.PanelViewModel = class PanelViewModel {
       return this.switchState(PanelViewModel.STATE.CONVERSATION_DETAILS, true);
     }
 
-    if (user.isBot) {
+    if (userEntity.isBot) {
       this.groupParticipantService.showGroupParticipant(userEntity);
       this.switchState(PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE, false);
     } else {
