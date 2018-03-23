@@ -458,7 +458,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       for (const file of Array.from(files)) {
         const isTooLarge = file.size > z.config.MAXIMUM_ASSET_FILE_SIZE;
         if (isTooLarge) {
-          const fileSize = z.util.format_bytes(z.config.MAXIMUM_ASSET_FILE_SIZE);
+          const fileSize = z.util.formatBytes(z.config.MAXIMUM_ASSET_FILE_SIZE);
           const options = {
             text: {
               message: z.l10n.text(z.string.modalAssetTooLargeMessage, fileSize),
