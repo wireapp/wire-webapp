@@ -1804,7 +1804,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
       .then(() => this.client_repository.registerClient(auto_login ? undefined : this.password()))
       .then(client_observable => {
         this.event_repository.currentClient = client_observable;
-        return this.event_repository.initializeStreamState(client_observable().id);
+        return this.event_repository.setStreamState(client_observable().id, true);
       })
       .catch(error => {
         if (error.code === z.service.BackendClientError.STATUS_CODE.NOT_FOUND) {
