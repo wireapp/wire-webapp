@@ -1,10 +1,12 @@
 <div id="conversation-title-bar" class="conversation-title-bar" data-bind="with: $root.titleBar">
   <!-- ko if: conversationEntity() -->
-    <div class="conversation-title-bar-library">
-      <span class="conversation-title-bar-icon button-icon-large icon-search"
-            data-bind="click: clickOnCollectionButton, l10n_tooltip: z.string.tooltipConversationSearch"
-            data-uie-name="do-collections"></span>
-    </div>
+    <!-- ko if: isActivatedAccount() -->
+      <div class="conversation-title-bar-library">
+        <span class="conversation-title-bar-icon button-icon-large icon-search"
+              data-bind="click: clickOnCollectionButton, l10n_tooltip: z.string.tooltipConversationSearch"
+              data-uie-name="do-collections"></span>
+      </div>
+    <!-- /ko -->
 
     <div id="show-participants"
           data-bind="click: clickOnDetails, attr: {'title': peopleTooltip}, event: {mousedown: onMouseDown, mousemove: onMouseMove, mouseup: onMouseUp}"
