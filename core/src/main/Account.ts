@@ -69,55 +69,6 @@ class Account extends EventEmitter {
     this.apiClient = apiClient;
   }
 
-  private decodeEvent(event: ConversationEvent): Promise<string> {
-    return new Promise(resolve => {
-      if (!this.service) {
-        throw new Error('Services are not set.');
-      }
-
-      switch (event.type) {
-        case ConversationEventType.OTR_MESSAGE_ADD: {
-          const otrMessage: OTRMessageAdd = event as OTRMessageAdd;
-          const sessionId: string = CryptographyService.constructSessionId(otrMessage.from, otrMessage.data.sender);
-          const ciphertext: string = otrMessage.data.text;
-          this.service.cryptography.decrypt(sessionId, ciphertext).then((decryptedMessage: Uint8Array) => {
-            const genericMessage = this.protocolBuffers.GenericMessage.decode(decryptedMessage);
-            switch (genericMessage.content) {
-              case GenericMessageType.TEXT: {
-                resolve(genericMessage.text.content);
-                break;
-              }
-              default:
-                resolve(undefined);
-            }
-          });
-          break;
-        }
-      }
-    });
-  }
-
-  private handleEvent(event: ConversationEvent): Promise<PayloadBundle> {
-    const {conversation, from} = event;
-    return this.decodeEvent(event).then((content: string) => {
-      return {
-        content,
-        conversation,
-        from,
-      };
-    });
-  }
-
-  private handleNotification(notification: IncomingNotification): void {
-    for (const event of notification.payload) {
-      this.handleEvent(event).then((data: PayloadBundle) => {
-        if (data.content) {
-          this.emit(Account.INCOMING.TEXT_MESSAGE, data);
-        }
-      });
-    }
-  }
-
   private init(): Promise<void> {
     const proto = {
       options: {java_package: 'com.waz.model'},
@@ -366,12 +317,26 @@ class Account extends EventEmitter {
       });
   }
 
-  private initClient(context: Context, loginData: LoginData, clientInfo?: ClientInfo): Promise<RegisteredClient> {
+  public login(
+    loginData: LoginData,
+    initClient: boolean = true,
+    clientInfo?: ClientInfo
+  ): Promise<Context | undefined> {
+    return this.resetContext()
+      .then(() => this.init())
+      .then(() => LoginSanitizer.removeNonPrintableCharacters(loginData))
+      .then(() => this.apiClient.login(loginData))
+      .then((context: Context) => {
+        return initClient
+          ? this.initClient(loginData, clientInfo).then(() => this.apiClient.context)
+          : this.apiClient.context;
+      });
+  }
+
+  private initClient(loginData: LoginData, clientInfo?: ClientInfo): Promise<RegisteredClient> {
     if (!this.service) {
       throw new Error('Services are not set.');
     }
-
-    this.context = context;
     let loadedClient: RegisteredClient;
 
     return this.service.cryptography
@@ -379,7 +344,7 @@ class Account extends EventEmitter {
       .then(client => (loadedClient = client))
       .then(() => this.apiClient.client.api.getClient(loadedClient.id))
       .then(() => {
-        this.service!.conversation.setClientID(<string>this.context!.clientId);
+        this.service!.conversation.setClientID(<string>this.apiClient.context!.clientId);
         return loadedClient;
       })
       .catch(error => {
@@ -392,7 +357,9 @@ class Account extends EventEmitter {
         const notFoundOnBackend = error.response && error.response.status === StatusCode.NOT_FOUND;
 
         if (notFoundInDatabase) {
-          return this.registerClient(loginData, clientInfo);
+          return this.registerClient(loginData, clientInfo).then((client: RegisteredClient) => {
+            return this.service!.client.synchronizeClients().then(() => client);
+          });
         }
         if (notFoundOnBackend) {
           const shouldDeleteWholeDatabase = loadedClient.type === ClientType.TEMPORARY;
@@ -400,11 +367,12 @@ class Account extends EventEmitter {
             return this.apiClient.config.store
               .purge()
               .then(() => this.apiClient.init())
-              .then(() => this.registerClient(loginData, clientInfo));
+              .then(() => this.registerClient(loginData, clientInfo))
+              .then((client: RegisteredClient) => this.service!.client.synchronizeClients().then(() => client));
           }
-          return this.service!.cryptography.deleteCryptographyStores().then(() =>
-            this.registerClient(loginData, clientInfo)
-          );
+          return this.service!.cryptography.deleteCryptographyStores()
+            .then(() => this.registerClient(loginData, clientInfo))
+            .then((client: RegisteredClient) => this.service!.client.synchronizeClients().then(() => client));
         }
         throw error;
       })
@@ -412,65 +380,6 @@ class Account extends EventEmitter {
       .catch((error: Error) => {
         throw error;
       });
-  }
-
-  public listen(loginData: LoginData, notificationHandler?: Function): Promise<Account> {
-    return Promise.resolve()
-      .then(() => (this.context ? this.context : this.login(loginData, true)))
-      .then(() => {
-        if (notificationHandler) {
-          this.apiClient.transport.ws.on(WebSocketClient.TOPIC.ON_MESSAGE, (notification: IncomingNotification) =>
-            notificationHandler(notification)
-          );
-        } else {
-          this.apiClient.transport.ws.on(WebSocketClient.TOPIC.ON_MESSAGE, this.handleNotification.bind(this));
-        }
-        return this.apiClient.connect();
-      })
-      .then(() => this);
-  }
-
-  public login(
-    loginData: LoginData,
-    initClient: boolean = true,
-    clientInfo?: ClientInfo
-  ): Promise<Context | undefined> {
-    return this.init()
-      .then(() => LoginSanitizer.removeNonPrintableCharacters(loginData))
-      .then(() => this.apiClient.login(loginData))
-      .then((context: Context) => {
-        if (initClient) {
-          return this.initClient(context, loginData, clientInfo).then(client => {
-            if (!this.apiClient.context) {
-              throw new Error('API client does not have a context.');
-            }
-            this.apiClient.context.clientId = client.id;
-          });
-        }
-        return undefined;
-      })
-      .then(() => {
-        if (!this.service) {
-          throw new Error('Services are not set.');
-        }
-
-        if (!this.apiClient.context) {
-          throw new Error('API client does not have a context.');
-        }
-
-        this.context = this.apiClient.context;
-        this.service.conversation.setClientID(<string>this.context!.clientId);
-        return this.context;
-      });
-  }
-
-  private resetContext(): void {
-    delete this.context;
-    delete this.service;
-  }
-
-  public logout(): Promise<void> {
-    return this.apiClient.logout().then(() => this.resetContext());
   }
 
   // TODO: Split functionality into "create" and "register" client
@@ -484,6 +393,9 @@ class Account extends EventEmitter {
   ): Promise<RegisteredClient> {
     if (!this.service) {
       throw new Error('Services are not set.');
+    }
+    if (!this.apiClient.context) {
+      throw new Error('Context is not set.');
     }
 
     const serializedPreKeys: Array<PreKey> = await this.service.cryptography.createCryptobox();
@@ -513,9 +425,87 @@ class Account extends EventEmitter {
     const client = await this.apiClient.client.api.postClient(newClient);
     await this.service.client.createLocalClient(client);
     await this.service.cryptography.loadLocalClient();
+    this.apiClient.context!.clientId = client.id;
+    this.service!.conversation.setClientID(<string>this.apiClient.context!.clientId);
     await this.service.notification.initializeNotificationStream(client.id);
 
     return client;
+  }
+
+  private resetContext(): Promise<void> {
+    return Promise.resolve().then(() => {
+      delete this.apiClient.context;
+      delete this.service;
+    });
+  }
+
+  public logout(): Promise<void> {
+    return this.apiClient.logout().then(() => this.resetContext());
+  }
+
+  public listen(loginData: LoginData, notificationHandler?: Function): Promise<Account> {
+    return Promise.resolve()
+      .then(() => (this.apiClient.context ? this.apiClient.context : this.login(loginData, true)))
+      .then(() => {
+        if (notificationHandler) {
+          this.apiClient.transport.ws.on(WebSocketClient.TOPIC.ON_MESSAGE, (notification: IncomingNotification) =>
+            notificationHandler(notification)
+          );
+        } else {
+          this.apiClient.transport.ws.on(WebSocketClient.TOPIC.ON_MESSAGE, this.handleNotification.bind(this));
+        }
+        return this.apiClient.connect();
+      })
+      .then(() => this);
+  }
+
+  private decodeEvent(event: ConversationEvent): Promise<string> {
+    return new Promise(resolve => {
+      if (!this.service) {
+        throw new Error('Services are not set.');
+      }
+
+      switch (event.type) {
+        case ConversationEventType.OTR_MESSAGE_ADD: {
+          const otrMessage: OTRMessageAdd = event as OTRMessageAdd;
+          const sessionId: string = CryptographyService.constructSessionId(otrMessage.from, otrMessage.data.sender);
+          const ciphertext: string = otrMessage.data.text;
+          this.service.cryptography.decrypt(sessionId, ciphertext).then((decryptedMessage: Uint8Array) => {
+            const genericMessage = this.protocolBuffers.GenericMessage.decode(decryptedMessage);
+            switch (genericMessage.content) {
+              case GenericMessageType.TEXT: {
+                resolve(genericMessage.text.content);
+                break;
+              }
+              default:
+                resolve(undefined);
+            }
+          });
+          break;
+        }
+      }
+    });
+  }
+
+  private handleEvent(event: ConversationEvent): Promise<PayloadBundle> {
+    const {conversation, from} = event;
+    return this.decodeEvent(event).then((content: string) => {
+      return {
+        content,
+        conversation,
+        from,
+      };
+    });
+  }
+
+  private handleNotification(notification: IncomingNotification): void {
+    for (const event of notification.payload) {
+      this.handleEvent(event).then((data: PayloadBundle) => {
+        if (data.content) {
+          this.emit(Account.INCOMING.TEXT_MESSAGE, data);
+        }
+      });
+    }
   }
 }
 

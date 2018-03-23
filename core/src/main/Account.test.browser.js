@@ -42,10 +42,12 @@ describe('Account', () => {
       const apiClient = new Client({
         schemaCallback: db => {
           db.version(1).stores({
+            amplify: '',
             authentication: '',
             clients: ', meta.primary_key',
             keys: '',
             prekeys: '',
+            sessions: '',
           });
         },
         store: engine,
@@ -58,11 +60,14 @@ describe('Account', () => {
       };
 
       const account = new Account(apiClient);
-      spyOn(account, 'registerClient');
+      spyOn(account, 'registerClient').and.callThrough();
 
       try {
         await account.init();
         account.service.client.synchronizeClients = () => Promise.resolve();
+        account.service.notification.backend.getLastNotification = () => Promise.resolve({id: 'notification-id'});
+        account.apiClient.context = {};
+        account.apiClient.client.api.postClient = () => Promise.resolve({id: context.clientId});
         await apiClient.initEngine(context);
         storeName = engine.storeName;
         await account.initClient(context);
