@@ -178,7 +178,7 @@ class Demo extends React.PureComponent {
             <Columns>
               <Column>Checkbox</Column>
               <Column>
-                <Checkbox id="ToU">
+                <Checkbox id="ToULink">
                   <Text bold fontSize="11px" textTransform="uppercase">
                     {'ToU '}
                   </Text>
