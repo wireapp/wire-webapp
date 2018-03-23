@@ -53,6 +53,7 @@ import BackendError from '../module/action/BackendError';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
 import WirelessUnsupportedBrowser from '../component/WirelessUnsupportedBrowser';
 import WirelessContainer from '../component/WirelessContainer';
+import * as TrackingAction from '../module/action/TrackingAction';
 
 class ConversationJoin extends Component {
   state = {
@@ -99,7 +100,10 @@ class ConversationJoin extends Component {
     }
   };
 
-  componentDidMount = () => this.readAndUpdateParamsFromUrl();
+  componentDidMount = () => {
+    this.props.trackEvent({name: TrackingAction.EVENT_NAME.GUEST_ROOMS.OPENED_SIGNUP});
+    this.readAndUpdateParamsFromUrl();
+  };
 
   componentWillReceiveProps = nextProps => this.readAndUpdateParamsFromUrl(nextProps);
 
@@ -287,7 +291,11 @@ export default withRouter(
         isTemporaryGuest: SelfSelector.isTemporaryGuest(state),
         selfName: SelfSelector.getSelfName(state),
       }),
-      {...ConversationAction, ...AuthAction}
+      {
+        ...AuthAction,
+        ...ConversationAction,
+        ...TrackingAction,
+      }
     )(ConversationJoin)
   )
 );
