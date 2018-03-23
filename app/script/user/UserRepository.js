@@ -787,10 +787,9 @@ z.user.UserRepository = class UserRepository {
     return this.connected_users()
       .filter(user_et => user_et.matches(query, is_handle, excludedEmojis))
       .sort((user_a, user_b) => {
-        if (is_handle) {
-          return z.util.StringUtil.sortByPriority(user_a.username(), user_b.username(), query);
-        }
-        return z.util.StringUtil.sortByPriority(user_a.name(), user_b.name(), query);
+        return is_handle
+          ? z.util.StringUtil.sortByPriority(user_a.username(), user_b.username(), query)
+          : z.util.StringUtil.sortByPriority(user_a.name(), user_b.name(), query);
       });
   }
 

@@ -95,10 +95,9 @@ z.search.SearchRepository = class SearchRepository {
 
         return userEntities
           .sort((userA, userB) => {
-            if (isHandle) {
-              return z.util.StringUtil.sortByPriority(userA.username(), userB.username(), name);
-            }
-            return z.util.StringUtil.sortByPriority(userA.name(), userB.name(), name);
+            return isHandle
+              ? z.util.StringUtil.sortByPriority(userA.username(), userB.username(), name)
+              : z.util.StringUtil.sortByPriority(userA.name(), userB.name(), name);
           })
           .slice(0, maxResults);
       });

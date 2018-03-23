@@ -226,7 +226,10 @@ z.viewModel.ListViewModel = class ListViewModel {
 
     $(document).on('keydown.listView', keyboardEvent => {
       if (z.util.KeyboardUtil.isEscapeKey(keyboardEvent)) {
-        this.switchList(ListViewModel.STATE.CONVERSATIONS);
+        const newState = this.isActivatedAccount()
+          ? ListViewModel.STATE.CONVERSATIONS
+          : ListViewModel.STATE.TEMPORARY_GUEST;
+        this.switchList(newState);
       }
     });
   }
@@ -358,7 +361,9 @@ z.viewModel.ListViewModel = class ListViewModel {
   }
 
   clickToArchive(conversationEntity = this.conversationRepository.active_conversation()) {
-    this.actionsViewModel.archiveConversation(conversationEntity);
+    if (this.isActivatedAccount()) {
+      this.actionsViewModel.archiveConversation(conversationEntity);
+    }
   }
 
   clickToBlock(conversationEntity) {

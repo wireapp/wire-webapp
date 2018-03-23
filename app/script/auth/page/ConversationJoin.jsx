@@ -53,6 +53,7 @@ import BackendError from '../module/action/BackendError';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
 import WirelessUnsupportedBrowser from '../component/WirelessUnsupportedBrowser';
 import WirelessContainer from '../component/WirelessContainer';
+import * as TrackingAction from '../module/action/TrackingAction';
 
 class ConversationJoin extends Component {
   state = {
@@ -99,17 +100,23 @@ class ConversationJoin extends Component {
     }
   };
 
-  componentDidMount = () => this.readAndUpdateParamsFromUrl();
+  componentDidMount = () => {
+    this.props.trackEvent({name: TrackingAction.EVENT_NAME.GUEST_ROOMS.OPENED_SIGNUP});
+    this.readAndUpdateParamsFromUrl();
+  };
 
   componentWillReceiveProps = nextProps => this.readAndUpdateParamsFromUrl(nextProps);
 
   onOpenWireClick = () => {
-    this.props.doJoinConversationByCode(this.state.conversationKey, this.state.conversationCode).then(() => {
-      const link = document.createElement('a');
-      link.href = pathWithParams('/');
-      document.body.appendChild(link); // workaround for Firefox
-      link.click();
-    });
+    this.props
+      .doJoinConversationByCode(this.state.conversationKey, this.state.conversationCode)
+      .then(() => this.trackAddParticipant())
+      .then(() => {
+        const link = document.createElement('a');
+        link.href = pathWithParams('/');
+        document.body.appendChild(link); // workaround for Firefox
+        link.click();
+      });
   };
 
   handleSubmit = event => {
@@ -125,6 +132,7 @@ class ConversationJoin extends Component {
         .then(name => name.trim())
         .then(name => this.props.doRegisterWireless({expires_in: this.state.expiresIn, name}))
         .then(() => this.props.doJoinConversationByCode(this.state.conversationKey, this.state.conversationCode))
+        .then(() => this.trackAddParticipant())
         .then(() => window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP)))
         .catch(error => this.props.doLogout());
     }
@@ -135,6 +143,20 @@ class ConversationJoin extends Component {
     error && error.label && error.is(BackendError.CONVERSATION_ERRORS.CONVERSATION_TOO_MANY_MEMBERS);
 
   resetErrors = () => this.setState({error: null, isValidName: true});
+
+  trackAddParticipant = () => {
+    const {isTemporaryGuest, trackEvent} = this.props;
+
+    return trackEvent({
+      attributes: {
+        guest_num: isTemporaryGuest ? 0 : 1,
+        is_allow_guests: true,
+        temporary_guest_num: isTemporaryGuest ? 1 : 0,
+        user_num: 0,
+      },
+      name: TrackingAction.EVENT_NAME.CONVERSATION.ADD_PARTICIPANTS,
+    });
+  };
 
   renderActivatedAccount = () => {
     const {selfName, intl: {formatMessage: _}} = this.props;
@@ -287,7 +309,11 @@ export default withRouter(
         isTemporaryGuest: SelfSelector.isTemporaryGuest(state),
         selfName: SelfSelector.getSelfName(state),
       }),
-      {...ConversationAction, ...AuthAction}
+      {
+        ...AuthAction,
+        ...ConversationAction,
+        ...TrackingAction,
+      }
     )(ConversationJoin)
   )
 );

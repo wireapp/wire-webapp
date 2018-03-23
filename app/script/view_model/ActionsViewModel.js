@@ -155,9 +155,7 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
   leaveConversation(conversationEntity) {
     if (conversationEntity) {
       amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
-        action: () => {
-          this.conversationRepository.removeMember(conversationEntity, this.userRepository.self().id);
-        },
+        action: () => this.conversationRepository.removeMember(conversationEntity, this.userRepository.self().id),
         text: {
           action: z.l10n.text(z.string.modalConversationLeaveAction),
           message: z.l10n.text(z.string.modalConversationLeaveMessage),

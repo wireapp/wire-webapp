@@ -69,7 +69,6 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
 
         this.conversationEntity()
           .participating_user_ets()
-          .sort((userA, userB) => z.util.StringUtil.sortByPriority(userA.first_name(), userB.first_name()))
           .map(userEntity => {
             if (userEntity.isBot) {
               return this.serviceParticipants.push(userEntity);

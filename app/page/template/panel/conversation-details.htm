@@ -17,7 +17,11 @@
                 <verified-icon class="conversation-details__name__verified-icon-right" data-uie-name="status-verified-conversation"></verified-icon>
               <!-- /ko -->
             </div>
-            <textarea class="conversation-details__name conversation-details__name--input" spellcheck="false" data-bind="visible: isEditingName, value: conversationEntity().display_name(), enter: renameConversation, hasFocus: isEditingName, resize" maxlength="64" dir="auto" data-uie-name="enter-name"></textarea>
+            <textarea class="conversation-details__name conversation-details__name--input"
+                      dir="auto"
+                      spellcheck="false"
+                      data-bind="attr: {maxlength: z.conversation.ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH}, enter: renameConversation, hasFocus: isEditingName, resize, value: conversationEntity().display_name(), visible: isEditingName"
+                      data-uie-name="enter-name"></textarea>
           <!-- /ko -->
           <!-- ko ifnot: isNameEditable() -->
             <div class="conversation-details__name" data-bind="css: {'conversation-details__name--centered': isSingleUserMode()}">

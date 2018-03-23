@@ -17,7 +17,7 @@
         "debug": true,
         "modules": false,
         "targets": {
-          "browsers": ["chrome >= 56", "firefox >= 52", "edge >= 14", "opera >= 43"]
+          "browsers": ["chrome >= 56", "firefox >= 52", "edge >= 15", "opera >= 43"]
         },
         "useBuiltIns": true
       }
