@@ -81,7 +81,6 @@ z.main.App = class App {
     repositories.audio = this.auth.audio;
     repositories.cache = new z.cache.CacheRepository();
     repositories.giphy = new z.extension.GiphyRepository(this.service.giphy);
-    repositories.lifecycle = new z.lifecycle.LifecycleRepository(this.service.lifecycle);
     repositories.media = new z.media.MediaRepository();
     repositories.storage = new z.storage.StorageRepository(this.service.storage);
 
@@ -104,6 +103,7 @@ z.main.App = class App {
       repositories.user
     );
     repositories.properties = new z.properties.PropertiesRepository(this.service.properties);
+    repositories.lifecycle = new z.lifecycle.LifecycleRepository(this.service.lifecycle, repositories.user);
     repositories.connect = new z.connect.ConnectRepository(
       this.service.connect,
       this.service.connect_google,
