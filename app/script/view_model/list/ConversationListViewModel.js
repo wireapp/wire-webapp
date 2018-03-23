@@ -49,6 +49,7 @@ z.viewModel.list.ConversationListViewModel = class ConversationListViewModel {
     this.selectedConversation = ko.observable();
 
     this.isTeam = this.teamRepository.isTeam;
+    this.isActivatedAccount = mainViewModel.isActivatedAccount;
 
     this.selfUser = ko.pureComputed(() => this.user_repository.self && this.user_repository.self());
     this.selfAvailability = ko.pureComputed(() => this.selfUser() && this.selfUser().availability());
@@ -167,6 +168,8 @@ z.viewModel.list.ConversationListViewModel = class ConversationListViewModel {
   }
 
   clickOnPeopleButton() {
-    this.listViewModel.switchList(z.viewModel.ListViewModel.STATE.START_UI);
+    if (this.isActivatedAccount()) {
+      this.listViewModel.switchList(z.viewModel.ListViewModel.STATE.START_UI);
+    }
   }
 };

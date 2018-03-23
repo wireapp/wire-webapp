@@ -358,7 +358,9 @@ z.viewModel.ListViewModel = class ListViewModel {
   }
 
   clickToArchive(conversationEntity = this.conversationRepository.active_conversation()) {
-    this.actionsViewModel.archiveConversation(conversationEntity);
+    if (this.isActivatedAccount()) {
+      this.actionsViewModel.archiveConversation(conversationEntity);
+    }
   }
 
   clickToBlock(conversationEntity) {
