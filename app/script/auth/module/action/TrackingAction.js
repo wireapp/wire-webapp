@@ -22,6 +22,9 @@ import RuntimeUtil from '../../util/RuntimeUtil';
 import {REGISTER_FLOW} from '../selector/AuthSelector';
 
 export const EVENT_NAME = {
+  CONVERSATION: {
+    ADD_PARTICIPANTS: 'conversation.add_participants',
+  },
   GUEST_ROOMS: {
     OPENED_SIGNUP: 'guest_rooms.opened_signup',
   },
