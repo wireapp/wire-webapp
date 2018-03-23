@@ -47,6 +47,7 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
     this.joinedCall = this.callingRepository.joinedCall;
     this.remoteMediaStreams = this.callingRepository.remoteMediaStreams;
     this.selfStreamState = this.callingRepository.selfStreamState;
+    this.isActivatedAccount = mainViewModel.isActivatedAccount;
 
     this.hasCall = ko.pureComputed(() => {
       const hasEntities = this.conversationEntity() && this.joinedCall();
@@ -99,7 +100,11 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
   addedToView() {
     window.setTimeout(() => {
       amplify.subscribe(z.event.WebApp.SHORTCUT.PEOPLE, () => this.showDetails());
-      amplify.subscribe(z.event.WebApp.SHORTCUT.ADD_PEOPLE, () => this.showDetails(true));
+      amplify.subscribe(z.event.WebApp.SHORTCUT.ADD_PEOPLE, () => {
+        if (this.isActivatedAccount()) {
+          this.showDetails(true);
+        }
+      });
     }, 50);
   }
 
