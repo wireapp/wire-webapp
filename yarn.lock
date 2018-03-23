@@ -154,10 +154,6 @@
   version "3.0.3"
   resolved "https://codeload.github.com/necolas/normalize.css/tar.gz/2bdda84272650aedfb45d8abe11a6d177933a803"
 
-"@bower_components/pako@nodeca/pako#1.0.6":
-  version "1.0.6"
-  resolved "https://codeload.github.com/nodeca/pako/tar.gz/893381abcafa10fa2081ce60dae7d4d8e873a658"
-
 "@bower_components/phone-format@albeebe/phoneformat.js#1.0.6":
   version "1.0.5"
   resolved "https://codeload.github.com/albeebe/phoneformat.js/tar.gz/6adb62e70153d9a5edb95f42deba144d6f914f37"
