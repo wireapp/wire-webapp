@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="1.0.16"></a>
+## 1.0.16 (2018-03-23)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Checkbox styling ([#411](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/411)) ([4c45926](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/4c45926))
+
+
+
+
 <a name="1.0.15"></a>
 ## [1.0.15](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@1.0.14...@wireapp/react-ui-kit@1.0.15) (2018-03-15)
 
