@@ -34,6 +34,11 @@ z.event.EventRepository = class EventRepository {
         z.event.EventError.TYPE.OUTDATED_E_CALL_EVENT,
         z.event.EventError.TYPE.VALIDATION_FAILED,
       ],
+      NOTIFICATION_BATCHES: {
+        INITIAL: 500,
+        MAX: 10000,
+        SUBSEQUENT: 5000,
+      },
     };
   }
 
@@ -127,7 +132,7 @@ z.event.EventRepository = class EventRepository {
 
     this.webSocketBuffer = [];
 
-    this.lastNotificationId = ko.observable(undefined);
+    this.lastNotificationId = ko.observable();
     this.lastEventDate = ko.observable();
 
     amplify.subscribe(z.event.WebApp.CONNECTION.ONLINE, this.recoverFromStream.bind(this));
@@ -205,10 +210,10 @@ z.event.EventRepository = class EventRepository {
    * Get notifications for the current client from the stream.
    *
    * @param {string} notificationId - Event ID to start from
-   * @param {number} [limit=10000] - Max. number of notifications to retrieve from backend at once
+   * @param {number} [limit=EventRepository.CONFIG.NOTIFICATION_BATCHES.MAX] - Max. number of notifications to retrieve from backend at once
    * @returns {Promise} Resolves when all new notifications from the stream have been handled
    */
-  getNotifications(notificationId, limit = 10000) {
+  getNotifications(notificationId, limit = EventRepository.CONFIG.NOTIFICATION_BATCHES.MAX) {
     return new Promise((resolve, reject) => {
       const _gotNotifications = ({has_more: hasAdditionalNotifications, notifications, time}) => {
         if (time) {
@@ -228,7 +233,7 @@ z.event.EventRepository = class EventRepository {
           this.notificationsTotal += notifications.length;
 
           if (hasAdditionalNotifications) {
-            return this.getNotifications(notificationId, 5000);
+            return this.getNotifications(notificationId, EventRepository.CONFIG.NOTIFICATION_BATCHES.SUBSEQUENT);
           }
 
           this.notificationsLoaded(true);
@@ -276,7 +281,7 @@ z.event.EventRepository = class EventRepository {
         }
 
         this.logger.warn('Last notification ID not found in database. Resetting...');
-        return this._getLastNotificationId(this.currentClient().id).then(() => {
+        return this.setStreamState(this.currentClient().id).then(() => {
           this._missedEventsFromStream();
           return this.lastNotificationId();
         });
@@ -285,6 +290,7 @@ z.event.EventRepository = class EventRepository {
         this.lastNotificationId(notificationId);
         return this.notificationService.getLastEventDateFromDb();
       })
+      .then(eventDate => this.lastEventDate(eventDate))
       .catch(error => {
         const isNoLastDate = error.type === z.event.EventError.TYPE.NO_LAST_DATE;
         if (!isNoLastDate) {
@@ -292,19 +298,13 @@ z.event.EventRepository = class EventRepository {
         }
 
         this.logger.warn('Last event date not found in database. Resetting...');
-        return this._updateLastEventDate(new Date(0).toISOString());
+        this.lastEventDate(new Date(0).toISOString());
       })
-      .then(eventDate => {
-        this.lastEventDate(eventDate);
-        return {
-          eventDate: this.lastEventDate(),
-          notificationId: this.lastNotificationId(),
-        };
-      });
+      .then(() => ({eventDate: this.lastEventDate(), notificationId: this.lastNotificationId()}));
   }
 
   /**
-   * Initialize from notification stream.
+   * Set state for notification stream.
    * @returns {Promise} Resolves when all notifications have been handled
    */
   initializeFromStream() {
@@ -321,16 +321,6 @@ z.event.EventRepository = class EventRepository {
 
         throw error;
       });
-  }
-
-  /**
-   * Get the last notification ID and set event date for a given client.
-   * @param {string} clientId - Client ID to retrieve last notification ID for
-   * @returns {Promise} Resolves with the last known notification ID matching the given client ID
-   */
-  initializeStreamState(clientId) {
-    this._updateLastEventDate(new Date(0).toISOString());
-    return this._getLastNotificationId(clientId);
   }
 
   /**
@@ -357,6 +347,51 @@ z.event.EventRepository = class EventRepository {
   }
 
   /**
+   * Get the last notification ID and set event date for a given client.
+   *
+   * @param {string} clientId - Client ID to retrieve last notification ID for
+   * @param {boolean} [isInitialization=false] - Set initial date to 0 if not found
+   * @returns {Promise} Resolves when stream state has been initialized
+   */
+  setStreamState(clientId, isInitialization = false) {
+    return this.notificationService.getNotificationsLast(clientId).then(({id: notificationId, payload}) => {
+      const [event] = payload;
+      const isoDateString = this._getIsoDateFromEvent(event, isInitialization);
+
+      if (notificationId) {
+        const logMessage = isoDateString
+          ? `Set starting point on notification stream to '${notificationId}' (isoDateString)`
+          : `Reset starting point on notification stream to '${notificationId}'`;
+        this.logger.info(logMessage);
+
+        return Promise.all([this._updateLastEventDate(isoDateString), this._updateLastNotificationId(notificationId)]);
+      }
+    });
+  }
+
+  _getIsoDateFromEvent(event, defaultValue = false) {
+    const {client, connection, time: eventDate, type: eventType} = event;
+
+    if (eventDate) {
+      return eventDate;
+    }
+
+    const isTypeUserClientAdd = eventType === z.event.Backend.USER.CLIENT_ADD;
+    if (isTypeUserClientAdd) {
+      return client.time;
+    }
+
+    const isTypeUserConnection = eventType === z.event.Backend.USER.CONNECTION;
+    if (isTypeUserConnection) {
+      return connection.last_update;
+    }
+
+    if (defaultValue) {
+      return new Date(0).toISOString();
+    }
+  }
+
+  /**
    * Get the ID of the last known notification.
    * @note Notifications that have not yet been handled but are in the queue should not be fetched again on recovery
    *
@@ -367,21 +402,6 @@ z.event.EventRepository = class EventRepository {
     return this.notificationsQueue().length
       ? this.notificationsQueue()[this.notificationsQueue().length - 1].id
       : this.lastNotificationId();
-  }
-
-  /**
-   * Get the last notification ID for a given client.
-   * @param {string} clientId - Client ID to retrieve last notification ID for
-   * @returns {Promise} Resolves with the last known notification ID matching the local client
-   */
-  _getLastNotificationId(clientId) {
-    return this.notificationService.getNotificationsLast(clientId).then(({id: notificationId}) => {
-      if (notificationId) {
-        this._updateLastNotificationId(notificationId);
-        this.logger.info(`Set starting point on notification stream to '${this.lastNotificationId()}'`);
-        return this.lastNotificationId();
-      }
-    });
   }
 
   _missedEventsFromStream() {
@@ -404,7 +424,7 @@ z.event.EventRepository = class EventRepository {
   _updateFromStream(lastNotificationId) {
     this.notificationsTotal = 0;
 
-    return this.getNotifications(lastNotificationId, 500)
+    return this.getNotifications(lastNotificationId, EventRepository.CONFIG.NOTIFICATION_BATCHES.INITIAL)
       .then(updatedLastNotificationId => {
         if (updatedLastNotificationId) {
           this.logger.info(`ID of last notification fetched from stream is '${updatedLastNotificationId}'`);
@@ -447,12 +467,13 @@ z.event.EventRepository = class EventRepository {
    *
    * @private
    * @param {string} eventDate - Updated last event date
-   * @returns {undefined} No return value
+   * @returns {Promise} Resolves when the last event date was stored
    */
   _updateLastEventDate(eventDate) {
-    if (eventDate > this.lastEventDate()) {
+    const didDateIncrease = eventDate > this.lastEventDate();
+    if (didDateIncrease) {
       this.lastEventDate(eventDate);
-      this.notificationService.saveLastEventDateToDb(eventDate);
+      return this.notificationService.saveLastEventDateToDb(eventDate);
     }
   }
 
@@ -461,12 +482,12 @@ z.event.EventRepository = class EventRepository {
    *
    * @private
    * @param {string} notificationId - Updated last notification ID
-   * @returns {undefined} No return value
+   * @returns {Promise} Resolves when the last notification ID was stored
    */
   _updateLastNotificationId(notificationId) {
     if (notificationId) {
       this.lastNotificationId(notificationId);
-      this.notificationService.saveLastNotificationIdToDb(notificationId);
+      return this.notificationService.saveLastNotificationIdToDb(notificationId);
     }
   }
 
@@ -586,14 +607,14 @@ z.event.EventRepository = class EventRepository {
    * @returns {JSON} The distributed event
    */
   _handleEventDistribution(event, source) {
-    const {time: eventDate, type: eventType} = event;
-
+    const eventDate = this._getIsoDateFromEvent(event);
     const isInjectedEvent = source === EventRepository.SOURCE.INJECTED;
-    if (!isInjectedEvent) {
+    const canSetEventDate = !isInjectedEvent && eventDate;
+    if (canSetEventDate) {
       this._updateLastEventDate(eventDate);
     }
 
-    const isCallEvent = eventType === z.event.Client.CALL.E_CALL;
+    const isCallEvent = event.type === z.event.Client.CALL.E_CALL;
     if (isCallEvent) {
       this._validateCallEventLifetime(event);
     }
@@ -670,7 +691,9 @@ z.event.EventRepository = class EventRepository {
    */
   _handleEventValidation(event, source) {
     return Promise.resolve().then(() => {
-      const isIgnoredEvent = z.event.EventTypeHandling.IGNORE.includes(event.type);
+      const {time: eventDate, type: eventType} = event;
+
+      const isIgnoredEvent = z.event.EventTypeHandling.IGNORE.includes(eventType);
       if (isIgnoredEvent) {
         this.logger.info(`Event ignored: '${event.type}'`, {event_json: JSON.stringify(event), event_object: event});
         const errorMessage = 'Event validation failed: Type ignored';
@@ -678,12 +701,13 @@ z.event.EventRepository = class EventRepository {
       }
 
       const eventFromStream = source === EventRepository.SOURCE.STREAM;
-      if (eventFromStream && event.time) {
-        const outdatedEvent = this.lastEventDate() >= new Date(event.time).toISOString();
+      const shouldCheckEventDate = eventFromStream && eventDate;
+      if (shouldCheckEventDate) {
+        const outdatedEvent = this.lastEventDate() >= new Date(eventDate).toISOString();
 
         if (outdatedEvent) {
           const logObject = {eventJson: JSON.stringify(event), eventObject: event};
-          this.logger.info(`Event from stream skipped as outdated: '${event.type}'`, logObject);
+          this.logger.info(`Event from stream skipped as outdated: '${eventType}'`, logObject);
           const errorMessage = 'Event validation failed: Outdated timestamp';
           throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, errorMessage);
         }
@@ -709,19 +733,11 @@ z.event.EventRepository = class EventRepository {
 
     if (!events.length) {
       this.logger.warn('Notification payload does not contain any events');
-      if (!isTransientEvent) {
-        this._updateLastNotificationId(id);
-      }
-      return Promise.resolve(id);
+      return !isTransientEvent ? this._updateLastNotificationId(id) : Promise.resolve(id);
     }
 
     return Promise.all(events.map(event => this._handleEvent(event, source)))
-      .then(() => {
-        if (!isTransientEvent) {
-          this._updateLastNotificationId(id);
-        }
-        return id;
-      })
+      .then(() => (!isTransientEvent ? this._updateLastNotificationId(id) : id))
       .catch(error => {
         this.logger.error(`Failed to handle notification '${id}' from '${source}': ${error.message}`, error);
         throw error;

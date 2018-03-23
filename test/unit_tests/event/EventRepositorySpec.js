@@ -74,14 +74,13 @@ describe('Event Repository', () => {
       });
 
       spyOn(TestFactory.notification_service, 'getNotificationsLast').and.returnValue(
-        Promise.resolve({id: z.util.createRandomUuid(), payload: []})
+        Promise.resolve({id: z.util.createRandomUuid(), payload: [{}]})
       );
 
       spyOn(TestFactory.notification_service, 'getLastNotificationIdFromDb').and.callFake(() => {
-        if (last_notification_id) {
-          return Promise.resolve(last_notification_id);
-        }
-        return Promise.reject(new z.event.EventError(z.event.EventError.TYPE.NO_LAST_ID));
+        return last_notification_id
+          ? Promise.resolve(last_notification_id)
+          : Promise.reject(new z.event.EventError(z.event.EventError.TYPE.NO_LAST_ID));
       });
 
       spyOn(TestFactory.notification_service, 'saveLastNotificationIdToDb').and.returnValue(
