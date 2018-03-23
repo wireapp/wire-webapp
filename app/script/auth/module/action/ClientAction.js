@@ -55,15 +55,7 @@ export function doCreateClient(password: string) {
     dispatch(ClientActionCreator.startCreateClient());
     return Promise.resolve()
       .then(() => dispatch(getLocalStorage(LocalStorageKey.AUTH.PERSIST)))
-      .then(persist =>
-        core.registerClient(
-          {
-            password,
-            persist: !!persist,
-          },
-          generateClientPayload(!!persist)
-        )
-      )
+      .then(persist => core.initClient({password, persist: !!persist}, generateClientPayload(!!persist)))
       .then(clients => dispatch(ClientActionCreator.successfulCreateClient()))
       .catch(error => {
         dispatch(ClientActionCreator.failedCreateClient(error));

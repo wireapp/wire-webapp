@@ -50,7 +50,7 @@ export function getLocalStorage(key) {
     dispatch(LocalStorageActionCreator.startLocalStorageGet());
     let data;
     return Promise.resolve()
-      .then(() => ({data} = localStorage.getItem(key)))
+      .then(() => (data = JSON.parse(localStorage.getItem(key))))
       .then(() => dispatch(LocalStorageActionCreator.successfulLocalStorageGet(key, data)))
       .then(() => data)
       .catch(error => {
