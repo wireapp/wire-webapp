@@ -66,7 +66,7 @@ describe('Conversation', () => {
     });
 
     it('should return the expected value for team conversations', () => {
-      conversation_et.team_id = z.util.create_random_uuid();
+      conversation_et.team_id = z.util.createRandomUuid();
 
       conversation_et.type(z.conversation.ConversationType.CONNECT);
       expect(conversation_et.is_group()).toBeFalsy();
@@ -92,14 +92,14 @@ describe('Conversation', () => {
       expect(conversation_et.is_request()).toBeFalsy();
       expect(conversation_et.is_self()).toBeFalsy();
 
-      conversation_et.participating_user_ids.push(z.util.create_random_uuid());
+      conversation_et.participating_user_ids.push(z.util.createRandomUuid());
       conversation_et.type(z.conversation.ConversationType.REGULAR);
       expect(conversation_et.is_group()).toBeFalsy();
       expect(conversation_et.is_one2one()).toBeTruthy();
       expect(conversation_et.is_request()).toBeFalsy();
       expect(conversation_et.is_self()).toBeFalsy();
 
-      conversation_et.participating_user_ids.push(z.util.create_random_uuid());
+      conversation_et.participating_user_ids.push(z.util.createRandomUuid());
       conversation_et.type(z.conversation.ConversationType.REGULAR);
       expect(conversation_et.is_group()).toBeTruthy();
       expect(conversation_et.is_one2one()).toBeFalsy();
@@ -112,7 +112,7 @@ describe('Conversation', () => {
     let initial_message_et = undefined;
 
     beforeEach(() => {
-      initial_message_et = new z.entity.Message(z.util.create_random_uuid());
+      initial_message_et = new z.entity.Message(z.util.createRandomUuid());
       initial_message_et.timestamp(first_timestamp);
       conversation_et.add_message(initial_message_et);
     });
@@ -125,7 +125,7 @@ describe('Conversation', () => {
     });
 
     it('should add message with a newer timestamp', () => {
-      const message_et = new z.entity.Message(z.util.create_random_uuid());
+      const message_et = new z.entity.Message(z.util.createRandomUuid());
       message_et.timestamp(second_timestamp);
 
       conversation_et.add_message(message_et);
@@ -138,7 +138,7 @@ describe('Conversation', () => {
 
     it('should add message with an older timestamp', () => {
       const older_timestamp = first_timestamp - 100;
-      const message_et = new z.entity.Message(z.util.create_random_uuid());
+      const message_et = new z.entity.Message(z.util.createRandomUuid());
       message_et.timestamp(older_timestamp);
 
       conversation_et.add_message(message_et);
@@ -151,7 +151,7 @@ describe('Conversation', () => {
 
     describe('affects last_event_timestamp', () => {
       it('and adding a message should update it', () => {
-        const message_et = new z.entity.Message(z.util.create_random_uuid());
+        const message_et = new z.entity.Message(z.util.createRandomUuid());
         message_et.timestamp(second_timestamp);
 
         conversation_et.last_event_timestamp(first_timestamp);
@@ -163,7 +163,7 @@ describe('Conversation', () => {
       });
 
       it('and adding a message should not update it if affect_order is false', () => {
-        const message_et = new z.entity.Message(z.util.create_random_uuid());
+        const message_et = new z.entity.Message(z.util.createRandomUuid());
         message_et.timestamp(second_timestamp);
         message_et.affect_order(false);
 
@@ -176,7 +176,7 @@ describe('Conversation', () => {
       });
 
       it('and adding a message should not update it if timestamp is greater than the last server timestamp', () => {
-        const message_et = new z.entity.Message(z.util.create_random_uuid());
+        const message_et = new z.entity.Message(z.util.createRandomUuid());
         message_et.timestamp(second_timestamp);
 
         conversation_et.last_event_timestamp(first_timestamp);
@@ -190,7 +190,7 @@ describe('Conversation', () => {
 
     describe('affects last_read_timestamp', () => {
       it('and adding a message should update it if sent by self user', () => {
-        const message_et = new z.entity.Message(z.util.create_random_uuid());
+        const message_et = new z.entity.Message(z.util.createRandomUuid());
         message_et.timestamp(second_timestamp);
         message_et.user(self_user);
 
@@ -203,7 +203,7 @@ describe('Conversation', () => {
       });
 
       it('should not update last read if last message was not send from self user', () => {
-        const message_et = new z.entity.Message(z.util.create_random_uuid());
+        const message_et = new z.entity.Message(z.util.createRandomUuid());
         message_et.timestamp(second_timestamp);
 
         conversation_et.last_read_timestamp(first_timestamp);
@@ -215,7 +215,7 @@ describe('Conversation', () => {
       });
 
       it('should not update last read if timestamp is greater than the last server timestamp', () => {
-        const message_et = new z.entity.Message(z.util.create_random_uuid());
+        const message_et = new z.entity.Message(z.util.createRandomUuid());
         message_et.timestamp(second_timestamp);
 
         conversation_et.last_read_timestamp(first_timestamp);
@@ -232,12 +232,12 @@ describe('Conversation', () => {
     const reference_timestamp = Date.now();
 
     const message1 = new z.entity.Message();
-    message1.id = z.util.create_random_uuid();
+    message1.id = z.util.createRandomUuid();
     message1.timestamp(reference_timestamp - 10000);
     message1.user(self_user);
 
     const message2 = new z.entity.Message();
-    message2.id = z.util.create_random_uuid();
+    message2.id = z.util.createRandomUuid();
     message2.timestamp(reference_timestamp - 5000);
 
     it('adds multiple messages', () => {
@@ -255,25 +255,25 @@ describe('Conversation', () => {
 
     it('returns last delivered message', () => {
       const sent_message_et = new z.entity.ContentMessage();
-      sent_message_et.id = z.util.create_random_uuid();
+      sent_message_et.id = z.util.createRandomUuid();
       sent_message_et.status(z.message.StatusType.SENT);
       conversation_et.add_message(sent_message_et);
       expect(conversation_et.get_last_delivered_message()).not.toBeDefined();
 
       const delivered_message_et = new z.entity.ContentMessage();
-      delivered_message_et.id = z.util.create_random_uuid();
+      delivered_message_et.id = z.util.createRandomUuid();
       delivered_message_et.status(z.message.StatusType.DELIVERED);
       conversation_et.add_message(delivered_message_et);
       expect(conversation_et.get_last_delivered_message()).toBe(delivered_message_et);
 
       const next_sent_message_et = new z.entity.ContentMessage();
-      next_sent_message_et.id = z.util.create_random_uuid();
+      next_sent_message_et.id = z.util.createRandomUuid();
       next_sent_message_et.status(z.message.StatusType.SENT);
       conversation_et.add_message(next_sent_message_et);
       expect(conversation_et.get_last_delivered_message()).toBe(delivered_message_et);
 
       const next_delivered_message_et = new z.entity.ContentMessage();
-      next_delivered_message_et.id = z.util.create_random_uuid();
+      next_delivered_message_et.id = z.util.createRandomUuid();
       next_delivered_message_et.status(z.message.StatusType.DELIVERED);
       conversation_et.add_message(next_delivered_message_et);
       expect(conversation_et.get_last_delivered_message()).toBe(next_delivered_message_et);
@@ -296,7 +296,7 @@ describe('Conversation', () => {
 
     it('returns undefined if last message is not text and not added by self user', () => {
       const message_et = new z.entity.PingMessage();
-      message_et.id = z.util.create_random_uuid();
+      message_et.id = z.util.createRandomUuid();
       message_et.user(new z.entity.User());
       conversation_et.add_message(message_et);
       expect(conversation_et.get_last_editable_message()).not.toBeDefined();
@@ -304,7 +304,7 @@ describe('Conversation', () => {
 
     it('returns undefined if last message is not text and not added by self user', () => {
       const message_et = new z.entity.PingMessage();
-      message_et.id = z.util.create_random_uuid();
+      message_et.id = z.util.createRandomUuid();
       message_et.user(new z.entity.User());
       conversation_et.add_message(message_et);
       expect(conversation_et.get_last_editable_message()).not.toBeDefined();
@@ -313,7 +313,7 @@ describe('Conversation', () => {
     it('returns undefined if last message is text and not send by self user', () => {
       const message_et = new z.entity.ContentMessage();
       message_et.add_asset(new z.entity.Text());
-      message_et.id = z.util.create_random_uuid();
+      message_et.id = z.util.createRandomUuid();
       message_et.user(new z.entity.User());
       conversation_et.add_message(message_et);
       expect(conversation_et.get_last_editable_message()).not.toBeDefined();
@@ -322,7 +322,7 @@ describe('Conversation', () => {
     it('returns message if last message is text and send by self user', () => {
       const message_et = new z.entity.ContentMessage();
       message_et.add_asset(new z.entity.Text());
-      message_et.id = z.util.create_random_uuid();
+      message_et.id = z.util.createRandomUuid();
       message_et.user(self_user_et);
       conversation_et.add_message(message_et);
       expect(conversation_et.get_last_editable_message()).toBeDefined();
@@ -331,12 +331,12 @@ describe('Conversation', () => {
     it('returns message if last message is text and send by self user', () => {
       const message_et = new z.entity.ContentMessage();
       message_et.add_asset(new z.entity.Text());
-      message_et.id = z.util.create_random_uuid();
+      message_et.id = z.util.createRandomUuid();
       message_et.user(self_user_et);
       conversation_et.add_message(message_et);
 
       const ping_message_et = new z.entity.PingMessage();
-      ping_message_et.id = z.util.create_random_uuid();
+      ping_message_et.id = z.util.createRandomUuid();
       ping_message_et.user(new z.entity.User());
       conversation_et.add_message(ping_message_et);
 
@@ -347,13 +347,13 @@ describe('Conversation', () => {
     it('returns message if last message is text and send by self user', () => {
       const message_et = new z.entity.ContentMessage();
       message_et.add_asset(new z.entity.Text());
-      message_et.id = z.util.create_random_uuid();
+      message_et.id = z.util.createRandomUuid();
       message_et.user(self_user_et);
       conversation_et.add_message(message_et);
 
       const next_message_et = new z.entity.ContentMessage();
       next_message_et.add_asset(new z.entity.Text());
-      next_message_et.id = z.util.create_random_uuid();
+      next_message_et.id = z.util.createRandomUuid();
       next_message_et.user(self_user_et);
       conversation_et.add_message(next_message_et);
 
@@ -364,13 +364,13 @@ describe('Conversation', () => {
     it('returns message if last message is text and ephemeral', () => {
       const message_et = new z.entity.ContentMessage();
       message_et.add_asset(new z.entity.Text());
-      message_et.id = z.util.create_random_uuid();
+      message_et.id = z.util.createRandomUuid();
       message_et.user(self_user_et);
       conversation_et.add_message(message_et);
 
       const ephemeral_message_et = new z.entity.ContentMessage();
       ephemeral_message_et.add_asset(new z.entity.Text());
-      ephemeral_message_et.id = z.util.create_random_uuid();
+      ephemeral_message_et.id = z.util.createRandomUuid();
       ephemeral_message_et.user(self_user_et);
       ephemeral_message_et.ephemeral_expires(true);
       conversation_et.add_message(ephemeral_message_et);
@@ -423,7 +423,7 @@ describe('Conversation', () => {
     });
 
     it('displays a group conversation name with names from the participants', () => {
-      const third_user = new z.entity.User(z.util.create_random_uuid());
+      const third_user = new z.entity.User(z.util.createRandomUuid());
       third_user.name('Brad Delson');
       other_user.name(entities.user.jane_roe.name);
       conversation_et.participating_user_ets.push(other_user);
@@ -441,7 +441,7 @@ describe('Conversation', () => {
     });
 
     it('displays a fallback if no user name has been set for a group conversation', () => {
-      const user = new z.entity.User(z.util.create_random_uuid());
+      const user = new z.entity.User(z.util.createRandomUuid());
       conversation_et.type(z.conversation.ConversationType.REGULAR);
       conversation_et.participating_user_ids.push(other_user.id);
       conversation_et.participating_user_ids.push(user.id);
@@ -550,9 +550,9 @@ describe('Conversation', () => {
 
   describe('is_with_bot', () =>
     it('detects bot conversations by the username of the remote participant', () => {
-      const user_et = new z.entity.User(z.util.create_random_uuid());
+      const user_et = new z.entity.User(z.util.createRandomUuid());
 
-      conversation_et = new z.entity.Conversation(z.util.create_random_uuid());
+      conversation_et = new z.entity.Conversation(z.util.createRandomUuid());
       conversation_et.participating_user_ets.push(user_et);
 
       user_et.username('ottothebot');
@@ -592,19 +592,19 @@ describe('Conversation', () => {
 
     it('returns visible unmerged pings', () => {
       const timestamp = Date.now();
-      conversation_et.id = z.util.create_random_uuid();
+      conversation_et.id = z.util.createRandomUuid();
 
       const ping_message_1 = new z.entity.PingMessage();
       ping_message_1.timestamp(timestamp - 4000);
-      ping_message_1.id = z.util.create_random_uuid();
+      ping_message_1.id = z.util.createRandomUuid();
 
       const ping_message_2 = new z.entity.PingMessage();
       ping_message_2.timestamp(timestamp - 2000);
-      ping_message_2.id = z.util.create_random_uuid();
+      ping_message_2.id = z.util.createRandomUuid();
 
       const ping_message_3 = new z.entity.PingMessage();
       ping_message_3.timestamp(timestamp);
-      ping_message_3.id = z.util.create_random_uuid();
+      ping_message_3.id = z.util.createRandomUuid();
 
       conversation_et.add_message(ping_message_1);
       conversation_et.add_message(ping_message_2);
@@ -618,7 +618,7 @@ describe('Conversation', () => {
 
   describe('release', () => {
     it('should not release messages if conversation has unread messages', () => {
-      const message_et = new z.entity.Message(z.util.create_random_uuid());
+      const message_et = new z.entity.Message(z.util.createRandomUuid());
       message_et.timestamp(second_timestamp);
       conversation_et.add_message(message_et);
       conversation_et.last_read_timestamp(first_timestamp);
@@ -633,7 +633,7 @@ describe('Conversation', () => {
     });
 
     it('should release messages if conversation has no unread messages', () => {
-      const message_et = new z.entity.Message(z.util.create_random_uuid());
+      const message_et = new z.entity.Message(z.util.createRandomUuid());
       message_et.timestamp(first_timestamp);
       conversation_et.add_message(message_et);
       conversation_et.last_read_timestamp(first_timestamp);
@@ -654,7 +654,7 @@ describe('Conversation', () => {
     let message_id = undefined;
 
     beforeEach(() => {
-      const message_et = new z.entity.Message(z.util.create_random_uuid());
+      const message_et = new z.entity.Message(z.util.createRandomUuid());
       conversation_et.add_message(message_et);
       message_id = message_et.id;
     });
@@ -685,11 +685,11 @@ describe('Conversation', () => {
     let message_et = undefined;
 
     beforeEach(() => {
-      const first_message_et = new z.entity.Message(z.util.create_random_uuid());
+      const first_message_et = new z.entity.Message(z.util.createRandomUuid());
       first_message_et.timestamp(first_timestamp);
       conversation_et.add_message(first_message_et);
 
-      message_et = new z.entity.Message(z.util.create_random_uuid());
+      message_et = new z.entity.Message(z.util.createRandomUuid());
       message_et.timestamp(second_timestamp);
       conversation_et.add_message(message_et);
     });

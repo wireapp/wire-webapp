@@ -46,7 +46,7 @@ z.components.FileAssetComponent = class FileAssetComponent {
     });
 
     this.file_extension = ko.pureComputed(() => {
-      const ext = z.util.get_file_extension(this.asset.file_name);
+      const ext = z.util.getFileExtension(this.asset.file_name);
       return ext.length <= 3 ? ext : '';
     });
   }
@@ -99,12 +99,12 @@ ko.components.register('file-asset', {
           <!-- /ko -->
           <div class="file-desc">
             <div data-uie-name="file-name"
-                 data-bind="text: z.util.trim_file_extension(asset.file_name)"
+                 data-bind="text: z.util.trimFileExtension(asset.file_name)"
                  class="label-bold-xs ellipsis"></div>
             <ul class="file-desc-meta label-xs text-graphite">
-              <li data-bind="text: z.util.format_bytes(asset.file_size)" data-uie-name="file-size"></li>
-              <!-- ko if: z.util.get_file_extension(asset.file_name) -->
-                <li data-bind="text: z.util.get_file_extension(asset.file_name)" data-uie-name="file-type"></li>
+              <li data-bind="text: z.util.formatBytes(asset.file_size)" data-uie-name="file-size"></li>
+              <!-- ko if: z.util.getFileExtension(asset.file_name) -->
+                <li data-bind="text: z.util.getFileExtension(asset.file_name)" data-uie-name="file-type"></li>
               <!-- /ko -->
               <!-- ko if: asset.status() === z.assets.AssetTransferState.UPLOADING -->
                 <li data-bind="l10n_text: z.string.conversationAssetUploading" data-uie-name="file-status"></li>

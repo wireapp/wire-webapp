@@ -167,7 +167,7 @@ z.links.LinkPreviewRepository = class LinkPreviewRepository {
    * @returns {Promise} Resolves with the uploaded asset
    */
   _uploadPreviewImage(dataUri) {
-    return Promise.resolve(z.util.base64_to_blob(dataUri)).then(blob =>
+    return Promise.resolve(z.util.base64ToBlob(dataUri)).then(blob =>
       this.assetService.uploadImageAsset(blob, {public: true})
     );
   }

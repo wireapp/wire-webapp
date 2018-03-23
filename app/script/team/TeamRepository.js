@@ -50,7 +50,7 @@ z.team.TeamRepository = class TeamRepository {
       return this.teamMembers()
         .concat(this.userRepository.connected_users())
         .filter((item, index, array) => array.indexOf(item) === index)
-        .sort((userA, userB) => z.util.StringUtil.sort_by_priority(userA.first_name(), userB.first_name()));
+        .sort((userA, userB) => z.util.StringUtil.sortByPriority(userA.first_name(), userB.first_name()));
     });
 
     this.teamMembers.subscribe(() => this.userRepository.map_guest_status());
@@ -148,13 +148,13 @@ z.team.TeamRepository = class TeamRepository {
    * @returns {Array<z.entity.User>} Matching users
    */
   searchForTeamUsers(query, isHandle) {
-    const excludedEmojis = Array.from(query).filter(char => EMOJI_UNICODE_RANGES.includes(char));
+    const excludedEmojis = Array.from(query).filter(char => z.util.EmojiUtil.UNICODE_RANGES.includes(char));
     return this.teamUsers()
       .filter(userEntity => userEntity.matches(query, isHandle, excludedEmojis))
       .sort((userA, userB) => {
         return isHandle
-          ? z.util.StringUtil.sort_by_priority(userA.username(), userB.username(), query)
-          : z.util.StringUtil.sort_by_priority(userA.name(), userB.name(), query);
+          ? z.util.StringUtil.sortByPriority(userA.username(), userB.username(), query)
+          : z.util.StringUtil.sortByPriority(userA.name(), userB.name(), query);
       });
   }
 
@@ -166,7 +166,7 @@ z.team.TeamRepository = class TeamRepository {
       imagePromise
         .then(imageBlob => {
           if (imageBlob) {
-            return z.util.load_data_url(imageBlob);
+            return z.util.loadDataUrl(imageBlob);
           }
         })
         .then(imageDataUrl => {

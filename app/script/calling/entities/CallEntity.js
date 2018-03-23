@@ -52,8 +52,10 @@ z.calling.entities.CallEntity = class CallEntity {
 
     const {id: conversationId, is_group} = conversationEntity;
     const {mediaStreamHandler, mediaRepository, selfState, telemetry, userRepository} = this.callingRepository;
+    this.messageLog = this.callingRepository.messageLog;
 
-    this.logger = new z.util.Logger(`z.calling.entities.CallEntity (${conversationId})`, z.config.LOGGER.OPTIONS);
+    const callLoggerName = `z.calling.entities.CallEntity (${conversationId})`;
+    this.callLogger = new z.telemetry.calling.CallLogger(callLoggerName, z.config.LOGGER.OPTIONS, this.messageLog);
 
     // IDs and references
     this.id = conversationId;
@@ -165,7 +167,14 @@ z.calling.entities.CallEntity = class CallEntity {
     });
 
     this.state.subscribe(state => {
-      this.logger.info(`Call state '${this.id}' changed to '${state}'`);
+      const logMessage = {
+        data: {
+          default: [this.id, state],
+          obfuscated: [this.callLogger.obfuscate(this.id), state],
+        },
+        message: `Call state '{0}' changed to '{1}'`,
+      };
+      this.callLogger.info(logMessage);
 
       this._clearStateTimeout();
 
@@ -216,7 +225,7 @@ z.calling.entities.CallEntity = class CallEntity {
 
       if (onGroupCheck && !everyoneLeft) {
         const userIds = this.participants().map(participantEntity => participantEntity.id);
-        this.logger.warn(`Deactivation on group check with remaining users '${userIds.join(', ')}' on group check`);
+        this.callLogger.warn(`Deactivation on group check with remaining users '${userIds.join(', ')}' on group check`);
       }
 
       this.terminationReason = terminationReason;
@@ -412,7 +421,7 @@ z.calling.entities.CallEntity = class CallEntity {
    */
   _clearGroupCheckTimeout() {
     if (this.groupCheckTimeoutId) {
-      this.logger.debug(`Clear group check timeout with ID '${this.groupCheckTimeoutId}'`);
+      this.callLogger.debug(`Clear group check timeout with ID '${this.groupCheckTimeoutId}'`);
       window.clearTimeout(this.groupCheckTimeoutId);
       this.groupCheckTimeoutId = undefined;
     }
@@ -438,7 +447,7 @@ z.calling.entities.CallEntity = class CallEntity {
    */
   _onSendGroupCheckTimeout(timeout) {
     if (this.participants().length) {
-      this.logger.info(`Sending group check after timeout of '${timeout}s' (ID: ${this.groupCheckTimeoutId})`);
+      this.callLogger.info(`Sending group check after timeout of '${timeout}s' (ID: ${this.groupCheckTimeoutId})`);
       const additionalPayload = z.calling.CallMessageBuilder.createPayload(this.id, this.selfUser.id);
       const callMessageEntity = z.calling.CallMessageBuilder.buildGroupCheck(true, this.sessionId, additionalPayload);
 
@@ -455,7 +464,7 @@ z.calling.entities.CallEntity = class CallEntity {
    * @returns {undefined} No return value
    */
   _onVerifyGroupCheckTimeout() {
-    this.logger.info(`Removing on group check timeout (ID: ${this.groupCheckTimeoutId})`);
+    this.callLogger.info(`Removing on group check timeout (ID: ${this.groupCheckTimeoutId})`);
     const additionalPayload = z.calling.CallMessageBuilder.createPayload(
       this.id,
       this.selfUser.id,
@@ -474,13 +483,13 @@ z.calling.entities.CallEntity = class CallEntity {
   _setSendGroupCheckTimeout() {
     const maximumTimeout = CallEntity.CONFIG.GROUP_CHECK_MAXIMUM_TIMEOUT;
     const minimumTimeout = CallEntity.CONFIG.GROUP_CHECK_MINIMUM_TIMEOUT;
-    const timeoutInSeconds = z.util.NumberUtil.get_random_number(minimumTimeout, maximumTimeout);
+    const timeoutInSeconds = z.util.NumberUtil.getRandomNumber(minimumTimeout, maximumTimeout);
 
     const timeout = timeoutInSeconds * 1000;
     this.groupCheckTimeoutId = window.setTimeout(() => this._onSendGroupCheckTimeout(timeoutInSeconds), timeout);
 
     const timeoutId = this.groupCheckTimeoutId;
-    this.logger.debug(`Set sending group check after timeout of '${timeoutInSeconds}s' (ID: ${timeoutId})`);
+    this.callLogger.debug(`Set sending group check after timeout of '${timeoutInSeconds}s' (ID: ${timeoutId})`);
   }
 
   /**
@@ -492,7 +501,7 @@ z.calling.entities.CallEntity = class CallEntity {
     const timeoutInSeconds = CallEntity.CONFIG.GROUP_CHECK_ACTIVITY_TIMEOUT;
 
     this.groupCheckTimeoutId = window.setTimeout(() => this._onVerifyGroupCheckTimeout(), timeoutInSeconds * 1000);
-    this.logger.debug(`Set verifying group check after '${timeoutInSeconds}s' (ID: ${this.groupCheckTimeoutId})`);
+    this.callLogger.debug(`Set verifying group check after '${timeoutInSeconds}s' (ID: ${this.groupCheckTimeoutId})`);
   }
 
   //##############################################################################
@@ -528,7 +537,7 @@ z.calling.entities.CallEntity = class CallEntity {
       }
 
       default: {
-        this.logger.error(`Tried to confirm call event of wrong type '${type}'`, callMessageEntity);
+        this.callLogger.error(`Tried to confirm call event of wrong type '${type}'`, callMessageEntity);
         return Promise.resolve();
       }
     }
@@ -728,7 +737,14 @@ z.calling.entities.CallEntity = class CallEntity {
           }
         }
 
-        this.logger.info(`Removed call participant '${participantEntity.user.name()}'`);
+        const logMessage = {
+          data: {
+            default: [participantEntity.user.name()],
+            obfuscated: [this.callLogger.obfuscate(participantEntity.user.id)],
+          },
+          message: `Removed call participant '{0}'`,
+        };
+        this.callLogger.info(logMessage);
         return this;
       })
       .catch(error => {
@@ -826,7 +842,14 @@ z.calling.entities.CallEntity = class CallEntity {
 
         this.participants.push(participantEntity);
 
-        this.logger.info(`Adding call participant '${userEntity.name()}'`, participantEntity);
+        const logMessage = {
+          data: {
+            default: [userEntity.name()],
+            obfuscated: [this.callLogger.obfuscate(userEntity.id)],
+          },
+          message: `Adding call participant '{0}'`,
+        };
+        this.callLogger.info(logMessage, participantEntity);
         return this._updateParticipantState(participantEntity, negotiate, callMessageEntity);
       });
     });
@@ -846,7 +869,14 @@ z.calling.entities.CallEntity = class CallEntity {
         participantEntity.verifyClientId(callMessageEntity.clientId);
       }
 
-      this.logger.info(`Updating call participant '${participantEntity.user.name()}'`, callMessageEntity);
+      const logMessage = {
+        data: {
+          default: [participantEntity.user.name()],
+          obfuscated: [this.callLogger.obfuscate(participantEntity.user.id)],
+        },
+        message: `Updating call participant '{0}'`,
+      };
+      this.callLogger.info(logMessage, callMessageEntity);
       return this._updateParticipantState(participantEntity, negotiate, callMessageEntity);
     });
   }
@@ -942,11 +972,18 @@ z.calling.entities.CallEntity = class CallEntity {
     const twoOrMoreParticipants = this.participants().length >= 2;
     if (twoOrMoreParticipants) {
       this.participants()
-        .sort((participantA, participantB) => participantA.user.joaat_hash - participantB.user.joaat_hash)
+        .sort((participantA, participantB) => participantA.user.joaatHash - participantB.user.joaatHash)
         .forEach((participantEntity, index) => {
           const panning = this._calculatePanning(index, this.participants().length);
 
-          this.logger.debug(`Panning for '${participantEntity.user.name()}' recalculated to '${panning}'`);
+          this.callLogger.debug({
+            data: {
+              default: [participantEntity.user.name(), panning],
+              obfuscated: [this.callLogger.obfuscate(participantEntity.user.id), panning],
+            },
+            message: `Panning for '{0}' recalculated to '{1}'`,
+          });
+
           participantEntity.panning(panning);
         });
 
@@ -954,7 +991,7 @@ z.calling.entities.CallEntity = class CallEntity {
         .map(({user}) => user.name())
         .join(', ');
 
-      this.logger.info(`New panning order: ${panningOrder}`);
+      this.callLogger.info(`New panning order: ${panningOrder}`);
     }
   }
 

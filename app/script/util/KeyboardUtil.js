@@ -98,11 +98,8 @@ z.util.KeyboardUtil = (() => {
   };
 
   const _isBackspaceKey = keyboardEvent => _isKey(keyboardEvent, KEYBOARD_KEY.BACKSPACE);
-
   const _isDeleteKey = keyboardEvent => _isKey(keyboardEvent, KEYBOARD_KEY.DELETE);
-
   const _isEnterKey = keyboardEvent => _isKey(keyboardEvent, KEYBOARD_KEY.ENTER);
-
   const _isEscapeKey = keyboardEvent => _isKey(keyboardEvent, KEYBOARD_KEY.ESC);
 
   const _isFunctionKey = keyboardEvent => {

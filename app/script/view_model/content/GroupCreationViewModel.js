@@ -75,7 +75,7 @@ z.viewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
 
         return this.teamRepository
           .teamMembers()
-          .sort((userA, userB) => z.util.StringUtil.sort_by_priority(userA.first_name(), userB.first_name()));
+          .sort((userA, userB) => z.util.StringUtil.sortByPriority(userA.first_name(), userB.first_name()));
       }
       return [];
     });

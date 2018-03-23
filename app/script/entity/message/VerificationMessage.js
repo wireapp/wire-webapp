@@ -52,7 +52,7 @@ z.entity.VerificationMessage = class VerificationMessage extends z.entity.Messag
 
     this.captionUser = ko.pureComputed(() => {
       const namesString = z.util.LocalizerUtil.joinNames(this.userEntities(), z.string.Declension.NOMINATIVE);
-      return z.util.StringUtil.capitalize_first_char(namesString);
+      return z.util.StringUtil.capitalizeFirstChar(namesString);
     });
 
     this.captionStartedUsing = ko.pureComputed(() => {

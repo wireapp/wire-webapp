@@ -68,7 +68,7 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
 
         this.conversationEntity()
           .participating_user_ets()
-          .sort((userA, userB) => z.util.StringUtil.sort_by_priority(userA.first_name(), userB.first_name()))
+          .sort((userA, userB) => z.util.StringUtil.sortByPriority(userA.first_name(), userB.first_name()))
           .map(userEntity => {
             if (userEntity.isBot) {
               return this.serviceParticipants.push(userEntity);
@@ -233,7 +233,7 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
       .display_name()
       .trim();
 
-    const newConversationName = z.util.StringUtil.remove_line_breaks(event.target.value.trim());
+    const newConversationName = z.util.StringUtil.removeLineBreaks(event.target.value.trim());
 
     const hasNameChanged = newConversationName.length && newConversationName !== currentConversationName;
     if (hasNameChanged) {

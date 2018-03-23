@@ -192,7 +192,7 @@ z.event.EventRepository = class EventRepository {
   _handleBufferedNotifications() {
     this.logger.info(`Received '${this.webSocketBuffer.length}' notifications via WebSocket while handling stream`);
     if (this.webSocketBuffer.length) {
-      z.util.ko_array_push_all(this.notificationsQueue, this.webSocketBuffer);
+      z.util.koArrayPushAll(this.notificationsQueue, this.webSocketBuffer);
       this.webSocketBuffer.length = 0;
     }
   }
@@ -219,7 +219,7 @@ z.event.EventRepository = class EventRepository {
           notificationId = notifications[notifications.length - 1].id;
 
           this.logger.info(`Added '${notifications.length}' notifications to the queue`);
-          z.util.ko_array_push_all(this.notificationsQueue, notifications);
+          z.util.koArrayPushAll(this.notificationsQueue, notifications);
 
           if (!this.notificationsPromises) {
             this.notificationsPromises = [resolve, reject];
@@ -364,10 +364,9 @@ z.event.EventRepository = class EventRepository {
    * @returns {string} ID of last known notification
    */
   _getLastKnownNotificationId() {
-    if (this.notificationsQueue().length) {
-      return this.notificationsQueue()[this.notificationsQueue().length - 1].id;
-    }
-    return this.lastNotificationId();
+    return this.notificationsQueue().length
+      ? this.notificationsQueue()[this.notificationsQueue().length - 1].id
+      : this.lastNotificationId();
   }
 
   /**
@@ -524,11 +523,11 @@ z.event.EventRepository = class EventRepository {
   _distributeEvent(event, source) {
     const {conversation: conversationId, from: userId, type} = event;
 
-    if (conversationId && userId) {
-      this.logger.info(`Distributed '${type}' event for conversation '${conversationId}' from user '${userId}'`, event);
-    } else {
-      this.logger.info(`Distributed '${type}' event`, event);
-    }
+    const hasIds = conversationId && userId;
+    const logMessage = hasIds
+      ? `Distributed '${type}' event for conversation '${conversationId}' from user '${userId}'`
+      : `Distributed '${type}' event`;
+    this.logger.info(logMessage, event);
 
     const [category] = type.split('.');
     switch (category) {
@@ -640,7 +639,7 @@ z.event.EventRepository = class EventRepository {
 
         const updatingLinkPreview = !!storedData.previews.length;
         if (updatingLinkPreview) {
-          this.logger.warn(`${logMessage} ID of link preview  reused`, event);
+          this.logger.warn(`${logMessage} ID of link preview reused`, event);
           const errorMessage = 'Event validation failed: ID of link preview reused';
           throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, errorMessage);
         }

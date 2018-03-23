@@ -22,12 +22,12 @@
 window.z = window.z || {};
 window.z.util = z.util || {};
 
-z.util.check_indexed_db = function() {
-  if (!z.util.Environment.browser.supports.indexed_db) {
-    if (z.util.Environment.browser.edge) {
-      return Promise.reject(new z.auth.AuthError(z.auth.AuthError.TYPE.PRIVATE_MODE));
-    }
-    return Promise.reject(new z.auth.AuthError(z.auth.AuthError.TYPE.INDEXED_DB_UNSUPPORTED));
+z.util.checkIndexedDb = () => {
+  if (!z.util.Environment.browser.supports.indexedDb) {
+    const errorType = z.util.Environment.browser.edge
+      ? z.auth.AuthError.TYPE.PRIVATE_MODE
+      : z.auth.AuthError.TYPE.INDEXED_DB_UNSUPPORTED;
+    return Promise.reject(new z.auth.AuthError(errorType));
   }
 
   if (z.util.Environment.browser.firefox) {
@@ -46,19 +46,20 @@ z.util.check_indexed_db = function() {
     }
 
     return new Promise((resolve, reject) => {
-      let current_attempt = 0;
+      let currentAttempt = 0;
       const interval = 10;
-      const max_retry = 50;
+      const maxRetry = 50;
 
       const interval_id = window.setInterval(() => {
-        current_attempt = current_attempt + 1;
+        currentAttempt = currentAttempt + 1;
 
         if (dbOpenRequest.readyState === 'done' && !dbOpenRequest.result) {
           window.clearInterval(interval_id);
           return reject(new z.auth.AuthError(z.auth.AuthError.TYPE.PRIVATE_MODE));
         }
 
-        if (current_attempt >= max_retry) {
+        const tooManyAttempts = currentAttempt >= maxRetry;
+        if (tooManyAttempts) {
           window.clearInterval(interval_id);
           resolve();
         }
@@ -69,50 +70,46 @@ z.util.check_indexed_db = function() {
   return Promise.resolve();
 };
 
-z.util.dummy_image = function(width, height) {
-  return `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 ${width} ${height}' width='${width}' height='${height}'></svg>`;
+z.util.isSameLocation = (pastLocation, currentLocation) => {
+  return pastLocation !== '' && currentLocation.startsWith(pastLocation);
 };
 
-z.util.is_same_location = function(past_location, current_location) {
-  return past_location !== '' && current_location.startsWith(past_location);
-};
-
-z.util.load_image = function(blob) {
+z.util.loadImage = function(blob) {
   return new Promise((resolve, reject) => {
     const object_url = window.URL.createObjectURL(blob);
     const img = new Image();
     img.onload = function() {
       resolve(this);
-      return window.URL.revokeObjectURL(object_url);
+      window.URL.revokeObjectURL(object_url);
     };
     img.onerror = reject;
     img.src = object_url;
   });
 };
 
-z.util.load_data_url = function(file) {
+z.util.loadDataUrl = file => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = function() {
-      return resolve(this.result);
+      resolve(this.result);
     };
     reader.onerror = reject;
     reader.readAsDataURL(file);
   });
 };
 
-z.util.load_file_buffer = function(file) {
+z.util.loadFileBuffer = file => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = function() {
-      return resolve(this.result);
+      resolve(this.result);
     };
     reader.onerror = reject;
     reader.readAsArrayBuffer(file);
   });
 };
 
-z.util.load_url_buffer = (url, xhrAccessorFunction) => {
+z.util.loadUrlBuffer = (url, xhrAccessorFunction) => {
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     xhr.open('GET', url, true);
@@ -134,45 +131,8 @@ z.util.load_url_buffer = (url, xhrAccessorFunction) => {
   });
 };
 
-z.util.load_url_blob = url => {
-  return z.util.load_url_buffer(url).then(({buffer, mimeType}) => new Blob([new Uint8Array(buffer)], {type: mimeType}));
-};
-
-z.util.append_url_parameter = function(url, parameter) {
-  const separator = z.util.StringUtil.includes(url, '?') ? '&' : '?';
-  return `${url}${separator}${parameter}`;
-};
-
-z.util.forward_url_parameter = function(url, parameter_name) {
-  const parameter_value = z.util.get_url_parameter(parameter_name);
-  if (parameter_value != null) {
-    return z.util.append_url_parameter(url, `${parameter_name}=${parameter_value}`);
-  }
-  return url;
-};
-
-z.util.get_url_parameter = function(name) {
-  const params = window.location.search.substring(1).split('&');
-  for (const param of params) {
-    let value = param.split('=');
-    if (value[0] === name) {
-      if (value[1]) {
-        value = window.decodeURI(value[1]);
-
-        if (value === 'false') {
-          return false;
-        }
-
-        if (value === 'true') {
-          return true;
-        }
-
-        return value;
-      }
-      return true;
-    }
-  }
-  return null;
+z.util.loadUrlBlob = url => {
+  return z.util.loadUrlBuffer(url).then(({buffer, mimeType}) => new Blob([new Uint8Array(buffer)], {type: mimeType}));
 };
 
 /**
@@ -180,7 +140,7 @@ z.util.get_url_parameter = function(name) {
  * @param {string} filename - filename including extension
  * @returns {string} File extension
  */
-z.util.get_file_extension = function(filename) {
+z.util.getFileExtension = filename => {
   if (!_.isString(filename) || !filename.includes('.')) {
     return '';
   }
@@ -197,7 +157,7 @@ z.util.get_file_extension = function(filename) {
  * @param {string} filename - filename including extension
  * @returns {string} New String without extension
  */
-z.util.trim_file_extension = function(filename) {
+z.util.trimFileExtension = filename => {
   if (_.isString(filename)) {
     if (filename.endsWith('.tar.gz')) {
       filename = filename.replace(/\.tar\.gz$/, '');
@@ -215,7 +175,7 @@ z.util.trim_file_extension = function(filename) {
  * @param {number} [decimals] - Number of decimals to keep
  * @returns {string} Bytes as a human readable string
  */
-z.util.format_bytes = function(bytes, decimals) {
+z.util.formatBytes = (bytes, decimals) => {
   if (bytes === 0) {
     return '0B';
   }
@@ -227,42 +187,14 @@ z.util.format_bytes = function(bytes, decimals) {
   return parseFloat((bytes / Math.pow(kilobytes, index)).toFixed(decimals)) + unit[index];
 };
 
-/**
- * Format seconds into hh:mm:ss.
- * @param {number} duration - duration to format in seconds
- * @returns {string}
- */
-
-z.util.format_seconds = function(duration) {
-  duration = Math.round(duration || 0);
-
-  const hours = Math.floor(duration / (60 * 60));
-
-  const divisor_for_minutes = duration % (60 * 60);
-  const minutes = Math.floor(divisor_for_minutes / 60);
-
-  const divisor_for_seconds = divisor_for_minutes % 60;
-  const seconds = Math.ceil(divisor_for_seconds);
-
-  const components = [z.util.zero_padding(minutes), z.util.zero_padding(seconds)];
-
-  if (hours > 0) {
-    components.unshift(hours);
-  }
-
-  return components.join(':');
-};
-
-z.util.get_content_type_from_data_url = function(data_url) {
+z.util.getContentTypeFromDataUrl = data_url => {
   return data_url
     .split(',')[0]
     .split(':')[1]
     .split(';')[0];
 };
 
-z.util.strip_data_uri = function(string) {
-  return string.replace(/^data:.*,/, '');
-};
+z.util.stripDataUri = string => string.replace(/^data:.*,/, '');
 
 /**
  * Convert base64 string to UInt8Array.
@@ -270,27 +202,23 @@ z.util.strip_data_uri = function(string) {
  * @param {string} base64 - base64 encoded string
  * @returns {UInt8Array} Typed array
  */
-z.util.base64_to_array = function(base64) {
-  return bazinga64.Decoder.fromBase64(z.util.strip_data_uri(base64)).asBytes;
-};
+z.util.base64ToArray = base64 => bazinga64.Decoder.fromBase64(z.util.stripDataUri(base64)).asBytes;
 
 /**
  * Convert ArrayBuffer or UInt8Array to base64 string
  * @param {ArrayBuffer|UInt8Array} array - raw binary data or bytes
  * @returns {string} Base64-encoded string
  */
-z.util.array_to_base64 = function(array) {
-  return bazinga64.Encoder.toBase64(new Uint8Array(array), true).asString;
-};
+z.util.arrayToBase64 = array => bazinga64.Encoder.toBase64(new Uint8Array(array), true).asString;
 
 /**
  * Returns base64 encoded md5 of the the given array.
  * @param {Uint8Array} array - Input array
  * @returns {string} MD5 hash
  */
-z.util.array_to_md5_base64 = function(array) {
-  const word_array = CryptoJS.lib.WordArray.create(array);
-  return CryptoJS.MD5(word_array).toString(CryptoJS.enc.Base64);
+z.util.arrayToMd5Base64 = array => {
+  const wordArray = CryptoJS.lib.WordArray.create(array);
+  return CryptoJS.MD5(wordArray).toString(CryptoJS.enc.Base64);
 };
 
 /**
@@ -299,10 +227,10 @@ z.util.array_to_md5_base64 = function(array) {
  * @returns {Blob} Binary output
  */
 
-z.util.base64_to_blob = function(base64) {
-  const mime_type = z.util.get_content_type_from_data_url(base64);
-  const bytes = z.util.base64_to_array(base64);
-  return new Blob([bytes], {type: mime_type});
+z.util.base64ToBlob = base64 => {
+  const mimeType = z.util.getContentTypeFromDataUrl(base64);
+  const bytes = z.util.base64ToArray(base64);
+  return new Blob([bytes], {type: mimeType});
 };
 
 /**
@@ -312,7 +240,7 @@ z.util.base64_to_blob = function(base64) {
  * @returns {number} Timeout identifier
  */
 
-z.util.download_blob = function(blob, filename) {
+z.util.downloadBlob = (blob, filename) => {
   const url = window.URL.createObjectURL(blob);
   const link = document.createElement('a');
   document.body.appendChild(link);
@@ -328,62 +256,23 @@ z.util.download_blob = function(blob, filename) {
   }, 100);
 };
 
-z.util.phone_number_to_e164 = function(phone_number, country_code) {
-  return window.PhoneFormat.formatE164(`${country_code}`.toUpperCase(), `${phone_number}`);
+z.util.phoneNumberToE164 = (phoneNumber, countryCode) => {
+  return window.PhoneFormat.formatE164(`${countryCode}`.toUpperCase(), `${phoneNumber}`);
 };
 
-z.util.create_random_uuid = function() {
-  return UUID.genV4().hexString;
-};
+z.util.createRandomUuid = () => UUID.genV4().hexString;
 
-/**
- * Returns a random integer between min (included) and max (excluded).
- * @param {number} min - Minimum
- * @param {number} max - Maximum
- * @returns {number} Random integer
- */
-z.util.get_random_int = function(min, max) {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min) + min);
-};
+z.util.encodeBase64 = text => window.btoa(text);
 
-z.util.encode_base64 = function(text) {
-  return window.btoa(text);
-};
+z.util.encodeSha256Base64 = text => CryptoJS.SHA256(text).toString(CryptoJS.enc.Base64);
 
-z.util.encode_sha256_base64 = function(text) {
-  return CryptoJS.SHA256(text).toString(CryptoJS.enc.Base64);
-};
+z.util.escapeHtml = html => _.escape(html);
 
-z.util.escape_html = function(html) {
-  return _.escape(html);
-};
-
-z.util.escape_regex = function(string) {
-  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-};
+z.util.escapeRegex = string => string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 // Note IE10 listens to "transitionend" instead of "animationend"
 z.util.alias = {
   animationend: 'transitionend animationend oAnimationEnd MSAnimationEnd mozAnimationEnd webkitAnimationEnd',
-};
-
-z.util.add_blank_targets = function(text_with_anchors) {
-  return `${text_with_anchors}`.replace(/rel="nofollow"/gi, 'target="_blank" rel="nofollow noopener noreferrer"');
-};
-
-/**
- * Adds http to given url if protocol missing
- * @param {string} url - URL you want to open in a new browser tab
- * @returns {undefined} No return value
- */
-z.util.add_http = function(url) {
-  if (!url.match(/^http[s]?:\/\//i)) {
-    url = `http://${url}`;
-  }
-
-  return url;
 };
 
 /**
@@ -393,51 +282,35 @@ z.util.add_http = function(url) {
  * @param {boolean} focus - True, if the new windows should get browser focus
  * @returns {Object} New window handle
  */
-z.util.safe_window_open = function(url, focus = true) {
-  const new_window = window.open(z.util.add_http(url));
+z.util.safeWindowOpen = (url, focus = true) => {
+  const newWindow = window.open(z.util.URLUtil.prependProtocol(url));
 
-  if (new_window) {
-    new_window.opener = null;
+  if (newWindow) {
+    newWindow.opener = null;
     if (focus) {
-      new_window.focus();
+      newWindow.focus();
     }
   }
 
-  return new_window;
+  return newWindow;
 };
 
-z.util.safe_mailto_open = function(event, email) {
+z.util.safeMailtoOpen = (event, email) => {
   event.preventDefault();
   event.stopPropagation();
 
-  if (!z.util.is_valid_email(email)) {
+  if (!z.util.isValidEmail(email)) {
     return;
   }
 
-  const new_window = window.open(`mailto:${email}`);
-  if (new_window) {
-    window.setTimeout(() => new_window.close(), 10);
+  const newWindow = window.open(`mailto:${email}`);
+  if (newWindow) {
+    window.setTimeout(() => newWindow.close(), 10);
   }
-};
-
-z.util.get_last_characters = function(message, amount) {
-  if (message.length < amount) {
-    return false;
-  }
-
-  return message.substring(message.length - amount);
-};
-
-z.util.cut_last_characters = function(message, amount) {
-  return message.substring(0, message.length - amount);
-};
-
-z.util.markup_links = function(message) {
-  return message.replace(/<a\s+href=/gi, '<a target="_blank" rel="nofollow noopener noreferrer" href=');
 };
 
 // Note: We are using "Underscore.js" to escape HTML in the original message
-z.util.render_message = function(message) {
+z.util.renderMessage = message => {
   message = marked(message, {
     highlight: function(code) {
       return hljs.highlightAuto(code).value;
@@ -449,37 +322,37 @@ z.util.render_message = function(message) {
   message = message.replace(/\n/g, '<br />');
 
   // Remove <br /> if it is the last thing in a message
-  if (z.util.get_last_characters(message, '<br />'.length) === '<br />') {
-    message = z.util.cut_last_characters(message, '<br />'.length);
+  if (z.util.StringUtil.getLastChars(message, '<br />'.length) === '<br />') {
+    message = z.util.StringUtil.cutLastChars(message, '<br />'.length);
   }
 
   return message;
 };
 
-z.util.ko_array_push_all = function(ko_array, values_to_push) {
+z.util.koArrayPushAll = (koArray, valuesToPush) => {
   // append array to knockout observableArray
   // https://github.com/knockout/knockout/issues/416
-  const underlyingArray = ko_array();
-  ko_array.valueWillMutate();
-  ko.utils.arrayPushAll(underlyingArray, values_to_push);
-  return ko_array.valueHasMutated();
+  const underlyingArray = koArray();
+  koArray.valueWillMutate();
+  ko.utils.arrayPushAll(underlyingArray, valuesToPush);
+  koArray.valueHasMutated();
 };
 
-z.util.ko_array_unshift_all = function(ko_array, values_to_shift) {
+z.util.koArrayUnshiftAll = (koArray, valuesToShift) => {
   // prepend array to knockout observableArray
-  const underlyingArray = ko_array();
-  ko_array.valueWillMutate();
-  Array.prototype.unshift.apply(underlyingArray, values_to_shift);
-  return ko_array.valueHasMutated();
+  const underlyingArray = koArray();
+  koArray.valueWillMutate();
+  Array.prototype.unshift.apply(underlyingArray, valuesToShift);
+  koArray.valueHasMutated();
 };
 
-z.util.ko_push_deferred = function(target, src, number = 100, delay = 300) {
+z.util.koPushDeferred = (target, src, number = 100, delay = 300) => {
   // push array deferred to knockout observableArray
   let interval;
 
   return (interval = window.setInterval(() => {
     const chunk = src.splice(0, number);
-    z.util.ko_array_push_all(target, chunk);
+    z.util.koArrayPushAll(target, chunk);
 
     if (src.length === 0) {
       return window.clearInterval(interval);
@@ -493,47 +366,23 @@ z.util.ko_push_deferred = function(target, src, number = 100, delay = 300) {
  * @param {number} length - Final output length
  * @returns {string} Input value with leading zeros (padding)
  */
-z.util.zero_padding = function(value, length = 2) {
-  if (value.toString().length < length) {
-    return z.util.zero_padding(`0${value}`, length);
-  }
-
-  return `${value}`;
-};
-
-/**
- * Human readable format of a timestamp.
- * @note: Not testable due to timezones :(
- * @param {number} timestamp - Timestamp
- * @param {boolean} long_format - True, if output should have leading numbers
- * @returns {string} Human readable format of a timestamp.
- */
-z.util.format_timestamp = function(timestamp, long_format = true) {
-  const time = moment(timestamp);
-  let format = 'DD.MM.YYYY (HH:mm:ss)';
-
-  if (long_format) {
-    format = moment().year() === time.year() ? 'ddd D MMM, HH:mm' : 'ddd D MMM YYYY, HH:mm';
-  }
-
-  return time.format(format);
+z.util.zeroPadding = (value, length = 2) => {
+  return value.toString().length < length ? z.util.zeroPadding(`0${value}`, length) : `${value}`;
 };
 
 /**
  * Test whether the given string is ISO 8601 format equally to date.toISOString()
- * @param {string} date_string - String with data
+ * @param {string} dateString - String with data
  * @returns {boolean} True, if input string follows ISO 8601
  */
-z.util.is_iso_string = function(date_string) {
-  return /\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z)/.test(date_string);
+z.util.isIsoString = dateString => {
+  return /\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z)/.test(dateString);
 };
 
-z.util.sort_groups_by_last_event = (groupA, groupB) => {
-  return groupB.last_event_timestamp() - groupA.last_event_timestamp();
-};
+z.util.sortGroupsByLastEvent = (groupA, groupB) => groupB.last_event_timestamp() - groupA.last_event_timestamp();
 
-z.util.sort_object_by_keys = function(object, reverse) {
-  const sorted_object = {};
+z.util.sortObjectByKeys = (object, reverse) => {
+  const sortedObject = {};
   const keys = Object.keys(object);
   keys.sort();
 
@@ -541,50 +390,32 @@ z.util.sort_object_by_keys = function(object, reverse) {
     for (let index = keys.length - 1; index >= 0; index--) {
       const key = keys[index];
       const value = object[key];
-      sorted_object[key] = value;
+      sortedObject[key] = value;
     }
   } else {
     for (const key of keys) {
       const value = object[key];
-      sorted_object[key] = value;
+      sortedObject[key] = value;
     }
   }
 
   // Returns a copy of an object, which is ordered by the keys of the original object.
-  return sorted_object;
+  return sortedObject;
 };
 
-z.util.strip_url_wrapper = function(url) {
-  /**
-   * This will remove url(' and url(" from the beginning of the string.
-   * It will also remove ") and ') from the end if present.
-   */
-  return url.replace(/^url\(["']?/, '').replace(/["']?\)$/, '');
-};
+// Removes url(' and url(" from the beginning of the string and also ") and ') from the end
+z.util.stripUrlWrapper = url => url.replace(/^url\(["']?/, '').replace(/["']?\)$/, '');
 
-/**
- * Removes protocol, www and trailing slashes in the given url
- * @param {string} url - URL
- * @returns {string} Plain URL
- */
-z.util.naked_url = function(url = '') {
-  return url
-    .toLowerCase()
-    .replace(/.*?:\/\//, '') // remove protocol
-    .replace(/\/$/, '') // remove trailing slash
-    .replace('www.', '');
-};
-
-z.util.validateProfileImageResolution = (file, min_width, min_height) => {
+z.util.validateProfileImageResolution = (file, minWidth, minHeight) => {
   return new Promise((resolve, reject) => {
     const image = new Image();
-    image.onload = () => resolve(image.width >= min_width && image.height >= min_height);
+    image.onload = () => resolve(image.width >= minWidth && image.height >= minHeight);
     image.onerror = () => reject(new Error('Failed to load profile picture for size validation'));
     image.src = window.URL.createObjectURL(file);
   });
 };
 
-z.util.is_valid_email = function(email) {
+z.util.isValidEmail = email => {
   const regExp = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   return regExp.test(email);
 };
@@ -592,29 +423,24 @@ z.util.is_valid_email = function(email) {
 /**
  * Checks if input has the format of an international phone number
  * @note Begins with + and contains only numbers
- * @param {string} phone_number - Input
+ * @param {string} phoneNumber - Input
  * @returns {boolean} True, if the input a phone number
  */
-z.util.is_valid_phone_number = function(phone_number) {
-  let regular_expression;
+z.util.isValidPhoneNumber = phoneNumber => {
+  const isProductionBackend = z.util.Environment.backend.current === z.service.BackendEnvironment.PRODUCTION;
+  const regularExpression = isProductionBackend ? /^\+[1-9]\d{1,14}$/ : /^\+[0-9]\d{1,14}$/;
 
-  if (z.util.Environment.backend.current === z.service.BackendEnvironment.PRODUCTION) {
-    regular_expression = /^\+[1-9]\d{1,14}$/;
-  } else {
-    regular_expression = /^\+[0-9]\d{1,14}$/;
-  }
-
-  return regular_expression.test(phone_number);
+  return regularExpression.test(phoneNumber);
 };
 
-z.util.is_valid_username = function(username) {
+z.util.isValidUsername = username => {
   if (username.startsWith('@')) {
     username = username.substring(1);
   }
   return /^[a-z_0-9]{2,21}$/.test(username);
 };
 
-z.util.murmurhash3 = function(key, seed) {
+z.util.murmurhash3 = (key, seed) => {
   const remainder = key.length & 3; // key.length % 4
   const bytes = key.length - remainder;
   let h1 = seed;
@@ -672,96 +498,97 @@ z.util.murmurhash3 = function(key, seed) {
   return h1 >>> 0;
 };
 
-z.util.get_unix_timestamp = function() {
-  return Math.floor(Date.now() / 1000);
-};
+z.util.getFirstName = (userEt, declension = z.string.Declension.NOMINATIVE) => {
+  if (userEt.is_me) {
+    let stringId;
 
-z.util.get_first_name = function(user_et, declension = z.string.Declension.NOMINATIVE) {
-  if (user_et.is_me) {
-    if (declension === z.string.Declension.NOMINATIVE) {
-      return z.l10n.text(z.string.conversationYouNominative);
-    } else if (declension === z.string.Declension.DATIVE) {
-      return z.l10n.text(z.string.conversationYouDative);
-    } else if (declension === z.string.Declension.ACCUSATIVE) {
-      return z.l10n.text(z.string.conversationYouAccusative);
+    switch (declension) {
+      case z.string.Declension.NOMINATIVE:
+        stringId = z.string.conversationYouNominative;
+        break;
+      case z.string.Declension.DATIVE:
+        stringId = z.string.conversationYouDative;
+        break;
+      case z.string.Declension.ACCUSATIVE:
+        stringId = z.string.conversationYouAccusative;
+        break;
     }
+
+    return z.l10n.text(stringId);
   }
-  return user_et.first_name();
+
+  return userEt.first_name();
 };
 
-z.util.print_devices_id = function(id) {
+z.util.printDevicesId = id => {
   if (!id) {
     return '';
   }
 
-  const id_with_padding = z.util.zero_padding(id, 16);
-  let prettified_id = '';
+  const idWithPadding = z.util.zeroPadding(id, 16);
+  let prettifiedId = '';
 
-  for (const part of id_with_padding.match(/.{1,2}/g)) {
-    prettified_id += `<span class='device-id-part'>${part}</span>`;
+  for (const part of idWithPadding.match(/.{1,2}/g)) {
+    prettifiedId += `<span class='device-id-part'>${part}</span>`;
   }
 
-  return prettified_id;
+  return prettifiedId;
 };
 
 /**
  * Returns bucket for given value based on the specified bucket limits
- * @example z.util.bucket_values(13, [0, 5, 10, 15, 20, 25]) will return '11-15')
+ * @example z.util.bucketValues(13, [0, 5, 10, 15, 20, 25]) will return '11-15')
  * @param {number} value - Numeric value
- * @param {Array<number>} bucket_limits - Array with numeric values that define the upper limit of the bucket
+ * @param {Array<number>} bucketLimits - Array with numeric values that define the upper limit of the bucket
  * @returns {string} Bucket
  */
-z.util.bucket_values = function(value, bucket_limits) {
-  if (value < bucket_limits[0] + 1) {
+z.util.bucketValues = (value, bucketLimits) => {
+  if (value < bucketLimits[0] + 1) {
     return '0';
   }
 
-  for (let index = 0; index < bucket_limits.length; index++) {
-    const limit = bucket_limits[index];
+  for (let index = 0; index < bucketLimits.length; index++) {
+    const limit = bucketLimits[index];
     if (value < limit + 1) {
-      const previous_limit = bucket_limits[index - 1];
+      const previous_limit = bucketLimits[index - 1];
       return `${previous_limit + 1}-${limit}`;
     }
   }
 
-  const last_limit = bucket_limits[bucket_limits.length - 1];
+  const last_limit = bucketLimits[bucketLimits.length - 1];
   return `${last_limit + 1}-`;
 };
 
-z.util.format_time_remaining = function(time_remaining) {
-  const moment_duration = moment.duration(time_remaining);
+z.util.formatTimeRemaining = timeRemaining => {
+  const momentDuration = moment.duration(timeRemaining);
 
   let title = '';
-  if (moment_duration.asHours() === 1) {
-    title += `${moment_duration.hours()} ${z.l10n.text(z.string.ephememalUnitsHour)}, `;
-  } else if (moment_duration.asHours() > 1) {
-    title += `${moment_duration.hours()} ${z.l10n.text(z.string.ephememalUnitsHours)}, `;
+  if (momentDuration.asHours() === 1) {
+    title += `${momentDuration.hours()} ${z.l10n.text(z.string.ephememalUnitsHour)}, `;
+  } else if (momentDuration.asHours() > 1) {
+    title += `${momentDuration.hours()} ${z.l10n.text(z.string.ephememalUnitsHours)}, `;
   }
 
-  if (moment_duration.asMinutes() === 1) {
-    title += `${moment_duration.minutes()} ${z.l10n.text(z.string.ephememalUnitsMinute)} ${z.l10n.text(z.string.and)} `;
-  } else if (moment_duration.asMinutes() > 1) {
-    title += `${moment_duration.minutes()} ${z.l10n.text(z.string.ephememalUnitsMinutes)} ${z.l10n.text(
-      z.string.and
-    )} `;
+  if (momentDuration.asMinutes() === 1) {
+    title += `${momentDuration.minutes()} ${z.l10n.text(z.string.ephememalUnitsMinute)} ${z.l10n.text(z.string.and)} `;
+  } else if (momentDuration.asMinutes() > 1) {
+    title += `${momentDuration.minutes()} ${z.l10n.text(z.string.ephememalUnitsMinutes)} ${z.l10n.text(z.string.and)} `;
   }
 
-  if (moment_duration.asSeconds() === 1) {
-    title += `${moment_duration.seconds()} ${z.l10n.text(z.string.ephememalUnitsSecond)}`;
-  } else if (moment_duration.asSeconds() > 1) {
-    title += `${moment_duration.seconds()} ${z.l10n.text(z.string.ephememalUnitsSeconds)}`;
+  if (momentDuration.asSeconds() === 1) {
+    title += `${momentDuration.seconds()} ${z.l10n.text(z.string.ephememalUnitsSecond)}`;
+  } else if (momentDuration.asSeconds() > 1) {
+    title += `${momentDuration.seconds()} ${z.l10n.text(z.string.ephememalUnitsSeconds)}`;
   }
 
   return title || '';
 };
 
-z.util.afterRender = callback => {
-  // https://developer.mozilla.org/en-US/Firefox/Performance_best_practices_for_Firefox_fe_engineers
-  window.requestAnimationFrame(() => window.setTimeout(callback, 0));
-};
+// https://developer.mozilla.org/en-US/Firefox/Performance_best_practices_for_Firefox_fe_engineers
+z.util.afterRender = callback => window.requestAnimationFrame(() => window.setTimeout(callback, 0));
 
 /**
  * No operation
- * @returns {undefined}
+ * @returns {void}
  */
-z.util.noop = function() {};
+z.util.noop = () => {};

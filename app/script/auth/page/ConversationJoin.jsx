@@ -137,7 +137,11 @@ class ConversationJoin extends Component {
     return (
       <ContainerXS style={{margin: 'auto 0'}}>
         <AppAlreadyOpen />
-        <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}} color={COLOR.GRAY} data-uie-name="status-join-headline">
+        <H2
+          style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}}
+          color={COLOR.GRAY}
+          data-uie-name="status-join-headline"
+        >
           {selfName ? (
             <FormattedHTMLMessage
               {...conversationJoinStrings.existentAccountHeadline}
@@ -148,7 +152,9 @@ class ConversationJoin extends Component {
           )}
         </H2>
         <H3 style={{marginTop: '10px'}}>{_(conversationJoinStrings.existentAccountSubhead)}</H3>
-        <Button onClick={this.onOpenWireClick} data-uie-name="do-open">{_(conversationJoinStrings.existentAccountOpenButton)}</Button>
+        <Button onClick={this.onOpenWireClick} data-uie-name="do-open">
+          {_(conversationJoinStrings.existentAccountOpenButton)}
+        </Button>
         <Small block>
           {`${_(conversationJoinStrings.acceptTou)} `}
           <Link href={EXTERNAL_ROUTE.WIRE_TERMS_PERSONAL} textTransform={'none'} data-uie-name="go-tou">
@@ -232,10 +238,16 @@ class ConversationJoin extends Component {
     const {intl: {formatMessage: _}} = this.props;
     return (
       <ContainerXS style={{margin: 'auto 0'}}>
-        <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}} color={COLOR.GRAY} data-uie-name="status-invalid-headline">
+        <H2
+          style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}}
+          color={COLOR.GRAY}
+          data-uie-name="status-invalid-headline"
+        >
           <FormattedHTMLMessage {...conversationJoinStrings.invalidHeadline} />
         </H2>
-        <H3 style={{marginTop: '10px'}} data-uie-name="status-invalid-text">{_(conversationJoinStrings.invalidSubhead)}</H3>
+        <H3 style={{marginTop: '10px'}} data-uie-name="status-invalid-text">
+          {_(conversationJoinStrings.invalidSubhead)}
+        </H3>
       </ContainerXS>
     );
   };
@@ -244,10 +256,16 @@ class ConversationJoin extends Component {
     const {intl: {formatMessage: _}} = this.props;
     return (
       <ContainerXS style={{margin: 'auto 0'}}>
-        <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}} color={COLOR.GRAY} data-uie-name="status-full-headline">
+        <H2
+          style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}}
+          color={COLOR.GRAY}
+          data-uie-name="status-full-headline"
+        >
           <FormattedHTMLMessage {...conversationJoinStrings.fullConversationHeadline} />
         </H2>
-        <H3 style={{marginTop: '10px'}} data-uie-name="status-full-text">{_(conversationJoinStrings.fullConversationSubhead)}</H3>
+        <H3 style={{marginTop: '10px'}} data-uie-name="status-full-text">
+          {_(conversationJoinStrings.fullConversationSubhead)}
+        </H3>
       </ContainerXS>
     );
   };

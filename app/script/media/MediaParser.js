@@ -42,7 +42,7 @@ class MediaParser {
    * @returns {string} Message with rendered media embeds
    */
   render_media_embeds(message, theme_color) {
-    const links = z.util.URLUtil.get_links_from_html(message);
+    const links = z.util.URLUtil.getLinksFromHtml(message);
 
     for (const link of links) {
       for (const embed of this.embeds) {
