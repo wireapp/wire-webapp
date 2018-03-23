@@ -37,9 +37,7 @@ z.lifecycle.LifecycleRepository = class LifecycleRepository {
   }
 
   init() {
-    window.setInterval(() => {
-      this.checkVersion();
-    }, LifecycleRepository.CONFIG.CHECK_INTERVAL);
+    window.setInterval(() => this.checkVersion(), LifecycleRepository.CONFIG.CHECK_INTERVAL);
   }
 
   checkVersion() {
@@ -48,7 +46,8 @@ z.lifecycle.LifecycleRepository = class LifecycleRepository {
         const currentVersion = z.util.Environment.version(false, true);
         this.logger.info(`Checking current webapp version. Server '${serverVersion}' vs. local '${currentVersion}'`);
 
-        if (serverVersion > currentVersion) {
+        const isOutdatedVersion = serverVersion > currentVersion;
+        if (isOutdatedVersion) {
           amplify.publish(z.event.WebApp.LIFECYCLE.UPDATE, z.lifecycle.UPDATE_SOURCE.WEBAPP);
         }
       });
