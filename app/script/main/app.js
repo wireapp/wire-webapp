@@ -769,7 +769,7 @@ z.main.App = class App {
         const isLeavingGuestRoom = isUserRequested && this.repository.user.self().isTemporaryGuest();
         if (isLeavingGuestRoom) {
           const path = z.l10n.text(z.string.urlWebsiteRoot);
-          const url = z.util.URLUtil.build_url(z.util.URLUtil.TYPE.WEBSITE, path);
+          const url = z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.WEBSITE, path);
           return window.location.replace(url);
         }
 
