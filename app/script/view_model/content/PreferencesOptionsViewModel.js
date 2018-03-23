@@ -27,6 +27,7 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
   constructor(mainViewModel, contentViewModel, repositories) {
     this.logger = new z.util.Logger('z.viewModel.content.PreferencesOptionsViewModel', z.config.LOGGER.OPTIONS);
 
+    this.callingRepository = repositories.calling;
     this.propertiesRepository = repositories.properties;
     this.teamRepository = repositories.team;
 
@@ -66,6 +67,17 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
 
   connectMacOSContacts() {
     amplify.publish(z.event.WebApp.CONNECT.IMPORT_CONTACTS, z.connect.ConnectSource.ICLOUD);
+  }
+
+  saveCallLogs() {
+    const messageLog = this.callingRepository.messageLog;
+    if (messageLog.length) {
+      const callLog = [messageLog.join('\r\n')];
+      const blob = new Blob(callLog, {type: 'text/plain;charset=utf-8'});
+      const currentDate = new Date().toISOString().replace(' ', '-');
+
+      z.util.downloadBlob(blob, `CallLogs-${currentDate}.log`);
+    }
   }
 
   updateProperties(properties) {

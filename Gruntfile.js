@@ -19,6 +19,9 @@
 
 'use strict';
 
+const webpack = require('webpack');
+const ProgressPlugin = require('webpack/lib/ProgressPlugin');
+
 module.exports = grunt => {
   require('load-grunt-tasks')(grunt);
 
@@ -91,7 +94,7 @@ module.exports = grunt => {
   // Tasks
   grunt.loadTasks('grunt/tasks');
   grunt.registerTask('default', ['prepare_dist', 'host']);
-  grunt.registerTask('init', ['clean:temp', 'npmBower', 'copy:frontend', 'scripts']);
+  grunt.registerTask('init', ['clean:temp', 'npmBower', 'copy:frontend', 'npmWebpack', 'scripts']);
 
   // Deploy to different environments
   grunt.registerTask('app_deploy', ['gitinfo', 'aws_deploy']);
@@ -112,6 +115,24 @@ module.exports = grunt => {
   grunt.registerTask('test', () =>
     grunt.task.run(['clean:docs_coverage', 'scripts', 'test_init', 'test_prepare', 'karma:test'])
   );
+
+  grunt.registerTask('npmWebpack', function() {
+    const done = this.async();
+
+    const compiler = webpack(require('./webpack.config.npm.js'));
+    const progress = new ProgressPlugin((percentage, message) => grunt.log.ok(`${~~(percentage * 100)}%`, message));
+
+    compiler.apply(progress);
+
+    compiler.run(error => {
+      if (error) {
+        grunt.log.error(`Plugin failed: ${error.message}`);
+        throw error;
+      }
+
+      done();
+    });
+  });
 
   grunt.registerTask('test_prepare', test_name => {
     const scripts = grunt.config('scripts');

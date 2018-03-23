@@ -39,7 +39,7 @@
     "@bower_components/webrtc-adapter": "webrtc/adapter#6.1.4",
     "@bower_components/wire-audio-files": "wireapp/wire-audio-files#1.1.1",
     "@bower_components/wire-theme": "wireapp/wire-theme#1.0.6",
-    "@wireapp/core": "2.1.7",
+    "@wireapp/core": "2.1.9",
     "@wireapp/react-ui-kit": "1.0.15",
     "babel-plugin-react-intl": "2.4.0",
     "babel-polyfill": "6.26.0",
@@ -58,6 +58,7 @@
     "redux": "3.7.2",
     "redux-logger": "3.0.6",
     "redux-thunk": "2.2.0",
+    "sdp-transform": "2.4.0",
     "speakingurl": "14.0.1",
     "uuid": "3.2.1"
   },

@@ -35,10 +35,13 @@ z.calling.entities.ParticipantEntity = class ParticipantEntity {
   constructor(callEntity, user, timings) {
     this.callEntity = callEntity;
     this.user = user;
+
     this.id = this.user.id;
+    this.messageLog = this.callEntity.messageLog;
     this.sessionId = undefined;
 
-    this.logger = new z.util.Logger(`z.calling.entities.ParticipantEntity (${this.id})`, z.config.LOGGER.OPTIONS);
+    const callLoggerName = `z.calling.entities.ParticipantEntity (${this.id})`;
+    this.callLogger = new z.telemetry.calling.CallLogger(callLoggerName, z.config.LOGGER.OPTIONS, this.messageLog);
 
     this.isConnected = ko.observable(false);
     this.panning = ko.observable(0.0);
@@ -134,8 +137,14 @@ z.calling.entities.ParticipantEntity = class ParticipantEntity {
       const isExpectedId = clientId === connectedClientId;
       const requestedByWrongSender = connectedClientId && !isExpectedId;
       if (requestedByWrongSender) {
-        const logMessage = `State change requested from '${clientId}' while we are connected to '${connectedClientId}'`;
-        this.logger.warn(logMessage, this);
+        const logMessage = {
+          data: {
+            default: [clientId, connectedClientId],
+            obfuscated: [this.callLogger.obfuscate(clientId), this.callLogger.obfuscate(connectedClientId)],
+          },
+          message: `State change requested from '{0}' while we are connected to '{1}'`,
+        };
+        this.callLogger.warn(logMessage, this);
         throw new z.calling.CallError(z.calling.CallError.TYPE.WRONG_SENDER);
       }
 
