@@ -1031,6 +1031,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   update_participating_user_ets(conversation_et, offline = false) {
     return this.user_repository.get_users_by_id(conversation_et.participating_user_ids(), offline).then(user_ets => {
+      user_ets.sort((userA, userB) => z.util.StringUtil.sortByPriority(userA.first_name(), userB.first_name()));
       conversation_et.participating_user_ets(user_ets);
       return conversation_et;
     });
@@ -2224,7 +2225,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return this.conversation_service
       .post_encrypted_message(conversationId, payload, preconditionOption)
       .then(response => {
-        this.clientMismatchHandler.onClientMismatch(response, conversationId);
+        this.clientMismatchHandler.onClientMismatch(response, genericMessage, payload, conversationId);
         return response;
       })
       .catch(error => {
@@ -2239,7 +2240,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
         let updatedPayload;
         return this.clientMismatchHandler
-          .onClientMismatch(error, conversationId, genericMessage, payload)
+          .onClientMismatch(error, genericMessage, payload, conversationId)
           .then(payloadWithMissingClients => {
             updatedPayload = payloadWithMissingClients;
 
@@ -3481,6 +3482,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
       if (messageEntity.is_member() || messageEntity.userEntities) {
         return this.user_repository.get_users_by_id(messageEntity.userIds()).then(userEntities => {
+          userEntities.sort((userA, userB) => z.util.StringUtil.sortByPriority(userA.first_name(), userB.first_name()));
           messageEntity.userEntities(userEntities);
           return messageEntity;
         });
@@ -3492,6 +3494,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
         messageEntity.reactions_user_ets.removeAll();
         if (userIds.length) {
           return this.user_repository.get_users_by_id(userIds).then(userEntities => {
+            userEntities.sort((userA, userB) => {
+              return z.util.StringUtil.sortByPriority(userA.first_name(), userB.first_name());
+            });
             messageEntity.reactions_user_ets(userEntities);
             return messageEntity;
           });

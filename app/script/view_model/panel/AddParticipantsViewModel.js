@@ -69,16 +69,14 @@ z.viewModel.panel.AddParticipantsViewModel = class AddParticipantsViewModel {
         return userEntities;
       }
 
-      if (!this.isTeam()) {
-        userEntities = this.userRepository.connected_users();
-      }
-
-      if (this.isTeamOnly()) {
-        userEntities = this.teamMembers().sort((userA, userB) => {
-          return z.util.StringUtil.sortByPriority(userA.first_name(), userB.first_name());
-        });
+      if (this.isTeam()) {
+        userEntities = this.isTeamOnly()
+          ? this.teamMembers().sort((userA, userB) => {
+              return z.util.StringUtil.sortByPriority(userA.first_name(), userB.first_name());
+            })
+          : this.teamUsers();
       } else {
-        userEntities = this.teamUsers();
+        userEntities = this.userRepository.connected_users();
       }
 
       return userEntities.filter(userEntity => {
