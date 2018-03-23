@@ -22,14 +22,12 @@ z.string.es.wireWindows = 'Wire para Windows';
 z.string.es.wireLinux = 'Wire para Linux';
 z.string.es.nonexistentUser = 'Usuario Borrado';
 z.string.es.and = 'y';
+z.string.es.enumerationAnd = ', y ';
 
 z.string.es.authAccountCountryCode = 'Código de País';
-z.string.es.authAccountDeletion = 'Fue desconectado porque su cuenta fue borrada.';
-z.string.es.authAccountExpiration = 'Su sesión ha vencido. Entrar nuevamente.';
 z.string.es.authAccountPasswordForgot = 'Contraseña Olvidada';
 z.string.es.authAccountPublicComputer = 'Es un ordenador público';
 z.string.es.authAccountSignIn = 'Iniciar sesión';
-z.string.es.authAccountSignInEmail = 'Correo';
 z.string.es.authAccountSignInPhone = 'Teléfono';
 
 z.string.es.authBlockedCookies = 'Habilita las cookies para iniciar sesión.';
@@ -101,9 +99,13 @@ z.string.es.modalAcknowledgeAction = 'OK';
 z.string.es.modalConfirmSecondary = 'Cancelar';
 z.string.es.modalOptionSecondary = 'Cancelar';
 
+z.string.es.modalAccountCreateAction = 'OK';
+
 z.string.es.modalAccountDeletionAction = 'Eliminar';
 z.string.es.modalAccountDeletionHeadline = 'Eliminar cuenta';
 z.string.es.modalAccountDeletionMessage = 'Enviaremos un mensaje por correo electrónico o SMS. Sigue el enlace para borrar permanentemente tu cuenta.';
+
+z.string.es.modalAccountLeaveGuestRoomAction = 'Abandonar';
 
 z.string.es.modalAccountLogoutAction = 'Cerrar sesión';
 z.string.es.modalAccountLogoutHeadline = '¿Borrar los Datos?';
@@ -180,7 +182,7 @@ z.string.es.modalConversationNewDeviceHeadlineMany = '{{user}}s comenzaron a uti
 z.string.es.modalConversationNewDeviceHeadlineYou = '{{user}} comenzó a utilizar un dispositivo nuevo';
 z.string.es.modalConversationNewDeviceIncomingCallAction = '¿Acepta la llamada?';
 z.string.es.modalConversationNewDeviceIncomingCallMessage = '¿Desea aceptar la llamada?';
-z.string.es.modalConversationNewDeviceMessage = '¿Desea enviar su mensaje?';
+z.string.es.modalConversationNewDeviceMessage = '¿Aún quieres enviar tus mensajes?';
 z.string.es.modalConversationNewDeviceOutgoingCallAction = 'Llamar de todos modos';
 z.string.es.modalConversationNewDeviceOutgoingCallMessage = '¿Desea realizar la llamada?';
 
@@ -257,7 +259,7 @@ z.string.es.conversationVerified = 'Verificado';
 z.string.es.conversationVoiceChannelDeactivate = ' llamó';
 z.string.es.conversationVoiceChannelDeactivateYou = ' llamó';
 z.string.es.conversationYesterday = 'Ayer';
-z.string.es.conversationUnableToDecrypt1 = 'un mensaje de {{user}} no se recibió';
+z.string.es.conversationUnableToDecrypt1 = 'un mensaje de {{user}}} no se ha recibido.';
 z.string.es.conversationUnableToDecrypt2 = '{{user}}´s identidad de dispositivo cambiada. Mensaje no entregado.';
 z.string.es.conversationUnableToDecryptLink = '¿Por qué?';
 z.string.es.conversationUnableToDecryptErrorMessage = 'Error';
@@ -282,6 +284,7 @@ z.string.es.conversationTweetAuthor = ' en Twitter';
 z.string.es.groupCreationPreferencesAction = 'Siguiente';
 z.string.es.groupCreationParticipantsActionCreate = 'Listo';
 z.string.es.groupCreationParticipantsPlaceholder = 'Buscar por nombre';
+
 
 z.string.es.collectionShowAll = 'Mostrar los {{number}}';
 z.string.es.collectionSectionLinks = 'Enlaces';
@@ -483,6 +486,8 @@ z.string.es.searchInviteShare = 'Compartir contactos';
 
 z.string.es.searchListEveryoneParticipates = 'Todas las personas con quien estás conectado ya se encuentran en esta conversación.';
 z.string.es.searchListNoMatches = 'No hay resultados coincidentes. Intente con un nombre diferente.';
+
+z.string.es.temporaryGuestCta = 'Crear una cuenta';
 
 z.string.es.uploadGoogleHeadline = 'Buscar con quien hablar.';
 z.string.es.uploadGoogleMessage = 'Compartir tus contactos te ayuda a conectarte con otros. Toda la información es anónima y no será compartida con nadie más.';

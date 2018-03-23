@@ -211,10 +211,6 @@ z.event.WebApp = {
   SYSTEM_NOTIFICATION: {
     CLICK: 'wire.webapp.notification.click', // todo: deprecated - remove when user base of wrappers version >= 3.2 is large enough
   },
-  TAKEOVER: {
-    DISMISS: 'wire.webapp.takeover.dismiss',
-    SHOW: 'wire.webapp.takeover.show',
-  },
   TEAM: {
     EVENT_FROM_BACKEND: 'wire.webapp.team.event_from_backend',
     INFO: 'wire.webapp.team.info',

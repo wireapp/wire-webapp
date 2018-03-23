@@ -48,6 +48,7 @@ z.viewModel.panel.GroupParticipantUserViewModel = class GroupParticipantUserView
     this.isTeam = ko.pureComputed(() => this.selectedParticipant().isTeamMember());
     this.isGuest = ko.pureComputed(() => this.selectedParticipant().isGuest());
     this.isTemporaryGuest = ko.pureComputed(() => this.selectedParticipant().isTemporaryGuest());
+    this.isActivatedAccount = this.mainViewModel.isActivatedAccount;
 
     this.isVisible = ko.pureComputed(() => {
       return this.panelViewModel.groupParticipantUserVisible() && this.selectedParticipant();
@@ -73,7 +74,6 @@ z.viewModel.panel.GroupParticipantUserViewModel = class GroupParticipantUserView
     this.showActionBlock = ko.pureComputed(() => {
       return this.selectedParticipant().is_connected() || this.selectedParticipant().is_request();
     });
-    this.showActionDevices = ko.pureComputed(() => this.selectedIsConnected());
     this.showActionOpenConversation = ko.pureComputed(() => {
       return this.selectedIsConnected() && !this.selectedParticipant().is_me;
     });

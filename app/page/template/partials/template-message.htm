@@ -244,11 +244,23 @@
       </div>
     <!-- /ko -->
 
-    <!-- ko if: message.isGroupCreation() && $parent.showInvitePeople() -->
-      <div class="message-group-creation-header">
-        <div data-bind="l10n_text: z.string.guestRoomConversationHead"></div>
-        <div class="message-group-creation-header-button" data-bind="click: $parent.clickOnInvitePeople, l10n_text: z.string.guestRoomConversationButton" data-uie-name="do-invite-people"></div>
-      </div>
+    <!-- ko if: message.isGroupCreation() -->
+      <!-- ko if: $parent.showInvitePeople() -->
+        <div class="message-group-creation-header">
+          <div data-bind="l10n_text: z.string.guestRoomConversationHead"></div>
+          <div class="message-group-creation-header-button" data-bind="click: $parent.clickOnInvitePeople, l10n_text: z.string.guestRoomConversationButton" data-uie-name="do-invite-people"></div>
+        </div>
+      <!-- /ko -->
+      <!-- ko if: $parent.selfUser().isTemporaryGuest() -->
+        <div class="message-group-creation-header">
+          <div class="message-group-creation-temporary-message" data-bind="l10n_text: z.string.temporaryGuestJoinMessage"></div>
+          <div class="message-group-creation-temporary-description" data-bind="l10n_text: z.string.temporaryGuestJoinDescription"></div>
+        </div>
+      <!-- /ko -->
+    <!-- /ko -->
+
+    <!-- ko if:  message.isMemberLeave() && message.user().is_me && $parent.selfUser().isTemporaryGuest() -->
+      <div class="message-group-creation-temporary-description" data-bind="l10n_text: z.string.temporaryGuestLeaveDescription"></div>
     <!-- /ko -->
   <!-- /ko -->
 </script>

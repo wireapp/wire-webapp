@@ -24,10 +24,8 @@ z.string.hr.nonexistentUser = 'Izbrisani korisnik';
 z.string.hr.and = 'i';
 
 z.string.hr.authAccountCountryCode = 'Pozivni broj';
-z.string.hr.authAccountExpiration = 'Odjavljeni ste jer je vaša sesija istekla. Molimo prijavite se ponovno.';
 z.string.hr.authAccountPasswordForgot = 'Zaboravljena lozinka';
 z.string.hr.authAccountSignIn = 'Prijava';
-z.string.hr.authAccountSignInEmail = 'Email';
 z.string.hr.authAccountSignInPhone = 'Telefon';
 
 z.string.hr.authVerifyAccountAdd = 'Dodaj';
@@ -91,9 +89,13 @@ z.string.hr.modalAcknowledgeAction = 'Ok';
 z.string.hr.modalConfirmSecondary = 'Odustani';
 z.string.hr.modalOptionSecondary = 'Odustani';
 
+z.string.hr.modalAccountCreateAction = 'U redu';
+
 z.string.hr.modalAccountDeletionAction = 'Obriši';
 z.string.hr.modalAccountDeletionHeadline = 'Brisanje računa';
 z.string.hr.modalAccountDeletionMessage = 'Poslati ćemo Vam poslati poruku putem e-maila ili SMS-a. Slijedite link za trajno brisanje računa.';
+
+z.string.hr.modalAccountLeaveGuestRoomAction = 'Izađi';
 
 z.string.hr.modalAccountLogoutAction = 'Odjava';
 z.string.hr.modalAccountLogoutHeadline = 'Obriši podatke?';
@@ -257,6 +259,7 @@ z.string.hr.conversationSomeone = 'Netko';
 z.string.hr.conversationTweetAuthor = ' na Twitteru';
 
 z.string.hr.groupCreationParticipantsPlaceholder = 'Traži po imenu';
+
 
 z.string.hr.collectionSectionLinks = 'Linkovi';
 z.string.hr.collectionSectionImages = 'Slike';
@@ -426,6 +429,7 @@ z.string.hr.searchInviteShare = 'Podijeli kontakte';
 
 z.string.hr.searchListEveryoneParticipates = 'Svi ljudi s kojima ste povezani su već u ovom razgovoru.';
 z.string.hr.searchListNoMatches = 'Nema odgovarajućih rezultata. Pokušajte unijeti drugačije ime.';
+
 
 z.string.hr.uploadGoogleHeadline = 'Pronađi ljude za razgovor.';
 z.string.hr.uploadGoogleMessage = 'Mi koristimo vaše kontakt podatke za povezivanje s drugima. Sve informacije su anonimiziane i nisu dijeljene s drugima.';

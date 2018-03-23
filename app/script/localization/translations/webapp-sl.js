@@ -25,11 +25,9 @@ z.string.sl.nonexistentUser = 'Izbrisan uporabnik';
 z.string.sl.and = 'in';
 
 z.string.sl.authAccountCountryCode = 'Koda države';
-z.string.sl.authAccountExpiration = 'Ker je vaša seja potekla, ste bili odjavljeni. Prosimo prijavite se ponovno.';
 z.string.sl.authAccountPasswordForgot = 'Pozabljeno geslo';
 z.string.sl.authAccountPublicComputer = 'To je javni računalnik';
 z.string.sl.authAccountSignIn = 'Prijava';
-z.string.sl.authAccountSignInEmail = 'E-pošta';
 z.string.sl.authAccountSignInPhone = 'Telefon';
 
 z.string.sl.authBlockedDatabase = 'Wire potrebuje dostop do lokalnega pomnilnika za prikaz sporočil. Lokalni pomnilnik ni na voljo v privatnem načinu.';
@@ -97,9 +95,13 @@ z.string.sl.modalAcknowledgeAction = 'V redu';
 z.string.sl.modalConfirmSecondary = 'Prekliči';
 z.string.sl.modalOptionSecondary = 'Prekliči';
 
+z.string.sl.modalAccountCreateAction = 'V redu';
+
 z.string.sl.modalAccountDeletionAction = 'Izbriši';
 z.string.sl.modalAccountDeletionHeadline = 'Izbriši račun';
 z.string.sl.modalAccountDeletionMessage = 'Poslali bomo sporočilo preko e-pošte ali SMS. Sledite povezavi za trajni izbris vašega računa.';
+
+z.string.sl.modalAccountLeaveGuestRoomAction = 'Zapusti';
 
 z.string.sl.modalAccountLogoutAction = 'Odjava';
 z.string.sl.modalAccountLogoutHeadline = 'Počisti podatke?';
@@ -269,6 +271,7 @@ z.string.sl.conversationSomeone = 'Nekdo';
 z.string.sl.conversationTweetAuthor = ' na Twitterju';
 
 z.string.sl.groupCreationParticipantsPlaceholder = 'Iskanje po imenu';
+
 
 z.string.sl.collectionShowAll = 'Prikaži vse {{number}}';
 z.string.sl.collectionSectionLinks = 'Povezave';
@@ -469,6 +472,7 @@ z.string.sl.searchInviteShare = 'Deli Stike';
 
 z.string.sl.searchListEveryoneParticipates = 'Vsi \ns katerimi ste povezani,\nso že v tem pogovoru.';
 z.string.sl.searchListNoMatches = 'Brez ujemanja rezultatov. \nPoizkusite vnesti drugo ime.';
+
 
 z.string.sl.uploadGoogleHeadline = 'Poiščite osebe\nza pogovor.';
 z.string.sl.uploadGoogleMessage = 'Uporabljamo vaše podatke stikov pri povezovanju z drugimi. Vse informacije anonimiziramo in ne delimo z drugimi.';

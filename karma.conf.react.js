@@ -17,6 +17,13 @@
  *
  */
 
+const dist = 'aws/static/min/';
+const test = 'test/';
+
+const preprocessors = {};
+preprocessors[`${dist}script.js`] = ['coverage'];
+preprocessors['**/*.js'] = ['sourcemap'];
+
 module.exports = function(config) {
   config.set({
     autoWatch: false,
@@ -38,18 +45,12 @@ module.exports = function(config) {
         flags: ['--no-sandbox'],
       },
     },
-    files: ['tests.webpack.js'],
+    files: [`${test}main.test.js`, `${dist}manifest.js`, `${dist}dexie.js`, `${dist}script.js`, `${dist}test.js`],
     frameworks: ['jasmine'],
     logLevel: config.LOG_INFO,
     port: 9876,
-    preprocessors: {
-      'tests.webpack.js': ['webpack'],
-    },
+    preprocessors,
     reporters: ['progress', 'coverage'],
     singleRun: true,
-    webpack: require('./webpack.config.test'),
-    webpackServer: {
-      noInfo: true,
-    },
   });
 };

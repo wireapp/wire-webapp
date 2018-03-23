@@ -30,6 +30,14 @@ conversation-list-calling-cell {
     bottom: 0;
     z-index: -1;
   }
+
+  &.dark-bg {
+    color: #fff;
+
+    &::before {
+      background-color: fade(@graphite-dark, 80%);
+    }
+  }
 }
 
 conversation-list-calling-cell:first-of-type {

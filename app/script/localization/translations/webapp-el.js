@@ -24,12 +24,9 @@ z.string.el.nonexistentUser = 'Διεγραμμένος χρήστης';
 z.string.el.and = 'και';
 
 z.string.el.authAccountCountryCode = 'Κωδικός Χώρας';
-z.string.el.authAccountDeletion = 'Αποσυνδεθήκατε, επειδή ο λογαριασμός έχει διαγραφεί.';
-z.string.el.authAccountExpiration = 'Αποσυνδεθήκατε διότι η περίοδος λειτουργίας σας έληξε. Παρακαλούμε συνδεθείτε ξανά.';
 z.string.el.authAccountPasswordForgot = 'Ξέχασα τον κωδικό πρόσβασης';
 z.string.el.authAccountPublicComputer = 'Αυτός είναι ένας δημόσιος υπολογιστής';
 z.string.el.authAccountSignIn = 'Σύνδεση';
-z.string.el.authAccountSignInEmail = 'Email';
 z.string.el.authAccountSignInPhone = 'Τηλεφωνο';
 
 z.string.el.authBlockedCookies = 'Ενεργοποιήστε τα cookies για να συνδεθείτε στο Wire.';
@@ -100,9 +97,13 @@ z.string.el.modalAcknowledgeAction = 'Εντάξει';
 z.string.el.modalConfirmSecondary = 'Ακύρωση';
 z.string.el.modalOptionSecondary = 'Ακύρωση';
 
+z.string.el.modalAccountCreateAction = 'Εντάξει';
+
 z.string.el.modalAccountDeletionAction = 'Διαγραφή';
 z.string.el.modalAccountDeletionHeadline = 'Διαγραφή λογαριασμού';
 z.string.el.modalAccountDeletionMessage = 'Θα σας στείλουμε ένα μήνυμα μέσω email ή SMS. Πατήστε επάνω στον σύνδεσμο μας για να διαγράψετε τον λογαριασμό σας οριστικά.';
+
+z.string.el.modalAccountLeaveGuestRoomAction = 'Αποχώρηση';
 
 z.string.el.modalAccountLogoutAction = 'Αποσύνδεση';
 z.string.el.modalAccountLogoutHeadline = 'Εκκαθάριση δεδομένων;';
@@ -279,6 +280,7 @@ z.string.el.conversationTweetAuthor = ' στο Twitter';
 z.string.el.groupCreationPreferencesAction = 'Επόμενο';
 z.string.el.groupCreationParticipantsActionCreate = 'Έγινε';
 z.string.el.groupCreationParticipantsPlaceholder = 'Αναζήτηση βάση ονόματος';
+
 
 z.string.el.collectionShowAll = 'Προβολή όλων {{number}}';
 z.string.el.collectionSectionLinks = 'Σύνδεσμοι';
@@ -478,6 +480,7 @@ z.string.el.searchInviteShare = 'Κοινή χρήση Επαφών';
 
 z.string.el.searchListEveryoneParticipates = 'Όλοι όσοι συνδεθήκατε βρίσκεστε ήδη εντός της συνομιλίας.';
 z.string.el.searchListNoMatches = 'Δεν υπάρχουν σχετικά αποτελέσματα.\nΔοκιμάστε να εισάγετε ένα διαφορετικό όνομα.';
+
 
 z.string.el.uploadGoogleHeadline = 'Εύρεση ατόμων για συνομιλία.';
 z.string.el.uploadGoogleMessage = 'Χρησιμοποιούμε τις επαφές σας για να συνδέεστε με άλλους. Κρατάμε όλες σας τις πληροφορίες ανώνυμες και δεν τις μοιραζόμαστε με κανέναν άλλον.';

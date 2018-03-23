@@ -31,8 +31,6 @@ z.auth.AuthView = {
   },
   MODE: {
     ACCOUNT_LOGIN: 'login',
-    ACCOUNT_PASSWORD: 'password',
-    ACCOUNT_PHONE: 'phone',
     BLOCKED_COOKIES: 'cookies',
     BLOCKED_DATABASE: 'database',
     BLOCKED_TABS: 'tabs',

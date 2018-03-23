@@ -27,12 +27,9 @@ z.string.fr.enumerationAnd = ', et ';
 
 //=L'application se charge
 z.string.fr.authAccountCountryCode = 'Indicatif du pays';
-z.string.fr.authAccountDeletion = 'Vous avez été déconnecté car votre compte a été supprimé.';
-z.string.fr.authAccountExpiration = 'Vous avez été déconnecté car votre session a expirée. Veuillez vous reconnecter.';
 z.string.fr.authAccountPasswordForgot = 'Mot de passe oublié';
 z.string.fr.authAccountPublicComputer = 'Cet ordinateur est public';
 z.string.fr.authAccountSignIn = 'Se connecter';
-z.string.fr.authAccountSignInEmail = 'E-mail';
 z.string.fr.authAccountSignInPhone = 'Téléphone';
 
 z.string.fr.authBlockedCookies = 'Autorisez les cookies pour vous connecter à Wire.';
@@ -104,9 +101,13 @@ z.string.fr.modalAcknowledgeAction = 'OK';
 z.string.fr.modalConfirmSecondary = 'Annuler';
 z.string.fr.modalOptionSecondary = 'Annuler';
 
+z.string.fr.modalAccountCreateAction = 'OK';
+
 z.string.fr.modalAccountDeletionAction = 'Supprimer';
 z.string.fr.modalAccountDeletionHeadline = 'Supprimer le compte';
 z.string.fr.modalAccountDeletionMessage = 'Nous allons envoyer un e-mail ou un SMS. Cliquez sur le lien pour supprimer définitivement votre compte.';
+
+z.string.fr.modalAccountLeaveGuestRoomAction = 'Quitter';
 
 z.string.fr.modalAccountLogoutAction = 'Se déconnecter';
 z.string.fr.modalAccountLogoutHeadline = 'Supprimer les données ?';
@@ -300,6 +301,7 @@ z.string.fr.groupCreationParticipantsActionCreate = 'Terminé';
 z.string.fr.groupCreationParticipantsActionSkip = 'Passer';
 z.string.fr.groupCreationParticipantsHeader = 'Ajouter un contact';
 z.string.fr.groupCreationParticipantsPlaceholder = 'Rechercher par nom';
+
 
 z.string.fr.collectionShowAll = 'Tout afficher ({{number}})';
 z.string.fr.collectionSectionLinks = 'Liens';
@@ -511,6 +513,7 @@ z.string.fr.searchServiceConfirmButton = 'Ajouter un service';
 
 z.string.fr.searchListEveryoneParticipates = 'Toutes les personnes\navec qui vous êtes connecté(e)\nsont déjà dans cette conversation.';
 z.string.fr.searchListNoMatches = 'Aucun résultat.\nEssayez avec un nom différent.';
+
 
 z.string.fr.uploadGoogleHeadline = 'Trouvez des personnes\nà qui parler.';
 z.string.fr.uploadGoogleMessage = 'Nous utilisons les données de vos contacts afin de vous connecter à d’autres personnes. Nous anonymisons toutes les informations et ne les partageons avec personne d’autre.';

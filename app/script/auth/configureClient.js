@@ -27,12 +27,13 @@ const BACKEND = Environment.onEnvironment(
   APIClient.BACKEND.PRODUCTION
 );
 
-const store = new StoreEngine.MemoryEngine();
-store.init('wire-webapp');
-
 export const configureClient = () => {
   return new APIClient({
-    store: store,
+    schemaCallback: db => {
+      const {schema, version} = window.z.storage.StorageService.SCHEMA;
+      db.version(version).stores(schema);
+    },
+    store: new StoreEngine.IndexedDBEngine(),
     urls: BACKEND,
   });
 };

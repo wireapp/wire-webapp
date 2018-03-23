@@ -25,6 +25,8 @@ module.exports = Object.assign({}, commonConfig, {
   plugins: [
     ...commonConfig.plugins,
     new UglifyJSPlugin({
+      /* Dexie has issues with UglifyJS */
+      exclude: /dexie\.js/i,
       sourceMap: true,
     }),
     new webpack.DefinePlugin({
