@@ -68,7 +68,7 @@ z.viewModel.MainViewModel = class MainViewModel {
     this.logger = new z.util.Logger('z.viewModel.MainViewModel', z.config.LOGGER.OPTIONS);
 
     this.selfUser = this.userRepository.self;
-    this.isActivatedAccount = ko.pureComputed(() => this.selfUser() && !this.selfUser().isTemporaryGuest());
+    this.isActivatedAccount = this.userRepository.isActivatedAccount;
 
     this.isPanelOpen = ko.observable(false);
 
