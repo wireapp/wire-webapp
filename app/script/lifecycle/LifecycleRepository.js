@@ -36,12 +36,11 @@ z.lifecycle.LifecycleRepository = class LifecycleRepository {
     this.lifecycleService = lifecycleService;
     this.userRepository = userRepository;
 
-    this.selfUser = this.userRepository.self;
+    this.isActivatedAccount = this.userRepository.isActivatedAccount;
   }
 
   init() {
-    const isActivatedAccount = !this.selfUser().isTemporaryGuest();
-    if (isActivatedAccount) {
+    if (this.isActivatedAccount()) {
       window.setInterval(() => this.checkVersion(), LifecycleRepository.CONFIG.CHECK_INTERVAL);
     }
   }
