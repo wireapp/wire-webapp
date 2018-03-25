@@ -22,11 +22,6 @@
 import DecodeError from './DecodeError';
 import Type from './Type';
 
-interface TypeMinorTuple extends Array<Type | number> {
-  0: Type;
-  1: number;
-}
-
 export interface DecoderConfig {
   max_array_length: number;
   max_bytes_length: number;
@@ -137,7 +132,7 @@ class Decoder {
     return this._read(len, callback);
   }
 
-  private _read_type_info(): TypeMinorTuple {
+  private _read_type_info(): [Type, number] {
     const type = this._u8();
 
     const major = (type & 0xe0) >> 5;
@@ -207,7 +202,7 @@ class Decoder {
     throw new DecodeError(DecodeError.INVALID_TYPE);
   }
 
-  private _type_info_with_assert(expected: number | Array<number>): TypeMinorTuple {
+  private _type_info_with_assert(expected: number | Array<number>): [Type, number] {
     const [type, minor] = this._read_type_info();
 
     if (!Array.isArray(expected)) {

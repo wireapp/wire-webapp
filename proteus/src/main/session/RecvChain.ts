@@ -33,12 +33,6 @@ import Envelope from '../message/Envelope';
 import ChainKey from './ChainKey';
 import MessageKeys from './MessageKeys';
 
-export interface RecvChainTriple extends Array<ChainKey | MessageKeys | Array<MessageKeys>> {
-  0: ChainKey;
-  1: MessageKeys;
-  2: Array<MessageKeys>;
-}
-
 class RecvChain {
   chain_key: ChainKey;
   message_keys: Array<MessageKeys>;
@@ -85,7 +79,7 @@ class RecvChain {
     return mk.decrypt(msg.cipher_text);
   }
 
-  stage_message_keys(msg: CipherMessage): RecvChainTriple {
+  stage_message_keys(msg: CipherMessage): [ChainKey, MessageKeys, Array<MessageKeys>] {
     const num = msg.counter - this.chain_key.idx;
     if (num > RecvChain.MAX_COUNTER_GAP) {
       if (this.chain_key.idx === 0) {

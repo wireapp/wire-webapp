@@ -12,12 +12,6 @@ import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine/';
 import EventEmitter = require('events');
 
 const logdown = require('logdown');
-
-export interface SessionFromMessageTuple extends Array<CryptoboxSession | Uint8Array> {
-  0: CryptoboxSession;
-  1: Uint8Array;
-}
-
 const VERSION = require('../../package.json').version;
 
 class Cryptobox extends EventEmitter {
@@ -265,18 +259,15 @@ class Cryptobox extends EventEmitter {
    * Uses a cipher message to create a new session and to decrypt to message which the given cipher message contains.
    * Saving the newly created session is not needed as it's done during the inbuilt decryption phase.
    */
-  private session_from_message(session_id: string, envelope: ArrayBuffer): Promise<SessionFromMessageTuple> {
+  private session_from_message(session_id: string, envelope: ArrayBuffer): Promise<[CryptoboxSession, Uint8Array]> {
     const env: ProteusMessage.Envelope = ProteusMessage.Envelope.deserialise(envelope);
 
     if (this.identity) {
-      return ProteusSession.Session.init_from_message(this.identity, this.store, env).then(
-        (tuple: Array<ProteusSession.Session | Uint8Array>) => {
-          const session: ProteusSession.Session | Uint8Array = <ProteusSession.Session>tuple[0];
-          const decrypted: ProteusSession.Session | Uint8Array = <Uint8Array>tuple[1];
-          const cryptoBoxSession: CryptoboxSession = new CryptoboxSession(session_id, this.store, session);
-          return <SessionFromMessageTuple>[cryptoBoxSession, decrypted];
-        }
-      );
+      return ProteusSession.Session.init_from_message(this.identity, this.store, env).then(tuple => {
+        const [session, decrypted] = tuple;
+        const cryptoBoxSession = new CryptoboxSession(session_id, this.store, session);
+        return <[CryptoboxSession, Uint8Array]>[cryptoBoxSession, decrypted];
+      });
     }
 
     return Promise.reject(new CryptoboxError('No local identity available.'));

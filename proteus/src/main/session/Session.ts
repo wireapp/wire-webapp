@@ -51,11 +51,6 @@ export interface IntermediateSessionState {
   };
 }
 
-export interface SessionFromMessageTuple extends Array<Session | Uint8Array> {
-  0: Session;
-  1: Uint8Array;
-}
-
 export class Session {
   static MAX_RECV_CHAINS = 5;
   static MAX_SESSION_STATES = 100;
@@ -102,7 +97,7 @@ export class Session {
     our_identity: IdentityKeyPair,
     prekey_store: PreKeyStore,
     envelope: Envelope
-  ): Promise<SessionFromMessageTuple> {
+  ): Promise<[Session, Uint8Array]> {
     return new Promise((resolve, reject) => {
       const pkmsg = (() => {
         if (envelope.message instanceof CipherMessage) {

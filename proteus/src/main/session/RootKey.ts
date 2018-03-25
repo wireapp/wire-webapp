@@ -27,11 +27,6 @@ import KeyPair from '../keys/KeyPair';
 import PublicKey from '../keys/PublicKey';
 import InputError from '../errors/InputError';
 
-export interface RatchetTuple extends Array<RootKey | ChainKey> {
-  0: RootKey;
-  1: ChainKey;
-}
-
 export class RootKey {
   key: CipherKey;
 
@@ -52,7 +47,7 @@ export class RootKey {
    * @param ours Our key pair
    * @param theirs Their public key
    */
-  dh_ratchet(ours: KeyPair, theirs: PublicKey): RatchetTuple {
+  dh_ratchet(ours: KeyPair, theirs: PublicKey): [RootKey, ChainKey] {
     const secret = ours.secret_key.shared_secret(theirs);
     const derived_secrets = DerivedSecrets.kdf(secret, this.key.key, 'dh_ratchet');
 
