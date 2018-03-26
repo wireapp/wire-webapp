@@ -296,6 +296,7 @@ z.string.conversationConnectionCancelRequest = 'Cancel connection request';
 z.string.conversationCreate = ' started a conversation with {{users}}';
 z.string.conversationCreateName = '{{user}} started the conversation';
 z.string.conversationCreateNameYou = '{{user}} started the conversation';
+z.string.conversationCreateTemporary = 'You joined the conversation';
 z.string.conversationCreateWith = 'with {{users}}';
 z.string.conversationCreateYou = ' started a conversation with {{users}}';
 z.string.conversationDeviceStartedUsingOne = ' started using';
