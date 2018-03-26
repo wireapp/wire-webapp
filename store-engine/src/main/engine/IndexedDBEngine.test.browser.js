@@ -25,12 +25,13 @@ describe('StoreEngine.IndexedDBEngine', () => {
 
   let engine = undefined;
 
-  async function initEngine() {
-    const storeEngine = new IndexedDBEngine();
+  async function initEngine(shouldCreateNewEngine = true) {
+    const storeEngine = shouldCreateNewEngine ? new IndexedDBEngine() : engine;
     const db = await storeEngine.init(STORE_NAME);
     db.version(1).stores({
       'the-simpsons': ',firstName,lastName',
     });
+    await db.open();
     return storeEngine;
   }
 

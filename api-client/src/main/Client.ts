@@ -226,6 +226,8 @@ class Client {
           [AUTH_TABLE_NAME]: '',
         });
       }
+      // In case the database got purged, db.close() is called automatically and we have to reopen it.
+      await db.open();
     }
     return this.config.store;
   }
