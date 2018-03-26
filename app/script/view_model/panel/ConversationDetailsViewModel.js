@@ -109,12 +109,12 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
     });
 
     this.isEditingName = ko.observable(false);
-    this.isEditingName.subscribe(value => {
-      if (!value) {
-        const name = $('.group-header .name span');
-        return $('.group-header textarea').css('height', `${name.height()}px`);
+    this.isEditingName.subscribe(isEditing => {
+      if (isEditing) {
+        return window.setTimeout(() => $('.conversation-details__name--input').focus(), 0);
       }
-      $('.group-header textarea').val(this.conversationEntity().display_name());
+      const name = $('.conversation-details__name--input');
+      $('.conversation-details__name').css('height', `${name.height()}px`);
     });
 
     this.showActionAddParticipants = ko.pureComputed(() => this.conversationEntity().is_group());
@@ -230,10 +230,10 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
 
     const newConversationName = z.util.StringUtil.removeLineBreaks(event.target.value.trim());
 
+    this.isEditingName(false);
     const hasNameChanged = newConversationName.length && newConversationName !== currentConversationName;
     if (hasNameChanged) {
       event.target.value = currentConversationName;
-      this.isEditingName(false);
       this.conversationRepository.rename_conversation(this.conversationEntity(), newConversationName);
     }
   }
