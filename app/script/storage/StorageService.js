@@ -396,6 +396,27 @@ z.storage.StorageService = class StorageService {
     return Promise.all(deleteStorePromises);
   }
 
+  exportStores(storeNames = ['events', 'users']) {
+    this.db
+      .transaction('r', this.db.tables, () => {
+        return Promise.all(
+          this.db.tables
+            .filter(table => storeNames.includes(table.name))
+            .map(table => table.toArray().then(rows => ({name: table.name, rows})))
+        );
+      })
+      .then(tables => {
+        for (const table of tables) {
+          const records = table.rows;
+          amplify.publish('z.event.WebApp.IMPORTEXPORT.EXPORT.DATA', table.name, records.length);
+          for (const record of records) {
+            amplify.publish('z.event.WebApp.IMPORTEXPORT.EXPORT.DATA', table.name, JSON.stringify(record));
+          }
+        }
+        amplify.publish('z.event.WebApp.IMPORTEXPORT.EXPORT.SENDER_DONE');
+      });
+  }
+
   /**
    * Returns an array of all records for a given object store.
    *
