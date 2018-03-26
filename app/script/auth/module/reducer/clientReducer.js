@@ -26,7 +26,6 @@ const initialState = {
   error: null,
   fetching: false,
   hasHistory: null,
-  isNewClient: false,
 };
 
 export default function clientReducer(state = initialState, action) {
