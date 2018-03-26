@@ -39,11 +39,13 @@
           </div>
         </div>
 
-        <div class="panel__action-item conversation-details__devices" data-bind="click: clickOnDevices" data-uie-name="go-devices">
-          <devices-icon class="panel__action-item__icon"></devices-icon>
-          <div class="panel__action-item__text" data-bind="l10n_text: z.string.conversationDetailsActionDevices"></div>
-          <disclose-icon></disclose-icon>
-        </div>
+        <!-- ko if: showActionDevices() -->
+          <div class="panel__action-item conversation-details__devices" data-bind="click: clickOnDevices" data-uie-name="go-devices">
+            <devices-icon class="panel__action-item__icon"></devices-icon>
+            <div class="panel__action-item__text" data-bind="l10n_text: z.string.conversationDetailsActionDevices"></div>
+            <disclose-icon></disclose-icon>
+          </div>
+        <!-- /ko -->
 
         <!-- ko if: isActivatedAccount() -->
           <div class="group-participant__bottom-actions">
