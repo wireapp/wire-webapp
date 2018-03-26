@@ -396,7 +396,7 @@ z.storage.StorageService = class StorageService {
     return Promise.all(deleteStorePromises);
   }
 
-  exportStores(storeNames = ['events', 'users']) {
+  exportStores(storeNames = ['conversations', 'events']) {
     this.db
       .transaction('r', this.db.tables, () => {
         return Promise.all(
