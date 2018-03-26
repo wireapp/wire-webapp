@@ -2,7 +2,7 @@
   <div class="preferences-titlebar" data-bind="l10n_text: z.string.preferencesOptions"></div>
   <div class="preferences-content-wrapper">
     <div class="preferences-content" data-bind="antiscroll">
-      <!-- ko if: isActivatedAccount && !isTeam()-->
+      <!-- ko if: isActivatedAccount() && !isTeam()-->
         <section class="preferences-section">
           <header class="preferences-header" data-bind="l10n_text: z.string.preferencesOptionsContacts"></header>
           <div class="preferences-option" data-uie-name="do-share-contacts">
