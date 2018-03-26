@@ -36,7 +36,6 @@ import {parseError, parseValidationErrors} from '../util/errorUtil';
 import ValidationError from '../module/action/ValidationError';
 import {clientItemStrings} from '../../strings';
 import {injectIntl} from 'react-intl';
-import {withRouter} from 'react-router';
 
 class ClientItem extends React.Component {
   static initialState = {
@@ -183,4 +182,4 @@ class ClientItem extends React.Component {
   }
 }
 
-export default withRouter(injectIntl(ClientItem));
+export default injectIntl(ClientItem);
