@@ -53,6 +53,7 @@ import * as URLUtil from '../util/urlUtil';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
 import BackendError from '../module/action/BackendError';
 import {Redirect} from 'react-router';
+import * as Environment from '../Environment';
 
 class Login extends React.PureComponent {
   inputs = {};
@@ -104,6 +105,10 @@ class Login extends React.PureComponent {
 
   componentWillReceiveProps = nextProps => this.readAndUpdateParamsFromUrl(nextProps);
 
+  forgotPassword = () => {
+    z.util.safeWindowOpen(z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.ACCOUNT, z.config.URL_PATH.PASSWORD_RESET));
+  };
+
   handleSubmit = event => {
     event.preventDefault();
     if (this.props.isFetching) {
@@ -128,8 +133,17 @@ class Login extends React.PureComponent {
       .then(() => {
         const {email, password, persist} = this.state;
         const login = {password, persist};
-        if (email.includes('@')) {
+
+        const phoneNumber = z.util.phoneNumberToE164(email, navigator.language);
+        if (this.isValidEmail(email)) {
           login.email = email;
+        } else if (this.isValidUsername(email)) {
+          login.handle = email.replace('@', '');
+        } else if (this.isValidPhoneNumber(phoneNumber)) {
+          login.phone = phoneNumber;
+        }
+
+        if (email.includes('@')) {
         } else {
           login.handle = email.replace('@', '');
         }
@@ -150,9 +164,24 @@ class Login extends React.PureComponent {
       });
   };
 
-  forgotPassword() {
-    z.util.safeWindowOpen(z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.ACCOUNT, z.config.URL_PATH.PASSWORD_RESET));
-  }
+  isValidEmail = email => {
+    const regExp = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return regExp.test(email);
+  };
+
+  isValidPhoneNumber = phoneNumber => {
+    const isProductionBackend = Environment.isEnvironment(Environment.PRODUCTION);
+    const regularExpression = isProductionBackend ? /^\+[1-9]\d{1,14}$/ : /^\+[0-9]\d{1,14}$/;
+
+    return regularExpression.test(phoneNumber);
+  };
+
+  isValidUsername = username => {
+    if (username.startsWith('@')) {
+      username = username.substring(1);
+    }
+    return /^[a-z_0-9]{2,21}$/.test(username);
+  };
 
   render() {
     const {intl: {formatMessage: _}, loginError} = this.props;
