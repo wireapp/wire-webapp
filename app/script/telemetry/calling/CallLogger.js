@@ -6,6 +6,19 @@ z.telemetry.calling.CallLogger = class CallLogger extends z.util.Logger {
     };
   }
 
+  static get LOG_LEVEL() {
+    return {
+      DEBUG: 700,
+      ERROR: 1000,
+      INFO: 800,
+      LEVEL_1: 300,
+      LEVEL_2: 400,
+      LEVEL_3: 500,
+      OFF: 0,
+      WARNING: 900,
+    };
+  }
+
   static get OBFUSCATED() {
     return {
       FINGERPRINT: 'XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX',
@@ -150,18 +163,17 @@ z.telemetry.calling.CallLogger = class CallLogger extends z.util.Logger {
 
   getDebugType(number) {
     switch (number) {
-      case 0:
-      case 300:
-      case 400:
-      case 500:
+      case CallLogger.LOG_LEVEL.LEVEL_1:
+      case CallLogger.LOG_LEVEL.LEVEL_2:
+      case CallLogger.LOG_LEVEL.LEVEL_3:
         return 'VERBOSE';
-      case 700:
+      case CallLogger.LOG_LEVEL.DEBUG:
         return 'DEBUG';
-      case 800:
+      case CallLogger.LOG_LEVEL.INFO:
         return 'INFO';
-      case 900:
+      case CallLogger.LOG_LEVEL.WARNING:
         return 'WARNING';
-      case 100:
+      case CallLogger.LOG_LEVEL.ERROR:
         return 'ERROR';
     }
   }
@@ -171,9 +183,12 @@ z.telemetry.calling.CallLogger = class CallLogger extends z.util.Logger {
       this.messageLog.shift();
     }
 
-    const logType = this.getDebugType(logLevel);
-    const logMessage = `[${new Date().toISOString()}] [${this.name}] (${logType}) ${obfuscatedMessage}`;
-    this.messageLog.push(logMessage);
+    const shouldLogToMemory = logLevel !== CallLogger.LOG_LEVEL.OFF;
+    if (shouldLogToMemory) {
+      const logType = this.getDebugType(logLevel);
+      const logMessage = `[${new Date().toISOString()}] [${this.name}] (${logType}) ${obfuscatedMessage}`;
+      this.messageLog.push(logMessage);
+    }
   }
 
   _isHardObfuscationMode() {
@@ -186,21 +201,26 @@ z.telemetry.calling.CallLogger = class CallLogger extends z.util.Logger {
 
   _print_log(args) {
     // Use obfuscated format for call logs if possible
-    const [logLevel, logMessage] = args;
-    const isLogMessageObject = typeof logMessage === 'object';
+    const [firstArgument, secondArgument] = args;
+    const isLogMessageObject = typeof secondArgument === 'object';
     if (isLogMessageObject) {
-      const {message, data} = logMessage;
+      const {message, data} = secondArgument;
 
-      if (typeof message === 'string' && typeof data === 'object') {
+      const isExpectedObjectStructure = typeof message === 'string' && typeof data === 'object';
+      if (isExpectedObjectStructure) {
         const defaultMessage = z.util.StringUtil.format(message, ...data.default);
         const obfuscatedMessage = z.util.StringUtil.format(message, ...data.obfuscated);
         args[1] = defaultMessage;
 
-        this.logToMemory(logLevel(), obfuscatedMessage);
+        this.logToMemory(firstArgument(), obfuscatedMessage);
+        return super._print_log(args);
       }
-    } else {
-      this.logToMemory(logLevel(), logMessage);
     }
+
+    const hasMultipleArgs = args.length > 1;
+    const logLevel = hasMultipleArgs ? firstArgument() : CallLogger.LOG_LEVEL.INFO;
+    const logMessage = hasMultipleArgs ? secondArgument : firstArgument;
+    this.logToMemory(logLevel, logMessage);
     return super._print_log(args);
   }
 };
