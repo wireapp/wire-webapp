@@ -3494,9 +3494,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
         messageEntity.reactions_user_ets.removeAll();
         if (userIds.length) {
           return this.user_repository.get_users_by_id(userIds).then(userEntities => {
-            userEntities.sort((userA, userB) => {
-              return z.util.StringUtil.sortByPriority(userA.first_name(), userB.first_name());
-            });
             messageEntity.reactions_user_ets(userEntities);
             return messageEntity;
           });
