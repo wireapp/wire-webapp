@@ -74,6 +74,7 @@ z.viewModel.panel.GroupParticipantUserViewModel = class GroupParticipantUserView
     this.showActionBlock = ko.pureComputed(() => {
       return this.selectedParticipant().is_connected() || this.selectedParticipant().is_request();
     });
+    this.showActionDevices = ko.pureComputed(() => !this.selectedParticipant().is_me);
     this.showActionOpenConversation = ko.pureComputed(() => {
       return this.selectedIsConnected() && !this.selectedParticipant().is_me;
     });
