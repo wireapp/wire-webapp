@@ -21,6 +21,7 @@ import {ContainerXS, Loading} from '@wireapp/react-ui-kit';
 import {injectIntl} from 'react-intl';
 import React from 'react';
 import * as ClientAction from '../module/action/ClientAction';
+import * as LocalStorageAction from '../module/action/LocalStorageAction';
 import ClientItem from '../component/ClientItem';
 import * as ClientSelector from '../module/selector/ClientSelector';
 import {connect} from 'react-redux';
@@ -42,7 +43,12 @@ class ClientList extends React.Component {
   removeClient = (clientId, password) => {
     return Promise.resolve()
       .then(() => this.props.doRemoveClient(clientId, password))
-      .then(() => this.props.doInitializeClient(password))
+      .then(() =>
+        this.props.doInitializeClient(
+          this.props.getLocalStorage(LocalStorageAction.LocalStorageKey.AUTH.PERSIST),
+          password
+        )
+      )
       .then(() => window.location.replace(URLUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP)))
       .catch(error => {
         if (error.label === BackendError.LABEL.NEW_CLIENT) {
@@ -87,6 +93,6 @@ export default injectIntl(
       isFetching: ClientSelector.isFetching(state),
       permanentClients: ClientSelector.getPermanentClients(state),
     }),
-    {...ClientAction}
+    {...ClientAction, ...LocalStorageAction}
   )(ClientList)
 );
