@@ -27,26 +27,16 @@ module.exports = {
       name: 'Old monitor',
     };
 
-    const updates = {
-      age: 177,
-      size: {
-        height: 1080,
-        width: 1920,
-      },
+    const update = {
+      name: 'Old monitor2',
     };
-
-    const expectedAmountOfProperties = 2;
 
     engine
       .create(TABLE_NAME, PRIMARY_KEY, entity)
-      .then(() => engine.updateOrCreate(TABLE_NAME, PRIMARY_KEY, updates))
+      .then(() => engine.updateOrCreate(TABLE_NAME, PRIMARY_KEY, update))
       .then(primaryKey => engine.read(TABLE_NAME, primaryKey))
       .then(updatedRecord => {
-        expect(updatedRecord.name).toBe(entity.name);
-        expect(updatedRecord.age).toBe(updates.age);
-        expect(Object.keys(updatedRecord.size).length).toBe(expectedAmountOfProperties);
-        expect(updatedRecord.size.height).toBe(updates.size.height);
-        expect(updatedRecord.size.width).toBe(updates.size.width);
+        expect(updatedRecord.name).toBe(update.name);
         done();
       })
       .catch(done.fail);
