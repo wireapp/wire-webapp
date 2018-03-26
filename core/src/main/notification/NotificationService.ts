@@ -40,7 +40,7 @@ export default class NotificationService {
       .then(notification => this.setLastNotificationId(notification));
   }
 
-  public hasNotificationEvents(): Promise<boolean> {
+  public hasHistory(): Promise<boolean> {
     return this.getNotificationEventList().then(notificationEvents => !!notificationEvents.length);
   }
 
