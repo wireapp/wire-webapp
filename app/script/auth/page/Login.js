@@ -54,6 +54,7 @@ import AppAlreadyOpen from '../component/AppAlreadyOpen';
 import BackendError from '../module/action/BackendError';
 import {Redirect} from 'react-router';
 import * as Environment from '../Environment';
+import {formatE164} from 'phoneFormat.js';
 
 class Login extends React.PureComponent {
   inputs = {};
@@ -109,6 +110,8 @@ class Login extends React.PureComponent {
     z.util.safeWindowOpen(z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.ACCOUNT, z.config.URL_PATH.PASSWORD_RESET));
   };
 
+  formatPhoneNumber = (phoneNumber, countryCode) => formatE164(`${countryCode}`.toUpperCase(), `${phoneNumber}`);
+
   handleSubmit = event => {
     event.preventDefault();
     if (this.props.isFetching) {
@@ -134,18 +137,13 @@ class Login extends React.PureComponent {
         const {email, password, persist} = this.state;
         const login = {password, persist};
 
-        const phoneNumber = z.util.phoneNumberToE164(email, navigator.language);
+        const phoneNumber = this.formatPhoneNumber(email, navigator.language);
         if (this.isValidEmail(email)) {
           login.email = email;
         } else if (this.isValidUsername(email)) {
           login.handle = email.replace('@', '');
         } else if (this.isValidPhoneNumber(phoneNumber)) {
           login.phone = phoneNumber;
-        }
-
-        if (email.includes('@')) {
-        } else {
-          login.handle = email.replace('@', '');
         }
 
         const hasKeyAndCode = this.state.conversationKey && this.state.conversationCode;
@@ -165,22 +163,24 @@ class Login extends React.PureComponent {
   };
 
   isValidEmail = email => {
-    const regExp = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    return regExp.test(email);
+    const emailRegex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return emailRegex.test(email);
   };
 
   isValidPhoneNumber = phoneNumber => {
     const isProductionBackend = Environment.isEnvironment(Environment.PRODUCTION);
-    const regularExpression = isProductionBackend ? /^\+[1-9]\d{1,14}$/ : /^\+[0-9]\d{1,14}$/;
+    const e164regex = isProductionBackend ? /^\+[1-9]\d{1,14}$/ : /^\+[0-9]\d{1,14}$/;
 
-    return regularExpression.test(phoneNumber);
+    return e164regex.test(phoneNumber);
   };
 
   isValidUsername = username => {
     if (username.startsWith('@')) {
       username = username.substring(1);
     }
-    return /^[a-z_0-9]{2,21}$/.test(username);
+
+    const usernameRegex = /^[a-z_0-9]{2,21}$/;
+    return usernameRegex.test(username);
   };
 
   render() {
