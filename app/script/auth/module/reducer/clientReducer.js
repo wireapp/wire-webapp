@@ -82,7 +82,7 @@ export default function clientReducer(state = initialState, action) {
       return {...state, hasHistory: action.payload};
     }
     case NotificationActionCreator.NOTIFICATION_CHECK_HISTORY_RESET: {
-      return {...state, hasHistory: initialState.hasHistory, isNewClient: initialState.isNewClient};
+      return {...state, hasHistory: initialState.hasHistory};
     }
     case ClientActionCreator.CLIENT_RESET_ERROR: {
       return {...state, error: null};
