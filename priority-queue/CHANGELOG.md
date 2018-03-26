@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="0.1.4"></a>
+## 0.1.4 (2018-03-26)
+
+
+### Bug Fixes
+
+* **travis-bot:** Fix conversations, move CLI to TypeScript ([#387](https://github.com/wireapp/wire-web-packages/tree/master/packages/priority-queue/issues/387)) ([702217a](https://github.com/wireapp/wire-web-packages/tree/master/packages/priority-queue/commit/702217a))
+
+
+
+
 <a name="0.1.3"></a>
 ## [0.1.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/priority-queue/compare/@wireapp/priority-queue@0.1.2...@wireapp/priority-queue@0.1.3) (2018-03-15)
 
