@@ -27,9 +27,9 @@ export const CLIENT_REMOVE_START = 'CLIENT_REMOVE_START';
 export const CLIENT_REMOVE_SUCCESS = 'CLIENT_REMOVE_SUCCESS';
 export const CLIENT_REMOVE_FAILED = 'CLIENT_REMOVE_FAILED';
 
-export const CLIENT_CREATE_START = 'CLIENT_CREATE_START';
-export const CLIENT_CREATE_SUCCESS = 'CLIENT_CREATE_SUCCESS';
-export const CLIENT_CREATE_FAILED = 'CLIENT_CREATE_FAILED';
+export const CLIENT_INIT_START = 'CLIENT_INIT_START';
+export const CLIENT_INIT_SUCCESS = 'CLIENT_INIT_SUCCESS';
+export const CLIENT_INIT_FAILED = 'CLIENT_INIT_FAILED';
 
 export const CLIENT_RESET_ERROR = 'CLIENT_RESET_ERROR';
 
@@ -62,18 +62,19 @@ export const failedRemoveClient = error => ({
   type: CLIENT_REMOVE_FAILED,
 });
 
-export const startCreateClient = params => ({
+export const startInitializeClient = params => ({
   params,
-  type: CLIENT_CREATE_START,
+  type: CLIENT_INIT_START,
 });
 
-export const successfulCreateClient = () => ({
-  type: CLIENT_CREATE_SUCCESS,
+export const successfulInitializeClient = creationStatus => ({
+  payload: creationStatus,
+  type: CLIENT_INIT_SUCCESS,
 });
 
-export const failedCreateClient = error => ({
+export const failedInitializeClient = error => ({
   payload: BackendError.handle(error),
-  type: CLIENT_CREATE_FAILED,
+  type: CLIENT_INIT_FAILED,
 });
 
 export const resetError = () => ({

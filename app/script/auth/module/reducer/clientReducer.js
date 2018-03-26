@@ -17,16 +17,26 @@
  *
  */
 
+import * as AuthActionCreator from '../action/creator/AuthActionCreator';
 import * as ClientActionCreator from '../action/creator/ClientActionCreator';
+import * as NotificationActionCreator from '../action/creator/NotificationActionCreator';
 
 const initialState = {
   clients: [],
   error: null,
   fetching: false,
+  hasHistory: null,
+  isNewClient: false,
 };
 
 export default function clientReducer(state = initialState, action) {
   switch (action.type) {
+    case ClientActionCreator.CLIENT_INIT_SUCCESS: {
+      return {
+        ...state,
+        isNewClient: action.payload.isNewClient,
+      };
+    }
     case ClientActionCreator.CLIENTS_FETCH_START: {
       return {
         ...state,
@@ -69,8 +79,17 @@ export default function clientReducer(state = initialState, action) {
         fetching: false,
       };
     }
+    case NotificationActionCreator.NOTIFICATION_CHECK_HISTORY_SUCCESS: {
+      return {...state, hasHistory: action.payload};
+    }
+    case NotificationActionCreator.NOTIFICATION_CHECK_HISTORY_RESET: {
+      return {...state, hasHistory: initialState.hasHistory, isNewClient: initialState.isNewClient};
+    }
     case ClientActionCreator.CLIENT_RESET_ERROR: {
       return {...state, error: null};
+    }
+    case AuthActionCreator.LOGOUT_SUCCESS: {
+      return {...initialState};
     }
     default:
       return state;

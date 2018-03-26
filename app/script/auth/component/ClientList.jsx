@@ -24,6 +24,7 @@ import * as ClientAction from '../module/action/ClientAction';
 import ClientItem from '../component/ClientItem';
 import * as ClientSelector from '../module/selector/ClientSelector';
 import {connect} from 'react-redux';
+import EXTERNAL_ROUTE from '../externalRoute';
 
 class ClientList extends React.Component {
   state = {
@@ -39,7 +40,13 @@ class ClientList extends React.Component {
   removeClient = (clientId, password) => {
     return Promise.resolve()
       .then(() => this.props.doRemoveClient(clientId, password))
-      .then(() => this.props.doCreateClient(password));
+      .then(() => this.props.doInitializeClient(password))
+      .then(() => window.location.replace(URLUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP)))
+      .catch(error => {
+        if (error.label === BackendError.LABEL.NEW_CLIENT) {
+          this.props.history.push(ROUTE.HISTORY_INFO);
+        }
+      });
   };
 
   isSelectedClient = clientId => clientId === this.state.currentlySelectedClient;
