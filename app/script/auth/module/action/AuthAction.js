@@ -21,10 +21,11 @@ import BackendError from './BackendError';
 import * as AuthActionCreator from './creator/AuthActionCreator';
 import * as SelfAction from './SelfAction';
 import {currentLanguage, currentCurrency} from '../../localeConfig';
-import {deleteLocalStorage, setLocalStorage, LocalStorageKey} from './LocalStorageAction';
+import {deleteLocalStorage, getLocalStorage, setLocalStorage, LocalStorageKey} from './LocalStorageAction';
 import * as ConversationAction from './ConversationAction';
 import * as ClientAction from './ClientAction';
 import * as TrackingAction from './TrackingAction';
+import {ClientType} from '@wireapp/core/dist/client/root';
 
 export const doLogin = loginData => doLoginPlain(loginData, dispatch => dispatch(doSilentLogout()), dispatch => {});
 
@@ -172,8 +173,14 @@ export function doRegisterWireless(registration) {
 export function doInit() {
   return function(dispatch, getState, {apiClient}) {
     dispatch(AuthActionCreator.startRefresh());
-    return apiClient
-      .init()
+    return Promise.resolve()
+      .then(() => dispatch(getLocalStorage(LocalStorageKey.AUTH.PERSIST)))
+      .then(persist => {
+        if (!persist) {
+          throw new Error(`Could not find value for '${LocalStorageKey.AUTH.PERSIST}'`);
+        }
+        apiClient.init(persist ? ClientType.PERMANENT : ClientType.TEMPORARY);
+      })
       .then(() => dispatch(SelfAction.fetchSelf()))
       .then(() => dispatch(AuthActionCreator.successfulRefresh(apiClient.accessTokenStore.accessToken)))
       .catch(error => dispatch(AuthActionCreator.failedRefresh(error)));
