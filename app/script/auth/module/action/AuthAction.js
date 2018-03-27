@@ -145,19 +145,17 @@ export function doRegisterPersonal(registration) {
   };
 }
 
-export function doRegisterWireless(registration) {
+export function doRegisterWireless(registrationData) {
   return function(dispatch, getState, {apiClient, core}) {
     const isPermanentClient = false;
-    registration.locale = currentLanguage();
-    registration.name = registration.name.trim();
-    dispatch(
-      AuthActionCreator.startRegisterWireless({
-        locale: registration.locale,
-        name: registration.name,
-      })
-    );
+    registrationData.locale = currentLanguage();
+    registrationData.name = registrationData.name.trim();
+
+    const obfuscatedRegistrationData = {locale: registrationData.locale, name: registrationData.name};
+    dispatch(AuthActionCreator.startRegisterWireless(obfuscatedRegistrationData));
+
     return Promise.resolve()
-      .then(() => apiClient.register(registration, isPermanentClient))
+      .then(() => apiClient.register(registrationData, isPermanentClient))
       .then(() => persistAuthData(isPermanentClient, core, dispatch))
       .then(() => core.init())
       .then(() => dispatch(ClientAction.doInitializeClient(isPermanentClient)))
