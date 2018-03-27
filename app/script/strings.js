@@ -310,7 +310,7 @@ export const conversationJoinStrings = defineMessages({
 export const errorHandlerStrings = defineMessages({
   [BackendError.LABEL.CONVERSATION_CODE_NOT_FOUND]: {
     id: 'BackendError.LABEL.CONVERSATION_CODE_NOT_FOUND',
-    defaultMessage: 'CONVERSATION_CODE_NOT_FOUND',
+    defaultMessage: 'This link is no longer valid. Ask the person who invited you how to join.',
   },
   [BackendError.LABEL.CONVERSATION_NOT_FOUND]: {
     id: 'BackendError.LABEL.CONVERSATION_NOT_FOUND',
@@ -318,7 +318,7 @@ export const errorHandlerStrings = defineMessages({
   },
   [BackendError.LABEL.CONVERSATION_TOO_MANY_MEMBERS]: {
     id: 'BackendError.LABEL.CONVERSATION_TOO_MANY_MEMBERS',
-    defaultMessage: 'CONVERSATION_TOO_MANY_MEMBERS',
+    defaultMessage: 'This conversation has reached the limit of participants',
   },
   [BackendError.LABEL.ACCESS_DENIED]: {
     id: 'BackendError.LABEL.ACCESS_DENIED',
