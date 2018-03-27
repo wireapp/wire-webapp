@@ -251,8 +251,8 @@ z.client.ClientRepository = class ClientRepository {
   getValidLocalClient() {
     return this.getCurrentClientFromDb()
       .then(clientEntity => this.getClientByIdFromBackend(clientEntity.id))
-      .then(clientEntity => {
-        this.logger.info(`Client with ID '${clientEntity.id}' (${clientEntity.type}) validated on backend`);
+      .then(clientPayload => {
+        this.logger.info(`Client with ID '${clientPayload.id}' (${clientPayload.type}) validated on backend`);
         return this.currentClient;
       })
       .catch(error => {

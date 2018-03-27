@@ -70,6 +70,8 @@ z.user.UserRepository = class UserRepository {
       })
       .extend({rateLimit: 1000});
 
+    this.isActivatedAccount = ko.pureComputed(() => this.self() && !this.self().isTemporaryGuest());
+
     this.isTeam = ko.observable();
     this.teamMembers = undefined;
     this.teamUsers = undefined;
@@ -925,7 +927,7 @@ z.user.UserRepository = class UserRepository {
    * Whether the user needs to set a username.
    * @returns {boolean} True, if username should be changed.
    */
-  should_change_username() {
+  shouldChangeUsername() {
     return this.should_set_username;
   }
 

@@ -40,6 +40,7 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
 
     this.actionsViewModel = this.mainViewModel.actions;
     this.conversationEntity = this.conversationRepository.active_conversation;
+    this.isActivatedAccount = this.mainViewModel.isActivatedAccount;
     this.isTeam = this.teamRepository.isTeam;
     this.isTeamOnly = this.panelViewModel.isTeamOnly;
     this.showIntegrations = this.panelViewModel.showIntegrations;
@@ -97,7 +98,7 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
 
     this.isNameEditable = ko.pureComputed(() => {
       if (this.hasConversation()) {
-        return this.conversationEntity().is_group() && !this.conversationEntity().removed_from_conversation();
+        return this.conversationEntity().is_group() && this.conversationEntity().isActiveParticipant();
       }
     });
 
@@ -108,12 +109,12 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
     });
 
     this.isEditingName = ko.observable(false);
-    this.isEditingName.subscribe(value => {
-      if (!value) {
-        const name = $('.group-header .name span');
-        return $('.group-header textarea').css('height', `${name.height()}px`);
+    this.isEditingName.subscribe(isEditing => {
+      if (isEditing) {
+        return window.setTimeout(() => $('.conversation-details__name--input').focus(), 0);
       }
-      $('.group-header textarea').val(this.conversationEntity().display_name());
+      const name = $('.conversation-details__name--input');
+      $('.conversation-details__name').css('height', `${name.height()}px`);
     });
 
     this.showActionAddParticipants = ko.pureComputed(() => this.conversationEntity().is_group());
@@ -126,11 +127,6 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
     this.showActionCancelRequest = ko.pureComputed(() => this.conversationEntity().is_request());
     this.showActionClear = ko.pureComputed(() => {
       return !this.conversationEntity().is_request() && !this.conversationEntity().is_cleared();
-    });
-    this.showActionDevices = ko.pureComputed(() => {
-      if (this.conversationEntity().is_one2one() && this.firstParticipant()) {
-        return this.firstParticipant().is_connected() || this.firstParticipant().isTeamMember();
-      }
     });
     this.showActionGuestOptions = ko.pureComputed(() => this.conversationEntity().inTeam());
     this.showActionLeave = ko.pureComputed(() => {
@@ -234,10 +230,10 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
 
     const newConversationName = z.util.StringUtil.removeLineBreaks(event.target.value.trim());
 
+    this.isEditingName(false);
     const hasNameChanged = newConversationName.length && newConversationName !== currentConversationName;
     if (hasNameChanged) {
       event.target.value = currentConversationName;
-      this.isEditingName(false);
       this.conversationRepository.rename_conversation(this.conversationEntity(), newConversationName);
     }
   }

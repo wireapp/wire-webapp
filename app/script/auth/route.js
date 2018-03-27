@@ -19,13 +19,17 @@
 
 export default {
   CHOOSE_HANDLE: '/choosehandle',
+  CLIENTS: '/clients',
   CONVERSATION_JOIN: '/join-conversation',
+  CONVERSATION_JOIN_INVALID: '/join-conversation-invalid',
   CREATE_ACCOUNT: '/createaccount',
   CREATE_TEAM: '/createteam',
   CREATE_TEAM_ACCOUNT: '/createteamaccount',
+  HISTORY_INFO: '/historyinfo',
   INDEX: '/',
   INITIAL_INVITE: '/teaminvite',
   INVITE: '/invite',
+  LOGIN: '/login',
   PERSONAL_INVITE: '/personalinvite',
   VERIFY: '/verify',
 };

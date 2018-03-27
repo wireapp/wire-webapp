@@ -24,12 +24,9 @@ z.string.pt.nonexistentUser = 'Utilizador eliminado';
 z.string.pt.and = 'e';
 
 z.string.pt.authAccountCountryCode = 'Código de País';
-z.string.pt.authAccountDeletion = 'Foi desconectado porque a sua conta foi eliminada.';
-z.string.pt.authAccountExpiration = 'A sessão terminou por ter expirado. Inicie sessão novamente.';
 z.string.pt.authAccountPasswordForgot = 'Esqueci a palavra-passe';
 z.string.pt.authAccountPublicComputer = 'Este computador é publico';
 z.string.pt.authAccountSignIn = 'Iniciar sessão';
-z.string.pt.authAccountSignInEmail = 'E-mail';
 z.string.pt.authAccountSignInPhone = 'Telefone';
 
 z.string.pt.authBlockedCookies = 'Ative os cookies para iniciar sessão no Wire.';
@@ -101,9 +98,13 @@ z.string.pt.modalAcknowledgeAction = 'Ok';
 z.string.pt.modalConfirmSecondary = 'Cancelar';
 z.string.pt.modalOptionSecondary = 'Cancelar';
 
+z.string.pt.modalAccountCreateAction = 'OK';
+
 z.string.pt.modalAccountDeletionAction = 'Eliminar';
 z.string.pt.modalAccountDeletionHeadline = 'Eliminar conta';
 z.string.pt.modalAccountDeletionMessage = 'Será enviada uma mensagem ou SMS. Siga a ligação para apagar a conta de forma permanente.';
+
+z.string.pt.modalAccountLeaveGuestRoomAction = 'Sair';
 
 z.string.pt.modalAccountLogoutAction = 'Terminar sessão';
 z.string.pt.modalAccountLogoutHeadline = 'Limpar Dados?';
@@ -282,6 +283,7 @@ z.string.pt.conversationTweetAuthor = ' no Twitter';
 z.string.pt.groupCreationPreferencesAction = 'Seguinte';
 z.string.pt.groupCreationParticipantsActionCreate = 'Pronto';
 z.string.pt.groupCreationParticipantsPlaceholder = 'Pesquisar por nome';
+
 
 z.string.pt.collectionShowAll = 'Mostrar todos os {{number}}';
 z.string.pt.collectionSectionLinks = 'Ligações';
@@ -482,6 +484,7 @@ z.string.pt.searchInviteShare = 'Partilhar Contactos';
 
 z.string.pt.searchListEveryoneParticipates = 'Todas as pessoas a que está ligado já estão nesta conversa.';
 z.string.pt.searchListNoMatches = 'Sem resultados. Tente um nome diferente.';
+
 
 z.string.pt.uploadGoogleHeadline = 'Encontre pessoas para conversar.';
 z.string.pt.uploadGoogleMessage = 'Usamos seus dados de contacto para liga-lo aos outros. Nós anonimizamos toda a informação e não a partilhamos com outras entidades.';

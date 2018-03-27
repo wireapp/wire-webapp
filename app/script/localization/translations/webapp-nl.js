@@ -26,12 +26,9 @@ z.string.nl.and = 'en';
 z.string.nl.enumerationAnd = ', en ';
 
 z.string.nl.authAccountCountryCode = 'Landcode';
-z.string.nl.authAccountDeletion = 'Je bent uitgelogt omdat je account is verwijdert.';
-z.string.nl.authAccountExpiration = 'Je bent afgemeld omdat de sessie verlopen is. Log opnieuw in.';
 z.string.nl.authAccountPasswordForgot = 'Wachtwoord vergeten';
 z.string.nl.authAccountPublicComputer = 'Dit is een publieke computer';
 z.string.nl.authAccountSignIn = 'Inloggen';
-z.string.nl.authAccountSignInEmail = 'E-mail';
 z.string.nl.authAccountSignInPhone = 'Telefoonnummer';
 
 z.string.nl.authBlockedCookies = 'Zet je cookies aan om in te loggen in Wire.';
@@ -103,9 +100,13 @@ z.string.nl.modalAcknowledgeAction = 'Ok';
 z.string.nl.modalConfirmSecondary = 'Annuleer';
 z.string.nl.modalOptionSecondary = 'Annuleer';
 
+z.string.nl.modalAccountCreateAction = 'OK';
+
 z.string.nl.modalAccountDeletionAction = 'Verwijderen';
 z.string.nl.modalAccountDeletionHeadline = 'Verwijder account';
 z.string.nl.modalAccountDeletionMessage = 'We vesturen je een bericht via email of SMS. Volg de instructies op in de link om je account te verwijderen.';
+
+z.string.nl.modalAccountLeaveGuestRoomAction = 'Verlaten';
 
 z.string.nl.modalAccountLogoutAction = 'Uitloggen';
 z.string.nl.modalAccountLogoutHeadline = 'Gegevens wissen?';
@@ -299,6 +300,7 @@ z.string.nl.groupCreationParticipantsActionCreate = 'Klaar';
 z.string.nl.groupCreationParticipantsActionSkip = 'Sla over';
 z.string.nl.groupCreationParticipantsHeader = 'Personen toevoegen';
 z.string.nl.groupCreationParticipantsPlaceholder = 'Zoeken op naam';
+
 
 z.string.nl.collectionShowAll = 'Toon alle {{number}}';
 z.string.nl.collectionSectionLinks = 'Links';
@@ -506,6 +508,7 @@ z.string.nl.searchServiceConfirmButton = 'Service toevoegen';
 
 z.string.nl.searchListEveryoneParticipates = 'Iedereen met wie je contact hebt zit al in dit gesprek.';
 z.string.nl.searchListNoMatches = 'Geen overeenkomende resultaten.\nProbeer een andere gebruikersnaam.';
+
 
 z.string.nl.uploadGoogleHeadline = 'Zoek mensen \nom mee te praten.';
 z.string.nl.uploadGoogleMessage = 'Dit helpt je om met anderen te verbinden. We anonimiseren alle informatie en delen deze niet met iemand anders.';

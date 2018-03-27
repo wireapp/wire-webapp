@@ -33,8 +33,8 @@
   global.toolbox.router.default = global.toolbox.networkOnly;
   global.toolbox.router.get(/forceCaching=true/, global.cacheLRU, {
     cache: {
-      name: CURRENT_CACHES.asset,
       maxEntries: ASSET_CACHE_MAX_ITEMS,
+      name: CURRENT_CACHES.asset,
     },
   });
 

@@ -232,7 +232,7 @@ export const unsupportedJoinStrings = defineMessages({
   unsupportedJoinSubhead: {
     id: 'conversationJoin.unsupportedJoinSubhead',
     defaultMessage:
-      '<p>This browser is not supported.</p>Download the latest version of <b style="font-weight: 600">Google Chrome, Mozilla Firefox, Opera</b> or <b  style="font-weight: 600">Microsoft Edge.</b>',
+      '<p>This browser is not supported.</p>Download the latest version of <b style="font-weight: 600">Google Chrome, Mozilla Firefox, Opera</b> or <b style="font-weight: 600">Microsoft Edge.</b>',
   },
   unsupportedJoinMobileSubhead: {
     id: 'conversationJoin.unsupportedJoinMobileSubhead',
@@ -304,14 +304,6 @@ export const conversationJoinStrings = defineMessages({
   loginLink: {
     id: 'conversationJoin.loginLink',
     defaultMessage: 'Log in',
-  },
-  acceptTou: {
-    id: 'conversationJoin.acceptTou',
-    defaultMessage: 'By continuing you accept the Wire',
-  },
-  touLink: {
-    id: 'conversationJoin.touLink',
-    defaultMessage: 'Terms of Use',
   },
 });
 
@@ -472,5 +464,85 @@ export const validationErrorStrings = defineMessages({
   unexpected: {
     id: 'BackendError.unexpected',
     defaultMessage: 'Unexpected error ({code} {message})',
+  },
+});
+
+export const loginStrings = defineMessages({
+  headline: {
+    id: 'login.headline',
+    defaultMessage: 'Log in',
+  },
+  subhead: {
+    id: 'login.subhead',
+    defaultMessage: 'Enter your email address or username.',
+  },
+  emailPlaceholder: {
+    id: 'login.emailPlaceholder',
+    defaultMessage: 'Email or username',
+  },
+  passwordPlaceholder: {
+    id: 'login.passwordPlaceholder',
+    defaultMessage: 'Password',
+  },
+  forgotPassword: {
+    id: 'login.forgotPassword',
+    defaultMessage: 'Forgot password?',
+  },
+  phoneLogin: {
+    id: 'login.phoneLogin',
+    defaultMessage: 'Log in with phone number',
+  },
+  publicComputer: {
+    id: 'login.publicComputer',
+    defaultMessage: 'This is a public computer',
+  },
+});
+
+export const clientManagerStrings = defineMessages({
+  headline: {
+    id: 'clientManager.headline',
+    defaultMessage: 'Remove a device',
+  },
+  subhead: {
+    id: 'clientManager.subhead',
+    defaultMessage: 'Remove one of your other devices to start using Wire on this one.',
+  },
+  logout: {
+    id: 'clientManager.logout',
+    defaultMessage: 'Log out',
+  },
+});
+
+export const clientItemStrings = defineMessages({
+  passwordPlaceholder: {
+    id: 'clientItem.passwordPlaceholder',
+    defaultMessage: 'Password',
+  },
+});
+
+export const historyInfoStrings = defineMessages({
+  hasHistoryHeadline: {
+    id: 'historyInfo.hasHistoryHeadline',
+    defaultMessage: 'You’ve used Wire on this device before.',
+  },
+  noHistoryHeadline: {
+    id: 'historyInfo.noHistoryHeadline',
+    defaultMessage: 'It’s the first time you’re using Wire on this device.',
+  },
+  hasHistoryInfo: {
+    id: 'historyInfo.hasHistoryInfo',
+    defaultMessage: 'Messages sent in the meantime<br/>will not appear here.',
+  },
+  noHistoryInfo: {
+    id: 'historyInfo.noHistoryInfo',
+    defaultMessage: 'For privacy reasons,<br/>your conversation history will not appear here.',
+  },
+  learnMore: {
+    id: 'historyInfo.learnMore',
+    defaultMessage: 'Learn more',
+  },
+  ok: {
+    id: 'historyInfo.ok',
+    defaultMessage: 'OK',
   },
 });

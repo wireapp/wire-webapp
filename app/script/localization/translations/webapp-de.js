@@ -25,19 +25,16 @@ z.string.de.nonexistentUser = 'Gelöschte Person';
 z.string.de.and = 'und';
 z.string.de.enumerationAnd = ' und ';
 
-z.string.de.authAccountClientDeletion  = 'Du wurdest abgemeldet, da dein Gerät gelöscht wurde.';
 z.string.de.authAccountCountryCode = 'Landesvorwahl';
-z.string.de.authAccountDeletion = 'Du wurdest abgemeldet, da dein Benutzerkonto gelöscht wurde.';
-z.string.de.authAccountExpiration = 'Du wurdest abgemeldet, da deine Session abgelaufen ist. Bitte melde dich erneut an.';
 z.string.de.authAccountPasswordForgot = 'Passwort vergessen';
 z.string.de.authAccountPublicComputer = 'Dies ist ein öffentlicher Computer';
 z.string.de.authAccountSignIn = 'Login';
-z.string.de.authAccountSignInEmail = 'E-Mail';
-z.string.de.authAccountSignInPhone = 'Handy';
+z.string.de.authAccountSignInPhone = 'Handy Login';
 
 z.string.de.authBlockedCookies = 'Aktiviere Cookies, um dich bei Wire einzuloggen.';
 z.string.de.authBlockedDatabase = 'Wire benötigt zum Anzeigen deiner Nachrichten Zugriff auf den lokalen Speicher. In Privaten Fenstern ist dieser nicht verfügbar.';
 z.string.de.authBlockedTabs = 'Wire ist bereits in einem anderen Tab geöffnet.';
+z.string.de.authBlockedTabsAction = 'Stattdessen diesen Tab verwenden';
 
 z.string.de.authVerifyAccountAdd = 'Hinzufügen';
 z.string.de.authVerifyAccountDetail = 'Hiermit kannst du Wire auf mehreren Geräten verwenden.';
@@ -105,9 +102,13 @@ z.string.de.modalAcknowledgeHeadline = 'Fehler aufgetreten';
 z.string.de.modalConfirmSecondary = 'Abbrechen';
 z.string.de.modalOptionSecondary = 'Abbrechen';
 
+z.string.de.modalAccountCreateAction = 'Verstanden';
+
 z.string.de.modalAccountDeletionAction = 'Löschen';
 z.string.de.modalAccountDeletionHeadline = 'Benutzerkonto löschen';
 z.string.de.modalAccountDeletionMessage = 'In Kürze erhältst du eine Nachricht per E-Mail oder SMS. Folge dem Link darin, um dein Konto zu löschen.';
+
+z.string.de.modalAccountLeaveGuestRoomAction = 'Verlassen';
 
 z.string.de.modalAccountLogoutAction = 'Abmelden';
 z.string.de.modalAccountLogoutHeadline = 'Daten löschen?';
@@ -341,9 +342,12 @@ z.string.de.groupCreationParticipantsPlaceholder = 'Nach Namen suchen';
 z.string.de.guestRoomConversationName = 'Gästezimmer';
 z.string.de.guestRoomToggleName = 'Gäste zulassen';
 z.string.de.guestRoomToggleInfo = 'Öffne diese Unterhaltung für Personen außerhalb deines Teams.';
-z.string.de.guestRoomToggleInfoExtended = 'Öffne diese Unterhaltung für Personen außerhalb deines Teams. Dies kann jederzeit wieder geändert werden.';
+z.string.de.guestRoomToggleInfoExtended = 'Öffne diese Unterhaltung für Personen außerhalb deines Teams. Diese Einstellung kann später jederzeit geändert werden.';
 
 z.string.de.guestRoomConversationBadge = 'Gäste anwesend';
+
+z.string.de.guestRoomConversationHead = 'Personen außerhalb deines Teams können an dieser Unterhaltung teilnehmen.';
+z.string.de.guestRoomConversationButton = 'Personen einladen';
 
 z.string.de.collectionShowAll = 'Zeige alle {{number}}';
 z.string.de.collectionSectionLinks = 'Links';
@@ -380,6 +384,7 @@ z.string.de.conversationsSecondaryLinePings = '{{number}} Ping';
 z.string.de.conversationsSecondaryLinePeopleLeft = '{{number}} Personen entfernt';
 z.string.de.conversationsSecondaryLinePersonLeft = '{{user}} hat die Unterhaltung verlassen';
 z.string.de.conversationsSecondaryLinePersonRemoved = '{{user}} wurde entfernt';
+z.string.de.conversationsSecondaryLinePersonRemovedTeam = '{{user}} wurde aus dem Team entfernt';
 z.string.de.conversationsSecondaryLinePeopleAdded = '{{user}} Personen wurden hinzugefügt';
 z.string.de.conversationsSecondaryLinePersonAdded = '{{user}} wurde hinzugefügt';
 z.string.de.conversationsSecondaryLinePersonAddedSelf = '{{user}} ist beigetreten';
@@ -582,6 +587,8 @@ z.string.de.searchServiceConfirmButton = 'Dienst hinzufügen';
 
 z.string.de.searchListEveryoneParticipates = 'Alle deine Kontakte\nsind bereits in\ndieser Unterhaltung.';
 z.string.de.searchListNoMatches = 'Kein passendes Ergebnis.\nSuche nach einen\nanderen Namen.';
+
+z.string.de.temporaryGuestCta = 'Erstelle ein Benutzerkonto';
 
 z.string.de.uploadGoogleHeadline = 'Finde Kontakte \nauf Wire.';
 z.string.de.uploadGoogleMessage = 'Wir verwenden deine Daten, um Kontakte für dich zu erstellen. Wir anonymisieren alle Informationen und teilen sie mit niemand anderem.';

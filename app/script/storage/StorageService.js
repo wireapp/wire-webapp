@@ -26,6 +26,7 @@ z.storage.StorageService = class StorageService {
   static get OBJECT_STORE() {
     return {
       AMPLIFY: 'amplify',
+      AUTHENTICATION: 'authentication',
       CLIENTS: 'clients',
       CONVERSATION_EVENTS: 'conversation_events',
       CONVERSATIONS: 'conversations',
@@ -34,6 +35,26 @@ z.storage.StorageService = class StorageService {
       PRE_KEYS: 'prekeys',
       SESSIONS: 'sessions',
       USERS: 'users',
+    };
+  }
+
+  static get SCHEMA() {
+    return {
+      schema: {
+        [StorageService.OBJECT_STORE.AMPLIFY]: '',
+        [StorageService.OBJECT_STORE.CLIENTS]: ', meta.primary_key',
+        [StorageService.OBJECT_STORE.CONVERSATION_EVENTS]:
+          ', category, conversation, time, type, [conversation+time], [conversation+category]',
+        [StorageService.OBJECT_STORE.CONVERSATIONS]: ', id, last_event_timestamp',
+        [StorageService.OBJECT_STORE.EVENTS]:
+          '++primary_key, id, category, conversation, time, type, [conversation+time], [conversation+category]',
+        [StorageService.OBJECT_STORE.KEYS]: '',
+        [StorageService.OBJECT_STORE.PRE_KEYS]: '',
+        [StorageService.OBJECT_STORE.SESSIONS]: '',
+        [StorageService.OBJECT_STORE.USERS]: ', id',
+        [StorageService.OBJECT_STORE.AUTHENTICATION]: '',
+      },
+      version: 15,
     };
   }
 
@@ -158,20 +179,6 @@ z.storage.StorageService = class StorageService {
         [StorageService.OBJECT_STORE.KEYS]: '',
         [StorageService.OBJECT_STORE.PRE_KEYS]: '',
         [StorageService.OBJECT_STORE.SESSIONS]: '',
-      };
-
-      const version15 = {
-        [StorageService.OBJECT_STORE.AMPLIFY]: '',
-        [StorageService.OBJECT_STORE.CLIENTS]: ', meta.primary_key',
-        [StorageService.OBJECT_STORE.CONVERSATION_EVENTS]:
-          ', category, conversation, time, type, [conversation+time], [conversation+category]',
-        [StorageService.OBJECT_STORE.CONVERSATIONS]: ', id, last_event_timestamp',
-        [StorageService.OBJECT_STORE.EVENTS]:
-          '++primary_key, id, category, conversation, time, type, [conversation+time], [conversation+category]',
-        [StorageService.OBJECT_STORE.KEYS]: '',
-        [StorageService.OBJECT_STORE.PRE_KEYS]: '',
-        [StorageService.OBJECT_STORE.SESSIONS]: '',
-        [StorageService.OBJECT_STORE.USERS]: ', id',
       };
 
       this.db = new Dexie(this.dbName);
@@ -300,7 +307,9 @@ z.storage.StorageService = class StorageService {
             }
           });
         });
-      this.db.version(15).stores(version15);
+
+      const {version, schema} = StorageService.SCHEMA;
+      this.db.version(version).stores(schema);
 
       this.db
         .open()

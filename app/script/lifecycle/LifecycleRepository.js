@@ -31,13 +31,18 @@ z.lifecycle.LifecycleRepository = class LifecycleRepository {
     };
   }
 
-  constructor(lifecycleService) {
+  constructor(lifecycleService, userRepository) {
     this.logger = new z.util.Logger('z.lifecycle.LifecycleRepository', z.config.LOGGER.OPTIONS);
     this.lifecycleService = lifecycleService;
+    this.userRepository = userRepository;
+
+    this.isActivatedAccount = this.userRepository.isActivatedAccount;
   }
 
   init() {
-    window.setInterval(() => this.checkVersion(), LifecycleRepository.CONFIG.CHECK_INTERVAL);
+    if (this.isActivatedAccount()) {
+      window.setInterval(() => this.checkVersion(), LifecycleRepository.CONFIG.CHECK_INTERVAL);
+    }
   }
 
   checkVersion() {

@@ -24,11 +24,9 @@ z.string.da.nonexistentUser = 'Slet bruger';
 z.string.da.and = 'og';
 
 z.string.da.authAccountCountryCode = 'Landekode';
-z.string.da.authAccountExpiration = 'Du er blevet logget af, da din session udløb. Log venligst ind igen.';
 z.string.da.authAccountPasswordForgot = 'Glemt adgangskode';
 z.string.da.authAccountPublicComputer = 'Dette er en offentlig computer';
 z.string.da.authAccountSignIn = 'Log ind';
-z.string.da.authAccountSignInEmail = 'Email';
 z.string.da.authAccountSignInPhone = 'Telefon';
 
 z.string.da.authVerifyAccountAdd = 'Tilføj';
@@ -92,9 +90,13 @@ z.string.da.modalAcknowledgeAction = 'Ok';
 z.string.da.modalConfirmSecondary = 'Annuller';
 z.string.da.modalOptionSecondary = 'Annuller';
 
+z.string.da.modalAccountCreateAction = 'OK';
+
 z.string.da.modalAccountDeletionAction = 'Slet';
 z.string.da.modalAccountDeletionHeadline = 'Slet konto';
 z.string.da.modalAccountDeletionMessage = 'Vi vil sende dig en besked via email eller SMS. Følg linket for at permanent slette din konto.';
+
+z.string.da.modalAccountLeaveGuestRoomAction = 'Forlad';
 
 z.string.da.modalAccountLogoutAction = 'Log ud';
 z.string.da.modalAccountLogoutHeadline = 'Ryd Data?';
@@ -265,6 +267,7 @@ z.string.da.conversationSomeone = 'Nogen';
 z.string.da.conversationTweetAuthor = ' på Twitter';
 
 z.string.da.groupCreationParticipantsPlaceholder = 'Søg ved navn';
+
 
 z.string.da.collectionShowAll = 'Vis alle {{number}}';
 z.string.da.collectionSectionLinks = 'Links';
@@ -452,6 +455,7 @@ z.string.da.searchInviteShare = 'Del Kontakter';
 
 z.string.da.searchListEveryoneParticipates = 'Alle du er \nforbundet med er allerede i \ndenne samtale.';
 z.string.da.searchListNoMatches = 'Ingen passende resultater.\nPrøv at indtaste et andet navn.';
+
 
 z.string.da.uploadGoogleHeadline = 'Finde personer at snakke med.';
 z.string.da.uploadGoogleMessage = 'Vi bruger dine kontaktdata til at forbinde dig med andre. Vi anonymisere alle oplysninger og deler ikke det med alle andre.';

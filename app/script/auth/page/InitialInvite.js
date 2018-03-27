@@ -58,14 +58,13 @@ class InitialInvite extends React.PureComponent {
 
   onInviteDone = () => {
     const {invites} = this.props;
-    const nextLocation = pathWithParams(EXTERNAL_ROUTE.LOGIN, 'reason=registration');
     const invited = !!invites.length;
     return this.props
       .trackEvent({
         attributes: {invited, invites: invites.length},
         name: TrackingAction.EVENT_NAME.TEAM.FINISHED_INVITE_STEP,
       })
-      .then(() => (window.location = nextLocation));
+      .then(() => window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP)));
   };
 
   renderEmail = email => (

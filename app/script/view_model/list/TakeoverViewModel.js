@@ -32,6 +32,7 @@ z.viewModel.list.TakeoverViewModel = class TakeoverViewModel {
    * @param {Object} repositories - Object containing all repositories
    */
   constructor(mainViewModel, listViewModel, repositories) {
+    this.listViewModel = listViewModel;
     this.conversationRepository = repositories.conversation;
     this.userRepository = repositories.user;
     this.logger = new z.util.Logger('z.viewModel.list.TakeoverViewModel', z.config.LOGGER.OPTIONS);
@@ -43,7 +44,7 @@ z.viewModel.list.TakeoverViewModel = class TakeoverViewModel {
   }
 
   chooseUsername() {
-    amplify.publish(z.event.WebApp.TAKEOVER.DISMISS);
+    this.listViewModel.dismissModal();
     window.requestAnimationFrame(() => amplify.publish(z.event.WebApp.PREFERENCES.MANAGE_ACCOUNT));
   }
 
@@ -61,6 +62,6 @@ z.viewModel.list.TakeoverViewModel = class TakeoverViewModel {
         }
       })
       .catch(() => amplify.publish(z.event.WebApp.PREFERENCES.MANAGE_ACCOUNT))
-      .then(() => amplify.publish(z.event.WebApp.TAKEOVER.DISMISS));
+      .then(() => this.listViewModel.dismissModal());
   }
 };

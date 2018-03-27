@@ -45,10 +45,11 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
 
     this.mainViewModel = mainViewModel;
     this.conversation_repository = repositories.conversation;
-    this.user_repository = repositories.user;
+    this.userRepository = repositories.user;
     this.logger = new z.util.Logger('z.viewModel.content.MessageListViewModel', z.config.LOGGER.OPTIONS);
 
     this.actionsViewModel = this.mainViewModel.actions;
+    this.selfUser = this.userRepository.self;
 
     this.conversation = ko.observable(new z.entity.Conversation());
     this.center_messages = ko.pureComputed(() => {
@@ -296,7 +297,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
       }
 
       // Scroll to bottom if self user send the message
-      if (last_message.from === this.user_repository.self().id) {
+      if (last_message.from === this.selfUser().id) {
         window.requestAnimationFrame(() => messages_container.scrollToBottom());
         return;
       }

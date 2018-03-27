@@ -24,12 +24,9 @@ z.string.cs.nonexistentUser = 'Smazaný uživatel';
 z.string.cs.and = 'a';
 
 z.string.cs.authAccountCountryCode = 'Kód země';
-z.string.cs.authAccountDeletion = 'Byli jste odhlášeni, protože váš účet byl smazán.';
-z.string.cs.authAccountExpiration = 'Byli jste odhlášeni, protože platnost relace vypršela. Přihlaste se znovu.';
 z.string.cs.authAccountPasswordForgot = 'Zapomenuté heslo';
 z.string.cs.authAccountPublicComputer = 'Toto je veřejný počítač';
 z.string.cs.authAccountSignIn = 'Přihlásit se';
-z.string.cs.authAccountSignInEmail = 'Email';
 z.string.cs.authAccountSignInPhone = 'Telefon';
 
 z.string.cs.authBlockedCookies = 'Pro přihlášení k Wire povolte soubory cookie.';
@@ -100,9 +97,13 @@ z.string.cs.modalAcknowledgeAction = 'Ok';
 z.string.cs.modalConfirmSecondary = 'Zrušit';
 z.string.cs.modalOptionSecondary = 'Zrušit';
 
+z.string.cs.modalAccountCreateAction = 'OK';
+
 z.string.cs.modalAccountDeletionAction = 'Smazat';
 z.string.cs.modalAccountDeletionHeadline = 'Smazat účet';
 z.string.cs.modalAccountDeletionMessage = 'Obdržíte od nás zprávu přes email nebo SMS. Pro trvalé smazání svého účtu otevřete zaslaný odkaz.';
+
+z.string.cs.modalAccountLeaveGuestRoomAction = 'Odejít';
 
 z.string.cs.modalAccountLogoutAction = 'Odhlásit se';
 z.string.cs.modalAccountLogoutHeadline = 'Vyčistit data?';
@@ -278,6 +279,7 @@ z.string.cs.conversationTweetAuthor = ' na Twittru';
 
 z.string.cs.groupCreationPreferencesAction = 'Další';
 z.string.cs.groupCreationParticipantsPlaceholder = 'Hledat podle jména';
+
 
 z.string.cs.collectionShowAll = 'Zobrazit všechny {{number}}';
 z.string.cs.collectionSectionLinks = 'Odkazy';
@@ -477,6 +479,7 @@ z.string.cs.searchInviteShare = 'Sdílet kontakty';
 
 z.string.cs.searchListEveryoneParticipates = 'Všichni, které znáte\njsou již připojeni\nk této konverzaci.';
 z.string.cs.searchListNoMatches = 'Žádné odpovídající výsledky.\nZkuste jiné jméno.';
+
 
 z.string.cs.uploadGoogleHeadline = 'Najít kontakty\npro konverzaci.';
 z.string.cs.uploadGoogleMessage = 'Vaše údaje o kontaktech používáme k propojení s ostatními uživateli. Všechny informace anonymizujeme a nesdílíme je s nikým dalším.';

@@ -409,7 +409,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         if (!conversationEntity.hasCreationMessage && !isCreationMessage) {
           conversationEntity.creatingFirstMessage = true;
           const creationEvent = conversationEntity.is_group()
-            ? z.conversation.EventBuilder.buildGroupCreation(conversationEntity)
+            ? z.conversation.EventBuilder.buildGroupCreation(conversationEntity, this.selfUser().isTemporaryGuest())
             : z.conversation.EventBuilder.build1to1Creation(conversationEntity);
 
           amplify.publish(z.event.WebApp.EVENT.INJECT, creationEvent);
@@ -2974,8 +2974,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .then(conversationEntity => {
         if (conversationEntity) {
           conversationEntity.hasCreationMessage = true;
-          const creationEvent = z.conversation.EventBuilder.buildGroupCreation(conversationEntity, initialTimestamp);
-          amplify.publish(z.event.WebApp.EVENT.INJECT, creationEvent, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
+          const event = z.conversation.EventBuilder.buildGroupCreation(conversationEntity, false, initialTimestamp);
+          amplify.publish(z.event.WebApp.EVENT.INJECT, event, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
           this.verification_state_handler.onConversationCreate(conversationEntity);
           return {conversationEntity};
         }
@@ -3494,9 +3494,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
         messageEntity.reactions_user_ets.removeAll();
         if (userIds.length) {
           return this.user_repository.get_users_by_id(userIds).then(userEntities => {
-            userEntities.sort((userA, userB) => {
-              return z.util.StringUtil.sortByPriority(userA.first_name(), userB.first_name());
-            });
             messageEntity.reactions_user_ets(userEntities);
             return messageEntity;
           });

@@ -178,8 +178,10 @@ z.entity.User = class User {
 
     this.availability = ko.observable(z.user.AvailabilityType.NONE);
 
-    this.expirationRemaining = ko.observable();
-    this.expirationText = ko.observable();
+    this.expirationRemaining = ko.observable(0);
+    this.expirationText = ko.observable('');
+    this.expirationIsUrgent = ko.observable(false);
+    this.expirationRemainingText = ko.observable('');
     this.expirationIntervalId = undefined;
     this.isExpired = ko.observable(false);
   }
@@ -247,27 +249,29 @@ z.entity.User = class User {
   }
 
   setRemaining(expirationTime) {
-    const timeToMinutes = 60 * 1000;
-    const timeToHours = timeToMinutes * 60;
+    const MILLISECONDS_IN_MINUTE = 60 * 1000;
+    const MILLISECONDS_IN_HOUR = MILLISECONDS_IN_MINUTE * 60;
 
     const remainingTime = Math.max(expirationTime - Date.now(), 0);
-    const remainingMinutes = Math.ceil(remainingTime / timeToMinutes);
+    const remainingMinutes = Math.ceil(remainingTime / MILLISECONDS_IN_MINUTE);
 
     let timeLeftText = z.string.userRemainingTimeHours;
     let timeValue = 0;
 
-    if (remainingMinutes <= 60) {
+    if (remainingMinutes <= 45) {
       timeLeftText = z.string.userRemainingTimeMinutes;
-      timeValue = Math.ceil(remainingMinutes / 15) * 15;
-      this.expirationRemaining(timeValue * timeToMinutes);
-    } else if (remainingMinutes <= 90) {
-      timeValue = 1.5;
-      this.expirationRemaining(timeValue * timeToHours);
+      const remainingQuarters = Math.max(1, Math.ceil(remainingMinutes / 15));
+      timeValue = remainingQuarters * 15;
+      this.expirationRemaining(timeValue * MILLISECONDS_IN_MINUTE);
+      this.expirationRemainingText(`${timeValue}m`);
     } else {
-      timeValue = Math.ceil(remainingMinutes / 60);
-      this.expirationRemaining(timeValue * timeToHours);
+      const showOneAndAHalf = remainingMinutes > 60 && remainingMinutes <= 90;
+      timeValue = showOneAndAHalf ? 1.5 : Math.ceil(remainingMinutes / 60);
+      this.expirationRemaining(timeValue * MILLISECONDS_IN_HOUR);
+      this.expirationRemainingText(`${timeValue}h`);
     }
 
+    this.expirationIsUrgent(remainingMinutes < 120);
     this.expirationText(z.l10n.text(timeLeftText, timeValue));
   }
 };
