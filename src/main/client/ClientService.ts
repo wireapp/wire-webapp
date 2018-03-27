@@ -17,6 +17,7 @@
  *
  */
 
+const logdown = require('logdown');
 const pkg = require('../../package.json');
 import APIClient = require('@wireapp/api-client');
 import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine/index';
@@ -41,6 +42,11 @@ export interface MetaClient extends RegisteredClient {
 }
 
 export default class ClientService {
+  private logger: any = logdown('@wireapp/core/ClientService', {
+    logger: console,
+    markdown: false,
+  });
+
   private database: ClientDatabaseRepository;
   private backend: ClientBackendRepository;
 
@@ -51,21 +57,26 @@ export default class ClientService {
   ) {
     this.database = new ClientDatabaseRepository(this.storeEngine);
     this.backend = new ClientBackendRepository(this.apiClient);
+    this.logger.state.isEnabled = true;
   }
 
   public deleteLocalClient(): Promise<string> {
+    this.logger.info('deleteLocalClient');
     return this.database.deleteLocalClient();
   }
 
   public getLocalClient(): Promise<MetaClient> {
+    this.logger.info('getLocalClient');
     return this.database.getLocalClient();
   }
 
   public createLocalClient(client: RegisteredClient): Promise<MetaClient> {
+    this.logger.info('createLocalClient');
     return this.database.createLocalClient(client);
   }
 
   public synchronizeClients() {
+    this.logger.info('synchronizeClients');
     return this.backend
       .getClients()
       .then((registeredClients: RegisteredClient[]) => {
@@ -85,6 +96,7 @@ export default class ClientService {
       model: `${pkg.name} v${pkg.version}`,
     }
   ): Promise<RegisteredClient> {
+    this.logger.info('register');
     if (!this.apiClient.context) {
       throw new Error('Context is not set.');
     }
