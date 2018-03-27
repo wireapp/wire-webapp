@@ -354,9 +354,9 @@
   version "3.0.11"
   resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-3.0.11.tgz#5c7cb36ae7277ee3cb957ef8a6445ff389285d52"
 
-"@wireapp/core@2.1.20":
-  version "2.1.20"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-2.1.20.tgz#6dbe2ee0ee3479273b4b92dfaa2b03b37e6374c1"
+"@wireapp/core@2.1.21":
+  version "2.1.21"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-2.1.21.tgz#78511e5bc89d5f1bc200cf7a08be7094d3311653"
   dependencies:
     "@types/node" "9.6.0"
     "@wireapp/api-client" "0.6.11"
@@ -7317,6 +7317,10 @@ performance-now@^0.2.0:
 performance-now@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/performance-now/-/performance-now-2.1.0.tgz#6309f4e0e5fa913ec1c69307ae364b4b377c9e7b"
+
+phoneformat.js@1.0.6:
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/phoneformat.js/-/phoneformat.js-1.0.6.tgz#11adc7672b590367d5ed268752124b37664c1a62"
 
 pify@^2.0.0, pify@^2.3.0:
   version "2.3.0"
