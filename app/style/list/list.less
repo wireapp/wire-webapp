@@ -36,11 +36,11 @@
   .left-list-container;
 
   &:not(.left-list-is-visible) {
-    .start-ui-transition-fadeout();
+    .start-ui-transition-fadeout;
   }
 
   &.left-list-is-visible {
-    .start-ui-transition-fadein();
+    .start-ui-transition-fadein;
   }
 }
 
@@ -58,7 +58,7 @@
   cursor: pointer;
 
   .availability-state-label {
-    .label-bold-xs();
+    .label-bold-xs;
     line-height: 12px;
     display: inline-block;
     max-width: @left-width - 58px;
@@ -66,8 +66,8 @@
 }
 
 .left-list-header-text {
-  .ellipsis-nowrap();
-  .label-bold-xs();
+  .ellipsis-nowrap;
+  .label-bold-xs;
   display: inline-block;
   max-width: @left-width - 40px;
 }
