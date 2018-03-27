@@ -43,10 +43,18 @@ function HistoryInfo({hasHistory, intl: {formatMessage: _}, ...connected}) {
         </Paragraph>
         {!hasHistory && (
           <Paragraph center style={{marginBottom: 40}}>
-            <Link>{_(historyInfoStrings.learnMore)}</Link>
+            <Link
+              href="https://support.wire.com/hc/articles/207834645"
+              target="_blank"
+              data-uie-name="do-history-learn-more"
+            >
+              {_(historyInfoStrings.learnMore)}
+            </Link>
           </Paragraph>
         )}
-        <Button onClick={onContinue}>{_(historyInfoStrings.ok)}</Button>
+        <Button onClick={onContinue} data-uie-name="do-history-confirm">
+          {_(historyInfoStrings.ok)}
+        </Button>
       </ContainerXS>
     </Page>
   );
