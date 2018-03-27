@@ -23,22 +23,23 @@ availability-state {
 
   .availability-state-arrow {
     display: inline-block;
-    .square(16px);
-    margin-left: 4px;
     padding-bottom: 4px;
+    margin-left: 4px;
+    .square(16px);
 
     &::before {
-      content: '';
       width: 0;
       height: 0;
-      border-left: 4px solid transparent;
-      border-right: 4px solid transparent;
       border-top: 4px solid currentColor;
+      border-right: 4px solid transparent;
+      border-left: 4px solid transparent;
+      content: '';
     }
   }
 
   .availability-state-icon {
     .square(10px);
+
     margin: 1px 6px 1px 0;
     fill: currentColor;
     stroke: currentColor;
@@ -46,6 +47,7 @@ availability-state {
 
   .availability-state-label {
     .ellipsis-nowrap();
+
     user-select: none;
   }
 }

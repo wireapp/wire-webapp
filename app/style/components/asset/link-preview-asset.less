@@ -22,8 +22,9 @@
 
 link-preview-asset {
   .asset-container-style;
-  cursor: pointer;
+
   width: 100%;
+  cursor: pointer;
 
   &.ephemeral-asset-expired {
     cursor: default;
@@ -32,15 +33,17 @@ link-preview-asset {
 
 .link-preview-image-container {
   .square(@link-preview-height);
-  background-color: fade(@graphite, 24%);
+
   flex: 0 0 auto;
+  background-color: fade(@graphite, 24%);
 }
 
 .link-preview-image-placeholder {
   .flex-center;
-  color: #fff;
+
   width: 100%;
   height: 100%;
+  color: #fff;
 }
 
 .link-preview-image {
@@ -50,12 +53,12 @@ link-preview-asset {
 
 .link-preview-info {
   display: flex;
+  width: 0;
+  height: @link-preview-height;
   flex: 1 1 auto;
   flex-direction: column;
-  height: @link-preview-height;
   justify-content: center;
   padding: 12px;
-  width: 0;
 }
 
 .link-preview-info-header {
@@ -69,11 +72,13 @@ link-preview-asset {
 
 .link-preview-info-title-singleline {
   .ellipsis;
+
   white-space: nowrap;
 }
 
 .link-preview-info-title-multiline {
   .ellipsis-multiline(2);
+
   max-height: 48px;
 }
 

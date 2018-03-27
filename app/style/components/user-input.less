@@ -18,11 +18,11 @@
  */
 
 user-input {
-  color: #fff;
-  display: block;
   position: relative;
+  display: block;
   background: fade(#fff, 8%);
   border-radius: 4px;
+  color: #fff;
 
   &.user-list-light {
     background: fade(@w-gray, 16%);
@@ -31,8 +31,8 @@ user-input {
 }
 
 .search-outer {
-  padding: 4px 8px;
   overflow: hidden;
+  padding: 4px 8px;
 }
 
 .search-inner-wrap {
@@ -41,27 +41,30 @@ user-input {
 
 .search-inner {
   .hide-scrollbar;
+
   display: flex;
+  max-height: 84px;
   flex-wrap: wrap;
   margin-right: -17px;
-  max-height: 84px;
   overflow-y: auto;
 }
 
 .search-inner > span {
   .label-bold-xs();
-  flex: 0 0 auto;
-  line-height: @line-height-lg;
-  padding-right: 16px;
+
   position: relative;
+  flex: 0 0 auto;
+  padding-right: 16px;
+  line-height: @line-height-lg;
 
   &::before {
     .dot-size(2px);
+
+    position: absolute;
+    top: 11px;
+    right: 7px;
     background-color: fade(#fff, 40%);
     content: '';
-    position: absolute;
-    right: 7px;
-    top: 11px;
 
     .user-list-light & {
       background-color: fade(#222, 40%);
@@ -74,14 +77,14 @@ user-input {
 }
 
 .search-inner > input {
-  appearance: none;
+  min-width: 65px;
+  height: @avatar-diameter-xs;
+  flex: 1 1;
   border: none;
+  appearance: none;
   background-color: transparent;
   color: currentColor;
-  flex: 1 1;
-  height: @avatar-diameter-xs;
   line-height: @avatar-diameter-xs;
-  min-width: 65px;
   outline: none;
 
   &:invalid {
@@ -93,8 +96,9 @@ user-input {
       color: fade(#fff, 40%);
     }
     .label-xs();
-    color: fade(#fff, 40%);
+
     padding-left: 8px;
+    color: fade(#fff, 40%);
   }
 
   // hack for chrome to fix line height issue
@@ -111,8 +115,8 @@ user-input {
 
 .search-icon {
   height: @avatar-diameter-xs;
-  line-height: @avatar-diameter-xs;
   margin-right: 8px;
+  line-height: @avatar-diameter-xs;
 }
 
 .search-input-show-placeholder {

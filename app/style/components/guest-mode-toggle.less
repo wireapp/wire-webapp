@@ -22,12 +22,12 @@ guest-mode-toggle {
   flex-direction: column;
 
   .guest-mode-toggle-row {
-    font-size: 16px;
     display: flex;
     justify-content: space-between;
-    line-height: 24px;
-    border-bottom: 1px solid fade(@graphite-dark, 8%);
     padding-bottom: 12px;
+    border-bottom: 1px solid fade(@graphite-dark, 8%);
+    font-size: 16px;
+    line-height: 24px;
   }
 
   .guest-mode-toggle-info {
@@ -38,7 +38,7 @@ guest-mode-toggle {
   }
 
   .slider.disabled {
-    pointer-events: none;
     opacity: 0.4;
+    pointer-events: none;
   }
 }

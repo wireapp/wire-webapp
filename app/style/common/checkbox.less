@@ -30,9 +30,9 @@
   display: inline-block;
 
   input[type='checkbox'] {
-    opacity: 0;
     position: absolute;
     left: -9999px;
+    opacity: 0;
 
     &:checked + label {
       &::after {
@@ -42,26 +42,27 @@
   }
 
   label {
-    user-select: none;
-    cursor: pointer;
-    display: inline-block;
-    line-height: @font-size-sm;
-    padding-left: 24px;
     position: relative;
+    display: inline-block;
+    padding-left: 24px;
+    cursor: pointer;
+    line-height: @font-size-sm;
+    user-select: none;
 
     &::after {
       .font-antialiasing();
+
+      position: absolute;
+      top: 0;
+      left: 0;
       content: '\e600';
       font-family: Wire;
       font-size: @icon-size-sm;
       font-style: normal;
-      font-weight: normal;
       font-variant: normal;
-      left: 0;
+      font-weight: normal;
       line-height: 1;
-      position: absolute;
       text-transform: none;
-      top: 0;
     }
 
     > div {

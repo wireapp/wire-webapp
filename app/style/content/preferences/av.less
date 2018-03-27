@@ -26,32 +26,32 @@
 }
 
 .preferences-av-label {
+  width: 48px;
   height: 48px;
   line-height: 48px;
-  width: 48px;
 }
 
 .preferences-av-meter {
+  width: 100%;
   height: 16px;
   margin-bottom: 16px;
-  width: 100%;
 }
 
 .preferences-av-select {
-  background: transparent;
-  color: @graphite-dark;
   width: 560px;
-  font-size: @font-size-sm;
   height: 48px;
   border: none;
   border-bottom: 1px solid @seperator-color;
+  background: transparent;
+  color: @graphite-dark;
+  font-size: @font-size-sm;
   outline: none;
 }
 
 .preferences-av-select-disabled {
+  border-color: fade(@graphite, 16%);
   color: fade(@graphite, 48%);
   cursor: default !important;
-  border-color: fade(@graphite, 16%);
 }
 
 .preferences-av-select-icon {
@@ -59,12 +59,12 @@
 }
 
 .preferences-av-video {
-  background-color: @graphite-dark;
-  height: 100%;
-  margin-top: 16px;
-  min-height: 316px;
-  object-fit: cover;
   width: 100%;
+  height: 100%;
+  min-height: 316px;
+  margin-top: 16px;
+  background-color: @graphite-dark;
+  object-fit: cover;
 }
 
 .preferences-av-video-disabled {

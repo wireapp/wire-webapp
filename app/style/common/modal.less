@@ -19,8 +19,8 @@
 
 .modal {
   z-index: @z-index-modal;
-  overflow-y: auto;
   overflow-x: hidden;
+  overflow-y: auto;
 
   &::before {
     position: fixed;
@@ -33,11 +33,11 @@
   }
 
   .modal-content {
-    cursor: default;
-    margin: auto; // http://stackoverflow.com/questions/24538100/issue-when-centering-vertically-with-flexbox-when-heights-are-unknown
-    padding: @modal-padding;
     position: relative;
     width: 384px;
+    padding: @modal-padding;
+    margin: auto; // http://stackoverflow.com/questions/24538100/issue-when-centering-vertically-with-flexbox-when-heights-are-unknown
+    cursor: default;
 
     a.close {
       position: absolute;
@@ -54,15 +54,16 @@
 
     header {
       .text-center;
+
       position: relative;
-      line-height: @line-height-lg;
       margin-bottom: @line-height-lg;
+      line-height: @line-height-lg;
     }
 
     section {
       display: flex;
-      font-size: @font-size-xs;
       padding-bottom: 24px;
+      font-size: @font-size-xs;
 
       &:not(:first-child) {
         padding-top: 24px;
@@ -75,31 +76,32 @@
   }
 
   .modal-input {
-    background: #fff;
-    border: 1px solid fade(@graphite, 56%);
-    border-radius: 4px;
-    height: 28px;
-    outline: none;
-    padding-left: 4px;
     width: 100%;
+    height: 28px;
+    padding-left: 4px;
+    border: 1px solid fade(@graphite, 56%);
+    background: #fff;
+    border-radius: 4px;
+    outline: none;
 
     &::placeholder {
       .label-xs();
+
       color: fade(@graphite, 56%);
     }
   }
 
   .modal-title {
+    padding-right: 48px;
+    margin-bottom: 16px;
     font-weight: @font-weight-bold;
     line-height: @line-height-lg;
-    margin-bottom: 16px;
-    padding-right: 48px;
   }
 
   .modal-text {
-    line-height: @line-height-lg;
-    margin-bottom: 16px;
     padding-right: 32px;
+    margin-bottom: 16px;
+    line-height: @line-height-lg;
   }
 
   .modal-option {
@@ -113,6 +115,7 @@
 
   .modal-footer {
     .flex-center;
+
     margin-top: 24px;
 
     .button {
@@ -135,15 +138,15 @@
   }
 
   .modal-header {
-    margin-bottom: 24px;
     min-height: 16px;
+    margin-bottom: 24px;
   }
 
   .modal-center {
-    height: 304px;
-    margin-left: -24px;
-    margin-right: -24px;
     position: relative;
+    height: 304px;
+    margin-right: -24px;
+    margin-left: -24px;
   }
 
   .modal-footer {
@@ -158,8 +161,9 @@
 
 .modal-acount-new-devices {
   .label-xs;
-  line-height: @line-height-sm;
+
   margin-bottom: 16px;
+  line-height: @line-height-sm;
 
   & div:nth-child(even) {
     margin-bottom: 16px;

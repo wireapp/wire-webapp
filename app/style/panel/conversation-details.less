@@ -40,17 +40,17 @@
   }
 
   &__name {
-    font-size: 20px;
-    font-weight: @font-weight-bold;
     display: flex;
     min-height: 24px;
-    border: none;
     padding: 0;
+    border: none;
+    font-size: 20px;
+    font-weight: @font-weight-bold;
     word-break: break-word;
 
     &--centered {
-      margin-top: 24px;
       justify-content: center;
+      margin-top: 24px;
     }
 
     &--input {
@@ -71,13 +71,13 @@
 
     &__edit-icon {
       flex-grow: 1;
+      margin-left: 11px;
       opacity: 0;
       transition: opacity @animation-timing-faster @ease-in-quart;
-      margin-left: 11px;
 
       svg {
-        height: 12px;
         width: 12px;
+        height: 12px;
       }
 
       path {
@@ -93,8 +93,8 @@
   &__participant_count {
     margin-top: 8px;
     font-size: 11px;
-    text-transform: uppercase;
     font-weight: @font-weight-bold;
+    text-transform: uppercase;
 
     &__service {
       margin-left: 8px;
@@ -106,10 +106,10 @@
   }
 
   &__user-name {
-    font-size: 12px;
-    text-align: center;
-    font-weight: @font-weight-regular;
     margin-top: 8px;
+    font-size: 12px;
+    font-weight: @font-weight-regular;
+    text-align: center;
 
     &::before {
       content: '@';
@@ -120,8 +120,8 @@
     margin: 32px 16px 8px;
     color: @graphite;
     font-size: 11px;
-    text-transform: uppercase;
     font-weight: @font-weight-bold;
+    text-transform: uppercase;
   }
 
   &__participant-options {
@@ -166,15 +166,15 @@
     display: flex;
     justify-content: center;
     margin-top: 8px;
-    font-weight: @font-weight-bold;
-    font-size: 12px;
     color: fade(@graphite-dark, 56%);
+    font-size: 12px;
+    font-weight: @font-weight-bold;
   }
 
   &__availability {
     justify-content: center;
-    text-transform: uppercase;
     font-size: 11px;
     font-weight: @font-weight-bold;
+    text-transform: uppercase;
   }
 }
