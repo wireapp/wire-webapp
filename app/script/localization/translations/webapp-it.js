@@ -247,7 +247,6 @@ z.string.it.conversationTeamLeave = ' è stato rimosso dal team';
 z.string.it.conversationPing = ' ha fatto un trillo';
 z.string.it.conversationPingYou = ' ha fatto un trillo';
 z.string.it.conversationToday = 'oggi';
-z.string.it.conversationVerified = 'Verificato';
 z.string.it.conversationVoiceChannelDeactivate = ' ha chiamato';
 z.string.it.conversationVoiceChannelDeactivateYou = ' ha chiamato';
 z.string.it.conversationYesterday = 'Ieri';
@@ -344,7 +343,6 @@ z.string.it.addParticipantsTabsPeople = 'Persone';
 z.string.it.addParticipantsTabsServices = 'Servizi';
 
 z.string.it.conversationDetailsActionCancelRequest = 'Annulla richiesta';
-z.string.it.conversationDetailsActionCreateGroup = 'Crea gruppo';
 z.string.it.conversationDetailsActionDevices = 'Dispositivi';
 z.string.it.conversationDetailsGuestsOff = 'Off';
 z.string.it.conversationDetailsParticipantsServicesMany = 'Servizi';

@@ -106,5 +106,11 @@
   "login.publicComputer": "Dette er en offentlig computer",
   "clientManager.headline": "",
   "clientManager.subhead": "Fjern en af dine andre enheder for at begynde at bruge Wire på denne.",
-  "clientManager.logout": "Log ud"
+  "clientManager.logout": "Log ud",
+  "historyInfo.hasHistoryHeadline": "Du har brugt Wire på denne enhed før.",
+  "historyInfo.noHistoryHeadline": "Det er første gang du bruger Wire på denne enhed.",
+  "historyInfo.hasHistoryInfo": "",
+  "historyInfo.noHistoryInfo": "",
+  "historyInfo.learnMore": "Lær mere",
+  "historyInfo.ok": "OK"
 }

@@ -48,7 +48,8 @@
     "Atsisiųskite naujausią <b style=\"font-weight: 600\">„Google Chrome“, „Mozilla Firefox“, „Opera“</b style=\"font-weight: 600\"> arba <b style=\"font-weight: 600\">„Microsoft Edge“.</b>",
   "conversationJoin.unsupportedJoinHeadline": "Jus pakvietė<br />prisijungti prie <b style=\"color: black;\">„Wire“ svečių kambario.</b>",
   "conversationJoin.headline": "Jus pakvietė<br />prisijungti prie <b style=\"color: black;\">„Wire“ svečių kambario.</b>",
-  "conversationJoin.unsupportedJoinSubhead": "",
+  "conversationJoin.unsupportedJoinSubhead":
+    "<p>Naršyklė nepalaikoma.</p>Atsisiųskite naujausią <b style=\"font-weight: 600\">„Google Chrome“, „Mozilla Firefox“, „Opera“</b> arba <b style=\"font-weight: 600\">„Microsoft Edge“.</b>",
   "conversationJoin.unsupportedJoinMobileSubhead": "Atverkite šią nuorodą kompiuteryje.",
   "conversationJoin.subhead": "Šifruoti grupiniai susirašinėjimai ir konferenciniai pokalbiai.<br />Paskyra nebūtina.",
   "conversationJoin.existentAccountHeadline": "{name}, jus pakvietė<br />prisijungti prie <b style=\"color: black;\">„Wire“ svečių kambario.</b>",
@@ -110,5 +111,11 @@
   "login.publicComputer": "Tai yra viešas kompiuteris",
   "clientManager.headline": "Pašalinti įrenginį",
   "clientManager.subhead": "Norėdami pradėti naudoti Wire šiame įrenginyje, pašalinkite vieną iš savo kitų įrenginių.",
-  "clientManager.logout": "Atsijungti"
+  "clientManager.logout": "Atsijungti",
+  "historyInfo.hasHistoryHeadline": "Naudojote „Wire“ šiame įrenginyje.",
+  "historyInfo.noHistoryHeadline": "Pirmą kartą naudojate „Wire“ šiame įrenginyje.",
+  "historyInfo.hasHistoryInfo": "Tuo laikotarpiu išsiųstos žinutės<br />čia nebus rodomos.",
+  "historyInfo.noHistoryInfo": "",
+  "historyInfo.learnMore": "Sužinoti daugiau",
+  "historyInfo.ok": "GERAI"
 }

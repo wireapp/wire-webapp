@@ -103,12 +103,16 @@ z.string.de.modalConfirmSecondary = 'Abbrechen';
 z.string.de.modalOptionSecondary = 'Abbrechen';
 
 z.string.de.modalAccountCreateAction = 'Verstanden';
+z.string.de.modalAccountCreateHeadline = 'Benutzerkonto erstellen?';
+z.string.de.modalAccountCreateMessage = 'Wenn du ein Benutzerkonto erstellst, verlierst du den Unterhaltungsverlauf dieses Gästezimmer.';
 
 z.string.de.modalAccountDeletionAction = 'Löschen';
 z.string.de.modalAccountDeletionHeadline = 'Benutzerkonto löschen';
 z.string.de.modalAccountDeletionMessage = 'In Kürze erhältst du eine Nachricht per E-Mail oder SMS. Folge dem Link darin, um dein Konto zu löschen.';
 
 z.string.de.modalAccountLeaveGuestRoomAction = 'Verlassen';
+z.string.de.modalAccountLeaveGuestRoomHeadline = 'Gästezimmer verlassen?';
+z.string.de.modalAccountLeaveGuestRoomMessage = 'Der Unterhaltungsverlauf wird gelöscht. Erstelle beim nächsten Mal ein Benutzerkonto, um ihn zu behalten.';
 
 z.string.de.modalAccountLogoutAction = 'Abmelden';
 z.string.de.modalAccountLogoutHeadline = 'Daten löschen?';
@@ -260,6 +264,8 @@ z.string.de.connectionRequestConnect = 'Kontakt hinzufügen';
 z.string.de.connectionRequestIgnore = 'Ignorieren';
 
 z.string.de.conversationGuestIndicator = 'Gast';
+z.string.de.userRemainingTimeHours = '{{time}}h verbleibend';
+z.string.de.userRemainingTimeMinutes = 'Weniger als {{time}}m verbleibend';
 
 z.string.de.conversationYouNominative = 'du';
 z.string.de.conversationYouDative = 'dir';
@@ -272,6 +278,7 @@ z.string.de.conversationConnectionCancelRequest = 'Kontaktanfrage abbrechen';
 z.string.de.conversationCreate = ' hat eine Unterhaltung mit {{users}} begonnen';
 z.string.de.conversationCreateName = '{{user}} hat eine Unterhaltung begonnen';
 z.string.de.conversationCreateNameYou = '{{user}} hast eine Unterhaltung begonnen';
+z.string.de.conversationCreateTemporary = 'Du bist der Unterhaltung beigetreten';
 z.string.de.conversationCreateWith = 'mit {{users}}';
 z.string.de.conversationCreateYou = ' hast eine Unterhaltung mit {{users}} begonnen';
 z.string.de.conversationDeviceStartedUsingOne = ' benutzt';
@@ -301,7 +308,6 @@ z.string.de.conversationTeamLeave = ' wurde aus dem Team entfernt';
 z.string.de.conversationPing = ' hat gepingt';
 z.string.de.conversationPingYou = ' hast gepingt';
 z.string.de.conversationToday = 'Heute';
-z.string.de.conversationVerified = 'Verifiziert';
 z.string.de.conversationVoiceChannelDeactivate = ' hat versucht anzurufen';
 z.string.de.conversationVoiceChannelDeactivateYou = ' hast versucht anzurufen';
 z.string.de.conversationYesterday = 'Gestern';
@@ -331,7 +337,7 @@ z.string.de.conversationTweetAuthor = ' auf Twitter';
 z.string.de.groupCreationPreferencesAction = 'Weiter';
 z.string.de.groupCreationPreferencesErrorNameShort = 'Gib mindestens ein Zeichen ein';
 z.string.de.groupCreationPreferencesErrorNameLong = 'Der eingegebene Gruppenname ist zu lang';
-z.string.de.groupCreationPreferencesHeader = 'Neue Gruppe';
+z.string.de.groupCreationPreferencesHeader = 'Gruppe erstellen';
 z.string.de.groupCreationPreferencesPlaceholder = 'Gruppenname';
 z.string.de.groupCreationParticipantsActionCreate = 'Fertig';
 z.string.de.groupCreationParticipantsActionSkip = 'Überspringen';
@@ -458,7 +464,7 @@ z.string.de.guestOptionsCopyLink = 'Link kopieren';
 z.string.de.guestOptionsCopyLinkDone = 'Link kopiert!';
 z.string.de.guestOptionsCreateLink = 'Link erstellen';
 z.string.de.guestOptionsInfoHeader = 'Andere per Link einladen';
-z.string.de.guestOptionsInfoText = 'Jeder kann der Gruppe mit diesem Link für 24 Stunden beitreten - auch ohne eine Wire-Benutzerkonto.';
+z.string.de.guestOptionsInfoText = 'Jeder kann der Gruppe mit diesem Link beitreten - auch ohne eine Wire-Benutzerkonto.';
 z.string.de.guestOptionsRevokeLink = 'Link widerrufen';
 z.string.de.guestOptionsTitle = 'Gast-Optionen';
 
@@ -466,7 +472,7 @@ z.string.de.participantDevicesDetailHeadline = 'Überprüfe, ob dieser Fingerabd
 z.string.de.participantDevicesDetailHowTo = 'Wie mache ich das?';
 z.string.de.participantDevicesDetailResetSession = 'Session zurücksetzen';
 z.string.de.participantDevicesDetailShowMyDevice = 'Zeige meinen Fingerabdruck';
-z.string.de.participantDevicesDetailVerify = 'Verifiziert';
+z.string.de.participantDevicesDetailVerify = 'Ok';
 
 z.string.de.participantDevicesHeader = 'Geräte';
 z.string.de.participantDevicesHeadline = 'Wire gibt jedem Gerät einen einzigartigen Fingerabdruck. Vergleiche diese mit {{user}} und überprüfe deine Unterhaltung.';
@@ -501,6 +507,8 @@ z.string.de.preferencesAboutWebsite = 'Wire-Webseite';
 z.string.de.preferencesAccountAvaibilityUnset = 'Wähle einen Status';
 z.string.de.preferencesAccountCreateTeam = 'Team erstellen';
 z.string.de.preferencesAccountDelete = 'Benutzerkonto löschen';
+z.string.de.preferencesAccountLeaveGuestRoom = 'Gästezimmer verlassen';
+z.string.de.preferencesAccountLeaveGuestRoomDescription = 'Du wirst nicht länger auf die Nachrichten dieser Unterhaltung zugreifen können.';
 z.string.de.preferencesAccountLogOut = 'Abmelden';
 z.string.de.preferencesAccountManageTeam = 'Team verwalten';
 z.string.de.preferencesAccountResetPassword = 'Passwort zurücksetzen';
@@ -547,15 +555,18 @@ z.string.de.preferencesOptionsData = 'Nutzungs- und Fehlerberichte';
 z.string.de.preferencesOptionsDataCheckbox = 'Anonyme Nutzungsdaten senden';
 z.string.de.preferencesOptionsDataDetail = 'Hilf uns, Wire durch das Senden anonymisierter Informationen zu verbessern.';
 z.string.de.preferencesOptionsPopular = 'Auf allgemeinen Wunsch';
-z.string.de.preferencesOptionsEmojiReplaceCheckbox = 'Ersetze Schrift-Emoticons mit Emojis';
+z.string.de.preferencesOptionsEmojiReplaceCheckbox = 'Schrift-Emoticons mit Emojis ersetzen';
 z.string.de.preferencesOptionsEmojiReplaceDetail = ':-) → {{icon}}';
-z.string.de.preferencesOptionsPreviewsSendCheckbox = 'Erstelle Vorschauen beim Senden von Links';
+z.string.de.preferencesOptionsPreviewsSendCheckbox = 'Vorschau beim Senden von Links erstellen';
 z.string.de.preferencesOptionsPreviewsSendDetail = 'Vorschauen können weiterhin für von anderen Personen gesendete Links angezeigt werden.';
 z.string.de.preferencesOptionsNotifications = 'Benachrichtigungen';
 z.string.de.preferencesOptionsNotificationsNone = 'Aus';
 z.string.de.preferencesOptionsNotificationsObfuscate = 'Details verbergen';
 z.string.de.preferencesOptionsNotificationsObfuscateMessage = 'Absendername zeigen';
 z.string.de.preferencesOptionsNotificationsOn = 'Zeige Absendername und Nachricht';
+z.string.de.preferencesOptionsCallLogs = 'Fehlerbehebung';
+z.string.de.preferencesOptionsCallLogsGet = 'Diagnose-Bericht zu Anrufen speichern';
+z.string.de.preferencesOptionsCallLogsDetail = 'Diese Informationen helfen uns Probleme bei Anrufen zu diagnostizieren.';
 
 z.string.de.searchConnect = 'Vorschläge';
 z.string.de.searchConnections = 'Kontakte';
@@ -589,6 +600,14 @@ z.string.de.searchListEveryoneParticipates = 'Alle deine Kontakte\nsind bereits 
 z.string.de.searchListNoMatches = 'Kein passendes Ergebnis.\nSuche nach einen\nanderen Namen.';
 
 z.string.de.temporaryGuestCta = 'Erstelle ein Benutzerkonto';
+z.string.de.temporaryGuestDescription = 'Für sichere Unternehmen mit verschlüsselter Kommunikation in Gruppen und Telefonkonferenzen.';
+z.string.de.temporaryGuestTimeRemaining = ' verbleibend in diesem Gästezimmer';
+
+z.string.de.temporaryGuestJoinMessage = 'Diese Unterhaltung steht für dich für 24 Stunden zur Verfügung.';
+z.string.de.temporaryGuestJoinDescription = 'Wenn du diese Seite schließt oder neu lädst, verlierst du den Zugriff.';
+
+z.string.de.temporaryGuestLeaveMessage = ' bist nicht länger Teil dieser Unterhaltung.';
+z.string.de.temporaryGuestLeaveDescription = 'Wenn du diese Seite schließt oder neu lädst, verlierst du den Zugriff auf den Unterhaltungsverlauf.';
 
 z.string.de.uploadGoogleHeadline = 'Finde Kontakte \nauf Wire.';
 z.string.de.uploadGoogleMessage = 'Wir verwenden deine Daten, um Kontakte für dich zu erstellen. Wir anonymisieren alle Informationen und teilen sie mit niemand anderem.';

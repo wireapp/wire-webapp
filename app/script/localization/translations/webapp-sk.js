@@ -252,7 +252,6 @@ z.string.sk.conversationTeamLeave = ' bol odstránený z tímu';
 z.string.sk.conversationPing = ' pingol';
 z.string.sk.conversationPingYou = ' pingol';
 z.string.sk.conversationToday = 'dnes';
-z.string.sk.conversationVerified = 'Overený';
 z.string.sk.conversationVoiceChannelDeactivate = ' volaný';
 z.string.sk.conversationVoiceChannelDeactivateYou = ' volaný';
 z.string.sk.conversationYesterday = 'Včera';
@@ -349,7 +348,6 @@ z.string.sk.addParticipantsTabsPeople = 'Ľudia';
 z.string.sk.addParticipantsTabsServices = 'Služby';
 
 z.string.sk.conversationDetailsActionCancelRequest = 'Zrušiť požiadavku';
-z.string.sk.conversationDetailsActionCreateGroup = 'Vytvoriť skupinu';
 z.string.sk.conversationDetailsActionDevices = 'Zariadenia';
 z.string.sk.conversationDetailsGuestsOff = 'Vypnúť';
 z.string.sk.conversationDetailsParticipantsServicesMany = 'Služby';
