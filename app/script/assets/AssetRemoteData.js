@@ -97,7 +97,11 @@ z.assets.AssetRemoteData = class AssetRemoteData {
     const objectUrl = z.assets.AssetURLCache.getUrl(this.identifier);
     return objectUrl
       ? Promise.resolve(objectUrl)
-      : this.load().then(blob => z.assets.AssetURLCache.setUrl(this.identifier, window.URL.createObjectURL(blob)));
+      : this.load().then(blob => {
+          if (blob) {
+            z.assets.AssetURLCache.setUrl(this.identifier, window.URL.createObjectURL(blob));
+          }
+        });
   }
 
   /**
@@ -117,7 +121,7 @@ z.assets.AssetRemoteData = class AssetRemoteData {
       })
       .then(plaintext => new Blob([new Uint8Array(plaintext)], {mime_type: type}))
       .catch(error => {
-        const errorMessage = error ? error.message : '';
+        const errorMessage = (error && error.message) || '';
         const isAssetNotFound = errorMessage.endsWith(z.service.BackendClientError.STATUS_CODE.NOT_FOUND);
         const isServerError = errorMessage.endsWith(z.service.BackendClientError.STATUS_CODE.INTERNAL_SERVER_ERROR);
 
