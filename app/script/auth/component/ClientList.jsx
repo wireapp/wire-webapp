@@ -21,9 +21,14 @@ import {ContainerXS, Loading} from '@wireapp/react-ui-kit';
 import {injectIntl} from 'react-intl';
 import React from 'react';
 import * as ClientAction from '../module/action/ClientAction';
+import * as LocalStorageAction from '../module/action/LocalStorageAction';
 import ClientItem from '../component/ClientItem';
 import * as ClientSelector from '../module/selector/ClientSelector';
 import {connect} from 'react-redux';
+import EXTERNAL_ROUTE from '../externalRoute';
+import ROUTE from '../route';
+import BackendError from '../module/action/BackendError';
+import {withRouter} from 'react-router';
 
 class ClientList extends React.Component {
   state = {
@@ -39,7 +44,16 @@ class ClientList extends React.Component {
   removeClient = (clientId, password) => {
     return Promise.resolve()
       .then(() => this.props.doRemoveClient(clientId, password))
-      .then(() => this.props.doCreateClient(password));
+      .then(() => {
+        const persist = this.props.getLocalStorage(LocalStorageAction.LocalStorageKey.AUTH.PERSIST);
+        return this.props.doInitializeClient(persist, password);
+      })
+      .then(() => window.location.replace(URLUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP)))
+      .catch(error => {
+        if (error.label === BackendError.LABEL.NEW_CLIENT) {
+          this.props.history.push(ROUTE.HISTORY_INFO);
+        }
+      });
   };
 
   isSelectedClient = clientId => clientId === this.state.currentlySelectedClient;
@@ -71,13 +85,15 @@ class ClientList extends React.Component {
   }
 }
 
-export default injectIntl(
-  connect(
-    state => ({
-      clientError: ClientSelector.getError(state),
-      isFetching: ClientSelector.isFetching(state),
-      permanentClients: ClientSelector.getPermanentClients(state),
-    }),
-    {...ClientAction}
-  )(ClientList)
+export default withRouter(
+  injectIntl(
+    connect(
+      state => ({
+        clientError: ClientSelector.getError(state),
+        isFetching: ClientSelector.isFetching(state),
+        permanentClients: ClientSelector.getPermanentClients(state),
+      }),
+      {...ClientAction, ...LocalStorageAction}
+    )(ClientList)
+  )
 );

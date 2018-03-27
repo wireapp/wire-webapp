@@ -49,10 +49,10 @@ import * as ConversationAction from '../module/action/ConversationAction';
 import ValidationError from '../module/action/ValidationError';
 import {loginStrings} from '../../strings';
 import RuntimeUtil from '../util/RuntimeUtil';
-import * as URLUtil from '../util/urlUtil';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
 import BackendError from '../module/action/BackendError';
-import {Redirect} from 'react-router';
+import {Redirect, withRouter} from 'react-router';
+import * as URLUtil from '../util/urlUtil';
 import * as Environment from '../Environment';
 import {formatE164} from 'phoneFormat.js';
 
@@ -153,11 +153,17 @@ class Login extends React.PureComponent {
       })
       .then(() => window.location.replace(URLUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP)))
       .catch(error => {
-        if (error.label === BackendError.LABEL.TOO_MANY_CLIENTS) {
-          this.props.history.push(ROUTE.CLIENTS);
-        } else {
-          this.setState({...this.state, validInputs: {...validInputs, email: false, password: false}});
-          throw error;
+        switch (error.label) {
+          case BackendError.LABEL.NEW_CLIENT:
+            this.props.history.push(ROUTE.HISTORY_INFO);
+            break;
+          case BackendError.LABEL.TOO_MANY_CLIENTS:
+            this.props.history.push(ROUTE.CLIENTS);
+            break;
+          default: {
+            this.setState({...this.state, validInputs: {...validInputs, email: false, password: false}});
+            throw error;
+          }
         }
       });
   };
@@ -300,12 +306,14 @@ class Login extends React.PureComponent {
   }
 }
 
-export default injectIntl(
-  connect(
-    state => ({
-      isFetching: AuthSelector.isFetching(state),
-      loginError: AuthSelector.getError(state),
-    }),
-    {...AuthAction, ...ConversationAction}
-  )(Login)
+export default withRouter(
+  injectIntl(
+    connect(
+      state => ({
+        isFetching: AuthSelector.isFetching(state),
+        loginError: AuthSelector.getError(state),
+      }),
+      {...AuthAction, ...ConversationAction}
+    )(Login)
+  )
 );

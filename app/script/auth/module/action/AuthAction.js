@@ -25,8 +25,7 @@ import {deleteLocalStorage, setLocalStorage, LocalStorageKey} from './LocalStora
 import * as ConversationAction from './ConversationAction';
 import * as ClientAction from './ClientAction';
 
-export const doLogin = loginData =>
-  doLoginPlain(loginData, dispatch => dispatch(doSilentLogout()), dispatch => dispatch(SelfAction.fetchSelf()));
+export const doLogin = loginData => doLoginPlain(loginData, dispatch => dispatch(doSilentLogout()), dispatch => {});
 
 export const doLoginAndJoin = (loginData, key, code, uri) =>
   doLoginPlain(
@@ -46,19 +45,15 @@ function doLoginPlain(loginData, onBeforeLogin, onAfterLogin) {
     );
     return Promise.resolve()
       .then(() => onBeforeLogin(dispatch, getState, global))
-      .then(() => core.login(loginData, true, ClientAction.generateClientPayload(loginData.persist)))
+      .then(() => core.login(loginData, false, ClientAction.generateClientPayload(loginData.persist)))
       .then(() => persistAuthData(loginData.persist, core, dispatch))
+      .then(() => dispatch(SelfAction.fetchSelf()))
       .then(() => onAfterLogin(dispatch, getState, global))
+      .then(() => dispatch(ClientAction.doInitializeClient(loginData.persist, loginData.password)))
       .then(() => dispatch(AuthActionCreator.successfulLogin()))
       .catch(error => {
-        const handledError = BackendError.handle(error);
-        if (handledError.label === BackendError.LABEL.TOO_MANY_CLIENTS) {
-          Promise.resolve()
-            .then(() => persistAuthData(loginData.persist, core, dispatch))
-            .then(() => onAfterLogin(dispatch, getState, global));
-        }
         dispatch(AuthActionCreator.failedLogin(error));
-        throw handledError;
+        throw BackendError.handle(error);
       });
   };
 }
@@ -98,7 +93,7 @@ export function doRegisterTeam(registration) {
       .then(() => apiClient.register(registration, isPermanentClient))
       .then(() => core.init())
       .then(() => persistAuthData(isPermanentClient, core, dispatch))
-      .then(() => dispatch(ClientAction.doCreateClient()))
+      .then(() => dispatch(ClientAction.doInitializeClient(isPermanentClient)))
       .then(() => dispatch(SelfAction.fetchSelf()))
       .then(createdTeam => dispatch(AuthActionCreator.successfulRegisterTeam(createdTeam)))
       .catch(error => {
@@ -128,7 +123,7 @@ export function doRegisterPersonal(registration) {
       .then(() => apiClient.register(registration, isPermanentClient))
       .then(() => persistAuthData(isPermanentClient, core, dispatch))
       .then(() => core.init())
-      .then(() => dispatch(ClientAction.doCreateClient()))
+      .then(() => dispatch(ClientAction.doInitializeClient(isPermanentClient)))
       .then(() => dispatch(SelfAction.fetchSelf()))
       .then(createdAccount => dispatch(AuthActionCreator.successfulRegisterPersonal(createdAccount)))
       .catch(error => {
@@ -153,7 +148,7 @@ export function doRegisterWireless(registration) {
       .then(() => apiClient.register(registration, isPermanentClient))
       .then(() => persistAuthData(isPermanentClient, core, dispatch))
       .then(() => core.init())
-      .then(() => dispatch(ClientAction.doCreateClient()))
+      .then(() => dispatch(ClientAction.doInitializeClient(isPermanentClient)))
       .then(() => dispatch(SelfAction.fetchSelf()))
       .then(createdAccount => dispatch(AuthActionCreator.successfulRegisterWireless(createdAccount)))
       .catch(error => {

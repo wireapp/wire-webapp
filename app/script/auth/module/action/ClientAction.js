@@ -19,10 +19,10 @@
 
 import BackendError from './BackendError';
 import * as ClientActionCreator from './creator/ClientActionCreator';
-import {getLocalStorage, LocalStorageKey} from './LocalStorageAction';
 import Runtime from '../../Runtime';
 import * as Environment from '../../Environment';
 import * as StringUtil from '../../util/stringUtil';
+import * as NotificationAction from './NotificationAction';
 
 export function doGetAllClients() {
   return function(dispatch, getState, {apiClient}) {
@@ -37,7 +37,7 @@ export function doGetAllClients() {
   };
 }
 
-export function doRemoveClient(clientId: string, password: string) {
+export function doRemoveClient(clientId, password) {
   return function(dispatch, getState, {apiClient}) {
     dispatch(ClientActionCreator.startRemoveClient());
     return Promise.resolve()
@@ -50,15 +50,25 @@ export function doRemoveClient(clientId: string, password: string) {
   };
 }
 
-export function doCreateClient(password: string) {
+export function doInitializeClient(persist, password) {
   return function(dispatch, getState, {core}) {
-    dispatch(ClientActionCreator.startCreateClient());
+    dispatch(ClientActionCreator.startInitializeClient());
     return Promise.resolve()
-      .then(() => dispatch(getLocalStorage(LocalStorageKey.AUTH.PERSIST)))
-      .then(persist => core.initClient({password, persist: !!persist}, generateClientPayload(!!persist)))
-      .then(clients => dispatch(ClientActionCreator.successfulCreateClient()))
+      .then(() => core.initClient({password, persist}, generateClientPayload(persist)))
+      .then(creationStatus =>
+        Promise.resolve()
+          .then(() => dispatch(ClientActionCreator.successfulInitializeClient(creationStatus)))
+          .then(() => creationStatus)
+      )
+      .then(creationStatus => {
+        const isNewSubsequentClient = password && creationStatus.isNewClient;
+        if (isNewSubsequentClient) {
+          dispatch(NotificationAction.checkHistory());
+          throw new BackendError({code: 201, label: BackendError.LABEL.NEW_CLIENT, message: 'New client is created.'});
+        }
+      })
       .catch(error => {
-        dispatch(ClientActionCreator.failedCreateClient(error));
+        dispatch(ClientActionCreator.failedInitializeClient(error));
         throw BackendError.handle(error);
       });
   };
