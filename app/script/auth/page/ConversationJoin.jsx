@@ -183,6 +183,9 @@ class ConversationJoin extends Component {
         <Button onClick={this.onOpenWireClick} data-uie-name="do-open">
           {_(conversationJoinStrings.existentAccountOpenButton)}
         </Button>
+        <ErrorMessage data-uie-name="error-message">
+          {error ? parseValidationErrors(error) : parseError(this.props.error)}
+        </ErrorMessage>
         <Small block>
           <Link
             onClick={() => this.setState({...this.state, forceNewTemporaryGuestAccount: true})}

@@ -94,8 +94,24 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
       }
 
       switch (this.type) {
+        case z.event.Backend.CONVERSATION.MEMBER_JOIN: {
+          const senderJoined = this.otherUser().id === this.user().id;
+          if (senderJoined) {
+            const userJoinedStringId = this.user().is_me
+              ? z.string.conversationMemberJoinSelfYou
+              : z.string.conversationMemberJoinSelf;
+            return z.l10n.text(userJoinedStringId);
+          }
+
+          const userJoinedStringId = this.user().is_me
+            ? z.string.conversationMemberJoinYou
+            : z.string.conversationMemberJoin;
+
+          return z.l10n.text(userJoinedStringId, this._generateNameString());
+        }
+
         case z.event.Backend.CONVERSATION.MEMBER_LEAVE: {
-          const temporaryGuestRemoval = this.user().is_me && this.user().isTemporaryGuest();
+          const temporaryGuestRemoval = this.otherUser().is_me && this.otherUser().isTemporaryGuest();
           if (temporaryGuestRemoval) {
             return z.string.text(z.string.temporaryGuestLeaveMessage);
           }
@@ -112,22 +128,6 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
             ? z.string.conversationMemberLeaveRemovedYou
             : z.string.conversationMemberLeaveRemoved;
           return z.l10n.text(userRemovedStringId, this._generateNameString());
-        }
-
-        case z.event.Backend.CONVERSATION.MEMBER_JOIN: {
-          const senderJoined = this.otherUser().id === this.user().id;
-          if (senderJoined) {
-            const userJoinedStringId = this.user().is_me
-              ? z.string.conversationMemberJoinSelfYou
-              : z.string.conversationMemberJoinSelf;
-            return z.l10n.text(userJoinedStringId);
-          }
-
-          const userJoinedStringId = this.user().is_me
-            ? z.string.conversationMemberJoinYou
-            : z.string.conversationMemberJoin;
-
-          return z.l10n.text(userJoinedStringId, this._generateNameString());
         }
 
         case z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE: {
