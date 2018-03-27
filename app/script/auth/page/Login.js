@@ -56,7 +56,6 @@ import * as URLUtil from '../util/urlUtil';
 import * as Environment from '../Environment';
 import {formatE164} from 'phoneFormat.js';
 
-
 class Login extends React.PureComponent {
   inputs = {};
 
