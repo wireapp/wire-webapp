@@ -333,7 +333,10 @@ class Account extends EventEmitter {
       });
   }
 
-  private initClient(loginData: LoginData, clientInfo?: ClientInfo): Promise<RegisteredClient> {
+  private initClient(
+    loginData: LoginData,
+    clientInfo?: ClientInfo
+  ): Promise<{isNewClient: boolean; localClient: RegisteredClient}> {
     if (!this.service) {
       throw new Error('Services are not set.');
     }
@@ -345,9 +348,11 @@ class Account extends EventEmitter {
       .then(() => this.apiClient.client.api.getClient(loadedClient.id))
       .then(() => {
         this.service!.conversation.setClientID(<string>this.apiClient.context!.clientId);
-        return loadedClient;
+        return {isNewClient: false, localClient: loadedClient};
       })
       .catch(error => {
+        let registeredClient: RegisteredClient;
+
         // There was no client so we need to "create" and "register" a client
         const notFoundInDatabase =
           error instanceof cryptobox.error.CryptoboxError ||
@@ -357,9 +362,12 @@ class Account extends EventEmitter {
         const notFoundOnBackend = error.response && error.response.status === StatusCode.NOT_FOUND;
 
         if (notFoundInDatabase) {
-          return this.registerClient(loginData, clientInfo).then((client: RegisteredClient) => {
-            return this.service!.client.synchronizeClients().then(() => client);
-          });
+          return this.registerClient(loginData, clientInfo)
+            .then((client: RegisteredClient) => (registeredClient = client))
+            .then(() => this.service!.client.synchronizeClients())
+            .then(() => {
+              return {isNewClient: true, localClient: registeredClient};
+            });
         }
         if (notFoundOnBackend) {
           const shouldDeleteWholeDatabase = loadedClient.type === ClientType.TEMPORARY;
@@ -368,11 +376,19 @@ class Account extends EventEmitter {
               .purge()
               .then(() => this.apiClient.init())
               .then(() => this.registerClient(loginData, clientInfo))
-              .then((client: RegisteredClient) => this.service!.client.synchronizeClients().then(() => client));
+              .then((client: RegisteredClient) => (registeredClient = client))
+              .then(() => this.service!.client.synchronizeClients())
+              .then(() => {
+                return {isNewClient: true, localClient: registeredClient};
+              });
           }
           return this.service!.cryptography.deleteCryptographyStores()
             .then(() => this.registerClient(loginData, clientInfo))
-            .then((client: RegisteredClient) => this.service!.client.synchronizeClients().then(() => client));
+            .then((client: RegisteredClient) => (registeredClient = client))
+            .then(() => this.service!.client.synchronizeClients())
+            .then(() => {
+              return {isNewClient: true, localClient: registeredClient};
+            });
         }
         throw error;
       });
