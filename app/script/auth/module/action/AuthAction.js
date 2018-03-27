@@ -21,10 +21,11 @@ import BackendError from './BackendError';
 import * as AuthActionCreator from './creator/AuthActionCreator';
 import * as SelfAction from './SelfAction';
 import {currentLanguage, currentCurrency} from '../../localeConfig';
-import {deleteLocalStorage, setLocalStorage, LocalStorageKey} from './LocalStorageAction';
+import {deleteLocalStorage, getLocalStorage, setLocalStorage, LocalStorageKey} from './LocalStorageAction';
 import * as ConversationAction from './ConversationAction';
 import * as ClientAction from './ClientAction';
 import * as TrackingAction from './TrackingAction';
+import {ClientType} from '@wireapp/core/dist/client/root';
 
 export const doLogin = loginData => doLoginPlain(loginData, dispatch => dispatch(doSilentLogout()), dispatch => {});
 
@@ -144,19 +145,17 @@ export function doRegisterPersonal(registration) {
   };
 }
 
-export function doRegisterWireless(registration) {
+export function doRegisterWireless(registrationData) {
   return function(dispatch, getState, {apiClient, core}) {
     const isPermanentClient = false;
-    registration.locale = currentLanguage();
-    registration.name = registration.name.trim();
-    dispatch(
-      AuthActionCreator.startRegisterWireless({
-        locale: registration.locale,
-        name: registration.name,
-      })
-    );
+    registrationData.locale = currentLanguage();
+    registrationData.name = registrationData.name.trim();
+
+    const obfuscatedRegistrationData = {locale: registrationData.locale, name: registrationData.name};
+    dispatch(AuthActionCreator.startRegisterWireless(obfuscatedRegistrationData));
+
     return Promise.resolve()
-      .then(() => apiClient.register(registration, isPermanentClient))
+      .then(() => apiClient.register(registrationData, isPermanentClient))
       .then(() => persistAuthData(isPermanentClient, core, dispatch))
       .then(() => core.init())
       .then(() => dispatch(ClientAction.doInitializeClient(isPermanentClient)))
@@ -172,8 +171,14 @@ export function doRegisterWireless(registration) {
 export function doInit() {
   return function(dispatch, getState, {apiClient}) {
     dispatch(AuthActionCreator.startRefresh());
-    return apiClient
-      .init()
+    return Promise.resolve()
+      .then(() => dispatch(getLocalStorage(LocalStorageKey.AUTH.PERSIST)))
+      .then(persist => {
+        if (persist === undefined) {
+          throw new Error(`Could not find value for '${LocalStorageKey.AUTH.PERSIST}'`);
+        }
+        apiClient.init(persist ? ClientType.PERMANENT : ClientType.TEMPORARY);
+      })
       .then(() => dispatch(SelfAction.fetchSelf()))
       .then(() => dispatch(AuthActionCreator.successfulRefresh(apiClient.accessTokenStore.accessToken)))
       .catch(error => dispatch(AuthActionCreator.failedRefresh(error)));
