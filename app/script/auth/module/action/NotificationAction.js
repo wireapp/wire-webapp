@@ -37,3 +37,9 @@ export function resetHistoryCheck() {
     return Promise.resolve().then(() => dispatch(NotificationActionCreator.resetHistoryCheck()));
   };
 }
+
+export function setLastEventDate(lastEventDate) {
+  return function(dispatch, getState, {core}) {
+    return Promise.resolve().then(() => core.service.notification.setLastEventDate(lastEventDate));
+  };
+}
