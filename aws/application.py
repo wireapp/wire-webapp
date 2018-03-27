@@ -64,6 +64,7 @@ def login():
   ))
   return response
 
+
 @application.route('/join/')
 def join():
   key = flask.request.args.get('key')
@@ -148,10 +149,16 @@ def service_worker():
  response.headers['Cache-Control'] = 'no-cache'
  return response
 
+
 @application.route('/version/')
 @main.latest_browser_required
 def version():
   return flask.jsonify({'version': config.CURRENT_VERSION_ID})
+
+
+@application.route('/googlea55419c13969e993.html')
+def google_site_verification():
+  return 'google-site-verification: googlea55419c13969e993.html'
 
 
 ###############################################################################
