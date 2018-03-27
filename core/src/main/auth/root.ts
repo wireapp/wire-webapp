@@ -18,4 +18,3 @@
  */
 
 export * from './LoginSanitizer';
-export * from './ClientInfo';

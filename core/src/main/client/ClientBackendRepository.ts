@@ -18,12 +18,16 @@
  */
 
 import APIClient = require('@wireapp/api-client');
-import {RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/index';
+import {RegisteredClient, NewClient} from '@wireapp/api-client/dist/commonjs/client/index';
 
 export default class ClientBackendRepository {
   constructor(private apiClient: APIClient) {}
 
   public getClients(): Promise<RegisteredClient[]> {
     return this.apiClient.client.api.getClients();
+  }
+
+  public postClient(client: NewClient): Promise<RegisteredClient> {
+    return this.apiClient.client.api.postClient(client);
   }
 }

@@ -27,7 +27,6 @@ import * as ProteusKeys from '@wireapp/proteus/dist/keys/root';
 import {PreKey as SerializedPreKey} from '@wireapp/api-client/dist/commonjs/auth/index';
 import CryptographyDatabaseRepository from './CryptographyDatabaseRepository';
 import {SessionPayloadBundle} from '../cryptography/root';
-import {ClientService} from '../client/root';
 import {OTRRecipients} from '@wireapp/api-client/dist/commonjs/conversation/index';
 
 export interface MetaClient extends RegisteredClient {
@@ -41,7 +40,7 @@ export default class CryptographyService {
   public cryptobox: Cryptobox;
   private database: CryptographyDatabaseRepository;
 
-  constructor(private apiClient: APIClient, private storeEngine: CRUDEngine, private clientService: ClientService) {
+  constructor(private apiClient: APIClient, private storeEngine: CRUDEngine) {
     this.cryptobox = new Cryptobox(this.storeEngine);
     this.database = new CryptographyDatabaseRepository(this.storeEngine);
   }
@@ -124,9 +123,8 @@ export default class CryptographyService {
     return {sessionId, encryptedPayload};
   }
 
-  public async loadLocalClient(): Promise<RegisteredClient> {
+  public async initCryptobox(): Promise<void> {
     const initialPreKeys: Array<ProteusKeys.PreKey> = await this.cryptobox.load();
-    return this.clientService.getLocalClient();
   }
 
   public deleteCryptographyStores(): Promise<boolean[]> {
