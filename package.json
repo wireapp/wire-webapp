@@ -47,5 +47,5 @@
     "test:node": "jasmine --config=src/test/node/support/jasmine.json"
   },
   "types": "./dist/Account.d.ts",
-  "version": "2.1.20"
+  "version": "2.1.21"
 }
