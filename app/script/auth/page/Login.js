@@ -158,7 +158,6 @@ class Login extends React.PureComponent {
             return this.props.history.push(ROUTE.CLIENTS);
           }
           default: {
-            this.setState({...this.state, validInputs: {...validInputs, email: false, password: false}});
             throw error;
           }
         }
