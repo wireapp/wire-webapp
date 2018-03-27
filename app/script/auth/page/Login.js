@@ -149,7 +149,7 @@ class Login extends React.PureComponent {
       .catch(error => {
         switch (error.label) {
           case BackendError.LABEL.NEW_CLIENT: {
-            const isFirstPersistentClient = login.persist && this.props.clients.length === 1;
+            const isFirstPersistentClient = this.state.persist && this.props.clients.length === 1;
             return isFirstPersistentClient
               ? window.location.replace(URLUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP))
               : this.props.history.push(ROUTE.HISTORY_INFO);
