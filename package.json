@@ -141,17 +141,6 @@
     "*.{json,md}": ["prettier --write", "git add"],
     "*.less": ["prettier --write", "stylelint --fix", "git add"]
   },
-  "stylelint": {
-    "extends": ["stylelint-config-idiomatic-order", "stylelint-config-prettier"],
-    "rules": {
-      "selector-type-no-unknown": [
-        true,
-        {
-          "ignore": ["custom-elements"]
-        }
-      ]
-    }
-  },
   "scripts": {
     "bundle:dev": "webpack --config webpack.config.dev.js --progress",
     "bundle:prod": "webpack --config webpack.config.prod.js --progress",
