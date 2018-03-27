@@ -19,7 +19,7 @@
     "tough-cookie": "2.3.4"
   },
   "devDependencies": {
-    "@wireapp/react-ui-kit": "1.0.17",
+    "@wireapp/react-ui-kit": "1.0.18",
     "babel-core": "6.26.0",
     "babel-loader": "7.1.4",
     "babel-preset-react": "6.24.1",
@@ -65,5 +65,5 @@
     "watch": "webpack-dev-server --config webpack.config.js"
   },
   "types": "./dist/commonjs/Client.d.ts",
-  "version": "0.6.11"
+  "version": "0.6.12"
 }
