@@ -104,12 +104,16 @@ z.string.lt.modalConfirmSecondary = 'Atsisakyti';
 z.string.lt.modalOptionSecondary = 'Atsisakyti';
 
 z.string.lt.modalAccountCreateAction = 'GERAI';
+z.string.lt.modalAccountCreateHeadline = 'Kurti abonementą?';
+z.string.lt.modalAccountCreateMessage = 'Sukūrę paskyrą prarasite bendravimo praeitį šiame svečių kambaryje.';
 
 z.string.lt.modalAccountDeletionAction = 'Ištrinti';
 z.string.lt.modalAccountDeletionHeadline = 'Ištrinti paskyrą';
 z.string.lt.modalAccountDeletionMessage = 'Mes išsiųsime jums pranešimą el. paštu arba SMS žinute. Pereikite nuorodos adresu, kad visiems laikams ištrintumėte savo paskyrą.';
 
 z.string.lt.modalAccountLeaveGuestRoomAction = 'Išeiti';
+z.string.lt.modalAccountLeaveGuestRoomHeadline = 'Išeiti iš svečių kambario?';
+z.string.lt.modalAccountLeaveGuestRoomMessage = 'Bendravimo praeitis bus ištrinta. Norėdami išsaugoti, kitą kartą susikurkite paskyrą.';
 
 z.string.lt.modalAccountLogoutAction = 'Atsijungti';
 z.string.lt.modalAccountLogoutHeadline = 'Išvalyti duomenis?';
@@ -261,6 +265,8 @@ z.string.lt.connectionRequestConnect = 'Užmegzti kontaktą';
 z.string.lt.connectionRequestIgnore = 'Nepaisyti';
 
 z.string.lt.conversationGuestIndicator = 'Svečias';
+z.string.lt.userRemainingTimeHours = 'Liko {{time}} val.';
+z.string.lt.userRemainingTimeMinutes = 'Liko mažiau nei {{time}} min.';
 
 z.string.lt.conversationYouNominative = 'jūs';
 z.string.lt.conversationYouDative = 'jūs';
@@ -302,7 +308,6 @@ z.string.lt.conversationTeamLeave = ' buvo pašalinta(-s) iš komandos';
 z.string.lt.conversationPing = ' patikrino ryšį';
 z.string.lt.conversationPingYou = ' patikrino ryšį';
 z.string.lt.conversationToday = 'šiandien';
-z.string.lt.conversationVerified = 'Patvirtintas';
 z.string.lt.conversationVoiceChannelDeactivate = ' skambino';
 z.string.lt.conversationVoiceChannelDeactivateYou = ' skambino';
 z.string.lt.conversationYesterday = 'Vakar';
@@ -429,7 +434,7 @@ z.string.lt.conversationDetailsActionAddParticipants = 'Pridėti dalyvių';
 z.string.lt.conversationDetailsActionBlock = 'Blokuoti kontaktą';
 z.string.lt.conversationDetailsActionCancelRequest = 'Atsisakyti užklausos';
 z.string.lt.conversationDetailsActionClear = 'Trinti turinį';
-z.string.lt.conversationDetailsActionCreateGroup = 'Sukurti grupę';
+z.string.lt.conversationDetailsActionCreateGroup = 'Nauja grupė';
 z.string.lt.conversationDetailsActionDevices = 'Įrenginiai';
 z.string.lt.conversationDetailsActionGuestOptions = 'Svečių nustatymai';
 z.string.lt.conversationDetailsActionLeave = 'Išeiti iš grupės';
@@ -502,6 +507,8 @@ z.string.lt.preferencesAboutWebsite = 'Wire svetainė';
 z.string.lt.preferencesAccountAvaibilityUnset = 'Pasirinkite būseną';
 z.string.lt.preferencesAccountCreateTeam = 'Sukurti komandą';
 z.string.lt.preferencesAccountDelete = 'Ištrinti paskyrą';
+z.string.lt.preferencesAccountLeaveGuestRoom = 'Išeiti iš svečių kambario';
+z.string.lt.preferencesAccountLeaveGuestRoomDescription = 'Nebegalėsite matyti šio susirašinėjimo žinučių.';
 z.string.lt.preferencesAccountLogOut = 'Atsijungti';
 z.string.lt.preferencesAccountManageTeam = 'Tvarkyti komandą';
 z.string.lt.preferencesAccountResetPassword = 'Atstatyti slaptažodį';
@@ -557,6 +564,9 @@ z.string.lt.preferencesOptionsNotificationsNone = 'Išjungta';
 z.string.lt.preferencesOptionsNotificationsObfuscate = 'Slėpti išsamesnę informaciją';
 z.string.lt.preferencesOptionsNotificationsObfuscateMessage = 'Rodyti siuntėją';
 z.string.lt.preferencesOptionsNotificationsOn = 'Rodyti siuntėją ir žinutę';
+z.string.lt.preferencesOptionsCallLogs = 'Trikčių šalinimas';
+z.string.lt.preferencesOptionsCallLogsGet = 'Išsaugoti skambučių derinimo ataskaitą';
+z.string.lt.preferencesOptionsCallLogsDetail = 'Ši informacija padeda „Wire“ pagalbos centrui išspręsti skambinimo nesklandumus.';
 
 z.string.lt.searchConnect = 'Užmegzti kontaktą';
 z.string.lt.searchConnections = 'Kontaktai';
@@ -590,6 +600,13 @@ z.string.lt.searchListEveryoneParticipates = 'Visi, su kuo esate\nužmezgę kont
 z.string.lt.searchListNoMatches = 'Nėra atitinkančių rezultatų.\nPabandykite įvesti kitą vardą.';
 
 z.string.lt.temporaryGuestCta = 'Kurti paskyrą';
+z.string.lt.temporaryGuestDescription = 'Apsaugokite savo verslą susirašinėdami ir kalbėdami konferenciniu būdu šifruojant.';
+
+z.string.lt.temporaryGuestJoinMessage = 'Šiame susirašinėjime galėsite dalyvauti 24 valandas.';
+z.string.lt.temporaryGuestJoinDescription = 'Jei puslapį uždarysite arba perkrausite iš naujo, prisijungti nebegalėsite.';
+
+z.string.lt.temporaryGuestLeaveMessage = ' išėjo iš šio susirašinėjimo.';
+z.string.lt.temporaryGuestLeaveDescription = 'Jei puslapį uždarysite arba perkrausite iš naujo, susirašinėjimo praeities matyti nebegalėsite.';
 
 z.string.lt.uploadGoogleHeadline = 'Raskite žmones\nsu kuriais pasikalbėti.';
 z.string.lt.uploadGoogleMessage = 'Mes naudojame jūsų kontaktinius duomenis tam, kad padėtume jums užmegzti kontaktą su kitais. Mes padarome visą informaciją anoniminę ir su niekuo ja nesidaliname.';

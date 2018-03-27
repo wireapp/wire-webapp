@@ -106,5 +106,11 @@
   "login.publicComputer": "To je javni računalnik",
   "clientManager.headline": "",
   "clientManager.subhead": "Odstranite eno izmed vaših naprav za začetek uporabe Wire na tej.",
-  "clientManager.logout": "Odjava"
+  "clientManager.logout": "Odjava",
+  "historyInfo.hasHistoryHeadline": "Na tej napravi si že uporabljal(-a) Wire.",
+  "historyInfo.noHistoryHeadline": "Prvič uporabljate Wire na tej napravi.",
+  "historyInfo.hasHistoryInfo": "",
+  "historyInfo.noHistoryInfo": "",
+  "historyInfo.learnMore": "Nauči se več",
+  "historyInfo.ok": "V redu"
 }

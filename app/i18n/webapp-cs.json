@@ -107,5 +107,11 @@
   "login.publicComputer": "Toto je veřejný počítač",
   "clientManager.headline": "",
   "clientManager.subhead": "Odeberte jeden ze svých přístrojů abyste mohli začít používat Wire na tomto zařízení.",
-  "clientManager.logout": "Odhlásit se"
+  "clientManager.logout": "Odhlásit se",
+  "historyInfo.hasHistoryHeadline": "Již jste dříve použili Wire na tomto zařízení.",
+  "historyInfo.noHistoryHeadline": "Toto je poprvé kdy používáte Wire na tomto přístroji.",
+  "historyInfo.hasHistoryInfo": "",
+  "historyInfo.noHistoryInfo": "",
+  "historyInfo.learnMore": "Dozvědět se více",
+  "historyInfo.ok": "OK"
 }
