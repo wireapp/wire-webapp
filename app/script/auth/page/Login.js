@@ -53,6 +53,7 @@ import AppAlreadyOpen from '../component/AppAlreadyOpen';
 import BackendError from '../module/action/BackendError';
 import {Redirect, withRouter} from 'react-router';
 import * as URLUtil from '../util/urlUtil';
+import * as ClientSelector from '../module/selector/ClientSelector';
 
 class Login extends React.PureComponent {
   inputs = {};
@@ -147,12 +148,15 @@ class Login extends React.PureComponent {
       .then(() => window.location.replace(URLUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP)))
       .catch(error => {
         switch (error.label) {
-          case BackendError.LABEL.NEW_CLIENT:
-            this.props.history.push(ROUTE.HISTORY_INFO);
-            break;
-          case BackendError.LABEL.TOO_MANY_CLIENTS:
-            this.props.history.push(ROUTE.CLIENTS);
-            break;
+          case BackendError.LABEL.NEW_CLIENT: {
+            const isFirstPersistentClient = login.persist && this.props.clients.length === 1;
+            return isFirstPersistentClient
+              ? window.location.replace(URLUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP))
+              : this.props.history.push(ROUTE.HISTORY_INFO);
+          }
+          case BackendError.LABEL.TOO_MANY_CLIENTS: {
+            return this.props.history.push(ROUTE.CLIENTS);
+          }
           default: {
             this.setState({...this.state, validInputs: {...validInputs, email: false, password: false}});
             throw error;
@@ -296,6 +300,7 @@ export default withRouter(
   injectIntl(
     connect(
       state => ({
+        clients: ClientSelector.getClients(state),
         isFetching: AuthSelector.isFetching(state),
         loginError: AuthSelector.getError(state),
       }),
