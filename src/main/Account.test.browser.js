@@ -60,10 +60,10 @@ describe('Account', () => {
       };
 
       const account = new Account(apiClient);
-      spyOn(account, 'registerClient').and.callThrough();
 
       try {
         await account.init();
+        spyOn(account.service.client, 'register').and.callThrough();
         account.service.client.synchronizeClients = () => Promise.resolve();
         account.service.notification.backend.getLastNotification = () => Promise.resolve({id: 'notification-id'});
         account.apiClient.context = {};
@@ -75,7 +75,7 @@ describe('Account', () => {
         return done.fail(error);
       }
 
-      expect(account.registerClient).toHaveBeenCalledTimes(1);
+      expect(account.service.client.register).toHaveBeenCalledTimes(1);
       done();
     });
   });

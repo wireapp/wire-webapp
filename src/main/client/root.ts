@@ -18,5 +18,6 @@
  */
 
 import ClientService from './ClientService';
+import {ClientInfo} from './ClientInfo';
 
-export {ClientService};
+export {ClientService, ClientInfo};
