@@ -23,7 +23,7 @@ export function checkHistory() {
   return function(dispatch, getState, {core}) {
     dispatch(NotificationActionCreator.startCheckHistory());
     return Promise.resolve()
-      .then(() => core.service.notification.hasNotificationEvents())
+      .then(() => core.service.notification.hasHistory())
       .then(hasHistory => dispatch(NotificationActionCreator.successfulCheckHistory(hasHistory)))
       .catch(error => {
         dispatch(NotificationActionCreator.failedCheckHistory(error));
