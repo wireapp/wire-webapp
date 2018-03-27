@@ -139,7 +139,7 @@
   "lint-staged": {
     "*.{js,jsx}": ["eslint --fix", "git add"],
     "*.{json,md}": ["prettier --write", "git add"],
-    "*.less": ["stylelint --fix", "git add"]
+    "*.less": ["prettier --write", "stylelint --fix", "git add"]
   },
   "stylelint": {
     "extends": ["stylelint-config-idiomatic-order", "stylelint-config-prettier"],
@@ -168,7 +168,7 @@
     "start": "grunt",
     "start:all": "concurrently \"yarn start:dev\" \"yarn start\"",
     "start:dev": "webpack-dev-server --config webpack.config.dev.js --open",
-    "fix:style": "stylelint --fix --ignore-path .gitignore \"**/*.less\"",
+    "stylelint": "prettier --ignore-path .gitignore --write \"**/*.less\" && stylelint --fix --ignore-path .gitignore \"**/*.less\"",
     "test": "yarn test:assets && yarn test:scripts && grunt check && grunt test",
     "test:assets": "yarn prettier --list-different",
     "test:auth": "yarn bundle:test && karma start karma.conf.react.js",
