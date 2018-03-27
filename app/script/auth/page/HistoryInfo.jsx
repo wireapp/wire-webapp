@@ -23,8 +23,15 @@ import {injectIntl, FormattedHTMLMessage} from 'react-intl';
 import {historyInfoStrings} from '../../strings';
 import Page from './Page';
 import {H1, Link, ContainerXS, Button, Paragraph} from '@wireapp/react-ui-kit';
+import * as ClientSelector from '../module/selector/ClientSelector';
+import EXTERNAL_ROUTE from '../externalRoute';
+import * as URLUtil from '../util/urlUtil';
+import * as NotificationAction from '../module/action/NotificationAction';
 
-function HistoryInfo({hasHistory, intl: {formatMessage: _}}) {
+function HistoryInfo({hasHistory, intl: {formatMessage: _}, ...connected}) {
+  const onContinue = () => {
+    connected.resetHistoryCheck().then(() => window.location.replace(URLUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP)));
+  };
   const headline = hasHistory ? historyInfoStrings.hasHistoryHeadline : historyInfoStrings.noHistoryHeadline;
   const infoText = hasHistory ? historyInfoStrings.hasHistoryInfo : historyInfoStrings.noHistoryInfo;
   return (
@@ -36,17 +43,28 @@ function HistoryInfo({hasHistory, intl: {formatMessage: _}}) {
         </Paragraph>
         {!hasHistory && (
           <Paragraph center style={{marginBottom: 40}}>
-            <Link>{_(historyInfoStrings.learnMore)}</Link>
+            <Link
+              href="https://support.wire.com/hc/articles/207834645"
+              target="_blank"
+              data-uie-name="do-history-learn-more"
+            >
+              {_(historyInfoStrings.learnMore)}
+            </Link>
           </Paragraph>
         )}
-        <Button>{_(historyInfoStrings.ok)}</Button>
+        <Button onClick={onContinue} data-uie-name="do-history-confirm">
+          {_(historyInfoStrings.ok)}
+        </Button>
       </ContainerXS>
     </Page>
   );
 }
 
 export default injectIntl(
-  connect(state => ({
-    hasHistory: true, // TODO: connect to real selector
-  }))(HistoryInfo)
+  connect(
+    state => ({
+      hasHistory: ClientSelector.hasHistory(state),
+    }),
+    {...NotificationAction}
+  )(HistoryInfo)
 );

@@ -54,6 +54,7 @@ export default class BackendError extends Error {
     INVALID_PHONE: 'invalid-phone',
     KEY_EXISTS: 'key-exists',
     MISSING_AUTH: 'missing-auth',
+    NEW_CLIENT: 'new-client', // Synthetic error label
     PENDING_ACTIVATION: 'pending-activation',
     PENDING_LOGIN: 'pending-login',
     SUSPENDED: 'suspended',
