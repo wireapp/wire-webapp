@@ -19,9 +19,9 @@
 
 // default
 .button {
-  .accent-background-color();
-  .button-large(); // default size is large
-  .label-bold-xs();
+  .accent-background-color;
+  .button-large; // default size is large
+  .label-bold-xs;
   border: @button-border-size solid transparent;
   border-radius: @button-border-radius;
   color: #fff;
@@ -43,8 +43,8 @@
 
   // types
   &.button-inverted {
-    .accent-color();
-    .accent-border-color();
+    .accent-color;
+    .accent-border-color;
     background-color: transparent;
   }
 
@@ -195,15 +195,15 @@
 }
 
 .button-theme {
-  .accent-background-color();
-  .button-color();
+  .accent-background-color;
+  .button-color;
   &.disabled {
     .accent-color(24%);
   }
 }
 
 .button-theme-color(@color) {
-  .button-color();
+  .button-color;
   background-color: @color !important;
   &.toggled {
     color: @color !important;

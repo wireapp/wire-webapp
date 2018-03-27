@@ -59,7 +59,11 @@ export const WirelessContainer = ({
             <FormattedHTMLMessage style={{textAlign: 'center'}} {...cookiePolicyStrings.bannerText} />
           </Link>
         </div>
-        <div onClick={onCookiePolicyBannerClose} style={{margin: '20px'}} data-uie-name="do-close-cookie-banner">
+        <div
+          onClick={onCookiePolicyBannerClose}
+          style={{cursor: 'pointer', padding: '20px'}}
+          data-uie-name="do-close-cookie-banner"
+        >
           <CloseIcon />
         </div>
       </Header>

@@ -847,7 +847,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   joinConversationWithCode(key, code) {
-    return this.conversation_service.postConversationJoin(key, code).then(response => this._onCreate(response));
+    return this.conversation_service.postConversationJoin(key, code).then(response => {
+      if (response) {
+        return this._onCreate(response);
+      }
+    });
   }
 
   /**
