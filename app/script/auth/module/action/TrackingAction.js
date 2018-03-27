@@ -22,6 +22,9 @@ import RuntimeUtil from '../../util/RuntimeUtil';
 import {REGISTER_FLOW} from '../selector/AuthSelector';
 
 export const EVENT_NAME = {
+  ACCOUNT: {
+    LOGGED_IN: 'account.logged_in',
+  },
   CONVERSATION: {
     ADD_PARTICIPANTS: 'conversation.add_participants',
   },

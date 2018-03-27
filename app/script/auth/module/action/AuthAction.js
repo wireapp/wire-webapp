@@ -24,29 +24,36 @@ import {currentLanguage, currentCurrency} from '../../localeConfig';
 import {deleteLocalStorage, setLocalStorage, LocalStorageKey} from './LocalStorageAction';
 import * as ConversationAction from './ConversationAction';
 import * as ClientAction from './ClientAction';
+import * as TrackingAction from './TrackingAction';
 
 export const doLogin = loginData => doLoginPlain(loginData, dispatch => dispatch(doSilentLogout()), dispatch => {});
 
-export const doLoginAndJoin = (loginData, key, code, uri) =>
-  doLoginPlain(
-    loginData,
-    dispatch => dispatch(doSilentLogout()),
-    dispatch => dispatch(ConversationAction.doJoinConversationByCode(key, code, uri))
-  );
+export const doLoginAndJoin = (loginData, key, code, uri) => {
+  const onBeforeLogin = dispatch => dispatch(doSilentLogout());
+  const onAfterLogin = dispatch => dispatch(ConversationAction.doJoinConversationByCode(key, code, uri));
+
+  return doLoginPlain(loginData, onBeforeLogin, onAfterLogin);
+};
 
 function doLoginPlain(loginData, onBeforeLogin, onAfterLogin) {
   return function(dispatch, getState, global) {
     const {core} = global;
-    dispatch(
-      AuthActionCreator.startLogin({
-        email: loginData.email,
-        password: '******',
-      })
-    );
+
+    const obfuscatedLoginData = {...loginData, password: '********'};
+    dispatch(AuthActionCreator.startLogin(obfuscatedLoginData));
+
     return Promise.resolve()
       .then(() => onBeforeLogin(dispatch, getState, global))
       .then(() => core.login(loginData, false, ClientAction.generateClientPayload(loginData.persist)))
       .then(() => persistAuthData(loginData.persist, core, dispatch))
+      .then(() => {
+        const loginContext = loginData.email ? 'email' : 'handle';
+        const trackingEventData = {
+          attributes: {context: loginContext, remember_me: loginData.persist},
+          name: TrackingAction.EVENT_NAME.ACCOUNT.LOGGED_IN,
+        };
+        return TrackingAction.trackEvent(trackingEventData);
+      })
       .then(() => dispatch(SelfAction.fetchSelf()))
       .then(() => onAfterLogin(dispatch, getState, global))
       .then(() => dispatch(ClientAction.doInitializeClient(loginData.persist, loginData.password)))
