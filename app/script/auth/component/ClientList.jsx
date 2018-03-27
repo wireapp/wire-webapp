@@ -28,6 +28,7 @@ import {connect} from 'react-redux';
 import EXTERNAL_ROUTE from '../externalRoute';
 import ROUTE from '../route';
 import BackendError from '../module/action/BackendError';
+import {withRouter} from 'react-router';
 
 class ClientList extends React.Component {
   state = {
@@ -43,12 +44,10 @@ class ClientList extends React.Component {
   removeClient = (clientId, password) => {
     return Promise.resolve()
       .then(() => this.props.doRemoveClient(clientId, password))
-      .then(() =>
-        this.props.doInitializeClient(
-          this.props.getLocalStorage(LocalStorageAction.LocalStorageKey.AUTH.PERSIST),
-          password
-        )
-      )
+      .then(() => {
+        const persist = this.props.getLocalStorage(LocalStorageAction.LocalStorageKey.AUTH.PERSIST);
+        return this.props.doInitializeClient(persist, password);
+      })
       .then(() => window.location.replace(URLUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP)))
       .catch(error => {
         if (error.label === BackendError.LABEL.NEW_CLIENT) {
@@ -86,13 +85,15 @@ class ClientList extends React.Component {
   }
 }
 
-export default injectIntl(
-  connect(
-    state => ({
-      clientError: ClientSelector.getError(state),
-      isFetching: ClientSelector.isFetching(state),
-      permanentClients: ClientSelector.getPermanentClients(state),
-    }),
-    {...ClientAction, ...LocalStorageAction}
-  )(ClientList)
+export default withRouter(
+  injectIntl(
+    connect(
+      state => ({
+        clientError: ClientSelector.getError(state),
+        isFetching: ClientSelector.isFetching(state),
+        permanentClients: ClientSelector.getPermanentClients(state),
+      }),
+      {...ClientAction, ...LocalStorageAction}
+    )(ClientList)
+  )
 );

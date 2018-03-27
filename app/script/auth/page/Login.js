@@ -142,11 +142,11 @@ class Login extends React.PureComponent {
       .then(() => window.location.replace(URLUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP)))
       .catch(error => {
         switch (error.label) {
-          case BackendError.LABEL.TOO_MANY_CLIENTS:
-            this.props.history.push(ROUTE.CLIENTS);
-            break;
           case BackendError.LABEL.NEW_CLIENT:
             this.props.history.push(ROUTE.HISTORY_INFO);
+            break;
+          case BackendError.LABEL.TOO_MANY_CLIENTS:
+            this.props.history.push(ROUTE.CLIENTS);
             break;
           default: {
             this.setState({...this.state, validInputs: {...validInputs, email: false, password: false}});
