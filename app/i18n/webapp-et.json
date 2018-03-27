@@ -109,5 +109,11 @@
   "login.publicComputer": "See on avalik arvuti",
   "clientManager.headline": "Eemalda seade",
   "clientManager.subhead": "Eemalda üks oma teistest seadmetest, et sellel Wire’i kasutada.",
-  "clientManager.logout": "Logi välja"
+  "clientManager.logout": "Logi välja",
+  "historyInfo.hasHistoryHeadline": "Oled sellel seadmel juba varem Wire’i kasutanud.",
+  "historyInfo.noHistoryHeadline": "Kasutad sellel seadmel Wire’it esimest korda.",
+  "historyInfo.hasHistoryInfo": "",
+  "historyInfo.noHistoryInfo": "",
+  "historyInfo.learnMore": "Loe lähemalt",
+  "historyInfo.ok": "OK"
 }

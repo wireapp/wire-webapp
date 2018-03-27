@@ -253,7 +253,6 @@ z.string.fi.conversationTeamLeave = ' poistettiin tiimistä';
 z.string.fi.conversationPing = ' pinggasi';
 z.string.fi.conversationPingYou = ' pinggasi';
 z.string.fi.conversationToday = 'tänään';
-z.string.fi.conversationVerified = 'Vahvistettu';
 z.string.fi.conversationVoiceChannelDeactivate = ' soitti';
 z.string.fi.conversationVoiceChannelDeactivateYou = ' soitti';
 z.string.fi.conversationYesterday = 'Eilen';
@@ -352,7 +351,6 @@ z.string.fi.addParticipantsTabsPeople = 'Ihmiset';
 z.string.fi.addParticipantsTabsServices = 'Palvelut';
 
 z.string.fi.conversationDetailsActionCancelRequest = 'Peru pyyntö';
-z.string.fi.conversationDetailsActionCreateGroup = 'Luo ryhmä';
 z.string.fi.conversationDetailsActionDevices = 'Laitteet';
 z.string.fi.conversationDetailsGuestsOff = 'Pois päältä';
 z.string.fi.conversationDetailsParticipantsServicesMany = 'Palvelut';

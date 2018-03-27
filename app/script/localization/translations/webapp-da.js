@@ -240,7 +240,6 @@ z.string.da.conversationResume = 'Start en samtale med {{users}}';
 z.string.da.conversationPing = ' pingede';
 z.string.da.conversationPingYou = ' pingede';
 z.string.da.conversationToday = 'i dag';
-z.string.da.conversationVerified = 'Bekræftet';
 z.string.da.conversationVoiceChannelDeactivate = ' ringede';
 z.string.da.conversationVoiceChannelDeactivateYou = ' ringede';
 z.string.da.conversationYesterday = 'I går';
@@ -329,7 +328,6 @@ z.string.da.addParticipantsTabsPeople = 'Personer';
 z.string.da.addParticipantsTabsServices = 'Tjenester';
 
 z.string.da.conversationDetailsActionCancelRequest = 'Annuller anmodning';
-z.string.da.conversationDetailsActionCreateGroup = 'Opret gruppe';
 z.string.da.conversationDetailsActionDevices = 'Enheder';
 z.string.da.conversationDetailsGuestsOff = 'Slået Fra';
 z.string.da.conversationDetailsParticipantsServicesMany = 'Tjenester';
