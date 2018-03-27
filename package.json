@@ -168,7 +168,7 @@
     "start": "grunt",
     "start:all": "concurrently \"yarn start:dev\" \"yarn start\"",
     "start:dev": "webpack-dev-server --config webpack.config.dev.js --open",
-    "stylelint": "stylelint --fix --ignore-path .gitignore \"**/*.less\"",
+    "fix:style": "stylelint --fix --ignore-path .gitignore \"**/*.less\"",
     "test": "yarn test:assets && yarn test:scripts && grunt check && grunt test",
     "test:assets": "yarn prettier --list-different",
     "test:auth": "yarn bundle:test && karma start karma.conf.react.js",
