@@ -30,7 +30,6 @@ export default {
   INITIAL_INVITE: '/teaminvite',
   INVITE: '/invite',
   LOGIN: '/login',
-  PASSWORD_RESET: '/forgot',
   PERSONAL_INVITE: '/personalinvite',
   VERIFY: '/verify',
 };

@@ -99,13 +99,18 @@ z.conversation.EventBuilder = {
       type: z.event.Client.CONVERSATION.DELETE_EVERYWHERE,
     };
   },
-  buildGroupCreation(conversationEntity, timestamp = 0) {
+  buildGroupCreation(conversationEntity, isTemporaryGuest = false, timestamp = 0) {
     const {creator: creatorId, id, self: selfUser} = conversationEntity;
 
     const userIds = conversationEntity.participating_user_ids();
-    const createdBySelf = selfUser.id === conversationEntity.creator;
+    const createdBySelf = creatorId === selfUser.id || isTemporaryGuest;
     if (!createdBySelf) {
       userIds.push(selfUser.id);
+    }
+
+    const addCreatorToUsers = isTemporaryGuest && creatorId !== selfUser.id;
+    if (addCreatorToUsers) {
+      userIds.push(creatorId);
     }
 
     return {
@@ -114,7 +119,7 @@ z.conversation.EventBuilder = {
         name: conversationEntity.name(),
         userIds: userIds,
       },
-      from: creatorId,
+      from: isTemporaryGuest ? selfUser.id : creatorId,
       id: z.util.createRandomUuid(),
       time: new Date(timestamp).toISOString(),
       type: z.event.Client.CONVERSATION.GROUP_CREATION,
