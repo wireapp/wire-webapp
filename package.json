@@ -139,7 +139,7 @@
   "lint-staged": {
     "*.{js,jsx}": ["eslint --fix", "git add"],
     "*.{json,md}": ["prettier --write", "git add"],
-    "*.{less}": ["stylelint --fix", "git add"]
+    "**/*.{less}": ["stylelint --fix", "git add"]
   },
   "stylelint": {
     "extends": ["stylelint-config-idiomatic-order", "stylelint-config-prettier"],
