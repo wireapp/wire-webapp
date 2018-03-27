@@ -176,7 +176,7 @@ export function doInit() {
     return Promise.resolve()
       .then(() => dispatch(getLocalStorage(LocalStorageKey.AUTH.PERSIST)))
       .then(persist => {
-        if (!persist) {
+        if (persist === undefined) {
           throw new Error(`Could not find value for '${LocalStorageKey.AUTH.PERSIST}'`);
         }
         apiClient.init(persist ? ClientType.PERMANENT : ClientType.TEMPORARY);
