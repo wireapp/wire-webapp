@@ -40,9 +40,10 @@ export function doJoinConversationByCode(key, code, uri) {
     dispatch(ConversationActionCreator.startJoinConversationByCode(params));
     return Promise.resolve()
       .then(() => apiClient.conversation.api.postJoinByCode({code, key, uri}))
-      .then(conversationEvent =>
-        dispatch(ConversationActionCreator.successfulJoinConversationByCode(conversationEvent))
-      )
+      .then(conversationEvent => {
+        dispatch(ConversationActionCreator.successfulJoinConversationByCode(conversationEvent));
+        return conversationEvent;
+      })
       .catch(error => {
         dispatch(ConversationActionCreator.failedJoinConversationByCode(error));
         throw BackendError.handle(error);
