@@ -42,7 +42,7 @@ const StyledCheckbox = Input.withComponent('input').extend.attrs({
 `;
 
 const checkSvg =
-  '<svg xmlns="http://www.w3.org/2000/svg" width="8" height="6" viewBox="0 0 8 6"><path fill="white" d="M2.8 6L8 .7 7.3 0 2.8 4.6.7 2.4l-.7.7z/></svg>';
+  '<svg xmlns="http://www.w3.org/2000/svg" width="8" height="6" viewBox="0 0 8 6"><path fill="white" d="M2.8 6L8 .7 7.3 0 2.8 4.6.7 2.4l-.7.7z"/></svg>';
 
 const StyledLabel = styled.label`
   display: flex;
