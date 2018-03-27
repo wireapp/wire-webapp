@@ -603,7 +603,7 @@ z.string.de.temporaryGuestCta = 'Erstelle ein Benutzerkonto';
 z.string.de.temporaryGuestDescription = 'Für sichere Unternehmen mit verschlüsselter Kommunikation in Gruppen und Telefonkonferenzen.';
 z.string.de.temporaryGuestTimeRemaining = ' verbleibend in diesem Gästezimmer';
 
-z.string.de.temporaryGuestJoinMessage = 'Diese Unterhaltung steht für dich für 24 Stunden zur Verfügung.';
+z.string.de.temporaryGuestJoinMessage = 'Diese Unterhaltung steht für dich 24 Stunden lang zur Verfügung.';
 z.string.de.temporaryGuestJoinDescription = 'Wenn du diese Seite schließt oder neu lädst, verlierst du den Zugriff.';
 
 z.string.de.temporaryGuestLeaveMessage = ' bist nicht länger Teil dieser Unterhaltung.';
