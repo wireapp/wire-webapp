@@ -130,13 +130,13 @@ class Client {
     };
   }
 
-  public init(): Promise<Context> {
+  public init(clientType?: ClientType): Promise<Context> {
     let context: Context;
     let accessToken: AccessTokenData;
     return this.transport.http
       .postAccess()
       .then((createdAccessToken: AccessTokenData) => {
-        context = this.createContext(createdAccessToken.user);
+        context = this.createContext(createdAccessToken.user, undefined, clientType);
         accessToken = createdAccessToken;
       })
       .then(() => this.initEngine(context))
