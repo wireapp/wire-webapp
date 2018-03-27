@@ -255,7 +255,6 @@ z.string.es.conversationTeamLeave = ' se ha eliminado del grupo';
 z.string.es.conversationPing = ' ping';
 z.string.es.conversationPingYou = ' ping';
 z.string.es.conversationToday = 'hoy';
-z.string.es.conversationVerified = 'Verificado';
 z.string.es.conversationVoiceChannelDeactivate = ' llamó';
 z.string.es.conversationVoiceChannelDeactivateYou = ' llamó';
 z.string.es.conversationYesterday = 'Ayer';
@@ -354,7 +353,6 @@ z.string.es.addParticipantsTabsPeople = 'Personas';
 z.string.es.addParticipantsTabsServices = 'Servicios';
 
 z.string.es.conversationDetailsActionCancelRequest = 'Cancelar solicitud';
-z.string.es.conversationDetailsActionCreateGroup = 'Crear grupo';
 z.string.es.conversationDetailsActionDevices = 'Dispositivos';
 z.string.es.conversationDetailsGuestsOff = 'Desactivar';
 z.string.es.conversationDetailsParticipantsServicesMany = 'Servicios';

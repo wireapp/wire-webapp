@@ -244,7 +244,6 @@ z.string.sl.conversationTeamLeave = ' je bil(-a) odstranjen(-a) iz ekipe';
 z.string.sl.conversationPing = ' je pingal(-a)';
 z.string.sl.conversationPingYou = ' je pingal(-a)';
 z.string.sl.conversationToday = 'danes';
-z.string.sl.conversationVerified = 'Preverjena';
 z.string.sl.conversationVoiceChannelDeactivate = ' je klical(-a)';
 z.string.sl.conversationVoiceChannelDeactivateYou = ' je klical(-a)';
 z.string.sl.conversationYesterday = 'Včeraj';
@@ -341,7 +340,6 @@ z.string.sl.addParticipantsTabsPeople = 'Osebe';
 z.string.sl.addParticipantsTabsServices = 'Storitve';
 
 z.string.sl.conversationDetailsActionCancelRequest = 'Prekliči prošnjo';
-z.string.sl.conversationDetailsActionCreateGroup = 'Ustvari skupino';
 z.string.sl.conversationDetailsActionDevices = 'Naprave';
 z.string.sl.conversationDetailsGuestsOff = 'Izklopljeno';
 z.string.sl.conversationDetailsParticipantsServicesMany = 'Storitve';

@@ -106,5 +106,11 @@
   "login.publicComputer": "To jest komputer publiczny",
   "clientManager.headline": "",
   "clientManager.subhead": "Żeby dodać to urządzenie, usuń jedno z poprzednich.",
-  "clientManager.logout": "Wyloguj się"
+  "clientManager.logout": "Wyloguj się",
+  "historyInfo.hasHistoryHeadline": "Używałeś wcześniej Wire na tym urządzeniu.",
+  "historyInfo.noHistoryHeadline": "Uruchomiłeś Wire na tym urządzeniu po raz pierwszy.",
+  "historyInfo.hasHistoryInfo": "",
+  "historyInfo.noHistoryInfo": "",
+  "historyInfo.learnMore": "Więcej informacji",
+  "historyInfo.ok": "OK"
 }

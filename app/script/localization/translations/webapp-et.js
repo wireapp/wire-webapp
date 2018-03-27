@@ -104,6 +104,8 @@ z.string.et.modalConfirmSecondary = 'Tühista';
 z.string.et.modalOptionSecondary = 'Tühista';
 
 z.string.et.modalAccountCreateAction = 'OK';
+z.string.et.modalAccountCreateHeadline = 'Lood konto?';
+z.string.et.modalAccountCreateMessage = 'Luues konto, kaotad sa vestlusajaloo selles külalistetoas.';
 
 z.string.et.modalAccountDeletionAction = 'Kustuta';
 z.string.et.modalAccountDeletionHeadline = 'Kustuta konto';
@@ -261,6 +263,7 @@ z.string.et.connectionRequestConnect = 'Ühendu';
 z.string.et.connectionRequestIgnore = 'Ignoreeri';
 
 z.string.et.conversationGuestIndicator = 'Külaline';
+z.string.et.userRemainingTimeHours = '{{time}}h jäänud';
 
 z.string.et.conversationYouNominative = 'sina';
 z.string.et.conversationYouDative = 'sina';
@@ -302,7 +305,6 @@ z.string.et.conversationTeamLeave = ' eemaldati meeskonnast';
 z.string.et.conversationPing = ' pingis';
 z.string.et.conversationPingYou = ' pingis';
 z.string.et.conversationToday = 'täna';
-z.string.et.conversationVerified = 'Kinnitatud';
 z.string.et.conversationVoiceChannelDeactivate = ' helistas';
 z.string.et.conversationVoiceChannelDeactivateYou = ' helistas';
 z.string.et.conversationYesterday = 'Eile';
@@ -429,7 +431,7 @@ z.string.et.conversationDetailsActionAddParticipants = 'Lisa osalejaid';
 z.string.et.conversationDetailsActionBlock = 'Blokeeri kontakt';
 z.string.et.conversationDetailsActionCancelRequest = 'Tühista taotlus';
 z.string.et.conversationDetailsActionClear = 'Kustuta sisu';
-z.string.et.conversationDetailsActionCreateGroup = 'Loo grupp';
+z.string.et.conversationDetailsActionCreateGroup = 'Uus grupp';
 z.string.et.conversationDetailsActionDevices = 'Seadmed';
 z.string.et.conversationDetailsActionGuestOptions = 'Külaliste valikud';
 z.string.et.conversationDetailsActionLeave = 'Lahku grupist';
@@ -557,6 +559,7 @@ z.string.et.preferencesOptionsNotificationsNone = 'Väljas';
 z.string.et.preferencesOptionsNotificationsObfuscate = 'Peida üksikasjad';
 z.string.et.preferencesOptionsNotificationsObfuscateMessage = 'Kuva saatjat';
 z.string.et.preferencesOptionsNotificationsOn = 'Kuva saatjat ja sõnumit';
+z.string.et.preferencesOptionsCallLogs = 'Veaotsing';
 
 z.string.et.searchConnect = 'Ühendu';
 z.string.et.searchConnections = 'Ühendused';

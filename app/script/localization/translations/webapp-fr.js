@@ -266,7 +266,6 @@ z.string.fr.conversationTeamLeave = ' a été exclu de l’équipe';
 z.string.fr.conversationPing = ' a fait un signe';
 z.string.fr.conversationPingYou = ' a fait un signe';
 z.string.fr.conversationToday = 'aujourd’hui';
-z.string.fr.conversationVerified = 'Vérifié';
 z.string.fr.conversationVoiceChannelDeactivate = ' a essayé d’appeler';
 z.string.fr.conversationVoiceChannelDeactivateYou = ' a essayé d’appeler';
 z.string.fr.conversationYesterday = 'Hier';
@@ -373,7 +372,7 @@ z.string.fr.addParticipantsTabsPeople = 'Personnes';
 z.string.fr.addParticipantsTabsServices = 'Services';
 
 z.string.fr.conversationDetailsActionCancelRequest = 'Annuler la demande';
-z.string.fr.conversationDetailsActionCreateGroup = 'Créer un groupe';
+z.string.fr.conversationDetailsActionCreateGroup = 'Nouveau groupe';
 z.string.fr.conversationDetailsActionDevices = 'Appareils';
 z.string.fr.conversationDetailsGuestsOff = 'Désactiver';
 z.string.fr.conversationDetailsParticipantsServicesMany = 'Services';
@@ -480,9 +479,6 @@ z.string.fr.preferencesOptionsNotificationsNone = 'Désactiver';
 z.string.fr.preferencesOptionsNotificationsObfuscate = 'Masquer les détails';
 z.string.fr.preferencesOptionsNotificationsObfuscateMessage = 'Afficher l’expéditeur';
 z.string.fr.preferencesOptionsNotificationsOn = 'Afficher l’expéditeur et le message';
-z.string.fr.preferencesOptionsCallLogs = 'Dépannage';
-z.string.fr.preferencesOptionsCallLogsGet = 'Sauvegarder le rapport de débogage des appels';
-z.string.fr.preferencesOptionsCallLogsDetail = 'Cette information aide l’assistance de Wire à diagnostiquer les problèmes d’appel.';
 
 z.string.fr.searchConnect = 'Se connecter';
 z.string.fr.searchConnections = 'Contacts';

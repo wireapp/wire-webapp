@@ -106,5 +106,11 @@
   "login.publicComputer": "Questo computer è pubblico",
   "clientManager.headline": "",
   "clientManager.subhead": "Rimuovi uno dei tuoi dispositivi per iniziare a utilizzare Wire su questo.",
-  "clientManager.logout": "Logout"
+  "clientManager.logout": "Logout",
+  "historyInfo.hasHistoryHeadline": "Hai utilizzato Wire su questo dispositivo prima.",
+  "historyInfo.noHistoryHeadline": "È la prima volta che utilizzi Wire questo dispositivo.",
+  "historyInfo.hasHistoryInfo": "",
+  "historyInfo.noHistoryInfo": "",
+  "historyInfo.learnMore": "Ulteriori informazioni",
+  "historyInfo.ok": "OK"
 }
