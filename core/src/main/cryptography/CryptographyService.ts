@@ -17,6 +17,7 @@
  *
  */
 
+const logdown = require('logdown');
 import APIClient = require('@wireapp/api-client');
 import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine/index';
 import {Cryptobox, store as CryptoboxStore} from '@wireapp/cryptobox';
@@ -37,12 +38,18 @@ export interface MetaClient extends RegisteredClient {
 }
 
 export default class CryptographyService {
+  private logger: any = logdown('@wireapp/core/Account', {
+    logger: console,
+    markdown: false,
+  });
+
   public cryptobox: Cryptobox;
   private database: CryptographyDatabaseRepository;
 
   constructor(private apiClient: APIClient, private storeEngine: CRUDEngine) {
     this.cryptobox = new Cryptobox(this.storeEngine);
     this.database = new CryptographyDatabaseRepository(this.storeEngine);
+    this.logger.state.isEnabled = true;
   }
 
   public static constructSessionId(userId: string, clientId: string): string {
@@ -50,6 +57,7 @@ export default class CryptographyService {
   }
 
   public async createCryptobox(): Promise<Array<SerializedPreKey>> {
+    this.logger.info('createCryptobox');
     const initialPreKeys: Array<ProteusKeys.PreKey> = await this.cryptobox.create();
 
     return initialPreKeys
@@ -64,6 +72,7 @@ export default class CryptographyService {
   }
 
   public decrypt(sessionId: string, encodedCiphertext: string): Promise<Uint8Array> {
+    this.logger.info('decrypt');
     const messageBytes: Uint8Array = Decoder.fromBase64(encodedCiphertext).asBytes;
     return this.cryptobox.decrypt(sessionId, messageBytes.buffer);
   }
@@ -73,6 +82,7 @@ export default class CryptographyService {
   }
 
   public async encrypt(plainText: Uint8Array, preKeyBundles: UserPreKeyBundleMap): Promise<OTRRecipients> {
+    this.logger.info('encrypt');
     const recipients: OTRRecipients = {};
     const encryptions: Array<Promise<SessionPayloadBundle>> = [];
 
@@ -106,6 +116,7 @@ export default class CryptographyService {
     plainText: Uint8Array,
     base64EncodedPreKey: string
   ): Promise<SessionPayloadBundle> {
+    this.logger.info('encryptPayloadForSession');
     let encryptedPayload;
 
     try {
@@ -124,10 +135,12 @@ export default class CryptographyService {
   }
 
   public async initCryptobox(): Promise<void> {
+    this.logger.info('initCryptobox');
     const initialPreKeys: Array<ProteusKeys.PreKey> = await this.cryptobox.load();
   }
 
   public deleteCryptographyStores(): Promise<boolean[]> {
+    this.logger.info('deleteCryptographyStores');
     return this.database.deleteStores();
   }
 }

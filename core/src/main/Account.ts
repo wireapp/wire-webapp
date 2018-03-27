@@ -18,7 +18,7 @@
  */
 
 const pkg = require('../package.json');
-const Logdown = require('logdown');
+const logdown = require('logdown');
 import {IncomingNotification} from '@wireapp/api-client/dist/commonjs/conversation/index';
 import * as cryptobox from '@wireapp/cryptobox';
 import {CryptographyService, GenericMessageType, PayloadBundle} from './cryptography/root';
@@ -47,6 +47,11 @@ import {StatusCode} from '@wireapp/api-client/dist/commonjs/http/index';
 import {RecordNotFoundError} from '@wireapp/store-engine/dist/commonjs/engine/error/index';
 
 class Account extends EventEmitter {
+  private logger: any = logdown('@wireapp/core/Account', {
+    logger: console,
+    markdown: false,
+  });
+
   public static INCOMING = {
     TEXT_MESSAGE: 'Account.INCOMING.TEXT_MESSAGE',
   };
@@ -59,17 +64,15 @@ class Account extends EventEmitter {
     cryptography: CryptographyService;
     notification: NotificationService;
   };
-  private logger: any = Logdown('@wireapp/core/Account', {
-    logger: console,
-    markdown: false,
-  });
 
   constructor(apiClient: Client = new Client()) {
     super();
     this.apiClient = apiClient;
+    this.logger.state.isEnabled = true;
   }
 
   private init(): Promise<void> {
+    this.logger.info('init');
     const proto = {
       options: {java_package: 'com.waz.model'},
       nested: {
@@ -322,6 +325,7 @@ class Account extends EventEmitter {
     initClient: boolean = true,
     clientInfo?: ClientInfo
   ): Promise<Context | undefined> {
+    this.logger.info('login');
     return this.resetContext()
       .then(() => this.init())
       .then(() => LoginSanitizer.removeNonPrintableCharacters(loginData))
@@ -337,6 +341,7 @@ class Account extends EventEmitter {
     loginData: LoginData,
     clientInfo?: ClientInfo
   ): Promise<{isNewClient: boolean; localClient: RegisteredClient}> {
+    this.logger.info('initClient');
     if (!this.service) {
       throw new Error('Services are not set.');
     }
@@ -363,9 +368,11 @@ class Account extends EventEmitter {
         const notFoundOnBackend = error.response && error.response.status === StatusCode.NOT_FOUND;
 
         if (notFoundInDatabase) {
+          this.logger.info('Could not find valid client in database');
           return this.service!.client.register(loginData, clientInfo)
             .then((client: RegisteredClient) => (registeredClient = client))
             .then(() => {
+              this.logger.info('Client is created');
               this.apiClient.context!.clientId = registeredClient.id;
               this.service!.conversation.setClientID(registeredClient.id);
               return this.service!.notification.initializeNotificationStream(registeredClient.id);
@@ -376,14 +383,17 @@ class Account extends EventEmitter {
             });
         }
         if (notFoundOnBackend) {
+          this.logger.info('Could not find valid client on backend');
           const shouldDeleteWholeDatabase = loadedClient.type === ClientType.TEMPORARY;
           if (shouldDeleteWholeDatabase) {
+            this.logger.info('Last client was temporary - Deleting database');
             return this.apiClient.config.store
               .purge()
               .then(() => this.apiClient.init(loginData.persist ? ClientType.PERMANENT : ClientType.TEMPORARY))
               .then(() => this.service!.client.register(loginData, clientInfo))
               .then((client: RegisteredClient) => (registeredClient = client))
               .then(() => {
+                this.logger.info('Client is created');
                 this.apiClient.context!.clientId = registeredClient.id;
                 this.service!.conversation.setClientID(registeredClient.id);
                 return this.service!.notification.initializeNotificationStream(registeredClient.id);
@@ -393,10 +403,12 @@ class Account extends EventEmitter {
                 return {isNewClient: true, localClient: registeredClient};
               });
           }
+          this.logger.info('Last client was permanent - Deleting cryptograpy stores');
           return this.service!.cryptography.deleteCryptographyStores()
             .then(() => this.service!.client.register(loginData, clientInfo))
             .then((client: RegisteredClient) => (registeredClient = client))
             .then(() => {
+              this.logger.info('Client is created');
               this.apiClient.context!.clientId = registeredClient.id;
               this.service!.conversation.setClientID(registeredClient.id);
               return this.service!.notification.initializeNotificationStream(registeredClient.id);
@@ -411,6 +423,7 @@ class Account extends EventEmitter {
   }
 
   private resetContext(): Promise<void> {
+    this.logger.info('resetContext');
     return Promise.resolve().then(() => {
       delete this.apiClient.context;
       delete this.service;
@@ -418,10 +431,12 @@ class Account extends EventEmitter {
   }
 
   public logout(): Promise<void> {
+    this.logger.info('logout');
     return this.apiClient.logout().then(() => this.resetContext());
   }
 
   public listen(loginData: LoginData, notificationHandler?: Function): Promise<Account> {
+    this.logger.info('listen');
     return Promise.resolve()
       .then(() => (this.apiClient.context ? this.apiClient.context : this.login(loginData, true)))
       .then(() => {
@@ -438,6 +453,7 @@ class Account extends EventEmitter {
   }
 
   private decodeEvent(event: ConversationEvent): Promise<string> {
+    this.logger.info('decodeEvent');
     return new Promise(resolve => {
       if (!this.service) {
         throw new Error('Services are not set.');
@@ -466,6 +482,7 @@ class Account extends EventEmitter {
   }
 
   private handleEvent(event: ConversationEvent): Promise<PayloadBundle> {
+    this.logger.info('handleEvent');
     const {conversation, from} = event;
     return this.decodeEvent(event).then((content: string) => {
       return {
@@ -477,6 +494,7 @@ class Account extends EventEmitter {
   }
 
   private handleNotification(notification: IncomingNotification): void {
+    this.logger.info('handleNotification');
     for (const event of notification.payload) {
       this.handleEvent(event).then((data: PayloadBundle) => {
         if (data.content) {
