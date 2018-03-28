@@ -38,7 +38,7 @@ z.backup.BackupRepository = class BackupRepository {
   }
 
   _initSubscriptions() {
-    amplify.subscribe(z.event.WebApp.BACKUP.EXPORT.FILENAME, this.onExportFilename.bind(this));
+    amplify.subscribe(z.event.WebApp.BACKUP.EXPORT.DONE, this.onExportDone.bind(this));
     amplify.subscribe(z.event.WebApp.BACKUP.IMPORT.DATA, this.onImportHistory.bind(this));
     amplify.subscribe(z.event.WebApp.BACKUP.IMPORT.ERROR, this.onError.bind(this));
     amplify.subscribe(z.event.WebApp.BACKUP.IMPORT.META, this.onImportMeta.bind(this));

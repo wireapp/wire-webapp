@@ -40,8 +40,8 @@ z.event.WebApp = {
     EXPORT: {
       CANCEL: 'wire.webapp.backup.export.cancel',
       DATA: 'wire.webapp.backup.export.data',
+      DONE: 'wire.webapp.backup.export.done',
       ERROR: 'wire.webapp.backup.export.error',
-      FILENAME: 'wire.webapp.backup.export.filename',
       META: 'wire.webapp.backup.export.meta',
     },
     IMPORT: {
