@@ -67,6 +67,7 @@ class Login extends React.PureComponent {
     loginError: null,
     password: '',
     persist: true,
+    reason: null,
     validInputs: {
       email: true,
       password: true,
@@ -75,6 +76,13 @@ class Login extends React.PureComponent {
   };
 
   readAndUpdateParamsFromUrl = (nextProps = this.props) => {
+    const reason = nextProps.match.params.reason;
+    const reasonChanged = reason !== this.state.reason;
+
+    if (reason && reasonChanged) {
+      this.setState((state, props) => ({...state, reason}));
+    }
+
     const conversationCode = nextProps.match.params.conversationCode;
     const conversationKey = nextProps.match.params.conversationKey;
 
@@ -82,7 +90,7 @@ class Login extends React.PureComponent {
     const keyChanged = conversationKey !== this.state.conversationKey;
     const codeChanged = conversationCode !== this.state.conversationCode;
     const keyOrCodeChanged = keyChanged || codeChanged;
-    if (keyAndCodeExistent && keyOrCodeChanged) {
+    if ((keyAndCodeExistent && keyOrCodeChanged) || (reason && reasonChanged)) {
       Promise.resolve()
         .then(() => {
           this.setState((state, props) => ({
@@ -90,6 +98,7 @@ class Login extends React.PureComponent {
             conversationCode,
             conversationKey,
             isValidLink: true,
+            reason,
           }));
         })
         .then(() => this.props.doCheckConversationCode(conversationKey, conversationCode))

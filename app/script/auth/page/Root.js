@@ -44,6 +44,12 @@ import {APP_INSTANCE_ID} from '../config';
 addLocaleData([...de]);
 
 class Root extends React.Component {
+  static LOGOUT_REASON = {
+    ACCOUNT_DELETED: 'deleted',
+    CLIENT_REMOVED: 'client_removed',
+    SESSION_EXPIRED: 'expired',
+  };
+
   componentDidMount = () => {
     this.props.setCookieIfAbsent(CookieSelector.COOKIE_NAME_APP_OPENED, {appInstanceId: APP_INSTANCE_ID});
     this.props.startPolling();
@@ -67,6 +73,13 @@ class Root extends React.Component {
               <Route exact path={ROUTE.INDEX} component={Index} />
               <Route path={ROUTE.CLIENTS} component={ClientManager} />
               <Route path={`${ROUTE.LOGIN}/:conversationKey?/:conversationCode?`} component={Login} />
+              <Route
+                path={`${ROUTE.LOGIN}/:reason(
+                  ${Root.LOGOUT_REASON.SESSION_EXPIRED}|
+                  ${Root.LOGOUT_REASON.CLIENT_REMOVED}|
+                  ${Root.LOGOUT_REASON.ACCOUNT_DELETED})?`}
+                component={Login}
+              />
               <Route
                 path={`${ROUTE.CONVERSATION_JOIN}/:conversationKey/:conversationCode/:expiresIn?`}
                 component={ConversationJoin}
