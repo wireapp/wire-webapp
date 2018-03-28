@@ -254,7 +254,6 @@ z.string.pt.conversationTeamLeave = ' foi removido da equipa';
 z.string.pt.conversationPing = ' pingou';
 z.string.pt.conversationPingYou = ' pingou';
 z.string.pt.conversationToday = 'hoje';
-z.string.pt.conversationVerified = 'Verificado';
 z.string.pt.conversationVoiceChannelDeactivate = ' ligou';
 z.string.pt.conversationVoiceChannelDeactivateYou = ' ligou';
 z.string.pt.conversationYesterday = 'Ontem';
@@ -353,7 +352,6 @@ z.string.pt.addParticipantsTabsPeople = 'Pessoas';
 z.string.pt.addParticipantsTabsServices = 'Serviços';
 
 z.string.pt.conversationDetailsActionCancelRequest = 'Cancelar pedido';
-z.string.pt.conversationDetailsActionCreateGroup = 'Criar grupo';
 z.string.pt.conversationDetailsActionDevices = 'Dispositivos';
 z.string.pt.conversationDetailsGuestsOff = 'Desligado';
 z.string.pt.conversationDetailsParticipantsServicesMany = 'Serviços';

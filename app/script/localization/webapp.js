@@ -326,7 +326,6 @@ z.string.conversationTeamLeave = ' was removed from the team';
 z.string.conversationPing = ' pinged';
 z.string.conversationPingYou = ' pinged';
 z.string.conversationToday = 'today';
-z.string.conversationVerified = 'Verified';
 z.string.conversationVoiceChannelDeactivate = ' called';
 z.string.conversationVoiceChannelDeactivateYou = ' called';
 z.string.conversationYesterday = 'Yesterday';

@@ -38,25 +38,21 @@ video-asset {
 
 .video-asset-placeholder {
   .full-screen;
-  align-items: center;
+  .flex-center;
   color: @seperator-color;
-  display: flex;
   font-size: @font-size-xl;
-  justify-content: center;
   z-index: -1;
 }
 
 .video-playback-error {
   .full-screen;
-  align-items: center;
+  .flex-center;
   background-color: fade(@graphite-dark, 40%);
   color: #fff;
-  display: flex;
-  justify-content: center;
 }
 
 .video-asset-container {
-  .full-screen();
+  .full-screen;
 
   video {
     width: 100%;
@@ -66,10 +62,8 @@ video-asset {
 
 // Video controls center
 .video-controls-center {
-  .full-screen();
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  .full-screen;
+  .flex-center;
 }
 
 // Video controls bottom bar

@@ -333,9 +333,9 @@
   version "2.3.2"
   resolved "https://registry.yarnpkg.com/@types/tough-cookie/-/tough-cookie-2.3.2.tgz#e0d481d8bb282ad8a8c9e100ceb72c995fb5e709"
 
-"@wireapp/api-client@0.6.11":
-  version "0.6.11"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-0.6.11.tgz#6e08b347e30b665b9caa35870ef203b41bfbb8fe"
+"@wireapp/api-client@0.6.13":
+  version "0.6.13"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-0.6.13.tgz#b40c1f0350f64affc553b856990219a3c2f6c0d3"
   dependencies:
     "@types/node" "9.6.0"
     "@types/spark-md5" "3.0.0"
@@ -354,12 +354,12 @@
   version "3.0.11"
   resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-3.0.11.tgz#5c7cb36ae7277ee3cb957ef8a6445ff389285d52"
 
-"@wireapp/core@2.1.19":
-  version "2.1.19"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-2.1.19.tgz#6153586caf7973c5f9e3f52e2db9c6b068634a6a"
+"@wireapp/core@2.1.24":
+  version "2.1.24"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-2.1.24.tgz#5dc09f662bab6f2b8b37c8790e97dc6d39fade30"
   dependencies:
     "@types/node" "9.6.0"
-    "@wireapp/api-client" "0.6.11"
+    "@wireapp/api-client" "0.6.13"
     "@wireapp/cryptobox" "8.3.9"
     "@wireapp/store-engine" "0.5.3"
     bazinga64 "5.0.3"
@@ -404,9 +404,9 @@
     ed2curve "0.2.1"
     libsodium-wrappers-sumo "0.7.3"
 
-"@wireapp/react-ui-kit@1.0.17":
-  version "1.0.17"
-  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-1.0.17.tgz#3b24f5a141ff3b5b72a39c55b0e86bd1ac582f7f"
+"@wireapp/react-ui-kit@1.0.18":
+  version "1.0.18"
+  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-1.0.18.tgz#f0aa386f3fe276e3bab7d456b9c7f6af1bcb3588"
   dependencies:
     color "3.0.0"
     gulp-concat "2.6.1"
@@ -7318,10 +7318,6 @@ performance-now@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/performance-now/-/performance-now-2.1.0.tgz#6309f4e0e5fa913ec1c69307ae364b4b377c9e7b"
 
-phoneformat.js@1.0.6:
-  version "1.0.6"
-  resolved "https://registry.yarnpkg.com/phoneformat.js/-/phoneformat.js-1.0.6.tgz#11adc7672b590367d5ed268752124b37664c1a62"
-
 pify@^2.0.0, pify@^2.3.0:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/pify/-/pify-2.3.0.tgz#ed141a6ac043a849ea588498e7dca8b15330e90c"
@@ -9097,9 +9093,9 @@ simple-swizzle@^0.2.2:
   dependencies:
     is-arrayish "^0.3.1"
 
-sinon@4.4.8:
-  version "4.4.8"
-  resolved "https://registry.yarnpkg.com/sinon/-/sinon-4.4.8.tgz#0479e0ccb8caa0d737ce9773c8d53d57d38f2d84"
+sinon@4.4.9:
+  version "4.4.9"
+  resolved "https://registry.yarnpkg.com/sinon/-/sinon-4.4.9.tgz#0792a2a5171eb0cf242edacb0eba3898b8b4297f"
   dependencies:
     "@sinonjs/formatio" "^2.0.0"
     diff "^3.1.0"

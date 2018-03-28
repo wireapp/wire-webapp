@@ -35,6 +35,8 @@ class Localizer {
 
     this.locale = stored_locale || current_browser_locale || DEFAULT_LOCALE;
 
+    document.getElementsByTagName('html')[0].setAttribute('lang', this.locale);
+
     moment.locale([this.locale, DEFAULT_LOCALE]);
 
     if (z.string[this.locale]) {

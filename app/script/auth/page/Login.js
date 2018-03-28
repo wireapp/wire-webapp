@@ -49,12 +49,11 @@ import * as ConversationAction from '../module/action/ConversationAction';
 import ValidationError from '../module/action/ValidationError';
 import {loginStrings} from '../../strings';
 import RuntimeUtil from '../util/RuntimeUtil';
-import * as URLUtil from '../util/urlUtil';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
 import BackendError from '../module/action/BackendError';
-import {Redirect} from 'react-router';
-import * as Environment from '../Environment';
-import {formatE164} from 'phoneFormat.js';
+import {Redirect, withRouter} from 'react-router';
+import * as URLUtil from '../util/urlUtil';
+import * as ClientSelector from '../module/selector/ClientSelector';
 
 class Login extends React.PureComponent {
   inputs = {};
@@ -110,8 +109,6 @@ class Login extends React.PureComponent {
     z.util.safeWindowOpen(z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.ACCOUNT, z.config.URL_PATH.PASSWORD_RESET));
   };
 
-  formatPhoneNumber = (phoneNumber, countryCode) => formatE164(`${countryCode}`.toUpperCase(), `${phoneNumber}`);
-
   handleSubmit = event => {
     event.preventDefault();
     if (this.props.isFetching) {
@@ -137,13 +134,10 @@ class Login extends React.PureComponent {
         const {email, password, persist} = this.state;
         const login = {password, persist};
 
-        const phoneNumber = this.formatPhoneNumber(email, navigator.language);
         if (this.isValidEmail(email)) {
           login.email = email;
         } else if (this.isValidUsername(email)) {
           login.handle = email.replace('@', '');
-        } else if (this.isValidPhoneNumber(phoneNumber)) {
-          login.phone = phoneNumber;
         }
 
         const hasKeyAndCode = this.state.conversationKey && this.state.conversationCode;
@@ -153,11 +147,19 @@ class Login extends React.PureComponent {
       })
       .then(() => window.location.replace(URLUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP)))
       .catch(error => {
-        if (error.label === BackendError.LABEL.TOO_MANY_CLIENTS) {
-          this.props.history.push(ROUTE.CLIENTS);
-        } else {
-          this.setState({...this.state, validInputs: {...validInputs, email: false, password: false}});
-          throw error;
+        switch (error.label) {
+          case BackendError.LABEL.NEW_CLIENT: {
+            const isFirstPersistentClient = this.state.persist && this.props.clients.length === 0;
+            return isFirstPersistentClient
+              ? window.location.replace(URLUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP))
+              : this.props.history.push(ROUTE.HISTORY_INFO);
+          }
+          case BackendError.LABEL.TOO_MANY_CLIENTS: {
+            return this.props.history.push(ROUTE.CLIENTS);
+          }
+          default: {
+            throw error;
+          }
         }
       });
   };
@@ -165,13 +167,6 @@ class Login extends React.PureComponent {
   isValidEmail = email => {
     const emailRegex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     return emailRegex.test(email);
-  };
-
-  isValidPhoneNumber = phoneNumber => {
-    const isProductionBackend = Environment.isEnvironment(Environment.PRODUCTION);
-    const e164regex = isProductionBackend ? /^\+[1-9]\d{1,14}$/ : /^\+[0-9]\d{1,14}$/;
-
-    return e164regex.test(phoneNumber);
   };
 
   isValidUsername = username => {
@@ -300,12 +295,15 @@ class Login extends React.PureComponent {
   }
 }
 
-export default injectIntl(
-  connect(
-    state => ({
-      isFetching: AuthSelector.isFetching(state),
-      loginError: AuthSelector.getError(state),
-    }),
-    {...AuthAction, ...ConversationAction}
-  )(Login)
+export default withRouter(
+  injectIntl(
+    connect(
+      state => ({
+        clients: ClientSelector.getClients(state),
+        isFetching: AuthSelector.isFetching(state),
+        loginError: AuthSelector.getError(state),
+      }),
+      {...AuthAction, ...ConversationAction}
+    )(Login)
+  )
 );

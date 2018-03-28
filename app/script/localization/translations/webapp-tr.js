@@ -254,7 +254,6 @@ z.string.tr.conversationTeamLeave = ' takımdan çıkartıldı';
 z.string.tr.conversationPing = ' pingledi';
 z.string.tr.conversationPingYou = ' pingledi';
 z.string.tr.conversationToday = 'bugün';
-z.string.tr.conversationVerified = 'Doğrulanmış';
 z.string.tr.conversationVoiceChannelDeactivate = ' aradı';
 z.string.tr.conversationVoiceChannelDeactivateYou = ' aradı';
 z.string.tr.conversationYesterday = 'Dün';
@@ -353,7 +352,6 @@ z.string.tr.addParticipantsTabsPeople = 'İnsanlar';
 z.string.tr.addParticipantsTabsServices = 'Servisler';
 
 z.string.tr.conversationDetailsActionCancelRequest = 'İsteği iptal et';
-z.string.tr.conversationDetailsActionCreateGroup = 'Grup oluştur';
 z.string.tr.conversationDetailsActionDevices = 'Cihazlar';
 z.string.tr.conversationDetailsGuestsOff = 'Yok';
 z.string.tr.conversationDetailsParticipantsServicesMany = 'Servisler';
@@ -486,6 +484,7 @@ z.string.tr.searchInviteShare = 'Kişileri Paylaş';
 z.string.tr.searchListEveryoneParticipates = 'Bağlantıda olduğun herkes zaten bu görüşme içerisinde.';
 z.string.tr.searchListNoMatches = 'Eşleşen sonuç yok.\nBaşka bir isim girmeyi deneyin.';
 
+z.string.tr.temporaryGuestCta = 'Bir hesap oluştur';
 
 z.string.tr.uploadGoogleHeadline = 'Konuşmak için\ninsanları bul.';
 z.string.tr.uploadGoogleMessage = 'İletişim verilerinizi sizi başkalarıyla bağlayabilmek için kullanıyoruz. Tüm bilgilerinizi gizler ve kimseyle paylaşmayız.';

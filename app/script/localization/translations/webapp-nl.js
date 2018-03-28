@@ -265,7 +265,6 @@ z.string.nl.conversationTeamLeave = 'is verwijderd uit het team';
 z.string.nl.conversationPing = ' pinged';
 z.string.nl.conversationPingYou = ' pinged';
 z.string.nl.conversationToday = 'vandaag';
-z.string.nl.conversationVerified = 'Geverifieerd';
 z.string.nl.conversationVoiceChannelDeactivate = ' belde';
 z.string.nl.conversationVoiceChannelDeactivateYou = ' belde';
 z.string.nl.conversationYesterday = 'Gisteren';
@@ -372,7 +371,7 @@ z.string.nl.addParticipantsTabsPeople = 'Deelnemers';
 z.string.nl.addParticipantsTabsServices = 'Services';
 
 z.string.nl.conversationDetailsActionCancelRequest = 'Annuleer verzoek';
-z.string.nl.conversationDetailsActionCreateGroup = 'Maak groep';
+z.string.nl.conversationDetailsActionCreateGroup = 'Nieuwe groep';
 z.string.nl.conversationDetailsActionDevices = 'Apparaten';
 z.string.nl.conversationDetailsGuestsOff = 'Uit';
 z.string.nl.conversationDetailsParticipantsServicesMany = 'Services';

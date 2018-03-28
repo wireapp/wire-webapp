@@ -232,7 +232,6 @@ z.string.hr.conversationResume = 'Započni razgovor s {{users}}';
 z.string.hr.conversationPing = ' pingala/o';
 z.string.hr.conversationPingYou = ' pingala/o';
 z.string.hr.conversationToday = 'danas';
-z.string.hr.conversationVerified = 'Verificirano';
 z.string.hr.conversationVoiceChannelDeactivate = ' zvao';
 z.string.hr.conversationVoiceChannelDeactivateYou = ' zvao';
 z.string.hr.conversationYesterday = 'Jučer';
@@ -310,7 +309,6 @@ z.string.hr.addParticipantsTabsPeople = 'Kontakti';
 z.string.hr.addParticipantsTabsServices = 'Usluge';
 
 z.string.hr.conversationDetailsActionCancelRequest = 'Poništi zahtjev';
-z.string.hr.conversationDetailsActionCreateGroup = 'Napravi grupu';
 z.string.hr.conversationDetailsActionDevices = 'Uređaji';
 z.string.hr.conversationDetailsGuestsOff = 'Isključi';
 z.string.hr.conversationDetailsParticipantsServicesMany = 'Usluge';

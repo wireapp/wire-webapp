@@ -160,11 +160,13 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
           const isCached = pictureResource.downloadProgress() === 100;
 
           pictureResource.getObjectUrl().then(url => {
-            const image = new Image();
-            image.src = url;
-            this.element.find('.avatar-image').html(image);
-            this.element.addClass(`avatar-image-loaded ${isCached && isSmall ? '' : 'avatar-loading-transition'}`);
-            this.avatarLoadingBlocked = false;
+            if (url) {
+              const image = new Image();
+              image.src = url;
+              this.element.find('.avatar-image').html(image);
+              this.element.addClass(`avatar-image-loaded ${isCached && isSmall ? '' : 'avatar-loading-transition'}`);
+              this.avatarLoadingBlocked = false;
+            }
           });
         } else {
           this.avatarLoadingBlocked = false;

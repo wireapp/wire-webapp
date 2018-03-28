@@ -40,6 +40,7 @@ import * as SelfSelector from '../module/selector/SelfSelector';
 import * as ConversationSelector from '../module/selector/ConversationSelector';
 import ValidationError from '../module/action/ValidationError';
 import * as AuthAction from '../module/action/AuthAction';
+import * as NotificationAction from '../module/action/NotificationAction';
 import * as StringUtil from '../util/stringUtil';
 import {Redirect} from 'react-router';
 import {Link as RRLink} from 'react-router-dom';
@@ -132,6 +133,7 @@ class ConversationJoin extends Component {
         .then(name => name.trim())
         .then(name => this.props.doRegisterWireless({expires_in: this.state.expiresIn, name}))
         .then(() => this.props.doJoinConversationByCode(this.state.conversationKey, this.state.conversationCode))
+        .then(conversationEvent => this.props.setLastEventDate(new Date(conversationEvent.time)))
         .then(() => this.trackAddParticipant())
         .then(() => window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP)))
         .catch(error => this.props.doLogout());
@@ -181,6 +183,9 @@ class ConversationJoin extends Component {
         <Button onClick={this.onOpenWireClick} data-uie-name="do-open">
           {_(conversationJoinStrings.existentAccountOpenButton)}
         </Button>
+        <ErrorMessage data-uie-name="error-message">
+          {error ? parseValidationErrors(error) : parseError(this.props.error)}
+        </ErrorMessage>
         <Small block>
           <Link
             onClick={() => this.setState({...this.state, forceNewTemporaryGuestAccount: true})}
@@ -312,6 +317,7 @@ export default withRouter(
       {
         ...AuthAction,
         ...ConversationAction,
+        ...NotificationAction,
         ...TrackingAction,
       }
     )(ConversationJoin)

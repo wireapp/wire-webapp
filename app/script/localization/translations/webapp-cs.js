@@ -251,7 +251,6 @@ z.string.cs.conversationTeamLeave = ' byl(a) odebrán(a) z týmu';
 z.string.cs.conversationPing = ' pingl(a)';
 z.string.cs.conversationPingYou = ' pingl(a)';
 z.string.cs.conversationToday = 'dnes';
-z.string.cs.conversationVerified = 'Ověreno';
 z.string.cs.conversationVoiceChannelDeactivate = ' volal(a)';
 z.string.cs.conversationVoiceChannelDeactivateYou = ' volal(a)';
 z.string.cs.conversationYesterday = 'Včera';
@@ -349,7 +348,6 @@ z.string.cs.addParticipantsTabsPeople = 'Kontakty';
 z.string.cs.addParticipantsTabsServices = 'Služby';
 
 z.string.cs.conversationDetailsActionCancelRequest = 'Zrušit žádost';
-z.string.cs.conversationDetailsActionCreateGroup = 'Vytvořit skupinu';
 z.string.cs.conversationDetailsActionDevices = 'Přístroje';
 z.string.cs.conversationDetailsGuestsOff = 'Vypnout';
 z.string.cs.conversationDetailsParticipantsServicesMany = 'Služby';

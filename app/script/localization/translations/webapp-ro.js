@@ -34,6 +34,7 @@ z.string.ro.authAccountSignInPhone = 'Telefon';
 z.string.ro.authBlockedCookies = 'Activează cookie-urile pentru intra în Wire.';
 z.string.ro.authBlockedDatabase = 'Wire are nevoie de acces la stocarea locală pentru a afișa mesaje. Stocarea locală nu este disponibilă în modul privat.';
 z.string.ro.authBlockedTabs = 'Wire este deja deschis în altă filă.';
+z.string.ro.authBlockedTabsAction = 'Folosește această filă în loc';
 
 z.string.ro.authVerifyAccountAdd = 'Adaugă';
 z.string.ro.authVerifyAccountDetail = 'Aceasta îți permite să folosești Wire pe mai multe dispozitive.';
@@ -97,16 +98,21 @@ z.string.ro.callChooseSharedScreen = 'Alege un ecran pentru a partaja';
 z.string.ro.callParticipants = '{{number}} în apel';
 
 z.string.ro.modalAcknowledgeAction = 'Ok';
+z.string.ro.modalAcknowledgeHeadline = 'Ceva nu a mers bine';
 z.string.ro.modalConfirmSecondary = 'Renunță';
 z.string.ro.modalOptionSecondary = 'Renunță';
 
 z.string.ro.modalAccountCreateAction = 'OK';
+z.string.ro.modalAccountCreateHeadline = 'Dorești să creezi un cont?';
+z.string.ro.modalAccountCreateMessage = 'Prin crearea unui cont vei pierde istoricul conversațiilor din această cameră de oaspeți.';
 
 z.string.ro.modalAccountDeletionAction = 'Șterge';
 z.string.ro.modalAccountDeletionHeadline = 'Șterge contul';
 z.string.ro.modalAccountDeletionMessage = 'Îți vom trimite un mesaj pe e-mail sau SMS. Urmează linkul pentru a șterge permanent contul tău.';
 
 z.string.ro.modalAccountLeaveGuestRoomAction = 'Ieși';
+z.string.ro.modalAccountLeaveGuestRoomHeadline = 'Ieși din camera de oaspeți?';
+z.string.ro.modalAccountLeaveGuestRoomMessage = 'Istoricul conversațiilor va fi șters. Poți păstra istoricul doar prin crearea unui cont.';
 
 z.string.ro.modalAccountLogoutAction = 'Deconectare';
 z.string.ro.modalAccountLogoutHeadline = 'Curăță datele?';
@@ -122,8 +128,10 @@ z.string.ro.modalAccountRemoveDeviceHeadline = 'Scoate „{{device}}”';
 z.string.ro.modalAccountRemoveDeviceMessage = 'Este necesară parola pentru a elimina acest dispozitiv.';
 z.string.ro.modalAccountRemoveDevicePlaceholder = 'Parolă';
 
+z.string.ro.modalAssetTooLargeHeadline = 'Fișierul este prea mare';
 z.string.ro.modalAssetTooLargeMessage = 'Poți trimite fișiere până la {{number}}';
 
+z.string.ro.modalAssetParallelUploadsHeadline = 'Prea multe fișiere de încărcat';
 z.string.ro.modalAssetParallelUploadsMessage = 'Poți trimite maxim {{number}} fișiere simultan.';
 
 z.string.ro.modalCallEmptyConversationHeadline = 'Nu ai pe cine apela';
@@ -267,7 +275,6 @@ z.string.ro.conversationTeamLeave = ' a fost scos din echipă';
 z.string.ro.conversationPing = ' pinguit';
 z.string.ro.conversationPingYou = ' pinguit';
 z.string.ro.conversationToday = 'azi';
-z.string.ro.conversationVerified = 'Verificat';
 z.string.ro.conversationVoiceChannelDeactivate = ' sunat';
 z.string.ro.conversationVoiceChannelDeactivateYou = ' sunat';
 z.string.ro.conversationYesterday = 'ieri';
@@ -374,7 +381,7 @@ z.string.ro.addParticipantsTabsPeople = 'Persoane';
 z.string.ro.addParticipantsTabsServices = 'Servicii';
 
 z.string.ro.conversationDetailsActionCancelRequest = 'Anulează cererea';
-z.string.ro.conversationDetailsActionCreateGroup = 'Creează grup';
+z.string.ro.conversationDetailsActionCreateGroup = 'Grup nou';
 z.string.ro.conversationDetailsActionDevices = 'Dispozitive';
 z.string.ro.conversationDetailsGuestsOff = 'Închis';
 z.string.ro.conversationDetailsParticipantsServicesMany = 'Servicii';

@@ -73,9 +73,7 @@
 
 .start-ui-list-spinner {
   .full-screen;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  .flex-center;
 
   .icon-spinner {
     font-size: @font-size-xl;
@@ -88,10 +86,8 @@
   padding: 0 8px;
 
   .start-ui-list-tab {
-    display: flex;
-    align-items: center;
+    .flex-center;
     flex-grow: 1;
-    justify-content: center;
     border-bottom: 1px solid transparent;
     opacity: 0.56;
     color: #fff;
@@ -155,7 +151,7 @@
 }
 
 .start-ui-list-header {
-  .label-bold-xs();
+  .label-bold-xs;
   display: block;
   line-height: 24px;
   margin-left: 16px;
@@ -169,7 +165,7 @@
 }
 
 .start-ui-import {
-  .accent-background-color();
+  .accent-background-color;
   align-items: center;
   cursor: pointer;
   display: flex;
@@ -185,7 +181,7 @@
 .start-ui-user-bubble {
   user-profile,
   .start-ui-service {
-    .bubble-content();
+    .bubble-content;
     background: #fff;
     border-radius: 4px;
     color: @graphite-dark;
@@ -204,7 +200,7 @@
   }
 
   .start-ui-service-button {
-    .button();
+    .button;
     width: 100%;
     height: 48px;
   }
