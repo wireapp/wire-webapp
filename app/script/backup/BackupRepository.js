@@ -34,21 +34,46 @@ z.backup.BackupRepository = class BackupRepository {
     this.backupService = backupService;
     this.clientRepository = clientRepository;
     this.userRepository = userRepository;
+    amplify.subscribe(z.event.WebApp.BACKUP.IMPORT.DATA, this.onImportHistory.bind(this));
+    amplify.subscribe(z.event.WebApp.BACKUP.IMPORT.ERROR, this.onError.bind(this));
+    amplify.subscribe(z.event.WebApp.BACKUP.IMPORT.META, this.onImportMeta.bind(this));
+    amplify.subscribe(z.event.WebApp.BACKUP.EXPORT.FILENAME, this.onExportFilename.bind(this));
   }
 
   createMetaDescription() {
     return {
       client_id: this.clientRepository.currentClient().id,
       creation_time: new Date().toISOString(),
-      database_version: this.backupService.getDatabaseVersion(),
       platform: 'Desktop',
       user_id: this.userRepository.self().id,
-      version: z.util.Environment.version(true),
+      version: this.backupService.getDatabaseVersion(),
     };
   }
 
   cancelBackup() {
     amplify.publish(z.event.WebApp.BACKUP.EXPORT.CANCEL);
+  }
+
+  importHistory(filename) {
+    amplify.publish(z.event.WebApp.BACKUP.IMPORT.FILENAME, filename);
+  }
+
+  onExportFilename(filename) {
+    // TODO
+  }
+
+  onError(error) {
+    // TODO
+  }
+
+  onImportHistory(data) {
+    // TODO
+    this.backupService.setHistory(data);
+  }
+
+  onImportMeta(metaData) {
+    // TODO
+    this.backupService.setMetadata(metaData);
   }
 
   async backupHistory() {

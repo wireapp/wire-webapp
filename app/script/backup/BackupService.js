@@ -37,6 +37,14 @@ z.backup.BackupService = class BackupService {
     return Promise.all(promises);
   }
 
+  setHistory(data) {
+    // TODO
+  }
+
+  setMetadata(metaData) {
+    // TODO
+  }
+
   getDatabaseVersion() {
     return this.storageService.db.verno;
   }
