@@ -34,8 +34,8 @@ z.backup.BackupService = class BackupService {
     });
   }
 
-  setHistory(data) {
-    // TODO
+  setHistory(tableName, data) {
+    this.storageService.save(tableName, undefined, JSON.parse(data));
   }
 
   setMetadata(metaData) {

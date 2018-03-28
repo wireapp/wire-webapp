@@ -34,10 +34,14 @@ z.backup.BackupRepository = class BackupRepository {
     this.backupService = backupService;
     this.clientRepository = clientRepository;
     this.userRepository = userRepository;
+    this._initSubscriptions();
+  }
+
+  _initSubscriptions() {
+    amplify.subscribe(z.event.WebApp.BACKUP.EXPORT.FILENAME, this.onExportFilename.bind(this));
     amplify.subscribe(z.event.WebApp.BACKUP.IMPORT.DATA, this.onImportHistory.bind(this));
     amplify.subscribe(z.event.WebApp.BACKUP.IMPORT.ERROR, this.onError.bind(this));
     amplify.subscribe(z.event.WebApp.BACKUP.IMPORT.META, this.onImportMeta.bind(this));
-    amplify.subscribe(z.event.WebApp.BACKUP.EXPORT.FILENAME, this.onExportFilename.bind(this));
   }
 
   createMetaDescription() {
@@ -66,9 +70,8 @@ z.backup.BackupRepository = class BackupRepository {
     // TODO
   }
 
-  onImportHistory(data) {
-    // TODO
-    this.backupService.setHistory(data);
+  onImportHistory(tableName, data) {
+    this.backupService.setHistory(tableName, data);
   }
 
   onImportMeta(metaData) {
