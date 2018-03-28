@@ -58,6 +58,7 @@ export const AUTHENTICATION_CONTEXT = {
   PERSONAL_INVITE: 'personal_invite',
   PHONE: 'phone',
   PHONE_CODE: 'phone_code',
+  PHONE_PASSWORD: 'phone_password',
 };
 
 export const FLOW_TO_CONTEXT = {
