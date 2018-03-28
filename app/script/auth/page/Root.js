@@ -45,10 +45,9 @@ addLocaleData([...de]);
 
 class Root extends React.Component {
   componentDidMount = () => {
-    this.props.setCookieIfAbsent(CookieSelector.COOKIE_NAME_APP_OPENED, {appInstanceId: APP_INSTANCE_ID});
     this.props.startPolling();
     window.onbeforeunload = () => {
-      this.props.removeCookie(CookieSelector.COOKIE_NAME_APP_OPENED, APP_INSTANCE_ID);
+      this.props.safelyRemoveCookie(CookieSelector.COOKIE_NAME_APP_OPENED, APP_INSTANCE_ID);
       this.props.stopPolling();
     };
   };

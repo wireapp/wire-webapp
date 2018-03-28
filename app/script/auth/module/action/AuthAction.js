@@ -25,9 +25,16 @@ import {deleteLocalStorage, getLocalStorage, setLocalStorage, LocalStorageKey} f
 import * as ConversationAction from './ConversationAction';
 import * as ClientAction from './ClientAction';
 import * as TrackingAction from './TrackingAction';
+import * as CookieAction from './CookieAction';
 import {ClientType} from '@wireapp/core/dist/client/root';
+import {APP_INSTANCE_ID} from '../../config';
+import {COOKIE_NAME_APP_OPENED} from '../selector/CookieSelector';
 
-export const doLogin = loginData => doLoginPlain(loginData, dispatch => dispatch(doSilentLogout()), dispatch => {});
+export const doLogin = loginData => {
+  const onBeforeLogin = dispatch => dispatch(doSilentLogout());
+
+  return doLoginPlain(loginData, onBeforeLogin, dispatch => {});
+};
 
 export const doLoginAndJoin = (loginData, key, code, uri) => {
   const onBeforeLogin = dispatch => dispatch(doSilentLogout());
@@ -45,6 +52,7 @@ function doLoginPlain(loginData, onBeforeLogin, onAfterLogin) {
 
     return Promise.resolve()
       .then(() => onBeforeLogin(dispatch, getState, global))
+      .then(() => dispatch(CookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: APP_INSTANCE_ID})))
       .then(() => core.login(loginData, false, ClientAction.generateClientPayload(loginData.persist)))
       .then(() => persistAuthData(loginData.persist, core, dispatch))
       .then(() => {
@@ -101,6 +109,7 @@ export function doRegisterTeam(registration) {
     dispatch(AuthActionCreator.startRegisterTeam({...registration, password: '******'}));
     return Promise.resolve()
       .then(() => dispatch(doSilentLogout()))
+      .then(() => dispatch(CookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: APP_INSTANCE_ID})))
       .then(() => apiClient.register(registration, isPermanentClient))
       .then(() => core.init())
       .then(() => persistAuthData(isPermanentClient, core, dispatch))
@@ -131,6 +140,7 @@ export function doRegisterPersonal(registration) {
     );
     return Promise.resolve()
       .then(() => dispatch(doSilentLogout()))
+      .then(() => dispatch(CookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: APP_INSTANCE_ID})))
       .then(() => apiClient.register(registration, isPermanentClient))
       .then(() => persistAuthData(isPermanentClient, core, dispatch))
       .then(() => core.init())
@@ -154,6 +164,7 @@ export function doRegisterWireless(registrationData) {
     dispatch(AuthActionCreator.startRegisterWireless(obfuscatedRegistrationData));
 
     return Promise.resolve()
+      .then(() => dispatch(CookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: APP_INSTANCE_ID})))
       .then(() => apiClient.register(registrationData, isPermanentClient))
       .then(() => persistAuthData(isPermanentClient, core, dispatch))
       .then(() => core.init())
