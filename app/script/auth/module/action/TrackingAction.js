@@ -50,35 +50,36 @@ export const EVENT_NAME = {
   },
 };
 
-export const EVENT_CONTEXT = {
+export const AUTHENTICATION_CONTEXT = {
+  AUTO: 'auto',
   EMAIL: 'email',
   GENERIC_INVITE: 'generic_invite',
+  HANDLE: 'handle',
   PERSONAL_INVITE: 'personal_invite',
+  PHONE: 'phone',
+  PHONE_CODE: 'phone_code',
 };
 
 export const FLOW_TO_CONTEXT = {
-  [REGISTER_FLOW.PERSONAL]: EVENT_CONTEXT.EMAIL,
-  [REGISTER_FLOW.GENERIC_INVITATION]: EVENT_CONTEXT.GENERIC_INVITE,
-  [REGISTER_FLOW.PERSONAL_INVITATION]: EVENT_CONTEXT.PERSONAL_INVITE,
+  [REGISTER_FLOW.PERSONAL]: AUTHENTICATION_CONTEXT.EMAIL,
+  [REGISTER_FLOW.GENERIC_INVITATION]: AUTHENTICATION_CONTEXT.GENERIC_INVITE,
+  [REGISTER_FLOW.PERSONAL_INVITATION]: AUTHENTICATION_CONTEXT.PERSONAL_INVITE,
 };
 
 export function trackEvent(event) {
   return function(dispatch, getState, {mixpanel}) {
     return Promise.resolve()
       .then(() => dispatch(TrackingActionCreator.startTrackingAction(event)))
-      .then(
-        () =>
-          new Promise(resolve => {
-            const attributes = Object.assign(
-              {
-                app: 'desktop',
-                desktop_app: RuntimeUtil.getPlatform(),
-              },
-              event.attributes
-            );
-            mixpanel.track(event.name, attributes, successCode => resolve(successCode));
-          })
-      )
+      .then(() => {
+        return new Promise(resolve => {
+          const attributes = {
+            ...event.attributes,
+            app: 'desktop',
+            desktop_app: RuntimeUtil.getPlatform(),
+          };
+          mixpanel.track(event.name, attributes, successCode => resolve(successCode));
+        });
+      })
       .then(trackingResult => dispatch(TrackingActionCreator.successfulTrackingAction(trackingResult)))
       .catch(error => dispatch(TrackingActionCreator.failedTrackingAction(error)));
   };
