@@ -605,6 +605,20 @@ z.string.preferencesOptionsCallLogs = 'Troubleshooting';
 z.string.preferencesOptionsCallLogsGet = 'Save the calling debug report';
 z.string.preferencesOptionsCallLogsDetail = 'This information helps Wire Support diagnose calling problems.';
 
+z.string.preferencesOptionsConversationHistoryTitle = 'Conversation history';
+z.string.preferencesOptionsConversationHistoryExportTitle = 'Back up history';
+z.string.preferencesOptionsConversationHistoryExportDescription = 'Bla bla history'
+z.string.preferencesOptionsConversationHistoryImportTitle = 'Restore from backup';
+z.string.preferencesOptionsConversationHistoryImportDescription = 'Bla bla restore';
+z.string.preferencesOptionsConversationHistoryPasswordTitle = 'Set email and password';
+z.string.preferencesOptionsConversationHistoryPasswordDescription = 'Bla bla password description';
+z.string.preferencesOptionsConversationHistoryErrorTitle = 'Restoring the historu failed.';
+z.string.preferencesOptionsConversationHistoryErrorDescription = 'Please, check your backup file, it might not be compatible or corrupted.';
+z.string.preferencesOptionsConversationHistoryImportProgress = 'Restoring your conversations...';
+z.string.preferencesOptionsConversationHistoryExportProgress = 'Backing up...';
+z.string.preferencesOptionsConversationHistoryProgressDone = 'Done';
+
+
 // Search
 z.string.searchConnect = 'Connect';
 z.string.searchConnections = 'Connections';

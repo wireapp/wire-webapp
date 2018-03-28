@@ -83,8 +83,20 @@
           </div>
         <!-- /ko -->
       </section>
-
       <!-- ko if: isActivatedAccount() -->
+        <section class="preferences-section preferences-section-conversation-history">
+          <hr class="preferences-separator">
+          <header class="preferences-header" data-bind="l10n_text: z.string.preferencesOptionsConversationHistoryTitle"></header>
+          <div class="preferences-option">
+            <div class="preferences-link text-theme" data-bind="l10n_text: z.string.preferencesOptionsConversationHistoryExportTitle"></div>
+          </div>
+          <div class="preferences-detail" data-bind="l10n_text: z.string.preferencesOptionsConversationHistoryExportDescription"></div>
+          <div class="preferences-option">
+            <div class="preferences-link text-theme" data-bind="l10n_text: z.string.preferencesOptionsConversationHistoryImportTitle"></div>
+          </div>
+          <div class="preferences-detail" data-bind="l10n_text: z.string.preferencesOptionsConversationHistoryImportDescription"></div>
+        </section>
+
         <section class="preferences-section preferences-section-account-security">
           <hr class="preferences-separator">
 
