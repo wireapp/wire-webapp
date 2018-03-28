@@ -50,7 +50,7 @@ export const EVENT_NAME = {
   },
 };
 
-export const EVENT_CONTEXT = {
+export const AUTHENTICATION_CONTEXT = {
   AUTO: 'auto',
   EMAIL: 'email',
   GENERIC_INVITE: 'generic_invite',
@@ -61,9 +61,9 @@ export const EVENT_CONTEXT = {
 };
 
 export const FLOW_TO_CONTEXT = {
-  [REGISTER_FLOW.PERSONAL]: EVENT_CONTEXT.EMAIL,
-  [REGISTER_FLOW.GENERIC_INVITATION]: EVENT_CONTEXT.GENERIC_INVITE,
-  [REGISTER_FLOW.PERSONAL_INVITATION]: EVENT_CONTEXT.PERSONAL_INVITE,
+  [REGISTER_FLOW.PERSONAL]: AUTHENTICATION_CONTEXT.EMAIL,
+  [REGISTER_FLOW.GENERIC_INVITATION]: AUTHENTICATION_CONTEXT.GENERIC_INVITE,
+  [REGISTER_FLOW.PERSONAL_INVITATION]: AUTHENTICATION_CONTEXT.PERSONAL_INVITE,
 };
 
 export function trackEvent(event) {
@@ -72,13 +72,11 @@ export function trackEvent(event) {
       .then(() => dispatch(TrackingActionCreator.startTrackingAction(event)))
       .then(() => {
         return new Promise(resolve => {
-          const attributes = Object.assign(
-            {
-              app: 'desktop',
-              desktop_app: RuntimeUtil.getPlatform(),
-            },
-            event.attributes
-          );
+          const attributes = {
+            ...event.attributes,
+            app: 'desktop',
+            desktop_app: RuntimeUtil.getPlatform(),
+          };
           mixpanel.track(event.name, attributes, successCode => resolve(successCode));
         });
       })
