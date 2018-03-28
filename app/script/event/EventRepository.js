@@ -733,11 +733,11 @@ z.event.EventRepository = class EventRepository {
 
     if (!events.length) {
       this.logger.warn('Notification payload does not contain any events');
-      return !isTransientEvent ? this._updateLastNotificationId(id) : Promise.resolve(id);
+      return isTransientEvent ? Promise.resolve(id) : this._updateLastNotificationId(id);
     }
 
     return Promise.all(events.map(event => this._handleEvent(event, source)))
-      .then(() => (!isTransientEvent ? this._updateLastNotificationId(id) : id))
+      .then(() => (isTransientEvent ? id : this._updateLastNotificationId(id)))
       .catch(error => {
         this.logger.error(`Failed to handle notification '${id}' from '${source}': ${error.message}`, error);
         throw error;

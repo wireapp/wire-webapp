@@ -99,7 +99,7 @@ z.entity.ContentMessage = class ContentMessage extends z.entity.Message {
 
     if (reactions !== this.reactions) {
       this.reactions(reactions);
-      this.version = this.version + 1;
+      this.version += 1;
       return {reactions: this.reactions(), version: this.version};
     }
   }
