@@ -192,15 +192,6 @@ class Login extends React.PureComponent {
     return usernameRegex.test(username);
   };
 
-  renderLogoutReason = () => {
-    const {logoutReason} = this.state;
-    return (
-      <Small center style={{marginBottom: '16px'}}>
-        <FormattedHTMLMessage {...logoutReasonStrings[logoutReason]} />
-      </Small>
-    );
-  };
-
   render() {
     const {intl: {formatMessage: _}, loginError} = this.props;
     const {logoutReason, isValidLink, email, password, persist, validInputs, validationErrors} = this.state;
@@ -285,7 +276,11 @@ class Login extends React.PureComponent {
                   ) : loginError ? (
                     <ErrorMessage data-uie-name="error-message">{parseError(loginError)}</ErrorMessage>
                   ) : null}
-                  {logoutReason && this.renderLogoutReason()}
+                  {logoutReason && (
+                    <Small center style={{marginBottom: '16px'}}>
+                      <FormattedHTMLMessage {...logoutReasonStrings[logoutReason]} />
+                    </Small>
+                  )}
                   {!RuntimeUtil.isDesktop() && (
                     <Checkbox
                       onChange={event => this.setState({persist: !event.target.checked})}

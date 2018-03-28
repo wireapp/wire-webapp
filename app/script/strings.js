@@ -510,7 +510,7 @@ export const logoutReasonStrings = defineMessages({
   },
   [LOGOUT_REASON.SESSION_EXPIRED]: {
     id: 'LOGOUT_REASON.SESSION_EXPIRED',
-    defaultMessage: 'You were signed out because your session expired. <br />Please log in again.',
+    defaultMessage: 'You were signed out because your session expired.<br />Please log in again.',
   },
 });
 
