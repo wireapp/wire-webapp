@@ -632,10 +632,10 @@ z.main.App = class App {
       this.logger.info("'window.unload' was triggered, so we will tear down calls.");
       this.repository.calling.leaveCallOnUnload();
 
-      if (this.repository.user.self().isTemporaryGuest()) {
-        this.repository.storage.deleteDatabase();
-      } else {
+      if (this.repository.user.isActivatedAccount()) {
         this.repository.storage.terminate('window.onunload');
+      } else {
+        this.repository.storage.deleteDatabase();
       }
 
       this.repository.notification.clearNotifications();
