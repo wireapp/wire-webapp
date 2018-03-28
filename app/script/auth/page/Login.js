@@ -46,6 +46,7 @@ import {parseError, parseValidationErrors} from '../util/errorUtil';
 import * as AuthAction from '../module/action/AuthAction';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import * as ConversationAction from '../module/action/ConversationAction';
+import * as ClientAction from '../module/action/ClientAction';
 import ValidationError from '../module/action/ValidationError';
 import {loginStrings} from '../../strings';
 import RuntimeUtil from '../util/RuntimeUtil';
@@ -149,10 +150,12 @@ class Login extends React.PureComponent {
       .catch(error => {
         switch (error.label) {
           case BackendError.LABEL.NEW_CLIENT: {
-            const isFirstPersistentClient = this.state.persist && this.props.clients.length === 0;
-            return isFirstPersistentClient
-              ? window.location.replace(URLUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP))
-              : this.props.history.push(ROUTE.HISTORY_INFO);
+            return this.props.doGetAllClients().then(clients => {
+              const isFirstPersistentClient = this.state.persist && clients.length === 1;
+              return isFirstPersistentClient
+                ? window.location.replace(URLUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP))
+                : this.props.history.push(ROUTE.HISTORY_INFO);
+            });
           }
           case BackendError.LABEL.TOO_MANY_CLIENTS: {
             return this.props.history.push(ROUTE.CLIENTS);
@@ -303,7 +306,7 @@ export default withRouter(
         isFetching: AuthSelector.isFetching(state),
         loginError: AuthSelector.getError(state),
       }),
-      {...AuthAction, ...ConversationAction}
+      {...AuthAction, ...ConversationAction, ...ClientAction}
     )(Login)
   )
 );
