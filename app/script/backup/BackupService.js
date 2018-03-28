@@ -27,6 +27,10 @@ z.backup.BackupService = class BackupService {
     this.storageService = storageService;
   }
 
+  getDatabaseVersion() {
+    return this.storageService.db.verno;
+  }
+
   getHistory() {
     return this.storageService.getTables(['conversations', 'events']).then(tableContainer => {
       const promises = tableContainer.map(table => table.toArray().then(rows => ({name: table.name, rows})));
@@ -40,9 +44,5 @@ z.backup.BackupService = class BackupService {
 
   setMetadata(metaData) {
     // TODO
-  }
-
-  getDatabaseVersion() {
-    return this.storageService.db.verno;
   }
 };

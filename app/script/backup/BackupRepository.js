@@ -58,11 +58,11 @@ z.backup.BackupRepository = class BackupRepository {
     amplify.publish(z.event.WebApp.BACKUP.EXPORT.CANCEL);
   }
 
-  importHistory(filename) {
-    amplify.publish(z.event.WebApp.BACKUP.IMPORT.FILENAME, filename);
+  importHistory() {
+    amplify.publish(z.event.WebApp.BACKUP.IMPORT.START);
   }
 
-  onExportFilename(filename) {
+  onExportDone() {
     // TODO
   }
 
@@ -75,7 +75,6 @@ z.backup.BackupRepository = class BackupRepository {
   }
 
   onImportMeta(metaData) {
-    // TODO
     this.backupService.setMetadata(metaData);
   }
 
