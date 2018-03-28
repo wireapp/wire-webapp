@@ -72,7 +72,7 @@ class ConversationJoin extends Component {
   readAndUpdateParamsFromUrl = (nextProps = this.props) => {
     const conversationCode = getURLParameter(QUERY_KEY.CONVERSATION_CODE);
     const conversationKey = getURLParameter(QUERY_KEY.CONVERSATION_KEY);
-    const expiresIn = parseInt(QUERY_KEY.JOIN_EXPIRES, 10) || undefined;
+    const expiresIn = parseInt(getURLParameter(QUERY_KEY.JOIN_EXPIRES), 10) || undefined;
 
     const codeParamChanged = conversationCode !== this.state.conversationCode;
     const keyParamChanged = conversationKey !== this.state.conversationKey;
