@@ -48,7 +48,7 @@ function doLoginPlain(loginData, onBeforeLogin, onAfterLogin) {
       .then(() => core.login(loginData, false, ClientAction.generateClientPayload(loginData.persist)))
       .then(() => persistAuthData(loginData.persist, core, dispatch))
       .then(() => {
-        const loginContext = loginData.email ? 'email' : 'handle';
+        const loginContext = loginData.email ? TrackingAction.EVENT_CONTEXT.EMAIL : TrackingAction.EVENT_CONTEXT.HANDLE;
         const trackingEventData = {
           attributes: {context: loginContext, remember_me: loginData.persist},
           name: TrackingAction.EVENT_NAME.ACCOUNT.LOGGED_IN,

@@ -51,9 +51,13 @@ export const EVENT_NAME = {
 };
 
 export const EVENT_CONTEXT = {
+  AUTO: 'auto',
   EMAIL: 'email',
   GENERIC_INVITE: 'generic_invite',
+  HANDLE: 'handle',
   PERSONAL_INVITE: 'personal_invite',
+  PHONE: 'phone',
+  PHONE_CODE: 'phone_code',
 };
 
 export const FLOW_TO_CONTEXT = {
@@ -66,19 +70,18 @@ export function trackEvent(event) {
   return function(dispatch, getState, {mixpanel}) {
     return Promise.resolve()
       .then(() => dispatch(TrackingActionCreator.startTrackingAction(event)))
-      .then(
-        () =>
-          new Promise(resolve => {
-            const attributes = Object.assign(
-              {
-                app: 'desktop',
-                desktop_app: RuntimeUtil.getPlatform(),
-              },
-              event.attributes
-            );
-            mixpanel.track(event.name, attributes, successCode => resolve(successCode));
-          })
-      )
+      .then(() => {
+        return new Promise(resolve => {
+          const attributes = Object.assign(
+            {
+              app: 'desktop',
+              desktop_app: RuntimeUtil.getPlatform(),
+            },
+            event.attributes
+          );
+          mixpanel.track(event.name, attributes, successCode => resolve(successCode));
+        });
+      })
       .then(trackingResult => dispatch(TrackingActionCreator.successfulTrackingAction(trackingResult)))
       .catch(error => dispatch(TrackingActionCreator.failedTrackingAction(error)));
   };
