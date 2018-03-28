@@ -32,6 +32,7 @@ import {
   CheckboxLabel,
   H1,
   Text,
+  Small,
   Link,
   ArrowIcon,
   COLOR,
@@ -41,14 +42,14 @@ import {ROUTE, QUERY_KEY} from '../route';
 import EXTERNAL_ROUTE from '../externalRoute';
 import {Link as RRLink} from 'react-router-dom';
 import {connect} from 'react-redux';
-import {injectIntl} from 'react-intl';
+import {injectIntl, FormattedHTMLMessage} from 'react-intl';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 import * as AuthAction from '../module/action/AuthAction';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import * as ConversationAction from '../module/action/ConversationAction';
 import * as ClientAction from '../module/action/ClientAction';
 import ValidationError from '../module/action/ValidationError';
-import {loginStrings} from '../../strings';
+import {loginStrings, logoutReasonStrings} from '../../strings';
 import RuntimeUtil from '../util/RuntimeUtil';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
 import BackendError from '../module/action/BackendError';
@@ -66,9 +67,9 @@ class Login extends React.PureComponent {
     email: '',
     isValidLink: true,
     loginError: null,
+    logoutReason: null,
     password: '',
     persist: true,
-    reason: null,
     validInputs: {
       email: true,
       password: true,
@@ -77,11 +78,11 @@ class Login extends React.PureComponent {
   };
 
   readAndUpdateParamsFromUrl = (nextProps = this.props) => {
-    const reason = getURLParameter(QUERY_KEY.LOGOUT_REASON) || null;
-    const reasonChanged = reason !== this.state.reason;
+    const logoutReason = getURLParameter(QUERY_KEY.LOGOUT_REASON) || null;
+    const logoutReasonChanged = logoutReason !== this.state.logoutReason;
 
-    if (reason && reasonChanged) {
-      this.setState((state, props) => ({...state, reason}));
+    if (logoutReason && logoutReasonChanged) {
+      this.setState((state, props) => ({...state, logoutReason}));
     }
 
     const conversationCode = getURLParameter(QUERY_KEY.CONVERSATION_CODE) || null;
@@ -99,7 +100,7 @@ class Login extends React.PureComponent {
             conversationCode,
             conversationKey,
             isValidLink: true,
-            reason,
+            logoutReason,
           }));
         })
         .then(() => this.props.doCheckConversationCode(conversationKey, conversationCode))
@@ -191,9 +192,18 @@ class Login extends React.PureComponent {
     return usernameRegex.test(username);
   };
 
+  renderLogoutReason = () => {
+    const {logoutReason} = this.state;
+    return (
+      <Small center style={{marginBottom: '16px'}}>
+        <FormattedHTMLMessage {...logoutReasonStrings[logoutReason]} />
+      </Small>
+    );
+  };
+
   render() {
     const {intl: {formatMessage: _}, loginError} = this.props;
-    const {isValidLink, email, password, persist, validInputs, validationErrors} = this.state;
+    const {logoutReason, isValidLink, email, password, persist, validInputs, validationErrors} = this.state;
     return (
       <Container centerText verticalCenter style={{width: '100%'}}>
         {!isValidLink && <Redirect to={ROUTE.CONVERSATION_JOIN_INVALID} />}
@@ -275,6 +285,7 @@ class Login extends React.PureComponent {
                   ) : loginError ? (
                     <ErrorMessage data-uie-name="error-message">{parseError(loginError)}</ErrorMessage>
                   ) : null}
+                  {logoutReason && this.renderLogoutReason()}
                   {!RuntimeUtil.isDesktop() && (
                     <Checkbox
                       onChange={event => this.setState({persist: !event.target.checked})}

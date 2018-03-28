@@ -20,6 +20,7 @@
 import {defineMessages} from 'react-intl';
 import BackendError from './auth/module/action/BackendError';
 import ValidationError from './auth/module/action/ValidationError';
+import {LOGOUT_REASON} from './auth/route';
 
 /* eslint-disable sort-keys */
 
@@ -495,6 +496,21 @@ export const loginStrings = defineMessages({
   publicComputer: {
     id: 'login.publicComputer',
     defaultMessage: 'This is a public computer',
+  },
+});
+
+export const logoutReasonStrings = defineMessages({
+  [LOGOUT_REASON.ACCOUNT_REMOVED]: {
+    id: 'LOGOUT_REASON.ACCOUNT_REMOVED',
+    defaultMessage: 'You were signed out because your account was deleted.',
+  },
+  [LOGOUT_REASON.CLIENT_REMOVED]: {
+    id: 'LOGOUT_REASON.CLIENT_REMOVED',
+    defaultMessage: 'You were signed out because your device was deleted.',
+  },
+  [LOGOUT_REASON.SESSION_EXPIRED]: {
+    id: 'LOGOUT_REASON.SESSION_EXPIRED',
+    defaultMessage: 'You were signed out because your session expired. <br />Please log in again.',
   },
 });
 

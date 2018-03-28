@@ -28,7 +28,7 @@ const QUERY_KEY = {
 };
 
 const LOGOUT_REASON = {
-  ACCOUNT_DELETED: 'deleted',
+  ACCOUNT_REMOVED: 'deleted',
   CLIENT_REMOVED: 'client_removed',
   SESSION_EXPIRED: 'expired',
 };
