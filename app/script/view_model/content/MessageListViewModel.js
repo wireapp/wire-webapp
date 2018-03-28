@@ -176,19 +176,19 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
   /**
    * Change conversation.
    *
-   * @param {z.entity.Conversation} conversation_et - Conversation entity to change to
-   * @param {z.entity.Message} message_et - message to be focused
+   * @param {z.entity.Conversation} conversationEntity - Conversation entity to change to
+   * @param {z.entity.Message} messageEntity - message to be focused
    * @returns {Promise} Resolves when conversation was changed
    */
-  change_conversation(conversation_et, message_et) {
+  changeConversation(conversationEntity, messageEntity) {
     // Clean up old conversation
     if (this.conversation()) {
       this.release_conversation(this.conversation());
     }
 
     // Update new conversation
-    this.conversation(conversation_et);
-    this.marked_message(message_et);
+    this.conversation(conversationEntity);
+    this.marked_message(messageEntity);
 
     // Keep last read timestamp to render unread when entering conversation
     if (this.conversation().unread_event_count()) {
@@ -196,25 +196,24 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     }
 
     // @todo Rethink conversation.is_loaded
-    if (conversation_et.is_loaded()) {
-      return this._render_conversation(conversation_et);
+    if (conversationEntity.is_loaded()) {
+      return this._render_conversation(conversationEntity);
     }
 
     return this.conversation_repository
-      .update_participating_user_ets(conversation_et)
-      .then(_conversation_et => {
-        if (this.marked_message()) {
-          return this.conversation_repository.get_messages_with_offset(_conversation_et, this.marked_message());
-        }
-        return this.conversation_repository.getPrecedingMessages(_conversation_et);
+      .updateParticipatingUserEntities(conversationEntity, false, true)
+      .then(_conversationEntity => {
+        return this.marked_message()
+          ? this.conversation_repository.get_messages_with_offset(_conversationEntity, this.marked_message())
+          : this.conversation_repository.getPrecedingMessages(_conversationEntity);
       })
       .then(() => {
-        const last_message = this.conversation().getLastMessage();
-        if (last_message && last_message.timestamp() === this.conversation().last_event_timestamp()) {
+        const lastMessageEntity = this.conversation().getLastMessage();
+        if (lastMessageEntity && lastMessageEntity.timestamp() === this.conversation().last_event_timestamp()) {
           this.conversation_reached_bottom = true;
         }
-        conversation_et.is_loaded(true);
-        return this._render_conversation(conversation_et);
+        conversationEntity.is_loaded(true);
+        return this._render_conversation(conversationEntity);
       });
   }
 

@@ -153,7 +153,12 @@ z.viewModel.panel.GroupParticipantUserViewModel = class GroupParticipantUserView
     this.selectedParticipant(undefined);
   }
 
-  showGroupParticipant(userEntity) {
-    this.selectedParticipant(ko.unwrap(userEntity));
+  showGroupParticipant(user) {
+    const userEntity = ko.unwrap(user);
+    this.selectedParticipant(userEntity);
+
+    if (userEntity.isTemporaryGuest()) {
+      userEntity.checkGuestExpiration();
+    }
   }
 };

@@ -125,7 +125,7 @@ z.user.UserMapper = class UserMapper {
 
     if (expirationDate) {
       userEntity.isTemporaryGuest(true);
-      userEntity.setExpiration(new Date(expirationDate).getTime());
+      userEntity.setGuestExpiration(new Date(expirationDate).getTime());
     }
 
     if (handle) {

@@ -232,7 +232,9 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
           this.userRepository
             .unblockUser(userEntity, showConversation)
             .then(() => this.conversationRepository.get_1to1_conversation(userEntity))
-            .then(conversationEntity => this.conversationRepository.update_participating_user_ets(conversationEntity));
+            .then(conversationEntity => {
+              return this.conversationRepository.updateParticipatingUserEntities(conversationEntity);
+            });
         },
         text: {
           action: z.l10n.text(z.string.modalUserUnblockAction),

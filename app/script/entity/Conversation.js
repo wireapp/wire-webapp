@@ -586,24 +586,31 @@ z.entity.Conversation = class Conversation {
    * @returns {number} Count of pending uploads
    */
   get_number_of_pending_uploads() {
-    const pending_uploads = [];
+    const pendingUploads = [];
 
-    for (const message_et of this.messages()) {
-      if (
-        message_et.assets &&
-        message_et.assets()[0] &&
-        message_et.assets()[0].pending_upload &&
-        message_et.assets()[0].pending_upload()
-      ) {
-        pending_uploads.push(message_et);
+    for (const messageEntity of this.messages()) {
+      const [assetEntity] = (messageEntity.assets && messageEntity.assets()) || [];
+      const isPendingUpload = assetEntity && assetEntity.pending_upload && assetEntity.pending_upload();
+      if (isPendingUpload) {
+        pendingUploads.push(messageEntity);
       }
     }
 
-    return pending_uploads.length;
+    return pendingUploads.length;
   }
 
-  get_users_with_unverified_clients() {
-    return [this.self].concat(this.participating_user_ets()).filter(user_et => !user_et.is_verified());
+  updateGuests() {
+    this.getTemporaryGuests().forEach(userEntity => userEntity.checkGuestExpiration());
+  }
+
+  getTemporaryGuests() {
+    const userEntities = this.self ? this.participating_user_ets().concat(this.self) : this.participating_user_ets();
+    return userEntities.filter(userEntity => userEntity.isTemporaryGuest());
+  }
+
+  getUsersWithUnverifiedClients() {
+    const userEntities = this.self ? this.participating_user_ets().concat(this.self) : this.participating_user_ets();
+    return userEntities.filter(userEntity => !userEntity.is_verified());
   }
 
   /**
