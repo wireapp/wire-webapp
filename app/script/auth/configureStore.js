@@ -21,6 +21,8 @@ import {applyMiddleware, combineReducers, compose, createStore} from 'redux';
 import {composeWithDevTools} from 'redux-devtools-extension';
 import reducers from './module/reducer';
 import thunk from 'redux-thunk';
+import {createLogger} from 'redux-logger';
+import * as Environment from './Environment';
 
 export const configureStore = (thunkArguments = {}) => {
   const store = createStore(combineReducers(reducers), createMiddleware(thunkArguments));
@@ -36,6 +38,20 @@ export const configureStore = (thunkArguments = {}) => {
 
 const createMiddleware = thunkArguments => {
   const middlewares = [thunk.withExtraArgument(thunkArguments)];
+  if (!Environment.isEnvironment(Environment.PRODUCTION)) {
+    middlewares.push(
+      createLogger({
+        collapsed: true,
+        diff: true,
+        duration: true,
+        level: {
+          action: 'info',
+          nextState: 'info',
+          prevState: false,
+        },
+      })
+    );
+  }
   const composeEnhancers = process.env.NODE_ENV !== 'production' ? composeWithDevTools : compose;
   return composeEnhancers(applyMiddleware(...middlewares));
 };

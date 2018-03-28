@@ -48,9 +48,12 @@ function doLoginPlain(loginData, onBeforeLogin, onAfterLogin) {
       .then(() => core.login(loginData, false, ClientAction.generateClientPayload(loginData.persist)))
       .then(() => persistAuthData(loginData.persist, core, dispatch))
       .then(() => {
-        const loginContext = loginData.email ? 'email' : 'handle';
+        const authenticationContext = loginData.email
+          ? TrackingAction.AUTHENTICATION_CONTEXT.EMAIL
+          : TrackingAction.AUTHENTICATION_CONTEXT.HANDLE;
+
         const trackingEventData = {
-          attributes: {context: loginContext, remember_me: loginData.persist},
+          attributes: {context: authenticationContext, remember_me: loginData.persist},
           name: TrackingAction.EVENT_NAME.ACCOUNT.LOGGED_IN,
         };
         return TrackingAction.trackEvent(trackingEventData);
@@ -60,12 +63,8 @@ function doLoginPlain(loginData, onBeforeLogin, onAfterLogin) {
       .then(() => dispatch(ClientAction.doInitializeClient(loginData.persist, loginData.password)))
       .then(() => dispatch(AuthActionCreator.successfulLogin()))
       .catch(error => {
-        const handledError = BackendError.handle(error);
-        if (handledError.label === BackendError.LABEL.NEW_CLIENT) {
-          dispatch(ClientAction.doGetAllClients());
-        }
         dispatch(AuthActionCreator.failedLogin(error));
-        throw handledError;
+        throw BackendError.handle(error);
       });
   };
 }

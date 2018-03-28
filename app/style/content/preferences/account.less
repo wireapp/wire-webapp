@@ -18,10 +18,10 @@
  */
 
 .preferences-section-account-profile {
-  display: flex;
   position: relative;
-  justify-content: space-between;
+  display: flex;
   width: 536px;
+  justify-content: space-between;
 }
 
 .preferences-section-conversation-history {
@@ -55,15 +55,15 @@
   width: 300px;
 
   .preferences-separator {
-    margin: 24px 0;
     width: 256px;
+    margin: 24px 0;
   }
 
   .preferences-leave-disclaimer {
-    font-size: 12px;
-    line-height: initial;
     margin-top: 16px;
+    font-size: 12px;
     font-weight: @font-weight-regular;
+    line-height: initial;
   }
 }
 
@@ -78,6 +78,7 @@
 
 .preferences-account-picture-button {
   .square(@avatar-diameter-xl);
+
   position: relative;
   display: inline-block;
   cursor: pointer;
@@ -85,10 +86,11 @@
   > span {
     .full-screen;
     .flex-center;
+
     color: #fff;
     font-size: @font-size-xl;
-    pointer-events: none;
     opacity: 0;
+    pointer-events: none;
 
     &::before {
       text-shadow: 0 0 40px fade(#000, 80%);
@@ -124,13 +126,14 @@
 
 .preferences-account-input {
   .reset-textarea;
-  background: transparent;
-  height: @line-height-xl;
-  line-height: @line-height-xl;
-  margin-left: -4px;
+
   width: 100%;
-  padding-left: 4px;
+  height: @line-height-xl;
   padding-right: 28px;
+  padding-left: 4px;
+  margin-left: -4px;
+  background: transparent;
+  line-height: @line-height-xl;
 
   &::placeholder {
     .label-xs;
@@ -138,6 +141,7 @@
 
   &:hover + .preferences-account-input-icon-edit::after {
     .icon-mixin('\e177'); // icon-edit
+
     font-size: 12px;
   }
 
@@ -147,15 +151,15 @@
   }
 
   &:focus + .preferences-account-input-icon-edit::after {
-    content: '';
     display: none;
+    content: '';
   }
 }
 
 .preferences-account-input-icon {
   position: absolute;
+  top: 0;
   right: 12px;
-  top: 0px;
 }
 
 .preferences-account-name {
@@ -166,8 +170,8 @@
   position: absolute;
   top: 0;
   left: 0;
-  line-height: @line-height-xl;
   color: @graphite;
+  line-height: @line-height-xl;
 }
 
 .preferences-account-username {
@@ -184,5 +188,6 @@
 
 .preferences-account-availability {
   .label-bold-xs;
+
   cursor: pointer;
 }

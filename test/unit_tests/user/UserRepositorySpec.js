@@ -159,7 +159,7 @@ describe('z.user.UserRepository', () => {
       });
     });
 
-    describe('find_user_by_id', () => {
+    describe('findUserById', () => {
       let user = null;
 
       beforeEach(done => {
@@ -177,7 +177,7 @@ describe('z.user.UserRepository', () => {
 
       it('should find an existing user', done => {
         TestFactory.user_repository
-          .find_user_by_id(user.id)
+          .findUserById(user.id)
           .then(user_et => {
             expect(user_et).toEqual(user);
             done();
@@ -187,7 +187,7 @@ describe('z.user.UserRepository', () => {
 
       it('should not find an unknown user', done => {
         TestFactory.user_repository
-          .find_user_by_id('1')
+          .findUserById('1')
           .then(done.fail)
           .catch(error => {
             expect(error.type).toBe(z.user.UserError.TYPE.USER_NOT_FOUND);

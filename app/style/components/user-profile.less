@@ -19,60 +19,63 @@
 
 user-profile {
   .bubble-content;
+
   color: @graphite-dark;
 }
 
 // TODO: make generic shift classes
 .user-profile-transition {
   .hardware-acc;
+
   height: 100%;
-  transition-property: transform;
   transition-duration: @animation-timing-fast;
+  transition-property: transform;
   // TODO: timing function
 }
 
 .user-profile-default {
   display: flex;
-  flex-direction: column;
-  height: 100%;
   overflow: hidden;
+  height: 100%;
+  flex-direction: column;
 }
 
 // user-profile-default
 .user-profile-header {
   display: flex;
+  min-height: 80px;
   flex-direction: column;
   padding-top: 21px;
-  padding-left: 56px;
   padding-right: 56px;
-  min-height: 80px;
+  padding-left: 56px;
   text-align: center;
 }
 
 .user-profile-details {
-  align-items: center;
+  position: relative;
   display: flex;
   flex: 1 1;
   flex-direction: column;
+  align-items: center;
   justify-content: center;
-  position: relative;
 }
 
 .user-profile-details-avatar {
   .square(@avatar-diameter-xl);
+
   position: relative;
 }
 
 .user-profile-footer {
+  padding-right: 18px;
   padding-bottom: 18px;
   padding-left: 18px;
-  padding-right: 18px;
 
   > .footer-controls-buttons {
     display: flex;
-    justify-content: center;
-    align-items: center;
     height: 100%;
+    align-items: center;
+    justify-content: center;
 
     .button:first-child {
       margin-right: 16px;
@@ -82,9 +85,10 @@ user-profile {
   > .footer-connection-request {
     .label-bold-xs;
     .flex-center;
+
     color: #fff;
-    text-align: center;
     cursor: pointer;
+    text-align: center;
   }
 
   > .footer-connection-request {

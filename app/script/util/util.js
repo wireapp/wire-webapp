@@ -51,7 +51,7 @@ z.util.checkIndexedDb = () => {
       const maxRetry = 50;
 
       const interval_id = window.setInterval(() => {
-        currentAttempt = currentAttempt + 1;
+        currentAttempt += 1;
 
         if (dbOpenRequest.readyState === 'done' && !dbOpenRequest.result) {
           window.clearInterval(interval_id);

@@ -40,6 +40,7 @@ z.entity.User = class User {
     return {
       TEMPORARY_GUEST: {
         EXPIRATION_INTERVAL: 60 * 1000,
+        EXPIRATION_THRESHOLD: 10 * 1000,
         LIFETIME: 24 * 60 * 60 * 1000,
       },
     };
@@ -183,6 +184,7 @@ z.entity.User = class User {
     this.expirationIsUrgent = ko.observable(false);
     this.expirationRemainingText = ko.observable('');
     this.expirationIntervalId = undefined;
+    this.expirationTimeoutId = undefined;
     this.isExpired = ko.observable(false);
   }
 
@@ -231,16 +233,19 @@ z.entity.User = class User {
     };
   }
 
-  setExpiration(timestamp) {
+  setGuestExpiration(timestamp) {
     if (this.expirationIntervalId) {
       window.clearInterval(this.expirationIntervalId);
       this.expirationIntervalId = undefined;
     }
 
-    this.setRemaining(timestamp);
+    this._setRemainingExpirationTime(timestamp);
 
     const expirationInterval = User.CONFIG.TEMPORARY_GUEST.EXPIRATION_INTERVAL;
-    this.expirationIntervalId = window.setInterval(() => this.setRemaining(timestamp), expirationInterval);
+    this.expirationIntervalId = window.setInterval(
+      () => this._setRemainingExpirationTime(timestamp),
+      expirationInterval
+    );
 
     window.setTimeout(() => {
       this.isExpired(true);
@@ -248,7 +253,26 @@ z.entity.User = class User {
     }, this.expirationRemaining());
   }
 
-  setRemaining(expirationTime) {
+  clearExpirationTimeout() {
+    if (this.expirationTimeoutId) {
+      window.clearTimeout(this.expirationTimeoutId);
+      this.expirationTimeoutId = undefined;
+    }
+  }
+
+  checkGuestExpiration() {
+    const checkExpiration = this.isTemporaryGuest() && !this.expirationTimeoutId;
+    if (checkExpiration) {
+      if (this.isExpired()) {
+        return amplify.publish(z.event.WebApp.USER.UPDATE, this.id);
+      }
+
+      const timeout = this.expirationRemaining() + User.CONFIG.TEMPORARY_GUEST.EXPIRATION_THRESHOLD;
+      this.expirationTimeoutId = window.setTimeout(() => amplify.publish(z.event.WebApp.USER.UPDATE, this.id), timeout);
+    }
+  }
+
+  _setRemainingExpirationTime(expirationTime) {
     const MILLISECONDS_IN_MINUTE = 60 * 1000;
     const MILLISECONDS_IN_HOUR = MILLISECONDS_IN_MINUTE * 60;
 

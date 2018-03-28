@@ -24,10 +24,10 @@ import {connect} from 'react-redux';
 import {Link as RRLink} from 'react-router-dom';
 import {withRouter} from 'react-router';
 import React from 'react';
-import ROUTE from '../route';
+import {ROUTE} from '../route';
 import EXTERNAL_ROUTE from '../externalRoute';
 import AccountForm from '../component/AccountForm';
-import {trackNameWithContext, EVENT_CONTEXT, EVENT_NAME, FLOW_TO_CONTEXT} from '../module/action/TrackingAction';
+import * as TrackingAction from '../module/action/TrackingAction';
 import {getAccount, getCurrentFlow, REGISTER_FLOW} from '../module/selector/AuthSelector';
 import * as AuthActionCreator from '../module/action/creator/AuthActionCreator';
 import * as AuthAction from '../module/action/AuthAction';
@@ -52,8 +52,9 @@ class CreatePersonalAccount extends React.PureComponent {
     this.props
       .doRegisterPersonal({...this.props.account, invitation_code: this.invitationCode})
       .then(() => {
-        this.props.trackNameWithContext(EVENT_NAME.PERSONAL.CREATED, EVENT_CONTEXT.PERSONAL_INVITE);
-        this.props.trackNameWithContext(EVENT_NAME.PERSONAL.VERIFIED, EVENT_CONTEXT.PERSONAL_INVITE);
+        const authenticationContext = TrackingAction.AUTHENTICATION_CONTEXT.PERSONAL_INVITE;
+        this.props.trackNameWithContext(TrackingAction.EVENT_NAME.PERSONAL.CREATED, authenticationContext);
+        this.props.trackNameWithContext(TrackingAction.EVENT_NAME.PERSONAL.VERIFIED, authenticationContext);
       })
       .then(() => {
         const link = document.createElement('a');
@@ -65,8 +66,8 @@ class CreatePersonalAccount extends React.PureComponent {
   };
 
   handleBeforeSubmit = () => {
-    const context = FLOW_TO_CONTEXT[this.props.currentFlow];
-    this.props.trackNameWithContext(EVENT_NAME.PERSONAL.ENTERED_ACCOUNT_DATA, context);
+    const authenticationContext = TrackingAction.FLOW_TO_CONTEXT[this.props.currentFlow];
+    this.props.trackNameWithContext(TrackingAction.EVENT_NAME.PERSONAL.ENTERED_ACCOUNT_DATA, authenticationContext);
   };
 
   handleSubmit = () => {
@@ -121,9 +122,9 @@ class CreatePersonalAccount extends React.PureComponent {
 export default withRouter(
   injectIntl(
     connect(state => ({account: getAccount(state), currentFlow: getCurrentFlow(state)}), {
-      trackNameWithContext,
       ...AuthAction,
       ...AuthActionCreator,
+      ...TrackingAction,
     })(CreatePersonalAccount)
   )
 );

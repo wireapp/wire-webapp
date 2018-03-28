@@ -21,9 +21,10 @@
 .seekbar-thumb-style() {
   .accent-background-color;
   .circle(12px);
+
+  border: none;
   appearance: none !important;
   background-color: transparent;
-  border: none;
   opacity: 0;
   transition: opacity @animation-timing-slow ease-in-out;
 }
@@ -34,11 +35,12 @@ seek-bar {
 
   input {
     .accent-color;
+
+    width: 100%;
+    height: 2px;
     appearance: none;
     border-radius: 1px;
     cursor: pointer;
-    width: 100%;
-    height: 2px;
     outline: none;
 
     &::-moz-range-thumb {
@@ -52,8 +54,8 @@ seek-bar {
     }
 
     &::-moz-range-track {
-      background-color: fade(#fff, 40%);
       border: none;
+      background-color: fade(#fff, 40%);
     }
 
     &.show-seek-bar-thumb::-webkit-slider-thumb {

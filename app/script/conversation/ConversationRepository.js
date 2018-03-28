@@ -558,7 +558,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   update_conversations_offline() {
     this.logger.info('Updating group participants offline');
-    this.sorted_conversations().map(conversation_et => this.update_participating_user_ets(conversation_et, true));
+    this.sorted_conversations().map(conversation_et => this.updateParticipatingUserEntities(conversation_et, true));
   }
 
   /**
@@ -787,7 +787,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return this.fetch_conversation_by_id(user_et.connection().conversation_id)
       .then(conversation_et => {
         conversation_et.connection(user_et.connection());
-        return this.update_participating_user_ets(conversation_et);
+        return this.updateParticipatingUserEntities(conversation_et);
       })
       .catch(error => {
         const isConversationNotFound = error.type === z.conversation.ConversationError.TYPE.CONVERSATION_NOT_FOUND;
@@ -885,7 +885,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           conversation_et.type(z.conversation.ConversationType.ONE2ONE);
         }
 
-        this.update_participating_user_ets(conversation_et).then(updated_conversation_et => {
+        this.updateParticipatingUserEntities(conversation_et).then(updated_conversation_et => {
           if (show_conversation) {
             amplify.publish(z.event.WebApp.CONVERSATION.SHOW, updated_conversation_et);
           }
@@ -1029,16 +1029,24 @@ z.conversation.ConversationRepository = class ConversationRepository {
   /**
    * Update participating users in a conversation.
    *
-   * @param {Conversation} conversation_et - Conversation to be updated
+   * @param {Conversation} conversationEntity - Conversation to be updated
    * @param {boolean} [offline=false] - Should we only look for cached contacts
+   * @param {boolean} [updateGuests=false] - Update conversation guests
    * @returns {Promise} Resolves when users have been updated
    */
-  update_participating_user_ets(conversation_et, offline = false) {
-    return this.user_repository.get_users_by_id(conversation_et.participating_user_ids(), offline).then(user_ets => {
-      user_ets.sort((userA, userB) => z.util.StringUtil.sortByPriority(userA.first_name(), userB.first_name()));
-      conversation_et.participating_user_ets(user_ets);
-      return conversation_et;
-    });
+  updateParticipatingUserEntities(conversationEntity, offline = false, updateGuests = false) {
+    return this.user_repository
+      .get_users_by_id(conversationEntity.participating_user_ids(), offline)
+      .then(userEntities => {
+        userEntities.sort((userA, userB) => z.util.StringUtil.sortByPriority(userA.first_name(), userB.first_name()));
+        conversationEntity.participating_user_ets(userEntities);
+
+        if (updateGuests) {
+          conversationEntity.updateGuests();
+        }
+
+        return conversationEntity;
+      });
   }
 
   //##############################################################################
@@ -2285,7 +2293,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         let sendAnyway = false;
 
         if (!userIds) {
-          userIds = conversationEntity.get_users_with_unverified_clients().map(userEntity => userEntity.id);
+          userIds = conversationEntity.getUsersWithUnverifiedClients().map(userEntity => userEntity.id);
         }
 
         return this.user_repository
@@ -2973,7 +2981,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
         throw error;
       })
-      .then(conversationEntity => this.update_participating_user_ets(conversationEntity))
+      .then(conversationEntity => this.updateParticipatingUserEntities(conversationEntity))
       .then(conversationEntity => this.save_conversation(conversationEntity))
       .then(conversationEntity => {
         if (conversationEntity) {
@@ -3048,7 +3056,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       conversationEntity.status(z.conversation.ConversationStatus.CURRENT_MEMBER);
     }
 
-    return this.update_participating_user_ets(conversationEntity)
+    return this.updateParticipatingUserEntities(conversationEntity, false, true)
       .then(() => this._add_event_to_conversation(eventJson, conversationEntity))
       .then(messageEntity => {
         this.verification_state_handler.onMemberJoined(conversationEntity, eventData.user_ids);
@@ -3088,12 +3096,16 @@ z.conversation.ConversationRepository = class ConversationRepository {
             .forEach(userEntity => {
               conversationEntity.participating_user_ids.remove(userEntity.id);
 
+              if (userEntity.isTemporaryGuest()) {
+                userEntity.clearExpirationTimeout();
+              }
+
               if (conversationEntity.call()) {
                 amplify.publish(z.event.WebApp.CALL.STATE.REMOVE_PARTICIPANT, conversationEntity.id, userEntity.id);
               }
             });
 
-          return this.update_participating_user_ets(conversationEntity).then(() => messageEntity);
+          return this.updateParticipatingUserEntities(conversationEntity).then(() => messageEntity);
         })
         .then(messageEntity => {
           this.verification_state_handler.onMemberLeft(conversationEntity);
@@ -3443,7 +3455,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   _fetch_users_and_events(conversation_et) {
     if (!conversation_et.is_loaded() && !conversation_et.is_pending()) {
-      this.update_participating_user_ets(conversation_et);
+      this.updateParticipatingUserEntities(conversation_et);
       this._get_unread_events(conversation_et);
     }
   }

@@ -19,36 +19,37 @@
 
 /* container */
 .conversation-list-cell {
-  cursor: pointer;
-  display: flex;
-  font-weight: @font-weight-regular;
-  height: 56px;
   position: relative;
+  display: flex;
+  height: 56px;
+  cursor: pointer;
+  font-weight: @font-weight-regular;
 
   &::after {
-    background-color: #fff;
-    bottom: 0;
-    content: '';
-    left: @left-list-item-left-width;
-    height: 1px;
-    opacity: 0.06;
     position: absolute;
     right: 0;
+    bottom: 0;
+    left: @left-list-item-left-width;
+    height: 1px;
+    background-color: #fff;
+    content: '';
+    opacity: 0.06;
   }
 }
 
 .conversation-list-cell-left {
   .flex-center;
-  flex: 0 0 auto;
+
   width: @left-list-item-left-width;
+  flex: 0 0 auto;
 }
 
 .conversation-list-cell-center {
   display: flex;
+  min-width: 0;
   flex: 1 1 auto;
   flex-direction: column;
   justify-content: center;
-  min-width: 0;
 
   &.conversation-list-cell-center-no-left {
     padding-left: 16px;
@@ -57,6 +58,7 @@
 
 .conversation-list-cell-right {
   .flex-center;
+
   padding-right: 16px;
 }
 
@@ -68,27 +70,30 @@
 
   .availability-state-label {
     .ellipsis-nowrap;
+
+    margin-right: 4px;
     font-size: 14px;
     line-height: 16px;
-    margin-right: 4px;
   }
 }
 
 .conversation-list-cell-name {
   .ellipsis-nowrap;
+
+  margin-right: 4px;
   font-size: 14px;
   line-height: 16px;
-  margin-right: 4px;
   user-select: none;
 }
 
 .conversation-list-cell-description {
   .ellipsis-nowrap;
+
+  margin-top: 2px;
+  margin-right: 4px;
   font-size: 12px;
   font-weight: @font-weight-regular;
   line-height: 16px;
-  margin-right: 4px;
-  margin-top: 2px;
   opacity: 0.64;
 }
 
@@ -101,14 +106,14 @@
   .square(20px);
 
   &::before {
-    content: '';
-    transition: opacity @animation-timing-slow @ease-out-quart @animation-timing-faster + 0.05;
-    opacity: 0;
     width: 0;
     height: 0;
-    border-left: 4px solid transparent;
-    border-right: 4px solid transparent;
     border-top: 4px solid #fff;
+    border-right: 4px solid transparent;
+    border-left: 4px solid transparent;
+    content: '';
+    opacity: 0;
+    transition: opacity @animation-timing-slow @ease-out-quart @animation-timing-faster + 0.05;
 
     .conversation-list-cell:hover & {
       opacity: 1;

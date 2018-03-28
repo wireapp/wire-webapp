@@ -31,7 +31,7 @@ import * as AuthSelector from '../module/selector/AuthSelector';
 import * as UserAction from '../module/action/UserAction';
 import Page from './Page';
 import React from 'react';
-import ROUTE from '../route';
+import {ROUTE} from '../route';
 
 const changeEmailRedirect = {
   [REGISTER_FLOW.PERSONAL]: ROUTE.CREATE_ACCOUNT,

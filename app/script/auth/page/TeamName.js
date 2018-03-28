@@ -33,7 +33,7 @@ import {
   RoundIconButton,
   ErrorMessage,
 } from '@wireapp/react-ui-kit';
-import ROUTE from '../route';
+import {ROUTE} from '../route';
 import EXTERNAL_ROUTE from '../externalRoute';
 import {Link as RRLink} from 'react-router-dom';
 import {connect} from 'react-redux';
