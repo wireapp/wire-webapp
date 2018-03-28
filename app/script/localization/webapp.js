@@ -607,17 +607,16 @@ z.string.preferencesOptionsCallLogsDetail = 'This information helps Wire Support
 
 z.string.preferencesOptionsConversationHistoryTitle = 'Conversation history';
 z.string.preferencesOptionsConversationHistoryExportTitle = 'Back up history';
-z.string.preferencesOptionsConversationHistoryExportDescription = 'Bla bla history'
+z.string.preferencesOptionsConversationHistoryExportDescription = 'Back up your conversation history to a safe place.\nThe back up is not protected by Wire end-to-end encryption.';
 z.string.preferencesOptionsConversationHistoryImportTitle = 'Restore from backup';
-z.string.preferencesOptionsConversationHistoryImportDescription = 'Bla bla restore';
+z.string.preferencesOptionsConversationHistoryImportDescription = 'You can only restore history from a backup of the same platform.';
 z.string.preferencesOptionsConversationHistoryPasswordTitle = 'Set email and password';
-z.string.preferencesOptionsConversationHistoryPasswordDescription = 'Bla bla password description';
-z.string.preferencesOptionsConversationHistoryErrorTitle = 'Restoring the historu failed.';
+z.string.preferencesOptionsConversationHistoryPasswordDescription = 'You need an email and a password in order to back up your conversation history. You can do it from the account page in Settings.';
+z.string.preferencesOptionsConversationHistoryErrorTitle = 'Restoring the history failed.';
 z.string.preferencesOptionsConversationHistoryErrorDescription = 'Please, check your backup file, it might not be compatible or corrupted.';
 z.string.preferencesOptionsConversationHistoryImportProgress = 'Restoring your conversations...';
 z.string.preferencesOptionsConversationHistoryExportProgress = 'Backing up...';
 z.string.preferencesOptionsConversationHistoryProgressDone = 'Done';
-
 
 // Search
 z.string.searchConnect = 'Connect';
