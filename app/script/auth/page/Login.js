@@ -38,6 +38,7 @@ import {
   COLOR,
   ErrorMessage,
 } from '@wireapp/react-ui-kit';
+import * as Environment from '../Environment';
 import {ROUTE, QUERY_KEY} from '../route';
 import EXTERNAL_ROUTE from '../externalRoute';
 import {Link as RRLink} from 'react-router-dom';
@@ -150,6 +151,8 @@ class Login extends React.PureComponent {
           login.email = email;
         } else if (this.isValidUsername(email)) {
           login.handle = email.replace('@', '');
+        } else if (this.isValidPhoneNumber(email)) {
+          login.phone = email;
         }
 
         const hasKeyAndCode = this.state.conversationKey && this.state.conversationCode;
@@ -181,6 +184,13 @@ class Login extends React.PureComponent {
   isValidEmail = email => {
     const emailRegex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     return emailRegex.test(email);
+  };
+
+  isValidPhoneNumber = phoneNumber => {
+    const isProductionBackend = Environment.isEnvironment(Environment.PRODUCTION);
+    const e164regex = isProductionBackend ? /^\+[1-9]\d{1,14}$/ : /^\+[0-9]\d{1,14}$/;
+
+    return e164regex.test(phoneNumber);
   };
 
   isValidUsername = username => {
