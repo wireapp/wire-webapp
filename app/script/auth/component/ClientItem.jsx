@@ -141,7 +141,6 @@ class ClientItem extends React.Component {
                     placeholder={_(clientItemStrings.passwordPlaceholder)}
                     type="password"
                     innerRef={node => (this.passwordInput = node)}
-                    markInvalid={!validPassword}
                     value={password}
                     autoComplete="section-login password"
                     maxLength="1024"
@@ -157,7 +156,7 @@ class ClientItem extends React.Component {
                     data-uie-name="remove-device-password"
                   />
                   <RoundIconButton
-                    disabled={!password}
+                    disabled={!password || !validPassword}
                     color={COLOR.RED}
                     type="submit"
                     icon={ICON_NAME.TRASH}
