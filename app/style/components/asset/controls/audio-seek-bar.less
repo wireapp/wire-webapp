@@ -18,16 +18,17 @@
  */
 
 audio-seek-bar {
-  cursor: pointer;
-  display: flex;
   position: relative;
+  display: flex;
   width: 100%;
   height: 100%;
+  cursor: pointer;
 
   span {
     .vertical-align;
-    background-color: @graphite;
+
     flex-grow: 1;
+    background-color: @graphite;
   }
 
   span + span {

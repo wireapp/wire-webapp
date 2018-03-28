@@ -19,6 +19,7 @@
 
 #background {
   .full-screen;
+
   background-color: fade(#000, 88%);
 }
 
@@ -27,14 +28,15 @@
 .background-image,
 .background-darken {
   .full-screen;
+
   overflow: hidden;
 }
 
 .background {
-  transition-property: opacity;
-  transition-duration: @animation-timing-slow;
-  transition-timing-function: @ease-out-quart;
   background-color: fade(#000, 88%);
+  transition-duration: @animation-timing-slow;
+  transition-property: opacity;
+  transition-timing-function: @ease-out-quart;
 
   &--white {
     background-color: @app-bg;
@@ -43,8 +45,8 @@
 }
 
 .background-image {
-  background-size: cover;
   background-position: center;
+  background-size: cover;
   filter: blur(32px) saturate(200%);
   transform: scale(1.4);
 }

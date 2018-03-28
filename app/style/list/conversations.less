@@ -30,18 +30,19 @@
 }
 
 .conversations-footer {
-  height: @conversation-input-min-height;
-  color: #fff;
   display: flex;
-  justify-content: space-between;
+  height: @conversation-input-min-height;
   align-items: center;
-  padding-left: 12px;
+  justify-content: space-between;
   padding-right: 12px;
+  padding-left: 12px;
+  color: #fff;
 
   .conversations-footer-contacts-label {
     .label-xs;
-    color: #fff;
+
     margin-left: 16px;
+    color: #fff;
   }
 }
 
@@ -51,24 +52,26 @@
 
 .conversations-settings-badge {
   .dot-md;
-  content: '';
+
   position: absolute;
-  right: 5px;
   top: 5px;
+  right: 5px;
+  content: '';
 }
 
 .conversations-hint {
-  margin-left: 20px;
-  margin-right: 24px;
   position: absolute;
   bottom: 0;
+  margin-right: 24px;
+  margin-left: 20px;
 }
 
 .conversations-hint-text {
   .text-white;
+
+  margin-bottom: 24px;
   font-size: @font-size-lg;
   font-weight: @font-weight-regular;
-  margin-bottom: 24px;
 }
 
 .conversations-hint-arrow {
@@ -81,5 +84,6 @@
   .label-xs;
   .text-center;
   .text-white;
+
   flex-direction: column;
 }

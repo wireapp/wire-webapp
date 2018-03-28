@@ -26,27 +26,30 @@
 // Video asset component
 video-asset {
   .asset-container-style;
-  display: block;
+
   position: relative;
+  display: block;
 
   &::after {
-    content: '';
     display: block;
     padding-bottom: 75%; // video ratio 4:3
+    content: '';
   }
 }
 
 .video-asset-placeholder {
   .full-screen;
   .flex-center;
+
+  z-index: -1;
   color: @seperator-color;
   font-size: @font-size-xl;
-  z-index: -1;
 }
 
 .video-playback-error {
   .full-screen;
   .flex-center;
+
   background-color: fade(@graphite-dark, 40%);
   color: #fff;
 }
@@ -68,21 +71,22 @@ video-asset {
 
 // Video controls bottom bar
 .video-controls-bottom {
-  align-items: center;
-  bottom: 0;
-  color: #fff;
-  display: flex;
-  height: 56px;
-  padding-left: 24px;
-  padding-right: 24px;
   position: absolute;
+  bottom: 0;
+  display: flex;
   width: 100%;
+  height: 56px;
+  align-items: center;
+  padding-right: 24px;
+  padding-left: 24px;
+  color: #fff;
 
   &::before {
     .full-screen;
-    content: '';
-    background: linear-gradient(to bottom, fade(#fff, 0), fade(#000, 40%));
+
     z-index: -1;
+    background: linear-gradient(to bottom, fade(#fff, 0), fade(#000, 40%));
+    content: '';
   }
 }
 
@@ -92,8 +96,8 @@ video-asset {
 }
 
 .video-controls-seekbar {
-  margin-left: 24px;
   margin-right: 24px;
+  margin-left: 24px;
 }
 
 &.hide-controls {
