@@ -49,7 +49,7 @@ import {injectIntl, FormattedHTMLMessage} from 'react-intl';
 import EXTERNAL_ROUTE from '../externalRoute';
 import {withRouter} from 'react-router';
 import React, {Component} from 'react';
-import {pathWithParams} from '../util/urlUtil';
+import {getURLParameter, pathWithParams} from '../util/urlUtil';
 import BackendError from '../module/action/BackendError';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
 import WirelessUnsupportedBrowser from '../component/WirelessUnsupportedBrowser';
