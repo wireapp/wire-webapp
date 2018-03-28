@@ -29,7 +29,10 @@ export function doGetAllClients() {
     dispatch(ClientActionCreator.startGetAllClients());
     return Promise.resolve()
       .then(() => apiClient.client.api.getClients())
-      .then(clients => dispatch(ClientActionCreator.successfulGetAllClients(clients)))
+      .then(clients => {
+        dispatch(ClientActionCreator.successfulGetAllClients(clients));
+        return clients;
+      })
       .catch(error => {
         dispatch(ClientActionCreator.failedGetAllClients(error));
         throw BackendError.handle(error);

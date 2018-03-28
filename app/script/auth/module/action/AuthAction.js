@@ -60,12 +60,8 @@ function doLoginPlain(loginData, onBeforeLogin, onAfterLogin) {
       .then(() => dispatch(ClientAction.doInitializeClient(loginData.persist, loginData.password)))
       .then(() => dispatch(AuthActionCreator.successfulLogin()))
       .catch(error => {
-        const handledError = BackendError.handle(error);
-        if (handledError.label === BackendError.LABEL.NEW_CLIENT) {
-          dispatch(ClientAction.doGetAllClients());
-        }
         dispatch(AuthActionCreator.failedLogin(error));
-        throw handledError;
+        throw BackendError.handle(error);
       });
   };
 }
