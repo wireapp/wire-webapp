@@ -219,6 +219,7 @@ class Login extends React.PureComponent {
                   <InputBlock>
                     <Input
                       name="email"
+                      tabIndex="1"
                       onChange={event =>
                         this.setState({
                           email: event.target.value,
@@ -244,6 +245,7 @@ class Login extends React.PureComponent {
                     <InputSubmitCombo>
                       <Input
                         name="password"
+                        tabIndex="2"
                         onChange={event =>
                           this.setState({
                             password: event.target.value,
@@ -263,6 +265,7 @@ class Login extends React.PureComponent {
                         data-uie-name="enter-password"
                       />
                       <RoundIconButton
+                        tabIndex="4"
                         disabled={!email || !password}
                         type="submit"
                         formNoValidate
@@ -283,6 +286,7 @@ class Login extends React.PureComponent {
                   )}
                   {!RuntimeUtil.isDesktop() && (
                     <Checkbox
+                      tabIndex="3"
                       onChange={event => this.setState({persist: !event.target.checked})}
                       checked={!persist}
                       data-uie-name="enter-public-computer-sign-in"
