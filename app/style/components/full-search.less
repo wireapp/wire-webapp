@@ -23,73 +23,76 @@ full-search {
 }
 
 .full-search-header {
-  align-items: center;
   display: flex;
   height: 40px;
+  align-items: center;
   margin-bottom: 16px;
 }
 
 .full-search-header-icon {
-  color: @graphite;
-  text-align: center;
   width: @conversation-message-sender-width;
   flex: 0 0 auto;
+  color: @graphite;
+  text-align: center;
 }
 
 .full-search-header-input {
+  display: flex;
   width: 100%;
   height: 100%;
-  display: flex;
   align-items: center;
   border-bottom: 1px solid @seperator-color;
 
   > input {
     .reset-textarea;
-    background-color: transparent;
+
     width: 100%;
     height: 24px;
+    background-color: transparent;
     line-height: 24px;
 
     &::placeholder {
       .label-xs;
-      color: fade(@graphite, 48%);
-      padding-left: 8px;
+
       height: 24px;
+      padding-left: 8px;
+      color: fade(@graphite, 48%);
       line-height: 24px;
     }
   }
 }
 
 .full-search-item {
-  align-items: center;
+  position: relative;
   display: flex;
   height: 56px;
-  position: relative;
+  align-items: center;
   cursor: pointer;
 
   &::after {
-    background-color: @seperator-color;
-    bottom: 0;
-    content: '';
-    height: 1px;
-    left: @conversation-message-sender-width;
     position: absolute;
     right: 0;
+    bottom: 0;
+    left: @conversation-message-sender-width;
+    height: 1px;
+    background-color: @seperator-color;
+    content: '';
   }
 }
 
 .full-search-item-avatar {
   .flex-center;
-  color: @graphite;
+
   width: @conversation-message-sender-width;
   flex: 0 0 auto;
+  color: @graphite;
 }
 
 .full-search-item-content {
-  overflow: hidden;
-  height: 100%;
-  width: 100%;
   display: flex;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
   flex-direction: column;
   justify-content: center;
   margin-right: 8px;
@@ -97,6 +100,7 @@ full-search {
 
 .full-search-item-content-info {
   .label-nocase-xs;
+
   color: @graphite;
   line-height: @line-height-sm;
 }
@@ -111,7 +115,7 @@ full-search {
 }
 
 .full-search-no-result {
-  margin-top: 80px;
   width: 100%;
+  margin-top: 80px;
   text-align: center;
 }

@@ -18,31 +18,31 @@
  */
 
 .preferences-devices-model {
-  font-weight: @font-weight-bold;
   height: @line-height-xl;
+  font-weight: @font-weight-bold;
   line-height: @line-height-xl;
 }
 
 .preferences-devices-activated {
+  margin: 16px 0;
   color: @graphite;
   font-size: @font-size-xs;
   line-height: @line-height-sm;
-  margin: 16px 0;
 }
 
 .preferences-devices-card {
-  cursor: pointer;
   display: flex;
-  justify-content: space-between;
-  height: 72px;
-  padding-top: 8px;
   width: 560px;
+  height: 72px;
+  justify-content: space-between;
+  padding-top: 8px;
+  cursor: pointer;
 
   .preferences-devices-card-action {
     display: flex;
-    justify-content: space-between;
-    height: 16px;
     width: 56px;
+    height: 16px;
+    justify-content: space-between;
     margin-top: 16px;
   }
 
@@ -51,8 +51,8 @@
   }
 
   .preferences-devices-card-icon {
-    height: 16px;
     width: 16px;
+    height: 16px;
     margin: 8px 16px 0 0;
   }
 }
@@ -63,16 +63,17 @@
 
 .preferences-devices-details {
   .label-bold-xs;
+
   display: flex;
-  line-height: @line-height-sm;
   margin: 0 0 16px -34px;
+  line-height: @line-height-sm;
 }
 
 .preferences-devices-icon {
-  cursor: pointer;
-  height: 16px;
   width: 16px;
+  height: 16px;
   margin-right: 16px;
+  cursor: pointer;
 }
 
 .preferences-devices-id {
@@ -89,24 +90,25 @@
 
 .preferences-devices-fingerprint {
   height: 48px;
-  line-height: @line-height-lg;
   font-family: monospace;
+  line-height: @line-height-lg;
 
   .device-id-part {
     display: inline;
   }
 
   .device-id-part:nth-child(17)::before {
-    content: ' ';
     display: block;
+    content: ' ';
   }
 }
 
 .preferences-devices-fingerprint-label {
   .label-xs;
-  color: @graphite;
+
   margin-top: 32px;
   margin-bottom: 8px;
+  color: @graphite;
 }
 
 .preferences-devices-session {
@@ -115,10 +117,10 @@
 
 .preferences-devices-session-confirmation,
 .preferences-devices-session-reset {
-  font-size: @font-size-xs;
-  line-height: @line-height-sm;
   height: 16px;
   padding-top: 16px;
+  font-size: @font-size-xs;
+  line-height: @line-height-sm;
 }
 
 .preferences-devices-session-reset {
@@ -130,6 +132,6 @@
 }
 
 .preferences-devices-separator {
-  margin-bottom: 32px;
   width: 560px;
+  margin-bottom: 32px;
 }

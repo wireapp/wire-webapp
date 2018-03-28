@@ -19,26 +19,29 @@
 
 group-avatar {
   .square(32px);
+
   border: 1px solid fade(#fff, 12%);
   border-radius: 6px;
 }
 
 .group-avatar-box-wrapper {
   .square(28px);
-  background-color: fade(#000, 40%);
-  border-radius: 4px;
+
   display: flex;
+  overflow: hidden;
   flex-wrap: wrap;
   margin: 1px;
-  overflow: hidden;
+  background-color: fade(#000, 40%);
+  border-radius: 4px;
 }
 
 .group-avatar-box {
   .flex-center;
   .square(14px);
+
   flex: 0 0 auto;
-  font-weight: 900;
   font-size: 9px;
+  font-weight: 900;
 }
 
 .group-avatar-active {

@@ -19,34 +19,35 @@
 
 .spinner:extend(.spin-slow) {
   .circle(@avatar-diameter-l);
-  background: @accent_colors-1;
+
   position: relative;
+  background: @accent_colors-1;
 
   &::before,
   &::after {
-    content: '';
     position: absolute;
     border-radius: 50%;
+    content: '';
   }
 
   &::before {
+    top: -1px;
+    right: -1px;
+    bottom: -1px;
+    left: -1px;
     background: linear-gradient(0deg, hsla(0, 0, 100%, 1) 50%, hsla(0, 0, 100%, 0.9) 100%) 0 0,
       linear-gradient(90deg, hsla(0, 0, 100%, 0.9) 0, hsla(0, 0, 100%, 0.6) 100%) 100% 0,
       linear-gradient(180deg, hsla(0, 0, 100%, 0.6) 0, hsla(0, 0, 100%, 0.3) 100%) 100% 100%,
       linear-gradient(360deg, hsla(0, 0, 100%, 0.3) 0, hsla(0, 0, 100%, 0) 100%) 0 100%;
     background-repeat: no-repeat;
     background-size: 50% 50%;
-    top: -1px;
-    bottom: -1px;
-    left: -1px;
-    right: -1px;
   }
 
   &::after {
-    background: #fff;
     top: 3px;
+    right: 3px;
     bottom: 3px;
     left: 3px;
-    right: 3px;
+    background: #fff;
   }
 }

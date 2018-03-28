@@ -59,8 +59,8 @@
     &--move-in--left,
     &--move-in--right {
       position: absolute;
-      width: 304px;
       top: 0;
+      width: 304px;
 
       & > .panel__header {
         animation: @animation-timing-fast @ease-out-expo headerfadein;
@@ -88,8 +88,8 @@
     }
 
     &--visible {
-      opacity: 1;
       height: 100%;
+      opacity: 1;
     }
 
     &:not(&--visible) {
@@ -99,11 +99,11 @@
 
   &__content {
     position: relative;
-    overflow: hidden;
     display: flex;
+    overflow: hidden;
     flex-direction: column;
-    transform: translateX(0);
     flex-grow: 1;
+    transform: translateX(0);
 
     &__scroll {
       width: 100%;
@@ -113,23 +113,23 @@
   }
 
   &__action-item {
+    display: flex;
     height: 48px;
+    align-items: center;
     border-bottom: 1px solid fade(@graphite-dark, 8%);
     margin: 0 16px;
-    display: flex;
-    align-items: center;
     cursor: pointer;
     user-select: none;
 
     &--alternate {
-      display: block;
       position: relative;
+      display: block;
       & > div {
         position: absolute;
         display: flex;
-        align-items: center;
         width: 100%;
         height: 100%;
+        align-items: center;
       }
     }
 
@@ -154,9 +154,9 @@
     }
 
     &__icon {
+      display: flex;
       width: 40px;
       margin-left: 4px;
-      display: flex;
       path {
         fill: @graphite-dark;
       }
@@ -186,23 +186,23 @@
     }
 
     &.disabled {
-      pointer-events: none;
       opacity: 0.4;
+      pointer-events: none;
     }
   }
 
   &__header {
+    display: flex;
     height: @content-title-bar-height;
     min-height: @content-title-bar-height;
-    display: flex;
     align-items: center;
     justify-content: space-between;
     opacity: 1;
 
     & > .icon-button {
+      display: flex;
       width: @content-title-bar-height;
       height: @content-title-bar-height;
-      display: flex;
       justify-content: center;
     }
 
@@ -222,8 +222,8 @@
   }
 
   &__footer {
-    transform: translateX(0);
     position: relative;
+    transform: translateX(0);
   }
 }
 

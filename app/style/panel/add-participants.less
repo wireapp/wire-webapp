@@ -27,28 +27,27 @@
     height: 44px;
     min-height: 44px;
     padding: 0 8px;
-    margin-bottom: 0;
     border-bottom: 1px solid #eee;
+    margin-bottom: 0;
   }
 
   &__tab {
     .flex-center;
+
     flex-grow: 1;
-
-    color: @graphite-dark;
-    font-weight: 600;
-    font-size: 11px;
-    text-transform: uppercase;
-
     border-bottom: 1px solid transparent;
-    cursor: pointer;
-    opacity: 0.56;
     margin-bottom: -1px;
+    color: @graphite-dark;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 600;
+    opacity: 0.56;
+    text-transform: uppercase;
 
     &--active {
       border-bottom-color: fade(@graphite-dark, 40%);
-      opacity: 1;
       cursor: default;
+      opacity: 1;
     }
 
     &:first-child {
@@ -74,8 +73,8 @@
   }
 
   &__service-header {
-    padding: 8px 16px;
     display: flex;
+    padding: 8px 16px;
   }
 
   &__service-details {
@@ -88,9 +87,9 @@
   }
 
   &__service-provider {
+    color: fade(@graphite-dark, 40%);
     font-size: 12px;
     font-weight: @font-weight-regular;
-    color: fade(@graphite-dark, 40%);
   }
 
   &__service-description {
