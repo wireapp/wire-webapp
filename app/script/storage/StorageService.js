@@ -405,27 +405,6 @@ z.storage.StorageService = class StorageService {
     return Promise.all(deleteStorePromises);
   }
 
-  exportStores(storeNames = ['conversations', 'events']) {
-    this.db
-      .transaction('r', this.db.tables, () => {
-        return Promise.all(
-          this.db.tables
-            .filter(table => storeNames.includes(table.name))
-            .map(table => table.toArray().then(rows => ({name: table.name, rows})))
-        );
-      })
-      .then(tables => {
-        for (const table of tables) {
-          const records = table.rows;
-          amplify.publish('z.event.WebApp.IMPORTEXPORT.EXPORT.DATA', table.name, records.length);
-          for (const record of records) {
-            amplify.publish('z.event.WebApp.IMPORTEXPORT.EXPORT.DATA', table.name, JSON.stringify(record));
-          }
-        }
-        amplify.publish('z.event.WebApp.IMPORTEXPORT.EXPORT.SENDER_DONE');
-      });
-  }
-
   /**
    * Returns an array of all records for a given object store.
    *
@@ -440,6 +419,16 @@ z.storage.StorageService = class StorageService {
         this.logger.error(`Failed to load objects from store '${storeName}'`, error);
         throw error;
       });
+  }
+
+  /**
+   * @param {Array<string>} tableNames - The table names to get
+   * @returns {Promise<Array<Table>>} All found tables in an array container
+   */
+  getTables(tableNames) {
+    return this.db.transaction('r', this.db.tables, () => {
+      return this.db.tables.filter(table => tableNames.includes(table.name));
+    });
   }
 
   /**

@@ -36,6 +36,17 @@ z.event.WebApp = {
     PLAY_IN_LOOP: 'wire.webapp.audio.play_in_loop',
     STOP: 'wire.webapp.audio.stop',
   },
+  BACKUP: {
+    EXPORT: {
+      CANCEL: 'wire.webapp.backup.export.cancel',
+      DATA: 'wire.webapp.backup.export.data',
+      META: 'wire.webapp.backup.export.meta',
+    },
+    IMPORT: {
+      DATA: 'wire.webapp.backup.import.data',
+      ERROR: 'wire.webapp.backup.import.error',
+    },
+  },
   BROADCAST: {
     SEND_MESSAGE: 'wire.app.broadcast.send_message',
   },

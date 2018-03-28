@@ -95,6 +95,7 @@ z.main.App = class App {
       this.service.search,
       repositories.client
     );
+    repositories.backup = new z.backup.BackupRepository(this.service.backup, repositories.client, repositories.user);
     repositories.event = new z.event.EventRepository(
       this.service.notification,
       this.service.web_socket,
@@ -161,26 +162,27 @@ z.main.App = class App {
    * @returns {Object} All services
    */
   _setup_services() {
-    const services = {};
+    const services = {
+      storage: new z.storage.StorageService(),
+    };
 
     services.asset = new z.assets.AssetService(this.auth.client);
-    services.integration = new z.integration.IntegrationService(this.auth.client);
+    services.backup = new z.backup.BackupService(services.storage);
     services.broadcast = new z.broadcast.BroadcastService(this.auth.client);
     services.calling = new z.calling.CallingService(this.auth.client);
+    services.client = new z.client.ClientService(this.auth.client, services.storage);
     services.connect = new z.connect.ConnectService(this.auth.client);
     services.connect_google = new z.connect.ConnectGoogleService(this.auth.client);
     services.cryptography = new z.cryptography.CryptographyService(this.auth.client);
     services.giphy = new z.extension.GiphyService(this.auth.client);
+    services.integration = new z.integration.IntegrationService(this.auth.client);
     services.lifecycle = new z.lifecycle.LifecycleService();
+    services.notification = new z.event.NotificationService(this.auth.client, services.storage);
+    services.properties = new z.properties.PropertiesService(this.auth.client);
     services.search = new z.search.SearchService(this.auth.client);
-    services.storage = new z.storage.StorageService();
     services.team = new z.team.TeamService(this.auth.client);
     services.user = new z.user.UserService(this.auth.client, services.storage);
-    services.properties = new z.properties.PropertiesService(this.auth.client);
     services.web_socket = new z.event.WebSocketService(this.auth.client);
-
-    services.client = new z.client.ClientService(this.auth.client, services.storage);
-    services.notification = new z.event.NotificationService(this.auth.client, services.storage);
 
     if (z.util.Environment.browser.edge) {
       services.conversation = new z.conversation.ConversationServiceNoCompound(this.auth.client, services.storage);
