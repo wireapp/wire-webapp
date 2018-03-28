@@ -781,7 +781,7 @@ z.main.App = class App {
 
         const redirectToLogin = signOutReason !== z.auth.SIGN_OUT_REASON.NOT_SIGNED_IN;
         if (redirectToLogin) {
-          url = `${url}'#login'`;
+          url = `${url}#login`;
         }
 
         window.location.replace(url);
