@@ -76,7 +76,7 @@ z.backup.BackupRepository = class BackupRepository {
     this.backupService.setMetadata(metaData);
   }
 
-  backupHistory() {
+  exportHistory() {
     const metadata = this.createMetaDescription();
     this.backupService.getHistory().then(tables => {
       for (const table of tables) {
