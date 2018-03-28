@@ -26,21 +26,23 @@ accent-color-picker {
     display: none;
 
     & + label {
-      cursor: pointer;
       position: relative;
       width: 16px;
+      cursor: pointer;
     }
 
     & + label::before {
       .square(6px);
+
       background-color: currentColor;
     }
 
     & + label::after,
     & + label::before {
       .absolute-center;
-      content: '';
+
       border-radius: 50%;
+      content: '';
       transition: all @animation-timing-faster ease-out;
     }
 
@@ -50,6 +52,7 @@ accent-color-picker {
 
     &:checked + label::after {
       .square(16px);
+
       border: 1px solid currentColor;
     }
   }

@@ -19,49 +19,50 @@
 
 file-asset {
   .asset-container-style;
-  padding: 12px;
+
   flex-wrap: wrap;
+  padding: 12px;
 }
 
 .file {
   position: relative;
   display: flex;
-  align-items: center;
   width: 100%;
+  align-items: center;
 }
 
 .file-icon {
-  font-size: @font-size-xl;
   position: relative;
+  font-size: @font-size-xl;
 }
 
 .file-icon-ext {
+  position: absolute;
+  right: 0;
   bottom: 4px;
+  left: 0;
   color: #fff;
   font-family: @font-family-base;
   font-size: @font-size-xs;
-  left: 0;
-  position: absolute;
-  right: 0;
   text-align: center;
 }
 
 .file-desc {
-  flex: 1 1 auto;
-  line-height: @line-height-sm;
   min-width: 0;
+  flex: 1 1 auto;
   margin-left: 12px;
+  line-height: @line-height-sm;
 }
 
 .file-desc-meta {
   display: flex;
-  list-style: none;
-  margin: 0;
   padding: 0;
+  margin: 0;
+  list-style: none;
 
   & > li:not(:first-child)::before {
-    content: '\b7'; // middot
     padding-right: 4px;
+    content: '\b7'; // middot
   }
 
   & > li:not(:last-child) {

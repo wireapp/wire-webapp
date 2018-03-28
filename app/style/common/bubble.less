@@ -19,18 +19,20 @@
 
 .bubble-menu {
   .list-unstyled;
+
+  width: 168px;
+  padding: @bubble-border-radius;
+  margin: -@bubble-border-radius;
   background-color: #fff;
   border-radius: @bubble-border-radius;
-  margin: -@bubble-border-radius;
-  padding: @bubble-border-radius;
   text-align: center;
-  width: 168px;
 
   > li {
     .label-bold-xs;
+
+    height: 40px;
     color: @graphite-dark;
     cursor: pointer;
-    height: 40px;
     line-height: 40px;
     user-select: none;
 

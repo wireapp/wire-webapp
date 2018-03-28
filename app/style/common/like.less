@@ -23,19 +23,22 @@
 
 .like-button {
   .circle(24px);
-  cursor: pointer;
+
   position: relative;
+  cursor: pointer;
 
   > span {
     .like-transform-mixin(1);
-    color: @w-red;
-    left: 50%;
+
     position: absolute;
     top: 50%;
+    left: 50%;
+    color: @w-red;
     transform-origin: 0 0;
 
     &:last-child {
       .like-transform-mixin(4);
+
       opacity: 0;
       pointer-events: none;
       transition: all @animation-timing-fast @ease-out-quart;
@@ -46,6 +49,7 @@
 .like-button-liked {
   > span:last-child {
     .like-transform-mixin(1);
+
     opacity: 1;
   }
 }
