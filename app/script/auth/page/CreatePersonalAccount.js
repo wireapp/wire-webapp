@@ -24,7 +24,7 @@ import {connect} from 'react-redux';
 import {Link as RRLink} from 'react-router-dom';
 import {withRouter} from 'react-router';
 import React from 'react';
-import ROUTE from '../route';
+import {ROUTE} from '../route';
 import EXTERNAL_ROUTE from '../externalRoute';
 import AccountForm from '../component/AccountForm';
 import {trackNameWithContext, EVENT_CONTEXT, EVENT_NAME, FLOW_TO_CONTEXT} from '../module/action/TrackingAction';

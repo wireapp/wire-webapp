@@ -773,12 +773,15 @@ z.main.App = class App {
           return window.location.replace(url);
         }
 
-        const expectedSignOutReasons = [z.auth.SIGN_OUT_REASON.ACCOUNT_DELETED, z.auth.SIGN_OUT_REASON.NOT_SIGNED_IN];
-        const notSignedIn = expectedSignOutReasons.includes(signOutReason);
-        let url = `/auth/${location.search}${notSignedIn ? '' : '#login'}`;
-
-        if (App.CONFIG.IMMEDIATE_SIGN_OUT_REASONS.includes(signOutReason)) {
+        let url = `/auth/${location.search}`;
+        const isImmediateSignOutReason = App.CONFIG.IMMEDIATE_SIGN_OUT_REASONS.includes(signOutReason);
+        if (isImmediateSignOutReason) {
           url = z.util.URLUtil.appendParameter(url, `${z.auth.URLParameter.REASON}=${signOutReason}`);
+        }
+
+        const redirectToLogin = signOutReason !== z.auth.SIGN_OUT_REASON.NOT_SIGNED_IN;
+        if (redirectToLogin) {
+          url = `${url}'#login'`;
         }
 
         window.location.replace(url);

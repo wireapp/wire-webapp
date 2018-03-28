@@ -1,14 +1,10 @@
 import {getURLParameter} from './util/urlUtil';
+import {QUERY_KEY} from './route';
 
 export const SUPPORTED_LANGUAGE = require('./supportedLocales');
 
 export const DEFAULT_CURRENCY = 'EUR';
 export const DEFAULT_LANGUAGE = 'en';
-
-const QUERY = {
-  CURRENCY: 'currency',
-  LANGUAGE: 'hl',
-};
 
 function getLocale() {
   return navigator.languages && navigator.languages.length ? navigator.languages[0] : navigator.language;
@@ -16,9 +12,9 @@ function getLocale() {
 
 export function currentLanguage() {
   const LANGUAGE_SHORTHAND_LENGTH = 2;
-  return getURLParameter(QUERY.LANGUAGE) || getLocale().substr(0, LANGUAGE_SHORTHAND_LENGTH) || DEFAULT_LANGUAGE;
+  return getURLParameter(QUERY_KEY.LANGUAGE) || getLocale().substr(0, LANGUAGE_SHORTHAND_LENGTH) || DEFAULT_LANGUAGE;
 }
 
 export function currentCurrency() {
-  return getURLParameter(QUERY.CURRENCY).toUpperCase() || DEFAULT_CURRENCY;
+  return getURLParameter(QUERY_KEY.CURRENCY).toUpperCase() || DEFAULT_CURRENCY;
 }

@@ -20,7 +20,7 @@
 import * as TrackingAction from '../module/action/TrackingAction';
 import {getLanguage} from '../module/selector/LanguageSelector';
 import React, {Component} from 'react';
-import ROUTE from '../route';
+import {ROUTE} from '../route';
 import {
   Link,
   Paragraph,
