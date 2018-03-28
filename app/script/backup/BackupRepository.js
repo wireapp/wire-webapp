@@ -76,18 +76,18 @@ z.backup.BackupRepository = class BackupRepository {
     this.backupService.setMetadata(metaData);
   }
 
-  async backupHistory() {
+  backupHistory() {
     const metadata = this.createMetaDescription();
-    const tables = await this.backupService.getHistory();
-
-    for (const table of tables) {
-      const records = table.rows;
-      amplify.publish(z.event.WebApp.BACKUP.EXPORT.DATA, table.name, records.length);
-      for (const record of records) {
-        amplify.publish(z.event.WebApp.BACKUP.EXPORT.DATA, table.name, JSON.stringify(record));
+    this.backupService.getHistory().then(tables => {
+      for (const table of tables) {
+        const records = table.rows;
+        amplify.publish(z.event.WebApp.BACKUP.EXPORT.DATA, table.name, records.length);
+        for (const record of records) {
+          amplify.publish(z.event.WebApp.BACKUP.EXPORT.DATA, table.name, JSON.stringify(record));
+        }
       }
-    }
 
-    amplify.publish(z.event.WebApp.BACKUP.EXPORT.META, JSON.stringify(metadata));
+      amplify.publish(z.event.WebApp.BACKUP.EXPORT.META, JSON.stringify(metadata));
+    });
   }
 };
