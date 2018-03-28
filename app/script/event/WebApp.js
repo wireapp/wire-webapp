@@ -228,6 +228,7 @@ z.event.WebApp = {
     PERSIST: 'wire.webapp.user.persist',
     SET_AVAILABILITY: 'wire.webapp.user.set_availability',
     UNBLOCKED: 'wire.webapp.user.unblocked',
+    UPDATE: 'wire.webapp.user.update',
   },
   WARNING: {
     DISMISS: 'wire.webapp.warning.dismiss',

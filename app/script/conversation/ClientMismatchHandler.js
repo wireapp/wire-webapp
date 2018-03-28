@@ -166,7 +166,7 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
 
       return Promise.all(this._mapRecipients(recipients, _removeRedundantClient, _removeRedundantUser)).then(() => {
         if (conversationEntity) {
-          this.conversationRepository.update_participating_user_ets(conversationEntity);
+          this.conversationRepository.updateParticipatingUserEntities(conversationEntity);
         }
 
         return payload;
