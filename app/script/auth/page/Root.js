@@ -35,7 +35,7 @@ import HistoryInfo from './HistoryInfo';
 import {IntlProvider, addLocaleData} from 'react-intl';
 import {connect} from 'react-redux';
 import de from 'react-intl/locale-data/de';
-import ROUTE from '../route';
+import {ROUTE} from '../route';
 import SUPPORTED_LOCALE from '../supportedLocales';
 import * as CookieAction from '../module/action/CookieAction';
 import * as CookieSelector from '../module/selector/CookieSelector';
@@ -44,12 +44,6 @@ import {APP_INSTANCE_ID} from '../config';
 addLocaleData([...de]);
 
 class Root extends React.Component {
-  static LOGOUT_REASON = {
-    ACCOUNT_DELETED: 'deleted',
-    CLIENT_REMOVED: 'client_removed',
-    SESSION_EXPIRED: 'expired',
-  };
-
   componentDidMount = () => {
     this.props.setCookieIfAbsent(CookieSelector.COOKIE_NAME_APP_OPENED, {appInstanceId: APP_INSTANCE_ID});
     this.props.startPolling();
@@ -72,18 +66,8 @@ class Root extends React.Component {
             <Switch>
               <Route exact path={ROUTE.INDEX} component={Index} />
               <Route path={ROUTE.CLIENTS} component={ClientManager} />
-              <Route path={`${ROUTE.LOGIN}/:conversationKey?/:conversationCode?`} component={Login} />
-              <Route
-                path={`${ROUTE.LOGIN}/:reason(
-                  ${Root.LOGOUT_REASON.SESSION_EXPIRED}|
-                  ${Root.LOGOUT_REASON.CLIENT_REMOVED}|
-                  ${Root.LOGOUT_REASON.ACCOUNT_DELETED})?`}
-                component={Login}
-              />
-              <Route
-                path={`${ROUTE.CONVERSATION_JOIN}/:conversationKey/:conversationCode/:expiresIn?`}
-                component={ConversationJoin}
-              />
+              <Route path={ROUTE.LOGIN} component={Login} />
+              <Route path={`${ROUTE.CONVERSATION_JOIN}`} component={ConversationJoin} />
               <Route path={ROUTE.CONVERSATION_JOIN_INVALID} component={ConversationJoinInvalid} />
               <Route path={ROUTE.CREATE_TEAM} component={TeamName} />
               <Route path={ROUTE.CREATE_TEAM_ACCOUNT} component={CreateAccount} />

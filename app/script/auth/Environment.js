@@ -18,6 +18,7 @@
  */
 
 import {getURLParameter} from './util/urlUtil';
+import {QUERY_KEY} from './route';
 
 export const LOCAL = 'LOCAL';
 export const STAGING = 'STAGING';
@@ -28,7 +29,7 @@ checkEnvironment();
 export function getEnvironmentFromQuery() {
   const isProductionHost = window.location.hostname.includes('wire.com');
   const isLocalHost = window.location.hostname.includes('localhost');
-  switch (getURLParameter('env')) {
+  switch (getURLParameter(QUERY_KEY.ENVIRONMENT)) {
     case 'staging':
       return STAGING;
     case 'prod':

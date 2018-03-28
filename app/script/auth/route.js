@@ -17,7 +17,23 @@
  *
  */
 
-export default {
+const QUERY_KEY = {
+  CONVERSATION_CODE: 'join_code',
+  CONVERSATION_KEY: 'join_key',
+  CURRENCY: 'currency',
+  ENVIRONMENT: 'env',
+  JOIN_EXPIRES: 'expires_in',
+  LANGUAGE: 'hl',
+  LOGOUT_REASON: 'reason',
+};
+
+const LOGOUT_REASON = {
+  ACCOUNT_DELETED: 'deleted',
+  CLIENT_REMOVED: 'client_removed',
+  SESSION_EXPIRED: 'expired',
+};
+
+const ROUTE = {
   CHOOSE_HANDLE: '/choosehandle',
   CLIENTS: '/clients',
   CONVERSATION_JOIN: '/join-conversation',
@@ -33,3 +49,5 @@ export default {
   PERSONAL_INVITE: '/personalinvite',
   VERIFY: '/verify',
 };
+
+export {ROUTE, QUERY_KEY, LOGOUT_REASON};

@@ -37,7 +37,7 @@ import {
   COLOR,
   ErrorMessage,
 } from '@wireapp/react-ui-kit';
-import ROUTE from '../route';
+import {ROUTE, QUERY_KEY} from '../route';
 import EXTERNAL_ROUTE from '../externalRoute';
 import {Link as RRLink} from 'react-router-dom';
 import {connect} from 'react-redux';
@@ -55,6 +55,7 @@ import BackendError from '../module/action/BackendError';
 import {Redirect, withRouter} from 'react-router';
 import * as URLUtil from '../util/urlUtil';
 import * as ClientSelector from '../module/selector/ClientSelector';
+import {getURLParameter} from '../util/urlUtil';
 
 class Login extends React.PureComponent {
   inputs = {};
@@ -76,21 +77,21 @@ class Login extends React.PureComponent {
   };
 
   readAndUpdateParamsFromUrl = (nextProps = this.props) => {
-    const reason = nextProps.match.params.reason;
+    const reason = getURLParameter(QUERY_KEY.LOGOUT_REASON) || null;
     const reasonChanged = reason !== this.state.reason;
 
     if (reason && reasonChanged) {
       this.setState((state, props) => ({...state, reason}));
     }
 
-    const conversationCode = nextProps.match.params.conversationCode;
-    const conversationKey = nextProps.match.params.conversationKey;
+    const conversationCode = getURLParameter(QUERY_KEY.CONVERSATION_CODE) || null;
+    const conversationKey = getURLParameter(QUERY_KEY.CONVERSATION_KEY) || null;
 
     const keyAndCodeExistent = conversationKey && conversationCode;
     const keyChanged = conversationKey !== this.state.conversationKey;
     const codeChanged = conversationCode !== this.state.conversationCode;
     const keyOrCodeChanged = keyChanged || codeChanged;
-    if ((keyAndCodeExistent && keyOrCodeChanged) || (reason && reasonChanged)) {
+    if (keyAndCodeExistent && keyOrCodeChanged) {
       Promise.resolve()
         .then(() => {
           this.setState((state, props) => ({
