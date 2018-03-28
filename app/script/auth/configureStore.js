@@ -39,7 +39,6 @@ export const configureStore = (thunkArguments = {}) => {
 const createMiddleware = thunkArguments => {
   const middlewares = [thunk.withExtraArgument(thunkArguments)];
   if (!Environment.isEnvironment(Environment.PRODUCTION)) {
-    window.localStorage.debug = '*';
     middlewares.push(
       createLogger({
         collapsed: true,
