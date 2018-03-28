@@ -24,9 +24,10 @@ const InputSubmitCombo = Input.withComponent('div').extend`
   align-items: center;
   justify-content: space-between;
   padding-right: 16px;
+  padding-left: 0;
   margin-bottom: 16px;
   ${() => Input} {
-    padding: 0;
+    padding: 0 0 0 20px;
     margin: 0 10px 0 0;
     flex-grow: 1;
   }
