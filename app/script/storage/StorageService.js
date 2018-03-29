@@ -42,6 +42,7 @@ z.storage.StorageService = class StorageService {
     return {
       schema: {
         [StorageService.OBJECT_STORE.AMPLIFY]: '',
+        [StorageService.OBJECT_STORE.AUTHENTICATION]: '',
         [StorageService.OBJECT_STORE.CLIENTS]: ', meta.primary_key',
         [StorageService.OBJECT_STORE.CONVERSATION_EVENTS]:
           ', category, conversation, time, type, [conversation+time], [conversation+category]',
@@ -52,7 +53,6 @@ z.storage.StorageService = class StorageService {
         [StorageService.OBJECT_STORE.PRE_KEYS]: '',
         [StorageService.OBJECT_STORE.SESSIONS]: '',
         [StorageService.OBJECT_STORE.USERS]: ', id',
-        [StorageService.OBJECT_STORE.AUTHENTICATION]: '',
       },
       version: 16,
     };
