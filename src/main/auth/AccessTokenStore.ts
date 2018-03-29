@@ -56,8 +56,7 @@ class AccessTokenStore extends EventEmitter {
         }" on table "${AUTH_TABLE_NAME}" with key "${AUTH_ACCESS_TOKEN_KEY}"`
       );
       return this.engine
-        .delete(AUTH_TABLE_NAME, AUTH_ACCESS_TOKEN_KEY)
-        .then(() => this.engine.create(AUTH_TABLE_NAME, AUTH_ACCESS_TOKEN_KEY, accessToken))
+        .updateOrCreate(AUTH_TABLE_NAME, AUTH_ACCESS_TOKEN_KEY, accessToken)
         .then(() => (this.accessToken = accessToken));
     }
     return Promise.resolve(this.accessToken);
