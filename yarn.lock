@@ -9644,9 +9644,9 @@ simple-swizzle@^0.2.2:
   dependencies:
     is-arrayish "^0.3.1"
 
-sinon@4.4.9:
-  version "4.4.9"
-  resolved "https://registry.yarnpkg.com/sinon/-/sinon-4.4.9.tgz#0792a2a5171eb0cf242edacb0eba3898b8b4297f"
+sinon@4.4.10:
+  version "4.4.10"
+  resolved "https://registry.yarnpkg.com/sinon/-/sinon-4.4.10.tgz#592ba39256cd5aecd35c883e1da2759b75d90e02"
   dependencies:
     "@sinonjs/formatio" "^2.0.0"
     diff "^3.1.0"
