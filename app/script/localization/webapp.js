@@ -607,7 +607,7 @@ z.string.preferencesOptionsCallLogsDetail = 'This information helps Wire Support
 
 z.string.preferencesOptionsConversationHistoryTitle = 'Conversation history';
 z.string.preferencesOptionsConversationHistoryExportTitle = 'Back up history';
-z.string.preferencesOptionsConversationHistoryExportDescription = 'Back up your conversation history to a safe place.\nThe back up is not protected by Wire end-to-end encryption.';
+z.string.preferencesOptionsConversationHistoryExportDescription = 'Back up your conversation history to a safe place.\nThe backup is not protected by Wire end-to-end encryption.';
 z.string.preferencesOptionsConversationHistoryImportTitle = 'Restore from backup';
 z.string.preferencesOptionsConversationHistoryImportDescription = 'You can only restore history from a backup of the same platform.';
 z.string.preferencesOptionsConversationHistoryPasswordTitle = 'Set email and password';
