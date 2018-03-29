@@ -85,11 +85,11 @@ z.backup.BackupRepository = class BackupRepository {
         const records = table.rows;
         amplify.publish(z.event.WebApp.BACKUP.EXPORT.DATA, table.name, records.length);
         for (const record of records) {
-          amplify.publish(z.event.WebApp.BACKUP.EXPORT.DATA, table.name, JSON.stringify(record));
+          amplify.publish(z.event.WebApp.BACKUP.EXPORT.DATA, table.name, record);
         }
       }
 
-      amplify.publish(z.event.WebApp.BACKUP.EXPORT.META, JSON.stringify(metadata));
+      amplify.publish(z.event.WebApp.BACKUP.EXPORT.META, metadata);
     });
   }
 };

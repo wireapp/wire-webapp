@@ -32,10 +32,9 @@ z.backup.BackupService = class BackupService {
   }
 
   getHistory() {
-    return this.storageService.getTables(['conversations', 'events']).then(tableContainer => {
-      const promises = tableContainer.map(table => table.toArray().then(rows => ({name: table.name, rows})));
-      return Promise.all(promises);
-    });
+    const tableContainer = this.storageService.getTables(['conversations', 'events']);
+    const promises = tableContainer.map(table => table.toArray().then(rows => ({name: table.name, rows})));
+    return Promise.all(promises);
   }
 
   setHistory(tableName, data) {

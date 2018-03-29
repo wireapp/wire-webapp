@@ -426,9 +426,7 @@ z.storage.StorageService = class StorageService {
    * @returns {Promise<Array<Table>>} All found tables in an array container
    */
   getTables(tableNames) {
-    return this.db.transaction('r', this.db.tables, () => {
-      return this.db.tables.filter(table => tableNames.includes(table.name));
-    });
+    return tableNames.map(tableName => this.db[tableName]);
   }
 
   /**
