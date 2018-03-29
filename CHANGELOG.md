@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="0.6.16"></a>
+## [0.6.16](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@0.6.15...@wireapp/api-client@0.6.16) (2018-03-29)
+
+
+### Bug Fixes
+
+* **api-client:** Use updateOrCreate when updating access token ([#433](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/433)) ([10dbae5](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/10dbae5))
+
+
+
+
 <a name="0.6.15"></a>
 ## [0.6.15](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@0.6.14...@wireapp/api-client@0.6.15) (2018-03-29)
 
