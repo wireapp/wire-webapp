@@ -38,7 +38,6 @@ export default class NotificationService {
   constructor(private apiClient: APIClient, private storeEngine: CRUDEngine) {
     this.backend = new NotificationBackendRepository(this.apiClient);
     this.database = new NotificationDatabaseRepository(this.storeEngine);
-    this.logger.state.isEnabled = true;
   }
 
   public initializeNotificationStream(clientId: string): Promise<string> {
