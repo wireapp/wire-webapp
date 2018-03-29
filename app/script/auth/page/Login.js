@@ -290,7 +290,7 @@ class Login extends React.PureComponent {
                     <ErrorMessage data-uie-name="error-message">{parseError(loginError)}</ErrorMessage>
                   ) : null}
                   {logoutReason && (
-                    <Small center style={{marginBottom: '16px'}}>
+                    <Small center style={{marginBottom: '16px'}} data-uie-name="status-logout-reason">
                       <FormattedHTMLMessage {...logoutReasonStrings[logoutReason]} />
                     </Small>
                   )}
