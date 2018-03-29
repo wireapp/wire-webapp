@@ -114,7 +114,10 @@ class Login extends React.PureComponent {
     }
   };
 
-  componentDidMount = () => this.readAndUpdateParamsFromUrl();
+  componentDidMount = () => {
+    this.props.resetError();
+    this.readAndUpdateParamsFromUrl();
+  };
 
   componentWillReceiveProps = nextProps => this.readAndUpdateParamsFromUrl(nextProps);
 
