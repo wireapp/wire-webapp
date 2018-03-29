@@ -39,7 +39,12 @@ z.backup.BackupService = class BackupService {
   }
 
   setHistory(tableName, data) {
-    this.storageService.save(tableName, undefined, JSON.parse(data));
+    const entity = JSON.parse(data);
+    if (tableName === 'conversations') {
+      this.storageService.save(tableName, entity.id, entity);
+    } else {
+      this.storageService.save(tableName, undefined, entity);
+    }
   }
 
   setMetadata(metaData) {
