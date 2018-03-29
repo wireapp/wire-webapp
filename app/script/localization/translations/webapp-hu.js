@@ -281,6 +281,7 @@ z.string.hu.conversationConnectionCancelRequest = 'Csatlakozási kérés visszav
 z.string.hu.conversationCreate = ' beszélgetést kezdett a következőkkel: {{users}}';
 z.string.hu.conversationCreateName = '{{user}} beszélgetést indított';
 z.string.hu.conversationCreateNameYou = '{{user}} beszélgetést indított';
+z.string.hu.conversationCreateTemporary = 'Csatlakoztál a beszélgetéshez';
 z.string.hu.conversationCreateWith = ' velük: {{users}}';
 z.string.hu.conversationCreateYou = ' beszélgetést kezdett a következőkkel: {{users}}';
 z.string.hu.conversationDeviceStartedUsingOne = ' elkezdett használni';
