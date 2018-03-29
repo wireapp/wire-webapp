@@ -57,7 +57,6 @@ export default class ClientService {
   ) {
     this.database = new ClientDatabaseRepository(this.storeEngine);
     this.backend = new ClientBackendRepository(this.apiClient);
-    this.logger.state.isEnabled = true;
   }
 
   public deleteLocalClient(): Promise<string> {

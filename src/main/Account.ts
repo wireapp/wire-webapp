@@ -68,7 +68,6 @@ class Account extends EventEmitter {
   constructor(apiClient: Client = new Client()) {
     super();
     this.apiClient = apiClient;
-    this.logger.state.isEnabled = true;
   }
 
   private init(): Promise<void> {

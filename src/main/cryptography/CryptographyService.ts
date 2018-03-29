@@ -49,7 +49,6 @@ export default class CryptographyService {
   constructor(private apiClient: APIClient, private storeEngine: CRUDEngine) {
     this.cryptobox = new Cryptobox(this.storeEngine);
     this.database = new CryptographyDatabaseRepository(this.storeEngine);
-    this.logger.state.isEnabled = true;
   }
 
   public static constructSessionId(userId: string, clientId: string): string {
