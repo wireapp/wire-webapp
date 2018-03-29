@@ -39,6 +39,8 @@ z.backup.BackupRepository = class BackupRepository {
 
   _initSubscriptions() {
     amplify.subscribe(z.event.WebApp.BACKUP.EXPORT.DONE, this.onExportDone.bind(this));
+    amplify.subscribe(z.event.WebApp.BACKUP.EXPORT.START, this.onExportHistory.bind(this));
+
     amplify.subscribe(z.event.WebApp.BACKUP.IMPORT.DATA, this.onImportHistory.bind(this));
     amplify.subscribe(z.event.WebApp.BACKUP.IMPORT.ERROR, this.onError.bind(this));
     amplify.subscribe(z.event.WebApp.BACKUP.IMPORT.META, this.onImportMeta.bind(this));
@@ -56,6 +58,13 @@ z.backup.BackupRepository = class BackupRepository {
 
   cancelBackup() {
     amplify.publish(z.event.WebApp.BACKUP.EXPORT.CANCEL);
+  }
+
+  exportHistory() {
+    this.backupService.getHistory().then(tables => {
+      const numberOfRecords = tables.reduce((accumulator, table) => accumulator + table.rows.length, 0);
+      amplify.publish(z.event.WebApp.BACKUP.EXPORT.INIT, numberOfRecords);
+    });
   }
 
   importHistory() {
@@ -78,12 +87,11 @@ z.backup.BackupRepository = class BackupRepository {
     this.backupService.setMetadata(metaData);
   }
 
-  exportHistory() {
+  onExportHistory() {
     const metadata = this.createMetaDescription();
     this.backupService.getHistory().then(tables => {
       for (const table of tables) {
         const records = table.rows;
-        amplify.publish(z.event.WebApp.BACKUP.EXPORT.DATA, table.name, records.length);
         for (const record of records) {
           amplify.publish(z.event.WebApp.BACKUP.EXPORT.DATA, table.name, record);
         }
