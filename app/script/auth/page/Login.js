@@ -58,6 +58,7 @@ import {Redirect, withRouter} from 'react-router';
 import * as URLUtil from '../util/urlUtil';
 import * as ClientSelector from '../module/selector/ClientSelector';
 import {getURLParameter} from '../util/urlUtil';
+import {resetError} from '../module/action/creator/AuthActionCreator';
 
 class Login extends React.PureComponent {
   inputs = {};
@@ -67,7 +68,6 @@ class Login extends React.PureComponent {
     conversationKey: null,
     email: '',
     isValidLink: true,
-    loginError: null,
     logoutReason: null,
     password: '',
     persist: true,
@@ -164,6 +164,7 @@ class Login extends React.PureComponent {
       .catch(error => {
         switch (error.label) {
           case BackendError.LABEL.NEW_CLIENT: {
+            this.props.resetError();
             return this.props.doGetAllClients().then(clients => {
               const isFirstPersistentClient = this.state.persist && clients.length === 1;
               return isFirstPersistentClient
@@ -172,6 +173,7 @@ class Login extends React.PureComponent {
             });
           }
           case BackendError.LABEL.TOO_MANY_CLIENTS: {
+            this.props.resetError();
             return this.props.history.push(ROUTE.CLIENTS);
           }
           default: {
@@ -336,7 +338,7 @@ export default withRouter(
         isFetching: AuthSelector.isFetching(state),
         loginError: AuthSelector.getError(state),
       }),
-      {...AuthAction, ...ConversationAction, ...ClientAction}
+      {resetError, ...AuthAction, ...ConversationAction, ...ClientAction}
     )(Login)
   )
 );
