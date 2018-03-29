@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="0.6.17"></a>
+## [0.6.17](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@0.6.16...@wireapp/api-client@0.6.17) (2018-03-29)
+
+
+### Bug Fixes
+
+* **api-client,core:** Login by phone number removed from request ([#434](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/434)) ([c5123fd](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/c5123fd))
+
+
+
+
 <a name="0.6.16"></a>
 ## [0.6.16](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@0.6.15...@wireapp/api-client@0.6.16) (2018-03-29)
 
