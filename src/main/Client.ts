@@ -1,21 +1,23 @@
-//
-// Wire
-// Copyright (C) 2018 Wire Swiss GmbH
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with this program. If not, see http://www.gnu.org/licenses/.
-//
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
 
+const logdown = require('logdown');
 import {Config} from './Config';
 import {AccessTokenData, AuthAPI, Context, LoginData, RegisterData, AUTH_TABLE_NAME} from './auth';
 import {AccessTokenStore} from './auth/';
@@ -39,6 +41,11 @@ import {retrieveCookie} from './shims/node/cookie';
 const VERSION = require('../../package.json').version;
 
 class Client {
+  private logger: any = logdown('@wireapp/api-client/Client', {
+    logger: console,
+    markdown: false,
+  });
+
   private STORE_NAME_PREFIX: string = 'wire';
   // APIs
   public asset: {api: AssetAPI};
@@ -211,11 +218,11 @@ class Client {
   }
 
   private async initEngine(context: Context) {
-    const db = await this.config.store.init(
-      `${this.STORE_NAME_PREFIX}@${this.config.urls.name}@${context.userId}${
-        context.clientType ? `@${context.clientType}` : ''
-      }`
-    );
+    const dbName = `${this.STORE_NAME_PREFIX}@${this.config.urls.name}@${context.userId}${
+      context.clientType ? `@${context.clientType}` : ''
+    }`;
+    this.logger.info(`Initialising store with name "${dbName}"`);
+    const db = await this.config.store.init(dbName);
     const isDexieStore = db && db.constructor.name === 'Dexie';
     const isSchemalessStore = isDexieStore && Object.keys(db._dbSchema).length === 0;
     if (isSchemalessStore) {
