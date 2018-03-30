@@ -2,6 +2,8 @@
   "dependencies": {
     "color": "3.0.0",
     "gulp-concat": "2.6.1",
+    "react": "16.3.0",
+    "react-dom": "16.3.0",
     "react": "16.2.0",
     "react-dom": "16.3.0",
     "recompose": "0.26.0",
