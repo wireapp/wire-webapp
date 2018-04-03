@@ -80,7 +80,7 @@ class Client {
 
   constructor(public config: Config = new Config()) {
     this.config = new Config(config.store, config.urls, config.schemaCallback);
-    this.accessTokenStore = new AccessTokenStore(this.config.store);
+    this.accessTokenStore = new AccessTokenStore();
 
     const httpClient = new HttpClient(this.config.urls.rest, this.accessTokenStore, this.config.store);
 
@@ -229,9 +229,7 @@ class Client {
       if (this.config.schemaCallback) {
         this.config.schemaCallback(db);
       } else {
-        db.version(1).stores({
-          [AUTH_TABLE_NAME]: '',
-        });
+        db.version(1).stores({});
       }
       // In case the database got purged, db.close() is called automatically and we have to reopen it.
       await db.open();

@@ -18,9 +18,7 @@
  */
 
 const logdown = require('logdown');
-import {AUTH_ACCESS_TOKEN_KEY, AUTH_TABLE_NAME, AccessTokenData} from '../auth';
-import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine';
-import {RecordNotFoundError} from '@wireapp/store-engine/dist/commonjs/engine/error';
+import {AccessTokenData} from '../auth';
 import EventEmitter = require('events');
 
 class AccessTokenStore extends EventEmitter {
@@ -29,55 +27,25 @@ class AccessTokenStore extends EventEmitter {
     markdown: false,
   });
 
-  public accessToken: AccessTokenData | undefined;
-
   public static TOPIC = {
     ACCESS_TOKEN_REFRESH: 'AccessTokenStore.TOPIC.ACCESS_TOKEN_REFRESH',
   };
 
-  constructor(private engine: CRUDEngine) {
-    super();
-  }
+  public accessToken: AccessTokenData | undefined;
 
   public async delete(): Promise<void> {
-    this.logger.info(
-      `Deleting access token in store "${
-        this.engine.storeName
-      }" on table "${AUTH_TABLE_NAME}" with key "${AUTH_ACCESS_TOKEN_KEY}"`
-    );
-    return this.engine.delete(AUTH_TABLE_NAME, AUTH_ACCESS_TOKEN_KEY).then(() => (this.accessToken = undefined));
+    this.logger.info('Deleting access token');
+    this.accessToken = undefined;
+    return Promise.resolve();
   }
 
   public async updateToken(accessToken: AccessTokenData): Promise<AccessTokenData> {
     if (this.accessToken !== accessToken) {
-      this.logger.info(
-        `Updating access token in store "${
-          this.engine.storeName
-        }" on table "${AUTH_TABLE_NAME}" with key "${AUTH_ACCESS_TOKEN_KEY}"`
-      );
-      return this.engine
-        .updateOrCreate(AUTH_TABLE_NAME, AUTH_ACCESS_TOKEN_KEY, accessToken)
-        .then(() => (this.accessToken = accessToken));
+      this.logger.info('Updating access token');
+      this.accessToken = accessToken;
+      this.emit(AccessTokenStore.TOPIC.ACCESS_TOKEN_REFRESH, this.accessToken);
     }
     return Promise.resolve(this.accessToken);
-  }
-
-  public async init(): Promise<AccessTokenData | undefined> {
-    this.logger.info(
-      `Initialising access token from store "${
-        this.engine.storeName
-      }" on table "${AUTH_TABLE_NAME}" with key "${AUTH_ACCESS_TOKEN_KEY}"`
-    );
-    return this.engine
-      .read<AccessTokenData>(AUTH_TABLE_NAME, AUTH_ACCESS_TOKEN_KEY)
-      .catch((error: Error) => {
-        if (error.name === RecordNotFoundError.name) {
-          return undefined;
-        }
-
-        throw error;
-      })
-      .then((accessToken: AccessTokenData | undefined) => (this.accessToken = accessToken));
   }
 }
 
