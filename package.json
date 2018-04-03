@@ -58,7 +58,7 @@
     "redux": "3.7.2",
     "redux-logger": "3.0.6",
     "redux-thunk": "2.2.0",
-    "sdp-transform": "2.4.0",
+    "sdp-transform": "2.4.1",
     "speakingurl": "14.0.1",
     "uuid": "3.2.1"
   },
