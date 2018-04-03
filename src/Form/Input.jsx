@@ -48,7 +48,7 @@ const Input = styled.input`
   /* positioning */
   line-height: 56px;
   margin: 0 0 16px;
-  padding: 0 20px;
+  padding: 0 16px;
   width: 100%;
 
   &::-webkit-input-placeholder {

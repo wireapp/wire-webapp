@@ -24,7 +24,7 @@ import styled from 'styled-components';
 const InputBlock = styled.div`
   background-color: ${COLOR.GRAY_LIGHTEN_88};
   border-radius: 4px;
-  box-shadow: inset 20px 20px 0 ${COLOR.WHITE}, inset -20px -20px 0 ${COLOR.WHITE};
+  box-shadow: inset 16px 16px 0 ${COLOR.WHITE}, inset -16px -16px 0 ${COLOR.WHITE};
   margin-bottom: 16px;
   & > ${() => Input} {
     margin: 0;
