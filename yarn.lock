@@ -339,11 +339,11 @@
   version "1.0.2"
   resolved "https://codeload.github.com/wireapp/webapp-module-namespace/tar.gz/24c17f5dc8e0025e65e02d35593310931856134e"
 
-"@bower_components/webrtc-adapter@webrtc/adapter#6.1.4":
-  version "6.1.4"
-  resolved "https://codeload.github.com/webrtc/adapter/tar.gz/f9eeb2ef782179ebdda7571503f84ce45bcfafb1"
+"@bower_components/webrtc-adapter@webrtc/adapter#6.1.5":
+  version "6.1.5"
+  resolved "https://codeload.github.com/webrtc/adapter/tar.gz/ae822299db17636aea4665762a73a43014b57cee"
   dependencies:
-    rtcpeerconnection-shim "^1.2.9"
+    rtcpeerconnection-shim "^1.2.10"
     sdp "^2.7.0"
 
 "@bower_components/wire-audio-files@wireapp/wire-audio-files#1.1.1":
@@ -9556,9 +9556,9 @@ rst-selector-parser@^2.2.3:
     lodash.flattendeep "^4.4.0"
     nearley "^2.7.10"
 
-rtcpeerconnection-shim@^1.2.9:
-  version "1.2.9"
-  resolved "https://registry.yarnpkg.com/rtcpeerconnection-shim/-/rtcpeerconnection-shim-1.2.9.tgz#612bd7a63f4d9a76d6064e3963028fee62b67378"
+rtcpeerconnection-shim@^1.2.10:
+  version "1.2.11"
+  resolved "https://registry.yarnpkg.com/rtcpeerconnection-shim/-/rtcpeerconnection-shim-1.2.11.tgz#df2b2456020365daf26bf8c135523bca2deb252b"
   dependencies:
     sdp "^2.6.0"
 
