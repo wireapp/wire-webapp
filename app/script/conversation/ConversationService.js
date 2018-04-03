@@ -576,7 +576,7 @@ z.conversation.ConversationService = class ConversationService {
    * @returns {Promise} Resolves with the stored record
    */
   save_event(event) {
-    event.category = z.message.MessageCategorization.category_from_event(event);
+    event.category = z.message.MessageCategorization.categoryFromEvent(event);
     return this.storageService.save(this.EVENT_STORE_NAME, undefined, event).then(() => event);
   }
 

@@ -63,10 +63,8 @@ z.storage.StorageService = class StorageService {
           resolve(this.dbName);
         })
         .catch(error => {
-          this.logger.error(
-            `Failed to initialize database '${this.dbName}' for Storage Service: ${error.message || error}`,
-            {error: error}
-          );
+          const logMessage = `Failed to initialize database '${this.dbName}': ${error.message || error}`;
+          this.logger.error(logMessage, {error: error});
           reject(new z.storage.StorageError(z.storage.StorageError.TYPE.FAILED_TO_OPEN));
         });
     });
@@ -236,12 +234,10 @@ z.storage.StorageService = class StorageService {
   update(storeName, primaryKey, changes) {
     return this.db[storeName]
       .update(primaryKey, changes)
-      .then(number_of_updates => {
-        this.logger.info(
-          `Updated ${number_of_updates} record(s) with key '${primaryKey}' in store '${storeName}'`,
-          changes
-        );
-        return number_of_updates;
+      .then(numberOfUpdates => {
+        const logMessage = `Updated ${numberOfUpdates} record(s) with key '${primaryKey}' in store '${storeName}'`;
+        this.logger.info(logMessage, changes);
+        return numberOfUpdates;
       })
       .catch(error => {
         this.logger.error(`Failed to update '${primaryKey}' in store '${storeName}'`, error);

@@ -195,7 +195,7 @@ z.storage.StorageSchemata = class StorageSchemata {
         },
         upgrade: transaction => {
           transaction[StorageSchemata.OBJECT_STORE.CONVERSATION_EVENTS].toCollection().modify(event => {
-            event.category = z.message.MessageCategorization.category_from_event(event);
+            event.category = z.message.MessageCategorization.categoryFromEvent(event);
           });
         },
         version: 10,
