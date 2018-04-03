@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="0.5.5"></a>
+## [0.5.5](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/compare/@wireapp/store-engine@0.5.4...@wireapp/store-engine@0.5.5) (2018-04-03)
+
+
+### Bug Fixes
+
+* **api-client,store-engine:** Always create new Dexie instance on Engine.init() ([#448](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/issues/448)) ([27623ee](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/commit/27623ee))
+
+
+
+
 <a name="0.5.4"></a>
 ## [0.5.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/compare/@wireapp/store-engine@0.5.3...@wireapp/store-engine@0.5.4) (2018-03-29)
 
