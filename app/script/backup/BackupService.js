@@ -37,7 +37,7 @@ z.backup.BackupService = class BackupService {
       const collection = table.toCollection();
       return table
         .count()
-        .then(n => new DexieBatch({batchSize: 1000, limit: n}))
+        .then(n => new DexieBatch({batchSize: 10000, limit: n}))
         .then(batchDriver => {
           const batches = [];
           return batchDriver
