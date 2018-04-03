@@ -28,12 +28,19 @@ z.main.App = class App {
       COOKIES_CHECK: {
         COOKIE_NAME: 'cookies_enabled',
       },
-      IMMEDIATE_SIGN_OUT_REASONS: [
-        z.auth.SIGN_OUT_REASON.ACCOUNT_DELETED,
-        z.auth.SIGN_OUT_REASON.CLIENT_REMOVED,
-        z.auth.SIGN_OUT_REASON.SESSION_EXPIRED,
-      ],
       NOTIFICATION_CHECK: 10 * 1000,
+      SIGN_OUT_REASONS: {
+        IMMEDIATE: [
+          z.auth.SIGN_OUT_REASON.ACCOUNT_DELETED,
+          z.auth.SIGN_OUT_REASON.CLIENT_REMOVED,
+          z.auth.SIGN_OUT_REASON.SESSION_EXPIRED,
+        ],
+        TEMPORARY_GUEST: [
+          z.auth.SIGN_OUT_REASON.MULTIPLE_TABS,
+          z.auth.SIGN_OUT_REASON.SESSION_EXPIRED,
+          z.auth.SIGN_OUT_REASON.USER_REQUESTED,
+        ],
+      },
       TABS_CHECK: {
         COOKIE_NAME: 'app_opened',
         INTERVAL: 1000,
@@ -716,7 +723,7 @@ z.main.App = class App {
         .catch(() => _redirectToLogin());
     };
 
-    if (App.CONFIG.IMMEDIATE_SIGN_OUT_REASONS.includes(signOutReason)) {
+    if (App.CONFIG.SIGN_OUT_REASONS.IMMEDIATE.includes(signOutReason)) {
       return _logout();
     }
 
@@ -765,8 +772,8 @@ z.main.App = class App {
     this.auth.client
       .execute_on_connectivity(z.service.BackendClient.CONNECTIVITY_CHECK_TRIGGER.LOGIN_REDIRECT)
       .then(() => {
-        const isUserRequested = signOutReason === z.auth.SIGN_OUT_REASON.USER_REQUESTED;
-        const isLeavingGuestRoom = isUserRequested && this.repository.user.self().isTemporaryGuest();
+        const isTemporaryGuestReason = App.CONFIG.SIGN_OUT_REASONS.TEMPORARY_GUEST.includes(signOutReason);
+        const isLeavingGuestRoom = isTemporaryGuestReason && this.repository.user.self().isTemporaryGuest();
         if (isLeavingGuestRoom) {
           const path = z.l10n.text(z.string.urlWebsiteRoot);
           const url = z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.WEBSITE, path);
@@ -774,7 +781,7 @@ z.main.App = class App {
         }
 
         let url = `/auth/${location.search}`;
-        const isImmediateSignOutReason = App.CONFIG.IMMEDIATE_SIGN_OUT_REASONS.includes(signOutReason);
+        const isImmediateSignOutReason = App.CONFIG.SIGN_OUT_REASONS.IMMEDIATE.includes(signOutReason);
         if (isImmediateSignOutReason) {
           url = z.util.URLUtil.appendParameter(url, `${z.auth.URLParameter.REASON}=${signOutReason}`);
         }
