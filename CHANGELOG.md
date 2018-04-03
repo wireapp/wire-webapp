@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="0.6.21"></a>
+## [0.6.21](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@0.6.20...@wireapp/api-client@0.6.21) (2018-04-03)
+
+
+### Bug Fixes
+
+* **api-client,cryptobox:** Show log messages during tests ([#435](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/435)) ([559759d](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/559759d))
+
+
+
+
 <a name="0.6.20"></a>
 ## [0.6.20](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@0.6.19...@wireapp/api-client@0.6.20) (2018-04-03)
 
