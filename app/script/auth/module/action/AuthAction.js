@@ -64,7 +64,7 @@ function doLoginPlain(loginData, onBeforeLogin, onAfterLogin) {
           attributes: {context: authenticationContext, remember_me: loginData.persist},
           name: TrackingAction.EVENT_NAME.ACCOUNT.LOGGED_IN,
         };
-        return TrackingAction.trackEvent(trackingEventData);
+        return dispatch(TrackingAction.trackEvent(trackingEventData));
       })
       .then(() => dispatch(SelfAction.fetchSelf()))
       .then(() => onAfterLogin(dispatch, getState, global))
