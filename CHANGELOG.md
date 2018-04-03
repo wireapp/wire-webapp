@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="0.6.24"></a>
+## [0.6.24](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@0.6.23...@wireapp/api-client@0.6.24) (2018-04-03)
+
+
+### Bug Fixes
+
+* **api-client,store-engine:** Always create new Dexie instance on Engine.init() ([#448](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/448)) ([27623ee](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/27623ee))
+
+
+
+
 <a name="0.6.23"></a>
 ## [0.6.23](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@0.6.22...@wireapp/api-client@0.6.23) (2018-04-03)
 
