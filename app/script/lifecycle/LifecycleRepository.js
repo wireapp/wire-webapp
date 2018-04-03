@@ -46,7 +46,8 @@ z.lifecycle.LifecycleRepository = class LifecycleRepository {
   }
 
   checkVersion() {
-    if (navigator.onLine) {
+    const shouldCheckVersion = this.isActivatedAccount() && navigator.onLine;
+    if (shouldCheckVersion) {
       return this.lifecycleService.getVersion().then(serverVersion => {
         const currentVersion = z.util.Environment.version(false, true);
         this.logger.info(`Checking current webapp version. Server '${serverVersion}' vs. local '${currentVersion}'`);
