@@ -224,12 +224,11 @@ class Client {
     this.logger.info(`Initialising store with name "${dbName}"`);
     const db = await this.config.store.init(dbName);
     const isDexieStore = db && db.constructor.name === 'Dexie';
-    const isSchemalessStore = isDexieStore && Object.keys(db._dbSchema).length === 0;
-    if (isSchemalessStore) {
+    if (isDexieStore) {
       if (this.config.schemaCallback) {
         this.config.schemaCallback(db);
       } else {
-        db.version(1).stores({});
+        throw new Error('Could not initialize database - missing schema definition');
       }
       // In case the database got purged, db.close() is called automatically and we have to reopen it.
       await db.open();

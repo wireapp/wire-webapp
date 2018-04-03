@@ -9,17 +9,18 @@ export interface DexieInstance extends Dexie {
 }
 
 export default class IndexedDBEngine implements CRUDEngine {
+  private db?: DexieInstance;
   public storeName: string = '';
 
-  constructor(private db?: DexieInstance) {}
-
   init(storeName: string): Promise<any> {
-    if (this.db) {
-      this.storeName = this.db.name;
-    } else {
-      this.storeName = storeName;
-      this.db = new Dexie(this.storeName);
-    }
+    this.db = new Dexie(storeName);
+    this.storeName = this.db.name;
+    return Promise.resolve(this.db);
+  }
+
+  initWithDb(db: DexieInstance): Promise<any> {
+    this.db = db;
+    this.storeName = this.db.name;
     return Promise.resolve(this.db);
   }
 

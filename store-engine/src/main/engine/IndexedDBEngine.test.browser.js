@@ -68,8 +68,8 @@ describe('StoreEngine.IndexedDBEngine', () => {
         [TABLE_NAME]: ', name, age',
       });
 
-      engine = new IndexedDBEngine(db);
-      await engine.init(STORE_NAME);
+      engine = new IndexedDBEngine();
+      await engine.initWithDb(db);
 
       engine
         .create(TABLE_NAME, PRIMARY_KEY, entity)
