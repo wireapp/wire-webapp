@@ -33,6 +33,7 @@ import '../util/util';
 // Adding "window.z.util.Environment" which is required by "wire-desktop"
 import '../util/Environment';
 import '../util/URLUtil';
+import '../tracking/SuperProperty';
 import '../event/Client';
 import '../message/MessageCategorization';
 import '../message/MessageCategory';
