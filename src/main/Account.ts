@@ -351,10 +351,8 @@ class Account extends EventEmitter {
       .then(() => this.service!.client.getLocalClient())
       .then(client => (loadedClient = client))
       .then(() => this.apiClient.client.api.getClient(loadedClient.id))
-      .then(() => {
-        this.service!.conversation.setClientID(<string>this.apiClient.context!.clientId);
-        return {isNewClient: false, localClient: loadedClient};
-      })
+      .then(() => this.service!.conversation.setClientID(<string>this.apiClient.context!.clientId))
+      .then(() => ({isNewClient: false, localClient: loadedClient}))
       .catch(error => {
         let registeredClient: RegisteredClient;
 
@@ -368,18 +366,7 @@ class Account extends EventEmitter {
 
         if (notFoundInDatabase) {
           this.logger.info('Could not find valid client in database');
-          return this.service!.client.register(loginData, clientInfo)
-            .then((client: RegisteredClient) => (registeredClient = client))
-            .then(() => {
-              this.logger.info('Client is created');
-              this.apiClient.context!.clientId = registeredClient.id;
-              this.service!.conversation.setClientID(registeredClient.id);
-              return this.service!.notification.initializeNotificationStream(registeredClient.id);
-            })
-            .then(() => this.service!.client.synchronizeClients())
-            .then(() => {
-              return {isNewClient: true, localClient: registeredClient};
-            });
+          return this.registerClient(loginData, clientInfo);
         }
         if (notFoundOnBackend) {
           this.logger.info('Could not find valid client on backend');
@@ -389,36 +376,37 @@ class Account extends EventEmitter {
             return this.apiClient.config.store
               .purge()
               .then(() => this.apiClient.init(loginData.persist ? ClientType.PERMANENT : ClientType.TEMPORARY))
-              .then(() => this.service!.client.register(loginData, clientInfo))
-              .then((client: RegisteredClient) => (registeredClient = client))
-              .then(() => {
-                this.logger.info('Client is created');
-                this.apiClient.context!.clientId = registeredClient.id;
-                this.service!.conversation.setClientID(registeredClient.id);
-                return this.service!.notification.initializeNotificationStream(registeredClient.id);
-              })
-              .then(() => this.service!.client.synchronizeClients())
-              .then(() => {
-                return {isNewClient: true, localClient: registeredClient};
-              });
+              .then(() => this.registerClient(loginData, clientInfo));
           }
           this.logger.info('Last client was permanent - Deleting cryptograpy stores');
-          return this.service!.cryptography.deleteCryptographyStores()
-            .then(() => this.service!.client.register(loginData, clientInfo))
-            .then((client: RegisteredClient) => (registeredClient = client))
-            .then(() => {
-              this.logger.info('Client is created');
-              this.apiClient.context!.clientId = registeredClient.id;
-              this.service!.conversation.setClientID(registeredClient.id);
-              return this.service!.notification.initializeNotificationStream(registeredClient.id);
-            })
-            .then(() => this.service!.client.synchronizeClients())
-            .then(() => {
-              return {isNewClient: true, localClient: registeredClient};
-            });
+          return this.service!.cryptography.deleteCryptographyStores().then(() =>
+            this.registerClient(loginData, clientInfo)
+          );
         }
         throw error;
       });
+  }
+
+  private registerClient(
+    loginData: LoginData,
+    clientInfo?: ClientInfo
+  ): Promise<{isNewClient: boolean; localClient: RegisteredClient}> {
+    this.logger.info('registerClient');
+    if (!this.service) {
+      throw new Error('Services are not set.');
+    }
+    let registeredClient: RegisteredClient;
+
+    return this.service!.client.register(loginData, clientInfo)
+      .then((client: RegisteredClient) => (registeredClient = client))
+      .then(() => {
+        this.logger.info('Client is created');
+        this.apiClient.context!.clientId = registeredClient.id;
+        this.service!.conversation.setClientID(registeredClient.id);
+        return this.service!.notification.initializeNotificationStream(registeredClient.id);
+      })
+      .then(() => this.service!.client.synchronizeClients())
+      .then(() => ({isNewClient: true, localClient: registeredClient}));
   }
 
   private resetContext(): Promise<void> {

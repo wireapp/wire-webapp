@@ -43,7 +43,6 @@ describe('Account', () => {
         schemaCallback: db => {
           db.version(1).stores({
             amplify: '',
-            authentication: '',
             clients: ', meta.primary_key',
             keys: '',
             prekeys: '',
