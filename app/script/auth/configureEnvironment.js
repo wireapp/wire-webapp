@@ -19,13 +19,15 @@
 
 import jQuery from 'jquery';
 import {amplify} from '@bower_components/amplify';
+import bazinga64 from 'bazinga64';
 import platform from 'platform';
 import '../event/WebApp';
 
-window.amplify = amplify;
-window.platform = platform;
-window.jQuery = jQuery;
 window.$ = jQuery;
+window.amplify = amplify;
+window.bazinga64 = bazinga64;
+window.jQuery = jQuery;
+window.platform = platform;
 
 import '../config';
 import '../service/BackendEnvironment';
