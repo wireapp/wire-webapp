@@ -47,21 +47,21 @@ export const indexStrings = defineMessages({
     id: 'index.claim',
     defaultMessage: 'Secure messaging for everyone.',
   },
-  createAccount: {
-    id: 'index.createAccount',
-    defaultMessage: 'Create an account',
+  createAccountForPersonalUse: {
+    id: 'index.createAccountForPersonalUse',
+    defaultMessage: 'For personal use',
   },
-  createAccountFor: {
-    id: 'index.createAccountFor',
-    defaultMessage: 'for personal use',
+  createAccountForOrganizations: {
+    id: 'index.createAccountForOrganizations',
+    defaultMessage: 'For organizations',
+  },
+  createPersonalAccount: {
+    id: 'index.createPersonalAccount',
+    defaultMessage: 'create an account',
   },
   createTeam: {
     id: 'index.createTeam',
-    defaultMessage: 'Create a team',
-  },
-  createTeamFor: {
-    id: 'index.createTeamFor',
-    defaultMessage: 'for work',
+    defaultMessage: 'create a team',
   },
   loginInfo: {
     id: 'index.loginInfo',

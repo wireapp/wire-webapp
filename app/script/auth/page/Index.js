@@ -74,11 +74,11 @@ class Index extends Component {
                   <ProfileIcon color={COLOR.WHITE} />
                 </RoundContainer>
                 <Bold fontSize="24px" color={COLOR.LINK}>
-                  {_(indexStrings.createAccount)}
+                  {_(indexStrings.createAccountForPersonalUse)}
                 </Bold>
                 <br />
                 <Text light fontSize="16px" color={COLOR.LINK} style={{lineHeight: '36px'}}>
-                  {_(indexStrings.createAccountFor)}
+                  {_(indexStrings.createPersonalAccount)}
                 </Text>
               </Link>
             </Column>
@@ -88,11 +88,11 @@ class Index extends Component {
                   <TeamIcon color={COLOR.WHITE} />
                 </RoundContainer>
                 <Bold fontSize="24px" color={COLOR.LINK}>
-                  {_(indexStrings.createTeam)}
+                  {_(indexStrings.createAccountForOrganizations)}
                 </Bold>
                 <br />
                 <Text light fontSize="16px" color={COLOR.LINK} style={{lineHeight: '36px'}}>
-                  {_(indexStrings.createTeamFor)}
+                  {_(indexStrings.createTeam)}
                 </Text>
               </Link>
             </Column>
