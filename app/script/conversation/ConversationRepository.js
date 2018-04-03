@@ -3085,6 +3085,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
         const reason = z.calling.enum.TERMINATION_REASON.MEMBER_LEAVE;
         amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, conversationEntity.id, reason);
       }
+
+      if (this.selfUser().isTemporaryGuest()) {
+        eventJson.from = this.selfUser().id;
+      }
     }
 
     if (!selfLeavingClearedConversation) {
