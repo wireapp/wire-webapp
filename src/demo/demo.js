@@ -17,12 +17,12 @@
  *
  */
 
-import {AUTH_TABLE_NAME, AccessTokenStore} from '@wireapp/api-client/dist/commonjs/auth/';
 import {Button, Form, Input} from '@wireapp/react-ui-kit/Form';
 import {COLOR, Logo} from '@wireapp/react-ui-kit/Identity';
 import {ContainerXS, Content, Header, StyledApp} from '@wireapp/react-ui-kit/Layout';
 import {H1, Link, Text} from '@wireapp/react-ui-kit/Text';
 import React, {Component} from 'react';
+import {AccessTokenStore} from '@wireapp/api-client/dist/commonjs/auth/';
 import Client from '@wireapp/api-client/dist/commonjs/Client';
 import {IndexedDBEngine} from '@wireapp/store-engine/dist/commonjs/engine';
 import ReactDOM from 'react-dom';
@@ -44,6 +44,15 @@ class Auth extends Component {
     this.doAuth = this.doAuth.bind(this);
     this.onEmailChange = this.onEmailChange.bind(this);
     this.onPasswordChange = this.onPasswordChange.bind(this);
+  }
+
+  componentDidMount() {
+    window.wire.client
+      .init()
+      .then(() => this.setState({authenticated: true}))
+      .catch(error => {
+        console.error('Could not recover from cookie', error);
+      });
   }
 
   doAuth(event) {
@@ -105,9 +114,7 @@ class Auth extends Component {
 window.onload = function() {
   const config = {
     schemaCallback: db => {
-      db.version(1).stores({
-        [AUTH_TABLE_NAME]: '',
-      });
+      db.version(1).stores({});
     },
     store: new IndexedDBEngine(),
     urls: BACKEND_ENV,
