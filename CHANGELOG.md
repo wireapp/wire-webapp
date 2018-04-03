@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="1.0.23"></a>
+## [1.0.23](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@1.0.22...@wireapp/react-ui-kit@1.0.23) (2018-04-03)
+
+
+### Bug Fixes
+
+* input block margins ([#447](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/447)) ([8a5461f](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/8a5461f))
+
+
+
+
 <a name="1.0.22"></a>
 ## [1.0.22](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@1.0.21...@wireapp/react-ui-kit@1.0.22) (2018-04-03)
 
