@@ -61,8 +61,8 @@ z.backup.BackupRepository = class BackupRepository {
   }
 
   exportHistory() {
-    this.backupService.getHistory().then(tables => {
-      const numberOfRecords = tables.reduce((accumulator, table) => accumulator + table.rows.length, 0);
+    this.backupService.getHistoryCount().then(entryContainer => {
+      const numberOfRecords = entryContainer.reduce((accumulator, entries) => accumulator + entries, 0);
       amplify.publish(z.event.WebApp.BACKUP.EXPORT.INIT, numberOfRecords);
     });
   }
@@ -91,12 +91,10 @@ z.backup.BackupRepository = class BackupRepository {
     const metadata = this.createMetaDescription();
     this.backupService.getHistory().then(tables => {
       for (const table of tables) {
-        const records = table.rows;
-        for (const record of records) {
-          amplify.publish(z.event.WebApp.BACKUP.EXPORT.DATA, table.name, record);
+        for (const batch of table.batches) {
+          amplify.publish(z.event.WebApp.BACKUP.EXPORT.DATA, table.name, batch);
         }
       }
-
       amplify.publish(z.event.WebApp.BACKUP.EXPORT.META, metadata);
     });
   }

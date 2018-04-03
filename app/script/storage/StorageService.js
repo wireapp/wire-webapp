@@ -423,7 +423,7 @@ z.storage.StorageService = class StorageService {
 
   /**
    * @param {Array<string>} tableNames - The table names to get
-   * @returns {Promise<Array<Table>>} All found tables in an array container
+   * @returns {Array<Table>} All found tables in an array container
    */
   getTables(tableNames) {
     return tableNames.map(tableName => this.db[tableName]);

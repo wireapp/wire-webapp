@@ -33,8 +33,24 @@ z.backup.BackupService = class BackupService {
 
   getHistory() {
     const tableContainer = this.storageService.getTables(['conversations', 'events']);
-    const promises = tableContainer.map(table => table.toArray().then(rows => ({name: table.name, rows})));
+    const promises = tableContainer.map(table => {
+      const collection = table.toCollection();
+      return table
+        .count()
+        .then(n => new DexieBatch({batchSize: 1000, limit: n}))
+        .then(batchDriver => {
+          const batches = [];
+          return batchDriver
+            .eachBatch(collection, batch => batches.push(batch))
+            .then(() => ({batches, name: table.name}));
+        });
+    });
     return Promise.all(promises);
+  }
+
+  getHistoryCount() {
+    const tableContainer = this.storageService.getTables(['conversations', 'events']);
+    return Promise.all(tableContainer.map(table => table.count()));
   }
 
   setHistory(tableName, data) {
