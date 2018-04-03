@@ -23,11 +23,11 @@ import bazinga64 from 'bazinga64';
 import platform from 'platform';
 import '../event/WebApp';
 
-window.$ = jQuery;
 window.amplify = amplify;
 window.bazinga64 = bazinga64;
-window.jQuery = jQuery;
 window.platform = platform;
+window.jQuery = jQuery;
+window.$ = jQuery;
 
 import '../config';
 import '../service/BackendEnvironment';
