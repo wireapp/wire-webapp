@@ -38,14 +38,53 @@ import {clientItemStrings} from '../../strings';
 import {injectIntl} from 'react-intl';
 
 class ClientItem extends React.Component {
+  static CONFIG = {
+    animationSteps: 8,
+  };
+
   static initialState = {
     password: '',
     validPassword: true,
     validationError: null,
   };
-  state = ClientItem.initialState;
+
+  state = {
+    ...ClientItem.initialState,
+    animationStep: 0,
+    isAnimating: false,
+  };
 
   formatId = (id = '?') => id.toUpperCase().replace(/(..)/g, '$1 ');
+
+  componentWillReceiveProps(newProps) {
+    if (!this.props.selected && newProps.selected) {
+      this.setState({isAnimating: true});
+      this.executeAnimateIn();
+    } else if (this.props.selected && !newProps.selected) {
+      this.setState({isAnimating: true});
+      this.executeAnimateOut();
+    } else {
+      this.setState({animationStep: 0});
+    }
+  }
+
+  executeAnimateIn() {
+    if (this.state.animationStep < ClientItem.CONFIG.animationSteps) {
+      window.requestAnimationFrame(this.executeAnimateIn.bind(this));
+      this.setState(state => ({animationStep: state.animationStep + 1}));
+    } else {
+      this.setState({isAnimating: false});
+    }
+  }
+
+  executeAnimateOut() {
+    if (this.state.animationStep > 0) {
+      window.requestAnimationFrame(this.executeAnimateOut.bind(this));
+      this.setState(state => ({animationStep: state.animationStep - 1}));
+    } else {
+      this.setState({isAnimating: false});
+    }
+  }
 
   formatDate = dateString =>
     dateString
@@ -101,20 +140,24 @@ class ClientItem extends React.Component {
 
   render() {
     const {client, selected, clientError, intl: {formatMessage: _}} = this.props;
-    const {validationError, validPassword, password} = this.state;
+    const {validationError, validPassword, password, animationStep, isAnimating} = this.state;
+    const animationPosition = animationStep / ClientItem.CONFIG.animationSteps;
+    const marginTop = animationPosition * 16;
+    const paddingHorizontal = animationPosition * 2;
+    const height = animationPosition * 56;
     return (
       <ContainerXS>
         <ContainerXS
-          style={selected ? {backgroundColor: 'white', borderRadius: '10px'} : {}}
+          style={{
+            backgroundColor: selected ? 'white' : '',
+            borderRadius: '10px',
+            transition: 'background-color .35s linear',
+          }}
           data-uie-value={client.model}
         >
           <ContainerXS
             onClick={this.wrappedOnClick}
-            style={
-              selected
-                ? {cursor: 'pointer', margin: '16px 0 0 0', padding: '5px 16px 0 16px'}
-                : {cursor: 'pointer', margin: '0 0 0 0', padding: '5px 16px 0 16px'}
-            }
+            style={{cursor: 'pointer', margin: `${marginTop}px 0 0 0`, padding: '5px 16px 0 16px'}}
             data-uie-name="go-remove-device"
           >
             <div style={{display: 'flex', flexDirection: 'row'}}>
@@ -129,12 +172,12 @@ class ClientItem extends React.Component {
                 <Small block>{this.formatDate(client.time)}</Small>
               </div>
             </div>
-            <Line color={COLOR.GRAY_LIGHTEN_72} style={{margin: '4px 0 0 0'}} />
+            <Line color="rgba(51, 55, 58, .04)" style={{backgroundColor: 'transparent', margin: '4px 0 0 0'}} />
           </ContainerXS>
-          {selected && (
-            <ContainerXS style={{margin: '-5px 0 0 0', padding: '5px'}}>
+          {(selected || isAnimating) && (
+            <ContainerXS style={{maxHeight: `${height}px`, overflow: 'hidden', padding: `${paddingHorizontal}px 5px`}}>
               <Form>
-                <InputSubmitCombo style={{marginBottom: '0'}}>
+                <InputSubmitCombo style={{background: 'transparent', marginBottom: '0'}}>
                   <Input
                     autoFocus
                     name="password"
@@ -147,6 +190,7 @@ class ClientItem extends React.Component {
                     minLength="8"
                     pattern=".{8,1024}"
                     required
+                    style={{background: 'transparent'}}
                     onChange={event =>
                       this.setState({
                         password: event.target.value,
@@ -162,6 +206,7 @@ class ClientItem extends React.Component {
                     icon={ICON_NAME.TRASH}
                     formNoValidate
                     onClick={this.handleSubmit}
+                    style={{marginBottom: '-4px'}}
                     data-uie-name="do-remove-device"
                   />
                 </InputSubmitCombo>
