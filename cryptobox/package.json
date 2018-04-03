@@ -53,7 +53,7 @@
     "dist": "yarn clear && yarn build",
     "test": "yarn dist && yarn test:node && yarn test:browser",
     "test:browser": "webpack && karma start",
-    "test:node": "cross-env DEBUG=@wireapp/cryptobox* jasmine --config=test/jasmine.node.json"
+    "test:node": "cross-env NODE_DEBUG=@wireapp/cryptobox* jasmine --config=test/jasmine.node.json"
   },
   "types": "dist/commonjs/index.d.ts",
   "version": "8.3.12"
