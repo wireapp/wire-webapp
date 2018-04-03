@@ -22,28 +22,19 @@
 window.z = window.z || {};
 window.z.message = z.message || {};
 
-z.message.MessageCategorization = (function() {
-  const _check_text = function(event) {
-    if (event.type === z.event.Client.CONVERSATION.MESSAGE_ADD) {
-      let category = z.message.MessageCategory.TEXT;
+z.message.MessageCategorization = (() => {
+  const _checkAsset = event => {
+    const {data: eventData, type: eventType} = event;
 
-      if (event.data.previews && event.data.previews.length > 0) {
-        category = category | z.message.MessageCategory.LINK | z.message.MessageCategory.LINK_PREVIEW;
-      }
-
-      return category;
-    }
-  };
-
-  const _check_asset = function(event) {
-    if (event.type === z.event.Client.CONVERSATION.ASSET_ADD) {
-      if (event.data.info.tag === undefined) {
+    const isAssetAdd = eventType === z.event.Client.CONVERSATION.ASSET_ADD;
+    if (isAssetAdd) {
+      const isTagUndefined = eventData.info.tag === undefined;
+      if (isTagUndefined) {
         return z.message.MessageCategory.FILE;
       }
 
       let category = z.message.MessageCategory.IMAGE;
-
-      if (event.data.content_type === 'image/gif') {
+      if (eventData.content_type === 'image/gif') {
         category = category | z.message.MessageCategory.GIF;
       }
 
@@ -51,46 +42,66 @@ z.message.MessageCategorization = (function() {
     }
   };
 
-  const _check_ping = function(event) {
-    if (event.type === z.event.Client.CONVERSATION.KNOCK) {
-      return z.message.MessageCategory.KNOCK;
-    }
-  };
-
-  const _check_location = function(event) {
-    if (event.type === z.event.Client.CONVERSATION.LOCATION) {
+  const _checkLocation = event => {
+    const isLocation = event.type === z.event.Client.CONVERSATION.LOCATION;
+    if (isLocation) {
       return z.message.MessageCategory.LOCATION;
     }
   };
 
-  const _category_from_event = function(event) {
-    try {
-      let category = z.message.MessageCategory.NONE;
+  const _checkPing = event => {
+    const isPing = event.type === z.event.Client.CONVERSATION.KNOCK;
+    if (isPing) {
+      return z.message.MessageCategory.KNOCK;
+    }
+  };
 
-      if (event.ephemeral_expires) {
-        // String, Number, true
-        return z.message.MessageCategory.NONE;
-      }
+  const _checkText = event => {
+    const {data: eventData, type: eventType} = event;
 
-      for (const check of [_check_text, _check_asset, _check_ping, _check_location]) {
-        const temp_category = check(event);
-        if (temp_category) {
-          category = temp_category;
-          break;
-        }
-      }
+    const isMessageAdd = eventType === z.event.Client.CONVERSATION.MESSAGE_ADD;
+    if (isMessageAdd) {
+      let category = z.message.MessageCategory.TEXT;
 
-      if (_.isObject(event.reactions) && Object.keys(event.reactions).length > 0) {
-        category = category | z.message.MessageCategory.LIKED;
+      const isLinkPreview = eventData.previews && !!eventData.previews.length;
+      if (isLinkPreview) {
+        category = category | z.message.MessageCategory.LINK | z.message.MessageCategory.LINK_PREVIEW;
       }
 
       return category;
-    } catch (error) {
-      return z.message.MessageCategory.UNDEFINED;
     }
   };
 
   return {
-    category_from_event: _category_from_event,
+    categoryFromEvent: event => {
+      try {
+        const {ephemeral_expires: eventEphemeralState, reactions: eventReactions} = event;
+        let category = z.message.MessageCategory.NONE;
+
+        const isEphemeral = !!eventEphemeralState;
+        // String, Number, true
+        if (isEphemeral) {
+          return z.message.MessageCategory.NONE;
+        }
+
+        const categoryChecks = [_checkText, _checkAsset, _checkPing, _checkLocation];
+        for (const check of categoryChecks) {
+          const matchedCategory = check(event);
+          if (matchedCategory) {
+            category = matchedCategory;
+            break;
+          }
+        }
+
+        const isReaction = _.isObject(eventReactions) && !!Object.keys(eventReactions).length;
+        if (isReaction) {
+          category = category | z.message.MessageCategory.LIKED;
+        }
+
+        return category;
+      } catch (error) {
+        return z.message.MessageCategory.UNDEFINED;
+      }
+    },
   };
 })();

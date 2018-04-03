@@ -30,6 +30,8 @@ z.storage.StorageRepository = class StorageRepository {
   constructor(storageService) {
     this.storageService = storageService;
     this.logger = new z.util.Logger('z.storage.StorageRepository', z.config.LOGGER.OPTIONS);
+
+    this.AMPLIFY_STORE_NAME = z.storage.StorageSchemata.OBJECT_STORE.AMPLIFY;
   }
 
   /**
@@ -49,11 +51,11 @@ z.storage.StorageRepository = class StorageRepository {
    */
   deleteCryptographyStores() {
     return this.storageService.deleteStores([
-      z.storage.StorageService.OBJECT_STORE.AMPLIFY,
-      z.storage.StorageService.OBJECT_STORE.CLIENTS,
-      z.storage.StorageService.OBJECT_STORE.KEYS,
-      z.storage.StorageService.OBJECT_STORE.SESSIONS,
-      z.storage.StorageService.OBJECT_STORE.PRE_KEYS,
+      z.storage.StorageSchemata.OBJECT_STORE.AMPLIFY,
+      z.storage.StorageSchemata.OBJECT_STORE.CLIENTS,
+      z.storage.StorageSchemata.OBJECT_STORE.KEYS,
+      z.storage.StorageSchemata.OBJECT_STORE.SESSIONS,
+      z.storage.StorageSchemata.OBJECT_STORE.PRE_KEYS,
     ]);
   }
 
@@ -74,7 +76,7 @@ z.storage.StorageRepository = class StorageRepository {
    * @returns {Promise} Resolves with the retrieved value
    */
   getValue(primaryKey) {
-    return this.storageService.load(z.storage.StorageService.OBJECT_STORE.AMPLIFY, primaryKey).then(record => {
+    return this.storageService.load(this.AMPLIFY_STORE_NAME, primaryKey).then(record => {
       if (record && record.value) {
         return record.value;
       }
@@ -90,7 +92,7 @@ z.storage.StorageRepository = class StorageRepository {
    * @returns {Promise} Resolves with the primary key
    */
   saveValue(primaryKey, value) {
-    return this.storageService.save(z.storage.StorageService.OBJECT_STORE.AMPLIFY, primaryKey, {value: value});
+    return this.storageService.save(this.AMPLIFY_STORE_NAME, primaryKey, {value: value});
   }
 
   /**

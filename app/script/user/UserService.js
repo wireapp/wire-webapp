@@ -42,6 +42,8 @@ z.user.UserService = class UserService {
     this.client = client;
     this.logger = new z.util.Logger('z.user.UserService', z.config.LOGGER.OPTIONS);
     this.storageService = storageService;
+
+    this.USER_STORE_NAME = z.storage.StorageSchemata.OBJECT_STORE.USERS;
   }
 
   //##############################################################################
@@ -53,7 +55,7 @@ z.user.UserService = class UserService {
    * @returns {Promise} Resolves with all the stored user states
    */
   loadUserFromDb() {
-    return this.storageService.getAll(z.storage.StorageService.OBJECT_STORE.USERS);
+    return this.storageService.getAll(this.USER_STORE_NAME);
   }
 
   /**
@@ -64,12 +66,10 @@ z.user.UserService = class UserService {
   saveUserInDb(userEntity) {
     const userData = userEntity.serialize();
 
-    return this.storageService
-      .save(z.storage.StorageService.OBJECT_STORE.USERS, userEntity.id, userData)
-      .then(primaryKey => {
-        this.logger.info(`State of user '${primaryKey}' was stored`, userData);
-        return userEntity;
-      });
+    return this.storageService.save(this.USER_STORE_NAME, userEntity.id, userData).then(primaryKey => {
+      this.logger.info(`State of user '${primaryKey}' was stored`, userData);
+      return userEntity;
+    });
   }
 
   //##############################################################################

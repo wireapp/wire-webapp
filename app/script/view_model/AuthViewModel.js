@@ -1597,7 +1597,8 @@ z.viewModel.AuthViewModel = class AuthViewModel {
    * @returns {Promise<boolean>} Resolves with whether at least one conversation event was found
    */
   _has_local_history() {
-    return this.storageService.getAll(z.storage.StorageService.OBJECT_STORE.EVENTS).then(events => events.length > 0);
+    const eventStoreName = z.storage.StorageSchemata.OBJECT_STORE.EVENTS;
+    return this.storageService.getAll(eventStoreName).then(events => events.length > 0);
   }
 
   /**
