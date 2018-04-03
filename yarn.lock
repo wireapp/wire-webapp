@@ -529,9 +529,9 @@
     ed2curve "0.2.1"
     libsodium-wrappers-sumo "0.7.3"
 
-"@wireapp/react-ui-kit@1.0.22":
-  version "1.0.22"
-  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-1.0.22.tgz#2e8f2244c0fe1f6908ea957dfe4c8de967d39050"
+"@wireapp/react-ui-kit@1.0.23":
+  version "1.0.23"
+  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-1.0.23.tgz#c6fa81fed51d103d639874822ebbeae9c596a116"
   dependencies:
     color "3.0.0"
     gulp-concat "2.6.1"
