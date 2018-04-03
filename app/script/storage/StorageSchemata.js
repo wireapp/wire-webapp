@@ -26,7 +26,6 @@ z.storage.StorageSchemata = class StorageSchemata {
   static get OBJECT_STORE() {
     return {
       AMPLIFY: 'amplify',
-      AUTHENTICATION: 'authentication',
       CLIENTS: 'clients',
       CONVERSATION_EVENTS: 'conversation_events',
       CONVERSATIONS: 'conversations',
@@ -212,14 +211,16 @@ z.storage.StorageSchemata = class StorageSchemata {
           [StorageSchemata.OBJECT_STORE.SESSIONS]: '',
         },
         upgrade: transaction => {
-          const expectedPrimaryKey = 'local_identity';
+          const localClientPrimaryKey = 'local_identity';
 
           transaction[StorageSchemata.OBJECT_STORE.CLIENTS].toCollection().each((client, cursor) => {
-            const isExpectedMetaPrimaryKey = client.meta.primary_key === expectedPrimaryKey;
-            const isExpectedPrimaryKey = client.primary_key === expectedPrimaryKey;
-            if (isExpectedMetaPrimaryKey && isExpectedPrimaryKey) {
+            const isExpectedMetaPrimaryKey = client.meta.primary_key === localClientPrimaryKey;
+            const isExpectedPrimaryKey = client.primary_key === localClientPrimaryKey;
+
+            const isExpectedClient = isExpectedMetaPrimaryKey && isExpectedPrimaryKey;
+            if (isExpectedClient) {
               transaction[StorageSchemata.OBJECT_STORE.CLIENTS].delete(cursor.primaryKey);
-              transaction[StorageSchemata.OBJECT_STORE.CLIENTS].put(client, expectedPrimaryKey);
+              transaction[StorageSchemata.OBJECT_STORE.CLIENTS].put(client, localClientPrimaryKey);
             }
           });
         },
@@ -268,9 +269,7 @@ z.storage.StorageSchemata = class StorageSchemata {
           transaction[StorageSchemata.OBJECT_STORE.CONVERSATION_EVENTS]
             .toCollection()
             .toArray()
-            .then(items => {
-              database[transaction.OBJECT_STORE.EVENTS].bulkPut(items);
-            });
+            .then(items => database[transaction.OBJECT_STORE.EVENTS].bulkPut(items));
         },
         version: 13,
       },
