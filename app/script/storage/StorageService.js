@@ -43,7 +43,7 @@ z.storage.StorageService = class StorageService {
    * @returns {Promise} Resolves with the database name
    */
   init(userId = this.userId) {
-    return new Promise((resolve, reject) => {
+    return Promise.resolve().then(() => {
       const isPermanent = z.util.StorageUtil.getValue(z.storage.StorageKey.AUTH.PERSIST);
       const clientType = isPermanent ? z.client.ClientType.PERMANENT : z.client.ClientType.TEMPORARY;
 
@@ -56,16 +56,16 @@ z.storage.StorageService = class StorageService {
 
       this._upgradeStores();
 
-      this.db
+      return this.db
         .open()
         .then(() => {
           this.logger.info(`Storage Service initialized with database '${this.dbName}' version '${this.db.verno}'`);
-          resolve(this.dbName);
+          return this.dbName;
         })
         .catch(error => {
           const logMessage = `Failed to initialize database '${this.dbName}': ${error.message || error}`;
           this.logger.error(logMessage, {error: error});
-          reject(new z.storage.StorageError(z.storage.StorageError.TYPE.FAILED_TO_OPEN));
+          throw new z.storage.StorageError(z.storage.StorageError.TYPE.FAILED_TO_OPEN);
         });
     });
   }
