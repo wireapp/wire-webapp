@@ -269,7 +269,7 @@ z.storage.StorageSchemata = class StorageSchemata {
           transaction[StorageSchemata.OBJECT_STORE.CONVERSATION_EVENTS]
             .toCollection()
             .toArray()
-            .then(items => database[transaction.OBJECT_STORE.EVENTS].bulkPut(items));
+            .then(items => database[StorageSchemata.OBJECT_STORE.EVENTS].bulkPut(items));
         },
         version: 13,
       },
