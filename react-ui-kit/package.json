@@ -43,5 +43,5 @@
     "test": "yarn dist && yarn test:browser",
     "test:browser": "exit 0"
   },
-  "version": "1.0.21"
+  "version": "1.0.22"
 }
