@@ -40,6 +40,8 @@ z.client.ClientService = class ClientService {
     this.client = clientEntity;
     this.storageService = storageService;
     this.logger = new z.util.Logger('z.client.ClientService', z.config.LOGGER.OPTIONS);
+
+    this.CLIENT_STORE_NAME = z.storage.StorageSchemata.OBJECT_STORE.CLIENTS;
   }
 
   //##############################################################################
@@ -140,7 +142,7 @@ z.client.ClientService = class ClientService {
    * @returns {Promise} Resolves once the client is deleted
    */
   deleteClientFromDb(primaryKey) {
-    return this.storageService.delete(z.storage.StorageService.OBJECT_STORE.CLIENTS, primaryKey);
+    return this.storageService.delete(this.CLIENT_STORE_NAME, primaryKey);
   }
 
   /**
@@ -148,7 +150,7 @@ z.client.ClientService = class ClientService {
    * @returns {Promise} Resolves with all the clients payloads
    */
   loadAllClientsFromDb() {
-    return this.storageService.getAll(z.storage.StorageService.OBJECT_STORE.CLIENTS);
+    return this.storageService.getAll(this.CLIENT_STORE_NAME);
   }
 
   /**
@@ -157,7 +159,7 @@ z.client.ClientService = class ClientService {
    * @returns {Promise<JSON|string>} Resolves with the client's payload or the primary key if not found
    */
   loadClientFromDb(primaryKey) {
-    return this.storageService.db[z.storage.StorageService.OBJECT_STORE.CLIENTS]
+    return this.storageService.db[this.CLIENT_STORE_NAME]
       .where('meta.primary_key')
       .equals(primaryKey)
       .first()
@@ -185,12 +187,10 @@ z.client.ClientService = class ClientService {
 
     clientPayload.meta.primary_key = primaryKey;
 
-    return this.storageService
-      .save(z.storage.StorageService.OBJECT_STORE.CLIENTS, primaryKey, clientPayload)
-      .then(() => {
-        this.logger.info(`Client '${clientPayload.id}' stored with primary key '${primaryKey}'`, clientPayload);
-        return clientPayload;
-      });
+    return this.storageService.save(this.CLIENT_STORE_NAME, primaryKey, clientPayload).then(() => {
+      this.logger.info(`Client '${clientPayload.id}' stored with primary key '${primaryKey}'`, clientPayload);
+      return clientPayload;
+    });
   }
 
   /**
@@ -201,6 +201,6 @@ z.client.ClientService = class ClientService {
    * @returns {Promise<Integer>} Number of updated records (1 if an object was updated, otherwise 0)
    */
   updateClientInDb(primaryKey, changes) {
-    return this.storageService.update(z.storage.StorageService.OBJECT_STORE.CLIENTS, primaryKey, changes);
+    return this.storageService.update(this.CLIENT_STORE_NAME, primaryKey, changes);
   }
 };

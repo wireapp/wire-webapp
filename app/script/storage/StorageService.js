@@ -23,44 +23,7 @@ window.z = window.z || {};
 window.z.storage = z.storage || {};
 
 z.storage.StorageService = class StorageService {
-  static get OBJECT_STORE() {
-    return {
-      AMPLIFY: 'amplify',
-      AUTHENTICATION: 'authentication',
-      CLIENTS: 'clients',
-      CONVERSATION_EVENTS: 'conversation_events',
-      CONVERSATIONS: 'conversations',
-      EVENTS: 'events',
-      KEYS: 'keys',
-      PRE_KEYS: 'prekeys',
-      SESSIONS: 'sessions',
-      USERS: 'users',
-    };
-  }
-
-  static get SCHEMA() {
-    return {
-      schema: {
-        [StorageService.OBJECT_STORE.AMPLIFY]: '',
-        [StorageService.OBJECT_STORE.AUTHENTICATION]: '',
-        [StorageService.OBJECT_STORE.CLIENTS]: ', meta.primary_key',
-        [StorageService.OBJECT_STORE.CONVERSATION_EVENTS]:
-          ', category, conversation, time, type, [conversation+time], [conversation+category]',
-        [StorageService.OBJECT_STORE.CONVERSATIONS]: ', id, last_event_timestamp',
-        [StorageService.OBJECT_STORE.EVENTS]:
-          '++primary_key, id, category, conversation, time, type, [conversation+time], [conversation+category]',
-        [StorageService.OBJECT_STORE.KEYS]: '',
-        [StorageService.OBJECT_STORE.PRE_KEYS]: '',
-        [StorageService.OBJECT_STORE.SESSIONS]: '',
-        [StorageService.OBJECT_STORE.USERS]: ', id',
-      },
-      version: 16,
-    };
-  }
-
-  /**
-   * Construct an new StorageService.
-   */
+  // Construct an new StorageService.
   constructor() {
     this.logger = new z.util.Logger('z.storage.StorageService', z.config.LOGGER.OPTIONS);
 
@@ -87,244 +50,11 @@ z.storage.StorageService = class StorageService {
       this.userId = userId;
       this.dbName = `wire@${z.util.Environment.backend.current}@${userId}@${clientType}`;
 
-      // https://github.com/dfahlander/Dexie.js/wiki/Version.stores()
-      const version1 = {
-        [StorageService.OBJECT_STORE.AMPLIFY]: '',
-        [StorageService.OBJECT_STORE.CLIENTS]: '',
-        [StorageService.OBJECT_STORE.CONVERSATION_EVENTS]: ', raw.conversation, raw.time, meta.timestamp',
-        [StorageService.OBJECT_STORE.KEYS]: '',
-        [StorageService.OBJECT_STORE.PRE_KEYS]: '',
-        [StorageService.OBJECT_STORE.SESSIONS]: '',
-      };
-
-      const version2 = {
-        [StorageService.OBJECT_STORE.AMPLIFY]: '',
-        [StorageService.OBJECT_STORE.CLIENTS]: '',
-        [StorageService.OBJECT_STORE.CONVERSATION_EVENTS]: ', raw.conversation, raw.time, raw.type, meta.timestamp',
-        [StorageService.OBJECT_STORE.KEYS]: '',
-        [StorageService.OBJECT_STORE.PRE_KEYS]: '',
-        [StorageService.OBJECT_STORE.SESSIONS]: '',
-      };
-
-      const version3 = {
-        [StorageService.OBJECT_STORE.AMPLIFY]: '',
-        [StorageService.OBJECT_STORE.CLIENTS]: '',
-        [StorageService.OBJECT_STORE.CONVERSATION_EVENTS]: ', raw.conversation, raw.time, raw.type, meta.timestamp',
-        [StorageService.OBJECT_STORE.CONVERSATIONS]: ', id, last_event_timestamp',
-        [StorageService.OBJECT_STORE.KEYS]: '',
-        [StorageService.OBJECT_STORE.PRE_KEYS]: '',
-        [StorageService.OBJECT_STORE.SESSIONS]: '',
-      };
-
-      const version4 = {
-        [StorageService.OBJECT_STORE.AMPLIFY]: '',
-        [StorageService.OBJECT_STORE.CLIENTS]: ', meta.primary_key',
-        [StorageService.OBJECT_STORE.CONVERSATION_EVENTS]: ', raw.conversation, raw.time, raw.type, meta.timestamp',
-        [StorageService.OBJECT_STORE.CONVERSATIONS]: ', id, last_event_timestamp',
-        [StorageService.OBJECT_STORE.KEYS]: '',
-        [StorageService.OBJECT_STORE.PRE_KEYS]: '',
-        [StorageService.OBJECT_STORE.SESSIONS]: '',
-      };
-
-      const version5 = {
-        [StorageService.OBJECT_STORE.AMPLIFY]: '',
-        [StorageService.OBJECT_STORE.CLIENTS]: ', meta.primary_key',
-        [StorageService.OBJECT_STORE.CONVERSATION_EVENTS]: ', conversation, time, type',
-        [StorageService.OBJECT_STORE.CONVERSATIONS]: ', id, last_event_timestamp',
-        [StorageService.OBJECT_STORE.KEYS]: '',
-        [StorageService.OBJECT_STORE.PRE_KEYS]: '',
-        [StorageService.OBJECT_STORE.SESSIONS]: '',
-      };
-
-      const version9 = {
-        [StorageService.OBJECT_STORE.AMPLIFY]: '',
-        [StorageService.OBJECT_STORE.CLIENTS]: ', meta.primary_key',
-        [StorageService.OBJECT_STORE.CONVERSATION_EVENTS]: ', conversation, time, type, [conversation+time]',
-        [StorageService.OBJECT_STORE.CONVERSATIONS]: ', id, last_event_timestamp',
-        [StorageService.OBJECT_STORE.KEYS]: '',
-        [StorageService.OBJECT_STORE.PRE_KEYS]: '',
-        [StorageService.OBJECT_STORE.SESSIONS]: '',
-      };
-
-      const version10 = {
-        [StorageService.OBJECT_STORE.AMPLIFY]: '',
-        [StorageService.OBJECT_STORE.CLIENTS]: ', meta.primary_key',
-        [StorageService.OBJECT_STORE.CONVERSATION_EVENTS]:
-          ', category, conversation, time, type, [conversation+time], [conversation+category]',
-        [StorageService.OBJECT_STORE.CONVERSATIONS]: ', id, last_event_timestamp',
-        [StorageService.OBJECT_STORE.KEYS]: '',
-        [StorageService.OBJECT_STORE.PRE_KEYS]: '',
-        [StorageService.OBJECT_STORE.SESSIONS]: '',
-      };
-
-      const version11 = {
-        [StorageService.OBJECT_STORE.AMPLIFY]: '',
-        [StorageService.OBJECT_STORE.CLIENTS]: ', meta.primary_key',
-        [StorageService.OBJECT_STORE.CONVERSATION_EVENTS]:
-          ', category, conversation, time, type, [conversation+time], [conversation+category]',
-        [StorageService.OBJECT_STORE.CONVERSATIONS]: ', id, last_event_timestamp',
-        [StorageService.OBJECT_STORE.KEYS]: '',
-        [StorageService.OBJECT_STORE.PRE_KEYS]: '',
-        [StorageService.OBJECT_STORE.SESSIONS]: '',
-      };
-
-      const version12 = {
-        [StorageService.OBJECT_STORE.AMPLIFY]: '',
-        [StorageService.OBJECT_STORE.CLIENTS]: ', meta.primary_key',
-        [StorageService.OBJECT_STORE.CONVERSATION_EVENTS]:
-          ', category, conversation, time, type, [conversation+time], [conversation+category]',
-        [StorageService.OBJECT_STORE.CONVERSATIONS]: ', id, last_event_timestamp',
-        [StorageService.OBJECT_STORE.EVENTS]:
-          '++primary_key, id, category, conversation, time, type, [conversation+time], [conversation+category]',
-        [StorageService.OBJECT_STORE.KEYS]: '',
-        [StorageService.OBJECT_STORE.PRE_KEYS]: '',
-        [StorageService.OBJECT_STORE.SESSIONS]: '',
-      };
-
-      const version15 = {
-        [StorageService.OBJECT_STORE.AMPLIFY]: '',
-        [StorageService.OBJECT_STORE.CLIENTS]: ', meta.primary_key',
-        [StorageService.OBJECT_STORE.CONVERSATION_EVENTS]:
-          ', category, conversation, time, type, [conversation+time], [conversation+category]',
-        [StorageService.OBJECT_STORE.CONVERSATIONS]: ', id, last_event_timestamp',
-        [StorageService.OBJECT_STORE.EVENTS]:
-          '++primary_key, id, category, conversation, time, type, [conversation+time], [conversation+category]',
-        [StorageService.OBJECT_STORE.KEYS]: '',
-        [StorageService.OBJECT_STORE.PRE_KEYS]: '',
-        [StorageService.OBJECT_STORE.SESSIONS]: '',
-        [StorageService.OBJECT_STORE.USERS]: ', id',
-      };
-
       this.db = new Dexie(this.dbName);
 
-      this.db.on('blocked', () => {
-        this.logger.error('Database is blocked');
-      });
+      this.db.on('blocked', () => this.logger.error('Database is blocked'));
 
-      // @see https://github.com/dfahlander/Dexie.js/wiki/Version.upgrade()
-      // @see https://github.com/dfahlander/Dexie.js/wiki/WriteableCollection.modify()
-      this.db.version(1).stores(version1);
-      this.db.version(2).stores(version2);
-      this.db.version(3).stores(version3);
-      this.db
-        .version(4)
-        .stores(version4)
-        .upgrade(transaction => {
-          this.logger.warn('Database upgrade to version 4', transaction);
-          transaction[StorageService.OBJECT_STORE.CLIENTS].toCollection().modify(client => {
-            return (client.meta = {
-              is_verified: true,
-              primary_key: 'local_identity',
-            });
-          });
-        });
-      this.db.version(5).stores(version4);
-      this.db
-        .version(6)
-        .stores(version4)
-        .upgrade(transaction => {
-          this.logger.warn('Database upgrade to version 6', transaction);
-          transaction[StorageService.OBJECT_STORE.CONVERSATIONS].toCollection().eachKey(key => {
-            this.db[StorageService.OBJECT_STORE.CONVERSATIONS].update(key, {id: key});
-          });
-          transaction[StorageService.OBJECT_STORE.SESSIONS].toCollection().eachKey(key => {
-            this.db[StorageService.OBJECT_STORE.SESSIONS].update(key, {id: key});
-          });
-          transaction[StorageService.OBJECT_STORE.PRE_KEYS].toCollection().eachKey(key => {
-            this.db[StorageService.OBJECT_STORE.PRE_KEYS].update(key, {id: key});
-          });
-        });
-      this.db
-        .version(7)
-        .stores(version5)
-        .upgrade(transaction => {
-          this.logger.warn('Database upgrade to version 7', transaction);
-          transaction[StorageService.OBJECT_STORE.CONVERSATION_EVENTS].toCollection().modify(event => {
-            const mappedEvent = event.mapped || event.raw;
-            delete event.mapped;
-            delete event.raw;
-            delete event.meta;
-            $.extend(event, mappedEvent);
-          });
-        });
-      this.db
-        .version(8)
-        .stores(version5)
-        .upgrade(transaction => {
-          this.logger.warn('Database upgrade to version 8', transaction);
-          transaction[StorageService.OBJECT_STORE.CONVERSATION_EVENTS].toCollection().modify(event => {
-            if (event.type === z.event.Client.CONVERSATION.DELETE_EVERYWHERE) {
-              event.time = new Date(event.time).toISOString();
-            }
-          });
-        });
-      this.db.version(9).stores(version9);
-      this.db
-        .version(10)
-        .stores(version10)
-        .upgrade(transaction => {
-          this.logger.warn('Database upgrade to version 10', transaction);
-          transaction[StorageService.OBJECT_STORE.CONVERSATION_EVENTS].toCollection().modify(event => {
-            event.category = z.message.MessageCategorization.category_from_event(event);
-          });
-        });
-      this.db
-        .version(11)
-        .stores(version11)
-        .upgrade(transaction => {
-          this.logger.warn('Database upgrade to version 11', transaction);
-          const expectedPrimaryKey = z.client.ClientRepository.PRIMARY_KEY_CURRENT_CLIENT;
-          transaction[StorageService.OBJECT_STORE.CLIENTS].toCollection().each((client, cursor) => {
-            const isExpectedMetaPrimaryKey = client.meta.primary_key === expectedPrimaryKey;
-            const isExpectedPrimaryKey = client.primary_key === expectedPrimaryKey;
-            if (isExpectedMetaPrimaryKey && isExpectedPrimaryKey) {
-              transaction[StorageService.OBJECT_STORE.CLIENTS].delete(cursor.primaryKey);
-              transaction[StorageService.OBJECT_STORE.CLIENTS].put(client, expectedPrimaryKey);
-            }
-          });
-        });
-      this.db
-        .version(12)
-        .stores(version11)
-        .upgrade(transaction => {
-          this.logger.warn('Database upgrade to version 12', transaction);
-          transaction[StorageService.OBJECT_STORE.KEYS].toCollection().modify(record => {
-            return (record.serialised = z.util.base64ToArray(record.serialised).buffer);
-          });
-          transaction[StorageService.OBJECT_STORE.PRE_KEYS].toCollection().modify(record => {
-            return (record.serialised = z.util.base64ToArray(record.serialised).buffer);
-          });
-          transaction[StorageService.OBJECT_STORE.SESSIONS].toCollection().modify(record => {
-            return (record.serialised = z.util.base64ToArray(record.serialised).buffer);
-          });
-        });
-      this.db
-        .version(13)
-        .stores(version12)
-        .upgrade(transaction => {
-          this.logger.warn('Database upgrade to version 13', transaction);
-          transaction[StorageService.OBJECT_STORE.CONVERSATION_EVENTS]
-            .toCollection()
-            .toArray()
-            .then(items => {
-              this.db[StorageService.OBJECT_STORE.EVENTS].bulkPut(items);
-            });
-        });
-      this.db
-        .version(14)
-        .stores(version12)
-        .upgrade(transaction => {
-          this.logger.warn('Database upgrade to version 14', transaction);
-          transaction[StorageService.OBJECT_STORE.EVENTS].toCollection().modify(event => {
-            if (event.type === 'conversation.asset-meta') {
-              event.type = z.event.Client.CONVERSATION.ASSET_ADD;
-            }
-          });
-        });
-      this.db.version(15).stores(version15);
-
-      const {version, schema} = StorageService.SCHEMA;
-      this.db.version(version).stores(schema);
+      this._upgradeStores();
 
       this.db
         .open()
@@ -339,6 +69,20 @@ z.storage.StorageService = class StorageService {
           );
           reject(new z.storage.StorageError(z.storage.StorageError.TYPE.FAILED_TO_OPEN));
         });
+    });
+  }
+
+  _upgradeStores() {
+    z.storage.StorageSchemata.SCHEMATA.forEach(({schema, upgrade, version}) => {
+      if (upgrade) {
+        this.logger.warn(`Database upgrade to version '${version}'`);
+        return this.db
+          .version(version)
+          .stores(schema)
+          .upgrade(transaction => upgrade(transaction, this.db));
+      }
+
+      this.db.version(version).stores(schema);
     });
   }
 
