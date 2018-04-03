@@ -20,7 +20,7 @@
     "gulp": "3.9.1",
     "gulp-plumber": "1.2.0",
     "gulp-sass": "3.2.1",
-    "react-hot-loader": "4.0.0",
+    "react-hot-loader": "4.0.1",
     "rimraf": "2.6.2",
     "webpack": "3.11.0",
     "webpack-dev-server": "2.11.2"
