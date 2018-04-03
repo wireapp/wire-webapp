@@ -22,4 +22,4 @@ export const getPermanentClients = state => getClients(state).filter(client => c
 export const getTemporaryClients = state => getClients(state).filter(client => client.type === 'temporary') || [];
 export const getError = state => state.clientState.error;
 export const isFetching = state => state.clientState.fetching;
-export const hasHistory = state => state.authState.hasHistory;
+export const hasHistory = state => state.clientState.hasHistory;
