@@ -62,7 +62,73 @@ export default class RuntimeUtil {
     return RuntimeUtil.PLATFORM_TYPE.BROWSER_APP;
   }
 
-  static hasCookieSupport() {}
+  static hasCookieSupport() {
+    const cookieName = z.main.App.CONFIG.COOKIES_CHECK.COOKIE_NAME;
 
-  static hasIndexDbSupport() {}
+    return new Promise((resolve, reject) => {
+      switch (navigator.cookieEnabled) {
+        case true:
+          return resolve();
+        case false:
+          return reject(new Error());
+        default:
+          Cookies.set(cookieName, 'yes');
+          if (Cookies.get(cookieName)) {
+            Cookies.remove(cookieName);
+            return resolve();
+          }
+          return reject(new Error());
+      }
+    });
+  }
+
+  static hasIndexDbSupport() {
+    if (!z.util.Environment.browser.supports.indexedDb) {
+      const errorType = z.util.Environment.browser.edge
+        ? z.auth.AuthError.TYPE.PRIVATE_MODE
+        : z.auth.AuthError.TYPE.INDEXED_DB_UNSUPPORTED;
+      return Promise.reject(new z.auth.AuthError(errorType));
+    }
+
+    if (z.util.Environment.browser.firefox) {
+      let dbOpenRequest;
+
+      try {
+        dbOpenRequest = window.indexedDB.open('test');
+        dbOpenRequest.onerror = event => {
+          if (dbOpenRequest.error) {
+            event.preventDefault();
+            Promise.reject(new z.auth.AuthError(z.auth.AuthError.TYPE.PRIVATE_MODE));
+          }
+        };
+      } catch (error) {
+        return Promise.reject(new z.auth.AuthError(z.auth.AuthError.TYPE.PRIVATE_MODE));
+      }
+
+      return new Promise((resolve, reject) => {
+        const interval = 10;
+        const maxRetry = 50;
+
+        function checkDbRequest(currentAttempt = 0) {
+          const tooManyAttempts = currentAttempt >= maxRetry;
+          const isRequestDone = dbOpenRequest.readyState === 'done';
+          const hasResult = !!dbOpenRequest.result;
+
+          if (isRequestDone && hasResult) {
+            return resolve();
+          }
+
+          if (tooManyAttempts || (isRequestDone && !hasResult)) {
+            return reject(new z.auth.AuthError(z.auth.AuthError.TYPE.PRIVATE_MODE));
+          }
+
+          window.setTimeout(() => checkDbRequest(currentAttempt + 1), interval);
+        }
+
+        checkDbRequest();
+      });
+    }
+
+    return Promise.resolve();
+  }
 }
