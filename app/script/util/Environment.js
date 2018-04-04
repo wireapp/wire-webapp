@@ -26,8 +26,7 @@ z.util.Environment = (() => {
   const APP_ENV = {
     INTERNAL: 'wire-webapp-staging.wire.com',
     LOCALHOST: 'localhost',
-    PROD_NEXT: 'wire-webapp-prod-next.wire.com',
-    PRODUCTION: 'app.wire.com',
+    PRODUCTION: 'wire.com',
     VIRTUAL_HOST: 'wire.ms', // The domain "wire.ms" is our virtual host for testing contact uploads
   };
 
@@ -133,7 +132,7 @@ z.util.Environment = (() => {
     frontend: {
       isInternal: () => window.location.hostname === APP_ENV.INTERNAL,
       isLocalhost: () => [APP_ENV.LOCALHOST, APP_ENV.VIRTUAL_HOST].includes(window.location.hostname),
-      isProduction: () => [APP_ENV.PRODUCTION, APP_ENV.PROD_NEXT].includes(window.location.hostname),
+      isProduction: () => window.location.hostname.includes(APP_ENV.PRODUCTION),
     },
     os: {
       linux: !_isMac() && !_isWindows(),
