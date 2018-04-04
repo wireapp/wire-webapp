@@ -1345,7 +1345,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when the conversation was archived
    */
   archive_conversation(conversation_et) {
-    return this._toggle_archive_conversation(conversation_et, true, 'archiving');
+    return this._toggleArchiveConversation(conversation_et, true, 'archiving');
   }
 
   /**
@@ -1356,54 +1356,53 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when the conversation was unarchived
    */
   unarchive_conversation(conversation_et, trigger = 'unknown') {
-    return this._toggle_archive_conversation(conversation_et, false, trigger);
+    return this._toggleArchiveConversation(conversation_et, false, trigger);
   }
 
-  _toggle_archive_conversation(conversation_et, new_archive_state, trigger) {
-    if (!conversation_et) {
-      return Promise.reject(
-        new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.CONVERSATION_NOT_FOUND)
-      );
+  _toggleArchiveConversation(conversationEntity, newState, trigger) {
+    if (!conversationEntity) {
+      const error = new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.CONVERSATION_NOT_FOUND);
+      return Promise.reject(error);
     }
 
-    const archive_timestamp = conversation_et.get_last_known_timestamp(this.timeOffset);
-    const no_state_change = conversation_et.is_archived() === new_archive_state;
-    const no_timestamp_change = conversation_et.archived_timestamp() === archive_timestamp;
-    if (no_state_change && no_timestamp_change) {
+    const archiveTimestamp = conversationEntity.get_last_known_timestamp(this.timeOffset);
+    const noStateChange = conversationEntity.is_archived() === newState;
+    const noTimestampChange = conversationEntity.archived_timestamp() === archiveTimestamp;
+    if (noStateChange && noTimestampChange) {
       return Promise.reject(new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.NO_CHANGES));
     }
 
     const payload = {
-      otr_archived: new_archive_state,
-      otr_archived_ref: new Date(archive_timestamp).toISOString(),
+      otr_archived: newState,
+      otr_archived_ref: new Date(archiveTimestamp).toISOString(),
     };
 
-    this.logger.info(`Conversation '${conversation_et.id}' archive state change triggered by '${trigger}'`);
-    return this.conversation_service
-      .update_member_properties(conversation_et.id, payload)
-      .catch(error => {
-        this.logger.error(
-          `Failed to change conversation '${conversation_et.id}' archived state to '${new_archive_state}': ${
-            error.code
-          }`
-        );
-        if (error.code !== z.service.BackendClientError.STATUS_CODE.NOT_FOUND) {
-          throw error;
-        }
-      })
-      .then(() => {
-        const response = {
-          data: payload,
-          from: this.selfUser().id,
-        };
+    const conversationId = conversationEntity.id;
+    this.logger.info(`Conversation '${conversationId}' archive state change triggered by '${trigger}'`);
 
-        this._onMemberUpdate(conversation_et, response);
-        this.logger.info(
-          `Update conversation '${conversation_et.id}' archive state to '${new_archive_state}' on '${
-            payload.otr_archived_ref
-          }'`
-        );
-      });
+    const updatePromise = conversationEntity.removed_from_conversation()
+      ? Promise.resolve()
+      : this.conversation_service.update_member_properties(conversationId, payload).catch(error => {
+          const logMessage = `Failed to change archived state of '${conversationId}' to '${newState}': ${error.code}`;
+          this.logger.error(logMessage);
+
+          const isNotFound = error.code === z.service.BackendClientError.STATUS_CODE.NOT_FOUND;
+          if (!isNotFound) {
+            throw error;
+          }
+        });
+
+    updatePromise.then(() => {
+      const response = {
+        data: payload,
+        from: this.selfUser().id,
+      };
+
+      this._onMemberUpdate(conversationEntity, response);
+      const isoDate = payload.otr_archived_ref;
+      const logMessage = `Updated conversation '${conversationId}' archive state to '${newState}' on '${isoDate}'`;
+      this.logger.info(logMessage);
+    });
   }
 
   _check_changed_conversations() {
