@@ -244,7 +244,13 @@ describe('Client', () => {
     });
 
     it('automatically gets an access token after registration', done => {
-      const client = new Client();
+      const client = new Client({
+        schemaCallback: db => {
+          db.version(1).stores({
+            [AUTH_TABLE_NAME]: '',
+          });
+        },
+      });
       client
         .register(registerData)
         .then(context => {
