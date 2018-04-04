@@ -48,13 +48,16 @@ class ClientItem extends React.Component {
     validationError: null,
   };
 
-  state = {
-    ...ClientItem.initialState,
-    animationStep: 0,
-    isAnimating: false,
-  };
-
   formatId = (id = '?') => id.toUpperCase().replace(/(..)/g, '$1 ');
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      ...ClientItem.initialState,
+      animationStep: props.selected ? ClientItem.CONFIG.animationSteps : 0,
+      isAnimating: false,
+    };
+  }
 
   componentWillReceiveProps(newProps) {
     if (!this.props.selected && newProps.selected) {
