@@ -80,8 +80,7 @@ class ConversationJoin extends Component {
     const urlParamChanged = codeParamChanged || keyParamChanged || expiresInParamChanged;
 
     if (urlParamChanged) {
-      this.props
-        .doInit()
+      Promise.resolve()
         .then(() => {
           this.setState((state, props) => ({
             ...state,
@@ -103,7 +102,10 @@ class ConversationJoin extends Component {
 
   componentDidMount = () => {
     this.props.trackEvent({name: TrackingAction.EVENT_NAME.GUEST_ROOMS.OPENED_SIGNUP});
-    this.readAndUpdateParamsFromUrl();
+    this.props
+      .doInit()
+      .catch(() => {})
+      .then(() => this.readAndUpdateParamsFromUrl());
   };
 
   componentWillReceiveProps = nextProps => this.readAndUpdateParamsFromUrl(nextProps);
@@ -162,6 +164,7 @@ class ConversationJoin extends Component {
 
   renderActivatedAccount = () => {
     const {selfName, intl: {formatMessage: _}} = this.props;
+    const {error} = this.state;
     return (
       <ContainerXS style={{margin: 'auto 0'}}>
         <AppAlreadyOpen />

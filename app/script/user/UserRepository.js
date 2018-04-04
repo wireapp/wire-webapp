@@ -71,6 +71,7 @@ z.user.UserRepository = class UserRepository {
       .extend({rateLimit: 1000});
 
     this.isActivatedAccount = ko.pureComputed(() => this.self() && !this.self().isTemporaryGuest());
+    this.isTemporaryGuest = ko.pureComputed(() => this.self() && this.self().isTemporaryGuest());
 
     this.isTeam = ko.observable();
     this.teamMembers = undefined;

@@ -33,7 +33,17 @@ import {withRouter} from 'react-router';
 class ClientList extends React.Component {
   state = {
     currentlySelectedClient: null,
+    showLoading: false,
   };
+
+  constructor(props) {
+    super(props);
+    this.loadingTimeout = 0;
+  }
+
+  componentWillUnmount() {
+    this.resetLoadingSpinner();
+  }
 
   setSelectedClient = clientId => {
     const isSelectedClient = this.state.currentlySelectedClient === clientId;
@@ -42,6 +52,8 @@ class ClientList extends React.Component {
   };
 
   removeClient = (clientId, password) => {
+    this.setState({showLoading: true});
+    this.loadingTimeout = window.setTimeout(this.resetLoadingSpinner.bind(this), 1000);
     return Promise.resolve()
       .then(() => this.props.doRemoveClient(clientId, password))
       .then(() => {
@@ -56,11 +68,18 @@ class ClientList extends React.Component {
       });
   };
 
+  resetLoadingSpinner() {
+    window.clearTimeout(this.loadingTimeout);
+    this.setState({showLoading: false});
+  }
+
   isSelectedClient = clientId => clientId === this.state.currentlySelectedClient;
 
   render() {
     const {isFetching, permanentClients} = this.props;
-    return isFetching ? (
+    const {showLoading} = this.state;
+
+    return isFetching || showLoading ? (
       <ContainerXS centerText verticalCenter style={{justifyContent: 'center'}}>
         <Loading />
       </ContainerXS>

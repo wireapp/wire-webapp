@@ -30,8 +30,16 @@ const BACKEND = Environment.onEnvironment(
 export const configureClient = () => {
   return new APIClient({
     schemaCallback: db => {
-      const {schema, version} = window.z.storage.StorageService.SCHEMA;
-      db.version(version).stores(schema);
+      const databaseSchemata = window.z.storage.StorageSchemata.SCHEMATA;
+      databaseSchemata.forEach(({schema, upgrade, version}) => {
+        if (upgrade) {
+          return db
+            .version(version)
+            .stores(schema)
+            .upgrade(transaction => upgrade(transaction, db));
+        }
+        db.version(version).stores(schema);
+      });
     },
     store: new StoreEngine.IndexedDBEngine(),
     urls: BACKEND,

@@ -26,7 +26,7 @@ import * as ConversationAction from './ConversationAction';
 import * as ClientAction from './ClientAction';
 import * as TrackingAction from './TrackingAction';
 import * as CookieAction from './CookieAction';
-import {ClientType} from '@wireapp/core/dist/client/root';
+import {ClientType} from '@wireapp/api-client/dist/commonjs/client/index';
 import {APP_INSTANCE_ID} from '../../config';
 import {COOKIE_NAME_APP_OPENED} from '../selector/CookieSelector';
 
@@ -64,7 +64,7 @@ function doLoginPlain(loginData, onBeforeLogin, onAfterLogin) {
           attributes: {context: authenticationContext, remember_me: loginData.persist},
           name: TrackingAction.EVENT_NAME.ACCOUNT.LOGGED_IN,
         };
-        return TrackingAction.trackEvent(trackingEventData);
+        return dispatch(TrackingAction.trackEvent(trackingEventData));
       })
       .then(() => dispatch(SelfAction.fetchSelf()))
       .then(() => onAfterLogin(dispatch, getState, global))
@@ -187,7 +187,7 @@ export function doInit() {
         if (persist === undefined) {
           throw new Error(`Could not find value for '${LocalStorageKey.AUTH.PERSIST}'`);
         }
-        apiClient.init(persist ? ClientType.PERMANENT : ClientType.TEMPORARY);
+        return apiClient.init(persist ? ClientType.PERMANENT : ClientType.TEMPORARY);
       })
       .then(() => dispatch(SelfAction.fetchSelf()))
       .then(() => dispatch(AuthActionCreator.successfulRefresh(apiClient.accessTokenStore.accessToken)))

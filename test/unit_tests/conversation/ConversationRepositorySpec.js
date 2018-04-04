@@ -410,8 +410,8 @@ describe('ConversationRepository', () => {
       const bad_message_key = `${conversation_et.id}@${bad_message.from}@NaN`;
 
       storage_service
-        .save(z.storage.StorageService.OBJECT_STORE.EVENTS, bad_message_key, bad_message)
-        .catch(() => storage_service.save(z.storage.StorageService.OBJECT_STORE.EVENTS, undefined, good_message))
+        .save(z.storage.StorageSchemata.OBJECT_STORE.EVENTS, bad_message_key, bad_message)
+        .catch(() => storage_service.save(z.storage.StorageSchemata.OBJECT_STORE.EVENTS, undefined, good_message))
         .then(() => TestFactory.conversation_repository.getPrecedingMessages(conversation_et))
         .then(loaded_events => {
           expect(loaded_events.length).toBe(1);
