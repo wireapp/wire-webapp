@@ -61,4 +61,8 @@ export default class RuntimeUtil {
     }
     return RuntimeUtil.PLATFORM_TYPE.BROWSER_APP;
   }
+
+  static hasCookieSupport() {}
+
+  static hasIndexDbSupport() {}
 }
