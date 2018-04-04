@@ -68,7 +68,9 @@ z.backup.BackupRepository = class BackupRepository {
   }
 
   importHistory() {
-    amplify.publish(z.event.WebApp.BACKUP.IMPORT.START);
+    const clientId = this.clientRepository.currentClient().id;
+    const userId = this.userRepository.self().id;
+    amplify.publish(z.event.WebApp.BACKUP.IMPORT.START, userId, clientId);
   }
 
   onExportDone() {
