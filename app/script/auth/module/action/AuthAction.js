@@ -200,6 +200,7 @@ export function doLogout() {
     dispatch(AuthActionCreator.startLogout());
     return core
       .logout()
+      .then(() => dispatch(CookieAction.safelyRemoveCookie(COOKIE_NAME_APP_OPENED, APP_INSTANCE_ID)))
       .then(() => dispatch(deleteLocalStorage(LocalStorageKey.AUTH.ACCESS_TOKEN.VALUE)))
       .then(() => dispatch(AuthActionCreator.successfulLogout()))
       .catch(error => dispatch(AuthActionCreator.failedLogout(error)));
@@ -211,6 +212,8 @@ export function doSilentLogout() {
     dispatch(AuthActionCreator.startLogout());
     return core
       .logout()
+      .then(() => dispatch(CookieAction.safelyRemoveCookie(COOKIE_NAME_APP_OPENED, APP_INSTANCE_ID)))
+      .then(() => dispatch(deleteLocalStorage(LocalStorageKey.AUTH.ACCESS_TOKEN.VALUE)))
       .then(() => dispatch(AuthActionCreator.successfulSilentLogout()))
       .catch(error => dispatch(AuthActionCreator.failedLogout(error)));
   };
