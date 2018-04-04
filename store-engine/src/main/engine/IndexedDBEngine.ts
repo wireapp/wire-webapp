@@ -18,7 +18,7 @@ export default class IndexedDBEngine implements CRUDEngine {
     return Promise.resolve(this.db);
   }
 
-  initWithDb(db: DexieInstance): Promise<any> {
+  initWithDb(db: DexieInstance): Promise<DexieInstance> {
     this.db = db;
     this.storeName = this.db.name;
     return Promise.resolve(this.db);
