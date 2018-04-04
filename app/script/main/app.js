@@ -607,7 +607,7 @@ z.main.App = class App {
   _showInterface() {
     const conversationEntity = this.repository.conversation.getMostRecentConversation();
     this.logger.info('Showing application UI');
-    if (this.repository.user.self().isTemporaryGuest()) {
+    if (this.repository.user.isTemporaryGuest()) {
       this.view.list.showTemporaryGuest();
     } else if (this.repository.user.shouldChangeUsername()) {
       this.view.list.showTakeover();
@@ -773,7 +773,7 @@ z.main.App = class App {
       .execute_on_connectivity(z.service.BackendClient.CONNECTIVITY_CHECK_TRIGGER.LOGIN_REDIRECT)
       .then(() => {
         const isTemporaryGuestReason = App.CONFIG.SIGN_OUT_REASONS.TEMPORARY_GUEST.includes(signOutReason);
-        const isLeavingGuestRoom = isTemporaryGuestReason && this.repository.user.self().isTemporaryGuest();
+        const isLeavingGuestRoom = isTemporaryGuestReason && this.repository.user.isTemporaryGuest();
         if (isLeavingGuestRoom) {
           const path = z.l10n.text(z.string.urlWebsiteRoot);
           const url = z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.WEBSITE, path);
