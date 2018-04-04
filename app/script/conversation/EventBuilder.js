@@ -108,11 +108,6 @@ z.conversation.EventBuilder = {
       userIds.push(selfUser.id);
     }
 
-    const addCreatorToUsers = isTemporaryGuest && creatorId !== selfUser.id;
-    if (addCreatorToUsers) {
-      userIds.push(creatorId);
-    }
-
     return {
       conversation: id,
       data: {
