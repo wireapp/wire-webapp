@@ -346,12 +346,8 @@ class Account extends EventEmitter {
     }
     let loadedClient: RegisteredClient;
 
-    return this.service.cryptography
-      .initCryptobox()
-      .then(() => this.service!.client.getLocalClient())
+    return this.loadAndValidateLocalClient()
       .then(client => (loadedClient = client))
-      .then(() => this.apiClient.client.api.getClient(loadedClient.id))
-      .then(() => this.service!.conversation.setClientID(<string>this.apiClient.context!.clientId))
       .then(() => ({isNewClient: false, localClient: loadedClient}))
       .catch(error => {
         let registeredClient: RegisteredClient;
@@ -385,6 +381,17 @@ class Account extends EventEmitter {
         }
         throw error;
       });
+  }
+
+  public loadAndValidateLocalClient(): Promise<RegisteredClient> {
+    this.logger.info('loadAndValidateLocalClient');
+    let loadedClient: RegisteredClient;
+    return this.service!.cryptography.initCryptobox()
+      .then(() => this.service!.client.getLocalClient())
+      .then(client => (loadedClient = client))
+      .then(() => this.apiClient.client.api.getClient(loadedClient.id))
+      .then(() => this.service!.conversation.setClientID(<string>this.apiClient.context!.clientId))
+      .then(() => loadedClient);
   }
 
   private registerClient(
