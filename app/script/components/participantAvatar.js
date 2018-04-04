@@ -165,8 +165,8 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
               image.src = url;
               this.element.find('.avatar-image').html(image);
               this.element.addClass(`avatar-image-loaded ${isCached && isSmall ? '' : 'avatar-loading-transition'}`);
-              this.avatarLoadingBlocked = false;
             }
+            this.avatarLoadingBlocked = false;
           });
         } else {
           this.avatarLoadingBlocked = false;
