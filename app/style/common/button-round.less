@@ -24,12 +24,13 @@
 //
 .button-round {
   .circle(@button-round-size);
+
+  position: relative;
+  display: inline-block;
   border: 1px solid fade(@graphite-dark, 40%);
   color: @graphite-dark;
   cursor: pointer;
-  display: inline-block;
   line-height: @button-round-size - 2px;
-  position: relative;
   text-align: center;
   user-select: none;
 
@@ -56,23 +57,23 @@
   }
 
   &.toggled {
-    border-color: transparent;
     background: fade(@graphite-dark, 72%);
+    border-color: transparent;
     color: #fff;
   }
 
   &.disabled {
-    background: transparent;
     border: 1px solid fade(@graphite-dark, 40%);
+    background: transparent;
     color: fade(@graphite-dark, 72%);
     cursor: default;
   }
 }
 
 .button-round-color() {
-  line-height: @button-round-size;
   border: none;
   color: #fff;
+  line-height: @button-round-size;
   &.toggled {
     background: #fff;
   }
@@ -102,6 +103,7 @@
 //
 .button-round-theme-color(@color) {
   .button-round-color;
+
   background-color: @color !important;
   &.toggled {
     color: @color !important;
@@ -151,14 +153,14 @@
   }
 
   &.toggled {
-    border-color: transparent;
     background: #fff;
+    border-color: transparent;
     color: @graphite-dark;
   }
 
   &.disabled {
-    background: transparent;
     border: 1px solid fade(#fff, 24%);
+    background: transparent;
     color: fade(#fff, 40%);
   }
 }
@@ -186,10 +188,11 @@
 
   > span {
     .label-xs;
-    color: @graphite-dark;
+
     height: 28px;
-    line-height: 28px;
     margin-left: 10px;
+    color: @graphite-dark;
+    line-height: 28px;
   }
 }
 
@@ -198,10 +201,12 @@
 //
 .button-round-md {
   .square(@button-round-size-md);
+
   line-height: @button-round-size-md;
 }
 
 .button-round-lg {
   .square(@button-round-size-lg);
+
   line-height: @button-round-size-lg;
 }

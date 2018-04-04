@@ -19,8 +19,8 @@
 
 // MEMBER LIST
 .message-list {
-  flex: 1 1;
   overflow: hidden;
+  flex: 1 1;
 }
 
 .messages-wrap {
@@ -30,9 +30,9 @@
 }
 
 .messages {
-  transform: translateZ(0);
-  height: 100%;
   max-width: @conversation-max-width;
+  height: 100%;
+  transform: translateZ(0);
 }
 
 // MESSAGE
@@ -55,10 +55,10 @@
   &.hover .context-menu,
   &:hover .context-menu,
   .show-timestamp.time {
+    background-color: @app-bg;
     cursor: default;
     opacity: 1;
     pointer-events: auto;
-    background-color: @app-bg;
   }
 
   &:not(:hover) {
@@ -81,35 +81,37 @@
 .message-marked {
   .text {
     .accent-background-color(24%);
-    animation-name: marked-animation;
+
     animation-delay: 1s;
-    animation-timing-function: @ease-out-quart;
     animation-duration: @animation-timing-slower * 2;
     animation-fill-mode: forwards;
+    animation-name: marked-animation;
+    animation-timing-function: @ease-out-quart;
   }
 }
 
 // MESSAGE - HEADER
 .message-header {
-  display: flex;
-  line-height: @avatar-diameter-xs;
-  margin-bottom: 4px;
   position: relative;
+  display: flex;
+  margin-bottom: 4px;
+  line-height: @avatar-diameter-xs;
 }
 
 .message-header-icon {
   .flex-center;
-  color: @graphite-dark;
+
   width: @conversation-message-sender-width;
+  color: @graphite-dark;
 }
 
 .message-header-label {
+  display: flex;
+  min-width: 0; // fixes ellipsis not working with flexbox (FF)
+  flex: 1;
+  align-items: center;
   font-size: 12px;
   font-weight: @font-weight-regular;
-  align-items: center;
-  display: flex;
-  flex: 1;
-  min-width: 0; // fixes ellipsis not working with flexbox (FF)
 
   .message-header-plain-sender-name {
     font-weight: @font-weight-bold;
@@ -147,33 +149,33 @@
 }
 
 .message-header-label-icon {
-  font-size: 8px;
   margin-left: 8px;
+  font-size: 8px;
 }
 
 .message-header-label-service {
-  font-size: 12px;
   margin-left: 4px;
   color: fade(@graphite-dark, 40%);
+  font-size: 12px;
   text-transform: uppercase;
 }
 
 .message-header-line {
-  background: @seperator-color;
-  border: none;
-  flex: 1;
-  height: 1px;
-  margin-left: 16px;
   min-width: @conversation-message-timestamp-width;
+  height: 1px;
+  flex: 1;
+  border: none;
+  margin-left: 16px;
+  background: @seperator-color;
 }
 
 // MESSAGE - TIMESTAMP
 .message-timestamp {
-  border-bottom: 1px solid @seperator-color;
   height: 48px;
-  line-height: 40px;
-  margin-bottom: 16px;
   padding-top: 8px; // TODO margin top is not working because of collapsing margins
+  border-bottom: 1px solid @seperator-color;
+  margin-bottom: 16px;
+  line-height: 40px;
   user-select: none;
 
   &:not(.message-timestamp-visible) {
@@ -187,8 +189,8 @@
   }
 
   &:not(.message-timestamp-day) {
-    margin-right: @conversation-message-timestamp-width;
     border: 0;
+    margin-right: @conversation-message-timestamp-width;
 
     .message-header-label {
       border-bottom: 1px dotted @seperator-color;
@@ -215,13 +217,14 @@
 // MESSAGE - BODY
 .message-body {
   position: relative;
-  margin-top: -5px;
-  padding-left: @conversation-message-sender-width;
   padding-right: @conversation-message-timestamp-width;
+  padding-left: @conversation-message-sender-width;
+  margin-top: -5px;
 
   .text {
     .text-selection;
     .accent-selection-color;
+
     display: inline-block;
     width: 100%;
     line-height: @line-height-lg;
@@ -235,13 +238,13 @@
   }
 
   .iframe-container {
-    margin-bottom: 24px;
     margin-top: 16px;
+    margin-bottom: 24px;
   }
 
   .iframe-container-video {
-    padding-bottom: 75%;
     position: relative;
+    padding-bottom: 75%;
 
     embed,
     iframe,
@@ -255,6 +258,7 @@
 
 .message-body-like {
   .flex-center;
+
   position: absolute;
   bottom: 0;
   left: 0;
@@ -266,8 +270,8 @@
   margin-bottom: 24px;
 
   .image {
-    display: inline-block;
     position: relative;
+    display: inline-block;
     max-width: 100%;
   }
 
@@ -281,9 +285,9 @@
   }
 
   .image-element {
-    cursor: pointer;
     max-width: 100%;
     max-height: 80vh;
+    cursor: pointer;
 
     &.image-ephemeral {
       cursor: default;
@@ -294,8 +298,9 @@
   .image-placeholder-icon {
     .asset-container-style;
     .full-screen;
-    align-items: center;
+
     display: none;
+    align-items: center;
     justify-content: center;
   }
 }
@@ -309,13 +314,14 @@
 
 .message-footer-icon {
   .flex-center;
+
   width: @conversation-message-sender-width;
 }
 
 .message-footer-label {
-  font-size: @font-size-xs;
   display: flex;
   align-items: center;
+  font-size: @font-size-xs;
 
   > * + * {
     margin-left: 8px;
@@ -324,11 +330,11 @@
 
 .message-footer-bottom {
   display: flex;
+  width: 100%;
   flex-wrap: wrap;
   margin-top: 4px;
-  margin-left: @conversation-message-sender-width;
   margin-right: @conversation-message-timestamp-width;
-  width: 100%;
+  margin-left: @conversation-message-sender-width;
 
   > *:not(:last-child) {
     margin-right: 8px;
@@ -339,6 +345,7 @@
 .message-footer-close-button {
   .square(@avatar-diameter-xs);
   .flex-center;
+
   cursor: pointer;
   font-size: @font-size-xs;
 }
@@ -346,9 +353,9 @@
 // hover
 .message-show-on-hover {
   opacity: 0;
+  transition-duration: @animation-timing-fast;
   transition-property: opacity;
   transition-timing-function: @ease-out-quart;
-  transition-duration: @animation-timing-fast;
 
   .message:hover & {
     opacity: 1;
@@ -366,10 +373,10 @@
 
   // actions pill
   .action-pill-style() {
-    opacity: 0;
-    line-height: 18px;
-    text-decoration: none;
     z-index: 1;
+    line-height: 18px;
+    opacity: 0;
+    text-decoration: none;
     transition: opacity, 0.3s;
   }
 
@@ -377,11 +384,12 @@
   .context-menu {
     .square(18px);
     .action-pill-style;
+
+    position: absolute;
+    top: 4px;
+    right: 72px;
     display: flex;
     justify-content: center;
-    position: absolute;
-    right: 72px;
-    top: 4px;
 
     &:focus {
       opacity: 1 !important;
@@ -396,14 +404,15 @@
   .time,
   .message-status {
     .action-pill-style;
+
+    position: absolute;
+    top: 3px;
+    right: 24px;
+    padding-right: 6px;
+    padding-left: 6px;
     color: fade(#000, 40%);
     font-size: @font-size-xs;
-    padding-left: 6px;
-    padding-right: 6px;
     pointer-events: none;
-    position: absolute;
-    right: 24px;
-    top: 3px;
     user-select: none;
   }
 
@@ -415,15 +424,15 @@
 }
 
 .message-body-actions-large {
-  width: 160px;
   position: relative;
+  width: 160px;
 }
 
 // MEMBER MESSAGE
 .message-connected {
-  align-items: center;
   display: flex;
   flex-direction: column;
+  align-items: center;
   margin-top: 32px;
   margin-bottom: 48px;
 }
@@ -446,45 +455,48 @@
 
 .message-connected-cancel {
   .label-xs;
-  cursor: pointer;
+
   margin-top: 32px;
+  cursor: pointer;
 }
 
-.message-group-creation-header {
-  font-size: 12px;
-  margin-left: 72px;
+.message-group-creation-header,
+.message-member-footer {
   padding-top: 16px;
+  margin-left: 72px;
+  font-size: 12px;
   font-weight: @font-weight-regular;
 }
 
 .message-group-creation-header-name {
+  margin: 8px 0;
   font-size: @font-size-lg;
   font-weight: @font-weight-bold;
-  margin: 8px 0;
 }
 
-.message-group-creation-header-button {
+.message-group-creation-header-button,
+.message-member-footer-button {
+  display: inline-block;
+  padding: 4px 16px;
+  margin-top: 16px;
   background-color: @seperator-color;
   border-radius: 4px;
   cursor: pointer;
-  display: inline-block;
   font-size: 14px;
   font-weight: @font-weight-bold;
   line-height: 16px;
-  margin-top: 16px;
-  padding: 4px 16px;
 }
 
-.message-group-creation-temporary-message {
+.message-member-footer-message {
   font-weight: @font-weight-regular;
   line-height: 16px;
 }
 
-.message-group-creation-temporary-description {
+.message-member-footer-description {
+  margin-top: 8px;
   color: fade(@graphite-dark, 40%);
   font-weight: @font-weight-regular;
   line-height: 16px;
-  margin-top: 8px;
 }
 
 // PING MESSAGE
@@ -507,10 +519,10 @@
 }
 
 .ping-animation {
-  animation-name: ping-scale-animation, ping-opacity-animation;
   animation-delay: 0.05s, 0.05s;
-  animation-timing-function: @ease-out-expo, @ease-out-quart;
   animation-duration: 0.7s, 0.7s;
+  animation-name: ping-scale-animation, ping-opacity-animation;
+  animation-timing-function: @ease-out-expo, @ease-out-quart;
 }
 
 .ping-animation-soft {
@@ -571,23 +583,25 @@
 
 .message-header-decrypt-error-label {
   .label-xs;
+
   color: @graphite;
 }
 
 .message-header-decrypt-reset-session {
   .label-xs;
-  display: inline-block;
-  cursor: pointer;
+
   position: relative;
-  height: 16px;
+  display: inline-block;
   width: 100%;
+  height: 16px;
+  cursor: pointer;
 }
 
 .message-header-decrypt-reset-session-action,
 .message-header-decrypt-reset-session-spinner {
   position: absolute;
-  left: 0;
   top: 0;
+  left: 0;
 }
 
 .message-header-decrypt-reset-session-action {
@@ -633,5 +647,6 @@
 .ephemeral-asset-expired {
   .bg-color-ephemeral;
   .flex-center;
+
   color: #fff;
 }

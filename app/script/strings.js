@@ -20,6 +20,7 @@
 import {defineMessages} from 'react-intl';
 import BackendError from './auth/module/action/BackendError';
 import ValidationError from './auth/module/action/ValidationError';
+import {LOGOUT_REASON} from './auth/route';
 
 /* eslint-disable sort-keys */
 
@@ -46,21 +47,21 @@ export const indexStrings = defineMessages({
     id: 'index.claim',
     defaultMessage: 'Secure messaging for everyone.',
   },
-  createAccount: {
-    id: 'index.createAccount',
-    defaultMessage: 'Create an account',
+  createAccountForPersonalUse: {
+    id: 'index.createAccountForPersonalUse',
+    defaultMessage: 'For personal use',
   },
-  createAccountFor: {
-    id: 'index.createAccountFor',
-    defaultMessage: 'for personal use',
+  createAccountForOrganizations: {
+    id: 'index.createAccountForOrganizations',
+    defaultMessage: 'For organizations',
+  },
+  createPersonalAccount: {
+    id: 'index.createPersonalAccount',
+    defaultMessage: 'create an account',
   },
   createTeam: {
     id: 'index.createTeam',
-    defaultMessage: 'Create a team',
-  },
-  createTeamFor: {
-    id: 'index.createTeamFor',
-    defaultMessage: 'for work',
+    defaultMessage: 'create a team',
   },
   loginInfo: {
     id: 'index.loginInfo',
@@ -495,6 +496,21 @@ export const loginStrings = defineMessages({
   publicComputer: {
     id: 'login.publicComputer',
     defaultMessage: 'This is a public computer',
+  },
+});
+
+export const logoutReasonStrings = defineMessages({
+  [LOGOUT_REASON.ACCOUNT_REMOVED]: {
+    id: 'LOGOUT_REASON.ACCOUNT_REMOVED',
+    defaultMessage: 'You were signed out because your account was deleted.',
+  },
+  [LOGOUT_REASON.CLIENT_REMOVED]: {
+    id: 'LOGOUT_REASON.CLIENT_REMOVED',
+    defaultMessage: 'You were signed out because your device was deleted.',
+  },
+  [LOGOUT_REASON.SESSION_EXPIRED]: {
+    id: 'LOGOUT_REASON.SESSION_EXPIRED',
+    defaultMessage: 'You were signed out because your session expired.<br />Please log in again.',
   },
 });
 

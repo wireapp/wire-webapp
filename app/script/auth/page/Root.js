@@ -35,7 +35,7 @@ import HistoryInfo from './HistoryInfo';
 import {IntlProvider, addLocaleData} from 'react-intl';
 import {connect} from 'react-redux';
 import de from 'react-intl/locale-data/de';
-import ROUTE from '../route';
+import {ROUTE} from '../route';
 import SUPPORTED_LOCALE from '../supportedLocales';
 import * as CookieAction from '../module/action/CookieAction';
 import * as CookieSelector from '../module/selector/CookieSelector';
@@ -45,10 +45,9 @@ addLocaleData([...de]);
 
 class Root extends React.Component {
   componentDidMount = () => {
-    this.props.setCookieIfAbsent(CookieSelector.COOKIE_NAME_APP_OPENED, {appInstanceId: APP_INSTANCE_ID});
     this.props.startPolling();
     window.onbeforeunload = () => {
-      this.props.removeCookie(CookieSelector.COOKIE_NAME_APP_OPENED, APP_INSTANCE_ID);
+      this.props.safelyRemoveCookie(CookieSelector.COOKIE_NAME_APP_OPENED, APP_INSTANCE_ID);
       this.props.stopPolling();
     };
   };
@@ -66,11 +65,8 @@ class Root extends React.Component {
             <Switch>
               <Route exact path={ROUTE.INDEX} component={Index} />
               <Route path={ROUTE.CLIENTS} component={ClientManager} />
-              <Route path={`${ROUTE.LOGIN}/:conversationKey?/:conversationCode?`} component={Login} />
-              <Route
-                path={`${ROUTE.CONVERSATION_JOIN}/:conversationKey/:conversationCode/:expiresIn?`}
-                component={ConversationJoin}
-              />
+              <Route path={ROUTE.LOGIN} component={Login} />
+              <Route path={ROUTE.CONVERSATION_JOIN} component={ConversationJoin} />
               <Route path={ROUTE.CONVERSATION_JOIN_INVALID} component={ConversationJoinInvalid} />
               <Route path={ROUTE.CREATE_TEAM} component={TeamName} />
               <Route path={ROUTE.CREATE_TEAM_ACCOUNT} component={CreateAccount} />

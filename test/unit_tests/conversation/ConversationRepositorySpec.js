@@ -410,8 +410,8 @@ describe('ConversationRepository', () => {
       const bad_message_key = `${conversation_et.id}@${bad_message.from}@NaN`;
 
       storage_service
-        .save(z.storage.StorageService.OBJECT_STORE.EVENTS, bad_message_key, bad_message)
-        .catch(() => storage_service.save(z.storage.StorageService.OBJECT_STORE.EVENTS, undefined, good_message))
+        .save(z.storage.StorageSchemata.OBJECT_STORE.EVENTS, bad_message_key, bad_message)
+        .catch(() => storage_service.save(z.storage.StorageSchemata.OBJECT_STORE.EVENTS, undefined, good_message))
         .then(() => TestFactory.conversation_repository.getPrecedingMessages(conversation_et))
         .then(loaded_events => {
           expect(loaded_events.length).toBe(1);
@@ -674,7 +674,7 @@ describe('ConversationRepository', () => {
       beforeEach(() => {
         spyOn(TestFactory.conversation_repository, '_onCreate').and.callThrough();
         spyOn(TestFactory.conversation_repository, 'map_conversations').and.returnValue(true);
-        spyOn(TestFactory.conversation_repository, 'update_participating_user_ets').and.returnValue(true);
+        spyOn(TestFactory.conversation_repository, 'updateParticipatingUserEntities').and.returnValue(true);
         spyOn(TestFactory.conversation_repository, 'save_conversation').and.returnValue(false);
 
         conversationId = z.util.createRandomUuid();
@@ -715,7 +715,7 @@ describe('ConversationRepository', () => {
 
       beforeEach(() => {
         spyOn(TestFactory.conversation_repository, '_onMemberJoin').and.callThrough();
-        spyOn(TestFactory.conversation_repository, 'update_participating_user_ets').and.callThrough();
+        spyOn(TestFactory.conversation_repository, 'updateParticipatingUserEntities').and.callThrough();
 
         member_join_event = {
           conversation: conversation_et.id,
@@ -734,7 +734,7 @@ describe('ConversationRepository', () => {
           ._handleConversationEvent(member_join_event)
           .then(() => {
             expect(TestFactory.conversation_repository._onMemberJoin).toHaveBeenCalled();
-            expect(TestFactory.conversation_repository.update_participating_user_ets).toHaveBeenCalled();
+            expect(TestFactory.conversation_repository.updateParticipatingUserEntities).toHaveBeenCalled();
             done();
           })
           .catch(done.fail);
@@ -751,7 +751,7 @@ describe('ConversationRepository', () => {
           ._handleConversationEvent(member_join_event)
           .then(() => {
             expect(TestFactory.conversation_repository._onMemberJoin).toHaveBeenCalled();
-            expect(TestFactory.conversation_repository.update_participating_user_ets).not.toHaveBeenCalled();
+            expect(TestFactory.conversation_repository.updateParticipatingUserEntities).not.toHaveBeenCalled();
             done();
           })
           .catch(done.fail);

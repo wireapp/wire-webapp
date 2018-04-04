@@ -30,31 +30,34 @@
 
 // wrapper
 .detail-view-content {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
   position: relative;
+  display: flex;
   width: 100%;
+  height: 100%;
+  flex-direction: column;
 }
 
 // layout
 .detail-view-header {
   .flex-center;
-  flex: 0 0 auto;
+
   height: 72px;
+  flex: 0 0 auto;
   line-height: @line-height-sm;
 }
 
 .detail-view-header-close-button {
   .circle(40px);
   .flex-center;
+
+  position: absolute;
   right: 24px;
   cursor: pointer;
-  position: absolute;
 }
 
 .detail-view-main {
   .flex-center;
+
   flex: 1 1;
 }
 
@@ -67,8 +70,9 @@
 
 .detail-view-footer {
   .flex-center;
-  flex: 0 0 auto;
+
   height: 72px;
+  flex: 0 0 auto;
 
   .detail-view-action-button + .detail-view-action-button {
     margin-left: 40px;
@@ -78,9 +82,10 @@
 // TODO generic butotn
 .detail-view-action-button {
   .label-bold-xs;
+
+  display: flex;
   align-items: center;
   cursor: pointer;
-  display: flex;
 
   & > span:first-child {
     margin-right: 12px;

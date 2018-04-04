@@ -52,7 +52,16 @@ function HistoryInfo({hasHistory, intl: {formatMessage: _}, ...connected}) {
             </Link>
           </Paragraph>
         )}
-        <Button onClick={onContinue} data-uie-name="do-history-confirm">
+        <Button
+          onClick={onContinue}
+          autoFocus
+          data-uie-name="do-history-confirm"
+          onKeyDown={event => {
+            if (event.key === 'Enter') {
+              onContinue();
+            }
+          }}
+        >
           {_(historyInfoStrings.ok)}
         </Button>
       </ContainerXS>

@@ -25,11 +25,10 @@ import * as CookieAction from '../module/action/CookieAction';
 import {H3, Button, Container, Columns, Column, Modal, Text} from '@wireapp/react-ui-kit';
 import * as CookieSelector from '../module/selector/CookieSelector';
 import {COOKIE_NAME_APP_OPENED} from '../module/selector/CookieSelector';
-import {APP_INSTANCE_ID} from '../config';
 
 class AppAlreadyOpen extends React.Component {
   onContinue = () => {
-    this.props.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: APP_INSTANCE_ID});
+    this.props.removeCookie(COOKIE_NAME_APP_OPENED);
   };
 
   render = () => {

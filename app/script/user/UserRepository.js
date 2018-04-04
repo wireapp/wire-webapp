@@ -71,6 +71,7 @@ z.user.UserRepository = class UserRepository {
       .extend({rateLimit: 1000});
 
     this.isActivatedAccount = ko.pureComputed(() => this.self() && !this.self().isTemporaryGuest());
+    this.isTemporaryGuest = ko.pureComputed(() => this.self() && this.self().isTemporaryGuest());
 
     this.isTeam = ko.observable();
     this.teamMembers = undefined;
@@ -90,6 +91,7 @@ z.user.UserRepository = class UserRepository {
     amplify.subscribe(z.event.WebApp.USER.SET_AVAILABILITY, this.setAvailability.bind(this));
     amplify.subscribe(z.event.WebApp.USER.EVENT_FROM_BACKEND, this.on_user_event.bind(this));
     amplify.subscribe(z.event.WebApp.USER.PERSIST, this.saveUserInDb.bind(this));
+    amplify.subscribe(z.event.WebApp.USER.UPDATE, this.updateUserById.bind(this));
   }
 
   /**
@@ -173,8 +175,9 @@ z.user.UserRepository = class UserRepository {
     }
 
     this.update_user_connections([connection_et]).then(() => {
-      if (previous_status === z.user.ConnectionStatus.SENT && connection_et.is_connected()) {
-        this.update_user_by_id(connection_et.to);
+      const shouldUpdateUser = previous_status === z.user.ConnectionStatus.SENT && connection_et.is_connected();
+      if (shouldUpdateUser) {
+        this.updateUserById(connection_et.to);
       }
       this._send_user_connection_notification(connection_et, source, previous_status);
       amplify.publish(z.event.WebApp.CONVERSATION.MAP_CONNECTION, connection_et, show_conversation);
@@ -685,7 +688,7 @@ z.user.UserRepository = class UserRepository {
    * @param {string} user_id - User ID
    * @returns {Promise<z.entity.User>} Resolves with the matching user entity
    */
-  find_user_by_id(user_id) {
+  findUserById(user_id) {
     for (const user_et of this.users()) {
       if (user_et.id === user_id) {
         return Promise.resolve(user_et);
@@ -718,7 +721,7 @@ z.user.UserRepository = class UserRepository {
    * @returns {Promise<z.entity.User>} Promise that resolves with the matching user entity
    */
   get_user_by_id(user_id) {
-    return this.find_user_by_id(user_id)
+    return this.findUserById(user_id)
       .catch(error => {
         if (error.type === z.user.UserError.TYPE.USER_NOT_FOUND) {
           return this.fetch_user_by_id(user_id);
@@ -756,7 +759,7 @@ z.user.UserRepository = class UserRepository {
     }
 
     const _find_user = user_id => {
-      return this.find_user_by_id(user_id).catch(error => {
+      return this.findUserById(user_id).catch(error => {
         if (error.type !== z.user.UserError.TYPE.USER_NOT_FOUND) {
           throw error;
         }
@@ -814,7 +817,7 @@ z.user.UserRepository = class UserRepository {
    * @returns {Promise} Resolves with the user entity
    */
   save_user(user_et, is_me = false) {
-    return this.find_user_by_id(user_et.id).catch(error => {
+    return this.findUserById(user_et.id).catch(error => {
       if (error.type !== z.user.UserError.TYPE.USER_NOT_FOUND) {
         throw error;
       }
@@ -835,7 +838,7 @@ z.user.UserRepository = class UserRepository {
    */
   save_users(user_ets) {
     const _find_users = user_et => {
-      return this.find_user_by_id(user_et.id)
+      return this.findUserById(user_et.id)
         .then(() => undefined)
         .catch(error => {
           if (error.type !== z.user.UserError.TYPE.USER_NOT_FOUND) {
@@ -855,25 +858,26 @@ z.user.UserRepository = class UserRepository {
 
   /**
    * Update a local user from the backend by ID.
-   * @param {string} user_id - User ID
+   * @param {string} userId - User ID
    * @returns {Promise} Resolves when user was updated
    */
-  update_user_by_id(user_id) {
-    const get_current_user = () =>
-      this.find_user_by_id(user_id).catch(error => {
-        if (error.type !== z.user.UserError.TYPE.USER_NOT_FOUND) {
-          throw error;
+  updateUserById(userId) {
+    const getLocalUser = () =>
+      this.findUserById(userId).catch(error => {
+        const isNotFound = error.type === z.user.UserError.TYPE.USER_NOT_FOUND;
+        if (isNotFound) {
+          return new z.entity.User();
         }
-        return new z.entity.User();
+        throw error;
       });
 
-    return Promise.all([get_current_user(user_id), this.user_service.get_user_by_id(user_id)])
-      .then(([current_user_et, updated_user_data]) =>
-        this.user_mapper.updateUserFromObject(current_user_et, updated_user_data)
+    return Promise.all([getLocalUser(userId), this.user_service.get_user_by_id(userId)])
+      .then(([localUserEntity, updatedUserData]) =>
+        this.user_mapper.updateUserFromObject(localUserEntity, updatedUserData)
       )
-      .then(updated_user_et => {
+      .then(userEntity => {
         if (this.isTeam()) {
-          this.map_guest_status([updated_user_et]);
+          this.map_guest_status([userEntity]);
         }
       });
   }

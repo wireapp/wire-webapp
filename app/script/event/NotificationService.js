@@ -44,7 +44,7 @@ z.event.NotificationService = class NotificationService {
     this.storageService = storageService;
     this.logger = new z.util.Logger('z.event.NotificationService', z.config.LOGGER.OPTIONS);
 
-    this.AMPLIFY_STORE_NAME = z.storage.StorageService.OBJECT_STORE.AMPLIFY;
+    this.AMPLIFY_STORE_NAME = z.storage.StorageSchemata.OBJECT_STORE.AMPLIFY;
   }
 
   /**

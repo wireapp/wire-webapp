@@ -113,7 +113,7 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
         case z.event.Backend.CONVERSATION.MEMBER_LEAVE: {
           const temporaryGuestRemoval = this.otherUser().is_me && this.otherUser().isTemporaryGuest();
           if (temporaryGuestRemoval) {
-            return z.string.text(z.string.temporaryGuestLeaveMessage);
+            return z.l10n.text(z.string.temporaryGuestLeaveMessage);
           }
 
           const senderLeft = this.otherUser().id === this.user().id;

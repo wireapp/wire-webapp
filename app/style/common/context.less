@@ -18,23 +18,23 @@
  */
 
 .ctx-menu {
+  position: fixed;
+  z-index: @z-index-context;
+  display: block;
   min-width: 160px;
+  padding-top: 4px;
+  padding-bottom: 4px;
   background-color: #fff;
   border-radius: 4px;
   box-shadow: 0 0 1px 0 fade(#000, 8%), 0 8px 24px 0 fade(#000, 16%);
-  display: block;
   font-size: 12px;
   font-weight: @font-weight-regular;
   line-height: @line-height-xl;
-  padding-top: 4px;
-  padding-bottom: 4px;
-  position: fixed;
-  z-index: @z-index-context;
 }
 
 .ctx-menu-item {
-  cursor: pointer;
   padding-left: 24px;
+  cursor: pointer;
 
   &:hover,
   &.selected {

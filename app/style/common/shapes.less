@@ -19,12 +19,12 @@
 
 // BOXES
 .box-round {
-  border: 1px solid fade(@graphite, 16%);
-  border-radius: 4px;
   display: inline-block;
   width: 24px;
   height: 24px;
   padding: 3px;
+  border: 1px solid fade(@graphite, 16%);
+  border-radius: 4px;
 }
 
 // DOTS
@@ -35,8 +35,9 @@
 
 .dot-size (@size) {
   .circle(@size);
-  color: #fff;
+
   display: inline-block;
+  color: #fff;
 }
 
 .dot-xs {

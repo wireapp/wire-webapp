@@ -21,27 +21,41 @@ import {ContainerXS, Loading} from '@wireapp/react-ui-kit';
 import {injectIntl} from 'react-intl';
 import React from 'react';
 import * as ClientAction from '../module/action/ClientAction';
+import {resetError} from '../module/action/creator/ClientActionCreator';
 import * as LocalStorageAction from '../module/action/LocalStorageAction';
 import ClientItem from '../component/ClientItem';
 import * as ClientSelector from '../module/selector/ClientSelector';
 import {connect} from 'react-redux';
 import EXTERNAL_ROUTE from '../externalRoute';
-import ROUTE from '../route';
+import {ROUTE} from '../route';
 import BackendError from '../module/action/BackendError';
 import {withRouter} from 'react-router';
 
 class ClientList extends React.Component {
   state = {
     currentlySelectedClient: null,
+    showLoading: false,
   };
+
+  constructor(props) {
+    super(props);
+    this.loadingTimeout = 0;
+  }
+
+  componentWillUnmount() {
+    this.resetLoadingSpinner();
+  }
 
   setSelectedClient = clientId => {
     const isSelectedClient = this.state.currentlySelectedClient === clientId;
     clientId = isSelectedClient ? null : clientId;
     this.setState({...this.state, currentlySelectedClient: clientId});
+    this.props.resetError();
   };
 
   removeClient = (clientId, password) => {
+    this.setState({showLoading: true});
+    this.loadingTimeout = window.setTimeout(this.resetLoadingSpinner.bind(this), 1000);
     return Promise.resolve()
       .then(() => this.props.doRemoveClient(clientId, password))
       .then(() => {
@@ -56,11 +70,18 @@ class ClientList extends React.Component {
       });
   };
 
+  resetLoadingSpinner() {
+    window.clearTimeout(this.loadingTimeout);
+    this.setState({showLoading: false});
+  }
+
   isSelectedClient = clientId => clientId === this.state.currentlySelectedClient;
 
   render() {
     const {isFetching, permanentClients} = this.props;
-    return isFetching ? (
+    const {showLoading} = this.state;
+
+    return isFetching || showLoading ? (
       <ContainerXS centerText verticalCenter style={{justifyContent: 'center'}}>
         <Loading />
       </ContainerXS>
@@ -93,7 +114,7 @@ export default withRouter(
         isFetching: ClientSelector.isFetching(state),
         permanentClients: ClientSelector.getPermanentClients(state),
       }),
-      {...ClientAction, ...LocalStorageAction}
+      {...ClientAction, ...LocalStorageAction, resetError}
     )(ClientList)
   )
 );

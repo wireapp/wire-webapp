@@ -21,17 +21,18 @@
 .input-level {
   display: flex;
   justify-content: space-between;
-  list-style: none;
   padding: 0;
+  list-style: none;
 }
 
 .input-level-bullet::before {
   .circle(@input-level-bullet-size);
+
   display: block;
-  content: '';
+  border: 1px solid @seperator-color;
   background-color: #fff;
   border-radius: @input-level-bullet-size / 2;
-  border: 1px solid @seperator-color;
+  content: '';
   transition: all 0.16s;
 }
 

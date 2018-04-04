@@ -38,7 +38,7 @@ describe('z.storage.StorageRepository', () => {
   describe('save', () => {
     it('does not save "null" values', done => {
       TestFactory.storage_service
-        .save(z.storage.StorageService.OBJECT_STORE.AMPLIFY, 'primary_key', null)
+        .save(z.storage.StorageSchemata.OBJECT_STORE.AMPLIFY, 'primary_key', null)
         .then(done.fail)
         .catch(error => {
           expect(error.type).toEqual(z.storage.StorageError.TYPE.NO_DATA);

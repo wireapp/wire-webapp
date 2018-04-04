@@ -187,11 +187,9 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
     }
   }
 
-  _set_super_property(super_property, value) {
-    this.logger.info(`Set super property '${super_property}' to value '${value}'`);
-    const super_properties = {};
-    super_properties[super_property] = value;
-    this.mixpanel.register(super_properties);
+  _set_super_property(superPropertyName, value) {
+    this.logger.info(`Set super property '${superPropertyName}' to value '${value}'`);
+    this.mixpanel.register({[superPropertyName]: value});
   }
 
   _track_event(event_name, attributes) {

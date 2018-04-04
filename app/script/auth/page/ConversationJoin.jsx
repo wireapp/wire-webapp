@@ -44,12 +44,12 @@ import * as NotificationAction from '../module/action/NotificationAction';
 import * as StringUtil from '../util/stringUtil';
 import {Redirect} from 'react-router';
 import {Link as RRLink} from 'react-router-dom';
-import ROUTE from '../route';
+import {ROUTE, QUERY_KEY} from '../route';
 import {injectIntl, FormattedHTMLMessage} from 'react-intl';
 import EXTERNAL_ROUTE from '../externalRoute';
 import {withRouter} from 'react-router';
 import React, {Component} from 'react';
-import {pathWithParams} from '../util/urlUtil';
+import {getURLParameter, pathWithParams} from '../util/urlUtil';
 import BackendError from '../module/action/BackendError';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
 import WirelessUnsupportedBrowser from '../component/WirelessUnsupportedBrowser';
@@ -70,9 +70,9 @@ class ConversationJoin extends Component {
   };
 
   readAndUpdateParamsFromUrl = (nextProps = this.props) => {
-    const conversationCode = nextProps.match.params.conversationCode;
-    const conversationKey = nextProps.match.params.conversationKey;
-    const expiresIn = parseInt(nextProps.match.params.expiresIn, 10) || undefined;
+    const conversationCode = getURLParameter(QUERY_KEY.CONVERSATION_CODE);
+    const conversationKey = getURLParameter(QUERY_KEY.CONVERSATION_KEY);
+    const expiresIn = parseInt(getURLParameter(QUERY_KEY.JOIN_EXPIRES), 10) || undefined;
 
     const codeParamChanged = conversationCode !== this.state.conversationCode;
     const keyParamChanged = conversationKey !== this.state.conversationKey;
@@ -80,8 +80,7 @@ class ConversationJoin extends Component {
     const urlParamChanged = codeParamChanged || keyParamChanged || expiresInParamChanged;
 
     if (urlParamChanged) {
-      this.props
-        .doInit()
+      Promise.resolve()
         .then(() => {
           this.setState((state, props) => ({
             ...state,
@@ -103,7 +102,10 @@ class ConversationJoin extends Component {
 
   componentDidMount = () => {
     this.props.trackEvent({name: TrackingAction.EVENT_NAME.GUEST_ROOMS.OPENED_SIGNUP});
-    this.readAndUpdateParamsFromUrl();
+    this.props
+      .doInit()
+      .catch(() => {})
+      .then(() => this.readAndUpdateParamsFromUrl());
   };
 
   componentWillReceiveProps = nextProps => this.readAndUpdateParamsFromUrl(nextProps);
@@ -162,6 +164,7 @@ class ConversationJoin extends Component {
 
   renderActivatedAccount = () => {
     const {selfName, intl: {formatMessage: _}} = this.props;
+    const {error} = this.state;
     return (
       <ContainerXS style={{margin: 'auto 0'}}>
         <AppAlreadyOpen />

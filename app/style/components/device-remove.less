@@ -20,6 +20,7 @@
 // mixins
 .device-remove-placeholder() {
   .label-xs;
+
   color: @graphite;
 }
 
@@ -34,17 +35,17 @@ device-remove {
 }
 
 .device-remove-input {
-  background-color: fade(#8d989f, 24%);
+  max-width: 128px;
+  height: @button-medium-sm-height;
+  flex: 1 1;
+  padding: 0 16px;
   border: none;
+  margin-right: 8px;
+  background-color: fade(#8d989f, 24%);
   border-radius: @button-border-radius;
   color: @graphite;
-  flex: 1 1;
-  height: @button-medium-sm-height;
   line-height: @button-medium-sm-height;
-  margin-right: 8px;
-  max-width: 128px;
   outline: 0;
-  padding: 0 16px;
 
   &::-ms-clear {
     display: none;
@@ -62,16 +63,18 @@ device-remove {
 
 .device-remove-button-remove {
   .fill-red;
+
   margin-right: 8px;
 }
 
 .device-remove-button {
   .label-xs;
+
+  padding: 0;
+  border: 0;
   -webkit-appearance: none;
   background: none;
-  border: 0;
   cursor: pointer;
   line-height: 24px;
   outline: 0;
-  padding: 0;
 }
