@@ -39,9 +39,9 @@
 }
 
 .video-element {
-  background-color: @graphite-dark;
-  height: 100%;
   width: 100%;
+  height: 100%;
+  background-color: @graphite-dark;
   object-fit: cover;
 
   &.video-element-mirrored {
@@ -50,32 +50,34 @@
 }
 
 .video-container-element() {
-  background-color: @graphite-dark;
-  height: 100%;
   width: 100%;
+  height: 100%;
+  background-color: @graphite-dark;
 }
 
 // common
 .video-element-overlay {
   .full-screen;
   .flex-center;
-  color: #fff;
+
   background-color: fade(#000, 24%);
   border-radius: 4px;
+  color: #fff;
 }
 
 .video-element-remote {
   .full-screen;
-  opacity: 0;
+
+  animation-duration: @animation-timing-slower;
+  animation-fill-mode: forwards;
 
   // fade in animation
   animation-name: video-fade-in;
-  animation-duration: @animation-timing-slower;
   animation-timing-function: @ease-out-quart;
-  animation-fill-mode: forwards;
+  opacity: 0;
 
   .video-element {
-    .video-container-element();
+    .video-container-element;
 
     &.video-element-contain {
       object-fit: contain;
@@ -85,8 +87,9 @@
 
 .video-element-remote-participant {
   .flex-center;
-  background: #fff;
+
   height: 100%;
+  background: #fff;
 }
 
 .video-element-remote-video {
@@ -96,8 +99,10 @@
 .video-element-remote-minimized {
   .video-container-round;
   .video-container-small;
-  left: auto;
+
+  z-index: @z-index-video;
   bottom: auto;
+  left: auto;
 
   .video-element {
     .video-container-round;
@@ -107,6 +112,7 @@
 .video-element-remote-fullscreen {
   .full-screen;
   .flex-center;
+
   color: #fff;
   cursor: pointer;
 }
@@ -116,8 +122,9 @@
   .video-container-small;
 
   .video-element {
-    .video-container-element();
+    .video-container-element;
     .video-container-round;
+
     margin-bottom: 16px;
   }
 }
@@ -125,15 +132,16 @@
 .video-message {
   .full-screen;
   .flex-center;
+
   color: #fff;
 }
 
 .video-title {
   position: fixed;
-  width: 100%;
   top: 48px;
-  font-weight: @font-weight-bold;
+  width: 100%;
   color: #fff;
+  font-weight: @font-weight-bold;
   text-align: center;
 }
 
@@ -143,10 +151,10 @@
 
 .video-controls {
   position: fixed;
-  display: flex;
-  justify-content: center;
-  width: 100%;
   bottom: 54px;
+  display: flex;
+  width: 100%;
+  justify-content: center;
   transition: opacity 0.25s ease-in-out;
 }
 
@@ -158,8 +166,8 @@
   }
 
   &:last-child {
-    margin-left: 24px;
     margin-right: 0;
+    margin-left: 24px;
   }
 }
 

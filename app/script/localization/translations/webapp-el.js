@@ -22,14 +22,12 @@ z.string.el.wireWindows = 'Wire για Windows';
 z.string.el.wireLinux = 'Wire για Linux';
 z.string.el.nonexistentUser = 'Διεγραμμένος χρήστης';
 z.string.el.and = 'και';
+z.string.el.enumerationAnd = ', και ';
 
 z.string.el.authAccountCountryCode = 'Κωδικός Χώρας';
-z.string.el.authAccountDeletion = 'Αποσυνδεθήκατε, επειδή ο λογαριασμός έχει διαγραφεί.';
-z.string.el.authAccountExpiration = 'Αποσυνδεθήκατε διότι η περίοδος λειτουργίας σας έληξε. Παρακαλούμε συνδεθείτε ξανά.';
 z.string.el.authAccountPasswordForgot = 'Ξέχασα τον κωδικό πρόσβασης';
 z.string.el.authAccountPublicComputer = 'Αυτός είναι ένας δημόσιος υπολογιστής';
 z.string.el.authAccountSignIn = 'Σύνδεση';
-z.string.el.authAccountSignInEmail = 'Email';
 z.string.el.authAccountSignInPhone = 'Τηλεφωνο';
 
 z.string.el.authBlockedCookies = 'Ενεργοποιήστε τα cookies για να συνδεθείτε στο Wire.';
@@ -97,12 +95,18 @@ z.string.el.callChooseSharedScreen = 'Επιλέξτε μια οθόνη για 
 z.string.el.callParticipants = '{{number}} στο τηλεφώνημα';
 
 z.string.el.modalAcknowledgeAction = 'Εντάξει';
+z.string.el.modalAcknowledgeHeadline = 'Κάτι πήγε στραβά';
 z.string.el.modalConfirmSecondary = 'Ακύρωση';
 z.string.el.modalOptionSecondary = 'Ακύρωση';
+
+z.string.el.modalAccountCreateAction = 'Εντάξει';
+z.string.el.modalAccountCreateHeadline = 'Δημιουργία λογαριασμού;';
 
 z.string.el.modalAccountDeletionAction = 'Διαγραφή';
 z.string.el.modalAccountDeletionHeadline = 'Διαγραφή λογαριασμού';
 z.string.el.modalAccountDeletionMessage = 'Θα σας στείλουμε ένα μήνυμα μέσω email ή SMS. Πατήστε επάνω στον σύνδεσμο μας για να διαγράψετε τον λογαριασμό σας οριστικά.';
+
+z.string.el.modalAccountLeaveGuestRoomAction = 'Αποχώρηση';
 
 z.string.el.modalAccountLogoutAction = 'Αποσύνδεση';
 z.string.el.modalAccountLogoutHeadline = 'Εκκαθάριση δεδομένων;';
@@ -118,6 +122,7 @@ z.string.el.modalAccountRemoveDeviceHeadline = 'Αφαίρεση "{{device}}"';
 z.string.el.modalAccountRemoveDeviceMessage = 'Απαιτείται ο κωδικός πρόσβασης σας για να αφαιρέσετε την συσκευή.';
 z.string.el.modalAccountRemoveDevicePlaceholder = 'Κωδικός Πρόσβασης';
 
+z.string.el.modalAssetTooLargeHeadline = 'Το αρχείο είναι πολύ μεγάλο';
 z.string.el.modalAssetTooLargeMessage = 'Μπορείτε να στείλετε αρχεία έως {{number}}';
 
 z.string.el.modalAssetParallelUploadsMessage = 'Μπορείτε να στείλετε μέχρι και {{number}} αρχεία ταυτόχρονα.';
@@ -174,6 +179,7 @@ z.string.el.modalConversationLeaveMessage = 'Δεν θα μπορείτε να �
 z.string.el.modalConversationMessageTooLongHeadline = 'Υπερμέγεθες μήνυμα';
 z.string.el.modalConversationMessageTooLongMessage = 'Μπορείτε να στείλετε μηνύματα έως {{number}} χαρακτήρες.';
 
+z.string.el.modalConversationNewDeviceAction = 'Αποστολή ούτως ή άλλως';
 z.string.el.modalConversationNewDeviceHeadlineOne = '{{user}} ξεκίνησε την χρήση μίας νέας συσκευής';
 z.string.el.modalConversationNewDeviceHeadlineMany = '{{users}} ξεκίνησε την χρήση νέων συσκευών';
 z.string.el.modalConversationNewDeviceHeadlineYou = '{{user}} ξεκίνησε την χρήση μίας νέας συσκευής';
@@ -190,6 +196,9 @@ z.string.el.modalConversationRemoveAction = 'Αφαίρεση';
 z.string.el.modalConversationRemoveHeadline = 'Αφαίρεση;';
 z.string.el.modalConversationRemoveMessage = '{{user}} δεν θα μπορεί να στείλει ή να λάβει μηνύματα σε αυτή την συνομιλία.';
 
+z.string.el.modalConversationRemoveGuestsAction = 'Αφαιρέστε τους επισκέπτες';
+
+z.string.el.modalConversationRevokeLinkAction = 'Ανάκληση συνδέσμου';
 
 z.string.el.modalConversationTooManyMembersHeadline = 'Full house';
 
@@ -250,7 +259,6 @@ z.string.el.conversationTeamLeave = ' αφαιρέθηκε από την ομά�
 z.string.el.conversationPing = ' σκουντημα';
 z.string.el.conversationPingYou = ' σκουντημα';
 z.string.el.conversationToday = 'σήμερα';
-z.string.el.conversationVerified = 'Επιβεβαιωμένο';
 z.string.el.conversationVoiceChannelDeactivate = ' κάλεσε';
 z.string.el.conversationVoiceChannelDeactivateYou = ' κάλεσε';
 z.string.el.conversationYesterday = 'Χθές';
@@ -278,7 +286,13 @@ z.string.el.conversationTweetAuthor = ' στο Twitter';
 
 z.string.el.groupCreationPreferencesAction = 'Επόμενο';
 z.string.el.groupCreationParticipantsActionCreate = 'Έγινε';
+z.string.el.groupCreationParticipantsHeader = 'Προσθήκη ατόμων';
+z.string.el.groupCreationParticipantsHeaderWithCounter = 'Προσθήκη ατόμων ({{number}})';
 z.string.el.groupCreationParticipantsPlaceholder = 'Αναζήτηση βάση ονόματος';
+
+z.string.el.guestRoomConversationName = 'Δωμάτιο καλεσμένων';
+
+z.string.el.guestRoomConversationButton = 'Πρόσκληση ατόμων';
 
 z.string.el.collectionShowAll = 'Προβολή όλων {{number}}';
 z.string.el.collectionSectionLinks = 'Σύνδεσμοι';
@@ -343,23 +357,34 @@ z.string.el.extensionsGiphyNoGifs = 'Ουπς! δεν υπάρχουν gifs';
 z.string.el.extensionsGiphyRandom = 'Τυχαία';
 
 z.string.el.addParticipantsConfirmLabel = 'Προσθήκη';
+z.string.el.addParticipantsHeader = 'Προσθήκη ατόμων';
+z.string.el.addParticipantsHeaderWithCounter = 'Προσθήκη ατόμων ({{number}})';
 z.string.el.addParticipantsSearchPlaceholder = 'Αναζήτηση βάση ονόματος';
 z.string.el.addParticipantsTabsPeople = 'Άτομα';
 z.string.el.addParticipantsTabsServices = 'Υπηρεσίες';
 
+z.string.el.conversationDetailsActionAddParticipants = 'Προσθήκη συμμετεχόντων';
+z.string.el.conversationDetailsActionBlock = 'Αποκλεισμός επαφής';
 z.string.el.conversationDetailsActionCancelRequest = 'Ακύρωση αιτήματος';
-z.string.el.conversationDetailsActionCreateGroup = 'Δημιουργία ομάδας';
+z.string.el.conversationDetailsActionClear = 'Διαγραφή περιεχομένου';
 z.string.el.conversationDetailsActionDevices = 'Συσκευές';
 z.string.el.conversationDetailsGuestsOff = 'Ανενεργό';
+z.string.el.conversationDetailsParticipantsServicesOne = 'Υπηρεσία';
 z.string.el.conversationDetailsParticipantsServicesMany = 'Υπηρεσίες';
+z.string.el.conversationDetailsParticipantsUsersOne = 'Άτομο';
 z.string.el.conversationDetailsParticipantsUsersMany = 'Άτομα';
 z.string.el.conversationDetailsPeople = 'Άτομα';
 z.string.el.conversationDetailsServices = 'Υπηρεσίες';
 
+z.string.el.groupParticipantActionBlock = 'Αποκλεισμός επαφής';
 z.string.el.groupParticipantActionCancelRequest = 'Ακύρωση αιτήματος';
 z.string.el.groupParticipantActionDevices = 'Συσκευές';
 z.string.el.groupParticipantActionPending = 'Εκκρεμεί';
 z.string.el.groupParticipantActionSendRequest = 'Σύνδεση';
+
+z.string.el.guestOptionsCopyLink = 'Αντιγραφή συνδέσμου';
+z.string.el.guestOptionsCreateLink = 'Δημιουργία συνδέσμου';
+z.string.el.guestOptionsRevokeLink = 'Ανάκληση συνδέσμου';
 
 z.string.el.participantDevicesDetailHeadline = 'Βεβαιωθείτε ότι αυτό αντιστοιχεί στο αποτύπωμα που εμφανίζεται στην συσκευή {{html1}} {{user}} {{html2}}.';
 z.string.el.participantDevicesDetailHowTo = 'Πώς μπορώ να το κάνω;';
@@ -478,6 +503,8 @@ z.string.el.searchInviteShare = 'Κοινή χρήση Επαφών';
 
 z.string.el.searchListEveryoneParticipates = 'Όλοι όσοι συνδεθήκατε βρίσκεστε ήδη εντός της συνομιλίας.';
 z.string.el.searchListNoMatches = 'Δεν υπάρχουν σχετικά αποτελέσματα.\nΔοκιμάστε να εισάγετε ένα διαφορετικό όνομα.';
+
+z.string.el.temporaryGuestCta = 'Δημιουργία λογαριασμού';
 
 z.string.el.uploadGoogleHeadline = 'Εύρεση ατόμων για συνομιλία.';
 z.string.el.uploadGoogleMessage = 'Χρησιμοποιούμε τις επαφές σας για να συνδέεστε με άλλους. Κρατάμε όλες σας τις πληροφορίες ανώνυμες και δεν τις μοιραζόμαστε με κανέναν άλλον.';

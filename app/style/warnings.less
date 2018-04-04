@@ -28,8 +28,8 @@
 
 .warning {
   position: absolute;
-  width: 100%;
   z-index: @z-index-warnings;
+  width: 100%;
 
   &.warning-dimmed {
     height: 100%;
@@ -38,11 +38,11 @@
 }
 
 .warning-bar {
-  color: #fff;
-  display: flex;
-  justify-content: center;
   position: absolute;
+  display: flex;
   width: 100%;
+  justify-content: center;
+  color: #fff;
 }
 
 .warning-bar-feature {
@@ -51,6 +51,7 @@
 
 .warning-bar-connection {
   .label-xs;
+
   height: @warning-bar-connection-height;
   justify-content: center;
 }
@@ -60,20 +61,20 @@
 }
 
 .warning-bar-progress {
-  background-color: @w-yellow;
-  animation: anim 2.1s @ease-in-out-quart infinite;
   position: absolute;
   width: 100%;
   height: 4px;
+  animation: anim 2.1s @ease-in-out-quart infinite;
+  background-color: @w-yellow;
 
   &::after {
-    background-color: @w-yellow;
-    content: '';
     position: absolute;
-    left: 0;
     top: 0;
+    left: 0;
     width: 100%;
     height: 4px;
+    background-color: @w-yellow;
+    content: '';
     transform: translateX(~'calc(100% + 32px)');
   }
 }
@@ -90,14 +91,14 @@
 
 .warning-bar-close {
   position: absolute;
-  right: 24px;
   top: 50%;
+  right: 24px;
   margin-top: -@button-medium-sm-height / 2;
 }
 
 .warning-bar-icon {
-  font-size: @icon-size-md;
   margin-right: 8px;
+  font-size: @icon-size-md;
 }
 
 .warning-bar-link {

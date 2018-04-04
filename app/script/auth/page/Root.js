@@ -22,16 +22,20 @@ import {StyledApp} from '@wireapp/react-ui-kit';
 import {HashRouter as Router, Redirect, Route, Switch} from 'react-router-dom';
 import Index from './Index';
 import InitialInvite from './InitialInvite';
+import Login from './Login';
 import TeamName from './TeamName';
 import CreateAccount from './CreateAccount';
 import CreatePersonalAccount from './CreatePersonalAccount';
 import ConversationJoin from './ConversationJoin';
 import ChooseHandle from './ChooseHandle';
+import ClientManager from './ClientManager';
+import ConversationJoinInvalid from './ConversationJoinInvalid';
 import Verify from './Verify';
+import HistoryInfo from './HistoryInfo';
 import {IntlProvider, addLocaleData} from 'react-intl';
 import {connect} from 'react-redux';
 import de from 'react-intl/locale-data/de';
-import ROUTE from '../route';
+import {ROUTE} from '../route';
 import SUPPORTED_LOCALE from '../supportedLocales';
 import * as CookieAction from '../module/action/CookieAction';
 import * as CookieSelector from '../module/selector/CookieSelector';
@@ -41,10 +45,9 @@ addLocaleData([...de]);
 
 class Root extends React.Component {
   componentDidMount = () => {
-    this.props.setCookieIfAbsent(CookieSelector.COOKIE_NAME_APP_OPENED, {appInstanceId: APP_INSTANCE_ID});
     this.props.startPolling();
     window.onbeforeunload = () => {
-      this.props.removeCookie(CookieSelector.COOKIE_NAME_APP_OPENED, APP_INSTANCE_ID);
+      this.props.safelyRemoveCookie(CookieSelector.COOKIE_NAME_APP_OPENED, APP_INSTANCE_ID);
       this.props.stopPolling();
     };
   };
@@ -61,18 +64,18 @@ class Root extends React.Component {
           <Router hashType="noslash">
             <Switch>
               <Route exact path={ROUTE.INDEX} component={Index} />
-              <Route
-                path={`${ROUTE.CONVERSATION_JOIN}/:conversationKey/:conversationCode`}
-                component={ConversationJoin}
-              />
+              <Route path={ROUTE.CLIENTS} component={ClientManager} />
+              <Route path={ROUTE.LOGIN} component={Login} />
+              <Route path={ROUTE.CONVERSATION_JOIN} component={ConversationJoin} />
+              <Route path={ROUTE.CONVERSATION_JOIN_INVALID} component={ConversationJoinInvalid} />
               <Route path={ROUTE.CREATE_TEAM} component={TeamName} />
               <Route path={ROUTE.CREATE_TEAM_ACCOUNT} component={CreateAccount} />
               <Route path={ROUTE.CREATE_ACCOUNT} component={CreatePersonalAccount} />
-              <Route path={`${ROUTE.INVITE}/:invitationCode`} component={CreatePersonalAccount} />
-              <Route path={ROUTE.INVITE} component={CreatePersonalAccount} />
+              <Route path={`${ROUTE.INVITE}/:invitationCode?`} component={CreatePersonalAccount} />
               <Route path={ROUTE.VERIFY} component={Verify} />
               <Route path={ROUTE.INITIAL_INVITE} component={InitialInvite} />
               <Route path={ROUTE.CHOOSE_HANDLE} component={ChooseHandle} />
+              <Route path={ROUTE.HISTORY_INFO} component={HistoryInfo} />
               <Redirect to={ROUTE.INDEX} />
             </Switch>
           </Router>

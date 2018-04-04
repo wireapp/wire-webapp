@@ -24,12 +24,9 @@ z.string.it.nonexistentUser = 'Elimina utente';
 z.string.it.and = 'e';
 
 z.string.it.authAccountCountryCode = 'Codice del paese';
-z.string.it.authAccountDeletion = 'Sei stato disconnesso perché il tuo account è stato eliminato.';
-z.string.it.authAccountExpiration = 'L’accesso è stato revocato perché la sessione è scaduta. Effettua il login nuovamente.';
 z.string.it.authAccountPasswordForgot = 'Ho dimenticato la password';
 z.string.it.authAccountPublicComputer = 'Questo computer è pubblico';
 z.string.it.authAccountSignIn = 'Accedi';
-z.string.it.authAccountSignInEmail = 'Email';
 z.string.it.authAccountSignInPhone = 'Telefono';
 
 z.string.it.authBlockedDatabase = 'Wire ha bisogno di accedere la memoria locale per visualizzare i messaggi. Archiviazione locale non è disponibile in modalità privata.';
@@ -99,9 +96,13 @@ z.string.it.modalAcknowledgeAction = 'Ok';
 z.string.it.modalConfirmSecondary = 'Annulla';
 z.string.it.modalOptionSecondary = 'Annulla';
 
+z.string.it.modalAccountCreateAction = 'OK';
+
 z.string.it.modalAccountDeletionAction = 'Elimina';
 z.string.it.modalAccountDeletionHeadline = 'Elimina account';
 z.string.it.modalAccountDeletionMessage = 'Ti invieremo un SMS o una email. Segui il link per eliminare definitivamente il tuo account.';
+
+z.string.it.modalAccountLeaveGuestRoomAction = 'Abbandona';
 
 z.string.it.modalAccountLogoutAction = 'Logout';
 z.string.it.modalAccountLogoutHeadline = 'Cancella dati?';
@@ -246,7 +247,6 @@ z.string.it.conversationTeamLeave = ' è stato rimosso dal team';
 z.string.it.conversationPing = ' ha fatto un trillo';
 z.string.it.conversationPingYou = ' ha fatto un trillo';
 z.string.it.conversationToday = 'oggi';
-z.string.it.conversationVerified = 'Verificato';
 z.string.it.conversationVoiceChannelDeactivate = ' ha chiamato';
 z.string.it.conversationVoiceChannelDeactivateYou = ' ha chiamato';
 z.string.it.conversationYesterday = 'Ieri';
@@ -273,6 +273,7 @@ z.string.it.conversationSomeone = 'Qualcuno';
 z.string.it.conversationTweetAuthor = ' su Twitter';
 
 z.string.it.groupCreationParticipantsPlaceholder = 'Cerca per nome';
+
 
 z.string.it.collectionShowAll = 'Mostra tutti i {{number}}';
 z.string.it.collectionSectionLinks = 'Link';
@@ -342,7 +343,6 @@ z.string.it.addParticipantsTabsPeople = 'Persone';
 z.string.it.addParticipantsTabsServices = 'Servizi';
 
 z.string.it.conversationDetailsActionCancelRequest = 'Annulla richiesta';
-z.string.it.conversationDetailsActionCreateGroup = 'Crea gruppo';
 z.string.it.conversationDetailsActionDevices = 'Dispositivi';
 z.string.it.conversationDetailsGuestsOff = 'Off';
 z.string.it.conversationDetailsParticipantsServicesMany = 'Servizi';
@@ -472,6 +472,7 @@ z.string.it.searchInviteShare = 'Condividi contatti';
 
 z.string.it.searchListEveryoneParticipates = 'Tutte le persone a cui sei connesso sono già in questa conversazione.';
 z.string.it.searchListNoMatches = 'Nessun risultato corrispondente. Provare ad inserire un nome diverso.';
+
 
 z.string.it.uploadGoogleHeadline = 'Trova persone con cui parlare.';
 z.string.it.uploadGoogleMessage = 'Utilizziamo i dati del tuo contatto per connetterti con gli altri. Rendiamo anonime tutte le informazioni e non le condividiamo con nessuno.';

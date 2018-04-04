@@ -40,16 +40,21 @@ import * as SelfSelector from '../module/selector/SelfSelector';
 import * as ConversationSelector from '../module/selector/ConversationSelector';
 import ValidationError from '../module/action/ValidationError';
 import * as AuthAction from '../module/action/AuthAction';
+import * as NotificationAction from '../module/action/NotificationAction';
 import * as StringUtil from '../util/stringUtil';
+import {Redirect} from 'react-router';
+import {Link as RRLink} from 'react-router-dom';
+import {ROUTE, QUERY_KEY} from '../route';
 import {injectIntl, FormattedHTMLMessage} from 'react-intl';
 import EXTERNAL_ROUTE from '../externalRoute';
 import {withRouter} from 'react-router';
 import React, {Component} from 'react';
-import {pathWithParams} from '../util/urlUtil';
+import {getURLParameter, pathWithParams} from '../util/urlUtil';
 import BackendError from '../module/action/BackendError';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
 import WirelessUnsupportedBrowser from '../component/WirelessUnsupportedBrowser';
 import WirelessContainer from '../component/WirelessContainer';
+import * as TrackingAction from '../module/action/TrackingAction';
 
 class ConversationJoin extends Component {
   state = {
@@ -57,6 +62,7 @@ class ConversationJoin extends Component {
     conversationKey: null,
     enteredName: '',
     error: null,
+    expiresIn: undefined,
     forceNewTemporaryGuestAccount: false,
     isValidLink: true,
     isValidName: true,
@@ -64,16 +70,23 @@ class ConversationJoin extends Component {
   };
 
   readAndUpdateParamsFromUrl = (nextProps = this.props) => {
-    const conversationCode = nextProps.match.params.conversationCode;
-    const conversationKey = nextProps.match.params.conversationKey;
-    if (conversationCode !== this.state.conversationCode || conversationKey !== this.state.conversationKey) {
-      this.props
-        .doInit()
+    const conversationCode = getURLParameter(QUERY_KEY.CONVERSATION_CODE);
+    const conversationKey = getURLParameter(QUERY_KEY.CONVERSATION_KEY);
+    const expiresIn = parseInt(getURLParameter(QUERY_KEY.JOIN_EXPIRES), 10) || undefined;
+
+    const codeParamChanged = conversationCode !== this.state.conversationCode;
+    const keyParamChanged = conversationKey !== this.state.conversationKey;
+    const expiresInParamChanged = expiresIn !== this.state.expiresIn;
+    const urlParamChanged = codeParamChanged || keyParamChanged || expiresInParamChanged;
+
+    if (urlParamChanged) {
+      Promise.resolve()
         .then(() => {
           this.setState((state, props) => ({
             ...state,
             conversationCode,
             conversationKey,
+            expiresIn,
             isValidLink: true,
           }));
         })
@@ -87,26 +100,26 @@ class ConversationJoin extends Component {
     }
   };
 
-  componentDidMount = () => this.readAndUpdateParamsFromUrl();
+  componentDidMount = () => {
+    this.props.trackEvent({name: TrackingAction.EVENT_NAME.GUEST_ROOMS.OPENED_SIGNUP});
+    this.props
+      .doInit()
+      .catch(() => {})
+      .then(() => this.readAndUpdateParamsFromUrl());
+  };
 
   componentWillReceiveProps = nextProps => this.readAndUpdateParamsFromUrl(nextProps);
 
-  openWebapp = params => {
-    const link = document.createElement('a');
-    link.href = pathWithParams(EXTERNAL_ROUTE.LOGIN, params);
-    document.body.appendChild(link); // workaround for Firefox
-    link.click();
-  };
-
-  onLoginClick = () => this.openWebapp('mode=login');
-
   onOpenWireClick = () => {
-    this.props.doJoinConversationByCode(this.state.conversationKey, this.state.conversationCode).then(() => {
-      const link = document.createElement('a');
-      link.href = pathWithParams('/');
-      document.body.appendChild(link); // workaround for Firefox
-      link.click();
-    });
+    this.props
+      .doJoinConversationByCode(this.state.conversationKey, this.state.conversationCode)
+      .then(() => this.trackAddParticipant())
+      .then(() => {
+        const link = document.createElement('a');
+        link.href = pathWithParams('/');
+        document.body.appendChild(link); // workaround for Firefox
+        link.click();
+      });
   };
 
   handleSubmit = event => {
@@ -120,9 +133,12 @@ class ConversationJoin extends Component {
     } else {
       Promise.resolve(this.nameInput.value)
         .then(name => name.trim())
-        .then(name => this.props.doRegisterWireless({name}))
+        .then(name => this.props.doRegisterWireless({expires_in: this.state.expiresIn, name}))
         .then(() => this.props.doJoinConversationByCode(this.state.conversationKey, this.state.conversationCode))
-        .then(() => this.openWebapp('reason=registration'));
+        .then(conversationEvent => this.props.setLastEventDate(new Date(conversationEvent.time)))
+        .then(() => this.trackAddParticipant())
+        .then(() => window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP)))
+        .catch(error => this.props.doLogout());
     }
     this.nameInput.focus();
   };
@@ -132,8 +148,23 @@ class ConversationJoin extends Component {
 
   resetErrors = () => this.setState({error: null, isValidName: true});
 
+  trackAddParticipant = () => {
+    const {isTemporaryGuest, trackEvent} = this.props;
+
+    return trackEvent({
+      attributes: {
+        guest_num: isTemporaryGuest ? 0 : 1,
+        is_allow_guests: true,
+        temporary_guest_num: isTemporaryGuest ? 1 : 0,
+        user_num: 0,
+      },
+      name: TrackingAction.EVENT_NAME.CONVERSATION.ADD_PARTICIPANTS,
+    });
+  };
+
   renderActivatedAccount = () => {
     const {selfName, intl: {formatMessage: _}} = this.props;
+    const {error} = this.state;
     return (
       <ContainerXS style={{margin: 'auto 0'}}>
         <AppAlreadyOpen />
@@ -155,12 +186,9 @@ class ConversationJoin extends Component {
         <Button onClick={this.onOpenWireClick} data-uie-name="do-open">
           {_(conversationJoinStrings.existentAccountOpenButton)}
         </Button>
-        <Small block>
-          {`${_(conversationJoinStrings.acceptTou)} `}
-          <Link href={EXTERNAL_ROUTE.WIRE_TERMS_PERSONAL} textTransform={'none'} data-uie-name="go-tou">
-            {_(conversationJoinStrings.touLink)}
-          </Link>
-        </Small>
+        <ErrorMessage data-uie-name="error-message">
+          {error ? parseValidationErrors(error) : parseError(this.props.error)}
+        </ErrorMessage>
         <Small block>
           <Link
             onClick={() => this.setState({...this.state, forceNewTemporaryGuestAccount: true})}
@@ -219,35 +247,16 @@ class ConversationJoin extends Component {
           </ErrorMessage>
         </Form>
         <Small block>
-          {`${_(conversationJoinStrings.acceptTou)} `}
-          <Link href={EXTERNAL_ROUTE.WIRE_TERMS_PERSONAL} textTransform={'none'} data-uie-name="go-tou">
-            {_(conversationJoinStrings.touLink)}
-          </Link>
-        </Small>
-        <Small block>
           {`${_(conversationJoinStrings.hasAccount)} `}
-          <Link onClick={this.onLoginClick} textTransform={'none'} data-uie-name="go-login">
+          <Link
+            component={RRLink}
+            to={`${ROUTE.LOGIN}/${this.state.conversationKey}/${this.state.conversationCode}`}
+            textTransform={'none'}
+            data-uie-name="go-login"
+          >
             {_(conversationJoinStrings.loginLink)}
           </Link>
         </Small>
-      </ContainerXS>
-    );
-  };
-
-  renderInvalidLink = () => {
-    const {intl: {formatMessage: _}} = this.props;
-    return (
-      <ContainerXS style={{margin: 'auto 0'}}>
-        <H2
-          style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}}
-          color={COLOR.GRAY}
-          data-uie-name="status-invalid-headline"
-        >
-          <FormattedHTMLMessage {...conversationJoinStrings.invalidHeadline} />
-        </H2>
-        <H3 style={{marginTop: '10px'}} data-uie-name="status-invalid-text">
-          {_(conversationJoinStrings.invalidSubhead)}
-        </H3>
       </ContainerXS>
     );
   };
@@ -271,16 +280,16 @@ class ConversationJoin extends Component {
   };
 
   renderJoin = () => {
-    const {error, isAuthenticated} = this.props;
+    const {error, isAuthenticated, isTemporaryGuest} = this.props;
     const {isValidLink, forceNewTemporaryGuestAccount} = this.state;
 
     if (!isValidLink) {
-      return this.renderInvalidLink();
+      return <Redirect to={ROUTE.CONVERSATION_JOIN_INVALID} />;
     }
     if (this.isConversationFullError(error)) {
       return this.renderFullConversation();
     }
-    const renderTemporaryGuestAccountCreation = !isAuthenticated || forceNewTemporaryGuestAccount;
+    const renderTemporaryGuestAccountCreation = !isAuthenticated || isTemporaryGuest || forceNewTemporaryGuestAccount;
     return renderTemporaryGuestAccountCreation ? this.renderTemporaryGuestAccount() : this.renderActivatedAccount();
   };
 
@@ -305,9 +314,15 @@ export default withRouter(
         error: ConversationSelector.getError(state),
         isAuthenticated: AuthSelector.isAuthenticated(state),
         isFetching: ConversationSelector.isFetching(state),
+        isTemporaryGuest: SelfSelector.isTemporaryGuest(state),
         selfName: SelfSelector.getSelfName(state),
       }),
-      {...ConversationAction, ...AuthAction}
+      {
+        ...AuthAction,
+        ...ConversationAction,
+        ...NotificationAction,
+        ...TrackingAction,
+      }
     )(ConversationJoin)
   )
 );

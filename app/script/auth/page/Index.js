@@ -20,7 +20,7 @@
 import * as TrackingAction from '../module/action/TrackingAction';
 import {getLanguage} from '../module/selector/LanguageSelector';
 import React, {Component} from 'react';
-import ROUTE from '../route';
+import {ROUTE} from '../route';
 import {
   Link,
   Paragraph,
@@ -35,11 +35,9 @@ import {
   Column,
   ContainerXS,
 } from '@wireapp/react-ui-kit';
-import EXTERNAL_ROUTE from '../externalRoute';
 import {connect} from 'react-redux';
 import {indexStrings} from '../../strings';
 import {injectIntl} from 'react-intl';
-import {pathWithParams} from '../util/urlUtil';
 import Page from './Page';
 
 class Index extends Component {
@@ -59,10 +57,7 @@ class Index extends Component {
 
   onLoginClick = () => {
     this.props.trackEvent({name: TrackingAction.EVENT_NAME.START.OPENED_LOGIN});
-    const link = document.createElement('a');
-    link.href = pathWithParams(EXTERNAL_ROUTE.LOGIN, 'mode=login');
-    document.body.appendChild(link); // workaround for Firefox
-    link.click();
+    this.props.history.push(ROUTE.LOGIN);
   };
 
   render() {
@@ -79,11 +74,11 @@ class Index extends Component {
                   <ProfileIcon color={COLOR.WHITE} />
                 </RoundContainer>
                 <Bold fontSize="24px" color={COLOR.LINK}>
-                  {_(indexStrings.createAccount)}
+                  {_(indexStrings.createAccountForPersonalUse)}
                 </Bold>
                 <br />
                 <Text light fontSize="16px" color={COLOR.LINK} style={{lineHeight: '36px'}}>
-                  {_(indexStrings.createAccountFor)}
+                  {_(indexStrings.createPersonalAccount)}
                 </Text>
               </Link>
             </Column>
@@ -93,11 +88,11 @@ class Index extends Component {
                   <TeamIcon color={COLOR.WHITE} />
                 </RoundContainer>
                 <Bold fontSize="24px" color={COLOR.LINK}>
-                  {_(indexStrings.createTeam)}
+                  {_(indexStrings.createAccountForOrganizations)}
                 </Bold>
                 <br />
                 <Text light fontSize="16px" color={COLOR.LINK} style={{lineHeight: '36px'}}>
-                  {_(indexStrings.createTeamFor)}
+                  {_(indexStrings.createTeam)}
                 </Text>
               </Link>
             </Column>

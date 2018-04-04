@@ -39,6 +39,9 @@ z.conversation.ConversationService = class ConversationService {
     this.client = client;
     this.storageService = storageService;
     this.logger = new z.util.Logger('z.conversation.ConversationService', z.config.LOGGER.OPTIONS);
+
+    this.CONVERSATION_STORE_NAME = z.storage.StorageSchemata.OBJECT_STORE.CONVERSATIONS;
+    this.EVENT_STORE_NAME = z.storage.StorageSchemata.OBJECT_STORE.EVENTS;
   }
 
   //##############################################################################
@@ -370,12 +373,10 @@ z.conversation.ConversationService = class ConversationService {
    * @returns {Promise} Resolves when the entity was deleted
    */
   delete_conversation_from_db(conversation_id) {
-    return this.storageService
-      .delete(z.storage.StorageService.OBJECT_STORE.CONVERSATIONS, conversation_id)
-      .then(primary_key => {
-        this.logger.info(`State of conversation '${primary_key}' was deleted`);
-        return primary_key;
-      });
+    return this.storageService.delete(this.CONVERSATION_STORE_NAME, conversation_id).then(primary_key => {
+      this.logger.info(`State of conversation '${primary_key}' was deleted`);
+      return primary_key;
+    });
   }
 
   /**
@@ -386,7 +387,7 @@ z.conversation.ConversationService = class ConversationService {
    * @returns {Promise} Resolves with the number of deleted records
    */
   delete_message_from_db(conversation_id, message_id) {
-    return this.storageService.db[z.storage.StorageService.OBJECT_STORE.EVENTS]
+    return this.storageService.db[this.EVENT_STORE_NAME]
       .where('conversation')
       .equals(conversation_id)
       .and(record => record.id === message_id)
@@ -400,7 +401,7 @@ z.conversation.ConversationService = class ConversationService {
    * @returns {Promise} Resolves with the number of deleted records
    */
   delete_message_with_key_from_db(primary_key) {
-    return this.storageService.db[z.storage.StorageService.OBJECT_STORE.EVENTS].delete(primary_key);
+    return this.storageService.db[this.EVENT_STORE_NAME].delete(primary_key);
   }
 
   /**
@@ -410,7 +411,7 @@ z.conversation.ConversationService = class ConversationService {
    * @returns {Promise} Resolves when the message was deleted
    */
   delete_messages_from_db(conversation_id, iso_date) {
-    return this.storageService.db[z.storage.StorageService.OBJECT_STORE.EVENTS]
+    return this.storageService.db[this.EVENT_STORE_NAME]
       .where('conversation')
       .equals(conversation_id)
       .filter(record => !iso_date || iso_date >= record.time)
@@ -425,7 +426,7 @@ z.conversation.ConversationService = class ConversationService {
     const min_date = new Date();
     min_date.setDate(min_date.getDate() - 30);
 
-    return this.storageService.db[z.storage.StorageService.OBJECT_STORE.EVENTS]
+    return this.storageService.db[this.EVENT_STORE_NAME]
       .where('time')
       .between(min_date.toISOString(), new Date().toISOString())
       .toArray()
@@ -449,7 +450,7 @@ z.conversation.ConversationService = class ConversationService {
    * @returns {Promise} Resolves with all the stored conversation states
    */
   load_conversation_states_from_db() {
-    return this.storageService.getAll(z.storage.StorageService.OBJECT_STORE.CONVERSATIONS);
+    return this.storageService.getAll(this.CONVERSATION_STORE_NAME);
   }
 
   /**
@@ -460,7 +461,7 @@ z.conversation.ConversationService = class ConversationService {
    * @returns {Promise} Resolves with the stored record
    */
   load_event_from_db(conversation_id, message_id) {
-    return this.storageService.db[z.storage.StorageService.OBJECT_STORE.EVENTS]
+    return this.storageService.db[this.EVENT_STORE_NAME]
       .where('conversation')
       .equals(conversation_id)
       .filter(record => message_id && record.id === message_id)
@@ -480,7 +481,7 @@ z.conversation.ConversationService = class ConversationService {
    * @returns {Promise} Resolves with matching events
    */
   load_events_with_category_from_db(conversation_id, category_min, category_max = z.message.MessageCategory.LIKED) {
-    return this.storageService.db[z.storage.StorageService.OBJECT_STORE.EVENTS]
+    return this.storageService.db[this.EVENT_STORE_NAME]
       .where('[conversation+category]')
       .between([conversation_id, category_min], [conversation_id, category_max], true, true)
       .sortBy('time');
@@ -492,7 +493,7 @@ z.conversation.ConversationService = class ConversationService {
    * @returns {Promise} Resolves with the retrieved records
    */
   load_events_with_types(event_types) {
-    return this.storageService.db[z.storage.StorageService.OBJECT_STORE.EVENTS]
+    return this.storageService.db[this.EVENT_STORE_NAME]
       .where('type')
       .anyOf(event_types)
       .sortBy('time');
@@ -524,7 +525,7 @@ z.conversation.ConversationService = class ConversationService {
       );
     }
 
-    return this.storageService.db[z.storage.StorageService.OBJECT_STORE.EVENTS]
+    return this.storageService.db[this.EVENT_STORE_NAME]
       .where('[conversation+time]')
       .between([conversation_id, lower_bound.toISOString()], [conversation_id, upper_bound.toISOString()], true, false)
       .reverse()
@@ -557,7 +558,7 @@ z.conversation.ConversationService = class ConversationService {
       throw new Error(`Upper bound (${typeof upper_bound}) must be of type 'Date'.`);
     }
 
-    return this.storageService.db[z.storage.StorageService.OBJECT_STORE.EVENTS]
+    return this.storageService.db[this.EVENT_STORE_NAME]
       .where('[conversation+time]')
       .between(
         [conversation_id, upper_bound.toISOString()],
@@ -575,8 +576,8 @@ z.conversation.ConversationService = class ConversationService {
    * @returns {Promise} Resolves with the stored record
    */
   save_event(event) {
-    event.category = z.message.MessageCategorization.category_from_event(event);
-    return this.storageService.save(z.storage.StorageService.OBJECT_STORE.EVENTS, undefined, event).then(() => event);
+    event.category = z.message.MessageCategorization.categoryFromEvent(event);
+    return this.storageService.save(this.EVENT_STORE_NAME, undefined, event).then(() => event);
   }
 
   /**
@@ -585,9 +586,7 @@ z.conversation.ConversationService = class ConversationService {
    * @returns {Promise} Resolves with the updated record
    */
   update_event(event) {
-    return this.storageService
-      .update(z.storage.StorageService.OBJECT_STORE.EVENTS, event.primary_key, event)
-      .then(() => event);
+    return this.storageService.update(this.EVENT_STORE_NAME, event.primary_key, event).then(() => event);
   }
 
   /**
@@ -597,9 +596,7 @@ z.conversation.ConversationService = class ConversationService {
    */
   save_conversations_in_db(conversations) {
     const keys = conversations.map(conversation => conversation.id);
-    return this.storageService.db[z.storage.StorageService.OBJECT_STORE.CONVERSATIONS]
-      .bulkPut(conversations, keys)
-      .then(() => conversations);
+    return this.storageService.db[this.CONVERSATION_STORE_NAME].bulkPut(conversations, keys).then(() => conversations);
   }
 
   /**
@@ -611,7 +608,7 @@ z.conversation.ConversationService = class ConversationService {
     const conversationData = conversation_et.serialize();
 
     return this.storageService
-      .save(z.storage.StorageService.OBJECT_STORE.CONVERSATIONS, conversation_et.id, conversationData)
+      .save(this.CONVERSATION_STORE_NAME, conversation_et.id, conversationData)
       .then(primary_key => {
         this.logger.info(`State of conversation '${primary_key}' was stored`, conversationData);
         return conversation_et;
@@ -643,7 +640,7 @@ z.conversation.ConversationService = class ConversationService {
    * @returns {Promise} Resolves when the message was updated in database
    */
   update_asset_as_uploaded_in_db(primary_key, event_json) {
-    return this.storageService.load(z.storage.StorageService.OBJECT_STORE.EVENTS, primary_key).then(record => {
+    return this.storageService.load(this.EVENT_STORE_NAME, primary_key).then(record => {
       if (record) {
         const {data: asset_data, time} = event_json;
 
@@ -657,7 +654,7 @@ z.conversation.ConversationService = class ConversationService {
         record.time = time;
 
         return this.storageService
-          .update(z.storage.StorageService.OBJECT_STORE.EVENTS, primary_key, record)
+          .update(this.EVENT_STORE_NAME, primary_key, record)
           .then(() => this.logger.info('Updated asset message_et (uploaded)', primary_key));
       }
 
@@ -673,17 +670,15 @@ z.conversation.ConversationService = class ConversationService {
    * @returns {Promise} Resolves when the message was updated in database
    */
   update_asset_as_failed_in_db(primary_key, reason) {
-    return this.storageService.load(z.storage.StorageService.OBJECT_STORE.EVENTS, primary_key).then(record => {
+    return this.storageService.load(this.EVENT_STORE_NAME, primary_key).then(record => {
       if (record) {
         record.data.reason = reason;
         record.data.status = z.assets.AssetTransferState.UPLOAD_FAILED;
 
-        return this.storageService
-          .update(z.storage.StorageService.OBJECT_STORE.EVENTS, primary_key, record)
-          .then(() => {
-            this.logger.info('Updated asset message_et (failed)', primary_key);
-            return record;
-          });
+        return this.storageService.update(this.EVENT_STORE_NAME, primary_key, record).then(() => {
+          this.logger.info('Updated asset message_et (failed)', primary_key);
+          return record;
+        });
       }
 
       this.logger.warn('Did not find message to update asset (failed)', primary_key);
@@ -702,7 +697,7 @@ z.conversation.ConversationService = class ConversationService {
     return Promise.resolve(message_et.primary_key).then(primary_key => {
       if (Object.keys(changes).length) {
         if (changes.version) {
-          return this.storageService.db.transaction('rw', z.storage.StorageService.OBJECT_STORE.EVENTS, () => {
+          return this.storageService.db.transaction('rw', this.EVENT_STORE_NAME, () => {
             return this.load_event_from_db(conversation_id, message_et.id).then(record => {
               let custom_data;
 
@@ -710,7 +705,7 @@ z.conversation.ConversationService = class ConversationService {
                 const database_version = record.version || 1;
 
                 if (changes.version === database_version + 1) {
-                  return this.storageService.update(z.storage.StorageService.OBJECT_STORE.EVENTS, primary_key, changes);
+                  return this.storageService.update(this.EVENT_STORE_NAME, primary_key, changes);
                 }
 
                 custom_data = {
@@ -725,7 +720,7 @@ z.conversation.ConversationService = class ConversationService {
           });
         }
 
-        return this.storageService.update(z.storage.StorageService.OBJECT_STORE.EVENTS, primary_key, changes);
+        return this.storageService.update(this.EVENT_STORE_NAME, primary_key, changes);
       }
 
       throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.NO_CHANGES);

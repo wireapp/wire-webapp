@@ -18,22 +18,23 @@
  */
 
 .preferences-page {
-  height: 100%;
   display: flex;
+  height: 100%;
   flex-direction: column;
 }
 
 .preferences-titlebar {
   .label-bold-xs;
-  align-items: center;
-  background-color: @app-bg;
-  border-bottom: 1px solid fade(@graphite, 12%);
-  display: flex;
-  height: @content-title-bar-height;
-  justify-content: center;
+
   position: relative;
+  display: flex;
   width: 100%;
+  height: @content-title-bar-height;
   flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid fade(@graphite, 12%);
+  background-color: @app-bg;
 }
 
 .preferences-content-wrapper {
@@ -42,13 +43,13 @@
 }
 
 .preferences-content {
-  color: @graphite-dark;
-  height: 100%;
-  min-width: 560px;
-  overflow-x: hidden;
-  padding: 32px 32px 32px 72px;
   position: absolute;
   width: 100%;
+  min-width: 560px;
+  height: 100%;
+  padding: 32px 32px 32px 72px;
+  color: @graphite-dark;
+  overflow-x: hidden;
 }
 
 .preferences-button {
@@ -56,11 +57,11 @@
 }
 
 .preferences-detail {
+  width: 380px;
+  height: 16px;
   color: @graphite;
   font-size: @font-size-xs;
-  height: 16px;
   line-height: @line-height-sm;
-  width: 380px;
 }
 
 .preferences-detail-emoji {
@@ -71,8 +72,9 @@
 
 .preferences-header {
   .label-bold-xs;
-  line-height: @line-height-sm;
+
   margin-bottom: 16px;
+  line-height: @line-height-sm;
 }
 
 .preferences-hint {
@@ -84,15 +86,15 @@
 }
 
 .preferences-info {
-  line-height: @line-height-lg;
   width: 400px;
+  line-height: @line-height-lg;
 }
 
 .preferences-link {
   display: block;
+  cursor: pointer;
   font-size: @font-size-sm;
   line-height: @line-height-xl;
-  cursor: pointer;
 }
 
 .preferences-option {
@@ -105,11 +107,11 @@
 }
 
 .preferences-option-icon {
-  font-size: @font-size-sm;
   height: @line-height-sm;
-  line-height: @line-height-sm;
-  margin: 0 0 0 -34px;
   padding-right: 18px;
+  margin: 0 0 0 -34px;
+  font-size: @font-size-sm;
+  line-height: @line-height-sm;
 
   div,
   svg {
@@ -120,20 +122,20 @@
 }
 
 .preferences-option-label {
-  cursor: pointer;
   display: inline;
   height: @line-height-sm;
+  cursor: pointer;
   line-height: @line-height-sm;
 }
 
 .preferences-section {
-  margin-bottom: 32px;
   width: 560px;
+  margin-bottom: 32px;
 }
 
 .preferences-separator {
-  background: @seperator-color;
-  border: 0;
   height: 1px;
+  border: 0;
   margin: 0;
+  background: @seperator-color;
 }

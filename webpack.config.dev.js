@@ -34,11 +34,17 @@ module.exports = Object.assign(commonConfig, {
     open: true,
     openPage: 'page/auth.html',
     overlay: true,
+    proxy: {
+      '/app': {pathRewrite: {'^/app': ''}, target: 'http://localhost:8888'},
+      '/audio': 'http://localhost:8888',
+      '/style': 'http://localhost:8888',
+    },
     publicPath: '/',
     stats: {
       chunks: false,
     },
   },
+
   entry: Object.assign(commonConfig.entry, {
     script: ['react-hot-loader/patch', path.resolve(__dirname, srcScript, 'main.js')],
   }),

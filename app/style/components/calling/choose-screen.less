@@ -19,23 +19,23 @@
 
 choose-screen {
   .full-screen;
-  background-color: fade(#000, 56%);
-  display: flex;
+  .flex-center;
+
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  background-color: fade(#000, 56%);
 }
 
 .choose-screen-list {
   display: flex;
-  margin-bottom: 32px;
   max-width: 100%;
-  padding-left: 32px;
   padding-right: 32px;
+  padding-left: 32px;
+  margin-bottom: 32px;
 
   &:hover > .choose-screen-list-item {
     &::before {
       .full-screen;
+
       background-color: fade(#000, 24%);
       content: '';
     }
@@ -51,12 +51,12 @@ choose-screen {
 }
 
 .choose-screen-list-item {
-  transition: all @animation-timing-faster;
-  background-color: @graphite-dark;
-  cursor: pointer;
+  position: relative;
   width: auto;
   height: 176px;
-  position: relative;
+  background-color: @graphite-dark;
+  cursor: pointer;
+  transition: all @animation-timing-faster;
 
   &:not(:last-child) {
     margin-right: 32px;
@@ -71,9 +71,9 @@ choose-screen {
 
 .choose-screen-controls {
   position: fixed;
-  display: flex;
-  justify-content: center;
-  width: 100%;
   bottom: 54px;
+  display: flex;
+  width: 100%;
+  justify-content: center;
   transition: opacity 0.25s ease-in-out;
 }

@@ -27,12 +27,9 @@ z.string.ru.enumerationAnd = ', и ';
 
 //=Загрузка приложения
 z.string.ru.authAccountCountryCode = 'Код страны';
-z.string.ru.authAccountDeletion = 'Вы вышли из системы потому что ваша учётная запись была удалена.';
-z.string.ru.authAccountExpiration = 'Вы были отключены, потому что срок действия вашей сессии истек. Пожалуйста, войдите снова.';
 z.string.ru.authAccountPasswordForgot = 'Восстановление пароля';
 z.string.ru.authAccountPublicComputer = 'Это общедоступный компьютер';
 z.string.ru.authAccountSignIn = 'Вход';
-z.string.ru.authAccountSignInEmail = 'Email';
 z.string.ru.authAccountSignInPhone = 'Телефон';
 
 z.string.ru.authBlockedCookies = 'Включите файлы cookie для входа в Wire.';
@@ -101,12 +98,17 @@ z.string.ru.callChooseSharedScreen = 'Выберите экран для дем�
 z.string.ru.callParticipants = '{{number}} участвуют(ет) в звонке';
 
 z.string.ru.modalAcknowledgeAction = 'OK';
+z.string.ru.modalAcknowledgeHeadline = 'Что-то пошло не так';
 z.string.ru.modalConfirmSecondary = 'Отменить';
 z.string.ru.modalOptionSecondary = 'Отменить';
+
+z.string.ru.modalAccountCreateAction = 'OK';
 
 z.string.ru.modalAccountDeletionAction = 'Удалить';
 z.string.ru.modalAccountDeletionHeadline = 'Удалить аккаунт';
 z.string.ru.modalAccountDeletionMessage = 'Мы вышлем вам сообщение по электронной почте или SMS. Перейдите по ссылке, чтобы навсегда удалить свой аккаунт.';
+
+z.string.ru.modalAccountLeaveGuestRoomAction = 'Покинуть';
 
 z.string.ru.modalAccountLogoutAction = 'Выход';
 z.string.ru.modalAccountLogoutHeadline = 'Удалить данные?';
@@ -122,8 +124,10 @@ z.string.ru.modalAccountRemoveDeviceHeadline = 'Удалить "{{device}}"';
 z.string.ru.modalAccountRemoveDeviceMessage = 'Для удаления устройства требуется пароль.';
 z.string.ru.modalAccountRemoveDevicePlaceholder = 'Пароль';
 
+z.string.ru.modalAssetTooLargeHeadline = 'Файл слишком большой';
 z.string.ru.modalAssetTooLargeMessage = 'Вы можете отправлять файлы размером до {{number}}';
 
+z.string.ru.modalAssetParallelUploadsHeadline = 'Слишком много файлов одновременно';
 z.string.ru.modalAssetParallelUploadsMessage = 'Вы можете отправить до {{number}} файлов за раз.';
 
 z.string.ru.modalCallEmptyConversationHeadline = 'Некому звонить';
@@ -164,6 +168,7 @@ z.string.ru.modalConversationAddBotMessage = 'Вы действительно х
 
 z.string.ru.modalConversationClearAction = 'Удалить';
 z.string.ru.modalConversationClearHeadline = 'Удалить содержимое?';
+z.string.ru.modalConversationClearMessage = 'Это очистит историю разговоров на всех ваших устройствах.';
 z.string.ru.modalConversationClearOption = 'Также покинуть разговор';
 
 z.string.ru.modalConversationDeleteMessageAction = 'Удалить';
@@ -175,11 +180,13 @@ z.string.ru.modalConversationDeleteMessageEveryoneHeadline = 'Удалить д�
 z.string.ru.modalConversationDeleteMessageEveryoneMessage = 'Действие не может быть отменено.';
 
 z.string.ru.modalConversationLeaveAction = 'Покинуть';
+z.string.ru.modalConversationLeaveHeadline = 'Покинуть разговор {{name}}?';
 z.string.ru.modalConversationLeaveMessage = 'Вы больше не сможете отправлять и получать сообщения в этом разговоре.';
 
 z.string.ru.modalConversationMessageTooLongHeadline = 'Сообщение слишком длинное';
 z.string.ru.modalConversationMessageTooLongMessage = 'Вы можете отправлять сообщения длиной до {{number}} символов.';
 
+z.string.ru.modalConversationNewDeviceAction = 'Все равно отправить';
 z.string.ru.modalConversationNewDeviceHeadlineOne = '{{user}} начал(а) использовать новое устройство';
 z.string.ru.modalConversationNewDeviceHeadlineMany = '{{user}}s начали использовать новые устройства';
 z.string.ru.modalConversationNewDeviceHeadlineYou = '{{user}} начал(а) использовать новое устройство';
@@ -197,12 +204,37 @@ z.string.ru.modalConversationRemoveAction = 'Удалить';
 z.string.ru.modalConversationRemoveHeadline = 'Удалить?';
 z.string.ru.modalConversationRemoveMessage = '{{user}} больше не сможет отправлять и получать сообщения в этом разговоре.';
 
+z.string.ru.modalConversationRemoveGuestsAction = 'Удалить гостей';
+z.string.ru.modalConversationRemoveGuestsHeadline = 'Отключить гостевой доступ?';
+z.string.ru.modalConversationRemoveGuestsMessage = 'Текущие гости будут удалены из разговора. Новые гости допущены не будут.';
+
+z.string.ru.modalConversationRevokeLinkAction = 'Отменить ссылку';
+z.string.ru.modalConversationRevokeLinkHeadline = 'Оменить эту ссылку?';
+z.string.ru.modalConversationRevokeLinkMessage = 'Новые гости не смогут присоединиться по этой ссылке. На доступ текущих гостей это не повлияет.';
+
+z.string.ru.modalConversationGuestOptionsDisableGuestMessage = 'Не удалось удалить гостей. Попробуйте снова.';
+z.string.ru.modalConversationGuestOptionsGetCodeMessage = 'Не удалось получить ссылку доступа.';
+z.string.ru.modalConversationGuestOptionsRequestCodeMessage = 'Не удалось запросить ссылку доступа. Пожалуйста, попробуйте еще раз.';
+z.string.ru.modalConversationGuestOptionsRevokeCodeMessage = 'Не удалось отменить ссылку доступа. Пожалуйста, попробуйте еще раз.';
+z.string.ru.modalConversationGuestOptionsToggleGuestsMessage = 'Не удалось изменить статус гостей.';
 
 z.string.ru.modalConversationTooManyMembersHeadline = 'Канал переполнен';
+z.string.ru.modalConversationTooManyMembersMessage = 'К разговору может присоединиться до {{number1}} человек. На текущий момент в комнате есть места еще для {{number2}} человек.';
+
+z.string.ru.modalGifTooLargeHeadline = 'Выбранная анимация слишком велика';
+z.string.ru.modalGifTooLargeMessage = 'Максимальный размер составляет {{number}} МБ.';
 
 z.string.ru.modalIntegrationUnavailableHeadline = 'Боты в настоящее время недоступны';
 z.string.ru.modalIntegrationUnavailableMessage = 'Благодарим вас за интерес к ботам. В настоящее время сервис приостановлен, пока мы работаем над следующей версией. Следите за обновлениями.';
 
+z.string.ru.modalPictureFileFormatHeadline = 'Не удается использовать это изображение';
+z.string.ru.modalPictureFileFormatMessage = 'Выберите файл PNG или JPEG.';
+
+z.string.ru.modalPictureTooLargeHeadline = 'Выбранное изображение слишком велико';
+z.string.ru.modalPictureTooLargeMessage = 'Вы можете использовать изображения размером до {{number}} МБ.';
+
+z.string.ru.modalPictureTooSmallHeadline = 'Изображение слишком мало';
+z.string.ru.modalPictureTooSmallMessage = 'Выберите изображение размером не менее 320 x 320 пикселей.';
 
 z.string.ru.modalServiceUnavailableHeadline = 'Добавление службы невозможно';
 z.string.ru.modalServiceUnavailableMessage = 'Эта служба недоступна в данный момент.';
@@ -227,6 +259,8 @@ z.string.ru.connectionRequestConnect = 'Связаться';
 z.string.ru.connectionRequestIgnore = 'Игнорировать';
 
 z.string.ru.conversationGuestIndicator = 'Гость';
+z.string.ru.userRemainingTimeHours = 'Осталось {{time}} час.';
+z.string.ru.userRemainingTimeMinutes = 'Осталось менее {{time}} мин.';
 
 z.string.ru.conversationYouNominative = 'вы';
 z.string.ru.conversationYouDative = 'вы';
@@ -248,6 +282,7 @@ z.string.ru.conversationDeviceYourDevices = ' ваши устройства';
 z.string.ru.conversationDeviceUserDevices = 'Устройства, принадлежащие {{user}}';
 z.string.ru.conversationDeviceNewDeviceOne = ' новое устройство';
 z.string.ru.conversationDeviceNewDeviceMany = ' новые устройства';
+z.string.ru.conversationDeviceNewPeopleJoined = 'Присоединились новые участники.';
 z.string.ru.conversationDeviceNewPeopleJoinedVerify = ' верифицируйте устройства';
 z.string.ru.conversationJustNow = 'Только что';
 z.string.ru.conversationLocationLink = 'Открыть карту';
@@ -267,7 +302,6 @@ z.string.ru.conversationTeamLeave = ' был удален из команды';
 z.string.ru.conversationPing = ' отправил(а) пинг';
 z.string.ru.conversationPingYou = ' отправил(а) пинг';
 z.string.ru.conversationToday = 'сегодня';
-z.string.ru.conversationVerified = 'Подтверждён';
 z.string.ru.conversationVoiceChannelDeactivate = ' позвонил(а)';
 z.string.ru.conversationVoiceChannelDeactivateYou = ' позвонил(а)';
 z.string.ru.conversationYesterday = 'Вчера';
@@ -306,6 +340,14 @@ z.string.ru.groupCreationParticipantsHeaderWithCounter = 'Добавить лю�
 z.string.ru.groupCreationParticipantsPlaceholder = 'Поиск по имени';
 
 z.string.ru.guestRoomConversationName = 'Гостевая комната';
+z.string.ru.guestRoomToggleName = 'Разрешить гостям';
+z.string.ru.guestRoomToggleInfo = 'Открыть этот разговор для людей не из вашей команды.';
+z.string.ru.guestRoomToggleInfoExtended = 'Открыть этот разговор для людей не из вашей команды. Вы всегда сможете изменить это позже.';
+
+z.string.ru.guestRoomConversationBadge = 'Присутствуют гости';
+
+z.string.ru.guestRoomConversationHead = 'Участники не из вашей команды смогут присоединиться к этому разговору.';
+z.string.ru.guestRoomConversationButton = 'Пригласить людей';
 
 z.string.ru.collectionShowAll = 'Показать все {{number}}';
 z.string.ru.collectionSectionLinks = 'Ссылки';
@@ -342,8 +384,10 @@ z.string.ru.conversationsSecondaryLinePings = '{{number}} пинга';
 z.string.ru.conversationsSecondaryLinePeopleLeft = '{{number}} человек(а) покинули';
 z.string.ru.conversationsSecondaryLinePersonLeft = '{{user}} покинул разговор';
 z.string.ru.conversationsSecondaryLinePersonRemoved = '{{user}} был удален';
+z.string.ru.conversationsSecondaryLinePersonRemovedTeam = '{{user}} был удален из команды';
 z.string.ru.conversationsSecondaryLinePeopleAdded = '{{user}} человек были добавлены';
 z.string.ru.conversationsSecondaryLinePersonAdded = '{{user}} был добавлен';
+z.string.ru.conversationsSecondaryLinePersonAddedSelf = '{{user}} присоединился';
 z.string.ru.conversationsSecondaryLinePersonAddedYou = '{{user}} добавил вас';
 z.string.ru.conversationsSecondaryLineRenamed = '{{user}} переименовал разговор';
 z.string.ru.conversationsSecondaryLineTimedMessage = 'Временное сообщение';
@@ -379,19 +423,42 @@ z.string.ru.addParticipantsServiceConfirmButton = 'Добавить службу
 z.string.ru.addParticipantsTabsPeople = 'Участники';
 z.string.ru.addParticipantsTabsServices = 'Сервисы';
 
+z.string.ru.conversationDetailsActionArchive = 'Архивировать разговор';
+z.string.ru.conversationDetailsActionAddParticipants = 'Добавить участников';
+z.string.ru.conversationDetailsActionBlock = 'Заблокировать контакт';
 z.string.ru.conversationDetailsActionCancelRequest = 'Отклонить запрос';
-z.string.ru.conversationDetailsActionCreateGroup = 'Создать группу';
+z.string.ru.conversationDetailsActionClear = 'Удалить содержимое';
+z.string.ru.conversationDetailsActionCreateGroup = 'Новая группа';
 z.string.ru.conversationDetailsActionDevices = 'Устройства';
+z.string.ru.conversationDetailsActionGuestOptions = 'Опции гостей';
+z.string.ru.conversationDetailsActionLeave = 'Покинуть группу';
 z.string.ru.conversationDetailsGuestsOff = 'Выключен';
+z.string.ru.conversationDetailsGuestsOn = 'Вкл.';
 z.string.ru.conversationDetailsParticipantsServicesMany = 'Сервисы';
 z.string.ru.conversationDetailsParticipantsUsersMany = 'Участники';
 z.string.ru.conversationDetailsPeople = 'Участники';
 z.string.ru.conversationDetailsServices = 'Сервисы';
 
+z.string.ru.groupParticipantActionBlock = 'Заблокировать контакт';
 z.string.ru.groupParticipantActionCancelRequest = 'Отклонить запрос';
 z.string.ru.groupParticipantActionDevices = 'Устройства';
+z.string.ru.groupParticipantActionIgnoreRequest = 'Игнорировать запрос';
+z.string.ru.groupParticipantActionIncomingRequest = 'Принять запрос';
+z.string.ru.groupParticipantActionLeave = 'Покинуть группу';
+z.string.ru.groupParticipantActionOpenConversation = 'Открыть разговор';
 z.string.ru.groupParticipantActionPending = 'Ожидает';
+z.string.ru.groupParticipantActionRemove = 'Удалить из группы';
+z.string.ru.groupParticipantActionSelfProfile = 'Открыть профиль';
 z.string.ru.groupParticipantActionSendRequest = 'Связаться';
+z.string.ru.groupParticipantActionUnblock = 'Разблокировать контакт';
+
+z.string.ru.guestOptionsCopyLink = 'Копировать ссылку';
+z.string.ru.guestOptionsCopyLinkDone = 'Ссылка скопирована!';
+z.string.ru.guestOptionsCreateLink = 'Создать ссылку';
+z.string.ru.guestOptionsInfoHeader = 'Пригласить других пользователей ссылкой';
+z.string.ru.guestOptionsInfoText = 'Любой, у кого есть ссылка, может присоединиться к разговору в течение 24 часов, даже если у них нет Wire.';
+z.string.ru.guestOptionsRevokeLink = 'Отменить ссылку';
+z.string.ru.guestOptionsTitle = 'Опции гостей';
 
 z.string.ru.participantDevicesDetailHeadline = 'Убедитесь, что этот отпечаток соответствует отпечатку, показанному на устройстве {{html1}}{{user}}{{html2}}.';
 z.string.ru.participantDevicesDetailHowTo = 'Как это сделать?';
@@ -432,6 +499,7 @@ z.string.ru.preferencesAboutWebsite = 'Веб-сайт Wire';
 z.string.ru.preferencesAccountAvaibilityUnset = 'Установить статус';
 z.string.ru.preferencesAccountCreateTeam = 'Создать команду';
 z.string.ru.preferencesAccountDelete = 'Удалить аккаунт';
+z.string.ru.preferencesAccountLeaveGuestRoom = 'Покинуть гостевую комнату';
 z.string.ru.preferencesAccountLogOut = 'Выход';
 z.string.ru.preferencesAccountManageTeam = 'Управлять командой';
 z.string.ru.preferencesAccountResetPassword = 'Сбросить пароль';
@@ -519,6 +587,8 @@ z.string.ru.searchServiceConfirmButton = 'Добавить службу';
 z.string.ru.searchListEveryoneParticipates = 'Все ваши контакты \nуже участвуют\nв этом разговоре.';
 z.string.ru.searchListNoMatches = 'Совпадений не найдено.\nПопробуйте ввести другое имя.';
 
+z.string.ru.temporaryGuestCta = 'Создать аккаунт';
+
 z.string.ru.uploadGoogleHeadline = 'Найти людей,\nчтобы поговорить.';
 z.string.ru.uploadGoogleMessage = 'Мы используем ваши контактные данные, чтобы соединить вас с другими пользователями. Мы анонимизируем всю информацию и не делимся ей с кем-либо еще.';
 
@@ -561,6 +631,7 @@ z.string.ru.notificationConnectionRequest = 'Хочет связаться';
 z.string.ru.notificationConversationCreate = '{{user}} начал разговор';
 z.string.ru.notificationConversationRename = '{{user}} переименовал разговор на {{name}}';
 z.string.ru.notificationMemberJoinMany = '{{user}} добавил {{number}} человек(а) в разговор';
+z.string.ru.notificationMemberJoinSelf = '{{user}} присоединился к разговору';
 z.string.ru.notificationMemberJoinOne = '{{user1}} добавил {{user2}} в разговор';
 z.string.ru.notificationMemberLeaveRemovedYou = '{{user}} удалил вас из разговора';
 z.string.ru.notificationObfuscated = 'Отправил(-а) Вам сообщение';
@@ -596,6 +667,7 @@ z.string.ru.tooltipConversationsPreferences = 'Открыть настройки
 z.string.ru.tooltipConversationsSilence = 'Выключить звук ({{shortcut}})';
 z.string.ru.tooltipConversationsStart = 'Начать разговор ({{shortcut}})';
 
+z.string.ru.tooltipConversationDetailsAddPeople = 'Добавить участников в разговор ({{shortcut}})';
 z.string.ru.tooltipConversationDetailsRename = 'Изменить название разговора';
 
 z.string.ru.tooltipPreferencesContactsGmail = 'Войдите в свой аккаунт Gmail, чтобы поделиться контактами';

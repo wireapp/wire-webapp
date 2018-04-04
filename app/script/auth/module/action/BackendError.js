@@ -54,10 +54,15 @@ export default class BackendError extends Error {
     INVALID_PHONE: 'invalid-phone',
     KEY_EXISTS: 'key-exists',
     MISSING_AUTH: 'missing-auth',
+    NEW_CLIENT: 'new-client', // Synthetic error label
     PENDING_ACTIVATION: 'pending-activation',
     PENDING_LOGIN: 'pending-login',
     SUSPENDED: 'suspended',
     TOO_MANY_LOGINS: 'client-error',
+  };
+
+  static CLIENT_ERRORS = {
+    TOO_MANY_CLIENTS: 'too-many-clients',
   };
 
   static CONVERSATION_ERRORS = {
@@ -103,6 +108,7 @@ export default class BackendError extends Error {
       ...BackendError.AUTH_ERRORS,
       ...BackendError.CONVERSATION_ERRORS,
       ...BackendError.GENERAL_ERRORS,
+      ...BackendError.CLIENT_ERRORS,
       ...BackendError.HANDLE_ERRORS,
       ...BackendError.TEAM_ERRORS,
       ...BackendError.TEAM_INVITE_ERRORS,

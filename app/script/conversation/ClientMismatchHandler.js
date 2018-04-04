@@ -36,24 +36,18 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
    *
    * @note As part of 412 or general response when sending encrypted message
    * @param {Object} clientMismatch - Client mismatch object containing client user maps for deleted, missing and obsolete clients
+   * @param {z.proto.GenericMessage} genericMessage - GenericMessage that was sent
+   * @param {Object} payload - Initial payload resulting in a 412
    * @param {string} conversationId - ID of conversation message was sent int
-   * @param {z.proto.GenericMessage} [genericMessage] - GenericMessage that was sent
-   * @param {Object} [payload] - Initial payload resulting in a 412
    * @returns {Promise} Resolve when mismatch was handled
    */
-  onClientMismatch(clientMismatch, conversationId, genericMessage, payload) {
+  onClientMismatch(clientMismatch, genericMessage, payload, conversationId) {
     const {deleted: deletedClients, missing: missingClients, redundant: redundantClients} = clientMismatch;
 
     return Promise.resolve()
-      .then(() => {
-        return this._handleClientMismatchRedundant(redundantClients, payload, conversationId);
-      })
-      .then(updatedPayload => {
-        return this._handleClientMismatchDeleted(deletedClients, updatedPayload);
-      })
-      .then(updatedPayload => {
-        return this._handleClientMismatchMissing(missingClients, updatedPayload, genericMessage);
-      });
+      .then(() => this._handleClientMismatchRedundant(redundantClients, payload, conversationId))
+      .then(updatedPayload => this._handleClientMismatchDeleted(deletedClients, updatedPayload))
+      .then(updatedPayload => this._handleClientMismatchMissing(missingClients, updatedPayload, genericMessage));
   }
 
   /**
@@ -63,7 +57,7 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
    * @private
    *
    * @param {Object} recipients - User client map containing redundant clients
-   * @param {Object} payload - Optional payload of the failed request
+   * @param {Object} payload - Payload of the request
    * @returns {Promise} Resolves with the updated payload
    */
   _handleClientMismatchDeleted(recipients, payload) {
@@ -73,20 +67,21 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
     this.logger.debug(`Message contains deleted clients of '${Object.keys(recipients).length}' users`, recipients);
 
     const _removeDeletedClient = (userId, clientId) => {
-      if (payload) {
-        delete payload.recipients[userId][clientId];
-      }
+      delete payload.recipients[userId][clientId];
       return this.userRepository.remove_client_from_user(userId, clientId);
     };
 
     const _removeDeletedUser = userId => {
-      if (payload && !Object.keys(payload.recipients[userId]).length) {
+      const clientIdsOfUser = Object.keys(payload.recipients[userId]);
+      const noRemainingClients = !clientIdsOfUser.length;
+
+      if (noRemainingClients) {
         delete payload.recipients[userId];
       }
     };
 
     return Promise.all(this._mapRecipients(recipients, _removeDeletedClient, _removeDeletedUser)).then(() => {
-      this.conversationRepository.verification_state_handler.onClientRemoved(Object.keys(recipients));
+      this.conversationRepository.verification_state_handler.onClientRemoved();
       return payload;
     });
   }
@@ -96,12 +91,12 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
    *
    * @private
    * @param {Object} recipients - User client map containing redundant clients
-   * @param {Object} payload - Optional payload of the failed request
+   * @param {Object} payload - Payload of the request
    * @param {z.proto.GenericMessage} genericMessage - Protobuffer message to be sent
    * @returns {Promise} Resolves with the updated payload
    */
   _handleClientMismatchMissing(recipients, payload, genericMessage) {
-    if (!payload || _.isEmpty(recipients)) {
+    if (_.isEmpty(recipients)) {
       return Promise.resolve(payload);
     }
 
@@ -130,8 +125,8 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
    * @private
    *
    * @param {Object} recipients - User client map containing redundant clients
-   * @param {Object} payload - Optional payload of the failed request
-   * @param {string} conversationId - ID of conversation the message was sent in
+   * @param {Object} payload - Payload of the request
+   * @param {string} [conversationId] - ID of conversation the message was sent in
    * @returns {Promise} Resolves with the updated payload
    */
   _handleClientMismatchRedundant(recipients, payload, conversationId) {
@@ -140,42 +135,43 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
     }
     this.logger.debug(`Message contains redundant clients of '${Object.keys(recipients).length}' users`, recipients);
 
-    return this.conversationRepository
-      .get_conversation_by_id(conversationId)
-      .catch(error => {
-        const isConversationNotFound = error.type === z.conversation.ConversationError.TYPE.CONVERSATION_NOT_FOUND;
-        if (!isConversationNotFound) {
-          throw error;
-        }
-      })
-      .then(conversationEntity => {
-        const _removeRedundantClient = (userId, clientId) => {
-          if (payload) {
-            delete payload.recipients[userId][clientId];
+    const conversationPromise = conversationId
+      ? this.conversationRepository.get_conversation_by_id(conversationId).catch(error => {
+          const isConversationNotFound = error.type === z.conversation.ConversationError.TYPE.CONVERSATION_NOT_FOUND;
+          if (!isConversationNotFound) {
+            throw error;
           }
-        };
+        })
+      : Promise.resolve();
 
-        const _removeRedundantUser = userId => {
-          if (conversationEntity && conversationEntity.is_group()) {
+    return conversationPromise.then(conversationEntity => {
+      const _removeRedundantClient = (userId, clientId) => delete payload.recipients[userId][clientId];
+
+      const _removeRedundantUser = userId => {
+        const clientIdsOfUser = Object.keys(payload.recipients[userId]);
+        const noRemainingClients = !clientIdsOfUser.length;
+
+        if (noRemainingClients) {
+          const isGroupConversation = conversationEntity && conversationEntity.is_group();
+          if (isGroupConversation) {
             const timeOffset = this.conversationRepository.timeOffset;
             const event = z.conversation.EventBuilder.buildMemberLeave(conversationEntity, userId, false, timeOffset);
 
             amplify.publish(z.event.WebApp.EVENT.INJECT, event);
           }
 
-          if (payload && !Object.keys(payload.recipients[userId]).length) {
-            return delete payload.recipients[userId];
-          }
-        };
+          delete payload.recipients[userId];
+        }
+      };
 
-        return Promise.all(this._mapRecipients(recipients, _removeRedundantClient, _removeRedundantUser)).then(() => {
-          if (conversationEntity) {
-            this.conversationRepository.update_participating_user_ets(conversationEntity);
-          }
+      return Promise.all(this._mapRecipients(recipients, _removeRedundantClient, _removeRedundantUser)).then(() => {
+        if (conversationEntity) {
+          this.conversationRepository.updateParticipatingUserEntities(conversationEntity);
+        }
 
-          return payload;
-        });
+        return payload;
       });
+    });
   }
 
   /**

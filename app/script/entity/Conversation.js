@@ -202,12 +202,9 @@ z.entity.Conversation = class Conversation {
           return this.name();
         }
 
-        const [user_et] = this.participating_user_ets();
-        if (user_et && user_et.name) {
-          return user_et.name();
-        }
-
-        return '…';
+        const [userEntity] = this.participating_user_ets();
+        const hasUser = userEntity && userEntity.name();
+        return hasUser ? userEntity.name() : '…';
       }
 
       if (this.is_group()) {
@@ -215,27 +212,28 @@ z.entity.Conversation = class Conversation {
           return this.name();
         }
 
-        if (this.participating_user_ets().length > 0) {
+        const hasUserEntities = !!this.participating_user_ets().length;
+        if (hasUserEntities) {
           const isJustBots = this.participating_user_ets().every(user_et => user_et.isBot);
-          return this.participating_user_ets()
+          const joinedNames = this.participating_user_ets()
             .filter(user_et => isJustBots || !user_et.isBot)
             .map(user_et => user_et.first_name())
             .join(', ');
+
+          const maxLength = z.conversation.ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;
+          return z.util.StringUtil.truncate(joinedNames, maxLength, false);
         }
 
-        if (this.participating_user_ids().length === 0) {
+        const hasUserIds = !!this.participating_user_ids().length;
+        if (!hasUserIds) {
           return z.l10n.text(z.string.conversationsEmptyConversation);
         }
-
-        return '…';
       }
 
       return this.name() || '…';
     });
 
-    this.persist_state = _.debounce(() => {
-      amplify.publish(z.event.WebApp.CONVERSATION.PERSIST_STATE, this);
-    }, 100);
+    this.persist_state = _.debounce(() => amplify.publish(z.event.WebApp.CONVERSATION.PERSIST_STATE, this), 100);
   }
 
   subscribe_to_state_updates() {
@@ -588,24 +586,31 @@ z.entity.Conversation = class Conversation {
    * @returns {number} Count of pending uploads
    */
   get_number_of_pending_uploads() {
-    const pending_uploads = [];
+    const pendingUploads = [];
 
-    for (const message_et of this.messages()) {
-      if (
-        message_et.assets &&
-        message_et.assets()[0] &&
-        message_et.assets()[0].pending_upload &&
-        message_et.assets()[0].pending_upload()
-      ) {
-        pending_uploads.push(message_et);
+    for (const messageEntity of this.messages()) {
+      const [assetEntity] = (messageEntity.assets && messageEntity.assets()) || [];
+      const isPendingUpload = assetEntity && assetEntity.pending_upload && assetEntity.pending_upload();
+      if (isPendingUpload) {
+        pendingUploads.push(messageEntity);
       }
     }
 
-    return pending_uploads.length;
+    return pendingUploads.length;
   }
 
-  get_users_with_unverified_clients() {
-    return [this.self].concat(this.participating_user_ets()).filter(user_et => !user_et.is_verified());
+  updateGuests() {
+    this.getTemporaryGuests().forEach(userEntity => userEntity.checkGuestExpiration());
+  }
+
+  getTemporaryGuests() {
+    const userEntities = this.self ? this.participating_user_ets().concat(this.self) : this.participating_user_ets();
+    return userEntities.filter(userEntity => userEntity.isTemporaryGuest());
+  }
+
+  getUsersWithUnverifiedClients() {
+    const userEntities = this.self ? this.participating_user_ets().concat(this.self) : this.participating_user_ets();
+    return userEntities.filter(userEntity => !userEntity.is_verified());
   }
 
   /**

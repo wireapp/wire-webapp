@@ -19,16 +19,27 @@
 
 import jQuery from 'jquery';
 import {amplify} from '@bower_components/amplify';
+import bazinga64 from 'bazinga64';
 import platform from 'platform';
 import '../event/WebApp';
 
 window.amplify = amplify;
+window.bazinga64 = bazinga64;
 window.platform = platform;
 window.jQuery = jQuery;
 window.$ = jQuery;
 
+import '../config';
+import '../service/BackendEnvironment';
+import '../util/util';
 // Adding "window.z.util.Environment" which is required by "wire-desktop"
 import '../util/Environment';
+import '../util/URLUtil';
+import '../tracking/SuperProperty';
+import '../event/Client';
+import '../message/MessageCategorization';
+import '../message/MessageCategory';
+import '../storage/StorageSchemata';
 
 // Expose wire object in global namespace to satisfy wrapper check
 const configureEnvironment = () => (window.wire = {});

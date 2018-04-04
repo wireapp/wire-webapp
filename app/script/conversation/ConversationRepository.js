@@ -409,7 +409,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         if (!conversationEntity.hasCreationMessage && !isCreationMessage) {
           conversationEntity.creatingFirstMessage = true;
           const creationEvent = conversationEntity.is_group()
-            ? z.conversation.EventBuilder.buildGroupCreation(conversationEntity)
+            ? z.conversation.EventBuilder.buildGroupCreation(conversationEntity, this.selfUser().isTemporaryGuest())
             : z.conversation.EventBuilder.build1to1Creation(conversationEntity);
 
           amplify.publish(z.event.WebApp.EVENT.INJECT, creationEvent);
@@ -558,7 +558,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   update_conversations_offline() {
     this.logger.info('Updating group participants offline');
-    this.sorted_conversations().map(conversation_et => this.update_participating_user_ets(conversation_et, true));
+    this.sorted_conversations().map(conversation_et => this.updateParticipatingUserEntities(conversation_et, true));
   }
 
   /**
@@ -787,7 +787,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return this.fetch_conversation_by_id(user_et.connection().conversation_id)
       .then(conversation_et => {
         conversation_et.connection(user_et.connection());
-        return this.update_participating_user_ets(conversation_et);
+        return this.updateParticipatingUserEntities(conversation_et);
       })
       .catch(error => {
         const isConversationNotFound = error.type === z.conversation.ConversationError.TYPE.CONVERSATION_NOT_FOUND;
@@ -847,7 +847,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   joinConversationWithCode(key, code) {
-    return this.conversation_service.postConversationJoin(key, code).then(response => this._onCreate(response));
+    return this.conversation_service.postConversationJoin(key, code).then(response => {
+      if (response) {
+        return this._onCreate(response);
+      }
+    });
   }
 
   /**
@@ -881,7 +885,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           conversation_et.type(z.conversation.ConversationType.ONE2ONE);
         }
 
-        this.update_participating_user_ets(conversation_et).then(updated_conversation_et => {
+        this.updateParticipatingUserEntities(conversation_et).then(updated_conversation_et => {
           if (show_conversation) {
             amplify.publish(z.event.WebApp.CONVERSATION.SHOW, updated_conversation_et);
           }
@@ -1025,15 +1029,24 @@ z.conversation.ConversationRepository = class ConversationRepository {
   /**
    * Update participating users in a conversation.
    *
-   * @param {Conversation} conversation_et - Conversation to be updated
+   * @param {Conversation} conversationEntity - Conversation to be updated
    * @param {boolean} [offline=false] - Should we only look for cached contacts
+   * @param {boolean} [updateGuests=false] - Update conversation guests
    * @returns {Promise} Resolves when users have been updated
    */
-  update_participating_user_ets(conversation_et, offline = false) {
-    return this.user_repository.get_users_by_id(conversation_et.participating_user_ids(), offline).then(user_ets => {
-      conversation_et.participating_user_ets(user_ets);
-      return conversation_et;
-    });
+  updateParticipatingUserEntities(conversationEntity, offline = false, updateGuests = false) {
+    return this.user_repository
+      .get_users_by_id(conversationEntity.participating_user_ids(), offline)
+      .then(userEntities => {
+        userEntities.sort((userA, userB) => z.util.StringUtil.sortByPriority(userA.first_name(), userB.first_name()));
+        conversationEntity.participating_user_ets(userEntities);
+
+        if (updateGuests) {
+          conversationEntity.updateGuests();
+        }
+
+        return conversationEntity;
+      });
   }
 
   //##############################################################################
@@ -2224,7 +2237,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return this.conversation_service
       .post_encrypted_message(conversationId, payload, preconditionOption)
       .then(response => {
-        this.clientMismatchHandler.onClientMismatch(response, conversationId);
+        this.clientMismatchHandler.onClientMismatch(response, genericMessage, payload, conversationId);
         return response;
       })
       .catch(error => {
@@ -2239,7 +2252,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
         let updatedPayload;
         return this.clientMismatchHandler
-          .onClientMismatch(error, conversationId, genericMessage, payload)
+          .onClientMismatch(error, genericMessage, payload, conversationId)
           .then(payloadWithMissingClients => {
             updatedPayload = payloadWithMissingClients;
 
@@ -2280,7 +2293,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         let sendAnyway = false;
 
         if (!userIds) {
-          userIds = conversationEntity.get_users_with_unverified_clients().map(userEntity => userEntity.id);
+          userIds = conversationEntity.getUsersWithUnverifiedClients().map(userEntity => userEntity.id);
         }
 
         return this.user_repository
@@ -2968,13 +2981,13 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
         throw error;
       })
-      .then(conversationEntity => this.update_participating_user_ets(conversationEntity))
+      .then(conversationEntity => this.updateParticipatingUserEntities(conversationEntity))
       .then(conversationEntity => this.save_conversation(conversationEntity))
       .then(conversationEntity => {
         if (conversationEntity) {
           conversationEntity.hasCreationMessage = true;
-          const creationEvent = z.conversation.EventBuilder.buildGroupCreation(conversationEntity, initialTimestamp);
-          amplify.publish(z.event.WebApp.EVENT.INJECT, creationEvent, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
+          const event = z.conversation.EventBuilder.buildGroupCreation(conversationEntity, false, initialTimestamp);
+          amplify.publish(z.event.WebApp.EVENT.INJECT, event, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
           this.verification_state_handler.onConversationCreate(conversationEntity);
           return {conversationEntity};
         }
@@ -3043,7 +3056,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       conversationEntity.status(z.conversation.ConversationStatus.CURRENT_MEMBER);
     }
 
-    return this.update_participating_user_ets(conversationEntity)
+    return this.updateParticipatingUserEntities(conversationEntity, false, true)
       .then(() => this._add_event_to_conversation(eventJson, conversationEntity))
       .then(messageEntity => {
         this.verification_state_handler.onMemberJoined(conversationEntity, eventData.user_ids);
@@ -3072,6 +3085,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
         const reason = z.calling.enum.TERMINATION_REASON.MEMBER_LEAVE;
         amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, conversationEntity.id, reason);
       }
+
+      if (this.selfUser().isTemporaryGuest()) {
+        eventJson.from = this.selfUser().id;
+      }
     }
 
     if (!selfLeavingClearedConversation) {
@@ -3083,12 +3100,16 @@ z.conversation.ConversationRepository = class ConversationRepository {
             .forEach(userEntity => {
               conversationEntity.participating_user_ids.remove(userEntity.id);
 
+              if (userEntity.isTemporaryGuest()) {
+                userEntity.clearExpirationTimeout();
+              }
+
               if (conversationEntity.call()) {
                 amplify.publish(z.event.WebApp.CALL.STATE.REMOVE_PARTICIPANT, conversationEntity.id, userEntity.id);
               }
             });
 
-          return this.update_participating_user_ets(conversationEntity).then(() => messageEntity);
+          return this.updateParticipatingUserEntities(conversationEntity).then(() => messageEntity);
         })
         .then(messageEntity => {
           this.verification_state_handler.onMemberLeft(conversationEntity);
@@ -3438,7 +3459,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   _fetch_users_and_events(conversation_et) {
     if (!conversation_et.is_loaded() && !conversation_et.is_pending()) {
-      this.update_participating_user_ets(conversation_et);
+      this.updateParticipatingUserEntities(conversation_et);
       this._get_unread_events(conversation_et);
     }
   }
@@ -3481,6 +3502,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
       if (messageEntity.is_member() || messageEntity.userEntities) {
         return this.user_repository.get_users_by_id(messageEntity.userIds()).then(userEntities => {
+          userEntities.sort((userA, userB) => z.util.StringUtil.sortByPriority(userA.first_name(), userB.first_name()));
           messageEntity.userEntities(userEntities);
           return messageEntity;
         });

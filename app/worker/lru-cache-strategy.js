@@ -23,16 +23,16 @@
   function cacheRequest(cache, request, response) {
     return cache
       .put(stripSearchParameters(request.url), response.clone())
-      .catch(error => console.warn(`Failed to cache asset: ${error.message}`))
+      .catch(error => console.warn(`Failed to cache asset: ${error.message}`)) // eslint-disable-line
       .then(() => response);
   }
 
   function cacheRequestLRU(cache, request, response, maxEntries = 100) {
     return cache.keys().then(keys => {
-      if (keys.length < maxEntries) {
-        return cacheRequest(cache, request, response);
-      }
-      return cache.delete(keys[0]).then(() => cacheRequest(cache, request, response));
+      const cacheExceedsLimit = keys.length >= maxEntries;
+      return cacheExceedsLimit
+        ? cache.delete(keys[0]).then(() => cacheRequest(cache, request, response))
+        : cacheRequest(cache, request, response);
     });
   }
 
@@ -45,14 +45,13 @@
   global.cacheLRU = function(request, values, options) {
     return global.caches.open(options.cache.name).then(cache => {
       return cache.match(stripSearchParameters(request.url)).then(response => {
-        if (response) {
-          return cacheRequest(cache, request, response);
-        }
-        return global.fetch(request).then(response => {
-          if (response.ok) {
-            return cacheRequestLRU(cache, request, response, options.cache.maxEntries);
-          }
-        });
+        return response
+          ? cacheRequest(cache, request, response)
+          : global.fetch(request).then(_response => {
+              if (_response.ok) {
+                return cacheRequestLRU(cache, request, _response, options.cache.maxEntries);
+              }
+            });
       });
     });
   };

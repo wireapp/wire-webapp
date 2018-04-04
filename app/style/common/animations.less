@@ -18,17 +18,17 @@
  */
 
 .start-ui-transition-fadein {
-  transition: all @animation-timing-slow @ease-out-expo @animation-timing-fast;
-  transform: translateY(0);
   opacity: 1;
   pointer-events: auto;
+  transform: translateY(0);
+  transition: all @animation-timing-slow @ease-out-expo @animation-timing-fast;
 }
 
 .start-ui-transition-fadeout {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(@start-ui-search-bar-offset);
   transition-delay: 0s;
   transition-duration: @animation-timing-fast;
   transition-timing-function: @ease-in-expo;
-  transform: translateY(@start-ui-search-bar-offset);
-  opacity: 0;
-  pointer-events: none;
 }

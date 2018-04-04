@@ -19,6 +19,7 @@
 
 #start-ui {
   .left-list-container;
+
   z-index: 1;
 
   &.left-list-is-visible {
@@ -38,8 +39,8 @@
 }
 
 .start-ui-header {
-  background-color: rgba(255, 255, 255, 0.08);
   padding: 8px;
+  background-color: rgba(255, 255, 255, 0.08);
   &.start-ui-header-integrations {
     padding-bottom: 0;
     margin-bottom: -1px;
@@ -59,23 +60,21 @@
 
 .start-ui-list-wrapper {
   display: flex;
-  flex-direction: column;
-  flex: 1 1;
   overflow: hidden;
+  flex: 1 1;
+  flex-direction: column;
 }
 
 .start-ui-list {
-  flex: 1 1;
   position: relative;
-  overflow-y: scroll;
+  flex: 1 1;
   overflow-x: hidden;
+  overflow-y: scroll;
 }
 
 .start-ui-list-spinner {
   .full-screen;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  .flex-center;
 
   .icon-spinner {
     font-size: @font-size-xl;
@@ -88,22 +87,21 @@
   padding: 0 8px;
 
   .start-ui-list-tab {
-    display: flex;
-    align-items: center;
+    .flex-center;
+
     flex-grow: 1;
-    justify-content: center;
     border-bottom: 1px solid transparent;
-    opacity: 0.56;
     color: #fff;
     cursor: pointer;
-    font-weight: 600;
     font-size: 11px;
+    font-weight: 600;
+    opacity: 0.56;
     text-transform: uppercase;
 
     &.active {
       border-bottom-color: #fff;
-      opacity: 1;
       cursor: default;
+      opacity: 1;
     }
   }
 }
@@ -112,9 +110,9 @@
 .start-ui-create-guest-room,
 .start-ui-invite-people {
   position: relative;
+  overflow: hidden;
   padding: 0;
   margin: 0;
-  overflow: hidden;
   .left-list-item {
     height: 56px;
     min-height: 56px;
@@ -147,19 +145,20 @@
 
 .start-ui-no-contacts,
 .start-ui-no-search-results {
-  text-align: center;
-  line-height: 24px;
   margin-top: 40px;
   margin-bottom: 16px;
+  line-height: 24px;
+  text-align: center;
   white-space: pre;
 }
 
 .start-ui-list-header {
-  .label-bold-xs();
+  .label-bold-xs;
+
   display: block;
-  line-height: 24px;
-  margin-left: 16px;
   margin-top: 24px;
+  margin-left: 16px;
+  line-height: 24px;
 }
 
 .start-ui-list-header-connections,
@@ -169,13 +168,14 @@
 }
 
 .start-ui-import {
-  .accent-background-color();
+  .accent-background-color;
+
+  display: flex;
+  height: @conversation-input-min-height;
+  flex: 0 0 auto;
   align-items: center;
   cursor: pointer;
-  display: flex;
-  flex: 0 0 auto;
   line-height: @conversation-input-min-height;
-  height: @conversation-input-min-height;
 }
 
 .start-ui-import-icon {
@@ -185,12 +185,13 @@
 .start-ui-user-bubble {
   user-profile,
   .start-ui-service {
-    .bubble-content();
+    .bubble-content;
+
+    position: relative;
+    margin: -@bubble-border-radius;
     background: #fff;
     border-radius: 4px;
     color: @graphite-dark;
-    margin: -@bubble-border-radius;
-    position: relative;
   }
 
   .start-ui-service-body {
@@ -198,22 +199,23 @@
     flex-basis: 104px;
     flex-direction: column;
     flex-grow: 1;
-    border-radius: 4px;
     padding: 16px;
     background-color: @app-bg;
+    border-radius: 4px;
   }
 
   .start-ui-service-button {
-    .button();
+    .button;
+
     width: 100%;
     height: 48px;
   }
 
   .start-ui-service-conversations {
-    flex-grow: 1;
-    flex-basis: 336px;
     display: flex;
+    flex-basis: 336px;
     flex-direction: column;
+    flex-grow: 1;
     border-radius: 4px;
 
     .start-ui-service-conversations-input {
@@ -222,8 +224,8 @@
 
     .start-ui-service-conversations-create {
       display: flex;
-      align-items: center;
       height: 56px;
+      align-items: center;
       cursor: pointer;
 
       .icon-plus {
@@ -251,15 +253,15 @@
   }
 
   .start-ui-service-description {
-    font-size: 14px;
-    margin-top: 16px;
     padding: 8px;
+    margin-top: 16px;
+    font-size: 14px;
   }
 
   .start-ui-service-header {
+    display: flex;
     flex-basis: 48px;
     padding: 16px;
-    display: flex;
   }
 
   .start-ui-service-footer {
@@ -268,8 +270,8 @@
 
   .start-ui-service-name {
     font-size: 24px;
-    line-height: 32px;
     font-weight: @font-weight-regular;
+    line-height: 32px;
   }
 
   .start-ui-service-provider {
@@ -282,10 +284,10 @@
   &.start-ui-service-bubble.bubble-left-top,
   &.start-ui-service-bubble.bubble-left,
   &.start-ui-service-bubble-conversation-list.bubble-left-top {
-    &:before {
+    &::before {
       background-color: @app-bg;
     }
-    &:after {
+    &::after {
       background: linear-gradient(-45deg, @app-bg 0%, @app-bg 50%, transparent 50%, transparent 100%);
     }
   }
@@ -295,39 +297,39 @@
   display: flex;
   height: 100%;
   align-items: center;
-  margin-left: 24px;
   margin-right: 24px;
+  margin-left: 24px;
 }
 
 .start-ui-import-headline {
-  font-size: @font-size-lg;
-  font-weight: normal;
   margin-top: 24px;
   margin-bottom: 24px;
+  font-size: @font-size-lg;
+  font-weight: normal;
 }
 
 .start-ui-import-buttons {
-  cursor: pointer;
   display: flex;
   align-items: center;
   margin-bottom: 8px;
+  cursor: pointer;
 }
 
 .start-ui-import-buttons-icon {
-  background-color: #fff;
-  border: 1px solid rgba(141, 152, 159, 0.16);
-  border-radius: 4px;
-  color: @graphite-dark;
   display: inline-block;
-  margin-right: 16px;
   width: 24px;
   height: 24px;
   padding: 3px;
+  border: 1px solid rgba(141, 152, 159, 0.16);
+  margin-right: 16px;
+  background-color: #fff;
+  border-radius: 4px;
+  color: @graphite-dark;
 }
 
 .start-ui-import-detail {
+  margin-top: 16px;
+  margin-bottom: 16px;
   font-size: @font-size-xs;
   line-height: @line-height-sm;
-  margin-bottom: 16px;
-  margin-top: 16px;
 }

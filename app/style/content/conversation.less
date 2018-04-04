@@ -43,22 +43,22 @@
 
 .conversation {
   .full-screen;
+
   display: flex;
   flex-direction: column;
 }
 
 .conversation-loading {
   .full-screen;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  animation-name: loading-spinner-fade-in;
-  animation-duration: 1s;
+  .flex-center;
+
   max-width: @conversation-max-width;
+  animation-duration: 1s;
+  animation-name: loading-spinner-fade-in;
 }
 
 .content-animation-incoming {
-  animation-name: content-incoming;
   animation-duration: @animation-timing-slow;
+  animation-name: content-incoming;
   animation-timing-function: @ease-out-expo;
 }

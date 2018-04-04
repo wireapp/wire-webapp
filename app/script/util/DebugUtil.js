@@ -49,11 +49,8 @@ z.util.DebugUtil = class DebugUtil {
           version: 'broken_by_qa',
         };
 
-        return wire.app.repository.storage.storageService.save(
-          z.storage.StorageService.OBJECT_STORE.SESSIONS,
-          sessionId,
-          record
-        );
+        const sessionStoreName = z.storage.StorageSchemata.OBJECT_STORE.SESSIONS;
+        return wire.app.repository.storage.storageService.save(sessionStoreName, sessionId, record);
       })
       .then(() => this.logger.log(`Corrupted Session ID '${sessionId}'`));
   }

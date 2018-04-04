@@ -155,9 +155,7 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
   leaveConversation(conversationEntity) {
     if (conversationEntity) {
       amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
-        action: () => {
-          this.conversationRepository.removeMember(conversationEntity, this.userRepository.self().id);
-        },
+        action: () => this.conversationRepository.removeMember(conversationEntity, this.userRepository.self().id),
         text: {
           action: z.l10n.text(z.string.modalConversationLeaveAction),
           message: z.l10n.text(z.string.modalConversationLeaveMessage),
@@ -234,7 +232,9 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
           this.userRepository
             .unblockUser(userEntity, showConversation)
             .then(() => this.conversationRepository.get_1to1_conversation(userEntity))
-            .then(conversationEntity => this.conversationRepository.update_participating_user_ets(conversationEntity));
+            .then(conversationEntity => {
+              return this.conversationRepository.updateParticipatingUserEntities(conversationEntity);
+            });
         },
         text: {
           action: z.l10n.text(z.string.modalUserUnblockAction),

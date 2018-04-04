@@ -151,8 +151,8 @@
         <div class="warning-bar warning-bar-connection bg-theme">
           <div class="warning-bar-message">
             <span data-bind="l10n_text: z.string.warningLifecycleUpdate"></span>&nbsp;
-            <a class="warning-bar-link" href="https://medium.com/wire-news/desktop-updates" data-bind="l10n_text: z.string.warningLifecycleUpdateNotes" rel="nofollow noopener noreferrer" target="_blank"></a>&nbsp;·&nbsp;
-            <a class="warning-bar-link" data-bind="click: function(){amplify.publish(z.event.WebApp.LIFECYCLE.REFRESH)}, l10n_text: z.string.warningLifecycleUpdateLink" rel="nofollow noopener noreferrer" target="_blank"></a>
+            <a class="warning-bar-link" href="https://medium.com/wire-news/desktop-updates" data-bind="l10n_text: z.string.warningLifecycleUpdateNotes" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="go-whats-new"></a>&nbsp;·&nbsp;
+            <a class="warning-bar-link" data-bind="click: function(){amplify.publish(z.event.WebApp.LIFECYCLE.REFRESH)}, l10n_text: z.string.warningLifecycleUpdateLink" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="do-update"></a>
           </div>
         </div>
       <!-- /ko -->

@@ -36,19 +36,20 @@
 // Buttons
 .media-button {
   .circle(@media-button-size);
+
+  position: relative;
+  flex: 0 0 auto;
   background-color: fade(#000, 40%);
   color: #fff;
   cursor: pointer;
-  flex: 0 0 auto;
   font-size: @font-size-sm;
   line-height: @media-button-size;
   text-align: center;
-  position: relative;
 
   & svg {
     position: absolute;
-    left: 0;
     top: 0;
+    left: 0;
     border-radius: 50%;
     transform: rotate(-90deg);
   }
@@ -62,11 +63,13 @@
 
   .media-button-border-fill {
     .full-screen;
+
     border: 2px solid fade(#fff, 40%);
     border-radius: 50%;
 
     &::before {
       .full-screen;
+
       border: 1px solid #fff;
       border-radius: 50%;
       content: '';
@@ -85,6 +88,7 @@
 
   .media-button-lg & {
     .circle(@media-button-size-lg);
+
     font-size: @font-size-xl;
     line-height: @media-button-size-lg;
 

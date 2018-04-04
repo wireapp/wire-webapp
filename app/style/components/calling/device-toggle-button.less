@@ -18,11 +18,11 @@
  */
 
 device-toggle-button {
+  display: inline-flex;
+  flex-direction: column;
   align-items: center;
   color: #fff;
   cursor: pointer;
-  display: inline-flex;
-  flex-direction: column;
 }
 
 .device-toggle-button-dark {
@@ -40,6 +40,7 @@ device-toggle-button {
 
 .device-toggle-button-indicator-dot {
   .dot-xs;
+
   background-color: fade(@graphite, 24%);
 
   &:not(:last-child) {
