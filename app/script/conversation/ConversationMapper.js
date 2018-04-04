@@ -269,7 +269,8 @@ z.conversation.ConversationMapper = class ConversationMapper {
     const isTeamConversation = conversationEntity && conversationEntity.team_id;
     if (isTeamConversation) {
       if (z.util.Environment.frontend.isInternal()) {
-        const accessLink = `${z.config.URL.WEBAPP.INTERNAL}/join/?key=${accessCode.key}&code=${accessCode.code}`;
+        const {code, key} = accessCode;
+        const accessLink = `${z.config.URL.WEBAPP.INTERNAL}/join/?key=${key}&code=${code}`;
         return conversationEntity.accessCode(accessLink);
       }
 
