@@ -392,9 +392,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
       if (!hasAdditionalMessages) {
         const firstMessage = conversationEntity.getFirstMessage();
-        let isCreationMessage = firstMessage && firstMessage.is_member() && firstMessage.isCreation();
-
-        if (conversationEntity.hasCreationMessage && isCreationMessage) {
+        const checkCreationMessage = firstMessage && firstMessage.is_member() && firstMessage.isCreation();
+        if (checkCreationMessage) {
           const groupCreationMessageIn1to1 = conversationEntity.is_one2one() && firstMessage.isGroupCreation();
           const one2oneConnectionMessageInGroup = conversationEntity.is_group() && firstMessage.isConnection();
           const wrongMessageTypeForConversation = groupCreationMessageIn1to1 || one2oneConnectionMessageInGroup;
@@ -402,22 +401,28 @@ z.conversation.ConversationRepository = class ConversationRepository {
           if (wrongMessageTypeForConversation) {
             this.delete_message(conversationEntity, firstMessage);
             conversationEntity.hasCreationMessage = false;
-            isCreationMessage = false;
+          } else {
+            conversationEntity.hasCreationMessage = true;
           }
         }
 
-        if (!conversationEntity.hasCreationMessage && !isCreationMessage) {
-          conversationEntity.creatingFirstMessage = true;
-          const creationEvent = conversationEntity.is_group()
-            ? z.conversation.EventBuilder.buildGroupCreation(conversationEntity, this.selfUser().isTemporaryGuest())
-            : z.conversation.EventBuilder.build1to1Creation(conversationEntity);
-
-          amplify.publish(z.event.WebApp.EVENT.INJECT, creationEvent);
+        const addCreationMessage = !conversationEntity.hasCreationMessage;
+        if (addCreationMessage) {
+          this._addCreationMessage(conversationEntity, this.selfUser().isTemporaryGuest());
         }
       }
 
       return mappedMessageEntities;
     });
+  }
+
+  _addCreationMessage(conversationEntity, isTemporaryGuest, timestamp) {
+    conversationEntity.hasCreationMessage = true;
+    const creationEvent = conversationEntity.is_group()
+      ? z.conversation.EventBuilder.buildGroupCreation(conversationEntity, isTemporaryGuest, timestamp)
+      : z.conversation.EventBuilder.build1to1Creation(conversationEntity);
+
+    amplify.publish(z.event.WebApp.EVENT.INJECT, creationEvent);
   }
 
   /**
@@ -2985,9 +2990,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .then(conversationEntity => this.save_conversation(conversationEntity))
       .then(conversationEntity => {
         if (conversationEntity) {
-          conversationEntity.hasCreationMessage = true;
-          const event = z.conversation.EventBuilder.buildGroupCreation(conversationEntity, false, initialTimestamp);
-          amplify.publish(z.event.WebApp.EVENT.INJECT, event, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
+          this._addCreationMessage(conversationEntity, false, initialTimestamp);
           this.verification_state_handler.onConversationCreate(conversationEntity);
           return {conversationEntity};
         }

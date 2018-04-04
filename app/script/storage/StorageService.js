@@ -73,11 +73,13 @@ z.storage.StorageService = class StorageService {
   _upgradeStores() {
     z.storage.StorageSchemata.SCHEMATA.forEach(({schema, upgrade, version}) => {
       if (upgrade) {
-        this.logger.warn(`Database upgrade to version '${version}'`);
         return this.db
           .version(version)
           .stores(schema)
-          .upgrade(transaction => upgrade(transaction, this.db));
+          .upgrade(transaction => {
+            this.logger.warn(`Database upgrade to version '${version}'`);
+            upgrade(transaction, this.db);
+          });
       }
 
       this.db.version(version).stores(schema);
