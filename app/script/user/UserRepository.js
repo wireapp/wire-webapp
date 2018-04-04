@@ -1031,17 +1031,17 @@ z.user.UserRepository = class UserRepository {
   change_picture(picture) {
     return this.asset_service
       .uploadProfileImage(picture)
-      .then(([small_key, medium_key]) => {
+      .then(({previewImageKey, mediumImageKey}) => {
         const assets = [
-          {key: small_key, size: 'preview', type: 'image'},
-          {key: medium_key, size: 'complete', type: 'image'},
+          {key: previewImageKey, size: 'preview', type: 'image'},
+          {key: mediumImageKey, size: 'complete', type: 'image'},
         ];
         return this.user_service
           .update_own_user_profile({assets})
           .then(() => this.user_update({user: {assets: assets, id: this.self().id}}));
       })
       .catch(error => {
-        throw new Error(`Error during profile image upload: ${error.message || error}`);
+        throw new Error(`Error during profile image upload: ${error.message || error.code || error}`);
       });
   }
 
