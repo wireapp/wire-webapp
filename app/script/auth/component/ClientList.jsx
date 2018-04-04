@@ -21,6 +21,7 @@ import {ContainerXS, Loading} from '@wireapp/react-ui-kit';
 import {injectIntl} from 'react-intl';
 import React from 'react';
 import * as ClientAction from '../module/action/ClientAction';
+import {resetError} from '../module/action/creator/ClientActionCreator';
 import * as LocalStorageAction from '../module/action/LocalStorageAction';
 import ClientItem from '../component/ClientItem';
 import * as ClientSelector from '../module/selector/ClientSelector';
@@ -49,6 +50,7 @@ class ClientList extends React.Component {
     const isSelectedClient = this.state.currentlySelectedClient === clientId;
     clientId = isSelectedClient ? null : clientId;
     this.setState({...this.state, currentlySelectedClient: clientId});
+    this.props.resetError();
   };
 
   removeClient = (clientId, password) => {
@@ -112,7 +114,7 @@ export default withRouter(
         isFetching: ClientSelector.isFetching(state),
         permanentClients: ClientSelector.getPermanentClients(state),
       }),
-      {...ClientAction, ...LocalStorageAction}
+      {...ClientAction, ...LocalStorageAction, resetError}
     )(ClientList)
   )
 );
