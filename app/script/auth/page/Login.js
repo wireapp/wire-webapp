@@ -253,11 +253,6 @@ class Login extends React.PureComponent {
                       value={email}
                       autoComplete="section-login email"
                       placeholder={_(loginStrings.emailPlaceholder)}
-                      onKeyDown={event => {
-                        if (event.key === 'Enter') {
-                          this.inputs.password.focus();
-                        }
-                      }}
                       maxLength="128"
                       type="text"
                       required
