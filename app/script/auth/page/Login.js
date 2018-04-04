@@ -168,11 +168,17 @@ class Login extends React.PureComponent {
         switch (error.label) {
           case BackendError.LABEL.NEW_CLIENT: {
             this.props.resetError();
+            /**
+             * Show history screen if:
+             *   1. database contains at least one event
+             *   2. there is at least one previously registered client
+             *   3. new local client is temporary
+             */
             return this.props.doGetAllClients().then(clients => {
-              const isFirstPersistentClient = this.state.persist && clients.length === 1;
-              return isFirstPersistentClient
-                ? window.location.replace(URLUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP))
-                : this.props.history.push(ROUTE.HISTORY_INFO);
+              const shouldShowHistoryInfo = this.props.hasHistory || clients.length > 1 || !this.state.persist;
+              return shouldShowHistoryInfo
+                ? this.props.history.push(ROUTE.HISTORY_INFO)
+                : window.location.replace(URLUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP));
             });
           }
           case BackendError.LABEL.TOO_MANY_CLIENTS: {
@@ -338,6 +344,7 @@ export default withRouter(
     connect(
       state => ({
         clients: ClientSelector.getClients(state),
+        hasHistory: ClientSelector.hasHistory(state),
         isFetching: AuthSelector.isFetching(state),
         loginError: AuthSelector.getError(state),
       }),

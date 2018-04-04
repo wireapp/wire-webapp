@@ -89,7 +89,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
     this.pending_server_request = ko.observable(false);
     this.disabled_by_animation = ko.observable(false);
 
-    this.device_reused = ko.observable(false);
+    this.deviceReused = ko.observable(false);
 
     this.country_code = ko.observable('');
     this.country = ko.observable('');
@@ -1596,7 +1596,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
    * @private
    * @returns {Promise<boolean>} Resolves with whether at least one conversation event was found
    */
-  _has_local_history() {
+  _hasLocalHistory() {
     const eventStoreName = z.storage.StorageSchemata.OBJECT_STORE.EVENTS;
     return this.storageService.getAll(eventStoreName).then(events => events.length > 0);
   }
@@ -1611,49 +1611,51 @@ z.viewModel.AuthViewModel = class AuthViewModel {
     window.location.replace(redirect_url);
   }
 
-  _register_client(auto_login) {
+  _register_client(autoLogin) {
     return this.cryptography_repository
       .createCryptobox(this.storageService.db)
-      .then(() => this.client_repository.registerClient(auto_login ? undefined : this.password()))
-      .then(client_observable => {
-        this.event_repository.currentClient = client_observable;
-        return this.event_repository.setStreamState(client_observable().id, true);
+      .then(() => this.client_repository.registerClient(autoLogin ? undefined : this.password()))
+      .then(clientObservable => {
+        this.event_repository.currentClient = clientObservable;
+        return this.event_repository.setStreamState(clientObservable().id, true);
       })
       .catch(error => {
-        if (error.code === z.service.BackendClientError.STATUS_CODE.NOT_FOUND) {
+        const isNotFound = error.code === z.service.BackendClientError.STATUS_CODE.NOT_FOUND;
+        if (isNotFound) {
           return this.logger.warn(`Cannot set starting point on notification stream: ${error.message}`, error);
         }
         throw error;
       })
       .then(() => this.client_repository.getClientsForSelf())
-      .then(client_ets => {
-        const number_of_clients = client_ets ? client_ets.length : 0;
-        this.logger.info(`User has '${number_of_clients}' registered clients`, client_ets);
+      .then(clientEntities => {
+        const numberOfClients = clientEntities ? clientEntities.length : 0;
+        this.logger.info(`User has '${numberOfClients}' registered clients`, clientEntities);
 
-        // Show history screen if there are already registered clients
-        if (number_of_clients) {
-          return this._has_local_history().then(has_history => {
-            this.device_reused(has_history);
-            this._set_hash(z.auth.AuthView.MODE.HISTORY);
-          });
-        }
+        /**
+         * Show history screen if:
+         *   1. database contains at least one event
+         *   2. new local client is temporary
+         *   3. there is at least one previously registered client
+         */
+        return this._hasLocalHistory().then(hasHistory => {
+          const shouldShowHistoryInfo = hasHistory || !!numberOfClients || this.client_repository.isTemporaryClient();
+          if (shouldShowHistoryInfo) {
+            this.deviceReused(hasHistory);
+            return this._set_hash(z.auth.AuthView.MODE.HISTORY);
+          }
 
-        // Make sure client entities always see the history screen
-        if (this.client_repository.currentClient().isTemporary()) {
-          return this._set_hash(z.auth.AuthView.MODE.HISTORY);
-        }
-
-        // Don't show history screen if the webapp is the first client that has been registered
-        this._redirect_to_app();
+          this._redirect_to_app();
+        });
       })
       .catch(error => {
-        if (error.type === z.client.ClientError.TYPE.TOO_MANY_CLIENTS) {
+        const isTooManyClients = error.type === z.client.ClientError.TYPE.TOO_MANY_CLIENTS;
+        if (isTooManyClients) {
           this.logger.warn('User has already registered the maximum number of clients', error);
           return (window.location.hash = z.auth.AuthView.MODE.LIMIT);
         }
         this.logger.error(`Failed to register a new client: ${error.message}`, error);
 
-        if (auto_login) {
+        if (autoLogin) {
           window.location.hash = z.auth.AuthView.MODE.ACCOUNT_LOGIN;
         }
       });
