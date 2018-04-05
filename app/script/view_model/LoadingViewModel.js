@@ -57,7 +57,8 @@ z.viewModel.LoadingViewModel = class LoadingViewModel {
 
         case z.string.initDecryption:
         case z.string.initEvents: {
-          if (z.util.Environment.frontend.isProduction()) {
+          const hideDetails = z.util.Environment.frontend.isProduction() && !!z.util.Environment.frontend.isInternal();
+          if (hideDetails) {
             updatedLoadingMessage = z.l10n.text(messageLocator);
             break;
           }
