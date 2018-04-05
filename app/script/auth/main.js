@@ -44,6 +44,8 @@ const store = configureStore({
   mixpanel,
 });
 
+store.dispatch();
+
 const Wrapper = Component => (
   <AppContainer>
     <Provider store={store}>
