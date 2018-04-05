@@ -1427,7 +1427,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {undefined} No return value
    */
   _clear_conversation(conversation_et, timestamp) {
-    this._delete_messages(conversation_et, timestamp);
+    this._deleteMessages(conversation_et, timestamp);
 
     if (conversation_et.removed_from_conversation()) {
       this.conversation_service.delete_conversation_from_db(conversation_et.id);
@@ -3577,15 +3577,16 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Delete messages from UI and database.
    *
    * @private
-   * @param {Conversation} conversation_et - Conversation that contains the message
+   * @param {Conversation} conversationEntity - Conversation that contains the message
    * @param {number} [timestamp] - Timestamp as upper bound which messages to remove
    * @returns {undefined} No return value
    */
-  _delete_messages(conversation_et, timestamp) {
-    conversation_et.remove_messages(timestamp);
+  _deleteMessages(conversationEntity, timestamp) {
+    conversationEntity.remove_messages(timestamp);
+    conversationEntity.hasCreationMessage = false;
 
     const iso_date = timestamp ? new Date(timestamp).toISOString() : undefined;
-    this.conversation_service.delete_messages_from_db(conversation_et.id, iso_date);
+    this.conversation_service.delete_messages_from_db(conversationEntity.id, iso_date);
   }
 
   /**
