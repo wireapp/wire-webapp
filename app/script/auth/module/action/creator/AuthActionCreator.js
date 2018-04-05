@@ -51,6 +51,10 @@ export const REFRESH_START = 'REFRESH_START';
 export const REFRESH_SUCCESS = 'REFRESH_SUCCESS';
 export const REFRESH_FAILED = 'REFRESH_FAILED';
 
+export const VALIDATE_LOCAL_CLIENT_START = 'VALIDATE_LOCAL_CLIENT_START';
+export const VALIDATE_LOCAL_CLIENT_SUCCESS = 'VALIDATE_LOCAL_CLIENT_SUCCESS';
+export const VALIDATE_LOCAL_CLIENT_FAILED = 'VALIDATE_LOCAL_CLIENT_FAILED';
+
 export const GET_INVITATION_FROM_CODE_START = 'GET_INVITATION_FROM_CODE_START';
 export const GET_INVITATION_FROM_CODE_SUCCESS = 'GET_INVITATION_FROM_CODE_SUCCESS';
 export const GET_INVITATION_FROM_CODE_FAILED = 'GET_INVITATION_FROM_CODE_FAILED';
@@ -148,6 +152,19 @@ export const successfulRefresh = authData => ({
 export const failedRefresh = error => ({
   payload: BackendError.handle(error),
   type: REFRESH_FAILED,
+});
+
+export const startValidateLocalClient = () => ({
+  type: VALIDATE_LOCAL_CLIENT_START,
+});
+
+export const successfulValidateLocalClient = () => ({
+  type: VALIDATE_LOCAL_CLIENT_SUCCESS,
+});
+
+export const failedValidateLocalClient = error => ({
+  payload: error,
+  type: VALIDATE_LOCAL_CLIENT_FAILED,
 });
 
 export const startLogout = () => ({
