@@ -206,11 +206,8 @@ ko.components.register('undo-icon', {
 ko.components.register('verified-icon', {
   template: `
   <svg width="14" height="16" viewBox="0 0 14 16">
-    <path id="a" fill="#0079B6" d="M14 1.87V8c0 4-2.97 7.1-7 8-4-.9-7-4-7-8V2l7-2 7 1.87z"></path>
-    <mask id="b">
-      <use xlink:href="#a"/>
-    </mask>
-    <path fill="#0097F8" d="M-3-3H7v23H-3z" mask="url(#b)"></path>
+    <path fill="#0097F8" d="M14 1.9L7 0 0 2v6c0 4 3 7.1 7 8 4-.9 7-4 7-8V1.9z"></path>
+    <path fill="#0079B6" d="M14 1.9L7 0v16c4-.9 7-4 7-8V1.9z"></path>
   </svg>
   `,
 });
