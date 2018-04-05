@@ -206,8 +206,8 @@ ko.components.register('undo-icon', {
 ko.components.register('verified-icon', {
   template: `
   <svg width="14" height="16" viewBox="0 0 14 16">
-    <path fill="#0096F1" d="M14 1.9L7 0 0 2v6c0 4 3 7.1 7 8 4-.9 7-4 7-8V1.9z"></path>
-    <path fill="#1A78B1" d="M14 1.9L7 0v16c4-.9 7-4 7-8V1.9z"></path>
+    <path fill="#0097F8" d="M14 1.9L7 0 0 2v6c0 4 3 7.1 7 8 4-.9 7-4 7-8V1.9z"></path>
+    <path fill="#0079B6" d="M14 1.9L7 0v16c4-.9 7-4 7-8V1.9z"></path>
   </svg>
   `,
 });
