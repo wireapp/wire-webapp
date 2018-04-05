@@ -103,12 +103,14 @@ z.string.ru.modalConfirmSecondary = 'Отменить';
 z.string.ru.modalOptionSecondary = 'Отменить';
 
 z.string.ru.modalAccountCreateAction = 'OK';
+z.string.ru.modalAccountCreateHeadline = 'Создать аккаунт?';
 
 z.string.ru.modalAccountDeletionAction = 'Удалить';
 z.string.ru.modalAccountDeletionHeadline = 'Удалить аккаунт';
 z.string.ru.modalAccountDeletionMessage = 'Мы вышлем вам сообщение по электронной почте или SMS. Перейдите по ссылке, чтобы навсегда удалить свой аккаунт.';
 
 z.string.ru.modalAccountLeaveGuestRoomAction = 'Покинуть';
+z.string.ru.modalAccountLeaveGuestRoomHeadline = 'Покинуть гостевую комнату?';
 
 z.string.ru.modalAccountLogoutAction = 'Выход';
 z.string.ru.modalAccountLogoutHeadline = 'Удалить данные?';
@@ -212,6 +214,7 @@ z.string.ru.modalConversationRevokeLinkAction = 'Отменить ссылку';
 z.string.ru.modalConversationRevokeLinkHeadline = 'Оменить эту ссылку?';
 z.string.ru.modalConversationRevokeLinkMessage = 'Новые гости не смогут присоединиться по этой ссылке. На доступ текущих гостей это не повлияет.';
 
+z.string.ru.modalConversationGuestOptionsAllowGuestMessage = 'Не удалось активировать гостевой доступ. Попробуйте снова.';
 z.string.ru.modalConversationGuestOptionsDisableGuestMessage = 'Не удалось удалить гостей. Попробуйте снова.';
 z.string.ru.modalConversationGuestOptionsGetCodeMessage = 'Не удалось получить ссылку доступа.';
 z.string.ru.modalConversationGuestOptionsRequestCodeMessage = 'Не удалось запросить ссылку доступа. Пожалуйста, попробуйте еще раз.';
@@ -273,6 +276,7 @@ z.string.ru.conversationConnectionCancelRequest = 'Отменить запрос
 z.string.ru.conversationCreate = ' начал(а) разговор с {{users}}';
 z.string.ru.conversationCreateName = '{{user}} начал разговор';
 z.string.ru.conversationCreateNameYou = '{{user}} начал разговор';
+z.string.ru.conversationCreateTemporary = 'Вы присоединились к разговору';
 z.string.ru.conversationCreateWith = ' с {{users}}';
 z.string.ru.conversationCreateYou = ' начал(а) разговор с {{users}}';
 z.string.ru.conversationDeviceStartedUsingOne = ' начал(-а) использовать';
@@ -500,6 +504,7 @@ z.string.ru.preferencesAccountAvaibilityUnset = 'Установить стату
 z.string.ru.preferencesAccountCreateTeam = 'Создать команду';
 z.string.ru.preferencesAccountDelete = 'Удалить аккаунт';
 z.string.ru.preferencesAccountLeaveGuestRoom = 'Покинуть гостевую комнату';
+z.string.ru.preferencesAccountLeaveGuestRoomDescription = 'Вы больше не сможете получить доступ к сообщениям в этом разговоре.';
 z.string.ru.preferencesAccountLogOut = 'Выход';
 z.string.ru.preferencesAccountManageTeam = 'Управлять командой';
 z.string.ru.preferencesAccountResetPassword = 'Сбросить пароль';
@@ -555,6 +560,8 @@ z.string.ru.preferencesOptionsNotificationsNone = 'Выключен';
 z.string.ru.preferencesOptionsNotificationsObfuscate = 'Скрывать содержание сообщения';
 z.string.ru.preferencesOptionsNotificationsObfuscateMessage = 'Показывать имя отправителя';
 z.string.ru.preferencesOptionsNotificationsOn = 'Показывать имя отправителя и текст сообщения';
+z.string.ru.preferencesOptionsCallLogs = 'Устранение неполадок';
+z.string.ru.preferencesOptionsCallLogsDetail = 'Эта информация помогает отделу поддержки Wire диагностировать проблемы, связанные со звонками.';
 
 z.string.ru.searchConnect = 'Связаться';
 z.string.ru.searchConnections = 'Контакты';
@@ -588,6 +595,8 @@ z.string.ru.searchListEveryoneParticipates = 'Все ваши контакты \
 z.string.ru.searchListNoMatches = 'Совпадений не найдено.\nПопробуйте ввести другое имя.';
 
 z.string.ru.temporaryGuestCta = 'Создать аккаунт';
+
+z.string.ru.temporaryGuestLeaveMessage = ' больше не участвуете в этом разговоре.';
 
 z.string.ru.uploadGoogleHeadline = 'Найти людей,\nчтобы поговорить.';
 z.string.ru.uploadGoogleMessage = 'Мы используем ваши контактные данные, чтобы соединить вас с другими пользователями. Мы анонимизируем всю информацию и не делимся ей с кем-либо еще.';

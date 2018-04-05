@@ -43,6 +43,8 @@ z.client.ClientRepository = class ClientRepository {
     this.clients = ko.pureComputed(() => (this.selfUser() ? this.selfUser().devices() : []));
     this.currentClient = ko.observable();
 
+    this.isTemporaryClient = ko.pureComputed(() => this.currentClient() && this.currentClient().isTemporary());
+
     amplify.subscribe(z.event.WebApp.LIFECYCLE.ASK_TO_CLEAR_DATA, this.logoutClient.bind(this));
     amplify.subscribe(z.event.WebApp.USER.EVENT_FROM_BACKEND, this.onUserEvent.bind(this));
   }
@@ -457,8 +459,7 @@ z.client.ClientRepository = class ClientRepository {
 
   logoutClient() {
     if (this.currentClient()) {
-      const isTemporaryClient = this.currentClient().type === z.client.ClientType.TEMPORARY;
-      if (isTemporaryClient) {
+      if (this.isTemporaryClient()) {
         return this.deleteTemporaryClient().then(() =>
           amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SIGN_OUT_REASON.USER_REQUESTED, true)
         );

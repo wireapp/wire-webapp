@@ -40,13 +40,16 @@ z.assets.AssetService = class AssetService {
    */
   uploadProfileImage(image) {
     return Promise.all([this._compressProfileImage(image), this._compressImage(image)])
-      .then(([{compressedBytes: smallImageBytes}, {compressedBytes: mediumImageBytes}]) => {
+      .then(([{compressedBytes: previewImageBytes}, {compressedBytes: mediumImageBytes}]) => {
+        const assetUploadOptions = {public: true, retention: z.assets.AssetRetentionPolicy.ETERNAL};
         return Promise.all([
-          this.postAsset(smallImageBytes, {public: true, retention: z.assets.AssetRetentionPolicy.ETERNAL}),
-          this.postAsset(mediumImageBytes, {public: true, retention: z.assets.AssetRetentionPolicy.ETERNAL}),
+          this.postAsset(previewImageBytes, assetUploadOptions),
+          this.postAsset(mediumImageBytes, assetUploadOptions),
         ]);
       })
-      .then(([smallCredentials, mediumCredentials]) => [smallCredentials.key, mediumCredentials.key]);
+      .then(([previewCredentials, mediumCredentials]) => {
+        return {mediumImageKey: mediumCredentials.key, previewImageKey: previewCredentials.key};
+      });
   }
 
   /**
