@@ -276,6 +276,7 @@ z.string.et.conversationConnectionCancelRequest = 'Tühista ühendussoov';
 z.string.et.conversationCreate = ' alustas vestlust kasutajatega {{users}}';
 z.string.et.conversationCreateName = '{{user}} alustas vestlust';
 z.string.et.conversationCreateNameYou = '{{user}} alustas vestlust';
+z.string.et.conversationCreateTemporary = 'Sina liitusid vestlusega';
 z.string.et.conversationCreateWith = ' koos {{users}}';
 z.string.et.conversationCreateYou = ' alustas vestlust kasutajatega {{users}}';
 z.string.et.conversationDeviceStartedUsingOne = ' hakkas kasutama';

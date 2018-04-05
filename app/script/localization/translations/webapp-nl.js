@@ -508,6 +508,7 @@ z.string.nl.searchServiceConfirmButton = 'Service toevoegen';
 z.string.nl.searchListEveryoneParticipates = 'Iedereen met wie je contact hebt zit al in dit gesprek.';
 z.string.nl.searchListNoMatches = 'Geen overeenkomende resultaten.\nProbeer een andere gebruikersnaam.';
 
+z.string.nl.temporaryGuestCta = 'Een account aanmaken';
 
 z.string.nl.uploadGoogleHeadline = 'Zoek mensen \nom mee te praten.';
 z.string.nl.uploadGoogleMessage = 'Dit helpt je om met anderen te verbinden. We anonimiseren alle informatie en delen deze niet met iemand anders.';

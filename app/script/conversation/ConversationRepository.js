@@ -392,9 +392,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
       if (!hasAdditionalMessages) {
         const firstMessage = conversationEntity.getFirstMessage();
-        let isCreationMessage = firstMessage && firstMessage.is_member() && firstMessage.isCreation();
-
-        if (conversationEntity.hasCreationMessage && isCreationMessage) {
+        const checkCreationMessage = firstMessage && firstMessage.is_member() && firstMessage.isCreation();
+        if (checkCreationMessage) {
           const groupCreationMessageIn1to1 = conversationEntity.is_one2one() && firstMessage.isGroupCreation();
           const one2oneConnectionMessageInGroup = conversationEntity.is_group() && firstMessage.isConnection();
           const wrongMessageTypeForConversation = groupCreationMessageIn1to1 || one2oneConnectionMessageInGroup;
@@ -402,22 +401,28 @@ z.conversation.ConversationRepository = class ConversationRepository {
           if (wrongMessageTypeForConversation) {
             this.delete_message(conversationEntity, firstMessage);
             conversationEntity.hasCreationMessage = false;
-            isCreationMessage = false;
+          } else {
+            conversationEntity.hasCreationMessage = true;
           }
         }
 
-        if (!conversationEntity.hasCreationMessage && !isCreationMessage) {
-          conversationEntity.creatingFirstMessage = true;
-          const creationEvent = conversationEntity.is_group()
-            ? z.conversation.EventBuilder.buildGroupCreation(conversationEntity, this.selfUser().isTemporaryGuest())
-            : z.conversation.EventBuilder.build1to1Creation(conversationEntity);
-
-          amplify.publish(z.event.WebApp.EVENT.INJECT, creationEvent);
+        const addCreationMessage = !conversationEntity.hasCreationMessage;
+        if (addCreationMessage) {
+          this._addCreationMessage(conversationEntity, this.selfUser().isTemporaryGuest());
         }
       }
 
       return mappedMessageEntities;
     });
+  }
+
+  _addCreationMessage(conversationEntity, isTemporaryGuest, timestamp) {
+    conversationEntity.hasCreationMessage = true;
+    const creationEvent = conversationEntity.is_group()
+      ? z.conversation.EventBuilder.buildGroupCreation(conversationEntity, isTemporaryGuest, timestamp)
+      : z.conversation.EventBuilder.build1to1Creation(conversationEntity);
+
+    amplify.publish(z.event.WebApp.EVENT.INJECT, creationEvent);
   }
 
   /**
@@ -1340,7 +1345,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when the conversation was archived
    */
   archive_conversation(conversation_et) {
-    return this._toggle_archive_conversation(conversation_et, true, 'archiving');
+    return this._toggleArchiveConversation(conversation_et, true, 'archiving');
   }
 
   /**
@@ -1351,54 +1356,53 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when the conversation was unarchived
    */
   unarchive_conversation(conversation_et, trigger = 'unknown') {
-    return this._toggle_archive_conversation(conversation_et, false, trigger);
+    return this._toggleArchiveConversation(conversation_et, false, trigger);
   }
 
-  _toggle_archive_conversation(conversation_et, new_archive_state, trigger) {
-    if (!conversation_et) {
-      return Promise.reject(
-        new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.CONVERSATION_NOT_FOUND)
-      );
+  _toggleArchiveConversation(conversationEntity, newState, trigger) {
+    if (!conversationEntity) {
+      const error = new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.CONVERSATION_NOT_FOUND);
+      return Promise.reject(error);
     }
 
-    const archive_timestamp = conversation_et.get_last_known_timestamp(this.timeOffset);
-    const no_state_change = conversation_et.is_archived() === new_archive_state;
-    const no_timestamp_change = conversation_et.archived_timestamp() === archive_timestamp;
-    if (no_state_change && no_timestamp_change) {
+    const archiveTimestamp = conversationEntity.get_last_known_timestamp(this.timeOffset);
+    const noStateChange = conversationEntity.is_archived() === newState;
+    const noTimestampChange = conversationEntity.archived_timestamp() === archiveTimestamp;
+    if (noStateChange && noTimestampChange) {
       return Promise.reject(new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.NO_CHANGES));
     }
 
     const payload = {
-      otr_archived: new_archive_state,
-      otr_archived_ref: new Date(archive_timestamp).toISOString(),
+      otr_archived: newState,
+      otr_archived_ref: new Date(archiveTimestamp).toISOString(),
     };
 
-    this.logger.info(`Conversation '${conversation_et.id}' archive state change triggered by '${trigger}'`);
-    return this.conversation_service
-      .update_member_properties(conversation_et.id, payload)
-      .catch(error => {
-        this.logger.error(
-          `Failed to change conversation '${conversation_et.id}' archived state to '${new_archive_state}': ${
-            error.code
-          }`
-        );
-        if (error.code !== z.service.BackendClientError.STATUS_CODE.NOT_FOUND) {
-          throw error;
-        }
-      })
-      .then(() => {
-        const response = {
-          data: payload,
-          from: this.selfUser().id,
-        };
+    const conversationId = conversationEntity.id;
+    this.logger.info(`Conversation '${conversationId}' archive state change triggered by '${trigger}'`);
 
-        this._onMemberUpdate(conversation_et, response);
-        this.logger.info(
-          `Update conversation '${conversation_et.id}' archive state to '${new_archive_state}' on '${
-            payload.otr_archived_ref
-          }'`
-        );
-      });
+    const updatePromise = conversationEntity.removed_from_conversation()
+      ? Promise.resolve()
+      : this.conversation_service.update_member_properties(conversationId, payload).catch(error => {
+          const logMessage = `Failed to change archived state of '${conversationId}' to '${newState}': ${error.code}`;
+          this.logger.error(logMessage);
+
+          const isNotFound = error.code === z.service.BackendClientError.STATUS_CODE.NOT_FOUND;
+          if (!isNotFound) {
+            throw error;
+          }
+        });
+
+    updatePromise.then(() => {
+      const response = {
+        data: payload,
+        from: this.selfUser().id,
+      };
+
+      this._onMemberUpdate(conversationEntity, response);
+      const isoDate = payload.otr_archived_ref;
+      const logMessage = `Updated conversation '${conversationId}' archive state to '${newState}' on '${isoDate}'`;
+      this.logger.info(logMessage);
+    });
   }
 
   _check_changed_conversations() {
@@ -1423,7 +1427,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {undefined} No return value
    */
   _clear_conversation(conversation_et, timestamp) {
-    this._delete_messages(conversation_et, timestamp);
+    this._deleteMessages(conversation_et, timestamp);
 
     if (conversation_et.removed_from_conversation()) {
       this.conversation_service.delete_conversation_from_db(conversation_et.id);
@@ -2985,9 +2989,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .then(conversationEntity => this.save_conversation(conversationEntity))
       .then(conversationEntity => {
         if (conversationEntity) {
-          conversationEntity.hasCreationMessage = true;
-          const event = z.conversation.EventBuilder.buildGroupCreation(conversationEntity, false, initialTimestamp);
-          amplify.publish(z.event.WebApp.EVENT.INJECT, event, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
+          this._addCreationMessage(conversationEntity, false, initialTimestamp);
           this.verification_state_handler.onConversationCreate(conversationEntity);
           return {conversationEntity};
         }
@@ -3575,15 +3577,16 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Delete messages from UI and database.
    *
    * @private
-   * @param {Conversation} conversation_et - Conversation that contains the message
+   * @param {Conversation} conversationEntity - Conversation that contains the message
    * @param {number} [timestamp] - Timestamp as upper bound which messages to remove
    * @returns {undefined} No return value
    */
-  _delete_messages(conversation_et, timestamp) {
-    conversation_et.remove_messages(timestamp);
+  _deleteMessages(conversationEntity, timestamp) {
+    conversationEntity.remove_messages(timestamp);
+    conversationEntity.hasCreationMessage = false;
 
     const iso_date = timestamp ? new Date(timestamp).toISOString() : undefined;
-    this.conversation_service.delete_messages_from_db(conversation_et.id, iso_date);
+    this.conversation_service.delete_messages_from_db(conversationEntity.id, iso_date);
   }
 
   /**
