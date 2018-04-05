@@ -48,13 +48,16 @@ class ClientItem extends React.Component {
     validationError: null,
   };
 
-  state = {
-    ...ClientItem.initialState,
-    animationStep: 0,
-    isAnimating: false,
-  };
-
   formatId = (id = '?') => id.toUpperCase().replace(/(..)/g, '$1 ');
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      ...ClientItem.initialState,
+      animationStep: props.selected ? ClientItem.CONFIG.animationSteps : 0,
+      isAnimating: false,
+    };
+  }
 
   componentWillReceiveProps(newProps) {
     if (!this.props.selected && newProps.selected) {
@@ -150,7 +153,7 @@ class ClientItem extends React.Component {
         <ContainerXS
           style={{
             backgroundColor: selected ? 'white' : '',
-            borderRadius: '10px',
+            borderRadius: '4px',
             transition: 'background-color .35s linear',
           }}
           data-uie-value={client.model}
@@ -162,10 +165,10 @@ class ClientItem extends React.Component {
           >
             <div style={{display: 'flex', flexDirection: 'row'}}>
               <div style={{flexBasis: '32px', margin: 'auto'}}>
-                <DeviceIcon />
+                <DeviceIcon color="#323639" />
               </div>
               <div style={{flexGrow: 1}}>
-                <Text bold block data-uie-name="device-header-model">
+                <Text bold block color="#323639" data-uie-name="device-header-model">
                   {this.formatName(client.model, client.class)}
                 </Text>
                 <Small block data-uie-name="device-id">{`ID: ${this.formatId(client.id)}`}</Small>
@@ -175,7 +178,7 @@ class ClientItem extends React.Component {
             <Line color="rgba(51, 55, 58, .04)" style={{backgroundColor: 'transparent', margin: '4px 0 0 0'}} />
           </ContainerXS>
           {(selected || isAnimating) && (
-            <ContainerXS style={{maxHeight: `${height}px`, overflow: 'hidden', padding: `${paddingHorizontal}px 5px`}}>
+            <ContainerXS style={{maxHeight: `${height}px`, overflow: 'hidden', padding: `${paddingHorizontal}px 0`}}>
               <Form>
                 <InputSubmitCombo style={{background: 'transparent', marginBottom: '0'}}>
                   <Input
