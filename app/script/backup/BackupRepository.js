@@ -78,7 +78,12 @@ z.backup.BackupRepository = class BackupRepository {
   }
 
   onError(error) {
-    // TODO
+    // TODO: Error modal
+    if (error.constructor.name === 'BackupImportError') {
+      alert('Meta Data Error!');
+    } else {
+      alert(error.message);
+    }
   }
 
   onImportHistory(tableName, data) {
