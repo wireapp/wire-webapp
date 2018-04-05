@@ -36,11 +36,8 @@ z.util.ValidationUtil = {
       return true;
     },
 
-    retentionPolicy: string => {
-      // Ensure the given asset is either eternal, persistent or volatile
-      // https://github.com/wireapp/wire-server/blob/e97f7c882cad37e4ddd922d2e48fe0d71751fc5a/libs/cargohold-types/src/CargoHold/Types/V3.hs#L151
-      return string > 0 && string < Object.keys(z.assets.AssetRetentionPolicy).length + 1;
-    },
+    // https://github.com/wireapp/wire-server/blob/dc3e9a8af5250c0d045e96a31aa23c255b4e01a3/libs/cargohold-types/src/CargoHold/Types/V3.hs#L156-L177
+    retentionPolicy: policyId => !!policyId > 0 && policyId < Object.keys(z.assets.AssetRetentionPolicy).length + 1,
 
     v3: (assetKey, assetToken) => {
       if (!assetKey) {
@@ -76,12 +73,8 @@ z.util.ValidationUtil = {
     return true;
   },
 
-  isBearerToken: token => {
-    // Since some special chars are allowed,
-    // remember to always encode Bearer tokens
-    // using encodeURIComponents afterwards!
-    return /^[a-zA-Z0-9\-._~+/]+[=]{0,2}$/.test(token);
-  },
+  // Since some special chars are allowed, remember to always encode Bearer tokens using encodeURIComponents afterwards!
+  isBearerToken: token => /^[a-zA-Z0-9\-._~+/]+[=]{0,2}$/.test(token),
 
   isUUID: string => /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(string),
 
