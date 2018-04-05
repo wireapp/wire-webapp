@@ -76,6 +76,13 @@ z.util.Environment = (() => {
   const _isMac = () => window.platform.ua.includes(PLATFORM_NAME.MACINTOSH);
   const _isWindows = () => window.platform.os.family.includes(PLATFORM_NAME.WINDOWS);
 
+  const isInternal = () => window.location.hostname === APP_ENV.INTERNAL;
+  const isLocalhost = () => [APP_ENV.LOCALHOST, APP_ENV.VIRTUAL_HOST].includes(window.location.hostname);
+  const isProduction = () => {
+    const isProductionHost = window.location.hostname.endsWith(APP_ENV.PRODUCTION);
+    return isProductionHost && !isInternal();
+  };
+
   const _supportsAudioOutputSelection = () => _isChrome();
   const _supportsCalling = () => {
     if (!_supportsMediaDevices()) {
@@ -130,9 +137,9 @@ z.util.Environment = (() => {
     electron: _isElectron(),
     electronVersion: _getElectronVersion,
     frontend: {
-      isInternal: () => window.location.hostname === APP_ENV.INTERNAL,
-      isLocalhost: () => [APP_ENV.LOCALHOST, APP_ENV.VIRTUAL_HOST].includes(window.location.hostname),
-      isProduction: () => window.location.hostname.includes(APP_ENV.PRODUCTION),
+      isInternal,
+      isLocalhost,
+      isProduction,
     },
     os: {
       linux: !_isMac() && !_isWindows(),
