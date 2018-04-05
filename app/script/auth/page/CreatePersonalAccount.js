@@ -36,16 +36,21 @@ import Page from './Page';
 
 class CreatePersonalAccount extends React.PureComponent {
   componentDidMount() {
-    const {match} = this.props;
-    if (match.path === ROUTE.CREATE_ACCOUNT) {
-      this.props.enterPersonalCreationFlow();
-    } else if (match.path === ROUTE.INVITE) {
-      this.props.enterGenericInviteCreationFlow();
-    } else {
-      this.props.enterPersonalInvitationCreationFlow();
-      this.invitationCode = match.params.invitationCode;
-      this.props.getInvitationFromCode(this.invitationCode);
+    const {params, url} = this.props.match;
+
+    const isInvite = url.startsWith(ROUTE.INVITE);
+    if (isInvite) {
+      const hasInvitationCode = !!params.invitationCode;
+      if (hasInvitationCode) {
+        this.props.enterPersonalInvitationCreationFlow();
+        this.invitationCode = params.invitationCode;
+        return this.props.getInvitationFromCode(this.invitationCode);
+      }
+
+      return this.props.enterGenericInviteCreationFlow();
     }
+
+    this.props.enterPersonalCreationFlow();
   }
 
   createAccount = () => {
