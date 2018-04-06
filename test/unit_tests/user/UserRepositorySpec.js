@@ -284,7 +284,7 @@ describe('z.user.UserRepository', () => {
       });
     });
 
-    describe('_assign_all_clients', () => {
+    describe('_assignAllClients', () => {
       let user_jane_roe = null;
       let user_john_doe = null;
 
@@ -319,7 +319,7 @@ describe('z.user.UserRepository', () => {
 
       it('assigns all available clients to the users', done => {
         TestFactory.user_repository
-          ._assign_all_clients()
+          ._assignAllClients()
           .then(() => {
             expect(TestFactory.client_repository.getAllClientsFromDb).toHaveBeenCalled();
             expect(user_jane_roe.devices().length).toBe(1);
