@@ -58,7 +58,7 @@ z.backup.BackupService = class BackupService {
   }
 
   getHistoryCount() {
-    return this.getTables().then(tables => tables.reduce((accumulator, table) => accumulator + table.count(), 0));
+    return this.getTables().reduce((accumulator, table) => accumulator + table.count(), 0);
   }
 
   getTables() {
