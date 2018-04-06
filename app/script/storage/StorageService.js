@@ -181,8 +181,8 @@ z.storage.StorageService = class StorageService {
   }
 
   /**
-   * @param {Array<string>} tableNames - The table names to get
-   * @returns {Array<Table>} All found tables in an array container
+   * @param {Array<string>} tableNames - Names of tables to get
+   * @returns {Array<Table>} Matching tables
    */
   getTables(tableNames) {
     return tableNames.map(tableName => this.db[tableName]);

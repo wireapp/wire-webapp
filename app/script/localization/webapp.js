@@ -149,6 +149,10 @@ z.string.modalAssetTooLargeMessage = 'You can send files up to {{number}}';
 z.string.modalAssetParallelUploadsHeadline = 'Too many files at once';
 z.string.modalAssetParallelUploadsMessage = 'You can send up to {{number}} files at once.';
 
+z.string.modalBackupErrorAction = 'Try again';
+z.string.modalBackupErrorHeadline = 'Export failed';
+z.string.modalBackupErrorMessage = 'Meta Data Error!';
+
 z.string.modalCallEmptyConversationHeadline = 'No one to call';
 z.string.modalCallEmptyConversationMessage = 'There is no one left here.';
 
@@ -610,8 +614,6 @@ z.string.preferencesOptionsConversationHistoryExportTitle = 'Back up history';
 z.string.preferencesOptionsConversationHistoryExportDescription = 'Back up your conversation history to a safe place.\nThe backup is not protected by Wire end-to-end encryption.';
 z.string.preferencesOptionsConversationHistoryImportTitle = 'Restore from backup';
 z.string.preferencesOptionsConversationHistoryImportDescription = 'You can only restore history from a backup of the same platform.';
-z.string.preferencesOptionsConversationHistoryPasswordTitle = 'Set email and password';
-z.string.preferencesOptionsConversationHistoryPasswordDescription = 'You need an email and a password in order to back up your conversation history. You can do it from the account page in Settings.';
 z.string.preferencesOptionsConversationHistoryErrorTitle = 'Restoring the history failed.';
 z.string.preferencesOptionsConversationHistoryErrorDescription = 'Please, check your backup file, it might not be compatible or corrupted.';
 z.string.preferencesOptionsConversationHistoryImportProgress = 'Restoring your conversations...';

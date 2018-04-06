@@ -23,6 +23,15 @@ window.z = window.z || {};
 window.z.backup = z.backup || {};
 
 z.backup.BackupService = class BackupService {
+  static get CONFIG() {
+    return {
+      SUPPORTED_TABLES: [
+        z.storage.StorageSchemata.OBJECT_STORE.CONVERSATIONS,
+        z.storage.StorageSchemata.OBJECT_STORE.EVENTS,
+      ],
+    };
+  }
+
   constructor(storageService) {
     this.storageService = storageService;
   }
@@ -32,34 +41,35 @@ z.backup.BackupService = class BackupService {
   }
 
   getHistory() {
-    const tableContainer = this.storageService.getTables(['conversations', 'events']);
-    const promises = tableContainer.map(table => {
+    const batchPromises = this.getTables().map(table => {
       const collection = table.toCollection();
+
       return table
         .count()
         .then(n => new DexieBatch({batchSize: 10000, limit: n}))
         .then(batchDriver => {
-          const batches = [];
-          return batchDriver
-            .eachBatch(collection, batch => batches.push(batch))
-            .then(() => ({batches, name: table.name}));
+          batchDriver.eachBatch(collection, batch => {
+            amplify.publish(z.event.WebApp.BACKUP.EXPORT.DATA, table.name, batch);
+          });
         });
     });
-    return Promise.all(promises);
+
+    return Promise.all(batchPromises);
   }
 
   getHistoryCount() {
-    const tableContainer = this.storageService.getTables(['conversations', 'events']);
-    return Promise.all(tableContainer.map(table => table.count()));
+    return this.getTables().then(tables => tables.reduce((accumulator, table) => accumulator + table.count(), 0));
   }
 
-  setHistory(tableName, data) {
-    const entity = JSON.parse(data);
-    if (tableName === 'conversations') {
-      this.storageService.save(tableName, entity.id, entity);
-    } else {
-      this.storageService.save(tableName, undefined, entity);
-    }
+  getTables() {
+    return this.storageService.getTables(BackupService.CONFIG.SUPPORTED_TABLES);
+  }
+
+  setHistory(tableName, entity) {
+    const isConversationTable = z.storage.StorageSchemata.OBJECT_STORE.CONVERSATIONS;
+    const primaryKey = isConversationTable ? entity.id : undefined;
+
+    this.storageService.save(tableName, primaryKey, entity);
   }
 
   setMetadata(metaData) {

@@ -61,8 +61,7 @@ z.backup.BackupRepository = class BackupRepository {
   }
 
   exportHistory() {
-    this.backupService.getHistoryCount().then(entryContainer => {
-      const numberOfRecords = entryContainer.reduce((accumulator, entries) => accumulator + entries, 0);
+    this.backupService.getHistoryCount().then(numberOfRecords => {
       amplify.publish(z.event.WebApp.BACKUP.EXPORT.INIT, numberOfRecords);
     });
   }
@@ -78,16 +77,22 @@ z.backup.BackupRepository = class BackupRepository {
   }
 
   onError(error) {
-    // TODO: Error modal
-    if (error.constructor.name === 'BackupImportError') {
-      alert('Meta Data Error!');
-    } else {
-      alert(error.message);
-    }
+    const isBackupImportError = error.constructor.name === 'BackupImportError';
+
+    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
+      action: () => this.exportHistory(),
+      preventClose: true,
+      text: {
+        action: z.l10n.text(z.string.modalBackupErrorAction),
+        message: isBackupImportError ? z.string.modalBackupErrorMessage : error.message,
+        title: z.l10n.text(z.string.modalBackupErrorHeadline),
+      },
+    });
   }
 
   onImportHistory(tableName, data) {
-    this.backupService.setHistory(tableName, data);
+    const entity = JSON.parse(data);
+    this.backupService.setHistory(tableName, entity);
   }
 
   onImportMeta(metaData) {
@@ -95,14 +100,8 @@ z.backup.BackupRepository = class BackupRepository {
   }
 
   onExportHistory() {
-    const metadata = this.createMetaDescription();
-    this.backupService.getHistory().then(tables => {
-      for (const table of tables) {
-        for (const batch of table.batches) {
-          amplify.publish(z.event.WebApp.BACKUP.EXPORT.DATA, table.name, batch);
-        }
-      }
-      amplify.publish(z.event.WebApp.BACKUP.EXPORT.META, metadata);
+    this.backupService.getHistory().then(() => {
+      amplify.publish(z.event.WebApp.BACKUP.EXPORT.META, this.createMetaDescription());
     });
   }
 };
