@@ -23,10 +23,7 @@ import WirelessContainer from '../component/WirelessContainer';
 import * as RuntimeSelector from '../module/selector/RuntimeSelector';
 import {connect} from 'react-redux';
 import {injectIntl, FormattedHTMLMessage} from 'react-intl';
-import Runtime from '../Runtime';
 import React from 'react';
-
-const runtime = new Runtime();
 
 const showUnsupportedMessage = (headline, subhead) => (
   <ContainerXS verticalCenter centerText>
@@ -40,8 +37,14 @@ const showUnsupportedMessage = (headline, subhead) => (
   </ContainerXS>
 );
 
-export const UnsupportedBrowser = ({children, hasCookieSupport, hasIndexedDbSupport, isCheckingSupport}) => {
-  if (!runtime.isSupportedBrowser()) {
+export const UnsupportedBrowser = ({
+  children,
+  hasCookieSupport,
+  hasIndexedDbSupport,
+  isCheckingSupport,
+  isSupportedBrowser,
+}) => {
+  if (!isSupportedBrowser) {
     return (
       <WirelessContainer>
         <Container verticalCenter>
@@ -80,5 +83,6 @@ export default injectIntl(
     hasCookieSupport: RuntimeSelector.hasCookieSupport(state),
     hasIndexedDbSupport: RuntimeSelector.hasIndexedDbSupport(state),
     isCheckingSupport: RuntimeSelector.isChecking(state),
+    isSupportedBrowser: RuntimeSelector.isSupportedBrowser(state),
   }))(UnsupportedBrowser)
 );

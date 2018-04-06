@@ -19,6 +19,16 @@
 
 import * as RuntimeActionCreator from './creator/RuntimeActionCreator';
 import RuntimeUtil from '../../util/RuntimeUtil';
+import Runtime from '../../Runtime';
+
+export function checkSupportedBrowser() {
+  const runtime = new Runtime();
+  return function(dispatch) {
+    if (runtime.isSupportedBrowser()) {
+      dispatch(RuntimeActionCreator.confirmSupportedBrowser());
+    }
+  };
+}
 
 export function checkIndexedDbSupport() {
   return function(dispatch) {

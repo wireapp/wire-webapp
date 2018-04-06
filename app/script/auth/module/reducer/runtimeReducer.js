@@ -24,6 +24,7 @@ const initialState = {
   hasIndexedDbSupport: false,
   isCheckingCookie: false,
   isCheckingIndexedDb: false,
+  isSupportedBrowser: false,
 };
 
 export default function reducer(state = initialState, action) {
@@ -49,6 +50,11 @@ export default function reducer(state = initialState, action) {
         ...state,
         hasCookieSupport: action.payload,
         isCheckingCookie: false,
+      };
+    case RuntimeActionCreator.RUNTIME_CONFIRM_SUPPORTED_BROWSER:
+      return {
+        ...state,
+        isSupportedBrowser: true,
       };
     default:
       return state;

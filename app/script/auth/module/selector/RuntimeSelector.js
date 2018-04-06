@@ -20,3 +20,4 @@
 export const isChecking = state => state.runtimeState.isCheckingIndexedDb || state.runtimeState.isCheckingCookie;
 export const hasIndexedDbSupport = state => state.runtimeState.hasIndexedDbSupport;
 export const hasCookieSupport = state => state.runtimeState.hasCookieSupport;
+export const isSupportedBrowser = state => state.runtimeState.isSupportedBrowser;

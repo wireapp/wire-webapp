@@ -21,6 +21,7 @@ export const RUNTIME_CHECK_INDEXEDDB_START = 'RUNTIME_CHECK_INDEXEDDB_START';
 export const RUNTIME_CHECK_INDEXEDDB_FINISH = 'RUNTIME_CHECK_INDEXEDDB_FINISH';
 export const RUNTIME_CHECK_COOKIE_START = 'RUNTIME_CHECK_COOKIE_START';
 export const RUNTIME_CHECK_COOKIE_FINISH = 'RUNTIME_CHECK_COOKIE_FINISH';
+export const RUNTIME_CONFIRM_SUPPORTED_BROWSER = 'RUNTIME_CONFIRM_SUPPORTED_BROWSER';
 
 export const startCheckIndexedDb = () => ({
   type: RUNTIME_CHECK_INDEXEDDB_START,
@@ -38,4 +39,8 @@ export const startCheckCookie = () => ({
 export const finishCheckCookie = result => ({
   payload: result,
   type: RUNTIME_CHECK_COOKIE_FINISH,
+});
+
+export const confirmSupportedBrowser = () => ({
+  type: RUNTIME_CONFIRM_SUPPORTED_BROWSER,
 });
