@@ -17,12 +17,7 @@
  *
  */
 
-import {ConversationEvent} from '../event/ConversationEvent';
-
-interface IncomingNotification {
-  payload: ConversationEvent[];
-  id: string;
-  transient: boolean;
-}
-
-export {IncomingNotification};
+export * from './BackendEvent';
+export * from './ConversationEvent';
+export * from './TeamEvent';
+export * from './UserEvent';

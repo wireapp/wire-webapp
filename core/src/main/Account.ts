@@ -27,9 +27,9 @@ import {NotificationService} from './notification/root';
 import {Context, LoginData, PreKey} from '@wireapp/api-client/dist/commonjs/auth/index';
 import {
   ConversationEvent,
-  ConversationEventType,
-  OTRMessageAdd,
-} from '@wireapp/api-client/dist/commonjs/conversation/event/index';
+  CONVERSATION_EVENT,
+  ConversationOtrMessageAddEvent,
+} from '@wireapp/api-client/dist/commonjs/event/index';
 import {
   ClientClassification,
   ClientType,
@@ -454,8 +454,8 @@ class Account extends EventEmitter {
       }
 
       switch (event.type) {
-        case ConversationEventType.OTR_MESSAGE_ADD: {
-          const otrMessage: OTRMessageAdd = event as OTRMessageAdd;
+        case CONVERSATION_EVENT.OTR_MESSAGE_ADD: {
+          const otrMessage: ConversationOtrMessageAddEvent = event as ConversationOtrMessageAddEvent;
           const sessionId: string = CryptographyService.constructSessionId(otrMessage.from, otrMessage.data.sender);
           const ciphertext: string = otrMessage.data.text;
           this.service.cryptography.decrypt(sessionId, ciphertext).then((decryptedMessage: Uint8Array) => {
