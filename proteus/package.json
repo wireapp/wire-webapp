@@ -29,10 +29,9 @@
     "clear": "rimraf dist",
     "dist": "yarn clear && yarn build:node && yarn build:browser",
     "start": "node dist/index.js",
-    "test": "yarn dist && yarn test:node",
-    "test:all": "yarn test && yarn test:longrunning",
-    "test:node": "jasmine",
-    "test:longrunning": "jasmine --config=spec/support/jasmine.longrunning.json"
+    "test": "yarn test:node",
+    "test:project": "yarn dist && yarn test",
+    "test:node": "jasmine"
   },
   "types": "dist/index.d.ts",
   "version": "7.1.18"

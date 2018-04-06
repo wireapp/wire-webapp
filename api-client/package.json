@@ -59,7 +59,8 @@
     "coverage": "istanbul cover --report html ./node_modules/jasmine/bin/jasmine.js",
     "dist": "yarn clear && yarn build",
     "start": "yarn build:node && concurrently \"tsc -w\" \"webpack -w\" \"browser-sync start -c bs-config.js\"",
-    "test": "yarn dist && yarn test:node && yarn test:browser",
+    "test": "yarn test:node && yarn test:browser",
+    "test:project": "yarn dist && yarn test",
     "test:browser": "webpack && karma start",
     "test:node": "cross-env NODE_DEBUG=@wireapp/api-client* JASMINE_CONFIG_PATH=src/test/node/support/jasmine.json jasmine",
     "watch": "webpack-dev-server --config webpack.config.js"

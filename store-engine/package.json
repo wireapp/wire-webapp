@@ -29,7 +29,8 @@
     "build:node": "tsc",
     "clear": "rimraf dist",
     "dist": "yarn clear && yarn build",
-    "test": "yarn dist && yarn test:node && yarn test:browser",
+    "test": "yarn test:node && yarn test:browser",
+    "test:project": "yarn dist && yarn test",
     "test:browser": "webpack --progress && karma start",
     "test:node": "jasmine --config=jasmine.json"
   },

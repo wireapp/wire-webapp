@@ -24,9 +24,10 @@
     "coverage:html": "istanbul cover --report html jasmine",
     "coverage:lcov": "istanbul cover --report lcov jasmine",
     "dist": "yarn clear && yarn build",
+    "test": "yarn test:node && yarn test:browser",
+    "test:project": "yarn dist && yarn test",
     "test:browser": "exit 0",
-    "test:node": "jasmine",
-    "test": "yarn dist && yarn test:node && yarn test:browser"
+    "test:node": "jasmine"
   },
   "types": "dist/index.d.ts",
   "version": "3.0.13"

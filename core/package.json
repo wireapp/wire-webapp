@@ -42,7 +42,8 @@
     "coverage": "istanbul cover --report html ./node_modules/jasmine/bin/jasmine.js",
     "dist": "yarn clear && yarn build",
     "start": "rimraf .tmp && yarn dist && node index.js",
-    "test": "yarn dist && yarn test:node && yarn test:browser",
+    "test": "yarn test:node && yarn test:browser",
+    "test:project": "yarn dist && yarn test",
     "test:browser": "webpack && karma start",
     "test:node": "jasmine --config=src/test/node/support/jasmine.json"
   },

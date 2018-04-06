@@ -24,7 +24,8 @@
     "build:node": "tsc",
     "clear": "rimraf dist",
     "dist": "yarn clear && yarn build",
-    "test": "yarn dist && yarn test:node",
+    "test": "yarn test:node",
+    "test:project": "yarn dist && yarn test",
     "test:node": "exit 0",
     "prepare": "yarn build"
   },
