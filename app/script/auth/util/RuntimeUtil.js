@@ -45,10 +45,6 @@ export default class RuntimeUtil {
     return platform.name === RuntimeUtil.BROWSER_NAME.ELECTRON;
   }
 
-  static isFirefox() {
-    return platform.name === RuntimeUtil.BROWSER_NAME.FIREFOX;
-  }
-
   static isDesktop() {
     return RuntimeUtil.isElectron() && platform.ua.includes(RuntimeUtil.BROWSER_NAME.WIRE);
   }

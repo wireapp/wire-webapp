@@ -18,11 +18,11 @@
  */
 
 import * as RuntimeActionCreator from './creator/RuntimeActionCreator';
-import RuntimeUtil from '../../util/RuntimeUtil';
 import Runtime from '../../Runtime';
 
+const runtime = new Runtime();
+
 export function checkSupportedBrowser() {
-  const runtime = new Runtime();
   return function(dispatch) {
     if (runtime.isSupportedBrowser()) {
       dispatch(RuntimeActionCreator.confirmSupportedBrowser());
@@ -70,10 +70,10 @@ function hasCookieSupport() {
 
 function hasIndexedDbSupport() {
   if (!window.indexedDB) {
-    return Promise.reject(new Error());
+    return Promise.reject(new Error('IndexedDB not supported'));
   }
 
-  if (RuntimeUtil.isFirefox()) {
+  if (runtime.isFirefox()) {
     let dbOpenRequest;
 
     try {
@@ -81,11 +81,11 @@ function hasIndexedDbSupport() {
       dbOpenRequest.onerror = event => {
         if (dbOpenRequest.error) {
           event.preventDefault();
-          Promise.reject(new Error());
+          Promise.reject(new Error('Error opening IndexedDB'));
         }
       };
     } catch (error) {
-      return Promise.reject(new Error());
+      return Promise.reject(new Error('Error initializing IndexedDB'));
     }
 
     return new Promise((resolve, reject) => {
