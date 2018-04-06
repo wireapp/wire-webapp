@@ -29,7 +29,7 @@ import React from 'react';
 const runtime = new Runtime();
 
 const showUnsupportedMessage = (headline, subhead) => (
-  <Container verticalCenter centerText>
+  <ContainerXS verticalCenter centerText>
     <Logo height="20" />
     <H1 center style={{marginBottom: '48px', marginTop: '24px'}}>
       <FormattedHTMLMessage {...headline} />
@@ -37,7 +37,7 @@ const showUnsupportedMessage = (headline, subhead) => (
     <Text center>
       <FormattedHTMLMessage {...subhead} />
     </Text>
-  </Container>
+  </ContainerXS>
 );
 
 export const UnsupportedBrowser = ({children, hasCookieSupport, hasIndexedDbSupport, isCheckingSupport}) => {
