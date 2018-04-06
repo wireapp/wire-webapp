@@ -17,24 +17,6 @@
  *
  */
 
-import authReducer from './authReducer';
-import clientReducer from './clientReducer';
-import cookieReducer from './cookieReducer';
-import conversationReducer from './conversationReducer';
-import inviteReducer from './inviteReducer';
-import languageReducer from './languageReducer';
-import runtimeReducer from './runtimeReducer';
-import selfReducer from './selfReducer';
-
-const reducers = {
-  authState: authReducer,
-  clientState: clientReducer,
-  conversationState: conversationReducer,
-  cookieState: cookieReducer,
-  inviteState: inviteReducer,
-  languageState: languageReducer,
-  runtimeState: runtimeReducer,
-  selfState: selfReducer,
-};
-
-export default reducers;
+export const isChecking = state => state.runtimeState.isCheckingIndexedDb || state.runtimeState.isCheckingCookie;
+export const hasIndexedDbSupport = state => state.runtimeState.hasIndexedDbSupport;
+export const hasCookieSupport = state => state.runtimeState.hasCookieSupport;

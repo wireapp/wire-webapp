@@ -17,9 +17,40 @@
  *
  */
 
-const initialState = {};
+import * as RuntimeActionCreator from '../action/creator/RuntimeActionCreator';
+
+const initialState = {
+  hasCookieSupport: false,
+  hasIndexedDbSupport: false,
+  isCheckingCookie: false,
+  isCheckingIndexedDb: false,
+};
 
 export default function reducer(state = initialState, action) {
   switch (action.type) {
+    case RuntimeActionCreator.RUNTIME_CHECK_INDEXEDDB_START:
+      return {
+        ...state,
+        isCheckingIndexedDb: true,
+      };
+    case RuntimeActionCreator.RUNTIME_CHECK_COOKIE_START:
+      return {
+        ...state,
+        isCheckingCookie: true,
+      };
+    case RuntimeActionCreator.RUNTIME_CHECK_INDEXEDDB_FINISH:
+      return {
+        ...state,
+        hasIndexedDbSupport: action.payload,
+        isCheckingIndexedDb: false,
+      };
+    case RuntimeActionCreator.RUNTIME_CHECK_COOKIE_FINISH:
+      return {
+        ...state,
+        hasCookieSupport: action.payload,
+        isCheckingCookie: false,
+      };
+    default:
+      return state;
   }
 }

@@ -25,6 +25,7 @@ import configureClient from './configureClient';
 import configureCore from './configureCore';
 import configureTracking from './configureTracking';
 import configureEnvironment from './configureEnvironment';
+import {checkCookieSupport, checkIndexedDbSupport} from './module/action/RuntimeAction';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Root from './page/Root';
@@ -44,7 +45,8 @@ const store = configureStore({
   mixpanel,
 });
 
-store.dispatch();
+store.dispatch(checkIndexedDbSupport());
+store.dispatch(checkCookieSupport());
 
 const Wrapper = Component => (
   <AppContainer>

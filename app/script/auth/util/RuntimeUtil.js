@@ -63,7 +63,7 @@ export default class RuntimeUtil {
   }
 
   static hasCookieSupport() {
-    const cookieName = z.main.App.CONFIG.COOKIES_CHECK.COOKIE_NAME;
+    const cookieName = 'cookie_supported';
 
     return new Promise((resolve, reject) => {
       switch (navigator.cookieEnabled) {
