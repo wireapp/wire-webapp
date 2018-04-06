@@ -114,12 +114,7 @@ class ConversationJoin extends Component {
     this.props
       .doJoinConversationByCode(this.state.conversationKey, this.state.conversationCode)
       .then(() => this.trackAddParticipant())
-      .then(() => {
-        const link = document.createElement('a');
-        link.href = pathWithParams('/');
-        document.body.appendChild(link); // workaround for Firefox
-        link.click();
-      });
+      .then(() => window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP)));
   };
 
   handleSubmit = event => {

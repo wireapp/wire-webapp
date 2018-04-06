@@ -248,6 +248,9 @@ export function getInvitationFromCode(invitationCode) {
     return apiClient.invitation.api
       .getInvitationInfo(invitationCode)
       .then(invitation => dispatch(AuthActionCreator.successfulGetInvitationFromCode(invitation)))
-      .catch(error => dispatch(AuthActionCreator.failedGetInvitationFromCode(error)));
+      .catch(error => {
+        dispatch(AuthActionCreator.failedGetInvitationFromCode(error));
+        throw BackendError.handle(error);
+      });
   };
 }
