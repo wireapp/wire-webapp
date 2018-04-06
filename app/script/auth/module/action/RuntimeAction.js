@@ -18,12 +18,12 @@
  */
 
 import * as RuntimeActionCreator from './creator/RuntimeActionCreator';
-import RuntimeUtil from '../../util/RuntimeUtil';
+import {isFirefox} from '../../util/RuntimeUtil';
 
 export function checkIndexedDbSupport() {
   return function(dispatch) {
     dispatch(RuntimeActionCreator.startCheckIndexedDb());
-    RuntimeUtil.hasIndexDbSupport()
+    hasIndexedDbSupport()
       .then(() => {
         dispatch(RuntimeActionCreator.finishCheckIndexedDb(true));
       })
@@ -36,7 +36,7 @@ export function checkIndexedDbSupport() {
 export function checkCookieSupport() {
   return function(dispatch) {
     dispatch(RuntimeActionCreator.startCheckCookie());
-    RuntimeUtil.hasCookieSupport()
+    hasCookieSupport()
       .then(() => {
         dispatch(RuntimeActionCreator.finishCheckCookie(true));
       })
@@ -44,4 +44,71 @@ export function checkCookieSupport() {
         dispatch(RuntimeActionCreator.finishCheckCookie(false));
       });
   };
+}
+
+function hasCookieSupport() {
+  const cookieName = 'cookie_supported';
+
+  return new Promise((resolve, reject) => {
+    switch (navigator.cookieEnabled) {
+      case true:
+        return resolve();
+      case false:
+        return reject(new Error());
+      default:
+        Cookies.set(cookieName, 'yes');
+        if (Cookies.get(cookieName)) {
+          Cookies.remove(cookieName);
+          return resolve();
+        }
+        return reject(new Error());
+    }
+  });
+}
+
+function hasIndexedDbSupport() {
+  if (!window.indexedDB) {
+    return Promise.reject(new Error());
+  }
+
+  if (isFirefox()) {
+    let dbOpenRequest;
+
+    try {
+      dbOpenRequest = window.indexedDB.open('test');
+      dbOpenRequest.onerror = event => {
+        if (dbOpenRequest.error) {
+          event.preventDefault();
+          Promise.reject(new Error());
+        }
+      };
+    } catch (error) {
+      return Promise.reject(new Error());
+    }
+
+    return new Promise((resolve, reject) => {
+      const interval = 10;
+      const maxRetry = 50;
+
+      function checkDbRequest(currentAttempt = 0) {
+        const tooManyAttempts = currentAttempt >= maxRetry;
+        const isRequestDone = dbOpenRequest.readyState === 'done';
+        const hasResult = !!dbOpenRequest.result;
+
+        if (isRequestDone && hasResult) {
+          return resolve();
+        }
+
+        if (tooManyAttempts || (isRequestDone && !hasResult)) {
+          return reject(new Error());
+        }
+
+        window.setTimeout(() => checkDbRequest(currentAttempt + 1), interval);
+      }
+
+      checkDbRequest();
+    });
+  }
+
+  return Promise.resolve();
 }
