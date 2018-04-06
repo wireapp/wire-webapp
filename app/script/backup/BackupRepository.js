@@ -60,13 +60,15 @@ z.backup.BackupRepository = class BackupRepository {
     amplify.publish(z.event.WebApp.BACKUP.EXPORT.CANCEL);
   }
 
-  exportHistory() {
-    this.backupService.getHistoryCount().then(numberOfRecords => {
-      amplify.publish(z.event.WebApp.BACKUP.EXPORT.INIT, numberOfRecords);
+  exportBackup() {
+    this.backupService.getHistoryCount().then(entryContainer => {
+      const userName = this.userRepository.self().username();
+      const numberOfRecords = entryContainer.reduce((accumulator, entries) => accumulator + entries, 0);
+      amplify.publish(z.event.WebApp.BACKUP.EXPORT.INIT, numberOfRecords, userName);
     });
   }
 
-  importHistory() {
+  importBackup() {
     const clientId = this.clientRepository.currentClient().id;
     const userId = this.userRepository.self().id;
     amplify.publish(z.event.WebApp.BACKUP.IMPORT.START, userId, clientId);

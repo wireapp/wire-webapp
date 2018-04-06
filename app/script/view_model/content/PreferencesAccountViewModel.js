@@ -196,11 +196,11 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   clickOnBackupExport() {
-    this.backupRepository.exportHistory();
+    this.backupRepository.exportBackup();
   }
 
   clickOnBackupImport() {
-    this.backupRepository.importHistory();
+    this.backupRepository.importBackup();
   }
 
   clickOnCreate() {
