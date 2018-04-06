@@ -34,12 +34,8 @@ export function checkIndexedDbSupport() {
   return function(dispatch) {
     dispatch(RuntimeActionCreator.startCheckIndexedDb());
     hasIndexedDbSupport()
-      .then(() => {
-        dispatch(RuntimeActionCreator.finishCheckIndexedDb(true));
-      })
-      .catch(() => {
-        dispatch(RuntimeActionCreator.finishCheckIndexedDb(false));
-      });
+      .then(() => dispatch(RuntimeActionCreator.finishCheckIndexedDb(true)))
+      .catch(() => dispatch(RuntimeActionCreator.finishCheckIndexedDb(false)));
   };
 }
 
@@ -47,12 +43,8 @@ export function checkCookieSupport() {
   return function(dispatch) {
     dispatch(RuntimeActionCreator.startCheckCookie());
     hasCookieSupport()
-      .then(() => {
-        dispatch(RuntimeActionCreator.finishCheckCookie(true));
-      })
-      .catch(() => {
-        dispatch(RuntimeActionCreator.finishCheckCookie(false));
-      });
+      .then(() => dispatch(RuntimeActionCreator.finishCheckCookie(true)))
+      .catch(() => dispatch(RuntimeActionCreator.finishCheckCookie(false)));
   };
 }
 
@@ -105,12 +97,12 @@ function hasIndexedDbSupport() {
         const isRequestDone = dbOpenRequest.readyState === 'done';
         const hasResult = !!dbOpenRequest.result;
 
-        if (isRequestDone && hasResult) {
-          return resolve();
+        if (isRequestDone) {
+          return hasResult ? resolve() : reject(new Error('Failed to open IndexedDb'));
         }
 
-        if (tooManyAttempts || (isRequestDone && !hasResult)) {
-          return reject(new Error());
+        if (tooManyAttempts) {
+          return reject(new Error('IndexedDb open request timed out'));
         }
 
         window.setTimeout(() => checkDbRequest(currentAttempt + 1), interval);
