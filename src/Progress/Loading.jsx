@@ -30,12 +30,13 @@ function LoadingComponent({className, progress}) {
   }
   return (
     <svg className={className} width="43" height="43" viewBox="0 0 43 43" strokeWidth="3" fill="none">
-      <circle cx="21.5" cy="21.5" r="20" stroke="rgba(48,53,56,.2)" />
+      <circle cx="21.5" cy="21.5" r="20" stroke="rgba(51,55,58,.08)" />
       <circle
         cx="21.5"
         cy="21.5"
         r="20"
         stroke="#218fd1"
+        strokeLinecap="round"
         transform="rotate(-90 21.5 21.5)"
         strokeDasharray={pathLength}
         {...additionalProps}
