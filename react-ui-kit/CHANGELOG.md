@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="1.1.0"></a>
+# [1.1.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@1.0.25...@wireapp/react-ui-kit@1.1.0) (2018-04-06)
+
+
+### Features
+
+* **react-ui-kit:** Loading spinner color and linecaps ([#453](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/453)) ([b3f4b7c](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/b3f4b7c))
+
+
+
+
 <a name="1.0.25"></a>
 ## [1.0.25](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@1.0.24...@wireapp/react-ui-kit@1.0.25) (2018-04-06)
 
