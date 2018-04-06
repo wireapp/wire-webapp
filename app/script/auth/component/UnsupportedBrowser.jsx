@@ -17,30 +17,72 @@
  *
  */
 
-import {H2, H3, Container, COLOR} from '@wireapp/react-ui-kit';
+import {H1, H2, H3, Text, Container, ContainerXS, COLOR, Loading, Logo} from '@wireapp/react-ui-kit';
 import {unsupportedStrings} from '../../strings';
 import WirelessContainer from '../component/WirelessContainer';
+import * as RuntimeSelector from '../module/selector/RuntimeSelector';
 import {connect} from 'react-redux';
 import {injectIntl, FormattedHTMLMessage} from 'react-intl';
-import Runtime from '../Runtime';
 import React from 'react';
 
-const runtime = new Runtime();
+const showUnsupportedMessage = (headline, subhead) => (
+  <ContainerXS verticalCenter centerText>
+    <Logo height="20" />
+    <H1 center style={{marginBottom: '48px', marginTop: '24px'}}>
+      <FormattedHTMLMessage {...headline} />
+    </H1>
+    <Text center>
+      <FormattedHTMLMessage {...subhead} />
+    </Text>
+  </ContainerXS>
+);
 
-export const UnsupportedBrowser = ({children, intl: {formatMessage: _}}) =>
-  runtime.isSupportedBrowser() ? (
-    children
-  ) : (
-    <WirelessContainer>
-      <Container verticalCenter>
-        <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}} color={COLOR.GRAY}>
-          <FormattedHTMLMessage {...unsupportedStrings.headline} />
-        </H2>
-        <H3 style={{marginBottom: '10px'}}>
-          <FormattedHTMLMessage {...unsupportedStrings.subhead} />
-        </H3>
-      </Container>
-    </WirelessContainer>
-  );
+export const UnsupportedBrowser = ({
+  children,
+  hasCookieSupport,
+  hasIndexedDbSupport,
+  isCheckingSupport,
+  isSupportedBrowser,
+}) => {
+  if (!isSupportedBrowser) {
+    return (
+      <WirelessContainer>
+        <Container verticalCenter>
+          <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}} color={COLOR.GRAY}>
+            <FormattedHTMLMessage {...unsupportedStrings.headlineBrowser} />
+          </H2>
+          <H3 style={{marginBottom: '10px'}}>
+            <FormattedHTMLMessage {...unsupportedStrings.subheadBrowser} />
+          </H3>
+        </Container>
+      </WirelessContainer>
+    );
+  }
 
-export default injectIntl(connect(state => ({}))(UnsupportedBrowser));
+  if (isCheckingSupport) {
+    return (
+      <ContainerXS centerText verticalCenter style={{justifyContent: 'center'}}>
+        <Loading />
+      </ContainerXS>
+    );
+  }
+
+  if (!hasCookieSupport) {
+    return showUnsupportedMessage(unsupportedStrings.headlineCookies, unsupportedStrings.subheadCookies);
+  }
+
+  if (!hasIndexedDbSupport) {
+    return showUnsupportedMessage(unsupportedStrings.headlineIndexedDb, unsupportedStrings.subheadIndexedDb);
+  }
+
+  return children;
+};
+
+export default injectIntl(
+  connect(state => ({
+    hasCookieSupport: RuntimeSelector.hasCookieSupport(state),
+    hasIndexedDbSupport: RuntimeSelector.hasIndexedDbSupport(state),
+    isCheckingSupport: RuntimeSelector.isChecking(state),
+    isSupportedBrowser: RuntimeSelector.isSupportedBrowser(state),
+  }))(UnsupportedBrowser)
+);
