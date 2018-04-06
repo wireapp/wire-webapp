@@ -28,16 +28,22 @@ z.main.App = class App {
       COOKIES_CHECK: {
         COOKIE_NAME: 'cookies_enabled',
       },
-      IMMEDIATE_SIGN_OUT_REASONS: [
-        z.auth.SIGN_OUT_REASON.ACCOUNT_DELETED,
-        z.auth.SIGN_OUT_REASON.CLIENT_REMOVED,
-        z.auth.SIGN_OUT_REASON.SESSION_EXPIRED,
-      ],
       NOTIFICATION_CHECK: 10 * 1000,
+      SIGN_OUT_REASONS: {
+        IMMEDIATE: [
+          z.auth.SIGN_OUT_REASON.ACCOUNT_DELETED,
+          z.auth.SIGN_OUT_REASON.CLIENT_REMOVED,
+          z.auth.SIGN_OUT_REASON.SESSION_EXPIRED,
+        ],
+        TEMPORARY_GUEST: [
+          z.auth.SIGN_OUT_REASON.MULTIPLE_TABS,
+          z.auth.SIGN_OUT_REASON.SESSION_EXPIRED,
+          z.auth.SIGN_OUT_REASON.USER_REQUESTED,
+        ],
+      },
       TABS_CHECK: {
         COOKIE_NAME: 'app_opened',
-        COOKIE_TIMEOUT: 5 * 60 * 1000,
-        RENEWAL_THRESHOLD: 15 * 1000,
+        INTERVAL: 1000,
       },
     };
   }
@@ -58,6 +64,8 @@ z.main.App = class App {
     this.repository = this._setup_repositories();
     this.view = this._setup_view_models();
     this.util = this._setup_utils();
+
+    this.instanceId = z.util.createRandomUuid();
 
     this._subscribe_to_events();
 
@@ -80,7 +88,6 @@ z.main.App = class App {
     repositories.audio = this.auth.audio;
     repositories.cache = new z.cache.CacheRepository();
     repositories.giphy = new z.extension.GiphyRepository(this.service.giphy);
-    repositories.lifecycle = new z.lifecycle.LifecycleRepository(this.service.lifecycle);
     repositories.media = new z.media.MediaRepository();
     repositories.storage = new z.storage.StorageRepository(this.service.storage);
 
@@ -103,6 +110,7 @@ z.main.App = class App {
       repositories.user
     );
     repositories.properties = new z.properties.PropertiesRepository(this.service.properties);
+    repositories.lifecycle = new z.lifecycle.LifecycleRepository(this.service.lifecycle, repositories.user);
     repositories.connect = new z.connect.ConnectRepository(
       this.service.connect,
       this.service.connect_google,
@@ -196,7 +204,7 @@ z.main.App = class App {
    */
   _setup_utils() {
     return {
-      debug: z.util.Environment.frontend.is_production()
+      debug: z.util.Environment.frontend.isProduction()
         ? undefined
         : new z.util.DebugUtil(this.repository.calling, this.repository.conversation, this.repository.user),
     };
@@ -236,15 +244,15 @@ z.main.App = class App {
    */
   init_app(is_reload = this._is_reload()) {
     z.util
-      .check_indexed_db()
-      .then(() => this._check_single_instance())
-      .then(() => this._load_access_token())
+      .checkIndexedDb()
+      .then(() => this._checkSingleInstanceOnInit())
+      .then(() => this._loadAccessToken())
       .then(() => {
         this.view.loading.updateProgress(2.5);
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
 
         const protoFile = `ext/proto/generic-message-proto/messages.proto?${z.util.Environment.version(false)}`;
-        return Promise.all([this._get_user_self(), z.util.protobuf.load_protos(protoFile)]);
+        return Promise.all([this._get_user_self(), z.util.protobuf.loadProtos(protoFile)]);
       })
       .then(([self_user_et]) => {
         this.view.loading.updateProgress(5, z.string.initReceivedSelfUser);
@@ -320,7 +328,7 @@ z.main.App = class App {
         return this._handleUrlParams();
       })
       .then(() => {
-        this._show_ui();
+        this._showInterface();
         this.telemetry.report();
         amplify.publish(z.event.WebApp.LIFECYCLE.LOADED);
         amplify.publish(z.event.WebApp.LOADED); // todo: deprecated - remove when user base of wrappers version >= 2.12 is large enough
@@ -384,10 +392,11 @@ z.main.App = class App {
     const {message, type} = error;
     const is_auth_error = error instanceof z.auth.AuthError;
     if (is_auth_error) {
-      if (type === z.auth.AuthError.TYPE.MULTIPLE_TABS) {
-        return this._redirect_to_login(z.auth.SIGN_OUT_REASON.MULTIPLE_TABS);
-      }
-      return this._redirect_to_login(z.auth.SIGN_OUT_REASON.INDEXED_DB);
+      const isTypeMultipleTabs = type === z.auth.AuthError.TYPE.MULTIPLE_TABS;
+      const signOutReason = isTypeMultipleTabs
+        ? z.auth.SIGN_OUT_REASON.MULTIPLE_TABS
+        : z.auth.SIGN_OUT_REASON.INDEXED_DB;
+      return this._redirectToLogin(signOutReason);
     }
 
     this.logger.debug(
@@ -402,7 +411,7 @@ z.main.App = class App {
       if (is_session_expired.includes(type)) {
         this.logger.error(`Session expired on page reload: ${message}`, error);
         Raygun.send(new Error('Session expired on page reload', error));
-        return this._redirect_to_login(z.auth.SIGN_OUT_REASON.SESSION_EXPIRED);
+        return this._redirectToLogin(z.auth.SIGN_OUT_REASON.SESSION_EXPIRED);
       }
 
       const is_access_token_error = error instanceof z.auth.AccessTokenError;
@@ -423,7 +432,7 @@ z.main.App = class App {
         case z.auth.AccessTokenError.TYPE.RETRIES_EXCEEDED:
         case z.auth.AccessTokenError.TYPE.REQUEST_FORBIDDEN: {
           this.logger.warn(`Redirecting to login: ${error.message}`, error);
-          return this._redirect_to_login(z.auth.SIGN_OUT_REASON.NOT_SIGNED_IN);
+          return this._redirectToLogin(z.auth.SIGN_OUT_REASON.NOT_SIGNED_IN);
         }
 
         default: {
@@ -448,36 +457,24 @@ z.main.App = class App {
 
   /**
    * Check whether we need to set different user information (picture, username).
-   * @param {z.entity.User} user_et - Self user entity
+   * @param {z.entity.User} userEntity - Self user entity
    * @returns {z.entity.User} Checked user entity
    */
-  _check_user_information(user_et) {
-    if (!user_et.mediumPictureResource()) {
-      this.repository.user.set_default_picture();
-    }
-    if (!user_et.username()) {
-      this.repository.user.get_username_suggestion();
-    }
+  _check_user_information(userEntity) {
+    const hasEmailAddress = userEntity.email();
+    const hasPhoneNumber = userEntity.phone();
+    const isActivatedUser = hasEmailAddress || hasPhoneNumber;
 
-    return user_et;
-  }
-
-  /**
-   * Check that this is the single instance tab of the app.
-   * @returns {Promise} Resolves when page is the first tab
-   */
-  _check_single_instance() {
-    if (!z.util.Environment.electron) {
-      const cookie_name = App.CONFIG.TABS_CHECK.COOKIE_NAME;
-      if (Cookies.get(cookie_name)) {
-        return Promise.reject(new z.auth.AuthError(z.auth.AuthError.TYPE.MULTIPLE_TABS));
+    if (isActivatedUser) {
+      if (!userEntity.mediumPictureResource()) {
+        this.repository.user.set_default_picture();
       }
-
-      this._set_single_instance_cookie();
-      $(window).on('beforeunload', () => Cookies.remove(cookie_name));
+      if (!userEntity.username()) {
+        this.repository.user.get_username_suggestion();
+      }
     }
 
-    return Promise.resolve();
+    return userEntity;
   }
 
   /**
@@ -485,13 +482,22 @@ z.main.App = class App {
    * @returns {Promise<z.entity.User>} Resolves with the self user entity
    */
   _get_user_self() {
-    return this.repository.user.get_me().then(user_et => {
-      this.logger.info(`Loaded self user with ID '${user_et.id}'`);
-      if (!user_et.email() && !user_et.phone()) {
-        throw new Error('User does not have a verified identity');
+    return this.repository.user.getSelf().then(userEntity => {
+      this.logger.info(`Loaded self user with ID '${userEntity.id}'`);
+
+      const hasEmailAddress = userEntity.email();
+      const hasPhoneNumber = userEntity.phone();
+      const isActivatedUser = hasEmailAddress || hasPhoneNumber;
+
+      if (!isActivatedUser) {
+        this.logger.info('User does not have an activated identity and seems to be wireless');
+
+        if (!userEntity.isTemporaryGuest()) {
+          throw new Error('User does not have an activated identity');
+        }
       }
 
-      return this.service.storage.init(user_et.id).then(() => this._check_user_information(user_et));
+      return this.service.storage.init(userEntity.id).then(() => this._check_user_information(userEntity));
     });
   }
 
@@ -501,23 +507,17 @@ z.main.App = class App {
    * @returns {undefined} Not return value
    */
   _handleUrlParams() {
-    const providerId = z.util.get_url_parameter(z.auth.URLParameter.BOT_PROVIDER);
-    const serviceId = z.util.get_url_parameter(z.auth.URLParameter.BOT_SERVICE);
+    const providerId = z.util.URLUtil.getParameter(z.auth.URLParameter.BOT_PROVIDER);
+    const serviceId = z.util.URLUtil.getParameter(z.auth.URLParameter.BOT_SERVICE);
     if (providerId && serviceId) {
       this.logger.info(`Found bot conversation initialization params '${serviceId}'`);
       this.repository.integration.addServiceFromParam(providerId, serviceId);
     }
 
-    const supportIntegrations = z.util.get_url_parameter(z.auth.URLParameter.INTEGRATIONS);
+    const supportIntegrations = z.util.URLUtil.getParameter(z.auth.URLParameter.INTEGRATIONS);
     if (_.isBoolean(supportIntegrations)) {
       this.logger.info(`Feature flag for integrations set to '${serviceId}'`);
       this.repository.integration.supportIntegrations(supportIntegrations);
-    }
-
-    const supportConversationLinks = z.util.get_url_parameter(z.auth.URLParameter.LINKS);
-    if (_.isBoolean(supportConversationLinks)) {
-      this.logger.info(`Feature flag for conversation links set to '${supportConversationLinks}'`);
-      this.repository.conversation.supportConversationLinks(supportConversationLinks);
     }
   }
 
@@ -527,7 +527,7 @@ z.main.App = class App {
    * @returns {boolean}  True if it is a page refresh
    */
   _is_reload() {
-    const is_reload = z.util.is_same_location(document.referrer, window.location.href);
+    const is_reload = z.util.isSameLocation(document.referrer, window.location.href);
     this.logger.debug(
       `App reload: '${is_reload}', Document referrer: '${document.referrer}', Location: '${window.location.href}'`
     );
@@ -538,37 +538,81 @@ z.main.App = class App {
    * Load the access token from cache or get one from the backend.
    * @returns {Promise} Resolves with the access token
    */
-  _load_access_token() {
-    const is_localhost = z.util.Environment.frontend.is_localhost();
-    const is_redirect_from_auth = document.referrer.toLowerCase().includes('/auth');
-    const get_cached_token = is_localhost || is_redirect_from_auth;
+  _loadAccessToken() {
+    const isLocalhost = z.util.Environment.frontend.isLocalhost();
+    const referrer = document.referrer.toLowerCase();
+    const isLoginRedirect = referrer.includes('/auth') || referrer.includes('/login');
+    const getCachedToken = isLocalhost || isLoginRedirect;
 
-    return get_cached_token ? this.auth.repository.getCachedAccessToken() : this.auth.repository.getAccessToken();
+    return getCachedToken ? this.auth.repository.getCachedAccessToken() : this.auth.repository.getAccessToken();
+  }
+
+  //##############################################################################
+  // Multiple tabs check
+  //##############################################################################
+
+  /**
+   * Check that this is the single instance tab of the app.
+   * @returns {Promise} Resolves when page is the first tab
+   */
+  _checkSingleInstanceOnInit() {
+    if (!z.util.Environment.electron) {
+      return this._setSingleInstanceCookie();
+    }
+
+    return Promise.resolve();
+  }
+
+  _checkSingleInstanceOnInterval() {
+    const singleInstanceCookie = Cookies.getJSON(App.CONFIG.TABS_CHECK.COOKIE_NAME);
+
+    const shouldBlockTab = !singleInstanceCookie || singleInstanceCookie.appInstanceId !== this.instanceId;
+    if (shouldBlockTab) {
+      return this._redirectToLogin(z.auth.SIGN_OUT_REASON.MULTIPLE_TABS);
+    }
   }
 
   /**
    * Set the cookie to verify we are running a single instace tab.
    * @returns {undefined} No return value
    */
-  _set_single_instance_cookie() {
-    const cookie_timeout = new Date(Date.now() + App.CONFIG.TABS_CHECK.COOKIE_TIMEOUT);
-    Cookies.set(App.CONFIG.TABS_CHECK.COOKIE_NAME, true, {expires: cookie_timeout});
+  _setSingleInstanceCookie() {
+    const shouldBlockTab = !!Cookies.get(App.CONFIG.TABS_CHECK.COOKIE_NAME);
+    if (shouldBlockTab) {
+      return Promise.reject(new z.auth.AuthError(z.auth.AuthError.TYPE.MULTIPLE_TABS));
+    }
 
-    const renewal_timeout = App.CONFIG.TABS_CHECK.COOKIE_TIMEOUT - App.CONFIG.TABS_CHECK.RENEWAL_THRESHOLD;
-    window.setTimeout(() => this._set_single_instance_cookie(), renewal_timeout);
+    const cookieData = {appInstanceId: this.instanceId};
+    Cookies.set(App.CONFIG.TABS_CHECK.COOKIE_NAME, cookieData);
+
+    window.setInterval(() => this._checkSingleInstanceOnInterval(), App.CONFIG.TABS_CHECK.INTERVAL);
+    this._registerSingleInstanceCookieDeletion();
+  }
+
+  _registerSingleInstanceCookieDeletion() {
+    $(window).on('beforeunload', () => {
+      const singleInstanceCookie = Cookies.getJSON(App.CONFIG.TABS_CHECK.COOKIE_NAME);
+
+      const isOwnInstanceId = singleInstanceCookie && singleInstanceCookie.appInstanceId === this.instanceId;
+      if (isOwnInstanceId) {
+        Cookies.remove(App.CONFIG.TABS_CHECK.COOKIE_NAME);
+      }
+    });
   }
 
   /**
    * Hide the loading spinner and show the application UI.
    * @returns {undefined} No return value
    */
-  _show_ui() {
-    const conversation_et = this.repository.conversation.getMostRecentConversation();
+  _showInterface() {
+    const conversationEntity = this.repository.conversation.getMostRecentConversation();
     this.logger.info('Showing application UI');
-    if (this.repository.user.should_change_username()) {
-      amplify.publish(z.event.WebApp.TAKEOVER.SHOW);
-    } else if (conversation_et) {
-      amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversation_et);
+    if (this.repository.user.isTemporaryGuest()) {
+      this.view.list.showTemporaryGuest();
+    } else if (this.repository.user.shouldChangeUsername()) {
+      this.view.list.showTakeover();
+    } else if (conversationEntity) {
+      amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity);
     } else if (this.repository.user.connect_requests().length) {
       amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS);
     }
@@ -592,7 +636,13 @@ z.main.App = class App {
     $(window).on('unload', () => {
       this.logger.info("'window.unload' was triggered, so we will tear down calls.");
       this.repository.calling.leaveCallOnUnload();
-      this.repository.storage.terminate('window.onunload');
+
+      if (this.repository.user.isActivatedAccount()) {
+        this.repository.storage.terminate('window.onunload');
+      } else {
+        this.repository.storage.deleteDatabase();
+      }
+
       this.repository.notification.clearNotifications();
     });
   }
@@ -614,76 +664,75 @@ z.main.App = class App {
   /**
    * Logs the user out on the backend and deletes cached data.
    *
-   * @param {z.auth.SIGN_OUT_REASON} sign_out_reason - Cause for logout
-   * @param {boolean} clear_data - Keep data in database
+   * @param {z.auth.SIGN_OUT_REASON} signOutReason - Cause for logout
+   * @param {boolean} clearData - Keep data in database
    * @returns {undefined} No return value
    */
-  logout(sign_out_reason, clear_data = false) {
+  logout(signOutReason, clearData = false) {
+    const _redirectToLogin = () => {
+      amplify.publish(z.event.WebApp.LIFECYCLE.SIGNED_OUT, clearData);
+      this._redirectToLogin(signOutReason);
+    };
+
     const _logout = () => {
       // Disconnect from our backend, end tracking and clear cached data
       this.repository.event.disconnectWebSocket(z.event.WebSocketService.CHANGE_TRIGGER.LOGOUT);
 
       // Clear Local Storage (but don't delete the cookie label if you were logged in with a permanent client)
-      const do_not_delete = [z.storage.StorageKey.AUTH.SHOW_LOGIN];
+      const keysToKeep = [z.storage.StorageKey.AUTH.SHOW_LOGIN];
 
-      if (this.repository.client.isCurrentClientPermanent() && !clear_data) {
-        do_not_delete.push(z.storage.StorageKey.AUTH.PERSIST);
+      const keepPermanentDatabase = this.repository.client.isCurrentClientPermanent() && !clearData;
+      if (keepPermanentDatabase) {
+        keysToKeep.push(z.storage.StorageKey.AUTH.PERSIST);
       }
 
       // @todo remove on next iteration
-      const self_user = this.repository.user.self();
-      if (self_user) {
-        const cookie_label_key = this.repository.client.constructCookieLabelKey(self_user.email() || self_user.phone());
+      const selfUser = this.repository.user.self();
+      if (selfUser) {
+        const cookieLabelKey = this.repository.client.constructCookieLabelKey(selfUser.email() || selfUser.phone());
 
-        Object.keys(amplify.store()).forEach(amplify_key => {
-          if (
-            !(amplify_key === cookie_label_key && clear_data) &&
-            z.util.StringUtil.includes(amplify_key, z.storage.StorageKey.AUTH.COOKIE_LABEL)
-          ) {
-            do_not_delete.push(amplify_key);
+        Object.keys(amplify.store()).forEach(keyInAmplifyStore => {
+          const isCookieLabelKey = keyInAmplifyStore === cookieLabelKey;
+          const deleteLabelKey = isCookieLabelKey && clearData;
+          const isCookieLabel = z.util.StringUtil.includes(keyInAmplifyStore, z.storage.StorageKey.AUTH.COOKIE_LABEL);
+
+          if (!deleteLabelKey && isCookieLabel) {
+            keysToKeep.push(keyInAmplifyStore);
           }
         });
 
-        const keep_conversation_input = sign_out_reason === z.auth.SIGN_OUT_REASON.SESSION_EXPIRED;
-        this.repository.cache.clearCache(keep_conversation_input, do_not_delete);
+        const keepConversationInput = signOutReason === z.auth.SIGN_OUT_REASON.SESSION_EXPIRED;
+        this.repository.cache.clearCache(keepConversationInput, keysToKeep);
       }
 
       // Clear IndexedDB
-      if (clear_data) {
-        this.repository.storage
-          .deleteDatabase()
-          .catch(error => this.logger.error('Failed to delete database before logout', error))
-          .then(() => {
-            amplify.publish(z.event.WebApp.LIFECYCLE.SIGNED_OUT, clear_data);
-            this._redirect_to_login(sign_out_reason);
-          });
-      } else {
-        amplify.publish(z.event.WebApp.LIFECYCLE.SIGNED_OUT, clear_data);
-        this._redirect_to_login(sign_out_reason);
-      }
+      const clearDataPromise = clearData
+        ? this.repository.storage
+            .deleteDatabase()
+            .catch(error => this.logger.error('Failed to delete database before logout', error))
+        : Promise.resolve();
+
+      return clearDataPromise.then(() => _redirectToLogin());
     };
 
-    const _logout_on_backend = () => {
-      this.logger.info(`Logout triggered by '${sign_out_reason}': Disconnecting user from the backend.`);
-      this.auth.repository
+    const _logoutOnBackend = () => {
+      this.logger.info(`Logout triggered by '${signOutReason}': Disconnecting user from the backend.`);
+      return this.auth.repository
         .logout()
         .then(() => _logout())
-        .catch(() => {
-          amplify.publish(z.event.WebApp.LIFECYCLE.SIGNED_OUT, clear_data);
-          this._redirect_to_login(sign_out_reason);
-        });
+        .catch(() => _redirectToLogin());
     };
 
-    if (App.CONFIG.IMMEDIATE_SIGN_OUT_REASONS.includes(sign_out_reason)) {
+    if (App.CONFIG.SIGN_OUT_REASONS.IMMEDIATE.includes(signOutReason)) {
       return _logout();
     }
 
     if (navigator.onLine) {
-      return _logout_on_backend();
+      return _logoutOnBackend();
     }
 
     this.logger.warn('No internet access. Continuing when internet connectivity regained.');
-    $(window).on('online', () => _logout_on_backend());
+    $(window).on('online', () => _logoutOnBackend());
   }
 
   /**
@@ -715,20 +764,31 @@ z.main.App = class App {
 
   /**
    * Redirect to the login page after internet connectivity has been verified.
-   * @param {z.auth.SIGN_OUT_REASON} sign_out_reason - Redirect triggered by session expiration
+   * @param {z.auth.SIGN_OUT_REASON} signOutReason - Redirect triggered by session expiration
    * @returns {undefined} No return value
    */
-  _redirect_to_login(sign_out_reason) {
-    this.logger.info(`Redirecting to login after connectivity verification. Reason: ${sign_out_reason}`);
+  _redirectToLogin(signOutReason) {
+    this.logger.info(`Redirecting to login after connectivity verification. Reason: ${signOutReason}`);
     this.auth.client
       .execute_on_connectivity(z.service.BackendClient.CONNECTIVITY_CHECK_TRIGGER.LOGIN_REDIRECT)
       .then(() => {
-        const expectedSignOutReasons = [z.auth.SIGN_OUT_REASON.ACCOUNT_DELETED, z.auth.SIGN_OUT_REASON.NOT_SIGNED_IN];
-        const notSignedIn = expectedSignOutReasons.includes(sign_out_reason);
-        let url = `${notSignedIn ? '/auth/' : '/login/'}${location.search}`;
+        const isTemporaryGuestReason = App.CONFIG.SIGN_OUT_REASONS.TEMPORARY_GUEST.includes(signOutReason);
+        const isLeavingGuestRoom = isTemporaryGuestReason && this.repository.user.isTemporaryGuest();
+        if (isLeavingGuestRoom) {
+          const path = z.l10n.text(z.string.urlWebsiteRoot);
+          const url = z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.WEBSITE, path);
+          return window.location.replace(url);
+        }
 
-        if (App.CONFIG.IMMEDIATE_SIGN_OUT_REASONS.includes(sign_out_reason)) {
-          url = z.util.append_url_parameter(url, `${z.auth.URLParameter.REASON}=${sign_out_reason}`);
+        let url = `/auth/${location.search}`;
+        const isImmediateSignOutReason = App.CONFIG.SIGN_OUT_REASONS.IMMEDIATE.includes(signOutReason);
+        if (isImmediateSignOutReason) {
+          url = z.util.URLUtil.appendParameter(url, `${z.auth.URLParameter.REASON}=${signOutReason}`);
+        }
+
+        const redirectToLogin = signOutReason !== z.auth.SIGN_OUT_REASON.NOT_SIGNED_IN;
+        if (redirectToLogin) {
+          url = `${url}#login`;
         }
 
         window.location.replace(url);
@@ -762,7 +822,7 @@ z.main.App = class App {
    * @returns {undefined} No return value
    */
   init_debugging() {
-    if (z.util.Environment.frontend.is_localhost()) {
+    if (z.util.Environment.frontend.isLocalhost()) {
       this._attach_live_reload();
     }
   }

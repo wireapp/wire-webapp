@@ -27,6 +27,7 @@ describe('ConversationService', () => {
   let server = null;
   let storage_service = null;
   const test_factory = new TestFactory();
+  const eventStoreName = z.storage.StorageSchemata.OBJECT_STORE.EVENTS;
 
   beforeAll(done => {
     test_factory
@@ -59,9 +60,7 @@ describe('ConversationService', () => {
     /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
 
     beforeEach(done => {
-      Promise.all(
-        messages.map(message => storage_service.save(z.storage.StorageService.OBJECT_STORE.EVENTS, undefined, message))
-      )
+      Promise.all(messages.map(message => storage_service.save(eventStoreName, undefined, message)))
         .then(done)
         .catch(done.fail);
     });
@@ -78,7 +77,7 @@ describe('ConversationService', () => {
 
     it('returns undefined if no event with id is found', done => {
       conversation_service
-        .load_event_from_db(conversation_id, z.util.create_random_uuid())
+        .load_event_from_db(conversation_id, z.util.createRandomUuid())
         .then(message_et => {
           expect(message_et).not.toBeDefined();
           done();
@@ -127,9 +126,7 @@ describe('ConversationService', () => {
         };
       });
 
-      Promise.all(
-        messages.map(message => storage_service.save(z.storage.StorageService.OBJECT_STORE.EVENTS, undefined, message))
-      )
+      Promise.all(messages.map(message => storage_service.save(eventStoreName, undefined, message)))
         .then(done)
         .catch(done.fail);
     });
@@ -237,9 +234,7 @@ describe('ConversationService', () => {
         };
       });
 
-      Promise.all(
-        events.map(event => storage_service.save(z.storage.StorageService.OBJECT_STORE.EVENTS, undefined, event))
-      )
+      Promise.all(events.map(event => storage_service.save(eventStoreName, undefined, event)))
         .then(done)
         .catch(done.fail);
     });
@@ -281,9 +276,7 @@ describe('ConversationService', () => {
     /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
 
     beforeEach(done => {
-      Promise.all(
-        messages.map(message => storage_service.save(z.storage.StorageService.OBJECT_STORE.EVENTS, undefined, message))
-      )
+      Promise.all(messages.map(message => storage_service.save(eventStoreName, undefined, message)))
         .then(ids => {
           primary_keys = ids;
           done();
@@ -330,11 +323,7 @@ describe('ConversationService', () => {
     });
 
     it('should return no entry matches the given category', done => {
-      Promise.all(
-        events
-          .slice(0, 1)
-          .map(event => storage_service.save(z.storage.StorageService.OBJECT_STORE.EVENTS, undefined, event))
-      )
+      Promise.all(events.slice(0, 1).map(event => storage_service.save(eventStoreName, undefined, event)))
         .then(() =>
           conversation_service.load_events_with_category_from_db(
             events[0].conversation,
@@ -349,9 +338,7 @@ describe('ConversationService', () => {
     });
 
     it('should get images in the correct order', done => {
-      Promise.all(
-        events.map(event => storage_service.save(z.storage.StorageService.OBJECT_STORE.EVENTS, undefined, event))
-      )
+      Promise.all(events.map(event => storage_service.save(eventStoreName, undefined, event)))
         .then(() =>
           conversation_service.load_events_with_category_from_db(
             events[0].conversation,
@@ -382,11 +369,7 @@ describe('ConversationService', () => {
     });
 
     it('should find query in text message', done => {
-      Promise.all(
-        events
-          .slice(0, 1)
-          .map(event => storage_service.save(z.storage.StorageService.OBJECT_STORE.EVENTS, undefined, event))
-      )
+      Promise.all(events.slice(0, 1).map(event => storage_service.save(eventStoreName, undefined, event)))
         .then(() => conversation_service.search_in_conversation(events[0].conversation, 'https://wire.com'))
         .then(result => {
           expect(result.length).toBe(1);
@@ -397,9 +380,7 @@ describe('ConversationService', () => {
     });
 
     it('should find query in text message with link preview', done => {
-      Promise.all(
-        events.map(event => storage_service.save(z.storage.StorageService.OBJECT_STORE.EVENTS, undefined, event))
-      )
+      Promise.all(events.map(event => storage_service.save(eventStoreName, undefined, event)))
         .then(() => conversation_service.search_in_conversation(events[0].conversation, 'https://wire.com'))
         .then(result => {
           expect(result.length).toBe(2);
@@ -430,9 +411,7 @@ describe('ConversationService', () => {
     });
 
     it('should return conversation ids sorted by number of messages', done => {
-      Promise.all(
-        events.map(event => storage_service.save(z.storage.StorageService.OBJECT_STORE.EVENTS, undefined, event))
-      )
+      Promise.all(events.map(event => storage_service.save(eventStoreName, undefined, event)))
         .then(() => conversation_service.get_active_conversations_from_db())
         .then(result => {
           expect(result.length).toBe(3);

@@ -19,14 +19,19 @@
 
 import {onEnvironment} from './Environment';
 
-const WEBAPP_ENV = onEnvironment('http://localhost:8888', '', '');
+const WEBAPP_ENV = onEnvironment('/app', '/', '/');
+const WIRE_WEBSITE = onEnvironment(
+  'https://wire-website-staging.zinfra.io/',
+  'https://wire-website-staging.zinfra.io/',
+  'https://wire.com/'
+);
 
 export default {
-  LOGIN: `${WEBAPP_ENV}/login`,
+  PHONE_LOGIN: `${WEBAPP_ENV}login`,
   WEBAPP: WEBAPP_ENV,
-  WIRE_ROOT: onEnvironment(
-    'https://wire-website-staging.zinfra.io',
-    'https://wire-website-staging.zinfra.io',
-    'https://wire.com'
-  ),
+  WIRE_PRIVACY_POLICY: `${WIRE_WEBSITE}legal/#privacy`,
+  WIRE_TEAM_FEATURES: `${WIRE_WEBSITE}create-team/#features`,
+  WIRE_TERMS_PERSONAL: `${WIRE_WEBSITE}legal/terms/#personal`,
+  WIRE_TERMS_TEAMS: `${WIRE_WEBSITE}legal/terms/#teams`,
+  WIRE_WEBSITE,
 };

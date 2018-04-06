@@ -19,15 +19,15 @@
 
 // input mixin
 .input-box {
+  display: block;
+  width: 100%;
+  height: @button-height;
+  padding: 0 16px;
+  margin-bottom: 8px;
   border-radius: @button-border-radius;
   color: #fff;
-  display: block;
-  height: @button-height;
   line-height: @button-height;
-  margin-bottom: 8px;
   outline: 0;
-  padding: 0 16px;
-  width: 100%;
 
   &::-ms-clear {
     display: none;
@@ -37,11 +37,13 @@
 // input
 .input {
   .input-box;
-  background-color: fade(#000, 40%);
+
   border: none;
+  background-color: fade(#000, 40%);
 
   &::placeholder {
-    .label-xs();
+    .label-xs;
+
     color: fade(#fff, 56%);
   }
 }
@@ -67,27 +69,27 @@
   }
 
   label {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: @button-height;
     height: @button-height;
     line-height: @button-height;
     pointer-events: none;
-    position: absolute;
-    right: 0;
     text-align: center;
-    top: 0;
-    width: @button-height;
   }
 }
 
 .input-group {
   display: flex;
+  overflow: hidden;
   margin-bottom: 8px;
   border-radius: @button-border-radius;
-  overflow: hidden;
 
   button,
   input {
-    border-radius: 0;
     margin-bottom: 0;
+    border-radius: 0;
 
     &:invalid {
       box-shadow: none;
@@ -96,10 +98,10 @@
 }
 
 .input-group-button {
-  flex: 0 0 auto;
-  line-height: @button-height;
   width: @button-height;
+  flex: 0 0 auto;
   padding: 0;
+  line-height: @button-height;
 
   &.visible {
     display: block;
@@ -112,7 +114,7 @@
 }
 
 .input-code {
-  text-align: center;
-  letter-spacing: 8px;
   font-size: @font-size-lg;
+  letter-spacing: 8px;
+  text-align: center;
 }

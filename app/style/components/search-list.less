@@ -25,9 +25,9 @@
 }
 
 .search-list-item {
-  cursor: pointer;
-  margin-bottom: 16px;
   overflow: hidden;
+  margin-bottom: 16px;
+  cursor: pointer;
 
   .search-list-sm & {
     text-align: center;
@@ -47,60 +47,61 @@
 .search-list-item-image {
   .search-list-sm & {
     .square(@avatar-diameter-l);
+
     position: relative;
     margin-bottom: 3px;
   }
 
   .search-list-lg & {
-    flex: 0 0 auto;
-    height: @avatar-diameter-m;
     position: relative;
     display: flex;
+    height: @avatar-diameter-m;
+    flex: 0 0 auto;
     align-items: center;
   }
 }
 
 .search-list-item-image-guest-indicator-badge {
   .guest-badge;
+
+  position: absolute;
   bottom: 0;
   left: 50%;
-  position: absolute;
   transform: translateX(-50%);
 }
 
 .search-list-item-image-overlay {
-  .full-screen();
-  align-items: center;
-  justify-content: center;
-  display: flex;
+  .full-screen;
+  .flex-center;
 
   .background {
-    .full-screen();
+    .full-screen;
+
     border-radius: 50%;
     opacity: 0;
   }
 
   .checkmark {
-    transform: scale(1.8);
     opacity: 0;
+    transform: scale(1.8);
   }
 }
 
 .search-list-item-content {
-  align-items: flex-start;
-  justify-content: center;
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
 
   .search-list-sm & {
     width: @avatar-diameter-l;
   }
 
   .search-list-lg & {
-    flex: 1 1;
-    height: @avatar-diameter-m;
-    margin-left: 16px;
     min-width: 0; // this will ensure that ellipses is working
+    height: @avatar-diameter-m;
+    flex: 1 1;
+    margin-left: 16px;
   }
 }
 
@@ -117,10 +118,11 @@
 
 .search-list-item-content-name {
   .ellipsis;
+
   width: 100%;
 
   .search-list-sm & {
-    .label-xs();
+    .label-xs;
   }
 }
 
@@ -133,10 +135,11 @@
 
 .search-list-item-header {
   .ellipsis;
-  height: @avatar-diameter-m;
-  line-height: @avatar-diameter-m;
-  margin-left: 16px;
+
   max-width: 184px;
+  height: @avatar-diameter-m;
+  margin-left: 16px;
+  line-height: @avatar-diameter-m;
 }
 
 .search-list-theme-black .image.state-badge::before {
@@ -145,23 +148,24 @@
 }
 
 .search-list-item-guest-indicator {
-  font-size: @font-size-xs;
-  height: @avatar-diameter-m;
   display: flex;
+  height: @avatar-diameter-m;
   align-items: center;
+  font-size: @font-size-xs;
 }
 
 .search-list-item-select {
   .square(24px);
+
   display: block;
   border: 2px solid fade(@graphite-dark, 64%);
-  border-radius: 12px;
   margin: 8px 0 8px 16px;
+  border-radius: 12px;
 
   &::before {
+    margin-left: 4px;
     color: #fff;
     font-size: 12px;
-    margin-left: 4px;
     opacity: 0;
   }
 
@@ -179,6 +183,6 @@
   .guest-badge;
 
   .user-list-light & {
-    .cell-badge-dark();
+    .cell-badge-dark;
   }
 }

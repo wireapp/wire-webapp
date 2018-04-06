@@ -69,7 +69,7 @@ z.viewModel.panel.ParticipantDevicesViewModel = class ParticipantDevicesViewMode
     });
 
     this.detailMessage = ko.pureComputed(() => {
-      const substitution = {user: z.util.escape_html(this.userEntity().first_name())};
+      const substitution = {user: z.util.escapeHtml(this.userEntity().first_name())};
       const text = z.l10n.text(z.string.participantDevicesDetailHeadline, substitution);
 
       const textWithHtmlTags = new RegExp('\\{\\{[^\\}]+\\}\\}[^\\{]+\\{\\{[^\\}]+\\}\\}');
@@ -96,8 +96,10 @@ z.viewModel.panel.ParticipantDevicesViewModel = class ParticipantDevicesViewMode
 
     this.isVisible.subscribe(isVisible => {
       if (isVisible) {
+        const userId = this.userEntity().id;
+
         this.clientRepository
-          .getClientsByUserId(this.userEntity().id)
+          .getClientsByUserId(userId)
           .then(clientEntities => {
             const hasDevices = clientEntities.length > 0;
             const deviceMode = hasDevices
@@ -105,7 +107,9 @@ z.viewModel.panel.ParticipantDevicesViewModel = class ParticipantDevicesViewMode
               : ParticipantDevicesViewModel.MODE.NOT_FOUND;
             this.deviceMode(deviceMode);
           })
-          .catch(error => this.logger.error(`Unable to retrieve clients for user '${this.userEntity().id}': ${error}`));
+          .catch(error => {
+            this.logger.error(`Unable to retrieve clients for user '${userId}': ${error.message || error}`);
+          });
       }
 
       this.selectedClientSubscription = this.selectedClient.subscribe(() => {
@@ -120,7 +124,7 @@ z.viewModel.panel.ParticipantDevicesViewModel = class ParticipantDevicesViewMode
     });
     this.shouldUpdateScrollbar = ko
       .computed(() => this.clientEntities() && this.showDeviceDetails() && this.isVisible())
-      .extend({notify: 'always', rateLimit: 500});
+      .extend({notify: 'always', rateLimit: {method: 'notifyWhenChangesStop', timeout: 0}});
   }
 
   clickOnBack() {
@@ -132,16 +136,16 @@ z.viewModel.panel.ParticipantDevicesViewModel = class ParticipantDevicesViewMode
       return this.selectedClient(undefined);
     }
 
-    const stateWasGroupParticipant = this.previousState() === z.viewModel.PanelViewModel.STATE.GROUP_PARTICIPANT;
+    const stateWasGroupParticipant = this.previousState() === z.viewModel.PanelViewModel.STATE.GROUP_PARTICIPANT_USER;
     if (stateWasGroupParticipant) {
-      return this.panelViewModel.showParticipant(this.userEntity());
+      return this.panelViewModel.showParticipant(this.userEntity(), true);
     }
 
     this.panelViewModel.switchState(this.previousState(), true);
   }
 
   clickOnClose() {
-    this.panelViewModel.closePanel().then(() => this.resetView());
+    this.panelViewModel.closePanel().then(didClose => didClose && this.resetView());
   }
 
   clickOnDevice(clientEntity) {

@@ -86,11 +86,11 @@ z.viewModel.ContentViewModel = class ContentViewModel {
     this.state.subscribe(state => {
       switch (state) {
         case ContentViewModel.STATE.CONVERSATION:
-          this.inputBar.added_to_view();
+          this.inputBar.addedToView();
           this.titleBar.addedToView();
           break;
         case ContentViewModel.STATE.PREFERENCES_ACCOUNT:
-          this.preferencesAccount.check_new_clients();
+          this.preferencesAccount.checkNewClients();
           break;
         case ContentViewModel.STATE.PREFERENCES_AV:
           this.preferencesAV.initiateDevices();
@@ -102,7 +102,7 @@ z.viewModel.ContentViewModel = class ContentViewModel {
           this.collection.setConversation(this.previousConversation);
           break;
         default:
-          this.inputBar.removed_from_view();
+          this.inputBar.removedFromView();
           this.titleBar.removedFromView();
       }
     });
@@ -122,7 +122,6 @@ z.viewModel.ContentViewModel = class ContentViewModel {
   _initSubscriptions() {
     amplify.subscribe(z.event.WebApp.CONTENT.SWITCH, this.switchContent.bind(this));
     amplify.subscribe(z.event.WebApp.CONVERSATION.SHOW, this.showConversation.bind(this));
-    amplify.subscribe(z.event.WebApp.LIST.SCROLL, this.inputBar.show_separator);
     amplify.subscribe(z.event.WebApp.WINDOW.RESIZE.HEIGHT, this.messageList.scroll_height);
   }
 
@@ -186,7 +185,7 @@ z.viewModel.ContentViewModel = class ContentViewModel {
         this.conversationRepository.active_conversation(conversationEntity);
       }
 
-      this.messageList.change_conversation(conversationEntity, messageEntity).then(() => {
+      this.messageList.changeConversation(conversationEntity, messageEntity).then(() => {
         this._showContent(ContentViewModel.STATE.CONVERSATION);
         this.previousConversation = this.conversationRepository.active_conversation();
       });
@@ -271,7 +270,7 @@ z.viewModel.ContentViewModel = class ContentViewModel {
 
     const isStatePreferencesAv = this.previousState === ContentViewModel.STATE.PREFERENCES_AV;
     if (isStatePreferencesAv) {
-      this.preferencesAV.release_devices();
+      this.preferencesAV.releaseDevices();
     }
   }
 

@@ -24,29 +24,24 @@
  */
 ko.bindingHandlers.drop_file = {
   init(element, valueAccessor, allBindings, data, context) {
-    const fileDragOver = function(_data, event) {
+    const onDragLeave = (_data, event) => event.currentTarget.classList.remove('drag-hover');
+
+    const onDragOver = (_data, event) => {
       event.preventDefault();
       event.originalEvent.dataTransfer.dropEffect = 'copy';
       event.currentTarget.classList.add('drag-hover');
     };
 
-    const fileDragLeave = function(_data, event) {
-      event.currentTarget.classList.remove('drag-hover');
-    };
-
-    const fileSelectHandler = function(_data, event) {
+    const onDrop = (_data, event) => {
       event.preventDefault();
       event.currentTarget.classList.remove('drag-hover');
 
-      let files = [];
-      if (event.dataTransfer) {
-        files = event.dataTransfer.files;
-      } else if (event.originalEvent && event.originalEvent.dataTransfer) {
-        files = event.originalEvent.dataTransfer.files;
-      }
+      const {dataTransfer, originalEvent} = event;
+      const eventDataTransfer = dataTransfer || (originalEvent && originalEvent.dataTransfer) || {};
+      const files = eventDataTransfer.files || [];
 
       if (files.length > 0) {
-        valueAccessor().call(this, files);
+        valueAccessor()(files);
       }
     };
 
@@ -54,9 +49,9 @@ ko.bindingHandlers.drop_file = {
       element,
       {
         event: {
-          dragleave: fileDragLeave,
-          dragover: fileDragOver,
-          drop: fileSelectHandler,
+          dragleave: onDragLeave,
+          dragover: onDragOver,
+          drop: onDrop,
         },
       },
       context
@@ -69,9 +64,9 @@ ko.bindingHandlers.drop_file = {
  */
 ko.bindingHandlers.paste_file = {
   init(element, valueAccessor, allBindings, data, context) {
-    const on_paste = function(_data, event) {
-      const clipboard_data = event.originalEvent.clipboardData;
-      const items = [].slice.call(clipboard_data.items || clipboard_data.files);
+    const onPaste = (_data, event) => {
+      const clipboardData = event.originalEvent.clipboardData;
+      const items = [].slice.call(clipboardData.items || clipboardData.files);
 
       const files = items
         .filter(item => item.kind === 'file')
@@ -85,11 +80,11 @@ ko.bindingHandlers.paste_file = {
       return true;
     };
 
-    return ko.applyBindingsToNode(
+    ko.applyBindingsToNode(
       window,
       {
         event: {
-          paste: on_paste,
+          paste: onPaste,
         },
       },
       context
@@ -103,16 +98,12 @@ ko.bindingHandlers.paste_file = {
  */
 ko.bindingHandlers.ignore_drop_file = {
   init(element, valueAccessor, allBindings, data, context) {
-    return ko.applyBindingsToNode(
+    ko.applyBindingsToNode(
       element,
       {
         event: {
-          dragover(_data, event) {
-            event.preventDefault();
-          },
-          drop(_data, event) {
-            event.preventDefault();
-          },
+          dragover: (_data, event) => event.preventDefault(),
+          drop: (_data, event) => event.preventDefault(),
         },
       },
       context
@@ -259,9 +250,9 @@ ko.bindingHandlers.file_select = {
 /**
  * Wait for image to be loaded before applying as background image.
  */
-ko.bindingHandlers.load_image = {
+ko.bindingHandlers.loadImage = {
   init(element, valueAccessor) {
-    const image_src = z.util.strip_url_wrapper(ko.unwrap(valueAccessor()));
+    const image_src = z.util.stripUrlWrapper(ko.unwrap(valueAccessor()));
     const image = new Image();
     image.onload = () => (element.style.backgroundImage = `url(${image_src})`);
     image.src = image_src;
@@ -527,7 +518,7 @@ ko.bindingHandlers.in_viewport = (function() {
       }
 
       function _dispose() {
-        z.util.ArrayUtil.remove_element(listeners, _checkElement);
+        z.util.ArrayUtil.removeElement(listeners, _checkElement);
       }
 
       function _checkElement(event) {

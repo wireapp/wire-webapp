@@ -17,10 +17,17 @@
  *
  */
 
-import {ContainerXS} from '@wireapp/react-ui-kit/Layout';
 import {chooseHandleStrings} from '../../strings';
-import {InputSubmitCombo, Input, RoundIconButton, Form, ErrorMessage} from '@wireapp/react-ui-kit/Form';
-import {H1, Text} from '@wireapp/react-ui-kit/Text';
+import {
+  H1,
+  Text,
+  ContainerXS,
+  InputSubmitCombo,
+  Input,
+  RoundIconButton,
+  Form,
+  ErrorMessage,
+} from '@wireapp/react-ui-kit';
 import {injectIntl} from 'react-intl';
 import {parseError} from '../util/errorUtil';
 import EXTERNAL_ROUTE from '../externalRoute';
@@ -54,7 +61,7 @@ class ChooseHandle extends React.PureComponent {
       .setHandle(this.state.handle)
       .then(() => {
         const link = document.createElement('a');
-        link.href = pathWithParams(EXTERNAL_ROUTE.LOGIN, 'reason=registration');
+        link.href = pathWithParams(EXTERNAL_ROUTE.WEBAPP);
         document.body.appendChild(link); // workaround for Firefox
         link.click();
       })

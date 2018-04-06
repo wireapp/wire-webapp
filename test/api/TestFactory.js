@@ -387,7 +387,6 @@ window.TestFactory.prototype.exposeCallingActors = function() {
       this.logger.info('✓ exposedConversationActors');
 
       TestFactory.calling_service = new z.calling.CallingService(this.client);
-      TestFactory.calling_service.logger.level = this.settings.logging_level;
 
       TestFactory.calling_repository = new z.calling.CallingRepository(
         TestFactory.calling_service,
@@ -396,7 +395,7 @@ window.TestFactory.prototype.exposeCallingActors = function() {
         TestFactory.media_repository,
         TestFactory.user_repository
       );
-      TestFactory.calling_repository.logger.level = this.settings.logging_level;
+      TestFactory.calling_repository.callLogger.level = this.settings.logging_level;
 
       return TestFactory.calling_repository;
     });
@@ -455,12 +454,18 @@ window.TestFactory.prototype.exposeTrackingActors = function() {
  */
 window.TestFactory.prototype.exposeLifecycleActors = function() {
   this.logger.info('- exposeLifecycleActors');
-  return Promise.resolve().then(() => {
-    TestFactory.lifecycle_service = new z.lifecycle.LifecycleService();
-    TestFactory.lifecycle_service.logger.level = this.settings.logging_level;
+  return Promise.resolve()
+    .then(() => this.exposeUserActors())
+    .then(() => {
+      this.logger.info('✓ exposedConversationActors');
+      TestFactory.lifecycle_service = new z.lifecycle.LifecycleService();
+      TestFactory.lifecycle_service.logger.level = this.settings.logging_level;
 
-    TestFactory.lifecycle_repository = new z.lifecycle.LifecycleRepository(TestFactory.lifecycle_service);
-    TestFactory.lifecycle_repository.logger.level = this.settings.logging_level;
-    return TestFactory.lifecycle_repository;
-  });
+      TestFactory.lifecycle_repository = new z.lifecycle.LifecycleRepository(
+        TestFactory.lifecycle_service,
+        TestFactory.user_repository
+      );
+      TestFactory.lifecycle_repository.logger.level = this.settings.logging_level;
+      return TestFactory.lifecycle_repository;
+    });
 };

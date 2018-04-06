@@ -47,7 +47,6 @@ def index():
 
 
 @application.route('/auth/')
-@main.latest_browser_required
 def auth():
   response = flask.make_response(flask.render_template(
     'auth/index.html',
@@ -64,6 +63,13 @@ def login():
     country=util.geoip_country(),
   ))
   return response
+
+
+@application.route('/join/')
+def join():
+  key = flask.request.args.get('key')
+  code = flask.request.args.get('code')
+  return flask.redirect('/auth/?join_key={0}&join_code={1}#join-conversation'.format(key, code))
 
 
 @application.route('/robots.txt')
@@ -143,10 +149,16 @@ def service_worker():
  response.headers['Cache-Control'] = 'no-cache'
  return response
 
+
 @application.route('/version/')
 @main.latest_browser_required
 def version():
   return flask.jsonify({'version': config.CURRENT_VERSION_ID})
+
+
+@application.route('/googlea55419c13969e993.html')
+def google_site_verification():
+  return 'google-site-verification: googlea55419c13969e993.html'
 
 
 ###############################################################################

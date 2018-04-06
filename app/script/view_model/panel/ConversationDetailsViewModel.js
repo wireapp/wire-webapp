@@ -25,7 +25,8 @@ window.z.viewModel.panel = z.viewModel.panel || {};
 
 z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewModel {
   constructor(mainViewModel, panelViewModel, repositories) {
-    this.clickOnShowParticipant = this.clickOnShowParticipant.bind(this);
+    this.clickOnShowService = this.clickOnShowService.bind(this);
+    this.clickOnShowUser = this.clickOnShowUser.bind(this);
 
     this.elementId = 'conversation-details';
     this.mainViewModel = mainViewModel;
@@ -39,6 +40,7 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
 
     this.actionsViewModel = this.mainViewModel.actions;
     this.conversationEntity = this.conversationRepository.active_conversation;
+    this.isActivatedAccount = this.mainViewModel.isActivatedAccount;
     this.isTeam = this.teamRepository.isTeam;
     this.isTeamOnly = this.panelViewModel.isTeamOnly;
     this.showIntegrations = this.panelViewModel.showIntegrations;
@@ -51,11 +53,11 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
 
     this.availabilityLabel = ko.pureComputed(() => {
       if (this.isVisible() && this.isTeam() && this.conversationEntity().is_one2one()) {
-        const userEntity = this.conversationEntity().firstUserEntity();
-        const availabilitySetToNone = userEntity.availability() === z.user.AvailabilityType.NONE;
+        const userAvailability = this.firstParticipant() && this.firstParticipant().availability();
+        const availabilitySetToNone = userAvailability === z.user.AvailabilityType.NONE;
 
         if (!availabilitySetToNone) {
-          return z.user.AvailabilityMapper.nameFromType(userEntity.availability());
+          return z.user.AvailabilityMapper.nameFromType(userAvailability);
         }
       }
     });
@@ -67,7 +69,6 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
 
         this.conversationEntity()
           .participating_user_ets()
-          .sort((userA, userB) => z.util.StringUtil.sort_by_priority(userA.first_name(), userB.first_name()))
           .map(userEntity => {
             if (userEntity.isBot) {
               return this.serviceParticipants.push(userEntity);
@@ -77,27 +78,27 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
       }
     });
 
+    this.firstParticipant = ko.pureComputed(() => {
+      return this.conversationEntity() && this.conversationEntity().firstUserEntity();
+    });
     this.isSingleUserMode = ko.pureComputed(() => {
       if (this.hasConversation()) {
         return this.conversationEntity().is_one2one() || this.conversationEntity().is_request();
       }
     });
-    this.userName = ko.pureComputed(() => {
-      if (this.hasConversation()) {
-        const userEntity = this.conversationEntity().firstUserEntity();
-        return userEntity.username();
-      }
+    this.userName = ko.pureComputed(() => (this.firstParticipant() ? this.firstParticipant().username() : ''));
+
+    this.isGuest = ko.pureComputed(() => {
+      return this.isSingleUserMode() && this.firstParticipant() && this.firstParticipant().isGuest();
     });
 
     this.isActiveParticipant = ko.pureComputed(() => {
-      if (this.hasConversation()) {
-        return !this.conversationEntity().removed_from_conversation() && !this.conversationEntity().is_guest();
-      }
+      return this.conversationEntity() ? this.conversationEntity().isActiveParticipant() : false;
     });
 
     this.isNameEditable = ko.pureComputed(() => {
       if (this.hasConversation()) {
-        return this.conversationEntity().is_group() && !this.conversationEntity().removed_from_conversation();
+        return this.conversationEntity().is_group() && this.conversationEntity().isActiveParticipant();
       }
     });
 
@@ -108,31 +109,24 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
     });
 
     this.isEditingName = ko.observable(false);
-    this.isEditingName.subscribe(value => {
-      if (!value) {
-        const name = $('.group-header .name span');
-        return $('.group-header textarea').css('height', `${name.height()}px`);
+    this.isEditingName.subscribe(isEditing => {
+      if (isEditing) {
+        return window.setTimeout(() => $('.conversation-details__name--input').focus(), 0);
       }
-      $('.group-header textarea').val(this.conversationEntity().display_name());
+      const name = $('.conversation-details__name--input');
+      $('.conversation-details__name').css('height', `${name.height()}px`);
     });
 
     this.showActionAddParticipants = ko.pureComputed(() => this.conversationEntity().is_group());
     this.showActionBlock = ko.pureComputed(() => {
-      if (this.isSingleUserMode()) {
-        const userEntity = this.conversationEntity().firstUserEntity();
-        return userEntity.is_connected() || userEntity.is_request();
+      if (this.isSingleUserMode() && this.firstParticipant()) {
+        return this.firstParticipant().is_connected() || this.firstParticipant().is_request();
       }
     });
     this.showActionCreateGroup = ko.pureComputed(() => this.conversationEntity().is_one2one());
     this.showActionCancelRequest = ko.pureComputed(() => this.conversationEntity().is_request());
     this.showActionClear = ko.pureComputed(() => {
       return !this.conversationEntity().is_request() && !this.conversationEntity().is_cleared();
-    });
-    this.showActionDevices = ko.pureComputed(() => {
-      if (this.conversationEntity().is_one2one()) {
-        const userEntity = this.conversationEntity().firstUserEntity();
-        return userEntity.is_connected() || userEntity.is_team_member();
-      }
     });
     this.showActionGuestOptions = ko.pureComputed(() => this.conversationEntity().inTeam());
     this.showActionLeave = ko.pureComputed(() => {
@@ -157,9 +151,9 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
 
     this.shouldUpdateScrollbar = ko
       .computed(() => this.serviceParticipants() && this.userParticipants() && this.isVisible())
-      .extend({notify: 'always', rateLimit: 500});
+      .extend({notify: 'always', rateLimit: {method: 'notifyWhenChangesStop', timeout: 0}});
 
-    const addPeopleShortcut = z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.ADD_PEOPLE);
+    const addPeopleShortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.ADD_PEOPLE);
     this.addPeopleTooltip = ko.pureComputed(() => {
       return z.l10n.text(z.string.tooltipConversationDetailsAddPeople, addPeopleShortcut);
     });
@@ -174,21 +168,23 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
   }
 
   clickOnCreateGroup() {
-    const userEntity = this.conversationEntity().firstUserEntity();
-    amplify.publish(z.event.WebApp.CONVERSATION.CREATE_GROUP, 'conversation_details', userEntity);
+    amplify.publish(z.event.WebApp.CONVERSATION.CREATE_GROUP, 'conversation_details', this.firstParticipant());
   }
 
   clickOnDevices() {
-    const userEntity = this.conversationEntity().firstUserEntity();
-    this.panelViewModel.showParticipantDevices(userEntity);
+    this.panelViewModel.showParticipantDevices(this.firstParticipant());
   }
 
   clickOnGuestOptions() {
     this.panelViewModel.switchState(z.viewModel.PanelViewModel.STATE.GUEST_OPTIONS);
   }
 
-  clickOnShowParticipant(userEntity) {
-    this.panelViewModel.showGroupParticipant(userEntity);
+  clickOnShowUser(userEntity) {
+    this.panelViewModel.showGroupParticipantUser(userEntity);
+  }
+
+  clickOnShowService(serviceEntity) {
+    this.panelViewModel.showGroupParticipantService(serviceEntity);
   }
 
   clickToArchive() {
@@ -232,12 +228,12 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
       .display_name()
       .trim();
 
-    const newConversationName = z.util.StringUtil.remove_line_breaks(event.target.value.trim());
+    const newConversationName = z.util.StringUtil.removeLineBreaks(event.target.value.trim());
 
+    this.isEditingName(false);
     const hasNameChanged = newConversationName.length && newConversationName !== currentConversationName;
     if (hasNameChanged) {
       event.target.value = currentConversationName;
-      this.isEditingName(false);
       this.conversationRepository.rename_conversation(this.conversationEntity(), newConversationName);
     }
   }

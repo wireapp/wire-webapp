@@ -24,12 +24,9 @@ z.string.tr.nonexistentUser = 'Silinmiş Kullanıcı';
 z.string.tr.and = 've';
 
 z.string.tr.authAccountCountryCode = 'Ülke Kodu';
-z.string.tr.authAccountDeletion = 'Çıkış yaptınız çünkü hesabınız silinmiş.';
-z.string.tr.authAccountExpiration = 'Oturumunuzun süresi dolduğu için çıkış yapıldı. Lütfen tekrar giriş yapın.';
 z.string.tr.authAccountPasswordForgot = 'Şifremi unuttum';
 z.string.tr.authAccountPublicComputer = 'Bu ortak bir bilgisayar';
 z.string.tr.authAccountSignIn = 'Giriş yap';
-z.string.tr.authAccountSignInEmail = 'E-posta';
 z.string.tr.authAccountSignInPhone = 'Telefon';
 
 z.string.tr.authBlockedCookies = 'Wire’a giriş yapabilmek için çerezleri etkinleştirin.';
@@ -101,9 +98,13 @@ z.string.tr.modalAcknowledgeAction = 'Tamam';
 z.string.tr.modalConfirmSecondary = 'İptal';
 z.string.tr.modalOptionSecondary = 'İptal';
 
+z.string.tr.modalAccountCreateAction = 'TAMAM';
+
 z.string.tr.modalAccountDeletionAction = 'Sil';
 z.string.tr.modalAccountDeletionHeadline = 'Hesabı Sil';
 z.string.tr.modalAccountDeletionMessage = 'Size kısa mesaj veya e-posta aracılığıyla bir mesaj göndereceğiz. Mesajdaki bağlantıyı takip ederek hesabınızı kalıcı olarak silebilirsiniz.';
+
+z.string.tr.modalAccountLeaveGuestRoomAction = 'Ayrıl';
 
 z.string.tr.modalAccountLogoutAction = 'Çıkış yap';
 z.string.tr.modalAccountLogoutHeadline = 'Veriyi Temizle?';
@@ -253,7 +254,6 @@ z.string.tr.conversationTeamLeave = ' takımdan çıkartıldı';
 z.string.tr.conversationPing = ' pingledi';
 z.string.tr.conversationPingYou = ' pingledi';
 z.string.tr.conversationToday = 'bugün';
-z.string.tr.conversationVerified = 'Doğrulanmış';
 z.string.tr.conversationVoiceChannelDeactivate = ' aradı';
 z.string.tr.conversationVoiceChannelDeactivateYou = ' aradı';
 z.string.tr.conversationYesterday = 'Dün';
@@ -282,6 +282,7 @@ z.string.tr.conversationTweetAuthor = ' Twitter’da';
 z.string.tr.groupCreationPreferencesAction = 'İleri';
 z.string.tr.groupCreationParticipantsActionCreate = 'Yapıldı';
 z.string.tr.groupCreationParticipantsPlaceholder = 'İsme göre ara';
+
 
 z.string.tr.collectionShowAll = '{{number}}’nun tümünü göster';
 z.string.tr.collectionSectionLinks = 'Bağlantılar';
@@ -351,7 +352,6 @@ z.string.tr.addParticipantsTabsPeople = 'İnsanlar';
 z.string.tr.addParticipantsTabsServices = 'Servisler';
 
 z.string.tr.conversationDetailsActionCancelRequest = 'İsteği iptal et';
-z.string.tr.conversationDetailsActionCreateGroup = 'Grup oluştur';
 z.string.tr.conversationDetailsActionDevices = 'Cihazlar';
 z.string.tr.conversationDetailsGuestsOff = 'Yok';
 z.string.tr.conversationDetailsParticipantsServicesMany = 'Servisler';
@@ -483,6 +483,8 @@ z.string.tr.searchInviteShare = 'Kişileri Paylaş';
 
 z.string.tr.searchListEveryoneParticipates = 'Bağlantıda olduğun herkes zaten bu görüşme içerisinde.';
 z.string.tr.searchListNoMatches = 'Eşleşen sonuç yok.\nBaşka bir isim girmeyi deneyin.';
+
+z.string.tr.temporaryGuestCta = 'Bir hesap oluştur';
 
 z.string.tr.uploadGoogleHeadline = 'Konuşmak için\ninsanları bul.';
 z.string.tr.uploadGoogleMessage = 'İletişim verilerinizi sizi başkalarıyla bağlayabilmek için kullanıyoruz. Tüm bilgilerinizi gizler ve kimseyle paylaşmayız.';

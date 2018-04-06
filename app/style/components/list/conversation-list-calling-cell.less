@@ -21,14 +21,22 @@ conversation-list-calling-cell {
   position: relative;
 
   &::before {
-    content: '';
-    background-color: fade(#000, 24%);
     position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
     z-index: -1;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: fade(#000, 24%);
+    content: '';
+  }
+
+  &.dark-bg {
+    color: #fff;
+
+    &::before {
+      background-color: fade(@graphite-dark, 80%);
+    }
   }
 }
 
@@ -43,30 +51,30 @@ conversation-list-calling-cell:first-of-type {
 }
 
 .conversation-list-calling-cell-controls {
-  width: 100%;
   display: flex;
+  width: 100%;
   justify-content: flex-end;
-  padding-left: 16px;
   padding-right: 16px;
   padding-bottom: 16px;
+  padding-left: 16px;
 }
 
 .conversation-list-calling-cell-participants {
   position: relative;
   display: flex;
+  height: 44px;
   align-items: center;
   padding-right: 16px;
   padding-left: 16px;
-  height: 44px;
 
   &::before {
-    content: '';
-    background-color: @seperator-color;
     position: absolute;
-    left: 16px;
-    right: 16px;
     top: 0;
+    right: 16px;
+    left: 16px;
     height: 1px;
+    background-color: @seperator-color;
+    content: '';
   }
 }
 
@@ -79,15 +87,16 @@ conversation-list-calling-cell:first-of-type {
 }
 
 .conversation-list-calling-cell-controls-on-call {
-  margin-left: 0;
   margin-right: auto;
+  margin-left: 0;
 }
 
 .conversation-list-calling-cell-controls-button {
   .cell-badge;
-  font-size: 12px;
-  padding-left: 8px;
+
   padding-right: 8px;
+  padding-left: 8px;
+  font-size: 12px;
   user-select: none;
 
   & + & {
@@ -101,8 +110,8 @@ conversation-list-calling-cell:first-of-type {
 }
 
 .conversation-list-calling-cell-participants-rest {
-  font-size: 12px;
   margin-left: 8px;
+  font-size: 12px;
 
   &::before {
     content: '+';

@@ -187,6 +187,14 @@ ko.components.register('profile-icon', {
   `,
 });
 
+ko.components.register('settings-icon', {
+  template: `
+  <svg width="16" height="16" viewBox="0 0 16 16">
+    <path d="M2.8 11a6 6 0 0 1-.6-1.5H0v-3h2.2c.1-.6.3-1 .6-1.5L1.3 3.4l2.1-2.1L5 2.8a6 6 0 0 1 1.5-.6V0h3v2.2c.6.1 1 .3 1.5.6l1.6-1.5 2.1 2.1L13.2 5c.3.4.5 1 .6 1.5H16v3h-2.2a6 6 0 0 1-.6 1.5l1.5 1.6-2.1 2.1-1.6-1.5a6 6 0 0 1-1.5.6V16h-3v-2.2a6 6 0 0 1-1.5-.6l-1.6 1.5-2.1-2.1L2.8 11zM8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"></path>
+  </svg>
+  `,
+});
+
 ko.components.register('undo-icon', {
   template: `
   <svg width="16" height="16" viewBox="0 0 16 16">
@@ -198,11 +206,8 @@ ko.components.register('undo-icon', {
 ko.components.register('verified-icon', {
   template: `
   <svg width="14" height="16" viewBox="0 0 14 16">
-    <path id="a" fill="#0079B6" d="M14 1.87V8c0 4-2.97 7.1-7 8-4-.9-7-4-7-8V2l7-2 7 1.87z"></path>
-    <mask id="b">
-      <use xlink:href="#a"/>
-    </mask>
-    <path fill="#0097F8" d="M-3-3H7v23H-3z" mask="url(#b)"></path>
+    <path fill="#0097F8" d="M14 1.9L7 0 0 2v6c0 4 3 7.1 7 8 4-.9 7-4 7-8V1.9z"></path>
+    <path fill="#0079B6" d="M14 1.9L7 0v16c4-.9 7-4 7-8V1.9z"></path>
   </svg>
   `,
 });

@@ -115,7 +115,7 @@ z.calling.entities.CallMessageEntity = class CallMessageEntity {
    */
   _createSessionId() {
     return _.range(CallMessageEntity.CONFIG.SESSION_ID_LENGTH)
-      .map(() => z.util.StringUtil.get_random_character())
+      .map(() => z.util.StringUtil.getRandomChar())
       .join('');
   }
 };

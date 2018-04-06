@@ -25,34 +25,38 @@ input-element {
 
   > textarea {
     .reset-textarea;
+
+    display: block;
+    max-width: @input-element-width;
+    height: 24px;
+    min-height: @line-height-lg;
+    padding-right: @input-element-indent;
+    padding-left: @input-element-indent;
+    margin-left: -@input-element-indent;
     background-color: fade(#fff, 24%);
     border-radius: 2px;
-    display: block;
-    height: 24px;
-    margin-left: -@input-element-indent;
-    max-width: @input-element-width;
-    min-height: @line-height-lg;
-    padding-left: @input-element-indent;
-    padding-right: @input-element-indent;
 
     &:focus {
       outline: 0;
     }
 
     &::placeholder {
-      .label-xs();
+      .label-xs;
+
       color: fade(#fff, 56%);
     }
   }
 
   > span {
     .ellipsis;
+
     display: block;
     max-width: 100%;
 
     &.hover::after,
     &:hover::after {
       .icon-mixin('\e177', @icon-size-sm); // icon-edit
+
       margin-left: 8px;
     }
   }

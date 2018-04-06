@@ -34,6 +34,10 @@ export const REGISTER_PERSONAL_START = 'REGISTER_PERSONAL_START';
 export const REGISTER_PERSONAL_SUCCESS = 'REGISTER_PERSONAL_SUCCESS';
 export const REGISTER_PERSONAL_FAILED = 'REGISTER_PERSONAL_FAILED';
 
+export const REGISTER_WIRELESS_START = 'REGISTER_WIRELESS_START';
+export const REGISTER_WIRELESS_SUCCESS = 'REGISTER_WIRELESS_SUCCESS';
+export const REGISTER_WIRELESS_FAILED = 'REGISTER_WIRELESS_FAILED';
+
 export const REGISTER_JOIN_START = 'REGISTER_JOIN_START';
 export const REGISTER_JOIN_SUCCESS = 'REGISTER_JOIN_SUCCESS';
 export const REGISTER_JOIN_FAILED = 'REGISTER_JOIN_FAILED';
@@ -63,8 +67,7 @@ export const startLogin = params => ({
   type: LOGIN_START,
 });
 
-export const successfulLogin = authData => ({
-  payload: authData,
+export const successfulLogin = () => ({
   type: LOGIN_SUCCESS,
 });
 
@@ -101,6 +104,21 @@ export const successfulRegisterPersonal = authData => ({
 export const failedRegisterPersonal = error => ({
   payload: BackendError.handle(error),
   type: REGISTER_PERSONAL_FAILED,
+});
+
+export const startRegisterWireless = params => ({
+  params,
+  type: REGISTER_WIRELESS_START,
+});
+
+export const successfulRegisterWireless = authData => ({
+  payload: authData,
+  type: REGISTER_WIRELESS_SUCCESS,
+});
+
+export const failedRegisterWireless = error => ({
+  payload: BackendError.handle(error),
+  type: REGISTER_WIRELESS_FAILED,
 });
 
 export const startRegisterJoin = params => ({

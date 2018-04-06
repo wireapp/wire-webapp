@@ -18,12 +18,18 @@
  */
 
 import authReducer from './authReducer';
+import clientReducer from './clientReducer';
+import cookieReducer from './cookieReducer';
+import conversationReducer from './conversationReducer';
 import inviteReducer from './inviteReducer';
 import languageReducer from './languageReducer';
 import selfReducer from './selfReducer';
 
 const reducers = {
   authState: authReducer,
+  clientState: clientReducer,
+  conversationState: conversationReducer,
+  cookieState: cookieReducer,
   inviteState: inviteReducer,
   languageState: languageReducer,
   selfState: selfReducer,

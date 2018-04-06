@@ -26,7 +26,7 @@ describe('z.cryptography.CryptographyRepository', () => {
 
   beforeAll(done => {
     z.util.protobuf
-      .load_protos('ext/proto/generic-message-proto/messages.proto')
+      .loadProtos('ext/proto/generic-message-proto/messages.proto')
       .then(() => test_factory.exposeCryptographyActors())
       .then(done)
       .catch(done.fail);
@@ -78,7 +78,7 @@ describe('z.cryptography.CryptographyRepository', () => {
         })
       );
 
-      const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
+      const generic_message = new z.proto.GenericMessage(z.util.createRandomUuid());
       generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT, new z.proto.Text('Unit test'));
 
       const recipients = {};
@@ -100,6 +100,56 @@ describe('z.cryptography.CryptographyRepository', () => {
   });
 
   describe('handleEncryptedEvent', () => {
+    afterEach(() => {
+      TestFactory.storage_repository.clearStores();
+    });
+
+    it('detects duplicated messages', async done => {
+      const database = TestFactory.storage_service.db;
+      const preKeys = await TestFactory.cryptography_repository.createCryptobox(database);
+      const alice = TestFactory.cryptography_repository.cryptobox.identity;
+      expect(alice).toBeDefined();
+
+      const aliceBundle = Proteus.keys.PreKeyBundle.new(alice.public_key, preKeys[0]);
+
+      const bobEngine = new window.StoreEngine.MemoryEngine();
+      await bobEngine.init('bob');
+
+      const bob = new window.cryptobox.Cryptobox(bobEngine, 1);
+      await bob.create();
+
+      const plainText = 'Hello, Alice!';
+
+      const genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
+      genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT, new z.proto.Text(plainText));
+
+      const cipherText = await bob.encrypt(
+        'session-with-alice',
+        genericMessage.toArrayBuffer(),
+        aliceBundle.serialise()
+      );
+      const encodedCipherText = z.util.arrayToBase64(cipherText);
+
+      const mockedEvent = {
+        data: {
+          text: encodedCipherText,
+        },
+        from: z.util.createRandomUuid(),
+        id: z.util.createRandomUuid(),
+      };
+
+      const decrypted = await TestFactory.cryptography_repository.handleEncryptedEvent(mockedEvent);
+      expect(decrypted.data.content).toBe(plainText);
+
+      try {
+        await TestFactory.cryptography_repository.handleEncryptedEvent(mockedEvent);
+      } catch (error) {
+        expect(error.type).toBe(z.cryptography.CryptographyError.TYPE.UNHANDLED_TYPE);
+      }
+
+      done();
+    });
+
     it('detects a session reset request', done => {
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
       const event = {
@@ -120,7 +170,7 @@ describe('z.cryptography.CryptographyRepository', () => {
         .catch(done.fail);
     });
 
-    it('only accept reasonable sized payload (text key)', done => {
+    it('only accepts reasonable sized payloads (text key)', done => {
       // Length of this message is 1 320 024 while the maximum is 150% of 12 000 (18 000)
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
       const text = window.btoa(`https://wir${'\u0000\u0001\u0000\u000D\u0000A'.repeat(165000)}e.com/`);
@@ -142,7 +192,7 @@ describe('z.cryptography.CryptographyRepository', () => {
         .catch(done.fail);
     });
 
-    it('only accept reasonable sized payload (data key)', done => {
+    it('only accepts reasonable sized payloads (data key)', done => {
       // Length of this message is 1 320 024 while the maximum is 150% of 12 000 (18 000)
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
       const data = window.btoa(`https://wir${'\u0000\u0001\u0000\u000D\u0000A'.repeat(165000)}e.com/`);

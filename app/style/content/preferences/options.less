@@ -18,8 +18,8 @@
  */
 
 .preferences-options-checkbox-label {
-  color: @graphite-dark;
   padding-left: 32px !important;
+  color: @graphite-dark;
 }
 
 .preferences-options-radio {
@@ -30,21 +30,21 @@
   }
 
   label {
-    cursor: pointer;
+    position: relative;
     display: flex;
     height: @line-height-xl;
-    position: relative;
     align-items: center;
+    cursor: pointer;
     white-space: pre;
   }
 
   label::before,
   label::after {
+    box-sizing: border-box;
+    margin-right: 16px;
+    border-radius: 50%;
     content: '';
     cursor: pointer;
-    border-radius: 50%;
-    margin-right: 16px;
-    box-sizing: border-box;
   }
 
   label::before {
@@ -54,9 +54,9 @@
   }
 
   input[type='radio']:checked + label::before {
+    background-color: #fff;
     border-color: currentColor;
     border-width: 6px;
-    background-color: #fff;
   }
 }
 

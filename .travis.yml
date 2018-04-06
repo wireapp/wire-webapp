@@ -27,6 +27,12 @@ language: node_js
 node_js:
   - "8"
 
+# http://docs.travis-ci.com/user/gui-and-headless-browsers/
+before_install:
+  - export CHROME_BIN=/usr/bin/google-chrome
+  - export DISPLAY=:99.0
+  - sh -e /etc/init.d/xvfb start
+
 # https://docs.travis-ci.com/user/caching/
 cache:
   directories:
@@ -40,6 +46,7 @@ notifications:
 
 # http://docs.travis-ci.com/user/deployment/
 before_deploy:
+  - yarn global add @wireapp/travis-bot@latest
   - if [ "$TRAVIS_BRANCH" == "dev" ]; then yarn run deploy-travis-dev; fi
   - if [ "$TRAVIS_BRANCH" == "edge" ]; then yarn run deploy-travis-staging; fi
   - if [ "$TRAVIS_BRANCH" == "staging" ]; then yarn run deploy-travis-staging; fi
@@ -112,7 +119,4 @@ deploy:
       branch: prod
 
 after_deploy:
-  - "AUTHOR_OF_LAST_COMMIT=$(git log | grep Author: | cut -d' ' -f2- | uniq | head -n1)"
-  - "SUMMARY_OF_LAST_COMMIT=$(git log -1 --pretty=%s)"
-  - chmod ugo+x ./bin/deployment_notification.js
-  - node ./bin/deployment_notification.js "$AUTHOR_OF_LAST_COMMIT" "$SUMMARY_OF_LAST_COMMIT"
+  - wire-travis-bot "fa0daf62-d5dc-48d2-aa92-ad2e0adeff4c"

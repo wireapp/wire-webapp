@@ -50,7 +50,7 @@ z.team.TeamRepository = class TeamRepository {
       return this.teamMembers()
         .concat(this.userRepository.connected_users())
         .filter((item, index, array) => array.indexOf(item) === index)
-        .sort((userA, userB) => z.util.StringUtil.sort_by_priority(userA.first_name(), userB.first_name()));
+        .sort((userA, userB) => z.util.StringUtil.sortByPriority(userA.first_name(), userB.first_name()));
     });
 
     this.teamMembers.subscribe(() => this.userRepository.map_guest_status());
@@ -67,20 +67,16 @@ z.team.TeamRepository = class TeamRepository {
   }
 
   getTeam() {
-    return this.teamService
-      .getTeams()
-      .then(({teams}) => {
-        if (teams.length) {
-          const [team] = teams;
-
-          if (team.binding) {
-            const teamEntity = this.teamMapper.mapTeamFromObject(team);
-            this.team(teamEntity);
-            return this.updateTeamMembers(teamEntity);
-          }
+    const teamPromise = this.selfUser().teamId ? this._getTeamById() : this._getBindingTeam();
+    return teamPromise
+      .then(teamData => {
+        if (teamData) {
+          const teamEntity = this.teamMapper.mapTeamFromObject(teamData);
+          this.team(teamEntity);
+          return this.updateTeamMembers(teamEntity);
         }
 
-        return this.team(new z.team.TeamEntity());
+        this.team(new z.team.TeamEntity());
       })
       .then(() => this.sendAccountInfo())
       .then(() => this.team());
@@ -152,28 +148,25 @@ z.team.TeamRepository = class TeamRepository {
    * @returns {Array<z.entity.User>} Matching users
    */
   searchForTeamUsers(query, isHandle) {
-    const excludedEmojis = Array.from(query).filter(char => EMOJI_UNICODE_RANGES.includes(char));
+    const excludedEmojis = Array.from(query).filter(char => z.util.EmojiUtil.UNICODE_RANGES.includes(char));
     return this.teamUsers()
       .filter(userEntity => userEntity.matches(query, isHandle, excludedEmojis))
       .sort((userA, userB) => {
-        if (isHandle) {
-          return z.util.StringUtil.sort_by_priority(userA.username(), userB.username(), query);
-        }
-        return z.util.StringUtil.sort_by_priority(userA.name(), userB.name(), query);
+        return isHandle
+          ? z.util.StringUtil.sortByPriority(userA.username(), userB.username(), query)
+          : z.util.StringUtil.sortByPriority(userA.name(), userB.name(), query);
       });
   }
 
   sendAccountInfo() {
     if (z.util.Environment.desktop) {
-      const imageResource = this.isTeam()
-        ? this.selfUser().previewPictureResource()
-        : this.selfUser().previewPictureResource();
+      const imageResource = this.isTeam() ? undefined : this.selfUser().previewPictureResource();
       const imagePromise = imageResource ? imageResource.load() : Promise.resolve();
 
       imagePromise
         .then(imageBlob => {
           if (imageBlob) {
-            return z.util.load_data_url(imageBlob);
+            return z.util.loadDataUrl(imageBlob);
           }
         })
         .then(imageDataUrl => {
@@ -182,7 +175,7 @@ z.team.TeamRepository = class TeamRepository {
             name: this.teamName(),
             picture: imageDataUrl,
             teamID: this.team().id,
-            teamRole: this.selfUser().team_role(),
+            teamRole: this.selfUser().teamRole(),
             userID: this.selfUser().id,
           };
 
@@ -218,6 +211,19 @@ z.team.TeamRepository = class TeamRepository {
     if (!members().find(member => member.id === userEntity.id)) {
       members.push(userEntity);
     }
+  }
+
+  _getTeamById() {
+    return this.teamService.getTeamById(this.selfUser().teamId);
+  }
+
+  _getBindingTeam() {
+    return this.teamService.getTeams().then(({teams}) => {
+      const [team] = teams;
+      if (team && team.binding) {
+        return team;
+      }
+    });
   }
 
   _onDelete({team: teamId}) {

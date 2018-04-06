@@ -25,13 +25,13 @@ window.z.ui = z.ui || {};
 z.ui.WindowHandler = class WindowHandler {
   constructor() {
     this.init = this.init.bind(this);
-    this._listen_to_window_resize = this._listen_to_window_resize.bind(this);
+    this._listenToWindowResize = this._listenToWindowResize.bind(this);
     this.logger = new z.util.Logger('z.ui.WindowHandler', z.config.LOGGER.OPTIONS);
 
     this.height = 0;
     this.width = 0;
 
-    this.is_visible = true;
+    this.isVisible = true;
 
     return this;
   }
@@ -39,48 +39,43 @@ z.ui.WindowHandler = class WindowHandler {
   init() {
     this.width = $(window).width();
     this.height = $(window).height();
-    this._listen_to_unhandled_promise_rejection();
-    this._listen_to_window_resize();
+    this._listenToUnhandledPromiseRejection();
+    this._listenToWindowResize();
+
     document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible') {
-        this.logger.info('Webapp is visible');
-        this.is_visible = true;
-      } else {
-        this.logger.info('Webapp is hidden');
-        this.is_visible = false;
-      }
+      const isVisible = document.visibilityState === 'visible';
+      this.logger.info(`Webapp is ${isVisible ? 'visible' : 'hidden'}`);
     });
+
     return this;
   }
 
-  _listen_to_window_resize() {
-    return $(window).on('resize', () => {
-      const current_height = $(window).height();
-      const current_width = $(window).width();
+  _listenToWindowResize() {
+    $(window).on('resize', () => {
+      const currentHeight = $(window).height();
+      const currentWidth = $(window).width();
 
-      const change_in_width = this.width - current_width;
-      const change_in_height = this.height - current_height;
+      const changeInWidth = this.width - currentWidth;
+      const changeInHeight = this.height - currentHeight;
 
-      amplify.publish(z.event.WebApp.WINDOW.RESIZE.WIDTH, change_in_width);
-      amplify.publish(z.event.WebApp.WINDOW.RESIZE.HEIGHT, change_in_height);
+      amplify.publish(z.event.WebApp.WINDOW.RESIZE.WIDTH, changeInWidth);
+      amplify.publish(z.event.WebApp.WINDOW.RESIZE.HEIGHT, changeInHeight);
 
-      this.width = current_width;
-      return (this.height = current_height);
+      this.width = currentWidth;
+      this.height = currentHeight;
     });
   }
 
-  _listen_to_unhandled_promise_rejection() {
-    return $(window).on('unhandledrejection', event => {
-      const promise_rejection_event = event.originalEvent;
-      const promise_error = promise_rejection_event.reason;
+  _listenToUnhandledPromiseRejection() {
+    $(window).on('unhandledrejection', event => {
+      const promiseRejectionEvent = event.originalEvent;
+      const error = promiseRejectionEvent.reason || {};
 
-      if (
-        promise_error &&
-        promise_error.type === z.conversation.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION
-      ) {
+      const isDegraded = error.type === z.conversation.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION;
+      if (isDegraded) {
         this.logger.log('User has canceled sending a message to a degraded conversation.');
-        promise_rejection_event.preventDefault();
-        promise_rejection_event.stopPropagation();
+        promiseRejectionEvent.preventDefault();
+        promiseRejectionEvent.stopPropagation();
         return false;
       }
     });

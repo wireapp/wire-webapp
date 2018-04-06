@@ -58,7 +58,7 @@ z.viewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
     this.isGuestRoom = ko.pureComputed(() => this.accessState() === z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM);
     this.isGuestRoom.subscribe(isGuestRoom => {
       if (!isGuestRoom) {
-        this.selectedContacts.remove(userEntity => !userEntity.is_team_member());
+        this.selectedContacts.remove(userEntity => !userEntity.isTeamMember());
       }
     });
 
@@ -75,7 +75,7 @@ z.viewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
 
         return this.teamRepository
           .teamMembers()
-          .sort((userA, userB) => z.util.StringUtil.sort_by_priority(userA.first_name(), userB.first_name()));
+          .sort((userA, userB) => z.util.StringUtil.sortByPriority(userA.first_name(), userB.first_name()));
       }
       return [];
     });

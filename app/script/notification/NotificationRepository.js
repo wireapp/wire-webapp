@@ -142,11 +142,11 @@ z.notification.NotificationRepository = class NotificationRepository {
    */
   notify(messageEntity, connectionEntity, conversationEntity) {
     return Promise.resolve().then(() => {
-      const isEditedContentMessage = messageEntity.is_content() && messageEntity.was_edited();
       const isEventToNotify = NotificationRepository.EVENTS_TO_NOTIFY.includes(messageEntity.super_type);
-      const isMutedConversation = conversationEntity && conversationEntity.is_muted();
+      const isMuted = conversationEntity && conversationEntity.is_muted();
 
-      if (isEventToNotify && !isEditedContentMessage && !isMutedConversation) {
+      const shouldNotify = isEventToNotify && !messageEntity.isEdited() && !messageEntity.isLinkPreview() && !isMuted;
+      if (shouldNotify) {
         this._notifySound(messageEntity);
         return this._notifyBanner(messageEntity, connectionEntity, conversationEntity);
       }
@@ -213,7 +213,7 @@ z.notification.NotificationRepository = class NotificationRepository {
   _createBodyContent(messageEntity) {
     if (messageEntity.has_asset_text()) {
       for (const asset_et of messageEntity.assets()) {
-        if (asset_et.is_text() && !asset_et.previews().length) {
+        if (asset_et.is_text()) {
           return z.util.StringUtil.truncate(asset_et.text, NotificationRepository.CONFIG.BODY_LENGTH);
         }
       }
@@ -266,7 +266,7 @@ z.notification.NotificationRepository = class NotificationRepository {
     const updatedOneParticipant = messageEntity.userEntities().length === 1;
     if (updatedOneParticipant) {
       const [otherUserEntity] = messageEntity.userEntities();
-      const nameOfJoinedUser = z.util.get_first_name(otherUserEntity, z.string.Declension.ACCUSATIVE);
+      const nameOfJoinedUser = z.util.getFirstName(otherUserEntity, z.string.Declension.ACCUSATIVE);
 
       const senderJoined = messageEntity.user().id === otherUserEntity.id;
       if (senderJoined) {
@@ -633,16 +633,20 @@ z.notification.NotificationRepository = class NotificationRepository {
     const muteSound = !document.hasFocus() && z.util.Environment.browser.firefox && z.util.Environment.os.mac;
     if (!muteSound) {
       switch (messageEntity.super_type) {
-        case z.message.SuperType.CONTENT:
+        case z.message.SuperType.CONTENT: {
           if (!messageEntity.user().is_me) {
             amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.NEW_MESSAGE);
           }
           break;
-        case z.message.SuperType.PING:
+        }
+
+        case z.message.SuperType.PING: {
           if (!messageEntity.user().is_me) {
             amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.INCOMING_PING);
           }
           break;
+        }
+
         default:
           this.logger.log(this.logger.levels.OFF, `No notification sound for message '${messageEntity.id}.`);
       }

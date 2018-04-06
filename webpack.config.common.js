@@ -18,7 +18,7 @@
  */
 
 const path = require('path');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const webpack = require('webpack');
 
 // https://github.com/babel/babel-loader/issues/149
 const babelSettings = {
@@ -27,15 +27,11 @@ const babelSettings = {
 
 const dist = 'aws/static/';
 const srcScript = 'app/script/auth/';
-const srcStyle = 'app/style/auth/';
-
-const extractSass = new ExtractTextPlugin({filename: 'style/[name].css'});
 
 module.exports = {
   devtool: 'source-map',
   entry: {
     script: path.resolve(__dirname, srcScript, 'main.js'),
-    style: path.resolve(__dirname, srcStyle, 'style.scss'),
   },
   externals: {
     'fs-extra': '{}',
@@ -43,7 +39,7 @@ module.exports = {
   module: {
     rules: [
       {
-        exclude: /(node_modules)/,
+        exclude: /node_modules/,
         test: /\.jsx?$/,
         use: [
           {
@@ -51,23 +47,28 @@ module.exports = {
           },
         ],
       },
-      {
-        exclude: /(node_modules)/,
-        test: /style\.scss$/,
-        // prettier-ignore
-        use: extractSass.extract('css-loader?sourceMap!postcss-loader?sourceMap!sass-loader?sourceMap')
-      },
     ],
   },
   node: {
     fs: 'empty',
+    path: 'empty',
   },
   output: {
     filename: 'min/[name].js',
     path: path.resolve(__dirname, dist),
     publicPath: '/',
   },
-  plugins: [extractSass],
+  plugins: [
+    new webpack.optimize.CommonsChunkPlugin({
+      minChunks(module) {
+        return module.context && module.context.indexOf('dexie') !== -1;
+      },
+      name: 'dexie',
+    }),
+    new webpack.optimize.CommonsChunkPlugin({
+      name: 'manifest',
+    }),
+  ],
   resolve: {
     extensions: ['.js', '.jsx'],
     modules: [path.resolve(srcScript), 'node_modules'],

@@ -18,23 +18,31 @@
  */
 
 import 'babel-polyfill'; // Polyfill needs to be imported first
-import {Account} from '@wireapp/core';
 import {AppContainer} from 'react-hot-loader';
 import {Provider} from 'react-redux';
 import configureStore from './configureStore';
 import configureClient from './configureClient';
+import configureCore from './configureCore';
 import configureTracking from './configureTracking';
 import configureEnvironment from './configureEnvironment';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Root from './page/Root';
+import CookieStore from 'js-cookie';
 
 configureEnvironment();
 const apiClient = configureClient();
-const core = new Account(apiClient);
+const core = configureCore(apiClient);
 const mixpanel = configureTracking();
+const cookieStore = CookieStore;
 
-const store = configureStore({apiClient: core.apiClient, core, mixpanel});
+const store = configureStore({
+  apiClient: core.apiClient,
+  cookieStore,
+  core,
+  localStorage: window.localStorage,
+  mixpanel,
+});
 
 const Wrapper = Component => (
   <AppContainer>

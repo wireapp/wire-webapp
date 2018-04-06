@@ -40,13 +40,16 @@ z.assets.AssetService = class AssetService {
    */
   uploadProfileImage(image) {
     return Promise.all([this._compressProfileImage(image), this._compressImage(image)])
-      .then(([{compressedBytes: smallImageBytes}, {compressedBytes: mediumImageBytes}]) => {
+      .then(([{compressedBytes: previewImageBytes}, {compressedBytes: mediumImageBytes}]) => {
+        const assetUploadOptions = {public: true, retention: z.assets.AssetRetentionPolicy.ETERNAL};
         return Promise.all([
-          this.postAsset(smallImageBytes, {public: true}),
-          this.postAsset(mediumImageBytes, {public: true}),
+          this.postAsset(previewImageBytes, assetUploadOptions),
+          this.postAsset(mediumImageBytes, assetUploadOptions),
         ]);
       })
-      .then(([smallCredentials, mediumCredentials]) => [smallCredentials.key, mediumCredentials.key]);
+      .then(([previewCredentials, mediumCredentials]) => {
+        return {mediumImageKey: mediumCredentials.key, previewImageKey: previewCredentials.key};
+      });
   }
 
   /**
@@ -84,7 +87,7 @@ z.assets.AssetService = class AssetService {
    */
   uploadAsset(file, options, xhrAccessorFunction) {
     return z.util
-      .load_file_buffer(file)
+      .loadFileBuffer(file)
       .then(buffer => this._uploadAsset(buffer, options, xhrAccessorFunction))
       .then(({key, keyBytes, sha256, token}) => {
         const asset = new z.proto.Asset();
@@ -173,40 +176,51 @@ z.assets.AssetService = class AssetService {
     });
   }
 
+  getAssetRetention(userEntity, conversationEntity) {
+    const isTeamMember = userEntity.inTeam();
+    const isTeamConversation = conversationEntity.inTeam();
+    const isTeamUserInConversation = conversationEntity
+      .participating_user_ets()
+      .some(conversationParticipant => conversationParticipant.inTeam());
+
+    const isEternal = isTeamMember || isTeamConversation || isTeamUserInConversation;
+    return isEternal ? z.assets.AssetRetentionPolicy.ETERNAL : z.assets.AssetRetentionPolicy.PERSISTENT;
+  }
+
   /**
    * Post assets.
    *
    * @param {Uint8Array} assetData - Asset data
-   * @param {Object} metadata - Asset metadata
-   * @param {boolean} [metadata.public] - Flag whether asset is public
-   * @param {z.assets.AssetRetentionPolicy} [metadata.retention] - Retention duration policy for asset
+   * @param {Object} options - Asset metadata
+   * @param {boolean} options.public - Flag whether asset is public
+   * @param {z.assets.AssetRetentionPolicy} options.retention - Retention duration policy for asset
    * @param {Function} [xhrAccessorFunction] - Function will get a reference to the underlying XMLHTTPRequest
    * @returns {Promise} Resolves when asset has been uploaded
    */
-  postAsset(assetData, metadata, xhrAccessorFunction) {
+  postAsset(assetData, options, xhrAccessorFunction) {
     return new Promise((resolve, reject) => {
       const BOUNDARY = 'frontier';
 
-      metadata = Object.assign(
+      options = Object.assign(
         {
           public: false,
           retention: z.assets.AssetRetentionPolicy.PERSISTENT,
         },
-        metadata
+        options
       );
 
-      metadata = JSON.stringify(metadata);
+      options = JSON.stringify(options);
 
       let body = '';
       body += `--${BOUNDARY}\r\n`;
       body += 'Content-Type: application/json; charset=utf-8\r\n';
-      body += `Content-length: ${metadata.length}\r\n`;
+      body += `Content-length: ${options.length}\r\n`;
       body += '\r\n';
-      body += `${metadata}\r\n`;
+      body += `${options}\r\n`;
       body += `--${BOUNDARY}\r\n`;
       body += 'Content-Type: application/octet-stream\r\n';
       body += `Content-length: ${assetData.length}\r\n`;
-      body += `Content-MD5: ${z.util.array_to_md5_base64(assetData)}\r\n`;
+      body += `Content-MD5: ${z.util.arrayToMd5Base64(assetData)}\r\n`;
       body += '\r\n';
       const footer = `\r\n--${BOUNDARY}--\r\n`;
 
@@ -257,7 +271,7 @@ z.assets.AssetService = class AssetService {
    */
   _compressImageWithWorker(worker, image, filter) {
     return z.util
-      .load_file_buffer(image)
+      .loadFileBuffer(image)
       .then(buffer => {
         if (typeof filter === 'function' ? filter() : undefined) {
           return new Uint8Array(buffer);
@@ -266,7 +280,7 @@ z.assets.AssetService = class AssetService {
       })
       .then(compressedBytes => {
         return z.util
-          .load_image(new Blob([compressedBytes], {type: image.type}))
+          .loadImage(new Blob([compressedBytes], {type: image.type}))
           .then(compressedImage => ({compressedBytes, compressedImage}));
       });
   }

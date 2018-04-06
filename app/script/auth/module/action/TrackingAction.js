@@ -22,6 +22,15 @@ import RuntimeUtil from '../../util/RuntimeUtil';
 import {REGISTER_FLOW} from '../selector/AuthSelector';
 
 export const EVENT_NAME = {
+  ACCOUNT: {
+    LOGGED_IN: 'account.logged_in',
+  },
+  CONVERSATION: {
+    ADD_PARTICIPANTS: 'conversation.add_participants',
+  },
+  GUEST_ROOMS: {
+    OPENED_SIGNUP: 'guest_rooms.opened_signup',
+  },
   PERSONAL: {
     CREATED: 'registration.succeeded',
     ENTERED_ACCOUNT_DATA: 'registration.entered_email_and_password',
@@ -34,41 +43,44 @@ export const EVENT_NAME = {
     OPENED_TEAM_REGISTRATION: 'start.opened_team_registration',
   },
   TEAM: {
+    ADDED_TEAM_NAME: 'team.added_team_name',
     CREATED: 'team.created',
     FINISHED_INVITE_STEP: 'team.finished_invite_step',
     VERIFIED: 'team.verified',
   },
 };
 
-export const EVENT_CONTEXT = {
+export const AUTHENTICATION_CONTEXT = {
+  AUTO: 'auto',
   EMAIL: 'email',
   GENERIC_INVITE: 'generic_invite',
+  HANDLE: 'handle',
   PERSONAL_INVITE: 'personal_invite',
+  PHONE: 'phone',
+  PHONE_CODE: 'phone_code',
+  PHONE_PASSWORD: 'phone_password',
 };
 
 export const FLOW_TO_CONTEXT = {
-  [REGISTER_FLOW.PERSONAL]: EVENT_CONTEXT.EMAIL,
-  [REGISTER_FLOW.GENERIC_INVITATION]: EVENT_CONTEXT.GENERIC_INVITE,
-  [REGISTER_FLOW.PERSONAL_INVITATION]: EVENT_CONTEXT.PERSONAL_INVITE,
+  [REGISTER_FLOW.PERSONAL]: AUTHENTICATION_CONTEXT.EMAIL,
+  [REGISTER_FLOW.GENERIC_INVITATION]: AUTHENTICATION_CONTEXT.GENERIC_INVITE,
+  [REGISTER_FLOW.PERSONAL_INVITATION]: AUTHENTICATION_CONTEXT.PERSONAL_INVITE,
 };
 
 export function trackEvent(event) {
   return function(dispatch, getState, {mixpanel}) {
     return Promise.resolve()
       .then(() => dispatch(TrackingActionCreator.startTrackingAction(event)))
-      .then(
-        () =>
-          new Promise(resolve => {
-            const attributes = Object.assign(
-              {
-                app: 'desktop',
-                desktop_app: RuntimeUtil.getPlatform(),
-              },
-              event.attributes
-            );
-            mixpanel.track(event.name, attributes, successCode => resolve(successCode));
-          })
-      )
+      .then(() => {
+        return new Promise(resolve => {
+          const attributes = {
+            ...event.attributes,
+            app: 'desktop',
+            desktop_app: RuntimeUtil.getPlatform(),
+          };
+          mixpanel.track(event.name, attributes, successCode => resolve(successCode));
+        });
+      })
       .then(trackingResult => dispatch(TrackingActionCreator.successfulTrackingAction(trackingResult)))
       .catch(error => dispatch(TrackingActionCreator.failedTrackingAction(error)));
   };

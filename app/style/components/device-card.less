@@ -18,8 +18,8 @@
  */
 
 device-card {
-  display: flex;
   position: relative;
+  display: flex;
 
   &:not(:last-child) {
     margin-bottom: 8px;
@@ -31,8 +31,8 @@ device-card {
 
   disclose-icon {
     display: flex;
-    align-self: center;
     height: 8px;
+    align-self: center;
 
     path {
       fill: fade(@graphite-dark, 40%);
@@ -45,9 +45,9 @@ device-card {
 }
 
 .device-info {
-  line-height: @line-height-sm;
-  padding-right: 16px;
   width: 100%;
+  padding-right: 16px;
+  line-height: @line-height-sm;
 }
 
 .device-label,
@@ -56,7 +56,8 @@ device-card {
 }
 
 .device-id-part {
-  .text-selection();
+  .text-selection;
+
   display: inline-block;
   margin-right: 4px;
 

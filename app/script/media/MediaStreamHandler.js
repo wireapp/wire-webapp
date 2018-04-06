@@ -118,7 +118,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
     return this.devices_handler
       .update_current_devices(video_send)
       .then(() => this.constraints_handler.get_media_stream_constraints(true, video_send))
-      .then(({media_stream_constraints}) => this.request_media_stream(media_type, media_stream_constraints))
+      .then(({streamConstraints}) => this.request_media_stream(media_type, streamConstraints))
       .then(media_stream_info => {
         this.self_stream_state.videoSend(video_send);
         if (video_send) {
@@ -206,9 +206,9 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
     }
 
     return constraints_promise
-      .then(({media_type, media_stream_constraints}) => {
-        return this.request_media_stream(media_type, media_stream_constraints).then(media_stream_info => {
-          this._set_self_stream_state(media_type);
+      .then(({mediaType, streamConstraints}) => {
+        return this.request_media_stream(mediaType, streamConstraints).then(media_stream_info => {
+          this._set_self_stream_state(mediaType);
           return this.replace_media_stream(media_stream_info);
         });
       })
@@ -229,15 +229,18 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
    * @returns {Promise} Resolves with the stream and its type
    */
   request_media_stream(media_type, media_stream_constraints) {
-    if (!this.devices_handler.has_microphone()) {
-      return Promise.reject(
-        new z.media.MediaError(z.media.MediaError.TYPE.MEDIA_STREAM_DEVICE, z.media.MediaType.AUDIO)
-      );
+    const audioTypes = [z.media.MediaType.AUDIO, z.media.MediaType.AUDIO_VIDEO];
+    const noAudioDevice = !this.devices_handler.has_microphone() && audioTypes.includes(media_type);
+    if (noAudioDevice) {
+      const mediaError = new z.media.MediaError(z.media.MediaError.TYPE.MEDIA_STREAM_DEVICE, z.media.MediaType.AUDIO);
+      return Promise.reject(mediaError);
     }
-    if (!this.devices_handler.has_camera() && media_type === z.media.MediaType.VIDEO) {
-      return Promise.reject(
-        new z.media.MediaError(z.media.MediaError.TYPE.MEDIA_STREAM_DEVICE, z.media.MediaType.VIDEO)
-      );
+
+    const videoTypes = [z.media.MediaType.AUDIO_VIDEO, z.media.MediaType.VIDEO];
+    const noVideoTypes = !this.devices_handler.has_camera() && videoTypes.includes(media_type);
+    if (noVideoTypes) {
+      const mediaError = new z.media.MediaError(z.media.MediaError.TYPE.MEDIA_STREAM_DEVICE, z.media.MediaType.VIDEO);
+      return Promise.reject(mediaError);
     }
 
     this.logger.info(`Requesting MediaStream access for '${media_type}'`, media_stream_constraints);

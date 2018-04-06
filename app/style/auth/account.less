@@ -23,21 +23,21 @@
     margin-bottom: 24px;
 
     .btn-mode {
+      width: 100%;
+      padding: 0 8px;
       background-color: transparent;
       font-weight: @font-weight-bold;
-      padding: 0 8px;
-      width: 100%;
     }
   }
 
   .selector-mode::after {
-    border-left: 8px solid transparent;
+    width: 0;
+    height: 0;
     border-right: 8px solid transparent;
     border-bottom: 8px solid fade(#fff, 88%);
-    content: '';
+    border-left: 8px solid transparent;
     margin-left: 152px;
-    height: 0;
-    width: 0;
+    content: '';
   }
 
   .platform-web & .spacer {
@@ -45,53 +45,19 @@
   }
 
   #form-account-login {
-    .selector-method {
-      height: 24px;
-      margin: 0 72px 24px;
-
-      .btn-method {
-        background-color: transparent;
-        color: fade(#fff, 64%);
-        font-weight: @font-weight-bold;
-        height: 24px;
-        line-height: 22px;
-        width: 80px;
-      }
-
-      .is-active {
-        border-color: fade(#fff, 92%);
-        border-radius: 12px;
-        color: #fff;
-      }
-    }
-
-    #login-method-password {
-      .reason-info {
-        display: inline-block;
-        font-size: 13px;
-        font-weight: 400;
-        height: 24px;
-        line-height: 24px;
-        margin: 12px 0 24px;
-      }
-    }
-
-    #login-method-phone {
+    #login-method-login {
       #wire-login-country-code {
-        border-right: 1px solid fade(#fff, 40%);
-        flex: 0 0 auto;
-        text-align: center;
-        padding: 0;
         width: 72px;
+        flex: 0 0 auto;
+        padding: 0;
+        border-right: 1px solid fade(#fff, 40%);
+        text-align: center;
       }
 
       #wire-login-phone {
         border-left: 0;
       }
-    }
 
-    #login-method-password,
-    #login-method-phone {
       .checkbox-remember {
         height: 24px;
         margin: 12px 4px 0;
@@ -104,8 +70,8 @@
     &:-webkit-autofill:hover,
     &:-webkit-autofill:focus {
       border: none;
-      -webkit-text-fill-color: #fff;
       -webkit-box-shadow: 0 0 0 1000px #265f82 inset;
+      -webkit-text-fill-color: #fff;
       -webkit-transition: background-color 5000s ease-in-out 0s;
     }
   }

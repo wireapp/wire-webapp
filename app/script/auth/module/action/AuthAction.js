@@ -19,24 +19,57 @@
 
 import BackendError from './BackendError';
 import * as AuthActionCreator from './creator/AuthActionCreator';
+import * as SelfAction from './SelfAction';
 import {currentLanguage, currentCurrency} from '../../localeConfig';
-import {fetchSelf} from './SelfAction';
+import {deleteLocalStorage, getLocalStorage, setLocalStorage, LocalStorageKey} from './LocalStorageAction';
+import * as ConversationAction from './ConversationAction';
+import * as ClientAction from './ClientAction';
+import * as TrackingAction from './TrackingAction';
+import * as CookieAction from './CookieAction';
+import {ClientType} from '@wireapp/api-client/dist/commonjs/client/index';
+import {APP_INSTANCE_ID} from '../../config';
+import {COOKIE_NAME_APP_OPENED} from '../selector/CookieSelector';
 
-export function doLogin(login) {
-  return function(dispatch, getState, {apiClient}) {
-    dispatch(
-      AuthActionCreator.startLogin({
-        code: login.code,
-        email: login.email,
-        handle: login.handle,
-        password: '******',
-        persist: login.persist,
-        phone: login.phone,
-      })
-    );
+export const doLogin = loginData => {
+  const onBeforeLogin = dispatch => dispatch(doSilentLogout());
+
+  return doLoginPlain(loginData, onBeforeLogin, dispatch => {});
+};
+
+export const doLoginAndJoin = (loginData, key, code, uri) => {
+  const onBeforeLogin = dispatch => dispatch(doSilentLogout());
+  const onAfterLogin = dispatch => dispatch(ConversationAction.doJoinConversationByCode(key, code, uri));
+
+  return doLoginPlain(loginData, onBeforeLogin, onAfterLogin);
+};
+
+function doLoginPlain(loginData, onBeforeLogin, onAfterLogin) {
+  return function(dispatch, getState, global) {
+    const {core} = global;
+
+    const obfuscatedLoginData = {...loginData, password: '********'};
+    dispatch(AuthActionCreator.startLogin(obfuscatedLoginData));
+
     return Promise.resolve()
-      .then(() => dispatch(doSilentLogout()))
-      .then(() => apiClient.login(login))
+      .then(() => onBeforeLogin(dispatch, getState, global))
+      .then(() => core.login(loginData, false, ClientAction.generateClientPayload(loginData.persist)))
+      .then(() => persistAuthData(loginData.persist, core, dispatch))
+      .then(() => dispatch(CookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: APP_INSTANCE_ID})))
+      .then(() => {
+        const authenticationContext = loginData.email
+          ? TrackingAction.AUTHENTICATION_CONTEXT.EMAIL
+          : TrackingAction.AUTHENTICATION_CONTEXT.HANDLE;
+
+        const trackingEventData = {
+          attributes: {context: authenticationContext, remember_me: loginData.persist},
+          name: TrackingAction.EVENT_NAME.ACCOUNT.LOGGED_IN,
+        };
+        return dispatch(TrackingAction.trackEvent(trackingEventData));
+      })
+      .then(() => dispatch(SelfAction.fetchSelf()))
+      .then(() => onAfterLogin(dispatch, getState, global))
+      .then(() => dispatch(ClientAction.doInitializeClient(loginData.persist, loginData.password)))
+      .then(() => dispatch(AuthActionCreator.successfulLogin()))
       .catch(error => {
         dispatch(AuthActionCreator.failedLogin(error));
         throw BackendError.handle(error);
@@ -44,14 +77,28 @@ export function doLogin(login) {
   };
 }
 
+function persistAuthData(persist, core, dispatch) {
+  const accessToken = core.apiClient.accessTokenStore.accessToken;
+  const expiresMillis = accessToken.expires_in * 1000;
+  const expireTimestamp = Date.now() + expiresMillis;
+  return Promise.all([
+    dispatch(setLocalStorage(LocalStorageKey.AUTH.PERSIST, persist)),
+    dispatch(setLocalStorage(LocalStorageKey.AUTH.ACCESS_TOKEN.EXPIRATION, expireTimestamp)),
+    dispatch(setLocalStorage(LocalStorageKey.AUTH.ACCESS_TOKEN.TTL, expiresMillis)),
+    dispatch(setLocalStorage(LocalStorageKey.AUTH.ACCESS_TOKEN.TYPE, accessToken.token_type)),
+    dispatch(setLocalStorage(LocalStorageKey.AUTH.ACCESS_TOKEN.VALUE, accessToken.access_token)),
+  ]);
+}
+
 export function pushAccountRegistrationData(registration) {
-  return function(dispatch, getState, {apiClient}) {
+  return function(dispatch, getState) {
     return dispatch(AuthActionCreator.pushAccountRegistrationData(registration));
   };
 }
 
 export function doRegisterTeam(registration) {
-  return function(dispatch, getState, {apiClient}) {
+  return function(dispatch, getState, {apiClient, core}) {
+    const isPermanentClient = true;
     registration.locale = currentLanguage();
     registration.name = registration.name.trim();
     registration.email = registration.email.trim();
@@ -62,7 +109,12 @@ export function doRegisterTeam(registration) {
     dispatch(AuthActionCreator.startRegisterTeam({...registration, password: '******'}));
     return Promise.resolve()
       .then(() => dispatch(doSilentLogout()))
-      .then(() => apiClient.register(registration))
+      .then(() => apiClient.register(registration, isPermanentClient))
+      .then(() => core.init())
+      .then(() => persistAuthData(isPermanentClient, core, dispatch))
+      .then(() => dispatch(CookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: APP_INSTANCE_ID})))
+      .then(() => dispatch(ClientAction.doInitializeClient(isPermanentClient)))
+      .then(() => dispatch(SelfAction.fetchSelf()))
       .then(createdTeam => dispatch(AuthActionCreator.successfulRegisterTeam(createdTeam)))
       .catch(error => {
         dispatch(AuthActionCreator.failedRegisterTeam(error));
@@ -72,7 +124,8 @@ export function doRegisterTeam(registration) {
 }
 
 export function doRegisterPersonal(registration) {
-  return function(dispatch, getState, {apiClient}) {
+  return function(dispatch, getState, {apiClient, core}) {
+    const isPermanentClient = true;
     registration.locale = currentLanguage();
     registration.name = registration.name.trim();
     registration.email = registration.email.trim();
@@ -87,11 +140,39 @@ export function doRegisterPersonal(registration) {
     );
     return Promise.resolve()
       .then(() => dispatch(doSilentLogout()))
-      .then(() => apiClient.register(registration))
+      .then(() => apiClient.register(registration, isPermanentClient))
+      .then(() => core.init())
+      .then(() => persistAuthData(isPermanentClient, core, dispatch))
+      .then(() => dispatch(CookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: APP_INSTANCE_ID})))
+      .then(() => dispatch(ClientAction.doInitializeClient(isPermanentClient)))
+      .then(() => dispatch(SelfAction.fetchSelf()))
       .then(createdAccount => dispatch(AuthActionCreator.successfulRegisterPersonal(createdAccount)))
-      .then(() => dispatch(fetchSelf()))
       .catch(error => {
         dispatch(AuthActionCreator.failedRegisterPersonal(error));
+        throw BackendError.handle(error);
+      });
+  };
+}
+
+export function doRegisterWireless(registrationData) {
+  return function(dispatch, getState, {apiClient, core}) {
+    const isPermanentClient = false;
+    registrationData.locale = currentLanguage();
+    registrationData.name = registrationData.name.trim();
+
+    const obfuscatedRegistrationData = {locale: registrationData.locale, name: registrationData.name};
+    dispatch(AuthActionCreator.startRegisterWireless(obfuscatedRegistrationData));
+
+    return Promise.resolve()
+      .then(() => apiClient.register(registrationData, isPermanentClient))
+      .then(() => core.init())
+      .then(() => persistAuthData(isPermanentClient, core, dispatch))
+      .then(() => dispatch(CookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: APP_INSTANCE_ID})))
+      .then(() => dispatch(ClientAction.doInitializeClient(isPermanentClient)))
+      .then(() => dispatch(SelfAction.fetchSelf()))
+      .then(createdAccount => dispatch(AuthActionCreator.successfulRegisterWireless(createdAccount)))
+      .catch(error => {
+        dispatch(AuthActionCreator.failedRegisterWireless(error));
         throw BackendError.handle(error);
       });
   };
@@ -100,28 +181,39 @@ export function doRegisterPersonal(registration) {
 export function doInit() {
   return function(dispatch, getState, {apiClient}) {
     dispatch(AuthActionCreator.startRefresh());
-    return apiClient
-      .init()
+    return Promise.resolve()
+      .then(() => dispatch(getLocalStorage(LocalStorageKey.AUTH.PERSIST)))
+      .then(persist => {
+        if (persist === undefined) {
+          throw new Error(`Could not find value for '${LocalStorageKey.AUTH.PERSIST}'`);
+        }
+        return apiClient.init(persist ? ClientType.PERMANENT : ClientType.TEMPORARY);
+      })
+      .then(() => dispatch(SelfAction.fetchSelf()))
       .then(() => dispatch(AuthActionCreator.successfulRefresh(apiClient.accessTokenStore.accessToken)))
       .catch(error => dispatch(AuthActionCreator.failedRefresh(error)));
   };
 }
 
 export function doLogout() {
-  return function(dispatch, getState, {apiClient}) {
+  return function(dispatch, getState, {core}) {
     dispatch(AuthActionCreator.startLogout());
-    return apiClient
+    return core
       .logout()
+      .then(() => dispatch(CookieAction.safelyRemoveCookie(COOKIE_NAME_APP_OPENED, APP_INSTANCE_ID)))
+      .then(() => dispatch(deleteLocalStorage(LocalStorageKey.AUTH.ACCESS_TOKEN.VALUE)))
       .then(() => dispatch(AuthActionCreator.successfulLogout()))
       .catch(error => dispatch(AuthActionCreator.failedLogout(error)));
   };
 }
 
 export function doSilentLogout() {
-  return function(dispatch, getState, {apiClient}) {
+  return function(dispatch, getState, {core}) {
     dispatch(AuthActionCreator.startLogout());
-    return apiClient
+    return core
       .logout()
+      .then(() => dispatch(CookieAction.safelyRemoveCookie(COOKIE_NAME_APP_OPENED, APP_INSTANCE_ID)))
+      .then(() => dispatch(deleteLocalStorage(LocalStorageKey.AUTH.ACCESS_TOKEN.VALUE)))
       .then(() => dispatch(AuthActionCreator.successfulSilentLogout()))
       .catch(error => dispatch(AuthActionCreator.failedLogout(error)));
   };

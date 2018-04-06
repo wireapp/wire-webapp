@@ -1,81 +1,109 @@
-<div id="preferences-account" class="preferences-page preferences-account" data-bind="with: $root.preferencesAccount, removed_from_view: $root.preferencesAccount.removed_from_view">
+<div id="preferences-account" class="preferences-page preferences-account" data-bind="with: $root.preferencesAccount, removed_from_view: $root.preferencesAccount.removedFromView">
   <div class="preferences-titlebar" data-bind="l10n_text: z.string.preferencesAccount"></div>
   <div class="preferences-content-wrapper">
     <div class="preferences-content" data-bind="antiscroll">
       <section class="preferences-section preferences-section-account-profile">
-        <div class="preferences-account-user-data">
-          <div class="preferences-account-name-wrapper">
-            <input class="preferences-account-name preferences-account-input"
-                   id="name" type="text"
-                   data-bind="value: name, event: {blur: reset_name_input}, enter: change_name, l10n_placeholder: z.string.preferencesAccountUsernamePlaceholder"
-                   data-uie-name="enter-name"
-                   maxlength="64"
-                   spellcheck="false" />
-            <span class="preferences-account-input-icon" data-bind="css: name_saved() ? 'checkmark' : 'preferences-account-input-icon-edit'"></span>
-          </div>
-          <!-- ko if: is_team() -->
-            <availability-state class="preferences-account-availability"
-                                data-bind="click: clickOnAvailability"
-                                data-uie-name="status-availability-in-profile"
-                                params="availability: availability, label: availabilityLabel, showArrow: true">
-            </availability-state>
+        <div class="preferences-account-user-data" data-bind="css: {'preferences-account-user-data-temporary': !isActivatedAccount()}">
+          <!-- ko if: isActivatedAccount() -->
+            <div class="preferences-account-name-wrapper">
+              <input class="preferences-account-name preferences-account-input"
+                     id="name" type="text"
+                     data-bind="value: name, event: {blur: resetNameInput}, enter: changeName, l10n_placeholder: z.string.preferencesAccountUsernamePlaceholder"
+                     data-uie-name="enter-name"
+                     maxlength="64"
+                     spellcheck="false" />
+              <span class="preferences-account-input-icon" data-bind="css: nameSaved() ? 'checkmark' : 'preferences-account-input-icon-edit'"></span>
+            </div>
+
+            <!-- ko if: isTeam() -->
+              <availability-state class="preferences-account-availability"
+                                  data-bind="click: clickOnAvailability"
+                                  data-uie-name="status-availability-in-profile"
+                                  params="availability: availability, label: availabilityLabel, showArrow: true">
+              </availability-state>
+            <!-- /ko -->
+
+            <div class="preferences-account-username-wrapper">
+              <span class="preferences-account-username-atsign">@</span>
+              <input class="preferences-account-username preferences-account-input"
+                     id="username" type="text"
+                     data-bind="textInput: username, event: {input: verifyUsername, keypress: checkUsernameInput, blur: resetUsernameInput}, enter: changeUsername, hasFocus: shouldFocusUsername()"
+                     data-uie-name="enter-username"
+                     maxlength="21"
+                     spellcheck="false"
+                     autocomplete="off" />
+              <span class="preferences-account-input-icon" data-bind="css: usernameSaved() ? 'checkmark' : 'preferences-account-input-icon-edit'"></span>
+              <!-- ko ifnot: usernameState() -->
+                <div class="preferences-account-username-hint text-graphite font-size-xs"
+                     data-bind="l10n_text: z.string.preferencesAccountUsernameHint"></div>
+              <!-- /ko -->
+              <!-- ko if: usernameState() === z.viewModel.content.PreferencesAccountViewModel.USERNAME_STATE.AVAILABLE -->
+                <div class="preferences-account-username-error font-size-xs"
+                     data-bind="l10n_text: z.string.preferencesAccountUsernameAvailable"></div>
+              <!-- /ko -->
+              <!-- ko if: usernameState() === z.viewModel.content.PreferencesAccountViewModel.USERNAME_STATE.TAKEN -->
+                <div class="preferences-account-username-error font-size-xs"
+                     data-bind="l10n_text: z.string.preferencesAccountUsernameErrorTaken, css: {'text-red': submittedUsername() === enteredUsername()}"></div>
+              <!-- /ko -->
+            </div>
+
+            <!-- ko if: isTeam() -->
+              <div class="preferences-account-team preferences-section-account-space-after" data-bind="text: teamName()" data-uie-name="status-team"></div>
+            <!-- /ko -->
+
+            <div class="preferences-account-mail" data-bind="text: selfUser().email()" data-uie-name="enter-email"></div>
+            <div class="preferences-account-phone" data-bind="text: selfUser().phone()" data-uie-name="enter-phone"></div>
+            <accent-color-picker class="preferences-account-accent-color preferences-section-account-space-before" params="user: selfUser(), selected: changeAccentColor" data-uie-name="enter-accent-color"></accent-color-picker>
           <!-- /ko -->
-          <div class="preferences-account-username-wrapper">
-            <span class="preferences-account-username-atsign">@</span>
-            <input class="preferences-account-username preferences-account-input"
-                   id="username" type="text"
-                   data-bind="textInput: username, event: {input: verify_username, keypress: check_username_input, blur: reset_username_input}, enter: change_username, hasFocus: should_focus_username()"
-                   data-uie-name="enter-username"
-                   maxlength="21"
-                   spellcheck="false"
-                   autocomplete="off" />
-            <span class="preferences-account-input-icon" data-bind="css: username_saved() ? 'checkmark' : 'preferences-account-input-icon-edit'"></span>
-            <!-- ko ifnot: username_error() -->
-              <div class="preferences-account-username-hint text-graphite font-size-xs"
-                   data-bind="l10n_text: z.string.preferencesAccountUsernameHint"></div>
-            <!-- /ko -->
-            <!-- ko if: username_error() === 'available' -->
-              <div class="preferences-account-username-error font-size-xs"
-                   data-bind="l10n_text: z.string.preferencesAccountUsernameAvailable"></div>
-            <!-- /ko -->
-            <!-- ko if: username_error() === 'taken' -->
-              <div class="preferences-account-username-error font-size-xs"
-                   data-bind="l10n_text: z.string.preferencesAccountUsernameErrorTaken, css: {'text-red': submitted_username() === entered_username()}"></div>
-            <!-- /ko -->
-          </div>
-          <!-- ko if: is_team() -->
-            <div class="preferences-account-team preferences-section-account-space-after" data-bind="text: team_name()" data-uie-name="status-team"></div>
+
+          <!-- ko ifnot: isActivatedAccount() -->
+            <div class="preferences-account-name-wrapper">
+              <div class="preferences-account-name" data-bind="text: name" data-uie-name="status-name"></div>
+            </div>
+            <hr class="preferences-separator">
+            <div class="preferences-link text-theme" data-bind="click: clickOnLeaveGuestRoom, l10n_text: z.string.preferencesAccountLeaveGuestRoom" data-uie-name="do-leave-guest-room"></div>
+            <div class="preferences-leave-disclaimer" data-bind="l10n_text: z.string.preferencesAccountLeaveGuestRoomDescription"></div>
           <!-- /ko -->
-          <div class="preferences-account-mail" data-bind="text: self_user().email()" data-uie-name="enter-email"></div>
-          <div class="preferences-account-phone" data-bind="text: self_user().phone()" data-uie-name="enter-phone"></div>
-          <accent-color-picker class="preferences-account-accent-color preferences-section-account-space-before" params="user: self_user(), selected: change_accent_color" data-uie-name="enter-accent-color"></accent-color-picker>
         </div>
 
-        <label class="preferences-account-picture-button" for="self-upload-file-input" data-bind="l10n_tooltip: z.string.tooltipPreferencesPicture">
-          <participant-avatar params="participant: self_user, size: z.components.ParticipantAvatar.SIZE.X_LARGE"></participant-avatar>
-          <input id="self-upload-file-input"
-                 type="file" accept="image/jpg,image/jpeg,image/png,image/bmp"
-                 data-bind="file_select: click_on_change_picture"
-                 data-uie-name="do-select-picture"/>
-          <span class="icon-camera"></span>
-        </label>
-      </section>
-
-      <section class="preferences-section preferences-section-account-security">
-        <hr class="preferences-separator">
-        <!-- ko if: is_team_manager() -->
-          <div class="preferences-link text-theme" data-bind="click: click_on_manage, l10n_text: z.string.preferencesAccountManageTeam" data-uie-name="do-manage-team"></div>
+        <!-- ko if: isActivatedAccount() -->
+          <label class="preferences-account-picture-button" for="self-upload-file-input" data-bind="l10n_tooltip: z.string.tooltipPreferencesPicture">
+            <participant-avatar params="participant: selfUser, size: z.components.ParticipantAvatar.SIZE.X_LARGE"></participant-avatar>
+            <input id="self-upload-file-input"
+                  type="file"
+                  data-bind="attr: {accept: z.viewModel.content.PreferencesAccountViewModel.CONFIG.PROFILE_IMAGE.FILE_TYPES.join(',')}, file_select: clickOnChangePicture"
+                  data-uie-name="do-select-picture"/>
+            <span class="icon-camera"></span>
+          </label>
         <!-- /ko -->
-        <div class="preferences-link text-theme" data-bind="click: click_on_create, l10n_text: z.string.preferencesAccountCreateTeam" data-uie-name="do-create-team"></div>
-        <div class="preferences-link text-theme" data-bind="click: click_on_reset_password, l10n_text: z.string.preferencesAccountResetPassword, l10n_tooltip: z.string.tooltipPreferencesPassword" data-uie-name="do-reset-password"></div>
-        <!-- ko ifnot: is_team() -->
-          <div class="preferences-link text-theme" data-bind="click: click_on_delete_account, l10n_text: z.string.preferencesAccountDelete" data-uie-name="go-delete-account"></div>
+
+        <!-- ko ifnot: isActivatedAccount() -->
+          <div>
+            <participant-avatar params="participant: selfUser, size: z.components.ParticipantAvatar.SIZE.X_LARGE"></participant-avatar>
+          </div>
         <!-- /ko -->
       </section>
 
-      <!-- ko ifnot: z.util.Environment.desktop -->
+      <!-- ko if: isActivatedAccount() -->
+        <section class="preferences-section preferences-section-account-security">
+          <hr class="preferences-separator">
+
+          <!-- ko if: isTeamManager() -->
+            <div class="preferences-link text-theme" data-bind="click: clickOnManage, l10n_text: z.string.preferencesAccountManageTeam" data-uie-name="do-manage-team"></div>
+          <!-- /ko -->
+
+          <div class="preferences-link text-theme" data-bind="click: clickOnCreate, l10n_text: z.string.preferencesAccountCreateTeam" data-uie-name="do-create-team"></div>
+          <div class="preferences-link text-theme" data-bind="click: clickOnResetPassword, l10n_text: z.string.preferencesAccountResetPassword, l10n_tooltip: z.string.tooltipPreferencesPassword" data-uie-name="do-reset-password"></div>
+
+          <!-- ko ifnot: isTeam() -->
+            <div class="preferences-link text-theme" data-bind="click: clickOnDeleteAccount, l10n_text: z.string.preferencesAccountDelete" data-uie-name="go-delete-account"></div>
+          <!-- /ko -->
+        </section>
+      <!-- /ko -->
+
+      <!-- ko if: isActivatedAccount() && !z.util.Environment.desktop -->
         <section class="preferences-section">
-          <div class="preferences-link text-theme" data-bind="click: click_on_logout, l10n_text: z.string.preferencesAccountLogOut" data-uie-name="do-logout"></div>
+          <div class="preferences-link text-theme" data-bind="click: clickOnLogout, l10n_text: z.string.preferencesAccountLogOut" data-uie-name="do-logout"></div>
         </section>
       <!-- /ko -->
     </div>

@@ -29,7 +29,6 @@ z.event.EventTypeHandling = {
     z.event.Client.CONVERSATION.LOCATION,
     z.event.Client.CONVERSATION.MESSAGE_ADD,
   ],
-  DECRYPT: [z.event.Backend.CONVERSATION.OTR_ASSET_ADD, z.event.Backend.CONVERSATION.OTR_MESSAGE_ADD],
   IGNORE: [z.event.Backend.CONVERSATION.TYPING],
   STORE: [
     z.event.Backend.CONVERSATION.MEMBER_JOIN,

@@ -23,12 +23,11 @@ window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 window.z.viewModel.panel = z.viewModel.panel || {};
 
-z.viewModel.panel.AppParticipantsViewModel = class AppParticipantsViewModel {
+z.viewModel.panel.AddParticipantsViewModel = class AddParticipantsViewModel {
   static get STATE() {
     return {
-      ADD_PEOPLE: 'AppParticipantsViewModel.STATE.ADD_PEOPLE',
-      ADD_SERVICE: 'AppParticipantsViewModel.STATE.ADD_SERVICE',
-      CONFIRMATION: 'AppParticipantsViewModel.STATE.CONFIRMATION',
+      ADD_PEOPLE: 'AddParticipantsViewModel.STATE.ADD_PEOPLE',
+      ADD_SERVICE: 'AddParticipantsViewModel.STATE.ADD_SERVICE',
     };
   }
 
@@ -40,7 +39,7 @@ z.viewModel.panel.AppParticipantsViewModel = class AppParticipantsViewModel {
     this.teamRepository = repositories.team;
     this.userRepository = repositories.user;
 
-    this.logger = new z.util.Logger('z.viewModel.panel.AppParticipantsViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger('z.viewModel.panel.AddParticipantsViewModel', z.config.LOGGER.OPTIONS);
 
     this.conversationEntity = this.conversationRepository.active_conversation;
     this.isTeam = this.teamRepository.isTeam;
@@ -55,17 +54,12 @@ z.viewModel.panel.AppParticipantsViewModel = class AppParticipantsViewModel {
     this.searchInput = ko.observable('');
     this.selectedContacts = ko.observableArray([]);
     this.selectedService = ko.observable();
-    this.state = ko.observable(AppParticipantsViewModel.STATE.ADD_PEOPLE);
+    this.state = ko.observable(AddParticipantsViewModel.STATE.ADD_PEOPLE);
 
-    this.enableAddAction = ko.pureComputed(() => this.selectedContacts().length > 0 || this.selectedService());
+    this.enableAddAction = ko.pureComputed(() => this.selectedContacts().length > 0);
 
-    this.isAddState = ko.pureComputed(() => this.isStateAddPeople() || this.isStateAddService());
-    this.isConfirmAddingState = ko.pureComputed(() => this.isStateAddPeople() || this.isStateConfirmation());
-    this.isServiceState = ko.pureComputed(() => this.isStateAddService() || this.isStateConfirmation());
-
-    this.isStateAddPeople = ko.pureComputed(() => this.state() === AppParticipantsViewModel.STATE.ADD_PEOPLE);
-    this.isStateAddService = ko.pureComputed(() => this.state() === AppParticipantsViewModel.STATE.ADD_SERVICE);
-    this.isStateConfirmation = ko.pureComputed(() => this.state() === AppParticipantsViewModel.STATE.CONFIRMATION);
+    this.isStateAddPeople = ko.pureComputed(() => this.state() === AddParticipantsViewModel.STATE.ADD_PEOPLE);
+    this.isStateAddService = ko.pureComputed(() => this.state() === AddParticipantsViewModel.STATE.ADD_SERVICE);
 
     this.contacts = ko.pureComputed(() => {
       const conversationEntity = this.conversationEntity();
@@ -75,16 +69,14 @@ z.viewModel.panel.AppParticipantsViewModel = class AppParticipantsViewModel {
         return userEntities;
       }
 
-      if (!this.isTeam()) {
-        userEntities = this.userRepository.connected_users();
-      }
-
-      if (this.isTeamOnly()) {
-        userEntities = this.teamMembers().sort((userA, userB) => {
-          return z.util.StringUtil.sort_by_priority(userA.first_name(), userB.first_name());
-        });
+      if (this.isTeam()) {
+        userEntities = this.isTeamOnly()
+          ? this.teamMembers().sort((userA, userB) => {
+              return z.util.StringUtil.sortByPriority(userA.first_name(), userB.first_name());
+            })
+          : this.teamUsers();
       } else {
-        userEntities = this.teamUsers();
+        userEntities = this.userRepository.connected_users();
       }
 
       return userEntities.filter(userEntity => {
@@ -109,11 +101,11 @@ z.viewModel.panel.AppParticipantsViewModel = class AppParticipantsViewModel {
   }
 
   clickOnAddPeople() {
-    this.state(AppParticipantsViewModel.STATE.ADD_PEOPLE);
+    this.state(AddParticipantsViewModel.STATE.ADD_PEOPLE);
   }
 
   clickOnAddService() {
-    this.state(AppParticipantsViewModel.STATE.ADD_SERVICE);
+    this.state(AddParticipantsViewModel.STATE.ADD_SERVICE);
     this.searchServices(this.searchInput());
   }
 
@@ -122,18 +114,16 @@ z.viewModel.panel.AppParticipantsViewModel = class AppParticipantsViewModel {
   }
 
   clickOnClose() {
-    this.panelViewModel.closePanel().then(() => this.resetView());
+    this.panelViewModel.closePanel().then(didClose => didClose && this.resetView());
   }
 
   clickOnSelectService(serviceEntity) {
     this.selectedService(serviceEntity);
-    this.state(AppParticipantsViewModel.STATE.CONFIRMATION);
-
-    this.integrationRepository.getProviderNameForService(serviceEntity);
+    this.panelViewModel.showAddService(serviceEntity);
   }
 
   clickToAddParticipants() {
-    if (this.isStateConfirmation()) {
+    if (this.isStateAddService()) {
       this._addService();
     } else {
       this._addMembers();
@@ -143,7 +133,7 @@ z.viewModel.panel.AppParticipantsViewModel = class AppParticipantsViewModel {
   }
 
   resetView() {
-    this.state(AppParticipantsViewModel.STATE.ADD_PEOPLE);
+    this.state(AddParticipantsViewModel.STATE.ADD_PEOPLE);
     this.selectedContacts.removeAll();
     this.selectedService(undefined);
     this.searchInput('');

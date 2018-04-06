@@ -45,7 +45,7 @@
                data-bind="css: {'hide-controls-hidden': !showRemoteParticipant() && !isChoosingScreen(),
                                 'video-element-dark': showRemoteParticipant()}">
             <div class="video-remote-name" data-bind="text: videodCall().conversationEntity.display_name()"></div>
-            <div class="video-timer label-xs" data-bind="text: z.util.format_seconds(videodCall().durationTime())"></div>
+            <div class="video-timer label-xs" data-bind="text: z.util.TimeUtil.formatSeconds(videodCall().durationTime())"></div>
           </div>
         <!-- /ko -->
 

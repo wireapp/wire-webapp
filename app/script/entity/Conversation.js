@@ -41,8 +41,8 @@ z.entity.Conversation = class Conversation {
     this.type = ko.observable();
 
     const inputStorageKey = `${z.storage.StorageKey.CONVERSATION.INPUT}|${this.id}`;
-    this.input = ko.observable(z.util.StorageUtil.get_value(inputStorageKey) || '');
-    this.input.subscribe(text => z.util.StorageUtil.set_value(inputStorageKey, text.trim()));
+    this.input = ko.observable(z.util.StorageUtil.getValue(inputStorageKey) || '');
+    this.input.subscribe(text => z.util.StorageUtil.setValue(inputStorageKey, text.trim()));
 
     this.is_loaded = ko.observable(false);
     this.is_pending = ko.observable(false);
@@ -56,30 +56,25 @@ z.entity.Conversation = class Conversation {
     this.firstUserEntity = ko.pureComputed(() => this.participating_user_ets()[0]);
     this.availabilityOfUser = ko.pureComputed(() => this.firstUserEntity() && this.firstUserEntity().availability());
 
-    this.is_guest = ko.observable(false);
-    this.is_managed = false;
+    this.isGuest = ko.observable(false);
+    this.isManaged = false;
 
-    this.inTeam = ko.pureComputed(() => this.team_id && !this.is_guest());
+    this.inTeam = ko.pureComputed(() => this.team_id && !this.isGuest());
     this.isGuestRoom = ko.pureComputed(() => this.accessState() === z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM);
     this.isTeamOnly = ko.pureComputed(() => this.accessState() === z.conversation.ACCESS_STATE.TEAM.TEAM_ONLY);
 
+    this.isTeam1to1 = ko.pureComputed(() => {
+      const isGroupConversation = this.type() === z.conversation.ConversationType.REGULAR;
+      const hasOneParticipant = this.participating_user_ids().length === 1;
+      return isGroupConversation && hasOneParticipant && this.team_id && !this.name();
+    });
     this.is_group = ko.pureComputed(() => {
-      const group_type = this.type() === z.conversation.ConversationType.REGULAR;
-      const group_conversation = group_type;
-
-      const has_one_participant = this.participating_user_ids().length === 1;
-      const team_one2one_conversation = group_type && has_one_participant && this.team_id && !this.name();
-
-      return group_conversation && !team_one2one_conversation;
+      const isGroupConversation = this.type() === z.conversation.ConversationType.REGULAR;
+      return isGroupConversation && !this.isTeam1to1();
     });
     this.is_one2one = ko.pureComputed(() => {
-      const one2one_conversation = this.type() === z.conversation.ConversationType.ONE2ONE;
-
-      const group_type = this.type() === z.conversation.ConversationType.REGULAR;
-      const has_one_participant = this.participating_user_ids().length === 1;
-      const team_one2one_conversation = group_type && has_one_participant && this.team_id && !this.name();
-
-      return one2one_conversation || team_one2one_conversation;
+      const is1to1Conversation = this.type() === z.conversation.ConversationType.ONE2ONE;
+      return is1to1Conversation || this.isTeam1to1();
     });
     this.is_request = ko.pureComputed(() => this.type() === z.conversation.ConversationType.CONNECT);
     this.is_self = ko.pureComputed(() => this.type() === z.conversation.ConversationType.SELF);
@@ -116,9 +111,10 @@ z.entity.Conversation = class Conversation {
     });
 
     this.status = ko.observable(z.conversation.ConversationStatus.CURRENT_MEMBER);
-    this.removed_from_conversation = ko.pureComputed(
-      () => this.status() === z.conversation.ConversationStatus.PAST_MEMBER
-    );
+    this.removed_from_conversation = ko.pureComputed(() => {
+      return this.status() === z.conversation.ConversationStatus.PAST_MEMBER;
+    });
+    this.isActiveParticipant = ko.pureComputed(() => !this.removed_from_conversation() && !this.isGuest());
 
     this.removed_from_conversation.subscribe(is_removed => {
       if (!is_removed) {
@@ -201,12 +197,9 @@ z.entity.Conversation = class Conversation {
           return this.name();
         }
 
-        const [user_et] = this.participating_user_ets();
-        if (user_et && user_et.name) {
-          return user_et.name();
-        }
-
-        return '…';
+        const [userEntity] = this.participating_user_ets();
+        const hasUser = userEntity && userEntity.name();
+        return hasUser ? userEntity.name() : '…';
       }
 
       if (this.is_group()) {
@@ -214,27 +207,28 @@ z.entity.Conversation = class Conversation {
           return this.name();
         }
 
-        if (this.participating_user_ets().length > 0) {
+        const hasUserEntities = !!this.participating_user_ets().length;
+        if (hasUserEntities) {
           const isJustBots = this.participating_user_ets().every(user_et => user_et.isBot);
-          return this.participating_user_ets()
+          const joinedNames = this.participating_user_ets()
             .filter(user_et => isJustBots || !user_et.isBot)
             .map(user_et => user_et.first_name())
             .join(', ');
+
+          const maxLength = z.conversation.ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;
+          return z.util.StringUtil.truncate(joinedNames, maxLength, false);
         }
 
-        if (this.participating_user_ids().length === 0) {
+        const hasUserIds = !!this.participating_user_ids().length;
+        if (!hasUserIds) {
           return z.l10n.text(z.string.conversationsEmptyConversation);
         }
-
-        return '…';
       }
 
       return this.name() || '…';
     });
 
-    this.persist_state = _.debounce(() => {
-      amplify.publish(z.event.WebApp.CONVERSATION.PERSIST_STATE, this);
-    }, 100);
+    this.persist_state = _.debounce(() => amplify.publish(z.event.WebApp.CONVERSATION.PERSIST_STATE, this), 100);
   }
 
   subscribe_to_state_updates() {
@@ -243,7 +237,7 @@ z.entity.Conversation = class Conversation {
       this.archived_timestamp,
       this.cleared_timestamp,
       this.ephemeral_timer,
-      this.is_guest,
+      this.isGuest,
       this.last_event_timestamp,
       this.last_read_timestamp,
       this.last_server_timestamp,
@@ -357,21 +351,21 @@ z.entity.Conversation = class Conversation {
       }
     }
 
-    z.util.ko_array_push_all(this.messages_unordered, message_ets);
+    z.util.koArrayPushAll(this.messages_unordered, message_ets);
   }
 
   get_last_known_timestamp(time_offset) {
     const last_known_timestamp = Math.max(this.last_server_timestamp(), this.last_event_timestamp());
-    return last_known_timestamp || z.util.TimeUtil.adjust_current_timestamp(time_offset);
+    return last_known_timestamp || z.util.TimeUtil.adjustCurrentTimestamp(time_offset);
   }
 
   get_latest_timestamp(time_offset) {
-    const current_timestamp = z.util.TimeUtil.adjust_current_timestamp(Math.min(0, time_offset));
+    const current_timestamp = z.util.TimeUtil.adjustCurrentTimestamp(Math.min(0, time_offset));
     return Math.max(this.last_server_timestamp(), this.last_event_timestamp(), current_timestamp);
   }
 
   get_next_iso_date(time_offset) {
-    const current_timestamp = z.util.TimeUtil.adjust_current_timestamp(time_offset);
+    const current_timestamp = z.util.TimeUtil.adjustCurrentTimestamp(time_offset);
     const timestamp = Math.max(this.last_server_timestamp() + 1, current_timestamp);
     return new Date(timestamp).toISOString();
   }
@@ -413,7 +407,7 @@ z.entity.Conversation = class Conversation {
   prepend_messages(message_ets) {
     message_ets = message_ets.map(message_et => this._checkForDuplicate(message_et)).filter(message_et => message_et);
 
-    z.util.ko_array_unshift_all(this.messages_unordered, message_ets);
+    z.util.koArrayUnshiftAll(this.messages_unordered, message_ets);
   }
 
   /**
@@ -587,24 +581,31 @@ z.entity.Conversation = class Conversation {
    * @returns {number} Count of pending uploads
    */
   get_number_of_pending_uploads() {
-    const pending_uploads = [];
+    const pendingUploads = [];
 
-    for (const message_et of this.messages()) {
-      if (
-        message_et.assets &&
-        message_et.assets()[0] &&
-        message_et.assets()[0].pending_upload &&
-        message_et.assets()[0].pending_upload()
-      ) {
-        pending_uploads.push(message_et);
+    for (const messageEntity of this.messages()) {
+      const [assetEntity] = (messageEntity.assets && messageEntity.assets()) || [];
+      const isPendingUpload = assetEntity && assetEntity.pending_upload && assetEntity.pending_upload();
+      if (isPendingUpload) {
+        pendingUploads.push(messageEntity);
       }
     }
 
-    return pending_uploads.length;
+    return pendingUploads.length;
   }
 
-  get_users_with_unverified_clients() {
-    return [this.self].concat(this.participating_user_ets()).filter(user_et => !user_et.is_verified());
+  updateGuests() {
+    this.getTemporaryGuests().forEach(userEntity => userEntity.checkGuestExpiration());
+  }
+
+  getTemporaryGuests() {
+    const userEntities = this.self ? this.participating_user_ets().concat(this.self) : this.participating_user_ets();
+    return userEntities.filter(userEntity => userEntity.isTemporaryGuest());
+  }
+
+  getUsersWithUnverifiedClients() {
+    const userEntities = this.self ? this.participating_user_ets().concat(this.self) : this.participating_user_ets();
+    return userEntities.filter(userEntity => !userEntity.is_verified());
   }
 
   /**
@@ -636,8 +637,8 @@ z.entity.Conversation = class Conversation {
       cleared_timestamp: this.cleared_timestamp(),
       ephemeral_timer: this.ephemeral_timer(),
       id: this.id,
-      is_guest: this.is_guest(),
-      is_managed: this.is_managed,
+      is_guest: this.isGuest(),
+      is_managed: this.isManaged,
       last_event_timestamp: this.last_event_timestamp(),
       last_read_timestamp: this.last_read_timestamp(),
       last_server_timestamp: this.last_server_timestamp(),

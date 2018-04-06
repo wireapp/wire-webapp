@@ -20,30 +20,31 @@
 // Content
 .content {
   display: flex;
-  flex-direction: column;
-  height: 100%;
   overflow: hidden;
+  height: 100%;
+  flex-direction: column;
 }
 
 // Titlebar
 .content-titlebar {
   .label-bold-xs;
   .flex-center;
-  background-color: @app-bg;
-  border-bottom: 1px solid fade(@graphite, 12%);
-  height: @content-title-bar-height;
+
   position: relative;
   width: 100%;
+  height: @content-title-bar-height;
   flex: 0 0 auto;
+  border-bottom: 1px solid fade(@graphite, 12%);
+  background-color: @app-bg;
 }
 
 .content-titlebar-items-left {
-  align-items: center;
+  position: absolute;
+  top: 0;
+  left: 0;
   display: flex;
   height: 100%;
-  position: absolute;
-  left: 0;
-  top: 0;
+  align-items: center;
 }
 
 .content-titlebar-items-center {
@@ -51,19 +52,20 @@
 }
 
 .content-titlebar-items-right {
-  align-items: center;
+  position: absolute;
+  top: 0;
+  right: 0;
   display: flex;
   height: 100%;
-  position: absolute;
-  right: 0;
-  top: 0;
+  align-items: center;
 }
 
 .content-titlebar-icon {
   .button-icon-large;
+
   flex: 0 0 auto;
-  margin-left: 12px;
   margin-right: 12px;
+  margin-left: 12px;
 }
 
 // List

@@ -43,6 +43,8 @@ z.client.ClientRepository = class ClientRepository {
     this.clients = ko.pureComputed(() => (this.selfUser() ? this.selfUser().devices() : []));
     this.currentClient = ko.observable();
 
+    this.isTemporaryClient = ko.pureComputed(() => this.currentClient() && this.currentClient().isTemporary());
+
     amplify.subscribe(z.event.WebApp.LIFECYCLE.ASK_TO_CLEAR_DATA, this.logoutClient.bind(this));
     amplify.subscribe(z.event.WebApp.USER.EVENT_FROM_BACKEND, this.onUserEvent.bind(this));
   }
@@ -229,7 +231,7 @@ z.client.ClientRepository = class ClientRepository {
    * @returns {string} Cookie label
    */
   constructCookieLabel(login, clientType = this._loadCurrentClientType()) {
-    const loginHash = z.util.murmurhash3(login, 42);
+    const loginHash = z.util.murmurhash3(login || this.selfUser().id, 42);
     return `webapp@${loginHash}@${clientType}@${Date.now()}`;
   }
 
@@ -240,7 +242,7 @@ z.client.ClientRepository = class ClientRepository {
    * @returns {string} Cookie label key
    */
   constructCookieLabelKey(login, clientType = this._loadCurrentClientType()) {
-    const loginHash = z.util.murmurhash3(login, 42);
+    const loginHash = z.util.murmurhash3(login || this.selfUser().id, 42);
     return `${z.storage.StorageKey.AUTH.COOKIE_LABEL}@${loginHash}@${clientType}`;
   }
 
@@ -251,8 +253,8 @@ z.client.ClientRepository = class ClientRepository {
   getValidLocalClient() {
     return this.getCurrentClientFromDb()
       .then(clientEntity => this.getClientByIdFromBackend(clientEntity.id))
-      .then(clientEntity => {
-        this.logger.info(`Client with ID '${clientEntity.id}' (${clientEntity.type}) validated on backend`);
+      .then(clientPayload => {
+        this.logger.info(`Client with ID '${clientPayload.id}' (${clientPayload.type}) validated on backend`);
         return this.currentClient;
       })
       .catch(error => {
@@ -341,7 +343,7 @@ z.client.ClientRepository = class ClientRepository {
         identifier = z.string.wireLinux;
       }
       deviceModel = z.l10n.text(identifier);
-      if (!z.util.Environment.frontend.is_production()) {
+      if (!z.util.Environment.frontend.isProduction()) {
         deviceModel = `${deviceModel} (Internal)`;
       }
     } else if (clientType === z.client.ClientType.TEMPORARY) {
@@ -368,7 +370,7 @@ z.client.ClientRepository = class ClientRepository {
    * @returns {string} Cookie label
    */
   _getCookieLabelValue(login) {
-    return z.util.StorageUtil.get_value(this.constructCookieLabelKey(login));
+    return z.util.StorageUtil.getValue(this.constructCookieLabelKey(login));
   }
 
   /**
@@ -387,7 +389,7 @@ z.client.ClientRepository = class ClientRepository {
     if (cookieLabel === undefined) {
       cookieLabel = this.constructCookieLabel(userIdentifier, clientType);
       this.logger.warn(`Cookie label is in an invalid state. We created a new one: '${cookieLabel}'`);
-      z.util.StorageUtil.set_value(localStorageKey, cookieLabel);
+      z.util.StorageUtil.setValue(localStorageKey, cookieLabel);
     }
 
     this.logger.info(`Saving cookie label '${cookieLabel}' in IndexedDB`, {
@@ -407,7 +409,7 @@ z.client.ClientRepository = class ClientRepository {
     if (this.currentClient()) {
       return this.currentClient().type;
     }
-    const isPermanent = z.util.StorageUtil.get_value(z.storage.StorageKey.AUTH.PERSIST);
+    const isPermanent = z.util.StorageUtil.getValue(z.storage.StorageKey.AUTH.PERSIST);
     const type = isPermanent ? z.client.ClientType.PERMANENT : z.client.ClientType.TEMPORARY;
     return z.util.Environment.electron ? z.client.ClientType.PERMANENT : type;
   }
@@ -457,8 +459,7 @@ z.client.ClientRepository = class ClientRepository {
 
   logoutClient() {
     if (this.currentClient()) {
-      const isTemporaryClient = this.currentClient().type === z.client.ClientType.TEMPORARY;
-      if (isTemporaryClient) {
+      if (this.isTemporaryClient()) {
         return this.deleteTemporaryClient().then(() =>
           amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SIGN_OUT_REASON.USER_REQUESTED, true)
         );

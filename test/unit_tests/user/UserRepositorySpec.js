@@ -47,7 +47,7 @@ describe('z.user.UserRepository', () => {
       let user_et = undefined;
 
       beforeEach(() => {
-        const connection_et = new z.entity.Connection(z.util.create_random_uuid());
+        const connection_et = new z.entity.Connection(z.util.createRandomUuid());
         connection_et.to = entities.user.jane_roe.id;
 
         user_et = new z.entity.User(entities.user.john_doe.id);
@@ -159,7 +159,7 @@ describe('z.user.UserRepository', () => {
       });
     });
 
-    describe('find_user_by_id', () => {
+    describe('findUserById', () => {
       let user = null;
 
       beforeEach(done => {
@@ -177,7 +177,7 @@ describe('z.user.UserRepository', () => {
 
       it('should find an existing user', done => {
         TestFactory.user_repository
-          .find_user_by_id(user.id)
+          .findUserById(user.id)
           .then(user_et => {
             expect(user_et).toEqual(user);
             done();
@@ -187,7 +187,7 @@ describe('z.user.UserRepository', () => {
 
       it('should not find an unknown user', done => {
         TestFactory.user_repository
-          .find_user_by_id('1')
+          .findUserById('1')
           .then(done.fail)
           .catch(error => {
             expect(error.type).toBe(z.user.UserError.TYPE.USER_NOT_FOUND);
@@ -204,12 +204,12 @@ describe('z.user.UserRepository', () => {
         const connection_et = new z.entity.Connection();
         connection_et.status(z.user.ConnectionStatus.ACCEPTED);
 
-        user_et_a = new z.entity.User(z.util.create_random_uuid());
+        user_et_a = new z.entity.User(z.util.createRandomUuid());
         user_et_a.name('René');
         user_et_a.username('foo');
         user_et_a.connection(connection_et);
 
-        user_et_b = new z.entity.User(z.util.create_random_uuid());
+        user_et_b = new z.entity.User(z.util.createRandomUuid());
         user_et_b.name('Gregor');
         user_et_b.connection(connection_et);
 

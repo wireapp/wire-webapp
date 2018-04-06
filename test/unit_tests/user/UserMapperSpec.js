@@ -64,7 +64,7 @@ describe('User Mapper', () => {
       self_user_payload.accent_id = 0;
       const user_et = mapper.map_user_from_object(self_user_payload);
       expect(user_et.name()).toBe('John Doe');
-      expect(user_et.joaat_hash).toBe(526273169);
+      expect(user_et.joaatHash).toBe(526273169);
       expect(user_et.accent_id()).toBe(z.config.ACCENT_ID.BLUE);
     });
   });
@@ -101,12 +101,12 @@ describe('User Mapper', () => {
     });
   });
 
-  describe('update_user_from_object', () => {
+  describe('updateUserFromObject', () => {
     it('can update the accent color', () => {
       const user_et = new z.entity.User();
       user_et.id = entities.user.john_doe.id;
       const data = {accent_id: 1, id: entities.user.john_doe.id};
-      const updated_user_et = mapper.update_user_from_object(user_et, data);
+      const updated_user_et = mapper.updateUserFromObject(user_et, data);
       expect(updated_user_et.accent_id()).toBe(z.config.ACCENT_ID.BLUE);
     });
 
@@ -114,7 +114,7 @@ describe('User Mapper', () => {
       const user_et = new z.entity.User();
       user_et.id = entities.user.john_doe.id;
       const data = {id: entities.user.john_doe.id, name: entities.user.jane_roe.name};
-      const updated_user_et = mapper.update_user_from_object(user_et, data);
+      const updated_user_et = mapper.updateUserFromObject(user_et, data);
       expect(updated_user_et.name()).toBe(entities.user.jane_roe.name);
     });
 
@@ -122,7 +122,7 @@ describe('User Mapper', () => {
       const user_et = new z.entity.User();
       user_et.id = entities.user.john_doe.id;
       const data = {handle: entities.user.jane_roe.handle, id: entities.user.john_doe.id};
-      const updated_user_et = mapper.update_user_from_object(user_et, data);
+      const updated_user_et = mapper.updateUserFromObject(user_et, data);
       expect(updated_user_et.username()).toBe(entities.user.jane_roe.handle);
     });
 
@@ -130,7 +130,7 @@ describe('User Mapper', () => {
       const user_et = new z.entity.User();
       user_et.id = entities.user.john_doe.id;
       const data = {id: entities.user.jane_roe.id, name: entities.user.jane_roe.name};
-      const func = () => mapper.update_user_from_object(user_et, data);
+      const func = () => mapper.updateUserFromObject(user_et, data);
       expect(func).toThrow();
     });
 
@@ -139,13 +139,13 @@ describe('User Mapper', () => {
       user_et.id = entities.user.john_doe.id;
       const data = {
         assets: [
-          {key: z.util.create_random_uuid(), size: 'preview', type: 'image'},
-          {key: z.util.create_random_uuid(), size: 'complete', type: 'image'},
+          {key: z.util.createRandomUuid(), size: 'preview', type: 'image'},
+          {key: z.util.createRandomUuid(), size: 'complete', type: 'image'},
         ],
         id: entities.user.john_doe.id,
         name: entities.user.jane_roe.name,
       };
-      const updated_user_et = mapper.update_user_from_object(user_et, data);
+      const updated_user_et = mapper.updateUserFromObject(user_et, data);
       expect(updated_user_et.previewPictureResource()).toBeDefined();
       expect(updated_user_et.mediumPictureResource()).toBeDefined();
     });

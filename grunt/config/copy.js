@@ -113,4 +113,24 @@ module.exports = {
     expand: true,
     src: 'script/**/*.js',
   },
+
+  frontend: {
+    cwd: 'node_modules',
+    dest: '<%= dir.app.ext %>/js/',
+    expand: true,
+    src: [
+      '@wireapp/cbor/dist/cbor.bundle.js',
+      '@wireapp/cbor/dist/cbor.bundle.js.map',
+      '@wireapp/cryptobox/dist/cryptobox.bundle.js',
+      '@wireapp/cryptobox/dist/cryptobox.bundle.js.map',
+      '@wireapp/lru-cache/dist/lru-cache.bundle.js',
+      '@wireapp/lru-cache/dist/lru-cache.bundle.js.map',
+      '@wireapp/priority-queue/dist/priority-queue.bundle.js',
+      '@wireapp/priority-queue/dist/priority-queue.bundle.js.map',
+      '@wireapp/proteus/dist/proteus.bundle.js',
+      '@wireapp/proteus/dist/proteus.bundle.js.map',
+      '@wireapp/store-engine/dist/store-engine.bundle.js',
+      '@wireapp/store-engine/dist/store-engine.bundle.js.map',
+    ],
+  },
 };

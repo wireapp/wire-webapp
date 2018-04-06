@@ -17,49 +17,53 @@
  *
  */
 
-import {ArrowIcon} from '@wireapp/react-ui-kit/Icon';
-import {COLOR} from '@wireapp/react-ui-kit/Identity';
-import {Container, ContainerXS, Columns, Column} from '@wireapp/react-ui-kit/Layout';
+import {H1, Link, COLOR, ArrowIcon, Container, ContainerXS, Columns, Column} from '@wireapp/react-ui-kit';
 import {createPersonalAccountStrings} from '../../strings';
-import {H1, Link} from '@wireapp/react-ui-kit/Text';
 import {injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {Link as RRLink} from 'react-router-dom';
 import {withRouter} from 'react-router';
 import React from 'react';
-import ROUTE from '../route';
+import {ROUTE} from '../route';
 import EXTERNAL_ROUTE from '../externalRoute';
 import AccountForm from '../component/AccountForm';
-import {trackNameWithContext, EVENT_CONTEXT, EVENT_NAME, FLOW_TO_CONTEXT} from '../module/action/TrackingAction';
+import * as TrackingAction from '../module/action/TrackingAction';
 import {getAccount, getCurrentFlow, REGISTER_FLOW} from '../module/selector/AuthSelector';
 import * as AuthActionCreator from '../module/action/creator/AuthActionCreator';
 import * as AuthAction from '../module/action/AuthAction';
 import {pathWithParams} from '../util/urlUtil';
+import Page from './Page';
 
 class CreatePersonalAccount extends React.PureComponent {
   componentDidMount() {
-    const {match} = this.props;
-    if (match.path === ROUTE.CREATE_ACCOUNT) {
-      this.props.enterPersonalCreationFlow();
-    } else if (match.path === ROUTE.INVITE) {
-      this.props.enterGenericInviteCreationFlow();
-    } else {
-      this.props.enterPersonalInvitationCreationFlow();
-      this.invitationCode = match.params.invitationCode;
-      this.props.getInvitationFromCode(this.invitationCode);
+    const {params, url} = this.props.match;
+
+    const isInvite = url.startsWith(ROUTE.INVITE);
+    if (isInvite) {
+      const hasInvitationCode = !!params.invitationCode;
+      if (hasInvitationCode) {
+        this.props.enterPersonalInvitationCreationFlow();
+        this.invitationCode = params.invitationCode;
+        return this.props.getInvitationFromCode(this.invitationCode);
+      }
+
+      return this.props.enterGenericInviteCreationFlow();
     }
+
+    this.props.enterPersonalCreationFlow();
   }
 
   createAccount = () => {
     this.props
       .doRegisterPersonal({...this.props.account, invitation_code: this.invitationCode})
       .then(() => {
-        this.props.trackNameWithContext(EVENT_NAME.PERSONAL.CREATED, EVENT_CONTEXT.PERSONAL_INVITE);
-        this.props.trackNameWithContext(EVENT_NAME.PERSONAL.VERIFIED, EVENT_CONTEXT.PERSONAL_INVITE);
+        const authenticationContext = TrackingAction.AUTHENTICATION_CONTEXT.PERSONAL_INVITE;
+        this.props.trackNameWithContext(TrackingAction.EVENT_NAME.PERSONAL.CREATED, authenticationContext);
+        this.props.trackNameWithContext(TrackingAction.EVENT_NAME.PERSONAL.VERIFIED, authenticationContext);
       })
       .then(() => {
         const link = document.createElement('a');
-        link.href = pathWithParams(EXTERNAL_ROUTE.LOGIN, 'reason=registration');
+        link.href = pathWithParams(EXTERNAL_ROUTE.WEBAPP);
         document.body.appendChild(link); // workaround for Firefox
         link.click();
       })
@@ -67,8 +71,8 @@ class CreatePersonalAccount extends React.PureComponent {
   };
 
   handleBeforeSubmit = () => {
-    const context = FLOW_TO_CONTEXT[this.props.currentFlow];
-    this.props.trackNameWithContext(EVENT_NAME.PERSONAL.ENTERED_ACCOUNT_DATA, context);
+    const authenticationContext = TrackingAction.FLOW_TO_CONTEXT[this.props.currentFlow];
+    this.props.trackNameWithContext(TrackingAction.EVENT_NAME.PERSONAL.ENTERED_ACCOUNT_DATA, authenticationContext);
   };
 
   handleSubmit = () => {
@@ -96,22 +100,26 @@ class CreatePersonalAccount extends React.PureComponent {
         />
       </ContainerXS>
     );
-    return currentFlow === REGISTER_FLOW.PERSONAL ? (
-      <Container centerText verticalCenter style={{width: '100%'}}>
-        <Columns>
-          <Column style={{display: 'flex'}}>
-            <div style={{margin: 'auto'}}>
-              <Link to={ROUTE.INDEX} component={RRLink} data-uie-name="go-index">
-                <ArrowIcon direction="left" color={COLOR.GRAY} />
-              </Link>
-            </div>
-          </Column>
-          <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>{pageContent}</Column>
-          <Column />
-        </Columns>
-      </Container>
-    ) : (
-      pageContent
+    return (
+      <Page>
+        {currentFlow === REGISTER_FLOW.PERSONAL ? (
+          <Container centerText verticalCenter style={{width: '100%'}}>
+            <Columns>
+              <Column style={{display: 'flex'}}>
+                <div style={{margin: 'auto'}}>
+                  <Link to={ROUTE.INDEX} component={RRLink} data-uie-name="go-index">
+                    <ArrowIcon direction="left" color={COLOR.GRAY} />
+                  </Link>
+                </div>
+              </Column>
+              <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>{pageContent}</Column>
+              <Column />
+            </Columns>
+          </Container>
+        ) : (
+          pageContent
+        )}
+      </Page>
     );
   }
 }
@@ -119,9 +127,9 @@ class CreatePersonalAccount extends React.PureComponent {
 export default withRouter(
   injectIntl(
     connect(state => ({account: getAccount(state), currentFlow: getCurrentFlow(state)}), {
-      trackNameWithContext,
       ...AuthAction,
       ...AuthActionCreator,
+      ...TrackingAction,
     })(CreatePersonalAccount)
   )
 );

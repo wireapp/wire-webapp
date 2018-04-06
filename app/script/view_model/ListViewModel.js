@@ -26,6 +26,7 @@ z.viewModel.ListViewModel = class ListViewModel {
   static get MODAL_TYPE() {
     return {
       TAKEOVER: 'ListViewModel.MODAL_TYPE.TAKEOVER',
+      TEMPORARY_GUEST: 'ListViewModal.MODAL_TYPE.TEMPORARY_GUEST',
     };
   }
 
@@ -35,6 +36,7 @@ z.viewModel.ListViewModel = class ListViewModel {
       CONVERSATIONS: 'ListViewModel.STATE.CONVERSATIONS',
       PREFERENCES: 'ListViewModel.STATE.PREFERENCES',
       START_UI: 'ListViewModel.STATE.START_UI',
+      TEMPORARY_GUEST: 'ListViewModel.STATE.TEMPORARY_GUEST',
     };
   }
   /**
@@ -53,6 +55,8 @@ z.viewModel.ListViewModel = class ListViewModel {
 
     this.actionsViewModel = this.mainViewModel.actions;
     this.contentViewModel = this.mainViewModel.content;
+    this.isActivatedAccount = this.mainViewModel.isActivatedAccount;
+    this.selfUser = this.userRepository.self;
 
     this.logger = new z.util.Logger('z.viewModel.ListViewModel', z.config.LOGGER.OPTIONS);
 
@@ -63,8 +67,8 @@ z.viewModel.ListViewModel = class ListViewModel {
     this.webappLoaded = ko.observable(false);
 
     this.selfUserPicture = ko.pureComputed(() => {
-      if (this.webappLoaded() && this.userRepository.self()) {
-        return this.userRepository.self().mediumPictureResource();
+      if (this.webappLoaded() && this.selfUser()) {
+        return this.selfUser().mediumPictureResource();
       }
     });
 
@@ -95,9 +99,10 @@ z.viewModel.ListViewModel = class ListViewModel {
     // Nested view models
     this.archive = new z.viewModel.list.ArchiveViewModel(mainViewModel, this, repositories);
     this.conversations = new z.viewModel.list.ConversationListViewModel(mainViewModel, this, repositories);
-    this.preferences = new z.viewModel.list.PreferencesListViewModel(mainViewModel, this);
+    this.preferences = new z.viewModel.list.PreferencesListViewModel(mainViewModel, this, repositories);
     this.start = new z.viewModel.list.StartUIViewModel(mainViewModel, this, repositories);
     this.takeover = new z.viewModel.list.TakeoverViewModel(mainViewModel, this, repositories);
+    this.temporaryGuest = new z.viewModel.list.TemporaryGuestViewModel(mainViewModel, this, repositories);
 
     this._initSubscriptions();
 
@@ -112,8 +117,6 @@ z.viewModel.ListViewModel = class ListViewModel {
     amplify.subscribe(z.event.WebApp.SEARCH.SHOW, this.openStartUI.bind(this));
     amplify.subscribe(z.event.WebApp.SHORTCUT.NEXT, this.goToNext.bind(this));
     amplify.subscribe(z.event.WebApp.SHORTCUT.PREV, this.goToPrevious.bind(this));
-    amplify.subscribe(z.event.WebApp.TAKEOVER.SHOW, this.showTakeover.bind(this));
-    amplify.subscribe(z.event.WebApp.TAKEOVER.DISMISS, this.dismissTakeover.bind(this));
     amplify.subscribe(z.event.WebApp.SHORTCUT.ARCHIVE, this.clickToArchive.bind(this));
     amplify.subscribe(z.event.WebApp.SHORTCUT.DELETE, this.clickToClear.bind(this));
     amplify.subscribe(z.event.WebApp.SHORTCUT.SILENCE, this.clickToToggleMute.bind(this));
@@ -138,7 +141,7 @@ z.viewModel.ListViewModel = class ListViewModel {
       ? z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS
       : this.conversationRepository.active_conversation();
 
-    const nextItem = z.util.ArrayUtil.iterate_item(this.visibleListItems(), activeConversationItem, reverse);
+    const nextItem = z.util.ArrayUtil.iterateItem(this.visibleListItems(), activeConversationItem, reverse);
 
     const isConnectionRequestItem = nextItem === z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS;
     if (isConnectionRequestItem) {
@@ -155,16 +158,20 @@ z.viewModel.ListViewModel = class ListViewModel {
 
     const isDeviceDetails = activePreference === z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICE_DETAILS;
     if (isDeviceDetails) {
-      activePreference = z.viewModel.ContentViewModel.STATE.DEVICES;
+      activePreference = z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICES;
     }
 
-    const nextPreference = z.util.ArrayUtil.iterate_item(this.visibleListItems(), activePreference, reverse);
+    const nextPreference = z.util.ArrayUtil.iterateItem(this.visibleListItems(), activePreference, reverse);
     if (nextPreference) {
       this.contentViewModel.switchContent(nextPreference);
     }
   }
 
   openPreferencesAccount() {
+    if (this.isActivatedAccount()) {
+      this.dismissModal();
+    }
+
     this.switchList(ListViewModel.STATE.PREFERENCES);
     this.contentViewModel.switchContent(z.viewModel.ContentViewModel.STATE.PREFERENCES_ACCOUNT);
   }
@@ -194,7 +201,9 @@ z.viewModel.ListViewModel = class ListViewModel {
   }
 
   openConversations() {
-    this.switchList(ListViewModel.STATE.CONVERSATIONS, false);
+    if (this.isActivatedAccount()) {
+      this.switchList(ListViewModel.STATE.CONVERSATIONS, false);
+    }
   }
 
   _hideList() {
@@ -217,7 +226,10 @@ z.viewModel.ListViewModel = class ListViewModel {
 
     $(document).on('keydown.listView', keyboardEvent => {
       if (z.util.KeyboardUtil.isEscapeKey(keyboardEvent)) {
-        this.switchList(ListViewModel.STATE.CONVERSATIONS);
+        const newState = this.isActivatedAccount()
+          ? ListViewModel.STATE.CONVERSATIONS
+          : ListViewModel.STATE.TEMPORARY_GUEST;
+        this.switchList(newState);
       }
     });
   }
@@ -248,17 +260,26 @@ z.viewModel.ListViewModel = class ListViewModel {
         return 'preferences';
       case ListViewModel.STATE.START_UI:
         return 'start-ui';
+      case ListViewModel.STATE.TEMPORARY_GUEST:
+        return 'temporary-guest';
       default:
         return 'conversations';
     }
+  }
+
+  dismissModal() {
+    this.modal(undefined);
   }
 
   showTakeover() {
     this.modal(ListViewModel.MODAL_TYPE.TAKEOVER);
   }
 
-  dismissTakeover() {
-    this.modal(undefined);
+  showTemporaryGuest() {
+    this.switchList(ListViewModel.STATE.TEMPORARY_GUEST);
+    this.modal(ListViewModel.MODAL_TYPE.TEMPORARY_GUEST);
+    const conversationEntity = this.conversationRepository.getMostRecentConversation();
+    amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity);
   }
 
   //##############################################################################
@@ -271,14 +292,14 @@ z.viewModel.ListViewModel = class ListViewModel {
 
     const canToggleMute = !conversationEntity.is_request() && !conversationEntity.removed_from_conversation();
     if (canToggleMute) {
-      const silenceShortcut = z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.SILENCE);
+      const silenceShortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.SILENCE);
       const notifyTooltip = z.l10n.text(z.string.tooltipConversationsNotify, silenceShortcut);
-      const silence_tooltip = z.l10n.text(z.string.tooltipConversationsSilence, silenceShortcut);
+      const silenceTooltip = z.l10n.text(z.string.tooltipConversationsSilence, silenceShortcut);
 
       const labelStringId = conversationEntity.is_muted()
         ? z.string.conversationsPopoverNotify
         : z.string.conversationsPopoverSilence;
-      title = conversationEntity.is_muted() ? notifyTooltip : silence_tooltip;
+      title = conversationEntity.is_muted() ? notifyTooltip : silenceTooltip;
       entries.push({
         click: () => this.clickToToggleMute(conversationEntity),
         label: z.l10n.text(labelStringId),
@@ -292,7 +313,7 @@ z.viewModel.ListViewModel = class ListViewModel {
         label: z.l10n.text(z.string.conversationsPopoverUnarchive),
       });
     } else {
-      const shortcut = z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.ARCHIVE);
+      const shortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.ARCHIVE);
 
       entries.push({
         click: () => this.clickToArchive(conversationEntity),
@@ -340,7 +361,9 @@ z.viewModel.ListViewModel = class ListViewModel {
   }
 
   clickToArchive(conversationEntity = this.conversationRepository.active_conversation()) {
-    this.actionsViewModel.archiveConversation(conversationEntity);
+    if (this.isActivatedAccount()) {
+      this.actionsViewModel.archiveConversation(conversationEntity);
+    }
   }
 
   clickToBlock(conversationEntity) {

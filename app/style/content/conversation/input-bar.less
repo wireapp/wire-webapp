@@ -18,12 +18,12 @@
  */
 
 .conversation-input-bar {
+  position: relative;
   display: flex;
-  box-sizing: content-box;
   width: 100%;
   min-height: @conversation-input-min-height;
+  box-sizing: content-box;
   background-color: #fff;
-  position: relative;
 }
 
 .conversation-input-bar-editing {
@@ -35,54 +35,57 @@
   .accent-selection-color;
   .custom-scrollbar;
   .reset-textarea;
-  background-color: transparent;
-  flex: 1 1;
-  line-height: @conversation-input-line-height;
+
+  overflow: hidden;
+  max-width: @conversation-max-width - @conversation-message-sender-width - @conversation-message-timestamp-width;
   height: @conversation-input-line-height;
-  margin-bottom: (@conversation-input-min-height - @conversation-input-line-height) / 2;
-  margin-top: (@conversation-input-min-height - @conversation-input-line-height) / 2;
   min-height: @conversation-input-line-height;
   max-height: @conversation-input-max-height;
-  max-width: @conversation-max-width - @conversation-message-sender-width - @conversation-message-timestamp-width;
-  overflow: hidden;
+  flex: 1 1;
+  margin-top: (@conversation-input-min-height - @conversation-input-line-height) / 2;
+  margin-bottom: (@conversation-input-min-height - @conversation-input-line-height) / 2;
+  background-color: transparent;
+  line-height: @conversation-input-line-height;
 
   &::placeholder {
     .label-xs;
-    color: fade(@graphite, 48%);
+
     padding-left: 8px;
+    color: fade(@graphite, 48%);
   }
 
   &.ephemeral-input::placeholder {
-    .accent-color();
+    .accent-color;
   }
 }
 
 .controls-left {
   .flex-center;
+
   width: @conversation-message-sender-width;
   height: @conversation-input-min-height;
 }
 
 .controls-center {
-  flex: 1 1;
-  display: flex;
-  align-items: center;
   position: relative;
+  display: flex;
   width: 100%;
+  flex: 1 1;
+  align-items: center;
 }
 
 .controls-right {
   display: flex;
+  min-width: @conversation-message-timestamp-width;
   align-items: center;
   justify-content: flex-end;
-  min-width: @conversation-message-timestamp-width;
 }
 
 .controls-right-button {
   position: relative;
   flex: 0 0 auto;
-  margin-left: 12px;
   margin-right: 12px;
+  margin-left: 12px;
 }
 
 .conversation-input-bar-ephemeral {
@@ -91,36 +94,39 @@
 
 .controls-right-button-ephemeral-context {
   .square(32px);
+
   position: absolute;
-  left: 0;
   top: 0;
+  left: 0;
   outline: 0;
 }
 
 .ephemeral-mode,
 .bubble-menu .ephemeral-mode {
-  .accent-color();
+  .accent-color;
 }
 
 .ephemeral-timer-button {
   .circle(@avatar-diameter-xs);
-  .accent-color();
+  .accent-color;
   .accent-border-color(24%);
+
   position: relative;
-  border-width: 1px;
+  margin: 4px;
   border-style: solid;
+  border-width: 1px;
   font-size: @font-size-xs;
   font-weight: @font-weight-bold;
   line-height: @avatar-diameter-xs - 2;
   text-align: center;
-  margin: 4px;
 }
 
 .ephemeral-timer-button-unit {
   .circle(16px);
+
   position: absolute;
-  right: -8px;
   top: -2px;
+  right: -8px;
   background-color: #fff;
   line-height: 14px;
 }
@@ -134,31 +140,34 @@
 
 .conversation-input-bar-paste-modal {
   .full-screen;
+
   display: flex;
+  animation-duration: @animation-timing-slow;
+  animation-fill-mode: forwards;
+  animation-name: paste-fade-in;
+  animation-timing-function: @ease-out-expo;
   background-color: #fff;
   opacity: 0;
-  animation-name: paste-fade-in;
-  animation-duration: @animation-timing-slow;
-  animation-timing-function: @ease-out-expo;
-  animation-fill-mode: forwards;
 }
 
 .conversation-input-bar-paste-icon {
-  color: @graphite;
   margin-right: 16px;
+  color: @graphite;
 }
 
 .conversation-input-bar-paste-image {
   .square(16px);
+
   object-fit: contain;
 }
 
 .conversation-input-bar-paste-send {
   .circle(32px);
+
+  margin-right: 16px;
   color: #fff;
   cursor: pointer;
   line-height: 32px;
-  margin-right: 16px;
   text-align: center;
 }
 
@@ -167,15 +176,15 @@
 }
 
 .conversation-input-bar-emoji-list {
+  position: fixed;
+  z-index: @z-index-context;
+  display: block;
   background-color: #fff;
   border-radius: 4px;
   box-shadow: 0 0 1px 0 rgba(0, 0, 0, 0.08), 0 8px 24px 0 rgba(0, 0, 0, 0.16);
-  display: block;
   font-size: 12px;
   font-weight: @font-weight-regular;
   line-height: @line-height-xl;
-  position: fixed;
-  z-index: @z-index-context;
 
   .emoji {
     cursor: pointer;
@@ -193,19 +202,19 @@
     }
 
     .symbol {
+      position: absolute;
       display: inline-block;
       padding-left: 12px;
       font-size: @font-size-sm;
       text-align: center;
       vertical-align: middle;
-      position: absolute;
     }
 
     .name {
       display: inline-block;
       padding-right: 16px;
-      vertical-align: middle;
       margin-left: 40px;
+      vertical-align: middle;
 
       &::first-letter {
         text-transform: capitalize;

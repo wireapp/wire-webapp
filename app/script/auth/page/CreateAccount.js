@@ -17,17 +17,14 @@
  *
  */
 
-import {ArrowIcon} from '@wireapp/react-ui-kit/Icon';
-import {COLOR} from '@wireapp/react-ui-kit/Identity';
-import {Container, ContainerXS, Columns, Column} from '@wireapp/react-ui-kit/Layout';
+import {H1, Link, COLOR, ArrowIcon, Container, ContainerXS, Columns, Column} from '@wireapp/react-ui-kit';
 import {createAccountStrings} from '../../strings';
-import {H1, Link} from '@wireapp/react-ui-kit/Text';
 import {injectIntl} from 'react-intl';
 import {Link as RRLink} from 'react-router-dom';
 import {withRouter} from 'react-router';
 import Page from './Page';
 import React from 'react';
-import ROUTE from '../route';
+import {ROUTE} from '../route';
 import AccountForm from '../component/AccountForm';
 
 function CreateAccount({history, intl: {formatMessage: _}}) {

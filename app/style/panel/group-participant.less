@@ -19,8 +19,8 @@
 
 .group-participant {
   &__service-header {
-    padding: 8px 16px;
     display: flex;
+    padding: 8px 16px;
   }
 
   &__service-details {
@@ -33,9 +33,9 @@
   }
 
   &__service-provider {
+    color: fade(@graphite-dark, 40%);
     font-size: 12px;
     font-weight: @font-weight-regular;
-    color: fade(@graphite-dark, 40%);
   }
 
   &__service-description {
@@ -46,5 +46,9 @@
 
   &__bottom-actions {
     margin-top: 56px;
+  }
+
+  .panel__footer {
+    padding: 8px;
   }
 }

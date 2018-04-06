@@ -54,16 +54,28 @@ export default class BackendError extends Error {
     INVALID_PHONE: 'invalid-phone',
     KEY_EXISTS: 'key-exists',
     MISSING_AUTH: 'missing-auth',
+    NEW_CLIENT: 'new-client', // Synthetic error label
     PENDING_ACTIVATION: 'pending-activation',
     PENDING_LOGIN: 'pending-login',
     SUSPENDED: 'suspended',
     TOO_MANY_LOGINS: 'client-error',
   };
 
+  static CLIENT_ERRORS = {
+    TOO_MANY_CLIENTS: 'too-many-clients',
+  };
+
+  static CONVERSATION_ERRORS = {
+    CONVERSATION_CODE_NOT_FOUND: 'no-conversation-code',
+    CONVERSATION_NOT_FOUND: 'no-conversation',
+    CONVERSATION_TOO_MANY_MEMBERS: 'too-many-members',
+  };
+
   static GENERAL_ERRORS = {
     ACCESS_DENIED: 'access-denied',
     BAD_REQUEST: 'bad-request',
     INVALID_OPERATION: 'invalid-op',
+    INVALID_PAYLOAD: 'invalid-payload',
     NOT_FOUND: 'not-found',
     OPERATION_DENIED: 'operation-denied',
     UNAUTHORIZED: 'unauthorized',
@@ -94,7 +106,9 @@ export default class BackendError extends Error {
   static get LABEL() {
     return {
       ...BackendError.AUTH_ERRORS,
+      ...BackendError.CONVERSATION_ERRORS,
       ...BackendError.GENERAL_ERRORS,
+      ...BackendError.CLIENT_ERRORS,
       ...BackendError.HANDLE_ERRORS,
       ...BackendError.TEAM_ERRORS,
       ...BackendError.TEAM_INVITE_ERRORS,

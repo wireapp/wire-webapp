@@ -86,7 +86,7 @@
       <!-- ko if: visibleWarning() === z.viewModel.WarningsViewModel.TYPE.UNSUPPORTED_INCOMING_CALL -->
         <div class="warning-bar warning-bar-feature bg-theme">
           <!-- ko ifnot: z.util.Environment.browser.chrome -->
-            <div class="warning-bar-message"><span data-bind="l10n_text: {'id': z.string.warningCallUnsupportedIncoming, substitute: z.util.escape_html(firstName())}"></span>&nbsp;<a class="warning-bar-link" rel="nofollow noopener noreferrer" target="_blank" data-bind="l10n_href: {support: z.config.SUPPORT.ID.CALLING}, l10n_text: z.string.warningLearnMore"></a></div>
+            <div class="warning-bar-message"><span data-bind="l10n_text: {'id': z.string.warningCallUnsupportedIncoming, substitute: z.util.escapeHtml(name())}"></span>&nbsp;<a class="warning-bar-link" rel="nofollow noopener noreferrer" target="_blank" data-bind="l10n_href: {support: z.config.SUPPORT.ID.CALLING}, l10n_text: z.string.warningLearnMore"></a></div>
           <!-- /ko -->
           <!-- ko if: z.util.Environment.browser.chrome -->
             <!-- ko if: z.util.Environment.desktop -->
@@ -151,8 +151,8 @@
         <div class="warning-bar warning-bar-connection bg-theme">
           <div class="warning-bar-message">
             <span data-bind="l10n_text: z.string.warningLifecycleUpdate"></span>&nbsp;
-            <a class="warning-bar-link" href="https://medium.com/wire-news/desktop-updates" data-bind="l10n_text: z.string.warningLifecycleUpdateNotes" rel="nofollow noopener noreferrer" target="_blank"></a>&nbsp;·&nbsp;
-            <a class="warning-bar-link" data-bind="click: function(){amplify.publish(z.event.WebApp.LIFECYCLE.REFRESH)}, l10n_text: z.string.warningLifecycleUpdateLink" rel="nofollow noopener noreferrer" target="_blank"></a>
+            <a class="warning-bar-link" href="https://medium.com/wire-news/desktop-updates" data-bind="l10n_text: z.string.warningLifecycleUpdateNotes" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="go-whats-new"></a>&nbsp;·&nbsp;
+            <a class="warning-bar-link" data-bind="click: function(){amplify.publish(z.event.WebApp.LIFECYCLE.REFRESH)}, l10n_text: z.string.warningLifecycleUpdateLink" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="do-update"></a>
           </div>
         </div>
       <!-- /ko -->

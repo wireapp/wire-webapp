@@ -90,7 +90,7 @@ describe('Conversation Mapper', () => {
 
   describe('update_properties', () => {
     it('can update the properties of a conversation', () => {
-      const creator_id = z.util.create_random_uuid();
+      const creator_id = z.util.createRandomUuid();
       const conversation_et = conversation_mapper._create_conversation_et(payload.conversations.get.conversations[0]);
       const data = {
         creator: creator_id,
@@ -259,7 +259,7 @@ describe('Conversation Mapper', () => {
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
 
       const remote_data_2 = JSON.parse(JSON.stringify(remote_data));
-      remote_data_2.id = z.util.create_random_uuid();
+      remote_data_2.id = z.util.createRandomUuid();
 
       const [merged_conversation, merged_conversation_2] = conversation_mapper.merge_conversations(
         [local_data],

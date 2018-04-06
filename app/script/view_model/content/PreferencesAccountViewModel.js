@@ -24,25 +24,40 @@ window.z.viewModel = z.viewModel || {};
 window.z.viewModel.content = z.viewModel.content || {};
 
 z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewModel {
-  static get SAVED_ANIMATION_TIMEOUT() {
-    return 750 * 2;
+  static get CONFIG() {
+    return {
+      PROFILE_IMAGE: {
+        FILE_TYPES: ['image/bmp', 'image/jpeg', 'image/jpg', 'image/png', '.jpg-large'],
+      },
+      SAVE_ANIMATION_TIMEOUT: z.motion.MotionDuration.X_LONG * 2,
+    };
+  }
+
+  static get USERNAME_STATE() {
+    return {
+      AVAILABLE: 'PreferencesAccountViewModel.USERNAME_STATE.AVAILABLE',
+      TAKEN: 'PreferencesAccountViewModel.USERNAME_STATE.TAKEN',
+    };
   }
 
   constructor(mainViewModel, contentViewModel, repositories) {
-    this.change_accent_color = this.change_accent_color.bind(this);
-    this.check_new_clients = this.check_new_clients.bind(this);
-    this.removed_from_view = this.removed_from_view.bind(this);
+    this.changeAccentColor = this.changeAccentColor.bind(this);
+    this.checkNewClients = this.checkNewClients.bind(this);
+    this.removedFromView = this.removedFromView.bind(this);
 
     this.logger = new z.util.Logger('z.viewModel.content.PreferencesAccountViewModel', z.config.LOGGER.OPTIONS);
 
-    this.client_repository = repositories.client;
-    this.team_repository = repositories.team;
-    this.user_repository = repositories.user;
+    this.mainViewModel = mainViewModel;
+    this.clientRepository = repositories.client;
+    this.teamRepository = repositories.team;
+    this.userRepository = repositories.user;
 
-    this.self_user = this.user_repository.self;
-    this.new_clients = ko.observableArray([]);
-    this.name = ko.pureComputed(() => this.self_user().name());
-    this.availability = ko.pureComputed(() => this.self_user().availability());
+    this.isActivatedAccount = this.mainViewModel.isActivatedAccount;
+    this.selfUser = this.userRepository.self;
+
+    this.newClients = ko.observableArray([]);
+    this.name = ko.pureComputed(() => this.selfUser().name());
+    this.availability = ko.pureComputed(() => this.selfUser().availability());
 
     this.availabilityLabel = ko.pureComputed(() => {
       let label = z.user.AvailabilityMapper.nameFromType(this.availability());
@@ -55,159 +70,107 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
       return label;
     });
 
-    this.username = ko.pureComputed(() => this.self_user().username());
-    this.entered_username = ko.observable();
-    this.submitted_username = ko.observable();
-    this.username_error = ko.observable();
+    this.username = ko.pureComputed(() => this.selfUser().username());
+    this.enteredUsername = ko.observable();
+    this.submittedUsername = ko.observable();
+    this.usernameState = ko.observable();
 
-    this.is_team = this.team_repository.isTeam;
-    this.is_team_manager = ko.pureComputed(() => this.is_team() && this.self_user().is_team_manager());
-    this.team = this.team_repository.team;
-    this.team_name = ko.pureComputed(() =>
-      z.l10n.text(z.string.preferencesAccountTeam, this.team_repository.teamName())
-    );
+    this.nameSaved = ko.observable();
+    this.usernameSaved = ko.observable();
 
-    this.name_saved = ko.observable();
-    this.username_saved = ko.observable();
+    this.isTeam = this.teamRepository.isTeam;
+    this.isTeamManager = ko.pureComputed(() => this.isTeam() && this.selfUser().isTeamManager());
+    this.team = this.teamRepository.team;
+    this.teamName = ko.pureComputed(() => z.l10n.text(z.string.preferencesAccountTeam, this.teamRepository.teamName()));
 
-    this._init_subscriptions();
+    this._initSubscriptions();
   }
 
-  _init_subscriptions() {
+  _initSubscriptions() {
     amplify.subscribe(z.event.WebApp.USER.CLIENT_ADDED, this.onClientAdd.bind(this));
     amplify.subscribe(z.event.WebApp.USER.CLIENT_REMOVED, this.onClientRemove.bind(this));
   }
 
-  removed_from_view() {
-    this._reset_username_input();
+  changeAccentColor(id) {
+    this.userRepository.change_accent_color(id);
   }
 
-  change_accent_color(id) {
-    this.user_repository.change_accent_color(id);
-  }
+  changeName(viewModel, event) {
+    const newName = event.target.value.trim();
 
-  change_name(view_model, event) {
-    const new_name = event.target.value.trim();
-
-    if (new_name === this.self_user().name()) {
-      event.target.blur();
+    const isUnchanged = newName === this.selfUser().name();
+    if (isUnchanged) {
+      return event.target.blur();
     }
 
-    if (new_name.length >= z.user.UserRepository.CONFIG.MINIMUM_NAME_LENGTH) {
-      this.user_repository.change_name(new_name).then(() => {
-        this.name_saved(true);
+    const isValidName = newName.length >= z.user.UserRepository.CONFIG.MINIMUM_NAME_LENGTH;
+    if (isValidName) {
+      this.userRepository.change_name(newName).then(() => {
+        this.nameSaved(true);
         event.target.blur();
-        window.setTimeout(() => {
-          this.name_saved(false);
-        }, PreferencesAccountViewModel.SAVED_ANIMATION_TIMEOUT);
+        window.setTimeout(() => this.nameSaved(false), PreferencesAccountViewModel.CONFIG.SAVE_ANIMATION_TIMEOUT);
       });
     }
   }
 
-  reset_name_input() {
-    if (!this.name_saved()) {
-      this.name.notifySubscribers();
-    }
-  }
+  changeUsername(username, event) {
+    const enteredUsername = event.target.value;
+    const normalizedUsername = enteredUsername.toLowerCase().replace(/[^a-z0-9_]/g, '');
 
-  reset_username_input() {
-    if (!this.username_saved()) {
-      this._reset_username_input();
-      return this.username.notifySubscribers();
-    }
-  }
-
-  should_focus_username() {
-    return this.user_repository.should_set_username;
-  }
-
-  check_username_input(username, keyboard_event) {
-    if (z.util.KeyboardUtil.isKey(keyboard_event, z.util.KeyboardUtil.KEY.BACKSPACE)) {
-      return true;
-    }
-    // Automation: KeyboardEvent triggered during tests is missing key property
-    const input_char = keyboard_event.key || String.fromCharCode(event.charCode);
-    return z.user.UserHandleGenerator.validate_character(input_char.toLowerCase());
-  }
-
-  clickOnAvailability(viewModel, event) {
-    z.ui.AvailabilityContextMenu.show(event, 'settings', 'preferences-account-availability-menu');
-  }
-
-  change_username(username, event) {
-    const entered_username = event.target.value;
-    const normalized_username = entered_username.toLowerCase().replace(/[^a-z0-9_]/g, '');
-
-    if (entered_username !== normalized_username) {
-      event.target.value = normalized_username;
+    const wasNormalized = enteredUsername !== normalizedUsername;
+    if (wasNormalized) {
+      event.target.value = normalizedUsername;
     }
 
-    if (normalized_username.length < z.user.UserRepository.CONFIG.MINIMUM_USERNAME_LENGTH) {
-      return this.username_error(null);
+    const isUnchanged = normalizedUsername === this.selfUser().username();
+    if (isUnchanged) {
+      return event.target.blur();
     }
 
-    if (normalized_username === this.self_user().username()) {
-      event.target.blur();
+    const isInvalidName = normalizedUsername.length < z.user.UserRepository.CONFIG.MINIMUM_USERNAME_LENGTH;
+    if (isInvalidName) {
+      return this.usernameState(null);
     }
 
-    this.submitted_username(normalized_username);
-    this.user_repository
-      .change_username(normalized_username)
+    this.submittedUsername(normalizedUsername);
+    this.userRepository
+      .change_username(normalizedUsername)
       .then(() => {
-        if (this.entered_username() === this.submitted_username()) {
-          this.username_error(null);
-          this.username_saved(true);
+        const isCurrentRequest = this.enteredUsername() === this.submittedUsername();
+        if (isCurrentRequest) {
+          this.usernameState(null);
+          this.usernameSaved(true);
 
           event.target.blur();
-          window.setTimeout(() => {
-            this.username_saved(false);
-          }, PreferencesAccountViewModel.SAVED_ANIMATION_TIMEOUT);
+          window.setTimeout(() => this.usernameSaved(false), PreferencesAccountViewModel.CONFIG.SAVE_ANIMATION_TIMEOUT);
         }
       })
       .catch(error => {
-        if (
-          error.type === z.user.UserError.TYPE.USERNAME_TAKEN &&
-          this.entered_username() === this.submitted_username()
-        ) {
-          return this.username_error('taken');
+        const isUsernameTaken = error.type === z.user.UserError.TYPE.USERNAME_TAKEN;
+        const isCurrentRequest = this.enteredUsername() === this.submittedUsername();
+        if (isUsernameTaken && isCurrentRequest) {
+          this.usernameState(PreferencesAccountViewModel.USERNAME_STATE.TAKEN);
         }
       });
   }
 
-  verify_username(username, event) {
-    const entered_username = event.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '');
-
-    const username_too_short = entered_username.length < z.user.UserRepository.CONFIG.MINIMUM_USERNAME_LENGTH;
-    const username_unchanged = entered_username === this.self_user().username();
-    if (username_too_short || username_unchanged) {
-      this.username_error(null);
-      return;
+  checkUsernameInput(username, keyboardEvent) {
+    if (z.util.KeyboardUtil.isKey(keyboardEvent, z.util.KeyboardUtil.KEY.BACKSPACE)) {
+      return true;
     }
 
-    this.entered_username(entered_username);
-
-    if (z.user.UserHandleGenerator.validate_handle(entered_username)) {
-      this.user_repository
-        .verify_username(entered_username)
-        .then(() => {
-          if (this.entered_username() === entered_username) {
-            this.username_error('available');
-          }
-        })
-        .catch(error => {
-          if (error.type === z.user.UserError.TYPE.USERNAME_TAKEN && this.entered_username() === entered_username) {
-            return this.username_error('taken');
-          }
-        });
-    }
+    // Automation: KeyboardEvent triggered during tests is missing key property
+    const inputChar = keyboardEvent.key || String.fromCharCode(event.charCode);
+    return z.user.UserHandleGenerator.validate_character(inputChar.toLowerCase());
   }
 
-  check_new_clients() {
-    if (this.new_clients().length) {
+  checkNewClients() {
+    if (this.newClients().length) {
       amplify.publish(z.event.WebApp.SEARCH.BADGE.HIDE);
+
       amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACCOUNT_NEW_DEVICES, {
-        close: () => this.new_clients.removeAll(),
-        data: this.new_clients(),
+        close: () => this.newClients.removeAll(),
+        data: this.newClients(),
         preventClose: true,
         secondary: () => {
           amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICES);
@@ -216,19 +179,29 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     }
   }
 
-  click_on_change_picture(files) {
-    const [new_user_picture] = Array.from(files);
+  clickOnChangePicture(files) {
+    const [newUserPicture] = Array.from(files);
 
-    this.set_picture(new_user_picture).catch(error => {
-      if (error.type !== z.user.UserError.TYPE.INVALID_UPDATE) {
+    this.setPicture(newUserPicture).catch(error => {
+      const isInvalidUpdate = error.type === z.user.UserError.TYPE.INVALID_UPDATE;
+      if (!isInvalidUpdate) {
         throw error;
       }
     });
   }
 
-  click_on_delete_account() {
+  clickOnAvailability(viewModel, event) {
+    z.ui.AvailabilityContextMenu.show(event, 'settings', 'preferences-account-availability-menu');
+  }
+
+  clickOnCreate() {
+    const path = `${z.l10n.text(z.string.urlWebsiteCreateTeam)}?pk_campaign=client&pk_kwd=desktop`;
+    z.util.safeWindowOpen(z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.WEBSITE, path));
+  }
+
+  clickOnDeleteAccount() {
     amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
-      action: () => this.user_repository.delete_me(),
+      action: () => this.userRepository.delete_me(),
       text: {
         action: z.l10n.text(z.string.modalAccountDeletionAction),
         message: z.l10n.text(z.string.modalAccountDeletionMessage),
@@ -237,88 +210,149 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     });
   }
 
-  click_on_create() {
-    const path = `${z.l10n.text(z.string.urlWebsiteCreateTeam)}?pk_campaign=client&pk_kwd=desktop`;
-    z.util.safe_window_open(z.util.URLUtil.build_url(z.util.URLUtil.TYPE.WEBSITE, path));
-  }
-
-  click_on_logout() {
-    this.client_repository.logoutClient();
-  }
-
-  click_on_manage() {
-    const path = `${z.config.URL_PATH.MANAGE_TEAM}?utm_source=client_settings&utm_term=desktop`;
-    z.util.safe_window_open(z.util.URLUtil.build_url(z.util.URLUtil.TYPE.TEAM_SETTINGS, path));
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM);
-  }
-
-  click_on_reset_password() {
-    z.util.safe_window_open(z.util.URLUtil.build_url(z.util.URLUtil.TYPE.ACCOUNT, z.config.URL_PATH.PASSWORD_RESET));
-  }
-
-  set_picture(new_user_picture) {
-    if (new_user_picture.size > z.config.MAXIMUM_IMAGE_FILE_SIZE) {
-      const maximum_size_in_mb = z.config.MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024;
-      const messageString = z.l10n.text(z.string.modalPictureTooLargeMessage, maximum_size_in_mb);
-      const titleString = z.l10n.text(z.string.modalPictureTooLargeHeadline);
-
-      return this._show_upload_warning(titleString, messageString);
-    }
-
-    if (!z.config.SUPPORTED_PROFILE_IMAGE_TYPES.includes(new_user_picture.type)) {
-      const titleString = z.l10n.text(z.string.modalPictureFileFormatHeadline);
-      const messageString = z.l10n.text(z.string.modalPictureFileFormatMessage);
-
-      return this._show_upload_warning(titleString, messageString);
-    }
-
-    const min_height = z.user.UserRepository.CONFIG.MINIMUM_PICTURE_SIZE.HEIGHT;
-    const min_width = z.user.UserRepository.CONFIG.MINIMUM_PICTURE_SIZE.WIDTH;
-
-    return z.util.valid_profile_image_size(new_user_picture, min_width, min_height).then(valid => {
-      if (valid) {
-        return this.user_repository.change_picture(new_user_picture);
-      }
-
-      const messageString = z.l10n.text(z.string.modalPictureTooSmallMessage);
-      const titleString = z.l10n.text(z.string.modalPictureTooSmallHeadline);
-      return this._show_upload_warning(titleString, messageString);
+  clickOnLeaveGuestRoom() {
+    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
+      action: () => this.clientRepository.logoutClient(),
+      preventClose: true,
+      text: {
+        action: z.l10n.text(z.string.modalAccountLeaveGuestRoomAction),
+        message: z.l10n.text(z.string.modalAccountLeaveGuestRoomMessage),
+        title: z.l10n.text(z.string.modalAccountLeaveGuestRoomHeadline),
+      },
+      warning: false,
     });
   }
 
-  _show_upload_warning(title, message) {
-    const modalOptions = {text: {message, title}};
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
+  clickOnLogout() {
+    this.clientRepository.logoutClient();
+  }
 
-    return Promise.reject(new z.user.UserError(z.user.UserError.TYPE.INVALID_UPDATE));
+  clickOnManage() {
+    const path = `${z.config.URL_PATH.MANAGE_TEAM}?utm_source=client_settings&utm_term=desktop`;
+    z.util.safeWindowOpen(z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.TEAM_SETTINGS, path));
+    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM);
+  }
+
+  clickOnResetPassword() {
+    z.util.safeWindowOpen(z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.ACCOUNT, z.config.URL_PATH.PASSWORD_RESET));
   }
 
   onClientAdd(userId, clientEntity) {
-    const isSelfUser = userId === this.self_user().id;
+    const isSelfUser = userId === this.selfUser().id;
     if (isSelfUser) {
       amplify.publish(z.event.WebApp.SEARCH.BADGE.SHOW);
-      this.new_clients.push(clientEntity);
+      this.newClients.push(clientEntity);
     }
   }
 
   onClientRemove(userId, clientId) {
-    const isSelfUser = userId === this.self_user().id;
+    const isSelfUser = userId === this.selfUser().id;
     if (isSelfUser) {
-      this.new_clients.remove(clientEntity => {
+      this.newClients.remove(clientEntity => {
         const isExpectedId = clientEntity.id === clientId;
         return isExpectedId && clientEntity.isPermanent();
       });
 
-      if (!this.new_clients().length) {
+      if (!this.newClients().length) {
         amplify.publish(z.event.WebApp.SEARCH.BADGE.HIDE);
       }
     }
     return true;
   }
 
-  _reset_username_input() {
-    this.username_error(null);
-    this.entered_username(null);
-    this.submitted_username(null);
+  removedFromView() {
+    this._resetUsernameInput();
+  }
+
+  resetNameInput() {
+    if (!this.nameSaved()) {
+      this.name.notifySubscribers();
+    }
+  }
+
+  resetUsernameInput() {
+    if (!this.usernameSaved()) {
+      this._resetUsernameInput();
+      this.username.notifySubscribers();
+    }
+  }
+
+  setPicture(newUserPicture) {
+    const isTooLarge = newUserPicture.size > z.config.MAXIMUM_IMAGE_FILE_SIZE;
+    if (isTooLarge) {
+      const maximumSizeInMB = z.config.MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024;
+      const messageString = z.l10n.text(z.string.modalPictureTooLargeMessage, maximumSizeInMB);
+      const titleString = z.l10n.text(z.string.modalPictureTooLargeHeadline);
+
+      return this._showUploadWarning(titleString, messageString);
+    }
+
+    const isWrongFormat = !PreferencesAccountViewModel.CONFIG.PROFILE_IMAGE.FILE_TYPES.includes(newUserPicture.type);
+    if (isWrongFormat) {
+      const titleString = z.l10n.text(z.string.modalPictureFileFormatHeadline);
+      const messageString = z.l10n.text(z.string.modalPictureFileFormatMessage);
+
+      return this._showUploadWarning(titleString, messageString);
+    }
+
+    const minHeight = z.user.UserRepository.CONFIG.MINIMUM_PICTURE_SIZE.HEIGHT;
+    const minWidth = z.user.UserRepository.CONFIG.MINIMUM_PICTURE_SIZE.WIDTH;
+
+    return z.util.validateProfileImageResolution(newUserPicture, minWidth, minHeight).then(isValid => {
+      if (isValid) {
+        return this.userRepository.change_picture(newUserPicture);
+      }
+
+      const messageString = z.l10n.text(z.string.modalPictureTooSmallMessage);
+      const titleString = z.l10n.text(z.string.modalPictureTooSmallHeadline);
+      return this._showUploadWarning(titleString, messageString);
+    });
+  }
+
+  shouldFocusUsername() {
+    return this.userRepository.should_set_username;
+  }
+
+  verifyUsername(username, event) {
+    const enteredUsername = event.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '');
+
+    const usernameTooShort = enteredUsername.length < z.user.UserRepository.CONFIG.MINIMUM_USERNAME_LENGTH;
+    const usernameUnchanged = enteredUsername === this.selfUser().username();
+    if (usernameTooShort || usernameUnchanged) {
+      return this.usernameState(null);
+    }
+
+    this.enteredUsername(enteredUsername);
+
+    if (z.user.UserHandleGenerator.validate_handle(enteredUsername)) {
+      this.userRepository
+        .verify_username(enteredUsername)
+        .then(() => {
+          const isCurrentRequest = this.enteredUsername() === enteredUsername;
+          if (isCurrentRequest) {
+            this.usernameState(PreferencesAccountViewModel.USERNAME_STATE.AVAILABLE);
+          }
+        })
+        .catch(error => {
+          const isUsernameTaken = error.type === z.user.UserError.TYPE.USERNAME_TAKEN;
+          const isCurrentRequest = this.enteredUsername() === enteredUsername;
+          if (isUsernameTaken && isCurrentRequest) {
+            this.usernameState(PreferencesAccountViewModel.USERNAME_STATE.TAKEN);
+          }
+        });
+    }
+  }
+
+  _showUploadWarning(title, message) {
+    const modalOptions = {text: {message, title}};
+    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
+
+    return Promise.reject(new z.user.UserError(z.user.UserError.TYPE.INVALID_UPDATE));
+  }
+
+  _resetUsernameInput() {
+    this.usernameState(null);
+    this.enteredUsername(null);
+    this.submittedUsername(null);
   }
 };

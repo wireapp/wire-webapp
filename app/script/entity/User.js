@@ -36,6 +36,16 @@ z.entity.User = class User {
     };
   }
 
+  static get CONFIG() {
+    return {
+      TEMPORARY_GUEST: {
+        EXPIRATION_INTERVAL: 60 * 1000,
+        EXPIRATION_THRESHOLD: 10 * 1000,
+        LIFETIME: 24 * 60 * 60 * 1000,
+      },
+    };
+  }
+
   static get THEME() {
     return {
       BLUE: 'theme-blue',
@@ -53,7 +63,7 @@ z.entity.User = class User {
     this.is_me = false;
     this.isBot = false;
 
-    this.joaat_hash = -1;
+    this.joaatHash = -1;
 
     this.accent_id = ko.observable(z.config.ACCENT_ID.BLUE);
     this.accent_theme = ko.pureComputed(
@@ -122,8 +132,8 @@ z.entity.User = class User {
     this.initials = ko.pureComputed(() => {
       let initials = '';
       if (this.first_name() && this.last_name()) {
-        const first = z.util.StringUtil.get_first_character(this.first_name());
-        const last = z.util.StringUtil.get_first_character(this.last_name());
+        const first = z.util.StringUtil.getFirstChar(this.first_name());
+        const last = z.util.StringUtil.getFirstChar(this.last_name());
         initials = `${first}${last}`;
       } else {
         initials = this.first_name().slice(0, 2);
@@ -146,14 +156,16 @@ z.entity.User = class User {
     this.is_outgoing_request = ko.pureComputed(() => this.connection().is_outgoing_request());
     this.is_unknown = ko.pureComputed(() => this.connection().is_unknown());
 
-    this.is_guest = ko.observable(false);
+    this.inTeam = ko.observable(false);
+    this.isGuest = ko.observable(false);
     this.isTemporaryGuest = ko.observable(false);
-    this.is_team_member = ko.observable(false);
-    this.team_role = ko.observable(z.team.TeamRole.ROLE.NONE);
-    this.is_team_manager = ko.pureComputed(() =>
-      [z.team.TeamRole.ROLE.ADMIN, z.team.TeamRole.ROLE.OWNER].includes(this.team_role())
-    );
-    this.isTeamOwner = ko.pureComputed(() => z.team.TeamRole.ROLE.OWNER === this.team_role());
+    this.isTeamMember = ko.observable(false);
+    this.teamRole = ko.observable(z.team.TeamRole.ROLE.NONE);
+    this.isTeamManager = ko.pureComputed(() => {
+      return [z.team.TeamRole.ROLE.ADMIN, z.team.TeamRole.ROLE.OWNER].includes(this.teamRole());
+    });
+    this.isTeamOwner = ko.pureComputed(() => z.team.TeamRole.ROLE.OWNER === this.teamRole());
+    this.teamId = undefined;
 
     this.is_request = ko.pureComputed(() => this.connection().is_request());
 
@@ -166,6 +178,14 @@ z.entity.User = class User {
     });
 
     this.availability = ko.observable(z.user.AvailabilityType.NONE);
+
+    this.expirationRemaining = ko.observable(0);
+    this.expirationText = ko.observable('');
+    this.expirationIsUrgent = ko.observable(false);
+    this.expirationRemainingText = ko.observable('');
+    this.expirationIntervalId = undefined;
+    this.expirationTimeoutId = undefined;
+    this.isExpired = ko.observable(false);
   }
 
   subscribeToChanges() {
@@ -201,9 +221,9 @@ z.entity.User = class User {
    */
   matches(query, is_handle, excludedChars = []) {
     if (is_handle) {
-      return z.util.StringUtil.starts_with(this.username(), query);
+      return z.util.StringUtil.startsWith(this.username(), query);
     }
-    return z.util.StringUtil.compare_transliteration(this.name(), query, excludedChars) || this.username() === query;
+    return z.util.StringUtil.compareTransliteration(this.name(), query, excludedChars) || this.username() === query;
   }
 
   serialize() {
@@ -211,5 +231,71 @@ z.entity.User = class User {
       availability: this.availability(),
       id: this.id,
     };
+  }
+
+  setGuestExpiration(timestamp) {
+    if (this.expirationIntervalId) {
+      window.clearInterval(this.expirationIntervalId);
+      this.expirationIntervalId = undefined;
+    }
+
+    this._setRemainingExpirationTime(timestamp);
+
+    const expirationInterval = User.CONFIG.TEMPORARY_GUEST.EXPIRATION_INTERVAL;
+    this.expirationIntervalId = window.setInterval(
+      () => this._setRemainingExpirationTime(timestamp),
+      expirationInterval
+    );
+
+    window.setTimeout(() => {
+      this.isExpired(true);
+      window.clearInterval(this.expirationIntervalId);
+    }, this.expirationRemaining());
+  }
+
+  clearExpirationTimeout() {
+    if (this.expirationTimeoutId) {
+      window.clearTimeout(this.expirationTimeoutId);
+      this.expirationTimeoutId = undefined;
+    }
+  }
+
+  checkGuestExpiration() {
+    const checkExpiration = this.isTemporaryGuest() && !this.expirationTimeoutId;
+    if (checkExpiration) {
+      if (this.isExpired()) {
+        return amplify.publish(z.event.WebApp.USER.UPDATE, this.id);
+      }
+
+      const timeout = this.expirationRemaining() + User.CONFIG.TEMPORARY_GUEST.EXPIRATION_THRESHOLD;
+      this.expirationTimeoutId = window.setTimeout(() => amplify.publish(z.event.WebApp.USER.UPDATE, this.id), timeout);
+    }
+  }
+
+  _setRemainingExpirationTime(expirationTime) {
+    const MILLISECONDS_IN_MINUTE = 60 * 1000;
+    const MILLISECONDS_IN_HOUR = MILLISECONDS_IN_MINUTE * 60;
+
+    const remainingTime = Math.max(expirationTime - Date.now(), 0);
+    const remainingMinutes = Math.ceil(remainingTime / MILLISECONDS_IN_MINUTE);
+
+    let timeLeftText = z.string.userRemainingTimeHours;
+    let timeValue = 0;
+
+    if (remainingMinutes <= 45) {
+      timeLeftText = z.string.userRemainingTimeMinutes;
+      const remainingQuarters = Math.max(1, Math.ceil(remainingMinutes / 15));
+      timeValue = remainingQuarters * 15;
+      this.expirationRemaining(timeValue * MILLISECONDS_IN_MINUTE);
+      this.expirationRemainingText(`${timeValue}m`);
+    } else {
+      const showOneAndAHalf = remainingMinutes > 60 && remainingMinutes <= 90;
+      timeValue = showOneAndAHalf ? 1.5 : Math.ceil(remainingMinutes / 60);
+      this.expirationRemaining(timeValue * MILLISECONDS_IN_HOUR);
+      this.expirationRemainingText(`${timeValue}h`);
+    }
+
+    this.expirationIsUrgent(remainingMinutes < 120);
+    this.expirationText(z.l10n.text(timeLeftText, timeValue));
   }
 };

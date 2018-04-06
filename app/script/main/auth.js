@@ -47,25 +47,23 @@ z.main.Auth = class Auth {
 // Setting up the Environment (DIST)
 //##############################################################################
 $(() => {
-  const default_env = z.util.Environment.frontend.is_production()
+  const defaultEnvironment = z.util.Environment.frontend.isProduction()
     ? z.service.BackendEnvironment.PRODUCTION
     : z.service.BackendEnvironment.STAGING;
-  const env = z.util.get_url_parameter(z.auth.URLParameter.ENVIRONMENT) || default_env;
-  let settings;
+  const env = z.util.URLUtil.getParameter(z.auth.URLParameter.ENVIRONMENT) || defaultEnvironment;
 
-  if (env === z.service.BackendEnvironment.STAGING) {
-    settings = {
-      environment: z.service.BackendEnvironment.STAGING,
-      rest_url: 'https://staging-nginz-https.zinfra.io',
-      web_socket_url: 'wss://staging-nginz-ssl.zinfra.io',
-    };
-  } else {
-    settings = {
-      environment: z.service.BackendEnvironment.PRODUCTION,
-      rest_url: 'https://prod-nginz-https.wire.com',
-      web_socket_url: 'wss://prod-nginz-ssl.wire.com',
-    };
-  }
+  const isStaging = env === z.service.BackendEnvironment.STAGING;
+  const settings = isStaging
+    ? {
+        environment: z.service.BackendEnvironment.STAGING,
+        rest_url: 'https://staging-nginz-https.zinfra.io',
+        web_socket_url: 'wss://staging-nginz-ssl.zinfra.io',
+      }
+    : {
+        environment: z.service.BackendEnvironment.PRODUCTION,
+        rest_url: 'https://prod-nginz-https.wire.com',
+        web_socket_url: 'wss://prod-nginz-ssl.wire.com',
+      };
 
   window.wire = {
     auth: new z.main.Auth(settings),

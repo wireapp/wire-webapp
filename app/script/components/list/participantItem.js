@@ -28,13 +28,22 @@ z.components.ParticipantItem = class ParticipantItem {
     this.isService = this.participant instanceof z.integration.ServiceEntity || this.participant.isBot;
     this.isUser = this.participant instanceof z.entity.User && !this.participant.isBot;
     this.selfUser = window.wire.app.repository.user.self;
-    this.contentInfo = this.isService ? this.participant.summary : this.participant.username();
+    this.isTemporaryGuest = this.isUser && this.participant.isTemporaryGuest();
+
     this.mode = params.mode || z.components.UserList.MODE.DEFAULT;
     this.isDefaultMode = this.mode === z.components.UserList.MODE.DEFAULT;
     this.isOthersMode = this.mode === z.components.UserList.MODE.OTHERS;
 
     this.canSelect = params.canSelect;
     this.isSelected = params.isSelected;
+
+    if (this.isService) {
+      this.contentInfo = this.participant.summary;
+    } else if (this.isTemporaryGuest) {
+      this.contentInfo = this.participant.expirationText;
+    } else {
+      this.contentInfo = this.participant.username();
+    }
   }
 };
 
@@ -46,18 +55,18 @@ ko.components.register('participant-item', {
       </div>
 
       <div class="participant-item-content">
-        <!-- ko if: isUser && selfUser().is_team_member() -->
+        <!-- ko if: isUser && selfUser().inTeam() -->
           <availability-state class="participant-item-content-availability participant-item-content-name"
             data-uie-name="status-name"
             params="availability: participant.availability, label: participant.name"></availability-state>
         <!-- /ko -->
 
-        <!-- ko if: isService || !selfUser().is_team_member() -->
+        <!-- ko if: isService || !selfUser().inTeam() -->
           <div class="participant-item-content-name" data-bind="text: participant.name" data-uie-name="status-name"></div>
         <!-- /ko -->
         <div class="participant-item-content-info">
           <!-- ko if: contentInfo -->
-            <span class="participant-item-content-username label-username-notext" data-bind="text: contentInfo, css: {'label-username': isUser}" data-uie-name="status-username"></span>
+            <span class="participant-item-content-username label-username-notext" data-bind="text: contentInfo, css: {'label-username': isUser && !isTemporaryGuest}" data-uie-name="status-username"></span>
           <!-- /ko -->
         </div>
       </div>
@@ -66,7 +75,7 @@ ko.components.register('participant-item', {
         <verified-icon></verified-icon>
       <!-- /ko -->
 
-      <!-- ko if: isUser && !isOthersMode && participant.is_guest() -->
+      <!-- ko if: isUser && !isOthersMode && participant.isGuest() -->
         <guest-icon class="participant-item-guest-indicator" data-uie-name="status-guest"></guest-icon>
       <!-- /ko -->
       <!-- ko if: canSelect -->

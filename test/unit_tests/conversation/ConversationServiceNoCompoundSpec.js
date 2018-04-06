@@ -27,6 +27,7 @@ describe('ConversationServiceNoCompound', () => {
   let server = null;
   let storage_service = null;
   const test_factory = new TestFactory();
+  const eventStoreName = z.storage.StorageSchemata.OBJECT_STORE.EVENTS;
 
   beforeAll(done => {
     test_factory
@@ -63,9 +64,7 @@ describe('ConversationServiceNoCompound', () => {
     /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
 
     beforeEach(done => {
-      Promise.all(
-        messages.map(message => storage_service.save(z.storage.StorageService.OBJECT_STORE.EVENTS, undefined, message))
-      )
+      Promise.all(messages.map(message => storage_service.save(eventStoreName, undefined, message)))
         .then(done)
         .catch(done.fail);
     });
@@ -82,7 +81,7 @@ describe('ConversationServiceNoCompound', () => {
 
     it('returns undefined if no event with id is found', done => {
       conversation_service
-        .load_event_from_db(conversation_id, z.util.create_random_uuid())
+        .load_event_from_db(conversation_id, z.util.createRandomUuid())
         .then(message_et => {
           expect(message_et).not.toBeDefined();
           done();
@@ -131,9 +130,7 @@ describe('ConversationServiceNoCompound', () => {
         };
       });
 
-      Promise.all(
-        messages.map(message => storage_service.save(z.storage.StorageService.OBJECT_STORE.EVENTS, undefined, message))
-      )
+      Promise.all(messages.map(message => storage_service.save(eventStoreName, undefined, message)))
         .then(done)
         .catch(done.fail);
     });
@@ -256,9 +253,7 @@ describe('ConversationServiceNoCompound', () => {
     /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
 
     beforeEach(done => {
-      Promise.all(
-        messages.map(message => storage_service.save(z.storage.StorageService.OBJECT_STORE.EVENTS, undefined, message))
-      )
+      Promise.all(messages.map(message => storage_service.save(eventStoreName, undefined, message)))
         .then(ids => {
           primary_keys = ids;
           done();
@@ -305,11 +300,7 @@ describe('ConversationServiceNoCompound', () => {
     });
 
     it('should return no entry matches the given category', done => {
-      Promise.all(
-        events
-          .slice(0, 1)
-          .map(event => storage_service.save(z.storage.StorageService.OBJECT_STORE.EVENTS, undefined, event))
-      )
+      Promise.all(events.slice(0, 1).map(event => storage_service.save(eventStoreName, undefined, event)))
         .then(() =>
           conversation_service.load_events_with_category_from_db(
             events[0].conversation,
@@ -324,9 +315,7 @@ describe('ConversationServiceNoCompound', () => {
     });
 
     it('should get images in the correct order', done => {
-      Promise.all(
-        events.map(event => storage_service.save(z.storage.StorageService.OBJECT_STORE.EVENTS, undefined, event))
-      )
+      Promise.all(events.map(event => storage_service.save(eventStoreName, undefined, event)))
         .then(() =>
           conversation_service.load_events_with_category_from_db(
             events[0].conversation,

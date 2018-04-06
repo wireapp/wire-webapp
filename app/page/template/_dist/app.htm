@@ -2,7 +2,7 @@
 <script src="/script/util/ArrayUtil.js"></script>
 <script src="/script/util/Crypto.js"></script>
 <script src="/script/util/DebugUtil.js"></script>
-<script src="/script/util/Emoji.js"></script>
+<script src="/script/util/EmojiUtil.js"></script>
 <script src="/script/util/Environment.js"></script>
 <script src="/script/util/util.js"></script>
 <script src="/script/util/protobuf.js"></script>
@@ -14,7 +14,6 @@
 <script src="/script/util/ObjectUtil.js"></script>
 <script src="/script/util/PromiseQueue.js"></script>
 <script src="/script/util/scroll-helpers.js"></script>
-<script src="/script/util/Statistics.js"></script>
 <script src="/script/util/StorageUtil.js"></script>
 <script src="/script/util/StringUtil.js"></script>
 <script src="/script/util/TimeUtil.js"></script>
@@ -49,6 +48,7 @@
 <script src="/script/storage/StorageError.js"></script>
 <script src="/script/storage/StorageKey.js"></script>
 <script src="/script/storage/StorageRepository.js"></script>
+<script src="/script/storage/StorageSchemata.js"></script>
 <script src="/script/storage/StorageService.js"></script>
 <!-- Localization -->
 <script src="/script/localization/strings-init.js"></script>
@@ -81,7 +81,6 @@
 <script src="/script/tracking/attribute/MessageType.js"></script>
 <script src="/script/tracking/attribute/PlatformType.js"></script>
 <script src="/script/tracking/attribute/UserType.js"></script>
-<script src="/script/tracking/event/PictureTakenEvent.js"></script>
 <script src="/script/tracking/EventName.js"></script>
 <script src="/script/tracking/EventTrackingRepository.js"></script>
 <script src="/script/tracking/Helpers.js"></script>
@@ -261,6 +260,7 @@
 <script src="/script/telemetry/calling/CallSetupTimings.js"></script>
 <script src="/script/telemetry/calling/FlowTelemetry.js"></script>
 <script src="/script/telemetry/calling/CallTelemetry.js"></script>
+<script src="/script/telemetry/calling/CallLogger.js"></script>
 <!-- User -->
 <script src="/script/user/AvailabilityMapper.js"></script>
 <script src="/script/user/AvailabilityType.js"></script>
@@ -309,7 +309,8 @@
 <script src="/script/view_model/PanelViewModel.js"></script>
 <script src="/script/view_model/panel/AddParticipantsViewModel.js"></script>
 <script src="/script/view_model/panel/ConversationDetailsViewModel.js"></script>
-<script src="/script/view_model/panel/GroupParticipantViewModel.js"></script>
+<script src="/script/view_model/panel/GroupParticipantUserViewModel.js"></script>
+<script src="/script/view_model/panel/GroupParticipantServiceViewModel.js"></script>
 <script src="/script/view_model/panel/GuestOptionsViewModel.js"></script>
 <script src="/script/view_model/panel/ParticipantDevicesViewModel.js"></script>
 <!-- View Models: List -->
@@ -319,6 +320,7 @@
 <script src="/script/view_model/list/PreferencesListViewModel.js"></script>
 <script src="/script/view_model/list/StartUIViewModel.js"></script>
 <script src="/script/view_model/list/TakeoverViewModel.js"></script>
+<script src="/script/view_model/list/TemporaryGuestViewModel.js"></script>
 <!-- Knockout components -->
 <script src="/script/components/accentColorPicker.js"></script>
 <script src="/script/components/availabilityState.js"></script>
@@ -339,6 +341,7 @@
 <script src="/script/components/userList.js"></script>
 <script src="/script/components/guestModeToggle.js"></script>
 <script src="/script/components/icons.js"></script>
+<script src="/script/components/logos.js"></script>
 <script src="/script/components/asset/assetHeader.js"></script>
 <script src="/script/components/asset/videoAsset.js"></script>
 <script src="/script/components/asset/audioAsset.js"></script>

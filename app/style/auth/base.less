@@ -24,9 +24,8 @@ body {
 }
 
 body {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  .flex-center;
+
   background-image: linear-gradient(0deg, #2391d3, #68b3e0);
 }
 
@@ -38,68 +37,67 @@ body {
 
   .auth-page-navigation {
     display: flex;
-    flex-grow: 1;
     flex-basis: 0;
+    flex-grow: 1;
   }
 
   .auth-page-navigation-back {
-    cursor: pointer;
     display: block;
-    margin: auto;
     padding: 72px;
+    margin: auto;
+    cursor: pointer;
   }
 
   .auth-page {
     display: none;
+    width: 400px;
+    max-width: 100%;
     height: 576px;
     max-height: 100%;
-    max-width: 100%;
-    padding: 80px 40px 56px;
-
     flex-basis: 400px;
-    width: 400px;
+    padding: 80px 40px 56px;
 
     .auth-header {
       .wire-link {
-        cursor: pointer;
         display: block;
+        width: 82px;
         height: 24px;
         margin-left: -4px;
-        width: 82px;
+        cursor: pointer;
 
         .auth-logo {
-          fill: #fff;
           width: 82px;
           height: 24px;
+          fill: #fff;
         }
       }
     }
 
     .content {
       position: relative;
-      height: 416px;
       width: 320px;
+      height: 416px;
 
       .section {
-        display: none;
-        bottom: 0;
-        opacity: 0;
         position: absolute;
+        bottom: 0;
+        display: none;
         width: 100%;
+        opacity: 0;
       }
 
       .footer,
       .header,
       .selector {
         &::after {
-          content: '';
           display: table;
           clear: both;
+          content: '';
         }
 
         .column {
-          float: left;
           width: 50%;
+          float: left;
         }
       }
 
@@ -119,8 +117,8 @@ body {
     .form,
     .method {
       display: none;
-      opacity: 0;
       width: 100%;
+      opacity: 0;
     }
 
     .form-control {
@@ -137,23 +135,23 @@ body {
     }
 
     .error-list {
-      list-style: none;
       min-height: 16px;
-      margin: 0;
       padding: 0;
+      margin: 0;
+      list-style: none;
 
       .error {
-        color: #fff;
-        font-size: 13px;
         height: 24px;
         padding-left: 16px;
+        color: #fff;
+        font-size: 13px;
         text-indent: -12px;
         visibility: visible;
       }
 
       .error::before {
-        content: '• ';
         color: #febf02;
+        content: '• ';
       }
 
       .error:last-child {
@@ -168,6 +166,7 @@ body {
 
     .auth-text-link {
       .auth-text;
+
       cursor: pointer;
 
       &,
@@ -180,6 +179,7 @@ body {
     .auth-link-button {
       .auth-text-link;
       .pull-right;
+
       height: 40px;
       line-height: 40px;
     }

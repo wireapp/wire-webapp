@@ -51,7 +51,7 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
 
     this.senderName = ko.pureComputed(() => {
       const isTeamMemberLeave = this.type === z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE;
-      return isTeamMemberLeave ? this.name() : z.util.get_first_name(this.user());
+      return isTeamMemberLeave ? this.name() : z.util.getFirstName(this.user());
     });
 
     this.showNamedCreation = ko.pureComputed(() => this.isConversationCreate() && this.name().length);
@@ -60,12 +60,7 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
       return isUnnamedGroupCreation || this.isMemberChange();
     });
 
-    this.otherUser = ko.pureComputed(() => {
-      if (this.hasUsers()) {
-        return this.userEntities()[0];
-      }
-      return new z.entity.User();
-    });
+    this.otherUser = ko.pureComputed(() => (this.hasUsers() ? this.userEntities()[0] : new z.entity.User()));
 
     this.caption = ko.pureComputed(() => {
       if (!this.hasUsers()) {
@@ -74,37 +69,32 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
 
       switch (this.memberMessageType) {
         case z.message.SystemMessageType.CONNECTION_ACCEPTED:
-        case z.message.SystemMessageType.CONNECTION_REQUEST:
+        case z.message.SystemMessageType.CONNECTION_REQUEST: {
           return this._getCaptionConnection(this.otherUser());
-        case z.message.SystemMessageType.CONVERSATION_CREATE:
+        }
+
+        case z.message.SystemMessageType.CONVERSATION_CREATE: {
           if (this.name().length) {
             return z.l10n.text(z.string.conversationCreateWith, this._generateNameString(z.string.Declension.DATIVE));
           }
+
           if (this.user().is_me) {
             return z.l10n.text(z.string.conversationCreateYou, this._generateNameString());
           }
+
           return z.l10n.text(z.string.conversationCreate, this._generateNameString(z.string.Declension.DATIVE));
-        case z.message.SystemMessageType.CONVERSATION_RESUME:
+        }
+
+        case z.message.SystemMessageType.CONVERSATION_RESUME: {
           return z.l10n.text(z.string.conversationResume, this._generateNameString(z.string.Declension.DATIVE));
+        }
+
         default:
           break;
       }
 
       switch (this.type) {
-        case z.event.Backend.CONVERSATION.MEMBER_LEAVE:
-          const senderLeft = this.otherUser().id === this.user().id;
-          if (senderLeft) {
-            const userLeftStringId = this.user().is_me
-              ? z.string.conversationMemberLeaveLeftYou
-              : z.string.conversationMemberLeaveLeft;
-            return z.l10n.text(userLeftStringId);
-          }
-
-          const userRemovedStringId = this.user().is_me
-            ? z.string.conversationMemberLeaveRemovedYou
-            : z.string.conversationMemberLeaveRemoved;
-          return z.l10n.text(userRemovedStringId, this._generateNameString());
-        case z.event.Backend.CONVERSATION.MEMBER_JOIN:
+        case z.event.Backend.CONVERSATION.MEMBER_JOIN: {
           const senderJoined = this.otherUser().id === this.user().id;
           if (senderJoined) {
             const userJoinedStringId = this.user().is_me
@@ -118,8 +108,32 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
             : z.string.conversationMemberJoin;
 
           return z.l10n.text(userJoinedStringId, this._generateNameString());
-        case z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE:
+        }
+
+        case z.event.Backend.CONVERSATION.MEMBER_LEAVE: {
+          const temporaryGuestRemoval = this.otherUser().is_me && this.otherUser().isTemporaryGuest();
+          if (temporaryGuestRemoval) {
+            return z.l10n.text(z.string.temporaryGuestLeaveMessage);
+          }
+
+          const senderLeft = this.otherUser().id === this.user().id;
+          if (senderLeft) {
+            const userLeftStringId = this.user().is_me
+              ? z.string.conversationMemberLeaveLeftYou
+              : z.string.conversationMemberLeaveLeft;
+            return z.l10n.text(userLeftStringId);
+          }
+
+          const userRemovedStringId = this.user().is_me
+            ? z.string.conversationMemberLeaveRemovedYou
+            : z.string.conversationMemberLeaveRemoved;
+          return z.l10n.text(userRemovedStringId, this._generateNameString());
+        }
+
+        case z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE: {
           return z.l10n.text(z.string.conversationTeamLeave);
+        }
+
         default:
           break;
       }
@@ -128,10 +142,14 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
 
     this.groupCreationHeader = ko.pureComputed(() => {
       if (this.showNamedCreation()) {
+        if (this.user().isTemporaryGuest()) {
+          return z.l10n.text(z.string.conversationCreateTemporary);
+        }
+
         const groupCreationStringId = this.user().is_me
           ? z.string.conversationCreateNameYou
           : z.string.conversationCreateName;
-        return z.util.StringUtil.capitalize_first_char(z.l10n.text(groupCreationStringId, this.senderName()));
+        return z.util.StringUtil.capitalizeFirstChar(z.l10n.text(groupCreationStringId, this.senderName()));
       }
       return '';
     });

@@ -20,29 +20,48 @@
 import {defineMessages} from 'react-intl';
 import BackendError from './auth/module/action/BackendError';
 import ValidationError from './auth/module/action/ValidationError';
+import {LOGOUT_REASON} from './auth/route';
 
 /* eslint-disable sort-keys */
+
+export const footerStrings = defineMessages({
+  wireLink: {
+    id: 'footer.wireLink',
+    defaultMessage: 'wire.com',
+  },
+  copy: {
+    id: 'footer.copy',
+    defaultMessage: '© Wire Swiss GmbH',
+  },
+});
+
+export const cookiePolicyStrings = defineMessages({
+  bannerText: {
+    id: 'cookiePolicyStrings.bannerText',
+    defaultMessage: `We use cookies to personalize your experience on our website. By continuing to use the website, you agree to the use of cookies.<br/>Further information on cookies can be found in our <b>privacy policy</b>.`,
+  },
+});
 
 export const indexStrings = defineMessages({
   claim: {
     id: 'index.claim',
     defaultMessage: 'Secure messaging for everyone.',
   },
-  createAccount: {
-    id: 'index.createAccount',
-    defaultMessage: 'Create an account',
+  createAccountForPersonalUse: {
+    id: 'index.createAccountForPersonalUse',
+    defaultMessage: 'For personal use',
   },
-  createAccountFor: {
-    id: 'index.createAccountFor',
-    defaultMessage: 'for personal use',
+  createAccountForOrganizations: {
+    id: 'index.createAccountForOrganizations',
+    defaultMessage: 'For organizations',
+  },
+  createPersonalAccount: {
+    id: 'index.createPersonalAccount',
+    defaultMessage: 'create an account',
   },
   createTeam: {
     id: 'index.createTeam',
-    defaultMessage: 'Create a team',
-  },
-  createTeamFor: {
-    id: 'index.createTeamFor',
-    defaultMessage: 'for work',
+    defaultMessage: 'create a team',
   },
   loginInfo: {
     id: 'index.loginInfo',
@@ -179,7 +198,129 @@ export const chooseHandleStrings = defineMessages({
   },
 });
 
+export const appAlreadyOpenStrings = defineMessages({
+  headline: {
+    id: 'appAlreadyOpenStrings.headline',
+    defaultMessage: 'Wire is already open in this browser',
+  },
+  text: {
+    id: 'appAlreadyOpenStrings.text',
+    defaultMessage: 'If you continue here, you will be logged out on the other tab.',
+  },
+  continueButton: {
+    id: 'appAlreadyOpenStrings.continueButton',
+    defaultMessage: 'Continue',
+  },
+});
+
+export const unsupportedStrings = defineMessages({
+  headline: {
+    id: 'unsupported.unsupportedHeadline',
+    defaultMessage: 'This browser is not supported.',
+  },
+  subhead: {
+    id: 'unsupported.unsupportedSubhead',
+    defaultMessage:
+      'Download the latest version of <b style="font-weight: 600">Google Chrome, Mozilla Firefox, Opera</b style="font-weight: 600"> or <b style="font-weight: 600">Microsoft Edge.</b>',
+  },
+});
+
+export const unsupportedJoinStrings = defineMessages({
+  unsupportedJoinHeadline: {
+    id: 'conversationJoin.unsupportedJoinHeadline',
+    defaultMessage: 'You have been invited <br />to join a <b style="color: black;">Wire guest room.</b>',
+  },
+  unsupportedJoinSubhead: {
+    id: 'conversationJoin.unsupportedJoinSubhead',
+    defaultMessage:
+      '<p>This browser is not supported.</p>Download the latest version of <b style="font-weight: 600">Google Chrome, Mozilla Firefox, Opera</b> or <b style="font-weight: 600">Microsoft Edge.</b>',
+  },
+  unsupportedJoinMobileSubhead: {
+    id: 'conversationJoin.unsupportedJoinMobileSubhead',
+    defaultMessage: 'Open this link on your computer.',
+  },
+});
+
+export const conversationJoinStrings = defineMessages({
+  headline: {
+    id: 'conversationJoin.headline',
+    defaultMessage: 'You have been invited <br />to join a <b style="color: black;">Wire guest room.</b>',
+  },
+  subhead: {
+    id: 'conversationJoin.subhead',
+    defaultMessage: 'Encrypted group messaging and conference calls. <br />No account necessary.',
+  },
+  existentAccountHeadline: {
+    id: 'conversationJoin.existentAccountHeadline',
+    defaultMessage: '{name}, you have been invited <br />to join a <b style="color: black;">Wire guest room.</b>',
+  },
+  existentAccountSubhead: {
+    id: 'conversationJoin.subheadExistentAccount',
+    defaultMessage: 'Guest rooms let you have conversations with people who are not on your team.',
+  },
+  existentAccountOpenButton: {
+    id: 'conversationJoin.buttonExistentAccountOpen',
+    defaultMessage: 'Open in Wire',
+  },
+  existentAccountJoinWithoutLink: {
+    id: 'conversationJoin.existentAccountJoinWithoutLink',
+    defaultMessage: 'Join the conversation',
+  },
+  existentAccountJoinWithoutText: {
+    id: 'conversationJoin.existentAccountJoinWithoutText',
+    defaultMessage: 'without an account.',
+  },
+  invalidHeadline: {
+    id: 'conversationJoin.invalidHeadline',
+    defaultMessage: 'This <b style="color: black;">Wire guest room</b><br />is now closed.',
+  },
+  invalidSubhead: {
+    id: 'conversationJoin.invalidSubhead',
+    defaultMessage: 'Ask the person who invited you how to join.',
+  },
+  invalidCreateAccountLink: {
+    id: 'conversationJoin.invalidCreateAccountLink',
+    defaultMessage: 'Create an account',
+  },
+  invalidCreateAccountText: {
+    id: 'conversationJoin.invalidCreateAccountText',
+    defaultMessage: 'for group messaging and conference calls.',
+  },
+  fullConversationHeadline: {
+    id: 'conversationJoin.fullConversationHeadline',
+    defaultMessage: 'This <b style="color: black;">Wire guest room</b><br />is full.',
+  },
+  fullConversationSubhead: {
+    id: 'conversationJoin.fullConversationSubhead',
+    defaultMessage: 'Talk to the person who invited you.',
+  },
+  namePlaceholder: {
+    id: 'conversationJoin.namePlaceholder',
+    defaultMessage: 'Your name',
+  },
+  hasAccount: {
+    id: 'conversationJoin.hasAccount',
+    defaultMessage: 'Already have an account?',
+  },
+  loginLink: {
+    id: 'conversationJoin.loginLink',
+    defaultMessage: 'Log in',
+  },
+});
+
 export const errorHandlerStrings = defineMessages({
+  [BackendError.LABEL.CONVERSATION_CODE_NOT_FOUND]: {
+    id: 'BackendError.LABEL.CONVERSATION_CODE_NOT_FOUND',
+    defaultMessage: 'This link is no longer valid. Ask the person who invited you how to join.',
+  },
+  [BackendError.LABEL.CONVERSATION_NOT_FOUND]: {
+    id: 'BackendError.LABEL.CONVERSATION_NOT_FOUND',
+    defaultMessage: 'CONVERSATION_NOT_FOUND',
+  },
+  [BackendError.LABEL.CONVERSATION_TOO_MANY_MEMBERS]: {
+    id: 'BackendError.LABEL.CONVERSATION_TOO_MANY_MEMBERS',
+    defaultMessage: 'This conversation has reached the limit of participants',
+  },
   [BackendError.LABEL.ACCESS_DENIED]: {
     id: 'BackendError.LABEL.ACCESS_DENIED',
     defaultMessage: 'Please verify your details and try again',
@@ -239,7 +380,11 @@ export const errorHandlerStrings = defineMessages({
   },
   [BackendError.LABEL.INVALID_OPERATION]: {
     id: 'BackendError.LABEL.INVALID_OPERATION',
-    defaultMessage: 'BackendError.LABEL.INVALID_OPERATION',
+    defaultMessage: 'Invalid operation',
+  },
+  [BackendError.LABEL.INVALID_PAYLOAD]: {
+    id: 'BackendError.LABEL.INVALID_PAYLOAD',
+    defaultMessage: 'Invalid input',
   },
   [BackendError.LABEL.NOT_FOUND]: {
     id: 'BackendError.LABEL.NOT_FOUND',
@@ -320,5 +465,100 @@ export const validationErrorStrings = defineMessages({
   unexpected: {
     id: 'BackendError.unexpected',
     defaultMessage: 'Unexpected error ({code} {message})',
+  },
+});
+
+export const loginStrings = defineMessages({
+  headline: {
+    id: 'login.headline',
+    defaultMessage: 'Log in',
+  },
+  subhead: {
+    id: 'login.subhead',
+    defaultMessage: 'Enter your email address or username.',
+  },
+  emailPlaceholder: {
+    id: 'login.emailPlaceholder',
+    defaultMessage: 'Email or username',
+  },
+  passwordPlaceholder: {
+    id: 'login.passwordPlaceholder',
+    defaultMessage: 'Password',
+  },
+  forgotPassword: {
+    id: 'login.forgotPassword',
+    defaultMessage: 'Forgot password?',
+  },
+  phoneLogin: {
+    id: 'login.phoneLogin',
+    defaultMessage: 'Log in with phone number',
+  },
+  publicComputer: {
+    id: 'login.publicComputer',
+    defaultMessage: 'This is a public computer',
+  },
+});
+
+export const logoutReasonStrings = defineMessages({
+  [LOGOUT_REASON.ACCOUNT_REMOVED]: {
+    id: 'LOGOUT_REASON.ACCOUNT_REMOVED',
+    defaultMessage: 'You were signed out because your account was deleted.',
+  },
+  [LOGOUT_REASON.CLIENT_REMOVED]: {
+    id: 'LOGOUT_REASON.CLIENT_REMOVED',
+    defaultMessage: 'You were signed out because your device was deleted.',
+  },
+  [LOGOUT_REASON.SESSION_EXPIRED]: {
+    id: 'LOGOUT_REASON.SESSION_EXPIRED',
+    defaultMessage: 'You were signed out because your session expired.<br />Please log in again.',
+  },
+});
+
+export const clientManagerStrings = defineMessages({
+  headline: {
+    id: 'clientManager.headline',
+    defaultMessage: 'Remove a device',
+  },
+  subhead: {
+    id: 'clientManager.subhead',
+    defaultMessage: 'Remove one of your other devices to start using Wire on this one.',
+  },
+  logout: {
+    id: 'clientManager.logout',
+    defaultMessage: 'Log out',
+  },
+});
+
+export const clientItemStrings = defineMessages({
+  passwordPlaceholder: {
+    id: 'clientItem.passwordPlaceholder',
+    defaultMessage: 'Password',
+  },
+});
+
+export const historyInfoStrings = defineMessages({
+  hasHistoryHeadline: {
+    id: 'historyInfo.hasHistoryHeadline',
+    defaultMessage: 'You’ve used Wire on this device before.',
+  },
+  noHistoryHeadline: {
+    id: 'historyInfo.noHistoryHeadline',
+    defaultMessage: 'It’s the first time you’re using Wire on this device.',
+  },
+  hasHistoryInfo: {
+    id: 'historyInfo.hasHistoryInfo',
+    defaultMessage: 'Messages sent in the meantime<br/>will not appear here.',
+  },
+  noHistoryInfo: {
+    id: 'historyInfo.noHistoryInfo',
+    defaultMessage: 'For privacy reasons,<br/>your conversation history will not appear here.',
+  },
+  learnMore: {
+    id: 'historyInfo.learnMore',
+    defaultMessage: 'Learn more',
+  },
+  ok: {
+    id: 'historyInfo.ok',
+    defaultMessage: 'OK',
   },
 });

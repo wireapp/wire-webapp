@@ -66,8 +66,6 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
 
     this.actionsViewModel = this.mainViewModel.actions;
 
-    this.enableConversationLinks = this.conversationRepository.enableConversationLinks;
-
     this.selfUser = this.userRepository.self;
 
     this.isTeam = this.teamRepository.isTeam;
@@ -122,7 +120,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
 
     this.showContent = ko.pureComputed(() => this.showContacts() || this.showMatches() || this.showSearchResults());
     this.showContacts = ko.pureComputed(() => this.contacts().length);
-    this.showCreateGuestRoom = ko.pureComputed(() => this.isTeam() && this.enableConversationLinks());
+    this.showCreateGuestRoom = ko.pureComputed(() => this.isTeam());
     this.showInvitePeople = ko.pureComputed(() => !this.isTeam());
     this.showMatches = ko.observable(false);
 
@@ -246,7 +244,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
 
   clickOnInviteMember() {
     const path = `${z.config.URL_PATH.MANAGE_TEAM}?utm_source=client_landing&utm_term=desktop`;
-    z.util.safe_window_open(z.util.URLUtil.build_url(z.util.URLUtil.TYPE.TEAM_SETTINGS, path));
+    z.util.safeWindowOpen(z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.TEAM_SETTINGS, path));
     amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM);
   }
 

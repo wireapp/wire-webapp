@@ -17,10 +17,15 @@
                 <verified-icon class="conversation-details__name__verified-icon-right" data-uie-name="status-verified-conversation"></verified-icon>
               <!-- /ko -->
             </div>
-            <textarea class="conversation-details__name conversation-details__name--input" spellcheck="false" data-bind="visible: isEditingName, value: conversationEntity().display_name(), enter: renameConversation, hasFocus: isEditingName, resize" maxlength="64" dir="auto" data-uie-name="enter-name"></textarea>
+            <textarea class="conversation-details__name conversation-details__name--input"
+                      dir="auto"
+                      spellcheck="false"
+                      data-bind="attr: {maxlength: z.conversation.ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH}, enter: renameConversation, resize, value: conversationEntity().display_name(), visible: isEditingName()"
+                      data-uie-name="enter-name">
+            </textarea>
           <!-- /ko -->
           <!-- ko ifnot: isNameEditable() -->
-            <div class="conversation-details__name" data-bind="css: {'conversation-details__name--centered': conversationEntity().is_one2one}">
+            <div class="conversation-details__name" data-bind="css: {'conversation-details__name--centered': isSingleUserMode()}">
               <div class="conversation-details__flex-row">
                 <!-- ko if: isVerified() -->
                   <verified-icon class="conversation-details__name__verified-icon" data-uie-name="status-verified-conversation"></verified-icon>
@@ -78,17 +83,23 @@
           <!-- ko if: conversationEntity().is_group() -->
             <!-- ko if: userParticipants().length -->
               <div class="conversation-details__list-head" data-bind="text: z.string.conversationDetailsPeople"></div>
-              <user-list params="user: userParticipants, click: clickOnShowParticipant, altStyle: true" data-uie-name="list-users"></user-list>
+              <user-list params="user: userParticipants, click: clickOnShowUser, altStyle: true" data-uie-name="list-users"></user-list>
             <!-- /ko -->
 
             <!-- ko if: serviceParticipants().length -->
               <div class="conversation-details__list-head" data-bind="text: z.string.conversationDetailsServices"></div>
-              <service-list params="services: serviceParticipants, click: clickOnShowParticipant, altStyle: true" data-uie-name="list-services"></service-list>
+              <service-list params="services: serviceParticipants, click: clickOnShowService, altStyle: true" data-uie-name="list-services"></service-list>
             <!-- /ko -->
           <!-- /ko -->
           <!-- ko if: isSingleUserMode() && conversationEntity().firstUserEntity() -->
             <participant-avatar params="participant: conversationEntity().firstUserEntity, size: z.components.ParticipantAvatar.SIZE.X_LARGE" data-uie-name="status-profile-picture"></participant-avatar>
-            <!-- if: isTeam() -->
+            <!-- ko if: isGuest() -->
+              <div class="conversation-details__guest-label" data-uie-name="status-guest">
+                <guest-icon></guest-icon>
+                <span data-bind="l10n_text: z.string.conversationGuestIndicator"></span>
+              </div>
+            <!-- /ko -->
+            <!-- ko if: isTeam() -->
               <availability-state class="conversation-details__availability"
                 data-uie-name="status-availability"
                 params="availability: conversationEntity().firstUserEntity().availability(), label: availabilityLabel()">
@@ -97,7 +108,7 @@
           <!-- /ko -->
         </div>
 
-        <!-- ko if: showActionDevices() -->
+        <!-- ko if: isSingleUserMode() -->
           <div class="conversation-details__devices">
             <div class="panel__action-item" data-bind="click: clickOnDevices" data-uie-name="go-devices">
               <devices-icon class="panel__action-item__icon"></devices-icon>
@@ -107,42 +118,44 @@
           </div>
         <!-- /ko -->
 
-        <div class="conversation-details__bottom-actions">
-          <!-- ko if: showActionCreateGroup() -->
-            <div class="panel__action-item" data-bind="click: clickOnCreateGroup" data-uie-name="go-create-group">
-              <group-icon class="panel__action-item__icon"></group-icon>
-              <div class="panel__action-item__text" data-bind="l10n_text: z.string.conversationDetailsActionCreateGroup"></div>
+        <!-- ko if: isActivatedAccount() -->
+          <div class="conversation-details__bottom-actions">
+            <!-- ko if: showActionCreateGroup() -->
+              <div class="panel__action-item" data-bind="click: clickOnCreateGroup" data-uie-name="go-create-group">
+                <group-icon class="panel__action-item__icon"></group-icon>
+                <div class="panel__action-item__text" data-bind="l10n_text: z.string.conversationDetailsActionCreateGroup"></div>
+              </div>
+            <!-- /ko -->
+            <div class="panel__action-item" data-bind="click: clickToArchive" data-uie-name="do-archive">
+              <archive-icon class="panel__action-item__icon"></archive-icon>
+              <div class="panel__action-item__text" data-bind="l10n_text: z.string.conversationDetailsActionArchive"></div>
             </div>
-          <!-- /ko -->
-          <div class="panel__action-item" data-bind="click: clickToArchive" data-uie-name="do-archive">
-            <archive-icon class="panel__action-item__icon"></archive-icon>
-            <div class="panel__action-item__text" data-bind="l10n_text: z.string.conversationDetailsActionArchive"></div>
+            <!-- ko if: showActionCancelRequest() -->
+              <div class="panel__action-item" data-bind="click: clickToCancelRequest" data-uie-name="do-cancel-request">
+                <close-icon class="panel__action-item__icon"></close-icon>
+                <div class="panel__action-item__text" data-bind="l10n_text: z.string.conversationDetailsActionCancelRequest"></div>
+              </div>
+            <!-- /ko -->
+            <!-- ko if: showActionClear() -->
+              <div class="panel__action-item" data-bind="click: clickToClear" data-uie-name="do-clear">
+                <delete-icon class="panel__action-item__icon"></delete-icon>
+                <div class="panel__action-item__text" data-bind="l10n_text: z.string.conversationDetailsActionClear"></div>
+              </div>
+            <!-- /ko -->
+            <!-- ko if: showActionBlock() -->
+              <div class="panel__action-item" data-bind="click: clickToBlock" data-uie-name="do-block">
+                <block-icon class="panel__action-item__icon"></block-icon>
+                <div class="panel__action-item__text" data-bind="l10n_text: z.string.conversationDetailsActionBlock"></div>
+              </div>
+            <!-- /ko -->
+            <!-- ko if: showActionLeave() -->
+              <div class="panel__action-item" data-bind="click: clickToLeave" data-uie-name="do-leave">
+                <leave-icon class="panel__action-item__icon"></leave-icon>
+                <div class="panel__action-item__text" data-bind="l10n_text: z.string.conversationDetailsActionLeave"></div>
+              </div>
+            <!-- /ko -->
           </div>
-          <!-- ko if: showActionCancelRequest() -->
-            <div class="panel__action-item" data-bind="click: clickToCancelRequest" data-uie-name="do-cancel-request">
-              <close-icon class="panel__action-item__icon"></close-icon>
-              <div class="panel__action-item__text" data-bind="l10n_text: z.string.conversationDetailsActionCancelRequest"></div>
-            </div>
-          <!-- /ko -->
-          <!-- ko if: showActionClear() -->
-            <div class="panel__action-item" data-bind="click: clickToClear" data-uie-name="do-clear">
-              <delete-icon class="panel__action-item__icon"></delete-icon>
-              <div class="panel__action-item__text" data-bind="l10n_text: z.string.conversationDetailsActionClear"></div>
-            </div>
-          <!-- /ko -->
-          <!-- ko if: showActionBlock() -->
-            <div class="panel__action-item" data-bind="click: clickToBlock" data-uie-name="do-block">
-              <block-icon class="panel__action-item__icon"></block-icon>
-              <div class="panel__action-item__text" data-bind="l10n_text: z.string.conversationDetailsActionBlock"></div>
-            </div>
-          <!-- /ko -->
-          <!-- ko if: showActionLeave() -->
-            <div class="panel__action-item" data-bind="click: clickToLeave" data-uie-name="do-leave">
-              <leave-icon class="panel__action-item__icon"></leave-icon>
-              <div class="panel__action-item__text" data-bind="l10n_text: z.string.conversationDetailsActionLeave"></div>
-            </div>
-          <!-- /ko -->
-        </div>
+        <!-- /ko -->
       </div>
     </div>
   <!-- /ko -->

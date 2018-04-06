@@ -17,14 +17,37 @@
  *
  */
 
-export default {
+const QUERY_KEY = {
+  CONVERSATION_CODE: 'join_code',
+  CONVERSATION_KEY: 'join_key',
+  CURRENCY: 'currency',
+  ENVIRONMENT: 'env',
+  JOIN_EXPIRES: 'expires_in',
+  LANGUAGE: 'hl',
+  LOGOUT_REASON: 'reason',
+};
+
+const LOGOUT_REASON = {
+  ACCOUNT_REMOVED: 'deleted',
+  CLIENT_REMOVED: 'client_removed',
+  SESSION_EXPIRED: 'expired',
+};
+
+const ROUTE = {
   CHOOSE_HANDLE: '/choosehandle',
+  CLIENTS: '/clients',
+  CONVERSATION_JOIN: '/join-conversation',
+  CONVERSATION_JOIN_INVALID: '/join-conversation-invalid',
   CREATE_ACCOUNT: '/createaccount',
   CREATE_TEAM: '/createteam',
   CREATE_TEAM_ACCOUNT: '/createteamaccount',
+  HISTORY_INFO: '/historyinfo',
   INDEX: '/',
   INITIAL_INVITE: '/teaminvite',
   INVITE: '/invite',
+  LOGIN: '/login',
   PERSONAL_INVITE: '/personalinvite',
   VERIFY: '/verify',
 };
+
+export {ROUTE, QUERY_KEY, LOGOUT_REASON};

@@ -20,16 +20,22 @@
 .app {
   .font-antialiasing;
   .full-screen;
+
   display: flex;
   min-width: @screen-md-min;
   background-color: @app-bg;
 
   .left-column {
     position: relative;
+    width: @left-width;
     flex: 0 0 auto;
     color: @left-color;
     fill: @left-color;
-    width: @left-width;
+
+    &--light-theme {
+      color: @graphite-dark;
+      fill: @graphite-dark;
+    }
 
     .team-mode & {
       width: @left-width + @teams-width;
@@ -43,9 +49,9 @@
     &__overlay {
       position: absolute;
       top: 0;
-      left: 0;
-      bottom: 0;
       right: 0;
+      bottom: 0;
+      left: 0;
       display: none;
       opacity: 0;
     }
@@ -57,13 +63,13 @@
   }
 
   .right-column {
-    background-color: #fff;
-    transform: scale(1, 1);
-    overflow: hidden;
     z-index: @z-index-panel;
+    overflow: hidden;
     width: 0;
     height: 100vh;
+    background-color: #fff;
     box-shadow: 0 0 24px rgba(0, 0, 0, 0.08);
+    transform: scale(1, 1);
   }
 
   @media (min-width: 1000px) {

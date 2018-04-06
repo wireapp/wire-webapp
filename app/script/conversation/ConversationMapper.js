@@ -186,7 +186,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
     }
 
     if (conversation_data.is_guest) {
-      conversation_et.is_guest(conversation_data.is_guest);
+      conversation_et.isGuest(conversation_data.is_guest);
     }
 
     // Access related data
@@ -268,6 +268,12 @@ z.conversation.ConversationMapper = class ConversationMapper {
   mapAccessCode(conversationEntity, accessCode) {
     const isTeamConversation = conversationEntity && conversationEntity.team_id;
     if (isTeamConversation) {
+      if (z.util.Environment.frontend.isInternal()) {
+        const {code, key} = accessCode;
+        const accessLink = `${z.config.URL.WEBAPP.INTERNAL}/join/?key=${key}&code=${code}`;
+        return conversationEntity.accessCode(accessLink);
+      }
+
       conversationEntity.accessCode(accessCode.uri);
     }
   }

@@ -68,6 +68,7 @@ z.viewModel.MainViewModel = class MainViewModel {
     this.logger = new z.util.Logger('z.viewModel.MainViewModel', z.config.LOGGER.OPTIONS);
 
     this.selfUser = this.userRepository.self;
+    this.isActivatedAccount = this.userRepository.isActivatedAccount;
 
     this.isPanelOpen = ko.observable(false);
 
@@ -148,6 +149,12 @@ z.viewModel.MainViewModel = class MainViewModel {
             overlay.addEventListener('click', this.closePanelOnClick);
           }
           window.dispatchEvent(new Event('resize'));
+          z.util.afterRender(() => {
+            const scrollToBottom = !isNarrowScreen && this.content.messageList.should_scroll_to_bottom;
+            if (scrollToBottom) {
+              $('.messages-wrap').scrollToBottom();
+            }
+          });
           resolve();
         }
       });
@@ -166,29 +173,26 @@ z.viewModel.MainViewModel = class MainViewModel {
         }
       }
 
-      // https://developer.mozilla.org/en-US/Firefox/Performance_best_practices_for_Firefox_fe_engineers
-      window.requestAnimationFrame(() =>
-        window.setTimeout(() => {
-          panel.style.transition = 'transform .35s cubic-bezier(0.19, 1, 0.22, 1)';
-          const widthTransition = 'width .35s cubic-bezier(0.19, 1, 0.22, 1)';
-          titleBar.style.transition = widthTransition;
-          input.style.transition = widthTransition;
+      z.util.afterRender(() => {
+        panel.style.transition = 'transform .35s cubic-bezier(0.19, 1, 0.22, 1)';
+        const widthTransition = 'width .35s cubic-bezier(0.19, 1, 0.22, 1)';
+        titleBar.style.transition = widthTransition;
+        input.style.transition = widthTransition;
 
-          if (isPanelOpen) {
-            this._applyStyle(panel, MainViewModel.PANEL_STYLE.CLOSED);
-            if (!isNarrowScreen) {
-              this._applyStyle(titleBar, {width: `${centerWidthClose}px`});
-              this._applyStyle(input, {width: `${centerWidthClose}px`});
-            }
-          } else {
-            this._applyStyle(panel, MainViewModel.PANEL_STYLE.OPEN);
-            if (!isNarrowScreen) {
-              this._applyStyle(titleBar, {width: `${centerWidthOpen}px`});
-              this._applyStyle(input, {width: `${centerWidthOpen}px`});
-            }
+        if (isPanelOpen) {
+          this._applyStyle(panel, MainViewModel.PANEL_STYLE.CLOSED);
+          if (!isNarrowScreen) {
+            this._applyStyle(titleBar, {width: `${centerWidthClose}px`});
+            this._applyStyle(input, {width: `${centerWidthClose}px`});
           }
-        }, 0)
-      );
+        } else {
+          this._applyStyle(panel, MainViewModel.PANEL_STYLE.OPEN);
+          if (!isNarrowScreen) {
+            this._applyStyle(titleBar, {width: `${centerWidthOpen}px`});
+            this._applyStyle(input, {width: `${centerWidthOpen}px`});
+          }
+        }
+      });
     });
   }
 

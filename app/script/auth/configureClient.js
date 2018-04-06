@@ -19,7 +19,7 @@
 
 import * as Environment from './Environment';
 import APIClient from '@wireapp/api-client';
-import {StoreEngine} from '@wireapp/store-engine';
+import StoreEngine from '@wireapp/store-engine';
 
 const BACKEND = Environment.onEnvironment(
   APIClient.BACKEND.STAGING,
@@ -29,7 +29,19 @@ const BACKEND = Environment.onEnvironment(
 
 export const configureClient = () => {
   return new APIClient({
-    store: new StoreEngine.MemoryEngine('wire-webapp'),
+    schemaCallback: db => {
+      const databaseSchemata = window.z.storage.StorageSchemata.SCHEMATA;
+      databaseSchemata.forEach(({schema, upgrade, version}) => {
+        if (upgrade) {
+          return db
+            .version(version)
+            .stores(schema)
+            .upgrade(transaction => upgrade(transaction, db));
+        }
+        db.version(version).stores(schema);
+      });
+    },
+    store: new StoreEngine.IndexedDBEngine(),
     urls: BACKEND,
   });
 };

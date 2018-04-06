@@ -1,13 +1,15 @@
 <!-- Vendor libraries -->
 <script src="/ext/js/bazinga64/bazinga64.js"></script>
-<script src="/ext/js/wire-webapp-lru-cache/LRUCache.js"></script>
+<script src="/ext/js/@wireapp/lru-cache/dist/lru-cache.bundle.js"></script>
+<script src="/ext/js/@wireapp/priority-queue/dist/priority-queue.bundle.js"></script>
+<script src="/ext/js/dexie/dexie.js"></script>
+<script src="/ext/js/@wireapp/store-engine/dist/store-engine.bundle.js"></script>
 <script src="/ext/js/jquery/jquery.js"></script>
 <script src="/ext/js/jquery-mousewheel/jquery.mousewheel.js"></script>
 <script src="/ext/js/url-search-params-polyfill/index.js"></script>
 <script src="/ext/js/webrtc-adapter/adapter.js"></script>
 <script src="/ext/js/amplify/amplify.js"></script>
 <script src="/ext/js/antiscroll-2/antiscroll-2.js"></script>
-<script src="/ext/js/dexie/dexie.js"></script>
 <script src="/ext/js/highlightjs/highlight.pack.js"></script>
 <script src="/ext/js/js-cookie/js.cookie.js"></script>
 <script src="/ext/js/keyboardjs/keyboard.js"></script>
@@ -45,6 +47,7 @@
 <script src="/ext/js/uint32/uint32.js"></script>
 <script src="/ext/js/underscore/underscore.js"></script>
 <script src="/ext/js/uuid.js/uuid.js"></script>
+<script src="/ext/js/sdp-transform/sdp-transform.bundle.js"></script>
 <script src="/ext/js/crypto-js/core.js"></script>
 <script src="/ext/js/crypto-js/enc-base64.js"></script>
 <script src="/ext/js/crypto-js/lib-typedarrays.js"></script>
@@ -53,10 +56,15 @@
 <script src="/ext/js/linkifyjs/linkify.min.js"></script>
 <script src="/ext/js/linkifyjs/linkify-html.min.js"></script>
 <!-- Encryption: Base libraries (don't change the order) -->
+<script>
+  window.sodium = {
+    onload: sodium => (window.sodium = sodium)
+  }
+</script>
 <script src="/ext/js/libsodium.js/sodium.js"></script>
-<script src="/ext/js/wire-webapp-cbor/wire-webapp-cbor.js"></script>
-<script src="/ext/js/wire-webapp-proteus/proteus.js"></script>
-<script src="/ext/js/wire-webapp-cryptobox/wire-webapp-cryptobox.js"></script>
+<script src="/ext/js/@wireapp/cbor/dist/cbor.bundle.js"></script>
+<script src="/ext/js/@wireapp/proteus/dist/proteus.bundle.js"></script>
+<script src="/ext/js/@wireapp/cryptobox/dist/cryptobox.bundle.js"></script>
 <!-- Encryption: Protocol Buffers -->
 <script src="/ext/js/long/long.js"></script>
 <script src="/ext/js/bytebuffer/ByteBufferAB.js"></script>

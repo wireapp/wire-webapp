@@ -120,7 +120,7 @@ z.extension.GiphyRepository = class GiphyRepository {
     }
 
     if (options.random) {
-      options.sorting = z.util.ArrayUtil.random_element(['recent', 'relevant']);
+      options.sorting = z.util.ArrayUtil.randomElement(['recent', 'relevant']);
 
       const total = this.gifQueryCache[options.query];
       if (total) {

@@ -56,7 +56,7 @@
 <script type="text/html" id="delete">
   <div class="message-header">
     <div class="message-header-icon">
-      <participant-avatar class="sender-avatar" params="participant: message.user, click: $parent.on_message_user_click, size: z.components.ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
+      <participant-avatar class="sender-avatar" params="participant: message.user, click: $parent.onMessageUserClick, size: z.components.ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
     </div>
     <div class="message-header-label">
       <span class="message-header-label-sender" data-bind='text: message.sender_name()'></span>
@@ -72,7 +72,7 @@
   <!-- ko if: !$parent.should_hide_user_avatar($data) -->
     <div class="message-header">
       <div class="message-header-icon">
-        <participant-avatar class="sender-avatar" params="participant: message.user, click: $parent.on_message_user_click, size: z.components.ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
+        <participant-avatar class="sender-avatar" params="participant: message.user, click: $parent.onMessageUserClick, size: z.components.ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
       </div>
       <div class="message-header-label">
         <span class="message-header-label-sender" data-bind='css: message.accent_color(), text: message.user().first_name()' data-uie-name="sender-name"></span>
@@ -116,7 +116,7 @@
       <!-- /ko -->
       <!-- ko if: asset.is_text() -->
         <!-- ko if: asset.should_render_text -->
-          <div class="text" data-bind="html: asset.render(), css: {'text-graphite': $parent.is_editing, 'text-large': z.util.emoji.includes_only_emojies(asset.text), 'text-graphite': message.status() === z.message.StatusType.SENDING, 'ephemeral-message-obfuscated': message.is_expired()}" dir="auto"></div>
+          <div class="text" data-bind="html: asset.render(), css: {'text-graphite': $parent.is_editing, 'text-large': z.util.EmojiUtil.includesOnlyEmojies(asset.text), 'text-graphite': message.status() === z.message.StatusType.SENDING, 'ephemeral-message-obfuscated': message.is_expired()}" dir="auto"></div>
         <!-- /ko -->
         <!-- ko foreach: asset.previews() -->
           <link-preview-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired': message.is_expired()}" params="message: message"></link-preview-asset>
@@ -179,7 +179,7 @@
       <!-- ko if: message.show_likes() -->
         <div class="message-footer-bottom" data-uie-name="message-liked-avatars">
           <!-- ko foreach: message.reactions_user_ets() -->
-            <participant-avatar params="participant: $data, click: $parents[1].on_message_user_click, size: z.components.ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
+            <participant-avatar params="participant: $data, click: $parents[1].onMessageUserClick, size: z.components.ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
           <!-- /ko -->
           <span class="message-footer-close-button icon-close" data-bind="click: function() { $data.show_likes(false) }"></span>
         </div>
@@ -211,6 +211,7 @@
         <div class="message-group-creation-header-name" data-bind="text: name()"></div>
       </div>
     <!-- /ko -->
+
     <!-- ko if: hasUsers() -->
       <div class="message-header">
         <div class="message-header-icon text-graphite">
@@ -234,12 +235,33 @@
       <div class="message-body">
         <!-- ko foreach: remoteUserEntities -->
           <!-- ko if: message.isGroupCreation() -->
-            <participant-avatar class="avatar-no-border" params="participant: $data, click: $parents[1].on_message_user_click, size: z.components.ParticipantAvatar.SIZE.MEDIUM"></participant-avatar>
+            <participant-avatar class="avatar-no-border" params="participant: $data, click: $parents[1].onMessageUserClick, size: z.components.ParticipantAvatar.SIZE.MEDIUM"></participant-avatar>
           <!-- /ko -->
           <!-- ko if: message.isMemberJoin() || message.isMemberLeave() -->
-            <participant-avatar data-bind="css: {'translucent': message.isMemberLeave()}" params="participant: $data, click: $parents[1].on_message_user_click, size: z.components.ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
+            <participant-avatar data-bind="css: {'translucent': message.isMemberLeave()}" params="participant: $data, click: $parents[1].onMessageUserClick, size: z.components.ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
           <!-- /ko -->
         <!-- /ko -->
+      </div>
+    <!-- /ko -->
+
+    <!-- ko if: message.isGroupCreation() -->
+      <!-- ko if: $parent.showInvitePeople() -->
+        <div class="message-member-footer">
+          <div data-bind="l10n_text: z.string.guestRoomConversationHead"></div>
+          <div class="message-member-footer-button" data-bind="click: $parent.clickOnInvitePeople, l10n_text: z.string.guestRoomConversationButton" data-uie-name="do-invite-people"></div>
+        </div>
+      <!-- /ko -->
+      <!-- ko if: $parent.selfUser().isTemporaryGuest() -->
+        <div class="message-member-footer">
+          <div class="message-member-footer-message" data-bind="l10n_text: z.string.temporaryGuestJoinMessage"></div>
+          <div class="message-member-footer-description" data-bind="l10n_text: z.string.temporaryGuestJoinDescription"></div>
+        </div>
+      <!-- /ko -->
+    <!-- /ko -->
+
+    <!-- ko if: message.isMemberLeave() && message.user().is_me && $parent.selfUser().isTemporaryGuest() -->
+      <div class="message-member-footer">
+        <div class="message-member-footer-description" data-bind="l10n_text: z.string.temporaryGuestLeaveDescription"></div>
       </div>
     <!-- /ko -->
   <!-- /ko -->

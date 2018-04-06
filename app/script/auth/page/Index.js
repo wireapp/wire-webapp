@@ -20,16 +20,25 @@
 import * as TrackingAction from '../module/action/TrackingAction';
 import {getLanguage} from '../module/selector/LanguageSelector';
 import React, {Component} from 'react';
-import ROUTE from '../route';
-import EXTERNAL_ROUTE from '../externalRoute';
-import {Columns, Column, ContainerXS} from '@wireapp/react-ui-kit/Layout';
+import {ROUTE} from '../route';
+import {
+  Link,
+  Paragraph,
+  Text,
+  Bold,
+  ProfileIcon,
+  RoundContainer,
+  TeamIcon,
+  Logo,
+  COLOR,
+  Columns,
+  Column,
+  ContainerXS,
+} from '@wireapp/react-ui-kit';
 import {connect} from 'react-redux';
 import {indexStrings} from '../../strings';
 import {injectIntl} from 'react-intl';
-import {Logo, COLOR} from '@wireapp/react-ui-kit/Identity';
-import {ProfileIcon, RoundContainer, TeamIcon} from '@wireapp/react-ui-kit/Icon';
-import {Link, Paragraph, Text, Bold} from '@wireapp/react-ui-kit/Text';
-import {pathWithParams} from '../util/urlUtil';
+import Page from './Page';
 
 class Index extends Component {
   componentDidMount() {
@@ -48,54 +57,53 @@ class Index extends Component {
 
   onLoginClick = () => {
     this.props.trackEvent({name: TrackingAction.EVENT_NAME.START.OPENED_LOGIN});
-    const link = document.createElement('a');
-    link.href = pathWithParams(EXTERNAL_ROUTE.LOGIN, 'mode=login');
-    document.body.appendChild(link); // workaround for Firefox
-    link.click();
+    this.props.history.push(ROUTE.LOGIN);
   };
 
   render() {
     const {intl: {formatMessage: _}} = this.props;
     return (
-      <ContainerXS centerText verticalCenter>
-        <Logo scale={1.68} data-uie-name="ui-wire-logo" />
-        <Paragraph center>{_(indexStrings.claim)}</Paragraph>
-        <Columns style={{margin: '70px auto'}}>
-          <Column>
-            <Link onClick={this.onRegisterPersonalClick} data-uie-name="go-register-personal">
-              <RoundContainer style={{marginBottom: 12}}>
-                <ProfileIcon color={COLOR.WHITE} />
-              </RoundContainer>
-              <Bold fontSize="24px" color={COLOR.LINK}>
-                {_(indexStrings.createAccount)}
-              </Bold>
-              <br />
-              <Text light fontSize="16px" color={COLOR.LINK} style={{lineHeight: '36px'}}>
-                {_(indexStrings.createAccountFor)}
-              </Text>
-            </Link>
-          </Column>
-          <Column>
-            <Link onClick={this.onRegisterTeamClick} data-uie-name="go-register-team">
-              <RoundContainer color={COLOR.GREEN} style={{marginBottom: 12}}>
-                <TeamIcon color={COLOR.WHITE} />
-              </RoundContainer>
-              <Bold fontSize="24px" color={COLOR.LINK}>
-                {_(indexStrings.createTeam)}
-              </Bold>
-              <br />
-              <Text light fontSize="16px" color={COLOR.LINK} style={{lineHeight: '36px'}}>
-                {_(indexStrings.createTeamFor)}
-              </Text>
-            </Link>
-          </Column>
-        </Columns>
-        <Text>{_(indexStrings.loginInfo)}</Text>
-        <br />
-        <Link fontSize="24px" textTransform="none" onClick={this.onLoginClick} data-uie-name="go-login">
-          {_(indexStrings.login)}
-        </Link>
-      </ContainerXS>
+      <Page>
+        <ContainerXS centerText verticalCenter>
+          <Logo scale={1.68} data-uie-name="ui-wire-logo" />
+          <Paragraph center>{_(indexStrings.claim)}</Paragraph>
+          <Columns style={{margin: '70px auto'}}>
+            <Column>
+              <Link onClick={this.onRegisterPersonalClick} data-uie-name="go-register-personal">
+                <RoundContainer style={{marginBottom: 12}}>
+                  <ProfileIcon color={COLOR.WHITE} />
+                </RoundContainer>
+                <Bold fontSize="24px" color={COLOR.LINK}>
+                  {_(indexStrings.createAccountForPersonalUse)}
+                </Bold>
+                <br />
+                <Text light fontSize="16px" color={COLOR.LINK} style={{lineHeight: '36px'}}>
+                  {_(indexStrings.createPersonalAccount)}
+                </Text>
+              </Link>
+            </Column>
+            <Column>
+              <Link onClick={this.onRegisterTeamClick} data-uie-name="go-register-team">
+                <RoundContainer color={COLOR.GREEN} style={{marginBottom: 12}}>
+                  <TeamIcon color={COLOR.WHITE} />
+                </RoundContainer>
+                <Bold fontSize="24px" color={COLOR.LINK}>
+                  {_(indexStrings.createAccountForOrganizations)}
+                </Bold>
+                <br />
+                <Text light fontSize="16px" color={COLOR.LINK} style={{lineHeight: '36px'}}>
+                  {_(indexStrings.createTeam)}
+                </Text>
+              </Link>
+            </Column>
+          </Columns>
+          <Text>{_(indexStrings.loginInfo)}</Text>
+          <br />
+          <Link fontSize="24px" textTransform="none" onClick={this.onLoginClick} data-uie-name="go-login">
+            {_(indexStrings.login)}
+          </Link>
+        </ContainerXS>
+      </Page>
     );
   }
 }

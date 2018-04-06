@@ -24,10 +24,10 @@ window.z.tracking = z.tracking || {};
 
 z.tracking.EventTrackingRepository = class EventTrackingRepository {
   static get CONFIG() {
-    const MIXPANEL_TOKEN = z.util.Environment.frontend.is_production()
+    const MIXPANEL_TOKEN = z.util.Environment.frontend.isProduction()
       ? 'c7dcb15893f14932b1c31b5fb33ff669'
       : '537da3b3bc07df1e420d07e2921a6f6f';
-    const RAYGUN_API_KEY = z.util.Environment.frontend.is_production()
+    const RAYGUN_API_KEY = z.util.Environment.frontend.isProduction()
       ? 'lAkLCPLx3ysnsXktajeHmw=='
       : '5hvAMmz8wTXaHBYqu2TFUQ==';
 
@@ -187,11 +187,9 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
     }
   }
 
-  _set_super_property(super_property, value) {
-    this.logger.info(`Set super property '${super_property}' to value '${value}'`);
-    const super_properties = {};
-    super_properties[super_property] = value;
-    this.mixpanel.register(super_properties);
+  _set_super_property(superPropertyName, value) {
+    this.logger.info(`Set super property '${superPropertyName}' to value '${value}'`);
+    this.mixpanel.register({[superPropertyName]: value});
   }
 
   _track_event(event_name, attributes) {
@@ -249,7 +247,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
         EventTrackingRepository.CONFIG.USER_ANALYTICS.API_KEY,
         {
           autotrack: false,
-          debug: !z.util.Environment.frontend.is_production(),
+          debug: !z.util.Environment.frontend.isProduction(),
           loaded: mixpanel => {
             mixpanel.register({
               $city: null,
@@ -269,7 +267,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
   }
 
   _is_domain_allowed_for_tracking() {
-    if (!z.util.get_url_parameter(z.auth.URLParameter.TRACKING)) {
+    if (!z.util.URLUtil.getParameter(z.auth.URLParameter.TRACKING)) {
       for (const domain of EventTrackingRepository.CONFIG.USER_ANALYTICS.DISABLED_DOMAINS) {
         if (z.util.StringUtil.includes(window.location.hostname, domain)) {
           this.logger.debug(`Tracking is disabled for domain '${window.location.hostname}'`);
@@ -357,7 +355,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
       ignoreAjaxError: true,
     };
 
-    options.debugMode = !z.util.Environment.frontend.is_production();
+    options.debugMode = !z.util.Environment.frontend.isProduction();
 
     Raygun.init(EventTrackingRepository.CONFIG.ERROR_REPORTING.API_KEY, options).attach();
     Raygun.disableAutoBreadcrumbs();
@@ -367,7 +365,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
     @note We cannot use our own version string as it has to be in a certain format
     @see https://github.com/MindscapeHQ/raygun4js#version-filtering
     */
-    if (!z.util.Environment.frontend.is_localhost()) {
+    if (!z.util.Environment.frontend.isLocalhost()) {
       Raygun.setVersion(z.util.Environment.version(false));
     }
     if (z.util.Environment.desktop) {
