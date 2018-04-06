@@ -169,35 +169,31 @@ z.main.App = class App {
    * @returns {Object} All services
    */
   _setup_services() {
-    const services = {
-      storage: new z.storage.StorageService(),
+    const storageService = new z.storage.StorageService();
+
+    return {
+      asset: new z.assets.AssetService(this.auth.client),
+      backup: new z.backup.BackupService(storageService),
+      broadcast: new z.broadcast.BroadcastService(this.auth.client),
+      calling: new z.calling.CallingService(this.auth.client),
+      client: new z.client.ClientService(this.auth.client, storageService),
+      connect: new z.connect.ConnectService(this.auth.client),
+      connect_google: new z.connect.ConnectGoogleService(this.auth.client),
+      conversation: z.util.Environment.browser.edge
+        ? new z.conversation.ConversationServiceNoCompound(this.auth.client, storageService)
+        : new z.conversation.ConversationService(this.auth.client, storageService),
+      cryptography: new z.cryptography.CryptographyService(this.auth.client),
+      giphy: new z.extension.GiphyService(this.auth.client),
+      integration: new z.integration.IntegrationService(this.auth.client),
+      lifecycle: new z.lifecycle.LifecycleService(),
+      notification: new z.event.NotificationService(this.auth.client, storageService),
+      properties: new z.properties.PropertiesService(this.auth.client),
+      search: new z.search.SearchService(this.auth.client),
+      storage: storageService,
+      team: new z.team.TeamService(this.auth.client),
+      user: new z.user.UserService(this.auth.client, storageService),
+      web_socket: new z.event.WebSocketService(this.auth.client),
     };
-
-    services.asset = new z.assets.AssetService(this.auth.client);
-    services.backup = new z.backup.BackupService(services.storage);
-    services.broadcast = new z.broadcast.BroadcastService(this.auth.client);
-    services.calling = new z.calling.CallingService(this.auth.client);
-    services.client = new z.client.ClientService(this.auth.client, services.storage);
-    services.connect = new z.connect.ConnectService(this.auth.client);
-    services.connect_google = new z.connect.ConnectGoogleService(this.auth.client);
-    services.cryptography = new z.cryptography.CryptographyService(this.auth.client);
-    services.giphy = new z.extension.GiphyService(this.auth.client);
-    services.integration = new z.integration.IntegrationService(this.auth.client);
-    services.lifecycle = new z.lifecycle.LifecycleService();
-    services.notification = new z.event.NotificationService(this.auth.client, services.storage);
-    services.properties = new z.properties.PropertiesService(this.auth.client);
-    services.search = new z.search.SearchService(this.auth.client);
-    services.team = new z.team.TeamService(this.auth.client);
-    services.user = new z.user.UserService(this.auth.client, services.storage);
-    services.web_socket = new z.event.WebSocketService(this.auth.client);
-
-    if (z.util.Environment.browser.edge) {
-      services.conversation = new z.conversation.ConversationServiceNoCompound(this.auth.client, services.storage);
-    } else {
-      services.conversation = new z.conversation.ConversationService(this.auth.client, services.storage);
-    }
-
-    return services;
   }
 
   /**
@@ -205,11 +201,11 @@ z.main.App = class App {
    * @returns {Object} All utils
    */
   _setup_utils() {
-    return {
-      debug: z.util.Environment.frontend.isProduction()
-        ? undefined
-        : new z.util.DebugUtil(this.repository.calling, this.repository.conversation, this.repository.user),
-    };
+    return z.util.Environment.frontend.isProduction()
+      ? {
+          debug: new z.util.DebugUtil(this.repository.calling, this.repository.conversation, this.repository.user),
+        }
+      : {};
   }
 
   /**
