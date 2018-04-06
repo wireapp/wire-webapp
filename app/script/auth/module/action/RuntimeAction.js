@@ -18,7 +18,7 @@
  */
 
 import * as RuntimeActionCreator from './creator/RuntimeActionCreator';
-import {isFirefox} from '../../util/RuntimeUtil';
+import RuntimeUtil from '../../util/RuntimeUtil';
 
 export function checkIndexedDbSupport() {
   return function(dispatch) {
@@ -71,7 +71,7 @@ function hasIndexedDbSupport() {
     return Promise.reject(new Error());
   }
 
-  if (isFirefox()) {
+  if (RuntimeUtil.isFirefox()) {
     let dbOpenRequest;
 
     try {
