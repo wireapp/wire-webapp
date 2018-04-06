@@ -1,7 +1,6 @@
 {
   "dependencies": {
     "color": "3.0.0",
-    "gulp-concat": "2.6.1",
     "react": "16.3.1",
     "react-dom": "16.3.1",
     "recompose": "0.26.0",
@@ -16,10 +15,6 @@
     "babel-plugin-transform-object-rest-spread": "6.26.0",
     "babel-preset-env": "1.6.1",
     "babel-preset-react": "6.24.1",
-    "browser-sync": "2.23.6",
-    "gulp": "3.9.1",
-    "gulp-plumber": "1.2.0",
-    "gulp-sass": "3.2.1",
     "react-hot-loader": "4.0.1",
     "rimraf": "2.6.2",
     "webpack": "3.11.0",
@@ -37,9 +32,7 @@
     "build": "babel src --out-dir dist --no-comments",
     "clear": "rimraf dist",
     "dist": "yarn clear && yarn build",
-    "start:demo": "webpack-dev-server",
-    "start:static": "gulp",
-    "start": "yarn start:demo",
+    "start": "webpack-dev-server",
     "test": "yarn test:browser",
     "test:project": "yarn dist && yarn test",
     "test:browser": "exit 0"
