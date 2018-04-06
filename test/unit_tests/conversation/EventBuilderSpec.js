@@ -38,7 +38,7 @@ describe('z.conversation.EventBuilder', () => {
 
   it('buildAllVerified', () => {
     const event = z.conversation.EventBuilder.buildAllVerified(conversation_et);
-    const message_et = event_mapper.map_json_event(event, conversation_et);
+    const message_et = event_mapper.mapJsonEvent(event, conversation_et);
     expect(message_et).toBeDefined();
     expect(message_et.super_type).toBe(z.message.SuperType.VERIFICATION);
     expect(message_et.verificationMessageType()).toBe(z.message.VerificationMessageType.VERIFIED);
@@ -53,7 +53,7 @@ describe('z.conversation.EventBuilder', () => {
       user_ids,
       z.message.VerificationMessageType.NEW_DEVICE
     );
-    const message_et = event_mapper.map_json_event(event, conversation_et);
+    const message_et = event_mapper.mapJsonEvent(event, conversation_et);
     expect(message_et).toBeDefined();
     expect(message_et.super_type).toBe(z.message.SuperType.VERIFICATION);
     expect(message_et.verificationMessageType()).toBe(z.message.VerificationMessageType.NEW_DEVICE);
@@ -64,7 +64,7 @@ describe('z.conversation.EventBuilder', () => {
 
   it('buildMissed', () => {
     const event = z.conversation.EventBuilder.buildMissed(conversation_et);
-    const message_et = event_mapper.map_json_event(event, conversation_et);
+    const message_et = event_mapper.mapJsonEvent(event, conversation_et);
     expect(message_et).toBeDefined();
     expect(message_et.super_type).toBe(z.message.SuperType.MISSED);
     expect(message_et.from).toBe(conversation_et.self.id);
