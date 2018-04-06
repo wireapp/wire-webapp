@@ -178,7 +178,7 @@ export function doRegisterWireless(registrationData) {
   };
 }
 
-export function doInit() {
+export function doInit(options = {shouldValidateLocalClient: false}) {
   return function(dispatch, getState, {apiClient}) {
     dispatch(AuthActionCreator.startRefresh());
     return Promise.resolve()
@@ -189,9 +189,32 @@ export function doInit() {
         }
         return apiClient.init(persist ? ClientType.PERMANENT : ClientType.TEMPORARY);
       })
+      .then(() => {
+        if (options.shouldValidateLocalClient) {
+          return dispatch(validateLocalClient());
+        }
+      })
       .then(() => dispatch(SelfAction.fetchSelf()))
       .then(() => dispatch(AuthActionCreator.successfulRefresh(apiClient.accessTokenStore.accessToken)))
-      .catch(error => dispatch(AuthActionCreator.failedRefresh(error)));
+      .catch(error => {
+        if (options.shouldValidateLocalClient) {
+          dispatch(doLogout());
+        }
+        dispatch(AuthActionCreator.failedRefresh(error));
+      });
+  };
+}
+
+function validateLocalClient() {
+  return function(dispatch, getState, {core}) {
+    dispatch(AuthActionCreator.startValidateLocalClient());
+    return Promise.resolve()
+      .then(() => core.loadAndValidateLocalClient())
+      .then(() => dispatch(AuthActionCreator.successfulValidateLocalClient()))
+      .catch(error => {
+        dispatch(AuthActionCreator.failedValidateLocalClient(error));
+        throw error;
+      });
   };
 }
 

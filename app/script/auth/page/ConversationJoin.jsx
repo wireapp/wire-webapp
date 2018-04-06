@@ -103,7 +103,7 @@ class ConversationJoin extends Component {
   componentDidMount = () => {
     this.props.trackEvent({name: TrackingAction.EVENT_NAME.GUEST_ROOMS.OPENED_SIGNUP});
     this.props
-      .doInit()
+      .doInit({shouldValidateLocalClient: true})
       .catch(() => {})
       .then(() => this.readAndUpdateParamsFromUrl());
   };
