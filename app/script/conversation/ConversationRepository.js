@@ -1392,7 +1392,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           }
         });
 
-    updatePromise.then(() => {
+    return updatePromise.then(() => {
       const response = {
         data: payload,
         from: this.selfUser().id,
