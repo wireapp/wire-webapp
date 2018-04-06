@@ -32,3 +32,8 @@ export const getCurrentFlow = state => state.authState.currentFlow;
 export const getAccount = state => state.authState.account || {};
 export const getAccountTeam = state => getAccount(state).team || {};
 export const getAccountTeamName = state => getAccountTeam(state).name;
+
+export const isGenericInvitationFlow = state => getCurrentFlow(state) === REGISTER_FLOW.GENERIC_INVITATION;
+export const isPersonalFlow = state => getCurrentFlow(state) === REGISTER_FLOW.PERSONAL;
+export const isPersonalInvitationFlow = state => getCurrentFlow(state) === REGISTER_FLOW.PERSONAL_INVITATION;
+export const isTeamFlow = state => getCurrentFlow(state) === REGISTER_FLOW.TEAM;
