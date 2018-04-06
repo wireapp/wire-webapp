@@ -44,7 +44,8 @@ z.entity.Message = class Message {
     this.ephemeral_expires = ko.observable(false);
     this.ephemeral_started = ko.observable('0');
     this.ephemeral_status = ko.computed(() => {
-      if (this.ephemeral_expires() === true) {
+      const isExpired = this.ephemeral_expires() === true;
+      if (isExpired) {
         return z.message.EphemeralStatusType.TIMED_OUT;
       }
 
@@ -53,10 +54,8 @@ z.entity.Message = class Message {
       }
 
       if (_.isString(this.ephemeral_expires())) {
-        if (this.ephemeral_expires() > Date.now()) {
-          return z.message.EphemeralStatusType.ACTIVE;
-        }
-        return z.message.EphemeralStatusType.TIMED_OUT;
+        const isExpiring = Date.now() >= this.ephemeral_expires();
+        return isExpiring ? z.message.EphemeralStatusType.TIMED_OUT : z.message.EphemeralStatusType.ACTIVE;
       }
 
       return z.message.EphemeralStatusType.NONE;

@@ -61,6 +61,7 @@ z.conversation.EventMapper = class EventMapper {
       return this._map_json_event(event, conversation_et, should_create_dummy_image);
     } catch (error) {
       this.logger.error(`Failed to map event of type '${event.type}': ${error.message}`, {error, event});
+      Raygun.send(error, {eventType: event.type});
       return undefined;
     }
   }

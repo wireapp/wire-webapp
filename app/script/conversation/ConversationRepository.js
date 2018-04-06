@@ -344,19 +344,24 @@ z.conversation.ConversationRepository = class ConversationRepository {
   /**
    * Get Message with given ID from the database.
    *
-   * @param {Conversation} conversation_et - Conversation message belongs to
-   * @param {string} message_id - ID of message
+   * @param {Conversation} conversationEntity - Conversation message belongs to
+   * @param {string} messageId - ID of message
    * @returns {Promise} Resolves with the message
    */
-  get_message_in_conversation_by_id(conversation_et, message_id) {
-    const message_et = conversation_et.get_message_by_id(message_id);
-    if (message_et) {
-      return Promise.resolve(message_et);
+  get_message_in_conversation_by_id(conversationEntity, messageId) {
+    const messageEntity = conversationEntity.get_message_by_id(messageId);
+    if (messageEntity) {
+      return Promise.resolve(messageEntity);
     }
 
-    return this.conversation_service.load_event_from_db(conversation_et.id, message_id).then(event => {
+    return this.conversation_service.load_event_from_db(conversationEntity.id, messageId).then(event => {
       if (event) {
-        return this.event_mapper.map_json_event(event, conversation_et);
+        return this.event_mapper.map_json_event(event, conversationEntity).then(message => {
+          if (message) {
+            return message;
+          }
+          throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND);
+        });
       }
       throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND);
     });
@@ -2775,7 +2780,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           case z.event.Client.CONVERSATION.MESSAGE_ADD:
             return this._on_message_add(conversationEntity, eventJson);
           case z.event.Client.CONVERSATION.MESSAGE_DELETE:
-            return this._on_message_deleted(conversationEntity, eventJson);
+            return this._onMessageDeleted(conversationEntity, eventJson);
           case z.event.Client.CONVERSATION.MESSAGE_HIDDEN:
             return this._onMessageHidden(eventJson);
           case z.event.Client.CONVERSATION.ONE2ONE_CREATION:
@@ -3263,36 +3268,39 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * A hide message received in a conversation.
    *
    * @private
-   * @param {Conversation} conversation_et - Conversation to add the event to
-   * @param {Object} event_json - JSON data of 'conversation.message-delete'
+   * @param {Conversation} conversationEntity - Conversation to add the event to
+   * @param {Object} eventJson - JSON data of 'conversation.message-delete'
    * @returns {Promise} Resolves when the event was handled
    */
-  _on_message_deleted(conversation_et, event_json) {
-    const {data: event_data, from, id: event_id, time} = event_json;
+  _onMessageDeleted(conversationEntity, eventJson) {
+    const {data: eventData, from, id: eventId, time} = eventJson;
 
-    return this.get_message_in_conversation_by_id(conversation_et, event_data.message_id)
-      .then(message_to_delete_et => {
-        if (message_to_delete_et.ephemeral_expires()) {
+    return this.get_message_in_conversation_by_id(conversationEntity, eventData.message_id)
+      .then(deletedMessageEntity => {
+        if (deletedMessageEntity) {
+        }
+        if (deletedMessageEntity.ephemeral_expires()) {
           return;
         }
 
-        const is_same_sender = from === message_to_delete_et.from;
-        if (!is_same_sender) {
+        const isSameSender = from === deletedMessageEntity.from;
+        if (!isSameSender) {
           throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_USER);
         }
 
-        const is_from_self = from === this.selfUser().id;
-        if (!is_from_self) {
-          return this._addDeleteMessage(conversation_et.id, event_id, time, message_to_delete_et);
+        const isFromSelf = from === this.selfUser().id;
+        if (!isFromSelf) {
+          return this._addDeleteMessage(conversationEntity.id, eventId, time, deletedMessageEntity);
         }
       })
       .then(() => {
-        amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, event_data.message_id);
-        return this._delete_message_by_id(conversation_et, event_data.message_id);
+        amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, eventData.message_id);
+        return this._delete_message_by_id(conversationEntity, eventData.message_id);
       })
       .catch(error => {
-        if (error.type !== z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND) {
-          this.logger.info(`Failed to delete message for conversation '${conversation_et.id}'`, error);
+        const isNotFound = error.type === z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND;
+        if (!isNotFound) {
+          this.logger.info(`Failed to delete message for conversation '${conversationEntity.id}'`, error);
           throw error;
         }
       });
