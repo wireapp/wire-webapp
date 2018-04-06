@@ -8,7 +8,7 @@ For licensing information, see the attached LICENSE file and the list of third-p
 
 ## Travis Bot
 
-A bot used by Travis build scripts which posts useful messages to Wire.
+A bot used by Travis build scripts to post Git commit messages to Wire when pull requests get merged. If there is a version tag, then the bot also posts a changelog.
 
 ### Getting Started
 
