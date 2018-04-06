@@ -22,13 +22,11 @@ import {unsupportedJoinStrings} from '../../strings';
 import WirelessContainer from './WirelessContainer';
 import {connect} from 'react-redux';
 import {injectIntl, FormattedHTMLMessage} from 'react-intl';
-import Runtime from '../Runtime';
+import {isSupportedBrowser, isMobileOs} from '../Runtime';
 import React from 'react';
 
-const runtime = new Runtime();
-
 export const WirelessUnsupportedBrowser = ({children, intl: {formatMessage: _}}) =>
-  runtime.isSupportedBrowser() ? (
+  isSupportedBrowser() ? (
     children
   ) : (
     <WirelessContainer>
@@ -36,7 +34,7 @@ export const WirelessUnsupportedBrowser = ({children, intl: {formatMessage: _}})
         <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}} color={COLOR.GRAY}>
           <FormattedHTMLMessage {...unsupportedJoinStrings.unsupportedJoinHeadline} />
         </H2>
-        {runtime.isMobileOs() ? (
+        {isMobileOs() ? (
           <H3 style={{marginBottom: '10px'}}>
             <FormattedHTMLMessage {...unsupportedJoinStrings.unsupportedJoinMobileSubhead} />
           </H3>
