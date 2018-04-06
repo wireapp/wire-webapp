@@ -27,7 +27,6 @@ const BROWSER = {
   IE: 'ie',
   OPERA: 'opera',
   SAFARI: 'safari',
-  WIRE: 'wire',
 };
 
 const ELECTRON_APP = {
