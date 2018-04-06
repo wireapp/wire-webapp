@@ -61,9 +61,10 @@ z.backup.BackupRepository = class BackupRepository {
   }
 
   exportBackup() {
-    const numberOfRecords = this.backupService.getHistoryCount();
-    const userName = this.userRepository.self().username();
-    amplify.publish(z.event.WebApp.BACKUP.EXPORT.INIT, numberOfRecords, userName);
+    this.backupService.getHistoryCount().then(numberOfRecords => {
+      const userName = this.userRepository.self().username();
+      amplify.publish(z.event.WebApp.BACKUP.EXPORT.INIT, numberOfRecords, userName);
+    });
   }
 
   importBackup() {
@@ -80,7 +81,7 @@ z.backup.BackupRepository = class BackupRepository {
     const isBackupImportError = error.constructor.name === 'BackupImportError';
 
     amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
-      action: () => this.exportHistory(),
+      action: () => this.exportBackup(),
       preventClose: true,
       text: {
         action: z.l10n.text(z.string.modalBackupErrorAction),
