@@ -25,9 +25,6 @@ module.exports = {
   aws: {
     path: 'http://localhost:<%= config.aws.port %>/',
   },
-  dist: {
-    path: 'http://localhost:<%= config.server.port %>/login/#login',
-  },
   ebs: {
     path: '<%= grunt.config("aws.deploy.options.application_versions") %>',
   },
