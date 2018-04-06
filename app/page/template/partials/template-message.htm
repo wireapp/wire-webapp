@@ -17,16 +17,16 @@
       <!-- ko if: message.isTypeUnverified() -->
         <span class="message-header-sender-name" data-bind="text: message.sender_name()"></span>
         <span class="ellipsis" data-bind="l10n_text: z.string.conversationDeviceUnverified"></span>
-        <span class="ellipsis text-theme" data-bind="click: clickOnDevice, text: message.captionUnverifiedDevice" data-uie-name="go-devices"></span>
+        <span class="message-verification-action text-theme" data-bind="click: clickOnDevice, text: message.captionUnverifiedDevice" data-uie-name="go-devices"></span>
       <!-- /ko -->
       <!-- ko if: message.isTypeNewDevice() -->
         <span class="message-header-plain-sender-name" data-bind='text: message.captionUser'></span>
         <span class="ellipsis" data-bind="text: message.captionStartedUsing"></span>
-        <span class="ellipsis text-theme" data-bind="click: clickOnDevice, text: message.captionNewDevice" data-uie-name="go-devices"></span>
+        <span class="message-verification-action text-theme" data-bind="click: clickOnDevice, text: message.captionNewDevice" data-uie-name="go-devices"></span>
       <!-- /ko -->
       <!-- ko if: message.isTypeNewMember() -->
         <span class="ellipsis" data-bind="l10n_text: z.string.conversationDeviceNewPeopleJoined"></span>
-        <span class="ellipsis text-theme" data-bind="click: clickOnDevice, l10n_text: z.string.conversationDeviceNewPeopleJoinedVerify" data-uie-name="go-devices"></span>
+        <span class="message-verification-action text-theme" data-bind="click: clickOnDevice, l10n_text: z.string.conversationDeviceNewPeopleJoinedVerify" data-uie-name="go-devices"></span>
       <!-- /ko -->
       <hr class="message-header-line" />
     </div>

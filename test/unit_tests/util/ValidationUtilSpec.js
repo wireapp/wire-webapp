@@ -91,11 +91,13 @@ describe('z.util.ValidationUtil', () => {
       expect(z.util.ValidationUtil.asset.retentionPolicy(1)).toBe(true);
       expect(z.util.ValidationUtil.asset.retentionPolicy(2)).toBe(true);
       expect(z.util.ValidationUtil.asset.retentionPolicy(3)).toBe(true);
+      expect(z.util.ValidationUtil.asset.retentionPolicy(4)).toBe(true);
+      expect(z.util.ValidationUtil.asset.retentionPolicy(5)).toBe(true);
     });
 
     it('detects invalid retention numbers', () => {
       expect(z.util.ValidationUtil.asset.retentionPolicy(0)).toBe(false);
-      expect(z.util.ValidationUtil.asset.retentionPolicy(4)).toBe(false);
+      expect(z.util.ValidationUtil.asset.retentionPolicy(6)).toBe(false);
     });
   });
 

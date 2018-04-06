@@ -390,7 +390,7 @@ z.user.UserRepository = class UserRepository {
             this._assign_connection(user_et);
           }
           if (assign_clients) {
-            return this._assign_all_clients();
+            return this._assignAllClients();
           }
         });
       })
@@ -404,23 +404,22 @@ z.user.UserRepository = class UserRepository {
    * @private
    * @returns {Promise} Promise that resolves with all user entities where client entities have been assigned to.
    */
-  _assign_all_clients() {
+  _assignAllClients() {
     return this.client_repository.getAllClientsFromDb().then(recipients => {
-      this.logger.info(`Found locally stored clients for '${Object.keys(recipients).length}' users`, recipients);
-      const user_ids = Object.keys(recipients);
+      const userIds = Object.keys(recipients);
+      this.logger.info(`Found locally stored clients for '${userIds.length}' users`, recipients);
 
-      return this.get_users_by_id(user_ids).then(user_ets => {
-        for (const user_et of user_ets) {
-          if (recipients[user_et.id].length > 8) {
-            this.logger.warn(
-              `Found '${recipients[user_et.id].length}' clients for '${user_et.name()}'`,
-              recipients[user_et.id]
-            );
+      return this.get_users_by_id(userIds).then(userEntities => {
+        userEntities.forEach(userEntity => {
+          const clientEntities = recipients[userEntity.id];
+          const tooManyClients = clientEntities > 8;
+          if (tooManyClients) {
+            this.logger.warn(`Found '${clientEntities.length}' clients for '${userEntity.name()}'`, clientEntities);
           }
-          user_et.devices(recipients[user_et.id]);
-        }
+          userEntity.devices(clientEntities);
+        });
 
-        return user_ets;
+        return userEntities;
       });
     });
   }
