@@ -10361,9 +10361,9 @@ stylelint-config-idiomatic-order@5.0.0:
     stylelint-config-standard "^16.0.0"
     stylelint-order "^0.5.0"
 
-stylelint-config-prettier@3.1.0:
-  version "3.1.0"
-  resolved "https://registry.yarnpkg.com/stylelint-config-prettier/-/stylelint-config-prettier-3.1.0.tgz#ec40ea4786d5f410048d8be9dfc86ffc393e41c7"
+stylelint-config-prettier@3.2.0:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/stylelint-config-prettier/-/stylelint-config-prettier-3.2.0.tgz#af32b7845adeeddbf0a0bd642ace4ca1e68958e2"
   dependencies:
     stylelint "^9.1.1"
 
