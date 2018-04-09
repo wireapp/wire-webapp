@@ -51,7 +51,7 @@ import * as ConversationAction from '../module/action/ConversationAction';
 import * as ClientAction from '../module/action/ClientAction';
 import ValidationError from '../module/action/ValidationError';
 import {loginStrings, logoutReasonStrings} from '../../strings';
-import RuntimeUtil from '../util/RuntimeUtil';
+import {isDesktopApp} from '../Runtime';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
 import BackendError from '../module/action/BackendError';
 import {Redirect, withRouter} from 'react-router';
@@ -296,7 +296,7 @@ class Login extends React.PureComponent {
                       <FormattedHTMLMessage {...logoutReasonStrings[logoutReason]} />
                     </Small>
                   )}
-                  {!RuntimeUtil.isDesktop() && (
+                  {!isDesktopApp() && (
                     <Checkbox
                       tabIndex="3"
                       onChange={event => this.setState({persist: !event.target.checked})}

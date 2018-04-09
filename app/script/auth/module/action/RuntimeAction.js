@@ -18,9 +18,7 @@
  */
 
 import * as RuntimeActionCreator from './creator/RuntimeActionCreator';
-import Runtime from '../../Runtime';
-
-const runtime = new Runtime();
+import {isFirefox} from '../../Runtime';
 
 export function checkSupportedBrowser() {
   return function(dispatch) {
@@ -73,7 +71,7 @@ function hasIndexedDbSupport() {
     return Promise.reject(new Error('IndexedDB not supported'));
   }
 
-  if (runtime.isFirefox()) {
+  if (isFirefox()) {
     let dbOpenRequest;
 
     try {
