@@ -25,10 +25,17 @@ const WIRE_WEBSITE = onEnvironment(
   'https://wire-website-staging.zinfra.io/',
   'https://wire.com/'
 );
+const WIRE_ACCOUNT = onEnvironment(
+  'https://wire-account-staging.zinfra.io/',
+  'https://wire-account-staging.zinfra.io/',
+  'https://account.wire.com/'
+);
 
 export default {
   PHONE_LOGIN: `${WEBAPP_ENV}login`,
   WEBAPP: WEBAPP_ENV,
+  WIRE_ACCOUNT,
+  WIRE_ACCOUNT_PASSWORD_RESET: `${WIRE_ACCOUNT}forgot/`,
   WIRE_PRIVACY_POLICY: `${WIRE_WEBSITE}legal/#privacy`,
   WIRE_TEAM_FEATURES: `${WIRE_WEBSITE}create-team/#features`,
   WIRE_TERMS_PERSONAL: `${WIRE_WEBSITE}legal/terms/#personal`,
