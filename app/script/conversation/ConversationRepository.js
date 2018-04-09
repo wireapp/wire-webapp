@@ -344,19 +344,21 @@ z.conversation.ConversationRepository = class ConversationRepository {
   /**
    * Get Message with given ID from the database.
    *
-   * @param {Conversation} conversation_et - Conversation message belongs to
-   * @param {string} message_id - ID of message
+   * @param {Conversation} conversationEntity - Conversation message belongs to
+   * @param {string} messageId - ID of message
    * @returns {Promise} Resolves with the message
    */
-  get_message_in_conversation_by_id(conversation_et, message_id) {
-    const message_et = conversation_et.get_message_by_id(message_id);
-    if (message_et) {
-      return Promise.resolve(message_et);
+  get_message_in_conversation_by_id(conversationEntity, messageId) {
+    const messageEntity = conversationEntity.get_message_by_id(messageId);
+    if (messageEntity) {
+      return Promise.resolve(messageEntity);
     }
 
-    return this.conversation_service.load_event_from_db(conversation_et.id, message_id).then(event => {
+    return this.conversation_service.load_event_from_db(conversationEntity.id, messageId).then(event => {
       if (event) {
-        return this.event_mapper.map_json_event(event, conversation_et);
+        return this.event_mapper.mapJsonEvent(event, conversationEntity).catch(() => {
+          throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND);
+        });
       }
       throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND);
     });
@@ -475,14 +477,14 @@ z.conversation.ConversationRepository = class ConversationRepository {
   /**
    * Get messages for given category. Category param acts as lower bound.
    *
-   * @param {Conversation} conversation_et - Conversation entity
+   * @param {Conversation} conversationEntity - Conversation entity
    * @param {MessageCategory} [category=z.message.MessageCategory.NONE] - Message category
    * @returns {Promise} Array of message entities
    */
-  get_events_for_category(conversation_et, category = z.message.MessageCategory.NONE) {
-    return this.conversation_service.load_events_with_category_from_db(conversation_et.id, category).then(events => {
-      const message_ets = this.event_mapper.map_json_events(events, conversation_et);
-      return Promise.all(message_ets.map(message_et => this._updateMessageUserEntities(message_et)));
+  get_events_for_category(conversationEntity, category = z.message.MessageCategory.NONE) {
+    return this.conversation_service.load_events_with_category_from_db(conversationEntity.id, category).then(events => {
+      const messageEntities = this.event_mapper.mapJsonEvents(events, conversationEntity);
+      return Promise.all(messageEntities.map(messageEntity => this._updateMessageUserEntities(messageEntity)));
     });
   }
 
@@ -501,7 +503,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return this.conversation_service
       .search_in_conversation(conversationEntity.id, query)
       .then(events => {
-        const messageEntities = this.event_mapper.map_json_events(events, conversationEntity);
+        const messageEntities = this.event_mapper.mapJsonEvents(events, conversationEntity);
         return Promise.all(messageEntities.map(messageEntity => this._updateMessageUserEntities(messageEntity)));
       })
       .then(messageEntities => ({messageEntities, query}));
@@ -2775,7 +2777,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           case z.event.Client.CONVERSATION.MESSAGE_ADD:
             return this._on_message_add(conversationEntity, eventJson);
           case z.event.Client.CONVERSATION.MESSAGE_DELETE:
-            return this._on_message_deleted(conversationEntity, eventJson);
+            return this._onMessageDeleted(conversationEntity, eventJson);
           case z.event.Client.CONVERSATION.MESSAGE_HIDDEN:
             return this._onMessageHidden(eventJson);
           case z.event.Client.CONVERSATION.ONE2ONE_CREATION:
@@ -2878,7 +2880,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   _on1to1Creation(conversationEntity, eventJson) {
     return Promise.resolve()
-      .then(() => this.event_mapper.map_json_event(eventJson, conversationEntity))
+      .then(() => this.event_mapper.mapJsonEvent(eventJson, conversationEntity))
       .then(messageEntity => this._updateMessageUserEntities(messageEntity))
       .then(messageEntity => {
         if (conversationEntity && messageEntity) {
@@ -3004,7 +3006,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   _onGroupCreation(conversationEntity, eventJson) {
     return Promise.resolve()
-      .then(() => this.event_mapper.map_json_event(eventJson, conversationEntity))
+      .then(() => this.event_mapper.mapJsonEvent(eventJson, conversationEntity))
       .then(messageEntity => {
         const creatorId = conversationEntity.creator;
         const createdByParticipant = !!conversationEntity.participating_user_ids().find(userId => userId === creatorId);
@@ -3263,36 +3265,37 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * A hide message received in a conversation.
    *
    * @private
-   * @param {Conversation} conversation_et - Conversation to add the event to
-   * @param {Object} event_json - JSON data of 'conversation.message-delete'
+   * @param {Conversation} conversationEntity - Conversation to add the event to
+   * @param {Object} eventJson - JSON data of 'conversation.message-delete'
    * @returns {Promise} Resolves when the event was handled
    */
-  _on_message_deleted(conversation_et, event_json) {
-    const {data: event_data, from, id: event_id, time} = event_json;
+  _onMessageDeleted(conversationEntity, eventJson) {
+    const {data: eventData, from, id: eventId, time} = eventJson;
 
-    return this.get_message_in_conversation_by_id(conversation_et, event_data.message_id)
-      .then(message_to_delete_et => {
-        if (message_to_delete_et.ephemeral_expires()) {
+    return this.get_message_in_conversation_by_id(conversationEntity, eventData.message_id)
+      .then(deletedMessageEntity => {
+        if (deletedMessageEntity.ephemeral_expires()) {
           return;
         }
 
-        const is_same_sender = from === message_to_delete_et.from;
-        if (!is_same_sender) {
+        const isSameSender = from === deletedMessageEntity.from;
+        if (!isSameSender) {
           throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_USER);
         }
 
-        const is_from_self = from === this.selfUser().id;
-        if (!is_from_self) {
-          return this._addDeleteMessage(conversation_et.id, event_id, time, message_to_delete_et);
+        const isFromSelf = from === this.selfUser().id;
+        if (!isFromSelf) {
+          return this._addDeleteMessage(conversationEntity.id, eventId, time, deletedMessageEntity);
         }
       })
       .then(() => {
-        amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, event_data.message_id);
-        return this._delete_message_by_id(conversation_et, event_data.message_id);
+        amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, eventData.message_id);
+        return this._delete_message_by_id(conversationEntity, eventData.message_id);
       })
       .catch(error => {
-        if (error.type !== z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND) {
-          this.logger.info(`Failed to delete message for conversation '${conversation_et.id}'`, error);
+        const isNotFound = error.type === z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND;
+        if (!isNotFound) {
+          this.logger.info(`Failed to delete message for conversation '${conversationEntity.id}'`, error);
           throw error;
         }
       });
@@ -3411,12 +3414,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   _add_event_to_conversation(json, conversation_et) {
     return Promise.resolve()
-      .then(() => this.event_mapper.map_json_event(json, conversation_et, true))
-      .then(message_et => {
-        if (message_et) {
-          return this._updateMessageUserEntities(message_et);
-        }
-      })
+      .then(() => this.event_mapper.mapJsonEvent(json, conversation_et, true))
+      .then(message_et => this._updateMessageUserEntities(message_et))
       .then(message_et => {
         if (conversation_et && message_et) {
           conversation_et.add_message(message_et);
@@ -3438,7 +3437,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   _add_events_to_conversation(events, conversation_et, prepend = true) {
     return Promise.resolve()
       .then(() => {
-        const message_ets = this.event_mapper.map_json_events(events, conversation_et, true);
+        const message_ets = this.event_mapper.mapJsonEvents(events, conversation_et, true);
         return Promise.all(message_ets.map(message_et => this._updateMessageUserEntities(message_et)));
       })
       .then(message_ets => {

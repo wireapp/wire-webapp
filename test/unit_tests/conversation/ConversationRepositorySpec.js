@@ -771,7 +771,7 @@ describe('ConversationRepository', () => {
             conversation_et.add_message(message_et);
 
             spyOn(TestFactory.conversation_repository, '_addDeleteMessage');
-            spyOn(TestFactory.conversation_repository, '_on_message_deleted').and.callThrough();
+            spyOn(TestFactory.conversation_repository, '_onMessageDeleted').and.callThrough();
 
             done();
           })
@@ -799,7 +799,7 @@ describe('ConversationRepository', () => {
           .catch(error => {
             expect(error).toEqual(jasmine.any(z.conversation.ConversationError));
             expect(error.type).toBe(z.conversation.ConversationError.TYPE.WRONG_USER);
-            expect(TestFactory.conversation_repository._on_message_deleted).toHaveBeenCalled();
+            expect(TestFactory.conversation_repository._onMessageDeleted).toHaveBeenCalled();
             expect(conversation_et.get_message_by_id(message_et.id)).toBeDefined();
             expect(TestFactory.conversation_repository._addDeleteMessage).not.toHaveBeenCalled();
             done();
@@ -822,7 +822,7 @@ describe('ConversationRepository', () => {
         TestFactory.conversation_repository
           ._handleConversationEvent(message_delete_event)
           .then(() => {
-            expect(TestFactory.conversation_repository._on_message_deleted).toHaveBeenCalled();
+            expect(TestFactory.conversation_repository._onMessageDeleted).toHaveBeenCalled();
             expect(conversation_et.get_message_by_id(message_et.id)).not.toBeDefined();
             expect(TestFactory.conversation_repository._addDeleteMessage).not.toHaveBeenCalled();
             done();
@@ -849,7 +849,7 @@ describe('ConversationRepository', () => {
         TestFactory.conversation_repository
           ._handleConversationEvent(message_delete_event)
           .then(() => {
-            expect(TestFactory.conversation_repository._on_message_deleted).toHaveBeenCalled();
+            expect(TestFactory.conversation_repository._onMessageDeleted).toHaveBeenCalled();
             expect(conversation_et.get_message_by_id(message_et.id)).not.toBeDefined();
             expect(TestFactory.conversation_repository._addDeleteMessage).toHaveBeenCalled();
             done();
@@ -877,7 +877,7 @@ describe('ConversationRepository', () => {
         TestFactory.conversation_repository
           ._handleConversationEvent(message_delete_event)
           .then(() => {
-            expect(TestFactory.conversation_repository._on_message_deleted).toHaveBeenCalled();
+            expect(TestFactory.conversation_repository._onMessageDeleted).toHaveBeenCalled();
             expect(conversation_et.get_message_by_id(message_et.id)).not.toBeDefined();
             expect(TestFactory.conversation_repository._addDeleteMessage).not.toHaveBeenCalled();
             done();
