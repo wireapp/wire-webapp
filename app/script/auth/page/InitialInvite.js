@@ -36,7 +36,7 @@ import {
   ErrorMessage,
 } from '@wireapp/react-ui-kit';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
-import {pathWithParams} from '../util/urlUtil';
+import {pathWithParams, syntheticLinkClick} from '../util/urlUtil';
 import EXTERNAL_ROUTE from '../externalRoute';
 import * as LanguageSelector from '../module/selector/LanguageSelector';
 import * as InviteSelector from '../module/selector/InviteSelector';
@@ -64,7 +64,7 @@ class InitialInvite extends React.PureComponent {
         attributes: {invited, invites: invites.length},
         name: TrackingAction.EVENT_NAME.TEAM.FINISHED_INVITE_STEP,
       })
-      .then(() => window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP)));
+      .then(() => syntheticLinkClick(pathWithParams(EXTERNAL_ROUTE.WEBAPP)));
   };
 
   renderEmail = email => (

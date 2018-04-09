@@ -25,12 +25,12 @@ import Page from './Page';
 import {H1, Link, ContainerXS, Button, Paragraph} from '@wireapp/react-ui-kit';
 import * as ClientSelector from '../module/selector/ClientSelector';
 import EXTERNAL_ROUTE from '../externalRoute';
-import * as URLUtil from '../util/urlUtil';
+import {pathWithParams, syntheticLinkClick} from '../util/urlUtil';
 import * as NotificationAction from '../module/action/NotificationAction';
 
 function HistoryInfo({hasHistory, intl: {formatMessage: _}, ...connected}) {
   const onContinue = () => {
-    connected.resetHistoryCheck().then(() => window.location.replace(URLUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP)));
+    connected.resetHistoryCheck().then(() => syntheticLinkClick(pathWithParams(EXTERNAL_ROUTE.WEBAPP)));
   };
   const headline = hasHistory ? historyInfoStrings.hasHistoryHeadline : historyInfoStrings.noHistoryHeadline;
   const infoText = hasHistory ? historyInfoStrings.hasHistoryInfo : historyInfoStrings.noHistoryInfo;

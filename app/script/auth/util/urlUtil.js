@@ -40,3 +40,17 @@ export function hasURLParameter(parameterName) {
     .map(parameter => parameter.split('=')[0])
     .includes(parameterName);
 }
+
+/**
+ * Creates an adhoc anchor element and clicks on it.
+ * Tests will fail on Firefox without this.
+ *
+ * @param {string} href - URL to navigate to
+ * @returns {undefined} No return value
+ */
+export function syntheticLinkClick(href) {
+  const link = document.createElement('a');
+  link.href = href;
+  document.body.appendChild(link);
+  link.click();
+}
