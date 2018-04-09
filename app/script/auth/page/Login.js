@@ -57,7 +57,6 @@ import BackendError from '../module/action/BackendError';
 import {Redirect, withRouter} from 'react-router';
 import * as URLUtil from '../util/urlUtil';
 import * as ClientSelector from '../module/selector/ClientSelector';
-import {getURLParameter} from '../util/urlUtil';
 import {resetError} from '../module/action/creator/AuthActionCreator';
 
 class Login extends React.PureComponent {
@@ -79,15 +78,15 @@ class Login extends React.PureComponent {
   };
 
   readAndUpdateParamsFromUrl = (nextProps = this.props) => {
-    const logoutReason = getURLParameter(QUERY_KEY.LOGOUT_REASON) || null;
+    const logoutReason = URLUtil.getURLParameter(QUERY_KEY.LOGOUT_REASON) || null;
     const logoutReasonChanged = logoutReason !== this.state.logoutReason;
 
     if (logoutReason && logoutReasonChanged) {
       this.setState((state, props) => ({...state, logoutReason}));
     }
 
-    const conversationCode = getURLParameter(QUERY_KEY.CONVERSATION_CODE) || null;
-    const conversationKey = getURLParameter(QUERY_KEY.CONVERSATION_KEY) || null;
+    const conversationCode = URLUtil.getURLParameter(QUERY_KEY.CONVERSATION_CODE) || null;
+    const conversationKey = URLUtil.getURLParameter(QUERY_KEY.CONVERSATION_KEY) || null;
 
     const keyAndCodeExistent = conversationKey && conversationCode;
     const keyChanged = conversationKey !== this.state.conversationKey;
@@ -121,9 +120,7 @@ class Login extends React.PureComponent {
 
   componentWillReceiveProps = nextProps => this.readAndUpdateParamsFromUrl(nextProps);
 
-  forgotPassword = () => {
-    z.util.safeWindowOpen(z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.ACCOUNT, z.config.URL_PATH.PASSWORD_RESET));
-  };
+  forgotPassword = () => URLUtil.openTab(EXTERNAL_ROUTE.WIRE_ACCOUNT_PASSWORD_RESET);
 
   handleSubmit = event => {
     event.preventDefault();
