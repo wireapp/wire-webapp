@@ -179,7 +179,7 @@ export function doRegisterWireless(registrationData) {
 }
 
 export function doInit(options = {isImmediateLogin: false, shouldValidateLocalClient: false}) {
-  return function(dispatch, getState, {apiClient}) {
+  return function(dispatch, getState, {apiClient, core}) {
     dispatch(AuthActionCreator.startRefresh());
     return Promise.resolve()
       .then(() => {
@@ -194,6 +194,7 @@ export function doInit(options = {isImmediateLogin: false, shouldValidateLocalCl
         }
         return apiClient.init(persist ? ClientType.PERMANENT : ClientType.TEMPORARY);
       })
+      .then(() => core.init())
       .then(() => {
         if (options.shouldValidateLocalClient) {
           return dispatch(validateLocalClient());
