@@ -28,7 +28,6 @@ z.conversation.EventMapper = class EventMapper {
    * Construct a new Event Mapper.
    */
   constructor() {
-    this.map_json_event = this.map_json_event.bind(this);
     this.logger = new z.util.Logger('z.conversation.EventMapper', z.config.LOGGER.OPTIONS);
   }
 
@@ -36,128 +35,133 @@ z.conversation.EventMapper = class EventMapper {
    * Convert multiple JSON events into message entities.
    *
    * @param {Object} events - Event data
-   * @param {Conversation} conversation_et - Conversation entity the events belong to
-   * @param {boolean} [should_create_dummy_image] - Create a dummy image
+   * @param {Conversation} conversationEntity - Conversation entity the events belong to
+   * @param {boolean} [createDummyImage] - Create a dummy image
    * @returns {Array<Message>} Mapped message entities
    */
-  map_json_events(events, conversation_et, should_create_dummy_image) {
+  mapJsonEvents(events, conversationEntity, createDummyImage) {
     return events
       .reverse()
       .filter(event => event)
-      .map(event => this.map_json_event(event, conversation_et, should_create_dummy_image))
-      .filter(message_et => message_et);
+      .map(event => {
+        try {
+          return this._mapJsonEvent(event, conversationEntity, createDummyImage);
+        } catch (error) {
+          this.logger.error(`Failed to map event of type '${event.type}': ${error.message}`, {error, event});
+          Raygun.send(error, {eventType: event.type});
+        }
+      })
+      .filter(messageEntity => messageEntity);
   }
 
   /**
    * Convert JSON event into a message entity.
    *
    * @param {Object} event - Event data
-   * @param {Conversation} conversation_et - Conversation entity the event belong to
-   * @param {boolean} [should_create_dummy_image] - Create a dummy image
+   * @param {Conversation} conversationEntity - Conversation entity the event belong to
+   * @param {boolean} [createDummyImage] - Create a dummy image
    * @returns {Message} Mapped message entity
    */
-  map_json_event(event, conversation_et, should_create_dummy_image) {
-    try {
-      return this._map_json_event(event, conversation_et, should_create_dummy_image);
-    } catch (error) {
-      this.logger.error(`Failed to map event of type '${event.type}': ${error.message}`, {error, event});
-      return undefined;
-    }
+  mapJsonEvent(event, conversationEntity, createDummyImage) {
+    return this._mapJsonEvent(event, conversationEntity, createDummyImage);
   }
 
   /**
    * Convert JSON event into a message entity.
    *
    * @param {Object} event - Event data
-   * @param {Conversation} conversation_et - Conversation entity the event belong to
-   * @param {boolean} should_create_dummy_image - Create a dummy image
+   * @param {Conversation} conversationEntity - Conversation entity the event belong to
+   * @param {boolean} createDummyImage - Create a dummy image
    * @returns {Message} Mapped message entity
    */
-  _map_json_event(event, conversation_et, should_create_dummy_image) {
-    let message_et;
+  _mapJsonEvent(event, conversationEntity, createDummyImage) {
+    let messageEntity;
 
     switch (event.type) {
       case z.event.Backend.CONVERSATION.MEMBER_JOIN:
-        message_et = this._mapEventMemberJoin(event, conversation_et);
+        messageEntity = this._mapEventMemberJoin(event, conversationEntity);
         break;
       case z.event.Backend.CONVERSATION.MEMBER_LEAVE:
-        message_et = this._mapEventMemberLeave(event);
+        messageEntity = this._mapEventMemberLeave(event);
         break;
       case z.event.Backend.CONVERSATION.RENAME:
-        message_et = this._map_event_rename(event);
+        messageEntity = this._mapEventRename(event);
         break;
       case z.event.Client.CONVERSATION.ASSET_ADD:
-        message_et = this._mapEventAssetAdd(event, should_create_dummy_image);
+        messageEntity = this._mapEventAssetAdd(event, createDummyImage);
         break;
       case z.event.Client.CONVERSATION.DELETE_EVERYWHERE:
-        message_et = this._map_event_delete_everywhere(event);
+        messageEntity = this._mapEventDeleteEverywhere(event);
         break;
       case z.event.Client.CONVERSATION.GROUP_CREATION:
-        message_et = this._mapEventGroupCreation(event);
+        messageEntity = this._mapEventGroupCreation(event);
         break;
       case z.event.Client.CONVERSATION.KNOCK:
-        message_et = this._mapEventPing();
+        messageEntity = this._mapEventPing();
         break;
       case z.event.Client.CONVERSATION.LOCATION:
-        message_et = this._map_event_location(event);
+        messageEntity = this._mapEventLocation(event);
         break;
       case z.event.Client.CONVERSATION.MESSAGE_ADD:
-        message_et = this._map_event_message_add(event);
+        messageEntity = this._mapEventMessageAdd(event);
         break;
       case z.event.Client.CONVERSATION.MISSED_MESSAGES:
-        message_et = this._map_event_missed_messages();
+        messageEntity = this._mapEventMissedMessages();
         break;
       case z.event.Client.CONVERSATION.ONE2ONE_CREATION:
-        message_et = this._mapEvent1to1Creation(event);
+        messageEntity = this._mapEvent1to1Creation(event);
         break;
       case z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE:
-        message_et = this._mapEventTeamMemberLeave(event);
+        messageEntity = this._mapEventTeamMemberLeave(event);
         break;
       case z.event.Client.CONVERSATION.UNABLE_TO_DECRYPT:
       case z.event.Client.CONVERSATION.INCOMING_MESSAGE_TOO_BIG:
-        message_et = this._map_event_unable_to_decrypt(event);
+        messageEntity = this._mapEventUnableToDecrypt(event);
         break;
       case z.event.Client.CONVERSATION.VERIFICATION:
-        message_et = this._mapEventVerification(event);
+        messageEntity = this._mapEventVerification(event);
         break;
       case z.event.Client.CONVERSATION.VOICE_CHANNEL_ACTIVATE:
-        message_et = this._map_event_voice_channel_activate();
+        messageEntity = this._mapEventVoiceChannelActivate();
         break;
       case z.event.Client.CONVERSATION.VOICE_CHANNEL_DEACTIVATE:
-        message_et = this._map_event_voice_channel_deactivate(event);
+        messageEntity = this._mapEventVoiceChannelDeactivate(event);
         break;
       default:
         this.logger.warn(`Ignored unhandled event '${event.id}' of type '${event.type}'`);
-        return message_et;
+        return messageEntity;
     }
 
-    message_et.category = event.category;
-    message_et.conversation_id = conversation_et.id;
-    message_et.from = event.from;
-    message_et.id = event.id;
-    message_et.primary_key = event.primary_key;
-    message_et.timestamp(new Date(event.time).getTime());
-    message_et.type = event.type;
-    message_et.version = event.version || 1;
+    const {category, from, id, primary_key, time, type, version} = event;
 
-    if (message_et.is_reactable()) {
-      message_et.reactions(event.reactions || {});
-      if (event.status) {
-        message_et.status(event.status);
+    messageEntity.category = category;
+    messageEntity.conversation_id = conversationEntity.id;
+    messageEntity.from = from;
+    messageEntity.id = id;
+    messageEntity.primary_key = primary_key;
+    messageEntity.timestamp(new Date(time).getTime());
+    messageEntity.type = type;
+    messageEntity.version = version || 1;
+
+    if (messageEntity.is_reactable()) {
+      const {reactions, status} = event;
+      messageEntity.reactions(reactions || {});
+      if (status) {
+        messageEntity.status(status);
       }
     }
 
     if (event.ephemeral_expires) {
-      message_et.ephemeral_expires(event.ephemeral_expires);
-      message_et.ephemeral_started(event.ephemeral_started || '0');
+      messageEntity.ephemeral_expires(event.ephemeral_expires);
+      messageEntity.ephemeral_started(event.ephemeral_started || '0');
     }
 
-    if (window.isNaN(message_et.timestamp())) {
-      this.logger.warn(`Could not get timestamp for message '${message_et.id}'. Skipping it.`, event);
-      message_et = undefined;
+    if (window.isNaN(messageEntity.timestamp())) {
+      this.logger.warn(`Could not get timestamp for message '${messageEntity.id}'. Skipping it.`, event);
+      messageEntity = undefined;
     }
 
-    return message_et;
+    return messageEntity;
   }
 
   //##############################################################################
@@ -183,19 +187,16 @@ z.conversation.EventMapper = class EventMapper {
    *
    * @private
    * @param {Object} event - Message data
-   * @param {boolean} shouldCreateDummyImage - Create a dummy image
+   * @param {boolean} createDummyImage - Create a dummy image
    * @returns {ContentMessage} Content message entity
    */
-  _mapEventAssetAdd(event, shouldCreateDummyImage) {
+  _mapEventAssetAdd(event, createDummyImage) {
     const eventData = event.data;
     const messageEntity = new z.entity.ContentMessage();
 
     const isMediumImage = eventData.info.tag === 'medium';
-    if (isMediumImage) {
-      messageEntity.assets.push(this._map_asset_image(event, shouldCreateDummyImage));
-    } else {
-      messageEntity.assets.push(this._map_asset_file(event));
-    }
+    const assetEntity = isMediumImage ? this._mapAssetImage(event, createDummyImage) : this._mapAssetFile(event);
+    messageEntity.assets.push(assetEntity);
 
     return messageEntity;
   }
@@ -204,13 +205,13 @@ z.conversation.EventMapper = class EventMapper {
    * Maps JSON data of delete everywhere event to message entity
    *
    * @private
-   * @param {Object} event_data - Message data
+   * @param {Object} eventData - Message data
    * @returns {DeleteMessage} Delete message entity
    */
-  _map_event_delete_everywhere({data: event_data}) {
-    const message_et = new z.entity.DeleteMessage();
-    message_et.deleted_timestamp = new Date(event_data.deleted_time).getTime();
-    return message_et;
+  _mapEventDeleteEverywhere({data: eventData}) {
+    const messageEntity = new z.entity.DeleteMessage();
+    messageEntity.deleted_timestamp = new Date(eventData.deleted_time).getTime();
+    return messageEntity;
   }
 
   /**
@@ -232,23 +233,23 @@ z.conversation.EventMapper = class EventMapper {
    * Maps JSON data of conversation.location message into message entity
    *
    * @private
-   * @param {Object} event_data - Message data
-   * @returns {LocationMessage} Location message entity
+   * @param {Object} eventData - Message data
+   * @returns {ContentMessage} Location message entity
    */
-  _map_event_location({data: event_data}) {
-    const {location, nonce} = event_data;
-    const message_et = new z.entity.ContentMessage();
-    const asset_et = new z.entity.Location();
+  _mapEventLocation({data: eventData}) {
+    const location = eventData.location;
+    const messageEntity = new z.entity.ContentMessage();
+    const assetEntity = new z.entity.Location();
 
-    asset_et.longitude = location.longitude;
-    asset_et.latitude = location.latitude;
-    asset_et.name = location.name;
-    asset_et.zoom = location.zoom;
+    assetEntity.longitude = location.longitude;
+    assetEntity.latitude = location.latitude;
+    assetEntity.name = location.name;
+    assetEntity.zoom = location.zoom;
 
-    message_et.assets.push(asset_et);
-    message_et.nonce = nonce;
+    messageEntity.assets.push(assetEntity);
+    messageEntity.nonce = nonce;
 
-    return message_et;
+    return messageEntity;
   }
 
   /**
@@ -303,36 +304,21 @@ z.conversation.EventMapper = class EventMapper {
   }
 
   /**
-   * Maps JSON data of conversation.member_update message into message entity
-   *
-   * @private
-   * @param {Object} event_data - Message data
-   * @returns {MemberMessage} Member message entity
-   */
-  _map_event_member_update({data: event_data}) {
-    const message_et = new z.entity.MemberMessage();
-    // Don't render last read
-    message_et.visible(!event_data.last_read_timestamp);
-    return message_et;
-  }
-
-  /**
    * Maps JSON data of conversation.message_add message into message entity
    *
    * @private
    * @param {Object} event - Message data
    * @returns {ContentMessage} Content message entity
    */
-  _map_event_message_add(event) {
-    const {data: event_data, edited_time} = event;
-    const message_et = new z.entity.ContentMessage();
+  _mapEventMessageAdd(event) {
+    const {data: eventData, edited_time: editedTime} = event;
+    const messageEntity = new z.entity.ContentMessage();
 
-    message_et.assets.push(this._map_asset_text(event_data));
-    message_et.nonce = event_data.nonce;
-    message_et.replacing_message_id = event_data.replacing_message_id;
-    message_et.edited_timestamp = new Date(edited_time || event_data.edited_time).getTime();
+    messageEntity.assets.push(this._mapAssetText(eventData));
+    messageEntity.replacing_message_id = eventData.replacing_message_id;
+    messageEntity.edited_timestamp = new Date(editedTime || eventData.edited_time).getTime();
 
-    return message_et;
+    return messageEntity;
   }
 
   /**
@@ -340,7 +326,7 @@ z.conversation.EventMapper = class EventMapper {
    * @private
    * @returns {MissedMessage} Missed message entity
    */
-  _map_event_missed_messages() {
+  _mapEventMissedMessages() {
     return new z.entity.MissedMessage();
   }
 
@@ -357,13 +343,13 @@ z.conversation.EventMapper = class EventMapper {
    * Maps JSON data of conversation.rename message into message entity
    *
    * @private
-   * @param {Object} event_data - Message data
+   * @param {Object} eventData - Message data
    * @returns {RenameMessage} Rename message entity
    */
-  _map_event_rename({data: event_data}) {
-    const message_et = new z.entity.RenameMessage();
-    message_et.name = event_data.name;
-    return message_et;
+  _mapEventRename({data: eventData}) {
+    const messageEntity = new z.entity.RenameMessage();
+    messageEntity.name = eventData.name;
+    return messageEntity;
   }
 
   /**
@@ -387,15 +373,16 @@ z.conversation.EventMapper = class EventMapper {
    * @param {Object} error_code - Error data received as JSON
    * @returns {DecryptErrorMessage} Decrypt error message entity
    */
-  _map_event_unable_to_decrypt({error_code}) {
-    const message_et = new z.entity.DecryptErrorMessage();
+  _mapEventUnableToDecrypt({error_code: errorCode}) {
+    const messageEntity = new z.entity.DecryptErrorMessage();
 
-    if (error_code) {
-      message_et.error_code = error_code.split(' ')[0];
-      message_et.client_id = error_code.substring(message_et.error_code.length + 1).replace(/[()]/g, '');
+    if (errorCode) {
+      const [code] = errorCode.split(' ');
+      messageEntity.error_code = code;
+      messageEntity.client_id = errorCode.substring(code.length + 1).replace(/[()]/g, '');
     }
 
-    return message_et;
+    return messageEntity;
   }
 
   /**
@@ -414,35 +401,36 @@ z.conversation.EventMapper = class EventMapper {
 
     return messageEntity;
   }
+
   /**
    * Maps JSON data of conversation.voice-channel-activate message into message entity
    * @private
    * @returns {z.calling.entities.CallMessageEntity} Call message entity
    */
-  _map_event_voice_channel_activate() {
-    const message_et = new z.entity.CallMessage();
+  _mapEventVoiceChannelActivate() {
+    const messageEntity = new z.entity.CallMessage();
 
-    message_et.call_message_type = z.message.CALL_MESSAGE_TYPE.ACTIVATED;
-    message_et.visible(false);
+    messageEntity.call_message_type = z.message.CALL_MESSAGE_TYPE.ACTIVATED;
+    messageEntity.visible(false);
 
-    return message_et;
+    return messageEntity;
   }
 
   /**
    * Maps JSON data of conversation.voice-channel-deactivate message into message entity
    *
    * @private
-   * @param {Object} event_data - Message data
+   * @param {Object} eventData - Message data
    * @returns {z.calling.entities.CallMessageEntity} Call message entity
    */
-  _map_event_voice_channel_deactivate({data: event_data}) {
-    const message_et = new z.entity.CallMessage();
+  _mapEventVoiceChannelDeactivate({data: eventData}) {
+    const messageEntity = new z.entity.CallMessage();
 
-    message_et.call_message_type = z.message.CALL_MESSAGE_TYPE.DEACTIVATED;
-    message_et.finished_reason = event_data.reason;
-    message_et.visible(message_et.finished_reason === z.calling.enum.TERMINATION_REASON.MISSED);
+    messageEntity.call_message_type = z.message.CALL_MESSAGE_TYPE.DEACTIVATED;
+    messageEntity.finished_reason = eventData.reason;
+    messageEntity.visible(messageEntity.finished_reason === z.calling.enum.TERMINATION_REASON.MISSED);
 
-    return message_et;
+    return messageEntity;
   }
 
   //##############################################################################
@@ -460,111 +448,40 @@ z.conversation.EventMapper = class EventMapper {
    * @param {Object} event - Asset data received as JSON
    * @returns {File} File asset entity
    */
-  _map_asset_file(event) {
-    const {conversation: conversation_id, data: event_data} = event;
-    const {content_length, content_type, id, info, meta, status} = event_data;
+  _mapAssetFile(event) {
+    const {conversation: conversationId, data: eventData} = event;
+    const {content_length, content_type, id, info, meta, status} = eventData;
 
-    const asset_et = new z.entity.File(id);
+    const assetEntity = new z.entity.File(id);
 
-    asset_et.correlation_id = info.correlation_id;
-    asset_et.conversation_id = conversation_id;
+    assetEntity.correlation_id = info.correlation_id;
+    assetEntity.conversationId = conversationId;
 
     // original
-    asset_et.file_size = content_length;
-    asset_et.file_type = content_type;
-    asset_et.file_name = info.name;
-    asset_et.meta = meta;
+    assetEntity.file_size = content_length;
+    assetEntity.file_type = content_type;
+    assetEntity.file_name = info.name;
+    assetEntity.meta = meta;
 
     // remote data - full
-    const {key, otr_key, sha256, token} = event_data;
-    if (key) {
-      asset_et.original_resource(z.assets.AssetRemoteData.v3(key, otr_key, sha256, token));
-    } else {
-      asset_et.original_resource(z.assets.AssetRemoteData.v2(conversation_id, id, otr_key, sha256));
-    }
+    const {key, otr_key, sha256, token} = eventData;
+    const remoteData = key
+      ? z.assets.AssetRemoteData.v3(key, otr_key, sha256, token)
+      : z.assets.AssetRemoteData.v2(conversationId, id, otr_key, sha256);
+    assetEntity.original_resource(remoteData);
 
     // remote data - preview
-    const {preview_id, preview_key, preview_otr_key, preview_sha256, preview_token} = event_data;
+    const {preview_id, preview_key, preview_otr_key, preview_sha256, preview_token} = eventData;
     if (preview_otr_key) {
-      if (preview_key) {
-        asset_et.preview_resource(
-          z.assets.AssetRemoteData.v3(preview_key, preview_otr_key, preview_sha256, preview_token, true)
-        );
-      } else {
-        asset_et.preview_resource(
-          z.assets.AssetRemoteData.v2(conversation_id, preview_id, preview_otr_key, preview_sha256, true)
-        );
-      }
+      const remoteDataPreview = preview_key
+        ? z.assets.AssetRemoteData.v3(preview_key, preview_otr_key, preview_sha256, preview_token, true)
+        : z.assets.AssetRemoteData.v2(conversationId, preview_id, preview_otr_key, preview_sha256, true);
+      assetEntity.preview_resource(remoteDataPreview);
     }
 
-    asset_et.status(status || z.assets.AssetTransferState.UPLOADING);
+    assetEntity.status(status || z.assets.AssetTransferState.UPLOADING);
 
-    return asset_et;
-  }
-
-  /**
-   * Map link preview
-   *
-   * @private
-   * @param {z.proto.LinkPreview} link_preview - Link preview proto message
-   * @returns {LinkPreview} Mapped link preview
-   */
-  _map_asset_link_preview(link_preview) {
-    if (link_preview) {
-      const {image, title, url, meta_data} = link_preview;
-      const {image: article_image, title: article_title} = link_preview.article || {};
-
-      const link_preview_et = new z.entity.LinkPreview(title || article_title, url);
-      link_preview_et.meta_data_type = meta_data;
-      link_preview_et.meta_data = link_preview[meta_data];
-
-      const preview_image = image || article_image;
-      if (preview_image) {
-        const {asset_token, asset_id: asset_key} = preview_image.uploaded;
-
-        if (asset_key) {
-          let {otr_key, sha256} = preview_image.uploaded;
-
-          otr_key = new Uint8Array(otr_key.toArrayBuffer());
-          sha256 = new Uint8Array(sha256.toArrayBuffer());
-
-          link_preview_et.image_resource(z.assets.AssetRemoteData.v3(asset_key, otr_key, sha256, asset_token, true));
-        }
-      }
-
-      return link_preview_et;
-    }
-  }
-
-  /**
-   * Map link previews
-   *
-   * @private
-   * @param {Array} [link_previews=[]] - base64 encoded proto previews
-   * @returns {Array<LinkPreview>} Array of mapped link previews
-   */
-  _map_asset_link_previews(link_previews = []) {
-    return link_previews
-      .map(encoded_link_preview => z.proto.LinkPreview.decode64(encoded_link_preview))
-      .map(link_preview => this._map_asset_link_preview(link_preview))
-      .filter(link_preview_et => link_preview_et);
-  }
-
-  /**
-   * Maps JSON data of text asset into asset entity
-   *
-   * @private
-   * @param {Object} event_data - Asset data received as JSON
-   * @returns {Text} Text asset entity
-   */
-  _map_asset_text(event_data) {
-    const {id, content, message, nonce, previews} = event_data;
-    const asset_et = new z.entity.Text(id, content || message);
-
-    asset_et.nonce = nonce;
-    asset_et.previews(this._map_asset_link_previews(previews));
-
-    return asset_et;
+    return assetEntity;
   }
 
   /**
@@ -572,32 +489,95 @@ z.conversation.EventMapper = class EventMapper {
    *
    * @private
    * @param {Object} event - Asset data received as JSON
-   * @param {boolean} should_create_dummy_image - Create a dummy image
+   * @param {boolean} createDummyImage - Create a dummy image
    * @returns {z.entity.MediumImage} Medium image asset entity
    */
-  _map_asset_image(event, should_create_dummy_image) {
-    const {data: event_data, conversation: conversation_id} = event;
-    const {content_length, content_type, id: asset_id, info} = event_data;
-    const asset_et = new z.entity.MediumImage(asset_id);
+  _mapAssetImage(event, createDummyImage) {
+    const {data: eventData, conversation: conversationId} = event;
+    const {content_length, content_type, id: assetId, info} = eventData;
+    const assetEntity = new z.entity.MediumImage(assetId);
 
-    asset_et.file_size = content_length;
-    asset_et.file_type = content_type;
-    asset_et.width = info.width;
-    asset_et.height = info.height;
-    asset_et.ratio = asset_et.height / asset_et.width;
+    assetEntity.file_size = content_length;
+    assetEntity.file_type = content_type;
+    assetEntity.width = info.width;
+    assetEntity.height = info.height;
+    assetEntity.ratio = assetEntity.height / assetEntity.width;
 
-    const {key, otr_key, sha256, token} = event_data;
+    const {key, otr_key, sha256, token} = eventData;
 
-    if (key) {
-      asset_et.resource(z.assets.AssetRemoteData.v3(key, otr_key, sha256, token, true));
-    } else {
-      asset_et.resource(z.assets.AssetRemoteData.v2(conversation_id, asset_id, otr_key, sha256, true));
+    const remoteData = key
+      ? z.assets.AssetRemoteData.v3(key, otr_key, sha256, token, true)
+      : z.assets.AssetRemoteData.v2(conversationId, assetId, otr_key, sha256, true);
+    assetEntity.resource(remoteData);
+
+    if (createDummyImage) {
+      assetEntity.dummy_url = this._createDummyImage(assetEntity.width, assetEntity.height);
     }
 
-    if (should_create_dummy_image) {
-      asset_et.dummy_url = this._createDummyImage(asset_et.width, asset_et.height);
-    }
+    return assetEntity;
+  }
 
-    return asset_et;
+  /**
+   * Map link preview
+   *
+   * @private
+   * @param {z.proto.LinkPreview} linkPreview - Link preview proto message
+   * @returns {LinkPreview} Mapped link preview
+   */
+  _mapAssetLinkPreview(linkPreview) {
+    if (linkPreview) {
+      const {image, title, url, meta_data} = linkPreview;
+      const {image: article_image, title: article_title} = linkPreview.article || {};
+
+      const linkPreviewEntity = new z.entity.LinkPreview(title || article_title, url);
+      linkPreviewEntity.meta_data_type = meta_data;
+      linkPreviewEntity.meta_data = linkPreview[meta_data];
+
+      const previewImage = image || article_image;
+      if (previewImage) {
+        const {asset_token, asset_id: asset_key} = previewImage.uploaded;
+
+        if (asset_key) {
+          let {otr_key, sha256} = previewImage.uploaded;
+
+          otr_key = new Uint8Array(otr_key.toArrayBuffer());
+          sha256 = new Uint8Array(sha256.toArrayBuffer());
+
+          linkPreviewEntity.image_resource(z.assets.AssetRemoteData.v3(asset_key, otr_key, sha256, asset_token, true));
+        }
+      }
+
+      return linkPreviewEntity;
+    }
+  }
+
+  /**
+   * Map link previews
+   *
+   * @private
+   * @param {Array} [linkPreviews=[]] - base64 encoded proto previews
+   * @returns {Array<LinkPreview>} Array of mapped link previews
+   */
+  _mapAssetLinkPreviews(linkPreviews = []) {
+    return linkPreviews
+      .map(encodedLinkPreview => z.proto.LinkPreview.decode64(encodedLinkPreview))
+      .map(linkPreview => this._mapAssetLinkPreview(linkPreview))
+      .filter(linkPreviewEntity => linkPreviewEntity);
+  }
+
+  /**
+   * Maps JSON data of text asset into asset entity
+   *
+   * @private
+   * @param {Object} eventData - Asset data received as JSON
+   * @returns {Text} Text asset entity
+   */
+  _mapAssetText(eventData) {
+    const {id, content, message, previews} = eventData;
+    const assetEntity = new z.entity.Text(id, content || message);
+
+    assetEntity.previews(this._mapAssetLinkPreviews(previews));
+
+    return assetEntity;
   }
 };
