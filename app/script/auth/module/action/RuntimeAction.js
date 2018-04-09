@@ -95,9 +95,9 @@ function hasIndexedDbSupport() {
       function checkDbRequest(currentAttempt = 0) {
         const tooManyAttempts = currentAttempt >= maxRetry;
         const isRequestDone = dbOpenRequest.readyState === 'done';
-        const hasResult = !!dbOpenRequest.result;
 
         if (isRequestDone) {
+          const hasResult = !!dbOpenRequest.result;
           return hasResult ? resolve() : reject(new Error('Failed to open IndexedDb'));
         }
 

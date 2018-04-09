@@ -40,3 +40,11 @@ export function hasURLParameter(parameterName) {
     .map(parameter => parameter.split('=')[0])
     .includes(parameterName);
 }
+
+export function openTab(url) {
+  const newWindow = window.open(url);
+  if (newWindow) {
+    newWindow.opener = null;
+  }
+  return newWindow;
+}
