@@ -42,6 +42,7 @@ import * as AuthSelector from '../module/selector/AuthSelector';
 import * as SelfSelector from '../module/selector/SelfSelector';
 import BackendError from '../module/action/BackendError';
 import {ROUTE} from '../route';
+import {withRouter} from 'react-router';
 
 class ChooseHandle extends React.PureComponent {
   state = {
@@ -63,7 +64,7 @@ class ChooseHandle extends React.PureComponent {
       .setHandle(this.state.handle)
       .then(() => {
         if (this.props.isTeamFlow) {
-          history.push(ROUTE.INITIAL_INVITE);
+          this.props.history.push(ROUTE.INITIAL_INVITE);
         } else {
           window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP));
         }
@@ -112,16 +113,18 @@ class ChooseHandle extends React.PureComponent {
   }
 }
 
-export default injectIntl(
-  connect(
-    state => ({
-      isFetching: SelfSelector.isFetching(state),
-      isTeamFlow: AuthSelector.isTeamFlow(state),
-      name: SelfSelector.getSelfName(state),
-    }),
-    {
-      checkHandles,
-      setHandle,
-    }
-  )(ChooseHandle)
+export default withRouter(
+  injectIntl(
+    connect(
+      state => ({
+        isFetching: SelfSelector.isFetching(state),
+        isTeamFlow: AuthSelector.isTeamFlow(state),
+        name: SelfSelector.getSelfName(state),
+      }),
+      {
+        checkHandles,
+        setHandle,
+      }
+    )(ChooseHandle)
+  )
 );
