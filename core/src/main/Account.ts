@@ -56,7 +56,6 @@ class Account extends EventEmitter {
     TEXT_MESSAGE: 'Account.INCOMING.TEXT_MESSAGE',
   };
   private apiClient: Client;
-  public context?: Context;
   private protocolBuffers: any = {};
   public service?: {
     client: ClientService;
@@ -329,7 +328,7 @@ class Account extends EventEmitter {
       .then(() => this.init())
       .then(() => LoginSanitizer.removeNonPrintableCharacters(loginData))
       .then(() => this.apiClient.login(loginData))
-      .then((context: Context) => {
+      .then(() => {
         return initClient
           ? this.initClient(loginData, clientInfo).then(() => this.apiClient.context)
           : this.apiClient.context;

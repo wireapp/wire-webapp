@@ -70,9 +70,10 @@ storeEngine.init('', {fileExtension: '.json'}).then(() => {
         throw error;
       }
     })
-    .then(() =>
-      console.log(`Connected to Wire — User ID "${account.context.userId}" — Client ID "${account.context.clientId}"`)
-    )
+    .then(() => {
+      const {clientId, userId} = apiClient!.context!;
+      console.log(`Connected to Wire — User ID "${userId}" — Client ID "${clientId}"`);
+    })
     .then(() => {
       const stdin = process.openStdin();
       stdin.addListener('data', data => {
