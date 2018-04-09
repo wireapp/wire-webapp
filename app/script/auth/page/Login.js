@@ -115,10 +115,22 @@ class Login extends React.PureComponent {
 
   componentDidMount = () => {
     this.props.resetError();
+    const immediateLogin = URLUtil.hasURLParameter(QUERY_KEY.IMMEDIATE_LOGIN);
+    if (immediateLogin) {
+      return this.immediateLogin();
+    }
     this.readAndUpdateParamsFromUrl();
   };
 
   componentWillReceiveProps = nextProps => this.readAndUpdateParamsFromUrl(nextProps);
+
+  immediateLogin = () => {
+    return Promise.resolve()
+      .then(() => this.props.doInit({isImmediateLogin: true}))
+      .then(() => this.props.doInitializeClient(true, undefined))
+      .then(() => window.location.replace(URLUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP)))
+      .catch(() => {});
+  };
 
   forgotPassword = () => URLUtil.openTab(EXTERNAL_ROUTE.WIRE_ACCOUNT_PASSWORD_RESET);
 
