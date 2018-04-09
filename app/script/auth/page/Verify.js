@@ -49,10 +49,11 @@ const Verify = ({account, authError, history, currentFlow, intl: {formatMessage:
             connected.trackEvent({name: TrackingAction.EVENT_NAME.TEAM.CREATED});
             connected.trackEvent({name: TrackingAction.EVENT_NAME.TEAM.VERIFIED});
           })
-          .then(() => history.push(ROUTE.INITIAL_INVITE))
+          .then(() => history.push(ROUTE.CHOOSE_HANDLE))
           .catch(error => console.error('Failed to create team account', error));
         break;
       }
+
       case REGISTER_FLOW.PERSONAL:
       case REGISTER_FLOW.GENERIC_INVITATION: {
         connected

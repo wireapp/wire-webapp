@@ -117,17 +117,12 @@ module.exports = grunt => {
     grunt.task.run(['todo']);
   });
 
-  return grunt.registerTask('host', (port, open = true) => {
+  return grunt.registerTask('host', port => {
     if (port !== undefined) {
       grunt.config('connect.server.port', port);
     }
 
     grunt.task.run('connect');
-
-    if (open) {
-      grunt.task.run('open:dist');
-    }
-
     grunt.task.run('watch');
   });
 };

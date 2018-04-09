@@ -20,12 +20,14 @@
 import {applyMiddleware, combineReducers, compose, createStore} from 'redux';
 import {composeWithDevTools} from 'redux-devtools-extension';
 import reducers from './module/reducer';
+import {checkCookieSupport, checkIndexedDbSupport, checkSupportedBrowser} from './module/action/RuntimeAction';
 import thunk from 'redux-thunk';
 import {createLogger} from 'redux-logger';
 import * as Environment from './Environment';
 
 export const configureStore = (thunkArguments = {}) => {
   const store = createStore(combineReducers(reducers), createMiddleware(thunkArguments));
+
   if (process.env.NODE_ENV !== 'production') {
     if (module.hot) {
       module.hot.accept('./module/reducer/index.js', () => {
@@ -33,6 +35,11 @@ export const configureStore = (thunkArguments = {}) => {
       });
     }
   }
+
+  store.dispatch(checkIndexedDbSupport());
+  store.dispatch(checkCookieSupport());
+  store.dispatch(checkSupportedBrowser());
+
   return store;
 };
 

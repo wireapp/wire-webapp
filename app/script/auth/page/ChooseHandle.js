@@ -38,8 +38,10 @@ import {createSuggestions} from '../util/handleUtil';
 import {checkHandles} from '../module/action/UserAction';
 import {setHandle} from '../module/action/SelfAction';
 import {connect} from 'react-redux';
+import * as AuthSelector from '../module/selector/AuthSelector';
 import * as SelfSelector from '../module/selector/SelfSelector';
 import BackendError from '../module/action/BackendError';
+import {ROUTE} from '../route';
 
 class ChooseHandle extends React.PureComponent {
   state = {
@@ -60,10 +62,11 @@ class ChooseHandle extends React.PureComponent {
     this.props
       .setHandle(this.state.handle)
       .then(() => {
-        const link = document.createElement('a');
-        link.href = pathWithParams(EXTERNAL_ROUTE.WEBAPP);
-        document.body.appendChild(link); // workaround for Firefox
-        link.click();
+        if (this.props.isTeamFlow) {
+          history.push(ROUTE.INITIAL_INVITE);
+        } else {
+          window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP));
+        }
       })
       .catch(error => {
         if (error.label === BackendError.HANDLE_ERRORS.INVALID_HANDLE && this.state.handle.trim().length < 2) {
@@ -113,6 +116,7 @@ export default injectIntl(
   connect(
     state => ({
       isFetching: SelfSelector.isFetching(state),
+      isTeamFlow: AuthSelector.isTeamFlow(state),
       name: SelfSelector.getSelfName(state),
     }),
     {

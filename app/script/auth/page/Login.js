@@ -249,7 +249,6 @@ class Login extends React.PureComponent {
                       }
                       innerRef={node => (this.inputs.email = node)}
                       markInvalid={!validInputs.email}
-                      disabled={this.props.disableEmail}
                       value={email}
                       autoComplete="section-login email"
                       placeholder={_(loginStrings.emailPlaceholder)}
