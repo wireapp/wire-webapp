@@ -18,11 +18,11 @@
  */
 
 import * as RuntimeActionCreator from './creator/RuntimeActionCreator';
-import {isFirefox} from '../../Runtime';
+import {isFirefox, isSupportedBrowser} from '../../Runtime';
 
 export function checkSupportedBrowser() {
   return function(dispatch) {
-    if (runtime.isSupportedBrowser()) {
+    if (isSupportedBrowser()) {
       dispatch(RuntimeActionCreator.confirmSupportedBrowser());
     }
   };
