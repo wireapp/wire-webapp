@@ -1183,6 +1183,13 @@ z.conversation.ConversationRepository = class ConversationRepository {
     }
   }
 
+  leaveGuestRoom() {
+    if (this.selfUser().isTemporaryGuest()) {
+      const conversationEntity = this.getMostRecentConversation();
+      return this.conversation_service.deleteMembers(conversationEntity.id, this.selfUser().id);
+    }
+  }
+
   /**
    * Remove bot from conversation.
    *
