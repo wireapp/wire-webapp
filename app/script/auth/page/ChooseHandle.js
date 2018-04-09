@@ -31,7 +31,7 @@ import {
 import {injectIntl} from 'react-intl';
 import {parseError} from '../util/errorUtil';
 import EXTERNAL_ROUTE from '../externalRoute';
-import {pathWithParams} from '../util/urlUtil';
+import {pathWithParams, syntheticLinkClick} from '../util/urlUtil';
 import Page from './Page';
 import React from 'react';
 import {createSuggestions} from '../util/handleUtil';
@@ -65,7 +65,7 @@ class ChooseHandle extends React.PureComponent {
         if (this.props.isTeamFlow) {
           history.push(ROUTE.INITIAL_INVITE);
         } else {
-          window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP));
+          syntheticLinkClick(pathWithParams(EXTERNAL_ROUTE.WEBAPP));
         }
       })
       .catch(error => {

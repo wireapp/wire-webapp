@@ -55,9 +55,8 @@ import RuntimeUtil from '../util/RuntimeUtil';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
 import BackendError from '../module/action/BackendError';
 import {Redirect, withRouter} from 'react-router';
-import * as URLUtil from '../util/urlUtil';
 import * as ClientSelector from '../module/selector/ClientSelector';
-import {getURLParameter} from '../util/urlUtil';
+import {getURLParameter, pathWithParams, syntheticLinkClick} from '../util/urlUtil';
 import {resetError} from '../module/action/creator/AuthActionCreator';
 
 class Login extends React.PureComponent {
@@ -163,7 +162,7 @@ class Login extends React.PureComponent {
           ? this.props.doLoginAndJoin(login, this.state.conversationKey, this.state.conversationCode)
           : this.props.doLogin(login);
       })
-      .then(() => window.location.replace(URLUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP)))
+      .then(() => syntheticLinkClick(pathWithParams(EXTERNAL_ROUTE.WEBAPP)))
       .catch(error => {
         switch (error.label) {
           case BackendError.LABEL.NEW_CLIENT: {
@@ -178,7 +177,7 @@ class Login extends React.PureComponent {
               const shouldShowHistoryInfo = this.props.hasHistory || clients.length > 1 || !this.state.persist;
               return shouldShowHistoryInfo
                 ? this.props.history.push(ROUTE.HISTORY_INFO)
-                : window.location.replace(URLUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP));
+                : syntheticLinkClick(pathWithParams(EXTERNAL_ROUTE.WEBAPP));
             });
           }
           case BackendError.LABEL.TOO_MANY_CLIENTS: {

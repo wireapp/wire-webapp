@@ -30,6 +30,7 @@ import EXTERNAL_ROUTE from '../externalRoute';
 import {ROUTE} from '../route';
 import BackendError from '../module/action/BackendError';
 import {withRouter} from 'react-router';
+import {pathWithParams, syntheticLinkClick} from '../util/urlUtil';
 
 class ClientList extends React.Component {
   state = {
@@ -62,7 +63,7 @@ class ClientList extends React.Component {
         const persist = this.props.getLocalStorage(LocalStorageAction.LocalStorageKey.AUTH.PERSIST);
         return this.props.doInitializeClient(persist, password);
       })
-      .then(() => window.location.replace(URLUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP)))
+      .then(() => syntheticLinkClick(pathWithParams(EXTERNAL_ROUTE.WEBAPP)))
       .catch(error => {
         if (error.label === BackendError.LABEL.NEW_CLIENT) {
           this.props.history.push(ROUTE.HISTORY_INFO);
