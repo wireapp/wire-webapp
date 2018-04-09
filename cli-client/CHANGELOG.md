@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="1.3.48"></a>
+## [1.3.48](https://github.com/wireapp/wire-web-packages/tree/master/packages/cli-client/compare/@wireapp/cli-client@1.3.47...@wireapp/cli-client@1.3.48) (2018-04-09)
+
+
+### Bug Fixes
+
+* **cli-client:** Access user context from API client ([#466](https://github.com/wireapp/wire-web-packages/tree/master/packages/cli-client/issues/466)) ([470e875](https://github.com/wireapp/wire-web-packages/tree/master/packages/cli-client/commit/470e875))
+
+
+
+
 <a name="1.3.47"></a>
 ## [1.3.47](https://github.com/wireapp/wire-web-packages/tree/master/packages/cli-client/compare/@wireapp/cli-client@1.3.46...@wireapp/cli-client@1.3.47) (2018-04-09)
 

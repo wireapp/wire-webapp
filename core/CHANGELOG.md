@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="2.1.48"></a>
+## [2.1.48](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.1.47...@wireapp/core@2.1.48) (2018-04-09)
+
+
+### Bug Fixes
+
+* **cli-client:** Access user context from API client ([#466](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/466)) ([470e875](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/470e875))
+
+
+
+
 <a name="2.1.47"></a>
 ## [2.1.47](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.1.46...@wireapp/core@2.1.47) (2018-04-09)
 
