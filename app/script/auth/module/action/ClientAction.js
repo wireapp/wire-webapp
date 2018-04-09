@@ -78,8 +78,8 @@ export function doInitializeClient(persist, password) {
 }
 
 export function generateClientPayload(persist) {
-  const deviceLabel = `${runtime.getOSFamily()}${runtime.getOS().version ? ` ${runtime.getOS().version}` : ''}`;
-  let deviceModel = StringUtil.capitalize(runtime.getBrowserName());
+  const deviceLabel = `${Runtime.getOsFamily()}${Runtime.getOs().version ? ` ${Runtime.getOs().version}` : ''}`;
+  let deviceModel = StringUtil.capitalize(Runtime.getBrowserName());
 
   if (Runtime.isElectron()) {
     if (Runtime.isMacOS()) {
