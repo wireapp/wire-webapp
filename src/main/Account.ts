@@ -344,11 +344,9 @@ class Account extends EventEmitter {
     if (!this.service) {
       throw new Error('Services are not set.');
     }
-    let loadedClient: RegisteredClient;
 
     return this.loadAndValidateLocalClient()
-      .then(client => (loadedClient = client))
-      .then(() => ({isNewClient: false, localClient: loadedClient}))
+      .then(localClient => ({isNewClient: false, localClient}))
       .catch(error => {
         let registeredClient: RegisteredClient;
 
@@ -366,18 +364,20 @@ class Account extends EventEmitter {
         }
         if (notFoundOnBackend) {
           this.logger.info('Could not find valid client on backend');
-          const shouldDeleteWholeDatabase = loadedClient.type === ClientType.TEMPORARY;
-          if (shouldDeleteWholeDatabase) {
-            this.logger.info('Last client was temporary - Deleting database');
-            return this.apiClient.config.store
-              .purge()
-              .then(() => this.apiClient.init(loginData.persist ? ClientType.PERMANENT : ClientType.TEMPORARY))
-              .then(() => this.registerClient(loginData, clientInfo));
-          }
-          this.logger.info('Last client was permanent - Deleting cryptograpy stores');
-          return this.service!.cryptography.deleteCryptographyStores().then(() =>
-            this.registerClient(loginData, clientInfo)
-          );
+          return this.service!.client.getLocalClient().then(client => {
+            const shouldDeleteWholeDatabase = client.type === ClientType.TEMPORARY;
+            if (shouldDeleteWholeDatabase) {
+              this.logger.info('Last client was temporary - Deleting database');
+              return this.apiClient.config.store
+                .purge()
+                .then(() => this.apiClient.init(loginData.persist ? ClientType.PERMANENT : ClientType.TEMPORARY))
+                .then(() => this.registerClient(loginData, clientInfo));
+            }
+            this.logger.info('Last client was permanent - Deleting cryptography stores');
+            return this.service!.cryptography.deleteCryptographyStores().then(() =>
+              this.registerClient(loginData, clientInfo)
+            );
+          });
         }
         throw error;
       });
