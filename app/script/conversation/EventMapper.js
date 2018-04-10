@@ -247,7 +247,6 @@ z.conversation.EventMapper = class EventMapper {
     assetEntity.zoom = location.zoom;
 
     messageEntity.assets.push(assetEntity);
-    messageEntity.nonce = nonce;
 
     return messageEntity;
   }
