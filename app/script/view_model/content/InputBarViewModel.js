@@ -32,7 +32,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       },
       GIPHY_TEXT_LENGTH: 256,
       IMAGE: {
-        FILE_TYPES: ['image/bmp', 'image/jpeg', 'image/jpg', 'image/png', '.jpg-large'],
+        FILE_TYPES: ['image/bmp', 'image/gif', 'image/jpeg', 'image/jpg', 'image/png', '.jpg-large'],
       },
       PING_TIMEOUT: 2000,
     };
