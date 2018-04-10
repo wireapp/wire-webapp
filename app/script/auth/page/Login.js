@@ -125,11 +125,20 @@ class Login extends React.PureComponent {
 
   componentWillReceiveProps = nextProps => this.readAndUpdateParamsFromUrl(nextProps);
 
+  navigateChooseHandleOrWebapp = () => {
+    return Promise.resolve().then(
+      () =>
+        this.props.hasSelfHandle
+          ? window.location.replace(URLUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP))
+          : this.props.history.push(ROUTE.CHOOSE_HANDLE)
+    );
+  };
+
   immediateLogin = () => {
     return Promise.resolve()
       .then(() => this.props.doInit({isImmediateLogin: true}))
       .then(() => this.props.doInitializeClient(true, undefined))
-      .then(() => window.location.replace(URLUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP)))
+      .then(() => this.navigateChooseHandleOrWebapp())
       .catch(() => {});
   };
 
@@ -174,7 +183,7 @@ class Login extends React.PureComponent {
           ? this.props.doLoginAndJoin(login, this.state.conversationKey, this.state.conversationCode)
           : this.props.doLogin(login);
       })
-      .then(() => window.location.replace(URLUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP)))
+      .then(() => this.navigateChooseHandleOrWebapp())
       .catch(error => {
         switch (error.label) {
           case BackendError.LABEL.NEW_CLIENT: {
@@ -352,6 +361,7 @@ export default withRouter(
       state => ({
         clients: ClientSelector.getClients(state),
         hasHistory: ClientSelector.hasHistory(state),
+        hasSelfHandle: SelfSelector.hasSelfHandle(state),
         isFetching: AuthSelector.isFetching(state),
         loginError: AuthSelector.getError(state),
       }),
