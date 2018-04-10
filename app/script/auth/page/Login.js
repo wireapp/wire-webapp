@@ -49,6 +49,7 @@ import * as AuthAction from '../module/action/AuthAction';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import * as ConversationAction from '../module/action/ConversationAction';
 import * as ClientAction from '../module/action/ClientAction';
+import * as SelfSelector from '../module/selector/SelfSelector';
 import ValidationError from '../module/action/ValidationError';
 import {loginStrings, logoutReasonStrings} from '../../strings';
 import {isDesktopApp} from '../Runtime';
@@ -198,7 +199,7 @@ class Login extends React.PureComponent {
               const shouldShowHistoryInfo = this.props.hasHistory || clients.length > 1 || !this.state.persist;
               return shouldShowHistoryInfo
                 ? this.props.history.push(ROUTE.HISTORY_INFO)
-                : window.location.replace(URLUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP));
+                : this.navigateChooseHandleOrWebapp();
             });
           }
           case BackendError.LABEL.TOO_MANY_CLIENTS: {
