@@ -84,9 +84,11 @@ z.backup.BackupRepository = class BackupRepository {
       action: () => this.exportBackup(),
       preventClose: true,
       text: {
-        action: z.l10n.text(z.string.modalBackupErrorAction),
-        message: isBackupImportError ? z.string.modalBackupErrorMessage : error.message,
-        title: z.l10n.text(z.string.modalBackupErrorHeadline),
+        action: z.l10n.text(z.string.backupErrorAction),
+        message: isBackupImportError ? z.l10n.text(z.string.backupImportGenericErrorSecondary) : error.message,
+        title: isBackupImportError
+          ? z.l10n.text(z.string.backupImportGenericErrorHeadline)
+          : z.l10n.text(z.string.backupExportGenericErrorHeadline),
       },
     });
   }
