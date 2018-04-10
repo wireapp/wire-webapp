@@ -196,11 +196,15 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   clickOnBackupExport() {
-    this.backupRepository.exportBackup();
+    this.backupRepository.exportBackup().then(({numberOfRecords, userName}) => {
+      amplify.publish(z.event.WebApp.BACKUP.EXPORT.INIT, numberOfRecords, userName);
+    });
   }
 
   clickOnBackupImport() {
-    this.backupRepository.importBackup();
+    this.backupRepository.importBackup().then(({userId, clientId}) => {
+      amplify.publish(z.event.WebApp.BACKUP.IMPORT.START, userId, clientId);
+    });
   }
 
   clickOnCreate() {
