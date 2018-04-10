@@ -2902,7 +2902,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           conversationEntity.add_message(messageEntity);
         }
 
-        return {conversationEntity, messageEntity};
+        return {conversationEntity};
       });
   }
 
