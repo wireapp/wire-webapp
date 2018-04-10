@@ -178,10 +178,15 @@ export function doRegisterWireless(registrationData) {
   };
 }
 
-export function doInit(options = {shouldValidateLocalClient: false}) {
-  return function(dispatch, getState, {apiClient}) {
+export function doInit(options = {isImmediateLogin: false, shouldValidateLocalClient: false}) {
+  return function(dispatch, getState, {apiClient, core}) {
     dispatch(AuthActionCreator.startRefresh());
     return Promise.resolve()
+      .then(() => {
+        if (options.isImmediateLogin) {
+          return dispatch(setLocalStorage(LocalStorageKey.AUTH.PERSIST, true));
+        }
+      })
       .then(() => dispatch(getLocalStorage(LocalStorageKey.AUTH.PERSIST)))
       .then(persist => {
         if (persist === undefined) {
@@ -189,6 +194,7 @@ export function doInit(options = {shouldValidateLocalClient: false}) {
         }
         return apiClient.init(persist ? ClientType.PERMANENT : ClientType.TEMPORARY);
       })
+      .then(() => core.init())
       .then(() => {
         if (options.shouldValidateLocalClient) {
           return dispatch(validateLocalClient());
@@ -199,6 +205,9 @@ export function doInit(options = {shouldValidateLocalClient: false}) {
       .catch(error => {
         if (options.shouldValidateLocalClient) {
           dispatch(doLogout());
+        }
+        if (options.isImmediateLogin) {
+          dispatch(deleteLocalStorage(LocalStorageKey.AUTH.PERSIST));
         }
         dispatch(AuthActionCreator.failedRefresh(error));
       });
