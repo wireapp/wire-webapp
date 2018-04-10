@@ -417,8 +417,8 @@
   resolved "https://registry.yarnpkg.com/@types/long/-/long-3.0.32.tgz#f4e5af31e9e9b196d8e5fca8a5e2e20aa3d60b69"
 
 "@types/node@*":
-  version "7.0.60"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-7.0.60.tgz#5406c35961e4f9e2d5a1b9482daa14501754ecda"
+  version "9.6.3"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-9.6.3.tgz#f5fd440f8a9867b65ae76d442e269622a1db00b5"
 
 "@types/node@9.6.2":
   version "9.6.2"
@@ -433,8 +433,8 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-7.0.46.tgz#c3dedd25558c676b3d6303e51799abb9c3f8f314"
 
 "@types/node@^8.9.4":
-  version "8.10.4"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-8.10.4.tgz#d3ca40ee884c853e2b786ee73096726ec59a5b31"
+  version "8.10.6"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-8.10.6.tgz#c922d975ab778435ea85c1b1ce6802ed9ff5d52f"
 
 "@types/spark-md5@3.0.0":
   version "3.0.0"
@@ -448,9 +448,9 @@
   version "2.3.2"
   resolved "https://registry.yarnpkg.com/@types/tough-cookie/-/tough-cookie-2.3.2.tgz#e0d481d8bb282ad8a8c9e100ceb72c995fb5e709"
 
-"@wireapp/api-client@0.6.32":
-  version "0.6.32"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-0.6.32.tgz#bd9b279f63a25acb160002e798d1f2e679b27ae9"
+"@wireapp/api-client@0.6.33":
+  version "0.6.33"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-0.6.33.tgz#3f185804199c4b26956a535bcf2ac800f54f8bc4"
   dependencies:
     "@types/node" "9.6.2"
     "@types/spark-md5" "3.0.0"
@@ -469,12 +469,12 @@
   version "3.0.14"
   resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-3.0.14.tgz#7114961a5a06d1b765ac542727eb195422b4bf01"
 
-"@wireapp/core@2.1.48":
-  version "2.1.48"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-2.1.48.tgz#40bca1761c447dfa57681d3eded9ae57f619919e"
+"@wireapp/core@2.1.49":
+  version "2.1.49"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-2.1.49.tgz#0f9abe8413554e6e53c4d4a559780a93682591bf"
   dependencies:
     "@types/node" "9.6.2"
-    "@wireapp/api-client" "0.6.32"
+    "@wireapp/api-client" "0.6.33"
     "@wireapp/cryptobox" "8.3.17"
     "@wireapp/store-engine" "0.5.8"
     bazinga64 "5.0.3"
