@@ -24,20 +24,13 @@ import {historyInfoStrings} from '../../strings';
 import Page from './Page';
 import {H1, Link, ContainerXS, Button, Paragraph} from '@wireapp/react-ui-kit';
 import * as ClientSelector from '../module/selector/ClientSelector';
-import * as SelfSelector from '../module/selector/SelfSelector';
 import EXTERNAL_ROUTE from '../externalRoute';
-import {ROUTE} from '../route';
 import * as URLUtil from '../util/urlUtil';
 import * as NotificationAction from '../module/action/NotificationAction';
-import {withRouter} from 'react-router';
 
-function HistoryInfo({hasHistory, hasSelfHandle, history, intl: {formatMessage: _}, ...connected}) {
+function HistoryInfo({hasHistory, intl: {formatMessage: _}, ...connected}) {
   const onContinue = () => {
-    connected.resetHistoryCheck().then(() => {
-      return hasSelfHandle
-        ? window.location.replace(URLUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP))
-        : history.push(ROUTE.CHOOSE_HANDLE);
-    });
+    connected.resetHistoryCheck().then(() => window.location.replace(URLUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP)));
   };
   const headline = hasHistory ? historyInfoStrings.hasHistoryHeadline : historyInfoStrings.noHistoryHeadline;
   const infoText = hasHistory ? historyInfoStrings.hasHistoryInfo : historyInfoStrings.noHistoryInfo;
@@ -76,14 +69,11 @@ function HistoryInfo({hasHistory, hasSelfHandle, history, intl: {formatMessage: 
   );
 }
 
-export default withRouter(
-  injectIntl(
-    connect(
-      state => ({
-        hasHistory: ClientSelector.hasHistory(state),
-        hasSelfHandle: SelfSelector.hasSelfHandle(state),
-      }),
-      {...NotificationAction}
-    )(HistoryInfo)
-  )
+export default injectIntl(
+  connect(
+    state => ({
+      hasHistory: ClientSelector.hasHistory(state),
+    }),
+    {...NotificationAction}
+  )(HistoryInfo)
 );

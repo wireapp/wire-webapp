@@ -19,8 +19,6 @@
 
 export const getSelf = state => state.selfState.self || {};
 export const getSelfName = state => getSelf(state).name;
-export const getSelfHandle = state => getSelf(state).handle;
-export const hasSelfHandle = state => !!getSelf(state).handle;
 export const isTemporaryGuest = state => !!getSelf(state).expires_at;
 export const getSelfTeamId = state => getSelf(state).team;
 export const getSelfError = state => state.selfState.error;
