@@ -140,6 +140,7 @@ class Login extends React.PureComponent {
     if (this.props.isFetching) {
       return;
     }
+    this.inputs.email.value = this.inputs.email.value.trim();
     const validationErrors = [];
     const validInputs = this.state.validInputs;
     for (const inputKey of Object.keys(this.inputs)) {
