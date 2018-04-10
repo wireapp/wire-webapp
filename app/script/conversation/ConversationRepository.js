@@ -356,9 +356,15 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     return this.conversation_service.load_event_from_db(conversationEntity.id, messageId).then(event => {
       if (event) {
-        return this.event_mapper.mapJsonEvent(event, conversationEntity).catch(() => {
-          throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND);
-        });
+        return Promise.resolve()
+          .then(() => this.event_mapper.mapJsonEvent(event, conversationEntity))
+          .catch(error => {
+            const errorMessage = `Failed to get and map event of type '${event.type}': ${error.message}`;
+            this.logger.error(errorMessage, {error, event});
+            Raygun.send(new Error(errorMessage), {eventType: event.type});
+
+            throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND);
+          });
       }
       throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND);
     });
@@ -1495,27 +1501,26 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Update last read of conversation using timestamp.
    *
    * @private
-   * @param {Conversation} conversation_et - Conversation to update
+   * @param {Conversation} conversationEntity - Conversation to update
    * @returns {undefined} No return value
    */
-  _update_last_read_timestamp(conversation_et) {
-    const timestamp = conversation_et.get_last_known_timestamp(this.timeOffset);
+  _update_last_read_timestamp(conversationEntity) {
+    const timestamp = conversationEntity.get_last_known_timestamp(this.timeOffset);
+    const conversationId = conversationEntity.id;
 
-    if (timestamp && conversation_et.set_timestamp(timestamp, z.conversation.TIMESTAMP_TYPE.LAST_READ)) {
-      const message_content = new z.proto.LastRead(conversation_et.id, conversation_et.last_read_timestamp());
-      const generic_message = new z.proto.GenericMessage(z.util.createRandomUuid());
-      generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.LAST_READ, message_content);
+    if (timestamp && conversationEntity.set_timestamp(timestamp, z.conversation.TIMESTAMP_TYPE.LAST_READ)) {
+      const messageContent = new z.proto.LastRead(conversationId, conversationEntity.last_read_timestamp());
+      const genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
+      genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.LAST_READ, messageContent);
 
-      this.send_generic_message_to_conversation(this.self_conversation().id, generic_message)
+      this.send_generic_message_to_conversation(this.self_conversation().id, genericMessage)
         .then(() => {
-          this.logger.info(
-            `Marked conversation '${conversation_et.id}' as read on '${new Date(timestamp).toISOString()}'`
-          );
+          this.logger.info(`Marked conversation '${conversationId}' as read on '${new Date(timestamp).toISOString()}'`);
         })
         .catch(error => {
-          this.logger.error(`Error (${error.label}): ${error.message}`);
-          const raygun_error = new Error('Failed to update last read timestamp');
-          Raygun.send(raygun_error, {label: error.label, message: error.message});
+          const errorMessage = 'Failed to update last read timestamp';
+          this.logger.error(`${errorMessage}: ${error.message}`, error);
+          Raygun.send(new Error(errorMessage), {label: error.label, message: error.message});
         });
     }
   }
@@ -1530,9 +1535,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return this.get_message_in_conversation_by_id(conversationEntity, messageId)
       .then(messageEntity => {
         const assetEntity = messageEntity.get_first_asset();
-        const options = {
-          retention: this.asset_service.getAssetRetention(this.selfUser(), conversationEntity),
-        };
+        const retention = this.asset_service.getAssetRetention(this.selfUser(), conversationEntity);
+        const options = {retention};
 
         assetEntity.uploaded_on_this_client(true);
         return this.asset_service.uploadAsset(file, options, xhr => {
@@ -1639,9 +1643,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
           throw Error('No image available');
         }
 
-        const options = {
-          retention: this.asset_service.getAssetRetention(this.selfUser(), conversationEntity),
-        };
+        const retention = this.asset_service.getAssetRetention(this.selfUser(), conversationEntity);
+        const options = {retention};
 
         return this.asset_service.uploadAsset(imageBlob, options).then(uploadedImageAsset => {
           const asset = new z.proto.Asset();
@@ -1766,9 +1769,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when the image was sent
    */
   send_image_asset(conversationEntity, image) {
-    const options = {
-      retention: this.asset_service.getAssetRetention(this.selfUser(), conversationEntity),
-    };
+    const retention = this.asset_service.getAssetRetention(this.selfUser(), conversationEntity);
+    const options = {retention};
 
     return this.asset_service
       .uploadImageAsset(image, options)
