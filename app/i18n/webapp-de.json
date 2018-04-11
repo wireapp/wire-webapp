@@ -46,7 +46,7 @@
   "unsupported.unsupportedSubhead":
     "Lade die neueste Version von <b style=\"font-weight: 600\">Google Chrome, Mozilla Firefox, Opera</b> oder <b style=\"font-weight: 600\">Microsoft Edge</b> herunter.",
   "conversationJoin.unsupportedJoinHeadline": "Du bist in einen <b style=\"color: black;\">Wire Gästebereich</b> <br />eingeladen.",
-  "conversationJoin.headline": "Du bist in ein <b style=\"color: black;\">Wire Gästezimmer</b> <br />eingeladen.",
+  "conversationJoin.headline": "Du bist in einen <b style=\"color: black;\">Wire Gästebereich</b> <br />eingeladen.",
   "conversationJoin.unsupportedJoinSubhead":
     "<p>Dieser Browser wird nicht unterstützt.</p>Lade die neueste Version von <b style=\"font-weight: 600\">Google Chrome, Mozilla Firefox, Opera</b> oder <b style=\"font-weight: 600\">Microsoft Edge</b> herunter.",
   "conversationJoin.unsupportedJoinMobileSubhead": "Öffne diesen Link auf deinem Computer.",
