@@ -33,7 +33,7 @@
     "karma-jasmine": "1.1.1",
     "karma-jasmine-diff-reporter": "1.1.1",
     "karma-sourcemap-loader": "0.3.7",
-    "nock": "9.2.4",
+    "nock": "9.2.5",
     "optimist": "0.6.1",
     "react-hot-loader": "4.0.1",
     "rimraf": "2.6.2",
