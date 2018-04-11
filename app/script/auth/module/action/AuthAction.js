@@ -71,7 +71,11 @@ function doLoginPlain(loginData, onBeforeLogin, onAfterLogin) {
       .then(() => dispatch(ClientAction.doInitializeClient(loginData.persist, loginData.password)))
       .then(() => dispatch(AuthActionCreator.successfulLogin()))
       .catch(error => {
-        dispatch(AuthActionCreator.failedLogin(error));
+        if (error.label === BackendError.LABEL.NEW_CLIENT || error.label === BackendError.LABEL.TOO_MANY_CLIENTS) {
+          dispatch(AuthActionCreator.successfulLogin());
+        } else {
+          dispatch(AuthActionCreator.failedLogin(error));
+        }
         throw BackendError.handle(error);
       });
   };
@@ -106,18 +110,25 @@ export function doRegisterTeam(registration) {
     registration.team.binding = true;
     registration.team.currency = currentCurrency();
     registration.team.name = registration.team.name.trim();
+
+    let createdAccount;
     dispatch(AuthActionCreator.startRegisterTeam({...registration, password: '******'}));
     return Promise.resolve()
       .then(() => dispatch(doSilentLogout()))
       .then(() => apiClient.register(registration, isPermanentClient))
+      .then(newAccount => (createdAccount = newAccount))
       .then(() => core.init())
       .then(() => persistAuthData(isPermanentClient, core, dispatch))
       .then(() => dispatch(CookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: APP_INSTANCE_ID})))
-      .then(() => dispatch(ClientAction.doInitializeClient(isPermanentClient)))
       .then(() => dispatch(SelfAction.fetchSelf()))
-      .then(createdTeam => dispatch(AuthActionCreator.successfulRegisterTeam(createdTeam)))
+      .then(() => dispatch(ClientAction.doInitializeClient(isPermanentClient)))
+      .then(() => dispatch(AuthActionCreator.successfulRegisterTeam(createdAccount)))
       .catch(error => {
-        dispatch(AuthActionCreator.failedRegisterTeam(error));
+        if (error.label === BackendError.LABEL.NEW_CLIENT) {
+          dispatch(AuthActionCreator.successfulRegisterTeam(createdAccount));
+        } else {
+          dispatch(AuthActionCreator.failedRegisterTeam(error));
+        }
         throw BackendError.handle(error);
       });
   };
@@ -129,6 +140,8 @@ export function doRegisterPersonal(registration) {
     registration.locale = currentLanguage();
     registration.name = registration.name.trim();
     registration.email = registration.email.trim();
+
+    let createdAccount;
     dispatch(
       AuthActionCreator.startRegisterPersonal({
         accent_id: registration.accent_id,
@@ -141,14 +154,19 @@ export function doRegisterPersonal(registration) {
     return Promise.resolve()
       .then(() => dispatch(doSilentLogout()))
       .then(() => apiClient.register(registration, isPermanentClient))
+      .then(newAccount => (createdAccount = newAccount))
       .then(() => core.init())
       .then(() => persistAuthData(isPermanentClient, core, dispatch))
       .then(() => dispatch(CookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: APP_INSTANCE_ID})))
-      .then(() => dispatch(ClientAction.doInitializeClient(isPermanentClient)))
       .then(() => dispatch(SelfAction.fetchSelf()))
-      .then(createdAccount => dispatch(AuthActionCreator.successfulRegisterPersonal(createdAccount)))
+      .then(() => dispatch(ClientAction.doInitializeClient(isPermanentClient)))
+      .then(() => dispatch(AuthActionCreator.successfulRegisterPersonal(createdAccount)))
       .catch(error => {
-        dispatch(AuthActionCreator.failedRegisterPersonal(error));
+        if (error.label === BackendError.LABEL.NEW_CLIENT) {
+          dispatch(AuthActionCreator.successfulRegisterPersonal(createdAccount));
+        } else {
+          dispatch(AuthActionCreator.failedRegisterPersonal(error));
+        }
         throw BackendError.handle(error);
       });
   };
@@ -160,28 +178,39 @@ export function doRegisterWireless(registrationData) {
     registrationData.locale = currentLanguage();
     registrationData.name = registrationData.name.trim();
 
+    let createdAccount;
     const obfuscatedRegistrationData = {locale: registrationData.locale, name: registrationData.name};
     dispatch(AuthActionCreator.startRegisterWireless(obfuscatedRegistrationData));
 
     return Promise.resolve()
       .then(() => apiClient.register(registrationData, isPermanentClient))
+      .then(newAccount => (createdAccount = newAccount))
       .then(() => core.init())
       .then(() => persistAuthData(isPermanentClient, core, dispatch))
       .then(() => dispatch(CookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: APP_INSTANCE_ID})))
-      .then(() => dispatch(ClientAction.doInitializeClient(isPermanentClient)))
       .then(() => dispatch(SelfAction.fetchSelf()))
-      .then(createdAccount => dispatch(AuthActionCreator.successfulRegisterWireless(createdAccount)))
+      .then(() => dispatch(ClientAction.doInitializeClient(isPermanentClient)))
+      .then(() => dispatch(AuthActionCreator.successfulRegisterWireless(createdAccount)))
       .catch(error => {
-        dispatch(AuthActionCreator.failedRegisterWireless(error));
+        if (error.label === BackendError.LABEL.NEW_CLIENT) {
+          dispatch(AuthActionCreator.successfulRegisterWireless(createdAccount));
+        } else {
+          dispatch(AuthActionCreator.failedRegisterWireless(error));
+        }
         throw BackendError.handle(error);
       });
   };
 }
 
-export function doInit() {
-  return function(dispatch, getState, {apiClient}) {
+export function doInit(options = {isImmediateLogin: false, shouldValidateLocalClient: false}) {
+  return function(dispatch, getState, {apiClient, core}) {
     dispatch(AuthActionCreator.startRefresh());
     return Promise.resolve()
+      .then(() => {
+        if (options.isImmediateLogin) {
+          return dispatch(setLocalStorage(LocalStorageKey.AUTH.PERSIST, true));
+        }
+      })
       .then(() => dispatch(getLocalStorage(LocalStorageKey.AUTH.PERSIST)))
       .then(persist => {
         if (persist === undefined) {
@@ -189,9 +218,36 @@ export function doInit() {
         }
         return apiClient.init(persist ? ClientType.PERMANENT : ClientType.TEMPORARY);
       })
+      .then(() => core.init())
+      .then(() => {
+        if (options.shouldValidateLocalClient) {
+          return dispatch(validateLocalClient());
+        }
+      })
       .then(() => dispatch(SelfAction.fetchSelf()))
       .then(() => dispatch(AuthActionCreator.successfulRefresh(apiClient.accessTokenStore.accessToken)))
-      .catch(error => dispatch(AuthActionCreator.failedRefresh(error)));
+      .catch(error => {
+        if (options.shouldValidateLocalClient) {
+          dispatch(doLogout());
+        }
+        if (options.isImmediateLogin) {
+          dispatch(deleteLocalStorage(LocalStorageKey.AUTH.PERSIST));
+        }
+        dispatch(AuthActionCreator.failedRefresh(error));
+      });
+  };
+}
+
+function validateLocalClient() {
+  return function(dispatch, getState, {core}) {
+    dispatch(AuthActionCreator.startValidateLocalClient());
+    return Promise.resolve()
+      .then(() => core.loadAndValidateLocalClient())
+      .then(() => dispatch(AuthActionCreator.successfulValidateLocalClient()))
+      .catch(error => {
+        dispatch(AuthActionCreator.failedValidateLocalClient(error));
+        throw error;
+      });
   };
 }
 
@@ -225,6 +281,9 @@ export function getInvitationFromCode(invitationCode) {
     return apiClient.invitation.api
       .getInvitationInfo(invitationCode)
       .then(invitation => dispatch(AuthActionCreator.successfulGetInvitationFromCode(invitation)))
-      .catch(error => dispatch(AuthActionCreator.failedGetInvitationFromCode(error)));
+      .catch(error => {
+        dispatch(AuthActionCreator.failedGetInvitationFromCode(error));
+        throw BackendError.handle(error);
+      });
   };
 }

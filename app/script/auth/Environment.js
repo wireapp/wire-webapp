@@ -27,7 +27,7 @@ export const PRODUCTION = 'PRODUCTION';
 export const APP_ENVIRONMENT = getEnvironmentFromQuery();
 checkEnvironment();
 export function getEnvironmentFromQuery() {
-  const isProductionHost = window.location.hostname.includes('wire.com');
+  const isProductionHost = window.location.hostname.endsWith('wire.com');
   const isLocalHost = window.location.hostname.includes('localhost');
   switch (getURLParameter(QUERY_KEY.ENVIRONMENT)) {
     case 'staging':

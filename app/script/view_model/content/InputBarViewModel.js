@@ -32,7 +32,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       },
       GIPHY_TEXT_LENGTH: 256,
       IMAGE: {
-        FILE_TYPES: ['image/bmp', 'image/jpeg', 'image/jpg', 'image/png', '.jpg-large'],
+        FILE_TYPES: ['image/bmp', 'image/gif', 'image/jpeg', 'image/jpg', 'image/png', '.jpg-large'],
       },
       PING_TIMEOUT: 2000,
     };
@@ -71,13 +71,12 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       }
       return {};
     });
-    this.hasConversation = ko.pureComputed(() => !!this.conversationEntity());
     this.hasEphemeralTimer = ko.pureComputed(() => {
-      return this.hasConversation() ? this.conversationEntity().ephemeral_timer() : false;
+      return this.conversationEntity() ? this.conversationEntity().ephemeral_timer() : false;
     });
     this.hasFocus = ko.pureComputed(() => this.isEditing() || this.conversationHasFocus()).extend({notify: 'always'});
     this.hasTextInput = ko.pureComputed(() => {
-      return this.hasConversation() ? this.conversationEntity().input().length > 0 : false;
+      return this.conversationEntity() ? this.conversationEntity().input().length > 0 : false;
     });
 
     this.input = ko.pureComputed({
@@ -134,7 +133,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this.isEditing = ko.pureComputed(() => !!this.editMessageEntity());
 
     this.showAvailabilityTooltip = ko.pureComputed(() => {
-      if (this.hasConversation() && this.conversationEntity().firstUserEntity()) {
+      if (this.conversationEntity() && this.conversationEntity().firstUserEntity()) {
         const isOne2OneConversation = this.conversationEntity().is_one2one();
         const firstUserEntity = this.conversationEntity().firstUserEntity();
         const availabilityIsNone = firstUserEntity.availability() === z.user.AvailabilityType.NONE;
@@ -145,7 +144,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     });
 
     this.showGiphyButton = ko.pureComputed(() => {
-      if (this.hasConversation() && this.hasTextInput()) {
+      if (this.conversationEntity() && this.hasTextInput()) {
         return this.conversationEntity().input().length <= InputBarViewModel.CONFIG.GIPHY_TEXT_LENGTH;
       }
     });
@@ -246,7 +245,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   }
 
   clickToPing() {
-    if (this.hasConversation() && !this.pingDisabled()) {
+    if (this.conversationEntity() && !this.pingDisabled()) {
       this.pingDisabled(true);
       this.conversationRepository.send_knock(this.conversationEntity()).then(() => {
         window.setTimeout(() => this.pingDisabled(false), InputBarViewModel.CONFIG.PING_TIMEOUT);
@@ -401,7 +400,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   }
 
   sendGiphy() {
-    if (this.hasConversation()) {
+    if (this.conversationEntity()) {
       this.conversationEntity().input('');
     }
   }

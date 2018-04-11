@@ -19,7 +19,7 @@
 
 import BackendError from './BackendError';
 import * as ClientActionCreator from './creator/ClientActionCreator';
-import Runtime from '../../Runtime';
+import * as Runtime from '../../Runtime';
 import * as Environment from '../../Environment';
 import * as StringUtil from '../../util/stringUtil';
 import * as NotificationAction from './NotificationAction';
@@ -78,15 +78,13 @@ export function doInitializeClient(persist, password) {
 }
 
 export function generateClientPayload(persist) {
-  const runtime = new Runtime();
+  const deviceLabel = `${Runtime.getOsFamily()}${Runtime.getOs().version ? ` ${Runtime.getOs().version}` : ''}`;
+  let deviceModel = StringUtil.capitalize(Runtime.getBrowserName());
 
-  const deviceLabel = `${runtime.getOSFamily()}${runtime.getOS().version ? ` ${runtime.getOS().version}` : ''}`;
-  let deviceModel = StringUtil.capitalize(runtime.getBrowserName());
-
-  if (runtime.isElectron()) {
-    if (runtime.isMacOS()) {
+  if (Runtime.isElectron()) {
+    if (Runtime.isMacOS()) {
       deviceModel = 'Wire macOS';
-    } else if (runtime.isWindows()) {
+    } else if (Runtime.isWindows()) {
       deviceModel = 'Wire Windows';
     } else {
       deviceModel = 'Wire Linux';

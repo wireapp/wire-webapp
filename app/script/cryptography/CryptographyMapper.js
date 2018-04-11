@@ -172,12 +172,13 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
   }
 
   _mapAssetMetaData(original) {
-    if (original.audio) {
-      const normalizedLoudness = original.audio.normalized_loudness;
-      const loudnessArray = normalizedLoudness ? original.audio.normalized_loudness.toArrayBuffer() : [];
+    const audioData = original.audio;
+    if (audioData) {
+      const loudnessArray = audioData.normalized_loudness ? audioData.normalized_loudness.toArrayBuffer() : [];
+      const durationInSeconds = audioData.duration_in_millis ? audioData.duration_in_millis / 1000 : 0;
 
       return {
-        duration: original.audio.duration_in_millis.toNumber() / 1000,
+        duration: durationInSeconds,
         loudness: new Uint8Array(loudnessArray),
       };
     }

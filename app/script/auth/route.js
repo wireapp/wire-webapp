@@ -22,6 +22,7 @@ const QUERY_KEY = {
   CONVERSATION_KEY: 'join_key',
   CURRENCY: 'currency',
   ENVIRONMENT: 'env',
+  IMMEDIATE_LOGIN: 'immediate_login',
   JOIN_EXPIRES: 'expires_in',
   LANGUAGE: 'hl',
   LOGOUT_REASON: 'reason',

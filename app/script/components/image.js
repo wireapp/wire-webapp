@@ -42,14 +42,18 @@ z.components.Image = class Image {
     this.load_image_asset = () => {
       this.asset_is_loading(true);
       this.asset.load().then(blob => {
+        if (blob) {
+          this.asset_src(window.URL.createObjectURL(blob));
+        }
         this.asset_is_loading(false);
-        this.asset_src(window.URL.createObjectURL(blob));
       });
     };
   }
 
   dispose() {
-    window.URL.revokeObjectURL(this.asset_src());
+    if (this.asset_src()) {
+      window.URL.revokeObjectURL(this.asset_src());
+    }
   }
 };
 

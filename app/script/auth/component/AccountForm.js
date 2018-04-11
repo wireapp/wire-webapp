@@ -57,8 +57,7 @@ class AccountForm extends PureComponent {
   }
 
   createURLForToU = () => {
-    const isPersonalFlow = this.props.currentFlow === AuthSelector.REGISTER_FLOW.PERSONAL;
-    return `${EXTERNAL_ROUTE.WIRE_WEBSITE}/legal/terms/${isPersonalFlow ? 'personal' : 'teams'}/`;
+    return `${EXTERNAL_ROUTE.WIRE_WEBSITE}/legal/terms/${this.props.isPersonalFlow ? 'personal' : 'teams'}/`;
   };
 
   handleSubmit = event => {
@@ -74,6 +73,7 @@ class AccountForm extends PureComponent {
       validInputs[inputKey] = currentInput.validity.valid;
     }
     this.setState({validInputs, validationErrors: errors});
+    const isPersonalInvitation = this.props.isPersonalInvitationFlow && this.state.email === this.props.account.email;
     return Promise.resolve()
       .then(() => {
         if (errors.length > 0) {
@@ -82,11 +82,11 @@ class AccountForm extends PureComponent {
       })
       .then(() => this.props.beforeSubmit && this.props.beforeSubmit())
       .then(() => this.props.pushAccountRegistrationData({...this.state}))
-      .then(
-        () =>
-          this.props.currentFlow !== AuthSelector.REGISTER_FLOW.PERSONAL_INVITATION &&
-          this.props.doSendActivationCode(this.state.email)
-      )
+      .then(() => {
+        if (!isPersonalInvitation) {
+          return this.props.doSendActivationCode(this.state.email);
+        }
+      })
       .then(() => this.props.onSubmit())
       .catch(error => {
         if (error.label) {
@@ -109,7 +109,7 @@ class AccountForm extends PureComponent {
   };
 
   render() {
-    const {isFetching, submitText, currentFlow, intl: {formatMessage: _}} = this.props;
+    const {isFetching, isPersonalFlow, submitText, intl: {formatMessage: _}} = this.props;
     const {name, email, password, termsAccepted, validInputs} = this.state;
     return (
       <Form
@@ -158,13 +158,10 @@ class AccountForm extends PureComponent {
               }
               innerRef={node => (this.inputs.email = node)}
               markInvalid={!validInputs.email}
-              disabled={this.props.disableEmail}
               value={email}
               autoComplete="section-create-team email"
               placeholder={_(
-                currentFlow === AuthSelector.REGISTER_FLOW.PERSONAL
-                  ? accountFormStrings.emailPersonalPlaceholder
-                  : accountFormStrings.emailTeamPlaceholder
+                isPersonalFlow ? accountFormStrings.emailPersonalPlaceholder : accountFormStrings.emailTeamPlaceholder
               )}
               onKeyDown={event => {
                 if (event.key === 'Enter') {
@@ -236,8 +233,9 @@ export default injectIntl(
     state => ({
       account: AuthSelector.getAccount(state),
       authError: AuthSelector.getError(state),
-      currentFlow: AuthSelector.getCurrentFlow(state),
       isFetching: AuthSelector.isFetching(state),
+      isPersonalFlow: AuthSelector.isPersonalFlow(state),
+      isPersonalInvitationFlow: AuthSelector.isPersonalInvitationFlow(state),
     }),
     {...AuthAction, ...UserAction}
   )(AccountForm)
