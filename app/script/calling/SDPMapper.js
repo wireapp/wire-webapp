@@ -53,7 +53,7 @@ z.calling.SDPMapper = {
       type: response ? z.calling.rtc.SDP_TYPE.ANSWER : z.calling.rtc.SDP_TYPE.OFFER,
     };
 
-    return Promise.resolve(new window.RTCSessionDescription(sdp));
+    return Promise.resolve(sdp);
   },
 
   /**
@@ -69,15 +69,15 @@ z.calling.SDPMapper = {
       throw new z.calling.CallError(z.calling.CallError.TYPE.NOT_FOUND, 'Cannot rewrite undefined SDP');
     }
 
-    const isSourceLocal = sdpSource === z.calling.enum.SDP_SOURCE.LOCAL;
-    if (isSourceLocal) {
-      rtcSdp.sdp = rtcSdp.sdp.replace('UDP/TLS/', '');
-    }
-
+    const {sdp, type} = rtcSdp;
     const sdpLines = [];
     const iceCandidates = [];
+    let sessionDescription;
 
-    rtcSdp.sdp.split('\r\n').forEach(sdpLine => {
+    const isSourceLocal = sdpSource === z.calling.enum.SDP_SOURCE.LOCAL;
+    sessionDescription = isSourceLocal ? sdp.replace('UDP/TLS/', '') : sdp;
+
+    sessionDescription.split('\r\n').forEach(sdpLine => {
       let outline = sdpLine;
 
       if (sdpLine.startsWith('t=')) {
@@ -139,7 +139,8 @@ z.calling.SDPMapper = {
       }
     });
 
-    rtcSdp.sdp = sdpLines.join('\r\n');
-    return Promise.resolve({iceCandidates, sdp: rtcSdp});
+    sessionDescription = sdpLines.join('\r\n');
+    const sdpInit = {sdp: sessionDescription, type};
+    return Promise.resolve({iceCandidates, sdp: sdpInit});
   },
 };
