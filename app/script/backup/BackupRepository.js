@@ -43,7 +43,6 @@ z.backup.BackupRepository = class BackupRepository {
 
     amplify.subscribe(z.event.WebApp.BACKUP.IMPORT.DATA, this.onImportHistory.bind(this));
     amplify.subscribe(z.event.WebApp.BACKUP.IMPORT.ERROR, this.onError.bind(this));
-    amplify.subscribe(z.event.WebApp.BACKUP.IMPORT.META, this.onImportMeta.bind(this));
   }
 
   createMetaDescription() {
@@ -102,10 +101,6 @@ z.backup.BackupRepository = class BackupRepository {
   onImportHistory(tableName, data) {
     const entity = JSON.parse(data);
     this.backupService.setHistory(tableName, entity);
-  }
-
-  onImportMeta(metaData) {
-    this.backupService.setMetadata(metaData);
   }
 
   onExportHistory() {
