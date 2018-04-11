@@ -1,7 +1,7 @@
 {
   "description": "Implementation of Concise Binary Object Representation (CBOR) data format (RFC7049).",
   "devDependencies": {
-    "@types/node": "9.6.2",
+    "@types/node": "9.6.4",
     "coveralls": "3.0.0",
     "cross-env": "5.1.4",
     "istanbul": "0.4.5",
