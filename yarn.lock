@@ -2565,13 +2565,9 @@ commander@2.6.0:
   version "2.6.0"
   resolved "https://registry.yarnpkg.com/commander/-/commander-2.6.0.tgz#9df7e52fb2a0cb0fb89058ee80c3104225f37e1d"
 
-commander@^2.14.1, commander@^2.9.0, commander@~2.15.0:
+commander@^2.14.1, commander@^2.15.1, commander@^2.9.0, commander@~2.15.0:
   version "2.15.1"
   resolved "https://registry.yarnpkg.com/commander/-/commander-2.15.1.tgz#df46e867d0fc2aec66a34662b406a9ccafff5b0f"
-
-commander@^2.15.0:
-  version "2.15.0"
-  resolved "https://registry.yarnpkg.com/commander/-/commander-2.15.0.tgz#ad2a23a1c3b036e392469b8012cec6b33b4c1322"
 
 commander@~2.13.0:
   version "2.13.0"
@@ -8805,12 +8801,12 @@ react-hot-loader@4.0.1:
     prop-types "^15.6.1"
     shallowequal "^1.0.2"
 
-react-intl-po@2.2.0:
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/react-intl-po/-/react-intl-po-2.2.0.tgz#8d0c5126913cfd7fd91cfd633e7075c77021f246"
+react-intl-po@2.2.1:
+  version "2.2.1"
+  resolved "https://registry.yarnpkg.com/react-intl-po/-/react-intl-po-2.2.1.tgz#f224aa9ac4e4dbc511f7199e5bfa498503bffe43"
   dependencies:
     chalk "^2.3.2"
-    commander "^2.15.0"
+    commander "^2.15.1"
     glob "^7.1.2"
     mkdirp "^0.5.1"
     po2json "^0.4.5"
