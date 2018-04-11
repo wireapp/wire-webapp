@@ -73,8 +73,4 @@ z.backup.BackupService = class BackupService {
 
     this.storageService.save(tableName, primaryKey, entity);
   }
-
-  setMetadata(metaData) {
-    // TODO
-  }
 };
