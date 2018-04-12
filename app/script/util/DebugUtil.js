@@ -51,7 +51,7 @@ z.util.DebugUtil = class DebugUtil {
         };
 
         const sessionStoreName = z.storage.StorageSchemata.OBJECT_STORE.SESSIONS;
-        return wire.app.repository.storage.storageService.update(sessionStoreName, sessionId, record);
+        return wire.app.repository.storage.storageService.updateOrCreate(sessionStoreName, sessionId, record);
       })
       .then(() => cryptobox.cachedSessions.delete(sessionId))
       .then(() => this.logger.log(`Corrupted Session ID '${sessionId}'`));
