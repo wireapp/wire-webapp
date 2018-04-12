@@ -202,9 +202,8 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   clickOnBackupImport() {
-    this.backupRepository.importBackup().then(({userId, clientId}) => {
-      amplify.publish(z.event.WebApp.BACKUP.IMPORT.START, userId, clientId);
-    });
+    const {userId, clientId} = this.backupRepository.getUserData();
+    amplify.publish(z.event.WebApp.BACKUP.IMPORT.START, userId, clientId);
   }
 
   clickOnCreate() {

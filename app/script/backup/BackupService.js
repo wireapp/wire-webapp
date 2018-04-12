@@ -40,7 +40,7 @@ z.backup.BackupService = class BackupService {
     return this.storageService.db.verno;
   }
 
-  getHistory() {
+  sendHistory() {
     const batchPromises = this.getTables().map(table => {
       const collection = table.toCollection();
 

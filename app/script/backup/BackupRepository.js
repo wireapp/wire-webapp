@@ -69,9 +69,10 @@ z.backup.BackupRepository = class BackupRepository {
     });
   }
 
-  importBackup() {
+  getUserData() {
     const clientId = this.clientRepository.currentClient().id;
     const userId = this.userRepository.self().id;
+
     return {
       clientId,
       userId,
@@ -104,7 +105,7 @@ z.backup.BackupRepository = class BackupRepository {
   }
 
   onExportHistory() {
-    this.backupService.getHistory().then(() => {
+    this.backupService.sendHistory().then(() => {
       amplify.publish(z.event.WebApp.BACKUP.EXPORT.META, this.createMetaDescription());
     });
   }
