@@ -29,10 +29,12 @@ import ValidationError from '../module/action/ValidationError';
 import React, {PureComponent} from 'react';
 import EXTERNAL_ROUTE from '../externalRoute';
 import BackendError from '../module/action/BackendError';
+import * as AccentColor from '../util/AccentColor';
 
 class AccountForm extends PureComponent {
   inputs = {};
   state = {
+    accent_id: AccentColor.random().id,
     email: this.props.account.email || '',
     name: this.props.account.name || '',
     password: this.props.account.password || '',
