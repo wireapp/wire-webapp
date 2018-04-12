@@ -79,7 +79,7 @@ class Login extends React.PureComponent {
     validationErrors: [],
   };
 
-  readAndUpdateParamsFromUrl = (nextProps = this.props) => {
+  readAndUpdateParamsFromUrl = nextProps => {
     const logoutReason = URLUtil.getURLParameter(QUERY_KEY.LOGOUT_REASON) || null;
     const logoutReasonChanged = logoutReason !== this.state.logoutReason;
 
@@ -121,7 +121,7 @@ class Login extends React.PureComponent {
     if (immediateLogin) {
       return this.immediateLogin();
     }
-    this.readAndUpdateParamsFromUrl();
+    this.readAndUpdateParamsFromUrl(this.props);
   };
 
   componentWillReceiveProps = nextProps => this.readAndUpdateParamsFromUrl(nextProps);
