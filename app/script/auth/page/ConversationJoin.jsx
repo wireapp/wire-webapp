@@ -55,9 +55,11 @@ import AppAlreadyOpen from '../component/AppAlreadyOpen';
 import WirelessUnsupportedBrowser from '../component/WirelessUnsupportedBrowser';
 import WirelessContainer from '../component/WirelessContainer';
 import * as TrackingAction from '../module/action/TrackingAction';
+import * as AccentColor from '../util/AccentColor';
 
 class ConversationJoin extends Component {
   state = {
+    accentColor: AccentColor.random(),
     conversationCode: null,
     conversationKey: null,
     enteredName: '',
@@ -128,7 +130,13 @@ class ConversationJoin extends Component {
     } else {
       Promise.resolve(this.nameInput.value)
         .then(name => name.trim())
-        .then(name => this.props.doRegisterWireless({expires_in: this.state.expiresIn, name}))
+        .then(name =>
+          this.props.doRegisterWireless({
+            accent_id: this.state.accentColor.id,
+            expires_in: this.state.expiresIn,
+            name,
+          })
+        )
         .then(() => this.props.doJoinConversationByCode(this.state.conversationKey, this.state.conversationCode))
         .then(conversationEvent => this.props.setLastEventDate(new Date(conversationEvent.time)))
         .then(() => this.trackAddParticipant())
