@@ -637,7 +637,7 @@ z.calling.CallingRepository = class CallingRepository {
       throw new z.calling.CallError(z.calling.CallError.TYPE.WRONG_PAYLOAD_FORMAT);
     }
 
-    const {conversationId, remoteUserId, type} = callMessageEntity;
+    const {conversationId, remoteUserId, response, type} = callMessageEntity;
 
     return this.getCallById(conversationId || conversationEntity.id)
       .then(callEntity => {
@@ -659,6 +659,10 @@ z.calling.CallingRepository = class CallingRepository {
         return this._limitMessageRecipients(callMessageEntity).then(({preconditionOption, recipients}) => {
           const isTypeHangup = type === z.calling.enum.CALL_MESSAGE_TYPE.HANGUP;
           if (isTypeHangup) {
+            if (response) {
+              throw error;
+            }
+
             callMessageEntity.type = z.calling.enum.CALL_MESSAGE_TYPE.CANCEL;
           }
 
@@ -687,7 +691,15 @@ z.calling.CallingRepository = class CallingRepository {
       return Promise.resolve(callEntity);
     }
 
-    return callEntity.confirmMessage(incomingCallMessageEntity).then(() => callEntity);
+    return callEntity
+      .confirmMessage(incomingCallMessageEntity)
+      .catch(error => {
+        const isNotDataChannel = error.type === z.calling.CallError.TYPE.NO_DATA_CHANNEL;
+        if (!isNotDataChannel) {
+          throw error;
+        }
+      })
+      .then(() => callEntity);
   }
 
   /**

@@ -638,6 +638,7 @@ z.main.App = class App {
       if (this.repository.user.isActivatedAccount()) {
         this.repository.storage.terminate('window.onunload');
       } else {
+        this.repository.conversation.leaveGuestRoom();
         this.repository.storage.deleteDatabase();
       }
 

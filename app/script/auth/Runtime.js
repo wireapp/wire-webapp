@@ -19,7 +19,7 @@
 
 import platform from 'platform';
 
-export const BROWSER = {
+const BROWSER = {
   CHROME: 'chrome',
   EDGE: 'microsoft edge',
   ELECTRON: 'electron',
@@ -27,6 +27,11 @@ export const BROWSER = {
   IE: 'ie',
   OPERA: 'opera',
   SAFARI: 'safari',
+};
+
+const ELECTRON_APP = {
+  FRANZ: 'franz',
+  WIRE: 'wire',
 };
 
 export const OS = {
@@ -49,47 +54,71 @@ export const SUPPORTED_BROWSERS = {
   [BROWSER.OPERA]: {major: 43, minor: 0},
 };
 
-export default class Runtime {
-  getPlatform = () => platform;
-  getOS = () => this.getPlatform().os;
+const getPlatform = () => platform;
+const getOs = () => getPlatform().os;
+const getUserAgent = () => getPlatform().ua.toLowerCase();
 
-  getOSFamily = () => this.getOS().family.toLowerCase();
-  getBrowserName = () => this.getPlatform().name.toLowerCase();
-  getBrowserVersion = () => {
-    const [majorVersion, minorVersion] = this.getPlatform().version.split('.');
-    return {major: parseInt(majorVersion, 10), minor: parseInt(minorVersion, 10)};
-  };
+const getOsFamily = () => getOs().family.toLowerCase();
+const getBrowserName = () => getPlatform().name.toLowerCase();
+const getBrowserVersion = () => {
+  const [majorVersion, minorVersion] = getPlatform().version.split('.');
+  return {major: parseInt(majorVersion, 10), minor: parseInt(minorVersion, 10)};
+};
 
-  isSupportedBrowser = () => {
-    const isFranz = this.isElectron() && this.getPlatform().ua.includes('Franz');
-    if (isFranz) {
-      return false;
-    }
+const isSupportedBrowser = () => {
+  if (isFranz()) {
+    return false;
+  }
 
-    return Object.entries(SUPPORTED_BROWSERS).some(([browser, supportedVersion]) => {
-      const isSupportedBrowser = this.getBrowserName() === browser;
-      const currentVersion = this.getBrowserVersion();
-      const isSupportedMajorVersion = currentVersion.major >= supportedVersion.major;
-      const isHigherMajorVersion = currentVersion.major > supportedVersion.major;
-      const isSupportedMinorVersion = isHigherMajorVersion || currentVersion.minor >= supportedVersion.minor;
-      return isSupportedBrowser && isSupportedMajorVersion && isSupportedMinorVersion;
-    });
-  };
+  return Object.entries(SUPPORTED_BROWSERS).some(([browser, supportedVersion]) => {
+    const isBrowserSupported = getBrowserName() === browser;
+    const currentVersion = getBrowserVersion();
+    const isSupportedMajorVersion = currentVersion.major >= supportedVersion.major;
+    const isHigherMajorVersion = currentVersion.major > supportedVersion.major;
+    const isSupportedMinorVersion = isHigherMajorVersion || currentVersion.minor >= supportedVersion.minor;
+    return isBrowserSupported && isSupportedMajorVersion && isSupportedMinorVersion;
+  });
+};
 
-  isChrome = () => this.getBrowserName() === BROWSER.CHROME;
-  isEdge = () => this.getBrowserName() === BROWSER.EDGE;
-  isElectron = () => this.getBrowserName() === BROWSER.ELECTRON;
-  isFirefox = () => this.getBrowserName() === BROWSER.FIREFOX;
-  isInternetExplorer = () => this.getBrowserName() === BROWSER.IE;
-  isOpera = () => this.getBrowserName() === BROWSER.OPERA;
-  isSafari = () => this.getBrowserName() === BROWSER.SAFARI;
+const isChrome = () => getBrowserName() === BROWSER.CHROME;
+const isEdge = () => getBrowserName() === BROWSER.EDGE;
+const isFirefox = () => getBrowserName() === BROWSER.FIREFOX;
+const isInternetExplorer = () => getBrowserName() === BROWSER.IE;
+const isOpera = () => getBrowserName() === BROWSER.OPERA;
+const isSafari = () => getBrowserName() === BROWSER.SAFARI;
 
-  isDesktopOs = () => this.isMacOS() || this.isWindows() || this.isLinux();
-  isMacOS = () => OS.DESKTOP.MAC.includes(this.getOSFamily());
-  isWindows = () => OS.DESKTOP.WINDOWS.includes(this.getOSFamily());
-  isLinux = () => OS.DESKTOP.LINUX.includes(this.getOSFamily());
+const isDesktopOs = () => isMacOS() || isWindows() || isLinux();
+const isElectron = () => getBrowserName() === BROWSER.ELECTRON;
+const isDesktopApp = () => isElectron() && getUserAgent().includes(ELECTRON_APP.WIRE);
+const isFranz = () => isElectron() && getUserAgent().includes(ELECTRON_APP.FRANZ);
 
-  isMobileOs = () => this.isAndroid() || this.isIOS();
-  isAndroid = () => OS.MOBILE.ANDROID.includes(this.getOSFamily());
-  isIOS = () => OS.MOBILE.IOS.includes(this.getOSFamily());
-}
+const isMacOS = () => OS.DESKTOP.MAC.includes(getOsFamily());
+const isWindows = () => OS.DESKTOP.WINDOWS.includes(getOsFamily());
+const isLinux = () => OS.DESKTOP.LINUX.includes(getOsFamily());
+
+const isMobileOs = () => isAndroid() || isIOS();
+const isAndroid = () => OS.MOBILE.ANDROID.includes(getOsFamily());
+const isIOS = () => OS.MOBILE.IOS.includes(getOsFamily());
+
+export {
+  getBrowserName,
+  getOs,
+  getOsFamily,
+  isChrome,
+  isEdge,
+  isInternetExplorer,
+  isOpera,
+  isSafari,
+  isFirefox,
+  isDesktopOs,
+  isElectron,
+  isDesktopApp,
+  isFranz,
+  isMacOS,
+  isWindows,
+  isLinux,
+  isMobileOs,
+  isAndroid,
+  isIOS,
+  isSupportedBrowser,
+};

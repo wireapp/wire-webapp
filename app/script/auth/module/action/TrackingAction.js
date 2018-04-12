@@ -18,7 +18,7 @@
  */
 
 import * as TrackingActionCreator from './creator/TrackingActionCreator';
-import RuntimeUtil from '../../util/RuntimeUtil';
+import * as Runtime from '../../Runtime';
 import {REGISTER_FLOW} from '../selector/AuthSelector';
 
 export const EVENT_NAME = {
@@ -67,6 +67,26 @@ export const FLOW_TO_CONTEXT = {
   [REGISTER_FLOW.PERSONAL_INVITATION]: AUTHENTICATION_CONTEXT.PERSONAL_INVITE,
 };
 
+const PLATFORM_TYPE = {
+  BROWSER_APP: 'web',
+  DESKTOP_LINUX: 'linux',
+  DESKTOP_MACOS: 'mac',
+  DESKTOP_WINDOWS: 'windows',
+};
+
+function getPlatformType() {
+  if (Runtime.isDesktopApp()) {
+    if (Runtime.isWindows()) {
+      return PLATFORM_TYPE.DESKTOP_WINDOWS;
+    }
+    if (Runtime.isMacOS()) {
+      return PLATFORM_TYPE.DESKTOP_MACOS;
+    }
+    return PLATFORM_TYPE.DESKTOP_LINUX;
+  }
+  return PLATFORM_TYPE.BROWSER_APP;
+}
+
 export function trackEvent(event) {
   return function(dispatch, getState, {mixpanel}) {
     return Promise.resolve()
@@ -76,7 +96,7 @@ export function trackEvent(event) {
           const attributes = {
             ...event.attributes,
             app: 'desktop',
-            desktop_app: RuntimeUtil.getPlatform(),
+            desktop_app: getPlatformType(),
           };
           mixpanel.track(event.name, attributes, successCode => resolve(successCode));
         });
