@@ -39,7 +39,7 @@
     "@bower_components/webrtc-adapter": "webrtc/adapter#6.1.5",
     "@bower_components/wire-audio-files": "wireapp/wire-audio-files#1.1.1",
     "@bower_components/wire-theme": "wireapp/wire-theme#1.0.6",
-    "@wireapp/core": "2.1.49",
+    "@wireapp/core": "2.1.51",
     "@wireapp/react-ui-kit": "1.1.2",
     "babel-plugin-react-intl": "2.4.0",
     "babel-polyfill": "6.26.0",
