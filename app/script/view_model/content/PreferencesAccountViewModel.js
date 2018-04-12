@@ -50,6 +50,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.mainViewModel = mainViewModel;
     this.backupRepository = repositories.backup;
     this.clientRepository = repositories.client;
+    this.conversationRepository = repositories.conversation;
     this.teamRepository = repositories.team;
     this.userRepository = repositories.user;
 
@@ -224,7 +225,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
   clickOnLeaveGuestRoom() {
     amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
-      action: () => this.clientRepository.logoutClient(),
+      action: () => this.conversationRepository.leaveGuestRoom().then(() => this.clientRepository.logoutClient()),
       preventClose: true,
       text: {
         action: z.l10n.text(z.string.modalAccountLeaveGuestRoomAction),

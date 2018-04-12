@@ -84,7 +84,7 @@ class AccountForm extends PureComponent {
       .then(() => this.props.pushAccountRegistrationData({...this.state}))
       .then(() => {
         if (!isPersonalInvitation) {
-          this.props.doSendActivationCode(this.state.email);
+          return this.props.doSendActivationCode(this.state.email);
         }
       })
       .then(() => this.props.onSubmit())

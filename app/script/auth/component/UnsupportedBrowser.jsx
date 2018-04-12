@@ -27,7 +27,7 @@ import React from 'react';
 
 const showUnsupportedMessage = (headline, subhead) => (
   <ContainerXS verticalCenter centerText>
-    <Logo height="20" />
+    <Logo height={20} />
     <H1 center style={{marginBottom: '48px', marginTop: '24px'}}>
       <FormattedHTMLMessage {...headline} />
     </H1>

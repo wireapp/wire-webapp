@@ -1273,7 +1273,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
     for (const rtpSender of this.peerConnection.getSenders()) {
       const {track: mediaStreamTrack} = rtpSender;
 
-      const isExpectedType = mediaStreamTrack.kind === mediaType;
+      const isExpectedType = mediaStreamTrack && mediaStreamTrack.kind === mediaType;
       if (isExpectedType) {
         const supportsReplaceTrack = typeof rtpSender.replaceTrack === 'function';
         if (supportsReplaceTrack) {
@@ -1370,7 +1370,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
     for (const rtpSender of this.peerConnection.getSenders()) {
       const {track: mediaStreamTrack} = rtpSender;
 
-      const isExpectedId = mediaStreamTrack.id === trackId;
+      const isExpectedId = mediaStreamTrack && mediaStreamTrack.id === trackId;
       if (isExpectedId) {
         this.peerConnection.removeTrack(rtpSender);
         this.callLogger.debug(`Removed local '${mediaType}' MediaStreamTrack from PeerConnection`);
