@@ -206,7 +206,10 @@ z.user.UserRepository = class UserRepository {
    */
   onUserAvailability(event) {
     if (this.isTeam()) {
-      const {from: userId, data: {availability}} = event;
+      const {
+        from: userId,
+        data: {availability},
+      } = event;
       this.get_user_by_id(userId).then(userEntity => userEntity.availability(availability));
     }
   }

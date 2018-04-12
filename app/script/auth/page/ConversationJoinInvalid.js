@@ -28,7 +28,9 @@ class ConversationJoinInvalid extends React.PureComponent {
   state = {};
 
   render() {
-    const {intl: {formatMessage: _}} = this.props;
+    const {
+      intl: {formatMessage: _},
+    } = this.props;
     return (
       <WirelessUnsupportedBrowser>
         <WirelessContainer>
