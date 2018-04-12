@@ -20,15 +20,14 @@
 import {H2, H3, ContainerXS, COLOR} from '@wireapp/react-ui-kit';
 import {unsupportedJoinStrings} from '../../strings';
 import WirelessContainer from './WirelessContainer';
+import * as RuntimeSelector from '../module/selector/RuntimeSelector';
 import {connect} from 'react-redux';
 import {injectIntl, FormattedHTMLMessage} from 'react-intl';
-import Runtime from '../Runtime';
+import {isMobileOs} from '../Runtime';
 import React from 'react';
 
-const runtime = new Runtime();
-
-export const WirelessUnsupportedBrowser = ({children, intl: {formatMessage: _}}) =>
-  runtime.isSupportedBrowser() ? (
+export const WirelessUnsupportedBrowser = ({children, isSupportedBrowser, intl: {formatMessage: _}}) =>
+  isSupportedBrowser ? (
     children
   ) : (
     <WirelessContainer>
@@ -36,7 +35,7 @@ export const WirelessUnsupportedBrowser = ({children, intl: {formatMessage: _}})
         <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}} color={COLOR.GRAY}>
           <FormattedHTMLMessage {...unsupportedJoinStrings.unsupportedJoinHeadline} />
         </H2>
-        {runtime.isMobileOs() ? (
+        {isMobileOs() ? (
           <H3 style={{marginBottom: '10px'}}>
             <FormattedHTMLMessage {...unsupportedJoinStrings.unsupportedJoinMobileSubhead} />
           </H3>
@@ -49,4 +48,8 @@ export const WirelessUnsupportedBrowser = ({children, intl: {formatMessage: _}})
     </WirelessContainer>
   );
 
-export default injectIntl(connect(state => ({}))(WirelessUnsupportedBrowser));
+export default injectIntl(
+  connect(state => ({
+    isSupportedBrowser: RuntimeSelector.isSupportedBrowser(state),
+  }))(WirelessUnsupportedBrowser)
+);

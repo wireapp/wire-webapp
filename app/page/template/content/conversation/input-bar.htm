@@ -4,7 +4,7 @@
      data-bind="with: $root.inputBar,
                 css: {'conversation-input-bar-editing': $root.inputBar.isEditing()}">
 
-  <!-- ko if: hasConversation() && !conversationEntity().connection().is_outgoing_request() -->
+  <!-- ko if: conversationEntity() && !conversationEntity().connection().is_outgoing_request() -->
     <div class="controls-left">
       <!-- ko if: input().length -->
         <participant-avatar class="cursor-default" params="participant: selfUser, size: z.components.ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
@@ -45,7 +45,7 @@
                   class="controls-right-button conversation-input-bar-ephemeral"
                   data-bind="click: clickOnEphemeral, l10n_tooltip: z.string.tooltipConversationEphemeral"
                   data-uie-name="do-set-ephemeral-timer">
-              <!-- ko if: hasEphemeralTimer() && hasConversation()-->
+              <!-- ko if: hasEphemeralTimer() && conversationEntity()-->
                 <div class="ephemeral-timer-button">
                   <span class="ephemeral-timer-button-unit" data-bind="text: ephemeralTimerText().unit"></span>
                   <span class="full-screen" data-bind="text: ephemeralTimerText().value"></span>

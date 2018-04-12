@@ -103,7 +103,7 @@ class ConversationJoin extends Component {
   componentDidMount = () => {
     this.props.trackEvent({name: TrackingAction.EVENT_NAME.GUEST_ROOMS.OPENED_SIGNUP});
     this.props
-      .doInit()
+      .doInit({shouldValidateLocalClient: true})
       .catch(() => {})
       .then(() => this.readAndUpdateParamsFromUrl());
   };
@@ -114,12 +114,7 @@ class ConversationJoin extends Component {
     this.props
       .doJoinConversationByCode(this.state.conversationKey, this.state.conversationCode)
       .then(() => this.trackAddParticipant())
-      .then(() => {
-        const link = document.createElement('a');
-        link.href = pathWithParams('/');
-        document.body.appendChild(link); // workaround for Firefox
-        link.click();
-      });
+      .then(() => window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP)));
   };
 
   handleSubmit = event => {
