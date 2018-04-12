@@ -389,7 +389,8 @@ class Account extends EventEmitter {
       .then(() => this.service!.client.getLocalClient())
       .then(client => (loadedClient = client))
       .then(() => this.apiClient.client.api.getClient(loadedClient.id))
-      .then(() => this.service!.conversation.setClientID(<string>this.apiClient.context!.clientId))
+      .then(() => (this.apiClient.context!.clientId = loadedClient.id))
+      .then(() => this.service!.conversation.setClientID(loadedClient.id))
       .then(() => loadedClient);
   }
 
