@@ -92,6 +92,7 @@ def update_headers(response):
   response.headers['X-XSS-Protection'] = '1; mode=block'
   response.headers['Referrer-Policy'] = 'same-origin'
   response.headers['Expect-CT'] = 'max-age=0, report-uri="https://wire.report-uri.com/r/d/ct/reportOnly"'
+  response.headers['X-DNS-Prefetch-Control'] = 'off'
 
   csp_values = ';'.join([
     "default-src 'self'",
