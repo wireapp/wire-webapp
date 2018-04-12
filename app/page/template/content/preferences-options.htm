@@ -103,14 +103,15 @@
         <div class="preferences-detail" data-bind="l10n_text: z.string.preferencesOptionsDataDetail"></div>
       </section>
 
-      <section class="preferences-section">
-        <header class="preferences-header" data-bind="l10n_text: z.string.preferencesOptionsCallLogs"></header>
-        <div class="preferences-option">
-          <div class="preferences-link text-theme" data-bind="click: saveCallLogs, l10n_text: z.string.preferencesOptionsCallLogsGet" data-uie-name="get-call-logs"></div>
-        </div>
-        <div class="preferences-detail" data-bind="l10n_text: z.string.preferencesOptionsCallLogsDetail"></div>
-      </section>
-
+      <!-- ko if: z.calling.CallingRepository.supportsCalling && !z.util.Environment.frontend.isProduction() -->
+        <section class="preferences-section">
+          <header class="preferences-header" data-bind="l10n_text: z.string.preferencesOptionsCallLogs"></header>
+          <div class="preferences-option">
+            <div class="preferences-link text-theme" data-bind="click: saveCallLogs, l10n_text: z.string.preferencesOptionsCallLogsGet" data-uie-name="get-call-logs"></div>
+          </div>
+          <div class="preferences-detail" data-bind="l10n_text: z.string.preferencesOptionsCallLogsDetail"></div>
+        </section>
+      <!-- /ko -->
     </div>
   </div>
 </div>
