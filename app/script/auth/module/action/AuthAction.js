@@ -179,7 +179,12 @@ export function doRegisterWireless(registrationData) {
     registrationData.name = registrationData.name.trim();
 
     let createdAccount;
-    const obfuscatedRegistrationData = {locale: registrationData.locale, name: registrationData.name};
+    const obfuscatedRegistrationData = {
+      accent_id: registrationData.accent_id,
+      expires_in: registrationData.expires_in,
+      locale: registrationData.locale,
+      name: registrationData.name,
+    };
     dispatch(AuthActionCreator.startRegisterWireless(obfuscatedRegistrationData));
 
     return Promise.resolve()
