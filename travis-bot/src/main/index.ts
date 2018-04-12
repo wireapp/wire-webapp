@@ -80,7 +80,8 @@ class TravisBot {
     const client = new APIClient(new Config(engine, APIClient.BACKEND.PRODUCTION));
 
     const account = new Account(client);
-    await account.listen(this.loginData);
+    await account.login(this.loginData);
+    await account.listen();
 
     if (!conversationIds) {
       const MAXIMUM_CONVERSATIONS = 500;

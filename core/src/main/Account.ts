@@ -429,10 +429,12 @@ class Account extends EventEmitter {
     return this.apiClient.logout().then(() => this.resetContext());
   }
 
-  public listen(loginData: LoginData, notificationHandler?: Function): Promise<Account> {
+  public listen(notificationHandler?: Function): Promise<Account> {
     this.logger.info('listen');
+    if (!this.apiClient.context) {
+      throw new Error('Context is not set - Please login first');
+    }
     return Promise.resolve()
-      .then(() => (this.apiClient.context ? this.apiClient.context : this.login(loginData, true)))
       .then(() => {
         if (notificationHandler) {
           this.apiClient.transport.ws.on(WebSocketClient.TOPIC.ON_MESSAGE, (notification: IncomingNotification) =>
