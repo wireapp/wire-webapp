@@ -69,7 +69,7 @@ class ConversationJoin extends Component {
     showCookiePolicyBanner: true,
   };
 
-  readAndUpdateParamsFromUrl = (nextProps = this.props) => {
+  readAndUpdateParamsFromUrl = nextProps => {
     const conversationCode = getURLParameter(QUERY_KEY.CONVERSATION_CODE);
     const conversationKey = getURLParameter(QUERY_KEY.CONVERSATION_KEY);
     const expiresIn = parseInt(getURLParameter(QUERY_KEY.JOIN_EXPIRES), 10) || undefined;
@@ -105,7 +105,7 @@ class ConversationJoin extends Component {
     this.props
       .doInit({shouldValidateLocalClient: true})
       .catch(() => {})
-      .then(() => this.readAndUpdateParamsFromUrl());
+      .then(() => this.readAndUpdateParamsFromUrl(this.props));
   };
 
   componentWillReceiveProps = nextProps => this.readAndUpdateParamsFromUrl(nextProps);
