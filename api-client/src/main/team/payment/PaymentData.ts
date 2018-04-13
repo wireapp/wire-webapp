@@ -20,6 +20,7 @@
 import {InvoiceData, PaymentPlan} from '.';
 
 interface PaymentData {
+  bankTransfer: boolean;
   card: {
     brand: string;
     country: string;
