@@ -76,7 +76,6 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.enteredUsername = ko.observable();
     this.submittedUsername = ko.observable();
     this.usernameState = ko.observable();
-    this.exportFileDestination = ko.observable();
 
     this.nameSaved = ko.observable();
     this.usernameSaved = ko.observable();
@@ -92,9 +91,6 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   _initSubscriptions() {
     amplify.subscribe(z.event.WebApp.USER.CLIENT_ADDED, this.onClientAdd.bind(this));
     amplify.subscribe(z.event.WebApp.USER.CLIENT_REMOVED, this.onClientRemove.bind(this));
-    // when a destination is picked on the electron wrapper
-    amplify.subscribe(z.event.WebApp.BACKUP.EXPORT.DESTINATION_SELECTED, this.onBackupDestinationSelected.bind(this));
-    this.exportFileDestination.subscribe(this.onBackupDestinationChange.bind(this));
   }
 
   changeAccentColor(id) {
@@ -201,26 +197,8 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   clickOnBackupExport() {
-    // request the electron app to show the file picker dialog
-    // cannot do this on the webapp side cause it seems impossible to
-    // select directory with basic input fields https://stackoverflow.com/a/26019091
-    amplify.publish(z.event.WebApp.BACKUP.EXPORT.REQUEST);
-  }
-
-  /**
-   * Will update the model that contains the export's destination dir
-   *
-   * @param {string} destinationPath - the destination's dir path
-   *
-   * @returns {void} void
-   */
-  onBackupDestinationSelected(destinationPath) {
-    this.exportFileDestination(destinationPath);
-  }
-
-  onBackupDestinationChange(destinationPath) {
     this.backupRepository.exportBackup().then(({numberOfRecords, userName}) => {
-      amplify.publish(z.event.WebApp.BACKUP.EXPORT.INIT, numberOfRecords, userName, destinationPath);
+      amplify.publish(z.event.WebApp.BACKUP.EXPORT.INIT, numberOfRecords, userName);
     });
   }
 
