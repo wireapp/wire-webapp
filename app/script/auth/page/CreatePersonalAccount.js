@@ -78,7 +78,10 @@ class CreatePersonalAccount extends React.PureComponent {
   };
 
   render() {
-    const {isPersonalFlow, intl: {formatMessage: _}} = this.props;
+    const {
+      isPersonalFlow,
+      intl: {formatMessage: _},
+    } = this.props;
     const pageContent = (
       <ContainerXS
         centerText
