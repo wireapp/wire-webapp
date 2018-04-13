@@ -54,8 +54,13 @@ class TravisBot {
   constructor(private loginData: LoginData, private messageData: MessageData) {}
 
   get message(): string {
-    const {build: {number: buildNumber, repositoryName}} = this.messageData;
-    const {changelog, commit: {branch, author, hash, message}} = this.messageData;
+    const {
+      build: {number: buildNumber, repositoryName},
+    } = this.messageData;
+    const {
+      changelog,
+      commit: {branch, author, hash, message},
+    } = this.messageData;
 
     let msg = `**${repositoryName}: Build '${buildNumber}' finished on '${branch}' branch.**\n`;
 

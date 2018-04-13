@@ -43,8 +43,7 @@ describe('FileEngine', () => {
     fs
       .remove(TEST_DIRECTORY)
       .then(done)
-      .catch(done.fail)
-  );
+      .catch(done.fail));
 
   describe('"resolvePath"', () => {
     it('properly validate paths', done => {
