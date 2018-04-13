@@ -86,15 +86,13 @@ def latest_browser_required(f):
 ###############################################################################
 def update_headers(response):
   # Security
-  response.headers['Strict-Transport-Security'] = 'max-age=26280000'
+  response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains; preload'
   response.headers['X-Content-Type-Options'] = 'nosniff'
   response.headers['X-Frame-Options'] = 'deny'
   response.headers['X-XSS-Protection'] = '1; mode=block'
-
-  if config.PUBLIC_KEY_PINS_REPORT_ONLY:
-    response.headers['Public-Key-Pins-Report-Only'] = config.PUBLIC_KEY_PINS_REPORT_ONLY
-  if config.PUBLIC_KEY_PINS:
-    response.headers['Public-Key-Pins'] = config.PUBLIC_KEY_PINS
+  response.headers['Referrer-Policy'] = 'same-origin'
+  response.headers['Expect-CT'] = 'max-age=0, report-uri="https://wire.report-uri.com/r/d/ct/reportOnly"'
+  response.headers['X-DNS-Prefetch-Control'] = 'off'
 
   csp_values = ';'.join([
     "default-src 'self'",
@@ -112,7 +110,7 @@ def update_headers(response):
   response.headers['X-Content-Security-Policy'] = csp_values
 
   # Custom headers
-  response.headers['X-Wire'] = 'Wire - Secure messenger'
+  response.headers['Server'] = 'Wire'
   response.headers['X-Wire-Version'] = config.CURRENT_VERSION_ID
 
   if response.mimetype in config.EXPIRES_MIMETYPES:
