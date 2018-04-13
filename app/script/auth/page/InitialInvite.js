@@ -104,7 +104,12 @@ class InitialInvite extends React.PureComponent {
   };
 
   render() {
-    const {invites, isFetching, error, intl: {formatMessage: _}} = this.props;
+    const {
+      invites,
+      isFetching,
+      error,
+      intl: {formatMessage: _},
+    } = this.props;
     const {enteredEmail} = this.state;
     return (
       <Page isAuthenticated>

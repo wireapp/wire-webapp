@@ -111,7 +111,12 @@ class AccountForm extends PureComponent {
   };
 
   render() {
-    const {isFetching, isPersonalFlow, submitText, intl: {formatMessage: _}} = this.props;
+    const {
+      isFetching,
+      isPersonalFlow,
+      submitText,
+      intl: {formatMessage: _},
+    } = this.props;
     const {name, email, password, termsAccepted, validInputs} = this.state;
     return (
       <Form
