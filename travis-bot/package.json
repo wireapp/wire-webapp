@@ -4,9 +4,8 @@
   },
   "dependencies": {
     "@types/generate-changelog": "1.7.0",
-    "@wireapp/core": "2.1.55",
     "@types/node": "9.6.5",
-    "@wireapp/core": "2.1.56",
+    "@wireapp/core": "2.1.57",
     "generate-changelog": "1.7.1"
   },
   "description": "A Travis deployment notification bot.",
@@ -31,5 +30,5 @@
     "test:project": "yarn dist && yarn test"
   },
   "types": "dist/index.d.ts",
-  "version": "0.1.67"
+  "version": "0.1.68"
 }
