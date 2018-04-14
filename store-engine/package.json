@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@types/node": "9.6.4",
+    "@types/node": "9.6.5",
     "dexie": "2.0.2",
     "fs-extra": "5.0.0"
   },
