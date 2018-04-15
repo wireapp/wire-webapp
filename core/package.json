@@ -10,7 +10,7 @@
     "bazinga64": "5.0.3",
     "logdown": "3.2.3",
     "protobufjs": "6.8.6",
-    "pure-uuid": "1.5.1"
+    "pure-uuid": "1.5.2"
   },
   "devDependencies": {
     "cross-env": "5.1.4",
