@@ -79,7 +79,7 @@
     "eslint": "4.19.1",
     "eslint-config-prettier": "2.9.0",
     "eslint-plugin-babel": "5.0.0",
-    "eslint-plugin-jsdoc": "3.6.2",
+    "eslint-plugin-jsdoc": "3.6.3",
     "eslint-plugin-no-unsanitized": "3.0.0",
     "eslint-plugin-prettier": "2.6.0",
     "eslint-plugin-react": "7.7.0",
