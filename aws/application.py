@@ -156,9 +156,9 @@ def version():
   return flask.jsonify({'version': config.CURRENT_VERSION_ID})
 
 
-@application.route('/googlea55419c13969e993.html')
+@application.route('/google66aebfb52a0446aa.html')
 def google_site_verification():
-  return 'google-site-verification: googlea55419c13969e993.html'
+  return 'google-site-verification: google66aebfb52a0446aa.html'
 
 
 ###############################################################################

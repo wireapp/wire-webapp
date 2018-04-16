@@ -17,24 +17,14 @@
  *
  */
 
-import authReducer from './authReducer';
-import clientReducer from './clientReducer';
-import cookieReducer from './cookieReducer';
-import conversationReducer from './conversationReducer';
-import inviteReducer from './inviteReducer';
-import languageReducer from './languageReducer';
-import runtimeReducer from './runtimeReducer';
-import selfReducer from './selfReducer';
+const {join, resolve} = require('path');
+const {execSync} = require('child_process');
 
-const reducers = {
-  authState: authReducer,
-  clientState: clientReducer,
-  conversationState: conversationReducer,
-  cookieState: cookieReducer,
-  inviteState: inviteReducer,
-  languageState: languageReducer,
-  runtimeState: runtimeReducer,
-  selfState: selfReducer,
+const root = resolve(__dirname, '..');
+
+const uploadToCrowdin = () => {
+  const crowdinYaml = join(root, 'keys', 'crowdin.yaml');
+  execSync(`crowdin upload sources --identity="${crowdinYaml}"`, {stdio: [0, 1]});
 };
 
-export default reducers;
+uploadToCrowdin();

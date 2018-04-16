@@ -88,8 +88,6 @@ window.z.config = {
     },
   },
 
-  SUPPORTED_CONVERSATION_IMAGE_TYPES: ['.jpg-large', 'image/jpg', 'image/jpeg', 'image/png', 'image/bmp', 'image/gif'],
-
   UNSPLASH_URL: 'https://source.unsplash.com/1200x1200/?landscape',
 
   URL: {
@@ -103,7 +101,7 @@ window.z.config = {
       STAGING: 'https://wire-admin-staging.zinfra.io',
     },
     WEBAPP: {
-      INTERNAL: 'https//wire-webapp-staging.wire.com',
+      INTERNAL: 'https://wire-webapp-staging.wire.com',
       PRODUCTION: 'https://app.wire.com',
       STAGING: 'https://wire-webapp-staging.zinfra.io',
     },

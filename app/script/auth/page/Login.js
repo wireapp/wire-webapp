@@ -49,16 +49,17 @@ import * as AuthAction from '../module/action/AuthAction';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import * as ConversationAction from '../module/action/ConversationAction';
 import * as ClientAction from '../module/action/ClientAction';
+import * as SelfSelector from '../module/selector/SelfSelector';
 import ValidationError from '../module/action/ValidationError';
 import {loginStrings, logoutReasonStrings} from '../../strings';
-import RuntimeUtil from '../util/RuntimeUtil';
+import {isDesktopApp} from '../Runtime';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
 import BackendError from '../module/action/BackendError';
 import {Redirect, withRouter} from 'react-router';
 import * as URLUtil from '../util/urlUtil';
 import * as ClientSelector from '../module/selector/ClientSelector';
-import {getURLParameter} from '../util/urlUtil';
 import {resetError} from '../module/action/creator/AuthActionCreator';
+import Page from './Page';
 
 class Login extends React.PureComponent {
   inputs = {};
@@ -78,16 +79,16 @@ class Login extends React.PureComponent {
     validationErrors: [],
   };
 
-  readAndUpdateParamsFromUrl = (nextProps = this.props) => {
-    const logoutReason = getURLParameter(QUERY_KEY.LOGOUT_REASON) || null;
+  readAndUpdateParamsFromUrl = nextProps => {
+    const logoutReason = URLUtil.getURLParameter(QUERY_KEY.LOGOUT_REASON) || null;
     const logoutReasonChanged = logoutReason !== this.state.logoutReason;
 
     if (logoutReason && logoutReasonChanged) {
       this.setState((state, props) => ({...state, logoutReason}));
     }
 
-    const conversationCode = getURLParameter(QUERY_KEY.CONVERSATION_CODE) || null;
-    const conversationKey = getURLParameter(QUERY_KEY.CONVERSATION_KEY) || null;
+    const conversationCode = URLUtil.getURLParameter(QUERY_KEY.CONVERSATION_CODE) || null;
+    const conversationKey = URLUtil.getURLParameter(QUERY_KEY.CONVERSATION_KEY) || null;
 
     const keyAndCodeExistent = conversationKey && conversationCode;
     const keyChanged = conversationKey !== this.state.conversationKey;
@@ -116,20 +117,37 @@ class Login extends React.PureComponent {
 
   componentDidMount = () => {
     this.props.resetError();
-    this.readAndUpdateParamsFromUrl();
+    const immediateLogin = URLUtil.hasURLParameter(QUERY_KEY.IMMEDIATE_LOGIN);
+    if (immediateLogin) {
+      return this.immediateLogin();
+    }
+    this.readAndUpdateParamsFromUrl(this.props);
   };
 
   componentWillReceiveProps = nextProps => this.readAndUpdateParamsFromUrl(nextProps);
 
-  forgotPassword = () => {
-    z.util.safeWindowOpen(z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.ACCOUNT, z.config.URL_PATH.PASSWORD_RESET));
+  immediateLogin = () => {
+    return Promise.resolve()
+      .then(() => this.props.doInit({isImmediateLogin: true}))
+      .then(() => this.props.doInitializeClient(true, undefined))
+      .then(this.navigateChooseHandleOrWebapp)
+      .catch(() => {});
   };
+
+  navigateChooseHandleOrWebapp = () => {
+    return this.props.hasSelfHandle
+      ? window.location.replace(URLUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP))
+      : this.props.history.push(ROUTE.CHOOSE_HANDLE);
+  };
+
+  forgotPassword = () => URLUtil.openTab(EXTERNAL_ROUTE.WIRE_ACCOUNT_PASSWORD_RESET);
 
   handleSubmit = event => {
     event.preventDefault();
     if (this.props.isFetching) {
       return;
     }
+    this.inputs.email.value = this.inputs.email.value.trim();
     const validationErrors = [];
     const validInputs = this.state.validInputs;
     for (const inputKey of Object.keys(this.inputs)) {
@@ -163,16 +181,22 @@ class Login extends React.PureComponent {
           ? this.props.doLoginAndJoin(login, this.state.conversationKey, this.state.conversationCode)
           : this.props.doLogin(login);
       })
-      .then(() => window.location.replace(URLUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP)))
+      .then(this.navigateChooseHandleOrWebapp)
       .catch(error => {
         switch (error.label) {
           case BackendError.LABEL.NEW_CLIENT: {
             this.props.resetError();
+            /**
+             * Show history screen if:
+             *   1. database contains at least one event
+             *   2. there is at least one previously registered client
+             *   3. new local client is temporary
+             */
             return this.props.doGetAllClients().then(clients => {
-              const isFirstPersistentClient = this.state.persist && clients.length === 1;
-              return isFirstPersistentClient
-                ? window.location.replace(URLUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP))
-                : this.props.history.push(ROUTE.HISTORY_INFO);
+              const shouldShowHistoryInfo = this.props.hasHistory || clients.length > 1 || !this.state.persist;
+              return shouldShowHistoryInfo
+                ? this.props.history.push(ROUTE.HISTORY_INFO)
+                : this.navigateChooseHandleOrWebapp();
             });
           }
           case BackendError.LABEL.TOO_MANY_CLIENTS: {
@@ -208,127 +232,126 @@ class Login extends React.PureComponent {
   };
 
   render() {
-    const {intl: {formatMessage: _}, loginError} = this.props;
+    const {
+      intl: {formatMessage: _},
+      loginError,
+    } = this.props;
     const {logoutReason, isValidLink, email, password, persist, validInputs, validationErrors} = this.state;
     return (
-      <Container centerText verticalCenter style={{width: '100%'}}>
-        {!isValidLink && <Redirect to={ROUTE.CONVERSATION_JOIN_INVALID} />}
-        <AppAlreadyOpen />
-        <Columns>
-          <Column style={{display: 'flex'}}>
-            <div style={{margin: 'auto'}}>
-              <Link to={ROUTE.INDEX} component={RRLink} data-uie-name="go-index">
-                <ArrowIcon direction="left" color={COLOR.GRAY} />
-              </Link>
-            </div>
-          </Column>
-          <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>
-            <ContainerXS
-              centerText
-              style={{display: 'flex', flexDirection: 'column', height: 428, justifyContent: 'space-between'}}
-            >
-              <div>
-                <H1 center>{_(loginStrings.headline)}</H1>
-                <Text>{_(loginStrings.subhead)}</Text>
-                <Form style={{marginTop: 30}} data-uie-name="login">
-                  <InputBlock>
-                    <Input
-                      name="email"
-                      tabIndex="1"
-                      onChange={event =>
-                        this.setState({
-                          email: event.target.value,
-                          validInputs: {...validInputs, email: true},
-                        })
-                      }
-                      innerRef={node => (this.inputs.email = node)}
-                      markInvalid={!validInputs.email}
-                      disabled={this.props.disableEmail}
-                      value={email}
-                      autoComplete="section-login email"
-                      placeholder={_(loginStrings.emailPlaceholder)}
-                      onKeyDown={event => {
-                        if (event.key === 'Enter') {
-                          this.inputs.password.focus();
-                        }
-                      }}
-                      maxLength="128"
-                      type="text"
-                      required
-                      data-uie-name="enter-email"
-                    />
-                    <InputSubmitCombo>
+      <Page>
+        <Container centerText verticalCenter style={{width: '100%'}}>
+          {!isValidLink && <Redirect to={ROUTE.CONVERSATION_JOIN_INVALID} />}
+          <AppAlreadyOpen />
+          <Columns>
+            <Column style={{display: 'flex'}}>
+              <div style={{margin: 'auto'}}>
+                <Link to={ROUTE.INDEX} component={RRLink} data-uie-name="go-index">
+                  <ArrowIcon direction="left" color={COLOR.GRAY} />
+                </Link>
+              </div>
+            </Column>
+            <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>
+              <ContainerXS
+                centerText
+                style={{display: 'flex', flexDirection: 'column', height: 428, justifyContent: 'space-between'}}
+              >
+                <div>
+                  <H1 center>{_(loginStrings.headline)}</H1>
+                  <Text>{_(loginStrings.subhead)}</Text>
+                  <Form style={{marginTop: 30}} data-uie-name="login">
+                    <InputBlock>
                       <Input
-                        name="password"
-                        tabIndex="2"
+                        name="email"
+                        tabIndex="1"
                         onChange={event =>
                           this.setState({
-                            password: event.target.value,
-                            validInputs: {...validInputs, password: true},
+                            email: event.target.value,
+                            validInputs: {...validInputs, email: true},
                           })
                         }
-                        innerRef={node => (this.inputs.password = node)}
-                        markInvalid={!validInputs.password}
-                        value={password}
-                        autoComplete="section-login password"
-                        type="password"
-                        placeholder={_(loginStrings.passwordPlaceholder)}
-                        maxLength="1024"
-                        minLength="8"
-                        pattern=".{8,1024}"
+                        innerRef={node => (this.inputs.email = node)}
+                        markInvalid={!validInputs.email}
+                        value={email}
+                        autoComplete="section-login email"
+                        placeholder={_(loginStrings.emailPlaceholder)}
+                        maxLength="128"
+                        type="text"
                         required
-                        data-uie-name="enter-password"
+                        data-uie-name="enter-email"
                       />
-                      <RoundIconButton
-                        tabIndex="4"
-                        disabled={!email || !password}
-                        type="submit"
-                        formNoValidate
-                        onClick={this.handleSubmit}
-                        data-uie-name="do-sign-in"
-                      />
-                    </InputSubmitCombo>
-                  </InputBlock>
-                  {validationErrors.length ? (
-                    parseValidationErrors(validationErrors)
-                  ) : loginError ? (
-                    <ErrorMessage data-uie-name="error-message">{parseError(loginError)}</ErrorMessage>
-                  ) : null}
-                  {logoutReason && (
-                    <Small center style={{marginBottom: '16px'}} data-uie-name="status-logout-reason">
-                      <FormattedHTMLMessage {...logoutReasonStrings[logoutReason]} />
-                    </Small>
-                  )}
-                  {!RuntimeUtil.isDesktop() && (
-                    <Checkbox
-                      tabIndex="3"
-                      onChange={event => this.setState({persist: !event.target.checked})}
-                      checked={!persist}
-                      data-uie-name="enter-public-computer-sign-in"
-                      style={{justifyContent: 'center'}}
-                    >
-                      <CheckboxLabel>{_(loginStrings.publicComputer)}</CheckboxLabel>
-                    </Checkbox>
-                  )}
-                </Form>
-              </div>
-              <Columns>
-                <Column>
-                  <Link onClick={this.forgotPassword} data-uie-name="go-forgot-password">
-                    {_(loginStrings.forgotPassword)}
-                  </Link>
-                </Column>
-                <Column>
-                  <Link href={EXTERNAL_ROUTE.PHONE_LOGIN + window.location.search} data-uie-name="go-sign-in-phone">
-                    {_(loginStrings.phoneLogin)}
-                  </Link>
-                </Column>
-              </Columns>
-            </ContainerXS>
-          </Column>
-          <Column />
-        </Columns>
-      </Container>
+                      <InputSubmitCombo>
+                        <Input
+                          name="password"
+                          tabIndex="2"
+                          onChange={event =>
+                            this.setState({
+                              password: event.target.value,
+                              validInputs: {...validInputs, password: true},
+                            })
+                          }
+                          innerRef={node => (this.inputs.password = node)}
+                          markInvalid={!validInputs.password}
+                          value={password}
+                          autoComplete="section-login password"
+                          type="password"
+                          placeholder={_(loginStrings.passwordPlaceholder)}
+                          maxLength="1024"
+                          minLength="8"
+                          pattern=".{8,1024}"
+                          required
+                          data-uie-name="enter-password"
+                        />
+                        <RoundIconButton
+                          tabIndex="4"
+                          disabled={!email || !password}
+                          type="submit"
+                          formNoValidate
+                          onClick={this.handleSubmit}
+                          data-uie-name="do-sign-in"
+                        />
+                      </InputSubmitCombo>
+                    </InputBlock>
+                    {validationErrors.length ? (
+                      parseValidationErrors(validationErrors)
+                    ) : loginError ? (
+                      <ErrorMessage data-uie-name="error-message">{parseError(loginError)}</ErrorMessage>
+                    ) : null}
+                    {logoutReason && (
+                      <Small center style={{marginBottom: '16px'}} data-uie-name="status-logout-reason">
+                        <FormattedHTMLMessage {...logoutReasonStrings[logoutReason]} />
+                      </Small>
+                    )}
+                    {!isDesktopApp() && (
+                      <Checkbox
+                        tabIndex="3"
+                        onChange={event => this.setState({persist: !event.target.checked})}
+                        checked={!persist}
+                        data-uie-name="enter-public-computer-sign-in"
+                        style={{justifyContent: 'center'}}
+                      >
+                        <CheckboxLabel>{_(loginStrings.publicComputer)}</CheckboxLabel>
+                      </Checkbox>
+                    )}
+                  </Form>
+                </div>
+                <Columns>
+                  <Column>
+                    <Link onClick={this.forgotPassword} data-uie-name="go-forgot-password">
+                      {_(loginStrings.forgotPassword)}
+                    </Link>
+                  </Column>
+                  <Column>
+                    <Link href={EXTERNAL_ROUTE.PHONE_LOGIN + window.location.search} data-uie-name="go-sign-in-phone">
+                      {_(loginStrings.phoneLogin)}
+                    </Link>
+                  </Column>
+                </Columns>
+              </ContainerXS>
+            </Column>
+            <Column />
+          </Columns>
+        </Container>
+      </Page>
     );
   }
 }
@@ -338,6 +361,8 @@ export default withRouter(
     connect(
       state => ({
         clients: ClientSelector.getClients(state),
+        hasHistory: ClientSelector.hasHistory(state),
+        hasSelfHandle: SelfSelector.hasSelfHandle(state),
         isFetching: AuthSelector.isFetching(state),
         loginError: AuthSelector.getError(state),
       }),

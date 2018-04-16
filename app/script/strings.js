@@ -214,14 +214,31 @@ export const appAlreadyOpenStrings = defineMessages({
 });
 
 export const unsupportedStrings = defineMessages({
-  headline: {
-    id: 'unsupported.unsupportedHeadline',
+  headlineBrowser: {
+    id: 'unsupported.headlineBrowser',
     defaultMessage: 'This browser is not supported.',
   },
-  subhead: {
-    id: 'unsupported.unsupportedSubhead',
+  subheadBrowser: {
+    id: 'unsupported.subheadBrowser',
     defaultMessage:
       'Download the latest version of <b style="font-weight: 600">Google Chrome, Mozilla Firefox, Opera</b style="font-weight: 600"> or <b style="font-weight: 600">Microsoft Edge.</b>',
+  },
+  headlineCookies: {
+    id: 'unsupported.headlineCookies',
+    defaultMessage: 'Enable cookies',
+  },
+  subheadCookies: {
+    id: 'unsupported.subheadCookies',
+    defaultMessage: 'Enable cookies to log in to Wire.',
+  },
+  headlineIndexedDb: {
+    id: 'unsupported.headlineIndexedDb',
+    defaultMessage: 'You are in private mode',
+  },
+  subheadIndexedDb: {
+    id: 'unsupported.subheadIndexedDb',
+    defaultMessage:
+      'Wire needs access to local storage to display your messages. Local storage is not available in private mode.',
   },
 });
 

@@ -22,10 +22,9 @@ const {execSync} = require('child_process');
 
 const root = resolve(__dirname, '..');
 
-const runCrowdin = () => {
-  const crowdin_yaml = join(root, 'keys', 'crowdin.yaml');
-  execSync(`crowdin upload sources --identity="${crowdin_yaml}"`, {stdio: [0, 1]});
-  execSync(`crowdin download --identity="${crowdin_yaml}"`, {stdio: [0, 1]});
+const downloadFromCrowdin = () => {
+  const crowdinYaml = join(root, 'keys', 'crowdin.yaml');
+  execSync(`crowdin download --identity="${crowdinYaml}"`, {stdio: [0, 1]});
 };
 
-runCrowdin();
+downloadFromCrowdin();

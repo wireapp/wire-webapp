@@ -48,8 +48,9 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
     this.serviceParticipants = ko.observableArray();
     this.userParticipants = ko.observableArray();
 
-    this.hasConversation = ko.pureComputed(() => !!this.conversationEntity());
-    this.isVisible = ko.pureComputed(() => this.hasConversation() && this.panelViewModel.conversationDetailsVisible());
+    this.isVisible = ko.pureComputed(() => {
+      return this.conversationEntity() && this.panelViewModel.conversationDetailsVisible();
+    });
 
     this.availabilityLabel = ko.pureComputed(() => {
       if (this.isVisible() && this.isTeam() && this.conversationEntity().is_one2one()) {
@@ -63,7 +64,7 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
     });
 
     ko.computed(() => {
-      if (this.hasConversation()) {
+      if (this.conversationEntity()) {
         this.serviceParticipants.removeAll();
         this.userParticipants.removeAll();
 
@@ -82,7 +83,7 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
       return this.conversationEntity() && this.conversationEntity().firstUserEntity();
     });
     this.isSingleUserMode = ko.pureComputed(() => {
-      if (this.hasConversation()) {
+      if (this.conversationEntity()) {
         return this.conversationEntity().is_one2one() || this.conversationEntity().is_request();
       }
     });
@@ -97,13 +98,13 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
     });
 
     this.isNameEditable = ko.pureComputed(() => {
-      if (this.hasConversation()) {
+      if (this.conversationEntity()) {
         return this.conversationEntity().is_group() && this.conversationEntity().isActiveParticipant();
       }
     });
 
     this.isVerified = ko.pureComputed(() => {
-      if (this.hasConversation()) {
+      if (this.conversationEntity()) {
         return this.conversationEntity().verification_state() === z.conversation.ConversationVerificationState.VERIFIED;
       }
     });

@@ -206,7 +206,10 @@ z.user.UserRepository = class UserRepository {
    */
   onUserAvailability(event) {
     if (this.isTeam()) {
-      const {from: userId, data: {availability}} = event;
+      const {
+        from: userId,
+        data: {availability},
+      } = event;
       this.get_user_by_id(userId).then(userEntity => userEntity.availability(availability));
     }
   }
@@ -390,7 +393,7 @@ z.user.UserRepository = class UserRepository {
             this._assign_connection(user_et);
           }
           if (assign_clients) {
-            return this._assign_all_clients();
+            return this._assignAllClients();
           }
         });
       })
@@ -404,23 +407,22 @@ z.user.UserRepository = class UserRepository {
    * @private
    * @returns {Promise} Promise that resolves with all user entities where client entities have been assigned to.
    */
-  _assign_all_clients() {
+  _assignAllClients() {
     return this.client_repository.getAllClientsFromDb().then(recipients => {
-      this.logger.info(`Found locally stored clients for '${Object.keys(recipients).length}' users`, recipients);
-      const user_ids = Object.keys(recipients);
+      const userIds = Object.keys(recipients);
+      this.logger.info(`Found locally stored clients for '${userIds.length}' users`, recipients);
 
-      return this.get_users_by_id(user_ids).then(user_ets => {
-        for (const user_et of user_ets) {
-          if (recipients[user_et.id].length > 8) {
-            this.logger.warn(
-              `Found '${recipients[user_et.id].length}' clients for '${user_et.name()}'`,
-              recipients[user_et.id]
-            );
+      return this.get_users_by_id(userIds).then(userEntities => {
+        userEntities.forEach(userEntity => {
+          const clientEntities = recipients[userEntity.id];
+          const tooManyClients = clientEntities > 8;
+          if (tooManyClients) {
+            this.logger.warn(`Found '${clientEntities.length}' clients for '${userEntity.name()}'`, clientEntities);
           }
-          user_et.devices(recipients[user_et.id]);
-        }
+          userEntity.devices(clientEntities);
+        });
 
-        return user_ets;
+        return userEntities;
       });
     });
   }
@@ -479,35 +481,35 @@ z.user.UserRepository = class UserRepository {
 
   /**
    * Send the user connection notification.
-   * @param {z.entity.Connection} connection_et - Connection entity
+   * @param {z.entity.Connection} connectionEntity - Connection entity
    * @param {z.event.EventRepository.SOURCE} source - Source of event
-   * @param {z.user.ConnectionStatus} previous_status - Previous connection status
+   * @param {z.user.ConnectionStatus} previousStatus - Previous connection status
    * @returns {undefined} No return value
    */
-  _send_user_connection_notification(connection_et, source, previous_status) {
+  _send_user_connection_notification(connectionEntity, source, previousStatus) {
     // We accepted the connection request or unblocked the user
-    const self_user_accepted =
-      connection_et.is_connected() &&
-      [z.user.ConnectionStatus.BLOCKED, z.user.ConnectionStatus.PENDING].includes(previous_status);
-    const is_web_socket_event = source === z.event.EventRepository.SOURCE.WEB_SOCKET;
+    const expectedPreviousStatus = [z.user.ConnectionStatus.BLOCKED, z.user.ConnectionStatus.PENDING];
+    const wasExpectedPreviousStatus = expectedPreviousStatus.includes(previousStatus);
+    const selfUserAccepted = connectionEntity.is_connected() && wasExpectedPreviousStatus;
+    const isWebSocketEvent = source === z.event.EventRepository.SOURCE.WEB_SOCKET;
 
-    if (is_web_socket_event && !self_user_accepted) {
-      this.get_user_by_id(connection_et.to).then(user_et => {
-        const message_et = new z.entity.MemberMessage();
-        message_et.user(user_et);
+    const showNotification = isWebSocketEvent && !selfUserAccepted;
+    if (showNotification) {
+      this.get_user_by_id(connectionEntity.to).then(userEntity => {
+        const messageEntity = new z.entity.MemberMessage();
+        messageEntity.user(userEntity);
 
-        switch (connection_et.status()) {
+        switch (connectionEntity.status()) {
           case z.user.ConnectionStatus.PENDING: {
-            message_et.memberMessageType = z.message.SystemMessageType.CONNECTION_REQUEST;
+            messageEntity.memberMessageType = z.message.SystemMessageType.CONNECTION_REQUEST;
             break;
           }
 
           case z.user.ConnectionStatus.ACCEPTED: {
-            if (previous_status === z.user.ConnectionStatus.SENT) {
-              message_et.memberMessageType = z.message.SystemMessageType.CONNECTION_ACCEPTED;
-            } else {
-              message_et.memberMessageType = z.message.SystemMessageType.CONNECTION_CONNECTED;
-            }
+            const statusWasSent = previousStatus === z.user.ConnectionStatus.SENT;
+            messageEntity.memberMessageType = statusWasSent
+              ? z.message.SystemMessageType.CONNECTION_ACCEPTED
+              : z.message.SystemMessageType.CONNECTION_CONNECTED;
             break;
           }
 
@@ -515,7 +517,7 @@ z.user.UserRepository = class UserRepository {
             break;
         }
 
-        amplify.publish(z.event.WebApp.NOTIFICATION.NOTIFY, message_et, connection_et);
+        amplify.publish(z.event.WebApp.NOTIFICATION.NOTIFY, messageEntity, connectionEntity);
       });
     }
   }
@@ -1031,17 +1033,17 @@ z.user.UserRepository = class UserRepository {
   change_picture(picture) {
     return this.asset_service
       .uploadProfileImage(picture)
-      .then(([small_key, medium_key]) => {
+      .then(({previewImageKey, mediumImageKey}) => {
         const assets = [
-          {key: small_key, size: 'preview', type: 'image'},
-          {key: medium_key, size: 'complete', type: 'image'},
+          {key: previewImageKey, size: 'preview', type: 'image'},
+          {key: mediumImageKey, size: 'complete', type: 'image'},
         ];
         return this.user_service
           .update_own_user_profile({assets})
           .then(() => this.user_update({user: {assets: assets, id: this.self().id}}));
       })
       .catch(error => {
-        throw new Error(`Error during profile image upload: ${error.message || error}`);
+        throw new Error(`Error during profile image upload: ${error.message || error.code || error}`);
       });
   }
 

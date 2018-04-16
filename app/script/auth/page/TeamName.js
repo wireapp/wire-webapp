@@ -85,7 +85,9 @@ class TeamName extends Component {
   };
 
   render() {
-    const {intl: {formatMessage: _}} = this.props;
+    const {
+      intl: {formatMessage: _},
+    } = this.props;
     const {enteredTeamName, isValidTeamName, error} = this.state;
     return (
       <Page>

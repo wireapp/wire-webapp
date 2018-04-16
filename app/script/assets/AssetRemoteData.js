@@ -99,7 +99,8 @@ z.assets.AssetRemoteData = class AssetRemoteData {
       ? Promise.resolve(objectUrl)
       : this.load().then(blob => {
           if (blob) {
-            z.assets.AssetURLCache.setUrl(this.identifier, window.URL.createObjectURL(blob));
+            const url = window.URL.createObjectURL(blob);
+            return z.assets.AssetURLCache.setUrl(this.identifier, url);
           }
         });
   }

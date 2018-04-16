@@ -90,9 +90,7 @@ z.util.loadImage = function(blob) {
 z.util.loadDataUrl = file => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.onload = function() {
-      resolve(this.result);
-    };
+    reader.onload = () => resolve(reader.result);
     reader.onerror = reject;
     reader.readAsDataURL(file);
   });
@@ -101,9 +99,7 @@ z.util.loadDataUrl = file => {
 z.util.loadFileBuffer = file => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.onload = function() {
-      resolve(this.result);
-    };
+    reader.onload = () => resolve(reader.result);
     reader.onerror = reject;
     reader.readAsArrayBuffer(file);
   });

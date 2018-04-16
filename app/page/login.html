@@ -207,17 +207,17 @@
           </div>
 
           <div id="section-history" class="section">
-            <!-- ko if: device_reused -->
+            <!-- ko if: deviceReused -->
               <div class="auth-headline" data-bind="l10n_text: z.string.authHistoryReuseHeadline"></div>
               <div class="auth-headline-sub" data-bind="l10n_text: z.string.authHistoryReuseDescription"></div>
             <!-- /ko -->
-            <!-- ko ifnot: device_reused -->
+            <!-- ko ifnot: deviceReused -->
               <div class="auth-headline" data-bind="l10n_text: z.string.authHistoryHeadline"></div>
               <div class="auth-headline-sub" data-bind="l10n_text: z.string.authHistoryDescription"></div>
             <!-- /ko -->
             <div class="footer">
               <div class="button-group">
-                <!-- ko ifnot: device_reused -->
+                <!-- ko ifnot: deviceReused -->
                   <a class="button button-outline" rel="nofollow noopener noreferrer" target="_blank"
                      data-bind="l10n_href: {support: z.config.SUPPORT.ID.HISTORY}, l10n_text: z.string.warningLearnMore"
                      data-uie-name="do-history-learn-more"></a>

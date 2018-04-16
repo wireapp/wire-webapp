@@ -57,29 +57,24 @@ z.entity.Conversation = class Conversation {
     this.availabilityOfUser = ko.pureComputed(() => this.firstUserEntity() && this.firstUserEntity().availability());
 
     this.isGuest = ko.observable(false);
-    this.is_managed = false;
+    this.isManaged = false;
 
     this.inTeam = ko.pureComputed(() => this.team_id && !this.isGuest());
     this.isGuestRoom = ko.pureComputed(() => this.accessState() === z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM);
     this.isTeamOnly = ko.pureComputed(() => this.accessState() === z.conversation.ACCESS_STATE.TEAM.TEAM_ONLY);
 
+    this.isTeam1to1 = ko.pureComputed(() => {
+      const isGroupConversation = this.type() === z.conversation.ConversationType.REGULAR;
+      const hasOneParticipant = this.participating_user_ids().length === 1;
+      return isGroupConversation && hasOneParticipant && this.team_id && !this.name();
+    });
     this.is_group = ko.pureComputed(() => {
-      const group_type = this.type() === z.conversation.ConversationType.REGULAR;
-      const group_conversation = group_type;
-
-      const has_one_participant = this.participating_user_ids().length === 1;
-      const team_one2one_conversation = group_type && has_one_participant && this.team_id && !this.name();
-
-      return group_conversation && !team_one2one_conversation;
+      const isGroupConversation = this.type() === z.conversation.ConversationType.REGULAR;
+      return isGroupConversation && !this.isTeam1to1();
     });
     this.is_one2one = ko.pureComputed(() => {
-      const one2one_conversation = this.type() === z.conversation.ConversationType.ONE2ONE;
-
-      const group_type = this.type() === z.conversation.ConversationType.REGULAR;
-      const has_one_participant = this.participating_user_ids().length === 1;
-      const team_one2one_conversation = group_type && has_one_participant && this.team_id && !this.name();
-
-      return one2one_conversation || team_one2one_conversation;
+      const is1to1Conversation = this.type() === z.conversation.ConversationType.ONE2ONE;
+      return is1to1Conversation || this.isTeam1to1();
     });
     this.is_request = ko.pureComputed(() => this.type() === z.conversation.ConversationType.CONNECT);
     this.is_self = ko.pureComputed(() => this.type() === z.conversation.ConversationType.SELF);
@@ -643,7 +638,7 @@ z.entity.Conversation = class Conversation {
       ephemeral_timer: this.ephemeral_timer(),
       id: this.id,
       is_guest: this.isGuest(),
-      is_managed: this.is_managed,
+      is_managed: this.isManaged,
       last_event_timestamp: this.last_event_timestamp(),
       last_read_timestamp: this.last_read_timestamp(),
       last_server_timestamp: this.last_server_timestamp(),

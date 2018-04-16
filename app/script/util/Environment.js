@@ -26,8 +26,7 @@ z.util.Environment = (() => {
   const APP_ENV = {
     INTERNAL: 'wire-webapp-staging.wire.com',
     LOCALHOST: 'localhost',
-    PROD_NEXT: 'wire-webapp-prod-next.wire.com',
-    PRODUCTION: 'app.wire.com',
+    PRODUCTION: 'wire.com',
     VIRTUAL_HOST: 'wire.ms', // The domain "wire.ms" is our virtual host for testing contact uploads
   };
 
@@ -76,6 +75,13 @@ z.util.Environment = (() => {
 
   const _isMac = () => window.platform.ua.includes(PLATFORM_NAME.MACINTOSH);
   const _isWindows = () => window.platform.os.family.includes(PLATFORM_NAME.WINDOWS);
+
+  const isInternal = () => window.location.hostname === APP_ENV.INTERNAL;
+  const isLocalhost = () => [APP_ENV.LOCALHOST, APP_ENV.VIRTUAL_HOST].includes(window.location.hostname);
+  const isProduction = () => {
+    const isProductionHost = window.location.hostname.endsWith(APP_ENV.PRODUCTION);
+    return isProductionHost && !isInternal();
+  };
 
   const _supportsAudioOutputSelection = () => _isChrome();
   const _supportsCalling = () => {
@@ -131,9 +137,9 @@ z.util.Environment = (() => {
     electron: _isElectron(),
     electronVersion: _getElectronVersion,
     frontend: {
-      isInternal: () => window.location.hostname === APP_ENV.INTERNAL,
-      isLocalhost: () => [APP_ENV.LOCALHOST, APP_ENV.VIRTUAL_HOST].includes(window.location.hostname),
-      isProduction: () => [APP_ENV.PRODUCTION, APP_ENV.PROD_NEXT].includes(window.location.hostname),
+      isInternal,
+      isLocalhost,
+      isProduction,
     },
     os: {
       linux: !_isMac() && !_isWindows(),
