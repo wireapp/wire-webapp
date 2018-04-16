@@ -23,6 +23,7 @@ import datetime
 import config
 
 CSP = {
+  'default-src': "'self'",
   'connect-src': [
     "'self'",
     'blob:',
@@ -38,12 +39,11 @@ CSP = {
     'https://*.wire.com',
     'wss://prod-nginz-ssl.wire.com',
     'https://*.zinfra.io',
-    'wss://*.zinfra.io",',
+    'wss://*.zinfra.io',
   ],
-  'default-src': "'self'",
   'font-src': [
     "'self'",
-    'data:'
+    'data:',
   ],
   'frame-src': [
     'https://accounts.google.com',
@@ -86,11 +86,10 @@ CSP = {
   ],
   'style-src': [
     "'self'",
-    "'unsafe-inline'"
+    "'unsafe-inline'",
     'https://*.wire.com',
-    'https://*.googleusercontent.com"',
-  ],
-  'worker-src': 'blob:',
+    'https://*.googleusercontent.com',
+  ]
 }
 
 CSP_VALUES = '; '.join('{} {}'.format(key, ' '.join(value) if type(value) == list else value) for key, value in CSP.items())
