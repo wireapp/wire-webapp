@@ -25,8 +25,6 @@ PRODUCTION = ENV != 'localhost'
 DEBUG = DEVELOPMENT = not PRODUCTION
 
 SECRET_KEY = os.environ.get('SECRET_KEY', '3.14159265358979323846264338327950')
-PUBLIC_KEY_PINS_REPORT_ONLY = os.environ.get('PUBLIC_KEY_PINS_REPORT_ONLY', '')
-PUBLIC_KEY_PINS = os.environ.get('PUBLIC_KEY_PINS', '')
 
 SUPPORTED = {
   'chrome': 56,
@@ -44,24 +42,24 @@ except:
 CURRENT_VERSION_DATE = CURRENT_VERSION_ID[:10]
 
 COMPRESS_MIMETYPES = [
-    'application/json',
-    'text/xml',
-    'application/javascript',
-    'image/svg+xml',
-    'text/css',
-    'text/html',
-    'text/javascript',
-  ]
+  'application/json',
+  'text/xml',
+  'application/javascript',
+  'image/svg+xml',
+  'text/css',
+  'text/html',
+  'text/javascript',
+]
 
 COMPRESS_MIN_SIZE = 500
 COMPRESS_LEVEL = 6
 
 EXPIRES_MIMETYPES = [
-    'application/javascript',
-    'text/css',
-    'text/javascript',
-  ]
+  'application/javascript',
+  'text/css',
+  'text/javascript',
+]
 
 NOCACHE_MIMETYPES = [
-    'text/html',
-  ]
+  'text/html',
+]
