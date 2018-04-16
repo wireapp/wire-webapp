@@ -38,9 +38,6 @@ z.backup.BackupRepository = class BackupRepository {
   }
 
   _initSubscriptions() {
-    amplify.subscribe(z.event.WebApp.BACKUP.EXPORT.DONE, this.onExportDone.bind(this));
-    amplify.subscribe(z.event.WebApp.BACKUP.EXPORT.START, this.onExportHistory.bind(this));
-
     amplify.subscribe(z.event.WebApp.BACKUP.IMPORT.DATA, this.onImportHistory.bind(this));
     amplify.subscribe(z.event.WebApp.BACKUP.IMPORT.ERROR, this.onError.bind(this));
   }
@@ -79,10 +76,6 @@ z.backup.BackupRepository = class BackupRepository {
     };
   }
 
-  onExportDone() {
-    // TODO
-  }
-
   onError(error) {
     const isBackupImportError = error.constructor.name === 'BackupImportError';
 
@@ -104,9 +97,11 @@ z.backup.BackupRepository = class BackupRepository {
     this.backupService.setHistory(tableName, entity);
   }
 
-  onExportHistory() {
-    this.backupService.sendHistory().then(() => {
-      amplify.publish(z.event.WebApp.BACKUP.EXPORT.META, this.createMetaDescription());
-    });
+  getTables() {
+    return this.backupService.getTables();
+  }
+
+  exportHistory(table, onProgress) {
+    return this.backupService.getHistory(table, onProgress);
   }
 };

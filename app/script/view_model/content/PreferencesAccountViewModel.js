@@ -197,9 +197,34 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   clickOnBackupExport() {
-    this.backupRepository.exportBackup().then(({numberOfRecords, userName}) => {
-      amplify.publish(z.event.WebApp.BACKUP.EXPORT.INIT, numberOfRecords, userName);
-    });
+    const encoder = new TextEncoder();
+
+    const tables = this.backupRepository.getTables();
+    const writeTableQueue = new z.util.PromiseQueue({name: 'ExportHistory'});
+
+    /* We need to put the execution in a queue because
+     * you need to be sure the previous file is closed before
+     * writting the next one : (see https://github.com/jimmywarting/StreamSaver.js/issues/64)
+     */
+    const writePromises = tables.map(table => writeTableQueue.push(() => writeTable.call(this, table)));
+
+    return Promise.all(writePromises); // TODO update the UI, handle errors and success
+    /**
+     * Will write a single table to the file system.
+     *
+     * @param {BackupTable} table - the table to export
+     * @returns {void} void
+     */
+    function writeTable(table) {
+      const writer = streamSaver.createWriteStream(`${table.name}.txt`).getWriter();
+      return this.backupRepository
+        .exportHistory(table, (tableName, rows) => {
+          const data = rows.map(row => JSON.stringify(row)).join('\n');
+          const uint8array = encoder.encode(data);
+          writer.write(uint8array);
+        })
+        .then(() => writer.close());
+    }
   }
 
   clickOnBackupImport() {
