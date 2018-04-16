@@ -108,11 +108,6 @@ def update_headers(response):
   response.headers['X-Wire-Version'] = config.CURRENT_VERSION_ID
   response.headers['X-XSS-Protection'] = '1; mode=block'
 
-  if config.PUBLIC_KEY_PINS_REPORT_ONLY:
-    response.headers['Public-Key-Pins-Report-Only'] = config.PUBLIC_KEY_PINS_REPORT_ONLY
-  if config.PUBLIC_KEY_PINS:
-    response.headers['Public-Key-Pins'] = config.PUBLIC_KEY_PINS
-
   if response.mimetype in config.EXPIRES_MIMETYPES:
     expiry_time = datetime.datetime.utcnow() + datetime.timedelta(365)
     response.headers['Expires'] = expiry_time.strftime('%a, %d %b %Y %H:%M:%S GMT')
