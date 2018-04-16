@@ -24,6 +24,8 @@
         <!-- /ko -->
       </div>
       <div id="center-column" class="center-column">
+          #include('content/history-export.htm')
+<!-- ko if: false -->
         <!-- ko if: state() === z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS -->
           #include('content/connect-requests.htm')
         <!-- /ko -->
@@ -35,6 +37,12 @@
         <!-- /ko -->
         <!-- ko if: state() === z.viewModel.ContentViewModel.STATE.COLLECTION_DETAILS -->
           #include('content/collection-details.htm')
+        <!-- /ko -->
+        <!-- ko if: state() === z.viewModel.ContentViewModel.STATE.HISTORY_EXPORT -->
+          #include('content/history-export.htm')
+        <!-- /ko -->
+        <!-- ko if: state() === z.viewModel.ContentViewModel.STATE.HISTORY_IMPORT -->
+          #include('content/history-import.htm')
         <!-- /ko -->
         <!-- ko if: state() === z.viewModel.ContentViewModel.STATE.PREFERENCES_ABOUT -->
           #include('content/preferences-about.htm')
@@ -57,6 +65,7 @@
         <!-- ko if: state() === z.viewModel.ContentViewModel.STATE.WATERMARK -->
           #include('content/watermark.htm')
         <!-- /ko -->
+<!-- /ko-->
         #include('modal/group-creation.htm')
         <div class="center-column__overlay"></div>
       </div>

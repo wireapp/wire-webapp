@@ -29,6 +29,8 @@ z.viewModel.ContentViewModel = class ContentViewModel {
       COLLECTION_DETAILS: 'ContentViewModel.STATE.COLLECTION_DETAILS',
       CONNECTION_REQUESTS: 'ContentViewModel.STATE.CONNECTION_REQUESTS',
       CONVERSATION: 'ContentViewModel.STATE.CONVERSATION',
+      HISTORY_EXPORT: 'ContentViewModel.STATE.HISTORY_EXPORT',
+      HISTORY_IMPORT: 'ContentViewModel.STATE.HISTORY_IMPORT',
       PREFERENCES_ABOUT: 'ContentViewModel.STATE.PREFERENCES_ABOUT',
       PREFERENCES_ACCOUNT: 'ContentViewModel.STATE.PREFERENCES_ACCOUNT',
       PREFERENCES_AV: 'ContentViewModel.STATE.PREFERENCES_AV',
@@ -51,7 +53,7 @@ z.viewModel.ContentViewModel = class ContentViewModel {
     this.logger = new z.util.Logger('z.viewModel.ContentViewModel', z.config.LOGGER.OPTIONS);
 
     // State
-    this.state = ko.observable(ContentViewModel.STATE.WATERMARK);
+    this.state = ko.observable(ContentViewModel.STATE.HISTORY_EXPORT);
     this.multitasking = {
       autoMinimize: ko.observable(true),
       isMinimized: ko.observable(false),
@@ -79,6 +81,9 @@ z.viewModel.ContentViewModel = class ContentViewModel {
     );
     this.preferencesDevices = new z.viewModel.content.PreferencesDevicesViewModel(mainViewModel, this, repositories);
     this.preferencesOptions = new z.viewModel.content.PreferencesOptionsViewModel(mainViewModel, this, repositories);
+
+    this.historyExport = new z.viewModel.content.HistoryExportViewModel();
+    this.historyImport = new z.viewModel.content.HistoryImportViewModel();
 
     this.previousState = undefined;
     this.previousConversation = undefined;

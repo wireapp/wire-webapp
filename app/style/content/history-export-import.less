@@ -1,0 +1,51 @@
+#history-export,
+#history-import {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  align-items: center;
+
+  loading-bar {
+    margin: auto;
+    &.with-cancel {
+      padding-top: 72px;
+    }
+  }
+
+  .cancel-button {
+    margin-bottom: 56px;
+    color: @w-blue;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: @font-weight-regular;
+    line-height: 16px;
+  }
+
+  .history-message {
+    margin: auto;
+    text-align: center;
+
+    &__headline {
+      font-size: 14px;
+      font-weight: @font-weight-bold;
+      line-height: 24px;
+    }
+
+    &__info {
+      margin-top: 8px;
+      font-size: 14px;
+      font-weight: @font-weight-regular;
+      line-height: 24px;
+    }
+
+    &__buttons {
+      display: flex;
+      justify-content: center;
+      margin-top: 32px;
+
+      button + button {
+        margin-left: 16px;
+      }
+    }
+  }
+}
