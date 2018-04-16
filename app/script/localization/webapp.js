@@ -605,6 +605,31 @@ z.string.preferencesOptionsCallLogs = 'Troubleshooting';
 z.string.preferencesOptionsCallLogsGet = 'Save the calling debug report';
 z.string.preferencesOptionsCallLogsDetail = 'This information helps Wire Support diagnose calling problems.';
 
+z.string.preferencesOptionsBackupHeader = 'History';
+z.string.preferencesOptionsBackupExportHeadline = 'Back up conversations';
+z.string.preferencesOptionsBackupExportSecondary = 'Create a backup to preserve your conversation history. You can use this to restore history if you lose your computer or switch to a new one.\nThe backup file is not protected by Wire end-to-end encryption, so store it in a safe place.';
+z.string.preferencesOptionsBackupImportHeadline = 'Restore from backup';
+z.string.preferencesOptionsBackupImportSecondary = 'You can only restore history from a backup of the same platform. Your backup will overwrite the conversations that you may have on this device.';
+
+z.string.backupErrorAction = 'Ok';
+z.string.backupErrorSecondaryAction = 'Cancel';
+z.string.backupExportGenericErrorHeadline = 'The file could not be saved';
+z.string.backupExportGenericErrorSecondary = 'You may not have enough space or permission to save it there.';
+z.string.backupExportProgressHeadline = 'Preparing…';
+z.string.backupExportProgressSecondary = 'Backing up · 7 of 10 MB — 70%';
+z.string.backupExportSuccessAction = 'Ok';
+z.string.backupExportSuccessHeadline = 'Backup completed';
+z.string.backupExportSuccessSecondary = 'You can use this to restore history if you lose your computer or switch to a new one.';
+z.string.backupImportGenericErrorHeadline = 'Something went wrong';
+z.string.backupImportGenericErrorSecondary = 'Your history could not be restored.';
+z.string.backupImportIncompatibleErrorHeadline = 'Wrong backup';
+z.string.backupImportIncompatibleErrorSecondary = 'You cannot restore history from a different account.';
+z.string.backupImportOutdatedErrorHeadline = 'Incompatible backup';
+z.string.backupImportOutdatedErrorSecondary = 'This backup was created by a newer or outdated version of Wire and cannot be restored here.';
+z.string.backupImportProgressHeadline = 'Preparing…';
+z.string.backupImportProgressSecondary = 'Restoring history · 7 of 10 MB — 70%';
+z.string.backupImportSuccessHeadline = 'History restored.';
+
 // Search
 z.string.searchConnect = 'Connect';
 z.string.searchConnections = 'Connections';

@@ -41,11 +41,8 @@ class CreatePersonalAccount extends React.PureComponent {
       const hasInvitationCode = !!params.invitationCode;
       if (hasInvitationCode) {
         return this.props
-          .getInvitationFromCode(this.invitationCode)
-          .then(() => {
-            this.props.enterPersonalInvitationCreationFlow();
-            this.invitationCode = params.invitationCode;
-          })
+          .getInvitationFromCode(params.invitationCode)
+          .then(() => this.props.enterPersonalInvitationCreationFlow())
           .catch(() => this.props.enterPersonalCreationFlow());
       }
 
@@ -56,12 +53,12 @@ class CreatePersonalAccount extends React.PureComponent {
   }
 
   createAccount = () => {
-    this.props
-      .doRegisterPersonal({...this.props.account, invitation_code: this.invitationCode})
+    const {account, trackNameWithContext, history, doRegisterPersonal, match} = this.props;
+    doRegisterPersonal({...account, invitation_code: match.params.invitationCode})
       .then(() => {
         const authenticationContext = TrackingAction.AUTHENTICATION_CONTEXT.PERSONAL_INVITE;
-        this.props.trackNameWithContext(TrackingAction.EVENT_NAME.PERSONAL.CREATED, authenticationContext);
-        this.props.trackNameWithContext(TrackingAction.EVENT_NAME.PERSONAL.VERIFIED, authenticationContext);
+        trackNameWithContext(TrackingAction.EVENT_NAME.PERSONAL.CREATED, authenticationContext);
+        trackNameWithContext(TrackingAction.EVENT_NAME.PERSONAL.VERIFIED, authenticationContext);
       })
       .then(() => history.push(ROUTE.CHOOSE_HANDLE))
       .catch(error => console.error('Failed to create personal account from invite', error));
@@ -81,7 +78,10 @@ class CreatePersonalAccount extends React.PureComponent {
   };
 
   render() {
-    const {isPersonalFlow, intl: {formatMessage: _}} = this.props;
+    const {
+      isPersonalFlow,
+      intl: {formatMessage: _},
+    } = this.props;
     const pageContent = (
       <ContainerXS
         centerText

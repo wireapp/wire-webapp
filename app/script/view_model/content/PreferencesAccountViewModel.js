@@ -48,6 +48,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.logger = new z.util.Logger('z.viewModel.content.PreferencesAccountViewModel', z.config.LOGGER.OPTIONS);
 
     this.mainViewModel = mainViewModel;
+    this.backupRepository = repositories.backup;
     this.clientRepository = repositories.client;
     this.conversationRepository = repositories.conversation;
     this.teamRepository = repositories.team;
@@ -193,6 +194,17 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
   clickOnAvailability(viewModel, event) {
     z.ui.AvailabilityContextMenu.show(event, 'settings', 'preferences-account-availability-menu');
+  }
+
+  clickOnBackupExport() {
+    this.backupRepository.exportBackup().then(({numberOfRecords, userName}) => {
+      amplify.publish(z.event.WebApp.BACKUP.EXPORT.INIT, numberOfRecords, userName);
+    });
+  }
+
+  clickOnBackupImport() {
+    const {userId, clientId} = this.backupRepository.getUserData();
+    amplify.publish(z.event.WebApp.BACKUP.IMPORT.START, userId, clientId);
   }
 
   clickOnCreate() {

@@ -131,6 +131,7 @@ module.exports = {
       '@wireapp/proteus/dist/proteus.bundle.js.map',
       '@wireapp/store-engine/dist/store-engine.bundle.js',
       '@wireapp/store-engine/dist/store-engine.bundle.js.map',
+      'dexie-batch/dexie-batch.js',
     ],
   },
 };

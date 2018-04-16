@@ -181,6 +181,14 @@ z.storage.StorageService = class StorageService {
   }
 
   /**
+   * @param {Array<string>} tableNames - Names of tables to get
+   * @returns {Array<Table>} Matching tables
+   */
+  getTables(tableNames) {
+    return tableNames.map(tableName => this.db[tableName]);
+  }
+
+  /**
    * Loads persisted data via a promise.
    * @note If a key cannot be found, it resolves and returns "undefined".
    *

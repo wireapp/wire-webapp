@@ -343,7 +343,9 @@
         }
         src = src.substring(cap[0].length);
         out += this.options.sanitize
-          ? this.options.sanitizer ? this.options.sanitizer(cap[0]) : escape(cap[0])
+          ? this.options.sanitizer
+            ? this.options.sanitizer(cap[0])
+            : escape(cap[0])
           : cap[0];
         continue;
       }

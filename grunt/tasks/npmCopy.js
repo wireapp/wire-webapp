@@ -32,6 +32,7 @@ module.exports = grunt =>
       '@wireapp/lru-cache': ['dist/lru-cache.bundle.js', 'dist/lru-cache.bundle.js.map'],
       '@wireapp/proteus': ['dist/proteus.bundle.js', 'dist/proteus.bundle.js.map'],
       '@wireapp/store-engine': ['dist/store-engine.bundle.js', 'dist/store-engine.bundle.js.map'],
+      'dexie-batch': ['dexie-batch.js'],
     };
 
     Object.keys(npmModules).forEach(module => {

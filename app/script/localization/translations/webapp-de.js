@@ -104,14 +104,14 @@ z.string.de.modalOptionSecondary = 'Abbrechen';
 
 z.string.de.modalAccountCreateAction = 'Verstanden';
 z.string.de.modalAccountCreateHeadline = 'Benutzerkonto erstellen?';
-z.string.de.modalAccountCreateMessage = 'Wenn du ein Benutzerkonto erstellst, verlierst du den Unterhaltungsverlauf dieses Gästezimmer.';
+z.string.de.modalAccountCreateMessage = 'Wenn du ein Benutzerkonto erstellst, verlierst du den Unterhaltungsverlauf dieses Gästebereichs.';
 
 z.string.de.modalAccountDeletionAction = 'Löschen';
 z.string.de.modalAccountDeletionHeadline = 'Benutzerkonto löschen';
 z.string.de.modalAccountDeletionMessage = 'In Kürze erhältst du eine Nachricht per E-Mail oder SMS. Folge dem Link darin, um dein Konto zu löschen.';
 
 z.string.de.modalAccountLeaveGuestRoomAction = 'Verlassen';
-z.string.de.modalAccountLeaveGuestRoomHeadline = 'Gästezimmer verlassen?';
+z.string.de.modalAccountLeaveGuestRoomHeadline = 'Gästebereich verlassen?';
 z.string.de.modalAccountLeaveGuestRoomMessage = 'Der Unterhaltungsverlauf wird gelöscht. Erstelle beim nächsten Mal ein Benutzerkonto, um ihn zu behalten.';
 
 z.string.de.modalAccountLogoutAction = 'Abmelden';
@@ -345,7 +345,7 @@ z.string.de.groupCreationParticipantsHeader = 'Personen hinzufügen';
 z.string.de.groupCreationParticipantsHeaderWithCounter = 'Personen hinzufügen ({{number}})';
 z.string.de.groupCreationParticipantsPlaceholder = 'Nach Namen suchen';
 
-z.string.de.guestRoomConversationName = 'Gästezimmer';
+z.string.de.guestRoomConversationName = 'Gästebereich';
 z.string.de.guestRoomToggleName = 'Gäste zulassen';
 z.string.de.guestRoomToggleInfo = 'Öffne diese Unterhaltung für Personen außerhalb deines Teams.';
 z.string.de.guestRoomToggleInfoExtended = 'Öffne diese Unterhaltung für Personen außerhalb deines Teams. Diese Einstellung kann später jederzeit geändert werden.';
@@ -507,7 +507,7 @@ z.string.de.preferencesAboutWebsite = 'Wire-Webseite';
 z.string.de.preferencesAccountAvaibilityUnset = 'Wähle einen Status';
 z.string.de.preferencesAccountCreateTeam = 'Team erstellen';
 z.string.de.preferencesAccountDelete = 'Benutzerkonto löschen';
-z.string.de.preferencesAccountLeaveGuestRoom = 'Gästezimmer verlassen';
+z.string.de.preferencesAccountLeaveGuestRoom = 'Gästebereich verlassen';
 z.string.de.preferencesAccountLeaveGuestRoomDescription = 'Du wirst nicht länger auf die Nachrichten dieser Unterhaltung zugreifen können.';
 z.string.de.preferencesAccountLogOut = 'Abmelden';
 z.string.de.preferencesAccountManageTeam = 'Team verwalten';
@@ -572,7 +572,7 @@ z.string.de.searchConnect = 'Vorschläge';
 z.string.de.searchConnections = 'Kontakte';
 z.string.de.searchContacts = 'Kontakte';
 z.string.de.searchCreateGroup = 'Gruppe erstellen';
-z.string.de.searchCreateGuestRoom = 'Gästezimmer erstellen';
+z.string.de.searchCreateGuestRoom = 'Gästebereich erstellen';
 z.string.de.searchGroups = 'Gruppen';
 z.string.de.searchPeople = 'Kontakte';
 z.string.de.searchPlaceholder = 'Name oder Benutzername suchen';
@@ -601,7 +601,7 @@ z.string.de.searchListNoMatches = 'Kein passendes Ergebnis.\nSuche nach einen\na
 
 z.string.de.temporaryGuestCta = 'Erstelle ein Benutzerkonto';
 z.string.de.temporaryGuestDescription = 'Für sichere Unternehmen mit verschlüsselter Kommunikation in Gruppen und Telefonkonferenzen.';
-z.string.de.temporaryGuestTimeRemaining = ' verbleibend in diesem Gästezimmer';
+z.string.de.temporaryGuestTimeRemaining = ' verbleibend in diesem Gästebereich';
 
 z.string.de.temporaryGuestJoinMessage = 'Diese Unterhaltung steht für dich 24 Stunden lang zur Verfügung.';
 z.string.de.temporaryGuestJoinDescription = 'Wenn du diese Seite schließt oder neu lädst, verlierst du den Zugriff.';

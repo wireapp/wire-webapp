@@ -61,7 +61,9 @@ class Index extends Component {
   };
 
   render() {
-    const {intl: {formatMessage: _}} = this.props;
+    const {
+      intl: {formatMessage: _},
+    } = this.props;
     return (
       <Page>
         <ContainerXS centerText verticalCenter>
