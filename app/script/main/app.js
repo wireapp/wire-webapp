@@ -588,7 +588,7 @@ z.main.App = class App {
   }
 
   _registerSingleInstanceCookieDeletion() {
-    $(window).on('unload', () => {
+    $(window).on('beforeunload', () => {
       const singleInstanceCookie = Cookies.getJSON(App.CONFIG.TABS_CHECK.COOKIE_NAME);
 
       const isOwnInstanceId = singleInstanceCookie && singleInstanceCookie.appInstanceId === this.instanceId;
@@ -626,9 +626,13 @@ z.main.App = class App {
    * @returns {undefined} No return value
    */
   _subscribe_to_unload_events() {
-    $(window).on('unload', () => {
-      this.logger.info("'window.onunload' was triggered, so we will disconnect from the backend.");
+    $(window).on('beforeunload', () => {
+      this.logger.info("'window.onbeforeunload' was triggered, so we will disconnect from the backend.");
       this.repository.event.disconnectWebSocket(z.event.WebSocketService.CHANGE_TRIGGER.PAGE_NAVIGATION);
+    });
+
+    $(window).on('unload', () => {
+      this.logger.info("'window.unload' was triggered, so we will tear down calls.");
       this.repository.calling.leaveCallOnUnload();
 
       if (this.repository.user.isActivatedAccount()) {
