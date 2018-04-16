@@ -56,7 +56,7 @@ class MyFlask(flask.Flask):
   def process_response(self, response):
     if flask.request.host.startswith('www.'):
       return flask.redirect(flask.request.url.replace('://www.', '://'))
-    return gzip_response(headers.update_headers)
+    return gzip_response(headers.update_headers(response))
 
 
 ###############################################################################
