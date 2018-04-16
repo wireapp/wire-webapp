@@ -197,14 +197,9 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   clickOnBackupExport() {
-    const fileStream = streamSaver.createWriteStream('filename.txt');
-    const writer = fileStream.getWriter();
-    const encoder = new TextEncoder();
-    const data = 'a'.repeat(1024);
-    const uint8array = encoder.encode(`${data}\n\n`);
-
-    writer.write(uint8array);
-    writer.close();
+    this.backupRepository.exportBackup().then(({numberOfRecords, userName}) => {
+      amplify.publish(z.event.WebApp.BACKUP.EXPORT.INIT, numberOfRecords, userName);
+    });
   }
 
   clickOnBackupImport() {

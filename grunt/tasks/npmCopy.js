@@ -33,7 +33,6 @@ module.exports = grunt =>
       '@wireapp/proteus': ['dist/proteus.bundle.js', 'dist/proteus.bundle.js.map'],
       '@wireapp/store-engine': ['dist/store-engine.bundle.js', 'dist/store-engine.bundle.js.map'],
       'dexie-batch': ['dexie-batch.js'],
-      streamsaver: ['StreamSaver.js', 'sw.js'],
     };
 
     Object.keys(npmModules).forEach(module => {
