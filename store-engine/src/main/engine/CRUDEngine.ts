@@ -2,6 +2,15 @@ interface CRUDEngine {
   storeName: string;
 
   /**
+   * Appends a string to an existing record.
+   * @param {string} tableName - Table name
+   * @param {string} primaryKey - Primary key of record which should get extended
+   * @param {Object} additions - Text to append
+   * @returns {Promise<string>} Resolves with the primary key of the extended record.
+   */
+  append(tableName: string, primaryKey: string, additions: string): Promise<string>;
+
+  /**
    * Initializes the store engine. This need to be done prior to operating with it.
    * @param {string} storeName - Name of the store
    * @param {Array} settings - Database-specific settings
@@ -65,7 +74,7 @@ interface CRUDEngine {
   /**
    * Updates a record with a set of properties.
    * @param {string} tableName - Table name
-   * @param {string} primaryKey - Primary key of record which should get updated.
+   * @param {string} primaryKey - Primary key of record which should get updated
    * @param {Object} changes - Updated properties that should be saved for the record
    * @returns {Promise<string>} Resolves with the primary key of the updated record.
    */
@@ -75,7 +84,7 @@ interface CRUDEngine {
    * Updates a record with a set of properties.
    * If the record doesn't exist, The record will be created automatically.
    * @param {string} tableName - Table name
-   * @param {string} primaryKey - Primary key of record which should get updated.
+   * @param {string} primaryKey - Primary key of record which should get updated
    * @param {Object} changes - Updated properties that should be saved for the record
    * @returns {Promise<string>} Resolves with the primary key of the updated record.
    */

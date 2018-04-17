@@ -1,7 +1,7 @@
 const fs = require('fs-extra');
 import CRUDEngine from './CRUDEngine';
-import path = require('path');
 import {PathValidationError, RecordAlreadyExistsError, RecordNotFoundError, RecordTypeError} from './error';
+import path = require('path');
 
 export default class FileEngine implements CRUDEngine {
   public storeName: string = '';
@@ -168,6 +168,23 @@ export default class FileEngine implements CRUDEngine {
           }
         });
       });
+    });
+  }
+
+  append(tableName: string, primaryKey: string, additions: string): Promise<string> {
+    return this.resolvePath(tableName, primaryKey).then(file => {
+      return this.read(tableName, primaryKey)
+        .then((record: any) => {
+          if (typeof record === 'string') {
+            record += additions;
+          } else {
+            const message: string = `Cannot append text to record "${primaryKey}" because it's not a string.`;
+            throw new RecordTypeError(message);
+          }
+          return record;
+        })
+        .then((updatedRecord: any) => fs.outputFile(file, updatedRecord))
+        .then(() => primaryKey);
     });
   }
 

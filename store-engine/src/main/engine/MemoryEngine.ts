@@ -98,6 +98,7 @@ export default class MemoryEngine implements CRUDEngine {
   }
 
   public updateOrCreate(tableName: string, primaryKey: string, changes: Object): Promise<string> {
+    this.prepareTable(tableName);
     return this.update(tableName, primaryKey, changes)
       .catch(error => {
         if (error instanceof RecordNotFoundError) {
@@ -106,5 +107,19 @@ export default class MemoryEngine implements CRUDEngine {
         throw error;
       })
       .then(() => primaryKey);
+  }
+
+  append(tableName: string, primaryKey: string, additions: string): Promise<string> {
+    this.prepareTable(tableName);
+    return this.read(tableName, primaryKey).then((record: any) => {
+      if (typeof record === 'string') {
+        record += additions;
+      } else {
+        const message: string = `Cannot append text to record "${primaryKey}" because it's not a string.`;
+        throw new RecordTypeError(message);
+      }
+      this.stores[this.storeName][tableName][primaryKey] = record;
+      return primaryKey;
+    });
   }
 }

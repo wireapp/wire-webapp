@@ -37,6 +37,12 @@ describe('StoreEngine.LocalStorageEngine', () => {
 
   afterEach(() => window.localStorage.clear());
 
+  describe('"append"', () => {
+    Object.entries(require('../../test/shared/append')).map(([description, testFunction]) => {
+      it(description, done => testFunction(done, engine));
+    });
+  });
+
   describe('"create"', () => {
     Object.entries(require('../../test/shared/create')).map(([description, testFunction]) => {
       it(description, done => testFunction(done, engine));

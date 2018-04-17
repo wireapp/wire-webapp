@@ -54,17 +54,13 @@ export default class IndexedDBEngine implements CRUDEngine {
   }
 
   public read<T>(tableName: string, primaryKey: string): Promise<T> {
-    return Promise.resolve()
-      .then(() => {
-        return this.db![tableName].get(primaryKey);
-      })
-      .then((record: T) => {
-        if (record) {
-          return record;
-        }
-        const message: string = `Record "${primaryKey}" in "${tableName}" could not be found.`;
-        throw new RecordNotFoundError(message);
-      });
+    return this.db![tableName].get(primaryKey).then((record: T) => {
+      if (record) {
+        return record;
+      }
+      const message: string = `Record "${primaryKey}" in "${tableName}" could not be found.`;
+      throw new RecordNotFoundError(message);
+    });
   }
 
   public readAll<T>(tableName: string): Promise<T[]> {
@@ -87,5 +83,17 @@ export default class IndexedDBEngine implements CRUDEngine {
 
   public updateOrCreate(tableName: string, primaryKey: string, changes: Object): Promise<string> {
     return this.db![tableName].put(changes, primaryKey);
+  }
+
+  append(tableName: string, primaryKey: string, additions: string): Promise<string> {
+    return this.db![tableName].get(primaryKey).then((record: any) => {
+      if (typeof record === 'string') {
+        record += additions;
+      } else {
+        const message: string = `Cannot append text to record "${primaryKey}" because it's not a string.`;
+        throw new RecordTypeError(message);
+      }
+      return this.updateOrCreate(tableName, primaryKey, record);
+    });
   }
 }
