@@ -27,7 +27,7 @@
     "karma": "2.0.0",
     "karma-chrome-launcher": "2.2.0",
     "karma-jasmine": "1.1.1",
-    "karma-jasmine-diff-reporter": "1.1.1",
+    "karma-jasmine-diff-reporter": "1.2.0",
     "karma-sourcemap-loader": "0.3.7",
     "logdown": "3.2.3",
     "pure-uuid": "1.5.2",
