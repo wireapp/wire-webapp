@@ -34,12 +34,6 @@ z.backup.BackupRepository = class BackupRepository {
     this.backupService = backupService;
     this.clientRepository = clientRepository;
     this.userRepository = userRepository;
-    this._initSubscriptions();
-  }
-
-  _initSubscriptions() {
-    amplify.subscribe(z.event.WebApp.BACKUP.IMPORT.DATA, this.onImportHistory.bind(this));
-    amplify.subscribe(z.event.WebApp.BACKUP.IMPORT.ERROR, this.onError.bind(this));
   }
 
   createMetaDescription() {
@@ -92,9 +86,8 @@ z.backup.BackupRepository = class BackupRepository {
     });
   }
 
-  onImportHistory(tableName, data) {
-    const entity = JSON.parse(data);
-    this.backupService.setHistory(tableName, entity);
+  importTable(tableName, entities) {
+    entities.forEach(entity => this.backupService.importEntity(tableName, entity));
   }
 
   getTables() {

@@ -90,6 +90,7 @@
           <div class="preferences-link text-theme" data-bind="click: clickOnBackupExport, l10n_text: z.string.preferencesOptionsBackupExportHeadline" data-uie-name="do-backup-export"></div>
           <div class="preferences-detail" data-bind="l10n_text: z.string.preferencesOptionsBackupExportSecondary"></div>
           <div class="preferences-link text-theme" data-bind="click: clickOnBackupImport, l10n_text: z.string.preferencesOptionsBackupImportHeadline" data-uie-name="do-backup-import"></div>
+          <input type="file" data-bind="event: { change: onImportFileChange }" />
           <div class="preferences-detail" data-bind="l10n_text: z.string.preferencesOptionsBackupImportSecondary"></div>
         </section>
 

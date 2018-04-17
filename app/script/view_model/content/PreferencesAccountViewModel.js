@@ -239,6 +239,51 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     amplify.publish(z.event.WebApp.BACKUP.IMPORT.START, userId, clientId);
   }
 
+  onImportFileChange(viewModel, event) {
+    const file = event.target.files[0];
+    const {user_id, version} = this.backupRepository.createMetaDescription();
+    if (!file) {
+      return;
+    }
+    JSZip.loadAsync(file).then(zip => {
+      const files = zip.files;
+      if (!files['meta.json']) {
+        //TODO throw a meaningful error
+        throw 'no meta';
+      }
+
+      files['meta.json']
+        .async('string')
+        .then(metaStr => JSON.parse(metaStr))
+        .then(checkMetas);
+      //TODO .catch()
+
+      const unzipPromises = Object.values(zip.files)
+        .filter(zippedFile => zippedFile.name !== 'meta.json')
+        .map(zippedFile => zippedFile.async('string').then(value => ({content: value, filename: zippedFile.name})));
+
+      Promise.all(unzipPromises).then(fileDescriptors => {
+        fileDescriptors.forEach(fileDescriptor => {
+          const tableName = fileDescriptor.filename.replace('.json', '');
+          const data = JSON.parse(fileDescriptor.content);
+          this.backupRepository.importTable(tableName, data);
+        });
+      });
+
+      function checkMetas(metadata) {
+        if (metadata.user_id !== user_id) {
+          const message = `History from user "${metadata.user_id}" cannot be restored for user "${user_id}".`;
+          throw new Error(message); // TODO DifferentAccountError
+        }
+
+        if (metadata.version !== version) {
+          const message = `History cannot be restored: database versions don't match`;
+          throw new Error(message); // TODO incompatible database error
+        }
+      }
+    });
+  }
+
   clickOnCreate() {
     const path = `${z.l10n.text(z.string.urlWebsiteCreateTeam)}?pk_campaign=client&pk_kwd=desktop`;
     z.util.safeWindowOpen(z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.WEBSITE, path));

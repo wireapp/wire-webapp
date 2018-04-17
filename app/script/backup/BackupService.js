@@ -62,8 +62,8 @@ z.backup.BackupService = class BackupService {
     return this.storageService.getTables(BackupService.CONFIG.SUPPORTED_TABLES);
   }
 
-  setHistory(tableName, entity) {
-    const isConversationTable = z.storage.StorageSchemata.OBJECT_STORE.CONVERSATIONS;
+  importEntity(tableName, entity) {
+    const isConversationTable = tableName === z.storage.StorageSchemata.OBJECT_STORE.CONVERSATIONS;
     const primaryKey = isConversationTable ? entity.id : undefined;
 
     this.storageService.save(tableName, primaryKey, entity);
