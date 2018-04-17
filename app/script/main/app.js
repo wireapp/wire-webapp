@@ -588,7 +588,7 @@ z.main.App = class App {
   }
 
   _registerSingleInstanceCookieDeletion() {
-    $(window).on('unload', () => {
+    $(window).on('beforeunload', () => {
       const singleInstanceCookie = Cookies.getJSON(App.CONFIG.TABS_CHECK.COOKIE_NAME);
 
       const isOwnInstanceId = singleInstanceCookie && singleInstanceCookie.appInstanceId === this.instanceId;
