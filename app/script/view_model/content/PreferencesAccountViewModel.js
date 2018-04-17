@@ -200,6 +200,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     const metadata = this.backupRepository.createMetaDescription();
     const tables = this.backupRepository.getTables();
     const rawData = {};
+    const username = this.selfUser().username();
 
     const loadDataPromises = tables.map(table => {
       return this.backupRepository.exportHistory(table, (tableName, rows) => {
@@ -218,10 +219,17 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
       });
 
       zip.generateAsync({type: 'base64'}).then(base64Data => {
+        const timestamp = new Date().toISOString().substring(0, 10);
         const link = document.createElement('a');
         link.href = `data:application/zip;base64,${base64Data}`;
-        link.setAttribute('download', 'filename.zip');
+        link.setAttribute('download', `Wire-${username}-Backup_${timestamp}.desktop_wbu`);
+        // firefox needs the element to be in the DOM for the download to start
+        // see https://stackoverflow.com/a/32226068
+        link.setAttribute('type', 'hidden');
+        document.body.appendChild(link);
+        // end firefox hack
         link.click();
+        link.remove();
       });
     }
   }
