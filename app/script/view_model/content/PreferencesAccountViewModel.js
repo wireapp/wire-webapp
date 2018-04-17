@@ -197,33 +197,32 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   clickOnBackupExport() {
-    const encoder = new TextEncoder();
-
+    const metadata = this.backupRepository.createMetaDescription();
     const tables = this.backupRepository.getTables();
-    const writeTableQueue = new z.util.PromiseQueue({name: 'ExportHistory'});
+    const rawData = {};
 
-    /* We need to put the execution in a queue because
-     * you need to be sure the previous file is closed before
-     * writting the next one : (see https://github.com/jimmywarting/StreamSaver.js/issues/64)
-     */
-    const writePromises = tables.map(table => writeTableQueue.push(() => writeTable.call(this, table)));
+    const loadDataPromises = tables.map(table => {
+      return this.backupRepository.exportHistory(table, (tableName, rows) => {
+        rawData[tableName] = (rawData[tableName] || []).concat(rows);
+      });
+    });
 
-    return Promise.all(writePromises); // TODO update the UI, handle errors and success
-    /**
-     * Will write a single table to the file system.
-     *
-     * @param {BackupTable} table - the table to export
-     * @returns {void} void
-     */
-    function writeTable(table) {
-      const writer = streamSaver.createWriteStream(`${table.name}.txt`).getWriter();
-      return this.backupRepository
-        .exportHistory(table, (tableName, rows) => {
-          const data = rows.map(row => JSON.stringify(row)).join('\n');
-          const uint8array = encoder.encode(data);
-          writer.write(uint8array);
-        })
-        .then(() => writer.close());
+    Promise.all(loadDataPromises).then(() => saveAsZip(metadata, rawData));
+
+    function saveAsZip(meta, tablesData) {
+      const zip = new JSZip();
+
+      zip.file('meta.json', JSON.stringify(meta));
+      Object.keys(tablesData).forEach(tableName => {
+        zip.file(`${tableName}.json`, JSON.stringify(tablesData[tableName]));
+      });
+
+      zip.generateAsync({type: 'base64'}).then(base64Data => {
+        const link = document.createElement('a');
+        link.href = `data:application/zip;base64,${base64Data}`;
+        link.setAttribute('download', 'filename.zip');
+        link.click();
+      });
     }
   }
 
