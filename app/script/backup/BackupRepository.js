@@ -72,7 +72,7 @@ z.backup.BackupRepository = class BackupRepository {
   }
 
   onError(error) {
-    const isBackupImportError = error.constructor.name === 'BackupImportError';
+    const isBackupImportError = error.constructor.name === 'ImportError';
 
     amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
       action: () => this.exportBackup(),
@@ -90,7 +90,7 @@ z.backup.BackupRepository = class BackupRepository {
   importHistory(archive) {
     const files = archive.files;
     if (!files[this.ARCHIVE_META_FILENAME]) {
-      throw new z.backup.importError.InvalidMetaDataError();
+      throw new z.backup.InvalidMetaDataError();
     }
 
     const metaCheckPromise = files[this.ARCHIVE_META_FILENAME]
@@ -115,12 +115,12 @@ z.backup.BackupRepository = class BackupRepository {
     function checkMetas(archiveMeta, currentMetadata) {
       if (archiveMeta.user_id !== currentMetadata.user_id) {
         const message = `History from user "${metadata.user_id}" cannot be restored for user "${user_id}".`;
-        throw new z.backup.importError.DifferentAccountError(message);
+        throw new z.backup.DifferentAccountError(message);
       }
 
       if (archiveMeta.version !== currentMetadata.version) {
         const message = `History cannot be restored: database versions don't match`;
-        throw new z.backup.importError.IncompatibleBackupError(message);
+        throw new z.backup.IncompatibleBackupError(message);
       }
     }
   }
@@ -156,7 +156,7 @@ z.backup.BackupRepository = class BackupRepository {
         return zip;
       })
       .catch(() => {
-        throw new z.backup.exportError.BackupExportError();
+        throw new z.backup.ExportError();
       });
   }
 };
