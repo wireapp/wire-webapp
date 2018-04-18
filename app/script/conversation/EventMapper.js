@@ -37,7 +37,7 @@ z.conversation.EventMapper = class EventMapper {
    * @param {Array} events - Event data
    * @param {Conversation} conversationEntity - Conversation entity the events belong to
    * @param {boolean} [createDummyImage] - Create a dummy image
-   * @returns {Promise} Resolves with an array of mapped message entities
+   * @returns {Promise<Array<Message>>} Resolves with the mapped message entities
    */
   mapJsonEvents(events, conversationEntity, createDummyImage) {
     return Promise.resolve().then(() => {
