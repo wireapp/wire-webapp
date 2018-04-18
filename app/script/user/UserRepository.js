@@ -132,9 +132,9 @@ z.user.UserRepository = class UserRepository {
           if (users.length) {
             this.logger.log(`Loaded state of '${users.length}' users from database`, users);
             return Promise.all(
-              users.map(user =>
-                this.get_user_by_id(user.id).then(userEntity => userEntity.availability(user.availability))
-              )
+              users.map(user => {
+                return this.get_user_by_id(user.id).then(userEntity => userEntity.availability(user.availability));
+              })
             );
           }
         })
