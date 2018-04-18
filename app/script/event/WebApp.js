@@ -49,6 +49,7 @@ z.event.WebApp = {
     IMPORT: {
       DATA: 'wire.webapp.backup.import.data',
       ERROR: 'wire.webapp.backup.import.error',
+      INIT: 'wire.webapp.backup.import.init',
       START: 'wire.webapp.backup.import.start',
     },
   },

@@ -60,7 +60,7 @@ z.backup.BackupRepository = class BackupRepository {
   }
 
   exportBackup() {
-    return this.backupService.getHistoryCount().then(numberOfRecords => {
+    return Promise.resolve(this.backupService.getHistoryCount()).then(numberOfRecords => {
       const userName = this.userRepository.self().username();
       return {
         numberOfRecords,

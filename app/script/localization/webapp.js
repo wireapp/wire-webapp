@@ -611,12 +611,12 @@ z.string.preferencesOptionsBackupExportSecondary = 'Create a backup to preserve 
 z.string.preferencesOptionsBackupImportHeadline = 'Restore from backup';
 z.string.preferencesOptionsBackupImportSecondary = 'You can only restore history from a backup of the same platform. Your backup will overwrite the conversations that you may have on this device.';
 
-z.string.backupErrorAction = 'Ok';
-z.string.backupErrorSecondaryAction = 'Cancel';
+z.string.backupErrorAction = 'Cancel';
+z.string.backupErrorSecondaryAction = 'Try Again';
 z.string.backupExportGenericErrorHeadline = 'The file could not be saved';
-z.string.backupExportGenericErrorSecondary = 'You may not have enough space or permission to save it there.';
+z.string.backupExportGenericErrorSecondary = 'The backup was not completed.';
 z.string.backupExportProgressHeadline = 'Preparing…';
-z.string.backupExportProgressSecondary = 'Backing up · 7 of 10 MB — 70%';
+z.string.backupExportProgressSecondary = 'Backing up · {{processed}} of {{total}} — {{progress}}%';
 z.string.backupExportSuccessAction = 'Ok';
 z.string.backupExportSuccessHeadline = 'Backup completed';
 z.string.backupExportSuccessSecondary = 'You can use this to restore history if you lose your computer or switch to a new one.';
@@ -627,8 +627,9 @@ z.string.backupImportIncompatibleErrorSecondary = 'You cannot restore history fr
 z.string.backupImportOutdatedErrorHeadline = 'Incompatible backup';
 z.string.backupImportOutdatedErrorSecondary = 'This backup was created by a newer or outdated version of Wire and cannot be restored here.';
 z.string.backupImportProgressHeadline = 'Preparing…';
-z.string.backupImportProgressSecondary = 'Restoring history · 7 of 10 MB — 70%';
+z.string.backupImportProgressSecondary = 'Restoring history · {{processed}} of {{total}} — {{progress}}%';
 z.string.backupImportSuccessHeadline = 'History restored.';
+z.string.backupCancel = 'Cancel';
 
 // Search
 z.string.searchConnect = 'Connect';

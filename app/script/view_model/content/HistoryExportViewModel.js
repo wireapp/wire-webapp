@@ -32,9 +32,9 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
     };
   }
 
-  constructor() {
-    this.hasError = ko.observable(true);
-    this.state = ko.observable(HistoryExportViewModel.STATE.DONE);
+  constructor(mainViewModel) {
+    this.hasError = ko.observable(false);
+    this.state = ko.observable(HistoryExportViewModel.STATE.PREPARING);
     this.isPreparing = ko.pureComputed(
       () => !this.hasError() && this.state() === HistoryExportViewModel.STATE.PREPARING
     );
@@ -42,14 +42,67 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
       () => !this.hasError() && this.state() === HistoryExportViewModel.STATE.EXPORTING
     );
     this.isDone = ko.pureComputed(() => !this.hasError() && this.state() === HistoryExportViewModel.STATE.DONE);
-    this.loadingProgress = ko.observable(20);
+
+    this.numberOfRecords = ko.observable(0);
+    this.numberOfProcessedRecords = ko.observable(0);
+    this.loadingProgress = ko.pureComputed(() => this.numberOfProcessedRecords() / this.numberOfRecords() * 100);
+
+    this.loadingMessage = ko.pureComputed(() => {
+      switch (this.state()) {
+        case HistoryExportViewModel.STATE.PREPARING: {
+          return z.l10n.text(z.string.backupExportProgressHeadline);
+        }
+        case HistoryExportViewModel.STATE.EXPORTING: {
+          const replacements = {
+            processed: this.numberOfProcessedRecords(),
+            progress: this.loadingProgress(),
+            total: this.numberOfRecords(),
+          };
+          return z.l10n.text(z.string.backupExportProgressSecondary, replacements);
+        }
+        default:
+          return '';
+      }
+    });
+
+    this.mainViewModel = mainViewModel;
+    amplify.subscribe(z.event.WebApp.BACKUP.EXPORT.DATA, this.onProgress.bind(this));
+    amplify.subscribe(z.event.WebApp.BACKUP.EXPORT.ERROR, this.onError.bind(this));
+    amplify.subscribe(z.event.WebApp.BACKUP.EXPORT.DONE, this.onSuccess.bind(this));
+    amplify.subscribe(z.event.WebApp.BACKUP.EXPORT.INIT, this.onInit.bind(this));
   }
 
-  onCancel() {}
+  onCancel() {
+    amplify.publish(z.event.WebApp.BACKUP.EXPORT.CANCEL);
+    this.dismissExport();
+  }
 
-  onProgress() {}
+  onInit(numberOfRecords) {
+    this.state(HistoryExportViewModel.STATE.PREPARING);
+    this.numberOfRecords(numberOfRecords);
+    this.numberOfProcessedRecords(0);
+    this.hasError(false);
+  }
 
-  onError() {}
+  onProgress(name, entries) {
+    this.state(HistoryExportViewModel.STATE.EXPORTING);
+    this.numberOfProcessedRecords(this.numberOfProcessedRecords() + entries.length);
+  }
 
-  onSuccess() {}
+  onError(data) {
+    this.hasError(true);
+  }
+
+  onSuccess(data) {
+    this.state(HistoryExportViewModel.STATE.DONE);
+    this.hasError(false);
+  }
+
+  onTryAgain() {
+    this.mainViewModel.content.preferencesAccount.clickOnBackupExport();
+  }
+
+  dismissExport() {
+    this.mainViewModel.content.switchPreviousContent();
+  }
 };

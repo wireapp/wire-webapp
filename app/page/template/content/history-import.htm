@@ -1,6 +1,6 @@
 <div id="history-import" data-bind="with: $root.historyImport">
   <!-- ko if: isPreparing -->
-    <loading-bar></loading-bar>
+    <loading-bar data-bind=""></loading-bar>
   <!-- /ko -->
   <!-- ko if: isImporting -->
     <loading-bar class="with-cancel"></loading-bar>
@@ -22,6 +22,29 @@
       <div class="history-message__buttons">
         <button class="button button-inverted">Cancel</button>
         <button class="button">Try Again</button>
+      </div>
+    </div>
+  <!-- /ko -->
+    <!-- ko if: isPreparing -->
+    <loading-bar params="progress: loadingProgress, message: loadingMessage"></loading-bar>
+  <!-- /ko -->
+  <!-- ko if: isImporting -->
+    <loading-bar params="progress: loadingProgress, message: loadingMessage" class="with-cancel"></loading-bar>
+    <div class="cancel-button" data-bind="click: onCancel, l10n_text: z.string.backupCancel"></div>
+  <!-- /ko -->
+  <!-- ko if: isDone -->
+    <div class="history-message">
+      <check-icon></check-icon>
+      <div class="history-message__headline" data-bind="l10n_text: z.string.backupImportSuccessHeadline"></div>
+    </div>
+  <!-- /ko -->
+  <!-- ko if: hasError -->
+    <div class="history-message">
+      <div class="history-message__headline" data-bind="l10n_text: z.string.backupExportGenericErrorHeadline"></div>
+      <div class="history-message__info" data-bind="l10n_text: z.string.backupExportGenericErrorSecondary"></div>
+      <div class="history-message__buttons">
+        <button class="button button-inverted" data-bind="l10n_text: z.string.backupErrorAction, click: onTryAgain"></button>
+        <button class="button" data-bind="l10n_text: z.string.backupErrorSecondaryAction, click: dismissExport"></button>
       </div>
     </div>
   <!-- /ko -->

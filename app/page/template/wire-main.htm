@@ -24,8 +24,6 @@
         <!-- /ko -->
       </div>
       <div id="center-column" class="center-column">
-          #include('content/history-export.htm')
-<!-- ko if: false -->
         <!-- ko if: state() === z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS -->
           #include('content/connect-requests.htm')
         <!-- /ko -->
@@ -65,7 +63,6 @@
         <!-- ko if: state() === z.viewModel.ContentViewModel.STATE.WATERMARK -->
           #include('content/watermark.htm')
         <!-- /ko -->
-<!-- /ko-->
         #include('modal/group-creation.htm')
         <div class="center-column__overlay"></div>
       </div>

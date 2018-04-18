@@ -34,7 +34,8 @@ z.viewModel.content.HistoryImportViewModel = class HistoryImportViewModel {
 
   constructor() {
     this.hasError = ko.observable(false);
-    this.state = ko.observable(HistoryImportViewModel.STATE.DONE);
+    this.error = ko.observable(null);
+    this.state = ko.observable(HistoryImportViewModel.STATE.PREPARING);
     this.isPreparing = ko.pureComputed(
       () => !this.hasError() && this.state() === HistoryImportViewModel.STATE.PREPARING
     );
@@ -42,5 +43,45 @@ z.viewModel.content.HistoryImportViewModel = class HistoryImportViewModel {
       () => !this.hasError() && this.state() === HistoryImportViewModel.STATE.IMPORTING
     );
     this.isDone = ko.pureComputed(() => !this.hasError() && this.state() === HistoryImportViewModel.STATE.DONE);
+
+    this.numberOfRecords = ko.observable(0);
+    this.numberOfProcessedRecords = ko.observable(0);
+    this.loadingProgress = ko.pureComputed(() => this.numberOfProcessedRecords() / this.numberOfRecords() * 100);
+
+    this.loadingMessage = ko.pureComputed(() => {
+      switch (this.state()) {
+        case HistoryImportViewModel.STATE.PREPARING: {
+          return z.l10n.text(z.string.backupImportProgressHeadline);
+        }
+        case HistoryImportViewModel.STATE.IMPORTING: {
+          const replacements = {
+            processed: this.numberOfProcessedRecords(),
+            progress: this.loadingProgress(),
+            total: this.numberOfRecords(),
+          };
+          return z.l10n.text(z.string.backupImportProgressSecondary, replacements);
+        }
+        default:
+          return '';
+      }
+    });
+
+    amplify.subscribe(z.event.Webapp.BACKUP.IMPORT.INIT, this.onInit.bind(this));
+  }
+
+  onInit(numberOfRecords) {
+    this.state(HistoryImportViewModel.STATE.PREPARING);
+    this.numberOfRecords(numberOfRecords);
+    this.numberOfProcessedRecords(0);
+    this.hasError(false);
+  }
+
+  onProgress(name, entries) {
+    this.state(HistoryImportViewModel.STATE.IMPORTING);
+    this.numberOfProcessedRecords(this.numberOfProcessedRecords() + entries.length);
+  }
+
+  onError(error) {
+    this.hasError(true);
   }
 };

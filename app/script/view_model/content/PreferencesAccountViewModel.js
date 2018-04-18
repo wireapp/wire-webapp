@@ -197,6 +197,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   clickOnBackupExport() {
+    amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.HISTORY_EXPORT);
     this.backupRepository.exportBackup().then(({numberOfRecords, userName}) => {
       amplify.publish(z.event.WebApp.BACKUP.EXPORT.INIT, numberOfRecords, userName);
     });
