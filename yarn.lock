@@ -181,9 +181,9 @@
   version "2.20.0"
   resolved "https://codeload.github.com/mixpanel/mixpanel-js/tar.gz/c9ce38392de6e0f205908abbe36af3aa460c9ab9"
 
-"@bower_components/moment@moment/moment#2.21.0":
-  version "2.21.0"
-  resolved "https://codeload.github.com/moment/moment/tar.gz/7c4c091bedb86ca6c1a5c5419ad5204ef3926347"
+"@bower_components/moment@moment/moment#2.22.1":
+  version "2.22.1"
+  resolved "https://codeload.github.com/moment/moment/tar.gz/c58511b94eba1000c1d66b23e9a9ff963ff1cc89"
 
 "@bower_components/normalize-css@necolas/normalize.css#3.0.3":
   version "3.0.3"
