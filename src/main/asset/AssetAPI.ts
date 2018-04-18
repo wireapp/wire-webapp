@@ -53,7 +53,7 @@ class AssetAPI {
       .then((response: AxiosResponse) => response.data);
   }
 
-  postAsset(asset: Uint8Array, options: {public: boolean; retention: AssetRetentionPolicy}): Promise<AssetUploadData> {
+  postAsset(asset: Uint8Array, options?: {public: boolean; retention: AssetRetentionPolicy}): Promise<AssetUploadData> {
     const BOUNDARY = `Frontier${unsafeAlphanumeric()}`;
 
     const metadata = JSON.stringify(
