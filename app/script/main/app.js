@@ -626,13 +626,9 @@ z.main.App = class App {
    * @returns {undefined} No return value
    */
   _subscribe_to_unload_events() {
-    $(window).on('beforeunload', () => {
-      this.logger.info("'window.onbeforeunload' was triggered, so we will disconnect from the backend.");
-      this.repository.event.disconnectWebSocket(z.event.WebSocketService.CHANGE_TRIGGER.PAGE_NAVIGATION);
-    });
-
     $(window).on('unload', () => {
-      this.logger.info("'window.unload' was triggered, so we will tear down calls.");
+      this.logger.info("'window.onunload' was triggered, so we will disconnect from the backend.");
+      this.repository.event.disconnectWebSocket(z.event.WebSocketService.CHANGE_TRIGGER.PAGE_NAVIGATION);
       this.repository.calling.leaveCallOnUnload();
 
       if (this.repository.user.isActivatedAccount()) {
@@ -779,7 +775,8 @@ z.main.App = class App {
           return window.location.replace(url);
         }
 
-        let url = `/auth/${location.search}`;
+        const baseUrl = z.util.Environment.frontend.isLocalhost() ? '/page/auth.html' : '/auth/';
+        let url = `${baseUrl}${location.search}`;
         const isImmediateSignOutReason = App.CONFIG.SIGN_OUT_REASONS.IMMEDIATE.includes(signOutReason);
         if (isImmediateSignOutReason) {
           url = z.util.URLUtil.appendParameter(url, `${z.auth.URLParameter.REASON}=${signOutReason}`);

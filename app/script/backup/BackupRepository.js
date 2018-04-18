@@ -34,15 +34,7 @@ z.backup.BackupRepository = class BackupRepository {
     this.backupService = backupService;
     this.clientRepository = clientRepository;
     this.userRepository = userRepository;
-    this._initSubscriptions();
-  }
-
-  _initSubscriptions() {
-    amplify.subscribe(z.event.WebApp.BACKUP.EXPORT.DONE, this.onExportDone.bind(this));
-    amplify.subscribe(z.event.WebApp.BACKUP.EXPORT.START, this.onExportHistory.bind(this));
-
-    amplify.subscribe(z.event.WebApp.BACKUP.IMPORT.DATA, this.onImportHistory.bind(this));
-    amplify.subscribe(z.event.WebApp.BACKUP.IMPORT.ERROR, this.onError.bind(this));
+    this.ARCHIVE_META_FILENAME = 'meta.json';
   }
 
   createMetaDescription() {
@@ -79,12 +71,8 @@ z.backup.BackupRepository = class BackupRepository {
     };
   }
 
-  onExportDone() {
-    // TODO
-  }
-
   onError(error) {
-    const isBackupImportError = error.constructor.name === 'BackupImportError';
+    const isBackupImportError = error.constructor.name === 'ImportError';
 
     amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
       action: () => this.exportBackup(),
@@ -99,14 +87,76 @@ z.backup.BackupRepository = class BackupRepository {
     });
   }
 
-  onImportHistory(tableName, data) {
-    const entity = JSON.parse(data);
-    this.backupService.setHistory(tableName, entity);
+  importHistory(archive) {
+    const files = archive.files;
+    if (!files[this.ARCHIVE_META_FILENAME]) {
+      throw new z.backup.InvalidMetaDataError();
+    }
+
+    const metaCheckPromise = files[this.ARCHIVE_META_FILENAME]
+      .async('string')
+      .then(JSON.parse)
+      .then(metadata => checkMetas(metadata, this.createMetaDescription()));
+
+    const unzipPromises = Object.values(archive.files)
+      .filter(zippedFile => zippedFile.name !== this.ARCHIVE_META_FILENAME)
+      .map(zippedFile => zippedFile.async('string').then(value => ({content: value, filename: zippedFile.name})));
+
+    const importEntriesPromise = Promise.all(unzipPromises).then(fileDescriptors => {
+      fileDescriptors.forEach(fileDescriptor => {
+        const tableName = fileDescriptor.filename.replace('.json', '');
+        const entities = JSON.parse(fileDescriptor.content);
+        entities.forEach(entity => this.backupService.importEntity(tableName, entity));
+      });
+    });
+
+    return Promise.all([metaCheckPromise, importEntriesPromise]);
+
+    function checkMetas(archiveMeta, currentMetadata) {
+      if (archiveMeta.user_id !== currentMetadata.user_id) {
+        const message = `History from user "${metadata.user_id}" cannot be restored for user "${user_id}".`;
+        throw new z.backup.DifferentAccountError(message);
+      }
+
+      if (archiveMeta.version !== currentMetadata.version) {
+        const message = `History cannot be restored: database versions don't match`;
+        throw new z.backup.IncompatibleBackupError(message);
+      }
+    }
   }
 
-  onExportHistory() {
-    this.backupService.sendHistory().then(() => {
-      amplify.publish(z.event.WebApp.BACKUP.EXPORT.META, this.createMetaDescription());
+  /**
+   * Gather needed data for the export and generates the history
+   *
+   * @returns {Promise<JSZip>} The promise that contains all the exported tables
+   */
+  generateHistory() {
+    const tables = this.backupService.getTables();
+    const meta = this.createMetaDescription();
+    const tablesData = {};
+
+    const loadDataPromises = tables.map(table => {
+      return this.backupService.exportTable(table, (tableName, rows) => {
+        tablesData[tableName] = (tablesData[tableName] || []).concat(rows);
+      });
     });
+
+    return Promise.all(loadDataPromises)
+      .then(() => {
+        const zip = new JSZip();
+
+        // first write the metadata file
+        zip.file(this.ARCHIVE_META_FILENAME, JSON.stringify(meta));
+
+        // then all the other tables
+        Object.keys(tablesData).forEach(tableName => {
+          zip.file(`${tableName}.json`, JSON.stringify(tablesData[tableName]));
+        });
+
+        return zip;
+      })
+      .catch(() => {
+        throw new z.backup.ExportError();
+      });
   }
 };
