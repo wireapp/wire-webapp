@@ -17,8 +17,11 @@
  *
  */
 
-import ConversationService from './ConversationService';
-import AssetService from './AssetService';
-import Image from './Image';
+interface Image {
+  data: Buffer;
+  height: number;
+  type: string;
+  width: number;
+}
 
-export {AssetService, ConversationService, Image};
+export default Image;

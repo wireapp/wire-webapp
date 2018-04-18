@@ -28,7 +28,8 @@ const {FileEngine} = require('@wireapp/store-engine');
     urls: APIClient.BACKEND.PRODUCTION,
   });
   const account = new Account(apiClient);
-  await account.listen(login);
+  await account.login(login);
+  await account.listen();
 
   function sendMessage() {
     const timeoutInMillis = 2000;
