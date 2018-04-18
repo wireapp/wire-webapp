@@ -82,8 +82,8 @@ z.viewModel.ContentViewModel = class ContentViewModel {
     this.preferencesDevices = new z.viewModel.content.PreferencesDevicesViewModel(mainViewModel, this, repositories);
     this.preferencesOptions = new z.viewModel.content.PreferencesOptionsViewModel(mainViewModel, this, repositories);
 
-    this.historyExport = new z.viewModel.content.HistoryExportViewModel(mainViewModel);
-    this.historyImport = new z.viewModel.content.HistoryImportViewModel(mainViewModel);
+    this.historyExport = new z.viewModel.content.HistoryExportViewModel(mainViewModel, this, repositories);
+    this.historyImport = new z.viewModel.content.HistoryImportViewModel(mainViewModel, this, repositories);
 
     this.previousState = undefined;
     this.previousConversation = undefined;

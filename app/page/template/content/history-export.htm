@@ -4,7 +4,7 @@
   <!-- /ko -->
   <!-- ko if: isExporting -->
     <loading-bar params="progress: loadingProgress, message: loadingMessage" class="with-cancel"></loading-bar>
-    <div class="cancel-button" data-bind="click: onCancel, l10n_text: z.string.backupErrorSecondaryAction"></div>
+    <div class="cancel-button" data-bind="click: onCancel, l10n_text: z.string.backupCancel"></div>
   <!-- /ko -->
   <!-- ko if: isDone -->
     <div class="history-message">
@@ -20,8 +20,8 @@
       <div class="history-message__headline" data-bind="l10n_text: z.string.backupExportGenericErrorHeadline"></div>
       <div class="history-message__info" data-bind="l10n_text: z.string.backupExportGenericErrorSecondary"></div>
       <div class="history-message__buttons">
-        <button class="button button-inverted" data-bind="l10n_text: z.string.backupErrorAction, click: onTryAgain"></button>
-        <button class="button" data-bind="l10n_text: z.string.backupErrorSecondaryAction, click: dismissExport"></button>
+        <button class="button button-inverted" data-bind="l10n_text: z.string.backupTryAgain, click: onTryAgain"></button>
+        <button class="button" data-bind="l10n_text: z.string.backupCancel, click: dismissExport"></button>
       </div>
     </div>
   <!-- /ko -->

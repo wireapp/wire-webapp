@@ -32,7 +32,7 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
     };
   }
 
-  constructor(mainViewModel) {
+  constructor(mainViewModel, contentViewModel, repositories) {
     this.hasError = ko.observable(false);
     this.state = ko.observable(HistoryExportViewModel.STATE.PREPARING);
     this.isPreparing = ko.pureComputed(
@@ -66,15 +66,31 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
     });
 
     this.mainViewModel = mainViewModel;
-    amplify.subscribe(z.event.WebApp.BACKUP.EXPORT.DATA, this.onProgress.bind(this));
-    amplify.subscribe(z.event.WebApp.BACKUP.EXPORT.ERROR, this.onError.bind(this));
-    amplify.subscribe(z.event.WebApp.BACKUP.EXPORT.DONE, this.onSuccess.bind(this));
-    amplify.subscribe(z.event.WebApp.BACKUP.EXPORT.INIT, this.onInit.bind(this));
+    this.backupRepository = repositories.backup;
+
+    amplify.subscribe(z.event.WebApp.BACKUP.EXPORT.START, this.exportHistory.bind(this));
+  }
+
+  exportHistory() {
+    const {numberOfRecords, userName} = this.backupRepository.getBackupInitData();
+    this.numberOfRecords(numberOfRecords);
+
+    this.backupRepository
+      .generateHistory(this.onProgress.bind(this))
+      .then(archive => archive.generateAsync({type: 'blob'}))
+      .then(archiveBlob => {
+        const timestamp = new Date().toISOString().substring(0, 10);
+        const filename = `Wire-${userName}-Backup_${timestamp}.desktop_wbu`;
+        this.onSuccess();
+
+        z.util.downloadBlob(archiveBlob, filename);
+      })
+      .catch(this.onError.bind(this));
   }
 
   onCancel() {
     amplify.publish(z.event.WebApp.BACKUP.EXPORT.CANCEL);
-    this.dismissExport();
+    this.backupRepository.cancelAction();
   }
 
   onInit(numberOfRecords) {
@@ -84,12 +100,15 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
     this.hasError(false);
   }
 
-  onProgress(name, entries) {
+  onProgress(processedNumber) {
     this.state(HistoryExportViewModel.STATE.EXPORTING);
-    this.numberOfProcessedRecords(this.numberOfProcessedRecords() + entries.length);
+    this.numberOfProcessedRecords(this.numberOfProcessedRecords() + processedNumber);
   }
 
-  onError(data) {
+  onError(error) {
+    if (error instanceof z.backup.CancelError) {
+      return this.dismissExport();
+    }
     this.hasError(true);
   }
 
@@ -99,7 +118,7 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
   }
 
   onTryAgain() {
-    this.mainViewModel.content.preferencesAccount.clickOnBackupExport();
+    this.exportHistory();
   }
 
   dismissExport() {

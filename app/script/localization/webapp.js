@@ -612,7 +612,7 @@ z.string.preferencesOptionsBackupImportHeadline = 'Restore from backup';
 z.string.preferencesOptionsBackupImportSecondary = 'You can only restore history from a backup of the same platform. Your backup will overwrite the conversations that you may have on this device.';
 
 z.string.backupErrorAction = 'Cancel';
-z.string.backupErrorSecondaryAction = 'Try Again';
+z.string.backupError = 'Try Again';
 z.string.backupExportGenericErrorHeadline = 'The file could not be saved';
 z.string.backupExportGenericErrorSecondary = 'The backup was not completed.';
 z.string.backupExportProgressHeadline = 'Preparing…';
@@ -630,6 +630,7 @@ z.string.backupImportProgressHeadline = 'Preparing…';
 z.string.backupImportProgressSecondary = 'Restoring history · {{processed}} of {{total}} — {{progress}}%';
 z.string.backupImportSuccessHeadline = 'History restored.';
 z.string.backupCancel = 'Cancel';
+z.string.backupTryAgain = 'Try Again';
 
 // Search
 z.string.searchConnect = 'Connect';

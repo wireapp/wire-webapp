@@ -40,21 +40,16 @@ z.backup.BackupService = class BackupService {
     return this.storageService.db.verno;
   }
 
-  sendHistory() {
-    const batchPromises = this.getTables().map(table => {
-      const collection = table.toCollection();
-
-      return table
-        .count()
-        .then(n => new DexieBatch({batchSize: 10000, limit: n}))
-        .then(batchDriver => {
-          batchDriver.eachBatch(collection, batch => {
-            amplify.publish(z.event.WebApp.BACKUP.EXPORT.DATA, table.name, batch);
-          });
+  exportTable(table, onProgress) {
+    const collection = table.toCollection();
+    return table
+      .count()
+      .then(n => new DexieBatch({batchSize: 10000, limit: n}))
+      .then(batchDriver => {
+        return batchDriver.eachBatch(collection, batch => {
+          onProgress(table.name, batch);
         });
-    });
-
-    return Promise.all(batchPromises);
+      });
   }
 
   getHistoryCount() {
@@ -65,8 +60,9 @@ z.backup.BackupService = class BackupService {
     return this.storageService.getTables(BackupService.CONFIG.SUPPORTED_TABLES);
   }
 
-  setHistory(tableName, entity) {
-    const isConversationTable = z.storage.StorageSchemata.OBJECT_STORE.CONVERSATIONS;
+  importEntity(tableName, entity) {
+    const isConversationTable = tableName === z.storage.StorageSchemata.OBJECT_STORE.CONVERSATIONS;
+    // we don't want to force the primaryKey if the table is not the conversations table
     const primaryKey = isConversationTable ? entity.id : undefined;
 
     this.storageService.save(tableName, primaryKey, entity);

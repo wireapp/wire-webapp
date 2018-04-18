@@ -66,7 +66,7 @@ z.viewModel.content.HistoryImportViewModel = class HistoryImportViewModel {
       }
     });
 
-    amplify.subscribe(z.event.Webapp.BACKUP.IMPORT.INIT, this.onInit.bind(this));
+    amplify.subscribe(z.event.WebApp.BACKUP.IMPORT.START, this.onInit.bind(this));
   }
 
   onInit(numberOfRecords) {
