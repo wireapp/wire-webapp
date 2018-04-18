@@ -40,7 +40,7 @@ z.backup.BackupService = class BackupService {
     return this.storageService.db.verno;
   }
 
-  getHistory(table, onProgress) {
+  exportTable(table, onProgress) {
     const collection = table.toCollection();
     return table
       .count()
@@ -64,6 +64,7 @@ z.backup.BackupService = class BackupService {
 
   importEntity(tableName, entity) {
     const isConversationTable = tableName === z.storage.StorageSchemata.OBJECT_STORE.CONVERSATIONS;
+    // we don't want to force the primaryKey if the table is not the conversations table
     const primaryKey = isConversationTable ? entity.id : undefined;
 
     this.storageService.save(tableName, primaryKey, entity);

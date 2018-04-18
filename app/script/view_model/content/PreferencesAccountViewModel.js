@@ -197,28 +197,13 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   clickOnBackupExport() {
-    const metadata = this.backupRepository.createMetaDescription();
-    const tables = this.backupRepository.getTables();
-    const rawData = {};
-    const username = this.selfUser().username();
+    this.backupRepository
+      .generateHistory()
+      .then(saveToDisk)
+      .catch(() => {} /* TODO update the UI depending on the error*/);
 
-    const loadDataPromises = tables.map(table => {
-      return this.backupRepository.exportHistory(table, (tableName, rows) => {
-        rawData[tableName] = (rawData[tableName] || []).concat(rows);
-      });
-    });
-
-    Promise.all(loadDataPromises).then(() => saveAsZip(metadata, rawData));
-
-    function saveAsZip(meta, tablesData) {
-      const zip = new JSZip();
-
-      zip.file('meta.json', JSON.stringify(meta));
-      Object.keys(tablesData).forEach(tableName => {
-        zip.file(`${tableName}.json`, JSON.stringify(tablesData[tableName]));
-      });
-
-      zip.generateAsync({type: 'base64'}).then(base64Data => {
+    function saveToDisk(archive) {
+      archive.generateAsync({type: 'base64'}).then(base64Data => {
         const timestamp = new Date().toISOString().substring(0, 10);
         const link = document.createElement('a');
         link.href = `data:application/zip;base64,${base64Data}`;
@@ -235,53 +220,17 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   clickOnBackupImport() {
+    // TODO click on the file input
     const {userId, clientId} = this.backupRepository.getUserData();
     amplify.publish(z.event.WebApp.BACKUP.IMPORT.START, userId, clientId);
   }
 
   onImportFileChange(viewModel, event) {
     const file = event.target.files[0];
-    const {user_id, version} = this.backupRepository.createMetaDescription();
     if (!file) {
       return;
     }
-    JSZip.loadAsync(file).then(zip => {
-      const files = zip.files;
-      if (!files['meta.json']) {
-        //TODO throw a meaningful error
-        throw 'no meta';
-      }
-
-      files['meta.json']
-        .async('string')
-        .then(metaStr => JSON.parse(metaStr))
-        .then(checkMetas);
-      //TODO .catch()
-
-      const unzipPromises = Object.values(zip.files)
-        .filter(zippedFile => zippedFile.name !== 'meta.json')
-        .map(zippedFile => zippedFile.async('string').then(value => ({content: value, filename: zippedFile.name})));
-
-      Promise.all(unzipPromises).then(fileDescriptors => {
-        fileDescriptors.forEach(fileDescriptor => {
-          const tableName = fileDescriptor.filename.replace('.json', '');
-          const data = JSON.parse(fileDescriptor.content);
-          this.backupRepository.importTable(tableName, data);
-        });
-      });
-
-      function checkMetas(metadata) {
-        if (metadata.user_id !== user_id) {
-          const message = `History from user "${metadata.user_id}" cannot be restored for user "${user_id}".`;
-          throw new Error(message); // TODO DifferentAccountError
-        }
-
-        if (metadata.version !== version) {
-          const message = `History cannot be restored: database versions don't match`;
-          throw new Error(message); // TODO incompatible database error
-        }
-      }
-    });
+    JSZip.loadAsync(file).then(archive => this.backupRepository.importHistory(archive));
   }
 
   clickOnCreate() {

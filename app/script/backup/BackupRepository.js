@@ -34,6 +34,7 @@ z.backup.BackupRepository = class BackupRepository {
     this.backupService = backupService;
     this.clientRepository = clientRepository;
     this.userRepository = userRepository;
+    this.ARCHIVE_META_FILENAME = 'meta.json';
   }
 
   createMetaDescription() {
@@ -86,15 +87,74 @@ z.backup.BackupRepository = class BackupRepository {
     });
   }
 
-  importTable(tableName, entities) {
-    entities.forEach(entity => this.backupService.importEntity(tableName, entity));
+  importHistory(archive) {
+    const files = archive.files;
+    if (!files[this.ARCHIVE_META_FILENAME]) {
+      throw new z.backup.importError.InvalidMetaDataError();
+    }
+
+    files[this.ARCHIVE_META_FILENAME]
+      .async('string')
+      .then(metaStr => JSON.parse(metaStr))
+      .then(checkMetas.bind(this));
+
+    const unzipPromises = Object.values(archive.files)
+      .filter(zippedFile => zippedFile.name !== this.ARCHIVE_META_FILENAME)
+      .map(zippedFile => zippedFile.async('string').then(value => ({content: value, filename: zippedFile.name})));
+
+    return Promise.all(unzipPromises).then(fileDescriptors => {
+      fileDescriptors.forEach(fileDescriptor => {
+        const tableName = fileDescriptor.filename.replace('.json', '');
+        const entities = JSON.parse(fileDescriptor.content);
+        entities.forEach(entity => this.backupService.importEntity(tableName, entity));
+      });
+    });
+
+    function checkMetas(metadata) {
+      const {user_id, version} = this.createMetaDescription();
+      if (metadata.user_id !== user_id) {
+        const message = `History from user "${metadata.user_id}" cannot be restored for user "${user_id}".`;
+        throw new z.backup.importError.DifferentAccountError(message);
+      }
+
+      if (metadata.version !== version) {
+        const message = `History cannot be restored: database versions don't match`;
+        throw new z.backup.importError.IncompatibleBackupError(message);
+      }
+    }
   }
 
-  getTables() {
-    return this.backupService.getTables();
-  }
+  /**
+   * Gather needed data for the export and generates the history
+   *
+   * @returns {Promise<archive>} The promise that contains all the exported tables
+   */
+  generateHistory() {
+    const tables = this.backupService.getTables();
+    const rawData = {};
 
-  exportHistory(table, onProgress) {
-    return this.backupService.getHistory(table, onProgress);
+    const loadDataPromises = tables.map(table => {
+      return this.backupService.exportTable(table, (tableName, rows) => {
+        rawData[tableName] = (rawData[tableName] || []).concat(rows);
+      });
+    });
+
+    return Promise.all(loadDataPromises)
+      .then(() => {
+        const zip = new JSZip();
+
+        // first write the metadata file
+        zip.file(this.ARCHIVE_META_FILENAME, JSON.stringify(meta));
+
+        // then all the other tables
+        Object.keys(tablesData).forEach(tableName => {
+          zip.file(`${tableName}.json`, JSON.stringify(tablesData[tableName]));
+        });
+
+        return zip;
+      })
+      .catch(() => {
+        throw new z.backup.exportError.BackupExportError();
+      });
   }
 };
