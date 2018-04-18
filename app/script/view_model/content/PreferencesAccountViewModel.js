@@ -219,12 +219,6 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     }
   }
 
-  clickOnBackupImport() {
-    // TODO click on the file input
-    const {userId, clientId} = this.backupRepository.getUserData();
-    amplify.publish(z.event.WebApp.BACKUP.IMPORT.START, userId, clientId);
-  }
-
   onImportFileChange(viewModel, event) {
     const file = event.target.files[0];
     if (!file) {
