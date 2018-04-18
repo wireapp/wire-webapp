@@ -93,16 +93,16 @@ z.backup.BackupRepository = class BackupRepository {
       throw new z.backup.importError.InvalidMetaDataError();
     }
 
-    files[this.ARCHIVE_META_FILENAME]
+    const metaCheckPromise = files[this.ARCHIVE_META_FILENAME]
       .async('string')
-      .then(metaStr => JSON.parse(metaStr))
-      .then(checkMetas.bind(this));
+      .then(JSON.parse)
+      .then(metadata => checkMetas(metadata, this.createMetaDescription()));
 
     const unzipPromises = Object.values(archive.files)
       .filter(zippedFile => zippedFile.name !== this.ARCHIVE_META_FILENAME)
       .map(zippedFile => zippedFile.async('string').then(value => ({content: value, filename: zippedFile.name})));
 
-    return Promise.all(unzipPromises).then(fileDescriptors => {
+    const importEntriesPromise = Promise.all(unzipPromises).then(fileDescriptors => {
       fileDescriptors.forEach(fileDescriptor => {
         const tableName = fileDescriptor.filename.replace('.json', '');
         const entities = JSON.parse(fileDescriptor.content);
@@ -110,14 +110,15 @@ z.backup.BackupRepository = class BackupRepository {
       });
     });
 
-    function checkMetas(metadata) {
-      const {user_id, version} = this.createMetaDescription();
-      if (metadata.user_id !== user_id) {
+    return Promise.all([metaCheckPromise, importEntriesPromise]);
+
+    function checkMetas(archiveMeta, currentMetadata) {
+      if (archiveMeta.user_id !== currentMetadata.user_id) {
         const message = `History from user "${metadata.user_id}" cannot be restored for user "${user_id}".`;
         throw new z.backup.importError.DifferentAccountError(message);
       }
 
-      if (metadata.version !== version) {
+      if (archiveMeta.version !== currentMetadata.version) {
         const message = `History cannot be restored: database versions don't match`;
         throw new z.backup.importError.IncompatibleBackupError(message);
       }
@@ -131,11 +132,12 @@ z.backup.BackupRepository = class BackupRepository {
    */
   generateHistory() {
     const tables = this.backupService.getTables();
-    const rawData = {};
+    const meta = this.createMetaDescription();
+    const tablesData = {};
 
     const loadDataPromises = tables.map(table => {
       return this.backupService.exportTable(table, (tableName, rows) => {
-        rawData[tableName] = (rawData[tableName] || []).concat(rows);
+        tablesData[tableName] = (tablesData[tableName] || []).concat(rows);
       });
     });
 

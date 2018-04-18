@@ -197,25 +197,26 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   clickOnBackupExport() {
+    const username = this.selfUser().username();
     this.backupRepository
       .generateHistory()
+      .then(archive => archive.generateAsync({type: 'base64'}))
       .then(saveToDisk)
-      .catch(() => {} /* TODO update the UI depending on the error*/);
+      .then(() => {} /* TODO success callback */)
+      .catch(console.error.bind(console) /* TODO update the UI depending on the error*/);
 
-    function saveToDisk(archive) {
-      archive.generateAsync({type: 'base64'}).then(base64Data => {
-        const timestamp = new Date().toISOString().substring(0, 10);
-        const link = document.createElement('a');
-        link.href = `data:application/zip;base64,${base64Data}`;
-        link.setAttribute('download', `Wire-${username}-Backup_${timestamp}.desktop_wbu`);
-        // firefox needs the element to be in the DOM for the download to start
-        // see https://stackoverflow.com/a/32226068
-        link.setAttribute('type', 'hidden');
-        document.body.appendChild(link);
-        // end firefox hack
-        link.click();
-        link.remove();
-      });
+    function saveToDisk(base64Data) {
+      const timestamp = new Date().toISOString().substring(0, 10);
+      const link = document.createElement('a');
+      link.href = `data:application/zip;base64,${base64Data}`;
+      link.setAttribute('download', `Wire-${username}-Backup_${timestamp}.desktop_wbu`);
+      // firefox needs the element to be in the DOM for the download to start
+      // see https://stackoverflow.com/a/32226068
+      link.setAttribute('type', 'hidden');
+      document.body.appendChild(link);
+      // end firefox hack
+      link.click();
+      link.remove();
     }
   }
 
@@ -224,7 +225,10 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     if (!file) {
       return;
     }
-    JSZip.loadAsync(file).then(archive => this.backupRepository.importHistory(archive));
+    JSZip.loadAsync(file)
+      .then(archive => this.backupRepository.importHistory(archive))
+      .then(() => {} /* TODO success callback */)
+      .catch(console.error.bind(console) /* TODO update UI according to error*/);
   }
 
   clickOnCreate() {
