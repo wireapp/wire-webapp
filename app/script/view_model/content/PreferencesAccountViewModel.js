@@ -200,24 +200,15 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     const username = this.selfUser().username();
     this.backupRepository
       .generateHistory()
-      .then(archive => archive.generateAsync({type: 'base64'}))
-      .then(saveToDisk)
+      .then(archive => archive.generateAsync({type: 'blob'}))
+      .then(archiveBlob => {
+        const timestamp = new Date().toISOString().substring(0, 10);
+        const filename = `Wire-${username}-Backup_${timestamp}.desktop_wbu`;
+
+        z.util.downloadBlob(archiveBlob, filename);
+      })
       .then(() => {} /* TODO success callback */)
       .catch(console.error.bind(console) /* TODO update the UI depending on the error*/);
-
-    function saveToDisk(base64Data) {
-      const timestamp = new Date().toISOString().substring(0, 10);
-      const link = document.createElement('a');
-      link.href = `data:application/zip;base64,${base64Data}`;
-      link.setAttribute('download', `Wire-${username}-Backup_${timestamp}.desktop_wbu`);
-      // firefox needs the element to be in the DOM for the download to start
-      // see https://stackoverflow.com/a/32226068
-      link.setAttribute('type', 'hidden');
-      document.body.appendChild(link);
-      // end firefox hack
-      link.click();
-      link.remove();
-    }
   }
 
   onImportFileChange(viewModel, event) {
