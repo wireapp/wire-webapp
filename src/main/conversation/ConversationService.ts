@@ -29,7 +29,8 @@ import {
 } from '@wireapp/api-client/dist/commonjs/conversation/index';
 import {UserPreKeyBundleMap} from '@wireapp/api-client/dist/commonjs/user/index';
 import {CryptographyService, EncryptedAsset} from '../cryptography/root';
-import {encryptAsset} from '../cryptography/AssetCryptography.node';
+import {AssetService, Image} from '../conversation/root';
+import * as AssetCryptography from '../cryptography/AssetCryptography.node';
 
 export default class ConversationService {
   private clientID: string = '';
@@ -37,7 +38,8 @@ export default class ConversationService {
   constructor(
     private apiClient: APIClient,
     private protocolBuffers: any = {},
-    private cryptographyService: CryptographyService
+    private cryptographyService: CryptographyService,
+    private assetService: AssetService
   ) {}
 
   // TODO: The correct functionality of this function is heavily based on the case that it always runs into the catch block
@@ -105,7 +107,7 @@ export default class ConversationService {
     const plainTextBuffer: Buffer = this.protocolBuffers.GenericMessage.encode(customTextMessage).finish();
 
     if (this.shouldSendAsExternal(plainTextBuffer, <UserPreKeyBundleMap>preKeyBundles)) {
-      const payload: EncryptedAsset = await encryptAsset(plainTextBuffer);
+      const payload: EncryptedAsset = await AssetCryptography.encryptAsset(plainTextBuffer);
 
       return this.sendExternalGenericMessage(
         this.clientID,
@@ -121,6 +123,21 @@ export default class ConversationService {
     );
 
     return this.sendMessage(this.clientID, conversationId, payload);
+  }
+
+  public async sendImage(conversationId: string, image: Image): Promise<ClientMismatch> {
+    const imageAsset = await this.assetService.uploadImageAsset(image);
+
+    const genericMessage = this.protocolBuffers.GenericMessage.create({
+      messageId: new UUID(4).format(),
+      asset: imageAsset,
+    });
+
+    const preKeyBundles = await this.getPreKeyBundles(conversationId);
+    const plainTextBuffer: Buffer = this.protocolBuffers.GenericMessage.encode(genericMessage).finish();
+    const payload: EncryptedAsset = await AssetCryptography.encryptAsset(plainTextBuffer);
+
+    return this.sendExternalGenericMessage(this.clientID, conversationId, payload, <UserPreKeyBundleMap>preKeyBundles);
   }
 
   public setClientID(clientID: string) {
