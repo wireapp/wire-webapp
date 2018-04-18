@@ -371,15 +371,15 @@
   version "2.3.2"
   resolved "https://registry.yarnpkg.com/@types/tough-cookie/-/tough-cookie-2.3.2.tgz#e0d481d8bb282ad8a8c9e100ceb72c995fb5e709"
 
-"@wireapp/api-client@0.6.39":
-  version "0.6.39"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-0.6.39.tgz#d059b4c10363c4398e62586d40219baf4cd63fa3"
+"@wireapp/api-client@0.6.43":
+  version "0.6.43"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-0.6.43.tgz#08c45cf882a3aa116f58164bf8faf26e6275249b"
   dependencies:
     "@types/node" "9.6.5"
     "@types/spark-md5" "3.0.0"
     "@types/tough-cookie" "2.3.2"
-    "@wireapp/priority-queue" "0.1.12"
-    "@wireapp/store-engine" "0.5.12"
+    "@wireapp/priority-queue" "0.1.13"
+    "@wireapp/store-engine" "0.6.1"
     axios "0.18.0"
     html5-websocket "2.0.2"
     logdown "3.2.3"
@@ -391,29 +391,29 @@
   version "3.0.16"
   resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-3.0.16.tgz#f8f41fa0d8e854fe77402a8b0a20c89f2ed93943"
 
-"@wireapp/core@2.1.58":
-  version "2.1.58"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-2.1.58.tgz#f8dd1f466ff8623800004c32801c1e17f07bc969"
+"@wireapp/core@2.1.62":
+  version "2.1.62"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-2.1.62.tgz#d072434af69f5a5e21011a472abbad8680723f28"
   dependencies:
     "@types/node" "9.6.5"
-    "@wireapp/api-client" "0.6.39"
-    "@wireapp/cryptobox" "8.3.23"
-    "@wireapp/store-engine" "0.5.12"
+    "@wireapp/api-client" "0.6.43"
+    "@wireapp/cryptobox" "8.3.25"
+    "@wireapp/store-engine" "0.6.1"
     bazinga64 "5.0.3"
     logdown "3.2.3"
     protobufjs "6.8.6"
     pure-uuid "1.5.2"
 
-"@wireapp/cryptobox@8.3.23":
-  version "8.3.23"
-  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-8.3.23.tgz#98157eb7874ca8a8ec981c0bf48a5799f0ef4492"
+"@wireapp/cryptobox@8.3.25":
+  version "8.3.25"
+  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-8.3.25.tgz#d17d9a4bed64b21825ad8d7e06a1a04a1b047ebc"
   dependencies:
     "@types/fs-extra" "5.0.2"
     "@types/node" "9.6.5"
     "@wireapp/lru-cache" "2.1.2"
-    "@wireapp/priority-queue" "0.1.12"
+    "@wireapp/priority-queue" "0.1.13"
     "@wireapp/proteus" "7.1.22"
-    "@wireapp/store-engine" "0.5.12"
+    "@wireapp/store-engine" "0.6.1"
     dexie "2.0.2"
     fs-extra "5.0.0"
 
@@ -423,9 +423,9 @@
   dependencies:
     webpack "3.11.0"
 
-"@wireapp/priority-queue@0.1.12":
-  version "0.1.12"
-  resolved "https://registry.yarnpkg.com/@wireapp/priority-queue/-/priority-queue-0.1.12.tgz#58b4b1000b408ba15fd1816e0f7a7d1c7283f175"
+"@wireapp/priority-queue@0.1.13":
+  version "0.1.13"
+  resolved "https://registry.yarnpkg.com/@wireapp/priority-queue/-/priority-queue-0.1.13.tgz#7b576832ad545a074023367c623d42561473b724"
   dependencies:
     "@types/node" "9.6.5"
     pure-uuid "1.5.2"
@@ -452,9 +452,9 @@
     styled-components "3.2.6"
     styled-normalize "4.0.0"
 
-"@wireapp/store-engine@0.5.12":
-  version "0.5.12"
-  resolved "https://registry.yarnpkg.com/@wireapp/store-engine/-/store-engine-0.5.12.tgz#9df74a379e8c9f77a1514ca45feb92c33c79ea14"
+"@wireapp/store-engine@0.6.1":
+  version "0.6.1"
+  resolved "https://registry.yarnpkg.com/@wireapp/store-engine/-/store-engine-0.6.1.tgz#600032d448b72a5f6d21f34232a9ce166aef3512"
   dependencies:
     "@types/node" "9.6.5"
     dexie "2.0.2"
@@ -2166,9 +2166,17 @@ chalk@^1.0.0, chalk@^1.1.1, chalk@^1.1.3, chalk@~1.1.1:
     strip-ansi "^3.0.0"
     supports-color "^2.0.0"
 
-chalk@^2.0.0, chalk@^2.0.1, chalk@^2.1.0, chalk@^2.3.0, chalk@^2.3.1, chalk@^2.3.2:
+chalk@^2.0.0, chalk@^2.0.1, chalk@^2.1.0, chalk@^2.3.1, chalk@^2.3.2:
   version "2.3.2"
   resolved "https://registry.yarnpkg.com/chalk/-/chalk-2.3.2.tgz#250dc96b07491bfd601e648d66ddf5f60c7a5c65"
+  dependencies:
+    ansi-styles "^3.2.1"
+    escape-string-regexp "^1.0.5"
+    supports-color "^5.3.0"
+
+chalk@^2.3.0:
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/chalk/-/chalk-2.4.0.tgz#a060a297a6b57e15b61ca63ce84995daa0fe6e52"
   dependencies:
     ansi-styles "^3.2.1"
     escape-string-regexp "^1.0.5"
@@ -10419,9 +10427,15 @@ supports-color@^4.0.0, supports-color@^4.2.1:
   dependencies:
     has-flag "^2.0.0"
 
-supports-color@^5.1.0, supports-color@^5.3.0:
+supports-color@^5.1.0:
   version "5.3.0"
   resolved "https://registry.yarnpkg.com/supports-color/-/supports-color-5.3.0.tgz#5b24ac15db80fa927cf5227a4a33fd3c4c7676c0"
+  dependencies:
+    has-flag "^3.0.0"
+
+supports-color@^5.3.0:
+  version "5.4.0"
+  resolved "https://registry.yarnpkg.com/supports-color/-/supports-color-5.4.0.tgz#1c6b337402c2137605efe19f10fec390f6faab54"
   dependencies:
     has-flag "^3.0.0"
 
