@@ -5,7 +5,7 @@
   "description": "Least Recently Used (LRU) Cache for JavaScript and TypeScript.",
   "devDependencies": {
     "jasmine": "3.1.0",
-    "rimraf": "2.6.1",
+    "rimraf": "2.6.2",
     "typescript": "2.8.1"
   },
   "files": [
