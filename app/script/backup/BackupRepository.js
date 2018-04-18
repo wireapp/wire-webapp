@@ -128,7 +128,7 @@ z.backup.BackupRepository = class BackupRepository {
   /**
    * Gather needed data for the export and generates the history
    *
-   * @returns {Promise<archive>} The promise that contains all the exported tables
+   * @returns {Promise<JSZip>} The promise that contains all the exported tables
    */
   generateHistory() {
     const tables = this.backupService.getTables();
