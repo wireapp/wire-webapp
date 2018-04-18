@@ -67,6 +67,7 @@ CSP = {
   'media-src': [
     "'self'",
     'data:',
+    'blob:',
     '*',
   ],
   'object-src': [
