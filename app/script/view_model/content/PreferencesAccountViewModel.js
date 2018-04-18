@@ -206,9 +206,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
         const filename = `Wire-${username}-Backup_${timestamp}.desktop_wbu`;
 
         z.util.downloadBlob(archiveBlob, filename);
-      })
-      .then(() => {} /* TODO success callback */)
-      .catch(console.error.bind(console) /* TODO update the UI depending on the error*/);
+      });
   }
 
   onImportFileChange(viewModel, event) {
@@ -216,10 +214,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     if (!file) {
       return;
     }
-    JSZip.loadAsync(file)
-      .then(archive => this.backupRepository.importHistory(archive))
-      .then(() => {} /* TODO success callback */)
-      .catch(console.error.bind(console) /* TODO update UI according to error*/);
+    JSZip.loadAsync(file).then(archive => this.backupRepository.importHistory(archive));
   }
 
   clickOnCreate() {
