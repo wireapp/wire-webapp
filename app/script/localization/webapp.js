@@ -340,8 +340,8 @@ z.string.conversationAssetDownloading = 'Downloading…';
 z.string.conversationAssetUploadFailed = 'Upload Failed';
 z.string.conversationPlaybackError = 'Unable to play';
 z.string.conversationContextMenuEdit = 'Edit';
-z.string.conversationContextMenuDelete = 'Delete for Me';
-z.string.conversationContextMenuDeleteEveryone = 'Delete for Everyone';
+z.string.conversationContextMenuDelete = 'Delete for Me…';
+z.string.conversationContextMenuDeleteEveryone = 'Delete for Everyone…';
 z.string.conversationContextMenuDownload = 'Download';
 z.string.conversationContextMenuLike = 'Like';
 z.string.conversationContextMenuUnlike = 'Unlike';
@@ -396,14 +396,14 @@ z.string.conversationsConnectionRequestMany = '{{number}} people waiting';
 z.string.conversationsConnectionRequestOne = '1 person waiting';
 z.string.conversationsEmptyConversation = 'Group conversation';
 z.string.conversationsNoConversations = 'Start a conversation or create a group.';
-z.string.conversationsPopoverArchive = 'Archive';
-z.string.conversationsPopoverBlock = 'Block';
-z.string.conversationsPopoverCancel = 'Cancel request';
-z.string.conversationsPopoverClear = 'Delete';
-z.string.conversationsPopoverLeave = 'Leave';
-z.string.conversationsPopoverNotify = 'Unmute';
-z.string.conversationsPopoverSilence = 'Mute';
-z.string.conversationsPopoverUnarchive = 'Unarchive';
+z.string.conversationsPopoverArchive = 'Archive conversation';
+z.string.conversationsPopoverBlock = 'Block contact…';
+z.string.conversationsPopoverCancel = 'Cancel request…';
+z.string.conversationsPopoverClear = 'Delete content…';
+z.string.conversationsPopoverLeave = 'Leave group…';
+z.string.conversationsPopoverNotify = 'Unmute conversation';
+z.string.conversationsPopoverSilence = 'Mute conversation';
+z.string.conversationsPopoverUnarchive = 'Unarchive conversation';
 
 // Conversations secondary line
 z.string.conversationsSecondaryLineMissedCall = '{{number}} missed call';
@@ -463,13 +463,13 @@ z.string.addParticipantsTabsServices = 'Services';
 // Panel: Conversation details
 z.string.conversationDetailsActionArchive = 'Archive conversation';
 z.string.conversationDetailsActionAddParticipants = 'Add participants';
-z.string.conversationDetailsActionBlock = 'Block contact';
-z.string.conversationDetailsActionCancelRequest = 'Cancel request';
-z.string.conversationDetailsActionClear = 'Delete content';
+z.string.conversationDetailsActionBlock = 'Block contact…';
+z.string.conversationDetailsActionCancelRequest = 'Cancel request…';
+z.string.conversationDetailsActionClear = 'Delete content…';
 z.string.conversationDetailsActionCreateGroup = 'Create group';
 z.string.conversationDetailsActionDevices = 'Devices';
 z.string.conversationDetailsActionGuestOptions = 'Guest options';
-z.string.conversationDetailsActionLeave = 'Leave group';
+z.string.conversationDetailsActionLeave = 'Leave group…';
 z.string.conversationDetailsGuestsOff = 'Off';
 z.string.conversationDetailsGuestsOn = 'On';
 z.string.conversationDetailsParticipantsServicesOne = 'Service';
@@ -480,18 +480,18 @@ z.string.conversationDetailsPeople = 'People';
 z.string.conversationDetailsServices = 'Services';
 
 // Panel: Group participant
-z.string.groupParticipantActionBlock = 'Block contact';
-z.string.groupParticipantActionCancelRequest = 'Cancel request';
+z.string.groupParticipantActionBlock = 'Block contact…';
+z.string.groupParticipantActionCancelRequest = 'Cancel request…';
 z.string.groupParticipantActionDevices = 'Devices';
 z.string.groupParticipantActionIgnoreRequest = 'Ignore request';
 z.string.groupParticipantActionIncomingRequest = 'Accept request';
-z.string.groupParticipantActionLeave = 'Leave group';
+z.string.groupParticipantActionLeave = 'Leave group…';
 z.string.groupParticipantActionOpenConversation = 'Open conversation';
 z.string.groupParticipantActionPending = 'Pending';
-z.string.groupParticipantActionRemove = 'Remove from group';
+z.string.groupParticipantActionRemove = 'Remove from group…';
 z.string.groupParticipantActionSelfProfile = 'Open profile';
 z.string.groupParticipantActionSendRequest = 'Connect';
-z.string.groupParticipantActionUnblock = 'Unblock contact';
+z.string.groupParticipantActionUnblock = 'Unblock contact…';
 
 // Panel: Guest options
 z.string.guestOptionsCopyLink = 'Copy link';
@@ -499,7 +499,7 @@ z.string.guestOptionsCopyLinkDone = 'Link copied!';
 z.string.guestOptionsCreateLink = 'Create link';
 z.string.guestOptionsInfoHeader = 'Invite others with a link';
 z.string.guestOptionsInfoText = 'Anyone with the link can join the conversation, even if they don’t have Wire.';
-z.string.guestOptionsRevokeLink = 'Revoke link';
+z.string.guestOptionsRevokeLink = 'Revoke link…';
 z.string.guestOptionsTitle = 'Guest options';
 
 // Panel: Participant devices
@@ -568,7 +568,7 @@ z.string.preferencesDevicesCurrent = 'Current';
 z.string.preferencesDevicesFingerprint = 'Key fingerprint';
 z.string.preferencesDevicesFingerprintDetail = 'Wire gives every device a unique fingerprint. Compare them and verify your devices and conversations.';
 z.string.preferencesDevicesId = 'ID: ';
-z.string.preferencesDevicesRemove = 'Remove';
+z.string.preferencesDevicesRemove = 'Remove…';
 z.string.preferencesDevicesRemoveCancel = 'Cancel';
 z.string.preferencesDevicesRemoveDetail = 'Remove this device if you have stopped using it. You will be logged out of this device immediately.';
 z.string.preferencesDevicesSessionConfirmation = 'The session has been reset.';
