@@ -195,7 +195,8 @@ z.conversation.EventMapper = class EventMapper {
     const eventData = event.data;
     const messageEntity = new z.entity.ContentMessage();
 
-    const isMediumImage = eventData.info.tag === 'medium';
+    const assetInfo = eventData.info;
+    const isMediumImage = assetInfo && assetInfo.tag === 'medium';
     const assetEntity = isMediumImage ? this._mapAssetImage(event, createDummyImage) : this._mapAssetFile(event);
     messageEntity.assets.push(assetEntity);
 
