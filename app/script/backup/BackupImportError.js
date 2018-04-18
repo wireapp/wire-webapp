@@ -19,9 +19,8 @@
 
 window.z = window.z || {};
 window.z.backup = z.backup || {};
-window.z.backup.importError = z.backup.importError || {};
 
-(function decorate(namespace) {
+z.backup.importError = (() => {
   class BackupImportError extends Error {
     constructor(message = 'Something went wrong.') {
       super(message);
@@ -44,16 +43,16 @@ window.z.backup.importError = z.backup.importError || {};
   }
 
   class IncompatibleBackupError extends BackupImportError {
-    constructor(
-      message = 'This backup was created by a newer or outdated version of Wire and cannot be restored here.'
-    ) {
+    constructor(message = 'Backup created by incompatible database version') {
       super(message);
       Object.setPrototypeOf(this, IncompatibleBackupError.prototype);
     }
   }
 
-  namespace.BackupImportError = BackupImportError;
-  namespace.InvalidMetaDataError = InvalidMetaDataError;
-  namespace.DifferentAccountError = DifferentAccountError;
-  namespace.IncompatibleBackupError = IncompatibleBackupError;
-})(z.backup.importError);
+  return {
+    BackupImportError,
+    DifferentAccountError,
+    IncompatibleBackupError,
+    InvalidMetaDataError,
+  };
+})();
