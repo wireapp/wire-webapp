@@ -169,7 +169,6 @@ z.backup.BackupRepository = class BackupRepository {
         return zip;
       })
       .catch(error => {
-        console.error(error);
         if (error instanceof z.backup.CancelError) {
           throw error;
         }
