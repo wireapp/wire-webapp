@@ -35,12 +35,12 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
   constructor(mainViewModel, contentViewModel, repositories) {
     this.hasError = ko.observable(false);
     this.state = ko.observable(HistoryExportViewModel.STATE.PREPARING);
-    this.isPreparing = ko.pureComputed(
-      () => !this.hasError() && this.state() === HistoryExportViewModel.STATE.PREPARING
-    );
-    this.isExporting = ko.pureComputed(
-      () => !this.hasError() && this.state() === HistoryExportViewModel.STATE.EXPORTING
-    );
+    this.isPreparing = ko.pureComputed(() => {
+      return !this.hasError() && this.state() === HistoryExportViewModel.STATE.PREPARING;
+    });
+    this.isExporting = ko.pureComputed(() => {
+      return !this.hasError() && this.state() === HistoryExportViewModel.STATE.EXPORTING;
+    });
     this.isDone = ko.pureComputed(() => !this.hasError() && this.state() === HistoryExportViewModel.STATE.DONE);
 
     this.numberOfRecords = ko.observable(0);
