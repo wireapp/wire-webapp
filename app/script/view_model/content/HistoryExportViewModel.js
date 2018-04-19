@@ -26,9 +26,9 @@ window.z.viewModel.content = z.viewModel.content || {};
 z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
   static get STATE() {
     return {
-      DONE: 'DONE',
-      EXPORTING: 'EXPORTING',
-      PREPARING: 'PREPARING',
+      DONE: 'HistoryExportViewModel.STATE.DONE',
+      EXPORTING: 'HistoryExportViewModel.STATE.EXPORTING',
+      PREPARING: 'HistoryExportViewModel.STATE.PREPARING',
     };
   }
 
