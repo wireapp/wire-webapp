@@ -53,7 +53,7 @@ z.viewModel.ContentViewModel = class ContentViewModel {
     this.logger = new z.util.Logger('z.viewModel.ContentViewModel', z.config.LOGGER.OPTIONS);
 
     // State
-    this.state = ko.observable(ContentViewModel.STATE.HISTORY_EXPORT);
+    this.state = ko.observable(ContentViewModel.STATE.WATERMARK);
     this.multitasking = {
       autoMinimize: ko.observable(true),
       isMinimized: ko.observable(false),
