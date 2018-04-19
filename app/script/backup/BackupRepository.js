@@ -47,10 +47,6 @@ z.backup.BackupRepository = class BackupRepository {
     };
   }
 
-  cancelBackup() {
-    amplify.publish(z.event.WebApp.BACKUP.EXPORT.CANCEL);
-  }
-
   exportBackup() {
     return this.backupService.getHistoryCount().then(numberOfRecords => {
       const userName = this.userRepository.self().username();
