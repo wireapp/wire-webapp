@@ -1,0 +1,28 @@
+<div id="history-export" data-bind="with: $root.historyExport">
+  <!-- ko if: isPreparing -->
+    <loading-bar params="progress: loadingProgress, message: loadingMessage"></loading-bar>
+  <!-- /ko -->
+  <!-- ko if: isExporting -->
+    <loading-bar params="progress: loadingProgress, message: loadingMessage" class="with-cancel"></loading-bar>
+    <div class="cancel-button" data-bind="click: onCancel, l10n_text: z.string.backupCancel"></div>
+  <!-- /ko -->
+  <!-- ko if: isDone -->
+    <div class="history-message">
+      <div class="history-message__headline" data-bind="l10n_text: z.string.backupExportSuccessHeadline"></div>
+      <div class="history-message__info" data-bind="l10n_text: z.string.backupExportSuccessSecondary"></div>
+      <div class="history-message__buttons">
+        <button class="button" data-bind="l10n_text: z.string.backupExportSuccessAction, click: dismissExport"></button>
+      </div>
+    </div>
+  <!-- /ko -->
+  <!-- ko if: hasError -->
+    <div class="history-message">
+      <div class="history-message__headline" data-bind="l10n_text: z.string.backupExportGenericErrorHeadline"></div>
+      <div class="history-message__info" data-bind="l10n_text: z.string.backupExportGenericErrorSecondary"></div>
+      <div class="history-message__buttons">
+        <button class="button button-inverted" data-bind="l10n_text: z.string.backupTryAgain, click: onTryAgain"></button>
+        <button class="button" data-bind="l10n_text: z.string.backupCancel, click: dismissExport"></button>
+      </div>
+    </div>
+  <!-- /ko -->
+</div>

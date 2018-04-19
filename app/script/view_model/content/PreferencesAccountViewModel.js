@@ -197,24 +197,16 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   clickOnBackupExport() {
-    const username = this.selfUser().username();
-    this.backupRepository
-      .generateHistory()
-      .then(archive => archive.generateAsync({type: 'blob'}))
-      .then(archiveBlob => {
-        const timestamp = new Date().toISOString().substring(0, 10);
-        const filename = `Wire-${username}-Backup_${timestamp}.desktop_wbu`;
-
-        z.util.downloadBlob(archiveBlob, filename);
-      });
+    amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.HISTORY_EXPORT);
+    amplify.publish(z.event.WebApp.BACKUP.EXPORT.START);
   }
 
   onImportFileChange(viewModel, event) {
     const file = event.target.files[0];
-    if (!file) {
-      return;
+    if (file) {
+      amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.HISTORY_IMPORT);
+      amplify.publish(z.event.WebApp.BACKUP.IMPORT.START, file);
     }
-    JSZip.loadAsync(file).then(archive => this.backupRepository.importHistory(archive));
   }
 
   clickOnCreate() {

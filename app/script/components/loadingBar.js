@@ -17,12 +17,19 @@
  *
  */
 
-.loading-screen {
-  .flex-center;
-
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background-color: @app-bg;
-  color: @graphite;
+class LoadingBar {
+  constructor({progress, message}) {
+    this.loadingMessage = message;
+    this.loadingPercentage = ko.pureComputed(() => `${progress()}%`);
+  }
 }
+
+ko.components.register('loading-bar', {
+  template: `
+    <div class="text-center">
+      <div class="progress-console" data-bind="text: loadingMessage"></div>
+      <div class="progress-bar"><div data-bind="style: {width: loadingPercentage}"></div></div>
+    </div>
+`,
+  viewModel: LoadingBar,
+});

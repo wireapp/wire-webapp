@@ -1,6 +1,3 @@
 <div id="loading-screen" class="loading-screen">
-  <div class="text-center">
-    <div class="progress-console" data-bind="text: loadingMessage"></div>
-    <div class="progress-bar"><div data-bind="style: {width: loadingPercentage}"></div></div>
-  </div>
+  <loading-bar params="message: loadingMessage, progress: loadingProgress"></loading-bar>
 </div>

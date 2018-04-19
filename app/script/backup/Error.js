@@ -28,6 +28,13 @@ window.z.backup = z.backup || {};
     }
   }
 
+  class CancelError extends Error {
+    constructor(message = 'Action was cancelled') {
+      super(message);
+      Object.setPrototypeOf(this, CancelError.prototype);
+    }
+  }
+
   class ImportError extends Error {
     constructor(message = 'Something went wrong.') {
       super(message);
@@ -56,6 +63,7 @@ window.z.backup = z.backup || {};
     }
   }
 
+  module.CancelError = CancelError;
   module.DifferentAccountError = DifferentAccountError;
   module.ExportError = ExportError;
   module.ImportError = ImportError;

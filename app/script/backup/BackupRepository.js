@@ -36,6 +36,7 @@ z.backup.BackupRepository = class BackupRepository {
     this.clientRepository = clientRepository;
     this.logger = new z.util.Logger('z.backup.BackupRepository', z.config.LOGGER.OPTIONS);
     this.userRepository = userRepository;
+    this.isCanceled = false;
   }
 
   createMetaDescription() {
@@ -48,15 +49,9 @@ z.backup.BackupRepository = class BackupRepository {
     };
   }
 
-  exportBackup() {
-    return this.backupService.getHistoryCount().then(numberOfRecords => {
-      const userName = this.userRepository.self().username();
-
-      return {
-        numberOfRecords,
-        userName,
-      };
-    });
+  getBackupInitData() {
+    const userName = this.userRepository.self().username();
+    return this.backupService.getHistoryCount().then(numberOfRecords => ({numberOfRecords, userName}));
   }
 
   getUserData() {
@@ -85,7 +80,8 @@ z.backup.BackupRepository = class BackupRepository {
     });
   }
 
-  importHistory(archive) {
+  importHistory(archive, initCallback, progressCallback) {
+    this.isCanceled = false;
     const files = archive.files;
     if (!files[this.ARCHIVE_META_FILENAME]) {
       throw new z.backup.InvalidMetaDataError();
@@ -101,10 +97,15 @@ z.backup.BackupRepository = class BackupRepository {
       .map(zippedFile => zippedFile.async('string').then(value => ({content: value, filename: zippedFile.name})));
 
     const importEntriesPromise = Promise.all(unzipPromises).then(fileDescriptors => {
+      initCallback(fileDescriptors.length);
       fileDescriptors.forEach(fileDescriptor => {
+        if (this.isCanceled) {
+          throw new z.backup.CancelError();
+        }
         const tableName = fileDescriptor.filename.replace('.json', '');
         const entities = JSON.parse(fileDescriptor.content);
         entities.forEach(entity => this.backupService.importEntity(tableName, entity));
+        progressCallback();
       });
     });
 
@@ -125,17 +126,30 @@ z.backup.BackupRepository = class BackupRepository {
     }
   }
 
-  generateHistory() {
+  cancelAction() {
+    this.isCanceled = true;
+  }
+
+  /**
+   * Gather needed data for the export and generates the history
+   *
+   * @param {function} progressCallback - called on every step of the export
+   * @returns {Promise<JSZip>} The promise that contains all the exported tables
+   */
+  generateHistory(progressCallback) {
     const tables = this.backupService.getTables();
     const meta = this.createMetaDescription();
     const tablesData = {};
-
+    this.isCanceled = false;
     const loadDataPromises = tables.map(table => {
       return this.backupService.exportTable(table, (tableName, rows) => {
+        if (this.isCanceled) {
+          throw new z.backup.CancelError();
+        }
+        progressCallback(rows.length);
         tablesData[tableName] = (tablesData[tableName] || []).concat(rows);
       });
     });
-
     return Promise.all(loadDataPromises)
       .then(() => {
         const zip = new JSZip();
@@ -150,7 +164,10 @@ z.backup.BackupRepository = class BackupRepository {
 
         return zip;
       })
-      .catch(() => {
+      .catch(error => {
+        if (error instanceof z.backup.CancelError) {
+          throw error;
+        }
         throw new z.backup.ExportError();
       });
   }
