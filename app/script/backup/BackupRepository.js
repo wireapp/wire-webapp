@@ -165,9 +165,12 @@ z.backup.BackupRepository = class BackupRepository {
         return zip;
       })
       .catch(error => {
+        this.logger.error(`Failed to export history: ${error.message}`, error);
+
         if (error instanceof z.backup.CancelError) {
           throw error;
         }
+
         throw new z.backup.ExportError();
       });
   }
