@@ -32,21 +32,19 @@ z.viewModel.content.HistoryImportViewModel = class HistoryImportViewModel {
     };
   }
 
-  constructor() {
-    this.hasError = ko.observable(false);
+  constructor(mainViewModel, contentViewModel, repositories) {
     this.error = ko.observable(null);
-    this.state = ko.observable(HistoryImportViewModel.STATE.PREPARING);
-    this.isPreparing = ko.pureComputed(
-      () => !this.hasError() && this.state() === HistoryImportViewModel.STATE.PREPARING
-    );
-    this.isImporting = ko.pureComputed(
-      () => !this.hasError() && this.state() === HistoryImportViewModel.STATE.IMPORTING
-    );
-    this.isDone = ko.pureComputed(() => !this.hasError() && this.state() === HistoryImportViewModel.STATE.DONE);
+    this.errorHeadline = ko.observable('');
+    this.errorSecondary = ko.observable('');
 
-    this.numberOfRecords = ko.observable(0);
-    this.numberOfProcessedRecords = ko.observable(0);
-    this.loadingProgress = ko.pureComputed(() => this.numberOfProcessedRecords() / this.numberOfRecords() * 100);
+    this.state = ko.observable(HistoryImportViewModel.STATE.PREPARING);
+    this.isPreparing = ko.pureComputed(() => !this.error() && this.state() === HistoryImportViewModel.STATE.PREPARING);
+    this.isImporting = ko.pureComputed(() => !this.error() && this.state() === HistoryImportViewModel.STATE.IMPORTING);
+    this.isDone = ko.pureComputed(() => !this.error() && this.state() === HistoryImportViewModel.STATE.DONE);
+
+    this.numberOfTables = ko.observable(0);
+    this.numberOfProcessedTables = ko.observable(0);
+    this.loadingProgress = ko.pureComputed(() => this.numberOfProcessedTables() / this.numberOfTables() * 100);
 
     this.loadingMessage = ko.pureComputed(() => {
       switch (this.state()) {
@@ -55,9 +53,9 @@ z.viewModel.content.HistoryImportViewModel = class HistoryImportViewModel {
         }
         case HistoryImportViewModel.STATE.IMPORTING: {
           const replacements = {
-            processed: this.numberOfProcessedRecords(),
+            processed: this.numberOfProcessedTables(),
             progress: this.loadingProgress(),
-            total: this.numberOfRecords(),
+            total: this.numberOfTables(),
           };
           return z.l10n.text(z.string.backupImportProgressSecondary, replacements);
         }
@@ -66,26 +64,63 @@ z.viewModel.content.HistoryImportViewModel = class HistoryImportViewModel {
       }
     });
 
+    this.error.subscribe(error => {
+      if (!error) {
+        this.errorHeadline('');
+        this.errorSecondary('');
+      } else if (error instanceof z.backup.DifferentAccountError) {
+        this.errorHeadline(z.l10n.text(z.string.backupImportAccountErrorHeadline));
+        this.errorSecondary(z.l10n.text(z.string.backupImportAccountErrorSecondary));
+      } else if (error instanceof z.backup.IncompatibleBackupError) {
+        this.errorHeadline(z.l10n.text(z.string.backupImportVersionErrorHeadline));
+        this.errorSecondary(z.l10n.text(z.string.backupImportVersionErrorSecondary));
+      } else {
+        this.errorHeadline(z.l10n.text(z.string.backupImportGenericErrorHeadline));
+        this.errorSecondary(z.l10n.text(z.string.backupImportGenericErrorSecondary));
+      }
+    });
+
+    this.backupRepository = repositories.backup;
+
     amplify.subscribe(z.event.WebApp.BACKUP.IMPORT.START, this.importHistory.bind(this));
   }
 
   importHistory(file) {
-    JSZip.loadAsync(file).then(archive => this.backupRepository.importHistory(archive));
-  }
-
-  onInit(numberOfRecords) {
     this.state(HistoryImportViewModel.STATE.PREPARING);
-    this.numberOfRecords(numberOfRecords);
-    this.numberOfProcessedRecords(0);
-    this.hasError(false);
+    this.error(null);
+    JSZip.loadAsync(file)
+      .then(archive => this.backupRepository.importHistory(archive, this.onInit.bind(this), this.onProgress.bind(this)))
+      .then(this.onSuccess.bind(this))
+      .catch(this.onError.bind(this));
   }
 
-  onProgress(name, entries) {
+  onInit(numberOfTables) {
+    this.state(HistoryImportViewModel.STATE.PREPARING);
+    this.numberOfTables(numberOfTables);
+    this.numberOfProcessedTables(0);
+    this.error(null);
+  }
+
+  onProgress() {
     this.state(HistoryImportViewModel.STATE.IMPORTING);
-    this.numberOfProcessedRecords(this.numberOfProcessedRecords() + entries.length);
+    this.numberOfProcessedTables(this.numberOfProcessedTables() + 1);
+  }
+
+  onSuccess() {
+    this.error(null);
+    this.state(HistoryImportViewModel.STATE.DONE);
+    window.setTimeout(this.dismissImport.bind(this), 1000);
+  }
+
+  onCancel() {
+    this.backupRepository.cancelAction();
+  }
+
+  dismissImport() {
+    amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.PREFERENCES_ACCOUNT);
   }
 
   onError(error) {
-    this.hasError(true);
+    this.error(error);
   }
 };

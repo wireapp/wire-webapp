@@ -83,7 +83,8 @@ z.backup.BackupRepository = class BackupRepository {
     });
   }
 
-  importHistory(archive) {
+  importHistory(archive, initCallback, progressCallback) {
+    this.isCanceled = false;
     const files = archive.files;
     if (!files[this.ARCHIVE_META_FILENAME]) {
       throw new z.backup.InvalidMetaDataError();
@@ -99,10 +100,15 @@ z.backup.BackupRepository = class BackupRepository {
       .map(zippedFile => zippedFile.async('string').then(value => ({content: value, filename: zippedFile.name})));
 
     const importEntriesPromise = Promise.all(unzipPromises).then(fileDescriptors => {
+      initCallback(fileDescriptors.length);
       fileDescriptors.forEach(fileDescriptor => {
+        if (this.isCanceled) {
+          throw new z.backup.CancelError();
+        }
         const tableName = fileDescriptor.filename.replace('.json', '');
         const entities = JSON.parse(fileDescriptor.content);
         entities.forEach(entity => this.backupService.importEntity(tableName, entity));
+        progressCallback();
       });
     });
 

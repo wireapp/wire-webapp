@@ -204,6 +204,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   onImportFileChange(viewModel, event) {
     const file = event.target.files[0];
     if (file) {
+      amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.HISTORY_IMPORT);
       amplify.publish(z.event.WebApp.BACKUP.IMPORT.START, file);
     }
   }

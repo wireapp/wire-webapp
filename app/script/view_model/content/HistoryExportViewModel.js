@@ -65,7 +65,6 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
       }
     });
 
-    this.mainViewModel = mainViewModel;
     this.backupRepository = repositories.backup;
 
     amplify.subscribe(z.event.WebApp.BACKUP.EXPORT.START, this.exportHistory.bind(this));
@@ -117,6 +116,6 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
   }
 
   dismissExport() {
-    this.mainViewModel.content.switchPreviousContent();
+    amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.PREFERENCES_ACCOUNT);
   }
 };

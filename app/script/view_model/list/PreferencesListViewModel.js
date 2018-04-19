@@ -62,11 +62,17 @@ z.viewModel.list.PreferencesListViewModel = class PreferencesListViewModel {
   }
 
   clickOnClosePreferences() {
-    if (!this.isActivatedAccount()) {
-      return this.listViewModel.showTemporaryGuest();
-    }
+    const preventingContentViewStates = [
+      z.viewModel.ContentViewModel.STATE.HISTORY_EXPORT,
+      z.viewModel.ContentViewModel.STATE.HISTORY_IMPORT,
+    ];
 
-    this.listViewModel.switchList(z.viewModel.ListViewModel.STATE.CONVERSATIONS);
+    if (!preventingContentViewStates.includes(this.contentViewModel.state())) {
+      if (!this.isActivatedAccount()) {
+        return this.listViewModel.showTemporaryGuest();
+      }
+      this.listViewModel.switchList(z.viewModel.ListViewModel.STATE.CONVERSATIONS);
+    }
   }
 
   clickOnAbout() {

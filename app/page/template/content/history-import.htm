@@ -1,31 +1,5 @@
 <div id="history-import" data-bind="with: $root.historyImport">
   <!-- ko if: isPreparing -->
-    <loading-bar data-bind=""></loading-bar>
-  <!-- /ko -->
-  <!-- ko if: isImporting -->
-    <loading-bar class="with-cancel"></loading-bar>
-    <div class="cancel-button">Cancel</div>
-  <!-- /ko -->
-  <!-- ko if: isDone -->
-    <div class="history-message">
-      <div class=history-message__headline>Backup completed</div>
-      <div class="history-message__info">You can use this to restore history if you lose your computer or switch to a new one.</div>
-      <div class="history-message__buttons">
-        <button class="button">OK</button>
-      </div>
-    </div>
-  <!-- /ko -->
-  <!-- ko if: hasError -->
-    <div class="history-message">
-      <div class=history-message__headline>Something went wrong </div>
-      <div class="history-message__info">The backup was not completed.</div>
-      <div class="history-message__buttons">
-        <button class="button button-inverted">Cancel</button>
-        <button class="button">Try Again</button>
-      </div>
-    </div>
-  <!-- /ko -->
-    <!-- ko if: isPreparing -->
     <loading-bar params="progress: loadingProgress, message: loadingMessage"></loading-bar>
   <!-- /ko -->
   <!-- ko if: isImporting -->
@@ -38,13 +12,12 @@
       <div class="history-message__headline" data-bind="l10n_text: z.string.backupImportSuccessHeadline"></div>
     </div>
   <!-- /ko -->
-  <!-- ko if: hasError -->
+  <!-- ko if: error -->
     <div class="history-message">
-      <div class="history-message__headline" data-bind="l10n_text: z.string.backupExportGenericErrorHeadline"></div>
-      <div class="history-message__info" data-bind="l10n_text: z.string.backupExportGenericErrorSecondary"></div>
+      <div class="history-message__headline" data-bind="text: errorHeadline"></div>
+      <div class="history-message__info" data-bind="text: errorSecondary"></div>
       <div class="history-message__buttons">
-        <button class="button button-inverted" data-bind="l10n_text: z.string.backupErrorAction, click: onTryAgain"></button>
-        <button class="button" data-bind="l10n_text: z.string.backupErrorSecondaryAction, click: dismissExport"></button>
+        <button class="button" data-bind="l10n_text: z.string.backupCancel, click: dismissImport"></button>
       </div>
     </div>
   <!-- /ko -->
