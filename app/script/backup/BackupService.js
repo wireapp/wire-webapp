@@ -33,6 +33,7 @@ z.backup.BackupService = class BackupService {
   }
 
   constructor(storageService) {
+    this.logger = new z.util.Logger('z.backup.BackupService', z.config.LOGGER.OPTIONS);
     this.storageService = storageService;
   }
 
