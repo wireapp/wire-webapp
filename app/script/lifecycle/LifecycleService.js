@@ -26,7 +26,7 @@ z.lifecycle.LifecycleService = class LifecycleService {
   static get CONFIG() {
     return {
       URL: {
-        VERSION: 'version/',
+        VERSION: '/version/',
       },
     };
   }

@@ -89,10 +89,10 @@ z.backup.BackupRepository = class BackupRepository {
       throw new z.backup.InvalidMetaDataError();
     }
 
-    const metaCheckPromise = files[this.ARCHIVE_META_FILENAME]
+    const verifyMetadataPromise = files[this.ARCHIVE_META_FILENAME]
       .async('string')
       .then(JSON.parse)
-      .then(metadata => checkMetas(metadata, this.createMetaDescription()));
+      .then(metadata => verifyMetadata(metadata, this.createMetaDescription()));
 
     const unzipPromises = Object.values(archive.files)
       .filter(zippedFile => zippedFile.name !== this.ARCHIVE_META_FILENAME)
@@ -106,15 +106,17 @@ z.backup.BackupRepository = class BackupRepository {
       });
     });
 
-    return Promise.all([metaCheckPromise, importEntriesPromise]);
+    return Promise.all([verifyMetadataPromise, importEntriesPromise]);
 
-    function checkMetas(archiveMeta, currentMetadata) {
-      if (archiveMeta.user_id !== currentMetadata.user_id) {
-        const message = `History from user "${metadata.user_id}" cannot be restored for user "${user_id}".`;
+    function verifyMetadata(archiveMetadata, localMetadata) {
+      if (archiveMetadata.user_id !== localMetadata.user_id) {
+        const fromUserId = archiveMetadata.user_id;
+        const toUserId = localMetadata.user_id;
+        const message = `History from user "${fromUserId}" cannot be restored for user "${toUserId}".`;
         throw new z.backup.DifferentAccountError(message);
       }
 
-      if (archiveMeta.version !== currentMetadata.version) {
+      if (archiveMetadata.version !== localMetadata.version) {
         const message = `History cannot be restored: database versions don't match`;
         throw new z.backup.IncompatibleBackupError(message);
       }

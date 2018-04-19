@@ -564,35 +564,32 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     if (message_et.is_downloadable() && !message_et.is_ephemeral()) {
       entries.push({
         click: () => message_et.download(),
-        label: z.string.conversationContextMenuDownload,
+        label: z.l10n.text(z.string.conversationContextMenuDownload),
       });
     }
 
     if (message_et.is_reactable() && !this.conversation().removed_from_conversation()) {
-      if (message_et.is_liked()) {
-        entries.push({
-          click: () => this.click_on_like(message_et, false),
-          label: z.string.conversationContextMenuUnlike,
-        });
-      } else {
-        entries.push({
-          click: () => this.click_on_like(message_et, false),
-          label: z.string.conversationContextMenuLike,
-        });
-      }
+      const stringId = message_et.is_liked()
+        ? z.string.conversationContextMenuUnlike
+        : z.string.conversationContextMenuLike;
+
+      entries.push({
+        click: () => this.click_on_like(message_et, false),
+        label: z.l10n.text(stringId),
+      });
     }
 
     if (message_et.is_editable() && !this.conversation().removed_from_conversation()) {
       entries.push({
         click: () => amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.EDIT, message_et),
-        label: z.string.conversationContextMenuEdit,
+        label: z.l10n.text(z.string.conversationContextMenuEdit),
       });
     }
 
     if (message_et.is_deletable()) {
       entries.push({
         click: () => this.actionsViewModel.deleteMessage(this.conversation(), message_et),
-        label: z.string.conversationContextMenuDelete,
+        label: z.l10n.text(z.string.conversationContextMenuDelete),
       });
     }
 
@@ -601,7 +598,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     if (canDelete) {
       entries.push({
         click: () => this.actionsViewModel.deleteMessageEveryone(this.conversation(), message_et),
-        label: z.string.conversationContextMenuDeleteEveryone,
+        label: z.l10n.text(z.string.conversationContextMenuDeleteEveryone),
       });
     }
 
