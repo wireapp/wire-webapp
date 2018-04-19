@@ -31,17 +31,18 @@ z.backup.BackupRepository = class BackupRepository {
    * @param {z.user.UserRepository} userRepository - Repository for all user and connection interactions
    */
   constructor(backupService, clientRepository, userRepository) {
+    this.ARCHIVE_META_FILENAME = 'meta.json';
     this.backupService = backupService;
     this.clientRepository = clientRepository;
+    this.logger = new z.util.Logger('z.backup.BackupRepository', z.config.LOGGER.OPTIONS);
     this.userRepository = userRepository;
-    this.ARCHIVE_META_FILENAME = 'meta.json';
   }
 
   createMetaDescription() {
     return {
       client_id: this.clientRepository.currentClient().id,
       creation_time: new Date().toISOString(),
-      platform: 'Desktop',
+      platform: 'Web',
       user_id: this.userRepository.self().id,
       version: this.backupService.getDatabaseVersion(),
     };

@@ -41,10 +41,6 @@ describe('z.auth.AuthRepository', () => {
       jasmine.clock().uninstall();
     });
 
-    afterAll(() => {
-      jasmine.clock().uninstall();
-    });
-
     it('renews the access token immediately if expiring in the past', () => {
       const expiration_timestamp = Date.now() - 30000;
       TestFactory.auth_repository._scheduleTokenRefresh(expiration_timestamp);
