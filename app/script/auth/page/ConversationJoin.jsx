@@ -166,7 +166,10 @@ class ConversationJoin extends Component {
   };
 
   renderActivatedAccount = () => {
-    const {selfName, intl: {formatMessage: _}} = this.props;
+    const {
+      selfName,
+      intl: {formatMessage: _},
+    } = this.props;
     const {error} = this.state;
     return (
       <ContainerXS style={{margin: 'auto 0'}}>
@@ -207,7 +210,9 @@ class ConversationJoin extends Component {
   };
 
   renderTemporaryGuestAccount = () => {
-    const {intl: {formatMessage: _}} = this.props;
+    const {
+      intl: {formatMessage: _},
+    } = this.props;
     const {enteredName, isValidName, error} = this.state;
     return (
       <ContainerXS style={{margin: 'auto 0'}}>
@@ -265,7 +270,9 @@ class ConversationJoin extends Component {
   };
 
   renderFullConversation = () => {
-    const {intl: {formatMessage: _}} = this.props;
+    const {
+      intl: {formatMessage: _},
+    } = this.props;
     return (
       <ContainerXS style={{margin: 'auto 0'}}>
         <H2

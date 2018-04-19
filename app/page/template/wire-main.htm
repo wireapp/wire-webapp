@@ -36,6 +36,12 @@
         <!-- ko if: state() === z.viewModel.ContentViewModel.STATE.COLLECTION_DETAILS -->
           #include('content/collection-details.htm')
         <!-- /ko -->
+        <!-- ko if: state() === z.viewModel.ContentViewModel.STATE.HISTORY_EXPORT -->
+          #include('content/history-export.htm')
+        <!-- /ko -->
+        <!-- ko if: state() === z.viewModel.ContentViewModel.STATE.HISTORY_IMPORT -->
+          #include('content/history-import.htm')
+        <!-- /ko -->
         <!-- ko if: state() === z.viewModel.ContentViewModel.STATE.PREFERENCES_ABOUT -->
           #include('content/preferences-about.htm')
         <!-- /ko -->
