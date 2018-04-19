@@ -441,9 +441,9 @@
     ed2curve "0.2.1"
     libsodium-wrappers-sumo "0.7.3"
 
-"@wireapp/react-ui-kit@1.1.4":
-  version "1.1.4"
-  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-1.1.4.tgz#cae960f73f79a5ea8b1b57ec50934f4ccbffeccb"
+"@wireapp/react-ui-kit@1.1.5":
+  version "1.1.5"
+  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-1.1.5.tgz#8e9f9b211a75560ac254f82aec9813f089c56bff"
   dependencies:
     color "3.0.0"
     react "16.3.2"
