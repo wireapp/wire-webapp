@@ -53,7 +53,9 @@ z.backup.BackupService = class BackupService {
   }
 
   getHistoryCount() {
-    return this.getTables().reduce((count, table) => count + table.count(), 0);
+    return Promise.all(this.getTables().map(table => table.count())).then(recordsPerTable => {
+      return recordsPerTable.reduce((accumulator, recordCount) => accumulator + recordCount, 0);
+    });
   }
 
   getTables() {

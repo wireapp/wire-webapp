@@ -72,32 +72,27 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
   }
 
   exportHistory() {
-    const {numberOfRecords, userName} = this.backupRepository.getBackupInitData();
-    this.numberOfRecords(numberOfRecords);
+    this.state(HistoryExportViewModel.STATE.PREPARING);
+    this.hasError(false);
+    this.backupRepository.getBackupInitData().then(({numberOfRecords, userName}) => {
+      this.numberOfRecords(numberOfRecords);
+      this.numberOfProcessedRecords(0);
+      this.backupRepository
+        .generateHistory(this.onProgress.bind(this))
+        .then(archive => archive.generateAsync({type: 'blob'}))
+        .then(archiveBlob => {
+          const timestamp = new Date().toISOString().substring(0, 10);
+          const filename = `Wire-${userName}-Backup_${timestamp}.desktop_wbu`;
+          this.onSuccess();
 
-    this.backupRepository
-      .generateHistory(this.onProgress.bind(this))
-      .then(archive => archive.generateAsync({type: 'blob'}))
-      .then(archiveBlob => {
-        const timestamp = new Date().toISOString().substring(0, 10);
-        const filename = `Wire-${userName}-Backup_${timestamp}.desktop_wbu`;
-        this.onSuccess();
-
-        z.util.downloadBlob(archiveBlob, filename);
-      })
-      .catch(this.onError.bind(this));
+          z.util.downloadBlob(archiveBlob, filename);
+        })
+        .catch(this.onError.bind(this));
+    });
   }
 
   onCancel() {
-    amplify.publish(z.event.WebApp.BACKUP.EXPORT.CANCEL);
     this.backupRepository.cancelAction();
-  }
-
-  onInit(numberOfRecords) {
-    this.state(HistoryExportViewModel.STATE.PREPARING);
-    this.numberOfRecords(numberOfRecords);
-    this.numberOfProcessedRecords(0);
-    this.hasError(false);
   }
 
   onProgress(processedNumber) {

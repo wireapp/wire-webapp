@@ -66,7 +66,11 @@ z.viewModel.content.HistoryImportViewModel = class HistoryImportViewModel {
       }
     });
 
-    amplify.subscribe(z.event.WebApp.BACKUP.IMPORT.START, this.onInit.bind(this));
+    amplify.subscribe(z.event.WebApp.BACKUP.IMPORT.START, this.importHistory.bind(this));
+  }
+
+  importHistory(file) {
+    JSZip.loadAsync(file).then(archive => this.backupRepository.importHistory(archive));
   }
 
   onInit(numberOfRecords) {

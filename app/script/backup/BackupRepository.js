@@ -53,12 +53,8 @@ z.backup.BackupRepository = class BackupRepository {
   }
 
   getBackupInitData() {
-    const numberOfRecords = this.backupService.getHistoryCount();
     const userName = this.userRepository.self().username();
-    return {
-      numberOfRecords,
-      userName,
-    };
+    return this.backupService.getHistoryCount().then(numberOfRecords => ({numberOfRecords, userName}));
   }
 
   getUserData() {

@@ -198,16 +198,14 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
   clickOnBackupExport() {
     amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.HISTORY_EXPORT);
-
     amplify.publish(z.event.WebApp.BACKUP.EXPORT.START);
   }
 
   onImportFileChange(viewModel, event) {
     const file = event.target.files[0];
-    if (!file) {
-      return;
+    if (file) {
+      amplify.publish(z.event.WebApp.BACKUP.IMPORT.START, file);
     }
-    JSZip.loadAsync(file).then(archive => this.backupRepository.importHistory(archive));
   }
 
   clickOnCreate() {
