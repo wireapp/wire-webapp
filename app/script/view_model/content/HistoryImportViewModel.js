@@ -109,7 +109,7 @@ z.viewModel.content.HistoryImportViewModel = class HistoryImportViewModel {
   onSuccess() {
     this.error(null);
     this.state(HistoryImportViewModel.STATE.DONE);
-    window.setTimeout(this.dismissImport.bind(this), 1000);
+    window.setTimeout(this.dismissImport.bind(this), 1500);
   }
 
   onCancel() {
