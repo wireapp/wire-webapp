@@ -91,6 +91,18 @@ describe('z.backup.BackupRepository', () => {
         const fileNames = Object.keys(zip.files);
         expect(fileNames).toContain('meta.json');
         tables.map(table => expect(fileNames).toContain(`${table}.json`));
+
+        const validateConversationsPromise = zip.files['conversations.json']
+          .async('string')
+          .then(conversationsStr => JSON.parse(conversationsStr))
+          .then(conversations => expect(conversations).toEqual([conversation]));
+
+        const validateEventsPromise = zip.files['events.json']
+          .async('string')
+          .then(eventsStr => JSON.parse(eventsStr))
+          .then(events => expect(events).toEqual(messages));
+
+        return Promise.all([validateConversationsPromise, validateEventsPromise]);
       });
     });
   });
