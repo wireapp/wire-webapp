@@ -4,8 +4,8 @@
   },
   "dependencies": {
     "@types/node": "9.6.6",
-    "@wireapp/api-client": "0.7.3",
-    "@wireapp/cryptobox": "8.3.27",
+    "@wireapp/api-client": "0.7.4",
+    "@wireapp/cryptobox": "8.3.28",
     "@wireapp/store-engine": "0.6.2",
     "bazinga64": "5.0.3",
     "logdown": "3.2.3",
@@ -48,5 +48,5 @@
     "test:node": "jasmine --config=src/test/node/support/jasmine.json"
   },
   "types": "./dist/Account.d.ts",
-  "version": "2.2.3"
+  "version": "2.2.4"
 }
