@@ -34,25 +34,27 @@ z.conversation.EventMapper = class EventMapper {
   /**
    * Convert multiple JSON events into message entities.
    *
-   * @param {Object} events - Event data
+   * @param {Array} events - Event data
    * @param {Conversation} conversationEntity - Conversation entity the events belong to
    * @param {boolean} [createDummyImage] - Create a dummy image
-   * @returns {Array<Message>} Mapped message entities
+   * @returns {Promise<Array<Message>>} Resolves with the mapped message entities
    */
   mapJsonEvents(events, conversationEntity, createDummyImage) {
-    return events
-      .reverse()
-      .filter(event => event)
-      .map(event => {
-        try {
-          return this._mapJsonEvent(event, conversationEntity, createDummyImage);
-        } catch (error) {
-          const errorMessage = `Failed to map event of type '${event.type}': ${error.message}`;
-          this.logger.error(errorMessage, {error, event});
-          Raygun.send(new Error(errorMessage), {eventType: event.type});
-        }
-      })
-      .filter(messageEntity => messageEntity);
+    return Promise.resolve().then(() => {
+      return events
+        .filter(event => event)
+        .reverse()
+        .map(event => {
+          try {
+            return this._mapJsonEvent(event, conversationEntity, createDummyImage);
+          } catch (error) {
+            const errorMessage = `Failure while mapping events. Affected type '${event.type}': ${error.message}`;
+            this.logger.error(errorMessage, {error, event});
+            Raygun.send(new Error(errorMessage), {eventType: event.type});
+          }
+        })
+        .filter(messageEntity => messageEntity);
+    });
   }
 
   /**
@@ -61,10 +63,23 @@ z.conversation.EventMapper = class EventMapper {
    * @param {Object} event - Event data
    * @param {Conversation} conversationEntity - Conversation entity the event belong to
    * @param {boolean} [createDummyImage] - Create a dummy image
-   * @returns {Message} Mapped message entity
+   * @returns {Promise} Resolves with the mapped message entity
    */
   mapJsonEvent(event, conversationEntity, createDummyImage) {
-    return this._mapJsonEvent(event, conversationEntity, createDummyImage);
+    return Promise.resolve()
+      .then(() => this._mapJsonEvent(event, conversationEntity, createDummyImage))
+      .catch(error => {
+        const isMessageNotFound = error.type === z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND;
+        if (isMessageNotFound) {
+          throw error;
+        }
+
+        const errorMessage = `Failure while mapping event. Affected type '${event.type}': ${error.message}`;
+        this.logger.error(errorMessage, {error, event});
+        Raygun.send(new Error(errorMessage), {eventType: event.type});
+
+        throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND);
+      });
   }
 
   /**
@@ -129,8 +144,8 @@ z.conversation.EventMapper = class EventMapper {
         messageEntity = this._mapEventVoiceChannelDeactivate(event);
         break;
       default:
-        this.logger.warn(`Ignored unhandled event '${event.id}' of type '${event.type}'`);
-        return messageEntity;
+        this.logger.warn(`Ignored unhandled event ${event.id ? `'${event.id}' ` : ''}of type '${event.type}'`, event);
+        throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND);
     }
 
     const {category, from, id, primary_key, time, type, version} = event;
@@ -195,7 +210,8 @@ z.conversation.EventMapper = class EventMapper {
     const eventData = event.data;
     const messageEntity = new z.entity.ContentMessage();
 
-    const isMediumImage = eventData.info.tag === 'medium';
+    const assetInfo = eventData.info;
+    const isMediumImage = assetInfo && assetInfo.tag === 'medium';
     const assetEntity = isMediumImage ? this._mapAssetImage(event, createDummyImage) : this._mapAssetFile(event);
     messageEntity.assets.push(assetEntity);
 

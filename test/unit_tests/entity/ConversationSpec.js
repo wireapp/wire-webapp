@@ -455,7 +455,7 @@ describe('Conversation', () => {
 
       const conversation_name = 'My favorite music band';
       conversation_et.name(conversation_name);
-      expect(conversation_et.display_name()).toBe(conversation_name);
+      expect(conversation_et.display_name()).toBe('…');
     });
   });
 

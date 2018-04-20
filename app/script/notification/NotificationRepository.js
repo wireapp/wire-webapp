@@ -156,12 +156,16 @@ z.notification.NotificationRepository = class NotificationRepository {
   // Remove notifications from the queue that are no longer unread
   removeReadNotifications() {
     this.notifications.forEach(notification => {
-      if (notification.data) {
-        const {conversationId, messageId} = notification.data;
+      const {conversationId, messageId, messageType} = notification.data || {};
+
+      if (messageId) {
         this.conversationRepository.is_message_read(conversationId, messageId).then(isRead => {
           if (isRead) {
             notification.close();
-            this.logger.info(`Removed read notification for '${messageId}' in '${conversationId}'.`);
+            const messageInfo = messageId
+              ? `message '${messageId}' of type '${messageType}'`
+              : `'${messageType}' message`;
+            this.logger.info(`Removed read notification for ${messageInfo} in '${conversationId}'.`);
           }
         });
       }
@@ -459,9 +463,12 @@ z.notification.NotificationRepository = class NotificationRepository {
    * @returns {Object} Notification message data
    */
   _createOptionsData(messageEntity, connectionEntity, conversationEntity) {
+    const {id: messageId, type: messageType} = messageEntity;
+
     return {
       conversationId: this._getConversationId(connectionEntity, conversationEntity),
-      messageId: messageEntity.id,
+      messageId: messageId === '0' ? undefined : messageId,
+      messageType: messageType,
     };
   }
 
@@ -487,10 +494,8 @@ z.notification.NotificationRepository = class NotificationRepository {
         });
     }
 
-    if (z.util.Environment.electron && z.util.Environment.os.mac) {
-      return Promise.resolve('');
-    }
-    return Promise.resolve(NotificationRepository.CONFIG.ICON_URL);
+    const isMacOsWrapper = z.util.Environment.electron && z.util.Environment.os.mac;
+    return Promise.resolve(isMacOsWrapper ? '' : NotificationRepository.CONFIG.ICON_URL);
   }
 
   /**
@@ -552,15 +557,20 @@ z.notification.NotificationRepository = class NotificationRepository {
     if (messageEntity.is_member()) {
       switch (messageEntity.memberMessageType) {
         case z.message.SystemMessageType.CONNECTION_ACCEPTED:
-        case z.message.SystemMessageType.CONNECTION_CONNECTED:
+        case z.message.SystemMessageType.CONNECTION_CONNECTED: {
           return () => amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationId);
-        case z.message.SystemMessageType.CONNECTION_REQUEST:
+        }
+
+        case z.message.SystemMessageType.CONNECTION_REQUEST: {
           return () => {
             amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS);
           };
-        default:
+        }
+
+        default: {
           const message = `No notification trigger for message '${messageEntity.id} in '${conversationId}'.`;
           this.logger.log(this.logger.levels.OFF, message);
+        }
       }
     }
     return () => amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity || conversationId);
@@ -585,13 +595,18 @@ z.notification.NotificationRepository = class NotificationRepository {
    */
   _getPermissionState() {
     switch (this.permissionState) {
-      case z.notification.PermissionStatusState.GRANTED:
+      case z.notification.PermissionStatusState.GRANTED: {
         return Promise.resolve(true);
+      }
+
       case z.notification.PermissionStatusState.IGNORED:
-      case z.notification.PermissionStatusState.UNSUPPORTED:
+      case z.notification.PermissionStatusState.UNSUPPORTED: {
         return Promise.resolve(false);
-      default:
+      }
+
+      default: {
         return Promise.resolve(undefined);
+      }
     }
   }
 
@@ -757,37 +772,39 @@ z.notification.NotificationRepository = class NotificationRepository {
     */
     this.removeReadNotifications();
     const notification = new window.Notification(notificationContent.title, notificationContent.options);
-    const {conversationId, messageId = 'ID not specified'} = notificationContent.options.data;
+    const {conversationId, messageId, messageType} = notificationContent.options.data;
     let timeoutTriggerId = undefined;
 
+    const messageInfo = messageId ? `message '${messageId}' of type '${messageType}'` : `'${messageType}' message`;
     notification.onclick = () => {
       amplify.publish(z.event.WebApp.NOTIFICATION.CLICK);
       window.focus();
       wire.app.view.content.multitasking.isMinimized(true);
       notificationContent.trigger();
-      this.logger.info(`Notification for message '${messageId} in conversation '${conversationId}' closed by click.`);
+
+      this.logger.info(`Notification for ${messageInfo} in '${conversationId}' closed by click.`);
       notification.close();
     };
 
     notification.onclose = () => {
       window.clearTimeout(timeoutTriggerId);
       this.notifications.splice(this.notifications.indexOf(notification), 1);
-      this.logger.info(`Removed notification for '${messageId}' in '${conversationId}' locally.`);
+      this.logger.info(`Removed notification for ${messageInfo} in '${conversationId}' locally.`);
     };
 
     notification.onerror = () => {
-      this.logger.error(`Notification for '${messageId}' in '${conversationId}' closed by error.`);
+      this.logger.error(`Notification for ${messageInfo} in '${conversationId}' closed by error.`);
       notification.close();
     };
 
     notification.onshow = () => {
       timeoutTriggerId = window.setTimeout(() => {
-        this.logger.info(`Notification for '${messageId}' in '${conversationId}' closed by timeout.`);
+        this.logger.info(`Notification for ${messageInfo} in '${conversationId}' closed by timeout.`);
         notification.close();
       }, notificationContent.timeout);
     };
 
     this.notifications.push(notification);
-    this.logger.info(`Added notification for '${messageId}' in '${conversationId}' to queue.`);
+    this.logger.info(`Added notification for ${messageInfo} in '${conversationId}' to queue.`);
   }
 };

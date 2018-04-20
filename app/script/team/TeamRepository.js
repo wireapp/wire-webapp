@@ -235,7 +235,10 @@ z.team.TeamRepository = class TeamRepository {
   }
 
   _onMemberJoin(eventJson) {
-    const {data: {user: userId}, team: teamId} = eventJson;
+    const {
+      data: {user: userId},
+      team: teamId,
+    } = eventJson;
     const isLocalTeam = this.team().id === teamId;
     const isOtherUser = this.selfUser().id !== userId;
 
@@ -245,7 +248,11 @@ z.team.TeamRepository = class TeamRepository {
   }
 
   _onMemberLeave(eventJson) {
-    const {data: {user: userId}, team: teamId, time} = eventJson;
+    const {
+      data: {user: userId},
+      team: teamId,
+      time,
+    } = eventJson;
     const isLocalTeam = this.team().id === teamId;
 
     if (isLocalTeam) {
@@ -260,7 +267,11 @@ z.team.TeamRepository = class TeamRepository {
   }
 
   _onMemberUpdate(eventJson) {
-    const {data: {user: userId}, permissions, team: teamId} = eventJson;
+    const {
+      data: {user: userId},
+      permissions,
+      team: teamId,
+    } = eventJson;
     const isLocalTeam = this.team().id === teamId;
     const isSelfUser = this.selfUser().id === userId;
 
