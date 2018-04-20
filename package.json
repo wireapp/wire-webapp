@@ -38,7 +38,7 @@
     "rimraf": "2.6.2",
     "sinon": "4.5.0",
     "sinon-har-server": "0.3.0",
-    "typescript": "2.8.1",
+    "typescript": "2.8.3",
     "webpack": "3.11.0",
     "webpack-dev-server": "3.1.3"
   },
