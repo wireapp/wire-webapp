@@ -1,0 +1,49 @@
+{
+  "description": "Base64 encoding and decoding with ASCII string representation.",
+  "devDependencies": {
+    "jasmine": "3.1.0",
+    "karma": "2.0.2",
+    "karma-chrome-launcher": "2.2.0",
+    "karma-coverage": "1.1.1",
+    "karma-jasmine": "1.1.1",
+    "karma-jasmine-diff-reporter": "1.2.0",
+    "karma-sourcemap-loader": "0.3.7",
+    "libsodium-wrappers": "0.7.3",
+    "rimraf": "2.6.2",
+    "run-sequence": "2.2.1",
+    "typescript": "2.8.1",
+    "webpack": "3.11.0"
+  },
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "array",
+    "ascii",
+    "base64",
+    "browsers",
+    "buffer",
+    "decode",
+    "decoding",
+    "encode",
+    "encoding",
+    "nodejs",
+    "string"
+  ],
+  "license": "GPL-3.0",
+  "main": "dist/bazinga64.js",
+  "name": "bazinga64",
+  "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/bazinga64",
+  "scripts": {
+    "build": "yarn build:node && yarn build:browser",
+    "build:browser": "webpack --progress",
+    "build:node": "tsc",
+    "clear": "rimraf dist",
+    "dist": "yarn clear && yarn build",
+    "test": "yarn test:node && yarn test:browser",
+    "test:browser": "webpack && karma start",
+    "test:node": "cross-env JASMINE_CONFIG_PATH=test/shared/support/jasmine.json jasmine"
+  },
+  "types": "dist/bazinga64.d.ts",
+  "version": "5.0.3"
+}
