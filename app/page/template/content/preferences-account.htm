@@ -91,7 +91,7 @@
           <div class="preferences-detail" data-bind="l10n_text: z.string.preferencesOptionsBackupExportSecondary"></div>
           <label class="preferences-link text-theme preferences-history-backup-import-field" data-uie-name="do-backup-import">
             <span data-bind="l10n_text: z.string.preferencesOptionsBackupImportHeadline"></span>
-            <input type="file" data-bind="event: { change: onImportFileChange }" data-uie-name="input-import-file"/>
+            <input type="file" data-bind="event: {change: onImportFileChange}, attr: {accept: `.${z.viewModel.content.HistoryExportViewModel.CONFIG.EXPORT_FILE_EXTENSION}`}" data-uie-name="input-import-file"/>
           </label>
           <div class="preferences-detail" data-bind="l10n_text: z.string.preferencesOptionsBackupImportSecondary"></div>
         </section>
