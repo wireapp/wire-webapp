@@ -193,13 +193,9 @@ z.entity.Conversation = class Conversation {
      */
     this.display_name = ko.pureComputed(() => {
       if (this.is_request() || this.is_one2one()) {
-        if (this.team_id && this.name()) {
-          return this.name();
-        }
-
         const [userEntity] = this.participating_user_ets();
-        const hasUser = userEntity && userEntity.name();
-        return hasUser ? userEntity.name() : '…';
+        const userName = userEntity && userEntity.name();
+        return userName ? userName : '…';
       }
 
       if (this.is_group()) {
@@ -209,10 +205,10 @@ z.entity.Conversation = class Conversation {
 
         const hasUserEntities = !!this.participating_user_ets().length;
         if (hasUserEntities) {
-          const isJustBots = this.participating_user_ets().every(user_et => user_et.isBot);
+          const isJustBots = this.participating_user_ets().every(userEntity => userEntity.isBot);
           const joinedNames = this.participating_user_ets()
-            .filter(user_et => isJustBots || !user_et.isBot)
-            .map(user_et => user_et.first_name())
+            .filter(userEntity => isJustBots || !userEntity.isBot)
+            .map(userEntity => userEntity.first_name())
             .join(', ');
 
           const maxLength = z.conversation.ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;
@@ -225,7 +221,7 @@ z.entity.Conversation = class Conversation {
         }
       }
 
-      return this.name() || '…';
+      return '…';
     });
 
     this.persist_state = _.debounce(() => amplify.publish(z.event.WebApp.CONVERSATION.PERSIST_STATE, this), 100);

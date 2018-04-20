@@ -239,6 +239,8 @@ z.util.base64ToBlob = base64 => {
 z.util.downloadBlob = (blob, filename) => {
   const url = window.URL.createObjectURL(blob);
   const link = document.createElement('a');
+  // firefox needs the element to be in the DOM for the download to start
+  // see https://stackoverflow.com/a/32226068
   document.body.appendChild(link);
   link.href = url;
   link.download = filename;

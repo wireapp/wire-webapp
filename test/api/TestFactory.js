@@ -95,6 +95,32 @@ window.TestFactory.prototype.exposeStorageActors = function() {
     });
 };
 
+window.TestFactory.prototype.exposeBackupActors = function() {
+  this.logger.info('- exposeBackupActors');
+  return Promise.resolve()
+    .then(() => this.exposeStorageActors())
+    .then(() => {
+      this.logger.info('✓ exposedStorageActors');
+
+      TestFactory.backup_service = new z.backup.BackupService(TestFactory.storage_service, status);
+      TestFactory.backup_service.logger.level = this.settings.logging_level;
+
+      return this.exposeUserActors();
+    })
+    .then(() => {
+      this.logger.info('✓ exposedUserActors');
+
+      TestFactory.backup_repository = new z.backup.BackupRepository(
+        TestFactory.backup_service,
+        TestFactory.client_repository,
+        TestFactory.user_repository
+      );
+      TestFactory.backup_repository.logger.level = this.settings.logging_level;
+
+      return TestFactory.backup_repository;
+    });
+};
+
 /**
  *
  * @returns {Promise<z.cryptography.CryptographyRepository>} The cryptography repository.

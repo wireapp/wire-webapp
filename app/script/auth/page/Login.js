@@ -49,6 +49,7 @@ import * as AuthAction from '../module/action/AuthAction';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import * as ConversationAction from '../module/action/ConversationAction';
 import * as ClientAction from '../module/action/ClientAction';
+import * as SelfSelector from '../module/selector/SelfSelector';
 import ValidationError from '../module/action/ValidationError';
 import {loginStrings, logoutReasonStrings} from '../../strings';
 import {isDesktopApp} from '../Runtime';
@@ -129,8 +130,14 @@ class Login extends React.PureComponent {
     return Promise.resolve()
       .then(() => this.props.doInit({isImmediateLogin: true}))
       .then(() => this.props.doInitializeClient(true, undefined))
-      .then(() => window.location.replace(URLUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP)))
+      .then(this.navigateChooseHandleOrWebapp)
       .catch(() => {});
+  };
+
+  navigateChooseHandleOrWebapp = () => {
+    return this.props.hasSelfHandle
+      ? window.location.replace(URLUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP))
+      : this.props.history.push(ROUTE.CHOOSE_HANDLE);
   };
 
   forgotPassword = () => URLUtil.openTab(EXTERNAL_ROUTE.WIRE_ACCOUNT_PASSWORD_RESET);
@@ -174,7 +181,7 @@ class Login extends React.PureComponent {
           ? this.props.doLoginAndJoin(login, this.state.conversationKey, this.state.conversationCode)
           : this.props.doLogin(login);
       })
-      .then(() => window.location.replace(URLUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP)))
+      .then(this.navigateChooseHandleOrWebapp)
       .catch(error => {
         switch (error.label) {
           case BackendError.LABEL.NEW_CLIENT: {
@@ -189,7 +196,7 @@ class Login extends React.PureComponent {
               const shouldShowHistoryInfo = this.props.hasHistory || clients.length > 1 || !this.state.persist;
               return shouldShowHistoryInfo
                 ? this.props.history.push(ROUTE.HISTORY_INFO)
-                : window.location.replace(URLUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP));
+                : this.navigateChooseHandleOrWebapp();
             });
           }
           case BackendError.LABEL.TOO_MANY_CLIENTS: {
@@ -225,7 +232,10 @@ class Login extends React.PureComponent {
   };
 
   render() {
-    const {intl: {formatMessage: _}, loginError} = this.props;
+    const {
+      intl: {formatMessage: _},
+      loginError,
+    } = this.props;
     const {logoutReason, isValidLink, email, password, persist, validInputs, validationErrors} = this.state;
     return (
       <Page>
@@ -352,6 +362,7 @@ export default withRouter(
       state => ({
         clients: ClientSelector.getClients(state),
         hasHistory: ClientSelector.hasHistory(state),
+        hasSelfHandle: SelfSelector.hasSelfHandle(state),
         isFetching: AuthSelector.isFetching(state),
         loginError: AuthSelector.getError(state),
       }),

@@ -83,8 +83,19 @@
           </div>
         <!-- /ko -->
       </section>
-
       <!-- ko if: isActivatedAccount() -->
+        <section class="preferences-section preferences-section-conversation-history">
+          <hr class="preferences-separator">
+          <header class="preferences-header" data-bind="l10n_text: z.string.preferencesOptionsBackupHeader"></header>
+          <div class="preferences-link text-theme" data-bind="click: clickOnBackupExport, l10n_text: z.string.preferencesOptionsBackupExportHeadline" data-uie-name="do-backup-export"></div>
+          <div class="preferences-detail" data-bind="l10n_text: z.string.preferencesOptionsBackupExportSecondary"></div>
+          <label class="preferences-link text-theme preferences-history-backup-import-field" data-uie-name="do-backup-import">
+            <span data-bind="l10n_text: z.string.preferencesOptionsBackupImportHeadline"></span>
+            <input type="file" data-bind="event: {change: onImportFileChange}, attr: {accept: `.${z.viewModel.content.HistoryExportViewModel.CONFIG.EXPORT_FILE_EXTENSION}`}" data-uie-name="input-import-file"/>
+          </label>
+          <div class="preferences-detail" data-bind="l10n_text: z.string.preferencesOptionsBackupImportSecondary"></div>
+        </section>
+
         <section class="preferences-section preferences-section-account-security">
           <hr class="preferences-separator">
 

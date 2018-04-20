@@ -17,21 +17,19 @@
  *
  */
 
-'use strict';
-
-window.z = window.z || {};
-window.z.entity = z.entity || {};
-
-z.entity.RenameMessage = class RenameMessage extends z.entity.SystemMessage {
-  constructor() {
-    super();
-
-    this.type = z.event.Backend.CONVERSATION.RENAME;
-    this.system_message_type = z.message.SystemMessageType.CONVERSATION_RENAME;
-
-    this.caption = ko.pureComputed(() => {
-      const identifier = this.user().is_me ? z.string.conversationRenameYou : z.string.conversationRename;
-      return z.l10n.text(identifier);
-    });
+class LoadingBar {
+  constructor({progress, message}) {
+    this.loadingMessage = message;
+    this.loadingPercentage = ko.pureComputed(() => `${progress()}%`);
   }
-};
+}
+
+ko.components.register('loading-bar', {
+  template: `
+    <div class="text-center">
+      <div class="progress-console" data-bind="text: loadingMessage"></div>
+      <div class="progress-bar"><div data-bind="style: {width: loadingPercentage}"></div></div>
+    </div>
+`,
+  viewModel: LoadingBar,
+});
