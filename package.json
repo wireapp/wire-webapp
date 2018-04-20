@@ -27,7 +27,7 @@
     "cross-env": "5.1.4",
     "istanbul": "0.4.5",
     "jasmine": "3.1.0",
-    "karma": "2.0.0",
+    "karma": "2.0.2",
     "karma-chrome-launcher": "2.2.0",
     "karma-jasmine": "1.1.1",
     "karma-jasmine-diff-reporter": "1.2.0",
