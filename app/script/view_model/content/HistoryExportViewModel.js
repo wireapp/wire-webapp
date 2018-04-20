@@ -32,6 +32,12 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
     };
   }
 
+  static get CONFIG() {
+    return {
+      EXPORT_FILE_EXTENSION: 'desktop_wbu',
+    };
+  }
+
   constructor(mainViewModel, contentViewModel, repositories) {
     this.hasError = ko.observable(false);
     this.state = ko.observable(HistoryExportViewModel.STATE.PREPARING);
@@ -81,7 +87,9 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
         .then(archive => archive.generateAsync({type: 'blob'}))
         .then(archiveBlob => {
           const timestamp = new Date().toISOString().substring(0, 10);
-          const filename = `Wire-${userName}-Backup_${timestamp}.desktop_wbu`;
+          const filename = `Wire-${userName}-Backup_${timestamp}.${
+            z.viewModel.content.HistoryExportViewModel.CONFIG.EXPORT_FILE_EXTENSION
+          }`;
           this.onSuccess();
 
           z.util.downloadBlob(archiveBlob, filename);
