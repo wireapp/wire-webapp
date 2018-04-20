@@ -130,13 +130,14 @@ class ConversationJoin extends Component {
     } else {
       Promise.resolve(this.nameInput.value)
         .then(name => name.trim())
-        .then(name =>
-          this.props.doRegisterWireless({
+        .then(name => {
+          const registrationData = {
             accent_id: this.state.accentColor.id,
             expires_in: this.state.expiresIn,
             name,
-          })
-        )
+          };
+          return this.props.doRegisterWireless(registrationData);
+        })
         .then(() => this.props.doJoinConversationByCode(this.state.conversationKey, this.state.conversationCode))
         .then(conversationEvent => this.props.setLastEventDate(new Date(conversationEvent.time)))
         .then(() => this.trackAddParticipant())

@@ -37,20 +37,16 @@ z.backup.BackupService = class BackupService {
     this.storageService = storageService;
   }
 
-  getDatabaseVersion() {
-    return this.storageService.db.verno;
-  }
-
   exportTable(table, onProgress) {
     const collection = table.toCollection();
     return table
       .count()
       .then(n => new DexieBatch({batchSize: 10000, limit: n}))
-      .then(batchDriver => {
-        return batchDriver.eachBatch(collection, batch => {
-          onProgress(table.name, batch);
-        });
-      });
+      .then(batchDriver => batchDriver.eachBatch(collection, batch => onProgress(table.name, batch)));
+  }
+
+  getDatabaseVersion() {
+    return this.storageService.db.verno;
   }
 
   getHistoryCount() {

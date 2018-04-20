@@ -23,6 +23,12 @@ window.z = window.z || {};
 window.z.backup = z.backup || {};
 
 z.backup.BackupRepository = class BackupRepository {
+  static get CONFIG() {
+    return {
+      META_FILENAME: 'meta.json',
+    };
+  }
+
   /**
    * Construct a new Backup repository.
    * @class z.backup.BackupRepository
@@ -31,12 +37,17 @@ z.backup.BackupRepository = class BackupRepository {
    * @param {z.user.UserRepository} userRepository - Repository for all user and connection interactions
    */
   constructor(backupService, clientRepository, userRepository) {
-    this.ARCHIVE_META_FILENAME = 'meta.json';
+    this.logger = new z.util.Logger('z.backup.BackupRepository', z.config.LOGGER.OPTIONS);
+
     this.backupService = backupService;
     this.clientRepository = clientRepository;
-    this.logger = new z.util.Logger('z.backup.BackupRepository', z.config.LOGGER.OPTIONS);
     this.userRepository = userRepository;
+
     this.isCanceled = false;
+  }
+
+  cancelAction() {
+    this.isCanceled = true;
   }
 
   createMetaDescription() {
@@ -47,87 +58,6 @@ z.backup.BackupRepository = class BackupRepository {
       user_id: this.userRepository.self().id,
       version: this.backupService.getDatabaseVersion(),
     };
-  }
-
-  getBackupInitData() {
-    const userName = this.userRepository.self().username();
-    return this.backupService.getHistoryCount().then(numberOfRecords => ({numberOfRecords, userName}));
-  }
-
-  getUserData() {
-    const clientId = this.clientRepository.currentClient().id;
-    const userId = this.userRepository.self().id;
-
-    return {
-      clientId,
-      userId,
-    };
-  }
-
-  onError(error) {
-    const isBackupImportError = error.constructor.name === 'ImportError';
-
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
-      action: () => this.exportBackup(),
-      preventClose: true,
-      text: {
-        action: z.l10n.text(z.string.backupErrorAction),
-        message: isBackupImportError ? z.l10n.text(z.string.backupImportGenericErrorSecondary) : error.message,
-        title: isBackupImportError
-          ? z.l10n.text(z.string.backupImportGenericErrorHeadline)
-          : z.l10n.text(z.string.backupExportGenericErrorHeadline),
-      },
-    });
-  }
-
-  importHistory(archive, initCallback, progressCallback) {
-    this.isCanceled = false;
-    const files = archive.files;
-    if (!files[this.ARCHIVE_META_FILENAME]) {
-      throw new z.backup.InvalidMetaDataError();
-    }
-
-    const verifyMetadataPromise = files[this.ARCHIVE_META_FILENAME]
-      .async('string')
-      .then(JSON.parse)
-      .then(metadata => verifyMetadata(metadata, this.createMetaDescription()));
-
-    const unzipPromises = Object.values(archive.files)
-      .filter(zippedFile => zippedFile.name !== this.ARCHIVE_META_FILENAME)
-      .map(zippedFile => zippedFile.async('string').then(value => ({content: value, filename: zippedFile.name})));
-
-    const importEntriesPromise = Promise.all(unzipPromises).then(fileDescriptors => {
-      initCallback(fileDescriptors.length);
-      fileDescriptors.forEach(fileDescriptor => {
-        if (this.isCanceled) {
-          throw new z.backup.CancelError();
-        }
-        const tableName = fileDescriptor.filename.replace('.json', '');
-        const entities = JSON.parse(fileDescriptor.content);
-        entities.forEach(entity => this.backupService.importEntity(tableName, entity));
-        progressCallback();
-      });
-    });
-
-    return Promise.all([verifyMetadataPromise, importEntriesPromise]);
-
-    function verifyMetadata(archiveMetadata, localMetadata) {
-      if (archiveMetadata.user_id !== localMetadata.user_id) {
-        const fromUserId = archiveMetadata.user_id;
-        const toUserId = localMetadata.user_id;
-        const message = `History from user "${fromUserId}" cannot be restored for user "${toUserId}".`;
-        throw new z.backup.DifferentAccountError(message);
-      }
-
-      if (archiveMetadata.version !== localMetadata.version) {
-        const message = `History cannot be restored: database versions don't match`;
-        throw new z.backup.IncompatibleBackupError(message);
-      }
-    }
-  }
-
-  cancelAction() {
-    this.isCanceled = true;
   }
 
   /**
@@ -141,6 +71,7 @@ z.backup.BackupRepository = class BackupRepository {
     const meta = this.createMetaDescription();
     const tablesData = {};
     this.isCanceled = false;
+
     const loadDataPromises = tables.map(table => {
       return this.backupService.exportTable(table, (tableName, rows) => {
         if (this.isCanceled) {
@@ -150,12 +81,13 @@ z.backup.BackupRepository = class BackupRepository {
         tablesData[tableName] = (tablesData[tableName] || []).concat(rows);
       });
     });
+
     return Promise.all(loadDataPromises)
       .then(() => {
         const zip = new JSZip();
 
         // first write the metadata file
-        zip.file(this.ARCHIVE_META_FILENAME, JSON.stringify(meta));
+        zip.file(BackupRepository.CONFIG.META_FILENAME, JSON.stringify(meta));
 
         // then all the other tables
         Object.keys(tablesData).forEach(tableName => {
@@ -173,5 +105,59 @@ z.backup.BackupRepository = class BackupRepository {
 
         throw new z.backup.ExportError();
       });
+  }
+
+  getBackupInitData() {
+    const userName = this.userRepository.self().username();
+    return this.backupService.getHistoryCount().then(numberOfRecords => ({numberOfRecords, userName}));
+  }
+
+  importHistory(archive, initCallback, progressCallback) {
+    this.isCanceled = false;
+    const files = archive.files;
+    if (!files[BackupRepository.CONFIG.META_FILENAME]) {
+      throw new z.backup.InvalidMetaDataError();
+    }
+
+    const verifyMetadataPromise = files[BackupRepository.CONFIG.META_FILENAME]
+      .async('string')
+      .then(JSON.parse)
+      .then(metadata => this.verifyMetadata(metadata));
+
+    const unzipPromises = Object.values(archive.files)
+      .filter(zippedFile => zippedFile.name !== BackupRepository.CONFIG.META_FILENAME)
+      .map(zippedFile => zippedFile.async('string').then(value => ({content: value, filename: zippedFile.name})));
+
+    const importEntriesPromise = Promise.all(unzipPromises).then(fileDescriptors => {
+      initCallback(fileDescriptors.length);
+      fileDescriptors.forEach(fileDescriptor => {
+        if (this.isCanceled) {
+          throw new z.backup.CancelError();
+        }
+        const tableName = fileDescriptor.filename.replace('.json', '');
+        const entities = JSON.parse(fileDescriptor.content);
+        entities.forEach(entity => this.backupService.importEntity(tableName, entity));
+        progressCallback();
+      });
+    });
+
+    return Promise.all([verifyMetadataPromise, importEntriesPromise]);
+  }
+
+  verifyMetadata(archiveMetadata) {
+    const localMetadata = this.createMetaDescription();
+    const isExpectedUserId = archiveMetadata.user_id === localMetadata.user_id;
+    if (!isExpectedUserId) {
+      const fromUserId = archiveMetadata.user_id;
+      const toUserId = localMetadata.user_id;
+      const message = `History from user "${fromUserId}" cannot be restored for user "${toUserId}".`;
+      throw new z.backup.DifferentAccountError(message);
+    }
+
+    const isExpectedVersion = archiveMetadata.version === localMetadata.version;
+    if (!isExpectedVersion) {
+      const message = `History cannot be restored: Database version mismatch`;
+      throw new z.backup.IncompatibleBackupError(message);
+    }
   }
 };
