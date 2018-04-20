@@ -92,7 +92,7 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
           }`;
           this.onSuccess();
 
-          z.util.downloadBlob(archiveBlob, filename);
+          z.util.downloadBlob(archiveBlob, filename, 'application/octet-stream');
         })
         .catch(this.onError.bind(this));
     });

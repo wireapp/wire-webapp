@@ -236,7 +236,7 @@ z.util.base64ToBlob = base64 => {
  * @returns {number} Timeout identifier
  */
 
-z.util.downloadBlob = (blob, filename) => {
+z.util.downloadBlob = (blob, filename, mimeType) => {
   const url = window.URL.createObjectURL(blob);
   const link = document.createElement('a');
   // firefox needs the element to be in the DOM for the download to start
@@ -245,6 +245,9 @@ z.util.downloadBlob = (blob, filename) => {
   link.href = url;
   link.download = filename;
   link.style = 'display: none';
+  if (mimeType) {
+    link.type = mimeType;
+  }
   link.click();
 
   // Wait before removing resource and link. Needed in FF
