@@ -4,7 +4,7 @@
     "@types/node": "9.6.6",
     "coveralls": "3.0.0",
     "cross-env": "5.1.4",
-    "istanbul": "0.4.5",
+    "istanbul": "1.1.0-alpha.1",
     "jasmine": "3.1.0",
     "rimraf": "2.6.2",
     "webpack": "3.11.0"

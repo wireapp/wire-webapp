@@ -25,7 +25,7 @@
     "browser-sync": "2.23.6",
     "concurrently": "3.5.1",
     "cross-env": "5.1.4",
-    "istanbul": "0.4.5",
+    "istanbul": "1.1.0-alpha.1",
     "jasmine": "3.1.0",
     "karma": "2.0.2",
     "karma-chrome-launcher": "2.2.0",
