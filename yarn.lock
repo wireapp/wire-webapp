@@ -347,7 +347,11 @@
   version "3.0.32"
   resolved "https://registry.yarnpkg.com/@types/long/-/long-3.0.32.tgz#f4e5af31e9e9b196d8e5fca8a5e2e20aa3d60b69"
 
-"@types/node@*", "@types/node@9.6.5":
+"@types/node@*":
+  version "9.6.6"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-9.6.6.tgz#439b91f9caf3983cad2eef1e11f6bedcbf9431d2"
+
+"@types/node@9.6.5":
   version "9.6.5"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-9.6.5.tgz#ee700810fdf49ac1c399fc5980b7559b3e5a381d"
 
@@ -360,8 +364,8 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-7.0.46.tgz#c3dedd25558c676b3d6303e51799abb9c3f8f314"
 
 "@types/node@^8.9.4":
-  version "8.10.8"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-8.10.8.tgz#794cba23cc9f8d9715f6543fa8827433b5f5cd3b"
+  version "8.10.9"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-8.10.9.tgz#b507a74a7d3eddc74a17dc35fd40d8f45dde0d6c"
 
 "@types/spark-md5@3.0.0":
   version "3.0.0"
@@ -371,9 +375,9 @@
   version "2.3.2"
   resolved "https://registry.yarnpkg.com/@types/tough-cookie/-/tough-cookie-2.3.2.tgz#e0d481d8bb282ad8a8c9e100ceb72c995fb5e709"
 
-"@wireapp/api-client@0.7.1":
-  version "0.7.1"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-0.7.1.tgz#0c806ebeaf785f94194906efbbd743f15a148d98"
+"@wireapp/api-client@0.7.2":
+  version "0.7.2"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-0.7.2.tgz#254b01706d88373e2475e65264bfe7a5782e83b0"
   dependencies:
     "@types/node" "9.6.5"
     "@types/spark-md5" "3.0.0"
@@ -391,12 +395,12 @@
   version "3.0.16"
   resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-3.0.16.tgz#f8f41fa0d8e854fe77402a8b0a20c89f2ed93943"
 
-"@wireapp/core@2.2.1":
-  version "2.2.1"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-2.2.1.tgz#193d854ef54a175cf170f8df83b9db0e0b25698f"
+"@wireapp/core@2.2.2":
+  version "2.2.2"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-2.2.2.tgz#18b23110bd8045d44c125d419786b159ef0e53d0"
   dependencies:
     "@types/node" "9.6.5"
-    "@wireapp/api-client" "0.7.1"
+    "@wireapp/api-client" "0.7.2"
     "@wireapp/cryptobox" "8.3.26"
     "@wireapp/store-engine" "0.6.1"
     bazinga64 "5.0.3"
