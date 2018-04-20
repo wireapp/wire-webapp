@@ -25,7 +25,7 @@ window.z.backup = z.backup || {};
 z.backup.BackupRepository = class BackupRepository {
   static get CONFIG() {
     return {
-      META_FILENAME: 'meta.json',
+      META_FILENAME: 'export.json',
     };
   }
 
