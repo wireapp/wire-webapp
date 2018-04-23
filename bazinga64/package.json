@@ -10,7 +10,6 @@
     "karma-sourcemap-loader": "0.3.7",
     "libsodium-wrappers": "0.7.3",
     "rimraf": "2.6.2",
-    "run-sequence": "2.2.1",
     "typescript": "2.8.1",
     "webpack": "3.11.0"
   },
@@ -41,7 +40,8 @@
     "clear": "rimraf dist",
     "dist": "yarn clear && yarn build",
     "test": "yarn test:node && yarn test:browser",
-    "test:browser": "webpack && karma start",
+    "test:project": "yarn dist && yarn test",
+    "test:browser": "karma start",
     "test:node": "cross-env JASMINE_CONFIG_PATH=test/shared/support/jasmine.json jasmine"
   },
   "types": "dist/bazinga64.d.ts",
