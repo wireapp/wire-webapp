@@ -107,4 +107,13 @@ describe('LRUCache', () => {
       expect(removedNode).toBe('Apple');
     });
   });
+
+  describe('"getAll"', () => {
+    it('gets all nodes', () => {
+      const cache = new LRUCache(4);
+      cache.set('1', 'Apple');
+      cache.set('2', 'Orange');
+      expect(cache.getAll()).toEqual([{'1': 'Apple'}, {'2': 'Orange'}]);
+    });
+  });
 });

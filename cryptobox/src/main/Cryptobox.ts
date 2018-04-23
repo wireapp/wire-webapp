@@ -20,14 +20,14 @@ class Cryptobox extends EventEmitter {
     NEW_SESSION: 'new-session',
   };
 
-  private cachedSessions: LRUCache;
+  private cachedSessions: LRUCache<CryptoboxSession>;
 
   private logger: any = logdown('@wireapp/cryptobox/Cryptobox', {
     logger: console,
     markdown: false,
   });
   private minimumAmountOfPreKeys: number;
-  private queues = new LRUCache(1000);
+  private queues = new LRUCache<PriorityQueue>(1000);
   private store: CryptoboxCRUDStore;
 
   public lastResortPreKey: ProteusKeys.PreKey | undefined;
@@ -56,7 +56,7 @@ class Cryptobox extends EventEmitter {
   }
 
   private get_session_queue(session_id: string): PriorityQueue {
-    let queue = <PriorityQueue | undefined>this.queues.get(session_id);
+    let queue = this.queues.get(session_id);
 
     if (!queue) {
       queue = new PriorityQueue({maxRetries: 0});
@@ -72,7 +72,7 @@ class Cryptobox extends EventEmitter {
     return session;
   }
 
-  private load_session_from_cache(session_id: string): CryptoboxSession {
+  private load_session_from_cache(session_id: string): CryptoboxSession | undefined {
     this.logger.log(`Trying to load Session with ID "${session_id}" from cache...`);
     return this.cachedSessions.get(session_id);
   }
@@ -276,7 +276,7 @@ class Cryptobox extends EventEmitter {
   public session_load(session_id: string): Promise<CryptoboxSession> {
     this.logger.log(`Trying to load Session with ID "${session_id}"...`);
 
-    const cachedSession: CryptoboxSession = this.load_session_from_cache(session_id);
+    const cachedSession: CryptoboxSession | undefined = this.load_session_from_cache(session_id);
     if (cachedSession) {
       return Promise.resolve(cachedSession);
     }

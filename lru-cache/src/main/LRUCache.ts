@@ -17,39 +17,64 @@
  *
  */
 
-class LRUCache {
-  private map: Object;
-  private head: any;
-  private end: any;
+export interface NodeMap<T> {
+  [index: string]: Node<T>;
+}
+
+export interface Node<T> {
+  key: string;
+  value: T;
+  next: Node<T> | null;
+  previous: Node<T> | null;
+}
+
+class LRUCache<T> {
+  private map: NodeMap<T>;
+  private head: Node<T> | null;
+  private end: Node<T> | null;
 
   constructor(private capacity: number = 100) {
     this.map = {};
+    this.head = null;
+    this.end = null;
   }
 
   public delete(key: string): boolean {
-    let node: any = (<any>this.map)[key];
+    const node = this.map[key];
 
     if (node) {
       this.remove(node);
-      delete (<any>this.map)[node.key];
+      delete this.map[node.key];
       return true;
-    } else {
-      return false;
     }
+
+    return false;
   }
 
-  public get(key: string): any {
-    let node: any = (<any>this.map)[key];
+  public get(key: string): T | undefined {
+    const node = this.map[key];
+
     if (node) {
       this.remove(node);
       this.setHead(node);
       return node.value;
     }
+
+    return undefined;
+  }
+
+  public getAll(key: string): {[id: string]: T}[] {
+    return Object.keys(this.map).map(id => {
+      const node = this.map[id];
+      return {
+        [id]: node.value,
+      };
+    });
   }
 
   public keys(): Array<string> {
-    let keys: Array<string> = [];
-    let entry: any = this.head;
+    const keys: Array<string> = [];
+    let entry = this.head;
 
     while (entry) {
       keys.push(entry.key);
@@ -59,22 +84,28 @@ class LRUCache {
     return keys;
   }
 
-  public latest(): any {
-    return this.head.value;
+  public latest(): T | null {
+    if (this.head) {
+      return this.head.value;
+    }
+    return null;
   }
 
-  public oldest(): any {
-    return this.end.value;
+  public oldest(): T | null {
+    if (this.end) {
+      return this.end.value;
+    }
+    return null;
   }
 
-  private remove(node: any): any {
+  private remove(node: Node<T>): Node<T> {
     if (node.previous) {
       node.previous.next = node.next;
     } else {
       this.head = node.next;
     }
 
-    if (node.next != null) {
+    if (node.next !== null) {
       node.next.previous = node.previous;
     } else {
       this.end = node.previous;
@@ -83,12 +114,9 @@ class LRUCache {
     return node;
   }
 
-  public set(key: string, value: any): Object {
-    let old: any = (<any>this.map)[key];
-    let removedNode: any = {
-      key: undefined,
-      value: undefined,
-    };
+  public set(key: string, value: T): T | undefined {
+    const old = this.map[key];
+    let removedNode;
 
     if (old) {
       old.value = value;
@@ -96,25 +124,32 @@ class LRUCache {
       this.setHead(old);
       return removedNode.value;
     } else {
-      let created: any = {
-        key: key,
-        value: value,
+      const created: Node<T> = {
+        key,
+        value,
+        next: null,
+        previous: null,
       };
 
       if (Object.keys(this.map).length >= this.capacity) {
-        delete (<any>this.map)[this.end.key];
-        removedNode = this.remove(this.end);
-        this.setHead(created);
-      } else {
-        this.setHead(created);
+        if (this.end) {
+          delete this.map[this.end.key];
+          removedNode = this.remove(this.end);
+        }
       }
 
-      (<any>this.map)[key] = created;
-      return removedNode.value;
+      this.setHead(created);
+
+      this.map[key] = created;
+      if (removedNode) {
+        return removedNode.value;
+      }
     }
+
+    return undefined;
   }
 
-  private setHead(node: any) {
+  private setHead(node: Node<T>): void {
     node.next = this.head;
     node.previous = null;
 
@@ -134,8 +169,8 @@ class LRUCache {
   }
 
   public toString(): string {
-    let string: string = '(newest) ';
-    let entry: any = this.head;
+    let string = '(newest) ';
+    let entry = this.head;
 
     while (entry) {
       string += `${String(entry.key)}:${entry.value}`;
