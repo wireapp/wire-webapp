@@ -147,7 +147,7 @@ z.backup.BackupRepository = class BackupRepository {
         const isConversationsTable = tableName === z.storage.StorageSchemata.OBJECT_STORE.CONVERSATIONS;
 
         const importPromise = isConversationsTable
-          ? this.conversationRepository.updateConversation(entities)
+          ? this.conversationRepository.updateConversations(entities)
           : this.backupService.importEntities(tableName, entities);
 
         importPromise.then(progressCallback);
