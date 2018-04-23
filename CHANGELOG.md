@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="0.7.6"></a>
+## [0.7.6](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@0.7.5...@wireapp/api-client@0.7.6) (2018-04-23)
+
+
+### Bug Fixes
+
+* **api-client:** Add team binding flag to TeamData structure ([#504](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/504)) ([082cde4](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/082cde4))
+
+
+
+
 <a name="0.7.5"></a>
 ## [0.7.5](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@0.7.4...@wireapp/api-client@0.7.5) (2018-04-20)
 
