@@ -23,7 +23,7 @@ class LoginSanitizer {
   constructor() {}
 
   public static removeNonPrintableCharacters(loginData: LoginData): void {
-    const nonPrintableCharacters = new RegExp('[^\x20-\x7E]+', 'gm');
+    const nonPrintableCharacters = /\s/gm;
 
     if (loginData.email) {
       loginData.email = loginData.email.replace(nonPrintableCharacters, '');
