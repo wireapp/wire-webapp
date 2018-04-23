@@ -77,8 +77,13 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
       const blob = new Blob(callLog, {type: 'text/plain;charset=utf-8'});
       const currentDate = new Date().toISOString().replace(' ', '-');
 
-      z.util.downloadBlob(blob, `CallLogs-${currentDate}.log`);
+      return z.util.downloadBlob(blob, `CallLogs-${currentDate}.log`);
     }
+
+    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, {
+      message: z.l10n.text(z.string.modalCallEmptyLogMessage),
+      title: z.l10n.text(z.string.modalCallEmptyLogHeadline),
+    });
   }
 
   updateProperties(properties) {
