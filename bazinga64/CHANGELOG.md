@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="5.1.2"></a>
+## [5.1.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/bazinga64/compare/bazinga64@5.1.1...bazinga64@5.1.2) (2018-04-23)
+
+
+### Bug Fixes
+
+* **bazinga64:** Streamline TS version ([d388c79](https://github.com/wireapp/wire-web-packages/tree/master/packages/bazinga64/commit/d388c79))
+
+
+
+
 <a name="5.1.1"></a>
 ## [5.1.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/bazinga64/compare/bazinga64@5.1.0...bazinga64@5.1.1) (2018-04-23)
 
