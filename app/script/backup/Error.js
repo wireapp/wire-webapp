@@ -63,10 +63,18 @@ window.z.backup = z.backup || {};
     }
   }
 
+  class IncompatiblePlatformError extends ImportError {
+    constructor(message = 'Backup created by incompatible platform') {
+      super(message);
+      Object.setPrototypeOf(this, IncompatiblePlatform.prototype);
+    }
+  }
+
   module.CancelError = CancelError;
   module.DifferentAccountError = DifferentAccountError;
   module.ExportError = ExportError;
   module.ImportError = ImportError;
   module.IncompatibleBackupError = IncompatibleBackupError;
+  module.IncompatiblePlatformError = IncompatiblePlatformError;
   module.InvalidMetaDataError = InvalidMetaDataError;
 })(z.backup);

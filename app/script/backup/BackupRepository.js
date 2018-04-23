@@ -158,6 +158,12 @@ z.backup.BackupRepository = class BackupRepository {
       throw new z.backup.DifferentAccountError(message);
     }
 
+    const isExpectedPlatform = archiveMetadata.platform === localMetadata.platform;
+    if (!isExpectedPlatform) {
+      const message = `History created from "${archiveMetadata.platform}" device cannot be imported`;
+      throw new z.backup.IncompatiblePlatformError(message);
+    }
+
     const isExpectedVersion = archiveMetadata.version === localMetadata.version;
     if (!isExpectedVersion) {
       const message = `History cannot be restored: Database version mismatch`;
