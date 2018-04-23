@@ -127,7 +127,7 @@ z.backup.BackupRepository = class BackupRepository {
     const unzipPromise = verifyMetadataPromise.then(() => {
       return Promise.all(
         Object.values(archive.files)
-          .filter(zippedFile => zippedFile.name !== this.ARCHIVE_META_FILENAME)
+          .filter(zippedFile => zippedFile.name !== BackupRepository.CONFIG.META_FILENAME)
           .map(zippedFile => zippedFile.async('string').then(value => ({content: value, filename: zippedFile.name})))
       );
     });
