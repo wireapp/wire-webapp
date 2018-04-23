@@ -28,9 +28,6 @@ z.viewModel.LoadingViewModel = class LoadingViewModel {
     this.userRepository = repositories.user;
     this.loadingMessage = ko.observable('');
     this.loadingProgress = ko.observable(0);
-
-    this.loadingPercentage = ko.pureComputed(() => `${this.loadingProgress()}%`);
-
     amplify.subscribe(z.event.WebApp.APP.UPDATE_PROGRESS, this.updateProgress.bind(this));
 
     ko.applyBindings(this, document.getElementById(this.elementId));

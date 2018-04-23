@@ -60,7 +60,6 @@ describe('z.notification.NotificationRepository', () => {
             body: '',
             data: {
               conversationId: conversation_et.id,
-              messageId: '0',
             },
             icon: '/image/logo/notification.png',
             silent: true,
@@ -93,7 +92,7 @@ describe('z.notification.NotificationRepository', () => {
         spyOn(TestFactory.notification_repository, '_showNotification');
         spyOn(TestFactory.notification_repository, '_notifySound');
 
-        verify_notification = function(_done, _conversation, _message, _expected_body) {
+        verify_notification = (_done, _conversation, _message, _expected_body) => {
           TestFactory.notification_repository
             .notify(_message, undefined, _conversation)
             .then(() => {
@@ -101,6 +100,7 @@ describe('z.notification.NotificationRepository', () => {
 
               const trigger = TestFactory.notification_repository._createTrigger(message_et, null, conversation_et);
               notification_content.options.body = _expected_body;
+              notification_content.options.data.messageType = _message.type;
               notification_content.trigger = trigger;
 
               if (_conversation.is_group()) {
@@ -119,7 +119,7 @@ describe('z.notification.NotificationRepository', () => {
             .catch(_done.fail);
         };
 
-        verify_notification_ephemeral = function(_done, _conversation, _message) {
+        verify_notification_ephemeral = (_done, _conversation, _message) => {
           TestFactory.notification_repository
             .notify(_message, undefined, _conversation)
             .then(() => {
@@ -127,6 +127,7 @@ describe('z.notification.NotificationRepository', () => {
 
               const trigger = TestFactory.notification_repository._createTrigger(message_et, null, conversation_et);
               notification_content.options.body = z.string.notificationObfuscated;
+              notification_content.options.data.messageType = _message.type;
               notification_content.title = z.string.notificationObfuscatedTitle;
               notification_content.trigger = trigger;
 
@@ -137,7 +138,7 @@ describe('z.notification.NotificationRepository', () => {
             .catch(_done.fail);
         };
 
-        verify_notification_obfuscated = function(_done, _conversation, _message, _setting) {
+        verify_notification_obfuscated = (_done, _conversation, _message, _setting) => {
           TestFactory.notification_repository
             .notify(_message, undefined, _conversation)
             .then(() => {
@@ -157,6 +158,7 @@ describe('z.notification.NotificationRepository', () => {
                 notification_content.options.body = z.string.notificationObfuscated;
                 notification_content.title = z.string.notificationObfuscatedTitle;
               }
+              notification_content.options.data.messageType = _message.type;
 
               const [firstResultArgs] = TestFactory.notification_repository._showNotification.calls.first().args;
               expect(JSON.stringify(firstResultArgs)).toEqual(JSON.stringify(notification_content));
@@ -165,7 +167,7 @@ describe('z.notification.NotificationRepository', () => {
             .catch(_done.fail);
         };
 
-        verify_notification_system = function(_done, _conversation, _message, _expected_body, _expected_title) {
+        verify_notification_system = (_done, _conversation, _message, _expected_body, _expected_title) => {
           TestFactory.notification_repository
             .notify(_message, undefined, _conversation)
             .then(() => {
@@ -174,6 +176,7 @@ describe('z.notification.NotificationRepository', () => {
               const trigger = TestFactory.notification_repository._createTrigger(message_et, null, conversation_et);
               notification_content.trigger = trigger;
               notification_content.options.body = _expected_body;
+              notification_content.options.data.messageType = _message.type;
 
               if (_expected_title) {
                 notification_content.options.data.conversationId = _conversation.id;
@@ -462,6 +465,7 @@ describe('z.notification.NotificationRepository', () => {
       conversation_et.from = payload.users.get.one[0].id;
       message_et = new z.entity.MemberMessage();
       message_et.user(user_et);
+      message_et.type = z.event.Backend.CONVERSATION.CREATE;
       message_et.memberMessageType = z.message.SystemMessageType.CONVERSATION_CREATE;
 
       const expected_body = `${first_name} started a conversation`;
