@@ -70,6 +70,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
     team_repository,
     user_repository
   ) {
+    this.save_conversation_state_in_db = this.save_conversation_state_in_db.bind(this);
+
     this.conversation_service = conversation_service;
     this.asset_service = asset_service;
     this.client_repository = client_repository;
@@ -190,7 +192,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     amplify.subscribe(z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, this.timeout_ephemeral_message.bind(this));
     amplify.subscribe(z.event.WebApp.CONVERSATION.MAP_CONNECTION, this.map_connection.bind(this));
     amplify.subscribe(z.event.WebApp.CONVERSATION.MISSED_EVENTS, this.on_missed_events.bind(this));
-    amplify.subscribe(z.event.WebApp.CONVERSATION.PERSIST_STATE, this.save_conversation_state_in_db.bind(this));
+    amplify.subscribe(z.event.WebApp.CONVERSATION.PERSIST_STATE, this.save_conversation_state_in_db);
     amplify.subscribe(
       z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE,
       this.set_notification_handling_state.bind(this)
@@ -338,6 +340,33 @@ z.conversation.ConversationRepository = class ConversationRepository {
         this.save_conversations(conversation_ets);
         this.update_conversations_offline();
         return this.conversations();
+      });
+  }
+
+  updateConversations(conversationsData) {
+    this.changePersistConversationStateSubscription(false);
+
+    return Promise.resolve()
+      .then(() => {
+        return conversationsData
+          .map(conversationData => {
+            const conversationEntity = this.conversations().find(conversation => {
+              return conversation.id === conversationData.id;
+            });
+
+            if (conversationEntity) {
+              this.conversation_mapper.update_self_status(conversationEntity, conversationData);
+            } else {
+              return conversationData;
+            }
+          })
+          .filter(conversationData => conversationData);
+      })
+      .then(unknownConversationsData => this.map_conversations(unknownConversationsData))
+      .then(conversationEntities => {
+        this.save_conversations(conversationEntities);
+        this.update_conversations_offline();
+        this.changePersistConversationStateSubscription(true);
       });
   }
 
@@ -992,6 +1021,14 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   save_conversation_state_in_db(conversation_et) {
     return this.conversation_service.save_conversation_state_in_db(conversation_et);
+  }
+
+  changePersistConversationStateSubscription(subscribe = true) {
+    if (subscribe) {
+      amplify.subscribe(z.event.WebApp.CONVERSATION.PERSIST_STATE, this.save_conversation_state_in_db);
+    } else {
+      amplify.unsubscribe(z.event.WebApp.CONVERSATION.PERSIST_STATE, this.save_conversation_state_in_db);
+    }
   }
 
   /**
