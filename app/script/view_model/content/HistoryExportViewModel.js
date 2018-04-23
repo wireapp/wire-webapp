@@ -51,7 +51,9 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
 
     this.numberOfRecords = ko.observable(0);
     this.numberOfProcessedRecords = ko.observable(0);
-    this.loadingProgress = ko.pureComputed(() => this.numberOfProcessedRecords() / this.numberOfRecords() * 100);
+    this.loadingProgress = ko.pureComputed(() => {
+      return Math.floor(this.numberOfProcessedRecords() / this.numberOfRecords() * 100);
+    });
 
     this.loadingMessage = ko.pureComputed(() => {
       switch (this.state()) {
@@ -92,7 +94,7 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
           }`;
           this.onSuccess();
 
-          z.util.downloadBlob(archiveBlob, filename);
+          z.util.downloadBlob(archiveBlob, filename, 'application/octet-stream');
         })
         .catch(this.onError.bind(this));
     });
