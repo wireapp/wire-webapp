@@ -62,7 +62,7 @@ z.backup.BackupService = class BackupService {
   importEntities(tableName, entities) {
     // We don't want to set the primaryKey for the events table
     const isEventsTable = tableName === z.storage.StorageSchemata.OBJECT_STORE.EVENTS;
-    const primaryKeys = isEventsTable ? entities.map(entity => entity.id) : undefined;
+    const primaryKeys = isEventsTable ? undefined : entities.map(entity => entity.id);
     return this.storageService.db[tableName].bulkPut(entities, primaryKeys);
   }
 };

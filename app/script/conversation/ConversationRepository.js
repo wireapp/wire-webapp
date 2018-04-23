@@ -362,10 +362,16 @@ z.conversation.ConversationRepository = class ConversationRepository {
           })
           .filter(conversationData => conversationData);
       })
-      .then(unknownConversationsData => this.map_conversations(unknownConversationsData))
+      .then(unknownConversationsData => {
+        if (unknownConversationsData.length) {
+          return this.map_conversations(unknownConversationsData);
+        }
+      })
       .then(conversationEntities => {
-        this.save_conversations(conversationEntities);
-        this.update_conversations_offline();
+        if (conversationEntities && conversationEntities.length) {
+          this.save_conversations(conversationEntities);
+          this._update_conversations(conversationEntities);
+        }
         this.changePersistConversationStateSubscription(true);
       });
   }
