@@ -44,7 +44,9 @@ z.viewModel.content.HistoryImportViewModel = class HistoryImportViewModel {
 
     this.numberOfTables = ko.observable(0);
     this.numberOfProcessedTables = ko.observable(0);
-    this.loadingProgress = ko.pureComputed(() => this.numberOfProcessedTables() / this.numberOfTables() * 100);
+    this.loadingProgress = ko.pureComputed(() => {
+      return Math.floor(this.numberOfProcessedTables() / this.numberOfTables() * 100);
+    });
 
     this.loadingMessage = ko.pureComputed(() => {
       switch (this.state()) {
@@ -98,7 +100,6 @@ z.viewModel.content.HistoryImportViewModel = class HistoryImportViewModel {
     this.state(HistoryImportViewModel.STATE.PREPARING);
     this.numberOfTables(numberOfTables);
     this.numberOfProcessedTables(0);
-    this.error(null);
   }
 
   onProgress() {
@@ -109,7 +110,7 @@ z.viewModel.content.HistoryImportViewModel = class HistoryImportViewModel {
   onSuccess() {
     this.error(null);
     this.state(HistoryImportViewModel.STATE.DONE);
-    window.setTimeout(this.dismissImport.bind(this), 1000);
+    window.setTimeout(this.dismissImport.bind(this), 1500);
   }
 
   onCancel() {

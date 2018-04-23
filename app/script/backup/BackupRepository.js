@@ -124,11 +124,15 @@ z.backup.BackupRepository = class BackupRepository {
       .then(JSON.parse)
       .then(metadata => this.verifyMetadata(metadata));
 
-    const unzipPromises = Object.values(archive.files)
-      .filter(zippedFile => zippedFile.name !== BackupRepository.CONFIG.META_FILENAME)
-      .map(zippedFile => zippedFile.async('string').then(value => ({content: value, filename: zippedFile.name})));
+    const unzipPromise = verifyMetadataPromise.then(() => {
+      return Promise.all(
+        Object.values(archive.files)
+          .filter(zippedFile => zippedFile.name !== this.ARCHIVE_META_FILENAME)
+          .map(zippedFile => zippedFile.async('string').then(value => ({content: value, filename: zippedFile.name})))
+      );
+    });
 
-    const importEntriesPromise = Promise.all(unzipPromises).then(fileDescriptors => {
+    const importEntriesPromise = unzipPromise.then(fileDescriptors => {
       initCallback(fileDescriptors.length);
       fileDescriptors.forEach(fileDescriptor => {
         if (this.isCanceled) {
@@ -141,7 +145,7 @@ z.backup.BackupRepository = class BackupRepository {
       });
     });
 
-    return Promise.all([verifyMetadataPromise, importEntriesPromise]);
+    return importEntriesPromise;
   }
 
   verifyMetadata(archiveMetadata) {
@@ -152,6 +156,12 @@ z.backup.BackupRepository = class BackupRepository {
       const toUserId = localMetadata.user_id;
       const message = `History from user "${fromUserId}" cannot be restored for user "${toUserId}".`;
       throw new z.backup.DifferentAccountError(message);
+    }
+
+    const isExpectedPlatform = archiveMetadata.platform === localMetadata.platform;
+    if (!isExpectedPlatform) {
+      const message = `History created from "${archiveMetadata.platform}" device cannot be imported`;
+      throw new z.backup.IncompatiblePlatformError(message);
     }
 
     const isExpectedVersion = archiveMetadata.version === localMetadata.version;
