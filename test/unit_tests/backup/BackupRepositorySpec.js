@@ -89,7 +89,7 @@ describe('z.backup.BackupRepository', () => {
 
       return archivePromise.then(zip => {
         const fileNames = Object.keys(zip.files);
-        expect(fileNames).toContain('meta.json');
+        expect(fileNames).toContain('export.json');
         tables.map(table => expect(fileNames).toContain(`${table}.json`));
 
         const validateConversationsPromise = zip.files['conversations.json']
