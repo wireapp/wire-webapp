@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="8.3.31"></a>
+## [8.3.31](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/compare/@wireapp/cryptobox@8.3.30...@wireapp/cryptobox@8.3.31) (2018-04-23)
+
+
+### Bug Fixes
+
+* **lru-cache:** Add generics and getAll ([#505](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/issues/505)) ([a7521a3](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/commit/a7521a3))
+
+
+
+
 <a name="8.3.30"></a>
 ## [8.3.30](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/compare/@wireapp/cryptobox@8.3.29...@wireapp/cryptobox@8.3.30) (2018-04-23)
 

@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="2.1.5"></a>
+## [2.1.5](https://github.com/wireapp/wire-web-packages/tree/master/packages/lru-cache/compare/@wireapp/lru-cache@2.1.4...@wireapp/lru-cache@2.1.5) (2018-04-23)
+
+
+### Bug Fixes
+
+* **lru-cache:** Add generics and getAll ([#505](https://github.com/wireapp/wire-web-packages/tree/master/packages/lru-cache/issues/505)) ([a7521a3](https://github.com/wireapp/wire-web-packages/tree/master/packages/lru-cache/commit/a7521a3))
+
+
+
+
 <a name="2.1.4"></a>
 ## [2.1.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/lru-cache/compare/@wireapp/lru-cache@2.1.3...@wireapp/lru-cache@2.1.4) (2018-04-20)
 
