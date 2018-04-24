@@ -126,6 +126,10 @@ class Login extends React.PureComponent {
 
   componentWillReceiveProps = nextProps => this.readAndUpdateParamsFromUrl(nextProps);
 
+  componentWillUmnount = () => {
+    this.props.resetError();
+  };
+
   immediateLogin = () => {
     return Promise.resolve()
       .then(() => this.props.doInit({isImmediateLogin: true}))
