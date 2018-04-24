@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="0.7.0"></a>
+# [0.7.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/compare/@wireapp/store-engine@0.6.3...@wireapp/store-engine@0.7.0) (2018-04-24)
+
+
+### Features
+
+* **store-engine:** FileSystemEngine ([#481](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/issues/481)) ([f63e588](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/commit/f63e588))
+
+
+
+
 <a name="0.6.3"></a>
 ## [0.6.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/compare/@wireapp/store-engine@0.6.2...@wireapp/store-engine@0.6.3) (2018-04-23)
 
