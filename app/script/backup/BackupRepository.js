@@ -132,6 +132,18 @@ z.backup.BackupRepository = class BackupRepository {
       );
     });
 
+    const mapEntityDataTypes = entity => {
+      const mappedFields = ['otr_key', 'sha256'];
+      if (entity.data) {
+        mappedFields.forEach(field => {
+          if (entity.data[field]) {
+            entity.data[field] = Uint8Array.from(Object.values(entity.data[field]));
+          }
+        });
+      }
+      return entity;
+    };
+
     const importEntriesPromise = unzipPromise.then(fileDescriptors => {
       initCallback(fileDescriptors.length);
       fileDescriptors.forEach(fileDescriptor => {
@@ -140,7 +152,10 @@ z.backup.BackupRepository = class BackupRepository {
         }
         const tableName = fileDescriptor.filename.replace('.json', '');
         const entities = JSON.parse(fileDescriptor.content);
-        entities.forEach(entity => this.backupService.importEntity(tableName, entity));
+        entities.forEach(entity => {
+          mapEntityDataTypes(entity);
+          this.backupService.importEntity(tableName, entity);
+        });
         progressCallback();
       });
     });
