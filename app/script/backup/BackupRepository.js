@@ -78,6 +78,12 @@ z.backup.BackupRepository = class BackupRepository {
           throw new z.backup.CancelError();
         }
         progressCallback(rows.length);
+
+        const isEventTable = tableName === z.storage.StorageSchemata.OBJECT_STORE.EVENTS;
+        if (isEventTable) {
+          rows = rows.filter(event => event.type !== z.event.Client.CONVERSATION.VERIFICATION);
+        }
+
         tablesData[tableName] = (tablesData[tableName] || []).concat(rows);
       });
     });
