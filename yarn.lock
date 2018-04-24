@@ -337,6 +337,16 @@
   dependencies:
     tweetnacl "^1.0.0"
 
+"@types/filesystem@0.0.28":
+  version "0.0.28"
+  resolved "https://registry.yarnpkg.com/@types/filesystem/-/filesystem-0.0.28.tgz#3fd7735830f2c7413cb5ac45780bc45904697b0e"
+  dependencies:
+    "@types/filewriter" "*"
+
+"@types/filewriter@*":
+  version "0.0.28"
+  resolved "https://registry.yarnpkg.com/@types/filewriter/-/filewriter-0.0.28.tgz#c054e8af4d9dd75db4e63abc76f885168714d4b3"
+
 "@types/fs-extra@5.0.2":
   version "5.0.2"
   resolved "https://registry.yarnpkg.com/@types/fs-extra/-/fs-extra-5.0.2.tgz#235a7e2b56452cc0a6a4809b53e1d1eaffff9c96"
@@ -375,15 +385,15 @@
   version "2.3.2"
   resolved "https://registry.yarnpkg.com/@types/tough-cookie/-/tough-cookie-2.3.2.tgz#e0d481d8bb282ad8a8c9e100ceb72c995fb5e709"
 
-"@wireapp/api-client@0.7.7":
-  version "0.7.7"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-0.7.7.tgz#8862199aabd728870abc5a57fea67d7f12ccba8f"
+"@wireapp/api-client@0.7.8":
+  version "0.7.8"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-0.7.8.tgz#8975c1be7a6fe2c8f6487302b19c1d54a4a7cd06"
   dependencies:
     "@types/node" "9.6.6"
     "@types/spark-md5" "3.0.0"
     "@types/tough-cookie" "2.3.2"
     "@wireapp/priority-queue" "0.1.15"
-    "@wireapp/store-engine" "0.6.3"
+    "@wireapp/store-engine" "0.7.0"
     axios "0.18.0"
     html5-websocket "2.0.2"
     logdown "3.2.3"
@@ -395,29 +405,29 @@
   version "3.0.18"
   resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-3.0.18.tgz#b5e32093d6fa0c0d8ee94a353f97b84fdce8bbb3"
 
-"@wireapp/core@2.2.14":
-  version "2.2.14"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-2.2.14.tgz#51015b2b26eee16060b2ae8e5219abd912779c33"
+"@wireapp/core@2.2.15":
+  version "2.2.15"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-2.2.15.tgz#380504da1e935839c92df7d97eca52299b13d5d8"
   dependencies:
     "@types/node" "9.6.6"
-    "@wireapp/api-client" "0.7.7"
-    "@wireapp/cryptobox" "8.3.33"
-    "@wireapp/store-engine" "0.6.3"
+    "@wireapp/api-client" "0.7.8"
+    "@wireapp/cryptobox" "8.3.34"
+    "@wireapp/store-engine" "0.7.0"
     bazinga64 "5.1.2"
     logdown "3.2.3"
     protobufjs "6.8.6"
     pure-uuid "1.5.2"
 
-"@wireapp/cryptobox@8.3.33":
-  version "8.3.33"
-  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-8.3.33.tgz#1fe40e9275f85dbe5d253843c8e8742ee0cbc472"
+"@wireapp/cryptobox@8.3.34":
+  version "8.3.34"
+  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-8.3.34.tgz#64c441ca7e5e0bf95df31d88d0bd7dc2bb13e774"
   dependencies:
     "@types/fs-extra" "5.0.2"
     "@types/node" "9.6.6"
     "@wireapp/lru-cache" "2.1.6"
     "@wireapp/priority-queue" "0.1.15"
     "@wireapp/proteus" "7.1.25"
-    "@wireapp/store-engine" "0.6.3"
+    "@wireapp/store-engine" "0.7.0"
     dexie "2.0.2"
     fs-extra "5.0.0"
 
@@ -456,11 +466,13 @@
     styled-components "3.2.6"
     styled-normalize "4.0.0"
 
-"@wireapp/store-engine@0.6.3":
-  version "0.6.3"
-  resolved "https://registry.yarnpkg.com/@wireapp/store-engine/-/store-engine-0.6.3.tgz#42d6ca17d67a25559da36a80e66bc1dc8bf60cae"
+"@wireapp/store-engine@0.7.0":
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/store-engine/-/store-engine-0.7.0.tgz#184ed038287d8d368031e8e5a50e01fb41d996e6"
   dependencies:
+    "@types/filesystem" "0.0.28"
     "@types/node" "9.6.6"
+    bro-fs "0.3.0"
     dexie "2.0.2"
     fs-extra "5.0.0"
 
@@ -1736,6 +1748,12 @@ braces@^2.3.0, braces@^2.3.1:
     snapdragon-node "^2.0.1"
     split-string "^3.0.2"
     to-regex "^3.0.1"
+
+bro-fs@0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/bro-fs/-/bro-fs-0.3.0.tgz#ef5636ed9f8e11b7d1c6802746f5fa17b2a17f7f"
+  dependencies:
+    marked "^0.3.17"
 
 brorand@^1.0.1:
   version "1.1.0"
@@ -6449,6 +6467,10 @@ markdown-table@^1.1.0:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/markdown-table/-/markdown-table-1.1.1.tgz#4b3dd3a133d1518b8ef0dbc709bf2a1b4824bc8c"
 
+marked@^0.3.17:
+  version "0.3.19"
+  resolved "https://registry.yarnpkg.com/marked/-/marked-0.3.19.tgz#5d47f709c4c9fc3c216b6d46127280f40b39d790"
+
 math-expression-evaluator@^1.2.14:
   version "1.2.17"
   resolved "https://registry.yarnpkg.com/math-expression-evaluator/-/math-expression-evaluator-1.2.17.tgz#de819fdbcd84dccd8fae59c6aeb79615b9d266ac"
@@ -8532,15 +8554,15 @@ react-dom@16.3.2:
     object-assign "^4.1.1"
     prop-types "^15.6.0"
 
-react-hot-loader@4.1.1:
-  version "4.1.1"
-  resolved "https://registry.yarnpkg.com/react-hot-loader/-/react-hot-loader-4.1.1.tgz#693499a6414b6dc6880287e254322a9d3155e944"
+react-hot-loader@4.1.2:
+  version "4.1.2"
+  resolved "https://registry.yarnpkg.com/react-hot-loader/-/react-hot-loader-4.1.2.tgz#5e8025f5bc5605506586b46eb2c6cc4006fd54d7"
   dependencies:
     fast-levenshtein "^2.0.6"
     global "^4.3.0"
     hoist-non-react-statics "^2.5.0"
     prop-types "^15.6.1"
-    react-lifecycles-compat "^2.0.0"
+    react-lifecycles-compat "^3.0.2"
     shallowequal "^1.0.2"
 
 react-intl-po@2.2.1:
@@ -8566,10 +8588,6 @@ react-intl@2.4.0:
 react-is@^16.3.1:
   version "16.3.2"
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.3.2.tgz#f4d3d0e2f5fbb6ac46450641eb2e25bf05d36b22"
-
-react-lifecycles-compat@^2.0.0:
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/react-lifecycles-compat/-/react-lifecycles-compat-2.0.2.tgz#00a23160eec17a43b94dd74f95d44a1a2c3c5ec1"
 
 react-lifecycles-compat@^3.0.2:
   version "3.0.2"
