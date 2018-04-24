@@ -80,6 +80,10 @@ describe('z.backup.BackupRepository', () => {
       ]);
     });
 
+    afterEach(() => {
+      return TestFactory.storage_service.clearStores();
+    });
+
     it('generate an archive of the database', () => {
       const backupRepository = new z.backup.BackupRepository(
         TestFactory.backup_service,
@@ -108,6 +112,36 @@ describe('z.backup.BackupRepository', () => {
 
         return Promise.all([validateConversationsPromise, validateEventsPromise]);
       });
+    });
+
+    it('ignore verification events in the backup', () => {
+      const backupRepository = new z.backup.BackupRepository(
+        TestFactory.backup_service,
+        TestFactory.client_repository,
+        TestFactory.user_repository
+      );
+
+      const verificationEvent = {
+        conversation: conversationId,
+        type: z.event.Client.CONVERSATION.VERIFICATION,
+      };
+
+      return TestFactory.storage_service
+        .save(z.storage.StorageSchemata.OBJECT_STORE.EVENTS, undefined, verificationEvent)
+        .then(() => {
+          const archivePromise = backupRepository.generateHistory(noop);
+
+          return archivePromise.then(zip => {
+            return zip.files[z.storage.StorageSchemata.OBJECT_STORE.EVENTS]
+              .async('string')
+              .then(eventsStr => JSON.parse(eventsStr))
+              .then(events => {
+                expect(events).not.toContain(verificationEvent);
+                expect(events).toHaveLength(messages);
+              });
+          });
+        })
+        .catch(console.error.bind(console));
     });
 
     it('cancels export', () => {
