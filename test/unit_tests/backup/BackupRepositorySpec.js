@@ -84,7 +84,7 @@ describe('z.backup.BackupRepository', () => {
       return TestFactory.storage_service.clearStores();
     });
 
-    it('generate an archive of the database', () => {
+    it('generates an archive of the database', () => {
       const backupRepository = new z.backup.BackupRepository(
         TestFactory.backup_service,
         TestFactory.client_repository,
@@ -114,7 +114,7 @@ describe('z.backup.BackupRepository', () => {
       });
     });
 
-    it('ignore verification events in the backup', () => {
+    it('ignores verification events in the backup', () => {
       const backupRepository = new z.backup.BackupRepository(
         TestFactory.backup_service,
         TestFactory.client_repository,
@@ -140,8 +140,7 @@ describe('z.backup.BackupRepository', () => {
                 expect(events).toHaveLength(messages);
               });
           });
-        })
-        .catch(console.error.bind(console));
+        });
     });
 
     it('cancels export', () => {

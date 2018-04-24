@@ -501,11 +501,11 @@ window.TestFactory.prototype.exposeLifecycleActors = function() {
 const actorsCache = new Map();
 
 /**
- * Will instanciate a service only once (uses the global actorsCache to store instances)
+ * Will instantiate a service only once (uses the global actorsCache to store instances)
  *
- * @param {Constructor} Service - the service to instanciate
+ * @param {Constructor} Service - the service to instantiate
  * @param {any} ...dependencies - the dependencies required by the service
- * @returns {Object} the instanciated service
+ * @returns {Object} the instantiated service
  */
 function singleton(Service, ...dependencies) {
   actorsCache[Service] = actorsCache[Service] || new Service(...dependencies);
