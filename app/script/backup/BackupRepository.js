@@ -26,6 +26,7 @@ z.backup.BackupRepository = class BackupRepository {
   static get CONFIG() {
     return {
       META_FILENAME: 'export.json',
+      UINT8ARRAY_FIELDS: ['otr_key', 'sha256'],
     };
   }
 
@@ -139,11 +140,12 @@ z.backup.BackupRepository = class BackupRepository {
     });
 
     const mapEntityDataTypes = entity => {
-      const mappedFields = ['otr_key', 'sha256'];
       if (entity.data) {
-        mappedFields.forEach(field => {
-          if (entity.data[field]) {
-            entity.data[field] = Uint8Array.from(Object.values(entity.data[field]));
+        BackupRepository.CONFIG.UINT8ARRAY_FIELDS.forEach(field => {
+          const dataField = entity.data[field];
+          if (dataField) {
+            const values = Object.keys(dataField).map(key => dataField[key]);
+            entity.data[field] = new Uint8Array(values);
           }
         });
       }
