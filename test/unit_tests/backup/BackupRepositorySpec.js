@@ -21,6 +21,18 @@
 
 const noop = () => {};
 
+const conversationId = '35a9a89d-70dc-4d9e-88a2-4d8758458a6a';
+// prettier-ignore
+/* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
+const conversation = {"id": conversationId,"accessModes":["private"],"accessRole":"private","creator":"1ccd93e0-0f4b-4a73-b33f-05c464b88439","name":"Tom @ Staging","status":0,"team_id":null,"type":2,"others":["a7122859-3f16-4870-b7f2-5cbca5572ab2"],"last_event_timestamp":2,"last_server_timestamp":2,"archived_state":false,"archived_timestamp":0,"muted_state":false,"muted_timestamp":0};
+
+// prettier-ignore
+const messages = [
+    {"conversation":conversationId,"id":"68a28ab1-d7f8-4014-8b52-5e99a05ea3b1","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:55.182Z","data":{"content":"First message","nonce":"68a28ab1-d7f8-4014-8b52-5e99a05ea3b1","previews":[]},"type":"conversation.message-add"},
+    {"conversation":conversationId,"id":"4af67f76-09f9-4831-b3a4-9df877b8c29a","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:58.993Z","data":{"content":"Second message","nonce":"4af67f76-09f9-4831-b3a4-9df877b8c29a","previews":[]},"type":"conversation.message-add"},
+  ];
+/* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
+
 describe('z.backup.BackupRepository', () => {
   const test_factory = new TestFactory();
 
@@ -59,19 +71,7 @@ describe('z.backup.BackupRepository', () => {
   });
 
   describe('"generateHistory"', () => {
-    const conversationId = '35a9a89d-70dc-4d9e-88a2-4d8758458a6a';
     const eventStoreName = z.storage.StorageSchemata.OBJECT_STORE.EVENTS;
-
-    // prettier-ignore
-    /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
-    const conversation = {"id": conversationId,"accessModes":["private"],"accessRole":"private","creator":"1ccd93e0-0f4b-4a73-b33f-05c464b88439","name":"Tom @ Staging","status":0,"team_id":null,"type":2,"others":["a7122859-3f16-4870-b7f2-5cbca5572ab2"],"last_event_timestamp":2,"last_server_timestamp":2,"archived_state":false,"archived_timestamp":0,"muted_state":false,"muted_timestamp":0};
-
-    // prettier-ignore
-    const messages = [
-        {"conversation":conversationId,"id":"68a28ab1-d7f8-4014-8b52-5e99a05ea3b1","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:55.182Z","data":{"content":"First message","nonce":"68a28ab1-d7f8-4014-8b52-5e99a05ea3b1","previews":[]},"type":"conversation.message-add"},
-        {"conversation":conversationId,"id":"4af67f76-09f9-4831-b3a4-9df877b8c29a","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:58.993Z","data":{"content":"Second message","nonce":"4af67f76-09f9-4831-b3a4-9df877b8c29a","previews":[]},"type":"conversation.message-add"},
-      ];
-    /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
 
     beforeEach(() => {
       return Promise.all([
@@ -130,7 +130,7 @@ describe('z.backup.BackupRepository', () => {
     });
   });
 
-  fdescribe('"importHistory"', () => {
+  describe('"importHistory"', () => {
     it("fails if metadata don't match", () => {
       const backupRepository = new z.backup.BackupRepository(
         TestFactory.backup_service,
@@ -153,7 +153,7 @@ describe('z.backup.BackupRepository', () => {
         },
       ];
 
-      tests.forEach(testDescription => {
+      const promises = tests.map(testDescription => {
         const archive = new JSZip();
         const meta = {
           ...backupRepository.createMetaDescription(),
@@ -162,7 +162,7 @@ describe('z.backup.BackupRepository', () => {
 
         archive.file(z.backup.BackupRepository.CONFIG.META_FILENAME, JSON.stringify(meta));
 
-        backupRepository
+        return backupRepository
           .importHistory(archive, noop, noop)
           .then(() => fail('import should fail'))
           .catch(error =>
@@ -170,6 +170,50 @@ describe('z.backup.BackupRepository', () => {
               `${error} not instanceof of ${testDescription.expectedError}`
             )
           );
+      });
+
+      return Promise.all(promises);
+    });
+
+    it('successfully import backup', () => {
+      const backupRepository = new z.backup.BackupRepository(
+        TestFactory.backup_service,
+        TestFactory.client_repository,
+        TestFactory.user_repository
+      );
+
+      const archive = new JSZip();
+
+      archive.file(
+        z.backup.BackupRepository.CONFIG.META_FILENAME,
+        JSON.stringify(backupRepository.createMetaDescription())
+      );
+      archive.file(z.storage.StorageSchemata.OBJECT_STORE.CONVERSATIONS, JSON.stringify([conversation]));
+      archive.file(z.storage.StorageSchemata.OBJECT_STORE.EVENTS, JSON.stringify(messages));
+
+      return backupRepository.importHistory(archive, noop, noop).then(() => {
+        const conversationsTest = TestFactory.storage_service
+          .getAll(z.storage.StorageSchemata.OBJECT_STORE.CONVERSATIONS)
+          .then(conversations => {
+            expect(conversations.length).toEqual(1);
+            expect(conversations[0]).toEqual(conversation);
+          });
+
+        const eventsTest = TestFactory.storage_service
+          .getAll(z.storage.StorageSchemata.OBJECT_STORE.EVENTS)
+          .then(events => {
+            expect(events.length).toEqual(messages.length);
+            expect(events.map(removePrimaryKey)).toEqual(messages.map(removePrimaryKey));
+          });
+
+        return Promise.all([conversationsTest, eventsTest]);
+
+        function removePrimaryKey(message) {
+          return {
+            ...message,
+            primary_key: undefined,
+          };
+        }
       });
     });
   });
