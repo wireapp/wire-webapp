@@ -66,7 +66,7 @@ window.z.backup = z.backup || {};
   class IncompatiblePlatformError extends ImportError {
     constructor(message = 'Backup created by incompatible platform') {
       super(message);
-      Object.setPrototypeOf(this, IncompatiblePlatform.prototype);
+      Object.setPrototypeOf(this, IncompatiblePlatformError.prototype);
     }
   }
 

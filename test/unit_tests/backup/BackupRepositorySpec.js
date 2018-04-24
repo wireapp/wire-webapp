@@ -19,6 +19,8 @@
 
 // grunt test_init && grunt test_run:backup/BackupRepository
 
+const noop = () => {};
+
 describe('z.backup.BackupRepository', () => {
   const test_factory = new TestFactory();
 
@@ -87,7 +89,7 @@ describe('z.backup.BackupRepository', () => {
 
       const tables = z.backup.BackupService.CONFIG.SUPPORTED_TABLES;
 
-      const archivePromise = backupRepository.generateHistory(() => {});
+      const archivePromise = backupRepository.generateHistory(noop);
 
       return archivePromise.then(zip => {
         const fileNames = Object.keys(zip.files);
@@ -118,13 +120,57 @@ describe('z.backup.BackupRepository', () => {
       spyOn(backupRepository, 'getIsCanceled').and.returnValue(true);
 
       const promise = backupRepository
-        .generateHistory(() => {})
+        .generateHistory(noop)
         .then(() => fail('export show fail with a CancelError'))
         .catch(error => expect(error instanceof z.backup.CancelError).toBeTruthy());
 
       backupRepository.cancelAction();
 
       return promise;
+    });
+  });
+
+  fdescribe('"importHistory"', () => {
+    it("fails if metadata don't match", () => {
+      const backupRepository = new z.backup.BackupRepository(
+        TestFactory.backup_service,
+        TestFactory.client_repository,
+        TestFactory.user_repository
+      );
+
+      const tests = [
+        {
+          expectedError: z.backup.DifferentAccountError,
+          metaChanges: {user_id: 'fail'},
+        },
+        {
+          expectedError: z.backup.IncompatibleBackupError,
+          metaChanges: {version: -1},
+        },
+        {
+          expectedError: z.backup.IncompatiblePlatformError,
+          metaChanges: {platform: 'random'},
+        },
+      ];
+
+      tests.forEach(testDescription => {
+        const archive = new JSZip();
+        const meta = {
+          ...backupRepository.createMetaDescription(),
+          ...testDescription.metaChanges,
+        };
+
+        archive.file(z.backup.BackupRepository.CONFIG.META_FILENAME, JSON.stringify(meta));
+
+        backupRepository
+          .importHistory(archive, noop, noop)
+          .then(() => fail('import should fail'))
+          .catch(error =>
+            expect(error instanceof testDescription.expectedError).toBeTruthy(
+              `${error} not instanceof of ${testDescription.expectedError}`
+            )
+          );
+      });
     });
   });
 });
