@@ -70,7 +70,7 @@ z.backup.BackupRepository = class BackupRepository {
    */
   generateHistory(progressCallback) {
     const tables = this.backupService.getTables();
-    const meta = this.createMetaDescription();
+    const metaData = this.createMetaDescription();
     const tablesData = {};
     this.isCanceled = false;
 
@@ -80,6 +80,12 @@ z.backup.BackupRepository = class BackupRepository {
           throw new z.backup.CancelError();
         }
         progressCallback(rows.length);
+
+        const isEventTable = tableName === z.storage.StorageSchemata.OBJECT_STORE.EVENTS;
+        if (isEventTable) {
+          rows = rows.filter(event => event.type !== z.event.Client.CONVERSATION.VERIFICATION);
+        }
+
         tablesData[tableName] = (tablesData[tableName] || []).concat(rows);
       });
     });
@@ -89,7 +95,7 @@ z.backup.BackupRepository = class BackupRepository {
         const zip = new JSZip();
 
         // first write the metadata file
-        zip.file(BackupRepository.CONFIG.META_FILENAME, JSON.stringify(meta));
+        zip.file(BackupRepository.CONFIG.META_FILENAME, JSON.stringify(metaData));
 
         // then all the other tables
         Object.keys(tablesData).forEach(tableName => {
@@ -134,7 +140,7 @@ z.backup.BackupRepository = class BackupRepository {
       );
     });
 
-    const importEntriesPromise = unzipPromise.then(fileDescriptors => {
+    return unzipPromise.then(fileDescriptors => {
       initCallback(fileDescriptors.length);
 
       fileDescriptors.forEach(fileDescriptor => {
@@ -153,8 +159,6 @@ z.backup.BackupRepository = class BackupRepository {
         importPromise.then(progressCallback);
       });
     });
-
-    return importEntriesPromise;
   }
 
   verifyMetadata(archiveMetadata) {

@@ -327,9 +327,9 @@
   dependencies:
     samsam "1.3.0"
 
-"@types/chai@4.1.2":
-  version "4.1.2"
-  resolved "https://registry.yarnpkg.com/@types/chai/-/chai-4.1.2.tgz#f1af664769cfb50af805431c407425ed619daa21"
+"@types/chai@4.1.3":
+  version "4.1.3"
+  resolved "https://registry.yarnpkg.com/@types/chai/-/chai-4.1.3.tgz#b8a74352977a23b604c01aa784f5b793443fb7dc"
 
 "@types/ed2curve@0.2.2":
   version "0.2.2"
@@ -347,9 +347,9 @@
   version "3.0.32"
   resolved "https://registry.yarnpkg.com/@types/long/-/long-3.0.32.tgz#f4e5af31e9e9b196d8e5fca8a5e2e20aa3d60b69"
 
-"@types/node@*", "@types/node@9.6.5":
-  version "9.6.5"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-9.6.5.tgz#ee700810fdf49ac1c399fc5980b7559b3e5a381d"
+"@types/node@*", "@types/node@9.6.6":
+  version "9.6.6"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-9.6.6.tgz#439b91f9caf3983cad2eef1e11f6bedcbf9431d2"
 
 "@types/node@^6.0.46":
   version "6.0.90"
@@ -360,8 +360,8 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-7.0.46.tgz#c3dedd25558c676b3d6303e51799abb9c3f8f314"
 
 "@types/node@^8.9.4":
-  version "8.10.8"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-8.10.8.tgz#794cba23cc9f8d9715f6543fa8827433b5f5cd3b"
+  version "8.10.9"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-8.10.9.tgz#b507a74a7d3eddc74a17dc35fd40d8f45dde0d6c"
 
 "@types/spark-md5@3.0.0":
   version "3.0.0"
@@ -371,15 +371,15 @@
   version "2.3.2"
   resolved "https://registry.yarnpkg.com/@types/tough-cookie/-/tough-cookie-2.3.2.tgz#e0d481d8bb282ad8a8c9e100ceb72c995fb5e709"
 
-"@wireapp/api-client@0.7.1":
-  version "0.7.1"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-0.7.1.tgz#0c806ebeaf785f94194906efbbd743f15a148d98"
+"@wireapp/api-client@0.7.7":
+  version "0.7.7"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-0.7.7.tgz#8862199aabd728870abc5a57fea67d7f12ccba8f"
   dependencies:
-    "@types/node" "9.6.5"
+    "@types/node" "9.6.6"
     "@types/spark-md5" "3.0.0"
     "@types/tough-cookie" "2.3.2"
-    "@wireapp/priority-queue" "0.1.14"
-    "@wireapp/store-engine" "0.6.1"
+    "@wireapp/priority-queue" "0.1.15"
+    "@wireapp/store-engine" "0.6.3"
     axios "0.18.0"
     html5-websocket "2.0.2"
     logdown "3.2.3"
@@ -387,76 +387,76 @@
     spark-md5 "3.0.0"
     tough-cookie "2.3.4"
 
-"@wireapp/cbor@3.0.16":
-  version "3.0.16"
-  resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-3.0.16.tgz#f8f41fa0d8e854fe77402a8b0a20c89f2ed93943"
+"@wireapp/cbor@3.0.18":
+  version "3.0.18"
+  resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-3.0.18.tgz#b5e32093d6fa0c0d8ee94a353f97b84fdce8bbb3"
 
-"@wireapp/core@2.2.1":
-  version "2.2.1"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-2.2.1.tgz#193d854ef54a175cf170f8df83b9db0e0b25698f"
+"@wireapp/core@2.2.14":
+  version "2.2.14"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-2.2.14.tgz#51015b2b26eee16060b2ae8e5219abd912779c33"
   dependencies:
-    "@types/node" "9.6.5"
-    "@wireapp/api-client" "0.7.1"
-    "@wireapp/cryptobox" "8.3.26"
-    "@wireapp/store-engine" "0.6.1"
-    bazinga64 "5.0.3"
+    "@types/node" "9.6.6"
+    "@wireapp/api-client" "0.7.7"
+    "@wireapp/cryptobox" "8.3.33"
+    "@wireapp/store-engine" "0.6.3"
+    bazinga64 "5.1.2"
     logdown "3.2.3"
     protobufjs "6.8.6"
     pure-uuid "1.5.2"
 
-"@wireapp/cryptobox@8.3.26":
-  version "8.3.26"
-  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-8.3.26.tgz#fba8d7d2a14de1d2649d01846da6d1cd0408a082"
+"@wireapp/cryptobox@8.3.33":
+  version "8.3.33"
+  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-8.3.33.tgz#1fe40e9275f85dbe5d253843c8e8742ee0cbc472"
   dependencies:
     "@types/fs-extra" "5.0.2"
-    "@types/node" "9.6.5"
-    "@wireapp/lru-cache" "2.1.3"
-    "@wireapp/priority-queue" "0.1.14"
-    "@wireapp/proteus" "7.1.22"
-    "@wireapp/store-engine" "0.6.1"
+    "@types/node" "9.6.6"
+    "@wireapp/lru-cache" "2.1.6"
+    "@wireapp/priority-queue" "0.1.15"
+    "@wireapp/proteus" "7.1.25"
+    "@wireapp/store-engine" "0.6.3"
     dexie "2.0.2"
     fs-extra "5.0.0"
 
-"@wireapp/lru-cache@2.1.3":
-  version "2.1.3"
-  resolved "https://registry.yarnpkg.com/@wireapp/lru-cache/-/lru-cache-2.1.3.tgz#0afb842dc6f50a1a4e2864cc220b52a4dfbd4538"
+"@wireapp/lru-cache@2.1.6":
+  version "2.1.6"
+  resolved "https://registry.yarnpkg.com/@wireapp/lru-cache/-/lru-cache-2.1.6.tgz#c684dcb88a75f3b6c3b18ab252a215482d6bab9e"
   dependencies:
     webpack "3.11.0"
 
-"@wireapp/priority-queue@0.1.14":
-  version "0.1.14"
-  resolved "https://registry.yarnpkg.com/@wireapp/priority-queue/-/priority-queue-0.1.14.tgz#725ca88f1db9120bf8f53fef1d2376499c4faa33"
+"@wireapp/priority-queue@0.1.15":
+  version "0.1.15"
+  resolved "https://registry.yarnpkg.com/@wireapp/priority-queue/-/priority-queue-0.1.15.tgz#c7f9e44a5761346f29ce0e760d601da72242e508"
   dependencies:
-    "@types/node" "9.6.5"
+    "@types/node" "9.6.6"
     pure-uuid "1.5.2"
 
-"@wireapp/proteus@7.1.22":
-  version "7.1.22"
-  resolved "https://registry.yarnpkg.com/@wireapp/proteus/-/proteus-7.1.22.tgz#88450238e8768fdac8cf3864beb1526e987a9899"
+"@wireapp/proteus@7.1.25":
+  version "7.1.25"
+  resolved "https://registry.yarnpkg.com/@wireapp/proteus/-/proteus-7.1.25.tgz#7a789999c342b77dee570daef707a6f24b0eb03e"
   dependencies:
-    "@types/chai" "4.1.2"
+    "@types/chai" "4.1.3"
     "@types/ed2curve" "0.2.2"
-    "@types/node" "9.6.5"
-    "@wireapp/cbor" "3.0.16"
+    "@types/node" "9.6.6"
+    "@wireapp/cbor" "3.0.18"
     ed2curve "0.2.1"
     libsodium-wrappers-sumo "0.7.3"
 
-"@wireapp/react-ui-kit@1.1.4":
-  version "1.1.4"
-  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-1.1.4.tgz#cae960f73f79a5ea8b1b57ec50934f4ccbffeccb"
+"@wireapp/react-ui-kit@1.1.7":
+  version "1.1.7"
+  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-1.1.7.tgz#637db3e2e243f81acd771d193eef8be941cae4e7"
   dependencies:
     color "3.0.0"
     react "16.3.2"
     react-dom "16.3.2"
-    recompose "0.26.0"
+    recompose "0.27.0"
     styled-components "3.2.6"
     styled-normalize "4.0.0"
 
-"@wireapp/store-engine@0.6.1":
-  version "0.6.1"
-  resolved "https://registry.yarnpkg.com/@wireapp/store-engine/-/store-engine-0.6.1.tgz#600032d448b72a5f6d21f34232a9ce166aef3512"
+"@wireapp/store-engine@0.6.3":
+  version "0.6.3"
+  resolved "https://registry.yarnpkg.com/@wireapp/store-engine/-/store-engine-0.6.3.tgz#42d6ca17d67a25559da36a80e66bc1dc8bf60cae"
   dependencies:
-    "@types/node" "9.6.5"
+    "@types/node" "9.6.6"
     dexie "2.0.2"
     fs-extra "5.0.0"
 
@@ -1574,9 +1574,9 @@ batch@0.6.1:
   version "0.6.1"
   resolved "https://registry.yarnpkg.com/batch/-/batch-0.6.1.tgz#dc34314f4e679318093fc760272525f94bf25c16"
 
-bazinga64@5.0.3:
-  version "5.0.3"
-  resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.0.3.tgz#b752851e95145d504ec3b16e07fee05e1f5d0e37"
+bazinga64@5.1.2:
+  version "5.1.2"
+  resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.1.2.tgz#f7fba9f44eee034f4844dd872c8d69ec00540807"
 
 bcrypt-pbkdf@^1.0.0:
   version "1.0.1"
@@ -2557,13 +2557,9 @@ core-js@^1.0.0:
   version "1.2.7"
   resolved "https://registry.yarnpkg.com/core-js/-/core-js-1.2.7.tgz#652294c14651db28fa93bd2d5ff2983a4f08c636"
 
-core-js@^2.2.0:
+core-js@^2.2.0, core-js@^2.4.0:
   version "2.5.5"
   resolved "https://registry.yarnpkg.com/core-js/-/core-js-2.5.5.tgz#b14dde936c640c0579a6b50cabcc132dd6127e3b"
-
-core-js@^2.4.0:
-  version "2.5.3"
-  resolved "https://registry.yarnpkg.com/core-js/-/core-js-2.5.3.tgz#8acc38345824f16d8365b7c9b4259168e8ed603e"
 
 core-js@^2.5.0:
   version "2.5.1"
@@ -3475,11 +3471,11 @@ eslint-config-prettier@2.9.0:
   dependencies:
     get-stdin "^5.0.1"
 
-eslint-plugin-babel@5.0.0:
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-babel/-/eslint-plugin-babel-5.0.0.tgz#57c082f89bfc67f535757a8a939617667c3c5c97"
+eslint-plugin-babel@5.1.0:
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-babel/-/eslint-plugin-babel-5.1.0.tgz#9c76e476162041e50b6ba69aa4eae3bdd6a4e1c3"
   dependencies:
-    eslint-rule-composer "^0.1.1"
+    eslint-rule-composer "^0.3.0"
 
 eslint-plugin-jsdoc@3.6.3:
   version "3.6.3"
@@ -3509,9 +3505,9 @@ eslint-plugin-react@7.7.0:
     jsx-ast-utils "^2.0.1"
     prop-types "^15.6.0"
 
-eslint-rule-composer@^0.1.1:
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/eslint-rule-composer/-/eslint-rule-composer-0.1.1.tgz#479dfd4e93d7f2777499a35ce9be76403c8e982a"
+eslint-rule-composer@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/eslint-rule-composer/-/eslint-rule-composer-0.3.0.tgz#79320c927b0c5c0d3d3d2b76c8b4a488f25bbaf9"
 
 eslint-scope@^3.7.1, eslint-scope@~3.7.1:
   version "3.7.1"
@@ -8532,9 +8528,9 @@ react-dom@16.3.2:
     object-assign "^4.1.1"
     prop-types "^15.6.0"
 
-react-hot-loader@4.1.0:
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/react-hot-loader/-/react-hot-loader-4.1.0.tgz#ae47224af27981c02d4b8c61d498e89d6d207096"
+react-hot-loader@4.1.1:
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/react-hot-loader/-/react-hot-loader-4.1.1.tgz#693499a6414b6dc6880287e254322a9d3155e944"
   dependencies:
     fast-levenshtein "^2.0.6"
     global "^4.3.0"
@@ -8570,6 +8566,10 @@ react-is@^16.3.1:
 react-lifecycles-compat@^2.0.0:
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/react-lifecycles-compat/-/react-lifecycles-compat-2.0.2.tgz#00a23160eec17a43b94dd74f95d44a1a2c3c5ec1"
+
+react-lifecycles-compat@^3.0.2:
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/react-lifecycles-compat/-/react-lifecycles-compat-3.0.2.tgz#7279047275bd727a912e25f734c0559527e84eff"
 
 react-reconciler@^0.7.0:
   version "0.7.0"
@@ -8761,13 +8761,15 @@ readdirp@^2.0.0:
     readable-stream "^2.0.2"
     set-immediate-shim "^1.0.1"
 
-recompose@0.26.0:
-  version "0.26.0"
-  resolved "https://registry.yarnpkg.com/recompose/-/recompose-0.26.0.tgz#9babff039cb72ba5bd17366d55d7232fbdfb2d30"
+recompose@0.27.0:
+  version "0.27.0"
+  resolved "https://registry.yarnpkg.com/recompose/-/recompose-0.27.0.tgz#8230ebd651bf1159097006f79083fe224b1501cf"
   dependencies:
+    babel-runtime "^6.26.0"
     change-emitter "^0.1.2"
     fbjs "^0.8.1"
     hoist-non-react-statics "^2.3.1"
+    react-lifecycles-compat "^3.0.2"
     symbol-observable "^1.0.4"
 
 reconnecting-websocket@3.2.2:
