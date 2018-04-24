@@ -28,8 +28,8 @@ describe('FileEngine', () => {
   const TEST_DIRECTORY = path.join(process.cwd(), '.tmp', STORE_NAME);
   let engine = undefined;
 
-  async function initEngine() {
-    const storeEngine = new FileEngine();
+  async function initEngine(shouldCreateNewEngine = true) {
+    const storeEngine = shouldCreateNewEngine ? new FileEngine() : engine;
     await storeEngine.init(TEST_DIRECTORY);
     return storeEngine;
   }

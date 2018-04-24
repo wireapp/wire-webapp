@@ -1,5 +1,5 @@
 import {ExpiredBundle, TransientBundle, TransientStore} from './store';
-import {FileEngine, IndexedDBEngine, LocalStorageEngine, MemoryEngine} from './engine';
+import {FileEngine, FileSystemEngine, IndexedDBEngine, LocalStorageEngine, MemoryEngine} from './engine';
 import {PathValidationError, RecordAlreadyExistsError, RecordNotFoundError, RecordTypeError} from './engine/error';
 
 export = {
@@ -16,6 +16,7 @@ export = {
     RecordTypeError,
   },
   FileEngine,
+  FileSystemEngine,
   IndexedDBEngine,
   MemoryEngine,
   LocalStorageEngine,

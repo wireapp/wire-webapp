@@ -35,7 +35,7 @@ module.exports = function(config) {
     customLaunchers: {
       ChromeNoSandbox: {
         base: 'ChromeHeadless',
-        flags: ['--no-sandbox'],
+        flags: ['--allow-file-access-from-files', '--no-sandbox', '--unlimited-quota-for-files'],
       },
     },
     files: ['https://unpkg.com/dexie@2.0.2/dist/dexie.js', `${dist}${projectName}.test.bundle.js`],

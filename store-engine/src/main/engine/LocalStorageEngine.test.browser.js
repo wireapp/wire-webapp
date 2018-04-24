@@ -24,8 +24,8 @@ describe('StoreEngine.LocalStorageEngine', () => {
 
   let engine = undefined;
 
-  async function initEngine() {
-    const storeEngine = new LocalStorageEngine();
+  async function initEngine(shouldCreateNewEngine = true) {
+    const storeEngine = shouldCreateNewEngine ? new LocalStorageEngine() : engine;
     await storeEngine.init(STORE_NAME);
     return storeEngine;
   }

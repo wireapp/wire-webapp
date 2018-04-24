@@ -1,6 +1,8 @@
 {
   "dependencies": {
+    "@types/filesystem": "0.0.28",
     "@types/node": "9.6.6",
+    "bro-fs": "0.3.0",
     "dexie": "2.0.2",
     "fs-extra": "5.0.0"
   },
@@ -15,9 +17,22 @@
     "typescript": "2.8.3",
     "webpack": "3.11.0"
   },
-  "description": "Provider for different storage engines.",
+  "description": "Provides a generic storage layer for File, FileSystem, IndexedDB, Memory & LocalStorage.",
   "files": [
     "dist"
+  ],
+  "keywords": [
+    "File",
+    "FileSystem",
+    "fs",
+    "generic",
+    "IndexedDB",
+    "LocalStorage",
+    "Memory",
+    "persistence",
+    "storage",
+    "transient",
+    "wrapper"
   ],
   "license": "GPL-3.0",
   "main": "./dist/commonjs/index.js",

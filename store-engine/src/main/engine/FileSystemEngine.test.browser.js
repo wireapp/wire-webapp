@@ -17,15 +17,17 @@
  *
  */
 
-const {MemoryEngine} = require('@wireapp/store-engine');
+import {FileSystemEngine} from '@wireapp/store-engine';
 
-describe('StoreEngine.MemoryEngine', () => {
+const fs = require('bro-fs');
+
+describe('FileSystemEngine', () => {
   const STORE_NAME = 'store-name';
 
   let engine = undefined;
 
   async function initEngine(shouldCreateNewEngine = true) {
-    const storeEngine = shouldCreateNewEngine ? new MemoryEngine() : engine;
+    const storeEngine = shouldCreateNewEngine ? new FileSystemEngine() : engine;
     await storeEngine.init(STORE_NAME);
     return storeEngine;
   }
@@ -33,6 +35,19 @@ describe('StoreEngine.MemoryEngine', () => {
   beforeEach(async done => {
     engine = await initEngine();
     done();
+  });
+
+  afterEach(async done => {
+    await fs.rmdir(STORE_NAME);
+    done();
+  });
+
+  describe('"init"', () => {
+    it('resolves with a browser-specific URL to the filesystem.', async done => {
+      const fileSystem = await engine.init();
+      expect(fileSystem.root.toURL().startsWith('filesystem:')).toBe(true);
+      done();
+    });
   });
 
   describe('"append"', () => {
@@ -59,7 +74,7 @@ describe('StoreEngine.MemoryEngine', () => {
     });
   });
 
-  describe('"purge"', () => {
+  fdescribe('"purge"', () => {
     Object.entries(require('../../test/shared/purge')).map(([description, testFunction]) => {
       it(description, done => testFunction(done, engine, initEngine));
     });

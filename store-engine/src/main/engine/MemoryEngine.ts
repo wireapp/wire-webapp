@@ -73,7 +73,7 @@ export default class MemoryEngine implements CRUDEngine {
     this.prepareTable(tableName);
     const promises: Array<Promise<T>> = [];
 
-    for (let primaryKey of Object.keys(this.stores[this.storeName][tableName])) {
+    for (const primaryKey of Object.keys(this.stores[this.storeName][tableName])) {
       promises.push(this.read(tableName, primaryKey));
     }
 

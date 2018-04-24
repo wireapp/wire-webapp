@@ -188,7 +188,6 @@ export default class FileEngine implements CRUDEngine {
     });
   }
 
-  // TODO: Make this function also work for binary data.
   update(tableName: string, primaryKey: string, changes: Object): Promise<string> {
     return this.resolvePath(tableName, primaryKey).then(file => {
       return this.read(tableName, primaryKey)
