@@ -68,7 +68,7 @@ z.backup.BackupRepository = class BackupRepository {
    */
   generateHistory(progressCallback) {
     const tables = this.backupService.getTables();
-    const meta = this.createMetaDescription();
+    const metaData = this.createMetaDescription();
     const tablesData = {};
     this.isCanceled = false;
 
@@ -93,7 +93,7 @@ z.backup.BackupRepository = class BackupRepository {
         const zip = new JSZip();
 
         // first write the metadata file
-        zip.file(BackupRepository.CONFIG.META_FILENAME, JSON.stringify(meta));
+        zip.file(BackupRepository.CONFIG.META_FILENAME, JSON.stringify(metaData));
 
         // then all the other tables
         Object.keys(tablesData).forEach(tableName => {
