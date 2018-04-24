@@ -318,14 +318,7 @@ z.string.nl.conversationsConnectionRequestMany = '{{number}} personen wachten';
 z.string.nl.conversationsConnectionRequestOne = '1 persoon wacht';
 z.string.nl.conversationsEmptyConversation = 'Groepsgesprek';
 z.string.nl.conversationsNoConversations = 'Nog geen gesprekken';
-z.string.nl.conversationsPopoverArchive = 'Archiveren';
-z.string.nl.conversationsPopoverBlock = 'Blokkeren';
 z.string.nl.conversationsPopoverCancel = 'Annuleer verzoek';
-z.string.nl.conversationsPopoverClear = 'Verwijderen';
-z.string.nl.conversationsPopoverLeave = 'Verlaten';
-z.string.nl.conversationsPopoverNotify = 'Dempen opheffen';
-z.string.nl.conversationsPopoverSilence = 'Dempen';
-z.string.nl.conversationsPopoverUnarchive = 'Terugzetten';
 
 z.string.nl.conversationsSecondaryLineMissedCall = '{{number}} gemist gesprek';
 z.string.nl.conversationsSecondaryLineMissedCalls = '{{number}} gemiste gespreken';
@@ -445,7 +438,6 @@ z.string.nl.preferencesDevicesCurrent = 'Huidig';
 z.string.nl.preferencesDevicesFingerprint = 'Digitale vingerafdruk';
 z.string.nl.preferencesDevicesFingerprintDetail = 'Wire geeft elk apparaat een eigen vingerafdruk. Vergelijk deze en verifieer je apparaten en gesprekken.';
 z.string.nl.preferencesDevicesId = 'ID: ';
-z.string.nl.preferencesDevicesRemove = 'Verwijderen';
 z.string.nl.preferencesDevicesRemoveCancel = 'Annuleer';
 z.string.nl.preferencesDevicesRemoveDetail = 'Verwijder dit apparaat als je het niet meer gebruikt. Je berichtengeschiedenis wordt verwijderd op dit apparaat en je wordt uitgelogd.';
 z.string.nl.preferencesDevicesSessionConfirmation = 'De sessie is gereset.';
@@ -478,6 +470,9 @@ z.string.nl.preferencesOptionsNotificationsNone = 'Uit';
 z.string.nl.preferencesOptionsNotificationsObfuscate = 'Details verbergen';
 z.string.nl.preferencesOptionsNotificationsObfuscateMessage = 'Toon zender';
 z.string.nl.preferencesOptionsNotificationsOn = 'Toon verzender en bericht';
+
+z.string.nl.backupExportSuccessAction = 'Ok';
+z.string.nl.backupCancel = 'Annuleer';
 
 z.string.nl.searchConnect = 'Verbind';
 z.string.nl.searchConnections = 'Contacten';

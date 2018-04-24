@@ -285,14 +285,7 @@ z.string.da.conversationsConnectionRequestMany = '{{number}} personer venter';
 z.string.da.conversationsConnectionRequestOne = '1 person venter';
 z.string.da.conversationsEmptyConversation = 'Gruppesamtale';
 z.string.da.conversationsNoConversations = 'Ingen samtaler';
-z.string.da.conversationsPopoverArchive = 'Arkivér';
-z.string.da.conversationsPopoverBlock = 'Blokér';
 z.string.da.conversationsPopoverCancel = 'Annuller anmodning';
-z.string.da.conversationsPopoverClear = 'Slet';
-z.string.da.conversationsPopoverLeave = 'Forlad';
-z.string.da.conversationsPopoverNotify = 'Lyd til';
-z.string.da.conversationsPopoverSilence = 'Lyd fra';
-z.string.da.conversationsPopoverUnarchive = 'Anuller arkivering';
 
 z.string.da.conversationsSecondaryLineMissedCall = '{{number}} ubesvaret opkald';
 z.string.da.conversationsSecondaryLineMissedCalls = '{{number}} ubesvarede opkald';
@@ -399,7 +392,6 @@ z.string.da.preferencesDevicesCurrent = 'Aktuel';
 z.string.da.preferencesDevicesFingerprint = 'Nøgle fingeraftryk';
 z.string.da.preferencesDevicesFingerprintDetail = 'Wire giver hver enhed et unikt fingeraftryk. Sammenlign dem og bekræft dine enheder og samtaler.';
 z.string.da.preferencesDevicesId = 'ID: ';
-z.string.da.preferencesDevicesRemove = 'Fjern';
 z.string.da.preferencesDevicesRemoveCancel = 'Annuller';
 z.string.da.preferencesDevicesRemoveDetail = 'Fjern denne enhed, hvis du ikke bruger den længere. Du bliver logget ud af enheden med det samme.';
 z.string.da.preferencesDevicesSessionConfirmation = 'Sessionen er blevet nulstillet.';
@@ -428,6 +420,9 @@ z.string.da.preferencesOptionsNotificationsNone = 'Slået Fra';
 z.string.da.preferencesOptionsNotificationsObfuscate = 'Skjul detaljer';
 z.string.da.preferencesOptionsNotificationsObfuscateMessage = 'Vis afsender';
 z.string.da.preferencesOptionsNotificationsOn = 'Vis afsender og besked';
+
+z.string.da.backupExportSuccessAction = 'Ok';
+z.string.da.backupCancel = 'Annuller';
 
 z.string.da.searchConnect = 'Forbind';
 z.string.da.searchConnections = 'Forbindelser';

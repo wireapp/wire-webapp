@@ -42,9 +42,12 @@
   "appAlreadyOpenStrings.headline": "Wire ist in diesem Browser bereits geöffnet",
   "appAlreadyOpenStrings.text": "Wenn du fortfährst, wirst du in dem anderen Tab ausgeloggt.",
   "appAlreadyOpenStrings.continueButton": "Weiter",
-  "unsupported.unsupportedHeadline": "Dieser Browser wird nicht unterstützt.",
-  "unsupported.unsupportedSubhead":
-    "Lade die neueste Version von <b style=\"font-weight: 600\">Google Chrome, Mozilla Firefox, Opera</b> oder <b style=\"font-weight: 600\">Microsoft Edge</b> herunter.",
+  "unsupported.headlineBrowser": "Dieser Browser wird nicht unterstützt.",
+  "unsupported.subheadBrowser": "Lade die neueste Version von <b style=\"font-weight: 600\">Google Chrome, Mozilla Firefox, Opera</b> oder <b style=\"font-weight: 600\">Microsoft Edge</b> herunter.",
+  "unsupported.headlineCookies": "Cookies erlauben",
+  "unsupported.subheadCookies": "Aktiviere Cookies, um dich bei Wire einzuloggen.",
+  "unsupported.headlineIndexedDb": "Lokaler Speicher nicht verfügbar",
+  "unsupported.subheadIndexedDb": "Wire benötigt zum Anzeigen deiner Nachrichten Zugriff auf den lokalen Speicher. In Privaten Fenstern ist dieser nicht verfügbar.",
   "conversationJoin.unsupportedJoinHeadline": "Du bist in einen <b style=\"color: black;\">Wire Gästebereich</b> <br />eingeladen.",
   "conversationJoin.headline": "Du bist in einen <b style=\"color: black;\">Wire Gästebereich</b> <br />eingeladen.",
   "conversationJoin.unsupportedJoinSubhead":

@@ -297,14 +297,7 @@ z.string.sk.conversationsConnectionRequestMany = '{{number}} ľudí čaká';
 z.string.sk.conversationsConnectionRequestOne = '1 osoba čaká';
 z.string.sk.conversationsEmptyConversation = 'Skupinová konverzácia';
 z.string.sk.conversationsNoConversations = 'Zatiaľ žiadne konverzácie';
-z.string.sk.conversationsPopoverArchive = 'Archív';
-z.string.sk.conversationsPopoverBlock = 'Blokovať';
 z.string.sk.conversationsPopoverCancel = 'Zrušiť požiadavku';
-z.string.sk.conversationsPopoverClear = 'Zmazať';
-z.string.sk.conversationsPopoverLeave = 'Opustiť';
-z.string.sk.conversationsPopoverNotify = 'Zapnúť zvuk';
-z.string.sk.conversationsPopoverSilence = 'Stlmiť';
-z.string.sk.conversationsPopoverUnarchive = 'Zrušiť archiváciu';
 
 z.string.sk.conversationsSecondaryLineMissedCall = '{{number}} zmeškaný hovor';
 z.string.sk.conversationsSecondaryLineMissedCalls = '{{number}} neprijaté hovory';
@@ -420,7 +413,6 @@ z.string.sk.preferencesDevicesCurrent = 'Aktuálny';
 z.string.sk.preferencesDevicesFingerprint = 'Identifikátor kľúča';
 z.string.sk.preferencesDevicesFingerprintDetail = 'Wire dáva každému zariadeniu jedinečný identifikátor. Porovnajte ich a overte Vaše zariadenia a rozhovory.';
 z.string.sk.preferencesDevicesId = 'ID: ';
-z.string.sk.preferencesDevicesRemove = 'Odstrániť';
 z.string.sk.preferencesDevicesRemoveCancel = 'Zrušiť';
 z.string.sk.preferencesDevicesRemoveDetail = 'Odstráňte toto zariadenie, ak ste ho prestali používať. Budete z neho ihneď odhlásený.';
 z.string.sk.preferencesDevicesSessionConfirmation = 'Relácia bola obnovená.';
@@ -452,6 +444,9 @@ z.string.sk.preferencesOptionsNotificationsNone = 'Vypnúť';
 z.string.sk.preferencesOptionsNotificationsObfuscate = 'Skryť detaily';
 z.string.sk.preferencesOptionsNotificationsObfuscateMessage = 'Zobraziť odosielateľa';
 z.string.sk.preferencesOptionsNotificationsOn = 'Zobraziť odosielateľa a správu';
+
+z.string.sk.backupExportSuccessAction = 'OK';
+z.string.sk.backupCancel = 'Zrušiť';
 
 z.string.sk.searchConnect = 'Pripojiť';
 z.string.sk.searchConnections = 'Pripojenia';
