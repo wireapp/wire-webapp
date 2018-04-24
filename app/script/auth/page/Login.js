@@ -126,7 +126,7 @@ class Login extends React.PureComponent {
 
   componentWillReceiveProps = nextProps => this.readAndUpdateParamsFromUrl(nextProps);
 
-  componentWillUmnount = () => {
+  componentWillUnmount = () => {
     this.props.resetError();
   };
 
