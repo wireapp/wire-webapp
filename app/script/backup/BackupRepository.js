@@ -53,6 +53,10 @@ z.backup.BackupRepository = class BackupRepository {
     this.isCanceled = true;
   }
 
+  getIsCanceled() {
+    return this.isCanceled;
+  }
+
   createMetaDescription() {
     return {
       client_id: this.clientRepository.currentClient().id,
@@ -77,7 +81,7 @@ z.backup.BackupRepository = class BackupRepository {
 
     const loadDataPromises = tables.map(table => {
       return this.backupService.exportTable(table, (tableName, rows) => {
-        if (this.isCanceled) {
+        if (this.getIsCanceled()) {
           throw new z.backup.CancelError();
         }
         progressCallback(rows.length);
