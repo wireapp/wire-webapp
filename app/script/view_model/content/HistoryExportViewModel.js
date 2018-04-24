@@ -86,7 +86,7 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
       this.numberOfProcessedRecords(0);
       this.backupRepository
         .generateHistory(this.onProgress.bind(this))
-        .then(archive => archive.generateAsync({type: 'blob'}))
+        .then(archive => archive.generateAsync({compression: 'DEFLATE', type: 'blob'}))
         .then(archiveBlob => {
           const timestamp = new Date().toISOString().substring(0, 10);
           const filename = `Wire-${userName}-Backup_${timestamp}.${
