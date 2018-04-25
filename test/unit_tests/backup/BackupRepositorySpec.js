@@ -132,12 +132,12 @@ describe('z.backup.BackupRepository', () => {
           const archivePromise = backupRepository.generateHistory(noop);
 
           return archivePromise.then(zip => {
-            return zip.files[z.storage.StorageSchemata.OBJECT_STORE.EVENTS]
+            return zip.files[`${z.storage.StorageSchemata.OBJECT_STORE.EVENTS}.json`]
               .async('string')
               .then(eventsStr => JSON.parse(eventsStr))
               .then(events => {
                 expect(events).not.toContain(verificationEvent);
-                expect(events).toHaveLength(messages);
+                expect(events.length).toBe(messages.length);
               });
           });
         });
@@ -155,7 +155,7 @@ describe('z.backup.BackupRepository', () => {
       const promise = backupRepository
         .generateHistory(noop)
         .then(() => fail('export show fail with a CancelError'))
-        .catch(error => expect(error instanceof z.backup.CancelError).toBeTruthy());
+        .catch(error => expect(error instanceof z.backup.CancelError).toBe(true));
 
       backupRepository.cancelAction();
 
@@ -199,7 +199,8 @@ describe('z.backup.BackupRepository', () => {
           .importHistory(archive, noop, noop)
           .then(() => fail('import should fail'))
           .catch(error =>
-            expect(error instanceof testDescription.expectedError).toBeTruthy(
+            expect(error instanceof testDescription.expectedError).toBe(
+              true,
               `${error} not instanceof of ${testDescription.expectedError}`
             )
           );
