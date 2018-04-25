@@ -148,7 +148,7 @@ z.backup.BackupRepository = class BackupRepository {
     return unzipPromise.then(fileDescriptors => {
       initCallback(fileDescriptors.length);
 
-      fileDescriptors.forEach(fileDescriptor => {
+      const importPromises = fileDescriptors.map(fileDescriptor => {
         if (this.isCanceled) {
           throw new z.backup.CancelError();
         }
@@ -163,8 +163,10 @@ z.backup.BackupRepository = class BackupRepository {
           ? this.conversationRepository.updateConversations(entities)
           : this.backupService.importEntities(tableName, entities);
 
-        importPromise.then(progressCallback);
+        return importPromise.then(progressCallback);
       });
+
+      return Promise.all(importPromises);
     });
   }
 
