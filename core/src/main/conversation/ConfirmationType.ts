@@ -17,9 +17,9 @@
  *
  */
 
-import CryptographyService from './CryptographyService';
-import PayloadBundle from './PayloadBundle';
-import SessionPayloadBundle from './SessionPayloadBundle';
-import EncryptedAsset from './EncryptedAsset';
+enum ConfirmationType {
+  DELIVERED = 0,
+  READ = 1,
+}
 
-export {CryptographyService, EncryptedAsset, PayloadBundle, SessionPayloadBundle};
+export default ConfirmationType;

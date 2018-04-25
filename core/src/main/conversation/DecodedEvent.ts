@@ -17,9 +17,12 @@
  *
  */
 
-import CryptographyService from './CryptographyService';
-import PayloadBundle from './PayloadBundle';
-import SessionPayloadBundle from './SessionPayloadBundle';
-import EncryptedAsset from './EncryptedAsset';
+import {GenericMessageType} from '../conversation/root';
 
-export {CryptographyService, EncryptedAsset, PayloadBundle, SessionPayloadBundle};
+interface DecodedEvent {
+  content?: string;
+  id: string;
+  type: GenericMessageType;
+}
+
+export default DecodedEvent;

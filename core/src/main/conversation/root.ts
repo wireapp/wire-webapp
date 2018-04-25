@@ -17,8 +17,22 @@
  *
  */
 
-import ConversationService from './ConversationService';
+import {Asset, Original, RemoteData} from './Asset';
 import AssetService from './AssetService';
+import ConfirmationType from './ConfirmationType';
+import ConversationService from './ConversationService';
+import DecodedEvent from './DecodedEvent';
+import GenericMessageType from './GenericMessageType';
 import Image from './Image';
 
-export {AssetService, ConversationService, Image};
+export {
+  Asset,
+  AssetService,
+  ConfirmationType,
+  ConversationService,
+  DecodedEvent,
+  Original,
+  GenericMessageType,
+  Image,
+  RemoteData,
+};

@@ -17,9 +17,25 @@
  *
  */
 
-import CryptographyService from './CryptographyService';
-import PayloadBundle from './PayloadBundle';
-import SessionPayloadBundle from './SessionPayloadBundle';
-import EncryptedAsset from './EncryptedAsset';
+interface RemoteData {
+  assetId: string;
+  otrKey: Uint8Array | Buffer;
+  sha256: Uint8Array | Buffer;
+  assetToken?: string;
+}
 
-export {CryptographyService, EncryptedAsset, PayloadBundle, SessionPayloadBundle};
+interface Original {
+  mimeType: string;
+  size: number;
+  image?: {
+    height: number;
+    width: number;
+  };
+}
+
+interface Asset {
+  uploaded: RemoteData;
+  original: Original;
+}
+
+export {Asset, Original, RemoteData};

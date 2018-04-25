@@ -21,7 +21,7 @@ const pkg = require('../package.json');
 const logdown = require('logdown');
 import {IncomingNotification} from '@wireapp/api-client/dist/commonjs/conversation/index';
 import * as cryptobox from '@wireapp/cryptobox';
-import {CryptographyService, GenericMessageType, PayloadBundle} from './cryptography/root';
+import {CryptographyService, PayloadBundle} from './cryptography/root';
 import {ClientService, ClientInfo} from './client/root';
 import {NotificationService} from './notification/root';
 import {Context, LoginData, PreKey} from '@wireapp/api-client/dist/commonjs/auth/index';
@@ -40,7 +40,7 @@ import {
 import {LoginSanitizer} from './auth/root';
 import {Root} from 'protobufjs';
 import {WebSocketClient} from '@wireapp/api-client/dist/commonjs/tcp/index';
-import {AssetService, ConversationService} from './conversation/root';
+import {AssetService, ConversationService, DecodedEvent, GenericMessageType} from './conversation/root';
 import Client = require('@wireapp/api-client');
 import EventEmitter = require('events');
 import {StatusCode} from '@wireapp/api-client/dist/commonjs/http/index';
@@ -54,8 +54,9 @@ class Account extends EventEmitter {
   });
 
   public static readonly INCOMING = {
-    TEXT_MESSAGE: 'Account.INCOMING.TEXT_MESSAGE',
     ASSET: 'Account.INCOMING.ASSET',
+    CONFIRMATION: 'Account.INCOMING.CONFIRMATION',
+    TEXT_MESSAGE: 'Account.INCOMING.TEXT_MESSAGE',
   };
   private apiClient: Client;
   private protocolBuffers: any = {};
@@ -78,6 +79,7 @@ class Account extends EventEmitter {
 
     this.protocolBuffers = {
       Asset: root.lookup('Asset'),
+      Confirmation: root.lookup('Confirmation'),
       External: root.lookup('External'),
       GenericMessage: root.lookup('GenericMessage'),
       Text: root.lookup('Text'),
@@ -232,7 +234,7 @@ class Account extends EventEmitter {
       .then(() => this);
   }
 
-  private decodeEvent(event: ConversationEvent): Promise<string> {
+  private decodeEvent(event: ConversationEvent): Promise<DecodedEvent> {
     this.logger.info('decodeEvent');
     return new Promise(resolve => {
       if (!this.service) {
@@ -246,18 +248,11 @@ class Account extends EventEmitter {
           const ciphertext: string = otrMessage.data.text;
           this.service.cryptography.decrypt(sessionId, ciphertext).then((decryptedMessage: Uint8Array) => {
             const genericMessage = this.protocolBuffers.GenericMessage.decode(decryptedMessage);
-            switch (genericMessage.content) {
-              case GenericMessageType.TEXT: {
-                resolve(genericMessage.text.content);
-                break;
-              }
-              case GenericMessageType.ASSET: {
-                resolve(genericMessage.asset);
-                break;
-              }
-              default:
-                resolve(undefined);
-            }
+            resolve({
+              content: genericMessage.text.content,
+              id: genericMessage.messageId,
+              type: genericMessage.content,
+            });
           });
           break;
         }
@@ -268,23 +263,20 @@ class Account extends EventEmitter {
   private handleEvent(event: ConversationEvent): Promise<PayloadBundle> {
     this.logger.info('handleEvent');
     const {conversation, from} = event;
-    return this.decodeEvent(event).then((content: string) => ({
-      content,
-      conversation,
-      from,
-    }));
+    return this.decodeEvent(event).then(data => Object.assign(data, {from, conversation}));
   }
 
   private handleNotification(notification: IncomingNotification): void {
     this.logger.info('handleNotification');
     for (const event of notification.payload) {
       this.handleEvent(event).then((data: PayloadBundle) => {
-        if (data.content) {
-          if (typeof data.content === 'string') {
+        switch (data.type) {
+          case GenericMessageType.TEXT:
             this.emit(Account.INCOMING.TEXT_MESSAGE, data);
-          } else {
+          case GenericMessageType.ASSET:
             this.emit(Account.INCOMING.ASSET, data);
-          }
+          case GenericMessageType.CONFIRMATION:
+            this.emit(Account.INCOMING.CONFIRMATION, data);
         }
       });
     }
