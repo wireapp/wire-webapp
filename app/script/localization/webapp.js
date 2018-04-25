@@ -152,6 +152,9 @@ z.string.modalAssetParallelUploadsMessage = 'You can send up to {{number}} files
 z.string.modalCallEmptyConversationHeadline = 'No one to call';
 z.string.modalCallEmptyConversationMessage = 'There is no one left here.';
 
+z.string.modalCallEmptyLogHeadline = 'No calls';
+z.string.modalCallEmptyLogMessage = 'There were no calls to base the debug report on.';
+
 z.string.modalCallNoGroupVideoHeadline = 'No video calls in groups';
 z.string.modalCallNoGroupVideoMessage = 'Video calls are not available in group conversations.';
 

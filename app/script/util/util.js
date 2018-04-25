@@ -233,7 +233,7 @@ z.util.base64ToBlob = base64 => {
  * Downloads blob using a hidden link element.
  * @param {Blob} blob - Blob to store
  * @param {string} filename - Data will be saved under this name
- * @param {string} mimeType - the mime type of the generated download
+ * @param {string} [mimeType] - Mime type of the generated download
  * @returns {number} Timeout identifier
  */
 
