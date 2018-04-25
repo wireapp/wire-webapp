@@ -781,9 +781,8 @@ describe('Conversation', () => {
     });
   });
 
-  describe('subscribe_to_state_updates', () =>
-    it('creates subscribers to state updates', () => {
-      conversation_et.subscribe_to_state_updates();
+  describe('check subscribers', () =>
+    it('to state updates', () => {
       conversation_et.archived_state(false);
       conversation_et.cleared_timestamp(0);
       conversation_et.last_event_timestamp(1467650148305);

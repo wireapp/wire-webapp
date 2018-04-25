@@ -73,10 +73,15 @@ z.conversation.ConversationMapper = class ConversationMapper {
    *
    * @param {Conversation} conversation_et - Conversation to be updated
    * @param {Object} self_state - Conversation self data
+   * @param {boolean} [disablePersistence=false] - Disable persistence of state changes during update
    * @returns {Conversation} Updated conversation entity
    */
-  update_self_status(conversation_et, self_state) {
+  update_self_status(conversation_et, self_state, disablePersistence = false) {
     if (conversation_et) {
+      if (disablePersistence) {
+        conversation_et.setStateChangePersistence(false);
+      }
+
       // Database states
       const {
         archived_timestamp,
@@ -141,6 +146,10 @@ z.conversation.ConversationMapper = class ConversationMapper {
         const otr_muted_timestamp = new Date(self_state.otr_muted_ref).getTime();
         conversation_et.set_timestamp(otr_muted_timestamp, z.conversation.TIMESTAMP_TYPE.MUTED);
         conversation_et.muted_state(otr_muted);
+      }
+
+      if (disablePersistence) {
+        conversation_et.setStateChangePersistence(true);
       }
 
       return conversation_et;
@@ -211,9 +220,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
       let local_conversation = local.filter(conversation => conversation).find(conversation => conversation.id === id);
 
       if (!local_conversation) {
-        local_conversation = {
-          id: id,
-        };
+        local_conversation = {id};
       }
 
       local_conversation.accessModes = access;
@@ -224,9 +231,13 @@ z.conversation.ConversationMapper = class ConversationMapper {
       local_conversation.team_id = team;
       local_conversation.type = type;
 
-      local_conversation.others = members.others
-        .filter(other => other.status === z.conversation.ConversationStatus.CURRENT_MEMBER)
-        .map(other => other.id);
+      const isGroup = type === z.conversation.ConversationType.REGULAR;
+      const noOthers = !local_conversation.others || !local_conversation.others.length;
+      if (isGroup || noOthers) {
+        local_conversation.others = members.others
+          .filter(other => other.status === z.conversation.ConversationStatus.CURRENT_MEMBER)
+          .map(other => other.id);
+      }
 
       // This should ensure a proper order
       if (!local_conversation.last_event_timestamp) {

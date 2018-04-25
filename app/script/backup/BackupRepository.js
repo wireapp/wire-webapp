@@ -35,13 +35,15 @@ z.backup.BackupRepository = class BackupRepository {
    * @class z.backup.BackupRepository
    * @param {z.backup.BackupService} backupService - Backup service implementation
    * @param {z.client.ClientRepository} clientRepository - Repository for all client interactions
+   * @param {z.conversation.ConversationRepository} conversationRepository - Repository for all conversation interactions
    * @param {z.user.UserRepository} userRepository - Repository for all user and connection interactions
    */
-  constructor(backupService, clientRepository, userRepository) {
+  constructor(backupService, clientRepository, conversationRepository, userRepository) {
     this.logger = new z.util.Logger('z.backup.BackupRepository', z.config.LOGGER.OPTIONS);
 
     this.backupService = backupService;
     this.clientRepository = clientRepository;
+    this.conversationRepository = conversationRepository;
     this.userRepository = userRepository;
 
     this.isCanceled = false;
@@ -139,34 +141,40 @@ z.backup.BackupRepository = class BackupRepository {
       );
     });
 
-    const mapEntityDataTypes = entity => {
-      if (entity.data) {
-        BackupRepository.CONFIG.UINT8ARRAY_FIELDS.forEach(field => {
-          const dataField = entity.data[field];
-          if (dataField) {
-            const values = Object.keys(dataField).map(key => dataField[key]);
-            entity.data[field] = new Uint8Array(values);
-          }
-        });
-      }
-      return entity;
-    };
-
     return unzipPromise.then(fileDescriptors => {
       initCallback(fileDescriptors.length);
+
       fileDescriptors.forEach(fileDescriptor => {
         if (this.isCanceled) {
           throw new z.backup.CancelError();
         }
         const tableName = fileDescriptor.filename.replace('.json', '');
-        const entities = JSON.parse(fileDescriptor.content);
-        entities.forEach(entity => {
-          mapEntityDataTypes(entity);
-          this.backupService.importEntity(tableName, entity);
-        });
-        progressCallback();
+        const isConversationsTable = tableName === z.storage.StorageSchemata.OBJECT_STORE.CONVERSATIONS;
+
+        const entities = isConversationsTable
+          ? JSON.parse(fileDescriptor.content)
+          : JSON.parse(fileDescriptor.content).map(entity => this.mapEntityDataType(entity));
+
+        const importPromise = isConversationsTable
+          ? this.conversationRepository.updateConversations(entities)
+          : this.backupService.importEntities(tableName, entities);
+
+        importPromise.then(progressCallback);
       });
     });
+  }
+
+  mapEntityDataType(entity) {
+    if (entity.data) {
+      BackupRepository.CONFIG.UINT8ARRAY_FIELDS.forEach(field => {
+        const dataField = entity.data[field];
+        if (dataField) {
+          const values = Object.keys(dataField).map(key => dataField[key]);
+          entity.data[field] = new Uint8Array(values);
+        }
+      });
+    }
+    return entity;
   }
 
   verifyMetadata(archiveMetadata) {

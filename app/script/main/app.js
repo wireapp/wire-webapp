@@ -102,7 +102,6 @@ z.main.App = class App {
       this.service.search,
       repositories.client
     );
-    repositories.backup = new z.backup.BackupRepository(this.service.backup, repositories.client, repositories.user);
     repositories.event = new z.event.EventRepository(
       this.service.notification,
       this.service.web_socket,
@@ -132,6 +131,12 @@ z.main.App = class App {
       repositories.user
     );
 
+    repositories.backup = new z.backup.BackupRepository(
+      this.service.backup,
+      repositories.client,
+      repositories.conversation,
+      repositories.user
+    );
     repositories.broadcast = new z.broadcast.BroadcastRepository(
       this.service.broadcast,
       repositories.client,

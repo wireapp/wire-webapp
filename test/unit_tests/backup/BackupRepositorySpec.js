@@ -41,6 +41,7 @@ describe('z.backup.BackupRepository', () => {
       const backupRepository = new z.backup.BackupRepository(
         TestFactory.backup_service,
         TestFactory.client_repository,
+        TestFactory.conversation_repository,
         TestFactory.user_repository
       );
       const metaDescription = backupRepository.createMetaDescription();

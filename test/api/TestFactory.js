@@ -99,6 +99,7 @@ window.TestFactory.prototype.exposeBackupActors = function() {
   this.logger.info('- exposeBackupActors');
   return Promise.resolve()
     .then(() => this.exposeStorageActors())
+    .then(() => this.exposeConversationActors())
     .then(() => {
       this.logger.info('✓ exposedStorageActors');
 
@@ -113,6 +114,7 @@ window.TestFactory.prototype.exposeBackupActors = function() {
       TestFactory.backup_repository = new z.backup.BackupRepository(
         TestFactory.backup_service,
         TestFactory.client_repository,
+        TestFactory.conversation_repository,
         TestFactory.user_repository
       );
       TestFactory.backup_repository.logger.level = this.settings.logging_level;

@@ -59,11 +59,10 @@ z.backup.BackupService = class BackupService {
     return this.storageService.getTables(BackupService.CONFIG.SUPPORTED_TABLES);
   }
 
-  importEntity(tableName, entity) {
-    const isConversationTable = tableName === z.storage.StorageSchemata.OBJECT_STORE.CONVERSATIONS;
-    // we don't want to force the primaryKey if the table is not the conversations table
-    const primaryKey = isConversationTable ? entity.id : undefined;
-
-    this.storageService.save(tableName, primaryKey, entity);
+  importEntities(tableName, entities) {
+    // We don't want to set the primaryKey for the events table
+    const isEventsTable = tableName === z.storage.StorageSchemata.OBJECT_STORE.EVENTS;
+    const primaryKeys = isEventsTable ? undefined : entities.map(entity => entity.id);
+    return this.storageService.db[tableName].bulkPut(entities, primaryKeys);
   }
 };

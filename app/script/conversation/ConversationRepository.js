@@ -341,6 +341,36 @@ z.conversation.ConversationRepository = class ConversationRepository {
       });
   }
 
+  updateConversations(conversationsData) {
+    return Promise.resolve()
+      .then(() => {
+        return conversationsData
+          .map(conversationData => {
+            const conversationEntity = this.conversations().find(conversation => {
+              return conversation.id === conversationData.id;
+            });
+
+            if (conversationEntity) {
+              this.conversation_mapper.update_self_status(conversationEntity, conversationData, true);
+            } else {
+              return conversationData;
+            }
+          })
+          .filter(conversationData => conversationData);
+      })
+      .then(unknownConversationsData => {
+        if (unknownConversationsData.length) {
+          return this.map_conversations(unknownConversationsData);
+        }
+      })
+      .then(conversationEntities => {
+        if (conversationEntities && conversationEntities.length) {
+          this.save_conversations(conversationEntities);
+          this._update_conversations(conversationEntities);
+        }
+      });
+  }
+
   /**
    * Get Message with given ID from the database.
    *
@@ -935,7 +965,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   _handle_mapped_conversation(conversation_et) {
     this._mapGuestStatusSelf(conversation_et);
     conversation_et.self = this.selfUser();
-    conversation_et.subscribe_to_state_updates();
+    conversation_et.setStateChangePersistence(true);
   }
 
   map_guest_status_self() {
