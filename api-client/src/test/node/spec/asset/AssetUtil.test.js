@@ -22,6 +22,7 @@ const {isValidKey, isValidToken} = require('@wireapp/api-client/dist/commonjs/as
 describe('"isValidToken"', () => {
   it('should return true if token is valid', () => {
     expect(isValidToken('xA-1TVMs83zq8s4NtfTItQ==')).toBeTruthy();
+    expect(isValidToken('xA_1TVMs83zq8s4NtfTItQ==')).toBeTruthy();
   });
 
   it('should return false if token is not valid', () => {

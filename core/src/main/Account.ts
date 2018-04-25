@@ -53,8 +53,9 @@ class Account extends EventEmitter {
     markdown: false,
   });
 
-  public static INCOMING = {
+  public static readonly INCOMING = {
     TEXT_MESSAGE: 'Account.INCOMING.TEXT_MESSAGE',
+    ASSET: 'Account.INCOMING.ASSET',
   };
   private apiClient: Client;
   private protocolBuffers: any = {};
@@ -250,6 +251,10 @@ class Account extends EventEmitter {
                 resolve(genericMessage.text.content);
                 break;
               }
+              case GenericMessageType.ASSET: {
+                resolve(genericMessage.asset);
+                break;
+              }
               default:
                 resolve(undefined);
             }
@@ -263,13 +268,11 @@ class Account extends EventEmitter {
   private handleEvent(event: ConversationEvent): Promise<PayloadBundle> {
     this.logger.info('handleEvent');
     const {conversation, from} = event;
-    return this.decodeEvent(event).then((content: string) => {
-      return {
-        content,
-        conversation,
-        from,
-      };
-    });
+    return this.decodeEvent(event).then((content: string) => ({
+      content,
+      conversation,
+      from,
+    }));
   }
 
   private handleNotification(notification: IncomingNotification): void {
@@ -277,7 +280,11 @@ class Account extends EventEmitter {
     for (const event of notification.payload) {
       this.handleEvent(event).then((data: PayloadBundle) => {
         if (data.content) {
-          this.emit(Account.INCOMING.TEXT_MESSAGE, data);
+          if (typeof data.content === 'string') {
+            this.emit(Account.INCOMING.TEXT_MESSAGE, data);
+          } else {
+            this.emit(Account.INCOMING.ASSET, data);
+          }
         }
       });
     }
