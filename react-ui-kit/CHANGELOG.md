@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="1.1.8"></a>
+## [1.1.8](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@1.1.7...@wireapp/react-ui-kit@1.1.8) (2018-04-25)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Downgrade "webpack-dev-server" version ([#516](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/516)) ([500ce48](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/500ce48))
+
+
+
+
 <a name="1.1.7"></a>
 ## [1.1.7](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@1.1.6...@wireapp/react-ui-kit@1.1.7) (2018-04-20)
 
