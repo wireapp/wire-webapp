@@ -29,8 +29,6 @@ z.entity.Conversation = class Conversation {
    * @param {string} conversation_id - Conversation ID
    */
   constructor(conversation_id = '') {
-    this.persistState = this.persistState.bind(this);
-
     this.id = conversation_id;
 
     this.logger = new z.util.Logger(`z.entity.Conversation (${this.id})`, z.config.LOGGER.OPTIONS);
@@ -226,7 +224,9 @@ z.entity.Conversation = class Conversation {
       return '…';
     });
 
-    this.persistStateChanges = false;
+    this.shouldPersistStateChanges = false;
+    this.publishPersistState = _.debounce(() => amplify.publish(z.event.WebApp.CONVERSATION.PERSIST_STATE, this), 100);
+
     this._initSubscriptions();
   }
 
@@ -250,14 +250,14 @@ z.entity.Conversation = class Conversation {
     ].forEach(property => property.subscribe(this.persistState));
   }
 
-  setStateChangePersistence(persistChanges) {
-    this.persistStateChanges = persistChanges;
+  persistState() {
+    if (this.shouldPersistStateChanges) {
+      this.publishPersistState();
+    }
   }
 
-  persistState() {
-    if (this.persistStateChanges) {
-      _.debounce(() => amplify.publish(z.event.WebApp.CONVERSATION.PERSIST_STATE, this), 100);
-    }
+  setStateChangePersistence(persistChanges) {
+    this.shouldPersistStateChanges = persistChanges;
   }
 
   /**

@@ -151,22 +151,9 @@ z.backup.BackupRepository = class BackupRepository {
         const tableName = fileDescriptor.filename.replace('.json', '');
         const isConversationsTable = tableName === z.storage.StorageSchemata.OBJECT_STORE.CONVERSATIONS;
 
-        const mapEntity = entity => {
-          if (entity.data) {
-            BackupRepository.CONFIG.UINT8ARRAY_FIELDS.forEach(field => {
-              const dataField = entity.data[field];
-              if (dataField) {
-                const values = Object.keys(dataField).map(key => dataField[key]);
-                entity.data[field] = new Uint8Array(values);
-              }
-            });
-          }
-          return entity;
-        };
-
         const entities = isConversationsTable
           ? JSON.parse(fileDescriptor.content)
-          : JSON.parse(fileDescriptor.content).map(mapEntity);
+          : JSON.parse(fileDescriptor.content).map(entity => this.mapEntityDataType(entity));
 
         const importPromise = isConversationsTable
           ? this.conversationRepository.updateConversations(entities)
@@ -175,6 +162,19 @@ z.backup.BackupRepository = class BackupRepository {
         importPromise.then(progressCallback);
       });
     });
+  }
+
+  mapEntityDataType(entity) {
+    if (entity.data) {
+      BackupRepository.CONFIG.UINT8ARRAY_FIELDS.forEach(field => {
+        const dataField = entity.data[field];
+        if (dataField) {
+          const values = Object.keys(dataField).map(key => dataField[key]);
+          entity.data[field] = new Uint8Array(values);
+        }
+      });
+    }
+    return entity;
   }
 
   verifyMetadata(archiveMetadata) {

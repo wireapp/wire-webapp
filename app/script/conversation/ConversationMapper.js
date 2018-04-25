@@ -220,9 +220,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
       let local_conversation = local.filter(conversation => conversation).find(conversation => conversation.id === id);
 
       if (!local_conversation) {
-        local_conversation = {
-          id: id,
-        };
+        local_conversation = {id};
       }
 
       local_conversation.accessModes = access;
@@ -233,9 +231,13 @@ z.conversation.ConversationMapper = class ConversationMapper {
       local_conversation.team_id = team;
       local_conversation.type = type;
 
-      local_conversation.others = members.others
-        .filter(other => other.status === z.conversation.ConversationStatus.CURRENT_MEMBER)
-        .map(other => other.id);
+      const isGroup = type === z.conversation.ConversationType.REGULAR;
+      const noOthers = !local_conversation.others || !local_conversation.others.length;
+      if (isGroup || noOthers) {
+        local_conversation.others = members.others
+          .filter(other => other.status === z.conversation.ConversationStatus.CURRENT_MEMBER)
+          .map(other => other.id);
+      }
 
       // This should ensure a proper order
       if (!local_conversation.last_event_timestamp) {
