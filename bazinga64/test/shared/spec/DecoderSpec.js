@@ -18,9 +18,10 @@
  */
 
 const bazinga64 = require('bazinga64');
+const fixtures = require('../fixtures/');
 
 describe('Decoder', () => {
-  describe('fromBase64', () => {
+  describe('"fromBase64"', () => {
     it('decodes arrays', () => {
       const decoded = bazinga64.Decoder.fromBase64(helloEncodedArray);
       const arrayBufferView = new Uint8Array(helloDecodedArray);
@@ -80,6 +81,13 @@ describe('Decoder', () => {
       encoded = firstLine + '\\' + secondLine + '!';
       bytes = bazinga64.Decoder.fromBase64(encoded).asBytes;
       expect(bytes.byteLength).toBeDefined();
+    });
+
+    it('decodes very long strings.', async () => {
+      const encoded = fixtures.files['yaoqi-lai-21901-unsplash_800.jpg'];
+      const bytes = bazinga64.Decoder.fromBase64(encoded).asBytes;
+      expect(bytes instanceof Uint8Array).toBe(true);
+      expect(bytes.byteLength).toBeGreaterThan(0);
     });
   });
 });

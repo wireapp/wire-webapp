@@ -22,7 +22,7 @@
 const bazinga64 = require('bazinga64');
 
 describe('Converter', () => {
-  describe('arrayBufferViewToStringUTF8', () => {
+  describe('"arrayBufferViewToStringUTF8"', () => {
     it('handles UTF-8 conversions', () => {
       const cyrillicCapitalLetterDje = '\u0402';
       const encoded = bazinga64.Converter.stringToArrayBufferViewUTF8(cyrillicCapitalLetterDje);
@@ -43,7 +43,7 @@ describe('Converter', () => {
     });
   });
 
-  describe('jsonToArrayBufferView', () => {
+  describe('"jsonToArrayBufferView"', () => {
     it('maps a JSON object to an array buffer', () => {
       // @formatter:off
       const json = {
@@ -172,7 +172,7 @@ describe('Converter', () => {
     });
   });
 
-  describe('numberArrayToArrayBufferView', () => {
+  describe('"numberArrayToArrayBufferView"', () => {
     it('converts an array of numbers into an array buffer view', () => {
       const arrayBufferView = bazinga64.Converter.numberArrayToArrayBufferView(helloDecodedArray);
       expect(arrayBufferView).toEqual(new Uint8Array(helloDecodedArray));
@@ -187,7 +187,7 @@ describe('Converter', () => {
     }
   });
 
-  describe('stringToArrayBufferViewUTF16', () => {
+  describe('"stringToArrayBufferViewUTF16"', () => {
     it('handles UTF-16 conversions', () => {
       const cyrillicCapitalLetterDje = '\u0402';
       const encoded = bazinga64.Converter.stringToArrayBufferViewUTF16(cyrillicCapitalLetterDje);
@@ -204,7 +204,7 @@ describe('Converter', () => {
     });
   });
 
-  describe('stringToArrayBufferViewUTF16', () => {
+  describe('"stringToArrayBufferViewUTF16"', () => {
     it('handles UTF-16 conversions', () => {
       const cyrillicCapitalLetterDje = '\u0402';
       const encoded = bazinga64.Converter.stringToArrayBufferViewUTF16(cyrillicCapitalLetterDje);
@@ -212,7 +212,7 @@ describe('Converter', () => {
     });
   });
 
-  describe('toArrayBufferView', () => {
+  describe('"toArrayBufferView"', () => {
     it('handles arrays', () => {
       const data = new Uint8Array(helloDecodedArray);
       const view = bazinga64.Converter.toArrayBufferView(helloDecodedArray);
@@ -248,7 +248,7 @@ describe('Converter', () => {
     });
   });
 
-  describe('toString', () => {
+  describe('"toString"', () => {
     it('handles arrays', () => {
       const data = helloDecodedArray;
       const text = bazinga64.Converter.toString(data);
@@ -284,7 +284,7 @@ describe('Converter', () => {
     });
   });
 
-  describe('stringToArrayBufferViewUTF8', () => {
+  describe('"stringToArrayBufferViewUTF8"', () => {
     it('handles UTF-8 conversions', () => {
       const cyrillicCapitalLetterDje = '\u0402';
       const encoded = bazinga64.Converter.stringToArrayBufferViewUTF8(cyrillicCapitalLetterDje);

@@ -22,7 +22,7 @@
 const bazinga64 = require('bazinga64');
 
 describe('Encoder', () => {
-  describe('toBase64', () => {
+  describe('"toBase64"', () => {
     it('encodes arrays', () => {
       const encoded = bazinga64.Encoder.toBase64(helloDecodedArray);
       expect(encoded.constructor.name).toBe('EncodedData');

@@ -25,7 +25,9 @@ export class Converter {
       if (typeof window === 'object' && 'TextDecoder' in window) {
         return new TextDecoder('utf-8').decode(arrayBufferView);
       }
-      return String.fromCharCode.apply(null, arrayBufferView);
+      return Array.from(arrayBufferView)
+        .map(char => String.fromCharCode(char))
+        .join('');
     }
   }
 
@@ -200,7 +202,10 @@ export class Encoder {
 
   private static fromByteArray(decoded: Uint8Array): string {
     if (typeof window === 'object') {
-      return window.btoa(String.fromCharCode.apply(null, decoded));
+      const decodedString = Array.from(decoded)
+        .map(char => String.fromCharCode(char))
+        .join('');
+      return window.btoa(decodedString);
     }
 
     return new Buffer(decoded).toString('base64');
