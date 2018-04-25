@@ -46,7 +46,7 @@ describe('FileEngine', () => {
       .catch(done.fail));
 
   describe('"resolvePath"', () => {
-    it('properly validate paths', done => {
+    it('properly validates paths.', done => {
       const PRIMARY_KEY = 'primary-key';
 
       Promise.all([
@@ -76,7 +76,7 @@ describe('FileEngine', () => {
       it(description, done => testFunction(done, engine));
     });
 
-    it('accepts custom file extensions', async done => {
+    it('accepts custom file extensions.', async done => {
       const options = {
         fileExtension: '.json',
       };
@@ -109,7 +109,7 @@ describe('FileEngine', () => {
       });
     });
 
-    it('does not work when non-printable characters are being used in the store name', async done => {
+    it('does not work when non-printable characters are being used in the store name.', async done => {
       await engine.init(path.join(process.cwd(), '.tmp', 'wrong\t'));
 
       const PRIMARY_KEY = 'primary-key';

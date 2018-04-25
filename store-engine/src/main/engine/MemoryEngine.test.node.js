@@ -19,7 +19,7 @@
 
 const {MemoryEngine} = require('@wireapp/store-engine');
 
-describe('StoreEngine.MemoryEngine', () => {
+describe('MemoryEngine', () => {
   const STORE_NAME = 'store-name';
 
   let engine = undefined;

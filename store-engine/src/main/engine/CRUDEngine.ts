@@ -15,6 +15,7 @@ interface CRUDEngine {
    * @param {string} storeName - Name of the store
    * @param {Array} settings - Database-specific settings
    * @returns {Promise<any>} Resolves with the underlying (unwrapped) instance of a database.
+   * @throws {UnsupportedError} Error when feature is not available on targeted platform.
    */
   init(storeName: string, ...settings: any[]): Promise<any>;
 

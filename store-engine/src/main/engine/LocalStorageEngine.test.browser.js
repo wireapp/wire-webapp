@@ -19,7 +19,7 @@
 
 import {LocalStorageEngine} from '@wireapp/store-engine';
 
-describe('StoreEngine.LocalStorageEngine', () => {
+describe('LocalStorageEngine', () => {
   const STORE_NAME = 'store-name';
 
   let engine = undefined;

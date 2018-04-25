@@ -20,7 +20,7 @@
 import Dexie from 'dexie';
 import {IndexedDBEngine} from '@wireapp/store-engine';
 
-describe('StoreEngine.IndexedDBEngine', () => {
+describe('IndexedDBEngine', () => {
   const STORE_NAME = 'store-name';
 
   let engine = undefined;

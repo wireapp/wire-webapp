@@ -19,7 +19,8 @@
 
 import CRUDEngine from './CRUDEngine';
 import {RecordTypeError} from './error/';
-import {RecordAlreadyExistsError, RecordNotFoundError} from './error';
+import {RecordAlreadyExistsError, RecordNotFoundError, UnsupportedError} from './error';
+import {isBrowser} from './EnvironmentUtil';
 
 const fs = require('bro-fs');
 
@@ -36,13 +37,17 @@ export default class FileSystemEngine implements CRUDEngine {
 
   private config: FileSystemEngineOptions = {
     fileExtension: '.dat',
-    type: window.TEMPORARY,
+    type: typeof window === 'undefined' ? 0 : window.TEMPORARY,
     size: TEN_MEGABYTES,
   };
 
   constructor() {}
 
   async init(storeName: string = '', options?: FileSystemEngineOptions): Promise<FileSystem> {
+    if (!isBrowser() || !fs.isSupported()) {
+      const message = `File and Directory Entries API is not available on your platform.`;
+      throw new UnsupportedError(message);
+    }
     this.config = Object.assign({}, this.config, options);
     this.storeName = storeName;
     const fileSystem: FileSystem = await fs.init({type: this.config.type, bytes: this.config.size});
