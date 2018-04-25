@@ -84,12 +84,12 @@ window.TestFactory.prototype.exposeStorageActors = function() {
   this.logger.info('- exposeStorageActors');
   return Promise.resolve()
     .then(() => {
-      TestFactory.storage_service = new z.storage.StorageService();
+      TestFactory.storage_service = singleton(z.storage.StorageService);
       TestFactory.storage_service.logger.level = this.settings.logging_level;
       return TestFactory.storage_service.init(entities.user.john_doe.id);
     })
     .then(() => {
-      TestFactory.storage_repository = new z.storage.StorageRepository(TestFactory.storage_service);
+      TestFactory.storage_repository = singleton(z.storage.StorageRepository, TestFactory.storage_service);
       TestFactory.storage_repository.logger.level = this.settings.logging_level;
       return TestFactory.storage_repository;
     });
@@ -497,3 +497,17 @@ window.TestFactory.prototype.exposeLifecycleActors = function() {
       return TestFactory.lifecycle_repository;
     });
 };
+
+const actorsCache = new Map();
+
+/**
+ * Will instantiate a service only once (uses the global actorsCache to store instances)
+ *
+ * @param {Constructor} Service - the service to instantiate
+ * @param {any} ...dependencies - the dependencies required by the service
+ * @returns {Object} the instantiated service
+ */
+function singleton(Service, ...dependencies) {
+  actorsCache[Service] = actorsCache[Service] || new Service(...dependencies);
+  return actorsCache[Service];
+}

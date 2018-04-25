@@ -46,11 +46,19 @@ z.backup.BackupRepository = class BackupRepository {
     this.conversationRepository = conversationRepository;
     this.userRepository = userRepository;
 
-    this.isCanceled = false;
+    this.canceled = false;
   }
 
   cancelAction() {
     this.isCanceled = true;
+  }
+
+  get isCanceled() {
+    return this.canceled;
+  }
+
+  set isCanceled(isCanceled) {
+    this.canceled = isCanceled;
   }
 
   createMetaDescription() {
@@ -144,7 +152,7 @@ z.backup.BackupRepository = class BackupRepository {
     return unzipPromise.then(fileDescriptors => {
       initCallback(fileDescriptors.length);
 
-      fileDescriptors.forEach(fileDescriptor => {
+      const importPromises = fileDescriptors.map(fileDescriptor => {
         if (this.isCanceled) {
           throw new z.backup.CancelError();
         }
@@ -159,8 +167,10 @@ z.backup.BackupRepository = class BackupRepository {
           ? this.conversationRepository.updateConversations(entities)
           : this.backupService.importEntities(tableName, entities);
 
-        importPromise.then(progressCallback);
+        return importPromise.then(progressCallback);
       });
+
+      return Promise.all(importPromises);
     });
   }
 
