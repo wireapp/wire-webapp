@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="2.4.0"></a>
+# [2.4.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.3.2...@wireapp/core@2.4.0) (2018-04-25)
+
+
+### Features
+
+* **core:** Send and receive confirmations ([#520](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/520)) ([9490f11](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/9490f11))
+
+
+
+
 <a name="2.3.2"></a>
 ## [2.3.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.3.1...@wireapp/core@2.3.2) (2018-04-25)
 
