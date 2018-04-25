@@ -328,14 +328,7 @@ z.string.ro.conversationsConnectionRequestMany = '{{number}} persoane așteaptă
 z.string.ro.conversationsConnectionRequestOne = '1 persoană așteaptă';
 z.string.ro.conversationsEmptyConversation = 'Conversație de grup';
 z.string.ro.conversationsNoConversations = 'Nu sunt încă conversații';
-z.string.ro.conversationsPopoverArchive = 'Arhivă';
-z.string.ro.conversationsPopoverBlock = 'Blochează';
 z.string.ro.conversationsPopoverCancel = 'Anulează cererea';
-z.string.ro.conversationsPopoverClear = 'Șterge';
-z.string.ro.conversationsPopoverLeave = 'Ieși';
-z.string.ro.conversationsPopoverNotify = 'Demutizează';
-z.string.ro.conversationsPopoverSilence = 'Mutizează';
-z.string.ro.conversationsPopoverUnarchive = 'Dezarhivează';
 
 z.string.ro.conversationsSecondaryLineMissedCall = '{{number}} apel pierdut';
 z.string.ro.conversationsSecondaryLineMissedCalls = '{{number}} apeluri pierdute';
@@ -455,7 +448,6 @@ z.string.ro.preferencesDevicesCurrent = 'Curent';
 z.string.ro.preferencesDevicesFingerprint = 'Amprentă cheie';
 z.string.ro.preferencesDevicesFingerprintDetail = 'Wire generează câte o amprentă unică pentru fiecare dispozitiv. Compară-le și verifică dispozitivele și conversațiile tale.';
 z.string.ro.preferencesDevicesId = 'ID: ';
-z.string.ro.preferencesDevicesRemove = 'Șterge';
 z.string.ro.preferencesDevicesRemoveCancel = 'Renunță';
 z.string.ro.preferencesDevicesRemoveDetail = 'Elimină acest dispozitiv dacă nu-l mai folosești. Vei fi deconectat de pe acest dispozitiv imediat.';
 z.string.ro.preferencesDevicesSessionConfirmation = 'Sesiunea a fost resetată.';
@@ -487,6 +479,10 @@ z.string.ro.preferencesOptionsNotificationsNone = 'Închis';
 z.string.ro.preferencesOptionsNotificationsObfuscate = 'Ascunde detaliile';
 z.string.ro.preferencesOptionsNotificationsObfuscateMessage = 'Arată expeditorul';
 z.string.ro.preferencesOptionsNotificationsOn = 'Arată expeditorul și mesajul';
+
+z.string.ro.backupExportSuccessAction = 'Ok';
+z.string.ro.backupImportGenericErrorHeadline = 'Ceva nu a mers bine';
+z.string.ro.backupCancel = 'Renunță';
 
 z.string.ro.searchConnect = 'Conectare';
 z.string.ro.searchConnections = 'Conexiuni';

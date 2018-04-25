@@ -26,6 +26,7 @@ z.backup.BackupRepository = class BackupRepository {
   static get CONFIG() {
     return {
       META_FILENAME: 'export.json',
+      UINT8ARRAY_FIELDS: ['otr_key', 'sha256'],
     };
   }
 
@@ -148,9 +149,24 @@ z.backup.BackupRepository = class BackupRepository {
           throw new z.backup.CancelError();
         }
         const tableName = fileDescriptor.filename.replace('.json', '');
-        const entities = JSON.parse(fileDescriptor.content);
-
         const isConversationsTable = tableName === z.storage.StorageSchemata.OBJECT_STORE.CONVERSATIONS;
+
+        const mapEntity = entity => {
+          if (entity.data) {
+            BackupRepository.CONFIG.UINT8ARRAY_FIELDS.forEach(field => {
+              const dataField = entity.data[field];
+              if (dataField) {
+                const values = Object.keys(dataField).map(key => dataField[key]);
+                entity.data[field] = new Uint8Array(values);
+              }
+            });
+          }
+          return entity;
+        };
+
+        const entities = isConversationsTable
+          ? JSON.parse(fileDescriptor.content)
+          : JSON.parse(fileDescriptor.content).map(mapEntity);
 
         const importPromise = isConversationsTable
           ? this.conversationRepository.updateConversations(entities)
