@@ -36,7 +36,8 @@ export default class FileEngine implements CRUDEngine {
 
     return new Promise((resolve, reject) => {
       if (isPathTraversal(tableName, primaryKey || '')) {
-        return reject(new PathValidationError(PathValidationError.TYPE.PATH_TRAVERSAL));
+        const message = `Path traversal has been detected on "${path.join(tableName, String(primaryKey))}".`;
+        return reject(new PathValidationError(message));
       }
 
       const filePath = path.join(
@@ -47,7 +48,8 @@ export default class FileEngine implements CRUDEngine {
       const nonPrintableCharacters = new RegExp('[^\x20-\x7E]+', 'gm');
 
       if (filePath.match(nonPrintableCharacters)) {
-        return reject(new PathValidationError(PathValidationError.TYPE.INVALID_NAME));
+        const message = `Cannot create file with path "${filePath}".`;
+        return reject(new PathValidationError(message));
       }
 
       return resolve(filePath);
@@ -59,7 +61,6 @@ export default class FileEngine implements CRUDEngine {
       if (entity) {
         this.resolvePath(tableName, primaryKey)
           .then((filePath: string) => {
-            // TODO: Implement "base64" serialization to save any kind of data.
             if (typeof entity === 'object') {
               try {
                 entity = JSON.stringify(entity);

@@ -58,8 +58,7 @@ describe('FileEngine', () => {
         engine.resolvePath(TABLE_NAME, '.etc').catch(error => error),
       ]).then(results => {
         for (error of results) {
-          expect(error.name === 'PathValidationError').toBe(true);
-          expect(error.message).toBe(StoreEngineError.PathValidationError.TYPE.PATH_TRAVERSAL);
+          expect(error instanceof StoreEngineError.PathValidationError).toBe(true);
         }
         done();
       });
@@ -104,8 +103,7 @@ describe('FileEngine', () => {
         engine.create(TABLE_NAME, '.etc', entity).catch(error => error),
       ]).then(results => {
         for (error of results) {
-          expect(error.name === 'PathValidationError').toBe(true);
-          expect(error.message).toBe(StoreEngineError.PathValidationError.TYPE.PATH_TRAVERSAL);
+          expect(error instanceof StoreEngineError.PathValidationError).toBe(true);
         }
         done();
       });
@@ -124,8 +122,7 @@ describe('FileEngine', () => {
         .create(TABLE_NAME, PRIMARY_KEY, entity)
         .then(() => done.fail(new Error('Method is supposed to throw an error.')))
         .catch(error => {
-          expect(error.name).toBe(StoreEngineError.PathValidationError.name);
-          expect(error.message).toBe(StoreEngineError.PathValidationError.TYPE.INVALID_NAME);
+          expect(error instanceof StoreEngineError.PathValidationError).toBe(true);
           done();
         });
     });
@@ -148,8 +145,7 @@ describe('FileEngine', () => {
         engine.delete(TABLE_NAME, '.etc').catch(error => error),
       ]).then(results => {
         for (error of results) {
-          expect(error.name === 'PathValidationError').toBe(true);
-          expect(error.message).toBe(StoreEngineError.PathValidationError.TYPE.PATH_TRAVERSAL);
+          expect(error instanceof StoreEngineError.PathValidationError).toBe(true);
         }
         done();
       });
@@ -168,8 +164,7 @@ describe('FileEngine', () => {
         engine.deleteAll('.etc').catch(error => error),
       ]).then(results => {
         for (error of results) {
-          expect(error.name === 'PathValidationError').toBe(true);
-          expect(error.message).toBe(StoreEngineError.PathValidationError.TYPE.PATH_TRAVERSAL);
+          expect(error instanceof StoreEngineError.PathValidationError).toBe(true);
         }
         done();
       });
@@ -199,8 +194,7 @@ describe('FileEngine', () => {
         engine.read(TABLE_NAME, '.etc').catch(error => error),
       ]).then(results => {
         for (error of results) {
-          expect(error.name === 'PathValidationError').toBe(true);
-          expect(error.message).toBe(StoreEngineError.PathValidationError.TYPE.PATH_TRAVERSAL);
+          expect(error instanceof StoreEngineError.PathValidationError).toBe(true);
         }
         done();
       });
@@ -219,8 +213,7 @@ describe('FileEngine', () => {
         engine.readAll('.etc').catch(error => error),
       ]).then(results => {
         for (error of results) {
-          expect(error.name === 'PathValidationError').toBe(true);
-          expect(error.message).toBe(StoreEngineError.PathValidationError.TYPE.PATH_TRAVERSAL);
+          expect(error instanceof StoreEngineError.PathValidationError).toBe(true);
         }
         done();
       });
