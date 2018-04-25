@@ -85,6 +85,25 @@ export default class ConversationService {
     return this.apiClient.conversation.api.postOTRMessage(sendingClientId, conversationId, message);
   }
 
+  public async getImage({
+    assetId,
+    otrKey,
+    sha256,
+    assetToken,
+  }: {
+    assetId: string;
+    otrKey: Uint8Array | Buffer;
+    sha256: Uint8Array | Buffer;
+    assetToken?: string;
+  }): Promise<Buffer> {
+    const encryptedBuffer = await this.apiClient.asset.api.getAsset(assetId, assetToken);
+    return AssetCryptography.decryptAsset({
+      cipherText: new Buffer(encryptedBuffer),
+      keyBytes: new Buffer(otrKey),
+      sha256: new Buffer(sha256),
+    });
+  }
+
   public sendMessage(
     sendingClientId: string,
     conversationId: string,

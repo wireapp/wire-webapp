@@ -1,3 +1,5 @@
+//@ts-check
+
 process.on('uncaughtException', error =>
   console.error(`Uncaught exception "${error.constructor.name}" (${error.code}): ${error.message}`, error)
 );
@@ -10,6 +12,7 @@ require('dotenv').config({path: path.join(__dirname, 'echo2.env')});
 
 const {Account} = require('@wireapp/core');
 const APIClient = require('@wireapp/api-client');
+const {Config} = require('@wireapp/api-client/dist/commonjs/Config');
 const {FileEngine} = require('@wireapp/store-engine');
 
 (async () => {
@@ -23,10 +26,7 @@ const {FileEngine} = require('@wireapp/store-engine');
 
   const engine = new FileEngine(path.join(__dirname, '.tmp', 'sender'));
   await engine.init(undefined, {fileExtension: '.json'});
-  const apiClient = new APIClient({
-    store: engine,
-    urls: APIClient.BACKEND.PRODUCTION,
-  });
+  const apiClient = new APIClient(new Config(engine, APIClient.BACKEND.PRODUCTION));
   const account = new Account(apiClient);
   await account.login(login);
   await account.listen();
