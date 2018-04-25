@@ -360,10 +360,13 @@ z.conversation.ConversationRepository = class ConversationRepository {
       })
       .then(unknownConversationsData => {
         if (unknownConversationsData.length) {
-          return this.map_conversations(unknownConversationsData);
+          return Promise.all([
+            this.map_conversations(unknownConversationsData),
+            this.conversation_service.save_conversations_in_db(unknownConversationsData),
+          ]);
         }
       })
-      .then(conversationEntities => {
+      .then(([conversationEntities]) => {
         if (conversationEntities && conversationEntities.length) {
           this.save_conversations(conversationEntities);
           this._update_conversations(conversationEntities);
