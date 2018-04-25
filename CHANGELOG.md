@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="0.8.0"></a>
+# [0.8.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@0.7.11...@wireapp/api-client@0.8.0) (2018-04-25)
+
+
+### Features
+
+* **core:** Receive images ([#509](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/509)) ([ce18d67](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/ce18d67))
+
+
+
+
 <a name="0.7.11"></a>
 ## [0.7.11](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@0.7.10...@wireapp/api-client@0.7.11) (2018-04-25)
 
