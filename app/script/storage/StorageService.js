@@ -129,8 +129,9 @@ z.storage.StorageService = class StorageService {
    */
   deleteDatabase() {
     if (this.db) {
-      return this.db
-        .delete()
+      return Promise.resolve()
+        .then(this.db.close)
+        .then(this.db.delete)
         .then(() => {
           this.logger.info(`Clearing IndexedDB '${this.dbName}' successful`);
           return true;
