@@ -114,11 +114,13 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
       return this.dismissExport();
     }
     this.hasError(true);
+    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.HISTORY.BACKUP_FAILED);
   }
 
   onSuccess(data) {
     this.state(HistoryExportViewModel.STATE.DONE);
     this.hasError(false);
+    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.HISTORY.BACKUP_SUCCEEDED);
   }
 
   onTryAgain() {

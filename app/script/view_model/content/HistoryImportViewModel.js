@@ -110,6 +110,7 @@ z.viewModel.content.HistoryImportViewModel = class HistoryImportViewModel {
   onSuccess() {
     this.error(null);
     this.state(HistoryImportViewModel.STATE.DONE);
+    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.HISTORY.RESTORE_SUCCEEDED);
     window.setTimeout(this.dismissImport.bind(this), 1500);
   }
 
@@ -123,5 +124,6 @@ z.viewModel.content.HistoryImportViewModel = class HistoryImportViewModel {
 
   onError(error) {
     this.error(error);
+    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.HISTORY.RESTORE_FAILED);
   }
 };
