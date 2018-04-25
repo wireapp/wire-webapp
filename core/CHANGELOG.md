@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="2.3.0"></a>
+# [2.3.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.2.19...@wireapp/core@2.3.0) (2018-04-25)
+
+
+### Features
+
+* **core:** Receive images ([#509](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/509)) ([ce18d67](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/ce18d67))
+
+
+
+
 <a name="2.2.19"></a>
 ## [2.2.19](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.2.18...@wireapp/core@2.2.19) (2018-04-25)
 
