@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="5.1.3"></a>
+## [5.1.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/bazinga64/compare/bazinga64@5.1.2...bazinga64@5.1.3) (2018-04-25)
+
+
+### Bug Fixes
+
+* **bazinga64:** Decoding of very long strings ([#519](https://github.com/wireapp/wire-web-packages/tree/master/packages/bazinga64/issues/519)) ([9826b2c](https://github.com/wireapp/wire-web-packages/tree/master/packages/bazinga64/commit/9826b2c))
+
+
+
+
 <a name="5.1.2"></a>
 ## [5.1.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/bazinga64/compare/bazinga64@5.1.1...bazinga64@5.1.2) (2018-04-23)
 
