@@ -46,15 +46,19 @@ z.backup.BackupRepository = class BackupRepository {
     this.conversationRepository = conversationRepository;
     this.userRepository = userRepository;
 
-    this.isCanceled = false;
+    this.canceled = false;
   }
 
   cancelAction() {
     this.isCanceled = true;
   }
 
-  getIsCanceled() {
-    return this.isCanceled;
+  get isCanceled() {
+    return this.canceled;
+  }
+
+  set isCanceled(isCanceled) {
+    this.canceled = isCanceled;
   }
 
   createMetaDescription() {
@@ -81,7 +85,7 @@ z.backup.BackupRepository = class BackupRepository {
 
     const loadDataPromises = tables.map(table => {
       return this.backupService.exportTable(table, (tableName, rows) => {
-        if (this.getIsCanceled()) {
+        if (this.isCanceled) {
           throw new z.backup.CancelError();
         }
         progressCallback(rows.length);

@@ -153,7 +153,7 @@ describe('z.backup.BackupRepository', () => {
         TestFactory.user_repository
       );
 
-      spyOn(backupRepository, 'getIsCanceled').and.returnValue(true);
+      spyOn(backupRepository, 'isCanceled').and.returnValue(true);
 
       const promise = backupRepository
         .generateHistory(noop)
