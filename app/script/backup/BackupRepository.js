@@ -26,6 +26,7 @@ z.backup.BackupRepository = class BackupRepository {
   static get CONFIG() {
     return {
       META_FILENAME: 'export.json',
+      UINT8ARRAY_FIELDS: ['otr_key', 'sha256'],
     };
   }
 
@@ -138,6 +139,19 @@ z.backup.BackupRepository = class BackupRepository {
       );
     });
 
+    const mapEntityDataTypes = entity => {
+      if (entity.data) {
+        BackupRepository.CONFIG.UINT8ARRAY_FIELDS.forEach(field => {
+          const dataField = entity.data[field];
+          if (dataField) {
+            const values = Object.keys(dataField).map(key => dataField[key]);
+            entity.data[field] = new Uint8Array(values);
+          }
+        });
+      }
+      return entity;
+    };
+
     return unzipPromise.then(fileDescriptors => {
       initCallback(fileDescriptors.length);
       fileDescriptors.forEach(fileDescriptor => {
@@ -146,7 +160,10 @@ z.backup.BackupRepository = class BackupRepository {
         }
         const tableName = fileDescriptor.filename.replace('.json', '');
         const entities = JSON.parse(fileDescriptor.content);
-        entities.forEach(entity => this.backupService.importEntity(tableName, entity));
+        entities.forEach(entity => {
+          mapEntityDataTypes(entity);
+          this.backupService.importEntity(tableName, entity);
+        });
         progressCallback();
       });
     });
