@@ -16,7 +16,6 @@ const fs = require('fs');
 const {promisify} = require('util');
 const {Config} = require('@wireapp/api-client/dist/commonjs/Config');
 const {MemoryEngine} = require('@wireapp/store-engine/dist/commonjs/engine');
-const engine = new MemoryEngine();
 
 (async () => {
   const login = {
@@ -25,10 +24,22 @@ const engine = new MemoryEngine();
     persist: false,
   };
 
+  const engine = new MemoryEngine();
   await engine.init('receiver');
 
   const apiClient = new APIClient(new Config(engine, APIClient.BACKEND.STAGING));
   const account = new Account(apiClient);
+
+  account.on(Account.INCOMING.TEXT_MESSAGE, async data => {
+    const {conversation: conversationId, from, content, id: messageId} = data;
+    console.log(`Message "${messageId}" in "${conversationId}" from "${from}":`, content);
+    await account.service.conversation.sendConfirmation(conversationId, messageId);
+  });
+
+  account.on(Account.INCOMING.CONFIRMATION, data => {
+    const {conversation: conversationId, from, id: messageId} = data;
+    console.log(`Confirmation "${messageId}" in "${conversationId}" from "${from}".`);
+  });
 
   account.on(Account.INCOMING.TEXT_MESSAGE, data => {
     console.log(`Message in "${data.conversation}" from "${data.from}":`, data.content);
@@ -47,6 +58,7 @@ const engine = new MemoryEngine();
   });
 
   try {
+    console.log('Logging in ...');
     await account.login(login);
     await account.listen();
     console.log('Listening for messages ...');

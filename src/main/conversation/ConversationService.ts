@@ -29,7 +29,7 @@ import {
 } from '@wireapp/api-client/dist/commonjs/conversation/index';
 import {UserPreKeyBundleMap} from '@wireapp/api-client/dist/commonjs/user/index';
 import {CryptographyService, EncryptedAsset} from '../cryptography/root';
-import {AssetService, Image} from '../conversation/root';
+import {AssetService, ConfirmationType, Image, RemoteData} from '../conversation/root';
 import * as AssetCryptography from '../cryptography/AssetCryptography.node';
 
 export default class ConversationService {
@@ -53,7 +53,33 @@ export default class ConversationService {
     });
   }
 
-  public async sendExternalGenericMessage(
+  public async sendConfirmation(conversationId: string, messageId: string): Promise<ClientMismatch> {
+    const confirmation = this.protocolBuffers.Confirmation.create({
+      type: ConfirmationType.DELIVERED,
+      firstMessageId: messageId,
+    });
+
+    const genericMessage = this.protocolBuffers.GenericMessage.create({
+      confirmation,
+      messageId: new UUID(4).format(),
+    });
+
+    return this.sendGenericMessage(this.clientID, conversationId, genericMessage);
+  }
+
+  private async sendGenericMessage(
+    sendingClientId: string,
+    conversationId: string,
+    genericMessage: any
+  ): Promise<ClientMismatch> {
+    const plainTextBuffer: Buffer = this.protocolBuffers.GenericMessage.encode(genericMessage).finish();
+    const preKeyBundles = await this.getPreKeyBundles(conversationId);
+    const recipients = await this.cryptographyService.encrypt(plainTextBuffer, <UserPreKeyBundleMap>preKeyBundles);
+
+    return this.sendMessage(sendingClientId, conversationId, recipients);
+  }
+
+  private async sendExternalGenericMessage(
     sendingClientId: string,
     conversationId: string,
     asset: EncryptedAsset,
@@ -85,17 +111,7 @@ export default class ConversationService {
     return this.apiClient.conversation.api.postOTRMessage(sendingClientId, conversationId, message);
   }
 
-  public async getImage({
-    assetId,
-    otrKey,
-    sha256,
-    assetToken,
-  }: {
-    assetId: string;
-    otrKey: Uint8Array | Buffer;
-    sha256: Uint8Array | Buffer;
-    assetToken?: string;
-  }): Promise<Buffer> {
+  public async getImage({assetId, otrKey, sha256, assetToken}: RemoteData): Promise<Buffer> {
     const encryptedBuffer = await this.apiClient.asset.api.getAsset(assetId, assetToken);
     return AssetCryptography.decryptAsset({
       cipherText: new Buffer(encryptedBuffer),
@@ -104,7 +120,7 @@ export default class ConversationService {
     });
   }
 
-  public sendMessage(
+  private sendMessage(
     sendingClientId: string,
     conversationId: string,
     recipients: OTRRecipients
