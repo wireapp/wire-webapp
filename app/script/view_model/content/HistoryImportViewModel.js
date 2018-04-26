@@ -104,8 +104,8 @@ z.viewModel.content.HistoryImportViewModel = class HistoryImportViewModel {
     this.numberOfProcessedTables(0);
   }
 
-  onProgress() {
-    this.numberOfProcessedTables(this.numberOfProcessedTables() + 1);
+  onProgress(numberProcessed) {
+    this.numberOfProcessedTables(this.numberOfProcessedTables() + numberProcessed);
   }
 
   onSuccess() {
@@ -124,6 +124,10 @@ z.viewModel.content.HistoryImportViewModel = class HistoryImportViewModel {
   }
 
   onError(error) {
+    if (error instanceof z.backup.CancelError) {
+      this.logger.log(`History import was cancelled`);
+      return this.dismissImport();
+    }
     this.error(error);
     this.logger.error(`Failed to import history: ${error.message}`, error);
     amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.HISTORY.RESTORE_FAILED);

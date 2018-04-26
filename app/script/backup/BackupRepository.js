@@ -143,8 +143,6 @@ z.backup.BackupRepository = class BackupRepository {
   }
 
   _importHistoryData(fileDescriptors, initCallback, progressCallback) {
-    initCallback(fileDescriptors.length);
-
     const conversationFileDescriptor = fileDescriptors.find(fileDescriptor => {
       return fileDescriptor.filename === BackupRepository.CONFIG.FILENAME.CONVERSATIONS;
     });
@@ -153,33 +151,63 @@ z.backup.BackupRepository = class BackupRepository {
       return fileDescriptor.filename === BackupRepository.CONFIG.FILENAME.EVENTS;
     });
 
-    return this._importHistoryConversations(conversationFileDescriptor, progressCallback).then(() => {
-      return this._importHistoryEvents(eventFileDescriptor, progressCallback);
+    const conversationEntities = JSON.parse(conversationFileDescriptor.content);
+    const eventEntitites = JSON.parse(eventFileDescriptor.content);
+    const entityCount = conversationEntities.length + eventEntitites.length;
+    initCallback(entityCount);
+
+    return this._importHistoryConversations(conversationEntities, progressCallback).then(() => {
+      return this._importHistoryEvents(eventEntitites, progressCallback);
     });
   }
 
-  _importHistoryConversations(conversationData, progressCallback) {
-    if (this.isCanceled) {
-      return Promise.reject(new z.backup.CancelError());
+  _splitIntoChunks(array, chunkSize) {
+    const chunks = [];
+    for (let i = 0; i < array.length; i += chunkSize) {
+      chunks.push(array.slice(i, i + chunkSize));
     }
-
-    const entities = JSON.parse(conversationData.content).map(entity => this.mapEntityDataType(entity));
-    return this.conversationRepository.updateConversations(entities).then(() => {
-      this.logger.log(`Imported state of '${entities.length}' conversations from backup`, conversationData);
-      progressCallback();
-    });
+    return chunks;
   }
 
-  _importHistoryEvents(eventData, progressCallback) {
-    if (this.isCanceled) {
-      return Promise.reject(new z.backup.CancelError());
-    }
+  _importHistoryConversations(conversationEntities, progressCallback) {
+    const entities = conversationEntities.map(entity => this.mapEntityDataType(entity));
+    const entityChunks = this._splitIntoChunks(entities, 5000);
 
-    const entities = JSON.parse(eventData.content);
-    return this.backupService.importEntities(this.EVENTS_STORE_NAME, entities).then(() => {
-      this.logger.log(`Imported '${entities.length}' events from backup`, eventData);
-      progressCallback();
-    });
+    const chunkImport = chunks => {
+      return chunks.reduce((promise, chunk) => {
+        return promise.then(result => {
+          if (this.isCanceled) {
+            return Promise.reject(new z.backup.CancelError());
+          }
+          return this.conversationRepository.updateConversations(chunk).then(() => {
+            this.logger.log(`Imported state of '${chunk.length}' conversations from backup`);
+            progressCallback(chunk.length);
+          });
+        });
+      }, Promise.resolve());
+    };
+
+    return chunkImport(entityChunks);
+  }
+
+  _importHistoryEvents(eventEntities, progressCallback) {
+    const entityChunks = this._splitIntoChunks(eventEntities, 5000);
+
+    const chunkImport = chunks => {
+      return chunks.reduce((promise, chunk) => {
+        return promise.then(result => {
+          if (this.isCanceled) {
+            return Promise.reject(new z.backup.CancelError());
+          }
+          return this.backupService.importEntities(this.EVENTS_STORE_NAME, chunk).then(() => {
+            this.logger.log(`Imported '${chunk.length}' events from backup`);
+            progressCallback(chunk.length);
+          });
+        });
+      }, Promise.resolve());
+    };
+
+    return chunkImport(entityChunks);
   }
 
   _extractHistoryFiles(files) {
