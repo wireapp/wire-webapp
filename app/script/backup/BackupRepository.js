@@ -25,7 +25,11 @@ window.z.backup = z.backup || {};
 z.backup.BackupRepository = class BackupRepository {
   static get CONFIG() {
     return {
-      META_FILENAME: 'export.json',
+      FILENAME: {
+        CONVERSATIONS: 'conversations.json',
+        EVENTS: 'events.json',
+        METADATA: 'export.json',
+      },
       UINT8ARRAY_FIELDS: ['otr_key', 'sha256'],
     };
   }
@@ -47,6 +51,8 @@ z.backup.BackupRepository = class BackupRepository {
     this.userRepository = userRepository;
 
     this.canceled = false;
+
+    this.EVENTS_STORE_NAME = z.storage.StorageSchemata.OBJECT_STORE.EVENTS;
   }
 
   cancelAction() {
@@ -90,7 +96,7 @@ z.backup.BackupRepository = class BackupRepository {
         }
         progressCallback(rows.length);
 
-        const isEventTable = tableName === z.storage.StorageSchemata.OBJECT_STORE.EVENTS;
+        const isEventTable = tableName === this.EVENTS_STORE_NAME;
         if (isEventTable) {
           rows = rows.filter(event => event.type !== z.event.Client.CONVERSATION.VERIFICATION);
         }
@@ -104,7 +110,7 @@ z.backup.BackupRepository = class BackupRepository {
         const zip = new JSZip();
 
         // first write the metadata file
-        zip.file(BackupRepository.CONFIG.META_FILENAME, JSON.stringify(metaData));
+        zip.file(BackupRepository.CONFIG.FILENAME.METADATA, JSON.stringify(metaData));
 
         // then all the other tables
         Object.keys(tablesData).forEach(tableName => {
@@ -132,45 +138,67 @@ z.backup.BackupRepository = class BackupRepository {
   importHistory(archive, initCallback, progressCallback) {
     this.isCanceled = false;
     const files = archive.files;
-    if (!files[BackupRepository.CONFIG.META_FILENAME]) {
+    if (!files[BackupRepository.CONFIG.FILENAME.METADATA]) {
       throw new z.backup.InvalidMetaDataError();
     }
 
-    const verifyMetadataPromise = files[BackupRepository.CONFIG.META_FILENAME]
-      .async('string')
-      .then(JSON.parse)
-      .then(metadata => this.verifyMetadata(metadata));
+    return this.verifyMetadata(files)
+      .then(() => this._extractHistoryFiles(files))
+      .then(fileDescriptors => this._importHistoryData(fileDescriptors, initCallback, progressCallback))
+      .catch(error => {
+        this.logger.error(`Failed to import history: ${error.message}`, error);
+        throw error;
+      });
+  }
 
-    const unzipPromise = verifyMetadataPromise.then(() => {
-      return Promise.all(
-        Object.values(archive.files)
-          .filter(zippedFile => zippedFile.name !== BackupRepository.CONFIG.META_FILENAME)
-          .map(zippedFile => zippedFile.async('string').then(value => ({content: value, filename: zippedFile.name})))
-      );
+  _importHistoryData(fileDescriptors, initCallback, progressCallback) {
+    initCallback(fileDescriptors.length);
+
+    const conversationData = fileDescriptors.find(fileDescriptor => {
+      return fileDescriptor.filename === BackupRepository.CONFIG.FILENAME.CONVERSATIONS;
     });
 
-    return unzipPromise.then(fileDescriptors => {
-      initCallback(fileDescriptors.length);
+    const eventData = fileDescriptors.find(fileDescriptor => {
+      return fileDescriptor.filename === BackupRepository.CONFIG.FILENAME.EVENTS;
+    });
 
-      const importPromises = fileDescriptors.map(fileDescriptor => {
-        if (this.isCanceled) {
-          throw new z.backup.CancelError();
-        }
-        const tableName = fileDescriptor.filename.replace('.json', '');
-        const isConversationsTable = tableName === z.storage.StorageSchemata.OBJECT_STORE.CONVERSATIONS;
+    return this._importHistoryConversations(conversationData, progressCallback).then(() => {
+      return this._importHistoryEvents(eventData, progressCallback);
+    });
+  }
 
-        const entities = isConversationsTable
-          ? JSON.parse(fileDescriptor.content)
-          : JSON.parse(fileDescriptor.content).map(entity => this.mapEntityDataType(entity));
+  _importHistoryConversations(conversationData, progressCallback) {
+    if (this.isCanceled) {
+      return Promise.reject(new z.backup.CancelError());
+    }
 
-        const importPromise = isConversationsTable
-          ? this.conversationRepository.updateConversations(entities)
-          : this.backupService.importEntities(tableName, entities);
+    const entities = JSON.parse(conversationData.content).map(entity => this.mapEntityDataType(entity));
+    return this.conversationRepository.updateConversations(entities).then(() => {
+      this.logger.log(`Imported state of '${entities.length}' conversations from backup`, conversationData);
+      progressCallback();
+    });
+  }
 
-        return importPromise.then(progressCallback);
-      });
+  _importHistoryEvents(eventData, progressCallback) {
+    if (this.isCanceled) {
+      return Promise.reject(new z.backup.CancelError());
+    }
 
-      return Promise.all(importPromises);
+    const entities = JSON.parse(eventData.content);
+    return this.backupService.importEntities(this.EVENTS_STORE_NAME, entities).then(() => {
+      this.logger.log(`Imported '${entities.length}' events from backup`, eventData);
+      progressCallback();
+    });
+  }
+
+  _extractHistoryFiles(files) {
+    const unzipPromises = Object.values(files)
+      .filter(zippedFile => zippedFile.name !== BackupRepository.CONFIG.FILENAME.METADATA)
+      .map(zippedFile => zippedFile.async('string').then(value => ({content: value, filename: zippedFile.name})));
+
+    return Promise.all(unzipPromises).then(fileDescriptors => {
+      this.logger.log('Unzipped files for history import', fileDescriptors);
+      return fileDescriptors;
     });
   }
 
@@ -187,7 +215,15 @@ z.backup.BackupRepository = class BackupRepository {
     return entity;
   }
 
-  verifyMetadata(archiveMetadata) {
+  verifyMetadata(files) {
+    return files[BackupRepository.CONFIG.FILENAME.METADATA]
+      .async('string')
+      .then(JSON.parse)
+      .then(metadata => this._verifyMetadata(metadata))
+      .then(() => this.logger.log('Validated metadata during history import', files));
+  }
+
+  _verifyMetadata(archiveMetadata) {
     const localMetadata = this.createMetaDescription();
     const isExpectedUserId = archiveMetadata.user_id === localMetadata.user_id;
     if (!isExpectedUserId) {

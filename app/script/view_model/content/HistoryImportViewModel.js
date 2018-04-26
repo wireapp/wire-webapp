@@ -97,13 +97,12 @@ z.viewModel.content.HistoryImportViewModel = class HistoryImportViewModel {
   }
 
   onInit(numberOfTables) {
-    this.state(HistoryImportViewModel.STATE.PREPARING);
+    this.state(HistoryImportViewModel.STATE.IMPORTING);
     this.numberOfTables(numberOfTables);
     this.numberOfProcessedTables(0);
   }
 
   onProgress() {
-    this.state(HistoryImportViewModel.STATE.IMPORTING);
     this.numberOfProcessedTables(this.numberOfProcessedTables() + 1);
   }
 
