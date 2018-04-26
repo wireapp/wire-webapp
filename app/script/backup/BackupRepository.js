@@ -165,8 +165,7 @@ z.backup.BackupRepository = class BackupRepository {
     const entityCount = conversationEntities.length;
     let importedEntities = 0;
 
-    const entities = conversationEntities.map(entity => this.mapEntityDataType(entity));
-    const entityChunks = z.util.ArrayUtil.chunk(entities, 5000);
+    const entityChunks = z.util.ArrayUtil.chunk(conversationEntities, 5000);
 
     const chunkImport = chunks => {
       return chunks.reduce((promise, chunk) => {
@@ -190,7 +189,8 @@ z.backup.BackupRepository = class BackupRepository {
     const entityCount = eventEntities.length;
     let importedEntities = 0;
 
-    const entityChunks = z.util.ArrayUtil.chunk(eventEntities, 5000);
+    const entities = eventEntities.map(entity => this.mapEntityDataType(entity));
+    const entityChunks = z.util.ArrayUtil.chunk(entities, 5000);
 
     const chunkImport = chunks => {
       return chunks.reduce((promise, chunk) => {
