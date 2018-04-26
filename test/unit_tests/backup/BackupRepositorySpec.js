@@ -92,21 +92,24 @@ describe('z.backup.BackupRepository', () => {
         TestFactory.user_repository
       );
 
-      const tables = z.backup.BackupService.CONFIG.SUPPORTED_TABLES;
+      const filesToCheck = [
+        z.backup.BackupRepository.CONFIG.FILENAME.CONVERSATIONS,
+        z.backup.BackupRepository.CONFIG.FILENAME.EVENTS,
+      ];
 
       const archivePromise = backupRepository.generateHistory(noop);
 
       return archivePromise.then(zip => {
         const fileNames = Object.keys(zip.files);
         expect(fileNames).toContain('export.json');
-        tables.map(table => expect(fileNames).toContain(`${table}.json`));
+        filesToCheck.map(filename => expect(fileNames).toContain(filename));
 
-        const validateConversationsPromise = zip.files['conversations.json']
+        const validateConversationsPromise = zip.files[z.backup.BackupRepository.CONFIG.FILENAME.CONVERSATIONS]
           .async('string')
           .then(conversationsStr => JSON.parse(conversationsStr))
           .then(conversations => expect(conversations).toEqual([conversation]));
 
-        const validateEventsPromise = zip.files['events.json']
+        const validateEventsPromise = zip.files[z.backup.BackupRepository.CONFIG.FILENAME.EVENTS]
           .async('string')
           .then(eventsStr => JSON.parse(eventsStr))
           .then(events => expect(events).toEqual(messages));
@@ -197,7 +200,7 @@ describe('z.backup.BackupRepository', () => {
           ...testDescription.metaChanges,
         };
 
-        archive.file(z.backup.BackupRepository.CONFIG.META_FILENAME, JSON.stringify(meta));
+        archive.file(z.backup.BackupRepository.CONFIG.FILENAME.METADATA, JSON.stringify(meta));
 
         return backupRepository
           .importHistory(archive, noop, noop)
@@ -224,11 +227,11 @@ describe('z.backup.BackupRepository', () => {
       const archive = new JSZip();
 
       archive.file(
-        z.backup.BackupRepository.CONFIG.META_FILENAME,
+        z.backup.BackupRepository.CONFIG.FILENAME.METADATA,
         JSON.stringify(backupRepository.createMetaDescription())
       );
-      archive.file(z.storage.StorageSchemata.OBJECT_STORE.CONVERSATIONS, JSON.stringify([conversation]));
-      archive.file(z.storage.StorageSchemata.OBJECT_STORE.EVENTS, JSON.stringify(messages));
+      archive.file(z.backup.BackupRepository.CONFIG.FILENAME.CONVERSATIONS, JSON.stringify([conversation]));
+      archive.file(z.backup.BackupRepository.CONFIG.FILENAME.EVENTS, JSON.stringify(messages));
 
       return backupRepository.importHistory(archive, noop, noop).then(() => {
         const conversationsTest = TestFactory.storage_service
