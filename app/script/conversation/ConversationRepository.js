@@ -344,24 +344,34 @@ z.conversation.ConversationRepository = class ConversationRepository {
   updateConversations(conversationsData) {
     return Promise.resolve()
       .then(() => {
-        return conversationsData
+        const updatedConversationEntities = [];
+
+        const unknownConversationsData = conversationsData
           .map(conversationData => {
             const conversationEntity = this.conversations().find(conversation => {
               return conversation.id === conversationData.id;
             });
 
             if (conversationEntity) {
-              const conversation = this.conversation_mapper.update_self_status(
+              const updatedConversationEntity = this.conversation_mapper.update_self_status(
                 conversationEntity,
                 conversationData,
                 true
               );
-              this.save_conversation_state_in_db(conversation);
+              updatedConversationEntities.push(updatedConversationEntity);
             } else {
               return conversationData;
             }
           })
           .filter(conversationData => conversationData);
+
+        this._update_conversations(updatedConversationEntities);
+        const updatedConversationsData = updatedConversationEntities.map(conversationEntity =>
+          conversationEntity.serialize()
+        );
+        return this.conversation_service
+          .save_conversations_in_db(updatedConversationsData)
+          .then(() => unknownConversationsData);
       })
       .then(unknownConversationsData => {
         if (unknownConversationsData.length) {
