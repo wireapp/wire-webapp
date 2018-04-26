@@ -120,13 +120,8 @@ z.backup.BackupRepository = class BackupRepository {
         return zip;
       })
       .catch(error => {
-        this.logger.error(`Failed to export history: ${error.message}`, error);
-
-        if (error instanceof z.backup.CancelError) {
-          throw error;
-        }
-
-        throw new z.backup.ExportError();
+        const isCancelError = error instanceof z.backup.CancelError;
+        throw isCancelError ? error : new z.backup.ExportError();
       });
   }
 
@@ -144,11 +139,7 @@ z.backup.BackupRepository = class BackupRepository {
 
     return this.verifyMetadata(files)
       .then(() => this._extractHistoryFiles(files))
-      .then(fileDescriptors => this._importHistoryData(fileDescriptors, initCallback, progressCallback))
-      .catch(error => {
-        this.logger.error(`Failed to import history: ${error.message}`, error);
-        throw error;
-      });
+      .then(fileDescriptors => this._importHistoryData(fileDescriptors, initCallback, progressCallback));
   }
 
   _importHistoryData(fileDescriptors, initCallback, progressCallback) {

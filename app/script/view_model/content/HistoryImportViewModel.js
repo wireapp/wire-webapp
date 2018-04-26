@@ -33,6 +33,10 @@ z.viewModel.content.HistoryImportViewModel = class HistoryImportViewModel {
   }
 
   constructor(mainViewModel, contentViewModel, repositories) {
+    this.backupRepository = repositories.backup;
+
+    this.logger = new z.util.Logger('z.viewModel.content.HistoryExportViewModel', z.config.LOGGER.OPTIONS);
+
     this.error = ko.observable(null);
     this.errorHeadline = ko.observable('');
     this.errorSecondary = ko.observable('');
@@ -82,8 +86,6 @@ z.viewModel.content.HistoryImportViewModel = class HistoryImportViewModel {
       }
     });
 
-    this.backupRepository = repositories.backup;
-
     amplify.subscribe(z.event.WebApp.BACKUP.IMPORT.START, this.importHistory.bind(this));
   }
 
@@ -123,6 +125,7 @@ z.viewModel.content.HistoryImportViewModel = class HistoryImportViewModel {
 
   onError(error) {
     this.error(error);
+    this.logger.error(`Failed to import history: ${error.message}`, error);
     amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.HISTORY.RESTORE_FAILED);
   }
 };
