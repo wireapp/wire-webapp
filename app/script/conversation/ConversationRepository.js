@@ -365,6 +365,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
             this.conversation_service.save_conversations_in_db(unknownConversationsData),
           ]);
         }
+        return [];
       })
       .then(([conversationEntities]) => {
         if (conversationEntities && conversationEntities.length) {
