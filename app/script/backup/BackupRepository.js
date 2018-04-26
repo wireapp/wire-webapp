@@ -154,16 +154,16 @@ z.backup.BackupRepository = class BackupRepository {
   _importHistoryData(fileDescriptors, initCallback, progressCallback) {
     initCallback(fileDescriptors.length);
 
-    const conversationData = fileDescriptors.find(fileDescriptor => {
+    const conversationFileDescriptor = fileDescriptors.find(fileDescriptor => {
       return fileDescriptor.filename === BackupRepository.CONFIG.FILENAME.CONVERSATIONS;
     });
 
-    const eventData = fileDescriptors.find(fileDescriptor => {
+    const eventFileDescriptor = fileDescriptors.find(fileDescriptor => {
       return fileDescriptor.filename === BackupRepository.CONFIG.FILENAME.EVENTS;
     });
 
-    return this._importHistoryConversations(conversationData, progressCallback).then(() => {
-      return this._importHistoryEvents(eventData, progressCallback);
+    return this._importHistoryConversations(conversationFileDescriptor, progressCallback).then(() => {
+      return this._importHistoryEvents(eventFileDescriptor, progressCallback);
     });
   }
 
