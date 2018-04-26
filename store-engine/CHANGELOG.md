@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="0.9.0"></a>
+# [0.9.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/compare/@wireapp/store-engine@0.8.0...@wireapp/store-engine@0.9.0) (2018-04-26)
+
+
+### Features
+
+* **store-engine:** Detect if IndexedDB is supported in Firefox private mode ([#526](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/issues/526)) ([85fe79b](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/commit/85fe79b))
+
+
+
+
 <a name="0.8.0"></a>
 # [0.8.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/compare/@wireapp/store-engine@0.7.1...@wireapp/store-engine@0.8.0) (2018-04-25)
 
