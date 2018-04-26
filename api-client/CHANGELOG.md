@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="0.8.3"></a>
+## [0.8.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@0.8.2...@wireapp/api-client@0.8.3) (2018-04-26)
+
+
+### Bug Fixes
+
+* **api-client:** Add expires_at to Self type ([#522](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/522)) ([aa710ad](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/aa710ad))
+
+
+
+
 <a name="0.8.2"></a>
 ## [0.8.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@0.8.1...@wireapp/api-client@0.8.2) (2018-04-25)
 
