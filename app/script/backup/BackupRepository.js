@@ -161,17 +161,12 @@ z.backup.BackupRepository = class BackupRepository {
     });
   }
 
-  _splitIntoChunks(array, chunkSize) {
-    const chunks = [];
-    for (let i = 0; i < array.length; i += chunkSize) {
-      chunks.push(array.slice(i, i + chunkSize));
-    }
-    return chunks;
-  }
-
   _importHistoryConversations(conversationEntities, progressCallback) {
+    const entityCount = conversationEntities.length;
+    let importedEntities = 0;
+
     const entities = conversationEntities.map(entity => this.mapEntityDataType(entity));
-    const entityChunks = this._splitIntoChunks(entities, 5000);
+    const entityChunks = z.util.ArrayUtil.chunk(entities, 5000);
 
     const chunkImport = chunks => {
       return chunks.reduce((promise, chunk) => {
@@ -180,7 +175,8 @@ z.backup.BackupRepository = class BackupRepository {
             return Promise.reject(new z.backup.CancelError());
           }
           return this.conversationRepository.updateConversations(chunk).then(() => {
-            this.logger.log(`Imported state of '${chunk.length}' conversations from backup`);
+            importedEntities += chunk.length;
+            this.logger.log(`Imported ${importedEntities} of ${entityCount} conversation states from backup`);
             progressCallback(chunk.length);
           });
         });
@@ -191,7 +187,10 @@ z.backup.BackupRepository = class BackupRepository {
   }
 
   _importHistoryEvents(eventEntities, progressCallback) {
-    const entityChunks = this._splitIntoChunks(eventEntities, 5000);
+    const entityCount = eventEntities.length;
+    let importedEntities = 0;
+
+    const entityChunks = z.util.ArrayUtil.chunk(eventEntities, 5000);
 
     const chunkImport = chunks => {
       return chunks.reduce((promise, chunk) => {
@@ -200,7 +199,8 @@ z.backup.BackupRepository = class BackupRepository {
             return Promise.reject(new z.backup.CancelError());
           }
           return this.backupService.importEntities(this.EVENTS_STORE_NAME, chunk).then(() => {
-            this.logger.log(`Imported '${chunk.length}' events from backup`);
+            importedEntities += chunk.length;
+            this.logger.log(`Imported ${importedEntities} of ${entityCount} events from backup`);
             progressCallback(chunk.length);
           });
         });
