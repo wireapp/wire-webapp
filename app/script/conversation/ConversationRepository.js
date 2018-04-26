@@ -351,7 +351,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
             });
 
             if (conversationEntity) {
-              this.conversation_mapper.update_self_status(conversationEntity, conversationData, true);
+              const conversation = this.conversation_mapper.update_self_status(
+                conversationEntity,
+                conversationData,
+                true
+              );
+              this.save_conversation_state_in_db(conversation);
             } else {
               return conversationData;
             }
