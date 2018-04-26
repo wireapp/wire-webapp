@@ -18,11 +18,16 @@
  */
 
 import {
+  AddPeopleIcon,
   ArrowIcon,
+  AttachmentIcon,
+  AudioVideoIcon,
   Bold,
   Button,
   ButtonLink,
   COLOR,
+  CallIcon,
+  CamIcon,
   Checkbox,
   CodeInput,
   Column,
@@ -36,35 +41,47 @@ import {
   ErrorMessage,
   Footer,
   Form,
+  GifIcon,
   H1,
   H2,
   H3,
   H4,
+  HangupIcon,
   Header,
   Heading,
   ICON_NAME,
+  ImageIcon,
   Input,
   InputBlock,
   InputSubmitCombo,
   Label,
   LabelLink,
+  LeaveIcon,
   Line,
   Link,
   Loading,
   Logo,
+  MessageIcon,
   Modal,
+  MuteIcon,
   Muted,
+  OptionsIcon,
   Paragraph,
+  PingIcon,
   PlaneIcon,
   ProfileIcon,
   RoundIconButton,
   Select,
+  SettingsIcon,
   ShakeBox,
   Small,
+  SpeakerIcon,
   StyledApp,
   TeamIcon,
   Text,
+  TimedIcon,
   Uppercase,
+  WireIcon,
 } from '@wireapp/react-ui-kit';
 import {CheckboxLabel} from '../src/Form/index';
 import Color from 'color';
@@ -97,14 +114,35 @@ class Demo extends React.PureComponent {
           <Loading progress={0.33} />
           <Loading progress={0.66} />
           <Logo scale="3" hover />
-          <ProfileIcon />
-          <DeviceIcon />
-          <TeamIcon />
-          <ArrowIcon direction="up" />
-          <PlaneIcon />
         </Header>
         <Content>
           <Container>
+            <H1>Icons</H1>
+            <Container style={{alignItems: 'center', display: 'flex', justifyContent: 'space-around'}}>
+              <ProfileIcon />
+              <DeviceIcon height={32} />
+              <TeamIcon />
+              <ArrowIcon direction="up" height={32} />
+              <PlaneIcon height={32} />
+              <SettingsIcon height={32} />
+              <CallIcon height={32} />
+              <MessageIcon height={32} />
+              <TimedIcon height={32} />
+              <ImageIcon height={32} />
+              <AttachmentIcon height={32} />
+              <PingIcon height={32} />
+              <MuteIcon height={32} />
+              <CamIcon width={32} />
+              <SpeakerIcon height={32} />
+              <HangupIcon width={32} />
+              <OptionsIcon height={32} />
+              <AudioVideoIcon height={32} />
+              <WireIcon width={32} />
+              <LeaveIcon height={32} />
+              <AddPeopleIcon height={32} />
+              <GifIcon width={32} />
+            </Container>
+            <Line />
             <H1>Layout</H1>
             <Line />
             <ContainerXS>

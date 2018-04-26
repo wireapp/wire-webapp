@@ -17,12 +17,30 @@
  *
  */
 
+export * from './AddPeopleIcon';
+export * from './AudioVideoIcon';
 export * from './ArrowIcon';
+export * from './AttachmentIcon';
+export * from './CallIcon';
+export * from './CamIcon';
 export * from './CheckIcon';
 export * from './CloseIcon';
 export * from './DeviceIcon';
+export * from './GifIcon';
+export * from './HangupIcon';
+export * from './ImageIcon';
+export * from './LeaveIcon';
+export * from './MessageIcon';
+export * from './MuteIcon';
+export * from './OptionsIcon';
+export * from './PingIcon';
 export * from './PlaneIcon';
 export * from './ProfileIcon';
+export * from './SettingsIcon';
+export * from './SpeakerIcon';
 export * from './TeamIcon';
+export * from './TimedIcon';
 export * from './TrashIcon';
+export * from './WireIcon';
+
 export * from './RoundContainer';
