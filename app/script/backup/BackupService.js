@@ -35,6 +35,8 @@ z.backup.BackupService = class BackupService {
   constructor(storageService) {
     this.logger = new z.util.Logger('z.backup.BackupService', z.config.LOGGER.OPTIONS);
     this.storageService = storageService;
+
+    this.EVENTS_STORE_NAME = z.storage.StorageSchemata.OBJECT_STORE.EVENTS;
   }
 
   exportTable(table, onProgress) {
@@ -61,7 +63,7 @@ z.backup.BackupService = class BackupService {
 
   importEntities(tableName, entities) {
     // We don't want to set the primaryKey for the events table
-    const isEventsTable = tableName === z.storage.StorageSchemata.OBJECT_STORE.EVENTS;
+    const isEventsTable = tableName === this.EVENTS_STORE_NAME;
     const primaryKeys = isEventsTable ? undefined : entities.map(entity => entity.id);
     return this.storageService.db[tableName].bulkPut(entities, primaryKeys);
   }

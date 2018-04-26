@@ -39,6 +39,9 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
   }
 
   constructor(mainViewModel, contentViewModel, repositories) {
+    this.backupRepository = repositories.backup;
+    this.logger = new z.util.Logger('z.viewModel.content.HistoryExportViewModel', z.config.LOGGER.OPTIONS);
+
     this.hasError = ko.observable(false);
     this.state = ko.observable(HistoryExportViewModel.STATE.PREPARING);
     this.isPreparing = ko.pureComputed(() => {
@@ -72,8 +75,6 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
           return '';
       }
     });
-
-    this.backupRepository = repositories.backup;
 
     amplify.subscribe(z.event.WebApp.BACKUP.EXPORT.START, this.exportHistory.bind(this));
   }
@@ -111,9 +112,11 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
 
   onError(error) {
     if (error instanceof z.backup.CancelError) {
+      this.logger.log(`History export was cancelled`);
       return this.dismissExport();
     }
     this.hasError(true);
+    this.logger.error(`Failed to export history: ${error.message}`, error);
     amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.HISTORY.BACKUP_FAILED);
   }
 
