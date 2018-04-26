@@ -247,7 +247,7 @@ z.entity.Conversation = class Conversation {
       this.status,
       this.type,
       this.verification_state,
-    ].forEach(property => property.subscribe(this.persistState));
+    ].forEach(property => property.subscribe(this.persistState.bind(this)));
   }
 
   persistState() {
