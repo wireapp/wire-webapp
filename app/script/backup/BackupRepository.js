@@ -86,60 +86,74 @@ z.backup.BackupRepository = class BackupRepository {
    */
   generateHistory(progressCallback) {
     this.isCanceled = false;
-    const tables = this.backupService.getTables();
 
     return Promise.resolve()
-      .then(() => this._exportHistoryConversations(tables, progressCallback))
-      .then(exportedData => this._exportHistoryEvents(tables, progressCallback, exportedData))
+      .then(() => this._exportHistory(progressCallback))
       .then(exportedData => this._compressHistoryFiles(exportedData))
       .catch(error => {
+        this.logger.error(`Could not export history: ${error.message}`, error);
+
         const isCancelError = error instanceof z.backup.CancelError;
         throw isCancelError ? error : new z.backup.ExportError();
       });
   }
 
-  _exportHistoryConversations(tables, progressCallback) {
-    const tableName = this.CONVERSATIONS_STORE_NAME;
-    const exportedData = {[tableName]: []};
+  _exportHistory(progressCallback) {
+    const tables = this.backupService.getTables();
+    const tableData = {};
 
-    const conversationsTable = tables.find(table => table.name === tableName);
-    const onProgress = tableRows => {
-      progressCallback(tableRows.length);
-
-      return tableRows.map(conversation => {
-        delete conversation.verification_state;
-        return conversation;
+    return Promise.resolve()
+      .then(() => this._exportHistoryConversations(tables, progressCallback))
+      .then(conversationsData => {
+        tableData[this.CONVERSATIONS_STORE_NAME] = conversationsData;
+        return this._exportHistoryEvents(tables, progressCallback);
+      })
+      .then(eventsData => {
+        tableData[this.EVENTS_STORE_NAME] = eventsData;
+        return tableData;
       });
-    };
-
-    return this._exportHistoryFromTable(exportedData, conversationsTable, onProgress);
   }
 
-  _exportHistoryEvents(tables, progressCallback, exportedData) {
-    const tableName = this.EVENTS_STORE_NAME;
-    exportedData[tableName] = [];
-
-    const eventsTable = tables.find(table => table.name === tableName);
-    const onProgress = tableRows => {
-      progressCallback(tableRows.length);
-
-      return tableRows.filter(event => event.type !== z.event.Client.CONVERSATION.VERIFICATION);
+  _exportHistoryConversations(tables, progressCallback) {
+    const conversationsTable = tables.find(table => table.name === this.CONVERSATIONS_STORE_NAME);
+    const onComplete = tableRows => {
+      tableRows.forEach(conversation => delete conversation.verification_state);
     };
 
-    return this._exportHistoryFromTable(exportedData, eventsTable, onProgress);
+    return this._exportHistoryFromTable(conversationsTable, progressCallback, onComplete);
   }
 
-  _exportHistoryFromTable(exportedData, table, onProgress) {
+  _exportHistoryEvents(tables, progressCallback) {
+    const eventsTable = tables.find(table => table.name === this.EVENTS_STORE_NAME);
+    const onComplete = tableRows => {
+      for (let index = tableRows.length - 1; index >= 0; index -= 1) {
+        const event = tableRows[index];
+        const isTypeVerification = event.type === z.event.Client.CONVERSATION.VERIFICATION;
+        if (isTypeVerification) {
+          tableRows.splice(index, 1);
+        }
+      }
+    };
+
+    return this._exportHistoryFromTable(eventsTable, progressCallback, onComplete);
+  }
+
+  _exportHistoryFromTable(table, progressCallback, onComplete) {
+    const tableData = [];
+
     return this.backupService
-      .exportTable(table, (tableName, tableRows) => {
+      .exportTable(table, tableRows => {
         if (this.isCanceled) {
           throw new z.backup.CancelError();
         }
-
-        tableRows = onProgress(tableRows);
-        exportedData[tableName] = exportedData[tableName].concat(tableRows);
+        progressCallback(tableRows.length);
+        tableData.push(tableRows);
       })
-      .then(() => exportedData);
+      .then(() => {
+        const data = [].concat(...tableData);
+        onComplete(data);
+        return data;
+      });
   }
 
   _compressHistoryFiles(exportedData) {
@@ -171,7 +185,11 @@ z.backup.BackupRepository = class BackupRepository {
 
     return this.verifyMetadata(files)
       .then(() => this._extractHistoryFiles(files))
-      .then(fileDescriptors => this._importHistoryData(fileDescriptors, initCallback, progressCallback));
+      .then(fileDescriptors => this._importHistoryData(fileDescriptors, initCallback, progressCallback))
+      .catch(error => {
+        this.logger.error(`Could not export history: ${error.message}`, error);
+        throw error;
+      });
   }
 
   _importHistoryData(fileDescriptors, initCallback, progressCallback) {
