@@ -52,6 +52,7 @@ z.backup.BackupRepository = class BackupRepository {
 
     this.canceled = false;
 
+    this.CONVERSATIONS_STORE_NAME = z.storage.StorageSchemata.OBJECT_STORE.CONVERSATIONS;
     this.EVENTS_STORE_NAME = z.storage.StorageSchemata.OBJECT_STORE.EVENTS;
   }
 
@@ -67,7 +68,7 @@ z.backup.BackupRepository = class BackupRepository {
     this.canceled = isCanceled;
   }
 
-  createMetaDescription() {
+  createMetaData() {
     return {
       client_id: this.clientRepository.currentClient().id,
       creation_time: new Date().toISOString(),
@@ -84,45 +85,76 @@ z.backup.BackupRepository = class BackupRepository {
    * @returns {Promise<JSZip>} The promise that contains all the exported tables
    */
   generateHistory(progressCallback) {
-    const tables = this.backupService.getTables();
-    const metaData = this.createMetaDescription();
-    const tablesData = {};
     this.isCanceled = false;
+    const tables = this.backupService.getTables();
 
-    const loadDataPromises = tables.map(table => {
-      return this.backupService.exportTable(table, (tableName, rows) => {
-        if (this.isCanceled) {
-          throw new z.backup.CancelError();
-        }
-        progressCallback(rows.length);
-
-        const isEventTable = tableName === this.EVENTS_STORE_NAME;
-        if (isEventTable) {
-          rows = rows.filter(event => event.type !== z.event.Client.CONVERSATION.VERIFICATION);
-        }
-
-        tablesData[tableName] = (tablesData[tableName] || []).concat(rows);
-      });
-    });
-
-    return Promise.all(loadDataPromises)
-      .then(() => {
-        const zip = new JSZip();
-
-        // first write the metadata file
-        zip.file(BackupRepository.CONFIG.FILENAME.METADATA, JSON.stringify(metaData));
-
-        // then all the other tables
-        Object.keys(tablesData).forEach(tableName => {
-          zip.file(`${tableName}.json`, JSON.stringify(tablesData[tableName]));
-        });
-
-        return zip;
-      })
+    return Promise.resolve()
+      .then(() => this._exportHistoryConversations(tables, progressCallback))
+      .then(exportedData => this._exportHistoryEvents(tables, progressCallback, exportedData))
+      .then(exportedData => this._compressHistoryFiles(exportedData))
       .catch(error => {
         const isCancelError = error instanceof z.backup.CancelError;
         throw isCancelError ? error : new z.backup.ExportError();
       });
+  }
+
+  _exportHistoryConversations(tables, progressCallback) {
+    const tableName = this.CONVERSATIONS_STORE_NAME;
+    const exportedData = {[tableName]: []};
+
+    const conversationsTable = tables.find(table => table.name === tableName);
+    const onProgress = tableRows => {
+      progressCallback(tableRows.length);
+
+      return tableRows.map(conversation => {
+        delete conversation.verification_state;
+        return conversation;
+      });
+    };
+
+    return this._exportHistoryFromTable(exportedData, conversationsTable, onProgress);
+  }
+
+  _exportHistoryEvents(tables, progressCallback, exportedData) {
+    const tableName = this.EVENTS_STORE_NAME;
+    exportedData[tableName] = [];
+
+    const eventsTable = tables.find(table => table.name === tableName);
+    const onProgress = tableRows => {
+      progressCallback(tableRows.length);
+
+      return tableRows.filter(event => event.type !== z.event.Client.CONVERSATION.VERIFICATION);
+    };
+
+    return this._exportHistoryFromTable(exportedData, eventsTable, onProgress);
+  }
+
+  _exportHistoryFromTable(exportedData, table, onProgress) {
+    return this.backupService
+      .exportTable(table, (tableName, tableRows) => {
+        if (this.isCanceled) {
+          throw new z.backup.CancelError();
+        }
+
+        tableRows = onProgress(tableRows);
+        exportedData[tableName] = exportedData[tableName].concat(tableRows);
+      })
+      .then(() => exportedData);
+  }
+
+  _compressHistoryFiles(exportedData) {
+    const metaData = this.createMetaData();
+    const zip = new JSZip();
+
+    // first write the metadata file
+    zip.file(BackupRepository.CONFIG.FILENAME.METADATA, JSON.stringify(metaData));
+
+    // then all the other tables
+    Object.keys(exportedData).forEach(tableName => {
+      zip.file(`${tableName}.json`, JSON.stringify(exportedData[tableName]));
+    });
+
+    return zip;
   }
 
   getBackupInitData() {
