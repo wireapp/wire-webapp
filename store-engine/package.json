@@ -3,7 +3,7 @@
     "@types/filesystem": "0.0.28",
     "@types/node": "9.6.6",
     "bro-fs": "0.3.0",
-    "dexie": "2.0.2",
+    "dexie": "2.0.3",
     "fs-extra": "5.0.0"
   },
   "devDependencies": {

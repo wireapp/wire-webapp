@@ -6,7 +6,7 @@
     "@wireapp/priority-queue": "0.1.16",
     "@wireapp/proteus": "7.1.26",
     "@wireapp/store-engine": "0.9.0",
-    "dexie": "2.0.2",
+    "dexie": "2.0.3",
     "fs-extra": "5.0.0"
   },
   "description": "High-level API with persistent storage for Proteus.",
