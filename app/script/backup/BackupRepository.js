@@ -167,22 +167,14 @@ z.backup.BackupRepository = class BackupRepository {
 
     const entityChunks = z.util.ArrayUtil.chunk(conversationEntities, 5000);
 
-    const chunkImport = chunks => {
-      return chunks.reduce((promise, chunk) => {
-        return promise.then(result => {
-          if (this.isCanceled) {
-            return Promise.reject(new z.backup.CancelError());
-          }
-          return this.conversationRepository.updateConversations(chunk).then(() => {
-            importedEntities += chunk.length;
-            this.logger.log(`Imported ${importedEntities} of ${entityCount} conversation states from backup`);
-            progressCallback(chunk.length);
-          });
-        });
-      }, Promise.resolve());
-    };
+    const importConversationChunk = chunk =>
+      this.conversationRepository.updateConversations(chunk).then(() => {
+        importedEntities += chunk.length;
+        this.logger.log(`Imported ${importedEntities} of ${entityCount} conversation states from backup`);
+        progressCallback(chunk.length);
+      });
 
-    return chunkImport(entityChunks);
+    return this._chunkImport(importConversationChunk, entityChunks);
   }
 
   _importHistoryEvents(eventEntities, progressCallback) {
@@ -192,22 +184,22 @@ z.backup.BackupRepository = class BackupRepository {
     const entities = eventEntities.map(entity => this.mapEntityDataType(entity));
     const entityChunks = z.util.ArrayUtil.chunk(entities, 5000);
 
-    const chunkImport = chunks => {
-      return chunks.reduce((promise, chunk) => {
-        return promise.then(result => {
-          if (this.isCanceled) {
-            return Promise.reject(new z.backup.CancelError());
-          }
-          return this.backupService.importEntities(this.EVENTS_STORE_NAME, chunk).then(() => {
-            importedEntities += chunk.length;
-            this.logger.log(`Imported ${importedEntities} of ${entityCount} events from backup`);
-            progressCallback(chunk.length);
-          });
-        });
-      }, Promise.resolve());
-    };
+    const importEventChunk = chunk =>
+      this.backupService.importEntities(this.EVENTS_STORE_NAME, chunk).then(() => {
+        importedEntities += chunk.length;
+        this.logger.log(`Imported ${importedEntities} of ${entityCount} events from backup`);
+        progressCallback(chunk.length);
+      });
 
-    return chunkImport(entityChunks);
+    return this._chunkImport(importEventChunk, entityChunks);
+  }
+
+  _chunkImport(importFunction, chunks) {
+    return chunks.reduce(
+      (promise, chunk) =>
+        promise.then(result => (this.isCanceled ? Promise.reject(new z.backup.CancelError()) : importFunction(chunk))),
+      Promise.resolve()
+    );
   }
 
   _extractHistoryFiles(files) {
