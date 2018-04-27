@@ -203,6 +203,8 @@ z.viewModel.ListViewModel = class ListViewModel {
   openConversations() {
     if (this.isActivatedAccount()) {
       this.switchList(ListViewModel.STATE.CONVERSATIONS, false);
+    } else {
+      this.switchList(ListViewModel.STATE.TEMPORARY_GUEST, false);
     }
   }
 
