@@ -116,9 +116,7 @@ z.backup.BackupRepository = class BackupRepository {
 
   _exportHistoryConversations(tables, progressCallback) {
     const conversationsTable = tables.find(table => table.name === this.CONVERSATIONS_STORE_NAME);
-    const onComplete = tableRows => {
-      tableRows.forEach(conversation => delete conversation.verification_state);
-    };
+    const onComplete = tableRows => tableRows.forEach(conversation => delete conversation.verification_state);
 
     return this._exportHistoryFromTable(conversationsTable, progressCallback, onComplete);
   }
@@ -265,7 +263,7 @@ z.backup.BackupRepository = class BackupRepository {
   }
 
   _verifyMetadata(archiveMetadata) {
-    const localMetadata = this.createMetaDescription();
+    const localMetadata = this.createMetaData();
     const isExpectedUserId = archiveMetadata.user_id === localMetadata.user_id;
     if (!isExpectedUserId) {
       const fromUserId = archiveMetadata.user_id;

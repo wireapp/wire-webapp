@@ -49,7 +49,7 @@ describe('z.backup.BackupRepository', () => {
 
   afterAll(() => jasmine.clock().uninstall());
 
-  describe('"createMetaDescription"', () => {
+  describe('"createMetaData"', () => {
     it('creates backup meta data', () => {
       const freezedTime = new Date();
       jasmine.clock().mockDate(freezedTime);
@@ -60,7 +60,7 @@ describe('z.backup.BackupRepository', () => {
         TestFactory.conversation_repository,
         TestFactory.user_repository
       );
-      const metaDescription = backupRepository.createMetaDescription();
+      const metaDescription = backupRepository.createMetaData();
 
       expect(metaDescription.client_id).toBe(TestFactory.client_repository.currentClient().id);
       expect(metaDescription.creation_time).toBe(freezedTime.toISOString());
@@ -196,7 +196,7 @@ describe('z.backup.BackupRepository', () => {
       const promises = tests.map(testDescription => {
         const archive = new JSZip();
         const meta = {
-          ...backupRepository.createMetaDescription(),
+          ...backupRepository.createMetaData(),
           ...testDescription.metaChanges,
         };
 
@@ -228,7 +228,7 @@ describe('z.backup.BackupRepository', () => {
 
       archive.file(
         z.backup.BackupRepository.CONFIG.FILENAME.METADATA,
-        JSON.stringify(backupRepository.createMetaDescription())
+        JSON.stringify(backupRepository.createMetaData())
       );
       archive.file(z.backup.BackupRepository.CONFIG.FILENAME.CONVERSATIONS, JSON.stringify([conversation]));
       archive.file(z.backup.BackupRepository.CONFIG.FILENAME.EVENTS, JSON.stringify(messages));
