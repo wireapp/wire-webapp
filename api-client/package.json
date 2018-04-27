@@ -19,7 +19,7 @@
   },
   "devDependencies": {
     "@wireapp/react-ui-kit": "1.1.11",
-    "babel-core": "6.26.0",
+    "babel-core": "6.26.2",
     "babel-loader": "7.1.4",
     "babel-preset-react": "6.24.1",
     "browser-sync": "2.23.7",
