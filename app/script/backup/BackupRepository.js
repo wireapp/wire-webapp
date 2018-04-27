@@ -211,11 +211,9 @@ z.backup.BackupRepository = class BackupRepository {
     const entityCount = conversationEntities.length + eventEntities.length;
     initCallback(entityCount);
 
-    return this._importHistoryConversations(conversationEntities, progressCallback).then(importedEntities => {
-      return this._importHistoryEvents(eventEntities, progressCallback).then(() => {
-        return this.conversationRepository.updateConversations(importedEntities);
-      });
-    });
+    return this._importHistoryConversations(conversationEntities, progressCallback)
+      .then(importedEntities => this._importHistoryEvents(eventEntities, progressCallback).then(() => importedEntities))
+      .then(importedEntities => this.conversationRepository.updateConversations(importedEntities));
   }
 
   _importHistoryConversations(conversationEntities, progressCallback) {
