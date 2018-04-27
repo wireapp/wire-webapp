@@ -25,6 +25,7 @@ window.z.backup = z.backup || {};
 z.backup.BackupService = class BackupService {
   static get CONFIG() {
     return {
+      BATCH_SIZE: 10000,
       SUPPORTED_TABLES: [
         z.storage.StorageSchemata.OBJECT_STORE.CONVERSATIONS,
         z.storage.StorageSchemata.OBJECT_STORE.EVENTS,
@@ -43,8 +44,9 @@ z.backup.BackupService = class BackupService {
     const collection = table.toCollection();
     return table
       .count()
-      .then(n => new DexieBatch({batchSize: 10000, limit: n}))
-      .then(batchDriver => batchDriver.eachBatch(collection, batch => onProgress(table.name, batch)));
+      .then(count => new DexieBatch({batchSize: BackupService.CONFIG.BATCH_SIZE, limit: count}))
+      .then(batchDriver => batchDriver.eachBatch(collection, batch => onProgress(batch)))
+      .then(count => this.logger.log(`Exported store '${table.name}' in '${count}' batches`));
   }
 
   getDatabaseVersion() {

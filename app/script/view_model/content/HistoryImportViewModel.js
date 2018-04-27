@@ -46,10 +46,10 @@ z.viewModel.content.HistoryImportViewModel = class HistoryImportViewModel {
     this.isImporting = ko.pureComputed(() => !this.error() && this.state() === HistoryImportViewModel.STATE.IMPORTING);
     this.isDone = ko.pureComputed(() => !this.error() && this.state() === HistoryImportViewModel.STATE.DONE);
 
-    this.numberOfTables = ko.observable(0);
-    this.numberOfProcessedTables = ko.observable(0);
+    this.numberOfRecords = ko.observable(0);
+    this.numberOfProcessedRecords = ko.observable(0);
     this.loadingProgress = ko.pureComputed(() => {
-      return Math.floor(this.numberOfProcessedTables() / this.numberOfTables() * 100);
+      return Math.floor(this.numberOfProcessedRecords() / this.numberOfRecords() * 100);
     });
 
     this.loadingMessage = ko.pureComputed(() => {
@@ -59,9 +59,9 @@ z.viewModel.content.HistoryImportViewModel = class HistoryImportViewModel {
         }
         case HistoryImportViewModel.STATE.IMPORTING: {
           const replacements = {
-            processed: this.numberOfProcessedTables(),
+            processed: this.numberOfProcessedRecords(),
             progress: this.loadingProgress(),
-            total: this.numberOfTables(),
+            total: this.numberOfRecords(),
           };
           return z.l10n.text(z.string.backupImportProgressSecondary, replacements);
         }
@@ -98,21 +98,21 @@ z.viewModel.content.HistoryImportViewModel = class HistoryImportViewModel {
       .catch(this.onError.bind(this));
   }
 
-  onInit(numberOfTables) {
+  onInit(numberOfRecords) {
     this.state(HistoryImportViewModel.STATE.IMPORTING);
-    this.numberOfTables(numberOfTables);
-    this.numberOfProcessedTables(0);
+    this.numberOfRecords(numberOfRecords);
+    this.numberOfProcessedRecords(0);
   }
 
-  onProgress() {
-    this.numberOfProcessedTables(this.numberOfProcessedTables() + 1);
+  onProgress(numberProcessed) {
+    this.numberOfProcessedRecords(this.numberOfProcessedRecords() + numberProcessed);
   }
 
   onSuccess() {
     this.error(null);
     this.state(HistoryImportViewModel.STATE.DONE);
     amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.HISTORY.RESTORE_SUCCEEDED);
-    window.setTimeout(this.dismissImport.bind(this), 1500);
+    window.setTimeout(this.dismissImport.bind(this), z.motion.MotionDuration.X_LONG * 2);
   }
 
   onCancel() {
@@ -124,6 +124,10 @@ z.viewModel.content.HistoryImportViewModel = class HistoryImportViewModel {
   }
 
   onError(error) {
+    if (error instanceof z.backup.CancelError) {
+      this.logger.log(`History import was cancelled`);
+      return this.dismissImport();
+    }
     this.error(error);
     this.logger.error(`Failed to import history: ${error.message}`, error);
     amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.HISTORY.RESTORE_FAILED);
