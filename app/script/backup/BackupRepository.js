@@ -201,12 +201,12 @@ z.backup.BackupRepository = class BackupRepository {
     });
 
     const conversationEntities = JSON.parse(conversationFileDescriptor.content);
-    const eventEntitites = JSON.parse(eventFileDescriptor.content);
-    const entityCount = conversationEntities.length + eventEntitites.length;
+    const eventEntities = JSON.parse(eventFileDescriptor.content);
+    const entityCount = conversationEntities.length + eventEntities.length;
     initCallback(entityCount);
 
     return this._importHistoryConversations(conversationEntities, progressCallback).then(() => {
-      return this._importHistoryEvents(eventEntitites, progressCallback);
+      return this._importHistoryEvents(eventEntities, progressCallback);
     });
   }
 
