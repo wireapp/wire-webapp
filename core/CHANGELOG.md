@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="2.4.4"></a>
+## [2.4.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.4.3...@wireapp/core@2.4.4) (2018-04-27)
+
+
+### Bug Fixes
+
+* **core:** Do not sanitize passwords ([#532](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/532)) ([96258c7](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/96258c7))
+
+
+
+
 <a name="2.4.3"></a>
 ## [2.4.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.4.2...@wireapp/core@2.4.3) (2018-04-26)
 
