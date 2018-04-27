@@ -201,11 +201,10 @@ z.viewModel.ListViewModel = class ListViewModel {
   }
 
   openConversations() {
-    if (this.isActivatedAccount()) {
-      this.switchList(ListViewModel.STATE.CONVERSATIONS, false);
-    } else {
-      this.switchList(ListViewModel.STATE.TEMPORARY_GUEST, false);
-    }
+    const newState = this.isActivatedAccount()
+      ? ListViewModel.STATE.CONVERSATIONS
+      : ListViewModel.STATE.TEMPORARY_GUEST;
+    this.switchList(newState, false);
   }
 
   _hideList() {
