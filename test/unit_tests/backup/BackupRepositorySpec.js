@@ -238,7 +238,8 @@ describe('z.backup.BackupRepository', () => {
           .getAll(z.storage.StorageSchemata.OBJECT_STORE.CONVERSATIONS)
           .then(conversations => {
             expect(conversations.length).toEqual(1);
-            expect(conversations[0]).toEqual(conversation);
+            expect(conversations[0].name).toEqual(conversation.name);
+            expect(conversations[0].id).toEqual(conversation.id);
           });
 
         const eventsTest = TestFactory.storage_service
