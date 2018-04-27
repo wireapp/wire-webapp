@@ -192,8 +192,6 @@ z.backup.BackupRepository = class BackupRepository {
   }
 
   _importHistoryData(fileDescriptors, initCallback, progressCallback) {
-    initCallback(fileDescriptors.length);
-
     const conversationFileDescriptor = fileDescriptors.find(fileDescriptor => {
       return fileDescriptor.filename === BackupRepository.CONFIG.FILENAME.CONVERSATIONS;
     });
@@ -202,33 +200,58 @@ z.backup.BackupRepository = class BackupRepository {
       return fileDescriptor.filename === BackupRepository.CONFIG.FILENAME.EVENTS;
     });
 
-    return this._importHistoryConversations(conversationFileDescriptor, progressCallback).then(() => {
-      return this._importHistoryEvents(eventFileDescriptor, progressCallback);
+    const conversationEntities = JSON.parse(conversationFileDescriptor.content);
+    const eventEntities = JSON.parse(eventFileDescriptor.content);
+    const entityCount = conversationEntities.length + eventEntities.length;
+    initCallback(entityCount);
+
+    return this._importHistoryConversations(conversationEntities, progressCallback).then(() => {
+      return this._importHistoryEvents(eventEntities, progressCallback);
     });
   }
 
-  _importHistoryConversations(conversationData, progressCallback) {
-    if (this.isCanceled) {
-      return Promise.reject(new z.backup.CancelError());
-    }
+  _importHistoryConversations(conversationEntities, progressCallback) {
+    const entityCount = conversationEntities.length;
+    let importedEntities = 0;
 
-    const entities = JSON.parse(conversationData.content).map(entity => this.mapEntityDataType(entity));
-    return this.conversationRepository.updateConversations(entities).then(() => {
-      this.logger.log(`Imported state of '${entities.length}' conversations from backup`, conversationData);
-      progressCallback();
-    });
+    const entityChunks = z.util.ArrayUtil.chunk(conversationEntities, z.backup.BackupService.CONFIG.BATCH_SIZE);
+
+    const importConversationChunk = chunk =>
+      this.conversationRepository.updateConversations(chunk).then(() => {
+        importedEntities += chunk.length;
+        this.logger.log(`Imported ${importedEntities} of ${entityCount} conversation states from backup`);
+        progressCallback(chunk.length);
+      });
+
+    return this._chunkImport(importConversationChunk, entityChunks);
   }
 
-  _importHistoryEvents(eventData, progressCallback) {
-    if (this.isCanceled) {
-      return Promise.reject(new z.backup.CancelError());
-    }
+  _importHistoryEvents(eventEntities, progressCallback) {
+    const entityCount = eventEntities.length;
+    let importedEntities = 0;
 
-    const entities = JSON.parse(eventData.content);
-    return this.backupService.importEntities(this.EVENTS_STORE_NAME, entities).then(() => {
-      this.logger.log(`Imported '${entities.length}' events from backup`, eventData);
-      progressCallback();
-    });
+    const entities = eventEntities.map(entity => this.mapEntityDataType(entity));
+    const entityChunks = z.util.ArrayUtil.chunk(entities, z.backup.BackupService.CONFIG.BATCH_SIZE);
+
+    const importEventChunk = chunk =>
+      this.backupService.importEntities(this.EVENTS_STORE_NAME, chunk).then(() => {
+        importedEntities += chunk.length;
+        this.logger.log(`Imported ${importedEntities} of ${entityCount} events from backup`);
+        progressCallback(chunk.length);
+      });
+
+    return this._chunkImport(importEventChunk, entityChunks);
+  }
+
+  _chunkImport(importFunction, chunks) {
+    return chunks.reduce((promise, chunk) => {
+      return promise.then(result => {
+        if (this.isCanceled) {
+          return Promise.reject(new z.backup.CancelError());
+        }
+        return importFunction(chunk);
+      });
+    }, Promise.resolve());
   }
 
   _extractHistoryFiles(files) {
