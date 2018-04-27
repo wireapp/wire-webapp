@@ -108,6 +108,7 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
   onProgress(processedNumber) {
     this.state(HistoryExportViewModel.STATE.EXPORTING);
     this.numberOfProcessedRecords(this.numberOfProcessedRecords() + processedNumber);
+    this.logger.log(`Exported '${this.numberOfProcessedRecords()}' of '${this.numberOfRecords()}' entities`);
   }
 
   onError(error) {
