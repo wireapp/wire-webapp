@@ -121,7 +121,7 @@ z.viewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
   }
 
   clickOnRemoveDevice() {
-    this.actionsViewModel.deleteClient(this.device());
+    this.actionsViewModel.deleteClient(this.device()).then(() => this.clickOnDetailsClose());
   }
 
   toggleDeviceVerification() {
