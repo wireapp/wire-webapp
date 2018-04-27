@@ -116,14 +116,19 @@ z.backup.BackupRepository = class BackupRepository {
 
   _exportHistoryConversations(tables, progressCallback) {
     const conversationsTable = tables.find(table => table.name === this.CONVERSATIONS_STORE_NAME);
-    const onComplete = tableRows => tableRows.forEach(conversation => delete conversation.verification_state);
+    const onProgress = tableRows => {
+      progressCallback(tableRows.length);
+      tableRows.forEach(conversation => delete conversation.verification_state);
+    };
 
-    return this._exportHistoryFromTable(conversationsTable, progressCallback, onComplete);
+    return this._exportHistoryFromTable(conversationsTable, onProgress);
   }
 
   _exportHistoryEvents(tables, progressCallback) {
     const eventsTable = tables.find(table => table.name === this.EVENTS_STORE_NAME);
-    const onComplete = tableRows => {
+    const onProgress = tableRows => {
+      progressCallback(tableRows.length);
+
       for (let index = tableRows.length - 1; index >= 0; index -= 1) {
         const event = tableRows[index];
         const isTypeVerification = event.type === z.event.Client.CONVERSATION.VERIFICATION;
@@ -133,10 +138,10 @@ z.backup.BackupRepository = class BackupRepository {
       }
     };
 
-    return this._exportHistoryFromTable(eventsTable, progressCallback, onComplete);
+    return this._exportHistoryFromTable(eventsTable, onProgress);
   }
 
-  _exportHistoryFromTable(table, progressCallback, onComplete) {
+  _exportHistoryFromTable(table, onProgress) {
     const tableData = [];
 
     return this.backupService
@@ -144,14 +149,10 @@ z.backup.BackupRepository = class BackupRepository {
         if (this.isCanceled) {
           throw new z.backup.CancelError();
         }
-        progressCallback(tableRows.length);
+        onProgress(tableRows);
         tableData.push(tableRows);
       })
-      .then(() => {
-        const data = [].concat(...tableData);
-        onComplete(data);
-        return data;
-      });
+      .then(() => [].concat(...tableData));
   }
 
   _compressHistoryFiles(exportedData) {
