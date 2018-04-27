@@ -211,25 +211,27 @@ z.backup.BackupRepository = class BackupRepository {
     const entityCount = conversationEntities.length + eventEntities.length;
     initCallback(entityCount);
 
-    return this._importHistoryConversations(conversationEntities, progressCallback).then(() => {
-      return this._importHistoryEvents(eventEntities, progressCallback);
+    return this._importHistoryConversations(conversationEntities, progressCallback).then(importedEntities => {
+      return this._importHistoryEvents(eventEntities, progressCallback).then(() => {
+        return this.conversationRepository.updateConversations(importedEntities);
+      });
     });
   }
 
   _importHistoryConversations(conversationEntities, progressCallback) {
     const entityCount = conversationEntities.length;
-    let importedEntities = 0;
+    let importedEntities = [];
 
     const entityChunks = z.util.ArrayUtil.chunk(conversationEntities, z.backup.BackupService.CONFIG.BATCH_SIZE);
 
     const importConversationChunk = chunk =>
-      this.conversationRepository.updateConversations(chunk).then(() => {
-        importedEntities += chunk.length;
-        this.logger.log(`Imported '${importedEntities}' of '${entityCount}' conversation states from backup`);
+      this.conversationRepository.updateConversationStates(chunk).then(importedConversationEntities => {
+        importedEntities = importedEntities.concat(importedConversationEntities);
+        this.logger.log(`Imported '${importedEntities.length}' of '${entityCount}' conversation states from backup`);
         progressCallback(chunk.length);
       });
 
-    return this._chunkImport(importConversationChunk, entityChunks);
+    return this._chunkImport(importConversationChunk, entityChunks).then(() => importedEntities);
   }
 
   _importHistoryEvents(eventEntities, progressCallback) {

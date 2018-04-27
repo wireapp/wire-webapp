@@ -341,51 +341,35 @@ z.conversation.ConversationRepository = class ConversationRepository {
       });
   }
 
-  updateConversations(conversationsData) {
+  updateConversationStates(conversationsData) {
+    const handledConversationEntities = [];
+
     return Promise.resolve()
       .then(() => {
-        const updatedConversationEntities = [];
+        const unknownConversations = [];
 
-        const unknownConversationsData = conversationsData
-          .map(conversationData => {
-            let conversationEntity = this.conversations().find(({id}) => id === conversationData.id);
+        conversationsData.forEach(conversationData => {
+          const conversationEntity = this.conversations().find(({id}) => id === conversationData.id);
 
-            if (conversationEntity) {
-              conversationEntity = this.conversation_mapper.update_self_status(
-                conversationEntity,
-                conversationData,
-                true
-              );
-              updatedConversationEntities.push(conversationEntity);
-            } else {
-              return conversationData;
-            }
-          })
-          .filter(conversationData => conversationData);
+          if (conversationEntity) {
+            const entity = this.conversation_mapper.update_self_status(conversationEntity, conversationData, true);
+            return handledConversationEntities.push(entity);
+          }
 
-        this._update_conversations(updatedConversationEntities);
-        const updatedConversationsData = updatedConversationEntities.map(conversationEntity => {
-          return conversationEntity.serialize();
+          unknownConversations.push(conversationData);
         });
-        return this.conversation_service
-          .save_conversations_in_db(updatedConversationsData)
-          .then(() => unknownConversationsData);
-      })
-      .then(unknownConversationsData => {
-        if (unknownConversationsData.length) {
-          return Promise.all([
-            this.map_conversations(unknownConversationsData),
-            this.conversation_service.save_conversations_in_db(unknownConversationsData),
-          ]);
-        }
 
-        return [];
+        return unknownConversations.length ? this.map_conversations(unknownConversations) : [];
       })
-      .then(([conversationEntities]) => {
-        if (conversationEntities && conversationEntities.length) {
+      .then(conversationEntities => {
+        if (conversationEntities.length) {
           this.save_conversations(conversationEntities);
-          this._update_conversations(conversationEntities);
         }
+        conversationEntities = conversationEntities.concat(handledConversationEntities);
+
+        const handledConversationData = conversationEntities.map(conversationEntity => conversationEntity.serialize());
+        this.conversation_service.save_conversations_in_db(handledConversationData);
+        return conversationEntities;
       });
   }
 
@@ -600,7 +584,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {undefined} No return value
    */
   update_conversations_archived() {
-    this._update_conversations(this.conversations_archived());
+    this.updateConversations(this.conversations_archived());
   }
 
   /**
@@ -617,23 +601,23 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {undefined} No return value
    */
   update_conversations_unarchived() {
-    this._update_conversations(this.conversations_unarchived());
+    this.updateConversations(this.conversations_unarchived());
   }
 
   /**
    * Get users and events for conversations.
    *
    * @note To reduce the number of backend calls we merge the user IDs of all conversations first.
-   * @private
-   * @param {Array<Conversation>} conversation_ets - Array of conversation entities to be updated
+   * @param {Array<Conversation>} conversationEntities - Array of conversation entities to be updated
    * @returns {undefined} No return value
    */
-  _update_conversations(conversation_ets) {
-    const user_ids = _.flatten(conversation_ets.map(conversation_et => conversation_et.participating_user_ids()));
+  updateConversations(conversationEntities) {
+    const mapOfUserIds = conversationEntities.map(conversationEntity => conversationEntity.participating_user_ids());
+    const userIds = _.flatten(mapOfUserIds);
 
     this.user_repository
-      .get_users_by_id(user_ids)
-      .then(() => conversation_ets.forEach(conversation_et => this._fetch_users_and_events(conversation_et)));
+      .get_users_by_id(userIds)
+      .then(() => conversationEntities.forEach(conversationEntity => this._fetch_users_and_events(conversationEntity)));
   }
 
   //##############################################################################
