@@ -7,7 +7,7 @@
     "@bower_components/bazinga64": "wireapp/bazinga64#5.0.3",
     "@bower_components/bytebuffer": "dcodeIO/ByteBuffer.js#~3",
     "@bower_components/cryptojs": "brix/crypto-js#3.1.9-1",
-    "@bower_components/dexie": "dfahlander/Dexie.js#2.0.2",
+    "@bower_components/dexie": "dfahlander/Dexie.js#2.0.3",
     "@bower_components/generic-message-proto": "wireapp/generic-message-proto#1.20.0",
     "@bower_components/highlightjs": "components/highlightjs#9.12.0",
     "@bower_components/jquery": "jquery/jquery#3.3.1",
