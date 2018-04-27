@@ -34,7 +34,7 @@ class LoginSanitizer {
     }
 
     if (loginData.password) {
-      loginData.password = loginData.password.toString().replace(nonPrintableCharacters, '');
+      loginData.password = loginData.password.toString();
     }
 
     if (loginData.phone) {
