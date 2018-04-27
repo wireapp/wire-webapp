@@ -52,6 +52,7 @@ z.backup.BackupRepository = class BackupRepository {
 
     this.canceled = false;
 
+    this.CONVERSATIONS_STORE_NAME = z.storage.StorageSchemata.OBJECT_STORE.CONVERSATIONS;
     this.EVENTS_STORE_NAME = z.storage.StorageSchemata.OBJECT_STORE.EVENTS;
   }
 
@@ -67,7 +68,7 @@ z.backup.BackupRepository = class BackupRepository {
     this.canceled = isCanceled;
   }
 
-  createMetaDescription() {
+  createMetaData() {
     return {
       client_id: this.clientRepository.currentClient().id,
       creation_time: new Date().toISOString(),
@@ -84,45 +85,89 @@ z.backup.BackupRepository = class BackupRepository {
    * @returns {Promise<JSZip>} The promise that contains all the exported tables
    */
   generateHistory(progressCallback) {
-    const tables = this.backupService.getTables();
-    const metaData = this.createMetaDescription();
-    const tablesData = {};
     this.isCanceled = false;
 
-    const loadDataPromises = tables.map(table => {
-      return this.backupService.exportTable(table, (tableName, rows) => {
-        if (this.isCanceled) {
-          throw new z.backup.CancelError();
-        }
-        progressCallback(rows.length);
-
-        const isEventTable = tableName === this.EVENTS_STORE_NAME;
-        if (isEventTable) {
-          rows = rows.filter(event => event.type !== z.event.Client.CONVERSATION.VERIFICATION);
-        }
-
-        tablesData[tableName] = (tablesData[tableName] || []).concat(rows);
-      });
-    });
-
-    return Promise.all(loadDataPromises)
-      .then(() => {
-        const zip = new JSZip();
-
-        // first write the metadata file
-        zip.file(BackupRepository.CONFIG.FILENAME.METADATA, JSON.stringify(metaData));
-
-        // then all the other tables
-        Object.keys(tablesData).forEach(tableName => {
-          zip.file(`${tableName}.json`, JSON.stringify(tablesData[tableName]));
-        });
-
-        return zip;
-      })
+    return Promise.resolve()
+      .then(() => this._exportHistory(progressCallback))
+      .then(exportedData => this._compressHistoryFiles(exportedData))
       .catch(error => {
+        this.logger.error(`Could not export history: ${error.message}`, error);
+
         const isCancelError = error instanceof z.backup.CancelError;
         throw isCancelError ? error : new z.backup.ExportError();
       });
+  }
+
+  _exportHistory(progressCallback) {
+    const tables = this.backupService.getTables();
+    const tableData = {};
+
+    return Promise.resolve()
+      .then(() => this._exportHistoryConversations(tables, progressCallback))
+      .then(conversationsData => {
+        tableData[this.CONVERSATIONS_STORE_NAME] = conversationsData;
+        return this._exportHistoryEvents(tables, progressCallback);
+      })
+      .then(eventsData => {
+        tableData[this.EVENTS_STORE_NAME] = eventsData;
+        return tableData;
+      });
+  }
+
+  _exportHistoryConversations(tables, progressCallback) {
+    const conversationsTable = tables.find(table => table.name === this.CONVERSATIONS_STORE_NAME);
+    const onProgress = tableRows => {
+      progressCallback(tableRows.length);
+      tableRows.forEach(conversation => delete conversation.verification_state);
+    };
+
+    return this._exportHistoryFromTable(conversationsTable, onProgress);
+  }
+
+  _exportHistoryEvents(tables, progressCallback) {
+    const eventsTable = tables.find(table => table.name === this.EVENTS_STORE_NAME);
+    const onProgress = tableRows => {
+      progressCallback(tableRows.length);
+
+      for (let index = tableRows.length - 1; index >= 0; index -= 1) {
+        const event = tableRows[index];
+        const isTypeVerification = event.type === z.event.Client.CONVERSATION.VERIFICATION;
+        if (isTypeVerification) {
+          tableRows.splice(index, 1);
+        }
+      }
+    };
+
+    return this._exportHistoryFromTable(eventsTable, onProgress);
+  }
+
+  _exportHistoryFromTable(table, onProgress) {
+    const tableData = [];
+
+    return this.backupService
+      .exportTable(table, tableRows => {
+        if (this.isCanceled) {
+          throw new z.backup.CancelError();
+        }
+        onProgress(tableRows);
+        tableData.push(tableRows);
+      })
+      .then(() => [].concat(...tableData));
+  }
+
+  _compressHistoryFiles(exportedData) {
+    const metaData = this.createMetaData();
+    const zip = new JSZip();
+
+    // first write the metadata file
+    zip.file(BackupRepository.CONFIG.FILENAME.METADATA, JSON.stringify(metaData));
+
+    // then all the other tables
+    Object.keys(exportedData).forEach(tableName => {
+      zip.file(`${tableName}.json`, JSON.stringify(exportedData[tableName]));
+    });
+
+    return zip;
   }
 
   getBackupInitData() {
@@ -139,7 +184,11 @@ z.backup.BackupRepository = class BackupRepository {
 
     return this.verifyMetadata(files)
       .then(() => this._extractHistoryFiles(files))
-      .then(fileDescriptors => this._importHistoryData(fileDescriptors, initCallback, progressCallback));
+      .then(fileDescriptors => this._importHistoryData(fileDescriptors, initCallback, progressCallback))
+      .catch(error => {
+        this.logger.error(`Could not export history: ${error.message}`, error);
+        throw error;
+      });
   }
 
   _importHistoryData(fileDescriptors, initCallback, progressCallback) {
@@ -165,7 +214,7 @@ z.backup.BackupRepository = class BackupRepository {
     const entityCount = conversationEntities.length;
     let importedEntities = 0;
 
-    const entityChunks = z.util.ArrayUtil.chunk(conversationEntities, 5000);
+    const entityChunks = z.util.ArrayUtil.chunk(conversationEntities, z.backup.BackupService.CONFIG.BATCH_SIZE);
 
     const importConversationChunk = chunk =>
       this.conversationRepository.updateConversations(chunk).then(() => {
@@ -182,7 +231,7 @@ z.backup.BackupRepository = class BackupRepository {
     let importedEntities = 0;
 
     const entities = eventEntities.map(entity => this.mapEntityDataType(entity));
-    const entityChunks = z.util.ArrayUtil.chunk(entities, 5000);
+    const entityChunks = z.util.ArrayUtil.chunk(entities, z.backup.BackupService.CONFIG.BATCH_SIZE);
 
     const importEventChunk = chunk =>
       this.backupService.importEntities(this.EVENTS_STORE_NAME, chunk).then(() => {
@@ -235,7 +284,7 @@ z.backup.BackupRepository = class BackupRepository {
   }
 
   _verifyMetadata(archiveMetadata) {
-    const localMetadata = this.createMetaDescription();
+    const localMetadata = this.createMetaData();
     const isExpectedUserId = archiveMetadata.user_id === localMetadata.user_id;
     if (!isExpectedUserId) {
       const fromUserId = archiveMetadata.user_id;
