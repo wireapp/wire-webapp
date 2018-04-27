@@ -116,8 +116,10 @@ z.backup.BackupRepository = class BackupRepository {
 
   _exportHistoryConversations(tables, progressCallback) {
     const conversationsTable = tables.find(table => table.name === this.CONVERSATIONS_STORE_NAME);
-    const onProgress = tableRows => {
+    const onProgress = (tableRows, exportedEntitiesCount) => {
       progressCallback(tableRows.length);
+      this.logger.log(`Exported '${exportedEntitiesCount}' conversation states from history`);
+
       tableRows.forEach(conversation => delete conversation.verification_state);
     };
 
@@ -126,8 +128,9 @@ z.backup.BackupRepository = class BackupRepository {
 
   _exportHistoryEvents(tables, progressCallback) {
     const eventsTable = tables.find(table => table.name === this.EVENTS_STORE_NAME);
-    const onProgress = tableRows => {
+    const onProgress = (tableRows, exportedEntitiesCount) => {
       progressCallback(tableRows.length);
+      this.logger.log(`Exported '${exportedEntitiesCount}' events from history`);
 
       for (let index = tableRows.length - 1; index >= 0; index -= 1) {
         const event = tableRows[index];
@@ -143,13 +146,16 @@ z.backup.BackupRepository = class BackupRepository {
 
   _exportHistoryFromTable(table, onProgress) {
     const tableData = [];
+    let exportedEntitiesCount = 0;
 
     return this.backupService
       .exportTable(table, tableRows => {
         if (this.isCanceled) {
           throw new z.backup.CancelError();
         }
-        onProgress(tableRows);
+        exportedEntitiesCount += tableRows.length;
+
+        onProgress(tableRows, exportedEntitiesCount);
         tableData.push(tableRows);
       })
       .then(() => [].concat(...tableData));
@@ -219,7 +225,7 @@ z.backup.BackupRepository = class BackupRepository {
     const importConversationChunk = chunk =>
       this.conversationRepository.updateConversations(chunk).then(() => {
         importedEntities += chunk.length;
-        this.logger.log(`Imported ${importedEntities} of ${entityCount} conversation states from backup`);
+        this.logger.log(`Imported '${importedEntities}' of '${entityCount}' conversation states from backup`);
         progressCallback(chunk.length);
       });
 
@@ -236,7 +242,7 @@ z.backup.BackupRepository = class BackupRepository {
     const importEventChunk = chunk =>
       this.backupService.importEntities(this.EVENTS_STORE_NAME, chunk).then(() => {
         importedEntities += chunk.length;
-        this.logger.log(`Imported ${importedEntities} of ${entityCount} events from backup`);
+        this.logger.log(`Imported '${importedEntities}' of '${entityCount}' events from backup`);
         progressCallback(chunk.length);
       });
 
