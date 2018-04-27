@@ -34,7 +34,7 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
 
   static get CONFIG() {
     return {
-      EXPORT_FILE_EXTENSION: 'desktop_wbu',
+      FILE_EXTENSION: 'desktop_wbu',
     };
   }
 
@@ -83,19 +83,21 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
     this.state(HistoryExportViewModel.STATE.PREPARING);
     this.hasError(false);
     this.backupRepository.getBackupInitData().then(({numberOfRecords, userName}) => {
+      this.logger.log(`Exporting '${numberOfRecords}' records from history`);
+
       this.numberOfRecords(numberOfRecords);
       this.numberOfProcessedRecords(0);
+
       this.backupRepository
         .generateHistory(this.onProgress.bind(this))
         .then(archive => archive.generateAsync({compression: 'DEFLATE', type: 'blob'}))
         .then(archiveBlob => {
           const timestamp = new Date().toISOString().substring(0, 10);
-          const filename = `Wire-${userName}-Backup_${timestamp}.${
-            z.viewModel.content.HistoryExportViewModel.CONFIG.EXPORT_FILE_EXTENSION
-          }`;
+          const filename = `Wire-${userName}-Backup_${timestamp}.${HistoryExportViewModel.CONFIG.FILE_EXTENSION}`;
           this.onSuccess();
 
           z.util.downloadBlob(archiveBlob, filename, 'application/octet-stream');
+          this.logger.log(`Completed export of '${numberOfRecords}' records from history`);
         })
         .catch(this.onError.bind(this));
     });
@@ -108,7 +110,6 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
   onProgress(processedNumber) {
     this.state(HistoryExportViewModel.STATE.EXPORTING);
     this.numberOfProcessedRecords(this.numberOfProcessedRecords() + processedNumber);
-    this.logger.log(`Exported '${this.numberOfProcessedRecords()}' of '${this.numberOfRecords()}' entities`);
   }
 
   onError(error) {
