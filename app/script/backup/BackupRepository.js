@@ -244,11 +244,14 @@ z.backup.BackupRepository = class BackupRepository {
   }
 
   _chunkImport(importFunction, chunks) {
-    return chunks.reduce(
-      (promise, chunk) =>
-        promise.then(result => (this.isCanceled ? Promise.reject(new z.backup.CancelError()) : importFunction(chunk))),
-      Promise.resolve()
-    );
+    return chunks.reduce((promise, chunk) => {
+      return promise.then(result => {
+        if (this.isCanceled) {
+          return Promise.reject(new z.backup.CancelError());
+        }
+        return importFunction(chunk);
+      });
+    }, Promise.resolve());
   }
 
   _extractHistoryFiles(files) {
