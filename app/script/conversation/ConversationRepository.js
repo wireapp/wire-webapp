@@ -348,17 +348,15 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
         const unknownConversationsData = conversationsData
           .map(conversationData => {
-            const conversationEntity = this.conversations().find(conversation => {
-              return conversation.id === conversationData.id;
-            });
+            let conversationEntity = this.conversations().find(({id}) => id === conversationData.id);
 
             if (conversationEntity) {
-              const updatedConversationEntity = this.conversation_mapper.update_self_status(
+              conversationEntity = this.conversation_mapper.update_self_status(
                 conversationEntity,
                 conversationData,
                 true
               );
-              updatedConversationEntities.push(updatedConversationEntity);
+              updatedConversationEntities.push(conversationEntity);
             } else {
               return conversationData;
             }
@@ -366,9 +364,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
           .filter(conversationData => conversationData);
 
         this._update_conversations(updatedConversationEntities);
-        const updatedConversationsData = updatedConversationEntities.map(conversationEntity =>
-          conversationEntity.serialize()
-        );
+        const updatedConversationsData = updatedConversationEntities.map(conversationEntity => {
+          return conversationEntity.serialize();
+        });
         return this.conversation_service
           .save_conversations_in_db(updatedConversationsData)
           .then(() => unknownConversationsData);
