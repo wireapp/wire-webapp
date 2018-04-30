@@ -341,6 +341,38 @@ z.conversation.ConversationRepository = class ConversationRepository {
       });
   }
 
+  updateConversationStates(conversationsData) {
+    const handledConversationEntities = [];
+
+    return Promise.resolve()
+      .then(() => {
+        const unknownConversations = [];
+
+        conversationsData.forEach(conversationData => {
+          const conversationEntity = this.conversations().find(({id}) => id === conversationData.id);
+
+          if (conversationEntity) {
+            const entity = this.conversation_mapper.update_self_status(conversationEntity, conversationData, true);
+            return handledConversationEntities.push(entity);
+          }
+
+          unknownConversations.push(conversationData);
+        });
+
+        return unknownConversations.length ? this.map_conversations(unknownConversations) : [];
+      })
+      .then(conversationEntities => {
+        if (conversationEntities.length) {
+          this.save_conversations(conversationEntities);
+        }
+        conversationEntities = conversationEntities.concat(handledConversationEntities);
+
+        const handledConversationData = conversationEntities.map(conversationEntity => conversationEntity.serialize());
+        this.conversation_service.save_conversations_in_db(handledConversationData);
+        return conversationEntities;
+      });
+  }
+
   /**
    * Get Message with given ID from the database.
    *
@@ -552,7 +584,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {undefined} No return value
    */
   update_conversations_archived() {
-    this._update_conversations(this.conversations_archived());
+    this.updateConversations(this.conversations_archived());
   }
 
   /**
@@ -569,23 +601,23 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {undefined} No return value
    */
   update_conversations_unarchived() {
-    this._update_conversations(this.conversations_unarchived());
+    this.updateConversations(this.conversations_unarchived());
   }
 
   /**
    * Get users and events for conversations.
    *
    * @note To reduce the number of backend calls we merge the user IDs of all conversations first.
-   * @private
-   * @param {Array<Conversation>} conversation_ets - Array of conversation entities to be updated
+   * @param {Array<Conversation>} conversationEntities - Array of conversation entities to be updated
    * @returns {undefined} No return value
    */
-  _update_conversations(conversation_ets) {
-    const user_ids = _.flatten(conversation_ets.map(conversation_et => conversation_et.participating_user_ids()));
+  updateConversations(conversationEntities) {
+    const mapOfUserIds = conversationEntities.map(conversationEntity => conversationEntity.participating_user_ids());
+    const userIds = _.flatten(mapOfUserIds);
 
     this.user_repository
-      .get_users_by_id(user_ids)
-      .then(() => conversation_ets.forEach(conversation_et => this._fetch_users_and_events(conversation_et)));
+      .get_users_by_id(userIds)
+      .then(() => conversationEntities.forEach(conversationEntity => this._fetch_users_and_events(conversationEntity)));
   }
 
   //##############################################################################
@@ -935,7 +967,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   _handle_mapped_conversation(conversation_et) {
     this._mapGuestStatusSelf(conversation_et);
     conversation_et.self = this.selfUser();
-    conversation_et.subscribe_to_state_updates();
+    conversation_et.setStateChangePersistence(true);
   }
 
   map_guest_status_self() {

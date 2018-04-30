@@ -1,4 +1,4 @@
-z.telemetry.calling.CallLogger = class CallLogger extends z.util.Logger {
+z.telemetry.calling.CallLogger = class CallLogger {
   static get CONFIG() {
     return {
       MESSAGE_LOG_LENGTH: 10000,
@@ -37,7 +37,8 @@ z.telemetry.calling.CallLogger = class CallLogger extends z.util.Logger {
   }
 
   constructor(name, options, messageLog) {
-    super(name, options);
+    this.logger = new z.util.Logger(name, options);
+    this.levels = this.logger.levels;
 
     this.messageLog = messageLog;
     this.name = name;
@@ -199,7 +200,27 @@ z.telemetry.calling.CallLogger = class CallLogger extends z.util.Logger {
     return this.obfuscationMode === CallLogger.OBFUSCATION_MODE.SOFT;
   }
 
-  _print_log(args) {
+  debug() {
+    this._log([this.logger.levels.DEBUG].concat(...arguments));
+  }
+
+  error() {
+    this._log([this.logger.levels.ERROR].concat(...arguments));
+  }
+
+  info() {
+    this._log([this.logger.levels.INFO].concat(...arguments));
+  }
+
+  warn() {
+    this._log([this.logger.levels.WARN].concat(...arguments));
+  }
+
+  log() {
+    this._log([this.logger.levels.INFO].concat(...arguments));
+  }
+
+  _log(args) {
     // Use obfuscated format for call logs if possible
     const [firstArgument, secondArgument] = args;
     const isLogMessageObject = typeof secondArgument === 'object';
@@ -213,7 +234,7 @@ z.telemetry.calling.CallLogger = class CallLogger extends z.util.Logger {
         args[1] = defaultMessage;
 
         this.logToMemory(firstArgument(), obfuscatedMessage);
-        return super._print_log(args);
+        return this.logger.log(...args);
       }
     }
 
@@ -221,6 +242,6 @@ z.telemetry.calling.CallLogger = class CallLogger extends z.util.Logger {
     const logLevel = hasMultipleArgs ? firstArgument() : CallLogger.LOG_LEVEL.INFO;
     const logMessage = hasMultipleArgs ? secondArgument : firstArgument;
     this.logToMemory(logLevel, logMessage);
-    return super._print_log(args);
+    this.logger.log(...args);
   }
 };

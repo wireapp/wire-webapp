@@ -312,14 +312,7 @@ z.string.pl.conversationsConnectionRequestMany = '{{number}} osób oczekujących
 z.string.pl.conversationsConnectionRequestOne = '1 osoba czeka';
 z.string.pl.conversationsEmptyConversation = 'Rozmowa grupowa';
 z.string.pl.conversationsNoConversations = 'Brak jeszcze konwersacji';
-z.string.pl.conversationsPopoverArchive = 'Archiwizuj';
-z.string.pl.conversationsPopoverBlock = 'Zablokuj';
 z.string.pl.conversationsPopoverCancel = 'Anuluj żądanie';
-z.string.pl.conversationsPopoverClear = 'Usuń';
-z.string.pl.conversationsPopoverLeave = 'Opuść';
-z.string.pl.conversationsPopoverNotify = 'Włącz dźwięk';
-z.string.pl.conversationsPopoverSilence = 'Wycisz';
-z.string.pl.conversationsPopoverUnarchive = 'Przywróć z archiwum';
 
 z.string.pl.conversationsSecondaryLineMissedCall = '{{number}} nieodebrane połączenie';
 z.string.pl.conversationsSecondaryLineMissedCalls = 'nieodebranych połączeń: {{number}}';
@@ -435,7 +428,6 @@ z.string.pl.preferencesDevicesCurrent = 'Aktualny';
 z.string.pl.preferencesDevicesFingerprint = 'Unikalny odcisk palca';
 z.string.pl.preferencesDevicesFingerprintDetail = 'Wire daje każdemu urządzeniowi unikalny odcisk palca. Porównaj i sprawdź swoje urządzenia oraz konwersacje.';
 z.string.pl.preferencesDevicesId = 'ID: ';
-z.string.pl.preferencesDevicesRemove = 'Usuń';
 z.string.pl.preferencesDevicesRemoveCancel = 'Anuluj';
 z.string.pl.preferencesDevicesRemoveDetail = 'Usuń urządzenie, jeśli przestałeś je używać. Będziesz natychmiast wylogowany z tego urządzenia.';
 z.string.pl.preferencesDevicesSessionConfirmation = 'Sesja została zresetowana.';
@@ -467,6 +459,10 @@ z.string.pl.preferencesOptionsNotificationsNone = 'Wyłącz';
 z.string.pl.preferencesOptionsNotificationsObfuscate = 'Ukryj szczegóły';
 z.string.pl.preferencesOptionsNotificationsObfuscateMessage = 'Pokaż nadawcę';
 z.string.pl.preferencesOptionsNotificationsOn = 'Pokaż nadawcę i wiadomości';
+
+z.string.pl.backupExportSuccessAction = 'OK';
+z.string.pl.backupImportGenericErrorHeadline = 'Coś poszło nie tak';
+z.string.pl.backupCancel = 'Anuluj';
 
 z.string.pl.searchConnect = 'Połącz';
 z.string.pl.searchConnections = 'Połączenia';

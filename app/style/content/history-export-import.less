@@ -4,6 +4,8 @@
   height: 100%;
   flex-direction: column;
   align-items: center;
+  margin-left: -@left-width;
+  background-color: @app-bg;
 
   loading-bar {
     margin: auto;
@@ -19,6 +21,7 @@
     font-size: 14px;
     font-weight: @font-weight-regular;
     line-height: 16px;
+    user-select: none;
   }
 
   .history-message {

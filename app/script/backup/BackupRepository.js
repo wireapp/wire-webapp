@@ -25,7 +25,12 @@ window.z.backup = z.backup || {};
 z.backup.BackupRepository = class BackupRepository {
   static get CONFIG() {
     return {
-      META_FILENAME: 'export.json',
+      FILENAME: {
+        CONVERSATIONS: 'conversations.json',
+        EVENTS: 'events.json',
+        METADATA: 'export.json',
+      },
+      UINT8ARRAY_FIELDS: ['otr_key', 'sha256'],
     };
   }
 
@@ -34,23 +39,36 @@ z.backup.BackupRepository = class BackupRepository {
    * @class z.backup.BackupRepository
    * @param {z.backup.BackupService} backupService - Backup service implementation
    * @param {z.client.ClientRepository} clientRepository - Repository for all client interactions
+   * @param {z.conversation.ConversationRepository} conversationRepository - Repository for all conversation interactions
    * @param {z.user.UserRepository} userRepository - Repository for all user and connection interactions
    */
-  constructor(backupService, clientRepository, userRepository) {
+  constructor(backupService, clientRepository, conversationRepository, userRepository) {
     this.logger = new z.util.Logger('z.backup.BackupRepository', z.config.LOGGER.OPTIONS);
 
     this.backupService = backupService;
     this.clientRepository = clientRepository;
+    this.conversationRepository = conversationRepository;
     this.userRepository = userRepository;
 
-    this.isCanceled = false;
+    this.canceled = false;
+
+    this.CONVERSATIONS_STORE_NAME = z.storage.StorageSchemata.OBJECT_STORE.CONVERSATIONS;
+    this.EVENTS_STORE_NAME = z.storage.StorageSchemata.OBJECT_STORE.EVENTS;
   }
 
   cancelAction() {
     this.isCanceled = true;
   }
 
-  createMetaDescription() {
+  get isCanceled() {
+    return this.canceled;
+  }
+
+  set isCanceled(isCanceled) {
+    this.canceled = isCanceled;
+  }
+
+  createMetaData() {
     return {
       client_id: this.clientRepository.currentClient().id,
       creation_time: new Date().toISOString(),
@@ -67,44 +85,95 @@ z.backup.BackupRepository = class BackupRepository {
    * @returns {Promise<JSZip>} The promise that contains all the exported tables
    */
   generateHistory(progressCallback) {
-    const tables = this.backupService.getTables();
-    const meta = this.createMetaDescription();
-    const tablesData = {};
     this.isCanceled = false;
 
-    const loadDataPromises = tables.map(table => {
-      return this.backupService.exportTable(table, (tableName, rows) => {
+    return Promise.resolve()
+      .then(() => this._exportHistory(progressCallback))
+      .then(exportedData => this._compressHistoryFiles(exportedData))
+      .catch(error => {
+        this.logger.error(`Could not export history: ${error.message}`, error);
+
+        const isCancelError = error instanceof z.backup.CancelError;
+        throw isCancelError ? error : new z.backup.ExportError();
+      });
+  }
+
+  _exportHistory(progressCallback) {
+    const tables = this.backupService.getTables();
+    const tableData = {};
+
+    return Promise.resolve()
+      .then(() => this._exportHistoryConversations(tables, progressCallback))
+      .then(conversationsData => {
+        tableData[this.CONVERSATIONS_STORE_NAME] = conversationsData;
+        return this._exportHistoryEvents(tables, progressCallback);
+      })
+      .then(eventsData => {
+        tableData[this.EVENTS_STORE_NAME] = eventsData;
+        return tableData;
+      });
+  }
+
+  _exportHistoryConversations(tables, progressCallback) {
+    const conversationsTable = tables.find(table => table.name === this.CONVERSATIONS_STORE_NAME);
+    const onProgress = (tableRows, exportedEntitiesCount) => {
+      progressCallback(tableRows.length);
+      this.logger.log(`Exported '${exportedEntitiesCount}' conversation states from history`);
+
+      tableRows.forEach(conversation => delete conversation.verification_state);
+    };
+
+    return this._exportHistoryFromTable(conversationsTable, onProgress);
+  }
+
+  _exportHistoryEvents(tables, progressCallback) {
+    const eventsTable = tables.find(table => table.name === this.EVENTS_STORE_NAME);
+    const onProgress = (tableRows, exportedEntitiesCount) => {
+      progressCallback(tableRows.length);
+      this.logger.log(`Exported '${exportedEntitiesCount}' events from history`);
+
+      for (let index = tableRows.length - 1; index >= 0; index -= 1) {
+        const event = tableRows[index];
+        const isTypeVerification = event.type === z.event.Client.CONVERSATION.VERIFICATION;
+        if (isTypeVerification) {
+          tableRows.splice(index, 1);
+        }
+      }
+    };
+
+    return this._exportHistoryFromTable(eventsTable, onProgress);
+  }
+
+  _exportHistoryFromTable(table, onProgress) {
+    const tableData = [];
+    let exportedEntitiesCount = 0;
+
+    return this.backupService
+      .exportTable(table, tableRows => {
         if (this.isCanceled) {
           throw new z.backup.CancelError();
         }
-        progressCallback(rows.length);
-        tablesData[tableName] = (tablesData[tableName] || []).concat(rows);
-      });
+        exportedEntitiesCount += tableRows.length;
+
+        onProgress(tableRows, exportedEntitiesCount);
+        tableData.push(tableRows);
+      })
+      .then(() => [].concat(...tableData));
+  }
+
+  _compressHistoryFiles(exportedData) {
+    const metaData = this.createMetaData();
+    const zip = new JSZip();
+
+    // first write the metadata file
+    zip.file(BackupRepository.CONFIG.FILENAME.METADATA, JSON.stringify(metaData));
+
+    // then all the other tables
+    Object.keys(exportedData).forEach(tableName => {
+      zip.file(`${tableName}.json`, JSON.stringify(exportedData[tableName]));
     });
 
-    return Promise.all(loadDataPromises)
-      .then(() => {
-        const zip = new JSZip();
-
-        // first write the metadata file
-        zip.file(BackupRepository.CONFIG.META_FILENAME, JSON.stringify(meta));
-
-        // then all the other tables
-        Object.keys(tablesData).forEach(tableName => {
-          zip.file(`${tableName}.json`, JSON.stringify(tablesData[tableName]));
-        });
-
-        return zip;
-      })
-      .catch(error => {
-        this.logger.error(`Failed to export history: ${error.message}`, error);
-
-        if (error instanceof z.backup.CancelError) {
-          throw error;
-        }
-
-        throw new z.backup.ExportError();
-      });
+    return zip;
   }
 
   getBackupInitData() {
@@ -115,43 +184,128 @@ z.backup.BackupRepository = class BackupRepository {
   importHistory(archive, initCallback, progressCallback) {
     this.isCanceled = false;
     const files = archive.files;
-    if (!files[BackupRepository.CONFIG.META_FILENAME]) {
+    if (!files[BackupRepository.CONFIG.FILENAME.METADATA]) {
       throw new z.backup.InvalidMetaDataError();
     }
 
-    const verifyMetadataPromise = files[BackupRepository.CONFIG.META_FILENAME]
-      .async('string')
-      .then(JSON.parse)
-      .then(metadata => this.verifyMetadata(metadata));
-
-    const unzipPromises = Object.values(archive.files)
-      .filter(zippedFile => zippedFile.name !== BackupRepository.CONFIG.META_FILENAME)
-      .map(zippedFile => zippedFile.async('string').then(value => ({content: value, filename: zippedFile.name})));
-
-    const importEntriesPromise = Promise.all(unzipPromises).then(fileDescriptors => {
-      initCallback(fileDescriptors.length);
-      fileDescriptors.forEach(fileDescriptor => {
-        if (this.isCanceled) {
-          throw new z.backup.CancelError();
-        }
-        const tableName = fileDescriptor.filename.replace('.json', '');
-        const entities = JSON.parse(fileDescriptor.content);
-        entities.forEach(entity => this.backupService.importEntity(tableName, entity));
-        progressCallback();
+    return this.verifyMetadata(files)
+      .then(() => this._extractHistoryFiles(files))
+      .then(fileDescriptors => this._importHistoryData(fileDescriptors, initCallback, progressCallback))
+      .catch(error => {
+        this.logger.error(`Could not export history: ${error.message}`, error);
+        throw error;
       });
-    });
-
-    return Promise.all([verifyMetadataPromise, importEntriesPromise]);
   }
 
-  verifyMetadata(archiveMetadata) {
-    const localMetadata = this.createMetaDescription();
+  _importHistoryData(fileDescriptors, initCallback, progressCallback) {
+    const conversationFileDescriptor = fileDescriptors.find(fileDescriptor => {
+      return fileDescriptor.filename === BackupRepository.CONFIG.FILENAME.CONVERSATIONS;
+    });
+
+    const eventFileDescriptor = fileDescriptors.find(fileDescriptor => {
+      return fileDescriptor.filename === BackupRepository.CONFIG.FILENAME.EVENTS;
+    });
+
+    const conversationEntities = JSON.parse(conversationFileDescriptor.content);
+    const eventEntities = JSON.parse(eventFileDescriptor.content);
+    const entityCount = conversationEntities.length + eventEntities.length;
+    initCallback(entityCount);
+
+    return this._importHistoryConversations(conversationEntities, progressCallback)
+      .then(importedEntities => this._importHistoryEvents(eventEntities, progressCallback).then(() => importedEntities))
+      .then(importedEntities => this.conversationRepository.updateConversations(importedEntities));
+  }
+
+  _importHistoryConversations(conversationEntities, progressCallback) {
+    const entityCount = conversationEntities.length;
+    let importedEntities = [];
+
+    const entityChunks = z.util.ArrayUtil.chunk(conversationEntities, z.backup.BackupService.CONFIG.BATCH_SIZE);
+
+    const importConversationChunk = chunk =>
+      this.conversationRepository.updateConversationStates(chunk).then(importedConversationEntities => {
+        importedEntities = importedEntities.concat(importedConversationEntities);
+        this.logger.log(`Imported '${importedEntities.length}' of '${entityCount}' conversation states from backup`);
+        progressCallback(chunk.length);
+      });
+
+    return this._chunkImport(importConversationChunk, entityChunks).then(() => importedEntities);
+  }
+
+  _importHistoryEvents(eventEntities, progressCallback) {
+    const entityCount = eventEntities.length;
+    let importedEntities = 0;
+
+    const entities = eventEntities.map(entity => this.mapEntityDataType(entity));
+    const entityChunks = z.util.ArrayUtil.chunk(entities, z.backup.BackupService.CONFIG.BATCH_SIZE);
+
+    const importEventChunk = chunk =>
+      this.backupService.importEntities(this.EVENTS_STORE_NAME, chunk).then(() => {
+        importedEntities += chunk.length;
+        this.logger.log(`Imported '${importedEntities}' of '${entityCount}' events from backup`);
+        progressCallback(chunk.length);
+      });
+
+    return this._chunkImport(importEventChunk, entityChunks);
+  }
+
+  _chunkImport(importFunction, chunks) {
+    return chunks.reduce((promise, chunk) => {
+      return promise.then(result => {
+        if (this.isCanceled) {
+          return Promise.reject(new z.backup.CancelError());
+        }
+        return importFunction(chunk);
+      });
+    }, Promise.resolve());
+  }
+
+  _extractHistoryFiles(files) {
+    const unzipPromises = Object.values(files)
+      .filter(zippedFile => zippedFile.name !== BackupRepository.CONFIG.FILENAME.METADATA)
+      .map(zippedFile => zippedFile.async('string').then(value => ({content: value, filename: zippedFile.name})));
+
+    return Promise.all(unzipPromises).then(fileDescriptors => {
+      this.logger.log('Unzipped files for history import', fileDescriptors);
+      return fileDescriptors;
+    });
+  }
+
+  mapEntityDataType(entity) {
+    if (entity.data) {
+      BackupRepository.CONFIG.UINT8ARRAY_FIELDS.forEach(field => {
+        const dataField = entity.data[field];
+        if (dataField) {
+          const values = Object.keys(dataField).map(key => dataField[key]);
+          entity.data[field] = new Uint8Array(values);
+        }
+      });
+    }
+    return entity;
+  }
+
+  verifyMetadata(files) {
+    return files[BackupRepository.CONFIG.FILENAME.METADATA]
+      .async('string')
+      .then(JSON.parse)
+      .then(metadata => this._verifyMetadata(metadata))
+      .then(() => this.logger.log('Validated metadata during history import', files));
+  }
+
+  _verifyMetadata(archiveMetadata) {
+    const localMetadata = this.createMetaData();
     const isExpectedUserId = archiveMetadata.user_id === localMetadata.user_id;
     if (!isExpectedUserId) {
       const fromUserId = archiveMetadata.user_id;
       const toUserId = localMetadata.user_id;
       const message = `History from user "${fromUserId}" cannot be restored for user "${toUserId}".`;
       throw new z.backup.DifferentAccountError(message);
+    }
+
+    const isExpectedPlatform = archiveMetadata.platform === localMetadata.platform;
+    if (!isExpectedPlatform) {
+      const message = `History created from "${archiveMetadata.platform}" device cannot be imported`;
+      throw new z.backup.IncompatiblePlatformError(message);
     }
 
     const isExpectedVersion = archiveMetadata.version === localMetadata.version;

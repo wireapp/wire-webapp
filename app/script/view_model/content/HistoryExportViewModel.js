@@ -34,11 +34,14 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
 
   static get CONFIG() {
     return {
-      EXPORT_FILE_EXTENSION: 'desktop_wbu',
+      FILE_EXTENSION: 'desktop_wbu',
     };
   }
 
   constructor(mainViewModel, contentViewModel, repositories) {
+    this.backupRepository = repositories.backup;
+    this.logger = new z.util.Logger('z.viewModel.content.HistoryExportViewModel', z.config.LOGGER.OPTIONS);
+
     this.hasError = ko.observable(false);
     this.state = ko.observable(HistoryExportViewModel.STATE.PREPARING);
     this.isPreparing = ko.pureComputed(() => {
@@ -51,7 +54,9 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
 
     this.numberOfRecords = ko.observable(0);
     this.numberOfProcessedRecords = ko.observable(0);
-    this.loadingProgress = ko.pureComputed(() => this.numberOfProcessedRecords() / this.numberOfRecords() * 100);
+    this.loadingProgress = ko.pureComputed(() => {
+      return Math.floor(this.numberOfProcessedRecords() / this.numberOfRecords() * 100);
+    });
 
     this.loadingMessage = ko.pureComputed(() => {
       switch (this.state()) {
@@ -71,8 +76,6 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
       }
     });
 
-    this.backupRepository = repositories.backup;
-
     amplify.subscribe(z.event.WebApp.BACKUP.EXPORT.START, this.exportHistory.bind(this));
   }
 
@@ -80,19 +83,21 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
     this.state(HistoryExportViewModel.STATE.PREPARING);
     this.hasError(false);
     this.backupRepository.getBackupInitData().then(({numberOfRecords, userName}) => {
+      this.logger.log(`Exporting '${numberOfRecords}' records from history`);
+
       this.numberOfRecords(numberOfRecords);
       this.numberOfProcessedRecords(0);
+
       this.backupRepository
         .generateHistory(this.onProgress.bind(this))
-        .then(archive => archive.generateAsync({type: 'blob'}))
+        .then(archive => archive.generateAsync({compression: 'DEFLATE', type: 'blob'}))
         .then(archiveBlob => {
           const timestamp = new Date().toISOString().substring(0, 10);
-          const filename = `Wire-${userName}-Backup_${timestamp}.${
-            z.viewModel.content.HistoryExportViewModel.CONFIG.EXPORT_FILE_EXTENSION
-          }`;
+          const filename = `Wire-${userName}-Backup_${timestamp}.${HistoryExportViewModel.CONFIG.FILE_EXTENSION}`;
           this.onSuccess();
 
-          z.util.downloadBlob(archiveBlob, filename);
+          z.util.downloadBlob(archiveBlob, filename, 'application/octet-stream');
+          this.logger.log(`Completed export of '${numberOfRecords}' records from history`);
         })
         .catch(this.onError.bind(this));
     });
@@ -109,14 +114,18 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
 
   onError(error) {
     if (error instanceof z.backup.CancelError) {
+      this.logger.log(`History export was cancelled`);
       return this.dismissExport();
     }
     this.hasError(true);
+    this.logger.error(`Failed to export history: ${error.message}`, error);
+    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.HISTORY.BACKUP_FAILED);
   }
 
   onSuccess(data) {
     this.state(HistoryExportViewModel.STATE.DONE);
     this.hasError(false);
+    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.HISTORY.BACKUP_SUCCEEDED);
   }
 
   onTryAgain() {

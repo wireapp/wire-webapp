@@ -301,14 +301,7 @@ z.string.pt.conversationsConnectionRequestMany = '{{number}} pessoas em espera';
 z.string.pt.conversationsConnectionRequestOne = '1 pessoa em espera';
 z.string.pt.conversationsEmptyConversation = 'Conversa em grupo';
 z.string.pt.conversationsNoConversations = 'Ainda não existem conversas';
-z.string.pt.conversationsPopoverArchive = 'Arquivar';
-z.string.pt.conversationsPopoverBlock = 'Bloquear';
 z.string.pt.conversationsPopoverCancel = 'Cancelar pedido';
-z.string.pt.conversationsPopoverClear = 'Eliminar';
-z.string.pt.conversationsPopoverLeave = 'Sair';
-z.string.pt.conversationsPopoverNotify = 'Activar som';
-z.string.pt.conversationsPopoverSilence = 'Desativar som';
-z.string.pt.conversationsPopoverUnarchive = 'Retirar do arquivo';
 
 z.string.pt.conversationsSecondaryLineMissedCall = '{{number}} chamada não atendida';
 z.string.pt.conversationsSecondaryLineMissedCalls = '{{number}} chamadas não atendida';
@@ -424,7 +417,6 @@ z.string.pt.preferencesDevicesCurrent = 'Atual';
 z.string.pt.preferencesDevicesFingerprint = 'Impressão digital da chave';
 z.string.pt.preferencesDevicesFingerprintDetail = 'O Wire gera em cada dispositivo uma impressão digital única. Compare-os e verifique se seus dispositivos e conversas.';
 z.string.pt.preferencesDevicesId = 'ID: ';
-z.string.pt.preferencesDevicesRemove = 'Remover';
 z.string.pt.preferencesDevicesRemoveCancel = 'Cancelar';
 z.string.pt.preferencesDevicesRemoveDetail = 'Remove este dispositivo se tiver parado de o usar. Terminará a sua sessão neste dispositivo imediatamente.';
 z.string.pt.preferencesDevicesSessionConfirmation = 'A sessão foi reposta.';
@@ -456,6 +448,9 @@ z.string.pt.preferencesOptionsNotificationsNone = 'Desligado';
 z.string.pt.preferencesOptionsNotificationsObfuscate = 'Ocultar detalhes';
 z.string.pt.preferencesOptionsNotificationsObfuscateMessage = 'Mostrar remetente';
 z.string.pt.preferencesOptionsNotificationsOn = 'Mostrar o remetente e a mensagem';
+
+z.string.pt.backupExportSuccessAction = 'Ok';
+z.string.pt.backupCancel = 'Cancelar';
 
 z.string.pt.searchConnect = 'Ligar';
 z.string.pt.searchConnections = 'Ligações';

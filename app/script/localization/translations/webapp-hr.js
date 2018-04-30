@@ -275,14 +275,7 @@ z.string.hr.conversationsConnectionRequestMany = '{{number}} ljudi čekaju';
 z.string.hr.conversationsConnectionRequestOne = '1 osoba čeka';
 z.string.hr.conversationsEmptyConversation = 'Grupni razgovor';
 z.string.hr.conversationsNoConversations = 'Nema razgovora';
-z.string.hr.conversationsPopoverArchive = 'Arhiviraj';
-z.string.hr.conversationsPopoverBlock = 'Blokiraj';
 z.string.hr.conversationsPopoverCancel = 'Poništi zahtjev';
-z.string.hr.conversationsPopoverClear = 'Obriši';
-z.string.hr.conversationsPopoverLeave = 'Izađi';
-z.string.hr.conversationsPopoverNotify = 'Uključi zvuk';
-z.string.hr.conversationsPopoverSilence = 'Isključi zvuk';
-z.string.hr.conversationsPopoverUnarchive = 'Dearhiviraj';
 
 z.string.hr.conversationsSecondaryLineTimedMessage = 'Odgođeno slanje';
 
@@ -378,7 +371,6 @@ z.string.hr.preferencesDevicesCurrent = 'Trenutno';
 z.string.hr.preferencesDevicesFingerprint = 'Otisak prsta';
 z.string.hr.preferencesDevicesFingerprintDetail = 'Wire daje svakom uređaju jedinstveni otisak. Usporedite otiske da bi verificirali uređaje i razgovore.';
 z.string.hr.preferencesDevicesId = 'ID: ';
-z.string.hr.preferencesDevicesRemove = 'Ukloni';
 z.string.hr.preferencesDevicesRemoveCancel = 'Odustani';
 z.string.hr.preferencesDevicesRemoveDetail = 'Uklonite ovaj uređaj ako ste ga prestali koristiti. Odmah ćete biti automatski odjavljeni.';
 z.string.hr.preferencesDevicesSessionConfirmation = 'Sesija je resetirana.';
@@ -405,6 +397,9 @@ z.string.hr.preferencesOptionsNotifications = 'Obavijesti';
 z.string.hr.preferencesOptionsNotificationsNone = 'Isključi';
 z.string.hr.preferencesOptionsNotificationsObfuscate = 'Sakrij detalje';
 z.string.hr.preferencesOptionsNotificationsOn = 'Prikaži pošiljatelja i poruku';
+
+z.string.hr.backupExportSuccessAction = 'Ok';
+z.string.hr.backupCancel = 'Odustani';
 
 z.string.hr.searchConnect = 'Poveži se';
 z.string.hr.searchConnections = 'Veze';

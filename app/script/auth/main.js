@@ -36,11 +36,16 @@ const core = configureCore(apiClient);
 const mixpanel = configureTracking();
 const cookieStore = CookieStore;
 
+let localStorage;
+try {
+  localStorage = window.localStorage;
+} catch (error) {}
+
 const store = configureStore({
   apiClient: core.apiClient,
   cookieStore,
   core,
-  localStorage: window.localStorage,
+  localStorage,
   mixpanel,
 });
 

@@ -224,10 +224,13 @@ z.entity.Conversation = class Conversation {
       return '…';
     });
 
-    this.persist_state = _.debounce(() => amplify.publish(z.event.WebApp.CONVERSATION.PERSIST_STATE, this), 100);
+    this.shouldPersistStateChanges = false;
+    this.publishPersistState = _.debounce(() => amplify.publish(z.event.WebApp.CONVERSATION.PERSIST_STATE, this), 100);
+
+    this._initSubscriptions();
   }
 
-  subscribe_to_state_updates() {
+  _initSubscriptions() {
     [
       this.archived_state,
       this.archived_timestamp,
@@ -244,7 +247,17 @@ z.entity.Conversation = class Conversation {
       this.status,
       this.type,
       this.verification_state,
-    ].forEach(property => property.subscribe(this.persist_state));
+    ].forEach(property => property.subscribe(this.persistState.bind(this)));
+  }
+
+  persistState() {
+    if (this.shouldPersistStateChanges) {
+      this.publishPersistState();
+    }
+  }
+
+  setStateChangePersistence(persistChanges) {
+    this.shouldPersistStateChanges = persistChanges;
   }
 
   /**
