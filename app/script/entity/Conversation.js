@@ -309,12 +309,12 @@ z.entity.Conversation = class Conversation {
         break;
     }
 
-    const updated_timestamp = allowDecrement ? timestamp : this._increment_time_only(entity_timestamp(), timestamp);
+    const updatedTimestamp = allowDecrement ? timestamp : this._increment_time_only(entity_timestamp(), timestamp);
 
-    if (updated_timestamp !== false) {
-      entity_timestamp(updated_timestamp);
+    if (updatedTimestamp !== false) {
+      entity_timestamp(updatedTimestamp);
     }
-    return updated_timestamp;
+    return updatedTimestamp;
   }
 
   /**
