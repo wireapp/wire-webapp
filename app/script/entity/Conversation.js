@@ -277,9 +277,10 @@ z.entity.Conversation = class Conversation {
    * @note This will only increment timestamps
    * @param {string|number} timestamp - Timestamp to be set
    * @param {z.conversation.TIMESTAMP_TYPE} type - Type of timestamp to be updated
+   * @param {boolean} allowDecrement - Allow setting a timestamp older than the current timestamp
    * @returns {boolean|number} Timestamp value which can be 'false' (boolean) if there is no timestamp
    */
-  set_timestamp(timestamp, type) {
+  set_timestamp(timestamp, type, allowDecrement = false) {
     let entity_timestamp;
     if (_.isString(timestamp)) {
       timestamp = window.parseInt(timestamp, 10);
@@ -308,8 +309,9 @@ z.entity.Conversation = class Conversation {
         break;
     }
 
-    const updated_timestamp = this._increment_time_only(entity_timestamp(), timestamp);
-    if (updated_timestamp) {
+    const updated_timestamp = allowDecrement ? timestamp : this._increment_time_only(entity_timestamp(), timestamp);
+
+    if (updated_timestamp !== false) {
       entity_timestamp(updated_timestamp);
     }
     return updated_timestamp;
