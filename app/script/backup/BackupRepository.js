@@ -214,10 +214,8 @@ z.backup.BackupRepository = class BackupRepository {
     return this._importHistoryConversations(conversationEntities, progressCallback)
       .then(importedEntities => this._importHistoryEvents(eventEntities, progressCallback).then(() => importedEntities))
       .then(importedEntities => {
-        return Promise.all([
-          this.conversationRepository.updateConversations(importedEntities),
-          this.conversationRepository.map_connections(this.userRepository.connections()),
-        ]).then(([updatedConversations]) => updatedConversations);
+        this.conversationRepository.updateConversations(importedEntities);
+        this.conversationRepository.map_connections(this.userRepository.connections());
       });
   }
 
