@@ -7,7 +7,7 @@
     "@wireapp/proteus": "7.1.26",
     "@wireapp/store-engine": "0.9.1",
     "dexie": "2.0.3",
-    "fs-extra": "5.0.0"
+    "fs-extra": "6.0.0"
   },
   "description": "High-level API with persistent storage for Proteus.",
   "devDependencies": {
