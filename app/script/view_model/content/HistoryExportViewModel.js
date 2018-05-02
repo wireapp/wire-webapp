@@ -112,7 +112,7 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
 
   downloadArchiveFile() {
     const timestamp = new Date().toISOString().substring(0, 10);
-    const userName = this.userRepository.self().name();
+    const userName = this.userRepository.self().username();
     const filename = `Wire-${userName}-Backup_${timestamp}.${HistoryExportViewModel.CONFIG.FILE_EXTENSION}`;
 
     this.dismissExport();
