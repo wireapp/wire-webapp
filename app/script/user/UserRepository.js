@@ -340,9 +340,7 @@ z.user.UserRepository = class UserRepository {
         }
 
         if (connection_ets.length) {
-          return this.update_user_connections(connection_ets, true).then(() => {
-            return this.connections();
-          });
+          return this.update_user_connections(connection_ets, true).then(() => this.connections());
         }
 
         return this.connections();
