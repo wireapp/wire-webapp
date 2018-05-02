@@ -399,7 +399,7 @@ z.string.fr.groupParticipantActionSendRequest = 'Se connecter';
 
 z.string.fr.guestOptionsCreateLink = 'Créer le lien';
 z.string.fr.guestOptionsInfoHeader = 'Inviter des personnes via un lien';
-z.string.fr.guestOptionsInfoText = 'N’importe qui avec le lien peut rejoindre la conversation, même s’ils n'utilisent pas Wire.';
+z.string.fr.guestOptionsInfoText = 'N’importe qui avec le lien peut rejoindre la conversation, même s’ils n’utilisent pas Wire.';
 z.string.fr.guestOptionsRevokeLink = 'Révoquer le lien';
 
 z.string.fr.participantDevicesDetailHeadline = 'Vérifiez que cela correspond à l’empreinte affichée sur {{html1}}l’appareil de {{user}}{{html2}}.';
