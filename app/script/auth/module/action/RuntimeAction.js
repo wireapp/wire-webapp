@@ -69,7 +69,7 @@ function hasCookieSupport() {
 function hasIndexedDbSupport() {
   let supportIndexedDb;
   try {
-    supportIndexedDb = !!window.indexedDb;
+    supportIndexedDb = !!window.indexedDB;
   } catch (error) {
     supportIndexedDb = false;
   }
