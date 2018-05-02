@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@types/node": "9.6.6",
+    "@types/node": "10.0.2",
     "pure-uuid": "1.5.2"
   },
   "devDependencies": {
