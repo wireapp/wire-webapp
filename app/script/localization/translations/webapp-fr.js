@@ -332,7 +332,11 @@ z.string.fr.conversationsConnectionRequestMany = '{{number}} personnes en attent
 z.string.fr.conversationsConnectionRequestOne = '1 personne en attente';
 z.string.fr.conversationsEmptyConversation = 'Conversation de groupe';
 z.string.fr.conversationsNoConversations = 'Pas encore de conversation';
+z.string.fr.conversationsPopoverArchive = 'Archiver';
 z.string.fr.conversationsPopoverCancel = 'Annuler la demande';
+z.string.fr.conversationsPopoverNotify = 'Activer le micro';
+z.string.fr.conversationsPopoverSilence = 'Mettre en sourdine';
+z.string.fr.conversationsPopoverUnarchive = 'Restaurer';
 
 z.string.fr.conversationsSecondaryLineMissedCall = '{{number}} appel manqué';
 z.string.fr.conversationsSecondaryLineMissedCalls = '{{number}} appels manqués';
@@ -377,6 +381,7 @@ z.string.fr.addParticipantsServiceConfirmButton = 'Ajouter un service';
 z.string.fr.addParticipantsTabsPeople = 'Personnes';
 z.string.fr.addParticipantsTabsServices = 'Services';
 
+z.string.fr.conversationDetailsActionArchive = 'Archiver';
 z.string.fr.conversationDetailsActionCancelRequest = 'Annuler la demande';
 z.string.fr.conversationDetailsActionCreateGroup = 'Nouveau groupe';
 z.string.fr.conversationDetailsActionDevices = 'Appareils';
@@ -394,7 +399,7 @@ z.string.fr.groupParticipantActionSendRequest = 'Se connecter';
 
 z.string.fr.guestOptionsCreateLink = 'Créer le lien';
 z.string.fr.guestOptionsInfoHeader = 'Inviter des personnes via un lien';
-z.string.fr.guestOptionsInfoText = 'N’importe qui avec le lien peut rejoindre la conversation, même s’ils n’utilisent pas Wire.';
+z.string.fr.guestOptionsInfoText = 'N’importe qui avec le lien peut rejoindre la conversation, même s’ils n'utilisent pas Wire.';
 z.string.fr.guestOptionsRevokeLink = 'Révoquer le lien';
 
 z.string.fr.participantDevicesDetailHeadline = 'Vérifiez que cela correspond à l’empreinte affichée sur {{html1}}l’appareil de {{user}}{{html2}}.';
@@ -491,7 +496,6 @@ z.string.fr.preferencesOptionsNotificationsObfuscate = 'Masquer les détails';
 z.string.fr.preferencesOptionsNotificationsObfuscateMessage = 'Afficher l’expéditeur';
 z.string.fr.preferencesOptionsNotificationsOn = 'Afficher l’expéditeur et le message';
 
-z.string.fr.backupExportSuccessAction = 'OK';
 z.string.fr.backupCancel = 'Annuler';
 
 z.string.fr.searchConnect = 'Se connecter';

@@ -318,8 +318,12 @@ z.string.el.conversationsConnectionRequestMany = '{{number}} άτομα σε α�
 z.string.el.conversationsConnectionRequestOne = '1 άτομο σε αναμονή';
 z.string.el.conversationsEmptyConversation = 'Ομαδική συζήτηση';
 z.string.el.conversationsNoConversations = 'Δεν υπάρχουν ακόμα συζητήσεις';
+z.string.el.conversationsPopoverArchive = 'Αρχειοθέτηση';
 z.string.el.conversationsPopoverCancel = 'Ακύρωση αιτήματος';
 z.string.el.conversationsPopoverClear = 'Διαγραφή περιεχομένου…';
+z.string.el.conversationsPopoverNotify = 'Ενεργή ένταση';
+z.string.el.conversationsPopoverSilence = 'Σίγαση';
+z.string.el.conversationsPopoverUnarchive = 'Αναίρεση αρχειοθέτησης';
 
 z.string.el.conversationsSecondaryLineMissedCall = '{{number}} αναπάντητη κλήση';
 z.string.el.conversationsSecondaryLineMissedCalls = '{{number}} αναπάντητες κλήσεις';
@@ -364,6 +368,7 @@ z.string.el.addParticipantsSearchPlaceholder = 'Αναζήτηση βάση ον
 z.string.el.addParticipantsTabsPeople = 'Άτομα';
 z.string.el.addParticipantsTabsServices = 'Υπηρεσίες';
 
+z.string.el.conversationDetailsActionArchive = 'Αρχειοθέτηση';
 z.string.el.conversationDetailsActionAddParticipants = 'Προσθήκη συμμετεχόντων';
 z.string.el.conversationDetailsActionBlock = 'Αποκλεισμός επαφής';
 z.string.el.conversationDetailsActionCancelRequest = 'Ακύρωση αιτήματος';
@@ -478,7 +483,6 @@ z.string.el.preferencesOptionsNotificationsObfuscate = 'Απόκρυψη λεπ�
 z.string.el.preferencesOptionsNotificationsObfuscateMessage = 'Εμφάνιση αποστολέα';
 z.string.el.preferencesOptionsNotificationsOn = 'Εμφάνιση αποστολέα και μηνύματος';
 
-z.string.el.backupExportSuccessAction = 'Εντάξει';
 z.string.el.backupImportGenericErrorHeadline = 'Κάτι πήγε στραβά';
 z.string.el.backupCancel = 'Ακύρωση';
 

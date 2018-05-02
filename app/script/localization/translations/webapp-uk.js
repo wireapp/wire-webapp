@@ -569,7 +569,6 @@ z.string.uk.preferencesOptionsCallLogs = 'Усунення проблем';
 z.string.uk.preferencesOptionsCallLogsGet = 'Зберегти технічний звіт про дзвінок';
 z.string.uk.preferencesOptionsCallLogsDetail = 'Ця інформація допомагає відділу підтримки Wire діагностувати проблеми, пов’язані з дзвінками.';
 
-z.string.uk.backupExportSuccessAction = 'ОК';
 z.string.uk.backupImportGenericErrorHeadline = 'Щось пішло не так';
 z.string.uk.backupCancel = 'Скасувати';
 
