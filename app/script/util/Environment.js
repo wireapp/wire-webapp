@@ -98,7 +98,7 @@ z.util.Environment = (() => {
   const _supportsIndexedDb = () => {
     try {
       return !!window.indexedDB;
-    } catch (e) {
+    } catch (error) {
       return false;
     }
   };

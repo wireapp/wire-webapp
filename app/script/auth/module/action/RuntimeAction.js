@@ -70,7 +70,7 @@ function hasIndexedDbSupport() {
   let supportIndexedDb;
   try {
     supportIndexedDb = !!window.indexedDb;
-  } catch (e) {
+  } catch (error) {
     supportIndexedDb = false;
   }
   if (!supportIndexedDb) {
