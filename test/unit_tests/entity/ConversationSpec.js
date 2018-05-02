@@ -721,7 +721,7 @@ describe('Conversation', () => {
     });
   });
 
-  describe('set_timestamp', () =>
+  describe('set_timestamp', () => {
     it('turns strings into numbers', () => {
       const lrt = conversation_et.last_read_timestamp();
       expect(lrt).toBe(0);
@@ -729,7 +729,22 @@ describe('Conversation', () => {
       const new_lrt_number = window.parseInt(new_lrt_string, 10);
       conversation_et.set_timestamp(new_lrt_string, z.conversation.TIMESTAMP_TYPE.LAST_READ);
       expect(conversation_et.last_read_timestamp()).toBe(new_lrt_number);
-    }));
+    });
+
+    it('checks that new timestamp is newer that previous one', () => {
+      const currentTimestamp = conversation_et.last_read_timestamp();
+      const newTimestamp = currentTimestamp - 10;
+      conversation_et.set_timestamp(newTimestamp, z.conversation.TIMESTAMP_TYPE.LAST_READ);
+      expect(conversation_et.last_read_timestamp()).toBe(currentTimestamp);
+    });
+
+    it('allows to set an older timestamp with the forceUpdate flag', () => {
+      const currentTimestamp = conversation_et.last_read_timestamp();
+      const newTimestamp = currentTimestamp - 10;
+      conversation_et.set_timestamp(newTimestamp, z.conversation.TIMESTAMP_TYPE.LAST_READ, true);
+      expect(conversation_et.last_read_timestamp()).toBe(newTimestamp);
+    });
+  });
 
   describe('should_unarchive', () => {
     let time = undefined;
