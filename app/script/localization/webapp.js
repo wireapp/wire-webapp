@@ -399,14 +399,14 @@ z.string.conversationsConnectionRequestMany = '{{number}} people waiting';
 z.string.conversationsConnectionRequestOne = '1 person waiting';
 z.string.conversationsEmptyConversation = 'Group conversation';
 z.string.conversationsNoConversations = 'Start a conversation or create a group.';
-z.string.conversationsPopoverArchive = 'Archive conversation';
-z.string.conversationsPopoverBlock = 'Block contact…';
+z.string.conversationsPopoverArchive = 'Archive';
+z.string.conversationsPopoverBlock = 'Block…';
 z.string.conversationsPopoverCancel = 'Cancel request…';
 z.string.conversationsPopoverClear = 'Delete content…';
 z.string.conversationsPopoverLeave = 'Leave group…';
-z.string.conversationsPopoverNotify = 'Unmute conversation';
-z.string.conversationsPopoverSilence = 'Mute conversation';
-z.string.conversationsPopoverUnarchive = 'Unarchive conversation';
+z.string.conversationsPopoverNotify = 'Unmute';
+z.string.conversationsPopoverSilence = 'Mute';
+z.string.conversationsPopoverUnarchive = 'Unarchive';
 
 // Conversations secondary line
 z.string.conversationsSecondaryLineMissedCall = '{{number}} missed call';
@@ -464,9 +464,9 @@ z.string.addParticipantsTabsPeople = 'People';
 z.string.addParticipantsTabsServices = 'Services';
 
 // Panel: Conversation details
-z.string.conversationDetailsActionArchive = 'Archive conversation';
+z.string.conversationDetailsActionArchive = 'Archive';
 z.string.conversationDetailsActionAddParticipants = 'Add participants';
-z.string.conversationDetailsActionBlock = 'Block contact…';
+z.string.conversationDetailsActionBlock = 'Block…';
 z.string.conversationDetailsActionCancelRequest = 'Cancel request…';
 z.string.conversationDetailsActionClear = 'Delete content…';
 z.string.conversationDetailsActionCreateGroup = 'Create group';
@@ -483,7 +483,7 @@ z.string.conversationDetailsPeople = 'People';
 z.string.conversationDetailsServices = 'Services';
 
 // Panel: Group participant
-z.string.groupParticipantActionBlock = 'Block contact…';
+z.string.groupParticipantActionBlock = 'Block…';
 z.string.groupParticipantActionCancelRequest = 'Cancel request…';
 z.string.groupParticipantActionDevices = 'Devices';
 z.string.groupParticipantActionIgnoreRequest = 'Ignore request';
@@ -494,7 +494,7 @@ z.string.groupParticipantActionPending = 'Pending';
 z.string.groupParticipantActionRemove = 'Remove from group…';
 z.string.groupParticipantActionSelfProfile = 'Open profile';
 z.string.groupParticipantActionSendRequest = 'Connect';
-z.string.groupParticipantActionUnblock = 'Unblock contact…';
+z.string.groupParticipantActionUnblock = 'Unblock…';
 
 // Panel: Guest options
 z.string.guestOptionsCopyLink = 'Copy link';
