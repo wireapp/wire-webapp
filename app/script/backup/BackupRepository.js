@@ -177,8 +177,7 @@ z.backup.BackupRepository = class BackupRepository {
   }
 
   getBackupInitData() {
-    const userName = this.userRepository.self().username();
-    return this.backupService.getHistoryCount().then(numberOfRecords => ({numberOfRecords, userName}));
+    return this.backupService.getHistoryCount();
   }
 
   importHistory(archive, initCallback, progressCallback) {

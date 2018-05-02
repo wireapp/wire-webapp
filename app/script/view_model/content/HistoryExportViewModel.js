@@ -90,7 +90,7 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
   exportHistory() {
     this.state(HistoryExportViewModel.STATE.PREPARING);
     this.hasError(false);
-    this.backupRepository.getBackupInitData().then(({numberOfRecords}) => {
+    this.backupRepository.getBackupInitData().then(numberOfRecords => {
       this.logger.log(`Exporting '${numberOfRecords}' records from history`);
 
       this.numberOfRecords(numberOfRecords);
