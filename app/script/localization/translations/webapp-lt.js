@@ -579,7 +579,6 @@ z.string.lt.backupExportGenericErrorHeadline = 'Failo išsaugoti nepavyko';
 z.string.lt.backupExportGenericErrorSecondary = 'Atsarginės kopijos kūrimas nebuvo sėkmingas.';
 z.string.lt.backupExportProgressHeadline = 'Ruošiama…';
 z.string.lt.backupExportProgressSecondary = 'Kuriame atsarginė kopija · {{processed}} iš {{total}} — {{progress}}%';
-z.string.lt.backupExportSuccessAction = 'Gerai';
 z.string.lt.backupExportSuccessHeadline = 'Atsarginis kopijavimas baigtas';
 z.string.lt.backupExportSuccessSecondary = 'Jei prarasite savo kompiuterį arba pasikeisite nauju, kopiją galėsite panaudoti praeities atkūrimui.';
 z.string.lt.backupImportGenericErrorHeadline = 'Kažkas nutiko';

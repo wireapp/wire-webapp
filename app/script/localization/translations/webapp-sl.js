@@ -289,7 +289,11 @@ z.string.sl.conversationsConnectionRequestMany = '{{number}} ljudi, ki čakajo';
 z.string.sl.conversationsConnectionRequestOne = '1 oseba čaka';
 z.string.sl.conversationsEmptyConversation = 'Skupinski pogovor';
 z.string.sl.conversationsNoConversations = 'Še ni pogovorov';
+z.string.sl.conversationsPopoverArchive = 'Arhiviraj';
 z.string.sl.conversationsPopoverCancel = 'Prekliči prošnjo';
+z.string.sl.conversationsPopoverNotify = 'Povrni glasnost';
+z.string.sl.conversationsPopoverSilence = 'Utišaj';
+z.string.sl.conversationsPopoverUnarchive = 'Dearhiviraj';
 
 z.string.sl.conversationsSecondaryLineMissedCall = '{{number}} zgrešeni klic';
 z.string.sl.conversationsSecondaryLineMissedCalls = '{{number}} zgrešenih klicev';
@@ -332,6 +336,7 @@ z.string.sl.addParticipantsSearchPlaceholder = 'Iskanje po imenu';
 z.string.sl.addParticipantsTabsPeople = 'Osebe';
 z.string.sl.addParticipantsTabsServices = 'Storitve';
 
+z.string.sl.conversationDetailsActionArchive = 'Arhiviraj';
 z.string.sl.conversationDetailsActionCancelRequest = 'Prekliči prošnjo';
 z.string.sl.conversationDetailsActionDevices = 'Naprave';
 z.string.sl.conversationDetailsGuestsOff = 'Izklopljeno';
@@ -437,7 +442,6 @@ z.string.sl.preferencesOptionsNotificationsObfuscate = 'Skrij podrobnosti';
 z.string.sl.preferencesOptionsNotificationsObfuscateMessage = 'Pokaži pošiljatelja';
 z.string.sl.preferencesOptionsNotificationsOn = 'Pokaži pošiljatelja in sporočilo';
 
-z.string.sl.backupExportSuccessAction = 'V redu';
 z.string.sl.backupCancel = 'Prekliči';
 
 z.string.sl.searchConnect = 'Poveži';

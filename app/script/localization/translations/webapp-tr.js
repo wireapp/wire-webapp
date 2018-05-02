@@ -301,7 +301,11 @@ z.string.tr.conversationsConnectionRequestMany = '{{number}} kişi bekliyor';
 z.string.tr.conversationsConnectionRequestOne = 'Bir kişi bekliyor';
 z.string.tr.conversationsEmptyConversation = 'Grup sohbeti';
 z.string.tr.conversationsNoConversations = 'Hiç konuşma yok';
+z.string.tr.conversationsPopoverArchive = 'Arşivle';
 z.string.tr.conversationsPopoverCancel = 'İsteği iptal et';
+z.string.tr.conversationsPopoverNotify = 'Susturmayı Aç';
+z.string.tr.conversationsPopoverSilence = 'Sustur';
+z.string.tr.conversationsPopoverUnarchive = 'Arşivden Çıkar';
 
 z.string.tr.conversationsSecondaryLineMissedCall = '{{number}} cevapsız çağrı';
 z.string.tr.conversationsSecondaryLineMissedCalls = '{{number}} cevapsız çağrı';
@@ -344,6 +348,7 @@ z.string.tr.addParticipantsSearchPlaceholder = 'İsme göre ara';
 z.string.tr.addParticipantsTabsPeople = 'İnsanlar';
 z.string.tr.addParticipantsTabsServices = 'Servisler';
 
+z.string.tr.conversationDetailsActionArchive = 'Arşivle';
 z.string.tr.conversationDetailsActionCancelRequest = 'İsteği iptal et';
 z.string.tr.conversationDetailsActionDevices = 'Cihazlar';
 z.string.tr.conversationDetailsGuestsOff = 'Yok';
@@ -450,7 +455,6 @@ z.string.tr.preferencesOptionsNotificationsObfuscate = 'Ayrıntıyı gizle';
 z.string.tr.preferencesOptionsNotificationsObfuscateMessage = 'Göndereni göster';
 z.string.tr.preferencesOptionsNotificationsOn = 'Göndereni ve mesajı göster';
 
-z.string.tr.backupExportSuccessAction = 'Tamam';
 z.string.tr.backupCancel = 'İptal';
 
 z.string.tr.searchConnect = 'Bağlan';

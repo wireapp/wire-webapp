@@ -316,7 +316,7 @@ z.string.ru.conversationUnableToDecrypt2 = 'Идентификатор устр�
 z.string.ru.conversationUnableToDecryptLink = 'Почему?';
 z.string.ru.conversationUnableToDecryptErrorMessage = 'Ошибка';
 z.string.ru.conversationUnableToDecryptResetSession = 'Сбросить сессию';
-z.string.ru.conversationMissedMessages = 'Вы не использовали это устройство некоторое время. Некоторые сообщения могут не отображаться.';
+z.string.ru.conversationMissedMessages = 'Вы не использовали это устройство продолжительное время. Некоторые сообщения могут не отображаться.';
 z.string.ru.conversationAssetUploading = 'Загрузка…';
 z.string.ru.conversationAssetDownloading = 'Загрузка…';
 z.string.ru.conversationAssetUploadFailed = 'Ошибка отправки';
@@ -377,6 +377,8 @@ z.string.ru.conversationsPopoverBlock = 'Блокировать контакт�
 z.string.ru.conversationsPopoverCancel = 'Отклонить запрос';
 z.string.ru.conversationsPopoverClear = 'Удалить содержимое…';
 z.string.ru.conversationsPopoverLeave = 'Покинуть группу…';
+z.string.ru.conversationsPopoverNotify = 'Вкл. звук';
+z.string.ru.conversationsPopoverSilence = 'Выкл. звук';
 z.string.ru.conversationsPopoverUnarchive = 'Разархивировать беседу';
 
 z.string.ru.conversationsSecondaryLineMissedCall = '{{number}} пропущенный звонок';
@@ -563,9 +565,28 @@ z.string.ru.preferencesOptionsNotificationsOn = 'Показывать имя о�
 z.string.ru.preferencesOptionsCallLogs = 'Устранение неполадок';
 z.string.ru.preferencesOptionsCallLogsDetail = 'Эта информация помогает отделу поддержки Wire диагностировать проблемы, связанные со звонками.';
 
-z.string.ru.backupExportSuccessAction = 'OK';
+z.string.ru.preferencesOptionsBackupHeader = 'История';
+z.string.ru.preferencesOptionsBackupExportHeadline = 'Резервная копия разговоров';
+z.string.ru.preferencesOptionsBackupExportSecondary = 'Создайте резервную копию, чтобы сохранить историю разговоров. Это пригодится для восстановления истории в случае потери или замены компьютера.\nРезервная копия не шифруется, поэтому храните ее в надежном месте.';
+z.string.ru.preferencesOptionsBackupImportHeadline = 'Восстановить из резервной копии';
+
+z.string.ru.backupExportGenericErrorHeadline = 'Не удалось сохранить файл';
+z.string.ru.backupExportProgressHeadline = 'Подготовка…';
+z.string.ru.backupExportProgressSecondary = 'Резервное копирование · {{processed}} из {{total}} — {{progress}}%';
+z.string.ru.backupExportSuccessHeadline = 'Резервная копия создана';
 z.string.ru.backupImportGenericErrorHeadline = 'Что-то пошло не так';
+z.string.ru.backupImportGenericErrorSecondary = 'Ваша история не может быть восстановлена.';
+z.string.ru.backupImportAccountErrorSecondary = 'Вы не можете восстановить историю из другой учетной записи.';
+z.string.ru.backupImportVersionErrorHeadline = 'Несовместимая резервная копия';
+z.string.ru.backupImportVersionErrorSecondary = 'Эта резервная копия была создана в более новой или устаревшей версии Wire и не может быть восстановлена.';
+z.string.ru.backupImportIncompatibleErrorSecondary = 'Вы не можете восстановить историю из другой учетной записи.';
+z.string.ru.backupImportOutdatedErrorHeadline = 'Несовместимая резервная копия';
+z.string.ru.backupImportOutdatedErrorSecondary = 'Эта резервная копия была создана в более новой или устаревшей версии Wire и не может быть восстановлена.';
+z.string.ru.backupImportProgressHeadline = 'Подготовка…';
+z.string.ru.backupImportProgressSecondary = 'Восстановление истории · {{processed}} из {{total}} — {{progress}}%';
+z.string.ru.backupImportSuccessHeadline = 'История восстановлена.';
 z.string.ru.backupCancel = 'Отменить';
+z.string.ru.backupTryAgain = 'Повторить попытку';
 
 z.string.ru.searchConnect = 'Связаться';
 z.string.ru.searchConnections = 'Контакты';

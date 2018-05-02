@@ -579,7 +579,6 @@ z.string.et.backupExportGenericErrorHeadline = 'Faili ei saanud salvestada';
 z.string.et.backupExportGenericErrorSecondary = 'Varundust ei viidud lõpule.';
 z.string.et.backupExportProgressHeadline = 'Ettevalmistamine…';
 z.string.et.backupExportProgressSecondary = 'Varundamine · {{processed}} / {{total}} — {{progress}}%';
-z.string.et.backupExportSuccessAction = 'Ok';
 z.string.et.backupExportSuccessHeadline = 'Varundus valmis';
 z.string.et.backupExportSuccessSecondary = 'Sa saad seda kasutada, et taastada ajalugu, kui kaotad oma arvuti või hakkad kasutama uut.';
 z.string.et.backupImportGenericErrorHeadline = 'Midagi läks valesti';

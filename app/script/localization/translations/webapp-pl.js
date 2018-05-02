@@ -312,7 +312,11 @@ z.string.pl.conversationsConnectionRequestMany = '{{number}} osób oczekujących
 z.string.pl.conversationsConnectionRequestOne = '1 osoba czeka';
 z.string.pl.conversationsEmptyConversation = 'Rozmowa grupowa';
 z.string.pl.conversationsNoConversations = 'Brak jeszcze konwersacji';
+z.string.pl.conversationsPopoverArchive = 'Archiwizuj';
 z.string.pl.conversationsPopoverCancel = 'Anuluj żądanie';
+z.string.pl.conversationsPopoverNotify = 'Włącz dźwięk';
+z.string.pl.conversationsPopoverSilence = 'Wycisz';
+z.string.pl.conversationsPopoverUnarchive = 'Przywróć z archiwum';
 
 z.string.pl.conversationsSecondaryLineMissedCall = '{{number}} nieodebrane połączenie';
 z.string.pl.conversationsSecondaryLineMissedCalls = 'nieodebranych połączeń: {{number}}';
@@ -355,6 +359,7 @@ z.string.pl.addParticipantsSearchPlaceholder = 'Szukaj według nazwy';
 z.string.pl.addParticipantsTabsPeople = 'Osoby';
 z.string.pl.addParticipantsTabsServices = 'Usługi';
 
+z.string.pl.conversationDetailsActionArchive = 'Archiwizuj';
 z.string.pl.conversationDetailsActionCancelRequest = 'Anuluj żądanie';
 z.string.pl.conversationDetailsActionDevices = 'Urządzenia';
 z.string.pl.conversationDetailsGuestsOff = 'Wyłącz';
@@ -460,7 +465,6 @@ z.string.pl.preferencesOptionsNotificationsObfuscate = 'Ukryj szczegóły';
 z.string.pl.preferencesOptionsNotificationsObfuscateMessage = 'Pokaż nadawcę';
 z.string.pl.preferencesOptionsNotificationsOn = 'Pokaż nadawcę i wiadomości';
 
-z.string.pl.backupExportSuccessAction = 'OK';
 z.string.pl.backupImportGenericErrorHeadline = 'Coś poszło nie tak';
 z.string.pl.backupCancel = 'Anuluj';
 

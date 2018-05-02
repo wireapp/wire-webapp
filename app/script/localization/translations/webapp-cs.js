@@ -297,7 +297,11 @@ z.string.cs.conversationsConnectionRequestMany = '{{number}} čekajících osob'
 z.string.cs.conversationsConnectionRequestOne = '1 čekající osoba';
 z.string.cs.conversationsEmptyConversation = 'Skupinová konverzace';
 z.string.cs.conversationsNoConversations = 'Zatím žádné konverzace';
+z.string.cs.conversationsPopoverArchive = 'Archivovat';
 z.string.cs.conversationsPopoverCancel = 'Zrušit žádost';
+z.string.cs.conversationsPopoverNotify = 'Zapnout zvuk';
+z.string.cs.conversationsPopoverSilence = 'Ztlumit';
+z.string.cs.conversationsPopoverUnarchive = 'Obnovit';
 
 z.string.cs.conversationsSecondaryLineMissedCall = '{{number}} zmeškaný hovor';
 z.string.cs.conversationsSecondaryLineMissedCalls = '{{number}} zmeškaných hovorů';
@@ -340,6 +344,7 @@ z.string.cs.addParticipantsSearchPlaceholder = 'Hledat podle jména';
 z.string.cs.addParticipantsTabsPeople = 'Kontakty';
 z.string.cs.addParticipantsTabsServices = 'Služby';
 
+z.string.cs.conversationDetailsActionArchive = 'Archivovat';
 z.string.cs.conversationDetailsActionCancelRequest = 'Zrušit žádost';
 z.string.cs.conversationDetailsActionDevices = 'Přístroje';
 z.string.cs.conversationDetailsGuestsOff = 'Vypnout';
@@ -444,7 +449,6 @@ z.string.cs.preferencesOptionsNotificationsObfuscate = 'Skrýt detaily';
 z.string.cs.preferencesOptionsNotificationsObfuscateMessage = 'Zobrazit odesílatele';
 z.string.cs.preferencesOptionsNotificationsOn = 'Zobrazit odesílatele a zprávu';
 
-z.string.cs.backupExportSuccessAction = 'Ok';
 z.string.cs.backupCancel = 'Zrušit';
 
 z.string.cs.searchConnect = 'Připojit';

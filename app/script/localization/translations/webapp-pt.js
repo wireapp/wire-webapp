@@ -301,7 +301,11 @@ z.string.pt.conversationsConnectionRequestMany = '{{number}} pessoas em espera';
 z.string.pt.conversationsConnectionRequestOne = '1 pessoa em espera';
 z.string.pt.conversationsEmptyConversation = 'Conversa em grupo';
 z.string.pt.conversationsNoConversations = 'Ainda não existem conversas';
+z.string.pt.conversationsPopoverArchive = 'Arquivar';
 z.string.pt.conversationsPopoverCancel = 'Cancelar pedido';
+z.string.pt.conversationsPopoverNotify = 'Activar som';
+z.string.pt.conversationsPopoverSilence = 'Desativar som';
+z.string.pt.conversationsPopoverUnarchive = 'Retirar do arquivo';
 
 z.string.pt.conversationsSecondaryLineMissedCall = '{{number}} chamada não atendida';
 z.string.pt.conversationsSecondaryLineMissedCalls = '{{number}} chamadas não atendida';
@@ -344,6 +348,7 @@ z.string.pt.addParticipantsSearchPlaceholder = 'Pesquisar por nome';
 z.string.pt.addParticipantsTabsPeople = 'Pessoas';
 z.string.pt.addParticipantsTabsServices = 'Serviços';
 
+z.string.pt.conversationDetailsActionArchive = 'Arquivar';
 z.string.pt.conversationDetailsActionCancelRequest = 'Cancelar pedido';
 z.string.pt.conversationDetailsActionDevices = 'Dispositivos';
 z.string.pt.conversationDetailsGuestsOff = 'Desligado';
@@ -449,7 +454,6 @@ z.string.pt.preferencesOptionsNotificationsObfuscate = 'Ocultar detalhes';
 z.string.pt.preferencesOptionsNotificationsObfuscateMessage = 'Mostrar remetente';
 z.string.pt.preferencesOptionsNotificationsOn = 'Mostrar o remetente e a mensagem';
 
-z.string.pt.backupExportSuccessAction = 'Ok';
 z.string.pt.backupCancel = 'Cancelar';
 
 z.string.pt.searchConnect = 'Ligar';
