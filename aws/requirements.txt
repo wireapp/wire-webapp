@@ -1,2 +1,2 @@
-Flask==0.12.2
+Flask==1.0.1
 python-geoip-geolite2==2015.0303
