@@ -41,6 +41,7 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
 
   constructor(mainViewModel, contentViewModel, repositories) {
     this.backupRepository = repositories.backup;
+    this.userRepository = repositories.user;
     this.logger = new z.util.Logger('z.viewModel.content.HistoryExportViewModel', z.config.LOGGER.OPTIONS);
 
     this.hasError = ko.observable(false);
@@ -61,7 +62,6 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
     });
 
     this.archiveBlob = ko.observable(null);
-    this.archiveFilename = ko.observable('');
 
     this.loadingMessage = ko.pureComputed(() => {
       switch (this.state()) {
@@ -90,7 +90,7 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
   exportHistory() {
     this.state(HistoryExportViewModel.STATE.PREPARING);
     this.hasError(false);
-    this.backupRepository.getBackupInitData().then(({numberOfRecords, userName}) => {
+    this.backupRepository.getBackupInitData().then(({numberOfRecords}) => {
       this.logger.log(`Exporting '${numberOfRecords}' records from history`);
 
       this.numberOfRecords(numberOfRecords);
@@ -103,7 +103,7 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
           return archive.generateAsync({compression: 'DEFLATE', type: 'blob'});
         })
         .then(archiveBlob => {
-          this.onSuccess(archiveBlob, userName);
+          this.onSuccess(archiveBlob);
           this.logger.log(`Completed export of '${numberOfRecords}' records from history`);
         })
         .catch(this.onError.bind(this));
@@ -111,8 +111,12 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
   }
 
   downloadArchiveFile() {
+    const timestamp = new Date().toISOString().substring(0, 10);
+    const userName = this.userRepository.self().name();
+    const filename = `Wire-${userName}-Backup_${timestamp}.${HistoryExportViewModel.CONFIG.FILE_EXTENSION}`;
+
     this.dismissExport();
-    z.util.downloadBlob(this.archiveBlob(), this.archiveFilename(), 'application/octet-stream');
+    z.util.downloadBlob(this.archiveBlob(), filename, 'application/octet-stream');
   }
 
   onCancel() {
@@ -134,14 +138,10 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
     amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.HISTORY.BACKUP_FAILED);
   }
 
-  onSuccess(archiveBlob, userName) {
-    const timestamp = new Date().toISOString().substring(0, 10);
-    const filename = `Wire-${userName}-Backup_${timestamp}.${HistoryExportViewModel.CONFIG.FILE_EXTENSION}`;
-
+  onSuccess(archiveBlob) {
     this.state(HistoryExportViewModel.STATE.DONE);
     this.hasError(false);
     this.archiveBlob(archiveBlob);
-    this.archiveFilename(filename);
     amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.HISTORY.BACKUP_SUCCEEDED);
   }
 
