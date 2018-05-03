@@ -249,7 +249,7 @@ class Account extends EventEmitter {
           this.service.cryptography.decrypt(sessionId, ciphertext).then((decryptedMessage: Uint8Array) => {
             const genericMessage = this.protocolBuffers.GenericMessage.decode(decryptedMessage);
             resolve({
-              content: genericMessage.text.content,
+              content: genericMessage.text && genericMessage.text.content,
               id: genericMessage.messageId,
               type: genericMessage.content,
             });
