@@ -24,6 +24,12 @@ window.z.viewModel = z.viewModel || {};
 window.z.viewModel.content = z.viewModel.content || {};
 
 z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewModel {
+  static get CONFIG() {
+    return {
+      MINIMUM_CALL_LOG_LENGTH: 10,
+    };
+  }
+
   constructor(mainViewModel, contentViewModel, repositories) {
     this.logger = new z.util.Logger('z.viewModel.content.PreferencesOptionsViewModel', z.config.LOGGER.OPTIONS);
 
@@ -72,7 +78,9 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
 
   saveCallLogs() {
     const messageLog = this.callingRepository.messageLog;
-    if (messageLog.length) {
+    // Very short logs will not contain useful information
+    const logExceedsMinimumLength = messageLog.length > PreferencesOptionsViewModel.CONFIG.MINIMUM_CALL_LOG_LENGTH;
+    if (logExceedsMinimumLength) {
       const callLog = [messageLog.join('\r\n')];
       const blob = new Blob(callLog, {type: 'text/plain;charset=utf-8'});
       const currentDate = new Date().toISOString().replace(' ', '-');
@@ -81,8 +89,10 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
     }
 
     amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, {
-      message: z.l10n.text(z.string.modalCallEmptyLogMessage),
-      title: z.l10n.text(z.string.modalCallEmptyLogHeadline),
+      text: {
+        message: z.l10n.text(z.string.modalCallEmptyLogMessage),
+        title: z.l10n.text(z.string.modalCallEmptyLogHeadline),
+      },
     });
   }
 
