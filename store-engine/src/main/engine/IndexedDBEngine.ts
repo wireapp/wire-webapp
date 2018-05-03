@@ -50,7 +50,7 @@ export default class IndexedDBEngine implements CRUDEngine {
     await this.isSupported();
     this.db = new Dexie(storeName);
     this.storeName = this.db.name;
-    return Promise.resolve(this.db);
+    return this.db;
   }
 
   public initWithDb(db: DexieInstance): Promise<DexieInstance> {
