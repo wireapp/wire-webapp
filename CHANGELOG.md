@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="2.4.5"></a>
+## [2.4.5](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.4.4...@wireapp/core@2.4.5) (2018-05-03)
+
+
+### Bug Fixes
+
+* **core:** Don't emit asset on text message ([#545](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/545)) ([ddcd91c](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/ddcd91c))
+* **core:** Pass empty content in decodeEvent when message text is empty ([#551](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/551)) ([f257f7b](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/f257f7b))
+
+
+
+
 <a name="2.4.4"></a>
 ## [2.4.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.4.3...@wireapp/core@2.4.4) (2018-04-27)
 
