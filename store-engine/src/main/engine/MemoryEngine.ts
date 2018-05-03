@@ -5,15 +5,17 @@ export default class MemoryEngine implements CRUDEngine {
   public storeName: string = '';
   private stores: {[index: string]: {[index: string]: any}} = {};
 
-  init(storeName: string): Promise<any> {
-    this.storeName = storeName;
-    this.stores[this.storeName] = this.stores[this.storeName] || {};
-    return Promise.resolve();
+  public async isSupported(): Promise<void> {
+    // Always available
   }
 
-  purge(): Promise<void> {
+  public async init(storeName: string): Promise<any> {
+    this.storeName = storeName;
+    this.stores[this.storeName] = this.stores[this.storeName] || {};
+  }
+
+  public async purge(): Promise<void> {
     delete this.stores[this.storeName];
-    return Promise.resolve();
   }
 
   private prepareTable(tableName: string) {

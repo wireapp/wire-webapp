@@ -90,6 +90,12 @@ interface CRUDEngine {
    * @returns {Promise<string>} Resolves with the primary key of the updated record.
    */
   updateOrCreate(tableName: string, primaryKey: string, changes: Object): Promise<string>;
+
+  /**
+   * Checks wether the engine is supported in the current environment.
+   * @returns {Promise<void>} Resolves if supported, rejects if unsupported.
+   */
+  isSupported(): Promise<void>;
 }
 
 export default CRUDEngine;
