@@ -117,6 +117,7 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
 
     this.dismissExport();
     z.util.downloadBlob(this.archiveBlob(), filename, 'application/octet-stream');
+    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.HISTORY.BACKUP_SUCCEEDED);
   }
 
   onCancel() {
@@ -142,7 +143,6 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
     this.state(HistoryExportViewModel.STATE.DONE);
     this.hasError(false);
     this.archiveBlob(archiveBlob);
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.HISTORY.BACKUP_SUCCEEDED);
   }
 
   onTryAgain() {
