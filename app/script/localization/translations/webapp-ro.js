@@ -328,7 +328,11 @@ z.string.ro.conversationsConnectionRequestMany = '{{number}} persoane așteaptă
 z.string.ro.conversationsConnectionRequestOne = '1 persoană așteaptă';
 z.string.ro.conversationsEmptyConversation = 'Conversație de grup';
 z.string.ro.conversationsNoConversations = 'Nu sunt încă conversații';
+z.string.ro.conversationsPopoverArchive = 'Arhivă';
 z.string.ro.conversationsPopoverCancel = 'Anulează cererea';
+z.string.ro.conversationsPopoverNotify = 'Demutizează';
+z.string.ro.conversationsPopoverSilence = 'Mutizează';
+z.string.ro.conversationsPopoverUnarchive = 'Dezarhivează';
 
 z.string.ro.conversationsSecondaryLineMissedCall = '{{number}} apel pierdut';
 z.string.ro.conversationsSecondaryLineMissedCalls = '{{number}} apeluri pierdute';
@@ -373,6 +377,7 @@ z.string.ro.addParticipantsServiceConfirmButton = 'Adaugă serviciu';
 z.string.ro.addParticipantsTabsPeople = 'Persoane';
 z.string.ro.addParticipantsTabsServices = 'Servicii';
 
+z.string.ro.conversationDetailsActionArchive = 'Arhivă';
 z.string.ro.conversationDetailsActionCancelRequest = 'Anulează cererea';
 z.string.ro.conversationDetailsActionCreateGroup = 'Grup nou';
 z.string.ro.conversationDetailsActionDevices = 'Dispozitive';
@@ -480,7 +485,6 @@ z.string.ro.preferencesOptionsNotificationsObfuscate = 'Ascunde detaliile';
 z.string.ro.preferencesOptionsNotificationsObfuscateMessage = 'Arată expeditorul';
 z.string.ro.preferencesOptionsNotificationsOn = 'Arată expeditorul și mesajul';
 
-z.string.ro.backupExportSuccessAction = 'Ok';
 z.string.ro.backupImportGenericErrorHeadline = 'Ceva nu a mers bine';
 z.string.ro.backupCancel = 'Renunță';
 

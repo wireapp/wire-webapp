@@ -100,8 +100,8 @@ z.conversation.ConversationMapper = class ConversationMapper {
         conversation_et.archived_state(self_state.archived_state);
       }
 
-      if (cleared_timestamp) {
-        conversation_et.set_timestamp(cleared_timestamp, z.conversation.TIMESTAMP_TYPE.CLEARED);
+      if (cleared_timestamp !== undefined) {
+        conversation_et.set_timestamp(cleared_timestamp, z.conversation.TIMESTAMP_TYPE.CLEARED, true);
       }
 
       if (ephemeral_timer !== undefined) {

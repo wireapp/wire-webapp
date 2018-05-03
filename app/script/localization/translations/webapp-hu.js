@@ -375,7 +375,11 @@ z.string.hu.conversationsConnectionRequestMany = '{{number}} partner várakozik'
 z.string.hu.conversationsConnectionRequestOne = '1 partner várakozik';
 z.string.hu.conversationsEmptyConversation = 'Csoportos beszélgetés';
 z.string.hu.conversationsNoConversations = 'Indíts egy beszélgetést vagy hozz létre egy csoportot.';
+z.string.hu.conversationsPopoverArchive = 'Archiválás';
 z.string.hu.conversationsPopoverCancel = 'Kérelem visszavonása';
+z.string.hu.conversationsPopoverNotify = 'Némítás feloldása';
+z.string.hu.conversationsPopoverSilence = 'Némítás';
+z.string.hu.conversationsPopoverUnarchive = 'Archiválás visszavonása';
 
 z.string.hu.conversationsSecondaryLineMissedCall = '{{number}} nem fogadott hívás';
 z.string.hu.conversationsSecondaryLineMissedCalls = '{{number}} nem fogadott hívás';
@@ -561,7 +565,6 @@ z.string.hu.preferencesOptionsCallLogs = 'Hibaelhárítás';
 z.string.hu.preferencesOptionsCallLogsGet = 'Hívások hibanaplójának mentése';
 z.string.hu.preferencesOptionsCallLogsDetail = 'Ez az információ segít a Wire Ügyfélszolgálatnak a hívással kapcsolatos problémák diagnosztizálásában.';
 
-z.string.hu.backupExportSuccessAction = 'Ok';
 z.string.hu.backupImportGenericErrorHeadline = 'Valami nem stimmel';
 z.string.hu.backupCancel = 'Mégsem';
 

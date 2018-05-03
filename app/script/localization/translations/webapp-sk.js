@@ -297,7 +297,11 @@ z.string.sk.conversationsConnectionRequestMany = '{{number}} ľudí čaká';
 z.string.sk.conversationsConnectionRequestOne = '1 osoba čaká';
 z.string.sk.conversationsEmptyConversation = 'Skupinová konverzácia';
 z.string.sk.conversationsNoConversations = 'Zatiaľ žiadne konverzácie';
+z.string.sk.conversationsPopoverArchive = 'Archív';
 z.string.sk.conversationsPopoverCancel = 'Zrušiť požiadavku';
+z.string.sk.conversationsPopoverNotify = 'Zapnúť zvuk';
+z.string.sk.conversationsPopoverSilence = 'Stlmiť';
+z.string.sk.conversationsPopoverUnarchive = 'Zrušiť archiváciu';
 
 z.string.sk.conversationsSecondaryLineMissedCall = '{{number}} zmeškaný hovor';
 z.string.sk.conversationsSecondaryLineMissedCalls = '{{number}} neprijaté hovory';
@@ -340,6 +344,7 @@ z.string.sk.addParticipantsSearchPlaceholder = 'Vyhľadať podľa mena';
 z.string.sk.addParticipantsTabsPeople = 'Ľudia';
 z.string.sk.addParticipantsTabsServices = 'Služby';
 
+z.string.sk.conversationDetailsActionArchive = 'Archív';
 z.string.sk.conversationDetailsActionCancelRequest = 'Zrušiť požiadavku';
 z.string.sk.conversationDetailsActionDevices = 'Zariadenia';
 z.string.sk.conversationDetailsGuestsOff = 'Vypnúť';
@@ -445,7 +450,6 @@ z.string.sk.preferencesOptionsNotificationsObfuscate = 'Skryť detaily';
 z.string.sk.preferencesOptionsNotificationsObfuscateMessage = 'Zobraziť odosielateľa';
 z.string.sk.preferencesOptionsNotificationsOn = 'Zobraziť odosielateľa a správu';
 
-z.string.sk.backupExportSuccessAction = 'OK';
 z.string.sk.backupCancel = 'Zrušiť';
 
 z.string.sk.searchConnect = 'Pripojiť';

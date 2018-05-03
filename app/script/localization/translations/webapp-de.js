@@ -137,6 +137,9 @@ z.string.de.modalAssetParallelUploadsMessage = 'Du kannst bis zu {{number}} Date
 z.string.de.modalCallEmptyConversationHeadline = 'Niemand um anzurufen';
 z.string.de.modalCallEmptyConversationMessage = 'Es ist niemand mehr in der Unterhaltung.';
 
+z.string.de.modalCallEmptyLogHeadline = 'Keine Anrufe';
+z.string.de.modalCallEmptyLogMessage = 'Es gab keine Anrufe, für die der Debug-Bericht erstellt werden kann.';
+
 z.string.de.modalCallNoGroupVideoHeadline = 'Keine Videoanrufe in Gruppen';
 z.string.de.modalCallNoGroupVideoMessage = 'Videoanrufe sind in Gruppen nicht verfügbar.';
 
@@ -372,14 +375,14 @@ z.string.de.conversationsConnectionRequestMany = '{{number}} Kontaktanfragen';
 z.string.de.conversationsConnectionRequestOne = 'Eine Kontaktanfrage';
 z.string.de.conversationsEmptyConversation = 'Gruppenunterhaltung';
 z.string.de.conversationsNoConversations = 'Beginne eine Unterhaltung oder erstelle eine Gruppe.';
-z.string.de.conversationsPopoverArchive = 'Unterhaltung archivieren';
-z.string.de.conversationsPopoverBlock = 'Kontakt blockieren…';
+z.string.de.conversationsPopoverArchive = 'Archivieren';
+z.string.de.conversationsPopoverBlock = 'Blockieren…';
 z.string.de.conversationsPopoverCancel = 'Anfrage abbrechen';
 z.string.de.conversationsPopoverClear = 'Unterhaltungsverlauf löschen…';
 z.string.de.conversationsPopoverLeave = 'Gruppe verlassen…';
 z.string.de.conversationsPopoverNotify = 'Benachrichtigen';
 z.string.de.conversationsPopoverSilence = 'Stummschalten';
-z.string.de.conversationsPopoverUnarchive = 'Unterhaltung entarchivieren';
+z.string.de.conversationsPopoverUnarchive = 'Entarchivieren';
 
 z.string.de.conversationsSecondaryLineMissedCall = '{{number}} verpasster Anruf';
 z.string.de.conversationsSecondaryLineMissedCalls = '{{number}} verpasste Anrufe';
@@ -429,7 +432,7 @@ z.string.de.addParticipantsServiceConfirmButton = 'Dienst hinzufügen';
 z.string.de.addParticipantsTabsPeople = 'Kontakte';
 z.string.de.addParticipantsTabsServices = 'Services';
 
-z.string.de.conversationDetailsActionArchive = 'Unterhaltung archivieren';
+z.string.de.conversationDetailsActionArchive = 'Archivieren';
 z.string.de.conversationDetailsActionAddParticipants = 'Personen hinzufügen';
 z.string.de.conversationDetailsActionBlock = 'Kontakt blockieren…';
 z.string.de.conversationDetailsActionCancelRequest = 'Anfrage abbrechen…';
@@ -458,7 +461,7 @@ z.string.de.groupParticipantActionPending = 'Ausstehend';
 z.string.de.groupParticipantActionRemove = 'Aus Gruppe entfernen…';
 z.string.de.groupParticipantActionSelfProfile = 'Profil öffnen';
 z.string.de.groupParticipantActionSendRequest = 'Kontakt hinzufügen';
-z.string.de.groupParticipantActionUnblock = 'Kontakt entsperren…';
+z.string.de.groupParticipantActionUnblock = 'Entsperren…';
 
 z.string.de.guestOptionsCopyLink = 'Link kopieren';
 z.string.de.guestOptionsCopyLinkDone = 'Link kopiert!';
@@ -578,8 +581,9 @@ z.string.de.backupExportGenericErrorHeadline = 'Datei nicht gespeichert';
 z.string.de.backupExportGenericErrorSecondary = 'Das Backup wurde nicht abgeschlossen.';
 z.string.de.backupExportProgressHeadline = 'Vorbereiten…';
 z.string.de.backupExportProgressSecondary = 'Erstelle Backup · {{processed}} von {{total}} — {{progress}}%';
-z.string.de.backupExportSuccessAction = 'Ok';
-z.string.de.backupExportSuccessHeadline = 'Backup abgeschlossen';
+z.string.de.backupExportProgressCompressing = 'Backup-Datei wird erstellt';
+z.string.de.backupExportSaveFileAction = 'Backup speichern';
+z.string.de.backupExportSuccessHeadline = 'Backup erstellt';
 z.string.de.backupExportSuccessSecondary = 'Mit diesem Backup kann der Gesprächsverlauf wiederhergestellt werden, wenn du dein Gerät verlierst oder zu einem neuen wechselst.';
 z.string.de.backupImportGenericErrorHeadline = 'Fehler aufgetreten';
 z.string.de.backupImportGenericErrorSecondary = 'Der Gesprächsverlauf konnte nicht wiederhergestellt werden.';

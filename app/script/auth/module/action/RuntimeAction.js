@@ -67,7 +67,13 @@ function hasCookieSupport() {
 }
 
 function hasIndexedDbSupport() {
-  if (!window.indexedDB) {
+  let supportIndexedDb;
+  try {
+    supportIndexedDb = !!window.indexedDB;
+  } catch (error) {
+    supportIndexedDb = false;
+  }
+  if (!supportIndexedDb) {
     return Promise.reject(new Error('IndexedDB not supported'));
   }
 

@@ -300,7 +300,11 @@ z.string.fi.conversationsConnectionRequestMany = '{{number}} ihmisiä odottaa';
 z.string.fi.conversationsConnectionRequestOne = '1 ihminen odottaa';
 z.string.fi.conversationsEmptyConversation = 'Ryhmäkeskustelu';
 z.string.fi.conversationsNoConversations = 'Ei vielä keskusteluita';
+z.string.fi.conversationsPopoverArchive = 'Arkistoi';
 z.string.fi.conversationsPopoverCancel = 'Peru pyyntö';
+z.string.fi.conversationsPopoverNotify = 'Poista mykistys';
+z.string.fi.conversationsPopoverSilence = 'Mykistä';
+z.string.fi.conversationsPopoverUnarchive = 'Palauta arkistosta';
 
 z.string.fi.conversationsSecondaryLineMissedCall = '{{number}} vastaamaton puhelu';
 z.string.fi.conversationsSecondaryLineMissedCalls = '{{number}} vastaamatonta puhelua';
@@ -343,6 +347,7 @@ z.string.fi.addParticipantsSearchPlaceholder = 'Hae nimellä';
 z.string.fi.addParticipantsTabsPeople = 'Ihmiset';
 z.string.fi.addParticipantsTabsServices = 'Palvelut';
 
+z.string.fi.conversationDetailsActionArchive = 'Arkistoi';
 z.string.fi.conversationDetailsActionCancelRequest = 'Peru pyyntö';
 z.string.fi.conversationDetailsActionDevices = 'Laitteet';
 z.string.fi.conversationDetailsGuestsOff = 'Pois päältä';
@@ -448,7 +453,6 @@ z.string.fi.preferencesOptionsNotificationsObfuscate = 'Piilota yksityiskohdat';
 z.string.fi.preferencesOptionsNotificationsObfuscateMessage = 'Näytä lähettäjä';
 z.string.fi.preferencesOptionsNotificationsOn = 'Näytä lähettäjä ja viesti';
 
-z.string.fi.backupExportSuccessAction = 'Ok';
 z.string.fi.backupCancel = 'Peruuta';
 
 z.string.fi.searchConnect = 'Yhdistä';

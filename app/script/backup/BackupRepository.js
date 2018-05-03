@@ -177,8 +177,7 @@ z.backup.BackupRepository = class BackupRepository {
   }
 
   getBackupInitData() {
-    const userName = this.userRepository.self().username();
-    return this.backupService.getHistoryCount().then(numberOfRecords => ({numberOfRecords, userName}));
+    return this.backupService.getHistoryCount();
   }
 
   importHistory(archive, initCallback, progressCallback) {
@@ -213,7 +212,10 @@ z.backup.BackupRepository = class BackupRepository {
 
     return this._importHistoryConversations(conversationEntities, progressCallback)
       .then(importedEntities => this._importHistoryEvents(eventEntities, progressCallback).then(() => importedEntities))
-      .then(importedEntities => this.conversationRepository.updateConversations(importedEntities));
+      .then(importedEntities => {
+        this.conversationRepository.updateConversations(importedEntities);
+        this.conversationRepository.map_connections(this.userRepository.connections());
+      });
   }
 
   _importHistoryConversations(conversationEntities, progressCallback) {

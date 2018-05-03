@@ -91,5 +91,7 @@ z.util.TimeUtil = {
     return time.format(format);
   },
 
+  getCurrentDate: () => new Date().toISOString().substring(0, 10),
+
   getUnixTimestamp: () => Math.floor(Date.now() / 1000),
 };
