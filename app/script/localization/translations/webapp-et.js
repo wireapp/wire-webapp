@@ -138,6 +138,9 @@ z.string.et.modalAssetParallelUploadsMessage = 'Sa saad ühekorraga saata kuni {
 z.string.et.modalCallEmptyConversationHeadline = 'Pole kellelegi helistada';
 z.string.et.modalCallEmptyConversationMessage = 'Siia pole kedagi jäänud.';
 
+z.string.et.modalCallEmptyLogHeadline = 'Kõned puuduvad';
+z.string.et.modalCallEmptyLogMessage = 'Kõned puuduvad, seega ei saa teha neil põhinevat silumisaruannet.';
+
 z.string.et.modalCallNoGroupVideoHeadline = 'Videokõnesid ei saa teha gruppides';
 z.string.et.modalCallNoGroupVideoMessage = 'Videokõned pole saadaval grupivestlustes.';
 
@@ -579,6 +582,8 @@ z.string.et.backupExportGenericErrorHeadline = 'Faili ei saanud salvestada';
 z.string.et.backupExportGenericErrorSecondary = 'Varundust ei viidud lõpule.';
 z.string.et.backupExportProgressHeadline = 'Ettevalmistamine…';
 z.string.et.backupExportProgressSecondary = 'Varundamine · {{processed}} / {{total}} — {{progress}}%';
+z.string.et.backupExportProgressCompressing = 'Valmistan varundusfaili ette';
+z.string.et.backupExportSaveFileAction = 'Salvesta fail';
 z.string.et.backupExportSuccessHeadline = 'Varundus valmis';
 z.string.et.backupExportSuccessSecondary = 'Sa saad seda kasutada, et taastada ajalugu, kui kaotad oma arvuti või hakkad kasutama uut.';
 z.string.et.backupImportGenericErrorHeadline = 'Midagi läks valesti';
