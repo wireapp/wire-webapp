@@ -398,7 +398,7 @@ describe('z.user.UserRepository', () => {
         TestFactory.user_repository
           .verify_username(username)
           .then(done.fail)
-          .catch(done);
+          .catch(() => done());
       });
     });
   });
