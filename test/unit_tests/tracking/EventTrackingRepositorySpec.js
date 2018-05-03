@@ -173,7 +173,7 @@ describe('z.tracking.EventTrackingRepository', () => {
     it('ignores a rejected Promise that is caught', done => {
       window.onerror = done.fail;
 
-      Promise.reject(new Error(error_description)).catch(done);
+      Promise.reject(new Error(error_description)).catch(() => done());
     });
   });
 });
