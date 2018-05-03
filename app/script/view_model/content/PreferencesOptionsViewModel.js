@@ -36,6 +36,7 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
     this.callingRepository = repositories.calling;
     this.propertiesRepository = repositories.properties;
     this.teamRepository = repositories.team;
+    this.userRepository = repositories.user;
 
     this.isActivatedAccount = mainViewModel.isActivatedAccount;
     this.isTeam = this.teamRepository.isTeam;
@@ -83,9 +84,11 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
     if (logExceedsMinimumLength) {
       const callLog = [messageLog.join('\r\n')];
       const blob = new Blob(callLog, {type: 'text/plain;charset=utf-8'});
-      const currentDate = new Date().toISOString().replace(' ', '-');
 
-      return z.util.downloadBlob(blob, `CallLogs-${currentDate}.log`);
+      const userName = this.userRepository.self().username();
+      const filename = `Wire-${userName}-Calling_${z.util.TimeUtil.getCurrentDate()}.log`;
+
+      return z.util.downloadBlob(blob, filename);
     }
 
     amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, {
