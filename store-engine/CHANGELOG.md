@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="0.11.2"></a>
+## [0.11.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/compare/@wireapp/store-engine@0.11.1...@wireapp/store-engine@0.11.2) (2018-05-03)
+
+
+### Bug Fixes
+
+* **api-client:** Guard initEngine ([#554](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/issues/554)) ([c0c5f04](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/commit/c0c5f04))
+
+
+
+
 <a name="0.11.1"></a>
 ## [0.11.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/compare/@wireapp/store-engine@0.11.0...@wireapp/store-engine@0.11.1) (2018-05-03)
 

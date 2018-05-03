@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="0.8.10"></a>
+## [0.8.10](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@0.8.9...@wireapp/api-client@0.8.10) (2018-05-03)
+
+
+### Bug Fixes
+
+* **api-client:** Guard initEngine ([#554](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/554)) ([c0c5f04](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/c0c5f04))
+
+
+
+
 <a name="0.8.9"></a>
 ## [0.8.9](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@0.8.8...@wireapp/api-client@0.8.9) (2018-05-03)
 
