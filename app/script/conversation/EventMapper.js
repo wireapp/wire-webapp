@@ -550,7 +550,7 @@ z.conversation.EventMapper = class EventMapper {
       linkPreviewEntity.meta_data = linkPreview[meta_data];
 
       const previewImage = image || article_image;
-      if (previewImage) {
+      if (previewImage && previewImage.uploaded) {
         const {asset_token, asset_id: asset_key} = previewImage.uploaded;
 
         if (asset_key) {
