@@ -3,7 +3,7 @@
   <div class="preferences-content-wrapper">
     <div class="preferences-content" data-bind="antiscroll">
 
-      <!-- ko if: availableDevices.audio_input().length -->
+      <!-- ko if: supportsAudioInput() -->
         <section class="preferences-section">
           <header class="preferences-header preferences-av-header" data-bind="l10n_text: z.string.preferencesAVMicrophone"></header>
           <!-- ko if: permissionDenied() -->
@@ -32,7 +32,7 @@
         </section>
       <!-- /ko -->
 
-      <!-- ko if: availableDevices.audio_output().length && z.util.Environment.browser.supports.audioOutputSelection -->
+      <!-- ko if: supportsAudioOutput() -->
         <section class="preferences-section">
           <header class="preferences-header preferences-av-header" data-bind="l10n_text: z.string.preferencesAVSpeakers"></header>
           <div class="preferences-option">
@@ -54,7 +54,7 @@
         </section>
       <!-- /ko -->
 
-      <!-- ko if: availableDevices.video_input().length -->
+      <!-- ko if: supportsVideoInput() -->
         <section class="preferences-section">
           <header class="preferences-header preferences-av-header" data-bind="l10n_text: z.string.preferencesAVCamera"></header>
           <!-- ko if: permissionDenied() -->

@@ -26,6 +26,7 @@ z.entity.RenameMessage = class RenameMessage extends z.entity.SystemMessage {
   constructor() {
     super();
 
+    this.type = z.event.Backend.CONVERSATION.RENAME;
     this.system_message_type = z.message.SystemMessageType.CONVERSATION_RENAME;
 
     this.caption = ko.pureComputed(() => {

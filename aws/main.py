@@ -42,13 +42,13 @@
 
 # coding: utf-8
 
-import datetime
 import flask
 import functools
 import gzip
 import io
 
 import config
+import headers
 import util
 
 
@@ -56,7 +56,7 @@ class MyFlask(flask.Flask):
   def process_response(self, response):
     if flask.request.host.startswith('www.'):
       return flask.redirect(flask.request.url.replace('://www.', '://'))
-    return gzip_response(update_headers(response))
+    return gzip_response(headers.update_headers(response))
 
 
 ###############################################################################
@@ -79,50 +79,6 @@ def latest_browser_required(f):
         return flask.abort(406)
     return f(*args, **kwargs)
   return decorated_function
-
-
-###############################################################################
-# Headers & security
-###############################################################################
-def update_headers(response):
-  # Security
-  response.headers['Strict-Transport-Security'] = 'max-age=26280000'
-  response.headers['X-Content-Type-Options'] = 'nosniff'
-  response.headers['X-Frame-Options'] = 'deny'
-  response.headers['X-XSS-Protection'] = '1; mode=block'
-
-  if config.PUBLIC_KEY_PINS_REPORT_ONLY:
-    response.headers['Public-Key-Pins-Report-Only'] = config.PUBLIC_KEY_PINS_REPORT_ONLY
-  if config.PUBLIC_KEY_PINS:
-    response.headers['Public-Key-Pins'] = config.PUBLIC_KEY_PINS
-
-  csp_values = ';'.join([
-    "default-src 'self'",
-    "connect-src 'self' blob: data: https://*.giphy.com https://apis.google.com https://www.google.com https://maps.googleapis.com https://api.mixpanel.com https://api.raygun.io https://*.unsplash.com https://wire.com https://*.wire.com wss://prod-nginz-ssl.wire.com https://*.zinfra.io wss://*.zinfra.io",
-    "font-src 'self' data:",
-    "frame-src 'self' https://accounts.google.com https://*.soundcloud.com https://*.spotify.com https://*.vimeo.com https://*.youtube-nocookie.com",
-    "img-src 'self' blob: data: https://*.giphy.com https://1-ps.googleusercontent.com https://api.mixpanel.com https://*.wire.com https://*.cloudfront.net https://*.zinfra.io https://csi.gstatic.com",
-    # Note: The "blob:" attribute needs to be explicitly set for Chrome 47+: https://code.google.com/p/chromium/issues/detail?id=473904
-    "media-src blob: data: *",
-    "object-src 'self' https://*.youtube-nocookie.com https://1-ps.googleusercontent.com",
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://apis.google.com https://api.mixpanel.com https://api.raygun.io https://*.wire.com https://*.zinfra.io",
-    "style-src 'self' 'unsafe-inline' https://*.wire.com https://*.googleusercontent.com"
-  ])
-  response.headers['Content-Security-Policy'] = csp_values
-  response.headers['X-Content-Security-Policy'] = csp_values
-
-  # Custom headers
-  response.headers['X-Wire'] = 'Wire - Secure messenger'
-  response.headers['X-Wire-Version'] = config.CURRENT_VERSION_ID
-
-  if response.mimetype in config.EXPIRES_MIMETYPES:
-    expiry_time = datetime.datetime.utcnow() + datetime.timedelta(365)
-    response.headers['Expires'] = expiry_time.strftime('%a, %d %b %Y %H:%M:%S GMT')
-
-  if response.mimetype in config.NOCACHE_MIMETYPES:
-    response.headers['Cache-Control'] = 'no-cache'
-
-  return response
 
 
 # Taken from https://github.com/wichitacode/flask-compress

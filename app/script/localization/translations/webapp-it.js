@@ -293,10 +293,7 @@ z.string.it.conversationsConnectionRequestOne = '1 persona in attesa';
 z.string.it.conversationsEmptyConversation = 'Conversazione di gruppo';
 z.string.it.conversationsNoConversations = 'Nessuna conversazione';
 z.string.it.conversationsPopoverArchive = 'Archivia';
-z.string.it.conversationsPopoverBlock = 'Blocca';
 z.string.it.conversationsPopoverCancel = 'Annulla richiesta';
-z.string.it.conversationsPopoverClear = 'Elimina';
-z.string.it.conversationsPopoverLeave = 'Abbandona';
 z.string.it.conversationsPopoverNotify = 'Riattiva audio';
 z.string.it.conversationsPopoverSilence = 'Silenzia';
 z.string.it.conversationsPopoverUnarchive = 'Disarchivia';
@@ -342,6 +339,7 @@ z.string.it.addParticipantsSearchPlaceholder = 'Cerca per nome';
 z.string.it.addParticipantsTabsPeople = 'Persone';
 z.string.it.addParticipantsTabsServices = 'Servizi';
 
+z.string.it.conversationDetailsActionArchive = 'Archivia';
 z.string.it.conversationDetailsActionCancelRequest = 'Annulla richiesta';
 z.string.it.conversationDetailsActionDevices = 'Dispositivi';
 z.string.it.conversationDetailsGuestsOff = 'Off';
@@ -414,7 +412,6 @@ z.string.it.preferencesDevicesCurrent = 'Attuale';
 z.string.it.preferencesDevicesFingerprint = 'Impronta digitale della chiave';
 z.string.it.preferencesDevicesFingerprintDetail = 'Wire dà un impronta digitale unica a ogni dispositivo. Confrontale per verificare i tuoi dispositivi e le conversazioni.';
 z.string.it.preferencesDevicesId = 'ID: ';
-z.string.it.preferencesDevicesRemove = 'Rimuovi';
 z.string.it.preferencesDevicesRemoveCancel = 'Annulla';
 z.string.it.preferencesDevicesRemoveDetail = 'RimuovI questo dispositivo se hai smesso di usarlo. Verrai disconnesso immediatamente.';
 z.string.it.preferencesDevicesSessionConfirmation = 'La sessione è stata resettata.';
@@ -446,6 +443,8 @@ z.string.it.preferencesOptionsNotificationsNone = 'Off';
 z.string.it.preferencesOptionsNotificationsObfuscate = 'Nascondi dettagli';
 z.string.it.preferencesOptionsNotificationsObfuscateMessage = 'Mostra mittente';
 z.string.it.preferencesOptionsNotificationsOn = 'Mostra mittente e messaggio';
+
+z.string.it.backupCancel = 'Annulla';
 
 z.string.it.searchConnect = 'Connetti';
 z.string.it.searchConnections = 'Connessioni';

@@ -23,6 +23,18 @@ window.z = window.z || {};
 window.z.storage = z.storage || {};
 
 z.storage.StorageRepository = class StorageRepository {
+  static get CONFIG() {
+    return {
+      CRYPTOGRAPHY_TABLES: [
+        z.storage.StorageSchemata.OBJECT_STORE.AMPLIFY,
+        z.storage.StorageSchemata.OBJECT_STORE.CLIENTS,
+        z.storage.StorageSchemata.OBJECT_STORE.KEYS,
+        z.storage.StorageSchemata.OBJECT_STORE.SESSIONS,
+        z.storage.StorageSchemata.OBJECT_STORE.PRE_KEYS,
+      ],
+    };
+  }
+
   /**
    * Construct an new Storage Repository.
    * @param {z.storage.StorageService} storageService - Service for all storage related interactions
@@ -50,13 +62,7 @@ z.storage.StorageRepository = class StorageRepository {
    * @returns {Promise} Resolves when stores have been deleted
    */
   deleteCryptographyStores() {
-    return this.storageService.deleteStores([
-      z.storage.StorageSchemata.OBJECT_STORE.AMPLIFY,
-      z.storage.StorageSchemata.OBJECT_STORE.CLIENTS,
-      z.storage.StorageSchemata.OBJECT_STORE.KEYS,
-      z.storage.StorageSchemata.OBJECT_STORE.SESSIONS,
-      z.storage.StorageSchemata.OBJECT_STORE.PRE_KEYS,
-    ]);
+    return this.storageService.deleteStores(StorageRepository.CONFIG.CRYPTOGRAPHY_TABLES);
   }
 
   /**

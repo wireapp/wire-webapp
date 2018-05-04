@@ -37,7 +37,8 @@ z.util.DebugUtil = class DebugUtil {
 
   breakSession(userId, clientId) {
     const sessionId = `${userId}@${clientId}`;
-    return wire.app.repository.cryptography.cryptobox
+    const cryptobox = wire.app.repository.cryptography.cryptobox;
+    return cryptobox
       .session_load(sessionId)
       .then(cryptoboxSession => {
         cryptoboxSession.session.session_states = {};
@@ -49,8 +50,10 @@ z.util.DebugUtil = class DebugUtil {
           version: 'broken_by_qa',
         };
 
+        cryptobox.cachedSessions.set(sessionId, cryptoboxSession);
+
         const sessionStoreName = z.storage.StorageSchemata.OBJECT_STORE.SESSIONS;
-        return wire.app.repository.storage.storageService.save(sessionStoreName, sessionId, record);
+        return wire.app.repository.storage.storageService.update(sessionStoreName, sessionId, record);
       })
       .then(() => this.logger.log(`Corrupted Session ID '${sessionId}'`));
   }

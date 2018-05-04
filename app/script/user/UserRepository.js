@@ -132,9 +132,9 @@ z.user.UserRepository = class UserRepository {
           if (users.length) {
             this.logger.log(`Loaded state of '${users.length}' users from database`, users);
             return Promise.all(
-              users.map(user =>
-                this.get_user_by_id(user.id).then(userEntity => userEntity.availability(user.availability))
-              )
+              users.map(user => {
+                return this.get_user_by_id(user.id).then(userEntity => userEntity.availability(user.availability));
+              })
             );
           }
         })
@@ -206,7 +206,10 @@ z.user.UserRepository = class UserRepository {
    */
   onUserAvailability(event) {
     if (this.isTeam()) {
-      const {from: userId, data: {availability}} = event;
+      const {
+        from: userId,
+        data: {availability},
+      } = event;
       this.get_user_by_id(userId).then(userEntity => userEntity.availability(availability));
     }
   }
@@ -337,9 +340,7 @@ z.user.UserRepository = class UserRepository {
         }
 
         if (connection_ets.length) {
-          return this.update_user_connections(connection_ets, true).then(() => {
-            return this.connections();
-          });
+          return this.update_user_connections(connection_ets, true).then(() => this.connections());
         }
 
         return this.connections();

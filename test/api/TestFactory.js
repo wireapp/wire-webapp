@@ -84,14 +84,42 @@ window.TestFactory.prototype.exposeStorageActors = function() {
   this.logger.info('- exposeStorageActors');
   return Promise.resolve()
     .then(() => {
-      TestFactory.storage_service = new z.storage.StorageService();
+      TestFactory.storage_service = singleton(z.storage.StorageService);
       TestFactory.storage_service.logger.level = this.settings.logging_level;
       return TestFactory.storage_service.init(entities.user.john_doe.id);
     })
     .then(() => {
-      TestFactory.storage_repository = new z.storage.StorageRepository(TestFactory.storage_service);
+      TestFactory.storage_repository = singleton(z.storage.StorageRepository, TestFactory.storage_service);
       TestFactory.storage_repository.logger.level = this.settings.logging_level;
       return TestFactory.storage_repository;
+    });
+};
+
+window.TestFactory.prototype.exposeBackupActors = function() {
+  this.logger.info('- exposeBackupActors');
+  return Promise.resolve()
+    .then(() => this.exposeStorageActors())
+    .then(() => this.exposeConversationActors())
+    .then(() => {
+      this.logger.info('✓ exposedStorageActors');
+
+      TestFactory.backup_service = new z.backup.BackupService(TestFactory.storage_service, status);
+      TestFactory.backup_service.logger.level = this.settings.logging_level;
+
+      return this.exposeUserActors();
+    })
+    .then(() => {
+      this.logger.info('✓ exposedUserActors');
+
+      TestFactory.backup_repository = new z.backup.BackupRepository(
+        TestFactory.backup_service,
+        TestFactory.client_repository,
+        TestFactory.conversation_repository,
+        TestFactory.user_repository
+      );
+      TestFactory.backup_repository.logger.level = this.settings.logging_level;
+
+      return TestFactory.backup_repository;
     });
 };
 
@@ -469,3 +497,17 @@ window.TestFactory.prototype.exposeLifecycleActors = function() {
       return TestFactory.lifecycle_repository;
     });
 };
+
+const actorsCache = new Map();
+
+/**
+ * Will instantiate a service only once (uses the global actorsCache to store instances)
+ *
+ * @param {Constructor} Service - the service to instantiate
+ * @param {any} ...dependencies - the dependencies required by the service
+ * @returns {Object} the instantiated service
+ */
+function singleton(Service, ...dependencies) {
+  actorsCache[Service] = actorsCache[Service] || new Service(...dependencies);
+  return actorsCache[Service];
+}

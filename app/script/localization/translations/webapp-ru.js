@@ -82,7 +82,7 @@ z.string.ru.authErrorPasswordShort = 'Выберите пароль длиной
 z.string.ru.authErrorPasswordWrong = 'Неправильный пароль. Пожалуйста, попробуйте еще раз.';
 z.string.ru.authErrorPending = 'Учетная запись еще не проверена';
 z.string.ru.authErrorPhoneNumberBudget = 'Вы делаете попытки войти слишком часто. Повторите попытку позже.';
-z.string.ru.authErrorPhoneNumberForbidden = 'Извините, этот номер телефона запрещён.';
+z.string.ru.authErrorPhoneNumberForbidden = 'Извините, этот номер телефона запрещен.';
 z.string.ru.authErrorPhoneNumberInvalid = 'Неправильный номер телефона';
 z.string.ru.authErrorPhoneNumberUnknown = 'Неизвестный номер телефона';
 z.string.ru.authErrorSuspended = 'У этой учетной записи истек срок действия авторизации.';
@@ -104,6 +104,7 @@ z.string.ru.modalOptionSecondary = 'Отменить';
 
 z.string.ru.modalAccountCreateAction = 'OK';
 z.string.ru.modalAccountCreateHeadline = 'Создать аккаунт?';
+z.string.ru.modalAccountCreateMessage = 'Создав учетную запись, вы потеряете историю разговоров в этой гостевой комнате.';
 
 z.string.ru.modalAccountDeletionAction = 'Удалить';
 z.string.ru.modalAccountDeletionHeadline = 'Удалить аккаунт';
@@ -111,6 +112,7 @@ z.string.ru.modalAccountDeletionMessage = 'Мы вышлем вам сообще
 
 z.string.ru.modalAccountLeaveGuestRoomAction = 'Покинуть';
 z.string.ru.modalAccountLeaveGuestRoomHeadline = 'Покинуть гостевую комнату?';
+z.string.ru.modalAccountLeaveGuestRoomMessage = 'История беседы будет удалена. Чтобы ее сохранить, создайте учетную запись в следующий раз.';
 
 z.string.ru.modalAccountLogoutAction = 'Выход';
 z.string.ru.modalAccountLogoutHeadline = 'Удалить данные?';
@@ -194,8 +196,8 @@ z.string.ru.modalConversationNewDeviceHeadlineMany = '{{user}}s начали и�
 z.string.ru.modalConversationNewDeviceHeadlineYou = '{{user}} начал(а) использовать новое устройство';
 z.string.ru.modalConversationNewDeviceIncomingCallAction = 'Принять вызов';
 z.string.ru.modalConversationNewDeviceIncomingCallMessage = 'Вы действительно хотите принять вызов?';
-z.string.ru.modalConversationNewDeviceMessage = 'Вы всё ещё хотите отправить ваши сообщения?';
-z.string.ru.modalConversationNewDeviceOutgoingCallAction = 'Всё равно позвонить';
+z.string.ru.modalConversationNewDeviceMessage = 'Вы все еще хотите отправить ваши сообщения?';
+z.string.ru.modalConversationNewDeviceOutgoingCallAction = 'Все равно позвонить';
 z.string.ru.modalConversationNewDeviceOutgoingCallMessage = 'Вы действительно хотите позвонить?';
 
 z.string.ru.modalConversationNotConnectedHeadline = 'В разговоре нет участников';
@@ -314,7 +316,7 @@ z.string.ru.conversationUnableToDecrypt2 = 'Идентификатор устр�
 z.string.ru.conversationUnableToDecryptLink = 'Почему?';
 z.string.ru.conversationUnableToDecryptErrorMessage = 'Ошибка';
 z.string.ru.conversationUnableToDecryptResetSession = 'Сбросить сессию';
-z.string.ru.conversationMissedMessages = 'Вы не использовали это устройство некоторое время. Некоторые сообщения могут не отображаться.';
+z.string.ru.conversationMissedMessages = 'Вы не использовали это устройство продолжительное время. Некоторые сообщения могут не отображаться.';
 z.string.ru.conversationAssetUploading = 'Загрузка…';
 z.string.ru.conversationAssetDownloading = 'Загрузка…';
 z.string.ru.conversationAssetUploadFailed = 'Ошибка отправки';
@@ -370,14 +372,14 @@ z.string.ru.conversationsConnectionRequestMany = '{{number}} ожидающих'
 z.string.ru.conversationsConnectionRequestOne = '1 человек ожидает';
 z.string.ru.conversationsEmptyConversation = 'Групповой разговор';
 z.string.ru.conversationsNoConversations = 'Начните разговор или создайте группу.';
-z.string.ru.conversationsPopoverArchive = 'Архивировать';
-z.string.ru.conversationsPopoverBlock = 'Заблокировать';
+z.string.ru.conversationsPopoverArchive = 'Архивировать разговор';
+z.string.ru.conversationsPopoverBlock = 'Блокировать контакт…';
 z.string.ru.conversationsPopoverCancel = 'Отклонить запрос';
-z.string.ru.conversationsPopoverClear = 'Удалить';
-z.string.ru.conversationsPopoverLeave = 'Покинуть';
+z.string.ru.conversationsPopoverClear = 'Удалить содержимое…';
+z.string.ru.conversationsPopoverLeave = 'Покинуть группу…';
 z.string.ru.conversationsPopoverNotify = 'Вкл. звук';
 z.string.ru.conversationsPopoverSilence = 'Выкл. звук';
-z.string.ru.conversationsPopoverUnarchive = 'Разархивировать';
+z.string.ru.conversationsPopoverUnarchive = 'Разархивировать беседу';
 
 z.string.ru.conversationsSecondaryLineMissedCall = '{{number}} пропущенный звонок';
 z.string.ru.conversationsSecondaryLineMissedCalls = '{{number}} пропущенных звонка';
@@ -398,9 +400,9 @@ z.string.ru.conversationsSecondaryLineTimedMessage = 'Временное соо�
 z.string.ru.conversationsSecondaryLineYouLeft = 'Вы покинули разговор';
 z.string.ru.conversationsSecondaryLineYouWereRemoved = 'Вы были удалены';
 
-z.string.ru.takeoverSub = 'Зарегистрируйте своё уникальное имя в Wire.';
+z.string.ru.takeoverSub = 'Зарегистрируйте свое уникальное имя в Wire.';
 z.string.ru.takeoverLink = 'Подробнее';
-z.string.ru.takeoverButtonChoose = 'Выбрать своё';
+z.string.ru.takeoverButtonChoose = 'Выбрать свое';
 z.string.ru.takeoverButtonKeep = 'Оставить это';
 
 z.string.ru.inviteMetaKeyMac = 'Cmd';
@@ -414,7 +416,7 @@ z.string.ru.inviteMessageNoEmail = 'Я использую Wire. Перейди �
 z.string.ru.extensionsBubbleButtonGif = 'Gif';
 
 z.string.ru.extensionsGiphyButtonOk = 'Отправить';
-z.string.ru.extensionsGiphyButtonMore = 'Попробуйте ещё';
+z.string.ru.extensionsGiphyButtonMore = 'Еще';
 z.string.ru.extensionsGiphyMessage = '{{tag}} • через giphy.com';
 z.string.ru.extensionsGiphyNoGifs = 'Упс, нет GIF-ок';
 z.string.ru.extensionsGiphyRandom = 'Случайно';
@@ -443,12 +445,12 @@ z.string.ru.conversationDetailsParticipantsUsersMany = 'Участники';
 z.string.ru.conversationDetailsPeople = 'Участники';
 z.string.ru.conversationDetailsServices = 'Сервисы';
 
-z.string.ru.groupParticipantActionBlock = 'Заблокировать контакт';
+z.string.ru.groupParticipantActionBlock = 'Блокировать контакт…';
 z.string.ru.groupParticipantActionCancelRequest = 'Отклонить запрос';
 z.string.ru.groupParticipantActionDevices = 'Устройства';
 z.string.ru.groupParticipantActionIgnoreRequest = 'Игнорировать запрос';
 z.string.ru.groupParticipantActionIncomingRequest = 'Принять запрос';
-z.string.ru.groupParticipantActionLeave = 'Покинуть группу';
+z.string.ru.groupParticipantActionLeave = 'Покинуть группу…';
 z.string.ru.groupParticipantActionOpenConversation = 'Открыть разговор';
 z.string.ru.groupParticipantActionPending = 'Ожидает';
 z.string.ru.groupParticipantActionRemove = 'Удалить из группы';
@@ -468,7 +470,7 @@ z.string.ru.participantDevicesDetailHeadline = 'Убедитесь, что эт�
 z.string.ru.participantDevicesDetailHowTo = 'Как это сделать?';
 z.string.ru.participantDevicesDetailResetSession = 'Сбросить сессию';
 z.string.ru.participantDevicesDetailShowMyDevice = 'Показать отпечаток моего устройства';
-z.string.ru.participantDevicesDetailVerify = 'Подтверждён';
+z.string.ru.participantDevicesDetailVerify = 'Подтвержден';
 
 z.string.ru.participantDevicesHeader = 'Устройства';
 z.string.ru.participantDevicesHeadline = 'Wire дает каждому устройству уникальный отпечаток. Сравните их с {{user}}, чтобы верифицировать разговор.';
@@ -522,19 +524,19 @@ z.string.ru.preferencesAVSpeakers = 'Динамики';
 z.string.ru.preferencesDevicesActivatedIn = 'в {{location}}';
 z.string.ru.preferencesDevicesActivatedOn = 'Активирован {{date}}';
 z.string.ru.preferencesDevicesActive = 'Активное';
-z.string.ru.preferencesDevicesActiveDetail = 'Если не распознаете устройство выше, удалите его и измените пароль.';
+z.string.ru.preferencesDevicesActiveDetail = 'Если вам не знакомо какое-либо из устройств, удалите его и измените пароль.';
 z.string.ru.preferencesDevicesCurrent = 'Текущее';
 z.string.ru.preferencesDevicesFingerprint = 'Отпечаток ключа';
 z.string.ru.preferencesDevicesFingerprintDetail = 'Wire присваивает каждому устройству уникальный отпечаток. Сравните их и верифицируйте ваши устройства и разговоры.';
 z.string.ru.preferencesDevicesId = 'ID: ';
-z.string.ru.preferencesDevicesRemove = 'Удалить';
+z.string.ru.preferencesDevicesRemove = 'Удалить…';
 z.string.ru.preferencesDevicesRemoveCancel = 'Отменить';
-z.string.ru.preferencesDevicesRemoveDetail = 'Удалите это устройство, если вы перестали им пользоваться. На этом устройстве сразу же будет осуществлён выход из аккаунта.';
+z.string.ru.preferencesDevicesRemoveDetail = 'Удалите это устройство, если вы перестали им пользоваться. На этом устройстве сразу же будет осуществлен выход из аккаунта.';
 z.string.ru.preferencesDevicesSessionConfirmation = 'Сессия была сброшена.';
 z.string.ru.preferencesDevicesSessionDetail = 'Если отпечатки не совпадают, сбросьте сессию для создания новых ключей шифрования на обеих сторонах.';
 z.string.ru.preferencesDevicesSessionReset = 'Сбросить сессию';
 z.string.ru.preferencesDevicesSessionOngoing = 'Сброс сессии…';
-z.string.ru.preferencesDevicesVerification = 'Подтверждён';
+z.string.ru.preferencesDevicesVerification = 'Подтвержден';
 
 z.string.ru.preferencesOptionsAudio = 'Звуковые уведомления';
 z.string.ru.preferencesOptionsAudioAll = 'Все';
@@ -554,7 +556,7 @@ z.string.ru.preferencesOptionsPopular = 'По многочисленным пр�
 z.string.ru.preferencesOptionsEmojiReplaceCheckbox = 'Заменять текстовые смайлы на эмодзи';
 z.string.ru.preferencesOptionsEmojiReplaceDetail = ':-) → {{icon}}';
 z.string.ru.preferencesOptionsPreviewsSendCheckbox = 'Показывать предпросмотр ссылок, отправляемых вами';
-z.string.ru.preferencesOptionsPreviewsSendDetail = 'Предпросмотр всё же может отображаться для ссылок от других людей.';
+z.string.ru.preferencesOptionsPreviewsSendDetail = 'Эта опция не влияет на предварительный просмотр ссылок от других людей.';
 z.string.ru.preferencesOptionsNotifications = 'Уведомления';
 z.string.ru.preferencesOptionsNotificationsNone = 'Выключен';
 z.string.ru.preferencesOptionsNotificationsObfuscate = 'Скрывать содержание сообщения';
@@ -562,6 +564,31 @@ z.string.ru.preferencesOptionsNotificationsObfuscateMessage = 'Показыва�
 z.string.ru.preferencesOptionsNotificationsOn = 'Показывать имя отправителя и текст сообщения';
 z.string.ru.preferencesOptionsCallLogs = 'Устранение неполадок';
 z.string.ru.preferencesOptionsCallLogsDetail = 'Эта информация помогает отделу поддержки Wire диагностировать проблемы, связанные со звонками.';
+
+z.string.ru.preferencesOptionsBackupHeader = 'История';
+z.string.ru.preferencesOptionsBackupExportHeadline = 'Резервная копия разговоров';
+z.string.ru.preferencesOptionsBackupExportSecondary = 'Создайте резервную копию, чтобы сохранить историю разговоров. Это пригодится для восстановления истории в случае потери или замены компьютера.\nРезервная копия не шифруется, поэтому храните ее в надежном месте.';
+z.string.ru.preferencesOptionsBackupImportHeadline = 'Восстановить из резервной копии';
+
+z.string.ru.backupExportGenericErrorHeadline = 'Не удалось сохранить файл';
+z.string.ru.backupExportProgressHeadline = 'Подготовка…';
+z.string.ru.backupExportProgressSecondary = 'Резервное копирование · {{processed}} из {{total}} — {{progress}}%';
+z.string.ru.backupExportProgressCompressing = 'Подготовка файла резервной копии';
+z.string.ru.backupExportSaveFileAction = 'Сохранить файл';
+z.string.ru.backupExportSuccessHeadline = 'Резервная копия создана';
+z.string.ru.backupImportGenericErrorHeadline = 'Что-то пошло не так';
+z.string.ru.backupImportGenericErrorSecondary = 'Ваша история не может быть восстановлена.';
+z.string.ru.backupImportAccountErrorSecondary = 'Вы не можете восстановить историю из другой учетной записи.';
+z.string.ru.backupImportVersionErrorHeadline = 'Несовместимая резервная копия';
+z.string.ru.backupImportVersionErrorSecondary = 'Эта резервная копия была создана в более новой или устаревшей версии Wire и не может быть восстановлена.';
+z.string.ru.backupImportIncompatibleErrorSecondary = 'Вы не можете восстановить историю из другой учетной записи.';
+z.string.ru.backupImportOutdatedErrorHeadline = 'Несовместимая резервная копия';
+z.string.ru.backupImportOutdatedErrorSecondary = 'Эта резервная копия была создана в более новой или устаревшей версии Wire и не может быть восстановлена.';
+z.string.ru.backupImportProgressHeadline = 'Подготовка…';
+z.string.ru.backupImportProgressSecondary = 'Восстановление истории · {{processed}} из {{total}} — {{progress}}%';
+z.string.ru.backupImportSuccessHeadline = 'История восстановлена.';
+z.string.ru.backupCancel = 'Отменить';
+z.string.ru.backupTryAgain = 'Повторить попытку';
 
 z.string.ru.searchConnect = 'Связаться';
 z.string.ru.searchConnections = 'Контакты';
@@ -582,7 +609,7 @@ z.string.ru.searchMemberInvite = 'Пригласите людей в коман�
 z.string.ru.searchOthers = 'Связаться';
 
 z.string.ru.searchInvite = 'Пригласите людей в Wire';
-z.string.ru.searchInviteDetail = 'Предоставление доступа к вашим контактам поможет вам связаться с другими людьми. Вся информация анонимна, мы не предоставляем её третьим лицам.';
+z.string.ru.searchInviteDetail = 'Поделитесь своими контактами, чтобы мы могли соединить вас с другими людьми. Мы анонимизируем всю информацию и не делимся ею с кем-либо еще.';
 z.string.ru.searchInviteButtonContacts = 'Из контактов';
 z.string.ru.searchInviteButtonGmail = 'Из Gmail';
 z.string.ru.searchInviteHeadline = 'Приведите друзей';
@@ -595,8 +622,13 @@ z.string.ru.searchListEveryoneParticipates = 'Все ваши контакты \
 z.string.ru.searchListNoMatches = 'Совпадений не найдено.\nПопробуйте ввести другое имя.';
 
 z.string.ru.temporaryGuestCta = 'Создать аккаунт';
+z.string.ru.temporaryGuestDescription = 'Защитите свой бизнес зашифрованными групповыми сообщениями и вызовами.';
+
+z.string.ru.temporaryGuestJoinMessage = 'Этот разговор будет доступен вам в течение 24 часов.';
+z.string.ru.temporaryGuestJoinDescription = 'Если вы закроете или обновите эту страницу, то потеряете доступ.';
 
 z.string.ru.temporaryGuestLeaveMessage = ' больше не участвуете в этом разговоре.';
+z.string.ru.temporaryGuestLeaveDescription = 'Если вы закроете или обновите эту страницу, то потеряете доступ к истории разговоров.';
 
 z.string.ru.uploadGoogleHeadline = 'Найти людей,\nчтобы поговорить.';
 z.string.ru.uploadGoogleMessage = 'Мы используем ваши контактные данные, чтобы соединить вас с другими пользователями. Мы анонимизируем всю информацию и не делимся ей с кем-либо еще.';

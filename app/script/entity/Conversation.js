@@ -193,13 +193,9 @@ z.entity.Conversation = class Conversation {
      */
     this.display_name = ko.pureComputed(() => {
       if (this.is_request() || this.is_one2one()) {
-        if (this.team_id && this.name()) {
-          return this.name();
-        }
-
         const [userEntity] = this.participating_user_ets();
-        const hasUser = userEntity && userEntity.name();
-        return hasUser ? userEntity.name() : '…';
+        const userName = userEntity && userEntity.name();
+        return userName ? userName : '…';
       }
 
       if (this.is_group()) {
@@ -209,10 +205,10 @@ z.entity.Conversation = class Conversation {
 
         const hasUserEntities = !!this.participating_user_ets().length;
         if (hasUserEntities) {
-          const isJustBots = this.participating_user_ets().every(user_et => user_et.isBot);
+          const isJustBots = this.participating_user_ets().every(userEntity => userEntity.isBot);
           const joinedNames = this.participating_user_ets()
-            .filter(user_et => isJustBots || !user_et.isBot)
-            .map(user_et => user_et.first_name())
+            .filter(userEntity => isJustBots || !userEntity.isBot)
+            .map(userEntity => userEntity.first_name())
             .join(', ');
 
           const maxLength = z.conversation.ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;
@@ -225,13 +221,16 @@ z.entity.Conversation = class Conversation {
         }
       }
 
-      return this.name() || '…';
+      return '…';
     });
 
-    this.persist_state = _.debounce(() => amplify.publish(z.event.WebApp.CONVERSATION.PERSIST_STATE, this), 100);
+    this.shouldPersistStateChanges = false;
+    this.publishPersistState = _.debounce(() => amplify.publish(z.event.WebApp.CONVERSATION.PERSIST_STATE, this), 100);
+
+    this._initSubscriptions();
   }
 
-  subscribe_to_state_updates() {
+  _initSubscriptions() {
     [
       this.archived_state,
       this.archived_timestamp,
@@ -248,7 +247,17 @@ z.entity.Conversation = class Conversation {
       this.status,
       this.type,
       this.verification_state,
-    ].forEach(property => property.subscribe(this.persist_state));
+    ].forEach(property => property.subscribe(this.persistState.bind(this)));
+  }
+
+  persistState() {
+    if (this.shouldPersistStateChanges) {
+      this.publishPersistState();
+    }
+  }
+
+  setStateChangePersistence(persistChanges) {
+    this.shouldPersistStateChanges = persistChanges;
   }
 
   /**
@@ -268,9 +277,10 @@ z.entity.Conversation = class Conversation {
    * @note This will only increment timestamps
    * @param {string|number} timestamp - Timestamp to be set
    * @param {z.conversation.TIMESTAMP_TYPE} type - Type of timestamp to be updated
+   * @param {boolean} forceUpdate - set the timestamp regardless of previous timestamp value (no checks)
    * @returns {boolean|number} Timestamp value which can be 'false' (boolean) if there is no timestamp
    */
-  set_timestamp(timestamp, type) {
+  set_timestamp(timestamp, type, forceUpdate = false) {
     let entity_timestamp;
     if (_.isString(timestamp)) {
       timestamp = window.parseInt(timestamp, 10);
@@ -299,11 +309,12 @@ z.entity.Conversation = class Conversation {
         break;
     }
 
-    const updated_timestamp = this._increment_time_only(entity_timestamp(), timestamp);
-    if (updated_timestamp) {
-      entity_timestamp(updated_timestamp);
+    const updatedTimestamp = forceUpdate ? timestamp : this._increment_time_only(entity_timestamp(), timestamp);
+
+    if (updatedTimestamp !== false) {
+      entity_timestamp(updatedTimestamp);
     }
-    return updated_timestamp;
+    return updatedTimestamp;
   }
 
   /**

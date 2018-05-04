@@ -39,8 +39,12 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
     this.initiateDevices = this.initiateDevices.bind(this);
     this.releaseDevices = this.releaseDevices.bind(this);
 
-    this.mediaRepository = repositories.media;
     this.logger = new z.util.Logger('z.viewModel.content.PreferencesAVViewModel', z.config.LOGGER.OPTIONS);
+
+    this.mediaRepository = repositories.media;
+    this.userRepository = repositories.user;
+
+    this.isActivatedAccount = this.userRepository.isActivatedAccount;
 
     this.devicesHandler = this.mediaRepository.devices_handler;
     this.availableDevices = this.devicesHandler.available_devices;
@@ -68,6 +72,14 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
     this.audioSource = undefined;
 
     this.permissionDenied = ko.observable(false);
+
+    this.supportsAudioInput = ko.pureComputed(() => !!this.availableDevices.audio_input().length);
+    this.supportsAudioOutput = ko.pureComputed(() => {
+      return !!this.availableDevices.audio_output().length && z.util.Environment.browser.supports.audioOutputSelection;
+    });
+    this.supportsVideoInput = ko.pureComputed(() => {
+      return !!this.availableDevices.video_input().length && this.isActivatedAccount();
+    });
   }
 
   /**
@@ -100,14 +112,16 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
    * @returns {Promise} Resolves with a MediaStream
    */
   _getMediaStream() {
-    if (this.mediaStream() && this.streamHandler.local_media_type() === z.media.MediaType.VIDEO) {
+    const hasSupportedVideoStream = this.supportsVideoInput
+      ? this.mediaStream() && this.streamHandler.local_media_type() === z.media.MediaType.VIDEO
+      : this.mediaStream();
+
+    if (hasSupportedVideoStream) {
       return Promise.resolve(this.mediaStream());
     }
 
-    const requestAudio = !!this.availableDevices.audio_input().length;
-    const requestVideo = !!this.availableDevices.video_input().length;
     return this.constraintsHandler
-      .get_media_stream_constraints(requestAudio, requestVideo)
+      .get_media_stream_constraints(this.supportsAudioInput(), this.supportsVideoInput())
       .then(({mediaType, streamConstraints}) => this.streamHandler.request_media_stream(mediaType, streamConstraints))
       .then(mediaStreamInfo => {
         if (this.availableDevices.video_input().length) {
