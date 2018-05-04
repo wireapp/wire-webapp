@@ -60,8 +60,10 @@ z.components.VideoAssetComponent = class VideoAssetComponent {
 
   _load_video_preview() {
     this.asset.load_preview().then(blob => {
-      this.video_element.setAttribute('poster', window.URL.createObjectURL(blob));
-      this.video_element.style.backgroundColor = '#000';
+      if (blob) {
+        this.video_element.setAttribute('poster', window.URL.createObjectURL(blob));
+        this.video_element.style.backgroundColor = '#000';
+      }
     });
   }
 
