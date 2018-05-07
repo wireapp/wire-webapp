@@ -139,8 +139,6 @@ class Account extends EventEmitter {
     return this.loadAndValidateLocalClient()
       .then(localClient => ({isNewClient: false, localClient}))
       .catch(error => {
-        let registeredClient: RegisteredClient;
-
         // There was no client so we need to "create" and "register" a client
         const notFoundInDatabase =
           error instanceof cryptobox.error.CryptoboxError ||
@@ -269,7 +267,7 @@ class Account extends EventEmitter {
   private handleEvent(event: ConversationEvent): Promise<PayloadBundle> {
     this.logger.info('handleEvent');
     const {conversation, from} = event;
-    return this.decodeEvent(event).then(data => Object.assign(data, {from, conversation}));
+    return this.decodeEvent(event).then(data => ({...data, from, conversation}));
   }
 
   private handleNotification(notification: IncomingNotification): void {
