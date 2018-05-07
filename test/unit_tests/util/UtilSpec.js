@@ -4272,8 +4272,8 @@ describe('Ignored Markdown syntax', () => {
 
   it('does not render header', () => {
     expect(z.util.renderMessage('# no header')).toBe('# no header');
-    expect(z.util.renderMessage('no h1\n===')).toBe('no h1<br>===');
-    expect(z.util.renderMessage('no h2\n---')).toBe('no h2<br>---');
+    expect(z.util.renderMessage('no h1\n===')).toBe('no h1<br />===');
+    expect(z.util.renderMessage('no h2\n---')).toBe('no h2<br />---');
   });
 
   it('does not render tables', () => {
