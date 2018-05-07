@@ -4270,7 +4270,7 @@ describe('Ignored Markdown syntax', () => {
     );
   });
 
-  it('does not render header', () => {
+  it('does not render headers', () => {
     expect(z.util.renderMessage('# no header')).toBe('# no header');
     expect(z.util.renderMessage('no h1\n===')).toBe('no h1<br />===');
     expect(z.util.renderMessage('no h2\n---')).toBe('no h2<br />---');
