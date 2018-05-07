@@ -91,7 +91,7 @@ export default class MemoryEngine implements CRUDEngine {
     this.prepareTable(tableName);
     return this.read(tableName, primaryKey)
       .then((entity: Object) => {
-        return Object.assign(entity, changes);
+        return {...entity, ...changes};
       })
       .then((updatedEntity: Object) => {
         this.stores[this.storeName][tableName][primaryKey] = updatedEntity;

@@ -9,6 +9,11 @@ import {
 } from './engine/error';
 
 export = {
+  FileEngine,
+  FileSystemEngine,
+  IndexedDBEngine,
+  LocalStorageEngine,
+  MemoryEngine,
   Store: {
     ExpiredBundle,
     RecordAlreadyExistsError,
@@ -22,9 +27,4 @@ export = {
     RecordTypeError,
     UnsupportedError,
   },
-  FileEngine,
-  FileSystemEngine,
-  IndexedDBEngine,
-  MemoryEngine,
-  LocalStorageEngine,
 };

@@ -36,7 +36,7 @@ export default class PriorityQueue {
   private queue: Array<Item> = [];
 
   constructor(config?: Config) {
-    this.config = Object.assign(this.config, config);
+    this.config = {...this.config, ...config};
   }
 
   public add(thunkedPromise: any, priority: Priority = Priority.MEDIUM, label?: string): Promise<any> {

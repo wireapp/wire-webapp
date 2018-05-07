@@ -1,9 +1,8 @@
-import {keys as ProteusKeys} from '@wireapp/proteus';
-import {session as ProteusSession} from '@wireapp/proteus';
-import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine/index';
-import {PersistedRecord, SerialisedRecord} from '../store/root';
+import {keys as ProteusKeys, session as ProteusSession} from '@wireapp/proteus';
 import {error as StoreEngineError} from '@wireapp/store-engine';
+import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine/index';
 import {Decoder, Encoder} from 'bazinga64';
+import {PersistedRecord, SerialisedRecord} from '../store/root';
 
 export enum CRUDStoreKeys {
   LOCAL_IDENTITY = 'local_identity',
@@ -95,7 +94,7 @@ class CryptoboxCRUDStore implements ProteusSession.PreKeyStore {
 
       records.forEach((record: PersistedRecord) => {
         const payload = this.from_store(record);
-        let preKey: ProteusKeys.PreKey = ProteusKeys.PreKey.deserialise(payload);
+        const preKey: ProteusKeys.PreKey = ProteusKeys.PreKey.deserialise(payload);
         preKeys.push(preKey);
       });
 

@@ -52,7 +52,7 @@ export default class FileSystemEngine implements CRUDEngine {
 
   public async init(storeName: string = '', options?: FileSystemEngineOptions): Promise<FileSystem> {
     await this.isSupported();
-    this.config = Object.assign({}, this.config, options);
+    this.config = {...this.config, ...options};
     this.storeName = storeName;
     const fileSystem: FileSystem = await fs.init({type: this.config.type, bytes: this.config.size});
     await fs.mkdir(this.storeName);

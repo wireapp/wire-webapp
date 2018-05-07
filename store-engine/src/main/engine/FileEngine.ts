@@ -38,7 +38,7 @@ export default class FileEngine implements CRUDEngine {
 
   private resolvePath(tableName: string, primaryKey?: string): Promise<string> {
     const isPathTraversal = (...testPaths: string[]): boolean => {
-      for (let testPath of testPaths) {
+      for (const testPath of testPaths) {
         if (
           typeof testPath !== 'undefined' &&
           (testPath.includes('.') || testPath.includes('/') || testPath.includes('\\'))

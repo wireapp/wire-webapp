@@ -57,15 +57,11 @@ class AssetAPI {
   postAsset(asset: Uint8Array, options?: {public: boolean; retention: AssetRetentionPolicy}): Promise<AssetUploadData> {
     const BOUNDARY = `Frontier${unsafeAlphanumeric()}`;
 
-    const metadata = JSON.stringify(
-      Object.assign(
-        {
-          public: true,
-          retention: AssetRetentionPolicy.PERSISTENT,
-        },
-        options
-      )
-    );
+    const metadata = JSON.stringify({
+      public: true,
+      retention: AssetRetentionPolicy.PERSISTENT,
+      ...options,
+    });
 
     let body = '';
 

@@ -50,7 +50,7 @@ const start = async (): Promise<TravisBot> => {
   const {TRAVIS_BRANCH, TRAVIS_BUILD_NUMBER, TRAVIS_COMMIT, TRAVIS_REPO_SLUG, TRAVIS_TAG} = process.env;
 
   const commitAuthor = await TravisBot.runCommand(`git log | grep Author: | cut -d' ' -f2- | uniq | head -n1`);
-  let commitSummary = await TravisBot.runCommand('git log -1 --pretty=%s');
+  const commitSummary = await TravisBot.runCommand('git log -1 --pretty=%s');
   let changelog;
 
   if (TRAVIS_TAG) {

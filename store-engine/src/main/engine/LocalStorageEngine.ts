@@ -119,7 +119,7 @@ export default class LocalStorageEngine implements CRUDEngine {
   public update(tableName: string, primaryKey: string, changes: Object): Promise<string> {
     return this.read(tableName, primaryKey)
       .then((entity: Object) => {
-        return Object.assign(entity, changes);
+        return {...entity, ...changes};
       })
       .then((updatedEntity: Object) => {
         return this.create(tableName, primaryKey, updatedEntity).catch(error => {

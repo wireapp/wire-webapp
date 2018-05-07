@@ -18,13 +18,12 @@
  */
 
 const logdown = require('logdown');
-import {NotificationEvent} from '@wireapp/api-client/dist/commonjs/notification/index';
-import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine/index';
-import APIClient = require('@wireapp/api-client');
-import {Notification} from '@wireapp/api-client/dist/commonjs/notification/index';
+import {Notification, NotificationEvent} from '@wireapp/api-client/dist/commonjs/notification/index';
 import {RecordNotFoundError} from '@wireapp/store-engine/dist/commonjs/engine/error/index';
-import NotificationDatabaseRepository from './NotificationDatabaseRepository';
+import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine/index';
 import NotificationBackendRepository from './NotificationBackendRepository';
+import NotificationDatabaseRepository from './NotificationDatabaseRepository';
+import APIClient = require('@wireapp/api-client');
 
 export default class NotificationService {
   private logger: any = logdown('@wireapp/core/Account', {
