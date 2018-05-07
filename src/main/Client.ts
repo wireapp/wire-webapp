@@ -179,7 +179,8 @@ class Client {
       Promise.resolve()
         .then(() => this.context && this.logout())
         .then(() => this.auth.api.postRegister(userAccount))
-        /** Note:
+        /**
+         * Note:
          * It's necessary to initialize the context (Client.createContext()) and the store (Client.initEngine())
          * for saving the retrieved cookie from POST /access (Client.init()) in a Node environment.
          */
@@ -210,12 +211,7 @@ class Client {
   }
 
   private createContext(userId: string, clientId?: string, clientType?: ClientType): Context {
-    if (this.context) {
-      this.context = {...this.context, clientId, clientType};
-    } else {
-      this.context = new Context(userId, clientId, clientType);
-    }
-
+    this.context = this.context ? {...this.context, clientId, clientType} : new Context(userId, clientId, clientType);
     return this.context;
   }
 
