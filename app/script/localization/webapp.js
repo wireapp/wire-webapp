@@ -170,9 +170,9 @@ z.string.modalCallSecondOngoingAction = 'Hang Up';
 z.string.modalCallSecondOngoingHeadline = 'Hang up call on another device?';
 z.string.modalCallSecondOngoingMessage = 'You can only be in one call at a time.';
 
-z.string.modalCallSecondOutgoingAction = 'Hang Up';
+z.string.modalCallSecondOutgoingAction = 'Call Anyway';
 z.string.modalCallSecondOutgoingHeadline = 'Hang up current call?';
-z.string.modalCallSecondOutgoingMessage = 'You can only be in one call at a time.';
+z.string.modalCallSecondOutgoingMessage = 'A call is active in another conversation. Calling here will hang up the other call.';
 
 z.string.modalConnectCancelAction = 'Yes';
 z.string.modalConnectCancelHeadline = 'Cancel Request?';
