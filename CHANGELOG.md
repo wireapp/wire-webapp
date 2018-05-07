@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="2.5.0"></a>
+# [2.5.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.4.8...@wireapp/core@2.5.0) (2018-05-07)
+
+
+### Features
+
+* **core:** Send and receive ping ([#564](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/564)) ([9b6dbd3](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/9b6dbd3))
+
+
+
+
 <a name="2.4.8"></a>
 ## [2.4.8](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.4.7...@wireapp/core@2.4.8) (2018-05-03)
 
