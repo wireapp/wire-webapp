@@ -53,6 +53,12 @@ const {MemoryEngine} = require('@wireapp/store-engine/dist/commonjs/engine');
     await promisify(fs.writeFile)(path.join('.', `received_image.${fileType}`), image);
   });
 
+  account.on(Account.INCOMING.PING, async data => {
+    const {conversation: conversationId, from} = data;
+    console.log(`Ping in "${conversationId}" from "${from}".`);
+    await account.service.conversation.sendPing(conversationId);
+  });
+
   try {
     console.log('Logging in ...');
     await account.login(login);
