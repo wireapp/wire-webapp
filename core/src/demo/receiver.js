@@ -63,6 +63,10 @@ const {MemoryEngine} = require('@wireapp/store-engine/dist/commonjs/engine');
     console.log('Logging in ...');
     await account.login(login);
     await account.listen();
+
+    const name = await account.service.self.getName();
+
+    console.log('My name:', name);
     console.log('Listening for messages ...');
   } catch (error) {
     console.error(error);
