@@ -110,6 +110,22 @@ export default class ConversationService {
     return messageId;
   }
 
+  public async sendPing(conversationId: string): Promise<string> {
+    const messageId = new UUID(4).format();
+    const knock = this.protocolBuffers.Knock.create();
+    const ping = this.protocolBuffers.GenericMessage.create({
+      messageId,
+      knock,
+    });
+
+    const preKeyBundles = await this.getPreKeyBundles(conversationId);
+    const plainTextBuffer: Buffer = this.protocolBuffers.GenericMessage.encode(ping).finish();
+    const payload: EncryptedAsset = await AssetCryptography.encryptAsset(plainTextBuffer);
+
+    await this.sendExternalGenericMessage(this.clientID, conversationId, payload, <UserPreKeyBundleMap>preKeyBundles);
+    return messageId;
+  }
+
   public setClientID(clientID: string) {
     this.clientID = clientID;
   }
