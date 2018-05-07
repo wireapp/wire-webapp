@@ -41,6 +41,7 @@ import {LoginSanitizer} from './auth/root';
 import {Root} from 'protobufjs';
 import {WebSocketClient} from '@wireapp/api-client/dist/commonjs/tcp/index';
 import {AssetService, ConversationService, DecodedEvent, GenericMessageType} from './conversation/root';
+import {SelfService} from './self/root';
 import Client = require('@wireapp/api-client');
 import EventEmitter = require('events');
 import {StatusCode} from '@wireapp/api-client/dist/commonjs/http/index';
@@ -66,6 +67,7 @@ class Account extends EventEmitter {
     conversation: ConversationService;
     cryptography: CryptographyService;
     notification: NotificationService;
+    self: SelfService;
   };
 
   constructor(apiClient: Client = new Client()) {
@@ -97,12 +99,14 @@ class Account extends EventEmitter {
       assetService
     );
     const notificationService = new NotificationService(this.apiClient, this.apiClient.config.store);
+    const selfService = new SelfService(this.apiClient);
 
     this.service = {
       client: clientService,
       conversation: conversationService,
       cryptography: cryptographyService,
       notification: notificationService,
+      self: selfService,
     };
   }
 
