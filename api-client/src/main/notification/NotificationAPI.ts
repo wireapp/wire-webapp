@@ -18,8 +18,8 @@
  */
 
 import {AxiosRequestConfig, AxiosResponse} from 'axios';
-import {Notification, NotificationList} from './index';
 import {HttpClient} from '../http';
+import {Notification, NotificationList} from './index';
 
 class NotificationAPI {
   constructor(private client: HttpClient) {}

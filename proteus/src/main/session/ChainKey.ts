@@ -21,9 +21,9 @@
 
 import * as CBOR from '@wireapp/cbor';
 
-import ClassUtil from '../util/ClassUtil';
 import DerivedSecrets from '../derived/DerivedSecrets';
 import MacKey from '../derived/MacKey';
+import ClassUtil from '../util/ClassUtil';
 import MessageKeys from './MessageKeys';
 
 class ChainKey {

@@ -21,8 +21,8 @@
 
 import * as CBOR from '@wireapp/cbor';
 
-import ClassUtil from '../util/ClassUtil';
 import PublicKey from '../keys/PublicKey';
+import ClassUtil from '../util/ClassUtil';
 
 import DecryptError from '../errors/DecryptError';
 import ProteusError from '../errors/ProteusError';

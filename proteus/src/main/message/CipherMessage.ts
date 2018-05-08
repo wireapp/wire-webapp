@@ -21,11 +21,11 @@
 
 import * as CBOR from '@wireapp/cbor';
 
-import ClassUtil from '../util/ClassUtil';
+import InputError from '../errors/InputError';
 import PublicKey from '../keys/PublicKey';
+import ClassUtil from '../util/ClassUtil';
 import Message from './Message';
 import SessionTag from './SessionTag';
-import InputError from '../errors/InputError';
 
 class CipherMessage extends Message {
   cipher_text: Uint8Array;

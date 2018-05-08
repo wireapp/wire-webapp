@@ -21,9 +21,9 @@
 
 import * as CBOR from '@wireapp/cbor';
 
+import KeyPair from '../keys/KeyPair';
 import ClassUtil from '../util/ClassUtil';
 import ChainKey from './ChainKey';
-import KeyPair from '../keys/KeyPair';
 
 class SendChain {
   chain_key: ChainKey;

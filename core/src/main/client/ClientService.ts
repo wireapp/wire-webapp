@@ -20,11 +20,7 @@
 const logdown = require('logdown');
 const pkg = require('../../package.json');
 import APIClient = require('@wireapp/api-client');
-import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine/index';
-import ClientBackendRepository from './ClientBackendRepository';
-import ClientDatabaseRepository from './ClientDatabaseRepository';
 import {LoginData, PreKey} from '@wireapp/api-client/dist/commonjs/auth/index';
-import {ClientInfo} from './root';
 import {
   ClientClassification,
   ClientType,
@@ -32,7 +28,11 @@ import {
   NewClient,
   RegisteredClient,
 } from '@wireapp/api-client/dist/commonjs/client/index';
+import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine/index';
 import {CryptographyService} from '../cryptography/root';
+import ClientBackendRepository from './ClientBackendRepository';
+import ClientDatabaseRepository from './ClientDatabaseRepository';
+import {ClientInfo} from './root';
 
 export interface MetaClient extends RegisteredClient {
   meta: {

@@ -17,13 +17,13 @@
  *
  */
 
-import {RegisterData} from './RegisterData';
-import {User} from '../user';
-import {LoginData} from '../auth';
-import {AxiosPromise, AxiosRequestConfig, AxiosResponse} from 'axios';
 import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine';
-import {sendRequestWithCookie} from '../shims/node/cookie';
+import {AxiosPromise, AxiosRequestConfig, AxiosResponse} from 'axios';
+import {LoginData} from '../auth';
 import {HttpClient} from '../http';
+import {sendRequestWithCookie} from '../shims/node/cookie';
+import {User} from '../user';
+import {RegisterData} from './RegisterData';
 
 class AuthAPI {
   constructor(private client: HttpClient, private engine: CRUDEngine) {}

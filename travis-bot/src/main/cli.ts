@@ -19,8 +19,8 @@
  *
  */
 
-import {TravisBot, MessageData} from './index';
 import {LoginData} from '@wireapp/api-client/dist/commonjs/auth/';
+import {MessageData, TravisBot} from './index';
 
 const logdown = require('logdown');
 const {version}: {version: string} = require('../package.json');

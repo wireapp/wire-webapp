@@ -18,9 +18,9 @@
  */
 
 import CRUDEngine from './CRUDEngine';
-import {RecordTypeError} from './error/';
-import {RecordAlreadyExistsError, RecordNotFoundError, UnsupportedError} from './error';
 import {isBrowser} from './EnvironmentUtil';
+import {RecordAlreadyExistsError, RecordNotFoundError, UnsupportedError} from './error';
+import {RecordTypeError} from './error/';
 
 const fs = require('bro-fs');
 

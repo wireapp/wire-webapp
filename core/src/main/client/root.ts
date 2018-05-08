@@ -17,7 +17,7 @@
  *
  */
 
-import ClientService from './ClientService';
 import {ClientInfo} from './ClientInfo';
+import ClientService from './ClientService';
 
 export {ClientService, ClientInfo};

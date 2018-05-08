@@ -19,16 +19,16 @@
 
 const logdown = require('logdown');
 import APIClient = require('@wireapp/api-client');
-import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine/index';
-import {Cryptobox, store as CryptoboxStore} from '@wireapp/cryptobox';
-import {Decoder, Encoder} from 'bazinga64';
-import {RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/index';
-import {UserPreKeyBundleMap} from '@wireapp/api-client/dist/commonjs/user/index';
-import * as ProteusKeys from '@wireapp/proteus/dist/keys/root';
 import {PreKey as SerializedPreKey} from '@wireapp/api-client/dist/commonjs/auth/index';
-import CryptographyDatabaseRepository from './CryptographyDatabaseRepository';
-import {SessionPayloadBundle} from '../cryptography/root';
+import {RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/index';
 import {OTRRecipients} from '@wireapp/api-client/dist/commonjs/conversation/index';
+import {UserPreKeyBundleMap} from '@wireapp/api-client/dist/commonjs/user/index';
+import {Cryptobox, store as CryptoboxStore} from '@wireapp/cryptobox';
+import * as ProteusKeys from '@wireapp/proteus/dist/keys/root';
+import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine/index';
+import {Decoder, Encoder} from 'bazinga64';
+import {SessionPayloadBundle} from '../cryptography/root';
+import CryptographyDatabaseRepository from './CryptographyDatabaseRepository';
 
 export interface MetaClient extends RegisteredClient {
   meta: {

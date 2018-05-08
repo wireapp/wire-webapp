@@ -24,8 +24,8 @@ import * as CBOR from '@wireapp/cbor';
 import ArrayUtil from '../util/ArrayUtil';
 import ClassUtil from '../util/ClassUtil';
 
-import MemoryUtil from '../util/MemoryUtil';
 import DecryptError from '../errors/DecryptError';
+import MemoryUtil from '../util/MemoryUtil';
 
 import DerivedSecrets from '../derived/DerivedSecrets';
 
@@ -37,8 +37,8 @@ import PublicKey from '../keys/PublicKey';
 
 import CipherMessage from '../message/CipherMessage';
 import Envelope from '../message/Envelope';
-import PreKeyMessage from '../message/PreKeyMessage';
 import Message from '../message/Message';
+import PreKeyMessage from '../message/PreKeyMessage';
 import SessionTag from '../message/SessionTag';
 
 import MessageKeys from '../session/MessageKeys';

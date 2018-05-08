@@ -19,8 +19,6 @@
 
 const UUID = require('pure-uuid');
 import APIClient = require('@wireapp/api-client');
-import {Encoder} from 'bazinga64';
-import {AxiosError} from 'axios';
 import {
   ClientMismatch,
   NewOTRMessage,
@@ -28,9 +26,11 @@ import {
   UserClients,
 } from '@wireapp/api-client/dist/commonjs/conversation/index';
 import {UserPreKeyBundleMap} from '@wireapp/api-client/dist/commonjs/user/index';
-import {CryptographyService, EncryptedAsset} from '../cryptography/root';
+import {AxiosError} from 'axios';
+import {Encoder} from 'bazinga64';
 import {AssetService, ConfirmationType, Image, RemoteData} from '../conversation/root';
 import * as AssetCryptography from '../cryptography/AssetCryptography.node';
+import {CryptographyService, EncryptedAsset} from '../cryptography/root';
 
 export default class ConversationService {
   private clientID: string = '';

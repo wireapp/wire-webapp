@@ -17,12 +17,12 @@
  *
  */
 
-import PreKey from './PreKey';
 import IdentityKey from './IdentityKey';
 import IdentityKeyPair from './IdentityKeyPair';
 import KeyPair from './KeyPair';
-import PreKeyBundle from './PreKeyBundle';
+import PreKey from './PreKey';
 import PreKeyAuth from './PreKeyAuth';
+import PreKeyBundle from './PreKeyBundle';
 import PublicKey from './PublicKey';
 import SecretKey from './SecretKey';
 

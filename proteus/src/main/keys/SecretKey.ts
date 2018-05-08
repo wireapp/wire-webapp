@@ -23,9 +23,9 @@ import * as sodium from 'libsodium-wrappers-sumo';
 
 import ClassUtil from '../util/ClassUtil';
 
-import PublicKey from './PublicKey';
-import ArrayUtil from '../util/ArrayUtil';
 import InputError from '../errors/InputError';
+import ArrayUtil from '../util/ArrayUtil';
+import PublicKey from './PublicKey';
 
 class SecretKey {
   sec_curve: Uint8Array;

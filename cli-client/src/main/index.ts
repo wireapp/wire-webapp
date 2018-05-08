@@ -5,14 +5,14 @@ const program = require('commander');
 const {Account} = require('@wireapp/core');
 const {description, version} = require('../../package.json');
 const {FileEngine} = require('@wireapp/store-engine');
+import APIClient = require('@wireapp/api-client');
+import {RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/';
+import {Config} from '@wireapp/api-client/dist/commonjs/Config';
+import {BackendErrorLabel} from '@wireapp/api-client/dist/commonjs/http/';
+import {PayloadBundle} from '@wireapp/core/dist/cryptography/root';
+import {AxiosError} from 'axios';
 import * as os from 'os';
 import * as path from 'path';
-import {AxiosError} from 'axios';
-import {BackendErrorLabel} from '@wireapp/api-client/dist/commonjs/http/';
-import {Config} from '@wireapp/api-client/dist/commonjs/Config';
-import {PayloadBundle} from '@wireapp/core/dist/cryptography/root';
-import {RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/';
-import APIClient = require('@wireapp/api-client');
 
 require('dotenv').config();
 

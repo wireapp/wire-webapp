@@ -20,8 +20,8 @@
 import * as CBOR from '@wireapp/cbor';
 import * as sodium from 'libsodium-wrappers-sumo';
 
-import ClassUtil from '../util/ClassUtil';
 import DecodeError from '../errors/DecodeError';
+import ClassUtil from '../util/ClassUtil';
 import RandomUtil from '../util/RandomUtil';
 
 class SessionTag {

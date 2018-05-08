@@ -19,9 +19,10 @@
 
 import {AxiosRequestConfig, AxiosResponse} from 'axios';
 
-import {HttpClient} from '../http';
 import {ClientPreKey, PreKeyBundle} from '../auth';
 import {PublicClient} from '../client/';
+import {UserClients} from '../conversation/UserClients';
+import {HttpClient} from '../http';
 import {
   Activate,
   ActivationResponse,
@@ -35,7 +36,6 @@ import {
   UserPreKeyBundleMap,
   VerifyDelete,
 } from '../user';
-import {UserClients} from '../conversation/UserClients';
 
 class UserAPI {
   constructor(private client: HttpClient) {}

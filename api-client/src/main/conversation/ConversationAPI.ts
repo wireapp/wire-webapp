@@ -21,9 +21,9 @@ import {AxiosRequestConfig, AxiosResponse} from 'axios';
 import {
   ClientMismatch,
   Conversation,
+  ConversationCode,
   ConversationIds,
   Conversations,
-  ConversationCode,
   ConversationUpdate,
   Invite,
   Member,
@@ -33,8 +33,8 @@ import {
   Typing,
 } from '../conversation/';
 import {ConversationEvent} from '../event/ConversationEvent';
-import {ValidationError} from '../validation/';
 import {HttpClient} from '../http/';
+import {ValidationError} from '../validation/';
 
 class ConversationAPI {
   constructor(private client: HttpClient) {}
