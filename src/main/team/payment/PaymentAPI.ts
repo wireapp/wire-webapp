@@ -20,13 +20,13 @@
 import {AxiosPromise, AxiosRequestConfig, AxiosResponse} from 'axios';
 
 import {
-  PaymentData,
   PaymentBillingData,
+  PaymentData,
   PaymentDataUpdate,
+  PaymentPlan,
   PaymentStripeCharge,
   PaymentStripeInvoice,
   PaymentStripePlan,
-  PaymentPlan,
 } from '.';
 import {HttpClient} from '../../http';
 

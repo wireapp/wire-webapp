@@ -19,8 +19,8 @@
 
 import {AxiosRequestConfig, AxiosResponse} from 'axios';
 
-import {HttpClient} from '../http/';
 import {Image} from '../giphy/';
+import {HttpClient} from '../http/';
 
 class GiphyAPI {
   constructor(private client: HttpClient) {}

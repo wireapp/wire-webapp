@@ -19,8 +19,8 @@
 
 import {AxiosPromise, AxiosRequestConfig, AxiosResponse} from 'axios';
 
-import {NewTeamInvitation, TeamInvitation, TeamInvitationChunk} from '../invitation';
 import {HttpClient} from '../../http';
+import {NewTeamInvitation, TeamInvitation, TeamInvitationChunk} from '../invitation';
 import {TeamAPI} from '../team';
 
 class TeamInvitationAPI {

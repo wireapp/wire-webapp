@@ -17,9 +17,9 @@
  *
  */
 
-import {AccessTokenData} from '../../auth';
-import {AxiosPromise, AxiosRequestConfig, AxiosResponse} from 'axios';
 import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine';
+import {AxiosPromise, AxiosRequestConfig, AxiosResponse} from 'axios';
+import {AccessTokenData} from '../../auth';
 import {HttpClient} from '../../http';
 
 export const retrieveCookie = (response: AxiosResponse, engine: CRUDEngine): Promise<AccessTokenData> =>
