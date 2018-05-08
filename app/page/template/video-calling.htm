@@ -6,13 +6,19 @@
            data-bind="css: {'video-element-remote-minimized': multitasking.isMinimized()}">
 
         <!-- ko if: showRemoteVideo() -->
-          <video class="video-element"
-                 autoplay
-                 data-bind="attr: {sinkId: currentDeviceId.audio_output()},
-                            css: {'video-element-contain': remoteVideoElementContain()},
-                            event: {loadedmetadata: onLoadedMetadata},
-                            muteMediaElement: remoteVideoStream(),
-                            sourceStream: remoteVideoStream()"></video>
+          <div style="display: flex; background: #000; height: 100%; width: 100%; justify-content: space-around; align-items: center;">
+            <!-- ko foreach: remoteVideoStreams() -->
+              <div style="width: 960px; height: 720px;">
+                <video class="video-element"
+                       autoplay
+                       data-bind="attr: {sinkId: $parent.currentDeviceId.audio_output()},
+                                  css: {'video-element-contain': $parent.remoteVideoElementContain()},
+                                  event: {loadedmetadata: $parent.onLoadedMetadata},
+                                  muteMediaElement: $data,
+                                  sourceStream: $data"></video>
+              </div>
+            <!-- /ko -->
+          </div>
         <!-- /ko -->
         <!-- ko if: showRemoteParticipant() -->
           <div class="video-element-remote-participant">

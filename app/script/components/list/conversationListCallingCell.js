@@ -80,9 +80,7 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
 
     this.show_screensharing_button = ko.pureComputed(() => z.calling.CallingRepository.supportsScreenSharing);
     this.show_video_button = ko.pureComputed(() => {
-      if (this.joined_call()) {
-        return this.joined_call().conversationEntity.is_one2one();
-      }
+      return this.joined_call() ? this.joined_call().conversationEntity.supportsVideoCall(false) : false;
     });
     this.disableToggleScreen = ko.pureComputed(() => {
       return this.joined_call() ? this.joined_call().isRemoteScreenSend() : true;

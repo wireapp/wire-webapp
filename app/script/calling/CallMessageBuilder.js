@@ -95,7 +95,7 @@ z.calling.CallMessageBuilder = (() => {
    * @param {Object} additionalPayload - Optional additional payload to be added
    * @returns {Object} call message props object
    */
-  const _createPayloadPropSync = (selfState, payloadType, invert, additionalPayload) => {
+  const _createPropSync = (selfState, payloadType, invert, additionalPayload) => {
     const payload = {};
 
     if (_.isBoolean(payloadType)) {
@@ -161,6 +161,6 @@ z.calling.CallMessageBuilder = (() => {
     buildSetup: _buildSetup,
     buildUpdate: _buildUpdate,
     createPayload: _createPayload,
-    createPayloadPropSync: _createPayloadPropSync,
+    createPropSync: _createPropSync,
   };
 })();

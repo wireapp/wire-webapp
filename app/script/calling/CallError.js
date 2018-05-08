@@ -65,7 +65,7 @@ z.calling.CallError = class CallError extends Error {
           this.message = 'Wrong conversation type for call message';
           break;
         case CallError.TYPE.WRONG_PAYLOAD_FORMAT:
-          this.message = 'Payload for an call message is in wrong format';
+          this.message = 'Payload for a call message is in wrong format';
           break;
         case CallError.TYPE.WRONG_SENDER:
           this.message = 'Call change from wrong sender';

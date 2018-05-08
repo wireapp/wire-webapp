@@ -36,6 +36,7 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
 
     this.callingRepository = repositories.calling;
     this.conversationRepository = repositories.conversation;
+    this.userRepository = repositories.user;
     this.multitasking = contentViewModel.multitasking;
     this.logger = new z.util.Logger('z.viewModel.content.TitleBarViewModel', z.config.LOGGER.OPTIONS);
 
@@ -77,7 +78,7 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
       return this.hasOngoingCall() && this.multitasking.isMinimized() && hasLocalVideo && !hasRemoteVideo;
     });
 
-    this.showCallControls = ko.computed(() => {
+    this.showCallControls = ko.pureComputed(() => {
       if (!this.conversationEntity()) {
         return false;
       }
@@ -86,6 +87,10 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
       const hasParticipants = !!this.conversationEntity().participating_user_ids().length;
       const isActiveConversation = hasParticipants && !this.conversationEntity().removed_from_conversation();
       return !this.hasCall() && isSupportedConversation && isActiveConversation;
+    });
+
+    this.supportsVideoCall = ko.pureComputed(() => {
+      return this.showCallControls() ? this.conversationEntity().supportsVideoCall(true) : false;
     });
 
     const shortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.PEOPLE);
