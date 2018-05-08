@@ -18,8 +18,8 @@
  */
 
 import CryptographyService from './CryptographyService';
+import EncryptedAsset from './EncryptedAsset';
 import PayloadBundle from './PayloadBundle';
 import SessionPayloadBundle from './SessionPayloadBundle';
-import EncryptedAsset from './EncryptedAsset';
 
 export {CryptographyService, EncryptedAsset, PayloadBundle, SessionPayloadBundle};

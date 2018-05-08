@@ -18,10 +18,10 @@
  */
 
 import APIClient = require('@wireapp/api-client');
-import {CryptographyService, EncryptedAsset} from '../cryptography/root';
+import {AssetRetentionPolicy} from '@wireapp/api-client/dist/commonjs/asset/AssetRetentionPolicy';
 import {Image} from '../conversation/root';
 import * as AssetCryptography from '../cryptography/AssetCryptography.node';
-import {AssetRetentionPolicy} from '@wireapp/api-client/dist/commonjs/asset/AssetRetentionPolicy';
+import {CryptographyService, EncryptedAsset} from '../cryptography/root';
 
 export interface AssetOptions {
   public: boolean;

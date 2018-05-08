@@ -19,17 +19,8 @@
 
 const pkg = require('../package.json');
 const logdown = require('logdown');
-import {IncomingNotification} from '@wireapp/api-client/dist/commonjs/conversation/index';
-import * as cryptobox from '@wireapp/cryptobox';
-import {CryptographyService, PayloadBundle} from './cryptography/root';
-import {ClientService, ClientInfo} from './client/root';
-import {NotificationService} from './notification/root';
+import Client = require('@wireapp/api-client');
 import {Context, LoginData, PreKey} from '@wireapp/api-client/dist/commonjs/auth/index';
-import {
-  ConversationEvent,
-  CONVERSATION_EVENT,
-  ConversationOtrMessageAddEvent,
-} from '@wireapp/api-client/dist/commonjs/event/index';
 import {
   ClientClassification,
   ClientType,
@@ -37,16 +28,25 @@ import {
   NewClient,
   RegisteredClient,
 } from '@wireapp/api-client/dist/commonjs/client/index';
-import {LoginSanitizer} from './auth/root';
-import {Root} from 'protobufjs';
-import {WebSocketClient} from '@wireapp/api-client/dist/commonjs/tcp/index';
-import {AssetService, ConversationService, DecodedEvent, GenericMessageType} from './conversation/root';
-import {SelfService} from './self/root';
-import Client = require('@wireapp/api-client');
-import EventEmitter = require('events');
+import {IncomingNotification} from '@wireapp/api-client/dist/commonjs/conversation/index';
+import {
+  CONVERSATION_EVENT,
+  ConversationEvent,
+  ConversationOtrMessageAddEvent,
+} from '@wireapp/api-client/dist/commonjs/event/index';
 import {StatusCode} from '@wireapp/api-client/dist/commonjs/http/index';
+import {WebSocketClient} from '@wireapp/api-client/dist/commonjs/tcp/index';
+import * as cryptobox from '@wireapp/cryptobox';
 import {RecordNotFoundError} from '@wireapp/store-engine/dist/commonjs/engine/error/index';
+import EventEmitter = require('events');
+import {Root} from 'protobufjs';
+import {LoginSanitizer} from './auth/root';
+import {ClientInfo, ClientService} from './client/root';
+import {AssetService, ConversationService, DecodedEvent, GenericMessageType} from './conversation/root';
+import {CryptographyService, PayloadBundle} from './cryptography/root';
+import {NotificationService} from './notification/root';
 import proto from './Protobuf';
+import {SelfService} from './self/root';
 
 class Account extends EventEmitter {
   private logger: any = logdown('@wireapp/core/Account', {

@@ -17,9 +17,9 @@
  *
  */
 
-import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine/index';
 import {RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/index';
 import {store as CryptoboxStore} from '@wireapp/cryptobox';
+import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine/index';
 import {MetaClient} from './CryptographyService';
 
 export enum DatabaseStores {
