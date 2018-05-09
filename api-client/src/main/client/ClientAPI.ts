@@ -42,7 +42,7 @@ class ClientAPI {
     return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
   }
 
-  public deleteClient(clientId: string, password?: string): Promise<Object> {
+  public async deleteClient(clientId: string, password?: string): Promise<void> {
     const config: AxiosRequestConfig = {
       data: {
         password,
@@ -51,7 +51,7 @@ class ClientAPI {
       url: `${ClientAPI.URL.CLIENTS}/${clientId}`,
     };
 
-    return this.client.sendJSON(config).then(() => ({}));
+    await this.client.sendJSON(config);
   }
 
   public getClient(clientId: string): Promise<RegisteredClient> {

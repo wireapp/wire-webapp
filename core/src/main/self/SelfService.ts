@@ -38,11 +38,11 @@ export default class SelfService {
     return this.apiClient.self.api.getSelf();
   }
 
-  public setName(name: string): Promise<{}> {
+  public setName(name: string): Promise<void> {
     return this.apiClient.self.api.putSelf({name});
   }
 
-  public async setUserName(userName: string): Promise<{}> {
+  public async setUserName(userName: string): Promise<void> {
     const [availableHandle] = await this.apiClient.user.api.postHandles({
       handles: [userName],
     });

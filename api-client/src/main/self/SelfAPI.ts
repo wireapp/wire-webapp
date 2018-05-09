@@ -43,40 +43,40 @@ class SelfAPI {
    * Remove your email address.
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/removeEmail
    */
-  public deleteEmail(): Promise<{}> {
+  public async deleteEmail(): Promise<void> {
     const config: AxiosRequestConfig = {
       method: 'delete',
       url: `${SelfAPI.URL.SELF}/${SelfAPI.URL.EMAIL}`,
     };
 
-    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+    await this.client.sendJSON(config);
   }
 
   /**
    * Remove your phone number.
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/removePhone
    */
-  public deletePhone(): Promise<{}> {
+  public async deletePhone(): Promise<void> {
     const config: AxiosRequestConfig = {
       method: 'delete',
       url: `${SelfAPI.URL.SELF}/${SelfAPI.URL.PHONE}`,
     };
 
-    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+    await this.client.sendJSON(config);
   }
 
   /**
    * Initiate account deletion.
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/deleteUser
    */
-  public deleteSelf(deleteData: Delete): Promise<{}> {
+  public async deleteSelf(deleteData: Delete): Promise<void> {
     const config: AxiosRequestConfig = {
       data: deleteData,
       method: 'delete',
       url: SelfAPI.URL.SELF,
     };
 
-    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+    await this.client.sendJSON(config);
   }
 
   /**
@@ -123,7 +123,7 @@ class SelfAPI {
    * @param emailData The new email address
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/changeEmail
    */
-  public putEmail(emailData: {email: string}): Promise<{}> {
+  public async putEmail(emailData: {email: string}): Promise<void> {
     const config: AxiosRequestConfig = {
       data: emailData,
       method: 'put',
@@ -138,14 +138,14 @@ class SelfAPI {
    * @param handleData The new handle
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/changeHandle
    */
-  public putHandle(handleData: {handle: string}): Promise<{}> {
+  public async putHandle(handleData: {handle: string}): Promise<void> {
     const config: AxiosRequestConfig = {
       data: handleData,
       method: 'put',
       url: `${SelfAPI.URL.SELF}/${SelfAPI.URL.HANDLE}`,
     };
 
-    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+    await this.client.sendJSON(config);
   }
 
   /**
@@ -153,14 +153,14 @@ class SelfAPI {
    * @param localeData The new locale
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/changeLocale
    */
-  public putLocale(localeData: {locale: string}): Promise<{}> {
+  public async putLocale(localeData: {locale: string}): Promise<void> {
     const config: AxiosRequestConfig = {
       data: localeData,
       method: 'put',
       url: `${SelfAPI.URL.SELF}/${SelfAPI.URL.LOCALE}`,
     };
 
-    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+    await this.client.sendJSON(config);
   }
 
   /**
@@ -168,14 +168,14 @@ class SelfAPI {
    * @param passwordData The new password
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/changePassword
    */
-  public putPassword(passwordData: ChangePassword): Promise<{}> {
+  public async putPassword(passwordData: ChangePassword): Promise<void> {
     const config: AxiosRequestConfig = {
       data: passwordData,
       method: 'put',
       url: `${SelfAPI.URL.SELF}/${SelfAPI.URL.PASSWORD}`,
     };
 
-    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+    await this.client.sendJSON(config);
   }
 
   /**
@@ -183,14 +183,14 @@ class SelfAPI {
    * @param phoneData The new phone number (E.164 format)
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/changePhone
    */
-  public putPhone(phoneData: {phone: string}): Promise<{}> {
+  public async putPhone(phoneData: {phone: string}): Promise<void> {
     const config: AxiosRequestConfig = {
       data: phoneData,
       method: 'put',
       url: `${SelfAPI.URL.SELF}/${SelfAPI.URL.PHONE}`,
     };
 
-    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+    await this.client.sendJSON(config);
   }
 
   /**
@@ -198,14 +198,14 @@ class SelfAPI {
    * @param statusData The new search status
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/updateSearchableStatus
    */
-  public putSearchable(statusData: SearchableStatus): Promise<{}> {
+  public async putSearchable(statusData: SearchableStatus): Promise<void> {
     const config: AxiosRequestConfig = {
       data: statusData,
       method: 'put',
       url: `${SelfAPI.URL.SELF}/${SelfAPI.URL.SEARCHABLE}`,
     };
 
-    return this.client.sendJSON(config).then(() => ({}));
+    await this.client.sendJSON(config);
   }
 
   /**
@@ -213,14 +213,14 @@ class SelfAPI {
    * @param profileData The new profile data
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/updateSelf
    */
-  public putSelf(profileData: UserUpdate): Promise<{}> {
+  public async putSelf(profileData: UserUpdate): Promise<void> {
     const config: AxiosRequestConfig = {
       data: profileData,
       method: 'put',
       url: SelfAPI.URL.SELF,
     };
 
-    return this.client.sendJSON(config).then(() => ({}));
+    await this.client.sendJSON(config);
   }
 }
 

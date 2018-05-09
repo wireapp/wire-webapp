@@ -58,13 +58,13 @@ class ConversationAPI {
    * @param conversationId The conversation ID to remove the bot from
    * @param botId The ID of the bot to be removed from the conversation
    */
-  public deleteBot(conversationId: string, botId: string): Promise<{}> {
+  public async deleteBot(conversationId: string, botId: string): Promise<void> {
     const config: AxiosRequestConfig = {
       method: 'delete',
       url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.BOTS}/${botId}`,
     };
 
-    return this.client.sendJSON(config).then(() => ({}));
+    await this.client.sendJSON(config);
   }
 
   /**
@@ -167,14 +167,14 @@ class ConversationAPI {
    * @param conversationData The new conversation
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/createOne2OneConversation
    */
-  public post1to1(conversationData: NewConversation): Promise<{}> {
+  public async post1to1(conversationData: NewConversation): Promise<void> {
     const config: AxiosRequestConfig = {
       data: conversationData,
       method: 'post',
       url: `${ConversationAPI.URL.CONVERSATIONS}/one2one`,
     };
 
-    return this.client.sendJSON(config).then(() => ({}));
+    await this.client.sendJSON(config);
   }
 
   /**
@@ -199,7 +199,7 @@ class ConversationAPI {
    * @param providerId ID of the bot provider
    * @param serviceId ID of the service provider
    */
-  public postBot(conversationId: string, providerId: string, serviceId: string): Promise<{}> {
+  public async postBot(conversationId: string, providerId: string, serviceId: string): Promise<void> {
     const config: AxiosRequestConfig = {
       data: {
         provider: providerId,
@@ -209,7 +209,7 @@ class ConversationAPI {
       url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.BOTS}`,
     };
 
-    return this.client.sendJSON(config).then(() => ({}));
+    await this.client.sendJSON(config);
   }
 
   /**
@@ -232,14 +232,14 @@ class ConversationAPI {
    * @param conversationCode The conversation code
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/checkConversationCode
    */
-  public postConversationCodeCheck(conversationCode: ConversationCode): Promise<{}> {
+  public async postConversationCodeCheck(conversationCode: ConversationCode): Promise<void> {
     const config: AxiosRequestConfig = {
       data: conversationCode,
       method: 'post',
       url: `${ConversationAPI.URL.CONVERSATIONS}${ConversationAPI.URL.CODE_CHECK}`,
     };
 
-    return this.client.sendJSON(config).then(() => ({}));
+    await this.client.sendJSON(config);
   }
 
   /**
@@ -337,14 +337,14 @@ class ConversationAPI {
    * @param typingData The typing status
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/isTyping
    */
-  public postTyping(conversationId: string, typingData: Typing): Promise<{}> {
+  public async postTyping(conversationId: string, typingData: Typing): Promise<void> {
     const config: AxiosRequestConfig = {
       data: typingData,
       method: 'post',
       url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.SELF}`,
     };
 
-    return this.client.sendJSON(config).then(() => ({}));
+    await this.client.sendJSON(config);
   }
 
   /**
@@ -369,14 +369,14 @@ class ConversationAPI {
    * @param memberData The new conversation
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/updateSelf
    */
-  public putMembershipProperties(conversationId: string, memberData: MemberUpdate): Promise<{}> {
+  public async putMembershipProperties(conversationId: string, memberData: MemberUpdate): Promise<void> {
     const config: AxiosRequestConfig = {
       data: memberData,
       method: 'put',
       url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.SELF}`,
     };
 
-    return this.client.sendJSON(config).then(() => ({}));
+    await this.client.sendJSON(config);
   }
 }
 
