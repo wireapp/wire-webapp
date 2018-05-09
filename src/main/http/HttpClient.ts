@@ -88,8 +88,14 @@ class HttpClient {
     }
 
     return axios.request(config).catch((error: AxiosError) => {
-      if (error.response && error.response.status === 401) {
-        return this.refreshAccessToken().then(() => this._sendRequest(config, tokenAsParam));
+      if (error.response) {
+        if (error.response.status === 401) {
+          return this.refreshAccessToken().then(() => this._sendRequest(config, tokenAsParam));
+        }
+
+        if (error.response.data) {
+          return Promise.reject(error.response.data);
+        }
       }
 
       return Promise.reject(error);

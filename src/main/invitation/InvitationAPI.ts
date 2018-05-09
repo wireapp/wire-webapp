@@ -37,13 +37,13 @@ class InvitationAPI {
    * @param invitationId The invitation ID to delete
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/invitation_0
    */
-  public deleteInvitation(invitationId: string): Promise<{}> {
+  public async deleteInvitation(invitationId: string): Promise<void> {
     const config: AxiosRequestConfig = {
       method: 'delete',
       url: `${InvitationAPI.URL.INVITATIONS}/${invitationId}`,
     };
 
-    return this.client.sendJSON(config).then(() => ({}));
+    await this.client.sendJSON(config);
   }
 
   /**

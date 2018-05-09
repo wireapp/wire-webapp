@@ -61,13 +61,13 @@ class UserAPI {
    * Clear all properties.
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/clearProperties
    */
-  public deleteProperties(): Promise<{}> {
+  public async deleteProperties(): Promise<void> {
     const config: AxiosRequestConfig = {
       method: 'delete',
       url: UserAPI.URL.PROPERTIES,
     };
 
-    return this.client.sendJSON(config).then(() => ({}));
+    await this.client.sendJSON(config);
   }
 
   /**
@@ -75,13 +75,13 @@ class UserAPI {
    * @param propertyKey The property key to delete
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/deleteProperty
    */
-  public deleteProperty(propertyKey: string): Promise<{}> {
+  public async deleteProperty(propertyKey: string): Promise<void> {
     const config: AxiosRequestConfig = {
       method: 'delete',
       url: `${UserAPI.URL.PROPERTIES}/${propertyKey}`,
     };
 
-    return this.client.sendJSON(config).then(() => ({}));
+    await this.client.sendJSON(config);
   }
 
   /**
@@ -293,14 +293,14 @@ class UserAPI {
    * @param activationCodeData Data to send an activation code
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/sendActivationCode
    */
-  public postActivationCode(activationCodeData: SendActivationCode): Promise<{}> {
+  public async postActivationCode(activationCodeData: SendActivationCode): Promise<void> {
     const config: AxiosRequestConfig = {
       data: activationCodeData,
       method: 'post',
       url: `${UserAPI.URL.ACTIVATE}/${UserAPI.URL.SEND}`,
     };
 
-    return this.client.sendJSON(config).then(() => ({}));
+    await this.client.sendJSON(config);
   }
 
   /**
@@ -308,14 +308,14 @@ class UserAPI {
    * @param verificationData Data to verify the account deletion
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/verifyDeleteUser
    */
-  public postDelete(verificationData: VerifyDelete): Promise<{}> {
+  public async postDelete(verificationData: VerifyDelete): Promise<void> {
     const config: AxiosRequestConfig = {
       data: verificationData,
       method: 'post',
       url: UserAPI.URL.DELETE,
     };
 
-    return this.client.sendJSON(config).then(() => ({}));
+    await this.client.sendJSON(config);
   }
 
   /**
@@ -355,14 +355,14 @@ class UserAPI {
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/beginPasswordReset
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/completePasswordReset
    */
-  public postPasswordReset(resetData: NewPasswordReset | CompletePasswordReset): Promise<{}> {
+  public async postPasswordReset(resetData: NewPasswordReset | CompletePasswordReset): Promise<void> {
     const config: AxiosRequestConfig = {
       data: resetData,
       method: 'post',
       url: UserAPI.URL.PASSWORDRESET,
     };
 
-    return this.client.sendJSON(config).then(() => ({}));
+    await this.client.sendJSON(config);
   }
 
   /**
@@ -371,14 +371,14 @@ class UserAPI {
    * @param propertyData The property data to set
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/setProperty
    */
-  public putProperty(propertyKey: string, propertyData: Object): Promise<{}> {
+  public async putProperty(propertyKey: string, propertyData: Object): Promise<void> {
     const config: AxiosRequestConfig = {
       data: propertyData,
       method: 'put',
       url: `${UserAPI.URL.PROPERTIES}/${propertyKey}`,
     };
 
-    return this.client.sendJSON(config).then(() => ({}));
+    await this.client.sendJSON(config);
   }
 }
 
