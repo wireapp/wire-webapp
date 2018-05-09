@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="2.6.3"></a>
+## [2.6.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.6.2...@wireapp/core@2.6.3) (2018-05-09)
+
+
+### Bug Fixes
+
+* **bazinga64,core:** Remove deprecated new Buffer() ([#570](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/570)) ([f44500b](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/f44500b))
+
+
+
+
 <a name="2.6.2"></a>
 ## [2.6.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.6.1...@wireapp/core@2.6.2) (2018-05-08)
 
