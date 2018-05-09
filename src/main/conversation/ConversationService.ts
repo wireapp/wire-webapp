@@ -61,9 +61,9 @@ export default class ConversationService {
   public async getImage({assetId, otrKey, sha256, assetToken}: RemoteData): Promise<Buffer> {
     const encryptedBuffer = await this.apiClient.asset.api.getAsset(assetId, assetToken);
     return AssetCryptography.decryptAsset({
-      cipherText: new Buffer(encryptedBuffer),
-      keyBytes: new Buffer(otrKey),
-      sha256: new Buffer(sha256),
+      cipherText: Buffer.from(encryptedBuffer),
+      keyBytes: Buffer.from(otrKey.buffer),
+      sha256: Buffer.from(sha256.buffer),
     });
   }
 

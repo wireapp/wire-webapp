@@ -41,14 +41,14 @@ describe('AssetService', () => {
     it('builds protocol buffers', async done => {
       const assetServerData = {
         key: `3-2-${new UUID(4).format()}`,
-        keyBytes: new Buffer(new UUID(4).format()),
+        keyBytes: Buffer.from(new UUID(4).format()),
         sha256: new UUID(4).format(),
         token: new UUID(4).format(),
       };
 
       const assetService = account.service.conversation.assetService;
       const image = {
-        data: new Buffer([1, 2, 3]),
+        data: Buffer.from([1, 2, 3]),
         height: 600,
         type: 'image/png',
         width: 600,
