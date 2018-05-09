@@ -291,11 +291,16 @@ class Demo extends React.PureComponent {
                     <InputSubmitCombo>
                       <Input placeholder="InputSubmitCombo" name="password" />
                       <RoundIconButton type="submit" icon={ICON_NAME.ARROW} formNoValidate />
+                      <RoundIconButton type="submit" icon={ICON_NAME.ATTACHMENT} formNoValidate />
                       <RoundIconButton type="submit" icon={ICON_NAME.CHECK} formNoValidate />
                       <RoundIconButton type="submit" icon={ICON_NAME.CLOSE} formNoValidate />
+                      <RoundIconButton type="submit" icon={ICON_NAME.GIF} formNoValidate />
+                      <RoundIconButton type="submit" icon={ICON_NAME.IMAGE} formNoValidate />
+                      <RoundIconButton type="submit" icon={ICON_NAME.PING} formNoValidate />
                       <RoundIconButton type="submit" icon={ICON_NAME.PLANE} formNoValidate />
                       <RoundIconButton type="submit" icon={ICON_NAME.PROFILE} formNoValidate />
                       <RoundIconButton type="submit" icon={ICON_NAME.TEAM} formNoValidate />
+                      <RoundIconButton type="submit" icon={ICON_NAME.TIMED} formNoValidate />
                       <RoundIconButton type="submit" icon={ICON_NAME.TRASH} formNoValidate />
                     </InputSubmitCombo>
                   </InputBlock>
