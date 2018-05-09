@@ -51,6 +51,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.backupRepository = repositories.backup;
     this.clientRepository = repositories.client;
     this.conversationRepository = repositories.conversation;
+    this.propertiesRepository = repositories.properties;
     this.teamRepository = repositories.team;
     this.userRepository = repositories.user;
 
@@ -84,6 +85,16 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.isTeamManager = ko.pureComputed(() => this.isTeam() && this.selfUser().isTeamManager());
     this.team = this.teamRepository.team;
     this.teamName = ko.pureComputed(() => z.l10n.text(z.string.preferencesAccountTeam, this.teamRepository.teamName()));
+
+    this.optionPrivacy = ko.observable();
+    this.optionPrivacy.subscribe(privacyPreference => {
+      this.propertiesRepository.savePreference(z.properties.PROPERTIES_TYPE.PRIVACY, privacyPreference);
+    });
+
+    this.optionReceiveNews = ko.observable();
+    this.optionReceiveNews.subscribe(privacyPreference => {
+      this.propertiesRepository.savePreference(z.properties.PROPERTIES_TYPE.NEWS, privacyPreference);
+    });
 
     this._initSubscriptions();
   }
@@ -194,6 +205,10 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
   clickOnAvailability(viewModel, event) {
     z.ui.AvailabilityContextMenu.show(event, 'settings', 'preferences-account-availability-menu');
+  }
+
+  clickOnAccountExportInfo() {
+    // TODO: Do the actual export
   }
 
   clickOnBackupExport() {

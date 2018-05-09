@@ -181,6 +181,7 @@ z.event.WebApp = {
       EMOJI: {
         REPLACE_INLINE: 'wire.webapp.properties.update.emoji.replace_inline',
       },
+      NEWS: 'wire.webapp.properties.update.news',
       NOTIFICATIONS: 'wire.webapp.properties.update.notifications',
       PREVIEWS: {
         SEND: 'wire.webapp.properties.update.previews.send',
