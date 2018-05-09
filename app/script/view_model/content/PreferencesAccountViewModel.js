@@ -209,7 +209,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   clickOnAccountExportInfo() {
-    // TODO: Do the actual export
+    amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.ACCOUNT_EXPORT);
   }
 
   clickOnBackupExport() {

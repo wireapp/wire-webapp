@@ -36,6 +36,9 @@
         <!-- ko if: state() === z.viewModel.ContentViewModel.STATE.COLLECTION_DETAILS -->
           #include('content/collection-details.htm')
         <!-- /ko -->
+        <!-- ko if: state() === z.viewModel.ContentViewModel.STATE.ACCOUNT_EXPORT -->
+          #include('content/account-export.htm')
+        <!-- /ko -->
         <!-- ko if: state() === z.viewModel.ContentViewModel.STATE.HISTORY_EXPORT -->
           #include('content/history-export.htm')
         <!-- /ko -->

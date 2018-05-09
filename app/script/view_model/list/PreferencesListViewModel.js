@@ -63,6 +63,7 @@ z.viewModel.list.PreferencesListViewModel = class PreferencesListViewModel {
 
   clickOnClosePreferences() {
     const preventingContentViewStates = [
+      z.viewModel.ContentViewModel.STATE.ACCOUNT_EXPORT,
       z.viewModel.ContentViewModel.STATE.HISTORY_EXPORT,
       z.viewModel.ContentViewModel.STATE.HISTORY_IMPORT,
     ];
