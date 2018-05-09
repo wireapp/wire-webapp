@@ -100,6 +100,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   _initSubscriptions() {
+    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, this.updateProperties.bind(this));
     amplify.subscribe(z.event.WebApp.USER.CLIENT_ADDED, this.onClientAdd.bind(this));
     amplify.subscribe(z.event.WebApp.USER.CLIENT_REMOVED, this.onClientRemove.bind(this));
   }
@@ -384,5 +385,10 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.usernameState(null);
     this.enteredUsername(null);
     this.submittedUsername(null);
+  }
+
+  updateProperties(properties) {
+    this.optionPrivacy(properties.settings.privacy.improve_wire);
+    this.optionReceiveNews(properties.settings.privacy.recieve_news);
   }
 };
