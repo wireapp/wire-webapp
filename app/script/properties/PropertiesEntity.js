@@ -35,6 +35,7 @@ z.properties.PropertiesEntity = class PropertiesEntity {
       },
       privacy: {
         improve_wire: true,
+        receive_news: true,
       },
       sound: {
         alerts: z.audio.AudioPreference.ALL,

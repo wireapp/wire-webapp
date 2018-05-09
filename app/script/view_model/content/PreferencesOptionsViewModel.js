@@ -98,7 +98,6 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
     this.optionAudio(properties.settings.sound.alerts);
     this.optionReplaceInlineEmoji(properties.settings.emoji.replace_inline);
     this.optionSendPreviews(properties.settings.previews.send);
-    // this.optionPrivacy(properties.settings.privacy.improve_wire);
     this.optionNotifications(properties.settings.notifications);
   }
 };

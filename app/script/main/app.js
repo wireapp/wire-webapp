@@ -310,6 +310,7 @@ z.main.App = class App {
         );
 
         this.repository.event_tracker.init(this.repository.properties.properties.settings.privacy.improve_wire);
+        this.repository.event_tracker.init(this.repository.properties.properties.settings.privacy.receive_news);
         return this.repository.conversation.initialize_conversations();
       })
       .then(() => {
