@@ -26,9 +26,10 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
   constructor(params) {
     this.me = params.me();
 
+    this.participants = ko.observableArray([]);
     this.participantsGrid = ko.observableArray([0, 0, 0, 0]);
     this.thumbnailVideo = ko.observable();
-    params.participants.subscribe(participants => {
+    this.participants.subscribe(participants => {
       if (participants.length !== 1) {
         participants.push(params.me());
         this.thumbnailVideo(null);
@@ -83,6 +84,16 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
     ];
   }
 
+  devAdd() {
+    this.participants.push({id: Math.floor(Math.random() * 1000)});
+  }
+
+  devRemove(id) {
+    this.participants.remove(element => {
+      return element.id === id;
+    });
+  }
+
   getClassNameForVideo(index) {
     const baseClass = `video-grid__element${index}`;
     const grid = this.participantsGrid();
@@ -113,12 +124,16 @@ ko.components.register('group-video-grid', {
         class="video-grid"
         data-bind="foreach: { data: participantsGrid, as: 'participant' }"
       >
-        <div class="video-grid__element" data-bind="text: participant, css: $parents[0].getClassNameForVideo($index())"></div>
+        <div class="video-grid__element" data-bind=" css: $parents[0].getClassNameForVideo($index())">
+          <span data-bind="text: participant"></span>
+          <button data-bind="click: () => $parents[0].devRemove(participant)">Remove</button>
+        </div>
       </div>
       <!-- ko if: thumbnailVideo() -->
         <div class="video-grid__thumbnail" data-bind="text: thumbnailVideo().id"></div>
       <!-- /ko -->
     <!-- /ko -->
+    <buttton style="position: absolute; top: 0; width: 100px; height: 100px; background-color: blue;" data-bind="click: devAdd">Add</button>
   `,
   viewModel: z.components.GroupVideoGrid,
 });
