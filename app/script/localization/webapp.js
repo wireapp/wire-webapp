@@ -259,6 +259,11 @@ z.string.modalPictureTooLargeMessage = 'You can use pictures up to {{number}} MB
 z.string.modalPictureTooSmallHeadline = 'Picture too small';
 z.string.modalPictureTooSmallMessage = 'Please choose a picture that is at least 320 x 320 px.';
 
+z.string.modalReceiveNewsAction = 'Accept'
+z.string.modalReceiveNewsSecondary = 'Not now'
+z.string.modalReceiveNewsHeadline = 'News and offers'
+z.string.modalReceiveNewsMessage = 'We would like to send you more information about our product. To do so, we may use external servicies like Salesforce and Marketo. You can unsubscribe at any time. We will not keep your data after that.'
+
 z.string.modalServiceUnavailableHeadline = 'Adding service not possible';
 z.string.modalServiceUnavailableMessage = 'The service is unavailable a the moment.';
 

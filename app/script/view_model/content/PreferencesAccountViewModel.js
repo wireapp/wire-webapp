@@ -212,6 +212,18 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.ACCOUNT_EXPORT);
   }
 
+  clickOnReceiveNews() {
+    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
+      action: () => console.log('Bla bla'),
+      text: {
+        action: z.l10n.text(z.string.modalReceiveNewsAction),
+        message: z.l10n.text(z.string.modalReceiveNewsMessage),
+        secondary: z.l10n.text(z.string.modalReceiveNewsSecondary),
+        title: z.l10n.text(z.string.modalReceiveNewsHeadline),
+      },
+    });
+  }
+
   clickOnBackupExport() {
     amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.HISTORY_EXPORT);
     amplify.publish(z.event.WebApp.BACKUP.EXPORT.START);
