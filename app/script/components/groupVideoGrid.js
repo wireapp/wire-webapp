@@ -28,8 +28,45 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
     this.participants = ko.pureComputed(() => {
       return params.participants().concat(params.me());
     });
+
+    this.participantsGrid = ko.observableArray([0, 0, 0, 0]);
+  }
+
+  /**
+   * Will compute the next grid layout according to the previous state and the new array of participants
+   * The grid will fill according to this pattern
+   * - 1 participant : [id, 0, 0, 0]
+   * - 2 participants: [id, 0, id, 0]
+   * - 3 participants: [id, 0, id, id]
+   * - 4 participants: [id, id, id, id]
+   * @param {Array<ParticipantId|0>} previousGrid - the previous state of the grid
+   * @param {Array<Participant>} participants - the new array of participants to dispatch in the grid
+   *
+   * @returns {Array<ParticipantId|0>} the new grid
+   */
+  computeGrid(previousGrid, participants) {
+    const participantIds = participants.map(participant => participant.id);
+    const currentParticipants = previousGrid.filter(participantId => participantId !== 0);
+
+    if (currentParticipants.length === 0) {
+      // if the current grid is empty, we just dispatch the participants according to this pattern
+      return [participantIds[0] || 0, participantIds[3] || 0, participantIds[1] || 0, participantIds[2] || 0];
+    }
+    const newParticipants = arrayDiff(currentParticipants, participantIds);
+    //const deletedParticipants = arrayDiff(participantIds, currentParticipants);
+
+    newParticipants.forEach(participant => {
+      const lastAvailableIndex = previousGrid.lastIndexOf(0);
+      previousGrid.splice(lastAvailableIndex, 1, participant);
+    });
+
+    return normalize(previousGrid);
   }
 };
+
+function arrayDiff(a, b) {
+  return b.filter(i => a.indexOf(i) === -1);
+}
 
 const participantVideo = `
   <div class="participant" data-bind="css: { is_me: participant === $parents[0].me }">
