@@ -149,6 +149,9 @@ z.properties.PropertiesRepository = class PropertiesRepository {
             case z.properties.PROPERTIES_TYPE.PRIVACY:
               amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.PRIVACY, updatedPreference);
               break;
+            case z.properties.PROPERTIES_TYPE.NEWS:
+              amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.NEWS, updatedPreference);
+              break;
             case z.properties.PROPERTIES_TYPE.SOUND_ALERTS:
               amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.SOUND_ALERTS, updatedPreference);
               break;
