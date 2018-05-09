@@ -465,9 +465,9 @@
     ed2curve "0.2.1"
     libsodium-wrappers-sumo "0.7.3"
 
-"@wireapp/react-ui-kit@1.1.17":
-  version "1.1.17"
-  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-1.1.17.tgz#3ccc31d6b97cbf3012377d74317886fc6ed81831"
+"@wireapp/react-ui-kit@1.1.18":
+  version "1.1.18"
+  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-1.1.18.tgz#f30672cdf8a8bb38d848782f28b02e4d040311e9"
   dependencies:
     bazinga64 "5.1.8"
     color "3.0.0"
@@ -2759,8 +2759,8 @@ css-select@~1.2.0:
     nth-check "~1.0.1"
 
 css-to-react-native@^2.0.3:
-  version "2.1.2"
-  resolved "https://registry.yarnpkg.com/css-to-react-native/-/css-to-react-native-2.1.2.tgz#c06d628467ef961c85ec358a90f3c87469fb0095"
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/css-to-react-native/-/css-to-react-native-2.2.0.tgz#d524ef7f39a2747a8914e86563669ba35b7cf2e7"
   dependencies:
     css-color-keywords "^1.0.0"
     fbjs "^0.8.5"
