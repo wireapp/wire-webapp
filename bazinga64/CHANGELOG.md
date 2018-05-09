@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="5.1.8"></a>
+## [5.1.8](https://github.com/wireapp/wire-web-packages/tree/master/packages/bazinga64/compare/bazinga64@5.1.7...bazinga64@5.1.8) (2018-05-09)
+
+
+### Bug Fixes
+
+* **bazinga64,core:** Remove deprecated new Buffer() ([#570](https://github.com/wireapp/wire-web-packages/tree/master/packages/bazinga64/issues/570)) ([f44500b](https://github.com/wireapp/wire-web-packages/tree/master/packages/bazinga64/commit/f44500b))
+
+
+
+
 <a name="5.1.7"></a>
 ## [5.1.7](https://github.com/wireapp/wire-web-packages/tree/master/packages/bazinga64/compare/bazinga64@5.1.6...bazinga64@5.1.7) (2018-05-07)
 
