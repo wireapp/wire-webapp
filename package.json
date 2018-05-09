@@ -7,7 +7,7 @@
   "dependencies": {
     "@types/node": "10.0.4",
     "@types/spark-md5": "3.0.0",
-    "@types/tough-cookie": "2.3.2",
+    "@types/tough-cookie": "2.3.3",
     "@wireapp/priority-queue": "0.1.21",
     "@wireapp/store-engine": "0.11.5",
     "axios": "0.18.0",
