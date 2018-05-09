@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="2.6.4"></a>
+## [2.6.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.6.3...@wireapp/core@2.6.4) (2018-05-09)
+
+
+### Bug Fixes
+
+* **api-client:** Return types ([#565](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/565)) ([3fffb4e](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/3fffb4e))
+
+
+
+
 <a name="2.6.3"></a>
 ## [2.6.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.6.2...@wireapp/core@2.6.3) (2018-05-09)
 
