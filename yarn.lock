@@ -469,11 +469,11 @@
     ed2curve "0.2.1"
     libsodium-wrappers-sumo "0.7.3"
 
-"@wireapp/react-ui-kit@1.1.13":
-  version "1.1.13"
-  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-1.1.13.tgz#426a7e10b1a2271c5beff711b641c2b49a035a52"
+"@wireapp/react-ui-kit@1.1.17":
+  version "1.1.17"
+  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-1.1.17.tgz#3ccc31d6b97cbf3012377d74317886fc6ed81831"
   dependencies:
-    bazinga64 "5.1.3"
+    bazinga64 "5.1.8"
     color "3.0.0"
     react "16.3.2"
     react-dom "16.3.2"
@@ -1609,6 +1609,10 @@ bazinga64@5.1.3:
   version "5.1.3"
   resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.1.3.tgz#a2cdc9421b5eecf38484277fbdcd61481855cfa3"
 
+bazinga64@5.1.8:
+  version "5.1.8"
+  resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.1.8.tgz#b3d7c3a80b7c9a775d315d6e5abf99713b26333f"
+
 bcrypt-pbkdf@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/bcrypt-pbkdf/-/bcrypt-pbkdf-1.0.1.tgz#63bc5dcb61331b92bc05fd528953c33462a06f8d"
@@ -2605,9 +2609,13 @@ core-js@^1.0.0:
   version "1.2.7"
   resolved "https://registry.yarnpkg.com/core-js/-/core-js-1.2.7.tgz#652294c14651db28fa93bd2d5ff2983a4f08c636"
 
-core-js@^2.2.0, core-js@^2.4.0, core-js@^2.5.0:
+core-js@^2.2.0, core-js@^2.5.0:
   version "2.5.5"
   resolved "https://registry.yarnpkg.com/core-js/-/core-js-2.5.5.tgz#b14dde936c640c0579a6b50cabcc132dd6127e3b"
+
+core-js@^2.4.0:
+  version "2.5.6"
+  resolved "https://registry.yarnpkg.com/core-js/-/core-js-2.5.6.tgz#0fe6d45bf3cac3ac364a9d72de7576f4eb221b9d"
 
 core-js@~2.3.0:
   version "2.3.0"
