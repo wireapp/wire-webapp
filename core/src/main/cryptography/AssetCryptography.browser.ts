@@ -37,7 +37,7 @@ export const decryptAsset = async ({
 }: EncryptedAsset): Promise<Buffer> => {
   const computedSha256 = await crypto.subtle.digest('SHA-256', cipherText);
 
-  if (!isEqual(new Buffer(computedSha256), referenceSha256)) {
+  if (!isEqual(Buffer.from(computedSha256), referenceSha256)) {
     throw new Error('Encrypted asset does not match its SHA-256 hash');
   }
 
@@ -47,7 +47,7 @@ export const decryptAsset = async ({
   const assetCipherText = cipherText.slice(16);
   const decipher = await crypto.subtle.decrypt({iv: initializationVector, name: 'AES-CBC'}, key, assetCipherText);
 
-  return new Buffer(decipher);
+  return Buffer.from(decipher);
 };
 
 export const encryptAsset = async (plaintext: ArrayBuffer): Promise<EncryptedAsset> => {
@@ -65,8 +65,8 @@ export const encryptAsset = async (plaintext: ArrayBuffer): Promise<EncryptedAss
   const keyBytes = await crypto.subtle.exportKey('raw', key);
 
   return {
-    cipherText: new Buffer(ivCipherText),
-    keyBytes: new Buffer(keyBytes),
-    sha256: new Buffer(computedSha256),
+    cipherText: Buffer.from(ivCipherText.buffer),
+    keyBytes: Buffer.from(keyBytes),
+    sha256: Buffer.from(computedSha256),
   };
 };

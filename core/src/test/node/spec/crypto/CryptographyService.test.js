@@ -150,7 +150,7 @@ describe('CryptographyService', () => {
     it('encrypts and decrypts ArrayBuffer', async done => {
       const bytes = new Uint8Array(16);
       await promisify(crypto.randomFill)(bytes);
-      const byteBuffer = new Buffer(bytes);
+      const byteBuffer = Buffer.from(bytes.buffer);
 
       const encryptedAsset = await encryptAsset(byteBuffer);
       const decryptedBuffer = await decryptAsset(encryptedAsset);
@@ -162,7 +162,7 @@ describe('CryptographyService', () => {
     it('does not decrypt when the hash is missing', async done => {
       const bytes = new Uint8Array(16);
       await promisify(crypto.randomFill)(bytes);
-      const byteBuffer = new Buffer(bytes);
+      const byteBuffer = Buffer.from(bytes.buffer);
 
       const {cipherText, keyBytes} = await encryptAsset(byteBuffer);
 
@@ -177,7 +177,7 @@ describe('CryptographyService', () => {
     it('does not decrypt when hash is an empty array', async done => {
       const bytes = new Uint8Array(16);
       await promisify(crypto.randomFill)(bytes);
-      const byteBuffer = new Buffer(bytes);
+      const byteBuffer = Buffer.from(bytes.buffer);
 
       const {cipherText, keyBytes} = await encryptAsset(byteBuffer);
 

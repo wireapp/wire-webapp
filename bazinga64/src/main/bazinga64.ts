@@ -208,7 +208,7 @@ export class Encoder {
       return window.btoa(decodedString);
     }
 
-    return new Buffer(decoded).toString('base64');
+    return Buffer.from(decoded.buffer).toString('base64');
   }
 }
 
