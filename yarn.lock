@@ -415,9 +415,9 @@
   version "3.0.23"
   resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-3.0.23.tgz#340771999603a92a9e6fb3897baf5e5a15465861"
 
-"@wireapp/core@2.6.5":
-  version "2.6.5"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-2.6.5.tgz#d5846e90f631c77b6a9ef45c7487b0ecfdae4521"
+"@wireapp/core@2.6.6":
+  version "2.6.6"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-2.6.6.tgz#effba9a402c2b69374c0a37a7f19df26f5a17daa"
   dependencies:
     "@types/node" "10.0.6"
     "@wireapp/api-client" "0.8.16"
