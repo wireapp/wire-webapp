@@ -116,6 +116,7 @@
     "lint-staged": "7.1.0",
     "load-grunt-tasks": "4.0.0",
     "node-sass": "4.9.0",
+    "patch-package": "5.1.1",
     "postcss-cssnext": "3.1.0",
     "postcss-import": "11.1.0",
     "postcss-scss": "1.0.5",
