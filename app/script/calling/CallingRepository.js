@@ -1217,7 +1217,7 @@ z.calling.CallingRepository = class CallingRepository {
   /**
    * Constructs a call entity.
    *
-   * @privatemessage to conversation
+   * @private
    * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.SETUP
    * @param {z.entity.User} creatingUserEntity - User that created call
    * @returns {Promise} Resolves with the new call entity
