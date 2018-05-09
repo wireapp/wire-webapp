@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="2.6.6"></a>
+## [2.6.6](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.6.5...@wireapp/core@2.6.6) (2018-05-09)
+
+
+### Bug Fixes
+
+* **core:** Additional username checks ([#568](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/568)) ([d7042e0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/d7042e0))
+
+
+
+
 <a name="2.6.5"></a>
 ## [2.6.5](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.6.4...@wireapp/core@2.6.5) (2018-05-09)
 
