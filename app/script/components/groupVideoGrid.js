@@ -25,11 +25,20 @@ window.z.components = z.components || {};
 z.components.GroupVideoGrid = class GroupVideoGrid {
   constructor(params) {
     this.me = params.me();
-    this.participants = ko.pureComputed(() => {
-      return params.participants().concat(params.me());
-    });
 
     this.participantsGrid = ko.observableArray([0, 0, 0, 0]);
+    this.thumbnailVideo = ko.observable();
+    params.participants.subscribe(participants => {
+      if (participants.length !== 1) {
+        participants.push(params.me());
+        this.thumbnailVideo(null);
+      } else {
+        this.thumbnailVideo(params.me());
+      }
+
+      const newGrid = this.computeGrid(this.participantsGrid(), participants);
+      this.participantsGrid(newGrid);
+    });
   }
 
   /**
@@ -38,6 +47,7 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
    * - 1 participant : [id, 0, 0, 0]
    * - 2 participants: [id, 0, id, 0]
    * - 3 participants: [id, 0, id, id]
+   * - 3 participants: [id, id, 0, id]
    * - 4 participants: [id, id, id, id]
    * @param {Array<ParticipantId|0>} previousGrid - the previous state of the grid
    * @param {Array<Participant>} participants - the new array of participants to dispatch in the grid
@@ -54,6 +64,8 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
     if (deletedParticipants.length > 0) {
       // if there was some participants that left the call
       // do not reorder the matrix
+      //
+      // TODO redistribute if only 2
       return previousGrid.map(id => {
         return deletedParticipants.includes(id) ? 0 : id;
       });
@@ -70,41 +82,42 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
       newParticipantsList[2] || 0,
     ];
   }
+
+  getClassNameForVideo(index) {
+    const baseClass = `video-grid__element${index}`;
+    const grid = this.participantsGrid();
+    let extraClass = '';
+    if (grid[index] === 0) {
+      extraClass = 'video-grid__element--empty';
+    }
+    const isAlone = grid.reduce((alone, value, i) => (i !== index && value !== 0 ? false : alone), true);
+    const hasVerticalNeighbor = index % 2 === 0 ? grid[index + 1] !== 0 : grid[index - 1] !== 0;
+
+    if (isAlone) {
+      extraClass += ' video-grid__element--full-size';
+    } else if (!hasVerticalNeighbor) {
+      extraClass += ' video-grid__element--full-height';
+    }
+    return `${baseClass} ${extraClass}`;
+  }
 };
 
 function arrayDiff(a, b) {
   return b.filter(i => a.indexOf(i) === -1);
 }
 
-const participantVideo = `
-  <div class="participant" data-bind="css: { is_me: participant === $parents[0].me }">
-    <span data-bind="text: participant.first_name()"></span>
-  </div>
-`;
-
-const threeParticipantsLayout = `
-  <div class="participant-grid">
-    <div class="participant" data-bind="css: { is_me: participants()[0] === $parents[0].me }">
-      <span data-bind="text: participants()[0].first_name()"></span>
-    </div>
-    <div class="participant-v-grid" data-bind="foreach: { data: participants().slice(1), as: 'participant' }">
-      ${participantVideo}
-    </div>
-  </div>
-`;
-
 ko.components.register('group-video-grid', {
   template: `
-    <!-- ko if: participants().length !== 3 -->
+    <!-- ko if: participantsGrid().length !== 3 -->
       <div
-        class="participant-grid"
-        data-bind="foreach: { data: participants, as: 'participant' }, css: {'has-overlay-thumbnail': participants().length === 2}"
+        class="video-grid"
+        data-bind="foreach: { data: participantsGrid, as: 'participant' }"
       >
-        ${participantVideo}
+        <div class="video-grid__element" data-bind="text: participant, css: $parents[0].getClassNameForVideo($index())"></div>
       </div>
-    <!-- /ko -->
-    <!-- ko if: participants().length === 3 -->
-      ${threeParticipantsLayout}
+      <!-- ko if: thumbnailVideo() -->
+        <div class="video-grid__thumbnail" data-bind="text: thumbnailVideo().id"></div>
+      <!-- /ko -->
     <!-- /ko -->
   `,
   viewModel: z.components.GroupVideoGrid,
