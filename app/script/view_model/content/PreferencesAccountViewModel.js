@@ -389,6 +389,6 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
   updateProperties(properties) {
     this.optionPrivacy(properties.settings.privacy.improve_wire);
-    this.optionReceiveNews(properties.settings.privacy.recieve_news);
+    this.optionReceiveNews(properties.settings.privacy.receive_news);
   }
 };
