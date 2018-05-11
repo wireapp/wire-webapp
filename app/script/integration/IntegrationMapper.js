@@ -60,9 +60,9 @@ z.integration.IntegrationMapper = (() => {
       if (url) {
         providerEntity.url = url;
       }
-
-      return providerEntity;
     }
+
+    return providerEntity;
   };
 
   const _updateServiceFromObject = (serviceData, serviceEntity = new z.integration.ServiceEntity()) => {
@@ -96,9 +96,9 @@ z.integration.IntegrationMapper = (() => {
       if (tags) {
         serviceEntity.tags = tags;
       }
-
-      return serviceEntity;
     }
+
+    return serviceEntity;
   };
 
   return {
