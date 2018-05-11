@@ -137,7 +137,7 @@ ko.components.register('group-video-grid', {
         <div class="video-grid__thumbnail" data-bind="text: thumbnailVideo().id"></div>
       <!-- /ko -->
     <!-- /ko -->
-    <buttton style="position: absolute; top: 0; width: 100px; height: 100px; background-color: blue;" data-bind="click: devAdd">Add</button>
+    <button style="position: absolute; top: 0; left: 50%;" data-bind="click: devAdd">Add</button>
   `,
   viewModel: z.components.GroupVideoGrid,
 });
