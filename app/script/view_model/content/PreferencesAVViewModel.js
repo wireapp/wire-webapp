@@ -52,7 +52,7 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
 
     this.constraintsHandler = this.mediaRepository.constraints_handler;
     this.streamHandler = this.mediaRepository.stream_handler;
-    this.mediaStream = this.streamHandler.local_media_stream;
+    this.mediaStream = this.streamHandler.localMediaStream;
 
     this.isVisible = false;
 
@@ -128,8 +128,8 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
           this.streamHandler.local_media_type(z.media.MediaType.VIDEO);
         }
 
-        this.streamHandler.local_media_stream(mediaStreamInfo.stream);
-        return this.streamHandler.local_media_stream();
+        this.streamHandler.localMediaStream(mediaStreamInfo.stream);
+        return this.streamHandler.localMediaStream();
       })
       .catch(error => {
         this.logger.error(`Requesting MediaStream failed: ${error.message}`, error);

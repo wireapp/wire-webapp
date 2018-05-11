@@ -641,6 +641,16 @@ z.entity.Conversation = class Conversation {
     return ['annathebot', 'ottothebot'].includes(this.firstUserEntity() && this.firstUserEntity().username());
   }
 
+  supportsVideoCall(isOutgoing = false) {
+    if (this.is_one2one()) {
+      return true;
+    }
+
+    const participantCount = this.getNumberOfParticipants(true, false);
+    const passesParticipantLimit = participantCount <= z.calling.CallingRepository.CONFIG.MAX_VIDEO_PARTICIPANTS;
+    return isOutgoing ? passesParticipantLimit && this.self.inTeam() : passesParticipantLimit;
+  }
+
   serialize() {
     return {
       archived_state: this.archived_state(),

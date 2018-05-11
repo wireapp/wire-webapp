@@ -34,6 +34,7 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
     this.clickedOnCancelScreen = this.clickedOnCancelScreen.bind(this);
     this.clickedOnChooseScreen = this.clickedOnChooseScreen.bind(this);
     this.chooseSharedScreen = this.chooseSharedScreen.bind(this);
+    this.onLoadedMetadata = this.onLoadedMetadata.bind(this);
 
     this.elementId = 'video-calling';
 
@@ -52,10 +53,10 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
     this.currentDeviceId = this.mediaRepository.devices_handler.current_device_id;
     this.currentDeviceIndex = this.mediaRepository.devices_handler.current_device_index;
 
-    this.localVideoStream = this.mediaRepository.stream_handler.local_media_stream;
-    this.remoteVideoStream = this.mediaRepository.stream_handler.remote_media_streams.video;
+    this.localVideoStream = this.mediaRepository.stream_handler.localMediaStream;
+    this.remoteVideoStreams = this.mediaRepository.stream_handler.remote_media_streams.video;
 
-    this.selfStreamState = this.mediaRepository.stream_handler.self_stream_state;
+    this.selfStreamState = this.mediaRepository.stream_handler.selfStreamState;
 
     this.isChoosingScreen = ko.observable(false);
 
@@ -131,7 +132,7 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
     this.showRemoteVideo = ko.pureComputed(() => {
       if (this.isCallOngoing()) {
         const remoteVideoState = this.joinedCall().isRemoteScreenSend() || this.joinedCall().isRemoteVideoSend();
-        return remoteVideoState && this.remoteVideoStream();
+        return remoteVideoState && this.remoteVideoStreams().length;
       }
     });
 
@@ -152,7 +153,7 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
       return this.isCallOngoing() && isVisible;
     });
     this.showToggleVideo = ko.pureComputed(() => {
-      return this.joinedCall() ? this.joinedCall().conversationEntity.is_one2one() : false;
+      return this.joinedCall() ? this.joinedCall().conversationEntity.supportsVideoCall(false) : false;
     });
     this.showToggleScreen = ko.pureComputed(() => z.calling.CallingRepository.supportsScreenSharing);
     this.disableToggleScreen = ko.pureComputed(() => {
