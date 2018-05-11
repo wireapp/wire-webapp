@@ -594,7 +594,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
   //##############################################################################
 
   /**
-   * Send an call message through the data channel.
+   * Send a call message through the data channel.
    * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message to be send
    * @returns {undefined} No return value
    */
@@ -749,7 +749,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
   //##############################################################################
 
   /**
-   * Save the remote SDP received via an call message within the flow.
+   * Save the remote SDP received via a call message within the flow.
    *
    * @note The resolving value indicates whether negotiation should be skipped for the current state.
    * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.SETUP
@@ -1004,7 +1004,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
     );
     const additionalPayload = Object.assign({remoteUser: this.remoteUser, sdp: this.localSdp().sdp}, payload);
 
-    return z.calling.CallMessageBuilder.createPayloadPropSync(
+    return z.calling.CallMessageBuilder.createPropSync(
       this.callEntity.selfState,
       this.callEntity.selfState.videoSend(),
       false,

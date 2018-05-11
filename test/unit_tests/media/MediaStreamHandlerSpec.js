@@ -37,23 +37,23 @@ describe('z.media.MediaStreamHandler', () => {
 
   describe('toggle_audio_send', () => {
     beforeEach(() => {
-      spyOn(TestFactory.media_repository.stream_handler, '_toggle_audio_send').and.returnValue(Promise.resolve());
+      spyOn(TestFactory.media_repository.stream_handler, '_toggleAudioSend').and.returnValue(Promise.resolve());
     });
 
     it('toggles the audio stream if available', done => {
-      TestFactory.media_repository.stream_handler.local_media_stream(true);
+      TestFactory.media_repository.stream_handler.localMediaStream(true);
 
       TestFactory.media_repository.stream_handler
         .toggle_audio_send()
         .then(() => {
-          expect(TestFactory.media_repository.stream_handler._toggle_audio_send).toHaveBeenCalled();
+          expect(TestFactory.media_repository.stream_handler._toggleAudioSend).toHaveBeenCalled();
           done();
         })
         .catch(done.fail);
     });
 
     it('throws an error if no audio stream is found', done => {
-      TestFactory.media_repository.stream_handler.local_media_stream(undefined);
+      TestFactory.media_repository.stream_handler.localMediaStream(undefined);
 
       TestFactory.media_repository.stream_handler
         .toggle_audio_send()
@@ -75,7 +75,7 @@ describe('z.media.MediaStreamHandler', () => {
     });
 
     it('toggles the video stream if available and in video mode', done => {
-      TestFactory.media_repository.stream_handler.local_media_stream(true);
+      TestFactory.media_repository.stream_handler.localMediaStream(true);
       TestFactory.media_repository.stream_handler.local_media_type(z.media.MediaType.VIDEO);
 
       TestFactory.media_repository.stream_handler
@@ -89,7 +89,7 @@ describe('z.media.MediaStreamHandler', () => {
     });
 
     it('turns on the video stream if it does not exist', done => {
-      TestFactory.media_repository.stream_handler.local_media_stream(undefined);
+      TestFactory.media_repository.stream_handler.localMediaStream(undefined);
       TestFactory.media_repository.stream_handler.local_media_type(z.media.MediaType.VIDEO);
 
       TestFactory.media_repository.stream_handler
@@ -105,7 +105,7 @@ describe('z.media.MediaStreamHandler', () => {
     });
 
     it('turns on the video stream if not in video mode', done => {
-      TestFactory.media_repository.stream_handler.local_media_stream(true);
+      TestFactory.media_repository.stream_handler.localMediaStream(true);
       TestFactory.media_repository.stream_handler.local_media_type(z.media.MediaType.SCREEN);
 
       TestFactory.media_repository.stream_handler
@@ -123,18 +123,18 @@ describe('z.media.MediaStreamHandler', () => {
 
   describe('toggle_screen_send', () => {
     beforeEach(() => {
-      spyOn(TestFactory.media_repository.stream_handler, '_toggle_screen_send').and.returnValue(Promise.resolve());
+      spyOn(TestFactory.media_repository.stream_handler, '_toggleScreenSend').and.returnValue(Promise.resolve());
       spyOn(TestFactory.media_repository.stream_handler, 'replace_input_source').and.returnValue(Promise.resolve());
     });
 
     it('toggles screen sharing if available and in screen sharing mode', done => {
-      TestFactory.media_repository.stream_handler.local_media_stream(true);
+      TestFactory.media_repository.stream_handler.localMediaStream(true);
       TestFactory.media_repository.stream_handler.local_media_type(z.media.MediaType.SCREEN);
 
       TestFactory.media_repository.stream_handler
         .toggle_screen_send()
         .then(() => {
-          expect(TestFactory.media_repository.stream_handler._toggle_screen_send).toHaveBeenCalled();
+          expect(TestFactory.media_repository.stream_handler._toggleScreenSend).toHaveBeenCalled();
           expect(TestFactory.media_repository.stream_handler.replace_input_source).not.toHaveBeenCalled();
           done();
         })
@@ -142,13 +142,13 @@ describe('z.media.MediaStreamHandler', () => {
     });
 
     it('turns on the screen sharing stream if it does not exist', done => {
-      TestFactory.media_repository.stream_handler.local_media_stream(undefined);
+      TestFactory.media_repository.stream_handler.localMediaStream(undefined);
       TestFactory.media_repository.stream_handler.local_media_type(z.media.MediaType.SCREEN);
 
       TestFactory.media_repository.stream_handler
         .toggle_screen_send()
         .then(() => {
-          expect(TestFactory.media_repository.stream_handler._toggle_screen_send).not.toHaveBeenCalled();
+          expect(TestFactory.media_repository.stream_handler._toggleScreenSend).not.toHaveBeenCalled();
           expect(TestFactory.media_repository.stream_handler.replace_input_source).toHaveBeenCalledWith(
             z.media.MediaType.SCREEN
           );
@@ -158,13 +158,13 @@ describe('z.media.MediaStreamHandler', () => {
     });
 
     it('turns on the video stream if not in screen sharing mode', done => {
-      TestFactory.media_repository.stream_handler.local_media_stream(true);
+      TestFactory.media_repository.stream_handler.localMediaStream(true);
       TestFactory.media_repository.stream_handler.local_media_type(z.media.MediaType.VIDEO);
 
       TestFactory.media_repository.stream_handler
         .toggle_screen_send()
         .then(() => {
-          expect(TestFactory.media_repository.stream_handler._toggle_screen_send).not.toHaveBeenCalled();
+          expect(TestFactory.media_repository.stream_handler._toggleScreenSend).not.toHaveBeenCalled();
           expect(TestFactory.media_repository.stream_handler.replace_input_source).toHaveBeenCalledWith(
             z.media.MediaType.SCREEN
           );

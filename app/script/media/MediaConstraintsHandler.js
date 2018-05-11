@@ -36,6 +36,11 @@ z.media.MediaConstraintsHandler = class MediaConstraintsHandler {
           height: 1080,
           width: 1920,
         },
+        GROUP: {
+          frameRate: 30,
+          height: 240,
+          width: 320,
+        },
         HD: {
           frameRate: 30,
           height: 720,
@@ -70,14 +75,17 @@ z.media.MediaConstraintsHandler = class MediaConstraintsHandler {
    * @private
    * @param {boolean} [request_audio=false] - Request audio in the constraints
    * @param {boolean} [request_video=false] - Request video in the constraints
+   * @param {boolean} [isGroup=false] - Get constraints for group
    * @returns {Promise} Resolves with MediaStreamConstraints and their type
    */
-  get_media_stream_constraints(request_audio = false, request_video = false) {
+  get_media_stream_constraints(request_audio = false, request_video = false, isGroup = false) {
     return Promise.resolve().then(() => {
       const current_device_id = this.media_repository.devices_handler.current_device_id;
+      const mode = isGroup ? z.media.VIDEO_QUALITY_MODE.GROUP : z.media.VIDEO_QUALITY_MODE.MOBILE;
+
       const streamConstraints = {
         audio: request_audio ? this._get_audio_stream_constraints(current_device_id.audio_input()) : undefined,
-        video: request_video ? this._get_video_stream_constraints(current_device_id.video_input()) : undefined,
+        video: request_video ? this._get_video_stream_constraints(current_device_id.video_input(), mode) : undefined,
       };
       const mediaType = request_video ? z.media.MediaType.VIDEO : z.media.MediaType.AUDIO;
 
@@ -163,16 +171,26 @@ z.media.MediaConstraintsHandler = class MediaConstraintsHandler {
   _get_video_stream_constraints(media_device_id, mode = z.media.VIDEO_QUALITY_MODE.MOBILE) {
     let media_stream_constraints;
     switch (mode) {
-      case z.media.VIDEO_QUALITY_MODE.FULL_HD:
+      case z.media.VIDEO_QUALITY_MODE.FULL_HD: {
         media_stream_constraints = MediaConstraintsHandler.CONFIG.VIDEO_CONSTRAINTS.FULL_HD;
         break;
-      case z.media.VIDEO_QUALITY_MODE.HD:
+      }
+
+      case z.media.VIDEO_QUALITY_MODE.GROUP: {
+        media_stream_constraints = MediaConstraintsHandler.CONFIG.VIDEO_CONSTRAINTS.FULL_HD;
+        break;
+      }
+
+      case z.media.VIDEO_QUALITY_MODE.HD: {
         media_stream_constraints = MediaConstraintsHandler.CONFIG.VIDEO_CONSTRAINTS.HD;
         break;
+      }
+
       case z.media.VIDEO_QUALITY_MODE.MOBILE:
-      default:
+      default: {
         media_stream_constraints = MediaConstraintsHandler.CONFIG.VIDEO_CONSTRAINTS.MOBILE;
         break;
+      }
     }
 
     if (_.isString(media_device_id)) {
