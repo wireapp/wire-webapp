@@ -30,11 +30,12 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
     this.participantsGrid = ko.observableArray([0, 0, 0, 0]);
     this.thumbnailVideo = ko.observable();
     this.participants.subscribe(participants => {
+      const me = params.me();
       if (participants.length !== 1) {
-        participants.push(params.me());
+        participants = participants.concat(me);
         this.thumbnailVideo(null);
       } else {
-        this.thumbnailVideo(params.me());
+        this.thumbnailVideo(me);
       }
 
       const newGrid = this.computeGrid(this.participantsGrid(), participants);
@@ -94,9 +95,7 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
   }
 
   devRemove(id) {
-    this.participants.remove(element => {
-      return element.id === id;
-    });
+    this.participants.remove(element => element.id === id);
   }
 
   getClassNameForVideo(index) {
