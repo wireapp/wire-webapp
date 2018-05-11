@@ -24,16 +24,18 @@ window.z.components = z.components || {};
 
 z.components.GroupVideoGrid = class GroupVideoGrid {
   constructor(params) {
-    this.me = null; //params.me && params.me();
+    this.me = params.me;
 
     this.participants = params.participants;
     this.participantsGrid = ko.observableArray([0, 0, 0, 0]);
+    this.videoStreams = ko.observableArray([]);
     this.thumbnailVideo = ko.observable();
     this.participants.subscribe(updateGrid.bind(this));
     updateGrid.bind(this)(this.participants());
 
     function updateGrid(participants) {
-      const me = null; //params.me();
+      const me = this.me();
+      me.rid = 123412341234;
       participants.forEach(p => (p.rid = p.rid || Math.floor(Math.random() * 100000)));
       if (participants.length !== 1) {
         participants = participants.concat(me);
@@ -44,6 +46,7 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
 
       participants = participants.filter(participant => !!participant);
       const newGrid = this.computeGrid(this.participantsGrid(), participants);
+      this.videoStreams(participants);
       this.participantsGrid(newGrid);
     }
   }
@@ -96,7 +99,7 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
   }
 
   getParticipantStream(id) {
-    return this.participants().find(participant => participant.rid === id);
+    return this.videoStreams().find(participant => participant.rid === id);
   }
 
   getClassNameForVideo(index) {
@@ -126,12 +129,12 @@ ko.components.register('group-video-grid', {
   template: `
     <div class="video-grid" data-bind="foreach: { data: participantsGrid, as: 'participant' }">
       <!-- ko if: participant !== 0 -->
-      <video class="video-grid__element" autoplay data-bind="css: $parent.getClassNameForVideo($index()), sourceStream: $parent.getParticipantStream(participant)">
+      <video class="video-grid__element" autoplay data-bind="css: $parent.getClassNameForVideo($index()), sourceStream: $parent.getParticipantStream(participant), muteMediaElement: $parent.getParticipantStream(participant)">
       </video>
       <!-- /ko -->
     </div>
     <!-- ko if: thumbnailVideo() -->
-      <div class="video-grid__thumbnail" data-bind="text: thumbnailVideo().id"></div>
+      <video class="video-grid__thumbnail" autoplay data-bind="muteMediaElement: thumbnailVideo(), sourceStream: thumbnailVideo()"></video>
     <!-- /ko -->
   `,
   viewModel: z.components.GroupVideoGrid,
