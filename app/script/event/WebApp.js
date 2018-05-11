@@ -146,7 +146,6 @@ z.event.WebApp = {
     CLICK: 'wire.webapp.notification.click',
     NOTIFY: 'wire.webapp.notification.notify',
     PERMISSION_STATE: 'wire.webapp.notification.permissionState',
-    REMOVE_READ: 'wire.webapp.notification.remove_read',
     SHOW: 'wire.webapp.notification.show',
   },
   PENDING: {

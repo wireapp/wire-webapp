@@ -964,7 +964,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     if (has_unread_events && !this.block_event_handling()) {
       this._update_last_read_timestamp(conversation_et);
-      amplify.publish(z.event.WebApp.NOTIFICATION.REMOVE_READ);
     }
   }
 

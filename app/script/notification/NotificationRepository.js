@@ -77,7 +77,6 @@ z.notification.NotificationRepository = class NotificationRepository {
   subscribeToEvents() {
     amplify.subscribe(z.event.WebApp.NOTIFICATION.NOTIFY, this.notify.bind(this));
     amplify.subscribe(z.event.WebApp.NOTIFICATION.PERMISSION_STATE, this.setPermissionState.bind(this));
-    amplify.subscribe(z.event.WebApp.NOTIFICATION.REMOVE_READ, this.removeReadNotifications.bind(this));
     amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, this.updatedProperties.bind(this));
     amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.NOTIFICATIONS, this.updatedNotificationsProperty.bind(this));
   }
