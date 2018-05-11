@@ -371,13 +371,9 @@
   version "3.0.32"
   resolved "https://registry.yarnpkg.com/@types/long/-/long-3.0.32.tgz#f4e5af31e9e9b196d8e5fca8a5e2e20aa3d60b69"
 
-"@types/node@*":
-  version "10.0.0"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-10.0.0.tgz#c40f8e07dce607d3ef25a626b93a6a7cdcf97881"
-
-"@types/node@9.6.6":
-  version "9.6.6"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-9.6.6.tgz#439b91f9caf3983cad2eef1e11f6bedcbf9431d2"
+"@types/node@*", "@types/node@10.0.6":
+  version "10.0.6"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-10.0.6.tgz#c0bce8e539bf34c1b850c13ff46bead2fecc2e58"
 
 "@types/node@^6.0.46":
   version "6.0.90"
@@ -388,26 +384,26 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-7.0.46.tgz#c3dedd25558c676b3d6303e51799abb9c3f8f314"
 
 "@types/node@^8.9.4":
-  version "8.10.10"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-8.10.10.tgz#fec07bc2ad549d9e6d2f7aa0fb0be3491b83163a"
+  version "8.10.13"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-8.10.13.tgz#786153acbe3e8e0b844053e72c9d9f2db71c796a"
 
 "@types/spark-md5@3.0.0":
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/@types/spark-md5/-/spark-md5-3.0.0.tgz#15b80a036f59167a8ec6045f6f1efcd9c8b02a7c"
 
-"@types/tough-cookie@2.3.2":
-  version "2.3.2"
-  resolved "https://registry.yarnpkg.com/@types/tough-cookie/-/tough-cookie-2.3.2.tgz#e0d481d8bb282ad8a8c9e100ceb72c995fb5e709"
+"@types/tough-cookie@2.3.3":
+  version "2.3.3"
+  resolved "https://registry.yarnpkg.com/@types/tough-cookie/-/tough-cookie-2.3.3.tgz#7f226d67d654ec9070e755f46daebf014628e9d9"
 
-"@wireapp/api-client@0.8.7":
-  version "0.8.7"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-0.8.7.tgz#78000756327abf1a9887a99c925bf23f6d5648ea"
+"@wireapp/api-client@0.8.16":
+  version "0.8.16"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-0.8.16.tgz#3158fc14a84dc14231ece5f252e40f3082af0fd0"
   dependencies:
-    "@types/node" "9.6.6"
+    "@types/node" "10.0.6"
     "@types/spark-md5" "3.0.0"
-    "@types/tough-cookie" "2.3.2"
-    "@wireapp/priority-queue" "0.1.16"
-    "@wireapp/store-engine" "0.9.1"
+    "@types/tough-cookie" "2.3.3"
+    "@wireapp/priority-queue" "0.1.22"
+    "@wireapp/store-engine" "0.11.6"
     axios "0.18.0"
     html5-websocket "2.0.2"
     logdown "3.2.3"
@@ -415,63 +411,63 @@
     spark-md5 "3.0.0"
     tough-cookie "2.3.4"
 
-"@wireapp/cbor@3.0.18":
-  version "3.0.18"
-  resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-3.0.18.tgz#b5e32093d6fa0c0d8ee94a353f97b84fdce8bbb3"
+"@wireapp/cbor@3.0.23":
+  version "3.0.23"
+  resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-3.0.23.tgz#340771999603a92a9e6fb3897baf5e5a15465861"
 
-"@wireapp/core@2.4.5":
-  version "2.4.5"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-2.4.5.tgz#0b7e9250498c67e8265faaca0a192a292ff98a02"
+"@wireapp/core@2.6.6":
+  version "2.6.6"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-2.6.6.tgz#effba9a402c2b69374c0a37a7f19df26f5a17daa"
   dependencies:
-    "@types/node" "9.6.6"
-    "@wireapp/api-client" "0.8.7"
-    "@wireapp/cryptobox" "8.3.39"
-    "@wireapp/store-engine" "0.9.1"
-    bazinga64 "5.1.3"
+    "@types/node" "10.0.6"
+    "@wireapp/api-client" "0.8.16"
+    "@wireapp/cryptobox" "8.3.47"
+    "@wireapp/store-engine" "0.11.6"
+    bazinga64 "5.1.8"
     logdown "3.2.3"
     protobufjs "6.8.6"
     pure-uuid "1.5.2"
 
-"@wireapp/cryptobox@8.3.39":
-  version "8.3.39"
-  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-8.3.39.tgz#ad4bc5e92547adb6a704d8f9ee450065b8d463d0"
+"@wireapp/cryptobox@8.3.47":
+  version "8.3.47"
+  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-8.3.47.tgz#96a6375bba93f62d3b520ff7c5e1f373dd6d050a"
   dependencies:
     "@types/fs-extra" "5.0.2"
-    "@types/node" "9.6.6"
-    "@wireapp/lru-cache" "2.1.6"
-    "@wireapp/priority-queue" "0.1.16"
-    "@wireapp/proteus" "7.1.26"
-    "@wireapp/store-engine" "0.9.1"
+    "@types/node" "10.0.6"
+    "@wireapp/lru-cache" "2.1.7"
+    "@wireapp/priority-queue" "0.1.22"
+    "@wireapp/proteus" "7.1.33"
+    "@wireapp/store-engine" "0.11.6"
     dexie "2.0.3"
-    fs-extra "5.0.0"
+    fs-extra "6.0.0"
 
-"@wireapp/lru-cache@2.1.6":
-  version "2.1.6"
-  resolved "https://registry.yarnpkg.com/@wireapp/lru-cache/-/lru-cache-2.1.6.tgz#c684dcb88a75f3b6c3b18ab252a215482d6bab9e"
+"@wireapp/lru-cache@2.1.7":
+  version "2.1.7"
+  resolved "https://registry.yarnpkg.com/@wireapp/lru-cache/-/lru-cache-2.1.7.tgz#4a0e8f28f594a9965fa5edca56611d8b3c9ddcbf"
   dependencies:
     webpack "3.11.0"
 
-"@wireapp/priority-queue@0.1.16":
-  version "0.1.16"
-  resolved "https://registry.yarnpkg.com/@wireapp/priority-queue/-/priority-queue-0.1.16.tgz#e87ba06f35d343df868af42f7bdfc88583acbc42"
+"@wireapp/priority-queue@0.1.22":
+  version "0.1.22"
+  resolved "https://registry.yarnpkg.com/@wireapp/priority-queue/-/priority-queue-0.1.22.tgz#ef7a926eba1f735ca45ebfb980f4e8155c2342e6"
   dependencies:
-    "@types/node" "9.6.6"
+    "@types/node" "10.0.6"
     pure-uuid "1.5.2"
 
-"@wireapp/proteus@7.1.26":
-  version "7.1.26"
-  resolved "https://registry.yarnpkg.com/@wireapp/proteus/-/proteus-7.1.26.tgz#0f46c2e9ba5506939d5eb9225a49b881f5fcf8ba"
+"@wireapp/proteus@7.1.33":
+  version "7.1.33"
+  resolved "https://registry.yarnpkg.com/@wireapp/proteus/-/proteus-7.1.33.tgz#7a06a0dfd416b17d17a2f84024083db078ff5c6f"
   dependencies:
     "@types/chai" "4.1.3"
     "@types/ed2curve" "0.2.2"
-    "@types/node" "9.6.6"
-    "@wireapp/cbor" "3.0.18"
+    "@types/node" "10.0.6"
+    "@wireapp/cbor" "3.0.23"
     ed2curve "0.2.1"
     libsodium-wrappers-sumo "0.7.3"
 
-"@wireapp/react-ui-kit@1.1.17":
-  version "1.1.17"
-  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-1.1.17.tgz#3ccc31d6b97cbf3012377d74317886fc6ed81831"
+"@wireapp/react-ui-kit@1.1.19":
+  version "1.1.19"
+  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-1.1.19.tgz#f4a105cdbce7979c0609a780cb3bc425370aaaed"
   dependencies:
     bazinga64 "5.1.8"
     color "3.0.0"
@@ -481,15 +477,15 @@
     styled-components "3.2.6"
     styled-normalize "4.0.0"
 
-"@wireapp/store-engine@0.9.1":
-  version "0.9.1"
-  resolved "https://registry.yarnpkg.com/@wireapp/store-engine/-/store-engine-0.9.1.tgz#0cdf2fce130e4926ca394141a56fd6c3b0aeaff1"
+"@wireapp/store-engine@0.11.6":
+  version "0.11.6"
+  resolved "https://registry.yarnpkg.com/@wireapp/store-engine/-/store-engine-0.11.6.tgz#1e412151eea109d4903a1d88e06c9a53e1c3cbd1"
   dependencies:
     "@types/filesystem" "0.0.28"
-    "@types/node" "9.6.6"
-    bro-fs "0.3.0"
+    "@types/node" "10.0.6"
+    bro-fs "0.4.0"
     dexie "2.0.3"
-    fs-extra "5.0.0"
+    fs-extra "6.0.0"
 
 JSONStream@^0.8.4:
   version "0.8.4"
@@ -1285,8 +1281,8 @@ babel-plugin-transform-es2015-modules-amd@^6.22.0, babel-plugin-transform-es2015
     babel-template "^6.24.1"
 
 babel-plugin-transform-es2015-modules-commonjs@^6.23.0, babel-plugin-transform-es2015-modules-commonjs@^6.24.1:
-  version "6.26.0"
-  resolved "https://registry.yarnpkg.com/babel-plugin-transform-es2015-modules-commonjs/-/babel-plugin-transform-es2015-modules-commonjs-6.26.0.tgz#0d8394029b7dc6abe1a97ef181e00758dd2e5d8a"
+  version "6.26.2"
+  resolved "https://registry.yarnpkg.com/babel-plugin-transform-es2015-modules-commonjs/-/babel-plugin-transform-es2015-modules-commonjs-6.26.2.tgz#58a793863a9e7ca870bdc5a881117ffac27db6f3"
   dependencies:
     babel-plugin-transform-strict-mode "^6.24.1"
     babel-runtime "^6.26.0"
@@ -1439,9 +1435,9 @@ babel-polyfill@6.26.0:
     core-js "^2.5.0"
     regenerator-runtime "^0.10.5"
 
-babel-preset-env@1.6.1:
-  version "1.6.1"
-  resolved "https://registry.yarnpkg.com/babel-preset-env/-/babel-preset-env-1.6.1.tgz#a18b564cc9b9afdf4aae57ae3c1b0d99188e6f48"
+babel-preset-env@1.7.0:
+  version "1.7.0"
+  resolved "https://registry.yarnpkg.com/babel-preset-env/-/babel-preset-env-1.7.0.tgz#dea79fa4ebeb883cd35dab07e260c1c9c04df77a"
   dependencies:
     babel-plugin-check-es2015-constants "^6.22.0"
     babel-plugin-syntax-trailing-function-commas "^6.22.0"
@@ -1470,7 +1466,7 @@ babel-preset-env@1.6.1:
     babel-plugin-transform-es2015-unicode-regex "^6.22.0"
     babel-plugin-transform-exponentiation-operator "^6.22.0"
     babel-plugin-transform-regenerator "^6.22.0"
-    browserslist "^2.1.2"
+    browserslist "^3.2.6"
     invariant "^2.2.2"
     semver "^5.3.0"
 
@@ -1604,10 +1600,6 @@ basic-auth@~2.0.0:
 batch@0.6.1:
   version "0.6.1"
   resolved "https://registry.yarnpkg.com/batch/-/batch-0.6.1.tgz#dc34314f4e679318093fc760272525f94bf25c16"
-
-bazinga64@5.1.3:
-  version "5.1.3"
-  resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.1.3.tgz#a2cdc9421b5eecf38484277fbdcd61481855cfa3"
 
 bazinga64@5.1.8:
   version "5.1.8"
@@ -1783,11 +1775,11 @@ braces@^2.3.1:
     split-string "^3.0.2"
     to-regex "^3.0.1"
 
-bro-fs@0.3.0:
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/bro-fs/-/bro-fs-0.3.0.tgz#ef5636ed9f8e11b7d1c6802746f5fa17b2a17f7f"
+bro-fs@0.4.0:
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/bro-fs/-/bro-fs-0.4.0.tgz#3df38350c463342186b075a43a9ba68e156b921a"
   dependencies:
-    marked "^0.3.17"
+    marked "^0.3.19"
 
 brorand@^1.0.1:
   version "1.1.0"
@@ -1862,7 +1854,7 @@ browserslist@^1.1.1, browserslist@^1.1.3, browserslist@^1.3.6, browserslist@^1.5
     caniuse-db "^1.0.30000639"
     electron-to-chromium "^1.2.7"
 
-browserslist@^2.0.0, browserslist@^2.1.2, browserslist@^2.5.1:
+browserslist@^2.0.0, browserslist@^2.5.1:
   version "2.6.1"
   resolved "https://registry.yarnpkg.com/browserslist/-/browserslist-2.6.1.tgz#cc65a05ad6131ebda26f076f2822ba1bc826376b"
   dependencies:
@@ -1870,11 +1862,11 @@ browserslist@^2.0.0, browserslist@^2.1.2, browserslist@^2.5.1:
     electron-to-chromium "^1.3.27"
 
 browserslist@^3.2.6:
-  version "3.2.6"
-  resolved "https://registry.yarnpkg.com/browserslist/-/browserslist-3.2.6.tgz#138a44d04a9af64443679191d041f28ce5b965d5"
+  version "3.2.7"
+  resolved "https://registry.yarnpkg.com/browserslist/-/browserslist-3.2.7.tgz#aa488634d320b55e88bab0256184dbbcca1e6de9"
   dependencies:
-    caniuse-lite "^1.0.30000830"
-    electron-to-chromium "^1.3.42"
+    caniuse-lite "^1.0.30000835"
+    electron-to-chromium "^1.3.45"
 
 buffer-crc32@^0.2.1:
   version "0.2.13"
@@ -2068,9 +2060,13 @@ caniuse-lite@^1.0.0, caniuse-lite@^1.0.30000748, caniuse-lite@^1.0.30000755:
   version "1.0.30000808"
   resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30000808.tgz#7d759b5518529ea08b6705a19e70dbf401628ffc"
 
-caniuse-lite@^1.0.30000830, caniuse-lite@^1.0.30000832:
+caniuse-lite@^1.0.30000832:
   version "1.0.30000832"
   resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30000832.tgz#22a277f1d623774cc9aea2f7c1a65cb1603c63b8"
+
+caniuse-lite@^1.0.30000835:
+  version "1.0.30000839"
+  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30000839.tgz#41fcc036cf1cb77a0e0be041210f77f1ced44a7b"
 
 caseless@~0.11.0:
   version "0.11.0"
@@ -2767,8 +2763,8 @@ css-select@~1.2.0:
     nth-check "~1.0.1"
 
 css-to-react-native@^2.0.3:
-  version "2.1.2"
-  resolved "https://registry.yarnpkg.com/css-to-react-native/-/css-to-react-native-2.1.2.tgz#c06d628467ef961c85ec358a90f3c87469fb0095"
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/css-to-react-native/-/css-to-react-native-2.2.0.tgz#d524ef7f39a2747a8914e86563669ba35b7cf2e7"
   dependencies:
     css-color-keywords "^1.0.0"
     fbjs "^0.8.5"
@@ -3249,9 +3245,9 @@ electron-to-chromium@^1.3.27:
   version "1.3.33"
   resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.33.tgz#bf00703d62a7c65238136578c352d6c5c042a545"
 
-electron-to-chromium@^1.3.42:
-  version "1.3.44"
-  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.44.tgz#ef6b150a60d523082388cadad88085ecd2fd4684"
+electron-to-chromium@^1.3.45:
+  version "1.3.45"
+  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.45.tgz#458ac1b1c5c760ce8811a16d2bfbd97ec30bafb8"
 
 elegant-spinner@^1.0.1:
   version "1.0.1"
@@ -4138,9 +4134,9 @@ fs-extra@4.0.2:
     jsonfile "^4.0.0"
     universalify "^0.1.0"
 
-fs-extra@5.0.0:
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/fs-extra/-/fs-extra-5.0.0.tgz#414d0110cdd06705734d055652c5411260c31abd"
+fs-extra@6.0.0:
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/fs-extra/-/fs-extra-6.0.0.tgz#0f0afb290bb3deb87978da816fcd3c7797f3a817"
   dependencies:
     graceful-fs "^4.1.2"
     jsonfile "^4.0.0"
@@ -6495,7 +6491,7 @@ markdown-table@^1.1.0:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/markdown-table/-/markdown-table-1.1.1.tgz#4b3dd3a133d1518b8ef0dbc709bf2a1b4824bc8c"
 
-marked@^0.3.17:
+marked@^0.3.19:
   version "0.3.19"
   resolved "https://registry.yarnpkg.com/marked/-/marked-0.3.19.tgz#5d47f709c4c9fc3c216b6d46127280f40b39d790"
 
