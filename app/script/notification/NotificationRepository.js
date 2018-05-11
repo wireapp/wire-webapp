@@ -128,7 +128,7 @@ z.notification.NotificationRepository = class NotificationRepository {
       notification.close();
       if (notification.data) {
         const {conversationId, messageId} = notification.data;
-        this.logger.info(`Notification for '${messageId}' in '${conversationId}' closed on unload.`, notification);
+        this.logger.info(`Forced to close notification for '${messageId}' in '${conversationId}'.`, notification);
       }
     });
   }
@@ -149,25 +149,6 @@ z.notification.NotificationRepository = class NotificationRepository {
       if (shouldNotify) {
         this._notifySound(messageEntity);
         return this._notifyBanner(messageEntity, connectionEntity, conversationEntity);
-      }
-    });
-  }
-
-  // Remove notifications from the queue that are no longer unread
-  removeReadNotifications() {
-    this.notifications.forEach(notification => {
-      const {conversationId, messageId, messageType} = notification.data || {};
-
-      if (messageId) {
-        this.conversationRepository.is_message_read(conversationId, messageId).then(isRead => {
-          if (isRead) {
-            notification.close();
-            const messageInfo = messageId
-              ? `message '${messageId}' of type '${messageType}'`
-              : `'${messageType}' message`;
-            this.logger.info(`Removed read notification for ${messageInfo} in '${conversationId}'.`);
-          }
-        });
       }
     });
   }
@@ -770,24 +751,25 @@ z.notification.NotificationRepository = class NotificationRepository {
     @note Notification.data is only supported on Chrome
     @see https://developer.mozilla.org/en-US/docs/Web/API/Notification/data
     */
-    this.removeReadNotifications();
+    this.clearNotifications();
+
     const notification = new window.Notification(notificationContent.title, notificationContent.options);
+    window.setTimeout(notification.close.bind(notification), notificationContent.timeout);
     const {conversationId, messageId, messageType} = notificationContent.options.data;
-    let timeoutTriggerId = undefined;
 
     const messageInfo = messageId ? `message '${messageId}' of type '${messageType}'` : `'${messageType}' message`;
     notification.onclick = () => {
+      notification.close();
+
       amplify.publish(z.event.WebApp.NOTIFICATION.CLICK);
       window.focus();
       wire.app.view.content.multitasking.isMinimized(true);
       notificationContent.trigger();
 
       this.logger.info(`Notification for ${messageInfo} in '${conversationId}' closed by click.`);
-      notification.close();
     };
 
     notification.onclose = () => {
-      window.clearTimeout(timeoutTriggerId);
       this.notifications.splice(this.notifications.indexOf(notification), 1);
       this.logger.info(`Removed notification for ${messageInfo} in '${conversationId}' locally.`);
     };
@@ -795,13 +777,6 @@ z.notification.NotificationRepository = class NotificationRepository {
     notification.onerror = () => {
       this.logger.error(`Notification for ${messageInfo} in '${conversationId}' closed by error.`);
       notification.close();
-    };
-
-    notification.onshow = () => {
-      timeoutTriggerId = window.setTimeout(() => {
-        this.logger.info(`Notification for ${messageInfo} in '${conversationId}' closed by timeout.`);
-        notification.close();
-      }, notificationContent.timeout);
     };
 
     this.notifications.push(notification);
