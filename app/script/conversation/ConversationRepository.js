@@ -165,15 +165,16 @@ z.conversation.ConversationRepository = class ConversationRepository {
       const conversations_cleared = [];
       const conversations_unarchived = [];
 
-      this.sorted_conversations().forEach(conversation_et => {
-        if (conversation_et.has_active_call()) {
-          conversations_calls.push(conversation_et);
-        } else if (conversation_et.is_cleared()) {
-          conversations_cleared.push(conversation_et);
-        } else if (conversation_et.is_archived()) {
-          conversations_archived.push(conversation_et);
+      this.sorted_conversations().forEach(conversationEntity => {
+        if (conversationEntity.has_active_call()) {
+          conversations_calls.push(conversationEntity);
+        }
+        if (conversationEntity.is_cleared()) {
+          conversations_cleared.push(conversationEntity);
+        } else if (conversationEntity.is_archived()) {
+          conversations_archived.push(conversationEntity);
         } else {
-          conversations_unarchived.push(conversation_et);
+          conversations_unarchived.push(conversationEntity);
         }
       });
 
