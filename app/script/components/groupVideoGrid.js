@@ -59,22 +59,27 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
     const participantIds = participants.map(participant => participant.id);
     const currentParticipants = previousGrid.filter(participantId => participantId !== 0);
 
-    const newParticipants = arrayDiff(currentParticipants, participantIds);
+    const addedParticipants = arrayDiff(currentParticipants, participantIds);
     const deletedParticipants = arrayDiff(participantIds, currentParticipants);
 
     if (deletedParticipants.length > 0) {
       // if there was some participants that left the call
       // do not reorder the matrix
-      //
-      // TODO redistribute if only 2
-      return previousGrid.map(id => {
+      const newGrid = previousGrid.map(id => {
         return deletedParticipants.includes(id) ? 0 : id;
       });
+
+      const newParticipants = newGrid.filter(participantId => participantId !== 0);
+
+      if (newParticipants.length === 2) {
+        return [newParticipants[0], 0, newParticipants[1], 0];
+      }
+      return newGrid;
     }
 
     const newParticipantsList = currentParticipants
       // add the new participants at the and
-      .concat(newParticipants);
+      .concat(addedParticipants);
 
     return [
       newParticipantsList[0] || 0,

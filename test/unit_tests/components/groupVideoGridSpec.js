@@ -79,29 +79,35 @@ describe('z.component.GroupVideoGrid', () => {
     });
 
     describe('people leaving call', () => {
-      it('computes a new grid', () => {
-        const tests = [
-          {
-            expected: ['first', 0, 0, 0],
-            grid: ['first', 0, 'second', 0],
-            participants: [{id: 'first'}],
-            scenario: 'second participant (of 2) leaves',
-          },
-          {
-            expected: ['first', 0, 0, 'third'],
-            grid: ['first', 0, 'second', 'third'],
-            participants: [{id: 'first'}, {id: 'third'}],
-            scenario: 'second participant (of 3) leaves',
-          },
-          {
-            expected: ['first', 'fourth', 0, 'third'],
-            grid: ['first', 'fourth', 'second', 'third'],
-            participants: [{id: 'first'}, {id: 'third'}, {id: 'fourth'}],
-            scenario: 'second participant (of 4) leaves',
-          },
-        ];
+      const tests = [
+        {
+          expected: ['first', 0, 0, 0],
+          grid: ['first', 0, 'second', 0],
+          participants: [{id: 'first'}],
+          scenario: 'second participant (of 2) leaves',
+        },
+        {
+          expected: ['first', 0, 'third', 0],
+          grid: ['first', 0, 'second', 'third'],
+          participants: [{id: 'first'}, {id: 'third'}],
+          scenario: 'second participant (of 3) leaves',
+        },
+        {
+          expected: ['first', 'fourth', 0, 'third'],
+          grid: ['first', 'fourth', 'second', 'third'],
+          participants: [{id: 'first'}, {id: 'third'}, {id: 'fourth'}],
+          scenario: 'second participant (of 4) leaves',
+        },
+        {
+          expected: ['first', 0, 'fourth', 0],
+          grid: ['first', 'fourth', 0, 'third'],
+          participants: [{id: 'first'}, {id: 'fourth'}],
+          scenario: 'one participant leaves one column empty',
+        },
+      ];
 
-        tests.forEach(({grid, participants, expected, scenario}) => {
+      tests.forEach(({grid, participants, expected, scenario}) => {
+        it(scenario, () => {
           const result = groupVideoGrid.computeGrid(grid, participants);
           expect(result).toEqual(expected, scenario);
         });
