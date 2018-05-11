@@ -103,7 +103,7 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
     const grid = this.participantsGrid();
     let extraClass = '';
     if (grid[index] === 0) {
-      extraClass = 'video-grid__element--empty';
+      return `${baseClass} video-grid__element--empty`;
     }
     const isAlone = grid.reduce((alone, value, i) => (i !== index && value !== 0 ? false : alone), true);
     const hasVerticalNeighbor = index % 2 === 0 ? grid[index + 1] !== 0 : grid[index - 1] !== 0;
@@ -123,19 +123,14 @@ function arrayDiff(a, b) {
 
 ko.components.register('group-video-grid', {
   template: `
-    <!-- ko if: participantsGrid().length !== 3 -->
-      <div
-        class="video-grid"
-        data-bind="foreach: { data: participantsGrid, as: 'participant' }"
-      >
-        <div class="video-grid__element" data-bind=" css: $parents[0].getClassNameForVideo($index())">
-          <span data-bind="text: participant"></span>
-          <button data-bind="click: () => $parents[0].devRemove(participant)">Remove</button>
-        </div>
+    <div class="video-grid" data-bind="foreach: { data: participantsGrid, as: 'participant' }">
+      <div class="video-grid__element" data-bind=" css: $parents[0].getClassNameForVideo($index())">
+        <span data-bind="text: participant"></span>
+        <button data-bind="click: () => $parents[0].devRemove(participant)">Remove</button>
       </div>
-      <!-- ko if: thumbnailVideo() -->
-        <div class="video-grid__thumbnail" data-bind="text: thumbnailVideo().id"></div>
-      <!-- /ko -->
+    </div>
+    <!-- ko if: thumbnailVideo() -->
+      <div class="video-grid__thumbnail" data-bind="text: thumbnailVideo().id"></div>
     <!-- /ko -->
     <button style="position: absolute; top: 0; left: 50%;" data-bind="click: devAdd">Add</button>
   `,
