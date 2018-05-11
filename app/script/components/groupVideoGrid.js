@@ -24,13 +24,17 @@ window.z.components = z.components || {};
 
 z.components.GroupVideoGrid = class GroupVideoGrid {
   constructor(params) {
-    this.me = params.me();
+    this.me = null; //params.me && params.me();
 
-    this.participants = ko.observableArray([]);
+    this.participants = params.participants;
     this.participantsGrid = ko.observableArray([0, 0, 0, 0]);
     this.thumbnailVideo = ko.observable();
-    this.participants.subscribe(participants => {
-      const me = params.me();
+    this.participants.subscribe(updateGrid.bind(this));
+    updateGrid.bind(this)(this.participants());
+
+    function updateGrid(participants) {
+      const me = null; //params.me();
+      participants.forEach(p => (p.rid = p.rid || Math.floor(Math.random() * 100000)));
       if (participants.length !== 1) {
         participants = participants.concat(me);
         this.thumbnailVideo(null);
@@ -38,9 +42,10 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
         this.thumbnailVideo(me);
       }
 
+      participants = participants.filter(participant => !!participant);
       const newGrid = this.computeGrid(this.participantsGrid(), participants);
       this.participantsGrid(newGrid);
-    });
+    }
   }
 
   /**
@@ -57,7 +62,7 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
    * @returns {Array<ParticipantId|0>} the new grid
    */
   computeGrid(previousGrid, participants) {
-    const participantIds = participants.map(participant => participant.id);
+    const participantIds = participants.map(participant => participant.rid);
     const currentParticipants = previousGrid.filter(participantId => participantId !== 0);
 
     const addedParticipants = arrayDiff(currentParticipants, participantIds);
@@ -90,12 +95,8 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
     ];
   }
 
-  devAdd() {
-    this.participants.push({id: Math.floor(Math.random() * 1000)});
-  }
-
-  devRemove(id) {
-    this.participants.remove(element => element.id === id);
+  getParticipantStream(id) {
+    return this.participants().find(participant => participant.rid === id);
   }
 
   getClassNameForVideo(index) {
@@ -124,15 +125,14 @@ function arrayDiff(a, b) {
 ko.components.register('group-video-grid', {
   template: `
     <div class="video-grid" data-bind="foreach: { data: participantsGrid, as: 'participant' }">
-      <div class="video-grid__element" data-bind=" css: $parents[0].getClassNameForVideo($index())">
-        <span data-bind="text: participant"></span>
-        <button data-bind="click: () => $parents[0].devRemove(participant)">Remove</button>
-      </div>
+      <!-- ko if: participant !== 0 -->
+      <video class="video-grid__element" autoplay data-bind="css: $parent.getClassNameForVideo($index()), sourceStream: $parent.getParticipantStream(participant)">
+      </video>
+      <!-- /ko -->
     </div>
     <!-- ko if: thumbnailVideo() -->
       <div class="video-grid__thumbnail" data-bind="text: thumbnailVideo().id"></div>
     <!-- /ko -->
-    <button style="position: absolute; top: 0; left: 50%;" data-bind="click: devAdd">Add</button>
   `,
   viewModel: z.components.GroupVideoGrid,
 });
