@@ -214,7 +214,9 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
   clickOnReceiveNews() {
     amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
-      action: () => console.log('Bla bla'),
+      action: () => {
+        // TODO: Do something :)
+      },
       text: {
         action: z.l10n.text(z.string.modalReceiveNewsAction),
         message: z.l10n.text(z.string.modalReceiveNewsMessage),
