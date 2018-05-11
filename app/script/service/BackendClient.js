@@ -75,15 +75,15 @@ z.service.BackendClient = class BackendClient {
    *
    * @param {Object} settings - Settings for different backend environments
    * @param {string} settings.environment - Backend environment used
-   * @param {string} settings.rest_url - Backend REST URL
-   * @param {string} settings.web_socket_url - Backend WebSocket URL
+   * @param {string} settings.restUrl - Backend REST URL
+   * @param {string} settings.webSocketUrl - Backend WebSocket URL
    */
   constructor(settings) {
     this.logger = new z.util.Logger('z.service.BackendClient', z.config.LOGGER.OPTIONS);
 
     z.util.Environment.backend.current = settings.environment;
-    this.rest_url = settings.rest_url;
-    this.web_socket_url = settings.web_socket_url;
+    this.restUrl = settings.restUrl;
+    this.webSocketUrl = settings.webSocketUrl;
 
     this.connectivity_timeout = undefined;
     this.connectivity_queue = new z.util.PromiseQueue({name: 'BackendClient.Connectivity'});
@@ -123,7 +123,7 @@ z.service.BackendClient = class BackendClient {
    */
   create_url(path) {
     z.util.ValidationUtil.isValidApiPath(path);
-    return `${this.rest_url}${path}`;
+    return `${this.restUrl}${path}`;
   }
 
   /**
