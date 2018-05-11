@@ -3533,9 +3533,9 @@ eslint-plugin-jsdoc@3.6.3:
     jsdoctypeparser "^2.0.0-alpha-8"
     lodash "^4.17.4"
 
-eslint-plugin-no-unsanitized@3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-no-unsanitized/-/eslint-plugin-no-unsanitized-3.0.0.tgz#1448b52cdd7871f1743c2900117bb087cfe7b806"
+eslint-plugin-no-unsanitized@3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-no-unsanitized/-/eslint-plugin-no-unsanitized-3.0.1.tgz#d6fc39b736126113e961b00f239f0a3fd95c6259"
 
 eslint-plugin-prettier@2.6.0:
   version "2.6.0"
