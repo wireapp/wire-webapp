@@ -24,11 +24,8 @@ window.z.components = z.components || {};
 
 z.components.GroupVideoGrid = class GroupVideoGrid {
   constructor(params) {
-    this.me = params.me;
-
     this.grid = ko.observableArray([0, 0, 0, 0]);
     this.streams = ko.observableArray([]);
-    this.thumbnailVideo = ko.observable();
     params.streams.subscribe(this.updateGrid.bind(this));
     this.updateGrid(params.streams());
   }
@@ -48,47 +45,34 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
    */
   computeGrid(previousGrid, streams) {
     const streamIds = streams.map(participant => participant.id);
-    const currentParticipants = previousGrid.filter(streamId => streamId !== 0);
+    const currentStreams = previousGrid.filter(streamId => streamId !== 0);
 
-    const addedParticipants = arrayDiff(currentParticipants, streamIds);
-    const deletedParticipants = arrayDiff(streamIds, currentParticipants);
+    const addedStreams = arrayDiff(currentStreams, streamIds);
+    const deletedStreams = arrayDiff(streamIds, currentStreams);
 
-    if (deletedParticipants.length > 0) {
+    if (deletedStreams.length > 0) {
       // if there was some streams that left the call
       // do not reorder the matrix
       const newGrid = previousGrid.map(id => {
-        return deletedParticipants.includes(id) ? 0 : id;
+        return deletedStreams.includes(id) ? 0 : id;
       });
 
-      const newParticipants = newGrid.filter(streamId => streamId !== 0);
+      const newStreams = newGrid.filter(streamId => streamId !== 0);
 
-      if (newParticipants.length === 2) {
-        return [newParticipants[0], 0, newParticipants[1], 0];
+      if (newStreams.length === 2) {
+        return [newStreams[0], 0, newStreams[1], 0];
       }
       return newGrid;
     }
 
-    const newParticipantsList = currentParticipants
+    const newStreamsList = currentStreams
       // add the new streams at the and
-      .concat(addedParticipants);
+      .concat(addedStreams);
 
-    return [
-      newParticipantsList[0] || 0,
-      newParticipantsList[3] || 0,
-      newParticipantsList[1] || 0,
-      newParticipantsList[2] || 0,
-    ];
+    return [newStreamsList[0] || 0, newStreamsList[3] || 0, newStreamsList[1] || 0, newStreamsList[2] || 0];
   }
 
   updateGrid(streams) {
-    const me = this.me();
-    if (streams.length !== 1) {
-      streams = streams.concat(me);
-      this.thumbnailVideo(null);
-    } else {
-      this.thumbnailVideo(me);
-    }
-
     streams = streams.filter(stream => !!stream);
     const newGrid = this.computeGrid(this.grid(), streams);
     this.streams(streams);
@@ -130,9 +114,6 @@ ko.components.register('group-video-grid', {
       </video>
       <!-- /ko -->
     </div>
-    <!-- ko if: thumbnailVideo() -->
-      <video class="video-grid__thumbnail" autoplay data-bind="muteMediaElement: thumbnailVideo(), sourceStream: thumbnailVideo()"></video>
-    <!-- /ko -->
   `,
   viewModel: z.components.GroupVideoGrid,
 });

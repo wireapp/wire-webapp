@@ -5,9 +5,7 @@
            class="video-element-remote"
            data-bind="css: {'video-element-remote-minimized': multitasking.isMinimized()}">
 
-        <!-- ko if: showRemoteVideo() -->
-        <group-video-grid params="streams: remoteVideoStreams, me: localVideoStream"></group-video-grid>
-        <!-- /ko -->
+        <group-video-grid params="streams: remoteVideoStreams"></group-video-grid>
         <!-- ko if: showRemoteParticipant() -->
           <div class="video-element-remote-participant">
             <!-- ko ifnot: videodCall().isGroup -->
@@ -70,9 +68,9 @@
       </div>
     <!-- /ko -->
 
-    <!-- ko if: false && showLocal() -->
+    <!-- ko if: showLocal() -->
       <div id="video-element-local" class="video-element-local">
-        <!-- ko if: showLocalVideo() -->
+        <!-- ko if: showLocalVideo() && showLocalVideoThumbnail() -->
           <video class="video-element"
                  autoplay
                  data-bind="css: {'mirror': !selfStreamState.screenSend()},
