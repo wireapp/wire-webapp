@@ -50,6 +50,7 @@ class ConversationAPI {
       JOIN: '/join',
       OTR: 'otr',
       SELF: 'self',
+      TYPING: 'typing',
     };
   }
 
@@ -341,7 +342,7 @@ class ConversationAPI {
     const config: AxiosRequestConfig = {
       data: typingData,
       method: 'post',
-      url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.SELF}`,
+      url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.TYPING}`,
     };
 
     await this.client.sendJSON(config);

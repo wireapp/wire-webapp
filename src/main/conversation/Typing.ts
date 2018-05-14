@@ -17,8 +17,10 @@
  *
  */
 
+import {CONVERSATION_TYPING} from '../event/index';
+
 interface Typing {
-  status: 'started' | 'stopped';
+  status: CONVERSATION_TYPING.STARTED | CONVERSATION_TYPING.STOPPED;
 }
 
 export {Typing};
