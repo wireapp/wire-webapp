@@ -18,9 +18,410 @@
  */
 
 const proto = {
-  options: {java_package: 'com.waz.model'},
   nested: {
+    Article: {
+      fields: {
+        image: {
+          id: 4,
+          type: 'Asset',
+        },
+        permanentUrl: {
+          id: 1,
+          rule: 'required',
+          type: 'string',
+        },
+        summary: {
+          id: 3,
+          type: 'string',
+        },
+        title: {
+          id: 2,
+          type: 'string',
+        },
+      },
+    },
+    Asset: {
+      fields: {
+        notUploaded: {
+          id: 3,
+          type: 'NotUploaded',
+        },
+        original: {
+          id: 1,
+          type: 'Original',
+        },
+        preview: {
+          id: 5,
+          type: 'Preview',
+        },
+        uploaded: {
+          id: 4,
+          type: 'RemoteData',
+        },
+      },
+      nested: {
+        AudioMetaData: {
+          fields: {
+            durationInMillis: {
+              id: 1,
+              type: 'uint64',
+            },
+            normalizedLoudness: {
+              id: 3,
+              type: 'bytes',
+            },
+          },
+        },
+        ImageMetaData: {
+          fields: {
+            height: {
+              id: 2,
+              rule: 'required',
+              type: 'int32',
+            },
+            tag: {
+              id: 3,
+              type: 'string',
+            },
+            width: {
+              id: 1,
+              rule: 'required',
+              type: 'int32',
+            },
+          },
+        },
+        NotUploaded: {
+          values: {
+            CANCELLED: 0,
+            FAILED: 1,
+          },
+        },
+        Original: {
+          fields: {
+            audio: {
+              id: 6,
+              type: 'AudioMetaData',
+            },
+            caption: {
+              id: 8,
+              type: 'string',
+            },
+            image: {
+              id: 4,
+              type: 'ImageMetaData',
+            },
+            mimeType: {
+              id: 1,
+              rule: 'required',
+              type: 'string',
+            },
+            name: {
+              id: 3,
+              type: 'string',
+            },
+            size: {
+              id: 2,
+              rule: 'required',
+              type: 'uint64',
+            },
+            source: {
+              id: 7,
+              type: 'string',
+            },
+            video: {
+              id: 5,
+              type: 'VideoMetaData',
+            },
+          },
+          oneofs: {
+            metaData: {
+              oneof: ['image', 'video', 'audio'],
+            },
+          },
+        },
+        Preview: {
+          fields: {
+            image: {
+              id: 4,
+              type: 'ImageMetaData',
+            },
+            mimeType: {
+              id: 1,
+              rule: 'required',
+              type: 'string',
+            },
+            remote: {
+              id: 3,
+              type: 'RemoteData',
+            },
+            size: {
+              id: 2,
+              rule: 'required',
+              type: 'uint64',
+            },
+          },
+          oneofs: {
+            metaData: {
+              oneof: ['image'],
+            },
+          },
+        },
+        RemoteData: {
+          fields: {
+            assetId: {
+              id: 3,
+              type: 'string',
+            },
+            assetToken: {
+              id: 5,
+              type: 'string',
+            },
+            encryption: {
+              id: 6,
+              type: 'EncryptionAlgorithm',
+            },
+            otrKey: {
+              id: 1,
+              rule: 'required',
+              type: 'bytes',
+            },
+            sha256: {
+              id: 2,
+              rule: 'required',
+              type: 'bytes',
+            },
+          },
+        },
+        VideoMetaData: {
+          fields: {
+            durationInMillis: {
+              id: 3,
+              type: 'uint64',
+            },
+            height: {
+              id: 2,
+              type: 'int32',
+            },
+            width: {
+              id: 1,
+              type: 'int32',
+            },
+          },
+        },
+      },
+      oneofs: {
+        status: {
+          oneof: ['notUploaded', 'uploaded'],
+        },
+      },
+    },
+    Availability: {
+      fields: {
+        type: {
+          id: 1,
+          rule: 'required',
+          type: 'Type',
+        },
+      },
+      nested: {
+        Type: {
+          values: {
+            AVAILABLE: 1,
+            AWAY: 2,
+            BUSY: 3,
+            NONE: 0,
+          },
+        },
+      },
+    },
+    Calling: {
+      fields: {
+        content: {
+          id: 1,
+          rule: 'required',
+          type: 'string',
+        },
+      },
+    },
+    Cleared: {
+      fields: {
+        clearedTimestamp: {
+          id: 2,
+          rule: 'required',
+          type: 'int64',
+        },
+        conversationId: {
+          id: 1,
+          rule: 'required',
+          type: 'string',
+        },
+      },
+    },
+    ClientAction: {
+      values: {
+        RESET_SESSION: 0,
+      },
+    },
+    Confirmation: {
+      fields: {
+        firstMessageId: {
+          id: 1,
+          rule: 'required',
+          type: 'string',
+        },
+        moreMessageIds: {
+          id: 3,
+          rule: 'repeated',
+          type: 'string',
+        },
+        type: {
+          id: 2,
+          rule: 'required',
+          type: 'Type',
+        },
+      },
+      nested: {
+        Type: {
+          values: {
+            DELIVERED: 0,
+            READ: 1,
+          },
+        },
+      },
+    },
+    EncryptionAlgorithm: {
+      values: {
+        AES_CBC: 0,
+        AES_GCM: 1,
+      },
+    },
+    Ephemeral: {
+      fields: {
+        asset: {
+          id: 5,
+          type: 'Asset',
+        },
+        expireAfterMillis: {
+          id: 1,
+          rule: 'required',
+          type: 'int64',
+        },
+        image: {
+          id: 3,
+          type: 'ImageAsset',
+        },
+        knock: {
+          id: 4,
+          type: 'Knock',
+        },
+        location: {
+          id: 6,
+          type: 'Location',
+        },
+        text: {
+          id: 2,
+          type: 'Text',
+        },
+      },
+      oneofs: {
+        content: {
+          oneof: ['text', 'image', 'knock', 'asset', 'location'],
+        },
+      },
+    },
+    External: {
+      fields: {
+        encryption: {
+          id: 3,
+          type: 'EncryptionAlgorithm',
+        },
+        otrKey: {
+          id: 1,
+          rule: 'required',
+          type: 'bytes',
+        },
+        sha256: {
+          id: 2,
+          type: 'bytes',
+        },
+      },
+    },
     GenericMessage: {
+      fields: {
+        asset: {
+          id: 11,
+          type: 'Asset',
+        },
+        availability: {
+          id: 19,
+          type: 'Availability',
+        },
+        calling: {
+          id: 10,
+          type: 'Calling',
+        },
+        cleared: {
+          id: 7,
+          type: 'Cleared',
+        },
+        clientAction: {
+          id: 9,
+          type: 'ClientAction',
+        },
+        confirmation: {
+          id: 16,
+          type: 'Confirmation',
+        },
+        deleted: {
+          id: 14,
+          type: 'MessageDelete',
+        },
+        edited: {
+          id: 15,
+          type: 'MessageEdit',
+        },
+        ephemeral: {
+          id: 18,
+          type: 'Ephemeral',
+        },
+        external: {
+          id: 8,
+          type: 'External',
+        },
+        hidden: {
+          id: 12,
+          type: 'MessageHide',
+        },
+        image: {
+          id: 3,
+          type: 'ImageAsset',
+        },
+        knock: {
+          id: 4,
+          type: 'Knock',
+        },
+        lastRead: {
+          id: 6,
+          type: 'LastRead',
+        },
+        location: {
+          id: 13,
+          type: 'Location',
+        },
+        messageId: {
+          id: 1,
+          rule: 'required',
+          type: 'string',
+        },
+        reaction: {
+          id: 17,
+          type: 'Reaction',
+        },
+        text: {
+          id: 2,
+          type: 'Text',
+        },
+      },
       oneofs: {
         content: {
           oneof: [
@@ -44,203 +445,264 @@ const proto = {
           ],
         },
       },
+    },
+    ImageAsset: {
       fields: {
-        messageId: {rule: 'required', type: 'string', id: 1},
-        text: {type: 'Text', id: 2},
-        image: {type: 'ImageAsset', id: 3},
-        knock: {type: 'Knock', id: 4},
-        lastRead: {type: 'LastRead', id: 6},
-        cleared: {type: 'Cleared', id: 7},
-        external: {type: 'External', id: 8},
-        clientAction: {type: 'ClientAction', id: 9},
-        calling: {type: 'Calling', id: 10},
-        asset: {type: 'Asset', id: 11},
-        hidden: {type: 'MessageHide', id: 12},
-        location: {type: 'Location', id: 13},
-        deleted: {type: 'MessageDelete', id: 14},
-        edited: {type: 'MessageEdit', id: 15},
-        confirmation: {type: 'Confirmation', id: 16},
-        reaction: {type: 'Reaction', id: 17},
-        ephemeral: {type: 'Ephemeral', id: 18},
-        availability: {type: 'Availability', id: 19},
+        height: {
+          id: 3,
+          rule: 'required',
+          type: 'int32',
+        },
+        mac: {
+          id: 10,
+          type: 'bytes',
+        },
+        macKey: {
+          id: 9,
+          type: 'bytes',
+        },
+        mimeType: {
+          id: 6,
+          rule: 'required',
+          type: 'string',
+        },
+        originalHeight: {
+          id: 5,
+          rule: 'required',
+          type: 'int32',
+        },
+        originalWidth: {
+          id: 4,
+          rule: 'required',
+          type: 'int32',
+        },
+        otrKey: {
+          id: 8,
+          type: 'bytes',
+        },
+        sha256: {
+          id: 11,
+          type: 'bytes',
+        },
+        size: {
+          id: 7,
+          rule: 'required',
+          type: 'int32',
+        },
+        tag: {
+          id: 1,
+          rule: 'required',
+          type: 'string',
+        },
+        width: {
+          id: 2,
+          rule: 'required',
+          type: 'int32',
+        },
       },
     },
-    Availability: {
-      fields: {type: {rule: 'required', type: 'Type', id: 1}},
-      nested: {Type: {values: {NONE: 0, AVAILABLE: 1, AWAY: 2, BUSY: 3}}},
-    },
-    Ephemeral: {
-      oneofs: {content: {oneof: ['text', 'image', 'knock', 'asset', 'location']}},
+    Knock: {
       fields: {
-        expireAfterMillis: {rule: 'required', type: 'int64', id: 1},
-        text: {type: 'Text', id: 2},
-        image: {type: 'ImageAsset', id: 3},
-        knock: {type: 'Knock', id: 4},
-        asset: {type: 'Asset', id: 5},
-        location: {type: 'Location', id: 6},
-      },
-    },
-    Text: {
-      fields: {
-        content: {rule: 'required', type: 'string', id: 1},
-        mention: {rule: 'repeated', type: 'Mention', id: 2, options: {packed: false}},
-        linkPreview: {rule: 'repeated', type: 'LinkPreview', id: 3, options: {packed: false}},
-      },
-    },
-    Knock: {fields: {hotKnock: {rule: 'required', type: 'bool', id: 1, options: {default: false}}}},
-    LinkPreview: {
-      oneofs: {preview: {oneof: ['article']}, metaData: {oneof: ['tweet']}},
-      fields: {
-        url: {rule: 'required', type: 'string', id: 1},
-        urlOffset: {rule: 'required', type: 'int32', id: 2},
-        article: {type: 'Article', id: 3},
-        permanentUrl: {type: 'string', id: 5},
-        title: {type: 'string', id: 6},
-        summary: {type: 'string', id: 7},
-        image: {type: 'Asset', id: 8},
-        tweet: {type: 'Tweet', id: 9},
-      },
-    },
-    Tweet: {fields: {author: {type: 'string', id: 1}, username: {type: 'string', id: 2}}},
-    Article: {
-      fields: {
-        permanentUrl: {rule: 'required', type: 'string', id: 1},
-        title: {type: 'string', id: 2},
-        summary: {type: 'string', id: 3},
-        image: {type: 'Asset', id: 4},
-      },
-    },
-    Mention: {
-      fields: {
-        userId: {rule: 'required', type: 'string', id: 1},
-        userName: {rule: 'required', type: 'string', id: 2},
+        hotKnock: {
+          id: 1,
+          options: {
+            default: false,
+          },
+          rule: 'required',
+          type: 'bool',
+        },
       },
     },
     LastRead: {
       fields: {
-        conversationId: {rule: 'required', type: 'string', id: 1},
-        lastReadTimestamp: {rule: 'required', type: 'int64', id: 2},
+        conversationId: {
+          id: 1,
+          rule: 'required',
+          type: 'string',
+        },
+        lastReadTimestamp: {
+          id: 2,
+          rule: 'required',
+          type: 'int64',
+        },
       },
     },
-    Cleared: {
+    LinkPreview: {
       fields: {
-        conversationId: {rule: 'required', type: 'string', id: 1},
-        clearedTimestamp: {rule: 'required', type: 'int64', id: 2},
+        article: {
+          id: 3,
+          type: 'Article',
+        },
+        image: {
+          id: 8,
+          type: 'Asset',
+        },
+        permanentUrl: {
+          id: 5,
+          type: 'string',
+        },
+        summary: {
+          id: 7,
+          type: 'string',
+        },
+        title: {
+          id: 6,
+          type: 'string',
+        },
+        tweet: {
+          id: 9,
+          type: 'Tweet',
+        },
+        url: {
+          id: 1,
+          rule: 'required',
+          type: 'string',
+        },
+        urlOffset: {
+          id: 2,
+          rule: 'required',
+          type: 'int32',
+        },
+      },
+      oneofs: {
+        metaData: {
+          oneof: ['tweet'],
+        },
+        preview: {
+          oneof: ['article'],
+        },
+      },
+    },
+    Location: {
+      fields: {
+        latitude: {
+          id: 2,
+          rule: 'required',
+          type: 'float',
+        },
+        longitude: {
+          id: 1,
+          rule: 'required',
+          type: 'float',
+        },
+        name: {
+          id: 3,
+          type: 'string',
+        },
+        zoom: {
+          id: 4,
+          type: 'int32',
+        },
+      },
+    },
+    Mention: {
+      fields: {
+        userId: {
+          id: 1,
+          rule: 'required',
+          type: 'string',
+        },
+        userName: {
+          id: 2,
+          rule: 'required',
+          type: 'string',
+        },
+      },
+    },
+    MessageDelete: {
+      fields: {
+        messageId: {
+          id: 1,
+          rule: 'required',
+          type: 'string',
+        },
+      },
+    },
+    MessageEdit: {
+      fields: {
+        replacingMessageId: {
+          id: 1,
+          rule: 'required',
+          type: 'string',
+        },
+        text: {
+          id: 2,
+          type: 'Text',
+        },
+      },
+      oneofs: {
+        content: {
+          oneof: ['text'],
+        },
       },
     },
     MessageHide: {
       fields: {
-        conversationId: {rule: 'required', type: 'string', id: 1},
-        messageId: {rule: 'required', type: 'string', id: 2},
+        conversationId: {
+          id: 1,
+          rule: 'required',
+          type: 'string',
+        },
+        messageId: {
+          id: 2,
+          rule: 'required',
+          type: 'string',
+        },
       },
     },
-    MessageDelete: {fields: {messageId: {rule: 'required', type: 'string', id: 1}}},
-    MessageEdit: {
-      oneofs: {content: {oneof: ['text']}},
-      fields: {replacingMessageId: {rule: 'required', type: 'string', id: 1}, text: {type: 'Text', id: 2}},
-    },
-    Confirmation: {
+    Reaction: {
       fields: {
-        type: {rule: 'required', type: 'Type', id: 2},
-        firstMessageId: {rule: 'required', type: 'string', id: 1},
-        moreMessageIds: {rule: 'repeated', type: 'string', id: 3},
+        emoji: {
+          id: 1,
+          type: 'string',
+        },
+        messageId: {
+          id: 2,
+          rule: 'required',
+          type: 'string',
+        },
       },
-      nested: {Type: {values: {DELIVERED: 0, READ: 1}}},
     },
-    Location: {
+    Text: {
       fields: {
-        longitude: {rule: 'required', type: 'float', id: 1},
-        latitude: {rule: 'required', type: 'float', id: 2},
-        name: {type: 'string', id: 3},
-        zoom: {type: 'int32', id: 4},
+        content: {
+          id: 1,
+          rule: 'required',
+          type: 'string',
+        },
+        linkPreview: {
+          id: 3,
+          options: {
+            packed: false,
+          },
+          rule: 'repeated',
+          type: 'LinkPreview',
+        },
+        mention: {
+          id: 2,
+          options: {
+            packed: false,
+          },
+          rule: 'repeated',
+          type: 'Mention',
+        },
       },
     },
-    ImageAsset: {
+    Tweet: {
       fields: {
-        tag: {rule: 'required', type: 'string', id: 1},
-        width: {rule: 'required', type: 'int32', id: 2},
-        height: {rule: 'required', type: 'int32', id: 3},
-        originalWidth: {rule: 'required', type: 'int32', id: 4},
-        originalHeight: {rule: 'required', type: 'int32', id: 5},
-        mimeType: {rule: 'required', type: 'string', id: 6},
-        size: {rule: 'required', type: 'int32', id: 7},
-        otrKey: {type: 'bytes', id: 8},
-        macKey: {type: 'bytes', id: 9},
-        mac: {type: 'bytes', id: 10},
-        sha256: {type: 'bytes', id: 11},
-      },
-    },
-    Asset: {
-      oneofs: {status: {oneof: ['notUploaded', 'uploaded']}},
-      fields: {
-        original: {type: 'Original', id: 1},
-        notUploaded: {type: 'NotUploaded', id: 3},
-        uploaded: {type: 'RemoteData', id: 4},
-        preview: {type: 'Preview', id: 5},
-      },
-      nested: {
-        Original: {
-          oneofs: {metaData: {oneof: ['image', 'video', 'audio']}},
-          fields: {
-            mimeType: {rule: 'required', type: 'string', id: 1},
-            size: {rule: 'required', type: 'uint64', id: 2},
-            name: {type: 'string', id: 3},
-            image: {type: 'ImageMetaData', id: 4},
-            video: {type: 'VideoMetaData', id: 5},
-            audio: {type: 'AudioMetaData', id: 6},
-            source: {type: 'string', id: 7},
-            caption: {type: 'string', id: 8},
-          },
+        author: {
+          id: 1,
+          type: 'string',
         },
-        Preview: {
-          oneofs: {metaData: {oneof: ['image']}},
-          fields: {
-            mimeType: {rule: 'required', type: 'string', id: 1},
-            size: {rule: 'required', type: 'uint64', id: 2},
-            remote: {type: 'RemoteData', id: 3},
-            image: {type: 'ImageMetaData', id: 4},
-          },
-        },
-        ImageMetaData: {
-          fields: {
-            width: {rule: 'required', type: 'int32', id: 1},
-            height: {rule: 'required', type: 'int32', id: 2},
-            tag: {type: 'string', id: 3},
-          },
-        },
-        VideoMetaData: {
-          fields: {
-            width: {type: 'int32', id: 1},
-            height: {type: 'int32', id: 2},
-            durationInMillis: {type: 'uint64', id: 3},
-          },
-        },
-        AudioMetaData: {
-          fields: {durationInMillis: {type: 'uint64', id: 1}, normalizedLoudness: {type: 'bytes', id: 3}},
-        },
-        NotUploaded: {values: {CANCELLED: 0, FAILED: 1}},
-        RemoteData: {
-          fields: {
-            otrKey: {rule: 'required', type: 'bytes', id: 1},
-            sha256: {rule: 'required', type: 'bytes', id: 2},
-            assetId: {type: 'string', id: 3},
-            assetToken: {type: 'string', id: 5},
-            encryption: {type: 'EncryptionAlgorithm', id: 6},
-          },
+        username: {
+          id: 2,
+          type: 'string',
         },
       },
     },
-    External: {
-      fields: {
-        otrKey: {rule: 'required', type: 'bytes', id: 1},
-        sha256: {type: 'bytes', id: 2},
-        encryption: {type: 'EncryptionAlgorithm', id: 3},
-      },
-    },
-    Reaction: {fields: {emoji: {type: 'string', id: 1}, messageId: {rule: 'required', type: 'string', id: 2}}},
-    ClientAction: {values: {RESET_SESSION: 0}},
-    Calling: {fields: {content: {rule: 'required', type: 'string', id: 1}}},
-    EncryptionAlgorithm: {values: {AES_CBC: 0, AES_GCM: 1}},
+  },
+  options: {
+    java_package: 'com.waz.model',
   },
 };
 

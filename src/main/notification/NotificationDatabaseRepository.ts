@@ -34,7 +34,7 @@ export default class NotificationDatabaseRepository {
   public static readonly STORES = DatabaseStores;
   public static readonly KEYS = DatabaseKeys;
 
-  constructor(private storeEngine: CRUDEngine) {}
+  constructor(private readonly storeEngine: CRUDEngine) {}
 
   public getNotificationEventList(): Promise<NotificationEvent[]> {
     return this.storeEngine.readAll<NotificationEvent>(NotificationDatabaseRepository.STORES.EVENTS);

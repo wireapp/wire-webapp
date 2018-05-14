@@ -21,7 +21,7 @@ import APIClient = require('@wireapp/api-client');
 import {Notification} from '@wireapp/api-client/dist/commonjs/notification/index';
 
 export default class NotificationBackendRepository {
-  constructor(private apiClient: APIClient) {}
+  constructor(private readonly apiClient: APIClient) {}
 
   public getLastNotification(clientId: string): Promise<Notification> {
     return this.apiClient.notification.api.getLastNotification(clientId);

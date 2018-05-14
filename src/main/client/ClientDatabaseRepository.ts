@@ -33,7 +33,7 @@ class ClientDatabaseRepository {
     LOCAL_IDENTITY: 'local_identity',
   };
 
-  constructor(private storeEngine: CRUDEngine) {}
+  constructor(private readonly storeEngine: CRUDEngine) {}
 
   public getLocalClient(): Promise<MetaClient> {
     return this.getClient(ClientDatabaseRepository.KEYS.LOCAL_IDENTITY);

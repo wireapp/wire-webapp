@@ -38,15 +38,15 @@ export interface MetaClient extends RegisteredClient {
 }
 
 export default class CryptographyService {
-  private logger: any = logdown('@wireapp/core/Account', {
+  private readonly logger: any = logdown('@wireapp/core/Account', {
     logger: console,
     markdown: false,
   });
 
   public cryptobox: Cryptobox;
-  private database: CryptographyDatabaseRepository;
+  private readonly database: CryptographyDatabaseRepository;
 
-  constructor(private apiClient: APIClient, private storeEngine: CRUDEngine) {
+  constructor(private readonly apiClient: APIClient, private readonly storeEngine: CRUDEngine) {
     this.cryptobox = new Cryptobox(this.storeEngine);
     this.database = new CryptographyDatabaseRepository(this.storeEngine);
   }

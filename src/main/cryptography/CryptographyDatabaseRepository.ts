@@ -33,7 +33,7 @@ export enum DatabaseStores {
 class CryptographyDatabaseRepository {
   public static readonly STORES = DatabaseStores;
 
-  constructor(private storeEngine: CRUDEngine) {}
+  constructor(private readonly storeEngine: CRUDEngine) {}
 
   public deleteStores(): Promise<boolean[]> {
     return Promise.all([
