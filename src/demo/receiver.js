@@ -59,6 +59,20 @@ const {MemoryEngine} = require('@wireapp/store-engine/dist/commonjs/engine');
     await account.service.conversation.sendPing(conversationId);
   });
 
+  account.on(Account.INCOMING.TYPING, async data => {
+    const {
+      conversation: conversationId,
+      from,
+      data: {status},
+    } = data;
+    console.log(`Typing in "${conversationId}" from "${from}".`, data);
+    if (status === 'started') {
+      await account.service.conversation.sendTypingStart(conversationId);
+    } else {
+      await account.service.conversation.sendTypingStop(conversationId);
+    }
+  });
+
   try {
     console.log('Logging in ...');
     await account.login(login);
