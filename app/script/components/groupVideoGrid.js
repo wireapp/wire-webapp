@@ -26,42 +26,41 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
   constructor(params) {
     this.me = params.me;
 
-    this.participants = params.participants;
-    this.participantsGrid = ko.observableArray([0, 0, 0, 0]);
-    this.videoStreams = ko.observableArray([]);
+    this.grid = ko.observableArray([0, 0, 0, 0]);
+    this.streams = ko.observableArray([]);
     this.thumbnailVideo = ko.observable();
-    this.participants.subscribe(this.updateGrid.bind(this));
-    this.updateGrid(this.participants());
+    params.streams.subscribe(this.updateGrid.bind(this));
+    this.updateGrid(params.streams());
   }
 
   /**
-   * Will compute the next grid layout according to the previous state and the new array of participants
+   * Will compute the next grid layout according to the previous state and the new array of streams
    * The grid will fill according to this pattern
-   * - 1 participant : [id, 0, 0, 0]
-   * - 2 participants: [id, 0, id, 0]
-   * - 3 participants: [id, 0, id, id]
-   * - 3 participants: [id, id, 0, id]
-   * - 4 participants: [id, id, id, id]
-   * @param {Array<ParticipantId|0>} previousGrid - the previous state of the grid
-   * @param {Array<Participant>} participants - the new array of participants to dispatch in the grid
+   * - 1 stream : [id, 0, 0, 0]
+   * - 2 streams: [id, 0, id, 0]
+   * - 3 streams: [id, 0, id, id]
+   * - 3 streams: [id, id, 0, id]
+   * - 4 streams: [id, id, id, id]
+   * @param {Array<StreamId|0>} previousGrid - the previous state of the grid
+   * @param {Array<Stream>} streams - the new array of streams to dispatch in the grid
    *
-   * @returns {Array<ParticipantId|0>} the new grid
+   * @returns {Array<StreamId|0>} the new grid
    */
-  computeGrid(previousGrid, participants) {
-    const participantIds = participants.map(participant => participant.id);
-    const currentParticipants = previousGrid.filter(participantId => participantId !== 0);
+  computeGrid(previousGrid, streams) {
+    const streamIds = streams.map(participant => participant.id);
+    const currentParticipants = previousGrid.filter(streamId => streamId !== 0);
 
-    const addedParticipants = arrayDiff(currentParticipants, participantIds);
-    const deletedParticipants = arrayDiff(participantIds, currentParticipants);
+    const addedParticipants = arrayDiff(currentParticipants, streamIds);
+    const deletedParticipants = arrayDiff(streamIds, currentParticipants);
 
     if (deletedParticipants.length > 0) {
-      // if there was some participants that left the call
+      // if there was some streams that left the call
       // do not reorder the matrix
       const newGrid = previousGrid.map(id => {
         return deletedParticipants.includes(id) ? 0 : id;
       });
 
-      const newParticipants = newGrid.filter(participantId => participantId !== 0);
+      const newParticipants = newGrid.filter(streamId => streamId !== 0);
 
       if (newParticipants.length === 2) {
         return [newParticipants[0], 0, newParticipants[1], 0];
@@ -70,7 +69,7 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
     }
 
     const newParticipantsList = currentParticipants
-      // add the new participants at the and
+      // add the new streams at the and
       .concat(addedParticipants);
 
     return [
@@ -81,28 +80,28 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
     ];
   }
 
-  updateGrid(participants) {
+  updateGrid(streams) {
     const me = this.me();
-    if (participants.length !== 1) {
-      participants = participants.concat(me);
+    if (streams.length !== 1) {
+      streams = streams.concat(me);
       this.thumbnailVideo(null);
     } else {
       this.thumbnailVideo(me);
     }
 
-    participants = participants.filter(participant => !!participant);
-    const newGrid = this.computeGrid(this.participantsGrid(), participants);
-    this.videoStreams(participants);
-    this.participantsGrid(newGrid);
+    streams = streams.filter(stream => !!stream);
+    const newGrid = this.computeGrid(this.grid(), streams);
+    this.streams(streams);
+    this.grid(newGrid);
   }
 
   getParticipantStream(id) {
-    return this.videoStreams().find(stream => stream.id === id);
+    return this.streams().find(stream => stream.id === id);
   }
 
   getClassNameForVideo(index) {
     const baseClass = `video-grid__element${index}`;
-    const grid = this.participantsGrid();
+    const grid = this.grid();
     let extraClass = '';
     if (grid[index] === 0) {
       return `${baseClass} video-grid__element--empty`;
@@ -125,7 +124,7 @@ function arrayDiff(a, b) {
 
 ko.components.register('group-video-grid', {
   template: `
-    <div class="video-grid" data-bind="foreach: { data: participantsGrid, as: 'streamId' }">
+    <div class="video-grid" data-bind="foreach: { data: grid, as: 'streamId' }">
       <!-- ko if: streamId !== 0 -->
       <video class="video-grid__element" autoplay data-bind="css: $parent.getClassNameForVideo($index()), sourceStream: $parent.getParticipantStream(streamId), muteMediaElement: $parent.getParticipantStream(streamId)">
       </video>

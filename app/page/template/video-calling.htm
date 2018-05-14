@@ -6,7 +6,7 @@
            data-bind="css: {'video-element-remote-minimized': multitasking.isMinimized()}">
 
         <!-- ko if: showRemoteVideo() -->
-        <group-video-grid params="participants: remoteVideoStreams, me: localVideoStream"></group-video-grid>
+        <group-video-grid params="streams: remoteVideoStreams, me: localVideoStream"></group-video-grid>
         <!-- /ko -->
         <!-- ko if: showRemoteParticipant() -->
           <div class="video-element-remote-participant">
