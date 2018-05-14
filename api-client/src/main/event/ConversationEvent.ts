@@ -17,13 +17,7 @@
  *
  */
 
-import {
-  Conversation,
-  CONVERSATION_ACCESS,
-  CONVERSATION_ACCESS_ROLE,
-  CONVERSATION_TYPE,
-  ConversationMembers,
-} from '../conversation';
+import {Conversation, CONVERSATION_ACCESS, CONVERSATION_ACCESS_ROLE} from '../conversation';
 import {BackendEvent} from './BackendEvent';
 
 enum CONVERSATION_EVENT {

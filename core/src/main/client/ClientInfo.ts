@@ -17,13 +17,7 @@
  *
  */
 
-import {
-  ClientClassification,
-  ClientType,
-  Location,
-  NewClient,
-  RegisteredClient,
-} from '@wireapp/api-client/dist/commonjs/client/index';
+import {ClientClassification, Location} from '@wireapp/api-client/dist/commonjs/client/index';
 
 interface ClientInfo {
   classification: ClientClassification;

@@ -17,8 +17,6 @@
  *
  */
 
-import {PaymentPlan} from '.';
-
 interface PaymentDataUpdate {
   interval?: 'day' | 'week' | 'month' | 'year';
   source?: string;

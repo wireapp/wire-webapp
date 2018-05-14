@@ -23,7 +23,7 @@ import {PreKey as SerializedPreKey} from '@wireapp/api-client/dist/commonjs/auth
 import {RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/index';
 import {OTRRecipients} from '@wireapp/api-client/dist/commonjs/conversation/index';
 import {UserPreKeyBundleMap} from '@wireapp/api-client/dist/commonjs/user/index';
-import {Cryptobox, store as CryptoboxStore} from '@wireapp/cryptobox';
+import {Cryptobox} from '@wireapp/cryptobox';
 import * as ProteusKeys from '@wireapp/proteus/dist/keys/root';
 import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine/index';
 import {Decoder, Encoder} from 'bazinga64';
@@ -46,7 +46,7 @@ export default class CryptographyService {
   public cryptobox: Cryptobox;
   private readonly database: CryptographyDatabaseRepository;
 
-  constructor(private readonly apiClient: APIClient, private readonly storeEngine: CRUDEngine) {
+  constructor(readonly apiClient: APIClient, private readonly storeEngine: CRUDEngine) {
     this.cryptobox = new Cryptobox(this.storeEngine);
     this.database = new CryptographyDatabaseRepository(this.storeEngine);
   }
@@ -135,7 +135,7 @@ export default class CryptographyService {
 
   public async initCryptobox(): Promise<void> {
     this.logger.info('initCryptobox');
-    const initialPreKeys: Array<ProteusKeys.PreKey> = await this.cryptobox.load();
+    await this.cryptobox.load();
   }
 
   public deleteCryptographyStores(): Promise<boolean[]> {

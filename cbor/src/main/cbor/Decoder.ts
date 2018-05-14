@@ -449,7 +449,7 @@ class Decoder {
   }
 
   public bool(): boolean {
-    const [_, minor] = this._type_info_with_assert(Type.BOOL);
+    const minor = this._type_info_with_assert(Type.BOOL)[1];
 
     switch (minor) {
       case 20:
@@ -462,7 +462,7 @@ class Decoder {
   }
 
   public bytes(): ArrayBuffer {
-    const [_, minor] = this._type_info_with_assert(Type.BYTES);
+    const minor = this._type_info_with_assert(Type.BYTES)[1];
 
     if (minor === 31) {
       // XXX: handle indefinite encoding
@@ -473,7 +473,7 @@ class Decoder {
   }
 
   public text(): string {
-    const [_, minor] = this._type_info_with_assert(Type.TEXT);
+    const minor = this._type_info_with_assert(Type.TEXT)[1];
 
     if (minor === 31) {
       // XXX: handle indefinite encoding
@@ -499,7 +499,7 @@ class Decoder {
   }
 
   public array(): number {
-    const [_, minor] = this._type_info_with_assert(Type.ARRAY);
+    const minor = this._type_info_with_assert(Type.ARRAY)[1];
 
     if (minor === 31) {
       // XXX: handle indefinite encoding
@@ -515,7 +515,7 @@ class Decoder {
   }
 
   public object(): number {
-    const [_, minor] = this._type_info_with_assert(Type.OBJECT);
+    const minor = this._type_info_with_assert(Type.OBJECT)[1];
 
     if (minor === 31) {
       // XXX: handle indefinite encoding

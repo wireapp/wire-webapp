@@ -144,9 +144,7 @@ export default class ConversationService {
 
     let clientCount = 0;
     for (const user in preKeyBundles) {
-      for (const device in preKeyBundles[user]) {
-        clientCount++;
-      }
+      clientCount += Object.keys(preKeyBundles[user]).length;
     }
 
     const messageInBytes = new Uint8Array(plainText).length;

@@ -84,12 +84,6 @@ export default class FileSystemEngine implements CRUDEngine {
       .then(() => primaryKey);
   }
 
-  private async createDirectory(tableName: string): Promise<string> {
-    const directoryPath = this.createDirectoryPath(tableName);
-    await fs.mkdir(directoryPath);
-    return directoryPath;
-  }
-
   async create<T>(tableName: string, primaryKey: string, entity: T): Promise<string> {
     if (!entity) {
       const message: string = `Record "${primaryKey}" cannot be saved in "${tableName}" because it's "undefined" or "null".`;
