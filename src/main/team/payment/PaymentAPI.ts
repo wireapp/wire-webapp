@@ -31,16 +31,16 @@ import {
 import {HttpClient} from '../../http';
 
 class PaymentAPI {
-  constructor(private client: HttpClient) {}
+  constructor(private readonly client: HttpClient) {}
 
   static get URL() {
     return {
       BILLING: 'billing',
-      INFO: 'info',
       CHARGES: 'charges',
+      INFO: 'info',
       INVOICES: 'invoices',
-      PLANS: 'plans',
       PLAN: 'plan',
+      PLANS: 'plans',
       TEAMS: '/teams',
     };
   }

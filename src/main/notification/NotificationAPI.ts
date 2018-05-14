@@ -22,12 +22,12 @@ import {HttpClient} from '../http';
 import {Notification, NotificationList} from './index';
 
 class NotificationAPI {
-  constructor(private client: HttpClient) {}
+  constructor(private readonly client: HttpClient) {}
 
   static get URL() {
     return {
-      NOTIFICATION: '/notifications',
       LAST: 'last',
+      NOTIFICATION: '/notifications',
     };
   }
 
@@ -37,10 +37,10 @@ class NotificationAPI {
    */
   public getLastNotification(clientId?: string): Promise<Notification> {
     const config: AxiosRequestConfig = {
+      method: 'get',
       params: {
         client: clientId,
       },
-      method: 'get',
       url: `${NotificationAPI.URL.NOTIFICATION}/${NotificationAPI.URL.LAST}`,
     };
 
@@ -58,13 +58,13 @@ class NotificationAPI {
     cancelFallbackNotifications?: boolean
   ): Promise<NotificationList> {
     const config: AxiosRequestConfig = {
+      method: 'get',
       params: {
         cancel_fallback: cancelFallbackNotifications,
         client: clientId,
-        size,
         since,
+        size,
       },
-      method: 'get',
       url: NotificationAPI.URL.NOTIFICATION,
     };
 
@@ -81,11 +81,11 @@ class NotificationAPI {
     cancelFallbackNotifications?: boolean
   ): Promise<Notification> {
     const config: AxiosRequestConfig = {
+      method: 'get',
       params: {
         cancel_fallback: cancelFallbackNotifications,
         client: clientId,
       },
-      method: 'get',
       url: `${NotificationAPI.URL.NOTIFICATION}/${notificationId}`,
     };
 

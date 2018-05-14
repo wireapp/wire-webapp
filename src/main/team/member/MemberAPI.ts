@@ -24,7 +24,7 @@ import {HttpClient} from '../../http';
 import {TeamAPI} from '../team/TeamAPI';
 
 class MemberAPI {
-  constructor(private client: HttpClient) {}
+  constructor(private readonly client: HttpClient) {}
 
   static get URL() {
     return {

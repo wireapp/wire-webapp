@@ -28,13 +28,17 @@ const logdown = require('logdown');
 
 class HttpClient {
   // private _authAPI: AuthAPI;
-  private logger: any = logdown('@wireapp/api-client/http.HttpClient', {
+  private readonly logger: any = logdown('@wireapp/api-client/http.HttpClient', {
     logger: console,
     markdown: false,
   });
-  private requestQueue: PriorityQueue;
+  private readonly requestQueue: PriorityQueue;
 
-  constructor(private baseURL: string, public accessTokenStore: AccessTokenStore, private engine: CRUDEngine) {
+  constructor(
+    private readonly baseURL: string,
+    public accessTokenStore: AccessTokenStore,
+    private readonly engine: CRUDEngine
+  ) {
     this.requestQueue = new PriorityQueue({
       maxRetries: 0,
       retryDelay: 1000,
@@ -110,9 +114,9 @@ class HttpClient {
   public postAccess(expiredAccessToken?: AccessTokenData): Promise<AccessTokenData> {
     const config: AxiosRequestConfig = {
       headers: {},
-      withCredentials: true,
       method: 'post',
       url: `${AuthAPI.URL.ACCESS}`,
+      withCredentials: true,
     };
 
     if (expiredAccessToken) {
