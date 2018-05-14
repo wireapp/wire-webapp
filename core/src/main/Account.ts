@@ -42,7 +42,7 @@ import EventEmitter = require('events');
 import {Root} from 'protobufjs';
 import {LoginSanitizer} from './auth/root';
 import {ClientInfo, ClientService} from './client/root';
-import {AssetService, ConversationService, DecodedEvent, GenericMessageType} from './conversation/root';
+import {AssetService, ConversationService, DecodedMessage, GenericMessageType} from './conversation/root';
 import {CryptographyService, PayloadBundle} from './cryptography/root';
 import {NotificationService} from './notification/root';
 import proto from './Protobuf';
@@ -57,8 +57,9 @@ class Account extends EventEmitter {
   public static readonly INCOMING = {
     ASSET: 'Account.INCOMING.ASSET',
     CONFIRMATION: 'Account.INCOMING.CONFIRMATION',
-    PING: 'Account.INCOMFING.PING',
+    PING: 'Account.INCOMING.PING',
     TEXT_MESSAGE: 'Account.INCOMING.TEXT_MESSAGE',
+    TYPING: 'Account.INCOMING.TYPING',
   };
   private apiClient: Client;
   private protocolBuffers: any = {};
@@ -238,46 +239,48 @@ class Account extends EventEmitter {
       .then(() => this);
   }
 
-  private decodeEvent(event: ConversationEvent): Promise<DecodedEvent> {
-    this.logger.info('decodeEvent');
-    return new Promise(resolve => {
-      if (!this.service) {
-        throw new Error('Services are not set.');
-      }
+  private async decodeGenericMessage(otrMessage: ConversationOtrMessageAddEvent): Promise<DecodedMessage> {
+    if (!this.service) {
+      throw new Error('Services are not set.');
+    }
 
-      switch (event.type) {
-        case CONVERSATION_EVENT.OTR_MESSAGE_ADD: {
-          const otrMessage: ConversationOtrMessageAddEvent = event as ConversationOtrMessageAddEvent;
-          const sessionId: string = CryptographyService.constructSessionId(otrMessage.from, otrMessage.data.sender);
-          const ciphertext: string = otrMessage.data.text;
-          this.service.cryptography.decrypt(sessionId, ciphertext).then((decryptedMessage: Uint8Array) => {
-            const genericMessage = this.protocolBuffers.GenericMessage.decode(decryptedMessage);
-            resolve({
-              content: genericMessage.text && genericMessage.text.content,
-              id: genericMessage.messageId,
-              type: genericMessage.content,
-            });
-          });
-          break;
-        }
-      }
-    });
+    const {
+      from,
+      data: {sender, text: cipherText},
+    } = otrMessage;
+
+    const sessionId = CryptographyService.constructSessionId(from, sender);
+    const decryptedMessage = await this.service.cryptography.decrypt(sessionId, cipherText);
+    const genericMessage = this.protocolBuffers.GenericMessage.decode(decryptedMessage);
+
+    return {
+      content: genericMessage.text && genericMessage.text.content,
+      id: genericMessage.messageId,
+      type: genericMessage.content,
+    };
   }
 
-  private handleEvent(event: ConversationEvent): Promise<PayloadBundle> {
+  private async handleEvent(event: ConversationEvent): Promise<PayloadBundle | ConversationEvent | void> {
     this.logger.info('handleEvent');
     const {conversation, from} = event;
-    return this.decodeEvent(event).then(data => ({...data, from, conversation}));
+
+    switch (event.type) {
+      case CONVERSATION_EVENT.OTR_MESSAGE_ADD: {
+        const decodedMessage = await this.decodeGenericMessage(event as ConversationOtrMessageAddEvent);
+        return {...decodedMessage, from, conversation};
+      }
+      case CONVERSATION_EVENT.TYPING: {
+        return {...event, from, conversation};
+      }
+    }
   }
 
-  private handleNotification(notification: IncomingNotification): void {
+  private async handleNotification(notification: IncomingNotification): Promise<void> {
     this.logger.info('handleNotification');
     for (const event of notification.payload) {
-      this.handleEvent(event).then((data: PayloadBundle) => {
+      const data = await this.handleEvent(event);
+      if (data) {
         switch (data.type) {
-          case GenericMessageType.TEXT:
-            this.emit(Account.INCOMING.TEXT_MESSAGE, data);
-            break;
           case GenericMessageType.ASSET:
             this.emit(Account.INCOMING.ASSET, data);
             break;
@@ -287,8 +290,15 @@ class Account extends EventEmitter {
           case GenericMessageType.KNOCK:
             this.emit(Account.INCOMING.PING, data);
             break;
+          case GenericMessageType.TEXT:
+            this.emit(Account.INCOMING.TEXT_MESSAGE, data);
+            break;
+          case CONVERSATION_EVENT.TYPING: {
+            this.emit(Account.INCOMING.TYPING, event);
+            break;
+          }
         }
-      });
+      }
     }
   }
 }

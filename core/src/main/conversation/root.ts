@@ -21,7 +21,7 @@ import {Asset, Original, RemoteData} from './Asset';
 import AssetService from './AssetService';
 import ConfirmationType from './ConfirmationType';
 import ConversationService from './ConversationService';
-import DecodedEvent from './DecodedEvent';
+import DecodedMessage from './DecodedMessage';
 import GenericMessageType from './GenericMessageType';
 import Image from './Image';
 
@@ -30,7 +30,7 @@ export {
   AssetService,
   ConfirmationType,
   ConversationService,
-  DecodedEvent,
+  DecodedMessage,
   Original,
   GenericMessageType,
   Image,
