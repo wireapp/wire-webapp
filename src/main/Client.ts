@@ -20,7 +20,7 @@
 const logdown = require('logdown');
 import {AxiosResponse} from 'axios';
 import {AssetAPI} from './asset/';
-import {AccessTokenData, AUTH_TABLE_NAME, AuthAPI, Context, LoginData, RegisterData} from './auth';
+import {AccessTokenData, AuthAPI, Context, LoginData, RegisterData} from './auth';
 import {AccessTokenStore} from './auth/';
 import {ClientAPI, ClientType} from './client/';
 import {Config} from './Config';
