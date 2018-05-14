@@ -65,7 +65,7 @@
     "uuid": "3.2.1"
   },
   "devDependencies": {
-    "autoprefixer": "8.4.1",
+    "autoprefixer": "8.5.0",
     "babel-core": "6.26.3",
     "babel-eslint": "8.2.3",
     "babel-loader": "7.1.4",
@@ -82,7 +82,7 @@
     "eslint-config-prettier": "2.9.0",
     "eslint-plugin-babel": "5.1.0",
     "eslint-plugin-jsdoc": "3.6.3",
-    "eslint-plugin-no-unsanitized": "3.0.0",
+    "eslint-plugin-no-unsanitized": "3.0.1",
     "eslint-plugin-prettier": "2.6.0",
     "eslint-plugin-react": "7.7.0",
     "grunt": "1.0.2",
@@ -95,7 +95,7 @@
     "grunt-contrib-copy": "1.0.0",
     "grunt-contrib-less": "1.4.1",
     "grunt-contrib-uglify": "wireapp/grunt-contrib-uglify#harmony-v2.8.22",
-    "grunt-contrib-watch": "1.0.1",
+    "grunt-contrib-watch": "1.1.0",
     "grunt-gitinfo": "0.1.8",
     "grunt-include-replace": "5.0.0",
     "grunt-karma": "2.0.0",
@@ -130,7 +130,7 @@
     "stylelint": "9.2.0",
     "stylelint-config-idiomatic-order": "5.0.0",
     "stylelint-config-prettier": "3.2.0",
-    "uglify-js": "3.3.24",
+    "uglify-js": "3.3.25",
     "uglifyjs-webpack-plugin": "1.2.5",
     "webpack": "3.11.0",
     "webpack-dev-server": "2.11.1"
