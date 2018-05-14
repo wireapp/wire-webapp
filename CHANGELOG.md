@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="2.7.0"></a>
+# [2.7.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.6.7...@wireapp/core@2.7.0) (2018-05-14)
+
+
+### Features
+
+* **api-client,core:** Send and receive typing notifications ([#579](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/579)) ([beb5526](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/beb5526))
+
+
+
+
 <a name="2.6.7"></a>
 ## [2.6.7](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.6.6...@wireapp/core@2.6.7) (2018-05-14)
 
