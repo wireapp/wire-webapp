@@ -23,7 +23,7 @@ import {NewTeamData, TeamChunkData, TeamData} from '../';
 import {HttpClient} from '../../http/';
 
 class TeamAPI {
-  constructor(private client: HttpClient) {}
+  constructor(private readonly client: HttpClient) {}
 
   static get URL() {
     return {
@@ -44,8 +44,8 @@ class TeamAPI {
   public putTeam(team: TeamData): AxiosPromise {
     const config: AxiosRequestConfig = {
       data: {
-        name: team.name,
         icon: team.icon,
+        name: team.name,
       },
       method: 'put',
       url: `${TeamAPI.URL.TEAMS}/${team.id}`,

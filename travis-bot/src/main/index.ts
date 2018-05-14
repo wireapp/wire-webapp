@@ -51,7 +51,7 @@ export interface MessageData {
 }
 
 class TravisBot {
-  constructor(private loginData: LoginData, private messageData: MessageData) {}
+  constructor(private readonly loginData: LoginData, private readonly messageData: MessageData) {}
 
   get message(): string {
     const {

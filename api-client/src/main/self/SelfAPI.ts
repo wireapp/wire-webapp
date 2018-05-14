@@ -24,7 +24,7 @@ import {ChangePassword, Delete, SearchableStatus, Self} from '../self';
 import {UserUpdate} from '../user';
 
 class SelfAPI {
-  constructor(private client: HttpClient) {}
+  constructor(private readonly client: HttpClient) {}
 
   static get URL() {
     return {

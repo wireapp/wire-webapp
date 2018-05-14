@@ -24,7 +24,7 @@ import {NewClient, RegisteredClient} from '../client/index';
 import {HttpClient} from '../http';
 
 class ClientAPI {
-  constructor(private client: HttpClient) {}
+  constructor(private readonly client: HttpClient) {}
 
   static get URL() {
     return {

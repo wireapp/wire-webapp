@@ -23,7 +23,7 @@ import {Connection, ConnectionRequest, ConnectionUpdate, UserConnectionList} fro
 import {HttpClient} from '../http';
 
 class ConnectionAPI {
-  constructor(private client: HttpClient) {}
+  constructor(private readonly client: HttpClient) {}
 
   static get URL() {
     return {

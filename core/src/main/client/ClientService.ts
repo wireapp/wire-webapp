@@ -24,7 +24,6 @@ import {LoginData, PreKey} from '@wireapp/api-client/dist/commonjs/auth/index';
 import {
   ClientClassification,
   ClientType,
-  Location,
   NewClient,
   RegisteredClient,
 } from '@wireapp/api-client/dist/commonjs/client/index';
@@ -42,18 +41,18 @@ export interface MetaClient extends RegisteredClient {
 }
 
 export default class ClientService {
-  private logger: any = logdown('@wireapp/core/ClientService', {
+  private readonly logger: any = logdown('@wireapp/core/ClientService', {
     logger: console,
     markdown: false,
   });
 
-  private database: ClientDatabaseRepository;
-  private backend: ClientBackendRepository;
+  private readonly database: ClientDatabaseRepository;
+  private readonly backend: ClientBackendRepository;
 
   constructor(
-    private apiClient: APIClient,
-    private storeEngine: CRUDEngine,
-    private cryptographyService: CryptographyService
+    private readonly apiClient: APIClient,
+    private readonly storeEngine: CRUDEngine,
+    private readonly cryptographyService: CryptographyService
   ) {
     this.database = new ClientDatabaseRepository(this.storeEngine);
     this.backend = new ClientBackendRepository(this.apiClient);
@@ -111,9 +110,9 @@ export default class ClientService {
           this.cryptographyService.cryptobox.lastResortPreKey
         ),
         location: clientInfo.location,
+        model: clientInfo.model,
         password: String(loginData.password),
         prekeys: serializedPreKeys,
-        model: clientInfo.model,
         sigkeys: {
           enckey: 'Wuec0oJi9/q9VsgOil9Ds4uhhYwBT+CAUrvi/S9vcz0=',
           mackey: 'Wuec0oJi9/q9VsgOil9Ds4uhhYwBT+CAUrvi/S9vcz0=',

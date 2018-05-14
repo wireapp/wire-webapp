@@ -22,7 +22,7 @@ import Item from './Item';
 import Priority from './Priority';
 
 export default class PriorityQueue {
-  private config: Config = {
+  private readonly config: Config = {
     comparator: (a: Item, b: Item): Priority => {
       if (a.priority === b.priority) {
         return a.timestamp - b.timestamp;

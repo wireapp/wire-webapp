@@ -37,8 +37,8 @@ export default class FileSystemEngine implements CRUDEngine {
 
   private config: FileSystemEngineOptions = {
     fileExtension: '.dat',
-    type: typeof window === 'undefined' ? 0 : window.TEMPORARY,
     size: TEN_MEGABYTES,
+    type: typeof window === 'undefined' ? 0 : window.TEMPORARY,
   };
 
   constructor() {}

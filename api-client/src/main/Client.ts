@@ -41,12 +41,12 @@ import {UserAPI} from './user/';
 const VERSION = require('../../package.json').version;
 
 class Client {
-  private logger: any = logdown('@wireapp/api-client/Client', {
+  private readonly logger: any = logdown('@wireapp/api-client/Client', {
     logger: console,
     markdown: false,
   });
 
-  private STORE_NAME_PREFIX: string = 'wire';
+  private readonly STORE_NAME_PREFIX: string = 'wire';
   // APIs
   public asset: {api: AssetAPI};
   public auth: {api: AuthAPI};
@@ -58,20 +58,20 @@ class Client {
   public notification: {api: NotificationAPI};
   public self: {api: SelfAPI};
   public teams: {
-    team: {api?: TeamAPI};
-    member: {api?: MemberAPI};
     invitation: {api?: TeamInvitationAPI};
+    member: {api?: MemberAPI};
     payment: {api?: PaymentAPI};
+    team: {api?: TeamAPI};
   } = {
-    team: {api: undefined},
-    member: {api: undefined},
     invitation: {api: undefined},
+    member: {api: undefined},
     payment: {api: undefined},
+    team: {api: undefined},
   };
   public user: {api: UserAPI};
 
   // Configuration
-  private accessTokenStore: AccessTokenStore;
+  private readonly accessTokenStore: AccessTokenStore;
   public context?: Context;
   public transport: {http: HttpClient; ws: WebSocketClient};
 

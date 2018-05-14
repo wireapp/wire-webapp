@@ -43,7 +43,7 @@ const DEFAULT_CONFIG: DecoderConfig = {
 class Decoder {
   private view: DataView;
 
-  constructor(private buffer: ArrayBuffer, private config = DEFAULT_CONFIG) {
+  constructor(private readonly buffer: ArrayBuffer, private readonly config = DEFAULT_CONFIG) {
     this.view = new DataView(this.buffer);
   }
 

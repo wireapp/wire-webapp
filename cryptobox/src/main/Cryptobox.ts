@@ -18,15 +18,15 @@ class Cryptobox extends EventEmitter {
     NEW_SESSION: 'new-session',
   };
 
-  private cachedSessions: LRUCache<CryptoboxSession>;
+  private readonly cachedSessions: LRUCache<CryptoboxSession>;
 
-  private logger: any = logdown('@wireapp/cryptobox/Cryptobox', {
+  private readonly logger: any = logdown('@wireapp/cryptobox/Cryptobox', {
     logger: console,
     markdown: false,
   });
-  private minimumAmountOfPreKeys: number;
-  private queues = new LRUCache<PriorityQueue>(1000);
-  private store: CryptoboxCRUDStore;
+  private readonly minimumAmountOfPreKeys: number;
+  private readonly queues = new LRUCache<PriorityQueue>(1000);
+  private readonly store: CryptoboxCRUDStore;
 
   public lastResortPreKey: ProteusKeys.PreKey | undefined;
   public identity: ProteusKeys.IdentityKeyPair | undefined;

@@ -18,7 +18,7 @@ class CryptoboxCRUDStore implements ProteusSession.PreKeyStore {
   public static readonly KEYS = CRUDStoreKeys;
   public static readonly STORES = CrudStoreStores;
 
-  constructor(private engine: CRUDEngine) {}
+  constructor(private readonly engine: CRUDEngine) {}
 
   private from_store(record: PersistedRecord): ArrayBuffer {
     return typeof record.serialised === 'string'

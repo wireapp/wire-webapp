@@ -26,7 +26,7 @@ import {User} from '../user';
 import {RegisterData} from './RegisterData';
 
 class AuthAPI {
-  constructor(private client: HttpClient, private engine: CRUDEngine) {}
+  constructor(private readonly client: HttpClient, private readonly engine: CRUDEngine) {}
 
   static get URL() {
     return {
@@ -71,8 +71,8 @@ class AuthAPI {
   public postLogin(loginData: LoginData): Promise<AxiosResponse<any>> {
     const login = {
       ...loginData,
-      persist: undefined,
       password: loginData.password ? String(loginData.password) : undefined,
+      persist: undefined,
     };
 
     const config: AxiosRequestConfig = {
@@ -90,9 +90,9 @@ class AuthAPI {
 
   public postLogout(): AxiosPromise {
     const config: AxiosRequestConfig = {
-      withCredentials: true,
       method: 'post',
       url: `${AuthAPI.URL.ACCESS}/${AuthAPI.URL.LOGOUT}`,
+      withCredentials: true,
     };
 
     return sendRequestWithCookie(this.client, config, this.engine).then((response: AxiosResponse) => response.data);

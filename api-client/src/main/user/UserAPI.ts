@@ -38,7 +38,7 @@ import {
 } from '../user';
 
 class UserAPI {
-  constructor(private client: HttpClient) {}
+  constructor(private readonly client: HttpClient) {}
 
   static get URL() {
     return {
@@ -92,11 +92,11 @@ class UserAPI {
    */
   public getActivation(activationCode: string, activationKey: string): Promise<ActivationResponse> {
     const config: AxiosRequestConfig = {
+      method: 'get',
       params: {
         code: activationCode,
         key: activationKey,
       },
-      method: 'get',
       url: UserAPI.URL.ACTIVATE,
     };
 
@@ -209,10 +209,10 @@ class UserAPI {
    */
   public getSearchContacts(query: string, limit?: number): Promise<SearchResult> {
     const config: AxiosRequestConfig = {
+      method: 'get',
       params: {
         q: query,
       },
-      method: 'get',
       url: `${UserAPI.URL.SEARCH}/${UserAPI.URL.CONTACTS}`,
     };
 

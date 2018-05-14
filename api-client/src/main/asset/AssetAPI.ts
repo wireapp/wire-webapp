@@ -28,7 +28,7 @@ import {isValidKey, isValidToken} from './AssetUtil';
 class AssetAPI {
   private static readonly ASSET_URL = '/assets/v3';
 
-  constructor(private client: HttpClient) {}
+  constructor(private readonly client: HttpClient) {}
 
   getAsset(key: string, token?: string): Promise<ArrayBuffer> {
     if (!isValidKey(key)) {
@@ -43,11 +43,11 @@ class AssetAPI {
       .sendRequest(
         {
           method: 'get',
-          url: `${AssetAPI.ASSET_URL}/${key}`,
-          responseType: 'arraybuffer',
           params: {
             asset_token: token,
           },
+          responseType: 'arraybuffer',
+          url: `${AssetAPI.ASSET_URL}/${key}`,
         },
         true
       )
@@ -81,12 +81,12 @@ class AssetAPI {
 
     return this.client
       .sendRequest({
-        method: 'post',
-        url: AssetAPI.ASSET_URL,
+        data: concatToBuffer(body, asset, footer),
         headers: {
           'Content-Type': `multipart/mixed; boundary=${BOUNDARY}`,
         },
-        data: concatToBuffer(body, asset, footer),
+        method: 'post',
+        url: AssetAPI.ASSET_URL,
       })
       .then((response: AxiosResponse) => response.data);
   }

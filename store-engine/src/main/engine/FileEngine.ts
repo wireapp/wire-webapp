@@ -16,7 +16,7 @@ export default class FileEngine implements CRUDEngine {
     fileExtension: '.dat',
   };
 
-  constructor(private baseDirectory: string = '') {}
+  constructor(private readonly baseDirectory: string = '') {}
 
   public async isSupported(): Promise<void> {
     if (isBrowser()) {

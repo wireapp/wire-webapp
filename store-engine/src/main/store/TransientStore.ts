@@ -24,14 +24,14 @@ import ExpiredBundle from './ExpiredBundle';
 import TransientBundle from './TransientBundle';
 
 export default class TransientStore extends EventEmitter {
-  private bundles: {[index: string]: TransientBundle} = {};
+  private readonly bundles: {[index: string]: TransientBundle} = {};
   private tableName: string = '';
 
   public static TOPIC = {
     EXPIRED: 'expired',
   };
 
-  constructor(private engine: CRUDEngine) {
+  constructor(private readonly engine: CRUDEngine) {
     super();
   }
 

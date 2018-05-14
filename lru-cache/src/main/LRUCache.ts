@@ -29,11 +29,11 @@ export interface Node<T> {
 }
 
 class LRUCache<T> {
-  private map: NodeMap<T>;
+  private readonly map: NodeMap<T>;
   private head: Node<T> | null;
   private end: Node<T> | null;
 
-  constructor(private capacity: number = 100) {
+  constructor(private readonly capacity: number = 100) {
     this.map = {};
     this.head = null;
     this.end = null;
@@ -126,9 +126,9 @@ class LRUCache<T> {
     } else {
       const created: Node<T> = {
         key,
-        value,
         next: null,
         previous: null,
+        value,
       };
 
       if (Object.keys(this.map).length >= this.capacity) {

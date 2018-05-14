@@ -37,17 +37,17 @@ export default class ConversationService {
   private clientID: string = '';
 
   constructor(
-    private apiClient: APIClient,
-    private protocolBuffers: any = {},
-    private cryptographyService: CryptographyService,
-    private assetService: AssetService
+    private readonly apiClient: APIClient,
+    private readonly protocolBuffers: any = {},
+    private readonly cryptographyService: CryptographyService,
+    private readonly assetService: AssetService
   ) {}
 
   public async sendConfirmation(conversationId: string, confirmMessageId: string): Promise<string> {
     const messageId = new UUID(4).format();
     const confirmation = this.protocolBuffers.Confirmation.create({
-      type: ConfirmationType.DELIVERED,
       firstMessageId: confirmMessageId,
+      type: ConfirmationType.DELIVERED,
     });
 
     const genericMessage = this.protocolBuffers.GenericMessage.create({
@@ -99,8 +99,8 @@ export default class ConversationService {
     const messageId = new UUID(4).format();
 
     const genericMessage = this.protocolBuffers.GenericMessage.create({
-      messageId,
       asset: imageAsset,
+      messageId,
     });
 
     const preKeyBundles = await this.getPreKeyBundles(conversationId);
@@ -115,8 +115,8 @@ export default class ConversationService {
     const messageId = new UUID(4).format();
     const knock = this.protocolBuffers.Knock.create();
     const ping = this.protocolBuffers.GenericMessage.create({
-      messageId,
       knock,
+      messageId,
     });
 
     const preKeyBundles = await this.getPreKeyBundles(conversationId);

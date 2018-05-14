@@ -63,9 +63,9 @@ class ConversionError extends InputError {
 }
 
 Object.assign(InputError, {
+  ConversionError,
   RangeError,
   TypeError,
-  ConversionError,
 });
 
 export default InputError;

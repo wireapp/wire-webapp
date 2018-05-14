@@ -49,7 +49,7 @@ import proto from './Protobuf';
 import {SelfService} from './self/root';
 
 class Account extends EventEmitter {
-  private logger: any = logdown('@wireapp/core/Account', {
+  private readonly logger: any = logdown('@wireapp/core/Account', {
     logger: console,
     markdown: false,
   });
@@ -61,7 +61,7 @@ class Account extends EventEmitter {
     TEXT_MESSAGE: 'Account.INCOMING.TEXT_MESSAGE',
     TYPING: 'Account.INCOMING.TYPING',
   };
-  private apiClient: Client;
+  private readonly apiClient: Client;
   private protocolBuffers: any = {};
   public service?: {
     client: ClientService;

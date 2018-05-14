@@ -3,7 +3,7 @@ import {RecordAlreadyExistsError, RecordNotFoundError, RecordTypeError} from './
 
 export default class MemoryEngine implements CRUDEngine {
   public storeName: string = '';
-  private stores: {[index: string]: {[index: string]: any}} = {};
+  private readonly stores: {[index: string]: {[index: string]: any}} = {};
 
   public async isSupported(): Promise<void> {
     // Always available
