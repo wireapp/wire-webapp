@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="0.9.0"></a>
+# [0.9.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@0.8.17...@wireapp/api-client@0.9.0) (2018-05-14)
+
+
+### Features
+
+* **api-client,core:** Send and receive typing notifications ([#579](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/579)) ([beb5526](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/beb5526))
+
+
+
+
 <a name="0.8.17"></a>
 ## [0.8.17](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@0.8.16...@wireapp/api-client@0.8.17) (2018-05-14)
 
