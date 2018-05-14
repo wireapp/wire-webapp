@@ -23,7 +23,7 @@
           <!-- /ko -->
         <!-- /ko -->
       </div>
-      <div id="center-column" class="center-column">
+      <div id="center-column" class="center-column" data-bind="css: {'dark-theme': isDarkTheme()}">
         <!-- ko if: state() === z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS -->
           #include('content/connect-requests.htm')
         <!-- /ko -->

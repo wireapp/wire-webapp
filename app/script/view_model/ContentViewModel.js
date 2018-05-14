@@ -51,6 +51,9 @@ z.viewModel.ContentViewModel = class ContentViewModel {
     this.conversationRepository = repositories.conversation;
     this.userRepository = repositories.user;
     this.logger = new z.util.Logger('z.viewModel.ContentViewModel', z.config.LOGGER.OPTIONS);
+    this.isDarkTheme = function() {
+      return false;
+    };
 
     // State
     this.state = ko.observable(ContentViewModel.STATE.WATERMARK);
