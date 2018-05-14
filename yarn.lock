@@ -465,9 +465,9 @@
     ed2curve "0.2.1"
     libsodium-wrappers-sumo "0.7.3"
 
-"@wireapp/react-ui-kit@1.1.19":
-  version "1.1.19"
-  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-1.1.19.tgz#f4a105cdbce7979c0609a780cb3bc425370aaaed"
+"@wireapp/react-ui-kit@1.1.20":
+  version "1.1.20"
+  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-1.1.20.tgz#8d70b6b81d303830d7e6392cb2c6e6b8cb3db6f4"
   dependencies:
     bazinga64 "5.1.8"
     color "3.0.0"
@@ -8605,8 +8605,8 @@ react-is@^16.3.1:
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.3.2.tgz#f4d3d0e2f5fbb6ac46450641eb2e25bf05d36b22"
 
 react-lifecycles-compat@^3.0.2:
-  version "3.0.2"
-  resolved "https://registry.yarnpkg.com/react-lifecycles-compat/-/react-lifecycles-compat-3.0.2.tgz#7279047275bd727a912e25f734c0559527e84eff"
+  version "3.0.4"
+  resolved "https://registry.yarnpkg.com/react-lifecycles-compat/-/react-lifecycles-compat-3.0.4.tgz#4f1a273afdfc8f3488a8c516bfda78f872352362"
 
 react-reconciler@^0.7.0:
   version "0.7.0"
