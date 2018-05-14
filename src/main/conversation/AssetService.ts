@@ -21,7 +21,7 @@ import APIClient = require('@wireapp/api-client');
 import {AssetRetentionPolicy} from '@wireapp/api-client/dist/commonjs/asset/AssetRetentionPolicy';
 import {Image} from '../conversation/root';
 import * as AssetCryptography from '../cryptography/AssetCryptography.node';
-import {CryptographyService, EncryptedAsset} from '../cryptography/root';
+import {EncryptedAsset} from '../cryptography/root';
 
 export interface AssetOptions {
   public: boolean;
@@ -29,11 +29,7 @@ export interface AssetOptions {
 }
 
 export default class AssetService {
-  constructor(
-    private readonly apiClient: APIClient,
-    private readonly protocolBuffers: any = {},
-    private readonly cryptographyService: CryptographyService
-  ) {}
+  constructor(private readonly apiClient: APIClient, private readonly protocolBuffers: any = {}) {}
 
   private async postAsset(
     buffer: Buffer,

@@ -17,17 +17,10 @@
  *
  */
 
-const pkg = require('../package.json');
 const logdown = require('logdown');
 import Client = require('@wireapp/api-client');
-import {Context, LoginData, PreKey} from '@wireapp/api-client/dist/commonjs/auth/index';
-import {
-  ClientClassification,
-  ClientType,
-  Location,
-  NewClient,
-  RegisteredClient,
-} from '@wireapp/api-client/dist/commonjs/client/index';
+import {Context, LoginData} from '@wireapp/api-client/dist/commonjs/auth/index';
+import {ClientType, RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/index';
 import {IncomingNotification} from '@wireapp/api-client/dist/commonjs/conversation/index';
 import {
   CONVERSATION_EVENT,
@@ -92,7 +85,7 @@ class Account extends EventEmitter {
 
     const cryptographyService = new CryptographyService(this.apiClient, this.apiClient.config.store);
     const clientService = new ClientService(this.apiClient, this.apiClient.config.store, cryptographyService);
-    const assetService = new AssetService(this.apiClient, this.protocolBuffers, cryptographyService);
+    const assetService = new AssetService(this.apiClient, this.protocolBuffers);
     const conversationService = new ConversationService(
       this.apiClient,
       this.protocolBuffers,
