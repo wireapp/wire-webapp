@@ -54,7 +54,13 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
     this.currentDeviceIndex = this.mediaRepository.devices_handler.current_device_index;
 
     this.localVideoStream = this.mediaRepository.stream_handler.localMediaStream;
-    this.remoteVideoStreams = this.mediaRepository.stream_handler.remote_media_streams.video;
+    this.remoteVideoStreams = ko.pureComputed(() => {
+      const videoStreams = this.mediaRepository.stream_handler.remote_media_streams.video();
+      // FIXME the media repository should release the memory of inactive video streams
+      // Right now, only the status is changed but we keep the stream in memory
+      // until the next page reload.
+      return videoStreams.filter(stream => stream.active);
+    });
 
     this.selfStreamState = this.mediaRepository.stream_handler.selfStreamState;
 
