@@ -78,9 +78,9 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
 
     this.selfStreamState = this.calling_repository.selfStreamState;
 
-    this.showScreensharingButton = ko.pureComputed(
-      () => this.callIsConnected() && z.calling.CallingRepository.supportsScreenSharing
-    );
+    this.showScreensharingButton = ko.pureComputed(() => {
+      return this.callIsConnected() && z.calling.CallingRepository.supportsScreenSharing;
+    });
     this.showVideoButton = ko.pureComputed(() => {
       return this.joinedCall() ? this.joinedCall().conversationEntity.supportsVideoCall(false) : false;
     });

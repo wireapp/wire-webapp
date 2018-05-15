@@ -93,7 +93,7 @@ ko.components.register('conversation-list-cell', {
           <span class="conversation-list-cell-badge cell-badge-light" data-bind="text: conversation.unread_message_count()" data-uie-name="status-unread"></span>
         <!-- /ko -->
         <!-- ko if: showJoinButton -->
-        <div class="call-ui__button call-ui__button--green call-ui__button--large" data-bind="click: onJoinCall, l10n_text: z.string.callJoin" data-uie-name="do-call-controls-call-join"></div>
+          <div class="call-ui__button call-ui__button--green call-ui__button--large" data-bind="click: onJoinCall, l10n_text: z.string.callJoin" data-uie-name="do-call-controls-call-join"></div>
         <!-- /ko -->
       </div>
     </div>
