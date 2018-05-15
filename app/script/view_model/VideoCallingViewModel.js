@@ -54,7 +54,6 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
     this.currentDeviceIndex = this.mediaRepository.devices_handler.current_device_index;
 
     this.localVideoStream = this.mediaRepository.stream_handler.localMediaStream;
-    this.showLocalVideoThumbnail = ko.observable(true);
     this.remoteVideoStreams = ko.pureComputed(() => {
       // FIXME the media repository should release the memory of inactive video streams
       // Right now, only the status is changed but we keep the stream in memory
@@ -65,9 +64,6 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
 
       if (videoStreams.length > 1) {
         videoStreams = videoStreams.concat(this.localVideoStream());
-        this.showLocalVideoThumbnail(false);
-      } else {
-        this.showLocalVideoThumbnail(true);
       }
       return videoStreams;
     });
@@ -127,10 +123,15 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
     });
 
     this.showLocal = ko.pureComputed(() => {
-      const shouldShowLocal = this.showLocalVideo() || this.overlayIconClass() || this.showLocalVideoThumbnail();
+      const shouldShowLocal = this.showLocalVideo() || this.overlayIconClass();
       return shouldShowLocal && !this.multitasking.isMinimized() && !this.isChoosingScreen();
     });
     this.showLocalVideo = ko.pureComputed(() => {
+      if (this.remoteVideoStreams().length > 1) {
+        // local video is included in the grid when there
+        // are more than 2 participants
+        return false;
+      }
       if (this.videodCall()) {
         const localVideoState = this.selfStreamState.screenSend() || this.selfStreamState.videoSend();
         const showLocalVideo = localVideoState || !this.isCallOngoing();

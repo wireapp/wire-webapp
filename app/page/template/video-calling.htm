@@ -70,7 +70,7 @@
 
     <!-- ko if: showLocal() -->
       <div id="video-element-local" class="video-element-local">
-        <!-- ko if: showLocalVideo() && showLocalVideoThumbnail() -->
+        <!-- ko if: showLocalVideo() -->
           <video class="video-element"
                  autoplay
                  data-bind="css: {'mirror': !selfStreamState.screenSend()},
