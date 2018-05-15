@@ -38,24 +38,22 @@ import {
 } from '../user';
 
 class UserAPI {
-  constructor(private readonly client: HttpClient) {}
+  static readonly URL = {
+    ACTIVATE: '/activate',
+    CALLS: '/calls',
+    CLIENTS: 'clients',
+    CONTACTS: 'contacts',
+    DELETE: '/delete',
+    HANDLES: 'handles',
+    PASSWORDRESET: '/password-reset',
+    PRE_KEYS: 'prekeys',
+    PROPERTIES: '/properties',
+    SEARCH: '/search',
+    SEND: 'send',
+    USERS: '/users',
+  };
 
-  static get URL() {
-    return {
-      ACTIVATE: '/activate',
-      CALLS: '/calls',
-      CLIENTS: 'clients',
-      CONTACTS: 'contacts',
-      DELETE: '/delete',
-      HANDLES: 'handles',
-      PASSWORDRESET: '/password-reset',
-      PRE_KEYS: 'prekeys',
-      PROPERTIES: '/properties',
-      SEARCH: '/search',
-      SEND: 'send',
-      USERS: '/users',
-    };
-  }
+  constructor(private readonly client: HttpClient) {}
 
   /**
    * Clear all properties.
@@ -270,6 +268,29 @@ class UserAPI {
     }
 
     return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+  }
+
+  /**
+   * List users.
+   * @param userIds Multiple user's IDs
+   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/users
+   */
+  public async getUsersByIds(userIds: string[]): Promise<User[]> {
+    const maxChunkSize = 100;
+    let allUsers: User[] = [];
+
+    for (let index = 0; index < userIds.length; index += maxChunkSize) {
+      const requestChunk = userIds.slice(index, index + maxChunkSize);
+      if (requestChunk.length) {
+        const conversationChunk = await this.getUsers({ids: requestChunk});
+
+        if (conversationChunk.length) {
+          allUsers = allUsers.concat(conversationChunk);
+        }
+      }
+    }
+
+    return allUsers;
   }
 
   /**

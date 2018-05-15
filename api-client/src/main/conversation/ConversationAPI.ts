@@ -37,22 +37,21 @@ import {HttpClient} from '../http/';
 import {ValidationError} from '../validation/';
 
 class ConversationAPI {
-  constructor(private readonly client: HttpClient) {}
+  static readonly MAX_CHUNK_SIZE = 500;
+  static readonly URL = {
+    BOTS: 'bots',
+    CLIENTS: '/clients',
+    CODE_CHECK: '/code-check',
+    CONVERSATIONS: '/conversations',
+    JOIN: '/join',
+    MEMBERS: 'members',
+    MESSAGES: 'messages',
+    OTR: 'otr',
+    SELF: 'self',
+    TYPING: 'typing',
+  };
 
-  static get URL() {
-    return {
-      BOTS: 'bots',
-      CLIENTS: '/clients',
-      CODE_CHECK: '/code-check',
-      CONVERSATIONS: '/conversations',
-      JOIN: '/join',
-      MEMBERS: 'members',
-      MESSAGES: 'messages',
-      OTR: 'otr',
-      SELF: 'self',
-      TYPING: 'typing',
-    };
-  }
+  constructor(private readonly client: HttpClient) {}
 
   /**
    * Remove bot from conversation.
@@ -84,6 +83,32 @@ class ConversationAPI {
   }
 
   /**
+   * Get all conversations.
+   */
+  public getAllConversations(): Promise<Conversation[]> {
+    let allConversations: Conversation[] = [];
+
+    const getConversationChunks = async (conversationId?: string): Promise<Conversation[]> => {
+      const {conversations, has_more} = await this.getConversations(conversationId, ConversationAPI.MAX_CHUNK_SIZE);
+
+      if (conversations.length) {
+        allConversations = allConversations.concat(conversations);
+      }
+
+      if (has_more) {
+        const lastConversation = conversations.pop();
+        if (lastConversation) {
+          return getConversationChunks(lastConversation.id);
+        }
+      }
+
+      return allConversations;
+    };
+
+    return getConversationChunks();
+  }
+
+  /**
    * Get a conversation by ID.
    * @param conversationId The conversation ID
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/conversation
@@ -108,42 +133,84 @@ class ConversationAPI {
       method: 'get',
       params: {
         size: limit,
+        start: conversationId,
       },
       url: `${ConversationAPI.URL.CONVERSATIONS}/ids`,
     };
-
-    if (conversationId) {
-      config.data.start = conversationId;
-    }
 
     return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
   }
 
   /**
-   * Get conversations.
+   * Get conversations as chunks.
    * Note: At most 500 conversations are returned per request.
+   * @param startConversationId Conversation ID to start from (exclusive). Mutually exclusive with `conversationIds`.
    * @param limit Max. number of conversations to return
-   * @param conversationId Conversation ID to start from (exclusive). Mutually exclusive with `conversationIds`.
-   * @param conversationIds Mutually exclusive with `conversationId`. At most 32 IDs per request.
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/conversations
    */
   public getConversations(
-    limit: number = 100,
-    conversationId?: string,
-    conversationIds?: string[]
+    startConversationId?: string,
+    limit = ConversationAPI.MAX_CHUNK_SIZE
+  ): Promise<Conversations> {
+    return this._getConversations(startConversationId, undefined, limit);
+  }
+
+  /**
+   * Get conversations.
+   * Note: At most 500 conversations are returned per request.
+   * @param conversationId Conversation ID to start from (exclusive). Mutually exclusive with `conversationIds`.
+   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/conversations
+   */
+  public async getConversationsByIds(filteredConversationIds: string[]): Promise<Conversation[]> {
+    let allConversations: Conversation[] = [];
+
+    const getConversationChunk = async (chunkedConversationIds: string[]): Promise<Conversation[]> => {
+      const {conversations} = await this._getConversations(
+        undefined,
+        chunkedConversationIds,
+        ConversationAPI.MAX_CHUNK_SIZE
+      );
+      return conversations;
+    };
+
+    for (let index = 0; index < filteredConversationIds.length; index += ConversationAPI.MAX_CHUNK_SIZE) {
+      const requestChunk = filteredConversationIds.slice(index, index + ConversationAPI.MAX_CHUNK_SIZE);
+      if (requestChunk.length) {
+        const conversationChunk = await getConversationChunk(requestChunk);
+
+        if (conversationChunk.length) {
+          allConversations = allConversations.concat(conversationChunk);
+        }
+      }
+    }
+
+    return allConversations;
+  }
+
+  /**
+   * Get conversations.
+   * Note: At most 500 conversations are returned per request.
+   * @param startConversationId Conversation ID to start from (exclusive). Mutually exclusive with `conversationIds`.
+   * @param filteredConversationIds Mutually exclusive with `startConversationId`. At most 32 IDs per request.
+   * @param limit Max. number of conversations to return
+   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/conversations
+   */
+  private _getConversations(
+    startConversationId?: string,
+    filteredConversationIds?: string[],
+    limit = ConversationAPI.MAX_CHUNK_SIZE
   ): Promise<Conversations> {
     const config: AxiosRequestConfig = {
       method: 'get',
       params: {
         size: limit,
+        start: startConversationId,
       },
       url: `${ConversationAPI.URL.CONVERSATIONS}`,
     };
 
-    if (conversationId) {
-      config.data.start = conversationId;
-    } else if (conversationIds) {
-      config.data.ids = conversationIds.join(',');
+    if (filteredConversationIds) {
+      config.params.ids = filteredConversationIds.join(',');
     }
 
     return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);

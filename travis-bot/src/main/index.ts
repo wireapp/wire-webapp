@@ -89,10 +89,8 @@ class TravisBot {
     await account.listen();
 
     if (!conversationIds) {
-      const MAXIMUM_CONVERSATIONS = 500;
-
-      const allConversations = await client.conversation.api.getConversations(MAXIMUM_CONVERSATIONS);
-      const groupConversations = allConversations.conversations.filter(conversation => conversation.type === 0);
+      const allConversations = await client.conversation.api.getAllConversations();
+      const groupConversations = allConversations.filter(conversation => conversation.type === 0);
       conversationIds = groupConversations.map(conversation => conversation.id);
     }
 

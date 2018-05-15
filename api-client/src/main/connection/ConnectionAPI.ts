@@ -25,11 +25,9 @@ import {HttpClient} from '../http';
 class ConnectionAPI {
   constructor(private readonly client: HttpClient) {}
 
-  static get URL() {
-    return {
-      CONNECTIONS: '/connections',
-    };
-  }
+  static readonly URL = {
+    CONNECTIONS: '/connections',
+  };
 
   /**
    * Get an existing connection to another user.
@@ -51,20 +49,44 @@ class ConnectionAPI {
    * @param connectionId The connection ID to start from
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/connections
    */
-  public getConnections(limit: number = 100, connectionId?: string): Promise<UserConnectionList> {
+  public getConnections(connectionId?: string, limit = 100): Promise<UserConnectionList> {
     const config: AxiosRequestConfig = {
       method: 'get',
       params: {
         size: limit,
+        start: connectionId,
       },
       url: ConnectionAPI.URL.CONNECTIONS,
     };
 
-    if (connectionId) {
-      config.params.start = connectionId;
-    }
-
     return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+  }
+
+  /**
+   * Get all connections to other users.
+   */
+  public getAllConnections(): Promise<Connection[]> {
+    let allConnections: Connection[] = [];
+
+    const getConnectionChunks = async (connectionId?: string): Promise<Connection[]> => {
+      const connectionsPerRequest = 500;
+      const {connections, has_more} = await this.getConnections(connectionId, connectionsPerRequest);
+
+      if (connections.length) {
+        allConnections = allConnections.concat(connections);
+      }
+
+      if (has_more) {
+        const lastConnection = connections.pop();
+        if (lastConnection) {
+          return getConnectionChunks(lastConnection.to);
+        }
+      }
+
+      return allConnections;
+    };
+
+    return getConnectionChunks();
   }
 
   /**
