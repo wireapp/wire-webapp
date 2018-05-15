@@ -5,21 +5,7 @@
            class="video-element-remote"
            data-bind="css: {'video-element-remote-minimized': multitasking.isMinimized()}">
 
-        <!-- ko if: showRemoteVideo() -->
-          <div style="display: flex; background: #000; height: 100%; width: 100%; justify-content: space-around; align-items: center;">
-            <!-- ko foreach: remoteVideoStreams() -->
-              <div style="width: 960px; height: 720px;">
-                <video class="video-element"
-                       autoplay
-                       data-bind="attr: {sinkId: $parent.currentDeviceId.audio_output()},
-                                  css: {'video-element-contain': $parent.remoteVideoElementContain()},
-                                  event: {loadedmetadata: $parent.onLoadedMetadata},
-                                  muteMediaElement: $data,
-                                  sourceStream: $data"></video>
-              </div>
-            <!-- /ko -->
-          </div>
-        <!-- /ko -->
+        <group-video-grid params="streams: remoteVideoStreams"></group-video-grid>
         <!-- ko if: showRemoteParticipant() -->
           <div class="video-element-remote-participant">
             <!-- ko ifnot: videodCall().isGroup -->
