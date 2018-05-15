@@ -17,19 +17,116 @@
  *
  */
 
+.call-ui {
+  &__button {
+    min-width: 40px;
+    height: 24px;
+    background-color: fade(@graphite-dark, 8%);
+    border-radius: 12px;
+    color: @graphite-dark;
+    cursor: pointer;
+    font-size: 12px;
+    line-height: 24px;
+    text-align: center;
+
+    &--active {
+      background-color: @graphite-dark;
+      color: #fff;
+    }
+
+    &--disabled {
+      cursor: default;
+      opacity: 0.4;
+    }
+
+    &--participants {
+      padding: 0 8px;
+      font-weight: @font-weight-regular;
+
+      &::after {
+        display: inline-block;
+        border: 4px solid;
+        margin-bottom: -2px;
+        margin-left: 8px;
+        border-color: currentcolor transparent transparent;
+        content: '';
+      }
+    }
+
+    &--active&--participants::after {
+      margin-bottom: 2px;
+      border-color: transparent transparent currentcolor;
+    }
+
+    &--large {
+      width: 64px;
+    }
+
+    &--green {
+      background-color: @w-green;
+      color: #fff;
+    }
+
+    &--red {
+      background-color: @w-red;
+      color: #fff;
+    }
+
+    & + & {
+      margin-left: 8px;
+    }
+  }
+  &__participant-list {
+    // TODO: antiscroll will be added later
+    // overflow: hidden;
+    // max-height: 184px;
+    color: @graphite-dark;
+
+    &::before {
+      display: block;
+      border-top: 1px solid fade(@graphite-dark, 4%);
+      margin: 0 16px;
+      content: '';
+    }
+
+    participant-item:first-of-type {
+      margin-top: 4px;
+    }
+
+    .participant-item {
+      height: 40px;
+      fill: @graphite-dark;
+
+      .participant-item-image {
+        width: 48px;
+
+        participant-avatar {
+          width: 16px;
+          height: 16px;
+
+          .avatar-initials {
+            font-size: 8px;
+            line-height: 16px;
+          }
+        }
+      }
+
+      verified-icon svg,
+      guest-icon svg {
+        height: 12px;
+      }
+
+      camera-icon svg {
+        width: 12px;
+      }
+    }
+  }
+}
 conversation-list-calling-cell {
   position: relative;
-
-  &::before {
-    position: absolute;
-    z-index: -1;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    background-color: fade(#000, 24%);
-    content: '';
-  }
+  margin: 0 16px;
+  background-color: #fff;
+  border-radius: 8px;
 
   &.dark-bg {
     color: #fff;
@@ -37,6 +134,13 @@ conversation-list-calling-cell {
     &::before {
       background-color: fade(@graphite-dark, 80%);
     }
+  }
+  .conversation-list-cell-name {
+    color: @graphite-dark;
+  }
+  .conversation-list-cell-description {
+    color: fade(@graphite-dark, 40%);
+    font-size: 11px;
   }
 }
 
@@ -53,29 +157,23 @@ conversation-list-calling-cell:first-of-type {
 .conversation-list-calling-cell-controls {
   display: flex;
   width: 100%;
-  justify-content: flex-end;
+  justify-content: space-between;
   padding-right: 16px;
   padding-bottom: 16px;
   padding-left: 16px;
+  &-left,
+  &-right {
+    display: flex;
+  }
 }
 
 .conversation-list-calling-cell-participants {
   position: relative;
   display: flex;
-  height: 44px;
+  height: 24px;
   align-items: center;
   padding-right: 16px;
   padding-left: 16px;
-
-  &::before {
-    position: absolute;
-    top: 0;
-    right: 16px;
-    left: 16px;
-    height: 1px;
-    background-color: @seperator-color;
-    content: '';
-  }
 }
 
 .conversation-list-calling-cell-participant {
@@ -92,12 +190,21 @@ conversation-list-calling-cell:first-of-type {
 }
 
 .conversation-list-calling-cell-controls-button {
-  .cell-badge;
-
+  min-width: 40px;
+  height: 24px;
   padding-right: 8px;
   padding-left: 8px;
+  background-color: fade(@graphite-dark, 8%);
+  border-radius: 12px;
+  color: @graphite-dark;
+  cursor: pointer;
   font-size: 12px;
+  line-height: 24px;
   user-select: none;
+
+  &-large {
+    min-width: 64px;
+  }
 
   & + & {
     margin-left: 8px;
@@ -107,13 +214,4 @@ conversation-list-calling-cell:first-of-type {
 .conversation-list-calling-cell-controls-join-button {
   .fill-green;
   .label-bold;
-}
-
-.conversation-list-calling-cell-participants-rest {
-  margin-left: 8px;
-  font-size: 12px;
-
-  &::before {
-    content: '+';
-  }
 }
