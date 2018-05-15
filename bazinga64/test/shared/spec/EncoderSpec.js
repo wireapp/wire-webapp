@@ -25,7 +25,6 @@ describe('Encoder', () => {
   describe('"toBase64"', () => {
     it('encodes arrays', () => {
       const encoded = bazinga64.Encoder.toBase64(helloDecodedArray);
-      expect(encoded.constructor.name).toBe('EncodedData');
       expect(encoded.asString).toBe(helloEncodedString);
     });
 
@@ -149,7 +148,6 @@ describe('Encoder', () => {
       };
       const arrayBufferView = bazinga64.Converter.jsonToArrayBufferView(json);
       const arrayBuffer = arrayBufferView.buffer;
-      expect(arrayBuffer.constructor.name).toBe('ArrayBuffer');
       const encoded = bazinga64.Encoder.toBase64(arrayBuffer);
       const expected =
         'owABARn//wKiAKEAWEDEX0UODINkYDHbu76tv17jYQX9SBtvclYEQ7765c26Xd9g90BBZTorb+oHtgqPUJ2PDKWb/XXcQbDiUEenRWUlAaEAWCDfYPdAQWU6K2/qB7YKj1Cdjwylm/113EGw4lBHp0VlJQ==';
@@ -159,7 +157,6 @@ describe('Encoder', () => {
     it('encodes byte arrays', () => {
       const data = new Uint8Array(helloDecodedArray);
       const encoded = bazinga64.Encoder.toBase64(data);
-      expect(encoded.constructor.name).toBe('EncodedData');
       expect(encoded.asString).toBe(helloEncodedString);
     });
 
@@ -169,7 +166,6 @@ describe('Encoder', () => {
 
     it('encodes strings', () => {
       const encoded = bazinga64.Encoder.toBase64(helloDecodedString);
-      expect(encoded.constructor.name).toBe('EncodedData');
       expect(encoded.asString).toBe(helloEncodedString);
     });
 

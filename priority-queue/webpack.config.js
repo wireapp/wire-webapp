@@ -27,6 +27,7 @@ module.exports = {
     [projectName]: `${__dirname}/${pkg.main}`,
     [`${projectName}.test`]: `${__dirname}/src/test/browser/index.js`,
   },
+  mode: 'production',
   output: {
     filename: '[name].bundle.js',
     library: 'PriorityQueue',

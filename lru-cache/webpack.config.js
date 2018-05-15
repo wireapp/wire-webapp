@@ -27,6 +27,7 @@ module.exports = {
   entry: {
     [projectName]: `${__dirname}/${pkg.main}`,
   },
+  mode: 'production',
   output: {
     filename: '[name].bundle.js',
     library: 'LRUCache',

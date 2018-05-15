@@ -25,7 +25,6 @@ describe('Decoder', () => {
     it('decodes arrays', () => {
       const decoded = bazinga64.Decoder.fromBase64(helloEncodedArray);
       const arrayBufferView = new Uint8Array(helloDecodedArray);
-      expect(decoded.constructor.name).toBe('DecodedData');
       expect(decoded.asBytes).toEqual(arrayBufferView);
       expect(decoded.asString).toBe(helloDecodedString);
     });
@@ -39,7 +38,6 @@ describe('Decoder', () => {
     it('decodes into a byte array', () => {
       const decoded = bazinga64.Decoder.fromBase64(helloEncodedString);
       const arrayBufferView = new Uint8Array(helloDecodedArray);
-      expect(decoded.constructor.name).toBe('DecodedData');
       expect(decoded.asBytes).toEqual(arrayBufferView);
       expect(decoded.asString).toBe(helloDecodedString);
     });
@@ -47,13 +45,11 @@ describe('Decoder', () => {
     it('decodes into a string', () => {
       const encoded = 'SGVsbG8sIHdvcmxk';
       const decoded = bazinga64.Decoder.fromBase64(encoded);
-      expect(decoded.constructor.name).toBe('DecodedData');
       expect(decoded.asString).toBe('Hello, world');
     });
 
     it('decodes numbers', () => {
       const decoded = bazinga64.Decoder.fromBase64(numberEncoded);
-      expect(decoded.constructor.name).toBe('DecodedData');
       expect(decoded.asString).toBe('1337');
     });
 

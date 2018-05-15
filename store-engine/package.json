@@ -15,7 +15,8 @@
     "karma-sourcemap-loader": "0.3.7",
     "rimraf": "2.6.2",
     "typescript": "2.8.3",
-    "webpack": "3.11.0"
+    "webpack": "4.8.3",
+    "webpack-cli": "2.1.3"
   },
   "description": "Provides a generic storage layer for File, FileSystem, IndexedDB, Memory & LocalStorage.",
   "files": [
@@ -45,8 +46,8 @@
     "clear": "rimraf dist",
     "dist": "yarn clear && yarn build",
     "test": "yarn test:node && yarn test:browser",
-    "test:project": "yarn dist && yarn test",
     "test:browser": "webpack --progress && karma start",
+    "test:project": "yarn dist && yarn test",
     "test:node": "jasmine --config=jasmine.json"
   },
   "types": "./dist/commonjs/index.d.ts",

@@ -38,6 +38,7 @@ module.exports = {
     'fs-extra': '{}',
     'libsodium-wrappers-sumo': 'sodium',
   },
+  mode: 'production',
   node: {
     fs: 'empty',
     path: 'empty',

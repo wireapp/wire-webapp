@@ -24,7 +24,9 @@
     "karma-sourcemap-loader": "0.3.7",
     "rimraf": "2.6.2",
     "typescript": "2.8.3",
-    "webpack": "3.11.0"
+    "uglifyjs-webpack-plugin": "1.2.5",
+    "webpack": "4.8.3",
+    "webpack-cli": "2.1.3"
   },
   "description": "Wire for Web's communication core.",
   "files": [
@@ -43,8 +45,8 @@
     "dist": "yarn clear && yarn build",
     "start": "rimraf .tmp && yarn dist && node index.js",
     "test": "yarn test:node && yarn test:browser",
-    "test:project": "yarn dist && yarn test",
     "test:browser": "webpack && karma start",
+    "test:project": "yarn dist && yarn test",
     "test:node": "jasmine --config=src/test/node/support/jasmine.json"
   },
   "types": "./dist/Account.d.ts",

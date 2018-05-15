@@ -13,6 +13,7 @@ module.exports = {
     dexie: 'Dexie',
     'fs-extra': '{}',
   },
+  mode: 'production',
   node: {
     path: 'empty',
   },

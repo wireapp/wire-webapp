@@ -38,7 +38,7 @@ module.exports = function(config) {
         flags: ['--no-sandbox'],
       },
     },
-    files: [`${dist}${projectName}.test.bundle.js`],
+    files: [`${dist}dexie.bundle.js`, `${dist}${projectName}.test.bundle.js`],
     frameworks: ['jasmine'],
     logLevel: config.LOG_INFO,
     port: 9876,

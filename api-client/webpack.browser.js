@@ -32,6 +32,7 @@ module.exports = {
     dexie: 'Dexie',
     'fs-extra': '{}',
   },
+  mode: 'production',
   output: {
     filename: `[name].bundle.js`,
     library: `${camelCasedRepositoryName}`,

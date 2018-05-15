@@ -1,6 +1,7 @@
 {
   "description": "Base64 encoding and decoding with ASCII string representation.",
   "devDependencies": {
+    "cross-env": "5.1.5",
     "jasmine": "3.1.0",
     "karma": "2.0.2",
     "karma-chrome-launcher": "2.2.0",
@@ -11,7 +12,7 @@
     "libsodium-wrappers": "0.7.3",
     "rimraf": "2.6.2",
     "typescript": "2.8.3",
-    "webpack": "3.11.0"
+    "webpack": "4.8.3"
   },
   "files": [
     "dist"

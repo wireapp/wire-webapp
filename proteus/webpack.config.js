@@ -31,6 +31,7 @@ module.exports = {
     '@wireapp/cbor': 'CBOR',
     'libsodium-wrappers-sumo': 'sodium',
   },
+  mode: 'production',
   node: {
     crypto: 'empty',
     fs: 'empty',
