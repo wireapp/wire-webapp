@@ -24,10 +24,9 @@
 describe('z.component.GroupVideoGrid', () => {
   let groupVideoGrid;
   const initialGrid = [0, 0, 0, 0];
-  const me = {id: 'its-me'};
 
   beforeEach(() => {
-    groupVideoGrid = new z.components.GroupVideoGrid({me: ko.observable(me), participants: ko.observableArray([])});
+    groupVideoGrid = new z.components.GroupVideoGrid({streams: ko.observableArray([])});
   });
 
   describe('computeGrid', () => {
