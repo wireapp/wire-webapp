@@ -41,6 +41,7 @@ module.exports = {
   externals: {
     'fs-extra': '{}',
   },
+  mode: 'production',
   module: {
     rules: [
       {
