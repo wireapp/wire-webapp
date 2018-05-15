@@ -236,7 +236,10 @@ class Login extends React.PureComponent {
   };
 
   render() {
-    const {intl: {formatMessage: _}, loginError} = this.props;
+    const {
+      intl: {formatMessage: _},
+      loginError,
+    } = this.props;
     const {logoutReason, isValidLink, email, password, persist, validInputs, validationErrors} = this.state;
     return (
       <Page>

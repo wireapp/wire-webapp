@@ -83,7 +83,10 @@ class ChooseHandle extends React.PureComponent {
   };
 
   render() {
-    const {isFetching, intl: {formatMessage: _}} = this.props;
+    const {
+      isFetching,
+      intl: {formatMessage: _},
+    } = this.props;
     return (
       <Page isAuthenticated>
         <ContainerXS centerText verticalCenter style={{display: 'flex', flexDirection: 'column', minHeight: 428}}>
