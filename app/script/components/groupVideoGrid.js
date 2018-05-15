@@ -90,7 +90,7 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
     if (grid[index] === 0) {
       return `${baseClass} video-grid__element--empty`;
     }
-    const isAlone = grid.reduce((alone, value, i) => (i !== index && value !== 0 ? false : alone), true);
+    const isAlone = grid.every((value, i) => i === index || value === 0);
     const hasVerticalNeighbor = index % 2 === 0 ? grid[index + 1] !== 0 : grid[index - 1] !== 0;
 
     if (isAlone) {
@@ -102,16 +102,16 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
   }
 };
 
-function arrayDiff(a, b) {
-  return b.filter(i => a.indexOf(i) === -1);
+function arrayDiff(array1, array2) {
+  return array2.filter(element => !array1.includes(element));
 }
 
 ko.components.register('group-video-grid', {
   template: `
     <div class="video-grid" data-bind="foreach: { data: grid, as: 'streamId' }">
       <!-- ko if: streamId !== 0 -->
-      <video class="video-grid__element" autoplay data-bind="css: $parent.getClassNameForVideo($index()), sourceStream: $parent.getParticipantStream(streamId), muteMediaElement: $parent.getParticipantStream(streamId)">
-      </video>
+        <video class="video-grid__element" autoplay data-bind="css: $parent.getClassNameForVideo($index()), sourceStream: $parent.getParticipantStream(streamId), muteMediaElement: $parent.getParticipantStream(streamId)">
+        </video>
       <!-- /ko -->
     </div>
   `,
