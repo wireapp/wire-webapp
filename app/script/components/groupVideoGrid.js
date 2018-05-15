@@ -110,8 +110,10 @@ ko.components.register('group-video-grid', {
   template: `
     <div class="video-grid" data-bind="foreach: { data: grid, as: 'streamId' }">
       <!-- ko if: streamId !== 0 -->
-        <video class="video-grid__element" autoplay data-bind="css: $parent.getClassNameForVideo($index()), sourceStream: $parent.getParticipantStream(streamId), muteMediaElement: $parent.getParticipantStream(streamId)">
-        </video>
+        <div class="video-grid__element" data-bind="css: $parent.getClassNameForVideo($index()), attr: { 'data-uie-name': 'grid-video-' + $index() }">
+          <video autoplay class="video-grid__element-video" data-bind="sourceStream: $parent.getParticipantStream(streamId), muteMediaElement: $parent.getParticipantStream(streamId)">
+          </video>
+        </div>
       <!-- /ko -->
     </div>
   `,
