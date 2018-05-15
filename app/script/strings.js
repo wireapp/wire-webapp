@@ -213,6 +213,26 @@ export const appAlreadyOpenStrings = defineMessages({
   },
 });
 
+export const acceptNewsModalStrings = defineMessages({
+  headline: {
+    id: 'acceptNewsModalStrings.headline',
+    defaultMessage: 'News and offers',
+  },
+  description: {
+    id: 'acceptNewsModalStrings.description',
+    defaultMessage:
+      'We would like to send you more information about our product. To do so, we may use external services like <b>Salesforce</b> and <b>Marketo</b>.</br>You can unsubscribe at any time. We will not keep your data after that.',
+  },
+  declineButton: {
+    id: 'acceptNewsModalStrings.declineButton',
+    defaultMessage: 'Not now',
+  },
+  confirmButton: {
+    id: 'acceptNewsModalStrings.confirmButton',
+    defaultMessage: 'Accept',
+  },
+});
+
 export const unsupportedStrings = defineMessages({
   headlineBrowser: {
     id: 'unsupported.headlineBrowser',

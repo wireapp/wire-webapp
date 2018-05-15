@@ -43,12 +43,17 @@ import * as SelfSelector from '../module/selector/SelfSelector';
 import BackendError from '../module/action/BackendError';
 import {ROUTE} from '../route';
 import {withRouter} from 'react-router';
+import AcceptNewsModal from '../component/AcceptNewsModal';
 
 class ChooseHandle extends React.PureComponent {
-  state = {
-    error: null,
-    handle: '',
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      error: null,
+      handle: '',
+      isAcceptNewsModalOpen: props.isAcceptNewsModalOpen,
+    };
+  }
 
   componentDidMount() {
     const suggestions = createSuggestions(this.props.name);
@@ -111,6 +116,16 @@ class ChooseHandle extends React.PureComponent {
           </Form>
           <ErrorMessage data-uie-name="error-message">{this.state.error && parseError(this.state.error)}</ErrorMessage>
         </ContainerXS>
+        <AcceptNewsModal
+          onConfirm={() => {
+            console.error('confirmed');
+            this.setState({isAcceptNewsModalOpen: false});
+          }}
+          onDecline={() => {
+            console.error('declined');
+            this.setState({isAcceptNewsModalOpen: false});
+          }}
+        />
       </Page>
     );
   }
@@ -120,6 +135,7 @@ export default withRouter(
   injectIntl(
     connect(
       state => ({
+        isAcceptNewsModalOpen: true, // TODO backend endpoint needed
         isFetching: SelfSelector.isFetching(state),
         isTeamFlow: AuthSelector.isTeamFlow(state),
         name: SelfSelector.getSelfName(state),
