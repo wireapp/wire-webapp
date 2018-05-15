@@ -34,6 +34,15 @@ z.components.ConversationListCell = class ConversationListCell {
     this.cell_state_observable = ko
       .computed(() => this.cell_state(z.conversation.ConversationCellState.generate(this.conversation)))
       .extend({rateLimit: 500});
+
+    this.showJoinButton = ko.pureComputed(() => this.conversation.hasActiveDeclinedCall());
+
+    this.onJoinCall = () => {
+      const mediaType = this.conversation.call().isRemoteVideoSend()
+        ? z.media.MediaType.AUDIO_VIDEO
+        : z.media.MediaType.AUDIO;
+      amplify.publish(z.event.WebApp.CALL.STATE.JOIN, this.conversation.id, mediaType);
+    };
   }
 
   destroy() {
@@ -82,6 +91,9 @@ ko.components.register('conversation-list-cell', {
         <!-- /ko -->
         <!-- ko if: cell_state().icon === z.conversation.ConversationStatusIcon.UNREAD_MESSAGES && conversation.unread_message_count() > 0 -->
           <span class="conversation-list-cell-badge cell-badge-light" data-bind="text: conversation.unread_message_count()" data-uie-name="status-unread"></span>
+        <!-- /ko -->
+        <!-- ko if: showJoinButton -->
+        <div class="call-ui__button call-ui__button--green call-ui__button--large" data-bind="click: onJoinCall, l10n_text: z.string.callJoin" data-uie-name="do-call-controls-call-join"></div>
         <!-- /ko -->
       </div>
     </div>
