@@ -75,7 +75,11 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
     });
 
     this.showVideoButton = ko.pureComputed(() => {
-      return this.joinedCall() ? this.joinedCall().conversationEntity.supportsVideoCall(false) : false;
+      return this.call().isRemoteVideoSend() || (this.callIsOutgoing() && this.selfStreamState.videoSend());
+    });
+
+    this.disableVideoButton = ko.pureComputed(() => {
+      return this.callIsOutgoing() && this.selfStreamState.videoSend() && !this.callIsConnected();
     });
 
     this.disableToggleScreen = ko.pureComputed(() => {
@@ -182,9 +186,11 @@ ko.components.register('conversation-list-calling-cell', {
         <div class="call-ui__button" data-bind="click: onToggleAudio, css: {'call-ui__button--active': selfStreamState.audioSend()}" data-uie-name="do-toggle-mute">
           <micoff-icon class="small-icon"></micoff-icon>
         </div>
-        <div class="call-ui__button" data-bind="if: showVideoButton, click: onToggleVideo, css: {'call-ui__button--active': selfStreamState.videoSend()}" data-uie-name="do-toggle-video">
-          <camera-icon class="small-icon"></camera-icon>
-        </div>
+        <!-- ko if: showVideoButton -->
+          <div class="call-ui__button" data-bind="click: onToggleVideo, css: {'call-ui__button--active': selfStreamState.videoSend(), 'call-ui__button--disabled': disableVideoButton()}" data-uie-name="do-toggle-video">
+            <camera-icon class="small-icon"></camera-icon>
+          </div>
+        <!-- /ko -->
         <!-- ko if: showScreensharingButton -->
         <div data-uie-name="do-toggle-screenshare" class="call-ui__button"
           data-bind="click: onToggleScreen, css: {'call-ui__button--disabled': disableToggleScreen(), 'call-ui__button--active': selfStreamState.screenSend()}">
@@ -204,7 +210,7 @@ ko.components.register('conversation-list-calling-cell', {
         <!-- /ko -->
         <!-- ko if: showDeclineButton -->
           <div class="call-ui__button call-ui__button--red call-ui__button--large" data-bind="click: callIsAnswerable() ? onRejectCall : onLeaveCall" data-uie-name="do-call-controls-call-decline">
-          <hangup-icon class="small-icon"></hangup-icon>
+            <hangup-icon class="small-icon"></hangup-icon>
           </div>
         <!-- /ko -->
       </div>
