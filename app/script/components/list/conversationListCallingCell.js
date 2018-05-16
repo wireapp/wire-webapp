@@ -36,6 +36,7 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
     };
 
     this.videoStreams = this.mediaRepository.stream_handler.remote_media_streams.activeVideo;
+    this.localVideoStream = this.mediaRepository.stream_handler.localMediaStream;
 
     this.onLeaveCall = () => {
       amplify.publish(
@@ -176,7 +177,7 @@ ko.components.register('conversation-list-calling-cell', {
     </div>
 
     <!-- ko if: showVideoPreview -->
-      <group-video-grid params="streams: videoStreams"></group-video-grid>
+      <group-video-grid params="streams: videoStreams, ownStream: localVideoStream"></group-video-grid>
     <!-- /ko -->
 
     <div class="conversation-list-calling-cell-controls">

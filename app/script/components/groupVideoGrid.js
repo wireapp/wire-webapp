@@ -26,8 +26,9 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
   constructor(params) {
     this.grid = ko.observableArray([0, 0, 0, 0]);
     this.streams = ko.observableArray([]);
-    params.streams.subscribe(this.updateGrid.bind(this));
-    this.updateGrid(params.streams());
+    params.streams.subscribe(remoteStreams => this.updateGrid(remoteStreams, params.ownStream()));
+    params.ownStream.subscribe(ownStream => this.updateGrid(params.streams(), ownStream));
+    this.updateGrid(params.streams(), params.ownStream());
   }
 
   /**
@@ -72,8 +73,8 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
     return [newStreamsList[0] || 0, newStreamsList[3] || 0, newStreamsList[1] || 0, newStreamsList[2] || 0];
   }
 
-  updateGrid(streams) {
-    streams = streams.filter(stream => !!stream);
+  updateGrid(streams, ownStream) {
+    streams = streams.concat(ownStream).filter(stream => !!stream);
     const newGrid = this.computeGrid(this.grid(), streams);
     this.streams(streams);
     this.grid(newGrid);

@@ -53,9 +53,10 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
     this.currentDeviceId = this.mediaRepository.devices_handler.current_device_id;
     this.currentDeviceIndex = this.mediaRepository.devices_handler.current_device_index;
 
-    this.localVideoStream = this.mediaRepository.stream_handler.localMediaStream;
+    const streamHandler = this.mediaRepository.stream_handler;
+    this.localVideoStream = streamHandler.localMediaStream;
     this.remoteVideoStreams = ko.pureComputed(() => {
-      let videoStreams = this.mediaRepository.stream_handler.remote_media_streams.activeVideo();
+      let videoStreams = streamHandler.remote_media_streams.activeVideo();
 
       if (videoStreams.length > 1) {
         videoStreams = videoStreams.concat(this.localVideoStream());
@@ -117,23 +118,6 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
       }
     });
 
-    this.showLocal = ko.pureComputed(() => {
-      const shouldShowLocal = this.showLocalVideo() || this.overlayIconClass();
-      return shouldShowLocal && !this.multitasking.isMinimized() && !this.isChoosingScreen();
-    });
-    this.showLocalVideo = ko.pureComputed(() => {
-      if (this.remoteVideoStreams().length > 1) {
-        // local video is included in the grid when there
-        // are more than 2 participants
-        return false;
-      }
-      if (this.videodCall()) {
-        const localVideoState = this.selfStreamState.screenSend() || this.selfStreamState.videoSend();
-        const showLocalVideo = localVideoState || !this.isCallOngoing();
-        return showLocalVideo && this.localVideoStream();
-      }
-    });
-
     this.showRemote = ko.pureComputed(() => {
       return this.showRemoteVideo() || this.showRemoteParticipant() || this.isChoosingScreen();
     });
@@ -146,17 +130,6 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
         const remoteVideoState = this.joinedCall().isRemoteScreenSend() || this.joinedCall().isRemoteVideoSend();
         return remoteVideoState && this.remoteVideoStreams().length;
       }
-    });
-
-    this.showSwitchCamera = ko.pureComputed(() => {
-      const hasMultipleCameras = this.availableDevices.video_input().length > 1;
-      const isVisible = hasMultipleCameras && this.localVideoStream() && this.selfStreamState.videoSend();
-      return this.isCallOngoing() && isVisible;
-    });
-    this.showSwitchScreen = ko.pureComputed(() => {
-      const hasMultipleCameras = this.availableDevices.screen_input().length > 1;
-      const isVisible = hasMultipleCameras && this.localVideoStream() && this.selfStreamState.screenSend();
-      return this.isCallOngoing() && isVisible;
     });
 
     this.showControls = ko.pureComputed(() => {
@@ -179,12 +152,12 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
         if (!isVisibleId) {
           this.visibleCallId = callEntity.id;
 
-          if (this.showLocalVideo() || this.showRemoteVideo()) {
+          if (this.showRemoteVideo()) {
             this.multitasking.isMinimized(false);
             return this.logger.info(`Maximizing video call '${callEntity.id}' to full-screen`, callEntity);
           }
 
-          this.multitasking.isMinimized(true);
+          //this.multitasking.isMinimized(true);
           this.logger.info(`Minimizing audio call '${callEntity.id}' from full-screen`, callEntity);
         }
       } else {
