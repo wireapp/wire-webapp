@@ -60,11 +60,7 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
 
     this.users = ko.pureComputed(() => this.conversation.participating_user_ets());
     this.call = ko.pureComputed(() => this.conversation.call());
-    this.callParticipants = ko.pureComputed(() => {
-      return this.call()
-        .participants()
-        .map(participantEntity => participantEntity.user);
-    });
+    this.callParticipants = ko.pureComputed(() => this.call().participants());
 
     this.joinedCall = this.calling_repository.joinedCall;
 
@@ -219,7 +215,7 @@ ko.components.register('conversation-list-calling-cell', {
 
     <!-- ko if: showParticipants -->
       <div class="call-ui__participant-list" data-bind="foreach: {data: callParticipants}" data-uie-name="list-call-ui-participants">
-        <participant-item params="participant: $data, hideInfo: true, showCamera: false" data-bind="css: {'no-underline': true}"></participant-item>
+        <participant-item params="participant: $data.user, hideInfo: true, showCamera: $data.state.videoSend()" data-bind="css: {'no-underline': true}"></participant-item>
       </div>
     <!-- /ko -->
   `,
