@@ -38,6 +38,16 @@
   border-radius: 4px;
 }
 
+.video-calling {
+  &--active {
+    position: absolute;
+    z-index: 101;
+    width: 100%;
+    height: 100%;
+    background-color: #000;
+  }
+}
+
 .video-element {
   width: 100%;
   height: 100%;
@@ -66,15 +76,12 @@
 }
 
 .video-element-remote {
-  .full-screen;
-
   animation-duration: @animation-timing-slower;
   animation-fill-mode: forwards;
 
   // fade in animation
   animation-name: video-fade-in;
   animation-timing-function: @ease-out-quart;
-  background-color: #000;
   opacity: 0;
 
   .video-element {
