@@ -14,8 +14,10 @@
   <!-- ko if: showCalls() -->
     <!-- ko foreach: callConversations -->
       <conversation-list-calling-cell
-        data-bind="click: $parent.clickOnConversation, event: {'contextmenu': $parent.listViewModel.onContextMenu}"
-        params="conversation: $data, is_selected: $parent.isSelectedConversation, calling_repository: $parent.callingRepository">
+        data-bind="click: $parent.clickOnConversation, event: {'contextmenu': $parent.listViewModel.onContextMenu}, attr: {'data-uie-uid': $data.id, 'data-uie-value': $data.display_name}"
+        params="conversation: $data, is_selected: $parent.isSelectedConversation, calling_repository: $parent.callingRepository"
+        data-uie-name="item-call"
+        >
       </conversation-list-calling-cell>
     <!-- /ko -->
   <!-- /ko -->
