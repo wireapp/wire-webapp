@@ -1,104 +1,107 @@
-<div id="video-calling" data-bind="hide_controls: z.viewModel.VideoCallingViewModel.CONFIG.HIDE_CONTROLS_TIMEOUT, css:{ 'video-calling--active': isCallOngoing() && !multitasking.isMinimized() }" class="video-calling">
+<div id="video-calling" data-bind="hide_controls: z.viewModel.VideoCallingViewModel.CONFIG.HIDE_CONTROLS_TIMEOUT, css:{ 'video-calling--active': isCallOngoing() && !multitasking.isMinimized() }"
+  class="video-calling">
   <!-- ko if: videodCall() -->
-    <!-- ko if: showRemote() -->
-      <div id="video-element-remote"
-           class="video-element-remote"
-           data-bind="css: {'video-element-remote-minimized': multitasking.isMinimized()}">
+  <!-- ko if: showRemote() -->
+  <div id="video-element-remote" class="video-element-remote" data-bind="css: {'video-element-remote-minimized': multitasking.isMinimized()}">
 
-        <group-video-grid params="streams: remoteVideoStreams"></group-video-grid>
-        <!-- ko if: showRemoteParticipant() -->
-          <div class="video-element-remote-participant">
-            <!-- ko ifnot: videodCall().isGroup -->
-              <participant-avatar class="video-element-remote-participant avatar-no-badge"
-                           params="participant: remoteUser, size: z.components.ParticipantAvatar.SIZE.X_LARGE"></participant-avatar>
-            <!-- /ko -->
-          </div>
-        <!-- /ko -->
+    <group-video-grid params="streams: remoteVideoStreams"></group-video-grid>
+    <!-- ko if: showRemoteParticipant() -->
+    <div class="video-element-remote-participant">
+      <!-- ko ifnot: videodCall().isGroup -->
+      <participant-avatar class="video-element-remote-participant avatar-no-badge" params="participant: remoteUser, size: z.components.ParticipantAvatar.SIZE.X_LARGE"></participant-avatar>
+      <!-- /ko -->
+    </div>
+    <!-- /ko -->
 
-        <!-- ko if: showRemoteVideo() && !isChoosingScreen() -->
-          <div class="video-element-overlay hide-controls-hidden"
-               data-bind="event: {dblclick: doubleClickedOnRemoteVideo}"></div>
-        <!-- /ko -->
-        <!-- ko if: multitasking.isMinimized() -->
-          <div class="video-element-remote-fullscreen icon-fullscreen hide-controls-hidden"
-               data-uie-name="do-call-controls-video-maximize"
-               data-bind="click: clickedOnMaximize">
-          </div>
-        <!-- /ko -->
+    <!-- ko if: showRemoteVideo() && !isChoosingScreen() -->
+    <div class="video-element-overlay hide-controls-hidden" data-bind="event: {dblclick: doubleClickedOnRemoteVideo}"></div>
+    <!-- /ko -->
+    <!-- ko if: multitasking.isMinimized() -->
+    <div class="video-element-remote-fullscreen icon-fullscreen hide-controls-hidden" data-uie-name="do-call-controls-video-maximize"
+      data-bind="click: clickedOnMaximize">
+    </div>
+    <!-- /ko -->
 
-        <!-- ko if: isChoosingScreen() -->
-          <choose-screen params="cancel: clickedOnCancelScreen,
+    <!-- ko if: isChoosingScreen() -->
+    <choose-screen params="cancel: clickedOnCancelScreen,
                                  choose: clickedOnChooseScreen,
                                  screens: availableDevices.screen_input"></choose-screen>
-        <!-- /ko -->
-
-        <!-- ko if: showControls() -->
-          <div id="video-title" class="video-title"
-               data-bind="css: {'hide-controls-hidden': !showRemoteParticipant() && !isChoosingScreen(),
-                                'video-element-dark': showRemoteParticipant()}">
-            <div class="video-remote-name" data-bind="text: videodCall().conversationEntity.display_name()"></div>
-            <div class="video-timer label-xs" data-bind="text: z.util.TimeUtil.formatSeconds(videodCall().durationTime())"></div>
-          </div>
-        <!-- /ko -->
-
-        <!-- ko if: showControls() && !isChoosingScreen() -->
-          <div id="video-controls" class="video-controls"
-               data-bind="css: {'hide-controls-hidden': !showRemoteParticipant()}">
-            <div class="video-controls-button button-round button-round-md icon-chat"
-                 data-uie-name="do-call-controls-video-minimize"
-                 data-bind="click: clickedOnMinimize, css: {'button-round-dark': !showRemoteParticipant()}"></div>
-            <div class="video-controls-button button-round button-round-md icon-mute"
-                 data-uie-name="do-call-controls-video-call-mute"
-                 data-bind="click: clickedOnMuteAudio, css: {'toggled': !selfStreamState.audioSend(), 'button-round-dark': !showRemoteParticipant()}"></div>
-            <!-- ko if: showToggleScreen() -->
-              <div class="video-controls-button button-round button-round-md icon-screensharing"
-                   data-bind="click: clickedOnShareScreen, css: {'toggled': selfStreamState.screenSend(), 'button-round-dark': !showRemoteParticipant(), 'disabled': disableToggleScreen()}"
-                   data-uie-name="do-call-controls-toggle-screen"></div>
-            <!-- /ko -->
-            <!-- ko if: showToggleVideo() -->
-              <div class="video-controls-button button-round button-round-md icon-video"
-                   data-bind="click: clickedOnStopVideo, css: {'toggled': selfStreamState.videoSend(), 'button-round-dark': !showRemoteParticipant()}"
-                   data-uie-name="do-call-controls-toggle-video"></div>
-            <!-- /ko -->
-            <div class="video-controls-button button-round button-round-md button-round-theme-red icon-end-call"
-                 data-uie-name="do-call-controls-video-call-cancel"
-                 data-bind="click: clickedOnLeaveCall"></div>
-          </div>
-        <!-- /ko -->
-      </div>
     <!-- /ko -->
 
-    <!-- ko if: showLocal() -->
-      <div id="video-element-local" class="video-element-local">
-        <!-- ko if: showLocalVideo() -->
-          <video class="video-element"
-                 autoplay
-                 data-bind="css: {'mirror': !selfStreamState.screenSend()},
+    <!-- ko if: showControls() -->
+    <div id="video-title" class="video-title" data-bind="css: {'hide-controls-hidden': !showRemoteParticipant() && !isChoosingScreen(),
+                                'video-element-dark': showRemoteParticipant()}">
+      <div class="video-remote-name" data-bind="text: videodCall().conversationEntity.display_name()"></div>
+      <div class="video-timer label-xs" data-bind="text: z.util.TimeUtil.formatSeconds(videodCall().durationTime())"></div>
+    </div>
+    <!-- /ko -->
+
+    <!-- ko if: showControls() && !isChoosingScreen() -->
+      <div id="video-controls" class="video-controls" data-bind="css: {'hide-controls-hidden': !showRemoteParticipant()}">
+
+        <div class="video-controls__button"
+          data-bind="click: clickedOnMinimize"
+          data-uie-name="do-call-controls-video-minimize">
+          <message-icon class=""></message-icon>
+        </div>
+
+        <div class="video-controls__button"
+          data-bind="click: clickedOnMuteAudio, css: {'video-controls__button--active': !selfStreamState.audioSend()}"
+          data-uie-name="do-call-controls-video-call-mute">
+          <mute-icon></mute-icon>
+        </div>
+
+        <!-- ko if: showToggleScreen() -->
+          <div class="video-controls__button"
+            data-bind="click: clickedOnShareScreen, css: {'video-controls__button--active': selfStreamState.screenSend(), 'video-controls__button--disabled': disableToggleScreen()}"
+            data-uie-name="do-call-controls-toggle-screen">
+            <screenshare-icon></screenshare-icon>
+          </div>
+        <!-- /ko -->
+
+        <!-- ko if: showToggleVideo() -->
+          <div class="video-controls__button"
+            data-bind="click: clickedOnStopVideo, css: {'toggled': selfStreamState.videoSend(), 'button-round-dark': !showRemoteParticipant()}"
+            data-uie-name="do-call-controls-toggle-video">
+            <camera-icon></camera-icon>
+          </div>
+        <!-- /ko -->
+
+        <div class="video-controls__button video-controls__button--red"
+          data-bind="click: clickedOnLeaveCall"
+          data-uie-name="do-call-controls-video-call-cancel">
+          <hangup-icon></hangup-icon>
+        </div>
+      </div>
+    <!-- /ko -->
+  </div>
+  <!-- /ko -->
+
+  <!-- ko if: showLocal() -->
+  <div id="video-element-local" class="video-element-local">
+    <!-- ko if: showLocalVideo() -->
+    <video class="video-element" autoplay data-bind="css: {'mirror': !selfStreamState.screenSend()},
                             muteMediaElement: localVideoStream(),
                             sourceStream: localVideoStream()"></video>
-        <!-- /ko -->
-        <!-- ko if: overlayIconClass() -->
-          <span class="video-element-overlay" data-bind="css: overlayIconClass()"></span>
-        <!-- /ko -->
-        <!-- ko if: showSwitchCamera()-->
-          <device-toggle-button class="device-toggle-button"
-                                data-bind="click: clickedOnToggleCamera,
+    <!-- /ko -->
+    <!-- ko if: overlayIconClass() -->
+    <span class="video-element-overlay" data-bind="css: overlayIconClass()"></span>
+    <!-- /ko -->
+    <!-- ko if: showSwitchCamera()-->
+    <device-toggle-button class="device-toggle-button" data-bind="click: clickedOnToggleCamera,
                                           css: {'hide-controls-hidden': !showRemoteParticipant(),
-                                                'device-toggle-button-dark': showRemoteParticipant()}"
-                                params="index: currentDeviceIndex.video_input,
+                                                'device-toggle-button-dark': showRemoteParticipant()}" params="index: currentDeviceIndex.video_input,
                                         devices: availableDevices.video_input,
                                         type: z.media.MediaDeviceType.VIDEO_INPUT"></device-toggle-button>
-        <!-- /ko -->
-        <!-- ko if: showSwitchScreen()-->
-          <device-toggle-button class="device-toggle-button"
-                                data-bind="click: clickedOnToggleScreen,
+    <!-- /ko -->
+    <!-- ko if: showSwitchScreen()-->
+    <device-toggle-button class="device-toggle-button" data-bind="click: clickedOnToggleScreen,
                                           css: {'hide-controls-hidden': !showRemoteParticipant(),
-                                                'device-toggle-button-dark': showRemoteParticipant()}"
-                                params="index: currentDeviceIndex.screen_input,
+                                                'device-toggle-button-dark': showRemoteParticipant()}" params="index: currentDeviceIndex.screen_input,
                                         devices: availableDevices.screen_input,
                                         type: z.media.MediaDeviceType.SCREEN_INPUT"></device-toggle-button>
-        <!-- /ko -->
-      </div>
     <!-- /ko -->
+  </div>
+  <!-- /ko -->
   <!-- /ko -->
 </div>
