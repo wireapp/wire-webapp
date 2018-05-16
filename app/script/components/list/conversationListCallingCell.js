@@ -183,7 +183,7 @@ ko.components.register('conversation-list-calling-cell', {
     <div class="conversation-list-calling-cell-controls">
 
       <div class="conversation-list-calling-cell-controls-left">
-        <div class="call-ui__button" data-bind="click: onToggleAudio, css: {'call-ui__button--active': selfStreamState.audioSend()}, attr: {'data-uie-value': selfStreamState.audioSend() ? 'active' : 'inactive'}" data-uie-name="do-toggle-mute">
+        <div class="call-ui__button" data-bind="click: onToggleAudio, css: {'call-ui__button--active': !selfStreamState.audioSend()}, attr: {'data-uie-value': selfStreamState.audioSend() ? 'inactive' : 'active'}" data-uie-name="do-toggle-mute">
           <micoff-icon class="small-icon"></micoff-icon>
         </div>
         <!-- ko if: showVideoButton -->
