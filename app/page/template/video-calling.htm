@@ -61,7 +61,7 @@
 
         <!-- ko if: showToggleVideo() -->
           <div class="video-controls__button"
-            data-bind="click: clickedOnStopVideo, css: {'toggled': selfStreamState.videoSend(), 'button-round-dark': !showRemoteParticipant()}"
+            data-bind="click: clickedOnStopVideo, css: {'video-controls__button--active': selfStreamState.videoSend()}"
             data-uie-name="do-call-controls-toggle-video">
             <camera-icon></camera-icon>
           </div>
