@@ -177,7 +177,7 @@ z.media.MediaConstraintsHandler = class MediaConstraintsHandler {
       }
 
       case z.media.VIDEO_QUALITY_MODE.GROUP: {
-        media_stream_constraints = MediaConstraintsHandler.CONFIG.VIDEO_CONSTRAINTS.FULL_HD;
+        media_stream_constraints = MediaConstraintsHandler.CONFIG.VIDEO_CONSTRAINTS.GROUP;
         break;
       }
 
