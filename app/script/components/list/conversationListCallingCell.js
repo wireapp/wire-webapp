@@ -66,14 +66,6 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
         .map(participantEntity => participantEntity.user);
     });
 
-    const MAX_DISPLAYED_PARTICIPANTS = 9;
-    this.callParticipantsRest = ko.observable(0);
-    this.callParticipantsDisplayed = ko.pureComputed(() => {
-      const displayedUserEntities = this.callParticipants().slice(0, MAX_DISPLAYED_PARTICIPANTS);
-      this.callParticipantsRest(this.callParticipants().length - displayedUserEntities.length);
-      return displayedUserEntities;
-    });
-
     this.joinedCall = this.calling_repository.joinedCall;
 
     this.selfStreamState = this.calling_repository.selfStreamState;
@@ -81,9 +73,11 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
     this.showScreensharingButton = ko.pureComputed(() => {
       return this.callIsConnected() && z.calling.CallingRepository.supportsScreenSharing;
     });
+
     this.showVideoButton = ko.pureComputed(() => {
       return this.joinedCall() ? this.joinedCall().conversationEntity.supportsVideoCall(false) : false;
     });
+
     this.disableToggleScreen = ko.pureComputed(() => {
       return this.joinedCall() ? this.joinedCall().isRemoteScreenSend() : true;
     });
@@ -142,12 +136,12 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
 
 ko.components.register('conversation-list-calling-cell', {
   template: `
-    <div class="conversation-list-calling-cell conversation-list-cell" data-bind="attr: {'data-uie-uid': conversation.id, 'data-uie-value': conversation.display_name}" data-uie-name="item-call">
+    <div class="conversation-list-calling-cell conversation-list-cell" data-bind="css:{'temporary-user-style': temporaryUserStyle}, attr: {'data-uie-uid': conversation.id, 'data-uie-value': conversation.display_name}" data-uie-name="item-call">
 
       <!-- ko ifnot: temporaryUserStyle -->
         <div class="conversation-list-cell-left">
           <!-- ko if: conversation.is_group() -->
-            <group-avatar class="conversation-list-cell-avatar-arrow" params="users: users(), conversation: conversation"></group-avatar>
+            <group-avatar class="conversation-list-cell-avatar-arrow call-ui__avatar" params="users: users(), conversation: conversation"></group-avatar>
           <!-- /ko -->
           <!-- ko if: !conversation.is_group() && users().length -->
             <participant-avatar params="participant: users()[0], size: z.components.ParticipantAvatar.SIZE.SMALL"></participant-avatar>
@@ -170,7 +164,9 @@ ko.components.register('conversation-list-calling-cell', {
 
       <div class="conversation-list-cell-right">
         <!-- ko if: callIsConnected -->
-          <div class="call-ui__button call-ui__button--red icon-end-call" data-bind="click: onLeaveCall" data-uie-name="do-call-controls-call-leave"></div>
+          <div class="call-ui__button call-ui__button--red" data-bind="click: onLeaveCall" data-uie-name="do-call-controls-call-leave">
+            <hangup-icon class="small-icon"></hangup-icon>
+          </div>
         <!-- /ko -->
       </div>
 
@@ -183,12 +179,17 @@ ko.components.register('conversation-list-calling-cell', {
     <div class="conversation-list-calling-cell-controls">
 
       <div class="conversation-list-calling-cell-controls-left">
-        <div class="call-ui__button icon-mute-small" data-bind="click: onToggleAudio, css: {'call-ui__button--active': selfStreamState.audioSend()}" data-uie-name="do-toggle-mute"></div>
-        <div class="call-ui__button icon-video" data-bind="if: showVideoButton, click: onToggleVideo, css: {'call-ui__button--active': selfStreamState.videoSend()}" data-uie-name="do-toggle-video"></div>
+        <div class="call-ui__button" data-bind="click: onToggleAudio, css: {'call-ui__button--active': selfStreamState.audioSend()}" data-uie-name="do-toggle-mute">
+          <micoff-icon class="small-icon"></micoff-icon>
+        </div>
+        <div class="call-ui__button" data-bind="if: showVideoButton, click: onToggleVideo, css: {'call-ui__button--active': selfStreamState.videoSend()}" data-uie-name="do-toggle-video">
+          <camera-icon class="small-icon"></camera-icon>
+        </div>
         <!-- ko if: showScreensharingButton -->
-        <div data-uie-name="do-toggle-screenshare" class="call-ui__button icon-screensharing-small"
+        <div data-uie-name="do-toggle-screenshare" class="call-ui__button"
           data-bind="click: onToggleScreen, css: {'call-ui__button--disabled': disableToggleScreen(), 'call-ui__button--active': selfStreamState.screenSend()}">
-          </div>
+          <screenshare-icon class="small-icon"></screenshare-icon>
+        </div>
         <!-- /ko -->
       </div>
 
@@ -197,10 +198,14 @@ ko.components.register('conversation-list-calling-cell', {
           <div class="call-ui__button call-ui__button--participants" data-bind="click: onParticipantsButtonClick, text: participantsButtonLabel, css: {'call-ui__button--active': showParticipants()}" data-uie-name="do-toggle-participants"></div>
         <!-- /ko -->
         <!-- ko if: showAcceptButton -->
-          <div class="call-ui__button call-ui__button--green call-ui__button--large icon-call" data-bind="click: onJoinCall" data-uie-name="do-call-controls-call-accept"></div>
+          <div class="call-ui__button call-ui__button--green call-ui__button--large" data-bind="click: onJoinCall" data-uie-name="do-call-controls-call-accept">
+            <pickup-icon class="small-icon"></pickup-icon>
+          </div>
         <!-- /ko -->
         <!-- ko if: showDeclineButton -->
-          <div class="call-ui__button call-ui__button--red call-ui__button--large icon-end-call" data-bind="click: callIsAnswerable() ? onRejectCall : onLeaveCall" data-uie-name="do-call-controls-call-decline"></div>
+          <div class="call-ui__button call-ui__button--red call-ui__button--large" data-bind="click: callIsAnswerable() ? onRejectCall : onLeaveCall" data-uie-name="do-call-controls-call-decline">
+          <hangup-icon class="small-icon"></hangup-icon>
+          </div>
         <!-- /ko -->
       </div>
 
@@ -208,7 +213,7 @@ ko.components.register('conversation-list-calling-cell', {
 
     <!-- ko if: showParticipants -->
       <div class="call-ui__participant-list"  data-bind="foreach: {data: callParticipants}">
-      <participant-item params="participant: $data, hideInfo: true, showCamera: true" data-bind="css: {'no-underline': true}"></participant-item>
+        <participant-item params="participant: $data, hideInfo: true, showCamera: true" data-bind="css: {'no-underline': true}"></participant-item>
       </div>
     <!-- /ko -->
   `,
