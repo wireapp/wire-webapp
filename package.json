@@ -127,7 +127,7 @@
     "redux-mock-store": "1.5.1",
     "request": "2.86.0",
     "sinon": "5.0.7",
-    "stylelint": "9.2.0",
+    "stylelint": "9.2.1",
     "stylelint-config-idiomatic-order": "5.0.0",
     "stylelint-config-prettier": "3.2.0",
     "uglify-js": "3.3.25",
