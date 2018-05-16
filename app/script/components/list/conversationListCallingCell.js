@@ -26,6 +26,7 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
   constructor(params) {
     this.conversation = params.conversation;
     this.calling_repository = params.calling_repository;
+    this.mediaRepository = params.mediaRepository;
     this.isSelected = params.is_selected;
     this.temporaryUserStyle = params.temporaryUserStyle;
 
@@ -33,6 +34,8 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
       const mediaType = this.call().isRemoteVideoSend() ? z.media.MediaType.AUDIO_VIDEO : z.media.MediaType.AUDIO;
       amplify.publish(z.event.WebApp.CALL.STATE.JOIN, this.conversation.id, mediaType);
     };
+
+    this.videoStreams = this.mediaRepository.stream_handler.remote_media_streams.activeVideo;
 
     this.onLeaveCall = () => {
       amplify.publish(
@@ -130,7 +133,7 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
 
     this.showParticipants = ko.observable(false);
 
-    this.showVideoPreview = ko.observable(false);
+    this.showVideoPreview = ko.observable(true);
   }
 };
 
@@ -173,7 +176,7 @@ ko.components.register('conversation-list-calling-cell', {
     </div>
 
     <!-- ko if: showVideoPreview -->
-      <div>video</div>
+      <group-video-grid params="streams: videoStreams"></group-video-grid>
     <!-- /ko -->
 
     <div class="conversation-list-calling-cell-controls">

@@ -1,4 +1,4 @@
-<div id="video-calling" data-bind="hide_controls: z.viewModel.VideoCallingViewModel.CONFIG.HIDE_CONTROLS_TIMEOUT, css:{ 'video-calling--active': isCallOngoing() && !multitasking.isMinimized() }" class="video-calling">
+<div id="video-calling" data-bind="hide_controls: z.viewModel.VideoCallingViewModel.CONFIG.HIDE_CONTROLS_TIMEOUT, css:{ 'video-calling--active': isCallOngoing(), 'video-calling--minimized': multitasking.isMinimized() }" class="video-calling">
   <!-- ko if: videodCall() -->
     <!-- ko if: showRemote() -->
       <div id="video-element-remote" class="video-element-remote" data-bind="css: {'video-element-remote-minimized': multitasking.isMinimized()}">
