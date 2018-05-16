@@ -140,7 +140,7 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
 
 ko.components.register('conversation-list-calling-cell', {
   template: `
-    <div class="conversation-list-calling-cell conversation-list-cell" data-bind="css:{'temporary-user-style': temporaryUserStyle}, attr: {'data-uie-uid': conversation.id, 'data-uie-value': conversation.display_name}" data-uie-name="item-call">
+    <div class="conversation-list-calling-cell conversation-list-cell" data-bind="css:{'temporary-user-style': temporaryUserStyle}">
 
       <!-- ko ifnot: temporaryUserStyle -->
         <div class="conversation-list-cell-left">
@@ -183,11 +183,11 @@ ko.components.register('conversation-list-calling-cell', {
     <div class="conversation-list-calling-cell-controls">
 
       <div class="conversation-list-calling-cell-controls-left">
-        <div class="call-ui__button" data-bind="click: onToggleAudio, css: {'call-ui__button--active': selfStreamState.audioSend()}" data-uie-name="do-toggle-mute">
+        <div class="call-ui__button" data-bind="click: onToggleAudio, css: {'call-ui__button--active': selfStreamState.audioSend()}, attr: {'data-uie-value': selfStreamState.audioSend() ? 'active' : 'inactive'}" data-uie-name="do-toggle-mute">
           <micoff-icon class="small-icon"></micoff-icon>
         </div>
         <!-- ko if: showVideoButton -->
-          <div class="call-ui__button" data-bind="click: onToggleVideo, css: {'call-ui__button--active': selfStreamState.videoSend(), 'call-ui__button--disabled': disableVideoButton()}" data-uie-name="do-toggle-video">
+          <div class="call-ui__button" data-bind="click: onToggleVideo, css: {'call-ui__button--active': selfStreamState.videoSend(), 'call-ui__button--disabled': disableVideoButton()}, attr: {'data-uie-value': selfStreamState.videoSend() ? 'active' : 'inactive'}" data-uie-name="do-toggle-video">
             <camera-icon class="small-icon"></camera-icon>
           </div>
         <!-- /ko -->
@@ -218,8 +218,8 @@ ko.components.register('conversation-list-calling-cell', {
     </div>
 
     <!-- ko if: showParticipants -->
-      <div class="call-ui__participant-list"  data-bind="foreach: {data: callParticipants}">
-        <participant-item params="participant: $data, hideInfo: true, showCamera: true" data-bind="css: {'no-underline': true}"></participant-item>
+      <div class="call-ui__participant-list" data-bind="foreach: {data: callParticipants}" data-uie-name="list-call-ui-participants">
+        <participant-item params="participant: $data, hideInfo: true, showCamera: false" data-bind="css: {'no-underline': true}"></participant-item>
       </div>
     <!-- /ko -->
   `,

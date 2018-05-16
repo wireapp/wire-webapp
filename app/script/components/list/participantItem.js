@@ -75,7 +75,7 @@ ko.components.register('participant-item', {
       </div>
 
       <!-- ko if: isUser && participant.is_verified() -->
-        <verified-icon></verified-icon>
+        <verified-icon data-uie-name="status-verified"></verified-icon>
       <!-- /ko -->
 
       <!-- ko if: isUser && !isOthersMode && participant.isGuest() -->
@@ -83,7 +83,7 @@ ko.components.register('participant-item', {
       <!-- /ko -->
 
       <!-- ko if: showCamera -->
-        <camera-icon></camera-icon>
+        <camera-icon data-uie-name="status-video"></camera-icon>
       <!-- /ko -->
 
       <!-- ko if: canSelect -->
