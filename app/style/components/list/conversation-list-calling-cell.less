@@ -19,8 +19,11 @@
 
 .call-ui {
   &__button {
+    display: flex;
     min-width: 40px;
     height: 24px;
+    align-items: center;
+    justify-content: center;
     background-color: fade(@graphite-dark, 8%);
     border-radius: 12px;
     color: @graphite-dark;
@@ -28,10 +31,19 @@
     font-size: 12px;
     line-height: 24px;
     text-align: center;
+    > * {
+      line-height: 0;
+    }
+    svg > path {
+      fill: @graphite-dark;
+    }
 
     &--active {
       background-color: @graphite-dark;
       color: #fff;
+      svg > path {
+        fill: #fff;
+      }
     }
 
     &--disabled {
@@ -62,14 +74,20 @@
       width: 64px;
     }
 
+    &--green,
+    &--red {
+      color: #fff;
+      svg > path {
+        fill: #fff;
+      }
+    }
+
     &--green {
       background-color: @w-green;
-      color: #fff;
     }
 
     &--red {
       background-color: @w-red;
-      color: #fff;
     }
 
     & + & {
@@ -121,10 +139,32 @@
       }
     }
   }
+
+  &__avatar {
+    border: 1px solid fade(@graphite-dark, 8%);
+
+    .group-avatar-box-wrapper {
+      background: fade(@graphite-dark, 16%);
+    }
+  }
 }
+
+.small-icon {
+  > svg {
+    max-width: 12px;
+    max-height: 12px;
+  }
+}
+
+hangup-icon.small-icon {
+  > svg {
+    max-width: 15px;
+  }
+}
+
 conversation-list-calling-cell {
   position: relative;
-  margin: 0 16px;
+  margin: 0 16px 16px;
   background-color: #fff;
   border-radius: 8px;
 
@@ -139,8 +179,13 @@ conversation-list-calling-cell {
     color: @graphite-dark;
   }
   .conversation-list-cell-description {
+    margin-top: 0;
     color: fade(@graphite-dark, 40%);
     font-size: 11px;
+  }
+
+  .temporary-user-style {
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.08);
   }
 }
 
