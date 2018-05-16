@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="2.8.0"></a>
+# [2.8.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.7.4...@wireapp/core@2.8.0) (2018-05-16)
+
+
+### Features
+
+* **core:** Status Bot ([#601](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/601)) ([3b62214](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/3b62214))
+
+
+
+
 <a name="2.7.4"></a>
 ## [2.7.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.7.3...@wireapp/core@2.7.4) (2018-05-16)
 
