@@ -60,7 +60,7 @@ export function doGetConsents() {
     dispatch(SelfActionCreator.startGetConsents());
     return apiClient.self.api
       .getConsents()
-      .then(result => dispatch(SelfActionCreator.successfulGetConsents({results})))
+      .then(({results}) => dispatch(SelfActionCreator.successfulGetConsents(results)))
       .catch(error => {
         dispatch(SelfActionCreator.failedGetConsents(error));
         throw BackendError.handle(error);
