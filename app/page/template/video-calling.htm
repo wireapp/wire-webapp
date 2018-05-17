@@ -41,27 +41,32 @@
               data-bind="click: clickedOnMinimize"
               data-uie-name="do-call-controls-video-minimize">
               <message-icon></message-icon>
+              <div class="video-controls__button__label" data-bind="l10n_text: z.string.videoCallOverlayConversations"></div>
             </div>
 
             <div class="video-controls__button"
               data-bind="click: clickedOnMuteAudio, css: {'video-controls__button--active': !selfStreamState.audioSend()}"
               data-uie-name="do-call-controls-video-call-mute">
               <mute-icon></mute-icon>
+              <div class="video-controls__button__label" data-bind="l10n_text: z.string.videoCallOverlayMute"></div>
             </div>
+
+            <!-- ko if: showToggleVideo() -->
+              <div class="video-controls__button"
+              data-bind="click: clickedOnStopVideo, css: {'video-controls__button--active': selfStreamState.videoSend()}"
+              data-uie-name="do-call-controls-toggle-video">
+                <camera-icon></camera-icon>
+                <div class="video-controls__button__label" data-bind="l10n_text: z.string.videoCallOverlayVideo"></div>
+
+              </div>
+            <!-- /ko -->
 
             <!-- ko if: showToggleScreen() -->
               <div class="video-controls__button"
                 data-bind="click: clickedOnShareScreen, css: {'video-controls__button--active': selfStreamState.screenSend(), 'video-controls__button--disabled': disableToggleScreen()}"
                 data-uie-name="do-call-controls-toggle-screen">
                 <screenshare-icon></screenshare-icon>
-              </div>
-            <!-- /ko -->
-
-            <!-- ko if: showToggleVideo() -->
-              <div class="video-controls__button"
-                data-bind="click: clickedOnStopVideo, css: {'video-controls__button--active': selfStreamState.videoSend()}"
-                data-uie-name="do-call-controls-toggle-video">
-                <camera-icon></camera-icon>
+                <div class="video-controls__button__label" data-bind="l10n_text: z.string.videoCallOverlayShareScreen"></div>
               </div>
             <!-- /ko -->
 
@@ -69,6 +74,7 @@
               data-bind="click: clickedOnLeaveCall"
               data-uie-name="do-call-controls-video-call-cancel">
               <hangup-icon></hangup-icon>
+              <div class="video-controls__button__label" data-bind="l10n_text: z.string.videoCallOverlayHangUp"></div>
             </div>
           </div>
         <!-- /ko -->
