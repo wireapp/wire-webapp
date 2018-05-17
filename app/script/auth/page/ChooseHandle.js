@@ -65,6 +65,10 @@ class ChooseHandle extends React.PureComponent {
       .catch(error => this.setState({error}));
   }
 
+  componentWillReceiveProps() {
+    this.props.doGetConsents();
+  }
+
   updateConsent = (consentType, value) =>
     this.props.doSetConsent(consentType, value).then(() => this.setState({isAcceptNewsModalOpen: false}));
 

@@ -200,38 +200,38 @@ export const chooseHandleStrings = defineMessages({
 
 export const appAlreadyOpenStrings = defineMessages({
   headline: {
-    id: 'appAlreadyOpenStrings.headline',
+    id: 'appAlreadyOpen.headline',
     defaultMessage: 'Wire is already open in this browser',
   },
   text: {
-    id: 'appAlreadyOpenStrings.text',
+    id: 'appAlreadyOpen.text',
     defaultMessage: 'If you continue here, you will be logged out on the other tab.',
   },
   continueButton: {
-    id: 'appAlreadyOpenStrings.continueButton',
+    id: 'appAlreadyOpen.continueButton',
     defaultMessage: 'Continue',
   },
 });
 
 export const acceptNewsModalStrings = defineMessages({
   headline: {
-    id: 'acceptNewsModalStrings.headline',
+    id: 'acceptNewsModal.headline',
     defaultMessage: 'Do you want to receive news and product updates from Wire via email?',
   },
   unsubscribeDescription: {
-    id: 'acceptNewsModalStrings.unsubscribeDescription',
+    id: 'acceptNewsModal.unsubscribeDescription',
     defaultMessage: 'You can unsubscribe at any time.',
   },
   privacyDescription: {
-    id: 'acceptNewsModalStrings.privacyDescription',
+    id: 'acceptNewsModal.privacyDescription',
     defaultMessage: 'Check our <b>Privacy Policy</b>.',
   },
   declineButton: {
-    id: 'acceptNewsModalStrings.declineButton',
+    id: 'acceptNewsModal.declineButton',
     defaultMessage: 'Not now',
   },
   confirmButton: {
-    id: 'acceptNewsModalStrings.confirmButton',
+    id: 'acceptNewsModal.confirmButton',
     defaultMessage: 'Accept',
   },
 });
