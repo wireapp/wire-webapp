@@ -136,7 +136,7 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
 
 ko.components.register('conversation-list-calling-cell', {
   template: `
-    <div class="conversation-list-calling-cell conversation-list-cell" data-bind="css:{'temporary-user-style': temporaryUserStyle}">
+    <div class="conversation-list-calling-cell conversation-list-cell">
 
       <!-- ko ifnot: temporaryUserStyle -->
         <div class="conversation-list-cell-left">
