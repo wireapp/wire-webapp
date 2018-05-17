@@ -53,3 +53,33 @@ export function setHandle(handle) {
       });
   };
 }
+
+export function doGetConsents() {
+  return function(dispatch, getState, {apiClient}) {
+    dispatch(SelfActionCreator.startGetConsent());
+    return apiClient.self.api
+      .getConsents()
+      .then(result => dispatch(SelfActionCreator.successfulGetConsent({results})))
+      .catch(error => {
+        dispatch(SelfActionCreator.failedGetConsent(error));
+        throw BackendError.handle(error);
+      });
+  };
+}
+
+export function doSetConsent(consentType, value) {
+  return function(dispatch, getState, {apiClient, config}) {
+    dispatch(SelfActionCreator.startSetConsent());
+    return apiClient.self.api
+      .putConsent({
+        source: `${config.APP_NAME}_${config.VERSION}`,
+        type: consentType,
+        value,
+      })
+      .then(result => dispatch(SelfActionCreator.successfulSetConsent(result)))
+      .catch(error => {
+        dispatch(SelfActionCreator.failedSetConsent(error));
+        throw BackendError.handle(error);
+      });
+  };
+}

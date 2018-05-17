@@ -19,5 +19,6 @@
 
 import UUID from 'uuid/v4';
 
+export const APP_NAME = 'TeamSettings';
 export const VERSION = window.VERSION || '0.0.0';
 export const APP_INSTANCE_ID = UUID();

@@ -27,6 +27,14 @@ export const HANDLE_SET_START = 'HANDLE_SET_START';
 export const HANDLE_SET_SUCCESS = 'HANDLE_SET_SUCCESS';
 export const HANDLE_SET_FAILED = 'HANDLE_SET_FAILED';
 
+export const CONSENT_GET_START = 'CONSENT_GET_START';
+export const CONSENT_GET_SUCCESS = 'CONSENT_GET_SUCCESS';
+export const CONSENT_GET_FAILED = 'CONSENT_GET_FAILED';
+
+export const CONSENT_SET_START = 'CONSENT_SET_START';
+export const CONSENT_SET_SUCCESS = 'CONSENT_SET_SUCCESS';
+export const CONSENT_SET_FAILED = 'CONSENT_SET_FAILED';
+
 export const startSetHandle = params => ({
   params,
   type: HANDLE_SET_START,
@@ -55,4 +63,34 @@ export const successfulFetchSelf = selfUser => ({
 export const failedFetchSelf = error => ({
   payload: BackendError.handle(error),
   type: SELF_FETCH_FAILED,
+});
+
+export const startGetConsent = params => ({
+  params,
+  type: CONSENT_GET_START,
+});
+
+export const successfulGetConsent = results => ({
+  payload: results,
+  type: CONSENT_GET_SUCCESS,
+});
+
+export const failedGetConsent = error => ({
+  payload: BackendError.handle(error),
+  type: CONSENT_GET_FAILED,
+});
+
+export const startSetConsent = params => ({
+  params,
+  type: CONSENT_SET_START,
+});
+
+export const successfulSetConsent = (consentId, result) => ({
+  payload: result,
+  type: CONSENT_SET_SUCCESS,
+});
+
+export const failedSetConsent = error => ({
+  payload: BackendError.handle(error),
+  type: CONSENT_SET_FAILED,
 });

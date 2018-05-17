@@ -216,12 +216,11 @@ export const appAlreadyOpenStrings = defineMessages({
 export const acceptNewsModalStrings = defineMessages({
   headline: {
     id: 'acceptNewsModalStrings.headline',
-    defaultMessage: 'News and offers',
+    defaultMessage: 'Do you want to receive news and product updates from Wire via email?',
   },
   description: {
     id: 'acceptNewsModalStrings.description',
-    defaultMessage:
-      'We would like to send you more information about our product. To do so, we may use external services like <b>Salesforce</b> and <b>Marketo</b>.</br>You can unsubscribe at any time. We will not keep your data after that.',
+    defaultMessage: 'You can unsubscribe at any time.<br />Check our <b>Privacy Policy</b>.',
   },
   declineButton: {
     id: 'acceptNewsModalStrings.declineButton',
