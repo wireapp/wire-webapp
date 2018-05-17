@@ -69,7 +69,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
 
     this.last_report = undefined;
     this.mixpanel = undefined;
-    this.privacy_preference = false;
+    this.privacy_preference = undefined;
 
     this.is_error_reporting_activated = false;
     this.is_user_analytics_activated = false;
