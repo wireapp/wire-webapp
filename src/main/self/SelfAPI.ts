@@ -22,12 +22,14 @@ import {AxiosRequestConfig, AxiosResponse} from 'axios';
 import {HttpClient} from '../http';
 import {ChangePassword, Delete, SearchableStatus, Self} from '../self';
 import {UserUpdate} from '../user';
+import {Consent} from './Consent';
 
 class SelfAPI {
   constructor(private readonly client: HttpClient) {}
 
   static get URL() {
     return {
+      CONSENT: 'consent',
       EMAIL: 'email',
       HANDLE: 'handle',
       LOCALE: 'locale',
@@ -90,6 +92,33 @@ class SelfAPI {
     };
 
     return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+  }
+
+  /**
+   * Get your consents.
+   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/consent
+   */
+  public getConsents(): Promise<{results: Consent[]}> {
+    const config: AxiosRequestConfig = {
+      method: 'get',
+      url: `${SelfAPI.URL.SELF}/${SelfAPI.URL.CONSENT}`,
+    };
+
+    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+  }
+
+  /**
+   * Put your consent.
+   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/consent
+   */
+  public async putConsent(consent: Consent): Promise<void> {
+    const config: AxiosRequestConfig = {
+      data: consent,
+      method: 'put',
+      url: `${SelfAPI.URL.SELF}/${SelfAPI.URL.CONSENT}`,
+    };
+
+    await this.client.sendJSON(config);
   }
 
   /**
