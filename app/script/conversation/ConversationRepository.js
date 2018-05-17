@@ -448,13 +448,13 @@ z.conversation.ConversationRepository = class ConversationRepository {
     });
   }
 
-  _addCreationMessage(conversationEntity, isTemporaryGuest, timestamp) {
+  _addCreationMessage(conversationEntity, isTemporaryGuest, timestamp, eventSource) {
     conversationEntity.hasCreationMessage = true;
     const creationEvent = conversationEntity.is_group()
       ? z.conversation.EventBuilder.buildGroupCreation(conversationEntity, isTemporaryGuest, timestamp)
       : z.conversation.EventBuilder.build1to1Creation(conversationEntity);
 
-    amplify.publish(z.event.WebApp.EVENT.INJECT, creationEvent);
+    amplify.publish(z.event.WebApp.EVENT.INJECT, creationEvent, eventSource);
   }
 
   /**
@@ -2789,7 +2789,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
         switch (type) {
           case z.event.Backend.CONVERSATION.CREATE:
-            return this._onCreate(eventJson);
+            return this._onCreate(eventJson, eventSource);
           case z.event.Backend.CONVERSATION.MEMBER_JOIN:
             return this._onMemberJoin(conversationEntity, eventJson);
           case z.event.Backend.CONVERSATION.MEMBER_LEAVE:
@@ -3003,9 +3003,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
    *
    * @private
    * @param {Object} eventJson - JSON data of 'conversation.create' event
+   * @param {z.event.EventRepository.SOURCE} eventSource - Source of event
    * @returns {Promise} Resolves when the event was handled
    */
-  _onCreate(eventJson) {
+  _onCreate(eventJson, eventSource) {
     const {conversation: conversationId, data: eventData, time} = eventJson;
     const eventTimestamp = new Date(time).getTime();
     const initialTimestamp = _.isNaN(eventTimestamp) ? this.getLatestEventTimestamp(true) : eventTimestamp;
@@ -3028,7 +3029,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .then(conversationEntity => this.save_conversation(conversationEntity))
       .then(conversationEntity => {
         if (conversationEntity) {
-          this._addCreationMessage(conversationEntity, false, initialTimestamp);
+          this._addCreationMessage(conversationEntity, false, initialTimestamp, eventSource);
           this.verification_state_handler.onConversationCreate(conversationEntity);
           return {conversationEntity};
         }

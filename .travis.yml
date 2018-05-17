@@ -46,7 +46,7 @@ notifications:
 
 # http://docs.travis-ci.com/user/deployment/
 before_deploy:
-  - yarn global add @wireapp/travis-bot@0.1.110
+  - yarn global add @wireapp/travis-bot@latest
   - if [ "$TRAVIS_BRANCH" == "dev" ]; then yarn run deploy-travis-dev; fi
   - if [ "$TRAVIS_BRANCH" == "edge" ]; then yarn run deploy-travis-staging; fi
   - if [ "$TRAVIS_BRANCH" == "staging" ]; then yarn run deploy-travis-staging; fi
