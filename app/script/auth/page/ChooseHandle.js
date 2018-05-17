@@ -52,7 +52,6 @@ class ChooseHandle extends React.PureComponent {
     this.state = {
       error: null,
       handle: '',
-      isAcceptNewsModalOpen: props.hasUnsetMarketingConsent,
     };
   }
 
@@ -65,12 +64,7 @@ class ChooseHandle extends React.PureComponent {
       .catch(error => this.setState({error}));
   }
 
-  componentWillReceiveProps() {
-    this.props.doGetConsents();
-  }
-
-  updateConsent = (consentType, value) =>
-    this.props.doSetConsent(consentType, value).then(() => this.setState({isAcceptNewsModalOpen: false}));
+  updateConsent = (consentType, value) => this.props.doSetConsent(consentType, value);
 
   onSetHandle = event => {
     event.preventDefault();
@@ -125,7 +119,7 @@ class ChooseHandle extends React.PureComponent {
           </Form>
           <ErrorMessage data-uie-name="error-message">{this.state.error && parseError(this.state.error)}</ErrorMessage>
         </ContainerXS>
-        {this.state.isAcceptNewsModalOpen && (
+        {this.props.hasUnsetMarketingConsent && (
           <AcceptNewsModal
             onConfirm={() => this.updateConsent(ConsentType.MARKETING, 1)}
             onDecline={() => this.updateConsent(ConsentType.MARKETING, 0)}
@@ -140,7 +134,7 @@ export default withRouter(
   injectIntl(
     connect(
       state => ({
-        hasUnsetMarketingConsent: SelfSelector.hasUnsetConsent(state, ConsentType.MARKETING),
+        hasUnsetMarketingConsent: SelfSelector.hasUnsetConsent(state, ConsentType.MARKETING) || false,
         isFetching: SelfSelector.isFetching(state),
         isTeamFlow: AuthSelector.isTeamFlow(state),
         name: SelfSelector.getSelfName(state),
