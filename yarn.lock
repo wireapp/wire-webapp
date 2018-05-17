@@ -441,11 +441,11 @@
     ed2curve "0.2.1"
     libsodium-wrappers-sumo "0.7.3"
 
-"@wireapp/react-ui-kit@1.1.19":
-  version "1.1.19"
-  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-1.1.19.tgz#f4a105cdbce7979c0609a780cb3bc425370aaaed"
+"@wireapp/react-ui-kit@1.1.21":
+  version "1.1.21"
+  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-1.1.21.tgz#96b1fb31542fa2ab8faeb291e4ac39d0cd53f755"
   dependencies:
-    bazinga64 "5.1.8"
+    bazinga64 "5.1.9"
     color "3.0.0"
     react "16.3.2"
     react-dom "16.3.2"
@@ -1593,6 +1593,10 @@ batch@0.6.1:
 bazinga64@5.1.8:
   version "5.1.8"
   resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.1.8.tgz#b3d7c3a80b7c9a775d315d6e5abf99713b26333f"
+
+bazinga64@5.1.9:
+  version "5.1.9"
+  resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.1.9.tgz#d0a57daa00b774b1b5a57697045617d679e09514"
 
 bcrypt-pbkdf@^1.0.0:
   version "1.0.1"
@@ -8614,8 +8618,8 @@ react-is@^16.3.1:
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.3.2.tgz#f4d3d0e2f5fbb6ac46450641eb2e25bf05d36b22"
 
 react-lifecycles-compat@^3.0.2:
-  version "3.0.2"
-  resolved "https://registry.yarnpkg.com/react-lifecycles-compat/-/react-lifecycles-compat-3.0.2.tgz#7279047275bd727a912e25f734c0559527e84eff"
+  version "3.0.4"
+  resolved "https://registry.yarnpkg.com/react-lifecycles-compat/-/react-lifecycles-compat-3.0.4.tgz#4f1a273afdfc8f3488a8c516bfda78f872352362"
 
 react-reconciler@^0.7.0:
   version "0.7.0"
