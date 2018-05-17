@@ -16,11 +16,12 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+import {ConsentType} from './ConsentType';
 
-export * from './ChangePassword';
-export * from './Delete';
-export * from './SearchableStatus';
-export * from './Self';
-export * from './SelfAPI';
-export * from './Consent';
-export * from './ConsentType';
+interface Consent {
+  type: ConsentType;
+  value: number;
+  source: string;
+}
+
+export {Consent};

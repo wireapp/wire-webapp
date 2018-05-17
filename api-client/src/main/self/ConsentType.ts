@@ -17,10 +17,9 @@
  *
  */
 
-export * from './ChangePassword';
-export * from './Delete';
-export * from './SearchableStatus';
-export * from './Self';
-export * from './SelfAPI';
-export * from './Consent';
-export * from './ConsentType';
+enum ConsentType {
+  TERMS_OF_USE = 1,
+  MARKETING = 2,
+}
+
+export {ConsentType};
