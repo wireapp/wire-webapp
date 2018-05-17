@@ -148,7 +148,7 @@ class ConversationJoin extends Component {
   };
 
   isConversationFullError = error =>
-    error && error.label && error.is && error.is(BackendError.CONVERSATION_ERRORS.CONVERSATION_TOO_MANY_MEMBERS);
+    error && error.label && error.label === BackendError.CONVERSATION_ERRORS.CONVERSATION_TOO_MANY_MEMBERS;
 
   resetErrors = () => this.setState({error: null, isValidName: true});
 
