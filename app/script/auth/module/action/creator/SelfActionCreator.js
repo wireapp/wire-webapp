@@ -18,6 +18,7 @@
  */
 
 import BackendError from '../BackendError';
+import {Consent} from '@wireapp/api-client/dist/commonjs/self/index';
 
 export const SELF_FETCH_START = 'SELF_FETCH_START';
 export const SELF_FETCH_SUCCESS = 'SELF_FETCH_SUCCESS';
@@ -65,17 +66,17 @@ export const failedFetchSelf = error => ({
   type: SELF_FETCH_FAILED,
 });
 
-export const startGetConsent = params => ({
+export const startGetConsents = params => ({
   params,
   type: CONSENT_GET_START,
 });
 
-export const successfulGetConsent = results => ({
-  payload: results,
+export const successfulGetConsents = (consents: Consent[]) => ({
+  payload: consents,
   type: CONSENT_GET_SUCCESS,
 });
 
-export const failedGetConsent = error => ({
+export const failedGetConsents = error => ({
   payload: BackendError.handle(error),
   type: CONSENT_GET_FAILED,
 });
@@ -85,8 +86,8 @@ export const startSetConsent = params => ({
   type: CONSENT_SET_START,
 });
 
-export const successfulSetConsent = (consentId, result) => ({
-  payload: result,
+export const successfulSetConsent = (consent: Consent) => ({
+  payload: consent,
   type: CONSENT_SET_SUCCESS,
 });
 

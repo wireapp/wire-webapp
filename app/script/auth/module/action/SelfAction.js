@@ -57,12 +57,12 @@ export function setHandle(handle) {
 
 export function doGetConsents() {
   return function(dispatch, getState, {apiClient}) {
-    dispatch(SelfActionCreator.startGetConsent());
+    dispatch(SelfActionCreator.startGetConsents());
     return apiClient.self.api
       .getConsents()
-      .then(result => dispatch(SelfActionCreator.successfulGetConsent({results})))
+      .then(result => dispatch(SelfActionCreator.successfulGetConsents({results})))
       .catch(error => {
-        dispatch(SelfActionCreator.failedGetConsent(error));
+        dispatch(SelfActionCreator.failedGetConsents(error));
         throw BackendError.handle(error);
       });
   };
@@ -71,13 +71,14 @@ export function doGetConsents() {
 export function doSetConsent(consentType, value) {
   return function(dispatch, getState, {apiClient}) {
     dispatch(SelfActionCreator.startSetConsent());
+    const consent = {
+      source: `${APP_NAME}_${VERSION}`,
+      type: consentType,
+      value,
+    };
     return apiClient.self.api
-      .putConsent({
-        source: `${APP_NAME}_${VERSION}`,
-        type: consentType,
-        value,
-      })
-      .then(result => dispatch(SelfActionCreator.successfulSetConsent(result)))
+      .putConsent(consent)
+      .then(() => dispatch(SelfActionCreator.successfulSetConsent(consent)))
       .catch(error => {
         dispatch(SelfActionCreator.failedSetConsent(error));
         throw BackendError.handle(error);
