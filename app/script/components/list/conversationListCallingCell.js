@@ -177,7 +177,7 @@ ko.components.register('conversation-list-calling-cell', {
     </div>
 
     <!-- ko if: showVideoPreview -->
-      <group-video-grid params="streams: videoStreams, ownStream: localVideoStream"></group-video-grid>
+      <group-video-grid params="streams: videoStreams, ownStream: localVideoStream, minimized: true"></group-video-grid>
     <!-- /ko -->
 
     <div class="conversation-list-calling-cell-controls">

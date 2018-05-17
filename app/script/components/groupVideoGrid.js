@@ -25,10 +25,23 @@ window.z.components = z.components || {};
 z.components.GroupVideoGrid = class GroupVideoGrid {
   constructor(params) {
     this.grid = ko.observableArray([0, 0, 0, 0]);
-    this.streams = ko.observableArray([]);
-    params.streams.subscribe(remoteStreams => this.updateGrid(remoteStreams, params.ownStream()));
-    params.ownStream.subscribe(ownStream => this.updateGrid(params.streams(), ownStream));
-    this.updateGrid(params.streams(), params.ownStream());
+    this.thumbnailStream = ko.observable(null);
+
+    this.streams = ko.pureComputed(() => {
+      const remoteStreams = params.streams();
+      const ownStream = params.ownStream();
+
+      if (remoteStreams.length === 1) {
+        this.thumbnailStream(ownStream);
+        return remoteStreams;
+      }
+      this.thumbnailStream(null);
+      return remoteStreams.concat(ownStream);
+    });
+
+    this.streams.subscribe(this.updateGrid.bind(this));
+
+    this.minimized = params.minimized;
   }
 
   /**
@@ -73,10 +86,8 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
     return [newStreamsList[0] || 0, newStreamsList[3] || 0, newStreamsList[1] || 0, newStreamsList[2] || 0];
   }
 
-  updateGrid(streams, ownStream) {
-    streams = streams.concat(ownStream).filter(stream => !!stream);
+  updateGrid(streams) {
     const newGrid = this.computeGrid(this.grid(), streams);
-    this.streams(streams);
     this.grid(newGrid);
   }
 
@@ -85,19 +96,19 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
   }
 
   getClassNameForVideo(index) {
-    const baseClass = `video-grid__element${index}`;
+    const baseClass = `group-video-grid__element${index}`;
     const grid = this.grid();
     let extraClass = '';
     if (grid[index] === 0) {
-      return `${baseClass} video-grid__element--empty`;
+      return `${baseClass} group-video-grid__element--empty`;
     }
     const isAlone = grid.every((value, i) => i === index || value === 0);
     const hasVerticalNeighbor = index % 2 === 0 ? grid[index + 1] !== 0 : grid[index - 1] !== 0;
 
     if (isAlone) {
-      extraClass += ' video-grid__element--full-size';
+      extraClass += ' group-video-grid__element--full-size';
     } else if (!hasVerticalNeighbor) {
-      extraClass += ' video-grid__element--full-height';
+      extraClass += ' group-video-grid__element--full-height';
     }
     return `${baseClass} ${extraClass}`;
   }
@@ -109,12 +120,18 @@ function arrayDiff(array1, array2) {
 
 ko.components.register('group-video-grid', {
   template: `
-    <div class="video-grid" data-bind="foreach: { data: grid, as: 'streamId' }">
-      <!-- ko if: streamId !== 0 -->
-        <div class="video-grid__element" data-bind="css: $parent.getClassNameForVideo($index()), attr: { 'data-uie-name': 'grid-video-' + $index() }">
-          <video autoplay class="video-grid__element-video" data-bind="sourceStream: $parent.getParticipantStream(streamId), muteMediaElement: $parent.getParticipantStream(streamId)">
-          </video>
-        </div>
+    <div class="group-video">
+      <div class="group-video-grid" data-bind="foreach: { data: grid, as: 'streamId' }">
+        <!-- ko if: streamId !== 0 -->
+          <div class="group-video-grid__element" data-bind="css: $parent.getClassNameForVideo($index()), attr: { 'data-uie-name': 'grid-video-' + $index() }">
+            <video autoplay class="group-video-grid__element-video" data-bind="sourceStream: $parent.getParticipantStream(streamId), muteMediaElement: $parent.getParticipantStream(streamId)">
+            </video>
+          </div>
+        <!-- /ko -->
+      </div>
+      <!-- ko if: thumbnailStream() -->
+        <video autoplay class="group-video__thumbnail" data-bind="css: {'group-video__thumbnail--minimized': minimized}, sourceStream: thumbnailStream(), muteMediaElement: thumbnailStream()">
+        </video>
       <!-- /ko -->
     </div>
   `,
