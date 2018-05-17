@@ -218,9 +218,13 @@ export const acceptNewsModalStrings = defineMessages({
     id: 'acceptNewsModalStrings.headline',
     defaultMessage: 'Do you want to receive news and product updates from Wire via email?',
   },
-  description: {
-    id: 'acceptNewsModalStrings.description',
-    defaultMessage: 'You can unsubscribe at any time.<br />Check our <b>Privacy Policy</b>.',
+  unsubscribeDescription: {
+    id: 'acceptNewsModalStrings.unsubscribeDescription',
+    defaultMessage: 'You can unsubscribe at any time.',
+  },
+  privacyDescription: {
+    id: 'acceptNewsModalStrings.privacyDescription',
+    defaultMessage: 'Check our <b>Privacy Policy</b>.',
   },
   declineButton: {
     id: 'acceptNewsModalStrings.declineButton',

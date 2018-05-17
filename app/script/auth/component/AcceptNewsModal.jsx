@@ -20,7 +20,8 @@
 import React from 'react';
 import {injectIntl, FormattedHTMLMessage} from 'react-intl';
 import {acceptNewsModalStrings} from '../../strings';
-import {H3, Button, Container, Columns, Column, Modal, Text, COLOR} from '@wireapp/react-ui-kit';
+import EXTERNAL_ROUTE from '../externalRoute';
+import {Link, H3, Button, Container, Columns, Column, Modal, Text, COLOR} from '@wireapp/react-ui-kit';
 
 const AcceptNewsModal = ({onConfirm, onDecline, intl: {formatMessage: _}}) => (
   <Modal>
@@ -28,9 +29,14 @@ const AcceptNewsModal = ({onConfirm, onDecline, intl: {formatMessage: _}}) => (
       <H3 style={{fontWeight: '500', marginTop: '10px'}} data-uie-name="accept-news-modal-title">
         {_(acceptNewsModalStrings.headline)}
       </H3>
-      <Text data-uie-name="accept-news-modal-text">
-        <FormattedHTMLMessage {...acceptNewsModalStrings.description} />
-      </Text>
+      <div data-uie-name="accept-news-modal-text">
+        <Text block>{_(acceptNewsModalStrings.unsubscribeDescription)}</Text>
+        <Link href={EXTERNAL_ROUTE.WIRE_PRIVACY_POLICY} target="_blank" data-uie-name="go-privacy">
+          <Text block>
+            <FormattedHTMLMessage {...acceptNewsModalStrings.privacyDescription} />
+          </Text>
+        </Link>
+      </div>
       <Columns style={{margin: '20px 0 10px'}}>
         <Column style={{textAlign: 'center'}}>
           <Button onClick={onDecline} backgroundColor={COLOR.GRAY} data-uie-name="do-decline">
