@@ -109,6 +109,12 @@ z.string.callJoin = 'Join';
 z.string.callChooseSharedScreen = 'Choose a screen to share';
 z.string.callParticipants = '{{number}} on call';
 
+z.string.videoCallOverlayConversations = 'Conversations';
+z.string.videoCallOverlayMute = 'Mute';
+z.string.videoCallOverlayVideo = 'Video';
+z.string.videoCallOverlayShareScreen = 'Share Screen';
+z.string.videoCallOverlayHangUp = 'Hang Up';
+
 // Modals
 // Modals type defaults
 z.string.modalAcknowledgeAction = 'Ok';

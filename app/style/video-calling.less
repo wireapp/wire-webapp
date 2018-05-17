@@ -166,6 +166,7 @@
   transition: opacity 0.25s ease-in-out;
 
   &__button {
+    position: relative;
     display: flex;
     width: 64px;
     height: 64px;
@@ -188,6 +189,18 @@
 
     svg > path {
       fill: #fff;
+    }
+
+    &__label {
+      position: absolute;
+      bottom: -12px;
+      left: 50%;
+      color: #fff;
+      font-size: 11px;
+      font-weight: @font-weight-bold;
+      text-transform: uppercase;
+      transform: translateX(-50%);
+      white-space: nowrap;
     }
 
     &--active {
