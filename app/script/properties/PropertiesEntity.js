@@ -34,8 +34,7 @@ z.properties.PropertiesEntity = class PropertiesEntity {
         send: true,
       },
       privacy: {
-        improve_wire: true,
-        receive_news: true,
+        improve_wire: undefined,
       },
       sound: {
         alerts: z.audio.AudioPreference.ALL,
@@ -45,7 +44,6 @@ z.properties.PropertiesEntity = class PropertiesEntity {
       google: undefined,
       macos: undefined,
     };
-    this[z.properties.PROPERTIES_TYPE.HAS_CREATED_CONVERSATION] = false;
     this[z.properties.PROPERTIES_TYPE.ENABLE_DEBUGGING] = false;
   }
 };

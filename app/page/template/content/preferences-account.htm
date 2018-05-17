@@ -84,11 +84,11 @@
         <!-- /ko -->
       </section>
 
-      <section class="preferences-section prefefernces-section-privacy">
+      <section class="preferences-section preferences-section-privacy">
         <hr class="preferences-separator">
         <header class="preferences-header" data-bind="l10n_text: z.string.preferencesAccountData"></header>
         <div class="preferences-option">
-          <div class="preferences-option-icon checkbox text-theme" data-bind="attr: {'data-uie-value': optionPrivacy}"  data-uie-name="status-preference-privacy">
+          <div class="preferences-option-icon checkbox text-theme" data-bind="attr: {'data-uie-value': optionPrivacy}" data-uie-name="status-preference-privacy">
             <input type="checkbox" id="privacy-checkbox" data-bind="checked: optionPrivacy">
             <label class="preferences-options-checkbox-label" for="privacy-checkbox" data-bind="l10n_text: z.string.preferencesAccountDataCheckbox"></label>
           </div>
@@ -96,16 +96,12 @@
         <div class="preferences-detail" data-bind="l10n_text: z.string.preferencesAccountDataDetail"></div>
 
         <div class="preferences-option">
-          <div class="preferences-option-icon checkbox text-theme" data-bind="attr: {'data-uie-value': optionReceiveNews}"  data-uie-name="status-preference-receive-news">
-            <input type="checkbox" id="receive-checkbox" data-bind="checked: optionReceiveNews">
-            <label class="preferences-options-checkbox-label" for="receive-checkbox" data-bind="l10n_text: z.string.preferencesAccountReceiveNewsCheckbox"></label>
+          <div class="preferences-option-icon checkbox text-theme" data-bind="attr: {'data-uie-value': optionMarketingConsent}" data-uie-name="status-preference-receive-news">
+            <input type="checkbox" id="receive-checkbox" data-bind="checked: optionMarketingConsent">
+            <label class="preferences-options-checkbox-label" for="receive-checkbox" data-bind="l10n_text: z.string.preferencesAccountMarketingConsentCheckbox"></label>
           </div>
         </div>
-        <div class="preferences-detail" data-bind="l10n_text: z.string.preferencesAccountReceiveNewsDetail"></div>
-        <div class="preferences-link text-theme" data-bind="click: clickOnAccountExportInfo, l10n_text: z.string.preferencesAccountExportPersonalInfoHeadline" data-uie-name="do-backup-export"></div>
-        <div class="preferences-detail" data-bind="l10n_text: z.string.preferencesAccountExportPersonalInfoSecondary"></div>
-        <hr class="preferences-separator">
-        <div class="preferences-link text-theme" data-bind="click: clickOnReceiveNews">Show Receive News Confirm</div>
+        <div class="preferences-detail" data-bind="l10n_text: z.string.preferencesAccountMarketingConsentDetail"></div>
       </section>
 
       <!-- ko if: isActivatedAccount() -->

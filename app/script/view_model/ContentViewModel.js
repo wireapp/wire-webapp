@@ -25,7 +25,6 @@ window.z.viewModel = z.viewModel || {};
 z.viewModel.ContentViewModel = class ContentViewModel {
   static get STATE() {
     return {
-      ACCOUNT_EXPORT: 'ContentViewModel.STATE.ACCOUNT_EXPORT',
       COLLECTION: 'ContentViewModel.STATE.COLLECTION',
       COLLECTION_DETAILS: 'ContentViewModel.STATE.COLLECTION_DETAILS',
       CONNECTION_REQUESTS: 'ContentViewModel.STATE.CONNECTION_REQUESTS',
@@ -82,8 +81,6 @@ z.viewModel.ContentViewModel = class ContentViewModel {
     );
     this.preferencesDevices = new z.viewModel.content.PreferencesDevicesViewModel(mainViewModel, this, repositories);
     this.preferencesOptions = new z.viewModel.content.PreferencesOptionsViewModel(mainViewModel, this, repositories);
-
-    this.accountExport = new z.viewModel.content.AccountExportViewModel(mainViewModel, this, repositories);
 
     this.historyExport = new z.viewModel.content.HistoryExportViewModel(mainViewModel, this, repositories);
     this.historyImport = new z.viewModel.content.HistoryImportViewModel(mainViewModel, this, repositories);

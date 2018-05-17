@@ -91,8 +91,8 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
       this.propertiesRepository.savePreference(z.properties.PROPERTIES_TYPE.PRIVACY, privacyPreference);
     });
 
-    this.optionReceiveNews = ko.observable();
-    this.optionReceiveNews.subscribe(privacyPreference => {
+    this.optionMarketingConsent = ko.observable();
+    this.optionMarketingConsent.subscribe(privacyPreference => {
       this.propertiesRepository.savePreference(z.properties.PROPERTIES_TYPE.NEWS, privacyPreference);
     });
 
@@ -206,10 +206,6 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
   clickOnAvailability(viewModel, event) {
     z.ui.AvailabilityContextMenu.show(event, 'settings', 'preferences-account-availability-menu');
-  }
-
-  clickOnAccountExportInfo() {
-    amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.ACCOUNT_EXPORT);
   }
 
   clickOnReceiveNews() {
@@ -403,6 +399,5 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
   updateProperties(properties) {
     this.optionPrivacy(properties.settings.privacy.improve_wire);
-    this.optionReceiveNews(properties.settings.privacy.receive_news);
   }
 };
