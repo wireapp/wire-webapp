@@ -119,12 +119,13 @@ class ChooseHandle extends React.PureComponent {
           </Form>
           <ErrorMessage data-uie-name="error-message">{this.state.error && parseError(this.state.error)}</ErrorMessage>
         </ContainerXS>
-        {this.props.hasUnsetMarketingConsent && (
-          <AcceptNewsModal
-            onConfirm={() => this.updateConsent(ConsentType.MARKETING, 1)}
-            onDecline={() => this.updateConsent(ConsentType.MARKETING, 0)}
-          />
-        )}
+        {!this.props.isFetching &&
+          this.props.hasUnsetMarketingConsent && (
+            <AcceptNewsModal
+              onConfirm={() => this.updateConsent(ConsentType.MARKETING, 1)}
+              onDecline={() => this.updateConsent(ConsentType.MARKETING, 0)}
+            />
+          )}
       </Page>
     );
   }
