@@ -66,7 +66,7 @@ class ChooseHandle extends React.PureComponent {
   }
 
   updateConsent = (consentType, value) =>
-    this.props.doSetConsent({consentType, value}).then(() => this.setState({isAcceptNewsModalOpen: false}));
+    this.props.doSetConsent(consentType, value).then(() => this.setState({isAcceptNewsModalOpen: false}));
 
   onSetHandle = event => {
     event.preventDefault();

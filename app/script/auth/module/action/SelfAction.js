@@ -19,6 +19,7 @@
 
 import * as SelfActionCreator from './creator/SelfActionCreator';
 import BackendError from './BackendError';
+import {APP_NAME, VERSION} from '../../config';
 
 export function fetchSelf() {
   return function(dispatch, getState, {apiClient}) {
@@ -68,11 +69,11 @@ export function doGetConsents() {
 }
 
 export function doSetConsent(consentType, value) {
-  return function(dispatch, getState, {apiClient, config}) {
+  return function(dispatch, getState, {apiClient}) {
     dispatch(SelfActionCreator.startSetConsent());
     return apiClient.self.api
       .putConsent({
-        source: `${config.APP_NAME}_${config.VERSION}`,
+        source: `${APP_NAME}_${VERSION}`,
         type: consentType,
         value,
       })
