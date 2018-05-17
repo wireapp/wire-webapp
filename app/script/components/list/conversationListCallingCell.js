@@ -26,7 +26,6 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
   constructor(params) {
     this.conversation = params.conversation;
     this.calling_repository = params.calling_repository;
-    this.isSelected = params.is_selected;
     this.temporaryUserStyle = params.temporaryUserStyle;
 
     this.onJoinCall = () => {
