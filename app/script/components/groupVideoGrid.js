@@ -44,6 +44,28 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
     this.minimized = params.minimized;
   }
 
+  scaleVideos(elements) {
+    elements
+      .filter(element => !!element.classList)
+      .filter(element => element.classList.contains('group-video-grid__element'))
+      .forEach(element => {
+        const containerRect = element.getBoundingClientRect();
+        const containerRatio = containerRect.width / containerRect.height;
+        element.querySelector('video').addEventListener('loadedmetadata', setScale);
+
+        function setScale(event) {
+          const video = event.target;
+          const videoRatio = video.videoWidth / video.videoHeight;
+          if (videoRatio < containerRatio) {
+            video.classList.add('group-video-grid__element-video--fill-width');
+          } else {
+            video.classList.add('group-video-grid__element-video--fill-height');
+          }
+          video.removeEventListener(event.type, setScale);
+        }
+      });
+  }
+
   /**
    * Will compute the next grid layout according to the previous state and the new array of streams
    * The grid will fill according to this pattern
@@ -121,7 +143,7 @@ function arrayDiff(array1, array2) {
 ko.components.register('group-video-grid', {
   template: `
     <div class="group-video">
-      <div class="group-video-grid" data-bind="foreach: { data: grid, as: 'streamId' }">
+      <div class="group-video-grid" data-bind="foreach: { data: grid, as: 'streamId', afterRender: scaleVideos}">
         <!-- ko if: streamId !== 0 -->
           <div class="group-video-grid__element" data-bind="css: $parent.getClassNameForVideo($index()), attr: { 'data-uie-name': 'grid-video-' + $index() }">
             <video autoplay class="group-video-grid__element-video" data-bind="sourceStream: $parent.getParticipantStream(streamId), muteMediaElement: $parent.getParticipantStream(streamId)">
