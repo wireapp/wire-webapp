@@ -24,7 +24,10 @@
   &__minimized-wrapper {
     position: relative;
     overflow: hidden;
+    height: 168px;
+    margin: 0 8px 16px;
     border-radius: 8px;
+
     &__overlay {
       position: absolute;
       top: 0;
@@ -35,6 +38,8 @@
       align-items: center;
       justify-content: center;
       background-color: fade(@graphite-dark, 40%);
+      border-radius: 8px;
+      cursor: pointer;
       opacity: 0;
       transition: opacity @animation-timing-fast @ease-out-quart;
 
@@ -127,9 +132,8 @@
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.16);
 
     &--minimized {
-      top: auto;
+      top: unset;
       right: 8px;
-      right: 32px;
       bottom: 8px;
       width: 80px;
       border-radius: 4px;

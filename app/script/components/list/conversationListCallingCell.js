@@ -138,7 +138,12 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
 
     this.showParticipants = ko.observable(false);
 
-    this.showVideoPreview = ko.observable(true);
+    this.showVideoPreview = ko.pureComputed(
+      () => wire.app.view.content.multitasking.isMinimized() || !this.callIsConnected()
+    );
+    this.showMaximize = ko.pureComputed(
+      () => wire.app.view.content.multitasking.isMinimized() && this.callIsConnected()
+    );
   }
 };
 
@@ -180,12 +185,14 @@ ko.components.register('conversation-list-calling-cell', {
 
     </div>
 
-    <!-- ko if: wire.app.view.content.multitasking.isMinimized -->
+    <!-- ko if: showVideoPreview -->
       <div class="group-video__minimized-wrapper" data-bind="click: onMaximizeVideoGrid">
         <group-video-grid params="streams: videoStreams, ownStream: localVideoStream, minimized: true"></group-video-grid>
-        <div class="group-video__minimized-wrapper__overlay">
-          <fullscreen-icon></fullscreen-icon>
-        </div>
+        <!-- ko if: showMaximize -->
+          <div class="group-video__minimized-wrapper__overlay">
+            <fullscreen-icon></fullscreen-icon>
+          </div>
+        <!-- /ko -->
       </div>
     <!-- /ko -->
 

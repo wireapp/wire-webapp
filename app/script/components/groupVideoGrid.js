@@ -36,7 +36,7 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
         return remoteStreams;
       }
       this.thumbnailStream(null);
-      return remoteStreams.concat(ownStream);
+      return ownStream ? remoteStreams.concat(ownStream) : remoteStreams;
     });
 
     this.streams.subscribe(this.updateGrid.bind(this));
