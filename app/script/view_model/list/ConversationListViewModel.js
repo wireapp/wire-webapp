@@ -43,6 +43,7 @@ z.viewModel.list.ConversationListViewModel = class ConversationListViewModel {
     this.teamRepository = repositories.team;
     this.user_repository = repositories.user;
     this.logger = new z.util.Logger('z.viewModel.list.ConversationListViewModel', z.config.LOGGER.OPTIONS);
+    this.multitasking = this.contentViewModel.multitasking;
 
     this.showCalls = ko.observable(false);
 
