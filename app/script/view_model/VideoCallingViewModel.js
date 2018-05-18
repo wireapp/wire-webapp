@@ -145,6 +145,8 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
         if (!isVisibleId) {
           this.visibleCallId = callEntity.id;
 
+          // FIXME find a better condition to actually minimize/maximize the call
+          // we should do this when we check that everything is alright with audio calls also
           if (this.showRemoteVideo()) {
             this.multitasking.isMinimized(false);
             return this.logger.info(`Maximizing video call '${callEntity.id}' to full-screen`, callEntity);
