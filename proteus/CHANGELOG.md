@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="7.1.39"></a>
+## [7.1.39](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/compare/@wireapp/proteus@7.1.38...@wireapp/proteus@7.1.39) (2018-05-18)
+
+
+
+
+**Note:** Version bump only for package @wireapp/proteus
+
 <a name="7.1.38"></a>
 ## [7.1.38](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/compare/@wireapp/proteus@7.1.37...@wireapp/proteus@7.1.38) (2018-05-17)
 
