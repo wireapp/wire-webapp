@@ -17,8 +17,12 @@
  *
  */
 
-import UUID from 'uuid/v4';
+'use strict';
 
-export const APP_NAME = 'Webapp';
-export const VERSION = window.VERSION || '0.0.0';
-export const APP_INSTANCE_ID = UUID();
+window.z = window.z || {};
+window.z.user = z.user || {};
+
+z.user.ConsentValue = {
+  GIVEN: 1,
+  NOT_GIVEN: 0,
+};

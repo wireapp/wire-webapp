@@ -85,6 +85,8 @@ z.user.UserRepository = class UserRepository {
       amplify.publish(z.event.WebApp.ANALYTICS.SUPER_PROPERTY, z.tracking.SuperProperty.CONTACTS, number_of_contacts);
     });
 
+    this.marketingConsent = ko.observable(false);
+
     amplify.subscribe(z.event.WebApp.CLIENT.ADD, this.addClientToUser.bind(this));
     amplify.subscribe(z.event.WebApp.CLIENT.REMOVE, this.remove_client_from_user.bind(this));
     amplify.subscribe(z.event.WebApp.CLIENT.UPDATE, this.update_clients_from_user.bind(this));
@@ -707,8 +709,9 @@ z.user.UserRepository = class UserRepository {
       .get_own_user()
       .then(response => {
         const userEntity = this.user_mapper.map_self_user_from_object(response);
-        return this.save_user(userEntity, true);
+        return Promise.all([this.save_user(userEntity, true), this.getMarketingConsent()]);
       })
+      .then(([userEntity]) => userEntity)
       .catch(error => {
         this.logger.error(`Unable to load self user: ${error.message || error}`, [error]);
         throw error;
@@ -1062,6 +1065,33 @@ z.user.UserRepository = class UserRepository {
         user_et.isGuest(!is_team_member);
         user_et.isTeamMember(is_team_member);
       }
+    });
+  }
+
+  getMarketingConsent() {
+    return this.user_service.getConsent().then(consents => {
+      for (const {type: consentType, value: consentValue} of consents) {
+        const isMarketingConsent = consentType === z.user.ConsentType.MARKETING;
+        if (isMarketingConsent) {
+          this.marketingConsent(consentValue === z.user.ConsentValue.GIVEN);
+          this.marketingConsent.subscribe(changedConsentValue => this.changeMarketingConsent(changedConsentValue));
+
+          this.logger.log(`Marketing consent retrieved as ${consentValue}`);
+          return;
+        }
+      }
+    });
+  }
+
+  setConsent(consentType, consentValue) {
+    return this.user_service.putConsent(consentType, consentValue, `Webapp ${z.util.Environment.version(false)}`);
+  }
+
+  changeMarketingConsent(consentGiven) {
+    const consentValue = consentGiven ? z.user.ConsentValue.GIVEN : z.user.ConsentValue.NOT_GIVEN;
+    return this.setConsent(z.user.ConsentType.MARKETING, consentValue).then(() => {
+      this.logger.log(`Marketing consent updated to ${consentValue}`);
+      this.marketingConsent(consentGiven);
     });
   }
 };

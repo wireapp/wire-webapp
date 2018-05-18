@@ -19,6 +19,7 @@
 
 import * as SelfActionCreator from './creator/SelfActionCreator';
 import BackendError from './BackendError';
+import {APP_NAME} from '../../config';
 
 export function fetchSelf() {
   return function(dispatch, getState, {apiClient}) {
@@ -49,6 +50,37 @@ export function setHandle(handle) {
       .then(result => dispatch(SelfActionCreator.successfulSetHandle(result)))
       .catch(error => {
         dispatch(SelfActionCreator.failedSetHandle(error));
+        throw BackendError.handle(error);
+      });
+  };
+}
+
+export function doGetConsents() {
+  return function(dispatch, getState, {apiClient}) {
+    dispatch(SelfActionCreator.startGetConsents());
+    return apiClient.self.api
+      .getConsents()
+      .then(({results}) => dispatch(SelfActionCreator.successfulGetConsents(results)))
+      .catch(error => {
+        dispatch(SelfActionCreator.failedGetConsents(error));
+        throw BackendError.handle(error);
+      });
+  };
+}
+
+export function doSetConsent(consentType, value) {
+  return function(dispatch, getState, {apiClient}) {
+    dispatch(SelfActionCreator.startSetConsent());
+    const consent = {
+      source: `${APP_NAME} ${z.util.Environment.version(false)}`,
+      type: consentType,
+      value,
+    };
+    return apiClient.self.api
+      .putConsent(consent)
+      .then(() => dispatch(SelfActionCreator.successfulSetConsent(consent)))
+      .catch(error => {
+        dispatch(SelfActionCreator.failedSetConsent(error));
         throw BackendError.handle(error);
       });
   };

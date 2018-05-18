@@ -259,6 +259,11 @@ z.string.modalPictureTooLargeMessage = 'You can use pictures up to {{number}} MB
 z.string.modalPictureTooSmallHeadline = 'Picture too small';
 z.string.modalPictureTooSmallMessage = 'Please choose a picture that is at least 320 x 320 px.';
 
+z.string.modalImproveWireAction = 'Accept';
+z.string.modalImproveWireSecondary = 'Not now';
+z.string.modalImproveWireHeadline = 'Help us make Wire better';
+z.string.modalImproveWireMessage = 'Sending anonymous usage and crash reports helps us to improve our products and services. We do not use this information for anything else.';
+
 z.string.modalServiceUnavailableHeadline = 'Adding service not possible';
 z.string.modalServiceUnavailableMessage = 'The service is unavailable a the moment.';
 
@@ -546,11 +551,16 @@ z.string.preferencesAboutWebsite = 'Wire website';
 
 z.string.preferencesAccountAvaibilityUnset = 'Set a status';
 z.string.preferencesAccountCreateTeam = 'Create a team';
+z.string.preferencesAccountData = 'Data usage permissions';
+z.string.preferencesAccountDataCheckbox = 'Send anonymous data';
+z.string.preferencesAccountDataDetail = 'Help make Wire better by sending anonymous usage and crash reports.';
 z.string.preferencesAccountDelete = 'Delete account';
 z.string.preferencesAccountLeaveGuestRoom = 'Leave the guest room';
 z.string.preferencesAccountLeaveGuestRoomDescription = 'You will no longer be able to access the messages in this conversation.';
 z.string.preferencesAccountLogOut = 'Log out';
 z.string.preferencesAccountManageTeam = 'Manage team';
+z.string.preferencesAccountMarketingConsentCheckbox = 'Receive newsletter';
+z.string.preferencesAccountMarketingConsentDetail = 'Receive news and product update from Wire via email.';
 z.string.preferencesAccountResetPassword = 'Reset password';
 z.string.preferencesAccountTeam = 'in {{name}}';
 z.string.preferencesAccountUsernamePlaceholder = 'Your full name';
@@ -591,9 +601,6 @@ z.string.preferencesOptionsContacts = 'Contacts';
 z.string.preferencesOptionsContactsGmail = 'Import from Gmail';
 z.string.preferencesOptionsContactsMacos = 'Import from Contacts';
 z.string.preferencesOptionsContactsDetail = 'We use your contact data to connect you with others. We anonymize all information and do not share it with anyone else.';
-z.string.preferencesOptionsData = 'Usage and crash reports';
-z.string.preferencesOptionsDataCheckbox = 'Send anonymous data';
-z.string.preferencesOptionsDataDetail = 'Make Wire better by sending anonymous information.';
 z.string.preferencesOptionsPopular = 'By popular demand';
 z.string.preferencesOptionsEmojiReplaceCheckbox = 'Replace type emoticons with emojis';
 z.string.preferencesOptionsEmojiReplaceDetail = ':-) → {{icon}}';

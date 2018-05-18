@@ -92,17 +92,6 @@
         </section>
       <!-- /ko -->
 
-      <section class="preferences-section">
-        <header class="preferences-header" data-bind="l10n_text: z.string.preferencesOptionsData"></header>
-        <div class="preferences-option">
-          <div class="preferences-option-icon checkbox text-theme" data-bind="attr: {'data-uie-value': optionPrivacy}"  data-uie-name="status-preference-privacy">
-            <input type="checkbox" id="data-checkbox" data-bind="checked: optionPrivacy">
-            <label class="preferences-options-checkbox-label" for="data-checkbox" data-bind="l10n_text: z.string.preferencesOptionsDataCheckbox"></label>
-          </div>
-        </div>
-        <div class="preferences-detail" data-bind="l10n_text: z.string.preferencesOptionsDataDetail"></div>
-      </section>
-
       <!-- ko if: z.calling.CallingRepository.supportsCalling -->
         <section class="preferences-section">
           <header class="preferences-header" data-bind="l10n_text: z.string.preferencesOptionsCallLogs"></header>
