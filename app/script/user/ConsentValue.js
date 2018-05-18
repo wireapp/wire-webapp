@@ -20,30 +20,9 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.properties = z.properties || {};
+window.z.user = z.user || {};
 
-z.properties.PropertiesEntity = class PropertiesEntity {
-  constructor() {
-    this[z.properties.PROPERTIES_TYPE.VERSION] = 1;
-    this.settings = {
-      emoji: {
-        replace_inline: true,
-      },
-      notifications: z.notification.NotificationPreference.ON,
-      previews: {
-        send: true,
-      },
-      privacy: {
-        improve_wire: undefined,
-      },
-      sound: {
-        alerts: z.audio.AudioPreference.ALL,
-      },
-    };
-    this.contact_import = {
-      google: undefined,
-      macos: undefined,
-    };
-    this[z.properties.PROPERTIES_TYPE.ENABLE_DEBUGGING] = false;
-  }
+z.user.ConsentValue = {
+  GIVEN: 1,
+  NOT_GIVEN: 0,
 };

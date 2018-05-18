@@ -20,9 +20,8 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-window.z.viewModel.content = z.viewModel.content || {};
+window.z.user = z.user || {};
 
-z.viewModel.content.AccountExportViewModel = class AccountExportViewModel {
-  constructor(mainViewModel, contentViewModel, repositories) {}
+z.user.ConsentType = {
+  MARKETING: 2,
 };

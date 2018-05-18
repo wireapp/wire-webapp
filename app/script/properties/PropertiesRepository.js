@@ -43,6 +43,33 @@ z.properties.PropertiesRepository = class PropertiesRepository {
     amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, this.propertiesUpdated.bind(this));
   }
 
+  checkPrivacyPermission() {
+    const privacyPropertySet = this.getPreference(z.properties.PROPERTIES_TYPE.PRIVACY) !== undefined;
+
+    return privacyPropertySet
+      ? Promise.resolve()
+      : new Promise(resolve => {
+          amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
+            action: () => {
+              this.savePreference(z.properties.PROPERTIES_TYPE.PRIVACY, true);
+              resolve();
+            },
+            preventClose: true,
+            secondary: () => {
+              this.savePreference(z.properties.PROPERTIES_TYPE.PRIVACY, false);
+              resolve();
+            },
+            text: {
+              action: z.l10n.text(z.string.modalImproveWireAction),
+              message: z.l10n.text(z.string.modalImproveWireMessage),
+              secondary: z.l10n.text(z.string.modalImproveWireSecondary),
+              title: z.l10n.text(z.string.modalImproveWireHeadline),
+            },
+            warning: false,
+          });
+        });
+  }
+
   /**
    * Get the current preference for a property type.
    * @param {z.properties.PROPERTIES_TYPE} propertiesType - Type of preference to get
@@ -148,9 +175,6 @@ z.properties.PropertiesRepository = class PropertiesRepository {
               break;
             case z.properties.PROPERTIES_TYPE.PRIVACY:
               amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.PRIVACY, updatedPreference);
-              break;
-            case z.properties.PROPERTIES_TYPE.NEWS:
-              amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.NEWS, updatedPreference);
               break;
             case z.properties.PROPERTIES_TYPE.SOUND_ALERTS:
               amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.SOUND_ALERTS, updatedPreference);

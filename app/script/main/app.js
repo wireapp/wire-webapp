@@ -618,10 +618,12 @@ z.main.App = class App {
       amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS);
     }
 
-    window.setTimeout(() => this.repository.notification.checkPermission(), App.CONFIG.NOTIFICATION_CHECK);
-
     this.view.loading.removeFromView();
     $('#wire-main').attr('data-uie-value', 'is-loaded');
+
+    this.repository.properties.checkPrivacyPermission().then(() => {
+      window.setTimeout(() => this.repository.notification.checkPermission(), App.CONFIG.NOTIFICATION_CHECK);
+    });
   }
 
   /**
