@@ -67,6 +67,12 @@ export default function reducer(state = initialState, action) {
         fetching: false,
       };
     }
+    case SelfActionCreator.CONSENT_SET_SUCCESS: {
+      return {
+        ...state,
+        consents: {...state.constents, [action.payload.type]: action.payload.value},
+      };
+    }
     default: {
       return state;
     }
