@@ -596,6 +596,7 @@ z.string.preferencesOptionsDataCheckbox = 'Send anonymous data';
 z.string.preferencesOptionsDataDetail = 'Make Wire better by sending anonymous information.';
 z.string.preferencesOptionsPopular = 'By popular demand';
 z.string.preferencesOptionsEmojiReplaceCheckbox = 'Replace type emoticons with emojis';
+z.string.preferencesOptionsEnableDarkTheme = 'Enable dark theme';
 z.string.preferencesOptionsEmojiReplaceDetail = ':-) → {{icon}}';
 z.string.preferencesOptionsPreviewsSendCheckbox = 'Create previews for links you send';
 z.string.preferencesOptionsPreviewsSendDetail = 'Previews may still be shown for links from other people.';

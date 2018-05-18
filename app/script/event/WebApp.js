@@ -178,8 +178,9 @@ z.event.WebApp = {
   PROPERTIES: {
     UPDATE: {
       CONTACTS: 'wire.webapp.properties.update.contacts',
+      DARK_THEME: 'wire.webapp.properties.update.dark_theme',
       EMOJI: {
-        REPLACE_INLINE: 'wire.webapp.properties.update.emoji.replace_inline',
+        REPLACE_INLINE: 'wire.webapp.properties.update.ce_inline',
       },
       NOTIFICATIONS: 'wire.webapp.properties.update.notifications',
       PREVIEWS: {

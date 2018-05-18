@@ -152,6 +152,9 @@ z.properties.PropertiesRepository = class PropertiesRepository {
             case z.properties.PROPERTIES_TYPE.SOUND_ALERTS:
               amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.SOUND_ALERTS, updatedPreference);
               break;
+            case z.properties.PROPERTIES_TYPE.DARK_THEME:
+              amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.DARK_THEME, updatedPreference);
+              break;
             default:
               throw new Error(`Failed to update preference of unhandled type '${propertiesType}'`);
           }

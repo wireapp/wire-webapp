@@ -26,6 +26,9 @@ z.properties.PropertiesEntity = class PropertiesEntity {
   constructor() {
     this[z.properties.PROPERTIES_TYPE.VERSION] = 1;
     this.settings = {
+      darktheme: {
+        enabled: false,
+      },
       emoji: {
         replace_inline: true,
       },
@@ -45,6 +48,6 @@ z.properties.PropertiesEntity = class PropertiesEntity {
       macos: undefined,
     };
     this[z.properties.PROPERTIES_TYPE.HAS_CREATED_CONVERSATION] = false;
-    this[z.properties.PROPERTIES_TYPE.ENABLE_DEBUGGING] = false;
+    this[z.properties.PROPERTIES_TYPE.ENABLE_DEBUGGING] = true;
   }
 };

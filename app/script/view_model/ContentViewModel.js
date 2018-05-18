@@ -45,15 +45,17 @@ z.viewModel.ContentViewModel = class ContentViewModel {
     this.showConversation = this.showConversation.bind(this);
     this.switchContent = this.switchContent.bind(this);
     this.switchPreviousContent = this.switchPreviousContent.bind(this);
+    this.updateBackground = this.updateBackground.bind(this);
 
     this.elementId = 'center-column';
     this.mainViewModel = mainViewModel;
     this.conversationRepository = repositories.conversation;
     this.userRepository = repositories.user;
+    this.preferencesRepository = repositories.properties;
     this.logger = new z.util.Logger('z.viewModel.ContentViewModel', z.config.LOGGER.OPTIONS);
-    this.isDarkTheme = function() {
-      return false;
-    };
+    this.isDarkTheme = repositories.properties.getPreference(z.properties.PROPERTIES_TYPE.DARK_THEME);
+
+    this.isDarkThemeFunc = ko.pureComputed(() => this.isDarkTheme);
 
     // State
     this.state = ko.observable(ContentViewModel.STATE.WATERMARK);
@@ -131,6 +133,8 @@ z.viewModel.ContentViewModel = class ContentViewModel {
     amplify.subscribe(z.event.WebApp.CONTENT.SWITCH, this.switchContent.bind(this));
     amplify.subscribe(z.event.WebApp.CONVERSATION.SHOW, this.showConversation.bind(this));
     amplify.subscribe(z.event.WebApp.WINDOW.RESIZE.HEIGHT, this.messageList.scroll_height);
+    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.DARK_THEME, this.updateBackground.bind(this));
+    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, this.updateBackground.bind(this));
   }
 
   /**
@@ -150,6 +154,15 @@ z.viewModel.ContentViewModel = class ContentViewModel {
           .removeClass(incomingCssClass)
           .off(z.util.alias.animationend);
       });
+  }
+
+  updateBackground(properties) {
+    this.isDarkTheme = this.preferencesRepository.getPreference(z.properties.PROPERTIES_TYPE.DARK_THEME);
+    if (this.isDarkTheme) {
+      $(`#${this.elementId}`).addClass('dark-theme');
+    } else {
+      $(`#${this.elementId}`).removeClass('dark-theme');
+    }
   }
 
   /**
