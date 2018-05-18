@@ -44,9 +44,9 @@ z.properties.PropertiesRepository = class PropertiesRepository {
   }
 
   checkPrivacyPermission() {
-    const privacyPropertySet = this.getPreference(z.properties.PROPERTIES_TYPE.PRIVACY) !== undefined;
+    const isPrivacyPreferenceSet = this.getPreference(z.properties.PROPERTIES_TYPE.PRIVACY) !== undefined;
 
-    return privacyPropertySet
+    return isPrivacyPreferenceSet
       ? Promise.resolve()
       : new Promise(resolve => {
           amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
