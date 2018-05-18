@@ -26,8 +26,6 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
   constructor(params) {
     this.conversation = params.conversation;
     this.calling_repository = params.calling_repository;
-    this.mediaRepository = params.mediaRepository;
-    this.isSelected = params.is_selected;
     this.temporaryUserStyle = params.temporaryUserStyle;
 
     this.onJoinCall = () => {
@@ -149,7 +147,7 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
 
 ko.components.register('conversation-list-calling-cell', {
   template: `
-    <div class="conversation-list-calling-cell conversation-list-cell" data-bind="css:{'temporary-user-style': temporaryUserStyle}">
+    <div class="conversation-list-calling-cell conversation-list-cell">
 
       <!-- ko ifnot: temporaryUserStyle -->
         <div class="conversation-list-cell-left">
