@@ -1,7 +1,7 @@
-<div id="video-calling" data-bind="hide_controls: z.viewModel.VideoCallingViewModel.CONFIG.HIDE_CONTROLS_TIMEOUT, css:{ 'video-calling--active': isCallOngoing(), 'video-calling--minimized': multitasking.isMinimized() }" class="video-calling">
+<div id="video-calling" data-bind="hide_controls: z.viewModel.VideoCallingViewModel.CONFIG.HIDE_CONTROLS_TIMEOUT, css:{ 'video-calling--active': isCallOngoing(), 'video-calling--minimized': multitasking.isMinimized()}" class="video-calling">
   <!-- ko if: videodCall() -->
     <!-- ko if: showRemote() -->
-      <div id="video-element-remote" class="video-element-remote" data-bind="css: {'video-element-remote-minimized': multitasking.isMinimized()}">
+      <div id="video-element-remote" class="video-element-remote">
         <group-video-grid params="streams: remoteVideoStreams, ownStream: localVideoStream"></group-video-grid>
         <!-- ko if: showRemoteParticipant() -->
           <div class="video-element-remote-participant">
@@ -13,11 +13,6 @@
 
         <!-- ko if: showRemoteVideo() && !isChoosingScreen() -->
           <div class="video-element-overlay hide-controls-hidden" data-bind="event: {dblclick: doubleClickedOnRemoteVideo}"></div>
-        <!-- /ko -->
-        <!-- ko if: multitasking.isMinimized() -->
-          <div class="video-element-remote-fullscreen icon-fullscreen hide-controls-hidden" data-uie-name="do-call-controls-video-maximize"
-            data-bind="click: clickedOnMaximize">
-          </div>
         <!-- /ko -->
 
         <!-- ko if: isChoosingScreen() -->

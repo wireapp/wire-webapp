@@ -299,11 +299,6 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
     this.logger.info(`Minimizing call '${this.videodCall().id}' on user click`);
   }
 
-  clickedOnMaximize() {
-    this.multitasking.isMinimized(false);
-    this.logger.info(`Maximizing call '${this.videodCall().id}' on user click`);
-  }
-
   doubleClickedOnRemoteVideo() {
     this.remoteVideoElementContain(!this.remoteVideoElementContain());
     this.logger.info(`Switched remote video object-fit. Contain is '${this.remoteVideoElementContain()}'`);

@@ -36,19 +36,13 @@
 
     <!-- ko if: hasOngoingCall() -->
       <div class="conversation-title-bar-icons">
-        <!-- ko if: showMaximizeControl() -->
-          <span class="conversation-title-bar-icon button-icon-large icon-fullscreen"
-                data-bind="click: clickOnMaximize"
-                data-uie-name="do-maximize-call">
-          </span>
-        <!-- /ko -->
         <!-- ko if: selfStreamState.screenSend() -->
-          <span class="conversation-title-bar-icon conversation-title-bar-icon-status button-icon-large icon-screensharing"
+          <span class="conversation-title-bar-icon button-icon-large icon-screensharing"
             data-uie-name="status-self-screensharing">
           </span>
         <!-- /ko -->
         <!-- ko if: selfStreamState.videoSend() -->
-          <span class="conversation-title-bar-icon conversation-title-bar-icon-status button-icon-large icon-video"
+          <span class="conversation-title-bar-icon button-icon-large icon-video"
                 data-uie-name="status-self-video">
           </span>
         <!-- /ko -->

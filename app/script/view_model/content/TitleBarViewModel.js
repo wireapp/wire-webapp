@@ -67,17 +67,6 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
       return this.hasCall() ? this.joinedCall().state() === z.calling.enum.CALL_STATE.ONGOING : false;
     });
 
-    this.showMaximizeControl = ko.pureComputed(() => {
-      if (!this.joinedCall()) {
-        return false;
-      }
-
-      const hasLocalVideo = this.selfStreamState.videoSend() || this.selfStreamState.screenSend();
-      const hasRemoteVideoSetting = this.joinedCall().isRemoteScreenSend() || this.joinedCall().isRemoteVideoSend();
-      const hasRemoteVideo = hasRemoteVideoSetting && this.remoteMediaStreams.video();
-      return this.hasOngoingCall() && this.multitasking.isMinimized() && hasLocalVideo && !hasRemoteVideo;
-    });
-
     this.showCallControls = ko.pureComputed(() => {
       if (!this.conversationEntity()) {
         return false;
@@ -122,12 +111,6 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
 
   clickOnCallButton() {
     amplify.publish(z.event.WebApp.CALL.STATE.TOGGLE, z.media.MediaType.AUDIO);
-  }
-
-  clickOnMaximize() {
-    this.multitasking.autoMinimize(false);
-    this.multitasking.isMinimized(false);
-    this.logger.info(`Maximizing call '${this.joinedCall().id}' on user click`);
   }
 
   clickOnDetails() {
