@@ -81,16 +81,14 @@ describe('ConversationRepository', () => {
         conversation_et = _generate_conversation(z.conversation.ConversationType.SELF);
         conversation_et.id = payload.conversations.knock.post.conversation;
 
-        const ping_url = `${test_factory.settings.connection.rest_url}/conversations/${conversation_et.id}/knock`;
+        const ping_url = `${test_factory.settings.connection.restUrl}/conversations/${conversation_et.id}/knock`;
         server.respondWith('POST', ping_url, [
           201,
           {'Content-Type': 'application/json'},
           JSON.stringify(payload.conversations.knock.post),
         ]);
 
-        const mark_as_read_url = `${test_factory.settings.connection.rest_url}/conversations/${
-          conversation_et.id
-        }/self`;
+        const mark_as_read_url = `${test_factory.settings.connection.restUrl}/conversations/${conversation_et.id}/self`;
         server.respondWith('PUT', mark_as_read_url, [200, {}, '']);
 
         return conversation_repository.save_conversation(conversation_et);
@@ -486,7 +484,7 @@ describe('ConversationRepository', () => {
   describe('"_handleConversationEvent"', () => {
     describe('"conversation.asset-add"', () => {
       beforeEach(() => {
-        const matchUsers = new RegExp(`${test_factory.settings.connection.rest_url}/users\\?ids=([a-z0-9-,]+)`);
+        const matchUsers = new RegExp(`${test_factory.settings.connection.restUrl}/users\\?ids=([a-z0-9-,]+)`);
         server.respondWith('GET', matchUsers, (xhr, ids) => {
           const users = [];
           for (const userId of ids.split(',')) {
@@ -536,9 +534,7 @@ describe('ConversationRepository', () => {
           xhr.respond(200, {'Content-Type': 'application/json'}, JSON.stringify(users));
         });
 
-        const matchConversations = new RegExp(
-          `${test_factory.settings.connection.rest_url}/conversations/([a-z0-9-]+)`
-        );
+        const matchConversations = new RegExp(`${test_factory.settings.connection.restUrl}/conversations/([a-z0-9-]+)`);
         server.respondWith('GET', matchConversations, (xhr, conversationId) => {
           const conversation = {
             access: ['private'],
