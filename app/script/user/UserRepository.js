@@ -708,10 +708,10 @@ z.user.UserRepository = class UserRepository {
     return this.user_service
       .get_own_user()
       .then(response => {
-        this.getMarketingConsent();
         const userEntity = this.user_mapper.map_self_user_from_object(response);
-        return this.save_user(userEntity, true);
+        return Promise.all([this.save_user(userEntity, true), this.getMarketingConsent()]);
       })
+      .then(([userEntity]) => userEntity)
       .catch(error => {
         this.logger.error(`Unable to load self user: ${error.message || error}`, [error]);
         throw error;
@@ -1069,13 +1069,14 @@ z.user.UserRepository = class UserRepository {
   }
 
   getMarketingConsent() {
-    this.user_service.getConsent().then(consents => {
+    return this.user_service.getConsent().then(consents => {
       for (const {type: consentType, value: consentValue} of consents) {
         const isMarketingConsent = consentType === z.user.ConsentType.MARKETING;
         if (isMarketingConsent) {
-          this.logger.log(`Marketing consent retrieved as ${consentValue}`);
           this.marketingConsent(consentValue === z.user.ConsentValue.GIVEN);
           this.marketingConsent.subscribe(changedConsentValue => this.changeMarketingConsent(changedConsentValue));
+
+          this.logger.log(`Marketing consent retrieved as ${consentValue}`);
           return;
         }
       }
@@ -1090,7 +1091,7 @@ z.user.UserRepository = class UserRepository {
     const consentValue = consentGiven ? z.user.ConsentValue.GIVEN : z.user.ConsentValue.NOT_GIVEN;
     return this.setConsent(z.user.ConsentType.MARKETING, consentValue).then(() => {
       this.logger.log(`Marketing consent updated to ${consentValue}`);
-      this.marketingConsent(updatedConsent);
+      this.marketingConsent(consentGiven);
     });
   }
 };

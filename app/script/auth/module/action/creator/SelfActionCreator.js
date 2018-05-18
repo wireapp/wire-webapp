@@ -18,15 +18,6 @@
  */
 
 import BackendError from '../BackendError';
-import {Consent} from '@wireapp/api-client/dist/commonjs/self/index';
-
-export const SELF_FETCH_START = 'SELF_FETCH_START';
-export const SELF_FETCH_SUCCESS = 'SELF_FETCH_SUCCESS';
-export const SELF_FETCH_FAILED = 'SELF_FETCH_FAILED';
-
-export const HANDLE_SET_START = 'HANDLE_SET_START';
-export const HANDLE_SET_SUCCESS = 'HANDLE_SET_SUCCESS';
-export const HANDLE_SET_FAILED = 'HANDLE_SET_FAILED';
 
 export const CONSENT_GET_START = 'CONSENT_GET_START';
 export const CONSENT_GET_SUCCESS = 'CONSENT_GET_SUCCESS';
@@ -35,6 +26,14 @@ export const CONSENT_GET_FAILED = 'CONSENT_GET_FAILED';
 export const CONSENT_SET_START = 'CONSENT_SET_START';
 export const CONSENT_SET_SUCCESS = 'CONSENT_SET_SUCCESS';
 export const CONSENT_SET_FAILED = 'CONSENT_SET_FAILED';
+
+export const HANDLE_SET_START = 'HANDLE_SET_START';
+export const HANDLE_SET_SUCCESS = 'HANDLE_SET_SUCCESS';
+export const HANDLE_SET_FAILED = 'HANDLE_SET_FAILED';
+
+export const SELF_FETCH_START = 'SELF_FETCH_START';
+export const SELF_FETCH_SUCCESS = 'SELF_FETCH_SUCCESS';
+export const SELF_FETCH_FAILED = 'SELF_FETCH_FAILED';
 
 export const startSetHandle = params => ({
   params,
@@ -71,7 +70,7 @@ export const startGetConsents = params => ({
   type: CONSENT_GET_START,
 });
 
-export const successfulGetConsents = (consents: Consent[]) => ({
+export const successfulGetConsents = consents => ({
   payload: consents,
   type: CONSENT_GET_SUCCESS,
 });
@@ -86,7 +85,7 @@ export const startSetConsent = params => ({
   type: CONSENT_SET_START,
 });
 
-export const successfulSetConsent = (consent: Consent) => ({
+export const successfulSetConsent = consent => ({
   payload: consent,
   type: CONSENT_SET_SUCCESS,
 });
