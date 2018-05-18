@@ -44,6 +44,11 @@ z.properties.PropertiesRepository = class PropertiesRepository {
   }
 
   checkPrivacyPermission() {
+    if (this.selfUser().isTemporaryGuest()) {
+      this.savePreference(z.properties.PROPERTIES_TYPE.PRIVACY, true);
+      return Promise.resolve();
+    }
+
     const isPrivacyPreferenceSet = this.getPreference(z.properties.PROPERTIES_TYPE.PRIVACY) !== undefined;
 
     return isPrivacyPreferenceSet
