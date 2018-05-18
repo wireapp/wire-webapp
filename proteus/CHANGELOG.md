@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="7.1.40"></a>
+## [7.1.40](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/compare/@wireapp/proteus@7.1.39...@wireapp/proteus@7.1.40) (2018-05-18)
+
+
+### Bug Fixes
+
+* **proteus:** Trigger status bot with correct credentials ([9ea1258](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/commit/9ea1258))
+
+
+
+
 <a name="7.1.39"></a>
 ## [7.1.39](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/compare/@wireapp/proteus@7.1.38...@wireapp/proteus@7.1.39) (2018-05-18)
 
