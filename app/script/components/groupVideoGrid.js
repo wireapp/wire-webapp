@@ -40,6 +40,7 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
     });
 
     this.streams.subscribe(this.updateGrid.bind(this));
+    this.updateGrid(this.streams());
 
     this.minimized = params.minimized;
   }
