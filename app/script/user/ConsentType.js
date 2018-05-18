@@ -24,4 +24,5 @@ window.z.user = z.user || {};
 
 z.user.ConsentType = {
   MARKETING: 2,
+  TERMS_OF_USE: 1,
 };
