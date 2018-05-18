@@ -29,25 +29,25 @@ export const initialState = {
 
 export default function reducer(state = initialState, action) {
   switch (action.type) {
-    case SelfActionCreator.SELF_FETCH_START:
     case SelfActionCreator.CONSENT_GET_START:
-    case SelfActionCreator.HANDLE_SET_START: {
+    case SelfActionCreator.HANDLE_SET_START:
+    case SelfActionCreator.SELF_FETCH_START: {
       return {
         ...state,
         fetching: true,
       };
     }
-    case SelfActionCreator.SELF_FETCH_FAILED:
     case SelfActionCreator.CONSENT_GET_FAILED:
-    case SelfActionCreator.HANDLE_SET_FAILED: {
+    case SelfActionCreator.HANDLE_SET_FAILED:
+    case SelfActionCreator.SELF_FETCH_FAILED: {
       return {
         ...state,
         error: action.payload,
         fetching: false,
       };
     }
-    case SelfActionCreator.SELF_FETCH_SUCCESS:
-    case SelfActionCreator.HANDLE_SET_SUCCESS: {
+    case SelfActionCreator.HANDLE_SET_SUCCESS:
+    case SelfActionCreator.SELF_FETCH_SUCCESS: {
       return {
         ...state,
         error: null,

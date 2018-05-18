@@ -1083,15 +1083,11 @@ z.user.UserRepository = class UserRepository {
   }
 
   setConsent(consentType, consentValue) {
-    const source = z.util.Environment.desktop
-      ? `Wrapper ${z.util.Environment.version(true)}`
-      : `Webapp ${z.util.Environment.version(false)}`;
-
-    return this.user_service.putConsent(consentType, consentValue, source);
+    return this.user_service.putConsent(consentType, consentValue, `Webapp ${z.util.Environment.version(false)}`);
   }
 
-  changeMarketingConsent(updatedConsent) {
-    const consentValue = updatedConsent ? z.user.ConsentValue.GIVEN : z.user.ConsentValue.NOT_GIVEN;
+  changeMarketingConsent(consentGiven) {
+    const consentValue = consentGiven ? z.user.ConsentValue.GIVEN : z.user.ConsentValue.NOT_GIVEN;
     return this.setConsent(z.user.ConsentType.MARKETING, consentValue).then(() => {
       this.logger.log(`Marketing consent updated to ${consentValue}`);
       this.marketingConsent(updatedConsent);

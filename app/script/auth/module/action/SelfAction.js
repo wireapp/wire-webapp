@@ -19,7 +19,7 @@
 
 import * as SelfActionCreator from './creator/SelfActionCreator';
 import BackendError from './BackendError';
-import {APP_NAME, VERSION} from '../../config';
+import {APP_NAME} from '../../config';
 
 export function fetchSelf() {
   return function(dispatch, getState, {apiClient}) {
@@ -72,7 +72,7 @@ export function doSetConsent(consentType, value) {
   return function(dispatch, getState, {apiClient}) {
     dispatch(SelfActionCreator.startSetConsent());
     const consent = {
-      source: `${APP_NAME}_${VERSION}`,
+      source: `${APP_NAME} ${z.util.Environment.version(false)}`,
       type: consentType,
       value,
     };
