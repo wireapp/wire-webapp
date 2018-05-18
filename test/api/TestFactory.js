@@ -34,7 +34,7 @@ window.TestFactory = function(logger_level) {
   this.settings = {
     connection: {
       environment: 'test',
-      rest_url: 'http://localhost',
+      restUrl: 'http://localhost',
       websocket_url: 'wss://localhost',
     },
     logging_level: logger_level,

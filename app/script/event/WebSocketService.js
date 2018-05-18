@@ -82,7 +82,7 @@ z.event.WebSocketService = class WebSocketService {
     this.onNotification = onNotification;
 
     return new Promise((resolve, reject) => {
-      this.connectionUrl = `${this.client.web_socket_url}/await?access_token=${this.client.access_token}`;
+      this.connectionUrl = `${this.client.webSocketUrl}/await?access_token=${this.client.access_token}`;
       if (this.clientId) {
         this.connectionUrl = z.util.URLUtil.appendParameter(this.connectionUrl, `client=${this.clientId}`);
       }
@@ -99,7 +99,7 @@ z.event.WebSocketService = class WebSocketService {
       delete this.socket.URL;
 
       this.socket.onopen = () => {
-        this.logger.info(`Connected WebSocket to: ${this.client.web_socket_url}/await`);
+        this.logger.info(`Connected WebSocket to: ${this.client.webSocketUrl}/await`);
         this.pingIntervalId = window.setInterval(this.sendPing, WebSocketService.CONFIG.PING_INTERVAL);
         resolve();
       };
