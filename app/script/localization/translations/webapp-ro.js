@@ -205,12 +205,10 @@ z.string.ro.modalConversationRemoveAction = 'Șterge';
 z.string.ro.modalConversationRemoveHeadline = 'Șterge?';
 z.string.ro.modalConversationRemoveMessage = '{{user}} nu va mai putea trimite sau primi mesaje în această conversație.';
 
-
 z.string.ro.modalConversationTooManyMembersHeadline = 'Canalul este plin';
 
 z.string.ro.modalIntegrationUnavailableHeadline = 'Roboții nu sunt momentan disponibili';
 z.string.ro.modalIntegrationUnavailableMessage = 'Mulțumim că ești interesat de roboți. Acest serviciu este momentan suspendat în timp ce lucrăm la următoarea versiune. Fii pe fază.';
-
 
 z.string.ro.modalServiceUnavailableHeadline = 'Adăugarea serviciului nu este posibilă';
 z.string.ro.modalServiceUnavailableMessage = 'Acest serviciu este indisponibil momentan.';
@@ -309,7 +307,6 @@ z.string.ro.groupCreationPreferencesPlaceholder = 'Nume grup';
 z.string.ro.groupCreationParticipantsActionCreate = 'Gata';
 z.string.ro.groupCreationParticipantsHeader = 'Adaugă persoane';
 z.string.ro.groupCreationParticipantsPlaceholder = 'Caută după nume';
-
 
 z.string.ro.collectionShowAll = 'Arată toate {{number}}';
 z.string.ro.collectionSectionLinks = 'Legături';
@@ -516,7 +513,6 @@ z.string.ro.searchServiceConfirmButton = 'Adaugă serviciu';
 
 z.string.ro.searchListEveryoneParticipates = 'Toată lumea cu care\nești conectat este deja\nîn această conversație.';
 z.string.ro.searchListNoMatches = 'Nu s-a găsit nimic.\nÎncearcă să scrii un alt nume.';
-
 
 z.string.ro.uploadGoogleHeadline = 'Caută persoane\ncu care să vorbești.';
 z.string.ro.uploadGoogleMessage = 'Vom folosi datele tale de contact pentru a te conecta cu alții. Vom anonimiza toate informațiile și nu le vom împărtăși cu altcineva.';

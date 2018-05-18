@@ -194,12 +194,10 @@ z.string.es.modalConversationRemoveAction = 'Eliminar';
 z.string.es.modalConversationRemoveHeadline = '¿Quitar?';
 z.string.es.modalConversationRemoveMessage = '{{user}} no podrá enviar o recibir mensajes en esta conversación.';
 
-
 z.string.es.modalConversationTooManyMembersHeadline = 'Llamada llena';
 
 z.string.es.modalIntegrationUnavailableHeadline = 'Bots no disponibles por el momento';
 z.string.es.modalIntegrationUnavailableMessage = 'Gracias por su interés en los bots. El servicio está suspendido mientras trabajamos en la próxima versión.';
-
 
 z.string.es.modalSessionResetHeadline = 'La sesión ha sido restablecida';
 z.string.es.modalSessionResetMessage1 = 'Si no se resuelva el problema,';
@@ -283,7 +281,6 @@ z.string.es.conversationTweetAuthor = ' en Twitter';
 z.string.es.groupCreationPreferencesAction = 'Siguiente';
 z.string.es.groupCreationParticipantsActionCreate = 'Listo';
 z.string.es.groupCreationParticipantsPlaceholder = 'Buscar por nombre';
-
 
 z.string.es.collectionShowAll = 'Mostrar los {{number}}';
 z.string.es.collectionSectionLinks = 'Enlaces';
