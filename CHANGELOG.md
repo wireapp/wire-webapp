@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="2.8.4"></a>
+## [2.8.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.8.3...@wireapp/core@2.8.4) (2018-05-18)
+
+
+### Bug Fixes
+
+* **core:** Add label to ClientInfo ([#604](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/604)) ([bb76915](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/bb76915))
+
+
+
+
 <a name="2.8.3"></a>
 ## [2.8.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.8.2...@wireapp/core@2.8.3) (2018-05-18)
 
