@@ -23,6 +23,7 @@ interface ClientInfo {
   classification: ClientClassification;
   cookieLabel: string;
   model: string;
+  label?: string;
   location?: Location;
 }
 

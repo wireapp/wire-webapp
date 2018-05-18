@@ -106,6 +106,7 @@ export default class ClientService {
       newClient = {
         class: clientInfo.classification,
         cookie: clientInfo.cookieLabel,
+        label: clientInfo.label,
         lastkey: this.cryptographyService.cryptobox.serialize_prekey(
           this.cryptographyService.cryptobox.lastResortPreKey
         ),
