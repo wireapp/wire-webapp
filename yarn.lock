@@ -443,11 +443,11 @@
     ed2curve "0.2.1"
     libsodium-wrappers-sumo "0.7.3"
 
-"@wireapp/react-ui-kit@1.1.21":
-  version "1.1.21"
-  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-1.1.21.tgz#96b1fb31542fa2ab8faeb291e4ac39d0cd53f755"
+"@wireapp/react-ui-kit@1.1.22":
+  version "1.1.22"
+  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-1.1.22.tgz#748a64e97f7426321ec50562cedc7698fcd59660"
   dependencies:
-    bazinga64 "5.1.9"
+    bazinga64 "5.1.10"
     color "3.0.0"
     react "16.3.2"
     react-dom "16.3.2"
@@ -1591,6 +1591,10 @@ basic-auth@~2.0.0:
 batch@0.6.1:
   version "0.6.1"
   resolved "https://registry.yarnpkg.com/batch/-/batch-0.6.1.tgz#dc34314f4e679318093fc760272525f94bf25c16"
+
+bazinga64@5.1.10:
+  version "5.1.10"
+  resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.1.10.tgz#b24924c889ae07a10af3de6137e456fc97fab563"
 
 bazinga64@5.1.9:
   version "5.1.9"
