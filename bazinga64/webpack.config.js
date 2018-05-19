@@ -29,6 +29,7 @@ module.exports = {
       `${__dirname}/test/browser/index.js`,
     ],
   },
+  mode: 'production',
   output: {
     filename: '[name].bundle.js',
     library: pkg.name,
