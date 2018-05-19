@@ -46,5 +46,5 @@
     "test:node": "cross-env JASMINE_CONFIG_PATH=test/shared/support/jasmine.json jasmine"
   },
   "types": "dist/bazinga64.d.ts",
-  "version": "5.1.9"
+  "version": "5.1.10"
 }
