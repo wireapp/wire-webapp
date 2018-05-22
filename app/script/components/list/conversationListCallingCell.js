@@ -183,7 +183,7 @@ ko.components.register('conversation-list-calling-cell', {
       <div class="group-video__minimized-wrapper" data-bind="click: onMaximizeVideoGrid">
         <group-video-grid params="streams: videoStreams, ownStream: localVideoStream, minimized: true"></group-video-grid>
         <!-- ko if: showMaximize -->
-          <div class="group-video__minimized-wrapper__overlay">
+          <div class="group-video__minimized-wrapper__overlay" data-uie-name="do-maximize-call">
             <fullscreen-icon></fullscreen-icon>
           </div>
         <!-- /ko -->
