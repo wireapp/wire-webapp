@@ -91,6 +91,12 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
     this.local_media_type = ko.observable(z.media.MediaType.AUDIO);
 
     this.remote_media_streams = {
+      activeVideo: ko.pureComputed(() => {
+        // FIXME the media repository should release the memory of inactive video streams
+        // Right now, only the status is changed but we keep the stream in memory
+        // until the next page reload.
+        return this.remote_media_streams.video().filter(stream => stream.active);
+      }),
       audio: ko.observableArray([]),
       video: ko.observableArray([]),
     };

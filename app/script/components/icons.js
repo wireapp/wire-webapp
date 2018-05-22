@@ -123,6 +123,14 @@ ko.components.register('edit-icon', {
   `,
 });
 
+ko.components.register('fullscreen-icon', {
+  template: `
+  <svg width="16" height="16" viewBox="0 0 16 16">
+    <path d="M16 7V0H9v2h3.6L8 6.6 9.4 8 14 3.4V7h2zM0 9v7h7v-2H3.4L8 9.4 6.6 8 2 12.6V9H0z"></path>
+  </svg>
+  `,
+});
+
 ko.components.register('group-icon', {
   template: `
   <svg width="16" height="16" viewBox="0 0 16 16">

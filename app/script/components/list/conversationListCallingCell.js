@@ -26,12 +26,17 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
   constructor(params) {
     this.conversation = params.conversation;
     this.calling_repository = params.calling_repository;
+    this.mediaRepository = params.mediaRepository;
+    this.multitasking = params.multitasking;
     this.temporaryUserStyle = params.temporaryUserStyle;
 
     this.onJoinCall = () => {
       const mediaType = this.call().isRemoteVideoSend() ? z.media.MediaType.AUDIO_VIDEO : z.media.MediaType.AUDIO;
       amplify.publish(z.event.WebApp.CALL.STATE.JOIN, this.conversation.id, mediaType);
     };
+
+    this.videoStreams = this.mediaRepository.stream_handler.remote_media_streams.activeVideo;
+    this.localVideoStream = this.mediaRepository.stream_handler.localMediaStream;
 
     this.onLeaveCall = () => {
       amplify.publish(
@@ -56,6 +61,8 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
     this.onToggleVideo = () => {
       amplify.publish(z.event.WebApp.CALL.MEDIA.TOGGLE, this.conversation.id, z.media.MediaType.VIDEO);
     };
+
+    this.onMaximizeVideoGrid = () => this.multitasking.isMinimized(false);
 
     this.users = ko.pureComputed(() => this.conversation.participating_user_ets());
     this.call = ko.pureComputed(() => this.conversation.call());
@@ -129,7 +136,8 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
 
     this.showParticipants = ko.observable(false);
 
-    this.showVideoPreview = ko.observable(false);
+    this.showVideoPreview = ko.pureComputed(() => this.multitasking.isMinimized() || !this.callIsConnected());
+    this.showMaximize = ko.pureComputed(() => this.multitasking.isMinimized() && this.callIsConnected());
   }
 };
 
@@ -172,7 +180,14 @@ ko.components.register('conversation-list-calling-cell', {
     </div>
 
     <!-- ko if: showVideoPreview -->
-      <div>video</div>
+      <div class="group-video__minimized-wrapper" data-bind="click: onMaximizeVideoGrid">
+        <group-video-grid params="streams: videoStreams, ownStream: localVideoStream, minimized: true"></group-video-grid>
+        <!-- ko if: showMaximize -->
+          <div class="group-video__minimized-wrapper__overlay">
+            <fullscreen-icon></fullscreen-icon>
+          </div>
+        <!-- /ko -->
+      </div>
     <!-- /ko -->
 
     <div class="conversation-list-calling-cell-controls">
