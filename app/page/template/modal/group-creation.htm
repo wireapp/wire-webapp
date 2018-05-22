@@ -36,7 +36,7 @@
                data-uie-name="enter-group-name">
         <div class="group-creation-error" data-bind="text: nameError, visible: nameError().length" data-uie-name="error-group-name"></div>
         <!-- ko if: isTeam -->
-          <div class="group-size-info" data-bind="l10n_text: z.string.groupSizeInfo"></div>
+          <div class="group-size-info" data-bind="text: groupSizeInfoText"></div>
           <guest-mode-toggle params="isChecked: isGuestRoom, onToggle: clickOnToggleGuestMode, extendedInfo: true"></guest-mode-toggle>
         <!-- /ko -->
       <!-- /ko -->

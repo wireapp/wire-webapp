@@ -44,6 +44,9 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
     this.isTeam = this.teamRepository.isTeam;
     this.isTeamOnly = this.panelViewModel.isTeamOnly;
     this.showIntegrations = this.panelViewModel.showIntegrations;
+    this.groupSizeInfoText = z.l10n.text(z.string.groupSizeInfo, {
+      count: z.conversation.ConversationRepository.CONFIG.GROUP.MAX_SIZE,
+    });
 
     this.serviceParticipants = ko.observableArray();
     this.userParticipants = ko.observableArray();
