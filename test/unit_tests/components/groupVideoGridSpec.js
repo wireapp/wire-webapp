@@ -26,7 +26,7 @@ describe('z.component.GroupVideoGrid', () => {
   const initialGrid = [0, 0, 0, 0];
 
   beforeEach(() => {
-    groupVideoGrid = new z.components.GroupVideoGrid({streams: ko.observableArray([])});
+    groupVideoGrid = new z.components.GroupVideoGrid({ownStream: ko.observable(null), streams: ko.observableArray([])});
   });
 
   describe('computeGrid', () => {
@@ -110,6 +110,36 @@ describe('z.component.GroupVideoGrid', () => {
           const result = groupVideoGrid.computeGrid(grid, participants);
           expect(result).toEqual(expected, scenario);
         });
+      });
+    });
+  });
+
+  describe('streams observable', () => {
+    it("doesn't contain the user's own video if there is only a single remote stream", () => {
+      const ownVideo = {own: true};
+      const removeVideos = [{}];
+      groupVideoGrid = new z.components.GroupVideoGrid({
+        ownStream: ko.observable(ownVideo),
+        streams: ko.observableArray(removeVideos),
+      });
+
+      expect(groupVideoGrid.streams()).not.toContain(ownVideo);
+      expect(groupVideoGrid.thumbnailStream()).toBe(ownVideo);
+    });
+
+    it("contains the user's own video if there are more or less than one other participant", () => {
+      const ownVideo = {own: true};
+      const nbOfRemoteStreams = [0, 2, 3];
+
+      nbOfRemoteStreams.forEach(nbOfStreams => {
+        const remoteStreams = new Array(nbOfStreams).fill({remote: true});
+        groupVideoGrid = new z.components.GroupVideoGrid({
+          ownStream: ko.observable(ownVideo),
+          streams: ko.observableArray(remoteStreams),
+        });
+
+        expect(groupVideoGrid.streams()).toContain(ownVideo);
+        expect(groupVideoGrid.thumbnailStream()).toBe(null);
       });
     });
   });

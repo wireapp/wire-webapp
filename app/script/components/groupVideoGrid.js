@@ -23,11 +23,59 @@ window.z = window.z || {};
 window.z.components = z.components || {};
 
 z.components.GroupVideoGrid = class GroupVideoGrid {
+  static get CONFIG() {
+    return {
+      VIDEO_ELEMENT_SIZE: {
+        FOURTH_SCREEN: 'fourth_screen',
+        FULL_SCREEN: 'full_screen',
+        HALF_SCREEN: 'half_screen',
+        HIDDEN: 'hidden',
+      },
+    };
+  }
+
   constructor(params) {
     this.grid = ko.observableArray([0, 0, 0, 0]);
-    this.streams = ko.observableArray([]);
-    params.streams.subscribe(this.updateGrid.bind(this));
-    this.updateGrid(params.streams());
+    this.thumbnailStream = ko.observable(null);
+
+    this.streams = ko.pureComputed(() => {
+      const remoteStreams = params.streams();
+      const ownStream = params.ownStream();
+
+      if (remoteStreams.length === 1) {
+        this.thumbnailStream(ownStream);
+        return remoteStreams;
+      }
+      this.thumbnailStream(null);
+      return ownStream ? remoteStreams.concat(ownStream) : remoteStreams;
+    });
+
+    this.streams.subscribe(this.updateGrid.bind(this));
+    this.updateGrid(this.streams());
+
+    this.minimized = params.minimized;
+  }
+
+  scaleVideos(elements) {
+    elements
+      .filter(element => !!element.classList)
+      .filter(element => element.classList.contains('group-video-grid__element'))
+      .forEach(element => {
+        const containerRect = element.getBoundingClientRect();
+        const containerRatio = containerRect.width / containerRect.height;
+        element.querySelector('video').addEventListener('loadedmetadata', setScale);
+
+        function setScale(event) {
+          const video = event.target;
+          const videoRatio = video.videoWidth / video.videoHeight;
+          if (videoRatio < containerRatio) {
+            video.classList.add('group-video-grid__element-video--fill-width');
+          } else {
+            video.classList.add('group-video-grid__element-video--fill-height');
+          }
+          video.removeEventListener(event.type, setScale);
+        }
+      });
   }
 
   /**
@@ -73,9 +121,7 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
   }
 
   updateGrid(streams) {
-    streams = streams.filter(stream => !!stream);
     const newGrid = this.computeGrid(this.grid(), streams);
-    this.streams(streams);
     this.grid(newGrid);
   }
 
@@ -83,22 +129,45 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
     return this.streams().find(stream => stream.id === id);
   }
 
-  getClassNameForVideo(index) {
-    const baseClass = `video-grid__element${index}`;
+  getSizeForVideo(index) {
     const grid = this.grid();
-    let extraClass = '';
+    const SIZES = GroupVideoGrid.CONFIG.VIDEO_ELEMENT_SIZE;
     if (grid[index] === 0) {
-      return `${baseClass} video-grid__element--empty`;
+      return SIZES.EMPTY;
     }
     const isAlone = grid.every((value, i) => i === index || value === 0);
     const hasVerticalNeighbor = index % 2 === 0 ? grid[index + 1] !== 0 : grid[index - 1] !== 0;
 
     if (isAlone) {
-      extraClass += ' video-grid__element--full-size';
+      return SIZES.FULL_SCREEN;
     } else if (!hasVerticalNeighbor) {
-      extraClass += ' video-grid__element--full-height';
+      return SIZES.HALF_SCREEN;
     }
-    return `${baseClass} ${extraClass}`;
+    return SIZES.FOURTH_SCREEN;
+  }
+
+  getClassNameForVideo(index) {
+    const size = this.getSizeForVideo(index);
+    const SIZES = GroupVideoGrid.CONFIG.VIDEO_ELEMENT_SIZE;
+    const extraClasses = {
+      [SIZES.EMPTY]: 'group-video-grid__element--empty',
+      [SIZES.FULL_SCREEN]: 'group-video-grid__element--full-size',
+      [SIZES.HALF_SCREEN]: 'group-video-grid__element--full-height',
+      [SIZES.FOURTH_SCREEN]: '',
+    };
+    return `group-video-grid__element${index} ${extraClasses[size]}`;
+  }
+
+  getUIEValueForVideo(index) {
+    const size = this.getSizeForVideo(index);
+    const SIZES = GroupVideoGrid.CONFIG.VIDEO_ELEMENT_SIZE;
+    const extraClasses = {
+      [SIZES.EMPTY]: '',
+      [SIZES.FULL_SCREEN]: 'full',
+      [SIZES.HALF_SCREEN]: 'half',
+      [SIZES.FOURTH_SCREEN]: 'fourth',
+    };
+    return extraClasses[size];
   }
 };
 
@@ -108,12 +177,18 @@ function arrayDiff(array1, array2) {
 
 ko.components.register('group-video-grid', {
   template: `
-    <div class="video-grid" data-bind="foreach: { data: grid, as: 'streamId' }">
-      <!-- ko if: streamId !== 0 -->
-        <div class="video-grid__element" data-bind="css: $parent.getClassNameForVideo($index()), attr: { 'data-uie-name': 'grid-video-' + $index() }">
-          <video autoplay class="video-grid__element-video" data-bind="sourceStream: $parent.getParticipantStream(streamId), muteMediaElement: $parent.getParticipantStream(streamId)">
-          </video>
-        </div>
+    <div class="group-video">
+      <div class="group-video-grid" data-bind="foreach: { data: grid, as: 'streamId', afterRender: scaleVideos}">
+        <!-- ko if: streamId !== 0 -->
+          <div class="group-video-grid__element" data-bind="css: $parent.getClassNameForVideo($index()), attr: { 'data-uie-name': 'item-grid', 'data-uie-value': $parent.getUIEValueForVideo($index()) }">
+            <video autoplay class="group-video-grid__element-video" data-bind="sourceStream: $parent.getParticipantStream(streamId), muteMediaElement: $parent.getParticipantStream(streamId)">
+            </video>
+          </div>
+        <!-- /ko -->
+      </div>
+      <!-- ko if: thumbnailStream() -->
+        <video autoplay class="group-video__thumbnail" data-uie-name="self-video-thumbnail" data-bind="css: {'group-video__thumbnail--minimized': minimized}, sourceStream: thumbnailStream(), muteMediaElement: thumbnailStream()">
+        </video>
       <!-- /ko -->
     </div>
   `,

@@ -76,22 +76,3 @@
 .conversation-title-bar-name-label {
   .label-bold-xs;
 }
-
-@keyframes pulsate-animation {
-  to {
-    opacity: 0.32;
-  }
-}
-
-.conversation-title-bar-icon-status {
-  color: @w-red;
-  cursor: default;
-}
-
-.conversation-title-bar-icon-status::before {
-  animation: pulsate-animation;
-  animation-direction: alternate;
-  animation-duration: @animation-timing-slower * 2;
-  animation-iteration-count: infinite;
-  animation-timing-function: @ease-in-cubic;
-}
