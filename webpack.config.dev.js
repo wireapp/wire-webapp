@@ -22,8 +22,9 @@ const ip = require('ip');
 const path = require('path');
 const webpack = require('webpack');
 
-const srcScript = 'app/script/auth/';
+const localIP = ip.address();
 const serve = 'app/';
+const srcScript = 'app/script/auth/';
 
 module.exports = Object.assign(commonConfig, {
   devServer: {
@@ -38,9 +39,9 @@ module.exports = Object.assign(commonConfig, {
     overlay: true,
     port: '8080',
     proxy: {
-      '/app': {pathRewrite: {'^/app': ''}, target: `http://${ip.address()}:8888`},
-      '/audio': `http://${ip.address()}:8888`,
-      '/style': `http://${ip.address()}:8888`,
+      '/app': {pathRewrite: {'^/app': ''}, target: `http://${localIP}:8888`},
+      '/audio': `http://${localIP}:8888`,
+      '/style': `http://${localIP}:8888`,
     },
     public: 'localhost:8080',
     publicPath: '/',
