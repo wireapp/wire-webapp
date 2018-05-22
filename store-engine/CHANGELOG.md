@@ -3,42 +3,32 @@
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
 <a name="0.11.14"></a>
+
 ## [0.11.14](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/compare/@wireapp/store-engine@0.11.13...@wireapp/store-engine@0.11.14) (2018-05-22)
-
-
-
 
 **Note:** Version bump only for package @wireapp/store-engine
 
 <a name="0.11.13"></a>
+
 ## [0.11.13](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/compare/@wireapp/store-engine@0.11.12...@wireapp/store-engine@0.11.13) (2018-05-19)
-
-
-
 
 **Note:** Version bump only for package @wireapp/store-engine
 
 <a name="0.11.12"></a>
+
 ## [0.11.12](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/compare/@wireapp/store-engine@0.11.11...@wireapp/store-engine@0.11.12) (2018-05-18)
-
-
-
 
 **Note:** Version bump only for package @wireapp/store-engine
 
 <a name="0.11.11"></a>
+
 ## [0.11.11](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/compare/@wireapp/store-engine@0.11.10...@wireapp/store-engine@0.11.11) (2018-05-17)
-
-
-
 
 **Note:** Version bump only for package @wireapp/store-engine
 
 <a name="0.11.10"></a>
+
 ## [0.11.10](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/compare/@wireapp/store-engine@0.11.9...@wireapp/store-engine@0.11.10) (2018-05-16)
-
-
-
 
 **Note:** Version bump only for package @wireapp/store-engine
 
