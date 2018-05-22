@@ -3,91 +3,68 @@
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
 <a name="2.8.7"></a>
+
 ## [2.8.7](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.8.6...@wireapp/core@2.8.7) (2018-05-22)
-
-
-
 
 **Note:** Version bump only for package @wireapp/core
 
 <a name="2.8.6"></a>
-## [2.8.6](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.8.5...@wireapp/core@2.8.6) (2018-05-22)
 
+## [2.8.6](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.8.5...@wireapp/core@2.8.6) (2018-05-22)
 
 ### Bug Fixes
 
 * Public initClient ([#612](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/612)) ([74672e8](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/74672e8))
 
-
-
-
 <a name="2.8.5"></a>
+
 ## [2.8.5](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.8.4...@wireapp/core@2.8.5) (2018-05-19)
-
-
-
 
 **Note:** Version bump only for package @wireapp/core
 
 <a name="2.8.4"></a>
-## [2.8.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.8.3...@wireapp/core@2.8.4) (2018-05-18)
 
+## [2.8.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.8.3...@wireapp/core@2.8.4) (2018-05-18)
 
 ### Bug Fixes
 
 * **core:** Add label to ClientInfo ([#604](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/604)) ([bb76915](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/bb76915))
 
-
-
-
 <a name="2.8.3"></a>
+
 ## [2.8.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.8.2...@wireapp/core@2.8.3) (2018-05-18)
-
-
-
 
 **Note:** Version bump only for package @wireapp/core
 
 <a name="2.8.2"></a>
+
 ## [2.8.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.8.1...@wireapp/core@2.8.2) (2018-05-18)
-
-
-
 
 **Note:** Version bump only for package @wireapp/core
 
 <a name="2.8.1"></a>
+
 ## [2.8.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.8.0...@wireapp/core@2.8.1) (2018-05-17)
-
-
-
 
 **Note:** Version bump only for package @wireapp/core
 
 <a name="2.8.0"></a>
-# [2.8.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.7.4...@wireapp/core@2.8.0) (2018-05-16)
 
+# [2.8.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.7.4...@wireapp/core@2.8.0) (2018-05-16)
 
 ### Features
 
 * **core:** Status Bot ([#601](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/601)) ([3b62214](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/3b62214))
 
-
-
-
 <a name="2.7.4"></a>
+
 ## [2.7.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.7.3...@wireapp/core@2.7.4) (2018-05-16)
-
-
-
 
 **Note:** Version bump only for package @wireapp/core
 
 <a name="2.7.3"></a>
+
 ## [2.7.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.7.2...@wireapp/core@2.7.3) (2018-05-15)
-
-
-
 
 **Note:** Version bump only for package @wireapp/core
 
