@@ -195,7 +195,7 @@ ko.components.register('conversation-list-calling-cell', {
       </div>
 
       <div class="conversation-list-calling-cell-controls-right">
-        <!-- ko if: true || showParticipantsButton -->
+        <!-- ko if: showParticipantsButton -->
           <div class="call-ui__button call-ui__button--participants" data-bind="click: onParticipantsButtonClick, css: {'call-ui__button--active': showParticipants()}" data-uie-name="do-toggle-participants">
             <span data-bind="text: participantsButtonLabel"></span><chevron-icon></chevron-icon>
           </div>
