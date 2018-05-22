@@ -36,6 +36,14 @@ z.telemetry.calling.CallLogger = class CallLogger {
     };
   }
 
+  static get REGEXES() {
+    return {
+      IPV4: /(([0-1]?[0-9]{1,2}\.)|(2[0-4][0-9]\.)|(25[0-5]\.)){3}(([0-1]?[0-9]{1,2})|(2[0-4][0-9])|(25[0-5]))/gm,
+      IPV6: /(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))/gm,
+      UUID: /([0-9a-f]{8})-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gm,
+    };
+  }
+
   constructor(name, options, messageLog) {
     this.logger = new z.util.Logger(name, options);
     this.levels = this.logger.levels;
@@ -60,20 +68,18 @@ z.telemetry.calling.CallLogger = class CallLogger {
   }
 
   obfuscateIp(ip) {
-    const ipVersion4Regex = /(([0-1]?[0-9]{1,2}\.)|(2[0-4][0-9]\.)|(25[0-5]\.)){3}(([0-1]?[0-9]{1,2})|(2[0-4][0-9])|(25[0-5]))/;
-    const ipVersion6Regex = /(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))/;
-
     if (this._isSoftObfuscationMode()) {
       // IPv4
-      const isIpVersion4 = ipVersion4Regex.test(ip);
+      const isIpVersion4 = CallLogger.REGEXES.IPV4.test(ip);
       if (isIpVersion4) {
         ip = ip.split('.');
         ip[ip.length - 1] = CallLogger.OBFUSCATED.IPV4;
+        ip[ip.length - 2] = CallLogger.OBFUSCATED.IPV4;
         return ip.join('.');
       }
 
       // IPv6
-      const isIpVersion6 = ipVersion6Regex.test(ip);
+      const isIpVersion6 = CallLogger.REGEXES.IPV6.test(ip);
       if (isIpVersion6) {
         ip = ip.split(':').slice(0, 3);
         return [...ip, CallLogger.OBFUSCATED.IPV6].join(':');
@@ -81,7 +87,7 @@ z.telemetry.calling.CallLogger = class CallLogger {
     }
 
     if (this._isHardObfuscationMode()) {
-      const isIpVersion4 = ipVersion4Regex.test(ip);
+      const isIpVersion4 = CallLogger.REGEXES.IPV4.test(ip);
       if (isIpVersion4) {
         // Extend the 4 bytes seed to 16 bytes using XOR encryption with static keys
         const originalSeedLength = seed.length;
@@ -105,7 +111,7 @@ z.telemetry.calling.CallLogger = class CallLogger {
           .join('.');
       }
 
-      const isIpVersion6 = ipVersion6Regex.test(ip);
+      const isIpVersion6 = CallLogger.REGEXES.IPV6.test(ip);
       if (isIpVersion6) {
         const fakeIp = CryptoJS.MD5(seed).toString();
         return fakeIp.match(/.{1,4}/g).join(':');
@@ -116,6 +122,10 @@ z.telemetry.calling.CallLogger = class CallLogger {
   }
 
   obfuscateSdp(sdpMessage) {
+    if (!window.sdpTransform) {
+      return '[Unknown]';
+    }
+
     const decodedSdpMessage = window.sdpTransform.parse(sdpMessage);
 
     for (const index in decodedSdpMessage.media) {
@@ -137,23 +147,6 @@ z.telemetry.calling.CallLogger = class CallLogger {
         for (const indexInvalid in decodedSdpMessage.media[index].invalid) {
           if (decodedSdpMessage.media[index].invalid[indexInvalid].value.startsWith('x-KASEv1')) {
             decodedSdpMessage.media[index].invalid[indexInvalid].value = CallLogger.OBFUSCATED.KASE_PUBLIC_KEY;
-          }
-        }
-      }
-
-      // Prevent recovery of original IPs
-      // Remove bytes from the IP, concatenate it with the conversation id and the current date of the week then hash it
-      // and use that hash to derive a deterministic IP from it
-      const isCandidateDefined = !!decodedSdpMessage.media[index].candidates;
-      if (isCandidateDefined) {
-        for (const indexCandidate in decodedSdpMessage.media[index].candidates) {
-          const obfuscatedCandidateIp = this.obfuscateIp(decodedSdpMessage.media[index].candidates[indexCandidate].ip);
-          decodedSdpMessage.media[index].candidates[indexCandidate].ip = obfuscatedCandidateIp;
-
-          const isRaddrDefined = decodedSdpMessage.media[index].candidates[indexCandidate].raddr;
-          if (isRaddrDefined) {
-            const obfuscatedRaddrIp = this.obfuscateIp(decodedSdpMessage.media[index].candidates[indexCandidate].raddr);
-            decodedSdpMessage.media[index].candidates[indexCandidate].raddr = obfuscatedRaddrIp;
           }
         }
       }
@@ -187,7 +180,9 @@ z.telemetry.calling.CallLogger = class CallLogger {
     const shouldLogToMemory = logLevel !== CallLogger.LOG_LEVEL.OFF;
     if (shouldLogToMemory) {
       const logType = this.getDebugType(logLevel);
-      const logMessage = `[${new Date().toISOString()}] [${this.name}] (${logType}) ${obfuscatedMessage}`;
+      const logMessage = this.safeGuard(
+        `[${new Date().toISOString()}] [${this.name}] (${logType}) ${obfuscatedMessage}`
+      );
       this.messageLog.push(logMessage);
     }
   }
@@ -243,5 +238,22 @@ z.telemetry.calling.CallLogger = class CallLogger {
     const logMessage = hasMultipleArgs ? secondArgument : firstArgument;
     this.logToMemory(logLevel, logMessage);
     this.logger.log(...args);
+  }
+
+  safeGuard(message) {
+    // Ensure UUID are properly obfuscated
+    message = message.replace(CallLogger.REGEXES.UUID, match => {
+      return this.obfuscate(match);
+    });
+
+    // Ensure IP addresses are obfuscated
+    message = message.replace(CallLogger.REGEXES.IPV4, match => {
+      return this.obfuscateIp(match);
+    });
+    message = message.replace(CallLogger.REGEXES.IPV6, match => {
+      return this.obfuscateIp(match);
+    });
+
+    return message;
   }
 };
