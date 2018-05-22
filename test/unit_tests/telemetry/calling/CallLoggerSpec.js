@@ -54,7 +54,7 @@ describe('z.telemetry.calling.CallLogger', () => {
     expect(callLogger.safeGuard('s-cfbb-4c33-a759-a')).toBe('s-cfbb-4c33-a759-a');
   });
 
-  fit('properly obfuscate a SDP message', () => {
+  it('properly obfuscate a SDP message', () => {
     const originalSdp = `v=0
 o=- 4162068053823794076 2 IN IP4 127.0.0.1
 s=-
