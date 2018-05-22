@@ -40,7 +40,7 @@
             </div>
 
             <div class="video-controls__button"
-              data-bind="click: clickedOnMuteAudio, css: {'video-controls__button--active': !selfStreamState.audioSend()}"
+              data-bind="click: clickedOnMuteAudio, css: {'video-controls__button--active': !selfStreamState.audioSend()}, attr: {'data-uie-value': selfStreamState.audioSend() ? 'inactive' : 'active'}"
               data-uie-name="do-call-controls-video-call-mute">
               <micoff-icon></micoff-icon>
               <div class="video-controls__button__label" data-bind="l10n_text: z.string.videoCallOverlayMute"></div>
@@ -48,7 +48,7 @@
 
             <!-- ko if: showToggleVideo() -->
               <div class="video-controls__button"
-              data-bind="click: clickedOnStopVideo, css: {'video-controls__button--active': selfStreamState.videoSend()}"
+              data-bind="click: clickedOnStopVideo, css: {'video-controls__button--active': selfStreamState.videoSend()}, attr: {'data-uie-value': selfStreamState.videoSend() ? 'active' : 'inactive'}"
               data-uie-name="do-call-controls-toggle-video">
                 <camera-icon></camera-icon>
                 <div class="video-controls__button__label" data-bind="l10n_text: z.string.videoCallOverlayVideo"></div>
