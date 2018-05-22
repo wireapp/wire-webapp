@@ -121,7 +121,7 @@ class Account extends EventEmitter {
       });
   }
 
-  private initClient(
+  public initClient(
     loginData: LoginData,
     clientInfo?: ClientInfo
   ): Promise<{isNewClient: boolean; localClient: RegisteredClient}> {
