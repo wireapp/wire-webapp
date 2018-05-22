@@ -30,21 +30,23 @@ module.exports = Object.assign(commonConfig, {
     compress: true,
     contentBase: path.resolve(__dirname, serve),
     historyApiFallback: true,
+    host: '0.0.0.0',
     hotOnly: true,
     open: true,
     openPage: 'page/auth.html',
     overlay: true,
+    port: '8080',
     proxy: {
-      '/app': {pathRewrite: {'^/app': ''}, target: 'http://localhost:8888'},
-      '/audio': 'http://localhost:8888',
-      '/style': 'http://localhost:8888',
+      '/app': {pathRewrite: {'^/app': ''}, target: 'http://192.168.10.224:8888'},
+      '/audio': 'http://192.168.10.224:8888',
+      '/style': 'http://192.168.10.224:8888',
     },
+    public: 'localhost:8080',
     publicPath: '/',
     stats: {
       chunks: false,
     },
   },
-
   entry: Object.assign(commonConfig.entry, {
     script: ['react-hot-loader/patch', path.resolve(__dirname, srcScript, 'main.js')],
   }),
