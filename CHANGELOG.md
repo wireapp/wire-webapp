@@ -1,6 +1,15 @@
 # Change Log
 
-All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+<a name="0.10.5"></a>
+## [0.10.5](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@0.10.4...@wireapp/api-client@0.10.5) (2018-05-22)
+
+
+
+
+**Note:** Version bump only for package @wireapp/api-client
 
 <a name="0.10.4"></a>
 
