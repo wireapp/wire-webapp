@@ -193,12 +193,10 @@ z.string.tr.modalConversationRemoveAction = 'Çıkart';
 z.string.tr.modalConversationRemoveHeadline = 'Çıkar?';
 z.string.tr.modalConversationRemoveMessage = '{{user}} bu konuşmaya mesaj gönderemeyecek ve bu konuşmadan mesaj alamayacak.';
 
-
 z.string.tr.modalConversationTooManyMembersHeadline = 'Dolup taşmış';
 
 z.string.tr.modalIntegrationUnavailableHeadline = 'Botlar şuanda kullanılabilir değil';
 z.string.tr.modalIntegrationUnavailableMessage = 'Botlara ilginiz için teşekkür ederiz. Bir bir sonraki sürüm üzerinde çalışırken hizmet askıya alınmış. Beklemede kalın.';
-
 
 z.string.tr.modalSessionResetHeadline = 'Oturum sıfırlandı';
 z.string.tr.modalSessionResetMessage1 = 'Eğer sorun çözülmemişse,';
@@ -282,7 +280,6 @@ z.string.tr.conversationTweetAuthor = ' Twitter’da';
 z.string.tr.groupCreationPreferencesAction = 'İleri';
 z.string.tr.groupCreationParticipantsActionCreate = 'Yapıldı';
 z.string.tr.groupCreationParticipantsPlaceholder = 'İsme göre ara';
-
 
 z.string.tr.collectionShowAll = '{{number}}’nun tümünü göster';
 z.string.tr.collectionSectionLinks = 'Bağlantılar';

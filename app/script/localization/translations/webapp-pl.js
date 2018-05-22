@@ -210,7 +210,6 @@ z.string.pl.modalConversationTooManyMembersHeadline = 'Zbyt wielu uczestników r
 z.string.pl.modalIntegrationUnavailableHeadline = 'Boty są obecnie niedostępne';
 z.string.pl.modalIntegrationUnavailableMessage = 'Dziękujemy za zainteresowanie naszymi botami. Usługa jest obecnie zawieszona, ponieważ pracujemy nad następną wersją. Bądź na bieżąco.';
 
-
 z.string.pl.modalSessionResetHeadline = 'Sesja została zresetowana';
 z.string.pl.modalSessionResetMessage1 = 'Jeśli problem nie zostanie rozwiązany,';
 z.string.pl.modalSessionResetMessageLink = 'kontakt';
@@ -293,7 +292,6 @@ z.string.pl.conversationTweetAuthor = ' na Twitterze';
 z.string.pl.groupCreationPreferencesAction = 'Dalej';
 z.string.pl.groupCreationParticipantsActionCreate = 'Zakończono';
 z.string.pl.groupCreationParticipantsPlaceholder = 'Szukaj według nazwy';
-
 
 z.string.pl.collectionShowAll = 'Pokaż wszystkie {{number}}';
 z.string.pl.collectionSectionLinks = 'Linki';

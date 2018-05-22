@@ -191,12 +191,10 @@ z.string.sk.modalConversationRemoveAction = 'Odstrániť';
 z.string.sk.modalConversationRemoveHeadline = 'Odstrániť?';
 z.string.sk.modalConversationRemoveMessage = '{{user}} nebude môcť odosielať ani prijímať správy v tomto rozhovore.';
 
-
 z.string.sk.modalConversationTooManyMembersHeadline = 'Priveľa účastníkov';
 
 z.string.sk.modalIntegrationUnavailableHeadline = 'Boti sú momentálne nedostupní';
 z.string.sk.modalIntegrationUnavailableMessage = 'Ďakujeme o Váš záujem o Botov. Služba je momentálne pozastavená kvôli práci na novej verzii.';
-
 
 z.string.sk.modalSessionResetHeadline = 'Relácia bola obnovená';
 z.string.sk.modalSessionResetMessage1 = 'Ak problém nebol vyriešený,';
@@ -278,7 +276,6 @@ z.string.sk.conversationSomeone = 'Niekto';
 z.string.sk.conversationTweetAuthor = ' na Twitteri';
 
 z.string.sk.groupCreationParticipantsPlaceholder = 'Vyhľadať podľa mena';
-
 
 z.string.sk.collectionShowAll = 'Zobraziť všetky {{number}}';
 z.string.sk.collectionSectionLinks = 'Odkazy';
@@ -477,7 +474,6 @@ z.string.sk.searchInviteShare = 'Zdieľať kontakty';
 
 z.string.sk.searchListEveryoneParticipates = 'Všetci pripojení sú už v tomto rozhovore.';
 z.string.sk.searchListNoMatches = 'Žiadne výsledky. Skúste zadať iné meno.';
-
 
 z.string.sk.uploadGoogleHeadline = 'Nájsť ľudí\npre rozhovor.';
 z.string.sk.uploadGoogleMessage = 'Vaše údaje o kontaktoch používame na pripojenie k iným užívateľom. Všetky informácie anonymizujeme a nezdieľame ich s nikým iným.';

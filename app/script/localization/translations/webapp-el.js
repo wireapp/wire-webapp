@@ -208,7 +208,6 @@ z.string.el.modalIntegrationUnavailableHeadline = 'Προσωρινά δεν ε�
 
 z.string.el.modalPictureFileFormatMessage = 'Παρακαλώ επιλέξτε ένα αρχείο PNG ή JPEG.';
 
-
 z.string.el.modalSessionResetHeadline = 'Η περίοδος λειτουργίας σύνδεσης έχει επαναφερθεί';
 z.string.el.modalSessionResetMessage1 = 'Εάν το πρόβλημα δεν επιλυθεί,';
 z.string.el.modalSessionResetMessageLink = 'επαφή';
