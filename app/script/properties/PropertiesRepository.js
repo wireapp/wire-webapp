@@ -57,6 +57,7 @@ z.properties.PropertiesRepository = class PropertiesRepository {
           amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
             action: () => {
               this.savePreference(z.properties.PROPERTIES_TYPE.PRIVACY, true);
+              amplify.publish(z.event.WebApp.PROPERTIES.UPDATED, this.properties);
               resolve();
             },
             preventClose: true,
