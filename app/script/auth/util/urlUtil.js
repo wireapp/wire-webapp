@@ -17,17 +17,26 @@
  *
  */
 
-export function pathWithParams(path, additionalParams) {
+import EXTERNAL_ROUTE from '../externalRoute';
+
+export function pathWithParams(path, additionalParams, excludeParams = []) {
   const searchParams = window.location.search
     .replace(/^\?/, '')
     .split('&')
-    .filter(searchParam => searchParam);
+    .filter(searchParam => {
+      const paramName = searchParam.split('=')[0];
+      return !!searchParam && !excludeParams.includes(paramName);
+    });
 
   if (additionalParams) {
     searchParams.push(additionalParams);
   }
   const joinedParams = searchParams.join('&');
   return `${path}${joinedParams.length ? `?${joinedParams}` : ''}`;
+}
+
+export function getAppPath() {
+  return pathWithParams(EXTERNAL_ROUTE.WEBAPP, undefined, ['reason']);
 }
 
 export function getURLParameter(parameterName) {
