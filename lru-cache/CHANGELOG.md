@@ -1,6 +1,15 @@
 # Change Log
 
-All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+<a name="2.1.11"></a>
+## [2.1.11](https://github.com/wireapp/wire-web-packages/tree/master/packages/lru-cache/compare/@wireapp/lru-cache@2.1.10...@wireapp/lru-cache@2.1.11) (2018-05-22)
+
+
+
+
+**Note:** Version bump only for package @wireapp/lru-cache
 
 <a name="2.1.10"></a>
 

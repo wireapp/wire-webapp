@@ -1,6 +1,15 @@
 # Change Log
 
-All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+<a name="3.0.32"></a>
+## [3.0.32](https://github.com/wireapp/wire-web-packages/tree/master/packages/cbor/compare/@wireapp/cbor@3.0.31...@wireapp/cbor@3.0.32) (2018-05-22)
+
+
+
+
+**Note:** Version bump only for package @wireapp/cbor
 
 <a name="3.0.31"></a>
 
