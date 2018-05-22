@@ -67,6 +67,14 @@ ko.components.register('check-icon', {
   `,
 });
 
+ko.components.register('chevron-icon', {
+  template: `
+  <svg width="7" height="4" viewBox="0 0 7 4">
+    <path d="M3.65 3.65L6.44.85A.5.5 0 0 0 6.09 0H.5a.5.5 0 0 0-.35.85l2.79 2.8c.2.2.51.2.7 0z"></path>
+  </svg>
+  `,
+});
+
 ko.components.register('close-icon', {
   template: `
   <svg width="14" height="14" viewBox="0 0 14 14">

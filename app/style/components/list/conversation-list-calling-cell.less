@@ -60,23 +60,28 @@
       padding: 0 8px;
       font-weight: @font-weight-regular;
 
-      &::after {
-        display: inline-block;
-        border: 4px solid;
-        margin-bottom: -2px;
+      chevron-icon {
         margin-left: 8px;
-        border-color: currentcolor transparent transparent;
-        content: '';
+        transition: transform @animation-timing-fast ease-in-out;
+        svg path {
+          fill: currentcolor;
+        }
       }
     }
 
-    &--active&--participants::after {
-      margin-bottom: 2px;
-      border-color: transparent transparent currentcolor;
+    &--active&--participants {
+      chevron-icon {
+        transform: rotate(-180deg);
+      }
     }
 
     &--large {
       width: 64px;
+    }
+
+    &--uppercase {
+      padding: 0 8px;
+      text-transform: uppercase;
     }
 
     &--green,
@@ -112,10 +117,6 @@
       content: '';
     }
 
-    participant-item:first-of-type {
-      margin-top: 4px;
-    }
-
     .participant-item {
       height: 40px;
       fill: @graphite-dark;
@@ -132,6 +133,10 @@
             line-height: 16px;
           }
         }
+      }
+
+      .availability-state-icon {
+        display: none;
       }
 
       verified-icon svg,
@@ -163,7 +168,7 @@
 
 hangup-icon.small-icon {
   > svg {
-    max-width: 15px;
+    max-width: 17px;
   }
 }
 
@@ -198,6 +203,9 @@ conversation-list-calling-cell:first-of-type {
   &::before {
     top: -40px;
   }
+}
+.conversation-list-calling-cell {
+  height: 60px;
 }
 
 .conversation-list-calling-cell::after {
