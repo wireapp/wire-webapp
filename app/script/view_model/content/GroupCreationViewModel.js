@@ -94,6 +94,10 @@ z.viewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
     this.stateIsPreferences = ko.pureComputed(() => this.state() === GroupCreationViewModel.STATE.PREFERENCES);
     this.stateIsParticipants = ko.pureComputed(() => this.state() === GroupCreationViewModel.STATE.PARTICIPANTS);
 
+    this.groupSizeInfoText = z.l10n.text(z.string.groupSizeInfo, {
+      count: z.conversation.ConversationRepository.CONFIG.GROUP.MAX_SIZE,
+    });
+
     this.nameInput.subscribe(() => this.nameError(''));
     this.stateIsPreferences.subscribe(stateIsPreference => {
       if (stateIsPreference) {
