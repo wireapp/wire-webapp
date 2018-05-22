@@ -29,7 +29,7 @@ const AcceptNewsModal = ({onConfirm, onDecline, intl: {formatMessage: _}}) => (
       <H3 style={{fontWeight: '500', marginTop: '10px'}} data-uie-name="accept-news-modal-title">
         {_(acceptNewsModalStrings.headline)}
       </H3>
-      <div data-uie-name="accept-news-modal-text">
+      <div data-uie-name="accept-news-modal-description">
         <Text block>{_(acceptNewsModalStrings.unsubscribeDescription)}</Text>
         <Link href={EXTERNAL_ROUTE.WIRE_PRIVACY_POLICY} target="_blank" data-uie-name="go-privacy">
           <Text block>
@@ -39,12 +39,12 @@ const AcceptNewsModal = ({onConfirm, onDecline, intl: {formatMessage: _}}) => (
       </div>
       <Columns style={{margin: '20px 0 10px'}}>
         <Column style={{textAlign: 'center'}}>
-          <Button onClick={onDecline} backgroundColor={COLOR.GRAY} data-uie-name="do-decline">
+          <Button onClick={onDecline} backgroundColor={COLOR.GRAY} data-uie-name="decline-news-button">
             {_(acceptNewsModalStrings.declineButton)}
           </Button>
         </Column>
         <Column style={{textAlign: 'center'}}>
-          <Button onClick={onConfirm} data-uie-name="do-confirm">
+          <Button onClick={onConfirm} data-uie-name="confirm-news-button">
             {_(acceptNewsModalStrings.confirmButton)}
           </Button>
         </Column>
