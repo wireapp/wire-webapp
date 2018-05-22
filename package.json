@@ -32,8 +32,8 @@
   "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit",
   "scripts": {
     "build": "babel src --out-dir dist --no-comments",
-    "clear": "rimraf dist",
-    "dist": "yarn clear && yarn build",
+    "clean": "rimraf dist",
+    "dist": "yarn clean && yarn build",
     "start": "webpack-dev-server",
     "test": "yarn test:browser",
     "test:project": "yarn dist && yarn test",
