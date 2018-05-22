@@ -76,7 +76,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
    */
   constructor(media_repository) {
     this.media_repository = media_repository;
-    this.logger = new z.util.Logger('z.media.MediaDevicesHandler', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger('z.media.MediaStreamHandler', z.config.LOGGER.OPTIONS);
 
     this.calls = () => [];
     this.joined_call = () => undefined;
@@ -91,12 +91,6 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
     this.local_media_type = ko.observable(z.media.MediaType.AUDIO);
 
     this.remote_media_streams = {
-      activeVideo: ko.pureComputed(() => {
-        // FIXME the media repository should release the memory of inactive video streams
-        // Right now, only the status is changed but we keep the stream in memory
-        // until the next page reload.
-        return this.remote_media_streams.video().filter(stream => stream.active);
-      }),
       audio: ko.observableArray([]),
       video: ko.observableArray([]),
     };
@@ -109,6 +103,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
 
     this.request_hint_timeout = undefined;
     amplify.subscribe(z.event.WebApp.CALL.MEDIA.ADD_STREAM, this.addRemoteMediaStream.bind(this));
+    amplify.subscribe(z.event.WebApp.CALL.MEDIA.REMOVE_STREAM, this.removeRemoteMediaStreams.bind(this));
   }
 
   //##############################################################################
@@ -528,6 +523,12 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
     }
 
     this.element_handler.add_media_element(mediaStreamInfo);
+  }
+
+  removeRemoteMediaStreams(streams) {
+    const streamIds = streams.map(stream => stream.id);
+    this.remote_media_streams.video.remove(stream => streamIds.includes(stream.id));
+    this.remote_media_streams.audio.remove(stream => streamIds.includes(stream.id));
   }
 
   //##############################################################################

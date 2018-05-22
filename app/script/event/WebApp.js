@@ -53,6 +53,7 @@ z.event.WebApp = {
       ADD_STREAM: 'wire.webapp.call.media.add_stream',
       CHOOSE_SCREEN: 'wire.webapp.call.media.choose_screen',
       MUTE_AUDIO: 'wire.webapp.call.media.mute_audio',
+      REMOVE_STREAM: 'wire.webapp.call.media.remove_stream',
       TOGGLE: 'wire.webapp.call.media.toggle',
     },
     SIGNALING: {

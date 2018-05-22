@@ -408,29 +408,33 @@ z.calling.entities.FlowEntity = class FlowEntity {
    * @returns {undefined} No return value
    */
   _closePeerConnection() {
-    if (this.peerConnection) {
-      this.peerConnection.oniceconnectionstatechange = () => {
-        this.callLogger.log(this.callLogger.levels.OFF, 'State change ignored - ICE connection');
+    const peerConnection = this.peerConnection;
+    if (!this.peerConnection) {
+      return;
+    }
+
+    peerConnection.oniceconnectionstatechange = () => {
+      this.callLogger.log(this.callLogger.levels.OFF, 'State change ignored - ICE connection');
+    };
+
+    peerConnection.onsignalingstatechange = () => {
+      const logMessage = `State change ignored - signaling state: ${this.peerConnection.signalingState}`;
+      this.callLogger.log(this.callLogger.levels.OFF, logMessage);
+    };
+
+    const isStateClosed = peerConnection.signalingState === z.calling.rtc.SIGNALING_STATE.CLOSED;
+    if (!isStateClosed) {
+      amplify.publish(z.event.WebApp.CALL.MEDIA.REMOVE_STREAM, peerConnection.getRemoteStreams());
+      peerConnection.close();
+
+      const logMessage = {
+        data: {
+          default: [this.remoteUser.name()],
+          obfuscated: [this.callLogger.obfuscate(this.remoteUser.id)],
+        },
+        message: `Closing PeerConnection '{0}' successful`,
       };
-
-      this.peerConnection.onsignalingstatechange = () => {
-        const logMessage = `State change ignored - signaling state: ${this.peerConnection.signalingState}`;
-        this.callLogger.log(this.callLogger.levels.OFF, logMessage);
-      };
-
-      const isStateClosed = this.peerConnection.signalingState === z.calling.rtc.SIGNALING_STATE.CLOSED;
-      if (!isStateClosed) {
-        this.peerConnection.close();
-
-        const logMessage = {
-          data: {
-            default: [this.remoteUser.name()],
-            obfuscated: [this.callLogger.obfuscate(this.remoteUser.id)],
-          },
-          message: `Closing PeerConnection '{0}' successful`,
-        };
-        this.callLogger.info(logMessage);
-      }
+      this.callLogger.info(logMessage);
     }
   }
 

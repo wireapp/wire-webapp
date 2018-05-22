@@ -35,7 +35,7 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
       amplify.publish(z.event.WebApp.CALL.STATE.JOIN, this.conversation.id, mediaType);
     };
 
-    this.videoStreams = this.mediaRepository.stream_handler.remote_media_streams.activeVideo;
+    this.videoStreams = this.mediaRepository.stream_handler.remote_media_streams.video;
     this.localVideoStream = this.mediaRepository.stream_handler.localMediaStream;
 
     this.onLeaveCall = () => {
