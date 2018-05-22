@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="2.8.6"></a>
+## [2.8.6](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.8.5...@wireapp/core@2.8.6) (2018-05-22)
+
+
+### Bug Fixes
+
+* Public initClient ([#612](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/612)) ([74672e8](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/74672e8))
+
+
+
+
 <a name="2.8.5"></a>
 ## [2.8.5](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.8.4...@wireapp/core@2.8.5) (2018-05-19)
 
