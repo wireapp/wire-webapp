@@ -42,7 +42,7 @@
   "appAlreadyOpen.headline": "Wire ist in diesem Browser bereits geöffnet",
   "appAlreadyOpen.text": "Wenn du fortfährst, wirst du in dem anderen Tab ausgeloggt.",
   "appAlreadyOpen.continueButton": "Weiter",
-  "acceptNewsModal.headline": "Möchtest du News und Informationen zu Produktupdates von Wire per E-Mail erhalten?",
+  "acceptNewsModal.headline": "Möchtest du Neuigkeiten und Informationen zu Produktupdates von Wire per E-Mail erhalten?",
   "acceptNewsModal.unsubscribeDescription": "Du kannst dich jederzeit abmelden.",
   "acceptNewsModal.privacyDescription": "Lies unsere <b>Datenschutzerklärung</b>.",
   "acceptNewsModal.declineButton": "Nicht jetzt",
