@@ -21,7 +21,7 @@
 
 // grunt test_init && grunt test_run:telemetry/calling/CallLogger
 
-fdescribe('z.telemetry.calling.CallLogger', () => {
+describe('z.telemetry.calling.CallLogger', () => {
   const callLogger = new z.telemetry.calling.CallLogger('test', {}, 'test');
 
   it('properly obfuscate IPv4 addresses', () => {
