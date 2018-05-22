@@ -22,8 +22,8 @@
   "scripts": {
     "build": "yarn build:node",
     "build:node": "tsc",
-    "clear": "rimraf dist",
-    "dist": "yarn clear && yarn build",
+    "clean": "rimraf dist",
+    "dist": "yarn clean && yarn build",
     "test": "yarn test:node",
     "test:project": "yarn dist && yarn test",
     "test:node": "exit 0",
