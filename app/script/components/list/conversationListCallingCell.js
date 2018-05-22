@@ -211,16 +211,18 @@ ko.components.register('conversation-list-calling-cell', {
 
       <div class="conversation-list-calling-cell-controls-right">
         <!-- ko if: showParticipantsButton -->
-          <div class="call-ui__button call-ui__button--participants" data-bind="click: onParticipantsButtonClick, text: participantsButtonLabel, css: {'call-ui__button--active': showParticipants()}" data-uie-name="do-toggle-participants"></div>
-        <!-- /ko -->
-        <!-- ko if: showAcceptButton -->
-          <div class="call-ui__button call-ui__button--green call-ui__button--large" data-bind="click: onJoinCall" data-uie-name="do-call-controls-call-accept">
-            <pickup-icon class="small-icon"></pickup-icon>
+          <div class="call-ui__button call-ui__button--participants" data-bind="click: onParticipantsButtonClick, css: {'call-ui__button--active': showParticipants()}" data-uie-name="do-toggle-participants">
+            <span data-bind="text: participantsButtonLabel"></span><chevron-icon></chevron-icon>
           </div>
         <!-- /ko -->
         <!-- ko if: showDeclineButton -->
           <div class="call-ui__button call-ui__button--red call-ui__button--large" data-bind="click: callIsAnswerable() ? onRejectCall : onLeaveCall" data-uie-name="do-call-controls-call-decline">
             <hangup-icon class="small-icon"></hangup-icon>
+          </div>
+        <!-- /ko -->
+        <!-- ko if: showAcceptButton -->
+          <div class="call-ui__button call-ui__button--green call-ui__button--large" data-bind="click: onJoinCall" data-uie-name="do-call-controls-call-accept">
+            <pickup-icon class="small-icon"></pickup-icon>
           </div>
         <!-- /ko -->
       </div>
