@@ -56,6 +56,10 @@
 
     padding-left: 8px;
     color: fade(@graphite, 48%);
+
+    .dark-theme & {
+      color: darken(#fff, 10%);
+    }
   }
 
   &.ephemeral-input::placeholder {
