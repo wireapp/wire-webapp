@@ -445,15 +445,15 @@
     ed2curve "0.2.1"
     libsodium-wrappers-sumo "0.7.3"
 
-"@wireapp/react-ui-kit@1.1.22":
-  version "1.1.22"
-  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-1.1.22.tgz#748a64e97f7426321ec50562cedc7698fcd59660"
+"@wireapp/react-ui-kit@1.1.24":
+  version "1.1.24"
+  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-1.1.24.tgz#fd617c871d8560abef2c5f99dbea1abca6054d4e"
   dependencies:
     bazinga64 "5.1.10"
     color "3.0.0"
     react "16.3.2"
     react-dom "16.3.2"
-    recompose "0.27.0"
+    recompose "0.27.1"
     styled-components "3.2.6"
     styled-normalize "4.0.0"
 
@@ -8773,9 +8773,9 @@ readdirp@^2.0.0:
     readable-stream "^2.0.2"
     set-immediate-shim "^1.0.1"
 
-recompose@0.27.0:
-  version "0.27.0"
-  resolved "https://registry.yarnpkg.com/recompose/-/recompose-0.27.0.tgz#8230ebd651bf1159097006f79083fe224b1501cf"
+recompose@0.27.1:
+  version "0.27.1"
+  resolved "https://registry.yarnpkg.com/recompose/-/recompose-0.27.1.tgz#1a49e931f183634516633bbb4f4edbfd3f38a7ba"
   dependencies:
     babel-runtime "^6.26.0"
     change-emitter "^0.1.2"
