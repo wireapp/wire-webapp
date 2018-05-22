@@ -31,7 +31,7 @@ const AcceptNewsModal = ({onConfirm, onDecline, intl: {formatMessage: _}}) => (
       </H3>
       <div data-uie-name="accept-news-modal-description">
         <Text block>{_(acceptNewsModalStrings.unsubscribeDescription)}</Text>
-        <Link href={EXTERNAL_ROUTE.WIRE_PRIVACY_POLICY} target="_blank" data-uie-name="go-privacy">
+        <Link href={EXTERNAL_ROUTE.WIRE_PRIVACY_POLICY} target="_blank" data-uie-name="accept-news-modal-link">
           <Text block>
             <FormattedHTMLMessage {...acceptNewsModalStrings.privacyDescription} />
           </Text>
