@@ -395,6 +395,10 @@
       opacity: 1 !important;
       outline: none;
     }
+
+    .dark-theme & {
+      background-color: @app-bg-dark;
+    }
   }
 
   .show-timestamp.time + .message-status {
@@ -414,12 +418,20 @@
     font-size: @font-size-xs;
     pointer-events: none;
     user-select: none;
+
+    .dark-theme & {
+      background-color: @app-bg-dark;
+    }
   }
 
   .message-ephemeral-timer {
     position: absolute;
     top: 0;
     right: 8px;
+  }
+
+  .dark-theme & {
+    background-color: @app-bg-dark;
   }
 }
 
