@@ -211,6 +211,8 @@ z.string.pl.modalIntegrationUnavailableHeadline = 'Boty są obecnie niedostępne
 z.string.pl.modalIntegrationUnavailableMessage = 'Dziękujemy za zainteresowanie naszymi botami. Usługa jest obecnie zawieszona, ponieważ pracujemy nad następną wersją. Bądź na bieżąco.';
 
 
+z.string.pl.modalImproveWireAction = 'Odbierz';
+
 z.string.pl.modalSessionResetHeadline = 'Sesja została zresetowana';
 z.string.pl.modalSessionResetMessage1 = 'Jeśli problem nie zostanie rozwiązany,';
 z.string.pl.modalSessionResetMessageLink = 'kontakt';
@@ -452,9 +454,6 @@ z.string.pl.preferencesOptionsContacts = 'Kontakty';
 z.string.pl.preferencesOptionsContactsGmail = 'Import z Gmail';
 z.string.pl.preferencesOptionsContactsMacos = 'Import z Kontaktów';
 z.string.pl.preferencesOptionsContactsDetail = 'Wykorzystujemy Twoje dane kontaktowe do łączenia Cię z innymi. Wszystkie informacje są anonimowe i nie dzielimy ich z nikim innym.';
-z.string.pl.preferencesOptionsData = 'Statystyki i raporty o awariach';
-z.string.pl.preferencesOptionsDataCheckbox = 'Wysyłanie anonimowych danych';
-z.string.pl.preferencesOptionsDataDetail = 'Ulepsz Wire przesyłając anonimowe informacje.';
 z.string.pl.preferencesOptionsPopular = 'Różne';
 z.string.pl.preferencesOptionsEmojiReplaceCheckbox = 'Zastępuj tekstowe emotikony ikonkami';
 z.string.pl.preferencesOptionsPreviewsSendCheckbox = 'Twórz podglądy wysyłanych linków';

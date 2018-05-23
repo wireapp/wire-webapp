@@ -197,6 +197,8 @@ z.string.cs.modalIntegrationUnavailableHeadline = 'Roboti jsou momentálně nedo
 z.string.cs.modalIntegrationUnavailableMessage = 'Děkujeme vám za váš zájem o roboty. Služba je pozastavena, zatímco pracujeme na další verzi.';
 
 
+z.string.cs.modalImproveWireAction = 'Přijmout';
+
 z.string.cs.modalSessionResetHeadline = 'Sezení bylo zresetováno';
 z.string.cs.modalSessionResetMessage1 = 'Pokud problém není vyřešen,';
 z.string.cs.modalSessionResetMessageLink = 'kontaktujte';
@@ -436,9 +438,6 @@ z.string.cs.preferencesOptionsContacts = 'Kontakty';
 z.string.cs.preferencesOptionsContactsGmail = 'Importovat ze služby Gmail';
 z.string.cs.preferencesOptionsContactsMacos = 'Import z kontaktů';
 z.string.cs.preferencesOptionsContactsDetail = 'Vaše údaje o kontaktech používáme k propojení s ostatními uživateli. Všechny informace anonymizujeme a nesdílíme je s nikým dalším.';
-z.string.cs.preferencesOptionsData = 'Použití a zprávy o pádech';
-z.string.cs.preferencesOptionsDataCheckbox = 'Použití a zprávy o pádech';
-z.string.cs.preferencesOptionsDataDetail = 'Přispějte k vylepšení aplikace Wire odesíláním anonymních informací.';
 z.string.cs.preferencesOptionsPopular = 'Podle popularity poptávky';
 z.string.cs.preferencesOptionsEmojiReplaceCheckbox = 'Nahradit psané emotikony pomocí emojis';
 z.string.cs.preferencesOptionsPreviewsSendCheckbox = 'Vytvořit náhledy pro odeslané odkazy';

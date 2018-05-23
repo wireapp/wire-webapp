@@ -377,15 +377,15 @@
   version "2.3.3"
   resolved "https://registry.yarnpkg.com/@types/tough-cookie/-/tough-cookie-2.3.3.tgz#7f226d67d654ec9070e755f46daebf014628e9d9"
 
-"@wireapp/api-client@0.10.2":
-  version "0.10.2"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-0.10.2.tgz#a5a0470813efe3b3ee83f0da910976be9c8b6f2c"
+"@wireapp/api-client@0.10.5":
+  version "0.10.5"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-0.10.5.tgz#54fbb32c44796a94ada8bfee143316cdfe692277"
   dependencies:
     "@types/node" "10.1.2"
     "@types/spark-md5" "3.0.0"
     "@types/tough-cookie" "2.3.3"
-    "@wireapp/priority-queue" "0.1.28"
-    "@wireapp/store-engine" "0.11.13"
+    "@wireapp/priority-queue" "0.1.30"
+    "@wireapp/store-engine" "0.11.15"
     axios "0.18.0"
     html5-websocket "2.0.3"
     logdown "3.2.3"
@@ -393,73 +393,73 @@
     spark-md5 "3.0.0"
     tough-cookie "2.3.4"
 
-"@wireapp/cbor@3.0.30":
-  version "3.0.30"
-  resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-3.0.30.tgz#ab9122ff11acb71cdce0e0e224ca4886d1a32ba2"
+"@wireapp/cbor@3.0.32":
+  version "3.0.32"
+  resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-3.0.32.tgz#02e0f8dcdaabf409f3873114755a1fbe05f0ffa3"
 
-"@wireapp/core@2.8.5":
-  version "2.8.5"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-2.8.5.tgz#6158fb7a2c9bd6e0d6921dc51748304c09414956"
+"@wireapp/core@2.8.8":
+  version "2.8.8"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-2.8.8.tgz#7e183aa1e205e27173fd59f4f2b69858885bf3d8"
   dependencies:
     "@types/node" "10.1.2"
-    "@wireapp/api-client" "0.10.2"
-    "@wireapp/cryptobox" "8.3.56"
-    "@wireapp/store-engine" "0.11.13"
-    bazinga64 "5.1.10"
+    "@wireapp/api-client" "0.10.5"
+    "@wireapp/cryptobox" "8.3.58"
+    "@wireapp/store-engine" "0.11.15"
+    bazinga64 "5.1.11"
     logdown "3.2.3"
     protobufjs "6.8.6"
     pure-uuid "1.5.2"
 
-"@wireapp/cryptobox@8.3.56":
-  version "8.3.56"
-  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-8.3.56.tgz#43726514c0c43fc556e431b3943cb3f5d8a085b2"
+"@wireapp/cryptobox@8.3.58":
+  version "8.3.58"
+  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-8.3.58.tgz#d11484e92b254da286b07129fcc9c65e48caa672"
   dependencies:
     "@types/fs-extra" "5.0.2"
     "@types/node" "10.1.2"
-    "@wireapp/lru-cache" "2.1.9"
-    "@wireapp/priority-queue" "0.1.28"
-    "@wireapp/proteus" "7.1.42"
-    "@wireapp/store-engine" "0.11.13"
+    "@wireapp/lru-cache" "2.1.11"
+    "@wireapp/priority-queue" "0.1.30"
+    "@wireapp/proteus" "7.1.44"
+    "@wireapp/store-engine" "0.11.15"
     dexie "2.0.3"
     fs-extra "6.0.1"
 
-"@wireapp/lru-cache@2.1.9":
-  version "2.1.9"
-  resolved "https://registry.yarnpkg.com/@wireapp/lru-cache/-/lru-cache-2.1.9.tgz#c3b0ecc55eee44ca318b70b8be2a7c76b751280b"
+"@wireapp/lru-cache@2.1.11":
+  version "2.1.11"
+  resolved "https://registry.yarnpkg.com/@wireapp/lru-cache/-/lru-cache-2.1.11.tgz#f99d255745fb6f7e0904e18109772ebf8085d9fc"
 
-"@wireapp/priority-queue@0.1.28":
-  version "0.1.28"
-  resolved "https://registry.yarnpkg.com/@wireapp/priority-queue/-/priority-queue-0.1.28.tgz#138f40f4a3b360ebbca6c9c7735d483853f337aa"
+"@wireapp/priority-queue@0.1.30":
+  version "0.1.30"
+  resolved "https://registry.yarnpkg.com/@wireapp/priority-queue/-/priority-queue-0.1.30.tgz#8eb11214e1145570556e54c56165ea8a57e936d3"
   dependencies:
     "@types/node" "10.1.2"
     pure-uuid "1.5.2"
 
-"@wireapp/proteus@7.1.42":
-  version "7.1.42"
-  resolved "https://registry.yarnpkg.com/@wireapp/proteus/-/proteus-7.1.42.tgz#0f81095c15f03b1a04f2e5d836cdc4de53687221"
+"@wireapp/proteus@7.1.44":
+  version "7.1.44"
+  resolved "https://registry.yarnpkg.com/@wireapp/proteus/-/proteus-7.1.44.tgz#99c8746fd27c87d6b304947e55002b7b9b3a4055"
   dependencies:
     "@types/chai" "4.1.3"
     "@types/ed2curve" "0.2.2"
     "@types/node" "10.1.2"
-    "@wireapp/cbor" "3.0.30"
+    "@wireapp/cbor" "3.0.32"
     ed2curve "0.2.1"
     libsodium-wrappers-sumo "0.7.3"
 
-"@wireapp/react-ui-kit@1.1.22":
-  version "1.1.22"
-  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-1.1.22.tgz#748a64e97f7426321ec50562cedc7698fcd59660"
+"@wireapp/react-ui-kit@1.1.25":
+  version "1.1.25"
+  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-1.1.25.tgz#ff7657f598702f7a16ee3aa03354f9d6e6770cea"
   dependencies:
-    bazinga64 "5.1.10"
+    bazinga64 "5.1.11"
     color "3.0.0"
     react "16.3.2"
     react-dom "16.3.2"
-    recompose "0.27.0"
+    recompose "0.27.1"
     styled-components "3.2.6"
     styled-normalize "4.0.0"
 
-"@wireapp/store-engine@0.11.13":
-  version "0.11.13"
-  resolved "https://registry.yarnpkg.com/@wireapp/store-engine/-/store-engine-0.11.13.tgz#7a0e4c91460be37054bc52af8a3865337c6f8033"
+"@wireapp/store-engine@0.11.15":
+  version "0.11.15"
+  resolved "https://registry.yarnpkg.com/@wireapp/store-engine/-/store-engine-0.11.15.tgz#b485e94c041414e9dc87bab6d9f04f9681e8cba0"
   dependencies:
     "@types/filesystem" "0.0.28"
     "@types/node" "10.1.2"
@@ -1594,9 +1594,9 @@ batch@0.6.1:
   version "0.6.1"
   resolved "https://registry.yarnpkg.com/batch/-/batch-0.6.1.tgz#dc34314f4e679318093fc760272525f94bf25c16"
 
-bazinga64@5.1.10:
-  version "5.1.10"
-  resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.1.10.tgz#b24924c889ae07a10af3de6137e456fc97fab563"
+bazinga64@5.1.11:
+  version "5.1.11"
+  resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.1.11.tgz#2927496d1987180319256cda51c1e93be3cc7fd0"
 
 bcrypt-pbkdf@^1.0.0:
   version "1.0.1"
@@ -3496,17 +3496,17 @@ eslint-plugin-babel@5.1.0:
   dependencies:
     eslint-rule-composer "^0.3.0"
 
-eslint-plugin-jsdoc@3.7.0:
-  version "3.7.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-jsdoc/-/eslint-plugin-jsdoc-3.7.0.tgz#b7ce206f99efdc4c0a31b492ae5aedfb06f03dc6"
+eslint-plugin-jsdoc@3.7.1:
+  version "3.7.1"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-jsdoc/-/eslint-plugin-jsdoc-3.7.1.tgz#3e5912d3f9f9ae41d8bd74c12dc96a0121707708"
   dependencies:
     comment-parser "^0.4.2"
     jsdoctypeparser "^2.0.0-alpha-8"
     lodash "^4.17.4"
 
-eslint-plugin-no-unsanitized@3.0.1:
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-no-unsanitized/-/eslint-plugin-no-unsanitized-3.0.1.tgz#d6fc39b736126113e961b00f239f0a3fd95c6259"
+eslint-plugin-no-unsanitized@3.0.2:
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-no-unsanitized/-/eslint-plugin-no-unsanitized-3.0.2.tgz#83c6fcf8e34715112757e03dd4ee436dce29ed45"
 
 eslint-plugin-prettier@2.6.0:
   version "2.6.0"
@@ -4028,8 +4028,8 @@ follow-redirects@1.0.0:
     debug "^2.2.0"
 
 follow-redirects@^1.3.0:
-  version "1.4.1"
-  resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.4.1.tgz#d8120f4518190f55aac65bb6fc7b85fcd666d6aa"
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.5.0.tgz#234f49cf770b7f35b40e790f636ceba0c3a0ab77"
   dependencies:
     debug "^3.1.0"
 
@@ -5156,7 +5156,7 @@ ip@1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/ip/-/ip-1.0.1.tgz#c7e356cdea225ae71b36d70f2e71a92ba4e42590"
 
-ip@^1.1.0, ip@^1.1.2, ip@^1.1.4, ip@^1.1.5:
+ip@1.1.5, ip@^1.1.0, ip@^1.1.2, ip@^1.1.4, ip@^1.1.5:
   version "1.1.5"
   resolved "https://registry.yarnpkg.com/ip/-/ip-1.1.5.tgz#bdded70114290828c0a039e72ef25f5aaec4354a"
 
@@ -6726,9 +6726,9 @@ mixin-deep@^1.2.0:
     for-in "^1.0.2"
     is-extendable "^1.0.1"
 
-mixpanel-browser@2.22.0:
-  version "2.22.0"
-  resolved "https://registry.yarnpkg.com/mixpanel-browser/-/mixpanel-browser-2.22.0.tgz#25329bf5dc141ee40827d6fa867ff1f89ba36b7f"
+mixpanel-browser@2.22.1:
+  version "2.22.1"
+  resolved "https://registry.yarnpkg.com/mixpanel-browser/-/mixpanel-browser-2.22.1.tgz#de9a80ee68982fecbae3d9b9b22b06d2c37b5a3f"
 
 mkdirp@0.5.x, "mkdirp@>=0.5 0", mkdirp@^0.5.0, mkdirp@^0.5.1, mkdirp@~0.5.0, mkdirp@~0.5.1:
   version "0.5.1"
@@ -8773,9 +8773,9 @@ readdirp@^2.0.0:
     readable-stream "^2.0.2"
     set-immediate-shim "^1.0.1"
 
-recompose@0.27.0:
-  version "0.27.0"
-  resolved "https://registry.yarnpkg.com/recompose/-/recompose-0.27.0.tgz#8230ebd651bf1159097006f79083fe224b1501cf"
+recompose@0.27.1:
+  version "0.27.1"
+  resolved "https://registry.yarnpkg.com/recompose/-/recompose-0.27.1.tgz#1a49e931f183634516633bbb4f4edbfd3f38a7ba"
   dependencies:
     babel-runtime "^6.26.0"
     change-emitter "^0.1.2"
@@ -10508,9 +10508,9 @@ uglify-es@^3.3.4:
     commander "~2.13.0"
     source-map "~0.6.1"
 
-uglify-js@3.3.26:
-  version "3.3.26"
-  resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-3.3.26.tgz#858b74e5e7262e876c834b907a5fa57d4fa0d525"
+uglify-js@3.3.27:
+  version "3.3.27"
+  resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-3.3.27.tgz#eb8c3c9429969f86ff5b0a2422ffc78c3cea8cc0"
   dependencies:
     commander "~2.15.0"
     source-map "~0.6.1"

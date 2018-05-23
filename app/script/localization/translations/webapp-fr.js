@@ -216,6 +216,8 @@ z.string.fr.modalPictureFileFormatMessage = 'Veuillez choisir un fichier PNG ou 
 
 z.string.fr.modalPictureTooLargeHeadline = 'La photo sélectionnée est trop volumineuse';
 
+z.string.fr.modalImproveWireAction = 'Accepter';
+
 z.string.fr.modalServiceUnavailableHeadline = 'L’ajout du service est impossible';
 z.string.fr.modalServiceUnavailableMessage = 'Le service est temporairement indisponible.';
 
@@ -482,9 +484,6 @@ z.string.fr.preferencesOptionsContacts = 'Contacts';
 z.string.fr.preferencesOptionsContactsGmail = 'Importer depuis Gmail';
 z.string.fr.preferencesOptionsContactsMacos = 'Importer depuis Contacts';
 z.string.fr.preferencesOptionsContactsDetail = 'Nous utilisons les données de vos contacts afin de vous connecter à d’autres personnes. Nous anonymisons toutes les informations et ne les partageons avec personne d’autre.';
-z.string.fr.preferencesOptionsData = 'Rapports d’utilisation et de plantage';
-z.string.fr.preferencesOptionsDataCheckbox = 'Envoyer des données anonymement';
-z.string.fr.preferencesOptionsDataDetail = 'Améliorez Wire en envoyant des informations anonymes.';
 z.string.fr.preferencesOptionsPopular = 'À la demande générale';
 z.string.fr.preferencesOptionsEmojiReplaceCheckbox = 'Remplace les émoticônes typographiques par des emojis';
 z.string.fr.preferencesOptionsEmojiReplaceDetail = ':-) → {{icon}}';
