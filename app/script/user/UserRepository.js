@@ -1069,18 +1069,26 @@ z.user.UserRepository = class UserRepository {
   }
 
   getMarketingConsent() {
-    return this.user_service.getConsent().then(consents => {
-      for (const {type: consentType, value: consentValue} of consents) {
-        const isMarketingConsent = consentType === z.user.ConsentType.MARKETING;
-        if (isMarketingConsent) {
-          this.marketingConsent(consentValue === z.user.ConsentValue.GIVEN);
-          this.marketingConsent.subscribe(changedConsentValue => this.changeMarketingConsent(changedConsentValue));
+    return this.user_service
+      .getConsent()
+      .then(consents => {
+        for (const {type: consentType, value: consentValue} of consents) {
+          const isMarketingConsent = consentType === z.user.ConsentType.MARKETING;
+          if (isMarketingConsent) {
+            const hasGivenConsent = consentValue === z.user.ConsentValue.GIVEN;
+            this.marketingConsent(hasGivenConsent);
+            this.marketingConsent.subscribe(changedConsentValue => this.changeMarketingConsent(changedConsentValue));
 
-          this.logger.log(`Marketing consent retrieved as ${consentValue}`);
-          return;
+            this.logger.log(`Marketing consent retrieved as '${consentValue}'`);
+            return;
+          }
         }
-      }
-    });
+
+        this.logger.log(`Marketing consent not set. Defaulting to '${this.marketingConsent()}'`);
+      })
+      .catch(error => {
+        this.logger.warn(`Failed to retrieve marketing consent: ${error.message || error.code}`, error);
+      });
   }
 
   setConsent(consentType, consentValue) {
