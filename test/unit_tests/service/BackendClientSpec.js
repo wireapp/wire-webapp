@@ -26,7 +26,7 @@ describe('z.service.BackendClient', () => {
   let server = null;
 
   const urls = {
-    rest_url: 'http://localhost',
+    restUrl: 'http://localhost',
     websocket_url: 'wss://localhost',
   };
 

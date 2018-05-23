@@ -240,6 +240,8 @@ z.string.da.modalPictureTooLargeMessage = 'Du kan bruge billeder op til {{number
 z.string.da.modalPictureTooSmallHeadline = 'Billede for lille';
 z.string.da.modalPictureTooSmallMessage = 'Vælg venligst et billede, der er mindst 320 x 320 px.';
 
+z.string.da.modalImproveWireAction = 'Besvar';
+
 z.string.da.modalServiceUnavailableHeadline = 'Tilføje tjeneste ikke muligt';
 z.string.da.modalServiceUnavailableMessage = 'Tjenesten er utilgængelig i øjeblikket.';
 
@@ -550,9 +552,6 @@ z.string.da.preferencesOptionsContacts = 'Kontakter';
 z.string.da.preferencesOptionsContactsGmail = 'Importér fra Gmail';
 z.string.da.preferencesOptionsContactsMacos = 'Omportér fra Kontakter';
 z.string.da.preferencesOptionsContactsDetail = 'Vi bruger dine kontaktdata til at forbinde dig med andre. Vi anonymisere alle oplysninger og deler ikke det med alle andre.';
-z.string.da.preferencesOptionsData = 'Forbrug og rapporter om nedbrud';
-z.string.da.preferencesOptionsDataCheckbox = 'Forbrug og rapporter om nedbrud';
-z.string.da.preferencesOptionsDataDetail = 'Gøre Wire bedre ved at sende anonyme oplysninger.';
 z.string.da.preferencesOptionsPopular = 'Ved populær efterspørgsel';
 z.string.da.preferencesOptionsEmojiReplaceCheckbox = 'Erstat type emoticons med emoji';
 z.string.da.preferencesOptionsPreviewsSendCheckbox = 'Lav previews til links du sender';

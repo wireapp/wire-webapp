@@ -43,6 +43,34 @@ z.properties.PropertiesRepository = class PropertiesRepository {
     amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, this.propertiesUpdated.bind(this));
   }
 
+  checkPrivacyPermission() {
+    const isPrivacyPreferenceSet = this.getPreference(z.properties.PROPERTIES_TYPE.PRIVACY) !== undefined;
+
+    return isPrivacyPreferenceSet
+      ? Promise.resolve()
+      : new Promise(resolve => {
+          amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
+            action: () => {
+              this.savePreference(z.properties.PROPERTIES_TYPE.PRIVACY, true);
+              this._publishProperties();
+              resolve();
+            },
+            preventClose: true,
+            secondary: () => {
+              this.savePreference(z.properties.PROPERTIES_TYPE.PRIVACY, false);
+              resolve();
+            },
+            text: {
+              action: z.l10n.text(z.string.modalImproveWireAction),
+              message: z.l10n.text(z.string.modalImproveWireMessage),
+              secondary: z.l10n.text(z.string.modalImproveWireSecondary),
+              title: z.l10n.text(z.string.modalImproveWireHeadline),
+            },
+            warning: false,
+          });
+        });
+  }
+
   /**
    * Get the current preference for a property type.
    * @param {z.properties.PROPERTIES_TYPE} propertiesType - Type of preference to get
@@ -67,13 +95,18 @@ z.properties.PropertiesRepository = class PropertiesRepository {
   /**
    * Initialize properties on app startup.
    * @param {z.entity.User} selfUserEntity - Self user
-   * @returns {undefined} No return value
+   * @returns {Promise} Resolves when repository has been initialized
    */
   init(selfUserEntity) {
-    this.propertiesService
+    this.selfUser(selfUserEntity);
+
+    return this.selfUser().isTemporaryGuest() ? this._initTemporaryGuestAccount() : this._initActivatedAccount();
+  }
+
+  _initActivatedAccount() {
+    return this.propertiesService
       .getProperties()
       .then(keys => {
-        this.selfUser(selfUserEntity);
         if (keys.includes(PropertiesRepository.CONFIG.PROPERTIES_KEY)) {
           return this.propertiesService
             .getPropertiesByKey(PropertiesRepository.CONFIG.PROPERTIES_KEY)
@@ -83,11 +116,20 @@ z.properties.PropertiesRepository = class PropertiesRepository {
             });
         }
 
-        this.logger.info('User has no saved properties, using defaults');
+        this.logger.info('No properties found: Using default properties');
       })
-      .then(() => {
-        amplify.publish(z.event.WebApp.PROPERTIES.UPDATED, this.properties);
-      });
+      .then(() => this._publishProperties());
+  }
+
+  _initTemporaryGuestAccount() {
+    this.logger.info('Temporary guest user: Using default properties');
+    this.savePreference(z.properties.PROPERTIES_TYPE.PRIVACY, true);
+    return Promise.resolve(this._publishProperties());
+  }
+
+  _publishProperties() {
+    amplify.publish(z.event.WebApp.PROPERTIES.UPDATED, this.properties);
+    return this.properties;
   }
 
   /**
@@ -124,38 +166,51 @@ z.properties.PropertiesRepository = class PropertiesRepository {
     if (updatedPreference !== this.getPreference(propertiesType)) {
       this._setPreference(propertiesType, updatedPreference);
 
-      this.propertiesService
-        .putPropertiesByKey(PropertiesRepository.CONFIG.PROPERTIES_KEY, this.properties)
-        .then(() => {
-          this.logger.info(`Saved updated preference: '${propertiesType}' - '${updatedPreference}'`);
+      const savePromise = this.selfUser().isTemporaryGuest()
+        ? this._savePreferenceActivatedAccount(propertiesType, updatedPreference)
+        : this._savePreferenceTemporaryGuestAccount(propertiesType, updatedPreference);
 
-          switch (propertiesType) {
-            case z.properties.PROPERTIES_TYPE.CONTACT_IMPORT.GOOGLE:
-            case z.properties.PROPERTIES_TYPE.CONTACT_IMPORT.MACOS:
-              amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.CONTACTS, updatedPreference);
-              break;
-            case z.properties.PROPERTIES_TYPE.EMOJI.REPLACE_INLINE:
-              amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.EMOJI.REPLACE_INLINE, updatedPreference);
-              break;
-            case z.properties.PROPERTIES_TYPE.ENABLE_DEBUGGING:
-              amplify.publish(z.util.Logger.prototype.LOG_ON_DEBUG, updatedPreference);
-              break;
-            case z.properties.PROPERTIES_TYPE.NOTIFICATIONS:
-              amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.NOTIFICATIONS, updatedPreference);
-              break;
-            case z.properties.PROPERTIES_TYPE.PREVIEWS.SEND:
-              amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.PREVIEWS.SEND, updatedPreference);
-              break;
-            case z.properties.PROPERTIES_TYPE.PRIVACY:
-              amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.PRIVACY, updatedPreference);
-              break;
-            case z.properties.PROPERTIES_TYPE.SOUND_ALERTS:
-              amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.SOUND_ALERTS, updatedPreference);
-              break;
-            default:
-              throw new Error(`Failed to update preference of unhandled type '${propertiesType}'`);
-          }
-        });
+      savePromise.then(() => this._publishPropertyUpdate(propertiesType, updatedPreference));
+    }
+  }
+
+  _savePreferenceActivatedAccount(propertiesType, updatedPreference) {
+    return this.propertiesService
+      .putPropertiesByKey(PropertiesRepository.CONFIG.PROPERTIES_KEY, this.properties)
+      .then(() => this.logger.info(`Saved updated preference: '${propertiesType}' - '${updatedPreference}'`));
+  }
+
+  _savePreferenceTemporaryGuestAccount(propertiesType, updatedPreference) {
+    this.logger.info(`Updated preference: '${propertiesType}' - '${updatedPreference}'`);
+    return Promise.resolve();
+  }
+
+  _publishPropertyUpdate(propertiesType, updatedPreference) {
+    switch (propertiesType) {
+      case z.properties.PROPERTIES_TYPE.CONTACT_IMPORT.GOOGLE:
+      case z.properties.PROPERTIES_TYPE.CONTACT_IMPORT.MACOS:
+        amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.CONTACTS, updatedPreference);
+        break;
+      case z.properties.PROPERTIES_TYPE.EMOJI.REPLACE_INLINE:
+        amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.EMOJI.REPLACE_INLINE, updatedPreference);
+        break;
+      case z.properties.PROPERTIES_TYPE.ENABLE_DEBUGGING:
+        amplify.publish(z.util.Logger.prototype.LOG_ON_DEBUG, updatedPreference);
+        break;
+      case z.properties.PROPERTIES_TYPE.NOTIFICATIONS:
+        amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.NOTIFICATIONS, updatedPreference);
+        break;
+      case z.properties.PROPERTIES_TYPE.PREVIEWS.SEND:
+        amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.PREVIEWS.SEND, updatedPreference);
+        break;
+      case z.properties.PROPERTIES_TYPE.PRIVACY:
+        amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.PRIVACY, updatedPreference);
+        break;
+      case z.properties.PROPERTIES_TYPE.SOUND_ALERTS:
+        amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.SOUND_ALERTS, updatedPreference);
+        break;
+      default:
+        throw new Error(`Failed to update preference of unhandled type '${propertiesType}'`);
     }
   }
 

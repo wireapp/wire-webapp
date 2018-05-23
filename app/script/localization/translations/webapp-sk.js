@@ -198,6 +198,8 @@ z.string.sk.modalIntegrationUnavailableHeadline = 'Boti sú momentálne nedostup
 z.string.sk.modalIntegrationUnavailableMessage = 'Ďakujeme o Váš záujem o Botov. Služba je momentálne pozastavená kvôli práci na novej verzii.';
 
 
+z.string.sk.modalImproveWireAction = 'Prijať';
+
 z.string.sk.modalSessionResetHeadline = 'Relácia bola obnovená';
 z.string.sk.modalSessionResetMessage1 = 'Ak problém nebol vyriešený,';
 z.string.sk.modalSessionResetMessageLink = 'kontakt';
@@ -437,9 +439,6 @@ z.string.sk.preferencesOptionsContacts = 'Kontakty';
 z.string.sk.preferencesOptionsContactsGmail = 'Import z Gmailu';
 z.string.sk.preferencesOptionsContactsMacos = 'Import z Kontaktov';
 z.string.sk.preferencesOptionsContactsDetail = 'Vaše údaje o kontaktoch používame na pripojenie k iným užívateľom. Všetky informácie anonymizujeme a nezdieľame ich s nikým iným.';
-z.string.sk.preferencesOptionsData = 'Využitie údajov a správy o zlyhaní';
-z.string.sk.preferencesOptionsDataCheckbox = 'Využitie údajov a správy o zlyhaní';
-z.string.sk.preferencesOptionsDataDetail = 'Vylepšiť Wire odosielaním anonymných informácií.';
 z.string.sk.preferencesOptionsPopular = 'Populárnej požiadavky';
 z.string.sk.preferencesOptionsEmojiReplaceCheckbox = 'Nahradiť emotikony pomocou emojis';
 z.string.sk.preferencesOptionsPreviewsSendCheckbox = 'Vytvoriť náhľady pre odkazy ktoré odosielate';

@@ -113,7 +113,7 @@ describe('z.user.UserRepository', () => {
     describe('get_connections', () => {
       // TODO: This test seems to be flaky!
       xit('should return the connected users', done => {
-        server.respondWith('GET', `${test_factory.settings.connection.rest_url}/connections?size=500`, [
+        server.respondWith('GET', `${test_factory.settings.connection.restUrl}/connections?size=500`, [
           200,
           {'Content-Type': 'application/json'},
           JSON.stringify(payload.connections.get),
@@ -121,7 +121,7 @@ describe('z.user.UserRepository', () => {
 
         server.respondWith(
           'GET',
-          `${test_factory.settings.connection.rest_url}/users?ids=${entities.user.jane_roe.id}%2C${
+          `${test_factory.settings.connection.restUrl}/users?ids=${entities.user.jane_roe.id}%2C${
             entities.user.jane_roe.id
           }`,
           [200, {'Content-Type': 'application/json'}, JSON.stringify(payload.users.get.many)]
@@ -336,7 +336,7 @@ describe('z.user.UserRepository', () => {
     describe('verify_usernames', () => {
       it('resolves with username when username is not taken', done => {
         const usernames = ['john_doe'];
-        server.respondWith('POST', `${test_factory.settings.connection.rest_url}/users/handles`, [
+        server.respondWith('POST', `${test_factory.settings.connection.restUrl}/users/handles`, [
           200,
           {'Content-Type': 'application/json'},
           JSON.stringify(usernames),
@@ -353,7 +353,7 @@ describe('z.user.UserRepository', () => {
 
       it('rejects when username is taken', done => {
         const usernames = ['john_doe'];
-        server.respondWith('POST', `${test_factory.settings.connection.rest_url}/users/handles`, [
+        server.respondWith('POST', `${test_factory.settings.connection.restUrl}/users/handles`, [
           200,
           {'Content-Type': 'application/json'},
           JSON.stringify([]),
@@ -372,7 +372,7 @@ describe('z.user.UserRepository', () => {
     describe('verify_username', () => {
       it('resolves with username when username is not taken', done => {
         const username = 'john_doe';
-        server.respondWith('HEAD', `${test_factory.settings.connection.rest_url}/users/handles/${username}`, [
+        server.respondWith('HEAD', `${test_factory.settings.connection.restUrl}/users/handles/${username}`, [
           404,
           {},
           '',
@@ -389,7 +389,7 @@ describe('z.user.UserRepository', () => {
 
       it('rejects when username is taken', done => {
         const username = 'john_doe';
-        server.respondWith('HEAD', `${test_factory.settings.connection.rest_url}/users/handles/${username}`, [
+        server.respondWith('HEAD', `${test_factory.settings.connection.restUrl}/users/handles/${username}`, [
           200,
           {},
           '',

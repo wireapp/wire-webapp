@@ -24,7 +24,7 @@
 describe('User Service', () => {
   let server = null;
   const urls = {
-    rest_url: 'http://localhost.com',
+    restUrl: 'http://localhost.com',
     websocket_url: 'wss://localhost',
   };
   let user_service = null;
@@ -43,7 +43,7 @@ describe('User Service', () => {
   });
 
   it('can get the users connections', done => {
-    const request_url = `${urls.rest_url}/connections?size=500`;
+    const request_url = `${urls.restUrl}/connections?size=500`;
     server.respondWith('GET', request_url, [
       200,
       {'Content-Type': 'application/json'},
@@ -66,7 +66,7 @@ describe('User Service', () => {
 
   describe('get_users', () => {
     it('can get a single existing user from the server', done => {
-      const request_url = `${urls.rest_url}/users?ids=7025598b-ffac-4993-8a81-af3f35b7147f`;
+      const request_url = `${urls.restUrl}/users?ids=7025598b-ffac-4993-8a81-af3f35b7147f`;
       server.respondWith('GET', request_url, [
         200,
         {'Content-Type': 'application/json'},
@@ -86,7 +86,7 @@ describe('User Service', () => {
     });
 
     it('cannot get a single fake user from the server', done => {
-      const request_url = `${urls.rest_url}/users?ids=7025598b-ffac-4993-8a81-af3f35b71414`;
+      const request_url = `${urls.restUrl}/users?ids=7025598b-ffac-4993-8a81-af3f35b71414`;
       server.respondWith('GET', request_url, [404, {'Content-Type': 'application/json'}, '']);
 
       user_service
@@ -102,7 +102,7 @@ describe('User Service', () => {
 
     it('can get multiple existing users from the server', done => {
       const request_url = `${
-        urls.rest_url
+        urls.restUrl
       }/users?ids=7025598b-ffac-4993-8a81-af3f35b7147f%2C7025598b-ffac-4993-8a81-af3f35b71414`;
       server.respondWith('GET', request_url, [
         200,
@@ -124,7 +124,7 @@ describe('User Service', () => {
 
     it('cannot fetch multiple fake users from the server', done => {
       const request_url = `${
-        urls.rest_url
+        urls.restUrl
       }/users?ids=7025598b-ffac-4993-8a81-af3f35b71488%2C7025598b-ffac-4993-8a81-af3f35b71414`;
       server.respondWith('GET', request_url, [404, {'Content-Type': 'application/json'}, '']);
 
@@ -141,7 +141,7 @@ describe('User Service', () => {
 
     it('can fetch the existing users from the servers in a group with fakes', done => {
       const request_url = `${
-        urls.rest_url
+        urls.restUrl
       }/users?ids=d5a39ffb-6ce3-4cc8-9048-0e15d031b4c5%2C7025598b-ffac-4993-8a81-af3f35b71425`;
       server.respondWith('GET', request_url, [
         200,
