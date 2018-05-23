@@ -49,5 +49,4 @@ module.exports = {
     path: `${__dirname}/dist`,
   },
   plugins: [new webpack.BannerPlugin(`${pkg.name} v${pkg.version}`)],
-  target: 'web',
 };

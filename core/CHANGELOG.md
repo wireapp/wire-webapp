@@ -1,13 +1,10 @@
 # Change Log
 
-All notable changes to this project will be documented in this file.
-See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
 <a name="2.8.8"></a>
+
 ## [2.8.8](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.8.7...@wireapp/core@2.8.8) (2018-05-22)
-
-
-
 
 **Note:** Version bump only for package @wireapp/core
 
