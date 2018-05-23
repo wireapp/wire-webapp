@@ -212,6 +212,8 @@ z.string.ro.modalIntegrationUnavailableHeadline = 'Roboții nu sunt momentan dis
 z.string.ro.modalIntegrationUnavailableMessage = 'Mulțumim că ești interesat de roboți. Acest serviciu este momentan suspendat în timp ce lucrăm la următoarea versiune. Fii pe fază.';
 
 
+z.string.ro.modalImproveWireAction = 'Acceptă';
+
 z.string.ro.modalServiceUnavailableHeadline = 'Adăugarea serviciului nu este posibilă';
 z.string.ro.modalServiceUnavailableMessage = 'Acest serviciu este indisponibil momentan.';
 
@@ -472,9 +474,6 @@ z.string.ro.preferencesOptionsContacts = 'Contacte';
 z.string.ro.preferencesOptionsContactsGmail = 'Importă din Gmail';
 z.string.ro.preferencesOptionsContactsMacos = 'Importă din contacte';
 z.string.ro.preferencesOptionsContactsDetail = 'Vom folosi datele tale de contact pentru a te conecta cu alții. Vom anonimiza toate informațiile și nu le vom împărtăși cu altcineva.';
-z.string.ro.preferencesOptionsData = 'Rapoarte de folosire și de avarie';
-z.string.ro.preferencesOptionsDataCheckbox = 'Rapoarte de folosire și de avarie';
-z.string.ro.preferencesOptionsDataDetail = 'Ajută la îmbunătățirea Wire prin trimiterea de informații anonime.';
 z.string.ro.preferencesOptionsPopular = 'În urma cererilor populare';
 z.string.ro.preferencesOptionsEmojiReplaceCheckbox = 'Înlocuiește emoticoanele cu emoji';
 z.string.ro.preferencesOptionsPreviewsSendCheckbox = 'Creează previzualizări pentru linkurile pe care le trimiți';
