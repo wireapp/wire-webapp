@@ -409,7 +409,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
    */
   _closePeerConnection() {
     const peerConnection = this.peerConnection;
-    if (!this.peerConnection) {
+    if (!peerConnection) {
       return;
     }
 
@@ -418,13 +418,21 @@ z.calling.entities.FlowEntity = class FlowEntity {
     };
 
     peerConnection.onsignalingstatechange = () => {
-      const logMessage = `State change ignored - signaling state: ${this.peerConnection.signalingState}`;
+      const logMessage = `State change ignored - signaling state: ${peerConnection.signalingState}`;
       this.callLogger.log(this.callLogger.levels.OFF, logMessage);
     };
 
     const isStateClosed = peerConnection.signalingState === z.calling.rtc.SIGNALING_STATE.CLOSED;
     if (!isStateClosed) {
-      amplify.publish(z.event.WebApp.CALL.MEDIA.REMOVE_STREAM, peerConnection.getRemoteStreams());
+      let connectionMediaStreamTracks;
+      if (peerConnection.getReceivers) {
+        connectionMediaStreamTracks = peerConnection.getReceivers().map(receiver => receiver.track);
+      } else {
+        connectionMediaStreamTracks = peerConnection
+          .getRemoteStreams()
+          .reduce((tracks, stream) => tracks.concat(stream.getTracks()), []);
+      }
+      amplify.publish(z.event.WebApp.CALL.MEDIA.CONNECTION_CLOSED, connectionMediaStreamTracks);
       peerConnection.close();
 
       const logMessage = {

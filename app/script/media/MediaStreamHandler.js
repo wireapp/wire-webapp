@@ -103,7 +103,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
 
     this.request_hint_timeout = undefined;
     amplify.subscribe(z.event.WebApp.CALL.MEDIA.ADD_STREAM, this.addRemoteMediaStream.bind(this));
-    amplify.subscribe(z.event.WebApp.CALL.MEDIA.REMOVE_STREAM, this.removeRemoteMediaStreams.bind(this));
+    amplify.subscribe(z.event.WebApp.CALL.MEDIA.CONNECTION_CLOSED, this.removeRemoteMediaStreamTracks.bind(this));
   }
 
   //##############################################################################
@@ -525,10 +525,27 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
     this.element_handler.add_media_element(mediaStreamInfo);
   }
 
-  removeRemoteMediaStreams(streams) {
-    const streamIds = streams.map(stream => stream.id);
-    this.remote_media_streams.video.remove(stream => streamIds.includes(stream.id));
-    this.remote_media_streams.audio.remove(stream => streamIds.includes(stream.id));
+  /**
+   * Removes the given tracks from the streams containing them.
+   * If a stream ends up having no tracks, it gets filtered out from the array of streams
+   * removeRemoteMediaStreamTracks
+   *
+   * @param {MediaStreamTrack[]} remoteTracks - the tracks to remove
+   * @returns {void} - void
+   */
+  removeRemoteMediaStreamTracks(remoteTracks) {
+    const removeTracks = (streams, tracks) => {
+      return streams
+        .map(stream => {
+          tracks.forEach(track => stream.removeTrack(track));
+          return stream;
+        })
+        .filter(stream => stream.getTracks().length > 0);
+    };
+
+    [this.remote_media_streams.video, this.remote_media_streams.audio].forEach(streams => {
+      streams(removeTracks(streams(), remoteTracks));
+    });
   }
 
   //##############################################################################
