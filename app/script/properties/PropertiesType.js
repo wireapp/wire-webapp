@@ -29,7 +29,7 @@ z.properties.PROPERTIES_TYPE = {
   },
   DARK_THEME: 'settings.darktheme.enabled',
   EMOJI: {
-    REPLACE_INLINE: 'settings.ce_inline',
+    REPLACE_INLINE: 'settings.emoji.replace_inline',
   },
   ENABLE_DEBUGGING: 'enable_debugging',
   NOTIFICATIONS: 'settings.notifications',

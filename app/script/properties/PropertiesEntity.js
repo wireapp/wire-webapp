@@ -48,6 +48,6 @@ z.properties.PropertiesEntity = class PropertiesEntity {
       macos: undefined,
     };
     this[z.properties.PROPERTIES_TYPE.HAS_CREATED_CONVERSATION] = false;
-    this[z.properties.PROPERTIES_TYPE.ENABLE_DEBUGGING] = true;
+    this[z.properties.PROPERTIES_TYPE.ENABLE_DEBUGGING] = false;
   }
 };
