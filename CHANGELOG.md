@@ -1,6 +1,15 @@
 # Change Log
 
-All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+<a name="1.1.26"></a>
+## [1.1.26](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@1.1.25...@wireapp/react-ui-kit@1.1.26) (2018-05-23)
+
+
+
+
+**Note:** Version bump only for package @wireapp/react-ui-kit
 
 <a name="1.1.25"></a>
 
