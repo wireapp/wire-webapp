@@ -470,23 +470,28 @@ z.conversation.EventMapper = class EventMapper {
 
     const assetEntity = new z.entity.File(id);
 
-    assetEntity.correlation_id = info.correlation_id;
     assetEntity.conversationId = conversationId;
 
-    // original
+    // Original
     assetEntity.file_size = content_length;
     assetEntity.file_type = content_type;
-    assetEntity.file_name = info.name;
     assetEntity.meta = meta;
 
-    // remote data - full
+    // info
+    if (info) {
+      const {correlation_id, name} = info;
+      assetEntity.correlation_id = correlation_id;
+      assetEntity.file_name = name;
+    }
+
+    // Remote data - full
     const {key, otr_key, sha256, token} = eventData;
     const remoteData = key
       ? z.assets.AssetRemoteData.v3(key, otr_key, sha256, token)
       : z.assets.AssetRemoteData.v2(conversationId, id, otr_key, sha256);
     assetEntity.original_resource(remoteData);
 
-    // remote data - preview
+    // Remote data - preview
     const {preview_id, preview_key, preview_otr_key, preview_sha256, preview_token} = eventData;
     if (preview_otr_key) {
       const remoteDataPreview = preview_key
@@ -515,9 +520,13 @@ z.conversation.EventMapper = class EventMapper {
 
     assetEntity.file_size = content_length;
     assetEntity.file_type = content_type;
-    assetEntity.width = info.width;
-    assetEntity.height = info.height;
     assetEntity.ratio = assetEntity.height / assetEntity.width;
+
+    if (info) {
+      const {height, width} = info;
+      assetEntity.width = width;
+      assetEntity.height = height;
+    }
 
     const {key, otr_key, sha256, token} = eventData;
 
@@ -550,7 +559,7 @@ z.conversation.EventMapper = class EventMapper {
       linkPreviewEntity.meta_data = linkPreview[meta_data];
 
       const previewImage = image || article_image;
-      if (previewImage) {
+      if (previewImage && previewImage.uploaded) {
         const {asset_token, asset_id: asset_key} = previewImage.uploaded;
 
         if (asset_key) {

@@ -95,7 +95,13 @@ z.util.Environment = (() => {
 
     return _isEdge() ? false : _isChrome() || _isFirefox() || _isOpera();
   };
-  const _supportsIndexedDb = () => !!window.indexedDB;
+  const _supportsIndexedDb = () => {
+    try {
+      return !!window.indexedDB;
+    } catch (error) {
+      return false;
+    }
+  };
   const _supportsMediaDevices = () => !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
   const _supportsNotifications = () => {
     const notificationNotSupported = window.Notification === undefined;

@@ -152,6 +152,9 @@ z.string.modalAssetParallelUploadsMessage = 'You can send up to {{number}} files
 z.string.modalCallEmptyConversationHeadline = 'No one to call';
 z.string.modalCallEmptyConversationMessage = 'There is no one left here.';
 
+z.string.modalCallEmptyLogHeadline = 'No calls';
+z.string.modalCallEmptyLogMessage = 'There were no calls to base the debug report on.';
+
 z.string.modalCallNoGroupVideoHeadline = 'No video calls in groups';
 z.string.modalCallNoGroupVideoMessage = 'Video calls are not available in group conversations.';
 
@@ -167,9 +170,9 @@ z.string.modalCallSecondOngoingAction = 'Hang Up';
 z.string.modalCallSecondOngoingHeadline = 'Hang up call on another device?';
 z.string.modalCallSecondOngoingMessage = 'You can only be in one call at a time.';
 
-z.string.modalCallSecondOutgoingAction = 'Hang Up';
+z.string.modalCallSecondOutgoingAction = 'Call Anyway';
 z.string.modalCallSecondOutgoingHeadline = 'Hang up current call?';
-z.string.modalCallSecondOutgoingMessage = 'You can only be in one call at a time.';
+z.string.modalCallSecondOutgoingMessage = 'A call is active in another conversation. Calling here will hang up the other call.';
 
 z.string.modalConnectCancelAction = 'Yes';
 z.string.modalConnectCancelHeadline = 'Cancel Request?';
@@ -255,6 +258,11 @@ z.string.modalPictureTooLargeMessage = 'You can use pictures up to {{number}} MB
 
 z.string.modalPictureTooSmallHeadline = 'Picture too small';
 z.string.modalPictureTooSmallMessage = 'Please choose a picture that is at least 320 x 320 px.';
+
+z.string.modalImproveWireAction = 'Accept';
+z.string.modalImproveWireSecondary = 'Not now';
+z.string.modalImproveWireHeadline = 'Help us make Wire better';
+z.string.modalImproveWireMessage = 'Sending anonymous usage and crash reports helps us to improve our products and services. We do not use this information for anything else.';
 
 z.string.modalServiceUnavailableHeadline = 'Adding service not possible';
 z.string.modalServiceUnavailableMessage = 'The service is unavailable a the moment.';
@@ -396,14 +404,14 @@ z.string.conversationsConnectionRequestMany = '{{number}} people waiting';
 z.string.conversationsConnectionRequestOne = '1 person waiting';
 z.string.conversationsEmptyConversation = 'Group conversation';
 z.string.conversationsNoConversations = 'Start a conversation or create a group.';
-z.string.conversationsPopoverArchive = 'Archive conversation';
-z.string.conversationsPopoverBlock = 'Block contact…';
+z.string.conversationsPopoverArchive = 'Archive';
+z.string.conversationsPopoverBlock = 'Block…';
 z.string.conversationsPopoverCancel = 'Cancel request…';
 z.string.conversationsPopoverClear = 'Delete content…';
 z.string.conversationsPopoverLeave = 'Leave group…';
-z.string.conversationsPopoverNotify = 'Unmute conversation';
-z.string.conversationsPopoverSilence = 'Mute conversation';
-z.string.conversationsPopoverUnarchive = 'Unarchive conversation';
+z.string.conversationsPopoverNotify = 'Unmute';
+z.string.conversationsPopoverSilence = 'Mute';
+z.string.conversationsPopoverUnarchive = 'Unarchive';
 
 // Conversations secondary line
 z.string.conversationsSecondaryLineMissedCall = '{{number}} missed call';
@@ -461,9 +469,9 @@ z.string.addParticipantsTabsPeople = 'People';
 z.string.addParticipantsTabsServices = 'Services';
 
 // Panel: Conversation details
-z.string.conversationDetailsActionArchive = 'Archive conversation';
+z.string.conversationDetailsActionArchive = 'Archive';
 z.string.conversationDetailsActionAddParticipants = 'Add participants';
-z.string.conversationDetailsActionBlock = 'Block contact…';
+z.string.conversationDetailsActionBlock = 'Block…';
 z.string.conversationDetailsActionCancelRequest = 'Cancel request…';
 z.string.conversationDetailsActionClear = 'Delete content…';
 z.string.conversationDetailsActionCreateGroup = 'Create group';
@@ -480,7 +488,7 @@ z.string.conversationDetailsPeople = 'People';
 z.string.conversationDetailsServices = 'Services';
 
 // Panel: Group participant
-z.string.groupParticipantActionBlock = 'Block contact…';
+z.string.groupParticipantActionBlock = 'Block…';
 z.string.groupParticipantActionCancelRequest = 'Cancel request…';
 z.string.groupParticipantActionDevices = 'Devices';
 z.string.groupParticipantActionIgnoreRequest = 'Ignore request';
@@ -491,7 +499,7 @@ z.string.groupParticipantActionPending = 'Pending';
 z.string.groupParticipantActionRemove = 'Remove from group…';
 z.string.groupParticipantActionSelfProfile = 'Open profile';
 z.string.groupParticipantActionSendRequest = 'Connect';
-z.string.groupParticipantActionUnblock = 'Unblock contact…';
+z.string.groupParticipantActionUnblock = 'Unblock…';
 
 // Panel: Guest options
 z.string.guestOptionsCopyLink = 'Copy link';
@@ -543,11 +551,16 @@ z.string.preferencesAboutWebsite = 'Wire website';
 
 z.string.preferencesAccountAvaibilityUnset = 'Set a status';
 z.string.preferencesAccountCreateTeam = 'Create a team';
+z.string.preferencesAccountData = 'Data usage permissions';
+z.string.preferencesAccountDataCheckbox = 'Send anonymous data';
+z.string.preferencesAccountDataDetail = 'Help make Wire better by sending anonymous usage and crash reports.';
 z.string.preferencesAccountDelete = 'Delete account';
 z.string.preferencesAccountLeaveGuestRoom = 'Leave the guest room';
 z.string.preferencesAccountLeaveGuestRoomDescription = 'You will no longer be able to access the messages in this conversation.';
 z.string.preferencesAccountLogOut = 'Log out';
 z.string.preferencesAccountManageTeam = 'Manage team';
+z.string.preferencesAccountMarketingConsentCheckbox = 'Receive newsletter';
+z.string.preferencesAccountMarketingConsentDetail = 'Receive news and product updates from Wire via email.';
 z.string.preferencesAccountResetPassword = 'Reset password';
 z.string.preferencesAccountTeam = 'in {{name}}';
 z.string.preferencesAccountUsernamePlaceholder = 'Your full name';
@@ -588,9 +601,6 @@ z.string.preferencesOptionsContacts = 'Contacts';
 z.string.preferencesOptionsContactsGmail = 'Import from Gmail';
 z.string.preferencesOptionsContactsMacos = 'Import from Contacts';
 z.string.preferencesOptionsContactsDetail = 'We use your contact data to connect you with others. We anonymize all information and do not share it with anyone else.';
-z.string.preferencesOptionsData = 'Usage and crash reports';
-z.string.preferencesOptionsDataCheckbox = 'Send anonymous data';
-z.string.preferencesOptionsDataDetail = 'Make Wire better by sending anonymous information.';
 z.string.preferencesOptionsPopular = 'By popular demand';
 z.string.preferencesOptionsEmojiReplaceCheckbox = 'Replace type emoticons with emojis';
 z.string.preferencesOptionsEmojiReplaceDetail = ':-) → {{icon}}';
@@ -604,6 +614,37 @@ z.string.preferencesOptionsNotificationsOn = 'Show sender and message';
 z.string.preferencesOptionsCallLogs = 'Troubleshooting';
 z.string.preferencesOptionsCallLogsGet = 'Save the calling debug report';
 z.string.preferencesOptionsCallLogsDetail = 'This information helps Wire Support diagnose calling problems.';
+
+z.string.preferencesOptionsBackupHeader = 'History';
+z.string.preferencesOptionsBackupExportHeadline = 'Back up conversations';
+z.string.preferencesOptionsBackupExportSecondary = 'Create a backup to preserve your conversation history. You can use this to restore history if you lose your computer or switch to a new one.\nThe backup file is not protected by Wire end-to-end encryption, so store it in a safe place.';
+z.string.preferencesOptionsBackupImportHeadline = 'Restore from backup';
+z.string.preferencesOptionsBackupImportSecondary = 'You can only restore history from a backup of the same platform. Your backup will overwrite the conversations that you may have on this device.';
+
+// History Backup
+z.string.backupExportGenericErrorHeadline = 'The file could not be saved';
+z.string.backupExportGenericErrorSecondary = 'The backup was not completed.';
+z.string.backupExportProgressHeadline = 'Preparing…';
+z.string.backupExportProgressSecondary = 'Backing up · {{processed}} of {{total}} — {{progress}}%';
+z.string.backupExportProgressCompressing = 'Preparing backup file';
+z.string.backupExportSaveFileAction = 'Save file';
+z.string.backupExportSuccessHeadline = 'Backup ready';
+z.string.backupExportSuccessSecondary = 'You can use this to restore history if you lose your computer or switch to a new one.';
+z.string.backupImportGenericErrorHeadline = 'Something went wrong';
+z.string.backupImportGenericErrorSecondary = 'Your history could not be restored.';
+z.string.backupImportAccountErrorHeadline = 'Wrong backup';
+z.string.backupImportAccountErrorSecondary = 'You cannot restore history from a different account.';
+z.string.backupImportVersionErrorHeadline = 'Incompatible backup';
+z.string.backupImportVersionErrorSecondary = 'This backup was created by a newer or outdated version of Wire and cannot be restored here.';
+z.string.backupImportIncompatibleErrorHeadline = 'Wrong backup';
+z.string.backupImportIncompatibleErrorSecondary = 'You cannot restore history from a different account.';
+z.string.backupImportOutdatedErrorHeadline = 'Incompatible backup';
+z.string.backupImportOutdatedErrorSecondary = 'This backup was created by a newer or outdated version of Wire and cannot be restored here.';
+z.string.backupImportProgressHeadline = 'Preparing…';
+z.string.backupImportProgressSecondary = 'Restoring history · {{processed}} of {{total}} — {{progress}}%';
+z.string.backupImportSuccessHeadline = 'History restored.';
+z.string.backupCancel = 'Cancel';
+z.string.backupTryAgain = 'Try Again';
 
 // Search
 z.string.searchConnect = 'Connect';

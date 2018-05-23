@@ -199,6 +199,8 @@ z.string.fi.modalIntegrationUnavailableHeadline = 'Botit eivät käytettävissä
 z.string.fi.modalIntegrationUnavailableMessage = 'Kiitos mielenkiinnostasi botteihin. Tämä palvelu on väliaikaisesti pois käytöstä, koska työstämme seuraavaa versiota.';
 
 
+z.string.fi.modalImproveWireAction = 'Hyväksy';
+
 z.string.fi.modalSessionResetHeadline = 'Istunto on nollattu';
 z.string.fi.modalSessionResetMessage1 = 'Jos ongelma ei ole ratkennut';
 z.string.fi.modalSessionResetMessageLink = 'ota yhteys';
@@ -301,10 +303,7 @@ z.string.fi.conversationsConnectionRequestOne = '1 ihminen odottaa';
 z.string.fi.conversationsEmptyConversation = 'Ryhmäkeskustelu';
 z.string.fi.conversationsNoConversations = 'Ei vielä keskusteluita';
 z.string.fi.conversationsPopoverArchive = 'Arkistoi';
-z.string.fi.conversationsPopoverBlock = 'Estä';
 z.string.fi.conversationsPopoverCancel = 'Peru pyyntö';
-z.string.fi.conversationsPopoverClear = 'Poista';
-z.string.fi.conversationsPopoverLeave = 'Poistu';
 z.string.fi.conversationsPopoverNotify = 'Poista mykistys';
 z.string.fi.conversationsPopoverSilence = 'Mykistä';
 z.string.fi.conversationsPopoverUnarchive = 'Palauta arkistosta';
@@ -350,6 +349,7 @@ z.string.fi.addParticipantsSearchPlaceholder = 'Hae nimellä';
 z.string.fi.addParticipantsTabsPeople = 'Ihmiset';
 z.string.fi.addParticipantsTabsServices = 'Palvelut';
 
+z.string.fi.conversationDetailsActionArchive = 'Arkistoi';
 z.string.fi.conversationDetailsActionCancelRequest = 'Peru pyyntö';
 z.string.fi.conversationDetailsActionDevices = 'Laitteet';
 z.string.fi.conversationDetailsGuestsOff = 'Pois päältä';
@@ -423,7 +423,6 @@ z.string.fi.preferencesDevicesCurrent = 'Nykyinen';
 z.string.fi.preferencesDevicesFingerprint = 'Sormenjälki avain';
 z.string.fi.preferencesDevicesFingerprintDetail = 'Wire antaa jokaiselle laitteelle yksilöllisen sormenjäljen. Vertaa niitä ja varmenna laitteesi ja keskustelusi.';
 z.string.fi.preferencesDevicesId = 'ID: ';
-z.string.fi.preferencesDevicesRemove = 'Poista';
 z.string.fi.preferencesDevicesRemoveCancel = 'Peruuta';
 z.string.fi.preferencesDevicesRemoveDetail = 'Poista tämä laite jos olet lakannut käyttämästä sitä. Sinut kirjataan ulos tästä laitteesta välittömästi.';
 z.string.fi.preferencesDevicesSessionConfirmation = 'Istunto on nollattu.';
@@ -443,9 +442,6 @@ z.string.fi.preferencesOptionsContacts = 'Yhteystiedot';
 z.string.fi.preferencesOptionsContactsGmail = 'Tuo Gmailista';
 z.string.fi.preferencesOptionsContactsMacos = 'Tuo Yhteystiedoista';
 z.string.fi.preferencesOptionsContactsDetail = 'Käytämme sinun kontaktitietoja yhdistääksemme sinut muiden kanssa. Anonymisoimme kaiken tiedon ja emme jaa sitä ulkopuolisille.';
-z.string.fi.preferencesOptionsData = 'Käyttö- ja vikaraportit';
-z.string.fi.preferencesOptionsDataCheckbox = 'Käyttö- ja vikaraportit';
-z.string.fi.preferencesOptionsDataDetail = 'Tee Wirestä parempi lähetämällä anonyymiä tietoa.';
 z.string.fi.preferencesOptionsPopular = 'Yleisön pyynnöstä';
 z.string.fi.preferencesOptionsEmojiReplaceCheckbox = 'Korvaa tekstihymiöt emojeilla';
 z.string.fi.preferencesOptionsPreviewsSendCheckbox = 'Luo esikatselut lähettämillesi linkeille';
@@ -455,6 +451,8 @@ z.string.fi.preferencesOptionsNotificationsNone = 'Pois päältä';
 z.string.fi.preferencesOptionsNotificationsObfuscate = 'Piilota yksityiskohdat';
 z.string.fi.preferencesOptionsNotificationsObfuscateMessage = 'Näytä lähettäjä';
 z.string.fi.preferencesOptionsNotificationsOn = 'Näytä lähettäjä ja viesti';
+
+z.string.fi.backupCancel = 'Peruuta';
 
 z.string.fi.searchConnect = 'Yhdistä';
 z.string.fi.searchConnections = 'Yhteydet';

@@ -204,6 +204,8 @@ z.string.nl.modalIntegrationUnavailableHeadline = 'Bots zijn nu niet beschikbaar
 z.string.nl.modalIntegrationUnavailableMessage = 'Dank je voor je intress voor bots. De service is nu gestopt, terwijl we nu werken aan een volgende versie.';
 
 
+z.string.nl.modalImproveWireAction = 'Neem op';
+
 z.string.nl.modalServiceUnavailableHeadline = 'Toevoegen van de service niet mogelijk';
 z.string.nl.modalServiceUnavailableMessage = 'De service is op dit moment niet beschikbaar.';
 
@@ -319,10 +321,7 @@ z.string.nl.conversationsConnectionRequestOne = '1 persoon wacht';
 z.string.nl.conversationsEmptyConversation = 'Groepsgesprek';
 z.string.nl.conversationsNoConversations = 'Nog geen gesprekken';
 z.string.nl.conversationsPopoverArchive = 'Archiveren';
-z.string.nl.conversationsPopoverBlock = 'Blokkeren';
 z.string.nl.conversationsPopoverCancel = 'Annuleer verzoek';
-z.string.nl.conversationsPopoverClear = 'Verwijderen';
-z.string.nl.conversationsPopoverLeave = 'Verlaten';
 z.string.nl.conversationsPopoverNotify = 'Dempen opheffen';
 z.string.nl.conversationsPopoverSilence = 'Dempen';
 z.string.nl.conversationsPopoverUnarchive = 'Terugzetten';
@@ -370,6 +369,7 @@ z.string.nl.addParticipantsServiceConfirmButton = 'Service toevoegen';
 z.string.nl.addParticipantsTabsPeople = 'Deelnemers';
 z.string.nl.addParticipantsTabsServices = 'Services';
 
+z.string.nl.conversationDetailsActionArchive = 'Archiveren';
 z.string.nl.conversationDetailsActionCancelRequest = 'Annuleer verzoek';
 z.string.nl.conversationDetailsActionCreateGroup = 'Nieuwe groep';
 z.string.nl.conversationDetailsActionDevices = 'Apparaten';
@@ -445,7 +445,6 @@ z.string.nl.preferencesDevicesCurrent = 'Huidig';
 z.string.nl.preferencesDevicesFingerprint = 'Digitale vingerafdruk';
 z.string.nl.preferencesDevicesFingerprintDetail = 'Wire geeft elk apparaat een eigen vingerafdruk. Vergelijk deze en verifieer je apparaten en gesprekken.';
 z.string.nl.preferencesDevicesId = 'ID: ';
-z.string.nl.preferencesDevicesRemove = 'Verwijderen';
 z.string.nl.preferencesDevicesRemoveCancel = 'Annuleer';
 z.string.nl.preferencesDevicesRemoveDetail = 'Verwijder dit apparaat als je het niet meer gebruikt. Je berichtengeschiedenis wordt verwijderd op dit apparaat en je wordt uitgelogd.';
 z.string.nl.preferencesDevicesSessionConfirmation = 'De sessie is gereset.';
@@ -465,9 +464,6 @@ z.string.nl.preferencesOptionsContacts = 'Contacten';
 z.string.nl.preferencesOptionsContactsGmail = 'Importeren uit Gmail';
 z.string.nl.preferencesOptionsContactsMacos = 'Importeren uit contacten';
 z.string.nl.preferencesOptionsContactsDetail = 'Dit helpt je om met anderen te verbinden. We anonimiseren alle informatie en delen deze niet met iemand anders.';
-z.string.nl.preferencesOptionsData = 'Diagnose en gebruik reporten';
-z.string.nl.preferencesOptionsDataCheckbox = 'Anoniem gegevens delen';
-z.string.nl.preferencesOptionsDataDetail = 'Maak Wire beter door anoniem data te versturen.';
 z.string.nl.preferencesOptionsPopular = 'Op veler verzoek';
 z.string.nl.preferencesOptionsEmojiReplaceCheckbox = 'Getypte emoticons vervangen door emojis';
 z.string.nl.preferencesOptionsEmojiReplaceDetail = ':-) → {{icon}}';
@@ -478,6 +474,8 @@ z.string.nl.preferencesOptionsNotificationsNone = 'Uit';
 z.string.nl.preferencesOptionsNotificationsObfuscate = 'Details verbergen';
 z.string.nl.preferencesOptionsNotificationsObfuscateMessage = 'Toon zender';
 z.string.nl.preferencesOptionsNotificationsOn = 'Toon verzender en bericht';
+
+z.string.nl.backupCancel = 'Annuleer';
 
 z.string.nl.searchConnect = 'Verbind';
 z.string.nl.searchConnections = 'Contacten';

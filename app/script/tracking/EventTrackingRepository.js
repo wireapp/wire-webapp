@@ -69,7 +69,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
 
     this.last_report = undefined;
     this.mixpanel = undefined;
-    this.privacy_preference = false;
+    this.privacy_preference = undefined;
 
     this.is_error_reporting_activated = false;
     this.is_user_analytics_activated = false;
@@ -193,11 +193,10 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
   }
 
   _track_event(event_name, attributes) {
-    if (attributes) {
-      this.logger.info(`Tracking event '${event_name}' with attributes: ${JSON.stringify(attributes)}`);
-    } else {
-      this.logger.info(`Tracking event '${event_name}' without attributes`);
-    }
+    const logMessage = attributes
+      ? `Tracking event '${event_name}' with attributes: ${JSON.stringify(attributes)}`
+      : `Tracking event '${event_name}' without attributes`;
+    this.logger.info(logMessage);
 
     const isDisabledEvent = EventTrackingRepository.CONFIG.USER_ANALYTICS.DISABLED_EVENTS.includes(event_name);
     if (!isDisabledEvent) {
@@ -210,9 +209,9 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
     this.is_user_analytics_activated = false;
 
     this._unsubscribe_from_tracking_events();
-    this._track_event(z.tracking.EventName.SETTINGS.OPTED_OUT_TRACKING);
 
     if (this.mixpanel) {
+      this._track_event(z.tracking.EventName.SETTINGS.OPTED_OUT_TRACKING);
       this.mixpanel.register({
         $ignore: true,
       });

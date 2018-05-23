@@ -201,6 +201,8 @@ z.string.es.modalIntegrationUnavailableHeadline = 'Bots no disponibles por el mo
 z.string.es.modalIntegrationUnavailableMessage = 'Gracias por su interés en los bots. El servicio está suspendido mientras trabajamos en la próxima versión.';
 
 
+z.string.es.modalImproveWireAction = 'Aceptar';
+
 z.string.es.modalSessionResetHeadline = 'La sesión ha sido restablecida';
 z.string.es.modalSessionResetMessage1 = 'Si no se resuelva el problema,';
 z.string.es.modalSessionResetMessageLink = 'comunicarse con';
@@ -268,7 +270,7 @@ z.string.es.conversationAssetDownloading = 'Descargando…';
 z.string.es.conversationAssetUploadFailed = 'Error al subir la información';
 z.string.es.conversationPlaybackError = 'Incapaz de reproducir';
 z.string.es.conversationContextMenuEdit = 'Editar';
-z.string.es.conversationContextMenuDelete = 'Eliminar para mi';
+z.string.es.conversationContextMenuDelete = 'Eliminar para mí';
 z.string.es.conversationContextMenuDeleteEveryone = 'Eliminar para todos';
 z.string.es.conversationContextMenuDownload = 'Descargar';
 z.string.es.conversationContextMenuLike = 'Me gusta';
@@ -303,10 +305,7 @@ z.string.es.conversationsConnectionRequestOne = '1 persona en espera';
 z.string.es.conversationsEmptyConversation = 'Conversación en grupo';
 z.string.es.conversationsNoConversations = 'Iniciar una conversación o crear un grupo.';
 z.string.es.conversationsPopoverArchive = 'Archivar';
-z.string.es.conversationsPopoverBlock = 'Bloquear';
 z.string.es.conversationsPopoverCancel = 'Cancelar solicitud';
-z.string.es.conversationsPopoverClear = 'Eliminar';
-z.string.es.conversationsPopoverLeave = 'Abandonar';
 z.string.es.conversationsPopoverNotify = 'Sonido';
 z.string.es.conversationsPopoverSilence = 'Silenciar';
 z.string.es.conversationsPopoverUnarchive = 'Desarchivar';
@@ -352,6 +351,7 @@ z.string.es.addParticipantsSearchPlaceholder = 'Buscar por nombre';
 z.string.es.addParticipantsTabsPeople = 'Personas';
 z.string.es.addParticipantsTabsServices = 'Servicios';
 
+z.string.es.conversationDetailsActionArchive = 'Archivar';
 z.string.es.conversationDetailsActionCancelRequest = 'Cancelar solicitud';
 z.string.es.conversationDetailsActionDevices = 'Dispositivos';
 z.string.es.conversationDetailsGuestsOff = 'Desactivar';
@@ -426,7 +426,6 @@ z.string.es.preferencesDevicesCurrent = 'Actual';
 z.string.es.preferencesDevicesFingerprint = 'Huella digital';
 z.string.es.preferencesDevicesFingerprintDetail = 'Wire proporciona a cada dispositivo una huella digital única. Compare las huellas dactilares para verificar su dispositivos y conversaciones.';
 z.string.es.preferencesDevicesId = 'ID: ';
-z.string.es.preferencesDevicesRemove = 'Eliminar';
 z.string.es.preferencesDevicesRemoveCancel = 'Cancelar';
 z.string.es.preferencesDevicesRemoveDetail = 'Elimina este dispositivo si has dejado de usarlo. Se cerrará la sesión inmediatamente en este dispositivo.';
 z.string.es.preferencesDevicesSessionConfirmation = 'La sesión ha sido restablecida.';
@@ -446,9 +445,6 @@ z.string.es.preferencesOptionsContacts = 'Contactos';
 z.string.es.preferencesOptionsContactsGmail = 'Importar desde Gmail';
 z.string.es.preferencesOptionsContactsMacos = 'Importar desde Contactos';
 z.string.es.preferencesOptionsContactsDetail = 'Compartir tus contactos te ayuda a conectarte con otros. Toda la información es anónima y no será compartida con nadie más.';
-z.string.es.preferencesOptionsData = 'Reportes de uso y fallas';
-z.string.es.preferencesOptionsDataCheckbox = 'Reportes de uso y fallas';
-z.string.es.preferencesOptionsDataDetail = 'Ayudar a mejorar Wire enviando información anónima.';
 z.string.es.preferencesOptionsPopular = 'Por demanda popular';
 z.string.es.preferencesOptionsEmojiReplaceCheckbox = 'Sustituir emoticonos por emojis';
 z.string.es.preferencesOptionsPreviewsSendCheckbox = 'Crear vistas previas para los enlaces enviados';
@@ -458,6 +454,8 @@ z.string.es.preferencesOptionsNotificationsNone = 'Desactivar';
 z.string.es.preferencesOptionsNotificationsObfuscate = 'Ocultar detalles';
 z.string.es.preferencesOptionsNotificationsObfuscateMessage = 'Mostrar remitente';
 z.string.es.preferencesOptionsNotificationsOn = 'Mostrar remitente y mensaje';
+
+z.string.es.backupCancel = 'Cancelar';
 
 z.string.es.searchConnect = 'Conectar';
 z.string.es.searchConnections = 'Conexiones';

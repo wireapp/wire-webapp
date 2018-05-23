@@ -125,6 +125,7 @@ z.string.el.modalAccountRemoveDevicePlaceholder = 'Κωδικός Πρόσβασ
 z.string.el.modalAssetTooLargeHeadline = 'Το αρχείο είναι πολύ μεγάλο';
 z.string.el.modalAssetTooLargeMessage = 'Μπορείτε να στείλετε αρχεία έως {{number}}';
 
+z.string.el.modalAssetParallelUploadsHeadline = 'Πάρα πολλά αρχεία ταυτόχρονα';
 z.string.el.modalAssetParallelUploadsMessage = 'Μπορείτε να στείλετε μέχρι και {{number}} αρχεία ταυτόχρονα.';
 
 z.string.el.modalCallEmptyConversationHeadline = 'Κανένας για κλήση';
@@ -160,6 +161,7 @@ z.string.el.modalConnectAcceptMessage = 'Αυτό θα σας συνδέσει �
 z.string.el.modalConnectAcceptSecondary = 'Αγνόηση';
 
 z.string.el.modalConversationAddBotAction = 'Επιβεβαίωση';
+z.string.el.modalConversationAddBotHeadline = 'Προσθήκη υπηρεσίας';
 
 z.string.el.modalConversationClearAction = 'Διαγραφή';
 z.string.el.modalConversationClearHeadline = 'Διαγραφή περιεχομένου;';
@@ -204,6 +206,9 @@ z.string.el.modalConversationTooManyMembersHeadline = 'Full house';
 
 z.string.el.modalIntegrationUnavailableHeadline = 'Προσωρινά δεν είναι διαθέσιμο';
 
+z.string.el.modalPictureFileFormatMessage = 'Παρακαλώ επιλέξτε ένα αρχείο PNG ή JPEG.';
+
+z.string.el.modalImproveWireAction = 'Αποδοχή';
 
 z.string.el.modalSessionResetHeadline = 'Η περίοδος λειτουργίας σύνδεσης έχει επαναφερθεί';
 z.string.el.modalSessionResetMessage1 = 'Εάν το πρόβλημα δεν επιλυθεί,';
@@ -285,7 +290,10 @@ z.string.el.conversationSomeone = 'Κάποιος';
 z.string.el.conversationTweetAuthor = ' στο Twitter';
 
 z.string.el.groupCreationPreferencesAction = 'Επόμενο';
+z.string.el.groupCreationPreferencesHeader = 'Δημιουργία ομάδος';
+z.string.el.groupCreationPreferencesPlaceholder = 'Όνομα ομάδος';
 z.string.el.groupCreationParticipantsActionCreate = 'Έγινε';
+z.string.el.groupCreationParticipantsActionSkip = 'Παράλειψη';
 z.string.el.groupCreationParticipantsHeader = 'Προσθήκη ατόμων';
 z.string.el.groupCreationParticipantsHeaderWithCounter = 'Προσθήκη ατόμων ({{number}})';
 z.string.el.groupCreationParticipantsPlaceholder = 'Αναζήτηση βάση ονόματος';
@@ -312,10 +320,8 @@ z.string.el.conversationsConnectionRequestOne = '1 άτομο σε αναμον�
 z.string.el.conversationsEmptyConversation = 'Ομαδική συζήτηση';
 z.string.el.conversationsNoConversations = 'Δεν υπάρχουν ακόμα συζητήσεις';
 z.string.el.conversationsPopoverArchive = 'Αρχειοθέτηση';
-z.string.el.conversationsPopoverBlock = 'Αποκλεισμός';
 z.string.el.conversationsPopoverCancel = 'Ακύρωση αιτήματος';
-z.string.el.conversationsPopoverClear = 'Διαγραφή';
-z.string.el.conversationsPopoverLeave = 'Αποχώρηση';
+z.string.el.conversationsPopoverClear = 'Διαγραφή περιεχομένου…';
 z.string.el.conversationsPopoverNotify = 'Ενεργή ένταση';
 z.string.el.conversationsPopoverSilence = 'Σίγαση';
 z.string.el.conversationsPopoverUnarchive = 'Αναίρεση αρχειοθέτησης';
@@ -363,10 +369,12 @@ z.string.el.addParticipantsSearchPlaceholder = 'Αναζήτηση βάση ον
 z.string.el.addParticipantsTabsPeople = 'Άτομα';
 z.string.el.addParticipantsTabsServices = 'Υπηρεσίες';
 
+z.string.el.conversationDetailsActionArchive = 'Αρχειοθέτηση';
 z.string.el.conversationDetailsActionAddParticipants = 'Προσθήκη συμμετεχόντων';
 z.string.el.conversationDetailsActionBlock = 'Αποκλεισμός επαφής';
 z.string.el.conversationDetailsActionCancelRequest = 'Ακύρωση αιτήματος';
 z.string.el.conversationDetailsActionClear = 'Διαγραφή περιεχομένου';
+z.string.el.conversationDetailsActionCreateGroup = 'Δημιουργία ομάδος';
 z.string.el.conversationDetailsActionDevices = 'Συσκευές';
 z.string.el.conversationDetailsGuestsOff = 'Ανενεργό';
 z.string.el.conversationDetailsParticipantsServicesOne = 'Υπηρεσία';
@@ -376,7 +384,6 @@ z.string.el.conversationDetailsParticipantsUsersMany = 'Άτομα';
 z.string.el.conversationDetailsPeople = 'Άτομα';
 z.string.el.conversationDetailsServices = 'Υπηρεσίες';
 
-z.string.el.groupParticipantActionBlock = 'Αποκλεισμός επαφής';
 z.string.el.groupParticipantActionCancelRequest = 'Ακύρωση αιτήματος';
 z.string.el.groupParticipantActionDevices = 'Συσκευές';
 z.string.el.groupParticipantActionPending = 'Εκκρεμεί';
@@ -445,7 +452,6 @@ z.string.el.preferencesDevicesCurrent = 'Τρεχων';
 z.string.el.preferencesDevicesFingerprint = 'Κλειδί αποτυπώματος';
 z.string.el.preferencesDevicesFingerprintDetail = 'Το Wire δίνει σε κάθε συσκευή ένα μοναδικό αποτύπωμα. Συγκρίνετε τα και επαληθεύστε τις συσκευές σας και τις συνομιλίες σας.';
 z.string.el.preferencesDevicesId = 'ID: ';
-z.string.el.preferencesDevicesRemove = 'Αφαίρεση';
 z.string.el.preferencesDevicesRemoveCancel = 'Ακύρωση';
 z.string.el.preferencesDevicesRemoveDetail = 'Αφαιρέστε αυτήν την συσκευή εάν έχετε σταματήσει να την χρησιμοποιήτε. Θα πρέπει να αποσυνδεθείτε από αυτήν την συσκευή αμέσως.';
 z.string.el.preferencesDevicesSessionConfirmation = 'Η περίοδος λειτουργίας έχει επαναφερθεί.';
@@ -465,9 +471,6 @@ z.string.el.preferencesOptionsContacts = 'Επαφές';
 z.string.el.preferencesOptionsContactsGmail = 'Εισαγωγή από το Gmail';
 z.string.el.preferencesOptionsContactsMacos = 'Εισαγωγή από τις Επαφές';
 z.string.el.preferencesOptionsContactsDetail = 'Χρησιμοποιούμε τις επαφές σας για να συνδέεστε με άλλους. Κρατάμε όλες σας τις πληροφορίες ανώνυμες και δεν τις μοιραζόμαστε με κανέναν άλλον.';
-z.string.el.preferencesOptionsData = 'Χρησιμοτητα και αναφορες σφαλματων';
-z.string.el.preferencesOptionsDataCheckbox = 'Αποστολή ανώνυμων δεδομένων';
-z.string.el.preferencesOptionsDataDetail = 'Βοηθήστε το Wire να βελτιωθεί στέλνοντας ανώνυμα δεδομένα σας.';
 z.string.el.preferencesOptionsPopular = 'Απο δημοφιλεις προτασεις';
 z.string.el.preferencesOptionsEmojiReplaceCheckbox = 'Αντικατάσταση τύπου emoticons με emojis';
 z.string.el.preferencesOptionsPreviewsSendCheckbox = 'Δημιουργία προεπισκόπησης για απεσταλμένους συνδέσμους σας';
@@ -477,6 +480,9 @@ z.string.el.preferencesOptionsNotificationsNone = 'Ανενεργό';
 z.string.el.preferencesOptionsNotificationsObfuscate = 'Απόκρυψη λεπτομερειών';
 z.string.el.preferencesOptionsNotificationsObfuscateMessage = 'Εμφάνιση αποστολέα';
 z.string.el.preferencesOptionsNotificationsOn = 'Εμφάνιση αποστολέα και μηνύματος';
+
+z.string.el.backupImportGenericErrorHeadline = 'Κάτι πήγε στραβά';
+z.string.el.backupCancel = 'Ακύρωση';
 
 z.string.el.searchConnect = 'Σύνδεση';
 z.string.el.searchConnections = 'Συνδέσεις';

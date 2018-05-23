@@ -192,6 +192,8 @@ z.string.sl.modalConversationTooManyMembersHeadline = 'Polna hiša';
 
 
 
+z.string.sl.modalImproveWireAction = 'Sprejmi';
+
 z.string.sl.modalSessionResetHeadline = 'Seja je bila ponastavljena';
 z.string.sl.modalSessionResetMessage1 = 'Če težave niste odpravili,';
 z.string.sl.modalSessionResetMessageLink = 'kontaktirajte';
@@ -290,10 +292,7 @@ z.string.sl.conversationsConnectionRequestOne = '1 oseba čaka';
 z.string.sl.conversationsEmptyConversation = 'Skupinski pogovor';
 z.string.sl.conversationsNoConversations = 'Še ni pogovorov';
 z.string.sl.conversationsPopoverArchive = 'Arhiviraj';
-z.string.sl.conversationsPopoverBlock = 'Blokiraj';
 z.string.sl.conversationsPopoverCancel = 'Prekliči prošnjo';
-z.string.sl.conversationsPopoverClear = 'Izbriši';
-z.string.sl.conversationsPopoverLeave = 'Zapusti';
 z.string.sl.conversationsPopoverNotify = 'Povrni glasnost';
 z.string.sl.conversationsPopoverSilence = 'Utišaj';
 z.string.sl.conversationsPopoverUnarchive = 'Dearhiviraj';
@@ -339,6 +338,7 @@ z.string.sl.addParticipantsSearchPlaceholder = 'Iskanje po imenu';
 z.string.sl.addParticipantsTabsPeople = 'Osebe';
 z.string.sl.addParticipantsTabsServices = 'Storitve';
 
+z.string.sl.conversationDetailsActionArchive = 'Arhiviraj';
 z.string.sl.conversationDetailsActionCancelRequest = 'Prekliči prošnjo';
 z.string.sl.conversationDetailsActionDevices = 'Naprave';
 z.string.sl.conversationDetailsGuestsOff = 'Izklopljeno';
@@ -412,7 +412,6 @@ z.string.sl.preferencesDevicesCurrent = 'Trenutna';
 z.string.sl.preferencesDevicesFingerprint = 'Ključ prstnega odtisa naprave';
 z.string.sl.preferencesDevicesFingerprintDetail = 'Wire dodeli vsaki napravi edinstven prstni odtis. Primerjajte jih, preverite vaše naprave in pogovore.';
 z.string.sl.preferencesDevicesId = 'ID: ';
-z.string.sl.preferencesDevicesRemove = 'Odstrani';
 z.string.sl.preferencesDevicesRemoveCancel = 'Prekliči';
 z.string.sl.preferencesDevicesRemoveDetail = 'Odstrani to napravo, če ste jo prenehali uporabljati. Takoj boste iz nje odjavljeni.';
 z.string.sl.preferencesDevicesSessionConfirmation = 'Seja je bila ponastavljena.';
@@ -432,9 +431,6 @@ z.string.sl.preferencesOptionsContacts = 'Stiki';
 z.string.sl.preferencesOptionsContactsGmail = 'Uvozi iz Gmail';
 z.string.sl.preferencesOptionsContactsMacos = 'Uvozi iz imenika stikov';
 z.string.sl.preferencesOptionsContactsDetail = 'Uporabljamo vaše podatke stikov pri povezovanju z drugimi. Vse informacije anonimiziramo in ne delimo z drugimi.';
-z.string.sl.preferencesOptionsData = 'Podatki o uporabi in poročila o prisilnih ustavitvah';
-z.string.sl.preferencesOptionsDataCheckbox = 'Podatki o uporabi in poročila o prisilnih ustavitvah';
-z.string.sl.preferencesOptionsDataDetail = 'Izboljšajte Wire s pošiljanjem anonimnih informacij.';
 z.string.sl.preferencesOptionsPopular = 'Po priljubljenosti';
 z.string.sl.preferencesOptionsEmojiReplaceCheckbox = 'Zamenjaj čustvene simbole z emojiji';
 z.string.sl.preferencesOptionsPreviewsSendCheckbox = 'Ustvari predogled za povezave, ki jih pošiljate';
@@ -444,6 +440,8 @@ z.string.sl.preferencesOptionsNotificationsNone = 'Izklopljeno';
 z.string.sl.preferencesOptionsNotificationsObfuscate = 'Skrij podrobnosti';
 z.string.sl.preferencesOptionsNotificationsObfuscateMessage = 'Pokaži pošiljatelja';
 z.string.sl.preferencesOptionsNotificationsOn = 'Pokaži pošiljatelja in sporočilo';
+
+z.string.sl.backupCancel = 'Prekliči';
 
 z.string.sl.searchConnect = 'Poveži';
 z.string.sl.searchConnections = 'Povezave';

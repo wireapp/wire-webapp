@@ -24,12 +24,19 @@ window.z.viewModel = z.viewModel || {};
 window.z.viewModel.content = z.viewModel.content || {};
 
 z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewModel {
+  static get CONFIG() {
+    return {
+      MINIMUM_CALL_LOG_LENGTH: 10,
+    };
+  }
+
   constructor(mainViewModel, contentViewModel, repositories) {
     this.logger = new z.util.Logger('z.viewModel.content.PreferencesOptionsViewModel', z.config.LOGGER.OPTIONS);
 
     this.callingRepository = repositories.calling;
     this.propertiesRepository = repositories.properties;
     this.teamRepository = repositories.team;
+    this.userRepository = repositories.user;
 
     this.isActivatedAccount = mainViewModel.isActivatedAccount;
     this.isTeam = this.teamRepository.isTeam;
@@ -54,11 +61,6 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
       this.propertiesRepository.savePreference(z.properties.PROPERTIES_TYPE.PREVIEWS.SEND, sendPreviewsPreference);
     });
 
-    this.optionPrivacy = ko.observable();
-    this.optionPrivacy.subscribe(privacyPreference => {
-      this.propertiesRepository.savePreference(z.properties.PROPERTIES_TYPE.PRIVACY, privacyPreference);
-    });
-
     amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, this.updateProperties.bind(this));
   }
 
@@ -72,20 +74,30 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
 
   saveCallLogs() {
     const messageLog = this.callingRepository.messageLog;
-    if (messageLog.length) {
+    // Very short logs will not contain useful information
+    const logExceedsMinimumLength = messageLog.length > PreferencesOptionsViewModel.CONFIG.MINIMUM_CALL_LOG_LENGTH;
+    if (logExceedsMinimumLength) {
       const callLog = [messageLog.join('\r\n')];
       const blob = new Blob(callLog, {type: 'text/plain;charset=utf-8'});
-      const currentDate = new Date().toISOString().replace(' ', '-');
 
-      z.util.downloadBlob(blob, `CallLogs-${currentDate}.log`);
+      const userName = this.userRepository.self().username();
+      const filename = `Wire-${userName}-Calling_${z.util.TimeUtil.getCurrentDate()}.log`;
+
+      return z.util.downloadBlob(blob, filename);
     }
+
+    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, {
+      text: {
+        message: z.l10n.text(z.string.modalCallEmptyLogMessage),
+        title: z.l10n.text(z.string.modalCallEmptyLogHeadline),
+      },
+    });
   }
 
   updateProperties(properties) {
     this.optionAudio(properties.settings.sound.alerts);
     this.optionReplaceInlineEmoji(properties.settings.emoji.replace_inline);
     this.optionSendPreviews(properties.settings.previews.send);
-    this.optionPrivacy(properties.settings.privacy.improve_wire);
     this.optionNotifications(properties.settings.notifications);
   }
 };

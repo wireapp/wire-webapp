@@ -63,6 +63,12 @@ z.tracking.EventName = {
     LINK_CREATED: 'guest_rooms.link_created',
     LINK_REVOKED: 'guest_rooms.link_revoked',
   },
+  HISTORY: {
+    BACKUP_FAILED: 'history.backup_failed',
+    BACKUP_SUCCEEDED: 'history.backup_succeeded',
+    RESTORE_FAILED: 'history.restore_failed',
+    RESTORE_SUCCEEDED: 'history.restore_succeeded',
+  },
   INTEGRATION: {
     ADDED_SERVICE: 'integration.added_service',
     REMOVED_SERVICE: 'integration.removed_service',

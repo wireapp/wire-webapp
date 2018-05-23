@@ -138,6 +138,9 @@ z.string.lt.modalAssetParallelUploadsMessage = 'Jūs vienu metu galite siųsti i
 z.string.lt.modalCallEmptyConversationHeadline = 'Nėra kam skambinti';
 z.string.lt.modalCallEmptyConversationMessage = 'Čia daugiau nieko nėra.';
 
+z.string.lt.modalCallEmptyLogHeadline = 'Skambučių nebuvo';
+z.string.lt.modalCallEmptyLogMessage = 'Nebuvo skambučių, pagal kuriuos galėtume sugeneruoti ataskaitą.';
+
 z.string.lt.modalCallNoGroupVideoHeadline = 'Vaizdo skambučiai grupėse nepalaikomi';
 z.string.lt.modalCallNoGroupVideoMessage = 'Vaizdo skambučiai grupės pokalbiuose yra neprieinami.';
 
@@ -242,6 +245,8 @@ z.string.lt.modalPictureTooLargeMessage = 'Galite naudoti iki {{number}} MB dyd�
 z.string.lt.modalPictureTooSmallHeadline = 'Paveikslėlis per mažas';
 z.string.lt.modalPictureTooSmallMessage = 'Pasirinkite bent 320 x 320 px dydžio paveikslėlį.';
 
+z.string.lt.modalImproveWireAction = 'Priimti';
+
 z.string.lt.modalServiceUnavailableHeadline = 'Paslaugos pridėjimas negalimas';
 z.string.lt.modalServiceUnavailableMessage = 'Paslauga šiuo metu negalima.';
 
@@ -279,6 +284,7 @@ z.string.lt.conversationConnectionCancelRequest = 'Atsisakyti kontakto užmezgim
 z.string.lt.conversationCreate = ' pradėjo pokalbį su {{users}}';
 z.string.lt.conversationCreateName = '{{user}} pradėjo susirašinėjimą';
 z.string.lt.conversationCreateNameYou = '{{user}} pradėjo susirašinėjimą';
+z.string.lt.conversationCreateTemporary = 'Prisijungėte prie susirašinėjimo';
 z.string.lt.conversationCreateWith = 'su {{users}}';
 z.string.lt.conversationCreateYou = ' pradėjo pokalbį su {{users}}';
 z.string.lt.conversationDeviceStartedUsingOne = ' pradėjo naudoti';
@@ -372,14 +378,14 @@ z.string.lt.conversationsConnectionRequestMany = 'Laukia {{number}} žmonės';
 z.string.lt.conversationsConnectionRequestOne = '1 asmuo laukia';
 z.string.lt.conversationsEmptyConversation = 'Grupės pokalbis';
 z.string.lt.conversationsNoConversations = 'Kol kas nėra pokalbių';
-z.string.lt.conversationsPopoverArchive = 'Archyvuoti';
-z.string.lt.conversationsPopoverBlock = 'Užblokuoti';
+z.string.lt.conversationsPopoverArchive = 'Archyvuoti susirašinėjimą';
+z.string.lt.conversationsPopoverBlock = 'Blokuoti kontaktą…';
 z.string.lt.conversationsPopoverCancel = 'Atsisakyti užklausos';
-z.string.lt.conversationsPopoverClear = 'Ištrinti';
-z.string.lt.conversationsPopoverLeave = 'Išeiti';
-z.string.lt.conversationsPopoverNotify = 'Įjungti garsą';
-z.string.lt.conversationsPopoverSilence = 'Nutildyti';
-z.string.lt.conversationsPopoverUnarchive = 'Išarchyvuoti';
+z.string.lt.conversationsPopoverClear = 'Trinti turinį…';
+z.string.lt.conversationsPopoverLeave = 'Išeiti iš grupės…';
+z.string.lt.conversationsPopoverNotify = 'Įjungti susirašinėjimo pranešimus';
+z.string.lt.conversationsPopoverSilence = 'Išjungti susirašinėjimo pranešimus';
+z.string.lt.conversationsPopoverUnarchive = 'Išimti susirašinėjimą iš archyvo';
 
 z.string.lt.conversationsSecondaryLineMissedCall = '{{number}} praleistas skambutis';
 z.string.lt.conversationsSecondaryLineMissedCalls = '{{number}} praleistų skambučių';
@@ -531,7 +537,7 @@ z.string.lt.preferencesDevicesCurrent = 'Esamas';
 z.string.lt.preferencesDevicesFingerprint = 'Rakto kontrolinis kodas';
 z.string.lt.preferencesDevicesFingerprintDetail = 'Wire kiekvienam įrenginiui suteikia unikalų kontrolinį kodą. Palyginkite juos ir patvirtinkite savo įrenginius ir pokalbius.';
 z.string.lt.preferencesDevicesId = 'ID: ';
-z.string.lt.preferencesDevicesRemove = 'Šalinti';
+z.string.lt.preferencesDevicesRemove = 'Išimti…';
 z.string.lt.preferencesDevicesRemoveCancel = 'Atsisakyti';
 z.string.lt.preferencesDevicesRemoveDetail = 'Jeigu nebenaudojate šį įrenginį, pašalinkite jį. Jūs būsite nedelsiant atjungti iš šio įrenginio.';
 z.string.lt.preferencesDevicesSessionConfirmation = 'Seansas buvo atstatytas.';
@@ -551,9 +557,6 @@ z.string.lt.preferencesOptionsContacts = 'Kontaktai';
 z.string.lt.preferencesOptionsContactsGmail = 'Importuoti iš Gmail';
 z.string.lt.preferencesOptionsContactsMacos = 'Importuoti iš kontaktų';
 z.string.lt.preferencesOptionsContactsDetail = 'Mes naudojame jūsų kontaktinius duomenis tam, kad padėtume jums užmegzti kontaktą su kitais. Mes padarome visą informaciją anoniminę ir su niekuo ja nesidaliname.';
-z.string.lt.preferencesOptionsData = 'Naudojimosi ir strigčių ataskaitos';
-z.string.lt.preferencesOptionsDataCheckbox = 'Naudojimosi ir strigčių ataskaitos';
-z.string.lt.preferencesOptionsDataDetail = 'Pagerinkite „Wire“ siųsdami anoniminę informaciją.';
 z.string.lt.preferencesOptionsPopular = 'Pagal populiarias užklausas';
 z.string.lt.preferencesOptionsEmojiReplaceCheckbox = 'Pakeisti rašomus jaustukus jausmaženkliais';
 z.string.lt.preferencesOptionsEmojiReplaceDetail = ':-) → {{icon}}';
@@ -567,6 +570,36 @@ z.string.lt.preferencesOptionsNotificationsOn = 'Rodyti siuntėją ir žinutę';
 z.string.lt.preferencesOptionsCallLogs = 'Trikčių šalinimas';
 z.string.lt.preferencesOptionsCallLogsGet = 'Išsaugoti skambučių derinimo ataskaitą';
 z.string.lt.preferencesOptionsCallLogsDetail = 'Ši informacija padeda „Wire“ pagalbos centrui išspręsti skambinimo nesklandumus.';
+
+z.string.lt.preferencesOptionsBackupHeader = 'Praeitis';
+z.string.lt.preferencesOptionsBackupExportHeadline = 'Kurti susirašinėjimų atsarginę kopiją';
+z.string.lt.preferencesOptionsBackupExportSecondary = 'Kurkite atsarginę kopiją, kad išsaugotumėte susirašinėjimo praeitį. Jei prarasite savo kompiuterį arba pasikeisite nauju, kopiją galėsite panaudoti praeities atkūrimui.\nAtsarginės kopijos failas nėra apsaugotas „Wire“ kodavimo, dėl to jūs turite parinkti jam saugią vietą.';
+z.string.lt.preferencesOptionsBackupImportHeadline = 'Atkurti iš atsarginės kopijos';
+z.string.lt.preferencesOptionsBackupImportSecondary = 'Atkurti praeitį iš atsarginės kopijos galite tik toje pačioje platformoje. Atsarginė kopija pakeis visus susirašinėjimus, kuriuos šiame įrenginyje turite.';
+
+z.string.lt.backupExportGenericErrorHeadline = 'Failo išsaugoti nepavyko';
+z.string.lt.backupExportGenericErrorSecondary = 'Atsarginės kopijos kūrimas nebuvo sėkmingas.';
+z.string.lt.backupExportProgressHeadline = 'Ruošiama…';
+z.string.lt.backupExportProgressSecondary = 'Kuriame atsarginė kopija · {{processed}} iš {{total}} — {{progress}}%';
+z.string.lt.backupExportProgressCompressing = 'Ruošiamas atsarginės kopijos failas';
+z.string.lt.backupExportSaveFileAction = 'Išsaugoti failą';
+z.string.lt.backupExportSuccessHeadline = 'Atsarginis kopijavimas baigtas';
+z.string.lt.backupExportSuccessSecondary = 'Jei prarasite savo kompiuterį arba pasikeisite nauju, kopiją galėsite panaudoti praeities atkūrimui.';
+z.string.lt.backupImportGenericErrorHeadline = 'Kažkas nutiko';
+z.string.lt.backupImportGenericErrorSecondary = 'Praeities atkurti nepavyko.';
+z.string.lt.backupImportAccountErrorHeadline = 'Netinkama atsarginė kopija';
+z.string.lt.backupImportAccountErrorSecondary = 'Atkurti kitos paskyros atsarginės kopijos nepavyks.';
+z.string.lt.backupImportVersionErrorHeadline = 'Nesuderinama atsarginė kopija';
+z.string.lt.backupImportVersionErrorSecondary = 'Ši atsarginė kopija buvo sukurta naudojant arba naujesnę arba senesnę „Wire“ versiją, ir negali būti naudojama atkūrimui.';
+z.string.lt.backupImportIncompatibleErrorHeadline = 'Netinkama atsarginė kopija';
+z.string.lt.backupImportIncompatibleErrorSecondary = 'Atkurti kitos paskyros atsarginės kopijos nepavyks.';
+z.string.lt.backupImportOutdatedErrorHeadline = 'Nesuderinama atsarginė kopija';
+z.string.lt.backupImportOutdatedErrorSecondary = 'Ši atsarginė kopija buvo sukurta naudojant arba naujesnę arba senesnę „Wire“ versiją, ir negali būti naudojama atkūrimui.';
+z.string.lt.backupImportProgressHeadline = 'Ruošiama…';
+z.string.lt.backupImportProgressSecondary = 'Atkuriama praeitis · {{processed}} iš {{total}} — {{progress}}%';
+z.string.lt.backupImportSuccessHeadline = 'Praeitis atkurta.';
+z.string.lt.backupCancel = 'Atsisakyti';
+z.string.lt.backupTryAgain = 'Bandykite dar kartą';
 
 z.string.lt.searchConnect = 'Užmegzti kontaktą';
 z.string.lt.searchConnections = 'Kontaktai';
@@ -601,6 +634,7 @@ z.string.lt.searchListNoMatches = 'Nėra atitinkančių rezultatų.\nPabandykite
 
 z.string.lt.temporaryGuestCta = 'Kurti paskyrą';
 z.string.lt.temporaryGuestDescription = 'Apsaugokite savo verslą susirašinėdami ir kalbėdami konferenciniu būdu šifruojant.';
+z.string.lt.temporaryGuestTimeRemaining = ' liko šiam svečių kambariui';
 
 z.string.lt.temporaryGuestJoinMessage = 'Šiame susirašinėjime galėsite dalyvauti 24 valandas.';
 z.string.lt.temporaryGuestJoinDescription = 'Jei puslapį uždarysite arba perkrausite iš naujo, prisijungti nebegalėsite.';

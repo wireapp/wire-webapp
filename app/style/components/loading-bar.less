@@ -1,0 +1,61 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+.progress-console {
+  overflow: hidden;
+  height: 14px;
+  margin-bottom: 14px;
+  font-size: @font-size-xs;
+  text-overflow: ellipsis;
+  white-space: pre;
+}
+
+.progress-bar {
+  @light: fade(#000, 4%);
+  @dark: fade(#000, 8%);
+  @rotation: 127deg;
+  @size: 14px;
+  @rotatedSize: (abs(cos(@rotation)) + abs(sin(@rotation))) * @size;
+
+  overflow: hidden;
+  width: 256px;
+  height: 4px;
+  border: none;
+  animation: move 0.5s linear infinite;
+  -webkit-appearance: none;
+  background-image: linear-gradient(@rotation, @light, @light 5px, @dark 7px, @dark 12px, @light 14px);
+  background-size: @rotatedSize 4px;
+  border-radius: 2px;
+
+  > div {
+    width: 0;
+    height: 100%;
+    background-color: @w-blue;
+    border-radius: 2px;
+  }
+
+  @keyframes move {
+    0% {
+      background-position: 0 0;
+    }
+    100% {
+      background-position: @rotatedSize 0;
+    }
+  }
+}

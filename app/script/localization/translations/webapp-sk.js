@@ -198,6 +198,8 @@ z.string.sk.modalIntegrationUnavailableHeadline = 'Boti sú momentálne nedostup
 z.string.sk.modalIntegrationUnavailableMessage = 'Ďakujeme o Váš záujem o Botov. Služba je momentálne pozastavená kvôli práci na novej verzii.';
 
 
+z.string.sk.modalImproveWireAction = 'Prijať';
+
 z.string.sk.modalSessionResetHeadline = 'Relácia bola obnovená';
 z.string.sk.modalSessionResetMessage1 = 'Ak problém nebol vyriešený,';
 z.string.sk.modalSessionResetMessageLink = 'kontakt';
@@ -298,10 +300,7 @@ z.string.sk.conversationsConnectionRequestOne = '1 osoba čaká';
 z.string.sk.conversationsEmptyConversation = 'Skupinová konverzácia';
 z.string.sk.conversationsNoConversations = 'Zatiaľ žiadne konverzácie';
 z.string.sk.conversationsPopoverArchive = 'Archív';
-z.string.sk.conversationsPopoverBlock = 'Blokovať';
 z.string.sk.conversationsPopoverCancel = 'Zrušiť požiadavku';
-z.string.sk.conversationsPopoverClear = 'Zmazať';
-z.string.sk.conversationsPopoverLeave = 'Opustiť';
 z.string.sk.conversationsPopoverNotify = 'Zapnúť zvuk';
 z.string.sk.conversationsPopoverSilence = 'Stlmiť';
 z.string.sk.conversationsPopoverUnarchive = 'Zrušiť archiváciu';
@@ -347,6 +346,7 @@ z.string.sk.addParticipantsSearchPlaceholder = 'Vyhľadať podľa mena';
 z.string.sk.addParticipantsTabsPeople = 'Ľudia';
 z.string.sk.addParticipantsTabsServices = 'Služby';
 
+z.string.sk.conversationDetailsActionArchive = 'Archív';
 z.string.sk.conversationDetailsActionCancelRequest = 'Zrušiť požiadavku';
 z.string.sk.conversationDetailsActionDevices = 'Zariadenia';
 z.string.sk.conversationDetailsGuestsOff = 'Vypnúť';
@@ -420,7 +420,6 @@ z.string.sk.preferencesDevicesCurrent = 'Aktuálny';
 z.string.sk.preferencesDevicesFingerprint = 'Identifikátor kľúča';
 z.string.sk.preferencesDevicesFingerprintDetail = 'Wire dáva každému zariadeniu jedinečný identifikátor. Porovnajte ich a overte Vaše zariadenia a rozhovory.';
 z.string.sk.preferencesDevicesId = 'ID: ';
-z.string.sk.preferencesDevicesRemove = 'Odstrániť';
 z.string.sk.preferencesDevicesRemoveCancel = 'Zrušiť';
 z.string.sk.preferencesDevicesRemoveDetail = 'Odstráňte toto zariadenie, ak ste ho prestali používať. Budete z neho ihneď odhlásený.';
 z.string.sk.preferencesDevicesSessionConfirmation = 'Relácia bola obnovená.';
@@ -440,9 +439,6 @@ z.string.sk.preferencesOptionsContacts = 'Kontakty';
 z.string.sk.preferencesOptionsContactsGmail = 'Import z Gmailu';
 z.string.sk.preferencesOptionsContactsMacos = 'Import z Kontaktov';
 z.string.sk.preferencesOptionsContactsDetail = 'Vaše údaje o kontaktoch používame na pripojenie k iným užívateľom. Všetky informácie anonymizujeme a nezdieľame ich s nikým iným.';
-z.string.sk.preferencesOptionsData = 'Využitie údajov a správy o zlyhaní';
-z.string.sk.preferencesOptionsDataCheckbox = 'Využitie údajov a správy o zlyhaní';
-z.string.sk.preferencesOptionsDataDetail = 'Vylepšiť Wire odosielaním anonymných informácií.';
 z.string.sk.preferencesOptionsPopular = 'Populárnej požiadavky';
 z.string.sk.preferencesOptionsEmojiReplaceCheckbox = 'Nahradiť emotikony pomocou emojis';
 z.string.sk.preferencesOptionsPreviewsSendCheckbox = 'Vytvoriť náhľady pre odkazy ktoré odosielate';
@@ -452,6 +448,8 @@ z.string.sk.preferencesOptionsNotificationsNone = 'Vypnúť';
 z.string.sk.preferencesOptionsNotificationsObfuscate = 'Skryť detaily';
 z.string.sk.preferencesOptionsNotificationsObfuscateMessage = 'Zobraziť odosielateľa';
 z.string.sk.preferencesOptionsNotificationsOn = 'Zobraziť odosielateľa a správu';
+
+z.string.sk.backupCancel = 'Zrušiť';
 
 z.string.sk.searchConnect = 'Pripojiť';
 z.string.sk.searchConnections = 'Pripojenia';

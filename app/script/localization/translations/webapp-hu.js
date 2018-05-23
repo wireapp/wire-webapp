@@ -244,6 +244,8 @@ z.string.hu.modalPictureTooLargeMessage = 'Maximum {{number}} MB méretű képek
 z.string.hu.modalPictureTooSmallHeadline = 'A kép túl kicsi';
 z.string.hu.modalPictureTooSmallMessage = 'Kérjük, legalább 320 x 320 képpont méretű képet válassz.';
 
+z.string.hu.modalImproveWireAction = 'Elfogadás';
+
 z.string.hu.modalServiceUnavailableHeadline = 'Új szolgáltatás hozzáadása nem lehetséges';
 z.string.hu.modalServiceUnavailableMessage = 'A szolgáltatás jelenleg nem elérhető.';
 
@@ -376,10 +378,7 @@ z.string.hu.conversationsConnectionRequestOne = '1 partner várakozik';
 z.string.hu.conversationsEmptyConversation = 'Csoportos beszélgetés';
 z.string.hu.conversationsNoConversations = 'Indíts egy beszélgetést vagy hozz létre egy csoportot.';
 z.string.hu.conversationsPopoverArchive = 'Archiválás';
-z.string.hu.conversationsPopoverBlock = 'Tiltás';
 z.string.hu.conversationsPopoverCancel = 'Kérelem visszavonása';
-z.string.hu.conversationsPopoverClear = 'Törlés';
-z.string.hu.conversationsPopoverLeave = 'Kilépés';
 z.string.hu.conversationsPopoverNotify = 'Némítás feloldása';
 z.string.hu.conversationsPopoverSilence = 'Némítás';
 z.string.hu.conversationsPopoverUnarchive = 'Archiválás visszavonása';
@@ -450,12 +449,10 @@ z.string.hu.conversationDetailsParticipantsUsersMany = 'Partner';
 z.string.hu.conversationDetailsPeople = 'Partner';
 z.string.hu.conversationDetailsServices = 'Szolgáltatások';
 
-z.string.hu.groupParticipantActionBlock = 'Partner tiltása';
 z.string.hu.groupParticipantActionCancelRequest = 'Kérelem visszavonása';
 z.string.hu.groupParticipantActionDevices = 'Eszközök';
 z.string.hu.groupParticipantActionIgnoreRequest = 'Kérés figyelmen kívül hatása';
 z.string.hu.groupParticipantActionIncomingRequest = 'Kérés elfogadása';
-z.string.hu.groupParticipantActionLeave = 'Kilépés a csoportból';
 z.string.hu.groupParticipantActionOpenConversation = 'Beszélgetés megnyitása';
 z.string.hu.groupParticipantActionPending = 'Függőben lévő';
 z.string.hu.groupParticipantActionRemove = 'Eltávolítás a csoportból';
@@ -534,7 +531,6 @@ z.string.hu.preferencesDevicesCurrent = 'Ez az eszköz';
 z.string.hu.preferencesDevicesFingerprint = 'Eszközazonosító ujjlenyomat';
 z.string.hu.preferencesDevicesFingerprintDetail = 'A Wire-ben minden eszköz egyedi ujjlenyomattal rendelkezik. Összehasonlítással ellenőrizd az eszközöket és a beszélgetéseket.';
 z.string.hu.preferencesDevicesId = 'Eszközazonosító (ID): ';
-z.string.hu.preferencesDevicesRemove = 'Eltávolítás';
 z.string.hu.preferencesDevicesRemoveCancel = 'Mégsem';
 z.string.hu.preferencesDevicesRemoveDetail = 'Távolítsd el ezt az eszközt, ha már nem használod. Ezzel együtt azonnal ki is jelentkezel erről az eszközről.';
 z.string.hu.preferencesDevicesSessionConfirmation = 'A munkamenet alaphelyzetbe lett állítva.';
@@ -554,9 +550,6 @@ z.string.hu.preferencesOptionsContacts = 'Névjegyek';
 z.string.hu.preferencesOptionsContactsGmail = 'Importálás Gmail-ből';
 z.string.hu.preferencesOptionsContactsMacos = 'Importálás Névjegyek-ből';
 z.string.hu.preferencesOptionsContactsDetail = 'A névjegyeid importálásával könnyebben kapcsolatba léphetsz másokkal. Minden információt anonimizálunk, és semmit nem osszuk meg senki mással.';
-z.string.hu.preferencesOptionsData = 'Használati adatok és hibajelentések';
-z.string.hu.preferencesOptionsDataCheckbox = 'Adatok küldése névtelenül';
-z.string.hu.preferencesOptionsDataDetail = 'Anonim információk küldésével segíts nekünk, hogy a Wire még jobb legyen.';
 z.string.hu.preferencesOptionsPopular = 'Közkívánatra';
 z.string.hu.preferencesOptionsEmojiReplaceCheckbox = 'Cserélje ki a begépelt hangulatjeleket emojikra';
 z.string.hu.preferencesOptionsEmojiReplaceDetail = ':-) → {{icon}}';
@@ -570,6 +563,9 @@ z.string.hu.preferencesOptionsNotificationsOn = 'Küldő és üzenet mutatása';
 z.string.hu.preferencesOptionsCallLogs = 'Hibaelhárítás';
 z.string.hu.preferencesOptionsCallLogsGet = 'Hívások hibanaplójának mentése';
 z.string.hu.preferencesOptionsCallLogsDetail = 'Ez az információ segít a Wire Ügyfélszolgálatnak a hívással kapcsolatos problémák diagnosztizálásában.';
+
+z.string.hu.backupImportGenericErrorHeadline = 'Valami nem stimmel';
+z.string.hu.backupCancel = 'Mégsem';
 
 z.string.hu.searchConnect = 'Csatlakozás';
 z.string.hu.searchConnections = 'Kapcsolatok';

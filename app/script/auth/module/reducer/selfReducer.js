@@ -20,6 +20,7 @@
 import * as SelfActionCreator from '../action/creator/SelfActionCreator';
 
 export const initialState = {
+  consents: {},
   error: null,
   fetched: false,
   fetching: false,
@@ -28,29 +29,48 @@ export const initialState = {
 
 export default function reducer(state = initialState, action) {
   switch (action.type) {
-    case SelfActionCreator.SELF_FETCH_START:
-    case SelfActionCreator.HANDLE_SET_START: {
+    case SelfActionCreator.CONSENT_GET_START:
+    case SelfActionCreator.HANDLE_SET_START:
+    case SelfActionCreator.SELF_FETCH_START: {
       return {
         ...state,
         fetching: true,
       };
     }
-    case SelfActionCreator.SELF_FETCH_FAILED:
-    case SelfActionCreator.HANDLE_SET_FAILED: {
+    case SelfActionCreator.CONSENT_GET_FAILED:
+    case SelfActionCreator.HANDLE_SET_FAILED:
+    case SelfActionCreator.SELF_FETCH_FAILED: {
       return {
         ...state,
         error: action.payload,
         fetching: false,
       };
     }
-    case SelfActionCreator.SELF_FETCH_SUCCESS:
-    case SelfActionCreator.HANDLE_SET_SUCCESS: {
+    case SelfActionCreator.HANDLE_SET_SUCCESS:
+    case SelfActionCreator.SELF_FETCH_SUCCESS: {
       return {
         ...state,
         error: null,
         fetched: true,
         fetching: false,
         self: action.payload,
+      };
+    }
+    case SelfActionCreator.CONSENT_GET_SUCCESS: {
+      return {
+        ...state,
+        consents: action.payload.reduce((consentAccumulator, consent) => {
+          return {...consentAccumulator, [consent.type]: consent.value};
+        }, {}),
+        error: null,
+        fetched: true,
+        fetching: false,
+      };
+    }
+    case SelfActionCreator.CONSENT_SET_SUCCESS: {
+      return {
+        ...state,
+        consents: {...state.constents, [action.payload.type]: action.payload.value},
       };
     }
     default: {

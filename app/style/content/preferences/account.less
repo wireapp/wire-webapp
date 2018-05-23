@@ -24,6 +24,22 @@
   justify-content: space-between;
 }
 
+.preferences-section-privacy {
+  .preferences-separator {
+    margin-bottom: 32px;
+  }
+
+  .preferences-detail {
+    margin-bottom: 16px;
+  }
+}
+
+.preferences-section-conversation-history {
+  .preferences-separator {
+    margin-bottom: 32px;
+  }
+}
+
 .preferences-section-account-security {
   margin-top: 32px;
   margin-bottom: 32px;
@@ -103,7 +119,14 @@
 
   > input {
     position: absolute;
-    left: -9999px;
+    left: @offscreen-left;
+  }
+}
+
+.preferences-history-backup-import-field {
+  > input {
+    position: absolute;
+    left: @offscreen-left;
   }
 }
 

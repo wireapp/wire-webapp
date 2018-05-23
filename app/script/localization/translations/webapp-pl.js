@@ -211,6 +211,8 @@ z.string.pl.modalIntegrationUnavailableHeadline = 'Boty są obecnie niedostępne
 z.string.pl.modalIntegrationUnavailableMessage = 'Dziękujemy za zainteresowanie naszymi botami. Usługa jest obecnie zawieszona, ponieważ pracujemy nad następną wersją. Bądź na bieżąco.';
 
 
+z.string.pl.modalImproveWireAction = 'Odbierz';
+
 z.string.pl.modalSessionResetHeadline = 'Sesja została zresetowana';
 z.string.pl.modalSessionResetMessage1 = 'Jeśli problem nie zostanie rozwiązany,';
 z.string.pl.modalSessionResetMessageLink = 'kontakt';
@@ -313,10 +315,7 @@ z.string.pl.conversationsConnectionRequestOne = '1 osoba czeka';
 z.string.pl.conversationsEmptyConversation = 'Rozmowa grupowa';
 z.string.pl.conversationsNoConversations = 'Brak jeszcze konwersacji';
 z.string.pl.conversationsPopoverArchive = 'Archiwizuj';
-z.string.pl.conversationsPopoverBlock = 'Zablokuj';
 z.string.pl.conversationsPopoverCancel = 'Anuluj żądanie';
-z.string.pl.conversationsPopoverClear = 'Usuń';
-z.string.pl.conversationsPopoverLeave = 'Opuść';
 z.string.pl.conversationsPopoverNotify = 'Włącz dźwięk';
 z.string.pl.conversationsPopoverSilence = 'Wycisz';
 z.string.pl.conversationsPopoverUnarchive = 'Przywróć z archiwum';
@@ -362,6 +361,7 @@ z.string.pl.addParticipantsSearchPlaceholder = 'Szukaj według nazwy';
 z.string.pl.addParticipantsTabsPeople = 'Osoby';
 z.string.pl.addParticipantsTabsServices = 'Usługi';
 
+z.string.pl.conversationDetailsActionArchive = 'Archiwizuj';
 z.string.pl.conversationDetailsActionCancelRequest = 'Anuluj żądanie';
 z.string.pl.conversationDetailsActionDevices = 'Urządzenia';
 z.string.pl.conversationDetailsGuestsOff = 'Wyłącz';
@@ -435,7 +435,6 @@ z.string.pl.preferencesDevicesCurrent = 'Aktualny';
 z.string.pl.preferencesDevicesFingerprint = 'Unikalny odcisk palca';
 z.string.pl.preferencesDevicesFingerprintDetail = 'Wire daje każdemu urządzeniowi unikalny odcisk palca. Porównaj i sprawdź swoje urządzenia oraz konwersacje.';
 z.string.pl.preferencesDevicesId = 'ID: ';
-z.string.pl.preferencesDevicesRemove = 'Usuń';
 z.string.pl.preferencesDevicesRemoveCancel = 'Anuluj';
 z.string.pl.preferencesDevicesRemoveDetail = 'Usuń urządzenie, jeśli przestałeś je używać. Będziesz natychmiast wylogowany z tego urządzenia.';
 z.string.pl.preferencesDevicesSessionConfirmation = 'Sesja została zresetowana.';
@@ -455,9 +454,6 @@ z.string.pl.preferencesOptionsContacts = 'Kontakty';
 z.string.pl.preferencesOptionsContactsGmail = 'Import z Gmail';
 z.string.pl.preferencesOptionsContactsMacos = 'Import z Kontaktów';
 z.string.pl.preferencesOptionsContactsDetail = 'Wykorzystujemy Twoje dane kontaktowe do łączenia Cię z innymi. Wszystkie informacje są anonimowe i nie dzielimy ich z nikim innym.';
-z.string.pl.preferencesOptionsData = 'Statystyki i raporty o awariach';
-z.string.pl.preferencesOptionsDataCheckbox = 'Wysyłanie anonimowych danych';
-z.string.pl.preferencesOptionsDataDetail = 'Ulepsz Wire przesyłając anonimowe informacje.';
 z.string.pl.preferencesOptionsPopular = 'Różne';
 z.string.pl.preferencesOptionsEmojiReplaceCheckbox = 'Zastępuj tekstowe emotikony ikonkami';
 z.string.pl.preferencesOptionsPreviewsSendCheckbox = 'Twórz podglądy wysyłanych linków';
@@ -467,6 +463,9 @@ z.string.pl.preferencesOptionsNotificationsNone = 'Wyłącz';
 z.string.pl.preferencesOptionsNotificationsObfuscate = 'Ukryj szczegóły';
 z.string.pl.preferencesOptionsNotificationsObfuscateMessage = 'Pokaż nadawcę';
 z.string.pl.preferencesOptionsNotificationsOn = 'Pokaż nadawcę i wiadomości';
+
+z.string.pl.backupImportGenericErrorHeadline = 'Coś poszło nie tak';
+z.string.pl.backupCancel = 'Anuluj';
 
 z.string.pl.searchConnect = 'Połącz';
 z.string.pl.searchConnections = 'Połączenia';

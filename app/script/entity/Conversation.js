@@ -224,10 +224,13 @@ z.entity.Conversation = class Conversation {
       return '…';
     });
 
-    this.persist_state = _.debounce(() => amplify.publish(z.event.WebApp.CONVERSATION.PERSIST_STATE, this), 100);
+    this.shouldPersistStateChanges = false;
+    this.publishPersistState = _.debounce(() => amplify.publish(z.event.WebApp.CONVERSATION.PERSIST_STATE, this), 100);
+
+    this._initSubscriptions();
   }
 
-  subscribe_to_state_updates() {
+  _initSubscriptions() {
     [
       this.archived_state,
       this.archived_timestamp,
@@ -244,7 +247,17 @@ z.entity.Conversation = class Conversation {
       this.status,
       this.type,
       this.verification_state,
-    ].forEach(property => property.subscribe(this.persist_state));
+    ].forEach(property => property.subscribe(this.persistState.bind(this)));
+  }
+
+  persistState() {
+    if (this.shouldPersistStateChanges) {
+      this.publishPersistState();
+    }
+  }
+
+  setStateChangePersistence(persistChanges) {
+    this.shouldPersistStateChanges = persistChanges;
   }
 
   /**
@@ -264,9 +277,10 @@ z.entity.Conversation = class Conversation {
    * @note This will only increment timestamps
    * @param {string|number} timestamp - Timestamp to be set
    * @param {z.conversation.TIMESTAMP_TYPE} type - Type of timestamp to be updated
+   * @param {boolean} forceUpdate - set the timestamp regardless of previous timestamp value (no checks)
    * @returns {boolean|number} Timestamp value which can be 'false' (boolean) if there is no timestamp
    */
-  set_timestamp(timestamp, type) {
+  set_timestamp(timestamp, type, forceUpdate = false) {
     let entity_timestamp;
     if (_.isString(timestamp)) {
       timestamp = window.parseInt(timestamp, 10);
@@ -295,11 +309,12 @@ z.entity.Conversation = class Conversation {
         break;
     }
 
-    const updated_timestamp = this._increment_time_only(entity_timestamp(), timestamp);
-    if (updated_timestamp) {
-      entity_timestamp(updated_timestamp);
+    const updatedTimestamp = forceUpdate ? timestamp : this._increment_time_only(entity_timestamp(), timestamp);
+
+    if (updatedTimestamp !== false) {
+      entity_timestamp(updatedTimestamp);
     }
-    return updated_timestamp;
+    return updatedTimestamp;
   }
 
   /**

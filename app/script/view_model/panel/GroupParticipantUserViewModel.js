@@ -86,7 +86,8 @@ z.viewModel.panel.GroupParticipantUserViewModel = class GroupParticipantUserView
       return isNotConnectedUser && canConnect;
     });
     this.showActionLeave = ko.pureComputed(() => {
-      return this.selectedParticipant().is_me && !this.conversationEntity().removed_from_conversation();
+      const isActiveParticipant = this.conversationEntity() && !this.conversationEntity().removed_from_conversation();
+      return this.selectedParticipant().is_me && isActiveParticipant;
     });
     this.showActionUnblock = ko.pureComputed(() => this.selectedParticipant().is_blocked());
     this.showGroupParticipant = this.showGroupParticipant.bind(this);

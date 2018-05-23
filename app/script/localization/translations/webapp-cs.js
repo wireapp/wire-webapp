@@ -197,6 +197,8 @@ z.string.cs.modalIntegrationUnavailableHeadline = 'Roboti jsou momentálně nedo
 z.string.cs.modalIntegrationUnavailableMessage = 'Děkujeme vám za váš zájem o roboty. Služba je pozastavena, zatímco pracujeme na další verzi.';
 
 
+z.string.cs.modalImproveWireAction = 'Přijmout';
+
 z.string.cs.modalSessionResetHeadline = 'Sezení bylo zresetováno';
 z.string.cs.modalSessionResetMessage1 = 'Pokud problém není vyřešen,';
 z.string.cs.modalSessionResetMessageLink = 'kontaktujte';
@@ -298,10 +300,7 @@ z.string.cs.conversationsConnectionRequestOne = '1 čekající osoba';
 z.string.cs.conversationsEmptyConversation = 'Skupinová konverzace';
 z.string.cs.conversationsNoConversations = 'Zatím žádné konverzace';
 z.string.cs.conversationsPopoverArchive = 'Archivovat';
-z.string.cs.conversationsPopoverBlock = 'Blokovat';
 z.string.cs.conversationsPopoverCancel = 'Zrušit žádost';
-z.string.cs.conversationsPopoverClear = 'Smazat';
-z.string.cs.conversationsPopoverLeave = 'Odejít';
 z.string.cs.conversationsPopoverNotify = 'Zapnout zvuk';
 z.string.cs.conversationsPopoverSilence = 'Ztlumit';
 z.string.cs.conversationsPopoverUnarchive = 'Obnovit';
@@ -347,6 +346,7 @@ z.string.cs.addParticipantsSearchPlaceholder = 'Hledat podle jména';
 z.string.cs.addParticipantsTabsPeople = 'Kontakty';
 z.string.cs.addParticipantsTabsServices = 'Služby';
 
+z.string.cs.conversationDetailsActionArchive = 'Archivovat';
 z.string.cs.conversationDetailsActionCancelRequest = 'Zrušit žádost';
 z.string.cs.conversationDetailsActionDevices = 'Přístroje';
 z.string.cs.conversationDetailsGuestsOff = 'Vypnout';
@@ -419,7 +419,6 @@ z.string.cs.preferencesDevicesCurrent = 'Aktuální';
 z.string.cs.preferencesDevicesFingerprint = 'Identifikátor klíče';
 z.string.cs.preferencesDevicesFingerprintDetail = 'Aplikace Wire přiděluje každému přístroji unikátní identifikátor. Jejich porovnáním ověříte své přístroje a konverzace.';
 z.string.cs.preferencesDevicesId = 'ID: ';
-z.string.cs.preferencesDevicesRemove = 'Odstranit';
 z.string.cs.preferencesDevicesRemoveCancel = 'Zrušit';
 z.string.cs.preferencesDevicesRemoveDetail = 'Jestliže jste přestali používat toto zařízení, odeberte jej. Poté z něj budete okamžitě odhlášeni.';
 z.string.cs.preferencesDevicesSessionConfirmation = 'Sezení bylo zresetováno.';
@@ -439,9 +438,6 @@ z.string.cs.preferencesOptionsContacts = 'Kontakty';
 z.string.cs.preferencesOptionsContactsGmail = 'Importovat ze služby Gmail';
 z.string.cs.preferencesOptionsContactsMacos = 'Import z kontaktů';
 z.string.cs.preferencesOptionsContactsDetail = 'Vaše údaje o kontaktech používáme k propojení s ostatními uživateli. Všechny informace anonymizujeme a nesdílíme je s nikým dalším.';
-z.string.cs.preferencesOptionsData = 'Použití a zprávy o pádech';
-z.string.cs.preferencesOptionsDataCheckbox = 'Použití a zprávy o pádech';
-z.string.cs.preferencesOptionsDataDetail = 'Přispějte k vylepšení aplikace Wire odesíláním anonymních informací.';
 z.string.cs.preferencesOptionsPopular = 'Podle popularity poptávky';
 z.string.cs.preferencesOptionsEmojiReplaceCheckbox = 'Nahradit psané emotikony pomocí emojis';
 z.string.cs.preferencesOptionsPreviewsSendCheckbox = 'Vytvořit náhledy pro odeslané odkazy';
@@ -451,6 +447,8 @@ z.string.cs.preferencesOptionsNotificationsNone = 'Vypnout';
 z.string.cs.preferencesOptionsNotificationsObfuscate = 'Skrýt detaily';
 z.string.cs.preferencesOptionsNotificationsObfuscateMessage = 'Zobrazit odesílatele';
 z.string.cs.preferencesOptionsNotificationsOn = 'Zobrazit odesílatele a zprávu';
+
+z.string.cs.backupCancel = 'Zrušit';
 
 z.string.cs.searchConnect = 'Připojit';
 z.string.cs.searchConnections = 'Kontakty';

@@ -200,6 +200,8 @@ z.string.tr.modalIntegrationUnavailableHeadline = 'Botlar şuanda kullanılabili
 z.string.tr.modalIntegrationUnavailableMessage = 'Botlara ilginiz için teşekkür ederiz. Bir bir sonraki sürüm üzerinde çalışırken hizmet askıya alınmış. Beklemede kalın.';
 
 
+z.string.tr.modalImproveWireAction = 'Kabul et';
+
 z.string.tr.modalSessionResetHeadline = 'Oturum sıfırlandı';
 z.string.tr.modalSessionResetMessage1 = 'Eğer sorun çözülmemişse,';
 z.string.tr.modalSessionResetMessageLink = 'iletişime geç';
@@ -302,10 +304,7 @@ z.string.tr.conversationsConnectionRequestOne = 'Bir kişi bekliyor';
 z.string.tr.conversationsEmptyConversation = 'Grup sohbeti';
 z.string.tr.conversationsNoConversations = 'Hiç konuşma yok';
 z.string.tr.conversationsPopoverArchive = 'Arşivle';
-z.string.tr.conversationsPopoverBlock = 'Engelle';
 z.string.tr.conversationsPopoverCancel = 'İsteği iptal et';
-z.string.tr.conversationsPopoverClear = 'Sil';
-z.string.tr.conversationsPopoverLeave = 'Ayrıl';
 z.string.tr.conversationsPopoverNotify = 'Susturmayı Aç';
 z.string.tr.conversationsPopoverSilence = 'Sustur';
 z.string.tr.conversationsPopoverUnarchive = 'Arşivden Çıkar';
@@ -351,6 +350,7 @@ z.string.tr.addParticipantsSearchPlaceholder = 'İsme göre ara';
 z.string.tr.addParticipantsTabsPeople = 'İnsanlar';
 z.string.tr.addParticipantsTabsServices = 'Servisler';
 
+z.string.tr.conversationDetailsActionArchive = 'Arşivle';
 z.string.tr.conversationDetailsActionCancelRequest = 'İsteği iptal et';
 z.string.tr.conversationDetailsActionDevices = 'Cihazlar';
 z.string.tr.conversationDetailsGuestsOff = 'Yok';
@@ -425,7 +425,6 @@ z.string.tr.preferencesDevicesCurrent = 'Mevcut';
 z.string.tr.preferencesDevicesFingerprint = 'Anahtar Parmak İzi';
 z.string.tr.preferencesDevicesFingerprintDetail = 'Wire her cihaza kendine has bir parmak izi verir. Cihazlarınızı ve konuşmalarınızı doğrulamak için parmak izlerinizi karşılaştırın.';
 z.string.tr.preferencesDevicesId = 'ID: ';
-z.string.tr.preferencesDevicesRemove = 'Çıkart';
 z.string.tr.preferencesDevicesRemoveCancel = 'İptal';
 z.string.tr.preferencesDevicesRemoveDetail = 'Eğer bu cihazı kullanmayı bıraktıysanız, cihazı kaldırın. Ardından cihazdan otomatik olarak çıkış yapılacaktır.';
 z.string.tr.preferencesDevicesSessionConfirmation = 'Oturum sıfırlandı.';
@@ -445,9 +444,6 @@ z.string.tr.preferencesOptionsContacts = 'Kişiler';
 z.string.tr.preferencesOptionsContactsGmail = 'Gmail’den içe aktar';
 z.string.tr.preferencesOptionsContactsMacos = 'Kişilerden içe aktar';
 z.string.tr.preferencesOptionsContactsDetail = 'İletişim verilerinizi sizi başkalarıyla bağlayabilmek için kullanıyoruz. Tüm bilgilerinizi gizler ve kimseyle paylaşmayız.';
-z.string.tr.preferencesOptionsData = 'Kullanım ve kilitlenme raporları';
-z.string.tr.preferencesOptionsDataCheckbox = 'Kullanım ve kilitlenme raporları';
-z.string.tr.preferencesOptionsDataDetail = 'Anonim bilgiler göndererek Wire’ın daha iyi olmasını sağlayabilirsiniz.';
 z.string.tr.preferencesOptionsPopular = 'Yoğun istek üzerine';
 z.string.tr.preferencesOptionsEmojiReplaceCheckbox = 'Yazı halindeki emojileri, gerçek emojiler ile değiştir';
 z.string.tr.preferencesOptionsPreviewsSendCheckbox = 'Gönderdiğin bağlantılar için ön izlemeler oluştur';
@@ -457,6 +453,8 @@ z.string.tr.preferencesOptionsNotificationsNone = 'Yok';
 z.string.tr.preferencesOptionsNotificationsObfuscate = 'Ayrıntıyı gizle';
 z.string.tr.preferencesOptionsNotificationsObfuscateMessage = 'Göndereni göster';
 z.string.tr.preferencesOptionsNotificationsOn = 'Göndereni ve mesajı göster';
+
+z.string.tr.backupCancel = 'İptal';
 
 z.string.tr.searchConnect = 'Bağlan';
 z.string.tr.searchConnections = 'Bağlantılar';
