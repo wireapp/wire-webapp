@@ -18,14 +18,16 @@
  */
 
 import EXTERNAL_ROUTE from '../externalRoute';
+import {FORWARDED_QUERY_KEYS} from '../route';
 
-export function pathWithParams(path, additionalParams, excludeParams = []) {
+export function pathWithParams(path, additionalParams, whitelistParams) {
   const searchParams = window.location.search
     .replace(/^\?/, '')
     .split('&')
+    .filter(searchParam => !!searchParam)
     .filter(searchParam => {
       const paramName = searchParam.split('=')[0];
-      return !!searchParam && !excludeParams.includes(paramName);
+      return !whitelistParams || whitelistParams.includes(paramName);
     });
 
   if (additionalParams) {
@@ -36,7 +38,7 @@ export function pathWithParams(path, additionalParams, excludeParams = []) {
 }
 
 export function getAppPath() {
-  return pathWithParams(EXTERNAL_ROUTE.WEBAPP, undefined, ['reason']);
+  return pathWithParams(EXTERNAL_ROUTE.WEBAPP, undefined, FORWARDED_QUERY_KEYS);
 }
 
 export function getURLParameter(parameterName) {
