@@ -424,14 +424,10 @@ z.calling.entities.FlowEntity = class FlowEntity {
 
     const isStateClosed = peerConnection.signalingState === z.calling.rtc.SIGNALING_STATE.CLOSED;
     if (!isStateClosed) {
-      let connectionMediaStreamTracks;
-      if (peerConnection.getReceivers) {
-        connectionMediaStreamTracks = peerConnection.getReceivers().map(receiver => receiver.track);
-      } else {
-        connectionMediaStreamTracks = peerConnection
-          .getRemoteStreams()
-          .reduce((tracks, stream) => tracks.concat(stream.getTracks()), []);
-      }
+      const connectionMediaStreamTracks = peerConnection.getReceivers
+        ? peerConnection.getReceivers().map(receiver => receiver.track)
+        : peerConnection.getRemoteStreams().reduce((tracks, stream) => tracks.concat(stream.getTracks()), []);
+
       amplify.publish(z.event.WebApp.CALL.MEDIA.CONNECTION_CLOSED, connectionMediaStreamTracks);
       peerConnection.close();
 
