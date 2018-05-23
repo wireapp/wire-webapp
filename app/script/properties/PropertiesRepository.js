@@ -167,8 +167,8 @@ z.properties.PropertiesRepository = class PropertiesRepository {
       this._setPreference(propertiesType, updatedPreference);
 
       const savePromise = this.selfUser().isTemporaryGuest()
-        ? this._savePreferenceActivatedAccount(propertiesType, updatedPreference)
-        : this._savePreferenceTemporaryGuestAccount(propertiesType, updatedPreference);
+        ? this._savePreferenceTemporaryGuestAccount(propertiesType, updatedPreference)
+        : this._savePreferenceActivatedAccount(propertiesType, updatedPreference);
 
       savePromise.then(() => this._publishPropertyUpdate(propertiesType, updatedPreference));
     }
