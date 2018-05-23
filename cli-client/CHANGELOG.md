@@ -1,6 +1,15 @@
 # Change Log
 
-All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+<a name="1.3.118"></a>
+## [1.3.118](https://github.com/wireapp/wire-web-packages/tree/master/packages/cli-client/compare/@wireapp/cli-client@1.3.117...@wireapp/cli-client@1.3.118) (2018-05-23)
+
+
+
+
+**Note:** Version bump only for package @wireapp/cli-client
 
 <a name="1.3.117"></a>
 
