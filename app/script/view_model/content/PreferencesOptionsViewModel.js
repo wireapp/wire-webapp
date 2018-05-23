@@ -79,9 +79,7 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
     if (logExceedsMinimumLength) {
       const callLog = [messageLog.join('\r\n')];
       const blob = new Blob(callLog, {type: 'text/plain;charset=utf-8'});
-
-      const userName = this.userRepository.self().username();
-      const filename = `Wire-${userName}-Calling_${z.util.TimeUtil.getCurrentDate()}.log`;
+      const filename = `Wire-Calling_${z.util.TimeUtil.getCurrentDate()}.log`;
 
       return z.util.downloadBlob(blob, filename);
     }
