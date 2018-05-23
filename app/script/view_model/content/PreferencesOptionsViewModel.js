@@ -66,11 +66,6 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
       this.propertiesRepository.savePreference(z.properties.PROPERTIES_TYPE.PREVIEWS.SEND, sendPreviewsPreference);
     });
 
-    this.optionPrivacy = ko.observable();
-    this.optionPrivacy.subscribe(privacyPreference => {
-      this.propertiesRepository.savePreference(z.properties.PROPERTIES_TYPE.PRIVACY, privacyPreference);
-    });
-
     amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, this.updateProperties.bind(this));
   }
 
@@ -109,7 +104,6 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
     this.optionReplaceInlineEmoji(properties.settings.emoji.replace_inline);
     this.optionEnableDarkTheme(properties.settings.darktheme.enabled);
     this.optionSendPreviews(properties.settings.previews.send);
-    this.optionPrivacy(properties.settings.privacy.improve_wire);
     this.optionNotifications(properties.settings.notifications);
   }
 };

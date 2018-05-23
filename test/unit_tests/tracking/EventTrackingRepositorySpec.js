@@ -35,14 +35,17 @@ describe('z.tracking.EventTrackingRepository', () => {
   });
 
   describe('Initialization', () => {
-    it('enables error reporting, user tracking and subscribes to tracking events by default', done => {
+    it('enables error reporting, user tracking and subscribes to tracking events', done => {
       expect(TestFactory.tracking_repository.mixpanel).toBeUndefined();
       spyOn(TestFactory.tracking_repository, '_enable_error_reporting').and.callThrough();
       spyOn(TestFactory.tracking_repository, '_init_tracking').and.callThrough();
       spyOn(TestFactory.tracking_repository, '_subscribe_to_tracking_events').and.callThrough();
 
       const properties = new z.properties.PropertiesEntity();
-      TestFactory.tracking_repository.init(properties.settings.privacy.improve_wire).then(() => {
+      const privacyPreference = properties.settings.privacy.improve_wire;
+      expect(privacyPreference).toBeFalsy();
+
+      TestFactory.tracking_repository.init(true).then(() => {
         expect(TestFactory.tracking_repository.mixpanel).toBeDefined();
         expect(TestFactory.tracking_repository._enable_error_reporting).toHaveBeenCalled();
         expect(TestFactory.tracking_repository._init_tracking).toHaveBeenCalled();

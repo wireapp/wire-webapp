@@ -244,6 +244,8 @@ z.string.hu.modalPictureTooLargeMessage = 'Maximum {{number}} MB méretű képek
 z.string.hu.modalPictureTooSmallHeadline = 'A kép túl kicsi';
 z.string.hu.modalPictureTooSmallMessage = 'Kérjük, legalább 320 x 320 képpont méretű képet válassz.';
 
+z.string.hu.modalImproveWireAction = 'Elfogadás';
+
 z.string.hu.modalServiceUnavailableHeadline = 'Új szolgáltatás hozzáadása nem lehetséges';
 z.string.hu.modalServiceUnavailableMessage = 'A szolgáltatás jelenleg nem elérhető.';
 
@@ -548,9 +550,6 @@ z.string.hu.preferencesOptionsContacts = 'Névjegyek';
 z.string.hu.preferencesOptionsContactsGmail = 'Importálás Gmail-ből';
 z.string.hu.preferencesOptionsContactsMacos = 'Importálás Névjegyek-ből';
 z.string.hu.preferencesOptionsContactsDetail = 'A névjegyeid importálásával könnyebben kapcsolatba léphetsz másokkal. Minden információt anonimizálunk, és semmit nem osszuk meg senki mással.';
-z.string.hu.preferencesOptionsData = 'Használati adatok és hibajelentések';
-z.string.hu.preferencesOptionsDataCheckbox = 'Adatok küldése névtelenül';
-z.string.hu.preferencesOptionsDataDetail = 'Anonim információk küldésével segíts nekünk, hogy a Wire még jobb legyen.';
 z.string.hu.preferencesOptionsPopular = 'Közkívánatra';
 z.string.hu.preferencesOptionsEmojiReplaceCheckbox = 'Cserélje ki a begépelt hangulatjeleket emojikra';
 z.string.hu.preferencesOptionsEmojiReplaceDetail = ':-) → {{icon}}';

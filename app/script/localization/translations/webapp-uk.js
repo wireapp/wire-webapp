@@ -138,6 +138,9 @@ z.string.uk.modalAssetParallelUploadsMessage = 'Ви можете надісла
 z.string.uk.modalCallEmptyConversationHeadline = 'Нікому дзвонити';
 z.string.uk.modalCallEmptyConversationMessage = 'Тут більше нікого немає.';
 
+z.string.uk.modalCallEmptyLogHeadline = 'Дзвінки відсутні';
+z.string.uk.modalCallEmptyLogMessage = 'Не відбулося жодного дзвінка, на основі якого було би можливо згенерувати звіт.';
+
 z.string.uk.modalCallNoGroupVideoHeadline = 'Відеодзвінки в групах не підтримуються';
 z.string.uk.modalCallNoGroupVideoMessage = 'Відеодзвінки недоступні в групових розмовах.';
 
@@ -241,6 +244,11 @@ z.string.uk.modalPictureTooLargeMessage = 'Ви можете використо�
 
 z.string.uk.modalPictureTooSmallHeadline = 'Картинка замала';
 z.string.uk.modalPictureTooSmallMessage = 'Будь ласка, виберіть картинка з роздільною здатністю принаймні 320x320 пікселів.';
+
+z.string.uk.modalImproveWireAction = 'Прийняти';
+z.string.uk.modalImproveWireSecondary = 'Не зараз';
+z.string.uk.modalImproveWireHeadline = 'Допоможіть нам зробити Wire кращим';
+z.string.uk.modalImproveWireMessage = 'Надсилання анонімних звітів про використання та збої в роботі допомагає нам вдосконалити наші продукти та послуги. Ми не використовуємо цю інформацію для будь-яких інших цілей.';
 
 z.string.uk.modalServiceUnavailableHeadline = 'Неможливо додати сервіс';
 z.string.uk.modalServiceUnavailableMessage = 'Даний сервіс наразі недоступний.';
@@ -373,14 +381,14 @@ z.string.uk.conversationsConnectionRequestMany = '{{number}} людей очік
 z.string.uk.conversationsConnectionRequestOne = '1 людина очікує';
 z.string.uk.conversationsEmptyConversation = 'Групова розмова';
 z.string.uk.conversationsNoConversations = 'Розпочніть розмову або створіть групу.';
-z.string.uk.conversationsPopoverArchive = 'Заархівувати розмову';
-z.string.uk.conversationsPopoverBlock = 'Заблокувати контакт…';
+z.string.uk.conversationsPopoverArchive = 'Заархівувати';
+z.string.uk.conversationsPopoverBlock = 'Заблокувати…';
 z.string.uk.conversationsPopoverCancel = 'Скасувати запит…';
 z.string.uk.conversationsPopoverClear = 'Видалити вміст…';
 z.string.uk.conversationsPopoverLeave = 'Вийти з групи…';
-z.string.uk.conversationsPopoverNotify = 'Увімк. звук в розмові';
-z.string.uk.conversationsPopoverSilence = 'Вимк. звук в розмові';
-z.string.uk.conversationsPopoverUnarchive = 'Розархівувати розмову';
+z.string.uk.conversationsPopoverNotify = 'Увімк. звук';
+z.string.uk.conversationsPopoverSilence = 'Вимк. звук';
+z.string.uk.conversationsPopoverUnarchive = 'Розархівувати';
 
 z.string.uk.conversationsSecondaryLineMissedCall = '{{number}} пропущений дзвінок';
 z.string.uk.conversationsSecondaryLineMissedCalls = '{{number}} пропущених дзвінків';
@@ -430,9 +438,9 @@ z.string.uk.addParticipantsServiceConfirmButton = 'Додати сервіс';
 z.string.uk.addParticipantsTabsPeople = 'Список контактів';
 z.string.uk.addParticipantsTabsServices = 'Сервіси';
 
-z.string.uk.conversationDetailsActionArchive = 'Заархівувати розмову';
+z.string.uk.conversationDetailsActionArchive = 'Заархівувати';
 z.string.uk.conversationDetailsActionAddParticipants = 'Додати учасників';
-z.string.uk.conversationDetailsActionBlock = 'Заблокувати контакт…';
+z.string.uk.conversationDetailsActionBlock = 'Заблокувати…';
 z.string.uk.conversationDetailsActionCancelRequest = 'Скасувати запит…';
 z.string.uk.conversationDetailsActionClear = 'Видалити вміст…';
 z.string.uk.conversationDetailsActionCreateGroup = 'Створити групу';
@@ -448,7 +456,7 @@ z.string.uk.conversationDetailsParticipantsUsersMany = 'Список конта�
 z.string.uk.conversationDetailsPeople = 'Список контактів';
 z.string.uk.conversationDetailsServices = 'Сервіси';
 
-z.string.uk.groupParticipantActionBlock = 'Заблокувати контакт…';
+z.string.uk.groupParticipantActionBlock = 'Заблокувати…';
 z.string.uk.groupParticipantActionCancelRequest = 'Скасувати запит…';
 z.string.uk.groupParticipantActionDevices = 'Пристрої';
 z.string.uk.groupParticipantActionIgnoreRequest = 'Ігнорувати запит';
@@ -459,7 +467,7 @@ z.string.uk.groupParticipantActionPending = 'Очікує підтверджен
 z.string.uk.groupParticipantActionRemove = 'Видалити з групи…';
 z.string.uk.groupParticipantActionSelfProfile = 'Відкрити профіль';
 z.string.uk.groupParticipantActionSendRequest = 'Додати до контактів';
-z.string.uk.groupParticipantActionUnblock = 'Розблокувати контакт…';
+z.string.uk.groupParticipantActionUnblock = 'Розблокувати…';
 
 z.string.uk.guestOptionsCopyLink = 'Скопіювати лінк';
 z.string.uk.guestOptionsCopyLinkDone = 'Лінк скопійовано!';
@@ -507,11 +515,16 @@ z.string.uk.preferencesAboutWebsite = 'Веб-сайт Wire';
 
 z.string.uk.preferencesAccountAvaibilityUnset = 'Встановити статус';
 z.string.uk.preferencesAccountCreateTeam = 'Створити команду';
+z.string.uk.preferencesAccountData = 'Дозвіл на використання даних';
+z.string.uk.preferencesAccountDataCheckbox = 'Надсилати анонімну статистику';
+z.string.uk.preferencesAccountDataDetail = 'Допоможіть зробити Wire кращим, відправляючи анонімні звіти про використання та збої в роботі.';
 z.string.uk.preferencesAccountDelete = 'Видалити акаунт';
 z.string.uk.preferencesAccountLeaveGuestRoom = 'Вийти з гостьової кімнати';
 z.string.uk.preferencesAccountLeaveGuestRoomDescription = 'Ви більше не зможете отримати доступ до повідомлень в цій розмові.';
 z.string.uk.preferencesAccountLogOut = 'Вийти';
 z.string.uk.preferencesAccountManageTeam = 'Керування командою';
+z.string.uk.preferencesAccountMarketingConsentCheckbox = 'Отримувати новини';
+z.string.uk.preferencesAccountMarketingConsentDetail = 'Отримувати новини та інформацію про оновлення Wire по електронній пошті.';
 z.string.uk.preferencesAccountResetPassword = 'Виконати скидання паролю';
 z.string.uk.preferencesAccountTeam = 'в {{name}}';
 z.string.uk.preferencesAccountUsernamePlaceholder = 'Ваше повне ім’я';
@@ -552,9 +565,6 @@ z.string.uk.preferencesOptionsContacts = 'Контакти';
 z.string.uk.preferencesOptionsContactsGmail = 'Імпорт з Gmail';
 z.string.uk.preferencesOptionsContactsMacos = 'Імпорт з Контактів';
 z.string.uk.preferencesOptionsContactsDetail = 'Ми використовуємо дані про ваші контакти, щоб ви могли знайти людей, яких ви знаєте. Ми анонімізуємо всю інформацію та не передаємо її третім особам.';
-z.string.uk.preferencesOptionsData = 'Статистика використання та збоїв';
-z.string.uk.preferencesOptionsDataCheckbox = 'Статистика використання та збоїв';
-z.string.uk.preferencesOptionsDataDetail = 'Зробіть Wire кращим, відправляючи анонімну інформацію.';
 z.string.uk.preferencesOptionsPopular = 'У відповідь на численні прохання';
 z.string.uk.preferencesOptionsEmojiReplaceCheckbox = 'Замінювати текстові смайлики іконками';
 z.string.uk.preferencesOptionsEmojiReplaceDetail = ':-) → {{icon}}';
@@ -569,8 +579,35 @@ z.string.uk.preferencesOptionsCallLogs = 'Усунення проблем';
 z.string.uk.preferencesOptionsCallLogsGet = 'Зберегти технічний звіт про дзвінок';
 z.string.uk.preferencesOptionsCallLogsDetail = 'Ця інформація допомагає відділу підтримки Wire діагностувати проблеми, пов’язані з дзвінками.';
 
+z.string.uk.preferencesOptionsBackupHeader = 'Історія';
+z.string.uk.preferencesOptionsBackupExportHeadline = 'Зробити резервну копію розмов';
+z.string.uk.preferencesOptionsBackupExportSecondary = 'Створіть резервну копію для збереження історії ваших розмов. Ви можете використовувати її, щоб відновити історію, якщо ваш комп’ютер вийде з ладу або ви почнете використовувати новий. \nФайл резервної копії не захищений скрізним криптуванням Wire, тому зберігайте його в безпечному місці.';
+z.string.uk.preferencesOptionsBackupImportHeadline = 'Відновити з резервної копії';
+z.string.uk.preferencesOptionsBackupImportSecondary = 'Історію розмов можна відновити тільки з резервної копії, зробленої на тій же платформі. Резервна копія перезапише розмови, які ви, можливо, уже маєте на цьому пристрої.';
+
+z.string.uk.backupExportGenericErrorHeadline = 'Не вдалося зберегти файл';
+z.string.uk.backupExportGenericErrorSecondary = 'Резервне копіювання не завершено.';
+z.string.uk.backupExportProgressHeadline = 'Підготовка…';
+z.string.uk.backupExportProgressSecondary = 'Резервне копіювання · {{processed}} з {{total}} — {{progress}}%';
+z.string.uk.backupExportProgressCompressing = 'Підготовка файлу резевної копії';
+z.string.uk.backupExportSaveFileAction = 'Зберегти файл';
+z.string.uk.backupExportSuccessHeadline = 'Резервна копія готова';
+z.string.uk.backupExportSuccessSecondary = 'Даний функціонал може бути корисним, якщо ваш комп’ютер вийде з ладу або ви почнете використовувати новий.';
 z.string.uk.backupImportGenericErrorHeadline = 'Щось пішло не так';
+z.string.uk.backupImportGenericErrorSecondary = 'Ваша історія не може бути відновлена.';
+z.string.uk.backupImportAccountErrorHeadline = 'Несумісна резервна копія';
+z.string.uk.backupImportAccountErrorSecondary = 'Ви не можете відновити історію з іншого акаунту.';
+z.string.uk.backupImportVersionErrorHeadline = 'Несумісний файл резервної копії';
+z.string.uk.backupImportVersionErrorSecondary = 'Цю резервну копію було створено новішою або застарілою версією Wire, тому її неможливо відновити.';
+z.string.uk.backupImportIncompatibleErrorHeadline = 'Несумісна резервна копія';
+z.string.uk.backupImportIncompatibleErrorSecondary = 'Ви не можете відновити історію з іншого акаунту.';
+z.string.uk.backupImportOutdatedErrorHeadline = 'Несумісний файл резервної копії';
+z.string.uk.backupImportOutdatedErrorSecondary = 'Цю резервну копію було створено новішою або застарілою версією Wire, тому її неможливо відновити.';
+z.string.uk.backupImportProgressHeadline = 'Підготовка…';
+z.string.uk.backupImportProgressSecondary = 'Відновлення історії розмов · {{processed}} з {{total}} — {{progress}}%';
+z.string.uk.backupImportSuccessHeadline = 'Історію розмов відновлено.';
 z.string.uk.backupCancel = 'Скасувати';
+z.string.uk.backupTryAgain = 'Спробувати ще раз';
 
 z.string.uk.searchConnect = 'Додати до контактів';
 z.string.uk.searchConnections = 'Контакти';

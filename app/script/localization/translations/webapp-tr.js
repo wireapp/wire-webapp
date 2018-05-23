@@ -200,6 +200,8 @@ z.string.tr.modalIntegrationUnavailableHeadline = 'Botlar şuanda kullanılabili
 z.string.tr.modalIntegrationUnavailableMessage = 'Botlara ilginiz için teşekkür ederiz. Bir bir sonraki sürüm üzerinde çalışırken hizmet askıya alınmış. Beklemede kalın.';
 
 
+z.string.tr.modalImproveWireAction = 'Kabul et';
+
 z.string.tr.modalSessionResetHeadline = 'Oturum sıfırlandı';
 z.string.tr.modalSessionResetMessage1 = 'Eğer sorun çözülmemişse,';
 z.string.tr.modalSessionResetMessageLink = 'iletişime geç';
@@ -442,9 +444,6 @@ z.string.tr.preferencesOptionsContacts = 'Kişiler';
 z.string.tr.preferencesOptionsContactsGmail = 'Gmail’den içe aktar';
 z.string.tr.preferencesOptionsContactsMacos = 'Kişilerden içe aktar';
 z.string.tr.preferencesOptionsContactsDetail = 'İletişim verilerinizi sizi başkalarıyla bağlayabilmek için kullanıyoruz. Tüm bilgilerinizi gizler ve kimseyle paylaşmayız.';
-z.string.tr.preferencesOptionsData = 'Kullanım ve kilitlenme raporları';
-z.string.tr.preferencesOptionsDataCheckbox = 'Kullanım ve kilitlenme raporları';
-z.string.tr.preferencesOptionsDataDetail = 'Anonim bilgiler göndererek Wire’ın daha iyi olmasını sağlayabilirsiniz.';
 z.string.tr.preferencesOptionsPopular = 'Yoğun istek üzerine';
 z.string.tr.preferencesOptionsEmojiReplaceCheckbox = 'Yazı halindeki emojileri, gerçek emojiler ile değiştir';
 z.string.tr.preferencesOptionsPreviewsSendCheckbox = 'Gönderdiğin bağlantılar için ön izlemeler oluştur';
