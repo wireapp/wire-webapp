@@ -55,7 +55,9 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
 
     const streamHandler = this.mediaRepository.stream_handler;
     this.localVideoStream = streamHandler.localMediaStream;
-    this.remoteVideoStreams = streamHandler.remote_media_streams.video;
+    this.remoteVideoStreams = ko.pureComputed(() => {
+      return streamHandler.remoteMediaStreamInfoIndex.video().map(mediaStreamInfo => mediaStreamInfo.stream);
+    });
 
     this.selfStreamState = this.mediaRepository.stream_handler.selfStreamState;
 
