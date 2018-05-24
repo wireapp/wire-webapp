@@ -27,6 +27,7 @@
     height: 168px;
     margin: 0 8px 16px;
     border-radius: 8px;
+    //animation: show-video-preview @animation-timing-fast ease-in-out 0s 1;
 
     &__overlay {
       position: absolute;
@@ -139,5 +140,14 @@
       border-radius: 4px;
       box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.16);
     }
+  }
+}
+
+@keyframes show-video-preview {
+  0% {
+    max-height: 0;
+  }
+  100% {
+    max-height: 168px;
   }
 }
