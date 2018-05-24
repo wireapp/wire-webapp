@@ -53,24 +53,8 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
     this.currentDeviceId = this.mediaRepository.devices_handler.current_device_id;
     this.currentDeviceIndex = this.mediaRepository.devices_handler.current_device_index;
 
-    const streamHandler = this.mediaRepository.stream_handler;
-    this.localVideoStream = streamHandler.localMediaStream;
-    this.remoteVideoStreams = ko.pureComputed(() => {
-      const hasActiveVideo = mediaStreamInfo => {
-        const noVideoParticipanIds = this.calls()
-          .reduce((participants, call) => participants.concat(call.participants()), [])
-          .filter(participant => !participant.state.videoSend())
-          .map(participant => participant.id);
-
-        // filter participant that have their video stream disabled
-        return !noVideoParticipanIds.includes(mediaStreamInfo.flow_id);
-      };
-
-      return streamHandler.remoteMediaStreamInfoIndex
-        .video()
-        .filter(hasActiveVideo)
-        .map(mediaStreamInfo => mediaStreamInfo.stream);
-    });
+    this.localVideoStream = this.mediaRepository.stream_handler.localMediaStream;
+    this.remoteVideoStreamsInfo = this.mediaRepository.stream_handler.remoteMediaStreamInfoIndex.video;
 
     this.selfStreamState = this.mediaRepository.stream_handler.selfStreamState;
 
@@ -136,7 +120,7 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
     this.showRemoteVideo = ko.pureComputed(() => {
       if (this.isCallOngoing()) {
         const remoteVideoState = this.joinedCall().isRemoteScreenSend() || this.joinedCall().isRemoteVideoSend();
-        return remoteVideoState && this.remoteVideoStreams().length;
+        return remoteVideoState && this.remoteVideoStreamsInfo().length;
       }
     });
 

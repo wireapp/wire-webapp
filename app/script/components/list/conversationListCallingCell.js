@@ -35,8 +35,9 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
       amplify.publish(z.event.WebApp.CALL.STATE.JOIN, this.conversation.id, mediaType);
     };
 
-    this.videoStreams = this.mediaRepository.stream_handler.remoteMediaStreamInfoIndex.video;
+    this.videoStreamsInfo = this.mediaRepository.stream_handler.remoteMediaStreamInfoIndex.video;
     this.localVideoStream = this.mediaRepository.stream_handler.localMediaStream;
+    this.calls = this.calling_repository.calls;
 
     this.onLeaveCall = () => {
       amplify.publish(
@@ -181,7 +182,7 @@ ko.components.register('conversation-list-calling-cell', {
 
     <!-- ko if: showVideoPreview -->
       <div class="group-video__minimized-wrapper" data-bind="click: onMaximizeVideoGrid">
-        <group-video-grid params="streams: videoStreams, ownStream: localVideoStream, minimized: true"></group-video-grid>
+        <group-video-grid params="streamsInfo: videoStreamsInfo, ownStream: localVideoStream, calls: calls, minimized: true"></group-video-grid>
         <!-- ko if: showMaximize -->
           <div class="group-video__minimized-wrapper__overlay" data-uie-name="do-maximize-call">
             <fullscreen-icon></fullscreen-icon>
