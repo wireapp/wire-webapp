@@ -55,7 +55,7 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
 
     const streamHandler = this.mediaRepository.stream_handler;
     this.localVideoStream = streamHandler.localMediaStream;
-    this.remoteVideoStreams = streamHandler.remote_media_streams.activeVideo;
+    this.remoteVideoStreams = streamHandler.remote_media_streams.video;
 
     this.selfStreamState = this.mediaRepository.stream_handler.selfStreamState;
 

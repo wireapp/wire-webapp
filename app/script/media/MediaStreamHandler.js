@@ -76,7 +76,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
    */
   constructor(media_repository) {
     this.media_repository = media_repository;
-    this.logger = new z.util.Logger('z.media.MediaDevicesHandler', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger('z.media.MediaStreamHandler', z.config.LOGGER.OPTIONS);
 
     this.calls = () => [];
     this.joined_call = () => undefined;
@@ -91,12 +91,6 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
     this.local_media_type = ko.observable(z.media.MediaType.AUDIO);
 
     this.remote_media_streams = {
-      activeVideo: ko.pureComputed(() => {
-        // FIXME the media repository should release the memory of inactive video streams
-        // Right now, only the status is changed but we keep the stream in memory
-        // until the next page reload.
-        return this.remote_media_streams.video().filter(stream => stream.active);
-      }),
       audio: ko.observableArray([]),
       video: ko.observableArray([]),
     };
@@ -109,6 +103,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
 
     this.request_hint_timeout = undefined;
     amplify.subscribe(z.event.WebApp.CALL.MEDIA.ADD_STREAM, this.addRemoteMediaStream.bind(this));
+    amplify.subscribe(z.event.WebApp.CALL.MEDIA.CONNECTION_CLOSED, this.removeRemoteMediaStreamTracks.bind(this));
   }
 
   //##############################################################################
@@ -528,6 +523,29 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
     }
 
     this.element_handler.add_media_element(mediaStreamInfo);
+  }
+
+  /**
+   * Removes the given tracks from the streams containing them.
+   * If a stream ends up having no tracks, it gets filtered out from the array of streams
+   * removeRemoteMediaStreamTracks
+   *
+   * @param {MediaStreamTrack[]} remoteTracks - the tracks to remove
+   * @returns {void} - void
+   */
+  removeRemoteMediaStreamTracks(remoteTracks) {
+    const removeTracks = (streams, tracks) => {
+      return streams
+        .map(stream => {
+          tracks.forEach(track => stream.removeTrack(track));
+          return stream;
+        })
+        .filter(stream => stream.getTracks().length > 0);
+    };
+
+    [this.remote_media_streams.video, this.remote_media_streams.audio].forEach(streams => {
+      streams(removeTracks(streams(), remoteTracks));
+    });
   }
 
   //##############################################################################
