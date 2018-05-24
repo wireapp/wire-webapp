@@ -35,8 +35,12 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
       amplify.publish(z.event.WebApp.CALL.STATE.JOIN, this.conversation.id, mediaType);
     };
 
+    this.selfStreamState = this.calling_repository.selfStreamState;
+
     this.videoStreamsInfo = this.mediaRepository.stream_handler.remoteMediaStreamInfoIndex.video;
-    this.localVideoStream = this.mediaRepository.stream_handler.localMediaStream;
+    this.localVideoStream = ko.pureComputed(() => {
+      return this.selfStreamState.videoSend() ? this.mediaRepository.stream_handler.localMediaStream() : null;
+    });
     this.calls = this.calling_repository.calls;
 
     this.onLeaveCall = () => {
@@ -70,8 +74,6 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
     this.callParticipants = ko.pureComputed(() => this.call().participants());
 
     this.joinedCall = this.calling_repository.joinedCall;
-
-    this.selfStreamState = this.calling_repository.selfStreamState;
 
     this.showScreensharingButton = ko.pureComputed(() => {
       return this.callIsConnected() && z.calling.CallingRepository.supportsScreenSharing;

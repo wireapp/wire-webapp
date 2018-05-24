@@ -53,10 +53,12 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
     this.currentDeviceId = this.mediaRepository.devices_handler.current_device_id;
     this.currentDeviceIndex = this.mediaRepository.devices_handler.current_device_index;
 
-    this.localVideoStream = this.mediaRepository.stream_handler.localMediaStream;
-    this.remoteVideoStreamsInfo = this.mediaRepository.stream_handler.remoteMediaStreamInfoIndex.video;
-
     this.selfStreamState = this.mediaRepository.stream_handler.selfStreamState;
+
+    this.localVideoStream = ko.pureComputed(() => {
+      return this.selfStreamState.videoSend() ? this.mediaRepository.stream_handler.localMediaStream() : null;
+    });
+    this.remoteVideoStreamsInfo = this.mediaRepository.stream_handler.remoteMediaStreamInfoIndex.video;
 
     this.isChoosingScreen = ko.observable(false);
 
