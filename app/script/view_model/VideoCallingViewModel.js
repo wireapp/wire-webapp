@@ -56,7 +56,20 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
     const streamHandler = this.mediaRepository.stream_handler;
     this.localVideoStream = streamHandler.localMediaStream;
     this.remoteVideoStreams = ko.pureComputed(() => {
-      return streamHandler.remoteMediaStreamInfoIndex.video().map(mediaStreamInfo => mediaStreamInfo.stream);
+      const hasActiveVideo = mediaStreamInfo => {
+        const noVideoParticipanIds = this.calls()
+          .reduce((participants, call) => participants.concat(call.participants()), [])
+          .filter(participant => !participant.state.videoSend())
+          .map(participant => participant.id);
+
+        // filter participant that have their video stream disabled
+        return !noVideoParticipanIds.includes(mediaStreamInfo.flow_id);
+      };
+
+      return streamHandler.remoteMediaStreamInfoIndex
+        .video()
+        .filter(hasActiveVideo)
+        .map(mediaStreamInfo => mediaStreamInfo.stream);
     });
 
     this.selfStreamState = this.mediaRepository.stream_handler.selfStreamState;
