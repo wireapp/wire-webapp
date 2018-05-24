@@ -51,6 +51,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.backupRepository = repositories.backup;
     this.clientRepository = repositories.client;
     this.conversationRepository = repositories.conversation;
+    this.propertiesRepository = repositories.properties;
     this.teamRepository = repositories.team;
     this.userRepository = repositories.user;
 
@@ -85,10 +86,18 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.team = this.teamRepository.team;
     this.teamName = ko.pureComputed(() => z.l10n.text(z.string.preferencesAccountTeam, this.teamRepository.teamName()));
 
+    this.optionPrivacy = ko.observable();
+    this.optionPrivacy.subscribe(privacyPreference => {
+      this.propertiesRepository.savePreference(z.properties.PROPERTIES_TYPE.PRIVACY, privacyPreference);
+    });
+
+    this.optionMarketingConsent = this.userRepository.marketingConsent;
+
     this._initSubscriptions();
   }
 
   _initSubscriptions() {
+    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, this.updateProperties.bind(this));
     amplify.subscribe(z.event.WebApp.USER.CLIENT_ADDED, this.onClientAdd.bind(this));
     amplify.subscribe(z.event.WebApp.USER.CLIENT_REMOVED, this.onClientRemove.bind(this));
   }
@@ -369,5 +378,9 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.usernameState(null);
     this.enteredUsername(null);
     this.submittedUsername(null);
+  }
+
+  updateProperties(properties) {
+    this.optionPrivacy(properties.settings.privacy.improve_wire);
   }
 };

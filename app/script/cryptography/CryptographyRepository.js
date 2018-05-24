@@ -142,7 +142,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
    */
   getRemoteFingerprint(userId, clientId) {
     return this._loadSession(userId, clientId).then(cryptoboxSession => {
-      return this._formatFingerprint(cryptoboxSession.fingerprint_remote());
+      return cryptoboxSession ? this._formatFingerprint(cryptoboxSession.fingerprint_remote()) : '';
     });
   }
 
@@ -342,10 +342,13 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
           return this.cryptobox.session_from_prekey(sessionId, z.util.base64ToArray(preKey.key).buffer);
         }
 
+        Raygun.send(new Error('Failed to create session: No pre-key found'));
         this.logger.warn(`No pre-key for user '${userId}' ('${clientId}') found. The client might have been deleted.`);
         return undefined;
       })
       .catch(error => {
+        Raygun.send(new Error(`Failed to create session: ${error.message}`));
+
         const message = `Pre-key for user '${userId}' ('${clientId}') invalid. Skipping encryption: ${error.message}`;
         this.logger.warn(message, error);
         return undefined;

@@ -1056,17 +1056,17 @@ z.calling.CallingRepository = class CallingRepository {
         switch (callState) {
           case z.calling.enum.CALL_STATE.INCOMING:
             actionStringId = z.string.modalCallSecondIncomingAction;
-            messageStringId = z.string.modalCallSecondIncomingHeadline;
+            messageStringId = z.string.modalCallSecondIncomingMessage;
             titleStringId = z.string.modalCallSecondIncomingHeadline;
             break;
           case z.calling.enum.CALL_STATE.ONGOING:
             actionStringId = z.string.modalCallSecondOngoingAction;
-            messageStringId = z.string.modalCallSecondOngoingHeadline;
+            messageStringId = z.string.modalCallSecondOngoingMessage;
             titleStringId = z.string.modalCallSecondOngoingHeadline;
             break;
           case z.calling.enum.CALL_STATE.OUTGOING:
             actionStringId = z.string.modalCallSecondOutgoingAction;
-            messageStringId = z.string.modalCallSecondOutgoingHeadline;
+            messageStringId = z.string.modalCallSecondOutgoingMessage;
             titleStringId = z.string.modalCallSecondOutgoingHeadline;
             break;
           default:

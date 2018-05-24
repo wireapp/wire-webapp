@@ -38,7 +38,7 @@ export const OS = {
   DESKTOP: {
     LINUX: ['linux', 'ubuntu', 'fedora', 'gentoo', 'debian', 'suse', 'centos', 'red hat', 'freebsd', 'openbsd'],
     MAC: ['os x', 'mac os'],
-    WINDOWS: ['windows'],
+    WINDOWS: ['windows', 'windows server 2008 r2 / 7', 'windows server 2008 / vista', 'windows xp'],
   },
   MOBILE: {
     ANDROID: ['android'],

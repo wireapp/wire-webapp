@@ -17,11 +17,15 @@
  *
  */
 
-export const getSelf = state => state.selfState.self || {};
+const getSelfState = state => state.selfState || {};
+export const getSelf = state => getSelfState(state).self || {};
 export const getSelfName = state => getSelf(state).name;
 export const getSelfHandle = state => getSelf(state).handle;
 export const hasSelfHandle = state => !!getSelf(state).handle;
 export const isTemporaryGuest = state => !!getSelf(state).expires_at;
 export const getSelfTeamId = state => getSelf(state).team;
-export const getSelfError = state => state.selfState.error;
-export const isFetching = state => state.selfState.fetching;
+export const getSelfError = state => getSelfState(state).error;
+export const isFetching = state => getSelfState(state).fetching;
+export const getConsents = state => getSelfState(state).consents || {};
+const getConsent = (state, consentType) => getConsents(state)[consentType];
+export const hasUnsetConsent = (state, consentType) => getConsent(state, consentType) === undefined;

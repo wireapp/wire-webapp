@@ -60,18 +60,18 @@ z.main.App = class App {
     this.update_source = undefined;
     this.window_handler = new z.ui.WindowHandler().init();
 
-    this.service = this._setup_services();
-    this.repository = this._setup_repositories();
-    this.view = this._setup_view_models();
+    this.service = this._setupServices();
+    this.repository = this._setupRepositories();
+    this.view = this._setupViewModels();
     this.util = this._setup_utils();
 
     this.instanceId = z.util.createRandomUuid();
 
-    this._subscribe_to_events();
+    this._subscribeToEvents();
 
-    this.init_debugging();
-    this.init_app();
-    this.init_service_worker();
+    this.initDebugging();
+    this.initApp();
+    this.initServiceWorker();
   }
 
   //##############################################################################
@@ -82,7 +82,7 @@ z.main.App = class App {
    * Create all app repositories.
    * @returns {Object} All repositories
    */
-  _setup_repositories() {
+  _setupRepositories() {
     const repositories = {};
 
     repositories.audio = this.auth.audio;
@@ -173,7 +173,7 @@ z.main.App = class App {
    * Create all app services.
    * @returns {Object} All services
    */
-  _setup_services() {
+  _setupServices() {
     const storageService = new z.storage.StorageService();
 
     return {
@@ -215,7 +215,7 @@ z.main.App = class App {
    * Create all app view models.
    * @returns {Object} All view models
    */
-  _setup_view_models() {
+  _setupViewModels() {
     return new z.viewModel.MainViewModel(this.repository);
   }
 
@@ -223,7 +223,7 @@ z.main.App = class App {
    * Subscribe to amplify events.
    * @returns {undefined} No return value
    */
-  _subscribe_to_events() {
+  _subscribeToEvents() {
     amplify.subscribe(z.event.WebApp.LIFECYCLE.REFRESH, this.refresh.bind(this));
     amplify.subscribe(z.event.WebApp.LIFECYCLE.SIGN_OUT, this.logout.bind(this));
     amplify.subscribe(z.event.WebApp.LIFECYCLE.UPDATE, this.update.bind(this));
@@ -240,10 +240,10 @@ z.main.App = class App {
    *   Any failure in the Promise chain will result in a logout.
    * @todo Check if we really need to logout the user in all these error cases or how to recover from them
    *
-   * @param {boolean} [is_reload=_is_reload()] - App init after page reload
+   * @param {boolean} [isReload=_isReload()] - App init after page reload
    * @returns {undefined} No return value
    */
-  init_app(is_reload = this._is_reload()) {
+  initApp(isReload = this._isReload()) {
     z.util
       .checkIndexedDb()
       .then(() => this._checkSingleInstanceOnInit())
@@ -253,7 +253,7 @@ z.main.App = class App {
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
 
         const protoFile = `ext/proto/generic-message-proto/messages.proto?${z.util.Environment.version(false)}`;
-        return Promise.all([this._get_user_self(), z.util.protobuf.loadProtos(protoFile)]);
+        return Promise.all([this._getUserSelf(), z.util.protobuf.loadProtos(protoFile)]);
       })
       .then(([self_user_et]) => {
         this.view.loading.updateProgress(5, z.string.initReceivedSelfUser);
@@ -295,7 +295,7 @@ z.main.App = class App {
         );
 
         this.repository.conversation.map_connections(this.repository.user.connections());
-        this._subscribe_to_unload_events();
+        this._subscribeToUnloadEvents();
 
         return this.repository.team.getTeam();
       })
@@ -315,7 +315,7 @@ z.main.App = class App {
       .then(() => {
         this.view.loading.updateProgress(97.5, z.string.initUpdatedFromNotifications);
 
-        this._watch_online_status();
+        this._watchOnlineStatus();
         return this.repository.client.getClientsForSelf();
       })
       .then(client_ets => {
@@ -343,14 +343,14 @@ z.main.App = class App {
         this.repository.conversation.cleanup_conversations();
         this.logger.info('App fully loaded');
       })
-      .catch(error => this._app_init_failure(error, is_reload));
+      .catch(error => this._appInitFailure(error, isReload));
   }
 
   /**
    * Initialize ServiceWorker if supported.
    * @returns {undefined} No return value
    */
-  init_service_worker() {
+  initServiceWorker() {
     if (navigator.serviceWorker) {
       navigator.serviceWorker
         .register(`/sw.js?${z.util.Environment.version(false)}`)
@@ -362,7 +362,7 @@ z.main.App = class App {
    * Behavior when internet connection is re-established.
    * @returns {undefined} No return value
    */
-  on_internet_connection_gained() {
+  onInternetConnectionGained() {
     this.logger.info('Internet connection regained. Re-establishing WebSocket connection...');
     this.auth.client
       .execute_on_connectivity(z.service.BackendClient.CONNECTIVITY_CHECK_TRIGGER.CONNECTION_REGAINED)
@@ -377,22 +377,22 @@ z.main.App = class App {
    * Reflect internet connection loss in the UI.
    * @returns {undefined} No return value
    */
-  on_internet_connection_lost() {
+  onInternetConnectionLost() {
     this.logger.warn('Internet connection lost');
     this.repository.event.disconnectWebSocket(z.event.WebSocketService.CHANGE_TRIGGER.OFFLINE);
     amplify.publish(z.event.WebApp.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.NO_INTERNET);
   }
 
-  _app_init_failure(error, is_reload) {
-    let log_message = `Could not initialize app version '${z.util.Environment.version(false)}'`;
+  _appInitFailure(error, isReload) {
+    let logMessage = `Could not initialize app version '${z.util.Environment.version(false)}'`;
     if (z.util.Environment.desktop) {
-      log_message = `${log_message} - Electron '${platform.os.family}' '${z.util.Environment.version()}'`;
+      logMessage = `${logMessage} - Electron '${platform.os.family}' '${z.util.Environment.version()}'`;
     }
-    this.logger.info(log_message, {error});
+    this.logger.info(logMessage, {error});
 
     const {message, type} = error;
-    const is_auth_error = error instanceof z.auth.AuthError;
-    if (is_auth_error) {
+    const isAuthError = error instanceof z.auth.AuthError;
+    if (isAuthError) {
       const isTypeMultipleTabs = type === z.auth.AuthError.TYPE.MULTIPLE_TABS;
       const signOutReason = isTypeMultipleTabs
         ? z.auth.SIGN_OUT_REASON.MULTIPLE_TABS
@@ -401,26 +401,26 @@ z.main.App = class App {
     }
 
     this.logger.debug(
-      `App reload: '${is_reload}', Document referrer: '${document.referrer}', Location: '${window.location.href}'`
+      `App reload: '${isReload}', Document referrer: '${document.referrer}', Location: '${window.location.href}'`
     );
-    if (is_reload) {
-      const is_session_expired = [
+    if (isReload) {
+      const isSessionExpired = [
         z.auth.AccessTokenError.TYPE.REQUEST_FORBIDDEN,
         z.auth.AccessTokenError.TYPE.NOT_FOUND_IN_CACHE,
       ];
 
-      if (is_session_expired.includes(type)) {
+      if (isSessionExpired.includes(type)) {
         this.logger.error(`Session expired on page reload: ${message}`, error);
         Raygun.send(new Error('Session expired on page reload', error));
         return this._redirectToLogin(z.auth.SIGN_OUT_REASON.SESSION_EXPIRED);
       }
 
-      const is_access_token_error = error instanceof z.auth.AccessTokenError;
-      const is_invalid_client = type === z.client.ClientError.TYPE.NO_VALID_CLIENT;
+      const isAccessTokenError = error instanceof z.auth.AccessTokenError;
+      const isInvalidClient = type === z.client.ClientError.TYPE.NO_VALID_CLIENT;
 
-      if (is_access_token_error || is_invalid_client) {
+      if (isAccessTokenError || isInvalidClient) {
         this.logger.warn('Connectivity issues. Trigger reload on regained connectivity.', error);
-        const trigger_source = is_access_token_error
+        const trigger_source = isAccessTokenError
           ? z.service.BackendClient.CONNECTIVITY_CHECK_TRIGGER.ACCESS_TOKEN_RETRIEVAL
           : z.service.BackendClient.CONNECTIVITY_CHECK_TRIGGER.APP_INIT_RELOAD;
         return this.auth.client.execute_on_connectivity(trigger_source).then(() => window.location.reload(false));
@@ -443,8 +443,8 @@ z.main.App = class App {
             Raygun.send(error);
           }
 
-          const is_access_token_error = error instanceof z.auth.AccessTokenError;
-          if (is_access_token_error) {
+          const isAccessTokenError = error instanceof z.auth.AccessTokenError;
+          if (isAccessTokenError) {
             this.logger.error(`Could not get access token: ${error.message}. Logging out user.`, error);
           }
           return this.logout(z.auth.SIGN_OUT_REASON.APP_INIT);
@@ -453,7 +453,7 @@ z.main.App = class App {
     }
 
     this.logger.warn('No connectivity. Trigger reload on regained connectivity.', error);
-    this._watch_online_status();
+    this._watchOnlineStatus();
   }
 
   /**
@@ -461,7 +461,7 @@ z.main.App = class App {
    * @param {z.entity.User} userEntity - Self user entity
    * @returns {z.entity.User} Checked user entity
    */
-  _check_user_information(userEntity) {
+  _checkUserInformation(userEntity) {
     const hasEmailAddress = userEntity.email();
     const hasPhoneNumber = userEntity.phone();
     const isActivatedUser = hasEmailAddress || hasPhoneNumber;
@@ -482,7 +482,7 @@ z.main.App = class App {
    * Get the self user from the backend.
    * @returns {Promise<z.entity.User>} Resolves with the self user entity
    */
-  _get_user_self() {
+  _getUserSelf() {
     return this.repository.user.getSelf().then(userEntity => {
       this.logger.info(`Loaded self user with ID '${userEntity.id}'`);
 
@@ -498,7 +498,7 @@ z.main.App = class App {
         }
       }
 
-      return this.service.storage.init(userEntity.id).then(() => this._check_user_information(userEntity));
+      return this.service.storage.init(userEntity.id).then(() => this._checkUserInformation(userEntity));
     });
   }
 
@@ -527,12 +527,12 @@ z.main.App = class App {
    * @private
    * @returns {boolean}  True if it is a page refresh
    */
-  _is_reload() {
-    const is_reload = z.util.isSameLocation(document.referrer, window.location.href);
+  _isReload() {
+    const isReload = z.util.isSameLocation(document.referrer, window.location.href);
     this.logger.debug(
-      `App reload: '${is_reload}', Document referrer: '${document.referrer}', Location: '${window.location.href}'`
+      `App reload: '${isReload}', Document referrer: '${document.referrer}', Location: '${window.location.href}'`
     );
-    return is_reload;
+    return isReload;
   }
 
   /**
@@ -618,17 +618,19 @@ z.main.App = class App {
       amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS);
     }
 
-    window.setTimeout(() => this.repository.notification.checkPermission(), App.CONFIG.NOTIFICATION_CHECK);
-
     this.view.loading.removeFromView();
     $('#wire-main').attr('data-uie-value', 'is-loaded');
+
+    this.repository.properties.checkPrivacyPermission().then(() => {
+      window.setTimeout(() => this.repository.notification.checkPermission(), App.CONFIG.NOTIFICATION_CHECK);
+    });
   }
 
   /**
    * Subscribe to 'beforeunload' to stop calls and disconnect the WebSocket.
    * @returns {undefined} No return value
    */
-  _subscribe_to_unload_events() {
+  _subscribeToUnloadEvents() {
     $(window).on('unload', () => {
       this.logger.info("'window.onunload' was triggered, so we will disconnect from the backend.");
       this.repository.event.disconnectWebSocket(z.event.WebSocketService.CHANGE_TRIGGER.PAGE_NAVIGATION);
@@ -649,10 +651,10 @@ z.main.App = class App {
    * Subscribe to 'navigator.onLine' related events.
    * @returns {undefined} No return value
    */
-  _watch_online_status() {
+  _watchOnlineStatus() {
     this.logger.info('Watching internet connectivity status');
-    $(window).on('offline', this.on_internet_connection_lost.bind(this));
-    $(window).on('online', this.on_internet_connection_gained.bind(this));
+    $(window).on('offline', this.onInternetConnectionLost.bind(this));
+    $(window).on('online', this.onInternetConnectionGained.bind(this));
   }
 
   //##############################################################################
@@ -802,7 +804,7 @@ z.main.App = class App {
    * Disable debugging on any environment.
    * @returns {undefined} No return value
    */
-  disable_debugging() {
+  disableDebugging() {
     z.config.LOGGER.OPTIONS.domains['app.wire.com'] = () => 0;
     this.repository.properties.savePreference(z.properties.PROPERTIES_TYPE.ENABLE_DEBUGGING, false);
   }
@@ -811,18 +813,18 @@ z.main.App = class App {
    * Enable debugging on any environment.
    * @returns {undefined} No return value
    */
-  enable_debugging() {
+  enableDebugging() {
     z.config.LOGGER.OPTIONS.domains['app.wire.com'] = () => 300;
-    this.repository.properties.savePreference(z.properties.PROPERTIES_TYPE.ENABLE_DEBUGGING, true);
+    this.repository.properties.savePreference(z.properties.PROPERTIES_TYPE.enableDebugging, true);
   }
 
   /**
    * Initialize debugging features.
    * @returns {undefined} No return value
    */
-  init_debugging() {
+  initDebugging() {
     if (z.util.Environment.frontend.isLocalhost()) {
-      this._attach_live_reload();
+      this._attachLiveReload();
     }
   }
 
@@ -830,7 +832,7 @@ z.main.App = class App {
    * Report call telemetry to Raygun for analysis.
    * @returns {undefined} No return value
    */
-  report_call() {
+  reportCall() {
     this.repository.calling.reportCall();
   }
 
@@ -838,11 +840,11 @@ z.main.App = class App {
    * Attach live reload on localhost.
    * @returns {undefined} No return value
    */
-  _attach_live_reload() {
-    const live_reload = document.createElement('script');
-    live_reload.id = 'live_reload';
-    live_reload.src = 'http://localhost:32123/livereload.js';
-    document.body.appendChild(live_reload);
+  _attachLiveReload() {
+    const liveReload = document.createElement('script');
+    liveReload.id = 'liveReload';
+    liveReload.src = 'http://localhost:32123/livereload.js';
+    document.body.appendChild(liveReload);
     $('html').addClass('development');
   }
 };

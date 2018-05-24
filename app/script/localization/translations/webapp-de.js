@@ -244,6 +244,11 @@ z.string.de.modalPictureTooLargeMessage = 'Du kannst Bilder mit bis zu {{number}
 z.string.de.modalPictureTooSmallHeadline = 'Ausgewähltes Bild zu klein';
 z.string.de.modalPictureTooSmallMessage = 'Wähle ein Bild mit mindestens 320 × 320 Pixeln.';
 
+z.string.de.modalImproveWireAction = 'Annehmen';
+z.string.de.modalImproveWireSecondary = 'Nicht jetzt';
+z.string.de.modalImproveWireHeadline = 'Hilf uns, Wire zu verbessern';
+z.string.de.modalImproveWireMessage = 'Anonymisierte Nutzungs- und Absturzberichte helfen uns, unsere Produkte und Dienstleistungen zu verbessern. Wir verwenden diese Informationen nicht für andere Zwecke.';
+
 z.string.de.modalServiceUnavailableHeadline = 'Hinzufügen des Dienstes nicht möglich';
 z.string.de.modalServiceUnavailableMessage = 'Der Dienst ist derzeit nicht verfügbar.';
 
@@ -509,11 +514,16 @@ z.string.de.preferencesAboutWebsite = 'Wire-Webseite';
 
 z.string.de.preferencesAccountAvaibilityUnset = 'Wähle einen Status';
 z.string.de.preferencesAccountCreateTeam = 'Team erstellen';
+z.string.de.preferencesAccountData = 'Datennutzung';
+z.string.de.preferencesAccountDataCheckbox = 'Anonyme Nutzungsdaten senden';
+z.string.de.preferencesAccountDataDetail = 'Hilf mit, Wire durch die Übermittlung anonymisierter Nutzungs- und Absturzberichte zu verbessern.';
 z.string.de.preferencesAccountDelete = 'Benutzerkonto löschen';
 z.string.de.preferencesAccountLeaveGuestRoom = 'Gästebereich verlassen';
 z.string.de.preferencesAccountLeaveGuestRoomDescription = 'Du wirst nicht länger auf die Nachrichten dieser Unterhaltung zugreifen können.';
 z.string.de.preferencesAccountLogOut = 'Abmelden';
 z.string.de.preferencesAccountManageTeam = 'Team verwalten';
+z.string.de.preferencesAccountMarketingConsentCheckbox = 'Newsletter abonnieren';
+z.string.de.preferencesAccountMarketingConsentDetail = 'Erhalte Neuigkeiten und Informationen zu Produktupdates von Wire per E-Mail.';
 z.string.de.preferencesAccountResetPassword = 'Passwort zurücksetzen';
 z.string.de.preferencesAccountTeam = 'in {{name}}';
 z.string.de.preferencesAccountUsernamePlaceholder = 'Dein vollständiger Name';
@@ -554,9 +564,6 @@ z.string.de.preferencesOptionsContacts = 'Kontakte';
 z.string.de.preferencesOptionsContactsGmail = 'Aus Gmail importieren';
 z.string.de.preferencesOptionsContactsMacos = 'Aus Kontakte importieren';
 z.string.de.preferencesOptionsContactsDetail = 'Wir verwenden deine Daten, um Kontakte für dich zu erstellen. Wir anonymisieren alle Informationen und teilen sie mit niemand anderem.';
-z.string.de.preferencesOptionsData = 'Nutzungs- und Fehlerberichte';
-z.string.de.preferencesOptionsDataCheckbox = 'Anonyme Nutzungsdaten senden';
-z.string.de.preferencesOptionsDataDetail = 'Hilf uns, Wire durch das Senden anonymisierter Informationen zu verbessern.';
 z.string.de.preferencesOptionsPopular = 'Auf allgemeinen Wunsch';
 z.string.de.preferencesOptionsEmojiReplaceCheckbox = 'Schrift-Emoticons mit Emojis ersetzen';
 z.string.de.preferencesOptionsEmojiReplaceDetail = ':-) → {{icon}}';
@@ -568,14 +575,14 @@ z.string.de.preferencesOptionsNotificationsObfuscate = 'Details verbergen';
 z.string.de.preferencesOptionsNotificationsObfuscateMessage = 'Absendername zeigen';
 z.string.de.preferencesOptionsNotificationsOn = 'Zeige Absendername und Nachricht';
 z.string.de.preferencesOptionsCallLogs = 'Fehlerbehebung';
-z.string.de.preferencesOptionsCallLogsGet = 'Diagnose-Bericht zu Anrufen speichern';
-z.string.de.preferencesOptionsCallLogsDetail = 'Diese Informationen helfen uns Probleme bei Anrufen zu diagnostizieren.';
+z.string.de.preferencesOptionsCallLogsGet = 'Anruf-Fehlerbericht speichern';
+z.string.de.preferencesOptionsCallLogsDetail = 'Diese Informationen helfen uns, Probleme bei Anrufen zu diagnostizieren.';
 
 z.string.de.preferencesOptionsBackupHeader = 'Gesprächsverlauf';
 z.string.de.preferencesOptionsBackupExportHeadline = 'Unterhaltungen sichern';
-z.string.de.preferencesOptionsBackupExportSecondary = 'Erstellen Sie ein Datensicherung, um Ihren Gesprächsverlauf zu erhalten. Sie können damit den Verlauf wiederherstellen, wenn Sie Ihr Computer verlieren oder zu einem neuen wechseln.\nDie Sicherungsdatei ist nicht durch eine Ende-zu-Ende-Verschlüsselung geschützt, also bewahren Sie sie an einem sicheren Ort auf.';
+z.string.de.preferencesOptionsBackupExportSecondary = 'Erstelle ein Backup, um den Gesprächsverlauf zu sichern. Damit können Unterhaltungen wiederhergestellt werden, falls du deinen Computer verlierst oder einen neuen nutzen möchtest.\n\nWähle ein sicheres Passwort, um die Backup-Datei zu schützen.';
 z.string.de.preferencesOptionsBackupImportHeadline = 'Backup wiederherstellen';
-z.string.de.preferencesOptionsBackupImportSecondary = 'Der Gesprächsverlauf kann nur mit einem Backup von der gleichen Plattform wiederhergestellt werden. Das Backup überschreibt möglicherweise bestehende Unterhaltungen auf diesem Gerät.';
+z.string.de.preferencesOptionsBackupImportSecondary = 'Es können nur Backup-Dateien derselben Plattform wiederhergestellt werden. Der Inhalt der Backup-Datei ersetzt den Gesprächsverlauf auf diesem Gerät.';
 
 z.string.de.backupExportGenericErrorHeadline = 'Datei nicht gespeichert';
 z.string.de.backupExportGenericErrorSecondary = 'Das Backup wurde nicht abgeschlossen.';
