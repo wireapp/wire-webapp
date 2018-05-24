@@ -14,7 +14,7 @@ environment-defaults:
 global:
   application_name: Webapp
   default_ec2_keyname: null
-  default_platform: Python
+  default_platform: Python 2.7
   default_region: eu-west-1
   instance_profile: null
   platform_name: null
