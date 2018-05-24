@@ -76,7 +76,7 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
       return this.callIsConnected() && z.calling.CallingRepository.supportsScreenSharing;
     });
 
-    this.showVideoButton = ko.pureComputed(() => {
+    this.isVideoCall = ko.pureComputed(() => {
       return this.call().isRemoteVideoSend() || (this.callIsOutgoing() && this.selfStreamState.videoSend());
     });
 
@@ -136,7 +136,9 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
 
     this.showParticipants = ko.observable(false);
 
-    this.showVideoPreview = ko.pureComputed(() => this.multitasking.isMinimized() || !this.callIsConnected());
+    this.showVideoPreview = ko.pureComputed(
+      () => this.isVideoCall() && (this.multitasking.isMinimized() || !this.callIsConnected())
+    );
     this.showMaximize = ko.pureComputed(() => this.multitasking.isMinimized() && this.callIsConnected());
   }
 };
@@ -196,7 +198,7 @@ ko.components.register('conversation-list-calling-cell', {
         <div class="call-ui__button" data-bind="click: onToggleAudio, css: {'call-ui__button--active': !selfStreamState.audioSend()}, attr: {'data-uie-value': selfStreamState.audioSend() ? 'inactive' : 'active'}" data-uie-name="do-toggle-mute">
           <micoff-icon class="small-icon"></micoff-icon>
         </div>
-        <!-- ko if: showVideoButton -->
+        <!-- ko if: isVideoCall -->
           <div class="call-ui__button" data-bind="click: onToggleVideo, css: {'call-ui__button--active': selfStreamState.videoSend(), 'call-ui__button--disabled': disableVideoButton()}, attr: {'data-uie-value': selfStreamState.videoSend() ? 'active' : 'inactive'}" data-uie-name="do-toggle-video">
             <camera-icon class="small-icon"></camera-icon>
           </div>
@@ -228,12 +230,11 @@ ko.components.register('conversation-list-calling-cell', {
       </div>
 
     </div>
-
-    <!-- ko if: showParticipants -->
-      <div class="call-ui__participant-list" data-bind="foreach: {data: callParticipants}" data-uie-name="list-call-ui-participants">
+    <div class="call-ui__participant-list__wrapper" data-bind="css: {'call-ui__participant-list__wrapper--active': showParticipants}">
+      <div class="call-ui__participant-list" data-bind="forEach: callParticipants"  data-uie-name="list-call-ui-participants">
         <participant-item params="participant: $data.user, hideInfo: true, showCamera: $data.state.videoSend()" data-bind="css: {'no-underline': true}"></participant-item>
       </div>
-    <!-- /ko -->
+    </div>
   `,
   viewModel: z.components.ConversationListCallingCell,
 });
