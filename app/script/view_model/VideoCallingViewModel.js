@@ -53,11 +53,12 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
     this.currentDeviceId = this.mediaRepository.devices_handler.current_device_id;
     this.currentDeviceIndex = this.mediaRepository.devices_handler.current_device_index;
 
-    const streamHandler = this.mediaRepository.stream_handler;
-    this.localVideoStream = streamHandler.localMediaStream;
-    this.remoteVideoStreams = streamHandler.remote_media_streams.video;
-
     this.selfStreamState = this.mediaRepository.stream_handler.selfStreamState;
+
+    this.localVideoStream = ko.pureComputed(() => {
+      return this.selfStreamState.videoSend() ? this.mediaRepository.stream_handler.localMediaStream() : null;
+    });
+    this.remoteVideoStreamsInfo = this.mediaRepository.stream_handler.remoteMediaStreamInfoIndex.video;
 
     this.isChoosingScreen = ko.observable(false);
 
@@ -121,7 +122,7 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
     this.showRemoteVideo = ko.pureComputed(() => {
       if (this.isCallOngoing()) {
         const remoteVideoState = this.joinedCall().isRemoteScreenSend() || this.joinedCall().isRemoteVideoSend();
-        return remoteVideoState && this.remoteVideoStreams().length;
+        return remoteVideoState && this.remoteVideoStreamsInfo().length;
       }
     });
 

@@ -26,7 +26,11 @@ describe('z.component.GroupVideoGrid', () => {
   const initialGrid = [0, 0, 0, 0];
 
   beforeEach(() => {
-    groupVideoGrid = new z.components.GroupVideoGrid({ownStream: ko.observable(null), streams: ko.observableArray([])});
+    groupVideoGrid = new z.components.GroupVideoGrid({
+      calls: ko.observableArray([]),
+      ownStream: ko.observable(null),
+      streamsInfo: ko.observableArray([]),
+    });
   });
 
   describe('computeGrid', () => {
@@ -117,14 +121,30 @@ describe('z.component.GroupVideoGrid', () => {
   describe('streams observable', () => {
     it("doesn't contain the user's own video if there is only a single remote stream", () => {
       const ownVideo = {own: true};
-      const removeVideos = [{}];
+      const remoteVideos = [{stream: {}}];
       groupVideoGrid = new z.components.GroupVideoGrid({
+        calls: ko.observableArray([]),
         ownStream: ko.observable(ownVideo),
-        streams: ko.observableArray(removeVideos),
+        streamsInfo: ko.observableArray(remoteVideos),
       });
 
       expect(groupVideoGrid.streams()).not.toContain(ownVideo);
       expect(groupVideoGrid.thumbnailStream()).toBe(ownVideo);
+    });
+
+    it('contains only the active videos', () => {
+      const remoteVideos = [
+        {flow_id: 'user-1', stream: {}},
+        {flow_id: 'user-2', stream: {}},
+        {flow_id: 'user-3', stream: {}},
+      ];
+      groupVideoGrid = new z.components.GroupVideoGrid({
+        calls: ko.observableArray([{participants: () => [{id: 'user-1', state: {videoSend: () => false}}]}]),
+        ownStream: ko.observable(null),
+        streamsInfo: ko.observableArray(remoteVideos),
+      });
+
+      expect(groupVideoGrid.streams().length).toBe(remoteVideos.length - 1);
     });
 
     it("contains the user's own video if there are more or less than one other participant", () => {
@@ -132,10 +152,11 @@ describe('z.component.GroupVideoGrid', () => {
       const nbOfRemoteStreams = [0, 2, 3];
 
       nbOfRemoteStreams.forEach(nbOfStreams => {
-        const remoteStreams = new Array(nbOfStreams).fill({remote: true});
+        const remoteStreams = new Array(nbOfStreams).fill({remote: true, stream: {}});
         groupVideoGrid = new z.components.GroupVideoGrid({
+          calls: ko.observableArray([]),
           ownStream: ko.observable(ownVideo),
-          streams: ko.observableArray(remoteStreams),
+          streamsInfo: ko.observableArray(remoteStreams),
         });
 
         expect(groupVideoGrid.streams()).toContain(ownVideo);

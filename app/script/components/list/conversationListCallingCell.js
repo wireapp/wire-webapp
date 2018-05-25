@@ -35,8 +35,13 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
       amplify.publish(z.event.WebApp.CALL.STATE.JOIN, this.conversation.id, mediaType);
     };
 
-    this.videoStreams = this.mediaRepository.stream_handler.remote_media_streams.video;
-    this.localVideoStream = this.mediaRepository.stream_handler.localMediaStream;
+    this.selfStreamState = this.calling_repository.selfStreamState;
+
+    this.videoStreamsInfo = this.mediaRepository.stream_handler.remoteMediaStreamInfoIndex.video;
+    this.localVideoStream = ko.pureComputed(() => {
+      return this.selfStreamState.videoSend() ? this.mediaRepository.stream_handler.localMediaStream() : null;
+    });
+    this.calls = this.calling_repository.calls;
 
     this.onLeaveCall = () => {
       amplify.publish(
@@ -69,8 +74,6 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
     this.callParticipants = ko.pureComputed(() => this.call().participants());
 
     this.joinedCall = this.calling_repository.joinedCall;
-
-    this.selfStreamState = this.calling_repository.selfStreamState;
 
     this.showScreensharingButton = ko.pureComputed(() => {
       return this.callIsConnected() && z.calling.CallingRepository.supportsScreenSharing;
@@ -183,7 +186,7 @@ ko.components.register('conversation-list-calling-cell', {
 
     <!-- ko if: showVideoPreview -->
       <div class="group-video__minimized-wrapper" data-bind="click: onMaximizeVideoGrid">
-        <group-video-grid params="streams: videoStreams, ownStream: localVideoStream, minimized: true"></group-video-grid>
+        <group-video-grid params="streamsInfo: videoStreamsInfo, ownStream: localVideoStream, calls: calls, minimized: true"></group-video-grid>
         <!-- ko if: showMaximize -->
           <div class="group-video__minimized-wrapper__overlay" data-uie-name="do-maximize-call">
             <fullscreen-icon></fullscreen-icon>

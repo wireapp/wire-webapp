@@ -48,7 +48,6 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
     this.conversationEntity = this.conversationRepository.active_conversation;
 
     this.joinedCall = this.callingRepository.joinedCall;
-    this.remoteMediaStreams = this.callingRepository.remoteMediaStreams;
     this.selfStreamState = this.callingRepository.selfStreamState;
     this.isActivatedAccount = mainViewModel.isActivatedAccount;
 

@@ -90,9 +90,15 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
     this.localMediaStream = ko.observable();
     this.local_media_type = ko.observable(z.media.MediaType.AUDIO);
 
-    this.remote_media_streams = {
-      audio: ko.observableArray([]),
-      video: ko.observableArray([]),
+    this.remoteMediaStreamInfo = ko.observableArray([]);
+    this.remoteMediaStreamInfoIndex = {
+      audio: ko.pureComputed(() => {
+        return this.remoteMediaStreamInfo().filter(mediaStreamInfo => mediaStreamInfo.type === z.media.MediaType.AUDIO);
+      }),
+      video: ko.pureComputed(() => {
+        const videoTypes = [z.media.MediaType.AUDIO_VIDEO, z.media.MediaType.VIDEO];
+        return this.remoteMediaStreamInfo().filter(mediaStreamInfo => videoTypes.includes(mediaStreamInfo.type));
+      }),
     };
 
     this.selfStreamState = {
@@ -503,25 +509,12 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
    * @returns {undefined} No return value
    */
   addRemoteMediaStream(mediaStreamInfo) {
-    const {stream: mediaStream, type: mediaType} = mediaStreamInfo;
-
-    switch (mediaType) {
-      case z.media.MediaType.AUDIO: {
-        this.remote_media_streams.audio.push(mediaStream);
-        break;
-      }
-
-      case z.media.MediaType.AUDIO_VIDEO:
-      case z.media.MediaType.VIDEO: {
-        this.remote_media_streams.video.push(mediaStream);
-        break;
-      }
-
-      default: {
-        throw new z.media.MediaError(z.media.MediaError.TYPE.UNHANDLED_MEDIA_TYPE);
-      }
+    const handledStreamTypes = [z.media.MediaType.AUDIO, z.media.MediaType.VIDEO, z.media.MediaType.AUDIO_VIDEO];
+    if (!handledStreamTypes.includes(mediaStreamInfo.type)) {
+      throw new z.media.MediaError(z.media.MediaError.TYPE.UNHANDLED_MEDIA_TYPE);
     }
 
+    this.remoteMediaStreamInfo.push(mediaStreamInfo);
     this.element_handler.add_media_element(mediaStreamInfo);
   }
 
@@ -530,22 +523,18 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
    * If a stream ends up having no tracks, it gets filtered out from the array of streams
    * removeRemoteMediaStreamTracks
    *
-   * @param {MediaStreamTrack[]} remoteTracks - the tracks to remove
+   * @param {MediaStreamTrack[]} tracks - the tracks to remove
    * @returns {void} - void
    */
-  removeRemoteMediaStreamTracks(remoteTracks) {
-    const removeTracks = (streams, tracks) => {
-      return streams
-        .map(stream => {
-          tracks.forEach(track => stream.removeTrack(track));
-          return stream;
-        })
-        .filter(stream => stream.getTracks().length > 0);
-    };
+  removeRemoteMediaStreamTracks(tracks) {
+    const filteredMediaStreamsInfo = this.remoteMediaStreamInfo()
+      .map(mediaStreamInfo => {
+        tracks.forEach(track => mediaStreamInfo.stream.removeTrack(track));
+        return mediaStreamInfo;
+      })
+      .filter(mediaStreamInfo => mediaStreamInfo.stream.getTracks().length > 0);
 
-    [this.remote_media_streams.video, this.remote_media_streams.audio].forEach(streams => {
-      streams(removeTracks(streams(), remoteTracks));
-    });
+    this.remoteMediaStreamInfo(filteredMediaStreamsInfo);
   }
 
   //##############################################################################

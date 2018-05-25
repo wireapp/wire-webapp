@@ -39,7 +39,9 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
     this.thumbnailStream = ko.observable(null);
 
     this.streams = ko.pureComputed(() => {
-      const remoteStreams = params.streams();
+      const remoteStreams = filterUnsentStreams(params.streamsInfo(), params.calls()).map(
+        mediaStreamInfo => mediaStreamInfo.stream
+      );
       const ownStream = params.ownStream();
 
       if (remoteStreams.length === 1) {
@@ -170,6 +172,20 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
     return extraClasses[size];
   }
 };
+
+function filterUnsentStreams(streamsInfo, calls) {
+  const hasActiveVideo = mediaStreamInfo => {
+    const noVideoParticipanIds = calls
+      .reduce((participants, call) => participants.concat(call.participants()), [])
+      .filter(participant => !participant.state.videoSend())
+      .map(participant => participant.id);
+
+    // filter participant that have their video stream disabled
+    return !noVideoParticipanIds.includes(mediaStreamInfo.flow_id);
+  };
+
+  return streamsInfo.filter(hasActiveVideo);
+}
 
 function arrayDiff(array1, array2) {
   return array2.filter(element => !array1.includes(element));
