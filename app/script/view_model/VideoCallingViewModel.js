@@ -131,8 +131,8 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
       return this.isCallOngoing() && isVisible;
     });
     this.showSwitchScreen = ko.pureComputed(() => {
-      const hasMultipleCameras = this.availableDevices.screen_input().length > 1;
-      const isVisible = hasMultipleCameras && this.localVideoStream() && this.selfStreamState.screenSend();
+      const hasMultipleScreens = this.availableDevices.screen_input().length > 1;
+      const isVisible = hasMultipleScreens && this.localVideoStream() && this.selfStreamState.screenSend();
       return this.isCallOngoing() && isVisible;
     });
 

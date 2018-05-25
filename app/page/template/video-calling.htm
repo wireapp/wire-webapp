@@ -58,7 +58,7 @@
                       type: z.media.MediaDeviceType.VIDEO_INPUT">
                   </device-toggle-button>
                 <!-- /ko -->
-                <!-- ko ifnot: showSwitchCamera -->
+                <!-- ko ifnot: showSwitchCamera() -->
                   <div class="video-controls__button__label" data-bind="l10n_text: z.string.videoCallOverlayVideo"></div>
                 <!-- /ko -->
               </div>
@@ -69,14 +69,14 @@
                 data-bind="click: clickedOnShareScreen, css: {'video-controls__button--active': selfStreamState.screenSend(), 'video-controls__button--disabled': disableToggleScreen()}"
                 data-uie-name="do-call-controls-toggle-screen">
                 <screenshare-icon></screenshare-icon>
-                <!-- ko if: showSwitchScreen -->
+                <!-- ko if: showSwitchScreen() -->
                   <device-toggle-button data-bind="click: clickedOnToggleScreen"
                     params="index: currentDeviceIndex.screen_input,
                       devices: availableDevices.screen_input,
                       type: z.media.MediaDeviceType.SCREEN_INPUT">
                   </device-toggle-button>
                 <!-- /ko -->
-                <!-- ko ifnot: showSwitchScreen -->
+                <!-- ko ifnot: showSwitchScreen() -->
                   <div class="video-controls__button__label" data-bind="l10n_text: z.string.videoCallOverlayShareScreen"></div>
                 <!-- /ko -->
               </div>
