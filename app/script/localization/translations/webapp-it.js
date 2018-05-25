@@ -193,6 +193,8 @@ z.string.it.modalConversationTooManyMembersHeadline = 'Chiamata piena';
 
 
 
+z.string.it.modalImproveWireAction = 'Accetta';
+
 z.string.it.modalSessionResetHeadline = 'La sessione è stata reimpostata';
 z.string.it.modalSessionResetMessage1 = 'Se il problema non viene risolto,';
 z.string.it.modalSessionResetMessageLink = 'contatta';
@@ -431,9 +433,6 @@ z.string.it.preferencesOptionsContacts = 'Contatti';
 z.string.it.preferencesOptionsContactsGmail = 'Importa da Gmail';
 z.string.it.preferencesOptionsContactsMacos = 'Importa dalla rubrica';
 z.string.it.preferencesOptionsContactsDetail = 'Utilizziamo i dati del tuo contatto per connetterti con gli altri. Rendiamo anonime tutte le informazioni e non le condividiamo con nessuno.';
-z.string.it.preferencesOptionsData = 'Segnalazioni di crash e dati di utilizzo';
-z.string.it.preferencesOptionsDataCheckbox = 'Segnalazioni di crash e dati di utilizzo';
-z.string.it.preferencesOptionsDataDetail = 'Migliora Wire con l’invio di informazioni anonime.';
 z.string.it.preferencesOptionsPopular = 'A grande richiesta';
 z.string.it.preferencesOptionsEmojiReplaceCheckbox = 'Sostituire il tipo emoticon con Emoji';
 z.string.it.preferencesOptionsPreviewsSendCheckbox = 'Genera anteprime per i link inviati da te';

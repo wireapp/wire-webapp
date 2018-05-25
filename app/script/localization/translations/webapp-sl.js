@@ -192,6 +192,8 @@ z.string.sl.modalConversationTooManyMembersHeadline = 'Polna hiša';
 
 
 
+z.string.sl.modalImproveWireAction = 'Sprejmi';
+
 z.string.sl.modalSessionResetHeadline = 'Seja je bila ponastavljena';
 z.string.sl.modalSessionResetMessage1 = 'Če težave niste odpravili,';
 z.string.sl.modalSessionResetMessageLink = 'kontaktirajte';
@@ -429,9 +431,6 @@ z.string.sl.preferencesOptionsContacts = 'Stiki';
 z.string.sl.preferencesOptionsContactsGmail = 'Uvozi iz Gmail';
 z.string.sl.preferencesOptionsContactsMacos = 'Uvozi iz imenika stikov';
 z.string.sl.preferencesOptionsContactsDetail = 'Uporabljamo vaše podatke stikov pri povezovanju z drugimi. Vse informacije anonimiziramo in ne delimo z drugimi.';
-z.string.sl.preferencesOptionsData = 'Podatki o uporabi in poročila o prisilnih ustavitvah';
-z.string.sl.preferencesOptionsDataCheckbox = 'Podatki o uporabi in poročila o prisilnih ustavitvah';
-z.string.sl.preferencesOptionsDataDetail = 'Izboljšajte Wire s pošiljanjem anonimnih informacij.';
 z.string.sl.preferencesOptionsPopular = 'Po priljubljenosti';
 z.string.sl.preferencesOptionsEmojiReplaceCheckbox = 'Zamenjaj čustvene simbole z emojiji';
 z.string.sl.preferencesOptionsPreviewsSendCheckbox = 'Ustvari predogled za povezave, ki jih pošiljate';

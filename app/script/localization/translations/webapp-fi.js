@@ -199,6 +199,8 @@ z.string.fi.modalIntegrationUnavailableHeadline = 'Botit eivät käytettävissä
 z.string.fi.modalIntegrationUnavailableMessage = 'Kiitos mielenkiinnostasi botteihin. Tämä palvelu on väliaikaisesti pois käytöstä, koska työstämme seuraavaa versiota.';
 
 
+z.string.fi.modalImproveWireAction = 'Hyväksy';
+
 z.string.fi.modalSessionResetHeadline = 'Istunto on nollattu';
 z.string.fi.modalSessionResetMessage1 = 'Jos ongelma ei ole ratkennut';
 z.string.fi.modalSessionResetMessageLink = 'ota yhteys';
@@ -440,9 +442,6 @@ z.string.fi.preferencesOptionsContacts = 'Yhteystiedot';
 z.string.fi.preferencesOptionsContactsGmail = 'Tuo Gmailista';
 z.string.fi.preferencesOptionsContactsMacos = 'Tuo Yhteystiedoista';
 z.string.fi.preferencesOptionsContactsDetail = 'Käytämme sinun kontaktitietoja yhdistääksemme sinut muiden kanssa. Anonymisoimme kaiken tiedon ja emme jaa sitä ulkopuolisille.';
-z.string.fi.preferencesOptionsData = 'Käyttö- ja vikaraportit';
-z.string.fi.preferencesOptionsDataCheckbox = 'Käyttö- ja vikaraportit';
-z.string.fi.preferencesOptionsDataDetail = 'Tee Wirestä parempi lähetämällä anonyymiä tietoa.';
 z.string.fi.preferencesOptionsPopular = 'Yleisön pyynnöstä';
 z.string.fi.preferencesOptionsEmojiReplaceCheckbox = 'Korvaa tekstihymiöt emojeilla';
 z.string.fi.preferencesOptionsPreviewsSendCheckbox = 'Luo esikatselut lähettämillesi linkeille';

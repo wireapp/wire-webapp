@@ -83,6 +83,29 @@
           </div>
         <!-- /ko -->
       </section>
+
+      <section class="preferences-section preferences-section-privacy">
+        <hr class="preferences-separator">
+        <header class="preferences-header" data-bind="l10n_text: z.string.preferencesAccountData"></header>
+        <div class="preferences-option">
+          <div class="preferences-option-icon checkbox text-theme" data-bind="attr: {'data-uie-value': optionPrivacy}" data-uie-name="status-preference-privacy">
+            <input type="checkbox" id="privacy-checkbox" data-bind="checked: optionPrivacy">
+            <label class="preferences-options-checkbox-label" for="privacy-checkbox" data-bind="l10n_text: z.string.preferencesAccountDataCheckbox"></label>
+          </div>
+        </div>
+        <div class="preferences-detail" data-bind="l10n_text: z.string.preferencesAccountDataDetail"></div>
+
+        <!-- ko if: isActivatedAccount() -->
+          <div class="preferences-option">
+            <div class="preferences-option-icon checkbox text-theme" data-bind="attr: {'data-uie-value': optionMarketingConsent}" data-uie-name="status-preference-marketing">
+              <input type="checkbox" id="marketing-checkbox" data-bind="checked: optionMarketingConsent">
+              <label class="preferences-options-checkbox-label" for="marketing-checkbox" data-bind="l10n_text: z.string.preferencesAccountMarketingConsentCheckbox"></label>
+            </div>
+          </div>
+          <div class="preferences-detail" data-bind="l10n_text: z.string.preferencesAccountMarketingConsentDetail"></div>
+        <!-- /ko -->
+      </section>
+
       <!-- ko if: isActivatedAccount() -->
         <section class="preferences-section preferences-section-conversation-history">
           <hr class="preferences-separator">

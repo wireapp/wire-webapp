@@ -245,6 +245,11 @@ z.string.et.modalPictureTooLargeMessage = 'Sa saad kasutada pilte suurusega kuni
 z.string.et.modalPictureTooSmallHeadline = 'Pilt on liiga väike';
 z.string.et.modalPictureTooSmallMessage = 'Palun vali pilt, mis on vähemalt 320 x 320 px suur.';
 
+z.string.et.modalImproveWireAction = 'Nõustu';
+z.string.et.modalImproveWireSecondary = 'Mitte praegu';
+z.string.et.modalImproveWireHeadline = 'Aita meil muuta Wire’i paremaks';
+z.string.et.modalImproveWireMessage = 'Anonüümsete kasutus- ja krahhiaruannete saatmine aitab meil oma tooteid ja teenuseid parandada. Me ei kasuta seda infot mitte millegi muu jaoks.';
+
 z.string.et.modalServiceUnavailableHeadline = 'Teenuse lisamine pole võimalik';
 z.string.et.modalServiceUnavailableMessage = 'Teenus pole hetkel saadaval.';
 
@@ -510,11 +515,16 @@ z.string.et.preferencesAboutWebsite = 'Wire’i koduleht';
 
 z.string.et.preferencesAccountAvaibilityUnset = 'Sea olek';
 z.string.et.preferencesAccountCreateTeam = 'Loo meeskond';
+z.string.et.preferencesAccountData = 'Andmekasutuse õigused';
+z.string.et.preferencesAccountDataCheckbox = 'Saada anonüümseid andmeid';
+z.string.et.preferencesAccountDataDetail = 'Aita Wire’i paremaks muuta, saates anonüümseid kasutus- ja krahhiaruandeid.';
 z.string.et.preferencesAccountDelete = 'Kustuta konto';
 z.string.et.preferencesAccountLeaveGuestRoom = 'Lahku külalistetoast';
 z.string.et.preferencesAccountLeaveGuestRoomDescription = 'Sa ei saa enam selle vestluse sõnumitele ligi.';
 z.string.et.preferencesAccountLogOut = 'Logi välja';
 z.string.et.preferencesAccountManageTeam = 'Meeskonna haldamine';
+z.string.et.preferencesAccountMarketingConsentCheckbox = 'Saa uudiskirja';
+z.string.et.preferencesAccountMarketingConsentDetail = 'Saa Wire’ilt uudiseid ja tooteuuendusi e-posti teel.';
 z.string.et.preferencesAccountResetPassword = 'Lähesta parool';
 z.string.et.preferencesAccountTeam = 'vestluses {{name}}';
 z.string.et.preferencesAccountUsernamePlaceholder = 'Sinu täisnimi';
@@ -555,9 +565,6 @@ z.string.et.preferencesOptionsContacts = 'Kontaktid';
 z.string.et.preferencesOptionsContactsGmail = 'Impordi Gmailist';
 z.string.et.preferencesOptionsContactsMacos = 'Impordi kontaktidest';
 z.string.et.preferencesOptionsContactsDetail = 'Me kasutame su kontakte, et ühendada sind teistega. Me muudame kogu info anonüümseks ja ei jaga seda kellegi teisega.';
-z.string.et.preferencesOptionsData = 'Kasutus- ja krahhiaruanded';
-z.string.et.preferencesOptionsDataCheckbox = 'Saada anonüümseid andmeid';
-z.string.et.preferencesOptionsDataDetail = 'Tee Wire paremaks, saates anonüümset infot.';
 z.string.et.preferencesOptionsPopular = 'Publiku nõudmisel';
 z.string.et.preferencesOptionsEmojiReplaceCheckbox = 'Asenda kirjutatud emotikonid emojidega';
 z.string.et.preferencesOptionsEmojiReplaceDetail = ':-) → {{icon}}';

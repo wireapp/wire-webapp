@@ -138,6 +138,9 @@ z.string.lt.modalAssetParallelUploadsMessage = 'Jūs vienu metu galite siųsti i
 z.string.lt.modalCallEmptyConversationHeadline = 'Nėra kam skambinti';
 z.string.lt.modalCallEmptyConversationMessage = 'Čia daugiau nieko nėra.';
 
+z.string.lt.modalCallEmptyLogHeadline = 'Skambučių nebuvo';
+z.string.lt.modalCallEmptyLogMessage = 'Nebuvo skambučių, pagal kuriuos galėtume sugeneruoti ataskaitą.';
+
 z.string.lt.modalCallNoGroupVideoHeadline = 'Vaizdo skambučiai grupėse nepalaikomi';
 z.string.lt.modalCallNoGroupVideoMessage = 'Vaizdo skambučiai grupės pokalbiuose yra neprieinami.';
 
@@ -241,6 +244,8 @@ z.string.lt.modalPictureTooLargeMessage = 'Galite naudoti iki {{number}} MB dyd�
 
 z.string.lt.modalPictureTooSmallHeadline = 'Paveikslėlis per mažas';
 z.string.lt.modalPictureTooSmallMessage = 'Pasirinkite bent 320 x 320 px dydžio paveikslėlį.';
+
+z.string.lt.modalImproveWireAction = 'Priimti';
 
 z.string.lt.modalServiceUnavailableHeadline = 'Paslaugos pridėjimas negalimas';
 z.string.lt.modalServiceUnavailableMessage = 'Paslauga šiuo metu negalima.';
@@ -552,9 +557,6 @@ z.string.lt.preferencesOptionsContacts = 'Kontaktai';
 z.string.lt.preferencesOptionsContactsGmail = 'Importuoti iš Gmail';
 z.string.lt.preferencesOptionsContactsMacos = 'Importuoti iš kontaktų';
 z.string.lt.preferencesOptionsContactsDetail = 'Mes naudojame jūsų kontaktinius duomenis tam, kad padėtume jums užmegzti kontaktą su kitais. Mes padarome visą informaciją anoniminę ir su niekuo ja nesidaliname.';
-z.string.lt.preferencesOptionsData = 'Naudojimosi ir strigčių ataskaitos';
-z.string.lt.preferencesOptionsDataCheckbox = 'Naudojimosi ir strigčių ataskaitos';
-z.string.lt.preferencesOptionsDataDetail = 'Pagerinkite „Wire“ siųsdami anoniminę informaciją.';
 z.string.lt.preferencesOptionsPopular = 'Pagal populiarias užklausas';
 z.string.lt.preferencesOptionsEmojiReplaceCheckbox = 'Pakeisti rašomus jaustukus jausmaženkliais';
 z.string.lt.preferencesOptionsEmojiReplaceDetail = ':-) → {{icon}}';
@@ -579,6 +581,8 @@ z.string.lt.backupExportGenericErrorHeadline = 'Failo išsaugoti nepavyko';
 z.string.lt.backupExportGenericErrorSecondary = 'Atsarginės kopijos kūrimas nebuvo sėkmingas.';
 z.string.lt.backupExportProgressHeadline = 'Ruošiama…';
 z.string.lt.backupExportProgressSecondary = 'Kuriame atsarginė kopija · {{processed}} iš {{total}} — {{progress}}%';
+z.string.lt.backupExportProgressCompressing = 'Ruošiamas atsarginės kopijos failas';
+z.string.lt.backupExportSaveFileAction = 'Išsaugoti failą';
 z.string.lt.backupExportSuccessHeadline = 'Atsarginis kopijavimas baigtas';
 z.string.lt.backupExportSuccessSecondary = 'Jei prarasite savo kompiuterį arba pasikeisite nauju, kopiją galėsite panaudoti praeities atkūrimui.';
 z.string.lt.backupImportGenericErrorHeadline = 'Kažkas nutiko';

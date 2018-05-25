@@ -70,7 +70,7 @@ describe('z.client.ClientRepository', () => {
   describe('getValidLocalClient', () => {
     let server = undefined;
 
-    const clientUrl = `${testFactory.settings.connection.rest_url}/clients/${clientId}`;
+    const clientUrl = `${testFactory.settings.connection.restUrl}/clients/${clientId}`;
     const clientPayloadServer = {
       address: '62.96.148.44',
       class: 'desktop',
