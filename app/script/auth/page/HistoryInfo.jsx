@@ -25,7 +25,6 @@ import Page from './Page';
 import {H1, Link, ContainerXS, Button, Paragraph} from '@wireapp/react-ui-kit';
 import * as ClientSelector from '../module/selector/ClientSelector';
 import * as SelfSelector from '../module/selector/SelfSelector';
-import EXTERNAL_ROUTE from '../externalRoute';
 import {ROUTE} from '../route';
 import * as URLUtil from '../util/urlUtil';
 import * as NotificationAction from '../module/action/NotificationAction';
@@ -34,9 +33,7 @@ import {withRouter} from 'react-router';
 function HistoryInfo({hasHistory, hasSelfHandle, history, intl: {formatMessage: _}, ...connected}) {
   const onContinue = () => {
     connected.resetHistoryCheck().then(() => {
-      return hasSelfHandle
-        ? window.location.replace(URLUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP))
-        : history.push(ROUTE.CHOOSE_HANDLE);
+      return hasSelfHandle ? window.location.replace(URLUtil.getAppPath()) : history.push(ROUTE.CHOOSE_HANDLE);
     });
   };
   const headline = hasHistory ? historyInfoStrings.hasHistoryHeadline : historyInfoStrings.noHistoryHeadline;

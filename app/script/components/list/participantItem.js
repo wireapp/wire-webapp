@@ -36,8 +36,11 @@ z.components.ParticipantItem = class ParticipantItem {
 
     this.canSelect = params.canSelect;
     this.isSelected = params.isSelected;
+    this.showCamera = params.showCamera;
 
-    if (this.isService) {
+    if (params.hideInfo) {
+      this.contentInfo = null;
+    } else if (this.isService) {
       this.contentInfo = this.participant.summary;
     } else if (this.isTemporaryGuest) {
       this.contentInfo = this.participant.expirationText;
@@ -72,15 +75,21 @@ ko.components.register('participant-item', {
       </div>
 
       <!-- ko if: isUser && participant.is_verified() -->
-        <verified-icon></verified-icon>
+        <verified-icon data-uie-name="status-verified"></verified-icon>
       <!-- /ko -->
 
       <!-- ko if: isUser && !isOthersMode && participant.isGuest() -->
         <guest-icon class="participant-item-guest-indicator" data-uie-name="status-guest"></guest-icon>
       <!-- /ko -->
+
+      <!-- ko if: showCamera -->
+        <camera-icon data-uie-name="status-video"></camera-icon>
+      <!-- /ko -->
+
       <!-- ko if: canSelect -->
         <div class="search-list-item-select icon-check" data-bind="css: {'selected': isSelected}" data-uie-name="status-selected"></div>
       <!-- /ko -->
+
       <disclose-icon></disclose-icon>
     </div>
   `,

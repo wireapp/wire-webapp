@@ -109,6 +109,12 @@ z.string.callJoin = 'Join';
 z.string.callChooseSharedScreen = 'Choose a screen to share';
 z.string.callParticipants = '{{number}} on call';
 
+z.string.videoCallOverlayConversations = 'Conversations';
+z.string.videoCallOverlayMute = 'Mute';
+z.string.videoCallOverlayVideo = 'Video';
+z.string.videoCallOverlayShareScreen = 'Share Screen';
+z.string.videoCallOverlayHangUp = 'Hang Up';
+
 // Modals
 // Modals type defaults
 z.string.modalAcknowledgeAction = 'Ok';
@@ -371,6 +377,7 @@ z.string.groupCreationParticipantsActionSkip = 'Skip';
 z.string.groupCreationParticipantsHeader = 'Add people';
 z.string.groupCreationParticipantsHeaderWithCounter = 'Add people ({{number}})';
 z.string.groupCreationParticipantsPlaceholder = 'Search by name';
+z.string.groupSizeInfo = 'Up to {{count}} people can join a group conversation. Video calls work in groups of 4 or less.';
 
 // Guest room
 z.string.guestRoomConversationName = 'Guest room';

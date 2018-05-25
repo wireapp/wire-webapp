@@ -408,29 +408,37 @@ z.calling.entities.FlowEntity = class FlowEntity {
    * @returns {undefined} No return value
    */
   _closePeerConnection() {
-    if (this.peerConnection) {
-      this.peerConnection.oniceconnectionstatechange = () => {
-        this.callLogger.log(this.callLogger.levels.OFF, 'State change ignored - ICE connection');
+    const peerConnection = this.peerConnection;
+    if (!peerConnection) {
+      return;
+    }
+
+    peerConnection.oniceconnectionstatechange = () => {
+      this.callLogger.log(this.callLogger.levels.OFF, 'State change ignored - ICE connection');
+    };
+
+    peerConnection.onsignalingstatechange = () => {
+      const logMessage = `State change ignored - signaling state: ${peerConnection.signalingState}`;
+      this.callLogger.log(this.callLogger.levels.OFF, logMessage);
+    };
+
+    const isStateClosed = peerConnection.signalingState === z.calling.rtc.SIGNALING_STATE.CLOSED;
+    if (!isStateClosed) {
+      const connectionMediaStreamTracks = peerConnection.getReceivers
+        ? peerConnection.getReceivers().map(receiver => receiver.track)
+        : peerConnection.getRemoteStreams().reduce((tracks, stream) => tracks.concat(stream.getTracks()), []);
+
+      amplify.publish(z.event.WebApp.CALL.MEDIA.CONNECTION_CLOSED, connectionMediaStreamTracks);
+      peerConnection.close();
+
+      const logMessage = {
+        data: {
+          default: [this.remoteUser.name()],
+          obfuscated: [this.callLogger.obfuscate(this.remoteUser.id)],
+        },
+        message: `Closing PeerConnection '{0}' successful`,
       };
-
-      this.peerConnection.onsignalingstatechange = () => {
-        const logMessage = `State change ignored - signaling state: ${this.peerConnection.signalingState}`;
-        this.callLogger.log(this.callLogger.levels.OFF, logMessage);
-      };
-
-      const isStateClosed = this.peerConnection.signalingState === z.calling.rtc.SIGNALING_STATE.CLOSED;
-      if (!isStateClosed) {
-        this.peerConnection.close();
-
-        const logMessage = {
-          data: {
-            default: [this.remoteUser.name()],
-            obfuscated: [this.callLogger.obfuscate(this.remoteUser.id)],
-          },
-          message: `Closing PeerConnection '{0}' successful`,
-        };
-        this.callLogger.info(logMessage);
-      }
+      this.callLogger.info(logMessage);
     }
   }
 
@@ -594,7 +602,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
   //##############################################################################
 
   /**
-   * Send an call message through the data channel.
+   * Send a call message through the data channel.
    * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message to be send
    * @returns {undefined} No return value
    */
@@ -749,7 +757,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
   //##############################################################################
 
   /**
-   * Save the remote SDP received via an call message within the flow.
+   * Save the remote SDP received via a call message within the flow.
    *
    * @note The resolving value indicates whether negotiation should be skipped for the current state.
    * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.SETUP
@@ -1004,7 +1012,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
     );
     const additionalPayload = Object.assign({remoteUser: this.remoteUser, sdp: this.localSdp().sdp}, payload);
 
-    return z.calling.CallMessageBuilder.createPayloadPropSync(
+    return z.calling.CallMessageBuilder.createPropSync(
       this.callEntity.selfState,
       this.callEntity.selfState.videoSend(),
       false,

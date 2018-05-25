@@ -17,19 +17,180 @@
  *
  */
 
+.call-ui {
+  &__button {
+    display: flex;
+    min-width: 40px;
+    height: 24px;
+    align-items: center;
+    justify-content: center;
+    animation: show-call-ui-button @animation-timing-fast ease-in-out 0s 1;
+    background-color: fade(@graphite-dark, 8%);
+    border-radius: 12px;
+    color: @graphite-dark;
+    cursor: pointer;
+    font-size: 12px;
+    line-height: 24px;
+    text-align: center;
+
+    > * {
+      line-height: 0;
+    }
+    svg > path {
+      fill: @graphite-dark;
+    }
+
+    &--active {
+      background-color: @graphite-dark;
+      color: #fff;
+
+      svg > path {
+        fill: #fff;
+      }
+    }
+
+    &--disabled {
+      cursor: default;
+      pointer-events: none;
+
+      svg {
+        opacity: 0.4;
+      }
+    }
+
+    &--participants {
+      padding: 0 8px;
+      font-weight: @font-weight-regular;
+
+      chevron-icon {
+        margin-left: 8px;
+        svg path {
+          fill: currentcolor;
+        }
+      }
+    }
+
+    &--active&--participants {
+      chevron-icon {
+        transform: rotate(-180deg);
+      }
+    }
+
+    &--large {
+      width: 64px;
+    }
+
+    &--uppercase {
+      padding: 0 8px;
+      text-transform: uppercase;
+    }
+
+    &--green,
+    &--red {
+      color: #fff;
+      svg > path {
+        fill: #fff;
+      }
+    }
+
+    &--green {
+      background-color: @w-green;
+    }
+
+    &--red {
+      background-color: @w-red;
+    }
+
+    & + & {
+      margin-left: 8px;
+    }
+  }
+  &__participant-list {
+    max-height: 184px;
+    overflow-y: scroll;
+
+    &__wrapper {
+      overflow: hidden;
+      // TODO: antiscroll will be added later
+      max-height: 0;
+      color: @graphite-dark;
+      transition: max-height @animation-timing-fast ease-in-out;
+
+      &::before {
+        display: block;
+        border-top: 1px solid fade(@graphite-dark, 4%);
+        margin: 0 16px;
+        content: '';
+      }
+
+      &--active {
+        max-height: 184px;
+      }
+    }
+
+    .participant-item {
+      height: 40px;
+      fill: @graphite-dark;
+
+      .participant-item-image {
+        width: 48px;
+
+        participant-avatar {
+          width: 16px;
+          height: 16px;
+
+          .avatar-initials {
+            font-size: 8px;
+            line-height: 16px;
+          }
+        }
+      }
+
+      .availability-state-icon {
+        display: none;
+      }
+
+      verified-icon svg,
+      guest-icon svg {
+        height: 12px;
+      }
+
+      camera-icon svg {
+        width: 12px;
+      }
+    }
+  }
+
+  &__avatar {
+    border: 1px solid fade(@graphite-dark, 8%);
+
+    .group-avatar-box-wrapper {
+      background: fade(@graphite-dark, 16%);
+    }
+  }
+}
+
+.small-icon {
+  > svg {
+    max-width: 12px;
+    max-height: 12px;
+  }
+}
+
+hangup-icon.small-icon {
+  > svg {
+    max-width: 17px;
+  }
+}
+
 conversation-list-calling-cell {
   position: relative;
-
-  &::before {
-    position: absolute;
-    z-index: -1;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    background-color: fade(#000, 24%);
-    content: '';
-  }
+  display: flex;
+  flex-direction: column;
+  margin: 0 16px 16px;
+  animation: show-call-ui @animation-timing-fast ease-in-out 0s 1;
+  background-color: #fff;
+  border-radius: 8px;
 
   &.dark-bg {
     color: #fff;
@@ -38,12 +199,32 @@ conversation-list-calling-cell {
       background-color: fade(@graphite-dark, 80%);
     }
   }
+  .conversation-list-cell-name {
+    color: @graphite-dark;
+  }
+  .conversation-list-cell-description {
+    margin-top: 0;
+    color: fade(@graphite-dark, 40%);
+    font-size: 11px;
+    opacity: 1;
+  }
+
+  .temporary-user-style {
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.08);
+  }
+
+  group-video-grid {
+    height: 168px;
+  }
 }
 
 conversation-list-calling-cell:first-of-type {
   &::before {
     top: -40px;
   }
+}
+.conversation-list-calling-cell {
+  height: 60px;
 }
 
 .conversation-list-calling-cell::after {
@@ -53,29 +234,23 @@ conversation-list-calling-cell:first-of-type {
 .conversation-list-calling-cell-controls {
   display: flex;
   width: 100%;
-  justify-content: flex-end;
+  justify-content: space-between;
   padding-right: 16px;
   padding-bottom: 16px;
   padding-left: 16px;
+  &-left,
+  &-right {
+    display: flex;
+  }
 }
 
 .conversation-list-calling-cell-participants {
   position: relative;
   display: flex;
-  height: 44px;
+  height: 24px;
   align-items: center;
   padding-right: 16px;
   padding-left: 16px;
-
-  &::before {
-    position: absolute;
-    top: 0;
-    right: 16px;
-    left: 16px;
-    height: 1px;
-    background-color: @seperator-color;
-    content: '';
-  }
 }
 
 .conversation-list-calling-cell-participant {
@@ -92,12 +267,21 @@ conversation-list-calling-cell:first-of-type {
 }
 
 .conversation-list-calling-cell-controls-button {
-  .cell-badge;
-
+  min-width: 40px;
+  height: 24px;
   padding-right: 8px;
   padding-left: 8px;
+  background-color: fade(@graphite-dark, 8%);
+  border-radius: 12px;
+  color: @graphite-dark;
+  cursor: pointer;
   font-size: 12px;
+  line-height: 24px;
   user-select: none;
+
+  &-large {
+    min-width: 64px;
+  }
 
   & + & {
     margin-left: 8px;
@@ -109,11 +293,26 @@ conversation-list-calling-cell:first-of-type {
   .label-bold;
 }
 
-.conversation-list-calling-cell-participants-rest {
-  margin-left: 8px;
-  font-size: 12px;
+@keyframes show-call-ui {
+  0% {
+    max-height: 0;
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  100% {
+    max-height: 500px;
+    opacity: 1;
+    transform: scale(1);
+  }
+}
 
-  &::before {
-    content: '+';
+@keyframes show-call-ui-button {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
   }
 }

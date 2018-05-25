@@ -140,7 +140,7 @@ class Login extends React.PureComponent {
 
   navigateChooseHandleOrWebapp = () => {
     return this.props.hasSelfHandle
-      ? window.location.replace(URLUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP))
+      ? window.location.replace(URLUtil.getAppPath())
       : this.props.history.push(ROUTE.CHOOSE_HANDLE);
   };
 

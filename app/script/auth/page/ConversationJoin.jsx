@@ -46,10 +46,9 @@ import {Redirect} from 'react-router';
 import {Link as RRLink} from 'react-router-dom';
 import {ROUTE, QUERY_KEY} from '../route';
 import {injectIntl, FormattedHTMLMessage} from 'react-intl';
-import EXTERNAL_ROUTE from '../externalRoute';
 import {withRouter} from 'react-router';
 import React, {Component} from 'react';
-import {getURLParameter, pathWithParams} from '../util/urlUtil';
+import {getURLParameter, getAppPath} from '../util/urlUtil';
 import BackendError from '../module/action/BackendError';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
 import WirelessUnsupportedBrowser from '../component/WirelessUnsupportedBrowser';
@@ -116,7 +115,7 @@ class ConversationJoin extends Component {
     this.props
       .doJoinConversationByCode(this.state.conversationKey, this.state.conversationCode)
       .then(() => this.trackAddParticipant())
-      .then(() => window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP)));
+      .then(() => window.location.replace(getAppPath()));
   };
 
   handleSubmit = event => {
@@ -141,7 +140,7 @@ class ConversationJoin extends Component {
         .then(() => this.props.doJoinConversationByCode(this.state.conversationKey, this.state.conversationCode))
         .then(conversationEvent => this.props.setLastEventDate(new Date(conversationEvent.time)))
         .then(() => this.trackAddParticipant())
-        .then(() => window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP)))
+        .then(() => window.location.replace(getAppPath()))
         .catch(error => this.props.doLogout());
     }
     this.nameInput.focus();

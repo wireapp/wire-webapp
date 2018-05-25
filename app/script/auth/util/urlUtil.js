@@ -17,17 +17,28 @@
  *
  */
 
-export function pathWithParams(path, additionalParams) {
+import EXTERNAL_ROUTE from '../externalRoute';
+import {FORWARDED_QUERY_KEYS} from '../route';
+
+export function pathWithParams(path, additionalParams, whitelistParams) {
   const searchParams = window.location.search
     .replace(/^\?/, '')
     .split('&')
-    .filter(searchParam => searchParam);
+    .filter(searchParam => !!searchParam)
+    .filter(searchParam => {
+      const paramName = searchParam.split('=')[0];
+      return !whitelistParams || whitelistParams.includes(paramName);
+    });
 
   if (additionalParams) {
     searchParams.push(additionalParams);
   }
   const joinedParams = searchParams.join('&');
   return `${path}${joinedParams.length ? `?${joinedParams}` : ''}`;
+}
+
+export function getAppPath() {
+  return pathWithParams(EXTERNAL_ROUTE.WEBAPP, undefined, FORWARDED_QUERY_KEYS);
 }
 
 export function getURLParameter(parameterName) {

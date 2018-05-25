@@ -38,6 +38,20 @@
   border-radius: 4px;
 }
 
+.video-calling {
+  &--active {
+    position: absolute;
+    z-index: 101;
+    width: 100%;
+    height: 100%;
+    background-color: #000;
+  }
+
+  &--minimized {
+    display: none;
+  }
+}
+
 .video-element {
   width: 100%;
   height: 100%;
@@ -66,8 +80,7 @@
 }
 
 .video-element-remote {
-  .full-screen;
-
+  height: 100vh;
   animation-duration: @animation-timing-slower;
   animation-fill-mode: forwards;
 
@@ -156,22 +169,81 @@
   width: 100%;
   justify-content: center;
   transition: opacity 0.25s ease-in-out;
+
+  &__button {
+    position: relative;
+    display: flex;
+    width: 56px;
+    height: 56px;
+    align-items: center;
+    justify-content: center;
+    margin-right: 40px;
+    background-color: rgba(255, 255, 255, 0.24);
+    border-radius: 32px;
+    cursor: pointer;
+    line-height: 0;
+
+    &:first-child {
+      margin-right: 72px;
+    }
+
+    &:last-child {
+      margin-right: 0;
+      margin-left: 72px;
+    }
+
+    svg > path {
+      fill: #fff;
+    }
+
+    &__label {
+      position: absolute;
+      bottom: -16px;
+      left: 50%;
+      color: #fff;
+      font-size: 11px;
+      font-weight: @font-weight-regular;
+      opacity: 0;
+      text-transform: uppercase;
+      transform: translateX(-50%);
+      transition: opacity @animation-timing-fast ease-in-out;
+      white-space: nowrap;
+    }
+
+    device-toggle-button {
+      position: absolute;
+      bottom: -16px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    &:hover &__label {
+      opacity: 1;
+    }
+
+    &--active {
+      background-color: #fff;
+
+      svg > path {
+        fill: @graphite-dark;
+      }
+    }
+
+    &--disabled {
+      pointer-events: none;
+
+      svg {
+        opacity: 0.4;
+      }
+    }
+
+    &--red {
+      background-color: @w-red;
+    }
+  }
 }
 
-.video-controls-button {
-  margin-right: 8px;
-
-  &:first-child {
-    margin-right: 32px;
-  }
-
-  &:last-child {
-    margin-right: 0;
-    margin-left: 24px;
-  }
-}
-
-.video-element-dark {
+.video-controls .video-element-dark {
   color: @graphite-dark;
 }
 

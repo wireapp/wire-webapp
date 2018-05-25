@@ -25,44 +25,48 @@ window.z.media = z.media || {};
 z.media.MediaStreamHandler = class MediaStreamHandler {
   /**
    * Detect whether a MediaStream has a video MediaStreamTrack attached
-   * @param {MediaStream} media_stream - MediaStream to detect the type off
+   * @param {MediaStream} mediaStream - MediaStream to detect the type off
    * @returns {MediaStream} MediaStream with new type information
    */
-  static detect_media_stream_type(media_stream) {
-    const audio_tracks = media_stream.getAudioTracks();
-    const video_tracks = media_stream.getVideoTracks();
+  static detect_media_stream_type(mediaStream) {
+    const audioTracks = mediaStream.getAudioTracks();
+    const videoTracks = mediaStream.getVideoTracks();
 
-    if (video_tracks && video_tracks.length) {
-      if (audio_tracks && audio_tracks.length) {
-        media_stream.type = z.media.MediaType.AUDIO_VIDEO;
-      } else {
-        media_stream.type = z.media.MediaType.VIDEO;
-      }
-    } else if (audio_tracks && audio_tracks.length) {
-      media_stream.type = z.media.MediaType.AUDIO;
+    const hasAudioTrack = audioTracks && audioTracks.length;
+    const hasVideoTrack = videoTracks && videoTracks.length;
+    if (hasVideoTrack) {
+      mediaStream.type = hasAudioTrack ? z.media.MediaType.AUDIO_VIDEO : z.media.MediaType.VIDEO;
     } else {
-      media_stream.type = z.media.MediaType.NONE;
+      mediaStream.type = hasAudioTrack ? z.media.MediaType.AUDIO : z.media.MediaType.NONE;
     }
-    return media_stream;
+
+    return mediaStream;
   }
 
   /**
    * Get MediaStreamTracks from a MediaStream.
    *
-   * @param {MediaStream} media_stream - MediaStream to get tracks from
-   * @param {z.media.MediaType} [media_type=z.media.MediaType.AUDIO_VIDEO] - Type of requested tracks
+   * @param {MediaStream} mediaStream - MediaStream to get tracks from
+   * @param {z.media.MediaType} [mediaType=z.media.MediaType.AUDIO_VIDEO] - Type of requested tracks
    * @returns {Array} MediaStreamTracks
    */
-  static get_media_tracks(media_stream, media_type = z.media.MediaType.AUDIO_VIDEO) {
-    switch (media_type) {
-      case z.media.MediaType.AUDIO:
-        return media_stream.getAudioTracks();
-      case z.media.MediaType.AUDIO_VIDEO:
-        return media_stream.getTracks();
-      case z.media.MediaType.VIDEO:
-        return media_stream.getVideoTracks();
-      default:
+  static get_media_tracks(mediaStream, mediaType = z.media.MediaType.AUDIO_VIDEO) {
+    switch (mediaType) {
+      case z.media.MediaType.AUDIO: {
+        return mediaStream.getAudioTracks();
+      }
+
+      case z.media.MediaType.AUDIO_VIDEO: {
+        return mediaStream.getTracks();
+      }
+
+      case z.media.MediaType.VIDEO: {
+        return mediaStream.getVideoTracks();
+      }
+
+      default: {
         throw new z.media.MediaError(z.media.MediaError.TYPE.UNHANDLED_MEDIA_TYPE);
+      }
     }
   }
 
@@ -72,7 +76,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
    */
   constructor(media_repository) {
     this.media_repository = media_repository;
-    this.logger = new z.util.Logger('z.media.MediaDevicesHandler', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger('z.media.MediaStreamHandler', z.config.LOGGER.OPTIONS);
 
     this.calls = () => [];
     this.joined_call = () => undefined;
@@ -83,22 +87,29 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
 
     this.current_device_id = this.devices_handler.current_device_id;
 
-    this.local_media_stream = ko.observable();
+    this.localMediaStream = ko.observable();
     this.local_media_type = ko.observable(z.media.MediaType.AUDIO);
 
-    this.remote_media_streams = {
-      audio: ko.observableArray([]),
-      video: ko.observable(),
+    this.remoteMediaStreamInfo = ko.observableArray([]);
+    this.remoteMediaStreamInfoIndex = {
+      audio: ko.pureComputed(() => {
+        return this.remoteMediaStreamInfo().filter(mediaStreamInfo => mediaStreamInfo.type === z.media.MediaType.AUDIO);
+      }),
+      video: ko.pureComputed(() => {
+        const videoTypes = [z.media.MediaType.AUDIO_VIDEO, z.media.MediaType.VIDEO];
+        return this.remoteMediaStreamInfo().filter(mediaStreamInfo => videoTypes.includes(mediaStreamInfo.type));
+      }),
     };
 
-    this.self_stream_state = {
+    this.selfStreamState = {
       audioSend: ko.observable(true),
       screenSend: ko.observable(false),
       videoSend: ko.observable(false),
     };
 
     this.request_hint_timeout = undefined;
-    amplify.subscribe(z.event.WebApp.CALL.MEDIA.ADD_STREAM, this.add_remote_media_stream.bind(this));
+    amplify.subscribe(z.event.WebApp.CALL.MEDIA.ADD_STREAM, this.addRemoteMediaStream.bind(this));
+    amplify.subscribe(z.event.WebApp.CALL.MEDIA.CONNECTION_CLOSED, this.removeRemoteMediaStreamTracks.bind(this));
   }
 
   //##############################################################################
@@ -110,17 +121,18 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
    *
    * @param {string} conversation_id - Conversation ID of call
    * @param {z.media.MediaType} [media_type=z.media.MediaType.AUDIO] - Media type for this call
+   * @param {boolean} [isGroup=false] - Set constraints for group
    * @returns {Promise} Resolves when the MediaStream has been initiated
    */
-  initiate_media_stream(conversation_id, media_type = z.media.MediaType.AUDIO) {
+  initiate_media_stream(conversation_id, media_type = z.media.MediaType.AUDIO, isGroup = false) {
     const video_send = media_type === z.media.MediaType.AUDIO_VIDEO;
 
     return this.devices_handler
       .update_current_devices(video_send)
-      .then(() => this.constraints_handler.get_media_stream_constraints(true, video_send))
+      .then(() => this.constraints_handler.get_media_stream_constraints(true, video_send, isGroup))
       .then(({streamConstraints}) => this.request_media_stream(media_type, streamConstraints))
       .then(media_stream_info => {
-        this.self_stream_state.videoSend(video_send);
+        this.selfStreamState.videoSend(video_send);
         if (video_send) {
           this.local_media_type(z.media.MediaType.VIDEO);
         }
@@ -143,8 +155,8 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
    * @returns {undefined} Not return value
    */
   release_media_stream() {
-    if (this._release_media_stream(this.local_media_stream())) {
-      this.local_media_stream(undefined);
+    if (this._release_media_stream(this.localMediaStream())) {
+      this.localMediaStream(undefined);
     }
   }
 
@@ -164,11 +176,8 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
     let update_promise;
     if (this.joined_call()) {
       this._set_stream_state(media_stream_info);
-      update_promise = Promise.all(
-        this.joined_call()
-          .getFlows()
-          .map(flow_et => flow_et.updateMediaStream(media_stream_info))
-      );
+      const flowEntities = this.joined_call().getFlows();
+      update_promise = Promise.all(flowEntities.map(flow_et => flow_et.updateMediaStream(media_stream_info)));
     } else {
       update_promise = Promise.resolve([media_stream_info]);
     }
@@ -177,8 +186,8 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
       const media_type = !update_media_stream_info.replaced ? type : undefined;
 
       this._set_stream_state(update_media_stream_info);
-      this._release_media_stream(this.local_media_stream(), media_type);
-      this.local_media_stream(update_media_stream_info.stream);
+      this._release_media_stream(this.localMediaStream(), media_type);
+      this.localMediaStream(update_media_stream_info.stream);
     });
   }
 
@@ -360,7 +369,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
         video_tracks: media_stream.getVideoTracks(),
       });
       this._set_stream_state(media_stream_info);
-      this.local_media_stream(media_stream);
+      this.localMediaStream(media_stream);
     }
   }
 
@@ -496,25 +505,36 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
 
   /**
    * Add a remote MediaStream.
-   * @param {z.media.MediaStreamInfo} media_stream_info - MediaStream information
+   * @param {z.media.MediaStreamInfo} mediaStreamInfo - MediaStream information
    * @returns {undefined} No return value
    */
-  add_remote_media_stream(media_stream_info) {
-    const {stream: media_stream, type: media_type} = media_stream_info;
-
-    switch (media_type) {
-      case z.media.MediaType.AUDIO:
-        this.remote_media_streams.audio.push(media_stream);
-        break;
-      case z.media.MediaType.AUDIO_VIDEO:
-      case z.media.MediaType.VIDEO:
-        this.remote_media_streams.video(media_stream);
-        break;
-      default:
-        throw new z.media.MediaError(z.media.MediaError.TYPE.UNHANDLED_MEDIA_TYPE);
+  addRemoteMediaStream(mediaStreamInfo) {
+    const handledStreamTypes = [z.media.MediaType.AUDIO, z.media.MediaType.VIDEO, z.media.MediaType.AUDIO_VIDEO];
+    if (!handledStreamTypes.includes(mediaStreamInfo.type)) {
+      throw new z.media.MediaError(z.media.MediaError.TYPE.UNHANDLED_MEDIA_TYPE);
     }
 
-    this.element_handler.add_media_element(media_stream_info);
+    this.remoteMediaStreamInfo.push(mediaStreamInfo);
+    this.element_handler.add_media_element(mediaStreamInfo);
+  }
+
+  /**
+   * Removes the given tracks from the streams containing them.
+   * If a stream ends up having no tracks, it gets filtered out from the array of streams
+   * removeRemoteMediaStreamTracks
+   *
+   * @param {MediaStreamTrack[]} tracks - the tracks to remove
+   * @returns {void} - void
+   */
+  removeRemoteMediaStreamTracks(tracks) {
+    const filteredMediaStreamsInfo = this.remoteMediaStreamInfo()
+      .map(mediaStreamInfo => {
+        tracks.forEach(track => mediaStreamInfo.stream.removeTrack(track));
+        return mediaStreamInfo;
+      })
+      .filter(mediaStreamInfo => mediaStreamInfo.stream.getTracks().length > 0);
+
+    this.remoteMediaStreamInfo(filteredMediaStreamsInfo);
   }
 
   //##############################################################################
@@ -540,33 +560,29 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
 
   // Toggle the camera.
   toggle_video_send() {
-    if (this.local_media_stream() && this.local_media_type() === z.media.MediaType.VIDEO) {
-      return this._toggle_video_send();
-    }
-    return this.replace_input_source(z.media.MediaType.VIDEO);
+    const hasActiveVideoStream = this.localMediaStream() && this.local_media_type() === z.media.MediaType.VIDEO;
+    return hasActiveVideoStream ? this._toggle_video_send() : this.replace_input_source(z.media.MediaType.VIDEO);
   }
 
   // Toggle the mute state of the microphone.
   toggle_audio_send() {
-    if (this.local_media_stream()) {
-      return this._toggle_audio_send();
-    }
-    return Promise.reject(new z.media.MediaError(z.media.MediaError.TYPE.NO_AUDIO_STREAM_FOUND));
+    const hasActiveAudioStream = !!this.localMediaStream();
+    return hasActiveAudioStream
+      ? this._toggleAudioSend()
+      : Promise.reject(new z.media.MediaError(z.media.MediaError.TYPE.NO_AUDIO_STREAM_FOUND));
   }
 
   // Toggle the screen.
   toggle_screen_send() {
-    if (this.local_media_stream() && this.local_media_type() === z.media.MediaType.SCREEN) {
-      return this._toggle_screen_send();
-    }
-    return this.replace_input_source(z.media.MediaType.SCREEN);
+    const hasActiveScreenStream = this.localMediaStream() && this.local_media_type() === z.media.MediaType.SCREEN;
+    return hasActiveScreenStream ? this._toggleScreenSend() : this.replace_input_source(z.media.MediaType.SCREEN);
   }
 
   // Reset the enabled states of media types.
   reset_self_states() {
-    this.self_stream_state.audioSend(true);
-    this.self_stream_state.screenSend(false);
-    this.self_stream_state.videoSend(false);
+    this.selfStreamState.audioSend(true);
+    this.selfStreamState.screenSend(false);
+    this.selfStreamState.videoSend(false);
     this.local_media_type(z.media.MediaType.AUDIO);
   }
 
@@ -581,26 +597,33 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
 
   /**
    * Set the self stream state to reflect current media type.
-   * @param {z.media.MediaType} media_type - Type of state to enable
+   * @param {z.media.MediaType} mediaType - Type of state to enable
    * @returns {undefined} No return value
    */
-  _set_self_stream_state(media_type) {
-    switch (media_type) {
-      case z.media.MediaType.AUDIO:
-        this.self_stream_state.audioSend(true);
+  _set_self_stream_state(mediaType) {
+    switch (mediaType) {
+      case z.media.MediaType.AUDIO: {
+        this.selfStreamState.audioSend(true);
         break;
-      case z.media.MediaType.SCREEN:
-        this.self_stream_state.videoSend(false);
-        this.self_stream_state.screenSend(true);
+      }
+
+      case z.media.MediaType.SCREEN: {
+        this.selfStreamState.videoSend(false);
+        this.selfStreamState.screenSend(true);
         this.local_media_type(z.media.MediaType.SCREEN);
         break;
-      case z.media.MediaType.VIDEO:
-        this.self_stream_state.videoSend(true);
-        this.self_stream_state.screenSend(false);
+      }
+
+      case z.media.MediaType.VIDEO: {
+        this.selfStreamState.videoSend(true);
+        this.selfStreamState.screenSend(false);
         this.local_media_type(z.media.MediaType.VIDEO);
         break;
-      default:
+      }
+
+      default: {
         throw new z.media.MediaError(z.media.MediaError.TYPE.UNHANDLED_MEDIA_TYPE);
+      }
     }
   }
 
@@ -616,7 +639,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
         media_stream_info.stream,
         z.media.MediaType.AUDIO
       );
-      audio_stream_track.enabled = this.self_stream_state.audioSend();
+      audio_stream_track.enabled = this.selfStreamState.audioSend();
     }
 
     if ([z.media.MediaType.AUDIO_VIDEO, z.media.MediaType.VIDEO].includes(media_stream_info.type)) {
@@ -624,7 +647,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
         media_stream_info.stream,
         z.media.MediaType.VIDEO
       );
-      video_stream_track.enabled = this.self_stream_state.screenSend() || this.self_stream_state.videoSend();
+      video_stream_track.enabled = this.selfStreamState.screenSend() || this.selfStreamState.videoSend();
     }
   }
 
@@ -633,14 +656,13 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
    * @private
    * @returns {Promise} Resolve when the stream has been toggled
    */
-  _toggle_audio_send() {
-    return this._toggle_stream_enabled(
-      z.media.MediaType.AUDIO,
-      this.local_media_stream(),
-      this.self_stream_state.audioSend
-    ).then(audio_tracks => {
-      this.logger.info(`Microphone enabled: ${this.self_stream_state.audioSend()}`, audio_tracks);
-      this.self_stream_state.audioSend();
+  _toggleAudioSend() {
+    const mediaType = z.media.MediaType.AUDIO;
+    const stateObservable = this.selfStreamState.audioSend;
+
+    return this._toggleStreamEnabled(mediaType, this.localMediaStream(), stateObservable).then(audioTracks => {
+      this.logger.info(`Microphone enabled: ${stateObservable()}`, audioTracks);
+      return stateObservable();
     });
   }
 
@@ -649,14 +671,13 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
    * @private
    * @returns {Promise} Resolve when the stream has been toggled
    */
-  _toggle_screen_send() {
-    return this._toggle_stream_enabled(
-      z.media.MediaType.VIDEO,
-      this.local_media_stream(),
-      this.self_stream_state.screenSend
-    ).then(video_tracks => {
-      this.logger.info(`Screen enabled: ${this.self_stream_state.screenSend()}`, video_tracks);
-      this.self_stream_state.screenSend();
+  _toggleScreenSend() {
+    const mediaType = z.media.MediaType.VIDEO;
+    const stateObservable = this.selfStreamState.screenSend;
+
+    return this._toggleStreamEnabled(mediaType, this.localMediaStream(), stateObservable).then(videoTracks => {
+      this.logger.info(`Screen enabled: ${stateObservable()}`, videoTracks);
+      return stateObservable();
     });
   }
 
@@ -666,13 +687,12 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
    * @returns {Promise} Resolve when the stream has been toggled
    */
   _toggle_video_send() {
-    return this._toggle_stream_enabled(
-      z.media.MediaType.VIDEO,
-      this.local_media_stream(),
-      this.self_stream_state.videoSend
-    ).then(video_tracks => {
-      this.logger.info(`Camera enabled: ${this.self_stream_state.videoSend()}`, video_tracks);
-      this.self_stream_state.videoSend();
+    const mediaType = z.media.MediaType.VIDEO;
+    const stateObservable = this.selfStreamState.videoSend;
+
+    return this._toggleStreamEnabled(mediaType, this.localMediaStream(), stateObservable).then(videoTracks => {
+      this.logger.info(`Camera enabled: ${stateObservable()}`, videoTracks);
+      return stateObservable();
     });
   }
 
@@ -680,21 +700,22 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
    * Toggle the enabled state of a MediaStream.
    *
    * @private
-   * @param {z.media.MediaType} media_type - Media type to toggle
-   * @param {MediaStream} media_stream - MediaStream to toggle enabled state off
-   * @param {ko.observable} state_observable - State observable to invert
+   * @param {z.media.MediaType} mediaType - Media type to toggle
+   * @param {MediaStream} mediaStream - MediaStream to toggle enabled state off
+   * @param {ko.observable} stateObservable - State observable to invert
    * @returns {Promise} Resolves with MediaStreamTrack with new enabled state
    */
-  _toggle_stream_enabled(media_type, media_stream, state_observable) {
+  _toggleStreamEnabled(mediaType, mediaStream, stateObservable) {
     return Promise.resolve().then(() => {
-      state_observable(!state_observable());
-      if (media_type === z.media.MediaType.AUDIO) {
-        amplify.publish(z.event.WebApp.CALL.MEDIA.MUTE_AUDIO, !state_observable());
+      stateObservable(!stateObservable());
+      const isTypeAudio = mediaType === z.media.MediaType.AUDIO;
+      if (isTypeAudio) {
+        amplify.publish(z.event.WebApp.CALL.MEDIA.MUTE_AUDIO, !stateObservable());
       }
 
-      const media_stream_tracks = z.media.MediaStreamHandler.get_media_tracks(media_stream, media_type);
-      media_stream_tracks.forEach(media_stream_track => (media_stream_track.enabled = state_observable()));
-      return media_stream_tracks;
+      const mediaStreamTracks = z.media.MediaStreamHandler.get_media_tracks(mediaStream, mediaType);
+      mediaStreamTracks.forEach(mediaStreamTrack => (mediaStreamTrack.enabled = stateObservable()));
+      return mediaStreamTracks;
     });
   }
 };
