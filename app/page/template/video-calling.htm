@@ -1,5 +1,5 @@
 <div id="video-calling" data-bind="hide_controls: z.viewModel.VideoCallingViewModel.CONFIG.HIDE_CONTROLS_TIMEOUT, css:{ 'video-calling--active': isCallOngoing(), 'video-calling--minimized': multitasking.isMinimized()}" class="video-calling">
-  <!-- ko if: videodCall() -->
+  <!-- ko if: videodCall() && !multitasking.isMinimized()-->
     <!-- ko if: showRemote() -->
       <div id="video-element-remote" class="video-element-remote">
         <group-video-grid params="streamsInfo: remoteVideoStreamsInfo, ownStream: localVideoStream, calls: calls"></group-video-grid>
