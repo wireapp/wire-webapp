@@ -183,6 +183,8 @@ z.string.hr.modalConversationTooManyMembersHeadline = 'Puna kuća';
 
 
 
+z.string.hr.modalImproveWireAction = 'Prihvati';
+
 z.string.hr.modalSessionResetHeadline = 'Sesija je resetirana';
 z.string.hr.modalSessionResetMessage1 = 'Ako problem nije razriješen,';
 z.string.hr.modalSessionResetMessageLink = 'kontaktirajte';
@@ -395,9 +397,6 @@ z.string.hr.preferencesOptionsContacts = 'Kontakti';
 z.string.hr.preferencesOptionsContactsGmail = 'Uvezi iz Gmaila';
 z.string.hr.preferencesOptionsContactsMacos = 'Uvezi iz kontakata';
 z.string.hr.preferencesOptionsContactsDetail = 'Mi koristimo vaše kontakt podatke za povezivanje s drugima. Sve informacije su anonimiziane i nisu dijeljene s drugima.';
-z.string.hr.preferencesOptionsData = 'Izvješće o korištenju i rušenju aplikacije';
-z.string.hr.preferencesOptionsDataCheckbox = 'Izvješće o korištenju i rušenju aplikacije';
-z.string.hr.preferencesOptionsDataDetail = 'Poboljšaj Wire slanjem anonimnih informacija.';
 z.string.hr.preferencesOptionsNotifications = 'Obavijesti';
 z.string.hr.preferencesOptionsNotificationsNone = 'Isključi';
 z.string.hr.preferencesOptionsNotificationsObfuscate = 'Sakrij detalje';

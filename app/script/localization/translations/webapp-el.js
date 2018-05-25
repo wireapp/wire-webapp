@@ -208,6 +208,7 @@ z.string.el.modalIntegrationUnavailableHeadline = 'Προσωρινά δεν ε�
 
 z.string.el.modalPictureFileFormatMessage = 'Παρακαλώ επιλέξτε ένα αρχείο PNG ή JPEG.';
 
+z.string.el.modalImproveWireAction = 'Αποδοχή';
 
 z.string.el.modalSessionResetHeadline = 'Η περίοδος λειτουργίας σύνδεσης έχει επαναφερθεί';
 z.string.el.modalSessionResetMessage1 = 'Εάν το πρόβλημα δεν επιλυθεί,';
@@ -470,9 +471,6 @@ z.string.el.preferencesOptionsContacts = 'Επαφές';
 z.string.el.preferencesOptionsContactsGmail = 'Εισαγωγή από το Gmail';
 z.string.el.preferencesOptionsContactsMacos = 'Εισαγωγή από τις Επαφές';
 z.string.el.preferencesOptionsContactsDetail = 'Χρησιμοποιούμε τις επαφές σας για να συνδέεστε με άλλους. Κρατάμε όλες σας τις πληροφορίες ανώνυμες και δεν τις μοιραζόμαστε με κανέναν άλλον.';
-z.string.el.preferencesOptionsData = 'Χρησιμοτητα και αναφορες σφαλματων';
-z.string.el.preferencesOptionsDataCheckbox = 'Αποστολή ανώνυμων δεδομένων';
-z.string.el.preferencesOptionsDataDetail = 'Βοηθήστε το Wire να βελτιωθεί στέλνοντας ανώνυμα δεδομένα σας.';
 z.string.el.preferencesOptionsPopular = 'Απο δημοφιλεις προτασεις';
 z.string.el.preferencesOptionsEmojiReplaceCheckbox = 'Αντικατάσταση τύπου emoticons με emojis';
 z.string.el.preferencesOptionsPreviewsSendCheckbox = 'Δημιουργία προεπισκόπησης για απεσταλμένους συνδέσμους σας';
