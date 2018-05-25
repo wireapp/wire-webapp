@@ -97,6 +97,9 @@ z.string.ru.callJoin = 'Присоединиться';
 z.string.ru.callChooseSharedScreen = 'Выберите экран для демонстрации';
 z.string.ru.callParticipants = '{{number}} участвуют(ет) в звонке';
 
+z.string.ru.videoCallOverlayMute = 'Выкл. звук';
+z.string.ru.videoCallOverlayHangUp = 'Завершить вызов';
+
 z.string.ru.modalAcknowledgeAction = 'OK';
 z.string.ru.modalAcknowledgeHeadline = 'Что-то пошло не так';
 z.string.ru.modalConfirmSecondary = 'Отменить';

@@ -96,6 +96,9 @@ z.string.nl.callJoin = 'Deelnemen';
 z.string.nl.callChooseSharedScreen = 'Kies een scherm om te delen';
 z.string.nl.callParticipants = '{{number}} bellen';
 
+z.string.nl.videoCallOverlayMute = 'Dempen';
+z.string.nl.videoCallOverlayHangUp = 'Ophangen';
+
 z.string.nl.modalAcknowledgeAction = 'Ok';
 z.string.nl.modalConfirmSecondary = 'Annuleer';
 z.string.nl.modalOptionSecondary = 'Annuleer';

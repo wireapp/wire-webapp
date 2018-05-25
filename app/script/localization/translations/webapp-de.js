@@ -97,6 +97,9 @@ z.string.de.callJoin = 'Beitreten';
 z.string.de.callChooseSharedScreen = 'Wähle einen Bildschirm aus';
 z.string.de.callParticipants = '{{number}} im Anruf';
 
+z.string.de.videoCallOverlayMute = 'Stummschalten';
+z.string.de.videoCallOverlayHangUp = 'Beenden';
+
 z.string.de.modalAcknowledgeAction = 'Ok';
 z.string.de.modalAcknowledgeHeadline = 'Fehler aufgetreten';
 z.string.de.modalConfirmSecondary = 'Abbrechen';
@@ -247,7 +250,7 @@ z.string.de.modalPictureTooSmallMessage = 'Wähle ein Bild mit mindestens 320 ×
 z.string.de.modalImproveWireAction = 'Annehmen';
 z.string.de.modalImproveWireSecondary = 'Nicht jetzt';
 z.string.de.modalImproveWireHeadline = 'Hilf uns, Wire zu verbessern';
-z.string.de.modalImproveWireMessage = 'Anonymisierte Nutzungs- und Absturzberichte helfen uns, unsere Produkte und Dienstleistungen zu verbessern. Wir verwenden diese Informationen nicht für andere Zwecke.';
+z.string.de.modalImproveWireMessage = 'Anonymisierte Nutzungs- und Fehlerberichte helfen uns, unsere Produkte und Dienstleistungen zu verbessern. Wir verwenden diese Informationen nicht für andere Zwecke.';
 
 z.string.de.modalServiceUnavailableHeadline = 'Hinzufügen des Dienstes nicht möglich';
 z.string.de.modalServiceUnavailableMessage = 'Der Dienst ist derzeit nicht verfügbar.';
@@ -355,12 +358,12 @@ z.string.de.groupCreationParticipantsPlaceholder = 'Nach Namen suchen';
 
 z.string.de.guestRoomConversationName = 'Gästebereich';
 z.string.de.guestRoomToggleName = 'Gäste zulassen';
-z.string.de.guestRoomToggleInfo = 'Öffne diese Unterhaltung für Personen außerhalb deines Teams.';
-z.string.de.guestRoomToggleInfoExtended = 'Öffne diese Unterhaltung für Personen außerhalb deines Teams. Diese Einstellung kann später jederzeit geändert werden.';
+z.string.de.guestRoomToggleInfo = 'Öffne diese Unterhaltung für Personen außerhalb des Teams.';
+z.string.de.guestRoomToggleInfoExtended = 'Öffne diese Unterhaltung für Personen außerhalb des Teams. Diese Einstellung kann später jederzeit geändert werden.';
 
 z.string.de.guestRoomConversationBadge = 'Gäste anwesend';
 
-z.string.de.guestRoomConversationHead = 'Personen außerhalb deines Teams können an dieser Unterhaltung teilnehmen.';
+z.string.de.guestRoomConversationHead = 'Personen außerhalb des Teams können an dieser Unterhaltung teilnehmen.';
 z.string.de.guestRoomConversationButton = 'Personen einladen';
 
 z.string.de.collectionShowAll = 'Zeige alle {{number}}';
@@ -387,7 +390,7 @@ z.string.de.conversationsPopoverClear = 'Unterhaltungsverlauf löschen…';
 z.string.de.conversationsPopoverLeave = 'Gruppe verlassen…';
 z.string.de.conversationsPopoverNotify = 'Benachrichtigen';
 z.string.de.conversationsPopoverSilence = 'Stummschalten';
-z.string.de.conversationsPopoverUnarchive = 'Entarchivieren';
+z.string.de.conversationsPopoverUnarchive = 'Reaktivieren';
 
 z.string.de.conversationsSecondaryLineMissedCall = '{{number}} verpasster Anruf';
 z.string.de.conversationsSecondaryLineMissedCalls = '{{number}} verpasste Anrufe';
@@ -435,7 +438,7 @@ z.string.de.addParticipantsHeaderWithCounter = 'Personen hinzufügen ({{number}}
 z.string.de.addParticipantsSearchPlaceholder = 'Nach Namen suchen';
 z.string.de.addParticipantsServiceConfirmButton = 'Dienst hinzufügen';
 z.string.de.addParticipantsTabsPeople = 'Kontakte';
-z.string.de.addParticipantsTabsServices = 'Services';
+z.string.de.addParticipantsTabsServices = 'Dienste';
 
 z.string.de.conversationDetailsActionArchive = 'Archivieren';
 z.string.de.conversationDetailsActionAddParticipants = 'Personen hinzufügen';
@@ -449,11 +452,11 @@ z.string.de.conversationDetailsActionLeave = 'Gruppe verlassen…';
 z.string.de.conversationDetailsGuestsOff = 'Aus';
 z.string.de.conversationDetailsGuestsOn = 'An';
 z.string.de.conversationDetailsParticipantsServicesOne = 'Dienst';
-z.string.de.conversationDetailsParticipantsServicesMany = 'Services';
+z.string.de.conversationDetailsParticipantsServicesMany = 'Dienste';
 z.string.de.conversationDetailsParticipantsUsersOne = 'Person';
 z.string.de.conversationDetailsParticipantsUsersMany = 'Personen';
 z.string.de.conversationDetailsPeople = 'Personen';
-z.string.de.conversationDetailsServices = 'Services';
+z.string.de.conversationDetailsServices = 'Dienste';
 
 z.string.de.groupParticipantActionBlock = 'Kontakt blockieren…';
 z.string.de.groupParticipantActionCancelRequest = 'Anfrage abbrechen…';
@@ -466,7 +469,7 @@ z.string.de.groupParticipantActionPending = 'Ausstehend';
 z.string.de.groupParticipantActionRemove = 'Aus Gruppe entfernen…';
 z.string.de.groupParticipantActionSelfProfile = 'Profil öffnen';
 z.string.de.groupParticipantActionSendRequest = 'Kontakt hinzufügen';
-z.string.de.groupParticipantActionUnblock = 'Entsperren…';
+z.string.de.groupParticipantActionUnblock = 'Freigeben…';
 
 z.string.de.guestOptionsCopyLink = 'Link kopieren';
 z.string.de.guestOptionsCopyLinkDone = 'Link kopiert!';
@@ -516,7 +519,7 @@ z.string.de.preferencesAccountAvaibilityUnset = 'Wähle einen Status';
 z.string.de.preferencesAccountCreateTeam = 'Team erstellen';
 z.string.de.preferencesAccountData = 'Datennutzung';
 z.string.de.preferencesAccountDataCheckbox = 'Anonyme Nutzungsdaten senden';
-z.string.de.preferencesAccountDataDetail = 'Hilf mit, Wire durch die Übermittlung anonymisierter Nutzungs- und Absturzberichte zu verbessern.';
+z.string.de.preferencesAccountDataDetail = 'Anonymisierte Nutzungs- und Fehlerberichte schicken, um Wire zu verbessern.';
 z.string.de.preferencesAccountDelete = 'Benutzerkonto löschen';
 z.string.de.preferencesAccountLeaveGuestRoom = 'Gästebereich verlassen';
 z.string.de.preferencesAccountLeaveGuestRoomDescription = 'Du wirst nicht länger auf die Nachrichten dieser Unterhaltung zugreifen können.';
@@ -617,7 +620,7 @@ z.string.de.searchGroups = 'Gruppen';
 z.string.de.searchPeople = 'Kontakte';
 z.string.de.searchPlaceholder = 'Name oder Benutzername suchen';
 z.string.de.searchServicePlaceholder = 'Nach Namen suchen';
-z.string.de.searchServices = 'Services';
+z.string.de.searchServices = 'Dienste';
 z.string.de.searchTeamGroups = 'Team-Gruppen';
 z.string.de.searchTeamMembers = 'Team-Mitglieder';
 z.string.de.searchTopPeople = 'Top Kontakte';

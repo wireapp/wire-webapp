@@ -91,6 +91,9 @@ z.string.sl.callAccept = 'Sprejmi';
 z.string.sl.callJoin = 'Pridruži';
 z.string.sl.callChooseSharedScreen = 'Izberite zaslon za deljenje';
 
+z.string.sl.videoCallOverlayMute = 'Utišaj';
+z.string.sl.videoCallOverlayHangUp = 'Odloži';
+
 z.string.sl.modalAcknowledgeAction = 'V redu';
 z.string.sl.modalConfirmSecondary = 'Prekliči';
 z.string.sl.modalOptionSecondary = 'Prekliči';
