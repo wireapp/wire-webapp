@@ -100,6 +100,9 @@ z.string.hu.callJoin = 'Csatlakozás';
 z.string.hu.callChooseSharedScreen = 'Válaszd ki a megosztandó képernyőt';
 z.string.hu.callParticipants = '{{number}} partner a vonalban';
 
+z.string.hu.videoCallOverlayMute = 'Némítás';
+z.string.hu.videoCallOverlayHangUp = 'Hívás befejezése';
+
 z.string.hu.modalAcknowledgeAction = 'Ok';
 z.string.hu.modalAcknowledgeHeadline = 'Valami nem stimmel';
 z.string.hu.modalConfirmSecondary = 'Mégsem';

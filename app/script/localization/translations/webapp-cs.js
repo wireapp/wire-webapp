@@ -93,6 +93,9 @@ z.string.cs.callJoin = 'Vstoupit';
 z.string.cs.callChooseSharedScreen = 'Vybrat obrazovku ke sdílení';
 z.string.cs.callParticipants = '{{number}} se účastní hovoru';
 
+z.string.cs.videoCallOverlayMute = 'Ztlumit';
+z.string.cs.videoCallOverlayHangUp = 'Zavěsit';
+
 z.string.cs.modalAcknowledgeAction = 'Ok';
 z.string.cs.modalConfirmSecondary = 'Zrušit';
 z.string.cs.modalOptionSecondary = 'Zrušit';

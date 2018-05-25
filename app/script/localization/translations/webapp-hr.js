@@ -85,6 +85,9 @@ z.string.hr.callAccept = 'Prihvati';
 z.string.hr.callJoin = 'Pridruži se';
 z.string.hr.callChooseSharedScreen = 'Odaberite zaslon za zajedničko korištenje';
 
+z.string.hr.videoCallOverlayMute = 'Isključi zvuk';
+z.string.hr.videoCallOverlayHangUp = 'Poklopi';
+
 z.string.hr.modalAcknowledgeAction = 'Ok';
 z.string.hr.modalConfirmSecondary = 'Odustani';
 z.string.hr.modalOptionSecondary = 'Odustani';

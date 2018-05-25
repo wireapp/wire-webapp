@@ -97,6 +97,9 @@ z.string.ro.callJoin = 'Alătură-te';
 z.string.ro.callChooseSharedScreen = 'Alege un ecran pentru a partaja';
 z.string.ro.callParticipants = '{{number}} în apel';
 
+z.string.ro.videoCallOverlayMute = 'Mutizează';
+z.string.ro.videoCallOverlayHangUp = 'Închide';
+
 z.string.ro.modalAcknowledgeAction = 'Ok';
 z.string.ro.modalAcknowledgeHeadline = 'Ceva nu a mers bine';
 z.string.ro.modalConfirmSecondary = 'Renunță';

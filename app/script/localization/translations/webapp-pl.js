@@ -95,18 +95,24 @@ z.string.pl.callJoin = 'Dołącz';
 z.string.pl.callChooseSharedScreen = 'Wybierz ekran do współdzielenia';
 z.string.pl.callParticipants = '{{number}} uczestników';
 
+z.string.pl.videoCallOverlayMute = 'Wycisz';
+z.string.pl.videoCallOverlayHangUp = 'Rozłącz';
+
 z.string.pl.modalAcknowledgeAction = 'OK';
 z.string.pl.modalAcknowledgeHeadline = 'Coś poszło nie tak';
 z.string.pl.modalConfirmSecondary = 'Anuluj';
 z.string.pl.modalOptionSecondary = 'Anuluj';
 
 z.string.pl.modalAccountCreateAction = 'OK';
+z.string.pl.modalAccountCreateHeadline = 'Utwórz konto';
 
 z.string.pl.modalAccountDeletionAction = 'Usuń';
 z.string.pl.modalAccountDeletionHeadline = 'Usuń konto';
 z.string.pl.modalAccountDeletionMessage = 'Wyślemy wiadomość poprzez e-mail lub SMS. Proszę użyć tego odnośnika, żeby trwale usunąć konto.';
 
 z.string.pl.modalAccountLeaveGuestRoomAction = 'Opuść';
+z.string.pl.modalAccountLeaveGuestRoomHeadline = 'Opuść pokój gości.';
+z.string.pl.modalAccountLeaveGuestRoomMessage = 'Historia konwersacji zostanie usunięta. Żeby ją zatrzymać, następnym razem utwórz konto.';
 
 z.string.pl.modalAccountLogoutAction = 'Wyloguj się';
 z.string.pl.modalAccountLogoutHeadline = 'Usunąć dane?';
@@ -130,6 +136,8 @@ z.string.pl.modalAssetParallelUploadsMessage = 'Jednorazowo możesz wysłać mak
 
 z.string.pl.modalCallEmptyConversationHeadline = 'Brak rozmówcy';
 z.string.pl.modalCallEmptyConversationMessage = 'Nikogo tutaj nie ma.';
+
+z.string.pl.modalCallEmptyLogHeadline = 'Nie ma połączeń';
 
 z.string.pl.modalCallNoGroupVideoHeadline = 'Grupowe połączenia video nie są możliwe';
 z.string.pl.modalCallNoGroupVideoMessage = 'Grupowe połączenia wideo nie są możliwe.';
@@ -207,11 +215,23 @@ z.string.pl.modalConversationRemoveGuestsHeadline = 'Wyłączyć dostęp dla go�
 
 z.string.pl.modalConversationTooManyMembersHeadline = 'Zbyt wielu uczestników rozmowy';
 
+z.string.pl.modalGifTooLargeMessage = 'Maksymalny rozmiar to {{number}} MB.';
+
 z.string.pl.modalIntegrationUnavailableHeadline = 'Boty są obecnie niedostępne';
 z.string.pl.modalIntegrationUnavailableMessage = 'Dziękujemy za zainteresowanie naszymi botami. Usługa jest obecnie zawieszona, ponieważ pracujemy nad następną wersją. Bądź na bieżąco.';
 
+z.string.pl.modalPictureFileFormatHeadline = 'Nie można użyć tego obrazu';
+z.string.pl.modalPictureFileFormatMessage = 'Proszę wybrać plik PNG lub JPEG.';
+
+z.string.pl.modalPictureTooLargeHeadline = 'Wybrany obraz jest za duży';
+
+z.string.pl.modalPictureTooSmallHeadline = 'Obrazek jest zbyt mały';
 
 z.string.pl.modalImproveWireAction = 'Odbierz';
+z.string.pl.modalImproveWireSecondary = 'Nie teraz';
+z.string.pl.modalImproveWireHeadline = 'Pomóż nam ulepszyć Wire';
+
+z.string.pl.modalServiceUnavailableHeadline = 'Dodanie usługi jest niemożliwe';
 
 z.string.pl.modalSessionResetHeadline = 'Sesja została zresetowana';
 z.string.pl.modalSessionResetMessage1 = 'Jeśli problem nie zostanie rozwiązany,';
@@ -233,15 +253,22 @@ z.string.pl.connectionRequestConnect = 'Połącz';
 z.string.pl.connectionRequestIgnore = 'Ignoruj';
 
 z.string.pl.conversationGuestIndicator = 'Gość';
+z.string.pl.userRemainingTimeHours = 'Zostało {{time}}h';
+z.string.pl.userRemainingTimeMinutes = 'Zostało mniej, niż {{time}}min';
 
 z.string.pl.conversationYouNominative = 'ty';
 z.string.pl.conversationYouDative = 'ty';
 z.string.pl.conversationYouAccusative = 'ty';
 
+z.string.pl.conversationBotUser = 'Bot';
 z.string.pl.conversationConnectionAccepted = 'Połączony';
 z.string.pl.conversationConnectionBlocked = 'Zablokowano';
 z.string.pl.conversationConnectionCancelRequest = 'Anuluj żądanie połączenia';
 z.string.pl.conversationCreate = ' rozpoczął rozmowę z {{users}}';
+z.string.pl.conversationCreateName = '{{user}} rozpoczął konwersację';
+z.string.pl.conversationCreateNameYou = '{{user}} rozpoczął konwersację';
+z.string.pl.conversationCreateTemporary = 'Dołączyłeś do konwersacji';
+z.string.pl.conversationCreateWith = 'z {{users}}';
 z.string.pl.conversationCreateYou = ' rozpoczął rozmowę z {{users}}';
 z.string.pl.conversationDeviceStartedUsingOne = ' rozpoczęto korzystanie';
 z.string.pl.conversationDeviceStartedUsingMany = ' rozpoczęto korzystanie';

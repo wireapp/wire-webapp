@@ -98,6 +98,9 @@ z.string.et.callJoin = 'Liitu';
 z.string.et.callChooseSharedScreen = 'Vali ekraan, mida jagada';
 z.string.et.callParticipants = '{{number}} kõnes';
 
+z.string.et.videoCallOverlayMute = 'Vaigista';
+z.string.et.videoCallOverlayHangUp = 'Lõpeta kõne';
+
 z.string.et.modalAcknowledgeAction = 'Ok';
 z.string.et.modalAcknowledgeHeadline = 'Midagi läks valesti';
 z.string.et.modalConfirmSecondary = 'Tühista';

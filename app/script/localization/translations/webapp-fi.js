@@ -93,6 +93,9 @@ z.string.fi.callJoin = 'Liity';
 z.string.fi.callChooseSharedScreen = 'Valitse näyttö jonka haluat jakaa';
 z.string.fi.callParticipants = '{{number}} puhelussa';
 
+z.string.fi.videoCallOverlayMute = 'Mykistä';
+z.string.fi.videoCallOverlayHangUp = 'Katkaise puhelu';
+
 z.string.fi.modalAcknowledgeAction = 'Ok';
 z.string.fi.modalConfirmSecondary = 'Peruuta';
 z.string.fi.modalOptionSecondary = 'Peruuta';
