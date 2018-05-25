@@ -2,7 +2,7 @@
   <!-- ko if: videodCall() -->
     <!-- ko if: showRemote() -->
       <div id="video-element-remote" class="video-element-remote">
-        <group-video-grid params="streams: remoteVideoStreams, ownStream: localVideoStream"></group-video-grid>
+        <group-video-grid params="streamsInfo: remoteVideoStreamsInfo, ownStream: localVideoStream, calls: calls"></group-video-grid>
         <!-- ko if: showRemoteParticipant() -->
           <div class="video-element-remote-participant">
             <!-- ko ifnot: videodCall().isGroup -->
