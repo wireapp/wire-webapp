@@ -126,6 +126,17 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
       }
     });
 
+    this.showSwitchCamera = ko.pureComputed(() => {
+      const hasMultipleCameras = this.availableDevices.video_input().length > 1;
+      const isVisible = hasMultipleCameras && this.localVideoStream() && this.selfStreamState.videoSend();
+      return this.isCallOngoing() && isVisible;
+    });
+    this.showSwitchScreen = ko.pureComputed(() => {
+      const hasMultipleScreens = this.availableDevices.screen_input().length > 1;
+      const isVisible = hasMultipleScreens && this.localVideoStream() && this.selfStreamState.screenSend();
+      return this.isCallOngoing() && isVisible;
+    });
+
     this.showControls = ko.pureComputed(() => {
       const isFullscreenEnabled = this.showRemoteParticipant() && !this.multitasking.isMinimized();
       const isVisible = this.showRemoteVideo() || isFullscreenEnabled;
