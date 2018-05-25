@@ -38,12 +38,14 @@ z.components.GroupVideoGrid = (() => {
     constructor(params) {
       this.grid = ko.observableArray([0, 0, 0, 0]);
       this.thumbnailStream = ko.observable(null);
+      this.ownId = ko.observable(null);
 
       this.streams = ko.pureComputed(() => {
         const remoteStreams = filterUnsentStreams(params.streamsInfo(), params.calls()).map(
           mediaStreamInfo => mediaStreamInfo.stream
         );
         const ownStream = params.ownStream();
+        this.ownId(ownStream ? ownStream.id : null);
 
         if (remoteStreams.length === 1) {
           this.thumbnailStream(ownStream);
@@ -152,13 +154,14 @@ z.components.GroupVideoGrid = (() => {
     getClassNameForVideo(index) {
       const size = this.getSizeForVideo(index);
       const SIZES = GroupVideoGrid.CONFIG.VIDEO_ELEMENT_SIZE;
+      const isOwnVideo = this.grid()[index] === this.ownId();
       const extraClasses = {
         [SIZES.EMPTY]: 'group-video-grid__element--empty',
         [SIZES.FULL_SCREEN]: 'group-video-grid__element--full-size',
         [SIZES.HALF_SCREEN]: 'group-video-grid__element--full-height',
         [SIZES.FOURTH_SCREEN]: '',
       };
-      return `group-video-grid__element${index} ${extraClasses[size]}`;
+      return `group-video-grid__element${index} ${extraClasses[size]} ${isOwnVideo ? 'mirror' : ''}`;
     }
 
     getUIEValueForVideo(index) {
@@ -204,7 +207,7 @@ z.components.GroupVideoGrid = (() => {
           <!-- /ko -->
         </div>
         <!-- ko if: thumbnailStream() -->
-          <video autoplay class="group-video__thumbnail" data-uie-name="self-video-thumbnail" data-bind="css: {'group-video__thumbnail--minimized': minimized}, sourceStream: thumbnailStream(), muteMediaElement: thumbnailStream()">
+          <video autoplay class="group-video__thumbnail mirror" data-uie-name="self-video-thumbnail" data-bind="css: {'group-video__thumbnail--minimized': minimized}, sourceStream: thumbnailStream(), muteMediaElement: thumbnailStream()">
           </video>
         <!-- /ko -->
       </div>
