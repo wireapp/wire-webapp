@@ -234,7 +234,7 @@ ko.components.register('conversation-list-calling-cell', {
 
     </div>
     <div class="call-ui__participant-list__wrapper" data-bind="css: {'call-ui__participant-list__wrapper--active': showParticipants}">
-      <div class="call-ui__participant-list" data-bind="forEach: callParticipants"  data-uie-name="list-call-ui-participants">
+      <div class="call-ui__participant-list" data-bind="foreach: callParticipants"  data-uie-name="list-call-ui-participants">
         <participant-item params="participant: $data.user, hideInfo: true, showCamera: $data.state.videoSend()" data-bind="css: {'no-underline': true}"></participant-item>
       </div>
     </div>
