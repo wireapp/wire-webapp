@@ -30,8 +30,7 @@ import {
 } from '@wireapp/react-ui-kit';
 import {injectIntl} from 'react-intl';
 import {parseError} from '../util/errorUtil';
-import EXTERNAL_ROUTE from '../externalRoute';
-import {pathWithParams} from '../util/urlUtil';
+import {getAppPath} from '../util/urlUtil';
 import Page from './Page';
 import React from 'react';
 import {createSuggestions} from '../util/handleUtil';
@@ -74,7 +73,7 @@ class ChooseHandle extends React.PureComponent {
         if (this.props.isTeamFlow) {
           this.props.history.push(ROUTE.INITIAL_INVITE);
         } else {
-          window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP));
+          window.location.replace(getAppPath());
         }
       })
       .catch(error => {

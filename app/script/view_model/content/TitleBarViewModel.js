@@ -36,6 +36,7 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
 
     this.callingRepository = repositories.calling;
     this.conversationRepository = repositories.conversation;
+    this.userRepository = repositories.user;
     this.multitasking = contentViewModel.multitasking;
     this.logger = new z.util.Logger('z.viewModel.content.TitleBarViewModel', z.config.LOGGER.OPTIONS);
 
@@ -47,7 +48,6 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
     this.conversationEntity = this.conversationRepository.active_conversation;
 
     this.joinedCall = this.callingRepository.joinedCall;
-    this.remoteMediaStreams = this.callingRepository.remoteMediaStreams;
     this.selfStreamState = this.callingRepository.selfStreamState;
     this.isActivatedAccount = mainViewModel.isActivatedAccount;
 
@@ -66,18 +66,7 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
       return this.hasCall() ? this.joinedCall().state() === z.calling.enum.CALL_STATE.ONGOING : false;
     });
 
-    this.showMaximizeControl = ko.pureComputed(() => {
-      if (!this.joinedCall()) {
-        return false;
-      }
-
-      const hasLocalVideo = this.selfStreamState.videoSend() || this.selfStreamState.screenSend();
-      const hasRemoteVideoSetting = this.joinedCall().isRemoteScreenSend() || this.joinedCall().isRemoteVideoSend();
-      const hasRemoteVideo = hasRemoteVideoSetting && this.remoteMediaStreams.video();
-      return this.hasOngoingCall() && this.multitasking.isMinimized() && hasLocalVideo && !hasRemoteVideo;
-    });
-
-    this.showCallControls = ko.computed(() => {
+    this.showCallControls = ko.pureComputed(() => {
       if (!this.conversationEntity()) {
         return false;
       }
@@ -86,6 +75,10 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
       const hasParticipants = !!this.conversationEntity().participating_user_ids().length;
       const isActiveConversation = hasParticipants && !this.conversationEntity().removed_from_conversation();
       return !this.hasCall() && isSupportedConversation && isActiveConversation;
+    });
+
+    this.supportsVideoCall = ko.pureComputed(() => {
+      return this.showCallControls() ? this.conversationEntity().supportsVideoCall(true) : false;
     });
 
     const shortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.PEOPLE);
@@ -117,12 +110,6 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
 
   clickOnCallButton() {
     amplify.publish(z.event.WebApp.CALL.STATE.TOGGLE, z.media.MediaType.AUDIO);
-  }
-
-  clickOnMaximize() {
-    this.multitasking.autoMinimize(false);
-    this.multitasking.isMinimized(false);
-    this.logger.info(`Maximizing call '${this.joinedCall().id}' on user click`);
   }
 
   clickOnDetails() {

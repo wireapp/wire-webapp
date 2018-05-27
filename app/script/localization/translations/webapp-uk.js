@@ -98,6 +98,9 @@ z.string.uk.callJoin = 'Приєднатись';
 z.string.uk.callChooseSharedScreen = 'Оберіть робочий стіл, скріншотами якого ви хочете поділитися';
 z.string.uk.callParticipants = '{{number}} учасників';
 
+z.string.uk.videoCallOverlayMute = 'Вимкнути звук';
+z.string.uk.videoCallOverlayHangUp = 'Завершити';
+
 z.string.uk.modalAcknowledgeAction = 'ОК';
 z.string.uk.modalAcknowledgeHeadline = 'Щось пішло не так';
 z.string.uk.modalConfirmSecondary = 'Скасувати';

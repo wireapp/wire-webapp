@@ -97,6 +97,9 @@ z.string.fr.callJoin = 'Rejoindre';
 z.string.fr.callChooseSharedScreen = 'Choisissez un écran à partager';
 z.string.fr.callParticipants = '{{number}} sur l’appel';
 
+z.string.fr.videoCallOverlayMute = 'Mettre en sourdine';
+z.string.fr.videoCallOverlayHangUp = 'Raccrocher';
+
 z.string.fr.modalAcknowledgeAction = 'OK';
 z.string.fr.modalConfirmSecondary = 'Annuler';
 z.string.fr.modalOptionSecondary = 'Annuler';

@@ -92,6 +92,9 @@ z.string.it.callJoin = 'Entra';
 z.string.it.callChooseSharedScreen = 'Scegli quale schermata condividere';
 z.string.it.callParticipants = '{{number}} nella chiamata';
 
+z.string.it.videoCallOverlayMute = 'Silenzia';
+z.string.it.videoCallOverlayHangUp = 'Riattacca';
+
 z.string.it.modalAcknowledgeAction = 'Ok';
 z.string.it.modalConfirmSecondary = 'Annulla';
 z.string.it.modalOptionSecondary = 'Annulla';

@@ -44,12 +44,10 @@ z.media.MediaElementHandler = class MediaElementHandler {
     if (media_stream_info.type !== z.media.MediaType.VIDEO) {
       const remote_media_element = this._create_media_element(media_stream_info);
       this.remote_media_elements.push(remote_media_element);
-      this.logger.info(
-        `Created MediaElement of type '${remote_media_element.nodeName.toLowerCase()}' for MediaStream of flow '${
-          media_stream_info.flow_id
-        }'`,
-        remote_media_element
-      );
+
+      const elementType = remote_media_element.nodeName.toLowerCase();
+      const message = `Created MediaElement of type '${elementType}' for flow '${media_stream_info.flow_id}'`;
+      this.logger.info(message, remote_media_element);
     }
   }
 
@@ -63,9 +61,8 @@ z.media.MediaElementHandler = class MediaElementHandler {
     this._get_media_elements(flow_id).forEach(media_element => {
       this._destroy_media_element(media_element);
       this.remote_media_elements.remove(media_element);
-      this.logger.info(
-        `Deleted MediaElement of type '${media_element.tagName.toLocaleLowerCase()}' for flow '${flow_id}'`
-      );
+      const elementType = media_element.tagName.toLocaleLowerCase();
+      this.logger.info(`Deleted MediaElement of type '${elementType}' for flow '${flow_id}'`);
     });
   }
 
@@ -139,21 +136,16 @@ z.media.MediaElementHandler = class MediaElementHandler {
    */
   _set_media_element_output(media_element, sink_id) {
     if (media_element.setSinkId) {
+      const flowId = media_element.dataset.flow_id;
+
       media_element
         .setSinkId(sink_id)
         .then(() => {
-          this.logger.info(
-            `Audio output device '${sink_id}' attached to flow '${media_element.dataset.flow_id}`,
-            media_element
-          );
+          this.logger.info(`Audio output device '${sink_id}' attached to flow '${flowId}`, media_element);
         })
         .catch(error => {
-          this.logger.warn(
-            `Failed to attach audio output device '${sink_id}' to flow '${media_element.dataset.flow_id}': ${
-              error.message
-            }`,
-            error
-          );
+          const message = `Failed to attach audio output device '${sink_id}' to flow '${flowId}': ${error.message}`;
+          this.logger.warn(message, error);
         });
     }
   }

@@ -94,6 +94,9 @@ z.string.tr.callJoin = 'Katıl';
 z.string.tr.callChooseSharedScreen = 'Paylaşmak için bir ekran seçin';
 z.string.tr.callParticipants = '{{number}} çağrıda';
 
+z.string.tr.videoCallOverlayMute = 'Sustur';
+z.string.tr.videoCallOverlayHangUp = 'Kapat';
+
 z.string.tr.modalAcknowledgeAction = 'Tamam';
 z.string.tr.modalConfirmSecondary = 'İptal';
 z.string.tr.modalOptionSecondary = 'İptal';

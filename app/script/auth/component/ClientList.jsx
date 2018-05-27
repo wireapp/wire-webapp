@@ -26,7 +26,6 @@ import * as LocalStorageAction from '../module/action/LocalStorageAction';
 import ClientItem from '../component/ClientItem';
 import * as ClientSelector from '../module/selector/ClientSelector';
 import {connect} from 'react-redux';
-import EXTERNAL_ROUTE from '../externalRoute';
 import {ROUTE} from '../route';
 import BackendError from '../module/action/BackendError';
 import {withRouter} from 'react-router';
@@ -62,7 +61,7 @@ class ClientList extends React.Component {
         const persist = this.props.getLocalStorage(LocalStorageAction.LocalStorageKey.AUTH.PERSIST);
         return this.props.doInitializeClient(persist, password);
       })
-      .then(() => window.location.replace(URLUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP)))
+      .then(() => window.location.replace(URLUtil.getAppPath()))
       .catch(error => {
         if (error.label === BackendError.LABEL.NEW_CLIENT) {
           this.props.history.push(ROUTE.HISTORY_INFO);
