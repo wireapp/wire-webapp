@@ -58,11 +58,14 @@ z.components.GroupVideoGrid = (() => {
       this.streams.subscribe(this.updateGrid.bind(this));
       this.updateGrid(this.streams());
 
+      this.scaleVideos = this.scaleVideos.bind(this, rootElement);
+      // scale videos when the grid is updated (on the next rendering cycle)
       this.grid.subscribe(() => {
-        window.requestAnimationFrame(() => this.scaleVideos(this.rootElement));
+        window.requestAnimationFrame(this.scaleVideos);
       });
 
-      window.addEventListener('resize', this.scaleVideos.bind(this, rootElement));
+      // scale the videos when the window is resized
+      window.addEventListener('resize', this.scaleVideos);
 
       this.rootElement = rootElement;
 
@@ -102,6 +105,10 @@ z.components.GroupVideoGrid = (() => {
             }
           }
         });
+    }
+
+    dispose() {
+      window.removeEventListener('resize', this.scaleVideos);
     }
 
     /**
@@ -218,7 +225,7 @@ z.components.GroupVideoGrid = (() => {
 
   ko.components.register('group-video-grid', {
     template: `
-      <div class="group-video" data-bind="template: { afterRender: () => scaleVideos(rootElement) }">
+      <div class="group-video" data-bind="template: { afterRender: scaleVideos }">
         <div class="group-video-grid" data-bind="foreach: { data: grid, as: 'streamId' }">
           <!-- ko if: streamId !== 0 -->
             <div class="group-video-grid__element" data-bind="css: $parent.getClassNameForVideo($index()), attr: { 'data-uie-name': 'item-grid', 'data-uie-value': $parent.getUIEValueForVideo($index()) }">
