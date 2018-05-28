@@ -138,6 +138,31 @@ export default class ConversationService {
     this.clientID = clientID;
   }
 
+  public async updateTextMessage(
+    conversationId: string,
+    originalMessageId: string,
+    newMessage: string
+  ): Promise<string> {
+    const messageId = new UUID(4).format();
+
+    const editedMessage = this.protocolBuffers.MessageEdit.create({
+      replacingMessageId: originalMessageId,
+      text: this.protocolBuffers.Text.create({content: newMessage}),
+    });
+
+    const genericMessage = this.protocolBuffers.GenericMessage.create({
+      edited: editedMessage,
+      messageId,
+    });
+
+    const preKeyBundles = await this.getPreKeyBundles(conversationId);
+    const plainTextBuffer: Buffer = this.protocolBuffers.GenericMessage.encode(genericMessage).finish();
+    const payload: EncryptedAsset = await AssetCryptography.encryptAsset(plainTextBuffer);
+
+    await this.sendExternalGenericMessage(this.clientID, conversationId, payload, <UserPreKeyBundleMap>preKeyBundles);
+    return messageId;
+  }
+
   private shouldSendAsExternal(plainText: Buffer, preKeyBundles: UserPreKeyBundleMap): boolean {
     const EXTERNAL_MESSAGE_THRESHOLD_BYTES = 200 * 1024;
 

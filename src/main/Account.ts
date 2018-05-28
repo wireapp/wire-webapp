@@ -80,6 +80,7 @@ class Account extends EventEmitter {
       External: root.lookup('External'),
       GenericMessage: root.lookup('GenericMessage'),
       Knock: root.lookup('Knock'),
+      MessageEdit: root.lookup('MessageEdit'),
       Text: root.lookup('Text'),
     };
 
