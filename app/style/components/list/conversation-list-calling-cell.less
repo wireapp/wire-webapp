@@ -130,7 +130,11 @@
 
     .participant-item {
       height: 40px;
+      cursor: default;
       fill: @graphite-dark;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity @animation-timing-fast ease-in-out;
 
       .participant-item-image {
         width: 48px;
@@ -158,6 +162,10 @@
       camera-icon svg {
         width: 12px;
       }
+    }
+
+    &__wrapper--active .participant-item {
+      opacity: 1;
     }
   }
 
