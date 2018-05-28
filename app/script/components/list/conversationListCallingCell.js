@@ -80,7 +80,7 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
     });
 
     this.isVideoCall = ko.pureComputed(() => {
-      return this.call().isRemoteVideoSend() || (this.callIsOutgoing() && this.selfStreamState.videoSend());
+      return this.call().isRemoteVideoSend() || this.selfStreamState.videoSend();
     });
 
     this.disableVideoButton = ko.pureComputed(() => {
