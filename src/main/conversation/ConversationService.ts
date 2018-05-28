@@ -85,10 +85,9 @@ export default class ConversationService {
       return messageId;
     }
 
-    const payload: OTRRecipients = await this.cryptographyService.encrypt(
-      plainTextBuffer,
-      <UserPreKeyBundleMap>preKeyBundles
-    );
+    const payload: OTRRecipients = await this.cryptographyService.encrypt(plainTextBuffer, <UserPreKeyBundleMap>(
+      preKeyBundles
+    ));
 
     await this.sendMessage(this.clientID, conversationId, payload);
     return messageId;
