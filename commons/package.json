@@ -12,7 +12,7 @@
     "rimraf": "2.6.2",
     "typescript": "2.8.3",
     "webpack": "4.9.1",
-    "webpack-cli": "2.1.3"
+    "webpack-cli": "2.1.4"
   },
   "description": "Collection of common components that are used across Wire web applications.",
   "files": [
