@@ -48,8 +48,8 @@ const typedArray: Uint8Array = Decoder.fromBase64('SGVsbG8=').asBytes;
 
 ### `Decoder`
 
-* `fromBase64`
+- `fromBase64`
 
 ### `Encoder`
 
-* `toBase64`
+- `toBase64`

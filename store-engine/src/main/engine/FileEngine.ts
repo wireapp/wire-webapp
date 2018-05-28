@@ -87,8 +87,7 @@ export default class FileEngine implements CRUDEngine {
             fs.writeFile(filePath, entity, {flag: 'wx'}, (error: NodeJS.ErrnoException) => {
               if (error) {
                 if (error.code === 'ENOENT') {
-                  fs
-                    .outputFile(filePath, entity)
+                  fs.outputFile(filePath, entity)
                     .then(() => resolve(primaryKey))
                     .catch((error: Error) => reject(error));
                 } else if (error.code === 'EEXIST') {

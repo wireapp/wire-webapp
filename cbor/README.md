@@ -18,7 +18,7 @@ yarn add @wireapp/cbor
 
 #### Browser
 
-* [demo.html](./demo.html)
+- [demo.html](./demo.html)
 
 #### TypeScript
 

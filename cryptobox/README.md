@@ -23,8 +23,8 @@ yarn add @wireapp/cryptobox
 
 #### Browser
 
-* [demo.html](./src/demo/demo.html)
+- [demo.html](./src/demo/demo.html)
 
 #### Node.js
 
-* [demo.js](./src/demo/demo.js)
+- [demo.js](./src/demo/demo.js)

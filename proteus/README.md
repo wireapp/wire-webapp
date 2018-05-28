@@ -18,11 +18,11 @@ yarn add @wireapp/proteus
 
 #### Browser
 
-* [demo.html](./src/demo/demo.html)
+- [demo.html](./src/demo/demo.html)
 
 #### Node.js
 
-* [demo.js](./src/demo/demo.js)
+- [demo.js](./src/demo/demo.js)
 
 #### TypeScript
 

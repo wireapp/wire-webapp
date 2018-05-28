@@ -25,7 +25,7 @@ yarn global add @wireapp/travis-bot
 
 ### Usage
 
-* [wire-travis-bot.js](./bin/wire-travis-bot.js)
+- [wire-travis-bot.js](./bin/wire-travis-bot.js)
 
 ### Execution
 
