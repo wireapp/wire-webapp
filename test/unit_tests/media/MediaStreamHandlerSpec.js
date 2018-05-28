@@ -35,6 +35,76 @@ describe('z.media.MediaStreamHandler', () => {
       .catch(done.fail);
   });
 
+  describe('addRemoteMediaStream', () => {
+    it('throws an error if stream type is not recognized', () => {
+      const streamHandler = TestFactory.media_repository.stream_handler;
+
+      const newMediaStream = {type: 'random'};
+
+      try {
+        streamHandler.addRemoteMediaStream(newMediaStream);
+      } catch (error) {
+        expect(error instanceof z.media.MediaError).toBe(true);
+        expect(error.type).toEqual(z.media.MediaError.TYPE.UNHANDLED_MEDIA_TYPE);
+      }
+    });
+
+    it('should add the stream if type is recognized', () => {
+      const streamHandler = TestFactory.media_repository.stream_handler;
+
+      const recognizedStreams = [
+        {type: z.media.MediaType.AUDIO},
+        {type: z.media.MediaType.VIDEO},
+        {type: z.media.MediaType.AUDIO_VIDEO},
+      ];
+
+      const expectedStreams = [
+        [recognizedStreams[0]],
+        [recognizedStreams[0], recognizedStreams[1]],
+        [recognizedStreams[0], recognizedStreams[1], recognizedStreams[2]],
+      ];
+
+      const subscription = streamHandler.remoteMediaStreamInfo.subscribe(streams => {
+        expect(streams).toEqual(expectedStreams.shift());
+      });
+
+      recognizedStreams.forEach(stream => streamHandler.addRemoteMediaStream(stream));
+      subscription.dispose();
+      streamHandler.remoteMediaStreamInfo([]);
+    });
+  });
+
+  describe('remoteMediaStreamInfoIndex', () => {
+    it('returns the media streams indexed by type', () => {
+      const streamHandler = TestFactory.media_repository.stream_handler;
+
+      const audioStream = {type: z.media.MediaType.AUDIO};
+      const videoStream = {type: z.media.MediaType.VIDEO};
+      const audioVideoStream = {type: z.media.MediaType.AUDIO_VIDEO};
+
+      const expectedAudioStreams = [[audioStream], [audioStream], [audioStream]];
+
+      const expectedVideoStreams = [[], [videoStream], [videoStream, audioVideoStream]];
+
+      const {audio: audioObservable, video: videoObservable} = streamHandler.remoteMediaStreamInfoIndex;
+      const subscriptions = [
+        audioObservable.subscribe(audioStreams => {
+          expect(audioStreams).toEqual(expectedAudioStreams.shift());
+        }),
+
+        videoObservable.subscribe(videoStreams => {
+          expect(videoStreams).toEqual(expectedVideoStreams.shift());
+        }),
+      ];
+
+      [audioStream, videoStream, audioVideoStream].forEach(stream => {
+        streamHandler.addRemoteMediaStream(stream);
+      });
+
+      subscriptions.forEach(subscription => subscription.dispose());
+    });
+  });
+
   describe('toggle_audio_send', () => {
     beforeEach(() => {
       spyOn(TestFactory.media_repository.stream_handler, '_toggleAudioSend').and.returnValue(Promise.resolve());
