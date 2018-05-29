@@ -27,8 +27,8 @@ const InputSubmitCombo = Input.withComponent('div').extend`
   padding-left: 0;
   margin-bottom: 16px;
   ${() => Input} {
-    padding: 0 0 0 20px;
-    margin: 0 10px 0 0;
+    padding: 0 0 0 16px;
+    margin: 0 8px 0 0;
     flex-grow: 1;
   }
 `;
