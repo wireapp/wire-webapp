@@ -35,7 +35,7 @@ z.components.GroupVideoGrid = (() => {
       };
     }
 
-    constructor(params) {
+    constructor(params, rootElement) {
       this.grid = ko.observableArray([0, 0, 0, 0]);
       this.thumbnailStream = ko.observable(null);
       this.ownId = ko.observable(null);
@@ -58,29 +58,52 @@ z.components.GroupVideoGrid = (() => {
       this.streams.subscribe(this.updateGrid.bind(this));
       this.updateGrid(this.streams());
 
+      this.scaleVideos = this.scaleVideos.bind(this, rootElement);
+      // scale videos when the grid is updated (on the next rendering cycle)
+      this.grid.subscribe(() => {
+        z.util.afterRender(this.scaleVideos);
+      });
+
+      // scale the videos when the window is resized
+      window.addEventListener('resize', this.scaleVideos);
+
       this.minimized = params.minimized;
     }
 
-    scaleVideos(elements) {
-      elements
-        .filter(element => !!element.classList)
-        .filter(element => element.classList.contains('group-video-grid__element'))
-        .forEach(element => {
-          const containerRect = element.getBoundingClientRect();
-          const containerRatio = containerRect.width / containerRect.height;
-          element.querySelector('video').addEventListener('loadedmetadata', setScale);
+    scaleVideos(rootElement) {
+      const elements = Array.from(rootElement.querySelectorAll('.group-video-grid__element'));
+      elements.forEach(element => {
+        const containerRect = element.getBoundingClientRect();
+        const containerRatio = containerRect.width / containerRect.height;
+        const videoElement = element.querySelector('video');
+        const handleLoadEvent = event => {
+          const video = event.target;
+          setScale(video);
+          video.removeEventListener(event.type, handleLoadEvent);
+        };
+        if (videoElement.videoWidth > 0) {
+          setScale(videoElement);
+        } else {
+          videoElement.addEventListener('loadedmetadata', handleLoadEvent);
+        }
 
-          function setScale(event) {
-            const video = event.target;
-            const videoRatio = video.videoWidth / video.videoHeight;
-            if (videoRatio < containerRatio) {
-              video.classList.add('group-video-grid__element-video--fill-width');
-            } else {
-              video.classList.add('group-video-grid__element-video--fill-height');
-            }
-            video.removeEventListener(event.type, setScale);
+        function setScale(video) {
+          const fullHeightClass = 'group-video-grid__element-video--fill-height';
+          const fullWidthClass = 'group-video-grid__element-video--fill-width';
+          const videoRatio = video.videoWidth / video.videoHeight;
+          video.classList.remove(fullHeightClass);
+          video.classList.remove(fullWidthClass);
+          if (videoRatio < containerRatio) {
+            video.classList.add(fullWidthClass);
+          } else {
+            video.classList.add(fullHeightClass);
           }
-        });
+        }
+      });
+    }
+
+    dispose() {
+      window.removeEventListener('resize', this.scaleVideos);
     }
 
     /**
@@ -119,7 +142,7 @@ z.components.GroupVideoGrid = (() => {
       }
 
       const newStreamsList = currentStreams
-        // add the new streams at the and
+        // add the new streams at the end
         .concat(addedStreams);
 
       return [newStreamsList[0] || 0, newStreamsList[3] || 0, newStreamsList[1] || 0, newStreamsList[2] || 0];
@@ -197,8 +220,8 @@ z.components.GroupVideoGrid = (() => {
 
   ko.components.register('group-video-grid', {
     template: `
-      <div class="group-video">
-        <div class="group-video-grid" data-bind="foreach: { data: grid, as: 'streamId', afterRender: scaleVideos}">
+      <div class="group-video" data-bind="template: { afterRender: scaleVideos }">
+        <div class="group-video-grid" data-bind="foreach: { data: grid, as: 'streamId' }">
           <!-- ko if: streamId !== 0 -->
             <div class="group-video-grid__element" data-bind="css: $parent.getClassNameForVideo($index()), attr: { 'data-uie-name': 'item-grid', 'data-uie-value': $parent.getUIEValueForVideo($index()) }">
               <video autoplay class="group-video-grid__element-video" data-bind="sourceStream: $parent.getParticipantStream(streamId), muteMediaElement: $parent.getParticipantStream(streamId)">
@@ -212,7 +235,9 @@ z.components.GroupVideoGrid = (() => {
         <!-- /ko -->
       </div>
     `,
-    viewModel: GroupVideoGrid,
+    viewModel: {
+      createViewModel: (params, componentInfo) => new GroupVideoGrid(params, componentInfo.element),
+    },
   });
 
   return GroupVideoGrid;
