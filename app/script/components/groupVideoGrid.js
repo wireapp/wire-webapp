@@ -67,44 +67,39 @@ z.components.GroupVideoGrid = (() => {
       // scale the videos when the window is resized
       window.addEventListener('resize', this.scaleVideos);
 
-      this.rootElement = rootElement;
-
       this.minimized = params.minimized;
     }
 
     scaleVideos(rootElement) {
       const elements = Array.from(rootElement.querySelectorAll('.group-video-grid__element'));
-      elements
-        .filter(element => !!element.classList)
-        .filter(element => element.classList.contains('group-video-grid__element'))
-        .forEach(element => {
-          const containerRect = element.getBoundingClientRect();
-          const containerRatio = containerRect.width / containerRect.height;
-          const videoElement = element.querySelector('video');
-          const handleLoadEvent = event => {
-            const video = event.target;
-            setScale(video);
-            video.removeEventListener(event.type, handleLoadEvent);
-          };
-          if (videoElement.videoWidth > 0) {
-            setScale(videoElement);
-          } else {
-            videoElement.addEventListener('loadedmetadata', handleLoadEvent);
-          }
+      elements.forEach(element => {
+        const containerRect = element.getBoundingClientRect();
+        const containerRatio = containerRect.width / containerRect.height;
+        const videoElement = element.querySelector('video');
+        const handleLoadEvent = event => {
+          const video = event.target;
+          setScale(video);
+          video.removeEventListener(event.type, handleLoadEvent);
+        };
+        if (videoElement.videoWidth > 0) {
+          setScale(videoElement);
+        } else {
+          videoElement.addEventListener('loadedmetadata', handleLoadEvent);
+        }
 
-          function setScale(video) {
-            const fullHeightClass = 'group-video-grid__element-video--fill-height';
-            const fullWidthClass = 'group-video-grid__element-video--fill-width';
-            const videoRatio = video.videoWidth / video.videoHeight;
-            video.classList.remove(fullHeightClass);
-            video.classList.remove(fullWidthClass);
-            if (videoRatio < containerRatio) {
-              video.classList.add(fullWidthClass);
-            } else {
-              video.classList.add(fullHeightClass);
-            }
+        function setScale(video) {
+          const fullHeightClass = 'group-video-grid__element-video--fill-height';
+          const fullWidthClass = 'group-video-grid__element-video--fill-width';
+          const videoRatio = video.videoWidth / video.videoHeight;
+          video.classList.remove(fullHeightClass);
+          video.classList.remove(fullWidthClass);
+          if (videoRatio < containerRatio) {
+            video.classList.add(fullWidthClass);
+          } else {
+            video.classList.add(fullHeightClass);
           }
-        });
+        }
+      });
     }
 
     dispose() {
