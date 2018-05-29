@@ -30,16 +30,12 @@ const WIRE_ACCOUNT = onEnvironment(
   'https://wire-account-staging.zinfra.io/',
   'https://account.wire.com/'
 );
-const WIRE_PWA = onEnvironment(
-  'https://wire-pwa-staging.zinfra.io/',
-  'https://wire-pwa-staging.zinfra.io/',
-  '/'
-);
+const WIRE_PWA = onEnvironment('https://wire-pwa-staging.zinfra.io/', 'https://wire-pwa-staging.zinfra.io/', '/');
 
 export default {
   PHONE_LOGIN: `${WEBAPP_ENV}login`,
-  WEBAPP: WEBAPP_ENV,
   PWA: WIRE_PWA,
+  WEBAPP: WEBAPP_ENV,
   WIRE_ACCOUNT,
   WIRE_ACCOUNT_PASSWORD_RESET: `${WIRE_ACCOUNT}forgot/`,
   WIRE_PRIVACY_POLICY: `${WIRE_WEBSITE}legal/#privacy`,
