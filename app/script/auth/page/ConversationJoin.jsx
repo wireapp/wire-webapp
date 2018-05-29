@@ -124,7 +124,6 @@ class ConversationJoin extends Component {
   routeToApp = () => {
     const mobileOsOrSafari = isMobileOs() || isSafari();
     const isPwaSupportedBrowser = Environment.onEnvironment({
-      onLocal: mobileOsOrSafari,
       onProduction: false,
       onStaging: mobileOsOrSafari,
     });

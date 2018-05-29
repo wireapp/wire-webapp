@@ -25,7 +25,6 @@ export function checkSupportedBrowser() {
   return function(dispatch) {
     const mobileOsOrSafari = isMobileOs() || isSafari();
     const isPwaSupportedBrowser = Environment.onEnvironment({
-      onLocal: mobileOsOrSafari,
       onProduction: false,
       onStaging: mobileOsOrSafari,
     });

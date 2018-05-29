@@ -22,7 +22,6 @@ import APIClient from '@wireapp/api-client';
 import StoreEngine from '@wireapp/store-engine';
 
 const BACKEND = Environment.onEnvironment({
-  onLocal: APIClient.BACKEND.STAGING,
   onProduction: APIClient.BACKEND.PRODUCTION,
   onStaging: APIClient.BACKEND.STAGING,
 });

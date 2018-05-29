@@ -57,7 +57,9 @@ export function isEnvironment(environment) {
 export function onEnvironment(environmentConditions) {
   switch (getEnvironment()) {
     case LOCAL: {
-      return environmentConditions.onLocal;
+      return environmentConditions.onLocal === undefined
+        ? environmentConditions.onStaging
+        : environmentConditions.onLocal;
     }
     case STAGING: {
       return environmentConditions.onStaging;

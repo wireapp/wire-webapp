@@ -25,17 +25,14 @@ const WEBAPP_ENV = onEnvironment({
   onStaging: '/',
 });
 const WIRE_WEBSITE = onEnvironment({
-  onLocal: 'https://wire-website-staging.zinfra.io/',
   onProduction: 'https://wire.com/',
   onStaging: 'https://wire-website-staging.zinfra.io/',
 });
 const WIRE_ACCOUNT = onEnvironment({
-  onLocal: 'https://wire-account-staging.zinfra.io/',
   onProduction: 'https://account.wire.com/',
   onStaging: 'https://wire-account-staging.zinfra.io/',
 });
 const WIRE_PWA = onEnvironment({
-  onLocal: 'https://wire-pwa-staging.zinfra.io/',
   onProduction: '/',
   onStaging: 'https://wire-pwa-staging.zinfra.io/',
 });
