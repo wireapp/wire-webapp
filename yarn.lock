@@ -115,9 +115,9 @@
   version "3.1.9"
   resolved "https://codeload.github.com/brix/crypto-js/tar.gz/0596faee7aa619f6f25e43e770e545ae7233b095"
 
-"@bower_components/dexie@dfahlander/Dexie.js#2.0.3":
-  version "2.0.3"
-  resolved "https://codeload.github.com/dfahlander/Dexie.js/tar.gz/745f9069faf712bc845d89eabc16f7ffcbf672d6"
+"@bower_components/dexie@dfahlander/Dexie.js#2.0.4":
+  version "2.0.4"
+  resolved "https://codeload.github.com/dfahlander/Dexie.js/tar.gz/70b22f3b85368762129639928075ea0c4865a199"
 
 "@bower_components/generic-message-proto@wireapp/generic-message-proto#1.20.0":
   version "1.20.0"
