@@ -38,11 +38,7 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
     this.selfStreamState = this.calling_repository.selfStreamState;
 
     this.videoStreamsInfo = this.mediaRepository.stream_handler.remoteMediaStreamInfoIndex.video;
-    this.localVideoStream = ko.pureComputed(() => {
-      return this.selfStreamState.videoSend() || this.selfStreamState.screenSend()
-        ? this.mediaRepository.stream_handler.localMediaStream()
-        : null;
-    });
+    this.localVideoStream = this.mediaRepository.stream_handler.localMediaStream;
     this.calls = this.calling_repository.calls;
 
     this.onLeaveCall = () => {
@@ -193,7 +189,7 @@ ko.components.register('conversation-list-calling-cell', {
 
     <!-- ko if: showVideoPreview -->
       <div class="group-video__minimized-wrapper" data-bind="click: onMaximizeVideoGrid">
-        <group-video-grid params="streamsInfo: videoStreamsInfo, selfStream: localVideoStream, calls: calls, minimized: true, screenSend: selfStreamState.screenSend()"></group-video-grid>
+        <group-video-grid params="streamsInfo: videoStreamsInfo, selfStreamInfo: {state: selfStreamState, stream: localVideoStream}, calls: calls, minimized: true"></group-video-grid>
         <!-- ko if: showMaximize -->
           <div class="group-video__minimized-wrapper__overlay" data-uie-name="do-maximize-call">
             <fullscreen-icon></fullscreen-icon>

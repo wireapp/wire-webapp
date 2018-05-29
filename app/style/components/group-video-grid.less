@@ -121,6 +121,22 @@
         }
       }
     }
+
+    &__mute-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      display: flex;
+      width: 100%;
+      height: 100%;
+      align-items: center;
+      justify-content: center;
+      background-color: fade(@graphite-dark, 40%);
+
+      svg path {
+        fill: #fff;
+      }
+    }
   }
 
   &__thumbnail {
@@ -128,16 +144,20 @@
     top: 32px;
     right: 32px;
     width: 160px;
-    border-radius: 4px;
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.16);
+    line-height: 0;
 
     &--minimized {
       top: unset;
       right: 8px;
       bottom: 8px;
       width: 80px;
-      border-radius: 4px;
       box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.16);
+    }
+
+    &-video {
+      width: 100%;
+      border-radius: 4px;
     }
   }
 }
