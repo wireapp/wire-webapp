@@ -56,7 +56,9 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
     this.selfStreamState = this.mediaRepository.stream_handler.selfStreamState;
 
     this.localVideoStream = ko.pureComputed(() => {
-      return this.selfStreamState.videoSend() ? this.mediaRepository.stream_handler.localMediaStream() : null;
+      return this.selfStreamState.videoSend() || this.selfStreamState.screenSend()
+        ? this.mediaRepository.stream_handler.localMediaStream()
+        : null;
     });
     this.remoteVideoStreamsInfo = this.mediaRepository.stream_handler.remoteMediaStreamInfoIndex.video;
 
@@ -121,7 +123,8 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
     });
     this.showRemoteVideo = ko.pureComputed(() => {
       if (this.isCallOngoing()) {
-        const remoteVideoState = this.joinedCall().isRemoteScreenSend() || this.joinedCall().isRemoteVideoSend();
+        const remoteVideoState =
+          this.joinedCall() && (this.joinedCall().isRemoteScreenSend() || this.joinedCall().isRemoteVideoSend());
         return remoteVideoState && this.remoteVideoStreamsInfo().length;
       }
     });
