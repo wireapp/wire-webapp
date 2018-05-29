@@ -271,7 +271,7 @@ z.string.modalImproveWireHeadline = 'Help us make Wire better';
 z.string.modalImproveWireMessage = 'Sending anonymous usage and crash reports helps us to improve our products and services. We do not use this information for anything else.';
 
 z.string.modalServiceUnavailableHeadline = 'Adding service not possible';
-z.string.modalServiceUnavailableMessage = 'The service is unavailable a the moment.';
+z.string.modalServiceUnavailableMessage = 'The service is unavailable at the moment.';
 
 z.string.modalSessionResetHeadline = 'The session has been reset';
 z.string.modalSessionResetMessage1 = 'If the problem is not resolved,';
