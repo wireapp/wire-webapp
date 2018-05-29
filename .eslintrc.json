@@ -45,7 +45,7 @@
     "z": true,
     "zeta": true
   },
-  "plugins": ["jsdoc", "no-unsanitized", "prettier", "react"],
+  "plugins": ["jsdoc", "prettier", "react"],
   "parser": "babel-eslint",
   "parserOptions": {
     "ecmaVersion": 6,
