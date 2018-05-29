@@ -34,6 +34,8 @@ import {
 import {conversationJoinStrings} from '../../strings';
 import {connect} from 'react-redux';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
+import {isMobileOs, isSafari} from '../Runtime';
+import * as Environment from '../Environment';
 import * as ConversationAction from '../module/action/ConversationAction';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import * as SelfSelector from '../module/selector/SelfSelector';
@@ -55,6 +57,7 @@ import WirelessUnsupportedBrowser from '../component/WirelessUnsupportedBrowser'
 import WirelessContainer from '../component/WirelessContainer';
 import * as TrackingAction from '../module/action/TrackingAction';
 import * as AccentColor from '../util/AccentColor';
+import EXTERNAL_ROUTE from '../externalRoute';
 
 class ConversationJoin extends Component {
   state = {
@@ -115,8 +118,18 @@ class ConversationJoin extends Component {
     this.props
       .doJoinConversationByCode(this.state.conversationKey, this.state.conversationCode)
       .then(() => this.trackAddParticipant())
-      .then(() => window.location.replace(getAppPath()));
+      .then(() => this.routeToApp());
   };
+
+  routeToApp = () => {
+    const isPwaSupportedBrowser = Environment.onEnvironment(isMobileOs() || isSafari(), isMobileOs() || isSafari(), false);
+
+    if (isPwaSupportedBrowser) {
+      window.location.replace(EXTERNAL_ROUTE.PWA);
+    } else {
+      window.location.replace(getAppPath());
+    }
+  }
 
   handleSubmit = event => {
     event.preventDefault();
@@ -140,7 +153,7 @@ class ConversationJoin extends Component {
         .then(() => this.props.doJoinConversationByCode(this.state.conversationKey, this.state.conversationCode))
         .then(conversationEvent => this.props.setLastEventDate(new Date(conversationEvent.time)))
         .then(() => this.trackAddParticipant())
-        .then(() => window.location.replace(getAppPath()))
+        .then(() => this.routeToApp())
         .catch(error => this.props.doLogout());
     }
     this.nameInput.focus();
