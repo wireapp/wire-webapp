@@ -61,7 +61,7 @@ z.components.GroupVideoGrid = (() => {
       this.scaleVideos = this.scaleVideos.bind(this, rootElement);
       // scale videos when the grid is updated (on the next rendering cycle)
       this.grid.subscribe(() => {
-        window.requestAnimationFrame(this.scaleVideos);
+        z.util.afterRender(this.scaleVideos);
       });
 
       // scale the videos when the window is resized
@@ -142,7 +142,7 @@ z.components.GroupVideoGrid = (() => {
       }
 
       const newStreamsList = currentStreams
-        // add the new streams at the and
+        // add the new streams at the end
         .concat(addedStreams);
 
       return [newStreamsList[0] || 0, newStreamsList[3] || 0, newStreamsList[1] || 0, newStreamsList[2] || 0];
