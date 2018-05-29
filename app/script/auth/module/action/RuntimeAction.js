@@ -23,7 +23,11 @@ import {isFirefox, isSupportedBrowser, isMobileOs, isSafari} from '../../Runtime
 
 export function checkSupportedBrowser() {
   return function(dispatch) {
-    const isPwaSupportedBrowser = Environment.onEnvironment(isMobileOs() || isSafari, isMobileOs() || isSafari, false);
+    const isPwaSupportedBrowser = Environment.onEnvironment(
+      isMobileOs() || isSafari(),
+      isMobileOs() || isSafari(),
+      false
+    );
     if (isSupportedBrowser() || isPwaSupportedBrowser) {
       dispatch(RuntimeActionCreator.confirmSupportedBrowser());
     }
