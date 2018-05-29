@@ -19,18 +19,23 @@
 
 import {onEnvironment} from './Environment';
 
-const WEBAPP_ENV = onEnvironment('/app', '/', '/');
-const WIRE_WEBSITE = onEnvironment(
-  'https://wire-website-staging.zinfra.io/',
-  'https://wire-website-staging.zinfra.io/',
-  'https://wire.com/'
-);
-const WIRE_ACCOUNT = onEnvironment(
-  'https://wire-account-staging.zinfra.io/',
-  'https://wire-account-staging.zinfra.io/',
-  'https://account.wire.com/'
-);
-const WIRE_PWA = onEnvironment('https://wire-pwa-staging.zinfra.io/', 'https://wire-pwa-staging.zinfra.io/', '/');
+const WEBAPP_ENV = onEnvironment({
+  onLocal: '/app',
+  onProduction: '/',
+  onStaging: '/',
+});
+const WIRE_WEBSITE = onEnvironment({
+  onProduction: 'https://wire.com/',
+  onStaging: 'https://wire-website-staging.zinfra.io/',
+});
+const WIRE_ACCOUNT = onEnvironment({
+  onProduction: 'https://account.wire.com/',
+  onStaging: 'https://wire-account-staging.zinfra.io/',
+});
+const WIRE_PWA = onEnvironment({
+  onProduction: '/',
+  onStaging: 'https://wire-pwa-staging.zinfra.io/',
+});
 
 export default {
   PHONE_LOGIN: `${WEBAPP_ENV}login`,
