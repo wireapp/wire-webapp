@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="1.1.28"></a>
+## [1.1.28](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@1.1.27...@wireapp/react-ui-kit@1.1.28) (2018-05-29)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** InputSubmitCombo padding/margin ([#634](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/634)) ([a401b74](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/a401b74))
+
+
+
+
 <a name="1.1.27"></a>
 ## [1.1.27](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@1.1.26...@wireapp/react-ui-kit@1.1.27) (2018-05-28)
 
