@@ -36,12 +36,14 @@ const ArrayUtil = {
   },
 
   concatenate_array_buffers(buffers: Array<Uint8Array>): Uint8Array {
-    return buffers.reduce((accumulator: Uint8Array, bytes: Uint8Array): Uint8Array => {
-      const buffer = new Uint8Array(accumulator.byteLength + bytes.byteLength);
-      buffer.set(accumulator, 0);
-      buffer.set(bytes, accumulator.byteLength);
-      return buffer;
-    });
+    return buffers.reduce(
+      (accumulator: Uint8Array, bytes: Uint8Array): Uint8Array => {
+        const buffer = new Uint8Array(accumulator.byteLength + bytes.byteLength);
+        buffer.set(accumulator, 0);
+        buffer.set(bytes, accumulator.byteLength);
+        return buffer;
+      }
+    );
   },
 };
 
