@@ -5,7 +5,7 @@
     "jasmine": true,
     "node": true
   },
-  "extends": ["plugin:no-unsanitized/DOM", "plugin:react/recommended", "prettier"],
+  "extends": ["plugin:react/recommended", "prettier"],
   "globals": {
     "$": true,
     "_": true,
