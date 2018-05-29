@@ -75,20 +75,20 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
 
     this.joinedCall = this.calling_repository.joinedCall;
 
-    this.showScreensharingButton = ko.pureComputed(() => {
-      return this.callIsConnected() && z.calling.CallingRepository.supportsScreenSharing;
-    });
-
     this.isVideoCall = ko.pureComputed(() => {
       return this.call().isRemoteVideoSend() || this.selfStreamState.videoSend();
     });
 
+    this.showVideoButton = ko.pureComputed(() => this.isVideoCall() || this.callIsConnected());
+
     this.disableVideoButton = ko.pureComputed(() => {
-      return this.callIsOutgoing() && this.selfStreamState.videoSend() && !this.callIsConnected();
+      const isRinging = this.callIsOutgoing() && this.selfStreamState.videoSend() && !this.callIsConnected();
+      return isRinging || !this.conversation.supportsVideoCall();
     });
 
     this.disableToggleScreen = ko.pureComputed(() => {
-      return this.joinedCall() ? this.joinedCall().isRemoteScreenSend() : true;
+      const isScreenSend = this.joinedCall() ? this.joinedCall().isRemoteScreenSend() : true;
+      return !z.calling.CallingRepository.supportsScreenSharing || isScreenSend;
     });
 
     this.callIsOutgoing = ko.pureComputed(() => this.call().state() === z.calling.enum.CALL_STATE.OUTGOING);
@@ -201,12 +201,12 @@ ko.components.register('conversation-list-calling-cell', {
         <div class="call-ui__button" data-bind="click: onToggleAudio, css: {'call-ui__button--active': !selfStreamState.audioSend()}, attr: {'data-uie-value': selfStreamState.audioSend() ? 'inactive' : 'active'}" data-uie-name="do-toggle-mute">
           <micoff-icon class="small-icon"></micoff-icon>
         </div>
-        <!-- ko if: isVideoCall -->
+        <!-- ko if: showVideoButton() -->
           <div class="call-ui__button" data-bind="click: onToggleVideo, css: {'call-ui__button--active': selfStreamState.videoSend(), 'call-ui__button--disabled': disableVideoButton()}, attr: {'data-uie-value': selfStreamState.videoSend() ? 'active' : 'inactive'}" data-uie-name="do-toggle-video">
             <camera-icon class="small-icon"></camera-icon>
           </div>
         <!-- /ko -->
-        <!-- ko if: showScreensharingButton -->
+        <!-- ko if: callIsConnected() -->
         <div data-uie-name="do-toggle-screenshare" class="call-ui__button"
           data-bind="click: onToggleScreen, css: {'call-ui__button--disabled': disableToggleScreen(), 'call-ui__button--active': selfStreamState.screenSend()}">
           <screenshare-icon class="small-icon"></screenshare-icon>

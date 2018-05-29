@@ -93,10 +93,10 @@ z.components.GroupVideoGrid = (() => {
           const videoRatio = video.videoWidth / video.videoHeight;
           video.classList.remove(fullHeightClass);
           video.classList.remove(fullWidthClass);
-          if (videoRatio < containerRatio) {
-            video.classList.add(fullWidthClass);
-          } else {
+          if (videoRatio > containerRatio || video.videoWidth < video.videoHeight) {
             video.classList.add(fullHeightClass);
+          } else {
+            video.classList.add(fullWidthClass);
           }
         }
       });
