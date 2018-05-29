@@ -22,11 +22,11 @@ import mixpanel from 'mixpanel-browser';
 
 const APP_TYPE = 'desktop';
 
-const MIXPANEL_TOKEN = Environment.onEnvironment(
-  '537da3b3bc07df1e420d07e2921a6f6f',
-  '537da3b3bc07df1e420d07e2921a6f6f',
-  'c7dcb15893f14932b1c31b5fb33ff669'
-);
+const MIXPANEL_TOKEN = Environment.onEnvironment({
+  onLocal: '537da3b3bc07df1e420d07e2921a6f6f',
+  onProduction: 'c7dcb15893f14932b1c31b5fb33ff669',
+  onStaging: '537da3b3bc07df1e420d07e2921a6f6f',
+});
 
 const setSuperProperty = (propertyName, value) => mixpanel.register({[propertyName]: value});
 

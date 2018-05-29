@@ -54,19 +54,19 @@ export function isEnvironment(environment) {
   return APP_ENVIRONMENT === environment;
 }
 
-export function onEnvironment(onLocal, onStaging, onProduction) {
+export function onEnvironment(environmentConditions) {
   switch (getEnvironment()) {
     case LOCAL: {
-      return onLocal;
+      return environmentConditions.onLocal;
     }
     case STAGING: {
-      return onStaging;
+      return environmentConditions.onStaging;
     }
     case PRODUCTION: {
-      return onProduction;
+      return environmentConditions.onProduction;
     }
     default: {
-      return onProduction;
+      return environmentConditions.onProduction;
     }
   }
 }

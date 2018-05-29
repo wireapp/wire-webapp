@@ -122,14 +122,15 @@ class ConversationJoin extends Component {
   };
 
   routeToApp = () => {
-    const isPwaSupportedBrowser = Environment.onEnvironment(isMobileOs() || isSafari(), isMobileOs() || isSafari(), false);
-
-    if (isPwaSupportedBrowser) {
-      window.location.replace(EXTERNAL_ROUTE.PWA);
-    } else {
-      window.location.replace(getAppPath());
-    }
-  }
+    const mobileOsOrSafari = isMobileOs() || isSafari();
+    const isPwaSupportedBrowser = Environment.onEnvironment({
+      onLocal: mobileOsOrSafari,
+      onProduction: false,
+      onStaging: mobileOsOrSafari,
+    });
+    const redirectLocation = isPwaSupportedBrowser ? EXTERNAL_ROUTE.PWA : getAppPath();
+    window.location.replace(redirectLocation);
+  };
 
   handleSubmit = event => {
     event.preventDefault();
