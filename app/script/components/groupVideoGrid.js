@@ -39,6 +39,7 @@ z.components.GroupVideoGrid = (() => {
       this.grid = ko.observableArray([0, 0, 0, 0]);
       this.thumbnailStream = ko.observable(null);
       this.ownId = ko.observable(null);
+      this.mirrorSelf = !params.screenSend;
 
       this.streams = ko.pureComputed(() => {
         const remoteStreams = filterUnsentStreams(params.streamsInfo(), params.calls()).map(
@@ -184,7 +185,7 @@ z.components.GroupVideoGrid = (() => {
         [SIZES.HALF_SCREEN]: 'group-video-grid__element--full-height',
         [SIZES.FOURTH_SCREEN]: '',
       };
-      return `group-video-grid__element${index} ${extraClasses[size]} ${isOwnVideo ? 'mirror' : ''}`;
+      return `group-video-grid__element${index} ${extraClasses[size]} ${isOwnVideo && this.mirrorSelf ? 'mirror' : ''}`;
     }
 
     getUIEValueForVideo(index) {
@@ -230,7 +231,7 @@ z.components.GroupVideoGrid = (() => {
           <!-- /ko -->
         </div>
         <!-- ko if: thumbnailStream() -->
-          <video autoplay class="group-video__thumbnail mirror" data-uie-name="self-video-thumbnail" data-bind="css: {'group-video__thumbnail--minimized': minimized}, sourceStream: thumbnailStream(), muteMediaElement: thumbnailStream()">
+          <video autoplay class="group-video__thumbnail" data-uie-name="self-video-thumbnail" data-bind="css: {'group-video__thumbnail--minimized': minimized, 'mirror': mirrorSelf}, sourceStream: thumbnailStream(), muteMediaElement: thumbnailStream()">
           </video>
         <!-- /ko -->
       </div>
