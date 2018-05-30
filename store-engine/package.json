@@ -15,7 +15,7 @@
     "karma-sourcemap-loader": "0.3.7",
     "rimraf": "2.6.2",
     "typescript": "2.8.3",
-    "webpack": "4.10.1",
+    "webpack": "4.10.2",
     "webpack-cli": "2.1.4"
   },
   "description": "Provides a generic storage layer for File, FileSystem, IndexedDB, Memory & LocalStorage.",
