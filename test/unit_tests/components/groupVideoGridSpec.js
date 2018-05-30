@@ -181,15 +181,14 @@ describe('z.component.GroupVideoGrid', () => {
   describe('selfStream observable', () => {
     it('contains the self stream only if video or screen is send', () => {
       const selfStream = {self: true};
-      const streamState = {
-        audioSend: ko.observable(true),
-        screenSend: ko.observable(false),
-        videoSend: ko.observable(true),
-      };
       groupVideoGrid = new z.components.GroupVideoGrid(
         generateParams({
           selfStreamInfo: {
-            state: streamState,
+            state: {
+              audioSend: ko.observable(true),
+              screenSend: ko.observable(false),
+              videoSend: ko.observable(true),
+            },
             stream: ko.observable(selfStream),
           },
         })
@@ -197,10 +196,33 @@ describe('z.component.GroupVideoGrid', () => {
 
       expect(groupVideoGrid.selfStream()).toBe(selfStream);
 
-      streamState.videoSend(false);
+      groupVideoGrid = new z.components.GroupVideoGrid(
+        generateParams({
+          selfStreamInfo: {
+            state: {
+              audioSend: ko.observable(true),
+              screenSend: ko.observable(false),
+              videoSend: ko.observable(false),
+            },
+            stream: ko.observable(selfStream),
+          },
+        })
+      );
+
       expect(groupVideoGrid.selfStream()).toBe(null);
 
-      streamState.screenSend(true);
+      groupVideoGrid = new z.components.GroupVideoGrid(
+        generateParams({
+          selfStreamInfo: {
+            state: {
+              audioSend: ko.observable(true),
+              screenSend: ko.observable(true),
+              videoSend: ko.observable(false),
+            },
+            stream: ko.observable(selfStream),
+          },
+        })
+      );
       expect(groupVideoGrid.selfStream()).toBe(selfStream);
     });
   });
