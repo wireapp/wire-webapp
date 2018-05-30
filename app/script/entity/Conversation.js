@@ -148,6 +148,15 @@ z.entity.Conversation = class Conversation {
       return this.has_local_call() ? z.calling.enum.CALL_STATE_GROUP.CAN_JOIN.includes(this.call().state()) : false;
     });
 
+    this.hasActiveDeclinedCall = ko.pureComputed(() => {
+      const call = this.call();
+      if (!call) {
+        return false;
+      }
+      const callIsOngoing = call.state() === z.calling.enum.CALL_STATE.ONGOING;
+      return (callIsOngoing && !call.selfUserJoined()) || call.isDeclined();
+    });
+
     this.unread_events = ko.pureComputed(() => {
       const unread_event = [];
       const messages = this.messages();
@@ -639,6 +648,16 @@ z.entity.Conversation = class Conversation {
     }
 
     return ['annathebot', 'ottothebot'].includes(this.firstUserEntity() && this.firstUserEntity().username());
+  }
+
+  supportsVideoCall(isOutgoing = false) {
+    if (this.is_one2one()) {
+      return true;
+    }
+
+    const participantCount = this.getNumberOfParticipants(true, false);
+    const passesParticipantLimit = participantCount <= z.calling.CallingRepository.CONFIG.MAX_VIDEO_PARTICIPANTS;
+    return isOutgoing ? passesParticipantLimit && this.self.inTeam() : passesParticipantLimit;
   }
 
   serialize() {

@@ -35,6 +35,8 @@ z.viewModel.list.TemporaryGuestViewModel = class TemporaryGuestViewModel {
     this.conversationRepository = repositories.conversation;
     this.userRepository = repositories.user;
     this.callingRepository = repositories.calling;
+    this.multitasking = mainViewModel.content.multitasking;
+    this.mediaRepository = repositories.media;
 
     this.logger = new z.util.Logger('z.viewModel.list.TemporaryGuestViewModel', z.config.LOGGER.OPTIONS);
 

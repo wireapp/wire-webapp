@@ -88,7 +88,7 @@ z.calling.entities.CallEntity = class CallEntity {
     this.interruptedParticipants = ko.observableArray([]);
 
     // Media
-    this.localMediaStream = mediaStreamHandler.local_media_stream;
+    this.localMediaStream = mediaStreamHandler.localMediaStream;
     this.localMediaType = mediaStreamHandler.local_media_type;
     this.remoteMediaType = ko.observable(z.media.MediaType.NONE);
 
@@ -229,12 +229,9 @@ z.calling.entities.CallEntity = class CallEntity {
       }
 
       this.terminationReason = terminationReason;
+      const eventSource = z.event.EventRepository.SOURCE.WEB_SOCKET;
       callMessageEntity.userId = this.creatingUser.id;
-      this.callingRepository.injectDeactivateEvent(
-        callMessageEntity,
-        z.event.EventRepository.SOURCE.WEB_SOCKET,
-        reason
-      );
+      this.callingRepository.injectDeactivateEvent(callMessageEntity, eventSource, reason);
 
       return this.callingRepository.deleteCall(this.id);
     }
@@ -257,30 +254,40 @@ z.calling.entities.CallEntity = class CallEntity {
 
   /**
    * Join the call.
-   * @returns {undefined} No return value
+   * @param {z.media.MediaType} [mediaType=z.media.MediaType.AUDIO] - Media type of the call
+   * @returns {void} No return value
    */
-  joinCall() {
+  joinCall(mediaType) {
     if (z.calling.enum.CALL_STATE_GROUP.CAN_CONNECT.includes(this.state())) {
       this.state(z.calling.enum.CALL_STATE.CONNECTING);
     }
     this.setSelfState(true);
 
-    if (this.isGroup) {
-      const response = this.state() !== z.calling.enum.CALL_STATE.OUTGOING;
-      const additionalPayload = z.calling.CallMessageBuilder.createPayload(this.id, this.selfUser.id);
-      const propSyncPayload = z.calling.CallMessageBuilder.createPayloadPropSync(
-        this.selfState,
-        z.media.MediaType.AUDIO,
-        false,
-        additionalPayload
-      );
+    return this.isGroup ? this._joinGroupCall(mediaType) : this._join1to1Call();
+  }
 
-      const callMessageEntity = z.calling.CallMessageBuilder.buildGroupStart(response, this.sessionId, propSyncPayload);
-      this.sendCallMessage(callMessageEntity);
-    } else {
-      const [remoteUserId] = this.conversationEntity.participating_user_ids();
-      this.addOrUpdateParticipant(remoteUserId, true);
-    }
+  /**
+   * Join the 1:1 call.
+   * @returns {void} No return value
+   */
+  _join1to1Call() {
+    const [remoteUserId] = this.conversationEntity.participating_user_ids();
+    this.addOrUpdateParticipant(remoteUserId, true);
+  }
+
+  /**
+   * Join group call.
+   * @param {z.media.MediaType} [mediaType=z.media.MediaType.AUDIO] - Media type of the call
+   * @returns {void} No return value
+   */
+  _joinGroupCall(mediaType = z.media.MediaType.AUDIO) {
+    const videoSend = mediaType === z.media.MediaType.AUDIO_VIDEO;
+    const response = this.state() !== z.calling.enum.CALL_STATE.OUTGOING;
+    const additionalPayload = z.calling.CallMessageBuilder.createPayload(this.id, this.selfUser.id);
+    const propSync = z.calling.CallMessageBuilder.createPropSync(this.selfState, videoSend, false, additionalPayload);
+
+    const callMessageEntity = z.calling.CallMessageBuilder.buildGroupStart(response, this.sessionId, propSync);
+    this.sendCallMessage(callMessageEntity);
   }
 
   /**
@@ -334,11 +341,9 @@ z.calling.entities.CallEntity = class CallEntity {
    */
   participantLeft(callMessageEntity, terminationReason) {
     if (!this.participants().length) {
-      if (this.selfClientJoined()) {
-        return this.leaveCall(terminationReason);
-      }
-
-      this.deactivateCall(callMessageEntity, terminationReason);
+      return this.selfClientJoined()
+        ? this.leaveCall(terminationReason)
+        : this.deactivateCall(callMessageEntity, terminationReason);
     }
   }
 
@@ -365,12 +370,7 @@ z.calling.entities.CallEntity = class CallEntity {
    */
   scheduleGroupCheck() {
     this._clearGroupCheckTimeout();
-
-    if (this.isConnected()) {
-      this._setSendGroupCheckTimeout();
-    } else {
-      this._setVerifyGroupCheckTimeout();
-    }
+    return this.isConnected() ? this._setSendGroupCheckTimeout() : this._setVerifyGroupCheckTimeout();
   }
 
   /**
@@ -394,18 +394,13 @@ z.calling.entities.CallEntity = class CallEntity {
    */
   toggleMedia(mediaType) {
     const callEventPromises = this.getFlows().map(({remoteClientId, remoteUserId}) => {
-      const additionalPayload = z.calling.CallMessageBuilder.createPayload(
+      const payload = z.calling.CallMessageBuilder.createPayload(
         this.id,
         this.selfUser.id,
         remoteUserId,
         remoteClientId
       );
-      const propSyncPayload = z.calling.CallMessageBuilder.createPayloadPropSync(
-        this.selfState,
-        mediaType,
-        true,
-        additionalPayload
-      );
+      const propSyncPayload = z.calling.CallMessageBuilder.createPropSync(this.selfState, mediaType, true, payload);
 
       const callMessageEntity = z.calling.CallMessageBuilder.buildPropSync(false, this.sessionId, propSyncPayload);
       return this.sendCallMessage(callMessageEntity);
@@ -515,21 +510,21 @@ z.calling.entities.CallEntity = class CallEntity {
    */
   confirmMessage(incomingCallMessageEntity) {
     const {clientId, type, userId} = incomingCallMessageEntity;
-    const additionalPayload = z.calling.CallMessageBuilder.createPayload(this.id, this.selfUser.id, userId, clientId);
+    const payload = z.calling.CallMessageBuilder.createPayload(this.id, this.selfUser.id, userId, clientId);
 
     let callMessageEntity;
     switch (type) {
       case z.calling.enum.CALL_MESSAGE_TYPE.HANGUP: {
-        callMessageEntity = z.calling.CallMessageBuilder.buildHangup(true, this.sessionId, additionalPayload);
+        callMessageEntity = z.calling.CallMessageBuilder.buildHangup(true, this.sessionId, payload);
         break;
       }
 
       case z.calling.enum.CALL_MESSAGE_TYPE.PROP_SYNC: {
-        const propSyncPayload = z.calling.CallMessageBuilder.createPayloadPropSync(
+        const propSyncPayload = z.calling.CallMessageBuilder.createPropSync(
           this.selfState,
           z.media.MediaType.VIDEO,
           false,
-          additionalPayload
+          payload
         );
 
         callMessageEntity = z.calling.CallMessageBuilder.buildPropSync(true, this.sessionId, propSyncPayload);

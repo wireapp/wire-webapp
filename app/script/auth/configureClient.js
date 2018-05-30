@@ -21,11 +21,10 @@ import * as Environment from './Environment';
 import APIClient from '@wireapp/api-client';
 import StoreEngine from '@wireapp/store-engine';
 
-const BACKEND = Environment.onEnvironment(
-  APIClient.BACKEND.STAGING,
-  APIClient.BACKEND.STAGING,
-  APIClient.BACKEND.PRODUCTION
-);
+const BACKEND = Environment.onEnvironment({
+  onProduction: APIClient.BACKEND.PRODUCTION,
+  onStaging: APIClient.BACKEND.STAGING,
+});
 
 export const configureClient = () => {
   return new APIClient({

@@ -109,6 +109,12 @@ z.string.callJoin = 'Join';
 z.string.callChooseSharedScreen = 'Choose a screen to share';
 z.string.callParticipants = '{{number}} on call';
 
+z.string.videoCallOverlayConversations = 'Conversations';
+z.string.videoCallOverlayMute = 'Mute';
+z.string.videoCallOverlayVideo = 'Video';
+z.string.videoCallOverlayShareScreen = 'Share Screen';
+z.string.videoCallOverlayHangUp = 'Hang Up';
+
 // Modals
 // Modals type defaults
 z.string.modalAcknowledgeAction = 'Ok';
@@ -265,7 +271,7 @@ z.string.modalImproveWireHeadline = 'Help us make Wire better';
 z.string.modalImproveWireMessage = 'Sending anonymous usage and crash reports helps us to improve our products and services. We do not use this information for anything else.';
 
 z.string.modalServiceUnavailableHeadline = 'Adding service not possible';
-z.string.modalServiceUnavailableMessage = 'The service is unavailable a the moment.';
+z.string.modalServiceUnavailableMessage = 'The service is unavailable at the moment.';
 
 z.string.modalSessionResetHeadline = 'The session has been reset';
 z.string.modalSessionResetMessage1 = 'If the problem is not resolved,';
@@ -371,6 +377,7 @@ z.string.groupCreationParticipantsActionSkip = 'Skip';
 z.string.groupCreationParticipantsHeader = 'Add people';
 z.string.groupCreationParticipantsHeaderWithCounter = 'Add people ({{number}})';
 z.string.groupCreationParticipantsPlaceholder = 'Search by name';
+z.string.groupSizeInfo = 'Up to {{count}} people can join a group conversation. Video calls work in groups of 4 or less.';
 
 // Guest room
 z.string.guestRoomConversationName = 'Guest room';

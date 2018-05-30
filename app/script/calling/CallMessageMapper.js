@@ -57,6 +57,7 @@ z.calling.CallMessageMapper = {
         break;
       }
 
+      case z.calling.enum.CALL_MESSAGE_TYPE.GROUP_START:
       case z.calling.enum.CALL_MESSAGE_TYPE.SETUP: {
         const {props: properties, sdp} = callMessage;
 

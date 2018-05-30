@@ -51,10 +51,26 @@ ko.components.register('block-icon', {
   `,
 });
 
+ko.components.register('camera-icon', {
+  template: `
+  <svg width="16" height="12" viewBox="0 0 16 12">
+    <path id="a" d="M2.6 0h4.8c1 0 1.3 0 1.6.3.3.1.6.4.7.7.2.3.3.7.3 1.6v6.8c0 1 0 1.3-.3 1.6-.1.3-.4.6-.7.7-.3.2-.7.3-1.6.3H2.6c-1 0-1.3 0-1.6-.3-.3-.1-.6-.4-.7-.7-.2-.3-.3-.7-.3-1.6V2.6c0-1 0-1.3.3-1.6C.4.7.7.4 1 .3c.3-.2.7-.3 1.6-.3zm8.7 5.3l3-3A1 1 0 0 1 16 3v6a1 1 0 0 1-1.7.7l-3-3a1 1 0 0 1 0-1.4z"></path>
+  </svg>
+  `,
+});
+
 ko.components.register('check-icon', {
   template: `
   <svg width="16" height="12" viewBox="0 0 16 12">
     <path d="M5.7 11.9L16 1.4 14.6 0 5.7 9 1.4 4.8 0 6.2z"></path>
+  </svg>
+  `,
+});
+
+ko.components.register('chevron-icon', {
+  template: `
+  <svg width="7" height="4" viewBox="0 0 7 4">
+    <path d="M3.65 3.65L6.44.85A.5.5 0 0 0 6.09 0H.5a.5.5 0 0 0-.35.85l2.79 2.8c.2.2.51.2.7 0z"></path>
   </svg>
   `,
 });
@@ -107,6 +123,14 @@ ko.components.register('edit-icon', {
   `,
 });
 
+ko.components.register('fullscreen-icon', {
+  template: `
+  <svg width="16" height="16" viewBox="0 0 16 16">
+    <path d="M16 7V0H9v2h3.6L8 6.6 9.4 8 14 3.4V7h2zM0 9v7h7v-2H3.4L8 9.4 6.6 8 2 12.6V9H0z"></path>
+  </svg>
+  `,
+});
+
 ko.components.register('group-icon', {
   template: `
   <svg width="16" height="16" viewBox="0 0 16 16">
@@ -119,6 +143,14 @@ ko.components.register('guest-icon', {
   template: `
   <svg width="14" height="16" viewBox="0 0 14 16">
     <path d="M5 1a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3c0-1.1.9-2 2-2h3zm.5 1a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1h-3zM7 9a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm-2 1a2 2 0 0 0-2 2v1h8v-1a2 2 0 0 0-2-2H5z"></path>
+  </svg>
+  `,
+});
+
+ko.components.register('hangup-icon', {
+  template: `
+  <svg width="20" height="8" viewBox="0 0 20 8">
+    <path d="M.6 2.7C2.2 1.2 6 0 9.7 0c3.8 0 7.6 1.2 9 2.7 1 .9.9 2.9 0 4.6l-.3.3H18A216 216 0 0 0 14 6c-.4-.1-.3-.1-.3-.5V3.4l-1-.2a13 13 0 0 0-6.2 0l-.9.2V6l-.4.2a155.4 155.4 0 0 0-3.8 1.5c-.4.1-.4.1-.6-.3-1-1.7-1-3.7-.2-4.6z"></path>
   </svg>
   `,
 });
@@ -142,7 +174,15 @@ ko.components.register('leave-icon', {
 ko.components.register('message-icon', {
   template: `
   <svg width="16" height="16" viewBox="0 0 16 16">
-    <path d="M9.8 13h.2a6 6 0 0 0 6-6V6a6 6 0 0 0-6-6H6a6 6 0 0 0-6 6v1a6 6 0 0 0 6 6h.2L8 16l1.8-3z"></path>
+    <path d="M3 0h10a3 3 0 0 1 3 3v7a3 3 0 0 1-3 3H6a3 3 0 0 0-1.8.7l-2.6 2.1A1 1 0 0 1 0 15V3a3 3 0 0 1 3-3z"></path>
+  </svg>
+  `,
+});
+
+ko.components.register('micoff-icon', {
+  template: `
+  <svg width="16" height="16" viewBox="0 0 16 16">
+    <path d="M3.2 14.5a8 8 0 0 0 10.7-1.1L12.4 12A6 6 0 0 1 5 13.2l-1.8 1.3zm8.7-6a4 4 0 0 1-5 3.4l5-3.4zm0-4.5a4 4 0 0 0-4-4 4 4 0 0 0-4 4v4c0 .5 0 1 .2 1.4L.8 11.7l-.8.5L1.1 14l.9-.6 13-9 .8-.5L14.6 2l-.8.6-2 1.3z"></path>
   </svg>
   `,
 });
@@ -171,6 +211,14 @@ ko.components.register('people-icon', {
   `,
 });
 
+ko.components.register('pickup-icon', {
+  template: `
+  <svg width="16" height="16" viewBox="0 0 16 16">
+    <path d="M12.7 16c-2 0-5.6-1.8-8.2-4.5C1.8 9 0 5.3 0 3.3 0 2 1.4.6 3.4.1l.3-.1.3.3a216 216 0 0 0 1.7 3.8c.1.4.1.4-.1.6l-1 1-.5.6.4.7A13 13 0 0 0 9 11.5l.7.4 1.6-1.5.1-.1.1-.1.4.1a155.4 155.4 0 0 0 3.8 1.7c.4.2.3.2.2.6-.5 2-1.9 3.4-3.2 3.4z"></path>
+  </svg>
+  `,
+});
+
 ko.components.register('plus-icon', {
   template: `
   <svg width="16" height="16" viewBox="0 0 16 16">
@@ -183,6 +231,14 @@ ko.components.register('profile-icon', {
   template: `
   <svg width="16" height="16" viewBox="0 0 16 16">
     <path d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16zM2 8c0 1.5.56 2.88 1.47 3.94l.08-.46c.15-.82.93-1.48 1.76-1.48h5.38c.83 0 1.61.67 1.76 1.48l.08.46A6 6 0 1 0 2 8zm6 1a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"></path>
+  </svg>
+  `,
+});
+
+ko.components.register('screenshare-icon', {
+  template: `
+  <svg width="16" height="16" viewBox="0 0 16 16">
+    <path d="M5 14h6v2H5v-2zM0 1c0-.6.4-1 1-1h14c.6 0 1 .4 1 1v11c0 .6-.4 1-1 1H1a1 1 0 0 1-1-1V1zm7 10h2V7h4L8 3 3 7h4v4z"></path>
   </svg>
   `,
 });

@@ -136,7 +136,7 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
 
     this.current_device_id.audio_input.subscribe(media_device_id => {
       z.util.StorageUtil.setValue(z.media.MediaDeviceType.AUDIO_INPUT, media_device_id);
-      if (media_device_id && this.media_repository.stream_handler.local_media_stream()) {
+      if (media_device_id && this.media_repository.stream_handler.localMediaStream()) {
         this.media_repository.stream_handler.replace_input_source(z.media.MediaType.AUDIO);
         this._update_current_index_from_id(z.media.MediaDeviceType.AUDIO_INPUT, media_device_id);
       }
@@ -153,7 +153,7 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
     this.current_device_id.screen_input.subscribe(media_device_id => {
       if (
         media_device_id &&
-        this.media_repository.stream_handler.local_media_stream() &&
+        this.media_repository.stream_handler.localMediaStream() &&
         this.media_repository.stream_handler.local_media_type() === z.media.MediaType.SCREEN
       ) {
         this.media_repository.stream_handler.replace_input_source(z.media.MediaType.SCREEN);
@@ -165,7 +165,7 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
       z.util.StorageUtil.setValue(z.media.MediaDeviceType.VIDEO_INPUT, media_device_id);
       if (
         media_device_id &&
-        this.media_repository.stream_handler.local_media_stream() &&
+        this.media_repository.stream_handler.localMediaStream() &&
         this.media_repository.stream_handler.local_media_type() === z.media.MediaType.VIDEO
       ) {
         this.media_repository.stream_handler.replace_input_source(z.media.MediaType.VIDEO);

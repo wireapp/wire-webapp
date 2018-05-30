@@ -34,6 +34,8 @@ import {
 import {conversationJoinStrings} from '../../strings';
 import {connect} from 'react-redux';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
+import {isMobileOs, isSafari} from '../Runtime';
+import * as Environment from '../Environment';
 import * as ConversationAction from '../module/action/ConversationAction';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import * as SelfSelector from '../module/selector/SelfSelector';
@@ -46,16 +48,16 @@ import {Redirect} from 'react-router';
 import {Link as RRLink} from 'react-router-dom';
 import {ROUTE, QUERY_KEY} from '../route';
 import {injectIntl, FormattedHTMLMessage} from 'react-intl';
-import EXTERNAL_ROUTE from '../externalRoute';
 import {withRouter} from 'react-router';
 import React, {Component} from 'react';
-import {getURLParameter, pathWithParams} from '../util/urlUtil';
+import {getURLParameter, getAppPath} from '../util/urlUtil';
 import BackendError from '../module/action/BackendError';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
 import WirelessUnsupportedBrowser from '../component/WirelessUnsupportedBrowser';
 import WirelessContainer from '../component/WirelessContainer';
 import * as TrackingAction from '../module/action/TrackingAction';
 import * as AccentColor from '../util/AccentColor';
+import EXTERNAL_ROUTE from '../externalRoute';
 
 class ConversationJoin extends Component {
   state = {
@@ -116,7 +118,17 @@ class ConversationJoin extends Component {
     this.props
       .doJoinConversationByCode(this.state.conversationKey, this.state.conversationCode)
       .then(() => this.trackAddParticipant())
-      .then(() => window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP)));
+      .then(() => this.routeToApp());
+  };
+
+  routeToApp = () => {
+    const mobileOsOrSafari = isMobileOs() || isSafari();
+    const isPwaSupportedBrowser = Environment.onEnvironment({
+      onProduction: false,
+      onStaging: mobileOsOrSafari,
+    });
+    const redirectLocation = isPwaSupportedBrowser ? EXTERNAL_ROUTE.PWA : getAppPath();
+    window.location.replace(redirectLocation);
   };
 
   handleSubmit = event => {
@@ -141,7 +153,7 @@ class ConversationJoin extends Component {
         .then(() => this.props.doJoinConversationByCode(this.state.conversationKey, this.state.conversationCode))
         .then(conversationEvent => this.props.setLastEventDate(new Date(conversationEvent.time)))
         .then(() => this.trackAddParticipant())
-        .then(() => window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP)))
+        .then(() => this.routeToApp())
         .catch(error => this.props.doLogout());
     }
     this.nameInput.focus();

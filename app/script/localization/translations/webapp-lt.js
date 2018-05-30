@@ -98,6 +98,9 @@ z.string.lt.callJoin = 'Prisijungti';
 z.string.lt.callChooseSharedScreen = 'Pasirinkite ekraną, kurį bendrinti';
 z.string.lt.callParticipants = '{{number}} kalba';
 
+z.string.lt.videoCallOverlayMute = 'Nutildyti';
+z.string.lt.videoCallOverlayHangUp = 'Užbaigti';
+
 z.string.lt.modalAcknowledgeAction = 'Gerai';
 z.string.lt.modalAcknowledgeHeadline = 'Kažkas nutiko';
 z.string.lt.modalConfirmSecondary = 'Atsisakyti';
