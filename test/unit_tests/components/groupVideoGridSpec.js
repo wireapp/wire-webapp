@@ -204,24 +204,21 @@ describe('z.component.GroupVideoGrid', () => {
       expect(groupVideoGrid.selfStream()).toBe(selfStream);
     });
   });
-});
 
-function generateParams(overrides = {}) {
-  const defaults = {
-    calls: ko.observableArray([]),
-    selfStreamInfo: {
-      state: {
-        audioSend: ko.observable(true),
-        screenSend: ko.observable(false),
-        videoSend: ko.observable(true),
+  function generateParams(overrides = {}) {
+    const defaults = {
+      calls: ko.observableArray([]),
+      selfStreamInfo: {
+        state: {
+          audioSend: ko.observable(true),
+          screenSend: ko.observable(false),
+          videoSend: ko.observable(true),
+        },
+        stream: ko.observable(null),
       },
-      stream: ko.observable(null),
-    },
-    streamsInfo: ko.observableArray([]),
-  };
+      streamsInfo: ko.observableArray([]),
+    };
 
-  return {
-    ...defaults,
-    ...overrides,
-  };
-}
+    return Object.assign({}, defaults, overrides);
+  }
+});
