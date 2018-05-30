@@ -112,7 +112,9 @@ switch (process.argv[SECOND_ARGUMENT]) {
     process.exit(0);
   }
   default: {
-    process.env.WIRE_WEBAPP_BOT_CONVERSATION_IDS = process.argv[SECOND_ARGUMENT];
+    if (process.argv[SECOND_ARGUMENT]) {
+      process.env.WIRE_WEBAPP_BOT_CONVERSATION_IDS = process.argv[SECOND_ARGUMENT];
+    }
   }
 }
 
