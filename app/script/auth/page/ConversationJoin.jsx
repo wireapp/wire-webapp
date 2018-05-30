@@ -50,7 +50,7 @@ import {ROUTE, QUERY_KEY} from '../route';
 import {injectIntl, FormattedHTMLMessage} from 'react-intl';
 import {withRouter} from 'react-router';
 import React, {Component} from 'react';
-import {getURLParameter, getAppPath} from '../util/urlUtil';
+import {getURLParameter, getAppPath, hasURLParameter} from '../util/urlUtil';
 import BackendError from '../module/action/BackendError';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
 import WirelessUnsupportedBrowser from '../component/WirelessUnsupportedBrowser';
