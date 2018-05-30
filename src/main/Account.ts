@@ -69,7 +69,7 @@ class Account extends EventEmitter {
     this.apiClient = apiClient;
   }
 
-  private async init(): Promise<void> {
+  public async init(): Promise<void> {
     this.logger.info('init');
 
     const root: Root = Root.fromJSON(proto);
