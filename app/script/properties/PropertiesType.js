@@ -27,6 +27,7 @@ z.properties.PROPERTIES_TYPE = {
     GOOGLE: 'contact_import.google',
     MACOS: 'contact_import.macos',
   },
+  DARK_THEME: 'settings.darktheme.enabled',
   EMOJI: {
     REPLACE_INLINE: 'settings.emoji.replace_inline',
   },

@@ -24,6 +24,10 @@
   min-height: @conversation-input-min-height;
   box-sizing: content-box;
   background-color: #fff;
+
+  .dark-theme & {
+    background-color: @title-bar-bg-dark;
+  }
 }
 
 .conversation-input-bar-editing {
@@ -52,6 +56,10 @@
 
     padding-left: 8px;
     color: fade(@graphite, 48%);
+
+    .dark-theme & {
+      color: darken(#fff, 10%);
+    }
   }
 
   &.ephemeral-input::placeholder {

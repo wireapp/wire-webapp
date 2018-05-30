@@ -35,6 +35,10 @@
   justify-content: center;
   border-bottom: 1px solid fade(@graphite, 12%);
   background-color: @app-bg;
+
+  .dark-theme & {
+    background-color: @title-bar-bg-dark;
+  }
 }
 
 .preferences-content-wrapper {
@@ -50,6 +54,10 @@
   padding: 32px 32px 32px 72px;
   color: @graphite-dark;
   overflow-x: hidden;
+
+  .dark-theme & {
+    color: @graphite-light;
+  }
 }
 
 .preferences-button {
@@ -78,10 +86,18 @@
 
 .preferences-hint {
   color: @graphite;
+
+  .dark-theme & {
+    color: @graphite;
+  }
 }
 
 .preferences-label {
   color: @graphite-dark;
+
+  .dark-theme & {
+    color: @graphite-light;
+  }
 }
 
 .preferences-info {

@@ -610,6 +610,7 @@ z.string.preferencesOptionsContactsMacos = 'Import from Contacts';
 z.string.preferencesOptionsContactsDetail = 'We use your contact data to connect you with others. We anonymize all information and do not share it with anyone else.';
 z.string.preferencesOptionsPopular = 'By popular demand';
 z.string.preferencesOptionsEmojiReplaceCheckbox = 'Replace type emoticons with emojis';
+z.string.preferencesOptionsEnableDarkTheme = 'Enable dark theme';
 z.string.preferencesOptionsEmojiReplaceDetail = ':-) → {{icon}}';
 z.string.preferencesOptionsPreviewsSendCheckbox = 'Create previews for links you send';
 z.string.preferencesOptionsPreviewsSendDetail = 'Previews may still be shown for links from other people.';

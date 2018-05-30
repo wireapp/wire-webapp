@@ -51,6 +51,11 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
       this.propertiesRepository.savePreference(z.properties.PROPERTIES_TYPE.EMOJI.REPLACE_INLINE, emojiPreference);
     });
 
+    this.optionEnableDarkTheme = ko.observable();
+    this.optionEnableDarkTheme.subscribe(darkPreference => {
+      this.propertiesRepository.savePreference(z.properties.PROPERTIES_TYPE.DARK_THEME, darkPreference);
+    });
+
     this.optionNotifications = ko.observable();
     this.optionNotifications.subscribe(notificationsPreference => {
       this.propertiesRepository.savePreference(z.properties.PROPERTIES_TYPE.NOTIFICATIONS, notificationsPreference);
@@ -97,6 +102,7 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
   updateProperties(properties) {
     this.optionAudio(properties.settings.sound.alerts);
     this.optionReplaceInlineEmoji(properties.settings.emoji.replace_inline);
+    this.optionEnableDarkTheme(properties.settings.darktheme.enabled);
     this.optionSendPreviews(properties.settings.previews.send);
     this.optionNotifications(properties.settings.notifications);
   }
