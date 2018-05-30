@@ -73,7 +73,12 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
 
     this.users = ko.pureComputed(() => this.conversation.participating_user_ets());
     this.call = ko.pureComputed(() => this.conversation.call());
-    this.callParticipants = ko.pureComputed(() => this.call().participants());
+    this.callParticipants = ko.pureComputed(() =>
+      this.call()
+        .participants()
+        .slice()
+        .reverse()
+    );
 
     this.joinedCall = this.calling_repository.joinedCall;
 
