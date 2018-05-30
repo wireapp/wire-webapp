@@ -80,19 +80,19 @@ z.components.AudioSeekBarComponent = class AudioSeekBarComponent {
 
   _normalize_loudness(loudness, max) {
     const peak = Math.max(...loudness);
-    return peak > max ? loudness.map(level => level * max / peak) : loudness;
+    return peak > max ? loudness.map(level => (level * max) / peak) : loudness;
   }
 
   _on_level_click(event) {
     const mouse_x = event.pageX - $(event.currentTarget).offset().left;
-    const currentTime = this.audio_element.duration * mouse_x / event.currentTarget.clientWidth;
+    const currentTime = (this.audio_element.duration * mouse_x) / event.currentTarget.clientWidth;
     this.audio_element.currentTime = Math.max(0, Math.min(currentTime, this.audio_element.duration));
     this._on_time_update();
   }
 
   _on_time_update() {
     const $levels = this._clear_theme();
-    const index = Math.floor(this.audio_element.currentTime / this.audio_element.duration * $levels.length);
+    const index = Math.floor((this.audio_element.currentTime / this.audio_element.duration) * $levels.length);
     this._add_theme(index);
   }
 
