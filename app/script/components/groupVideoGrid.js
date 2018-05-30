@@ -51,10 +51,8 @@ z.components.GroupVideoGrid = (() => {
         return !this.selfStreamState.screenSend();
       });
       this.streams = ko.pureComputed(() => {
-        const remoteStreams = filterUnsentStreams(params.streamsInfo(), params.calls()).map(
-          mediaStreamInfo => mediaStreamInfo.stream
-        );
-        const selfStream = params.selfStream();
+        const remoteStreams = filterUnsentStreams(params.streamsInfo(), params.calls());
+        const selfStream = this.selfStream();
         this.selfId(selfStream ? selfStream.id : null);
 
         if (remoteStreams.length === 1) {
@@ -202,20 +200,6 @@ z.components.GroupVideoGrid = (() => {
       };
       return extraClasses[size];
     }
-
-    filterUnsentStreams(streamsInfo, calls) {
-      const hasActiveVideo = mediaStreamInfo => {
-        const noVideoParticipantIds = calls
-          .reduce((participants, call) => participants.concat(call.participants()), [])
-          .filter(participant => !participant.state.videoSend())
-          .map(participant => participant.id);
-
-        // filter participant that have their video stream disabled
-        return !noVideoParticipantIds.includes(mediaStreamInfo.flow_id);
-      };
-
-      return streamsInfo.filter(hasActiveVideo).map(mediaStreamInfo => mediaStreamInfo.stream);
-    }
   }
 
   ko.components.register('group-video-grid', {
@@ -251,6 +235,20 @@ z.components.GroupVideoGrid = (() => {
       createViewModel: (params, componentInfo) => new GroupVideoGrid(params, componentInfo.element),
     },
   });
+
+  function filterUnsentStreams(streamsInfo, calls) {
+    const hasActiveVideo = mediaStreamInfo => {
+      const noVideoParticipantIds = calls
+        .reduce((participants, call) => participants.concat(call.participants()), [])
+        .filter(participant => !participant.state.videoSend())
+        .map(participant => participant.id);
+
+      // filter participant that have their video stream disabled
+      return !noVideoParticipantIds.includes(mediaStreamInfo.flow_id);
+    };
+
+    return streamsInfo.filter(hasActiveVideo).map(mediaStreamInfo => mediaStreamInfo.stream);
+  }
 
   return GroupVideoGrid;
 })();
