@@ -44,6 +44,10 @@ z.util.ArrayUtil = {
     return closest;
   },
 
+  getDifference: (array1, array2) => {
+    return array2.filter(element => !array1.includes(element));
+  },
+
   getNextItem: (array, currentItem, filter) => {
     const currentIndex = array.indexOf(currentItem);
 
