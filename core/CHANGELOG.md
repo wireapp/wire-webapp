@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="2.9.2"></a>
+## [2.9.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.9.1...@wireapp/core@2.9.2) (2018-05-30)
+
+
+### Bug Fixes
+
+* **core:** Browser file path ([#637](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/637)) ([d130c75](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/d130c75))
+
+
+
+
 <a name="2.9.1"></a>
 ## [2.9.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.9.0...@wireapp/core@2.9.1) (2018-05-29)
 
