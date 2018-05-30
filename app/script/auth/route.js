@@ -30,6 +30,7 @@ const QUERY_KEY = {
   LANGUAGE: 'hl',
   LOCALE: 'hl',
   LOGOUT_REASON: 'reason',
+  PWA_AWARE: 'pwa_aware',
   TRACKING: 'tracking',
 };
 
