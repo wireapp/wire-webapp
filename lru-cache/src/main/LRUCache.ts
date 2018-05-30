@@ -115,14 +115,15 @@ class LRUCache<T> {
   }
 
   public set(key: string, value: T): T | undefined {
-    const old = this.map[key];
+    const matchedNode = this.map[key];
     let removedNode;
 
-    if (old) {
-      old.value = value;
-      removedNode = this.remove(old);
-      this.setHead(old);
-      return removedNode.value;
+    if (matchedNode) {
+      const removedValue = matchedNode.value;
+      matchedNode.value = value;
+      this.remove(matchedNode);
+      this.setHead(matchedNode);
+      return removedValue;
     } else {
       const created: Node<T> = {
         key,
@@ -131,16 +132,19 @@ class LRUCache<T> {
         value,
       };
 
-      if (Object.keys(this.map).length >= this.capacity) {
+      const isOverCapacity = Object.keys(this.map).length >= this.capacity;
+      if (isOverCapacity) {
         if (this.end) {
           delete this.map[this.end.key];
           removedNode = this.remove(this.end);
         }
       }
 
-      this.setHead(created);
+      if (this.capacity > 0) {
+        this.setHead(created);
+        this.map[key] = created;
+      }
 
-      this.map[key] = created;
       if (removedNode) {
         return removedNode.value;
       }

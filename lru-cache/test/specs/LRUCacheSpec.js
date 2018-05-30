@@ -22,6 +22,13 @@
 describe('LRUCache', () => {
   const LRUCache = require('../../dist/commonjs/LRUCache').default;
 
+  describe('"constructor"', () => {
+    it('sets a default capacity', () => {
+      const cache = new LRUCache();
+      expect(cache.capacity).toBe(100);
+    });
+  });
+
   describe('"delete"', () => {
     it('keeps the list order intact when deleting', () => {
       const cache = new LRUCache(3);
@@ -46,6 +53,11 @@ describe('LRUCache', () => {
       cache.set('5', 'Banana');
       expect(cache.size()).toBe(3);
     });
+
+    it('does not do anything when the key is not found', () => {
+      const cache = new LRUCache(3);
+      expect(cache.delete('invalid-key')).toBe(false);
+    });
   });
 
   describe('"get"', () => {
@@ -53,6 +65,15 @@ describe('LRUCache', () => {
       const cache = new LRUCache(3);
       const value = cache.get('not-existing');
       expect(value).toBe(undefined);
+    });
+  });
+
+  describe('"getAll"', () => {
+    it('gets all nodes', () => {
+      const cache = new LRUCache(4);
+      cache.set('1', 'Apple');
+      cache.set('2', 'Orange');
+      expect(cache.getAll()).toEqual([{'1': 'Apple'}, {'2': 'Orange'}]);
     });
   });
 
@@ -74,6 +95,11 @@ describe('LRUCache', () => {
       cache.set('3', 'Tomato');
       expect(cache.latest()).toBe('Tomato');
     });
+
+    it('does not do anything when the key is not found', () => {
+      const cache = new LRUCache(3);
+      expect(cache.latest()).toBeNull();
+    });
   });
 
   describe('"oldest"', () => {
@@ -83,6 +109,11 @@ describe('LRUCache', () => {
       cache.set('2', 'Orange');
       cache.set('3', 'Tomato');
       expect(cache.oldest()).toBe('Apple');
+    });
+
+    it('does not do anything when the key is not found', () => {
+      const cache = new LRUCache(3);
+      expect(cache.oldest()).toBeNull();
     });
   });
 
@@ -103,17 +134,63 @@ describe('LRUCache', () => {
       cache.set('1', 'Apple');
       cache.set('2', 'Tomato');
       cache.set('3', 'Orange');
-      const removedNode = cache.set('4', 'Plum');
-      expect(removedNode).toBe('Apple');
+      const removedValue = cache.set('4', 'Plum');
+      expect(removedValue).toBe('Apple');
+    });
+
+    it('overrides existing values', () => {
+      const cache = new LRUCache(3);
+      const key = 'lang';
+      cache.set(key, 'Java');
+      const removedValue = cache.set(key, 'JavaScript');
+      expect(removedValue).toBe('Java');
+      expect(cache.size()).toBe(1);
+    });
+
+    it('properly sets head and tail when overriding values', () => {
+      const cache = new LRUCache(5);
+      cache.set('A', 'Apple');
+      cache.set('B', 'Banana');
+      cache.set('C', 'Citron');
+      cache.set('D', 'Durian');
+      cache.set('E', 'Elderberry');
+
+      expect(cache.size()).toBe(5);
+      expect(cache.latest()).toBe('Elderberry');
+
+      const removedValue = cache.set('C', 'Cucumber');
+
+      expect(removedValue).toBe('Citron');
+      expect(cache.size()).toBe(5);
+      expect(cache.latest()).toBe('Cucumber');
+      expect(cache.oldest()).toBe('Apple');
+    });
+
+    it('assigns head and tail properly if there is only one node', () => {
+      const value = 'Apple';
+      const cache = new LRUCache(1);
+      cache.set('A', value);
+      expect(cache.size()).toBe(1);
+      expect(cache.latest()).toBe(value);
+      expect(cache.oldest()).toBe(value);
+    });
+
+    it('handles states where there is no capacity', () => {
+      const cache = new LRUCache(0);
+      cache.set('A', 'Apple');
+      expect(cache.size()).toBe(0);
     });
   });
 
-  describe('"getAll"', () => {
-    it('gets all nodes', () => {
-      const cache = new LRUCache(4);
-      cache.set('1', 'Apple');
-      cache.set('2', 'Orange');
-      expect(cache.getAll()).toEqual([{'1': 'Apple'}, {'2': 'Orange'}]);
+  describe('"toString"', () => {
+    it('returns a printable text', () => {
+      const cache = new LRUCache(3);
+      cache.set('A', 'Apple');
+      cache.set('B', 'Banana');
+      cache.set('C', 'Citron');
+      const text = cache.toString();
+      const expected = '(newest) C:Citron > B:Banana > A:Apple (oldest)';
+      expect(text).toBe(expected);
     });
   });
 });
