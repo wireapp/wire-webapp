@@ -63,7 +63,9 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
     );
 
     this.hasOngoingCall = ko.computed(() => {
-      return this.hasCall() ? this.joinedCall().state() === z.calling.enum.CALL_STATE.ONGOING : false;
+      return this.hasCall() && this.joinedCall()
+        ? this.joinedCall().state() === z.calling.enum.CALL_STATE.ONGOING
+        : false;
     });
 
     this.showCallControls = ko.pureComputed(() => {
