@@ -36,6 +36,7 @@ module.exports = {
   externals: {
     'fs-extra': '{}',
   },
+  mode: 'production',
   module: {
     rules: [
       {
@@ -53,22 +54,32 @@ module.exports = {
     fs: 'empty',
     path: 'empty',
   },
+  optimization: {
+    runtimeChunk: 'single',
+    splitChunks: {
+      cacheGroups: {
+        dexie: {
+          chunks: 'initial',
+          enforce: true,
+          name: 'dexie',
+          priority: 2,
+          test: /dexie/,
+        },
+        vendor: {
+          chunks: 'initial',
+          name: 'vendor',
+          priority: 1,
+          test: /node_modules/,
+        },
+      },
+    },
+  },
   output: {
     filename: 'min/[name].js',
     path: path.resolve(__dirname, dist),
     publicPath: '/',
   },
-  plugins: [
-    new webpack.optimize.CommonsChunkPlugin({
-      minChunks(module) {
-        return module.context && module.context.indexOf('dexie') !== -1;
-      },
-      name: 'dexie',
-    }),
-    new webpack.optimize.CommonsChunkPlugin({
-      name: 'manifest',
-    }),
-  ],
+  plugins: [new webpack.IgnorePlugin(/^.\/locale$/, /moment$/)],
   resolve: {
     extensions: ['.js', '.jsx'],
     modules: [path.resolve(srcScript), 'node_modules'],

@@ -52,6 +52,7 @@ module.exports = Object.assign(commonConfig, {
   entry: Object.assign(commonConfig.entry, {
     script: ['react-hot-loader/patch', path.resolve(__dirname, srcScript, 'main.js')],
   }),
+  mode: 'development',
   output: Object.assign(commonConfig.output, {
     path: path.resolve(__dirname, serve),
   }),
