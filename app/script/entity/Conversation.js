@@ -149,12 +149,12 @@ z.entity.Conversation = class Conversation {
     });
 
     this.hasActiveDeclinedCall = ko.pureComputed(() => {
-      const call = this.call();
-      if (!call) {
-        return false;
+      const callEntity = this.call();
+      if (callEntity) {
+        const callIsOngoing = callEntity.state() === z.calling.enum.CALL_STATE.ONGOING;
+        return (callIsOngoing && !callEntity.selfUserJoined()) || callEntity.isDeclined();
       }
-      const callIsOngoing = call.state() === z.calling.enum.CALL_STATE.ONGOING;
-      return (callIsOngoing && !call.selfUserJoined()) || call.isDeclined();
+      return false;
     });
 
     this.unread_events = ko.pureComputed(() => {

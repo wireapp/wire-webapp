@@ -38,22 +38,20 @@ z.components.GroupVideoGrid = (() => {
     constructor(params, rootElement) {
       this.grid = ko.observableArray([0, 0, 0, 0]);
       this.thumbnailStream = ko.observable(null);
-      this.ownId = ko.observable(null);
+      this.selfId = ko.observable(null);
       this.mirrorSelf = !params.screenSend;
 
       this.streams = ko.pureComputed(() => {
-        const remoteStreams = filterUnsentStreams(params.streamsInfo(), params.calls()).map(
-          mediaStreamInfo => mediaStreamInfo.stream
-        );
-        const ownStream = params.ownStream();
-        this.ownId(ownStream ? ownStream.id : null);
+        const remoteStreams = this.filterUnsentStreams(params.streamsInfo(), params.calls());
+        const selfStream = params.selfStream();
+        this.selfId(selfStream ? selfStream.id : null);
 
         if (remoteStreams.length === 1) {
-          this.thumbnailStream(ownStream);
+          this.thumbnailStream(selfStream);
           return remoteStreams;
         }
         this.thumbnailStream(null);
-        return ownStream ? remoteStreams.concat(ownStream) : remoteStreams;
+        return selfStream ? remoteStreams.concat(selfStream) : remoteStreams;
       });
 
       this.streams.subscribe(this.updateGrid.bind(this));
@@ -61,9 +59,7 @@ z.components.GroupVideoGrid = (() => {
 
       this.scaleVideos = this.scaleVideos.bind(this, rootElement);
       // scale videos when the grid is updated (on the next rendering cycle)
-      this.grid.subscribe(() => {
-        z.util.afterRender(this.scaleVideos);
-      });
+      this.grid.subscribe(() => z.util.afterRender(this.scaleVideos));
 
       // scale the videos when the window is resized
       window.addEventListener('resize', this.scaleVideos);
@@ -73,32 +69,32 @@ z.components.GroupVideoGrid = (() => {
 
     scaleVideos(rootElement) {
       const elements = Array.from(rootElement.querySelectorAll('.group-video-grid__element'));
+      const setScale = (video, containerRatio) => {
+        const fullHeightClass = 'group-video-grid__element-video--fill-height';
+        const fullWidthClass = 'group-video-grid__element-video--fill-width';
+        const videoRatio = video.videoWidth / video.videoHeight;
+        video.classList.remove(fullHeightClass);
+        video.classList.remove(fullWidthClass);
+
+        const isPortrait = videoRatio > containerRatio || video.videoWidth < video.videoHeight;
+        const fillClasses = isPortrait ? fullHeightClass : fullWidthClass;
+        video.classList.add(fillClasses);
+      };
+
       elements.forEach(element => {
         const containerRect = element.getBoundingClientRect();
         const containerRatio = containerRect.width / containerRect.height;
         const videoElement = element.querySelector('video');
         const handleLoadEvent = event => {
           const video = event.target;
-          setScale(video);
+          setScale(video, containerRatio);
           video.removeEventListener(event.type, handleLoadEvent);
         };
+
         if (videoElement.videoWidth > 0) {
-          setScale(videoElement);
+          setScale(videoElement, containerRatio);
         } else {
           videoElement.addEventListener('loadedmetadata', handleLoadEvent);
-        }
-
-        function setScale(video) {
-          const fullHeightClass = 'group-video-grid__element-video--fill-height';
-          const fullWidthClass = 'group-video-grid__element-video--fill-width';
-          const videoRatio = video.videoWidth / video.videoHeight;
-          video.classList.remove(fullHeightClass);
-          video.classList.remove(fullWidthClass);
-          if (videoRatio > containerRatio || video.videoWidth < video.videoHeight) {
-            video.classList.add(fullHeightClass);
-          } else {
-            video.classList.add(fullWidthClass);
-          }
         }
       });
     }
@@ -115,38 +111,31 @@ z.components.GroupVideoGrid = (() => {
      * - 3 streams: [id, 0, id, id]
      * - 3 streams: [id, id, 0, id]
      * - 4 streams: [id, id, id, id]
-     * @param {Array<StreamId|0>} previousGrid - the previous state of the grid
-     * @param {Array<Stream>} streams - the new array of streams to dispatch in the grid
+     * @param {Array<string|0>} previousGrid - the previous state of the grid
+     * @param {Array<MediaStream>} streams - the new array of streams to dispatch in the grid
      *
-     * @returns {Array<StreamId|0>} the new grid
+     * @returns {Array<string|0>} the new grid
      */
     computeGrid(previousGrid, streams) {
-      const streamIds = streams.map(participant => participant.id);
-      const currentStreams = previousGrid.filter(streamId => streamId !== 0);
+      const currentStreamIds = streams.map(participant => participant.id);
+      const previousStreamIds = previousGrid.filter(streamId => streamId !== 0);
 
-      const addedStreams = arrayDiff(currentStreams, streamIds);
-      const deletedStreams = arrayDiff(streamIds, currentStreams);
+      const addedStreamIds = z.util.ArrayUtil.getDifference(previousStreamIds, currentStreamIds);
+      const deletedStreamIds = z.util.ArrayUtil.getDifference(currentStreamIds, previousStreamIds);
 
-      if (deletedStreams.length > 0) {
+      if (deletedStreamIds.length > 0) {
         // if there was some streams that left the call
         // do not reorder the matrix
-        const newGrid = previousGrid.map(id => {
-          return deletedStreams.includes(id) ? 0 : id;
-        });
+        const newGrid = previousGrid.map(id => (deletedStreamIds.includes(id) ? 0 : id));
 
-        const newStreams = newGrid.filter(streamId => streamId !== 0);
-
-        if (newStreams.length === 2) {
-          return [newStreams[0], 0, newStreams[1], 0];
-        }
-        return newGrid;
+        const newStreamIds = newGrid.filter(streamId => streamId !== 0);
+        const hasTwoStreamIds = newStreamIds.length === 2;
+        return hasTwoStreamIds ? [newStreamIds[0], 0, newStreamIds[1], 0] : newGrid;
       }
 
-      const newStreamsList = currentStreams
-        // add the new streams at the end
-        .concat(addedStreams);
-
-      return [newStreamsList[0] || 0, newStreamsList[3] || 0, newStreamsList[1] || 0, newStreamsList[2] || 0];
+      // Add the new streams at the end
+      const newStreamsIds = previousStreamIds.concat(addedStreamIds);
+      return [newStreamsIds[0] || 0, newStreamsIds[3] || 0, newStreamsIds[1] || 0, newStreamsIds[2] || 0];
     }
 
     updateGrid(streams) {
@@ -164,6 +153,7 @@ z.components.GroupVideoGrid = (() => {
       if (grid[index] === 0) {
         return SIZES.EMPTY;
       }
+
       const isAlone = grid.every((value, i) => i === index || value === 0);
       const hasVerticalNeighbor = index % 2 === 0 ? grid[index + 1] !== 0 : grid[index - 1] !== 0;
 
@@ -178,14 +168,16 @@ z.components.GroupVideoGrid = (() => {
     getClassNameForVideo(index) {
       const size = this.getSizeForVideo(index);
       const SIZES = GroupVideoGrid.CONFIG.VIDEO_ELEMENT_SIZE;
-      const isOwnVideo = this.grid()[index] === this.ownId();
       const extraClasses = {
         [SIZES.EMPTY]: 'group-video-grid__element--empty',
         [SIZES.FULL_SCREEN]: 'group-video-grid__element--full-size',
         [SIZES.HALF_SCREEN]: 'group-video-grid__element--full-height',
         [SIZES.FOURTH_SCREEN]: '',
       };
-      return `group-video-grid__element${index} ${extraClasses[size]} ${isOwnVideo && this.mirrorSelf ? 'mirror' : ''}`;
+
+      const isSelfVideo = this.grid()[index] === this.selfId();
+      const mirrorClass = isSelfVideo && this.mirrorSelf ? ' mirror' : '';
+      return `group-video-grid__element${index} ${extraClasses[size]} ${mirrorClass}`;
     }
 
     getUIEValueForVideo(index) {
@@ -199,40 +191,35 @@ z.components.GroupVideoGrid = (() => {
       };
       return extraClasses[size];
     }
-  }
 
-  function arrayDiff(array1, array2) {
-    return array2.filter(element => !array1.includes(element));
-  }
+    filterUnsentStreams(streamsInfo, calls) {
+      const hasActiveVideo = mediaStreamInfo => {
+        const noVideoParticipantIds = calls
+          .reduce((participants, call) => participants.concat(call.participants()), [])
+          .filter(participant => !participant.state.videoSend())
+          .map(participant => participant.id);
 
-  function filterUnsentStreams(streamsInfo, calls) {
-    const hasActiveVideo = mediaStreamInfo => {
-      const noVideoParticipanIds = calls
-        .reduce((participants, call) => participants.concat(call.participants()), [])
-        .filter(participant => !participant.state.videoSend())
-        .map(participant => participant.id);
+        // filter participant that have their video stream disabled
+        return !noVideoParticipantIds.includes(mediaStreamInfo.flow_id);
+      };
 
-      // filter participant that have their video stream disabled
-      return !noVideoParticipanIds.includes(mediaStreamInfo.flow_id);
-    };
-
-    return streamsInfo.filter(hasActiveVideo);
+      return streamsInfo.filter(hasActiveVideo).map(mediaStreamInfo => mediaStreamInfo.stream);
+    }
   }
 
   ko.components.register('group-video-grid', {
     template: `
-      <div class="group-video" data-bind="template: { afterRender: scaleVideos }">
-        <div class="group-video-grid" data-bind="foreach: { data: grid, as: 'streamId' }">
+      <div class="group-video" data-bind="template: {afterRender: scaleVideos}">
+        <div class="group-video-grid" data-bind="foreach: {data: grid, as: 'streamId'}">
           <!-- ko if: streamId !== 0 -->
-            <div class="group-video-grid__element" data-bind="css: $parent.getClassNameForVideo($index()), attr: { 'data-uie-name': 'item-grid', 'data-uie-value': $parent.getUIEValueForVideo($index()) }">
+            <div class="group-video-grid__element" data-bind="css: $parent.getClassNameForVideo($index()), attr: {'data-uie-name': 'item-grid', 'data-uie-value': $parent.getUIEValueForVideo($index())}">
               <video autoplay class="group-video-grid__element-video" data-bind="sourceStream: $parent.getParticipantStream(streamId), muteMediaElement: $parent.getParticipantStream(streamId)">
               </video>
             </div>
           <!-- /ko -->
         </div>
         <!-- ko if: thumbnailStream() -->
-          <video autoplay class="group-video__thumbnail" data-uie-name="self-video-thumbnail" data-bind="css: {'group-video__thumbnail--minimized': minimized, 'mirror': mirrorSelf}, sourceStream: thumbnailStream(), muteMediaElement: thumbnailStream()">
-          </video>
+          <video autoplay class="group-video__thumbnail" data-uie-name="self-video-thumbnail" data-bind="css: {'group-video__thumbnail--minimized': minimized, 'mirror': mirrorSelf}, sourceStream: thumbnailStream(), muteMediaElement: thumbnailStream()"></video>
         <!-- /ko -->
       </div>
     `,

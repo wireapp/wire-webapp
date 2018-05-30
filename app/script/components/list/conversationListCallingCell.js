@@ -141,9 +141,9 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
 
     this.showParticipants = ko.observable(false);
 
-    this.showVideoPreview = ko.pureComputed(
-      () => this.isVideoCall() && (this.multitasking.isMinimized() || !this.callIsConnected())
-    );
+    this.showVideoPreview = ko.pureComputed(() => {
+      return this.isVideoCall() && (this.multitasking.isMinimized() || !this.callIsConnected());
+    });
     this.showMaximize = ko.pureComputed(() => this.multitasking.isMinimized() && this.callIsConnected());
   }
 };
@@ -188,7 +188,7 @@ ko.components.register('conversation-list-calling-cell', {
 
     <!-- ko if: showVideoPreview -->
       <div class="group-video__minimized-wrapper" data-bind="click: onMaximizeVideoGrid">
-        <group-video-grid params="streamsInfo: videoStreamsInfo, ownStream: localVideoStream, calls: calls, minimized: true, screenSend: selfStreamState.screenSend()"></group-video-grid>
+        <group-video-grid params="streamsInfo: videoStreamsInfo, selfStream: localVideoStream, calls: calls, minimized: true, screenSend: selfStreamState.screenSend()"></group-video-grid>
         <!-- ko if: showMaximize -->
           <div class="group-video__minimized-wrapper__overlay" data-uie-name="do-maximize-call">
             <fullscreen-icon></fullscreen-icon>
