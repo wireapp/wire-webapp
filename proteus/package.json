@@ -13,7 +13,7 @@
     "chai": "4.1.2",
     "jasmine": "3.1.0",
     "rimraf": "2.6.2",
-    "typescript": "2.8.3",
+    "typescript": "2.8.4",
     "webpack": "4.10.2",
     "webpack-cli": "2.1.4"
   },
