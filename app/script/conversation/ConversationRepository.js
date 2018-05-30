@@ -167,7 +167,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
       this.sorted_conversations().forEach(conversationEntity => {
         if (conversationEntity.has_active_call() && !conversationEntity.hasActiveDeclinedCall()) {
-          this.unarchive_conversation(conversationEntity, 'Call on COnversation');
+          this.unarchive_conversation(conversationEntity, 'Call on ctyponversation');
           conversations_calls.push(conversationEntity);
         }
         if (conversationEntity.is_cleared()) {
