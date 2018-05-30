@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="2.9.4"></a>
+## [2.9.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.9.3...@wireapp/core@2.9.4) (2018-05-30)
+
+
+### Bug Fixes
+
+* **core:** Public init function ([#640](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/640)) ([285cd07](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/285cd07))
+
+
+
+
 <a name="2.9.3"></a>
 ## [2.9.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.9.2...@wireapp/core@2.9.3) (2018-05-30)
 
