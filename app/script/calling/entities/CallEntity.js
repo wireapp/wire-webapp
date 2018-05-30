@@ -952,7 +952,7 @@ z.calling.entities.CallEntity = class CallEntity {
     }
 
     const position = -(numberOfParticipants - 1.0) / (numberOfParticipants + 1.0);
-    const delta = -2.0 * position / (numberOfParticipants - 1.0);
+    const delta = (-2.0 * position) / (numberOfParticipants - 1.0);
 
     return position + delta * index;
   }

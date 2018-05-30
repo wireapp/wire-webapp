@@ -110,4 +110,9 @@ class Index extends Component {
   }
 }
 
-export default injectIntl(connect(state => ({language: getLanguage(state)}), {...TrackingAction})(Index));
+export default injectIntl(
+  connect(
+    state => ({language: getLanguage(state)}),
+    {...TrackingAction}
+  )(Index)
+);

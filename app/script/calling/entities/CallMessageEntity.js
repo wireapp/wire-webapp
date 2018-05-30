@@ -126,7 +126,8 @@ z.calling.entities.CallMessageEntity = class CallMessageEntity {
    * @returns {string} Random char session ID of length CallMessageEntity.CONFIG.SESSION_ID_LENGTH
    */
   _createSessionId() {
-    return _.range(CallMessageEntity.CONFIG.SESSION_ID_LENGTH)
+    return _
+      .range(CallMessageEntity.CONFIG.SESSION_ID_LENGTH)
       .map(() => z.util.StringUtil.getRandomChar())
       .join('');
   }

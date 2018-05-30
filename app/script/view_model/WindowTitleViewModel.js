@@ -43,89 +43,87 @@ z.viewModel.WindowTitleViewModel = class WindowTitleViewModel {
     this.logger.info('Starting to update window title');
     this.updateWindowTitle(true);
 
-    ko
-      .computed(() => {
-        if (this.updateWindowTitle()) {
-          let specificTitle = '';
-          let unreadConversations = 0;
-          const connectionRequests = this.userRepository.connect_requests().length;
+    ko.computed(() => {
+      if (this.updateWindowTitle()) {
+        let specificTitle = '';
+        let unreadConversations = 0;
+        const connectionRequests = this.userRepository.connect_requests().length;
 
-          this.conversationRepository.conversations_unarchived().forEach(conversationEntity => {
-            const isIgnored = conversationEntity.is_request() || conversationEntity.is_muted();
-            if (conversationEntity.unread_message_count() && !isIgnored) {
-              unreadConversations++;
-            }
-          });
-
-          this.conversationRepository.conversations_calls().forEach(conversationEntity => {
-            if (conversationEntity.has_joinable_call()) {
-              unreadConversations++;
-            }
-          });
-
-          const unreadCount = connectionRequests + unreadConversations;
-          if (unreadCount > 0) {
-            specificTitle = `(${unreadCount}) · `;
+        this.conversationRepository.conversations_unarchived().forEach(conversationEntity => {
+          const isIgnored = conversationEntity.is_request() || conversationEntity.is_muted();
+          if (conversationEntity.unread_message_count() && !isIgnored) {
+            unreadConversations++;
           }
+        });
 
-          amplify.publish(z.event.WebApp.LIFECYCLE.UNREAD_COUNT, unreadCount);
-
-          switch (this.contentState()) {
-            case z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS: {
-              const multipleRequests = connectionRequests > 1;
-              const stringId = multipleRequests
-                ? z.string.conversationsConnectionRequestMany
-                : z.string.conversationsConnectionRequestOne;
-              specificTitle += z.l10n.text(stringId, connectionRequests);
-              break;
-            }
-
-            case z.viewModel.ContentViewModel.STATE.CONVERSATION: {
-              if (this.conversationRepository.active_conversation()) {
-                specificTitle += this.conversationRepository.active_conversation().display_name();
-              }
-              break;
-            }
-
-            case z.viewModel.ContentViewModel.STATE.PREFERENCES_ABOUT: {
-              specificTitle += z.l10n.text(z.string.preferencesAbout);
-              break;
-            }
-
-            case z.viewModel.ContentViewModel.STATE.PREFERENCES_ACCOUNT: {
-              specificTitle += z.l10n.text(z.string.preferencesAccount);
-              break;
-            }
-
-            case z.viewModel.ContentViewModel.STATE.PREFERENCES_AV: {
-              specificTitle += z.l10n.text(z.string.preferencesAV);
-              break;
-            }
-
-            case z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICE_DETAILS: {
-              specificTitle += z.l10n.text(z.string.preferencesDeviceDetails);
-              break;
-            }
-
-            case z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICES: {
-              specificTitle += z.l10n.text(z.string.preferencesDevices);
-              break;
-            }
-
-            case z.viewModel.ContentViewModel.STATE.PREFERENCES_OPTIONS: {
-              specificTitle += z.l10n.text(z.string.preferencesOptions);
-              break;
-            }
-
-            default:
-              break;
+        this.conversationRepository.conversations_calls().forEach(conversationEntity => {
+          if (conversationEntity.has_joinable_call()) {
+            unreadConversations++;
           }
+        });
 
-          const isTitleSet = specificTitle !== '' && !specificTitle.endsWith(' ');
-          window.document.title = `${specificTitle}${isTitleSet ? ' · ' : ''}${z.l10n.text(z.string.wire)}`;
+        const unreadCount = connectionRequests + unreadConversations;
+        if (unreadCount > 0) {
+          specificTitle = `(${unreadCount}) · `;
         }
-      })
-      .extend({rateLimit: 250});
+
+        amplify.publish(z.event.WebApp.LIFECYCLE.UNREAD_COUNT, unreadCount);
+
+        switch (this.contentState()) {
+          case z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS: {
+            const multipleRequests = connectionRequests > 1;
+            const stringId = multipleRequests
+              ? z.string.conversationsConnectionRequestMany
+              : z.string.conversationsConnectionRequestOne;
+            specificTitle += z.l10n.text(stringId, connectionRequests);
+            break;
+          }
+
+          case z.viewModel.ContentViewModel.STATE.CONVERSATION: {
+            if (this.conversationRepository.active_conversation()) {
+              specificTitle += this.conversationRepository.active_conversation().display_name();
+            }
+            break;
+          }
+
+          case z.viewModel.ContentViewModel.STATE.PREFERENCES_ABOUT: {
+            specificTitle += z.l10n.text(z.string.preferencesAbout);
+            break;
+          }
+
+          case z.viewModel.ContentViewModel.STATE.PREFERENCES_ACCOUNT: {
+            specificTitle += z.l10n.text(z.string.preferencesAccount);
+            break;
+          }
+
+          case z.viewModel.ContentViewModel.STATE.PREFERENCES_AV: {
+            specificTitle += z.l10n.text(z.string.preferencesAV);
+            break;
+          }
+
+          case z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICE_DETAILS: {
+            specificTitle += z.l10n.text(z.string.preferencesDeviceDetails);
+            break;
+          }
+
+          case z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICES: {
+            specificTitle += z.l10n.text(z.string.preferencesDevices);
+            break;
+          }
+
+          case z.viewModel.ContentViewModel.STATE.PREFERENCES_OPTIONS: {
+            specificTitle += z.l10n.text(z.string.preferencesOptions);
+            break;
+          }
+
+          default:
+            break;
+        }
+
+        const isTitleSet = specificTitle !== '' && !specificTitle.endsWith(' ');
+        window.document.title = `${specificTitle}${isTitleSet ? ' · ' : ''}${z.l10n.text(z.string.wire)}`;
+      }
+    }).extend({rateLimit: 250});
   }
 
   setUpdateState(handlingNotifications) {

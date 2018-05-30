@@ -119,7 +119,7 @@
     "postcss-cssnext": "3.1.0",
     "postcss-import": "11.1.0",
     "postcss-scss": "1.0.5",
-    "prettier": "1.12.1",
+    "prettier": "1.13.2",
     "raf": "3.4.0",
     "react-addons-test-utils": "15.6.2",
     "react-hot-loader": "4.2.0",
@@ -140,9 +140,19 @@
     "yarn": ">= 1.0.0"
   },
   "lint-staged": {
-    "*.{js,jsx}": ["eslint --fix", "git add"],
-    "*.{json,md}": ["prettier --write", "git add"],
-    "*.less": ["prettier --write", "stylelint --fix", "git add"]
+    "*.{js,jsx}": [
+      "eslint --fix",
+      "git add"
+    ],
+    "*.{json,md}": [
+      "prettier --write",
+      "git add"
+    ],
+    "*.less": [
+      "prettier --write",
+      "stylelint --fix",
+      "git add"
+    ]
   },
   "scripts": {
     "bundle:dev": "webpack --config webpack.config.dev.js --progress",
@@ -191,7 +201,13 @@
       "js": "dist/ByteBufferAB.js"
     },
     "@bower_components/cryptojs": {
-      "js": ["core.js", "lib-typedarrays.js", "md5.js", "enc-base64.js", "sha256.js"]
+      "js": [
+        "core.js",
+        "lib-typedarrays.js",
+        "md5.js",
+        "enc-base64.js",
+        "sha256.js"
+      ]
     },
     "@bower_components/dexie": {
       "js": "dist/dexie.js"
@@ -228,7 +244,10 @@
       "js": "dist/long.js"
     },
     "@bower_components/mixpanel": {
-      "js": ["mixpanel-jslib-snippet.js", "mixpanel.min.js"]
+      "js": [
+        "mixpanel-jslib-snippet.js",
+        "mixpanel.min.js"
+      ]
     },
     "@bower_components/moment": {
       "js": [
