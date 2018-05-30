@@ -353,9 +353,13 @@
   version "3.0.32"
   resolved "https://registry.yarnpkg.com/@types/long/-/long-3.0.32.tgz#f4e5af31e9e9b196d8e5fca8a5e2e20aa3d60b69"
 
-"@types/node@*", "@types/node@10.1.2":
+"@types/node@*":
   version "10.1.2"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-10.1.2.tgz#1b928a0baa408fc8ae3ac012cc81375addc147c6"
+
+"@types/node@10.1.4":
+  version "10.1.4"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-10.1.4.tgz#606651d3f8a8bec08b8cb262161aab9209f4a29d"
 
 "@types/node@^6.0.46":
   version "6.0.90"
@@ -377,15 +381,15 @@
   version "2.3.3"
   resolved "https://registry.yarnpkg.com/@types/tough-cookie/-/tough-cookie-2.3.3.tgz#7f226d67d654ec9070e755f46daebf014628e9d9"
 
-"@wireapp/api-client@0.10.6":
-  version "0.10.6"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-0.10.6.tgz#be2b95402ccbbca8ad3305dc45bcba53f14b3790"
+"@wireapp/api-client@0.10.9":
+  version "0.10.9"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-0.10.9.tgz#61a743b80fdfe0cf6639a9c43307b68901cd5e2f"
   dependencies:
-    "@types/node" "10.1.2"
+    "@types/node" "10.1.4"
     "@types/spark-md5" "3.0.0"
     "@types/tough-cookie" "2.3.3"
-    "@wireapp/priority-queue" "0.1.31"
-    "@wireapp/store-engine" "0.11.16"
+    "@wireapp/priority-queue" "0.1.34"
+    "@wireapp/store-engine" "0.11.19"
     axios "0.18.0"
     html5-websocket "2.0.3"
     logdown "3.2.3"
@@ -393,55 +397,55 @@
     spark-md5 "3.0.0"
     tough-cookie "2.3.4"
 
-"@wireapp/cbor@3.0.33":
-  version "3.0.33"
-  resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-3.0.33.tgz#80d82d9c9e0e7e88d6c474c8c935cc05c5eecc3b"
+"@wireapp/cbor@3.0.36":
+  version "3.0.36"
+  resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-3.0.36.tgz#9951b35a6a81e0cbfe8c12800f3fb2173e986151"
 
-"@wireapp/core@2.8.9":
-  version "2.8.9"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-2.8.9.tgz#19ea4cfbd73aa6032ffea83e1db70aa8bb6f424a"
+"@wireapp/core@2.9.2":
+  version "2.9.2"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-2.9.2.tgz#ece4b5ca610679062f0c1883a78d0eb459482050"
   dependencies:
-    "@types/node" "10.1.2"
-    "@wireapp/api-client" "0.10.6"
-    "@wireapp/cryptobox" "8.3.59"
-    "@wireapp/store-engine" "0.11.16"
-    bazinga64 "5.1.12"
+    "@types/node" "10.1.4"
+    "@wireapp/api-client" "0.10.9"
+    "@wireapp/cryptobox" "8.3.62"
+    "@wireapp/store-engine" "0.11.19"
+    bazinga64 "5.1.15"
     logdown "3.2.3"
     protobufjs "6.8.6"
     pure-uuid "1.5.2"
 
-"@wireapp/cryptobox@8.3.59":
-  version "8.3.59"
-  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-8.3.59.tgz#0d4508902d2a7a2b33f02d41690e9aae3fb74ba1"
+"@wireapp/cryptobox@8.3.62":
+  version "8.3.62"
+  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-8.3.62.tgz#08518d7ccb25bd722e9a8eed2501ec0caac84932"
   dependencies:
     "@types/fs-extra" "5.0.2"
-    "@types/node" "10.1.2"
-    "@wireapp/lru-cache" "2.1.12"
-    "@wireapp/priority-queue" "0.1.31"
-    "@wireapp/proteus" "7.1.45"
-    "@wireapp/store-engine" "0.11.16"
-    dexie "2.0.3"
+    "@types/node" "10.1.4"
+    "@wireapp/lru-cache" "2.1.15"
+    "@wireapp/priority-queue" "0.1.34"
+    "@wireapp/proteus" "7.1.48"
+    "@wireapp/store-engine" "0.11.19"
+    dexie "2.0.4"
     fs-extra "6.0.1"
 
-"@wireapp/lru-cache@2.1.12":
-  version "2.1.12"
-  resolved "https://registry.yarnpkg.com/@wireapp/lru-cache/-/lru-cache-2.1.12.tgz#3936e56c57bed13ff268289d2c8de971c0367a8d"
+"@wireapp/lru-cache@2.1.15":
+  version "2.1.15"
+  resolved "https://registry.yarnpkg.com/@wireapp/lru-cache/-/lru-cache-2.1.15.tgz#434e56e6cbb5983acb2b76f6fe47451cc04974b0"
 
-"@wireapp/priority-queue@0.1.31":
-  version "0.1.31"
-  resolved "https://registry.yarnpkg.com/@wireapp/priority-queue/-/priority-queue-0.1.31.tgz#55d48ec7f300d453500fd2acadd9615f0faf3356"
+"@wireapp/priority-queue@0.1.34":
+  version "0.1.34"
+  resolved "https://registry.yarnpkg.com/@wireapp/priority-queue/-/priority-queue-0.1.34.tgz#49c053037165a166795d66263428546d6c2c7df5"
   dependencies:
-    "@types/node" "10.1.2"
+    "@types/node" "10.1.4"
     pure-uuid "1.5.2"
 
-"@wireapp/proteus@7.1.45":
-  version "7.1.45"
-  resolved "https://registry.yarnpkg.com/@wireapp/proteus/-/proteus-7.1.45.tgz#dc51814bc6d671eca4cd30084873d4b6a9bc9224"
+"@wireapp/proteus@7.1.48":
+  version "7.1.48"
+  resolved "https://registry.yarnpkg.com/@wireapp/proteus/-/proteus-7.1.48.tgz#0c2792445c10517139882a8d2c57928df5da438c"
   dependencies:
     "@types/chai" "4.1.3"
     "@types/ed2curve" "0.2.2"
-    "@types/node" "10.1.2"
-    "@wireapp/cbor" "3.0.33"
+    "@types/node" "10.1.4"
+    "@wireapp/cbor" "3.0.36"
     ed2curve "0.2.1"
     libsodium-wrappers-sumo "0.7.3"
 
@@ -457,14 +461,14 @@
     styled-components "3.3.0"
     styled-normalize "4.0.0"
 
-"@wireapp/store-engine@0.11.16":
-  version "0.11.16"
-  resolved "https://registry.yarnpkg.com/@wireapp/store-engine/-/store-engine-0.11.16.tgz#314ee78da1419b5a993373f75e72f04b9029c9b2"
+"@wireapp/store-engine@0.11.19":
+  version "0.11.19"
+  resolved "https://registry.yarnpkg.com/@wireapp/store-engine/-/store-engine-0.11.19.tgz#1716d7f882743adad7a3799d54eaba1f59240806"
   dependencies:
     "@types/filesystem" "0.0.28"
-    "@types/node" "10.1.2"
+    "@types/node" "10.1.4"
     bro-fs "0.4.0"
-    dexie "2.0.3"
+    dexie "2.0.4"
     fs-extra "6.0.1"
 
 JSONStream@^0.8.4:
@@ -1599,10 +1603,6 @@ basic-auth@~2.0.0:
 batch@0.6.1:
   version "0.6.1"
   resolved "https://registry.yarnpkg.com/batch/-/batch-0.6.1.tgz#dc34314f4e679318093fc760272525f94bf25c16"
-
-bazinga64@5.1.12:
-  version "5.1.12"
-  resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.1.12.tgz#c2c2e1d95dfadf21ee357fc8f53c2c5b30a2761d"
 
 bazinga64@5.1.15:
   version "5.1.15"
@@ -3044,9 +3044,9 @@ dexie-batch@ffflorian/dexie-batch#dbf3b4dd9c24066a5ad11d875566ef61ffa53150:
   version "0.3.1"
   resolved "https://codeload.github.com/ffflorian/dexie-batch/tar.gz/dbf3b4dd9c24066a5ad11d875566ef61ffa53150"
 
-dexie@2.0.3:
-  version "2.0.3"
-  resolved "https://registry.yarnpkg.com/dexie/-/dexie-2.0.3.tgz#c32db3e8c7d43ac509379ad126f125c57a0e7c9c"
+dexie@2.0.4:
+  version "2.0.4"
+  resolved "https://registry.yarnpkg.com/dexie/-/dexie-2.0.4.tgz#6027a5e05879424e8f9979d8c14e7420f27e3a11"
 
 di@^0.0.1:
   version "0.0.1"
