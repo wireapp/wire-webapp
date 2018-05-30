@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="0.1.133"></a>
+## [0.1.133](https://github.com/wireapp/wire-web-packages/tree/master/packages/travis-bot/compare/@wireapp/travis-bot@0.1.132...@wireapp/travis-bot@0.1.133) (2018-05-30)
+
+
+### Bug Fixes
+
+* **travis-bot:** Only read conversation ID if it is provided ([#639](https://github.com/wireapp/wire-web-packages/tree/master/packages/travis-bot/issues/639)) ([8b6448f](https://github.com/wireapp/wire-web-packages/tree/master/packages/travis-bot/commit/8b6448f))
+
+
+
+
 <a name="0.1.132"></a>
 ## [0.1.132](https://github.com/wireapp/wire-web-packages/tree/master/packages/travis-bot/compare/@wireapp/travis-bot@0.1.131...@wireapp/travis-bot@0.1.132) (2018-05-30)
 
