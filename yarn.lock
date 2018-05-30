@@ -445,16 +445,16 @@
     ed2curve "0.2.1"
     libsodium-wrappers-sumo "0.7.3"
 
-"@wireapp/react-ui-kit@1.1.26":
-  version "1.1.26"
-  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-1.1.26.tgz#b85320aace9cd4ecbaf41a3a567b5114cb698c5f"
+"@wireapp/react-ui-kit@1.1.29":
+  version "1.1.29"
+  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-1.1.29.tgz#be25fa98fc474faacea29e9a90229ca1783930e2"
   dependencies:
-    bazinga64 "5.1.12"
+    bazinga64 "5.1.15"
     color "3.0.0"
-    react "16.3.2"
-    react-dom "16.3.2"
+    react "16.4.0"
+    react-dom "16.4.0"
     recompose "0.27.1"
-    styled-components "3.2.6"
+    styled-components "3.3.0"
     styled-normalize "4.0.0"
 
 "@wireapp/store-engine@0.11.16":
@@ -1603,6 +1603,10 @@ batch@0.6.1:
 bazinga64@5.1.12:
   version "5.1.12"
   resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.1.12.tgz#c2c2e1d95dfadf21ee357fc8f53c2c5b30a2761d"
+
+bazinga64@5.1.15:
+  version "5.1.15"
+  resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.1.15.tgz#3c11b3b3ab763babd80e58dcc917aa919539a18c"
 
 bcrypt-pbkdf@^1.0.0:
   version "1.0.1"
@@ -8564,15 +8568,6 @@ react-addons-test-utils@15.6.2:
   version "15.6.2"
   resolved "https://registry.yarnpkg.com/react-addons-test-utils/-/react-addons-test-utils-15.6.2.tgz#c12b6efdc2247c10da7b8770d185080a7b047156"
 
-react-dom@16.3.2:
-  version "16.3.2"
-  resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-16.3.2.tgz#cb90f107e09536d683d84ed5d4888e9640e0e4df"
-  dependencies:
-    fbjs "^0.8.16"
-    loose-envify "^1.1.0"
-    object-assign "^4.1.1"
-    prop-types "^15.6.0"
-
 react-dom@16.4.0:
   version "16.4.0"
   resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-16.4.0.tgz#099f067dd5827ce36a29eaf9a6cdc7cbf6216b1e"
@@ -8670,15 +8665,6 @@ react-test-renderer@^16.0.0-0:
   dependencies:
     fbjs "^0.8.16"
     object-assign "^4.1.1"
-
-react@16.3.2:
-  version "16.3.2"
-  resolved "https://registry.yarnpkg.com/react/-/react-16.3.2.tgz#fdc8420398533a1e58872f59091b272ce2f91ea9"
-  dependencies:
-    fbjs "^0.8.16"
-    loose-envify "^1.1.0"
-    object-assign "^4.1.1"
-    prop-types "^15.6.0"
 
 react@16.4.0:
   version "16.4.0"
@@ -10037,9 +10023,9 @@ style-search@^0.1.0:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/style-search/-/style-search-0.1.0.tgz#7958c793e47e32e07d2b5cafe5c0bf8e12e77902"
 
-styled-components@3.2.6:
-  version "3.2.6"
-  resolved "https://registry.yarnpkg.com/styled-components/-/styled-components-3.2.6.tgz#99e6e75a746bdedd295a17e03dd1493055a1cc3b"
+styled-components@3.3.0:
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/styled-components/-/styled-components-3.3.0.tgz#335b1b2b673b416cd5ec012010e237ed1f877fe9"
   dependencies:
     buffer "^5.0.3"
     css-to-react-native "^2.0.3"
