@@ -242,46 +242,23 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
    * @returns {Promise} Resolves with the encrypted payload
    */
   encryptGenericMessage(recipients, genericMessage, payload = this._constructPayload(this.currentClient().id)) {
-    const cipherPayloadPromises = [];
-
-    for (const userId in recipients) {
-      const client_ids = recipients[userId];
-
-      payload.recipients[userId] = payload.recipients[userId] || {};
-      client_ids.forEach(client_id => {
-        const sessionId = this._constructSessionId(userId, client_id);
-        cipherPayloadPromises.push(this._encryptPayloadForSession(sessionId, genericMessage));
-      });
-    }
-
-    const receivingUsers = Object.keys(payload.recipients).length;
-    const logMessage = `Encrypting message of type '${genericMessage.content}' for '${receivingUsers}' users.`;
-    this.logger.log(logMessage, payload.recipients);
-
-    return Promise.all(cipherPayloadPromises)
-      .then(cipherPayloads => {
-        const recipientsWithMissingSessions = {};
-
-        cipherPayloads.forEach(({cipherText, sessionId}) => {
-          const {userId, clientId} = z.client.ClientEntity.dismantleUserClientId(sessionId);
-          if (!cipherText) {
-            recipientsWithMissingSessions[userId] = recipientsWithMissingSessions[userId] || [];
-            recipientsWithMissingSessions[userId].push(clientId);
-          }
-
-          payload.recipients[userId][clientId] = cipherText;
-        });
-
-        return this._encryptGenericMessageForNewSessions(recipientsWithMissingSessions, genericMessage);
+    return this._encryptGenericMessage(recipients, genericMessage, payload)
+      .then(({messagePayload, missingRecipients}) => {
+        return Object.keys(missingRecipients).length
+          ? this._encryptGenericMessageForMissingRecipients(missingRecipients, genericMessage, messagePayload)
+          : {messagePayload};
       })
-      .then(additionalCipherPayloads => {
-        additionalCipherPayloads.forEach(({cipherText, sessionId}) => {
-          const {userId, clientId} = z.client.ClientEntity.dismantleUserClientId(sessionId);
-          payload.recipients[userId] = payload.recipients[userId] || {};
-          payload.recipients[userId][clientId] = cipherText;
-        });
+      .then(({messagePayload, missingRecipients}) => {
+        const payloadUsers = Object.keys(messagePayload.recipients).length;
+        const logMessage = `Encrypted message of type '${genericMessage.content}' for '${payloadUsers}' users.`;
+        this.logger.log(logMessage, messagePayload.recipients);
 
-        return payload;
+        const missingUsers = Object.keys(missingRecipients).length;
+        if (missingUsers) {
+          this.logger.warn(`Failed to encrypt message for '${missingUsers}' users`, missingRecipients);
+        }
+
+        return messagePayload;
       });
   }
 
@@ -355,36 +332,71 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
       });
   }
 
-  _encryptGenericMessageForNewSessions(recipientsWithMissingSessions, genericMessage) {
-    if (Object.keys(recipientsWithMissingSessions).length) {
-      return this.getUsersPreKeys(recipientsWithMissingSessions)
-        .then(userPreKeyMap => {
-          this.logger.info(`Fetched pre-keys for '${Object.keys(userPreKeyMap).length}' users.`, userPreKeyMap);
+  _encryptGenericMessage(recipients, genericMessage, messagePayload) {
+    return Promise.resolve()
+      .then(() => {
+        const cipherPayloadPromises = [];
 
-          const newSessionPromises = [];
+        for (const userId in recipients) {
+          const clientIds = recipients[userId];
 
-          for (const userId in userPreKeyMap) {
-            const clientPreKeyMap = userPreKeyMap[userId];
+          messagePayload.recipients[userId] = messagePayload.recipients[userId] || {};
+          clientIds.forEach(clientId => {
+            const sessionId = this._constructSessionId(userId, clientId);
+            cipherPayloadPromises.push(this._encryptPayloadForSession(sessionId, genericMessage));
+          });
+        }
 
-            for (const clientId in clientPreKeyMap) {
-              const preKey = clientPreKeyMap[clientId];
-              newSessionPromises.push(this._createSessionFromPreKey(preKey, userId, clientId));
+        const receivingUsers = Object.keys(messagePayload.recipients).length;
+        const logMessage = `Encrypting message of type '${genericMessage.content}' for '${receivingUsers}' users.`;
+        this.logger.log(logMessage, messagePayload.recipients);
+
+        return Promise.all(cipherPayloadPromises);
+      })
+      .then(cipherPayload => this._mapCipherTextToPayload(messagePayload, cipherPayload));
+  }
+
+  _encryptGenericMessageForMissingRecipients(missingRecipients, genericMessage, messagePayload) {
+    return this.getUsersPreKeys(missingRecipients)
+      .then(userPreKeyMap => {
+        this.logger.info(`Fetched pre-keys for '${Object.keys(userPreKeyMap).length}' users.`, userPreKeyMap);
+
+        const cipherPayloadPromises = [];
+
+        for (const userId in userPreKeyMap) {
+          const clientPreKeyMap = userPreKeyMap[userId];
+
+          for (const clientId in clientPreKeyMap) {
+            const preKey = clientPreKeyMap[clientId];
+
+            if (preKey) {
+              const sessionId = this._constructSessionId(userId, clientId);
+              const preKeyBundle = z.util.base64ToArray(preKey.key).buffer;
+              cipherPayloadPromises.push(this._encryptPayloadForSession(sessionId, genericMessage, preKeyBundle));
             }
           }
+        }
 
-          return Promise.all(newSessionPromises);
-        })
-        .then(cryptoboxSessions => {
-          const cipherPayloadPromises = [];
+        return Promise.all(cipherPayloadPromises);
+      })
+      .then(cipherPayload => this._mapCipherTextToPayload(messagePayload, cipherPayload));
+  }
 
-          cryptoboxSessions.filter(cryptoboxSession => cryptoboxSession).forEach(cryptoboxSession => {
-            cipherPayloadPromises.push(this._encryptPayloadForSession(cryptoboxSession.id, genericMessage));
-          });
+  _mapCipherTextToPayload(messagePayload, cipherPayload) {
+    const missingRecipients = {};
 
-          return Promise.all(cipherPayloadPromises);
-        });
-    }
-    return Promise.resolve([]);
+    cipherPayload.forEach(({cipherText, sessionId}) => {
+      const {userId, clientId} = z.client.ClientEntity.dismantleUserClientId(sessionId);
+
+      if (cipherText) {
+        messagePayload.recipients[userId][clientId] = cipherText;
+      } else {
+        missingRecipients[userId] = missingRecipients[userId] || [];
+        missingRecipients[userId].push(clientId);
+      }
+    });
+
+    return {messagePayload, missingRecipients};
   }
 
   /**
@@ -424,11 +436,12 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
    * @private
    * @param {string} sessionId - ID of session to encrypt for
    * @param {z.proto.GenericMessage} genericMessage - ProtoBuffer message
+   * @param {Object} [preKeyBundle] - Pre-key bundle
    * @returns {Object} Contains session ID and encrypted message as base64 encoded string
    */
-  _encryptPayloadForSession(sessionId, genericMessage) {
+  _encryptPayloadForSession(sessionId, genericMessage, preKeyBundle) {
     return this.cryptobox
-      .encrypt(sessionId, genericMessage.toArrayBuffer())
+      .encrypt(sessionId, genericMessage.toArrayBuffer(), preKeyBundle)
       .then(cipherText => ({cipherText: z.util.arrayToBase64(cipherText), sessionId}))
       .catch(error => {
         if (error instanceof StoreEngine.error.RecordNotFoundError) {
