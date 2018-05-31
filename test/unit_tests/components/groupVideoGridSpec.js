@@ -112,6 +112,24 @@ describe('z.component.GroupVideoGrid', () => {
         });
       });
     });
+
+    describe('people leaving and joining at the same time (video toggling and own video)', () => {
+      const tests = [
+        {
+          expected: ['own', 0, 0, 0],
+          grid: ['other', 0, 0, 0],
+          participants: [{id: 'own'}],
+          scenario: 'second participant (of 2) leaves',
+        },
+      ];
+
+      tests.forEach(({grid, participants, expected, scenario}) => {
+        it(scenario, () => {
+          const result = groupVideoGrid.computeGrid(grid, participants);
+          expect(result).toEqual(expected, scenario);
+        });
+      });
+    });
   });
 
   describe('streams observable', () => {
