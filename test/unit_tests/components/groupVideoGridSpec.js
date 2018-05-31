@@ -92,7 +92,7 @@ describe('z.component.GroupVideoGrid', () => {
           scenario: 'second participant (of 3) leaves',
         },
         {
-          expected: ['first', 'fourth', 0, 'third'],
+          expected: ['first', 0, 'fourth', 'third'],
           grid: ['first', 'fourth', 'second', 'third'],
           participants: [{id: 'first'}, {id: 'third'}, {id: 'fourth'}],
           scenario: 'second participant (of 4) leaves',

@@ -126,25 +126,19 @@ z.components.GroupVideoGrid = (() => {
      * @returns {Array<string|0>} the new grid
      */
     computeGrid(previousGrid, streams) {
-      const currentStreamIds = streams.map(participant => participant.id);
       const previousStreamIds = previousGrid.filter(streamId => streamId !== 0);
+      const currentStreamIds = streams.map(participant => participant.id);
 
       const addedStreamIds = z.util.ArrayUtil.getDifference(previousStreamIds, currentStreamIds);
-      const deletedStreamIds = z.util.ArrayUtil.getDifference(currentStreamIds, previousStreamIds);
 
-      if (deletedStreamIds.length > 0) {
-        // if there was some streams that left the call
-        // do not reorder the matrix
-        const newGrid = previousGrid.map(id => (deletedStreamIds.includes(id) ? 0 : id));
+      const filteredGrid = previousGrid.map(id => (currentStreamIds.includes(id) ? id : 0));
 
-        const newStreamIds = newGrid.filter(streamId => streamId !== 0);
-        const hasTwoStreamIds = newStreamIds.length === 2;
-        return hasTwoStreamIds ? [newStreamIds[0], 0, newStreamIds[1], 0] : newGrid;
-      }
-
+      const streamIds = filteredGrid.filter(streamId => streamId !== 0);
       // Add the new streams at the end
-      const newStreamsIds = previousStreamIds.concat(addedStreamIds);
-      return [newStreamsIds[0] || 0, newStreamsIds[3] || 0, newStreamsIds[1] || 0, newStreamsIds[2] || 0];
+      const newStreamsIds = streamIds.concat(addedStreamIds);
+      return newStreamsIds.length === 2
+        ? [newStreamsIds[0], 0, newStreamsIds[1], 0]
+        : [newStreamsIds[0] || 0, newStreamsIds[3] || 0, newStreamsIds[1] || 0, newStreamsIds[2] || 0];
     }
 
     updateGrid(streams) {
