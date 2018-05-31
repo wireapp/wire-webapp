@@ -657,7 +657,17 @@ z.entity.Conversation = class Conversation {
 
     const participantCount = this.getNumberOfParticipants(true, false);
     const passesParticipantLimit = participantCount <= z.calling.CallingRepository.CONFIG.MAX_VIDEO_PARTICIPANTS;
-    return isOutgoing ? passesParticipantLimit && this.self.inTeam() : passesParticipantLimit;
+
+    if (!passesParticipantLimit) {
+      return false;
+    }
+
+    if (this.self.inTeam()) {
+      return true;
+    }
+
+    const hasRemoteVideo = this.call() && (this.call().isRemoteVideoSend() || this.call().isRemoteScreenSend());
+    return hasRemoteVideo;
   }
 
   serialize() {
