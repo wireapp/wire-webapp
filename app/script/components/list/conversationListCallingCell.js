@@ -86,7 +86,7 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
 
     this.disableVideoButton = ko.pureComputed(() => {
       const isRinging = this.callIsOutgoing() && this.selfStreamState.videoSend() && !this.callIsConnected();
-      return isRinging || !this.conversation.supportsVideoCall();
+      return isRinging || (!this.selfStreamState.videoSend() && !this.conversation.supportsVideoCall());
     });
 
     this.disableToggleScreen = ko.pureComputed(() => {
