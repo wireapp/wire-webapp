@@ -396,7 +396,7 @@ z.viewModel.ListViewModel = class ListViewModel {
   }
 
   clickToUnarchive(conversationEntity) {
-    this.conversationRepository.unarchive_conversation(conversationEntity, 'manual un-archive').then(() => {
+    this.conversationRepository.unarchiveConversation(conversationEntity, true, 'manual un-archive').then(() => {
       if (!this.conversationRepository.conversations_archived().length) {
         this.switchList(ListViewModel.STATE.CONVERSATIONS);
       }
