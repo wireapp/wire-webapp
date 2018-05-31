@@ -242,7 +242,14 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
    * @returns {Promise} Resolves with the encrypted payload
    */
   encryptGenericMessage(recipients, genericMessage, payload = this._constructPayload(this.currentClient().id)) {
-    return this._encryptGenericMessage(recipients, genericMessage, payload)
+    return Promise.resolve()
+      .then(() => {
+        const receivingUsers = Object.keys(recipients).length;
+        const logMessage = `Encrypting message of type '${genericMessage.content}' for '${receivingUsers}' users.`;
+        this.logger.log(logMessage, recipients);
+
+        return this._encryptGenericMessage(recipients, genericMessage, payload);
+      })
       .then(({messagePayload, missingRecipients}) => {
         return Object.keys(missingRecipients).length
           ? this._encryptGenericMessageForMissingRecipients(missingRecipients, genericMessage, messagePayload)
@@ -346,10 +353,6 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
             cipherPayloadPromises.push(this._encryptPayloadForSession(sessionId, genericMessage));
           });
         }
-
-        const receivingUsers = Object.keys(messagePayload.recipients).length;
-        const logMessage = `Encrypting message of type '${genericMessage.content}' for '${receivingUsers}' users.`;
-        this.logger.log(logMessage, messagePayload.recipients);
 
         return Promise.all(cipherPayloadPromises);
       })
