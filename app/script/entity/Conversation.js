@@ -451,11 +451,15 @@ z.entity.Conversation = class Conversation {
     this.messages_unordered.removeAll();
   }
 
-  should_unarchive() {
+  shouldUnarchive() {
     if (this.archived_state()) {
-      const has_new_event = this.last_event_timestamp() > this.archived_timestamp();
+      const hasNewerMessage = this.last_event_timestamp() > this.archived_timestamp();
 
-      return has_new_event && !this.is_muted();
+      const lastMessageEntity = this.getLastMessage();
+      const hasNewerCall = lastMessageEntity && lastMessageEntity.is_call() && lastMessageEntity.is_activation();
+
+      const hasUpdate = hasNewerMessage || hasNewerCall;
+      return hasUpdate && !this.is_muted();
     }
     return false;
   }
