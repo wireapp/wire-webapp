@@ -70,6 +70,9 @@ z.calling.CallError = class CallError extends Error {
         case CallError.TYPE.WRONG_SENDER:
           this.message = 'Call change from wrong sender';
           break;
+        case CallError.TYPE.WRONG_STATE:
+          this.message = 'Call in wrong state for change';
+          break;
         default:
           this.message = 'Unknown CallError';
       }
@@ -91,6 +94,7 @@ z.calling.CallError = class CallError extends Error {
       WRONG_CONVERSATION_TYPE: 'CallError.TYPE.WRONG_CONVERSATION_TYPE',
       WRONG_PAYLOAD_FORMAT: 'CallError.TYPE.WRONG_PAYLOAD_FORMAT',
       WRONG_SENDER: 'CallError.TYPE.WRONG_SENDER',
+      WRONG_STATE: 'CallError.TYPE.WRONG_STATE',
     };
   }
 };
