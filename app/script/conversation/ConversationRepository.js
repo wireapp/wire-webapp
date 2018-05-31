@@ -1564,7 +1564,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
         assetEntity.uploaded_on_this_client(true);
         return this.asset_service.uploadAsset(file, options, xhr => {
-          xhr.upload.onprogress = event => assetEntity.upload_progress(Math.round(event.loaded / event.total * 100));
+          xhr.upload.onprogress = event => assetEntity.upload_progress(Math.round((event.loaded / event.total) * 100));
           assetEntity.upload_cancel = () => xhr.abort();
         });
       })
@@ -2882,7 +2882,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
                 handled: this.init_handled,
                 total: this.init_total,
               };
-              const progress = this.init_handled / this.init_total * 20 + 75;
+              const progress = (this.init_handled / this.init_total) * 20 + 75;
 
               amplify.publish(z.event.WebApp.APP.UPDATE_PROGRESS, progress, z.string.initEvents, content);
             }

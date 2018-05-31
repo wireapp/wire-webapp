@@ -533,35 +533,35 @@
   version "3.0.36"
   resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-3.0.36.tgz#9951b35a6a81e0cbfe8c12800f3fb2173e986151"
 
-"@wireapp/core@2.9.2":
-  version "2.9.2"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-2.9.2.tgz#ece4b5ca610679062f0c1883a78d0eb459482050"
+"@wireapp/core@2.9.4":
+  version "2.9.4"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-2.9.4.tgz#abf3cc15d49ee2a1a4cbde9dc06099127820235e"
   dependencies:
     "@types/node" "10.1.4"
     "@wireapp/api-client" "0.10.9"
-    "@wireapp/cryptobox" "8.3.62"
+    "@wireapp/cryptobox" "8.3.63"
     "@wireapp/store-engine" "0.11.19"
     bazinga64 "5.1.15"
     logdown "3.2.3"
     protobufjs "6.8.6"
     pure-uuid "1.5.2"
 
-"@wireapp/cryptobox@8.3.62":
-  version "8.3.62"
-  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-8.3.62.tgz#08518d7ccb25bd722e9a8eed2501ec0caac84932"
+"@wireapp/cryptobox@8.3.63":
+  version "8.3.63"
+  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-8.3.63.tgz#82c9240f38f6506463b323b3a16aaef23606a19c"
   dependencies:
     "@types/fs-extra" "5.0.2"
     "@types/node" "10.1.4"
-    "@wireapp/lru-cache" "2.1.15"
+    "@wireapp/lru-cache" "2.1.16"
     "@wireapp/priority-queue" "0.1.34"
     "@wireapp/proteus" "7.1.48"
     "@wireapp/store-engine" "0.11.19"
     dexie "2.0.4"
     fs-extra "6.0.1"
 
-"@wireapp/lru-cache@2.1.15":
-  version "2.1.15"
-  resolved "https://registry.yarnpkg.com/@wireapp/lru-cache/-/lru-cache-2.1.15.tgz#434e56e6cbb5983acb2b76f6fe47451cc04974b0"
+"@wireapp/lru-cache@2.1.16":
+  version "2.1.16"
+  resolved "https://registry.yarnpkg.com/@wireapp/lru-cache/-/lru-cache-2.1.16.tgz#b18035e8cd6cf3fa595a0d11de67e3da7d2420f7"
 
 "@wireapp/priority-queue@0.1.34":
   version "0.1.34"
@@ -9021,13 +9021,9 @@ preserve@^0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/preserve/-/preserve-0.2.0.tgz#815ed1f6ebc65926f865b310c0713bcb3315ce4b"
 
-prettier@1.12.1:
-  version "1.12.1"
-  resolved "https://registry.yarnpkg.com/prettier/-/prettier-1.12.1.tgz#c1ad20e803e7749faf905a409d2367e06bbe7325"
-
-prettier@^1.12.1:
-  version "1.13.2"
-  resolved "https://registry.yarnpkg.com/prettier/-/prettier-1.13.2.tgz#412b87bc561cb11074d2877a33a38f78c2303cda"
+prettier@1.13.3, prettier@^1.12.1:
+  version "1.13.3"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-1.13.3.tgz#e74c09a7df6519d472ca6febaa37cf7addb48a20"
 
 pretty-bytes@^1.0.0:
   version "1.0.4"

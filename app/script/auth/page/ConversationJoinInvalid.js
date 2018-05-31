@@ -52,4 +52,9 @@ class ConversationJoinInvalid extends React.PureComponent {
   }
 }
 
-export default injectIntl(connect(state => ({}), {})(ConversationJoinInvalid));
+export default injectIntl(
+  connect(
+    state => ({}),
+    {}
+  )(ConversationJoinInvalid)
+);

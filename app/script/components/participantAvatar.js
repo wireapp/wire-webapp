@@ -69,7 +69,7 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
 
     const borderScale = 0.9916;
     const finalBorderWidth = this.size === ParticipantAvatar.SIZE.X_LARGE ? 4 : 1;
-    this.borderWidth = finalBorderWidth / ParticipantAvatar.DIAMETER[this.size] * 32;
+    this.borderWidth = (finalBorderWidth / ParticipantAvatar.DIAMETER[this.size]) * 32;
     this.borderRadius = (16 - this.borderWidth / 2) * borderScale;
     this.timerLength = this.borderRadius * Math.PI * 2;
     this.timerOffset = ko.observable();
