@@ -41,9 +41,18 @@ z.components.GroupVideoGrid = (() => {
       this.selfId = ko.observable(null);
       this.mirrorSelf = !params.screenSend;
 
+      this.selfStreamState = params.selfStreamInfo.state;
+      this.selfStream = ko.pureComputed(() => {
+        return this.selfStreamState.videoSend() || this.selfStreamState.screenSend()
+          ? params.selfStreamInfo.stream()
+          : null;
+      });
+      this.mirrorSelf = ko.pureComputed(() => {
+        return !this.selfStreamState.screenSend();
+      });
       this.streams = ko.pureComputed(() => {
-        const remoteStreams = this.filterUnsentStreams(params.streamsInfo(), params.calls());
-        const selfStream = params.selfStream();
+        const remoteStreams = filterUnsentStreams(params.streamsInfo(), params.calls());
+        const selfStream = this.selfStream();
         this.selfId(selfStream ? selfStream.id : null);
 
         if (remoteStreams.length === 1) {
@@ -191,20 +200,6 @@ z.components.GroupVideoGrid = (() => {
       };
       return extraClasses[size];
     }
-
-    filterUnsentStreams(streamsInfo, calls) {
-      const hasActiveVideo = mediaStreamInfo => {
-        const noVideoParticipantIds = calls
-          .reduce((participants, call) => participants.concat(call.participants()), [])
-          .filter(participant => !participant.state.videoSend())
-          .map(participant => participant.id);
-
-        // filter participant that have their video stream disabled
-        return !noVideoParticipantIds.includes(mediaStreamInfo.flow_id);
-      };
-
-      return streamsInfo.filter(hasActiveVideo).map(mediaStreamInfo => mediaStreamInfo.stream);
-    }
   }
 
   ko.components.register('group-video-grid', {
@@ -215,11 +210,24 @@ z.components.GroupVideoGrid = (() => {
             <div class="group-video-grid__element" data-bind="css: $parent.getClassNameForVideo($index()), attr: {'data-uie-name': 'item-grid', 'data-uie-value': $parent.getUIEValueForVideo($index())}">
               <video autoplay class="group-video-grid__element-video" data-bind="sourceStream: $parent.getParticipantStream(streamId), muteMediaElement: $parent.getParticipantStream(streamId)">
               </video>
+              <!-- ko if: streamId === $parent.selfId() && !$parent.selfStreamState.audioSend() -->
+                <div class="group-video-grid__mute-overlay">
+                  <micoff-icon></micoff-icon>
+                </div>
+              <!-- /ko -->
             </div>
           <!-- /ko -->
         </div>
         <!-- ko if: thumbnailStream() -->
-          <video autoplay class="group-video__thumbnail" data-uie-name="self-video-thumbnail" data-bind="css: {'group-video__thumbnail--minimized': minimized, 'mirror': mirrorSelf}, sourceStream: thumbnailStream(), muteMediaElement: thumbnailStream()"></video>
+          <div class="group-video__thumbnail" data-bind="css: {'group-video__thumbnail--minimized': minimized}">
+            <video autoplay class="mirror group-video__thumbnail-video" data-uie-name="self-video-thumbnail" data-bind="css: {'group-video__thumbnail--minimized': minimized, 'mirror': mirrorSelf}, sourceStream: thumbnailStream(), muteMediaElement: thumbnailStream()">
+            </video>
+            <!-- ko if: !selfStreamState.audioSend() -->
+              <div class="group-video-grid__mute-overlay">
+                <micoff-icon></micoff-icon>
+              </div>
+            <!-- /ko -->
+          </div>
         <!-- /ko -->
       </div>
     `,
@@ -227,6 +235,20 @@ z.components.GroupVideoGrid = (() => {
       createViewModel: (params, componentInfo) => new GroupVideoGrid(params, componentInfo.element),
     },
   });
+
+  function filterUnsentStreams(streamsInfo, calls) {
+    const hasActiveVideo = mediaStreamInfo => {
+      const noVideoParticipantIds = calls
+        .reduce((participants, call) => participants.concat(call.participants()), [])
+        .filter(participant => !participant.state.videoSend())
+        .map(participant => participant.id);
+
+      // filter participant that have their video stream disabled
+      return !noVideoParticipantIds.includes(mediaStreamInfo.flow_id);
+    };
+
+    return streamsInfo.filter(hasActiveVideo).map(mediaStreamInfo => mediaStreamInfo.stream);
+  }
 
   return GroupVideoGrid;
 })();
