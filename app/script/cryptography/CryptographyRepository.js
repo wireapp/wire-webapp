@@ -246,7 +246,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
       .then(({messagePayload, missingRecipients}) => {
         return Object.keys(missingRecipients).length
           ? this._encryptGenericMessageForMissingRecipients(missingRecipients, genericMessage, messagePayload)
-          : {messagePayload};
+          : {messagePayload, missingRecipients};
       })
       .then(({messagePayload, missingRecipients}) => {
         const payloadUsers = Object.keys(messagePayload.recipients).length;
