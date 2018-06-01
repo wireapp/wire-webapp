@@ -143,7 +143,15 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
     this.showParticipants = ko.observable(false);
 
     this.showVideoPreview = ko.pureComputed(() => {
-      return this.isVideoCall() && (this.multitasking.isMinimized() || !this.callIsConnected());
+      const nbOfOtherOngoingCalls = this.calls()
+        .filter(call => call.id !== this.call().id)
+        .filter(call => call.state() === z.calling.enum.CALL_STATE.ONGOING).length;
+
+      return (
+        nbOfOtherOngoingCalls === 0 &&
+        this.isVideoCall() &&
+        (this.multitasking.isMinimized() || !this.callIsConnected())
+      );
     });
     this.showMaximize = ko.pureComputed(() => this.multitasking.isMinimized() && this.callIsConnected());
   }
