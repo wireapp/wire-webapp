@@ -234,7 +234,8 @@ export default class ConversationService {
     return this.sendMessage(sendingClientId, conversationId, recipients);
   }
 
-  // TODO: The correct functionality of this function is heavily based on the case that it always runs into the catch block
+  // TODO: The correct functionality of this function is heavily based on the case that it always runs into the catch
+  // block
   private getPreKeyBundles(conversationId: string): Promise<ClientMismatch | UserPreKeyBundleMap> {
     return this.apiClient.conversation.api.postOTRMessage(this.clientID, conversationId).catch((error: AxiosError) => {
       if (error.response && error.response.status === 412) {

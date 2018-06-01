@@ -63,7 +63,8 @@ storeEngine.init('', {fileExtension: '.json'}).then(() => {
             })
             .then(() => account.logout())
             // TODO: Completely removing the Wire Cryptobox directoy isn't a good idea! The "logout" method should
-            // handle already the cleanup of artifacts. Unfortunately "logout" sometimes has issues (we need to solve these!)
+            // handle already the cleanup of artifacts. Unfortunately "logout" sometimes has issues (we need to solve
+            // these!)
             .then(() => fs.remove(directory))
             .then(() => account.login(loginData))
             .then(() => account.listen())

@@ -1,3 +1,22 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
 import LRUCache from '@wireapp/lru-cache';
 import {PriorityQueue} from '@wireapp/priority-queue';
 import {keys as ProteusKeys, message as ProteusMessage, session as ProteusSession} from '@wireapp/proteus';
@@ -221,8 +240,11 @@ class Cryptobox extends EventEmitter {
   }
 
   /**
-   * Creates a new session which can be used for cryptographic operations (encryption & decryption) from a remote PreKey bundle.
-   * Saving the session takes automatically place when the session is used to encrypt or decrypt a message.
+   * Creates (and persists) a new session which can be used for cryptographic operations (encryption & decryption) from
+   * a remote PreKey bundle. This function is automatically called on every execution of "encrypt" and "decrypt" so you
+   * might not need to call it yourself. However, it has been marked as "public" because there are some cases where you
+   * just need the session without executing an encryption or decryption. This is the case when you for example just
+   * want to show the fingerprint of the remote party.
    */
   public session_from_prekey(session_id: string, pre_key_bundle: ArrayBuffer): Promise<CryptoboxSession> {
     return this.session_load(session_id).catch(sessionLoadError => {

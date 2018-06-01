@@ -11,7 +11,7 @@ interface CRUDEngine {
   append(tableName: string, primaryKey: string, additions: string): Promise<string>;
 
   /**
-   * Initializes the store engine. This need to be done prior to operating with it.
+   * Initializes the store engine. This needs to be done prior to operating with it.
    * @param {string} storeName - Name of the store
    * @param {Array} settings - Database-specific settings
    * @returns {Promise<any>} Resolves with the underlying (unwrapped) instance of a database.
