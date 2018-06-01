@@ -22,189 +22,131 @@
 window.z = window.z || {};
 window.z.components = z.components || {};
 
-z.components.GroupVideoGrid = (() => {
-  class GroupVideoGrid {
-    static get CONFIG() {
-      return {
-        VIDEO_ELEMENT_SIZE: {
-          FOURTH_SCREEN: 'fourth_screen',
-          FULL_SCREEN: 'full_screen',
-          HALF_SCREEN: 'half_screen',
-          HIDDEN: 'hidden',
-        },
-      };
-    }
-
-    constructor(params, rootElement) {
-      this.grid = ko.observableArray([0, 0, 0, 0]);
-      this.thumbnailStream = ko.observable(null);
-      this.selfId = ko.observable(null);
-      this.mirrorSelf = !params.screenSend;
-
-      this.selfStreamState = params.selfStreamInfo.state;
-      this.selfStream = ko.pureComputed(() => {
-        return this.selfStreamState.videoSend() || this.selfStreamState.screenSend()
-          ? params.selfStreamInfo.stream()
-          : null;
-      });
-      this.mirrorSelf = ko.pureComputed(() => {
-        return !this.selfStreamState.screenSend();
-      });
-      this.streams = ko.pureComputed(() => {
-        const remoteStreams = filterUnsentStreams(params.streamsInfo(), params.calls());
-        const selfStream = this.selfStream();
-        this.selfId(selfStream ? selfStream.id : null);
-
-        if (remoteStreams.length === 1) {
-          this.thumbnailStream(selfStream);
-          return remoteStreams;
-        }
-        this.thumbnailStream(null);
-        return selfStream ? remoteStreams.concat(selfStream) : remoteStreams;
-      });
-
-      this.streams.subscribe(this.updateGrid.bind(this));
-      this.updateGrid(this.streams());
-
-      this.scaleVideos = this.scaleVideos.bind(this, rootElement);
-      // scale videos when the grid is updated (on the next rendering cycle)
-      this.grid.subscribe(() => z.util.afterRender(this.scaleVideos));
-
-      // scale the videos when the window is resized
-      window.addEventListener('resize', this.scaleVideos);
-
-      this.minimized = params.minimized;
-    }
-
-    scaleVideos(rootElement) {
-      const elements = Array.from(rootElement.querySelectorAll('.group-video-grid__element'));
-      const setScale = (video, containerRatio) => {
-        const fullHeightClass = 'group-video-grid__element-video--fill-height';
-        const fullWidthClass = 'group-video-grid__element-video--fill-width';
-        const videoRatio = video.videoWidth / video.videoHeight;
-        video.classList.remove(fullHeightClass);
-        video.classList.remove(fullWidthClass);
-
-        const isPortrait = videoRatio > containerRatio || video.videoWidth < video.videoHeight;
-        const fillClasses = isPortrait ? fullHeightClass : fullWidthClass;
-        video.classList.add(fillClasses);
-      };
-
-      elements.forEach(element => {
-        const containerRect = element.getBoundingClientRect();
-        const containerRatio = containerRect.width / containerRect.height;
-        const videoElement = element.querySelector('video');
-        const handleLoadEvent = event => {
-          const video = event.target;
-          setScale(video, containerRatio);
-          video.removeEventListener(event.type, handleLoadEvent);
-        };
-
-        if (videoElement.videoWidth > 0) {
-          setScale(videoElement, containerRatio);
-        } else {
-          videoElement.addEventListener('loadedmetadata', handleLoadEvent);
-        }
-      });
-    }
-
-    dispose() {
-      window.removeEventListener('resize', this.scaleVideos);
-    }
-
-    /**
-     * Will compute the next grid layout according to the previous state and the new array of streams
-     * The grid will fill according to this pattern
-     * - 1 stream : [id, 0, 0, 0]
-     * - 2 streams: [id, 0, id, 0]
-     * - 3 streams: [id, 0, id, id]
-     * - 3 streams: [id, id, 0, id]
-     * - 4 streams: [id, id, id, id]
-     * @param {Array<string|0>} previousGrid - the previous state of the grid
-     * @param {Array<MediaStream>} streams - the new array of streams to dispatch in the grid
-     *
-     * @returns {Array<string|0>} the new grid
-     */
-    computeGrid(previousGrid, streams) {
-      const previousStreamIds = previousGrid.filter(streamId => streamId !== 0);
-      const currentStreamIds = streams.map(participant => participant.id);
-
-      const addedStreamIds = z.util.ArrayUtil.getDifference(previousStreamIds, currentStreamIds);
-
-      const filteredGrid = previousGrid.map(id => (currentStreamIds.includes(id) ? id : 0));
-
-      const streamIds = filteredGrid.filter(streamId => streamId !== 0);
-      // Add the new streams at the end
-      const newStreamsIds = streamIds.concat(addedStreamIds);
-      return newStreamsIds.length === 2
-        ? [newStreamsIds[0], 0, newStreamsIds[1], 0]
-        : [newStreamsIds[0] || 0, newStreamsIds[3] || 0, newStreamsIds[1] || 0, newStreamsIds[2] || 0];
-    }
-
-    updateGrid(streams) {
-      const newGrid = this.computeGrid(this.grid(), streams);
-      this.grid(newGrid);
-    }
-
-    getParticipantStream(id) {
-      return this.streams().find(stream => stream.id === id);
-    }
-
-    getSizeForVideo(index) {
-      const grid = this.grid();
-      const SIZES = GroupVideoGrid.CONFIG.VIDEO_ELEMENT_SIZE;
-      if (grid[index] === 0) {
-        return SIZES.EMPTY;
-      }
-
-      const isAlone = grid.every((value, i) => i === index || value === 0);
-      const hasVerticalNeighbor = index % 2 === 0 ? grid[index + 1] !== 0 : grid[index - 1] !== 0;
-
-      if (isAlone) {
-        return SIZES.FULL_SCREEN;
-      } else if (!hasVerticalNeighbor) {
-        return SIZES.HALF_SCREEN;
-      }
-      return SIZES.FOURTH_SCREEN;
-    }
-
-    getClassNameForVideo(index) {
-      const size = this.getSizeForVideo(index);
-      const SIZES = GroupVideoGrid.CONFIG.VIDEO_ELEMENT_SIZE;
-      const extraClasses = {
-        [SIZES.EMPTY]: 'group-video-grid__element--empty',
-        [SIZES.FULL_SCREEN]: 'group-video-grid__element--full-size',
-        [SIZES.HALF_SCREEN]: 'group-video-grid__element--full-height',
-        [SIZES.FOURTH_SCREEN]: '',
-      };
-
-      const isSelfVideo = this.grid()[index] === this.selfId();
-      const mirrorClass = isSelfVideo && this.mirrorSelf ? ' mirror' : '';
-      return `group-video-grid__element${index} ${extraClasses[size]} ${mirrorClass}`;
-    }
-
-    getUIEValueForVideo(index) {
-      const size = this.getSizeForVideo(index);
-      const SIZES = GroupVideoGrid.CONFIG.VIDEO_ELEMENT_SIZE;
-      const extraClasses = {
-        [SIZES.EMPTY]: '',
-        [SIZES.FULL_SCREEN]: 'full',
-        [SIZES.HALF_SCREEN]: 'half',
-        [SIZES.FOURTH_SCREEN]: 'fourth',
-      };
-      return extraClasses[size];
-    }
+z.components.GroupVideoGrid = class GroupVideoGrid {
+  static get CONFIG() {
+    return {
+      VIDEO_ELEMENT_SIZE: {
+        FOURTH_SCREEN: 'fourth_screen',
+        FULL_SCREEN: 'full_screen',
+        HALF_SCREEN: 'half_screen',
+        HIDDEN: 'hidden',
+      },
+    };
   }
 
-  ko.components.register('group-video-grid', {
-    template: `
+  constructor({minimized, videoGridRepository}, rootElement) {
+    this.grid = videoGridRepository.grid;
+    this.selfId = videoGridRepository.selfId;
+    this.thumbnailStream = videoGridRepository.thumbnailStream;
+    this.mirrorSelf = videoGridRepository.mirrorSelf;
+    this.selfStreamMuted = videoGridRepository.selfStreamMuted;
+    this.streams = videoGridRepository.streams;
+
+    this.scaleVideos = this.scaleVideos.bind(this, rootElement);
+    // scale videos when the grid is updated (on the next rendering cycle)
+    this.grid.subscribe(() => z.util.afterRender(this.scaleVideos));
+
+    // scale the videos when the window is resized
+    window.addEventListener('resize', this.scaleVideos);
+
+    this.minimized = minimized;
+  }
+
+  scaleVideos(rootElement) {
+    const elements = Array.from(rootElement.querySelectorAll('.group-video-grid__element'));
+    const setScale = (video, containerRatio) => {
+      const fullHeightClass = 'group-video-grid__element-video--fill-height';
+      const fullWidthClass = 'group-video-grid__element-video--fill-width';
+      const videoRatio = video.videoWidth / video.videoHeight;
+      video.classList.remove(fullHeightClass);
+      video.classList.remove(fullWidthClass);
+
+      const isPortrait = videoRatio > containerRatio || video.videoWidth < video.videoHeight;
+      const fillClasses = isPortrait ? fullHeightClass : fullWidthClass;
+      video.classList.add(fillClasses);
+    };
+
+    elements.forEach(element => {
+      const containerRect = element.getBoundingClientRect();
+      const containerRatio = containerRect.width / containerRect.height;
+      const videoElement = element.querySelector('video');
+      const handleLoadEvent = event => {
+        const video = event.target;
+        setScale(video, containerRatio);
+        video.removeEventListener(event.type, handleLoadEvent);
+      };
+
+      if (videoElement.videoWidth > 0) {
+        setScale(videoElement, containerRatio);
+      } else {
+        videoElement.addEventListener('loadedmetadata', handleLoadEvent);
+      }
+    });
+  }
+
+  dispose() {
+    window.removeEventListener('resize', this.scaleVideos);
+  }
+
+  getParticipantStream(id) {
+    return this.streams().find(stream => stream.id === id);
+  }
+
+  getSizeForVideo(index) {
+    const grid = this.grid();
+    const SIZES = GroupVideoGrid.CONFIG.VIDEO_ELEMENT_SIZE;
+    if (grid[index] === 0) {
+      return SIZES.EMPTY;
+    }
+
+    const isAlone = grid.every((value, i) => i === index || value === 0);
+    const hasVerticalNeighbor = index % 2 === 0 ? grid[index + 1] !== 0 : grid[index - 1] !== 0;
+
+    if (isAlone) {
+      return SIZES.FULL_SCREEN;
+    } else if (!hasVerticalNeighbor) {
+      return SIZES.HALF_SCREEN;
+    }
+    return SIZES.FOURTH_SCREEN;
+  }
+
+  getClassNameForVideo(index) {
+    const size = this.getSizeForVideo(index);
+    const SIZES = GroupVideoGrid.CONFIG.VIDEO_ELEMENT_SIZE;
+    const extraClasses = {
+      [SIZES.EMPTY]: 'group-video-grid__element--empty',
+      [SIZES.FULL_SCREEN]: 'group-video-grid__element--full-size',
+      [SIZES.HALF_SCREEN]: 'group-video-grid__element--full-height',
+      [SIZES.FOURTH_SCREEN]: '',
+    };
+
+    const isSelfVideo = this.grid()[index] === this.selfId();
+    const mirrorClass = isSelfVideo && this.mirrorSelf ? ' mirror' : '';
+    return `group-video-grid__element${index} ${extraClasses[size]} ${mirrorClass}`;
+  }
+
+  getUIEValueForVideo(index) {
+    const size = this.getSizeForVideo(index);
+    const SIZES = GroupVideoGrid.CONFIG.VIDEO_ELEMENT_SIZE;
+    const extraClasses = {
+      [SIZES.EMPTY]: '',
+      [SIZES.FULL_SCREEN]: 'full',
+      [SIZES.HALF_SCREEN]: 'half',
+      [SIZES.FOURTH_SCREEN]: 'fourth',
+    };
+    return extraClasses[size];
+  }
+};
+
+ko.components.register('group-video-grid', {
+  template: `
       <div class="group-video" data-bind="template: {afterRender: scaleVideos}">
         <div class="group-video-grid" data-bind="foreach: {data: grid, as: 'streamId'}">
           <!-- ko if: streamId !== 0 -->
             <div class="group-video-grid__element" data-bind="css: $parent.getClassNameForVideo($index()), attr: {'data-uie-name': 'item-grid', 'data-uie-value': $parent.getUIEValueForVideo($index())}">
               <video autoplay class="group-video-grid__element-video" data-bind="sourceStream: $parent.getParticipantStream(streamId), muteMediaElement: $parent.getParticipantStream(streamId)">
               </video>
-              <!-- ko if: streamId === $parent.selfId() && !$parent.selfStreamState.audioSend() -->
+              <!-- ko if: streamId === $parent.selfId() && $parent.selfStreamMuted -->
                 <div class="group-video-grid__mute-overlay">
                   <micoff-icon></micoff-icon>
                 </div>
@@ -216,7 +158,7 @@ z.components.GroupVideoGrid = (() => {
           <div class="group-video__thumbnail" data-bind="css: {'group-video__thumbnail--minimized': minimized}">
             <video autoplay class="mirror group-video__thumbnail-video" data-uie-name="self-video-thumbnail" data-bind="css: {'group-video__thumbnail--minimized': minimized, 'mirror': mirrorSelf}, sourceStream: thumbnailStream(), muteMediaElement: thumbnailStream()">
             </video>
-            <!-- ko if: !selfStreamState.audioSend() -->
+            <!-- ko if: selfStreamMuted -->
               <div class="group-video-grid__mute-overlay">
                 <micoff-icon></micoff-icon>
               </div>
@@ -225,24 +167,7 @@ z.components.GroupVideoGrid = (() => {
         <!-- /ko -->
       </div>
     `,
-    viewModel: {
-      createViewModel: (params, componentInfo) => new GroupVideoGrid(params, componentInfo.element),
-    },
-  });
-
-  function filterUnsentStreams(streamsInfo, calls) {
-    const hasActiveVideo = mediaStreamInfo => {
-      const noVideoParticipantIds = calls
-        .reduce((participants, call) => participants.concat(call.participants()), [])
-        .filter(participant => !participant.state.videoSend())
-        .map(participant => participant.id);
-
-      // filter participant that have their video stream disabled
-      return !noVideoParticipantIds.includes(mediaStreamInfo.flow_id);
-    };
-
-    return streamsInfo.filter(hasActiveVideo).map(mediaStreamInfo => mediaStreamInfo.stream);
-  }
-
-  return GroupVideoGrid;
-})();
+  viewModel: {
+    createViewModel: (params, componentInfo) => new z.components.GroupVideoGrid(params, componentInfo.element),
+  },
+});

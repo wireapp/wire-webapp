@@ -42,6 +42,7 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
     this.conversationRepository = repositories.conversation;
     this.mediaRepository = repositories.media;
     this.userRepository = repositories.user;
+    this.videoGridRepository = repositories.videoGrid;
 
     this.contentViewModel = mainViewModel.content;
     this.multitasking = this.contentViewModel.multitasking;
