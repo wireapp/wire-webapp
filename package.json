@@ -133,7 +133,7 @@
     "uglify-js": "3.3.28",
     "uglifyjs-webpack-plugin": "1.2.5",
     "webpack": "4.10.2",
-    "webpack-cli": "2.1.4",
+    "webpack-cli": "3.0.0",
     "webpack-dev-server": "3.1.4"
   },
   "engines": {
