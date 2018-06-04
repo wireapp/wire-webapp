@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="2.9.6"></a>
+## [2.9.6](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.9.5...@wireapp/core@2.9.6) (2018-06-04)
+
+
+### Bug Fixes
+
+* **core:** Don't send external message for ping ([#658](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/658)) ([092facb](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/092facb))
+
+
+
+
 <a name="2.9.5"></a>
 ## [2.9.5](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@2.9.4...@wireapp/core@2.9.5) (2018-06-01)
 

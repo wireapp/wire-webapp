@@ -2,10 +2,10 @@
   "dependencies": {
     "@types/fs-extra": "5.0.2",
     "@types/node": "10.3.0",
-    "@wireapp/lru-cache": "2.1.17",
-    "@wireapp/priority-queue": "0.1.35",
-    "@wireapp/proteus": "7.1.49",
-    "@wireapp/store-engine": "0.11.20",
+    "@wireapp/lru-cache": "2.1.18",
+    "@wireapp/priority-queue": "0.1.36",
+    "@wireapp/proteus": "7.1.50",
+    "@wireapp/store-engine": "0.11.21",
     "dexie": "2.0.4",
     "fs-extra": "6.0.1"
   },
@@ -58,5 +58,5 @@
     "test:node": "cross-env NODE_DEBUG=@wireapp/cryptobox* jasmine --config=test/jasmine.node.json"
   },
   "types": "dist/commonjs/index.d.ts",
-  "version": "8.3.64"
+  "version": "8.3.65"
 }
