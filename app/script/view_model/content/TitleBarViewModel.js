@@ -81,7 +81,7 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
 
     this.supportsVideoCall = ko.pureComputed(() => {
       return this.showCallControls()
-        ? this.userRepository.self().inTeam() && this.conversationEntity().supportsVideoCall(true)
+        ? this.userRepository.isTeam() && this.conversationEntity().supportsVideoCall(true)
         : false;
     });
 
