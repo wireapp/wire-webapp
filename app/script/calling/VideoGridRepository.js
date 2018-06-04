@@ -26,36 +26,34 @@ z.calling.VideoGridRepository = (() => {
   return class VideoGridRepository {
     /**
      * Construct an new VideoGridRepository.
-     * @param {MediaRepository} mediaRepository - Repository for the media streams
      * @param {CallingRepository} callingRepository - Repository for the calls
+     * @param {MediaRepository} mediaRepository - Repository for the media streams
      */
-    constructor(mediaRepository, callingRepository) {
+    constructor(callingRepository, mediaRepository) {
       const streamHandler = mediaRepository.stream_handler;
       const streamsInfo = streamHandler.remoteMediaStreamInfoIndex.video;
       const localMediaStream = streamHandler.localMediaStream;
       const selfStreamState = callingRepository.selfStreamState;
       const calls = callingRepository.calls;
       this.grid = ko.observableArray([0, 0, 0, 0]);
-      this.selfId = ko.observable(null);
-      this.thumbnailStream = ko.observable(null);
-      this.mirrorSelf = ko.pureComputed(() => {
-        return !selfStreamState.screenSend();
-      });
+      this.selfId = ko.observable();
+      this.thumbnailStream = ko.observable();
+      this.mirrorSelf = ko.pureComputed(() => !selfStreamState.screenSend());
 
       const selfStream = ko.pureComputed(() => {
-        return selfStreamState.videoSend() || selfStreamState.screenSend() ? localMediaStream() : null;
+        return selfStreamState.videoSend() || selfStreamState.screenSend() ? localMediaStream() : undefined;
       });
       this.selfStreamMuted = ko.pureComputed(() => !selfStreamState.audioSend());
 
       this.streams = ko.pureComputed(() => {
         const remoteStreams = filterUnsentStreams(streamsInfo(), calls());
-        this.selfId(selfStream() ? selfStream().id : null);
+        this.selfId(selfStream() ? selfStream().id : undefined);
 
         if (remoteStreams.length === 1) {
           this.thumbnailStream(selfStream());
           return remoteStreams;
         }
-        this.thumbnailStream(null);
+        this.thumbnailStream(undefined);
         return selfStream() ? remoteStreams.concat(selfStream()) : remoteStreams;
       });
 

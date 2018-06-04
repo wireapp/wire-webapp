@@ -146,7 +146,7 @@ ko.components.register('group-video-grid', {
             <div class="group-video-grid__element" data-bind="css: $parent.getClassNameForVideo($index()), attr: {'data-uie-name': 'item-grid', 'data-uie-value': $parent.getUIEValueForVideo($index())}">
               <video autoplay class="group-video-grid__element-video" data-bind="sourceStream: $parent.getParticipantStream(streamId), muteMediaElement: $parent.getParticipantStream(streamId)">
               </video>
-              <!-- ko if: streamId === $parent.selfId() && $parent.selfStreamMuted -->
+              <!-- ko if: streamId === $parent.selfId() && $parent.selfStreamMuted() -->
                 <div class="group-video-grid__mute-overlay">
                   <micoff-icon></micoff-icon>
                 </div>
@@ -158,7 +158,7 @@ ko.components.register('group-video-grid', {
           <div class="group-video__thumbnail" data-bind="css: {'group-video__thumbnail--minimized': minimized}">
             <video autoplay class="mirror group-video__thumbnail-video" data-uie-name="self-video-thumbnail" data-bind="css: {'group-video__thumbnail--minimized': minimized, 'mirror': mirrorSelf}, sourceStream: thumbnailStream(), muteMediaElement: thumbnailStream()">
             </video>
-            <!-- ko if: selfStreamMuted -->
+            <!-- ko if: selfStreamMuted() -->
               <div class="group-video-grid__mute-overlay">
                 <micoff-icon></micoff-icon>
               </div>
