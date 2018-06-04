@@ -157,8 +157,7 @@ class Client {
     let cookieResponse: AxiosResponse;
 
     return Promise.resolve()
-      .then(() => this.context && this.logout())
-      .catch(error => this.logger.error(error))
+      .then(() => this.context && this.logout({ignoreError: true}))
       .then(() => this.auth.api.postLogin(loginData))
       .then((response: AxiosResponse<any>) => {
         cookieResponse = response;
@@ -174,8 +173,7 @@ class Client {
   public register(userAccount: RegisterData, clientType: ClientType = ClientType.PERMANENT): Promise<Context> {
     return (
       Promise.resolve()
-        .then(() => this.context && this.logout())
-        .catch(error => this.logger.error(error))
+        .then(() => this.context && this.logout({ignoreError: true}))
         .then(() => this.auth.api.postRegister(userAccount))
         /**
          * Note:
@@ -188,9 +186,16 @@ class Client {
     );
   }
 
-  public logout(): Promise<void> {
+  public logout(options = {ignoreError: false}): Promise<void> {
     return this.auth.api
       .postLogout()
+      .catch(error => {
+        if (options.ignoreError) {
+          this.logger.error(error);
+        } else {
+          throw error;
+        }
+      })
       .then(() => this.disconnect('Closed by client logout'))
       .then(() => this.accessTokenStore.delete())
       .then(() => {
