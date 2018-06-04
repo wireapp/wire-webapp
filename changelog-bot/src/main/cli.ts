@@ -1,0 +1,119 @@
+#!/usr/bin/env node
+
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {LoginData} from '@wireapp/api-client/dist/commonjs/auth/';
+import {ChangelogBot, MessageData} from './index';
+
+const logdown = require('logdown');
+const {version}: {version: string} = require('../package.json');
+
+const logger = logdown('@wireapp/changelog-bot/cli', {
+  logger: console,
+  markdown: false,
+});
+
+const scriptName = require('path').basename(process.argv[1]);
+
+const requiredEnvVars = ['WIRE_CHANGELOG_BOT_EMAIL', 'WIRE_CHANGELOG_BOT_PASSWORD'];
+const travisEnvVars = ['TRAVIS_COMMIT_RANGE', 'TRAVIS_EVENT_TYPE', 'TRAVIS_REPO_SLUG'];
+
+const setBold = (text: string): string => `\x1b[1m${text}\x1b[0m`;
+
+const usage = (): void => {
+  console.info(`${setBold('Usage:')} ${scriptName} <conversation id(s)>\n`);
+  console.info(
+    `${setBold('Example:')} ${scriptName} "e4302e84-75fd-4dc7-8a16-67018bd94ce7,44be7db8-7b7c-4acf-887d-86fbb9a5508f"`
+  );
+};
+const envVarUsage = (): void => console.info(setBold('Required environment variables:'), requiredEnvVars.join(', '));
+
+const start = async (): Promise<ChangelogBot> => {
+  const {WIRE_CHANGELOG_BOT_EMAIL, WIRE_CHANGELOG_BOT_PASSWORD, WIRE_CHANGELOG_BOT_CONVERSATION_IDS} = process.env;
+  const {TRAVIS_COMMIT_RANGE, TRAVIS_REPO_SLUG} = process.env;
+
+  const loginData: LoginData = {
+    email: WIRE_CHANGELOG_BOT_EMAIL,
+    password: WIRE_CHANGELOG_BOT_PASSWORD,
+    persist: false,
+  };
+
+  const changelog = await ChangelogBot.generateChangelog(String(TRAVIS_REPO_SLUG), String(TRAVIS_COMMIT_RANGE));
+
+  const messageData: MessageData = {
+    content: changelog,
+  };
+
+  if (WIRE_CHANGELOG_BOT_CONVERSATION_IDS) {
+    messageData.conversationIds = WIRE_CHANGELOG_BOT_CONVERSATION_IDS.replace(' ', '').split(',');
+  }
+
+  logger.info('Booting up ...');
+
+  const bot = new ChangelogBot(loginData, messageData);
+  await bot.start();
+
+  return bot;
+};
+
+logger.info(setBold(`wire-changelog-bot v${version}`) + '\n');
+
+const SECOND_ARGUMENT = 2;
+
+switch (process.argv[SECOND_ARGUMENT]) {
+  case '-help':
+  case '--help':
+  case '-h':
+  case '--h': {
+    usage();
+    envVarUsage();
+    process.exit(0);
+  }
+  default: {
+    if (process.argv[SECOND_ARGUMENT]) {
+      process.env.WIRE_CHANGELOG_BOT_CONVERSATION_IDS = process.argv[SECOND_ARGUMENT];
+    }
+  }
+}
+
+travisEnvVars.forEach(envVar => {
+  if (!process.env[envVar]) {
+    console.error(
+      `${setBold('Error:')} Travis environment variable "${envVar}" is not set.\n` +
+        'Read more: https://docs.travis-ci.com/user/environment-variables/#Default-Environment-Variables'
+    );
+    process.exit(1);
+  }
+});
+
+requiredEnvVars.forEach(envVar => {
+  if (!process.env[envVar]) {
+    console.error(`Error: Environment variable "${envVar}" is not set.`);
+    envVarUsage();
+    process.exit(1);
+  }
+});
+
+start()
+  .then(() => process.exit(0))
+  .catch(error => {
+    console.error(error);
+    process.exit(1);
+  });
