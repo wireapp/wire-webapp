@@ -566,10 +566,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
 
   // Toggle the mute state of the microphone.
   toggle_audio_send() {
-    const hasActiveAudioStream = !!this.localMediaStream();
-    return hasActiveAudioStream
-      ? this._toggleAudioSend()
-      : Promise.reject(new z.media.MediaError(z.media.MediaError.TYPE.NO_AUDIO_STREAM_FOUND));
+    return this._toggleAudioSend();
   }
 
   // Toggle the screen.
@@ -713,9 +710,11 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
         amplify.publish(z.event.WebApp.CALL.MEDIA.MUTE_AUDIO, !stateObservable());
       }
 
-      const mediaStreamTracks = z.media.MediaStreamHandler.get_media_tracks(mediaStream, mediaType);
-      mediaStreamTracks.forEach(mediaStreamTrack => (mediaStreamTrack.enabled = stateObservable()));
-      return mediaStreamTracks;
+      if (mediaStream) {
+        const mediaStreamTracks = z.media.MediaStreamHandler.get_media_tracks(mediaStream, mediaType);
+        mediaStreamTracks.forEach(mediaStreamTrack => (mediaStreamTrack.enabled = stateObservable()));
+        return mediaStreamTracks;
+      }
     });
   }
 };
