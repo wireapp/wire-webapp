@@ -118,11 +118,7 @@ export default class ConversationService {
       messageId,
     });
 
-    const preKeyBundles = await this.getPreKeyBundles(conversationId);
-    const plainTextBuffer: Buffer = this.protocolBuffers.GenericMessage.encode(ping).finish();
-    const payload: EncryptedAsset = await AssetCryptography.encryptAsset(plainTextBuffer);
-
-    await this.sendExternalGenericMessage(this.clientID, conversationId, payload, <UserPreKeyBundleMap>preKeyBundles);
+    await this.sendGenericMessage(this.clientID, conversationId, ping);
     return messageId;
   }
 
