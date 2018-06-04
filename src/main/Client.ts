@@ -158,6 +158,7 @@ class Client {
 
     return Promise.resolve()
       .then(() => this.context && this.logout())
+      .catch(error => this.logger.error(error))
       .then(() => this.auth.api.postLogin(loginData))
       .then((response: AxiosResponse<any>) => {
         cookieResponse = response;
@@ -174,6 +175,7 @@ class Client {
     return (
       Promise.resolve()
         .then(() => this.context && this.logout())
+        .catch(error => this.logger.error(error))
         .then(() => this.auth.api.postRegister(userAccount))
         /**
          * Note:
