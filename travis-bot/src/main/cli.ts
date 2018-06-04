@@ -20,7 +20,7 @@
  */
 
 import {LoginData} from '@wireapp/api-client/dist/commonjs/auth/';
-import {ClientType} from '@wireapp/api-client/dist/commonjs/client';
+import {ClientType} from '@wireapp/api-client/dist/commonjs/client/';
 import {MessageData, TravisBot} from './index';
 
 const logdown = require('logdown');
