@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="1.0.1"></a>
+## [1.0.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@1.0.0...@wireapp/api-client@1.0.1) (2018-06-04)
+
+
+### Bug Fixes
+
+* **api-client:** Continue registration & login on precautionary logout error ([#661](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/661)) ([2f04c72](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/2f04c72))
+
+
+
+
 <a name="1.0.0"></a>
 # [1.0.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@0.10.11...@wireapp/api-client@1.0.0) (2018-06-04)
 
