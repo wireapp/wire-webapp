@@ -20,6 +20,7 @@
 import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine';
 import {AxiosPromise, AxiosRequestConfig, AxiosResponse} from 'axios';
 import {LoginData} from '../auth';
+import {ClientType} from '../client/';
 import {HttpClient} from '../http';
 import {sendRequestWithCookie} from '../shims/node/cookie';
 import {User} from '../user';
@@ -71,15 +72,15 @@ class AuthAPI {
   public postLogin(loginData: LoginData): Promise<AxiosResponse<any>> {
     const login = {
       ...loginData,
+      clientType: undefined,
       password: loginData.password ? String(loginData.password) : undefined,
-      persist: undefined,
     };
 
     const config: AxiosRequestConfig = {
       data: login,
       method: 'post',
       params: {
-        persist: loginData.persist.toString(),
+        persist: loginData.clientType === ClientType.PERMANENT ? true : false,
       },
       url: AuthAPI.URL.LOGIN,
       withCredentials: true,

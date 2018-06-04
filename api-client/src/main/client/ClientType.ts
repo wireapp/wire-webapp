@@ -18,6 +18,7 @@
  */
 
 enum ClientType {
+  NONE = 'none',
   PERMANENT = 'permanent',
   TEMPORARY = 'temporary',
 }

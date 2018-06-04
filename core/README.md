@@ -28,9 +28,9 @@ account.on(Account.INCOMING.TEXT_MESSAGE, ({conversation, content}) => {
 });
 
 account.listen({
+  clientType: 'temporary',
   email: 'name@email.com',
   password: 'secret',
-  persist: false,
 });
 ```
 
@@ -39,14 +39,15 @@ account.listen({
 ```typescript
 import {Account} from '@wireapp/core';
 import {PayloadBundle} from '@wireapp/core/dist/commonjs/cryptography/';
+import {ClientType} from '@wireapp/api-client/dist/commonjs/client/';
 import {LoginData} from '@wireapp/api-client/dist/commonjs/auth/';
 
 const account: Account = new Account();
 
 const login: LoginData = {
+  clientType: ClientType.TEMPORARY,
   email: 'name@email.com',
   password: 'secret',
-  persist: false,
 };
 
 account.on(Account.INCOMING.TEXT_MESSAGE, (data: PayloadBundle) => {

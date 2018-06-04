@@ -28,12 +28,13 @@ const Client = require('@wireapp/api-client');
 const path = require('path');
 const {FileEngine} = require('@wireapp/store-engine');
 const {WebSocketClient} = require('@wireapp/api-client/dist/commonjs/tcp/');
+const {ClientType} = require('@wireapp/api-client/dist/commonjs/client/');
 
 const login = {
+  clientType: ClientType.PERMANENT,
   email: argv.email,
   handle: argv.handle,
   password: argv.password,
-  persist: true,
 };
 
 const storagePath = path.join(process.cwd(), '.tmp', login.email);

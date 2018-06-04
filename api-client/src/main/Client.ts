@@ -137,13 +137,13 @@ class Client {
     };
   }
 
-  public init(clientType?: ClientType): Promise<Context> {
+  public init(clientType: ClientType = ClientType.NONE): Promise<Context> {
     let context: Context;
     let accessToken: AccessTokenData;
     return this.transport.http
       .postAccess()
       .then((createdAccessToken: AccessTokenData) => {
-        context = this.createContext(createdAccessToken.user, undefined, clientType);
+        context = this.createContext(createdAccessToken.user, clientType);
         accessToken = createdAccessToken;
       })
       .then(() => this.initEngine(context))
@@ -162,11 +162,7 @@ class Client {
       .then((response: AxiosResponse<any>) => {
         cookieResponse = response;
         accessToken = response.data;
-        context = this.createContext(
-          accessToken.user,
-          undefined,
-          loginData.persist ? ClientType.PERMANENT : ClientType.TEMPORARY
-        );
+        context = this.createContext(accessToken.user, loginData.clientType);
       })
       .then(() => this.initEngine(context))
       .then(() => retrieveCookie(cookieResponse, this.config.store))
@@ -174,7 +170,7 @@ class Client {
       .then(() => context);
   }
 
-  public register(userAccount: RegisterData, persist: boolean = true): Promise<Context> {
+  public register(userAccount: RegisterData, clientType: ClientType = ClientType.PERMANENT): Promise<Context> {
     return (
       Promise.resolve()
         .then(() => this.context && this.logout())
@@ -184,11 +180,9 @@ class Client {
          * It's necessary to initialize the context (Client.createContext()) and the store (Client.initEngine())
          * for saving the retrieved cookie from POST /access (Client.init()) in a Node environment.
          */
-        .then((user: User) =>
-          this.createContext(user.id, undefined, persist ? ClientType.PERMANENT : ClientType.TEMPORARY)
-        )
+        .then((user: User) => this.createContext(user.id, clientType))
         .then((context: Context) => this.initEngine(context))
-        .then(() => this.init(persist ? ClientType.PERMANENT : ClientType.TEMPORARY))
+        .then(() => this.init(clientType))
     );
   }
 
@@ -210,8 +204,8 @@ class Client {
     }
   }
 
-  private createContext(userId: string, clientId?: string, clientType?: ClientType): Context {
-    this.context = this.context ? {...this.context, clientId, clientType} : new Context(userId, clientId, clientType);
+  private createContext(userId: string, clientType: ClientType, clientId?: string): Context {
+    this.context = this.context ? {...this.context, clientId, clientType} : new Context(userId, clientType, clientId);
     return this.context;
   }
 
@@ -220,9 +214,8 @@ class Client {
   }
 
   private async initEngine(context: Context) {
-    const dbName = `${this.STORE_NAME_PREFIX}@${this.config.urls.name}@${context.userId}${
-      context.clientType ? `@${context.clientType}` : ''
-    }`;
+    const clientType = context.clientType === ClientType.NONE ? '' : `@${context.clientType}`;
+    const dbName = `${this.STORE_NAME_PREFIX}@${this.config.urls.name}@${context.userId}${clientType}`;
     this.logger.info(`Initialising store with name "${dbName}"`);
     try {
       const db = await this.config.store.init(dbName);

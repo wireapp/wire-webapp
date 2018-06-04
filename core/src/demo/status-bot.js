@@ -20,6 +20,7 @@
 //@ts-check
 
 const APIClient = require('@wireapp/api-client');
+const ClientType = require('@wireapp/api-client/dist/commonjs/client/ClientType');
 const {Account} = require('@wireapp/core');
 const {Config} = require('@wireapp/api-client/dist/commonjs/Config');
 const {MemoryEngine} = require('@wireapp/store-engine');
@@ -42,9 +43,9 @@ if (!conversationId) {
 
 (async () => {
   const login = {
+    clientType: ClientType.TEMPORARY,
     email: process.env.WIRE_STATUS_BOT_EMAIL,
     password: process.env.WIRE_STATUS_BOT_PASSWORD,
-    persist: false,
   };
 
   try {

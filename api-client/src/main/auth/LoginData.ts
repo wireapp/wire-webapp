@@ -1,3 +1,5 @@
+import {ClientType} from '../client/';
+
 /*
  * Wire
  * Copyright (C) 2018 Wire Swiss GmbH
@@ -22,7 +24,7 @@ interface LoginData {
   email?: string;
   handle?: string;
   password?: number | string;
-  persist: boolean;
+  clientType: ClientType;
   phone?: string;
 }
 

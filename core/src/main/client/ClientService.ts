@@ -98,6 +98,9 @@ export default class ClientService {
     if (!this.apiClient.context) {
       throw new Error('Context is not set.');
     }
+    if (loginData.clientType === ClientType.NONE) {
+      throw new Error(`Can't register client of type "${ClientType.NONE}"`);
+    }
 
     const serializedPreKeys: Array<PreKey> = await this.cryptographyService.createCryptobox();
 
@@ -118,7 +121,7 @@ export default class ClientService {
           enckey: 'Wuec0oJi9/q9VsgOil9Ds4uhhYwBT+CAUrvi/S9vcz0=',
           mackey: 'Wuec0oJi9/q9VsgOil9Ds4uhhYwBT+CAUrvi/S9vcz0=',
         },
-        type: loginData.persist ? ClientType.PERMANENT : ClientType.TEMPORARY,
+        type: loginData.clientType,
       };
     } else {
       throw new Error('Cryptobox got initialized without a last resort PreKey.');

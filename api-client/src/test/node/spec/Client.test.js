@@ -79,9 +79,9 @@ describe('Client', () => {
     };
 
     const loginData = {
+      clientType: 'temporary',
       email: 'me@mail.com',
       password: 'top-secret',
-      persist: false,
     };
 
     const userData = [
@@ -134,7 +134,7 @@ describe('Client', () => {
           email: loginData.email,
           password: loginData.password,
         })
-        .query({persist: loginData.persist})
+        .query({persist: loginData.clientType === 'permanent'})
         .reply(200, accessTokenData);
 
       nock(baseURL)
@@ -208,8 +208,8 @@ describe('Client', () => {
 
       const context = client.createContext(
         '3721e5d3-558d-45ac-b476-b4a64a8f74c1',
-        'dce3d529-51e6-40c2-9147-e091eef48e73',
-        'temporary'
+        'temporary',
+        'dce3d529-51e6-40c2-9147-e091eef48e73'
       );
       await client.initEngine(context);
 

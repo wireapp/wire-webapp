@@ -6,7 +6,7 @@ const {Account} = require('@wireapp/core');
 const {description, version} = require('../../package.json');
 const {FileEngine} = require('@wireapp/store-engine');
 import APIClient = require('@wireapp/api-client');
-import {RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/';
+import {ClientType, RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/';
 import {Config} from '@wireapp/api-client/dist/commonjs/Config';
 import {BackendErrorLabel} from '@wireapp/api-client/dist/commonjs/http/';
 import {PayloadBundle} from '@wireapp/core/dist/cryptography/root';
@@ -25,9 +25,9 @@ program
   .parse(process.argv);
 
 const loginData = {
+  clientType: ClientType.PERMANENT,
   email: program.email || process.env.WIRE_LOGIN_EMAIL,
   password: program.password || process.env.WIRE_LOGIN_PASSWORD,
-  persist: true,
 };
 
 const conversationID = program.conversation || process.env.WIRE_CONVERSATION_ID;

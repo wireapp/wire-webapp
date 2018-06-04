@@ -20,6 +20,7 @@
  */
 
 import {LoginData} from '@wireapp/api-client/dist/commonjs/auth/';
+import {ClientType} from '@wireapp/api-client/dist/commonjs/client';
 import {MessageData, TravisBot} from './index';
 
 const logdown = require('logdown');
@@ -66,9 +67,9 @@ const start = async (): Promise<TravisBot> => {
   }
 
   const loginData: LoginData = {
+    clientType: ClientType.TEMPORARY,
     email: WIRE_WEBAPP_BOT_EMAIL,
     password: WIRE_WEBAPP_BOT_PASSWORD,
-    persist: false,
   };
 
   const messageData: MessageData = {
