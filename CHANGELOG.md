@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="1.1.0"></a>
+# [1.1.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@1.0.1...@wireapp/api-client@1.1.0) (2018-06-04)
+
+
+### Features
+
+* **api-client:** Logout function ignoreError option ([#663](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/663)) ([72dc8e6](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/72dc8e6))
+
+
+
+
 <a name="1.0.1"></a>
 ## [1.0.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@1.0.0...@wireapp/api-client@1.0.1) (2018-06-04)
 
