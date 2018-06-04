@@ -345,13 +345,17 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
         const cipherPayloadPromises = [];
 
         for (const userId in recipients) {
-          const clientIds = recipients[userId];
+          if (recipients.hasOwnProperty(userId)) {
+            const clientIds = recipients[userId];
 
-          messagePayload.recipients[userId] = messagePayload.recipients[userId] || {};
-          clientIds.forEach(clientId => {
-            const sessionId = this._constructSessionId(userId, clientId);
-            cipherPayloadPromises.push(this._encryptPayloadForSession(sessionId, genericMessage));
-          });
+            if (clientIds && clientIds.length) {
+              messagePayload.recipients[userId] = messagePayload.recipients[userId] || {};
+              clientIds.forEach(clientId => {
+                const sessionId = this._constructSessionId(userId, clientId);
+                cipherPayloadPromises.push(this._encryptPayloadForSession(sessionId, genericMessage));
+              });
+            }
+          }
         }
 
         return Promise.all(cipherPayloadPromises);
@@ -367,15 +371,21 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
         const cipherPayloadPromises = [];
 
         for (const userId in userPreKeyMap) {
-          const clientPreKeyMap = userPreKeyMap[userId];
+          if (userPreKeyMap.hasOwnProperty(userId)) {
+            const clientPreKeyMap = userPreKeyMap[userId];
 
-          for (const clientId in clientPreKeyMap) {
-            const preKey = clientPreKeyMap[clientId];
+            if (clientPreKeyMap && Object.keys(clientPreKeyMap).length) {
+              for (const clientId in clientPreKeyMap) {
+                if (clientPreKeyMap.hasOwnProperty(clientId)) {
+                  const preKeyPayload = clientPreKeyMap[clientId];
 
-            if (preKey) {
-              const sessionId = this._constructSessionId(userId, clientId);
-              const preKeyBundle = z.util.base64ToArray(preKey.key).buffer;
-              cipherPayloadPromises.push(this._encryptPayloadForSession(sessionId, genericMessage, preKeyBundle));
+                  if (preKeyPayload) {
+                    const sessionId = this._constructSessionId(userId, clientId);
+                    const preKeyBundle = z.util.base64ToArray(preKeyPayload.key).buffer;
+                    cipherPayloadPromises.push(this._encryptPayloadForSession(sessionId, genericMessage, preKeyBundle));
+                  }
+                }
+              }
             }
           }
         }
