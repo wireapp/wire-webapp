@@ -50,9 +50,9 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
 
     this.selfUser = this.userRepository.self;
 
-    this.availableDevices = this.mediaRepository.devices_handler.available_devices;
-    this.currentDeviceId = this.mediaRepository.devices_handler.current_device_id;
-    this.currentDeviceIndex = this.mediaRepository.devices_handler.current_device_index;
+    this.availableDevices = this.mediaRepository.devicesHandler.available_devices;
+    this.currentDeviceId = this.mediaRepository.devicesHandler.current_device_id;
+    this.currentDeviceIndex = this.mediaRepository.devicesHandler.current_device_index;
 
     this.selfStreamState = this.mediaRepository.stream_handler.selfStreamState;
 
@@ -215,7 +215,7 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
       }
 
       if (z.util.Environment.desktop) {
-        this.mediaRepository.devices_handler
+        this.mediaRepository.devicesHandler
           .get_screen_sources()
           .then(screenSources => {
             const conversationEntity = this.joinedCall().conversationEntity;
@@ -296,11 +296,11 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
   }
 
   clickedOnToggleCamera() {
-    this.mediaRepository.devices_handler.toggle_next_camera();
+    this.mediaRepository.devicesHandler.toggle_next_camera();
   }
 
   clickedOnToggleScreen() {
-    this.mediaRepository.devices_handler.toggle_next_screen();
+    this.mediaRepository.devicesHandler.toggle_next_screen();
   }
 
   clickedOnMinimize() {

@@ -457,7 +457,7 @@ z.calling.CallingRepository = class CallingRepository {
         if (!callEntity.selfClientJoined()) {
           this.callLogger.info(`Rejecting call in conversation '${conversationId}'`, callEntity);
           callEntity.state(z.calling.enum.CALL_STATE.REJECTED);
-          this.mediaStreamHandler.reset_media_stream();
+          this.mediaStreamHandler.resetMediaStream();
         }
       })
       .catch(this._throwMessageError);
@@ -1019,7 +1019,7 @@ z.calling.CallingRepository = class CallingRepository {
 
     callEntity.deleteCall();
     this.calls.remove(call => call.id === conversationId);
-    this.mediaStreamHandler.reset_media_stream();
+    this.mediaStreamHandler.resetMediaStream();
   }
 
   /**
@@ -1101,7 +1101,7 @@ z.calling.CallingRepository = class CallingRepository {
     return this.mediaStreamHandler.localMediaStream()
       ? Promise.resolve(callEntity)
       : this.mediaStreamHandler
-          .initiate_media_stream(conversationId, mediaType, callEntity.isGroup)
+          .initiateMediaStream(conversationId, mediaType, callEntity.isGroup)
           .then(() => callEntity);
   }
 
@@ -1141,7 +1141,7 @@ z.calling.CallingRepository = class CallingRepository {
       terminationReason = undefined;
     }
 
-    this.mediaStreamHandler.release_media_stream();
+    this.mediaStreamHandler.releaseMediaStream();
     callEntity.leaveCall(terminationReason);
   }
 
@@ -1201,15 +1201,15 @@ z.calling.CallingRepository = class CallingRepository {
   _toggleMediaState(mediaType) {
     switch (mediaType) {
       case z.media.MediaType.AUDIO: {
-        return this.mediaStreamHandler.toggle_audio_send();
+        return this.mediaStreamHandler.toggleAudioSend();
       }
 
       case z.media.MediaType.SCREEN: {
-        return this.mediaStreamHandler.toggle_screen_send();
+        return this.mediaStreamHandler.toggleScreenSend();
       }
 
       case z.media.MediaType.VIDEO: {
-        return this.mediaStreamHandler.toggle_video_send();
+        return this.mediaStreamHandler.toggleVideoSend();
       }
 
       default: {
@@ -1285,7 +1285,7 @@ z.calling.CallingRepository = class CallingRepository {
           const eventFromWebSocket = source === z.event.EventRepository.SOURCE.WEB_SOCKET;
           if (eventFromWebSocket && callEntity.isRemoteVideoSend()) {
             const mediaStreamType = z.media.MediaType.AUDIO_VIDEO;
-            this.mediaStreamHandler.initiate_media_stream(callEntity.id, mediaStreamType, callEntity.isGroup);
+            this.mediaStreamHandler.initiateMediaStream(callEntity.id, mediaStreamType, callEntity.isGroup);
           }
 
           return callEntity;
