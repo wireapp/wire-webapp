@@ -154,7 +154,7 @@ class Account extends EventEmitter {
               this.logger.info('Last client was temporary - Deleting database');
               return this.apiClient.config.store
                 .purge()
-                .then(() => this.apiClient.init(loginData.persist ? ClientType.PERMANENT : ClientType.TEMPORARY))
+                .then(() => this.apiClient.init(loginData.clientType))
                 .then(() => this.registerClient(loginData, clientInfo));
             }
             this.logger.info('Last client was permanent - Deleting cryptography stores');

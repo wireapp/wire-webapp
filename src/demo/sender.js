@@ -12,6 +12,7 @@ require('dotenv').config({path: path.join(__dirname, 'echo2.env')});
 
 const {Account} = require('@wireapp/core');
 const APIClient = require('@wireapp/api-client');
+const ClientType = require('@wireapp/api-client/dist/commonjs/client/ClientType');
 const {Config} = require('@wireapp/api-client/dist/commonjs/Config');
 const {FileEngine} = require('@wireapp/store-engine');
 
@@ -19,9 +20,9 @@ const {FileEngine} = require('@wireapp/store-engine');
   const CONVERSATION_ID = process.env.WIRE_CONVERSATION_ID;
 
   const login = {
+    clientType: ClientType.TEMPORARY,
     email: process.env.WIRE_EMAIL,
     password: process.env.WIRE_PASSWORD,
-    persist: true,
   };
 
   const engine = new FileEngine(path.join(__dirname, '.tmp', 'sender'));

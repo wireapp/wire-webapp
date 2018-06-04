@@ -95,7 +95,7 @@ describe('Account', () => {
         account.service.cryptography.initCryptobox = () => Promise.resolve();
         account.service.client.getLocalClient = () => Promise.resolve({id: clientId});
         account.apiClient.client.api.getClient = () => Promise.resolve({id: clientId});
-        account.apiClient.createContext('userId', 'clientId', 'clientType');
+        account.apiClient.createContext('userId', 'clientType', 'clientId');
 
         await account.loadAndValidateLocalClient();
       } catch (error) {
@@ -123,7 +123,7 @@ describe('Account', () => {
         account.service.client.register = () => Promise.resolve({id: clientId});
         account.service.client.synchronizeClients = () => Promise.resolve();
         account.service.notification.initializeNotificationStream = () => Promise.resolve();
-        account.apiClient.createContext('userId', 'clientId', 'clientType');
+        account.apiClient.createContext('userId', 'clientType', 'clientId');
 
         await account.registerClient();
       } catch (error) {
