@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="1.0.0"></a>
+# [1.0.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/travis-bot/compare/@wireapp/travis-bot@0.1.136...@wireapp/travis-bot@1.0.0) (2018-06-04)
+
+
+### Code Refactoring
+
+* **api-client,core:** Add ClientType.NONE ([#660](https://github.com/wireapp/wire-web-packages/tree/master/packages/travis-bot/issues/660)) ([97e7b12](https://github.com/wireapp/wire-web-packages/tree/master/packages/travis-bot/commit/97e7b12))
+
+
+### BREAKING CHANGES
+
+* **api-client,core:** Expecting ClientType in init calls, register calls and LoginData type.
+
+
+
+
 <a name="0.1.136"></a>
 ## [0.1.136](https://github.com/wireapp/wire-web-packages/tree/master/packages/travis-bot/compare/@wireapp/travis-bot@0.1.135...@wireapp/travis-bot@0.1.136) (2018-06-04)
 
