@@ -29,6 +29,7 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
     this.mediaRepository = params.mediaRepository;
     this.multitasking = params.multitasking;
     this.temporaryUserStyle = params.temporaryUserStyle;
+    this.videoGridRepository = params.videoGridRepository;
 
     this.onJoinCall = () => {
       const mediaType = this.call().isRemoteVideoSend() ? z.media.MediaType.AUDIO_VIDEO : z.media.MediaType.AUDIO;
@@ -36,10 +37,6 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
     };
 
     this.selfStreamState = this.calling_repository.selfStreamState;
-
-    this.videoStreamsInfo = this.mediaRepository.stream_handler.remoteMediaStreamInfoIndex.video;
-    this.localVideoStream = this.mediaRepository.stream_handler.localMediaStream;
-    this.calls = this.calling_repository.calls;
 
     this.onLeaveCall = () => {
       amplify.publish(
@@ -195,7 +192,7 @@ ko.components.register('conversation-list-calling-cell', {
 
     <!-- ko if: showVideoPreview -->
       <div class="group-video__minimized-wrapper" data-bind="click: onMaximizeVideoGrid">
-        <group-video-grid params="streamsInfo: videoStreamsInfo, selfStreamInfo: {state: selfStreamState, stream: localVideoStream}, calls: calls, minimized: true"></group-video-grid>
+        <group-video-grid params="minimized: true, videoGridRepository: videoGridRepository"></group-video-grid>
         <!-- ko if: showMaximize -->
           <div class="group-video__minimized-wrapper__overlay" data-uie-name="do-maximize-call">
             <fullscreen-icon></fullscreen-icon>

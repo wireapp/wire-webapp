@@ -42,6 +42,8 @@ z.viewModel.list.ConversationListViewModel = class ConversationListViewModel {
     this.conversationRepository = repositories.conversation;
     this.teamRepository = repositories.team;
     this.user_repository = repositories.user;
+    this.videoGridRepository = repositories.videoGrid;
+
     this.logger = new z.util.Logger('z.viewModel.list.ConversationListViewModel', z.config.LOGGER.OPTIONS);
     this.multitasking = this.contentViewModel.multitasking;
 
