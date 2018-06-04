@@ -149,13 +149,13 @@
   version "3.2.0"
   resolved "https://codeload.github.com/dcodeIO/Long.js/tar.gz/8cdc1f74ced4f771aa844f1cbc565b1d4c4451b8"
 
-"@bower_components/mixpanel@mixpanel/mixpanel-js#2.22.3":
-  version "2.22.3"
-  resolved "https://codeload.github.com/mixpanel/mixpanel-js/tar.gz/bf6269a3055593b4490a39f6070174bff02b40de"
+"@bower_components/mixpanel@mixpanel/mixpanel-js#2.22.4":
+  version "2.22.4"
+  resolved "https://codeload.github.com/mixpanel/mixpanel-js/tar.gz/40945bbee973dbc85d061653a687faa81f3cfd05"
 
-"@bower_components/moment@moment/moment#2.22.1":
-  version "2.22.1"
-  resolved "https://codeload.github.com/moment/moment/tar.gz/c58511b94eba1000c1d66b23e9a9ff963ff1cc89"
+"@bower_components/moment@moment/moment#2.22.2":
+  version "2.22.2"
+  resolved "https://codeload.github.com/moment/moment/tar.gz/2e2a5b35439665d4b0200143d808a7c26d6cd30f"
 
 "@bower_components/normalize-css@necolas/normalize.css#3.0.3":
   version "3.0.3"
@@ -6693,9 +6693,9 @@ mixin-deep@^1.2.0:
     for-in "^1.0.2"
     is-extendable "^1.0.1"
 
-mixpanel-browser@2.22.3:
-  version "2.22.3"
-  resolved "https://registry.yarnpkg.com/mixpanel-browser/-/mixpanel-browser-2.22.3.tgz#9593df16a17594c52756ffaf80f7e522473423b7"
+mixpanel-browser@2.22.4:
+  version "2.22.4"
+  resolved "https://registry.yarnpkg.com/mixpanel-browser/-/mixpanel-browser-2.22.4.tgz#f1d57a2c2f50801f57357fb16f38288bcee3cc7d"
 
 mkdirp@0.5.x, "mkdirp@>=0.5 0", mkdirp@^0.5.0, mkdirp@^0.5.1, mkdirp@~0.5.0, mkdirp@~0.5.1:
   version "0.5.1"
