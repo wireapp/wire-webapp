@@ -1283,10 +1283,9 @@ z.calling.CallingRepository = class CallingRepository {
           this.injectActivateEvent(callMessageEntity, source);
 
           const eventFromWebSocket = source === z.event.EventRepository.SOURCE.WEB_SOCKET;
-          if (eventFromWebSocket) {
-            const fixedMediaType = mediaType === z.media.MediaType.VIDEO ? z.media.MediaType.AUDIO_VIDEO : mediaType;
-
-            this.mediaStreamHandler.initiate_media_stream(callEntity.id, fixedMediaType, callEntity.isGroup);
+          if (eventFromWebSocket && callEntity.isRemoteVideoSend()) {
+            const mediaStreamType = z.media.MediaType.AUDIO_VIDEO;
+            this.mediaStreamHandler.initiate_media_stream(callEntity.id, mediaStreamType, callEntity.isGroup);
           }
 
           return callEntity;
