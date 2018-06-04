@@ -9,7 +9,7 @@
     "rimraf": "2.6.2",
     "tsd-jsdoc": "dcodeio/tsd-jsdoc#fe76c4dc071b00bb549d3af7a3bad8c555999e81",
     "webpack": "4.10.2",
-    "webpack-cli": "3.0.0"
+    "webpack-cli": "3.0.1"
   },
   "files": [
     "dist"
