@@ -37,6 +37,7 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
     };
 
     this.selfStreamState = this.calling_repository.selfStreamState;
+    this.calls = this.calling_repository.calls;
 
     this.onLeaveCall = () => {
       amplify.publish(
