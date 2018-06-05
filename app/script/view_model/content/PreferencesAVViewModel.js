@@ -46,11 +46,11 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
 
     this.isActivatedAccount = this.userRepository.isActivatedAccount;
 
-    this.devicesHandler = this.mediaRepository.devicesHandler;
+    this.devicesHandler = this.mediaRepository.devices_handler;
     this.availableDevices = this.devicesHandler.available_devices;
     this.currentDeviceId = this.devicesHandler.current_device_id;
 
-    this.constraintsHandler = this.mediaRepository.constraintsHandler;
+    this.constraintsHandler = this.mediaRepository.constraints_handler;
     this.streamHandler = this.mediaRepository.stream_handler;
     this.mediaStream = this.streamHandler.localMediaStream;
 

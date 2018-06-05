@@ -85,6 +85,9 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
    * @param {z.media.MediaRepository} mediaRepository - Media repository with with references to all other handlers
    */
   constructor(mediaRepository) {
+    this._toggleScreenSend = this._toggleScreenSend.bind(this);
+    this._toggleVideoSend = this._toggleVideoSend.bind(this);
+
     this.mediaRepository = mediaRepository;
     this.logger = new z.util.Logger('z.media.MediaStreamHandler', z.config.LOGGER.OPTIONS);
 
@@ -588,14 +591,12 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
 
   // Toggle the screen.
   toggleScreenSend() {
-    const hasActiveScreenStream = this.localMediaStream() && this.localMediaType() === z.media.MediaType.SCREEN;
-    return hasActiveScreenStream ? this._toggleScreenSend() : this.replaceInputSource(z.media.MediaType.SCREEN);
+    return this._toggleMediaSend(z.media.MediaType.SCREEN, this._toggleScreenSend);
   }
 
   // Toggle the camera.
   toggleVideoSend() {
-    const hasActiveVideoStream = this.localMediaStream() && this.localMediaType() === z.media.MediaType.VIDEO;
-    return hasActiveVideoStream ? this._toggleVideoSend() : this.replaceInputSource(z.media.MediaType.VIDEO);
+    return this._toggleMediaSend(z.media.MediaType.VIDEO, this._toggleVideoSend);
   }
 
   // Reset the enabled states of media types.
@@ -672,40 +673,57 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
   /**
    * Toggle the audio stream.
    * @private
-   * @returns {Promise} Resolve when the stream has been toggled
+   * @returns {Promise} Resolves when the stream has been toggled
    */
   _toggleAudioSend() {
-    return Promise.resolve().then(() => {
-      this.selfStreamState.audioSend(!this.selfStreamState.audioSend());
-      this.logger.info(`Microphone enabled: ${this.selfStreamState.audioSend()}`);
-      return this.selfStreamState.audioSend();
-    });
+    return this._toggleSendState(this.selfStreamState.audioSend, 'Microphone');
+  }
+
+  /**
+   * Toggle the screen stream.
+   *
+   * @private
+   * @param {z.media.MediaType} mediaType - Type of media to toggle
+   * @param {Function} toggleFn - Function to toggle type of media
+   * @returns {Promise} Resolves when the stream has been toggled
+   */
+  _toggleMediaSend(mediaType, toggleFn) {
+    const hasActiveScreenStream = this.localMediaStream() && this.localMediaType() === mediaType;
+    return hasActiveScreenStream ? toggleFn() : this.replaceInputSource(mediaType);
   }
 
   /**
    * Toggle the screen stream.
    * @private
-   * @returns {Promise} Resolve when the stream has been toggled
+   * @returns {Promise} Resolves when the stream has been toggled
    */
   _toggleScreenSend() {
+    return this._toggleSendState(this.selfStreamState.screenSend, 'Screen');
+  }
+
+  /**
+   * Toggle a given send state.
+   *
+   * @private
+   * @param {ko.observable} stateObservable - State to toggle
+   * @param {string} name - Name of state being toggled
+   * @returns {Promise} Resolves when the state has been toggled
+   */
+  _toggleSendState(stateObservable, name) {
     return Promise.resolve().then(() => {
-      this.selfStreamState.screenSend(!this.selfStreamState.screenSend());
-      this.logger.info(`Screen enabled: ${this.selfStreamState.screenSend()}`);
-      return this.selfStreamState.screenSend();
+      stateObservable(!stateObservable());
+      this.logger.info(`${name} enabled: ${stateObservable()}`);
+      return stateObservable();
     });
   }
 
   /**
    * Toggle the video stream.
    * @private
-   * @returns {Promise} Resolve when the stream has been toggled
+   * @returns {Promise} Resolves when the stream has been toggled
    */
   _toggleVideoSend() {
-    return Promise.resolve().then(() => {
-      this.selfStreamState.videoSend(!this.selfStreamState.videoSend());
-      this.logger.info(`Camera enabled: ${this.selfStreamState.videoSend()}`);
-      return this.selfStreamState.videoSend();
-    });
+    return this._toggleSendState(this.selfStreamState.videoSend, 'Camera');
   }
 
   /**
