@@ -20,7 +20,7 @@
 //@ts-check
 
 const APIClient = require('@wireapp/api-client');
-const ClientType = require('@wireapp/api-client/dist/commonjs/client/ClientType');
+const {ClientType} = require('@wireapp/api-client/dist/commonjs/client/');
 const {Account} = require('@wireapp/core');
 const {Config} = require('@wireapp/api-client/dist/commonjs/Config');
 const {MemoryEngine} = require('@wireapp/store-engine');
