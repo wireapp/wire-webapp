@@ -38,7 +38,9 @@ class ClientManager extends React.Component {
       .then(() => this.props.history.push(ROUTE.LOGIN));
 
   render() {
-    const {intl: {formatMessage: _}} = this.props;
+    const {
+      intl: {formatMessage: _},
+    } = this.props;
     return (
       <Page>
         <ContainerXS
@@ -66,4 +68,9 @@ class ClientManager extends React.Component {
   }
 }
 
-export default injectIntl(connect(null, {...AuthAction, ...ClientAction})(ClientManager));
+export default injectIntl(
+  connect(
+    null,
+    {...AuthAction, ...ClientAction}
+  )(ClientManager)
+);
