@@ -31,7 +31,7 @@ z.media.MediaElementHandler = class MediaElementHandler {
     this.mediaRepository = mediaRepository;
     this.logger = new z.util.Logger('z.media.MediaElementHandler', z.config.LOGGER.OPTIONS);
 
-    this.currentDeviceId = this.mediaRepository.devicesHandler.current_device_id;
+    this.currentDeviceId = this.mediaRepository.devicesHandler.currentDeviceId;
     this.remoteMediaElements = ko.observableArray([]);
   }
 
@@ -91,7 +91,7 @@ z.media.MediaElementHandler = class MediaElementHandler {
       mediaElement.muted = false;
       mediaElement.setAttribute('autoplay', true);
       if (z.util.Environment.browser.supports.audioOutputSelection) {
-        this._setMediaElementOutput(mediaElement, this.currentDeviceId.audio_output());
+        this._setMediaElementOutput(mediaElement, this.currentDeviceId.audioOutput());
       }
       return mediaElement;
     } catch (error) {

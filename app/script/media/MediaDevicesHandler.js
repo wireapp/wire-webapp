@@ -23,6 +23,12 @@ window.z = window.z || {};
 window.z.media = z.media || {};
 
 z.media.MediaDevicesHandler = class MediaDevicesHandler {
+  static get CONFIG() {
+    return {
+      DEFAULT_DEVICE_ID: 'default',
+    };
+  }
+
   /**
    * Construct a new MediaDevices handler.
    * @param {z.media.MediaRepository} mediaRepository - Media repository referencing the other handlers
@@ -31,62 +37,70 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
     this.mediaRepository = mediaRepository;
     this.logger = new z.util.Logger('z.media.MediaDevicesHandler', z.config.LOGGER.OPTIONS);
 
-    this.available_devices = {
-      audio_input: ko.observableArray([]),
-      audio_output: ko.observableArray([]),
-      screen_input: ko.observableArray([]),
-      video_input: ko.observableArray([]),
+    this.availableDevices = {
+      audioInput: ko.observableArray([]),
+      audioOutput: ko.observableArray([]),
+      screenInput: ko.observableArray([]),
+      videoInput: ko.observableArray([]),
     };
 
-    this.current_device_id = {
-      audio_input: ko.observable(),
-      audio_output: ko.observable(),
-      screen_input: ko.observable(),
-      video_input: ko.observable(),
+    this.currentDeviceId = {
+      audioInput: ko.observable(),
+      audioOutput: ko.observable(),
+      screenInput: ko.observable(),
+      videoInput: ko.observable(),
     };
 
-    this.current_device_index = {
-      audio_input: ko.observable(0),
-      audio_output: ko.observable(0),
-      screen_input: ko.observable(0),
-      video_input: ko.observable(0),
+    this.currentDeviceIndex = {
+      audioInput: ko.observable(0),
+      audioOutput: ko.observable(0),
+      screenInput: ko.observable(0),
+      videoInput: ko.observable(0),
     };
 
-    this.has_camera = ko.pureComputed(() => this.available_devices.video_input().length > 0);
-    this.has_microphone = ko.pureComputed(() => this.available_devices.audio_input().length > 0);
+    this.hasCamera = ko.pureComputed(() => this.availableDevices.videoInput().length > 0);
+    this.hasMicrophone = ko.pureComputed(() => this.availableDevices.audioInput().length > 0);
 
-    this.initialize_media_devices();
+    this.initializeMediaDevices();
   }
 
   /**
    * Initialize the list of MediaDevices and subscriptions.
    * @returns {undefined} No return value
    */
-  initialize_media_devices() {
-    if (!z.media.MediaRepository.supportsMediaDevices()) {
-      return;
+  initializeMediaDevices() {
+    if (z.media.MediaRepository.supportsMediaDevices()) {
+      this.getMediaDevices().then(() => {
+        this._setCurrentDevices();
+        this._subscribeToObservables();
+        this._subscribeToDevices();
+      });
     }
-
-    this.get_media_devices().then(() => {
-      this._set_current_devices();
-      this._subscribe_to_observables();
-      this._subscribe_to_devices();
-    });
   }
 
   /**
    * Set current media device IDs.
    * @returns {undefined} No return value
    */
-  _set_current_devices() {
-    this.current_device_id.audio_input(z.util.StorageUtil.getValue(z.media.MediaDeviceType.AUDIO_INPUT) || 'default');
-    this.current_device_id.audio_output(z.util.StorageUtil.getValue(z.media.MediaDeviceType.AUDIO_OUTPUT) || 'default');
-    this.current_device_id.video_input(z.util.StorageUtil.getValue(z.media.MediaDeviceType.VIDEO_INPUT));
+  _setCurrentDevices() {
+    const defaultDeviceId = MediaDevicesHandler.CONFIG.DEFAULT_DEVICE_ID;
 
-    if (!this.current_device_id.video_input() && this.available_devices.video_input().length) {
-      const default_device_index = this.available_devices.video_input().length - 1;
-      this.current_device_id.video_input(this.available_devices.video_input()[default_device_index].deviceId);
-      this.current_device_index.video_input(default_device_index);
+    const audioInputId = z.util.StorageUtil.getValue(z.media.MediaDeviceType.AUDIO_INPUT) || defaultDeviceId;
+    this.currentDeviceId.audioInput(audioInputId);
+
+    const audioOutputId = z.util.StorageUtil.getValue(z.media.MediaDeviceType.AUDIO_OUTPUT) || defaultDeviceId;
+    this.currentDeviceId.audioOutput(audioOutputId);
+
+    const videoInputId = z.util.StorageUtil.getValue(z.media.MediaDeviceType.VIDEO_INPUT);
+    this.currentDeviceId.videoInput(videoInputId);
+
+    const setDefaultVideoId = !this.currentDeviceId.videoInput() && this.availableDevices.videoInput().length;
+    if (setDefaultVideoId) {
+      const defaultDeviceIndex = this.availableDevices.videoInput().length - 1;
+      const videoDeviceId = this.availableDevices.videoInput()[defaultDeviceIndex].deviceId;
+
+      this.currentDeviceId.videoInput(videoDeviceId);
+      this.currentDeviceIndex.videoInput(defaultDeviceIndex);
     }
 
     this.logger.info('Set selected MediaDevice IDs');
@@ -96,11 +110,11 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
    * Subscribe to MediaDevices updates if available.
    * @returns {undefined} No return value
    */
-  _subscribe_to_devices() {
+  _subscribeToDevices() {
     if (navigator.mediaDevices.ondevicechange) {
       navigator.mediaDevices.ondevicechange = () => {
         this.logger.info('List of available MediaDevices has changed');
-        this.get_media_devices();
+        this.getMediaDevices();
       };
     }
   }
@@ -109,67 +123,67 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
    * Subscribe to Knockout observables.
    * @returns {undefined} No return value
    */
-  _subscribe_to_observables() {
-    this.available_devices.audio_input.subscribe(mediaDevices => {
+  _subscribeToObservables() {
+    this.availableDevices.audioInput.subscribe(mediaDevices => {
       if (mediaDevices.length) {
-        this._update_current_index_from_devices(z.media.MediaDeviceType.AUDIO_INPUT, mediaDevices);
+        this._updateCurrentIndexFromDevices(z.media.MediaDeviceType.AUDIO_INPUT, mediaDevices);
       }
     });
 
-    this.available_devices.audio_output.subscribe(mediaDevices => {
+    this.availableDevices.audioOutput.subscribe(mediaDevices => {
       if (mediaDevices.length) {
-        this._update_current_index_from_devices(z.media.MediaDeviceType.AUDIO_OUTPUT, mediaDevices);
+        this._updateCurrentIndexFromDevices(z.media.MediaDeviceType.AUDIO_OUTPUT, mediaDevices);
       }
     });
 
-    this.available_devices.screen_input.subscribe(mediaDevices => {
+    this.availableDevices.screenInput.subscribe(mediaDevices => {
       if (mediaDevices.length) {
-        this._update_current_index_from_devices(z.media.MediaDeviceType.SCREEN_INPUT, mediaDevices);
+        this._updateCurrentIndexFromDevices(z.media.MediaDeviceType.SCREEN_INPUT, mediaDevices);
       }
     });
 
-    this.available_devices.video_input.subscribe(mediaDevices => {
+    this.availableDevices.videoInput.subscribe(mediaDevices => {
       if (mediaDevices.length) {
-        this._update_current_index_from_devices(z.media.MediaDeviceType.VIDEO_INPUT, mediaDevices);
+        this._updateCurrentIndexFromDevices(z.media.MediaDeviceType.VIDEO_INPUT, mediaDevices);
       }
     });
 
-    this.current_device_id.audio_input.subscribe(media_device_id => {
-      z.util.StorageUtil.setValue(z.media.MediaDeviceType.AUDIO_INPUT, media_device_id);
-      if (media_device_id && this.mediaRepository.streamHandler.localMediaStream()) {
+    this.currentDeviceId.audioInput.subscribe(mediaDeviceId => {
+      z.util.StorageUtil.setValue(z.media.MediaDeviceType.AUDIO_INPUT, mediaDeviceId);
+
+      const updateStream = mediaDeviceId && this.mediaRepository.streamHandler.localMediaStream();
+      if (updateStream) {
         this.mediaRepository.streamHandler.replaceInputSource(z.media.MediaType.AUDIO);
-        this._update_current_index_from_id(z.media.MediaDeviceType.AUDIO_INPUT, media_device_id);
+        this._updateCurrentIndexFromId(z.media.MediaDeviceType.AUDIO_INPUT, mediaDeviceId);
       }
     });
 
-    this.current_device_id.audio_output.subscribe(media_device_id => {
-      z.util.StorageUtil.setValue(z.media.MediaDeviceType.AUDIO_OUTPUT, media_device_id);
-      if (media_device_id) {
-        this.mediaRepository.elementHandler.switchMediaElementOutput(media_device_id);
-        this._update_current_index_from_id(z.media.MediaDeviceType.AUDIO_OUTPUT, media_device_id);
+    this.currentDeviceId.audioOutput.subscribe(mediaDeviceId => {
+      z.util.StorageUtil.setValue(z.media.MediaDeviceType.AUDIO_OUTPUT, mediaDeviceId);
+
+      if (mediaDeviceId) {
+        this.mediaRepository.elementHandler.switchMediaElementOutput(mediaDeviceId);
+        this._updateCurrentIndexFromId(z.media.MediaDeviceType.AUDIO_OUTPUT, mediaDeviceId);
       }
     });
 
-    this.current_device_id.screen_input.subscribe(media_device_id => {
-      if (
-        media_device_id &&
-        this.mediaRepository.streamHandler.localMediaStream() &&
-        this.mediaRepository.streamHandler.local_media_type() === z.media.MediaType.SCREEN
-      ) {
+    this.currentDeviceId.screenInput.subscribe(mediaDeviceId => {
+      const isMediaTypeScreen = this.mediaRepository.streamHandler.local_media_type() === z.media.MediaType.SCREEN;
+      const updateStream = mediaDeviceId && isMediaTypeScreen && this.mediaRepository.streamHandler.localMediaStream();
+      if (updateStream) {
         this.mediaRepository.streamHandler.replaceInputSource(z.media.MediaType.SCREEN);
-        this._update_current_index_from_id(z.media.MediaDeviceType.SCREEN_INPUT, media_device_id);
+        this._updateCurrentIndexFromId(z.media.MediaDeviceType.SCREEN_INPUT, mediaDeviceId);
       }
     });
 
-    this.current_device_id.video_input.subscribe(media_device_id => {
-      z.util.StorageUtil.setValue(z.media.MediaDeviceType.VIDEO_INPUT, media_device_id);
-      if (
-        media_device_id &&
-        this.mediaRepository.streamHandler.localMediaStream() &&
-        this.mediaRepository.streamHandler.local_media_type() === z.media.MediaType.VIDEO
-      ) {
+    this.currentDeviceId.videoInput.subscribe(mediaDeviceId => {
+      z.util.StorageUtil.setValue(z.media.MediaDeviceType.VIDEO_INPUT, mediaDeviceId);
+
+      const isMediaTypeVideo = this.mediaRepository.streamHandler.local_media_type() === z.media.MediaType.VIDEO;
+      const updateStream = mediaDeviceId && isMediaTypeVideo && this.mediaRepository.streamHandler.localMediaStream();
+      if (updateStream) {
         this.mediaRepository.streamHandler.replaceInputSource(z.media.MediaType.VIDEO);
-        this._update_current_index_from_id(z.media.MediaDeviceType.VIDEO_INPUT, media_device_id);
+        this._updateCurrentIndexFromId(z.media.MediaDeviceType.VIDEO_INPUT, mediaDeviceId);
       }
     });
   }
@@ -178,7 +192,7 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
    * Update list of available MediaDevices.
    * @returns {Promise} Resolves with all MediaDevices when the list has been updated
    */
-  get_media_devices() {
+  getMediaDevices() {
     return navigator.mediaDevices
       .enumerateDevices()
       .catch(error => {
@@ -186,32 +200,39 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
         throw error;
       })
       .then(mediaDevices => {
-        this._remove_all_devices();
+        this._removeAllDevices();
 
         if (mediaDevices) {
-          const audio_input_devices = [];
-          const audio_output_devices = [];
-          const video_input_devices = [];
+          const audioInputDevices = [];
+          const audioOutputDevices = [];
+          const videoInputDevices = [];
 
-          mediaDevices.forEach(media_device => {
-            switch (media_device.kind) {
-              case z.media.MediaDeviceType.AUDIO_INPUT:
-                audio_input_devices.push(media_device);
+          mediaDevices.forEach(mediaDevice => {
+            switch (mediaDevice.kind) {
+              case z.media.MediaDeviceType.AUDIO_INPUT: {
+                audioInputDevices.push(mediaDevice);
                 break;
-              case z.media.MediaDeviceType.AUDIO_OUTPUT:
-                audio_output_devices.push(media_device);
+              }
+
+              case z.media.MediaDeviceType.AUDIO_OUTPUT: {
+                audioOutputDevices.push(mediaDevice);
                 break;
-              case z.media.MediaDeviceType.VIDEO_INPUT:
-                video_input_devices.push(media_device);
+              }
+
+              case z.media.MediaDeviceType.VIDEO_INPUT: {
+                videoInputDevices.push(mediaDevice);
                 break;
-              default:
+              }
+
+              default: {
                 throw new z.media.MediaError(z.media.MediaError.TYPE.UNHANDLED_MEDIA_TYPE);
+              }
             }
           });
 
-          z.util.koArrayPushAll(this.available_devices.audio_input, audio_input_devices);
-          z.util.koArrayPushAll(this.available_devices.audio_output, audio_output_devices);
-          z.util.koArrayPushAll(this.available_devices.video_input, video_input_devices);
+          z.util.koArrayPushAll(this.availableDevices.audioInput, audioInputDevices);
+          z.util.koArrayPushAll(this.availableDevices.audioOutput, audioOutputDevices);
+          z.util.koArrayPushAll(this.availableDevices.videoInput, videoInputDevices);
 
           this.logger.info('Updated MediaDevice list', mediaDevices);
           return mediaDevices;
@@ -224,7 +245,7 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
    * Update list of available Screens.
    * @returns {Promise} resolves with all screen sources when the list has been updated
    */
-  get_screen_sources() {
+  getScreenSources() {
     return new Promise((resolve, reject) => {
       const options = {
         thumbnailSize: {
@@ -234,23 +255,21 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
         types: [z.media.MediaConstraintsHandler.CONFIG.SCREEN_CONSTRAINTS.SOURCE_TYPE],
       };
 
-      return window.desktopCapturer.getSources(options, (error, screen_sources) => {
+      return window.desktopCapturer.getSources(options, (error, screenSources) => {
         if (error) {
           return reject(error);
         }
 
-        this.logger.info(
-          `Detected '${screen_sources.length}' sources for screen sharing from Electron`,
-          screen_sources
-        );
-        this.available_devices.screen_input(screen_sources);
-        if (screen_sources.length === 1) {
-          const [first_screen_source] = screen_sources;
-          this.current_device_id.screen_input('');
-          this.logger.info(`Selected '${first_screen_source.name}' for screen sharing`, first_screen_source);
-          this.current_device_id.screen_input(first_screen_source.id);
+        this.logger.info(`Detected '${screenSources.length}' sources for screen sharing from Electron`, screenSources);
+        this.availableDevices.screenInput(screenSources);
+
+        if (screenSources.length === 1) {
+          const [firstScreenSource] = screenSources;
+          this.currentDeviceId.screenInput('');
+          this.logger.info(`Selected '${firstScreenSource.name}' for screen sharing`, firstScreenSource);
+          this.currentDeviceId.screenInput(firstScreenSource.id);
         }
-        return resolve(screen_sources);
+        return resolve(screenSources);
       });
     });
   }
@@ -259,23 +278,14 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
    * Toggle between the available cameras.
    * @returns {Promise} Resolves when camera has been toggled.
    */
-  toggle_next_camera() {
-    return this.get_media_devices().then(() => {
-      const {current_device} = this._get_current_device(
-        this.available_devices.video_input(),
-        this.current_device_id.video_input()
-      );
-      const next_device = this.available_devices.video_input()[
-        z.util.ArrayUtil.iterateIndex(this.available_devices.video_input(), this.current_device_index.video_input()) ||
-          0
-      ];
+  toggleNextCamera() {
+    return this.getMediaDevices().then(() => {
+      const availableDevices = this.availableDevices.videoInput();
+      const currentDeviceId = this.currentDeviceId.videoInput;
+      const currentDeviceIndex = this.currentDeviceIndex.videoInput();
 
-      this.current_device_id.video_input(next_device.deviceId);
-
-      const current_device_name = current_device ? current_device.label || current_device.deviceId : undefined;
-      this.logger.info(
-        `Switching the active camera from '${current_device_name}' to '${next_device.label || next_device.deviceId}'`
-      );
+      const {deviceName, nextDeviceId} = this._toggleNextDevice(availableDevices, currentDeviceId, currentDeviceIndex);
+      this.logger.info(`Switching the active camera from '${deviceName}' to '${nextDeviceId}'`);
     });
   }
 
@@ -284,49 +294,51 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
    * @returns {Promise} Resolves when screen has been toggled.
    */
   toggle_next_screen() {
-    return this.get_screen_sources().then(() => {
-      const {current_device} = this._get_current_device(
-        this.available_devices.screen_input(),
-        this.current_device_id.screen_input()
-      );
-      const next_device = this.available_devices.screen_input()[
-        z.util.ArrayUtil.iterateIndex(
-          this.available_devices.screen_input(),
-          this.current_device_index.screen_input()
-        ) || 0
-      ];
+    return this.getScreenSources().then(() => {
+      const availableDevices = this.availableDevices.screenInput();
+      const currentDeviceId = this.currentDeviceId.screenInput;
+      const currentDeviceIndex = this.currentDeviceIndex.screenInput();
 
-      this.current_device_id.screen_input(next_device.id);
-
-      const current_device_name = current_device ? current_device.name || current_device.id : undefined;
-      this.logger.info(
-        `Switching the active screen from '${current_device_name}' to '${next_device.name || next_device.id}'`
-      );
+      const {deviceName, nextDeviceId} = this._toggleNextDevice(availableDevices, currentDeviceId, currentDeviceIndex);
+      this.logger.info(`Switching the active screen from '${deviceName}' to '${nextDeviceId}'`);
     });
+  }
+
+  _toggleNextDevice(availableDevices, currentDeviceIdObservable, currentDeviceIndex) {
+    const {device} = this._getCurrentDevice(availableDevices, currentDeviceIdObservable());
+    const nextIndex = z.util.ArrayUtil.iterateIndex(availableDevices, currentDeviceIndex);
+
+    const {deviceId, label} = availableDevices[nextIndex || 0];
+    currentDeviceIdObservable(deviceId);
+
+    const deviceName = device ? device.label || device.deviceId : undefined;
+    const nextDeviceId = label || deviceId;
+
+    return {deviceName, nextDeviceId};
   }
 
   /**
    * Check for availability of selected devices.
-   * @param {boolean} video_send - Also check for video devices
+   * @param {boolean} videoSend - Also check for video devices
    * @returns {Promise} Resolves when the current device has been updated
    */
-  update_current_devices(video_send) {
-    return this.get_media_devices().then(() => {
-      const _check_device = (mediaType, deviceType) => {
-        deviceType = this._type_conversion(deviceType);
+  updateCurrentDevices(videoSend) {
+    return this.getMediaDevices().then(() => {
+      const _checkDevice = (mediaType, deviceType) => {
+        deviceType = this._typeConversion(deviceType);
 
-        const deviceIdObservable = this.current_device_id[`${deviceType}`];
-        const mediaDevices = this.available_devices[`${deviceType}`]();
-        const {current_device: mediaDevice} = this._get_current_device(mediaDevices, deviceIdObservable());
+        const deviceIdObservable = this.currentDeviceId[`${deviceType}`];
+        const mediaDevices = this.availableDevices[`${deviceType}`]();
+        const {device: mediaDevice} = this._getCurrentDevice(mediaDevices, deviceIdObservable());
 
         if (!mediaDevice) {
-          const [updated_device] = this.available_devices[`${deviceType}`]();
+          const [updatedDevice] = this.availableDevices[`${deviceType}`]();
 
-          if (updated_device) {
-            const id = updated_device.label || updated_device.deviceId;
+          if (updatedDevice) {
+            const id = updatedDevice.label || updatedDevice.deviceId;
             const log = `Selected '${mediaType}' device '${deviceIdObservable()}' not found and replaced by '${id}'`;
             this.logger.warn(log, mediaDevices);
-            return deviceIdObservable(updated_device.deviceId);
+            return deviceIdObservable(updatedDevice.deviceId);
           }
 
           const logMessage = `Selected '${mediaType}' device '${deviceIdObservable()}' not found and reset'`;
@@ -335,9 +347,9 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
         }
       };
 
-      _check_device(z.media.MediaType.AUDIO, z.media.MediaDeviceType.AUDIO_INPUT);
-      if (video_send) {
-        _check_device(z.media.MediaType.VIDEO, z.media.MediaDeviceType.VIDEO_INPUT);
+      _checkDevice(z.media.MediaType.AUDIO, z.media.MediaDeviceType.AUDIO_INPUT);
+      if (videoSend) {
+        _checkDevice(z.media.MediaType.VIDEO, z.media.MediaDeviceType.VIDEO_INPUT);
       }
     });
   }
@@ -346,17 +358,18 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
    * Get the currently selected MediaDevice.
    *
    * @param {Array} mediaDevices - Array of MediaDevices
-   * @param {string} current_device_id - ID of selected MediaDevice
+   * @param {string} currentDeviceId - ID of selected MediaDevice
    * @returns {Object} Selected MediaDevice and its array index
    */
-  _get_current_device(mediaDevices, current_device_id) {
-    for (const [index, media_device] of mediaDevices.entries()) {
-      if (media_device.deviceId === current_device_id || media_device.id === current_device_id) {
-        return {current_device: media_device, current_device_index: index};
+  _getCurrentDevice(mediaDevices, currentDeviceId) {
+    for (const [index, mediaDevice] of mediaDevices.entries()) {
+      const isCurrentDevice = mediaDevice.deviceId === currentDeviceId || mediaDevice.id === currentDeviceId;
+      if (isCurrentDevice) {
+        return {device: mediaDevice, deviceIndex: index};
       }
     }
 
-    return {current_device_index: 0};
+    return {deviceIndex: 0};
   }
 
   /**
@@ -364,68 +377,66 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
    * @private
    * @returns {undefined} No return value
    */
-  _remove_all_devices() {
-    this.available_devices.audio_input.removeAll();
-    this.available_devices.audio_output.removeAll();
-    this.available_devices.video_input.removeAll();
+  _removeAllDevices() {
+    this.availableDevices.audioInput.removeAll();
+    this.availableDevices.audioOutput.removeAll();
+    this.availableDevices.videoInput.removeAll();
   }
 
   /**
    * Add underscore to MediaDevice types.
    * @private
-   * @param {z.media.MediaDeviceType} device_type - Device type string to update
+   * @param {z.media.MediaDeviceType} deviceType - Device type string to update
    * @returns {string} Updated device type
    */
-  _type_conversion(device_type) {
-    return device_type.replace('input', '_input').replace('output', '_output');
+  _typeConversion(deviceType) {
+    return deviceType.replace('input', '_input').replace('output', '_output');
   }
 
   /**
    * Update the current index by searching for the current device.
    *
    * @private
-   * @param {ko.observable} index_observable - Observable containing the current index
-   * @param {Array} available_devices - Array of MediaDevices
-   * @param {string} current_device_id - Current device ID to look for
+   * @param {ko.observable} indexObservable - Observable containing the current index
+   * @param {Array} availableDevices - Array of MediaDevices
+   * @param {string} currentDeviceId - Current device ID to look for
    * @returns {undefined} No return value
    */
-  _update_current_device_index(index_observable, available_devices, current_device_id) {
-    const {current_device_index} = this._get_current_device(available_devices, current_device_id);
+  _updateCurrentDeviceIndex(indexObservable, availableDevices, currentDeviceId) {
+    const {deviceIndex} = this._getCurrentDevice(availableDevices, currentDeviceId);
 
-    if (_.isNumber(current_device_index)) {
-      index_observable(current_device_index);
+    if (_.isNumber(deviceIndex)) {
+      indexObservable(deviceIndex);
     }
   }
 
   /**
    * Update the index for current device after the list of devices changed.
    * @private
-   * @param {z.media.MediaDeviceType} device_type - MediaDeviceType to be updates
-   * @param {Array} available_devices - Array of MediaDevices
+   * @param {z.media.MediaDeviceType} deviceType - MediaDeviceType to be updates
+   * @param {Array} availableDevices - Array of MediaDevices
    * @returns {undefined} No return value
    */
-  _update_current_index_from_devices(device_type, available_devices) {
-    device_type = this._type_conversion(device_type);
-    this._update_current_device_index(
-      this.current_device_index[`${device_type}`],
-      available_devices,
-      this.current_device_id[`${device_type}`]()
-    );
+  _updateCurrentIndexFromDevices(deviceType, availableDevices) {
+    deviceType = this._typeConversion(deviceType);
+    const deviceIndexObservable = this.currentDeviceIndex[`${deviceType}`];
+    const currentDeviceId = this.currentDeviceId[`${deviceType}`]();
+
+    this._updateCurrentDeviceIndex(deviceIndexObservable, availableDevices, currentDeviceId);
   }
 
   /**
    * Update the index for current device after the current device changed.
    * @private
-   * @param {z.media.MediaDeviceType} device_type - MediaDeviceType to be updates
-   * @param {string} selected_input_device_id - ID of selected input device
+   * @param {z.media.MediaDeviceType} deviceType - MediaDeviceType to be updates
+   * @param {string} selectedInputDeviceId - ID of selected input device
    * @returns {undefined} No return value
    */
-  _update_current_index_from_id(device_type, selected_input_device_id) {
-    device_type = this._type_conversion(device_type);
-    this._update_current_device_index(
-      this.current_device_index[`${device_type}`],
-      this.available_devices[`${device_type}`](),
-      selected_input_device_id
-    );
+  _updateCurrentIndexFromId(deviceType, selectedInputDeviceId) {
+    deviceType = this._typeConversion(deviceType);
+    const deviceIndexObservable = this.currentDeviceIndex[`${deviceType}`];
+    const availableDevices = this.availableDevices[`${deviceType}`]();
+
+    this._updateCurrentDeviceIndex(deviceIndexObservable, availableDevices, selectedInputDeviceId);
   }
 };

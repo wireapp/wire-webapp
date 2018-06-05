@@ -150,7 +150,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
     const videoSend = mediaType === z.media.MediaType.AUDIO_VIDEO;
 
     return this.devicesHandler
-      .update_current_devices(videoSend)
+      .updateCurrentDevices(videoSend)
       .then(() => this.constraintsHandler.getMediaStreamConstraints(true, videoSend, isGroup))
       .then(({streamConstraints}) => this.requestMediaStream(mediaType, streamConstraints))
       .then(mediaStreamInfo => {
@@ -273,14 +273,14 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
    */
   requestMediaStream(mediaType, mediaStreamConstraints) {
     const audioTypes = [z.media.MediaType.AUDIO, z.media.MediaType.AUDIO_VIDEO];
-    const noAudioDevice = !this.devicesHandler.has_microphone() && audioTypes.includes(mediaType);
+    const noAudioDevice = !this.devicesHandler.hasMicrophone() && audioTypes.includes(mediaType);
     if (noAudioDevice) {
       const mediaError = new z.media.MediaError(z.media.MediaError.TYPE.MEDIA_STREAM_DEVICE, z.media.MediaType.AUDIO);
       return Promise.reject(mediaError);
     }
 
     const videoTypes = [z.media.MediaType.AUDIO_VIDEO, z.media.MediaType.VIDEO];
-    const noVideoTypes = !this.devicesHandler.has_camera() && videoTypes.includes(mediaType);
+    const noVideoTypes = !this.devicesHandler.hasCamera() && videoTypes.includes(mediaType);
     if (noVideoTypes) {
       const mediaError = new z.media.MediaError(z.media.MediaError.TYPE.MEDIA_STREAM_DEVICE, z.media.MediaType.VIDEO);
       return Promise.reject(mediaError);
