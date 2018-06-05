@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="3.0.3"></a>
+## [3.0.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@3.0.2...@wireapp/core@3.0.3) (2018-06-05)
+
+
+### Bug Fixes
+
+* **core:** ClientType import ([#667](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/667)) ([cfdaf51](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/cfdaf51))
+
+
+
+
 <a name="3.0.2"></a>
 ## [3.0.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@3.0.1...@wireapp/core@3.0.2) (2018-06-04)
 
