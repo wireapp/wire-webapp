@@ -2850,6 +2850,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
         if (!eventFromStream) {
           amplify.publish(z.event.WebApp.NOTIFICATION.NOTIFY, messageEntity, undefined, conversationEntity);
         }
+
+        if (conversationEntity.is_cleared()) {
+          conversationEntity.cleared_timestamp(0);
+        }
       }
 
       // Check if event needs to be un-archived
