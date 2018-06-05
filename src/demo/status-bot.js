@@ -21,22 +21,27 @@
 
 const APIClient = require('@wireapp/api-client');
 const {ClientType} = require('@wireapp/api-client/dist/commonjs/client/');
+const logdown = require('logdown');
 const {Account} = require('@wireapp/core');
 const {Config} = require('@wireapp/api-client/dist/commonjs/Config');
 const {MemoryEngine} = require('@wireapp/store-engine');
 
 const {version} = require('../../package.json');
+const logger = logdown('@wireapp/core/StatusBot', {
+  logger: console,
+  markdown: false,
+});
 
 const CONVERSATION_ARGUMENT_INDEX = 2;
 const conversationId = process.argv[CONVERSATION_ARGUMENT_INDEX];
 if (!conversationId) {
-  console.error(`Error: Conversation id is not set. Example: status-bot.js "c94a6e69-7718-406b-b834-df4144e5a65b".`);
+  logger.error(`Error: Conversation id is not set. Example: status-bot.js "c94a6e69-7718-406b-b834-df4144e5a65b".`);
   process.exit(1);
 }
 
 ['WIRE_STATUS_BOT_EMAIL', 'WIRE_STATUS_BOT_PASSWORD'].forEach((envVar, index, array) => {
   if (!process.env[envVar]) {
-    console.error(`Error: Environment variable "${envVar}" is not set. Required variables: ${array.join(', ')}.`);
+    logger.error(`Error: Environment variable "${envVar}" is not set. Required variables: ${array.join(', ')}.`);
     process.exit(1);
   }
 });
@@ -61,6 +66,6 @@ if (!conversationId) {
       `I am posting from @wireapp/core v${version}. 🌞`
     );
   } catch (error) {
-    console.error('Error:', error);
+    logger.error('Error:', error.stack);
   }
 })();
