@@ -110,7 +110,7 @@ describe('z.media.MediaStreamHandler', () => {
       spyOn(TestFactory.media_repository.stream_handler, '_toggleAudioSend').and.returnValue(Promise.resolve());
     });
 
-    it('toggles the audio stream if available', done => {
+    it('toggles the audio state if MediaStream is available', done => {
       TestFactory.media_repository.stream_handler.localMediaStream(true);
 
       TestFactory.media_repository.stream_handler
@@ -122,26 +122,23 @@ describe('z.media.MediaStreamHandler', () => {
         .catch(done.fail);
     });
 
-    it('throws an error if no audio stream is found', done => {
+    it('toggles the audio state if MediaStream is unavailable', done => {
       TestFactory.media_repository.stream_handler.localMediaStream(undefined);
 
       TestFactory.media_repository.stream_handler
         .toggleAudioSend()
-        .then(done.fail)
-        .catch(error => {
-          expect(error).toEqual(jasmine.any(z.media.MediaError));
-          expect(error.type).toBe(z.media.MediaError.TYPE.NO_AUDIO_STREAM_FOUND);
+        .then(() => {
+          expect(TestFactory.media_repository.stream_handler._toggleAudioSend).toHaveBeenCalled();
           done();
-        });
+        })
+        .catch(done.fail);
     });
   });
 
   describe('toggleVideoSend', () => {
     beforeEach(() => {
-      spyOn(TestFactory.media_repository.stream_handler, '_toggle_video_send').and.returnValue(Promise.resolve());
-      return spyOn(TestFactory.media_repository.stream_handler, 'replaceInputSource').and.returnValue(
-        Promise.resolve()
-      );
+      spyOn(TestFactory.media_repository.stream_handler, '_toggleVideoSend').and.returnValue(Promise.resolve());
+      spyOn(TestFactory.media_repository.stream_handler, 'replaceInputSource').and.returnValue(Promise.resolve());
     });
 
     it('toggles the video stream if available and in video mode', done => {
