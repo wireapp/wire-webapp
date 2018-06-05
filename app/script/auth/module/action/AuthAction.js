@@ -61,7 +61,7 @@ function doLoginPlain(loginData, onBeforeLogin, onAfterLogin) {
           : TrackingAction.AUTHENTICATION_CONTEXT.HANDLE;
 
         const trackingEventData = {
-          attributes: {context: authenticationContext, remember_me: loginData.persist},
+          attributes: {context: authenticationContext, remember_me: loginData.clientType === ClientType.PERMANENT},
           name: TrackingAction.EVENT_NAME.ACCOUNT.LOGGED_IN,
         };
         return dispatch(TrackingAction.trackEvent(trackingEventData));

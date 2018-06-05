@@ -42,14 +42,17 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
     this.selfStreamMuted = videoGridRepository.selfStreamMuted;
     this.streams = videoGridRepository.streams;
 
+    this.minimized = minimized;
+    const gridElementsCount = ko.pureComputed(() => this.grid().filter(id => id !== 0).length);
+    this.hasBlackBackground = this.minimized && gridElementsCount > 1;
+
     this.scaleVideos = this.scaleVideos.bind(this, rootElement);
+
     // scale videos when the grid is updated (on the next rendering cycle)
     this.grid.subscribe(() => z.util.afterRender(this.scaleVideos));
 
     // scale the videos when the window is resized
     window.addEventListener('resize', this.scaleVideos);
-
-    this.minimized = minimized;
   }
 
   scaleVideos(rootElement) {
@@ -141,12 +144,12 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
 ko.components.register('group-video-grid', {
   template: `
       <div class="group-video" data-bind="template: {afterRender: scaleVideos}">
-        <div class="group-video-grid" data-bind="foreach: {data: grid, as: 'streamId'}">
+        <div class="group-video-grid" data-bind="foreach: {data: grid, as: 'streamId'}, css: {'group-video-grid--black-background': hasBlackBackground}">
           <!-- ko if: streamId !== 0 -->
             <div class="group-video-grid__element" data-bind="css: $parent.getClassNameForVideo($index()), attr: {'data-uie-name': 'item-grid', 'data-uie-value': $parent.getUIEValueForVideo($index())}">
               <video autoplay class="group-video-grid__element-video" data-bind="sourceStream: $parent.getParticipantStream(streamId), muteMediaElement: $parent.getParticipantStream(streamId)">
               </video>
-              <!-- ko if: streamId === $parent.selfId() && $parent.selfStreamMuted() -->
+              <!-- ko if: streamId === $parent.selfId() && $parent.selfStreamMuted() && !$parent.minimized -->
                 <div class="group-video-grid__mute-overlay">
                   <micoff-icon></micoff-icon>
                 </div>
@@ -158,7 +161,7 @@ ko.components.register('group-video-grid', {
           <div class="group-video__thumbnail" data-bind="css: {'group-video__thumbnail--minimized': minimized}">
             <video autoplay class="mirror group-video__thumbnail-video" data-uie-name="self-video-thumbnail" data-bind="css: {'group-video__thumbnail--minimized': minimized, 'mirror': mirrorSelf}, sourceStream: thumbnailStream(), muteMediaElement: thumbnailStream()">
             </video>
-            <!-- ko if: selfStreamMuted() -->
+            <!-- ko if: selfStreamMuted() && !minimized -->
               <div class="group-video-grid__mute-overlay">
                 <micoff-icon></micoff-icon>
               </div>
