@@ -278,8 +278,7 @@ z.backup.BackupRepository = class BackupRepository {
       BackupRepository.CONFIG.UINT8ARRAY_FIELDS.forEach(field => {
         const dataField = entity.data[field];
         if (dataField) {
-          const values = Object.keys(dataField).map(key => dataField[key]);
-          entity.data[field] = new Uint8Array(values);
+          entity.data[field] = new Uint8Array(Object.values(dataField));
         }
       });
     }
