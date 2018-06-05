@@ -51,7 +51,7 @@ z.calling.VideoGridRepository = class VideoGridRepository {
         .map(participant => participant.id);
 
       const remoteStreams = streamsInfo()
-        .filter(mediaStreamInfo => !noVideoParticipantIds.includes(mediaStreamInfo.flow_id))
+        .filter(mediaStreamInfo => !noVideoParticipantIds.includes(mediaStreamInfo.flowId))
         .map(mediaStreamInfo => mediaStreamInfo.stream);
 
       this.selfId(selfStream() ? selfStream().id : undefined);

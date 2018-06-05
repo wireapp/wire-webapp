@@ -293,7 +293,7 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
    * Toggle between the available screens.
    * @returns {Promise} Resolves when screen has been toggled.
    */
-  toggle_next_screen() {
+  toggleNextScreen() {
     return this.getScreenSources().then(() => {
       const availableDevices = this.availableDevices.screenInput();
       const currentDeviceId = this.currentDeviceId.screenInput;

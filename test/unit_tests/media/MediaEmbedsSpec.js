@@ -37,7 +37,7 @@ describe('MediaEmbeds', () => {
   const build_message_with_anchor = link => `<a href="${link}" target="_blank" rel="nofollow">${link}</a>`;
 
   const build_youtube_iframe = function(link) {
-    const embed_url = z.media.MediaEmbeds.generate_youtube_embed_url(link);
+    const embed_url = z.media.MediaEmbeds.generateYouTubeEmbedUrl(link);
     return `<a href="${link}" target="_blank" rel="nofollow">${link}</a><div class="iframe-container iframe-container-video"><iframe class="youtube" width="100%" height="100%" src="${embed_url}" frameborder="0" allowfullscreen></iframe></div>`;
   };
 
@@ -424,27 +424,27 @@ describe('MediaEmbeds', () => {
     });
   });
 
-  describe('convert_youtube_timestamp_to_seconds', () => {
+  describe('convertYouTubeTimestampToSeconds', () => {
     it('doesn´t convert timestamp that only contains numbers', () => {
-      expect(z.media.MediaEmbeds.convert_youtube_timestamp_to_seconds('125')).toBe(125);
+      expect(z.media.MediaEmbeds.convertYouTubeTimestampToSeconds('125')).toBe(125);
     });
 
     it('converts timestamp with only seconds', () => {
-      expect(z.media.MediaEmbeds.convert_youtube_timestamp_to_seconds('25s')).toBe(25);
+      expect(z.media.MediaEmbeds.convertYouTubeTimestampToSeconds('25s')).toBe(25);
     });
 
     it('converts timestamp with only minutes and seconds', () => {
-      expect(z.media.MediaEmbeds.convert_youtube_timestamp_to_seconds('31m08s')).toBe(1868);
+      expect(z.media.MediaEmbeds.convertYouTubeTimestampToSeconds('31m08s')).toBe(1868);
     });
 
     it('converts timestamp with hours, minutes and seconds', () => {
-      expect(z.media.MediaEmbeds.convert_youtube_timestamp_to_seconds('1h1m1s')).toBe(3661);
+      expect(z.media.MediaEmbeds.convertYouTubeTimestampToSeconds('1h1m1s')).toBe(3661);
     });
 
     it('converts invalid values to 0', () => {
-      expect(z.media.MediaEmbeds.convert_youtube_timestamp_to_seconds('hms')).toBe(0);
-      expect(z.media.MediaEmbeds.convert_youtube_timestamp_to_seconds(null)).toBe(0);
-      expect(z.media.MediaEmbeds.convert_youtube_timestamp_to_seconds()).toBe(0);
+      expect(z.media.MediaEmbeds.convertYouTubeTimestampToSeconds('hms')).toBe(0);
+      expect(z.media.MediaEmbeds.convertYouTubeTimestampToSeconds(null)).toBe(0);
+      expect(z.media.MediaEmbeds.convertYouTubeTimestampToSeconds()).toBe(0);
     });
   });
 });

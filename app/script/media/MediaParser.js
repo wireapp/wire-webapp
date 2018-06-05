@@ -39,12 +39,12 @@ class MediaParser {
    * @note Checks message for valid media links and appends an iFrame right after the link
    *
    * @param {string} message - Message text
-   * @param {string} theme_color - Accent color to be applied to the embed
+   * @param {string} themeColor - Accent color to be applied to the embed
    * @returns {string} Message with rendered media embeds
    */
-  renderMediaEmbeds(message, theme_color) {
+  renderMediaEmbeds(message, themeColor) {
     z.util.URLUtil.getLinksFromHtml(message).forEach(link => {
-      this.embeds.forEach(embed => (message = embed(link, message, theme_color)));
+      this.embeds.forEach(embed => (message = embed(link, message, themeColor)));
     });
 
     return message;
