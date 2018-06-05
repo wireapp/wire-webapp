@@ -74,9 +74,7 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
             if (userEntity.isBot) {
               return this.serviceParticipants.push(userEntity);
             }
-            if (!userEntity.is_me) {
-              this.userParticipants.push(userEntity);
-            }
+            this.userParticipants.push(userEntity);
           });
       }
     });
