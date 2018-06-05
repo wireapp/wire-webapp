@@ -25,24 +25,17 @@ yarn global add @wireapp/changelog-bot
 
 ### Usage
 
-- [cli.ts](./src/main/cli.ts)
-
-### Execution
+Just ask for `--help` to get informed on how to use this bot:
 
 **Bash**
 
 ```bash
-#!/bin/bash
-
-export WIRE_WEBAPP_BOT_EMAIL="<email>"
-export WIRE_WEBAPP_BOT_PASSWORD="<password>"
-
-wire-changelog-bot "<conversation id>,<conversation id>"
+wire-changelog-bot --help
 ```
 
 **Node**
 
 ```bash
 yarn dist
-node dist/cli.js "<conversation id>,<conversation id>"
+node dist/cli.js --help
 ```

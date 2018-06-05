@@ -19,101 +19,53 @@
  *
  */
 
-import {LoginData} from '@wireapp/api-client/dist/commonjs/auth/';
-import {ChangelogBot, MessageData} from './index';
+import chalk from 'chalk';
+import {start} from './start';
 
+const program = require('commander');
 const logdown = require('logdown');
-const {version}: {version: string} = require('../package.json');
+const {description, version} = require('../package.json');
 
 const logger = logdown('@wireapp/changelog-bot/cli', {
   logger: console,
   markdown: false,
 });
 
-const scriptName = require('path').basename(process.argv[1]);
+logger.state.isEnabled = true;
 
-const requiredEnvVars = ['WIRE_CHANGELOG_BOT_EMAIL', 'WIRE_CHANGELOG_BOT_PASSWORD'];
-const travisEnvVars = ['TRAVIS_COMMIT_RANGE', 'TRAVIS_EVENT_TYPE', 'TRAVIS_REPO_SLUG'];
+program
+  .version(version)
+  .description(description)
+  .option('-c, --conversations <conversationId,...>', 'The conversation IDs to write in')
+  .option('-e, --email <address>', 'Your email address')
+  .option('-p, --password <password>', 'Your password')
+  .parse(process.argv);
 
-const setBold = (text: string): string => `\x1b[1m${text}\x1b[0m`;
+const TRAVIS_ENV_VARS = ['TRAVIS_COMMIT_RANGE', 'TRAVIS_EVENT_TYPE', 'TRAVIS_REPO_SLUG'];
 
-const usage = (): void => {
-  console.info(`${setBold('Usage:')} ${scriptName} <conversation id(s)>\n`);
-  console.info(
-    `${setBold('Example:')} ${scriptName} "e4302e84-75fd-4dc7-8a16-67018bd94ce7,44be7db8-7b7c-4acf-887d-86fbb9a5508f"`
-  );
-};
-const envVarUsage = (): void => console.info(setBold('Required environment variables:'), requiredEnvVars.join(', '));
-
-const start = async (): Promise<ChangelogBot> => {
-  const {WIRE_CHANGELOG_BOT_EMAIL, WIRE_CHANGELOG_BOT_PASSWORD, WIRE_CHANGELOG_BOT_CONVERSATION_IDS} = process.env;
-  const {TRAVIS_COMMIT_RANGE, TRAVIS_REPO_SLUG} = process.env;
-
-  const loginData: LoginData = {
-    email: WIRE_CHANGELOG_BOT_EMAIL,
-    password: WIRE_CHANGELOG_BOT_PASSWORD,
-    persist: false,
-  };
-
-  const changelog = await ChangelogBot.generateChangelog(String(TRAVIS_REPO_SLUG), String(TRAVIS_COMMIT_RANGE));
-
-  const messageData: MessageData = {
-    content: changelog,
-  };
-
-  if (WIRE_CHANGELOG_BOT_CONVERSATION_IDS) {
-    messageData.conversationIds = WIRE_CHANGELOG_BOT_CONVERSATION_IDS.replace(' ', '').split(',');
-  }
-
-  logger.info('Booting up ...');
-
-  const bot = new ChangelogBot(loginData, messageData);
-  await bot.start();
-
-  return bot;
+const parameters = {
+  WIRE_CHANGELOG_BOT_CONVERSATION_IDS: program.conversations || process.env.WIRE_CHANGELOG_BOT_CONVERSATION_IDS,
+  WIRE_CHANGELOG_BOT_EMAIL: program.email || process.env.WIRE_CHANGELOG_BOT_EMAIL,
+  WIRE_CHANGELOG_BOT_PASSWORD: program.password || process.env.WIRE_CHANGELOG_BOT_PASSWORD,
 };
 
-logger.info(setBold(`wire-changelog-bot v${version}`) + '\n');
+logger.info(chalk`{bold wire-changelog-bot v${version}}`);
 
-const SECOND_ARGUMENT = 2;
-
-switch (process.argv[SECOND_ARGUMENT]) {
-  case '-help':
-  case '--help':
-  case '-h':
-  case '--h': {
-    usage();
-    envVarUsage();
-    process.exit(0);
-  }
-  default: {
-    if (process.argv[SECOND_ARGUMENT]) {
-      process.env.WIRE_CHANGELOG_BOT_CONVERSATION_IDS = process.argv[SECOND_ARGUMENT];
-    }
-  }
-}
-
-travisEnvVars.forEach(envVar => {
+TRAVIS_ENV_VARS.forEach(envVar => {
   if (!process.env[envVar]) {
-    console.error(
-      `${setBold('Error:')} Travis environment variable "${envVar}" is not set.\n` +
-        'Read more: https://docs.travis-ci.com/user/environment-variables/#Default-Environment-Variables'
+    logger.error(
+      chalk`{bold Error:} Travis environment variable "${envVar}" is not set.` +
+        '\nRead more: https://docs.travis-ci.com/user/environment-variables/#Default-Environment-Variables'
     );
     process.exit(1);
   }
 });
 
-requiredEnvVars.forEach(envVar => {
-  if (!process.env[envVar]) {
-    console.error(`Error: Environment variable "${envVar}" is not set.`);
-    envVarUsage();
-    process.exit(1);
-  }
-});
-
-start()
+start(parameters)
   .then(() => process.exit(0))
   .catch(error => {
-    console.error(error);
+    // Info:
+    // Don't log error payloads here (on a global level) as they can leak sensitive information. Stack traces are ok!
+    logger.error('Error at:', error.stack);
     process.exit(1);
   });
