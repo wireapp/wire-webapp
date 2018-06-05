@@ -47,8 +47,8 @@ fs.readFile(outFileName, 'utf8', (error, file) => {
   if (error) {
     return console.error(error);
   }
-  Object.keys(replacements).forEach(key => {
-    file = file.replace(RegExp(`(${rxPrefix})${key} `, 'gm'), `$1${replacements[key]} `);
+  Object.entries(replacements).forEach(([key, value]) => {
+    file = file.replace(RegExp(`(${rxPrefix})${key} `, 'gm'), `$1${value} `);
   });
   fs.writeFileSync(outFileName, file, 'utf8');
 });

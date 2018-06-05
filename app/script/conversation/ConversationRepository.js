@@ -1448,12 +1448,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   _check_changed_conversations() {
-    Object.keys(this.conversations_with_new_events).forEach(conversation_id => {
-      if (this.conversations_with_new_events.hasOwnProperty(conversation_id)) {
-        const conversation_et = this.conversations_with_new_events[conversation_id];
-        if (conversation_et.shouldUnarchive()) {
-          this.unarchiveConversation(conversation_et, false, 'event from notification stream');
-        }
+    Object.values(this.conversations_with_new_events).forEach(conversationEntity => {
+      if (conversationEntity.shouldUnarchive()) {
+        this.unarchiveConversation(conversationEntity, false, 'event from notification stream');
       }
     });
 
