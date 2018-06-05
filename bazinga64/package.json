@@ -12,7 +12,7 @@
     "libsodium-wrappers": "0.7.3",
     "rimraf": "2.6.2",
     "typescript": "2.9.1",
-    "webpack": "4.10.2"
+    "webpack": "4.11.0"
   },
   "files": [
     "dist"
