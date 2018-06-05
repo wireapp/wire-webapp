@@ -53,9 +53,9 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
     this.devicesHandler = this.mediaRepository.devicesHandler;
     this.streamHandler = this.mediaRepository.streamHandler;
 
-    this.availableDevices = this.devicesHandler.available_devices;
-    this.currentDeviceId = this.devicesHandler.current_device_id;
-    this.currentDeviceIndex = this.devicesHandler.current_device_index;
+    this.availableDevices = this.devicesHandler.availableDevices;
+    this.currentDeviceId = this.devicesHandler.currentDeviceId;
+    this.currentDeviceIndex = this.devicesHandler.currentDeviceIndex;
 
     this.selfStreamState = this.streamHandler.selfStreamState;
     this.localVideoStream = this.streamHandler.localMediaStream;
@@ -129,12 +129,12 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
     });
 
     this.showSwitchCamera = ko.pureComputed(() => {
-      const hasMultipleCameras = this.availableDevices.video_input().length > 1;
+      const hasMultipleCameras = this.availableDevices.videoInput().length > 1;
       const isVisible = hasMultipleCameras && this.localVideoStream() && this.selfStreamState.videoSend();
       return this.isCallOngoing() && isVisible;
     });
     this.showSwitchScreen = ko.pureComputed(() => {
-      const hasMultipleScreens = this.availableDevices.screen_input().length > 1;
+      const hasMultipleScreens = this.availableDevices.screenInput().length > 1;
       const isVisible = hasMultipleScreens && this.localVideoStream() && this.selfStreamState.screenSend();
       return this.isCallOngoing() && isVisible;
     });
@@ -218,7 +218,7 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
 
       if (z.util.Environment.desktop) {
         this.mediaRepository.devicesHandler
-          .get_screen_sources()
+          .getScreenSources()
           .then(screenSources => {
             const conversationEntity = this.joinedCall().conversationEntity;
 
@@ -277,11 +277,11 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
   }
 
   clickedOnChooseScreen(screenSource) {
-    this.currentDeviceId.screen_input('');
+    this.currentDeviceId.screenInput('');
 
     this.logger.info(`Selected '${screenSource.name}' for screen sharing`, screenSource);
     this.isChoosingScreen(false);
-    this.currentDeviceId.screen_input(screenSource.id);
+    this.currentDeviceId.screenInput(screenSource.id);
     amplify.publish(z.event.WebApp.CALL.MEDIA.TOGGLE, this.joinedCall().id, z.media.MediaType.SCREEN);
 
     if (this.multitasking.resetMinimize()) {
@@ -298,7 +298,7 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
   }
 
   clickedOnToggleCamera() {
-    this.mediaRepository.devicesHandler.toggle_next_camera();
+    this.mediaRepository.devicesHandler.toggleNextCamera();
   }
 
   clickedOnToggleScreen() {

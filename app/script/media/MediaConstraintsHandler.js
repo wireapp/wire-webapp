@@ -80,12 +80,12 @@ z.media.MediaConstraintsHandler = class MediaConstraintsHandler {
    */
   getMediaStreamConstraints(requestAudio = false, requestVideo = false, isGroup = false) {
     return Promise.resolve().then(() => {
-      const currentDeviceId = this.mediaRepository.devicesHandler.current_device_id;
+      const currentDeviceId = this.mediaRepository.devicesHandler.currentDeviceId;
       const mode = isGroup ? z.media.VIDEO_QUALITY_MODE.GROUP : z.media.VIDEO_QUALITY_MODE.MOBILE;
 
       const streamConstraints = {
-        audio: requestAudio ? this._getAudioStreamConstraints(currentDeviceId.audio_input()) : undefined,
-        video: requestVideo ? this._getVideoStreamConstraints(currentDeviceId.video_input(), mode) : undefined,
+        audio: requestAudio ? this._getAudioStreamConstraints(currentDeviceId.audioInput()) : undefined,
+        video: requestVideo ? this._getVideoStreamConstraints(currentDeviceId.videoInput(), mode) : undefined,
       };
       const mediaType = requestVideo ? z.media.MediaType.VIDEO : z.media.MediaType.AUDIO;
 
@@ -100,14 +100,8 @@ z.media.MediaConstraintsHandler = class MediaConstraintsHandler {
    * @returns {Object} Video stream constraints
    */
   _getAudioStreamConstraints(mediaDeviceId = '') {
-    if (mediaDeviceId && mediaDeviceId !== MediaConstraintsHandler.CONFIG.DEFAULT_DEVICE_ID) {
-      return {
-        deviceId: {
-          exact: mediaDeviceId,
-        },
-      };
-    }
-    return true;
+    const requireExactMediaDevice = mediaDeviceId && mediaDeviceId !== MediaConstraintsHandler.CONFIG.DEFAULT_DEVICE_ID;
+    return requireExactMediaDevice ? {deviceId: {exact: mediaDeviceId}} : true;
   }
 
   /**
@@ -118,7 +112,7 @@ z.media.MediaConstraintsHandler = class MediaConstraintsHandler {
     if (window.desktopCapturer) {
       this.logger.info('Enabling screen sharing from Electron');
 
-      const currentDeviceId = this.mediaRepository.devicesHandler.current_device_id;
+      const currentDeviceId = this.mediaRepository.devicesHandler.currentDeviceId;
       const preferredResolution = MediaConstraintsHandler.CONFIG.VIDEO_CONSTRAINTS.HD;
 
       const streamConstraints = {
@@ -126,7 +120,7 @@ z.media.MediaConstraintsHandler = class MediaConstraintsHandler {
         video: {
           mandatory: {
             chromeMediaSource: MediaConstraintsHandler.CONFIG.SCREEN_CONSTRAINTS.MEDIA_SOURCE,
-            chromeMediaSourceId: currentDeviceId.screen_input(),
+            chromeMediaSourceId: currentDeviceId.screenInput(),
             maxHeight: preferredResolution.height,
             maxWidth: preferredResolution.width,
             minHeight: preferredResolution.height,

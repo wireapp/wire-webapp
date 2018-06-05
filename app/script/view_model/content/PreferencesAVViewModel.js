@@ -47,8 +47,8 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
     this.isActivatedAccount = this.userRepository.isActivatedAccount;
 
     this.devicesHandler = this.mediaRepository.devicesHandler;
-    this.availableDevices = this.devicesHandler.available_devices;
-    this.currentDeviceId = this.devicesHandler.current_device_id;
+    this.availableDevices = this.devicesHandler.availableDevices;
+    this.currentDeviceId = this.devicesHandler.currentDeviceId;
 
     this.constraintsHandler = this.mediaRepository.constraintsHandler;
     this.streamHandler = this.mediaRepository.streamHandler;
@@ -73,12 +73,12 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
 
     this.permissionDenied = ko.observable(false);
 
-    this.supportsAudioInput = ko.pureComputed(() => !!this.availableDevices.audio_input().length);
+    this.supportsAudioInput = ko.pureComputed(() => !!this.availableDevices.audioInput().length);
     this.supportsAudioOutput = ko.pureComputed(() => {
-      return !!this.availableDevices.audio_output().length && z.util.Environment.browser.supports.audioOutputSelection;
+      return !!this.availableDevices.audioOutput().length && z.util.Environment.browser.supports.audioOutputSelection;
     });
     this.supportsVideoInput = ko.pureComputed(() => {
-      return !!this.availableDevices.video_input().length && this.isActivatedAccount();
+      return !!this.availableDevices.videoInput().length && this.isActivatedAccount();
     });
   }
 
@@ -124,7 +124,7 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
       .getMediaStreamConstraints(this.supportsAudioInput(), this.supportsVideoInput())
       .then(({mediaType, streamConstraints}) => this.streamHandler.requestMediaStream(mediaType, streamConstraints))
       .then(mediaStreamInfo => {
-        if (this.availableDevices.video_input().length) {
+        if (this.availableDevices.videoInput().length) {
           this.streamHandler.localMediaType(z.media.MediaType.VIDEO);
         }
 
