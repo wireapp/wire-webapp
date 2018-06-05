@@ -70,11 +70,7 @@ z.calling.entities.CallMessageEntity = class CallMessageEntity {
    * @returns {undefined} No return value
    */
   addProperties(additionalProperties = {}) {
-    for (const key in additionalProperties) {
-      if (additionalProperties.hasOwnProperty(key)) {
-        this[key] = additionalProperties[key];
-      }
-    }
+    Object.entries(additionalProperties).forEach(([key, value]) => (this[key] = value));
   }
 
   /**

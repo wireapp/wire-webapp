@@ -155,13 +155,14 @@ class Login extends React.PureComponent {
     this.inputs.email.value = this.inputs.email.value.trim();
     const validationErrors = [];
     const validInputs = this.state.validInputs;
-    for (const inputKey of Object.keys(this.inputs)) {
-      const currentInput = this.inputs[inputKey];
+
+    Object.entries(this.inputs).forEach(([inputKey, currentInput]) => {
       if (!currentInput.checkValidity()) {
         validationErrors.push(ValidationError.handleValidationState(currentInput.name, currentInput.validity));
       }
       validInputs[inputKey] = currentInput.validity.valid;
-    }
+    });
+
     this.setState({validInputs, validationErrors});
     return Promise.resolve(validationErrors)
       .then(errors => {

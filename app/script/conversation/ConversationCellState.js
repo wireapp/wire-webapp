@@ -51,9 +51,8 @@ z.conversation.ConversationCellState = (() => {
   };
 
   const _generateActivityString = activities => {
-    return Object.keys(activities)
-      .map(activity => {
-        const activityCount = activities[activity];
+    return Object.entries(activities)
+      .map(([activity, activityCount]) => {
         if (activityCount) {
           const activityCountIsOne = activityCount === 1;
           let stringId = undefined;

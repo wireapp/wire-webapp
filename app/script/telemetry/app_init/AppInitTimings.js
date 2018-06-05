@@ -40,15 +40,11 @@ z.telemetry.app_init.AppInitTimings = class AppInitTimings {
   get() {
     const timings = {};
 
-    for (const key in this) {
-      if (this.hasOwnProperty(key)) {
-        const value = this[key];
-
-        if (key.toString() !== 'init' && _.isNumber(value)) {
-          timings[key] = value;
-        }
+    Object.entries(this).forEach(([key, value]) => {
+      if (key.toString() !== 'init' && _.isNumber(value)) {
+        timings[key] = value;
       }
-    }
+    });
 
     return timings;
   }
@@ -63,23 +59,16 @@ z.telemetry.app_init.AppInitTimings = class AppInitTimings {
   log() {
     this.logger.debug('App initialization step durations');
 
-    for (const key in this) {
-      if (this.hasOwnProperty(key)) {
-        const value = this[key];
+    Object.entries(this).forEach(([key, value]) => {
+      if (key.toString() !== 'init' && _.isNumber(value)) {
+        const placeholderKeyLength = Math.max(AppInitTimings.CONFIG.LOG_LENGTH_KEY - key.length, 1);
+        const placeholderKey = new Array(placeholderKeyLength).join(' ');
+        const placeholderValueLength = Math.max(AppInitTimings.CONFIG.LOG_LENGTH_VALUE - value.toString().length, 1);
+        const placeholderValue = new Array(placeholderValueLength).join(' ');
 
-        if (key.toString() !== 'init' && _.isNumber(value)) {
-          const placeholder_key_length = Math.max(AppInitTimings.CONFIG.LOG_LENGTH_KEY - key.length, 1);
-          const placeholder_key = new Array(placeholder_key_length).join(' ');
-          const placeholder_value_length = Math.max(
-            AppInitTimings.CONFIG.LOG_LENGTH_VALUE - value.toString().length,
-            1
-          );
-          const placeholder_value = new Array(placeholder_value_length).join(' ');
-
-          this.logger.info(`${placeholder_key}'${key}':${placeholder_value}${value}ms`);
-        }
+        this.logger.info(`${placeholderKey}'${key}':${placeholderValue}${value}ms`);
       }
-    }
+    });
   }
 
   time_step(step) {

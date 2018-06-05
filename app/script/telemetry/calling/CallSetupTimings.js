@@ -82,9 +82,8 @@ z.telemetry.calling.CallSetupTimings = class CallSetupTimings {
   }
 
   _steps_order() {
-    if (this.is_answer) {
-      return z.telemetry.calling.CallSetupStepsOrder.ANSWER;
-    }
-    return z.telemetry.calling.CallSetupStepsOrder.OFFER;
+    return this.is_answer
+      ? z.telemetry.calling.CallSetupStepsOrder.ANSWER
+      : z.telemetry.calling.CallSetupStepsOrder.OFFER;
   }
 };
