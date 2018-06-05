@@ -29,6 +29,7 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
     this.mediaRepository = params.mediaRepository;
     this.multitasking = params.multitasking;
     this.temporaryUserStyle = params.temporaryUserStyle;
+    this.videoGridRepository = params.videoGridRepository;
 
     this.onJoinCall = () => {
       const mediaType = this.call().isRemoteVideoSend() ? z.media.MediaType.AUDIO_VIDEO : z.media.MediaType.AUDIO;
@@ -36,13 +37,6 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
     };
 
     this.selfStreamState = this.calling_repository.selfStreamState;
-
-    this.videoStreamsInfo = this.mediaRepository.stream_handler.remoteMediaStreamInfoIndex.video;
-    this.localVideoStream = ko.pureComputed(() => {
-      return this.selfStreamState.videoSend() || this.selfStreamState.screenSend()
-        ? this.mediaRepository.stream_handler.localMediaStream()
-        : null;
-    });
     this.calls = this.calling_repository.calls;
 
     this.onLeaveCall = () => {
@@ -73,7 +67,12 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
 
     this.users = ko.pureComputed(() => this.conversation.participating_user_ets());
     this.call = ko.pureComputed(() => this.conversation.call());
-    this.callParticipants = ko.pureComputed(() => this.call().participants());
+    this.callParticipants = ko.pureComputed(() =>
+      this.call()
+        .participants()
+        .slice()
+        .reverse()
+    );
 
     this.joinedCall = this.calling_repository.joinedCall;
 
@@ -85,7 +84,7 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
 
     this.disableVideoButton = ko.pureComputed(() => {
       const isRinging = this.callIsOutgoing() && this.selfStreamState.videoSend() && !this.callIsConnected();
-      return isRinging || !this.conversation.supportsVideoCall();
+      return isRinging || (!this.selfStreamState.videoSend() && !this.conversation.supportsVideoCall());
     });
 
     this.disableToggleScreen = ko.pureComputed(() => {
@@ -141,9 +140,15 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
 
     this.showParticipants = ko.observable(false);
 
-    this.showVideoPreview = ko.pureComputed(
-      () => this.isVideoCall() && (this.multitasking.isMinimized() || !this.callIsConnected())
-    );
+    this.showVideoPreview = ko.pureComputed(() => {
+      const hasOtherOngoingCalls =
+        this.calls()
+          .filter(call => call.id !== this.call().id)
+          .filter(call => call.state() === z.calling.enum.CALL_STATE.ONGOING).length > 0;
+
+      const isInMinimizedState = this.multitasking.isMinimized() || !this.callIsConnected();
+      return !hasOtherOngoingCalls && this.isVideoCall() && isInMinimizedState;
+    });
     this.showMaximize = ko.pureComputed(() => this.multitasking.isMinimized() && this.callIsConnected());
   }
 };
@@ -188,7 +193,7 @@ ko.components.register('conversation-list-calling-cell', {
 
     <!-- ko if: showVideoPreview -->
       <div class="group-video__minimized-wrapper" data-bind="click: onMaximizeVideoGrid">
-        <group-video-grid params="streamsInfo: videoStreamsInfo, ownStream: localVideoStream, calls: calls, minimized: true, screenSend: selfStreamState.screenSend()"></group-video-grid>
+        <group-video-grid params="minimized: true, videoGridRepository: videoGridRepository"></group-video-grid>
         <!-- ko if: showMaximize -->
           <div class="group-video__minimized-wrapper__overlay" data-uie-name="do-maximize-call">
             <fullscreen-icon></fullscreen-icon>

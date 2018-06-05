@@ -49,7 +49,7 @@ z.viewModel.content.HistoryImportViewModel = class HistoryImportViewModel {
     this.numberOfRecords = ko.observable(0);
     this.numberOfProcessedRecords = ko.observable(0);
     this.loadingProgress = ko.pureComputed(() => {
-      return Math.floor(this.numberOfProcessedRecords() / this.numberOfRecords() * 100);
+      return Math.floor((this.numberOfProcessedRecords() / this.numberOfRecords()) * 100);
     });
 
     this.loadingMessage = ko.pureComputed(() => {

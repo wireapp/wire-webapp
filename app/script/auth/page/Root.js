@@ -85,4 +85,7 @@ class Root extends React.Component {
   };
 }
 
-export default connect(({languageState}) => ({language: languageState.language}), {...CookieAction})(Root);
+export default connect(
+  ({languageState}) => ({language: languageState.language}),
+  {...CookieAction}
+)(Root);

@@ -39,7 +39,7 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
 
   archiveConversation(conversationEntity) {
     if (conversationEntity) {
-      return this.conversationRepository.archive_conversation(conversationEntity);
+      return this.conversationRepository.archiveConversation(conversationEntity);
     }
   }
 
@@ -187,7 +187,7 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
 
   _openConversation(conversationEntity) {
     if (conversationEntity.is_archived()) {
-      this.conversationRepository.unarchive_conversation(conversationEntity);
+      this.conversationRepository.unarchiveConversation(conversationEntity, true);
     }
 
     if (conversationEntity.is_cleared()) {

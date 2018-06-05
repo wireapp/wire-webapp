@@ -497,7 +497,7 @@ z.event.EventRepository = class EventRepository {
         handled: this.notificationsHandled,
         total: this.notificationsTotal,
       };
-      const progress = this.notificationsHandled / this.notificationsTotal * 50 + 25;
+      const progress = (this.notificationsHandled / this.notificationsTotal) * 50 + 25;
 
       amplify.publish(z.event.WebApp.APP.UPDATE_PROGRESS, progress, z.string.initDecryption, content);
     }

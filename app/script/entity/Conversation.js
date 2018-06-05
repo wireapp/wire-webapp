@@ -149,12 +149,12 @@ z.entity.Conversation = class Conversation {
     });
 
     this.hasActiveDeclinedCall = ko.pureComputed(() => {
-      const call = this.call();
-      if (!call) {
-        return false;
+      const callEntity = this.call();
+      if (callEntity) {
+        const callIsOngoing = callEntity.state() === z.calling.enum.CALL_STATE.ONGOING;
+        return (callIsOngoing && !callEntity.selfUserJoined()) || callEntity.isDeclined();
       }
-      const callIsOngoing = call.state() === z.calling.enum.CALL_STATE.ONGOING;
-      return (callIsOngoing && !call.selfUserJoined()) || call.isDeclined();
+      return false;
     });
 
     this.unread_events = ko.pureComputed(() => {
@@ -451,11 +451,15 @@ z.entity.Conversation = class Conversation {
     this.messages_unordered.removeAll();
   }
 
-  should_unarchive() {
+  shouldUnarchive() {
     if (this.archived_state()) {
-      const has_new_event = this.last_event_timestamp() > this.archived_timestamp();
+      const hasNewerMessage = this.last_event_timestamp() > this.archived_timestamp();
 
-      return has_new_event && !this.is_muted();
+      const lastMessageEntity = this.getLastMessage();
+      const hasNewerCall = lastMessageEntity && lastMessageEntity.is_call() && lastMessageEntity.is_activation();
+
+      const hasUpdate = hasNewerMessage || hasNewerCall;
+      return hasUpdate && !this.is_muted();
     }
     return false;
   }
@@ -657,7 +661,17 @@ z.entity.Conversation = class Conversation {
 
     const participantCount = this.getNumberOfParticipants(true, false);
     const passesParticipantLimit = participantCount <= z.calling.CallingRepository.CONFIG.MAX_VIDEO_PARTICIPANTS;
-    return isOutgoing ? passesParticipantLimit && this.self.inTeam() : passesParticipantLimit;
+
+    if (!passesParticipantLimit) {
+      return false;
+    }
+
+    if (this.self.inTeam()) {
+      return true;
+    }
+
+    const hasRemoteVideo = this.call() && (this.call().isRemoteVideoSend() || this.call().isRemoteScreenSend());
+    return hasRemoteVideo;
   }
 
   serialize() {

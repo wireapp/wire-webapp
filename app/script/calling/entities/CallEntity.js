@@ -254,7 +254,7 @@ z.calling.entities.CallEntity = class CallEntity {
 
   /**
    * Join the call.
-   * @param {z.media.MediaType} [mediaType=z.media.MediaType.AUDIO] - Media type of the call
+   * @param {z.media.MediaType} [mediaType] - Media type of the call
    * @returns {void} No return value
    */
   joinCall(mediaType) {
@@ -268,6 +268,7 @@ z.calling.entities.CallEntity = class CallEntity {
 
   /**
    * Join the 1:1 call.
+   * @private
    * @returns {void} No return value
    */
   _join1to1Call() {
@@ -277,6 +278,8 @@ z.calling.entities.CallEntity = class CallEntity {
 
   /**
    * Join group call.
+   *
+   * @private
    * @param {z.media.MediaType} [mediaType=z.media.MediaType.AUDIO] - Media type of the call
    * @returns {void} No return value
    */
@@ -949,7 +952,7 @@ z.calling.entities.CallEntity = class CallEntity {
     }
 
     const position = -(numberOfParticipants - 1.0) / (numberOfParticipants + 1.0);
-    const delta = -2.0 * position / (numberOfParticipants - 1.0);
+    const delta = (-2.0 * position) / (numberOfParticipants - 1.0);
 
     return position + delta * index;
   }

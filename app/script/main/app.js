@@ -165,6 +165,7 @@ z.main.App = class App {
       repositories.calling,
       repositories.conversation
     );
+    repositories.videoGrid = new z.calling.VideoGridRepository(repositories.calling, repositories.media);
 
     return repositories;
   }

@@ -746,7 +746,7 @@ describe('Conversation', () => {
     });
   });
 
-  describe('should_unarchive', () => {
+  describe('shouldUnarchive', () => {
     let time = undefined;
 
     beforeEach(() => {
@@ -758,33 +758,33 @@ describe('Conversation', () => {
 
     it('returns expected bool whether a conversation should be unarchived', () => {
       conversation_et.last_event_timestamp(time - 100);
-      expect(conversation_et.should_unarchive()).toBeFalsy();
+      expect(conversation_et.shouldUnarchive()).toBeFalsy();
 
       conversation_et.last_event_timestamp(time);
-      expect(conversation_et.should_unarchive()).toBeFalsy();
+      expect(conversation_et.shouldUnarchive()).toBeFalsy();
 
       conversation_et.last_event_timestamp(time + 100);
-      expect(conversation_et.should_unarchive()).toBeFalsy();
+      expect(conversation_et.shouldUnarchive()).toBeFalsy();
 
       conversation_et.muted_state(false);
       conversation_et.last_event_timestamp(time - 100);
-      expect(conversation_et.should_unarchive()).toBeFalsy();
+      expect(conversation_et.shouldUnarchive()).toBeFalsy();
 
       conversation_et.last_event_timestamp(time);
-      expect(conversation_et.should_unarchive()).toBeFalsy();
+      expect(conversation_et.shouldUnarchive()).toBeFalsy();
 
       conversation_et.last_event_timestamp(time + 100);
-      expect(conversation_et.should_unarchive()).toBeTruthy();
+      expect(conversation_et.shouldUnarchive()).toBeTruthy();
 
       conversation_et.archived_state(false);
       conversation_et.last_event_timestamp(time - 100);
-      expect(conversation_et.should_unarchive()).toBeFalsy();
+      expect(conversation_et.shouldUnarchive()).toBeFalsy();
 
       conversation_et.last_event_timestamp(time);
-      expect(conversation_et.should_unarchive()).toBeFalsy();
+      expect(conversation_et.shouldUnarchive()).toBeFalsy();
 
       conversation_et.last_event_timestamp(time + 100);
-      expect(conversation_et.should_unarchive()).toBeFalsy();
+      expect(conversation_et.shouldUnarchive()).toBeFalsy();
     });
   });
 

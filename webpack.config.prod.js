@@ -22,13 +22,19 @@ const commonConfig = require('./webpack.config.common');
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 
 module.exports = Object.assign({}, commonConfig, {
+  mode: 'production',
+  optimization: {
+    ...commonConfig.optimization,
+    minimizer: [
+      new UglifyJSPlugin({
+        /* Dexie has issues with UglifyJS */
+        exclude: /dexie/g,
+        sourceMap: true,
+      }),
+    ],
+  },
   plugins: [
     ...commonConfig.plugins,
-    new UglifyJSPlugin({
-      /* Dexie has issues with UglifyJS */
-      exclude: /dexie\.js/i,
-      sourceMap: true,
-    }),
     new webpack.DefinePlugin({
       'process.env': {
         NODE_ENV: JSON.stringify('production'),
