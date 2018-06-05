@@ -48,18 +48,15 @@ class Localizer {
 z.localization.Localizer = new Localizer();
 
 z.l10n = (() => {
-  function replaceWithString(string, substitute) {
-    return string.replace(/{{\w+}}/, substitute);
-  }
+  const replaceWithString = (string, substitute) => string.replace(/{{\w+}}/, substitute);
 
-  function replaceWithObject(string, substitute) {
-    for (const identifier in substitute) {
-      if (substitute.hasOwnProperty(identifier)) {
-        string = string.replace(new RegExp(`{{${identifier}}}`, 'g'), substitute[identifier]);
-      }
-    }
+  const replaceWithObject = (string, substitutions) => {
+    Object.entries(substitutions).forEach(([identifier, substitute]) => {
+      string = string.replace(new RegExp(`{{${identifier}}}`, 'g'), substitute);
+    });
+
     return string;
-  }
+  };
 
   return {
     /**

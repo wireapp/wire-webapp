@@ -185,19 +185,14 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
    */
   _mapRecipients(recipients, clientFn, userFn) {
     const result = [];
-    const userIds = Object.keys(recipients);
 
-    userIds.forEach(userId => {
-      if (recipients.hasOwnProperty(userId)) {
-        const clientIds = recipients[userId] || [];
+    Object.entries(recipients).forEach(([userId, clientIds = []]) => {
+      if (_.isFunction(clientFn)) {
+        clientIds.forEach(clientId => result.push(clientFn(userId, clientId)));
+      }
 
-        if (_.isFunction(clientFn)) {
-          clientIds.forEach(clientId => result.push(clientFn(userId, clientId)));
-        }
-
-        if (_.isFunction(userFn)) {
-          result.push(userFn(userId));
-        }
+      if (_.isFunction(userFn)) {
+        result.push(userFn(userId));
       }
     });
 
