@@ -38,10 +38,7 @@ z.components.ConversationListCell = class ConversationListCell {
     this.showJoinButton = ko.pureComputed(() => this.conversation.hasActiveDeclinedCall());
 
     this.onJoinCall = () => {
-      const mediaType = this.conversation.call().isRemoteVideoSend()
-        ? z.media.MediaType.AUDIO_VIDEO
-        : z.media.MediaType.AUDIO;
-      amplify.publish(z.event.WebApp.CALL.STATE.JOIN, this.conversation.id, mediaType);
+      amplify.publish(z.event.WebApp.CALL.STATE.JOIN, this.conversation.id, z.media.MediaType.AUDIO);
     };
   }
 
