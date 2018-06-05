@@ -302,7 +302,7 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
   }
 
   clickedOnToggleScreen() {
-    this.mediaRepository.devicesHandler.toggle_next_screen();
+    this.mediaRepository.devicesHandler.toggleNextScreen();
   }
 
   clickedOnMinimize() {

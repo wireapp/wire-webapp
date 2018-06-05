@@ -46,7 +46,7 @@ z.media.MediaElementHandler = class MediaElementHandler {
       this.remoteMediaElements.push(remoteMediaElement);
 
       const elementType = remoteMediaElement.nodeName.toLowerCase();
-      const message = `Created MediaElement of type '${elementType}' for flow '${mediaStreamInfo.flow_id}'`;
+      const message = `Created MediaElement of type '${elementType}' for flow '${mediaStreamInfo.flowId}'`;
       this.logger.info(message, remoteMediaElement);
     }
   }
@@ -86,8 +86,8 @@ z.media.MediaElementHandler = class MediaElementHandler {
     try {
       const mediaElement = document.createElement('audio');
       mediaElement.srcObject = mediaStreamInfo.stream;
-      mediaElement.dataset.conversationId = mediaStreamInfo.conversation_id;
-      mediaElement.dataset.flowId = mediaStreamInfo.flow_id;
+      mediaElement.dataset.conversationId = mediaStreamInfo.conversationId;
+      mediaElement.dataset.flowId = mediaStreamInfo.flowId;
       mediaElement.muted = false;
       mediaElement.setAttribute('autoplay', true);
       if (z.util.Environment.browser.supports.audioOutputSelection) {
@@ -95,7 +95,7 @@ z.media.MediaElementHandler = class MediaElementHandler {
       }
       return mediaElement;
     } catch (error) {
-      this.logger.error(`Unable to create AudioElement for flow '${mediaStreamInfo.flow_id}'`, error);
+      this.logger.error(`Unable to create AudioElement for flow '${mediaStreamInfo.flowId}'`, error);
     }
   }
 

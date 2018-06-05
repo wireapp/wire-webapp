@@ -92,7 +92,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
     this.logger = new z.util.Logger('z.media.MediaStreamHandler', z.config.LOGGER.OPTIONS);
 
     this.calls = () => [];
-    this.joined_call = () => undefined;
+    this.joinedCall = () => undefined;
 
     this.constraintsHandler = this.mediaRepository.constraintsHandler;
     this.devicesHandler = this.mediaRepository.devicesHandler;
@@ -201,9 +201,9 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
     this.logger.debug(logMessage, logObject);
 
     let updatePromise;
-    if (this.joined_call()) {
+    if (this.joinedCall()) {
       this._setStreamState(mediaStreamInfo);
-      const flowEntities = this.joined_call().getFlows();
+      const flowEntities = this.joinedCall().getFlows();
       updatePromise = Promise.all(flowEntities.map(flowEntity => flowEntity.updateMediaStream(mediaStreamInfo)));
     } else {
       updatePromise = Promise.resolve([mediaStreamInfo]);

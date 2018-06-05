@@ -160,9 +160,9 @@ describe('z.calling.VideoGridRepository', () => {
 
     it('contains only the active videos', () => {
       const remoteVideos = [
-        {flow_id: 'user-1', stream: {}},
-        {flow_id: 'user-2', stream: {}},
-        {flow_id: 'user-3', stream: {}},
+        {flowId: 'user-1', stream: {}},
+        {flowId: 'user-2', stream: {}},
+        {flowId: 'user-3', stream: {}},
       ];
       groupVideoGrid = new z.calling.VideoGridRepository(
         generateCallingRepository({
