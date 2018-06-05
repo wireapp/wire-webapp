@@ -654,7 +654,7 @@ z.entity.Conversation = class Conversation {
     return ['annathebot', 'ottothebot'].includes(this.firstUserEntity() && this.firstUserEntity().username());
   }
 
-  supportsVideoCall(isOutgoing = false) {
+  supportsVideoCall(isCreatingUser = false) {
     if (this.is_one2one()) {
       return true;
     }
@@ -668,6 +668,10 @@ z.entity.Conversation = class Conversation {
 
     if (this.self.inTeam()) {
       return true;
+    }
+
+    if (isCreatingUser) {
+      return false;
     }
 
     const hasRemoteVideo = this.call() && (this.call().isRemoteVideoSend() || this.call().isRemoteScreenSend());

@@ -80,8 +80,7 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
     });
 
     this.supportsVideoCall = ko.pureComputed(() => {
-      const userAllowedVideoCall = this.userRepository.isTeam() || this.conversationEntity().is_one2one();
-      return this.showCallControls() && this.conversationEntity().supportsVideoCall(true) && userAllowedVideoCall;
+      return this.showCallControls() && this.conversationEntity().supportsVideoCall(true);
     });
 
     const shortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.PEOPLE);
