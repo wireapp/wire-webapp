@@ -102,7 +102,7 @@ z.conversation.EventBuilder = {
   buildGroupCreation(conversationEntity, isTemporaryGuest = false, timestamp = 0) {
     const {creator: creatorId, id, self: selfUser} = conversationEntity;
 
-    const userIds = conversationEntity.participating_user_ids();
+    const userIds = conversationEntity.participating_user_ids().slice();
     const createdBySelf = creatorId === selfUser.id || isTemporaryGuest;
     if (!createdBySelf) {
       userIds.push(selfUser.id);
