@@ -113,7 +113,7 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
    */
   _getMediaStream() {
     const hasSupportedVideoStream = this.supportsVideoInput
-      ? this.mediaStream() && this.streamHandler.local_media_type() === z.media.MediaType.VIDEO
+      ? this.mediaStream() && this.streamHandler.localMediaType() === z.media.MediaType.VIDEO
       : this.mediaStream();
 
     if (hasSupportedVideoStream) {
@@ -122,10 +122,10 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
 
     return this.constraintsHandler
       .getMediaStreamConstraints(this.supportsAudioInput(), this.supportsVideoInput())
-      .then(({mediaType, streamConstraints}) => this.streamHandler.request_media_stream(mediaType, streamConstraints))
+      .then(({mediaType, streamConstraints}) => this.streamHandler.requestMediaStream(mediaType, streamConstraints))
       .then(mediaStreamInfo => {
         if (this.availableDevices.video_input().length) {
-          this.streamHandler.local_media_type(z.media.MediaType.VIDEO);
+          this.streamHandler.localMediaType(z.media.MediaType.VIDEO);
         }
 
         this.streamHandler.localMediaStream(mediaStreamInfo.stream);
@@ -193,7 +193,7 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
   }
 
   _releaseMediaStream() {
-    this.streamHandler.reset_media_stream();
+    this.streamHandler.resetMediaStream();
     this.permissionDenied(false);
   }
 };

@@ -89,7 +89,7 @@ z.calling.entities.CallEntity = class CallEntity {
 
     // Media
     this.localMediaStream = mediaStreamHandler.localMediaStream;
-    this.localMediaType = mediaStreamHandler.local_media_type;
+    this.localMediaType = mediaStreamHandler.localMediaType;
     this.remoteMediaType = ko.observable(z.media.MediaType.NONE);
 
     // Statistics
@@ -240,7 +240,7 @@ z.calling.entities.CallEntity = class CallEntity {
       this.scheduleGroupCheck();
     }
 
-    this.callingRepository.mediaStreamHandler.reset_media_stream();
+    this.callingRepository.mediaStreamHandler.resetMediaStream();
   }
 
   /**
@@ -360,7 +360,7 @@ z.calling.entities.CallEntity = class CallEntity {
     this.state(z.calling.enum.CALL_STATE.REJECTED);
 
     if (this.isRemoteVideoSend()) {
-      this.callingRepository.mediaStreamHandler.reset_media_stream();
+      this.callingRepository.mediaStreamHandler.resetMediaStream();
     }
 
     const callMessageEntity = z.calling.CallMessageBuilder.buildReject(false, this.sessionId, additionalPayload);

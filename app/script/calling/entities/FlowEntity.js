@@ -508,7 +508,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
       videoTracks: mediaStream.getVideoTracks(),
     });
 
-    mediaStream = z.media.MediaStreamHandler.detect_media_stream_type(mediaStream);
+    mediaStream = z.media.MediaStreamHandler.detectMediaStreamType(mediaStream);
     const isTypeAudio = mediaStream.type === z.media.MediaType.AUDIO;
     if (isTypeAudio) {
       mediaStream = this.audio.wrapAudioOutputStream(mediaStream);
@@ -1439,7 +1439,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
     if (this.mediaStream()) {
       const {stream: newMediaStream, type: mediaType} = mediaStreamInfo;
 
-      z.media.MediaStreamHandler.get_media_tracks(this.mediaStream(), mediaType).forEach(mediaStreamTrack => {
+      z.media.MediaStreamHandler.getMediaTracks(this.mediaStream(), mediaType).forEach(mediaStreamTrack => {
         this.mediaStream().removeTrack(mediaStreamTrack);
         mediaStreamTrack.stop();
         const mediaKind = mediaStreamTrack.kind;
@@ -1448,7 +1448,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
 
       const mediaStream = this.mediaStream().clone();
 
-      z.media.MediaStreamHandler.get_media_tracks(newMediaStream, mediaType).forEach(mediaStreamTrack => {
+      z.media.MediaStreamHandler.getMediaTracks(newMediaStream, mediaType).forEach(mediaStreamTrack => {
         mediaStream.addTrack(mediaStreamTrack);
       });
 

@@ -137,7 +137,7 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
     this.current_device_id.audio_input.subscribe(media_device_id => {
       z.util.StorageUtil.setValue(z.media.MediaDeviceType.AUDIO_INPUT, media_device_id);
       if (media_device_id && this.mediaRepository.stream_handler.localMediaStream()) {
-        this.mediaRepository.stream_handler.replace_input_source(z.media.MediaType.AUDIO);
+        this.mediaRepository.stream_handler.replaceInputSource(z.media.MediaType.AUDIO);
         this._update_current_index_from_id(z.media.MediaDeviceType.AUDIO_INPUT, media_device_id);
       }
     });
@@ -156,7 +156,7 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
         this.mediaRepository.stream_handler.localMediaStream() &&
         this.mediaRepository.stream_handler.local_media_type() === z.media.MediaType.SCREEN
       ) {
-        this.mediaRepository.stream_handler.replace_input_source(z.media.MediaType.SCREEN);
+        this.mediaRepository.stream_handler.replaceInputSource(z.media.MediaType.SCREEN);
         this._update_current_index_from_id(z.media.MediaDeviceType.SCREEN_INPUT, media_device_id);
       }
     });
@@ -168,7 +168,7 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
         this.mediaRepository.stream_handler.localMediaStream() &&
         this.mediaRepository.stream_handler.local_media_type() === z.media.MediaType.VIDEO
       ) {
-        this.mediaRepository.stream_handler.replace_input_source(z.media.MediaType.VIDEO);
+        this.mediaRepository.stream_handler.replaceInputSource(z.media.MediaType.VIDEO);
         this._update_current_index_from_id(z.media.MediaDeviceType.VIDEO_INPUT, media_device_id);
       }
     });
