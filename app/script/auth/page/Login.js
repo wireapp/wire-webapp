@@ -60,6 +60,7 @@ import * as URLUtil from '../util/urlUtil';
 import * as ClientSelector from '../module/selector/ClientSelector';
 import {resetError} from '../module/action/creator/AuthActionCreator';
 import Page from './Page';
+import {ClientType} from '@wireapp/api-client/dist/commonjs/client/index';
 
 class Login extends React.PureComponent {
   inputs = {};
@@ -170,7 +171,7 @@ class Login extends React.PureComponent {
       })
       .then(() => {
         const {email, password, persist} = this.state;
-        const login = {password, persist};
+        const login = {clientType: persist ? ClientType.PERMANENT : ClientType.TEMPORARY, password};
 
         if (this.isValidEmail(email)) {
           login.email = email;
