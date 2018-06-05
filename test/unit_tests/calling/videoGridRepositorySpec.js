@@ -145,7 +145,7 @@ describe('z.calling.VideoGridRepository', () => {
           },
         }),
         generateMediaRepository({
-          stream_handler: {
+          streamHandler: {
             localMediaStream: ko.observable(selfVideo),
             remoteMediaStreamInfoIndex: {
               video: ko.observableArray(remoteVideos),
@@ -171,7 +171,7 @@ describe('z.calling.VideoGridRepository', () => {
           ]),
         }),
         generateMediaRepository({
-          stream_handler: {
+          streamHandler: {
             localMediaStream: ko.observable(),
             remoteMediaStreamInfoIndex: {
               video: ko.observableArray(remoteVideos),
@@ -198,7 +198,7 @@ describe('z.calling.VideoGridRepository', () => {
             },
           }),
           generateMediaRepository({
-            stream_handler: {
+            streamHandler: {
               localMediaStream: ko.observable(selfVideo),
               remoteMediaStreamInfoIndex: {
                 video: ko.observableArray(remoteStreams),
@@ -223,7 +223,7 @@ describe('z.calling.VideoGridRepository', () => {
           },
         }),
         generateMediaRepository({
-          stream_handler: {
+          streamHandler: {
             localMediaStream: ko.observable(selfStream),
             remoteMediaStreamInfoIndex: {
               video: ko.observableArray([]),
@@ -243,7 +243,7 @@ describe('z.calling.VideoGridRepository', () => {
           },
         }),
         generateMediaRepository({
-          stream_handler: {
+          streamHandler: {
             localMediaStream: ko.observable(selfStream),
             remoteMediaStreamInfoIndex: {
               video: ko.observableArray([]),
@@ -263,7 +263,7 @@ describe('z.calling.VideoGridRepository', () => {
           },
         }),
         generateMediaRepository({
-          stream_handler: {
+          streamHandler: {
             localMediaStream: ko.observable(selfStream),
             remoteMediaStreamInfoIndex: {
               video: ko.observableArray([]),
@@ -277,7 +277,7 @@ describe('z.calling.VideoGridRepository', () => {
 
   function generateMediaRepository(overrides = {}) {
     const defaults = {
-      stream_handler: {
+      streamHandler: {
         localMediaStream: ko.observable(),
         remoteMediaStreamInfoIndex: {
           video: ko.observableArray([]),

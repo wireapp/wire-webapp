@@ -49,7 +49,7 @@ z.entity.Text = class Text extends z.entity.Asset {
   render() {
     let message = z.util.renderMessage(this.text);
     if (!this.previews().length) {
-      message = z.media.MediaParser.render_media_embeds(message, this.theme_color);
+      message = z.media.MediaParser.renderMediaEmbeds(message, this.theme_color);
     }
     return message;
   }

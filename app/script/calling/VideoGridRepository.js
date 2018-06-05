@@ -29,7 +29,7 @@ z.calling.VideoGridRepository = class VideoGridRepository {
    * @param {MediaRepository} mediaRepository - Repository for the media streams
    */
   constructor(callingRepository, mediaRepository) {
-    const streamHandler = mediaRepository.stream_handler;
+    const streamHandler = mediaRepository.streamHandler;
     const streamsInfo = streamHandler.remoteMediaStreamInfoIndex.video;
     const localMediaStream = streamHandler.localMediaStream;
     const selfStreamState = callingRepository.selfStreamState;

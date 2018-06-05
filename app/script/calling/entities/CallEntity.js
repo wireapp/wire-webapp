@@ -714,7 +714,7 @@ z.calling.entities.CallEntity = class CallEntity {
         this.participants.remove(participantEntity);
 
         this._updateRemoteState();
-        this.callingRepository.mediaElementHandler.remove_media_element(userId);
+        this.callingRepository.mediaElementHandler.removeMediaElement(userId);
 
         if (this.selfClientJoined()) {
           switch (terminationReason) {
@@ -793,7 +793,7 @@ z.calling.entities.CallEntity = class CallEntity {
       this.interruptedParticipants.remove(participantEntity);
 
       this._updateRemoteState();
-      this.callingRepository.mediaElementHandler.remove_media_element(userId);
+      this.callingRepository.mediaElementHandler.removeMediaElement(userId);
     });
   }
 

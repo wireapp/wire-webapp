@@ -46,12 +46,12 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
 
     this.isActivatedAccount = this.userRepository.isActivatedAccount;
 
-    this.devicesHandler = this.mediaRepository.devices_handler;
+    this.devicesHandler = this.mediaRepository.devicesHandler;
     this.availableDevices = this.devicesHandler.available_devices;
     this.currentDeviceId = this.devicesHandler.current_device_id;
 
-    this.constraintsHandler = this.mediaRepository.constraints_handler;
-    this.streamHandler = this.mediaRepository.stream_handler;
+    this.constraintsHandler = this.mediaRepository.constraintsHandler;
+    this.streamHandler = this.mediaRepository.streamHandler;
     this.mediaStream = this.streamHandler.localMediaStream;
 
     this.isVisible = false;
@@ -158,7 +158,7 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
    */
   _initiateAudioMeter(mediaStream) {
     this.logger.info('Initiating new audio meter', mediaStream);
-    this.audioContext = this.mediaRepository.get_audio_context();
+    this.audioContext = this.mediaRepository.getAudioContext();
 
     const audioAnalyser = this.audioContext.createAnalyser();
     audioAnalyser.fftSize = PreferencesAVViewModel.CONFIG.AUDIO_METER.FFT_SIZE;
