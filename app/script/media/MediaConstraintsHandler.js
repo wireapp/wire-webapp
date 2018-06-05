@@ -80,7 +80,7 @@ z.media.MediaConstraintsHandler = class MediaConstraintsHandler {
    */
   getMediaStreamConstraints(requestAudio = false, requestVideo = false, isGroup = false) {
     return Promise.resolve().then(() => {
-      const currentDeviceId = this.mediaRepository.devices_handler.current_device_id;
+      const currentDeviceId = this.mediaRepository.devicesHandler.current_device_id;
       const mode = isGroup ? z.media.VIDEO_QUALITY_MODE.GROUP : z.media.VIDEO_QUALITY_MODE.MOBILE;
 
       const streamConstraints = {
@@ -118,7 +118,7 @@ z.media.MediaConstraintsHandler = class MediaConstraintsHandler {
     if (window.desktopCapturer) {
       this.logger.info('Enabling screen sharing from Electron');
 
-      const currentDeviceId = this.mediaRepository.devices_handler.current_device_id;
+      const currentDeviceId = this.mediaRepository.devicesHandler.current_device_id;
       const preferredResolution = MediaConstraintsHandler.CONFIG.VIDEO_CONSTRAINTS.HD;
 
       const streamConstraints = {

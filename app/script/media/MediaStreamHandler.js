@@ -94,9 +94,9 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
     this.calls = () => [];
     this.joined_call = () => undefined;
 
-    this.constraintsHandler = this.mediaRepository.constraints_handler;
-    this.devicesHandler = this.mediaRepository.devices_handler;
-    this.elementHandler = this.mediaRepository.element_handler;
+    this.constraintsHandler = this.mediaRepository.constraintsHandler;
+    this.devicesHandler = this.mediaRepository.devicesHandler;
+    this.elementHandler = this.mediaRepository.elementHandler;
 
     this.localMediaStream = ko.observable();
     this.localMediaType = ko.observable(z.media.MediaType.AUDIO);
@@ -541,7 +541,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
     }
 
     this.remoteMediaStreamInfo.push(mediaStreamInfo);
-    this.elementHandler.add_media_element(mediaStreamInfo);
+    this.elementHandler.addMediaElement(mediaStreamInfo);
   }
 
   /**
@@ -612,7 +612,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
     if (!this.needsMediaStream()) {
       this.releaseMediaStream();
       this.resetSelfStates();
-      this.mediaRepository.close_audio_context();
+      this.mediaRepository.closeAudioContext();
     }
   }
 

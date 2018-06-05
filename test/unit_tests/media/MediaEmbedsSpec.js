@@ -122,13 +122,13 @@ describe('MediaEmbeds', () => {
     describe('no rich media content', () => {
       it('renders a normal link', () => {
         const message = '<a href="https://www.google.com" target="_blank" rel="nofollow">https://www.google.com</a>';
-        expect(z.media.MediaParser.render_media_embeds(message)).toBe(message);
+        expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(message);
       });
 
       it('renders a normal link with text', () => {
         const message =
           'Check this <a href="https://www.google.com" target="_blank" rel="nofollow">https://www.google.com</a>';
-        expect(z.media.MediaParser.render_media_embeds(message)).toBe(message);
+        expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(message);
       });
     });
 
@@ -137,21 +137,21 @@ describe('MediaEmbeds', () => {
         const link = 'youtube-nocookie.com';
         const message = build_message_with_anchor(link);
 
-        expect(z.media.MediaParser.render_media_embeds(message)).toBe(message);
+        expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(message);
       });
 
       it('does not render a malicious youtube link', () => {
         const link = 'https://xn--yutube-wqf.com/#youtu0be/v/fKopy74weus';
         const message = build_message_with_anchor(link);
 
-        expect(z.media.MediaParser.render_media_embeds(message)).toBe(message);
+        expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(message);
       });
 
       it('https://www.youtube-nocookie.com/playlist?list=PLNy867I3fkD6LqNQdk5rAPb6xAI-SbZOd', () => {
         const link = 'https://www.youtube-nocookie.com/playlist?list=PLNy867I3fkD6LqNQdk5rAPb6xAI-SbZOd';
         const message = build_message_with_anchor(link);
 
-        expect(z.media.MediaParser.render_media_embeds(message)).toBe(message);
+        expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(message);
       });
 
       it('renders link with params (http://www.youtube-nocookie.com/watch?v=6o-nmK9WRGE&feature=player_embedded)', () => {
@@ -160,7 +160,7 @@ describe('MediaEmbeds', () => {
         const message = build_message_with_anchor(link);
         const iframe = build_youtube_iframe(link);
 
-        expect(z.media.MediaParser.render_media_embeds(message)).toBe(iframe);
+        expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(iframe);
       });
 
       it('renders link with params (http://www.youtube-nocookie.com/watch?v=0zM3nApSvMg&feature=feedrec_grec_index)', () => {
@@ -169,7 +169,7 @@ describe('MediaEmbeds', () => {
         const message = build_message_with_anchor(link);
         const iframe = build_youtube_iframe(link);
 
-        expect(z.media.MediaParser.render_media_embeds(message)).toBe(iframe);
+        expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(iframe);
       });
 
       it('renders link with params (http://www.youtube-nocookie.com/v/0zM3nApSvMg?fs=1&hl=en_US&rel=0)', () => {
@@ -178,7 +178,7 @@ describe('MediaEmbeds', () => {
         const message = build_message_with_anchor(link);
         const iframe = build_youtube_iframe(link);
 
-        expect(z.media.MediaParser.render_media_embeds(message)).toBe(iframe);
+        expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(iframe);
       });
 
       it('renders link with timestamp (http://www.youtube-nocookie.com/watch?v=0zM3nApSvMg#t=0m10s)', () => {
@@ -186,7 +186,7 @@ describe('MediaEmbeds', () => {
 
         const message = build_message_with_anchor(link);
         const iframe = build_youtube_iframe(link);
-        expect(z.media.MediaParser.render_media_embeds(message)).toBe(iframe);
+        expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(iframe);
       });
 
       it('renders link with timestamp inverted (https://www.youtube-nocookie.com/watch?t=125&v=CfEWiV8PoZo)', () => {
@@ -194,7 +194,7 @@ describe('MediaEmbeds', () => {
 
         const message = build_message_with_anchor(link);
         const iframe = build_youtube_iframe(link);
-        expect(z.media.MediaParser.render_media_embeds(message)).toBe(iframe);
+        expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(iframe);
       });
 
       it('renders embed link (http://www.youtube-nocookie.com/embed/0zM3nApSvMg?rel=0)', () => {
@@ -203,7 +203,7 @@ describe('MediaEmbeds', () => {
         const message = build_message_with_anchor(link);
         const iframe = build_youtube_iframe(link);
 
-        expect(z.media.MediaParser.render_media_embeds(message)).toBe(iframe);
+        expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(iframe);
       });
 
       it('renders watch link (http://www.youtube-nocookie.com/watch?v=0zM3nApSvMg)', () => {
@@ -212,7 +212,7 @@ describe('MediaEmbeds', () => {
         const message = build_message_with_anchor(link);
         const iframe = build_youtube_iframe(link);
 
-        expect(z.media.MediaParser.render_media_embeds(message)).toBe(iframe);
+        expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(iframe);
       });
 
       it('renders a short link (http://youtu.be/0zM3nApSvMg)', () => {
@@ -221,7 +221,7 @@ describe('MediaEmbeds', () => {
         const message = build_message_with_anchor(link);
         const iframe = build_youtube_iframe(link);
 
-        expect(z.media.MediaParser.render_media_embeds(message)).toBe(iframe);
+        expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(iframe);
       });
 
       it('renders a short link playlist (https://youtu.be/oL1xf_X0W2s?list=PLuKg-WhduhkmIcFMN7wxfVWYu8qnk0jMN)', () => {
@@ -230,7 +230,7 @@ describe('MediaEmbeds', () => {
         const message = build_message_with_anchor(link);
         const iframe = build_youtube_iframe(link);
 
-        expect(z.media.MediaParser.render_media_embeds(message)).toBe(iframe);
+        expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(iframe);
       });
 
       it('renders a mobile link (https://m.youtube-nocookie.com/?#/watch?v=0zM3nApSvMg)', () => {
@@ -239,7 +239,7 @@ describe('MediaEmbeds', () => {
         const message = build_message_with_anchor(link);
         const iframe = build_youtube_iframe(link);
 
-        expect(z.media.MediaParser.render_media_embeds(message)).toBe(iframe);
+        expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(iframe);
       });
 
       it('renders another mobile link (https://www.youtube-nocookie.com/watch?v=1w4Gf97q2oU&feature=youtu.be)', () => {
@@ -248,7 +248,7 @@ describe('MediaEmbeds', () => {
         const message = build_message_with_anchor(link);
         const iframe = build_youtube_iframe(link);
 
-        expect(z.media.MediaParser.render_media_embeds(message)).toBe(iframe);
+        expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(iframe);
       });
 
       it('doesn`t render Youtube profile link', () => {
@@ -256,7 +256,7 @@ describe('MediaEmbeds', () => {
           '<a href="https://www.youtube-nocookie.com/user/GoogleWebDesigner" target="_blank" rel="nofollow">https://www.youtube-nocookie.com/user/GoogleWebDesigner</a>';
         const iframe =
           '<a href="https://www.youtube-nocookie.com/user/GoogleWebDesigner" target="_blank" rel="nofollow">https://www.youtube-nocookie.com/user/GoogleWebDesigner</a>';
-        expect(z.media.MediaParser.render_media_embeds(message)).toBe(iframe);
+        expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(iframe);
       });
 
       it('removes autoplay param from url (https://www.youtube-nocookie.com/watch?v=oHg5SJYRHA0&autoplay=1)', () => {
@@ -266,7 +266,7 @@ describe('MediaEmbeds', () => {
         const iframe =
           '<a href="https://www.youtube-nocookie.com/watch?v=oHg5SJYRHA0&autoplay=1" target="_blank" rel="nofollow">https://www.youtube-nocookie.com/watch?v=oHg5SJYRHA0&autoplay=1</a><div class="iframe-container iframe-container-video"><iframe class="youtube" width="100%" height="100%" src="https://www.youtube-nocookie.com/embed/oHg5SJYRHA0?html5=1&enablejsapi=0&modestbranding=1&rel=0" frameborder="0" allowfullscreen></iframe></div>';
 
-        expect(z.media.MediaParser.render_media_embeds(message)).toBe(iframe);
+        expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(iframe);
       });
 
       return it('removes autoplay param from url (https://www.youtube-nocookie.com/watch?autoplay=1&v=oHg5SJYRHA0)', () => {
@@ -276,7 +276,7 @@ describe('MediaEmbeds', () => {
         const iframe =
           '<a href="https://www.youtube-nocookie.com/watch?autoplay=1&v=oHg5SJYRHA0" target="_blank" rel="nofollow">https://www.youtube-nocookie.com/watch?autoplay=1&v=oHg5SJYRHA0</a><div class="iframe-container iframe-container-video"><iframe class="youtube" width="100%" height="100%" src="https://www.youtube-nocookie.com/embed/oHg5SJYRHA0?html5=1&enablejsapi=0&modestbranding=1&rel=0" frameborder="0" allowfullscreen></iframe></div>';
 
-        expect(z.media.MediaParser.render_media_embeds(message)).toBe(iframe);
+        expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(iframe);
       });
     });
 
@@ -287,7 +287,7 @@ describe('MediaEmbeds', () => {
         const message = build_message_with_anchor(link);
         const iframe = build_soundcloud_iframe_for_tracks(link);
 
-        expect(z.media.MediaParser.render_media_embeds(message)).toBe(iframe);
+        expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(iframe);
       });
 
       it('renders a playlist (https://soundcloud.com/onedirectionmusic/sets/liams-you-i-remix-playlist)', () => {
@@ -296,17 +296,17 @@ describe('MediaEmbeds', () => {
         const message = build_message_with_anchor(link);
         const iframe = build_soundcloud_iframe_for_playlists(link);
 
-        expect(z.media.MediaParser.render_media_embeds(message)).toBe(iframe);
+        expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(iframe);
       });
 
       it('renders profiles without embeds (https://soundcloud.com/dp-conference)', () => {
         const message = build_message_with_anchor('https://soundcloud.com/dp-conference');
-        expect(z.media.MediaParser.render_media_embeds(message)).toBe(message);
+        expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(message);
       });
 
       it('renders profiles without embeds even if profiles have a trailing slash (https://soundcloud.com/dp-conference/)', () => {
         const message = build_message_with_anchor('https://soundcloud.com/dp-conference/');
-        expect(z.media.MediaParser.render_media_embeds(message)).toBe(message);
+        expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(message);
       });
 
       it('renders a group (https://soundcloud.com/groups/playlist-digital-sintonia)', () => {
@@ -315,7 +315,7 @@ describe('MediaEmbeds', () => {
         const message = build_message_with_anchor(link);
         const iframe = build_soundcloud_iframe_for_tracks(link);
 
-        expect(z.media.MediaParser.render_media_embeds(message)).toBe(iframe);
+        expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(iframe);
       });
 
       it('renders a track without trailing slash (https://soundcloud.com/florian-paetzold/limp-bizkit-my-way-florian-paetzold-remix-free-download)', () => {
@@ -324,7 +324,7 @@ describe('MediaEmbeds', () => {
         const message = build_message_with_anchor(link);
         const iframe = build_soundcloud_iframe_for_tracks(link);
 
-        expect(z.media.MediaParser.render_media_embeds(message)).toBe(iframe);
+        expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(iframe);
       });
 
       it('renders a track with trailing slash (https://soundcloud.com/florian-paetzold/limp-bizkit-my-way-florian-paetzold-remix-free-download/)', () => {
@@ -333,13 +333,13 @@ describe('MediaEmbeds', () => {
         const message = build_message_with_anchor(link);
         const iframe = build_soundcloud_iframe_for_tracks(link);
 
-        expect(z.media.MediaParser.render_media_embeds(message)).toBe(iframe);
+        expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(iframe);
       });
 
       return it('doesn’t render links which cannot be rendered (https://soundcloud.com/fdvm/lulleaux-fdvm-up-to-you-original-mix/recommended)', () => {
         const link = 'https://soundcloud.com/fdvm/lulleaux-fdvm-up-to-you-original-mix/recommended';
         const message = `<a href="${link}" target="_blank" rel="nofollow">${link}</a>`;
-        expect(z.media.MediaParser.render_media_embeds(message)).toBe(message);
+        expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(message);
       });
     });
 
@@ -351,7 +351,7 @@ describe('MediaEmbeds', () => {
         const message = build_message_with_anchor(link);
         const iframe = build_spotify_iframe(link, partial_link);
 
-        expect(z.media.MediaParser.render_media_embeds(message)).toBe(iframe);
+        expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(iframe);
       });
 
       it('renders track (https://open.spotify.com/track/26fwlVGkISUr5P91hAeTW8)', () => {
@@ -361,7 +361,7 @@ describe('MediaEmbeds', () => {
         const message = build_message_with_anchor(link);
         const iframe = build_spotify_iframe(link, partial_link);
 
-        expect(z.media.MediaParser.render_media_embeds(message)).toBe(iframe);
+        expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(iframe);
       });
 
       it('renders album (https://open.spotify.com/album/7iN0r7Sl624EkOUNUCOGu9)', () => {
@@ -371,7 +371,7 @@ describe('MediaEmbeds', () => {
         const message = build_message_with_anchor(link);
         const iframe = build_spotify_iframe(link, partial_link);
 
-        expect(z.media.MediaParser.render_media_embeds(message)).toBe(iframe);
+        expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(iframe);
       });
 
       it('renders playlist (https://open.spotify.com/user/1123867741/playlist/2w63WroxrrIbNg4WIxdoBn)', () => {
@@ -381,7 +381,7 @@ describe('MediaEmbeds', () => {
         const message = build_message_with_anchor(link);
         const iframe = build_spotify_iframe(link, partial_link);
 
-        expect(z.media.MediaParser.render_media_embeds(message)).toBe(iframe);
+        expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(iframe);
       });
 
       return it('renders track with params (https://play.spotify.com/track/5yEPxDjbbzUzyauGtnmVEC?play=true&utm_source=open.spotify.com&utm_medium=open)', () => {
@@ -392,7 +392,7 @@ describe('MediaEmbeds', () => {
         const message = build_message_with_anchor(link);
         const iframe = build_spotify_iframe(link, partial_link);
 
-        expect(z.media.MediaParser.render_media_embeds(message)).toBe(iframe);
+        expect(z.media.MediaParser.renderMediaEmbeds(message)).toBe(iframe);
       });
     });
 
@@ -404,12 +404,12 @@ describe('MediaEmbeds', () => {
         const message = build_message_with_anchor(link);
         const iframe = build_vimeo_iframe(link, id);
 
-        expect(z.media.MediaParser.render_media_embeds(message, '#333')).toBe(iframe);
+        expect(z.media.MediaParser.renderMediaEmbeds(message, '#333')).toBe(iframe);
       });
 
       it('doesn’t render user https://vimeo.com/user38597062', () => {
         const message = build_message_with_anchor('https://vimeo.com/user38597062');
-        expect(z.media.MediaParser.render_media_embeds(message, '#333')).toBe(message);
+        expect(z.media.MediaParser.renderMediaEmbeds(message, '#333')).toBe(message);
       });
 
       return it('renders link with params (https://vimeo.com/channels/staffpicks/127053285?utm_source=social&utm_campaign=9914)', () => {
@@ -419,7 +419,7 @@ describe('MediaEmbeds', () => {
         const message = build_message_with_anchor(link);
         const iframe = build_vimeo_iframe(link, id);
 
-        expect(z.media.MediaParser.render_media_embeds(message, '#333')).toBe(iframe);
+        expect(z.media.MediaParser.renderMediaEmbeds(message, '#333')).toBe(iframe);
       });
     });
   });

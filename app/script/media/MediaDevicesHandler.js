@@ -136,8 +136,8 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
 
     this.current_device_id.audio_input.subscribe(media_device_id => {
       z.util.StorageUtil.setValue(z.media.MediaDeviceType.AUDIO_INPUT, media_device_id);
-      if (media_device_id && this.mediaRepository.stream_handler.localMediaStream()) {
-        this.mediaRepository.stream_handler.replaceInputSource(z.media.MediaType.AUDIO);
+      if (media_device_id && this.mediaRepository.streamHandler.localMediaStream()) {
+        this.mediaRepository.streamHandler.replaceInputSource(z.media.MediaType.AUDIO);
         this._update_current_index_from_id(z.media.MediaDeviceType.AUDIO_INPUT, media_device_id);
       }
     });
@@ -145,7 +145,7 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
     this.current_device_id.audio_output.subscribe(media_device_id => {
       z.util.StorageUtil.setValue(z.media.MediaDeviceType.AUDIO_OUTPUT, media_device_id);
       if (media_device_id) {
-        this.mediaRepository.element_handler.switch_media_element_output(media_device_id);
+        this.mediaRepository.elementHandler.switchMediaElementOutput(media_device_id);
         this._update_current_index_from_id(z.media.MediaDeviceType.AUDIO_OUTPUT, media_device_id);
       }
     });
@@ -153,10 +153,10 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
     this.current_device_id.screen_input.subscribe(media_device_id => {
       if (
         media_device_id &&
-        this.mediaRepository.stream_handler.localMediaStream() &&
-        this.mediaRepository.stream_handler.local_media_type() === z.media.MediaType.SCREEN
+        this.mediaRepository.streamHandler.localMediaStream() &&
+        this.mediaRepository.streamHandler.local_media_type() === z.media.MediaType.SCREEN
       ) {
-        this.mediaRepository.stream_handler.replaceInputSource(z.media.MediaType.SCREEN);
+        this.mediaRepository.streamHandler.replaceInputSource(z.media.MediaType.SCREEN);
         this._update_current_index_from_id(z.media.MediaDeviceType.SCREEN_INPUT, media_device_id);
       }
     });
@@ -165,10 +165,10 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
       z.util.StorageUtil.setValue(z.media.MediaDeviceType.VIDEO_INPUT, media_device_id);
       if (
         media_device_id &&
-        this.mediaRepository.stream_handler.localMediaStream() &&
-        this.mediaRepository.stream_handler.local_media_type() === z.media.MediaType.VIDEO
+        this.mediaRepository.streamHandler.localMediaStream() &&
+        this.mediaRepository.streamHandler.local_media_type() === z.media.MediaType.VIDEO
       ) {
-        this.mediaRepository.stream_handler.replaceInputSource(z.media.MediaType.VIDEO);
+        this.mediaRepository.streamHandler.replaceInputSource(z.media.MediaType.VIDEO);
         this._update_current_index_from_id(z.media.MediaDeviceType.VIDEO_INPUT, media_device_id);
       }
     });

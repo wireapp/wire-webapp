@@ -31,11 +31,11 @@ z.media.MediaStreamInfo = class MediaStreamInfo {
     this.type = z.media.MediaType.NONE;
 
     this.conversation_id = call_et ? call_et.id : undefined;
-    this.update_stream_type();
+    this.updateStreamType();
     return this;
   }
 
-  update_stream_type() {
+  updateStreamType() {
     this.stream = z.media.MediaStreamHandler.detectMediaStreamType(this.stream);
     return (this.type = this.stream.type);
   }

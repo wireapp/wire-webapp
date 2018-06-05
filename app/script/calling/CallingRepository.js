@@ -85,12 +85,11 @@ z.calling.CallingRepository = class CallingRepository {
     this.telemetry = new z.telemetry.calling.CallTelemetry();
 
     // Media Handler
-    this.mediaDevicesHandler = this.mediaRepository.devices_handler;
-    this.mediaStreamHandler = this.mediaRepository.stream_handler;
-    this.mediaElementHandler = this.mediaRepository.element_handler;
-    this.selfStreamState = this.mediaRepository.stream_handler.selfStreamState;
+    this.mediaDevicesHandler = this.mediaRepository.devicesHandler;
+    this.mediaStreamHandler = this.mediaRepository.streamHandler;
+    this.mediaElementHandler = this.mediaRepository.elementHandler;
 
-    this.selfState = this.mediaStreamHandler.selfStreamState;
+    this.selfStreamState = this.mediaStreamHandler.selfStreamState;
 
     this.calls = ko.observableArray([]);
     this.joinedCall = ko.pureComputed(() => {
@@ -113,8 +112,8 @@ z.calling.CallingRepository = class CallingRepository {
    * @returns {undefined} No return value
    */
   shareCallStates() {
-    this.mediaRepository.stream_handler.calls = this.calls;
-    this.mediaRepository.stream_handler.joined_call = this.joinedCall;
+    this.mediaRepository.streamHandler.calls = this.calls;
+    this.mediaRepository.streamHandler.joined_call = this.joinedCall;
   }
 
   /**
@@ -1080,8 +1079,8 @@ z.calling.CallingRepository = class CallingRepository {
   _initiateOutgoingCall(conversationId, mediaType, callState) {
     const videoSend = mediaType === z.media.MediaType.AUDIO_VIDEO;
     const payload = {conversationId};
-    const propSyncPayload = z.calling.CallMessageBuilder.createPropSync(this.selfState, videoSend, false, payload);
-    const callMessageEntity = z.calling.CallMessageBuilder.buildPropSync(false, undefined, propSyncPayload);
+    const messagePayload = z.calling.CallMessageBuilder.createPropSync(this.selfStreamState, videoSend, false, payload);
+    const callMessageEntity = z.calling.CallMessageBuilder.buildPropSync(false, undefined, messagePayload);
     return this._createOutgoingCall(callMessageEntity);
   }
 
