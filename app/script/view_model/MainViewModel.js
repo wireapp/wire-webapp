@@ -198,7 +198,7 @@ z.viewModel.MainViewModel = class MainViewModel {
 
   _applyStyle(element, style) {
     if (element) {
-      Object.keys(style).forEach(key => (element.style[key] = style[key]));
+      Object.entries(style).forEach(([key, styleValue]) => (element.style[key] = styleValue));
     }
   }
 
