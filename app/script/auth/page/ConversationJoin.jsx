@@ -50,7 +50,7 @@ import {ROUTE, QUERY_KEY} from '../route';
 import {injectIntl, FormattedHTMLMessage} from 'react-intl';
 import {withRouter} from 'react-router';
 import React, {Component} from 'react';
-import {getURLParameter, getAppPath, hasURLParameter} from '../util/urlUtil';
+import {getURLParameter, getAppPath, hasURLParameter, pathWithParams} from '../util/urlUtil';
 import BackendError from '../module/action/BackendError';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
 import WirelessUnsupportedBrowser from '../component/WirelessUnsupportedBrowser';
@@ -121,13 +121,18 @@ class ConversationJoin extends Component {
       .then(() => this.routeToApp());
   };
 
-  routeToApp = () => {
+  isPwaSupportedBrowser = () => {
     const pwaAware = hasURLParameter(QUERY_KEY.PWA_AWARE);
-    const isPwaSupportedBrowser = Environment.onEnvironment({
+    return Environment.onEnvironment({
       onProduction: false,
       onStaging: pwaAware && (isMobileOs() || isSafari()),
     });
-    const redirectLocation = isPwaSupportedBrowser ? EXTERNAL_ROUTE.PWA : getAppPath();
+  };
+
+  routeToApp = () => {
+    const redirectLocation = this.isPwaSupportedBrowser()
+      ? pathWithParams(EXTERNAL_ROUTE.PWA, QUERY_KEY.IMMEDIATE_LOGIN)
+      : getAppPath();
     window.location.replace(redirectLocation);
   };
 
@@ -148,7 +153,9 @@ class ConversationJoin extends Component {
             expires_in: this.state.expiresIn,
             name,
           };
-          return this.props.doRegisterWireless(registrationData);
+          return this.props.doRegisterWireless(registrationData, {
+            shouldInitializeClient: !this.isPwaSupportedBrowser(),
+          });
         })
         .then(() => this.props.doJoinConversationByCode(this.state.conversationKey, this.state.conversationCode))
         .then(conversationEvent => this.props.setLastEventDate(new Date(conversationEvent.time)))
