@@ -79,9 +79,7 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
       return !this.hasCall() && isSupportedConversation && isActiveConversation;
     });
 
-    this.supportsVideoCall = ko.pureComputed(() => {
-      return this.showCallControls() && this.conversationEntity().supportsVideoCall(true);
-    });
+    this.supportsVideoCall = ko.pureComputed(() => this.conversationEntity().supportsVideoCall(true));
 
     const shortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.PEOPLE);
     this.peopleTooltip = z.l10n.text(z.string.tooltipConversationPeople, shortcut);
