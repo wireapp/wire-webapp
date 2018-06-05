@@ -58,10 +58,10 @@ z.media.MediaConstraintsHandler = class MediaConstraintsHandler {
 
   /**
    * Construct a new MediaConstraints handler.
-   * @param {z.media.MediaRepository} media_repository - Media repository with with references to all other handlers
+   * @param {z.media.MediaRepository} mediaRepository - Media repository with with references to all other handlers
    */
-  constructor(media_repository) {
-    this.media_repository = media_repository;
+  constructor(mediaRepository) {
+    this.mediaRepository = mediaRepository;
     this.logger = new z.util.Logger('z.media.MediaConstraintsHandler', z.config.LOGGER.OPTIONS);
   }
 
@@ -73,21 +73,21 @@ z.media.MediaConstraintsHandler = class MediaConstraintsHandler {
    * Get the MediaStreamConstraints to be used for MediaStream creation.
    *
    * @private
-   * @param {boolean} [request_audio=false] - Request audio in the constraints
-   * @param {boolean} [request_video=false] - Request video in the constraints
+   * @param {boolean} [requestAudio=false] - Request audio in the constraints
+   * @param {boolean} [requestVideo=false] - Request video in the constraints
    * @param {boolean} [isGroup=false] - Get constraints for group
    * @returns {Promise} Resolves with MediaStreamConstraints and their type
    */
-  get_media_stream_constraints(request_audio = false, request_video = false, isGroup = false) {
+  getMediaStreamConstraints(requestAudio = false, requestVideo = false, isGroup = false) {
     return Promise.resolve().then(() => {
-      const current_device_id = this.media_repository.devices_handler.current_device_id;
+      const currentDeviceId = this.mediaRepository.devices_handler.current_device_id;
       const mode = isGroup ? z.media.VIDEO_QUALITY_MODE.GROUP : z.media.VIDEO_QUALITY_MODE.MOBILE;
 
       const streamConstraints = {
-        audio: request_audio ? this._get_audio_stream_constraints(current_device_id.audio_input()) : undefined,
-        video: request_video ? this._get_video_stream_constraints(current_device_id.video_input(), mode) : undefined,
+        audio: requestAudio ? this._getAudioStreamConstraints(currentDeviceId.audio_input()) : undefined,
+        video: requestVideo ? this._getVideoStreamConstraints(currentDeviceId.video_input(), mode) : undefined,
       };
-      const mediaType = request_video ? z.media.MediaType.VIDEO : z.media.MediaType.AUDIO;
+      const mediaType = requestVideo ? z.media.MediaType.VIDEO : z.media.MediaType.AUDIO;
 
       return {mediaType, streamConstraints};
     });
@@ -96,14 +96,14 @@ z.media.MediaConstraintsHandler = class MediaConstraintsHandler {
   /**
    * Get the video constraints to be used for MediaStream creation.
    * @private
-   * @param {string} [media_device_id=''] - ID of MediaDevice to be used
+   * @param {string} [mediaDeviceId=''] - ID of MediaDevice to be used
    * @returns {Object} Video stream constraints
    */
-  _get_audio_stream_constraints(media_device_id = '') {
-    if (media_device_id && media_device_id !== MediaConstraintsHandler.CONFIG.DEFAULT_DEVICE_ID) {
+  _getAudioStreamConstraints(mediaDeviceId = '') {
+    if (mediaDeviceId && mediaDeviceId !== MediaConstraintsHandler.CONFIG.DEFAULT_DEVICE_ID) {
       return {
         deviceId: {
-          exact: media_device_id,
+          exact: mediaDeviceId,
         },
       };
     }
@@ -114,37 +114,37 @@ z.media.MediaConstraintsHandler = class MediaConstraintsHandler {
    * Get the MediaStreamConstraints to be used for screen sharing.
    * @returns {Promise} Resolves with MediaStreamConstraints and their type
    */
-  get_screen_stream_constraints() {
+  getScreenStreamConstraints() {
     if (window.desktopCapturer) {
       this.logger.info('Enabling screen sharing from Electron');
 
-      const current_device_id = this.media_repository.devices_handler.current_device_id;
-      const preferred_resolution = MediaConstraintsHandler.CONFIG.VIDEO_CONSTRAINTS.HD;
+      const currentDeviceId = this.mediaRepository.devices_handler.current_device_id;
+      const preferredResolution = MediaConstraintsHandler.CONFIG.VIDEO_CONSTRAINTS.HD;
 
-      const media_stream_constraints = {
+      const streamConstraints = {
         audio: false,
         video: {
           mandatory: {
             chromeMediaSource: MediaConstraintsHandler.CONFIG.SCREEN_CONSTRAINTS.MEDIA_SOURCE,
-            chromeMediaSourceId: current_device_id.screen_input(),
-            maxHeight: preferred_resolution.height,
-            maxWidth: preferred_resolution.width,
-            minHeight: preferred_resolution.height,
-            minWidth: preferred_resolution.width,
+            chromeMediaSourceId: currentDeviceId.screen_input(),
+            maxHeight: preferredResolution.height,
+            maxWidth: preferredResolution.width,
+            minHeight: preferredResolution.height,
+            minWidth: preferredResolution.width,
           },
         },
       };
 
       return Promise.resolve({
         mediaType: z.media.MediaType.SCREEN,
-        streamConstraints: media_stream_constraints,
+        streamConstraints,
       });
     }
 
     if (z.util.Environment.browser.firefox) {
       this.logger.info('Enabling screen sharing from Firefox');
 
-      const media_stream_constraints = {
+      const streamConstraints = {
         audio: false,
         video: {
           mediaSource: MediaConstraintsHandler.CONFIG.SCREEN_CONSTRAINTS.SOURCE_TYPE,
@@ -153,7 +153,7 @@ z.media.MediaConstraintsHandler = class MediaConstraintsHandler {
 
       return Promise.resolve({
         mediaType: z.media.MediaType.SCREEN,
-        streamConstraints: media_stream_constraints,
+        streamConstraints,
       });
     }
 
@@ -164,43 +164,43 @@ z.media.MediaConstraintsHandler = class MediaConstraintsHandler {
    * Get the video constraints to be used for MediaStream creation.
    *
    * @private
-   * @param {string} media_device_id - Optional ID of MediaDevice to be used
+   * @param {string} mediaDeviceId - Optional ID of MediaDevice to be used
    * @param {z.media.VIDEO_QUALITY_MODE} [mode=z.media.VIDEO_QUALITY_MODE.MOBILE] - Quality of video stream requested
    * @returns {Object} Video stream constraints
    */
-  _get_video_stream_constraints(media_device_id, mode = z.media.VIDEO_QUALITY_MODE.MOBILE) {
-    let media_stream_constraints;
+  _getVideoStreamConstraints(mediaDeviceId, mode = z.media.VIDEO_QUALITY_MODE.MOBILE) {
+    let streamConstraints;
     switch (mode) {
       case z.media.VIDEO_QUALITY_MODE.FULL_HD: {
-        media_stream_constraints = MediaConstraintsHandler.CONFIG.VIDEO_CONSTRAINTS.FULL_HD;
+        streamConstraints = MediaConstraintsHandler.CONFIG.VIDEO_CONSTRAINTS.FULL_HD;
         break;
       }
 
       case z.media.VIDEO_QUALITY_MODE.GROUP: {
-        media_stream_constraints = MediaConstraintsHandler.CONFIG.VIDEO_CONSTRAINTS.GROUP;
+        streamConstraints = MediaConstraintsHandler.CONFIG.VIDEO_CONSTRAINTS.GROUP;
         break;
       }
 
       case z.media.VIDEO_QUALITY_MODE.HD: {
-        media_stream_constraints = MediaConstraintsHandler.CONFIG.VIDEO_CONSTRAINTS.HD;
+        streamConstraints = MediaConstraintsHandler.CONFIG.VIDEO_CONSTRAINTS.HD;
         break;
       }
 
       case z.media.VIDEO_QUALITY_MODE.MOBILE:
       default: {
-        media_stream_constraints = MediaConstraintsHandler.CONFIG.VIDEO_CONSTRAINTS.MOBILE;
+        streamConstraints = MediaConstraintsHandler.CONFIG.VIDEO_CONSTRAINTS.MOBILE;
         break;
       }
     }
 
-    if (_.isString(media_device_id)) {
-      media_stream_constraints.deviceId = {
-        exact: media_device_id,
+    if (_.isString(mediaDeviceId)) {
+      streamConstraints.deviceId = {
+        exact: mediaDeviceId,
       };
     } else {
-      media_stream_constraints.facingMode = MediaConstraintsHandler.CONFIG.VIDEO_CONSTRAINTS.PREFERRED_FACING_MODE;
+      streamConstraints.facingMode = MediaConstraintsHandler.CONFIG.VIDEO_CONSTRAINTS.PREFERRED_FACING_MODE;
     }
 
-    return media_stream_constraints;
+    return streamConstraints;
   }
 };

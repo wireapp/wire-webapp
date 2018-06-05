@@ -129,7 +129,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
 
     return this.devices_handler
       .update_current_devices(video_send)
-      .then(() => this.constraints_handler.get_media_stream_constraints(true, video_send, isGroup))
+      .then(() => this.constraints_handler.getMediaStreamConstraints(true, video_send, isGroup))
       .then(({streamConstraints}) => this.request_media_stream(media_type, streamConstraints))
       .then(media_stream_info => {
         this.selfStreamState.videoSend(video_send);
@@ -202,13 +202,13 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
     let constraints_promise;
     switch (input_media_type) {
       case z.media.MediaType.AUDIO:
-        constraints_promise = this.constraints_handler.get_media_stream_constraints(true, is_preference_change);
+        constraints_promise = this.constraints_handler.getMediaStreamConstraints(true, is_preference_change);
         break;
       case z.media.MediaType.SCREEN:
-        constraints_promise = this.constraints_handler.get_screen_stream_constraints();
+        constraints_promise = this.constraints_handler.getScreenStreamConstraints();
         break;
       case z.media.MediaType.VIDEO:
-        constraints_promise = this.constraints_handler.get_media_stream_constraints(is_preference_change, true);
+        constraints_promise = this.constraints_handler.getMediaStreamConstraints(is_preference_change, true);
         break;
       default:
         throw new z.media.MediaError(z.media.MediaError.TYPE.UNHANDLED_MEDIA_TYPE);
