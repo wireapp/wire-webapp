@@ -47,7 +47,7 @@ z.calling.VideoGridRepository = class VideoGridRepository {
     this.streams = ko.pureComputed(() => {
       const noVideoParticipantIds = calls()
         .reduce((participants, call) => participants.concat(call.participants()), [])
-        .filter(participant => !(participant.state.videoSend() || participant.state.screenSend()))
+        .filter(participant => !(participant.activeState.videoSend() || participant.activeState.screenSend()))
         .map(participant => participant.id);
 
       const remoteStreams = streamsInfo()
