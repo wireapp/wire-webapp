@@ -111,11 +111,16 @@ z.calling.entities.ParticipantEntity = class ParticipantEntity {
    * @returns {Promise} Resolves when the state was updated
    */
   updateState(callMessageEntity) {
-    const {clientId, properties, sdp: rtcSdp, sessionId} = callMessageEntity;
+    const {clientId, properties, sdp: rtcSdp, sessionId, type} = callMessageEntity;
 
     return this.updateProperties(properties).then(() => {
       this.sessionId = sessionId;
       this.flowEntity.setRemoteClientId(clientId);
+
+      const isGroupStart = type === z.calling.enum.CALL_MESSAGE_TYPE.GROUP_START;
+      if (isGroupStart && this.flowEntity.pcInitialized()) {
+        this.flowEntity.restartNegotiation(z.calling.enum.SDP_NEGOTIATION_MODE.STATE_COLLISION, false);
+      }
 
       return rtcSdp ? this.flowEntity.saveRemoteSdp(callMessageEntity) : false;
     });
