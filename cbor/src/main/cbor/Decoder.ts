@@ -17,8 +17,6 @@
  *
  */
 
-/* eslint no-magic-numbers: "off" */
-
 import DecodeError from './DecodeError';
 import Type from './Type';
 
@@ -187,6 +185,8 @@ class Decoder {
             return [Type.BOOL, minor];
           case 22:
             return [Type.NULL, minor];
+          case 23:
+            return [Type.UNDEFINED, minor];
           case 25:
             return [Type.FLOAT16, minor];
           case 26:
@@ -209,7 +209,8 @@ class Decoder {
       expected = [expected];
     }
 
-    if (!expected.some(error => type === error)) {
+    const hasExpectedType = expected.some(expectedType => type === expectedType);
+    if (!hasExpectedType) {
       throw new DecodeError(DecodeError.UNEXPECTED_TYPE, [type, minor]);
     }
 
@@ -299,6 +300,7 @@ class Decoder {
 
       case Type.BOOL:
       case Type.NULL:
+      case Type.UNDEFINED:
         return true;
 
       case Type.BREAK:
@@ -343,10 +345,6 @@ class Decoder {
         return false;
     }
   }
-
-  /*
-   * public API
-   */
 
   public u8(): number {
     const [type, minor] = this._type_info_with_assert([Type.UINT8]);
@@ -487,12 +485,17 @@ class Decoder {
     return decodeURIComponent(escape(utf8));
   }
 
-  public optional<T>(closure: () => T): T | null {
+  public optional<T>(closure: () => T): T | null | undefined {
     try {
       return closure();
     } catch (error) {
-      if (error instanceof DecodeError && error.extra && error.extra[0] === Type.NULL) {
-        return null;
+      if (error instanceof DecodeError && error.extra) {
+        const type = error.extra[0];
+        if (type === Type.NULL) {
+          return null;
+        } else if (type === Type.UNDEFINED) {
+          return undefined;
+        }
       }
       throw error;
     }

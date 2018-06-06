@@ -17,8 +17,6 @@
  *
  */
 
-/* eslint no-magic-numbers: "off" */
-
 import ClassUtil from '../util/ClassUtil';
 
 import KeyDerivationUtil from '../util/KeyDerivationUtil';

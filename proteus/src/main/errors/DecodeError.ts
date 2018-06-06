@@ -17,8 +17,6 @@
  *
  */
 
-/* eslint no-magic-numbers: "off" */
-
 import ProteusError from './ProteusError';
 
 class DecodeError extends ProteusError {

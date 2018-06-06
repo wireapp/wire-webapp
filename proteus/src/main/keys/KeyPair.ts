@@ -17,8 +17,6 @@
  *
  */
 
-/* eslint no-magic-numbers: "off" */
-
 import * as CBOR from '@wireapp/cbor';
 import * as ed2curve from 'ed2curve';
 import * as _sodium from 'libsodium-wrappers-sumo';

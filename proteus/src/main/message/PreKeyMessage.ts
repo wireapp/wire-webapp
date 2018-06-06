@@ -17,8 +17,6 @@
  *
  */
 
-/* eslint no-magic-numbers: "off" */
-
 import * as CBOR from '@wireapp/cbor';
 
 import IdentityKey from '../keys/IdentityKey';

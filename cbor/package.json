@@ -23,13 +23,16 @@
     "build:node": "tsc",
     "build": "yarn build:node && yarn build:browser",
     "clean": "rimraf dist",
-    "coverage:html": "istanbul cover --report html jasmine",
-    "coverage:lcov": "istanbul cover --report lcov jasmine",
+    "clean:coverage": "rimraf coverage",
+    "coverage": "yarn clean:coverage && yarn coverage:node && yarn coverage:browser",
+    "coverage:browser": "exit 0",
+    "coverage:node": "cross-env JASMINE_CONFIG_PATH=jasmine.json istanbul cover --report html --dir ./coverage/node ../../node_modules/jasmine/bin/jasmine.js",
     "dist": "yarn clean && yarn build",
-    "test": "yarn test:node && yarn test:browser",
+    "test": "yarn test:node && yarn test:browser && yarn test:coverage",
+    "test:coverage": "yarn coverage && istanbul check-coverage --branches 80 --functions 90 --lines 90 --statements 90",
     "test:project": "yarn dist && yarn test",
     "test:browser": "exit 0",
-    "test:node": "jasmine"
+    "test:node": "jasmine --config=jasmine.json"
   },
   "types": "dist/index.d.ts",
   "version": "3.0.41"
