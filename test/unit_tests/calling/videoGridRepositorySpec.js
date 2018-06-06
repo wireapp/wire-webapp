@@ -167,7 +167,7 @@ describe('z.calling.VideoGridRepository', () => {
       groupVideoGrid = new z.calling.VideoGridRepository(
         generateCallingRepository({
           calls: ko.observableArray([
-            {participants: () => [{id: 'user-1', state: {screenSend: () => false, videoSend: () => false}}]},
+            {participants: () => [{activeState: {screenSend: () => false, videoSend: () => false}, id: 'user-1'}]},
           ]),
         }),
         generateMediaRepository({
