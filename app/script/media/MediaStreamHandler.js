@@ -239,7 +239,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
       }
 
       case z.media.MediaType.VIDEO: {
-        constraintsPromise = this.constraintsHandler.getScreenStreamConstraints();
+        constraintsPromise = this.constraintsHandler.getMediaStreamConstraints(isPreferenceChange, true);
         break;
       }
 
