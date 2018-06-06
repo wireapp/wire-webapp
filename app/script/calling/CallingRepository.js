@@ -1274,6 +1274,10 @@ z.calling.CallingRepository = class CallingRepository {
         callEntity.direction = z.calling.enum.CALL_STATE.INCOMING;
         callEntity.setRemoteVersion(callMessageEntity);
 
+        if (callEntity.conversationEntity.is_muted()) {
+          silent = true;
+        }
+
         const callState = silent ? z.calling.enum.CALL_STATE.REJECTED : z.calling.enum.CALL_STATE.INCOMING;
         callEntity.state(callState);
 
