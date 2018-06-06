@@ -141,6 +141,7 @@ z.entity.Conversation = class Conversation {
     // Calling
     this.call = ko.observable(undefined);
     this.has_local_call = ko.pureComputed(() => !!this.call() && !this.call().isOngoingOnAnotherClient());
+    this.has_remote_call = ko.pureComputed(() => !!this.call() && this.call().isOngoingOnAnotherClient());
     this.has_active_call = ko.pureComputed(() => {
       return this.has_local_call() ? !z.calling.enum.CALL_STATE_GROUP.IS_ENDED.includes(this.call().state()) : false;
     });
@@ -152,7 +153,7 @@ z.entity.Conversation = class Conversation {
       const callEntity = this.call();
       if (callEntity) {
         const callIsOngoing = callEntity.state() === z.calling.enum.CALL_STATE.ONGOING;
-        return (callIsOngoing && !callEntity.selfUserJoined()) || callEntity.isDeclined();
+        return (callIsOngoing && !this.has_remote_call() && !callEntity.selfUserJoined()) || callEntity.isDeclined();
       }
       return false;
     });

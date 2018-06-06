@@ -656,11 +656,11 @@ z.calling.entities.CallEntity = class CallEntity {
   _updateRemoteState() {
     let mediaTypeChanged = false;
 
-    this.participants().forEach(({state}) => {
-      if (state.screenSend()) {
+    this.participants().forEach(({activeState}) => {
+      if (activeState.screenSend()) {
         this.remoteMediaType(z.media.MediaType.SCREEN);
         mediaTypeChanged = true;
-      } else if (state.videoSend()) {
+      } else if (activeState.videoSend()) {
         this.remoteMediaType(z.media.MediaType.VIDEO);
         mediaTypeChanged = true;
       }
