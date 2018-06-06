@@ -2,7 +2,7 @@
   <!-- ko if: videodCall() && !multitasking.isMinimized()-->
     <!-- ko if: showRemote() -->
       <div id="video-element-remote" class="video-element-remote">
-        <group-video-grid params="streamsInfo: remoteVideoStreamsInfo, selfStreamInfo: {state: selfStreamState, stream:localVideoStream}, calls: calls"></group-video-grid>
+        <group-video-grid params="videoGridRepository: videoGridRepository"></group-video-grid>
         <!-- ko if: showRemoteParticipant() -->
           <div class="video-element-remote-participant">
             <!-- ko ifnot: videodCall().isGroup -->
@@ -16,7 +16,7 @@
         <!-- /ko -->
 
         <!-- ko if: isChoosingScreen() -->
-          <choose-screen params="cancel: clickedOnCancelScreen, choose: clickedOnChooseScreen, screens: availableDevices.screen_input"></choose-screen>
+          <choose-screen params="cancel: clickedOnCancelScreen, choose: clickedOnChooseScreen, screens: availableDevices.screenInput"></choose-screen>
         <!-- /ko -->
 
         <!-- ko if: showControls() -->
@@ -48,7 +48,7 @@
                 <camera-icon></camera-icon>
                 <!-- ko if: showSwitchCamera() -->
                   <device-toggle-button data-bind="click: clickedOnToggleCamera, clickBubble: false"
-                                        params="index: currentDeviceIndex.video_input, devices: availableDevices.video_input, type: z.media.MediaDeviceType.VIDEO_INPUT">
+                                        params="index: currentDeviceIndex.videoInput, devices: availableDevices.videoInput, type: z.media.MediaDeviceType.VIDEO_INPUT">
                   </device-toggle-button>
                 <!-- /ko -->
                 <!-- ko ifnot: showSwitchCamera() -->
@@ -63,7 +63,7 @@
               <screenshare-icon></screenshare-icon>
               <!-- ko if: showSwitchScreen() -->
                 <device-toggle-button data-bind="click: clickedOnToggleScreen, clickBubble: false"
-                                      params="index: currentDeviceIndex.screen_input, devices: availableDevices.screen_input, type: z.media.MediaDeviceType.SCREEN_INPUT">
+                                      params="index: currentDeviceIndex.screenInput, devices: availableDevices.screenInput, type: z.media.MediaDeviceType.SCREEN_INPUT">
                 </device-toggle-button>
               <!-- /ko -->
               <!-- ko ifnot: showSwitchScreen() -->

@@ -29,6 +29,7 @@ import {connect} from 'react-redux';
 import {ROUTE} from '../route';
 import BackendError from '../module/action/BackendError';
 import {withRouter} from 'react-router';
+import {ClientType} from '@wireapp/api-client/dist/commonjs/client/';
 
 class ClientList extends React.Component {
   state = {
@@ -59,7 +60,7 @@ class ClientList extends React.Component {
       .then(() => this.props.doRemoveClient(clientId, password))
       .then(() => {
         const persist = this.props.getLocalStorage(LocalStorageAction.LocalStorageKey.AUTH.PERSIST);
-        return this.props.doInitializeClient(persist, password);
+        return this.props.doInitializeClient(persist ? ClientType.PERMANENT : ClientType.TEMPORARY, password);
       })
       .then(() => window.location.replace(URLUtil.getAppPath()))
       .catch(error => {

@@ -43,17 +43,12 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
    * @returns {Object} Containing all the sessions
    */
   log_sessions() {
-    const sorted_sessions = z.util.sortObjectByKeys(this.sessions, true);
+    const sortedSessions = z.util.sortObjectByKeys(this.sessions, true);
 
     this.logger.force_log('Your last session IDs:');
-    for (const session_id in sorted_sessions) {
-      if (sorted_sessions.hasOwnProperty(session_id)) {
-        const tracking_info = sorted_sessions[session_id];
-        this.logger.force_log(tracking_info.to_string());
-      }
-    }
+    Object.values(sortedSessions).forEach(trackingInfo => this.logger.force_log(trackingInfo.to_string()));
 
-    return sorted_sessions;
+    return sortedSessions;
   }
 
   //##############################################################################

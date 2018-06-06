@@ -23,6 +23,7 @@ import * as Runtime from '../../Runtime';
 import * as Environment from '../../Environment';
 import * as StringUtil from '../../util/stringUtil';
 import * as NotificationAction from './NotificationAction';
+import {ClientType} from '@wireapp/api-client/dist/commonjs/client/index';
 
 export function doGetAllClients() {
   return function(dispatch, getState, {apiClient}) {
@@ -53,11 +54,11 @@ export function doRemoveClient(clientId, password) {
   };
 }
 
-export function doInitializeClient(persist, password) {
+export function doInitializeClient(clientType, password) {
   return function(dispatch, getState, {core}) {
     dispatch(ClientActionCreator.startInitializeClient());
     return Promise.resolve()
-      .then(() => core.initClient({password, persist}, generateClientPayload(persist)))
+      .then(() => core.initClient({clientType, password}, generateClientPayload(clientType)))
       .then(creationStatus =>
         Promise.resolve()
           .then(() => dispatch(ClientActionCreator.successfulInitializeClient(creationStatus)))
@@ -77,7 +78,10 @@ export function doInitializeClient(persist, password) {
   };
 }
 
-export function generateClientPayload(persist) {
+export function generateClientPayload(clientType: ClientType) {
+  if (clientType === ClientType.NONE) {
+    return undefined;
+  }
   const deviceLabel = `${Runtime.getOsFamily()}${Runtime.getOs().version ? ` ${Runtime.getOs().version}` : ''}`;
   let deviceModel = StringUtil.capitalize(Runtime.getBrowserName());
 
@@ -92,7 +96,7 @@ export function generateClientPayload(persist) {
     if (!Environment.isEnvironment(Environment.PRODUCTION)) {
       deviceModel = `${deviceModel} (Internal)`;
     }
-  } else if (!persist) {
+  } else if (clientType === ClientType.TEMPORARY) {
     deviceModel = `${deviceModel} (Temporary)`;
   }
 

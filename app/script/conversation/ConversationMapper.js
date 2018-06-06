@@ -46,26 +46,24 @@ z.conversation.ConversationMapper = class ConversationMapper {
    * @example data: {"name":"ThisIsMyNewConversationName"}
    * @todo make utility?
    *
-   * @param {Conversation} conversation_et - Conversation to be updated
-   * @param {Object} conversation_data - Conversation data
+   * @param {Conversation} conversationEntity - Conversation to be updated
+   * @param {Object} conversationData - Conversation data
    * @returns {Conversation} Updated conversation entity
    */
-  update_properties(conversation_et, conversation_data) {
-    for (const key in conversation_data) {
-      if (key !== 'id' && conversation_et.hasOwnProperty(key)) {
-        const value = conversation_data[key];
-
+  update_properties(conversationEntity, conversationData) {
+    Object.entries(conversationData).forEach(([key, value]) => {
+      if (key !== 'id') {
         if (value !== undefined) {
-          if (ko.isObservable(conversation_et[key])) {
-            conversation_et[key](value);
+          if (ko.isObservable(conversationEntity[key])) {
+            conversationEntity[key](value);
           } else {
-            conversation_et[key] = value;
+            conversationEntity[key] = value;
           }
         }
       }
-    }
+    });
 
-    return conversation_et;
+    return conversationEntity;
   }
 
   /**

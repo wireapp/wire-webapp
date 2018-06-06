@@ -23,20 +23,20 @@ window.z = window.z || {};
 window.z.media = z.media || {};
 
 z.media.MediaStreamInfo = class MediaStreamInfo {
-  constructor(source, flow_id, stream, call_et) {
+  constructor(source, flowId, stream, callEntity) {
     this.source = source;
-    this.flow_id = flow_id;
+    this.flowId = flowId;
     this.stream = stream;
-    this.call_et = call_et;
+    this.callEntity = callEntity;
     this.type = z.media.MediaType.NONE;
 
-    this.conversation_id = call_et ? call_et.id : undefined;
-    this.update_stream_type();
+    this.conversationId = callEntity ? callEntity.id : undefined;
+    this.updateStreamType();
     return this;
   }
 
-  update_stream_type() {
-    this.stream = z.media.MediaStreamHandler.detect_media_stream_type(this.stream);
+  updateStreamType() {
+    this.stream = z.media.MediaStreamHandler.detectMediaStreamType(this.stream);
     return (this.type = this.stream.type);
   }
 };
