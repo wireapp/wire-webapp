@@ -205,7 +205,7 @@ z.util.base64ToArray = base64 => bazinga64.Decoder.fromBase64(z.util.stripDataUr
  * @param {ArrayBuffer|UInt8Array} array - raw binary data or bytes
  * @returns {string} Base64-encoded string
  */
-z.util.arrayToBase64 = array => bazinga64.Encoder.toBase64(new Uint8Array(array), true).asString;
+z.util.arrayToBase64 = array => bazinga64.Encoder.toBase64(new Uint8Array(array)).asString;
 
 /**
  * Returns base64 encoded md5 of the the given array.
