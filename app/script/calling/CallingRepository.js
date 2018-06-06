@@ -379,6 +379,7 @@ z.calling.CallingRepository = class CallingRepository {
         if (isSelfUser && !callEntity.selfClientJoined()) {
           callEntity.selfUserJoined(true);
           callEntity.wasConnected = true;
+          this.mediaStreamHandler.resetMediaStream();
           return callEntity.state(z.calling.enum.CALL_STATE.REJECTED);
         }
 
