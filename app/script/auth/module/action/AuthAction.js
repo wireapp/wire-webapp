@@ -230,7 +230,7 @@ export function doInit(options = {isImmediateLogin: false, shouldValidateLocalCl
         return apiClient.init(previousPersist ? ClientType.PERMANENT : ClientType.TEMPORARY);
       })
       .then(() => core.init())
-      .then(() => persistAuthData(previousPersist, core, dispatch))
+      .then(() => persistAuthData(previousPersist ? ClientType.PERMANENT : ClientType.TEMPORARY, core, dispatch))
       .then(() => {
         if (options.shouldValidateLocalClient) {
           return dispatch(validateLocalClient());
