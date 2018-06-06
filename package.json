@@ -126,7 +126,7 @@
     "redux-devtools-extension": "2.13.2",
     "redux-mock-store": "1.5.1",
     "request": "2.87.0",
-    "sinon": "5.0.10",
+    "sinon": "5.1.0",
     "stylelint": "9.2.1",
     "stylelint-config-idiomatic-order": "5.0.0",
     "stylelint-config-prettier": "3.2.0",
