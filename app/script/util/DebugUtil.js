@@ -79,14 +79,18 @@ z.util.DebugUtil = class DebugUtil {
 
   getSerialisedSession(sessionId) {
     return wire.app.repository.storage.storageService.load('sessions', sessionId).then(record => {
-      record.serialised = z.util.arrayToBase64(record.serialised);
+      if (typeof record.serialised !== 'string') {
+        record.serialised = z.util.arrayToBase64(record.serialised);
+      }
       return record;
     });
   }
 
   getSerialisedIdentity() {
     return wire.app.repository.storage.storageService.load('keys', 'local_identity').then(record => {
-      record.serialised = z.util.arrayToBase64(record.serialised);
+      if (typeof record.serialised !== 'string') {
+        record.serialised = z.util.arrayToBase64(record.serialised);
+      }
       return record;
     });
   }
