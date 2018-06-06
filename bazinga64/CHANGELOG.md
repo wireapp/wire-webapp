@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="5.2.0"></a>
+# [5.2.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/bazinga64/compare/bazinga64@5.1.18...bazinga64@5.2.0) (2018-06-06)
+
+
+### Features
+
+* **bazinga64:** Add encode support for Uint8Array ([#677](https://github.com/wireapp/wire-web-packages/tree/master/packages/bazinga64/issues/677)) ([aaaaf36](https://github.com/wireapp/wire-web-packages/tree/master/packages/bazinga64/commit/aaaaf36))
+
+
+
+
 <a name="5.1.18"></a>
 ## [5.1.18](https://github.com/wireapp/wire-web-packages/tree/master/packages/bazinga64/compare/bazinga64@5.1.17...bazinga64@5.1.18) (2018-06-06)
 
