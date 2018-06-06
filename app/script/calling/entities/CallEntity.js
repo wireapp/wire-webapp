@@ -502,10 +502,10 @@ z.calling.entities.CallEntity = class CallEntity {
    * @returns {undefined} No return value
    */
   _setVerifyGroupCheckTimeout() {
-    const timeoutInSeconds = CallEntity.CONFIG.GROUP_CHECK.ACTIVITY_TIMEOUT;
+    const {ACTIVITY_TIMEOUT} = CallEntity.CONFIG.GROUP_CHECK;
 
-    this.groupCheckTimeoutId = window.setTimeout(() => this._onVerifyGroupCheckTimeout(), timeoutInSeconds * 1000);
-    this.callLogger.debug(`Set verifying group check after '${timeoutInSeconds}s' (ID: ${this.groupCheckTimeoutId})`);
+    this.groupCheckTimeoutId = window.setTimeout(() => this._onVerifyGroupCheckTimeout(), ACTIVITY_TIMEOUT * 1000);
+    this.callLogger.debug(`Set verifying group check after '${ACTIVITY_TIMEOUT}s' (ID: ${this.groupCheckTimeoutId})`);
   }
 
   //##############################################################################
