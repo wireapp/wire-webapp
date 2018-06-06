@@ -213,7 +213,7 @@ export function doRegisterWireless(registrationData, options = {shouldInitialize
 
 export function doInit(options = {isImmediateLogin: false, shouldValidateLocalClient: false}) {
   return function(dispatch, getState, {apiClient, core}) {
-    let previousPersist;
+    let clientType;
     dispatch(AuthActionCreator.startRefresh());
     return Promise.resolve()
       .then(() => {
@@ -226,11 +226,11 @@ export function doInit(options = {isImmediateLogin: false, shouldValidateLocalCl
         if (persist === undefined) {
           throw new Error(`Could not find value for '${LocalStorageKey.AUTH.PERSIST}'`);
         }
-        previousPersist = persist;
-        return apiClient.init(previousPersist ? ClientType.PERMANENT : ClientType.TEMPORARY);
+        clientType = persist ? ClientType.PERMANENT : ClientType.TEMPORARY;
+        return apiClient.init(clientType);
       })
       .then(() => core.init())
-      .then(() => persistAuthData(previousPersist ? ClientType.PERMANENT : ClientType.TEMPORARY, core, dispatch))
+      .then(() => persistAuthData(clientType, core, dispatch))
       .then(() => {
         if (options.shouldValidateLocalClient) {
           return dispatch(validateLocalClient());
