@@ -26,12 +26,16 @@ window.z.calling.entities = z.calling.entities || {};
 z.calling.entities.CallEntity = class CallEntity {
   static get CONFIG() {
     return {
-      GROUP_CHECK_ACTIVITY_TIMEOUT: 2 * 60,
-      GROUP_CHECK_MAXIMUM_TIMEOUT: 90,
-      GROUP_CHECK_MINIMUM_TIMEOUT: 60,
+      GROUP_CHECK: {
+        ACTIVITY_TIMEOUT: 2 * 60,
+        MAXIMUM_TIMEOUT: 90,
+        MINIMUM_TIMEOUT: 60,
+      },
       STATE_TIMEOUT: 30 * 1000,
-      TIMER_UPDATE_INTERVAL: 1000,
-      TIMER_UPDATE_START: 100,
+      TIMER: {
+        INIT_THRESHOLD: 100,
+        UPDATE_INTERVAL: 1000,
+      },
     };
   }
 
@@ -125,12 +129,12 @@ z.calling.entities.CallEntity = class CallEntity {
 
         const attributes = {direction: this.direction};
         this.telemetry.track_event(z.tracking.EventName.CALLING.ESTABLISHED_CALL, this, attributes);
-        this.timerStart = Date.now() - CallEntity.CONFIG.TIMER_UPDATE_START;
+        this.timerStart = Date.now() - CallEntity.CONFIG.TIMER.INIT_THRESHOLD;
 
         this.callTimerInterval = window.setInterval(() => {
           const durationInSeconds = Math.floor((Date.now() - this.timerStart) / 1000);
           this.durationTime(durationInSeconds);
-        }, CallEntity.CONFIG.TIMER_UPDATE_INTERVAL);
+        }, CallEntity.CONFIG.TIMER.UPDATE_INTERVAL);
       }
     });
 
@@ -481,9 +485,8 @@ z.calling.entities.CallEntity = class CallEntity {
    * @returns {undefined} No return value
    */
   _setSendGroupCheckTimeout() {
-    const maximumTimeout = CallEntity.CONFIG.GROUP_CHECK_MAXIMUM_TIMEOUT;
-    const minimumTimeout = CallEntity.CONFIG.GROUP_CHECK_MINIMUM_TIMEOUT;
-    const timeoutInSeconds = z.util.NumberUtil.getRandomNumber(minimumTimeout, maximumTimeout);
+    const {MAXIMUM_TIMEOUT, MINIMUM_TIMEOUT} = CallEntity.CONFIG.GROUP_CHECK;
+    const timeoutInSeconds = z.util.NumberUtil.getRandomNumber(MINIMUM_TIMEOUT, MAXIMUM_TIMEOUT);
 
     const timeout = timeoutInSeconds * 1000;
     this.groupCheckTimeoutId = window.setTimeout(() => this._onSendGroupCheckTimeout(timeoutInSeconds), timeout);
@@ -498,7 +501,7 @@ z.calling.entities.CallEntity = class CallEntity {
    * @returns {undefined} No return value
    */
   _setVerifyGroupCheckTimeout() {
-    const timeoutInSeconds = CallEntity.CONFIG.GROUP_CHECK_ACTIVITY_TIMEOUT;
+    const timeoutInSeconds = CallEntity.CONFIG.GROUP_CHECK.ACTIVITY_TIMEOUT;
 
     this.groupCheckTimeoutId = window.setTimeout(() => this._onVerifyGroupCheckTimeout(), timeoutInSeconds * 1000);
     this.callLogger.debug(`Set verifying group check after '${timeoutInSeconds}s' (ID: ${this.groupCheckTimeoutId})`);
