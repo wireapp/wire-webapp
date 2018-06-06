@@ -152,7 +152,7 @@ z.entity.Conversation = class Conversation {
       const callEntity = this.call();
       if (callEntity) {
         const callIsOngoing = callEntity.state() === z.calling.enum.CALL_STATE.ONGOING;
-        return (callIsOngoing && !callEntity.selfUserJoined()) || callEntity.isDeclined();
+        return !callEntity.selfUserJoined() && (callIsOngoing || callEntity.isDeclined());
       }
       return false;
     });
