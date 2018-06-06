@@ -358,19 +358,20 @@ z.calling.entities.CallEntity = class CallEntity {
 
   /**
    * Reject the call.
+   * @param {boolean} [shareRejection=false] - Send rejection message to other clients
    * @returns {undefined} No return value
    */
-  rejectCall() {
-    const additionalPayload = z.calling.CallMessageBuilder.createPayload(this.id, this.selfUser.id);
-
+  rejectCall(shareRejection = false) {
     this.state(z.calling.enum.CALL_STATE.REJECTED);
-
     if (this.isRemoteVideoCall()) {
       this.callingRepository.mediaStreamHandler.resetMediaStream();
     }
 
-    const callMessageEntity = z.calling.CallMessageBuilder.buildReject(false, this.sessionId, additionalPayload);
-    this.sendCallMessage(callMessageEntity);
+    if (shareRejection) {
+      const additionalPayload = z.calling.CallMessageBuilder.createPayload(this.id, this.selfUser.id);
+      const callMessageEntity = z.calling.CallMessageBuilder.buildReject(false, this.sessionId, additionalPayload);
+      this.sendCallMessage(callMessageEntity);
+    }
   }
 
   /**
@@ -630,9 +631,7 @@ z.calling.entities.CallEntity = class CallEntity {
       this._stopRingTone(isIncoming);
 
       if (isIncoming) {
-        return this.isGroup
-          ? this.state(z.calling.enum.CALL_STATE.REJECTED)
-          : amplify.publish(z.event.WebApp.CALL.STATE.DELETE, this.id);
+        return this.isGroup ? this.rejectCall(false) : amplify.publish(z.event.WebApp.CALL.STATE.DELETE, this.id);
       }
 
       amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, this.id, z.calling.enum.TERMINATION_REASON.TIMEOUT);
