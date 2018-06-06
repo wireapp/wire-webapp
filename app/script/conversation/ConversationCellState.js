@@ -112,6 +112,24 @@ z.conversation.ConversationCellState = (() => {
     },
   };
 
+  const _getStateCall = {
+    description: conversationEntity => {
+      const lastMessageEntity = conversationEntity.getLastMessage();
+      return z.l10n.text(z.string.conversationsSecondaryLineIncomingCall, lastMessageEntity.sender_name());
+    },
+    icon: () => z.conversation.ConversationStatusIcon.NONE,
+    match: conversationEntity => {
+      const selfUserId = conversationEntity.self.id;
+      const lastMessageEntity = conversationEntity.getLastMessage();
+      if (lastMessageEntity) {
+        const isCallActivation = lastMessageEntity.is_call() && lastMessageEntity.is_activation();
+        const messageFromSelf = lastMessageEntity.from === selfUserId;
+
+        return isCallActivation && !messageFromSelf;
+      }
+    },
+  };
+
   const _getStateDefault = {
     description: () => '',
     icon: () => z.conversation.ConversationStatusIcon.NONE,
@@ -288,6 +306,7 @@ z.conversation.ConversationCellState = (() => {
   return {
     generate: conversationEntity => {
       const states = [
+        _getStateCall,
         _getStateRemoved,
         _getStateMuted,
         _getStateAlert,
