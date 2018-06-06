@@ -95,6 +95,8 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
     this.callIsOutgoing = ko.pureComputed(() => this.call().state() === z.calling.enum.CALL_STATE.OUTGOING);
     this.callIsOngoing = ko.pureComputed(() => this.call().state() === z.calling.enum.CALL_STATE.ONGOING);
     this.callIsIncoming = ko.pureComputed(() => this.call().state() === z.calling.enum.CALL_STATE.INCOMING);
+    this.callIsConnecting = ko.pureComputed(() => this.call().state() === z.calling.enum.CALL_STATE.CONNECTING);
+
     this.callIsAnswerable = ko.pureComputed(() => this.callIsIncoming() && !this.call().isDeclined());
     this.callIsConnected = ko.pureComputed(() => this.call().isConnected());
 
@@ -175,6 +177,9 @@ ko.components.register('conversation-list-calling-cell', {
         <!-- /ko -->
         <!-- ko if: callIsIncoming -->
           <span class="conversation-list-cell-description" data-bind="l10n_text: z.string.callStateIncoming" data-uie-name="call-label-incoming"></span>
+        <!-- /ko -->
+        <!-- ko if: callIsConnecting -->
+          <span class="conversation-list-cell-description" data-bind="l10n_text: z.string.callStateConnecting" data-uie-name="call-label-connecting"></span>
         <!-- /ko -->
         <!-- ko if: showCallTimer -->
           <span class="conversation-list-cell-description" data-bind="text: z.util.TimeUtil.formatSeconds(call().durationTime())" data-uie-name="call-duration"></span>
