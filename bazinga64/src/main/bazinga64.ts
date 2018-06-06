@@ -66,7 +66,7 @@ export class Converter {
     return arrayBufferView;
   }
 
-  public static toArrayBufferView(data: number | string | number[] | Buffer | ArrayBuffer): Uint8Array {
+  public static toArrayBufferView(data: number | string | number[] | Buffer | ArrayBuffer | Uint8Array): Uint8Array {
     switch (data.constructor.name) {
       case 'ArrayBuffer':
         return new Uint8Array(<ArrayBuffer>data);
@@ -192,7 +192,7 @@ export class EncodedData implements IData {
 }
 
 export class Encoder {
-  public static toBase64(data: string | number | number[] | ArrayBuffer | Buffer): EncodedData {
+  public static toBase64(data: string | number | number[] | ArrayBuffer | Buffer | Uint8Array): EncodedData {
     const decoded = Converter.toArrayBufferView(data);
     const asString = Encoder.fromByteArray(decoded);
     const asBytes = Converter.stringToArrayBufferViewUTF8(asString);
