@@ -384,13 +384,13 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
   }
 
   /**
-   * Add underscore to MediaDevice types.
+   * Add uppercase to MediaDevice types.
    * @private
    * @param {z.media.MediaDeviceType} deviceType - Device type string to update
    * @returns {string} Updated device type
    */
   _typeConversion(deviceType) {
-    return deviceType.replace('input', '_input').replace('output', '_output');
+    return deviceType.replace('input', 'Input').replace('output', 'Output');
   }
 
   /**
@@ -419,8 +419,8 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
    */
   _updateCurrentIndexFromDevices(deviceType, availableDevices) {
     deviceType = this._typeConversion(deviceType);
-    const deviceIndexObservable = this.currentDeviceIndex[`${deviceType}`];
-    const currentDeviceId = this.currentDeviceId[`${deviceType}`]();
+    const deviceIndexObservable = this.currentDeviceIndex[deviceType];
+    const currentDeviceId = this.currentDeviceId[deviceType]();
 
     this._updateCurrentDeviceIndex(deviceIndexObservable, availableDevices, currentDeviceId);
   }
@@ -434,8 +434,8 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
    */
   _updateCurrentIndexFromId(deviceType, selectedInputDeviceId) {
     deviceType = this._typeConversion(deviceType);
-    const deviceIndexObservable = this.currentDeviceIndex[`${deviceType}`];
-    const availableDevices = this.availableDevices[`${deviceType}`]();
+    const deviceIndexObservable = this.currentDeviceIndex[deviceType];
+    const availableDevices = this.availableDevices[deviceType]();
 
     this._updateCurrentDeviceIndex(deviceIndexObservable, availableDevices, selectedInputDeviceId);
   }
