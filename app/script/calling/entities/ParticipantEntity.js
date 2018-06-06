@@ -66,11 +66,15 @@ z.calling.entities.ParticipantEntity = class ParticipantEntity {
     };
 
     this.activeState = {
-      audioSend: ko.pureComputed(() => ParticipantEntity.CONFIG.PROPERTY_STATE.ACTIVE.includes(this.state.audioSend())),
-      screenSend: ko.pureComputed(() => {
-        return ParticipantEntity.CONFIG.PROPERTY_STATE.ACTIVE.includes(this.state.screenSend());
+      audioSend: ko.pureComputed(() => {
+        return ParticipantEntity.CONFIG.PROPERTY_STATES.ACTIVE.includes(this.state.audioSend());
       }),
-      videoSend: ko.pureComputed(() => ParticipantEntity.CONFIG.PROPERTY_STATE.ACTIVE.includes(this.state.videoSend())),
+      screenSend: ko.pureComputed(() => {
+        return ParticipantEntity.CONFIG.PROPERTY_STATES.ACTIVE.includes(this.state.screenSend());
+      }),
+      videoSend: ko.pureComputed(() => {
+        return ParticipantEntity.CONFIG.PROPERTY_STATES.ACTIVE.includes(this.state.videoSend());
+      }),
     };
 
     this.flowEntity = new z.calling.entities.FlowEntity(this.callEntity, this, timings);
