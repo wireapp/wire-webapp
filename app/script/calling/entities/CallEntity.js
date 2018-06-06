@@ -51,7 +51,7 @@ z.calling.entities.CallEntity = class CallEntity {
     this.callingRepository = callingRepository;
 
     const {id: conversationId, is_group} = conversationEntity;
-    const {mediaStreamHandler, mediaRepository, selfState, telemetry, userRepository} = this.callingRepository;
+    const {mediaStreamHandler, mediaRepository, selfStreamState, telemetry, userRepository} = this.callingRepository;
     this.messageLog = this.callingRepository.messageLog;
 
     const callLoggerName = `z.calling.entities.CallEntity (${conversationId})`;
@@ -64,7 +64,7 @@ z.calling.entities.CallEntity = class CallEntity {
     this.mediaRepository = mediaRepository;
     this.userRepository = userRepository;
     this.selfUser = this.userRepository.self();
-    this.selfState = selfState;
+    this.selfState = selfStreamState;
     this.telemetry = telemetry;
 
     // States
