@@ -75,8 +75,7 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
         const isActiveCall = z.calling.enum.CALL_STATE_GROUP.IS_ACTIVE.includes(callEntity.state());
         const selfScreenSend = callEntity.selfClientJoined() && this.selfStreamState.screenSend();
         const selfVideoSend = selfScreenSend || this.selfStreamState.videoSend();
-        const remoteVideoState = callEntity.isRemoteScreenSend() || callEntity.isRemoteVideoSend();
-        const remoteVideoSend = remoteVideoState && !callEntity.isOngoingOnAnotherClient();
+        const remoteVideoSend = callEntity.isRemoteVideoCall() && !callEntity.isOngoingOnAnotherClient();
         const isVideoCall = selfVideoSend || remoteVideoSend || this.isChoosingScreen();
 
         if (isActiveCall && isVideoCall) {
@@ -122,8 +121,7 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
     });
     this.showRemoteVideo = ko.pureComputed(() => {
       if (this.isCallOngoing()) {
-        const remoteVideoState =
-          this.joinedCall() && (this.joinedCall().isRemoteScreenSend() || this.joinedCall().isRemoteVideoSend());
+        const remoteVideoState = this.joinedCall() && this.joinedCall().isRemoteVideoCall();
         return remoteVideoState && this.remoteVideoStreamsInfo().length;
       }
     });

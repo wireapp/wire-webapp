@@ -558,7 +558,7 @@ z.calling.CallingRepository = class CallingRepository {
       Promise.all(promises)
         .then(([callEntity, grantedCall]) => {
           if (grantedCall) {
-            const mediaType = callEntity.isRemoteVideoSend() ? z.media.MediaType.AUDIO_VIDEO : z.media.MediaType.AUDIO;
+            const mediaType = callEntity.isRemoteVideoCall() ? z.media.MediaType.AUDIO_VIDEO : z.media.MediaType.AUDIO;
             this.joinCall(conversationId, mediaType);
           }
         })
@@ -1412,7 +1412,9 @@ z.calling.CallingRepository = class CallingRepository {
    * @returns {z.media.MediaType} MediaType of call
    */
   _getMediaTypeFromProperties(properties) {
-    const isTypeVideo = properties && properties.videosend === z.calling.enum.PROPERTY_STATE.TRUE;
+    const isVideoSend = properties && properties.videosend === z.calling.enum.PROPERTY_STATE.TRUE;
+    const isScreenSend = properties && properties.screensend === z.calling.enum.PROPERTY_STATE.TRUE;
+    const isTypeVideo = isVideoSend || isScreenSend;
     return isTypeVideo ? z.media.MediaType.VIDEO : z.media.MediaType.AUDIO;
   }
 
