@@ -159,7 +159,7 @@ z.calling.entities.FlowAudioEntity = class FlowAudioEntity {
    */
   _getAudioContext() {
     if (!this.audioContext || this.audioContext.state === z.media.MediaRepository.AUDIO_CONTEXT_STATE.CLOSED) {
-      this.audioContext = this.mediaRepository.get_audio_context();
+      this.audioContext = this.mediaRepository.getAudioContext();
     }
     return this.audioContext;
   }
