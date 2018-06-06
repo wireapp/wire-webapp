@@ -379,8 +379,7 @@ z.calling.CallingRepository = class CallingRepository {
         if (isSelfUser && !callEntity.selfClientJoined()) {
           callEntity.selfUserJoined(true);
           callEntity.wasConnected = true;
-          this.mediaStreamHandler.resetMediaStream();
-          return callEntity.state(z.calling.enum.CALL_STATE.REJECTED);
+          return callEntity.rejectCall(false);
         }
 
         const isOutgoingCall = callEntity.state() === z.calling.enum.CALL_STATE.OUTGOING;
@@ -456,8 +455,7 @@ z.calling.CallingRepository = class CallingRepository {
 
         if (!callEntity.selfClientJoined()) {
           this.callLogger.info(`Rejecting call in conversation '${conversationId}'`, callEntity);
-          callEntity.state(z.calling.enum.CALL_STATE.REJECTED);
-          this.mediaStreamHandler.resetMediaStream();
+          callEntity.rejectCall(false);
         }
       })
       .catch(this._throwMessageError);
@@ -1154,7 +1152,7 @@ z.calling.CallingRepository = class CallingRepository {
    */
   _rejectCall(callEntity) {
     this.callLogger.info(`Rejecting call in conversation '${callEntity.id}'`, callEntity);
-    callEntity.rejectCall();
+    callEntity.rejectCall(true);
   }
 
   /**
@@ -1273,6 +1271,10 @@ z.calling.CallingRepository = class CallingRepository {
 
         callEntity.direction = z.calling.enum.CALL_STATE.INCOMING;
         callEntity.setRemoteVersion(callMessageEntity);
+
+        if (callEntity.conversationEntity.is_muted()) {
+          silent = true;
+        }
 
         const callState = silent ? z.calling.enum.CALL_STATE.REJECTED : z.calling.enum.CALL_STATE.INCOMING;
         callEntity.state(callState);

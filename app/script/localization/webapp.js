@@ -421,6 +421,7 @@ z.string.conversationsPopoverSilence = 'Mute';
 z.string.conversationsPopoverUnarchive = 'Unarchive';
 
 // Conversations secondary line
+z.string.conversationsSecondaryLineIncomingCall = '{{user}} is calling';
 z.string.conversationsSecondaryLineMissedCall = '{{number}} missed call';
 z.string.conversationsSecondaryLineMissedCalls = '{{number}} missed calls';
 z.string.conversationsSecondaryLineNewMessage = '{{number}} new message';
