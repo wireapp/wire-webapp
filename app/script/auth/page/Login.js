@@ -39,7 +39,7 @@ import {
   ErrorMessage,
 } from '@wireapp/react-ui-kit';
 import * as Environment from '../Environment';
-import {ROUTE, QUERY_KEY} from '../route';
+import {ROUTE, QUERY_KEY, LOGOUT_REASON} from '../route';
 import EXTERNAL_ROUTE from '../externalRoute';
 import {Link as RRLink} from 'react-router-dom';
 import {connect} from 'react-redux';
@@ -80,11 +80,12 @@ class Login extends React.PureComponent {
     validationErrors: [],
   };
 
-  readAndUpdateParamsFromUrl = nextProps => {
+  readAndUpdateParamsFromUrl = prevState => {
     const logoutReason = URLUtil.getURLParameter(QUERY_KEY.LOGOUT_REASON) || null;
-    const logoutReasonChanged = logoutReason !== this.state.logoutReason;
+    const logoutReasonChanged = logoutReason !== prevState.logoutReason;
+    const isValidLogoutReason = Object.values(LOGOUT_REASON).includes(logoutReason);
 
-    if (logoutReason && logoutReasonChanged) {
+    if (logoutReason && logoutReasonChanged && isValidLogoutReason) {
       this.setState((state, props) => ({...state, logoutReason}));
     }
 
@@ -92,8 +93,8 @@ class Login extends React.PureComponent {
     const conversationKey = URLUtil.getURLParameter(QUERY_KEY.CONVERSATION_KEY) || null;
 
     const keyAndCodeExistent = conversationKey && conversationCode;
-    const keyChanged = conversationKey !== this.state.conversationKey;
-    const codeChanged = conversationCode !== this.state.conversationCode;
+    const keyChanged = conversationKey !== prevState.conversationKey;
+    const codeChanged = conversationCode !== prevState.conversationCode;
     const keyOrCodeChanged = keyChanged || codeChanged;
     if (keyAndCodeExistent && keyOrCodeChanged) {
       Promise.resolve()
@@ -122,11 +123,12 @@ class Login extends React.PureComponent {
     if (immediateLogin) {
       return this.immediateLogin();
     }
-    this.readAndUpdateParamsFromUrl(this.props);
+    this.readAndUpdateParamsFromUrl(this.state);
   };
 
-  componentWillReceiveProps = nextProps => this.readAndUpdateParamsFromUrl(nextProps);
-
+  componentDidUpdate(prevProps, prevState) {
+    this.readAndUpdateParamsFromUrl(this.state);
+  }
   componentWillUnmount = () => {
     this.props.resetError();
   };

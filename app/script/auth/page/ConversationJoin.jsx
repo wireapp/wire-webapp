@@ -73,14 +73,14 @@ class ConversationJoin extends Component {
     showCookiePolicyBanner: true,
   };
 
-  readAndUpdateParamsFromUrl = nextProps => {
+  readAndUpdateParamsFromUrl = prevState => {
     const conversationCode = getURLParameter(QUERY_KEY.CONVERSATION_CODE);
     const conversationKey = getURLParameter(QUERY_KEY.CONVERSATION_KEY);
     const expiresIn = parseInt(getURLParameter(QUERY_KEY.JOIN_EXPIRES), 10) || undefined;
 
-    const codeParamChanged = conversationCode !== this.state.conversationCode;
-    const keyParamChanged = conversationKey !== this.state.conversationKey;
-    const expiresInParamChanged = expiresIn !== this.state.expiresIn;
+    const codeParamChanged = conversationCode !== prevState.conversationCode;
+    const keyParamChanged = conversationKey !== prevState.conversationKey;
+    const expiresInParamChanged = expiresIn !== prevState.expiresIn;
     const urlParamChanged = codeParamChanged || keyParamChanged || expiresInParamChanged;
 
     if (urlParamChanged) {
@@ -109,10 +109,12 @@ class ConversationJoin extends Component {
     this.props
       .doInit({shouldValidateLocalClient: true})
       .catch(() => {})
-      .then(() => this.readAndUpdateParamsFromUrl(this.props));
+      .then(() => this.readAndUpdateParamsFromUrl(this.state));
   };
 
-  componentWillReceiveProps = nextProps => this.readAndUpdateParamsFromUrl(nextProps);
+  componentDidUpdate(prevProps, prevState) {
+    this.readAndUpdateParamsFromUrl(this.state);
+  }
 
   onOpenWireClick = () => {
     this.props

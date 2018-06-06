@@ -47,15 +47,16 @@ class AccountForm extends PureComponent {
     validationErrors: [],
   };
 
-  componentWillReceiveProps({account}) {
+  static getDerivedStateFromProps({account}, state) {
     if (account) {
       if (account.email !== this.state.email) {
-        this.setState({email: account.email});
+        return {...state, email: account.email};
       }
       if (account.name !== this.props.account.name) {
-        this.setState({name: account.name});
+        return {...state, name: account.name};
       }
     }
+    return null;
   }
 
   createURLForToU = () => {
