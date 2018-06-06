@@ -574,7 +574,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
   needsMediaStream() {
     for (const callEntity of this.calls()) {
       const isIncomingCall = callEntity.state() === z.calling.enum.CALL_STATE.INCOMING;
-      const isIncomingVideoCall = isIncomingCall && callEntity.isRemoteVideoSend();
+      const isIncomingVideoCall = isIncomingCall && callEntity.isRemoteVideoCall();
 
       if (callEntity.selfClientJoined() || isIncomingVideoCall) {
         return true;

@@ -102,6 +102,8 @@ z.calling.entities.CallEntity = class CallEntity {
     this.isRemoteScreenSend = ko.pureComputed(() => this.remoteMediaType() === z.media.MediaType.SCREEN);
     this.isRemoteVideoSend = ko.pureComputed(() => this.remoteMediaType() === z.media.MediaType.VIDEO);
 
+    this.isRemoteVideoCall = ko.pureComputed(() => this.isRemoteScreenSend() || this.isRemoteVideoSend());
+
     this.networkInterruption = ko.pureComputed(() => {
       if (this.isConnected() && !this.isGroup) {
         return this.interruptedParticipants().length > 0;
@@ -359,7 +361,7 @@ z.calling.entities.CallEntity = class CallEntity {
 
     this.state(z.calling.enum.CALL_STATE.REJECTED);
 
-    if (this.isRemoteVideoSend()) {
+    if (this.isRemoteVideoCall()) {
       this.callingRepository.mediaStreamHandler.resetMediaStream();
     }
 

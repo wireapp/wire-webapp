@@ -77,7 +77,7 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
     this.joinedCall = this.calling_repository.joinedCall;
 
     this.isVideoCall = ko.pureComputed(() => {
-      return this.call().isRemoteVideoSend() || this.selfStreamState.videoSend();
+      return this.call().isRemoteVideoCall() || this.selfStreamState.videoSend();
     });
 
     this.showVideoButton = ko.pureComputed(() => this.isVideoCall() || this.callIsConnected());

@@ -674,8 +674,7 @@ z.entity.Conversation = class Conversation {
       return false;
     }
 
-    const hasRemoteVideo = this.call() && (this.call().isRemoteVideoSend() || this.call().isRemoteScreenSend());
-    return hasRemoteVideo;
+    return this.call() && this.call().isRemoteVideoCall();
   }
 
   serialize() {
