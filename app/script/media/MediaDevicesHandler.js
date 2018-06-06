@@ -168,7 +168,7 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
     });
 
     this.currentDeviceId.screenInput.subscribe(mediaDeviceId => {
-      const isMediaTypeScreen = this.mediaRepository.streamHandler.local_media_type() === z.media.MediaType.SCREEN;
+      const isMediaTypeScreen = this.mediaRepository.streamHandler.localMediaType() === z.media.MediaType.SCREEN;
       const updateStream = mediaDeviceId && isMediaTypeScreen && this.mediaRepository.streamHandler.localMediaStream();
       if (updateStream) {
         this.mediaRepository.streamHandler.replaceInputSource(z.media.MediaType.SCREEN);
@@ -179,7 +179,7 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
     this.currentDeviceId.videoInput.subscribe(mediaDeviceId => {
       z.util.StorageUtil.setValue(z.media.MediaDeviceType.VIDEO_INPUT, mediaDeviceId);
 
-      const isMediaTypeVideo = this.mediaRepository.streamHandler.local_media_type() === z.media.MediaType.VIDEO;
+      const isMediaTypeVideo = this.mediaRepository.streamHandler.localMediaType() === z.media.MediaType.VIDEO;
       const updateStream = mediaDeviceId && isMediaTypeVideo && this.mediaRepository.streamHandler.localMediaStream();
       if (updateStream) {
         this.mediaRepository.streamHandler.replaceInputSource(z.media.MediaType.VIDEO);
