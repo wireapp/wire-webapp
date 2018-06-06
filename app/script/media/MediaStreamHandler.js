@@ -122,7 +122,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
       this._toggleStreamEnabled(z.media.MediaType.AUDIO, audioSend);
     });
     this.selfStreamState.screenSend.subscribe(screenSend => {
-      this._toggleStreamEnabled(z.media.MediaType.SCREEN, screenSend);
+      this._toggleStreamEnabled(z.media.MediaType.VIDEO, screenSend);
     });
     this.selfStreamState.videoSend.subscribe(videoSend => {
       this._toggleStreamEnabled(z.media.MediaType.VIDEO, videoSend);
