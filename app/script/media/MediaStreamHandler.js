@@ -573,9 +573,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
    */
   needsMediaStream() {
     for (const callEntity of this.calls()) {
-      const isIncomingCall = callEntity.state() === z.calling.enum.CALL_STATE.INCOMING;
-      const hasPreJoinVideoPreview = isIncomingCall && callEntity.isRemoteVideoCall();
-
+      const hasPreJoinVideoPreview = callEntity.isIncoming() && callEntity.isRemoteVideoCall();
       if (!callEntity.isOngoingOnAnotherClient() && (callEntity.selfClientJoined() || hasPreJoinVideoPreview)) {
         return true;
       }
