@@ -1214,7 +1214,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   leaveGuestRoom() {
     if (this.selfUser().isTemporaryGuest()) {
-      const conversationEntity = this.getMostRecentConversation();
+      const conversationEntity = this.getMostRecentConversation(true);
       return this.conversation_service.deleteMembers(conversationEntity.id, this.selfUser().id);
     }
   }
