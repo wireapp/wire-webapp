@@ -548,10 +548,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
    * @returns {undefined} No return value
    */
   _onIceConnectionStateChange(event) {
-    const endingCallStates = [z.calling.enum.CALL_STATE.DISCONNECTING, z.calling.enum.CALL_STATE.ENDED];
-    const isEndingCall = endingCallStates.includes(this.callEntity.state());
-
-    if (this.peerConnection || !isEndingCall) {
+    if (this.peerConnection && this.callEntity.isActiveState()) {
       this.callLogger.info('State changed - ICE connection', event);
       const connectionMessage = `ICE connection state: ${this.peerConnection.iceConnectionState}`;
       this.callLogger.log(this.callLogger.levels.LEVEL_1, connectionMessage);

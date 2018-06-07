@@ -166,7 +166,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       const conversations_unarchived = [];
 
       this.sorted_conversations().forEach(conversationEntity => {
-        if (conversationEntity.has_active_call() && !conversationEntity.hasActiveDeclinedCall()) {
+        if (conversationEntity.hasActiveCall()) {
           conversations_calls.push(conversationEntity);
         }
         if (conversationEntity.is_cleared()) {

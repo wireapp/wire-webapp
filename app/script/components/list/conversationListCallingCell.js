@@ -92,10 +92,10 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
       return !z.calling.CallingRepository.supportsScreenSharing || isScreenSend;
     });
 
-    this.callIsOutgoing = ko.pureComputed(() => this.call().state() === z.calling.enum.CALL_STATE.OUTGOING);
-    this.callIsOngoing = ko.pureComputed(() => this.call().state() === z.calling.enum.CALL_STATE.ONGOING);
-    this.callIsIncoming = ko.pureComputed(() => this.call().state() === z.calling.enum.CALL_STATE.INCOMING);
-    this.callIsConnecting = ko.pureComputed(() => this.call().state() === z.calling.enum.CALL_STATE.CONNECTING);
+    this.callIsConnecting = this.call().isConnecting;
+    this.callIsIncoming = this.call().isIncoming;
+    this.callIsOngoing = this.call().isOngoing;
+    this.callIsOutgoing = this.call().isOutgoing;
 
     this.callIsAnswerable = ko.pureComputed(() => this.callIsIncoming() && !this.call().isDeclined());
     this.callIsConnected = ko.pureComputed(() => this.call().isConnected());
@@ -143,10 +143,9 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
     this.showParticipants = ko.observable(false);
 
     this.showVideoPreview = ko.pureComputed(() => {
-      const hasOtherOngoingCalls =
-        this.calls()
-          .filter(call => call.id !== this.call().id)
-          .filter(call => call.state() === z.calling.enum.CALL_STATE.ONGOING).length > 0;
+      const hasOtherOngoingCalls = !!this.calls().filter(callEntity => {
+        return callEntity.id !== this.call().id && callEntity.isOngoing();
+      }).length;
 
       const isInMinimizedState = this.multitasking.isMinimized() || !this.callIsConnected();
       return !hasOtherOngoingCalls && this.isVideoCall() && isInMinimizedState;

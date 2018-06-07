@@ -140,22 +140,10 @@ z.entity.Conversation = class Conversation {
 
     // Calling
     this.call = ko.observable(undefined);
-    this.has_local_call = ko.pureComputed(() => !!this.call() && !this.call().isOngoingOnAnotherClient());
-    this.has_active_call = ko.pureComputed(() => {
-      return this.has_local_call() ? !z.calling.enum.CALL_STATE_GROUP.IS_ENDED.includes(this.call().state()) : false;
-    });
-    this.has_joinable_call = ko.pureComputed(() => {
-      return this.has_local_call() ? z.calling.enum.CALL_STATE_GROUP.CAN_JOIN.includes(this.call().state()) : false;
-    });
+    this.hasLocalCall = ko.pureComputed(() => !!this.call() && !this.call().isOngoingOnAnotherClient());
 
-    this.hasActiveDeclinedCall = ko.pureComputed(() => {
-      const callEntity = this.call();
-      if (callEntity) {
-        const callIsOngoing = callEntity.state() === z.calling.enum.CALL_STATE.ONGOING;
-        return !callEntity.selfUserJoined() && (callIsOngoing || callEntity.isDeclined());
-      }
-      return false;
-    });
+    this.hasActiveCall = ko.pureComputed(() => (this.hasLocalCall() ? this.call().isActiveState() : false));
+    this.hasJoinableCall = ko.pureComputed(() => (this.hasLocalCall() ? this.call().canJoinState() : false));
 
     this.unread_events = ko.pureComputed(() => {
       const unread_event = [];
