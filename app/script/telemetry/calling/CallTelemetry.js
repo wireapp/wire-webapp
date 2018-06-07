@@ -101,14 +101,14 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
 
   /**
    * Reports call events for call tracking to Localytics.
-   * @param {z.tracking.EventName} event_name - String for call event
-   * @param {z.calling.entities.CallEntity} call_et - Call entity
+   * @param {z.tracking.EventName} eventName - String for call event
+   * @param {z.calling.entities.CallEntity} callEntity - Call entity
    * @param {Object} [attributes={}] - Attributes for the event
    * @returns {undefined} No return value
    */
-  track_event(event_name, call_et, attributes = {}) {
-    if (call_et) {
-      const {conversationEntity, isGroup, maxNumberOfParticipants} = call_et;
+  track_event(eventName, callEntity, attributes = {}) {
+    if (callEntity) {
+      const {conversationEntity, isGroup, maxNumberOfParticipants, direction} = callEntity;
 
       attributes = Object.assign(
         {
@@ -117,28 +117,22 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
           conversation_type: isGroup
             ? z.tracking.attribute.ConversationType.GROUP
             : z.tracking.attribute.ConversationType.ONE_TO_ONE,
+          direction,
           remote_version: [
             z.tracking.EventName.CALLING.ESTABLISHED_CALL,
             z.tracking.EventName.CALLING.JOINED_CALL,
-          ].includes(event_name)
+          ].includes(eventName)
             ? this.remote_version
             : undefined,
+          started_with_video: callEntity.initialMediaType === z.media.MediaType.VIDEO,
           with_service: conversationEntity.isWithBot(),
         },
-        attributes
+        attributes,
+        z.tracking.helpers.getGuestAttributes(conversationEntity)
       );
-
-      const isTeamConversation = !!conversationEntity.team_id;
-      if (isTeamConversation) {
-        attributes = Object.assign(attributes, z.tracking.helpers.getGuestAttributes(conversationEntity));
-      }
-
-      if ([z.media.MediaType.AUDIO_VIDEO, z.media.MediaType.VIDEO].includes(this.media_type)) {
-        event_name = event_name.replace('_call', '_video_call');
-      }
     }
 
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, event_name, attributes);
+    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, eventName, attributes);
   }
 
   /**
@@ -181,7 +175,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
 
       const attributes = {
         conversation_participants: conversationEntity.getNumberOfParticipants(),
-        conversation_participants_in_call: maxNumberOfParticipants,
+        conversation_participants_in_call_max: maxNumberOfParticipants,
         conversation_type: isGroup
           ? z.tracking.attribute.ConversationType.GROUP
           : z.tracking.attribute.ConversationType.ONE_TO_ONE,

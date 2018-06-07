@@ -47,12 +47,15 @@ z.calling.entities.CallEntity = class CallEntity {
    * @param {z.entity.User} creatingUser - Entity of user starting the call
    * @param {string} sessionId - Session ID to identify call
    * @param {z.calling.CallingRepository} callingRepository - Calling Repository
+   * @param {z.media.MediaType} initialMediaType - The initial type of the call
    */
-  constructor(conversationEntity, creatingUser, sessionId, callingRepository) {
+  constructor(conversationEntity, creatingUser, sessionId, callingRepository, initialMediaType) {
     this.conversationEntity = conversationEntity;
     this.creatingUser = creatingUser;
     this.sessionId = sessionId;
     this.callingRepository = callingRepository;
+
+    this.initialMediaType = initialMediaType;
 
     const {id: conversationId, is_group} = conversationEntity;
     const {mediaStreamHandler, mediaRepository, selfStreamState, telemetry, userRepository} = this.callingRepository;
@@ -146,8 +149,7 @@ z.calling.entities.CallEntity = class CallEntity {
           this.scheduleGroupCheck();
         }
 
-        const attributes = {direction: this.direction};
-        this.telemetry.track_event(z.tracking.EventName.CALLING.ESTABLISHED_CALL, this, attributes);
+        this.telemetry.track_event(z.tracking.EventName.CALLING.ESTABLISHED_CALL, this);
         this.timerStart = Date.now() - CallEntity.CONFIG.TIMER.INIT_THRESHOLD;
 
         this.callTimerInterval = window.setInterval(() => {
@@ -216,8 +218,7 @@ z.calling.entities.CallEntity = class CallEntity {
 
       const isConnectingCall = state === z.calling.enum.CALL_STATE.CONNECTING;
       if (isConnectingCall) {
-        const attributes = {direction: this.direction};
-        this.telemetry.track_event(z.tracking.EventName.CALLING.JOINED_CALL, this, attributes);
+        this.telemetry.track_event(z.tracking.EventName.CALLING.JOINED_CALL, this);
       }
 
       this.previousState = state;
