@@ -124,11 +124,11 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
           ].includes(eventName)
             ? this.remote_version
             : undefined,
-          started_with_video: callEntity.initialMediaType === z.media.MediaType.VIDEO,
+          started_as_video: callEntity.initialMediaType === z.media.MediaType.VIDEO,
           with_service: conversationEntity.isWithBot(),
         },
-        attributes,
-        z.tracking.helpers.getGuestAttributes(conversationEntity)
+        z.tracking.helpers.getGuestAttributes(conversationEntity),
+        attributes
       );
     }
 
@@ -137,19 +137,11 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
 
   /**
    * Track the call duration.
-   * @param {z.calling.entities.CallEntity} call_et - Call entity
+   * @param {z.calling.entities.CallEntity} callEntity - Call entity
    * @returns {undefined} No return value
    */
-  track_duration(call_et) {
-    const {
-      conversationEntity,
-      direction,
-      durationTime,
-      isGroup,
-      terminationReason,
-      timerStart,
-      maxNumberOfParticipants,
-    } = call_et;
+  track_duration(callEntity) {
+    const {terminationReason, timerStart, durationTime} = callEntity;
 
     const duration = Math.floor((Date.now() - timerStart) / 1000);
 
@@ -174,30 +166,14 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
       }
 
       const attributes = {
-        conversation_participants: conversationEntity.getNumberOfParticipants(),
-        conversation_participants_in_call_max: maxNumberOfParticipants,
-        conversation_type: isGroup
-          ? z.tracking.attribute.ConversationType.GROUP
-          : z.tracking.attribute.ConversationType.ONE_TO_ONE,
-        direction: direction,
         duration: duration_bucket,
         duration_sec: duration,
         reason: terminationReason,
         remote_version: this.remote_version,
-        with_service: conversationEntity.isWithBot(),
       };
 
-      const isTeamConversation = !!conversationEntity.team_id;
-      if (isTeamConversation) {
-        Object.assign(attributes, z.tracking.helpers.getGuestAttributes(conversationEntity));
-      }
-
-      let event_name = z.tracking.EventName.CALLING.ENDED_CALL;
-      if (this.media_type === z.media.MediaType.AUDIO_VIDEO) {
-        event_name = event_name.replace('_call', '_video_call');
-      }
-
-      amplify.publish(z.event.WebApp.ANALYTICS.EVENT, event_name, attributes);
+      const eventName = z.tracking.EventName.CALLING.ENDED_CALL;
+      this.track_event(eventName, callEntity, attributes);
     }
   }
 };
