@@ -46,12 +46,12 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
 
     this.isActivatedAccount = this.userRepository.isActivatedAccount;
 
-    this.devicesHandler = this.mediaRepository.devices_handler;
-    this.availableDevices = this.devicesHandler.available_devices;
-    this.currentDeviceId = this.devicesHandler.current_device_id;
+    this.devicesHandler = this.mediaRepository.devicesHandler;
+    this.availableDevices = this.devicesHandler.availableDevices;
+    this.currentDeviceId = this.devicesHandler.currentDeviceId;
 
-    this.constraintsHandler = this.mediaRepository.constraints_handler;
-    this.streamHandler = this.mediaRepository.stream_handler;
+    this.constraintsHandler = this.mediaRepository.constraintsHandler;
+    this.streamHandler = this.mediaRepository.streamHandler;
     this.mediaStream = this.streamHandler.localMediaStream;
 
     this.isVisible = false;
@@ -73,12 +73,12 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
 
     this.permissionDenied = ko.observable(false);
 
-    this.supportsAudioInput = ko.pureComputed(() => !!this.availableDevices.audio_input().length);
+    this.supportsAudioInput = ko.pureComputed(() => !!this.availableDevices.audioInput().length);
     this.supportsAudioOutput = ko.pureComputed(() => {
-      return !!this.availableDevices.audio_output().length && z.util.Environment.browser.supports.audioOutputSelection;
+      return !!this.availableDevices.audioOutput().length && z.util.Environment.browser.supports.audioOutputSelection;
     });
     this.supportsVideoInput = ko.pureComputed(() => {
-      return !!this.availableDevices.video_input().length && this.isActivatedAccount();
+      return !!this.availableDevices.videoInput().length && this.isActivatedAccount();
     });
   }
 
@@ -113,7 +113,7 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
    */
   _getMediaStream() {
     const hasSupportedVideoStream = this.supportsVideoInput
-      ? this.mediaStream() && this.streamHandler.local_media_type() === z.media.MediaType.VIDEO
+      ? this.mediaStream() && this.streamHandler.localMediaType() === z.media.MediaType.VIDEO
       : this.mediaStream();
 
     if (hasSupportedVideoStream) {
@@ -121,11 +121,11 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
     }
 
     return this.constraintsHandler
-      .get_media_stream_constraints(this.supportsAudioInput(), this.supportsVideoInput())
-      .then(({mediaType, streamConstraints}) => this.streamHandler.request_media_stream(mediaType, streamConstraints))
+      .getMediaStreamConstraints(this.supportsAudioInput(), this.supportsVideoInput())
+      .then(({mediaType, streamConstraints}) => this.streamHandler.requestMediaStream(mediaType, streamConstraints))
       .then(mediaStreamInfo => {
-        if (this.availableDevices.video_input().length) {
-          this.streamHandler.local_media_type(z.media.MediaType.VIDEO);
+        if (this.availableDevices.videoInput().length) {
+          this.streamHandler.localMediaType(z.media.MediaType.VIDEO);
         }
 
         this.streamHandler.localMediaStream(mediaStreamInfo.stream);
@@ -158,7 +158,7 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
    */
   _initiateAudioMeter(mediaStream) {
     this.logger.info('Initiating new audio meter', mediaStream);
-    this.audioContext = this.mediaRepository.get_audio_context();
+    this.audioContext = this.mediaRepository.getAudioContext();
 
     const audioAnalyser = this.audioContext.createAnalyser();
     audioAnalyser.fftSize = PreferencesAVViewModel.CONFIG.AUDIO_METER.FFT_SIZE;
@@ -193,7 +193,7 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
   }
 
   _releaseMediaStream() {
-    this.streamHandler.reset_media_stream();
+    this.streamHandler.resetMediaStream();
     this.permissionDenied(false);
   }
 };

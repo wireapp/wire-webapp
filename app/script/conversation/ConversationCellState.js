@@ -51,9 +51,8 @@ z.conversation.ConversationCellState = (() => {
   };
 
   const _generateActivityString = activities => {
-    return Object.keys(activities)
-      .map(activity => {
-        const activityCount = activities[activity];
+    return Object.entries(activities)
+      .map(([activity, activityCount]) => {
         if (activityCount) {
           const activityCountIsOne = activityCount === 1;
           let stringId = undefined;
@@ -110,6 +109,24 @@ z.conversation.ConversationCellState = (() => {
     match: conversationEntity => {
       const hasUnreadEvents = conversationEntity.unread_event_count() > 0;
       return hasUnreadEvents && conversationEntity.unread_events().some(_isAlert);
+    },
+  };
+
+  const _getStateCall = {
+    description: conversationEntity => {
+      const lastMessageEntity = conversationEntity.getLastMessage();
+      return z.l10n.text(z.string.conversationsSecondaryLineIncomingCall, lastMessageEntity.sender_name());
+    },
+    icon: () => z.conversation.ConversationStatusIcon.NONE,
+    match: conversationEntity => {
+      const selfUserId = conversationEntity.self.id;
+      const lastMessageEntity = conversationEntity.getLastMessage();
+      if (lastMessageEntity) {
+        const isCallActivation = lastMessageEntity.is_call() && lastMessageEntity.is_activation();
+        const messageFromSelf = lastMessageEntity.from === selfUserId;
+
+        return isCallActivation && !messageFromSelf;
+      }
     },
   };
 
@@ -289,6 +306,7 @@ z.conversation.ConversationCellState = (() => {
   return {
     generate: conversationEntity => {
       const states = [
+        _getStateCall,
         _getStateRemoved,
         _getStateMuted,
         _getStateAlert,

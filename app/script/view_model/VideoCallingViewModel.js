@@ -50,14 +50,16 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
 
     this.selfUser = this.userRepository.self;
 
-    this.availableDevices = this.mediaRepository.devices_handler.available_devices;
-    this.currentDeviceId = this.mediaRepository.devices_handler.current_device_id;
-    this.currentDeviceIndex = this.mediaRepository.devices_handler.current_device_index;
+    this.devicesHandler = this.mediaRepository.devicesHandler;
+    this.streamHandler = this.mediaRepository.streamHandler;
 
-    this.selfStreamState = this.mediaRepository.stream_handler.selfStreamState;
+    this.availableDevices = this.devicesHandler.availableDevices;
+    this.currentDeviceId = this.devicesHandler.currentDeviceId;
+    this.currentDeviceIndex = this.devicesHandler.currentDeviceIndex;
 
-    this.localVideoStream = this.mediaRepository.stream_handler.localMediaStream;
-    this.remoteVideoStreamsInfo = this.mediaRepository.stream_handler.remoteMediaStreamInfoIndex.video;
+    this.selfStreamState = this.streamHandler.selfStreamState;
+    this.localVideoStream = this.streamHandler.localMediaStream;
+    this.remoteVideoStreamsInfo = this.streamHandler.remoteMediaStreamInfoIndex.video;
 
     this.isChoosingScreen = ko.observable(false);
 
@@ -73,8 +75,7 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
         const isActiveCall = z.calling.enum.CALL_STATE_GROUP.IS_ACTIVE.includes(callEntity.state());
         const selfScreenSend = callEntity.selfClientJoined() && this.selfStreamState.screenSend();
         const selfVideoSend = selfScreenSend || this.selfStreamState.videoSend();
-        const remoteVideoState = callEntity.isRemoteScreenSend() || callEntity.isRemoteVideoSend();
-        const remoteVideoSend = remoteVideoState && !callEntity.isOngoingOnAnotherClient();
+        const remoteVideoSend = callEntity.isRemoteVideoCall() && !callEntity.isOngoingOnAnotherClient();
         const isVideoCall = selfVideoSend || remoteVideoSend || this.isChoosingScreen();
 
         if (isActiveCall && isVideoCall) {
@@ -120,19 +121,18 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
     });
     this.showRemoteVideo = ko.pureComputed(() => {
       if (this.isCallOngoing()) {
-        const remoteVideoState =
-          this.joinedCall() && (this.joinedCall().isRemoteScreenSend() || this.joinedCall().isRemoteVideoSend());
+        const remoteVideoState = this.joinedCall() && this.joinedCall().isRemoteVideoCall();
         return remoteVideoState && this.remoteVideoStreamsInfo().length;
       }
     });
 
     this.showSwitchCamera = ko.pureComputed(() => {
-      const hasMultipleCameras = this.availableDevices.video_input().length > 1;
+      const hasMultipleCameras = this.availableDevices.videoInput().length > 1;
       const isVisible = hasMultipleCameras && this.localVideoStream() && this.selfStreamState.videoSend();
       return this.isCallOngoing() && isVisible;
     });
     this.showSwitchScreen = ko.pureComputed(() => {
-      const hasMultipleScreens = this.availableDevices.screen_input().length > 1;
+      const hasMultipleScreens = this.availableDevices.screenInput().length > 1;
       const isVisible = hasMultipleScreens && this.localVideoStream() && this.selfStreamState.screenSend();
       return this.isCallOngoing() && isVisible;
     });
@@ -215,8 +215,8 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
       }
 
       if (z.util.Environment.desktop) {
-        this.mediaRepository.devices_handler
-          .get_screen_sources()
+        this.mediaRepository.devicesHandler
+          .getScreenSources()
           .then(screenSources => {
             const conversationEntity = this.joinedCall().conversationEntity;
 
@@ -275,11 +275,11 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
   }
 
   clickedOnChooseScreen(screenSource) {
-    this.currentDeviceId.screen_input('');
+    this.currentDeviceId.screenInput('');
 
     this.logger.info(`Selected '${screenSource.name}' for screen sharing`, screenSource);
     this.isChoosingScreen(false);
-    this.currentDeviceId.screen_input(screenSource.id);
+    this.currentDeviceId.screenInput(screenSource.id);
     amplify.publish(z.event.WebApp.CALL.MEDIA.TOGGLE, this.joinedCall().id, z.media.MediaType.SCREEN);
 
     if (this.multitasking.resetMinimize()) {
@@ -296,11 +296,11 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
   }
 
   clickedOnToggleCamera() {
-    this.mediaRepository.devices_handler.toggle_next_camera();
+    this.mediaRepository.devicesHandler.toggleNextCamera();
   }
 
   clickedOnToggleScreen() {
-    this.mediaRepository.devices_handler.toggle_next_screen();
+    this.mediaRepository.devicesHandler.toggleNextScreen();
   }
 
   clickedOnMinimize() {

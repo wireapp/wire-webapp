@@ -29,7 +29,7 @@ z.media.MediaEmbeds = (function() {
    * @param {Object} options - Settings to be used to create the iframe
    * @returns {string} HTML string
    */
-  const _create_iframe_container = function(options) {
+  const _createIframeContainer = options => {
     const defaults = {
       allowfullscreen: ' allowfullscreen',
       class: 'iframe-container iframe-container-video',
@@ -41,7 +41,7 @@ z.media.MediaEmbeds = (function() {
     };
 
     options = _.extend(defaults, options);
-    const iframe_container = `<div class="{0}"><iframe class="${
+    const iframeContainer = `<div class="{0}"><iframe class="${
       options.type
     }" width="{1}" height="{2}" src="{3}" frameborder="{4}"{5}></iframe></div>`;
 
@@ -55,7 +55,7 @@ z.media.MediaEmbeds = (function() {
     }
 
     return z.util.StringUtil.format(
-      iframe_container,
+      iframeContainer,
       options.class,
       options.width,
       options.height,
@@ -83,9 +83,9 @@ z.media.MediaEmbeds = (function() {
    * @param {string} iframe - HTML of iframe
    * @returns {string} Message content
    */
-  const _append_iframe = function(link, message, iframe) {
-    const link_string = link.outerHTML.replace(/&amp;/g, '&');
-    return message.replace(/&amp;/g, '&').replace(link_string, `${link_string}${iframe}`);
+  const _appendIframe = (link, message, iframe) => {
+    const linkString = link.outerHTML.replace(/&amp;/g, '&');
+    return message.replace(/&amp;/g, '&').replace(linkString, `${linkString}${iframe}`);
   };
 
   /**
@@ -95,9 +95,7 @@ z.media.MediaEmbeds = (function() {
    * @param {string} params - String where we should find the parameters
    * @returns {string} Parameters
    */
-  const _get_parameters = params => {
-    return params.substr(params.indexOf('?'), params.length).replace(/^\?/, '');
-  };
+  const _getParameters = params => params.substr(params.indexOf('?'), params.length).replace(/^\?/, '');
 
   /**
    * Generate embed URL to use as src in iframes
@@ -106,19 +104,17 @@ z.media.MediaEmbeds = (function() {
    * @param {string} url - Given youtube url
    * @returns {string} Youtube embed URL
    */
-  const _generate_youtube_embed_url = function(url) {
+  const _generateYouTubeEmbedUrl = url => {
     if (url.match(_regex.youtube)) {
-      const video_id = url.match(/(?:embed\/|v=|v\/|be\/)([a-zA-Z0-9_-]{11})/);
-      if (!video_id) {
+      const videoId = url.match(/(?:embed\/|v=|v\/|be\/)([a-zA-Z0-9_-]{11})/);
+      if (!videoId) {
         return;
       }
 
       // Extract params from the URL
       const parser = document.createElement('a');
       parser.href = url;
-      const searchParams = new URLSearchParams(
-        [_get_parameters(parser.search), _get_parameters(parser.hash)].join('&')
-      );
+      const searchParams = new URLSearchParams([_getParameters(parser.search), _getParameters(parser.hash)].join('&'));
 
       // Append HTML5 parameter to YouTube src to force HTML5 mode
       // This fixes the issue that FF displays black box in some cases
@@ -132,7 +128,7 @@ z.media.MediaEmbeds = (function() {
 
       // Convert the timestamp into an embed friendly format (start=seconds)
       if (searchParams.has('t')) {
-        searchParams.set('start', _convert_youtube_timestamp_to_seconds(searchParams.get('t')));
+        searchParams.set('start', _convertYouTubeTimestampToSeconds(searchParams.get('t')));
         searchParams.delete('t');
       }
 
@@ -142,7 +138,7 @@ z.media.MediaEmbeds = (function() {
       searchParams.delete('widget_referrer');
       searchParams.delete('showinfo');
 
-      return `https://www.youtube-nocookie.com/embed/${video_id[1]}?${searchParams.toString()}`;
+      return `https://www.youtube-nocookie.com/embed/${videoId[1]}?${searchParams.toString()}`;
     }
   };
 
@@ -153,25 +149,25 @@ z.media.MediaEmbeds = (function() {
    * @param {string} timestamp - Youtube timestamp (1h8m55s)
    * @returns {number} Timestamp in seconds
    */
-  const _convert_youtube_timestamp_to_seconds = function(timestamp) {
+  const _convertYouTubeTimestampToSeconds = timestamp => {
     if (timestamp) {
       if (/^[0-9]*$/.test(timestamp)) {
         return window.parseInt(timestamp, 10);
       }
 
-      const _extract_unit = function(unit) {
+      const _extractUnit = unit => {
         return window.parseInt((timestamp.match(new RegExp(`([0-9]+)(?=${unit})`)) || [0])[0], 10);
       };
 
-      return _extract_unit('h') * 3600 + _extract_unit('m') * 60 + _extract_unit('s');
+      return _extractUnit('h') * 3600 + _extractUnit('m') * 60 + _extractUnit('s');
     }
     return 0;
   };
 
   // Make public for testability.
   return {
-    convert_youtube_timestamp_to_seconds: _convert_youtube_timestamp_to_seconds,
-    generate_youtube_embed_url: _generate_youtube_embed_url,
+    convertYouTubeTimestampToSeconds: _convertYouTubeTimestampToSeconds,
+    generateYouTubeEmbedUrl: _generateYouTubeEmbedUrl,
     regex: _regex,
 
     /**
@@ -182,29 +178,29 @@ z.media.MediaEmbeds = (function() {
      * @returns {string} Message with appended iFrame
      */
     soundcloud(link, message) {
-      let link_src = link.href;
+      let linkSrc = link.href;
 
-      if (link_src.match(_regex.soundcloud)) {
-        link_src = link_src.replace(/(m\.)/, '');
-        let link_path_name = link.pathname;
+      if (linkSrc.match(_regex.soundcloud)) {
+        linkSrc = linkSrc.replace(/(m\.)/, '');
+        let linkPathName = link.pathname;
 
-        if (link_path_name.endsWith('/')) {
-          link_path_name = link_path_name.substr(0, link_path_name.length - 1);
+        if (linkPathName.endsWith('/')) {
+          linkPathName = linkPathName.substr(0, linkPathName.length - 1);
         }
 
-        let is_single_track = false;
-        const slashes_in_link = link_path_name.split('/').length;
+        let isSingleTrack = false;
+        const slashesInLink = linkPathName.split('/').length;
 
-        if (slashes_in_link === 3) {
-          is_single_track = true;
-        } else if (slashes_in_link > 3 && link_path_name.indexOf('sets') === -1) {
+        if (slashesInLink === 3) {
+          isSingleTrack = true;
+        } else if (slashesInLink > 3 && linkPathName.indexOf('sets') === -1) {
           // Fix for WEBAPP-1137
           return message;
         }
 
-        const height = is_single_track ? 164 : 465;
+        const height = isSingleTrack ? 164 : 465;
 
-        const iframe = _create_iframe_container({
+        const iframe = _createIframeContainer({
           height: height,
           src:
             'https://w.soundcloud.com/player/?url={1}&visual=false&show_comments=false&buying=false&show_playcount=false&liking=false&sharing=false&hide_related=true',
@@ -212,8 +208,8 @@ z.media.MediaEmbeds = (function() {
           video: false,
         });
 
-        const embed = z.util.StringUtil.format(iframe, height, link_src);
-        message = _append_iframe(link, message, embed);
+        const embed = z.util.StringUtil.format(iframe, height, linkSrc);
+        message = _appendIframe(link, message, embed);
       }
 
       return message;
@@ -227,10 +223,10 @@ z.media.MediaEmbeds = (function() {
      * @returns {string} Message with appended iFrame
      */
     spotify(link, message) {
-      const link_src = link.href;
+      const linkSrc = link.href;
 
-      if (link_src.match(_regex.spotify)) {
-        const iframe = _create_iframe_container({
+      if (linkSrc.match(_regex.spotify)) {
+        const iframe = _createIframeContainer({
           height: '80px',
           src: 'https://embed.spotify.com/?uri=spotify$1',
           type: 'spotify',
@@ -239,13 +235,13 @@ z.media.MediaEmbeds = (function() {
 
         // convert spotify uri: album/23... -> album:23... -> album%3A23...
         let embed = '';
-        link_src.replace(_regex.spotify, (match, group1) => {
-          const replace_slashes = group1.replace(/\//g, ':');
-          const encoded_params = window.encodeURIComponent(`:${replace_slashes}`);
-          return (embed = iframe.replace('$1', encoded_params));
+        linkSrc.replace(_regex.spotify, (match, group1) => {
+          const replaceSlashes = group1.replace(/\//g, ':');
+          const encodedParams = window.encodeURIComponent(`:${replaceSlashes}`);
+          return (embed = iframe.replace('$1', encodedParams));
         });
 
-        message = _append_iframe(link, message, embed);
+        message = _appendIframe(link, message, embed);
       }
 
       return message;
@@ -256,27 +252,27 @@ z.media.MediaEmbeds = (function() {
      *
      * @param {HTMLAnchorElement} link - Link element
      * @param {string} message - Message containing the link
-     * @param {string} theme_color - User color
+     * @param {string} themeColor - User color
      * @returns {string} Message with appended iFrame
      */
-    vimeo(link, message, theme_color) {
-      const link_src = link.href;
-      const vimeo_color = theme_color ? theme_color.replace('#', '') : undefined;
+    vimeo(link, message, themeColor) {
+      const linkSrc = link.href;
+      const vimeoColor = themeColor ? themeColor.replace('#', '') : undefined;
 
-      if (link_src.match(_regex.vimeo)) {
-        if (z.util.StringUtil.includes(link_src, '/user')) {
+      if (linkSrc.match(_regex.vimeo)) {
+        if (z.util.StringUtil.includes(linkSrc, '/user')) {
           return message;
         }
 
-        const iframe = _create_iframe_container({
-          src: `https://player.vimeo.com/video/$1?portrait=0&color=${vimeo_color}&badge=0`,
+        const iframe = _createIframeContainer({
+          src: `https://player.vimeo.com/video/$1?portrait=0&color=${vimeoColor}&badge=0`,
           type: 'vimeo',
         });
 
         let embed = '';
-        link_src.replace(_regex.vimeo, (match, group1) => (embed = iframe.replace('$1', group1)));
+        linkSrc.replace(_regex.vimeo, (match, group1) => (embed = iframe.replace('$1', group1)));
 
-        message = _append_iframe(link, message, embed);
+        message = _appendIframe(link, message, embed);
       }
 
       return message;
@@ -290,15 +286,15 @@ z.media.MediaEmbeds = (function() {
      * @returns {string} Message with appended iFrame
      */
     youtube(link, message) {
-      const embed_url = _generate_youtube_embed_url(link.href);
+      const embedUrl = _generateYouTubeEmbedUrl(link.href);
 
-      if (embed_url) {
-        const iframe = _create_iframe_container({
-          src: embed_url,
+      if (embedUrl) {
+        const iframe = _createIframeContainer({
+          src: embedUrl,
           type: 'youtube',
         });
 
-        message = _append_iframe(link, message, iframe);
+        message = _appendIframe(link, message, iframe);
         return message;
       }
 

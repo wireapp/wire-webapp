@@ -85,4 +85,20 @@ describe('z.conversation.EventBuilder', () => {
       })
       .catch(done.fail);
   });
+
+  it('buildGroupCreation', done => {
+    conversation_et.participating_user_ids(['one', 'two', 'three']);
+    conversation.creator = 'one';
+    const event = z.conversation.EventBuilder.buildGroupCreation(conversation_et);
+    event_mapper
+      .mapJsonEvent(event, conversation_et)
+      .then(messageEntity => {
+        expect(messageEntity).toBeDefined();
+        expect(messageEntity.type).toBe(z.event.Client.CONVERSATION.GROUP_CREATION);
+        expect(messageEntity.conversation_id).toBe(conversation_et.id);
+        expect(conversation_et.participating_user_ids().length).toBe(3);
+        done();
+      })
+      .catch(done.fail);
+  });
 });

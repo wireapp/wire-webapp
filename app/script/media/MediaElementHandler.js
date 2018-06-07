@@ -25,79 +25,77 @@ window.z.media = z.media || {};
 z.media.MediaElementHandler = class MediaElementHandler {
   /**
    * Construct an new MediaElement handler.
-   * @param {z.media.MediaRepository} media_repository - Repository for media interactions
+   * @param {z.media.MediaRepository} mediaRepository - Repository for media interactions
    */
-  constructor(media_repository) {
-    this.media_repository = media_repository;
+  constructor(mediaRepository) {
+    this.mediaRepository = mediaRepository;
     this.logger = new z.util.Logger('z.media.MediaElementHandler', z.config.LOGGER.OPTIONS);
 
-    this.current_device_id = this.media_repository.devices_handler.current_device_id;
-    this.remote_media_elements = ko.observableArray([]);
+    this.currentDeviceId = this.mediaRepository.devicesHandler.currentDeviceId;
+    this.remoteMediaElements = ko.observableArray([]);
   }
 
   /**
    * Add MediaElement for new stream.
-   * @param {z.media.MediaStreamInfo} media_stream_info - MediaStream information
+   * @param {z.media.MediaStreamInfo} mediaStreamInfo - MediaStream information
    * @returns {undefined} No return value
    */
-  add_media_element(media_stream_info) {
-    if (media_stream_info.type !== z.media.MediaType.VIDEO) {
-      const remote_media_element = this._create_media_element(media_stream_info);
-      this.remote_media_elements.push(remote_media_element);
+  addMediaElement(mediaStreamInfo) {
+    if (mediaStreamInfo.type !== z.media.MediaType.VIDEO) {
+      const remoteMediaElement = this._createMediaElement(mediaStreamInfo);
+      this.remoteMediaElements.push(remoteMediaElement);
 
-      const elementType = remote_media_element.nodeName.toLowerCase();
-      const message = `Created MediaElement of type '${elementType}' for flow '${media_stream_info.flow_id}'`;
-      this.logger.info(message, remote_media_element);
+      const elementType = remoteMediaElement.nodeName.toLowerCase();
+      const message = `Created MediaElement of type '${elementType}' for flow '${mediaStreamInfo.flowId}'`;
+      this.logger.info(message, remoteMediaElement);
     }
   }
 
   /**
    * Destroy the remote media element of a flow.
    * @private
-   * @param {string} flow_id - Flow ID for which to destroy the remote media element
+   * @param {string} flowId - Flow ID for which to destroy the remote media element
    * @returns {undefined} No return value
    */
-  remove_media_element(flow_id) {
-    this._get_media_elements(flow_id).forEach(media_element => {
-      this._destroy_media_element(media_element);
-      this.remote_media_elements.remove(media_element);
-      const elementType = media_element.tagName.toLocaleLowerCase();
-      this.logger.info(`Deleted MediaElement of type '${elementType}' for flow '${flow_id}'`);
+  removeMediaElement(flowId) {
+    this._getMediaElements(flowId).forEach(mediaElement => {
+      this._destroyMediaElement(mediaElement);
+      this.remoteMediaElements.remove(mediaElement);
+      const elementType = mediaElement.tagName.toLocaleLowerCase();
+      this.logger.info(`Deleted MediaElement of type '${elementType}' for flow '${flowId}'`);
     });
   }
 
   /**
    * Switch the output device used for all MediaElements.
-   * @param {string} media_device_id - Media Device ID to be used for playback
+   * @param {string} mediaDeviceId - Media Device ID to be used for playback
    * @returns {undefined} No return value
    */
-  switch_media_element_output(media_device_id) {
-    this.remote_media_elements().forEach(media_element =>
-      this._set_media_element_output(media_element, media_device_id)
-    );
+  switchMediaElementOutput(mediaDeviceId) {
+    this.remoteMediaElements().forEach(mediaElement => this._setMediaElementOutput(mediaElement, mediaDeviceId));
   }
 
   /**
    * Create a new media element.
    *
    * @private
-   * @param {z.media.MediaStreamInfo} media_stream_info - MediaStream information
+   * @param {z.media.MediaStreamInfo} mediaStreamInfo - MediaStream information
    * @returns {Element} HTMLAudioElement that has the stream attached to it
    */
-  _create_media_element(media_stream_info) {
+  _createMediaElement(mediaStreamInfo) {
     try {
-      const media_element = document.createElement('audio');
-      media_element.srcObject = media_stream_info.stream;
-      media_element.dataset.conversation_id = media_stream_info.conversation_id;
-      media_element.dataset.flow_id = media_stream_info.flow_id;
-      media_element.muted = false;
-      media_element.setAttribute('autoplay', true);
+      const mediaElement = document.createElement('audio');
+      mediaElement.srcObject = mediaStreamInfo.stream;
+      mediaElement.dataset.conversationId = mediaStreamInfo.conversationId;
+      mediaElement.dataset.flowId = mediaStreamInfo.flowId;
+      mediaElement.muted = false;
+      mediaElement.setAttribute('autoplay', true);
       if (z.util.Environment.browser.supports.audioOutputSelection) {
-        this._set_media_element_output(media_element, this.current_device_id.audio_output());
+        this._setMediaElementOutput(mediaElement, this.currentDeviceId.audioOutput());
       }
-      return media_element;
+      return mediaElement;
     } catch (error) {
-      this.logger.error(`Unable to create AudioElement for flow '${media_stream_info.flow_id}'`, error);
+      this.logger.error(`Unable to create AudioElement for flow '${mediaStreamInfo.flowId}'`, error);
     }
   }
 
@@ -105,13 +103,13 @@ z.media.MediaElementHandler = class MediaElementHandler {
    * Stop the media element.
    *
    * @private
-   * @param {HTMLMediaElement} media_element - A HTMLMediaElement that has the media stream attached to it
+   * @param {HTMLMediaElement} mediaElement - A HTMLMediaElement that has the media stream attached to it
    * @returns {undefined} No return value
    */
-  _destroy_media_element(media_element) {
-    if (media_element) {
-      media_element.pause();
-      media_element.srcObject = undefined;
+  _destroyMediaElement(mediaElement) {
+    if (mediaElement) {
+      mediaElement.pause();
+      mediaElement.srcObject = undefined;
     }
   }
 
@@ -119,32 +117,30 @@ z.media.MediaElementHandler = class MediaElementHandler {
    * Get all the MediaElements related to a given flow ID.
    *
    * @private
-   * @param {string} flow_id - ID of flow to search MediaElements for
+   * @param {string} flowId - ID of flow to search MediaElements for
    * @returns {Array<HTMLMediaElement>} Related MediaElements
    */
-  _get_media_elements(flow_id) {
-    return this.remote_media_elements().filter(media_element => media_element.dataset.flow_id === flow_id);
+  _getMediaElements(flowId) {
+    return this.remoteMediaElements().filter(mediaElement => mediaElement.dataset.flowId === flowId);
   }
 
   /**
    * Change the output device used for audio playback of a media element.
    *
    * @private
-   * @param {Element} media_element - HTMLMediaElement to change playback device for
-   * @param {string} sink_id - ID of MediaDevice to be used
+   * @param {Element} mediaElement - HTMLMediaElement to change playback device for
+   * @param {string} sinkId - ID of MediaDevice to be used
    * @returns {undefined} No return value
    */
-  _set_media_element_output(media_element, sink_id) {
-    if (media_element.setSinkId) {
-      const flowId = media_element.dataset.flow_id;
+  _setMediaElementOutput(mediaElement, sinkId) {
+    if (mediaElement.setSinkId) {
+      const flowId = mediaElement.dataset.flowId;
 
-      media_element
-        .setSinkId(sink_id)
-        .then(() => {
-          this.logger.info(`Audio output device '${sink_id}' attached to flow '${flowId}`, media_element);
-        })
+      mediaElement
+        .setSinkId(sinkId)
+        .then(() => this.logger.info(`Audio output device '${sinkId}' attached to flow '${flowId}`, mediaElement))
         .catch(error => {
-          const message = `Failed to attach audio output device '${sink_id}' to flow '${flowId}': ${error.message}`;
+          const message = `Failed to attach audio output device '${sinkId}' to flow '${flowId}': ${error.message}`;
           this.logger.warn(message, error);
         });
     }

@@ -85,12 +85,11 @@ z.calling.CallingRepository = class CallingRepository {
     this.telemetry = new z.telemetry.calling.CallTelemetry();
 
     // Media Handler
-    this.mediaDevicesHandler = this.mediaRepository.devices_handler;
-    this.mediaStreamHandler = this.mediaRepository.stream_handler;
-    this.mediaElementHandler = this.mediaRepository.element_handler;
-    this.selfStreamState = this.mediaRepository.stream_handler.selfStreamState;
+    this.mediaDevicesHandler = this.mediaRepository.devicesHandler;
+    this.mediaStreamHandler = this.mediaRepository.streamHandler;
+    this.mediaElementHandler = this.mediaRepository.elementHandler;
 
-    this.selfState = this.mediaStreamHandler.selfStreamState;
+    this.selfStreamState = this.mediaStreamHandler.selfStreamState;
 
     this.calls = ko.observableArray([]);
     this.joinedCall = ko.pureComputed(() => {
@@ -113,8 +112,8 @@ z.calling.CallingRepository = class CallingRepository {
    * @returns {undefined} No return value
    */
   shareCallStates() {
-    this.mediaRepository.stream_handler.calls = this.calls;
-    this.mediaRepository.stream_handler.joined_call = this.joinedCall;
+    this.mediaRepository.streamHandler.calls = this.calls;
+    this.mediaRepository.streamHandler.joinedCall = this.joinedCall;
   }
 
   /**
@@ -380,7 +379,7 @@ z.calling.CallingRepository = class CallingRepository {
         if (isSelfUser && !callEntity.selfClientJoined()) {
           callEntity.selfUserJoined(true);
           callEntity.wasConnected = true;
-          return callEntity.state(z.calling.enum.CALL_STATE.REJECTED);
+          return callEntity.rejectCall(false);
         }
 
         const isOutgoingCall = callEntity.state() === z.calling.enum.CALL_STATE.OUTGOING;
@@ -456,8 +455,7 @@ z.calling.CallingRepository = class CallingRepository {
 
         if (!callEntity.selfClientJoined()) {
           this.callLogger.info(`Rejecting call in conversation '${conversationId}'`, callEntity);
-          callEntity.state(z.calling.enum.CALL_STATE.REJECTED);
-          this.mediaStreamHandler.reset_media_stream();
+          callEntity.rejectCall(false);
         }
       })
       .catch(this._throwMessageError);
@@ -559,7 +557,7 @@ z.calling.CallingRepository = class CallingRepository {
       Promise.all(promises)
         .then(([callEntity, grantedCall]) => {
           if (grantedCall) {
-            const mediaType = callEntity.isRemoteVideoSend() ? z.media.MediaType.AUDIO_VIDEO : z.media.MediaType.AUDIO;
+            const mediaType = callEntity.isRemoteVideoCall() ? z.media.MediaType.AUDIO_VIDEO : z.media.MediaType.AUDIO;
             this.joinCall(conversationId, mediaType);
           }
         })
@@ -1019,7 +1017,7 @@ z.calling.CallingRepository = class CallingRepository {
 
     callEntity.deleteCall();
     this.calls.remove(call => call.id === conversationId);
-    this.mediaStreamHandler.reset_media_stream();
+    this.mediaStreamHandler.resetMediaStream();
   }
 
   /**
@@ -1080,8 +1078,8 @@ z.calling.CallingRepository = class CallingRepository {
   _initiateOutgoingCall(conversationId, mediaType, callState) {
     const videoSend = mediaType === z.media.MediaType.AUDIO_VIDEO;
     const payload = {conversationId};
-    const propSyncPayload = z.calling.CallMessageBuilder.createPropSync(this.selfState, videoSend, false, payload);
-    const callMessageEntity = z.calling.CallMessageBuilder.buildPropSync(false, undefined, propSyncPayload);
+    const messagePayload = z.calling.CallMessageBuilder.createPropSync(this.selfStreamState, videoSend, false, payload);
+    const callMessageEntity = z.calling.CallMessageBuilder.buildPropSync(false, undefined, messagePayload);
     return this._createOutgoingCall(callMessageEntity);
   }
 
@@ -1101,7 +1099,7 @@ z.calling.CallingRepository = class CallingRepository {
     return this.mediaStreamHandler.localMediaStream()
       ? Promise.resolve(callEntity)
       : this.mediaStreamHandler
-          .initiate_media_stream(conversationId, mediaType, callEntity.isGroup)
+          .initiateMediaStream(conversationId, mediaType, callEntity.isGroup)
           .then(() => callEntity);
   }
 
@@ -1141,7 +1139,7 @@ z.calling.CallingRepository = class CallingRepository {
       terminationReason = undefined;
     }
 
-    this.mediaStreamHandler.release_media_stream();
+    this.mediaStreamHandler.releaseMediaStream();
     callEntity.leaveCall(terminationReason);
   }
 
@@ -1154,7 +1152,7 @@ z.calling.CallingRepository = class CallingRepository {
    */
   _rejectCall(callEntity) {
     this.callLogger.info(`Rejecting call in conversation '${callEntity.id}'`, callEntity);
-    callEntity.rejectCall();
+    callEntity.rejectCall(true);
   }
 
   /**
@@ -1201,15 +1199,15 @@ z.calling.CallingRepository = class CallingRepository {
   _toggleMediaState(mediaType) {
     switch (mediaType) {
       case z.media.MediaType.AUDIO: {
-        return this.mediaStreamHandler.toggle_audio_send();
+        return this.mediaStreamHandler.toggleAudioSend();
       }
 
       case z.media.MediaType.SCREEN: {
-        return this.mediaStreamHandler.toggle_screen_send();
+        return this.mediaStreamHandler.toggleScreenSend();
       }
 
       case z.media.MediaType.VIDEO: {
-        return this.mediaStreamHandler.toggle_video_send();
+        return this.mediaStreamHandler.toggleVideoSend();
       }
 
       default: {
@@ -1274,6 +1272,10 @@ z.calling.CallingRepository = class CallingRepository {
         callEntity.direction = z.calling.enum.CALL_STATE.INCOMING;
         callEntity.setRemoteVersion(callMessageEntity);
 
+        if (callEntity.conversationEntity.is_muted()) {
+          silent = true;
+        }
+
         const callState = silent ? z.calling.enum.CALL_STATE.REJECTED : z.calling.enum.CALL_STATE.INCOMING;
         callEntity.state(callState);
 
@@ -1285,7 +1287,7 @@ z.calling.CallingRepository = class CallingRepository {
           const eventFromWebSocket = source === z.event.EventRepository.SOURCE.WEB_SOCKET;
           if (eventFromWebSocket && callEntity.isRemoteVideoSend()) {
             const mediaStreamType = z.media.MediaType.AUDIO_VIDEO;
-            this.mediaStreamHandler.initiate_media_stream(callEntity.id, mediaStreamType, callEntity.isGroup);
+            this.mediaStreamHandler.initiateMediaStream(callEntity.id, mediaStreamType, callEntity.isGroup);
           }
 
           return callEntity;
@@ -1413,7 +1415,9 @@ z.calling.CallingRepository = class CallingRepository {
    * @returns {z.media.MediaType} MediaType of call
    */
   _getMediaTypeFromProperties(properties) {
-    const isTypeVideo = properties && properties.videosend === z.calling.enum.PROPERTY_STATE.TRUE;
+    const isVideoSend = properties && properties.videosend === z.calling.enum.PROPERTY_STATE.TRUE;
+    const isScreenSend = properties && properties.screensend === z.calling.enum.PROPERTY_STATE.TRUE;
+    const isTypeVideo = isVideoSend || isScreenSend;
     return isTypeVideo ? z.media.MediaType.VIDEO : z.media.MediaType.AUDIO;
   }
 

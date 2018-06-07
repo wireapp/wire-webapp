@@ -17,15 +17,15 @@
             </div>
             <div class="input-select">
               <select class="preferences-av-select" name="select"
-                      data-bind="attr: {'disabled': availableDevices.audio_input().length < 2 || permissionDenied},
+                      data-bind="attr: {'disabled': availableDevices.audioInput().length < 2 || permissionDenied},
                                  css: {'preferences-av-select-disabled': permissionDenied},
-                                 options: availableDevices.audio_input,
+                                 options: availableDevices.audioInput,
                                  optionsText: function(item) {return item.label || z.string.preferencesAVMicrophone},
                                  optionsValue: 'deviceId',
-                                 value: currentDeviceId.audio_input"
+                                 value: currentDeviceId.audioInput"
                       data-uie-name="enter-microphone">
               </select>
-              <label class="icon-down preferences-av-label" data-bind="visible: availableDevices.audio_input().length >= 2"></label>
+              <label class="icon-down preferences-av-label" data-bind="visible: availableDevices.audioInput().length >= 2"></label>
             </div>
           </div>
           <input-level class="preferences-av-meter text-theme" params="level: audioLevel, disabled: permissionDenied"></input-level>
@@ -41,14 +41,14 @@
             </div>
             <div class="input-select">
               <select class="preferences-av-select" name="select"
-                      data-bind="enabled: availableDevices.audio_output().length >= 2,
-                                 options: availableDevices.audio_output,
+                      data-bind="enabled: availableDevices.audioOutput().length >= 2,
+                                 options: availableDevices.audioOutput,
                                  optionsText: function(item) {return item.label || z.string.preferencesAVSpeakers},
                                  optionsValue: 'deviceId',
-                                 value: currentDeviceId.audio_output"
+                                 value: currentDeviceId.audioOutput"
                       data-uie-name="enter-speaker">
               </select>
-              <label class="icon-down preferences-av-label" data-bind="visible: availableDevices.audio_output().length >= 2"></label>
+              <label class="icon-down preferences-av-label" data-bind="visible: availableDevices.audioOutput().length >= 2"></label>
             </div>
           </div>
         </section>
@@ -68,15 +68,15 @@
             </div>
             <div class="input-select">
               <select class="preferences-av-select" name="select"
-                      data-bind="attr: {'disabled': availableDevices.audio_input().length < 2 || permissionDenied},
+                      data-bind="attr: {'disabled': availableDevices.audioInput().length < 2 || permissionDenied},
                                  css: {'preferences-av-select-disabled': permissionDenied},
-                                 options: availableDevices.video_input,
+                                 options: availableDevices.videoInput,
                                  optionsText: function(item) {return item.label || z.string.preferencesAVCamera},
                                  optionsValue: 'deviceId',
-                                 value: currentDeviceId.video_input"
+                                 value: currentDeviceId.videoInput"
                       data-uie-name="enter-camera">
               </select>
-              <label class="icon-down preferences-av-label" data-bind="visible: availableDevices.video_input().length >= 2"></label>
+              <label class="icon-down preferences-av-label" data-bind="visible: availableDevices.videoInput().length >= 2"></label>
             </div>
           </div>
           <video class="preferences-av-video"

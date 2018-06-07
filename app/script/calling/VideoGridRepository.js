@@ -22,91 +22,83 @@
 window.z = window.z || {};
 window.z.calling = z.calling || {};
 
-z.calling.VideoGridRepository = (() => {
-  return class VideoGridRepository {
-    /**
-     * Construct an new VideoGridRepository.
-     * @param {CallingRepository} callingRepository - Repository for the calls
-     * @param {MediaRepository} mediaRepository - Repository for the media streams
-     */
-    constructor(callingRepository, mediaRepository) {
-      const streamHandler = mediaRepository.stream_handler;
-      const streamsInfo = streamHandler.remoteMediaStreamInfoIndex.video;
-      const localMediaStream = streamHandler.localMediaStream;
-      const selfStreamState = callingRepository.selfStreamState;
-      const calls = callingRepository.calls;
-      this.grid = ko.observableArray([0, 0, 0, 0]);
-      this.selfId = ko.observable();
-      this.thumbnailStream = ko.observable();
-      this.mirrorSelf = ko.pureComputed(() => !selfStreamState.screenSend());
+z.calling.VideoGridRepository = class VideoGridRepository {
+  /**
+   * Construct an new VideoGridRepository.
+   * @param {CallingRepository} callingRepository - Repository for the calls
+   * @param {MediaRepository} mediaRepository - Repository for the media streams
+   */
+  constructor(callingRepository, mediaRepository) {
+    const streamHandler = mediaRepository.streamHandler;
+    const streamsInfo = streamHandler.remoteMediaStreamInfoIndex.video;
+    const localMediaStream = streamHandler.localMediaStream;
+    const selfStreamState = callingRepository.selfStreamState;
+    const calls = callingRepository.calls;
+    this.grid = ko.observableArray([0, 0, 0, 0]);
+    this.selfId = ko.observable();
+    this.thumbnailStream = ko.observable();
+    this.mirrorSelf = ko.pureComputed(() => !selfStreamState.screenSend());
 
-      const selfStream = ko.pureComputed(() => {
-        return selfStreamState.videoSend() || selfStreamState.screenSend() ? localMediaStream() : undefined;
-      });
-      this.selfStreamMuted = ko.pureComputed(() => !selfStreamState.audioSend());
+    const selfStream = ko.pureComputed(() => {
+      return selfStreamState.videoSend() || selfStreamState.screenSend() ? localMediaStream() : undefined;
+    });
+    this.selfStreamMuted = ko.pureComputed(() => !selfStreamState.audioSend());
 
-      this.streams = ko.pureComputed(() => {
-        const remoteStreams = filterUnsentStreams(streamsInfo(), calls());
-        this.selfId(selfStream() ? selfStream().id : undefined);
-
-        if (remoteStreams.length === 1) {
-          this.thumbnailStream(selfStream());
-          return remoteStreams;
-        }
-        this.thumbnailStream(undefined);
-        return selfStream() ? remoteStreams.concat(selfStream()) : remoteStreams;
-      });
-
-      this.streams.subscribe(this.updateGrid.bind(this));
-      this.updateGrid(this.streams());
-    }
-
-    /**
-     * Will compute the next grid layout according to the previous state and the new array of streams
-     * The grid will fill according to this pattern
-     * - 1 stream : [id, 0, 0, 0]
-     * - 2 streams: [id, 0, id, 0]
-     * - 3 streams: [id, 0, id, id]
-     * - 3 streams: [id, id, 0, id]
-     * - 4 streams: [id, id, id, id]
-     * @param {Array<string|0>} previousGrid - the previous state of the grid
-     * @param {Array<MediaStream>} streams - the new array of streams to dispatch in the grid
-     *
-     * @returns {Array<string|0>} the new grid
-     */
-    computeGrid(previousGrid, streams) {
-      const previousStreamIds = previousGrid.filter(streamId => streamId !== 0);
-      const currentStreamIds = streams.map(participant => participant.id);
-
-      const addedStreamIds = z.util.ArrayUtil.getDifference(previousStreamIds, currentStreamIds);
-
-      const filteredGrid = previousGrid.map(id => (currentStreamIds.includes(id) ? id : 0));
-
-      const streamIds = filteredGrid.filter(streamId => streamId !== 0);
-      // Add the new streams at the end
-      const newStreamsIds = streamIds.concat(addedStreamIds);
-      return newStreamsIds.length === 2
-        ? [newStreamsIds[0], 0, newStreamsIds[1], 0]
-        : [newStreamsIds[0] || 0, newStreamsIds[3] || 0, newStreamsIds[1] || 0, newStreamsIds[2] || 0];
-    }
-
-    updateGrid(streams) {
-      const newGrid = this.computeGrid(this.grid(), streams);
-      this.grid(newGrid);
-    }
-  };
-
-  function filterUnsentStreams(streamsInfo, calls) {
-    const hasActiveVideo = mediaStreamInfo => {
-      const noVideoParticipantIds = calls
+    this.streams = ko.pureComputed(() => {
+      const noVideoParticipantIds = calls()
         .reduce((participants, call) => participants.concat(call.participants()), [])
-        .filter(participant => !participant.state.videoSend())
+        .filter(participant => !(participant.activeState.videoSend() || participant.activeState.screenSend()))
         .map(participant => participant.id);
 
-      // filter participant that have their video stream disabled
-      return !noVideoParticipantIds.includes(mediaStreamInfo.flow_id);
-    };
+      const remoteStreams = streamsInfo()
+        .filter(mediaStreamInfo => !noVideoParticipantIds.includes(mediaStreamInfo.flowId))
+        .map(mediaStreamInfo => mediaStreamInfo.stream);
 
-    return streamsInfo.filter(hasActiveVideo).map(mediaStreamInfo => mediaStreamInfo.stream);
+      this.selfId(selfStream() ? selfStream().id : undefined);
+
+      if (remoteStreams.length === 1) {
+        this.thumbnailStream(selfStream());
+        return remoteStreams;
+      }
+      this.thumbnailStream(undefined);
+      return selfStream() ? remoteStreams.concat(selfStream()) : remoteStreams;
+    });
+
+    this.streams.subscribe(this.updateGrid.bind(this));
+    this.updateGrid(this.streams());
   }
-})();
+
+  /**
+   * Will compute the next grid layout according to the previous state and the new array of streams
+   * The grid will fill according to this pattern
+   * - 1 stream : [id, 0, 0, 0]
+   * - 2 streams: [id, 0, id, 0]
+   * - 3 streams: [id, 0, id, id]
+   * - 3 streams: [id, id, 0, id]
+   * - 4 streams: [id, id, id, id]
+   * @param {Array<string|0>} previousGrid - the previous state of the grid
+   * @param {Array<MediaStream>} streams - the new array of streams to dispatch in the grid
+   *
+   * @returns {Array<string|0>} the new grid
+   */
+  computeGrid(previousGrid, streams) {
+    const previousStreamIds = previousGrid.filter(streamId => streamId !== 0);
+    const currentStreamIds = streams.map(participant => participant.id);
+
+    const addedStreamIds = z.util.ArrayUtil.getDifference(previousStreamIds, currentStreamIds);
+
+    const filteredGrid = previousGrid.map(id => (currentStreamIds.includes(id) ? id : 0));
+
+    const streamIds = filteredGrid.filter(streamId => streamId !== 0);
+    // Add the new streams at the end
+    const newStreamsIds = streamIds.concat(addedStreamIds);
+    return newStreamsIds.length === 2
+      ? [newStreamsIds[0], 0, newStreamsIds[1], 0]
+      : [newStreamsIds[0] || 0, newStreamsIds[3] || 0, newStreamsIds[1] || 0, newStreamsIds[2] || 0];
+  }
+
+  updateGrid(streams) {
+    const newGrid = this.computeGrid(this.grid(), streams);
+    this.grid(newGrid);
+  }
+};

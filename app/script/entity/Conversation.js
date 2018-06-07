@@ -152,7 +152,7 @@ z.entity.Conversation = class Conversation {
       const callEntity = this.call();
       if (callEntity) {
         const callIsOngoing = callEntity.state() === z.calling.enum.CALL_STATE.ONGOING;
-        return (callIsOngoing && !callEntity.selfUserJoined()) || callEntity.isDeclined();
+        return !callEntity.selfUserJoined() && (callIsOngoing || callEntity.isDeclined());
       }
       return false;
     });
@@ -654,7 +654,7 @@ z.entity.Conversation = class Conversation {
     return ['annathebot', 'ottothebot'].includes(this.firstUserEntity() && this.firstUserEntity().username());
   }
 
-  supportsVideoCall(isOutgoing = false) {
+  supportsVideoCall(isCreatingUser = false) {
     if (this.is_one2one()) {
       return true;
     }
@@ -670,8 +670,11 @@ z.entity.Conversation = class Conversation {
       return true;
     }
 
-    const hasRemoteVideo = this.call() && (this.call().isRemoteVideoSend() || this.call().isRemoteScreenSend());
-    return hasRemoteVideo;
+    if (isCreatingUser) {
+      return false;
+    }
+
+    return this.call() && this.call().isRemoteVideoCall();
   }
 
   serialize() {

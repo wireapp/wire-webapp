@@ -50,15 +50,11 @@ z.telemetry.app_init.AppInitStatistics = class AppInitStatistics {
   get() {
     const statistics = {};
 
-    for (const key in this) {
-      if (this.hasOwnProperty(key)) {
-        const value = this[key];
-
-        if (_.isNumber(value) || _.isString(value)) {
-          statistics[key] = value;
-        }
+    Object.entries(this).forEach(([key, value]) => {
+      if (_.isNumber(value) || _.isString(value)) {
+        statistics[key] = value;
       }
-    }
+    });
 
     return statistics;
   }
@@ -66,22 +62,16 @@ z.telemetry.app_init.AppInitStatistics = class AppInitStatistics {
   log() {
     this.logger.debug('App initialization statistics');
 
-    for (const key in this) {
-      if (this.hasOwnProperty(key)) {
-        const value = this[key];
-        if (_.isNumber(value) || _.isString(value)) {
-          const placeholder_key_length = Math.max(AppInitStatistics.CONFIG.LOG_LENGTH_KEY - key.length, 1);
-          const placeholder_key = new Array(placeholder_key_length).join(' ');
-          const placeholder_value_length = Math.max(
-            AppInitStatistics.CONFIG.LOG_LENGTH_VALUE - value.toString().length,
-            1
-          );
-          const placeholder_value = new Array(placeholder_value_length).join(' ');
+    Object.entries(this).forEach(([key, value]) => {
+      if (_.isNumber(value) || _.isString(value)) {
+        const placeholderKeyLength = Math.max(AppInitStatistics.CONFIG.LOG_LENGTH_KEY - key.length, 1);
+        const placeholderKey = new Array(placeholderKeyLength).join(' ');
+        const placeholderValueLength = Math.max(AppInitStatistics.CONFIG.LOG_LENGTH_VALUE - value.toString().length, 1);
+        const placeholderValue = new Array(placeholderValueLength).join(' ');
 
-          this.logger.info(`${placeholder_key}'${key}':${placeholder_value}${value}`);
-        }
+        this.logger.info(`${placeholderKey}'${key}':${placeholderValue}${value}`);
       }
-    }
+    });
   }
 
   update_backend_requests(number_of_requests) {
