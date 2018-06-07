@@ -196,8 +196,8 @@ z.calling.entities.CallEntity = class CallEntity {
 
       const hasState = state !== z.calling.enum.CALL_STATE.UNKNOWN;
       if (hasState) {
-        const isUnsnsweredState = z.calling.enum.CALL_STATE_GROUP.UNANSWERED.includes(state);
-        if (isUnsnsweredState) {
+        const isUnansweredState = z.calling.enum.CALL_STATE_GROUP.UNANSWERED.includes(state);
+        if (isUnansweredState) {
           const isIncomingCall = state === z.calling.enum.CALL_STATE.INCOMING;
           this._onStateStartRinging(isIncomingCall);
         } else {
