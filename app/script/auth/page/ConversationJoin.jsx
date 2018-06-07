@@ -274,17 +274,19 @@ class ConversationJoin extends Component {
             {error ? parseValidationErrors(error) : parseError(this.props.error)}
           </ErrorMessage>
         </Form>
-        <Small block>
-          {`${_(conversationJoinStrings.hasAccount)} `}
-          <Link
-            component={RRLink}
-            to={`${ROUTE.LOGIN}/${this.state.conversationKey}/${this.state.conversationCode}`}
-            textTransform={'none'}
-            data-uie-name="go-login"
-          >
-            {_(conversationJoinStrings.loginLink)}
-          </Link>
-        </Small>
+        {!this.isPwaSupportedBrowser() && (
+          <Small block>
+            {`${_(conversationJoinStrings.hasAccount)} `}
+            <Link
+              component={RRLink}
+              to={`${ROUTE.LOGIN}/${this.state.conversationKey}/${this.state.conversationCode}`}
+              textTransform={'none'}
+              data-uie-name="go-login"
+            >
+              {_(conversationJoinStrings.loginLink)}
+            </Link>
+          </Small>
+        )}
       </ContainerXS>
     );
   };
