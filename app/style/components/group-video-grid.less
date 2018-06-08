@@ -126,7 +126,8 @@
       }
     }
 
-    &__mute-overlay {
+    &__mute-overlay,
+    &__pause-overlay {
       position: absolute;
       top: 0;
       left: 0;
@@ -140,6 +141,23 @@
 
       svg path {
         fill: #fff;
+      }
+
+      &__label {
+        z-index: 1;
+        max-width: 50%;
+        color: #fff;
+        font-size: 14px;
+        font-weight: @font-weight-bold;
+        text-align: center;
+
+        &--minimized {
+          font-size: 11px;
+        }
+      }
+
+      .background {
+        transition: none;
       }
     }
   }
