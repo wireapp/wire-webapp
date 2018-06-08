@@ -74,6 +74,9 @@ class ConversationJoin extends Component {
   };
 
   readAndUpdateParamsFromUrl = nextProps => {
+    if (this.isPwaSupportedBrowser()) {
+      this.setState({forceNewTemporaryGuestAccount: true});
+    }
     const conversationCode = getURLParameter(QUERY_KEY.CONVERSATION_CODE);
     const conversationKey = getURLParameter(QUERY_KEY.CONVERSATION_KEY);
     const expiresIn = parseInt(getURLParameter(QUERY_KEY.JOIN_EXPIRES), 10) || undefined;
