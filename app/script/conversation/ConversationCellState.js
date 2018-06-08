@@ -30,22 +30,22 @@ z.conversation.ConversationCellState = (() => {
   };
 
   const _accumulateActivity = conversationEntity => {
-    const unreadEvents = conversationEntity.unread_events();
     const activities = {
       [ACTIVITY_TYPE.CALL]: 0,
       [ACTIVITY_TYPE.MESSAGE]: 0,
       [ACTIVITY_TYPE.PING]: 0,
     };
 
-    for (const messageEntity of unreadEvents) {
-      if (messageEntity.is_call() && messageEntity.was_missed()) {
+    conversationEntity.unread_events().forEach(messageEntity => {
+      const isMissedCall = messageEntity.is_call() && messageEntity.was_missed();
+      if (isMissedCall) {
         activities[ACTIVITY_TYPE.CALL] += 1;
       } else if (messageEntity.is_ping()) {
         activities[ACTIVITY_TYPE.PING] += 1;
       } else if (messageEntity.is_content()) {
         activities[ACTIVITY_TYPE.MESSAGE] += 1;
       }
-    }
+    });
 
     return _generateActivityString(activities);
   };
@@ -114,20 +114,11 @@ z.conversation.ConversationCellState = (() => {
 
   const _getStateCall = {
     description: conversationEntity => {
-      const lastMessageEntity = conversationEntity.getLastMessage();
-      return z.l10n.text(z.string.conversationsSecondaryLineIncomingCall, lastMessageEntity.sender_name());
+      const creatorName = conversationEntity.call().creatingUser.first_name();
+      return z.l10n.text(z.string.conversationsSecondaryLineIncomingCall, creatorName);
     },
     icon: () => z.conversation.ConversationStatusIcon.NONE,
-    match: conversationEntity => {
-      const selfUserId = conversationEntity.self.id;
-      const lastMessageEntity = conversationEntity.getLastMessage();
-      if (lastMessageEntity) {
-        const isCallActivation = lastMessageEntity.is_call() && lastMessageEntity.is_activation();
-        const messageFromSelf = lastMessageEntity.from === selfUserId;
-
-        return isCallActivation && !messageFromSelf;
-      }
-    },
+    match: conversationEntity => conversationEntity.call() && conversationEntity.call().canJoinState(),
   };
 
   const _getStateDefault = {
