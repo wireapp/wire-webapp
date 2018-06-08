@@ -88,9 +88,9 @@ class CryptoboxCRUDStore implements ProteusSession.PreKeyStore {
   /**
    * Loads all available PreKeys.
    */
-  public load_prekeys(): Promise<Array<ProteusKeys.PreKey>> {
-    return this.engine.readAll(CryptoboxCRUDStore.STORES.PRE_KEYS).then((records: Array<any>) => {
-      const preKeys: Array<ProteusKeys.PreKey> = [];
+  public load_prekeys(): Promise<ProteusKeys.PreKey[]> {
+    return this.engine.readAll(CryptoboxCRUDStore.STORES.PRE_KEYS).then((records: any[]) => {
+      const preKeys: ProteusKeys.PreKey[] = [];
 
       records.forEach((record: PersistedRecord) => {
         const payload = this.from_store(record);
@@ -114,7 +114,6 @@ class CryptoboxCRUDStore implements ProteusSession.PreKeyStore {
 
   /**
    * Saves the serialised format of a specified PreKey.
-   * @deprecated Please use "save_prekeys" instead.
    * @return Promise<string> Resolves with the "ID" from the saved PreKey record.
    */
   public save_prekey(pre_key: ProteusKeys.PreKey): Promise<ProteusKeys.PreKey> {
@@ -127,7 +126,7 @@ class CryptoboxCRUDStore implements ProteusSession.PreKeyStore {
    * Saves the serialised formats from a batch of PreKeys.
    */
   public save_prekeys(pre_keys: ProteusKeys.PreKey[]): Promise<ProteusKeys.PreKey[]> {
-    const promises: Array<Promise<ProteusKeys.PreKey>> = pre_keys.map(pre_key => this.save_prekey(pre_key));
+    const promises: Promise<ProteusKeys.PreKey>[] = pre_keys.map(pre_key => this.save_prekey(pre_key));
     return Promise.all(promises).then(() => pre_keys);
   }
 
@@ -152,6 +151,19 @@ class CryptoboxCRUDStore implements ProteusSession.PreKeyStore {
         const payload = this.from_store(record);
         return ProteusSession.Session.deserialise(identity, payload);
       });
+  }
+
+  public async read_sessions(
+    identity: ProteusKeys.IdentityKeyPair
+  ): Promise<{[sessionId: string]: ProteusSession.Session}> {
+    const sessionIds = await this.engine.readAllPrimaryKeys(CryptoboxCRUDStore.STORES.SESSIONS);
+    const sessions: {[sessionId: string]: ProteusSession.Session} = {};
+
+    for (const sessionId of sessionIds) {
+      sessions[sessionId] = await this.read_session(identity, sessionId);
+    }
+
+    return sessions;
   }
 
   public update_session(session_id: string, session: ProteusSession.Session): Promise<ProteusSession.Session> {

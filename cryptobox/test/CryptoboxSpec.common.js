@@ -244,7 +244,7 @@ describe('cryptobox.Cryptobox', () => {
           return Proteus.session.Session.init_from_prekey(box.identity, bob.bundle);
         })
         .then(session => {
-          const cryptoBoxSession = new cryptobox.CryptoboxSession(sessionIdUnique, box.pk_store, session);
+          const cryptoBoxSession = new cryptobox.CryptoboxSession(sessionIdUnique, session);
           return box.session_save(cryptoBoxSession);
         })
         .then(() => {

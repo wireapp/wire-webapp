@@ -23,23 +23,21 @@ import {CryptoboxCRUDStore} from './store/root';
 
 class CryptoboxSession {
   public id: string;
-  public pk_store: CryptoboxCRUDStore;
   public session: ProteusSession.Session;
 
-  constructor(id: string, pk_store: CryptoboxCRUDStore, session: ProteusSession.Session) {
+  constructor(id: string, session: ProteusSession.Session) {
     this.id = id;
-    this.pk_store = pk_store;
     this.session = session;
     Object.freeze(this);
   }
 
-  public decrypt(ciphertext: ArrayBuffer): Promise<Uint8Array> {
+  public decrypt(ciphertext: ArrayBuffer, pk_store: CryptoboxCRUDStore): Promise<Uint8Array> {
     if (ciphertext.byteLength === 0) {
       return Promise.reject(new DecryptionError('Cannot decrypt an empty ArrayBuffer.'));
     }
 
     const envelope: ProteusMessage.Envelope = ProteusMessage.Envelope.deserialise(ciphertext);
-    return this.session.decrypt(this.pk_store, envelope);
+    return this.session.decrypt(pk_store, envelope);
   }
 
   public encrypt(plaintext: string | Uint8Array): Promise<ArrayBuffer> {

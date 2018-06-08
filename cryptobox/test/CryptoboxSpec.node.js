@@ -73,4 +73,74 @@ describe('Cryptobox', () => {
         .catch(done.fail);
     });
   });
+
+  describe('"serialize / deserialize"', () => {
+    it('can be used to export and import Cryptobox instances', async done => {
+      // Test serialization
+      const amountOfAlicePreKeys = 15;
+      const alice = await createCryptobox('alice', amountOfAlicePreKeys);
+      await alice.create();
+      let serializedAlice = await alice.serialize();
+
+      expect(Object.keys(serializedAlice.prekeys).length).toBe(amountOfAlicePreKeys);
+      expect(Object.keys(serializedAlice.sessions).length).toBe(0);
+
+      // Test serialization with sessions
+      const bob = await createCryptobox('bob', 2);
+      await bob.create();
+
+      const bobBundle = Proteus.keys.PreKeyBundle.new(bob.identity.public_key, await bob.store.load_prekey(0));
+      const sessionName = 'alice-to-bob';
+      await alice.encrypt(sessionName, 'Hello Bob. This is Alice.', bobBundle.serialise());
+
+      serializedAlice = await alice.serialize();
+
+      expect(Object.keys(serializedAlice.prekeys).length).toBe(amountOfAlicePreKeys);
+      expect(Object.keys(serializedAlice.sessions).length).toBe(1);
+
+      const eve = await createCryptobox('eve', 5);
+      await eve.create();
+
+      const aliceBundle = Proteus.keys.PreKeyBundle.new(alice.identity.public_key, await alice.store.load_prekey(0));
+      const cipherText = await eve.encrypt('eve-to-alice', 'Hello Alice. This is Eve.', aliceBundle.serialise());
+      await alice.decrypt('alice-to-eve', cipherText);
+
+      serializedAlice = await alice.serialize();
+
+      const expectedSessionsOfAlice = 2;
+      expect(Object.keys(serializedAlice.prekeys).length).toBe(amountOfAlicePreKeys);
+      expect(Object.keys(serializedAlice.sessions).length).toBe(expectedSessionsOfAlice);
+
+      // Test that Alice and Eve are NOT the same
+      const aliceId = alice.identity.public_key.fingerprint();
+      let eveId = eve.identity.public_key.fingerprint();
+      expect(aliceId).not.toBe(eveId);
+
+      // Test that Eve can import Alice's Identity
+      await eve.deserialize(serializedAlice);
+      eveId = eve.identity.public_key.fingerprint();
+      expect(aliceId).toBe(eveId);
+
+      // Test that Eve can import Alice's PreKeys
+      const evePreKeys = await eve.store.load_prekeys();
+      expect(eve.lastResortPreKey).toBeDefined();
+      expect(evePreKeys.length).toBe(amountOfAlicePreKeys);
+
+      // Test that Eve can import Alice's Sessions
+      const eveSessions = await eve.store.read_sessions(eve.identity);
+      expect(Object.keys(eveSessions).length).toBe(expectedSessionsOfAlice);
+
+      // Test that Eve's Cryptobox can be serialized
+      const serializedEve = await eve.serialize();
+      expect(Object.keys(serializedEve.prekeys).length).toBe(amountOfAlicePreKeys);
+
+      // Test that Eve can write to Bob because Alice had a session with Bob
+      const messageEveToBob = 'Hello Bob, I am your new Alice. ;)';
+      const encrypted = await eve.encrypt(sessionName, messageEveToBob);
+      const decrypted = await bob.decrypt('bob-to-alice', encrypted);
+      expect(Buffer.from(decrypted).toString('utf8')).toBe(messageEveToBob);
+
+      done();
+    });
+  });
 });

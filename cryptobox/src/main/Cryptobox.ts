@@ -21,13 +21,16 @@ import LRUCache from '@wireapp/lru-cache';
 import {PriorityQueue} from '@wireapp/priority-queue';
 import {keys as ProteusKeys, message as ProteusMessage, session as ProteusSession} from '@wireapp/proteus';
 import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine/';
+import {Decoder, Encoder} from 'bazinga64';
 import EventEmitter = require('events');
 import CryptoboxSession from './CryptoboxSession';
 import DecryptionError from './DecryptionError';
 import {CryptoboxError} from './error/root';
 import InvalidPreKeyFormatError from './InvalidPreKeyFormatError';
+import {SerializedCryptobox} from './SerializedCryptobox';
 import {CryptoboxCRUDStore} from './store/root';
 
+const DEFAULT_CAPACITY = 1000;
 const logdown = require('logdown');
 const VERSION = require('../../package.json').version;
 
@@ -37,14 +40,13 @@ class Cryptobox extends EventEmitter {
     NEW_SESSION: 'new-session',
   };
 
-  private readonly cachedSessions: LRUCache<CryptoboxSession>;
-
+  private cachedSessions: LRUCache<CryptoboxSession>;
   private readonly logger: any = logdown('@wireapp/cryptobox/Cryptobox', {
     logger: console,
     markdown: false,
   });
   private readonly minimumAmountOfPreKeys: number;
-  private readonly queues = new LRUCache<PriorityQueue>(1000);
+  private queues = new LRUCache<PriorityQueue>(DEFAULT_CAPACITY);
   private readonly store: CryptoboxCRUDStore;
 
   public lastResortPreKey: ProteusKeys.PreKey | undefined;
@@ -62,7 +64,7 @@ class Cryptobox extends EventEmitter {
       minimumAmountOfPreKeys = ProteusKeys.PreKey.MAX_PREKEY_ID;
     }
 
-    this.cachedSessions = new LRUCache(1000);
+    this.cachedSessions = new LRUCache(DEFAULT_CAPACITY);
     this.minimumAmountOfPreKeys = minimumAmountOfPreKeys;
     this.store = new CryptoboxCRUDStore(engine);
 
@@ -102,14 +104,7 @@ class Cryptobox extends EventEmitter {
   public create(): Promise<Array<ProteusKeys.PreKey>> {
     this.logger.log(`Initializing Cryptobox. Creating local identity...`);
     return this.create_new_identity()
-      .then((identity: ProteusKeys.IdentityKeyPair) => {
-        this.identity = identity;
-        this.logger.log(
-          `Initialized Cryptobox with new local identity. Fingerprint is "${identity.public_key.fingerprint()}".`
-        );
-
-        return this.create_last_resort_prekey();
-      })
+      .then(() => this.create_last_resort_prekey())
       .then((lastResortPreKey: ProteusKeys.PreKey) => {
         this.logger.log(`Created Last Resort PreKey with ID "${lastResortPreKey.key_id}".`);
         return this.init(false);
@@ -235,8 +230,14 @@ class Cryptobox extends EventEmitter {
       })
       .then((identity: ProteusKeys.IdentityKeyPair) => {
         this.logger.warn(`Cleaned cryptographic items prior to saving a new local identity.`);
-        return this.store.save_identity(identity);
+        this.logger.log(`Created new local identity. Fingerprint is "${identity.public_key.fingerprint()}".`);
+        return this.save_identity(identity);
       });
+  }
+
+  private save_identity(identity: ProteusKeys.IdentityKeyPair): Promise<ProteusKeys.IdentityKeyPair> {
+    this.identity = identity;
+    return this.store.save_identity(identity);
   }
 
   /**
@@ -265,7 +266,7 @@ class Cryptobox extends EventEmitter {
       if (this.identity) {
         return ProteusSession.Session.init_from_prekey(this.identity, bundle).then(
           (session: ProteusSession.Session) => {
-            const cryptobox_session = new CryptoboxSession(session_id, this.store, session);
+            const cryptobox_session = new CryptoboxSession(session_id, session);
             return this.session_save(cryptobox_session);
           }
         );
@@ -285,7 +286,7 @@ class Cryptobox extends EventEmitter {
     if (this.identity) {
       return ProteusSession.Session.init_from_message(this.identity, this.store, env).then(tuple => {
         const [session, decrypted] = tuple;
-        const cryptoBoxSession = new CryptoboxSession(session_id, this.store, session);
+        const cryptoBoxSession = new CryptoboxSession(session_id, session);
         return <[CryptoboxSession, Uint8Array]>[cryptoBoxSession, decrypted];
       });
     }
@@ -303,7 +304,7 @@ class Cryptobox extends EventEmitter {
 
     if (this.identity) {
       return this.store.read_session(this.identity, session_id).then((session: ProteusSession.Session) => {
-        const cryptobox_session = new CryptoboxSession(session_id, this.store, session);
+        const cryptobox_session = new CryptoboxSession(session_id, session);
         return this.save_session_in_cache(cryptobox_session);
       });
     }
@@ -403,7 +404,7 @@ class Cryptobox extends EventEmitter {
             }
 
             session = value;
-            return session.decrypt(ciphertext);
+            return session.decrypt(ciphertext, this.store);
           })
           .then(decrypted_message => {
             message = decrypted_message;
@@ -417,6 +418,86 @@ class Cryptobox extends EventEmitter {
           .then(() => message)
       );
     });
+  }
+
+  private async deleteData(): Promise<void> {
+    this.cachedSessions = new LRUCache(DEFAULT_CAPACITY);
+    this.identity = undefined;
+    this.lastResortPreKey = undefined;
+    this.queues = new LRUCache<PriorityQueue>(DEFAULT_CAPACITY);
+    await this.store.delete_all();
+  }
+
+  private async importIdentity(payload: string): Promise<void> {
+    this.logger.log(`Importing local identity...`);
+
+    const identityBuffer = Decoder.fromBase64(payload).asBytes.buffer;
+    const identity = ProteusKeys.IdentityKeyPair.deserialise(identityBuffer);
+
+    await this.save_identity(identity);
+  }
+
+  private async importPreKeys(serializedPreKeys: {[sessionId: string]: string}): Promise<void> {
+    this.logger.log(`Importing "${serializedPreKeys.length}" PreKeys...`);
+
+    const proteusPreKeys = Object.values(serializedPreKeys).map(preKey => {
+      const preKeyBuffer = Decoder.fromBase64(preKey).asBytes.buffer;
+      const proteusPreKey = ProteusKeys.PreKey.deserialise(preKeyBuffer);
+      if (proteusPreKey.key_id === ProteusKeys.PreKey.MAX_PREKEY_ID) {
+        this.lastResortPreKey = proteusPreKey;
+      }
+      return proteusPreKey;
+    });
+
+    await this.store.save_prekeys(proteusPreKeys);
+  }
+
+  private async importSessions(serializedSessions: {[sessionId: string]: string}): Promise<void> {
+    this.logger.log(`Importing "${serializedSessions.length}" sessions...`);
+
+    for (const sessionId in serializedSessions) {
+      const serializedSession = serializedSessions[sessionId];
+      const sessionBuffer = Decoder.fromBase64(serializedSession).asBytes.buffer;
+      const proteusSession = ProteusSession.Session.deserialise(this.identity!, sessionBuffer);
+      const cryptoBoxSession = new CryptoboxSession(sessionId, proteusSession);
+      await this.session_save(cryptoBoxSession);
+    }
+  }
+
+  public async deserialize(payload: SerializedCryptobox) {
+    await this.deleteData();
+    await this.importIdentity(payload.identity);
+    await this.importPreKeys(payload.prekeys);
+    await this.importSessions(payload.sessions);
+    await this.refill_prekeys(true);
+  }
+
+  public async serialize(): Promise<SerializedCryptobox> {
+    const toBase64 = (buffer: ArrayBuffer) => Encoder.toBase64(buffer).asString;
+
+    const data: SerializedCryptobox = {
+      identity: '',
+      prekeys: {},
+      sessions: {},
+    };
+
+    const identity = await this.store.load_identity();
+
+    if (identity) {
+      data.identity = toBase64(identity.serialise());
+      const sessions = await this.store.read_sessions(identity);
+      for (const sessionId in sessions) {
+        const storedSession = sessions[sessionId];
+        data.sessions[sessionId] = toBase64(storedSession.serialise());
+      }
+    }
+
+    const storedPreKeys = await this.store.load_prekeys();
+    for (const storedPreKey of storedPreKeys) {
+      data.prekeys[storedPreKey.key_id] = toBase64(storedPreKey.serialise());
+    }
+
+    return data;
   }
 }
 
