@@ -134,7 +134,7 @@ class Login extends React.PureComponent {
   immediateLogin = () => {
     return Promise.resolve()
       .then(() => this.props.doInit({isImmediateLogin: true}))
-      .then(() => this.props.doInitializeClient(true, undefined))
+      .then(() => this.props.doInitializeClient(ClientType.PERMANENT, undefined))
       .then(this.navigateChooseHandleOrWebapp)
       .catch(() => {});
   };
