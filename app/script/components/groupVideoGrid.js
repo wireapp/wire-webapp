@@ -40,7 +40,6 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
     this.streams = videoGridRepository.streams;
 
     this.minimized = minimized;
-    this.pausedState = z.calling.enum.PROPERTY_STATE.PAUSED;
 
     const gridElementsCount = ko.pureComputed(() => this.grid().filter(id => id !== 0).length);
     this.hasBlackBackground = this.minimized && gridElementsCount > 1;
@@ -152,7 +151,7 @@ ko.components.register('group-video-grid', {
                   <micoff-icon></micoff-icon>
                 </div>
               <!-- /ko -->
-              <!-- ko if: $parent.getStreamInfo(id).videoSend() === $parent.pausedState -->
+              <!-- ko if: $parent.getStreamInfo(id).videoSend() === z.calling.enum.PROPERTY_STATE.PAUSED -->
                 <div class="group-video-grid__pause-overlay" data-bind="switchBackground: $parent.getStreamInfo(id).picture()">
                   <div class="background">
                     <div class="background-image"></div>
