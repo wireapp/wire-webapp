@@ -38,37 +38,36 @@ z.calling.VideoGridRepository = class VideoGridRepository {
     this.thumbnailStream = ko.observable();
 
     const selfStream = ko.pureComputed(() => {
-      const stream = selfStreamState.videoSend() || selfStreamState.screenSend() ? localMediaStream() : undefined;
+      const hasVideo = selfStreamState.videoSend() || selfStreamState.screenSend();
+      const stream = hasVideo ? localMediaStream() : undefined;
       return {
+        audioSend: selfStreamState.audioSend,
         id: stream && stream.id,
-        isMirrored: !!selfStreamState.videoSend(),
-        isMuted: !selfStreamState.audioSend(),
         isSelf: true,
         stream: stream,
+        videoSend: selfStreamState.videoSend,
       };
     });
 
-    const videoParticipants = ko.pureComputed(() => {
-      return calls()
+    this.streams = ko.pureComputed(() => {
+      const videoParticipants = calls()
         .reduce((participants, call) => participants.concat(call.participants()), [])
         .filter(participant => participant.activeState.videoSend() || participant.activeState.screenSend());
-    });
 
-    this.streams = ko.pureComputed(() => {
-      const videoParticipantIds = videoParticipants().map(participant => participant.id);
+      const videoParticipantIds = videoParticipants.map(participant => participant.id);
 
       const remoteStreams = streamsInfo()
         .filter(mediaStreamInfo => videoParticipantIds.includes(mediaStreamInfo.flowId))
         .map(mediaStreamInfo => {
           const stream = mediaStreamInfo.stream;
-          const participant = videoParticipants().find(
+          const participant = videoParticipants.find(
             videoParticipant => videoParticipant.id === mediaStreamInfo.flowId
           );
           return {
             id: stream.id,
-            isPaused: participant.state.videoSend() === z.calling.enum.PROPERTY_STATE.PAUSED,
-            picture: participant.user.mediumPictureResource(),
+            picture: participant.user.mediumPictureResource,
             stream: stream,
+            videoSend: participant.state.videoSend,
           };
         });
 
@@ -77,7 +76,7 @@ z.calling.VideoGridRepository = class VideoGridRepository {
         return remoteStreams;
       }
       this.thumbnailStream(undefined);
-      return selfStream() ? remoteStreams.concat(selfStream()) : remoteStreams;
+      return selfStream().stream ? remoteStreams.concat(selfStream()) : remoteStreams;
     });
 
     this.streams.subscribe(this.updateGrid.bind(this));
