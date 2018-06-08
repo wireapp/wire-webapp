@@ -121,8 +121,9 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
       [SIZES.FOURTH_SCREEN]: '',
     };
 
+    const roundedClass = this.streams().length === 1 && this.minimized ? ' group-video-grid__element--rounded' : '';
     const mirrorClass = isMirrored ? ' mirror' : '';
-    return `group-video-grid__element${index} ${extraClasses[size]} ${mirrorClass}`;
+    return `group-video-grid__element${index} ${extraClasses[size]}${mirrorClass}${roundedClass}`;
   }
 
   getUIEValueForVideo(index) {
