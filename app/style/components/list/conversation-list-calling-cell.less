@@ -62,10 +62,16 @@
     &--join,
     &--participants {
       padding: 0 8px;
-      font-weight: @font-weight-regular;
+    }
+
+    &--join {
+      font-weight: @font-weight-bold;
+      text-transform: uppercase;
     }
 
     &--participants {
+      font-weight: @font-weight-regular;
+
       chevron-icon {
         margin-left: 8px;
 
@@ -83,11 +89,6 @@
 
     &--large {
       width: 64px;
-    }
-
-    &--uppercase {
-      padding: 0 8px;
-      text-transform: uppercase;
     }
 
     &--green,
