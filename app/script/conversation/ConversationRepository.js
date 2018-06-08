@@ -158,30 +158,33 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.stateHandler = new z.conversation.ConversationStateHandler(this.conversation_service, this);
   }
 
-  _init_state_updates() {
+  _initStateUpdates() {
     ko.computed(() => {
-      const conversations_archived = [];
-      const conversations_calls = [];
-      const conversations_cleared = [];
-      const conversations_unarchived = [];
+      const conversationsArchived = [];
+      const conversationsCalls = [];
+      const conversationsCleared = [];
+      const conversationsUnarchived = [];
 
       this.sorted_conversations().forEach(conversationEntity => {
-        if (conversationEntity.hasActiveCall()) {
-          conversations_calls.push(conversationEntity);
+        const conversationWithCall = this.selfUser().isTemporaryGuest()
+          ? conversationEntity.hasActiveCall() || conversationEntity.hasJoinableCall()
+          : conversationEntity.hasActiveCall();
+        if (conversationWithCall) {
+          conversationsCalls.push(conversationEntity);
         }
         if (conversationEntity.is_cleared()) {
-          conversations_cleared.push(conversationEntity);
+          conversationsCleared.push(conversationEntity);
         } else if (conversationEntity.is_archived()) {
-          conversations_archived.push(conversationEntity);
+          conversationsArchived.push(conversationEntity);
         } else {
-          conversations_unarchived.push(conversationEntity);
+          conversationsUnarchived.push(conversationEntity);
         }
       });
 
-      this.conversations_archived(conversations_archived);
-      this.conversations_calls(conversations_calls);
-      this.conversations_cleared(conversations_cleared);
-      this.conversations_unarchived(conversations_unarchived);
+      this.conversations_archived(conversationsArchived);
+      this.conversations_calls(conversationsCalls);
+      this.conversations_cleared(conversationsCleared);
+      this.conversations_unarchived(conversationsUnarchived);
     });
   }
 
@@ -873,7 +876,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   initialize_conversations() {
-    this._init_state_updates();
+    this._initStateUpdates();
     this.init_total = this.receiving_queue.getLength();
 
     if (this.init_total > 5) {
