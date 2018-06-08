@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="8.4.0"></a>
+# [8.4.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/compare/@wireapp/cryptobox@8.3.70...@wireapp/cryptobox@8.4.0) (2018-06-08)
+
+
+### Features
+
+* **cryptobox:** Serialization & Deserialization of cryptographic items ([#684](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/issues/684)) ([540e7b1](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/commit/540e7b1))
+
+
+
+
 <a name="8.3.70"></a>
 ## [8.3.70](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/compare/@wireapp/cryptobox@8.3.69...@wireapp/cryptobox@8.3.70) (2018-06-06)
 
