@@ -59,10 +59,13 @@
       }
     }
 
+    &--join,
     &--participants {
       padding: 0 8px;
       font-weight: @font-weight-regular;
+    }
 
+    &--participants {
       chevron-icon {
         margin-left: 8px;
 
@@ -257,55 +260,6 @@ conversation-list-calling-cell:first-of-type {
   &-right {
     display: flex;
   }
-}
-
-.conversation-list-calling-cell-participants {
-  position: relative;
-  display: flex;
-  height: 24px;
-  align-items: center;
-  padding-right: 16px;
-  padding-left: 16px;
-}
-
-.conversation-list-calling-cell-participant {
-  cursor: default;
-
-  & + & {
-    margin-left: 8px;
-  }
-}
-
-.conversation-list-calling-cell-controls-on-call {
-  margin-right: auto;
-  margin-left: 0;
-}
-
-.conversation-list-calling-cell-controls-button {
-  min-width: 40px;
-  height: 24px;
-  padding-right: 8px;
-  padding-left: 8px;
-  background-color: fade(@graphite-dark, 8%);
-  border-radius: 12px;
-  color: @graphite-dark;
-  cursor: pointer;
-  font-size: 12px;
-  line-height: 24px;
-  user-select: none;
-
-  &-large {
-    min-width: 64px;
-  }
-
-  & + & {
-    margin-left: 8px;
-  }
-}
-
-.conversation-list-calling-cell-controls-join-button {
-  .fill-green;
-  .label-bold;
 }
 
 @keyframes show-call-ui {

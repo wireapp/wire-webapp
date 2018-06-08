@@ -60,9 +60,10 @@ z.calling.VideoGridRepository = class VideoGridRepository {
         .filter(mediaStreamInfo => videoParticipantIds.includes(mediaStreamInfo.flowId))
         .map(mediaStreamInfo => {
           const stream = mediaStreamInfo.stream;
-          const participant = videoParticipants.find(
-            videoParticipant => videoParticipant.id === mediaStreamInfo.flowId
-          );
+          const participant = videoParticipants.find(videoParticipant => {
+            return videoParticipant.id === mediaStreamInfo.flowId;
+          });
+
           return {
             id: stream.id,
             picture: participant.user.mediumPictureResource,
