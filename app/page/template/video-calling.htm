@@ -58,8 +58,8 @@
             <!-- /ko -->
 
             <div class="video-controls__button"
-                 data-bind="click: clickedOnShareScreen, css: {'video-controls__button--active': selfStreamState.screenSend(), 'video-controls__button--disabled': disableToggleScreen()}"
-                 data-uie-name="do-call-controls-toggle-screen">
+                 data-bind="click: clickedOnShareScreen, css: {'video-controls__button--active': selfStreamState.screenSend(), 'video-controls__button--disabled': disableToggleScreen()}, attr: {'data-uie-value': selfStreamState.screenSend() ? 'active' : 'inactive', 'data-uie-enabled': disableToggleScreen() ? 'false' : 'true'}"
+                 data-uie-name="do-toggle-screen">
               <screenshare-icon></screenshare-icon>
               <!-- ko if: showSwitchScreen() -->
                 <device-toggle-button data-bind="click: clickedOnToggleScreen, clickBubble: false"
