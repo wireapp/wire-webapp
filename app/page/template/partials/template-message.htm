@@ -214,8 +214,8 @@
 
     <!-- ko if: hasUsers() -->
       <div class="message-header">
-        <div class="message-header-icon text-graphite">
-          <span class="icon-chat" data-bind="visible: isGroupCreation()"></span>
+        <div class="message-header-icon message-header-icon--svg text-graphite">
+          <message-icon data-bind="visible: isGroupCreation()"></message-icon>
           <span class="icon-minus" data-bind="visible: isMemberRemoval()"></span>
           <span class="icon-plus" data-bind="visible: isMemberJoin()"></span>
         </div>
