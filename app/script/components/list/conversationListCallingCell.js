@@ -111,6 +111,7 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
   }
 
   onMaximizeVideoGrid() {
+    this.multitasking.autoMinimize(false);
     this.multitasking.isMinimized(false);
   }
 
