@@ -168,7 +168,7 @@ ko.components.register('group-video-grid', {
             <video autoplay class="mirror group-video__thumbnail-video" data-uie-name="self-video-thumbnail" data-bind="css: {'group-video__thumbnail--minimized': minimized, 'mirror': thumbnailStream().videoSend()}, sourceStream: thumbnailStream().stream, muteMediaElement: thumbnailStream().stream">
             </video>
             <!-- ko if: !thumbnailStream().audioSend() && !minimized -->
-              <div class="group-video-grid__overlay">
+              <div class="group-video-grid__mute-overlay">
                 <micoff-icon></micoff-icon>
               </div>
             <!-- /ko -->
