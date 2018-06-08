@@ -112,14 +112,13 @@
   }
   &__participant-list {
     max-height: 184px;
+    overflow-x: hidden;
     overflow-y: scroll;
 
     &__wrapper {
       overflow: hidden;
-      // TODO: antiscroll will be added later
       max-height: 0;
       color: @graphite-dark;
-      transition: max-height @animation-timing-fast ease-in-out;
 
       &::before {
         display: block;

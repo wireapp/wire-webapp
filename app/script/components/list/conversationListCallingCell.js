@@ -89,6 +89,8 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
     });
 
     this.showMaximize = ko.pureComputed(() => this.multitasking.isMinimized() && this.isConnected());
+
+    this.shouldUpdateScrollbar = ko.computed(() => this.callParticipants()).extend({notify: 'always', rateLimit: 500});
   }
 
   onEndCall() {
@@ -170,8 +172,8 @@ ko.components.register('conversation-list-calling-cell', {
             <hangup-icon class="small-icon"></hangup-icon>
           </div>
         <!-- /ko -->
-        <!-- ko if: canJoin() -->	
-          <div class="call-ui__button call-ui__button--join call-ui__button--green" data-bind="click: onJoinDeclinedCall, l10n_text: z.string.callJoin" data-uie-name="do-call-controls-call-join"></div>	
+        <!-- ko if: canJoin() -->
+          <div class="call-ui__button call-ui__button--join call-ui__button--green" data-bind="click: onJoinDeclinedCall, l10n_text: z.string.callJoin" data-uie-name="do-call-controls-call-join"></div>
         <!-- /ko -->
       </div>
 
@@ -226,7 +228,7 @@ ko.components.register('conversation-list-calling-cell', {
 
       </div>
       <div class="call-ui__participant-list__wrapper" data-bind="css: {'call-ui__participant-list__wrapper--active': showParticipants}">
-        <div class="call-ui__participant-list" data-bind="foreach: callParticipants"  data-uie-name="list-call-ui-participants">
+        <div class="call-ui__participant-list" data-bind="foreach: callParticipants, antiscroll: shouldUpdateScrollbar" data-uie-name="list-call-ui-participants">
           <participant-item params="participant: $data.user, hideInfo: true, showCamera: $data.activeState.videoSend()" data-bind="css: {'no-underline': true}"></participant-item>
         </div>
       </div>
