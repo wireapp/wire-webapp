@@ -903,6 +903,19 @@ z.calling.entities.FlowEntity = class FlowEntity {
   }
 
   /**
+   * Build RTCOfferAnswerOptions for SDP creation
+   *
+   * @see https://www.w3.org/TR/webrtc/#offer/answer-options
+   *
+   * @private
+   * @param {boolean} iceRestart - Is ICE restart
+   * @returns {RTCOfferAnswerOptions} Object containing the RTCOfferAnswerOptions
+   */
+  _createOfferAnswerOptions(iceRestart) {
+    return {iceRestart, voiceActivityDetection: true};
+  }
+
+  /**
    * Create a local SDP of type 'answer'.
    *
    * @see https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/createAnswer
@@ -922,7 +935,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
     this.callLogger.debug(logMessage);
 
     this.peerConnection
-      .createAnswer()
+      .createAnswer(this._createOfferAnswerOptions())
       .then(rtcSdp => this._createSdpSuccess(rtcSdp))
       .catch(error => this._createSdpFailure(error, z.calling.rtc.SDP_TYPE.ANSWER));
   }
@@ -972,14 +985,6 @@ z.calling.entities.FlowEntity = class FlowEntity {
     this.negotiationNeeded(false);
     this._initializeDataChannel();
 
-    /*
-     * https://www.w3.org/TR/webrtc/#offer-answer-options
-     * https://www.w3.org/TR/webrtc/#configuration-data-extensions
-     *
-     * Set offerToReceiveVideo to true on audio calls. Else it should be undefined for Firefox compatibility reasons.
-     */
-    const offerOptions = {iceRestart, voiceActivityDetection: true};
-
     const logMessage = {
       data: {
         default: [z.calling.rtc.SDP_TYPE.OFFER, this.remoteUser.name()],
@@ -990,7 +995,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
     this.callLogger.debug(logMessage);
 
     this.peerConnection
-      .createOffer(offerOptions)
+      .createOffer(this._createOfferAnswerOptions(iceRestart))
       .then(rtcSdp => this._createSdpSuccess(rtcSdp))
       .catch(error => this._createSdpFailure(error, z.calling.rtc.SDP_TYPE.OFFER));
   }
