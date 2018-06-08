@@ -151,6 +151,8 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
       return !hasOtherOngoingCalls && this.isVideoCall() && isInMinimizedState;
     });
     this.showMaximize = ko.pureComputed(() => this.multitasking.isMinimized() && this.callIsConnected());
+
+    this.shouldUpdateScrollbar = ko.computed(() => this.callParticipants()).extend({notify: 'always', rateLimit: 500});
   }
 };
 
@@ -245,7 +247,7 @@ ko.components.register('conversation-list-calling-cell', {
 
     </div>
     <div class="call-ui__participant-list__wrapper" data-bind="css: {'call-ui__participant-list__wrapper--active': showParticipants}">
-      <div class="call-ui__participant-list" data-bind="foreach: callParticipants"  data-uie-name="list-call-ui-participants">
+      <div class="call-ui__participant-list" data-bind="foreach: callParticipants, antiscroll: shouldUpdateScrollbar" data-uie-name="list-call-ui-participants">
         <participant-item params="participant: $data.user, hideInfo: true, showCamera: $data.activeState.videoSend()" data-bind="css: {'no-underline': true}"></participant-item>
       </div>
     </div>
