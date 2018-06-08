@@ -257,6 +257,7 @@ z.calling.entities.CallEntity = class CallEntity {
     }
 
     if (this.isGroup) {
+      this.state(z.calling.enum.CALL_STATE.REJECTED);
       this.scheduleGroupCheck();
     }
 
