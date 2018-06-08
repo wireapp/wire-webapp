@@ -77,8 +77,8 @@ z.telemetry.calling.CallLogger = class CallLogger {
 
     const decodedSdpMessage = window.sdpTransform.parse(sdpMessage);
 
-    // Remove fingerprints
     decodedSdpMessage.media.forEach(({fingerprint, icePwd, invalid}, index) => {
+      // Remove fingerprints
       const hasFingerprintHash = fingerprint && fingerprint.hash;
       if (hasFingerprintHash) {
         decodedSdpMessage.media[index].fingerprint.hash = CallLogger.OBFUSCATED.FINGERPRINT;
