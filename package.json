@@ -65,7 +65,7 @@
     "uuid": "3.2.1"
   },
   "devDependencies": {
-    "autoprefixer": "8.6.1",
+    "autoprefixer": "8.6.2",
     "babel-core": "6.26.3",
     "babel-eslint": "8.2.3",
     "babel-loader": "7.1.4",
