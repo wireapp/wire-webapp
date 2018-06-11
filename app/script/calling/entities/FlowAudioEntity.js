@@ -39,8 +39,9 @@ z.calling.entities.FlowAudioEntity = class FlowAudioEntity {
 
     this.messageLog = this.flowEntity.messageLog;
 
-    const callLoggerName = `z.calling.entities.FlowAudio - ${this.flowEntity.id} (${new Date().getMilliseconds()})`;
-    this.callLogger = new z.telemetry.calling.CallLogger(callLoggerName, z.config.LOGGER.OPTIONS, this.messageLog);
+    const id = this.flowEntity.id;
+    const loggerName = 'z.calling.entities.FlowAudio';
+    this.callLogger = new z.telemetry.calling.CallLogger(loggerName, id, z.config.LOGGER.OPTIONS, this.messageLog);
 
     this.callLogger.info({
       data: {

@@ -22,7 +22,7 @@
 // grunt test_init && grunt test_run:telemetry/calling/CallLogger
 
 describe('z.telemetry.calling.CallLogger', () => {
-  const callLogger = new z.telemetry.calling.CallLogger('test', {}, 'test');
+  const callLogger = new z.telemetry.calling.CallLogger('test', null, {}, 'test');
 
   it('properly obfuscate IPv4 addresses', () => {
     expect(callLogger.safeGuard('test 10.10.12.43 test')).toBe('test 10.10.XXX.XXX test');

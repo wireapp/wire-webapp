@@ -33,11 +33,14 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
    * @param {CallSetupTimings} timings - Timings of call setup steps
    */
   constructor(id, remote_user_id, call_et, timings) {
+    this.id = id;
     this.remote_user_id = remote_user_id;
     this.call_et = call_et;
-    this.logger = new z.util.Logger(`z.telemetry.calling.FlowTelemetry (${id})`, z.config.LOGGER.OPTIONS);
 
-    this.id = id;
+    const loggerId = this.id.substr(0, 8);
+    const loggerTimestamp = new Date().getMilliseconds();
+    const loggerName = `z.telemetry.calling.FlowTelemetry - ${loggerId} (${loggerTimestamp})`;
+    this.logger = new z.util.Logger(loggerName, z.config.LOGGER.OPTIONS);
     this.is_answer = false;
     this.peer_connection = undefined;
 
