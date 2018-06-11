@@ -52,7 +52,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
     this.conversationId = this.callEntity.id;
     this.messageLog = this.participantEntity.messageLog;
 
-    const callLoggerName = `z.calling.entities.FlowEntity (${this.id})`;
+    const callLoggerName = `z.calling.entities.FlowEntity - ${this.id} (${new Date().getMilliseconds()})`;
     this.callLogger = new z.telemetry.calling.CallLogger(callLoggerName, z.config.LOGGER.OPTIONS, this.messageLog);
 
     // States
@@ -71,6 +71,14 @@ z.calling.entities.FlowEntity = class FlowEntity {
 
     // Telemetry
     this.telemetry = new z.telemetry.calling.FlowTelemetry(this.id, this.remoteUserId, this.callEntity, timings);
+
+    this.callLogger.info({
+      data: {
+        default: [this.remoteUser.name()],
+        obfuscated: [this.callLogger.obfuscate(this.remoteUser.id)],
+      },
+      message: `Created new flow entity for user {0}`,
+    });
 
     //##############################################################################
     // PeerConnection
