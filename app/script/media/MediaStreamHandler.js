@@ -657,15 +657,30 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
 
     const includesAudioTracks = MediaStreamHandler.CONFIG.MEDIA_TYPE.CONTAINS_AUDIO.includes(mediaType);
     if (includesAudioTracks) {
-      const [audioStreamTrack] = z.media.MediaStreamHandler.getMediaTracks(mediaStream, z.media.MediaType.AUDIO);
-      audioStreamTrack.enabled = this.selfStreamState.audioSend();
+      this._setTrackState(mediaStream, z.media.MediaType.AUDIO);
     }
 
     const includesVideoTracks = MediaStreamHandler.CONFIG.MEDIA_TYPE.CONTAINS_VIDEO.includes(mediaType);
     if (includesVideoTracks) {
-      const [videoStreamTrack] = z.media.MediaStreamHandler.getMediaTracks(mediaStream, z.media.MediaType.VIDEO);
-      videoStreamTrack.enabled = this.selfStreamState.screenSend() || this.selfStreamState.videoSend();
+      this._setTrackState(mediaStream, z.media.MediaType.VIDEO);
     }
+  }
+
+  _setTrackState(mediaStream, mediaType) {
+    const streamTracks = z.media.MediaStreamHandler.getMediaTracks(mediaStream, mediaType);
+
+    if (streamTracks.length > 1) {
+      this.logger.warn(`Media stream contains multiple '${mediaType}' tracks`, streamTracks);
+    }
+
+    const isVideo = mediaType === z.media.MediaType.VIDEO;
+    const isEnabledState = isVideo
+      ? this.selfStreamState.screenSend() || this.selfStreamState.videoSend()
+      : this.selfStreamState.audioSend();
+
+    streamTracks.forEach(streamTrack => (streamTrack.enabled = isEnabledState));
+    const logMessage = `Set stream '${mediaType}' enabled to '${isEnabledState}' on '${streamTracks.length}' tracks`;
+    this.logger.log(logMessage, streamTracks);
   }
 
   /**
