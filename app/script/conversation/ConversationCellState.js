@@ -120,7 +120,7 @@ z.conversation.ConversationCellState = (() => {
     icon: () => z.conversation.ConversationStatusIcon.NONE,
     match: conversationEntity => {
       if (conversationEntity.call()) {
-        return conversationEntity.call().canJoinState() && !conversationEntity.call().isOngoingOnAnotherClient();
+        return conversationEntity.call().canJoinState() && !conversationEntity.call().selfUserJoined();
       }
     },
   };
