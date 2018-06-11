@@ -94,7 +94,7 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
   }
 
   onEndCall() {
-    return this.isIncoming ? this.onRejectCall() : this.onLeaveCall();
+    return this.isIncoming() ? this.onRejectCall() : this.onLeaveCall();
   }
 
   onJoinCall() {
