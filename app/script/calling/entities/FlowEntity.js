@@ -59,15 +59,15 @@ z.calling.entities.FlowEntity = class FlowEntity {
     this.isAnswer = ko.observable(false);
     this.selfState = this.callEntity.selfState;
 
-    // Audio
-    this.audio = new z.calling.entities.FlowAudioEntity(this, this.callingRepository.mediaRepository);
-
     // Users
     this.remoteClientId = undefined;
     this.remoteUser = this.participantEntity.user;
     this.remoteUserId = this.remoteUser.id;
     this.selfUser = this.callEntity.selfUser;
     this.selfUserId = this.selfUser.id;
+
+    // Audio
+    this.audio = new z.calling.entities.FlowAudioEntity(this, this.callingRepository.mediaRepository);
 
     // Telemetry
     this.telemetry = new z.telemetry.calling.FlowTelemetry(this.id, this.remoteUserId, this.callEntity, timings);
