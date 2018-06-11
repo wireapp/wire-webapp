@@ -118,7 +118,11 @@ z.conversation.ConversationCellState = (() => {
       return z.l10n.text(z.string.conversationsSecondaryLineIncomingCall, creatorName);
     },
     icon: () => z.conversation.ConversationStatusIcon.NONE,
-    match: conversationEntity => conversationEntity.call() && conversationEntity.call().canJoinState(),
+    match: conversationEntity => {
+      if (conversationEntity.call()) {
+        return conversationEntity.call().canJoinState() && !conversationEntity.call().isOngoingOnAnotherClient();
+      }
+    },
   };
 
   const _getStateDefault = {
