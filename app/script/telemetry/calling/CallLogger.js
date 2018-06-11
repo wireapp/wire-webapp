@@ -159,7 +159,10 @@ z.telemetry.calling.CallLogger = class CallLogger {
     this._log([this.logger.levels.WARN].concat(...arguments));
   }
 
-  log() {
+  log(logLevel) {
+    if (typeof logLevel === 'function') {
+      return this._log(arguments);
+    }
     this._log([this.logger.levels.INFO].concat(...arguments));
   }
 
