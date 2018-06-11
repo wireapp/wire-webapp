@@ -58,8 +58,16 @@ z.calling.entities.CallEntity = class CallEntity {
     const {mediaStreamHandler, mediaRepository, selfStreamState, telemetry, userRepository} = this.callingRepository;
     this.messageLog = this.callingRepository.messageLog;
 
-    const callLoggerName = `z.calling.entities.CallEntity (${conversationId})`;
+    const callLoggerName = `z.calling.entities.CallEntity - ${conversationId} (${new Date().getMilliseconds()})`;
     this.callLogger = new z.telemetry.calling.CallLogger(callLoggerName, z.config.LOGGER.OPTIONS, this.messageLog);
+
+    this.callLogger.info({
+      data: {
+        default: [conversationId],
+        obfuscated: [this.callLogger.obfuscate(conversationId)],
+      },
+      message: `Created new call entity in conversation {0}`,
+    });
 
     // IDs and references
     this.id = conversationId;
