@@ -78,9 +78,9 @@ z.util.DebugUtil = class DebugUtil {
   }
 
   exportCryptobox() {
-    const clientId = wire.app.repository.client.current_client().id;
+    const clientId = wire.app.repository.client.currentClient().id;
     const userId = wire.app.repository.user.self().id;
-    const fileName = `cryptobox-${userId}-${clientId}.txt`;
+    const fileName = `cryptobox-${userId}-${clientId}.json`;
 
     wire.app.repository.cryptography.cryptobox
       .serialize()
@@ -88,7 +88,7 @@ z.util.DebugUtil = class DebugUtil {
   }
 
   getNotificationFromStream(notificationId, notificationIdSince) {
-    const clientId = wire.app.repository.client.current_client().id;
+    const clientId = wire.app.repository.client.currentClient().id;
 
     const _gotNotifications = ({hasMore, notifications}) => {
       const matchingNotifications = notifications.filter(notification => notification.id === notificationId);
@@ -107,7 +107,7 @@ z.util.DebugUtil = class DebugUtil {
   }
 
   getNotificationsFromStream(remoteUserId, remoteClientId, matchingNotifications = [], notificationIdSince) {
-    const localClientId = wire.app.repository.client.current_client().id;
+    const localClientId = wire.app.repository.client.currentClient().id;
     const localUserId = wire.app.repository.user.self().id;
 
     const _gotNotifications = ({hasMore, notifications}) => {

@@ -244,16 +244,16 @@ z.util.downloadBlob = (blob, fileName, mimeType) => {
   if (mimeType) {
     anchor.type = mimeType;
   }
-  return z.util.downloadContent(anchor, url, fileName);
+  return z.util.downloadFile(anchor, url, fileName);
 };
 
 z.util.downloadText = (text, fileName = 'default.txt') => {
   const anchor = document.createElement('a');
   anchor.href = `data:text/plain;charset=utf-8,${encodeURIComponent(text)}`;
-  return z.util.downloadContent(anchor, fileName);
+  return z.util.downloadFile(anchor, fileName);
 };
 
-z.util.downloadContent = (anchor, fileName) => {
+z.util.downloadFile = (anchor, fileName) => {
   anchor.download = fileName;
   anchor.style = 'display: none';
 
