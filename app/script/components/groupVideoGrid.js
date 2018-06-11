@@ -41,8 +41,10 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
 
     this.minimized = minimized;
 
-    const gridElementsCount = ko.pureComputed(() => this.grid().filter(id => id !== 0).length);
-    this.hasBlackBackground = this.minimized && gridElementsCount > 1;
+    this.hasBlackBackground = ko.pureComputed(() => {
+      const gridElementsCount = this.grid().filter(id => id !== 0).length;
+      return this.minimized && gridElementsCount > 1;
+    });
 
     this.scaleVideos = this.scaleVideos.bind(this, rootElement);
 
@@ -142,7 +144,7 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
 ko.components.register('group-video-grid', {
   template: `
       <div class="group-video" data-bind="template: {afterRender: scaleVideos}">
-        <div class="group-video-grid" data-bind="foreach: {data: grid, as: 'id'}, css: {'group-video-grid--black-background': hasBlackBackground}">
+        <div class="group-video-grid" data-bind="foreach: {data: grid, as: 'id'}, css: {'group-video-grid--black-background': hasBlackBackground()}">
           <!-- ko if: id !== 0 -->
             <div class="group-video-grid__element" data-bind="css: $parent.getClassNameForVideo($index(), $parent.getStreamInfo(id).isSelf && $parent.getStreamInfo(id).videoSend()), attr: {'data-uie-name': 'item-grid', 'data-uie-value': $parent.getUIEValueForVideo($index())}">
               <video autoplay class="group-video-grid__element-video" data-bind="sourceStream: $parent.getStreamInfo(id).stream, muteMediaElement: $parent.getStreamInfo(id).stream">
