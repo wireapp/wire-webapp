@@ -86,9 +86,9 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
 
       const isInMinimizedState = this.multitasking.isMinimized() || !this.isConnected();
       const hasPreJoinVideo = !this.isConnected() && this.call().selfState.videoSend();
-      const isInActiveVideoCall = this.isConnected() && this.isVideoCall() && !this.isDeclined();
+      const isOngoingVideoCall = this.isConnected() && this.isVideoCall() && !this.isDeclined();
 
-      return !hasOtherOngoingCalls && isInMinimizedState && (hasPreJoinVideo || isInActiveVideoCall);
+      return !hasOtherOngoingCalls && isInMinimizedState && (hasPreJoinVideo || isOngoingVideoCall);
     });
 
     this.showMaximize = ko.pureComputed(() => this.multitasking.isMinimized() && this.isConnected());
