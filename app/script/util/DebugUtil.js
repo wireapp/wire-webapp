@@ -78,9 +78,13 @@ z.util.DebugUtil = class DebugUtil {
   }
 
   exportCryptobox() {
+    const clientId = wire.app.repository.client.current_client().id;
+    const userId = wire.app.repository.user.self().id;
+    const fileName = `cryptobox-${userId}-${clientId}.txt`;
+
     wire.app.repository.cryptography.cryptobox
       .serialize()
-      .then(cryptobox => z.util.downloadText(JSON.stringify(cryptobox)));
+      .then(cryptobox => z.util.downloadText(JSON.stringify(cryptobox), fileName));
   }
 
   getNotificationFromStream(notificationId, notificationIdSince) {
