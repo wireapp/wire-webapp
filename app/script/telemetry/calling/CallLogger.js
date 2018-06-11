@@ -45,7 +45,9 @@ z.telemetry.calling.CallLogger = class CallLogger {
     };
   }
 
-  constructor(name, options, messageLog) {
+  constructor(name, id, options, messageLog) {
+    name = id ? this._createName(name, id) : name;
+
     this.logger = new z.util.Logger(name, options);
     this.levels = this.logger.levels;
 
@@ -133,6 +135,10 @@ z.telemetry.calling.CallLogger = class CallLogger {
       logMessage = this.safeGuard(logMessage);
       this.messageLog.push(logMessage);
     }
+  }
+
+  _createName(name, id) {
+    return `${name} - ${this.obfuscate(id)} (${new Date().getMilliseconds()})`;
   }
 
   _isHardObfuscationMode() {
