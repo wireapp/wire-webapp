@@ -85,10 +85,10 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
       });
 
       const isInMinimizedState = this.multitasking.isMinimized() || !this.isConnected();
-      const isSelfVideoPreview = !this.isConnected() && this.call().selfState.videoSend();
+      const hasPreJoinVideo = !this.isConnected() && this.call().selfState.videoSend();
       const isInActiveVideoCall = this.isConnected() && this.isVideoCall() && !this.isDeclined();
 
-      return !hasOtherOngoingCalls && isInMinimizedState && (isSelfVideoPreview || isInActiveVideoCall);
+      return !hasOtherOngoingCalls && isInMinimizedState && (hasPreJoinVideo || isInActiveVideoCall);
     });
 
     this.showMaximize = ko.pureComputed(() => this.multitasking.isMinimized() && this.isConnected());
