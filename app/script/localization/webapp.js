@@ -114,6 +114,7 @@ z.string.videoCallOverlayMute = 'Mute';
 z.string.videoCallOverlayVideo = 'Video';
 z.string.videoCallOverlayShareScreen = 'Share Screen';
 z.string.videoCallOverlayHangUp = 'Hang Up';
+z.string.videoCallPaused = "Video paused";
 
 // Modals
 // Modals type defaults

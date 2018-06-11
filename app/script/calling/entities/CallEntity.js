@@ -100,7 +100,17 @@ z.calling.entities.CallEntity = class CallEntity {
     this._resetTimer();
 
     // Computed values
+    this.isConnecting = ko.pureComputed(() => this.state() === z.calling.enum.CALL_STATE.CONNECTING);
     this.isDeclined = ko.pureComputed(() => this.state() === z.calling.enum.CALL_STATE.REJECTED);
+    this.isDisconnecting = ko.pureComputed(() => this.state() === z.calling.enum.CALL_STATE.DISCONNECTING);
+    this.isIncoming = ko.pureComputed(() => this.state() === z.calling.enum.CALL_STATE.INCOMING);
+    this.isOngoing = ko.pureComputed(() => this.state() === z.calling.enum.CALL_STATE.ONGOING);
+    this.isOutgoing = ko.pureComputed(() => this.state() === z.calling.enum.CALL_STATE.OUTGOING);
+
+    this.canConnectState = ko.pureComputed(() => z.calling.enum.CALL_STATE_GROUP.CAN_CONNECT.includes(this.state()));
+    this.canJoinState = ko.pureComputed(() => z.calling.enum.CALL_STATE_GROUP.CAN_JOIN.includes(this.state()));
+    this.isActiveState = ko.pureComputed(() => z.calling.enum.CALL_STATE_GROUP.IS_ACTIVE.includes(this.state()));
+    this.isEndedState = ko.pureComputed(() => z.calling.enum.CALL_STATE_GROUP.IS_ENDED.includes(this.state()));
 
     this.isOngoingOnAnotherClient = ko.pureComputed(() => this.selfUserJoined() && !this.selfClientJoined());
     this.isRemoteScreenSend = ko.pureComputed(() => this.remoteMediaType() === z.media.MediaType.SCREEN);
@@ -159,7 +169,7 @@ z.calling.entities.CallEntity = class CallEntity {
       if (!isJoined) {
         this.isConnected(false);
 
-        if (z.calling.enum.CALL_STATE_GROUP.IS_ENDING.includes(this.state())) {
+        if (this.isOngoing() || this.isDisconnecting()) {
           amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.TALK_LATER);
         }
 
@@ -184,11 +194,15 @@ z.calling.entities.CallEntity = class CallEntity {
 
       this._clearStateTimeout();
 
-      if (z.calling.enum.CALL_STATE_GROUP.STOP_RINGING.includes(state)) {
-        this._onStateStopRinging();
-      } else if (z.calling.enum.CALL_STATE_GROUP.IS_RINGING.includes(state)) {
-        const isIncomingCall = state === z.calling.enum.CALL_STATE.INCOMING;
-        this._onStateStartRinging(isIncomingCall);
+      const hasState = state !== z.calling.enum.CALL_STATE.UNKNOWN;
+      if (hasState) {
+        const isUnansweredState = z.calling.enum.CALL_STATE_GROUP.UNANSWERED.includes(state);
+        if (isUnansweredState) {
+          const isIncomingCall = state === z.calling.enum.CALL_STATE.INCOMING;
+          this._onStateStartRinging(isIncomingCall);
+        } else {
+          this._onStateStopRinging();
+        }
       }
 
       const isConnectingCall = state === z.calling.enum.CALL_STATE.CONNECTING;
@@ -243,6 +257,7 @@ z.calling.entities.CallEntity = class CallEntity {
     }
 
     if (this.isGroup) {
+      this.state(z.calling.enum.CALL_STATE.REJECTED);
       this.scheduleGroupCheck();
     }
 
@@ -264,7 +279,7 @@ z.calling.entities.CallEntity = class CallEntity {
    * @returns {void} No return value
    */
   joinCall(mediaType) {
-    if (z.calling.enum.CALL_STATE_GROUP.CAN_CONNECT.includes(this.state())) {
+    if (this.canConnectState()) {
       this.state(z.calling.enum.CALL_STATE.CONNECTING);
     }
     this.setSelfState(true);
@@ -290,9 +305,10 @@ z.calling.entities.CallEntity = class CallEntity {
    * @returns {void} No return value
    */
   _joinGroupCall(mediaType = z.media.MediaType.AUDIO) {
-    const videoSend = mediaType === z.media.MediaType.AUDIO_VIDEO;
-    const response = this.state() !== z.calling.enum.CALL_STATE.OUTGOING;
     const additionalPayload = z.calling.CallMessageBuilder.createPayload(this.id, this.selfUser.id);
+    const videoSend = mediaType === z.media.MediaType.AUDIO_VIDEO;
+
+    const response = !this.isOutgoing();
     const propSync = z.calling.CallMessageBuilder.createPropSync(this.selfState, videoSend, false, additionalPayload);
 
     const callMessageEntity = z.calling.CallMessageBuilder.buildGroupStart(response, this.sessionId, propSync);
@@ -305,8 +321,7 @@ z.calling.entities.CallEntity = class CallEntity {
    * @returns {undefined} No return value
    */
   leaveCall(terminationReason) {
-    const isOngoingCall = this.state() === z.calling.enum.CALL_STATE.ONGOING;
-    if (isOngoingCall && !this.isGroup) {
+    if (this.isOngoing() && !this.isGroup) {
       this.state(z.calling.enum.CALL_STATE.DISCONNECTING);
     }
 
@@ -601,7 +616,8 @@ z.calling.entities.CallEntity = class CallEntity {
    * @returns {undefined} No return value
    */
   _onStateStopRinging() {
-    if (z.calling.enum.CALL_STATE_GROUP.IS_RINGING.includes(this.previousState)) {
+    const wasUnanswered = z.calling.enum.CALL_STATE_GROUP.UNANSWERED.includes(this.previousState);
+    if (wasUnanswered) {
       const wasIncomingCall = this.previousState === z.calling.enum.CALL_STATE.INCOMING;
       this._stopRingTone(wasIncomingCall);
     }

@@ -192,6 +192,7 @@ export function doRegisterWireless(registrationData, options = {shouldInitialize
     dispatch(AuthActionCreator.startRegisterWireless(obfuscatedRegistrationData));
 
     return Promise.resolve()
+      .then(() => dispatch(doSilentLogout()))
       .then(() => apiClient.register(registrationData, clientType))
       .then(newAccount => (createdAccount = newAccount))
       .then(() => core.init())

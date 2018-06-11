@@ -57,7 +57,7 @@ z.viewModel.WindowTitleViewModel = class WindowTitleViewModel {
         });
 
         this.conversationRepository.conversations_calls().forEach(conversationEntity => {
-          if (conversationEntity.has_joinable_call()) {
+          if (conversationEntity.hasJoinableCall()) {
             unreadConversations++;
           }
         });

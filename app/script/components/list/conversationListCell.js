@@ -35,7 +35,7 @@ z.components.ConversationListCell = class ConversationListCell {
       .computed(() => this.cell_state(z.conversation.ConversationCellState.generate(this.conversation)))
       .extend({rateLimit: 500});
 
-    this.showJoinButton = ko.pureComputed(() => this.conversation.hasActiveDeclinedCall());
+    this.showJoinButton = this.conversation.hasJoinableCall;
 
     this.onJoinCall = () => {
       amplify.publish(z.event.WebApp.CALL.STATE.JOIN, this.conversation.id, z.media.MediaType.AUDIO);
@@ -92,7 +92,7 @@ ko.components.register('conversation-list-cell', {
           <!-- /ko -->
         <!-- /ko -->
         <!-- ko if: showJoinButton -->
-          <div class="call-ui__button call-ui__button--green call-ui__button--uppercase" data-bind="click: onJoinCall, l10n_text: z.string.callJoin" data-uie-name="do-call-controls-call-join"></div>
+          <div class="call-ui__button call-ui__button--green call-ui__button--join" data-bind="click: onJoinCall, l10n_text: z.string.callJoin" data-uie-name="do-call-controls-call-join"></div>
         <!-- /ko -->
       </div>
     </div>

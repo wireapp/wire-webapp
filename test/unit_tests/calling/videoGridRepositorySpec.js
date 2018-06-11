@@ -135,9 +135,14 @@ describe('z.calling.VideoGridRepository', () => {
   describe('streams observable', () => {
     it("doesn't contain the user's self video if there is only a single remote stream", () => {
       const selfVideo = {self: true};
-      const remoteVideos = [{stream: {}}];
+      const remoteVideos = [{flowId: 'user-1', stream: {}}];
       groupVideoGrid = new z.calling.VideoGridRepository(
         generateCallingRepository({
+          calls: ko.observableArray([
+            {
+              participants: () => [generateParticipant('user-1', true)],
+            },
+          ]),
           selfStreamState: {
             audioSend: ko.observable(true),
             screenSend: ko.observable(true),
@@ -155,7 +160,7 @@ describe('z.calling.VideoGridRepository', () => {
       );
 
       expect(groupVideoGrid.streams()).not.toContain(selfVideo);
-      expect(groupVideoGrid.thumbnailStream()).toBe(selfVideo);
+      expect(groupVideoGrid.thumbnailStream().stream).toBe(selfVideo);
     });
 
     it('contains only the active videos', () => {
@@ -167,7 +172,13 @@ describe('z.calling.VideoGridRepository', () => {
       groupVideoGrid = new z.calling.VideoGridRepository(
         generateCallingRepository({
           calls: ko.observableArray([
-            {participants: () => [{activeState: {screenSend: () => false, videoSend: () => false}, id: 'user-1'}]},
+            {
+              participants: () => [
+                generateParticipant('user-1'),
+                generateParticipant('user-2', true),
+                generateParticipant('user-3', true),
+              ],
+            },
           ]),
         }),
         generateMediaRepository({
@@ -207,7 +218,7 @@ describe('z.calling.VideoGridRepository', () => {
           })
         );
 
-        expect(groupVideoGrid.streams()).toContain(selfVideo);
+        expect(groupVideoGrid.streams()[0].stream).toBe(selfVideo);
         expect(groupVideoGrid.thumbnailStream()).toBe(undefined);
       });
     });
@@ -232,7 +243,7 @@ describe('z.calling.VideoGridRepository', () => {
         })
       );
 
-      expect(groupVideoGrid.streams()).toEqual([selfStream]);
+      expect(groupVideoGrid.streams()[0].stream).toBe(selfStream);
 
       groupVideoGrid = new z.calling.VideoGridRepository(
         generateCallingRepository({
@@ -271,7 +282,7 @@ describe('z.calling.VideoGridRepository', () => {
           },
         })
       );
-      expect(groupVideoGrid.streams()).toEqual([selfStream]);
+      expect(groupVideoGrid.streams()[0].stream).toBe(selfStream);
     });
   });
 
@@ -299,5 +310,17 @@ describe('z.calling.VideoGridRepository', () => {
     };
 
     return Object.assign({}, defaults, overrides);
+  }
+
+  function generateParticipant(id, videoSend = false, screenSend = false) {
+    return {
+      activeState: {
+        screenSend: () => screenSend,
+        videoSend: () => videoSend,
+      },
+      id,
+      state: {},
+      user: {},
+    };
   }
 });

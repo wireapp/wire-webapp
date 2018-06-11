@@ -35,33 +35,49 @@ z.calling.VideoGridRepository = class VideoGridRepository {
     const selfStreamState = callingRepository.selfStreamState;
     const calls = callingRepository.calls;
     this.grid = ko.observableArray([0, 0, 0, 0]);
-    this.selfId = ko.observable();
     this.thumbnailStream = ko.observable();
-    this.mirrorSelf = ko.pureComputed(() => !selfStreamState.screenSend());
 
     const selfStream = ko.pureComputed(() => {
-      return selfStreamState.videoSend() || selfStreamState.screenSend() ? localMediaStream() : undefined;
+      const hasVideo = selfStreamState.videoSend() || selfStreamState.screenSend();
+      const stream = hasVideo ? localMediaStream() : undefined;
+      return {
+        audioSend: selfStreamState.audioSend,
+        id: stream && stream.id,
+        isSelf: true,
+        stream: stream,
+        videoSend: selfStreamState.videoSend,
+      };
     });
-    this.selfStreamMuted = ko.pureComputed(() => !selfStreamState.audioSend());
 
     this.streams = ko.pureComputed(() => {
-      const noVideoParticipantIds = calls()
+      const videoParticipants = calls()
         .reduce((participants, call) => participants.concat(call.participants()), [])
-        .filter(participant => !(participant.activeState.videoSend() || participant.activeState.screenSend()))
-        .map(participant => participant.id);
+        .filter(participant => participant.activeState.videoSend() || participant.activeState.screenSend());
+
+      const videoParticipantIds = videoParticipants.map(participant => participant.id);
 
       const remoteStreams = streamsInfo()
-        .filter(mediaStreamInfo => !noVideoParticipantIds.includes(mediaStreamInfo.flowId))
-        .map(mediaStreamInfo => mediaStreamInfo.stream);
+        .filter(mediaStreamInfo => videoParticipantIds.includes(mediaStreamInfo.flowId))
+        .map(mediaStreamInfo => {
+          const stream = mediaStreamInfo.stream;
+          const participant = videoParticipants.find(videoParticipant => {
+            return videoParticipant.id === mediaStreamInfo.flowId;
+          });
 
-      this.selfId(selfStream() ? selfStream().id : undefined);
+          return {
+            id: stream.id,
+            picture: participant.user.mediumPictureResource,
+            stream: stream,
+            videoSend: participant.state.videoSend,
+          };
+        });
 
       if (remoteStreams.length === 1) {
         this.thumbnailStream(selfStream());
         return remoteStreams;
       }
       this.thumbnailStream(undefined);
-      return selfStream() ? remoteStreams.concat(selfStream()) : remoteStreams;
+      return selfStream().stream ? remoteStreams.concat(selfStream()) : remoteStreams;
     });
 
     this.streams.subscribe(this.updateGrid.bind(this));
@@ -83,7 +99,7 @@ z.calling.VideoGridRepository = class VideoGridRepository {
    */
   computeGrid(previousGrid, streams) {
     const previousStreamIds = previousGrid.filter(streamId => streamId !== 0);
-    const currentStreamIds = streams.map(participant => participant.id);
+    const currentStreamIds = streams.map(stream => stream.id);
 
     const addedStreamIds = z.util.ArrayUtil.getDifference(previousStreamIds, currentStreamIds);
 

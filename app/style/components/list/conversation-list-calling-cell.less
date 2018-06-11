@@ -59,8 +59,17 @@
       }
     }
 
+    &--join,
     &--participants {
       padding: 0 8px;
+    }
+
+    &--join {
+      font-weight: @font-weight-bold;
+      text-transform: uppercase;
+    }
+
+    &--participants {
       font-weight: @font-weight-regular;
 
       chevron-icon {
@@ -80,11 +89,6 @@
 
     &--large {
       width: 64px;
-    }
-
-    &--uppercase {
-      padding: 0 8px;
-      text-transform: uppercase;
     }
 
     &--green,
@@ -109,14 +113,13 @@
   }
   &__participant-list {
     max-height: 184px;
+    overflow-x: hidden;
     overflow-y: scroll;
 
     &__wrapper {
       overflow: hidden;
-      // TODO: antiscroll will be added later
       max-height: 0;
       color: @graphite-dark;
-      transition: max-height @animation-timing-fast ease-in-out;
 
       &::before {
         display: block;
@@ -134,9 +137,7 @@
       height: 40px;
       cursor: default;
       fill: @graphite-dark;
-      opacity: 0;
       pointer-events: none;
-      transition: opacity @animation-timing-fast ease-in-out;
 
       .participant-item-image {
         width: 48px;
@@ -164,10 +165,6 @@
       camera-icon svg {
         width: 12px;
       }
-    }
-
-    &__wrapper--active .participant-item {
-      opacity: 1;
     }
   }
 
@@ -257,55 +254,6 @@ conversation-list-calling-cell:first-of-type {
   &-right {
     display: flex;
   }
-}
-
-.conversation-list-calling-cell-participants {
-  position: relative;
-  display: flex;
-  height: 24px;
-  align-items: center;
-  padding-right: 16px;
-  padding-left: 16px;
-}
-
-.conversation-list-calling-cell-participant {
-  cursor: default;
-
-  & + & {
-    margin-left: 8px;
-  }
-}
-
-.conversation-list-calling-cell-controls-on-call {
-  margin-right: auto;
-  margin-left: 0;
-}
-
-.conversation-list-calling-cell-controls-button {
-  min-width: 40px;
-  height: 24px;
-  padding-right: 8px;
-  padding-left: 8px;
-  background-color: fade(@graphite-dark, 8%);
-  border-radius: 12px;
-  color: @graphite-dark;
-  cursor: pointer;
-  font-size: 12px;
-  line-height: 24px;
-  user-select: none;
-
-  &-large {
-    min-width: 64px;
-  }
-
-  & + & {
-    margin-left: 8px;
-  }
-}
-
-.conversation-list-calling-cell-controls-join-button {
-  .fill-green;
-  .label-bold;
 }
 
 @keyframes show-call-ui {

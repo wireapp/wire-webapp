@@ -72,22 +72,19 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
 
     this.videodCall = ko.pureComputed(() => {
       for (const callEntity of this.calls()) {
-        const isActiveCall = z.calling.enum.CALL_STATE_GROUP.IS_ACTIVE.includes(callEntity.state());
         const selfScreenSend = callEntity.selfClientJoined() && this.selfStreamState.screenSend();
         const selfVideoSend = selfScreenSend || this.selfStreamState.videoSend();
         const remoteVideoSend = callEntity.isRemoteVideoCall() && !callEntity.isOngoingOnAnotherClient();
         const isVideoCall = selfVideoSend || remoteVideoSend || this.isChoosingScreen();
 
-        if (isActiveCall && isVideoCall) {
+        if (callEntity.isActiveState() && isVideoCall) {
           return callEntity;
         }
       }
     });
 
     this.isCallOngoing = ko.pureComputed(() => {
-      return this.joinedCall()
-        ? this.videodCall() && this.joinedCall().state() === z.calling.enum.CALL_STATE.ONGOING
-        : false;
+      return this.joinedCall() ? this.videodCall() && this.joinedCall().isOngoing() : false;
     });
 
     this.overlayIconClass = ko.pureComputed(() => {

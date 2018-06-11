@@ -74,6 +74,9 @@ class ConversationJoin extends Component {
   };
 
   readAndUpdateParamsFromUrl = nextProps => {
+    if (this.isPwaSupportedBrowser()) {
+      this.setState({forceNewTemporaryGuestAccount: true});
+    }
     const conversationCode = getURLParameter(QUERY_KEY.CONVERSATION_CODE);
     const conversationKey = getURLParameter(QUERY_KEY.CONVERSATION_KEY);
     const expiresIn = parseInt(getURLParameter(QUERY_KEY.JOIN_EXPIRES), 10) || undefined;
@@ -274,17 +277,19 @@ class ConversationJoin extends Component {
             {error ? parseValidationErrors(error) : parseError(this.props.error)}
           </ErrorMessage>
         </Form>
-        <Small block>
-          {`${_(conversationJoinStrings.hasAccount)} `}
-          <Link
-            component={RRLink}
-            to={`${ROUTE.LOGIN}/${this.state.conversationKey}/${this.state.conversationCode}`}
-            textTransform={'none'}
-            data-uie-name="go-login"
-          >
-            {_(conversationJoinStrings.loginLink)}
-          </Link>
-        </Small>
+        {!this.isPwaSupportedBrowser() && (
+          <Small block>
+            {`${_(conversationJoinStrings.hasAccount)} `}
+            <Link
+              component={RRLink}
+              to={`${ROUTE.LOGIN}/${this.state.conversationKey}/${this.state.conversationCode}`}
+              textTransform={'none'}
+              data-uie-name="go-login"
+            >
+              {_(conversationJoinStrings.loginLink)}
+            </Link>
+          </Small>
+        )}
       </ContainerXS>
     );
   };

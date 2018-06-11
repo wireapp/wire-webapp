@@ -110,6 +110,10 @@
         height: 0;
       }
 
+      &--rounded video {
+        border-radius: 8px;
+      }
+
       &-video {
         position: absolute;
         top: 50%;
@@ -126,7 +130,8 @@
       }
     }
 
-    &__mute-overlay {
+    &__mute-overlay,
+    &__pause-overlay {
       position: absolute;
       top: 0;
       left: 0;
@@ -136,9 +141,27 @@
       align-items: center;
       justify-content: center;
       background-color: fade(@graphite-dark, 16%);
+      transform: translateZ(0);
 
       svg path {
         fill: #fff;
+      }
+
+      &__label {
+        z-index: 1;
+        max-width: 50%;
+        color: #fff;
+        font-size: 14px;
+        font-weight: @font-weight-bold;
+        text-align: center;
+
+        &--minimized {
+          font-size: 11px;
+        }
+      }
+
+      .background {
+        transition: none;
       }
     }
   }

@@ -322,8 +322,7 @@ z.calling.CallingRepository = class CallingRepository {
 
     this.getCallById(conversationId)
       .then(callEntity => {
-        const isOutgoingCall = callEntity.state() === z.calling.enum.CALL_STATE.OUTGOING;
-        if (isOutgoingCall) {
+        if (callEntity.isOutgoing()) {
           throw new z.calling.CallError(z.calling.CallError.TYPE.WRONG_SENDER, 'Remote user leaving outgoing call');
         }
 
@@ -382,8 +381,7 @@ z.calling.CallingRepository = class CallingRepository {
           return callEntity.rejectCall(false);
         }
 
-        const isOutgoingCall = callEntity.state() === z.calling.enum.CALL_STATE.OUTGOING;
-        if (isOutgoingCall) {
+        if (callEntity.isOutgoing()) {
           callEntity.state(z.calling.enum.CALL_STATE.CONNECTING);
         }
 
@@ -1134,8 +1132,7 @@ z.calling.CallingRepository = class CallingRepository {
     const logMessage = `Leaving call in conversation '${conversationId}' triggered by '${terminationReason}'`;
     this.callLogger.info(logMessage, callEntity);
 
-    const isOngoingCall = callEntity.state() === z.calling.enum.CALL_STATE.ONGOING;
-    if (!isOngoingCall) {
+    if (!callEntity.isOngoing()) {
       terminationReason = undefined;
     }
 
@@ -1541,7 +1538,7 @@ z.calling.CallingRepository = class CallingRepository {
     this.getCallById(conversationId)
       .catch(() => {
         for (const callEntity of this.calls()) {
-          if (!z.calling.enum.CALL_STATE_GROUP.IS_ENDED.includes(callEntity.state())) {
+          if (!callEntity.isEndedState()) {
             return callEntity;
           }
         }
