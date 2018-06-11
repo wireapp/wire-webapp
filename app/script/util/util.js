@@ -232,28 +232,40 @@ z.util.base64ToBlob = base64 => {
 /**
  * Downloads blob using a hidden link element.
  * @param {Blob} blob - Blob to store
- * @param {string} filename - Data will be saved under this name
+ * @param {string} fileName - Data will be saved under this name
  * @param {string} [mimeType] - Mime type of the generated download
  * @returns {number} Timeout identifier
  */
 
-z.util.downloadBlob = (blob, filename, mimeType) => {
+z.util.downloadBlob = (blob, fileName, mimeType) => {
   const url = window.URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  // firefox needs the element to be in the DOM for the download to start
-  // see https://stackoverflow.com/a/32226068
-  document.body.appendChild(link);
-  link.href = url;
-  link.download = filename;
-  link.style = 'display: none';
+  const anchor = document.createElement('a');
+  anchor.href = url;
   if (mimeType) {
-    link.type = mimeType;
+    anchor.type = mimeType;
   }
-  link.click();
+  return z.util.downloadContent(anchor, url, fileName);
+};
 
-  // Wait before removing resource and link. Needed in FF
+z.util.downloadText = (text, fileName = 'default.txt') => {
+  const anchor = document.createElement('a');
+  anchor.href = `data:text/plain;charset=utf-8,${encodeURIComponent(text)}`;
+  return z.util.downloadContent(anchor, fileName);
+};
+
+z.util.downloadContent = (anchor, fileName) => {
+  anchor.download = fileName;
+  anchor.style = 'display: none';
+
+  // Firefox needs the element to be in the DOM for the download to start:
+  // @see https://stackoverflow.com/a/32226068
+  document.body.appendChild(anchor);
+  anchor.click();
+
+  // Wait before removing resource and link. Needed in FF.
   return window.setTimeout(() => {
-    document.body.removeChild(link);
+    const url = anchor.href;
+    document.body.removeChild(anchor);
     window.URL.revokeObjectURL(url);
   }, 100);
 };
