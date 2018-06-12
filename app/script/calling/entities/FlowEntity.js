@@ -31,10 +31,6 @@ z.calling.entities.FlowEntity = class FlowEntity {
       NEGOTIATION_RESTART_TIMEOUT: 2500,
       SDP_SEND_TIMEOUT: 5 * 1000,
       SDP_SEND_TIMEOUT_RESET: 1000,
-      UPGRADE_TRACK_FAILED: [
-        z.calling.CallError.TYPE.NO_REPLACEABLE_TRACK,
-        z.calling.CallError.TYPE.RTP_SENDER_NOT_SUPPORTED,
-      ],
     };
   }
 
@@ -1274,29 +1270,14 @@ z.calling.entities.FlowEntity = class FlowEntity {
    * @returns {Promise<boolean>} Resolves when the replacement capability has been checked
    */
   supportsTrackReplacement(mediaType) {
-    return Promise.resolve()
-      .then(() => {
-        const supportsGetSenders = typeof this.peerConnection.getSenders === 'function';
-        if (supportsGetSenders) {
-          return this._getRtcSender(mediaType);
-        }
-
-        throw new z.calling.CallError(z.calling.CallError.TYPE.RTP_SENDER_NOT_SUPPORTED);
-      })
-      .then(rtpSender => !!rtpSender)
-      .catch(error => {
-        const {name, message, type} = error;
-
-        const isExpectedError = FlowEntity.CONFIG.UPGRADE_TRACK_FAILED.includes(type);
-        if (isExpectedError) {
-          this.callLogger.debug(`Renegotiation required: ${message}`, error);
-          return false;
-        }
-
-        const log = `Failed checking '${mediaType}' track replacement capability: ${name} - ${message}`;
-        this.callLogger.error(log, error);
-        throw error;
-      });
+    return Promise.resolve().then(() => {
+      const supportsGetSenders = typeof this.peerConnection.getSenders === 'function';
+      return supportsGetSenders
+        ? this._getRtcSender(mediaType)
+            .then(rtpSender => !!rtpSender)
+            .catch(() => false)
+        : false;
+    });
   }
 
   /**
