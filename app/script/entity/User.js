@@ -275,8 +275,9 @@ z.entity.User = class User {
   _setRemainingExpirationTime(expirationTime) {
     const MILLISECONDS_IN_MINUTE = 60 * 1000;
     const MILLISECONDS_IN_HOUR = MILLISECONDS_IN_MINUTE * 60;
+    const LIFETIME_HOURS = User.CONFIG.TEMPORARY_GUEST.LIFETIME / MILLISECONDS_IN_HOUR;
 
-    const remainingTime = Math.min(Math.max(expirationTime - Date.now(), 0), 24);
+    const remainingTime = Math.min(Math.max(expirationTime - Date.now(), 0), LIFETIME_HOURS);
     const remainingMinutes = Math.ceil(remainingTime / MILLISECONDS_IN_MINUTE);
 
     let timeLeftText = z.string.userRemainingTimeHours;
