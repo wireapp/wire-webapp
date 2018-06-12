@@ -67,8 +67,8 @@ z.calling.CallingRepository = class CallingRepository {
     this.userRepository = userRepository;
 
     this.messageLog = [];
-    const callLoggerName = 'z.calling.CallingRepository';
-    this.callLogger = new z.telemetry.calling.CallLogger(callLoggerName, z.config.LOGGER.OPTIONS, this.messageLog);
+    const loggerName = 'z.calling.CallingRepository';
+    this.callLogger = new z.telemetry.calling.CallLogger(loggerName, null, z.config.LOGGER.OPTIONS, this.messageLog);
 
     this.selfUserId = ko.pureComputed(() => {
       if (this.userRepository.self()) {
@@ -296,7 +296,7 @@ z.calling.CallingRepository = class CallingRepository {
   }
 
   /**
-   * call group check message handling.
+   * Call group check message handling.
    *
    * @private
    * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.GROUP_CHECK
@@ -310,7 +310,7 @@ z.calling.CallingRepository = class CallingRepository {
   }
 
   /**
-   * call group leave message handling.
+   * Call group leave message handling.
    *
    * @private
    * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.GROUP_LEAVE
@@ -339,7 +339,7 @@ z.calling.CallingRepository = class CallingRepository {
   }
 
   /**
-   * call group setup message handling.
+   * Call group setup message handling.
    *
    * @private
    * @param {z.calling.entities.CallMessageEntity} callMessageEntity - call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.GROUP_SETUP
@@ -360,7 +360,7 @@ z.calling.CallingRepository = class CallingRepository {
   }
 
   /**
-   * call group start message handling.
+   * Call group start message handling.
    *
    * @private
    * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.GROUP_START
@@ -393,7 +393,7 @@ z.calling.CallingRepository = class CallingRepository {
   }
 
   /**
-   * call hangup message handling.
+   * Call hangup message handling.
    *
    * @private
    * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.HANGUP
@@ -418,7 +418,7 @@ z.calling.CallingRepository = class CallingRepository {
   }
 
   /**
-   * call prop-sync message handling.
+   * Call prop-sync message handling.
    *
    * @private
    * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.SETUP
@@ -435,7 +435,7 @@ z.calling.CallingRepository = class CallingRepository {
   }
 
   /**
-   * call reject message handling.
+   * Call reject message handling.
    *
    * @private
    * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.REJECT
@@ -460,7 +460,7 @@ z.calling.CallingRepository = class CallingRepository {
   }
 
   /**
-   * call setup message handling.
+   * Call setup message handling.
    *
    * @private
    * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.SETUP
@@ -492,7 +492,7 @@ z.calling.CallingRepository = class CallingRepository {
   }
 
   /**
-   * call setup message handling.
+   * Call setup message handling.
    *
    * @private
    * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.SETUP
