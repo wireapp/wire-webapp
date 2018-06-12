@@ -200,16 +200,11 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
     };
     this.logger.debug(logMessage, logObject);
 
-    let updatePromise;
-    if (this.joinedCall()) {
-      this._setStreamState(mediaStreamInfo);
-      const flowEntities = this.joinedCall().getFlows();
-      updatePromise = Promise.all(flowEntities.map(flowEntity => flowEntity.updateMediaStream(mediaStreamInfo)));
-    } else {
-      updatePromise = Promise.resolve([mediaStreamInfo]);
-    }
+    const replacePromise = this.joinedCall()
+      ? this._updateJoinedCall(mediaStreamInfo)
+      : Promise.resolve(mediaStreamInfo);
 
-    return updatePromise.then(([updateMediaStreamInfo]) => {
+    return replacePromise.then(updateMediaStreamInfo => {
       const mediaType = !updateMediaStreamInfo.replaced ? type : undefined;
 
       this._setStreamState(updateMediaStreamInfo);
@@ -437,6 +432,22 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
     return false;
   }
 
+  _replaceMediaTrack(mediaStreamInfo, flowEntities) {
+    const replacementPromises = flowEntities.map(flowEntity => flowEntity.replaceMediaTrack(mediaStreamInfo));
+    return Promise.all(replacementPromises).then(() => mediaStreamInfo);
+  }
+
+  _replaceMediaStream(mediaStreamInfo, flowEntities) {
+    return this._upgradeMediaStream(mediaStreamInfo).then(newMediaStreamInfo => {
+      newMediaStreamInfo.replaced = true;
+
+      const upgradePromises = flowEntities.map(flowEntity => {
+        return flowEntity.replaceMediaStream(newMediaStreamInfo, this.localMediaStream());
+      });
+      return Promise.all(upgradePromises).then(() => newMediaStreamInfo);
+    });
+  }
+
   _selectPermissionDeniedWarningType(mediaType) {
     switch (mediaType) {
       case z.media.MediaType.AUDIO: {
@@ -523,6 +534,63 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
       const warningType = this._selectPermissionRequestWarningType(mediaType);
       amplify.publish(z.event.WebApp.WARNING.SHOW, warningType);
     }
+  }
+
+  /**
+   * Update MediaStream used in joined call.
+   *
+   * @private
+   * @param {z.media.MediaStreamInfo} mediaStreamInfo - New MediaStream to use
+   * @returns {Promise} Resolves when MediaStream was replaced
+   */
+  _updateJoinedCall(mediaStreamInfo) {
+    this._setStreamState(mediaStreamInfo);
+    const flowEntities = this.joinedCall().getFlows();
+    const [firstFlowEntity] = flowEntities;
+
+    return firstFlowEntity
+      .supportsTrackReplacement(mediaStreamInfo.type)
+      .then(replacementSupported => {
+        return replacementSupported
+          ? this._replaceMediaTrack(mediaStreamInfo, flowEntities)
+          : this._replaceMediaStream(mediaStreamInfo, flowEntities);
+      })
+      .catch(error => {
+        const logMessage = `Failed to replace the '${mediaStreamInfo.type}' track: ${error.name} - ${error.message}`;
+        this.logger.error(logMessage, error);
+        throw error;
+      });
+  }
+
+  /**
+   * Upgrade the local MediaStream with new MediaStreamTracks.
+   *
+   * @private
+   * @param {z.media.MediaStreamInfo} mediaStreamInfo - MediaStreamInfo containing new MediaStreamTracks
+   * @returns {Promise<z.media.MediaStreamInfo>} Resolves with new MediaStream to be used
+   */
+  _upgradeMediaStream(mediaStreamInfo) {
+    if (!this.localMediaStream()) {
+      return Promise.reject(new z.media.MediaError(z.media.MediaError.TYPE.STREAM_NOT_FOUND));
+    }
+
+    const {stream: newMediaStream, type: mediaType} = mediaStreamInfo;
+    z.media.MediaStreamHandler.getMediaTracks(this.localMediaStream(), mediaType).forEach(mediaStreamTrack => {
+      this.localMediaStream().removeTrack(mediaStreamTrack);
+      mediaStreamTrack.stop();
+      this.logger.debug(`Stopping MediaStreamTrack of kind '${mediaStreamTrack.kind}' successful`, mediaStreamTrack);
+    });
+
+    const clonedMediaStream = this.localMediaStream().clone();
+    // Reset MediaStreamTrack enabled states as older Chrome versions fail to copy these when cloning
+    this._setStreamState(clonedMediaStream);
+
+    z.media.MediaStreamHandler.getMediaTracks(newMediaStream, mediaType).forEach(mediaStreamTrack => {
+      clonedMediaStream.addTrack(mediaStreamTrack);
+    });
+
+    this.logger.info(`Upgraded the MediaStream to update '${mediaType}'`, clonedMediaStream);
+    return Promise.resolve(new z.media.MediaStreamInfo(z.media.MediaStreamSource.LOCAL, 'self', clonedMediaStream));
   }
 
   //##############################################################################
