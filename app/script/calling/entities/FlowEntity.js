@@ -52,8 +52,8 @@ z.calling.entities.FlowEntity = class FlowEntity {
     this.conversationId = this.callEntity.id;
     this.messageLog = this.participantEntity.messageLog;
 
-    const callLoggerName = `z.calling.entities.FlowEntity - ${this.id} (${new Date().getMilliseconds()})`;
-    this.callLogger = new z.telemetry.calling.CallLogger(callLoggerName, z.config.LOGGER.OPTIONS, this.messageLog);
+    const loggerName = 'z.calling.entities.FlowEntity';
+    this.callLogger = new z.telemetry.calling.CallLogger(loggerName, this.id, z.config.LOGGER.OPTIONS, this.messageLog);
 
     // States
     this.isAnswer = ko.observable(false);
