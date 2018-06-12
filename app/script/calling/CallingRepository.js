@@ -408,11 +408,7 @@ z.calling.CallingRepository = class CallingRepository {
         .then(callEntity => callEntity.verifySessionId(callMessageEntity))
         .then(callEntity => this._confirmCallMessage(callEntity, callMessageEntity))
         .then(callEntity => callEntity.deleteParticipant(userId, clientId, terminationReason))
-        .then(callEntity => {
-          if (!callEntity.isGroup) {
-            callEntity.deactivateCall(callMessageEntity, terminationReason);
-          }
-        })
+        .then(callEntity => callEntity.participantLeft(callMessageEntity, terminationReason))
         .catch(this._throwMessageError);
     }
   }
