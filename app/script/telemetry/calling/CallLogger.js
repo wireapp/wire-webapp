@@ -60,15 +60,13 @@ z.telemetry.calling.CallLogger = class CallLogger {
 
   obfuscate(string) {
     if (string) {
-      if (this._isSoftObfuscationMode()) {
-        return string.substr(0, CallLogger.CONFIG.OBFUSCATION_TRUNCATE_TO);
-      }
-
       if (this._isHardObfuscationMode()) {
         return CryptoJS.SHA256(string)
           .toString()
           .substr(0, CallLogger.CONFIG.OBFUSCATION_TRUNCATE_TO);
       }
+
+      return string.substr(0, CallLogger.CONFIG.OBFUSCATION_TRUNCATE_TO);
     }
   }
 
@@ -110,16 +108,25 @@ z.telemetry.calling.CallLogger = class CallLogger {
     switch (number) {
       case CallLogger.LOG_LEVEL.LEVEL_1:
       case CallLogger.LOG_LEVEL.LEVEL_2:
-      case CallLogger.LOG_LEVEL.LEVEL_3:
+      case CallLogger.LOG_LEVEL.LEVEL_3: {
         return 'VERBOSE';
-      case CallLogger.LOG_LEVEL.DEBUG:
+      }
+
+      case CallLogger.LOG_LEVEL.DEBUG: {
         return 'DEBUG';
-      case CallLogger.LOG_LEVEL.INFO:
+      }
+
+      case CallLogger.LOG_LEVEL.INFO: {
         return 'INFO';
-      case CallLogger.LOG_LEVEL.WARNING:
-        return 'WARNING';
-      case CallLogger.LOG_LEVEL.ERROR:
+      }
+
+      case CallLogger.LOG_LEVEL.WARNING: {
+        return 'INFO';
+      }
+
+      case CallLogger.LOG_LEVEL.ERROR: {
         return 'ERROR';
+      }
     }
   }
 
@@ -143,10 +150,6 @@ z.telemetry.calling.CallLogger = class CallLogger {
 
   _isHardObfuscationMode() {
     return this.obfuscationMode === CallLogger.OBFUSCATION_MODE.HARD;
-  }
-
-  _isSoftObfuscationMode() {
-    return this.obfuscationMode === CallLogger.OBFUSCATION_MODE.SOFT;
   }
 
   debug() {
