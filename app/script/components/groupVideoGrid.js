@@ -76,13 +76,12 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
       const handleLoadEvent = event => {
         const video = event.target;
         setScale(video, containerRatio);
-        video.removeEventListener(event.type, handleLoadEvent);
       };
 
       if (videoElement.videoWidth > 0) {
         setScale(videoElement, containerRatio);
       } else {
-        videoElement.addEventListener('loadedmetadata', handleLoadEvent);
+        videoElement.addEventListener('loadedmetadata', handleLoadEvent, {once: true});
       }
     });
   }

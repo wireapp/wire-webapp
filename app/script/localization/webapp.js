@@ -103,6 +103,7 @@ z.string.authErrorSignIn = 'Please verify your details and try again.';
 z.string.callStateOutgoing = 'Ringing…';
 z.string.callStateConnecting = 'Connecting…';
 z.string.callStateIncoming = 'Calling…';
+z.string.callStateIncomingGroup = '{{user}} is calling';
 z.string.callDecline = 'Decline';
 z.string.callAccept = 'Accept';
 z.string.callJoin = 'Join';
