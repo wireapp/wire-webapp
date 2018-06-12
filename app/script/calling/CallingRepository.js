@@ -861,11 +861,12 @@ z.calling.CallingRepository = class CallingRepository {
   /**
    * User action to reject incoming call.
    * @param {string} conversationId - ID of conversation to ignore call in
+   * @param {boolean} shareRejection - Send rejection to other clients
    * @returns {undefined} No return value
    */
-  rejectCall(conversationId) {
+  rejectCall(conversationId, shareRejection = true) {
     this.getCallById(conversationId)
-      .then(callEntity => this._rejectCall(callEntity))
+      .then(callEntity => this._rejectCall(callEntity, shareRejection))
       .catch(error => this._handleNotFoundError(error));
   }
 
@@ -1144,11 +1145,12 @@ z.calling.CallingRepository = class CallingRepository {
    *
    * @private
    * @param {CallEntity} callEntity - Call entity to ignore
+   * @param {boolean} shareRejection - Share rejection with other clients
    * @returns {undefined} No return value
    */
-  _rejectCall(callEntity) {
+  _rejectCall(callEntity, shareRejection) {
     this.callLogger.info(`Rejecting call in conversation '${callEntity.id}'`, callEntity);
-    callEntity.rejectCall(true);
+    callEntity.rejectCall(shareRejection);
   }
 
   /**

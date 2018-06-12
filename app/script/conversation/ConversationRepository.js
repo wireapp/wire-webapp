@@ -3202,12 +3202,20 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     this.conversation_mapper.update_self_status(conversationEntity, eventData);
 
-    if (previouslyArchived && !conversationEntity.is_archived()) {
+    const wasUnarchived = previouslyArchived && !conversationEntity.is_archived();
+    if (wasUnarchived) {
       return this._fetch_users_and_events(conversationEntity);
     }
 
     if (conversationEntity.is_cleared()) {
       this._clear_conversation(conversationEntity, conversationEntity.cleared_timestamp());
+    }
+
+    if (conversationEntity.is_muted()) {
+      const hasIncomingCall = conversationEntity.call() && conversationEntity.call().isIncoming();
+      if (hasIncomingCall) {
+        amplify.publish(z.event.WebApp.CALL.STATE.REJECT, conversationEntity.id, false);
+      }
     }
 
     if (isActiveConversation && (conversationEntity.is_archived() || conversationEntity.is_cleared())) {
