@@ -239,22 +239,33 @@ z.util.base64ToBlob = base64 => {
 
 z.util.downloadBlob = (blob, filename, mimeType) => {
   const url = window.URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  // firefox needs the element to be in the DOM for the download to start
-  // see https://stackoverflow.com/a/32226068
-  document.body.appendChild(link);
-  link.href = url;
-  link.download = filename;
-  link.style = 'display: none';
-  if (mimeType) {
-    link.type = mimeType;
-  }
-  link.click();
+  return z.util.downloadFile(url, filename, mimeType);
+};
 
-  // Wait before removing resource and link. Needed in FF
+z.util.downloadText = (text, filename = 'default.txt') => {
+  const url = `data:text/plain;charset=utf-8,${encodeURIComponent(text)}`;
+  return z.util.downloadFile(url, filename);
+};
+
+z.util.downloadFile = (url, fileName, mimeType) => {
+  const anchor = document.createElement('a');
+  anchor.download = fileName;
+  anchor.href = url;
+  anchor.style = 'display: none';
+  if (mimeType) {
+    anchor.type = mimeType;
+  }
+
+  // Firefox needs the element to be in the DOM for the download to start:
+  // @see https://stackoverflow.com/a/32226068
+  document.body.appendChild(anchor);
+  anchor.click();
+
+  // Wait before removing resource and link. Needed in FF.
   return window.setTimeout(() => {
-    document.body.removeChild(link);
-    window.URL.revokeObjectURL(url);
+    const objectURL = anchor.href;
+    document.body.removeChild(anchor);
+    window.URL.revokeObjectURL(objectURL);
   }, 100);
 };
 
