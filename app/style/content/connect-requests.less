@@ -34,6 +34,7 @@
   display: flex;
   width: 100%;
   max-width: @conversation-max-width;
+  min-height: 100vh;
   flex-direction: column;
   align-items: center;
 }
@@ -46,13 +47,17 @@
   padding-top: 40px;
   padding-bottom: 40px;
 
+  > * {
+    flex-shrink: 0;
+  }
+
   & + & {
     border-top: 1px solid fade(#000, 8%);
   }
 
   &:only-child {
-    height: 100vh;
     justify-content: center;
+    margin: auto;
   }
 }
 

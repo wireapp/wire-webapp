@@ -22,15 +22,15 @@
     <!-- ko if: showCallControls() -->
       <div class="conversation-title-bar-icons">
         <!-- ko if: supportsVideoCall() -->
-          <span class="conversation-title-bar-icon button-icon-large icon-video"
+          <camera-icon class="conversation-title-bar-icon"
                 data-bind="click: clickOnVideoButton, l10n_tooltip: z.string.tooltipConversationVideoCall"
                 data-uie-name="do-video-call">
-          </span>
+          </camera-icon>
         <!-- /ko -->
-        <span class="conversation-title-bar-icon button-icon-large icon-call"
+        <pickup-icon class="conversation-title-bar-icon"
               data-bind="click: clickOnCallButton, l10n_tooltip: z.string.tooltipConversationCall"
               data-uie-name="do-call">
-        </span>
+        </pickup-icon>
       </div>
     <!-- /ko -->
 
