@@ -842,7 +842,10 @@ z.calling.CallingRepository = class CallingRepository {
    */
   leaveCall(conversationId, terminationReason) {
     this.getCallById(conversationId)
-      .then(callEntity => this._leaveCall(callEntity, terminationReason))
+      .then(callEntity => {
+        const leftConversation = terminationReason === z.calling.enum.TERMINATION_REASON.MEMBER_LEAVE;
+        return leftConversation ? this._deleteCall(callEntity) : this._leaveCall(callEntity, terminationReason);
+      })
       .catch(error => this._handleNotFoundError(error));
   }
 
