@@ -31,6 +31,10 @@ z.calling.entities.FlowEntity = class FlowEntity {
       NEGOTIATION_RESTART_TIMEOUT: 2500,
       SDP_SEND_TIMEOUT: 5 * 1000,
       SDP_SEND_TIMEOUT_RESET: 1000,
+      UPGRADE_TRACK_FAILED: [
+        z.calling.CallError.TYPE.NO_REPLACEABLE_TRACK,
+        z.calling.CallError.TYPE.RTP_SENDER_NOT_SUPPORTED,
+      ],
     };
   }
 
@@ -1222,25 +1226,77 @@ z.calling.entities.FlowEntity = class FlowEntity {
   //##############################################################################
 
   /**
-   * Update the local MediaStream.
+   * Replace the MediaStream attached to the PeerConnection.
+   *
+   * @private
    * @param {z.media.MediaStreamInfo} mediaStreamInfo - Object containing the required MediaStream information
-   * @returns {Promise} Resolves when the updated MediaStream is used
+   * @param {MediaStream} outdatedMediaStream - Previous MediaStream
+   * @returns {Promise} Resolves when negotiation has been restarted
    */
-  updateMediaStream(mediaStreamInfo) {
-    return this._replaceMediaTrack(mediaStreamInfo).catch(error => {
-      const {message, type} = error;
-      const expectedErrorTypes = [
-        z.calling.CallError.TYPE.NO_REPLACEABLE_TRACK,
-        z.calling.CallError.TYPE.RTP_SENDER_NOT_SUPPORTED,
-      ];
+  replaceMediaStream(mediaStreamInfo, outdatedMediaStream) {
+    return Promise.resolve()
+      .then(() => this._removeMediaStream(outdatedMediaStream))
+      .then(() => {
+        const {stream: mediaStream} = mediaStreamInfo;
+        this.restartNegotiation(z.calling.enum.SDP_NEGOTIATION_MODE.STREAM_CHANGE, false, mediaStream);
+      })
+      .catch(error => {
+        this.callLogger.error(`Failed to replace local MediaStream: ${error.message}`, error);
+        throw error;
+      });
+  }
 
-      const isExpectedError = expectedErrorTypes.includes(type);
-      if (isExpectedError) {
-        this.callLogger.debug(`Replacement of MediaStream and renegotiation necessary: ${message}`, error);
-        return this._replaceMediaStream(mediaStreamInfo);
-      }
-      throw error;
-    });
+  /**
+   * Replace the a MediaStreamTrack attached to the MediaStream of the PeerConnection.
+   *
+   * @private
+   * @param {z.media.MediaStreamInfo} mediaStreamInfo - Object containing the required MediaStream information
+   * @returns {Promise} Resolves when a MediaStreamTrack has been replaced
+   */
+  replaceMediaTrack(mediaStreamInfo) {
+    const {stream: mediaStream, type: mediaType} = mediaStreamInfo;
+    const [mediaStreamTrack] = mediaStream.getTracks();
+
+    return Promise.resolve()
+      .then(() => this._getRtcSender(mediaType))
+      .then(rtpSender => rtpSender.replaceTrack(mediaStreamTrack))
+      .then(() => {
+        this.callLogger.debug(`Replaced the '${mediaType}' track`);
+        return mediaStreamInfo;
+      });
+  }
+
+  /**
+   * Replace the a MediaStreamTrack attached to the MediaStream of the PeerConnection.
+   *
+   * @private
+   * @param {z.media.MediaType} mediaType - Type to check replacement capability for
+   * @returns {Promise} Resolves when the replacement capability has been checked
+   */
+  supportsTrackReplacement(mediaType) {
+    return Promise.resolve()
+      .then(() => {
+        const supportsGetSenders = typeof this.peerConnection.getSenders === 'function';
+        if (supportsGetSenders) {
+          return this._getRtcSender(mediaType);
+        }
+
+        throw new z.calling.CallError(z.calling.CallError.TYPE.RTP_SENDER_NOT_SUPPORTED);
+      })
+      .then(rtpSender => !!rtpSender)
+      .catch(error => {
+        const {name, message, type} = error;
+
+        const isExpectedError = FlowEntity.CONFIG.UPGRADE_TRACK_FAILED.includes(type);
+        if (isExpectedError) {
+          this.callLogger.debug(`Renegotiation required: ${message}`, error);
+          return false;
+        }
+
+        const log = `Failed checking '${mediaType}' track replacement capability: ${name} - ${message}`;
+        this.callLogger.error(log, error);
+        throw error;
+      });
   }
 
   /**
@@ -1306,77 +1362,6 @@ z.calling.entities.FlowEntity = class FlowEntity {
   }
 
   /**
-   * Replace the MediaStream attached to the PeerConnection.
-   *
-   * @private
-   * @param {z.media.MediaStreamInfo} mediaStreamInfo - Object containing the required MediaStream information
-   * @returns {Promise} Resolves when MediaStream has been replaced
-   */
-  _replaceMediaStream(mediaStreamInfo) {
-    const mediaType = mediaStreamInfo.type;
-
-    return Promise.resolve()
-      .then(() => this._removeMediaStream(this.mediaStream()))
-      .then(() => this._upgradeMediaStream(mediaStreamInfo))
-      .then(upgradedMediaStreamInfo => {
-        const {stream: mediaStream} = upgradedMediaStreamInfo;
-        upgradedMediaStreamInfo.replaced = true;
-
-        this.callLogger.info(`Upgraded the MediaStream to update '${mediaType}'`, mediaStream);
-        this.restartNegotiation(z.calling.enum.SDP_NEGOTIATION_MODE.STREAM_CHANGE, false, mediaStream);
-        return upgradedMediaStreamInfo;
-      })
-      .catch(error => {
-        this.callLogger.error(`Failed to replace local MediaStream: ${error.message}`, error);
-        throw error;
-      });
-  }
-
-  /**
-   * Replace the a MediaStreamTrack attached to the MediaStream of the PeerConnection.
-   *
-   * @private
-   * @param {z.media.MediaStreamInfo} mediaStreamInfo - Object containing the required MediaStream information
-   * @returns {Promise} Resolves when a MediaStreamTrack has been replaced
-   */
-  _replaceMediaTrack(mediaStreamInfo) {
-    const {stream: mediaStream, type: mediaType} = mediaStreamInfo;
-
-    return Promise.resolve()
-      .then(() => {
-        const supportsGetSenders = typeof this.peerConnection.getSenders === 'function';
-        if (supportsGetSenders) {
-          return this._getRtcSender(mediaType);
-        }
-
-        throw new z.calling.CallError(z.calling.CallError.TYPE.RTP_SENDER_NOT_SUPPORTED);
-      })
-      .then(rtpSender => {
-        const [mediaStreamTrack] = mediaStream.getTracks();
-
-        rtpSender.replaceTrack(mediaStreamTrack);
-      })
-      .then(() => {
-        this.callLogger.debug(`Replaced the '${mediaType}' track`);
-        return mediaStreamInfo;
-      })
-      .catch(error => {
-        const {message, name, type} = error;
-
-        const expectedErrorTypes = [
-          z.calling.CallError.TYPE.NO_REPLACEABLE_TRACK,
-          z.calling.CallError.TYPE.RTP_SENDER_NOT_SUPPORTED,
-        ];
-
-        const isExpectedError = expectedErrorTypes.includes(type);
-        if (!isExpectedError) {
-          this.callLogger.error(`Failed to replace the '${mediaType}' track: ${name} - ${message}`, error);
-        }
-        throw error;
-      });
-  }
-
-  /**
    * Removes a MediaStreamTrack from the PeerConnection.
    *
    * @private
@@ -1436,36 +1421,6 @@ z.calling.entities.FlowEntity = class FlowEntity {
         });
       }
     }
-  }
-
-  /**
-   * Upgrade the local MediaStream with new MediaStreamTracks
-   *
-   * @private
-   * @param {z.media.MediaStreamInfo} mediaStreamInfo - MediaStreamInfo containing new MediaStreamTracks
-   * @returns {z.media.MediaStreamInfo} New MediaStream to be used
-   */
-  _upgradeMediaStream(mediaStreamInfo) {
-    if (this.mediaStream()) {
-      const {stream: newMediaStream, type: mediaType} = mediaStreamInfo;
-
-      z.media.MediaStreamHandler.getMediaTracks(this.mediaStream(), mediaType).forEach(mediaStreamTrack => {
-        this.mediaStream().removeTrack(mediaStreamTrack);
-        mediaStreamTrack.stop();
-        const mediaKind = mediaStreamTrack.kind;
-        this.callLogger.debug(`Stopping MediaStreamTrack of kind '${mediaKind}' successful`, mediaStreamTrack);
-      });
-
-      const mediaStream = this.mediaStream().clone();
-
-      z.media.MediaStreamHandler.getMediaTracks(newMediaStream, mediaType).forEach(mediaStreamTrack => {
-        mediaStream.addTrack(mediaStreamTrack);
-      });
-
-      return new z.media.MediaStreamInfo(z.media.MediaStreamSource.LOCAL, 'self', mediaStream);
-    }
-
-    return mediaStreamInfo;
   }
 
   //##############################################################################
