@@ -1247,7 +1247,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
   }
 
   /**
-   * Replace the a MediaStreamTrack attached to the MediaStream of the PeerConnection.
+   * Replace the MediaStreamTrack attached to the MediaStream of the PeerConnection.
    *
    * @private
    * @param {z.media.MediaStreamInfo} mediaStreamInfo - Object containing the required MediaStream information
@@ -1267,11 +1267,11 @@ z.calling.entities.FlowEntity = class FlowEntity {
   }
 
   /**
-   * Replace the a MediaStreamTrack attached to the MediaStream of the PeerConnection.
+   * Check for support of MediaStreamTrack replacement.
    *
    * @private
    * @param {z.media.MediaType} mediaType - Type to check replacement capability for
-   * @returns {Promise} Resolves when the replacement capability has been checked
+   * @returns {Promise<boolean>} Resolves when the replacement capability has been checked
    */
   supportsTrackReplacement(mediaType) {
     return Promise.resolve()
