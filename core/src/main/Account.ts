@@ -49,6 +49,7 @@ class Account extends EventEmitter {
 
   public static readonly INCOMING = {
     ASSET: 'Account.INCOMING.ASSET',
+    CLIENT_ACTION: 'Account.CLIENT_ACTION',
     CONFIRMATION: 'Account.INCOMING.CONFIRMATION',
     PING: 'Account.INCOMING.PING',
     TEXT_MESSAGE: 'Account.INCOMING.TEXT_MESSAGE',
@@ -76,6 +77,7 @@ class Account extends EventEmitter {
 
     this.protocolBuffers = {
       Asset: root.lookup('Asset'),
+      ClientAction: root.lookup('ClientAction'),
       Confirmation: root.lookup('Confirmation'),
       External: root.lookup('External'),
       GenericMessage: root.lookup('GenericMessage'),
@@ -260,8 +262,10 @@ class Account extends EventEmitter {
 
     switch (event.type) {
       case CONVERSATION_EVENT.OTR_MESSAGE_ADD: {
-        const decodedMessage = await this.decodeGenericMessage(event as ConversationOtrMessageAddEvent);
-        return {...decodedMessage, from, conversation};
+        const otrMessage = event as ConversationOtrMessageAddEvent;
+        const sessionId = CryptographyService.constructSessionId(from, otrMessage.data.sender);
+        const decodedMessage = await this.decodeGenericMessage(otrMessage);
+        return {...decodedMessage, from, conversation, sessionId};
       }
       case CONVERSATION_EVENT.TYPING: {
         return {...event, from, conversation};
@@ -277,6 +281,9 @@ class Account extends EventEmitter {
         switch (data.type) {
           case GenericMessageType.ASSET:
             this.emit(Account.INCOMING.ASSET, data);
+            break;
+          case GenericMessageType.CLIENT_ACTION:
+            this.emit(Account.INCOMING.CLIENT_ACTION, data);
             break;
           case GenericMessageType.CONFIRMATION:
             this.emit(Account.INCOMING.CONFIRMATION, data);

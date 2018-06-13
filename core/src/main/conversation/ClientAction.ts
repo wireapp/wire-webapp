@@ -17,15 +17,8 @@
  *
  */
 
-import {Asset, GenericMessageType} from '../conversation/root';
-
-interface PayloadBundle {
-  content?: string | Asset;
-  conversation: string;
-  from: string;
-  id: string;
-  sessionId: string;
-  type: GenericMessageType;
+enum ClientAction {
+  RESET_SESSION = 0,
 }
 
-export default PayloadBundle;
+export {ClientAction};
