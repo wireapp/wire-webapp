@@ -123,7 +123,9 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
       attributes = Object.assign(
         {
           conversation_participants: conversationEntity.getNumberOfParticipants(),
-          conversation_participants_in_call: this.maxNumberOfParticipants ? this.maxNumberOfParticipants : undefined,
+          conversation_participants_in_call_max: this.maxNumberOfParticipants
+            ? this.maxNumberOfParticipants
+            : undefined,
           conversation_type: isGroup
             ? z.tracking.attribute.ConversationType.GROUP
             : z.tracking.attribute.ConversationType.ONE_TO_ONE,
@@ -165,8 +167,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
         remote_version: this.remote_version,
       };
 
-      const eventName = z.tracking.EventName.CALLING.ENDED_CALL;
-      this.track_event(eventName, callEntity, attributes);
+      this.track_event(z.tracking.EventName.CALLING.ENDED_CALL, callEntity, attributes);
     }
   }
 
