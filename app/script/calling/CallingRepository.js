@@ -1255,9 +1255,9 @@ z.calling.CallingRepository = class CallingRepository {
 
     return this.userRepository
       .get_user_by_id(userId)
-      .then(remoteUserEntity =>
-        this._createCall(callMessageEntity, remoteUserEntity, z.calling.enum.CALL_STATE.INCOMING)
-      )
+      .then(remoteUserEntity => {
+        return this._createCall(callMessageEntity, remoteUserEntity, z.calling.enum.CALL_STATE.INCOMING);
+      })
       .then(callEntity => {
         const mediaType = this._getMediaTypeFromProperties(properties);
         const conversationName = callEntity.conversationEntity.display_name();
