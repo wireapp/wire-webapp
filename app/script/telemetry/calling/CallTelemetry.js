@@ -30,7 +30,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
 
     this.sessions = {};
     this.remote_version = undefined;
-    this.hasSwitchedAV = false;
+    this.hasToggledAV = false;
 
     this.mediaType = z.media.MediaType.AUDIO;
   }
@@ -85,8 +85,12 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
    */
   initiateNewCall(mediaType = z.media.MediaType.AUDIO) {
     this.mediaType = mediaType;
-    this.hasSwitchedAV = false;
+    this.hasToggledAV = false;
     this.logger.info(`Initiate new call of type '${this.mediaType}'`);
+  }
+
+  setAVToggled() {
+    this.hasToggledAV = true;
   }
 
   /**
@@ -170,7 +174,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
       }
 
       const attributes = {
-        AV_switch_toggled: this.hasSwitchedAV,
+        AV_switch_toggled: this.hasToggledAV,
         duration: duration_bucket,
         duration_sec: duration,
         reason: terminationReason,
