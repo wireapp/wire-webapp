@@ -19,6 +19,7 @@
 
 /* eslint no-magic-numbers: "off" */
 
+const bazinga64 = require('bazinga64');
 const Proteus = require('@wireapp/proteus');
 const {Cryptobox} = require('@wireapp/cryptobox');
 const {MemoryEngine} = require('@wireapp/store-engine');
@@ -71,6 +72,25 @@ describe('Cryptobox', () => {
           done();
         })
         .catch(done.fail);
+    });
+
+    it("throws an error when receiving a PreKey message that was encoded with a PreKey which does not exist anymore on the receiver's side", async () => {
+      const cryptobox = require('./fixtures/qa-break-session/cryptobox');
+      const event = require('./fixtures/qa-break-session/event');
+      const sessionId = `${event.from}@${event.data.sender}`;
+
+      const amountOfAlicePreKeys = Object.keys(cryptobox.prekeys).length;
+      const alice = await createCryptobox('alice', amountOfAlicePreKeys);
+      await alice.create();
+      await alice.deserialize(cryptobox);
+
+      const ciphertext = bazinga64.Decoder.fromBase64(event.data.text).asBytes;
+
+      try {
+        await alice.decrypt(sessionId, ciphertext.buffer);
+      } catch (error) {
+        expect(error.code).toBe(Proteus.errors.ProteusError.CODE.CASE_101);
+      }
     });
   });
 

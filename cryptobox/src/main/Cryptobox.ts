@@ -158,6 +158,21 @@ class Cryptobox extends EventEmitter {
     return this.store.load_prekey(prekey_id);
   }
 
+  public async get_prekey_bundle(
+    preKeyId: number = ProteusKeys.PreKey.MAX_PREKEY_ID
+  ): Promise<ProteusKeys.PreKeyBundle> {
+    const preKey = await this.get_prekey(preKeyId);
+
+    if (!this.identity) {
+      throw new CryptoboxError('No local identity available.');
+    }
+    if (!preKey) {
+      throw new CryptoboxError(`PreKey with ID "${preKeyId}" cannot be found.`);
+    }
+
+    return ProteusKeys.PreKeyBundle.new(this.identity.public_key, preKey);
+  }
+
   public get_serialized_standard_prekeys(): Promise<Array<{id: number; key: string}>> {
     return this.store.load_prekeys().then(prekeys =>
       prekeys
@@ -438,7 +453,7 @@ class Cryptobox extends EventEmitter {
   }
 
   private async importPreKeys(serializedPreKeys: {[sessionId: string]: string}): Promise<void> {
-    this.logger.log(`Importing "${serializedPreKeys.length}" PreKeys...`);
+    this.logger.log(`Importing "${Object.keys(serializedPreKeys).length}" PreKeys...`);
 
     const proteusPreKeys = Object.values(serializedPreKeys).map(preKey => {
       const preKeyBuffer = Decoder.fromBase64(preKey).asBytes.buffer;
@@ -453,7 +468,7 @@ class Cryptobox extends EventEmitter {
   }
 
   private async importSessions(serializedSessions: {[sessionId: string]: string}): Promise<void> {
-    this.logger.log(`Importing "${serializedSessions.length}" sessions...`);
+    this.logger.log(`Importing "${Object.keys(serializedSessions).length}" sessions...`);
 
     for (const sessionId in serializedSessions) {
       const serializedSession = serializedSessions[sessionId];

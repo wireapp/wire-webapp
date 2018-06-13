@@ -33,7 +33,6 @@ class ProteusError extends Error {
     this.code = code;
     this.message = message;
     this.name = this.constructor.name;
-    //this.stack = new Error().stack;
   }
 }
 

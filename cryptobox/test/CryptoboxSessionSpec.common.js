@@ -57,7 +57,7 @@ describe('cryptobox.CryptoboxSession', () => {
     const preKey = await bob.get_prekey(bobPreKeyId);
     const bobBundle = Proteus.keys.PreKeyBundle.new(bob.identity.public_key, preKey);
     // 2. Alice takes Bob's PreKey bundle to initiate a session
-    const sessionWithBob = await alice.session_from_prekey('session-with-bob', bobBundle.serialise());
+    const sessionWithBob = await alice.session_from_prekey('alice-to-bob', bobBundle.serialise());
     return sessionWithBob;
   }
 
@@ -104,6 +104,25 @@ describe('cryptobox.CryptoboxSession', () => {
           done();
         })
         .catch(done.fail);
+    });
+
+    it('always accepts a PreKey message even if there is already an existing session', async () => {
+      // Alice creates a session with Bob and Bob creates a session with Alice by decrypting Alice's message
+      const sessionWithBob = await setupAliceToBob(5, 0);
+      const sessionIdFromBob = 'bob-to-alice';
+      let serialisedCipherText = await sessionWithBob.encrypt(plaintext);
+      let decryptedBuffer = await bob.decrypt(sessionIdFromBob, serialisedCipherText);
+      let decryptedString = sodium.to_string(decryptedBuffer);
+      expect(decryptedString).toBe(plaintext);
+      // Alice deletes the session with Bob and creates a new one with another PreKey from Bob
+      const sessionIdFromAlice = sessionWithBob.id;
+      const message = 'Hello Bob. Nice to see you!';
+      await alice.session_delete(sessionIdFromAlice);
+      const bobBundle = await bob.get_prekey_bundle(1);
+      serialisedCipherText = await alice.encrypt(sessionIdFromAlice, message, bobBundle.serialise());
+      decryptedBuffer = await bob.decrypt(sessionIdFromBob, serialisedCipherText);
+      decryptedString = sodium.to_string(decryptedBuffer);
+      expect(decryptedString).toBe(message);
     });
   });
 
