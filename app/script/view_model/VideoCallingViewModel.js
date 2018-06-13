@@ -85,10 +85,16 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
 
     this.isCallOngoing = ko.pureComputed(() => {
       if (this.joinedCall()) {
-        const isSendingVideo = this.selfStreamState.screenSend() || this.selfStreamState.videoSend();
-        const isVideodCall = isSendingVideo || this.joinedCall().isRemoteVideoCall();
-        return this.joinedCall().isOngoing() && isVideodCall;
+        const isSelfVideoState = this.selfStreamState.screenSend() || this.selfStreamState.videoSend();
+        const isSendingVideo = this.localVideoStream() && isSelfVideoState;
+        const isVideoCall = isSendingVideo || this.joinedCall().isRemoteVideoCall();
+        return this.joinedCall().isOngoing() && isVideoCall;
       }
+    });
+
+    this.showFullscreen = ko.pureComputed(() => {
+      const isFullscreenstate = this.isCallOngoing() || this.isChoosingScreen();
+      return isFullscreenstate && !this.multitasking.isMinimized();
     });
 
     this.overlayIconClass = ko.pureComputed(() => {
