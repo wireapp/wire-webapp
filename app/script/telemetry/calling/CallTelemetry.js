@@ -158,27 +158,9 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
     if (!window.isNaN(duration)) {
       this.logger.info(`Call duration: ${duration} seconds.`, durationTime());
 
-      let duration_bucket;
-      if (duration <= 15) {
-        duration_bucket = '0s-15s';
-      } else if (duration <= 30) {
-        duration_bucket = '16s-30s';
-      } else if (duration <= 60) {
-        duration_bucket = '31s-60s';
-      } else if (duration <= 3 * 60) {
-        duration_bucket = '61s-3min';
-      } else if (duration <= 10 * 60) {
-        duration_bucket = '3min-10min';
-      } else if (duration <= 60 * 60) {
-        duration_bucket = '10min-1h';
-      } else {
-        duration_bucket = '1h-infinite';
-      }
-
       const attributes = {
         AV_switch_toggled: this.hasToggledAV,
-        duration: duration_bucket,
-        duration_sec: duration,
+        duration: duration,
         reason: terminationReason,
         remote_version: this.remote_version,
       };
