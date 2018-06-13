@@ -134,8 +134,10 @@ z.calling.entities.CallEntity = class CallEntity {
       return false;
     });
 
-    ko.pureComputed(() => this.getNumberOfParticipants(this.selfUserJoined())).subscribe(usersInCall => {
-      this.telemetry.numberOfParticipantsChanged(usersInCall);
+    this.participants.subscribe(participants => {
+      const additionalCount = this.selfClientJoined() ? 1 : 0;
+      const numberOfParticipants = participants.length + additionalCount;
+      this.telemetry.numberOfParticipantsChanged(numberOfParticipants);
     });
 
     // Observable subscriptions
@@ -783,16 +785,6 @@ z.calling.entities.CallEntity = class CallEntity {
 
         throw error;
       });
-  }
-
-  /**
-   * Get the number of participants in the call.
-   * @param {boolean} [countSelfUser=false] - Add self user to count
-   * @returns {number} Number of participants in call
-   */
-  getNumberOfParticipants(countSelfUser = false) {
-    const additionalCount = countSelfUser ? 1 : 0;
-    return this.participants().length + additionalCount;
   }
 
   /**
