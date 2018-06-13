@@ -715,7 +715,7 @@ z.calling.entities.CallEntity = class CallEntity {
    */
   addOrUpdateParticipant(userId, negotiate, callMessageEntity) {
     return this.getParticipantById(userId)
-      .then(() => this._updateParticipant(userId, negotiate, callMessageEntity))
+      .then(participantEntity => this._updateParticipant(participantEntity, negotiate, callMessageEntity))
       .catch(error => {
         const isNotFound = error.type === z.calling.CallError.TYPE.NOT_FOUND;
         if (isNotFound) {
@@ -851,54 +851,53 @@ z.calling.entities.CallEntity = class CallEntity {
    * @returns {Promise} Resolves with the added participant
    */
   _addParticipant(userId, negotiate, callMessageEntity) {
-    return this.getParticipantById(userId).catch(error => {
-      const isNotFound = error.type === z.calling.CallError.TYPE.NOT_FOUND;
-      if (!isNotFound) {
-        throw error;
-      }
+    const isSelfUser = userId === this.selfUser.id;
+    if (isSelfUser) {
+      const errorMessage = 'Self user should not be added as call participant';
+      return Promise.reject(new z.calling.CallError(z.calling.CallError.TYPE.WRONG_STATE, errorMessage));
+    }
 
-      return this.userRepository.get_user_by_id(userId).then(userEntity => {
-        const participantEntity = new z.calling.entities.ParticipantEntity(this, userEntity, this.timings);
+    return this.userRepository.get_user_by_id(userId).then(userEntity => {
+      const participantEntity = new z.calling.entities.ParticipantEntity(this, userEntity, this.timings);
 
-        this.participants.push(participantEntity);
+      this.participants.push(participantEntity);
 
-        const logMessage = {
-          data: {
-            default: [userEntity.name()],
-            obfuscated: [this.callLogger.obfuscate(userEntity.id)],
-          },
-          message: `Adding call participant '{0}'`,
-        };
-        this.callLogger.info(logMessage, participantEntity);
-        return this._updateParticipantState(participantEntity, negotiate, callMessageEntity);
-      });
+      const logMessage = {
+        data: {
+          default: [userEntity.name()],
+          obfuscated: [this.callLogger.obfuscate(userEntity.id)],
+        },
+        message: `Adding call participant '{0}'`,
+      };
+      this.callLogger.info(logMessage, participantEntity);
+
+      return this._updateParticipantState(participantEntity, negotiate, callMessageEntity);
     });
   }
 
   /**
    * Update call participant with call message.
    *
-   * @param {string} userId - User ID to be updated in the call
+   * @param {z.calling.entities.ParticipantEntity} participantEntity - Participant entity to be updated in the call
    * @param {boolean} negotiate - Should negotiation be started
    * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message to update user with
    * @returns {Promise} Resolves with the updated participant
    */
-  _updateParticipant(userId, negotiate, callMessageEntity) {
-    return this.getParticipantById(userId).then(participantEntity => {
-      if (callMessageEntity && callMessageEntity.clientId) {
-        participantEntity.verifyClientId(callMessageEntity.clientId);
-      }
+  _updateParticipant(participantEntity, negotiate, callMessageEntity) {
+    if (callMessageEntity && callMessageEntity.clientId) {
+      participantEntity.verifyClientId(callMessageEntity.clientId);
+    }
 
-      const logMessage = {
-        data: {
-          default: [participantEntity.user.name()],
-          obfuscated: [this.callLogger.obfuscate(participantEntity.user.id)],
-        },
-        message: `Updating call participant '{0}'`,
-      };
-      this.callLogger.info(logMessage, callMessageEntity);
-      return this._updateParticipantState(participantEntity, negotiate, callMessageEntity);
-    });
+    const logMessage = {
+      data: {
+        default: [participantEntity.user.name()],
+        obfuscated: [this.callLogger.obfuscate(participantEntity.user.id)],
+      },
+      message: `Updating call participant '{0}'`,
+    };
+    this.callLogger.info(logMessage, callMessageEntity);
+
+    return this._updateParticipantState(participantEntity, negotiate, callMessageEntity);
   }
 
   /**
