@@ -170,7 +170,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
           ? conversationEntity.hasActiveCall() || conversationEntity.hasJoinableCall()
           : conversationEntity.hasActiveCall();
         if (conversationWithCall) {
-          conversationsCalls.push(conversationEntity);
+          if (conversationEntity.call().isOngoing()) {
+            conversationsCalls.unshift(conversationEntity);
+          } else {
+            conversationsCalls.push(conversationEntity);
+          }
         }
         if (conversationEntity.is_cleared()) {
           conversationsCleared.push(conversationEntity);
