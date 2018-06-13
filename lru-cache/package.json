@@ -1,7 +1,7 @@
 {
   "description": "Least Recently Used (LRU) Cache for JavaScript and TypeScript.",
   "devDependencies": {
-    "cross-env": "5.1.4",
+    "cross-env": "5.2.0",
     "istanbul": "1.1.0-alpha.1",
     "jasmine": "3.1.0",
     "rimraf": "2.6.2",
