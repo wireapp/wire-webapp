@@ -47,15 +47,12 @@ z.calling.entities.CallEntity = class CallEntity {
    * @param {z.entity.User} creatingUser - Entity of user starting the call
    * @param {string} sessionId - Session ID to identify call
    * @param {z.calling.CallingRepository} callingRepository - Calling Repository
-   * @param {z.media.MediaType} initialMediaType - The initial type of the call
    */
-  constructor(conversationEntity, creatingUser, sessionId, callingRepository, initialMediaType) {
+  constructor(conversationEntity, creatingUser, sessionId, callingRepository) {
     this.conversationEntity = conversationEntity;
     this.creatingUser = creatingUser;
     this.sessionId = sessionId;
     this.callingRepository = callingRepository;
-
-    this.initialMediaType = initialMediaType;
 
     const {id: conversationId, is_group} = conversationEntity;
     const {mediaStreamHandler, mediaRepository, selfStreamState, telemetry, userRepository} = this.callingRepository;
@@ -428,6 +425,12 @@ z.calling.entities.CallEntity = class CallEntity {
    * @returns {Promise} Resolves when state has been toggled
    */
   toggleMedia(mediaType) {
+    const toggledVideo = mediaType === z.media.MediaType.SCREEN && !this.selfState.videoSend();
+    const toggledScreen = mediaType === z.media.MediaType.VIDEO && !this.selfState.screenSend();
+    if (toggledVideo || toggledScreen) {
+      this.telemetry.hasSwitchedAV = true;
+    }
+
     const callEventPromises = this.getFlows().map(({remoteClientId, remoteUserId}) => {
       const payload = z.calling.CallMessageBuilder.createPayload(
         this.id,

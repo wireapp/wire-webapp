@@ -30,6 +30,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
 
     this.sessions = {};
     this.remote_version = undefined;
+    this.hasSwitchedAV = false;
 
     this.media_type = z.media.MediaType.AUDIO;
   }
@@ -124,7 +125,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
           ].includes(eventName)
             ? this.remote_version
             : undefined,
-          started_as_video: callEntity.initialMediaType === z.media.MediaType.VIDEO,
+          started_as_video: this.media_type === z.media.MediaType.VIDEO,
           with_service: conversationEntity.isWithBot(),
         },
         z.tracking.helpers.getGuestAttributes(conversationEntity),
@@ -166,6 +167,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
       }
 
       const attributes = {
+        AV_switch_toggled: this.hasSwitchedAV,
         duration: duration_bucket,
         duration_sec: duration,
         reason: terminationReason,

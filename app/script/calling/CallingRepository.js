@@ -1228,17 +1228,10 @@ z.calling.CallingRepository = class CallingRepository {
    */
   _createCall(callMessageEntity, creatingUserEntity) {
     const {conversationId, sessionId} = callMessageEntity;
-    const mediaType = this._getMediaTypeFromProperties(callMessageEntity.properties);
 
     return this.getCallById(conversationId).catch(() => {
       return this.conversationRepository.get_conversation_by_id(conversationId).then(conversationEntity => {
-        const callEntity = new z.calling.entities.CallEntity(
-          conversationEntity,
-          creatingUserEntity,
-          sessionId,
-          this,
-          mediaType
-        );
+        const callEntity = new z.calling.entities.CallEntity(conversationEntity, creatingUserEntity, sessionId, this);
 
         this.calls.push(callEntity);
         return callEntity;
