@@ -427,7 +427,7 @@ z.calling.entities.CallEntity = class CallEntity {
     const toggledVideo = mediaType === z.media.MediaType.SCREEN && !this.selfState.videoSend();
     const toggledScreen = mediaType === z.media.MediaType.VIDEO && !this.selfState.screenSend();
     if (toggledVideo || toggledScreen) {
-      this.telemetry.setAVtoggled();
+      this.telemetry.setAVToggled();
     }
 
     const callEventPromises = this.getFlows().map(({remoteClientId, remoteUserId}) => {
