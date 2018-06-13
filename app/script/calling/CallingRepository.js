@@ -408,11 +408,7 @@ z.calling.CallingRepository = class CallingRepository {
         .then(callEntity => callEntity.verifySessionId(callMessageEntity))
         .then(callEntity => this._confirmCallMessage(callEntity, callMessageEntity))
         .then(callEntity => callEntity.deleteParticipant(userId, clientId, terminationReason))
-        .then(callEntity => {
-          if (!callEntity.isGroup) {
-            callEntity.deactivateCall(callMessageEntity, terminationReason);
-          }
-        })
+        .then(callEntity => callEntity.participantLeft(callMessageEntity, terminationReason))
         .catch(this._throwMessageError);
     }
   }
@@ -842,7 +838,10 @@ z.calling.CallingRepository = class CallingRepository {
    */
   leaveCall(conversationId, terminationReason) {
     this.getCallById(conversationId)
-      .then(callEntity => this._leaveCall(callEntity, terminationReason))
+      .then(callEntity => {
+        const leftConversation = terminationReason === z.calling.enum.TERMINATION_REASON.MEMBER_LEAVE;
+        return leftConversation ? this._deleteCall(callEntity) : this._leaveCall(callEntity, terminationReason);
+      })
       .catch(error => this._handleNotFoundError(error));
   }
 
@@ -862,11 +861,12 @@ z.calling.CallingRepository = class CallingRepository {
   /**
    * User action to reject incoming call.
    * @param {string} conversationId - ID of conversation to ignore call in
+   * @param {boolean} shareRejection - Send rejection to other clients
    * @returns {undefined} No return value
    */
-  rejectCall(conversationId) {
+  rejectCall(conversationId, shareRejection = true) {
     this.getCallById(conversationId)
-      .then(callEntity => this._rejectCall(callEntity))
+      .then(callEntity => this._rejectCall(callEntity, shareRejection))
       .catch(error => this._handleNotFoundError(error));
   }
 
@@ -1145,11 +1145,12 @@ z.calling.CallingRepository = class CallingRepository {
    *
    * @private
    * @param {CallEntity} callEntity - Call entity to ignore
+   * @param {boolean} shareRejection - Share rejection with other clients
    * @returns {undefined} No return value
    */
-  _rejectCall(callEntity) {
+  _rejectCall(callEntity, shareRejection) {
     this.callLogger.info(`Rejecting call in conversation '${callEntity.id}'`, callEntity);
-    callEntity.rejectCall(true);
+    callEntity.rejectCall(shareRejection);
   }
 
   /**
@@ -1282,7 +1283,10 @@ z.calling.CallingRepository = class CallingRepository {
           this.injectActivateEvent(callMessageEntity, source);
 
           const eventFromWebSocket = source === z.event.EventRepository.SOURCE.WEB_SOCKET;
-          if (eventFromWebSocket && callEntity.isRemoteVideoSend()) {
+          const hasOtherCalls = this.calls().some(call => call.id !== callEntity.id);
+          const hasCallWithoutVideo = hasOtherCalls && !this.mediaStreamHandler.selfStreamState.videoSend();
+
+          if (eventFromWebSocket && callEntity.isRemoteVideoSend() && !hasCallWithoutVideo) {
             const mediaStreamType = z.media.MediaType.AUDIO_VIDEO;
             this.mediaStreamHandler.initiateMediaStream(callEntity.id, mediaStreamType, callEntity.isGroup);
           }

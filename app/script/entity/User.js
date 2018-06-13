@@ -276,7 +276,7 @@ z.entity.User = class User {
     const MILLISECONDS_IN_MINUTE = 60 * 1000;
     const MILLISECONDS_IN_HOUR = MILLISECONDS_IN_MINUTE * 60;
 
-    const remainingTime = Math.max(expirationTime - Date.now(), 0);
+    const remainingTime = Math.min(Math.max(expirationTime - Date.now(), 0), User.CONFIG.TEMPORARY_GUEST.LIFETIME);
     const remainingMinutes = Math.ceil(remainingTime / MILLISECONDS_IN_MINUTE);
 
     let timeLeftText = z.string.userRemainingTimeHours;

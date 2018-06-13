@@ -84,7 +84,11 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
     });
 
     this.isCallOngoing = ko.pureComputed(() => {
-      return this.joinedCall() ? this.videodCall() && this.joinedCall().isOngoing() : false;
+      if (this.joinedCall()) {
+        const isSendingVideo = this.selfStreamState.screenSend() || this.selfStreamState.videoSend();
+        const isVideodCall = isSendingVideo || this.joinedCall().isRemoteVideoCall();
+        return this.joinedCall().isOngoing() && isVideodCall;
+      }
     });
 
     this.overlayIconClass = ko.pureComputed(() => {

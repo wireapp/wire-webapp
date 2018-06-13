@@ -47,6 +47,9 @@ z.media.MediaError = class MediaError extends Error {
       case MediaError.TYPE.SCREEN_NOT_SUPPORTED:
         this.message = 'Screen sharing is not yet supported by this browser';
         break;
+      case MediaError.TYPE.STREAM_NOT_FOUND:
+        this.message = 'No local MediaStream found';
+        break;
       case MediaError.TYPE.UNHANDLED_MEDIA_TYPE:
         this.message = 'Media type unknown';
         break;
@@ -63,6 +66,7 @@ z.media.MediaError = class MediaError extends Error {
       NO_MEDIA_DEVICES_FOUND: 'MediaError.TYPE.NO_MEDIA_DEVICES_FOUND',
       NO_VIDEO_INPUT_DEVICE_FOUND: 'MediaError.TYPE.NO_VIDEO_INPUT_DEVICE_FOUND',
       SCREEN_NOT_SUPPORTED: 'MediaError.TYPE.SCREEN_NOT_SUPPORTED',
+      STREAM_NOT_FOUND: 'MediaError.TYPE.STREAM_NOT_FOUND',
       UNHANDLED_MEDIA_TYPE: 'MediaError.UNHANDLED_MEDIA_TYPE',
       UNKNOWN: 'MediaError.TYPE.UNKNOWN',
     };
