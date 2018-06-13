@@ -523,28 +523,28 @@
   version "3.0.46"
   resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-3.0.46.tgz#4fa0c29315a7e869d84c5cdb64f9864211f01db9"
 
-"@wireapp/core@3.0.11":
-  version "3.0.11"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-3.0.11.tgz#f546e1a99af12bb69cfe931f82cd821bc0173f82"
+"@wireapp/core@3.1.0":
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-3.1.0.tgz#1fdbceb86dddbde9038e58ce8cd39f0e5641bc5d"
   dependencies:
     "@types/node" "10.3.2"
     "@wireapp/api-client" "1.1.7"
-    "@wireapp/cryptobox" "8.4.2"
+    "@wireapp/cryptobox" "8.4.3"
     "@wireapp/store-engine" "0.11.27"
     bazinga64 "5.2.2"
     logdown "3.2.3"
     protobufjs "6.8.6"
     pure-uuid "1.5.2"
 
-"@wireapp/cryptobox@8.4.2":
-  version "8.4.2"
-  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-8.4.2.tgz#ebe4e968518174eae222270a9199599f4f4047d1"
+"@wireapp/cryptobox@8.4.3":
+  version "8.4.3"
+  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-8.4.3.tgz#580888b733cc05e5c6e0429a7f86ae5b0be519aa"
   dependencies:
     "@types/fs-extra" "5.0.3"
     "@types/node" "10.3.2"
     "@wireapp/lru-cache" "2.1.25"
     "@wireapp/priority-queue" "0.1.43"
-    "@wireapp/proteus" "7.1.58"
+    "@wireapp/proteus" "7.1.59"
     "@wireapp/store-engine" "0.11.27"
     dexie "2.0.4"
     fs-extra "6.0.1"
@@ -560,9 +560,9 @@
     "@types/node" "10.3.2"
     pure-uuid "1.5.2"
 
-"@wireapp/proteus@7.1.58":
-  version "7.1.58"
-  resolved "https://registry.yarnpkg.com/@wireapp/proteus/-/proteus-7.1.58.tgz#3cb42a4dc6156366d811f773232b01574c387201"
+"@wireapp/proteus@7.1.59":
+  version "7.1.59"
+  resolved "https://registry.yarnpkg.com/@wireapp/proteus/-/proteus-7.1.59.tgz#d415b1471d3bbc93a7cda57b0d1a4518a325c01a"
   dependencies:
     "@types/chai" "4.1.3"
     "@types/ed2curve" "0.2.2"
