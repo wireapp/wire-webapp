@@ -85,6 +85,8 @@ z.calling.entities.ParticipantEntity = class ParticipantEntity {
       }),
     };
 
+    this.hasActiveVideo = ko.pureComputed(() => this.activeState.screenSend() || this.activeState.videoSend());
+
     this.flowEntity = new z.calling.entities.FlowEntity(this.callEntity, this, timings);
 
     this.isConnected.subscribe(isConnected => {
