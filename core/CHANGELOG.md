@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="3.1.0"></a>
+# [3.1.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@3.0.11...@wireapp/core@3.1.0) (2018-06-13)
+
+
+### Features
+
+* **core:** Send and receive session reset messages ([#698](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/698)) ([7099ce5](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/7099ce5))
+
+
+
+
 <a name="3.0.11"></a>
 ## [3.0.11](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@3.0.10...@wireapp/core@3.0.11) (2018-06-13)
 
