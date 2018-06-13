@@ -91,14 +91,19 @@ z.string.ru.authErrorSignIn = 'Пожалуйста, проверьте ваши
 z.string.ru.callStateOutgoing = 'Звонит…';
 z.string.ru.callStateConnecting = 'Подключение…';
 z.string.ru.callStateIncoming = 'Звонит…';
+z.string.ru.callStateIncomingGroup = '{{user}} звонит';
 z.string.ru.callDecline = 'Отменить';
 z.string.ru.callAccept = 'Принять';
 z.string.ru.callJoin = 'Присоединиться';
 z.string.ru.callChooseSharedScreen = 'Выберите экран для демонстрации';
 z.string.ru.callParticipants = '{{number}} участвуют(ет) в звонке';
 
-z.string.ru.videoCallOverlayMute = 'Выкл. звук';
+z.string.ru.videoCallOverlayConversations = 'Разговоры';
+z.string.ru.videoCallOverlayMute = 'Выключить уведомления';
+z.string.ru.videoCallOverlayVideo = 'Видео';
+z.string.ru.videoCallOverlayShareScreen = 'Поделиться экраном';
 z.string.ru.videoCallOverlayHangUp = 'Завершить вызов';
+z.string.ru.videoCallPaused="Видео приостановлено";
 
 z.string.ru.modalAcknowledgeAction = 'OK';
 z.string.ru.modalAcknowledgeHeadline = 'Что-то пошло не так';
@@ -352,6 +357,7 @@ z.string.ru.groupCreationParticipantsActionSkip = 'Пропустить';
 z.string.ru.groupCreationParticipantsHeader = 'Добавить людей';
 z.string.ru.groupCreationParticipantsHeaderWithCounter = 'Добавить людей ({{number}})';
 z.string.ru.groupCreationParticipantsPlaceholder = 'Поиск по имени';
+z.string.ru.groupSizeInfo = 'К групповому разговору может присоединиться до {{count}} участников. Видеозвонки работают в группах из 4 участников и меньше.';
 
 z.string.ru.guestRoomConversationName = 'Гостевая комната';
 z.string.ru.guestRoomToggleName = 'Разрешить гостям';
@@ -389,6 +395,7 @@ z.string.ru.conversationsPopoverNotify = 'Вкл. звук';
 z.string.ru.conversationsPopoverSilence = 'Выкл. звук';
 z.string.ru.conversationsPopoverUnarchive = 'Разархивировать беседу';
 
+z.string.ru.conversationsSecondaryLineIncomingCall = '{{user}} звонит';
 z.string.ru.conversationsSecondaryLineMissedCall = '{{number}} пропущенный звонок';
 z.string.ru.conversationsSecondaryLineMissedCalls = '{{number}} пропущенных звонка';
 z.string.ru.conversationsSecondaryLineNewMessage = '{{number}} новое сообщение';
