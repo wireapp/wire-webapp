@@ -101,7 +101,8 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
   }
 
   onJoinCall() {
-    const mediaType = this.call().isRemoteVideoSend() ? z.media.MediaType.AUDIO_VIDEO : z.media.MediaType.AUDIO;
+    const isVideoCall = this.call().isRemoteVideoSend() && this.selfStreamState.videoSend();
+    const mediaType = isVideoCall ? z.media.MediaType.AUDIO_VIDEO : z.media.MediaType.AUDIO;
     amplify.publish(z.event.WebApp.CALL.STATE.JOIN, this.conversation.id, mediaType);
   }
 
