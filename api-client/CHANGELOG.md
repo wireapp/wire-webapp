@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="1.1.7"></a>
+## [1.1.7](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@1.1.6...@wireapp/api-client@1.1.7) (2018-06-13)
+
+
+### Bug Fixes
+
+* **api-client:** Add optional expires_at to User entity ([9cc6d06](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/9cc6d06))
+
+
+
+
 <a name="1.1.6"></a>
 ## [1.1.6](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@1.1.5...@wireapp/api-client@1.1.6) (2018-06-13)
 
