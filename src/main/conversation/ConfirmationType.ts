@@ -22,4 +22,4 @@ enum ConfirmationType {
   READ = 1,
 }
 
-export default ConfirmationType;
+export {ConfirmationType};
