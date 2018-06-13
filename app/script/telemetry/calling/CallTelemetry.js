@@ -31,6 +31,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
     this.sessions = {};
     this.remote_version = undefined;
     this.hasToggledAV = false;
+    this.maxNumberOfParticipants = 0;
 
     this.mediaType = z.media.MediaType.AUDIO;
   }
@@ -86,6 +87,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
   initiateNewCall(mediaType = z.media.MediaType.AUDIO) {
     this.mediaType = mediaType;
     this.hasToggledAV = false;
+    this.maxNumberOfParticipants = 0;
     this.logger.info(`Initiate new call of type '${this.mediaType}'`);
   }
 
@@ -114,14 +116,14 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
    */
   track_event(eventName, callEntity, attributes = {}) {
     if (callEntity) {
-      const {conversationEntity, isGroup, maxNumberOfParticipants, direction} = callEntity;
+      const {conversationEntity, isGroup, direction} = callEntity;
 
       const videoTypes = [z.media.MediaType.VIDEO, z.media.MediaType.AUDIO_VIDEO];
 
       attributes = Object.assign(
         {
           conversation_participants: conversationEntity.getNumberOfParticipants(),
-          conversation_participants_in_call: maxNumberOfParticipants ? maxNumberOfParticipants : undefined,
+          conversation_participants_in_call: this.maxNumberOfParticipants ? this.maxNumberOfParticipants : undefined,
           conversation_type: isGroup
             ? z.tracking.attribute.ConversationType.GROUP
             : z.tracking.attribute.ConversationType.ONE_TO_ONE,
@@ -184,5 +186,9 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
       const eventName = z.tracking.EventName.CALLING.ENDED_CALL;
       this.track_event(eventName, callEntity, attributes);
     }
+  }
+
+  numberOfParticipantsChanged(newNumberOfParticipants) {
+    this.maxNumberOfParticipants = Math.max(this.maxNumberOfParticipants, newNumberOfParticipants);
   }
 };

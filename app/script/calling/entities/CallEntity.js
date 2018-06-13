@@ -97,7 +97,6 @@ z.calling.entities.CallEntity = class CallEntity {
     this.previousState = undefined;
 
     this.participants = ko.observableArray([]);
-    this.maxNumberOfParticipants = 0;
     this.interruptedParticipants = ko.observableArray([]);
 
     // Media
@@ -135,7 +134,9 @@ z.calling.entities.CallEntity = class CallEntity {
       return false;
     });
 
-    this.participantsCount = ko.pureComputed(() => this.getNumberOfParticipants(this.selfUserJoined()));
+    ko.pureComputed(() => this.getNumberOfParticipants(this.selfUserJoined())).subscribe(usersInCall => {
+      this.telemetry.numberOfParticipantsChanged(usersInCall);
+    });
 
     // Observable subscriptions
     this.wasConnected = false;
@@ -167,10 +168,6 @@ z.calling.entities.CallEntity = class CallEntity {
         return amplify.publish(z.event.WebApp.AUDIO.PLAY_IN_LOOP, z.audio.AudioType.NETWORK_INTERRUPTION);
       }
       amplify.publish(z.event.WebApp.AUDIO.STOP, z.audio.AudioType.NETWORK_INTERRUPTION);
-    });
-
-    this.participantsCount.subscribe(usersInCall => {
-      this.maxNumberOfParticipants = Math.max(usersInCall, this.maxNumberOfParticipants);
     });
 
     this.selfClientJoined.subscribe(isJoined => {
