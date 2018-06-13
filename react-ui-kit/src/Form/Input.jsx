@@ -47,9 +47,9 @@ const Input = styled.input`
   caret-color: ${COLOR.BLUE};
 
   /* positioning */
-  line-height: 56px;
+  line-height: 24px;
   margin: 0 0 16px;
-  padding: 0 16px;
+  padding: 16px;
   width: 100%;
 
   &::-webkit-input-placeholder {
