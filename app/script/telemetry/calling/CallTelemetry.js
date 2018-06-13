@@ -32,7 +32,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
     this.remote_version = undefined;
     this.hasSwitchedAV = false;
 
-    this.media_type = z.media.MediaType.AUDIO;
+    this.mediaType = z.media.MediaType.AUDIO;
   }
 
   //##############################################################################
@@ -79,13 +79,14 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
   //##############################################################################
 
   /**
-   * Set the media type of the call.
-   * @param {z.media.MediaType} [media_type=z.media.MediaType.AUDIO] - Media type for this call
+   * Prepare the call telemetry for a new call (resets to initial values)
+   * @param {z.media.MediaType} [mediaType=z.media.MediaType.AUDIO] - Media type for this call
    * @returns {undefined} No return value
    */
-  set_media_type(media_type = z.media.MediaType.AUDIO) {
-    this.media_type = media_type;
-    this.logger.info(`Set media type to '${this.media_type}'`);
+  initiateNewCall(mediaType = z.media.MediaType.AUDIO) {
+    this.mediaType = mediaType;
+    this.hasSwitchedAV = false;
+    this.logger.info(`Initiate new call of type '${this.mediaType}'`);
   }
 
   /**
@@ -111,6 +112,8 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
     if (callEntity) {
       const {conversationEntity, isGroup, maxNumberOfParticipants, direction} = callEntity;
 
+      const videoTypes = [z.media.MediaType.VIDEO, z.media.MediaType.AUDIO_VIDEO];
+
       attributes = Object.assign(
         {
           conversation_participants: conversationEntity.getNumberOfParticipants(),
@@ -125,7 +128,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
           ].includes(eventName)
             ? this.remote_version
             : undefined,
-          started_as_video: this.media_type === z.media.MediaType.VIDEO,
+          started_as_video: videoTypes.includes(this.mediaType),
           with_service: conversationEntity.isWithBot(),
         },
         z.tracking.helpers.getGuestAttributes(conversationEntity),

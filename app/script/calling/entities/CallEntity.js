@@ -966,7 +966,7 @@ z.calling.entities.CallEntity = class CallEntity {
    * @returns {undefined} No return value
    */
   initiateTelemetry(mediaType = z.media.MediaType.AUDIO) {
-    this.telemetry.set_media_type(mediaType);
+    this.telemetry.initiateNewCall(mediaType);
     this.timings = new z.telemetry.calling.CallSetupTimings(this.id);
   }
 

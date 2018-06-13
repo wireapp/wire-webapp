@@ -1278,7 +1278,7 @@ z.calling.CallingRepository = class CallingRepository {
         callEntity.state(callState);
 
         return callEntity.addOrUpdateParticipant(userId, false, callMessageEntity).then(() => {
-          this.telemetry.set_media_type(mediaType);
+          this.telemetry.initiateNewCall(mediaType);
           this.telemetry.track_event(z.tracking.EventName.CALLING.RECEIVED_CALL, callEntity);
           this.injectActivateEvent(callMessageEntity, source);
 
@@ -1331,7 +1331,7 @@ z.calling.CallingRepository = class CallingRepository {
       callEntity.direction = z.calling.enum.CALL_STATE.OUTGOING;
       callEntity.state(z.calling.enum.CALL_STATE.OUTGOING);
 
-      this.telemetry.set_media_type(mediaType);
+      this.telemetry.initiateNewCall(mediaType);
       this.telemetry.track_event(z.tracking.EventName.CALLING.INITIATED_CALL, callEntity);
       return callEntity;
     });
