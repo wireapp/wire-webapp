@@ -100,7 +100,7 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
             .deleteClient(clientEntity.id, password)
             .then(resolve)
             .catch(error => {
-              amplify.subscribe(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
+              amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
               reject(error);
             });
         },
