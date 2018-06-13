@@ -133,9 +133,10 @@ z.calling.entities.CallEntity = class CallEntity {
       return false;
     });
 
-    this.participants.subscribe(participants => {
+    ko.pureComputed(() => {
       const additionalCount = this.selfClientJoined() ? 1 : 0;
-      const numberOfParticipants = participants.length + additionalCount;
+      return this.participants().length + additionalCount;
+    }).subscribe(numberOfParticipants => {
       this.telemetry.numberOfParticipantsChanged(numberOfParticipants);
     });
 
