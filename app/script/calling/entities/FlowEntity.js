@@ -1230,12 +1230,13 @@ z.calling.entities.FlowEntity = class FlowEntity {
    * @returns {Promise} Resolves when negotiation has been restarted
    */
   replaceMediaStream(mediaStreamInfo, outdatedMediaStream) {
+    const {stream: mediaStream, type: mediaType} = mediaStreamInfo;
+    const negotiationMode = z.calling.enum.SDP_NEGOTIATION_MODE.STREAM_CHANGE;
+
     return Promise.resolve()
       .then(() => this._removeMediaStream(outdatedMediaStream))
-      .then(() => {
-        const {stream: mediaStream} = mediaStreamInfo;
-        this.restartNegotiation(z.calling.enum.SDP_NEGOTIATION_MODE.STREAM_CHANGE, false, mediaStream);
-      })
+      .then(() => this.restartNegotiation(negotiationMode, false, mediaStream))
+      .then(() => this.callLogger.debug(`Replaced the '${mediaType}' track`))
       .catch(error => {
         this.callLogger.error(`Failed to replace local MediaStream: ${error.message}`, error);
         throw error;
@@ -1256,9 +1257,10 @@ z.calling.entities.FlowEntity = class FlowEntity {
     return Promise.resolve()
       .then(() => this._getRtcSender(mediaType))
       .then(rtpSender => rtpSender.replaceTrack(mediaStreamTrack))
-      .then(() => {
-        this.callLogger.debug(`Replaced the '${mediaType}' track`);
-        return mediaStreamInfo;
+      .then(() => this.callLogger.debug(`Replaced the MediaStream containing '${mediaType}'`))
+      .catch(error => {
+        this.callLogger.error(`Failed to replace local MediaStreamTrack: ${error.message}`, error);
+        throw error;
       });
   }
 
@@ -1270,14 +1272,13 @@ z.calling.entities.FlowEntity = class FlowEntity {
    * @returns {Promise<boolean>} Resolves when the replacement capability has been checked
    */
   supportsTrackReplacement(mediaType) {
-    return Promise.resolve().then(() => {
-      const supportsGetSenders = typeof this.peerConnection.getSenders === 'function';
-      return supportsGetSenders
-        ? this._getRtcSender(mediaType)
-            .then(rtpSender => !!rtpSender)
-            .catch(() => false)
-        : false;
-    });
+    return Promise.resolve()
+      .then(() => {
+        const supportsGetSenders = typeof this.peerConnection.getSenders === 'function';
+        return supportsGetSenders ? this._getRtcSender(mediaType) : false;
+      })
+      .then(rtpSender => !!rtpSender)
+      .catch(() => false);
   }
 
   /**
