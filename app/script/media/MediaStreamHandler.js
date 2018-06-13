@@ -128,6 +128,8 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
       this._toggleStreamEnabled(z.media.MediaType.VIDEO, videoSend);
     });
 
+    this.hasActiveVideo = ko.pureComputed(() => this.selfStreamState.screenSend() || this.selfStreamState.videoSend());
+
     this.requestHintTimeout = undefined;
 
     amplify.subscribe(z.event.WebApp.CALL.MEDIA.ADD_STREAM, this.addRemoteMediaStream.bind(this));
@@ -742,9 +744,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
     }
 
     const isVideo = mediaType === z.media.MediaType.VIDEO;
-    const isEnabledState = isVideo
-      ? this.selfStreamState.screenSend() || this.selfStreamState.videoSend()
-      : this.selfStreamState.audioSend();
+    const isEnabledState = isVideo ? this.hasActiveVideo() : this.selfStreamState.audioSend();
 
     streamTracks.forEach(streamTrack => (streamTrack.enabled = isEnabledState));
     const logMessage = `Set stream '${mediaType}' enabled to '${isEnabledState}' on '${streamTracks.length}' tracks`;

@@ -31,15 +31,14 @@ z.calling.VideoGridRepository = class VideoGridRepository {
   constructor(callingRepository, mediaRepository) {
     const streamHandler = mediaRepository.streamHandler;
     const streamsInfo = streamHandler.remoteMediaStreamInfoIndex.video;
-    const localMediaStream = streamHandler.localMediaStream;
-    const selfStreamState = callingRepository.selfStreamState;
+    const {hasActiveVideo, localMediaStream, selfStreamState} = streamHandler;
+
     const calls = callingRepository.calls;
     this.grid = ko.observableArray([0, 0, 0, 0]);
     this.thumbnailStream = ko.observable();
 
     const selfStream = ko.pureComputed(() => {
-      const hasVideo = selfStreamState.videoSend() || selfStreamState.screenSend();
-      const stream = hasVideo ? localMediaStream() : undefined;
+      const stream = hasActiveVideo ? localMediaStream() : undefined;
       return {
         audioSend: selfStreamState.audioSend,
         id: stream && stream.id,
@@ -51,8 +50,8 @@ z.calling.VideoGridRepository = class VideoGridRepository {
 
     this.streams = ko.pureComputed(() => {
       const videoParticipants = calls()
-        .reduce((participants, call) => participants.concat(call.participants()), [])
-        .filter(participant => participant.activeState.videoSend() || participant.activeState.screenSend());
+        .reduce((participantEntities, callEntity) => participantEntities.concat(callEntity.participants()), [])
+        .filter(participantEntity => participantEntity.hasActiveVideo());
 
       const videoParticipantIds = videoParticipants.map(participant => participant.id);
 
