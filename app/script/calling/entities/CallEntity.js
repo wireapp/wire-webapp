@@ -83,7 +83,6 @@ z.calling.entities.CallEntity = class CallEntity {
     // States
     this.callTimerInterval = undefined;
     this.timerStart = undefined;
-    this.direction = undefined;
     this.durationTime = ko.observable(0);
     this.groupCheckTimeoutId = undefined;
     this.terminationReason = undefined;
@@ -951,11 +950,12 @@ z.calling.entities.CallEntity = class CallEntity {
 
   /**
    * Initiate the call telemetry.
+   * @param {z.calling.enum.CALL_STATE} direction - direction of the call (outgoing or incoming)
    * @param {z.media.MediaType} [mediaType=z.media.MediaType.AUDIO] - Media type for this call
    * @returns {undefined} No return value
    */
-  initiateTelemetry(mediaType = z.media.MediaType.AUDIO) {
-    this.telemetry.initiateNewCall(mediaType);
+  initiateTelemetry(direction, mediaType = z.media.MediaType.AUDIO) {
+    this.telemetry.initiateNewCall(direction, mediaType);
     this.timings = new z.telemetry.calling.CallSetupTimings(this.id);
   }
 

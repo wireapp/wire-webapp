@@ -32,6 +32,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
     this.remote_version = undefined;
     this.hasToggledAV = false;
     this.maxNumberOfParticipants = 0;
+    this.direction = undefined;
 
     this.mediaType = z.media.MediaType.AUDIO;
   }
@@ -81,14 +82,16 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
 
   /**
    * Prepare the call telemetry for a new call (resets to initial values)
+   * @param {z.calling.enum.CALL_STATE} direction - direction of the call (outgoing or incoming)
    * @param {z.media.MediaType} [mediaType=z.media.MediaType.AUDIO] - Media type for this call
    * @returns {undefined} No return value
    */
-  initiateNewCall(mediaType = z.media.MediaType.AUDIO) {
+  initiateNewCall(direction, mediaType = z.media.MediaType.AUDIO) {
     this.mediaType = mediaType;
     this.hasToggledAV = false;
     this.maxNumberOfParticipants = 0;
-    this.logger.info(`Initiate new call of type '${this.mediaType}'`);
+    this.direction = direction;
+    this.logger.info(`Initiate new '${direction}' call of type '${this.mediaType}'`);
   }
 
   setAVToggled() {
@@ -116,7 +119,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
    */
   track_event(eventName, callEntity, attributes = {}) {
     if (callEntity) {
-      const {conversationEntity, isGroup, direction} = callEntity;
+      const {conversationEntity, isGroup} = callEntity;
 
       const videoTypes = [z.media.MediaType.VIDEO, z.media.MediaType.AUDIO_VIDEO];
 
@@ -129,7 +132,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
           conversation_type: isGroup
             ? z.tracking.attribute.ConversationType.GROUP
             : z.tracking.attribute.ConversationType.ONE_TO_ONE,
-          direction,
+          direction: this.direction,
           remote_version: [
             z.tracking.EventName.CALLING.ESTABLISHED_CALL,
             z.tracking.EventName.CALLING.JOINED_CALL,
