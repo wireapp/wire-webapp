@@ -19,7 +19,7 @@
 
 'use strict';
 
-// grunt test_init && grunt test_run:components/groupVideoGrid
+// grunt test_init && grunt test_run:calling/videoGridRepository
 
 describe('z.calling.VideoGridRepository', () => {
   let groupVideoGrid;
@@ -142,9 +142,15 @@ describe('z.calling.VideoGridRepository', () => {
         }),
         generateMediaRepository({
           streamHandler: {
+            hasActiveVideo: ko.observable(true),
             localMediaStream: ko.observable(selfVideo),
             remoteMediaStreamInfoIndex: {
               video: ko.observableArray(remoteVideos),
+            },
+            selfStreamState: {
+              audioSend: ko.observable(true),
+              screenSend: ko.observable(false),
+              videoSend: ko.observable(true),
             },
           },
         })
@@ -174,9 +180,15 @@ describe('z.calling.VideoGridRepository', () => {
         }),
         generateMediaRepository({
           streamHandler: {
+            hasActiveVideo: ko.observable(true),
             localMediaStream: ko.observable(),
             remoteMediaStreamInfoIndex: {
               video: ko.observableArray(remoteVideos),
+            },
+            selfStreamState: {
+              audioSend: ko.observable(true),
+              screenSend: ko.observable(false),
+              videoSend: ko.observable(true),
             },
           },
         })
@@ -195,9 +207,15 @@ describe('z.calling.VideoGridRepository', () => {
           generateCallingRepository(),
           generateMediaRepository({
             streamHandler: {
+              hasActiveVideo: ko.observable(true),
               localMediaStream: ko.observable(selfVideo),
               remoteMediaStreamInfoIndex: {
                 video: ko.observableArray(remoteStreams),
+              },
+              selfStreamState: {
+                audioSend: ko.observable(true),
+                screenSend: ko.observable(false),
+                videoSend: ko.observable(true),
               },
             },
           })
@@ -214,9 +232,15 @@ describe('z.calling.VideoGridRepository', () => {
         generateCallingRepository(),
         generateMediaRepository({
           streamHandler: {
+            hasActiveVideo: ko.observable(true),
             localMediaStream: ko.observable(selfStream),
             remoteMediaStreamInfoIndex: {
               video: ko.observableArray([]),
+            },
+            selfStreamState: {
+              audioSend: ko.observable(true),
+              screenSend: ko.observable(false),
+              videoSend: ko.observable(true),
             },
           },
         })
@@ -248,6 +272,7 @@ describe('z.calling.VideoGridRepository', () => {
         generateCallingRepository(),
         generateMediaRepository({
           streamHandler: {
+            hasActiveVideo: ko.observable(true),
             localMediaStream: ko.observable(selfStream),
             remoteMediaStreamInfoIndex: {
               video: ko.observableArray([]),

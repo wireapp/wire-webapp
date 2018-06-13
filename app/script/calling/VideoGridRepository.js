@@ -38,7 +38,7 @@ z.calling.VideoGridRepository = class VideoGridRepository {
     this.thumbnailStream = ko.observable();
 
     const selfStream = ko.pureComputed(() => {
-      const stream = hasActiveVideo ? localMediaStream() : undefined;
+      const stream = hasActiveVideo() ? localMediaStream() : undefined;
       return {
         audioSend: selfStreamState.audioSend,
         id: stream && stream.id,
