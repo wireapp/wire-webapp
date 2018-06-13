@@ -375,10 +375,8 @@ z.calling.CallingRepository = class CallingRepository {
         // @todo Grant message for ongoing call
 
         const isSelfUser = userId === this.selfUserId();
-        if (isSelfUser && !callEntity.selfClientJoined()) {
-          callEntity.selfUserJoined(true);
-          callEntity.wasConnected = true;
-          return callEntity.rejectCall(false);
+        if (isSelfUser) {
+          this._remoteSelfJoin(callEntity, callMessageEntity);
         }
 
         if (callEntity.isOutgoing()) {
@@ -448,7 +446,14 @@ z.calling.CallingRepository = class CallingRepository {
         }
 
         if (!callEntity.selfClientJoined()) {
-          this.callLogger.info(`Rejecting call in conversation '${conversationId}'`, callEntity);
+          const logMessage = {
+            data: {
+              default: [conversationId],
+              obfuscated: [this.callLogger.obfuscate(conversationId)],
+            },
+            message: `Rejecting call in conversation '{0}'`,
+          };
+          this.callLogger.info(logMessage, callEntity);
           callEntity.rejectCall(false);
         }
       })
@@ -471,10 +476,8 @@ z.calling.CallingRepository = class CallingRepository {
         callEntity.setRemoteVersion(callMessageEntity);
 
         const isSelfUser = userId === this.selfUserId();
-        if (response && isSelfUser) {
-          const conversationName = callEntity.conversationEntity.display_name();
-          this.callLogger.info(`Incoming call in conversation '${conversationName}' accepted on other device`);
-          return this.deleteCall(conversationId);
+        if (isSelfUser) {
+          return this._remoteSelfJoin(callEntity, callMessageEntity);
         }
 
         const shouldNegotiate = response !== true;
@@ -502,6 +505,47 @@ z.calling.CallingRepository = class CallingRepository {
       .then(callEntity => callEntity.verifySessionId(callMessageEntity))
       .then(callEntity => callEntity.addOrUpdateParticipant(userId, false, callMessageEntity))
       .catch(this._throwMessageError);
+  }
+
+  /**
+   * Handle remote self join message.
+   *
+   * @private
+   * @param {z.calling.entities.CallEntity} callEntity - Call entity
+   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity from remote self client
+   * @returns {Promise} Resolves when self join was handled
+   */
+  _remoteSelfJoin(callEntity, callMessageEntity) {
+    const {conversationEntity} = callEntity;
+
+    if (callEntity.selfClientJoined()) {
+      const logMessage = {
+        data: {
+          default: [conversationEntity.display_name()],
+          obfuscated: [this.callLogger.obfuscate(conversationEntity.id)],
+        },
+        message: `Attempt to join ongoing call in conversation '{0}' from other device`,
+      };
+
+      this.callLogger.warn(logMessage, callEntity);
+    } else {
+      const logMessage = {
+        data: {
+          default: [conversationEntity.display_name()],
+          obfuscated: [this.callLogger.obfuscate(conversationEntity.id)],
+        },
+        message: `Call in conversation '{0}' accepted on other device`,
+      };
+      this.callLogger.info(logMessage, callEntity);
+
+      if (callEntity.isGroup) {
+        callEntity.selfUserJoined(true);
+        callEntity.wasConnected = true;
+        return callEntity.rejectCall(false);
+      }
+
+      return this.deleteCall(conversationEntity.id);
+    }
   }
 
   /**
