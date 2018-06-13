@@ -10857,9 +10857,9 @@ wbuf@^1.1.0, wbuf@^1.7.2:
   dependencies:
     minimalistic-assert "^1.0.0"
 
-webpack-cli@3.0.4:
-  version "3.0.4"
-  resolved "https://registry.yarnpkg.com/webpack-cli/-/webpack-cli-3.0.4.tgz#55d6ad2cdd608de8c0f757dde5bc4bf5bd2dec68"
+webpack-cli@3.0.5:
+  version "3.0.5"
+  resolved "https://registry.yarnpkg.com/webpack-cli/-/webpack-cli-3.0.5.tgz#0523412b5b6e5b0d6fa799881c58081318ec5eda"
   dependencies:
     chalk "^2.4.1"
     cross-spawn "^6.0.5"
