@@ -1093,7 +1093,6 @@ z.calling.CallingRepository = class CallingRepository {
     const conversationId = callEntity.id;
     this.callLogger.info(`Joining call in conversation '${conversationId}'`, callEntity);
 
-    callEntity.initiateTelemetry(mediaType);
     return this.mediaStreamHandler.localMediaStream()
       ? Promise.resolve(callEntity)
       : this.mediaStreamHandler
@@ -1224,15 +1223,18 @@ z.calling.CallingRepository = class CallingRepository {
    * @private
    * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.SETUP
    * @param {z.entity.User} creatingUserEntity - User that created call
+   * @param {z.calling.enum.CALL_STATE} direction - direction of the call (outgoing or incoming)
    * @returns {Promise} Resolves with the new call entity
    */
-  _createCall(callMessageEntity, creatingUserEntity) {
-    const {conversationId, sessionId} = callMessageEntity;
+  _createCall(callMessageEntity, creatingUserEntity, direction) {
+    const {conversationId, sessionId, properties} = callMessageEntity;
+    const mediaType = this._getMediaTypeFromProperties(properties);
 
     return this.getCallById(conversationId).catch(() => {
       return this.conversationRepository.get_conversation_by_id(conversationId).then(conversationEntity => {
         const callEntity = new z.calling.entities.CallEntity(conversationEntity, creatingUserEntity, sessionId, this);
 
+        callEntity.initiateTelemetry(direction, mediaType);
         this.calls.push(callEntity);
         return callEntity;
       });
@@ -1253,7 +1255,9 @@ z.calling.CallingRepository = class CallingRepository {
 
     return this.userRepository
       .get_user_by_id(userId)
-      .then(remoteUserEntity => this._createCall(callMessageEntity, remoteUserEntity))
+      .then(remoteUserEntity => {
+        return this._createCall(callMessageEntity, remoteUserEntity, z.calling.enum.CALL_STATE.INCOMING);
+      })
       .then(callEntity => {
         const mediaType = this._getMediaTypeFromProperties(properties);
         const conversationName = callEntity.conversationEntity.display_name();
@@ -1267,7 +1271,6 @@ z.calling.CallingRepository = class CallingRepository {
         };
         this.callLogger.info(logMessage, callEntity);
 
-        callEntity.direction = z.calling.enum.CALL_STATE.INCOMING;
         callEntity.setRemoteVersion(callMessageEntity);
 
         if (callEntity.conversationEntity.is_muted()) {
@@ -1278,7 +1281,6 @@ z.calling.CallingRepository = class CallingRepository {
         callEntity.state(callState);
 
         return callEntity.addOrUpdateParticipant(userId, false, callMessageEntity).then(() => {
-          this.telemetry.set_media_type(mediaType);
           this.telemetry.track_event(z.tracking.EventName.CALLING.RECEIVED_CALL, callEntity);
           this.injectActivateEvent(callMessageEntity, source);
 
@@ -1314,7 +1316,8 @@ z.calling.CallingRepository = class CallingRepository {
   _createOutgoingCall(callMessageEntity) {
     const {properties} = callMessageEntity;
 
-    return this._createCall(callMessageEntity, this.userRepository.self()).then(callEntity => {
+    const direction = z.calling.enum.CALL_STATE.OUTGOING;
+    return this._createCall(callMessageEntity, this.userRepository.self(), direction).then(callEntity => {
       const mediaType = this._getMediaTypeFromProperties(properties);
       const conversationName = callEntity.conversationEntity.display_name();
       const conversationId = callEntity.conversationEntity.id;
@@ -1328,10 +1331,8 @@ z.calling.CallingRepository = class CallingRepository {
       };
       this.callLogger.info(logMessage, callEntity);
 
-      callEntity.direction = z.calling.enum.CALL_STATE.OUTGOING;
       callEntity.state(z.calling.enum.CALL_STATE.OUTGOING);
 
-      this.telemetry.set_media_type(mediaType);
       this.telemetry.track_event(z.tracking.EventName.CALLING.INITIATED_CALL, callEntity);
       return callEntity;
     });

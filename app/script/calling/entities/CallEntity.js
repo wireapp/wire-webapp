@@ -83,7 +83,6 @@ z.calling.entities.CallEntity = class CallEntity {
     // States
     this.callTimerInterval = undefined;
     this.timerStart = undefined;
-    this.direction = undefined;
     this.durationTime = ko.observable(0);
     this.groupCheckTimeoutId = undefined;
     this.terminationReason = undefined;
@@ -97,7 +96,6 @@ z.calling.entities.CallEntity = class CallEntity {
     this.previousState = undefined;
 
     this.participants = ko.observableArray([]);
-    this.maxNumberOfParticipants = 0;
     this.interruptedParticipants = ko.observableArray([]);
 
     // Media
@@ -135,7 +133,12 @@ z.calling.entities.CallEntity = class CallEntity {
       return false;
     });
 
-    this.participantsCount = ko.pureComputed(() => this.getNumberOfParticipants(this.selfUserJoined()));
+    ko.pureComputed(() => {
+      const additionalCount = this.selfClientJoined() ? 1 : 0;
+      return this.participants().length + additionalCount;
+    }).subscribe(numberOfParticipants => {
+      this.telemetry.numberOfParticipantsChanged(numberOfParticipants);
+    });
 
     // Observable subscriptions
     this.wasConnected = false;
@@ -146,8 +149,7 @@ z.calling.entities.CallEntity = class CallEntity {
           this.scheduleGroupCheck();
         }
 
-        const attributes = {direction: this.direction};
-        this.telemetry.track_event(z.tracking.EventName.CALLING.ESTABLISHED_CALL, this, attributes);
+        this.telemetry.track_event(z.tracking.EventName.CALLING.ESTABLISHED_CALL, this);
         this.timerStart = Date.now() - CallEntity.CONFIG.TIMER.INIT_THRESHOLD;
 
         this.callTimerInterval = window.setInterval(() => {
@@ -168,10 +170,6 @@ z.calling.entities.CallEntity = class CallEntity {
         return amplify.publish(z.event.WebApp.AUDIO.PLAY_IN_LOOP, z.audio.AudioType.NETWORK_INTERRUPTION);
       }
       amplify.publish(z.event.WebApp.AUDIO.STOP, z.audio.AudioType.NETWORK_INTERRUPTION);
-    });
-
-    this.participantsCount.subscribe(usersInCall => {
-      this.maxNumberOfParticipants = Math.max(usersInCall, this.maxNumberOfParticipants);
     });
 
     this.selfClientJoined.subscribe(isJoined => {
@@ -216,8 +214,7 @@ z.calling.entities.CallEntity = class CallEntity {
 
       const isConnectingCall = state === z.calling.enum.CALL_STATE.CONNECTING;
       if (isConnectingCall) {
-        const attributes = {direction: this.direction};
-        this.telemetry.track_event(z.tracking.EventName.CALLING.JOINED_CALL, this, attributes);
+        this.telemetry.track_event(z.tracking.EventName.CALLING.JOINED_CALL, this);
       }
 
       this.previousState = state;
@@ -427,6 +424,12 @@ z.calling.entities.CallEntity = class CallEntity {
    * @returns {Promise} Resolves when state has been toggled
    */
   toggleMedia(mediaType) {
+    const toggledVideo = mediaType === z.media.MediaType.SCREEN && !this.selfState.videoSend();
+    const toggledScreen = mediaType === z.media.MediaType.VIDEO && !this.selfState.screenSend();
+    if (toggledVideo || toggledScreen) {
+      this.telemetry.setAVtoggled();
+    }
+
     const callEventPromises = this.getFlows().map(({remoteClientId, remoteUserId}) => {
       const payload = z.calling.CallMessageBuilder.createPayload(
         this.id,
@@ -785,16 +788,6 @@ z.calling.entities.CallEntity = class CallEntity {
   }
 
   /**
-   * Get the number of participants in the call.
-   * @param {boolean} [countSelfUser=false] - Add self user to count
-   * @returns {number} Number of participants in call
-   */
-  getNumberOfParticipants(countSelfUser = false) {
-    const additionalCount = countSelfUser ? 1 : 0;
-    return this.participants().length + additionalCount;
-  }
-
-  /**
    * Get a call participant by his id.
    * @param {string} userId - User ID of participant to be returned
    * @returns {Promise} Resolves with the call participant that matches given user ID
@@ -958,11 +951,12 @@ z.calling.entities.CallEntity = class CallEntity {
 
   /**
    * Initiate the call telemetry.
+   * @param {z.calling.enum.CALL_STATE} direction - direction of the call (outgoing or incoming)
    * @param {z.media.MediaType} [mediaType=z.media.MediaType.AUDIO] - Media type for this call
    * @returns {undefined} No return value
    */
-  initiateTelemetry(mediaType = z.media.MediaType.AUDIO) {
-    this.telemetry.set_media_type(mediaType);
+  initiateTelemetry(direction, mediaType = z.media.MediaType.AUDIO) {
+    this.telemetry.initiateNewCall(direction, mediaType);
     this.timings = new z.telemetry.calling.CallSetupTimings(this.id);
   }
 
