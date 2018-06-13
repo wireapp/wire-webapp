@@ -123,6 +123,7 @@ z.calling.entities.CallEntity = class CallEntity {
     this.isRemoteScreenSend = ko.pureComputed(() => this.remoteMediaType() === z.media.MediaType.SCREEN);
     this.isRemoteVideoSend = ko.pureComputed(() => this.remoteMediaType() === z.media.MediaType.VIDEO);
 
+    this.isLocalVideoCall = ko.pureComputed(() => this.selfState.screenSend() || this.selfState.videoSend());
     this.isRemoteVideoCall = ko.pureComputed(() => this.isRemoteScreenSend() || this.isRemoteVideoSend());
 
     this.networkInterruption = ko.pureComputed(() => {
