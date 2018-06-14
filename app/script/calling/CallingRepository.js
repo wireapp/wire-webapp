@@ -922,7 +922,7 @@ z.calling.CallingRepository = class CallingRepository {
    * @returns {undefined} No return value
    */
   toggleMedia(conversationId, mediaType) {
-    this.getCallById(conversationId)
+    return this.getCallById(conversationId)
       .then(callEntity => this._toggleMediaState(mediaType).then(() => callEntity))
       .then(callEntity => callEntity.toggleMedia(mediaType))
       .catch(error => {
@@ -1433,18 +1433,18 @@ z.calling.CallingRepository = class CallingRepository {
    * @returns {Promise} Resolves with the call entity for conversation ID
    */
   getCallById(conversationId) {
-    if (conversationId) {
-      for (const callEntity of this.calls()) {
-        const isExpectedId = callEntity.id === conversationId;
-        if (isExpectedId) {
-          return Promise.resolve(callEntity);
-        }
-      }
-
-      return Promise.reject(new z.calling.CallError(z.calling.CallError.TYPE.NOT_FOUND));
+    if (!conversationId) {
+      return Promise.reject(new z.calling.CallError(z.calling.CallError.TYPE.NO_CONVERSATION_ID));
     }
 
-    return Promise.reject(new z.calling.CallError(z.calling.CallError.TYPE.NO_CONVERSATION_ID));
+    for (const callEntity of this.calls()) {
+      const isExpectedId = callEntity.id === conversationId;
+      if (isExpectedId) {
+        return Promise.resolve(callEntity);
+      }
+    }
+
+    return Promise.reject(new z.calling.CallError(z.calling.CallError.TYPE.NOT_FOUND));
   }
 
   /**
