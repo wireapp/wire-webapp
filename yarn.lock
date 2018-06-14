@@ -503,9 +503,9 @@
     "@webassemblyjs/wast-parser" "1.5.12"
     long "^3.2.0"
 
-"@wireapp/api-client@1.1.8":
-  version "1.1.8"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-1.1.8.tgz#1b6579559bf97aed7073ac8fe63e44293d7527fd"
+"@wireapp/api-client@1.1.9":
+  version "1.1.9"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-1.1.9.tgz#966c5d6f0b1291235e96cfa51cecabfd24dd26a5"
   dependencies:
     "@types/node" "10.3.3"
     "@types/spark-md5" "3.0.0"
@@ -523,12 +523,12 @@
   version "3.0.47"
   resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-3.0.47.tgz#c4a859679de04e596808dde1e90003bdc7d7cfdf"
 
-"@wireapp/core@3.1.1":
-  version "3.1.1"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-3.1.1.tgz#97c0e632c12d7b375a5df1ba990f5346fbe12e7f"
+"@wireapp/core@3.1.2":
+  version "3.1.2"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-3.1.2.tgz#d3e706cc776d8ef54ec4bb679ba4c128cb8c932b"
   dependencies:
     "@types/node" "10.3.3"
-    "@wireapp/api-client" "1.1.8"
+    "@wireapp/api-client" "1.1.9"
     "@wireapp/cryptobox" "8.4.4"
     "@wireapp/store-engine" "0.11.28"
     bazinga64 "5.2.3"
