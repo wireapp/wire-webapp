@@ -23,6 +23,8 @@ import styled from 'styled-components';
 
 const Columns = styled.div`
   display: flex;
+  margin-left: -${GUTTER}px;
+  margin-left: -${GUTTER}px;
   ${media.mobile`
     flex-direction: column;
   `};
@@ -33,19 +35,7 @@ const Column = styled.div`
   flex-grow: 1;
   flex-basis: 0;
   flex-shrink: 1;
-  padding: 0 ${GUTTER}px;
-  &:first-child {
-    padding-left: 0;
-  }
-  &:last-child {
-    padding-right: 0;
-  }
-
-  ${media.mobile`
-    &, &:first-child, &:last-child{
-      padding: 0;
-    }
-  `};
+  margin-left: ${GUTTER}px;
 `;
 
 export {Column, Columns};

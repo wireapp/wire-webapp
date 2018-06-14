@@ -24,7 +24,7 @@ const Content = styled.div`
   flex-grow: 1;
   display: flex;
   flex-direction: column;
-  padding: 0 ${GUTTER + GUTTER}px;
+  padding: 0 ${GUTTER}px;
 `;
 
 export {Content};
