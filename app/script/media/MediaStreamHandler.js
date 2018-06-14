@@ -98,6 +98,8 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
     this.devicesHandler = this.mediaRepository.devicesHandler;
     this.elementHandler = this.mediaRepository.elementHandler;
 
+    this.deviceSupport = this.devicesHandler.deviceSupport;
+
     this.localMediaStream = ko.observable();
     this.localMediaType = ko.observable(z.media.MediaType.AUDIO);
 
@@ -272,14 +274,14 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
    */
   requestMediaStream(mediaType, mediaStreamConstraints) {
     const audioTypes = [z.media.MediaType.AUDIO, z.media.MediaType.AUDIO_VIDEO];
-    const noAudioDevice = !this.devicesHandler.hasMicrophone() && audioTypes.includes(mediaType);
+    const noAudioDevice = !this.deviceSupport.audioInput() && audioTypes.includes(mediaType);
     if (noAudioDevice) {
       const mediaError = new z.media.MediaError(z.media.MediaError.TYPE.MEDIA_STREAM_DEVICE, z.media.MediaType.AUDIO);
       return Promise.reject(mediaError);
     }
 
     const videoTypes = [z.media.MediaType.AUDIO_VIDEO, z.media.MediaType.VIDEO];
-    const noVideoTypes = !this.devicesHandler.hasCamera() && videoTypes.includes(mediaType);
+    const noVideoTypes = !this.deviceSupport.videoInput() && videoTypes.includes(mediaType);
     if (noVideoTypes) {
       const mediaError = new z.media.MediaError(z.media.MediaError.TYPE.MEDIA_STREAM_DEVICE, z.media.MediaType.VIDEO);
       return Promise.reject(mediaError);

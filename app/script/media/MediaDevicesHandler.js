@@ -58,8 +58,12 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
       videoInput: ko.observable(0),
     };
 
-    this.hasCamera = ko.pureComputed(() => this.availableDevices.videoInput().length > 0);
-    this.hasMicrophone = ko.pureComputed(() => this.availableDevices.audioInput().length > 0);
+    this.deviceSupport = {
+      audioInput: ko.pureComputed(() => !!this.availableDevices.audioInput().length),
+      audioOutput: ko.pureComputed(() => !!this.availableDevices.audioOutput().length),
+      screenInput: ko.pureComputed(() => !!this.availableDevices.screenInput().length),
+      videoInput: ko.pureComputed(() => !!this.availableDevices.videoInput().length),
+    };
 
     this.initializeMediaDevices();
   }
@@ -94,7 +98,7 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
     const videoInputId = z.util.StorageUtil.getValue(z.media.MediaDeviceType.VIDEO_INPUT);
     this.currentDeviceId.videoInput(videoInputId);
 
-    const setDefaultVideoId = !this.currentDeviceId.videoInput() && this.availableDevices.videoInput().length;
+    const setDefaultVideoId = !this.currentDeviceId.videoInput() && this.deviceSupport.videoInput();
     if (setDefaultVideoId) {
       const defaultDeviceIndex = this.availableDevices.videoInput().length - 1;
       const videoDeviceId = this.availableDevices.videoInput()[defaultDeviceIndex].deviceId;
