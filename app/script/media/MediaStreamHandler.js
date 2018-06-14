@@ -163,7 +163,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
         return this._initiateMediaStreamSuccess(mediaStreamInfo);
       })
       .catch(error => {
-        if (error.media_type) {
+        if (error.mediaType) {
           this._initiateMediaStreamFailure(error, conversationId);
         }
 
