@@ -503,15 +503,15 @@
     "@webassemblyjs/wast-parser" "1.5.12"
     long "^3.2.0"
 
-"@wireapp/api-client@1.1.5":
-  version "1.1.5"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-1.1.5.tgz#6c7864d79e2d1495431f4f1f1eb2d1e6b40a6dda"
+"@wireapp/api-client@1.1.7":
+  version "1.1.7"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-1.1.7.tgz#309d7bc898d7b95847c584b4d90700eeb39fcfc1"
   dependencies:
     "@types/node" "10.3.2"
     "@types/spark-md5" "3.0.0"
     "@types/tough-cookie" "2.3.3"
-    "@wireapp/priority-queue" "0.1.41"
-    "@wireapp/store-engine" "0.11.26"
+    "@wireapp/priority-queue" "0.1.43"
+    "@wireapp/store-engine" "0.11.27"
     axios "0.18.0"
     html5-websocket "2.0.3"
     logdown "3.2.3"
@@ -519,63 +519,63 @@
     spark-md5 "3.0.0"
     tough-cookie "2.4.2"
 
-"@wireapp/cbor@3.0.44":
-  version "3.0.44"
-  resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-3.0.44.tgz#da53607ada7f89762e18ce68c5a9aa5c64378586"
+"@wireapp/cbor@3.0.46":
+  version "3.0.46"
+  resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-3.0.46.tgz#4fa0c29315a7e869d84c5cdb64f9864211f01db9"
 
-"@wireapp/core@3.0.9":
-  version "3.0.9"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-3.0.9.tgz#84c289647702b24408bd5ac16a61d4042494a623"
+"@wireapp/core@3.1.0":
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-3.1.0.tgz#1fdbceb86dddbde9038e58ce8cd39f0e5641bc5d"
   dependencies:
     "@types/node" "10.3.2"
-    "@wireapp/api-client" "1.1.5"
-    "@wireapp/cryptobox" "8.4.0"
-    "@wireapp/store-engine" "0.11.26"
-    bazinga64 "5.2.1"
+    "@wireapp/api-client" "1.1.7"
+    "@wireapp/cryptobox" "8.4.3"
+    "@wireapp/store-engine" "0.11.27"
+    bazinga64 "5.2.2"
     logdown "3.2.3"
     protobufjs "6.8.6"
     pure-uuid "1.5.2"
 
-"@wireapp/cryptobox@8.4.0":
-  version "8.4.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-8.4.0.tgz#5df6bd2e07c6eeb614d45596071407e5eda51b71"
+"@wireapp/cryptobox@8.4.3":
+  version "8.4.3"
+  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-8.4.3.tgz#580888b733cc05e5c6e0429a7f86ae5b0be519aa"
   dependencies:
     "@types/fs-extra" "5.0.3"
     "@types/node" "10.3.2"
-    "@wireapp/lru-cache" "2.1.23"
-    "@wireapp/priority-queue" "0.1.41"
-    "@wireapp/proteus" "7.1.56"
-    "@wireapp/store-engine" "0.11.26"
+    "@wireapp/lru-cache" "2.1.25"
+    "@wireapp/priority-queue" "0.1.43"
+    "@wireapp/proteus" "7.1.59"
+    "@wireapp/store-engine" "0.11.27"
     dexie "2.0.4"
     fs-extra "6.0.1"
 
-"@wireapp/lru-cache@2.1.23":
-  version "2.1.23"
-  resolved "https://registry.yarnpkg.com/@wireapp/lru-cache/-/lru-cache-2.1.23.tgz#12abeb9ef542d512cb13badd83359ef4d101c16e"
+"@wireapp/lru-cache@2.1.25":
+  version "2.1.25"
+  resolved "https://registry.yarnpkg.com/@wireapp/lru-cache/-/lru-cache-2.1.25.tgz#afbd2a1c4b2e50da2e3b8c39651d644d3ce79c01"
 
-"@wireapp/priority-queue@0.1.41":
-  version "0.1.41"
-  resolved "https://registry.yarnpkg.com/@wireapp/priority-queue/-/priority-queue-0.1.41.tgz#2dacdd43e295c46a28448cbc154c3a232dfaf362"
+"@wireapp/priority-queue@0.1.43":
+  version "0.1.43"
+  resolved "https://registry.yarnpkg.com/@wireapp/priority-queue/-/priority-queue-0.1.43.tgz#5285d6687a5051abe53f4db92c939030f18fcec0"
   dependencies:
     "@types/node" "10.3.2"
     pure-uuid "1.5.2"
 
-"@wireapp/proteus@7.1.56":
-  version "7.1.56"
-  resolved "https://registry.yarnpkg.com/@wireapp/proteus/-/proteus-7.1.56.tgz#26c9d3930b5fb7f6e104e6e75008fa111e4cefaa"
+"@wireapp/proteus@7.1.59":
+  version "7.1.59"
+  resolved "https://registry.yarnpkg.com/@wireapp/proteus/-/proteus-7.1.59.tgz#d415b1471d3bbc93a7cda57b0d1a4518a325c01a"
   dependencies:
     "@types/chai" "4.1.3"
     "@types/ed2curve" "0.2.2"
     "@types/node" "10.3.2"
-    "@wireapp/cbor" "3.0.44"
+    "@wireapp/cbor" "3.0.46"
     ed2curve "0.2.1"
     libsodium-wrappers-sumo "0.7.3"
 
-"@wireapp/react-ui-kit@1.1.37":
-  version "1.1.37"
-  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-1.1.37.tgz#0bc40d0c41894cedcb30491f77707c437b203e4e"
+"@wireapp/react-ui-kit@1.1.39":
+  version "1.1.39"
+  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-1.1.39.tgz#7ff9da099f5daa4161e9bca4639ec5e5dc51ea04"
   dependencies:
-    bazinga64 "5.2.1"
+    bazinga64 "5.2.2"
     color "3.0.0"
     react "16.4.0"
     react-dom "16.4.0"
@@ -583,9 +583,9 @@
     styled-components "3.3.2"
     styled-normalize "4.0.0"
 
-"@wireapp/store-engine@0.11.26":
-  version "0.11.26"
-  resolved "https://registry.yarnpkg.com/@wireapp/store-engine/-/store-engine-0.11.26.tgz#db94fb20c4032b998ea10473d22744ca647dd248"
+"@wireapp/store-engine@0.11.27":
+  version "0.11.27"
+  resolved "https://registry.yarnpkg.com/@wireapp/store-engine/-/store-engine-0.11.27.tgz#cd623927840a0a6f038774095a99ad530a6728d9"
   dependencies:
     "@types/filesystem" "0.0.28"
     "@types/node" "10.3.2"
@@ -1712,9 +1712,9 @@ batch@0.6.1:
   version "0.6.1"
   resolved "https://registry.yarnpkg.com/batch/-/batch-0.6.1.tgz#dc34314f4e679318093fc760272525f94bf25c16"
 
-bazinga64@5.2.1:
-  version "5.2.1"
-  resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.2.1.tgz#d1a8d1bc2e78041e32e41d759f5246c6d0795390"
+bazinga64@5.2.2:
+  version "5.2.2"
+  resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.2.2.tgz#e0fcb8a8c23bf2d9bb4352b049d98592cdbf17c9"
 
 bcrypt-pbkdf@^1.0.0:
   version "1.0.1"
@@ -8569,9 +8569,18 @@ react-dom@16.4.0:
     object-assign "^4.1.1"
     prop-types "^15.6.0"
 
-react-hot-loader@4.3.1:
-  version "4.3.1"
-  resolved "https://registry.yarnpkg.com/react-hot-loader/-/react-hot-loader-4.3.1.tgz#47f59fe09b97ec655e77a1f90819785eda513a86"
+react-dom@16.4.1:
+  version "16.4.1"
+  resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-16.4.1.tgz#7f8b0223b3a5fbe205116c56deb85de32685dad6"
+  dependencies:
+    fbjs "^0.8.16"
+    loose-envify "^1.1.0"
+    object-assign "^4.1.1"
+    prop-types "^15.6.0"
+
+react-hot-loader@4.3.2:
+  version "4.3.2"
+  resolved "https://registry.yarnpkg.com/react-hot-loader/-/react-hot-loader-4.3.2.tgz#42d629a541d12c84df5e8333534ea6ef99b7ae49"
   dependencies:
     fast-levenshtein "^2.0.6"
     global "^4.3.0"
@@ -8661,6 +8670,15 @@ react-test-renderer@^16.0.0-0:
 react@16.4.0:
   version "16.4.0"
   resolved "https://registry.yarnpkg.com/react/-/react-16.4.0.tgz#402c2db83335336fba1962c08b98c6272617d585"
+  dependencies:
+    fbjs "^0.8.16"
+    loose-envify "^1.1.0"
+    object-assign "^4.1.1"
+    prop-types "^15.6.0"
+
+react@16.4.1:
+  version "16.4.1"
+  resolved "https://registry.yarnpkg.com/react/-/react-16.4.1.tgz#de51ba5764b5dbcd1f9079037b862bd26b82fe32"
   dependencies:
     fbjs "^0.8.16"
     loose-envify "^1.1.0"
@@ -10844,9 +10862,9 @@ wbuf@^1.1.0, wbuf@^1.7.2:
   dependencies:
     minimalistic-assert "^1.0.0"
 
-webpack-cli@3.0.4:
-  version "3.0.4"
-  resolved "https://registry.yarnpkg.com/webpack-cli/-/webpack-cli-3.0.4.tgz#55d6ad2cdd608de8c0f757dde5bc4bf5bd2dec68"
+webpack-cli@3.0.5:
+  version "3.0.5"
+  resolved "https://registry.yarnpkg.com/webpack-cli/-/webpack-cli-3.0.5.tgz#0523412b5b6e5b0d6fa799881c58081318ec5eda"
   dependencies:
     chalk "^2.4.1"
     cross-spawn "^6.0.5"

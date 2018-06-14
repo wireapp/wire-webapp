@@ -91,14 +91,19 @@ z.string.de.authErrorSignIn = 'Überprüfe deine Eingaben und versuche es erneut
 z.string.de.callStateOutgoing = 'Klingelt…';
 z.string.de.callStateConnecting = 'Verbinde…';
 z.string.de.callStateIncoming = 'Klingelt…';
+z.string.de.callStateIncomingGroup = '{{user}} ruft an';
 z.string.de.callDecline = 'Ablehnen';
 z.string.de.callAccept = 'Annehmen';
 z.string.de.callJoin = 'Beitreten';
 z.string.de.callChooseSharedScreen = 'Wähle einen Bildschirm aus';
 z.string.de.callParticipants = '{{number}} im Anruf';
 
+z.string.de.videoCallOverlayConversations = 'Unterhaltungen';
 z.string.de.videoCallOverlayMute = 'Stummschalten';
+z.string.de.videoCallOverlayVideo = 'Video';
+z.string.de.videoCallOverlayShareScreen = 'Bildschirm teilen';
 z.string.de.videoCallOverlayHangUp = 'Beenden';
+z.string.de.videoCallPaused="Video wurde angehalten";
 
 z.string.de.modalAcknowledgeAction = 'Ok';
 z.string.de.modalAcknowledgeHeadline = 'Fehler aufgetreten';
@@ -355,6 +360,7 @@ z.string.de.groupCreationParticipantsActionSkip = 'Überspringen';
 z.string.de.groupCreationParticipantsHeader = 'Personen hinzufügen';
 z.string.de.groupCreationParticipantsHeaderWithCounter = 'Personen hinzufügen ({{number}})';
 z.string.de.groupCreationParticipantsPlaceholder = 'Nach Namen suchen';
+z.string.de.groupSizeInfo = 'Bis zu {{count}} Personen können an einer Unterhaltung teilnehmen. Videoanrufe funktionieren in Gruppen mit vier oder weniger Personen.';
 
 z.string.de.guestRoomConversationName = 'Gästebereich';
 z.string.de.guestRoomToggleName = 'Gäste zulassen';
@@ -392,6 +398,7 @@ z.string.de.conversationsPopoverNotify = 'Benachrichtigen';
 z.string.de.conversationsPopoverSilence = 'Stummschalten';
 z.string.de.conversationsPopoverUnarchive = 'Reaktivieren';
 
+z.string.de.conversationsSecondaryLineIncomingCall = '{{user}} ruft an';
 z.string.de.conversationsSecondaryLineMissedCall = '{{number}} verpasster Anruf';
 z.string.de.conversationsSecondaryLineMissedCalls = '{{number}} verpasste Anrufe';
 z.string.de.conversationsSecondaryLineNewMessage = '{{number}} neue Nachricht';
@@ -526,7 +533,7 @@ z.string.de.preferencesAccountLeaveGuestRoomDescription = 'Du wirst nicht länge
 z.string.de.preferencesAccountLogOut = 'Abmelden';
 z.string.de.preferencesAccountManageTeam = 'Team verwalten';
 z.string.de.preferencesAccountMarketingConsentCheckbox = 'Newsletter abonnieren';
-z.string.de.preferencesAccountMarketingConsentDetail = 'Erhalte Neuigkeiten und Informationen zu Produktupdates von Wire per E-Mail.';
+z.string.de.preferencesAccountMarketingConsentDetail = 'Neuigkeiten und Informationen zu Produktaktualisierungen von Wire per E-Mail erhalten.';
 z.string.de.preferencesAccountResetPassword = 'Passwort zurücksetzen';
 z.string.de.preferencesAccountTeam = 'in {{name}}';
 z.string.de.preferencesAccountUsernamePlaceholder = 'Dein vollständiger Name';

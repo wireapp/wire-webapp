@@ -83,7 +83,6 @@ z.calling.entities.CallEntity = class CallEntity {
     // States
     this.callTimerInterval = undefined;
     this.timerStart = undefined;
-    this.direction = undefined;
     this.durationTime = ko.observable(0);
     this.groupCheckTimeoutId = undefined;
     this.terminationReason = undefined;
@@ -97,7 +96,6 @@ z.calling.entities.CallEntity = class CallEntity {
     this.previousState = undefined;
 
     this.participants = ko.observableArray([]);
-    this.maxNumberOfParticipants = 0;
     this.interruptedParticipants = ko.observableArray([]);
 
     // Media
@@ -125,6 +123,7 @@ z.calling.entities.CallEntity = class CallEntity {
     this.isRemoteScreenSend = ko.pureComputed(() => this.remoteMediaType() === z.media.MediaType.SCREEN);
     this.isRemoteVideoSend = ko.pureComputed(() => this.remoteMediaType() === z.media.MediaType.VIDEO);
 
+    this.isLocalVideoCall = ko.pureComputed(() => this.selfState.screenSend() || this.selfState.videoSend());
     this.isRemoteVideoCall = ko.pureComputed(() => this.isRemoteScreenSend() || this.isRemoteVideoSend());
 
     this.networkInterruption = ko.pureComputed(() => {
@@ -135,7 +134,12 @@ z.calling.entities.CallEntity = class CallEntity {
       return false;
     });
 
-    this.participantsCount = ko.pureComputed(() => this.getNumberOfParticipants(this.selfUserJoined()));
+    ko.pureComputed(() => {
+      const additionalCount = this.selfClientJoined() ? 1 : 0;
+      return this.participants().length + additionalCount;
+    }).subscribe(numberOfParticipants => {
+      this.telemetry.numberOfParticipantsChanged(numberOfParticipants);
+    });
 
     // Observable subscriptions
     this.wasConnected = false;
@@ -146,8 +150,7 @@ z.calling.entities.CallEntity = class CallEntity {
           this.scheduleGroupCheck();
         }
 
-        const attributes = {direction: this.direction};
-        this.telemetry.track_event(z.tracking.EventName.CALLING.ESTABLISHED_CALL, this, attributes);
+        this.telemetry.track_event(z.tracking.EventName.CALLING.ESTABLISHED_CALL, this);
         this.timerStart = Date.now() - CallEntity.CONFIG.TIMER.INIT_THRESHOLD;
 
         this.callTimerInterval = window.setInterval(() => {
@@ -168,10 +171,6 @@ z.calling.entities.CallEntity = class CallEntity {
         return amplify.publish(z.event.WebApp.AUDIO.PLAY_IN_LOOP, z.audio.AudioType.NETWORK_INTERRUPTION);
       }
       amplify.publish(z.event.WebApp.AUDIO.STOP, z.audio.AudioType.NETWORK_INTERRUPTION);
-    });
-
-    this.participantsCount.subscribe(usersInCall => {
-      this.maxNumberOfParticipants = Math.max(usersInCall, this.maxNumberOfParticipants);
     });
 
     this.selfClientJoined.subscribe(isJoined => {
@@ -216,8 +215,7 @@ z.calling.entities.CallEntity = class CallEntity {
 
       const isConnectingCall = state === z.calling.enum.CALL_STATE.CONNECTING;
       if (isConnectingCall) {
-        const attributes = {direction: this.direction};
-        this.telemetry.track_event(z.tracking.EventName.CALLING.JOINED_CALL, this, attributes);
+        this.telemetry.track_event(z.tracking.EventName.CALLING.JOINED_CALL, this);
       }
 
       this.previousState = state;
@@ -427,6 +425,12 @@ z.calling.entities.CallEntity = class CallEntity {
    * @returns {Promise} Resolves when state has been toggled
    */
   toggleMedia(mediaType) {
+    const toggledVideo = mediaType === z.media.MediaType.SCREEN && !this.selfState.videoSend();
+    const toggledScreen = mediaType === z.media.MediaType.VIDEO && !this.selfState.screenSend();
+    if (toggledVideo || toggledScreen) {
+      this.telemetry.setAVToggled();
+    }
+
     const callEventPromises = this.getFlows().map(({remoteClientId, remoteUserId}) => {
       const payload = z.calling.CallMessageBuilder.createPayload(
         this.id,
@@ -712,7 +716,7 @@ z.calling.entities.CallEntity = class CallEntity {
    */
   addOrUpdateParticipant(userId, negotiate, callMessageEntity) {
     return this.getParticipantById(userId)
-      .then(() => this._updateParticipant(userId, negotiate, callMessageEntity))
+      .then(participantEntity => this._updateParticipant(participantEntity, negotiate, callMessageEntity))
       .catch(error => {
         const isNotFound = error.type === z.calling.CallError.TYPE.NOT_FOUND;
         if (isNotFound) {
@@ -785,16 +789,6 @@ z.calling.entities.CallEntity = class CallEntity {
   }
 
   /**
-   * Get the number of participants in the call.
-   * @param {boolean} [countSelfUser=false] - Add self user to count
-   * @returns {number} Number of participants in call
-   */
-  getNumberOfParticipants(countSelfUser = false) {
-    const additionalCount = countSelfUser ? 1 : 0;
-    return this.participants().length + additionalCount;
-  }
-
-  /**
    * Get a call participant by his id.
    * @param {string} userId - User ID of participant to be returned
    * @returns {Promise} Resolves with the call participant that matches given user ID
@@ -858,54 +852,53 @@ z.calling.entities.CallEntity = class CallEntity {
    * @returns {Promise} Resolves with the added participant
    */
   _addParticipant(userId, negotiate, callMessageEntity) {
-    return this.getParticipantById(userId).catch(error => {
-      const isNotFound = error.type === z.calling.CallError.TYPE.NOT_FOUND;
-      if (!isNotFound) {
-        throw error;
-      }
+    const isSelfUser = userId === this.selfUser.id;
+    if (isSelfUser) {
+      const errorMessage = 'Self user should not be added as call participant';
+      return Promise.reject(new z.calling.CallError(z.calling.CallError.TYPE.WRONG_STATE, errorMessage));
+    }
 
-      return this.userRepository.get_user_by_id(userId).then(userEntity => {
-        const participantEntity = new z.calling.entities.ParticipantEntity(this, userEntity, this.timings);
+    return this.userRepository.get_user_by_id(userId).then(userEntity => {
+      const participantEntity = new z.calling.entities.ParticipantEntity(this, userEntity, this.timings);
 
-        this.participants.push(participantEntity);
+      this.participants.push(participantEntity);
 
-        const logMessage = {
-          data: {
-            default: [userEntity.name()],
-            obfuscated: [this.callLogger.obfuscate(userEntity.id)],
-          },
-          message: `Adding call participant '{0}'`,
-        };
-        this.callLogger.info(logMessage, participantEntity);
-        return this._updateParticipantState(participantEntity, negotiate, callMessageEntity);
-      });
+      const logMessage = {
+        data: {
+          default: [userEntity.name()],
+          obfuscated: [this.callLogger.obfuscate(userEntity.id)],
+        },
+        message: `Adding call participant '{0}'`,
+      };
+      this.callLogger.info(logMessage, participantEntity);
+
+      return this._updateParticipantState(participantEntity, negotiate, callMessageEntity);
     });
   }
 
   /**
    * Update call participant with call message.
    *
-   * @param {string} userId - User ID to be updated in the call
+   * @param {z.calling.entities.ParticipantEntity} participantEntity - Participant entity to be updated in the call
    * @param {boolean} negotiate - Should negotiation be started
    * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message to update user with
    * @returns {Promise} Resolves with the updated participant
    */
-  _updateParticipant(userId, negotiate, callMessageEntity) {
-    return this.getParticipantById(userId).then(participantEntity => {
-      if (callMessageEntity && callMessageEntity.clientId) {
-        participantEntity.verifyClientId(callMessageEntity.clientId);
-      }
+  _updateParticipant(participantEntity, negotiate, callMessageEntity) {
+    if (callMessageEntity && callMessageEntity.clientId) {
+      participantEntity.verifyClientId(callMessageEntity.clientId);
+    }
 
-      const logMessage = {
-        data: {
-          default: [participantEntity.user.name()],
-          obfuscated: [this.callLogger.obfuscate(participantEntity.user.id)],
-        },
-        message: `Updating call participant '{0}'`,
-      };
-      this.callLogger.info(logMessage, callMessageEntity);
-      return this._updateParticipantState(participantEntity, negotiate, callMessageEntity);
-    });
+    const logMessage = {
+      data: {
+        default: [participantEntity.user.name()],
+        obfuscated: [this.callLogger.obfuscate(participantEntity.user.id)],
+      },
+      message: `Updating call participant '{0}'`,
+    };
+    this.callLogger.info(logMessage, callMessageEntity);
+
+    return this._updateParticipantState(participantEntity, negotiate, callMessageEntity);
   }
 
   /**
@@ -958,11 +951,12 @@ z.calling.entities.CallEntity = class CallEntity {
 
   /**
    * Initiate the call telemetry.
+   * @param {z.calling.enum.CALL_STATE} direction - direction of the call (outgoing or incoming)
    * @param {z.media.MediaType} [mediaType=z.media.MediaType.AUDIO] - Media type for this call
    * @returns {undefined} No return value
    */
-  initiateTelemetry(mediaType = z.media.MediaType.AUDIO) {
-    this.telemetry.set_media_type(mediaType);
+  initiateTelemetry(direction, mediaType = z.media.MediaType.AUDIO) {
+    this.telemetry.initiateNewCall(direction, mediaType);
     this.timings = new z.telemetry.calling.CallSetupTimings(this.id);
   }
 

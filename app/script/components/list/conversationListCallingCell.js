@@ -53,7 +53,7 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
       return callParticipants.slice().reverse();
     });
 
-    this.isVideoCall = ko.pureComputed(() => this.call().isRemoteVideoCall() || this.selfStreamState.videoSend());
+    this.isVideoCall = ko.pureComputed(() => this.call().isLocalVideoCall() || this.call().isRemoteVideoCall());
 
     this.canJoin = ko.pureComputed(() => {
       if (this.selfUser.isTemporaryGuest()) {

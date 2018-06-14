@@ -57,6 +57,7 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
     this.currentDeviceId = this.devicesHandler.currentDeviceId;
     this.currentDeviceIndex = this.devicesHandler.currentDeviceIndex;
 
+    this.hasSelfVideo = this.streamHandler.hasActiveVideo;
     this.selfStreamState = this.streamHandler.selfStreamState;
     this.localVideoStream = this.streamHandler.localMediaStream;
     this.remoteVideoStreamsInfo = this.streamHandler.remoteMediaStreamInfoIndex.video;
@@ -85,10 +86,15 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
 
     this.isCallOngoing = ko.pureComputed(() => {
       if (this.joinedCall()) {
-        const isSendingVideo = this.selfStreamState.screenSend() || this.selfStreamState.videoSend();
-        const isVideodCall = isSendingVideo || this.joinedCall().isRemoteVideoCall();
-        return this.joinedCall().isOngoing() && isVideodCall;
+        const isSendingVideo = this.localVideoStream() && this.hasSelfVideo();
+        const isVideoCall = isSendingVideo || this.joinedCall().isRemoteVideoCall();
+        return this.joinedCall().isOngoing() && isVideoCall;
       }
+    });
+
+    this.showFullscreen = ko.pureComputed(() => {
+      const isFullScreenState = this.isCallOngoing() || this.isChoosingScreen();
+      return isFullScreenState && !this.multitasking.isMinimized();
     });
 
     this.overlayIconClass = ko.pureComputed(() => {
@@ -98,7 +104,7 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
           return 'icon-mute';
         }
 
-        const isVideoDisabled = !this.selfStreamState.screenSend() && !this.selfStreamState.videoSend();
+        const isVideoDisabled = !this.hasSelfVideo();
         if (isVideoDisabled) {
           return 'icon-video-off';
         }
