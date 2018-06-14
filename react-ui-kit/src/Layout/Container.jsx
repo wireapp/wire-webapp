@@ -42,11 +42,11 @@ const Container = styled.div`
     LEVEL[level] ||
     `${media.desktop`
             padding: 0;
-            width: ${WIDTH.DESKTOP_MIN - GUTTER * 4}px;
+            width: ${WIDTH.DESKTOP_MIN - GUTTER * 2}px;
           `};
           ${media.desktopXL`
             padding: 0;
-            width: ${WIDTH.DESKTOP_MIN - GUTTER * 4}px;
+            width: ${WIDTH.DESKTOP_MIN - GUTTER * 2}px;
           `};`}
   }};
 `;
