@@ -51,9 +51,6 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
 
     // scale videos when the grid is updated (on the next rendering cycle)
     this.grid.subscribe(() => z.util.afterRender(this.scaleVideos));
-
-    // scale the videos when the window is resized
-    window.addEventListener('resize', this.scaleVideos);
   }
 
   scaleVideos(rootElement) {
@@ -66,7 +63,7 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
     elements.forEach(element => {
       const videoElement = element.querySelector('video');
       if (videoElement.videoWidth > 0) {
-        setScale(videoElement);
+        z.util.afterRender(() => setScale(videoElement));
       } else {
         videoElement.addEventListener('loadedmetadata', () => setScale(videoElement), {once: true});
       }
@@ -76,10 +73,6 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
   doubleClickedOnVideo(data, event) {
     const childVideo = event.currentTarget.querySelector('video');
     childVideo.classList.toggle(GroupVideoGrid.CONFIG.CONTAIN_CLASS);
-  }
-
-  dispose() {
-    window.removeEventListener('resize', this.scaleVideos);
   }
 
   getStreamInfo(id) {
