@@ -36,7 +36,7 @@ import {Root} from 'protobufjs';
 import {LoginSanitizer} from './auth/root';
 import {ClientInfo, ClientService} from './client/root';
 import {AssetService, ConversationService, DecodedMessage, GenericMessageType} from './conversation/root';
-import {CryptographyService, PayloadBundle} from './cryptography/root';
+import {CryptographyService, PayloadBundle, PayloadBundleState} from './cryptography/root';
 import {NotificationService} from './notification/root';
 import proto from './Protobuf';
 import {SelfService} from './self/root';
@@ -88,7 +88,7 @@ class Account extends EventEmitter {
 
     const cryptographyService = new CryptographyService(this.apiClient, this.apiClient.config.store);
     const clientService = new ClientService(this.apiClient, this.apiClient.config.store, cryptographyService);
-    const assetService = new AssetService(this.apiClient, this.protocolBuffers);
+    const assetService = new AssetService(this.apiClient);
     const conversationService = new ConversationService(
       this.apiClient,
       this.protocolBuffers,
@@ -223,6 +223,8 @@ class Account extends EventEmitter {
     }
     return Promise.resolve()
       .then(() => {
+        this.apiClient.transport.ws.removeAllListeners(WebSocketClient.TOPIC.ON_MESSAGE);
+
         if (notificationHandler) {
           this.apiClient.transport.ws.on(WebSocketClient.TOPIC.ON_MESSAGE, (notification: IncomingNotification) =>
             notificationHandler(notification)
@@ -263,9 +265,8 @@ class Account extends EventEmitter {
     switch (event.type) {
       case CONVERSATION_EVENT.OTR_MESSAGE_ADD: {
         const otrMessage = event as ConversationOtrMessageAddEvent;
-        const sessionId = CryptographyService.constructSessionId(from, otrMessage.data.sender);
         const decodedMessage = await this.decodeGenericMessage(otrMessage);
-        return {...decodedMessage, from, conversation, sessionId};
+        return {...decodedMessage, from, conversation, state: PayloadBundleState.INCOMING};
       }
       case CONVERSATION_EVENT.TYPING: {
         return {...event, from, conversation};

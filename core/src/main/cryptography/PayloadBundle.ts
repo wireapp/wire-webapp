@@ -17,15 +17,21 @@
  *
  */
 
-import {Asset, GenericMessageType} from '../conversation/root';
+import {Asset, GenericMessageType, Image, ImageAsset} from '../conversation/root';
+
+enum PayloadBundleState {
+  INCOMING = 'PayloadBundleState.INCOMING',
+  OUTGOING_SENT = 'PayloadBundleState.OUTGOING_SENT',
+  OUTGOING_UNSENT = 'PayloadBundleState.OUTGOING_UNSENT',
+}
 
 interface PayloadBundle {
-  content?: string | Asset;
-  conversation: string;
+  content?: string | Asset | Image | ImageAsset;
+  conversation?: string;
   from: string;
   id: string;
-  sessionId: string;
+  state: PayloadBundleState;
   type: GenericMessageType;
 }
 
-export default PayloadBundle;
+export {PayloadBundle, PayloadBundleState};

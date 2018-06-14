@@ -38,7 +38,7 @@ describe('AssetService', () => {
   });
 
   describe('"uploadImageAsset"', () => {
-    it('builds protocol buffers', async done => {
+    it('builds an encrypted asset payload', async done => {
       const assetServerData = {
         key: `3-2-${new UUID(4).format()}`,
         keyBytes: Buffer.from(new UUID(4).format()),
@@ -58,26 +58,12 @@ describe('AssetService', () => {
 
       const asset = await assetService.uploadImageAsset(image);
 
-      expect(asset.original).toEqual(
+      expect(asset).toEqual(
         jasmine.objectContaining({
-          mimeType: image.type,
-          size: image.data.length,
-        })
-      );
-
-      expect(asset.original.image).toEqual(
-        jasmine.objectContaining({
-          height: image.height,
-          width: image.width,
-        })
-      );
-
-      expect(asset.uploaded).toEqual(
-        jasmine.objectContaining({
-          assetId: assetServerData.key,
-          assetToken: assetServerData.token,
-          otrKey: assetServerData.keyBytes,
+          key: assetServerData.key,
+          keyBytes: assetServerData.keyBytes,
           sha256: assetServerData.sha256,
+          token: assetServerData.token,
         })
       );
 

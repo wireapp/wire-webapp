@@ -28,22 +28,19 @@ enum CONVERSATION_TYPE {
 
 enum CONVERSATION_ACCESS_ROLE {
   ACTIVATED = 'activated',
+  NON_ACTIVATED = 'non_activated',
   PRIVATE = 'private',
   TEAM = 'team',
-  NON_ACTIVATED = 'non_activated',
 }
 
 enum CONVERSATION_ACCESS {
-  PRIVATE = 'private',
+  CODE = 'code',
   INVITE = 'invite',
   LINK = 'link',
-  CODE = 'code',
+  PRIVATE = 'private',
 }
 
 interface Conversation {
-  id: string;
-  type: CONVERSATION_TYPE.REGULAR | CONVERSATION_TYPE.SELF | CONVERSATION_TYPE.ONE_TO_ONE | CONVERSATION_TYPE.CONNECT;
-  creator: string;
   access:
     | CONVERSATION_ACCESS.PRIVATE
     | CONVERSATION_ACCESS.INVITE
@@ -54,9 +51,12 @@ interface Conversation {
     | CONVERSATION_ACCESS_ROLE.PRIVATE
     | CONVERSATION_ACCESS_ROLE.TEAM
     | CONVERSATION_ACCESS_ROLE.NON_ACTIVATED;
-  name: string;
+  creator: string;
+  id: string;
   members: ConversationMembers;
+  name: string;
   team?: string;
+  type: CONVERSATION_TYPE.REGULAR | CONVERSATION_TYPE.SELF | CONVERSATION_TYPE.ONE_TO_ONE | CONVERSATION_TYPE.CONNECT;
 }
 
 export {CONVERSATION_ACCESS_ROLE, CONVERSATION_ACCESS, CONVERSATION_TYPE, Conversation};
