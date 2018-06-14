@@ -24,4 +24,4 @@ interface EncryptedAsset {
   sha256: Buffer;
 }
 
-export default EncryptedAsset;
+export {EncryptedAsset};

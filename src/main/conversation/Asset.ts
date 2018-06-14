@@ -17,6 +17,9 @@
  *
  */
 
+import {Image} from '../conversation/root';
+import {EncryptedAsset} from '../cryptography/root';
+
 interface RemoteData {
   assetId: string;
   otrKey: Uint8Array | Buffer;
@@ -38,4 +41,9 @@ interface Asset {
   original: Original;
 }
 
-export {Asset, Original, RemoteData};
+interface ImageAsset {
+  asset: EncryptedAsset & {key: string; token: string};
+  image: Image;
+}
+
+export {Asset, ImageAsset, Original, RemoteData};

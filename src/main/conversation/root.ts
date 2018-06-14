@@ -17,7 +17,7 @@
  *
  */
 
-import {Asset, Original, RemoteData} from './Asset';
+import {Asset, ImageAsset, Original, RemoteData} from './Asset';
 import AssetService from './AssetService';
 import {ClientAction} from './ClientAction';
 import {ConfirmationType} from './ConfirmationType';
@@ -36,5 +36,6 @@ export {
   Original,
   GenericMessageType,
   Image,
+  ImageAsset,
   RemoteData,
 };

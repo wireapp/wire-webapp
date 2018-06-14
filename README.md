@@ -10,52 +10,13 @@ For licensing information, see the attached LICENSE file and the list of third-p
 
 Wire for Web's communication core.
 
-### Example
+### Installation
 
 ```bash
-yarn add @wireapp/core@0.0.30
+yarn add @wireapp/core
 ```
 
-#### JavaScript (Node.js)
+#### Demo
 
-```javascript
-const {Account} = require('@wireapp/core');
-
-const account = new Account();
-
-account.on(Account.INCOMING.TEXT_MESSAGE, ({conversation, content}) => {
-  account.service.conversation.sendTextMessage(conversation, `Echo: ${content}`);
-});
-
-account.listen({
-  clientType: 'temporary',
-  email: 'name@email.com',
-  password: 'secret',
-});
-```
-
-#### TypeScript
-
-```typescript
-import {Account} from '@wireapp/core';
-import {PayloadBundle} from '@wireapp/core/dist/commonjs/cryptography/';
-import {ClientType} from '@wireapp/api-client/dist/commonjs/client/';
-import {LoginData} from '@wireapp/api-client/dist/commonjs/auth/';
-
-const account: Account = new Account();
-
-const login: LoginData = {
-  clientType: ClientType.TEMPORARY,
-  email: 'name@email.com',
-  password: 'secret',
-};
-
-account.on(Account.INCOMING.TEXT_MESSAGE, (data: PayloadBundle) => {
-  account.service.conversation.sendTextMessage(data.conversation, data.content);
-});
-
-account.listen(login).catch(error => {
-  console.error(error.stack);
-  return process.exit(1);
-});
-```
+- [sender.js](./src/demo/sender.js)
+- [receiver.js](./src/demo/receiver.js)

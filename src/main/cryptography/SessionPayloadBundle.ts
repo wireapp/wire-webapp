@@ -22,4 +22,4 @@ interface SessionPayloadBundle {
   encryptedPayload: string;
 }
 
-export default SessionPayloadBundle;
+export {SessionPayloadBundle};

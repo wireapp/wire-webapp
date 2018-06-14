@@ -37,7 +37,7 @@ export interface MetaClient extends RegisteredClient {
   };
 }
 
-export default class CryptographyService {
+class CryptographyService {
   private readonly logger: any = logdown('@wireapp/core/Account', {
     logger: console,
     markdown: false,
@@ -148,3 +148,5 @@ export default class CryptographyService {
     this.logger.info(`Deleted session ID "${sessionId}".`);
   }
 }
+
+export {CryptographyService};

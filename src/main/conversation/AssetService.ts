@@ -29,7 +29,7 @@ export interface AssetOptions {
 }
 
 export default class AssetService {
-  constructor(private readonly apiClient: APIClient, private readonly protocolBuffers: any = {}) {}
+  constructor(private readonly apiClient: APIClient) {}
 
   private async postAsset(
     buffer: Buffer,
@@ -37,6 +37,7 @@ export default class AssetService {
   ): Promise<EncryptedAsset & {key: string; token: string}> {
     const {cipherText, keyBytes, sha256} = await AssetCryptography.encryptAsset(buffer);
     const {key, token} = await this.apiClient.asset.api.postAsset(new Uint8Array(cipherText), options);
+
     return {
       cipherText,
       key,
@@ -46,32 +47,10 @@ export default class AssetService {
     };
   }
 
-  public async uploadImageAsset(image: Image, options?: AssetOptions): Promise<any> {
-    const {key, keyBytes, sha256, token} = await this.postAsset(image.data, options);
-    const imageMetadata = this.protocolBuffers.Asset.ImageMetaData.create({
-      height: image.height,
-      width: image.width,
-    });
-
-    const original = this.protocolBuffers.Asset.Original.create({
-      image: imageMetadata,
-      mimeType: image.type,
-      name: null,
-      size: image.data.length,
-    });
-
-    const remoteData = this.protocolBuffers.Asset.RemoteData.create({
-      assetId: key,
-      assetToken: token,
-      otrKey: keyBytes,
-      sha256,
-    });
-
-    const asset = this.protocolBuffers.Asset.create({
-      original,
-      uploaded: remoteData,
-    });
-
-    return asset;
+  public uploadImageAsset(
+    image: Image,
+    options?: AssetOptions
+  ): Promise<EncryptedAsset & {key: string; token: string}> {
+    return this.postAsset(image.data, options);
   }
 }

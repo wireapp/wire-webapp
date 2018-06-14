@@ -17,9 +17,7 @@
  *
  */
 
-import CryptographyService from './CryptographyService';
-import EncryptedAsset from './EncryptedAsset';
-import PayloadBundle from './PayloadBundle';
-import SessionPayloadBundle from './SessionPayloadBundle';
-
-export {CryptographyService, EncryptedAsset, PayloadBundle, SessionPayloadBundle};
+export * from './CryptographyService';
+export * from './EncryptedAsset';
+export * from './PayloadBundle';
+export * from './SessionPayloadBundle';

@@ -12,7 +12,7 @@ require('dotenv').config({path: path.join(__dirname, 'echo2.env')});
 
 const {Account} = require('@wireapp/core');
 const APIClient = require('@wireapp/api-client');
-const ClientType = require('@wireapp/api-client/dist/commonjs/client/ClientType');
+const {ClientType} = require('@wireapp/api-client/dist/commonjs/client/ClientType');
 const {Config} = require('@wireapp/api-client/dist/commonjs/Config');
 const {FileEngine} = require('@wireapp/store-engine');
 
@@ -31,11 +31,13 @@ const {FileEngine} = require('@wireapp/store-engine');
   const account = new Account(apiClient);
   await account.login(login);
   await account.listen();
+  const textMessage = await account.service.conversation.createText('Hello World');
 
   function sendMessage() {
     const timeoutInMillis = 2000;
     setTimeout(async () => {
-      await account.service.conversation.sendTextMessage(CONVERSATION_ID, 'Hello World!');
+      const textPayload = await account.service.conversation.createText(textMessage);
+      await account.service.conversation.sendText(CONVERSATION_ID, textPayload);
       sendMessage();
     }, timeoutInMillis);
   }
