@@ -156,7 +156,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
     return this.devicesHandler
       .updateCurrentDevices(videoSend)
       .then(() => this.constraintsHandler.getMediaStreamConstraints(true, videoSend, isGroup))
-      .then(({streamConstraints}) => this.requestMediaStream(mediaType, streamConstraints))
+      .then(streamConstraints => this.requestMediaStream(mediaType, streamConstraints))
       .then(mediaStreamInfo => {
         this.selfStreamState.videoSend(videoSend);
         if (videoSend) {
@@ -219,14 +219,14 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
 
   /**
    * Update the used MediaStream after a new input device was selected.
-   * @param {z.media.MediaType} inputMediaType - Media type of device that was replaced
+   * @param {z.media.MediaType} mediaType - Media type of device that was replaced
    * @returns {Promise} Resolves when the input source has been replaced
    */
-  replaceInputSource(inputMediaType) {
+  replaceInputSource(mediaType) {
     const isPreferenceChange = !this.needsMediaStream();
 
     let constraintsPromise;
-    switch (inputMediaType) {
+    switch (mediaType) {
       case z.media.MediaType.AUDIO: {
         constraintsPromise = this.constraintsHandler.getMediaStreamConstraints(true, isPreferenceChange);
         break;
@@ -248,17 +248,17 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
     }
 
     return constraintsPromise
-      .then(({mediaType, streamConstraints}) => {
+      .then(streamConstraints => {
         return this.requestMediaStream(mediaType, streamConstraints).then(mediaStreamInfo => {
           this._setSelfStreamState(mediaType);
           this.replaceMediaStream(mediaStreamInfo);
         });
       })
       .catch(error => {
-        const isMediaTypeScreen = inputMediaType === z.media.MediaType.SCREEN;
+        const isMediaTypeScreen = mediaType === z.media.MediaType.SCREEN;
         const logMessage = isMediaTypeScreen
           ? `Could not enable screen sharing: ${error.message}`
-          : `Could not replace '${inputMediaType}' input source: ${error.message}`;
+          : `Could not replace '${mediaType}' input source: ${error.message}`;
         this.logger.warn(logMessage, error);
 
         throw error;
@@ -273,13 +273,12 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
    * @returns {Promise} Resolves with the stream and its type
    */
   requestMediaStream(mediaType, mediaStreamConstraints) {
-    const audioTypes = [z.media.MediaType.AUDIO, z.media.MediaType.AUDIO_VIDEO];
-    const noAudioDevice = !this.deviceSupport.audioInput() && audioTypes.includes(mediaType);
-    if (noAudioDevice) {
-      const mediaError = new z.media.MediaError(z.media.MediaError.TYPE.MEDIA_STREAM_DEVICE, z.media.MediaType.AUDIO);
-      return Promise.reject(mediaError);
-    }
+    return this._checkDeviceAvailability(mediaType).then(() => {
+      return this._requestMediaStream(mediaType, mediaStreamConstraints);
+    });
+  }
 
+  _checkDeviceAvailability(mediaType) {
     const videoTypes = [z.media.MediaType.AUDIO_VIDEO, z.media.MediaType.VIDEO];
     const noVideoTypes = !this.deviceSupport.videoInput() && videoTypes.includes(mediaType);
     if (noVideoTypes) {
@@ -287,6 +286,25 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
       return Promise.reject(mediaError);
     }
 
+    const audioTypes = [z.media.MediaType.AUDIO, z.media.MediaType.AUDIO_VIDEO];
+    const noAudioDevice = !this.deviceSupport.audioInput() && audioTypes.includes(mediaType);
+    if (noAudioDevice) {
+      const mediaError = new z.media.MediaError(z.media.MediaError.TYPE.MEDIA_STREAM_DEVICE, z.media.MediaType.AUDIO);
+      return Promise.reject(mediaError);
+    }
+
+    return Promise.resolve();
+  }
+
+  /**
+   * Request a MediaStream.
+   *
+   * @private
+   * @param {z.media.MediaType} mediaType - Type of MediaStream to be requested
+   * @param {RTCMediaStreamConstraints} mediaStreamConstraints - Constraints for the MediaStream to be requested
+   * @returns {Promise} Resolves with the stream and its type
+   */
+  _requestMediaStream(mediaType, mediaStreamConstraints) {
     this.logger.info(`Requesting MediaStream access for '${mediaType}'`, mediaStreamConstraints);
     this.requestHintTimeout = window.setTimeout(() => {
       this._hidePermissionFailedHint(mediaType);
