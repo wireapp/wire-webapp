@@ -249,15 +249,17 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
       .then(({mediaType, streamConstraints}) => {
         return this.requestMediaStream(mediaType, streamConstraints).then(mediaStreamInfo => {
           this._setSelfStreamState(mediaType);
-          return this.replaceMediaStream(mediaStreamInfo);
+          this.replaceMediaStream(mediaStreamInfo);
         });
       })
       .catch(error => {
-        if (inputMediaType === z.media.MediaType.SCREEN) {
-          return this.logger.error(`Failed to enable screen sharing: ${error.message}`, error);
-        }
+        const isMediaTypeScreen = inputMediaType === z.media.MediaType.SCREEN;
+        const logMessage = isMediaTypeScreen
+          ? `Could not enable screen sharing: ${error.message}`
+          : `Could not replace '${inputMediaType}' input source: ${error.message}`;
+        this.logger.warn(logMessage, error);
 
-        this.logger.error(`Failed to replace '${inputMediaType}' input source: ${error.message}`, error);
+        throw error;
       });
   }
 
