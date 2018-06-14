@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="1.1.40"></a>
+## [1.1.40](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@1.1.39...@wireapp/react-ui-kit@1.1.40) (2018-06-14)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Grid gutter updates ([#700](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/700)) ([e8d0677](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/e8d0677))
+
+
+
+
 <a name="1.1.39"></a>
 ## [1.1.39](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@1.1.38...@wireapp/react-ui-kit@1.1.39) (2018-06-13)
 
