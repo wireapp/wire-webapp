@@ -194,7 +194,25 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
    * @returns {Promise} Resolves when the MediaStream has been replaced
    */
   replaceMediaStream(mediaStreamInfo) {
-    const {stream: mediaStream, type} = mediaStreamInfo;
+    const {stream: mediaStream} = mediaStreamInfo;
+
+    const replaceMediaStream = (localMediaStream, newMediaStreamInfo) => {
+      this._releaseMediaStream(this.localMediaStream());
+      this._setStreamState(updateMediaStreamInfo);
+      this.localMediaStream(updateMediaStreamInfo.stream);
+    };
+
+    const replaceMediaTracks = (localMediaStream, newMediaStream) => {
+      localMediaStream.getTracks().forEach(localTrack => {
+        updateMediaStreamInfo.stream.getTracks().forEach(newTrack => {
+          if (localTrack.kind === newTrack.kind) {
+            localTrack.stop();
+            localMediaStream.removeTrack(localTrack);
+            localMediaStream.addTrack(newTrack);
+          }
+        });
+      });
+    };
 
     const logMessage = `Received new MediaStream containing '${mediaStream.getTracks().length}' track/s`;
     const logObject = {
@@ -209,11 +227,9 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
       : Promise.resolve(mediaStreamInfo);
 
     return replacePromise.then(updateMediaStreamInfo => {
-      const mediaType = !updateMediaStreamInfo.replaced ? type : undefined;
-
-      this._setStreamState(updateMediaStreamInfo);
-      this._releaseMediaStream(this.localMediaStream(), mediaType);
-      this.localMediaStream(updateMediaStreamInfo.stream);
+      return updateMediaStreamInfo.replaced
+        ? replaceMediaStream(this.localMediaStream(), updateMediaStreamInfo)
+        : replaceMediaTracks(this.localMediaStream(), updateMediaStreamInfo.stream);
     });
   }
 
