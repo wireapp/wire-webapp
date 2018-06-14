@@ -571,14 +571,14 @@
     ed2curve "0.2.1"
     libsodium-wrappers-sumo "0.7.3"
 
-"@wireapp/react-ui-kit@1.1.39":
-  version "1.1.39"
-  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-1.1.39.tgz#7ff9da099f5daa4161e9bca4639ec5e5dc51ea04"
+"@wireapp/react-ui-kit@1.1.40":
+  version "1.1.40"
+  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-1.1.40.tgz#926a5ed5bc89782131fd39743625cc3d6fac5526"
   dependencies:
-    bazinga64 "5.2.2"
+    bazinga64 "5.2.3"
     color "3.0.0"
-    react "16.4.0"
-    react-dom "16.4.0"
+    react "16.4.1"
+    react-dom "16.4.1"
     recompose "0.27.1"
     styled-components "3.3.2"
     styled-normalize "4.0.0"
@@ -1715,6 +1715,10 @@ batch@0.6.1:
 bazinga64@5.2.2:
   version "5.2.2"
   resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.2.2.tgz#e0fcb8a8c23bf2d9bb4352b049d98592cdbf17c9"
+
+bazinga64@5.2.3:
+  version "5.2.3"
+  resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.2.3.tgz#9715b753a76fcc0d004fdd20c504a7925f4a63b1"
 
 bcrypt-pbkdf@^1.0.0:
   version "1.0.1"
@@ -8560,15 +8564,6 @@ react-addons-test-utils@15.6.2:
   version "15.6.2"
   resolved "https://registry.yarnpkg.com/react-addons-test-utils/-/react-addons-test-utils-15.6.2.tgz#c12b6efdc2247c10da7b8770d185080a7b047156"
 
-react-dom@16.4.0:
-  version "16.4.0"
-  resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-16.4.0.tgz#099f067dd5827ce36a29eaf9a6cdc7cbf6216b1e"
-  dependencies:
-    fbjs "^0.8.16"
-    loose-envify "^1.1.0"
-    object-assign "^4.1.1"
-    prop-types "^15.6.0"
-
 react-dom@16.4.1:
   version "16.4.1"
   resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-16.4.1.tgz#7f8b0223b3a5fbe205116c56deb85de32685dad6"
@@ -8666,15 +8661,6 @@ react-test-renderer@^16.0.0-0:
   dependencies:
     fbjs "^0.8.16"
     object-assign "^4.1.1"
-
-react@16.4.0:
-  version "16.4.0"
-  resolved "https://registry.yarnpkg.com/react/-/react-16.4.0.tgz#402c2db83335336fba1962c08b98c6272617d585"
-  dependencies:
-    fbjs "^0.8.16"
-    loose-envify "^1.1.0"
-    object-assign "^4.1.1"
-    prop-types "^15.6.0"
 
 react@16.4.1:
   version "16.4.1"
