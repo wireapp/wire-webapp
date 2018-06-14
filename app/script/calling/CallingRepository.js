@@ -923,9 +923,14 @@ z.calling.CallingRepository = class CallingRepository {
    */
   toggleMedia(conversationId, mediaType) {
     this.getCallById(conversationId)
+      .then(callEntity => this._toggleMediaState(mediaType).then(() => callEntity))
       .then(callEntity => callEntity.toggleMedia(mediaType))
-      .then(() => this._toggleMediaState(mediaType))
-      .catch(error => this._handleNotFoundError(error));
+      .catch(error => {
+        const isNotFound = error.type === z.calling.CallError.TYPE.NOT_FOUND;
+        if (!isNotFound) {
+          this.callLogger.error(`Failed to toggle media of type '${mediaType}'`, error);
+        }
+      });
   }
 
   /**
@@ -1120,7 +1125,7 @@ z.calling.CallingRepository = class CallingRepository {
   _initiateOutgoingCall(conversationId, mediaType, callState) {
     const videoSend = mediaType === z.media.MediaType.AUDIO_VIDEO;
     const payload = {conversationId};
-    const messagePayload = z.calling.CallMessageBuilder.createPropSync(this.selfStreamState, videoSend, false, payload);
+    const messagePayload = z.calling.CallMessageBuilder.createPropSync(this.selfStreamState, videoSend, payload);
     const callMessageEntity = z.calling.CallMessageBuilder.buildPropSync(false, undefined, messagePayload);
     return this._createOutgoingCall(callMessageEntity);
   }
