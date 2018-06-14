@@ -49,6 +49,7 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
     this.devicesHandler = this.mediaRepository.devicesHandler;
     this.availableDevices = this.devicesHandler.availableDevices;
     this.currentDeviceId = this.devicesHandler.currentDeviceId;
+    this.deviceSupport = this.devicesHandler.deviceSupport;
 
     this.constraintsHandler = this.mediaRepository.constraintsHandler;
     this.streamHandler = this.mediaRepository.streamHandler;
@@ -73,12 +74,8 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
 
     this.permissionDenied = ko.observable(false);
 
-    this.supportsAudioInput = ko.pureComputed(() => !!this.availableDevices.audioInput().length);
     this.supportsAudioOutput = ko.pureComputed(() => {
-      return !!this.availableDevices.audioOutput().length && z.util.Environment.browser.supports.audioOutputSelection;
-    });
-    this.supportsVideoInput = ko.pureComputed(() => {
-      return !!this.availableDevices.videoInput().length && this.isActivatedAccount();
+      return this.deviceSupport.audioOutput() && z.util.Environment.browser.supports.audioOutputSelection;
     });
   }
 
@@ -112,7 +109,7 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
    * @returns {Promise} Resolves with a MediaStream
    */
   _getMediaStream() {
-    const hasSupportedVideoStream = this.supportsVideoInput
+    const hasSupportedVideoStream = this.deviceSupport.videoInput()
       ? this.mediaStream() && this.streamHandler.localMediaType() === z.media.MediaType.VIDEO
       : this.mediaStream();
 
@@ -121,10 +118,10 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
     }
 
     return this.constraintsHandler
-      .getMediaStreamConstraints(this.supportsAudioInput(), this.supportsVideoInput())
+      .getMediaStreamConstraints(this.deviceSupport.audioInput(), this.deviceSupport.videoInput())
       .then(({mediaType, streamConstraints}) => this.streamHandler.requestMediaStream(mediaType, streamConstraints))
       .then(mediaStreamInfo => {
-        if (this.availableDevices.videoInput().length) {
+        if (this.deviceSupport.videoInput()) {
           this.streamHandler.localMediaType(z.media.MediaType.VIDEO);
         }
 
