@@ -81,12 +81,14 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
   /**
    * Construct a new MediaStream handler.
    * @param {z.media.MediaRepository} mediaRepository - Media repository with with references to all other handlers
+   * @param {z.permission.PermissionRepository} permissionRepository - Repository for all permission interactions
    */
-  constructor(mediaRepository) {
+  constructor(mediaRepository, permissionRepository) {
     this._toggleScreenSend = this._toggleScreenSend.bind(this);
     this._toggleVideoSend = this._toggleVideoSend.bind(this);
 
     this.mediaRepository = mediaRepository;
+    this.permissionRepository = permissionRepository;
     this.logger = new z.util.Logger('z.media.MediaStreamHandler', z.config.LOGGER.OPTIONS);
 
     this.calls = () => [];
@@ -288,16 +290,38 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
    * @returns {Promise} Resolves with the stream and its type
    */
   requestMediaStream(mediaType, mediaStreamConstraints) {
-    return this._checkDeviceAvailability(mediaType).then(() => {
-      return this._requestMediaStream(mediaType, mediaStreamConstraints);
-    });
+    return this._checkDeviceAvailability(mediaType)
+      .then(() => this._checkPermissions(mediaType))
+      .then(() => this._requestMediaStream(mediaType, mediaStreamConstraints))
+      .catch(error => {
+        const isPermissionDenied = error.type === z.permission.PermissionError.TYPE.DENIED;
+        throw isPermissionDenied
+          ? new z.media.MediaError(z.media.MediaError.TYPE.MEDIA_STREAM_PERMISSION, mediaType)
+          : error;
+      });
   }
 
+  /**
+   * Add tracks to a new stream.
+   *
+   * @private
+   * @param {MediaStream} sourceStream - MediaStream to take tracks from
+   * @param {MediaStream} targetStream - MediaStream to add tracks to
+   * @param {z.media.MediaType} mediaType - Type of track to add
+   * @returns {undefined} Not return value
+   */
   _addTracksToStream(sourceStream, targetStream, mediaType) {
     const mediaStreamTracks = MediaStreamHandler.getMediaTracks(sourceStream, mediaType);
     mediaStreamTracks.forEach(mediaStreamTrack => targetStream.addTrack(mediaStreamTrack));
   }
 
+  /**
+   * Check for devices of requested media type.
+   *
+   * @private
+   * @param {z.media.MediaType} mediaType - Requested media type
+   * @returns {Promise} Resolves when the device availability has been verified
+   */
   _checkDeviceAvailability(mediaType) {
     const videoTypes = [z.media.MediaType.AUDIO_VIDEO, z.media.MediaType.VIDEO];
     const noVideoTypes = !this.deviceSupport.videoInput() && videoTypes.includes(mediaType);
@@ -314,6 +338,59 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
     }
 
     return Promise.resolve();
+  }
+
+  /**
+   * Check for permission for the requested media type.
+   *
+   * @private
+   * @param {z.media.MediaType} mediaType - Requested media type
+   * @returns {Promise} Resolves when the permissions are not denied
+   */
+  _checkPermissions(mediaType) {
+    if (!z.util.Environment.browser.supports.mediaPermissions) {
+      return Promise.resolve();
+    }
+
+    const permissionTypes = this._getPermissionTypes(mediaType);
+    const shouldCheckPermissions = permissionTypes && permissionTypes.length;
+    return shouldCheckPermissions
+      ? this.permissionRepository.getPermissionStates(permissionTypes).then(permissions => {
+          for (const permission of permissions) {
+            const {permissionState, permissionType} = permission;
+            const isPermissionDenied = permissionState === z.permission.PermissionStatusState.DENIED;
+            if (isPermissionDenied) {
+              this.logger.warn(`Permission for '${permissionType}' is set to '${permissionState}'`, permissions);
+              return Promise.reject(new z.permission.PermissionError(z.permission.PermissionError.TYPE.DENIED));
+            }
+          }
+
+          return Promise.resolve();
+        })
+      : Promise.resolve();
+  }
+
+  /**
+   * Get permission types for the requested media type.
+   *
+   * @private
+   * @param {z.media.MediaType} mediaType - Requested media type
+   * @returns {Array<z.permission.PermissionType>} Array containing the necessary permission types
+   */
+  _getPermissionTypes(mediaType) {
+    switch (mediaType) {
+      case z.media.MediaType.AUDIO: {
+        return [z.permission.PermissionType.MICROPHONE];
+      }
+
+      case z.media.MediaType.AUDIO_VIDEO: {
+        return [z.permission.PermissionType.CAMERA, z.permission.PermissionType.MICROPHONE];
+      }
+
+      case z.media.MediaType.VIDEO: {
+        return [z.permission.PermissionType.CAMERA];
+      }
+    }
   }
 
   /**

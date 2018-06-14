@@ -20,14 +20,11 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.notification = z.notification || {};
+window.z.permission = z.permission || {};
 
 // https://developer.mozilla.org/en-US/docs/Web/API/PermissionStatus/state
-z.notification.PermissionStatusState = {
-  DEFAULT: 'default',
+z.permission.PermissionStatusState = {
   DENIED: 'denied',
   GRANTED: 'granted',
-  IGNORED: 'ignored',
   PROMPT: 'prompt',
-  UNSUPPORTED: 'unsupported',
 };

@@ -25,7 +25,7 @@ window.z.notification = z.notification || {};
 /**
  * Notification repository to trigger browser and audio notifications.
  *
- * @see https://developer.mozilla.org/en/docs/Web/API/notification
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/notification
  * @see http://www.w3.org/TR/notifications
  */
 z.notification.NotificationRepository = class NotificationRepository {
@@ -52,11 +52,13 @@ z.notification.NotificationRepository = class NotificationRepository {
   /**
    * Construct a new Notification Repository.
    * @param {z.calling.CallingRepository} callingRepository - Repository for all call interactions
-   * @param {z.conversation.ConversationService} conversationRepository - Repository for all conversation interactions
+   * @param {z.conversation.ConversationRepository} conversationRepository - Repository for all conversation interactions
+   * @param {z.permission.PermissionRepository} permissionRepository - Repository for all permission interactions
    */
-  constructor(callingRepository, conversationRepository) {
+  constructor(callingRepository, conversationRepository, permissionRepository) {
     this.callingRepository = callingRepository;
     this.conversationRepository = conversationRepository;
+    this.permissionRepository = permissionRepository;
     this.logger = new z.util.Logger('z.notification.NotificationRepository', z.config.LOGGER.OPTIONS);
 
     this.notifications = [];
@@ -70,13 +72,12 @@ z.notification.NotificationRepository = class NotificationRepository {
       }
     });
 
-    this.permissionState = z.notification.PermissionStatusState.PROMPT;
-    this.permissionStatus = undefined;
+    this.permissionState = this.permissionRepository.permissionState[z.permission.PermissionType.NOTIFICATIONS];
   }
 
   subscribeToEvents() {
     amplify.subscribe(z.event.WebApp.NOTIFICATION.NOTIFY, this.notify.bind(this));
-    amplify.subscribe(z.event.WebApp.NOTIFICATION.PERMISSION_STATE, this.setPermissionState.bind(this));
+    amplify.subscribe(z.event.WebApp.NOTIFICATION.PERMISSION_STATE, this.updatePermissionState.bind(this));
     amplify.subscribe(z.event.WebApp.NOTIFICATION.REMOVE_READ, this.removeReadNotifications.bind(this));
     amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, this.updatedProperties.bind(this));
     amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.NOTIFICATIONS, this.updatedNotificationsProperty.bind(this));
@@ -87,35 +88,28 @@ z.notification.NotificationRepository = class NotificationRepository {
    * @returns {Promise} Promise that resolves with the permission state
    */
   checkPermission() {
-    return this._getPermissionState().then(isPermitted => {
+    return this._checkPermissionState().then(isPermitted => {
       if (_.isBoolean(isPermitted)) {
         return isPermitted;
       }
 
       if (!z.util.Environment.browser.supports.notifications) {
-        return this.setPermissionState(z.notification.PermissionStatusState.UNSUPPORTED);
+        return this.updatePermissionState(z.notification.PermissionState.UNSUPPORTED);
       }
 
-      if (navigator.permissions) {
-        return navigator.permissions.query({name: 'notifications'}).then(permissionStatus => {
-          this.permissionStatus = permissionStatus;
-          this.permissionStatus.onchange = () => this.setPermissionState(this.permissionStatus.state);
-
-          switch (permissionStatus.state) {
-            case z.notification.PermissionStatusState.PROMPT:
-              return this._requestPermission();
-            default:
-              return this.setPermissionState(permissionStatus.state);
-          }
-        });
+      if (z.util.Environment.browser.supports.permissions) {
+        return this.permissionRepository
+          .getPermissionState(z.permission.PermissionType.NOTIFICATIONS)
+          .then(permissionState => {
+            const shouldRequestPermission = permissionState === z.permission.PermissionStatusState.PROMPT;
+            return shouldRequestPermission ? this._requestPermission() : this._checkPermissionState();
+          });
       }
 
-      switch (window.Notification.permission) {
-        case z.notification.PermissionStatusState.DEFAULT:
-          return this._requestPermission();
-        default:
-          return this.setPermissionState(window.Notification.permission);
-      }
+      const shouldRequestPermission = window.Notification.permission === z.notification.PermissionState.DEFAULT;
+      return shouldRequestPermission
+        ? this._requestPermission()
+        : this.updatePermissionState(window.Notification.permission);
     });
   }
 
@@ -172,16 +166,6 @@ z.notification.NotificationRepository = class NotificationRepository {
     });
   }
 
-  /**
-   * Set the permission state.
-   * @param {z.notification.PermissionStatusState} permissionState - State of browser permission
-   * @returns {Promise} Resolves with true if notificaions are enabled
-   */
-  setPermissionState(permissionState) {
-    this.permissionState = permissionState;
-    return this._getPermissionState();
-  }
-
   updatedProperties(properties) {
     const notificationPreference = properties.settings.notifications;
     return this.notificationsPreference(notificationPreference);
@@ -189,6 +173,16 @@ z.notification.NotificationRepository = class NotificationRepository {
 
   updatedNotificationsProperty(notificationPreference) {
     return this.notificationsPreference(notificationPreference);
+  }
+
+  /**
+   * Set the permission state.
+   * @param {z.permission.PermissionStatusState} permissionState - State of browser permission
+   * @returns {Promise} Resolves with true if notifications are enabled
+   */
+  updatePermissionState(permissionState) {
+    this.permissionState(permissionState);
+    return this._checkPermissionState();
   }
 
   /**
@@ -593,14 +587,15 @@ z.notification.NotificationRepository = class NotificationRepository {
    * @private
    * @returns {Promise} Resolves with true if notifications are permitted
    */
-  _getPermissionState() {
-    switch (this.permissionState) {
-      case z.notification.PermissionStatusState.GRANTED: {
+  _checkPermissionState() {
+    switch (this.permissionState()) {
+      case z.permission.PermissionStatusState.GRANTED: {
         return Promise.resolve(true);
       }
 
-      case z.notification.PermissionStatusState.IGNORED:
-      case z.notification.PermissionStatusState.UNSUPPORTED: {
+      case z.notification.PermissionState.IGNORED:
+      case z.notification.PermissionState.UNSUPPORTED:
+      case z.permission.PermissionStatusState.DENIED: {
         return Promise.resolve(false);
       }
 
@@ -677,7 +672,7 @@ z.notification.NotificationRepository = class NotificationRepository {
       if (window.Notification.requestPermission) {
         window.Notification.requestPermission(permissionState => {
           amplify.publish(z.event.WebApp.WARNING.DISMISS, z.viewModel.WarningsViewModel.TYPE.REQUEST_NOTIFICATION);
-          return this.setPermissionState(permissionState).then(resolve);
+          this.updatePermissionState(permissionState).then(resolve);
         });
       }
     });
@@ -725,7 +720,7 @@ z.notification.NotificationRepository = class NotificationRepository {
 
     const activeConversation = document.hasFocus() && inConversationView && inActiveConversation && !inMaximizedCall;
     const messageFromSelf = messageEntity.user().is_me;
-    const permissionDenied = this.permissionState === z.notification.PermissionStatusState.DENIED;
+    const permissionDenied = this.permissionState() === z.permission.PermissionStatusState.DENIED;
     const preferenceIsNone = this.notificationsPreference() === z.notification.NotificationPreference.NONE;
     const supportsNotification = z.util.Environment.browser.supports.notifications;
 
