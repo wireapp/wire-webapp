@@ -104,22 +104,57 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
   }
 
   /**
+   * Check supported media type.
+   * @private
+   * @returns {Promise} Resolves with a MediaType or false
+   */
+  _checkMediaSupport() {
+    let mediaType;
+    if (this.deviceSupport.audioInput()) {
+      mediaType = this.deviceSupport.videoInput() ? z.media.MediaType.AUDIO_VIDEO : z.media.MediaType.AUDIO;
+    } else {
+      mediaType = this.deviceSupport.videoInput() ? z.media.MediaType.VIDEO : undefined;
+    }
+
+    return mediaType
+      ? Promise.resolve(mediaType)
+      : Promise.reject(new z.media.MediaError(z.media.MediaError.TYPE.MEDIA_STREAM_DEVICE));
+  }
+
+  /**
+   * Get current MediaStream or initiate it.
+   * @private
+   * @returns {Promise} Resolves with a MediaStream
+   */
+  _getCurrentMediaStream() {
+    const hasActiveStream = this.deviceSupport.videoInput()
+      ? !!this.mediaStream() && this.streamHandler.localMediaType() === z.media.MediaType.VIDEO
+      : !!this.mediaStream();
+
+    return Promise.resolve(hasActiveStream ? this.mediaStream() : undefined);
+  }
+
+  /**
    * Get current MediaStream or initiate it.
    * @private
    * @returns {Promise} Resolves with a MediaStream
    */
   _getMediaStream() {
-    const hasSupportedVideoStream = this.deviceSupport.videoInput()
-      ? this.mediaStream() && this.streamHandler.localMediaType() === z.media.MediaType.VIDEO
-      : this.mediaStream();
+    return this._getCurrentMediaStream().then(mediaStream => (mediaStream ? mediaStream : this._initiateMediaStream()));
+  }
 
-    if (hasSupportedVideoStream) {
-      return Promise.resolve(this.mediaStream());
-    }
-
-    return this.constraintsHandler
-      .getMediaStreamConstraints(this.deviceSupport.audioInput(), this.deviceSupport.videoInput())
-      .then(({mediaType, streamConstraints}) => this.streamHandler.requestMediaStream(mediaType, streamConstraints))
+  /**
+   * Initiate MediaStream.
+   * @private
+   * @returns {Promise} Resolves with a MediaStream
+   */
+  _initiateMediaStream() {
+    return this._checkMediaSupport()
+      .then(mediaType => {
+        return this.constraintsHandler
+          .getMediaStreamConstraints(this.deviceSupport.audioInput(), this.deviceSupport.videoInput)
+          .then(streamConstraints => this.streamHandler.requestMediaStream(mediaType, streamConstraints));
+      })
       .then(mediaStreamInfo => {
         if (this.deviceSupport.videoInput()) {
           this.streamHandler.localMediaType(z.media.MediaType.VIDEO);
