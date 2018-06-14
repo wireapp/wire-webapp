@@ -64,11 +64,11 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
     };
 
     elements.forEach(element => {
-      const video = element.querySelector('video');
-      if (video.videoWidth > 0) {
-        setScale(video);
+      const videoElement = element.querySelector('video');
+      if (videoElement.videoWidth > 0) {
+        setScale(videoElement);
       } else {
-        video.addEventListener('loadedmetadata', () => setScale(video), {once: true});
+        videoElement.addEventListener('loadedmetadata', () => setScale(videoElement), {once: true});
       }
     });
   }
