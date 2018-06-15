@@ -599,7 +599,8 @@ z.calling.entities.FlowEntity = class FlowEntity {
    * @returns {undefined} No return value
    */
   _onTrack(event) {
-    this.callLogger.info('Remote MediaStreamTrack added to PeerConnection', event);
+    const mediaStreamTrack = event.track;
+    this.callLogger.info(`Remote '${mediaStreamTrack.kind}' MediaStreamTrack added to PeerConnection`, event);
   }
 
   //##############################################################################

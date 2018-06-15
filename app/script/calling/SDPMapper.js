@@ -74,14 +74,17 @@ z.calling.SDPMapper = {
     const iceCandidates = [];
     let sessionDescription;
 
-    const isSourceLocal = sdpSource === z.calling.enum.SDP_SOURCE.LOCAL;
-    sessionDescription = isSourceLocal ? sdp.replace('UDP/TLS/', '') : sdp;
+    const isIceRestart = flowEntity.negotiationMode() === z.calling.enum.SDP_NEGOTIATION_MODE.ICE_RESTART;
+    const isLocalSdp = sdpSource === z.calling.enum.SDP_SOURCE.LOCAL;
+    const isOffer = rtcSdp.type === z.calling.rtc.SDP_TYPE.OFFER;
+
+    sessionDescription = isLocalSdp ? sdp.replace('UDP/TLS/', '') : sdp;
 
     sessionDescription.split('\r\n').forEach(sdpLine => {
       let outline = sdpLine;
 
       if (sdpLine.startsWith('t=')) {
-        if (isSourceLocal) {
+        if (isLocalSdp) {
           sdpLines.push(sdpLine);
 
           const browserString = `${z.util.Environment.browser.name} ${z.util.Environment.browser.version}`;
@@ -98,38 +101,30 @@ z.calling.SDPMapper = {
         iceCandidates.push(sdpLine);
       } else if (sdpLine.startsWith('a=mid')) {
         // Remove once obsolete due to high uptake of clients based on AVS build 3.3.11 containing fix for AUDIO-1215
-        const isRemoteSdp = sdpSource === z.calling.enum.SDP_SOURCE.REMOTE;
-        const isAnswer = rtcSdp.type === z.calling.rtc.SDP_TYPE.ANSWER;
-
-        if (isRemoteSdp && isAnswer && z.util.Environment.browser.firefox) {
-          const isSdpLineData = sdpLine === 'a=mid:data';
-          if (isSdpLineData) {
-            outline = 'a=mid:sdparta_2';
-          }
+        const isAffectedSetup = z.util.Environment.browser.firefox && !isLocalSdp && !isOffer;
+        const shouldFixMediaStreamId = isAffectedSetup && sdpLine === 'a=mid:data';
+        if (shouldFixMediaStreamId) {
+          outline = 'a=mid:sdparta_2';
         }
       } else if (sdpLine.startsWith('m=audio')) {
         // Code to nail in bit-rate and ptime settings for improved performance and experience
-        const isIceRestart = flowEntity.negotiationMode() === z.calling.enum.SDP_NEGOTIATION_MODE.ICE_RESTART;
-        const isLocalSdp = sdpSource === z.calling.enum.SDP_SOURCE.LOCAL;
-
-        if (isIceRestart || (isLocalSdp && flowEntity.isGroup)) {
+        const isLocalSdpInGroup = isLocalSdp && flowEntity.isGroup;
+        const shouldAdBitRate = isLocalSdpInGroup || isIceRestart;
+        if (shouldAdBitRate) {
           sdpLines.push(sdpLine);
           outline = `b=AS:${z.calling.SDPMapper.CONFIG.AUDIO_BITRATE}`;
         }
       } else if (sdpLine.startsWith('a=rtpmap')) {
-        const isIceRestart = flowEntity.negotiationMode() === z.calling.enum.SDP_NEGOTIATION_MODE.ICE_RESTART;
-        const isLocalSdp = sdpSource === z.calling.enum.SDP_SOURCE.LOCAL;
-
-        if (isIceRestart || (isLocalSdp && flowEntity.isGroup)) {
-          if (z.util.StringUtil.includes(sdpLine, 'opus')) {
-            sdpLines.push(sdpLine);
-            outline = `a=ptime:${z.calling.SDPMapper.CONFIG.AUDIO_PTIME}`;
-          }
+        const isLocalSdpInGroup = isLocalSdp && flowEntity.isGroup;
+        const shouldAddPTime = isLocalSdpInGroup || isIceRestart;
+        if (shouldAddPTime && z.util.StringUtil.includes(sdpLine, 'opus')) {
+          sdpLines.push(sdpLine);
+          outline = `a=ptime:${z.calling.SDPMapper.CONFIG.AUDIO_PTIME}`;
         }
       } else if (sdpLine.startsWith('a=fmtp')) {
         // Workaround for incompatibility between Chrome 57 and AVS builds. Remove once update of clients with AVS 3.3.x is high enough.
-        const isAffectedCodec = sdpLine === 'a=fmtp:125 apt=100';
-        if (isAffectedCodec) {
+        const shouldFixCodec = sdpLine === 'a=fmtp:125 apt=100';
+        if (shouldFixCodec) {
           outline = 'a=fmtp:125 apt=96';
         }
       }
