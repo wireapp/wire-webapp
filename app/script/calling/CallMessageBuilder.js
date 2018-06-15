@@ -91,39 +91,28 @@ z.calling.CallMessageBuilder = (() => {
    *
    * @param {Object} selfState - Current self state
    * @param {z.media.MediaType|boolean} payloadType - Media type of property change or forced videosend state
-   * @param {boolean} [invert=false] - Invert state
    * @param {Object} additionalPayload - Optional additional payload to be added
    * @returns {Object} call message props object
    */
-  const _createPropSync = (selfState, payloadType, invert, additionalPayload) => {
+  const _createPropSync = (selfState, payloadType, additionalPayload) => {
     const payload = {};
 
     if (_.isBoolean(payloadType)) {
       payload.properties = {videosend: `${payloadType}`};
     } else {
-      let audioSendState;
-      let screenSendState;
-      let videoSendState = undefined;
-
       switch (payloadType) {
         case z.media.MediaType.AUDIO: {
           const {audioSend: audioSelfState} = selfState;
-
-          audioSendState = invert ? !audioSelfState() : audioSelfState();
-
-          payload.properties = {audiosend: `${audioSendState}`};
+          payload.properties = {audiosend: `${audioSelfState()}`};
           break;
         }
 
         case z.media.MediaType.SCREEN: {
           const {screenSend: screenSelfState, videoSend: videoSelfState} = selfState;
 
-          screenSendState = invert ? !screenSelfState() : screenSelfState();
-          videoSendState = invert ? z.calling.enum.PROPERTY_STATE.FALSE : videoSelfState();
-
           payload.properties = {
-            screensend: `${screenSendState}`,
-            videosend: `${videoSendState}`,
+            screensend: `${screenSelfState()}`,
+            videosend: `${videoSelfState()}`,
           };
           break;
         }
@@ -131,12 +120,9 @@ z.calling.CallMessageBuilder = (() => {
         case z.media.MediaType.VIDEO: {
           const {screenSend: screenSelfState, videoSend: videoSelfState} = selfState;
 
-          screenSendState = invert ? z.calling.enum.PROPERTY_STATE.FALSE : screenSelfState();
-          videoSendState = invert ? !videoSelfState() : videoSelfState();
-
           payload.properties = {
-            screensend: `${screenSendState}`,
-            videosend: `${videoSendState}`,
+            screensend: `${screenSelfState()}`,
+            videosend: `${videoSelfState()}`,
           };
           break;
         }

@@ -39,8 +39,8 @@
     "@bower_components/webrtc-adapter": "webrtc/adapter#6.2.1",
     "@bower_components/wire-audio-files": "wireapp/wire-audio-files#1.1.1",
     "@bower_components/wire-theme": "wireapp/wire-theme#1.0.6",
-    "@wireapp/core": "3.1.0",
-    "@wireapp/react-ui-kit": "1.1.39",
+    "@wireapp/core": "3.1.2",
+    "@wireapp/react-ui-kit": "1.1.40",
     "babel-plugin-react-intl": "2.4.0",
     "babel-polyfill": "6.26.0",
     "dexie-batch": "ffflorian/dexie-batch#dbf3b4dd9c24066a5ad11d875566ef61ffa53150",
@@ -124,7 +124,7 @@
     "react-addons-test-utils": "15.6.2",
     "react-hot-loader": "4.3.2",
     "redux-devtools-extension": "2.13.2",
-    "redux-mock-store": "1.5.1",
+    "redux-mock-store": "1.5.3",
     "request": "2.87.0",
     "sinon": "6.0.0",
     "stylelint": "9.2.1",
@@ -133,7 +133,7 @@
     "uglify-js": "3.4.0",
     "uglifyjs-webpack-plugin": "1.2.5",
     "webpack": "4.12.0",
-    "webpack-cli": "3.0.5",
+    "webpack-cli": "3.0.6",
     "webpack-dev-server": "3.1.4"
   },
   "engines": {

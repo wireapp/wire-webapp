@@ -1022,12 +1022,8 @@ z.calling.entities.FlowEntity = class FlowEntity {
     );
     const additionalPayload = Object.assign({remoteUser: this.remoteUser, sdp: this.localSdp().sdp}, payload);
 
-    return z.calling.CallMessageBuilder.createPropSync(
-      this.callEntity.selfState,
-      this.callEntity.selfState.videoSend(),
-      false,
-      additionalPayload
-    );
+    const selfState = this.callEntity.selfState;
+    return z.calling.CallMessageBuilder.createPropSync(selfState, selfState.videoSend(), additionalPayload);
   }
 
   /**

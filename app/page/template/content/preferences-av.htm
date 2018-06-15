@@ -3,7 +3,7 @@
   <div class="preferences-content-wrapper">
     <div class="preferences-content" data-bind="antiscroll">
 
-      <!-- ko if: supportsAudioInput() -->
+      <!-- ko if: deviceSupport.audioInput() -->
         <section class="preferences-section">
           <header class="preferences-header preferences-av-header" data-bind="l10n_text: z.string.preferencesAVMicrophone"></header>
           <!-- ko if: permissionDenied() -->
@@ -54,7 +54,7 @@
         </section>
       <!-- /ko -->
 
-      <!-- ko if: supportsVideoInput() -->
+      <!-- ko if: deviceSupport.videoInput() -->
         <section class="preferences-section">
           <header class="preferences-header preferences-av-header" data-bind="l10n_text: z.string.preferencesAVCamera"></header>
           <!-- ko if: permissionDenied() -->
