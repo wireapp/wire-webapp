@@ -206,15 +206,15 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
 
     const replacePromise = this.joinedCall()
       ? this._updateJoinedCall(mediaStreamInfo)
-      : Promise.resolve(mediaStreamInfo);
+      : Promise.resolve({replace: false, streamInfo: mediaStreamInfo});
 
-    replacePromise.then(updatedMediaStreamInfo => this._handleReplacedMediaStream(updatedMediaStreamInfo));
+    replacePromise.then(this._handleReplacedMediaStream.bind(this));
   }
 
-  _handleReplacedMediaStream(mediaStreamInfo) {
+  _handleReplacedMediaStream({streamInfo: mediaStreamInfo, replace}) {
     const replaceMediaStreamLocally = newMediaStreamInfo => {
-      const newMediaStream = mediaStreamInfo.stream;
-      const newMediaStreamType = mediaStreamInfo.getType();
+      const newMediaStream = newMediaStreamInfo.stream;
+      const newMediaStreamType = newMediaStreamInfo.getType();
 
       this._releaseMediaStream(this.localMediaStream());
       this._setStreamState(newMediaStream, newMediaStreamType);
@@ -229,9 +229,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
       this._addTracksToStream(mediaStream, this.localMediaStream(), mediaType);
     };
 
-    return mediaStreamInfo.replaced
-      ? replaceMediaStreamLocally(mediaStreamInfo)
-      : replaceMediaTracksLocally(mediaStreamInfo);
+    return replace ? replaceMediaStreamLocally(mediaStreamInfo) : replaceMediaTracksLocally(mediaStreamInfo);
   }
 
   /**
@@ -594,8 +592,6 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
 
     const replaceMediaStreamInFlows = (streamInfo, flows) => {
       return this._updateMediaStream(streamInfo).then(newMediaStreamInfo => {
-        newMediaStreamInfo.replaced = true;
-
         const upgradePromises = flows.map(flowEntity => {
           return flowEntity.replaceMediaStream(newMediaStreamInfo, this.localMediaStream());
         });
@@ -605,10 +601,11 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
 
     return firstFlowEntity
       .supportsTrackReplacement(mediaStreamInfo.getType())
-      .then(replacementSupported => {
-        return replacementSupported
+      .then(replace => {
+        const replacePromise = replace
           ? replaceMediaTrackInFlows(mediaStreamInfo, flowEntities)
           : replaceMediaStreamInFlows(mediaStreamInfo, flowEntities);
+        return replacePromise.then(streamInfo => ({replace, streamInfo}));
       })
       .catch(error => {
         const message = `Failed to update call with '${mediaStreamInfo.getType()}': ${error.name} - ${error.message}`;
