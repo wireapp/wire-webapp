@@ -197,14 +197,14 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
     const {stream: mediaStream} = mediaStreamInfo;
 
     const replaceMediaStream = (localMediaStream, newMediaStreamInfo) => {
-      this._releaseMediaStream(this.localMediaStream());
-      this._setStreamState(updateMediaStreamInfo);
-      this.localMediaStream(updateMediaStreamInfo.stream);
+      this._releaseMediaStream(localMediaStream);
+      this._setStreamState(newMediaStreamInfo);
+      this.localMediaStream(newMediaStreamInfo.stream);
     };
 
     const replaceMediaTracks = (localMediaStream, newMediaStream) => {
       localMediaStream.getTracks().forEach(localTrack => {
-        updateMediaStreamInfo.stream.getTracks().forEach(newTrack => {
+        newMediaStream.getTracks().forEach(newTrack => {
           if (localTrack.kind === newTrack.kind) {
             localTrack.stop();
             localMediaStream.removeTrack(localTrack);
