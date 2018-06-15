@@ -76,6 +76,7 @@ z.calling.SDPMapper = {
 
     const isIceRestart = flowEntity.negotiationMode() === z.calling.enum.SDP_NEGOTIATION_MODE.ICE_RESTART;
     const isLocalSdp = sdpSource === z.calling.enum.SDP_SOURCE.LOCAL;
+    const isLocalSdpInGroup = isLocalSdp && flowEntity.isGroup;
     const isOffer = rtcSdp.type === z.calling.rtc.SDP_TYPE.OFFER;
 
     sessionDescription = isLocalSdp ? sdp.replace('UDP/TLS/', '') : sdp;
@@ -108,14 +109,12 @@ z.calling.SDPMapper = {
         }
       } else if (sdpLine.startsWith('m=audio')) {
         // Code to nail in bit-rate and ptime settings for improved performance and experience
-        const isLocalSdpInGroup = isLocalSdp && flowEntity.isGroup;
         const shouldAddBitRate = isLocalSdpInGroup || isIceRestart;
         if (shouldAddBitRate) {
           sdpLines.push(sdpLine);
           outline = `b=AS:${z.calling.SDPMapper.CONFIG.AUDIO_BITRATE}`;
         }
       } else if (sdpLine.startsWith('a=rtpmap')) {
-        const isLocalSdpInGroup = isLocalSdp && flowEntity.isGroup;
         const shouldAddPTime = isLocalSdpInGroup || isIceRestart;
         if (shouldAddPTime && z.util.StringUtil.includes(sdpLine, 'opus')) {
           sdpLines.push(sdpLine);
