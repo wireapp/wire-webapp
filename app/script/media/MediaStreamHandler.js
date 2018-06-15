@@ -611,10 +611,8 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
           : replaceMediaStreamInFlows(mediaStreamInfo, flowEntities);
       })
       .catch(error => {
-        const logMessage = `Failed to update call with '${mediaStreamInfo.getType()}': ${error.name} - ${
-          error.message
-        }`;
-        this.logger.error(logMessage, error);
+        const message = `Failed to update call with '${mediaStreamInfo.getType()}': ${error.name} - ${error.message}`;
+        this.logger.error(message, error);
         throw error;
       });
   }
