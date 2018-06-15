@@ -89,7 +89,7 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
 
     this.showFullscreen = ko.pureComputed(() => {
       const isFullScreenState = this.isCallOngoing() || this.isChoosingScreen();
-      return isFullScreenState && !this.multitasking.isMinimized();
+      return isFullScreenState && !this.multitasking.isMinimized() && !!this.videodCall();
     });
 
     this.remoteUser = ko.pureComputed(() => {
