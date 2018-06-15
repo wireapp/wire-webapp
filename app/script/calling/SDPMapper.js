@@ -109,8 +109,8 @@ z.calling.SDPMapper = {
       } else if (sdpLine.startsWith('m=audio')) {
         // Code to nail in bit-rate and ptime settings for improved performance and experience
         const isLocalSdpInGroup = isLocalSdp && flowEntity.isGroup;
-        const shouldAdBitRate = isLocalSdpInGroup || isIceRestart;
-        if (shouldAdBitRate) {
+        const shouldAddBitRate = isLocalSdpInGroup || isIceRestart;
+        if (shouldAddBitRate) {
           sdpLines.push(sdpLine);
           outline = `b=AS:${z.calling.SDPMapper.CONFIG.AUDIO_BITRATE}`;
         }
