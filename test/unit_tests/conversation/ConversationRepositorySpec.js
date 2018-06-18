@@ -1031,6 +1031,39 @@ describe('ConversationRepository', () => {
     });
   });
 
+  describe('send_text_with_link_preview', () => {
+    it('sends ephemeral message', () => {
+      const conversationRepository = TestFactory.conversation_repository;
+      const conversation = _generate_conversation();
+      conversationRepository.conversations([conversation]);
+      const conversationPromise = Promise.resolve(conversation);
+      spyOn(conversationRepository.conversation_service, 'post_encrypted_message').and.returnValue(Promise.resolve({}));
+      spyOn(conversationRepository.conversation_mapper, 'map_conversations').and.returnValue(conversationPromise);
+      const expirations = [1000, 300, 31557600000];
+      spyOn(conversationRepository.cryptography_repository, 'encryptGenericMessage').and.callFake(
+        (conversationId, genericMessage, payload, preconditionOption) => {
+          const {content, ephemeral} = genericMessage;
+          expect(content).toBe(z.cryptography.GENERIC_MESSAGE_TYPE.EPHEMERAL);
+          expect(ephemeral.content).toBe(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT);
+          expect(ephemeral.expire_after_millis.low).toBe(expirations.shift());
+          return Promise.resolve({});
+        }
+      );
+
+      const sentPromises = expirations.map(expiration => {
+        conversation.ephemeral_timer(expiration);
+        conversation.self = {id: 'felix'};
+        const message = 'hello there';
+        return conversationRepository.send_text_with_link_preview(message, conversation);
+      });
+      return Promise.all(sentPromises).then(sentMessages => {
+        expect(conversationRepository.conversation_service.post_encrypted_message).toHaveBeenCalledTimes(
+          sentMessages.length
+        );
+      });
+    });
+  });
+
   describe('Encryption', () => {
     let anne;
     let bob;
