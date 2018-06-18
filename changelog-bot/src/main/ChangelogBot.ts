@@ -73,7 +73,7 @@ class ChangelogBot {
         if (id) {
           logger.info(`Sending message to conversation ${id} ...`);
           const textPayload = await account.service.conversation.createText(this.message);
-          await account.service.conversation.sendText(id, textPayload);
+          await account.service.conversation.send(id, textPayload);
         }
       })
     );

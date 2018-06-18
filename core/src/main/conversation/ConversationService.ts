@@ -81,6 +81,25 @@ export default class ConversationService {
     });
   }
 
+  private async sendConfirmation(
+    conversationId: string,
+    payloadBundle: PayloadBundleOutgoingUnsent
+  ): Promise<PayloadBundleOutgoing> {
+    const confirmation = this.protocolBuffers.Confirmation.create({
+      firstMessageId: payloadBundle.content,
+      type: ConfirmationType.DELIVERED,
+    });
+
+    const genericMessage = this.protocolBuffers.GenericMessage.create({
+      confirmation,
+      messageId: payloadBundle.id,
+    });
+
+    await this.sendGenericMessage(this.clientID, conversationId, genericMessage);
+
+    return {...payloadBundle, conversation: conversationId, state: PayloadBundleState.OUTGOING_SENT};
+  }
+
   private async sendExternalGenericMessage(
     sendingClientId: string,
     conversationId: string,
@@ -123,104 +142,10 @@ export default class ConversationService {
     const preKeyBundles = await this.getPreKeyBundles(conversationId);
     const recipients = await this.cryptographyService.encrypt(plainTextBuffer, preKeyBundles as UserPreKeyBundleMap);
 
-    return this.sendMessage(sendingClientId, conversationId, recipients);
+    return this.sendOTRMessage(sendingClientId, conversationId, recipients);
   }
 
-  private sendMessage(
-    sendingClientId: string,
-    conversationId: string,
-    recipients: OTRRecipients
-  ): Promise<ClientMismatch> {
-    const message: NewOTRMessage = {
-      recipients,
-      sender: sendingClientId,
-    };
-    return this.apiClient.conversation.api.postOTRMessage(sendingClientId, conversationId, message);
-  }
-
-  private shouldSendAsExternal(plainText: Buffer, preKeyBundles: UserPreKeyBundleMap): boolean {
-    const EXTERNAL_MESSAGE_THRESHOLD_BYTES = 200 * 1024;
-
-    let clientCount = 0;
-    for (const user in preKeyBundles) {
-      clientCount += Object.keys(preKeyBundles[user]).length;
-    }
-
-    const messageInBytes = new Uint8Array(plainText).length;
-    const estimatedPayloadInBytes = clientCount * messageInBytes;
-
-    return estimatedPayloadInBytes > EXTERNAL_MESSAGE_THRESHOLD_BYTES;
-  }
-
-  public static createId(): string {
-    return new UUID(4).format();
-  }
-
-  public async createImage(
-    image: Image,
-    messageId: string = ConversationService.createId()
-  ): Promise<PayloadBundleOutgoingUnsent> {
-    const imageAsset = await this.assetService.uploadImageAsset(image);
-
-    return {
-      content: {
-        asset: imageAsset,
-        image,
-      },
-      from: this.apiClient.context!.userId,
-      id: messageId,
-      state: PayloadBundleState.OUTGOING_UNSENT,
-      type: GenericMessageType.ASSET,
-    };
-  }
-
-  public async createText(
-    message: string,
-    messageId: string = ConversationService.createId()
-  ): Promise<PayloadBundleOutgoingUnsent> {
-    return {
-      content: message,
-      from: this.apiClient.context!.userId,
-      id: messageId,
-      state: PayloadBundleState.OUTGOING_UNSENT,
-      type: GenericMessageType.TEXT,
-    };
-  }
-
-  public async getImage({assetId, otrKey, sha256, assetToken}: RemoteData): Promise<Buffer> {
-    const encryptedBuffer = await this.apiClient.asset.api.getAsset(assetId, assetToken);
-    return AssetCryptography.decryptAsset({
-      cipherText: Buffer.from(encryptedBuffer),
-      keyBytes: Buffer.from(otrKey.buffer),
-      sha256: Buffer.from(sha256.buffer),
-    });
-  }
-
-  public async sendConfirmation(conversationId: string, confirmMessageId: string): Promise<PayloadBundleOutgoing> {
-    const messageId = ConversationService.createId();
-
-    const confirmation = this.protocolBuffers.Confirmation.create({
-      firstMessageId: confirmMessageId,
-      type: ConfirmationType.DELIVERED,
-    });
-
-    const genericMessage = this.protocolBuffers.GenericMessage.create({
-      confirmation,
-      messageId,
-    });
-
-    await this.sendGenericMessage(this.clientID, conversationId, genericMessage);
-
-    return {
-      conversation: conversationId,
-      from: this.apiClient.context!.userId,
-      id: messageId,
-      state: PayloadBundleState.OUTGOING_SENT,
-      type: GenericMessageType.CONFIRMATION,
-    };
-  }
-
-  public async sendImage(
+  private async sendImage(
     conversationId: string,
     payloadBundle: PayloadBundleOutgoingUnsent,
     expireAfterMillis?: number
@@ -272,46 +197,48 @@ export default class ConversationService {
     return {...payloadBundle, conversation: conversationId, state: PayloadBundleState.OUTGOING_SENT};
   }
 
-  public async sendPing(conversationId: string): Promise<PayloadBundleOutgoing> {
-    const messageId = ConversationService.createId();
+  private sendOTRMessage(
+    sendingClientId: string,
+    conversationId: string,
+    recipients: OTRRecipients
+  ): Promise<ClientMismatch> {
+    const message: NewOTRMessage = {
+      recipients,
+      sender: sendingClientId,
+    };
+    return this.apiClient.conversation.api.postOTRMessage(sendingClientId, conversationId, message);
+  }
 
+  private async sendPing(
+    conversationId: string,
+    payloadBundle: PayloadBundleOutgoingUnsent
+  ): Promise<PayloadBundleOutgoing> {
     const knock = this.protocolBuffers.Knock.create();
     const genericMessage = this.protocolBuffers.GenericMessage.create({
       knock,
-      messageId,
+      messageId: payloadBundle.id,
     });
 
     await this.sendGenericMessage(this.clientID, conversationId, genericMessage);
 
-    return {
-      conversation: conversationId,
-      from: this.apiClient.context!.userId,
-      id: messageId,
-      state: PayloadBundleState.OUTGOING_SENT,
-      type: GenericMessageType.KNOCK,
-    };
+    return {...payloadBundle, conversation: conversationId, state: PayloadBundleState.OUTGOING_SENT};
   }
 
-  public async sendSessionReset(conversationId: string): Promise<PayloadBundleOutgoing> {
-    const messageId = ConversationService.createId();
-
+  private async sendSessionReset(
+    conversationId: string,
+    payloadBundle: PayloadBundleOutgoingUnsent
+  ): Promise<PayloadBundleOutgoing> {
     const sessionReset = this.protocolBuffers.GenericMessage.create({
       clientAction: ClientAction.RESET_SESSION,
-      messageId,
+      messageId: payloadBundle.id,
     });
 
     await this.sendGenericMessage(this.clientID, conversationId, sessionReset);
 
-    return {
-      conversation: conversationId,
-      from: this.apiClient.context!.userId,
-      id: messageId,
-      state: PayloadBundleState.OUTGOING_SENT,
-      type: GenericMessageType.CLIENT_ACTION,
-    };
+    return {...payloadBundle, conversation: conversationId, state: PayloadBundleState.OUTGOING_SENT};
   }
 
-  public async sendText(
+  private async sendText(
     conversationId: string,
     originalPayloadBundle: PayloadBundleOutgoingUnsent,
     expireAfterMillis?: number
@@ -350,8 +277,128 @@ export default class ConversationService {
       preKeyBundles as UserPreKeyBundleMap
     );
 
-    await this.sendMessage(this.clientID, conversationId, payload);
+    await this.sendOTRMessage(this.clientID, conversationId, payload);
     return payloadBundle;
+  }
+
+  private shouldSendAsExternal(plainText: Buffer, preKeyBundles: UserPreKeyBundleMap): boolean {
+    const EXTERNAL_MESSAGE_THRESHOLD_BYTES = 200 * 1024;
+
+    let clientCount = 0;
+    for (const user in preKeyBundles) {
+      clientCount += Object.keys(preKeyBundles[user]).length;
+    }
+
+    const messageInBytes = new Uint8Array(plainText).length;
+    const estimatedPayloadInBytes = clientCount * messageInBytes;
+
+    return estimatedPayloadInBytes > EXTERNAL_MESSAGE_THRESHOLD_BYTES;
+  }
+
+  public static createId(): string {
+    return new UUID(4).format();
+  }
+
+  public async createImage(
+    image: Image,
+    messageId: string = ConversationService.createId()
+  ): Promise<PayloadBundleOutgoingUnsent> {
+    const imageAsset = await this.assetService.uploadImageAsset(image);
+
+    return {
+      content: {
+        asset: imageAsset,
+        image,
+      },
+      from: this.apiClient.context!.userId,
+      id: messageId,
+      state: PayloadBundleState.OUTGOING_UNSENT,
+      type: GenericMessageType.ASSET,
+    };
+  }
+
+  public createText(message: string, messageId: string = ConversationService.createId()): PayloadBundleOutgoingUnsent {
+    return {
+      content: message,
+      from: this.apiClient.context!.userId,
+      id: messageId,
+      state: PayloadBundleState.OUTGOING_UNSENT,
+      type: GenericMessageType.TEXT,
+    };
+  }
+
+  public createConfirmation(
+    confirmMessageId: string,
+    messageId: string = ConversationService.createId()
+  ): PayloadBundleOutgoingUnsent {
+    return {
+      content: confirmMessageId,
+      from: this.apiClient.context!.userId,
+      id: messageId,
+      state: PayloadBundleState.OUTGOING_UNSENT,
+      type: GenericMessageType.CONFIRMATION,
+    };
+  }
+
+  public createPing(messageId: string = ConversationService.createId()): PayloadBundleOutgoingUnsent {
+    return {
+      from: this.apiClient.context!.userId,
+      id: messageId,
+      state: PayloadBundleState.OUTGOING_UNSENT,
+      type: GenericMessageType.KNOCK,
+    };
+  }
+
+  public createSessionReset(messageId: string = ConversationService.createId()): PayloadBundleOutgoingUnsent {
+    return {
+      content: String(ClientAction.RESET_SESSION),
+      from: this.apiClient.context!.userId,
+      id: messageId,
+      state: PayloadBundleState.OUTGOING_UNSENT,
+      type: GenericMessageType.CLIENT_ACTION,
+    };
+  }
+
+  public async getImage({assetId, otrKey, sha256, assetToken}: RemoteData): Promise<Buffer> {
+    const encryptedBuffer = await this.apiClient.asset.api.getAsset(assetId, assetToken);
+    return AssetCryptography.decryptAsset({
+      cipherText: Buffer.from(encryptedBuffer),
+      keyBytes: Buffer.from(otrKey.buffer),
+      sha256: Buffer.from(sha256.buffer),
+    });
+  }
+
+  public async send(
+    conversationId: string,
+    payloadBundle: PayloadBundleOutgoingUnsent
+  ): Promise<PayloadBundleOutgoing> {
+    switch (payloadBundle.type) {
+      case GenericMessageType.ASSET: {
+        if (payloadBundle.content) {
+          if ((payloadBundle.content as ImageAsset).image) {
+            return this.sendImage(conversationId, payloadBundle);
+          }
+          throw new Error(`No send method implemented for sending other assets than images.`);
+        }
+        throw new Error(`No send method implemented for "${payloadBundle.type}" without content".`);
+      }
+      case GenericMessageType.CLIENT_ACTION: {
+        if (payloadBundle.content === ClientAction.RESET_SESSION) {
+          return this.sendSessionReset(conversationId, payloadBundle);
+        }
+        throw new Error(
+          `No send method implemented for "${payloadBundle.type}" and ClientAction "${payloadBundle.content}".`
+        );
+      }
+      case GenericMessageType.CONFIRMATION:
+        return this.sendConfirmation(conversationId, payloadBundle);
+      case GenericMessageType.KNOCK:
+        return this.sendPing(conversationId, payloadBundle);
+      case GenericMessageType.TEXT:
+        return this.sendText(conversationId, payloadBundle);
+      default:
+        throw new Error(`No send method implemented for "${payloadBundle.type}."`);
+    }
   }
 
   public sendTypingStart(conversationId: string): Promise<void> {

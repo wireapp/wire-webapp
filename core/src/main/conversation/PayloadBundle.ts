@@ -17,7 +17,7 @@
  *
  */
 
-import {Asset, GenericMessageType, Image, ImageAsset} from '../conversation/root';
+import {Asset, ClientAction, GenericMessageType, Image, ImageAsset} from '../conversation/root';
 
 enum PayloadBundleState {
   INCOMING = 'PayloadBundleState.INCOMING',
@@ -33,7 +33,7 @@ type PayloadBundleOutgoing = PayloadBundle & {
 type PayloadBundleOutgoingUnsent = PayloadBundle & {state: PayloadBundleState.OUTGOING_UNSENT};
 
 interface PayloadBundle {
-  content?: string | Asset | Image | ImageAsset;
+  content?: string | Asset | Image | ImageAsset | ClientAction;
   from: string;
   id: string;
   state: PayloadBundleState;
