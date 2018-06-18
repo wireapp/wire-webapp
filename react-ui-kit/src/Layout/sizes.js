@@ -30,4 +30,4 @@ export const WIDTH = {
   DESKTOP_XL_MAX: 1600,
 };
 
-export const GUTTER = 12;
+export const GUTTER = 8;

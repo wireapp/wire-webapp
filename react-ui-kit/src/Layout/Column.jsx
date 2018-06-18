@@ -24,7 +24,6 @@ import styled from 'styled-components';
 const Columns = styled.div`
   display: flex;
   margin-left: -${GUTTER}px;
-  margin-left: -${GUTTER}px;
   ${media.mobile`
     flex-direction: column;
   `};
