@@ -54,7 +54,7 @@ class ChangelogBot {
     const engine = new MemoryEngine();
     await engine.init('');
 
-    const client = new APIClient(new Config(engine, APIClient.BACKEND.STAGING));
+    const client = new APIClient(new Config(engine, APIClient.BACKEND.PRODUCTION));
 
     const account = new Account(client);
     await account.login(this.loginData);

@@ -19,8 +19,10 @@
  *
  */
 
+// @ts-check
+
 import chalk from 'chalk';
-import {start} from './start';
+import {start as startChangelogBot} from './start';
 
 const program = require('commander');
 const logdown = require('logdown');
@@ -41,12 +43,12 @@ program
   .option('-p, --password <password>', 'Your password')
   .parse(process.argv);
 
-const TRAVIS_ENV_VARS = ['TRAVIS_COMMIT_RANGE', 'TRAVIS_EVENT_TYPE', 'TRAVIS_REPO_SLUG'];
+const TRAVIS_ENV_VARS = ['TRAVIS_COMMIT_RANGE', 'TRAVIS_REPO_SLUG'];
 
 const parameters = {
-  WIRE_CHANGELOG_BOT_CONVERSATION_IDS: program.conversations || process.env.WIRE_CHANGELOG_BOT_CONVERSATION_IDS,
-  WIRE_CHANGELOG_BOT_EMAIL: program.email || process.env.WIRE_CHANGELOG_BOT_EMAIL,
-  WIRE_CHANGELOG_BOT_PASSWORD: program.password || process.env.WIRE_CHANGELOG_BOT_PASSWORD,
+  conversationIds: program.conversations || process.env.WIRE_CHANGELOG_BOT_CONVERSATION_IDS,
+  email: program.email || process.env.WIRE_CHANGELOG_BOT_EMAIL,
+  password: program.password || process.env.WIRE_CHANGELOG_BOT_PASSWORD,
 };
 
 logger.info(chalk`{bold wire-changelog-bot v${version}}`);
@@ -61,7 +63,7 @@ TRAVIS_ENV_VARS.forEach(envVar => {
   }
 });
 
-start(parameters)
+startChangelogBot(parameters)
   .then(() => process.exit(0))
   .catch(error => {
     // Info:

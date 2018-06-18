@@ -20,7 +20,7 @@
     "dist"
   ],
   "license": "GPL-3.0",
-  "main": "dist/index.js",
+  "main": "dist/ChangelogBot.js",
   "name": "@wireapp/changelog-bot",
   "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/changelog-bot",
   "scripts": {
@@ -31,6 +31,6 @@
     "test": "exit 0",
     "test:project": "yarn dist && yarn test"
   },
-  "types": "dist/index.d.ts",
+  "types": "dist/ChangelogBot.d.ts",
   "version": "0.1.16"
 }
