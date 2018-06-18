@@ -17,7 +17,7 @@
  *
  */
 
-import {FileEngine} from '@wireapp/store-engine';
+const {error: StoreEngineError, FileEngine} = require('@wireapp/store-engine');
 
 describe('FileEngine', () => {
   const STORE_NAME = 'store-name';

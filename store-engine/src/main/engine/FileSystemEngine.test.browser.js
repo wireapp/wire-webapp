@@ -74,7 +74,7 @@ describe('FileSystemEngine', () => {
     });
   });
 
-  fdescribe('"purge"', () => {
+  describe('"purge"', () => {
     Object.entries(require('../../test/shared/purge')).map(([description, testFunction]) => {
       it(description, done => testFunction(done, engine, initEngine));
     });

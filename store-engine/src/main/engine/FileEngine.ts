@@ -15,19 +15,23 @@ export default class FileEngine implements CRUDEngine {
   private options: {fileExtension: string} = {
     fileExtension: '.dat',
   };
+  private static readonly path = path;
 
-  constructor(private readonly baseDirectory: string = '') {}
+  constructor(private readonly baseDirectory: string = './') {}
 
   public async isSupported(): Promise<void> {
     if (isBrowser()) {
-      const message = `Node.js' File System Module is not available on your platform.`;
+      const message = `Node.js File System Module is not available on your platform.`;
       throw new UnsupportedError(message);
     }
   }
 
   public async init(storeName: string = '', options: {fileExtension: string}): Promise<any> {
     await this.isSupported();
-    this.storeName = path.normalize(path.join(this.baseDirectory, storeName));
+
+    FileEngine.enforcePathRestrictions(this.baseDirectory, storeName);
+    this.storeName = FileEngine.path.resolve(this.baseDirectory, storeName);
+
     this.options = {...this.options, ...options};
     return Promise.resolve(storeName);
   }
@@ -36,38 +40,33 @@ export default class FileEngine implements CRUDEngine {
     return fs.remove(this.storeName);
   }
 
-  private resolvePath(tableName: string, primaryKey?: string): Promise<string> {
-    const isPathTraversal = (...testPaths: string[]): boolean => {
-      for (const testPath of testPaths) {
-        if (
-          typeof testPath !== 'undefined' &&
-          (testPath.includes('.') || testPath.includes('/') || testPath.includes('\\'))
-        ) {
-          return true;
-        }
-      }
-      return false;
-    };
+  static enforcePathRestrictions(givenTrustedRoot: string, givenPath: string): string {
+    const trustedRoot = FileEngine.path.resolve(givenTrustedRoot);
 
+    const trustedRootDetails = FileEngine.path.parse(trustedRoot);
+    if (trustedRootDetails.root === trustedRootDetails.dir && trustedRootDetails.base === '') {
+      const message = `"${trustedRoot}" cannot be the root of the filesystem.`;
+      throw new PathValidationError(message);
+    }
+
+    const unsafePath = FileEngine.path.resolve(trustedRoot, givenPath);
+    if (unsafePath.startsWith(trustedRoot) === false) {
+      const message = `Path traversal has been detected. Allowed path was "${trustedRoot}" but tested path "${givenPath}" attempted to reach "${unsafePath}"`;
+      throw new PathValidationError(message);
+    }
+
+    return unsafePath;
+  }
+
+  private resolvePath(tableName: string, primaryKey: string = ''): Promise<string> {
     return new Promise((resolve, reject) => {
-      if (isPathTraversal(tableName, primaryKey || '')) {
-        const message = `Path traversal has been detected on "${path.join(tableName, String(primaryKey))}".`;
-        return reject(new PathValidationError(message));
-      }
-
-      const filePath = path.join(
-        this.storeName,
-        tableName,
+      const tableNamePath = FileEngine.enforcePathRestrictions(this.storeName, tableName);
+      const primaryKeyPath = FileEngine.enforcePathRestrictions(
+        tableNamePath,
         primaryKey ? `${primaryKey}${this.options.fileExtension}` : ''
       );
-      const nonPrintableCharacters = new RegExp('[^\x20-\x7E]+', 'gm');
 
-      if (filePath.match(nonPrintableCharacters)) {
-        const message = `Cannot create file with path "${filePath}".`;
-        return reject(new PathValidationError(message));
-      }
-
-      return resolve(filePath);
+      return resolve(primaryKeyPath);
     });
   }
 
@@ -158,7 +157,7 @@ export default class FileEngine implements CRUDEngine {
           if (error) {
             reject(error);
           } else {
-            const recordNames = files.map(file => path.basename(file, path.extname(file)));
+            const recordNames = files.map(file => FileEngine.path.basename(file, FileEngine.path.extname(file)));
             const promises: Array<Promise<T>> = recordNames.map(primaryKey => this.read(tableName, primaryKey));
             Promise.all(promises).then((records: T[]) => resolve(records));
           }
@@ -178,7 +177,7 @@ export default class FileEngine implements CRUDEngine {
               throw error;
             }
           } else {
-            const fileNames: string[] = files.map((file: string) => path.parse(file).name);
+            const fileNames: string[] = files.map((file: string) => FileEngine.path.parse(file).name);
             resolve(fileNames);
           }
         });

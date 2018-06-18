@@ -22,19 +22,19 @@ const path = require('path');
 const {error: StoreEngineError, FileEngine} = require('@wireapp/store-engine');
 
 describe('FileEngine', () => {
-  const STORE_NAME = 'store-name';
-  const TABLE_NAME = 'the-simpsons';
-
-  const TEST_DIRECTORY = path.join(process.cwd(), '.tmp', STORE_NAME);
+  const BASE_DIRECTORY = path.join(process.cwd(), '.tmp');
+  const STORE_NAME = 'the-simpsons';
+  const TEST_DIRECTORY = path.join(BASE_DIRECTORY, STORE_NAME);
   let engine = undefined;
 
   async function initEngine(shouldCreateNewEngine = true) {
-    const storeEngine = shouldCreateNewEngine ? new FileEngine() : engine;
-    await storeEngine.init(TEST_DIRECTORY);
+    const storeEngine = shouldCreateNewEngine ? new FileEngine(BASE_DIRECTORY) : engine;
+    await storeEngine.init(STORE_NAME);
     return storeEngine;
   }
 
   beforeEach(async done => {
+    FileEngine.path = path;
     engine = await initEngine();
     done();
   });
@@ -45,23 +45,67 @@ describe('FileEngine', () => {
       .then(done)
       .catch(done.fail));
 
-  describe('"resolvePath"', () => {
-    it('properly validates paths.', done => {
-      const PRIMARY_KEY = 'primary-key';
+  describe('"enforcePathRestrictions"', () => {
+    const enforcePathRestrictions = (...opts) => () => FileEngine.enforcePathRestrictions(...opts);
+    const error = StoreEngineError.PathValidationError;
+    const unixFolder = '/home/marge/test/';
+    const windowsFolder = 'C:\\Users\\bart\\Documents\\Database\\';
 
-      Promise.all([
-        engine.resolvePath('../etc', PRIMARY_KEY).catch(error => error),
-        engine.resolvePath('..\\etc', PRIMARY_KEY).catch(error => error),
-        engine.resolvePath('.etc', PRIMARY_KEY).catch(error => error),
-        engine.resolvePath(TABLE_NAME, '../etc').catch(error => error),
-        engine.resolvePath(TABLE_NAME, '..\\etc').catch(error => error),
-        engine.resolvePath(TABLE_NAME, '.etc').catch(error => error),
-      ]).then(results => {
-        for (error of results) {
-          expect(error instanceof StoreEngineError.PathValidationError).toBe(true);
-        }
-        done();
-      });
+    it('allows dots inside of primary keys.', () => {
+      const tableName = 'amplify';
+      const primaryKey = 'z.storage.StorageKey.EVENT.LAST_DATE';
+
+      FileEngine.path = path.posix;
+      const actual = FileEngine.enforcePathRestrictions(FileEngine.path.join(unixFolder, tableName), primaryKey);
+      expect(actual).toBeDefined();
+    });
+
+    it('allows slashes inside of primary keys as long as they do not navigate outside of the base folder.', () => {
+      FileEngine.path = path.posix;
+      expect(FileEngine.enforcePathRestrictions(unixFolder, 'users/..')).toBeDefined();
+      expect(FileEngine.enforcePathRestrictions(unixFolder, 'users/../')).toBeDefined();
+      expect(FileEngine.enforcePathRestrictions(unixFolder, 'users/../sandbox')).toBeDefined();
+      expect(FileEngine.enforcePathRestrictions(unixFolder, 'users/me')).toBeDefined();
+      expect(FileEngine.enforcePathRestrictions(unixFolder, 'a/b/c/d/e/f/g/../../../../ok')).toBeDefined();
+      expect(FileEngine.enforcePathRestrictions(unixFolder, 'a/b/c/../../../')).toBeDefined();
+      expect(enforcePathRestrictions(unixFolder, 'a/b/c/../../../../')).toThrowError(error);
+    });
+
+    it('allows empty strings.', () => {
+      const tableName = 'amplify';
+      const primaryKey = '';
+
+      FileEngine.path = path.posix;
+      const actual = FileEngine.enforcePathRestrictions(FileEngine.path.join(unixFolder, tableName), primaryKey);
+      expect(actual).toBeDefined();
+    });
+
+    it('throws errors on path traversals.', () => {
+      FileEngine.path = path.win32;
+      expect(enforcePathRestrictions(windowsFolder, 'malicious\\..\\..\\test\\..\\..')).toThrowError(error);
+      expect(enforcePathRestrictions(windowsFolder, '\\malicious\\..\\\\..entry\\..\\..')).toThrowError(error);
+      expect(enforcePathRestrictions(windowsFolder, 'malicious\\..\\entry\\..\\..')).toThrowError(error);
+      expect(enforcePathRestrictions(windowsFolder, '\\\\server\\..\\..\\..')).toThrowError(error);
+      expect(enforcePathRestrictions(windowsFolder, 'malicious\\..\\..\\entry\\..\\')).toThrowError(error);
+      expect(enforcePathRestrictions(windowsFolder, '..\\etc')).toThrowError(error);
+
+      FileEngine.path = path.posix;
+      expect(enforcePathRestrictions(unixFolder, '../etc')).toThrowError(error);
+      expect(enforcePathRestrictions(unixFolder, '/malicious/../../../entry/../test')).toThrowError(error);
+      expect(enforcePathRestrictions(unixFolder, 'malicious/../../../entry/..')).toThrowError(error);
+      expect(enforcePathRestrictions(unixFolder, 'documents/../../../../../etc/hosts')).toThrowError(error);
+      expect(enforcePathRestrictions(unixFolder, 'malicious/../../../entry/../')).toThrowError(error);
+      expect(enforcePathRestrictions(unixFolder, '../etc')).toThrowError(error);
+      expect(enforcePathRestrictions(unixFolder, 'users/../../tigris')).toThrowError(error);
+      expect(enforcePathRestrictions(unixFolder, 'users/../tigris/../../')).toThrowError(error);
+    });
+
+    it('throws errors when attempting to use the root folder as a trusted root.', () => {
+      FileEngine.path = path.posix;
+      expect(enforcePathRestrictions('/', 'etc/hosts')).toThrowError(error);
+
+      FileEngine.path = path.win32;
+      expect(enforcePathRestrictions('C:/', '\\Windows\\System32\\drivers\\etc\\hosts')).toThrowError(error);
     });
   });
 
@@ -80,51 +124,11 @@ describe('FileEngine', () => {
       const options = {
         fileExtension: '.json',
       };
-      engine = new FileEngine();
+      engine = new FileEngine(BASE_DIRECTORY);
       await engine.init(STORE_NAME, options);
 
       expect(engine.options.fileExtension).toBe(options.fileExtension);
       done();
-    });
-
-    it('does not allow path traversal', done => {
-      const PRIMARY_KEY = 'primary-key';
-
-      const entity = {
-        some: 'value',
-      };
-
-      Promise.all([
-        engine.create('../etc', PRIMARY_KEY, entity).catch(error => error),
-        engine.create('..\\etc', PRIMARY_KEY, entity).catch(error => error),
-        engine.create('.etc', PRIMARY_KEY, entity).catch(error => error),
-        engine.create(TABLE_NAME, '../etc', entity).catch(error => error),
-        engine.create(TABLE_NAME, '..\\etc', entity).catch(error => error),
-        engine.create(TABLE_NAME, '.etc', entity).catch(error => error),
-      ]).then(results => {
-        for (error of results) {
-          expect(error instanceof StoreEngineError.PathValidationError).toBe(true);
-        }
-        done();
-      });
-    });
-
-    it('does not work when non-printable characters are being used in the store name.', async done => {
-      await engine.init(path.join(process.cwd(), '.tmp', 'wrong\t'));
-
-      const PRIMARY_KEY = 'primary-key';
-
-      const entity = {
-        some: 'value',
-      };
-
-      engine
-        .create(TABLE_NAME, PRIMARY_KEY, entity)
-        .then(() => done.fail(new Error('Method is supposed to throw an error.')))
-        .catch(error => {
-          expect(error instanceof StoreEngineError.PathValidationError).toBe(true);
-          done();
-        });
     });
   });
 
@@ -132,42 +136,11 @@ describe('FileEngine', () => {
     Object.entries(require('../../test/shared/delete')).map(([description, testFunction]) => {
       it(description, done => testFunction(done, engine));
     });
-
-    it('does not allow path traversal', done => {
-      const PRIMARY_KEY = 'primary-key';
-
-      Promise.all([
-        engine.delete('../etc', PRIMARY_KEY).catch(error => error),
-        engine.delete('..\\etc', PRIMARY_KEY).catch(error => error),
-        engine.delete('.etc', PRIMARY_KEY).catch(error => error),
-        engine.delete(TABLE_NAME, '../etc').catch(error => error),
-        engine.delete(TABLE_NAME, '..\\etc').catch(error => error),
-        engine.delete(TABLE_NAME, '.etc').catch(error => error),
-      ]).then(results => {
-        for (error of results) {
-          expect(error instanceof StoreEngineError.PathValidationError).toBe(true);
-        }
-        done();
-      });
-    });
   });
 
   describe('"deleteAll"', () => {
     Object.entries(require('../../test/shared/deleteAll')).map(([description, testFunction]) => {
       it(description, done => testFunction(done, engine));
-    });
-
-    it('does not allow path traversal', done => {
-      Promise.all([
-        engine.deleteAll('../etc').catch(error => error),
-        engine.deleteAll('..\\etc').catch(error => error),
-        engine.deleteAll('.etc').catch(error => error),
-      ]).then(results => {
-        for (error of results) {
-          expect(error instanceof StoreEngineError.PathValidationError).toBe(true);
-        }
-        done();
-      });
     });
   });
 
@@ -181,42 +154,11 @@ describe('FileEngine', () => {
     Object.entries(require('../../test/shared/read')).map(([description, testFunction]) => {
       it(description, done => testFunction(done, engine));
     });
-
-    it('does not allow path traversal', done => {
-      const PRIMARY_KEY = 'primary-key';
-
-      Promise.all([
-        engine.read('../etc', PRIMARY_KEY).catch(error => error),
-        engine.read('..\\etc', PRIMARY_KEY).catch(error => error),
-        engine.read('.etc', PRIMARY_KEY).catch(error => error),
-        engine.read(TABLE_NAME, '../etc').catch(error => error),
-        engine.read(TABLE_NAME, '..\\etc').catch(error => error),
-        engine.read(TABLE_NAME, '.etc').catch(error => error),
-      ]).then(results => {
-        for (error of results) {
-          expect(error instanceof StoreEngineError.PathValidationError).toBe(true);
-        }
-        done();
-      });
-    });
   });
 
   describe('"readAll"', () => {
     Object.entries(require('../../test/shared/readAll')).map(([description, testFunction]) => {
       it(description, done => testFunction(done, engine));
-    });
-
-    it('does not allow path traversal', done => {
-      Promise.all([
-        engine.readAll('../etc').catch(error => error),
-        engine.readAll('..\\etc').catch(error => error),
-        engine.readAll('.etc').catch(error => error),
-      ]).then(results => {
-        for (error of results) {
-          expect(error instanceof StoreEngineError.PathValidationError).toBe(true);
-        }
-        done();
-      });
     });
   });
 
