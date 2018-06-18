@@ -131,10 +131,26 @@ ko.components.register('edit-icon', {
   `,
 });
 
+ko.components.register('file-icon', {
+  template: `
+  <svg  width="12" height="16" viewBox="0 0 12 16">
+    <path d="M1 0a1 1 0 0 0-1 1v14c0 .6.5 1 1 1h10c.6 0 1-.5 1-1V6H8a2 2 0 0 1-2-2V0H1zm11 5H8.4C7.7 5 7 4.4 7 3.7V0l5 5z"></path>
+  </svg>
+  `,
+});
+
 ko.components.register('fullscreen-icon', {
   template: `
   <svg width="16" height="16" viewBox="0 0 16 16">
     <path d="M16 7V0H9v2h3.6L8 6.6 9.4 8 14 3.4V7h2zM0 9v7h7v-2H3.4L8 9.4 6.6 8 2 12.6V9H0z"></path>
+  </svg>
+  `,
+});
+
+ko.components.register('gif-icon', {
+  template: `
+  <svg width="16" height="13" viewBox="0 0 16 13">
+    <path d="M12 7.2v5h-2V.2h6v2h-4v3h3v2h-3zm-5-7h2v12H7V.2zm-2 5h1v4.2a3 3 0 0 1-6 0V3a3 3 0 0 1 6 0v.2H4V3a1 1 0 0 0-1-1 1 1 0 0 0-1 1v6.4a1 1 0 0 0 1 1 1 1 0 0 0 1-1V7.2H3v-2h2z"></path>
   </svg>
   `,
 });
@@ -279,6 +295,14 @@ ko.components.register('screenshare-icon', {
   template: `
   <svg width="16" height="16" viewBox="0 0 16 16">
     <path d="M5 14h6v2H5v-2zM0 1c0-.6.4-1 1-1h14c.6 0 1 .4 1 1v11c0 .6-.4 1-1 1H1a1 1 0 0 1-1-1V1zm7 10h2V7h4L8 3 3 7h4v4z"></path>
+  </svg>
+  `,
+});
+
+ko.components.register('send-icon', {
+  template: `
+  <svg width="16" height="16" viewBox="0 0 16 16">
+    <path d="M0 14.3c0 1.5 1 2.1 2.3 1.4L15 9.2c1.3-.7 1.3-1.7 0-2.4L2.3.3C1.1-.4 0 .3 0 1.7V8h12L0 10v4.3z"></path>
   </svg>
   `,
 });
