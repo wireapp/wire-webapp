@@ -88,9 +88,9 @@ z.string.de.authErrorPhoneNumberUnknown = 'Unbekannte Telefonnummer';
 z.string.de.authErrorSuspended = 'Benutzerkonto ist nicht mehr zum Login berechtigt.';
 z.string.de.authErrorSignIn = 'Überprüfe deine Eingaben und versuche es erneut.';
 
-z.string.de.callStateOutgoing = 'Klingelt…';
+z.string.de.callStateOutgoing = 'Klingeln…';
 z.string.de.callStateConnecting = 'Verbinde…';
-z.string.de.callStateIncoming = 'Klingelt…';
+z.string.de.callStateIncoming = 'Anruf wird aufgebaut…';
 z.string.de.callStateIncomingGroup = '{{user}} ruft an';
 z.string.de.callDecline = 'Ablehnen';
 z.string.de.callAccept = 'Annehmen';
@@ -545,6 +545,7 @@ z.string.de.preferencesAVCamera = 'Kamera';
 z.string.de.preferencesAVMicrophone = 'Mikrofon';
 z.string.de.preferencesAVPermissionDetail = 'In deinen Browser-Einstellungen aktivieren';
 z.string.de.preferencesAVSpeakers = 'Lautsprecher';
+z.string.de.preferencesAVTemporaryDisclaimer = 'Gäste können Videokonferenzen nicht selbst starten. Wähle die Kamera aus, die bei der Teilnahme verwendet werden soll.';
 
 z.string.de.preferencesDevicesActivatedIn = 'in {{location}}';
 z.string.de.preferencesDevicesActivatedOn = 'Aktiviert am {{date}}';

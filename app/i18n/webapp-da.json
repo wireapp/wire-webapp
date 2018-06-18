@@ -44,7 +44,7 @@
   "acceptNewsModal.headline": "",
   "acceptNewsModal.unsubscribeDescription": "",
   "acceptNewsModal.privacyDescription": "",
-  "acceptNewsModal.declineButton": "",
+  "acceptNewsModal.declineButton": "Afvis",
   "acceptNewsModal.confirmButton": "Besvar",
   "unsupported.headlineBrowser": "",
   "unsupported.subheadBrowser": "",

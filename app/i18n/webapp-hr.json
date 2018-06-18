@@ -44,7 +44,7 @@
   "acceptNewsModal.headline": "",
   "acceptNewsModal.unsubscribeDescription": "",
   "acceptNewsModal.privacyDescription": "",
-  "acceptNewsModal.declineButton": "",
+  "acceptNewsModal.declineButton": "Odbij",
   "acceptNewsModal.confirmButton": "Prihvati",
   "unsupported.headlineBrowser": "",
   "unsupported.subheadBrowser": "",

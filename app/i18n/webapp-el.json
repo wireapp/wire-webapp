@@ -44,7 +44,7 @@
   "acceptNewsModal.headline": "",
   "acceptNewsModal.unsubscribeDescription": "",
   "acceptNewsModal.privacyDescription": "",
-  "acceptNewsModal.declineButton": "",
+  "acceptNewsModal.declineButton": "Απόρριψη",
   "acceptNewsModal.confirmButton": "Αποδοχή",
   "unsupported.headlineBrowser": "",
   "unsupported.subheadBrowser": "",
