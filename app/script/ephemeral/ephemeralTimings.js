@@ -25,12 +25,7 @@ window.z.ephemeral = z.ephemeral || {};
 z.ephemeral.timings = (() => {
   const TIMINGS = [1000 * 5, 1000 * 15, 1000 * 30, 1000 * 60, 1000 * 60 * 5, 1000 * 60 * 60 * 24];
 
-  const _getValues = () => TIMINGS;
-
-  const _mapToClosestTiming = milliseconds => z.util.ArrayUtil.findClosest(TIMINGS, milliseconds);
-
   return {
-    getValues: _getValues,
-    mapToClosestTiming: _mapToClosestTiming,
+    getValues: () => TIMINGS,
   };
 })();
