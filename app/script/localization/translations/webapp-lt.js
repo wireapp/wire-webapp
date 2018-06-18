@@ -92,6 +92,7 @@ z.string.lt.authErrorSignIn = 'Patvirtinkite savo duomenis ir bandykite dar kart
 z.string.lt.callStateOutgoing = 'Kviečiama…';
 z.string.lt.callStateConnecting = 'Sujungiama…';
 z.string.lt.callStateIncoming = 'Skambinama…';
+z.string.lt.callStateIncomingGroup = '{{user}} jums skambina';
 z.string.lt.callDecline = 'Atmesti';
 z.string.lt.callAccept = 'Priimti';
 z.string.lt.callJoin = 'Prisijungti';
@@ -103,6 +104,7 @@ z.string.lt.videoCallOverlayMute = 'Nutildyti';
 z.string.lt.videoCallOverlayVideo = 'Vaizdas';
 z.string.lt.videoCallOverlayShareScreen = 'Siųsti ekrano vaizdą';
 z.string.lt.videoCallOverlayHangUp = 'Užbaigti';
+z.string.lt.videoCallPaused="Vaizdas pristabdytas";
 
 z.string.lt.modalAcknowledgeAction = 'Gerai';
 z.string.lt.modalAcknowledgeHeadline = 'Kažkas nutiko';
@@ -397,6 +399,7 @@ z.string.lt.conversationsPopoverNotify = 'Įjungti susirašinėjimo pranešimus'
 z.string.lt.conversationsPopoverSilence = 'Išjungti susirašinėjimo pranešimus';
 z.string.lt.conversationsPopoverUnarchive = 'Išimti susirašinėjimą iš archyvo';
 
+z.string.lt.conversationsSecondaryLineIncomingCall = '{{user}} jums skambina';
 z.string.lt.conversationsSecondaryLineMissedCall = '{{number}} praleistas skambutis';
 z.string.lt.conversationsSecondaryLineMissedCalls = '{{number}} praleistų skambučių';
 z.string.lt.conversationsSecondaryLineNewMessage = '{{number}} nauja žinutė';
