@@ -28,7 +28,7 @@ const {MemoryEngine} = require('@wireapp/store-engine/dist/commonjs/engine');
   const engine = new MemoryEngine();
   await engine.init('receiver');
 
-  const apiClient = new APIClient(new Config(engine, APIClient.BACKEND.STAGING));
+  const apiClient = new APIClient(new Config(engine, APIClient.BACKEND.PRODUCTION));
   const account = new Account(apiClient);
 
   account.on(Account.INCOMING.TEXT_MESSAGE, async data => {

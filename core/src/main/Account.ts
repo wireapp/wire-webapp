@@ -86,6 +86,7 @@ class Account extends EventEmitter {
       Asset: root.lookup('Asset'),
       ClientAction: root.lookup('ClientAction'),
       Confirmation: root.lookup('Confirmation'),
+      Ephemeral: root.lookup('Ephemeral'),
       External: root.lookup('External'),
       GenericMessage: root.lookup('GenericMessage'),
       Knock: root.lookup('Knock'),
