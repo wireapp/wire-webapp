@@ -1045,7 +1045,7 @@ describe('ConversationRepository', () => {
           const {content, ephemeral} = genericMessage;
           expect(content).toBe(z.cryptography.GENERIC_MESSAGE_TYPE.EPHEMERAL);
           expect(ephemeral.content).toBe(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT);
-          expect(ephemeral.expire_after_millis.low).toBe(expirations.shift());
+          expect(ephemeral.expire_after_millis.toString()).toBe(expirations.shift().toString());
           return Promise.resolve({});
         }
       );
