@@ -28,7 +28,7 @@ import APIClient = require('@wireapp/api-client');
 import {ClientType, RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/';
 import {Config} from '@wireapp/api-client/dist/commonjs/Config';
 import {BackendErrorLabel} from '@wireapp/api-client/dist/commonjs/http/';
-import {PayloadBundle} from '@wireapp/core/dist/cryptography/root';
+import {PayloadBundleIncoming} from '@wireapp/core/dist/conversation/root';
 import {AxiosError} from 'axios';
 import * as os from 'os';
 import * as path from 'path';
@@ -58,7 +58,7 @@ storeEngine.init('', {fileExtension: '.json'}).then(() => {
 
   const account = new Account(apiClient);
 
-  account.on(Account.INCOMING.TEXT_MESSAGE, (data: PayloadBundle) => {
+  account.on(Account.INCOMING.TEXT_MESSAGE, (data: PayloadBundleIncoming) => {
     console.log(
       `Received message from user ID "${data.from}" in conversation ID "${data.conversation}": ${data.content}`
     );

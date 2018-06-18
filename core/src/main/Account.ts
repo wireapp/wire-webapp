@@ -35,8 +35,15 @@ import EventEmitter = require('events');
 import {Root} from 'protobufjs';
 import {LoginSanitizer} from './auth/root';
 import {ClientInfo, ClientService} from './client/root';
-import {AssetService, ConversationService, DecodedMessage, GenericMessageType} from './conversation/root';
-import {CryptographyService, PayloadBundle, PayloadBundleState} from './cryptography/root';
+import {
+  AssetService,
+  ConversationService,
+  DecodedMessage,
+  GenericMessageType,
+  PayloadBundleIncoming,
+  PayloadBundleState,
+} from './conversation/root';
+import {CryptographyService} from './cryptography/root';
 import {NotificationService} from './notification/root';
 import proto from './Protobuf';
 import {SelfService} from './self/root';
@@ -258,7 +265,7 @@ class Account extends EventEmitter {
     };
   }
 
-  private async handleEvent(event: ConversationEvent): Promise<PayloadBundle | ConversationEvent | void> {
+  private async handleEvent(event: ConversationEvent): Promise<PayloadBundleIncoming | ConversationEvent | void> {
     this.logger.info('handleEvent');
     const {conversation, from} = event;
 
