@@ -83,9 +83,18 @@
 
 .controls-right-button {
   position: relative;
+  display: flex;
+  width: 32px;
+  height: 32px;
   flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
   margin-right: 12px;
   margin-left: 12px;
+
+  svg path {
+    fill: @graphite-dark;
+  }
 }
 
 .conversation-input-bar-ephemeral {
