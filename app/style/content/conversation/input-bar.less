@@ -83,9 +83,18 @@
 
 .controls-right-button {
   position: relative;
+  display: flex;
+  width: 32px;
+  height: 32px;
   flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
   margin-right: 12px;
   margin-left: 12px;
+
+  svg path {
+    fill: @graphite-dark;
+  }
 }
 
 .conversation-input-bar-ephemeral {
@@ -153,7 +162,14 @@
 
 .conversation-input-bar-paste-icon {
   margin-right: 16px;
-  color: @graphite;
+
+  file-icon {
+    display: flex;
+  }
+
+  svg path {
+    fill: @graphite;
+  }
 }
 
 .conversation-input-bar-paste-image {
@@ -165,15 +181,25 @@
 .conversation-input-bar-paste-send {
   .circle(32px);
 
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin-right: 16px;
-  color: #fff;
   cursor: pointer;
-  line-height: 32px;
-  text-align: center;
+  line-height: 0;
+
+  send-icon {
+    margin-left: 2px;
+
+    svg path {
+      fill: #fff;
+    }
+  }
 }
 
 .conversation-input-bar-paste-cancel {
   margin-right: 32px;
+  line-height: 0;
 }
 
 .conversation-input-bar-emoji-list {
