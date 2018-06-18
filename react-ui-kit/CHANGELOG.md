@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="1.1.42"></a>
+## [1.1.42](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@1.1.41...@wireapp/react-ui-kit@1.1.42) (2018-06-18)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Gutter size & Content padding ([#724](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/724)) ([0e4ea02](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/0e4ea02))
+
+
+
+
 <a name="1.1.41"></a>
 ## [1.1.41](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@1.1.40...@wireapp/react-ui-kit@1.1.41) (2018-06-15)
 

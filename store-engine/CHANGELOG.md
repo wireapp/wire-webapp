@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="0.11.30"></a>
+## [0.11.30](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/compare/@wireapp/store-engine@0.11.29...@wireapp/store-engine@0.11.30) (2018-06-18)
+
+
+### Bug Fixes
+
+* **store-engine:** Allow dots in directory names ([#715](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/issues/715)) ([3f5cc4e](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/commit/3f5cc4e))
+
+
+
+
 <a name="0.11.29"></a>
 ## [0.11.29](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/compare/@wireapp/store-engine@0.11.28...@wireapp/store-engine@0.11.29) (2018-06-15)
 

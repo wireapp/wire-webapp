@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="2.1.28"></a>
+## [2.1.28](https://github.com/wireapp/wire-web-packages/tree/master/packages/lru-cache/compare/@wireapp/lru-cache@2.1.27...@wireapp/lru-cache@2.1.28) (2018-06-18)
+
+
+
+
+**Note:** Version bump only for package @wireapp/lru-cache
+
 <a name="2.1.27"></a>
 ## [2.1.27](https://github.com/wireapp/wire-web-packages/tree/master/packages/lru-cache/compare/@wireapp/lru-cache@2.1.26...@wireapp/lru-cache@2.1.27) (2018-06-15)
 
