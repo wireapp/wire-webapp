@@ -25,13 +25,19 @@ enum PayloadBundleState {
   OUTGOING_UNSENT = 'PayloadBundleState.OUTGOING_UNSENT',
 }
 
+type PayloadBundleIncoming = PayloadBundle & {conversation?: string; state: PayloadBundleState.INCOMING};
+type PayloadBundleOutgoing = PayloadBundle & {
+  conversation: string;
+  state: PayloadBundleState.OUTGOING_SENT;
+};
+type PayloadBundleOutgoingUnsent = PayloadBundle & {state: PayloadBundleState.OUTGOING_UNSENT};
+
 interface PayloadBundle {
   content?: string | Asset | Image | ImageAsset;
-  conversation?: string;
   from: string;
   id: string;
   state: PayloadBundleState;
   type: GenericMessageType;
 }
 
-export {PayloadBundle, PayloadBundleState};
+export {PayloadBundle, PayloadBundleIncoming, PayloadBundleOutgoing, PayloadBundleOutgoingUnsent, PayloadBundleState};

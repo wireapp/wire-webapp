@@ -34,11 +34,13 @@ import {
   GenericMessageType,
   Image,
   ImageAsset,
+  PayloadBundleOutgoing,
+  PayloadBundleOutgoingUnsent,
+  PayloadBundleState,
   RemoteData,
 } from '../conversation/root';
 import * as AssetCryptography from '../cryptography/AssetCryptography.node';
-import {PayloadBundleState} from '../cryptography/PayloadBundle';
-import {CryptographyService, EncryptedAsset, PayloadBundle} from '../cryptography/root';
+import {CryptographyService, EncryptedAsset} from '../cryptography/root';
 
 const UUID = require('pure-uuid');
 import APIClient = require('@wireapp/api-client');
@@ -140,7 +142,10 @@ export default class ConversationService {
     return new UUID(4).format();
   }
 
-  public async createImage(image: Image, messageId: string = ConversationService.createId()): Promise<PayloadBundle> {
+  public async createImage(
+    image: Image,
+    messageId: string = ConversationService.createId()
+  ): Promise<PayloadBundleOutgoingUnsent> {
     const imageAsset = await this.assetService.uploadImageAsset(image);
 
     return {
@@ -155,7 +160,10 @@ export default class ConversationService {
     };
   }
 
-  public async createText(message: string, messageId: string = ConversationService.createId()): Promise<PayloadBundle> {
+  public async createText(
+    message: string,
+    messageId: string = ConversationService.createId()
+  ): Promise<PayloadBundleOutgoingUnsent> {
     return {
       content: message,
       from: this.clientID,
@@ -174,7 +182,7 @@ export default class ConversationService {
     });
   }
 
-  public async sendConfirmation(conversationId: string, confirmMessageId: string): Promise<PayloadBundle> {
+  public async sendConfirmation(conversationId: string, confirmMessageId: string): Promise<PayloadBundleOutgoing> {
     const messageId = ConversationService.createId();
 
     const confirmation = this.protocolBuffers.Confirmation.create({
@@ -198,7 +206,10 @@ export default class ConversationService {
     };
   }
 
-  public async sendImage(conversationId: string, payloadBundle: PayloadBundle): Promise<PayloadBundle> {
+  public async sendImage(
+    conversationId: string,
+    payloadBundle: PayloadBundleOutgoingUnsent
+  ): Promise<PayloadBundleOutgoing> {
     if (!payloadBundle.content) {
       throw new Error('No content for sendImage provided!');
     }
@@ -239,10 +250,10 @@ export default class ConversationService {
     const payload: EncryptedAsset = await AssetCryptography.encryptAsset(plainTextBuffer);
 
     await this.sendExternalGenericMessage(this.clientID, conversationId, payload, preKeyBundles as UserPreKeyBundleMap);
-    return {...payloadBundle, state: PayloadBundleState.OUTGOING_SENT};
+    return {...payloadBundle, conversation: conversationId, state: PayloadBundleState.OUTGOING_SENT};
   }
 
-  public async sendPing(conversationId: string): Promise<PayloadBundle> {
+  public async sendPing(conversationId: string): Promise<PayloadBundleOutgoing> {
     const messageId = ConversationService.createId();
 
     const knock = this.protocolBuffers.Knock.create();
@@ -262,7 +273,7 @@ export default class ConversationService {
     };
   }
 
-  public async sendSessionReset(conversationId: string): Promise<PayloadBundle> {
+  public async sendSessionReset(conversationId: string): Promise<PayloadBundleOutgoing> {
     const messageId = ConversationService.createId();
 
     const sessionReset = this.protocolBuffers.GenericMessage.create({
@@ -271,6 +282,7 @@ export default class ConversationService {
     });
 
     await this.sendGenericMessage(this.clientID, conversationId, sessionReset);
+
     return {
       conversation: conversationId,
       from: this.clientID,
@@ -280,8 +292,15 @@ export default class ConversationService {
     };
   }
 
-  public async sendText(conversationId: string, originalPayloadBundle: PayloadBundle): Promise<PayloadBundle> {
-    const payloadBundle = {...originalPayloadBundle, state: PayloadBundleState.OUTGOING_SENT};
+  public async sendText(
+    conversationId: string,
+    originalPayloadBundle: PayloadBundleOutgoingUnsent
+  ): Promise<PayloadBundleOutgoing> {
+    const payloadBundle: PayloadBundleOutgoing = {
+      ...originalPayloadBundle,
+      conversation: conversationId,
+      state: PayloadBundleState.OUTGOING_SENT,
+    };
     const genericMessage = this.protocolBuffers.GenericMessage.create({
       messageId: payloadBundle.id,
       text: this.protocolBuffers.Text.create({content: payloadBundle.content}),

@@ -19,5 +19,4 @@
 
 export * from './CryptographyService';
 export * from './EncryptedAsset';
-export * from './PayloadBundle';
 export * from './SessionPayloadBundle';
