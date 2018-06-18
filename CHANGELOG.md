@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="3.2.0"></a>
+# [3.2.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@3.1.6...@wireapp/core@3.2.0) (2018-06-18)
+
+
+### Features
+
+* **core:** Ephemeral messages ([#719](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/719)) ([3fc4231](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/3fc4231))
+
+
+
+
 <a name="3.1.6"></a>
 ## [3.1.6](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@3.1.5...@wireapp/core@3.1.6) (2018-06-18)
 
