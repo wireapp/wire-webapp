@@ -57,6 +57,9 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
 
     this.isVisible = false;
 
+    const selfUser = this.userRepository.self;
+    this.isTemporaryGuest = ko.pureComputed(() => selfUser() && selfUser().isTemporaryGuest());
+
     this.mediaStream.subscribe(mediaStream => {
       if (this.audioInterval) {
         this._releaseAudioMeter();
