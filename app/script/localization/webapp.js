@@ -582,7 +582,7 @@ z.string.preferencesAVCamera = 'Camera';
 z.string.preferencesAVMicrophone = 'Microphone';
 z.string.preferencesAVPermissionDetail = 'Enable from your browser Preferences';
 z.string.preferencesAVSpeakers = 'Speakers';
-z.string.preferencesAVTemporaryDisclaimer = 'Guests can\'t start video conferences. Select the camera to use if you join one.';
+z.string.preferencesAVTemporaryDisclaimer = 'Guests can’t start video conferences. Select the camera to use if you join one.';
 
 z.string.preferencesDevicesActivatedIn = 'in {{location}}';
 z.string.preferencesDevicesActivatedOn = 'Activated on {{date}}';
