@@ -1,10 +1,10 @@
 //@ts-check
 
 process.on('uncaughtException', error =>
-  console.error(`Uncaught exception "${error.constructor.name}" (${error.code}): ${error.message}`, error)
+  console.error(`Uncaught exception "${error.constructor.name}" (code: ${error.code}): ${error.message}`, error)
 );
 process.on('unhandledRejection', error =>
-  console.error(`Uncaught rejection "${error.constructor.name}" (${error.code}): ${error.message}`, error)
+  console.error(`Uncaught rejection "${error.constructor.name}" (code: ${error.code}): ${error.message}`, error)
 );
 
 const path = require('path');
