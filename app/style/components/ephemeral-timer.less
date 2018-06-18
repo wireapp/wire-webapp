@@ -18,26 +18,14 @@
  */
 
 .ephemeral-timer {
-  display: inline-block;
-  padding: 3px;
-  margin: 0;
-  background-color: #fff;
-  border-radius: 4px;
-  list-style: none;
-}
+  &__background {
+    fill: fade(@graphite, 16%);
+  }
 
-.ephemeral-timer-bullet::before {
-  .circle(3px);
-
-  display: block;
-  content: '';
-  .accent-background-color;
-}
-
-.ephemeral-timer-bullet-inactive::before {
-  opacity: 0.24;
-}
-
-.ephemeral-timer-bullet + .ephemeral-timer-bullet {
-  margin-top: 2px;
+  &__dial {
+    fill: none;
+    stroke: @graphite;
+    transition-property: stroke-dashoffset;
+    transition-timing-function: linear;
+  }
 }

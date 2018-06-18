@@ -85,7 +85,11 @@
       </div>
     </div>
   <!-- /ko -->
+      
   <div class="message-body">
+    <!-- ko if: message.ephemeral_status() === z.message.EphemeralStatusType.ACTIVE -->
+      <ephemeral-timer class="message-ephemeral-timer" data-bind="attr: {'title': message.ephemeral_caption()}" params="message: message"></ephemeral-timer>
+    <!-- /ko -->
 
     <!-- ko foreach: {data: message.assets, as: 'asset'} -->
       <!-- ko if: asset.is_image() -->
@@ -155,9 +159,6 @@
       <!-- /ko -->
       <!-- ko if: $parent.is_last_delivered_message(message) -->
         <span class="message-status" data-bind="l10n_text: z.string.conversationMessageDelivered"></span>
-      <!-- /ko -->
-      <!-- ko if: message.ephemeral_status() === z.message.EphemeralStatusType.ACTIVE -->
-        <ephemeral-timer class="message-ephemeral-timer" data-bind="attr: {'title': message.ephemeral_caption()}" params="message: message"></ephemeral-timer>
       <!-- /ko -->
     </div>
 
