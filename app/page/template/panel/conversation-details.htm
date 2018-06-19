@@ -78,6 +78,8 @@
                   </div>
                 </div>
               <!-- /ko -->
+            <!-- /ko -->
+            <!-- ko if: showActionTimedMessages() -->
               <div class="conversation-details__timed-messages">
                 <div class="panel__action-item" data-bind="click: clickOnTimedMessages" data-uie-name="go-timed-messages">
                   <hourglass-icon class="panel__action-item__icon"></hourglass-icon>
@@ -89,7 +91,6 @@
             <!-- /ko -->
           </div>
         <!-- /ko -->
-
         <div class="conversation-details__participants">
           <!-- ko if: conversationEntity().is_group() -->
             <!-- ko if: userParticipants().length -->
