@@ -32,10 +32,14 @@ class AppAlreadyOpen extends React.Component {
   };
 
   render = () => {
-    const {isAppAlreadyOpen, intl: {formatMessage: _}} = this.props;
+    const {
+      isAppAlreadyOpen,
+      fullscreen,
+      intl: {formatMessage: _},
+    } = this.props;
     return (
       isAppAlreadyOpen && (
-        <Modal>
+        <Modal fullscreen={fullscreen}>
           <Container style={{maxWidth: '320px'}} data-uie-name="modal-already-open">
             <H3 style={{fontWeight: '500', marginTop: '10px'}} data-uie-name="status-modal-title">
               {_(appAlreadyOpenStrings.headline)}
