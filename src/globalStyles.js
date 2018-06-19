@@ -24,7 +24,14 @@ let areGlobalStylesSet = false;
 
 export default function applyGlobalStyles() {
   if (!areGlobalStylesSet) {
-    injectGlobal([styledNormalize]);
+    // eslint-disable-next-line
+    injectGlobal`
+      ${styledNormalize}
+
+      p {
+        margin-top: 0;
+      }
+    `;
     areGlobalStylesSet = true;
   }
 }
