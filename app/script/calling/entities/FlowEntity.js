@@ -1290,7 +1290,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
   _addMediaStream(mediaStream) {
     if (mediaStream) {
       const mediaType = z.media.MediaStreamHandler.detectMediaStreamType(mediaStream);
-      const containsAudio = z.media.MediaStreamHandler.CONFIG.CONTAINS_AUDIO.includes(mediaType);
+      const containsAudio = z.media.MediaStreamHandler.CONFIG.MEDIA_TYPE.CONTAINS_AUDIO.includes(mediaType);
       if (containsAudio) {
         mediaStream = this.audio.wrapAudioInputStream(mediaStream);
       }
