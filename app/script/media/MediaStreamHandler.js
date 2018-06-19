@@ -352,22 +352,24 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
       return Promise.resolve();
     }
 
+    const checkPermissionStates = typesToCheck => {
+      return this.permissionRepository.getPermissionStates(typesToCheck).then(permissions => {
+        for (const permission of permissions) {
+          const {permissionState, permissionType} = permission;
+          const isPermissionDenied = permissionState === z.permission.PermissionStatusState.DENIED;
+          if (isPermissionDenied) {
+            this.logger.warn(`Permission for '${permissionType}' is set to '${permissionState}'`, permissions);
+            return Promise.reject(new z.permission.PermissionError(z.permission.PermissionError.TYPE.DENIED));
+          }
+        }
+
+        return Promise.resolve();
+      });
+    };
+
     const permissionTypes = this._getPermissionTypes(mediaType);
     const shouldCheckPermissions = permissionTypes && permissionTypes.length;
-    return shouldCheckPermissions
-      ? this.permissionRepository.getPermissionStates(permissionTypes).then(permissions => {
-          for (const permission of permissions) {
-            const {permissionState, permissionType} = permission;
-            const isPermissionDenied = permissionState === z.permission.PermissionStatusState.DENIED;
-            if (isPermissionDenied) {
-              this.logger.warn(`Permission for '${permissionType}' is set to '${permissionState}'`, permissions);
-              return Promise.reject(new z.permission.PermissionError(z.permission.PermissionError.TYPE.DENIED));
-            }
-          }
-
-          return Promise.resolve();
-        })
-      : Promise.resolve();
+    return shouldCheckPermissions ? checkPermissionStates(permissionTypes) : Promise.resolve();
   }
 
   /**
