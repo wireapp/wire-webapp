@@ -81,7 +81,8 @@ z.components.SeekBarComponent = class SeekBarComponent {
   }
 
   on_change() {
-    this.media_element.currentTime = this.media_element.duration * (this.seek_bar.value / 100);
+    const currentTime = this.media_element.duration * (this.seek_bar.value / 100);
+    this.media_element.currentTime = z.util.NumberUtil.clamp(currentTime, 0, this.media_element.duration);
   }
 
   on_timeupdate() {
@@ -104,11 +105,11 @@ z.components.SeekBarComponent = class SeekBarComponent {
 
   _update_seek_bar_style(progress) {
     // TODO check if we can find a css solution
-    if (this.dark_mode) {
-      return (this.seek_bar.style.backgroundImage = `linear-gradient(to right, currentColor ${progress}%, rgba(141,152,159,0.24) ${progress}%)`);
-    }
+    this.seek_bar.style.backgroundImage = this.dark_mode
+      ? `linear-gradient(to right, currentColor ${progress}%, rgba(141,152,159,0.24) ${progress}%)`
+      : `linear-gradient(to right, currentColor ${progress}%, rgba(255,255,255,0.4) ${progress}%)`;
 
-    return (this.seek_bar.style.backgroundImage = `linear-gradient(to right, currentColor ${progress}%, rgba(255,255,255,0.4) ${progress}%)`);
+    return this.seek_bar.style.backgroundImage;
   }
 
   dispose() {
