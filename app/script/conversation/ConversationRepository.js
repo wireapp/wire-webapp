@@ -1266,8 +1266,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {string} name - New conversation name
    * @returns {Promise} Resolves when conversation was renamed
    */
-  rename_conversation(conversation_et, name) {
-    return this.conversation_service.update_conversation_properties(conversation_et.id, name).then(response => {
+  renameConversation(conversation_et, name) {
+    return this.conversation_service.updateConversationProperties(conversation_et.id, {name}).then(response => {
       if (response) {
         amplify.publish(z.event.WebApp.EVENT.INJECT, response, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
         return response;
@@ -2060,7 +2060,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   _wrap_in_ephemeral_message(generic_message, millis) {
     const ephemeral = new z.proto.Ephemeral();
-    ephemeral.set('expire_after_millis', millis);
+    const fixedTimer = z.util.NumberUtil.clamp(
+      millis,
+      z.cryptography.CryptographyMapper.CONFIG.TIMED_MESSAGES_RANGE.MIN,
+      z.cryptography.CryptographyMapper.CONFIG.TIMED_MESSAGES_RANGE.MAX
+    );
+    ephemeral.set('expire_after_millis', fixedTimer);
     ephemeral.set(generic_message.content, generic_message[generic_message.content]);
 
     generic_message = new z.proto.GenericMessage(generic_message.message_id);
