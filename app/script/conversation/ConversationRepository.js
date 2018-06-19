@@ -1270,8 +1270,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {string} name - New conversation name
    * @returns {Promise} Resolves when conversation was renamed
    */
-  rename_conversation(conversation_et, name) {
-    return this.conversation_service.update_conversation_properties(conversation_et.id, name).then(response => {
+  renameConversation(conversation_et, name) {
+    return this.conversation_service.updateConversationProperties(conversation_et.id, {name}).then(response => {
       if (response) {
         amplify.publish(z.event.WebApp.EVENT.INJECT, response, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
         return response;
