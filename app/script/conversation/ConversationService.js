@@ -139,13 +139,19 @@ z.conversation.ConversationService = class ConversationService {
    *   handled properties:
    *   {
    *     name: {string} name of the conversation,
-   *     message_timer: {number} global time for the conversation
+   *     message_timer: {number} global message timer for the conversation
    *   }
    * @returns {Promise} Resolves with the server response
    */
   updateConversationProperties(conversation_id, updates) {
+    const handledProperties = ['name', 'message_timer'];
+    const updatesPayload = handledProperties.reduce((properties, propertyName) => {
+      return updates[propertyName]
+        ? Object.assign({}, properties, {[propertyName]: updates[propertyName]})
+        : properties;
+    }, {});
     return this.client.send_json({
-      data: updates,
+      data: updatesPayload,
       type: 'PUT',
       url: this.client.create_url(`${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversation_id}`),
     });
