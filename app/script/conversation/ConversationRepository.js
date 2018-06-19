@@ -27,10 +27,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
   static get CONFIG() {
     return {
       CONFIRMATION_THRESHOLD: 7 * 24 * 60 * 60 * 1000,
-      EPHEMERAL_TIMER: {
-        MAX: 31557600000,
-        MIN: 1000,
-      },
       EXTERNAL_MESSAGE_THRESHOLD: 200 * 1024,
       GROUP: {
         MAX_NAME_LENGTH: 64,
@@ -2070,8 +2066,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const ephemeral = new z.proto.Ephemeral();
     const fixedTimer = z.util.NumberUtil.clamp(
       millis,
-      ConversationRepository.CONFIG.EPHEMERAL_TIMER.MIN,
-      ConversationRepository.CONFIG.EPHEMERAL_TIMER.MAX
+      z.cryptography.CryptographyMapper.CONFIG.TIMED_MESSAGES_RANGE.MIN,
+      z.cryptography.CryptographyMapper.CONFIG.TIMED_MESSAGES_RANGE.MAX
     );
     ephemeral.set('expire_after_millis', fixedTimer);
     ephemeral.set(generic_message.content, generic_message[generic_message.content]);
