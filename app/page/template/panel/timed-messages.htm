@@ -6,20 +6,23 @@
         <close-icon class="right-panel-close icon-button" data-bind="click: clickOnClose" data-uie-name="do-close"></close-icon>
     </div>
     <div class="panel__content">
-        <div class="panel__action-item" data-bind="click: clickOnMessageTimeOff" data-uie-name="item-timed-messages-option">
-            <div class="panel__action-item__text" data-bind="l10n_text: z.string.timedMessagesOff"></div>
-            <!-- ko if: currentMessageTimer() === 0 -->
+        <div class="panel__content__scroll" data-bind="antiscroll: shouldUpdateScrollbar">
+            <div class="panel__action-item" data-bind="click: clickOnMessageTimeOff" data-uie-name="item-timed-messages-option">
+                <div class="panel__action-item__text" data-bind="l10n_text: z.string.timedMessagesOff"></div>
+                <!-- ko if: currentMessageTimer() === 0 -->
                 <check-icon></check-icon>
-            <!-- /ko -->
-        </div>
-        <!-- ko foreach: messageTimes -->
+                <!-- /ko -->
+            </div>
+            <!-- ko foreach: {data: messageTimes, afterRender: afterRender} -->
             <div class="panel__action-item" data-bind="click: $parent.clickOnMessageTime" data-uie-name="item-timed-messages-option">
                 <div class="panel__action-item__text" data-bind="text: text"></div>
                 <!-- ko if: $parent.currentMessageTimer() === value -->
-                    <check-icon></check-icon>
+                <check-icon></check-icon>
                 <!-- /ko -->
             </div>
-        <!-- /ko -->
+            <!-- /ko -->
+            <div class="panel__info-text timed-messages__disclaimer" data-bind="l10n_text: z.string.timedMessageDisclaimer"></div>
+        </div>
     </div>
     <!-- /ko -->
 </div>
