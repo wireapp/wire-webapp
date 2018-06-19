@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="3.3.0"></a>
+# [3.3.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@3.2.3...@wireapp/core@3.3.0) (2018-06-19)
+
+
+### Features
+
+* **core:** Support timed messages in send method ([#731](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/731)) ([f4ec8c1](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/f4ec8c1))
+
+
+
+
 <a name="3.2.3"></a>
 ## [3.2.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@3.2.2...@wireapp/core@3.2.3) (2018-06-19)
 

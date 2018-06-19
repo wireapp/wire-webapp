@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="2.1.0"></a>
+# [2.1.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/cli-client/compare/@wireapp/cli-client@2.0.22...@wireapp/cli-client@2.1.0) (2018-06-19)
+
+
+### Features
+
+* **core:** Support timed messages in send method ([#731](https://github.com/wireapp/wire-web-packages/tree/master/packages/cli-client/issues/731)) ([f4ec8c1](https://github.com/wireapp/wire-web-packages/tree/master/packages/cli-client/commit/f4ec8c1))
+
+
+
+
 <a name="2.0.22"></a>
 ## [2.0.22](https://github.com/wireapp/wire-web-packages/tree/master/packages/cli-client/compare/@wireapp/cli-client@2.0.21...@wireapp/cli-client@2.0.22) (2018-06-19)
 
