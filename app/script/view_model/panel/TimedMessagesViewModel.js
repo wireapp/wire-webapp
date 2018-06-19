@@ -59,7 +59,6 @@ z.viewModel.panel.TimedMessagesViewModel = class TimedMessagesViewModel {
 
     this.clickOnMessageTime = this.clickOnMessageTime.bind(this);
     this.clickOnMessageTimeOff = this.clickOnMessageTimeOff.bind(this);
-    this.afterRender = this.afterRender.bind(this);
   }
 
   clickOnBack() {
@@ -78,9 +77,5 @@ z.viewModel.panel.TimedMessagesViewModel = class TimedMessagesViewModel {
   clickOnMessageTimeOff() {
     this.conversationEntity().globalMessageTimer(0);
     this.clickOnBack();
-  }
-
-  afterRender() {
-    this.isRendered(true);
   }
 };
