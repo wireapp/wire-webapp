@@ -1055,7 +1055,7 @@ describe('ConversationRepository', () => {
       );
 
       const sentPromises = inBoundValues.concat(outOfBoundValues).map(expiration => {
-        conversation.ephemeral_timer(expiration);
+        conversation.localMessageTimer(expiration);
         conversation.self = {id: 'felix'};
         const message = 'hello there';
         return conversationRepository.send_text_with_link_preview(message, conversation);
