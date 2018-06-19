@@ -211,13 +211,18 @@ export default class ConversationService {
 
   private async sendPing(
     conversationId: string,
-    payloadBundle: PayloadBundleOutgoingUnsent
+    payloadBundle: PayloadBundleOutgoingUnsent,
+    expireAfterMillis?: number
   ): Promise<PayloadBundleOutgoing> {
     const knock = this.protocolBuffers.Knock.create();
-    const genericMessage = this.protocolBuffers.GenericMessage.create({
+    let genericMessage = this.protocolBuffers.GenericMessage.create({
       knock,
       messageId: payloadBundle.id,
     });
+
+    if (expireAfterMillis) {
+      genericMessage = this.createEphemeral(genericMessage, expireAfterMillis);
+    }
 
     await this.sendGenericMessage(this.clientID, conversationId, genericMessage);
 
@@ -370,13 +375,14 @@ export default class ConversationService {
 
   public async send(
     conversationId: string,
-    payloadBundle: PayloadBundleOutgoingUnsent
+    payloadBundle: PayloadBundleOutgoingUnsent,
+    expireAfterMillis?: number
   ): Promise<PayloadBundleOutgoing> {
     switch (payloadBundle.type) {
       case GenericMessageType.ASSET: {
         if (payloadBundle.content) {
           if ((payloadBundle.content as ImageAsset).image) {
-            return this.sendImage(conversationId, payloadBundle);
+            return this.sendImage(conversationId, payloadBundle, expireAfterMillis);
           }
           throw new Error(`No send method implemented for sending other assets than images.`);
         }
@@ -393,9 +399,9 @@ export default class ConversationService {
       case GenericMessageType.CONFIRMATION:
         return this.sendConfirmation(conversationId, payloadBundle);
       case GenericMessageType.KNOCK:
-        return this.sendPing(conversationId, payloadBundle);
+        return this.sendPing(conversationId, payloadBundle, expireAfterMillis);
       case GenericMessageType.TEXT:
-        return this.sendText(conversationId, payloadBundle);
+        return this.sendText(conversationId, payloadBundle, expireAfterMillis);
       default:
         throw new Error(`No send method implemented for "${payloadBundle.type}."`);
     }
