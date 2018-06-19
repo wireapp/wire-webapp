@@ -292,6 +292,31 @@ describe('Conversation Mapper', () => {
       expect(merged_conversation_2.last_server_timestamp).toBe(2);
     });
 
+    it('updates local message timer if present on the remote', () => {
+      const baseConversation = {
+        id: 'd5a39ffb-6ce3-4cc8-9048-0123456789abc',
+        members: {others: [], self: {}},
+      };
+      const tests = [
+        {
+          expected: {messageTimer: 10000},
+          local: Object.assign({}, baseConversation, {messageTimer: undefined}),
+          remote: Object.assign({}, baseConversation, {message_timer: 10000}),
+        },
+        {
+          expected: {messageTimer: 0},
+          local: Object.assign({}, baseConversation, {messageTimer: 1000}),
+          remote: Object.assign({}, baseConversation, {message_timer: 0}),
+        },
+      ];
+
+      tests.forEach(({local, remote, expected}) => {
+        const [merged_conversation] = conversation_mapper.merge_conversations([local], [remote]);
+
+        expect(merged_conversation.messageTimer).toEqual(expected.messageTimer);
+      });
+    });
+
     it('updates local archive and muted timestamps if time of remote data is newer', () => {
       // prettier-ignore
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
