@@ -18,15 +18,30 @@
  */
 
 const QUERY_KEY = {
+  BOT_PROVIDER: 'bot_provider',
+  BOT_SERVICE: 'bot_service',
   CONVERSATION_CODE: 'join_code',
   CONVERSATION_KEY: 'join_key',
   CURRENCY: 'currency',
   ENVIRONMENT: 'env',
   IMMEDIATE_LOGIN: 'immediate_login',
+  INTEGRATIONS: 'integrations',
   JOIN_EXPIRES: 'expires_in',
   LANGUAGE: 'hl',
+  LOCALE: 'hl',
   LOGOUT_REASON: 'reason',
+  PWA_AWARE: 'pwa_aware',
+  TRACKING: 'tracking',
 };
+
+const FORWARDED_QUERY_KEYS = [
+  QUERY_KEY.BOT_PROVIDER,
+  QUERY_KEY.BOT_SERVICE,
+  QUERY_KEY.ENVIRONMENT,
+  QUERY_KEY.INTEGRATIONS,
+  QUERY_KEY.LOCALE,
+  QUERY_KEY.TRACKING,
+];
 
 const LOGOUT_REASON = {
   ACCOUNT_REMOVED: 'deleted',
@@ -51,4 +66,4 @@ const ROUTE = {
   VERIFY: '/verify',
 };
 
-export {ROUTE, QUERY_KEY, LOGOUT_REASON};
+export {ROUTE, QUERY_KEY, FORWARDED_QUERY_KEYS, LOGOUT_REASON};

@@ -77,22 +77,18 @@ z.util.DebugUtil = class DebugUtil {
       });
   }
 
-  getSerialisedSession(sessionId) {
-    return wire.app.repository.storage.storageService.load('sessions', sessionId).then(record => {
-      record.serialised = z.util.arrayToBase64(record.serialised);
-      return record;
-    });
-  }
+  exportCryptobox() {
+    const clientId = wire.app.repository.client.currentClient().id;
+    const userId = wire.app.repository.user.self().id;
+    const fileName = `cryptobox-${userId}-${clientId}.json`;
 
-  getSerialisedIdentity() {
-    return wire.app.repository.storage.storageService.load('keys', 'local_identity').then(record => {
-      record.serialised = z.util.arrayToBase64(record.serialised);
-      return record;
-    });
+    wire.app.repository.cryptography.cryptobox
+      .serialize()
+      .then(cryptobox => z.util.downloadText(JSON.stringify(cryptobox), fileName));
   }
 
   getNotificationFromStream(notificationId, notificationIdSince) {
-    const clientId = wire.app.repository.client.current_client().id;
+    const clientId = wire.app.repository.client.currentClient().id;
 
     const _gotNotifications = ({hasMore, notifications}) => {
       const matchingNotifications = notifications.filter(notification => notification.id === notificationId);
@@ -111,7 +107,7 @@ z.util.DebugUtil = class DebugUtil {
   }
 
   getNotificationsFromStream(remoteUserId, remoteClientId, matchingNotifications = [], notificationIdSince) {
-    const localClientId = wire.app.repository.client.current_client().id;
+    const localClientId = wire.app.repository.client.currentClient().id;
     const localUserId = wire.app.repository.user.self().id;
 
     const _gotNotifications = ({hasMore, notifications}) => {

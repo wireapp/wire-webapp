@@ -52,15 +52,12 @@ z.calling.entities.FlowEntity = class FlowEntity {
     this.conversationId = this.callEntity.id;
     this.messageLog = this.participantEntity.messageLog;
 
-    const callLoggerName = `z.calling.entities.FlowEntity (${this.id})`;
-    this.callLogger = new z.telemetry.calling.CallLogger(callLoggerName, z.config.LOGGER.OPTIONS, this.messageLog);
+    const loggerName = 'z.calling.entities.FlowEntity';
+    this.callLogger = new z.telemetry.calling.CallLogger(loggerName, this.id, z.config.LOGGER.OPTIONS, this.messageLog);
 
     // States
     this.isAnswer = ko.observable(false);
     this.selfState = this.callEntity.selfState;
-
-    // Audio
-    this.audio = new z.calling.entities.FlowAudioEntity(this, this.callingRepository.mediaRepository);
 
     // Users
     this.remoteClientId = undefined;
@@ -69,8 +66,19 @@ z.calling.entities.FlowEntity = class FlowEntity {
     this.selfUser = this.callEntity.selfUser;
     this.selfUserId = this.selfUser.id;
 
+    // Audio
+    this.audio = new z.calling.entities.FlowAudioEntity(this, this.callingRepository.mediaRepository);
+
     // Telemetry
     this.telemetry = new z.telemetry.calling.FlowTelemetry(this.id, this.remoteUserId, this.callEntity, timings);
+
+    this.callLogger.info({
+      data: {
+        default: [this.remoteUser.name()],
+        obfuscated: [this.callLogger.obfuscate(this.remoteUser.id)],
+      },
+      message: `Created new flow entity for user {0}`,
+    });
 
     //##############################################################################
     // PeerConnection
@@ -408,29 +416,37 @@ z.calling.entities.FlowEntity = class FlowEntity {
    * @returns {undefined} No return value
    */
   _closePeerConnection() {
-    if (this.peerConnection) {
-      this.peerConnection.oniceconnectionstatechange = () => {
-        this.callLogger.log(this.callLogger.levels.OFF, 'State change ignored - ICE connection');
+    const peerConnection = this.peerConnection;
+    if (!peerConnection) {
+      return;
+    }
+
+    peerConnection.oniceconnectionstatechange = () => {
+      this.callLogger.log(this.callLogger.levels.OFF, 'State change ignored - ICE connection');
+    };
+
+    peerConnection.onsignalingstatechange = () => {
+      const logMessage = `State change ignored - signaling state: ${peerConnection.signalingState}`;
+      this.callLogger.log(this.callLogger.levels.OFF, logMessage);
+    };
+
+    const isStateClosed = peerConnection.signalingState === z.calling.rtc.SIGNALING_STATE.CLOSED;
+    if (!isStateClosed) {
+      const connectionMediaStreamTracks = peerConnection.getReceivers
+        ? peerConnection.getReceivers().map(receiver => receiver.track)
+        : peerConnection.getRemoteStreams().reduce((tracks, stream) => tracks.concat(stream.getTracks()), []);
+
+      amplify.publish(z.event.WebApp.CALL.MEDIA.CONNECTION_CLOSED, connectionMediaStreamTracks);
+      peerConnection.close();
+
+      const logMessage = {
+        data: {
+          default: [this.remoteUser.name()],
+          obfuscated: [this.callLogger.obfuscate(this.remoteUser.id)],
+        },
+        message: `Closing PeerConnection '{0}' successful`,
       };
-
-      this.peerConnection.onsignalingstatechange = () => {
-        const logMessage = `State change ignored - signaling state: ${this.peerConnection.signalingState}`;
-        this.callLogger.log(this.callLogger.levels.OFF, logMessage);
-      };
-
-      const isStateClosed = this.peerConnection.signalingState === z.calling.rtc.SIGNALING_STATE.CLOSED;
-      if (!isStateClosed) {
-        this.peerConnection.close();
-
-        const logMessage = {
-          data: {
-            default: [this.remoteUser.name()],
-            obfuscated: [this.callLogger.obfuscate(this.remoteUser.id)],
-          },
-          message: `Closing PeerConnection '{0}' successful`,
-        };
-        this.callLogger.info(logMessage);
-      }
+      this.callLogger.info(logMessage);
     }
   }
 
@@ -500,8 +516,8 @@ z.calling.entities.FlowEntity = class FlowEntity {
       videoTracks: mediaStream.getVideoTracks(),
     });
 
-    mediaStream = z.media.MediaStreamHandler.detect_media_stream_type(mediaStream);
-    const isTypeAudio = mediaStream.type === z.media.MediaType.AUDIO;
+    const mediaType = z.media.MediaStreamHandler.detectMediaStreamType(mediaStream);
+    const isTypeAudio = mediaType === z.media.MediaType.AUDIO;
     if (isTypeAudio) {
       mediaStream = this.audio.wrapAudioOutputStream(mediaStream);
     }
@@ -540,10 +556,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
    * @returns {undefined} No return value
    */
   _onIceConnectionStateChange(event) {
-    const endingCallStates = [z.calling.enum.CALL_STATE.DISCONNECTING, z.calling.enum.CALL_STATE.ENDED];
-    const isEndingCall = endingCallStates.includes(this.callEntity.state());
-
-    if (this.peerConnection || !isEndingCall) {
+    if (this.peerConnection && this.callEntity.isActiveState()) {
       this.callLogger.info('State changed - ICE connection', event);
       const connectionMessage = `ICE connection state: ${this.peerConnection.iceConnectionState}`;
       this.callLogger.log(this.callLogger.levels.LEVEL_1, connectionMessage);
@@ -586,7 +599,8 @@ z.calling.entities.FlowEntity = class FlowEntity {
    * @returns {undefined} No return value
    */
   _onTrack(event) {
-    this.callLogger.info('Remote MediaStreamTrack added to PeerConnection', event);
+    const mediaStreamTrack = event.track;
+    this.callLogger.info(`Remote '${mediaStreamTrack.kind}' MediaStreamTrack added to PeerConnection`, event);
   }
 
   //##############################################################################
@@ -594,7 +608,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
   //##############################################################################
 
   /**
-   * Send an call message through the data channel.
+   * Send a call message through the data channel.
    * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message to be send
    * @returns {undefined} No return value
    */
@@ -749,7 +763,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
   //##############################################################################
 
   /**
-   * Save the remote SDP received via an call message within the flow.
+   * Save the remote SDP received via a call message within the flow.
    *
    * @note The resolving value indicates whether negotiation should be skipped for the current state.
    * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.SETUP
@@ -898,6 +912,19 @@ z.calling.entities.FlowEntity = class FlowEntity {
   }
 
   /**
+   * Build RTCOfferAnswerOptions for SDP creation
+   *
+   * @see https://www.w3.org/TR/webrtc/#offer/answer-options
+   *
+   * @private
+   * @param {boolean} iceRestart - Is ICE restart
+   * @returns {RTCOfferAnswerOptions} Object containing the RTCOfferAnswerOptions
+   */
+  _createOfferAnswerOptions(iceRestart) {
+    return {iceRestart, voiceActivityDetection: true};
+  }
+
+  /**
    * Create a local SDP of type 'answer'.
    *
    * @see https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/createAnswer
@@ -917,7 +944,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
     this.callLogger.debug(logMessage);
 
     this.peerConnection
-      .createAnswer()
+      .createAnswer(this._createOfferAnswerOptions())
       .then(rtcSdp => this._createSdpSuccess(rtcSdp))
       .catch(error => this._createSdpFailure(error, z.calling.rtc.SDP_TYPE.ANSWER));
   }
@@ -967,14 +994,6 @@ z.calling.entities.FlowEntity = class FlowEntity {
     this.negotiationNeeded(false);
     this._initializeDataChannel();
 
-    /*
-     * https://www.w3.org/TR/webrtc/#offer-answer-options
-     * https://www.w3.org/TR/webrtc/#configuration-data-extensions
-     *
-     * Set offerToReceiveVideo to true on audio calls. Else it should be undefined for Firefox compatibility reasons.
-     */
-    const offerOptions = {iceRestart, voiceActivityDetection: true};
-
     const logMessage = {
       data: {
         default: [z.calling.rtc.SDP_TYPE.OFFER, this.remoteUser.name()],
@@ -985,7 +1004,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
     this.callLogger.debug(logMessage);
 
     this.peerConnection
-      .createOffer(offerOptions)
+      .createOffer(this._createOfferAnswerOptions(iceRestart))
       .then(rtcSdp => this._createSdpSuccess(rtcSdp))
       .catch(error => this._createSdpFailure(error, z.calling.rtc.SDP_TYPE.OFFER));
   }
@@ -1004,12 +1023,8 @@ z.calling.entities.FlowEntity = class FlowEntity {
     );
     const additionalPayload = Object.assign({remoteUser: this.remoteUser, sdp: this.localSdp().sdp}, payload);
 
-    return z.calling.CallMessageBuilder.createPayloadPropSync(
-      this.callEntity.selfState,
-      this.callEntity.selfState.videoSend(),
-      false,
-      additionalPayload
-    );
+    const selfState = this.callEntity.selfState;
+    return z.calling.CallMessageBuilder.createPropSync(selfState, selfState.videoSend(), additionalPayload);
   }
 
   /**
@@ -1204,25 +1219,65 @@ z.calling.entities.FlowEntity = class FlowEntity {
   //##############################################################################
 
   /**
-   * Update the local MediaStream.
+   * Replace the MediaStream attached to the PeerConnection.
+   *
+   * @private
    * @param {z.media.MediaStreamInfo} mediaStreamInfo - Object containing the required MediaStream information
-   * @returns {Promise} Resolves when the updated MediaStream is used
+   * @param {MediaStream} outdatedMediaStream - Previous MediaStream
+   * @returns {Promise} Resolves when negotiation has been restarted
    */
-  updateMediaStream(mediaStreamInfo) {
-    return this._replaceMediaTrack(mediaStreamInfo).catch(error => {
-      const {message, type} = error;
-      const expectedErrorTypes = [
-        z.calling.CallError.TYPE.NO_REPLACEABLE_TRACK,
-        z.calling.CallError.TYPE.RTP_SENDER_NOT_SUPPORTED,
-      ];
+  replaceMediaStream(mediaStreamInfo, outdatedMediaStream) {
+    const mediaStream = mediaStreamInfo.stream;
+    const mediaType = mediaStreamInfo.getType();
+    const negotiationMode = z.calling.enum.SDP_NEGOTIATION_MODE.STREAM_CHANGE;
 
-      const isExpectedError = expectedErrorTypes.includes(type);
-      if (isExpectedError) {
-        this.callLogger.debug(`Replacement of MediaStream and renegotiation necessary: ${message}`, error);
-        return this._replaceMediaStream(mediaStreamInfo);
-      }
-      throw error;
-    });
+    return Promise.resolve()
+      .then(() => this._removeMediaStream(outdatedMediaStream))
+      .then(() => this.restartNegotiation(negotiationMode, false, mediaStream))
+      .then(() => this.callLogger.debug(`Replaced the '${mediaType}' track`))
+      .catch(error => {
+        this.callLogger.error(`Failed to replace local MediaStream: ${error.message}`, error);
+        throw error;
+      });
+  }
+
+  /**
+   * Replace the MediaStreamTrack attached to the MediaStream of the PeerConnection.
+   *
+   * @private
+   * @param {z.media.MediaStreamInfo} mediaStreamInfo - Object containing the required MediaStream information
+   * @returns {Promise} Resolves when a MediaStreamTrack has been replaced
+   */
+  replaceMediaTrack(mediaStreamInfo) {
+    const mediaStream = mediaStreamInfo.stream;
+    const mediaType = mediaStreamInfo.getType();
+    const [mediaStreamTrack] = mediaStream.getTracks();
+
+    return Promise.resolve()
+      .then(() => this._getRtcSender(mediaType))
+      .then(rtpSender => rtpSender.replaceTrack(mediaStreamTrack))
+      .then(() => this.callLogger.debug(`Replaced the MediaStream containing '${mediaType}'`))
+      .catch(error => {
+        this.callLogger.error(`Failed to replace local MediaStreamTrack: ${error.message}`, error);
+        throw error;
+      });
+  }
+
+  /**
+   * Check for support of MediaStreamTrack replacement.
+   *
+   * @private
+   * @param {z.media.MediaType} mediaType - Type to check replacement capability for
+   * @returns {Promise<boolean>} Resolves when the replacement capability has been checked
+   */
+  supportsTrackReplacement(mediaType) {
+    return Promise.resolve()
+      .then(() => {
+        const supportsGetSenders = typeof this.peerConnection.getSenders === 'function';
+        return supportsGetSenders ? this._getRtcSender(mediaType) : false;
+      })
+      .then(rtpSender => !!rtpSender)
+      .catch(() => false);
   }
 
   /**
@@ -1288,77 +1343,6 @@ z.calling.entities.FlowEntity = class FlowEntity {
   }
 
   /**
-   * Replace the MediaStream attached to the PeerConnection.
-   *
-   * @private
-   * @param {z.media.MediaStreamInfo} mediaStreamInfo - Object containing the required MediaStream information
-   * @returns {Promise} Resolves when MediaStream has been replaced
-   */
-  _replaceMediaStream(mediaStreamInfo) {
-    const mediaType = mediaStreamInfo.type;
-
-    return Promise.resolve()
-      .then(() => this._removeMediaStream(this.mediaStream()))
-      .then(() => this._upgradeMediaStream(mediaStreamInfo))
-      .then(upgradedMediaStreamInfo => {
-        const {stream: mediaStream} = upgradedMediaStreamInfo;
-        upgradedMediaStreamInfo.replaced = true;
-
-        this.callLogger.info(`Upgraded the MediaStream to update '${mediaType}'`, mediaStream);
-        this.restartNegotiation(z.calling.enum.SDP_NEGOTIATION_MODE.STREAM_CHANGE, false, mediaStream);
-        return upgradedMediaStreamInfo;
-      })
-      .catch(error => {
-        this.callLogger.error(`Failed to replace local MediaStream: ${error.message}`, error);
-        throw error;
-      });
-  }
-
-  /**
-   * Replace the a MediaStreamTrack attached to the MediaStream of the PeerConnection.
-   *
-   * @private
-   * @param {z.media.MediaStreamInfo} mediaStreamInfo - Object containing the required MediaStream information
-   * @returns {Promise} Resolves when a MediaStreamTrack has been replaced
-   */
-  _replaceMediaTrack(mediaStreamInfo) {
-    const {stream: mediaStream, type: mediaType} = mediaStreamInfo;
-
-    return Promise.resolve()
-      .then(() => {
-        const supportsGetSenders = typeof this.peerConnection.getSenders === 'function';
-        if (supportsGetSenders) {
-          return this._getRtcSender(mediaType);
-        }
-
-        throw new z.calling.CallError(z.calling.CallError.TYPE.RTP_SENDER_NOT_SUPPORTED);
-      })
-      .then(rtpSender => {
-        const [mediaStreamTrack] = mediaStream.getTracks();
-
-        rtpSender.replaceTrack(mediaStreamTrack);
-      })
-      .then(() => {
-        this.callLogger.debug(`Replaced the '${mediaType}' track`);
-        return mediaStreamInfo;
-      })
-      .catch(error => {
-        const {message, name, type} = error;
-
-        const expectedErrorTypes = [
-          z.calling.CallError.TYPE.NO_REPLACEABLE_TRACK,
-          z.calling.CallError.TYPE.RTP_SENDER_NOT_SUPPORTED,
-        ];
-
-        const isExpectedError = expectedErrorTypes.includes(type);
-        if (!isExpectedError) {
-          this.callLogger.error(`Failed to replace the '${mediaType}' track: ${name} - ${message}`, error);
-        }
-        throw error;
-      });
-  }
-
-  /**
    * Removes a MediaStreamTrack from the PeerConnection.
    *
    * @private
@@ -1418,36 +1402,6 @@ z.calling.entities.FlowEntity = class FlowEntity {
         });
       }
     }
-  }
-
-  /**
-   * Upgrade the local MediaStream with new MediaStreamTracks
-   *
-   * @private
-   * @param {z.media.MediaStreamInfo} mediaStreamInfo - MediaStreamInfo containing new MediaStreamTracks
-   * @returns {z.media.MediaStreamInfo} New MediaStream to be used
-   */
-  _upgradeMediaStream(mediaStreamInfo) {
-    if (this.mediaStream()) {
-      const {stream: newMediaStream, type: mediaType} = mediaStreamInfo;
-
-      z.media.MediaStreamHandler.get_media_tracks(this.mediaStream(), mediaType).forEach(mediaStreamTrack => {
-        this.mediaStream().removeTrack(mediaStreamTrack);
-        mediaStreamTrack.stop();
-        const mediaKind = mediaStreamTrack.kind;
-        this.callLogger.debug(`Stopping MediaStreamTrack of kind '${mediaKind}' successful`, mediaStreamTrack);
-      });
-
-      const mediaStream = this.mediaStream().clone();
-
-      z.media.MediaStreamHandler.get_media_tracks(newMediaStream, mediaType).forEach(mediaStreamTrack => {
-        mediaStream.addTrack(mediaStreamTrack);
-      });
-
-      return new z.media.MediaStreamInfo(z.media.MediaStreamSource.LOCAL, 'self', mediaStream);
-    }
-
-    return mediaStreamInfo;
   }
 
   //##############################################################################

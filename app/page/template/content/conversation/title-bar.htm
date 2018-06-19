@@ -21,34 +21,28 @@
 
     <!-- ko if: showCallControls() -->
       <div class="conversation-title-bar-icons">
-        <!-- ko ifnot: conversationEntity().is_group() -->
-          <span class="conversation-title-bar-icon button-icon-large icon-video"
+        <!-- ko if: supportsVideoCall() -->
+          <camera-icon class="conversation-title-bar-icon"
                 data-bind="click: clickOnVideoButton, l10n_tooltip: z.string.tooltipConversationVideoCall"
                 data-uie-name="do-video-call">
-          </span>
+          </camera-icon>
         <!-- /ko -->
-        <span class="conversation-title-bar-icon button-icon-large icon-call"
+        <pickup-icon class="conversation-title-bar-icon"
               data-bind="click: clickOnCallButton, l10n_tooltip: z.string.tooltipConversationCall"
               data-uie-name="do-call">
-        </span>
+        </pickup-icon>
       </div>
     <!-- /ko -->
 
     <!-- ko if: hasOngoingCall() -->
       <div class="conversation-title-bar-icons">
-        <!-- ko if: showMaximizeControl() -->
-          <span class="conversation-title-bar-icon button-icon-large icon-fullscreen"
-                data-bind="click: clickOnMaximize"
-                data-uie-name="do-maximize-call">
-          </span>
-        <!-- /ko -->
         <!-- ko if: selfStreamState.screenSend() -->
-          <span class="conversation-title-bar-icon conversation-title-bar-icon-status button-icon-large icon-screensharing"
+          <span class="conversation-title-bar-icon button-icon-large icon-screensharing"
             data-uie-name="status-self-screensharing">
           </span>
         <!-- /ko -->
         <!-- ko if: selfStreamState.videoSend() -->
-          <span class="conversation-title-bar-icon conversation-title-bar-icon-status button-icon-large icon-video"
+          <span class="conversation-title-bar-icon button-icon-large icon-video"
                 data-uie-name="status-self-video">
           </span>
         <!-- /ko -->

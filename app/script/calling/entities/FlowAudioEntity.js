@@ -39,8 +39,17 @@ z.calling.entities.FlowAudioEntity = class FlowAudioEntity {
 
     this.messageLog = this.flowEntity.messageLog;
 
-    const callLoggerName = `z.calling.entities.FlowAudio (${this.flowEntity.id})`;
-    this.callLogger = new z.telemetry.calling.CallLogger(callLoggerName, z.config.LOGGER.OPTIONS, this.messageLog);
+    const id = this.flowEntity.id;
+    const loggerName = 'z.calling.entities.FlowAudio';
+    this.callLogger = new z.telemetry.calling.CallLogger(loggerName, id, z.config.LOGGER.OPTIONS, this.messageLog);
+
+    this.callLogger.info({
+      data: {
+        default: [this.flowEntity.remoteUser.name()],
+        obfuscated: [this.callLogger.obfuscate(this.flowEntity.remoteUser.id)],
+      },
+      message: `Created new flow audio entity for user {0}`,
+    });
 
     this.audioContext = undefined;
 
@@ -159,7 +168,7 @@ z.calling.entities.FlowAudioEntity = class FlowAudioEntity {
    */
   _getAudioContext() {
     if (!this.audioContext || this.audioContext.state === z.media.MediaRepository.AUDIO_CONTEXT_STATE.CLOSED) {
-      this.audioContext = this.mediaRepository.get_audio_context();
+      this.audioContext = this.mediaRepository.getAudioContext();
     }
     return this.audioContext;
   }

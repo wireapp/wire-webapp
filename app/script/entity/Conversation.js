@@ -140,13 +140,10 @@ z.entity.Conversation = class Conversation {
 
     // Calling
     this.call = ko.observable(undefined);
-    this.has_local_call = ko.pureComputed(() => !!this.call() && !this.call().isOngoingOnAnotherClient());
-    this.has_active_call = ko.pureComputed(() => {
-      return this.has_local_call() ? !z.calling.enum.CALL_STATE_GROUP.IS_ENDED.includes(this.call().state()) : false;
-    });
-    this.has_joinable_call = ko.pureComputed(() => {
-      return this.has_local_call() ? z.calling.enum.CALL_STATE_GROUP.CAN_JOIN.includes(this.call().state()) : false;
-    });
+    this.hasLocalCall = ko.pureComputed(() => !!this.call() && !this.call().isOngoingOnAnotherClient());
+
+    this.hasActiveCall = ko.pureComputed(() => (this.hasLocalCall() ? this.call().isActiveState() : false));
+    this.hasJoinableCall = ko.pureComputed(() => (this.hasLocalCall() ? this.call().canJoinState() : false));
 
     this.unread_events = ko.pureComputed(() => {
       const unread_event = [];
@@ -442,11 +439,15 @@ z.entity.Conversation = class Conversation {
     this.messages_unordered.removeAll();
   }
 
-  should_unarchive() {
+  shouldUnarchive() {
     if (this.archived_state()) {
-      const has_new_event = this.last_event_timestamp() > this.archived_timestamp();
+      const hasNewerMessage = this.last_event_timestamp() > this.archived_timestamp();
 
-      return has_new_event && !this.is_muted();
+      const lastMessageEntity = this.getLastMessage();
+      const hasNewerCall = lastMessageEntity && lastMessageEntity.is_call() && lastMessageEntity.is_activation();
+
+      const hasUpdate = hasNewerMessage || hasNewerCall;
+      return hasUpdate && !this.is_muted();
     }
     return false;
   }
@@ -639,6 +640,29 @@ z.entity.Conversation = class Conversation {
     }
 
     return ['annathebot', 'ottothebot'].includes(this.firstUserEntity() && this.firstUserEntity().username());
+  }
+
+  supportsVideoCall(isCreatingUser = false) {
+    if (this.is_one2one()) {
+      return true;
+    }
+
+    const participantCount = this.getNumberOfParticipants(true, false);
+    const passesParticipantLimit = participantCount <= z.calling.CallingRepository.CONFIG.MAX_VIDEO_PARTICIPANTS;
+
+    if (!passesParticipantLimit) {
+      return false;
+    }
+
+    if (this.self.inTeam()) {
+      return true;
+    }
+
+    if (isCreatingUser) {
+      return false;
+    }
+
+    return this.call() && this.call().isRemoteVideoCall();
   }
 
   serialize() {

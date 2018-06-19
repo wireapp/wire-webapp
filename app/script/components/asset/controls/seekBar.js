@@ -85,7 +85,7 @@ z.components.SeekBarComponent = class SeekBarComponent {
   }
 
   on_timeupdate() {
-    const value = 100 / this.media_element.duration * this.media_element.currentTime;
+    const value = (100 / this.media_element.duration) * this.media_element.currentTime;
     this._update_seek_bar(value);
   }
 

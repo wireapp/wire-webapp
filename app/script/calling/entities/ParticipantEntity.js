@@ -24,6 +24,18 @@ window.z.calling = z.calling || {};
 window.z.calling.entities = z.calling.entities || {};
 
 z.calling.entities.ParticipantEntity = class ParticipantEntity {
+  static get CONFIG() {
+    return {
+      PROPERTY_STATES: {
+        ACTIVE: [z.calling.enum.PROPERTY_STATE.PAUSED, z.calling.enum.PROPERTY_STATE.TRUE],
+        EXPECTED: [
+          z.calling.enum.PROPERTY_STATE.FALSE,
+          z.calling.enum.PROPERTY_STATE.PAUSED,
+          z.calling.enum.PROPERTY_STATE.TRUE,
+        ],
+      },
+    };
+  }
   /**
    * Construct a new participant.
    *
@@ -40,18 +52,40 @@ z.calling.entities.ParticipantEntity = class ParticipantEntity {
     this.messageLog = this.callEntity.messageLog;
     this.sessionId = undefined;
 
-    const callLoggerName = `z.calling.entities.ParticipantEntity (${this.id})`;
-    this.callLogger = new z.telemetry.calling.CallLogger(callLoggerName, z.config.LOGGER.OPTIONS, this.messageLog);
+    const loggerName = 'z.calling.entities.ParticipantEntity';
+    this.callLogger = new z.telemetry.calling.CallLogger(loggerName, this.id, z.config.LOGGER.OPTIONS, this.messageLog);
+
+    this.callLogger.info({
+      data: {
+        default: [this.id],
+        obfuscated: [this.callLogger.obfuscate(this.id)],
+      },
+      message: `Created new participant entity for user {0}`,
+    });
 
     this.isConnected = ko.observable(false);
     this.panning = ko.observable(0.0);
     this.wasConnected = false;
 
     this.state = {
-      audioSend: ko.observable(true),
-      screenSend: ko.observable(false),
-      videoSend: ko.observable(false),
+      audioSend: ko.observable(z.calling.enum.PROPERTY_STATE.TRUE),
+      screenSend: ko.observable(z.calling.enum.PROPERTY_STATE.FALSE),
+      videoSend: ko.observable(z.calling.enum.PROPERTY_STATE.FALSE),
     };
+
+    this.activeState = {
+      audioSend: ko.pureComputed(() => {
+        return ParticipantEntity.CONFIG.PROPERTY_STATES.ACTIVE.includes(this.state.audioSend());
+      }),
+      screenSend: ko.pureComputed(() => {
+        return ParticipantEntity.CONFIG.PROPERTY_STATES.ACTIVE.includes(this.state.screenSend());
+      }),
+      videoSend: ko.pureComputed(() => {
+        return ParticipantEntity.CONFIG.PROPERTY_STATES.ACTIVE.includes(this.state.videoSend());
+      }),
+    };
+
+    this.hasActiveVideo = ko.pureComputed(() => this.activeState.screenSend() || this.activeState.videoSend());
 
     this.flowEntity = new z.calling.entities.FlowEntity(this.callEntity, this, timings);
 
@@ -87,11 +121,16 @@ z.calling.entities.ParticipantEntity = class ParticipantEntity {
    * @returns {Promise} Resolves when the state was updated
    */
   updateState(callMessageEntity) {
-    const {clientId, properties, sdp: rtcSdp, sessionId} = callMessageEntity;
+    const {clientId, properties, sdp: rtcSdp, sessionId, type} = callMessageEntity;
 
     return this.updateProperties(properties).then(() => {
       this.sessionId = sessionId;
       this.flowEntity.setRemoteClientId(clientId);
+
+      const isGroupStart = type === z.calling.enum.CALL_MESSAGE_TYPE.GROUP_START;
+      if (isGroupStart && this.flowEntity.pcInitialized()) {
+        this.flowEntity.restartNegotiation(z.calling.enum.SDP_NEGOTIATION_MODE.STATE_COLLISION, false);
+      }
 
       return rtcSdp ? this.flowEntity.saveRemoteSdp(callMessageEntity) : false;
     });
@@ -105,21 +144,21 @@ z.calling.entities.ParticipantEntity = class ParticipantEntity {
   updateProperties(properties) {
     return Promise.resolve().then(() => {
       if (properties) {
-        const {audiosend: audioSend, screensend: screenSend, videosend: videoSend} = properties;
+        const {audiosend, screensend, videosend} = properties;
 
-        if (audioSend !== undefined) {
-          const isAudioSend = audioSend === z.calling.enum.PROPERTY_STATE.TRUE;
-          this.state.audioSend(isAudioSend);
+        const hasAudioSend = ParticipantEntity.CONFIG.PROPERTY_STATES.EXPECTED.includes(audiosend);
+        if (hasAudioSend) {
+          this.state.audioSend(audiosend);
         }
 
-        if (screenSend !== undefined) {
-          const isScreenSend = screenSend === z.calling.enum.PROPERTY_STATE.TRUE;
-          this.state.screenSend(isScreenSend);
+        const hasScreenSend = ParticipantEntity.CONFIG.PROPERTY_STATES.EXPECTED.includes(screensend);
+        if (hasScreenSend) {
+          this.state.screenSend(screensend);
         }
 
-        if (videoSend !== undefined) {
-          const isVideoSend = videoSend === z.calling.enum.PROPERTY_STATE.TRUE;
-          this.state.videoSend(isVideoSend);
+        const hasVideoSend = ParticipantEntity.CONFIG.PROPERTY_STATES.EXPECTED.includes(videosend);
+        if (hasVideoSend) {
+          this.state.videoSend(videosend);
         }
       }
     });

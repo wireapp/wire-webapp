@@ -92,11 +92,19 @@ z.string.et.authErrorSignIn = 'Palun kinnita oma andmeid ja proovi uuesti.';
 z.string.et.callStateOutgoing = 'Heliseb…';
 z.string.et.callStateConnecting = 'Ühendan…';
 z.string.et.callStateIncoming = 'Helistab…';
+z.string.et.callStateIncomingGroup = '{{user}} helistab';
 z.string.et.callDecline = 'Keeldu';
 z.string.et.callAccept = 'Nõustu';
 z.string.et.callJoin = 'Liitu';
 z.string.et.callChooseSharedScreen = 'Vali ekraan, mida jagada';
 z.string.et.callParticipants = '{{number}} kõnes';
+
+z.string.et.videoCallOverlayConversations = 'Vestlused';
+z.string.et.videoCallOverlayMute = 'Vaigista';
+z.string.et.videoCallOverlayVideo = 'Video';
+z.string.et.videoCallOverlayShareScreen = 'Jaga ekraani';
+z.string.et.videoCallOverlayHangUp = 'Lõpeta kõne';
+z.string.et.videoCallPaused="Video pausil";
 
 z.string.et.modalAcknowledgeAction = 'Ok';
 z.string.et.modalAcknowledgeHeadline = 'Midagi läks valesti';
@@ -353,6 +361,7 @@ z.string.et.groupCreationParticipantsActionSkip = 'Jäta vahele';
 z.string.et.groupCreationParticipantsHeader = 'Lisa inimesi';
 z.string.et.groupCreationParticipantsHeaderWithCounter = 'Lisa inimesi ({{number}})';
 z.string.et.groupCreationParticipantsPlaceholder = 'Otsi nime järgi';
+z.string.et.groupSizeInfo = 'Grupivestlusega saab liituda kuni {{count}} inimest. Videokõned töötavad kuni 4 osalejaga grupis.';
 
 z.string.et.guestRoomConversationName = 'Külalistetuba';
 z.string.et.guestRoomToggleName = 'Luba külalisi';
@@ -390,6 +399,7 @@ z.string.et.conversationsPopoverNotify = 'Eemalda vestluse vaigistus';
 z.string.et.conversationsPopoverSilence = 'Vaigista vestlus';
 z.string.et.conversationsPopoverUnarchive = 'Taasta vestlus arhiivist';
 
+z.string.et.conversationsSecondaryLineIncomingCall = '{{user}} helistab';
 z.string.et.conversationsSecondaryLineMissedCall = '{{number}} vastamata kõne';
 z.string.et.conversationsSecondaryLineMissedCalls = '{{number}} vastamata kõnet';
 z.string.et.conversationsSecondaryLineNewMessage = '{{number}} uus sõnum';

@@ -94,6 +94,9 @@ z.string.el.callJoin = 'Συμμετοχή';
 z.string.el.callChooseSharedScreen = 'Επιλέξτε μια οθόνη για κοινή χρήση';
 z.string.el.callParticipants = '{{number}} στο τηλεφώνημα';
 
+z.string.el.videoCallOverlayMute = 'Σίγαση';
+z.string.el.videoCallOverlayHangUp = 'Τερματισμός κλήσης';
+
 z.string.el.modalAcknowledgeAction = 'Εντάξει';
 z.string.el.modalAcknowledgeHeadline = 'Κάτι πήγε στραβά';
 z.string.el.modalConfirmSecondary = 'Ακύρωση';

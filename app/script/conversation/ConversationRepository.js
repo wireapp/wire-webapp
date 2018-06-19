@@ -158,29 +158,37 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.stateHandler = new z.conversation.ConversationStateHandler(this.conversation_service, this);
   }
 
-  _init_state_updates() {
+  _initStateUpdates() {
     ko.computed(() => {
-      const conversations_archived = [];
-      const conversations_calls = [];
-      const conversations_cleared = [];
-      const conversations_unarchived = [];
+      const conversationsArchived = [];
+      const conversationsCalls = [];
+      const conversationsCleared = [];
+      const conversationsUnarchived = [];
 
-      this.sorted_conversations().forEach(conversation_et => {
-        if (conversation_et.has_active_call()) {
-          conversations_calls.push(conversation_et);
-        } else if (conversation_et.is_cleared()) {
-          conversations_cleared.push(conversation_et);
-        } else if (conversation_et.is_archived()) {
-          conversations_archived.push(conversation_et);
+      this.sorted_conversations().forEach(conversationEntity => {
+        const conversationWithCall = this.selfUser().isTemporaryGuest()
+          ? conversationEntity.hasActiveCall() || conversationEntity.hasJoinableCall()
+          : conversationEntity.hasActiveCall();
+        if (conversationWithCall) {
+          if (conversationEntity.call().isOngoing()) {
+            conversationsCalls.unshift(conversationEntity);
+          } else {
+            conversationsCalls.push(conversationEntity);
+          }
+        }
+        if (conversationEntity.is_cleared()) {
+          conversationsCleared.push(conversationEntity);
+        } else if (conversationEntity.is_archived()) {
+          conversationsArchived.push(conversationEntity);
         } else {
-          conversations_unarchived.push(conversation_et);
+          conversationsUnarchived.push(conversationEntity);
         }
       });
 
-      this.conversations_archived(conversations_archived);
-      this.conversations_calls(conversations_calls);
-      this.conversations_cleared(conversations_cleared);
-      this.conversations_unarchived(conversations_unarchived);
+      this.conversations_archived(conversationsArchived);
+      this.conversations_calls(conversationsCalls);
+      this.conversations_cleared(conversationsCleared);
+      this.conversations_unarchived(conversationsUnarchived);
     });
   }
 
@@ -872,7 +880,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   initialize_conversations() {
-    this._init_state_updates();
+    this._initStateUpdates();
     this.init_total = this.receiving_queue.getLength();
 
     if (this.init_total > 5) {
@@ -1213,7 +1221,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   leaveGuestRoom() {
     if (this.selfUser().isTemporaryGuest()) {
-      const conversationEntity = this.getMostRecentConversation();
+      const conversationEntity = this.getMostRecentConversation(true);
       return this.conversation_service.deleteMembers(conversationEntity.id, this.selfUser().id);
     }
   }
@@ -1378,34 +1386,42 @@ z.conversation.ConversationRepository = class ConversationRepository {
   /**
    * Archive a conversation.
    *
-   * @param {Conversation} conversation_et - Conversation to rename
+   * @param {Conversation} conversationEntity - Conversation to rename
    * @returns {Promise} Resolves when the conversation was archived
    */
-  archive_conversation(conversation_et) {
-    return this._toggleArchiveConversation(conversation_et, true, 'archiving');
+  archiveConversation(conversationEntity) {
+    return this._toggleArchiveConversation(conversationEntity, true).then(() => {
+      this.logger.info(`Conversation '${conversationEntity.id}' archived`);
+    });
   }
 
   /**
    * Un-archive a conversation.
    *
-   * @param {Conversation} conversation_et - Conversation to unarchive
+   * @param {Conversation} conversationEntity - Conversation to unarchive
+   * @param {boolean} [forceChange=false] - Force state change without new message
    * @param {string} trigger - Trigger for unarchive
    * @returns {Promise} Resolves when the conversation was unarchived
    */
-  unarchive_conversation(conversation_et, trigger = 'unknown') {
-    return this._toggleArchiveConversation(conversation_et, false, trigger);
+  unarchiveConversation(conversationEntity, forceChange = false, trigger = 'unknown') {
+    return this._toggleArchiveConversation(conversationEntity, false, forceChange).then(() => {
+      this.logger.info(`Conversation '${conversationEntity.id}' unarchived by trigger '${trigger}'`);
+    });
   }
 
-  _toggleArchiveConversation(conversationEntity, newState, trigger) {
+  _toggleArchiveConversation(conversationEntity, newState, forceChange) {
     if (!conversationEntity) {
       const error = new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.CONVERSATION_NOT_FOUND);
       return Promise.reject(error);
     }
 
+    const stateChange = conversationEntity.is_archived() !== newState;
+
     const archiveTimestamp = conversationEntity.get_last_known_timestamp(this.timeOffset);
-    const noStateChange = conversationEntity.is_archived() === newState;
-    const noTimestampChange = conversationEntity.archived_timestamp() === archiveTimestamp;
-    if (noStateChange && noTimestampChange) {
+    const sameTimestamp = conversationEntity.archived_timestamp() === archiveTimestamp;
+    const skipChange = sameTimestamp && !forceChange;
+
+    if (!stateChange && skipChange) {
       return Promise.reject(new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.NO_CHANGES));
     }
 
@@ -1415,7 +1431,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
     };
 
     const conversationId = conversationEntity.id;
-    this.logger.info(`Conversation '${conversationId}' archive state change triggered by '${trigger}'`);
 
     const updatePromise = conversationEntity.removed_from_conversation()
       ? Promise.resolve()
@@ -1436,19 +1451,13 @@ z.conversation.ConversationRepository = class ConversationRepository {
       };
 
       this._onMemberUpdate(conversationEntity, response);
-      const isoDate = payload.otr_archived_ref;
-      const logMessage = `Updated conversation '${conversationId}' archive state to '${newState}' on '${isoDate}'`;
-      this.logger.info(logMessage);
     });
   }
 
   _check_changed_conversations() {
-    Object.keys(this.conversations_with_new_events).forEach(conversation_id => {
-      if (this.conversations_with_new_events.hasOwnProperty(conversation_id)) {
-        const conversation_et = this.conversations_with_new_events[conversation_id];
-        if (conversation_et.should_unarchive()) {
-          this.unarchive_conversation(conversation_et, 'event from notification stream');
-        }
+    Object.values(this.conversations_with_new_events).forEach(conversationEntity => {
+      if (conversationEntity.shouldUnarchive()) {
+        this.unarchiveConversation(conversationEntity, false, 'event from notification stream');
       }
     });
 
@@ -1562,7 +1571,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
         assetEntity.uploaded_on_this_client(true);
         return this.asset_service.uploadAsset(file, options, xhr => {
-          xhr.upload.onprogress = event => assetEntity.upload_progress(Math.round(event.loaded / event.total * 100));
+          xhr.upload.onprogress = event => assetEntity.upload_progress(Math.round((event.loaded / event.total) * 100));
           assetEntity.upload_cancel = () => xhr.abort();
         });
       })
@@ -2845,6 +2854,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
         if (!eventFromStream) {
           amplify.publish(z.event.WebApp.NOTIFICATION.NOTIFY, messageEntity, undefined, conversationEntity);
         }
+
+        if (conversationEntity.is_cleared()) {
+          conversationEntity.cleared_timestamp(0);
+        }
       }
 
       // Check if event needs to be un-archived
@@ -2854,8 +2867,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
           return (this.conversations_with_new_events[conversationEntity.id] = conversationEntity);
         }
 
-        if (eventFromWebSocket && conversationEntity.should_unarchive()) {
-          return this.unarchive_conversation(conversationEntity, 'event from WebSocket');
+        if (eventFromWebSocket && conversationEntity.shouldUnarchive()) {
+          return this.unarchiveConversation(conversationEntity, false, 'event from WebSocket');
         }
       }
     }
@@ -2880,7 +2893,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
                 handled: this.init_handled,
                 total: this.init_total,
               };
-              const progress = this.init_handled / this.init_total * 20 + 75;
+              const progress = (this.init_handled / this.init_total) * 20 + 75;
 
               amplify.publish(z.event.WebApp.APP.UPDATE_PROGRESS, progress, z.string.initEvents, content);
             }
@@ -3157,7 +3170,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           this.verification_state_handler.onMemberLeft(conversationEntity);
 
           if (isFromSelf && conversationEntity.removed_from_conversation()) {
-            this.archive_conversation(conversationEntity);
+            this.archiveConversation(conversationEntity);
           }
 
           return {conversationEntity, messageEntity};
@@ -3193,12 +3206,20 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     this.conversation_mapper.update_self_status(conversationEntity, eventData);
 
-    if (previouslyArchived && !conversationEntity.is_archived()) {
+    const wasUnarchived = previouslyArchived && !conversationEntity.is_archived();
+    if (wasUnarchived) {
       return this._fetch_users_and_events(conversationEntity);
     }
 
     if (conversationEntity.is_cleared()) {
       this._clear_conversation(conversationEntity, conversationEntity.cleared_timestamp());
+    }
+
+    if (conversationEntity.is_muted()) {
+      const hasIncomingCall = conversationEntity.call() && conversationEntity.call().isIncoming();
+      if (hasIncomingCall) {
+        amplify.publish(z.event.WebApp.CALL.STATE.REJECT, conversationEntity.id, false);
+      }
     }
 
     if (isActiveConversation && (conversationEntity.is_archived() || conversationEntity.is_cleared())) {

@@ -23,11 +23,11 @@ window.z = window.z || {};
 window.z.media = z.media || {};
 
 z.media.MediaError = class MediaError extends Error {
-  constructor(type, media_type) {
+  constructor(type, mediaType) {
     super();
 
     this.name = this.constructor.name;
-    this.media_type = media_type;
+    this.mediaType = mediaType;
     this.stack = new Error().stack;
     this.type = type || MediaError.TYPE.UNKNOWN;
 
@@ -41,14 +41,14 @@ z.media.MediaError = class MediaError extends Error {
       case MediaError.TYPE.MEDIA_STREAM_PERMISSION:
         this.message = 'Permission related failure when getting MediaStream';
         break;
-      case MediaError.TYPE.NO_AUDIO_STREAM_FOUND:
-        this.message = 'No audio stream found to toggle mute state';
-        break;
       case MediaError.TYPE.NO_MEDIA_DEVICES_FOUND:
         this.message = 'No MediaDevices found';
         break;
       case MediaError.TYPE.SCREEN_NOT_SUPPORTED:
         this.message = 'Screen sharing is not yet supported by this browser';
+        break;
+      case MediaError.TYPE.STREAM_NOT_FOUND:
+        this.message = 'No local MediaStream found';
         break;
       case MediaError.TYPE.UNHANDLED_MEDIA_TYPE:
         this.message = 'Media type unknown';
@@ -63,10 +63,10 @@ z.media.MediaError = class MediaError extends Error {
       MEDIA_STREAM_DEVICE: 'MediaError.TYPE.MEDIA_STREAM_DEVICE',
       MEDIA_STREAM_MISC: 'MediaError.TYPE.MEDIA_STREAM_MISC',
       MEDIA_STREAM_PERMISSION: 'MediaError.TYPE.MEDIA_STREAM_PERMISSION',
-      NO_AUDIO_STREAM_FOUND: 'MediaError.TYPE.NO_AUDIO_STREAM_FOUND',
       NO_MEDIA_DEVICES_FOUND: 'MediaError.TYPE.NO_MEDIA_DEVICES_FOUND',
       NO_VIDEO_INPUT_DEVICE_FOUND: 'MediaError.TYPE.NO_VIDEO_INPUT_DEVICE_FOUND',
       SCREEN_NOT_SUPPORTED: 'MediaError.TYPE.SCREEN_NOT_SUPPORTED',
+      STREAM_NOT_FOUND: 'MediaError.TYPE.STREAM_NOT_FOUND',
       UNHANDLED_MEDIA_TYPE: 'MediaError.UNHANDLED_MEDIA_TYPE',
       UNKNOWN: 'MediaError.TYPE.UNKNOWN',
     };

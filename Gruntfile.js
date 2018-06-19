@@ -43,7 +43,7 @@ module.exports = grunt => {
       page: 'app/page',
       script: 'app/script',
       style: 'app/style',
-      template_dist: 'app/page/template/_dist',
+      templateDist: 'app/page/template/_dist',
     },
     aws_: 'aws',
     aws: {
@@ -63,7 +63,7 @@ module.exports = grunt => {
       api: 'test/api',
       coverage: 'test/coverage',
       lib: 'test/lib',
-      unit_tests: 'test/unit_tests',
+      unitTests: 'test/unit_tests',
     },
   };
 
@@ -134,27 +134,27 @@ module.exports = grunt => {
     });
   });
 
-  grunt.registerTask('test_prepare', test_name => {
+  grunt.registerTask('test_prepare', testName => {
     const scripts = grunt.config('scripts');
-    const scripts_minified = grunt.config('scripts_minified');
+    const scriptsMinified = grunt.config('scripts_minified');
 
-    const prepare_file_names = file_names => file_names.map(name => name.replace('deploy/', ''));
+    const prepareFileNames = fileNames => fileNames.map(name => name.replace('deploy/', ''));
 
-    const helper_files = grunt.config.get('karma.options.files');
-    const app_files = prepare_file_names(scripts_minified.app.concat(scripts.app));
-    const component_files = prepare_file_names(scripts_minified.component.concat(scripts.component));
-    const vendor_files = prepare_file_names(scripts_minified.vendor.concat(scripts.vendor));
-    const test_files = test_name ? [`../test/unit_tests/${test_name}Spec.js`] : ['../test/unit_tests/**/*Spec.js'];
+    const helperFiles = grunt.config.get('karma.options.files');
+    const appFiles = prepareFileNames(scriptsMinified.app.concat(scripts.app));
+    const componentFiles = prepareFileNames(scriptsMinified.component.concat(scripts.component));
+    const vendorFiles = prepareFileNames(scriptsMinified.vendor.concat(scripts.vendor));
+    const testFiles = testName ? [`../test/unit_tests/${testName}Spec.js`] : ['../test/unit_tests/**/*Spec.js'];
 
-    const files = [].concat(helper_files, vendor_files, component_files, app_files, test_files);
+    const files = [].concat(helperFiles, vendorFiles, componentFiles, appFiles, testFiles);
 
     grunt.config('karma.options.files', files);
   });
 
   grunt.registerTask('test_init', ['prepare_dist']);
 
-  grunt.registerTask('test_run', test_name => {
+  grunt.registerTask('test_run', testName => {
     grunt.config('karma.options.reporters', ['progress']);
-    grunt.task.run(['scripts', 'newer:copy:dist_js', `test_prepare:${test_name}`, 'karma:test']);
+    grunt.task.run(['scripts', 'newer:copy:dist_js', `test_prepare:${testName}`, 'karma:test']);
   });
 };

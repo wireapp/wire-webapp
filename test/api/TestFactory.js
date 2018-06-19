@@ -391,9 +391,9 @@ window.TestFactory.prototype.exposeMediaActors = function() {
       TestFactory.media_repository = new z.media.MediaRepository(TestFactory.audio_repository);
       TestFactory.media_repository.logger.level = this.settings.logging_level;
 
-      TestFactory.media_repository.devices_handler.logger.level = this.settings.logging_level;
-      TestFactory.media_repository.element_handler.logger.level = this.settings.logging_level;
-      TestFactory.media_repository.stream_handler.logger.level = this.settings.logging_level;
+      TestFactory.media_repository.devicesHandler.logger.level = this.settings.logging_level;
+      TestFactory.media_repository.elementHandler.logger.level = this.settings.logging_level;
+      TestFactory.media_repository.streamHandler.logger.level = this.settings.logging_level;
 
       return TestFactory.media_repository;
     });

@@ -103,6 +103,14 @@
 
   width: @conversation-message-sender-width;
   color: @graphite-dark;
+
+  &--svg {
+    line-height: 0;
+
+    svg path {
+      fill: @graphite;
+    }
+  }
 }
 
 .message-header-label {

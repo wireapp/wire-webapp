@@ -7,7 +7,7 @@
     "@bower_components/bazinga64": "wireapp/bazinga64#5.0.3",
     "@bower_components/bytebuffer": "dcodeIO/ByteBuffer.js#~3",
     "@bower_components/cryptojs": "brix/crypto-js#3.1.9-1",
-    "@bower_components/dexie": "dfahlander/Dexie.js#2.0.3",
+    "@bower_components/dexie": "dfahlander/Dexie.js#2.0.4",
     "@bower_components/generic-message-proto": "wireapp/generic-message-proto#1.20.0",
     "@bower_components/highlightjs": "components/highlightjs#9.12.0",
     "@bower_components/jquery": "jquery/jquery#3.3.1",
@@ -18,8 +18,8 @@
     "@bower_components/libsodium.js": "jedisct1/libsodium.js#0.7.3",
     "@bower_components/linkifyjs": "nfrasser/linkify-shim#2.1.5",
     "@bower_components/long": "dcodeIO/Long.js#*",
-    "@bower_components/mixpanel": "mixpanel/mixpanel-js#2.22.0",
-    "@bower_components/moment": "moment/moment#2.22.1",
+    "@bower_components/mixpanel": "mixpanel/mixpanel-js#2.22.4",
+    "@bower_components/moment": "moment/moment#2.22.2",
     "@bower_components/normalize-css": "necolas/normalize.css#3.0.3",
     "@bower_components/pako": "nodeca/pako#1.0.6",
     "@bower_components/phone-format": "albeebe/phoneformat.js#1.0.6",
@@ -36,11 +36,11 @@
     "@bower_components/webapp-module-logger": "wireapp/webapp-module-logger#1.1.1",
     "@bower_components/webapp-module-modal": "wireapp/webapp-module-modal#1.0.2",
     "@bower_components/webapp-module-namespace": "wireapp/webapp-module-namespace#1.0.2",
-    "@bower_components/webrtc-adapter": "webrtc/adapter#6.1.5",
+    "@bower_components/webrtc-adapter": "webrtc/adapter#6.2.1",
     "@bower_components/wire-audio-files": "wireapp/wire-audio-files#1.1.1",
     "@bower_components/wire-theme": "wireapp/wire-theme#1.0.6",
-    "@wireapp/core": "2.8.9",
-    "@wireapp/react-ui-kit": "1.1.26",
+    "@wireapp/core": "3.1.3",
+    "@wireapp/react-ui-kit": "1.1.41",
     "babel-plugin-react-intl": "2.4.0",
     "babel-polyfill": "6.26.0",
     "dexie-batch": "ffflorian/dexie-batch#dbf3b4dd9c24066a5ad11d875566ef61ffa53150",
@@ -48,24 +48,24 @@
     "jquery": "3.3.1",
     "js-cookie": "2.2.0",
     "jszip": "3.1.5",
-    "mixpanel-browser": "2.22.1",
+    "mixpanel-browser": "2.22.4",
     "platform": "1.3.5",
-    "react": "16.3.2",
-    "react-dom": "16.3.2",
+    "react": "16.4.1",
+    "react-dom": "16.4.1",
     "react-intl": "2.4.0",
     "react-intl-po": "2.2.2",
     "react-redux": "5.0.7",
-    "react-router": "4.2.0",
-    "react-router-dom": "4.2.2",
+    "react-router": "4.3.1",
+    "react-router-dom": "4.3.1",
     "redux": "4.0.0",
     "redux-logger": "3.0.6",
-    "redux-thunk": "2.2.0",
+    "redux-thunk": "2.3.0",
     "sdp-transform": "2.4.1",
     "speakingurl": "14.0.1",
     "uuid": "3.2.1"
   },
   "devDependencies": {
-    "autoprefixer": "8.5.0",
+    "autoprefixer": "8.6.2",
     "babel-core": "6.26.3",
     "babel-eslint": "8.2.3",
     "babel-loader": "7.1.4",
@@ -82,10 +82,9 @@
     "eslint-config-prettier": "2.9.0",
     "eslint-plugin-babel": "5.1.0",
     "eslint-plugin-jsdoc": "3.7.1",
-    "eslint-plugin-no-unsanitized": "3.0.2",
     "eslint-plugin-prettier": "2.6.0",
     "eslint-plugin-react": "7.7.0",
-    "grunt": "1.0.2",
+    "grunt": "1.0.3",
     "grunt-aws-s3": "2.0.0",
     "grunt-cli": "1.2.0",
     "grunt-contrib-clean": "1.1.0",
@@ -93,7 +92,7 @@
     "grunt-contrib-concat": "1.0.1",
     "grunt-contrib-connect": "1.0.2",
     "grunt-contrib-copy": "1.0.0",
-    "grunt-contrib-less": "1.4.1",
+    "grunt-contrib-less": "2.0.0",
     "grunt-contrib-uglify": "wireapp/grunt-contrib-uglify#harmony-v2.8.22",
     "grunt-contrib-watch": "1.1.0",
     "grunt-gitinfo": "0.1.8",
@@ -109,40 +108,51 @@
     "ip": "1.1.5",
     "jasmine-ajax": "3.4.0",
     "jasmine-core": "3.1.0",
-    "karma": "2.0.2",
+    "karma": "2.0.3",
     "karma-chrome-launcher": "2.2.0",
     "karma-coverage": "1.1.2",
     "karma-jasmine": "1.1.2",
     "karma-sourcemap-loader": "0.3.7",
-    "lint-staged": "7.1.2",
+    "lint-staged": "7.2.0",
     "load-grunt-tasks": "4.0.0",
     "node-sass": "4.9.0",
     "postcss-cssnext": "3.1.0",
     "postcss-import": "11.1.0",
     "postcss-scss": "1.0.5",
-    "prettier": "1.12.1",
+    "prettier": "1.13.5",
     "raf": "3.4.0",
     "react-addons-test-utils": "15.6.2",
-    "react-hot-loader": "4.2.0",
+    "react-hot-loader": "4.3.3",
     "redux-devtools-extension": "2.13.2",
-    "redux-mock-store": "1.5.1",
+    "redux-mock-store": "1.5.3",
     "request": "2.87.0",
-    "sinon": "5.0.7",
-    "stylelint": "9.2.1",
+    "sinon": "6.0.0",
+    "stylelint": "9.3.0",
     "stylelint-config-idiomatic-order": "5.0.0",
     "stylelint-config-prettier": "3.2.0",
-    "uglify-js": "3.3.27",
+    "uglify-js": "3.4.0",
     "uglifyjs-webpack-plugin": "1.2.5",
-    "webpack": "3.11.0",
-    "webpack-dev-server": "2.11.1"
+    "webpack": "4.12.0",
+    "webpack-cli": "3.0.8",
+    "webpack-dev-server": "3.1.4"
   },
   "engines": {
     "yarn": ">= 1.0.0"
   },
   "lint-staged": {
-    "*.{js,jsx}": ["eslint --fix", "git add"],
-    "*.{json,md}": ["prettier --write", "git add"],
-    "*.less": ["prettier --write", "stylelint --fix", "git add"]
+    "*.{js,jsx}": [
+      "eslint --fix",
+      "git add"
+    ],
+    "*.{json,md}": [
+      "prettier --write",
+      "git add"
+    ],
+    "*.less": [
+      "prettier --write",
+      "stylelint --fix",
+      "git add"
+    ]
   },
   "scripts": {
     "bundle:dev": "webpack --config webpack.config.dev.js --progress",
@@ -191,7 +201,13 @@
       "js": "dist/ByteBufferAB.js"
     },
     "@bower_components/cryptojs": {
-      "js": ["core.js", "lib-typedarrays.js", "md5.js", "enc-base64.js", "sha256.js"]
+      "js": [
+        "core.js",
+        "lib-typedarrays.js",
+        "md5.js",
+        "enc-base64.js",
+        "sha256.js"
+      ]
     },
     "@bower_components/dexie": {
       "js": "dist/dexie.js"
@@ -228,7 +244,10 @@
       "js": "dist/long.js"
     },
     "@bower_components/mixpanel": {
-      "js": ["mixpanel-jslib-snippet.js", "mixpanel.min.js"]
+      "js": [
+        "mixpanel-jslib-snippet.js",
+        "mixpanel.min.js"
+      ]
     },
     "@bower_components/moment": {
       "js": [

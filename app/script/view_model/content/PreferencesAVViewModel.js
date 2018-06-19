@@ -46,15 +46,19 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
 
     this.isActivatedAccount = this.userRepository.isActivatedAccount;
 
-    this.devicesHandler = this.mediaRepository.devices_handler;
-    this.availableDevices = this.devicesHandler.available_devices;
-    this.currentDeviceId = this.devicesHandler.current_device_id;
+    this.devicesHandler = this.mediaRepository.devicesHandler;
+    this.availableDevices = this.devicesHandler.availableDevices;
+    this.currentDeviceId = this.devicesHandler.currentDeviceId;
+    this.deviceSupport = this.devicesHandler.deviceSupport;
 
-    this.constraintsHandler = this.mediaRepository.constraints_handler;
-    this.streamHandler = this.mediaRepository.stream_handler;
-    this.mediaStream = this.streamHandler.local_media_stream;
+    this.constraintsHandler = this.mediaRepository.constraintsHandler;
+    this.streamHandler = this.mediaRepository.streamHandler;
+    this.mediaStream = this.streamHandler.localMediaStream;
 
     this.isVisible = false;
+
+    const selfUser = this.userRepository.self;
+    this.isTemporaryGuest = ko.pureComputed(() => selfUser() && selfUser().isTemporaryGuest());
 
     this.mediaStream.subscribe(mediaStream => {
       if (this.audioInterval) {
@@ -73,12 +77,8 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
 
     this.permissionDenied = ko.observable(false);
 
-    this.supportsAudioInput = ko.pureComputed(() => !!this.availableDevices.audio_input().length);
     this.supportsAudioOutput = ko.pureComputed(() => {
-      return !!this.availableDevices.audio_output().length && z.util.Environment.browser.supports.audioOutputSelection;
-    });
-    this.supportsVideoInput = ko.pureComputed(() => {
-      return !!this.availableDevices.video_input().length && this.isActivatedAccount();
+      return this.deviceSupport.audioOutput() && z.util.Environment.browser.supports.audioOutputSelection;
     });
   }
 
@@ -107,29 +107,64 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
   }
 
   /**
+   * Check supported media type.
+   * @private
+   * @returns {Promise} Resolves with a MediaType or false
+   */
+  _checkMediaSupport() {
+    let mediaType;
+    if (this.deviceSupport.audioInput()) {
+      mediaType = this.deviceSupport.videoInput() ? z.media.MediaType.AUDIO_VIDEO : z.media.MediaType.AUDIO;
+    } else {
+      mediaType = this.deviceSupport.videoInput() ? z.media.MediaType.VIDEO : undefined;
+    }
+
+    return mediaType
+      ? Promise.resolve(mediaType)
+      : Promise.reject(new z.media.MediaError(z.media.MediaError.TYPE.MEDIA_STREAM_DEVICE));
+  }
+
+  /**
+   * Get current MediaStream or initiate it.
+   * @private
+   * @returns {Promise} Resolves with a MediaStream
+   */
+  _getCurrentMediaStream() {
+    const hasActiveStream = this.deviceSupport.videoInput()
+      ? !!this.mediaStream() && this.streamHandler.localMediaType() === z.media.MediaType.VIDEO
+      : !!this.mediaStream();
+
+    return Promise.resolve(hasActiveStream ? this.mediaStream() : undefined);
+  }
+
+  /**
    * Get current MediaStream or initiate it.
    * @private
    * @returns {Promise} Resolves with a MediaStream
    */
   _getMediaStream() {
-    const hasSupportedVideoStream = this.supportsVideoInput
-      ? this.mediaStream() && this.streamHandler.local_media_type() === z.media.MediaType.VIDEO
-      : this.mediaStream();
+    return this._getCurrentMediaStream().then(mediaStream => (mediaStream ? mediaStream : this._initiateMediaStream()));
+  }
 
-    if (hasSupportedVideoStream) {
-      return Promise.resolve(this.mediaStream());
-    }
-
-    return this.constraintsHandler
-      .get_media_stream_constraints(this.supportsAudioInput(), this.supportsVideoInput())
-      .then(({mediaType, streamConstraints}) => this.streamHandler.request_media_stream(mediaType, streamConstraints))
+  /**
+   * Initiate MediaStream.
+   * @private
+   * @returns {Promise} Resolves with a MediaStream
+   */
+  _initiateMediaStream() {
+    return this._checkMediaSupport()
+      .then(mediaType => {
+        return this.constraintsHandler
+          .getMediaStreamConstraints(this.deviceSupport.audioInput(), this.deviceSupport.videoInput)
+          .then(streamConstraints => this.streamHandler.requestMediaStream(mediaType, streamConstraints));
+      })
       .then(mediaStreamInfo => {
-        if (this.availableDevices.video_input().length) {
-          this.streamHandler.local_media_type(z.media.MediaType.VIDEO);
+        if (this.deviceSupport.videoInput()) {
+          this.streamHandler.localMediaType(z.media.MediaType.VIDEO);
         }
 
-        this.streamHandler.local_media_stream(mediaStreamInfo.stream);
-        return this.streamHandler.local_media_stream();
+        this.streamHandler.localMediaStream(mediaStreamInfo.stream);
+        return this.streamHandler.localMediaStream();
       })
       .catch(error => {
         this.logger.error(`Requesting MediaStream failed: ${error.message}`, error);
@@ -158,7 +193,7 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
    */
   _initiateAudioMeter(mediaStream) {
     this.logger.info('Initiating new audio meter', mediaStream);
-    this.audioContext = this.mediaRepository.get_audio_context();
+    this.audioContext = this.mediaRepository.getAudioContext();
 
     const audioAnalyser = this.audioContext.createAnalyser();
     audioAnalyser.fftSize = PreferencesAVViewModel.CONFIG.AUDIO_METER.FFT_SIZE;
@@ -193,7 +228,7 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
   }
 
   _releaseMediaStream() {
-    this.streamHandler.reset_media_stream();
+    this.streamHandler.resetMediaStream();
     this.permissionDenied(false);
   }
 };

@@ -44,7 +44,7 @@
   "acceptNewsModal.headline": "",
   "acceptNewsModal.unsubscribeDescription": "",
   "acceptNewsModal.privacyDescription": "",
-  "acceptNewsModal.declineButton": "",
+  "acceptNewsModal.declineButton": "Rejeitar",
   "acceptNewsModal.confirmButton": "Aceitar",
   "unsupported.headlineBrowser": "",
   "unsupported.subheadBrowser": "",

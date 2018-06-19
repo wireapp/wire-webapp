@@ -38,10 +38,14 @@ z.viewModel.list.ConversationListViewModel = class ConversationListViewModel {
     this.contentViewModel = mainViewModel.content;
     this.listViewModel = listViewModel;
     this.callingRepository = repositories.calling;
+    this.mediaRepository = repositories.media;
     this.conversationRepository = repositories.conversation;
     this.teamRepository = repositories.team;
     this.user_repository = repositories.user;
+    this.videoGridRepository = repositories.videoGrid;
+
     this.logger = new z.util.Logger('z.viewModel.list.ConversationListViewModel', z.config.LOGGER.OPTIONS);
+    this.multitasking = this.contentViewModel.multitasking;
 
     this.showCalls = ko.observable(false);
 

@@ -30,8 +30,11 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
 
     this.sessions = {};
     this.remote_version = undefined;
+    this.hasToggledAV = false;
+    this.maxNumberOfParticipants = 0;
+    this.direction = undefined;
 
-    this.media_type = z.media.MediaType.AUDIO;
+    this.mediaType = z.media.MediaType.AUDIO;
   }
 
   //##############################################################################
@@ -43,17 +46,12 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
    * @returns {Object} Containing all the sessions
    */
   log_sessions() {
-    const sorted_sessions = z.util.sortObjectByKeys(this.sessions, true);
+    const sortedSessions = z.util.sortObjectByKeys(this.sessions, true);
 
     this.logger.force_log('Your last session IDs:');
-    for (const session_id in sorted_sessions) {
-      if (sorted_sessions.hasOwnProperty(session_id)) {
-        const tracking_info = sorted_sessions[session_id];
-        this.logger.force_log(tracking_info.to_string());
-      }
-    }
+    Object.values(sortedSessions).forEach(trackingInfo => this.logger.force_log(trackingInfo.to_string()));
 
-    return sorted_sessions;
+    return sortedSessions;
   }
 
   //##############################################################################
@@ -83,13 +81,21 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
   //##############################################################################
 
   /**
-   * Set the media type of the call.
-   * @param {z.media.MediaType} [media_type=z.media.MediaType.AUDIO] - Media type for this call
+   * Prepare the call telemetry for a new call (resets to initial values)
+   * @param {z.calling.enum.CALL_STATE} direction - direction of the call (outgoing or incoming)
+   * @param {z.media.MediaType} [mediaType=z.media.MediaType.AUDIO] - Media type for this call
    * @returns {undefined} No return value
    */
-  set_media_type(media_type = z.media.MediaType.AUDIO) {
-    this.media_type = media_type;
-    this.logger.info(`Set media type to '${this.media_type}'`);
+  initiateNewCall(direction, mediaType = z.media.MediaType.AUDIO) {
+    this.mediaType = mediaType;
+    this.hasToggledAV = false;
+    this.maxNumberOfParticipants = 0;
+    this.direction = direction;
+    this.logger.info(`Initiate new '${direction}' call of type '${this.mediaType}'`);
+  }
+
+  setAVToggled() {
+    this.hasToggledAV = true;
   }
 
   /**
@@ -106,109 +112,69 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
 
   /**
    * Reports call events for call tracking to Localytics.
-   * @param {z.tracking.EventName} event_name - String for call event
-   * @param {z.calling.entities.CallEntity} call_et - Call entity
+   * @param {z.tracking.EventName} eventName - String for call event
+   * @param {z.calling.entities.CallEntity} callEntity - Call entity
    * @param {Object} [attributes={}] - Attributes for the event
    * @returns {undefined} No return value
    */
-  track_event(event_name, call_et, attributes = {}) {
-    if (call_et) {
-      const {conversationEntity, isGroup, maxNumberOfParticipants} = call_et;
+  track_event(eventName, callEntity, attributes = {}) {
+    if (callEntity) {
+      const {conversationEntity, isGroup} = callEntity;
+
+      const videoTypes = [z.media.MediaType.VIDEO, z.media.MediaType.AUDIO_VIDEO];
 
       attributes = Object.assign(
         {
           conversation_participants: conversationEntity.getNumberOfParticipants(),
-          conversation_participants_in_call: maxNumberOfParticipants ? maxNumberOfParticipants : undefined,
+          conversation_participants_in_call_max: this.maxNumberOfParticipants
+            ? this.maxNumberOfParticipants
+            : undefined,
           conversation_type: isGroup
             ? z.tracking.attribute.ConversationType.GROUP
             : z.tracking.attribute.ConversationType.ONE_TO_ONE,
+          direction: this.direction,
           remote_version: [
             z.tracking.EventName.CALLING.ESTABLISHED_CALL,
             z.tracking.EventName.CALLING.JOINED_CALL,
-          ].includes(event_name)
+          ].includes(eventName)
             ? this.remote_version
             : undefined,
+          started_as_video: videoTypes.includes(this.mediaType),
           with_service: conversationEntity.isWithBot(),
         },
+        z.tracking.helpers.getGuestAttributes(conversationEntity),
         attributes
       );
-
-      const isTeamConversation = !!conversationEntity.team_id;
-      if (isTeamConversation) {
-        attributes = Object.assign(attributes, z.tracking.helpers.getGuestAttributes(conversationEntity));
-      }
-
-      if ([z.media.MediaType.AUDIO_VIDEO, z.media.MediaType.VIDEO].includes(this.media_type)) {
-        event_name = event_name.replace('_call', '_video_call');
-      }
     }
 
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, event_name, attributes);
+    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, eventName, attributes);
   }
 
   /**
    * Track the call duration.
-   * @param {z.calling.entities.CallEntity} call_et - Call entity
+   * @param {z.calling.entities.CallEntity} callEntity - Call entity
    * @returns {undefined} No return value
    */
-  track_duration(call_et) {
-    const {
-      conversationEntity,
-      direction,
-      durationTime,
-      isGroup,
-      terminationReason,
-      timerStart,
-      maxNumberOfParticipants,
-    } = call_et;
+  track_duration(callEntity) {
+    const {terminationReason, timerStart, durationTime} = callEntity;
 
     const duration = Math.floor((Date.now() - timerStart) / 1000);
 
     if (!window.isNaN(duration)) {
       this.logger.info(`Call duration: ${duration} seconds.`, durationTime());
 
-      let duration_bucket;
-      if (duration <= 15) {
-        duration_bucket = '0s-15s';
-      } else if (duration <= 30) {
-        duration_bucket = '16s-30s';
-      } else if (duration <= 60) {
-        duration_bucket = '31s-60s';
-      } else if (duration <= 3 * 60) {
-        duration_bucket = '61s-3min';
-      } else if (duration <= 10 * 60) {
-        duration_bucket = '3min-10min';
-      } else if (duration <= 60 * 60) {
-        duration_bucket = '10min-1h';
-      } else {
-        duration_bucket = '1h-infinite';
-      }
-
       const attributes = {
-        conversation_participants: conversationEntity.getNumberOfParticipants(),
-        conversation_participants_in_call: maxNumberOfParticipants,
-        conversation_type: isGroup
-          ? z.tracking.attribute.ConversationType.GROUP
-          : z.tracking.attribute.ConversationType.ONE_TO_ONE,
-        direction: direction,
-        duration: duration_bucket,
-        duration_sec: duration,
+        AV_switch_toggled: this.hasToggledAV,
+        duration: duration,
         reason: terminationReason,
         remote_version: this.remote_version,
-        with_service: conversationEntity.isWithBot(),
       };
 
-      const isTeamConversation = !!conversationEntity.team_id;
-      if (isTeamConversation) {
-        Object.assign(attributes, z.tracking.helpers.getGuestAttributes(conversationEntity));
-      }
-
-      let event_name = z.tracking.EventName.CALLING.ENDED_CALL;
-      if (this.media_type === z.media.MediaType.AUDIO_VIDEO) {
-        event_name = event_name.replace('_call', '_video_call');
-      }
-
-      amplify.publish(z.event.WebApp.ANALYTICS.EVENT, event_name, attributes);
+      this.track_event(z.tracking.EventName.CALLING.ENDED_CALL, callEntity, attributes);
     }
+  }
+
+  numberOfParticipantsChanged(newNumberOfParticipants) {
+    this.maxNumberOfParticipants = Math.max(this.maxNumberOfParticipants, newNumberOfParticipants);
   }
 };

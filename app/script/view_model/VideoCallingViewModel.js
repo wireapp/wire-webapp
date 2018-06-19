@@ -41,64 +41,55 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
     this.conversationRepository = repositories.conversation;
     this.mediaRepository = repositories.media;
     this.userRepository = repositories.user;
+    this.videoGridRepository = repositories.videoGrid;
 
     this.contentViewModel = mainViewModel.content;
     this.multitasking = this.contentViewModel.multitasking;
     this.logger = new z.util.Logger('z.viewModel.VideoCallingViewModel', z.config.LOGGER.OPTIONS);
 
-    this.selfUser = this.userRepository.self;
+    this.devicesHandler = this.mediaRepository.devicesHandler;
+    this.streamHandler = this.mediaRepository.streamHandler;
 
-    this.availableDevices = this.mediaRepository.devices_handler.available_devices;
-    this.currentDeviceId = this.mediaRepository.devices_handler.current_device_id;
-    this.currentDeviceIndex = this.mediaRepository.devices_handler.current_device_index;
+    this.availableDevices = this.devicesHandler.availableDevices;
+    this.currentDeviceId = this.devicesHandler.currentDeviceId;
+    this.currentDeviceIndex = this.devicesHandler.currentDeviceIndex;
 
-    this.localVideoStream = this.mediaRepository.stream_handler.local_media_stream;
-    this.remoteVideoStream = this.mediaRepository.stream_handler.remote_media_streams.video;
-
-    this.selfStreamState = this.mediaRepository.stream_handler.self_stream_state;
+    this.hasSelfVideo = this.streamHandler.hasActiveVideo;
+    this.selfStreamState = this.streamHandler.selfStreamState;
+    this.localVideoStream = this.streamHandler.localMediaStream;
+    this.remoteVideoStreamsInfo = this.streamHandler.remoteMediaStreamInfoIndex.video;
 
     this.isChoosingScreen = ko.observable(false);
 
     this.minimizeTimeout = undefined;
-
-    this.remoteVideoElementContain = ko.observable(false);
 
     this.calls = this.callingRepository.calls;
     this.joinedCall = this.callingRepository.joinedCall;
 
     this.videodCall = ko.pureComputed(() => {
       for (const callEntity of this.calls()) {
-        const isActiveCall = z.calling.enum.CALL_STATE_GROUP.IS_ACTIVE.includes(callEntity.state());
         const selfScreenSend = callEntity.selfClientJoined() && this.selfStreamState.screenSend();
         const selfVideoSend = selfScreenSend || this.selfStreamState.videoSend();
-        const remoteVideoState = callEntity.isRemoteScreenSend() || callEntity.isRemoteVideoSend();
-        const remoteVideoSend = remoteVideoState && !callEntity.isOngoingOnAnotherClient();
+        const remoteVideoSend = callEntity.isRemoteVideoCall() && !callEntity.isOngoingOnAnotherClient();
         const isVideoCall = selfVideoSend || remoteVideoSend || this.isChoosingScreen();
 
-        if (isActiveCall && isVideoCall) {
+        if (callEntity.isActiveState() && isVideoCall) {
           return callEntity;
         }
       }
     });
 
     this.isCallOngoing = ko.pureComputed(() => {
-      return this.joinedCall()
-        ? this.videodCall() && this.joinedCall().state() === z.calling.enum.CALL_STATE.ONGOING
-        : false;
+      if (this.joinedCall()) {
+        const isSendingVideo = this.localVideoStream() && this.hasSelfVideo();
+        const isVideoCall = isSendingVideo || this.joinedCall().isRemoteVideoCall();
+        return this.joinedCall().isOngoing() && isVideoCall;
+      }
     });
 
-    this.overlayIconClass = ko.pureComputed(() => {
-      if (this.isCallOngoing()) {
-        const isMuted = !this.selfStreamState.audioSend();
-        if (isMuted) {
-          return 'icon-mute';
-        }
-
-        const isVideoDisabled = !this.selfStreamState.screenSend() && !this.selfStreamState.videoSend();
-        if (isVideoDisabled) {
-          return 'icon-video-off';
-        }
-      }
+    this.showFullscreen = ko.pureComputed(() => {
+      const isFullScreenState = this.isCallOngoing() || this.isChoosingScreen();
+      return isFullScreenState && !this.multitasking.isMinimized() && !!this.videodCall();
     });
 
     this.remoteUser = ko.pureComputed(() => {
@@ -109,40 +100,30 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
       }
     });
 
-    this.showLocal = ko.pureComputed(() => {
-      const shouldShowLocal = this.showLocalVideo() || this.overlayIconClass();
-      return shouldShowLocal && !this.multitasking.isMinimized() && !this.isChoosingScreen();
-    });
-    this.showLocalVideo = ko.pureComputed(() => {
-      if (this.videodCall()) {
-        const localVideoState = this.selfStreamState.screenSend() || this.selfStreamState.videoSend();
-        const showLocalVideo = localVideoState || !this.isCallOngoing();
-        return showLocalVideo && this.localVideoStream();
-      }
-    });
-
     this.showRemote = ko.pureComputed(() => {
       return this.showRemoteVideo() || this.showRemoteParticipant() || this.isChoosingScreen();
     });
+
     this.showRemoteParticipant = ko.pureComputed(() => {
       const showRemoteParticipant = this.remoteUser() && !this.multitasking.isMinimized() && !this.isChoosingScreen();
       return showRemoteParticipant && this.isCallOngoing() && !this.showRemoteVideo();
     });
+
     this.showRemoteVideo = ko.pureComputed(() => {
       if (this.isCallOngoing()) {
-        const remoteVideoState = this.joinedCall().isRemoteScreenSend() || this.joinedCall().isRemoteVideoSend();
-        return remoteVideoState && this.remoteVideoStream();
+        const remoteVideoState = this.joinedCall() && this.joinedCall().isRemoteVideoCall();
+        return remoteVideoState && this.remoteVideoStreamsInfo().length;
       }
     });
 
     this.showSwitchCamera = ko.pureComputed(() => {
-      const hasMultipleCameras = this.availableDevices.video_input().length > 1;
+      const hasMultipleCameras = this.availableDevices.videoInput().length > 1;
       const isVisible = hasMultipleCameras && this.localVideoStream() && this.selfStreamState.videoSend();
       return this.isCallOngoing() && isVisible;
     });
     this.showSwitchScreen = ko.pureComputed(() => {
-      const hasMultipleCameras = this.availableDevices.screen_input().length > 1;
-      const isVisible = hasMultipleCameras && this.localVideoStream() && this.selfStreamState.screenSend();
+      const hasMultipleScreens = this.availableDevices.screenInput().length > 1;
+      const isVisible = hasMultipleScreens && this.localVideoStream() && this.selfStreamState.screenSend();
       return this.isCallOngoing() && isVisible;
     });
 
@@ -152,11 +133,13 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
       return this.isCallOngoing() && isVisible;
     });
     this.showToggleVideo = ko.pureComputed(() => {
-      return this.joinedCall() ? this.joinedCall().conversationEntity.is_one2one() : false;
+      return this.joinedCall() ? this.joinedCall().conversationEntity.supportsVideoCall(false) : false;
     });
-    this.showToggleScreen = ko.pureComputed(() => z.calling.CallingRepository.supportsScreenSharing);
     this.disableToggleScreen = ko.pureComputed(() => {
-      return this.joinedCall() ? this.joinedCall().isRemoteScreenSend() : true;
+      return (
+        !z.calling.CallingRepository.supportsScreenSharing ||
+        (this.joinedCall() ? this.joinedCall().isRemoteScreenSend() : true)
+      );
     });
 
     this.visibleCallId = undefined;
@@ -166,12 +149,14 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
         if (!isVisibleId) {
           this.visibleCallId = callEntity.id;
 
-          if (this.showLocalVideo() || this.showRemoteVideo()) {
+          // FIXME find a better condition to actually minimize/maximize the call
+          // we should do this when we check that everything is alright with audio calls also
+          if (this.showRemoteVideo()) {
             this.multitasking.isMinimized(false);
             return this.logger.info(`Maximizing video call '${callEntity.id}' to full-screen`, callEntity);
           }
 
-          this.multitasking.isMinimized(true);
+          //this.multitasking.isMinimized(true);
           this.logger.info(`Minimizing audio call '${callEntity.id}' from full-screen`, callEntity);
         }
       } else {
@@ -220,8 +205,8 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
       }
 
       if (z.util.Environment.desktop) {
-        this.mediaRepository.devices_handler
-          .get_screen_sources()
+        this.mediaRepository.devicesHandler
+          .getScreenSources()
           .then(screenSources => {
             const conversationEntity = this.joinedCall().conversationEntity;
 
@@ -280,11 +265,11 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
   }
 
   clickedOnChooseScreen(screenSource) {
-    this.currentDeviceId.screen_input('');
+    this.currentDeviceId.screenInput('');
 
     this.logger.info(`Selected '${screenSource.name}' for screen sharing`, screenSource);
     this.isChoosingScreen(false);
-    this.currentDeviceId.screen_input(screenSource.id);
+    this.currentDeviceId.screenInput(screenSource.id);
     amplify.publish(z.event.WebApp.CALL.MEDIA.TOGGLE, this.joinedCall().id, z.media.MediaType.SCREEN);
 
     if (this.multitasking.resetMinimize()) {
@@ -301,46 +286,15 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
   }
 
   clickedOnToggleCamera() {
-    this.mediaRepository.devices_handler.toggle_next_camera();
+    this.mediaRepository.devicesHandler.toggleNextCamera();
   }
 
   clickedOnToggleScreen() {
-    this.mediaRepository.devices_handler.toggle_next_screen();
+    this.mediaRepository.devicesHandler.toggleNextScreen();
   }
 
   clickedOnMinimize() {
     this.multitasking.isMinimized(true);
     this.logger.info(`Minimizing call '${this.videodCall().id}' on user click`);
-  }
-
-  clickedOnMaximize() {
-    this.multitasking.isMinimized(false);
-    this.logger.info(`Maximizing call '${this.videodCall().id}' on user click`);
-  }
-
-  doubleClickedOnRemoteVideo() {
-    this.remoteVideoElementContain(!this.remoteVideoElementContain());
-    this.logger.info(`Switched remote video object-fit. Contain is '${this.remoteVideoElementContain()}'`);
-  }
-
-  /**
-   * Detect the aspect ratio of a MediaElement and set the video mode.
-   *
-   * @param {VideoCallingViewModel} videoCallingViewModel - Video calling view model
-   * @param {HTMLVideoElement} mediaElement - Media element containing video
-   * @returns {undefined} No return value
-   */
-  onLoadedMetadata(videoCallingViewModel, {target: mediaElement}) {
-    let detectedVideoMode;
-
-    const isPortraitStream = mediaElement.videoHeight > mediaElement.videoWidth;
-    if (isPortraitStream) {
-      this.remoteVideoElementContain(true);
-      detectedVideoMode = z.calling.enum.VIDEO_ORIENTATION.PORTRAIT;
-    } else {
-      this.remoteVideoElementContain(false);
-      detectedVideoMode = z.calling.enum.VIDEO_ORIENTATION.LANDSCAPE;
-    }
-    this.logger.info(`Remote video is in '${detectedVideoMode}' mode`);
   }
 };

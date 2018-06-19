@@ -96,6 +96,9 @@ z.string.da.callJoin = 'Deltag';
 z.string.da.callChooseSharedScreen = 'Vælg en skærm som du vil dele';
 z.string.da.callParticipants = '{{number}} i samtalen';
 
+z.string.da.videoCallOverlayMute = 'Lyd fra';
+z.string.da.videoCallOverlayHangUp = 'Læg På';
+
 z.string.da.modalAcknowledgeAction = 'Ok';
 z.string.da.modalAcknowledgeHeadline = 'Noget gik galt';
 z.string.da.modalConfirmSecondary = 'Annuller';

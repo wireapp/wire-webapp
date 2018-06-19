@@ -147,8 +147,7 @@ z.links.LinkPreviewRepository = class LinkPreviewRepository {
         }
 
         if (data) {
-          data = Object.keys(data).reduce((filteredData, key) => {
-            const value = data[key];
+          data = Object.entries(data).reduce((filteredData, [key, value]) => {
             filteredData[key] = Array.isArray(value) ? value[0] : value;
             return filteredData;
           }, {});

@@ -52,8 +52,8 @@ function doLoginPlain(loginData, onBeforeLogin, onAfterLogin) {
 
     return Promise.resolve()
       .then(() => onBeforeLogin(dispatch, getState, global))
-      .then(() => core.login(loginData, false, ClientAction.generateClientPayload(loginData.persist)))
-      .then(() => persistAuthData(loginData.persist, core, dispatch))
+      .then(() => core.login(loginData, false, ClientAction.generateClientPayload(loginData.clientType)))
+      .then(() => persistAuthData(loginData.clientType, core, dispatch))
       .then(() => dispatch(CookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: APP_INSTANCE_ID})))
       .then(() => {
         const authenticationContext = loginData.email
@@ -61,14 +61,14 @@ function doLoginPlain(loginData, onBeforeLogin, onAfterLogin) {
           : TrackingAction.AUTHENTICATION_CONTEXT.HANDLE;
 
         const trackingEventData = {
-          attributes: {context: authenticationContext, remember_me: loginData.persist},
+          attributes: {context: authenticationContext, remember_me: loginData.clientType === ClientType.PERMANENT},
           name: TrackingAction.EVENT_NAME.ACCOUNT.LOGGED_IN,
         };
         return dispatch(TrackingAction.trackEvent(trackingEventData));
       })
       .then(() => dispatch(SelfAction.fetchSelf()))
       .then(() => onAfterLogin(dispatch, getState, global))
-      .then(() => dispatch(ClientAction.doInitializeClient(loginData.persist, loginData.password)))
+      .then(() => dispatch(ClientAction.doInitializeClient(loginData.clientType, loginData.password)))
       .then(() => dispatch(AuthActionCreator.successfulLogin()))
       .catch(error => {
         if (error.label === BackendError.LABEL.NEW_CLIENT || error.label === BackendError.LABEL.TOO_MANY_CLIENTS) {
@@ -81,17 +81,21 @@ function doLoginPlain(loginData, onBeforeLogin, onAfterLogin) {
   };
 }
 
-function persistAuthData(persist, core, dispatch) {
+function persistAuthData(clientType, core, dispatch) {
+  const persist = clientType === ClientType.PERMANENT;
   const accessToken = core.apiClient.accessTokenStore.accessToken;
   const expiresMillis = accessToken.expires_in * 1000;
   const expireTimestamp = Date.now() + expiresMillis;
-  return Promise.all([
-    dispatch(setLocalStorage(LocalStorageKey.AUTH.PERSIST, persist)),
+  const saveTasks = [
     dispatch(setLocalStorage(LocalStorageKey.AUTH.ACCESS_TOKEN.EXPIRATION, expireTimestamp)),
     dispatch(setLocalStorage(LocalStorageKey.AUTH.ACCESS_TOKEN.TTL, expiresMillis)),
     dispatch(setLocalStorage(LocalStorageKey.AUTH.ACCESS_TOKEN.TYPE, accessToken.token_type)),
     dispatch(setLocalStorage(LocalStorageKey.AUTH.ACCESS_TOKEN.VALUE, accessToken.access_token)),
-  ]);
+  ];
+  if (clientType !== ClientType.NONE) {
+    saveTasks.push(dispatch(setLocalStorage(LocalStorageKey.AUTH.PERSIST, persist)));
+  }
+  return Promise.all(saveTasks);
 }
 
 export function pushAccountRegistrationData(registration) {
@@ -102,7 +106,7 @@ export function pushAccountRegistrationData(registration) {
 
 export function doRegisterTeam(registration) {
   return function(dispatch, getState, {apiClient, core}) {
-    const isPermanentClient = true;
+    const clientType = ClientType.PERMANENT;
     registration.locale = currentLanguage();
     registration.name = registration.name.trim();
     registration.email = registration.email.trim();
@@ -115,13 +119,13 @@ export function doRegisterTeam(registration) {
     dispatch(AuthActionCreator.startRegisterTeam({...registration, password: '******'}));
     return Promise.resolve()
       .then(() => dispatch(doSilentLogout()))
-      .then(() => apiClient.register(registration, isPermanentClient))
+      .then(() => apiClient.register(registration, clientType))
       .then(newAccount => (createdAccount = newAccount))
       .then(() => core.init())
-      .then(() => persistAuthData(isPermanentClient, core, dispatch))
+      .then(() => persistAuthData(clientType, core, dispatch))
       .then(() => dispatch(CookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: APP_INSTANCE_ID})))
       .then(() => dispatch(SelfAction.fetchSelf()))
-      .then(() => dispatch(ClientAction.doInitializeClient(isPermanentClient)))
+      .then(() => dispatch(ClientAction.doInitializeClient(clientType)))
       .then(() => dispatch(AuthActionCreator.successfulRegisterTeam(createdAccount)))
       .catch(error => {
         if (error.label === BackendError.LABEL.NEW_CLIENT) {
@@ -136,7 +140,7 @@ export function doRegisterTeam(registration) {
 
 export function doRegisterPersonal(registration) {
   return function(dispatch, getState, {apiClient, core}) {
-    const isPermanentClient = true;
+    const clientType = ClientType.PERMANENT;
     registration.locale = currentLanguage();
     registration.name = registration.name.trim();
     registration.email = registration.email.trim();
@@ -153,13 +157,13 @@ export function doRegisterPersonal(registration) {
     );
     return Promise.resolve()
       .then(() => dispatch(doSilentLogout()))
-      .then(() => apiClient.register(registration, isPermanentClient))
+      .then(() => apiClient.register(registration, clientType))
       .then(newAccount => (createdAccount = newAccount))
       .then(() => core.init())
-      .then(() => persistAuthData(isPermanentClient, core, dispatch))
+      .then(() => persistAuthData(clientType, core, dispatch))
       .then(() => dispatch(CookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: APP_INSTANCE_ID})))
       .then(() => dispatch(SelfAction.fetchSelf()))
-      .then(() => dispatch(ClientAction.doInitializeClient(isPermanentClient)))
+      .then(() => dispatch(ClientAction.doInitializeClient(clientType)))
       .then(() => dispatch(AuthActionCreator.successfulRegisterPersonal(createdAccount)))
       .catch(error => {
         if (error.label === BackendError.LABEL.NEW_CLIENT) {
@@ -172,9 +176,9 @@ export function doRegisterPersonal(registration) {
   };
 }
 
-export function doRegisterWireless(registrationData) {
+export function doRegisterWireless(registrationData, options = {shouldInitializeClient: true}) {
   return function(dispatch, getState, {apiClient, core}) {
-    const isPermanentClient = false;
+    const clientType = options.shouldInitializeClient ? ClientType.TEMPORARY : ClientType.NONE;
     registrationData.locale = currentLanguage();
     registrationData.name = registrationData.name.trim();
 
@@ -188,13 +192,14 @@ export function doRegisterWireless(registrationData) {
     dispatch(AuthActionCreator.startRegisterWireless(obfuscatedRegistrationData));
 
     return Promise.resolve()
-      .then(() => apiClient.register(registrationData, isPermanentClient))
+      .then(() => dispatch(doSilentLogout()))
+      .then(() => apiClient.register(registrationData, clientType))
       .then(newAccount => (createdAccount = newAccount))
       .then(() => core.init())
-      .then(() => persistAuthData(isPermanentClient, core, dispatch))
+      .then(() => persistAuthData(clientType, core, dispatch))
       .then(() => dispatch(CookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: APP_INSTANCE_ID})))
       .then(() => dispatch(SelfAction.fetchSelf()))
-      .then(() => dispatch(ClientAction.doInitializeClient(isPermanentClient)))
+      .then(() => clientType !== ClientType.NONE && dispatch(ClientAction.doInitializeClient(clientType)))
       .then(() => dispatch(AuthActionCreator.successfulRegisterWireless(createdAccount)))
       .catch(error => {
         if (error.label === BackendError.LABEL.NEW_CLIENT) {
@@ -209,7 +214,7 @@ export function doRegisterWireless(registrationData) {
 
 export function doInit(options = {isImmediateLogin: false, shouldValidateLocalClient: false}) {
   return function(dispatch, getState, {apiClient, core}) {
-    let previousPersist;
+    let clientType;
     dispatch(AuthActionCreator.startRefresh());
     return Promise.resolve()
       .then(() => {
@@ -222,11 +227,11 @@ export function doInit(options = {isImmediateLogin: false, shouldValidateLocalCl
         if (persist === undefined) {
           throw new Error(`Could not find value for '${LocalStorageKey.AUTH.PERSIST}'`);
         }
-        previousPersist = persist;
-        return apiClient.init(previousPersist ? ClientType.PERMANENT : ClientType.TEMPORARY);
+        clientType = persist ? ClientType.PERMANENT : ClientType.TEMPORARY;
+        return apiClient.init(clientType);
       })
       .then(() => core.init())
-      .then(() => persistAuthData(previousPersist, core, dispatch))
+      .then(() => persistAuthData(clientType, core, dispatch))
       .then(() => {
         if (options.shouldValidateLocalClient) {
           return dispatch(validateLocalClient());

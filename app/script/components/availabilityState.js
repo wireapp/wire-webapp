@@ -49,7 +49,7 @@ ko.components.register('availability-state', {
         </svg>
       <!-- /ko -->
       <!-- ko if: $data.label -->
-        <div class="availability-state-label" data-bind="css: {'text-theme': theme}, text: $data.label"></div>
+        <div class="availability-state-label" data-bind="css: {'text-theme': theme}, text: $data.label" data-uie-name="status-label"></div>
       <!-- /ko -->
       <!-- ko if: $data.showArrow -->
         <span class="availability-state-arrow"></span>

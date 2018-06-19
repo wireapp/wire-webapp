@@ -34,6 +34,8 @@ import {
 import {conversationJoinStrings} from '../../strings';
 import {connect} from 'react-redux';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
+import {isMobileOs, isSafari} from '../Runtime';
+import * as Environment from '../Environment';
 import * as ConversationAction from '../module/action/ConversationAction';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import * as SelfSelector from '../module/selector/SelfSelector';
@@ -46,16 +48,16 @@ import {Redirect} from 'react-router';
 import {Link as RRLink} from 'react-router-dom';
 import {ROUTE, QUERY_KEY} from '../route';
 import {injectIntl, FormattedHTMLMessage} from 'react-intl';
-import EXTERNAL_ROUTE from '../externalRoute';
 import {withRouter} from 'react-router';
 import React, {Component} from 'react';
-import {getURLParameter, pathWithParams} from '../util/urlUtil';
+import {getURLParameter, getAppPath, hasURLParameter, pathWithParams} from '../util/urlUtil';
 import BackendError from '../module/action/BackendError';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
 import WirelessUnsupportedBrowser from '../component/WirelessUnsupportedBrowser';
 import WirelessContainer from '../component/WirelessContainer';
 import * as TrackingAction from '../module/action/TrackingAction';
 import * as AccentColor from '../util/AccentColor';
+import EXTERNAL_ROUTE from '../externalRoute';
 
 class ConversationJoin extends Component {
   state = {
@@ -72,6 +74,9 @@ class ConversationJoin extends Component {
   };
 
   readAndUpdateParamsFromUrl = nextProps => {
+    if (this.isPwaSupportedBrowser()) {
+      this.setState({forceNewTemporaryGuestAccount: true});
+    }
     const conversationCode = getURLParameter(QUERY_KEY.CONVERSATION_CODE);
     const conversationKey = getURLParameter(QUERY_KEY.CONVERSATION_KEY);
     const expiresIn = parseInt(getURLParameter(QUERY_KEY.JOIN_EXPIRES), 10) || undefined;
@@ -116,7 +121,22 @@ class ConversationJoin extends Component {
     this.props
       .doJoinConversationByCode(this.state.conversationKey, this.state.conversationCode)
       .then(() => this.trackAddParticipant())
-      .then(() => window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP)));
+      .then(() => this.routeToApp());
+  };
+
+  isPwaSupportedBrowser = () => {
+    const pwaAware = hasURLParameter(QUERY_KEY.PWA_AWARE);
+    return Environment.onEnvironment({
+      onProduction: false,
+      onStaging: pwaAware && (isMobileOs() || isSafari()),
+    });
+  };
+
+  routeToApp = () => {
+    const redirectLocation = this.isPwaSupportedBrowser()
+      ? pathWithParams(EXTERNAL_ROUTE.PWA, QUERY_KEY.IMMEDIATE_LOGIN)
+      : getAppPath();
+    window.location.replace(redirectLocation);
   };
 
   handleSubmit = event => {
@@ -136,12 +156,14 @@ class ConversationJoin extends Component {
             expires_in: this.state.expiresIn,
             name,
           };
-          return this.props.doRegisterWireless(registrationData);
+          return this.props.doRegisterWireless(registrationData, {
+            shouldInitializeClient: !this.isPwaSupportedBrowser(),
+          });
         })
         .then(() => this.props.doJoinConversationByCode(this.state.conversationKey, this.state.conversationCode))
         .then(conversationEvent => this.props.setLastEventDate(new Date(conversationEvent.time)))
         .then(() => this.trackAddParticipant())
-        .then(() => window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP)))
+        .then(() => this.routeToApp())
         .catch(error => this.props.doLogout());
     }
     this.nameInput.focus();
@@ -255,17 +277,19 @@ class ConversationJoin extends Component {
             {error ? parseValidationErrors(error) : parseError(this.props.error)}
           </ErrorMessage>
         </Form>
-        <Small block>
-          {`${_(conversationJoinStrings.hasAccount)} `}
-          <Link
-            component={RRLink}
-            to={`${ROUTE.LOGIN}/${this.state.conversationKey}/${this.state.conversationCode}`}
-            textTransform={'none'}
-            data-uie-name="go-login"
-          >
-            {_(conversationJoinStrings.loginLink)}
-          </Link>
-        </Small>
+        {!this.isPwaSupportedBrowser() && (
+          <Small block>
+            {`${_(conversationJoinStrings.hasAccount)} `}
+            <Link
+              component={RRLink}
+              to={`${ROUTE.LOGIN}/${this.state.conversationKey}/${this.state.conversationCode}`}
+              textTransform={'none'}
+              data-uie-name="go-login"
+            >
+              {_(conversationJoinStrings.loginLink)}
+            </Link>
+          </Small>
+        )}
       </ContainerXS>
     );
   };

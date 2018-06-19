@@ -165,6 +165,7 @@ z.main.App = class App {
       repositories.calling,
       repositories.conversation
     );
+    repositories.videoGrid = new z.calling.VideoGridRepository(repositories.calling, repositories.media);
 
     return repositories;
   }
@@ -815,7 +816,7 @@ z.main.App = class App {
    */
   enableDebugging() {
     z.config.LOGGER.OPTIONS.domains['app.wire.com'] = () => 300;
-    this.repository.properties.savePreference(z.properties.PROPERTIES_TYPE.enableDebugging, true);
+    this.repository.properties.savePreference(z.properties.PROPERTIES_TYPE.ENABLE_DEBUGGING, true);
   }
 
   /**

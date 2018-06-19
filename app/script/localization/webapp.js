@@ -103,11 +103,19 @@ z.string.authErrorSignIn = 'Please verify your details and try again.';
 z.string.callStateOutgoing = 'Ringing…';
 z.string.callStateConnecting = 'Connecting…';
 z.string.callStateIncoming = 'Calling…';
+z.string.callStateIncomingGroup = '{{user}} is calling';
 z.string.callDecline = 'Decline';
 z.string.callAccept = 'Accept';
 z.string.callJoin = 'Join';
 z.string.callChooseSharedScreen = 'Choose a screen to share';
 z.string.callParticipants = '{{number}} on call';
+
+z.string.videoCallOverlayConversations = 'Conversations';
+z.string.videoCallOverlayMute = 'Mute';
+z.string.videoCallOverlayVideo = 'Video';
+z.string.videoCallOverlayShareScreen = 'Share Screen';
+z.string.videoCallOverlayHangUp = 'Hang Up';
+z.string.videoCallPaused = "Video paused";
 
 // Modals
 // Modals type defaults
@@ -265,7 +273,7 @@ z.string.modalImproveWireHeadline = 'Help us make Wire better';
 z.string.modalImproveWireMessage = 'Sending anonymous usage and crash reports helps us to improve our products and services. We do not use this information for anything else.';
 
 z.string.modalServiceUnavailableHeadline = 'Adding service not possible';
-z.string.modalServiceUnavailableMessage = 'The service is unavailable a the moment.';
+z.string.modalServiceUnavailableMessage = 'The service is unavailable at the moment.';
 
 z.string.modalSessionResetHeadline = 'The session has been reset';
 z.string.modalSessionResetMessage1 = 'If the problem is not resolved,';
@@ -371,6 +379,7 @@ z.string.groupCreationParticipantsActionSkip = 'Skip';
 z.string.groupCreationParticipantsHeader = 'Add people';
 z.string.groupCreationParticipantsHeaderWithCounter = 'Add people ({{number}})';
 z.string.groupCreationParticipantsPlaceholder = 'Search by name';
+z.string.groupSizeInfo = 'Up to {{count}} people can join a group conversation. Video calls work in groups of 4 or less.';
 
 // Guest room
 z.string.guestRoomConversationName = 'Guest room';
@@ -414,6 +423,7 @@ z.string.conversationsPopoverSilence = 'Mute';
 z.string.conversationsPopoverUnarchive = 'Unarchive';
 
 // Conversations secondary line
+z.string.conversationsSecondaryLineIncomingCall = '{{user}} is calling';
 z.string.conversationsSecondaryLineMissedCall = '{{number}} missed call';
 z.string.conversationsSecondaryLineMissedCalls = '{{number}} missed calls';
 z.string.conversationsSecondaryLineNewMessage = '{{number}} new message';
@@ -572,6 +582,7 @@ z.string.preferencesAVCamera = 'Camera';
 z.string.preferencesAVMicrophone = 'Microphone';
 z.string.preferencesAVPermissionDetail = 'Enable from your browser Preferences';
 z.string.preferencesAVSpeakers = 'Speakers';
+z.string.preferencesAVTemporaryDisclaimer = 'Guests can’t start video conferences. Select the camera to use if you join one.';
 
 z.string.preferencesDevicesActivatedIn = 'in {{location}}';
 z.string.preferencesDevicesActivatedOn = 'Activated on {{date}}';

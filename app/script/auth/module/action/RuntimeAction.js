@@ -17,12 +17,20 @@
  *
  */
 
+import * as Environment from '../../Environment';
 import * as RuntimeActionCreator from './creator/RuntimeActionCreator';
-import {isFirefox, isSupportedBrowser} from '../../Runtime';
+import {isFirefox, isSupportedBrowser, isMobileOs, isSafari} from '../../Runtime';
+import {hasURLParameter} from '../../util/urlUtil';
+import {QUERY_KEY} from '../../route';
 
 export function checkSupportedBrowser() {
   return function(dispatch) {
-    if (isSupportedBrowser()) {
+    const pwaAware = hasURLParameter(QUERY_KEY.PWA_AWARE);
+    const isPwaSupportedBrowser = Environment.onEnvironment({
+      onProduction: false,
+      onStaging: pwaAware && (isMobileOs() || isSafari()),
+    });
+    if (isSupportedBrowser() || isPwaSupportedBrowser) {
       dispatch(RuntimeActionCreator.confirmSupportedBrowser());
     }
   };

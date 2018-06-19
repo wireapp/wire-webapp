@@ -68,30 +68,19 @@
 }
 
 .conversation-title-bar-icon {
+  display: flex;
+  height: 16px;
   flex: 0 0 auto;
+  align-items: center;
   margin-right: 12px;
   margin-left: 12px;
+  cursor: pointer;
+
+  svg path {
+    fill: @graphite-dark;
+  }
 }
 
 .conversation-title-bar-name-label {
   .label-bold-xs;
-}
-
-@keyframes pulsate-animation {
-  to {
-    opacity: 0.32;
-  }
-}
-
-.conversation-title-bar-icon-status {
-  color: @w-red;
-  cursor: default;
-}
-
-.conversation-title-bar-icon-status::before {
-  animation: pulsate-animation;
-  animation-direction: alternate;
-  animation-duration: @animation-timing-slower * 2;
-  animation-iteration-count: infinite;
-  animation-timing-function: @ease-in-cubic;
 }

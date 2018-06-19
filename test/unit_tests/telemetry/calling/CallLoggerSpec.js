@@ -22,7 +22,7 @@
 // grunt test_init && grunt test_run:telemetry/calling/CallLogger
 
 describe('z.telemetry.calling.CallLogger', () => {
-  const callLogger = new z.telemetry.calling.CallLogger('test', {}, 'test');
+  const callLogger = new z.telemetry.calling.CallLogger('test', null, {}, 'test');
 
   it('properly obfuscate IPv4 addresses', () => {
     expect(callLogger.safeGuard('test 10.10.12.43 test')).toBe('test 10.10.XXX.XXX test');
@@ -74,6 +74,7 @@ a=candidate:2418293877 1 udp 41885439 18.194.139.224 41059 typ relay raddr 62.21
 a=candidate:1647293877 1 udp 41885695 54.93.169.110 46225 typ relay raddr 62.210.99.39 rport 58873 generation 0 network-id 2 network-cost 50
 a=ice-ufrag:9hp9
 a=ice-pwd:kTmV2sRxTv4ct0PabUVbsp4t
+a=x-KASEv1:w+U/tSD28B9XMTjaqbmMRyiTIl+Ri5lw5oK6k2/DPU0=
 a=ice-options:trickle
 a=fingerprint:sha-256 71:97:92:58:9B:19:12:4F:50:3C:C9:A6:A5:A0:EA:CA:16:E8:7A:D8:02:3C:5B:A9:FC:87:B7:48:55:3D:55:D3
 a=setup:active
@@ -147,6 +148,7 @@ a=ssrc:3363014553 msid:EwQOn5YWBRyDDfyGSGRaMgKqCG7APyMD9UXk 12f3
 a=ssrc:3363014553 mslabel:EwQOn5YWBRyDDfyGSGRaMgKqCG7APyMD9UXk
 a=ssrc:3363014553 label:12f3
 a=rtcp-mux
+a=x-KASEv1:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 m=video 9 RTP/SAVPF 100 96
 c=IN IP4 0.0.XXX.XXX
 a=rtpmap:100 VP8/90000
@@ -177,6 +179,7 @@ a=ice-pwd:XXXXXXXXXXXXXXXXXXXXXXXX
 a=fingerprint:sha-256 XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX
 a=ice-options:trickle
 a=sctpmap:5000 webrtc-datachannel 1024`;
+
     expect(callLogger.safeGuard(callLogger.obfuscateSdp(originalSdp)).trim()).toBe(
       window.sdpTransform.write(window.sdpTransform.parse(obfuscatedSdp)).trim()
     );

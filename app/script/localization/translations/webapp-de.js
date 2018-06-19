@@ -88,14 +88,22 @@ z.string.de.authErrorPhoneNumberUnknown = 'Unbekannte Telefonnummer';
 z.string.de.authErrorSuspended = 'Benutzerkonto ist nicht mehr zum Login berechtigt.';
 z.string.de.authErrorSignIn = 'Überprüfe deine Eingaben und versuche es erneut.';
 
-z.string.de.callStateOutgoing = 'Klingelt…';
+z.string.de.callStateOutgoing = 'Klingeln…';
 z.string.de.callStateConnecting = 'Verbinde…';
 z.string.de.callStateIncoming = 'Klingelt…';
+z.string.de.callStateIncomingGroup = '{{user}} ruft an';
 z.string.de.callDecline = 'Ablehnen';
 z.string.de.callAccept = 'Annehmen';
 z.string.de.callJoin = 'Beitreten';
 z.string.de.callChooseSharedScreen = 'Wähle einen Bildschirm aus';
 z.string.de.callParticipants = '{{number}} im Anruf';
+
+z.string.de.videoCallOverlayConversations = 'Unterhaltungen';
+z.string.de.videoCallOverlayMute = 'Stummschalten';
+z.string.de.videoCallOverlayVideo = 'Video';
+z.string.de.videoCallOverlayShareScreen = 'Bildschirm teilen';
+z.string.de.videoCallOverlayHangUp = 'Beenden';
+z.string.de.videoCallPaused="Video wurde angehalten";
 
 z.string.de.modalAcknowledgeAction = 'Ok';
 z.string.de.modalAcknowledgeHeadline = 'Fehler aufgetreten';
@@ -247,7 +255,7 @@ z.string.de.modalPictureTooSmallMessage = 'Wähle ein Bild mit mindestens 320 ×
 z.string.de.modalImproveWireAction = 'Annehmen';
 z.string.de.modalImproveWireSecondary = 'Nicht jetzt';
 z.string.de.modalImproveWireHeadline = 'Hilf uns, Wire zu verbessern';
-z.string.de.modalImproveWireMessage = 'Anonymisierte Nutzungs- und Absturzberichte helfen uns, unsere Produkte und Dienstleistungen zu verbessern. Wir verwenden diese Informationen nicht für andere Zwecke.';
+z.string.de.modalImproveWireMessage = 'Anonymisierte Nutzungs- und Fehlerberichte helfen uns, unsere Produkte und Dienstleistungen zu verbessern. Wir verwenden diese Informationen nicht für andere Zwecke.';
 
 z.string.de.modalServiceUnavailableHeadline = 'Hinzufügen des Dienstes nicht möglich';
 z.string.de.modalServiceUnavailableMessage = 'Der Dienst ist derzeit nicht verfügbar.';
@@ -352,15 +360,16 @@ z.string.de.groupCreationParticipantsActionSkip = 'Überspringen';
 z.string.de.groupCreationParticipantsHeader = 'Personen hinzufügen';
 z.string.de.groupCreationParticipantsHeaderWithCounter = 'Personen hinzufügen ({{number}})';
 z.string.de.groupCreationParticipantsPlaceholder = 'Nach Namen suchen';
+z.string.de.groupSizeInfo = 'Bis zu {{count}} Personen können an einer Unterhaltung teilnehmen. Videoanrufe funktionieren in Gruppen mit vier oder weniger Personen.';
 
 z.string.de.guestRoomConversationName = 'Gästebereich';
 z.string.de.guestRoomToggleName = 'Gäste zulassen';
-z.string.de.guestRoomToggleInfo = 'Öffne diese Unterhaltung für Personen außerhalb deines Teams.';
-z.string.de.guestRoomToggleInfoExtended = 'Öffne diese Unterhaltung für Personen außerhalb deines Teams. Diese Einstellung kann später jederzeit geändert werden.';
+z.string.de.guestRoomToggleInfo = 'Öffne diese Unterhaltung für Personen außerhalb des Teams.';
+z.string.de.guestRoomToggleInfoExtended = 'Öffne diese Unterhaltung für Personen außerhalb des Teams. Diese Einstellung kann später jederzeit geändert werden.';
 
 z.string.de.guestRoomConversationBadge = 'Gäste anwesend';
 
-z.string.de.guestRoomConversationHead = 'Personen außerhalb deines Teams können an dieser Unterhaltung teilnehmen.';
+z.string.de.guestRoomConversationHead = 'Personen außerhalb des Teams können an dieser Unterhaltung teilnehmen.';
 z.string.de.guestRoomConversationButton = 'Personen einladen';
 
 z.string.de.collectionShowAll = 'Zeige alle {{number}}';
@@ -387,8 +396,9 @@ z.string.de.conversationsPopoverClear = 'Unterhaltungsverlauf löschen…';
 z.string.de.conversationsPopoverLeave = 'Gruppe verlassen…';
 z.string.de.conversationsPopoverNotify = 'Benachrichtigen';
 z.string.de.conversationsPopoverSilence = 'Stummschalten';
-z.string.de.conversationsPopoverUnarchive = 'Entarchivieren';
+z.string.de.conversationsPopoverUnarchive = 'Reaktivieren';
 
+z.string.de.conversationsSecondaryLineIncomingCall = '{{user}} ruft an';
 z.string.de.conversationsSecondaryLineMissedCall = '{{number}} verpasster Anruf';
 z.string.de.conversationsSecondaryLineMissedCalls = '{{number}} verpasste Anrufe';
 z.string.de.conversationsSecondaryLineNewMessage = '{{number}} neue Nachricht';
@@ -435,7 +445,7 @@ z.string.de.addParticipantsHeaderWithCounter = 'Personen hinzufügen ({{number}}
 z.string.de.addParticipantsSearchPlaceholder = 'Nach Namen suchen';
 z.string.de.addParticipantsServiceConfirmButton = 'Dienst hinzufügen';
 z.string.de.addParticipantsTabsPeople = 'Kontakte';
-z.string.de.addParticipantsTabsServices = 'Services';
+z.string.de.addParticipantsTabsServices = 'Dienste';
 
 z.string.de.conversationDetailsActionArchive = 'Archivieren';
 z.string.de.conversationDetailsActionAddParticipants = 'Personen hinzufügen';
@@ -449,11 +459,11 @@ z.string.de.conversationDetailsActionLeave = 'Gruppe verlassen…';
 z.string.de.conversationDetailsGuestsOff = 'Aus';
 z.string.de.conversationDetailsGuestsOn = 'An';
 z.string.de.conversationDetailsParticipantsServicesOne = 'Dienst';
-z.string.de.conversationDetailsParticipantsServicesMany = 'Services';
+z.string.de.conversationDetailsParticipantsServicesMany = 'Dienste';
 z.string.de.conversationDetailsParticipantsUsersOne = 'Person';
 z.string.de.conversationDetailsParticipantsUsersMany = 'Personen';
 z.string.de.conversationDetailsPeople = 'Personen';
-z.string.de.conversationDetailsServices = 'Services';
+z.string.de.conversationDetailsServices = 'Dienste';
 
 z.string.de.groupParticipantActionBlock = 'Kontakt blockieren…';
 z.string.de.groupParticipantActionCancelRequest = 'Anfrage abbrechen…';
@@ -466,7 +476,7 @@ z.string.de.groupParticipantActionPending = 'Ausstehend';
 z.string.de.groupParticipantActionRemove = 'Aus Gruppe entfernen…';
 z.string.de.groupParticipantActionSelfProfile = 'Profil öffnen';
 z.string.de.groupParticipantActionSendRequest = 'Kontakt hinzufügen';
-z.string.de.groupParticipantActionUnblock = 'Entsperren…';
+z.string.de.groupParticipantActionUnblock = 'Freigeben…';
 
 z.string.de.guestOptionsCopyLink = 'Link kopieren';
 z.string.de.guestOptionsCopyLinkDone = 'Link kopiert!';
@@ -516,14 +526,14 @@ z.string.de.preferencesAccountAvaibilityUnset = 'Wähle einen Status';
 z.string.de.preferencesAccountCreateTeam = 'Team erstellen';
 z.string.de.preferencesAccountData = 'Datennutzung';
 z.string.de.preferencesAccountDataCheckbox = 'Anonyme Nutzungsdaten senden';
-z.string.de.preferencesAccountDataDetail = 'Hilf mit, Wire durch die Übermittlung anonymisierter Nutzungs- und Absturzberichte zu verbessern.';
+z.string.de.preferencesAccountDataDetail = 'Anonymisierte Nutzungs- und Fehlerberichte schicken, um Wire zu verbessern.';
 z.string.de.preferencesAccountDelete = 'Benutzerkonto löschen';
 z.string.de.preferencesAccountLeaveGuestRoom = 'Gästebereich verlassen';
 z.string.de.preferencesAccountLeaveGuestRoomDescription = 'Du wirst nicht länger auf die Nachrichten dieser Unterhaltung zugreifen können.';
 z.string.de.preferencesAccountLogOut = 'Abmelden';
 z.string.de.preferencesAccountManageTeam = 'Team verwalten';
 z.string.de.preferencesAccountMarketingConsentCheckbox = 'Newsletter abonnieren';
-z.string.de.preferencesAccountMarketingConsentDetail = 'Erhalte Neuigkeiten und Informationen zu Produktupdates von Wire per E-Mail.';
+z.string.de.preferencesAccountMarketingConsentDetail = 'Neuigkeiten und Informationen zu Produktaktualisierungen von Wire per E-Mail erhalten.';
 z.string.de.preferencesAccountResetPassword = 'Passwort zurücksetzen';
 z.string.de.preferencesAccountTeam = 'in {{name}}';
 z.string.de.preferencesAccountUsernamePlaceholder = 'Dein vollständiger Name';
@@ -535,6 +545,7 @@ z.string.de.preferencesAVCamera = 'Kamera';
 z.string.de.preferencesAVMicrophone = 'Mikrofon';
 z.string.de.preferencesAVPermissionDetail = 'In deinen Browser-Einstellungen aktivieren';
 z.string.de.preferencesAVSpeakers = 'Lautsprecher';
+z.string.de.preferencesAVTemporaryDisclaimer = 'Gäste können Videokonferenzen nicht selbst starten. Wähle die Kamera aus, die bei der Teilnahme verwendet werden soll.';
 
 z.string.de.preferencesDevicesActivatedIn = 'in {{location}}';
 z.string.de.preferencesDevicesActivatedOn = 'Aktiviert am {{date}}';
@@ -617,7 +628,7 @@ z.string.de.searchGroups = 'Gruppen';
 z.string.de.searchPeople = 'Kontakte';
 z.string.de.searchPlaceholder = 'Name oder Benutzername suchen';
 z.string.de.searchServicePlaceholder = 'Nach Namen suchen';
-z.string.de.searchServices = 'Services';
+z.string.de.searchServices = 'Dienste';
 z.string.de.searchTeamGroups = 'Team-Gruppen';
 z.string.de.searchTeamMembers = 'Team-Mitglieder';
 z.string.de.searchTopPeople = 'Top Kontakte';

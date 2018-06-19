@@ -25,13 +25,13 @@ import {Link, H3, Button, Container, Columns, Column, Modal, Text, COLOR} from '
 
 const AcceptNewsModal = ({onConfirm, onDecline, intl: {formatMessage: _}}) => (
   <Modal>
-    <Container style={{maxWidth: '400px'}} data-uie-name="accept-news-modal">
-      <H3 style={{fontWeight: '500', marginTop: '10px'}} data-uie-name="accept-news-modal-title">
+    <Container style={{maxWidth: '400px'}} data-uie-name="modal-marketing-consent">
+      <H3 style={{fontWeight: '500', marginTop: '10px'}} data-uie-name="modal-marketing-consent-title">
         {_(acceptNewsModalStrings.headline)}
       </H3>
-      <div data-uie-name="accept-news-modal-description">
+      <div data-uie-name="modal-marketing-consent-description">
         <Text block>{_(acceptNewsModalStrings.unsubscribeDescription)}</Text>
-        <Link href={EXTERNAL_ROUTE.WIRE_PRIVACY_POLICY} target="_blank" data-uie-name="accept-news-modal-link">
+        <Link href={EXTERNAL_ROUTE.WIRE_PRIVACY_POLICY} target="_blank" data-uie-name="go-privacy">
           <Text block>
             <FormattedHTMLMessage {...acceptNewsModalStrings.privacyDescription} />
           </Text>
@@ -39,12 +39,12 @@ const AcceptNewsModal = ({onConfirm, onDecline, intl: {formatMessage: _}}) => (
       </div>
       <Columns style={{margin: '20px 0 10px'}}>
         <Column style={{textAlign: 'center'}}>
-          <Button onClick={onDecline} backgroundColor={COLOR.GRAY} data-uie-name="decline-news-button">
+          <Button onClick={onDecline} backgroundColor={COLOR.GRAY} data-uie-name="do-decline-marketing-consent">
             {_(acceptNewsModalStrings.declineButton)}
           </Button>
         </Column>
         <Column style={{textAlign: 'center'}}>
-          <Button onClick={onConfirm} data-uie-name="confirm-news-button">
+          <Button onClick={onConfirm} data-uie-name="do-confirm-marketing-consent">
             {_(acceptNewsModalStrings.confirmButton)}
           </Button>
         </Column>

@@ -25,193 +25,224 @@ window.z.components = z.components || {};
 z.components.ConversationListCallingCell = class ConversationListCallingCell {
   constructor(params) {
     this.conversation = params.conversation;
-    this.calling_repository = params.calling_repository;
-    this.is_selected = params.is_selected;
+    this.callingRepository = params.callingRepository;
+    this.mediaRepository = params.mediaRepository;
+    this.multitasking = params.multitasking;
     this.temporaryUserStyle = params.temporaryUserStyle;
+    this.videoGridRepository = params.videoGridRepository;
 
-    this.on_join_call = () => {
-      const mediaType = this.call().isRemoteVideoSend() ? z.media.MediaType.AUDIO_VIDEO : z.media.MediaType.AUDIO;
-      amplify.publish(z.event.WebApp.CALL.STATE.JOIN, this.conversation.id, mediaType);
-    };
+    this.calls = this.callingRepository.calls;
+    this.call = this.conversation.call;
+    this.conversationParticipants = this.conversation.participating_user_ets;
+    this.joinedCall = this.callingRepository.joinedCall;
+    this.selfStreamState = this.callingRepository.selfStreamState;
+    this.selfUser = this.conversation.self;
 
-    this.on_leave_call = () => {
-      amplify.publish(
-        z.event.WebApp.CALL.STATE.LEAVE,
-        this.conversation.id,
-        z.calling.enum.TERMINATION_REASON.SELF_USER
-      );
-    };
+    this.isConnected = this.call().isConnected;
 
-    this.on_reject_call = () => {
-      amplify.publish(z.event.WebApp.CALL.STATE.REJECT, this.conversation.id);
-    };
+    this.isConnecting = this.call().isConnecting;
+    this.isDeclined = this.call().isDeclined;
+    this.isIncoming = this.call().isIncoming;
+    this.isOngoing = this.call().isOngoing;
+    this.isOutgoing = this.call().isOutgoing;
 
-    this.on_toggle_audio = () => {
-      amplify.publish(z.event.WebApp.CALL.MEDIA.TOGGLE, this.conversation.id, z.media.MediaType.AUDIO);
-    };
+    this.showParticipants = ko.observable(false);
 
-    this.on_toggle_screen = () => {
-      amplify.publish(z.event.WebApp.CALL.MEDIA.CHOOSE_SCREEN, this.conversation.id);
-    };
-
-    this.on_toggle_video = () => {
-      amplify.publish(z.event.WebApp.CALL.MEDIA.TOGGLE, this.conversation.id, z.media.MediaType.VIDEO);
-    };
-
-    this.users = ko.pureComputed(() => this.conversation.participating_user_ets());
-    this.call = ko.pureComputed(() => this.conversation.call());
-    this.call_participants = ko.pureComputed(() => {
-      return this.call()
-        .participants()
-        .map(participant_et => participant_et.user);
+    this.callParticipants = ko.pureComputed(() => {
+      const callParticipants = this.call().participants();
+      return callParticipants.slice().reverse();
     });
 
-    const MAX_DISPLAYED_PARTICIPANTS = 9;
-    this.call_participants_rest = ko.observable(0);
-    this.call_participants_displayed = ko.pureComputed(() => {
-      const displayed_user_ets = this.call_participants().slice(0, MAX_DISPLAYED_PARTICIPANTS);
-      this.call_participants_rest(this.call_participants().length - displayed_user_ets.length);
-      return displayed_user_ets;
-    });
+    this.isVideoCall = ko.pureComputed(() => this.call().isLocalVideoCall() || this.call().isRemoteVideoCall());
 
-    this.joined_call = this.calling_repository.joinedCall;
-
-    this.self_stream_state = this.calling_repository.selfStreamState;
-
-    this.show_screensharing_button = ko.pureComputed(() => z.calling.CallingRepository.supportsScreenSharing);
-    this.show_video_button = ko.pureComputed(() => {
-      if (this.joined_call()) {
-        return this.joined_call().conversationEntity.is_one2one();
+    this.canJoin = ko.pureComputed(() => {
+      if (this.selfUser.isTemporaryGuest()) {
+        const isOngoingCall = !this.call().selfUserJoined() && this.isOngoing();
+        return this.call().isDeclined() || isOngoingCall;
       }
+      return false;
     });
-    this.disableToggleScreen = ko.pureComputed(() => {
-      return this.joined_call() ? this.joined_call().isRemoteScreenSend() : true;
+    this.showParticipantsButton = ko.pureComputed(() => this.isConnected() && this.conversation.is_group());
+    this.showVideoButton = ko.pureComputed(() => this.isVideoCall() || this.isConnected());
+
+    this.disableVideoButton = ko.pureComputed(() => {
+      const isOutgoingVideoCall = this.isOutgoing() && this.selfStreamState.videoSend();
+      const isVideoUnsupported = !this.selfStreamState.videoSend() && !this.conversation.supportsVideoCall();
+      return isOutgoingVideoCall || isVideoUnsupported;
     });
-
-    this.call_is_outgoing = ko.pureComputed(() => this.call().state() === z.calling.enum.CALL_STATE.OUTGOING);
-    this.call_is_ongoing = ko.pureComputed(() => this.call().state() === z.calling.enum.CALL_STATE.ONGOING);
-    this.call_is_incoming = ko.pureComputed(() => this.call().state() === z.calling.enum.CALL_STATE.INCOMING);
-    this.call_is_anwserable = ko.pureComputed(() => this.call_is_incoming() && !this.call().isDeclined());
-
-    this.show_leave_button = ko.pureComputed(() => {
-      return this.call().selfUserJoined();
-    });
-
-    this.show_decline_button = ko.pureComputed(() => {
-      return this.call_is_anwserable();
+    this.disableScreenButton = ko.pureComputed(() => {
+      const isScreenSend = this.joinedCall() ? this.joinedCall().isRemoteScreenSend() : true;
+      return !z.calling.CallingRepository.supportsScreenSharing || isScreenSend;
     });
 
-    this.show_accept_button = ko.pureComputed(() => {
-      return this.call_is_anwserable() && !this.call().isRemoteVideoSend();
+    this.participantsButtonLabel = ko.pureComputed(() => {
+      return z.l10n.text(z.string.callParticipants, this.callParticipants().length);
     });
 
-    this.show_accept_video_button = ko.pureComputed(() => {
-      return this.call_is_anwserable() && this.call().isRemoteVideoSend();
+    this.showVideoPreview = ko.pureComputed(() => {
+      const hasOtherOngoingCalls = this.calls().some(callEntity => {
+        return callEntity.id !== this.call().id && callEntity.isOngoing();
+      });
+
+      const isInMinimizedState = this.multitasking.isMinimized() || !this.isConnected();
+      const hasPreJoinVideo = !this.isConnected() && this.call().selfState.videoSend();
+      const isOngoingVideoCall = this.isConnected() && this.isVideoCall() && !this.isDeclined();
+
+      return !hasOtherOngoingCalls && isInMinimizedState && (hasPreJoinVideo || isOngoingVideoCall);
     });
 
-    this.show_call_timer = ko.pureComputed(() => {
-      return this.call_is_ongoing() && this.call().selfUserJoined();
-    });
+    this.showMaximize = ko.pureComputed(() => this.multitasking.isMinimized() && this.isConnected());
 
-    this.show_join_button = ko.pureComputed(() => {
-      return (this.call_is_ongoing() && !this.call().selfUserJoined()) || this.call().isDeclined();
-    });
+    this.shouldUpdateScrollbar = ko.computed(() => this.callParticipants()).extend({notify: 'always', rateLimit: 500});
+  }
 
-    this.show_call_controls = ko.pureComputed(() => {
-      return this.call().selfUserJoined();
-    });
+  onEndCall() {
+    return this.isIncoming() ? this.onRejectCall() : this.onLeaveCall();
+  }
 
-    this.on_participants_button_click = () => {
-      this.show_participants(!this.show_participants());
-    };
+  onJoinCall() {
+    const isVideoCall = this.call().isRemoteVideoSend() && this.selfStreamState.videoSend();
+    const mediaType = isVideoCall ? z.media.MediaType.AUDIO_VIDEO : z.media.MediaType.AUDIO;
+    amplify.publish(z.event.WebApp.CALL.STATE.JOIN, this.conversation.id, mediaType);
+  }
 
-    this.participants_button_label = ko.pureComputed(() => {
-      return z.l10n.text(z.string.callParticipants, this.call_participants().length);
-    });
+  onJoinDeclinedCall() {
+    amplify.publish(z.event.WebApp.CALL.STATE.JOIN, this.conversation.id, z.media.MediaType.AUDIO);
+  }
 
-    this.show_participants_button = ko.pureComputed(() => {
-      return this.conversation.is_group() && this.call_is_ongoing();
-    });
+  onLeaveCall() {
+    amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, this.conversation.id, z.calling.enum.TERMINATION_REASON.SELF_USER);
+  }
 
-    this.show_participants = ko.observable(false);
+  onMaximizeVideoGrid() {
+    this.multitasking.autoMinimize(false);
+    this.multitasking.isMinimized(false);
+  }
+
+  onParticipantsClick() {
+    this.showParticipants(!this.showParticipants());
+  }
+
+  onRejectCall() {
+    amplify.publish(z.event.WebApp.CALL.STATE.REJECT, this.conversation.id);
+  }
+
+  onToggleAudio() {
+    amplify.publish(z.event.WebApp.CALL.MEDIA.TOGGLE, this.conversation.id, z.media.MediaType.AUDIO);
+  }
+
+  onToggleScreen() {
+    amplify.publish(z.event.WebApp.CALL.MEDIA.CHOOSE_SCREEN, this.conversation.id);
+  }
+
+  onToggleVideo() {
+    amplify.publish(z.event.WebApp.CALL.MEDIA.TOGGLE, this.conversation.id, z.media.MediaType.VIDEO);
   }
 };
 
 ko.components.register('conversation-list-calling-cell', {
   template: `
-    <div class="conversation-list-calling-cell conversation-list-cell" data-bind="attr: {'data-uie-uid': conversation.id, 'data-uie-value': conversation.display_name}, css: {'conversation-list-cell-active': is_selected(conversation)}" data-uie-name="item-call">
+    <div class="conversation-list-calling-cell conversation-list-cell">
+
       <!-- ko ifnot: temporaryUserStyle -->
         <div class="conversation-list-cell-left">
           <!-- ko if: conversation.is_group() -->
-            <group-avatar class="conversation-list-cell-avatar-arrow" params="users: users(), conversation: conversation"></group-avatar>
+            <group-avatar class="conversation-list-cell-avatar-arrow call-ui__avatar" params="users: conversationParticipants(), conversation: conversation"></group-avatar>
           <!-- /ko -->
-          <!-- ko if: !conversation.is_group() && users().length -->
-            <participant-avatar params="participant: users()[0], size: z.components.ParticipantAvatar.SIZE.SMALL"></participant-avatar>
+          <!-- ko if: !conversation.is_group() && conversationParticipants().length -->
+            <participant-avatar params="participant: conversationParticipants()[0], size: z.components.ParticipantAvatar.SIZE.SMALL"></participant-avatar>
           <!-- /ko -->
         </div>
       <!-- /ko -->
+
       <div class="conversation-list-cell-center" data-bind="css: {'conversation-list-cell-center-no-left': temporaryUserStyle}">
-        <span class="conversation-list-cell-name" data-bind="text: conversation.display_name(), css: {'text-theme': is_selected(conversation) && !temporaryUserStyle}"></span>
-        <!-- ko if: call_is_outgoing -->
+        <span class="conversation-list-cell-name" data-bind="text: conversation.display_name()"></span>
+        <!-- ko if: isIncoming() -->
+          <!-- ko if: call().isGroup -->
+            <span class="conversation-list-cell-description" data-bind="l10n_text: {id: z.string.callStateIncomingGroup, substitute: call().creatingUser.first_name()}" data-uie-name="call-label-incoming"></span>
+          <!-- /ko -->
+          <!-- ko ifnot: call().isGroup -->
+            <span class="conversation-list-cell-description" data-bind="l10n_text: z.string.callStateIncoming" data-uie-name="call-label-incoming"></span>
+          <!-- /ko -->
+        <!-- /ko -->
+        <!-- ko if: isOutgoing() -->
           <span class="conversation-list-cell-description" data-bind="l10n_text: z.string.callStateOutgoing" data-uie-name="call-label-outgoing"></span>
         <!-- /ko -->
-        <!-- ko if: call_is_incoming -->
-          <span class="conversation-list-cell-description" data-bind="l10n_text: z.string.callStateIncoming" data-uie-name="call-label-incoming"></span>
+        <!-- ko if: isConnecting() -->
+          <span class="conversation-list-cell-description" data-bind="l10n_text: z.string.callStateConnecting" data-uie-name="call-label-connecting"></span>
         <!-- /ko -->
-        <!-- ko if: show_call_timer -->
+        <!-- ko if: isConnected() -->
           <span class="conversation-list-cell-description" data-bind="text: z.util.TimeUtil.formatSeconds(call().durationTime())" data-uie-name="call-duration"></span>
         <!-- /ko -->
       </div>
+
       <div class="conversation-list-cell-right">
-        <!-- ko if: show_decline_button -->
-           <div class="conversation-list-calling-cell-controls-button fill-red icon-end-call" data-bind="click: on_reject_call" data-uie-name="do-call-controls-call-decline"></div>
-        <!-- /ko -->
-        <!-- ko if: show_leave_button -->
-           <div class="conversation-list-calling-cell-controls-button fill-red icon-end-call" data-bind="click: on_leave_call" data-uie-name="do-call-controls-call-leave"></div>
-        <!-- /ko -->
-        <!-- ko if: show_accept_button -->
-          <div class="conversation-list-calling-cell-controls-button fill-green icon-call" data-bind="click: on_join_call" data-uie-name="do-call-controls-call-accept"></div>
-        <!-- /ko -->
-        <!-- ko if: show_accept_video_button -->
-          <div class="conversation-list-calling-cell-controls-button fill-green icon-video" data-bind="click: on_join_call" data-uie-name="do-call-controls-call-accept"></div>
-        <!-- /ko -->
-        <!-- ko if: show_join_button -->
-          <div class="conversation-list-calling-cell-controls-button conversation-list-calling-cell-controls-join-button" data-bind="click: on_join_call, l10n_text: z.string.callJoin" data-uie-name="do-call-controls-call-join"></div>
-        <!-- /ko -->
-      </div>
-    </div>
-    <!-- ko if: show_call_controls -->
-    <div class="conversation-list-calling-cell-controls">
-      <!-- ko if: show_participants_button -->
-        <div class="conversation-list-calling-cell-controls-button cursor-pointer conversation-list-calling-cell-controls-on-call" data-bind="click: on_participants_button_click, text: participants_button_label, css: show_participants() ? 'cell-badge-light' : 'cell-badge-dark'" data-uie-name="do-toggle-participants"></div>
-      <!-- /ko -->
-      <div class="conversation-list-calling-cell-controls-button icon-mute-small cursor-pointer" data-bind="click: on_toggle_audio, css: self_stream_state.audioSend() ? 'cell-badge-dark' : 'cell-badge-light'" data-uie-name="do-toggle-mute"></div>
-      <!-- ko if: call_is_ongoing -->
-        <!-- ko if: show_video_button() -->
-          <div class="conversation-list-calling-cell-controls-button icon-video cursor-pointer" data-bind="click: on_toggle_video, css: self_stream_state.videoSend() ? 'cell-badge-light' : 'cell-badge-dark'" data-uie-name="do-toggle-video"></div>
-        <!-- /ko -->
-        <!-- ko if: show_screensharing_button() -->
-          <div data-uie-name="do-toggle-screenshare" class="conversation-list-calling-cell-controls-button icon-screensharing-small cursor-pointer"
-               data-bind="click: on_toggle_screen, css: {
-                'disabled': disableToggleScreen(),
-                'cell-badge-light': self_stream_state.screenSend(),
-                'cell-badge-dark': !self_stream_state.screenSend()
-               }">
+        <!-- ko if: isConnecting() || isConnected() -->
+          <div class="call-ui__button call-ui__button--red" data-bind="click: onLeaveCall" data-uie-name="do-call-controls-call-leave">
+            <hangup-icon class="small-icon"></hangup-icon>
           </div>
         <!-- /ko -->
-      <!-- /ko -->
-    </div>
-    <!-- /ko -->
-    <!-- ko if: show_participants -->
-      <div class="conversation-list-calling-cell-participants">
-        <!-- ko foreach: call_participants_displayed() -->
-          <participant-avatar class="conversation-list-calling-cell-participant" params="participant: $data, size: z.components.ParticipantAvatar.SIZE.XX_SMALL"></participant-avatar>
+        <!-- ko if: canJoin() -->
+          <div class="call-ui__button call-ui__button--join call-ui__button--green" data-bind="click: onJoinDeclinedCall, l10n_text: z.string.callJoin" data-uie-name="do-call-controls-call-join"></div>
         <!-- /ko -->
-        <!-- ko if: call_participants_rest() > 0 -->
-          <div class="conversation-list-calling-cell-participants-rest" data-bind="text: call_participants_rest()"></div>
+      </div>
+
+    </div>
+
+    <!-- ko if: showVideoPreview() -->
+      <div class="group-video__minimized-wrapper" data-bind="click: onMaximizeVideoGrid">
+        <group-video-grid params="minimized: true, videoGridRepository: videoGridRepository"></group-video-grid>
+        <!-- ko if: showMaximize() -->
+          <div class="group-video__minimized-wrapper__overlay" data-uie-name="do-maximize-call">
+            <fullscreen-icon></fullscreen-icon>
+          </div>
         <!-- /ko -->
       </div>
     <!-- /ko -->
-  `,
+
+    <!-- ko ifnot: canJoin() -->
+      <div class="conversation-list-calling-cell-controls">
+        <div class="conversation-list-calling-cell-controls-left">
+          <div class="call-ui__button" data-bind="click: onToggleAudio, css: {'call-ui__button--active': !selfStreamState.audioSend()}, attr: {'data-uie-value': selfStreamState.audioSend() ? 'inactive' : 'active'}" data-uie-name="do-toggle-mute">
+            <micoff-icon class="small-icon"></micoff-icon>
+          </div>
+          <!-- ko if: showVideoButton() -->
+            <div class="call-ui__button" data-bind="click: onToggleVideo, css: {'call-ui__button--active': selfStreamState.videoSend(), 'call-ui__button--disabled': disableVideoButton()}, attr: {'data-uie-value': selfStreamState.videoSend() ? 'active' : 'inactive'}" data-uie-name="do-toggle-video">
+              <camera-icon class="small-icon"></camera-icon>
+            </div>
+          <!-- /ko -->
+          <!-- ko if: isConnected() -->
+            <div class="call-ui__button" data-bind="click: onToggleScreen, css: {'call-ui__button--active': selfStreamState.screenSend(), 'call-ui__button--disabled': disableScreenButton()}, attr: {'data-uie-value': selfStreamState.screenSend() ? 'active' : 'inactive', 'data-uie-enabled': disableScreenButton() ? 'false' : 'true'}" data-uie-name="do-call-controls-toggle-screenshare">
+              <screenshare-icon class="small-icon"></screenshare-icon>
+            </div>
+          <!-- /ko -->
+        </div>
+
+        <div class="conversation-list-calling-cell-controls-right">
+          <!-- ko if: showParticipantsButton() -->
+            <div class="call-ui__button call-ui__button--participants" data-bind="click: onParticipantsClick, css: {'call-ui__button--active': showParticipants()}" data-uie-name="do-toggle-participants">
+              <span data-bind="text: participantsButtonLabel"></span><chevron-icon></chevron-icon>
+            </div>
+          <!-- /ko -->
+          <!-- ko if: isIncoming() || isOutgoing() -->
+            <div class="call-ui__button call-ui__button--red call-ui__button--large" data-bind="click: onEndCall" data-uie-name="do-call-controls-call-decline">
+              <hangup-icon class="small-icon"></hangup-icon>
+            </div>
+          <!-- /ko -->
+          <!-- ko if: isIncoming() -->
+            <div class="call-ui__button call-ui__button--green call-ui__button--large" data-bind="click: onJoinCall" data-uie-name="do-call-controls-call-accept">
+              <pickup-icon class="small-icon"></pickup-icon>
+            </div>
+          <!-- /ko -->
+        </div>
+
+      </div>
+      <div class="call-ui__participant-list__wrapper" data-bind="css: {'call-ui__participant-list__wrapper--active': showParticipants}">
+        <div class="call-ui__participant-list" data-bind="foreach: callParticipants, antiscroll: shouldUpdateScrollbar" data-uie-name="list-call-ui-participants">
+          <participant-item params="participant: $data.user, hideInfo: true, showCamera: $data.activeState.videoSend()" data-bind="css: {'no-underline': true}"></participant-item>
+        </div>
+      </div>
+    <!-- /ko -->
+ `,
   viewModel: z.components.ConversationListCallingCell,
 });

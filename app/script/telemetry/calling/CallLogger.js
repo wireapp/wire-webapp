@@ -45,7 +45,9 @@ z.telemetry.calling.CallLogger = class CallLogger {
     };
   }
 
-  constructor(name, options, messageLog) {
+  constructor(name, id, options, messageLog) {
+    name = id ? this._createName(name, id) : name;
+
     this.logger = new z.util.Logger(name, options);
     this.levels = this.logger.levels;
 
@@ -57,47 +59,47 @@ z.telemetry.calling.CallLogger = class CallLogger {
   }
 
   obfuscate(string) {
-    if (this._isSoftObfuscationMode()) {
-      return string.substr(0, CallLogger.CONFIG.OBFUSCATION_TRUNCATE_TO);
-    }
+    if (string) {
+      if (this._isHardObfuscationMode()) {
+        return CryptoJS.SHA256(string)
+          .toString()
+          .substr(0, CallLogger.CONFIG.OBFUSCATION_TRUNCATE_TO);
+      }
 
-    if (this._isHardObfuscationMode()) {
-      return CryptoJS.SHA256(string)
-        .toString()
-        .substr(0, CallLogger.CONFIG.OBFUSCATION_TRUNCATE_TO);
+      return string.substr(0, CallLogger.CONFIG.OBFUSCATION_TRUNCATE_TO);
     }
   }
 
   obfuscateSdp(sdpMessage) {
-    if (!window.sdpTransform) {
+    if (!sdpMessage || !window.sdpTransform) {
       return '[Unknown]';
     }
 
     const decodedSdpMessage = window.sdpTransform.parse(sdpMessage);
 
-    for (const index in decodedSdpMessage.media) {
-      // Remove fingerprint
-      const isFingerprintDefined = !!decodedSdpMessage.media[index].fingerprint;
-      if (isFingerprintDefined && !!decodedSdpMessage.media[index].fingerprint.hash) {
+    decodedSdpMessage.media.forEach(({fingerprint, icePwd, invalid}, index) => {
+      // Remove fingerprints
+      const hasFingerprintHash = fingerprint && fingerprint.hash;
+      if (hasFingerprintHash) {
         decodedSdpMessage.media[index].fingerprint.hash = CallLogger.OBFUSCATED.FINGERPRINT;
       }
 
       // Remove ice password
-      const isIcePasswordDefined = !!decodedSdpMessage.media[index].icePwd;
-      if (isIcePasswordDefined) {
+      const hasIcePassword = !!icePwd;
+      if (hasIcePassword) {
         decodedSdpMessage.media[index].icePwd = CallLogger.OBFUSCATED.ICE_PASSWORD;
       }
 
       // Remove KASE public key (for receiving side)
-      const isPublicKeyDefined = !!decodedSdpMessage.media[index].invalid;
-      if (isPublicKeyDefined) {
-        for (const indexInvalid in decodedSdpMessage.media[index].invalid) {
-          if (decodedSdpMessage.media[index].invalid[indexInvalid].value.startsWith('x-KASEv1')) {
-            decodedSdpMessage.media[index].invalid[indexInvalid].value = CallLogger.OBFUSCATED.KASE_PUBLIC_KEY;
+      const hasInvalid = !!invalid;
+      if (hasInvalid) {
+        invalid.forEach(({value}, invalidIndex) => {
+          if (value.startsWith('x-KASEv1')) {
+            decodedSdpMessage.media[index].invalid[invalidIndex].value = CallLogger.OBFUSCATED.KASE_PUBLIC_KEY;
           }
-        }
+        });
       }
-    }
+    });
 
     return window.sdpTransform.write(decodedSdpMessage);
   }
@@ -106,16 +108,25 @@ z.telemetry.calling.CallLogger = class CallLogger {
     switch (number) {
       case CallLogger.LOG_LEVEL.LEVEL_1:
       case CallLogger.LOG_LEVEL.LEVEL_2:
-      case CallLogger.LOG_LEVEL.LEVEL_3:
+      case CallLogger.LOG_LEVEL.LEVEL_3: {
         return 'VERBOSE';
-      case CallLogger.LOG_LEVEL.DEBUG:
+      }
+
+      case CallLogger.LOG_LEVEL.DEBUG: {
         return 'DEBUG';
-      case CallLogger.LOG_LEVEL.INFO:
+      }
+
+      case CallLogger.LOG_LEVEL.INFO: {
         return 'INFO';
-      case CallLogger.LOG_LEVEL.WARNING:
-        return 'WARNING';
-      case CallLogger.LOG_LEVEL.ERROR:
+      }
+
+      case CallLogger.LOG_LEVEL.WARNING: {
+        return 'INFO';
+      }
+
+      case CallLogger.LOG_LEVEL.ERROR: {
         return 'ERROR';
+      }
     }
   }
 
@@ -133,12 +144,12 @@ z.telemetry.calling.CallLogger = class CallLogger {
     }
   }
 
-  _isHardObfuscationMode() {
-    return this.obfuscationMode === CallLogger.OBFUSCATION_MODE.HARD;
+  _createName(name, id) {
+    return `${name} - ${this.obfuscate(id)} (${new Date().getMilliseconds()})`;
   }
 
-  _isSoftObfuscationMode() {
-    return this.obfuscationMode === CallLogger.OBFUSCATION_MODE.SOFT;
+  _isHardObfuscationMode() {
+    return this.obfuscationMode === CallLogger.OBFUSCATION_MODE.HARD;
   }
 
   debug() {
@@ -157,7 +168,10 @@ z.telemetry.calling.CallLogger = class CallLogger {
     this._log([this.logger.levels.WARN].concat(...arguments));
   }
 
-  log() {
+  log(logLevel) {
+    if (typeof logLevel === 'function') {
+      return this._log(arguments);
+    }
     this._log([this.logger.levels.INFO].concat(...arguments));
   }
 

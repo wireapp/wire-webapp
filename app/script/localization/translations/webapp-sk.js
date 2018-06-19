@@ -94,6 +94,9 @@ z.string.sk.callJoin = 'Pripojiť';
 z.string.sk.callChooseSharedScreen = 'Vybrať obrazovku pre zdieľanie';
 z.string.sk.callParticipants = '{{number}} je dostupné';
 
+z.string.sk.videoCallOverlayMute = 'Stlmiť';
+z.string.sk.videoCallOverlayHangUp = 'Ukončiť';
+
 z.string.sk.modalAcknowledgeAction = 'OK';
 z.string.sk.modalConfirmSecondary = 'Zrušiť';
 z.string.sk.modalOptionSecondary = 'Zrušiť';

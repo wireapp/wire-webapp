@@ -46,10 +46,10 @@ z.media.MediaRepository = class MediaRepository {
   constructor() {
     this.logger = new z.util.Logger('z.media.MediaRepository', z.config.LOGGER.OPTIONS);
 
-    this.constraints_handler = new z.media.MediaConstraintsHandler(this);
-    this.devices_handler = new z.media.MediaDevicesHandler(this);
-    this.element_handler = new z.media.MediaElementHandler(this);
-    this.stream_handler = new z.media.MediaStreamHandler(this);
+    this.constraintsHandler = new z.media.MediaConstraintsHandler(this);
+    this.devicesHandler = new z.media.MediaDevicesHandler(this);
+    this.elementHandler = new z.media.MediaElementHandler(this);
+    this.streamHandler = new z.media.MediaStreamHandler(this);
 
     this.audioContext = undefined;
   }
@@ -58,8 +58,9 @@ z.media.MediaRepository = class MediaRepository {
    * Closing the AudioContext.
    * @returns {undefined} No return value
    */
-  close_audio_context() {
-    if (this.audioContext && this.audioContext.state === MediaRepository.AUDIO_CONTEXT_STATE.RUNNING) {
+  closeAudioContext() {
+    const contextRunning = this.audioContext && this.audioContext.state === MediaRepository.AUDIO_CONTEXT_STATE.RUNNING;
+    if (contextRunning) {
       this.audioContext.close().then(() => {
         this.logger.info('Closed existing AudioContext', this.audioContext);
         this.audioContext = undefined;
@@ -71,8 +72,9 @@ z.media.MediaRepository = class MediaRepository {
    * Initialize the AudioContext.
    * @returns {AudioContext} AudioContext
    */
-  get_audio_context() {
-    if (this.audioContext && this.audioContext.state === MediaRepository.AUDIO_CONTEXT_STATE.RUNNING) {
+  getAudioContext() {
+    const contextRunning = this.audioContext && this.audioContext.state === MediaRepository.AUDIO_CONTEXT_STATE.RUNNING;
+    if (contextRunning) {
       this.logger.info('Reusing existing AudioContext', this.audioContext);
       return this.audioContext;
     }

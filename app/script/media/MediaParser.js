@@ -24,7 +24,8 @@ window.z.media = z.media || {};
 
 class MediaParser {
   constructor() {
-    this.render_media_embeds = this.render_media_embeds.bind(this);
+    this.renderMediaEmbeds = this.renderMediaEmbeds.bind(this);
+
     this.embeds = [
       z.media.MediaEmbeds.soundcloud,
       z.media.MediaEmbeds.spotify,
@@ -38,17 +39,13 @@ class MediaParser {
    * @note Checks message for valid media links and appends an iFrame right after the link
    *
    * @param {string} message - Message text
-   * @param {string} theme_color - Accent color to be applied to the embed
+   * @param {string} themeColor - Accent color to be applied to the embed
    * @returns {string} Message with rendered media embeds
    */
-  render_media_embeds(message, theme_color) {
-    const links = z.util.URLUtil.getLinksFromHtml(message);
-
-    for (const link of links) {
-      for (const embed of this.embeds) {
-        message = embed(link, message, theme_color);
-      }
-    }
+  renderMediaEmbeds(message, themeColor) {
+    z.util.URLUtil.getLinksFromHtml(message).forEach(link => {
+      this.embeds.forEach(embed => (message = embed(link, message, themeColor)));
+    });
 
     return message;
   }

@@ -60,6 +60,7 @@ import * as URLUtil from '../util/urlUtil';
 import * as ClientSelector from '../module/selector/ClientSelector';
 import {resetError} from '../module/action/creator/AuthActionCreator';
 import Page from './Page';
+import {ClientType} from '@wireapp/api-client/dist/commonjs/client/index';
 
 class Login extends React.PureComponent {
   inputs = {};
@@ -133,14 +134,14 @@ class Login extends React.PureComponent {
   immediateLogin = () => {
     return Promise.resolve()
       .then(() => this.props.doInit({isImmediateLogin: true}))
-      .then(() => this.props.doInitializeClient(true, undefined))
+      .then(() => this.props.doInitializeClient(ClientType.PERMANENT, undefined))
       .then(this.navigateChooseHandleOrWebapp)
       .catch(() => {});
   };
 
   navigateChooseHandleOrWebapp = () => {
     return this.props.hasSelfHandle
-      ? window.location.replace(URLUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP))
+      ? window.location.replace(URLUtil.getAppPath())
       : this.props.history.push(ROUTE.CHOOSE_HANDLE);
   };
 
@@ -154,13 +155,14 @@ class Login extends React.PureComponent {
     this.inputs.email.value = this.inputs.email.value.trim();
     const validationErrors = [];
     const validInputs = this.state.validInputs;
-    for (const inputKey of Object.keys(this.inputs)) {
-      const currentInput = this.inputs[inputKey];
+
+    Object.entries(this.inputs).forEach(([inputKey, currentInput]) => {
       if (!currentInput.checkValidity()) {
         validationErrors.push(ValidationError.handleValidationState(currentInput.name, currentInput.validity));
       }
       validInputs[inputKey] = currentInput.validity.valid;
-    }
+    });
+
     this.setState({validInputs, validationErrors});
     return Promise.resolve(validationErrors)
       .then(errors => {
@@ -170,7 +172,7 @@ class Login extends React.PureComponent {
       })
       .then(() => {
         const {email, password, persist} = this.state;
-        const login = {password, persist};
+        const login = {clientType: persist ? ClientType.PERMANENT : ClientType.TEMPORARY, password};
 
         if (this.isValidEmail(email)) {
           login.email = email;

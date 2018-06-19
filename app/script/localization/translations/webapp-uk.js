@@ -98,6 +98,12 @@ z.string.uk.callJoin = 'Приєднатись';
 z.string.uk.callChooseSharedScreen = 'Оберіть робочий стіл, скріншотами якого ви хочете поділитися';
 z.string.uk.callParticipants = '{{number}} учасників';
 
+z.string.uk.videoCallOverlayConversations = 'Розмови';
+z.string.uk.videoCallOverlayMute = 'Вимкнути звук';
+z.string.uk.videoCallOverlayVideo = 'Відео';
+z.string.uk.videoCallOverlayShareScreen = 'Показати свій екран';
+z.string.uk.videoCallOverlayHangUp = 'Завершити';
+
 z.string.uk.modalAcknowledgeAction = 'ОК';
 z.string.uk.modalAcknowledgeHeadline = 'Щось пішло не так';
 z.string.uk.modalConfirmSecondary = 'Скасувати';
@@ -353,6 +359,7 @@ z.string.uk.groupCreationParticipantsActionSkip = 'Пропустити';
 z.string.uk.groupCreationParticipantsHeader = 'Додати учасників';
 z.string.uk.groupCreationParticipantsHeaderWithCounter = 'Додати учасників ({{number}})';
 z.string.uk.groupCreationParticipantsPlaceholder = 'Пошук за іменем';
+z.string.uk.groupSizeInfo = 'Групова розмова може містити до {{count}} учасників. Відеодзвінки працюють тільки в групах з 4-ма або менше учасниками.';
 
 z.string.uk.guestRoomConversationName = 'Гостьова кімната';
 z.string.uk.guestRoomToggleName = 'Дозволити присутність гостей';
