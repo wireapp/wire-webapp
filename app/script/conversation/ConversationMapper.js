@@ -85,6 +85,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
         archived_timestamp,
         cleared_timestamp,
         ephemeral_timer,
+        global_message_timer,
         last_event_timestamp,
         last_read_timestamp,
         last_server_timestamp,
@@ -104,6 +105,10 @@ z.conversation.ConversationMapper = class ConversationMapper {
 
       if (ephemeral_timer !== undefined) {
         conversation_et.localMessageTimer(ephemeral_timer);
+      }
+
+      if (global_message_timer !== undefined) {
+        conversation_et.globalMessageTimer(global_message_timer);
       }
 
       if (last_event_timestamp) {
