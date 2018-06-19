@@ -85,7 +85,9 @@ z.components.AudioSeekBarComponent = class AudioSeekBarComponent {
 
   _on_level_click(event) {
     const mouse_x = event.pageX - $(event.currentTarget).offset().left;
-    const currentTime = (this.audio_element.duration * mouse_x) / event.currentTarget.clientWidth;
+    const calculatedTime = (this.audio_element.duration * mouse_x) / event.currentTarget.clientWidth;
+    const currentTime = window.isNaN(calculatedTime) ? 0 : calculatedTime;
+
     this.audio_element.currentTime = z.util.NumberUtil.clamp(currentTime, 0, this.audio_element.duration);
     this._on_time_update();
   }

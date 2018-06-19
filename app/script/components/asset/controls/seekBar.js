@@ -105,11 +105,8 @@ z.components.SeekBarComponent = class SeekBarComponent {
 
   _update_seek_bar_style(progress) {
     // TODO check if we can find a css solution
-    this.seek_bar.style.backgroundImage = this.dark_mode
-      ? `linear-gradient(to right, currentColor ${progress}%, rgba(141,152,159,0.24) ${progress}%)`
-      : `linear-gradient(to right, currentColor ${progress}%, rgba(255,255,255,0.4) ${progress}%)`;
-
-    return this.seek_bar.style.backgroundImage;
+    const color = this.dark_mode ? 'rgba(141,152,159,0.24)' : 'rgba(255,255,255,0.4)';
+    this.seek_bar.style.backgroundImage = `linear-gradient(to right, currentColor ${progress}%, ${color} ${progress}%)`;
   }
 
   dispose() {
