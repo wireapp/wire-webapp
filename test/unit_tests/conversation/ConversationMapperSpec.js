@@ -321,7 +321,7 @@ describe('Conversation Mapper', () => {
       expect(merged_conversation.last_event_timestamp).toBe(local_data.last_event_timestamp);
       expect(merged_conversation.last_read_timestamp).toBe(local_data.last_read_timestamp);
 
-      expect(merged_conversation.muted_timestamp).toBe(local_data.muted_timestamp);
+      expect(merged_conversation.muted_timestamp).not.toBe(local_data.muted_timestamp);
       expect(merged_conversation.verification_state).toBe(local_data.verification_state);
 
       // remote one is newer
