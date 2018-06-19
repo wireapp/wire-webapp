@@ -68,7 +68,7 @@
                   <div class="panel__action-item__text" data-bind="l10n_text: z.string.conversationDetailsActionAddParticipants"></div>
                 </div>
               </div>
-              <!-- ko if: showTeamMemberActions() -->
+              <!-- ko if: showActionGuestOptions() -->
                 <div class="conversation-details__guest-options">
                   <div class="panel__action-item" data-bind="click: clickOnGuestOptions" data-uie-name="go-guest-options">
                     <guest-icon class="panel__action-item__icon"></guest-icon>
@@ -76,20 +76,21 @@
                     <div class="panel__action-item__status" data-bind="l10n_text: guestOptionsText" data-uie-name="status-allow-guests"></div>
                     <disclose-icon></disclose-icon>
                   </div>
-                </div>             
-                <div class="conversation-details__timed-messages">
-                  <div class="panel__action-item" data-bind="click: clickOnTimedMessages" data-uie-name="go-timed-messages">
-                    <hourglass-icon class="panel__action-item__icon"></hourglass-icon>
-                    <div class="panel__action-item__text" data-bind="l10n_text: z.string.conversationDetailsActionTimedMessages"></div>
-                    <div class="panel__action-item__status" data-bind="l10n_text: timedMessagesText" data-uie-name="status-timed-messages"></div>
-                    <disclose-icon></disclose-icon>
-                  </div>
                 </div>
               <!-- /ko -->
             <!-- /ko -->
+            <!-- ko if: showActionTimedMessages() -->
+              <div class="conversation-details__timed-messages">
+                <div class="panel__action-item" data-bind="click: clickOnTimedMessages" data-uie-name="go-timed-messages">
+                  <hourglass-icon class="panel__action-item__icon"></hourglass-icon>
+                  <div class="panel__action-item__text" data-bind="l10n_text: z.string.conversationDetailsActionTimedMessages"></div>
+                  <div class="panel__action-item__status" data-bind="l10n_text: timedMessagesText" data-uie-name="status-timed-messages"></div>
+                  <disclose-icon></disclose-icon>
+                </div>
+              </div>
+            <!-- /ko -->
           </div>
         <!-- /ko -->
-
         <div class="conversation-details__participants">
           <!-- ko if: conversationEntity().is_group() -->
             <!-- ko if: userParticipants().length -->
