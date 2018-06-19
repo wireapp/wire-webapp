@@ -26,7 +26,8 @@ const QUERY = {
   mobile: `max-width: ${WIDTH.MOBILE}px`,
   mobileUp: `min-width: ${WIDTH.MOBILE}px`,
   tablet: `min-width: ${WIDTH.TABLET_MIN}px) and (max-width: ${WIDTH.TABLET_MAX}px`,
-  tabletDown: `min-width: ${WIDTH.TABLET_MAX}px`,
+  tabletDown: `max-width: ${WIDTH.TABLET_MAX}px`,
+  tabletUp: `min-width: ${WIDTH.TABLET_MIN}px`,
 };
 
 export default Object.entries(QUERY).reduce(
