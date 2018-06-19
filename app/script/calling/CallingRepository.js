@@ -376,7 +376,7 @@ z.calling.CallingRepository = class CallingRepository {
 
         const isSelfUser = userId === this.selfUserId();
         if (isSelfUser) {
-          this._remoteSelfJoin(callEntity, callMessageEntity);
+          return this._remoteSelfJoin(callEntity, callMessageEntity);
         }
 
         if (callEntity.isOutgoing()) {
