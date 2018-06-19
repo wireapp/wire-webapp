@@ -130,33 +130,38 @@ z.conversation.ConversationService = class ConversationService {
   }
 
   /**
-   * Update conversation properties.
+   * Update conversation's name
    *
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/updateConversation
    *
    * @param {string} conversation_id - ID of conversation to rename
-   * @param {Object} updates - object containing all the properties to update
-   *   handled properties:
-   *   {
-   *     name: {string} name of the conversation,
-   *     message_timer: {number} global message timer for the conversation
-   *   }
+   * @param {string} name - new name of the conversation
    * @returns {Promise} Resolves with the server response
    */
-  updateConversationProperties(conversation_id, updates) {
-    const handledProperties = ['name', 'message_timer'];
-    const updatesPayload = handledProperties.reduce((properties, propertyName) => {
-      return updates[propertyName]
-        ? Object.assign({}, properties, {[propertyName]: updates[propertyName]})
-        : properties;
-    }, {});
+  updateConversationName(conversation_id, name) {
     return this.client.send_json({
-      data: updatesPayload,
+      data: {name},
       type: 'PUT',
       url: this.client.create_url(`${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversation_id}`),
     });
   }
 
+  /**
+   * Update conversation's message timer value
+   *
+   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/updateConversation
+   *
+   * @param {string} conversation_id - ID of conversation to rename
+   * @param {number} messageTimer - new message timer of the conversation
+   * @returns {Promise} Resolves with the server response
+   */
+  updateConversationMessageTimer(conversation_id, messageTimer) {
+    return this.client.send_json({
+      data: {message_timer: messageTimer},
+      type: 'PUT',
+      url: this.client.create_url(`${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversation_id}/message-timer`),
+    });
+  }
   /**
    * Update self membership properties.
    *

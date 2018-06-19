@@ -1267,12 +1267,30 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when conversation was renamed
    */
   renameConversation(conversation_et, name) {
-    return this.conversation_service.updateConversationProperties(conversation_et.id, {name}).then(response => {
+    return this.conversation_service.updateConversationName(conversation_et.id, name).then(response => {
       if (response) {
         amplify.publish(z.event.WebApp.EVENT.INJECT, response, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
         return response;
       }
     });
+  }
+
+  /**
+   * Set the global message timer
+   *
+   * @param {Conversation} conversationEntity - Conversation to rename
+   * @param {number} messageTimer - New message timer value
+   * @returns {Promise} Resolves when conversation was updated on server side
+   */
+  updateConversationMessageTimer(conversationEntity, messageTimer) {
+    return this.conversation_service
+      .updateConversationMessageTimer(conversationEntity.id, messageTimer)
+      .then(response => {
+        if (response) {
+          amplify.publish(z.event.WebApp.EVENT.INJECT, response, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
+          return response;
+        }
+      });
   }
 
   reset_session(user_id, client_id, conversation_id) {
