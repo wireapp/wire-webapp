@@ -92,14 +92,19 @@ z.string.lt.authErrorSignIn = 'Patvirtinkite savo duomenis ir bandykite dar kart
 z.string.lt.callStateOutgoing = 'Kviečiama…';
 z.string.lt.callStateConnecting = 'Sujungiama…';
 z.string.lt.callStateIncoming = 'Skambinama…';
+z.string.lt.callStateIncomingGroup = '{{user}} jums skambina';
 z.string.lt.callDecline = 'Atmesti';
 z.string.lt.callAccept = 'Priimti';
 z.string.lt.callJoin = 'Prisijungti';
 z.string.lt.callChooseSharedScreen = 'Pasirinkite ekraną, kurį bendrinti';
 z.string.lt.callParticipants = '{{number}} kalba';
 
+z.string.lt.videoCallOverlayConversations = 'Susirašinėjimai';
 z.string.lt.videoCallOverlayMute = 'Nutildyti';
+z.string.lt.videoCallOverlayVideo = 'Vaizdas';
+z.string.lt.videoCallOverlayShareScreen = 'Siųsti ekrano vaizdą';
 z.string.lt.videoCallOverlayHangUp = 'Užbaigti';
+z.string.lt.videoCallPaused="Vaizdas pristabdytas";
 
 z.string.lt.modalAcknowledgeAction = 'Gerai';
 z.string.lt.modalAcknowledgeHeadline = 'Kažkas nutiko';
@@ -249,6 +254,9 @@ z.string.lt.modalPictureTooSmallHeadline = 'Paveikslėlis per mažas';
 z.string.lt.modalPictureTooSmallMessage = 'Pasirinkite bent 320 x 320 px dydžio paveikslėlį.';
 
 z.string.lt.modalImproveWireAction = 'Priimti';
+z.string.lt.modalImproveWireSecondary = 'Ne dabar';
+z.string.lt.modalImproveWireHeadline = 'Pagerinkite „Wire“';
+z.string.lt.modalImproveWireMessage = 'Siųsdami anoniminę naudojimosi ir trikčių ataskaitą padedate mums pagerinti produktus ir paslaugas. Šios informacijos daugiau niekur nenaudojame.';
 
 z.string.lt.modalServiceUnavailableHeadline = 'Paslaugos pridėjimas negalimas';
 z.string.lt.modalServiceUnavailableMessage = 'Paslauga šiuo metu negalima.';
@@ -353,6 +361,7 @@ z.string.lt.groupCreationParticipantsActionSkip = 'Praleisti';
 z.string.lt.groupCreationParticipantsHeader = 'Pridėti žmonių';
 z.string.lt.groupCreationParticipantsHeaderWithCounter = 'Pridėti žmonių ({{number}})';
 z.string.lt.groupCreationParticipantsPlaceholder = 'Ieškokite pagal vardą';
+z.string.lt.groupSizeInfo = 'Prie pokalbio gali prisijungti iki {{count}} pašnekovų. Vaizdo skambučiai veikai grupėse iki 4 pašnekovų.';
 
 z.string.lt.guestRoomConversationName = 'Svečio kambarys';
 z.string.lt.guestRoomToggleName = 'Leisti svečius';
@@ -390,6 +399,7 @@ z.string.lt.conversationsPopoverNotify = 'Įjungti susirašinėjimo pranešimus'
 z.string.lt.conversationsPopoverSilence = 'Išjungti susirašinėjimo pranešimus';
 z.string.lt.conversationsPopoverUnarchive = 'Išimti susirašinėjimą iš archyvo';
 
+z.string.lt.conversationsSecondaryLineIncomingCall = '{{user}} jums skambina';
 z.string.lt.conversationsSecondaryLineMissedCall = '{{number}} praleistas skambutis';
 z.string.lt.conversationsSecondaryLineMissedCalls = '{{number}} praleistų skambučių';
 z.string.lt.conversationsSecondaryLineNewMessage = '{{number}} nauja žinutė';
@@ -515,11 +525,16 @@ z.string.lt.preferencesAboutWebsite = 'Wire svetainė';
 
 z.string.lt.preferencesAccountAvaibilityUnset = 'Pasirinkite būseną';
 z.string.lt.preferencesAccountCreateTeam = 'Sukurti komandą';
+z.string.lt.preferencesAccountData = 'Duomenų naudojimo leidimas';
+z.string.lt.preferencesAccountDataCheckbox = 'Siųsti anoniminę nformaciją';
+z.string.lt.preferencesAccountDataDetail = 'Pagerinkite „Wire“ siųsdami anoniminę naudojimosi ir trikčių ataskaitą.';
 z.string.lt.preferencesAccountDelete = 'Ištrinti paskyrą';
 z.string.lt.preferencesAccountLeaveGuestRoom = 'Išeiti iš svečių kambario';
 z.string.lt.preferencesAccountLeaveGuestRoomDescription = 'Nebegalėsite matyti šio susirašinėjimo žinučių.';
 z.string.lt.preferencesAccountLogOut = 'Atsijungti';
 z.string.lt.preferencesAccountManageTeam = 'Tvarkyti komandą';
+z.string.lt.preferencesAccountMarketingConsentCheckbox = 'Gaukite naujienlaiškį';
+z.string.lt.preferencesAccountMarketingConsentDetail = 'Gaukite naujienas ir produktų pakeitimo informaciją iš „Wire“ el. paštu.';
 z.string.lt.preferencesAccountResetPassword = 'Atstatyti slaptažodį';
 z.string.lt.preferencesAccountTeam = 'komandoje {{name}}';
 z.string.lt.preferencesAccountUsernamePlaceholder = 'Jūsų vardas ir pavardė';

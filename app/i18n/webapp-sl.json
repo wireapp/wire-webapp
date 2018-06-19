@@ -44,7 +44,7 @@
   "acceptNewsModal.headline": "",
   "acceptNewsModal.unsubscribeDescription": "",
   "acceptNewsModal.privacyDescription": "",
-  "acceptNewsModal.declineButton": "",
+  "acceptNewsModal.declineButton": "Zavrni",
   "acceptNewsModal.confirmButton": "Sprejmi",
   "unsupported.headlineBrowser": "",
   "unsupported.subheadBrowser": "",

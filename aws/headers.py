@@ -95,10 +95,8 @@ CSP = {
 
 CSP_VALUES = '; '.join('{} {}'.format(key, ' '.join(value) if type(value) == list else value) for key, value in CSP.items())
 
-
 def update_headers(response):
   response.headers['Content-Security-Policy'] = CSP_VALUES
-  response.headers['Expect-CT'] = 'max-age=0, report-uri="https://wire.report-uri.com/r/d/ct/reportOnly"'
   response.headers['Referrer-Policy'] = 'same-origin'
   response.headers['Server'] = 'Wire'
   response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains; preload'

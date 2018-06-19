@@ -76,20 +76,17 @@ z.media.MediaConstraintsHandler = class MediaConstraintsHandler {
    * @param {boolean} [requestAudio=false] - Request audio in the constraints
    * @param {boolean} [requestVideo=false] - Request video in the constraints
    * @param {boolean} [isGroup=false] - Get constraints for group
-   * @returns {Promise} Resolves with MediaStreamConstraints and their type
+   * @returns {Promise} Resolves with MediaStreamConstraints
    */
   getMediaStreamConstraints(requestAudio = false, requestVideo = false, isGroup = false) {
     return Promise.resolve().then(() => {
       const currentDeviceId = this.mediaRepository.devicesHandler.currentDeviceId;
       const mode = isGroup ? z.media.VIDEO_QUALITY_MODE.GROUP : z.media.VIDEO_QUALITY_MODE.MOBILE;
 
-      const streamConstraints = {
+      return {
         audio: requestAudio ? this._getAudioStreamConstraints(currentDeviceId.audioInput()) : undefined,
         video: requestVideo ? this._getVideoStreamConstraints(currentDeviceId.videoInput(), mode) : undefined,
       };
-      const mediaType = requestVideo ? z.media.MediaType.VIDEO : z.media.MediaType.AUDIO;
-
-      return {mediaType, streamConstraints};
     });
   }
 
@@ -129,10 +126,7 @@ z.media.MediaConstraintsHandler = class MediaConstraintsHandler {
         },
       };
 
-      return Promise.resolve({
-        mediaType: z.media.MediaType.SCREEN,
-        streamConstraints,
-      });
+      return Promise.resolve(streamConstraints);
     }
 
     if (z.util.Environment.browser.firefox) {
@@ -145,10 +139,7 @@ z.media.MediaConstraintsHandler = class MediaConstraintsHandler {
         },
       };
 
-      return Promise.resolve({
-        mediaType: z.media.MediaType.SCREEN,
-        streamConstraints,
-      });
+      return Promise.resolve(streamConstraints);
     }
 
     return Promise.reject(new z.media.MediaError(z.media.MediaError.TYPE.SCREEN_NOT_SUPPORTED));

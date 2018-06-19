@@ -44,7 +44,7 @@
   "acceptNewsModal.headline": "",
   "acceptNewsModal.unsubscribeDescription": "",
   "acceptNewsModal.privacyDescription": "",
-  "acceptNewsModal.declineButton": "Не зараз",
+  "acceptNewsModal.declineButton": "Скасувати",
   "acceptNewsModal.confirmButton": "Прийняти",
   "unsupported.headlineBrowser": "",
   "unsupported.subheadBrowser": "",

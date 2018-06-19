@@ -25,6 +25,7 @@ window.z.components = z.components || {};
 z.components.GroupVideoGrid = class GroupVideoGrid {
   static get CONFIG() {
     return {
+      CONTAIN_CLASS: 'group-video-grid__element-video--contain',
       VIDEO_ELEMENT_SIZE: {
         FOURTH_SCREEN: 'fourth_screen',
         FULL_SCREEN: 'full_screen',
@@ -50,44 +51,28 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
 
     // scale videos when the grid is updated (on the next rendering cycle)
     this.grid.subscribe(() => z.util.afterRender(this.scaleVideos));
-
-    // scale the videos when the window is resized
-    window.addEventListener('resize', this.scaleVideos);
   }
 
   scaleVideos(rootElement) {
     const elements = Array.from(rootElement.querySelectorAll('.group-video-grid__element'));
-    const setScale = (video, containerRatio) => {
-      const fullHeightClass = 'group-video-grid__element-video--fill-height';
-      const fullWidthClass = 'group-video-grid__element-video--fill-width';
-      const videoRatio = video.videoWidth / video.videoHeight;
-      video.classList.remove(fullHeightClass);
-      video.classList.remove(fullWidthClass);
-
-      const isPortrait = videoRatio > containerRatio || video.videoWidth < video.videoHeight;
-      const fillClasses = isPortrait ? fullHeightClass : fullWidthClass;
-      video.classList.add(fillClasses);
+    const setScale = video => {
+      const isPortrait = video.videoHeight > video.videoWidth;
+      video.classList.toggle(GroupVideoGrid.CONFIG.CONTAIN_CLASS, isPortrait);
     };
 
     elements.forEach(element => {
-      const containerRect = element.getBoundingClientRect();
-      const containerRatio = containerRect.width / containerRect.height;
       const videoElement = element.querySelector('video');
-      const handleLoadEvent = event => {
-        const video = event.target;
-        setScale(video, containerRatio);
-      };
-
       if (videoElement.videoWidth > 0) {
-        setScale(videoElement, containerRatio);
+        z.util.afterRender(() => setScale(videoElement));
       } else {
-        videoElement.addEventListener('loadedmetadata', handleLoadEvent, {once: true});
+        videoElement.addEventListener('loadedmetadata', () => setScale(videoElement), {once: true});
       }
     });
   }
 
-  dispose() {
-    window.removeEventListener('resize', this.scaleVideos);
+  doubleClickedOnVideo(data, event) {
+    const childVideo = event.currentTarget.querySelector('video');
+    childVideo.classList.toggle(GroupVideoGrid.CONFIG.CONTAIN_CLASS);
   }
 
   getStreamInfo(id) {
@@ -145,7 +130,7 @@ ko.components.register('group-video-grid', {
       <div class="group-video" data-bind="template: {afterRender: scaleVideos}">
         <div class="group-video-grid" data-bind="foreach: {data: grid, as: 'id'}, css: {'group-video-grid--black-background': hasBlackBackground()}">
           <!-- ko if: id !== 0 -->
-            <div class="group-video-grid__element" data-bind="css: $parent.getClassNameForVideo($index(), $parent.getStreamInfo(id).isSelf && $parent.getStreamInfo(id).videoSend()), attr: {'data-uie-name': 'item-grid', 'data-uie-value': $parent.getUIEValueForVideo($index())}">
+            <div class="group-video-grid__element" data-bind="css: $parent.getClassNameForVideo($index(), $parent.getStreamInfo(id).isSelf && $parent.getStreamInfo(id).videoSend()), attr: {'data-uie-name': 'item-grid', 'data-uie-value': $parent.getUIEValueForVideo($index())}, event: {dblclick: $parent.doubleClickedOnVideo}">
               <video autoplay class="group-video-grid__element-video" data-bind="sourceStream: $parent.getStreamInfo(id).stream, muteMediaElement: $parent.getStreamInfo(id).stream">
               </video>
               <!-- ko if: $parent.getStreamInfo(id).isSelf && !$parent.getStreamInfo(id).audioSend() && !$parent.minimized -->

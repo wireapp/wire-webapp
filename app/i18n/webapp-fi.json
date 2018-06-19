@@ -44,7 +44,7 @@
   "acceptNewsModal.headline": "",
   "acceptNewsModal.unsubscribeDescription": "",
   "acceptNewsModal.privacyDescription": "",
-  "acceptNewsModal.declineButton": "",
+  "acceptNewsModal.declineButton": "Kieltäydy",
   "acceptNewsModal.confirmButton": "Hyväksy",
   "unsupported.headlineBrowser": "",
   "unsupported.subheadBrowser": "",
