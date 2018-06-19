@@ -40,7 +40,7 @@ ko.components.register('guest-mode-toggle', {
         <label class="button-label" for="toggle" data-bind="click: onToggle, attr: {'data-uie-value': isChecked() ? 'checked': 'unchecked'}" data-uie-name="do-allow-guests" ></label>
       </div>
     </div>
-    <div class="guest-mode-toggle-info" data-bind="text: infoText" data-uie-name="status-guest-toggle"></div>
+    <div class="panel__info-text guest-mode-toggle-info" data-bind="text: infoText" data-uie-name="status-guest-toggle"></div>
   `,
   viewModel: z.components.GuestModeToggle,
 });
