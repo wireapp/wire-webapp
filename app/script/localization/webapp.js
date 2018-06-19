@@ -536,6 +536,7 @@ z.string.timedMessagesMinute = 'minute';
 z.string.timedMessagesMinutes = 'minutes';
 z.string.timedMessagesSecond = 'second';
 z.string.timedMessagesSeconds = 'seconds';
+z.string.timedMessageDisclaimer = 'Timed messages will be turned on for all the participants in this conversation.';
 
 // Panel: Participant devices
 z.string.participantDevicesDetailHeadline = 'Verify that this matches the fingerprint shown on {{html1}}{{user}}’s device{{html2}}.';

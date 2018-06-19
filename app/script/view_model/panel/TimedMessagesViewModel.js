@@ -47,9 +47,15 @@ z.viewModel.panel.TimedMessagesViewModel = class TimedMessagesViewModel {
       }))
     );
 
+    this.isRendered = ko.observable(false).extend({notify: 'always'});
+
     this.currentMessageTimer = ko.pureComputed(() => {
       return this.conversationEntity().hasGlobalMessageTimer() ? this.conversationEntity().messageTimer() : 0;
     });
+
+    this.shouldUpdateScrollbar = ko
+      .pureComputed(() => this.isRendered())
+      .extend({notify: 'always', rateLimit: {method: 'notifyWhenChangesStop', timeout: 0}});
 
     this.clickOnMessageTime = this.clickOnMessageTime.bind(this);
     this.clickOnMessageTimeOff = this.clickOnMessageTimeOff.bind(this);

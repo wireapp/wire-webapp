@@ -11,7 +11,7 @@
           <guest-mode-toggle params="isChecked: isGuestEnabled(), onToggle: toggleAccessState, isDisabled: requestOngoing"></guest-mode-toggle>
         </div>
         <!-- ko if: showLinkOptions() -->
-          <div class="guest-options__info">
+          <div class="guest-options__info panel__info-text">
             <div class="guest-options__info__head" data-bind="l10n_text: z.string.guestOptionsInfoHeader"></div>
             <div data-bind="l10n_text: z.string.guestOptionsInfoText" data-uie-name="status-guest-options-info"></div>
           </div>
