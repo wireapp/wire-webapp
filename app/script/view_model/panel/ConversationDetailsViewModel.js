@@ -235,7 +235,7 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
     const hasNameChanged = newConversationName.length && newConversationName !== currentConversationName;
     if (hasNameChanged) {
       event.target.value = currentConversationName;
-      this.conversationRepository.rename_conversation(this.conversationEntity(), newConversationName);
+      this.conversationRepository.renameConversation(this.conversationEntity(), newConversationName);
     }
   }
 };

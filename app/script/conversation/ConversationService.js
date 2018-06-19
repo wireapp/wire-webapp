@@ -135,14 +135,17 @@ z.conversation.ConversationService = class ConversationService {
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/updateConversation
    *
    * @param {string} conversation_id - ID of conversation to rename
-   * @param {string} name - New conversation name
+   * @param {Object} updates - object containing all the properties to update
+   *   handled properties:
+   *   {
+   *     name: {string} name of the conversation,
+   *     message_timer: {number} global time for the conversation
+   *   }
    * @returns {Promise} Resolves with the server response
    */
-  update_conversation_properties(conversation_id, name) {
+  updateConversationProperties(conversation_id, updates) {
     return this.client.send_json({
-      data: {
-        name: name,
-      },
+      data: updates,
       type: 'PUT',
       url: this.client.create_url(`${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversation_id}`),
     });
