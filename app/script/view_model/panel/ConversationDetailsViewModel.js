@@ -150,6 +150,14 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
       return this.isTeamOnly() ? z.string.conversationDetailsGuestsOff : z.string.conversationDetailsGuestsOn;
     });
 
+    this.timedMessagesText = ko.pureComputed(() => {
+      const conversation = this.conversationEntity();
+      const hasMessageTimeSet = conversation.messageTimer() && conversation.hasGlobalMessageTimer();
+      return hasMessageTimeSet
+        ? z.util.formatTime(conversation.messageTimer())
+        : z.l10n.text(z.string.timedMessagesOff);
+    });
+
     this.shouldUpdateScrollbar = ko
       .computed(() => this.serviceParticipants() && this.userParticipants() && this.isVisible())
       .extend({notify: 'always', rateLimit: {method: 'notifyWhenChangesStop', timeout: 0}});
@@ -178,6 +186,10 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
 
   clickOnGuestOptions() {
     this.panelViewModel.switchState(z.viewModel.PanelViewModel.STATE.GUEST_OPTIONS);
+  }
+
+  clickOnTimedMessages() {
+    this.panelViewModel.switchState(z.viewModel.PanelViewModel.STATE.TIMED_MESSAGES);
   }
 
   clickOnShowUser(userEntity) {

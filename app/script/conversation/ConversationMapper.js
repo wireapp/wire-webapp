@@ -103,7 +103,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
       }
 
       if (ephemeral_timer !== undefined) {
-        conversation_et.ephemeral_timer(ephemeral_timer);
+        conversation_et.localMessageTimer(ephemeral_timer);
       }
 
       if (last_event_timestamp) {

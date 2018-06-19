@@ -544,13 +544,13 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     }
 
     if (document.hasFocus()) {
-      this.conversation_repository.check_ephemeral_timer(message_et);
+      this.conversation_repository.checkMessageTimer(message_et);
     } else {
       const start_timer_on_focus = this.conversation.id;
 
       $(window).one('focus', () => {
         if (start_timer_on_focus === this.conversation.id) {
-          this.conversation_repository.check_ephemeral_timer(message_et);
+          this.conversation_repository.checkMessageTimer(message_et);
         }
       });
     }
