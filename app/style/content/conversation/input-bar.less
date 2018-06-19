@@ -117,8 +117,6 @@
 
 .ephemeral-timer-button {
   .circle(@avatar-diameter-xs);
-  .accent-color;
-  .accent-border-color(24%);
 
   position: relative;
   margin: 4px;
@@ -129,6 +127,20 @@
   font-weight: @font-weight-bold;
   line-height: @avatar-diameter-xs - 2;
   text-align: center;
+
+  svg path {
+    fill: currentColor;
+  }
+
+  &--disabled {
+    border-color: fade(@graphite, 24%);
+    color: @graphite;
+  }
+
+  &--enabled {
+    .accent-color;
+    .accent-border-color(24%);
+  }
 }
 
 .ephemeral-timer-button-unit {

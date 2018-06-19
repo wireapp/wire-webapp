@@ -487,6 +487,7 @@ z.string.conversationDetailsActionClear = 'Delete content…';
 z.string.conversationDetailsActionCreateGroup = 'Create group';
 z.string.conversationDetailsActionDevices = 'Devices';
 z.string.conversationDetailsActionGuestOptions = 'Guest options';
+z.string.conversationDetailsActionTimedMessages = 'Timed messages';
 z.string.conversationDetailsActionLeave = 'Leave group…';
 z.string.conversationDetailsGuestsOff = 'Off';
 z.string.conversationDetailsGuestsOn = 'On';
@@ -519,6 +520,22 @@ z.string.guestOptionsInfoHeader = 'Invite others with a link';
 z.string.guestOptionsInfoText = 'Anyone with the link can join the conversation, even if they don’t have Wire.';
 z.string.guestOptionsRevokeLink = 'Revoke link…';
 z.string.guestOptionsTitle = 'Guest options';
+
+// Panel: Timed messages
+z.string.timedMessagesTitle = 'Timed messages';
+z.string.timedMessagesOff = 'Off';
+z.string.timedMessagesMonth = 'month';
+z.string.timedMessagesMonths = 'months';
+z.string.timedMessagesWeek = 'week';
+z.string.timedMessagesWeeks = 'weeks';
+z.string.timedMessagesDay = 'day';
+z.string.timedMessagesDays = 'days';
+z.string.timedMessagesHour = 'hour';
+z.string.timedMessagesHours = 'hours';
+z.string.timedMessagesMinute = 'minute';
+z.string.timedMessagesMinutes = 'minutes';
+z.string.timedMessagesSecond = 'second';
+z.string.timedMessagesSeconds = 'seconds';
 
 // Panel: Participant devices
 z.string.participantDevicesDetailHeadline = 'Verify that this matches the fingerprint shown on {{html1}}{{user}}’s device{{html2}}.';

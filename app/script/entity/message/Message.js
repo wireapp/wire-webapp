@@ -35,7 +35,7 @@ z.entity.Message = class Message {
   constructor(id = '0', super_type = '') {
     this.equals = this.equals.bind(this);
     this.is_expired = this.is_expired.bind(this);
-    this.start_ephemeral_timer = this.start_ephemeral_timer.bind(this);
+    this.startMessageTimer = this.startMessageTimer.bind(this);
     this.id = id;
     this.super_type = super_type;
     this.ephemeral_caption = ko.observable('');
@@ -260,7 +260,7 @@ z.entity.Message = class Message {
   }
 
   // Start the ephemeral timer for the message.
-  start_ephemeral_timer() {
+  startMessageTimer() {
     if (this.ephemeral_timeout_id) {
       return;
     }

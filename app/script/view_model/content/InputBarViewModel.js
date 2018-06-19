@@ -67,13 +67,14 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
     this.ephemeralTimerText = ko.pureComputed(() => {
       if (this.hasEphemeralTimer()) {
-        return z.util.TimeUtil.formatMilliseconds(this.conversationEntity().ephemeral_timer());
+        return z.util.TimeUtil.formatMilliseconds(this.conversationEntity().messageTimer());
       }
       return {};
     });
     this.hasEphemeralTimer = ko.pureComputed(() => {
-      return this.conversationEntity() ? this.conversationEntity().ephemeral_timer() : false;
+      return this.conversationEntity() ? this.conversationEntity().messageTimer() : false;
     });
+    this.isTimerDisabled = ko.pureComputed(() => this.conversationEntity().hasGlobalMessageTimer());
     this.hasFocus = ko.pureComputed(() => this.isEditing() || this.conversationHasFocus()).extend({notify: 'always'});
     this.hasTextInput = ko.pureComputed(() => {
       return this.conversationEntity() ? this.conversationEntity().input().length > 0 : false;
@@ -123,7 +124,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
         return z.l10n.text(stringId, userEntity.first_name());
       }
 
-      stringId = this.conversationEntity().ephemeral_timer()
+      stringId = this.conversationEntity().messageTimer()
         ? z.string.tooltipConversationEphemeral
         : z.string.tooltipConversationInputPlaceholder;
 
@@ -216,6 +217,10 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
    * @returns {undefined} No return value
    */
   clickOnEphemeral(data, event) {
+    if (this.isTimerDisabled()) {
+      return event.preventDefault();
+    }
+
     const entries = [
       {
         click: () => this.setEphemeralTimer(0),
@@ -391,11 +396,11 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     const conversationName = this.conversationEntity().display_name();
 
     if (!milliseconds) {
-      this.conversationEntity().ephemeral_timer(false);
+      this.conversationEntity().localMessageTimer(0);
       return this.logger.info(`Ephemeral timer for conversation '${conversationName}' turned off.`);
     }
 
-    this.conversationEntity().ephemeral_timer(milliseconds);
+    this.conversationEntity().localMessageTimer(milliseconds);
     this.logger.info(`Ephemeral timer for conversation '${conversationName}' is now at '${milliseconds}'.`);
   }
 

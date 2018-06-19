@@ -667,11 +667,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Conversation} Conversation is locally available
    */
   _find_conversation_by_id(conversation_id) {
-    for (const conversation of this.conversations()) {
-      if (conversation.id === conversation_id) {
-        return conversation;
-      }
-    }
+    return this.conversations().find(conversation => conversation.id === conversation_id);
   }
 
   get_all_users_in_conversation(conversation_id) {
@@ -1579,14 +1575,14 @@ z.conversation.ConversationRepository = class ConversationRepository {
         genericMessage = new z.proto.GenericMessage(messageId);
         genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, asset);
 
-        if (conversationEntity.ephemeral_timer()) {
-          genericMessage = this._wrap_in_ephemeral_message(genericMessage, conversationEntity.ephemeral_timer());
+        if (conversationEntity.messageTimer()) {
+          genericMessage = this._wrap_in_ephemeral_message(genericMessage, conversationEntity.messageTimer());
         }
 
         return this.send_generic_message_to_conversation(conversationEntity.id, genericMessage);
       })
       .then(payload => {
-        const {uploaded: assetData} = conversationEntity.ephemeral_timer()
+        const {uploaded: assetData} = conversationEntity.messageTimer()
           ? genericMessage.ephemeral.asset
           : genericMessage.asset;
 
@@ -1641,8 +1637,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
         let generic_message = new z.proto.GenericMessage(z.util.createRandomUuid());
         generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, asset);
 
-        if (conversation_et.ephemeral_timer()) {
-          generic_message = this._wrap_in_ephemeral_message(generic_message, conversation_et.ephemeral_timer());
+        if (conversation_et.messageTimer()) {
+          generic_message = this._wrap_in_ephemeral_message(generic_message, conversation_et.messageTimer());
         }
 
         return this._send_and_inject_generic_message(conversation_et, generic_message);
@@ -1809,8 +1805,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
         let genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
         genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, asset);
 
-        if (conversationEntity.ephemeral_timer()) {
-          genericMessage = this._wrap_in_ephemeral_message(genericMessage, conversationEntity.ephemeral_timer());
+        if (conversationEntity.messageTimer()) {
+          genericMessage = this._wrap_in_ephemeral_message(genericMessage, conversationEntity.messageTimer());
         }
 
         return this._send_and_inject_generic_message(conversationEntity, genericMessage);
@@ -1831,8 +1827,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
     let generic_message = new z.proto.GenericMessage(z.util.createRandomUuid());
     generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.KNOCK, new z.proto.Knock(false));
 
-    if (conversation_et.ephemeral_timer()) {
-      generic_message = this._wrap_in_ephemeral_message(generic_message, conversation_et.ephemeral_timer());
+    if (conversation_et.messageTimer()) {
+      generic_message = this._wrap_in_ephemeral_message(generic_message, conversation_et.messageTimer());
     }
 
     return this._send_and_inject_generic_message(conversation_et, generic_message).catch(error => {
@@ -2026,8 +2022,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
     let generic_message = new z.proto.GenericMessage(z.util.createRandomUuid());
     generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT, new z.proto.Text(message));
 
-    if (conversation_et.ephemeral_timer()) {
-      generic_message = this._wrap_in_ephemeral_message(generic_message, conversation_et.ephemeral_timer());
+    if (conversation_et.messageTimer()) {
+      generic_message = this._wrap_in_ephemeral_message(generic_message, conversation_et.messageTimer());
     }
 
     return this._send_and_inject_generic_message(conversation_et, generic_message).then(() => generic_message);
@@ -2577,16 +2573,16 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {Message} message_et - Message to check
    * @returns {undefined} No return value
    */
-  check_ephemeral_timer(message_et) {
+  checkMessageTimer(message_et) {
     switch (message_et.ephemeral_status()) {
       case z.message.EphemeralStatusType.TIMED_OUT:
         this.timeout_ephemeral_message(message_et);
         break;
       case z.message.EphemeralStatusType.ACTIVE:
-        message_et.start_ephemeral_timer();
+        message_et.startMessageTimer();
         break;
       case z.message.EphemeralStatusType.INACTIVE:
-        message_et.start_ephemeral_timer();
+        message_et.startMessageTimer();
         this.conversation_service.update_message_in_db(message_et, {
           ephemeral_expires: message_et.ephemeral_expires(),
           ephemeral_started: message_et.ephemeral_started(),

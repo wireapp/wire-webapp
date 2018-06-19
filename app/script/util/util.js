@@ -597,6 +597,46 @@ z.util.formatTimeRemaining = timeRemaining => {
   return title || '';
 };
 
+z.util.formatTime = time => {
+  const momentDuration = moment.duration(time);
+  const units = [
+    {
+      count: momentDuration.months(),
+      plural: z.string.timedMessagesMonths,
+      singular: z.string.timedMessagesMonth,
+    },
+    {
+      count: momentDuration.weeks(),
+      plural: z.string.timedMessagesWeeks,
+      singular: z.string.timedMessagesWeek,
+    },
+    {
+      count: momentDuration.days(),
+      plural: z.string.timedMessagesDays,
+      singular: z.string.timedMessagesDay,
+    },
+    {
+      count: momentDuration.hours(),
+      plural: z.string.timedMessagesHours,
+      singular: z.string.timedMessagesHour,
+    },
+    {
+      count: momentDuration.minutes(),
+      plural: z.string.timedMessagesMinutes,
+      singular: z.string.timedMessagesMinute,
+    },
+    {
+      count: momentDuration.seconds(),
+      plural: z.string.timedMessagesSeconds,
+      singular: z.string.timedMessagesSecond,
+    },
+  ];
+  const upperUnit = units.find(unit => unit.count > 0);
+  return upperUnit.count === 1
+    ? `1 ${z.l10n.text(upperUnit.singular)}`
+    : `${upperUnit.count} ${z.l10n.text(upperUnit.plural)}`;
+};
+
 // https://developer.mozilla.org/en-US/Firefox/Performance_best_practices_for_Firefox_fe_engineers
 z.util.afterRender = callback => window.requestAnimationFrame(() => window.setTimeout(callback, 0));
 

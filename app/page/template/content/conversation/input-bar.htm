@@ -17,7 +17,6 @@
                   class="conversation-input-bar-text border-theme"
                   data-bind="event: {'keydown': onInputKeyDown, 'keyup': onInputKeyUp},
                              focus_on_keydown: true,
-                             css: {'ephemeral-input': hasEphemeralTimer() && !showAvailabilityTooltip()},
                              enter: onInputEnter,
                              hasFocus: hasFocus,
                              textInput: input,
@@ -43,11 +42,12 @@
           <!-- ko ifnot: input().length -->
             <span id="conversation-input-bar-ephemeral"
                   class="controls-right-button conversation-input-bar-ephemeral"
-                  data-bind="click: clickOnEphemeral, l10n_tooltip: z.string.tooltipConversationEphemeral"
-                  data-uie-name="do-set-ephemeral-timer">
+                  data-bind="click: clickOnEphemeral, l10n_tooltip: z.string.tooltipConversationEphemeral, attr: {'data-uie-value': isTimerDisabled() ? 'disabled' : 'enabled'}"
+                  data-uie-name="do-set-ephemeral-timer"
+                  data-uie-value>
               <!-- ko if: hasEphemeralTimer() && conversationEntity()-->
-                <div class="ephemeral-timer-button">
-                  <span class="ephemeral-timer-button-unit svg-ephemeral text-ephemeral" data-bind="text: ephemeralTimerText().unit"></span>
+                <div class="ephemeral-timer-button" data-bind="css: isTimerDisabled() ? 'ephemeral-timer-button--disabled' : 'ephemeral-timer-button--enabled'">
+                  <span class="ephemeral-timer-button-unit" data-bind="text: ephemeralTimerText().unit"></span>
                   <span class="full-screen" data-bind="text: ephemeralTimerText().value"></span>
                 </div>
               <!-- /ko -->
