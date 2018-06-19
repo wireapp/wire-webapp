@@ -85,6 +85,8 @@ z.calling.entities.ParticipantEntity = class ParticipantEntity {
       }),
     };
 
+    this.hasActiveVideo = ko.pureComputed(() => this.activeState.screenSend() || this.activeState.videoSend());
+
     this.flowEntity = new z.calling.entities.FlowEntity(this.callEntity, this, timings);
 
     this.isConnected.subscribe(isConnected => {
@@ -142,21 +144,21 @@ z.calling.entities.ParticipantEntity = class ParticipantEntity {
   updateProperties(properties) {
     return Promise.resolve().then(() => {
       if (properties) {
-        const {audiosend: audioSend, screensend: screenSend, videosend: videoSend} = properties;
+        const {audiosend, screensend, videosend} = properties;
 
-        const hasAudioSend = ParticipantEntity.CONFIG.PROPERTY_STATES.EXPECTED.includes(audioSend);
+        const hasAudioSend = ParticipantEntity.CONFIG.PROPERTY_STATES.EXPECTED.includes(audiosend);
         if (hasAudioSend) {
-          this.state.audioSend(audioSend);
+          this.state.audioSend(audiosend);
         }
 
-        const hasScreenSend = ParticipantEntity.CONFIG.PROPERTY_STATES.EXPECTED.includes(screenSend);
+        const hasScreenSend = ParticipantEntity.CONFIG.PROPERTY_STATES.EXPECTED.includes(screensend);
         if (hasScreenSend) {
-          this.state.screenSend(hasScreenSend);
+          this.state.screenSend(screensend);
         }
 
-        const hasVideoSend = ParticipantEntity.CONFIG.PROPERTY_STATES.EXPECTED.includes(videoSend);
+        const hasVideoSend = ParticipantEntity.CONFIG.PROPERTY_STATES.EXPECTED.includes(videosend);
         if (hasVideoSend) {
-          this.state.videoSend(videoSend);
+          this.state.videoSend(videosend);
         }
       }
     });

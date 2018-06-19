@@ -19,7 +19,7 @@
 
 'use strict';
 
-// grunt test_init && grunt test_run:components/groupVideoGrid
+// grunt test_init && grunt test_run:calling/videoGridRepository
 
 describe('z.calling.VideoGridRepository', () => {
   let groupVideoGrid;
@@ -138,22 +138,19 @@ describe('z.calling.VideoGridRepository', () => {
       const remoteVideos = [{flowId: 'user-1', stream: {}}];
       groupVideoGrid = new z.calling.VideoGridRepository(
         generateCallingRepository({
-          calls: ko.observableArray([
-            {
-              participants: () => [generateParticipant('user-1', true)],
-            },
-          ]),
-          selfStreamState: {
-            audioSend: ko.observable(true),
-            screenSend: ko.observable(true),
-            videoSend: ko.observable(true),
-          },
+          calls: ko.observableArray([{participants: () => [generateParticipant('user-1', true)]}]),
         }),
         generateMediaRepository({
           streamHandler: {
+            hasActiveVideo: ko.observable(true),
             localMediaStream: ko.observable(selfVideo),
             remoteMediaStreamInfoIndex: {
               video: ko.observableArray(remoteVideos),
+            },
+            selfStreamState: {
+              audioSend: ko.observable(true),
+              screenSend: ko.observable(false),
+              videoSend: ko.observable(true),
             },
           },
         })
@@ -183,9 +180,15 @@ describe('z.calling.VideoGridRepository', () => {
         }),
         generateMediaRepository({
           streamHandler: {
+            hasActiveVideo: ko.observable(true),
             localMediaStream: ko.observable(),
             remoteMediaStreamInfoIndex: {
               video: ko.observableArray(remoteVideos),
+            },
+            selfStreamState: {
+              audioSend: ko.observable(true),
+              screenSend: ko.observable(false),
+              videoSend: ko.observable(true),
             },
           },
         })
@@ -201,18 +204,18 @@ describe('z.calling.VideoGridRepository', () => {
       nbOfRemoteStreams.forEach(nbOfStreams => {
         const remoteStreams = new Array(nbOfStreams).fill({remote: true, stream: {}});
         groupVideoGrid = new z.calling.VideoGridRepository(
-          generateCallingRepository({
-            selfStreamState: {
-              audioSend: ko.observable(true),
-              screenSend: ko.observable(true),
-              videoSend: ko.observable(true),
-            },
-          }),
+          generateCallingRepository(),
           generateMediaRepository({
             streamHandler: {
+              hasActiveVideo: ko.observable(true),
               localMediaStream: ko.observable(selfVideo),
               remoteMediaStreamInfoIndex: {
                 video: ko.observableArray(remoteStreams),
+              },
+              selfStreamState: {
+                audioSend: ko.observable(true),
+                screenSend: ko.observable(false),
+                videoSend: ko.observable(true),
               },
             },
           })
@@ -226,18 +229,18 @@ describe('z.calling.VideoGridRepository', () => {
     it('contains the self stream only if video or screen is send', () => {
       const selfStream = {self: true};
       groupVideoGrid = new z.calling.VideoGridRepository(
-        generateCallingRepository({
-          selfStreamState: {
-            audioSend: ko.observable(true),
-            screenSend: ko.observable(false),
-            videoSend: ko.observable(true),
-          },
-        }),
+        generateCallingRepository(),
         generateMediaRepository({
           streamHandler: {
+            hasActiveVideo: ko.observable(true),
             localMediaStream: ko.observable(selfStream),
             remoteMediaStreamInfoIndex: {
               video: ko.observableArray([]),
+            },
+            selfStreamState: {
+              audioSend: ko.observable(true),
+              screenSend: ko.observable(false),
+              videoSend: ko.observable(true),
             },
           },
         })
@@ -246,18 +249,18 @@ describe('z.calling.VideoGridRepository', () => {
       expect(groupVideoGrid.streams()[0].stream).toBe(selfStream);
 
       groupVideoGrid = new z.calling.VideoGridRepository(
-        generateCallingRepository({
-          selfStreamState: {
-            audioSend: ko.observable(true),
-            screenSend: ko.observable(false),
-            videoSend: ko.observable(false),
-          },
-        }),
+        generateCallingRepository(),
         generateMediaRepository({
           streamHandler: {
+            hasActiveVideo: ko.observable(false),
             localMediaStream: ko.observable(selfStream),
             remoteMediaStreamInfoIndex: {
               video: ko.observableArray([]),
+            },
+            selfStreamState: {
+              audioSend: ko.observable(true),
+              screenSend: ko.observable(false),
+              videoSend: ko.observable(false),
             },
           },
         })
@@ -266,18 +269,18 @@ describe('z.calling.VideoGridRepository', () => {
       expect(groupVideoGrid.streams()).toEqual([]);
 
       groupVideoGrid = new z.calling.VideoGridRepository(
-        generateCallingRepository({
-          selfStreamState: {
-            audioSend: ko.observable(true),
-            screenSend: ko.observable(true),
-            videoSend: ko.observable(false),
-          },
-        }),
+        generateCallingRepository(),
         generateMediaRepository({
           streamHandler: {
+            hasActiveVideo: ko.observable(true),
             localMediaStream: ko.observable(selfStream),
             remoteMediaStreamInfoIndex: {
               video: ko.observableArray([]),
+            },
+            selfStreamState: {
+              audioSend: ko.observable(true),
+              screenSend: ko.observable(true),
+              videoSend: ko.observable(false),
             },
           },
         })
@@ -289,9 +292,15 @@ describe('z.calling.VideoGridRepository', () => {
   function generateMediaRepository(overrides = {}) {
     const defaults = {
       streamHandler: {
+        hasActiveVideo: ko.observable(true),
         localMediaStream: ko.observable(),
         remoteMediaStreamInfoIndex: {
           video: ko.observableArray([]),
+        },
+        selfStreamState: {
+          audioSend: ko.observable(true),
+          screenSend: ko.observable(false),
+          videoSend: ko.observable(true),
         },
       },
     };
@@ -302,11 +311,6 @@ describe('z.calling.VideoGridRepository', () => {
   function generateCallingRepository(overrides = {}) {
     const defaults = {
       calls: ko.observableArray([]),
-      selfStreamState: {
-        audioSend: ko.observable(true),
-        screenSend: ko.observable(false),
-        videoSend: ko.observable(true),
-      },
     };
 
     return Object.assign({}, defaults, overrides);
@@ -318,6 +322,7 @@ describe('z.calling.VideoGridRepository', () => {
         screenSend: () => screenSend,
         videoSend: () => videoSend,
       },
+      hasActiveVideo: () => screenSend || videoSend,
       id,
       state: {},
       user: {},

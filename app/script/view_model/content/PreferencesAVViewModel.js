@@ -49,12 +49,16 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
     this.devicesHandler = this.mediaRepository.devicesHandler;
     this.availableDevices = this.devicesHandler.availableDevices;
     this.currentDeviceId = this.devicesHandler.currentDeviceId;
+    this.deviceSupport = this.devicesHandler.deviceSupport;
 
     this.constraintsHandler = this.mediaRepository.constraintsHandler;
     this.streamHandler = this.mediaRepository.streamHandler;
     this.mediaStream = this.streamHandler.localMediaStream;
 
     this.isVisible = false;
+
+    const selfUser = this.userRepository.self;
+    this.isTemporaryGuest = ko.pureComputed(() => selfUser() && selfUser().isTemporaryGuest());
 
     this.mediaStream.subscribe(mediaStream => {
       if (this.audioInterval) {
@@ -73,12 +77,8 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
 
     this.permissionDenied = ko.observable(false);
 
-    this.supportsAudioInput = ko.pureComputed(() => !!this.availableDevices.audioInput().length);
     this.supportsAudioOutput = ko.pureComputed(() => {
-      return !!this.availableDevices.audioOutput().length && z.util.Environment.browser.supports.audioOutputSelection;
-    });
-    this.supportsVideoInput = ko.pureComputed(() => {
-      return !!this.availableDevices.videoInput().length && this.isActivatedAccount();
+      return this.deviceSupport.audioOutput() && z.util.Environment.browser.supports.audioOutputSelection;
     });
   }
 
@@ -107,24 +107,59 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
   }
 
   /**
+   * Check supported media type.
+   * @private
+   * @returns {Promise} Resolves with a MediaType or false
+   */
+  _checkMediaSupport() {
+    let mediaType;
+    if (this.deviceSupport.audioInput()) {
+      mediaType = this.deviceSupport.videoInput() ? z.media.MediaType.AUDIO_VIDEO : z.media.MediaType.AUDIO;
+    } else {
+      mediaType = this.deviceSupport.videoInput() ? z.media.MediaType.VIDEO : undefined;
+    }
+
+    return mediaType
+      ? Promise.resolve(mediaType)
+      : Promise.reject(new z.media.MediaError(z.media.MediaError.TYPE.MEDIA_STREAM_DEVICE));
+  }
+
+  /**
+   * Get current MediaStream or initiate it.
+   * @private
+   * @returns {Promise} Resolves with a MediaStream
+   */
+  _getCurrentMediaStream() {
+    const hasActiveStream = this.deviceSupport.videoInput()
+      ? !!this.mediaStream() && this.streamHandler.localMediaType() === z.media.MediaType.VIDEO
+      : !!this.mediaStream();
+
+    return Promise.resolve(hasActiveStream ? this.mediaStream() : undefined);
+  }
+
+  /**
    * Get current MediaStream or initiate it.
    * @private
    * @returns {Promise} Resolves with a MediaStream
    */
   _getMediaStream() {
-    const hasSupportedVideoStream = this.supportsVideoInput
-      ? this.mediaStream() && this.streamHandler.localMediaType() === z.media.MediaType.VIDEO
-      : this.mediaStream();
+    return this._getCurrentMediaStream().then(mediaStream => (mediaStream ? mediaStream : this._initiateMediaStream()));
+  }
 
-    if (hasSupportedVideoStream) {
-      return Promise.resolve(this.mediaStream());
-    }
-
-    return this.constraintsHandler
-      .getMediaStreamConstraints(this.supportsAudioInput(), this.supportsVideoInput())
-      .then(({mediaType, streamConstraints}) => this.streamHandler.requestMediaStream(mediaType, streamConstraints))
+  /**
+   * Initiate MediaStream.
+   * @private
+   * @returns {Promise} Resolves with a MediaStream
+   */
+  _initiateMediaStream() {
+    return this._checkMediaSupport()
+      .then(mediaType => {
+        return this.constraintsHandler
+          .getMediaStreamConstraints(this.deviceSupport.audioInput(), this.deviceSupport.videoInput)
+          .then(streamConstraints => this.streamHandler.requestMediaStream(mediaType, streamConstraints));
+      })
       .then(mediaStreamInfo => {
-        if (this.availableDevices.videoInput().length) {
+        if (this.deviceSupport.videoInput()) {
           this.streamHandler.localMediaType(z.media.MediaType.VIDEO);
         }
 

@@ -3,7 +3,7 @@
   <div class="preferences-content-wrapper">
     <div class="preferences-content" data-bind="antiscroll">
 
-      <!-- ko if: supportsAudioInput() -->
+      <!-- ko if: deviceSupport.audioInput() -->
         <section class="preferences-section">
           <header class="preferences-header preferences-av-header" data-bind="l10n_text: z.string.preferencesAVMicrophone"></header>
           <!-- ko if: permissionDenied() -->
@@ -54,7 +54,7 @@
         </section>
       <!-- /ko -->
 
-      <!-- ko if: supportsVideoInput() -->
+      <!-- ko if: deviceSupport.videoInput() -->
         <section class="preferences-section">
           <header class="preferences-header preferences-av-header" data-bind="l10n_text: z.string.preferencesAVCamera"></header>
           <!-- ko if: permissionDenied() -->
@@ -79,6 +79,9 @@
               <label class="icon-down preferences-av-label" data-bind="visible: availableDevices.videoInput().length >= 2"></label>
             </div>
           </div>
+          <!-- ko if: isTemporaryGuest() -->
+            <div class="preferences-detail" data-bind="l10n_text: z.string.preferencesAVTemporaryDisclaimer"></div>
+          <!-- /ko -->
           <video class="preferences-av-video"
                  autoplay
                  data-bind="css: {'preferences-av-video-disabled': permissionDenied},

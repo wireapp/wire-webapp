@@ -44,7 +44,7 @@
   "acceptNewsModal.headline": "Вы хотите получать новости и обновления от Wire по электронной почте?",
   "acceptNewsModal.unsubscribeDescription": "Вы можете отписаться в любое время.",
   "acceptNewsModal.privacyDescription": "Проверьте нашу <b>Политику конфиденциальности</b>.",
-  "acceptNewsModal.declineButton": "Не сейчас",
+  "acceptNewsModal.declineButton": "Отменить",
   "acceptNewsModal.confirmButton": "Принять",
   "unsupported.headlineBrowser": "Этот браузер не поддерживается.",
   "unsupported.subheadBrowser":

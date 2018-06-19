@@ -34,7 +34,6 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
     this.clickedOnCancelScreen = this.clickedOnCancelScreen.bind(this);
     this.clickedOnChooseScreen = this.clickedOnChooseScreen.bind(this);
     this.chooseSharedScreen = this.chooseSharedScreen.bind(this);
-    this.onLoadedMetadata = this.onLoadedMetadata.bind(this);
 
     this.elementId = 'video-calling';
 
@@ -48,8 +47,6 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
     this.multitasking = this.contentViewModel.multitasking;
     this.logger = new z.util.Logger('z.viewModel.VideoCallingViewModel', z.config.LOGGER.OPTIONS);
 
-    this.selfUser = this.userRepository.self;
-
     this.devicesHandler = this.mediaRepository.devicesHandler;
     this.streamHandler = this.mediaRepository.streamHandler;
 
@@ -57,6 +54,7 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
     this.currentDeviceId = this.devicesHandler.currentDeviceId;
     this.currentDeviceIndex = this.devicesHandler.currentDeviceIndex;
 
+    this.hasSelfVideo = this.streamHandler.hasActiveVideo;
     this.selfStreamState = this.streamHandler.selfStreamState;
     this.localVideoStream = this.streamHandler.localMediaStream;
     this.remoteVideoStreamsInfo = this.streamHandler.remoteMediaStreamInfoIndex.video;
@@ -64,8 +62,6 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
     this.isChoosingScreen = ko.observable(false);
 
     this.minimizeTimeout = undefined;
-
-    this.remoteVideoElementContain = ko.observable(false);
 
     this.calls = this.callingRepository.calls;
     this.joinedCall = this.callingRepository.joinedCall;
@@ -84,21 +80,16 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
     });
 
     this.isCallOngoing = ko.pureComputed(() => {
-      return this.joinedCall() ? this.videodCall() && this.joinedCall().isOngoing() : false;
+      if (this.joinedCall()) {
+        const isSendingVideo = this.localVideoStream() && this.hasSelfVideo();
+        const isVideoCall = isSendingVideo || this.joinedCall().isRemoteVideoCall();
+        return this.joinedCall().isOngoing() && isVideoCall;
+      }
     });
 
-    this.overlayIconClass = ko.pureComputed(() => {
-      if (this.isCallOngoing()) {
-        const isMuted = !this.selfStreamState.audioSend();
-        if (isMuted) {
-          return 'icon-mute';
-        }
-
-        const isVideoDisabled = !this.selfStreamState.screenSend() && !this.selfStreamState.videoSend();
-        if (isVideoDisabled) {
-          return 'icon-video-off';
-        }
-      }
+    this.showFullscreen = ko.pureComputed(() => {
+      const isFullScreenState = this.isCallOngoing() || this.isChoosingScreen();
+      return isFullScreenState && !this.multitasking.isMinimized() && !!this.videodCall();
     });
 
     this.remoteUser = ko.pureComputed(() => {
@@ -112,10 +103,12 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
     this.showRemote = ko.pureComputed(() => {
       return this.showRemoteVideo() || this.showRemoteParticipant() || this.isChoosingScreen();
     });
+
     this.showRemoteParticipant = ko.pureComputed(() => {
       const showRemoteParticipant = this.remoteUser() && !this.multitasking.isMinimized() && !this.isChoosingScreen();
       return showRemoteParticipant && this.isCallOngoing() && !this.showRemoteVideo();
     });
+
     this.showRemoteVideo = ko.pureComputed(() => {
       if (this.isCallOngoing()) {
         const remoteVideoState = this.joinedCall() && this.joinedCall().isRemoteVideoCall();
@@ -303,31 +296,5 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
   clickedOnMinimize() {
     this.multitasking.isMinimized(true);
     this.logger.info(`Minimizing call '${this.videodCall().id}' on user click`);
-  }
-
-  doubleClickedOnRemoteVideo() {
-    this.remoteVideoElementContain(!this.remoteVideoElementContain());
-    this.logger.info(`Switched remote video object-fit. Contain is '${this.remoteVideoElementContain()}'`);
-  }
-
-  /**
-   * Detect the aspect ratio of a MediaElement and set the video mode.
-   *
-   * @param {VideoCallingViewModel} videoCallingViewModel - Video calling view model
-   * @param {HTMLVideoElement} mediaElement - Media element containing video
-   * @returns {undefined} No return value
-   */
-  onLoadedMetadata(videoCallingViewModel, {target: mediaElement}) {
-    let detectedVideoMode;
-
-    const isPortraitStream = mediaElement.videoHeight > mediaElement.videoWidth;
-    if (isPortraitStream) {
-      this.remoteVideoElementContain(true);
-      detectedVideoMode = z.calling.enum.VIDEO_ORIENTATION.PORTRAIT;
-    } else {
-      this.remoteVideoElementContain(false);
-      detectedVideoMode = z.calling.enum.VIDEO_ORIENTATION.LANDSCAPE;
-    }
-    this.logger.info(`Remote video is in '${detectedVideoMode}' mode`);
   }
 };

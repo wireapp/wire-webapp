@@ -28,15 +28,11 @@ z.media.MediaStreamInfo = class MediaStreamInfo {
     this.flowId = flowId;
     this.stream = stream;
     this.callEntity = callEntity;
-    this.type = z.media.MediaType.NONE;
 
     this.conversationId = callEntity ? callEntity.id : undefined;
-    this.updateStreamType();
-    return this;
   }
 
-  updateStreamType() {
-    this.stream = z.media.MediaStreamHandler.detectMediaStreamType(this.stream);
-    return (this.type = this.stream.type);
+  getType() {
+    return z.media.MediaStreamHandler.detectMediaStreamType(this.stream);
   }
 };

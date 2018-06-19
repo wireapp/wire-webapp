@@ -39,7 +39,7 @@ describe('z.media.MediaStreamHandler', () => {
     it('throws an error if stream type is not recognized', () => {
       const streamHandler = TestFactory.media_repository.streamHandler;
 
-      const newMediaStream = {type: 'random'};
+      const newMediaStream = {getType: () => 'random'};
 
       try {
         streamHandler.addRemoteMediaStream(newMediaStream);
@@ -53,9 +53,9 @@ describe('z.media.MediaStreamHandler', () => {
       const streamHandler = TestFactory.media_repository.streamHandler;
 
       const recognizedStreams = [
-        {type: z.media.MediaType.AUDIO},
-        {type: z.media.MediaType.VIDEO},
-        {type: z.media.MediaType.AUDIO_VIDEO},
+        {getType: () => z.media.MediaType.AUDIO},
+        {getType: () => z.media.MediaType.VIDEO},
+        {getType: () => z.media.MediaType.AUDIO_VIDEO},
       ];
 
       const expectedStreams = [
@@ -78,9 +78,9 @@ describe('z.media.MediaStreamHandler', () => {
     it('returns the media streams indexed by type', () => {
       const streamHandler = TestFactory.media_repository.streamHandler;
 
-      const audioStream = {type: z.media.MediaType.AUDIO};
-      const videoStream = {type: z.media.MediaType.VIDEO};
-      const audioVideoStream = {type: z.media.MediaType.AUDIO_VIDEO};
+      const audioStream = {getType: () => z.media.MediaType.AUDIO};
+      const videoStream = {getType: () => z.media.MediaType.VIDEO};
+      const audioVideoStream = {getType: () => z.media.MediaType.AUDIO_VIDEO};
 
       const expectedAudioStreams = [[audioStream], [audioStream], [audioStream]];
 

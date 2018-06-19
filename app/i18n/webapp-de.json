@@ -45,7 +45,7 @@
   "acceptNewsModal.headline": "Möchtest du Neuigkeiten und Informationen zu Produktupdates von Wire per E-Mail erhalten?",
   "acceptNewsModal.unsubscribeDescription": "Du kannst dich jederzeit abmelden.",
   "acceptNewsModal.privacyDescription": "Lies unsere <b>Datenschutzerklärung</b>.",
-  "acceptNewsModal.declineButton": "Nicht jetzt",
+  "acceptNewsModal.declineButton": "Ablehnen",
   "acceptNewsModal.confirmButton": "Annehmen",
   "unsupported.headlineBrowser": "Dieser Browser wird nicht unterstützt.",
   "unsupported.subheadBrowser": "Lade die neueste Version von <b style=\"font-weight: 600\">Google Chrome, Mozilla Firefox, Opera</b> oder <b style=\"font-weight: 600\">Microsoft Edge</b> herunter.",

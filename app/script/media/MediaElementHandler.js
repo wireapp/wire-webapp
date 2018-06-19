@@ -41,7 +41,8 @@ z.media.MediaElementHandler = class MediaElementHandler {
    * @returns {undefined} No return value
    */
   addMediaElement(mediaStreamInfo) {
-    if (mediaStreamInfo.type !== z.media.MediaType.VIDEO) {
+    const isVideoStream = mediaStreamInfo.getType() === z.media.MediaType.VIDEO;
+    if (!isVideoStream) {
       const remoteMediaElement = this._createMediaElement(mediaStreamInfo);
       this.remoteMediaElements.push(remoteMediaElement);
 

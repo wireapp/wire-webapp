@@ -58,8 +58,12 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
       videoInput: ko.observable(0),
     };
 
-    this.hasCamera = ko.pureComputed(() => this.availableDevices.videoInput().length > 0);
-    this.hasMicrophone = ko.pureComputed(() => this.availableDevices.audioInput().length > 0);
+    this.deviceSupport = {
+      audioInput: ko.pureComputed(() => !!this.availableDevices.audioInput().length),
+      audioOutput: ko.pureComputed(() => !!this.availableDevices.audioOutput().length),
+      screenInput: ko.pureComputed(() => !!this.availableDevices.screenInput().length),
+      videoInput: ko.pureComputed(() => !!this.availableDevices.videoInput().length),
+    };
 
     this.initializeMediaDevices();
   }
@@ -94,7 +98,7 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
     const videoInputId = z.util.StorageUtil.getValue(z.media.MediaDeviceType.VIDEO_INPUT);
     this.currentDeviceId.videoInput(videoInputId);
 
-    const setDefaultVideoId = !this.currentDeviceId.videoInput() && this.availableDevices.videoInput().length;
+    const setDefaultVideoId = !this.currentDeviceId.videoInput() && this.deviceSupport.videoInput();
     if (setDefaultVideoId) {
       const defaultDeviceIndex = this.availableDevices.videoInput().length - 1;
       const videoDeviceId = this.availableDevices.videoInput()[defaultDeviceIndex].deviceId;
@@ -153,8 +157,7 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
 
       const updateStream = mediaDeviceId && this.mediaRepository.streamHandler.localMediaStream();
       if (updateStream) {
-        this.mediaRepository.streamHandler.replaceInputSource(z.media.MediaType.AUDIO);
-        this._updateCurrentIndexFromId(z.media.MediaDeviceType.AUDIO_INPUT, mediaDeviceId);
+        this._replaceInputDevice(z.media.MediaType.AUDIO, z.media.MediaDeviceType.AUDIO_INPUT, mediaDeviceId);
       }
     });
 
@@ -171,8 +174,7 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
       const isMediaTypeScreen = this.mediaRepository.streamHandler.localMediaType() === z.media.MediaType.SCREEN;
       const updateStream = mediaDeviceId && isMediaTypeScreen && this.mediaRepository.streamHandler.localMediaStream();
       if (updateStream) {
-        this.mediaRepository.streamHandler.replaceInputSource(z.media.MediaType.SCREEN);
-        this._updateCurrentIndexFromId(z.media.MediaDeviceType.SCREEN_INPUT, mediaDeviceId);
+        this._replaceInputDevice(z.media.MediaType.SCREEN, z.media.MediaDeviceType.SCREEN_INPUT, mediaDeviceId);
       }
     });
 
@@ -182,8 +184,7 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
       const isMediaTypeVideo = this.mediaRepository.streamHandler.localMediaType() === z.media.MediaType.VIDEO;
       const updateStream = mediaDeviceId && isMediaTypeVideo && this.mediaRepository.streamHandler.localMediaStream();
       if (updateStream) {
-        this.mediaRepository.streamHandler.replaceInputSource(z.media.MediaType.VIDEO);
-        this._updateCurrentIndexFromId(z.media.MediaDeviceType.VIDEO_INPUT, mediaDeviceId);
+        this._replaceInputDevice(z.media.MediaType.VIDEO, z.media.MediaDeviceType.VIDEO_INPUT, mediaDeviceId);
       }
     });
   }
@@ -272,6 +273,24 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
         return resolve(screenSources);
       });
     });
+  }
+
+  /**
+   * Replace input device of given type
+   *
+   * @private
+   * @param {z.media.MediaType} mediaType - Media type to change device for
+   * @param {z.media.MediaDeviceType} mediaDeviceType - Media device type to change
+   * @param {string} mediaDeviceId - New media device Id
+   * @returns {undefined} No return value
+   */
+  _replaceInputDevice(mediaType, mediaDeviceType, mediaDeviceId) {
+    this.mediaRepository.streamHandler
+      .replaceInputSource(mediaType)
+      .then(() => this._updateCurrentIndexFromId(mediaDeviceType, mediaDeviceId))
+      .catch(error => {
+        this.logger.error(`Failed to replace input device of type '${mediaType}'`, error);
+      });
   }
 
   /**
