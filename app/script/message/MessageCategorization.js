@@ -75,7 +75,7 @@ z.message.MessageCategorization = (() => {
   return {
     categoryFromEvent: event => {
       try {
-        const {reactions: eventReactions} = event;
+        const eventReactions = event.reactions;
         let category = z.message.MessageCategory.NONE;
 
         const categoryChecks = [_checkText, _checkAsset, _checkPing, _checkLocation];
