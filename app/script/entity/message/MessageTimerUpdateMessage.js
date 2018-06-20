@@ -31,8 +31,12 @@ z.entity.MessageTimerUpdateMessage = class MessageTimerUpdateMessage extends z.e
     this.message_timer = messageTimer;
 
     this.caption = ko.pureComputed(() => {
-      const identifier = ` set timer to ${this.message_timer}`;
-      return z.l10n.text(identifier);
+      if (this.message_timer === null) {
+        return z.l10n.text(z.string.conversationUpdatedTimer);
+      }
+      const timeString = z.util.TimeUtil.formatDuration(this.message_timer).text;
+      const identifier = z.string.conversationUpdatedTimer;
+      return z.l10n.text(identifier, {time: timeString});
     });
   }
 };
