@@ -24,25 +24,14 @@ window.z.viewModel = z.viewModel || {};
 window.z.viewModel.panel = z.viewModel.panel || {};
 
 z.viewModel.panel.TimedMessagesViewModel = class TimedMessagesViewModel {
-  static get MESSAGE_TIMES() {
-    return [
-      1000 * 10,
-      1000 * 60 * 5,
-      1000 * 60 * 60,
-      1000 * 60 * 60 * 24,
-      1000 * 60 * 60 * 24 * 7,
-      1000 * 60 * 60 * 24 * 28,
-    ];
-  }
-
   constructor(mainViewModel, panelViewModel, repositories) {
     this.panelViewModel = panelViewModel;
     this.isVisible = this.panelViewModel.timedMessagesVisible;
     this.conversationRepository = repositories.conversation;
     this.conversationEntity = this.conversationRepository.active_conversation;
     this.messageTimes = ko.observableArray(
-      TimedMessagesViewModel.MESSAGE_TIMES.map(time => ({
-        text: z.util.formatTime(time),
+      z.ephemeral.timings.VALUES.map(time => ({
+        text: z.util.TimeUtil.formatDuration(time).text,
         value: time,
       }))
     );

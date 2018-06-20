@@ -53,10 +53,6 @@
     padding-left: 8px;
     color: fade(@graphite, 48%);
   }
-
-  &.ephemeral-input::placeholder {
-    .accent-color;
-  }
 }
 
 .controls-left {
@@ -95,63 +91,6 @@
   svg path {
     fill: @graphite-dark;
   }
-}
-
-.conversation-input-bar-ephemeral {
-  position: relative;
-}
-
-.controls-right-button-ephemeral-context {
-  .square(32px);
-
-  position: absolute;
-  top: 0;
-  left: 0;
-  outline: 0;
-}
-
-.ephemeral-mode,
-.bubble-menu .ephemeral-mode {
-  .accent-color;
-}
-
-.ephemeral-timer-button {
-  .circle(@avatar-diameter-xs);
-
-  position: relative;
-  margin: 4px;
-  border-style: solid;
-  border-width: 1px;
-  font-size: @font-size-xs;
-  font-weight: @font-weight-bold;
-  line-height: @avatar-diameter-xs - 2;
-  text-align: center;
-
-  svg path {
-    fill: currentColor;
-  }
-
-  &--disabled {
-    border-color: fade(@graphite, 24%);
-    color: @graphite;
-  }
-
-  &--enabled {
-    .accent-color;
-    .accent-border-color(24%);
-
-    cursor: pointer;
-  }
-}
-
-.ephemeral-timer-button-unit {
-  .circle(16px);
-
-  position: absolute;
-  top: -2px;
-  right: -8px;
-  background-color: #fff;
-  line-height: 14px;
 }
 
 // paste modal
