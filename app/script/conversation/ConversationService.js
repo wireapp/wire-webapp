@@ -149,7 +149,7 @@ z.conversation.ConversationService = class ConversationService {
   /**
    * Update conversation's message timer value
    *
-   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/updateConversation
+   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/updateConversationMessageTimer
    *
    * @param {string} conversation_id - ID of conversation to rename
    * @param {number} messageTimer - new message timer of the conversation

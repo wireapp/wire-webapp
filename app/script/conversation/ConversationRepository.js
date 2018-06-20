@@ -1278,7 +1278,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   /**
    * Set the global message timer
    *
-   * @param {Conversation} conversationEntity - Conversation to rename
+   * @param {Conversation} conversationEntity - Conversation to update
    * @param {number} messageTimer - New message timer value
    * @returns {Promise} Resolves when conversation was updated on server side
    */
