@@ -414,36 +414,6 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
       .catch(() => reset_progress());
   }
 
-  /**
-   * Gets CSS class that will be applied to the message div in order to style.
-   * @param {z.entity.Message} message - Message entity for generating css class
-   * @returns {string} CSS class that is applied to the element
-   */
-  get_css_class(message) {
-    switch (message.super_type) {
-      case z.message.SuperType.CALL:
-        return 'message-system message-call';
-      case z.message.SuperType.CONTENT:
-        return 'message-normal';
-      case z.message.SuperType.MEMBER:
-        return 'message message-system message-member';
-      case z.message.SuperType.PING:
-        return 'message-ping';
-      case z.message.SuperType.SYSTEM:
-        const systemClasses = {
-          [z.message.SystemMessageType.CONVERSATION_RENAME]: 'message-system message-rename',
-          [z.message.SystemMessageType.CONVERSATION_MESSAGE_TIMER_UPDATE]: 'message-system message-timer-update',
-        };
-        return systemClasses[message.system_message_type] || '';
-      case z.message.SuperType.UNABLE_TO_DECRYPT:
-        return 'message-system';
-      case z.message.SuperType.VERIFICATION:
-        return 'message-system';
-      default:
-        break;
-    }
-  }
-
   getSystemMessageIconComponent(message) {
     const iconComponents = {
       [z.message.SystemMessageType.CONVERSATION_RENAME]: 'edit-icon',
