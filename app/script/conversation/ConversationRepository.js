@@ -3476,7 +3476,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   /**
-   * A conversation was renamed.
+   * A conversation's message timer was changed
    *
    * @private
    * @param {Conversation} conversationEntity - Conversation entity which message timer was changed
