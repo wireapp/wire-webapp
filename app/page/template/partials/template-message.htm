@@ -85,7 +85,7 @@
       </div>
     </div>
   <!-- /ko -->
-      
+
   <div class="message-body">
     <!-- ko if: message.ephemeral_status() === z.message.EphemeralStatusType.ACTIVE -->
       <ephemeral-timer class="message-ephemeral-timer" data-bind="attr: {'title': message.ephemeral_caption()}" params="message: message"></ephemeral-timer>
@@ -292,7 +292,7 @@
 <script type="text/html" id="system">
   <div class="message-header">
     <div class="message-header-icon text-graphite">
-      <span class="icon-edit"></span>
+      <span data-bind="component: $parent.getSystemMessageIconComponent(message)"></span>
     </div>
     <div class="message-header-label">
       <span class="message-header-sender-name" data-bind='text: message.sender_name()'></span>
