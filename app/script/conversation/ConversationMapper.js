@@ -220,9 +220,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
   mergeConversation(local, remote) {
     return remote.map((remote_conversation, index) => {
       const {access, access_role, id, creator, members, message_timer, name, team, type} = remote_conversation;
-      const localConversation = local
-        .filter(conversation => conversation)
-        .find(conversation => conversation.id === id) || {id};
+      const localConversation = local.filter(conversation => conversation).find(conversation => conversation.id === id);
 
       const updates = {
         accessModes: access,
@@ -234,7 +232,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
         team_id: team,
         type,
       };
-      const mergedConversation = Object.assign({}, localConversation, updates);
+      const mergedConversation = Object.assign({}, localConversation || {id}, updates);
 
       const isGroup = type === z.conversation.ConversationType.REGULAR;
       const noOthers = !mergedConversation.others || !mergedConversation.others.length;
