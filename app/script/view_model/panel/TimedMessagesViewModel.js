@@ -80,7 +80,9 @@ z.viewModel.panel.TimedMessagesViewModel = class TimedMessagesViewModel {
   }
 
   clickOnMessageTime({value}) {
-    this.conversationEntity().globalMessageTimer(value);
+    const conversationEntity = this.conversationEntity();
+    conversationEntity.globalMessageTimer(value);
+    this.conversationRepository.updateConversationMessageTimer(conversationEntity, value);
     this.clickOnBack();
   }
 

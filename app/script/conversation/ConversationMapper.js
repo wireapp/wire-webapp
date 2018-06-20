@@ -85,7 +85,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
         archived_timestamp,
         cleared_timestamp,
         ephemeral_timer,
-        global_message_timer,
+        message_timer,
         last_event_timestamp,
         last_read_timestamp,
         last_server_timestamp,
@@ -107,8 +107,8 @@ z.conversation.ConversationMapper = class ConversationMapper {
         conversation_et.localMessageTimer(ephemeral_timer);
       }
 
-      if (global_message_timer !== undefined) {
-        conversation_et.globalMessageTimer(global_message_timer);
+      if (message_timer !== undefined) {
+        conversation_et.globalMessageTimer(message_timer);
       }
 
       if (last_event_timestamp) {
@@ -217,65 +217,65 @@ z.conversation.ConversationMapper = class ConversationMapper {
    * @param {Array} remote - Backend payload
    * @returns {Array} Merged conversation data
    */
-  merge_conversations(local, remote) {
+  mergeConversation(local, remote) {
     return remote.map((remote_conversation, index) => {
-      const {access, access_role, id, creator, members, name, team, type} = remote_conversation;
-      let local_conversation = local.filter(conversation => conversation).find(conversation => conversation.id === id);
+      const {access, access_role, id, creator, members, message_timer, name, team, type} = remote_conversation;
+      const localConversation = local.filter(conversation => conversation).find(conversation => conversation.id === id);
 
-      if (!local_conversation) {
-        local_conversation = {id};
-      }
-
-      local_conversation.accessModes = access;
-      local_conversation.accessRole = access_role;
-      local_conversation.creator = creator;
-      local_conversation.name = name;
-      local_conversation.status = members.self.status;
-      local_conversation.team_id = team;
-      local_conversation.type = type;
+      const updates = {
+        accessModes: access,
+        accessRole: access_role,
+        creator,
+        message_timer,
+        name,
+        status: members.self.status,
+        team_id: team,
+        type,
+      };
+      const mergedConversation = Object.assign({}, localConversation || {id}, updates);
 
       const isGroup = type === z.conversation.ConversationType.REGULAR;
-      const noOthers = !local_conversation.others || !local_conversation.others.length;
+      const noOthers = !mergedConversation.others || !mergedConversation.others.length;
       if (isGroup || noOthers) {
-        local_conversation.others = members.others
+        mergedConversation.others = members.others
           .filter(other => other.status === z.conversation.ConversationStatus.CURRENT_MEMBER)
           .map(other => other.id);
       }
 
       // This should ensure a proper order
-      if (!local_conversation.last_event_timestamp) {
-        local_conversation.last_event_timestamp = index + 1;
+      if (!mergedConversation.last_event_timestamp) {
+        mergedConversation.last_event_timestamp = index + 1;
       }
 
       // Set initially or correct server timestamp
-      const wrong_server_timestamp = local_conversation.last_server_timestamp < local_conversation.last_event_timestamp;
-      if (!local_conversation.last_server_timestamp || wrong_server_timestamp) {
-        local_conversation.last_server_timestamp = local_conversation.last_event_timestamp;
+      const wrong_server_timestamp = mergedConversation.last_server_timestamp < mergedConversation.last_event_timestamp;
+      if (!mergedConversation.last_server_timestamp || wrong_server_timestamp) {
+        mergedConversation.last_server_timestamp = mergedConversation.last_event_timestamp;
       }
 
       // Some archived timestamp were not properly stored in the database.
       // To fix this we check if the remote one is newer and update our local timestamp.
-      const {archived_state: local_archived_state, archived_timestamp: local_archived_timestamp} = local_conversation;
+      const {archived_state: local_archived_state, archived_timestamp: local_archived_timestamp} = mergedConversation;
       const remote_archived_timestamp = new Date(members.self.otr_archived_ref).getTime();
       const is_remote_archived_timestamp_newer =
         local_archived_timestamp !== undefined && remote_archived_timestamp > local_archived_timestamp;
 
       if (is_remote_archived_timestamp_newer || local_archived_state === undefined) {
-        local_conversation.archived_state = members.self.otr_archived;
-        local_conversation.archived_timestamp = remote_archived_timestamp;
+        mergedConversation.archived_state = members.self.otr_archived;
+        mergedConversation.archived_timestamp = remote_archived_timestamp;
       }
 
-      const {muted_state: local_muted_state, muted_timestamp: local_muted_timestamp} = local_conversation;
+      const {muted_state: local_muted_state, muted_timestamp: local_muted_timestamp} = mergedConversation;
       const remote_muted_timestamp = new Date(members.self.otr_muted_ref).getTime();
       const is_remote_muted_timestamp_newer =
         local_muted_timestamp !== undefined && remote_muted_timestamp > local_muted_timestamp;
 
       if (is_remote_muted_timestamp_newer || local_muted_state === undefined) {
-        local_conversation.muted_state = members.self.otr_muted;
-        local_conversation.muted_timestamp = remote_muted_timestamp;
+        mergedConversation.muted_state = members.self.otr_muted;
+        mergedConversation.muted_timestamp = remote_muted_timestamp;
       }
 
-      return local_conversation;
+      return mergedConversation;
     });
   }
 
