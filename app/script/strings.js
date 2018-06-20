@@ -228,7 +228,7 @@ export const acceptNewsModalStrings = defineMessages({
   },
   declineButton: {
     id: 'acceptNewsModal.declineButton',
-    defaultMessage: 'Decline',
+    defaultMessage: 'No, thanks',
   },
   confirmButton: {
     id: 'acceptNewsModal.confirmButton',
