@@ -29,11 +29,8 @@ z.components.MessageTimerButton = class MessageTimerButton {
       return this.conversationEntity() ? this.conversationEntity().messageTimer() : false;
     });
     this.isTimerDisabled = ko.pureComputed(() => this.conversationEntity().hasGlobalMessageTimer());
-    this.timerText = ko.pureComputed(() => {
-      if (this.hasMessageTimer()) {
-        return z.util.TimeUtil.formatDuration(this.conversationEntity().messageTimer());
-      }
-      return {};
+    this.duration = ko.pureComputed(() => {
+      return this.hasMessageTimer() ? z.util.TimeUtil.formatDuration(this.conversationEntity().messageTimer()) : {};
     });
   }
 
@@ -77,8 +74,8 @@ ko.components.register('message-timer-button', {
         data-uie-value>
         <!-- ko if: hasMessageTimer() && conversationEntity()-->
             <div class="message-timer-button" data-bind="css: isTimerDisabled() ? 'message-timer-button--disabled' : 'message-timer-button--enabled'">
-                <span class="message-timer-button-unit" data-bind="text: timerText().unit"></span>
-                <span class="full-screen" data-bind="text: timerText().value"></span>
+                <span class="message-timer-button-unit" data-bind="text: duration().unit"></span>
+                <span class="full-screen" data-bind="text: duration().value"></span>
             </div>
         <!-- /ko -->
 
