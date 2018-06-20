@@ -20,22 +20,19 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.message = z.message || {};
+window.z.entity = z.entity || {};
 
-/**
- * Enum for different system message types.
- * @todo Refactor to use member-join and member-leave instead of normal. It duplicates "z.message.SuperType".
- * @type {z.message.SystemMessageType} Enum of system message types
- */
-z.message.SystemMessageType = {
-  CONNECTION_ACCEPTED: 'created-one-to-one',
-  CONNECTION_CONNECTED: 'connected',
-  CONNECTION_REQUEST: 'connecting',
-  CONVERSATION_CREATE: 'created-group',
-  CONVERSATION_MESSAGE_TIMER_UPDATE: 'message-timer-update',
-  CONVERSATION_RENAME: 'rename',
-  CONVERSATION_RESUME: 'resume',
-  MEMBER_JOIN: 'join',
-  MEMBER_LEAVE: 'leave',
-  NORMAL: 'normal',
+z.entity.MessageTimerUpdateMessage = class MessageTimerUpdateMessage extends z.entity.SystemMessage {
+  constructor(messageTimer) {
+    super();
+
+    this.type = z.event.Backend.CONVERSATION.MESSAGE_TIMER_UPDATE;
+    this.system_message_type = z.message.SystemMessageType.CONVERSATION_MESSAGE_TIMER_UPDATE;
+    this.message_timer = messageTimer;
+
+    this.caption = ko.pureComputed(() => {
+      const identifier = ` set timer to ${this.message_timer}`;
+      return z.l10n.text(identifier);
+    });
+  }
 };

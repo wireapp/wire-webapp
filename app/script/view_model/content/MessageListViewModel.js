@@ -430,10 +430,11 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
       case z.message.SuperType.PING:
         return 'message-ping';
       case z.message.SuperType.SYSTEM:
-        if (message.system_message_type === z.message.SystemMessageType.CONVERSATION_RENAME) {
-          return 'message-system message-rename';
-        }
-        break;
+        const systemClasses = {
+          [z.message.SystemMessageType.CONVERSATION_RENAME]: 'message-system message-rename',
+          [z.message.SystemMessageType.CONVERSATION_MESSAGE_TIMER_UPDATE]: 'message-system message-timer-update',
+        };
+        return systemClasses[message.system_message_type] || '';
       case z.message.SuperType.UNABLE_TO_DECRYPT:
         return 'message-system';
       case z.message.SuperType.VERIFICATION:
