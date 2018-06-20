@@ -40,12 +40,22 @@ z.viewModel.panel.TimedMessagesViewModel = class TimedMessagesViewModel {
     this.isVisible = this.panelViewModel.timedMessagesVisible;
     this.conversationRepository = repositories.conversation;
     this.conversationEntity = this.conversationRepository.active_conversation;
-    this.messageTimes = ko.observableArray(
-      TimedMessagesViewModel.MESSAGE_TIMES.map(time => ({
+
+    this.messageTimes = ko.pureComputed(() => {
+      const times = TimedMessagesViewModel.MESSAGE_TIMES;
+      const currentTime = this.currentMessageTimer();
+
+      if (currentTime && !times.includes(currentTime)) {
+        times.push(currentTime);
+      }
+
+      times.sort((a, b) => a - b);
+
+      return times.map(time => ({
         text: z.util.formatTime(time),
         value: time,
-      }))
-    );
+      }));
+    });
 
     this.isRendered = ko.observable(false).extend({notify: 'always'});
 
