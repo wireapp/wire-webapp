@@ -19,6 +19,7 @@
 
 import {
   ClientMismatch,
+  Conversation,
   NewOTRMessage,
   OTRRecipients,
   UserClients,
@@ -362,6 +363,18 @@ export default class ConversationService {
       state: PayloadBundleState.OUTGOING_UNSENT,
       type: GenericMessageType.CLIENT_ACTION,
     };
+  }
+
+  public async getConversations(conversationId: string): Promise<Conversation>;
+  public async getConversations(conversationId?: string[]): Promise<Conversation[]>;
+  public async getConversations(conversationId?: string | string[]): Promise<Conversation[] | Conversation> {
+    if (!conversationId || !conversationId.length) {
+      return this.apiClient.conversation.api.getAllConversations();
+    }
+    if (typeof conversationId === 'string') {
+      return this.apiClient.conversation.api.getConversation(conversationId);
+    }
+    return this.apiClient.conversation.api.getConversationsByIds(conversationId);
   }
 
   public async getImage({assetId, otrKey, sha256, assetToken}: RemoteData): Promise<Buffer> {

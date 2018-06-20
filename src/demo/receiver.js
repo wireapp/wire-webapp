@@ -12,7 +12,7 @@ require('dotenv').config({path: path.join(__dirname, 'echo1.env')});
 
 const {Account} = require('@wireapp/core');
 const APIClient = require('@wireapp/api-client');
-const ClientType = require('@wireapp/api-client/dist/commonjs/client/ClientType');
+const {ClientType} = require('@wireapp/api-client/dist/commonjs/client/ClientType');
 const fs = require('fs');
 const {promisify} = require('util');
 const {Config} = require('@wireapp/api-client/dist/commonjs/Config');
