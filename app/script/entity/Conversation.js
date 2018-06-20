@@ -123,8 +123,8 @@ z.entity.Conversation = class Conversation {
     });
 
     // Messages
-    this.localMessageTimer = ko.observable(0);
-    this.globalMessageTimer = ko.observable(0);
+    this.localMessageTimer = ko.observable(null);
+    this.globalMessageTimer = ko.observable(null);
 
     this.messageTimer = ko.pureComputed(() => this.globalMessageTimer() || this.localMessageTimer());
     this.hasGlobalMessageTimer = ko.pureComputed(() => this.globalMessageTimer() > 0);

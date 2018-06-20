@@ -57,7 +57,7 @@ z.viewModel.panel.TimedMessagesViewModel = class TimedMessagesViewModel {
       .extend({notify: 'always', rateLimit: {method: 'notifyWhenChangesStop', timeout: 0}});
 
     this.clickOnMessageTime = this.clickOnMessageTime.bind(this);
-    this.clickOnMessageTimeOff = this.clickOnMessageTimeOff.bind(this);
+    this.clickOnMessageTimeOff = this.clickOnMessageTime.bind(this, {value: null});
   }
 
   clickOnBack() {
@@ -72,11 +72,6 @@ z.viewModel.panel.TimedMessagesViewModel = class TimedMessagesViewModel {
     const conversationEntity = this.conversationEntity();
     conversationEntity.globalMessageTimer(value);
     this.conversationRepository.updateConversationMessageTimer(conversationEntity, value);
-    this.clickOnBack();
-  }
-
-  clickOnMessageTimeOff() {
-    this.conversationEntity().globalMessageTimer(0);
     this.clickOnBack();
   }
 };
