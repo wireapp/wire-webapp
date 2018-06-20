@@ -1162,7 +1162,7 @@ z.calling.CallingRepository = class CallingRepository {
   _joinCall(conversationId, mediaType, callState, callEntity) {
     this._checkCallingSupport(conversationId, mediaType, callState)
       .then(() => this._checkConcurrentJoinedCall(conversationId, callState))
-      .then(() => (callEntity ? callEntity : this._initiateOutgoingCall(conversationId, mediaType, callState)))
+      .then(() => callEntity || this._initiateOutgoingCall(conversationId, mediaType, callState))
       .then(callEntityToJoin => this._initiateMediaStream(callEntityToJoin, mediaType))
       .then(callEntityToJoin => this._initiateJoinCall(callEntityToJoin, mediaType));
   }
