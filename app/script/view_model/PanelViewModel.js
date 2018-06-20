@@ -229,8 +229,8 @@ z.viewModel.PanelViewModel = class PanelViewModel {
     const oldPanel = $(`#${this._getElementIdOfPanel(this.state())}`);
     const newPanel = this._showPanel(newState);
 
-    newPanel.addClass(`panel__page--move-in--${fromLeft ? 'left' : 'right'}`);
-    oldPanel.addClass(`panel__page--move-out--${fromLeft ? 'left' : 'right'}`);
+    newPanel.addClass(`panel__page--move-in${fromLeft ? '--left' : '--right'}`);
+    oldPanel.addClass(`panel__page--move-out${fromLeft ? '--left' : '--right'}`);
 
     window.setTimeout(() => {
       newPanel.removeClass('panel__page--move-in--left panel__page--move-in--right');
