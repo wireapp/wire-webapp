@@ -30,6 +30,7 @@ z.viewModel.content.CollectionViewModel = class CollectionViewModel {
     this.clickOnMessage = this.clickOnMessage.bind(this);
     this.itemAdded = this.itemAdded.bind(this);
     this.itemRemoved = this.itemRemoved.bind(this);
+    this.messageRemoved = this.messageRemoved.bind(this);
     this.onInputChange = this.onInputChange.bind(this);
     this.removedFromView = this.removedFromView.bind(this);
     this.searchInConversation = this.searchInConversation.bind(this);
@@ -52,6 +53,7 @@ z.viewModel.content.CollectionViewModel = class CollectionViewModel {
   addedToView() {
     amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.ADDED, this.itemAdded);
     amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, this.itemRemoved);
+    amplify.subscribe(z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, this.messageRemoved);
     $(document).on('keydown.collection', keyboardEvent => {
       if (z.util.KeyboardUtil.isEscapeKey(keyboardEvent)) {
         amplify.publish(z.event.WebApp.CONVERSATION.SHOW, this.conversationEntity());
@@ -74,6 +76,10 @@ z.viewModel.content.CollectionViewModel = class CollectionViewModel {
     }
   }
 
+  messageRemoved(message) {
+    this.itemRemoved(message.id);
+  }
+
   itemRemoved(removedMessageId) {
     const _removeItem = messageEntity => messageEntity.id === removedMessageId;
     [this.audio, this.files, this.images, this.links].forEach(array => array.remove(_removeItem));
@@ -82,6 +88,7 @@ z.viewModel.content.CollectionViewModel = class CollectionViewModel {
   removedFromView() {
     amplify.unsubscribe(z.event.WebApp.CONVERSATION.MESSAGE.ADDED, this.itemAdded);
     amplify.unsubscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, this.itemRemoved);
+    amplify.unsubscribe(z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, this.messageRemoved);
     $(document).off('keydown.collection');
     this.conversationEntity(null);
     this.searchInput('');
@@ -99,7 +106,10 @@ z.viewModel.content.CollectionViewModel = class CollectionViewModel {
   }
 
   _populate_items(messageEntities) {
-    messageEntities.map(messageEntity => {
+    messageEntities.forEach(messageEntity => {
+      if (messageEntity.is_expired()) {
+        return;
+      }
       // TODO: create binary map helper
       const isImage = messageEntity.category & z.message.MessageCategory.IMAGE;
       const isGif = messageEntity.category & z.message.MessageCategory.GIF;
