@@ -75,14 +75,8 @@ z.message.MessageCategorization = (() => {
   return {
     categoryFromEvent: event => {
       try {
-        const {ephemeral_expires: eventEphemeralState, reactions: eventReactions} = event;
+        const {reactions: eventReactions} = event;
         let category = z.message.MessageCategory.NONE;
-
-        const isEphemeral = !!eventEphemeralState;
-        // String, Number, true
-        if (isEphemeral) {
-          return z.message.MessageCategory.NONE;
-        }
 
         const categoryChecks = [_checkText, _checkAsset, _checkPing, _checkLocation];
         for (const check of categoryChecks) {

@@ -52,6 +52,7 @@ z.viewModel.content.CollectionViewModel = class CollectionViewModel {
   addedToView() {
     amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.ADDED, this.itemAdded);
     amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, this.itemRemoved);
+    amplify.subscribe(z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, message => this.itemRemoved(message.id));
     $(document).on('keydown.collection', keyboardEvent => {
       if (z.util.KeyboardUtil.isEscapeKey(keyboardEvent)) {
         amplify.publish(z.event.WebApp.CONVERSATION.SHOW, this.conversationEntity());
@@ -99,7 +100,10 @@ z.viewModel.content.CollectionViewModel = class CollectionViewModel {
   }
 
   _populate_items(messageEntities) {
-    messageEntities.map(messageEntity => {
+    messageEntities.forEach(messageEntity => {
+      if (messageEntity.is_expired()) {
+        return;
+      }
       // TODO: create binary map helper
       const isImage = messageEntity.category & z.message.MessageCategory.IMAGE;
       const isGif = messageEntity.category & z.message.MessageCategory.GIF;
