@@ -22,10 +22,15 @@
 window.z = window.z || {};
 window.z.ephemeral = z.ephemeral || {};
 
-z.ephemeral.timings = (() => {
-  const TIMINGS = [1000 * 5, 1000 * 15, 1000 * 30, 1000 * 60, 1000 * 60 * 5, 1000 * 60 * 60 * 24];
-
-  return {
-    getValues: () => TIMINGS,
-  };
-})();
+z.ephemeral.timings = class {
+  static get VALUES() {
+    return [
+      1000 * 10,
+      1000 * 60 * 5,
+      1000 * 60 * 60,
+      1000 * 60 * 60 * 24,
+      1000 * 60 * 60 * 24 * 7,
+      1000 * 60 * 60 * 24 * 28,
+    ];
+  }
+};

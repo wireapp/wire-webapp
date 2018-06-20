@@ -523,19 +523,6 @@ z.string.guestOptionsTitle = 'Guest options';
 
 // Panel: Timed messages
 z.string.timedMessagesTitle = 'Timed messages';
-z.string.timedMessagesOff = 'Off';
-z.string.timedMessagesMonth = 'month';
-z.string.timedMessagesMonths = 'months';
-z.string.timedMessagesWeek = 'week';
-z.string.timedMessagesWeeks = 'weeks';
-z.string.timedMessagesDay = 'day';
-z.string.timedMessagesDays = 'days';
-z.string.timedMessagesHour = 'hour';
-z.string.timedMessagesHours = 'hours';
-z.string.timedMessagesMinute = 'minute';
-z.string.timedMessagesMinutes = 'minutes';
-z.string.timedMessagesSecond = 'second';
-z.string.timedMessagesSeconds = 'seconds';
 z.string.timedMessageDisclaimer = 'Timed messages will be turned on for all the participants in this conversation.';
 
 // Panel: Participant devices
@@ -830,3 +817,7 @@ z.string.ephememalUnitsHour = 'hour';
 z.string.ephememalUnitsHours = 'hours';
 z.string.ephememalUnitsDay = 'day';
 z.string.ephememalUnitsDays = 'days';
+z.string.ephemeralUnitsWeek = 'week';
+z.string.ephemeralUnitsWeeks = 'weeks';
+z.string.ephemeralUnitsMonth = 'month';
+z.string.ephemeralUnitsMonths = 'months';

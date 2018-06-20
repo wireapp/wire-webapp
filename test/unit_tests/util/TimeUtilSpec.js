@@ -22,23 +22,23 @@
 'use strict';
 
 describe('z.util.TimeUtil', () => {
-  describe('formatMilliseconds', () => {
+  describe('formatDuration', () => {
     it('should format duration under 1 minute', () => {
-      expect(z.util.TimeUtil.formatMilliseconds(5000)).toEqual({unit: 's', value: 5});
-      expect(z.util.TimeUtil.formatMilliseconds(15000)).toEqual({unit: 's', value: 15});
+      expect(z.util.TimeUtil.formatDuration(5000)).toEqual({text: '5 seconds', unit: 's', value: 5});
+      expect(z.util.TimeUtil.formatDuration(15000)).toEqual({text: '15 seconds', unit: 's', value: 15});
     });
 
     it('should format duration over 1 minute', () => {
-      expect(z.util.TimeUtil.formatMilliseconds(60000)).toEqual({unit: 'm', value: 1});
-      expect(z.util.TimeUtil.formatMilliseconds(900000)).toEqual({unit: 'm', value: 15});
+      expect(z.util.TimeUtil.formatDuration(60000)).toEqual({text: '1 minute', unit: 'm', value: 1});
+      expect(z.util.TimeUtil.formatDuration(900000)).toEqual({text: '15 minutes', unit: 'm', value: 15});
     });
 
     it('should format duration over 1 hour', () => {
-      expect(z.util.TimeUtil.formatMilliseconds(1000 * 60 * 60 * 3)).toEqual({unit: 'h', value: 3});
+      expect(z.util.TimeUtil.formatDuration(1000 * 60 * 60 * 3)).toEqual({text: '3 hours', unit: 'h', value: 3});
     });
 
     it('should format duration over 1 day', () => {
-      expect(z.util.TimeUtil.formatMilliseconds(1000 * 60 * 60 * 24 * 3)).toEqual({unit: 'd', value: 3});
+      expect(z.util.TimeUtil.formatDuration(1000 * 60 * 60 * 24 * 3)).toEqual({text: '3 days', unit: 'd', value: 3});
     });
   });
 
