@@ -30,6 +30,7 @@ z.viewModel.content.CollectionViewModel = class CollectionViewModel {
     this.clickOnMessage = this.clickOnMessage.bind(this);
     this.itemAdded = this.itemAdded.bind(this);
     this.itemRemoved = this.itemRemoved.bind(this);
+    this.messageRemoved = this.messageRemoved.bind(this);
     this.onInputChange = this.onInputChange.bind(this);
     this.removedFromView = this.removedFromView.bind(this);
     this.searchInConversation = this.searchInConversation.bind(this);
