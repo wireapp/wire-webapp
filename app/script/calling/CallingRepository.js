@@ -446,14 +446,7 @@ z.calling.CallingRepository = class CallingRepository {
         }
 
         if (!callEntity.selfClientJoined()) {
-          const logMessage = {
-            data: {
-              default: [conversationId],
-              obfuscated: [this.callLogger.obfuscate(conversationId)],
-            },
-            message: `Rejecting call in conversation '{0}'`,
-          };
-          this.callLogger.info(logMessage, callEntity);
+          this.callLogger.info(`Rejecting call in conversation '${conversationId}'`, callEntity);
           callEntity.rejectCall(false);
         }
       })
@@ -1164,7 +1157,12 @@ z.calling.CallingRepository = class CallingRepository {
       .then(() => this._checkConcurrentJoinedCall(conversationId, callState))
       .then(() => callEntity || this._initiateOutgoingCall(conversationId, mediaType, callState))
       .then(callEntityToJoin => this._initiateMediaStream(callEntityToJoin, mediaType))
-      .then(callEntityToJoin => this._initiateJoinCall(callEntityToJoin, mediaType));
+      .then(callEntityToJoin => this._initiateJoinCall(callEntityToJoin, mediaType))
+      .catch(error => {
+        this.callLogger.warn(`Failed to join call in conversation '${conversationId}'`, error);
+        const isOutgoingCall = !callEntity;
+        return isOutgoingCall ? this.deleteCall(conversationId) : this.rejectCall(conversationId, true);
+      });
   }
 
   /**
@@ -1645,46 +1643,21 @@ z.calling.CallingRepository = class CallingRepository {
   _logMessage(isOutgoing, callMessageEntity, date = new Date().toISOString()) {
     const {conversationId, destinationUserId, remoteUserId, response, type, userId} = callMessageEntity;
 
-    let logMessage;
+    let log;
+    const target = `conversation '${conversationId}'`;
     if (isOutgoing) {
-      if (remoteUserId) {
-        logMessage = {
-          data: {
-            default: [type, response, remoteUserId, conversationId],
-            obfuscated: [
-              type,
-              response,
-              this.callLogger.obfuscate(remoteUserId),
-              this.callLogger.obfuscate(conversationId),
-            ],
-          },
-          message: `Sending '{0}' message (response: {1}) to user '{2}' in conversation '{3}'`,
-        };
-      } else {
-        logMessage = {
-          data: {
-            default: [type, response, conversationId],
-            obfuscated: [type, response, this.callLogger.obfuscate(conversationId)],
-          },
-          message: `Sending '{0}' message (response: {1}) to conversation '{2}'`,
-        };
-      }
+      const additionalMessage = remoteUserId ? `user '${remoteUserId}' in ${target}` : `${target}`;
+      log = `Sending '${type}' message (response: ${response}) to ${additionalMessage}`;
     } else {
       const isSelfUser = destinationUserId === this.selfUserId();
       if (destinationUserId && !isSelfUser) {
         return;
       }
 
-      logMessage = {
-        data: {
-          default: [type, response, userId, conversationId],
-          obfuscated: [type, response, this.callLogger.obfuscate(userId), this.callLogger.obfuscate(conversationId)],
-        },
-        message: `Received '{0}' message (response: {1}) from user '{2}' in conversation '{3}'`,
-      };
+      log = `Received '${type}' message (response: ${response}) from user '${userId}' in ${target}`;
     }
 
-    this.callLogger.info(logMessage, callMessageEntity);
+    this.callLogger.info(log, callMessageEntity);
   }
 
   /**

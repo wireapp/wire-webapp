@@ -55,13 +55,7 @@ z.calling.entities.ParticipantEntity = class ParticipantEntity {
     const loggerName = 'z.calling.entities.ParticipantEntity';
     this.callLogger = new z.telemetry.calling.CallLogger(loggerName, this.id, z.config.LOGGER.OPTIONS, this.messageLog);
 
-    this.callLogger.info({
-      data: {
-        default: [this.id],
-        obfuscated: [this.callLogger.obfuscate(this.id)],
-      },
-      message: `Created new participant entity for user {0}`,
-    });
+    this.callLogger.info(`Created new participant entity for user ${this.id}`);
 
     this.isConnected = ko.observable(false);
     this.panning = ko.observable(0.0);
