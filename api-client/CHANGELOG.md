@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="1.2.0"></a>
+# [1.2.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@1.1.14...@wireapp/api-client@1.2.0) (2018-06-20)
+
+
+### Features
+
+* **api-client:** Conversation Message Timer ([#735](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/735)) ([38d8546](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/38d8546))
+
+
+
+
 <a name="1.1.14"></a>
 ## [1.1.14](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@1.1.13...@wireapp/api-client@1.1.14) (2018-06-19)
 
