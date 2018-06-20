@@ -8785,9 +8785,9 @@ reduce-function-call@^1.0.1, reduce-function-call@^1.0.2:
   dependencies:
     balanced-match "^0.4.2"
 
-redux-devtools-extension@2.13.3:
-  version "2.13.3"
-  resolved "https://registry.yarnpkg.com/redux-devtools-extension/-/redux-devtools-extension-2.13.3.tgz#a75e9a7288c4849424974ae41b57ad9762ddb0c8"
+redux-devtools-extension@2.13.4:
+  version "2.13.4"
+  resolved "https://registry.yarnpkg.com/redux-devtools-extension/-/redux-devtools-extension-2.13.4.tgz#f89b6c0da27c3321e20b8c100801d32a7c8420f5"
 
 redux-logger@3.0.6:
   version "3.0.6"
