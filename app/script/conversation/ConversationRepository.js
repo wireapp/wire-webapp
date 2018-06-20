@@ -2827,6 +2827,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
             return this._onMemberUpdate(conversationEntity, eventJson);
           case z.event.Backend.CONVERSATION.RENAME:
             return this._onRename(conversationEntity, eventJson);
+          case z.event.Backend.CONVERSATION.MESSAGE_TIMER_UPDATE:
+            return this._onMessageTimerUpdate(conversationEntity, eventJson);
           case z.event.Client.CONVERSATION.ASSET_ADD:
             return this._on_asset_add(conversationEntity, eventJson);
           case z.event.Client.CONVERSATION.CONFIRMATION:
@@ -3469,6 +3471,22 @@ z.conversation.ConversationRepository = class ConversationRepository {
   _onRename(conversationEntity, eventJson) {
     return this._add_event_to_conversation(eventJson, conversationEntity).then(messageEntity => {
       this.conversation_mapper.update_properties(conversationEntity, eventJson.data);
+      return {conversationEntity, messageEntity};
+    });
+  }
+
+  /**
+   * A conversation was renamed.
+   *
+   * @private
+   * @param {Conversation} conversationEntity - Conversation entity which message timer was changed
+   * @param {Object} eventJson - JSON data of 'conversation.message-timer-update' event
+   * @returns {Promise} Resolves when the event was handled
+   */
+  _onMessageTimerUpdate(conversationEntity, eventJson) {
+    return this._add_event_to_conversation(eventJson, conversationEntity).then(messageEntity => {
+      const updates = {globalMessageTimer: eventJson.data.message_timer};
+      this.conversation_mapper.update_properties(conversationEntity, updates);
       return {conversationEntity, messageEntity};
     });
   }
