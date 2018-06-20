@@ -217,7 +217,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
    * @param {Array} remote - Backend payload
    * @returns {Array} Merged conversation data
    */
-  merge_conversations(local, remote) {
+  mergeConversation(local, remote) {
     return remote.map((remote_conversation, index) => {
       const {access, access_role, id, creator, members, message_timer, name, team, type} = remote_conversation;
       const localConversation = local

@@ -335,7 +335,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return Promise.all([this.conversation_service.load_conversation_states_from_db(), remote_conversations_promise])
       .then(([local_conversations, remote_conversations = []]) => {
         if (remote_conversations.length) {
-          const conversations = this.conversation_mapper.merge_conversations(local_conversations, remote_conversations);
+          const conversations = this.conversation_mapper.mergeConversation(local_conversations, remote_conversations);
           return this.conversation_service.save_conversations_in_db(conversations);
         }
 
