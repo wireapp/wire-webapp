@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="3.4.0"></a>
+# [3.4.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@3.3.1...@wireapp/core@3.4.0) (2018-06-20)
+
+
+### Features
+
+* **core:** Get (all) conversations ([#734](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/734)) ([4b8b24c](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/4b8b24c))
+
+
+
+
 <a name="3.3.1"></a>
 ## [3.3.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@3.3.0...@wireapp/core@3.3.1) (2018-06-19)
 
