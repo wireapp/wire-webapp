@@ -24,17 +24,6 @@ window.z.viewModel = z.viewModel || {};
 window.z.viewModel.panel = z.viewModel.panel || {};
 
 z.viewModel.panel.TimedMessagesViewModel = class TimedMessagesViewModel {
-  static get MESSAGE_TIMES() {
-    return [
-      1000 * 10,
-      1000 * 60 * 5,
-      1000 * 60 * 60,
-      1000 * 60 * 60 * 24,
-      1000 * 60 * 60 * 24 * 7,
-      1000 * 60 * 60 * 24 * 28,
-    ];
-  }
-
   constructor(mainViewModel, panelViewModel, repositories) {
     this.panelViewModel = panelViewModel;
     this.isVisible = this.panelViewModel.timedMessagesVisible;
@@ -42,7 +31,7 @@ z.viewModel.panel.TimedMessagesViewModel = class TimedMessagesViewModel {
     this.conversationEntity = this.conversationRepository.active_conversation;
 
     this.messageTimes = ko.pureComputed(() => {
-      const times = TimedMessagesViewModel.MESSAGE_TIMES;
+      const times = z.ephemeral.timings.VALUES;
       const currentTime = this.currentMessageTimer();
 
       if (currentTime && !times.includes(currentTime)) {
@@ -52,7 +41,7 @@ z.viewModel.panel.TimedMessagesViewModel = class TimedMessagesViewModel {
       times.sort((a, b) => a - b);
 
       return times.map(time => ({
-        text: z.util.formatTime(time),
+        text: z.util.TimeUtil.formatDuration(time).text,
         value: time,
       }));
     });

@@ -29,23 +29,58 @@ z.util.TimeUtil = {
   },
 
   /**
-   * Format seconds into 15s, 2m.
-   * @param {number} duration - Duration to format in seconds
-   * @returns {Object} Unit and value
+   * Format milliseconds into 15s, 2m.
+   * @param {number} duration - Duration to format in milliseconds
+   * @returns {Object} Unit, value and localized string
    */
-  formatMilliseconds: duration => {
-    const seconds = Math.floor(duration / 1000);
+  formatDuration: duration => {
+    const momentDuration = moment.duration(duration);
+    const units = [
+      {
+        plural: z.string.ephemeralUnitsMonths,
+        singular: z.string.ephemeralUnitsMonth,
+        unit: 'M',
+        value: momentDuration.months(),
+      },
+      {
+        plural: z.string.ephemeralUnitsWeeks,
+        singular: z.string.ephemeralUnitsWeek,
+        unit: 'w',
+        value: momentDuration.weeks(),
+      },
+      {
+        plural: z.string.ephememalUnitsDays,
+        singular: z.string.ephememalUnitsDay,
+        unit: 'd',
+        value: momentDuration.days(),
+      },
+      {
+        plural: z.string.ephememalUnitsHours,
+        singular: z.string.ephememalUnitsHour,
+        unit: 'h',
+        value: momentDuration.hours(),
+      },
+      {
+        plural: z.string.ephememalUnitsMinutes,
+        singular: z.string.ephememalUnitsMinute,
+        unit: 'm',
+        value: momentDuration.minutes(),
+      },
+      {
+        plural: z.string.ephememalUnitsSeconds,
+        singular: z.string.ephememalUnitsSecond,
+        unit: 's',
+        value: momentDuration.seconds(),
+      },
+    ];
+    const upperUnit = units.find(unit => unit.value > 0);
+    const isSingular = upperUnit.value === 1;
 
-    switch (false) {
-      case !(seconds < 60):
-        return {unit: 's', value: seconds};
-      case !(seconds < 60 * 60):
-        return {unit: 'm', value: Math.floor(seconds / 60)};
-      case !(seconds < 60 * 60 * 24):
-        return {unit: 'h', value: Math.floor(seconds / 60 / 60)};
-      default:
-        return {unit: 'd', value: Math.floor(seconds / 60 / 60 / 24)};
-    }
+    return {
+      text: isSingular ? `1 ${z.l10n.text(upperUnit.singular)}` : `${upperUnit.value} ${z.l10n.text(upperUnit.plural)}`,
+      unit: upperUnit.unit,
+      value: upperUnit.value,
+    };
   },
 
   /**

@@ -40,22 +40,7 @@
           <!-- /ko -->
 
           <!-- ko ifnot: input().length -->
-            <span id="conversation-input-bar-ephemeral"
-                  class="controls-right-button conversation-input-bar-ephemeral"
-                  data-bind="click: clickOnEphemeral, l10n_tooltip: z.string.tooltipConversationEphemeral, attr: {'data-uie-value': isTimerDisabled() ? 'disabled' : 'enabled'}"
-                  data-uie-name="do-set-ephemeral-timer"
-                  data-uie-value>
-              <!-- ko if: hasEphemeralTimer() && conversationEntity()-->
-                <div class="ephemeral-timer-button" data-bind="css: isTimerDisabled() ? 'ephemeral-timer-button--disabled' : 'ephemeral-timer-button--enabled'">
-                  <span class="ephemeral-timer-button-unit" data-bind="text: ephemeralTimerText().unit"></span>
-                  <span class="full-screen" data-bind="text: ephemeralTimerText().value"></span>
-                </div>
-              <!-- /ko -->
-
-              <!-- ko ifnot: hasEphemeralTimer() -->
-                <hourglass-icon class="button-icon-large"></hourglass-icon>
-              <!-- /ko -->
-            </span>
+            <message-timer-button params="conversation: conversationEntity"></message-timer-button>
 
             <label id="conversation-input-bar-photo" class="controls-right-button button-icon-large">
               <image-icon></image-icon>
