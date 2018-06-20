@@ -299,13 +299,13 @@ describe('Conversation Mapper', () => {
       };
       const tests = [
         {
-          expected: {messageTimer: 10000},
-          local: Object.assign({}, baseConversation, {messageTimer: undefined}),
+          expected: {message_timer: 10000},
+          local: Object.assign({}, baseConversation, {message_timer: undefined}),
           remote: Object.assign({}, baseConversation, {message_timer: 10000}),
         },
         {
-          expected: {messageTimer: 0},
-          local: Object.assign({}, baseConversation, {messageTimer: 1000}),
+          expected: {message_timer: 0},
+          local: Object.assign({}, baseConversation, {message_timer: 1000}),
           remote: Object.assign({}, baseConversation, {message_timer: 0}),
         },
       ];
@@ -313,7 +313,7 @@ describe('Conversation Mapper', () => {
       tests.forEach(({local, remote, expected}) => {
         const [merged_conversation] = conversation_mapper.merge_conversations([local], [remote]);
 
-        expect(merged_conversation.messageTimer).toEqual(expected.messageTimer);
+        expect(merged_conversation.message_timer).toEqual(expected.message_timer);
       });
     });
 
