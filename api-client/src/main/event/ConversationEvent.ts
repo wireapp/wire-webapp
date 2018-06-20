@@ -17,7 +17,12 @@
  *
  */
 
-import {Conversation, CONVERSATION_ACCESS, CONVERSATION_ACCESS_ROLE} from '../conversation';
+import {
+  Conversation,
+  CONVERSATION_ACCESS,
+  CONVERSATION_ACCESS_ROLE,
+  ConversationMessageTimerUpdate,
+} from '../conversation';
 import {BackendEvent} from './BackendEvent';
 
 enum CONVERSATION_EVENT {
@@ -30,6 +35,7 @@ enum CONVERSATION_EVENT {
   MEMBER_JOIN = 'conversation.member-join',
   MEMBER_LEAVE = 'conversation.member-leave',
   MEMBER_UPDATE = 'conversation.member-update',
+  MESSAGE_TIMER_UPDATE = 'conversation.message-timer-update',
   OTR_MESSAGE_ADD = 'conversation.otr-message-add',
   RENAME = 'conversation.rename',
   TYPING = 'conversation.typing',
@@ -41,15 +47,14 @@ enum CONVERSATION_TYPING {
 }
 
 interface ConversationEvent extends BackendEvent {
-  type: CONVERSATION_EVENT;
   conversation: string;
+  data: {};
   from: string;
   time: string;
-  data: {};
+  type: CONVERSATION_EVENT;
 }
 
 interface ConversationAccessUpdateEvent extends ConversationEvent {
-  type: CONVERSATION_EVENT.ACCESS_UPDATE;
   data: {
     access:
       | CONVERSATION_ACCESS.PRIVATE
@@ -62,6 +67,7 @@ interface ConversationAccessUpdateEvent extends ConversationEvent {
       | CONVERSATION_ACCESS_ROLE.TEAM
       | CONVERSATION_ACCESS_ROLE.NON_ACTIVATED;
   };
+  type: CONVERSATION_EVENT.ACCESS_UPDATE;
 }
 
 interface ConversationCodeDeleteEvent extends ConversationEvent {
@@ -69,24 +75,24 @@ interface ConversationCodeDeleteEvent extends ConversationEvent {
 }
 
 interface ConversationCodeUpdateEvent extends ConversationEvent {
-  type: CONVERSATION_EVENT.CODE_UPDATE;
   data: {
-    key: string;
     code: string;
+    key: string;
     uri: string;
   };
+  type: CONVERSATION_EVENT.CODE_UPDATE;
 }
 
 interface ConversationConnectRequestEvent extends ConversationEvent {
-  type: CONVERSATION_EVENT.CONNECT_REQUEST;
   data: {
     recipient: string;
   };
+  type: CONVERSATION_EVENT.CONNECT_REQUEST;
 }
 
 interface ConversationCreateEvent extends ConversationEvent {
-  type: CONVERSATION_EVENT.CREATE;
   data: Conversation;
+  type: CONVERSATION_EVENT.CREATE;
 }
 
 interface ConversationDeleteEvent extends ConversationEvent {
@@ -94,68 +100,74 @@ interface ConversationDeleteEvent extends ConversationEvent {
 }
 
 interface ConversationMemberJoinEvent extends ConversationEvent {
-  type: CONVERSATION_EVENT.MEMBER_JOIN;
   data: {
     user_ids: string[];
   };
+  type: CONVERSATION_EVENT.MEMBER_JOIN;
 }
 
 interface ConversationMemberLeaveEvent extends ConversationEvent {
-  type: CONVERSATION_EVENT.MEMBER_LEAVE;
   data: {
     user_ids: string[];
   };
+  type: CONVERSATION_EVENT.MEMBER_LEAVE;
 }
 
 interface ConversationMemberUpdateEvent extends ConversationEvent {
-  type: CONVERSATION_EVENT.MEMBER_UPDATE;
   data: {
-    otr_muted?: boolean;
-    otr_muted_ref?: string;
-    otr_archived?: boolean;
-    otr_archived_ref?: string;
-    hidden?: boolean;
     hidden_ref?: string;
+    hidden?: boolean;
+    otr_archived_ref?: string;
+    otr_archived?: boolean;
+    otr_muted_ref?: string;
+    otr_muted?: boolean;
   };
+  type: CONVERSATION_EVENT.MEMBER_UPDATE;
+}
+
+interface ConversationMessageTimerUpdateEvent extends ConversationEvent {
+  data: ConversationMessageTimerUpdate;
+  type: CONVERSATION_EVENT.MESSAGE_TIMER_UPDATE;
 }
 
 interface ConversationOtrMessageAddEvent extends ConversationEvent {
-  type: CONVERSATION_EVENT.OTR_MESSAGE_ADD;
   data: {
-    sender: string;
-    recipient: string;
-    text: string;
     data?: string;
+    recipient: string;
+    sender: string;
+    text: string;
   };
+  type: CONVERSATION_EVENT.OTR_MESSAGE_ADD;
 }
 
 interface ConversationRenameEvent extends ConversationEvent {
-  type: CONVERSATION_EVENT.RENAME;
   data: {
     name: string;
   };
+  type: CONVERSATION_EVENT.RENAME;
 }
 
 interface ConversationTypingEvent extends ConversationEvent {
-  type: CONVERSATION_EVENT.TYPING;
   data: {
     status: CONVERSATION_TYPING.STARTED | CONVERSATION_TYPING.STOPPED;
   };
+  type: CONVERSATION_EVENT.TYPING;
 }
 
 export {
   CONVERSATION_EVENT,
   CONVERSATION_TYPING,
-  ConversationEvent,
   ConversationAccessUpdateEvent,
   ConversationCodeDeleteEvent,
   ConversationCodeUpdateEvent,
   ConversationConnectRequestEvent,
   ConversationCreateEvent,
   ConversationDeleteEvent,
+  ConversationEvent,
   ConversationMemberJoinEvent,
   ConversationMemberLeaveEvent,
   ConversationMemberUpdateEvent,
+  ConversationMessageTimerUpdateEvent,
   ConversationOtrMessageAddEvent,
   ConversationRenameEvent,
   ConversationTypingEvent,

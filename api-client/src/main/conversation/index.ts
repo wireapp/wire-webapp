@@ -23,6 +23,7 @@ export * from './ConversationAPI';
 export * from './ConversationCode';
 export * from './ConversationIds';
 export * from './ConversationMembers';
+export * from './ConversationMessageTimerUpdate';
 export * from './Conversations';
 export * from './ConversationUpdate';
 export * from './IncomingNotification';
