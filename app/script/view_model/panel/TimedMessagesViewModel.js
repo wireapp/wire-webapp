@@ -29,12 +29,22 @@ z.viewModel.panel.TimedMessagesViewModel = class TimedMessagesViewModel {
     this.isVisible = this.panelViewModel.timedMessagesVisible;
     this.conversationRepository = repositories.conversation;
     this.conversationEntity = this.conversationRepository.active_conversation;
-    this.messageTimes = ko.observableArray(
-      z.ephemeral.timings.VALUES.map(time => ({
+
+    this.messageTimes = ko.pureComputed(() => {
+      const times = z.ephemeral.timings.VALUES;
+      const currentTime = this.currentMessageTimer();
+
+      if (currentTime && !times.includes(currentTime)) {
+        times.push(currentTime);
+      }
+
+      times.sort((a, b) => a - b);
+
+      return times.map(time => ({
         text: z.util.TimeUtil.formatDuration(time).text,
         value: time,
-      }))
-    );
+      }));
+    });
 
     this.isRendered = ko.observable(false).extend({notify: 'always'});
 
@@ -59,7 +69,9 @@ z.viewModel.panel.TimedMessagesViewModel = class TimedMessagesViewModel {
   }
 
   clickOnMessageTime({value}) {
-    this.conversationEntity().globalMessageTimer(value);
+    const conversationEntity = this.conversationEntity();
+    conversationEntity.globalMessageTimer(value);
+    this.conversationRepository.updateConversationMessageTimer(conversationEntity, value);
     this.clickOnBack();
   }
 

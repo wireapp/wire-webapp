@@ -335,7 +335,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return Promise.all([this.conversation_service.load_conversation_states_from_db(), remote_conversations_promise])
       .then(([local_conversations, remote_conversations = []]) => {
         if (remote_conversations.length) {
-          const conversations = this.conversation_mapper.merge_conversations(local_conversations, remote_conversations);
+          const conversations = this.conversation_mapper.mergeConversation(local_conversations, remote_conversations);
           return this.conversation_service.save_conversations_in_db(conversations);
         }
 
@@ -1267,12 +1267,30 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when conversation was renamed
    */
   renameConversation(conversation_et, name) {
-    return this.conversation_service.updateConversationProperties(conversation_et.id, {name}).then(response => {
+    return this.conversation_service.updateConversationName(conversation_et.id, name).then(response => {
       if (response) {
         amplify.publish(z.event.WebApp.EVENT.INJECT, response, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
         return response;
       }
     });
+  }
+
+  /**
+   * Set the global message timer
+   *
+   * @param {Conversation} conversationEntity - Conversation to update
+   * @param {number} messageTimer - New message timer value
+   * @returns {Promise} Resolves when conversation was updated on server side
+   */
+  updateConversationMessageTimer(conversationEntity, messageTimer) {
+    return this.conversation_service
+      .updateConversationMessageTimer(conversationEntity.id, messageTimer)
+      .then(response => {
+        if (response) {
+          amplify.publish(z.event.WebApp.EVENT.INJECT, response, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
+          return response;
+        }
+      });
   }
 
   reset_session(user_id, client_id, conversation_id) {
