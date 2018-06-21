@@ -38,7 +38,10 @@ z.entity.Message = class Message {
     this.startMessageTimer = this.startMessageTimer.bind(this);
     this.id = id;
     this.super_type = super_type;
-    this.ephemeral_caption = ko.observable('');
+    this.ephemeral_caption = ko.pureComputed(() => {
+      const remainingTime = this.ephemeral_remaining();
+      return remainingTime ? z.util.TimeUtil.formatDuration(remainingTime, 3).text : '';
+    });
     this.ephemeral_duration = ko.observable(0);
     this.ephemeral_remaining = ko.observable(0);
     this.ephemeral_expires = ko.observable(false);
@@ -261,7 +264,7 @@ z.entity.Message = class Message {
 
   // Start the ephemeral timer for the message.
   startMessageTimer() {
-    if (this.ephemeral_timeout_id) {
+    if (this.messageTimerStarted) {
       return;
     }
 
@@ -273,18 +276,7 @@ z.entity.Message = class Message {
 
     const remainingTime = this.ephemeral_expires() - Date.now();
     this.ephemeral_remaining(remainingTime);
-
-    this.ephemeral_interval_id = window.setInterval(() => {
-      const updatedRemainingTime = this.ephemeral_expires() - Date.now();
-      const formatedRemainingTime = z.util.TimeUtil.formatDuration(updatedRemainingTime, 3);
-      this.ephemeral_remaining(updatedRemainingTime);
-      this.ephemeral_caption(formatedRemainingTime.text);
-    }, 250);
-
-    this.ephemeral_timeout_id = window.setTimeout(() => {
-      amplify.publish(z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, this);
-      window.clearInterval(this.ephemeral_interval_id);
-    }, this.ephemeral_remaining());
+    this.messageTimerStarted = true;
   }
 
   /**
