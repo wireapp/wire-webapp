@@ -98,16 +98,15 @@ z.notification.NotificationRepository = class NotificationRepository {
       }
 
       if (z.util.Environment.browser.supports.permissions) {
-        return this._updateBrowserPermissionState().then(() => {
+        return this.permissionRepository.getPermissionState(z.permission.PermissionType.NOTIFICATIONS).then(() => {
           const shouldRequestPermission = this.permissionState() === z.permission.PermissionStatusState.PROMPT;
           return shouldRequestPermission ? this._requestPermission() : this._checkPermissionState();
         });
       }
 
-      const shouldRequestPermission = window.Notification.permission === z.notification.PermissionState.DEFAULT;
-      return shouldRequestPermission
-        ? this._requestPermission()
-        : this.updatePermissionState(window.Notification.permission);
+      const currentPermission = window.Notification.permission;
+      const shouldRequestPermission = currentPermission === z.notification.PermissionState.DEFAULT;
+      return shouldRequestPermission ? this._requestPermission() : this.updatePermissionState(currentPermission);
     });
   }
 
@@ -601,15 +600,6 @@ z.notification.NotificationRepository = class NotificationRepository {
         return Promise.resolve(undefined);
       }
     }
-  }
-
-  /**
-   * Get the current browser permission state.
-   * @private
-   * @returns {Promise} Resolves with true if notifications are permitted
-   */
-  _updateBrowserPermissionState() {
-    return this.permissionRepository.getPermissionState(z.permission.PermissionType.NOTIFICATIONS);
   }
 
   /**
