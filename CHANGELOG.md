@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="3.5.0"></a>
+# [3.5.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@3.4.2...@wireapp/core@3.5.0) (2018-06-21)
+
+
+### Features
+
+* **core:** Receive Message Timer Events ([#737](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/737)) ([da1bb34](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/da1bb34))
+
+
+
+
 <a name="3.4.2"></a>
 ## [3.4.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@3.4.1...@wireapp/core@3.4.2) (2018-06-21)
 
