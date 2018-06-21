@@ -292,7 +292,7 @@
 <script type="text/html" id="system">
   <div class="message-header">
     <div class="message-header-icon text-graphite">
-      <span class="icon-edit"></span>
+      <span data-bind="component: $parent.getSystemMessageIconComponent(message)"></span>
     </div>
     <div class="message-header-label">
       <span class="message-header-sender-name" data-bind='text: message.sender_name()'></span>
