@@ -20,7 +20,7 @@
 import {WIDTH} from './Layout/sizes';
 import {css} from 'styled-components';
 
-const QUERY = {
+export const QUERY = {
   desktop: `min-width: ${WIDTH.DESKTOP_MIN}px`,
   desktopXL: `min-width: ${WIDTH.DESKTOP_XL_MIN}px`,
   mobile: `max-width: ${WIDTH.MOBILE}px`,
