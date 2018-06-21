@@ -362,7 +362,7 @@ class Demo extends React.PureComponent {
                 </Form>
               </ShakeBox>
               <ErrorMessage>Submit form for shake effect</ErrorMessage>
-              <CodeInput onCodeComplete={code => console.log(code)} />
+              <CodeInput onCodeComplete={code => console.info(code)} />
             </ContainerXS>
 
             <H1>Modals</H1>
