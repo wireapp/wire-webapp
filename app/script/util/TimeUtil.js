@@ -53,7 +53,7 @@ z.util.TimeUtil = {
         plural: z.string.ephememalUnitsDays,
         singular: z.string.ephememalUnitsDay,
         unit: 'd',
-        value: momentDuration.days(),
+        value: momentDuration.days() % 7,
       },
       {
         plural: z.string.ephememalUnitsHours,
