@@ -31,9 +31,10 @@ z.util.TimeUtil = {
   /**
    * Format milliseconds into 15s, 2m.
    * @param {number} duration - Duration to format in milliseconds
+   * @param {number} maximumUnits - Maximum number of units shown in the textual representation
    * @returns {Object} Unit, value and localized string
    */
-  formatDuration: duration => {
+  formatDuration: (duration, maximumUnits = 1) => {
     const momentDuration = moment.duration(duration);
     const units = [
       {
@@ -73,11 +74,19 @@ z.util.TimeUtil = {
         value: momentDuration.seconds(),
       },
     ];
-    const upperUnit = units.find(unit => unit.value > 0);
-    const isSingular = upperUnit.value === 1;
+    const validUnits = units.filter(unit => unit.value > 0).slice(0, maximumUnits);
+
+    const longText = validUnits
+      .map(unit => {
+        const isSingular = unit.value === 1;
+        return isSingular ? `1 ${z.l10n.text(unit.singular)}` : `${unit.value} ${z.l10n.text(unit.plural)}`;
+      })
+      .join(', ');
+
+    const upperUnit = validUnits[0] || {};
 
     return {
-      text: isSingular ? `1 ${z.l10n.text(upperUnit.singular)}` : `${upperUnit.value} ${z.l10n.text(upperUnit.plural)}`,
+      text: longText,
       unit: upperUnit.unit,
       value: upperUnit.value,
     };

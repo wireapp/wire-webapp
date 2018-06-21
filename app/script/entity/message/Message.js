@@ -266,15 +266,19 @@ z.entity.Message = class Message {
     }
 
     if (this.ephemeral_status() === z.message.EphemeralStatusType.INACTIVE) {
-      this.ephemeral_expires(new Date(Date.now() + this.ephemeral_expires()).getTime().toString());
-      this.ephemeral_started(new Date(Date.now()).getTime().toString());
+      const expirationDate = `${Date.now() + this.ephemeral_expires()}`;
+      this.ephemeral_expires(expirationDate);
+      this.ephemeral_started(`${Date.now()}`);
     }
 
-    this.ephemeral_remaining(this.ephemeral_expires() - Date.now());
+    const remainingTime = this.ephemeral_expires() - Date.now();
+    this.ephemeral_remaining(remainingTime);
 
     this.ephemeral_interval_id = window.setInterval(() => {
-      this.ephemeral_remaining(this.ephemeral_expires() - Date.now());
-      this.ephemeral_caption(z.util.formatTimeRemaining(this.ephemeral_remaining()));
+      const updatedRemainingTime = this.ephemeral_expires() - Date.now();
+      const formatedRemainingTime = z.util.TimeUtil.formatDuration(updatedRemainingTime, 3);
+      this.ephemeral_remaining(updatedRemainingTime);
+      this.ephemeral_caption(formatedRemainingTime.text);
     }, 250);
 
     this.ephemeral_timeout_id = window.setTimeout(() => {
