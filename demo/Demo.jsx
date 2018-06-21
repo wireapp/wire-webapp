@@ -487,16 +487,46 @@ class Demo extends React.PureComponent {
 
             <Label>Label</Label>
             <LabelLink block>LabelLink</LabelLink>
-
-            <H1>Colors</H1>
             <Line />
-            {Object.keys(COLOR).map(colorKey => (
-              <div key={colorKey} style={{backgroundColor: COLOR[colorKey], color: Color(COLOR[colorKey]).negate()}}>
-                {colorKey} ({Color(COLOR[colorKey])
-                  .hex()
-                  .toString()})
-              </div>
-            ))}
+            <H1>Colors</H1>
+            <div
+              style={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                justifyContent: 'space-around',
+              }}
+            >
+              {Object.keys(COLOR).map((colorKey, index) => (
+                <div
+                  key={colorKey}
+                  style={{
+                    backgroundColor: COLOR[colorKey],
+                    borderRadius: '12px',
+                    height: '96px',
+                    margin: '8px',
+                    width: '192px',
+                  }}
+                >
+                  <div
+                    style={{
+                      backgroundColor: COLOR.WHITE,
+                      border: `1px solid ${Color(COLOR[colorKey])
+                        .hex()
+                        .toString()}`,
+                      fontSize: '12px',
+                      fontWeight: 600,
+                      padding: '4px',
+                      textAlign: 'center',
+                    }}
+                  >
+                    {colorKey}
+                    ({Color(COLOR[colorKey])
+                      .hex()
+                      .toString()})
+                  </div>
+                </div>
+              ))}
+            </div>
           </Container>
         </Content>
         <Footer>Footer</Footer>
