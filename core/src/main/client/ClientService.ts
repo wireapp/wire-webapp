@@ -41,7 +41,7 @@ export interface MetaClient extends RegisteredClient {
 }
 
 export default class ClientService {
-  private readonly logger: any = logdown('@wireapp/core/ClientService', {
+  private readonly logger: any = logdown('@wireapp/core/client/ClientService', {
     logger: console,
     markdown: false,
   });

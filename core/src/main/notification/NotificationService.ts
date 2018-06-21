@@ -26,7 +26,7 @@ import NotificationBackendRepository from './NotificationBackendRepository';
 import NotificationDatabaseRepository from './NotificationDatabaseRepository';
 
 export default class NotificationService {
-  private readonly logger: any = logdown('@wireapp/core/Account', {
+  private readonly logger: any = logdown('@wireapp/core/notification/NotificationService', {
     logger: console,
     markdown: false,
   });

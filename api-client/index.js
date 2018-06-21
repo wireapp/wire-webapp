@@ -24,6 +24,9 @@ const argv = require('optimist')
   .alias('h', 'handle')
   .alias('p', 'password').argv;
 
+const logger = require('logdown')('@wireapp/api-client/index.js');
+logger.state.isEnabled = true;
+
 const Client = require('@wireapp/api-client');
 const path = require('path');
 const {FileEngine} = require('@wireapp/store-engine');
@@ -51,22 +54,22 @@ Promise.resolve()
     return apiClient.init();
   })
   .catch(error => {
-    console.log(`Authentication via existing authenticator (Session Cookie or Access Token) failed: ${error.message}`);
+    logger.log(`Authentication via existing authenticator (Session Cookie or Access Token) failed: ${error.message}`);
     return apiClient.login(login);
   })
   .then(context => {
-    console.log(`Got self user with ID "${context.userId}".`);
+    logger.log(`Got self user with ID "${context.userId}".`);
     return apiClient.user.api.getUsers({handles: ['webappbot']});
   })
   .then(userData => {
-    console.log(`Found user with name "${userData[0].name}" by handle "${userData[0].handle}".`);
+    logger.log(`Found user with name "${userData[0].name}" by handle "${userData[0].handle}".`);
     return apiClient.connect();
   })
   .then(webSocketClient => {
     webSocketClient.on(WebSocketClient.TOPIC.ON_MESSAGE, notification => {
-      console.log('Received notification via WebSocket', notification);
+      logger.log('Received notification via WebSocket', notification);
     });
   })
   .catch(error => {
-    console.error(error.message, error);
+    logger.error(error.message, error);
   });

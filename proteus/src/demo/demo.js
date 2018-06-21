@@ -17,5 +17,5 @@ const _sodium = require('libsodium-wrappers-sumo');
   const messageFingerprint = `Identity Test (Fingerprint): ${fingerprint}`;
   const messageSerialization = `Identity Test (Serialization): ${encodedSerializedIdentity}`;
 
-  console.log(`${messageFingerprint}\r\n${messageSerialization}`);
+  console.info(`${messageFingerprint}\r\n${messageSerialization}`);
 })();

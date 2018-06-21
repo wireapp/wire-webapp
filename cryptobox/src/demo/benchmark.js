@@ -60,7 +60,7 @@ async function encryptBeforeDecrypt({alice, bob}, messageCount) {
   let stopTime = getTimeInSeconds(startTime);
   process.stdout.write('Done.\n');
 
-  console.log(`Execution time: ${stopTime} seconds.\n`);
+  console.info(`Execution time: ${stopTime} seconds.\n`);
 
   // Decryption
   process.stdout.write(`Measuring decryption time for "${messageCount}" messages ... `);
@@ -71,7 +71,7 @@ async function encryptBeforeDecrypt({alice, bob}, messageCount) {
   stopTime = getTimeInSeconds(startTime);
   process.stdout.write('Done.\n');
 
-  console.log(`Execution time: ${stopTime} seconds.\n`);
+  console.info(`Execution time: ${stopTime} seconds.\n`);
 }
 
 async function pingPong({alice, bob}, messageCount) {
@@ -101,7 +101,7 @@ async function pingPong({alice, bob}, messageCount) {
   const stopTime = getTimeInSeconds(startTime);
   process.stdout.write('Done.\n');
 
-  console.log(`Execution time: ${stopTime} seconds.\n`);
+  console.info(`Execution time: ${stopTime} seconds.\n`);
 }
 
 async function pingPongWithMultipleSessions(messageCount) {
@@ -128,7 +128,7 @@ async function pingPongWithMultipleSessions(messageCount) {
 
   let stopTime = getTimeInSeconds(startTime);
   process.stdout.write('Done.\n');
-  console.log(`Execution time: ${stopTime} seconds.\n`);
+  console.info(`Execution time: ${stopTime} seconds.\n`);
 
   process.stdout.write(
     `Measuring time for encrypting "${messageCount}" messages with "${messageCount}" cryptoboxes ... `
@@ -141,7 +141,7 @@ async function pingPongWithMultipleSessions(messageCount) {
 
   stopTime = getTimeInSeconds(startTime);
   process.stdout.write('Done.\n');
-  console.log(`Execution time: ${stopTime} seconds.\n`);
+  console.info(`Execution time: ${stopTime} seconds.\n`);
 
   process.stdout.write(`Measuring time for decrypting "${messageCount}" messages in "${messageCount}" sessions ... `);
   startTime = process.hrtime();
@@ -150,12 +150,12 @@ async function pingPongWithMultipleSessions(messageCount) {
 
   stopTime = getTimeInSeconds(startTime);
   process.stdout.write('Done.\n');
-  console.log(`Execution time: ${stopTime} seconds.\n`);
+  console.info(`Execution time: ${stopTime} seconds.\n`);
 }
 
 (async () => {
   try {
-    console.log('Running benchmark(s) ... \n');
+    console.info('Running benchmark(s) ... \n');
     const amountOfMessages = 3000;
     await encryptBeforeDecrypt(await initialSetup(), amountOfMessages);
     await pingPong(await initialSetup(), amountOfMessages);

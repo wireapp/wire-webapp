@@ -18,5 +18,5 @@ yarn add @wireapp/core
 
 #### Demo
 
+- [echo.js](./src/demo/echo.js)
 - [sender.js](./src/demo/sender.js)
-- [receiver.js](./src/demo/receiver.js)

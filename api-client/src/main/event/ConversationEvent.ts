@@ -132,7 +132,6 @@ interface ConversationMessageTimerUpdateEvent extends ConversationEvent {
 
 interface ConversationOtrMessageAddEvent extends ConversationEvent {
   data: {
-    data?: string;
     recipient: string;
     sender: string;
     text: string;
