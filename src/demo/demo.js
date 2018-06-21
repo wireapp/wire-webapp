@@ -28,6 +28,9 @@ import {IndexedDBEngine} from '@wireapp/store-engine/dist/commonjs/engine';
 import ReactDOM from 'react-dom';
 import {WebSocketClient} from '@wireapp/api-client/dist/commonjs/tcp/';
 
+const logger = require('logdown')('@wireapp/api-client/demo/demo.js');
+logger.state.isEnabled = true;
+
 const BACKEND_ENV = Client.BACKEND.STAGING;
 
 class Auth extends Component {
@@ -51,7 +54,7 @@ class Auth extends Component {
       .init()
       .then(() => this.setState({authenticated: true}))
       .catch(error => {
-        console.error('Could not recover from cookie', error);
+        logger.error('Could not recover from cookie', error);
       });
   }
 
@@ -62,7 +65,7 @@ class Auth extends Component {
       .then(() => window.wire.client.init())
       .catch(error => window.wire.client.login(this.state.login))
       .then(context => {
-        console.log('Login successful', context);
+        logger.log('Login successful', context);
         this.setState({authenticated: true});
         return window.wire.client.connect();
       });
@@ -121,10 +124,10 @@ window.onload = function() {
   };
   const client = new Client(config);
   client.transport.ws.on(WebSocketClient.TOPIC.ON_MESSAGE, notification => {
-    console.log('Received notification via WebSocket', notification);
+    logger.log('Received notification via WebSocket', notification);
   });
   client.accessTokenStore.on(AccessTokenStore.TOPIC.ACCESS_TOKEN_REFRESH, accessToken => {
-    console.log('Acquired AccessToken', accessToken);
+    logger.log('Acquired AccessToken', accessToken);
   });
   window.wire = Object.assign({}, {client});
 
