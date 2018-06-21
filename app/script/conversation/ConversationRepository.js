@@ -30,7 +30,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       EXTERNAL_MESSAGE_THRESHOLD: 200 * 1024,
       GROUP: {
         MAX_NAME_LENGTH: 64,
-        MAX_SIZE: 128,
+        MAX_SIZE: 258,
       },
       STATE_EVENTS: [
         z.event.Backend.CONVERSATION.ACCESS_UPDATE,
