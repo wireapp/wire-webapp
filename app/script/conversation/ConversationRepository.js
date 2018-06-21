@@ -1703,12 +1703,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when the asset failure was sent
    */
   send_asset_upload_failed(conversation_et, messageId, reason = z.assets.AssetUploadFailedReason.FAILED) {
-    const reason_proto =
-      reason === z.assets.AssetUploadFailedReason.CANCELLED
-        ? z.proto.Asset.NotUploaded.CANCELLED
-        : z.proto.Asset.NotUploaded.FAILED;
+    const wasCancelled = reason === z.assets.AssetUploadFailedReason.CANCELLED;
+    const protoReason = wasCancelled ? z.proto.Asset.NotUploaded.CANCELLED : z.proto.Asset.NotUploaded.FAILED;
     const asset = new z.proto.Asset();
-    asset.set('not_uploaded', reason_proto);
+    asset.set('not_uploaded', protoReason);
 
     const generic_message = new z.proto.GenericMessage(messageId);
     generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, asset);

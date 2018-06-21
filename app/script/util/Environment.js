@@ -102,7 +102,11 @@ z.util.Environment = (() => {
       return false;
     }
   };
-  const _supportsMediaDevices = () => !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+  const _supportsMediaDevices = () => !!navigator.mediaDevices && !!navigator.mediaDevices.getUserMedia;
+
+  const _supportsPermissions = () => !!navigator.permissions;
+  const _supportsMediaPermissions = () => _supportsPermissions() && _isChrome() && _getVersion() >= 64;
+
   const _supportsNotifications = () => {
     const notificationNotSupported = window.Notification === undefined;
     if (notificationNotSupported) {
@@ -134,7 +138,9 @@ z.util.Environment = (() => {
         calling: _supportsCalling(),
         indexedDb: _supportsIndexedDb(),
         mediaDevices: _supportsMediaDevices(),
+        mediaPermissions: _supportsMediaPermissions(),
         notifications: _supportsNotifications(),
+        permissions: _supportsPermissions(),
         screenSharing: _supportsScreenSharing(),
       },
       version: _getVersion(),

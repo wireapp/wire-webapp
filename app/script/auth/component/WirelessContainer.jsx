@@ -46,7 +46,7 @@ export const WirelessContainer = ({
           margin: '0',
         }}
       >
-        <div style={{margin: '16px 16px', textAlign: 'center', width: '100%'}}>
+        <div style={{margin: '16px 40px', textAlign: 'center', width: '100%'}}>
           <Link
             onClick={onCookiePolicyBannerClose}
             href={EXTERNAL_ROUTE.WIRE_PRIVACY_POLICY}
@@ -61,7 +61,7 @@ export const WirelessContainer = ({
         </div>
         <div
           onClick={onCookiePolicyBannerClose}
-          style={{cursor: 'pointer', padding: '20px'}}
+          style={{cursor: 'pointer', padding: '16px', position: 'absolute', right: 0, top: 0}}
           data-uie-name="do-close-cookie-banner"
         >
           <CloseIcon />

@@ -88,7 +88,7 @@ z.main.App = class App {
     repositories.audio = this.auth.audio;
     repositories.cache = new z.cache.CacheRepository();
     repositories.giphy = new z.extension.GiphyRepository(this.service.giphy);
-    repositories.media = new z.media.MediaRepository();
+    repositories.permission = new z.permission.PermissionRepository();
     repositories.storage = new z.storage.StorageRepository(this.service.storage);
 
     repositories.cryptography = new z.cryptography.CryptographyRepository(
@@ -96,6 +96,7 @@ z.main.App = class App {
       repositories.storage
     );
     repositories.client = new z.client.ClientRepository(this.service.client, repositories.cryptography);
+    repositories.media = new z.media.MediaRepository(repositories.permission);
     repositories.user = new z.user.UserRepository(
       this.service.user,
       this.service.asset,
@@ -163,7 +164,8 @@ z.main.App = class App {
     );
     repositories.notification = new z.notification.NotificationRepository(
       repositories.calling,
-      repositories.conversation
+      repositories.conversation,
+      repositories.permission
     );
     repositories.videoGrid = new z.calling.VideoGridRepository(repositories.calling, repositories.media);
 

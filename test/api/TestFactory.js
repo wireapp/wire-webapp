@@ -78,6 +78,19 @@ window.TestFactory.prototype.exposeAuthActors = function() {
 
 /**
  *
+ * @returns {Promise<z.permission.PermissionRepository>} The permission repository.
+ */
+window.TestFactory.prototype.exposePermissionActors = function() {
+  this.logger.info('- exposePermissionActors');
+  return Promise.resolve().then(() => {
+    TestFactory.permission_repository = new z.permission.PermissionRepository();
+    TestFactory.permission_repository.logger.level = this.settings.logging_level;
+    return TestFactory.permission_repository;
+  });
+};
+
+/**
+ *
  * @returns {Promise<z.storage.StorageRepository>} The storage repository.
  */
 window.TestFactory.prototype.exposeStorageActors = function() {
@@ -436,7 +449,11 @@ window.TestFactory.prototype.exposeCallingActors = function() {
 window.TestFactory.prototype.exposeNotificationActors = function() {
   this.logger.info('- exposeNotificationActors');
   return Promise.resolve()
-    .then(() => this.exposeConversationActors())
+    .then(() => this.exposePermissionActors())
+    .then(() => {
+      this.logger.info('✓ exposedPermissionActors');
+      return this.exposeConversationActors();
+    })
     .then(() => {
       this.logger.info('✓ exposedConversationActors');
       return this.exposeCallingActors();
@@ -446,7 +463,8 @@ window.TestFactory.prototype.exposeNotificationActors = function() {
 
       TestFactory.notification_repository = new z.notification.NotificationRepository(
         TestFactory.calling_repository,
-        TestFactory.conversation_repository
+        TestFactory.conversation_repository,
+        TestFactory.permission_repository
       );
       TestFactory.notification_repository.logger.level = this.settings.logging_level;
 
