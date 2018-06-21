@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="1.3.0"></a>
+# [1.3.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@1.2.1...@wireapp/api-client@1.3.0) (2018-06-21)
+
+
+### Features
+
+* **core:** Receive Message Timer Events ([#737](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/737)) ([da1bb34](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/da1bb34))
+
+
+
+
 <a name="1.2.1"></a>
 ## [1.2.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@1.2.0...@wireapp/api-client@1.2.1) (2018-06-21)
 

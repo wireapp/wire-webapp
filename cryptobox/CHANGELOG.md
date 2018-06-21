@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="8.5.0"></a>
+# [8.5.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/compare/@wireapp/cryptobox@8.4.8...@wireapp/cryptobox@8.5.0) (2018-06-21)
+
+
+### Features
+
+* **core:** Receive Message Timer Events ([#737](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/issues/737)) ([da1bb34](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/commit/da1bb34))
+
+
+
+
 <a name="8.4.8"></a>
 ## [8.4.8](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/compare/@wireapp/cryptobox@8.4.7...@wireapp/cryptobox@8.4.8) (2018-06-19)
 

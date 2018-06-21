@@ -35,5 +35,5 @@
     "test:node": "jasmine"
   },
   "types": "dist/index.d.ts",
-  "version": "7.1.63"
+  "version": "7.2.0"
 }
