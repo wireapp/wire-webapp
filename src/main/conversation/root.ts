@@ -32,6 +32,7 @@ import {
   PayloadBundleOutgoingUnsent,
   PayloadBundleState,
 } from './PayloadBundle';
+import {TimerService} from './TimerService';
 
 export {
   Asset,
@@ -50,4 +51,5 @@ export {
   PayloadBundleOutgoingUnsent,
   PayloadBundleState,
   RemoteData,
+  TimerService,
 };

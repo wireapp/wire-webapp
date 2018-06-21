@@ -39,6 +39,7 @@ import {
   PayloadBundleOutgoingUnsent,
   PayloadBundleState,
   RemoteData,
+  TimerService,
 } from '../conversation/root';
 import * as AssetCryptography from '../cryptography/AssetCryptography.node';
 import {CryptographyService, EncryptedAsset} from '../cryptography/root';
@@ -48,13 +49,16 @@ import APIClient = require('@wireapp/api-client');
 
 export default class ConversationService {
   private clientID: string = '';
+  public readonly timerService: TimerService;
 
   constructor(
     private readonly apiClient: APIClient,
     private readonly protocolBuffers: any = {},
     private readonly cryptographyService: CryptographyService,
     private readonly assetService: AssetService
-  ) {}
+  ) {
+    this.timerService = new TimerService();
+  }
 
   private createEphemeral(originalGenericMessage: any, expireAfterMillis: number): any {
     const ephemeral = this.protocolBuffers.Ephemeral.create({
@@ -148,8 +152,7 @@ export default class ConversationService {
 
   private async sendImage(
     conversationId: string,
-    payloadBundle: PayloadBundleOutgoingUnsent,
-    expireAfterMillis?: number
+    payloadBundle: PayloadBundleOutgoingUnsent
   ): Promise<PayloadBundleOutgoing> {
     if (!payloadBundle.content) {
       throw new Error('No content for sendImage provided!');
@@ -186,7 +189,8 @@ export default class ConversationService {
       messageId: payloadBundle.id,
     });
 
-    if (expireAfterMillis) {
+    const expireAfterMillis = this.timerService.getMessageTimer(conversationId);
+    if (expireAfterMillis > 0) {
       genericMessage = this.createEphemeral(genericMessage, expireAfterMillis);
     }
 
@@ -212,8 +216,7 @@ export default class ConversationService {
 
   private async sendPing(
     conversationId: string,
-    payloadBundle: PayloadBundleOutgoingUnsent,
-    expireAfterMillis?: number
+    payloadBundle: PayloadBundleOutgoingUnsent
   ): Promise<PayloadBundleOutgoing> {
     const knock = this.protocolBuffers.Knock.create();
     let genericMessage = this.protocolBuffers.GenericMessage.create({
@@ -221,7 +224,8 @@ export default class ConversationService {
       messageId: payloadBundle.id,
     });
 
-    if (expireAfterMillis) {
+    const expireAfterMillis = this.timerService.getMessageTimer(conversationId);
+    if (expireAfterMillis > 0) {
       genericMessage = this.createEphemeral(genericMessage, expireAfterMillis);
     }
 
@@ -246,8 +250,7 @@ export default class ConversationService {
 
   private async sendText(
     conversationId: string,
-    originalPayloadBundle: PayloadBundleOutgoingUnsent,
-    expireAfterMillis?: number
+    originalPayloadBundle: PayloadBundleOutgoingUnsent
   ): Promise<PayloadBundleOutgoing> {
     const payloadBundle: PayloadBundleOutgoing = {
       ...originalPayloadBundle,
@@ -259,7 +262,8 @@ export default class ConversationService {
       text: this.protocolBuffers.Text.create({content: payloadBundle.content}),
     });
 
-    if (expireAfterMillis) {
+    const expireAfterMillis = this.timerService.getMessageTimer(conversationId);
+    if (expireAfterMillis > 0) {
       genericMessage = this.createEphemeral(genericMessage, expireAfterMillis);
     }
 
@@ -388,14 +392,13 @@ export default class ConversationService {
 
   public async send(
     conversationId: string,
-    payloadBundle: PayloadBundleOutgoingUnsent,
-    expireAfterMillis?: number
+    payloadBundle: PayloadBundleOutgoingUnsent
   ): Promise<PayloadBundleOutgoing> {
     switch (payloadBundle.type) {
       case GenericMessageType.ASSET: {
         if (payloadBundle.content) {
           if ((payloadBundle.content as ImageAsset).image) {
-            return this.sendImage(conversationId, payloadBundle, expireAfterMillis);
+            return this.sendImage(conversationId, payloadBundle);
           }
           throw new Error(`No send method implemented for sending other assets than images.`);
         }
@@ -412,9 +415,9 @@ export default class ConversationService {
       case GenericMessageType.CONFIRMATION:
         return this.sendConfirmation(conversationId, payloadBundle);
       case GenericMessageType.KNOCK:
-        return this.sendPing(conversationId, payloadBundle, expireAfterMillis);
+        return this.sendPing(conversationId, payloadBundle);
       case GenericMessageType.TEXT:
-        return this.sendText(conversationId, payloadBundle, expireAfterMillis);
+        return this.sendText(conversationId, payloadBundle);
       default:
         throw new Error(`No send method implemented for "${payloadBundle.type}."`);
     }

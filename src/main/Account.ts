@@ -17,21 +17,20 @@
  *
  */
 
-const logdown = require('logdown');
-import Client = require('@wireapp/api-client');
 import {Context, LoginData} from '@wireapp/api-client/dist/commonjs/auth/index';
 import {ClientType, RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/index';
 import {IncomingNotification} from '@wireapp/api-client/dist/commonjs/conversation/index';
 import {
   CONVERSATION_EVENT,
   ConversationEvent,
+  ConversationMessageTimerUpdateEvent,
   ConversationOtrMessageAddEvent,
 } from '@wireapp/api-client/dist/commonjs/event/index';
 import {StatusCode} from '@wireapp/api-client/dist/commonjs/http/index';
 import {WebSocketClient} from '@wireapp/api-client/dist/commonjs/tcp/index';
 import * as cryptobox from '@wireapp/cryptobox';
 import {RecordNotFoundError} from '@wireapp/store-engine/dist/commonjs/engine/error/index';
-import EventEmitter = require('events');
+import * as Long from 'long';
 import {Root} from 'protobufjs';
 import {LoginSanitizer} from './auth/root';
 import {ClientInfo, ClientService} from './client/root';
@@ -48,6 +47,10 @@ import {NotificationService} from './notification/root';
 import proto from './Protobuf';
 import {SelfService} from './self/root';
 
+const logdown = require('logdown');
+import Client = require('@wireapp/api-client');
+import EventEmitter = require('events');
+
 class Account extends EventEmitter {
   private readonly logger: any = logdown('@wireapp/core/Account', {
     logger: console,
@@ -56,8 +59,9 @@ class Account extends EventEmitter {
 
   public static readonly INCOMING = {
     ASSET: 'Account.INCOMING.ASSET',
-    CLIENT_ACTION: 'Account.CLIENT_ACTION',
+    CLIENT_ACTION: 'Account.INCOMING.CLIENT_ACTION',
     CONFIRMATION: 'Account.INCOMING.CONFIRMATION',
+    MESSAGE_TIMER_UPDATE: 'Account.INCOMING.MESSAGE_TIMER_UPDATE',
     PING: 'Account.INCOMING.PING',
     TEXT_MESSAGE: 'Account.INCOMING.TEXT_MESSAGE',
     TYPING: 'Account.INCOMING.TYPING',
@@ -259,26 +263,30 @@ class Account extends EventEmitter {
     const decryptedMessage = await this.service.cryptography.decrypt(sessionId, cipherText);
     const genericMessage = this.protocolBuffers.GenericMessage.decode(decryptedMessage);
 
+    const contentBody = genericMessage.ephemeral ? genericMessage.ephemeral.text : genericMessage.text;
+    const messageTimer = genericMessage.ephemeral ? (genericMessage.ephemeral.expireAfterMillis as Long).toNumber() : 0;
+    const type = genericMessage.ephemeral ? genericMessage.ephemeral.content : genericMessage.content;
+
     return {
-      content: genericMessage.text && genericMessage.text.content,
+      content: contentBody && contentBody.content,
       id: genericMessage.messageId,
-      type: genericMessage.content,
+      messageTimer,
+      type,
     };
   }
 
   private async handleEvent(event: ConversationEvent): Promise<PayloadBundleIncoming | ConversationEvent | void> {
-    this.logger.info('handleEvent');
+    this.logger.info('handleEvent', event.type);
     const {conversation, from} = event;
 
-    switch (event.type) {
-      case CONVERSATION_EVENT.OTR_MESSAGE_ADD: {
-        const otrMessage = event as ConversationOtrMessageAddEvent;
-        const decodedMessage = await this.decodeGenericMessage(otrMessage);
-        return {...decodedMessage, from, conversation, state: PayloadBundleState.INCOMING};
-      }
-      case CONVERSATION_EVENT.TYPING: {
-        return {...event, from, conversation};
-      }
+    const ENCRYPTED_EVENTS = [CONVERSATION_EVENT.OTR_MESSAGE_ADD];
+    const META_EVENTS = [CONVERSATION_EVENT.MESSAGE_TIMER_UPDATE, CONVERSATION_EVENT.TYPING];
+
+    if (ENCRYPTED_EVENTS.includes(event.type)) {
+      const decodedMessage = await this.decodeGenericMessage(event as ConversationOtrMessageAddEvent);
+      return {...decodedMessage, from, conversation, state: PayloadBundleState.INCOMING};
+    } else if (META_EVENTS.includes(event.type)) {
+      return {...event, from, conversation};
     }
   }
 
@@ -303,11 +311,31 @@ class Account extends EventEmitter {
           case GenericMessageType.TEXT:
             this.emit(Account.INCOMING.TEXT_MESSAGE, data);
             break;
+          case CONVERSATION_EVENT.MESSAGE_TIMER_UPDATE: {
+            const {
+              data: {message_timer},
+              conversation,
+            } = data as ConversationMessageTimerUpdateEvent;
+            const expireAfterMillis = Number(message_timer);
+            this.logger.info(
+              `Received "${expireAfterMillis}" ms timer on conversation level for conversation "${conversation}".`
+            );
+            this.service!.conversation.timerService.setConversationLevelTimer(conversation, expireAfterMillis);
+            this.emit(Account.INCOMING.MESSAGE_TIMER_UPDATE, event);
+            break;
+          }
           case CONVERSATION_EVENT.TYPING: {
             this.emit(Account.INCOMING.TYPING, event);
             break;
           }
         }
+      } else {
+        this.logger.info(
+          `Received unsupported event "${event.type}" in conversation "${event.conversation}" from user "${
+            event.from
+          }".`,
+          event
+        );
       }
     }
   }

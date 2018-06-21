@@ -38,7 +38,7 @@ export interface MetaClient extends RegisteredClient {
 }
 
 class CryptographyService {
-  private readonly logger: any = logdown('@wireapp/core/Account', {
+  private readonly logger: any = logdown('@wireapp/core/cryptography/CryptographyService', {
     logger: console,
     markdown: false,
   });
