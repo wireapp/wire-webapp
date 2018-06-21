@@ -98,18 +98,15 @@ z.notification.NotificationRepository = class NotificationRepository {
       }
 
       if (z.util.Environment.browser.supports.permissions) {
-        return this.permissionRepository
-          .getPermissionState(z.permission.PermissionType.NOTIFICATIONS)
-          .then(permissionState => {
-            const shouldRequestPermission = permissionState === z.permission.PermissionStatusState.PROMPT;
-            return shouldRequestPermission ? this._requestPermission() : this._checkPermissionState();
-          });
+        return this.permissionRepository.getPermissionState(z.permission.PermissionType.NOTIFICATIONS).then(() => {
+          const shouldRequestPermission = this.permissionState() === z.permission.PermissionStatusState.PROMPT;
+          return shouldRequestPermission ? this._requestPermission() : this._checkPermissionState();
+        });
       }
 
-      const shouldRequestPermission = window.Notification.permission === z.notification.PermissionState.DEFAULT;
-      return shouldRequestPermission
-        ? this._requestPermission()
-        : this.updatePermissionState(window.Notification.permission);
+      const currentPermission = window.Notification.permission;
+      const shouldRequestPermission = currentPermission === z.notification.PermissionState.DEFAULT;
+      return shouldRequestPermission ? this._requestPermission() : this.updatePermissionState(currentPermission);
     });
   }
 
@@ -583,7 +580,7 @@ z.notification.NotificationRepository = class NotificationRepository {
   }
 
   /**
-   * Evaluates the current permission state
+   * Evaluates the current permission state.
    * @private
    * @returns {Promise} Resolves with true if notifications are permitted
    */
@@ -620,9 +617,7 @@ z.notification.NotificationRepository = class NotificationRepository {
       .then(() => this._createNotificationContent(messageEntity, connectionEntity, conversationEntity))
       .then(notificationContent => {
         return this.checkPermission().then(isPermitted => {
-          if (isPermitted) {
-            return this._showNotification(notificationContent);
-          }
+          return isPermitted ? this._showNotification(notificationContent) : undefined;
         });
       })
       .catch(error => {
@@ -641,19 +636,18 @@ z.notification.NotificationRepository = class NotificationRepository {
    */
   _notifySound(messageEntity) {
     const muteSound = !document.hasFocus() && z.util.Environment.browser.firefox && z.util.Environment.os.mac;
-    if (!muteSound) {
+    const isFromSelf = messageEntity.user().is_me;
+    const shouldPlaySound = !muteSound && !isFromSelf;
+
+    if (shouldPlaySound) {
       switch (messageEntity.super_type) {
         case z.message.SuperType.CONTENT: {
-          if (!messageEntity.user().is_me) {
-            amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.NEW_MESSAGE);
-          }
+          amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.NEW_MESSAGE);
           break;
         }
 
         case z.message.SuperType.PING: {
-          if (!messageEntity.user().is_me) {
-            amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.INCOMING_PING);
-          }
+          amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.INCOMING_PING);
           break;
         }
 
@@ -787,8 +781,8 @@ z.notification.NotificationRepository = class NotificationRepository {
       this.logger.info(`Removed notification for ${messageInfo} in '${conversationId}' locally.`);
     };
 
-    notification.onerror = () => {
-      this.logger.error(`Notification for ${messageInfo} in '${conversationId}' closed by error.`);
+    notification.onerror = error => {
+      this.logger.error(`Notification for ${messageInfo} in '${conversationId}' closed by error.`, error);
       notification.close();
     };
 

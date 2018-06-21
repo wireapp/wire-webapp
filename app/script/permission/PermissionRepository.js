@@ -51,6 +51,8 @@ z.permission.PermissionRepository = class PermissionRepository {
 
   checkPermissionState(permissionType) {
     return Promise.resolve().then(() => {
+      const setPermissionState = permissionState => this.permissionState[permissionType](permissionState);
+
       if (!z.util.Environment.browser.supports.permissions) {
         throw new z.permission.PermissionError(z.permission.PermissionError.TYPE.UNSUPPORTED);
       }
@@ -60,23 +62,24 @@ z.permission.PermissionRepository = class PermissionRepository {
         throw new z.permission.PermissionError(z.permission.PermissionError.TYPE.UNSUPPORTED_TYPE);
       }
 
-      let status;
       return navigator.permissions.query({name: permissionType}).then(permissionStatus => {
-        status = permissionStatus;
-        this.logger.log(`Permission for '${permissionType}' is currently '${status.state}'`, status);
+        this.logger.log(`Permission state for '${permissionType}' is '${permissionStatus.state}'`, permissionStatus);
+        setPermissionState(permissionStatus.state);
 
-        status.onChange = () => {
-          this.logger.log(`Permission for '${permissionType}' changed to '${status.state}'`, status);
-          this.permissionState[permissionType](status.state);
+        permissionStatus.onchange = () => {
+          const logMessage = `Permission  state for '${permissionType}' changed to '${permissionStatus.state}'`;
+          this.logger.log(logMessage, permissionStatus);
+          setPermissionState(permissionStatus.state);
         };
 
-        return status.state;
+        return permissionStatus.state;
       });
     });
   }
 
   getPermissionState(permissionType) {
-    return this[permissionType] ? Promise.resolve(this[permissionType]) : this.checkPermissionState(permissionType);
+    const currentPermissionState = this.permissionState[permissionType]();
+    return currentPermissionState ? Promise.resolve(currentPermissionState) : this.checkPermissionState(permissionType);
   }
 
   getPermissionStates(permissionTypes) {

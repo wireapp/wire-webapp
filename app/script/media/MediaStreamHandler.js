@@ -291,8 +291,8 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
    */
   requestMediaStream(mediaType, mediaStreamConstraints) {
     return this._checkDeviceAvailability(mediaType)
-      .then(() => this._checkPermissions(mediaType))
-      .then(() => this._requestMediaStream(mediaType, mediaStreamConstraints))
+      .then(() => this._hasPermissionToAccess(mediaType))
+      .then(hasPermission => this._requestMediaStream(mediaType, mediaStreamConstraints, hasPermission))
       .catch(error => {
         const isPermissionDenied = error.type === z.permission.PermissionError.TYPE.DENIED;
         throw isPermissionDenied
@@ -345,31 +345,37 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
    *
    * @private
    * @param {z.media.MediaType} mediaType - Requested media type
-   * @returns {Promise} Resolves when the permissions are not denied
+   * @returns {Promise} Resolves true when permissions is granted
    */
-  _checkPermissions(mediaType) {
+  _hasPermissionToAccess(mediaType) {
     if (!z.util.Environment.browser.supports.mediaPermissions) {
-      return Promise.resolve();
+      return Promise.resolve(false);
     }
 
     const checkPermissionStates = typesToCheck => {
       return this.permissionRepository.getPermissionStates(typesToCheck).then(permissions => {
         for (const permission of permissions) {
           const {permissionState, permissionType} = permission;
+          const isPermissionPrompt = permissionState === z.permission.PermissionStatusState.PROMPT;
+          if (isPermissionPrompt) {
+            this.logger.info(`Need to prompt for '${permissionType}' permission`, permissions);
+            return Promise.resolve(false);
+          }
+
           const isPermissionDenied = permissionState === z.permission.PermissionStatusState.DENIED;
           if (isPermissionDenied) {
-            this.logger.warn(`Permission for '${permissionType}' is set to '${permissionState}'`, permissions);
+            this.logger.warn(`Permission for '${permissionType}' is denied`, permissions);
             return Promise.reject(new z.permission.PermissionError(z.permission.PermissionError.TYPE.DENIED));
           }
         }
 
-        return Promise.resolve();
+        return Promise.resolve(true);
       });
     };
 
     const permissionTypes = this._getPermissionTypes(mediaType);
     const shouldCheckPermissions = permissionTypes && permissionTypes.length;
-    return shouldCheckPermissions ? checkPermissionStates(permissionTypes) : Promise.resolve();
+    return shouldCheckPermissions ? checkPermissionStates(permissionTypes) : Promise.resolve(true);
   }
 
   /**
@@ -472,16 +478,9 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
     const {type, mediaType} = error;
 
     const isStreamDeviceError = type === z.media.MediaError.TYPE.MEDIA_STREAM_DEVICE;
-    if (isStreamDeviceError) {
-      return this._showDeviceNotFoundHint(mediaType, conversationId);
-    }
-
-    const isStreamPermissionError = type === z.media.MediaError.TYPE.MEDIA_STREAM_PERMISSION;
-    if (isStreamPermissionError) {
-      return this._showPermissionDeniedHint(mediaType);
-    }
-
-    this._showPermissionDeniedHint(mediaType);
+    return isStreamDeviceError
+      ? this._showDeviceNotFoundHint(mediaType, conversationId)
+      : this._showPermissionDeniedHint(mediaType);
   }
 
   /**
@@ -521,21 +520,30 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
     return false;
   }
 
+  _schedulePermissionHint(mediaType) {
+    this.requestHintTimeout = window.setTimeout(() => {
+      this._hidePermissionFailedHint(mediaType);
+      this._showPermissionRequestHint(mediaType);
+      this.requestHintTimeout = undefined;
+    }, MediaStreamHandler.CONFIG.PERMISSION_HINT_DELAY);
+  }
+
   /**
    * Request a MediaStream.
    *
    * @private
    * @param {z.media.MediaType} mediaType - Type of MediaStream to be requested
    * @param {RTCMediaStreamConstraints} mediaStreamConstraints - Constraints for the MediaStream to be requested
+   * @param {boolean} hasPermission - Has required media permissions
    * @returns {Promise} Resolves with the stream and its type
    */
-  _requestMediaStream(mediaType, mediaStreamConstraints) {
+  _requestMediaStream(mediaType, mediaStreamConstraints, hasPermission) {
     this.logger.info(`Requesting MediaStream access for '${mediaType}'`, mediaStreamConstraints);
-    this.requestHintTimeout = window.setTimeout(() => {
-      this._hidePermissionFailedHint(mediaType);
-      this._showPermissionRequestHint(mediaType);
-      this.requestHintTimeout = undefined;
-    }, MediaStreamHandler.CONFIG.PERMISSION_HINT_DELAY);
+
+    const willPromptForPermission = !hasPermission && !z.util.Environment.desktop;
+    if (willPromptForPermission) {
+      this._schedulePermissionHint(mediaType);
+    }
 
     return navigator.mediaDevices
       .getUserMedia(mediaStreamConstraints)
