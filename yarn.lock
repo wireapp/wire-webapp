@@ -503,9 +503,9 @@
     "@webassemblyjs/wast-parser" "1.5.12"
     long "^3.2.0"
 
-"@wireapp/api-client@1.2.1":
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-1.2.1.tgz#216857317afd7a85d8ce5f7b0d87a221588bf925"
+"@wireapp/api-client@1.3.0":
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-1.3.0.tgz#8dfba5138feb8d4c0de7cb2e66a429ee371f0c72"
   dependencies:
     "@types/node" "10.3.4"
     "@types/spark-md5" "3.0.0"
@@ -523,28 +523,28 @@
   version "3.0.50"
   resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-3.0.50.tgz#2824fe60b6a0cd90aefd5df1cbad6f16a7772896"
 
-"@wireapp/core@3.4.2":
-  version "3.4.2"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-3.4.2.tgz#420e911317fd58edcee57d6478f53ec347de176a"
+"@wireapp/core@3.5.0":
+  version "3.5.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-3.5.0.tgz#7b33eb0616885261e95a8c3d4ff24552b4ce18ff"
   dependencies:
     "@types/node" "10.3.4"
-    "@wireapp/api-client" "1.2.1"
-    "@wireapp/cryptobox" "8.4.8"
+    "@wireapp/api-client" "1.3.0"
+    "@wireapp/cryptobox" "8.5.0"
     "@wireapp/store-engine" "0.11.32"
     bazinga64 "5.2.4"
     logdown "3.2.3"
     protobufjs "6.8.6"
     pure-uuid "1.5.2"
 
-"@wireapp/cryptobox@8.4.8":
-  version "8.4.8"
-  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-8.4.8.tgz#e6c964c819264b91d88bc40eaa909b17ca130ebc"
+"@wireapp/cryptobox@8.5.0":
+  version "8.5.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-8.5.0.tgz#ab3dceb0dd2d61ca5515d861fef4a4f77b6ccb32"
   dependencies:
     "@types/fs-extra" "5.0.3"
     "@types/node" "10.3.4"
     "@wireapp/lru-cache" "2.1.28"
     "@wireapp/priority-queue" "0.1.47"
-    "@wireapp/proteus" "7.1.63"
+    "@wireapp/proteus" "7.2.0"
     "@wireapp/store-engine" "0.11.32"
     dexie "2.0.4"
     fs-extra "6.0.1"
@@ -560,9 +560,9 @@
     "@types/node" "10.3.4"
     pure-uuid "1.5.2"
 
-"@wireapp/proteus@7.1.63":
-  version "7.1.63"
-  resolved "https://registry.yarnpkg.com/@wireapp/proteus/-/proteus-7.1.63.tgz#0387c12deb8922a71aa390450412784858407ad5"
+"@wireapp/proteus@7.2.0":
+  version "7.2.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/proteus/-/proteus-7.2.0.tgz#4a9ba2e196c2936692f76ba1f32b86130ca5a32a"
   dependencies:
     "@types/chai" "4.1.4"
     "@types/ed2curve" "0.2.2"
