@@ -37,15 +37,6 @@ z.conversation.AbstractConversationEventHandler = class AbstractConversationEven
   }
 
   /**
-   * Returns true if the handle can handle that event type depending on the config given at construct time
-   * @param {string} eventType - the type of event to be handled
-   * @returns {boolean} true if the event type is handled, else false
-   */
-  shouldHandleConversationEvent(eventType) {
-    return this.eventHandlingConfig[eventType] !== undefined;
-  }
-
-  /**
    * Handle a configured event
    *
    * @param {z.entity.Conversation} conversationEntity - the conversation the event relates to
