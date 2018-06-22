@@ -744,13 +744,13 @@ z.string.ru.initEvents = 'Загрузка сообщений';
 z.string.ru.initUpdatedFromNotifications = 'Почти готово - наслаждайтесь Wire';
 z.string.ru.initProgress = ' — {{number1}} из {{number2}}';
 
-z.string.ru.ephememalUnitsNone = 'Выключен';
-z.string.ru.ephememalUnitsSecond = 'сек';
-z.string.ru.ephememalUnitsSeconds = 'сек.';
-z.string.ru.ephememalUnitsMinute = 'мин.';
-z.string.ru.ephememalUnitsMinutes = 'мин.';
-z.string.ru.ephememalUnitsHour = 'час';
-z.string.ru.ephememalUnitsHours = 'часов';
-z.string.ru.ephememalUnitsDay = 'дн.';
-z.string.ru.ephememalUnitsDays = 'дн.';
+z.string.ru.ephemeralUnitsNone = 'Выключен';
+z.string.ru.ephemeralUnitsSecond = 'сек';
+z.string.ru.ephemeralUnitsSeconds = 'сек.';
+z.string.ru.ephemeralUnitsMinute = 'мин.';
+z.string.ru.ephemeralUnitsMinutes = 'мин.';
+z.string.ru.ephemeralUnitsHour = 'час';
+z.string.ru.ephemeralUnitsHours = 'часов';
+z.string.ru.ephemeralUnitsDay = 'дн.';
+z.string.ru.ephemeralUnitsDays = 'дн.';
 

@@ -575,13 +575,13 @@ z.string.tr.initEvents = 'İletiler yükleniyor';
 z.string.tr.initUpdatedFromNotifications = 'Neredeyse bitti - Wire’ın keyfini çıkarın';
 z.string.tr.initProgress = ' — {{number2}}’de/da {{number1}}';
 
-z.string.tr.ephememalUnitsNone = 'Yok';
-z.string.tr.ephememalUnitsSecond = 'saniye';
-z.string.tr.ephememalUnitsSeconds = 'saniye';
-z.string.tr.ephememalUnitsMinute = 'dakika';
-z.string.tr.ephememalUnitsMinutes = 'dakika';
-z.string.tr.ephememalUnitsHour = 'saat';
-z.string.tr.ephememalUnitsHours = 'saat';
-z.string.tr.ephememalUnitsDay = 'gün';
-z.string.tr.ephememalUnitsDays = 'gün';
+z.string.tr.ephemeralUnitsNone = 'Yok';
+z.string.tr.ephemeralUnitsSecond = 'saniye';
+z.string.tr.ephemeralUnitsSeconds = 'saniye';
+z.string.tr.ephemeralUnitsMinute = 'dakika';
+z.string.tr.ephemeralUnitsMinutes = 'dakika';
+z.string.tr.ephemeralUnitsHour = 'saat';
+z.string.tr.ephemeralUnitsHours = 'saat';
+z.string.tr.ephemeralUnitsDay = 'gün';
+z.string.tr.ephemeralUnitsDays = 'gün';
 

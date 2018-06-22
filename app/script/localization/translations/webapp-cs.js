@@ -560,13 +560,13 @@ z.string.cs.initReceivedUserData = 'Kontrola nových zpráv';
 z.string.cs.initDecryption = 'Dešifrovat zprávu';
 z.string.cs.initEvents = 'Zprávy se načítají';
 
-z.string.cs.ephememalUnitsNone = 'Vypnout';
-z.string.cs.ephememalUnitsSecond = 'sekunda';
-z.string.cs.ephememalUnitsSeconds = 'sekund(y)';
-z.string.cs.ephememalUnitsMinute = 'minuta';
-z.string.cs.ephememalUnitsMinutes = 'minut';
-z.string.cs.ephememalUnitsHour = 'hodina';
-z.string.cs.ephememalUnitsHours = 'hodin';
-z.string.cs.ephememalUnitsDay = 'den';
-z.string.cs.ephememalUnitsDays = 'dnů';
+z.string.cs.ephemeralUnitsNone = 'Vypnout';
+z.string.cs.ephemeralUnitsSecond = 'sekunda';
+z.string.cs.ephemeralUnitsSeconds = 'sekund(y)';
+z.string.cs.ephemeralUnitsMinute = 'minuta';
+z.string.cs.ephemeralUnitsMinutes = 'minut';
+z.string.cs.ephemeralUnitsHour = 'hodina';
+z.string.cs.ephemeralUnitsHours = 'hodin';
+z.string.cs.ephemeralUnitsDay = 'den';
+z.string.cs.ephemeralUnitsDays = 'dnů';
 

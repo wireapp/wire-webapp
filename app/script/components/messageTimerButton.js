@@ -48,7 +48,7 @@ z.components.MessageTimerButton = class MessageTimerButton {
     const entries = [
       {
         click: () => this.conversationEntity().localMessageTimer(0),
-        label: z.l10n.text(z.string.ephememalUnitsNone),
+        label: z.l10n.text(z.string.ephemeralUnitsNone),
       },
     ].concat(
       z.ephemeral.timings.VALUES.map(milliseconds => {

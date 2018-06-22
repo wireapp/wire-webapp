@@ -756,13 +756,13 @@ z.string.de.initEvents = 'Lade Nachrichten';
 z.string.de.initUpdatedFromNotifications = 'Fast fertig - viel Spaß mit Wire';
 z.string.de.initProgress = ' — {{number1}} von {{number2}}';
 
-z.string.de.ephememalUnitsNone = 'Aus';
-z.string.de.ephememalUnitsSecond = 'Sekunde';
-z.string.de.ephememalUnitsSeconds = 'Sekunden';
-z.string.de.ephememalUnitsMinute = 'Minute';
-z.string.de.ephememalUnitsMinutes = 'Minuten';
-z.string.de.ephememalUnitsHour = 'Stunde';
-z.string.de.ephememalUnitsHours = 'Stunden';
-z.string.de.ephememalUnitsDay = 'Tag';
-z.string.de.ephememalUnitsDays = 'Tage';
+z.string.de.ephemeralUnitsNone = 'Aus';
+z.string.de.ephemeralUnitsSecond = 'Sekunde';
+z.string.de.ephemeralUnitsSeconds = 'Sekunden';
+z.string.de.ephemeralUnitsMinute = 'Minute';
+z.string.de.ephemeralUnitsMinutes = 'Minuten';
+z.string.de.ephemeralUnitsHour = 'Stunde';
+z.string.de.ephemeralUnitsHours = 'Stunden';
+z.string.de.ephemeralUnitsDay = 'Tag';
+z.string.de.ephemeralUnitsDays = 'Tage';
 
