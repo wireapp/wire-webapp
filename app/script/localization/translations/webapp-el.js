@@ -594,13 +594,13 @@ z.string.el.initReceivedSelfUser = 'Γεια σου, {{user}}.';
 z.string.el.initReceivedUserData = 'Ελέγξτε για νέα μηνύματα';
 z.string.el.initEvents = 'Φόρτωση μηνυμάτων';
 
-z.string.el.ephememalUnitsNone = 'Ανενεργό';
-z.string.el.ephememalUnitsSecond = 'δευτερόλεπτο';
-z.string.el.ephememalUnitsSeconds = 'δευτερόλεπτα';
-z.string.el.ephememalUnitsMinute = 'λεπτό';
-z.string.el.ephememalUnitsMinutes = 'λεπτά';
-z.string.el.ephememalUnitsHour = 'ώρα';
-z.string.el.ephememalUnitsHours = 'ώρες';
-z.string.el.ephememalUnitsDay = 'ημέρα';
-z.string.el.ephememalUnitsDays = 'ημέρες';
+z.string.el.ephemeralUnitsNone = 'Ανενεργό';
+z.string.el.ephemeralUnitsSecond = 'δευτερόλεπτο';
+z.string.el.ephemeralUnitsSeconds = 'δευτερόλεπτα';
+z.string.el.ephemeralUnitsMinute = 'λεπτό';
+z.string.el.ephemeralUnitsMinutes = 'λεπτά';
+z.string.el.ephemeralUnitsHour = 'ώρα';
+z.string.el.ephemeralUnitsHours = 'ώρες';
+z.string.el.ephemeralUnitsDay = 'ημέρα';
+z.string.el.ephemeralUnitsDays = 'ημέρες';
 
