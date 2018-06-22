@@ -2684,15 +2684,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
         return conversationEntity;
       })
-
-      .then(conversationEntity => {
-        const handlers = [this.messageTimerHandler, this.stateHandler];
-        const handlePromises = handlers.map(handler =>
-          handler.handleConversationEvent(conversationEntity, eventJson, eventSource)
-        );
-        return Promise.all(handlePromises).then(() => conversationEntity);
-      })
-
+      .then(conversationEntity => this._triggerFeatureEventHandlers(conversationEntity, eventJson, eventSource))
       .then(conversationEntity => {
         switch (type) {
           case z.event.Backend.CONVERSATION.CREATE:
@@ -2735,6 +2727,23 @@ z.conversation.ConversationRepository = class ConversationRepository {
           throw error;
         }
       });
+  }
+
+  /**
+   * calls the feature specific event handler on the current event being handled
+   *
+   * @private
+   * @param {Conversation} conversationEntity - Conversation targeted by the event
+   * @param {Object} eventJson - JSON data of the event
+   * @param {z.event.EventRepository.SOURCE} eventSource - Source of event
+   * @returns {Promise} Resolves when all the handlers have done their job
+   */
+  _triggerFeatureEventHandlers(conversationEntity, eventJson, eventSource) {
+    const handlers = [this.messageTimerHandler, this.stateHandler];
+    const handlePromises = handlers.map(handler =>
+      handler.handleConversationEvent(conversationEntity, eventJson, eventSource)
+    );
+    return Promise.all(handlePromises).then(() => conversationEntity);
   }
 
   /**
