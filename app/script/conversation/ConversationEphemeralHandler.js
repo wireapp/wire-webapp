@@ -22,7 +22,7 @@
 window.z = window.z || {};
 window.z.conversation = z.conversation || {};
 
-z.conversation.ConversationTimedHandler = class ConversationTimedHandler {
+z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler {
   static get CONFIG() {
     return {
       INTERVAL_TIME: 250,
@@ -32,45 +32,45 @@ z.conversation.ConversationTimedHandler = class ConversationTimedHandler {
   constructor(conversationService, onMessageTimeout) {
     this.conversationService = conversationService;
     this.onMessageTimeout = onMessageTimeout;
-    this.logger = new z.util.Logger('z.conversation.ConversationTimedHandler', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger('z.conversation.ConversationEphemeralHandler', z.config.LOGGER.OPTIONS);
 
     this.timedMessages = [];
-    window.setInterval(this._updateTimedMessages.bind(this), ConversationTimedHandler.CONFIG.INTERVAL_TIME);
+    window.setInterval(this._updateTimedMessages.bind(this), ConversationEphemeralHandler.CONFIG.INTERVAL_TIME);
   }
 
   _updateTimedMessages() {
     const now = Date.now();
     for (let index = this.timedMessages.length - 1; index >= 0; index--) {
-      const message = this.timedMessages[index];
-      if (_.isString(message.ephemeral_expires())) {
-        const remainingTime = message.ephemeral_expires() - now;
+      const messageEntity = this.timedMessages[index];
+      if (_.isString(messageEntity.ephemeral_expires())) {
+        const remainingTime = messageEntity.ephemeral_expires() - now;
         if (remainingTime > 0) {
-          message.ephemeral_remaining(remainingTime);
+          messageEntity.ephemeral_remaining(remainingTime);
         } else {
-          this._removeTimedMessage(message);
+          this._removeTimedMessage(messageEntity);
         }
       }
     }
   }
 
-  addTimedMessage(message) {
-    if (message.ephemeral_status === z.message.EphemeralStatusType.NONE) {
+  addTimedMessage(messageEntity) {
+    if (messageEntity.ephemeral_status === z.message.EphemeralStatusType.NONE) {
       return;
     }
     const isAlreadyAdded = this.timedMessages.some(timedMessage => {
-      return timedMessage.id === message.id && timedMessage.conversation_id === message.conversation_id;
+      return timedMessage.id === messageEntity.id && timedMessage.conversation_id === messageEntity.conversation_id;
     });
     if (!isAlreadyAdded) {
-      this.timedMessages.push(message);
+      this.timedMessages.push(messageEntity);
       this._updateTimedMessages();
     }
   }
 
-  _removeTimedMessage(message) {
-    const messageIndex = this.timedMessages.indexOf(message);
+  _removeTimedMessage(messageEntity) {
+    const messageIndex = this.timedMessages.indexOf(messageEntity);
     if (messageIndex > -1) {
-      amplify.publish(z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, message);
-      this._timeoutEphemeralMessage(message);
+      amplify.publish(z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, messageEntity);
+      this._timeoutEphemeralMessage(messageEntity);
       this.timedMessages.splice(messageIndex, 1);
     }
   }
@@ -120,25 +120,25 @@ z.conversation.ConversationTimedHandler = class ConversationTimedHandler {
     }
   }
 
-  _obfuscateAssetMessage(messageEntity) {
-    const asset = messageEntity.get_first_asset();
-    messageEntity.ephemeral_expires(true);
+  _obfuscateAssetMessage(assetEntity) {
+    const asset = assetEntity.get_first_asset();
+    assetEntity.ephemeral_expires(true);
 
-    this.conversationService.update_message_in_db(messageEntity, {
+    this.conversationService.update_message_in_db(assetEntity, {
       data: {
         content_type: asset.file_type,
         meta: {},
       },
       ephemeral_expires: true,
     });
-    this.logger.info(`Obfuscated asset message '${messageEntity.id}'`);
+    this.logger.info(`Obfuscated asset message '${assetEntity.id}'`);
   }
 
-  _obfuscateImageMessage(messageEntity) {
-    const asset = messageEntity.get_first_asset();
-    messageEntity.ephemeral_expires(true);
+  _obfuscateImageMessage(assetEntity) {
+    const asset = assetEntity.get_first_asset();
+    assetEntity.ephemeral_expires(true);
 
-    this.conversationService.update_message_in_db(messageEntity, {
+    this.conversationService.update_message_in_db(assetEntity, {
       data: {
         info: {
           height: asset.height,
@@ -148,28 +148,28 @@ z.conversation.ConversationTimedHandler = class ConversationTimedHandler {
       },
       ephemeral_expires: true,
     });
-    this.logger.info(`Obfuscated image message '${messageEntity.id}'`);
+    this.logger.info(`Obfuscated image message '${assetEntity.id}'`);
   }
 
   _obfuscateTextMessage(messageEntity) {
     const asset = messageEntity.get_first_asset();
-    const obfuscated_asset = new z.entity.Text(messageEntity.id);
-    const obfuscated_previews = asset.previews().map(link_preview => {
-      link_preview.obfuscate();
-      const article = new z.proto.Article(link_preview.url, link_preview.title); // deprecated format
-      return new z.proto.LinkPreview(link_preview.url, 0, article, link_preview.url, link_preview.title).encode64();
+    const obfuscatedAsset = new z.entity.Text(messageEntity.id);
+    const obfuscatedPreviews = asset.previews().map(linkPreview => {
+      linkPreview.obfuscate();
+      const article = new z.proto.Article(linkPreview.url, linkPreview.title); // deprecated format
+      return new z.proto.LinkPreview(linkPreview.url, 0, article, linkPreview.url, linkPreview.title).encode64();
     });
 
-    obfuscated_asset.text = z.util.StringUtil.obfuscate(asset.text);
-    obfuscated_asset.previews(asset.previews());
+    obfuscatedAsset.text = z.util.StringUtil.obfuscate(asset.text);
+    obfuscatedAsset.previews(asset.previews());
 
-    messageEntity.assets([obfuscated_asset]);
+    messageEntity.assets([obfuscatedAsset]);
     messageEntity.ephemeral_expires(true);
 
     this.conversationService.update_message_in_db(messageEntity, {
       data: {
-        content: obfuscated_asset.text,
-        previews: obfuscated_previews,
+        content: obfuscatedAsset.text,
+        previews: obfuscatedPreviews,
       },
       ephemeral_expires: true,
     });

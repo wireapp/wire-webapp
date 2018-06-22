@@ -156,11 +156,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this._init_subscriptions();
 
     this.stateHandler = new z.conversation.ConversationStateHandler(this.conversation_service, this);
-    this.timedMessageHandler = new z.conversation.ConversationTimedHandler(
+    this.ephemeralHandler = new z.conversation.ConversationEphemeralHandler(
       this.conversation_service,
       this.handleMessageTimeout.bind(this)
     );
-    this.checkMessageTimer = this.timedMessageHandler.checkMessageTimer.bind(this.timedMessageHandler);
+    this.checkMessageTimer = this.ephemeralHandler.checkMessageTimer.bind(this.ephemeralHandler);
   }
 
   _initStateUpdates() {
@@ -3364,7 +3364,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.get_conversation_by_id(messageEntity.conversation_id).then(conversationEntity => {
       if (messageEntity.user().is_me) {
         this.get_message_in_conversation_by_id(conversationEntity, messageEntity.id).then(message =>
-          this.timedMessageHandler.obfuscateMessage(message)
+          this.ephemeralHandler.obfuscateMessage(message)
         );
       }
 
@@ -3396,7 +3396,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .then(message_et => {
         if (conversation_et && message_et) {
           conversation_et.add_message(message_et);
-          this.timedMessageHandler.addTimedMessage(message_et);
+          this.ephemeralHandler.addTimedMessage(message_et);
         }
 
         return message_et;
@@ -3422,7 +3422,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         } else {
           conversationEntity.add_messages(messageEntities);
         }
-        messageEntities.forEach(messageEntity => this.timedMessageHandler.addTimedMessage(messageEntity));
+        messageEntities.forEach(messageEntity => this.ephemeralHandler.addTimedMessage(messageEntity));
         return messageEntities;
       });
   }
