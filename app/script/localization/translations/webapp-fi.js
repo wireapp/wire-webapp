@@ -567,13 +567,13 @@ z.string.fi.initEvents = 'Ladataan viestejä';
 z.string.fi.initUpdatedFromNotifications = 'Melkein valmista - nauti Wirestä';
 z.string.fi.initProgress = ' — {{number1}} / {{number2}}';
 
-z.string.fi.ephememalUnitsNone = 'Pois päältä';
-z.string.fi.ephememalUnitsSecond = 'sekunti';
-z.string.fi.ephememalUnitsSeconds = 'sekuntia';
-z.string.fi.ephememalUnitsMinute = 'minuutti';
-z.string.fi.ephememalUnitsMinutes = 'minuutia';
-z.string.fi.ephememalUnitsHour = 'tunti';
-z.string.fi.ephememalUnitsHours = 'tuntia';
-z.string.fi.ephememalUnitsDay = 'päivä';
-z.string.fi.ephememalUnitsDays = 'päivää';
+z.string.fi.ephemeralUnitsNone = 'Pois päältä';
+z.string.fi.ephemeralUnitsSecond = 'sekunti';
+z.string.fi.ephemeralUnitsSeconds = 'sekuntia';
+z.string.fi.ephemeralUnitsMinute = 'minuutti';
+z.string.fi.ephemeralUnitsMinutes = 'minuutia';
+z.string.fi.ephemeralUnitsHour = 'tunti';
+z.string.fi.ephemeralUnitsHours = 'tuntia';
+z.string.fi.ephemeralUnitsDay = 'päivä';
+z.string.fi.ephemeralUnitsDays = 'päivää';
 
