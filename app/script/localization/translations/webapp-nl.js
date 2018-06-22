@@ -599,13 +599,13 @@ z.string.nl.initEvents = 'Berichten laden';
 z.string.nl.initUpdatedFromNotifications = 'Bijna klaar - Geniet van Wire';
 z.string.nl.initProgress = ' — {{number1}} van {{number2}}';
 
-z.string.nl.ephememalUnitsNone = 'Uit';
-z.string.nl.ephememalUnitsSecond = 'seconde';
-z.string.nl.ephememalUnitsSeconds = 'secondes';
-z.string.nl.ephememalUnitsMinute = 'minuut';
-z.string.nl.ephememalUnitsMinutes = 'minuten';
-z.string.nl.ephememalUnitsHour = 'uur';
-z.string.nl.ephememalUnitsHours = 'uren';
-z.string.nl.ephememalUnitsDay = 'dag';
-z.string.nl.ephememalUnitsDays = 'dagen';
+z.string.nl.ephemeralUnitsNone = 'Uit';
+z.string.nl.ephemeralUnitsSecond = 'seconde';
+z.string.nl.ephemeralUnitsSeconds = 'secondes';
+z.string.nl.ephemeralUnitsMinute = 'minuut';
+z.string.nl.ephemeralUnitsMinutes = 'minuten';
+z.string.nl.ephemeralUnitsHour = 'uur';
+z.string.nl.ephemeralUnitsHours = 'uren';
+z.string.nl.ephemeralUnitsDay = 'dag';
+z.string.nl.ephemeralUnitsDays = 'dagen';
 

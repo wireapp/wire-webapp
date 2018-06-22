@@ -757,13 +757,13 @@ z.string.et.initEvents = 'Laadin sõnumeid';
 z.string.et.initUpdatedFromNotifications = 'Peaaegu valmis - naudi Wire’i';
 z.string.et.initProgress = ' — {{number1}}/{{number2}}';
 
-z.string.et.ephememalUnitsNone = 'Väljas';
-z.string.et.ephememalUnitsSecond = 'sekund';
-z.string.et.ephememalUnitsSeconds = 'sekundit';
-z.string.et.ephememalUnitsMinute = 'minut';
-z.string.et.ephememalUnitsMinutes = 'minutit';
-z.string.et.ephememalUnitsHour = 'tund';
-z.string.et.ephememalUnitsHours = 'tundi';
-z.string.et.ephememalUnitsDay = 'päev';
-z.string.et.ephememalUnitsDays = 'päeva';
+z.string.et.ephemeralUnitsNone = 'Väljas';
+z.string.et.ephemeralUnitsSecond = 'sekund';
+z.string.et.ephemeralUnitsSeconds = 'sekundit';
+z.string.et.ephemeralUnitsMinute = 'minut';
+z.string.et.ephemeralUnitsMinutes = 'minutit';
+z.string.et.ephemeralUnitsHour = 'tund';
+z.string.et.ephemeralUnitsHours = 'tundi';
+z.string.et.ephemeralUnitsDay = 'päev';
+z.string.et.ephemeralUnitsDays = 'päeva';
 

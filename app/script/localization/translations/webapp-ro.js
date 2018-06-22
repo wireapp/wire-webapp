@@ -608,13 +608,13 @@ z.string.ro.initEvents = 'Se încarcă mesaje';
 z.string.ro.initUpdatedFromNotifications = 'Aproape gata - Bucură-te de Wire';
 z.string.ro.initProgress = ' — {{number1}} din {{number2}}';
 
-z.string.ro.ephememalUnitsNone = 'Închis';
-z.string.ro.ephememalUnitsSecond = 'secundă';
-z.string.ro.ephememalUnitsSeconds = 'secunde';
-z.string.ro.ephememalUnitsMinute = 'minut';
-z.string.ro.ephememalUnitsMinutes = 'minute';
-z.string.ro.ephememalUnitsHour = 'oră';
-z.string.ro.ephememalUnitsHours = 'ore';
-z.string.ro.ephememalUnitsDay = 'zi';
-z.string.ro.ephememalUnitsDays = 'zile';
+z.string.ro.ephemeralUnitsNone = 'Închis';
+z.string.ro.ephemeralUnitsSecond = 'secundă';
+z.string.ro.ephemeralUnitsSeconds = 'secunde';
+z.string.ro.ephemeralUnitsMinute = 'minut';
+z.string.ro.ephemeralUnitsMinutes = 'minute';
+z.string.ro.ephemeralUnitsHour = 'oră';
+z.string.ro.ephemeralUnitsHours = 'ore';
+z.string.ro.ephemeralUnitsDay = 'zi';
+z.string.ro.ephemeralUnitsDays = 'zile';
 

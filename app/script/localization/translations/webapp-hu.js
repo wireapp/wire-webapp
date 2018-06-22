@@ -708,13 +708,13 @@ z.string.hu.initEvents = 'Üzenetek betöltése';
 z.string.hu.initUpdatedFromNotifications = 'Majdnem kész - Élvezd a Wire-t';
 z.string.hu.initProgress = ' — {{number1}} / {{number2}}';
 
-z.string.hu.ephememalUnitsNone = 'Kikapcsolva';
-z.string.hu.ephememalUnitsSecond = 'másodperc';
-z.string.hu.ephememalUnitsSeconds = 'másodperc';
-z.string.hu.ephememalUnitsMinute = 'perc';
-z.string.hu.ephememalUnitsMinutes = 'perc';
-z.string.hu.ephememalUnitsHour = 'óra';
-z.string.hu.ephememalUnitsHours = 'óra';
-z.string.hu.ephememalUnitsDay = 'nap';
-z.string.hu.ephememalUnitsDays = 'nap';
+z.string.hu.ephemeralUnitsNone = 'Kikapcsolva';
+z.string.hu.ephemeralUnitsSecond = 'másodperc';
+z.string.hu.ephemeralUnitsSeconds = 'másodperc';
+z.string.hu.ephemeralUnitsMinute = 'perc';
+z.string.hu.ephemeralUnitsMinutes = 'perc';
+z.string.hu.ephemeralUnitsHour = 'óra';
+z.string.hu.ephemeralUnitsHours = 'óra';
+z.string.hu.ephemeralUnitsDay = 'nap';
+z.string.hu.ephemeralUnitsDays = 'nap';
 
