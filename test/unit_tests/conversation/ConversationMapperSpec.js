@@ -108,12 +108,15 @@ describe('Conversation Mapper', () => {
       const updatedName = 'Christmas 2017';
       const conversationEntity = new z.entity.Conversation(z.util.createRandomUuid());
       conversationEntity.name('Christmas 2016');
+
       expect(conversationEntity.name()).toBeDefined();
+
       const updates = {
         newProperty: 'abc',
         name: updatedName,
       };
       conversation_mapper.update_properties(conversationEntity, updates);
+
       expect(conversationEntity.name()).toBe(updatedName);
       expect(conversationEntity.newProperty).toBeUndefined();
     });
