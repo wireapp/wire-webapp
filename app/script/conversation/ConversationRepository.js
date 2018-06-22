@@ -616,6 +616,13 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.updateConversations(this.conversations_unarchived());
   }
 
+  updateConversationFromBackend(conversationEntity) {
+    this.conversation_service.get_conversation_by_id(conversationEntity.id).then(conversationData => {
+      this.conversation_mapper.update_properties(conversationEntity, conversationData);
+      this.conversation_mapper.update_self_status(conversationEntity, conversationData);
+    });
+  }
+
   /**
    * Get users and events for conversations.
    *
@@ -3001,7 +3008,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
       conversationEntity.status(z.conversation.ConversationStatus.CURRENT_MEMBER);
     }
 
-    return this.updateParticipatingUserEntities(conversationEntity, false, true)
+    const updateSequence = selfUserRejoins ? this.updateConversationFromBackend(conversationEntity) : Promise.resolve();
+
+    return updateSequence
+      .then(() => this.updateParticipatingUserEntities(conversationEntity, false, true))
       .then(() => this._add_event_to_conversation(eventJson, conversationEntity))
       .then(messageEntity => {
         this.verification_state_handler.onMemberJoined(conversationEntity, eventData.user_ids);

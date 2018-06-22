@@ -53,7 +53,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
   update_properties(conversationEntity, conversationData) {
     Object.entries(conversationData).forEach(([key, value]) => {
       if (key !== 'id') {
-        if (value !== undefined) {
+        if (value !== undefined && conversationEntity.hasOwnProperty(key)) {
           if (ko.isObservable(conversationEntity[key])) {
             conversationEntity[key](value);
           } else {
