@@ -28,6 +28,39 @@ z.util.TimeUtil = {
     return Date.now() - timeOffset;
   },
 
+  durationUnits: [
+    {
+      plural: z.string.ephemeralUnitsWeeks,
+      singular: z.string.ephemeralUnitsWeek,
+      unit: 'w',
+      value: 1000 * 60 * 60 * 24 * 7,
+    },
+    {
+      plural: z.string.ephememalUnitsDays,
+      singular: z.string.ephememalUnitsDay,
+      unit: 'd',
+      value: 1000 * 60 * 60 * 24,
+    },
+    {
+      plural: z.string.ephememalUnitsHours,
+      singular: z.string.ephememalUnitsHour,
+      unit: 'h',
+      value: 1000 * 60 * 60,
+    },
+    {
+      plural: z.string.ephememalUnitsMinutes,
+      singular: z.string.ephememalUnitsMinute,
+      unit: 'm',
+      value: 1000 * 60,
+    },
+    {
+      plural: z.string.ephememalUnitsSeconds,
+      singular: z.string.ephememalUnitsSecond,
+      unit: 's',
+      value: 1000,
+    },
+  ],
+
   /**
    * Format milliseconds into 15s, 2m.
    * @param {number} duration - Duration to format in milliseconds
@@ -36,40 +69,7 @@ z.util.TimeUtil = {
    * @returns {Object} Unit, value and localized string
    */
   formatDuration: (duration, rounded = true, maximumUnits = 1) => {
-    const units = [
-      {
-        plural: z.string.ephemeralUnitsWeeks,
-        singular: z.string.ephemeralUnitsWeek,
-        unit: 'w',
-        value: 1000 * 60 * 60 * 24 * 7,
-      },
-      {
-        plural: z.string.ephememalUnitsDays,
-        singular: z.string.ephememalUnitsDay,
-        unit: 'd',
-        value: 1000 * 60 * 60 * 24,
-      },
-      {
-        plural: z.string.ephememalUnitsHours,
-        singular: z.string.ephememalUnitsHour,
-        unit: 'h',
-        value: 1000 * 60 * 60,
-      },
-      {
-        plural: z.string.ephememalUnitsMinutes,
-        singular: z.string.ephememalUnitsMinute,
-        unit: 'm',
-        value: 1000 * 60,
-      },
-      {
-        plural: z.string.ephememalUnitsSeconds,
-        singular: z.string.ephememalUnitsSecond,
-        unit: 's',
-        value: 1000,
-      },
-    ];
-
-    const mappedUnits = units.map((unit, index) => {
+    const mappedUnits = z.util.TimeUtil.durationUnits.map((unit, index) => {
       let value = duration;
       if (index > 0) {
         value %= units[index - 1].value;
