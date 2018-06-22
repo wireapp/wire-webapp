@@ -214,7 +214,7 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
   }
 
   /**
-   * A conversation's message timer was changed
+   * Updates the ephemeral timer of a conversation when an timer-update message is received
    *
    * @private
    * @param {Conversation} conversationEntity - Conversation entity which message timer was changed
