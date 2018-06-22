@@ -276,7 +276,7 @@ z.entity.Message = class Message {
 
     this.ephemeral_interval_id = window.setInterval(() => {
       const updatedRemainingTime = this.ephemeral_expires() - Date.now();
-      const formatedRemainingTime = z.util.TimeUtil.formatDuration(updatedRemainingTime, 3);
+      const formatedRemainingTime = z.util.TimeUtil.formatDuration(updatedRemainingTime, false, 3);
       this.ephemeral_remaining(updatedRemainingTime);
       this.ephemeral_caption(formatedRemainingTime.text);
     }, 250);

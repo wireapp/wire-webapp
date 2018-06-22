@@ -31,64 +31,63 @@ z.util.TimeUtil = {
   /**
    * Format milliseconds into 15s, 2m.
    * @param {number} duration - Duration to format in milliseconds
+   * @param {boolean} rounded - Enables rounding of numbers
    * @param {number} maximumUnits - Maximum number of units shown in the textual representation
    * @returns {Object} Unit, value and localized string
    */
-  formatDuration: (duration, maximumUnits = 1) => {
-    const momentDuration = moment.duration(duration);
+  formatDuration: (duration, rounded = true, maximumUnits = 1) => {
     const units = [
-      {
-        plural: z.string.ephemeralUnitsYears,
-        singular: z.string.ephemeralUnitsYear,
-        unit: 'y',
-        value: momentDuration.years(),
-      },
-      {
-        plural: z.string.ephemeralUnitsMonths,
-        singular: z.string.ephemeralUnitsMonth,
-        unit: 'M',
-        value: momentDuration.months(),
-      },
       {
         plural: z.string.ephemeralUnitsWeeks,
         singular: z.string.ephemeralUnitsWeek,
         unit: 'w',
-        value: momentDuration.weeks(),
+        value: 1000 * 60 * 60 * 24 * 7,
       },
       {
         plural: z.string.ephememalUnitsDays,
         singular: z.string.ephememalUnitsDay,
         unit: 'd',
-        value: momentDuration.days() % 7,
+        value: 1000 * 60 * 60 * 24,
       },
       {
         plural: z.string.ephememalUnitsHours,
         singular: z.string.ephememalUnitsHour,
         unit: 'h',
-        value: momentDuration.hours(),
+        value: 1000 * 60 * 60,
       },
       {
         plural: z.string.ephememalUnitsMinutes,
         singular: z.string.ephememalUnitsMinute,
         unit: 'm',
-        value: momentDuration.minutes(),
+        value: 1000 * 60,
       },
       {
         plural: z.string.ephememalUnitsSeconds,
         singular: z.string.ephememalUnitsSecond,
         unit: 's',
-        value: momentDuration.seconds(),
+        value: 1000,
       },
     ];
-    const validUnits = units.filter(unit => unit.value > 0).slice(0, maximumUnits);
 
-    const longText = validUnits
-      .map(unit => {
-        const isSingular = unit.value === 1;
-        return isSingular ? `1 ${z.l10n.text(unit.singular)}` : `${unit.value} ${z.l10n.text(unit.plural)}`;
-      })
-      .join(', ');
+    const mappedUnits = units.map((unit, index) => {
+      let value = duration;
+      if (index > 0) {
+        value %= units[index - 1].value;
+      }
+      value /= unit.value;
+      value = rounded ? Math.round(value) : Math.floor(value);
+      const longUnit = value === 1 ? unit.singular : unit.plural;
+      return {
+        longUnit,
+        unit: unit.unit,
+        value,
+      };
+    });
 
+    const firstNonZeroUnit = mappedUnits.find(unit => unit.value > 0);
+    const startIndex = mappedUnits.indexOf(firstNonZeroUnit);
+    const validUnits = mappedUnits.slice(startIndex, startIndex + maximumUnits);
+    const longText = validUnits.map(unit => `${unit.value} ${z.l10n.text(unit.longUnit)}`).join(', ');
     const upperUnit = validUnits[0] || {};
 
     return {
