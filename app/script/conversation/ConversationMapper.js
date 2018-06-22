@@ -70,7 +70,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
    * Update the membership properties of a conversation.
    *
    * @param {Conversation} conversation_et - Conversation to be updated
-   * @param {Object} self_state - Conversation self data
+   * @param {Object} self_state - Conversation self data from the database
    * @param {boolean} [disablePersistence=false] - Disable persistence of state changes during update
    * @returns {Conversation} Updated conversation entity
    */
