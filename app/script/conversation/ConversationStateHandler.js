@@ -22,16 +22,25 @@
 window.z = window.z || {};
 window.z.conversation = z.conversation || {};
 
-z.conversation.ConversationStateHandler = class ConversationStateHandler {
+z.conversation.ConversationStateHandler = class ConversationStateHandler extends z.conversation
+  .AbstractConversationEventHandler {
   /**
    * Construct a new conversation state handler.
    * @param {ConversationService} conversationService - Service for conversation related backend interactions
-   * @param {ConversationRepository} conversationRepository - Repository for conversation interactions
+   * @param {ConversationRepository} conversationMapper - Repository for conversation interactions
    */
-  constructor(conversationService, conversationRepository) {
+  constructor(conversationService, conversationMapper) {
+    super();
+    const eventHandlingConfig = {
+      [z.event.Backend.CONVERSATION.ACCESS_UPDATE]: () =>
+        this.conversationMapper.mapAccessState(conversationEntity, eventData.access, eventData.access_role),
+      [z.event.Backend.CONVERSATION.CODE_DELETE]: conversationEntity => conversationEntity.accessCode(undefined),
+      [z.event.Backend.CONVERSATION.CODE_UPDATE]: () =>
+        this.conversationMapper.mapAccessCode(conversationEntity, eventData),
+    };
+    this.setEventHandlingConfig(eventHandlingConfig);
     this.conversationService = conversationService;
-    this.conversationRepository = conversationRepository;
-    this.conversationMapper = this.conversationRepository.conversation_mapper;
+    this.conversationMapper = conversationMapper;
   }
 
   changeAccessState(conversationEntity, accessState) {
@@ -112,45 +121,6 @@ z.conversation.ConversationStateHandler = class ConversationStateHandler {
         amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.GUEST_ROOMS.LINK_REVOKED);
       })
       .catch(() => this._showModal(z.string.modalConversationGuestOptionsRevokeCodeMessage));
-  }
-
-  /**
-   * Listener for incoming events.
-   *
-   * @param {Object} eventJson - JSON data for event
-   * @param {z.event.EventRepository.SOURCE} eventSource - Source of event
-   * @returns {Promise} Resolves when event was handled
-   */
-  onConversationEvent(eventJson, eventSource = z.event.EventRepository.SOURCE.STREAM) {
-    if (!eventJson) {
-      return Promise.reject(new Error('Conversation Repository Event Handling: Event missing'));
-    }
-
-    const {conversation: conversationId, data: eventData, type} = eventJson;
-
-    return this.conversationRepository
-      .get_conversation_by_id(conversationId)
-      .then(conversationEntity => {
-        switch (type) {
-          case z.event.Backend.CONVERSATION.ACCESS_UPDATE:
-            this.conversationMapper.mapAccessState(conversationEntity, eventData.access, eventData.access_role);
-            break;
-          case z.event.Backend.CONVERSATION.CODE_DELETE:
-            conversationEntity.accessCode(undefined);
-            break;
-          case z.event.Backend.CONVERSATION.CODE_UPDATE:
-            this.conversationMapper.mapAccessCode(conversationEntity, eventData);
-            break;
-          default:
-            break;
-        }
-      })
-      .catch(error => {
-        const isNotFound = error.type === z.conversation.ConversationError.TYPE.CONVERSATION_NOT_FOUND;
-        if (!isNotFound) {
-          throw error;
-        }
-      });
   }
 
   _showModal(messageStringId) {

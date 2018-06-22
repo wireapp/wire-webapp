@@ -32,11 +32,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
         MAX_NAME_LENGTH: 64,
         MAX_SIZE: 256,
       },
-      STATE_EVENTS: [
-        z.event.Backend.CONVERSATION.ACCESS_UPDATE,
-        z.event.Backend.CONVERSATION.CODE_DELETE,
-        z.event.Backend.CONVERSATION.CODE_UPDATE,
-      ],
     };
   }
 
@@ -155,12 +150,14 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     this._init_subscriptions();
 
-    this.stateHandler = new z.conversation.ConversationStateHandler(this.conversation_service, this);
-    this.ephemeralHandler = new z.conversation.ConversationEphemeralHandler(
+    this.stateHandler = new z.conversation.ConversationStateHandler(
       this.conversation_service,
-      this.handleMessageTimeout.bind(this)
+      this.conversation_mapper
     );
-    this.checkMessageTimer = this.ephemeralHandler.checkMessageTimer.bind(this.ephemeralHandler);
+    this.messageTimerHandler = new z.conversation.ConversationMessageTimerHandler(
+      this.conversation_service,
+      this.conversation_mapper
+    );
   }
 
   _initStateUpdates() {
@@ -2645,11 +2642,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const logMessage = `»» Conversation Event: '${eventJson.type}' (Source: ${eventSource})`;
     this.logger.info(logMessage, logObject);
 
-    const isStateEvent = ConversationRepository.CONFIG.STATE_EVENTS.includes(eventJson.type);
-    if (isStateEvent) {
-      return this.stateHandler.onConversationEvent(eventJson, eventSource);
-    }
-
     return this._pushToReceivingQueue(eventJson, eventSource);
   }
 
@@ -2690,6 +2682,18 @@ z.conversation.ConversationRepository = class ConversationRepository {
           conversationEntity.update_timestamp_server(eventJson.server_time || eventJson.time, isBackendTimestamp);
         }
 
+        return conversationEntity;
+      })
+
+      .then(conversationEntity => {
+        const handlers = [this.messageTimerHandler, this.stateHandler];
+        const handlePromises = handlers.map(handler =>
+          handler.handleConversationEvent(conversationEntity, eventJson, eventSource)
+        );
+        return Promise.all(handlePromises).then(() => conversationEntity);
+      })
+
+      .then(conversationEntity => {
         switch (type) {
           case z.event.Backend.CONVERSATION.CREATE:
             return this._onCreate(eventJson, eventSource);
@@ -2702,8 +2706,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
             return this._onMemberUpdate(conversationEntity, eventJson);
           case z.event.Backend.CONVERSATION.RENAME:
             return this._onRename(conversationEntity, eventJson);
-          case z.event.Backend.CONVERSATION.MESSAGE_TIMER_UPDATE:
-            return this._onMessageTimerUpdate(conversationEntity, eventJson);
           case z.event.Client.CONVERSATION.ASSET_ADD:
             return this._on_asset_add(conversationEntity, eventJson);
           case z.event.Client.CONVERSATION.CONFIRMATION:
@@ -2721,9 +2723,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
           case z.event.Client.CONVERSATION.REACTION:
             return this._on_reaction(conversationEntity, eventJson);
           default:
-            return this._onAddEvent(conversationEntity, eventJson);
+            return this._add_event_to_conversation(eventJson, conversationEntity);
         }
       })
+
+      .then(conversationEntity => this._handleConversationEventPersistence(conversationEntity, eventJson))
       .then((entityObject = {}) => this._handledConversationEvent(entityObject, eventSource, previouslyArchived))
       .catch(error => {
         const isMessageNotFound = error.type === z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND;
@@ -2731,6 +2735,28 @@ z.conversation.ConversationRepository = class ConversationRepository {
           throw error;
         }
       });
+  }
+
+  /**
+   * A message or ping received in a conversation.
+   *
+   * @private
+   * @param {Conversation} conversationEntity - Conversation to add the event to
+   * @param {Object} eventJson - JSON data of 'conversation.message-add' or 'conversation.knock' event
+   * @returns {Promise} Resolves when event was handled
+   */
+  _handleConversationEventPersistence(conversationEntity, eventJson) {
+    const persistedEvents = [
+      z.event.Backend.CONVERSATION.MEMBER_JOIN,
+      z.event.Backend.CONVERSATION.RENAME,
+      z.event.Backend.CONVERSATION.MESSAGE_TIMER_UPDATE,
+    ];
+    if (!persistedEvents.includes(eventJson.type)) {
+      return Promise.resolve();
+    }
+    return this._add_event_to_conversation(eventJson, conversationEntity).then(messageEntity => {
+      return {conversationEntity, messageEntity};
+    });
   }
 
   _handledConversationEvent(entityObject = {}, eventSource, previouslyArchived) {
@@ -2841,20 +2867,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
         return {conversationEntity};
       });
-  }
-
-  /**
-   * A message or ping received in a conversation.
-   *
-   * @private
-   * @param {Conversation} conversationEntity - Conversation to add the event to
-   * @param {Object} eventJson - JSON data of 'conversation.message-add' or 'conversation.knock' event
-   * @returns {Promise} Resolves when event was handled
-   */
-  _onAddEvent(conversationEntity, eventJson) {
-    return this._add_event_to_conversation(eventJson, conversationEntity).then(messageEntity => {
-      return {conversationEntity, messageEntity};
-    });
   }
 
   /**
@@ -3011,10 +3023,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     return updateSequence
       .then(() => this.updateParticipatingUserEntities(conversationEntity, false, true))
-      .then(() => this._add_event_to_conversation(eventJson, conversationEntity))
-      .then(messageEntity => {
+      .then(() => {
         this.verification_state_handler.onMemberJoined(conversationEntity, eventData.user_ids);
-        return {conversationEntity, messageEntity};
       });
   }
 
@@ -3347,25 +3357,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when the event was handled
    */
   _onRename(conversationEntity, eventJson) {
-    return this._add_event_to_conversation(eventJson, conversationEntity).then(messageEntity => {
-      this.conversation_mapper.update_properties(conversationEntity, eventJson.data);
-      return {conversationEntity, messageEntity};
-    });
-  }
-
-  /**
-   * A conversation's message timer was changed
-   *
-   * @private
-   * @param {Conversation} conversationEntity - Conversation entity which message timer was changed
-   * @param {Object} eventJson - JSON data of 'conversation.message-timer-update' event
-   * @returns {Promise} Resolves when the event was handled
-   */
-  _onMessageTimerUpdate(conversationEntity, eventJson) {
-    return this._add_event_to_conversation(eventJson, conversationEntity).then(messageEntity => {
-      const updates = {globalMessageTimer: eventJson.data.message_timer};
-      this.conversation_mapper.update_properties(conversationEntity, updates);
-      return {conversationEntity, messageEntity};
+    return Promise.resolve().then(() => {
+      return this.conversation_mapper.update_properties(conversationEntity, eventJson.data);
     });
   }
 
