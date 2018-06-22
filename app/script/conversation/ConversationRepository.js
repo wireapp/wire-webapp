@@ -156,8 +156,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this._init_subscriptions();
 
     this.stateHandler = new z.conversation.ConversationStateHandler(this.conversation_service, this);
-    this.timedMessageHandler = new z.conversation.ConversationTimedHandler(this.conversation_service, this);
-    this.checkMessageTimer = this.timedMessageHandler.checkMessageTimer;
+    this.timedMessageHandler = new z.conversation.ConversationTimedHandler(
+      this.conversation_service,
+      this.handleMessageTimeout.bind(this)
+    );
+    this.checkMessageTimer = this.timedMessageHandler.checkMessageTimer.bind(this.timedMessageHandler);
   }
 
   _initStateUpdates() {
@@ -3357,6 +3360,23 @@ z.conversation.ConversationRepository = class ConversationRepository {
     });
   }
 
+  handleMessageTimeout(messageEntity) {
+    this.get_conversation_by_id(messageEntity.conversation_id).then(conversationEntity => {
+      if (messageEntity.user().is_me) {
+        this.get_message_in_conversation_by_id(conversationEntity, messageEntity.id).then(message =>
+          this.timedMessageHandler.obfuscateMessage(message)
+        );
+      }
+
+      if (conversationEntity.is_group()) {
+        const user_ids = _.union([this.selfUser().id], [messageEntity.from]);
+        return this.delete_message_everyone(conversationEntity, messageEntity, user_ids);
+      }
+
+      return this.delete_message_everyone(conversationEntity, messageEntity);
+    });
+  }
+
   //##############################################################################
   // Private
   //##############################################################################
@@ -3401,9 +3421,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
           conversationEntity.prepend_messages(messageEntities);
         } else {
           conversationEntity.add_messages(messageEntities);
-          messageEntities.forEach(this.timedMessageHandler.addTimedMessage);
         }
-
+        messageEntities.forEach(messageEntity => this.timedMessageHandler.addTimedMessage(messageEntity));
         return messageEntities;
       });
   }

@@ -24,7 +24,6 @@ window.z.components = z.components || {};
 
 z.components.EphemeralTimer = class EphemeralTimer {
   constructor(params, componentInfo) {
-    this.destroy = this.destroy.bind(this);
     const messageEntity = params.message;
 
     const ephemeralDuration = messageEntity.ephemeral_expires() - messageEntity.ephemeral_started();
@@ -35,13 +34,6 @@ z.components.EphemeralTimer = class EphemeralTimer {
 
     const dial = componentInfo.element.querySelector('.ephemeral-timer__dial');
     z.util.afterRender(() => (dial.style.strokeDashoffset = dashLength));
-  }
-
-  destroy() {
-    window.clearInterval(this.message_et.ephemeral_interval_id);
-    this.message_et.ephemeral_interval_id = undefined;
-    window.clearTimeout(this.message_et.ephemeral_timeout_id);
-    this.message_et.ephemeral_timeout_id = undefined;
   }
 };
 
