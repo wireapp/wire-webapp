@@ -38,6 +38,12 @@ z.util.TimeUtil = {
     const momentDuration = moment.duration(duration);
     const units = [
       {
+        plural: z.string.ephemeralUnitsYears,
+        singular: z.string.ephemeralUnitsYear,
+        unit: 'y',
+        value: momentDuration.years(),
+      },
+      {
         plural: z.string.ephemeralUnitsMonths,
         singular: z.string.ephemeralUnitsMonth,
         unit: 'M',
