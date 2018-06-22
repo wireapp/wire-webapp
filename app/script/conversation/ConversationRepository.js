@@ -3120,6 +3120,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           return {conversationEntity, messageEntity};
         });
     }
+    return Promise.resolve();
   }
 
   /**
@@ -3169,6 +3170,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     if (isActiveConversation && (conversationEntity.is_archived() || conversationEntity.is_cleared())) {
       amplify.publish(z.event.WebApp.CONVERSATION.SHOW, nextConversationEt);
     }
+    return Promise.resolve();
   }
 
   /**
