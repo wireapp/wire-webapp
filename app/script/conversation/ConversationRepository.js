@@ -2686,37 +2686,52 @@ z.conversation.ConversationRepository = class ConversationRepository {
       })
       .then(conversationEntity => this._triggerFeatureEventHandlers(conversationEntity, eventJson, eventSource))
       .then(conversationEntity => {
+        let handledPromise;
         switch (type) {
           case z.event.Backend.CONVERSATION.CREATE:
-            return this._onCreate(eventJson, eventSource);
+            handledPromise = this._onCreate(eventJson, eventSource);
+            break;
           case z.event.Backend.CONVERSATION.MEMBER_JOIN:
-            return this._onMemberJoin(conversationEntity, eventJson);
+            handledPromise = this._onMemberJoin(conversationEntity, eventJson);
+            break;
           case z.event.Backend.CONVERSATION.MEMBER_LEAVE:
           case z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE:
-            return this._onMemberLeave(conversationEntity, eventJson);
+            handledPromise = this._onMemberLeave(conversationEntity, eventJson);
+            break;
           case z.event.Backend.CONVERSATION.MEMBER_UPDATE:
-            return this._onMemberUpdate(conversationEntity, eventJson);
+            handledPromise = this._onMemberUpdate(conversationEntity, eventJson);
+            break;
           case z.event.Backend.CONVERSATION.RENAME:
-            return this._onRename(conversationEntity, eventJson);
+            handledPromise = this._onRename(conversationEntity, eventJson);
+            break;
           case z.event.Client.CONVERSATION.ASSET_ADD:
-            return this._on_asset_add(conversationEntity, eventJson);
+            handledPromise = this._on_asset_add(conversationEntity, eventJson);
+            break;
           case z.event.Client.CONVERSATION.CONFIRMATION:
-            return this._on_confirmation(conversationEntity, eventJson);
+            handledPromise = this._on_confirmation(conversationEntity, eventJson);
+            break;
           case z.event.Client.CONVERSATION.GROUP_CREATION:
-            return this._onGroupCreation(conversationEntity, eventJson);
+            handledPromise = this._onGroupCreation(conversationEntity, eventJson);
+            break;
           case z.event.Client.CONVERSATION.MESSAGE_ADD:
-            return this._on_message_add(conversationEntity, eventJson);
+            handledPromise = this._on_message_add(conversationEntity, eventJson);
+            break;
           case z.event.Client.CONVERSATION.MESSAGE_DELETE:
-            return this._onMessageDeleted(conversationEntity, eventJson);
+            handledPromise = this._onMessageDeleted(conversationEntity, eventJson);
+            break;
           case z.event.Client.CONVERSATION.MESSAGE_HIDDEN:
-            return this._onMessageHidden(eventJson);
+            handledPromise = this._onMessageHidden(eventJson);
+            break;
           case z.event.Client.CONVERSATION.ONE2ONE_CREATION:
-            return this._on1to1Creation(conversationEntity, eventJson);
+            handledPromise = this._on1to1Creation(conversationEntity, eventJson);
+            break;
           case z.event.Client.CONVERSATION.REACTION:
-            return this._on_reaction(conversationEntity, eventJson);
+            handledPromise = this._on_reaction(conversationEntity, eventJson);
+            break;
           default:
-            return conversationEntity;
+            handledPromise = Promise.resolve();
         }
+        return handledPromise.then(() => conversationEntity);
       })
 
       .then(conversationEntity => this._handleEventPersistence(conversationEntity, eventJson))
