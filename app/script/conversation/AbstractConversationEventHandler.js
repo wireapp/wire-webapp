@@ -37,7 +37,7 @@ z.conversation.AbstractConversationEventHandler = class AbstractConversationEven
   }
 
   /**
-   * Handle a configured event
+   * Handles a conversation event
    *
    * @param {z.entity.Conversation} conversationEntity - the conversation the event relates to
    * @param {Object} eventJson - JSON data for event

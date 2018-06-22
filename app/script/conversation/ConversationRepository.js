@@ -2727,8 +2727,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
         }
       })
 
-      .then(conversationEntity => this._handleConversationEventPersistence(conversationEntity, eventJson))
-      .then((entityObject = {}) => this._handledConversationEvent(entityObject, eventSource, previouslyArchived))
+      .then(conversationEntity => this._handleEventPersistence(conversationEntity, eventJson))
+      .then((entityObject = {}) => this._handleConversationStatusUpdate(entityObject, eventSource, previouslyArchived))
       .catch(error => {
         const isMessageNotFound = error.type === z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND;
         if (!isMessageNotFound) {
@@ -2738,28 +2738,39 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   /**
-   * A message or ping received in a conversation.
+   * Add relevant events to the conversation entity in order for it to be displayed on the UI.
+   * Does nothing if the event type doesn't need to be persisted in memory
    *
    * @private
    * @param {Conversation} conversationEntity - Conversation to add the event to
-   * @param {Object} eventJson - JSON data of 'conversation.message-add' or 'conversation.knock' event
+   * @param {Object} eventJson - JSON data of the event
    * @returns {Promise} Resolves when event was handled
    */
-  _handleConversationEventPersistence(conversationEntity, eventJson) {
+  _handleEventPersistence(conversationEntity, eventJson) {
     const persistedEvents = [
       z.event.Backend.CONVERSATION.MEMBER_JOIN,
       z.event.Backend.CONVERSATION.RENAME,
       z.event.Backend.CONVERSATION.MESSAGE_TIMER_UPDATE,
     ];
     if (!persistedEvents.includes(eventJson.type)) {
-      return Promise.resolve();
+      return Promise.resolve({});
     }
     return this._addEventToConversation(conversationEntity, eventJson).then(messageEntity => {
       return {conversationEntity, messageEntity};
     });
   }
 
-  _handledConversationEvent(entityObject = {}, eventSource, previouslyArchived) {
+  /**
+   * Update a few conversation status depending on the event that was handled
+   * also handles notifications if needed
+   *
+   * @private
+   * @param {Object} entityObject - Object containing the conversation and the message that are targeted by the event
+   * @param {z.event.EventRepository.SOURCE} eventSource - Source of event
+   * @param {boolean} previouslyArchived - true if the previous state of the conversation was archived
+   * @returns {void}
+   */
+  _handleConversationStatusUpdate(entityObject = {}, eventSource, previouslyArchived) {
     const {conversationEntity, messageEntity} = entityObject;
 
     if (conversationEntity) {
