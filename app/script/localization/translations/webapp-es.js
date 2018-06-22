@@ -576,13 +576,13 @@ z.string.es.initEvents = 'Cargando mensajes';
 z.string.es.initUpdatedFromNotifications = 'Casi terminado - Disfruta  Wire';
 z.string.es.initProgress = ' — {{number1}} de {{number2}}';
 
-z.string.es.ephememalUnitsNone = 'Desactivar';
-z.string.es.ephememalUnitsSecond = 'segundo';
-z.string.es.ephememalUnitsSeconds = 'segundos';
-z.string.es.ephememalUnitsMinute = 'minuto';
-z.string.es.ephememalUnitsMinutes = 'minutos';
-z.string.es.ephememalUnitsHour = 'hora';
-z.string.es.ephememalUnitsHours = 'horas';
-z.string.es.ephememalUnitsDay = 'día';
-z.string.es.ephememalUnitsDays = 'días';
+z.string.es.ephemeralUnitsNone = 'Desactivar';
+z.string.es.ephemeralUnitsSecond = 'segundo';
+z.string.es.ephemeralUnitsSeconds = 'segundos';
+z.string.es.ephemeralUnitsMinute = 'minuto';
+z.string.es.ephemeralUnitsMinutes = 'minutos';
+z.string.es.ephemeralUnitsHour = 'hora';
+z.string.es.ephemeralUnitsHours = 'horas';
+z.string.es.ephemeralUnitsDay = 'día';
+z.string.es.ephemeralUnitsDays = 'días';
 

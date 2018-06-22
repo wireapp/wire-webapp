@@ -156,7 +156,7 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
       const hasMessageTimeSet = conversation.messageTimer() && conversation.hasGlobalMessageTimer();
       return hasMessageTimeSet
         ? z.util.TimeUtil.formatDuration(conversation.messageTimer()).text
-        : z.l10n.text(z.string.ephememalUnitsNone);
+        : z.l10n.text(z.string.ephemeralUnitsNone);
     });
 
     this.shouldUpdateScrollbar = ko

@@ -562,13 +562,13 @@ z.string.sk.initReceivedUserData = 'Kontrola nových správ';
 z.string.sk.initDecryption = 'Dešifrovať správy';
 z.string.sk.initEvents = 'Načítavam správy';
 
-z.string.sk.ephememalUnitsNone = 'Vypnúť';
-z.string.sk.ephememalUnitsSecond = 'sekunda';
-z.string.sk.ephememalUnitsSeconds = 'sekundy';
-z.string.sk.ephememalUnitsMinute = 'minúta';
-z.string.sk.ephememalUnitsMinutes = 'minúty';
-z.string.sk.ephememalUnitsHour = 'hodina';
-z.string.sk.ephememalUnitsHours = 'hodiny';
-z.string.sk.ephememalUnitsDay = 'deň';
-z.string.sk.ephememalUnitsDays = 'dni';
+z.string.sk.ephemeralUnitsNone = 'Vypnúť';
+z.string.sk.ephemeralUnitsSecond = 'sekunda';
+z.string.sk.ephemeralUnitsSeconds = 'sekundy';
+z.string.sk.ephemeralUnitsMinute = 'minúta';
+z.string.sk.ephemeralUnitsMinutes = 'minúty';
+z.string.sk.ephemeralUnitsHour = 'hodina';
+z.string.sk.ephemeralUnitsHours = 'hodiny';
+z.string.sk.ephemeralUnitsDay = 'deň';
+z.string.sk.ephemeralUnitsDays = 'dni';
 

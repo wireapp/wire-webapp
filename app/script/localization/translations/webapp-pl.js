@@ -605,13 +605,13 @@ z.string.pl.initEvents = 'Ładowanie wiadomości';
 z.string.pl.initUpdatedFromNotifications = 'Prawie skończone - miłego korzystania z Wire';
 z.string.pl.initProgress = ' — {{number1}} z {{number2}}';
 
-z.string.pl.ephememalUnitsNone = 'Wyłącz';
-z.string.pl.ephememalUnitsSecond = 'sekunda';
-z.string.pl.ephememalUnitsSeconds = 'sekund';
-z.string.pl.ephememalUnitsMinute = 'minuta';
-z.string.pl.ephememalUnitsMinutes = 'minut';
-z.string.pl.ephememalUnitsHour = 'godzina';
-z.string.pl.ephememalUnitsHours = 'godzin';
-z.string.pl.ephememalUnitsDay = 'dzień';
-z.string.pl.ephememalUnitsDays = 'dni';
+z.string.pl.ephemeralUnitsNone = 'Wyłącz';
+z.string.pl.ephemeralUnitsSecond = 'sekunda';
+z.string.pl.ephemeralUnitsSeconds = 'sekund';
+z.string.pl.ephemeralUnitsMinute = 'minuta';
+z.string.pl.ephemeralUnitsMinutes = 'minut';
+z.string.pl.ephemeralUnitsHour = 'godzina';
+z.string.pl.ephemeralUnitsHours = 'godzin';
+z.string.pl.ephemeralUnitsDay = 'dzień';
+z.string.pl.ephemeralUnitsDays = 'dni';
 
