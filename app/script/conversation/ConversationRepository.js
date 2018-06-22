@@ -156,6 +156,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this._init_subscriptions();
 
     this.stateHandler = new z.conversation.ConversationStateHandler(this.conversation_service, this);
+    this.ephemeralHandler = new z.conversation.ConversationEphemeralHandler(
+      this.conversation_service,
+      this.handleMessageTimeout.bind(this)
+    );
+    this.checkMessageTimer = this.ephemeralHandler.checkMessageTimer.bind(this.ephemeralHandler);
   }
 
   _initStateUpdates() {
@@ -195,7 +200,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
   _init_subscriptions() {
     amplify.subscribe(z.event.WebApp.CONVERSATION.ASSET.CANCEL, this.cancel_asset_upload.bind(this));
     amplify.subscribe(z.event.WebApp.CONVERSATION.EVENT_FROM_BACKEND, this.onConversationEvent.bind(this));
-    amplify.subscribe(z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, this.timeout_ephemeral_message.bind(this));
     amplify.subscribe(z.event.WebApp.CONVERSATION.MAP_CONNECTION, this.map_connection.bind(this));
     amplify.subscribe(z.event.WebApp.CONVERSATION.MISSED_EVENTS, this.on_missed_events.bind(this));
     amplify.subscribe(z.event.WebApp.CONVERSATION.PERSIST_STATE, this.save_conversation_state_in_db.bind(this));
@@ -2592,141 +2596,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   /**
-   * Check the remaining lifetime for a given ephemeral message.
-   * @param {Message} message_et - Message to check
-   * @returns {undefined} No return value
-   */
-  checkMessageTimer(message_et) {
-    switch (message_et.ephemeral_status()) {
-      case z.message.EphemeralStatusType.TIMED_OUT:
-        this.timeout_ephemeral_message(message_et);
-        break;
-      case z.message.EphemeralStatusType.ACTIVE:
-        message_et.startMessageTimer();
-        break;
-      case z.message.EphemeralStatusType.INACTIVE:
-        message_et.startMessageTimer();
-        this.conversation_service.update_message_in_db(message_et, {
-          ephemeral_expires: message_et.ephemeral_expires(),
-          ephemeral_started: message_et.ephemeral_started(),
-        });
-        break;
-      default:
-        this.logger.warn(`Ephemeral message of unsupported type: ${message_et.type}`);
-    }
-  }
-
-  timeout_ephemeral_message(message_et) {
-    if (!message_et.is_expired()) {
-      this.get_conversation_by_id(message_et.conversation_id).then(conversation_et => {
-        if (message_et.user().is_me) {
-          switch (false) {
-            case !message_et.has_asset_text():
-              return this._obfuscate_text_message(conversation_et, message_et.id);
-            case !message_et.is_ping():
-              return this._obfuscate_ping_message(conversation_et, message_et.id);
-            case !message_et.has_asset():
-              return this._obfuscate_asset_message(conversation_et, message_et.id);
-            case !message_et.has_asset_image():
-              return this._obfuscate_image_message(conversation_et, message_et.id);
-            default:
-              return this.logger.warn(`Ephemeral message of unsupported type: ${message_et.type}`);
-          }
-        }
-
-        if (conversation_et.is_group()) {
-          const user_ids = _.union([this.selfUser().id], [message_et.from]);
-          return this.delete_message_everyone(conversation_et, message_et, user_ids);
-        }
-
-        return this.delete_message_everyone(conversation_et, message_et);
-      });
-    }
-  }
-
-  _obfuscate_asset_message(conversation_et, message_id) {
-    return this.get_message_in_conversation_by_id(conversation_et, message_id)
-      .then(message_et => {
-        const asset = message_et.get_first_asset();
-        message_et.ephemeral_expires(true);
-
-        return this.conversation_service.update_message_in_db(message_et, {
-          data: {
-            content_type: asset.file_type,
-            meta: {},
-          },
-          ephemeral_expires: true,
-        });
-      })
-      .then(() => {
-        this.logger.info(`Obfuscated asset message '${message_id}'`);
-      });
-  }
-
-  _obfuscate_image_message(conversation_et, message_id) {
-    return this.get_message_in_conversation_by_id(conversation_et, message_id)
-      .then(message_et => {
-        const asset = message_et.get_first_asset();
-        message_et.ephemeral_expires(true);
-
-        return this.conversation_service.update_message_in_db(message_et, {
-          data: {
-            info: {
-              height: asset.height,
-              tag: 'medium',
-              width: asset.width,
-            },
-          },
-          ephemeral_expires: true,
-        });
-      })
-      .then(() => {
-        this.logger.info(`Obfuscated image message '${message_id}'`);
-      });
-  }
-
-  _obfuscate_text_message(conversation_et, message_id) {
-    return this.get_message_in_conversation_by_id(conversation_et, message_id)
-      .then(message_et => {
-        const asset = message_et.get_first_asset();
-        const obfuscated_asset = new z.entity.Text(message_et.id);
-        const obfuscated_previews = asset.previews().map(link_preview => {
-          link_preview.obfuscate();
-          const article = new z.proto.Article(link_preview.url, link_preview.title); // deprecated format
-          return new z.proto.LinkPreview(link_preview.url, 0, article, link_preview.url, link_preview.title).encode64();
-        });
-
-        obfuscated_asset.text = z.util.StringUtil.obfuscate(asset.text);
-        obfuscated_asset.previews(asset.previews());
-
-        message_et.assets([obfuscated_asset]);
-        message_et.ephemeral_expires(true);
-
-        return this.conversation_service.update_message_in_db(message_et, {
-          data: {
-            content: obfuscated_asset.text,
-            previews: obfuscated_previews,
-          },
-          ephemeral_expires: true,
-        });
-      })
-      .then(() => {
-        this.logger.info(`Obfuscated text message '${message_id}'`);
-      });
-  }
-
-  _obfuscate_ping_message(conversation_et, message_id) {
-    return this.get_message_in_conversation_by_id(conversation_et, message_id)
-      .then(message_et => {
-        message_et.ephemeral_expires(true);
-        return this.conversation_service.update_message_in_db(message_et, {ephemeral_expires: true});
-      })
-      .then(() => {
-        this.logger.info(`Obfuscated ping message '${message_id}'`);
-      });
-  }
-
-  /**
    * Can user upload assets to conversation.
    * @param {Conversation} conversation_et - Conversation to check
    * @returns {boolean} Can assets be uploaded
@@ -3491,6 +3360,23 @@ z.conversation.ConversationRepository = class ConversationRepository {
     });
   }
 
+  handleMessageTimeout(messageEntity) {
+    this.get_conversation_by_id(messageEntity.conversation_id).then(conversationEntity => {
+      if (messageEntity.user().is_me) {
+        this.get_message_in_conversation_by_id(conversationEntity, messageEntity.id).then(message =>
+          this.ephemeralHandler.obfuscateMessage(message)
+        );
+      }
+
+      if (conversationEntity.is_group()) {
+        const user_ids = _.union([this.selfUser().id], [messageEntity.from]);
+        return this.delete_message_everyone(conversationEntity, messageEntity, user_ids);
+      }
+
+      return this.delete_message_everyone(conversationEntity, messageEntity);
+    });
+  }
+
   //##############################################################################
   // Private
   //##############################################################################
@@ -3510,6 +3396,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .then(message_et => {
         if (conversation_et && message_et) {
           conversation_et.add_message(message_et);
+          this.ephemeralHandler.addTimedMessage(message_et);
         }
 
         return message_et;
@@ -3535,7 +3422,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         } else {
           conversationEntity.add_messages(messageEntities);
         }
-
+        messageEntities.forEach(messageEntity => this.ephemeralHandler.addTimedMessage(messageEntity));
         return messageEntities;
       });
   }

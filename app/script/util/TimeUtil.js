@@ -30,32 +30,32 @@ z.util.TimeUtil = {
 
   durationUnits: [
     {
-      plural: z.string.ephemeralUnitsWeeks,
-      singular: z.string.ephemeralUnitsWeek,
+      plural: 'ephemeralUnitsWeeks',
+      singular: 'ephemeralUnitsWeek',
       unit: 'w',
       value: 1000 * 60 * 60 * 24 * 7,
     },
     {
-      plural: z.string.ephemeralUnitsDays,
-      singular: z.string.ephemeralUnitsDay,
+      plural: 'ephemeralUnitsDays',
+      singular: 'ephemeralUnitsDay',
       unit: 'd',
       value: 1000 * 60 * 60 * 24,
     },
     {
-      plural: z.string.ephemeralUnitsHours,
-      singular: z.string.ephemeralUnitsHour,
+      plural: 'ephemeralUnitsHours',
+      singular: 'ephemeralUnitsHour',
       unit: 'h',
       value: 1000 * 60 * 60,
     },
     {
-      plural: z.string.ephemeralUnitsMinutes,
-      singular: z.string.ephemeralUnitsMinute,
+      plural: 'ephemeralUnitsMinutes',
+      singular: 'ephemeralUnitsMinute',
       unit: 'm',
       value: 1000 * 60,
     },
     {
-      plural: z.string.ephemeralUnitsSeconds,
-      singular: z.string.ephemeralUnitsSecond,
+      plural: 'ephemeralUnitsSeconds',
+      singular: 'ephemeralUnitsSecond',
       unit: 's',
       value: 1000,
     },
@@ -72,11 +72,11 @@ z.util.TimeUtil = {
     const mappedUnits = z.util.TimeUtil.durationUnits.map((unit, index) => {
       let value = duration;
       if (index > 0) {
-        value %= units[index - 1].value;
+        value %= z.util.TimeUtil.durationUnits[index - 1].value;
       }
       value /= unit.value;
       value = rounded ? Math.round(value) : Math.floor(value);
-      const longUnit = value === 1 ? unit.singular : unit.plural;
+      const longUnit = z.string[value === 1 ? unit.singular : unit.plural];
       return {
         longUnit,
         unit: unit.unit,
