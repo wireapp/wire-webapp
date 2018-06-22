@@ -158,6 +158,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
       this.conversation_service,
       this.conversation_mapper
     );
+    this.ephemeralHandler = new z.conversation.ConversationEphemeralHandler(
+      this.conversation_service,
+      this.handleMessageTimeout.bind(this)
+    );
   }
 
   _initStateUpdates() {
@@ -3251,7 +3255,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         if (event) {
           conversation_et.remove_message_by_id(event_json.id);
 
-          return this._onAddEvent(conversation_et, event).then(({messageEntity}) => {
+          return this._addEventToConversation(conversation_et, event).then(messageEntity => {
             const first_asset = messageEntity.get_first_asset();
             if (first_asset.is_image() || first_asset.status() === z.assets.AssetTransferState.UPLOADED) {
               return {conversationEntity: conversation_et, messageEntity};
