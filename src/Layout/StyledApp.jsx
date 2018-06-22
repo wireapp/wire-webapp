@@ -28,7 +28,7 @@ const StyledApp = styled.div`
   flex-direction: column;
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Helvetica, Arial, sans-serif;
   font-weight: 300;
-  line-height: 1.5;
+  line-height: 1.75;
   min-height: 100vh;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
