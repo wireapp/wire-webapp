@@ -112,8 +112,8 @@ describe('Conversation Mapper', () => {
       expect(conversationEntity.name()).toBeDefined();
 
       const updates = {
-        newProperty: 'abc',
         name: updatedName,
+        newProperty: 'abc',
       };
       conversation_mapper.update_properties(conversationEntity, updates);
 
