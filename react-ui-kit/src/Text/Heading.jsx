@@ -35,6 +35,7 @@ const H1 = Text.withComponent('h1').extend`
   min-height: 48px;
   ${media.mobile`
     font-size: 24px;
+    line-height: 32px;
   `}
 `;
 
