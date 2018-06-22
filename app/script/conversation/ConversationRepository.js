@@ -154,14 +154,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
       this.conversation_service,
       this.conversation_mapper
     );
-    this.messageTimerHandler = new z.conversation.ConversationMessageTimerHandler(
-      this.conversation_service,
-      this.conversation_mapper
-    );
     this.ephemeralHandler = new z.conversation.ConversationEphemeralHandler(
       this.conversation_service,
+      this.conversation_mapper,
       this.handleMessageTimeout.bind(this)
     );
+    this.checkMessageTimer = this.ephemeralHandler.checkMessageTimer.bind(this.ephemeralHandler);
   }
 
   _initStateUpdates() {
@@ -2758,8 +2756,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when all the handlers have done their job
    */
   _triggerFeatureEventHandlers(conversationEntity, eventJson, eventSource) {
-    const handlers = [this.messageTimerHandler, this.stateHandler];
-    const handlePromises = handlers.map(handler =>
+    const conversationEventHandlers = [this.ephemeralHandler, this.stateHandler];
+    const handlePromises = conversationEventHandlers.map(handler =>
       handler.handleConversationEvent(conversationEntity, eventJson, eventSource)
     );
     return Promise.all(handlePromises).then(() => conversationEntity);
