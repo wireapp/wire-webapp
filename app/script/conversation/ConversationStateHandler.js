@@ -32,11 +32,9 @@ z.conversation.ConversationStateHandler = class ConversationStateHandler extends
   constructor(conversationService, conversationMapper) {
     super();
     const eventHandlingConfig = {
-      [z.event.Backend.CONVERSATION.ACCESS_UPDATE]: () =>
-        this.conversationMapper.mapAccessState(conversationEntity, eventData.access, eventData.access_role),
-      [z.event.Backend.CONVERSATION.CODE_DELETE]: conversationEntity => conversationEntity.accessCode(undefined),
-      [z.event.Backend.CONVERSATION.CODE_UPDATE]: () =>
-        this.conversationMapper.mapAccessCode(conversationEntity, eventData),
+      [z.event.Backend.CONVERSATION.ACCESS_UPDATE]: this._mapConversationAccessState.bind(this),
+      [z.event.Backend.CONVERSATION.CODE_DELETE]: this._resetConversationAccessCode.bind(this),
+      [z.event.Backend.CONVERSATION.CODE_UPDATE]: this._updateConversationAccessCode.bind(this),
     };
     this.setEventHandlingConfig(eventHandlingConfig);
     this.conversationService = conversationService;
@@ -121,6 +119,18 @@ z.conversation.ConversationStateHandler = class ConversationStateHandler extends
         amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.GUEST_ROOMS.LINK_REVOKED);
       })
       .catch(() => this._showModal(z.string.modalConversationGuestOptionsRevokeCodeMessage));
+  }
+
+  _mapConversationAccessState(conversationEntity, eventJson) {
+    this.conversationMapper.mapAccessState(conversationEntity, eventJson.access, eventJson.access_role);
+  }
+
+  _resetConversationAccessCode(conversationEntity) {
+    conversationEntity.accessCode(undefined);
+  }
+
+  _updateConversationAccessCode(conversationEntity, eventJson) {
+    this.conversationMapper.mapAccessCode(conversationEntity, eventJson);
   }
 
   _showModal(messageStringId) {

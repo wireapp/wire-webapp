@@ -2723,7 +2723,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           case z.event.Client.CONVERSATION.REACTION:
             return this._on_reaction(conversationEntity, eventJson);
           default:
-            return this._add_event_to_conversation(eventJson, conversationEntity);
+            return conversationEntity;
         }
       })
 
@@ -2754,7 +2754,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     if (!persistedEvents.includes(eventJson.type)) {
       return Promise.resolve();
     }
-    return this._add_event_to_conversation(eventJson, conversationEntity).then(messageEntity => {
+    return this._addEventToConversation(conversationEntity, eventJson).then(messageEntity => {
       return {conversationEntity, messageEntity};
     });
   }
@@ -3056,7 +3056,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     }
 
     if (!selfLeavingClearedConversation) {
-      return this._add_event_to_conversation(eventJson, conversationEntity)
+      return this._addEventToConversation(conversationEntity, eventJson)
         .then(messageEntity => {
           messageEntity
             .userEntities()
@@ -3161,7 +3161,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       })
       .then(updated_event_json => {
         if (updated_event_json) {
-          return this._onAddEvent(conversation_et, updated_event_json);
+          return this._addEventToConversation(conversation_et, updated_event_json);
         }
       });
   }
@@ -3387,17 +3387,17 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Convert a JSON event into an entity and add it to a given conversation.
    *
    * @private
-   * @param {Object} json - Event data
-   * @param {Conversation} conversation_et - Conversation entity the event will be added to
+   * @param {Conversation} conversationEntity - Conversation entity the event will be added to
+   * @param {Object} eventJson - Event data
    * @returns {Promise} Promise that resolves with the message entity for the event
    */
-  _add_event_to_conversation(json, conversation_et) {
+  _addEventToConversation(conversationEntity, eventJson) {
     return this.event_mapper
-      .mapJsonEvent(json, conversation_et, true)
+      .mapJsonEvent(eventJson, conversationEntity, true)
       .then(message_et => this._updateMessageUserEntities(message_et))
       .then(message_et => {
-        if (conversation_et && message_et) {
-          conversation_et.add_message(message_et);
+        if (conversationEntity && message_et) {
+          conversationEntity.add_message(message_et);
           this.ephemeralHandler.addTimedMessage(message_et);
         }
 
