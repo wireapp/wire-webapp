@@ -39,9 +39,11 @@ import {
   Content,
   DeviceIcon,
   ErrorMessage,
+  FacebookIcon,
   Footer,
   Form,
   GifIcon,
+  GitHubIcon,
   H1,
   H2,
   H3,
@@ -59,6 +61,7 @@ import {
   LeaveIcon,
   Line,
   Link,
+  LinkedInIcon,
   Loading,
   Logo,
   MessageIcon,
@@ -80,6 +83,7 @@ import {
   TeamIcon,
   Text,
   TimedIcon,
+  TwitterIcon,
   Uppercase,
   WireIcon,
 } from '@wireapp/react-ui-kit';
@@ -159,6 +163,14 @@ class Demo extends React.PureComponent {
               <LeaveIcon height={32} />
               <AddPeopleIcon height={32} />
               <GifIcon width={32} />
+            </Container>
+            <Line />
+            <H1>Brand Icons</H1>
+            <Container style={{alignItems: 'center', display: 'flex', justifyContent: 'space-around'}}>
+              <FacebookIcon width={32} />
+              <GitHubIcon width={32} />
+              <LinkedInIcon width={32} />
+              <TwitterIcon width={32} />
             </Container>
             <Line />
             <H1>Layout</H1>
