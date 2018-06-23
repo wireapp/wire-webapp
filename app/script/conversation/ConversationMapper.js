@@ -17,7 +17,27 @@
  *
  */
 
+// @ts-check
+
 'use strict';
+
+/**
+ * @typedef {object} SelfStatusUpdate
+ * @property {number=} archived_timestamp
+ * @property {number=} cleared_timestamp
+ * @property {number=} ephemeral_timer
+ * @property {number=} message_timer
+ * @property {number=} last_event_timestamp
+ * @property {number=} last_read_timestamp
+ * @property {number=} last_server_timestamp
+ * @property {boolean=} otr_archived
+ * @property {string=} otr_archived_ref
+ * @property {boolean=} otr_muted
+ * @property {string=} otr_muted_ref
+ * @property {boolean=} muted_state
+ * @property {number=} status
+ * @property {number=} verification_state
+ */
 
 window.z = window.z || {};
 window.z.conversation = z.conversation || {};
@@ -53,7 +73,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
   update_properties(conversationEntity, conversationData) {
     Object.entries(conversationData).forEach(([key, value]) => {
       if (key !== 'id') {
-        if (value !== undefined) {
+        if (value !== undefined && conversationEntity.hasOwnProperty(key)) {
           if (ko.isObservable(conversationEntity[key])) {
             conversationEntity[key](value);
           } else {
@@ -70,7 +90,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
    * Update the membership properties of a conversation.
    *
    * @param {Conversation} conversation_et - Conversation to be updated
-   * @param {Object} self_state - Conversation self data
+   * @param {SelfStatusUpdate} self_state - Conversation self data from the database
    * @param {boolean} [disablePersistence=false] - Disable persistence of state changes during update
    * @returns {Conversation} Updated conversation entity
    */
