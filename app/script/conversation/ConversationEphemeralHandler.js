@@ -30,48 +30,68 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
   }
 
   constructor(conversationService, onMessageTimeout) {
+    this._updateTimedMessages = this._updateTimedMessages.bind(this);
+
     this.conversationService = conversationService;
     this.onMessageTimeout = onMessageTimeout;
     this.logger = new z.util.Logger('z.conversation.ConversationEphemeralHandler', z.config.LOGGER.OPTIONS);
 
-    this.timedMessages = [];
-    window.setInterval(this._updateTimedMessages.bind(this), ConversationEphemeralHandler.CONFIG.INTERVAL_TIME);
+    this.timedMessages = ko.observableArray([]);
+
+    let updateIntervalId = null;
+    this.timedMessages.subscribe(messageEntities => {
+      const shouldClearInterval = !messageEntities.length && updateIntervalId;
+      if (shouldClearInterval) {
+        window.clearInterval(updateIntervalId);
+        updateIntervalId = null;
+        return this.logger.info('Cleared ephemeral message check interval');
+      }
+
+      const shouldSetInterval = messageEntities.length && !updateIntervalId;
+      if (shouldSetInterval) {
+        updateIntervalId = window.setInterval(() => {
+          this._updateTimedMessages();
+        }, ConversationEphemeralHandler.CONFIG.INTERVAL_TIME);
+        this.logger.info('Started ephemeral message check interval');
+      }
+    });
   }
 
   _updateTimedMessages() {
-    const now = Date.now();
-    for (let index = this.timedMessages.length - 1; index >= 0; index--) {
-      const messageEntity = this.timedMessages[index];
+    const currentTimestamp = Date.now();
+    const removeTimedMessage = (messageEntity, index) => {
+      amplify.publish(z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, messageEntity);
+      this._timeoutEphemeralMessage(messageEntity);
+      this.timedMessages().splice(index, 1);
+    };
+
+    for (let index = this.timedMessages().length - 1; index >= 0; index--) {
+      const messageEntity = this.timedMessages()[index];
       if (_.isString(messageEntity.ephemeral_expires())) {
-        const remainingTime = messageEntity.ephemeral_expires() - now;
+        const remainingTime = messageEntity.ephemeral_expires() - currentTimestamp;
         if (remainingTime > 0) {
           messageEntity.ephemeral_remaining(remainingTime);
         } else {
-          this._removeTimedMessage(messageEntity);
+          removeTimedMessage(messageEntity, index);
         }
       }
     }
   }
 
   addTimedMessage(messageEntity) {
-    if (messageEntity.ephemeral_status === z.message.EphemeralStatusType.NONE) {
-      return;
-    }
-    const isAlreadyAdded = this.timedMessages.some(timedMessage => {
-      return timedMessage.id === messageEntity.id && timedMessage.conversation_id === messageEntity.conversation_id;
-    });
-    if (!isAlreadyAdded) {
-      this.timedMessages.push(messageEntity);
-      this._updateTimedMessages();
-    }
-  }
+    const {ephemeral_status: ephemeralStatus, id, conversation_id: conversationId} = messageEntity;
 
-  _removeTimedMessage(messageEntity) {
-    const messageIndex = this.timedMessages.indexOf(messageEntity);
-    if (messageIndex > -1) {
-      amplify.publish(z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, messageEntity);
-      this._timeoutEphemeralMessage(messageEntity);
-      this.timedMessages.splice(messageIndex, 1);
+    const isEphemeralMessage = ephemeralStatus() !== z.message.EphemeralStatusType.NONE;
+    if (isEphemeralMessage) {
+      const isAlreadyAdded = this.timedMessages().some(timedMessageEntity => {
+        const {conversation_id: timedConversationId, id: timedMessageId} = timedMessageEntity;
+        return timedMessageId === id && timedConversationId === conversationId;
+      });
+
+      if (!isAlreadyAdded) {
+        this.timedMessages().push(messageEntity);
+        this._updateTimedMessages();
+      }
     }
   }
 
@@ -82,19 +102,25 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
    */
   checkMessageTimer(messageEntity) {
     switch (messageEntity.ephemeral_status()) {
-      case z.message.EphemeralStatusType.TIMED_OUT:
+      case z.message.EphemeralStatusType.TIMED_OUT: {
         this._timeoutEphemeralMessage(messageEntity);
         break;
-      case z.message.EphemeralStatusType.ACTIVE:
+      }
+
+      case z.message.EphemeralStatusType.ACTIVE: {
         messageEntity.startMessageTimer();
         break;
-      case z.message.EphemeralStatusType.INACTIVE:
+      }
+
+      case z.message.EphemeralStatusType.INACTIVE: {
         messageEntity.startMessageTimer();
         this.conversationService.update_message_in_db(messageEntity, {
           ephemeral_expires: messageEntity.ephemeral_expires(),
           ephemeral_started: messageEntity.ephemeral_started(),
         });
         break;
+      }
+
       default:
         this.logger.warn(`Ephemeral message of unsupported type: ${messageEntity.type}`);
     }
@@ -151,6 +177,12 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
     this.logger.info(`Obfuscated image message '${assetEntity.id}'`);
   }
 
+  _obfuscatePingMessage(messageEntity) {
+    messageEntity.ephemeral_expires(true);
+    this.conversationService.update_message_in_db(messageEntity, {ephemeral_expires: true});
+    this.logger.info(`Obfuscated ping message '${messageEntity.id}'`);
+  }
+
   _obfuscateTextMessage(messageEntity) {
     const asset = messageEntity.get_first_asset();
     const obfuscatedAsset = new z.entity.Text(messageEntity.id);
@@ -174,11 +206,5 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
       ephemeral_expires: true,
     });
     this.logger.info(`Obfuscated text message '${messageEntity.id}'`);
-  }
-
-  _obfuscatePingMessage(messageEntity) {
-    messageEntity.ephemeral_expires(true);
-    this.conversationService.update_message_in_db(messageEntity, {ephemeral_expires: true});
-    this.logger.info(`Obfuscated ping message '${messageEntity.id}'`);
   }
 };
