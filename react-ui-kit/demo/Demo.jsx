@@ -369,6 +369,7 @@ class Demo extends React.PureComponent {
                       <RoundIconButton type="submit" icon={ICON_NAME.TEAM} formNoValidate />
                       <RoundIconButton type="submit" icon={ICON_NAME.TIMED} formNoValidate />
                       <RoundIconButton type="submit" icon={ICON_NAME.TRASH} formNoValidate />
+                      <RoundIconButton type="submit" formNoValidate />
                     </InputSubmitCombo>
                   </InputBlock>
                 </Form>
