@@ -30,15 +30,17 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
     };
   }
 
-  constructor(conversationService, conversationMapper, onMessageTimeout) {
+  constructor(conversationService, conversationMapper) {
     super();
+
     this.setEventHandlingConfig({
       [z.event.Backend.CONVERSATION.MESSAGE_TIMER_UPDATE]: this._updateEphemeralTimer.bind(this),
     });
-    this._updateTimedMessages = this._updateTimedMessages.bind(this);
+
+    this.checkMessageTimer = this.checkMessageTimer.bind(this);
+
     this.conversationMapper = conversationMapper;
     this.conversationService = conversationService;
-    this.onMessageTimeout = onMessageTimeout;
     this.logger = new z.util.Logger('z.conversation.ConversationEphemeralHandler', z.config.LOGGER.OPTIONS);
 
     this.timedMessages = ko.observableArray([]);
@@ -59,58 +61,6 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
         this.logger.info('Started ephemeral message check interval');
       }
     });
-  }
-
-  _updateTimedMessage(messageEntity) {
-    if (_.isString(messageEntity.ephemeral_expires())) {
-      const remainingTime = messageEntity.ephemeral_expires() - Date.now();
-      if (remainingTime > 0) {
-        messageEntity.ephemeral_remaining(remainingTime);
-      } else {
-        amplify.publish(z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, messageEntity);
-        this._timeoutEphemeralMessage(messageEntity);
-        return messageEntity;
-      }
-    }
-  }
-
-  _updateTimedMessages() {
-    const expiredMessages = this.timedMessages()
-      .map(messageEntity => this._updateTimedMessage(messageEntity))
-      .filter(messageEntity => messageEntity);
-
-    if (expiredMessages.length) {
-      this.timedMessages.remove(messageEntity => {
-        for (const expiredMessage of expiredMessages) {
-          const {conversation_id: conversationId, id: messageId} = expiredMessage;
-          const isExpiredMessage = messageEntity.id === messageId && messageEntity.conversation_id === conversationId;
-          if (isExpiredMessage) {
-            return true;
-          }
-        }
-
-        return false;
-      });
-    }
-  }
-
-  addTimedMessage(messageEntity) {
-    const {ephemeral_status: ephemeralStatus, id, conversation_id: conversationId} = messageEntity;
-
-    const isEphemeralMessage = ephemeralStatus() !== z.message.EphemeralStatusType.NONE;
-    if (isEphemeralMessage) {
-      const isAlreadyAdded = this.timedMessages().some(timedMessageEntity => {
-        const {conversation_id: timedConversationId, id: timedMessageId} = timedMessageEntity;
-        return timedMessageId === id && timedConversationId === conversationId;
-      });
-
-      if (!isAlreadyAdded) {
-        const isExpired = !!this._updateTimedMessage(messageEntity);
-        if (!isExpired) {
-          this.timedMessages.push(messageEntity);
-        }
-      }
-    }
   }
 
   /**
@@ -144,24 +94,32 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
     }
   }
 
-  _timeoutEphemeralMessage(messageEntity) {
-    if (!messageEntity.is_expired()) {
-      this.onMessageTimeout(messageEntity);
+  validateMessage(messageEntity) {
+    const isEphemeralMessage = messageEntity.ephemeral_status() !== z.message.EphemeralStatusType.NONE;
+    if (!isEphemeralMessage) {
+      return messageEntity;
+    }
+
+    const isExpired = !!this._updateTimedMessage(messageEntity);
+    if (!isExpired) {
+      const {id, conversation_id: conversationId} = messageEntity;
+
+      const isAlreadyAdded = this.timedMessages().some(timedMessageEntity => {
+        const {conversation_id: timedConversationId, id: timedMessageId} = timedMessageEntity;
+        return timedMessageId === id && timedConversationId === conversationId;
+      });
+      if (!isAlreadyAdded) {
+        this.timedMessages.push(messageEntity);
+      }
+
+      return messageEntity;
     }
   }
 
-  obfuscateMessage(messageEntity) {
-    if (messageEntity.has_asset_text()) {
-      this._obfuscateTextMessage(messageEntity);
-    } else if (messageEntity.is_ping()) {
-      this._obfuscatePingMessage(messageEntity);
-    } else if (messageEntity.has_asset()) {
-      this._obfuscateAssetMessage(messageEntity);
-    } else if (messageEntity.has_asset_image()) {
-      this._obfuscateImageMessage(messageEntity);
-    } else {
-      this.logger.warn(`Ephemeral message of unsupported type: ${messageEntity.type}`);
-    }
+  validateMessages(messageEntities) {
+    return messageEntities
+      .map(messageEntity => this.validateMessage(messageEntity))
+      .filter(messageEntity => messageEntity);
   }
 
   _obfuscateAssetMessage(assetEntity) {
@@ -195,6 +153,19 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
     this.logger.info(`Obfuscated image message '${assetEntity.id}'`);
   }
 
+  _obfuscateMessage(messageEntity) {
+    if (messageEntity.has_asset_text()) {
+      this._obfuscateTextMessage(messageEntity);
+    } else if (messageEntity.is_ping()) {
+      this._obfuscatePingMessage(messageEntity);
+    } else if (messageEntity.has_asset()) {
+      this._obfuscateAssetMessage(messageEntity);
+    } else if (messageEntity.has_asset_image()) {
+      this._obfuscateImageMessage(messageEntity);
+    } else {
+      this.logger.warn(`Ephemeral message of unsupported type: ${messageEntity.type}`);
+    }
+  }
   _obfuscatePingMessage(messageEntity) {
     messageEntity.ephemeral_expires(true);
     this.conversationService.update_message_in_db(messageEntity, {ephemeral_expires: true});
@@ -226,6 +197,16 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
     this.logger.info(`Obfuscated text message '${messageEntity.id}'`);
   }
 
+  _timeoutEphemeralMessage(messageEntity) {
+    if (!messageEntity.is_expired()) {
+      if (messageEntity.user().is_me) {
+        return this._obfuscateMessage(messageEntity);
+      }
+
+      amplify.publish(z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, messageEntity);
+    }
+  }
+
   /**
    * Updates the ephemeral timer of a conversation when an timer-update message is received.
    *
@@ -238,5 +219,37 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
     const updates = {globalMessageTimer: eventJson.data.message_timer};
     this.conversationMapper.update_properties(conversationEntity, updates);
     return Promise.resolve(conversationEntity);
+  }
+
+  _updateTimedMessage(messageEntity) {
+    if (_.isString(messageEntity.ephemeral_expires())) {
+      const remainingTime = messageEntity.ephemeral_expires() - Date.now();
+      if (remainingTime > 0) {
+        messageEntity.ephemeral_remaining(remainingTime);
+      } else {
+        this._timeoutEphemeralMessage(messageEntity);
+        return messageEntity;
+      }
+    }
+  }
+
+  _updateTimedMessages() {
+    const expiredMessages = this.timedMessages()
+      .map(messageEntity => this._updateTimedMessage(messageEntity))
+      .filter(messageEntity => messageEntity);
+
+    if (expiredMessages.length) {
+      this.timedMessages.remove(messageEntity => {
+        for (const expiredMessage of expiredMessages) {
+          const {conversation_id: conversationId, id: messageId} = expiredMessage;
+          const isExpiredMessage = messageEntity.id === messageId && messageEntity.conversation_id === conversationId;
+          if (isExpiredMessage) {
+            return true;
+          }
+        }
+
+        return false;
+      });
+    }
   }
 };

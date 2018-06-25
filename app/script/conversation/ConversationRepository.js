@@ -65,8 +65,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
     team_repository,
     user_repository
   ) {
-    this.handleMessageExpiration = this.handleMessageExpiration.bind(this);
-
     this.conversation_service = conversation_service;
     this.asset_service = asset_service;
     this.client_repository = client_repository;
@@ -158,10 +156,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
     );
     this.ephemeralHandler = new z.conversation.ConversationEphemeralHandler(
       this.conversation_service,
-      this.conversation_mapper,
-      this.handleMessageExpiration
+      this.conversation_mapper
     );
-    this.checkMessageTimer = this.ephemeralHandler.checkMessageTimer.bind(this.ephemeralHandler);
+    this.checkMessageTimer = this.ephemeralHandler.checkMessageTimer;
   }
 
   _initStateUpdates() {
@@ -200,6 +197,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   _init_subscriptions() {
     amplify.subscribe(z.event.WebApp.CONVERSATION.ASSET.CANCEL, this.cancel_asset_upload.bind(this));
+    amplify.subscribe(z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, this.handleMessageExpiration.bind(this));
     amplify.subscribe(z.event.WebApp.CONVERSATION.EVENT_FROM_BACKEND, this.onConversationEvent.bind(this));
     amplify.subscribe(z.event.WebApp.CONVERSATION.MAP_CONNECTION, this.map_connection.bind(this));
     amplify.subscribe(z.event.WebApp.CONVERSATION.MISSED_EVENTS, this.on_missed_events.bind(this));
@@ -3393,18 +3391,16 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   handleMessageExpiration(messageEntity) {
-    this.get_conversation_by_id(messageEntity.conversation_id).then(conversationEntity => {
-      if (messageEntity.user().is_me) {
-        return this.ephemeralHandler.obfuscateMessage(messageEntity);
-      }
+    if (!messageEntity.user().is_me) {
+      this.get_conversation_by_id(messageEntity.conversation_id).then(conversationEntity => {
+        if (conversationEntity.is_group()) {
+          const user_ids = _.union([this.selfUser().id], [messageEntity.from]);
+          return this.delete_message_everyone(conversationEntity, messageEntity, user_ids);
+        }
 
-      if (conversationEntity.is_group()) {
-        const user_ids = _.union([this.selfUser().id], [messageEntity.from]);
-        return this.delete_message_everyone(conversationEntity, messageEntity, user_ids);
-      }
-
-      return this.delete_message_everyone(conversationEntity, messageEntity);
-    });
+        return this.delete_message_everyone(conversationEntity, messageEntity);
+      });
+    }
   }
 
   //##############################################################################
@@ -3423,10 +3419,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return this.event_mapper
       .mapJsonEvent(eventJson, conversationEntity, true)
       .then(messageEntity => this._updateMessageUserEntities(messageEntity))
+      .then(messageEntity => this.ephemeralHandler.validateMessage(messageEntity))
       .then(messageEntity => {
         if (conversationEntity && messageEntity) {
           conversationEntity.add_message(messageEntity);
-          this.ephemeralHandler.addTimedMessage(messageEntity);
         }
         return {conversationEntity, messageEntity};
       });
@@ -3445,13 +3441,13 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return this.event_mapper
       .mapJsonEvents(events, conversationEntity, true)
       .then(messageEntities => this._updateMessagesUserEntities(messageEntities))
+      .then(messageEntities => this.ephemeralHandler.validateMessages(messageEntities))
       .then(messageEntities => {
         if (prepend && conversationEntity.messages().length) {
           conversationEntity.prepend_messages(messageEntities);
         } else {
           conversationEntity.add_messages(messageEntities);
         }
-        messageEntities.forEach(messageEntity => this.ephemeralHandler.addTimedMessage(messageEntity));
         return messageEntities;
       });
   }
