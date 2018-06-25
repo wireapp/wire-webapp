@@ -24,6 +24,7 @@ import {NewTeamInvitation, TeamInvitation, TeamInvitationChunk} from '../invitat
 import {TeamAPI} from '../team';
 
 class TeamInvitationAPI {
+  static readonly MAX_CHUNK_SIZE = 100;
   constructor(private readonly client: HttpClient) {}
 
   static get URL() {
@@ -42,9 +43,33 @@ class TeamInvitationAPI {
     return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
   }
 
-  public getInvitations(teamId: string): Promise<TeamInvitationChunk> {
+  public async getAllInvitations(teamId: string): Promise<TeamInvitation[]> {
+    let allInvitations: TeamInvitation[] = [];
+
+    let invitationChunk = await this.getInvitations(teamId, undefined);
+    allInvitations = allInvitations.concat(invitationChunk.invitations);
+    while (invitationChunk.has_more) {
+      const invitations = invitationChunk.invitations;
+      const lastInvitation = invitations[invitations.length - 1] || {};
+      const lastChunkEmail = lastInvitation.email;
+      invitationChunk = await this.getInvitations(teamId, lastChunkEmail);
+      allInvitations = allInvitations.concat(invitations);
+    }
+
+    return allInvitations;
+  }
+
+  public getInvitations(
+    teamId: string,
+    startEmail?: string,
+    limit = TeamInvitationAPI.MAX_CHUNK_SIZE
+  ): Promise<TeamInvitationChunk> {
     const config: AxiosRequestConfig = {
       method: 'get',
+      params: {
+        size: limit,
+        start: startEmail,
+      },
       url: `${TeamAPI.URL.TEAMS}/${teamId}/${TeamInvitationAPI.URL.INVITATIONS}`,
     };
 
