@@ -2688,7 +2688,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       })
       .then(conversationEntity => this._triggerFeatureEventHandlers(conversationEntity, eventJson, eventSource))
       .then(() => this._reactToConverationEvent(conversationEntity, eventJson))
-      .then((entityObject = {}) => this._handleConversationStatusUpdate(entityObject, eventSource, previouslyArchived))
+      .then((entityObject = {}) => this._handleConversationNotification(entityObject, eventSource, previouslyArchived))
       .catch(error => {
         const isMessageNotFound = error.type === z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND;
         if (!isMessageNotFound) {
@@ -2778,8 +2778,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   /**
-   * Updates a few conversation status depending on the event that was handled
-   * also handles notifications if needed.
+   * Handles conversation update and notification message.
    *
    * @private
    * @param {Object} entityObject - Object containing the conversation and the message that are targeted by the event
@@ -2787,7 +2786,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {boolean} previouslyArchived - true if the previous state of the conversation was archived
    * @returns {Promise} Resolves when the conversation was updated
    */
-  _handleConversationStatusUpdate(entityObject = {}, eventSource, previouslyArchived) {
+  _handleConversationNotification(entityObject = {}, eventSource, previouslyArchived) {
     const {conversationEntity, messageEntity} = entityObject;
 
     if (conversationEntity) {
