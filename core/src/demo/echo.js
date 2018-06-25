@@ -8,9 +8,13 @@ process.on('unhandledRejection', error =>
 );
 
 const path = require('path');
+const logdown = require('logdown');
 require('dotenv').config({path: path.join(__dirname, 'echo1.env')});
 
-const logger = require('logdown')('@wireapp/core/demo/echo.js');
+const logger = logdown('@wireapp/core/demo/echo.js', {
+  logger: console,
+  markdown: false,
+});
 logger.state.isEnabled = true;
 
 const {Account} = require('@wireapp/core');
@@ -47,9 +51,9 @@ const {MemoryEngine} = require('@wireapp/store-engine/dist/commonjs/engine');
     await account.service.conversation.send(conversationId, confirmationPayload);
 
     const textPayload = account.service.conversation.createText(content);
-    account.service.conversation.timerService.setConversationLevelTimer(conversationId, messageTimer);
+    account.service.conversation.messageTimer.setConversationLevelTimer(conversationId, messageTimer);
     await account.service.conversation.send(conversationId, textPayload);
-    account.service.conversation.timerService.setMessageLevelTimer(conversationId, 0);
+    account.service.conversation.messageTimer.setMessageLevelTimer(conversationId, 0);
   });
 
   account.on(Account.INCOMING.CONFIRMATION, data => {
@@ -81,9 +85,9 @@ const {MemoryEngine} = require('@wireapp/store-engine/dist/commonjs/engine');
       messageTimer ? `(ephemeral message, ${messageTimer} ms timeout)` : ''
     );
     const payload = account.service.conversation.createPing();
-    account.service.conversation.timerService.setMessageLevelTimer(conversationId, messageTimer);
+    account.service.conversation.messageTimer.setMessageLevelTimer(conversationId, messageTimer);
     await account.service.conversation.send(conversationId, payload);
-    account.service.conversation.timerService.setMessageLevelTimer(conversationId, 0);
+    account.service.conversation.messageTimer.setMessageLevelTimer(conversationId, 0);
   });
 
   account.on(Account.INCOMING.TYPING, async data => {
