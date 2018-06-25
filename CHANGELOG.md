@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="1.4.0"></a>
+# [1.4.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@1.3.0...@wireapp/react-ui-kit@1.4.0) (2018-06-25)
+
+
+### Features
+
+* **react-ui-kit:** Allow children in RoundIconButton ([#760](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/760)) ([93ddab1](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/93ddab1))
+
+
+
+
 <a name="1.3.0"></a>
 # [1.3.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@1.2.6...@wireapp/react-ui-kit@1.3.0) (2018-06-25)
 
