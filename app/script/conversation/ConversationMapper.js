@@ -22,7 +22,7 @@
 'use strict';
 
 /**
- * @typedef {object} ConversationData
+ * @typedef {object} ConversationBackendData
  * @property {string[]=} access
  * @property {string=} access_role
  * @property {string=} creator
@@ -112,7 +112,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
    * @todo make utility?
    *
    * @param {Conversation} conversationEntity - Conversation to be updated
-   * @param {ConversationData} conversationData - Conversation data from backend
+   * @param {ConversationBackendData} conversationData - Conversation data from backend
    * @returns {Conversation} Updated conversation entity
    */
   update_properties(conversationEntity, conversationData) {
