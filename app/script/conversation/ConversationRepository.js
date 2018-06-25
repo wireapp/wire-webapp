@@ -2686,7 +2686,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return conversationEntity;
       })
       .then(conversationEntity => this._triggerFeatureEventHandlers(conversationEntity, eventJson, eventSource))
-      .then(conversationEntity => this._reactToConverationEvent(conversationEntity, eventJson, eventSource))
+      .then(conversationEntity => this._reactToConversationEvent(conversationEntity, eventJson, eventSource))
       .then((entityObject = {}) => this._handleConversationNotification(entityObject, eventSource, previouslyArchived))
       .catch(error => {
         const isMessageNotFound = error.type === z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND;
@@ -2704,7 +2704,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {z.event.EventRepository.SOURCE} eventSource - Source of event
    * @returns {Promise<any>} Resolves when the event has been treated
    */
-  _reactToConverationEvent(conversationEntity, eventJson, eventSource) {
+  _reactToConversationEvent(conversationEntity, eventJson, eventSource) {
     switch (eventJson.type) {
       case z.event.Backend.CONVERSATION.CREATE:
         return this._onCreate(eventJson, eventSource);
@@ -3427,8 +3427,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
         if (conversationEntity && messageEntity) {
           conversationEntity.add_message(messageEntity);
           this.ephemeralHandler.addTimedMessage(messageEntity);
-          return {conversationEntity, messageEntity};
         }
+        return {conversationEntity, messageEntity};
       });
   }
 
