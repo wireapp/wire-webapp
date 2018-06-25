@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="1.4.0"></a>
+# [1.4.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@1.3.9...@wireapp/api-client@1.4.0) (2018-06-25)
+
+
+### Features
+
+* **api-client:** Fetch chunked team invitations ([#747](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/747)) ([0373c23](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/0373c23))
+
+
+
+
 <a name="1.3.9"></a>
 ## [1.3.9](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@1.3.8...@wireapp/api-client@1.3.9) (2018-06-25)
 
