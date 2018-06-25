@@ -22,16 +22,21 @@
 window.z = window.z || {};
 window.z.conversation = z.conversation || {};
 
-z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler {
+z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler extends z.conversation
+  .AbstractConversationEventHandler {
   static get CONFIG() {
     return {
       INTERVAL_TIME: 250,
     };
   }
 
-  constructor(conversationService, onMessageTimeout) {
+  constructor(conversationService, conversationMapper, onMessageTimeout) {
+    super();
+    this.setEventHandlingConfig({
+      [z.event.Backend.CONVERSATION.MESSAGE_TIMER_UPDATE]: this._updateEphemeralTimer.bind(this),
+    });
     this._updateTimedMessages = this._updateTimedMessages.bind(this);
-
+    this.conversationMapper = conversationMapper;
     this.conversationService = conversationService;
     this.onMessageTimeout = onMessageTimeout;
     this.logger = new z.util.Logger('z.conversation.ConversationEphemeralHandler', z.config.LOGGER.OPTIONS);
@@ -219,5 +224,19 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
       ephemeral_expires: true,
     });
     this.logger.info(`Obfuscated text message '${messageEntity.id}'`);
+  }
+
+  /**
+   * Updates the ephemeral timer of a conversation when an timer-update message is received.
+   *
+   * @private
+   * @param {Conversation} conversationEntity - Conversation entity which message timer was changed
+   * @param {Object} eventJson - JSON data of 'conversation.message-timer-update' event
+   * @returns {Promise} Resolves when the event was handled
+   */
+  _updateEphemeralTimer(conversationEntity, eventJson) {
+    const updates = {globalMessageTimer: eventJson.data.message_timer};
+    this.conversationMapper.update_properties(conversationEntity, updates);
+    return Promise.resolve(conversationEntity);
   }
 };

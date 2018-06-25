@@ -32,11 +32,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
         MAX_NAME_LENGTH: 64,
         MAX_SIZE: 256,
       },
-      STATE_EVENTS: [
-        z.event.Backend.CONVERSATION.ACCESS_UPDATE,
-        z.event.Backend.CONVERSATION.CODE_DELETE,
-        z.event.Backend.CONVERSATION.CODE_UPDATE,
-      ],
     };
   }
 
@@ -157,9 +152,13 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     this._init_subscriptions();
 
-    this.stateHandler = new z.conversation.ConversationStateHandler(this.conversation_service, this);
+    this.stateHandler = new z.conversation.ConversationStateHandler(
+      this.conversation_service,
+      this.conversation_mapper
+    );
     this.ephemeralHandler = new z.conversation.ConversationEphemeralHandler(
       this.conversation_service,
+      this.conversation_mapper,
       this.handleMessageExpiration
     );
     this.checkMessageTimer = this.ephemeralHandler.checkMessageTimer.bind(this.ephemeralHandler);
@@ -433,7 +432,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   _addPrecedingEventsToConversation(events, conversationEntity) {
     const hasAdditionalMessages = events.length === z.config.MESSAGES_FETCH_LIMIT;
 
-    return this._add_events_to_conversation(events, conversationEntity).then(mappedMessageEntities => {
+    return this._addEventsToConversation(events, conversationEntity).then(mappedMessageEntities => {
       conversationEntity.hasAdditionalMessages(hasAdditionalMessages);
 
       if (!hasAdditionalMessages) {
@@ -489,7 +488,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       this.conversation_service.load_subsequent_events_from_db(conversation_et.id, message_date, padding, true),
     ])
       .then(([older_events, newer_events]) =>
-        this._add_events_to_conversation(older_events.concat(newer_events), conversation_et)
+        this._addEventsToConversation(older_events.concat(newer_events), conversation_et)
       )
       .then(mapped_messages => {
         conversation_et.is_pending(false);
@@ -511,7 +510,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     return this.conversation_service
       .load_subsequent_events_from_db(conversation_et.id, message_date, z.config.MESSAGES_FETCH_LIMIT, include_message)
-      .then(events => this._add_events_to_conversation(events, conversation_et))
+      .then(events => this._addEventsToConversation(events, conversation_et))
       .then(mapped_messages => {
         conversation_et.is_pending(false);
         return mapped_messages;
@@ -572,7 +571,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         .load_preceding_events_from_db(conversation_et.id, lower_bound, upper_bound)
         .then(events => {
           if (events.length) {
-            this._add_events_to_conversation(events, conversation_et);
+            this._addEventsToConversation(events, conversation_et);
           }
           conversation_et.is_pending(false);
         })
@@ -2647,11 +2646,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const logMessage = `»» Conversation Event: '${eventJson.type}' (Source: ${eventSource})`;
     this.logger.info(logMessage, logObject);
 
-    const isStateEvent = ConversationRepository.CONFIG.STATE_EVENTS.includes(eventJson.type);
-    if (isStateEvent) {
-      return this.stateHandler.onConversationEvent(eventJson, eventSource);
-    }
-
     return this._pushToReceivingQueue(eventJson, eventSource);
   }
 
@@ -2692,41 +2686,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
           conversationEntity.update_timestamp_server(eventJson.server_time || eventJson.time, isBackendTimestamp);
         }
 
-        switch (type) {
-          case z.event.Backend.CONVERSATION.CREATE:
-            return this._onCreate(eventJson, eventSource);
-          case z.event.Backend.CONVERSATION.MEMBER_JOIN:
-            return this._onMemberJoin(conversationEntity, eventJson);
-          case z.event.Backend.CONVERSATION.MEMBER_LEAVE:
-          case z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE:
-            return this._onMemberLeave(conversationEntity, eventJson);
-          case z.event.Backend.CONVERSATION.MEMBER_UPDATE:
-            return this._onMemberUpdate(conversationEntity, eventJson);
-          case z.event.Backend.CONVERSATION.RENAME:
-            return this._onRename(conversationEntity, eventJson);
-          case z.event.Backend.CONVERSATION.MESSAGE_TIMER_UPDATE:
-            return this._onMessageTimerUpdate(conversationEntity, eventJson);
-          case z.event.Client.CONVERSATION.ASSET_ADD:
-            return this._on_asset_add(conversationEntity, eventJson);
-          case z.event.Client.CONVERSATION.CONFIRMATION:
-            return this._on_confirmation(conversationEntity, eventJson);
-          case z.event.Client.CONVERSATION.GROUP_CREATION:
-            return this._onGroupCreation(conversationEntity, eventJson);
-          case z.event.Client.CONVERSATION.MESSAGE_ADD:
-            return this._on_message_add(conversationEntity, eventJson);
-          case z.event.Client.CONVERSATION.MESSAGE_DELETE:
-            return this._onMessageDeleted(conversationEntity, eventJson);
-          case z.event.Client.CONVERSATION.MESSAGE_HIDDEN:
-            return this._onMessageHidden(eventJson);
-          case z.event.Client.CONVERSATION.ONE2ONE_CREATION:
-            return this._on1to1Creation(conversationEntity, eventJson);
-          case z.event.Client.CONVERSATION.REACTION:
-            return this._on_reaction(conversationEntity, eventJson);
-          default:
-            return this._onAddEvent(conversationEntity, eventJson);
-        }
+        return conversationEntity;
       })
-      .then((entityObject = {}) => this._handledConversationEvent(entityObject, eventSource, previouslyArchived))
+      .then(conversationEntity => this._triggerFeatureEventHandlers(conversationEntity, eventJson, eventSource))
+      .then(conversationEntity => this._reactToConverationEvent(conversationEntity, eventJson, eventSource))
+      .then((entityObject = {}) => this._handleConversationNotification(entityObject, eventSource, previouslyArchived))
       .catch(error => {
         const isMessageNotFound = error.type === z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND;
         if (!isMessageNotFound) {
@@ -2735,7 +2699,97 @@ z.conversation.ConversationRepository = class ConversationRepository {
       });
   }
 
-  _handledConversationEvent(entityObject = {}, eventSource, previouslyArchived) {
+  /**
+   * Triggers the methods associated with a specific event.
+   *
+   * @param {Conversation} conversationEntity - Conversation targeted by the event
+   * @param {Object} eventJson - JSON data of the event
+   * @param {z.event.EventRepository.SOURCE} eventSource - Source of event
+   * @returns {Promise<any>} Resolves when the event has been treated
+   */
+  _reactToConverationEvent(conversationEntity, eventJson, eventSource) {
+    switch (eventJson.type) {
+      case z.event.Backend.CONVERSATION.CREATE:
+        return this._onCreate(eventJson, eventSource);
+
+      case z.event.Backend.CONVERSATION.MEMBER_JOIN:
+        return this._onMemberJoin(conversationEntity, eventJson);
+
+      case z.event.Backend.CONVERSATION.MEMBER_LEAVE:
+      case z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE:
+        return this._onMemberLeave(conversationEntity, eventJson);
+
+      case z.event.Backend.CONVERSATION.MEMBER_UPDATE:
+        return this._onMemberUpdate(conversationEntity, eventJson);
+
+      case z.event.Backend.CONVERSATION.RENAME:
+        return this._onRename(conversationEntity, eventJson);
+
+      case z.event.Client.CONVERSATION.ASSET_ADD:
+        return this._on_asset_add(conversationEntity, eventJson);
+
+      case z.event.Client.CONVERSATION.CONFIRMATION:
+        return this._on_confirmation(conversationEntity, eventJson);
+
+      case z.event.Client.CONVERSATION.GROUP_CREATION:
+        return this._onGroupCreation(conversationEntity, eventJson);
+
+      case z.event.Client.CONVERSATION.MESSAGE_ADD:
+        return this._on_message_add(conversationEntity, eventJson);
+
+      case z.event.Client.CONVERSATION.MESSAGE_DELETE:
+        return this._onMessageDeleted(conversationEntity, eventJson);
+
+      case z.event.Client.CONVERSATION.MESSAGE_HIDDEN:
+        return this._onMessageHidden(eventJson);
+
+      case z.event.Client.CONVERSATION.ONE2ONE_CREATION:
+        return this._on1to1Creation(conversationEntity, eventJson);
+
+      case z.event.Client.CONVERSATION.REACTION:
+        return this._on_reaction(conversationEntity, eventJson);
+
+      case z.event.Backend.CONVERSATION.MESSAGE_TIMER_UPDATE:
+      case z.event.Client.CONVERSATION.DELETE_EVERYWHERE:
+      case z.event.Client.CONVERSATION.INCOMING_MESSAGE_TOO_BIG:
+      case z.event.Client.CONVERSATION.KNOCK:
+      case z.event.Client.CONVERSATION.LOCATION:
+      case z.event.Client.CONVERSATION.MISSED_MESSAGES:
+      case z.event.Client.CONVERSATION.UNABLE_TO_DECRYPT:
+      case z.event.Client.CONVERSATION.VERIFICATION:
+      case z.event.Client.CONVERSATION.VOICE_CHANNEL_ACTIVATE:
+      case z.event.Client.CONVERSATION.VOICE_CHANNEL_DEACTIVATE:
+        return this._addEventToConversation(conversationEntity, eventJson);
+    }
+  }
+
+  /**
+   * Calls the feature specific event handler on the current event being handled.
+   *
+   * @private
+   * @param {Conversation} conversationEntity - Conversation targeted by the event
+   * @param {Object} eventJson - JSON data of the event
+   * @param {z.event.EventRepository.SOURCE} eventSource - Source of event
+   * @returns {Promise} Resolves when all the handlers have done their job
+   */
+  _triggerFeatureEventHandlers(conversationEntity, eventJson, eventSource) {
+    const conversationEventHandlers = [this.ephemeralHandler, this.stateHandler];
+    const handlePromises = conversationEventHandlers.map(handler =>
+      handler.handleConversationEvent(conversationEntity, eventJson, eventSource)
+    );
+    return Promise.all(handlePromises).then(() => conversationEntity);
+  }
+
+  /**
+   * Handles conversation update and notification message.
+   *
+   * @private
+   * @param {Object} entityObject - Object containing the conversation and the message that are targeted by the event
+   * @param {z.event.EventRepository.SOURCE} eventSource - Source of event
+   * @param {boolean} previouslyArchived - true if the previous state of the conversation was archived
+   * @returns {Promise} Resolves when the conversation was updated
+   */
+  _handleConversationNotification(entityObject = {}, eventSource, previouslyArchived) {
     const {conversationEntity, messageEntity} = entityObject;
 
     if (conversationEntity) {
@@ -2760,7 +2814,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
       // Check if event needs to be un-archived
       if (previouslyArchived) {
-        // Add to check for unarchive at the end of stream handling
+        // Add to check for un-archiving at the end of stream handling
         if (eventFromStream) {
           return (this.conversations_with_new_events[conversationEntity.id] = conversationEntity);
         }
@@ -2843,20 +2897,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
         return {conversationEntity};
       });
-  }
-
-  /**
-   * A message or ping received in a conversation.
-   *
-   * @private
-   * @param {Conversation} conversationEntity - Conversation to add the event to
-   * @param {Object} eventJson - JSON data of 'conversation.message-add' or 'conversation.knock' event
-   * @returns {Promise} Resolves when event was handled
-   */
-  _onAddEvent(conversationEntity, eventJson) {
-    return this._add_event_to_conversation(eventJson, conversationEntity).then(messageEntity => {
-      return {conversationEntity, messageEntity};
-    });
   }
 
   /**
@@ -3013,8 +3053,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     return updateSequence
       .then(() => this.updateParticipatingUserEntities(conversationEntity, false, true))
-      .then(() => this._add_event_to_conversation(eventJson, conversationEntity))
-      .then(messageEntity => {
+      .then(() => this._addEventToConversation(conversationEntity, eventJson))
+      .then(({messageEntity}) => {
         this.verification_state_handler.onMemberJoined(conversationEntity, eventData.user_ids);
         return {conversationEntity, messageEntity};
       });
@@ -3048,8 +3088,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
     }
 
     if (!selfLeavingClearedConversation) {
-      return this._add_event_to_conversation(eventJson, conversationEntity)
-        .then(messageEntity => {
+      return this._addEventToConversation(conversationEntity, eventJson)
+        .then(({messageEntity}) => {
           messageEntity
             .userEntities()
             .filter(userEntity => !userEntity.is_me)
@@ -3153,7 +3193,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       })
       .then(updated_event_json => {
         if (updated_event_json) {
-          return this._onAddEvent(conversation_et, updated_event_json);
+          return this._addEventToConversation(conversation_et, updated_event_json);
         }
       });
   }
@@ -3206,7 +3246,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         if (event) {
           conversation_et.remove_message_by_id(event_json.id);
 
-          return this._onAddEvent(conversation_et, event).then(({messageEntity}) => {
+          return this._addEventToConversation(conversation_et, event).then(({messageEntity}) => {
             const first_asset = messageEntity.get_first_asset();
             if (first_asset.is_image() || first_asset.status() === z.assets.AssetTransferState.UPLOADED) {
               return {conversationEntity: conversation_et, messageEntity};
@@ -3349,24 +3389,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when the event was handled
    */
   _onRename(conversationEntity, eventJson) {
-    return this._add_event_to_conversation(eventJson, conversationEntity).then(messageEntity => {
+    return this._addEventToConversation(conversationEntity, eventJson).then(({messageEntity}) => {
       this.conversation_mapper.update_properties(conversationEntity, eventJson.data);
-      return {conversationEntity, messageEntity};
-    });
-  }
-
-  /**
-   * A conversation's message timer was changed
-   *
-   * @private
-   * @param {Conversation} conversationEntity - Conversation entity which message timer was changed
-   * @param {Object} eventJson - JSON data of 'conversation.message-timer-update' event
-   * @returns {Promise} Resolves when the event was handled
-   */
-  _onMessageTimerUpdate(conversationEntity, eventJson) {
-    return this._add_event_to_conversation(eventJson, conversationEntity).then(messageEntity => {
-      const updates = {globalMessageTimer: eventJson.data.message_timer};
-      this.conversation_mapper.update_properties(conversationEntity, updates);
       return {conversationEntity, messageEntity};
     });
   }
@@ -3394,21 +3418,20 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Convert a JSON event into an entity and add it to a given conversation.
    *
    * @private
-   * @param {Object} json - Event data
-   * @param {Conversation} conversation_et - Conversation entity the event will be added to
+   * @param {Conversation} conversationEntity - Conversation entity the event will be added to
+   * @param {Object} eventJson - Event data
    * @returns {Promise} Promise that resolves with the message entity for the event
    */
-  _add_event_to_conversation(json, conversation_et) {
+  _addEventToConversation(conversationEntity, eventJson) {
     return this.event_mapper
-      .mapJsonEvent(json, conversation_et, true)
-      .then(message_et => this._updateMessageUserEntities(message_et))
-      .then(message_et => {
-        if (conversation_et && message_et) {
-          conversation_et.add_message(message_et);
-          this.ephemeralHandler.addTimedMessage(message_et);
+      .mapJsonEvent(eventJson, conversationEntity, true)
+      .then(messageEntity => this._updateMessageUserEntities(messageEntity))
+      .then(messageEntity => {
+        if (conversationEntity && messageEntity) {
+          conversationEntity.add_message(messageEntity);
+          this.ephemeralHandler.addTimedMessage(messageEntity);
+          return {conversationEntity, messageEntity};
         }
-
-        return message_et;
       });
   }
 
@@ -3421,7 +3444,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {boolean} [prepend=true] - Should existing messages be prepended
    * @returns {Promise} Resolves with an array of mapped messages
    */
-  _add_events_to_conversation(events, conversationEntity, prepend = true) {
+  _addEventsToConversation(events, conversationEntity, prepend = true) {
     return this.event_mapper
       .mapJsonEvents(events, conversationEntity, true)
       .then(messageEntities => this._updateMessagesUserEntities(messageEntities))
