@@ -22,16 +22,25 @@
 window.z = window.z || {};
 window.z.conversation = z.conversation || {};
 
+/**
+ * @typedef {Object} EventHandlingConfig - Object representing conversation event handlers
+ * @property {() => void} [eventId: string] - an event handler function
+ */
+
 z.conversation.AbstractConversationEventHandler = class AbstractConversationEventHandler {
   /**
    * Abtract class that represents an entity that can
    * react to a conversation event
-   * @param {Object} eventHandlingConfig - Config object representing which method to call depending on the event type
    */
-  constructor(eventHandlingConfig) {
+  constructor() {
     this.eventHandlingConfig = {};
   }
 
+  /**
+   * adds an eventhandling config to the current instance
+   * @param {EventHandlingConfig} eventHandlingConfig - Config containing events name and the associated callback
+   * @returns {void}
+   */
   setEventHandlingConfig(eventHandlingConfig) {
     this.eventHandlingConfig = eventHandlingConfig;
   }
