@@ -45,7 +45,7 @@
   "acceptNewsModal.headline": "Kas soovid saada Wire'i uudiseid ja tooteuuendusi e-posti teel?",
   "acceptNewsModal.unsubscribeDescription": "Saad igal ajal tellimuse lõpetada.",
   "acceptNewsModal.privacyDescription": "Vaata Wire <b>privaatsuspõhimõtted</b> üle.",
-  "acceptNewsModal.declineButton": "Mitte praegu",
+  "acceptNewsModal.declineButton": "Keeldu",
   "acceptNewsModal.confirmButton": "Nõustu",
   "unsupported.headlineBrowser": "Seda brauserit ei toetata.",
   "unsupported.subheadBrowser":

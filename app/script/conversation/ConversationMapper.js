@@ -212,7 +212,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
     conversation_et.participating_user_ids(participatingUserIds);
 
     // Team ID from database or backend payload
-    const team_id = conversation_data.team_id ? conversation_data.team_id : conversation_data.team;
+    const team_id = conversation_data.team_id || conversation_data.team;
     if (team_id) {
       conversation_et.team_id = team_id;
     }
@@ -222,8 +222,8 @@ z.conversation.ConversationMapper = class ConversationMapper {
     }
 
     // Access related data
-    const accessModes = conversation_data.accessModes ? conversation_data.accessModes : conversation_data.access;
-    const accessRole = conversation_data.accessRole ? conversation_data.accessRole : conversation_data.access_role;
+    const accessModes = conversation_data.accessModes || conversation_data.access;
+    const accessRole = conversation_data.accessRole || conversation_data.access_role;
     if (accessModes && accessRole) {
       this.mapAccessState(conversation_et, accessModes, accessRole);
     }

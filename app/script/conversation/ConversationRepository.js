@@ -30,7 +30,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       EXTERNAL_MESSAGE_THRESHOLD: 200 * 1024,
       GROUP: {
         MAX_NAME_LENGTH: 64,
-        MAX_SIZE: 128,
+        MAX_SIZE: 256,
       },
       STATE_EVENTS: [
         z.event.Backend.CONVERSATION.ACCESS_UPDATE,
@@ -1520,7 +1520,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     }
   }
 
-  _handleTooManyMembersError(participants = 128) {
+  _handleTooManyMembersError(participants = ConversationRepository.CONFIG.GROUP.MAX_SIZE) {
     const openSpots = ConversationRepository.CONFIG.GROUP.MAX_SIZE - participants;
     const substitutions = {number1: ConversationRepository.CONFIG.GROUP.MAX_SIZE, number2: Math.max(0, openSpots)};
 
@@ -1729,12 +1729,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when the asset failure was sent
    */
   send_asset_upload_failed(conversation_et, messageId, reason = z.assets.AssetUploadFailedReason.FAILED) {
-    const reason_proto =
-      reason === z.assets.AssetUploadFailedReason.CANCELLED
-        ? z.proto.Asset.NotUploaded.CANCELLED
-        : z.proto.Asset.NotUploaded.FAILED;
+    const wasCancelled = reason === z.assets.AssetUploadFailedReason.CANCELLED;
+    const protoReason = wasCancelled ? z.proto.Asset.NotUploaded.CANCELLED : z.proto.Asset.NotUploaded.FAILED;
     const asset = new z.proto.Asset();
-    asset.set('not_uploaded', reason_proto);
+    asset.set('not_uploaded', protoReason);
 
     const generic_message = new z.proto.GenericMessage(messageId);
     generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, asset);

@@ -381,7 +381,7 @@ z.string.groupCreationParticipantsActionSkip = 'Skip';
 z.string.groupCreationParticipantsHeader = 'Add people';
 z.string.groupCreationParticipantsHeaderWithCounter = 'Add people ({{number}})';
 z.string.groupCreationParticipantsPlaceholder = 'Search by name';
-z.string.groupSizeInfo = 'Up to {{count}} people can join a group conversation. Video calls work in groups of 4 or less.';
+z.string.groupSizeInfo = 'Up to {{count}} people can join a group conversation. Video calls work with up to 3 other people and you.';
 
 // Guest room
 z.string.guestRoomConversationName = 'Guest room';
@@ -589,6 +589,7 @@ z.string.preferencesAVCamera = 'Camera';
 z.string.preferencesAVMicrophone = 'Microphone';
 z.string.preferencesAVPermissionDetail = 'Enable from your browser Preferences';
 z.string.preferencesAVSpeakers = 'Speakers';
+z.string.preferencesAVTemporaryDisclaimer = 'Guests can’t start video conferences. Select the camera to use if you join one.';
 
 z.string.preferencesDevicesActivatedIn = 'in {{location}}';
 z.string.preferencesDevicesActivatedOn = 'Activated on {{date}}';

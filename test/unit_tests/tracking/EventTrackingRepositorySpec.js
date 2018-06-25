@@ -138,45 +138,4 @@ describe('z.tracking.EventTrackingRepository', () => {
       expect(error_payload).toBe(false);
     });
   });
-
-  describe('_attach_promise_rejection_handler', () => {
-    const error_description = 'Unit test error';
-
-    beforeAll(done => {
-      TestFactory.tracking_repository.init(true).then(() => {
-        TestFactory.tracking_repository._attach_promise_rejection_handler();
-        done();
-      });
-    });
-
-    afterAll(() => TestFactory.tracking_repository._detach_promise_rejection_handler());
-
-    it('handles a Promise rejected with an Error that is uncaught', done => {
-      window.onerror = (error_message, file_name, line_number, column_number, error) => {
-        expect(error_message).toBe(error_description);
-        expect(error.message).toBe(error_description);
-        done();
-      };
-
-      Promise.reject(new Error('Unit test error'));
-    });
-
-    it('handles a Promise rejected with a String that is uncaught', done => {
-      window.onerror = (error_message, file_name) => {
-        expect(error_message).toBe(error_description);
-        expect(file_name).toBeNull();
-        done();
-      };
-
-      /* eslint-disable prefer-promise-reject-errors */
-      Promise.reject(error_description);
-      /* eslint-enable prefer-promise-reject-errors */
-    });
-
-    it('ignores a rejected Promise that is caught', done => {
-      window.onerror = done.fail;
-
-      Promise.reject(new Error(error_description)).catch(() => done());
-    });
-  });
 });

@@ -516,8 +516,8 @@ z.calling.entities.FlowEntity = class FlowEntity {
       videoTracks: mediaStream.getVideoTracks(),
     });
 
-    mediaStream = z.media.MediaStreamHandler.detectMediaStreamType(mediaStream);
-    const isTypeAudio = mediaStream.type === z.media.MediaType.AUDIO;
+    const mediaType = z.media.MediaStreamHandler.detectMediaStreamType(mediaStream);
+    const isTypeAudio = mediaType === z.media.MediaType.AUDIO;
     if (isTypeAudio) {
       mediaStream = this.audio.wrapAudioOutputStream(mediaStream);
     }
@@ -599,7 +599,8 @@ z.calling.entities.FlowEntity = class FlowEntity {
    * @returns {undefined} No return value
    */
   _onTrack(event) {
-    this.callLogger.info('Remote MediaStreamTrack added to PeerConnection', event);
+    const mediaStreamTrack = event.track;
+    this.callLogger.info(`Remote '${mediaStreamTrack.kind}' MediaStreamTrack added to PeerConnection`, event);
   }
 
   //##############################################################################
@@ -1226,7 +1227,8 @@ z.calling.entities.FlowEntity = class FlowEntity {
    * @returns {Promise} Resolves when negotiation has been restarted
    */
   replaceMediaStream(mediaStreamInfo, outdatedMediaStream) {
-    const {stream: mediaStream, type: mediaType} = mediaStreamInfo;
+    const mediaStream = mediaStreamInfo.stream;
+    const mediaType = mediaStreamInfo.getType();
     const negotiationMode = z.calling.enum.SDP_NEGOTIATION_MODE.STREAM_CHANGE;
 
     return Promise.resolve()
@@ -1247,7 +1249,8 @@ z.calling.entities.FlowEntity = class FlowEntity {
    * @returns {Promise} Resolves when a MediaStreamTrack has been replaced
    */
   replaceMediaTrack(mediaStreamInfo) {
-    const {stream: mediaStream, type: mediaType} = mediaStreamInfo;
+    const mediaStream = mediaStreamInfo.stream;
+    const mediaType = mediaStreamInfo.getType();
     const [mediaStreamTrack] = mediaStream.getTracks();
 
     return Promise.resolve()
@@ -1286,8 +1289,9 @@ z.calling.entities.FlowEntity = class FlowEntity {
    */
   _addMediaStream(mediaStream) {
     if (mediaStream) {
-      const isTypeAudio = mediaStream.type === z.media.MediaType.AUDIO;
-      if (isTypeAudio) {
+      const mediaType = z.media.MediaStreamHandler.detectMediaStreamType(mediaStream);
+      const containsAudio = z.media.MediaStreamHandler.CONFIG.MEDIA_TYPE.CONTAINS_AUDIO.includes(mediaType);
+      if (containsAudio) {
         mediaStream = this.audio.wrapAudioInputStream(mediaStream);
       }
 

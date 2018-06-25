@@ -94,14 +94,19 @@ z.string.hu.authErrorSignIn = 'Kérjük, ellenőrizd az adataid, majd próbáld 
 z.string.hu.callStateOutgoing = 'Kicsengés…';
 z.string.hu.callStateConnecting = 'Csatlakozás…';
 z.string.hu.callStateIncoming = 'Hívás…';
+z.string.hu.callStateIncomingGroup = '{{user}} hív';
 z.string.hu.callDecline = 'Elutasítás';
 z.string.hu.callAccept = 'Elfogadás';
 z.string.hu.callJoin = 'Csatlakozás';
 z.string.hu.callChooseSharedScreen = 'Válaszd ki a megosztandó képernyőt';
 z.string.hu.callParticipants = '{{number}} partner a vonalban';
 
+z.string.hu.videoCallOverlayConversations = 'Beszélgetések';
 z.string.hu.videoCallOverlayMute = 'Némítás';
+z.string.hu.videoCallOverlayVideo = 'Videó';
+z.string.hu.videoCallOverlayShareScreen = 'Képernyő megosztása';
 z.string.hu.videoCallOverlayHangUp = 'Hívás befejezése';
+z.string.hu.videoCallPaused="Videó szüneteltetve";
 
 z.string.hu.modalAcknowledgeAction = 'Ok';
 z.string.hu.modalAcknowledgeHeadline = 'Valami nem stimmel';
@@ -142,6 +147,9 @@ z.string.hu.modalAssetParallelUploadsMessage = 'Egyszerre {{number}} fájt küld
 
 z.string.hu.modalCallEmptyConversationHeadline = 'Senki sem hívható';
 z.string.hu.modalCallEmptyConversationMessage = 'Senki sem maradt itt.';
+
+z.string.hu.modalCallEmptyLogHeadline = 'Nincsenek hívások';
+z.string.hu.modalCallEmptyLogMessage = 'Nincsenek hívások, amikről hibanapló készíthető lenne.';
 
 z.string.hu.modalCallNoGroupVideoHeadline = 'A csoportokban a videóhívás nem elérhető';
 z.string.hu.modalCallNoGroupVideoMessage = 'Videohívások nem érhetők el a csoportos beszélgetésben.';
@@ -248,6 +256,9 @@ z.string.hu.modalPictureTooSmallHeadline = 'A kép túl kicsi';
 z.string.hu.modalPictureTooSmallMessage = 'Kérjük, legalább 320 x 320 képpont méretű képet válassz.';
 
 z.string.hu.modalImproveWireAction = 'Elfogadás';
+z.string.hu.modalImproveWireSecondary = 'Most nem';
+z.string.hu.modalImproveWireHeadline = 'Segíts nekünk jobbá tenni a Wire-t';
+z.string.hu.modalImproveWireMessage = 'Segíts jobbá tenni termékeinket és szolgáltatásainkat azzal, hogy névtelen használati és hibajelentéseket küldesz. Ezeket az információkat semmi másra nem használjuk.';
 
 z.string.hu.modalServiceUnavailableHeadline = 'Új szolgáltatás hozzáadása nem lehetséges';
 z.string.hu.modalServiceUnavailableMessage = 'A szolgáltatás jelenleg nem elérhető.';
@@ -352,6 +363,7 @@ z.string.hu.groupCreationParticipantsActionSkip = 'Kihagyás';
 z.string.hu.groupCreationParticipantsHeader = 'Partnerek hozzáadása';
 z.string.hu.groupCreationParticipantsHeaderWithCounter = 'Partnerek hozzáadása ({{number}})';
 z.string.hu.groupCreationParticipantsPlaceholder = 'Keresés név szerint';
+z.string.hu.groupSizeInfo = 'Maximum {{count}} partner csatlakozhat a csoportos beszélgetéshez. Videóhívások 4 vagy kevesebb emberrel lehetségesek.';
 
 z.string.hu.guestRoomConversationName = 'Vendégszoba';
 z.string.hu.guestRoomToggleName = 'Vendégek engedélyezése';
@@ -381,11 +393,15 @@ z.string.hu.conversationsConnectionRequestOne = '1 partner várakozik';
 z.string.hu.conversationsEmptyConversation = 'Csoportos beszélgetés';
 z.string.hu.conversationsNoConversations = 'Indíts egy beszélgetést vagy hozz létre egy csoportot.';
 z.string.hu.conversationsPopoverArchive = 'Archiválás';
+z.string.hu.conversationsPopoverBlock = 'Letilt…';
 z.string.hu.conversationsPopoverCancel = 'Kérelem visszavonása';
+z.string.hu.conversationsPopoverClear = 'Tartalom törlése…';
+z.string.hu.conversationsPopoverLeave = 'Kilépés a csoportból…';
 z.string.hu.conversationsPopoverNotify = 'Némítás feloldása';
 z.string.hu.conversationsPopoverSilence = 'Némítás';
 z.string.hu.conversationsPopoverUnarchive = 'Archiválás visszavonása';
 
+z.string.hu.conversationsSecondaryLineIncomingCall = '{{user}} hív';
 z.string.hu.conversationsSecondaryLineMissedCall = '{{number}} nem fogadott hívás';
 z.string.hu.conversationsSecondaryLineMissedCalls = '{{number}} nem fogadott hívás';
 z.string.hu.conversationsSecondaryLineNewMessage = '{{number}} új üzenet';
@@ -452,10 +468,12 @@ z.string.hu.conversationDetailsParticipantsUsersMany = 'Partner';
 z.string.hu.conversationDetailsPeople = 'Partner';
 z.string.hu.conversationDetailsServices = 'Szolgáltatások';
 
+z.string.hu.groupParticipantActionBlock = 'Letilt…';
 z.string.hu.groupParticipantActionCancelRequest = 'Kérelem visszavonása';
 z.string.hu.groupParticipantActionDevices = 'Eszközök';
 z.string.hu.groupParticipantActionIgnoreRequest = 'Kérés figyelmen kívül hatása';
 z.string.hu.groupParticipantActionIncomingRequest = 'Kérés elfogadása';
+z.string.hu.groupParticipantActionLeave = 'Kilépés a csoportból…';
 z.string.hu.groupParticipantActionOpenConversation = 'Beszélgetés megnyitása';
 z.string.hu.groupParticipantActionPending = 'Függőben lévő';
 z.string.hu.groupParticipantActionRemove = 'Eltávolítás a csoportból';
@@ -509,11 +527,16 @@ z.string.hu.preferencesAboutWebsite = 'Wire weboldala';
 
 z.string.hu.preferencesAccountAvaibilityUnset = 'Állapot beállítása';
 z.string.hu.preferencesAccountCreateTeam = 'Csapat létrehozása';
+z.string.hu.preferencesAccountData = 'Adatokhasználati engedélyek';
+z.string.hu.preferencesAccountDataCheckbox = 'Adatok küldése névtelenül';
+z.string.hu.preferencesAccountDataDetail = 'Névtelen használati és hibajelentések küldésével segíthetsz, hogy a Wire még jobb legyen.';
 z.string.hu.preferencesAccountDelete = 'Fiók törlése';
 z.string.hu.preferencesAccountLeaveGuestRoom = 'Vendégszoba elhagyása';
 z.string.hu.preferencesAccountLeaveGuestRoomDescription = 'Ezután nem tudod elérni az ebben a beszélgetésben lévő üzeneteket.';
 z.string.hu.preferencesAccountLogOut = 'Kijelentkezés';
 z.string.hu.preferencesAccountManageTeam = 'Csapat kezelése';
+z.string.hu.preferencesAccountMarketingConsentCheckbox = 'Feliratkozás hírlevélre';
+z.string.hu.preferencesAccountMarketingConsentDetail = 'Hírek és termékinformációk fogadása e-mailben a Wire-től.';
 z.string.hu.preferencesAccountResetPassword = 'Jelszó visszaállítása';
 z.string.hu.preferencesAccountTeam = 'innen: {{name}}';
 z.string.hu.preferencesAccountUsernamePlaceholder = 'Teljes neved';
@@ -534,6 +557,7 @@ z.string.hu.preferencesDevicesCurrent = 'Ez az eszköz';
 z.string.hu.preferencesDevicesFingerprint = 'Eszközazonosító ujjlenyomat';
 z.string.hu.preferencesDevicesFingerprintDetail = 'A Wire-ben minden eszköz egyedi ujjlenyomattal rendelkezik. Összehasonlítással ellenőrizd az eszközöket és a beszélgetéseket.';
 z.string.hu.preferencesDevicesId = 'Eszközazonosító (ID): ';
+z.string.hu.preferencesDevicesRemove = 'Eltávolítás…';
 z.string.hu.preferencesDevicesRemoveCancel = 'Mégsem';
 z.string.hu.preferencesDevicesRemoveDetail = 'Távolítsd el ezt az eszközt, ha már nem használod. Ezzel együtt azonnal ki is jelentkezel erről az eszközről.';
 z.string.hu.preferencesDevicesSessionConfirmation = 'A munkamenet alaphelyzetbe lett állítva.';
@@ -567,8 +591,35 @@ z.string.hu.preferencesOptionsCallLogs = 'Hibaelhárítás';
 z.string.hu.preferencesOptionsCallLogsGet = 'Hívások hibanaplójának mentése';
 z.string.hu.preferencesOptionsCallLogsDetail = 'Ez az információ segít a Wire Ügyfélszolgálatnak a hívással kapcsolatos problémák diagnosztizálásában.';
 
+z.string.hu.preferencesOptionsBackupHeader = 'Előzmények';
+z.string.hu.preferencesOptionsBackupExportHeadline = 'Beszélgetések mentése';
+z.string.hu.preferencesOptionsBackupExportSecondary = 'Biztonsági mentés készítésével megőrizheted a beszélgetések előzményeit. Később ezzel vissza tudod állítani az előzményeket, ha elhagyod a számítógéped vagy újat kezdesz használni.\nA mentés nincs titkosítva, ezért biztonságos helyen tárold.';
+z.string.hu.preferencesOptionsBackupImportHeadline = 'Visszaállítás biztonsági másolatból';
+z.string.hu.preferencesOptionsBackupImportSecondary = 'Csak ugyanazon platformon készült mentést tudsz visszaállítani. A visszaállítás felülírja az eszközön jelenleg lévő beszélgetéseket.';
+
+z.string.hu.backupExportGenericErrorHeadline = 'Nem sikerült a fájl mentése';
+z.string.hu.backupExportGenericErrorSecondary = 'A mentés nem készült el.';
+z.string.hu.backupExportProgressHeadline = 'Előkészítés…';
+z.string.hu.backupExportProgressSecondary = 'Mentés folyamatban · {{processed}} / {{total}} — {{progress}}%';
+z.string.hu.backupExportProgressCompressing = 'Biztonsági másolat készítése';
+z.string.hu.backupExportSaveFileAction = 'Fájl mentése';
+z.string.hu.backupExportSuccessHeadline = 'Biztonsági mentés kész';
+z.string.hu.backupExportSuccessSecondary = 'Ennek segítségével vissza tudod állítani az előzményeket, ha elhagyod a számítógéped vagy elkezdesz egy újat használni.';
 z.string.hu.backupImportGenericErrorHeadline = 'Valami nem stimmel';
+z.string.hu.backupImportGenericErrorSecondary = 'Az előzmények visszaállítása nem sikerült.';
+z.string.hu.backupImportAccountErrorHeadline = 'Rossz mentés';
+z.string.hu.backupImportAccountErrorSecondary = 'Az előzményeket nem lehet másik felhasználói fiókból visszaállítani.';
+z.string.hu.backupImportVersionErrorHeadline = 'A mentés nem kompatibilis';
+z.string.hu.backupImportVersionErrorSecondary = 'Ez a mentés egy újabb vagy elavultabb Wire verzióval készült és nem lehet itt visszaállítani.';
+z.string.hu.backupImportIncompatibleErrorHeadline = 'Rossz mentés';
+z.string.hu.backupImportIncompatibleErrorSecondary = 'Az előzményeket nem lehet másik felhasználói fiókból visszaállítani.';
+z.string.hu.backupImportOutdatedErrorHeadline = 'A mentés nem kompatibilis';
+z.string.hu.backupImportOutdatedErrorSecondary = 'Ez a mentés egy újabb vagy elavultabb Wire verzióval készült és nem lehet itt visszaállítani.';
+z.string.hu.backupImportProgressHeadline = 'Előkészítés…';
+z.string.hu.backupImportProgressSecondary = 'Visszaállítás folyamatban · {{processed}} / {{total}} — {{progress}}%';
+z.string.hu.backupImportSuccessHeadline = 'Az előzmények visszaállítva.';
 z.string.hu.backupCancel = 'Mégsem';
+z.string.hu.backupTryAgain = 'Próbáld újra';
 
 z.string.hu.searchConnect = 'Csatlakozás';
 z.string.hu.searchConnections = 'Kapcsolatok';
