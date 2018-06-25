@@ -2132,7 +2132,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   send_generic_message_to_conversation(conversation_id, generic_message) {
     return this.sending_queue.push(() => {
-      const skip_own_clients = generic_message.content === z.cryptography.GENERIC_MESSAGE_TYPE.EPHEMERAL;
+      const skip_own_clients = false;
 
       return this.create_recipients(conversation_id, skip_own_clients).then(recipients => {
         const precondition_option = skip_own_clients ? Object.keys(recipients) : undefined;
