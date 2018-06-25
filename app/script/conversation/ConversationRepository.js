@@ -618,7 +618,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   updateConversationFromBackend(conversationEntity) {
-    this.conversation_service.get_conversation_by_id(conversationEntity.id).then(conversationData => {
+    return this.conversation_service.get_conversation_by_id(conversationEntity.id).then(conversationData => {
       const {name, message_timer} = conversationData;
       this.conversation_mapper.update_properties(conversationEntity, {name});
       this.conversation_mapper.update_self_status(conversationEntity, {message_timer});
