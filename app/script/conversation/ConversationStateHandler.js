@@ -37,8 +37,8 @@ z.conversation.ConversationStateHandler = class ConversationStateHandler extends
       [z.event.Backend.CONVERSATION.CODE_UPDATE]: this._updateConversationAccessCode.bind(this),
     };
     this.setEventHandlingConfig(eventHandlingConfig);
-    this.conversationService = conversationService;
     this.conversationMapper = conversationMapper;
+    this.conversationService = conversationService;
   }
 
   changeAccessState(conversationEntity, accessState) {

@@ -2770,8 +2770,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   /**
-   * Update a few conversation status depending on the event that was handled
-   * also handles notifications if needed
+   * Updates a few conversation status depending on the event that was handled
+   * also handles notifications if needed.
    *
    * @private
    * @param {Object} entityObject - Object containing the conversation and the message that are targeted by the event
