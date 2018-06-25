@@ -130,7 +130,9 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
       return !this.conversationEntity().is_request() && !this.conversationEntity().is_cleared();
     });
     this.showActionGuestOptions = ko.pureComputed(() => this.conversationEntity().inTeam());
-    this.showActionTimedMessages = ko.pureComputed(() => !this.conversationEntity().isGuest());
+    this.showActionTimedMessages = ko.pureComputed(() => {
+      return this.conversationEntity().is_group() && !this.conversationEntity().isGuest();
+    });
     this.showActionLeave = ko.pureComputed(() => {
       return this.conversationEntity().is_group() && !this.conversationEntity().removed_from_conversation();
     });
