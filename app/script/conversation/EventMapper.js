@@ -100,11 +100,11 @@ z.conversation.EventMapper = class EventMapper {
       case z.event.Backend.CONVERSATION.MEMBER_LEAVE:
         messageEntity = this._mapEventMemberLeave(event);
         break;
-      case z.event.Backend.CONVERSATION.RENAME:
-        messageEntity = this._mapEventRename(event);
-        break;
       case z.event.Backend.CONVERSATION.MESSAGE_TIMER_UPDATE:
         messageEntity = this._mapEventMessageTimerUpdate(event);
+        break;
+      case z.event.Backend.CONVERSATION.RENAME:
+        messageEntity = this._mapEventRename(event);
         break;
       case z.event.Client.CONVERSATION.ASSET_ADD:
         messageEntity = this._mapEventAssetAdd(event, createDummyImage);

@@ -52,8 +52,8 @@ z.viewModel.content.CollectionDetailsViewModel = class CollectionDetailsViewMode
   }
 
   itemAdded(messageEntity) {
-    const isExpectedId = this.conversationEntity().id === messageEntity.conversation_id;
-    if (isExpectedId) {
+    const isCurrentConversation = this.conversationEntity().id === messageEntity.conversation_id;
+    if (isCurrentConversation) {
       switch (this.template()) {
         case 'images': {
           const isImage = messageEntity.category & z.message.MessageCategory.IMAGE;
@@ -85,14 +85,20 @@ z.viewModel.content.CollectionDetailsViewModel = class CollectionDetailsViewMode
     }
   }
 
-  messageRemoved(message) {
-    this.itemRemoved(message.id);
+  itemRemoved(messageId, conversationId) {
+    const isCurrentConversation = this.conversationEntity().id === conversationId;
+    if (isCurrentConversation) {
+      this.items.remove(messageEntity => messageEntity.id === messageId);
+      if (!this.items().length) {
+        this.clickOnBackButton();
+      }
+    }
   }
 
-  itemRemoved(removedMessageId) {
-    this.items.remove(messageEntity => messageEntity.id === removedMessageId);
-    if (!this.items().length) {
-      this.clickOnBackButton();
+  messageRemoved(messageEntity) {
+    const isCurrentConversation = this.conversationEntity().id === messageEntity.conversation_id;
+    if (isCurrentConversation) {
+      this.itemRemoved(messageEntity.id);
     }
   }
 
