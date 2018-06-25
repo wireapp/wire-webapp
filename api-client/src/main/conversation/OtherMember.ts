@@ -22,6 +22,7 @@ import {ServiceRef} from '../conversation';
 interface OtherMember {
   id: string;
   service?: ServiceRef;
+  status: number;
 }
 
 export {OtherMember};
