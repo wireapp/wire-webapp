@@ -3372,7 +3372,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   handleMessageTimeout(messageEntity) {
     this.get_conversation_by_id(messageEntity.conversation_id).then(conversationEntity => {
       if (messageEntity.user().is_me) {
-        this.get_message_in_conversation_by_id(conversationEntity, messageEntity.id).then(message =>
+        return this.get_message_in_conversation_by_id(conversationEntity, messageEntity.id).then(message =>
           this.ephemeralHandler.obfuscateMessage(message)
         );
       }
