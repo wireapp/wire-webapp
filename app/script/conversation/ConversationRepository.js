@@ -2687,7 +2687,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return conversationEntity;
       })
       .then(conversationEntity => this._triggerFeatureEventHandlers(conversationEntity, eventJson, eventSource))
-      .then(() => this._reactToConverationEvent(conversationEntity, eventJson))
+      .then(conversationEntity => this._reactToConverationEvent(conversationEntity, eventJson, eventSource))
       .then((entityObject = {}) => this._handleConversationNotification(entityObject, eventSource, previouslyArchived))
       .catch(error => {
         const isMessageNotFound = error.type === z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND;
@@ -2702,10 +2702,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
    *
    * @param {Conversation} conversationEntity - Conversation targeted by the event
    * @param {Object} eventJson - JSON data of the event
+   * @param {z.event.EventRepository.SOURCE} eventSource - Source of event
    * @returns {Promise<any>} Resolves when the event has been treated
    */
-  _reactToConverationEvent(conversationEntity, eventJson) {
-    switch (type) {
+  _reactToConverationEvent(conversationEntity, eventJson, eventSource) {
+    switch (eventJson.type) {
       case z.event.Backend.CONVERSATION.CREATE:
         return this._onCreate(eventJson, eventSource);
 
