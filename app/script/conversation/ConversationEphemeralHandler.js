@@ -49,32 +49,43 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
 
       const shouldSetInterval = messageEntities.length && !updateIntervalId;
       if (shouldSetInterval) {
-        updateIntervalId = window.setInterval(() => {
-          this._updateTimedMessages();
-        }, ConversationEphemeralHandler.CONFIG.INTERVAL_TIME);
+        const {INTERVAL_TIME} = ConversationEphemeralHandler.CONFIG;
+        updateIntervalId = window.setInterval(() => this._updateTimedMessages(), INTERVAL_TIME);
         this.logger.info('Started ephemeral message check interval');
       }
     });
   }
 
-  _updateTimedMessages() {
-    const currentTimestamp = Date.now();
-    const removeTimedMessage = (messageEntity, index) => {
-      amplify.publish(z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, messageEntity);
-      this._timeoutEphemeralMessage(messageEntity);
-      this.timedMessages().splice(index, 1);
-    };
-
-    for (let index = this.timedMessages().length - 1; index >= 0; index--) {
-      const messageEntity = this.timedMessages()[index];
-      if (_.isString(messageEntity.ephemeral_expires())) {
-        const remainingTime = messageEntity.ephemeral_expires() - currentTimestamp;
-        if (remainingTime > 0) {
-          messageEntity.ephemeral_remaining(remainingTime);
-        } else {
-          removeTimedMessage(messageEntity, index);
-        }
+  _updateTimedMessage(messageEntity) {
+    if (_.isString(messageEntity.ephemeral_expires())) {
+      const remainingTime = messageEntity.ephemeral_expires() - Date.now();
+      if (remainingTime > 0) {
+        messageEntity.ephemeral_remaining(remainingTime);
+      } else {
+        amplify.publish(z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, messageEntity);
+        this._timeoutEphemeralMessage(messageEntity);
+        return messageEntity;
       }
+    }
+  }
+
+  _updateTimedMessages() {
+    const expiredMessages = this.timedMessages()
+      .map(messageEntity => this._updateTimedMessage(messageEntity))
+      .filter(messageEntity => messageEntity);
+
+    if (expiredMessages.length) {
+      this.timedMessages.remove(messageEntity => {
+        for (const expiredMessage of expiredMessages) {
+          const {conversation_id: conversationId, id: messageId} = expiredMessage;
+          const isExpiredMessage = messageEntity.id === messageId && messageEntity.conversation_id === conversationId;
+          if (isExpiredMessage) {
+            return true;
+          }
+        }
+
+        return false;
+      });
     }
   }
 
@@ -89,8 +100,10 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
       });
 
       if (!isAlreadyAdded) {
-        this.timedMessages().push(messageEntity);
-        this._updateTimedMessages();
+        const isExpired = !!this._updateTimedMessage(messageEntity);
+        if (!isExpired) {
+          this.timedMessages.push(messageEntity);
+        }
       }
     }
   }

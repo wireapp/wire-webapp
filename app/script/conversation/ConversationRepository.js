@@ -70,6 +70,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
     team_repository,
     user_repository
   ) {
+    this.handleMessageExpiration = this.handleMessageExpiration.bind(this);
+
     this.conversation_service = conversation_service;
     this.asset_service = asset_service;
     this.client_repository = client_repository;
@@ -158,7 +160,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.stateHandler = new z.conversation.ConversationStateHandler(this.conversation_service, this);
     this.ephemeralHandler = new z.conversation.ConversationEphemeralHandler(
       this.conversation_service,
-      this.handleMessageTimeout.bind(this)
+      this.handleMessageExpiration
     );
     this.checkMessageTimer = this.ephemeralHandler.checkMessageTimer.bind(this.ephemeralHandler);
   }
@@ -3369,12 +3371,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
     });
   }
 
-  handleMessageTimeout(messageEntity) {
+  handleMessageExpiration(messageEntity) {
     this.get_conversation_by_id(messageEntity.conversation_id).then(conversationEntity => {
       if (messageEntity.user().is_me) {
-        return this.get_message_in_conversation_by_id(conversationEntity, messageEntity.id).then(message =>
-          this.ephemeralHandler.obfuscateMessage(message)
-        );
+        return this.ephemeralHandler.obfuscateMessage(messageEntity);
       }
 
       if (conversationEntity.is_group()) {
