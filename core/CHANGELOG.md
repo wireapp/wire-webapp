@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="3.6.1"></a>
+## [3.6.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@3.6.0...@wireapp/core@3.6.1) (2018-06-25)
+
+
+### Bug Fixes
+
+* **core:** Use fixed generic message types as keys ([#764](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/764)) ([f801f2a](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/f801f2a))
+
+
+
+
 <a name="3.6.0"></a>
 # [3.6.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@3.5.10...@wireapp/core@3.6.0) (2018-06-25)
 
