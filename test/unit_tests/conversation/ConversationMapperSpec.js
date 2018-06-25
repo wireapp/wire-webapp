@@ -103,6 +103,23 @@ describe('Conversation Mapper', () => {
       expect(updated_conversation_et.id).not.toBe(data.id);
       expect(updated_conversation_et.creator).toBe(data.creator);
     });
+
+    it('only updates existing properties', () => {
+      const updatedName = 'Christmas 2017';
+      const conversationEntity = new z.entity.Conversation(z.util.createRandomUuid());
+      conversationEntity.name('Christmas 2016');
+
+      expect(conversationEntity.name()).toBeDefined();
+
+      const updates = {
+        name: updatedName,
+        newProperty: 'abc',
+      };
+      conversation_mapper.update_properties(conversationEntity, updates);
+
+      expect(conversationEntity.name()).toBe(updatedName);
+      expect(conversationEntity.newProperty).toBeUndefined();
+    });
   });
 
   describe('update_self_status', () => {
