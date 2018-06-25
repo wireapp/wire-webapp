@@ -29,18 +29,17 @@ window.z.conversation = z.conversation || {};
 
 z.conversation.AbstractConversationEventHandler = class AbstractConversationEventHandler {
   /**
-   * Abtract class that represents an entity that can
-   * react to a conversation event.
+   * Abstract class that represents an entity that can react to a conversation event.
    */
   constructor() {
     this.eventHandlingConfig = {};
   }
 
   /**
-   * Adds an eventhandling config to the current instance.
+   * Adds an event handling config to the current instance.
    *
    * @param {EventHandlingConfig} eventHandlingConfig - Config containing events name and the associated callback
-   * @returns {void}
+   * @returns {void} No return value
    */
   setEventHandlingConfig(eventHandlingConfig) {
     this.eventHandlingConfig = eventHandlingConfig;
