@@ -8,7 +8,14 @@ process.on('unhandledRejection', error =>
 );
 
 const path = require('path');
+const logdown = require('logdown');
 require('dotenv').config({path: path.join(__dirname, 'echo2.env')});
+
+const logger = logdown('@wireapp/core/demo/sender.js', {
+  logger: console,
+  markdown: false,
+});
+logger.state.isEnabled = true;
 
 const {Account} = require('@wireapp/core');
 const APIClient = require('@wireapp/api-client');
@@ -34,14 +41,34 @@ const {FileEngine} = require('@wireapp/store-engine');
   await account.login(login);
   await account.listen();
 
+  const name = await account.service.self.getName();
+
+  logger.log('Name', name);
+  logger.log('User ID', account.service.self.apiClient.context.userId);
+  logger.log('Client ID', account.service.self.apiClient.context.clientId);
+
+  async function sendAndDeleteMessage() {
+    const deleteTextPayload = await account.service.conversation.createText('Delete me!');
+    const {id: messageId} = await account.service.conversation.send(CONVERSATION_ID, deleteTextPayload);
+
+    const fiveSecondsInMillis = 5000;
+    setTimeout(async () => {
+      await account.service.conversation.deleteMessageEveryone(CONVERSATION_ID, messageId);
+    }, fiveSecondsInMillis);
+  }
+
   async function sendEphemeralText(expiry = MESSAGE_TIMER) {
+    account.service.conversation.messageTimer.setMessageLevelTimer(CONVERSATION_ID, expiry);
     const payload = await account.service.conversation.createText(`Expires after ${expiry}ms ...`);
-    await account.service.conversation.send(CONVERSATION_ID, payload, expiry);
+    await account.service.conversation.send(CONVERSATION_ID, payload);
+    account.service.conversation.messageTimer.setMessageLevelTimer(CONVERSATION_ID, 0);
   }
 
   async function sendPing(expiry = MESSAGE_TIMER) {
+    account.service.conversation.messageTimer.setMessageLevelTimer(CONVERSATION_ID, expiry);
     const payload = await account.service.conversation.createPing();
-    await account.service.conversation.send(CONVERSATION_ID, payload, expiry);
+    await account.service.conversation.send(CONVERSATION_ID, payload);
+    account.service.conversation.messageTimer.setMessageLevelTimer(CONVERSATION_ID, 0);
   }
 
   async function sendText() {
@@ -49,7 +76,7 @@ const {FileEngine} = require('@wireapp/store-engine');
     await account.service.conversation.send(CONVERSATION_ID, payload);
   }
 
-  const methods = [sendEphemeralText, sendPing, sendText];
+  const methods = [sendAndDeleteMessage, sendEphemeralText, sendPing, sendText];
 
   const timeoutInMillis = 2000;
   setInterval(() => {
