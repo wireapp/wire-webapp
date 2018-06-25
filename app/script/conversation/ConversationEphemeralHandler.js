@@ -200,7 +200,7 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
   _timeoutEphemeralMessage(messageEntity) {
     if (!messageEntity.is_expired()) {
       if (messageEntity.user().is_me) {
-        return this._obfuscateMessage(messageEntity);
+        this._obfuscateMessage(messageEntity);
       }
 
       amplify.publish(z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, messageEntity);
@@ -223,10 +223,11 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
 
   _updateTimedMessage(messageEntity) {
     if (_.isString(messageEntity.ephemeral_expires())) {
-      const remainingTime = messageEntity.ephemeral_expires() - Date.now();
-      if (remainingTime > 0) {
-        messageEntity.ephemeral_remaining(remainingTime);
-      } else {
+      const remainingTime = Math.max(0, messageEntity.ephemeral_expires() - Date.now());
+      messageEntity.ephemeral_remaining(remainingTime);
+
+      const isExpired = remainingTime === 0;
+      if (isExpired) {
         this._timeoutEphemeralMessage(messageEntity);
         return messageEntity;
       }

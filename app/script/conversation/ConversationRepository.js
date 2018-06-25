@@ -2552,7 +2552,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         });
       })
       .then(() => {
-        amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, message_et.id);
+        amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, message_et.id, conversation_et.id);
         return this._delete_message_by_id(conversation_et, message_et.id);
       })
       .catch(error => {
@@ -2585,7 +2585,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return this.send_generic_message_to_conversation(this.self_conversation().id, generic_message);
       })
       .then(() => {
-        amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, message_et.id);
+        amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, message_et.id, conversation_et.id);
         return this._delete_message_by_id(conversation_et, message_et.id);
       })
       .catch(error => {
@@ -3279,7 +3279,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         }
       })
       .then(() => {
-        amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, eventData.message_id);
+        amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, eventData.message_id, conversationEntity.id);
         return this._delete_message_by_id(conversationEntity, eventData.message_id);
       })
       .catch(error => {
@@ -3316,7 +3316,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return this.get_conversation_by_id(eventData.conversation_id);
       })
       .then(conversationEntity => {
-        amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, eventData.message_id);
+        amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, eventData.message_id, conversationEntity.id);
         return this._delete_message_by_id(conversationEntity, eventData.message_id);
       })
       .catch(error => {

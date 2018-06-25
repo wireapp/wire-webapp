@@ -118,19 +118,22 @@ z.viewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
   }
 
   messageAdded(messageEntity) {
-    const isExpectedId = messageEntity.conversation === this.conversationEntity().id;
-    if (isExpectedId) {
+    const isCurrentConversation = this.conversationEntity().id === messageEntity.conversation;
+    if (isCurrentConversation) {
       this.items.push(messageEntity);
     }
   }
 
-  messageRemoved(removedMessageId) {
-    const isExpectedId = this.messageEntity().id === removedMessageId;
-    if (isExpectedId) {
-      return this.imageModal.hide();
-    }
+  messageRemoved(messageId, conversationId) {
+    const isCurrentConversation = this.conversationEntity().id === conversationId;
+    if (isCurrentConversation) {
+      const isVisibleMessage = this.messageEntity().id === messageId;
+      if (isVisibleMessage) {
+        return this.imageModal.hide();
+      }
 
-    this.items.remove(message_et => message_et.id === removedMessageId);
+      this.items.remove(messageEntity => messageEntity.id === messageId);
+    }
   }
 
   _loadImage() {

@@ -38,7 +38,7 @@ z.viewModel.panel.TimedMessagesViewModel = class TimedMessagesViewModel {
         times.push(currentTime);
       }
 
-      times.sort((a, b) => a - b);
+      times.sort((timeA, timeB) => timeA - timeB);
 
       return times.map(time => ({
         text: z.util.TimeUtil.formatDuration(time).text,
