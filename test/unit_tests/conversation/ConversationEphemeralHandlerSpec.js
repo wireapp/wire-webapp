@@ -19,19 +19,10 @@
 
 'use strict';
 
-const testFactory = new TestFactory();
-
-beforeEach(() => {
-  return testFactory.exposeConversationActors();
-});
-
 const buildConversationEphemeralHandler = () => {
   const conversationMapper = new z.conversation.ConversationMapper();
-  return new z.conversation.ConversationEphemeralHandler(
-    TestFactory.conversation_service,
-    conversationMapper,
-    () => {}
-  );
+  const conversationService = new z.conversation.ConversationService(null, null);
+  return new z.conversation.ConversationEphemeralHandler(conversationService, conversationMapper, () => {});
 };
 
 describe('z.conversation.ConversationEphemeralHandler', () => {
