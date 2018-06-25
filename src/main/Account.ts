@@ -320,7 +320,7 @@ class Account extends EventEmitter {
             this.logger.info(
               `Received "${expireAfterMillis}" ms timer on conversation level for conversation "${conversation}".`
             );
-            this.service!.conversation.timerService.setConversationLevelTimer(conversation, expireAfterMillis);
+            this.service!.conversation.messageTimer.setConversationLevelTimer(conversation, expireAfterMillis);
             this.emit(Account.INCOMING.MESSAGE_TIMER_UPDATE, event);
             break;
           }
