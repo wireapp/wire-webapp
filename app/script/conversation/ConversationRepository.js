@@ -2747,7 +2747,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   /**
-   * calls the feature specific event handler on the current event being handled
+   * Calls the feature specific event handler on the current event being handled.
    *
    * @private
    * @param {Conversation} conversationEntity - Conversation targeted by the event

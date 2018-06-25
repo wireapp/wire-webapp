@@ -36,8 +36,8 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
       [z.event.Backend.CONVERSATION.MESSAGE_TIMER_UPDATE]: this._updateEphemeralTimer.bind(this),
     });
     this._updateTimedMessages = this._updateTimedMessages.bind(this);
-    this.conversationService = conversationService;
     this.conversationMapper = conversationMapper;
+    this.conversationService = conversationService;
     this.onMessageTimeout = onMessageTimeout;
     this.logger = new z.util.Logger('z.conversation.ConversationEphemeralHandler', z.config.LOGGER.OPTIONS);
 
@@ -214,7 +214,7 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
   }
 
   /**
-   * Updates the ephemeral timer of a conversation when an timer-update message is received
+   * Updates the ephemeral timer of a conversation when an timer-update message is received.
    *
    * @private
    * @param {Conversation} conversationEntity - Conversation entity which message timer was changed
