@@ -30,6 +30,12 @@ z.util.TimeUtil = {
 
   durationUnits: [
     {
+      plural: 'ephemeralUnitsYears',
+      singular: 'ephemeralUnitsYear',
+      unit: 'y',
+      value: 31557600000,
+    },
+    {
       plural: 'ephemeralUnitsWeeks',
       singular: 'ephemeralUnitsWeek',
       unit: 'w',
