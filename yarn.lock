@@ -186,9 +186,9 @@
     glob "^5.0.10"
     yargs "^3.10.0"
 
-"@bower_components/raygun4js@MindscapeHQ/raygun4js#2.9.4":
-  version "2.9.4"
-  resolved "https://codeload.github.com/MindscapeHQ/raygun4js/tar.gz/91ab41003273ad2f007b408f3b13228626e8ab42"
+"@bower_components/raygun4js@MindscapeHQ/raygun4js#2.10.0":
+  version "2.10.0"
+  resolved "https://codeload.github.com/MindscapeHQ/raygun4js/tar.gz/ef4b04ed0ff9a73f02e1bb32ba86c2bc5fba5a59"
 
 "@bower_components/speakingurl@pid/speakingurl#v14.0.1":
   version "14.0.1"
@@ -503,15 +503,15 @@
     "@webassemblyjs/wast-parser" "1.5.12"
     long "^3.2.0"
 
-"@wireapp/api-client@1.2.0":
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-1.2.0.tgz#c89857b8f27fbdaf42e7ab15acf982c4366fcd33"
+"@wireapp/api-client@1.3.3":
+  version "1.3.3"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-1.3.3.tgz#e8a961c87d98107084c7e23d4a599fffbb6ce9ed"
   dependencies:
     "@types/node" "10.3.4"
     "@types/spark-md5" "3.0.0"
     "@types/tough-cookie" "2.3.3"
-    "@wireapp/priority-queue" "0.1.47"
-    "@wireapp/store-engine" "0.11.32"
+    "@wireapp/priority-queue" "0.1.48"
+    "@wireapp/store-engine" "0.11.33"
     axios "0.18.0"
     html5-websocket "2.0.3"
     logdown "3.2.3"
@@ -523,29 +523,29 @@
   version "3.0.50"
   resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-3.0.50.tgz#2824fe60b6a0cd90aefd5df1cbad6f16a7772896"
 
-"@wireapp/core@3.4.1":
-  version "3.4.1"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-3.4.1.tgz#6b092e42d3d4ecbd6b18c2a0df53eaeb4e41e668"
+"@wireapp/core@3.5.3":
+  version "3.5.3"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-3.5.3.tgz#f82c69e7a259eb70f643d05464ce97e2dd965b24"
   dependencies:
     "@types/node" "10.3.4"
-    "@wireapp/api-client" "1.2.0"
-    "@wireapp/cryptobox" "8.4.8"
-    "@wireapp/store-engine" "0.11.32"
-    bazinga64 "5.2.4"
+    "@wireapp/api-client" "1.3.3"
+    "@wireapp/cryptobox" "8.5.1"
+    "@wireapp/store-engine" "0.11.33"
+    bazinga64 "5.2.5"
     logdown "3.2.3"
     protobufjs "6.8.6"
     pure-uuid "1.5.2"
 
-"@wireapp/cryptobox@8.4.8":
-  version "8.4.8"
-  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-8.4.8.tgz#e6c964c819264b91d88bc40eaa909b17ca130ebc"
+"@wireapp/cryptobox@8.5.1":
+  version "8.5.1"
+  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-8.5.1.tgz#91d141da29b8cb21a618e3405eade01daff6bfdd"
   dependencies:
     "@types/fs-extra" "5.0.3"
     "@types/node" "10.3.4"
     "@wireapp/lru-cache" "2.1.28"
-    "@wireapp/priority-queue" "0.1.47"
-    "@wireapp/proteus" "7.1.63"
-    "@wireapp/store-engine" "0.11.32"
+    "@wireapp/priority-queue" "0.1.48"
+    "@wireapp/proteus" "7.2.0"
+    "@wireapp/store-engine" "0.11.33"
     dexie "2.0.4"
     fs-extra "6.0.1"
 
@@ -553,16 +553,16 @@
   version "2.1.28"
   resolved "https://registry.yarnpkg.com/@wireapp/lru-cache/-/lru-cache-2.1.28.tgz#6cb7aea2b9f972c19194961eebdaea97df577da1"
 
-"@wireapp/priority-queue@0.1.47":
-  version "0.1.47"
-  resolved "https://registry.yarnpkg.com/@wireapp/priority-queue/-/priority-queue-0.1.47.tgz#7dbe0c54f5fb669c1753163a3d3c06664e422d26"
+"@wireapp/priority-queue@0.1.48":
+  version "0.1.48"
+  resolved "https://registry.yarnpkg.com/@wireapp/priority-queue/-/priority-queue-0.1.48.tgz#b4f4b79c99a0c727465610a8100a0eb98e917f1d"
   dependencies:
     "@types/node" "10.3.4"
     pure-uuid "1.5.2"
 
-"@wireapp/proteus@7.1.63":
-  version "7.1.63"
-  resolved "https://registry.yarnpkg.com/@wireapp/proteus/-/proteus-7.1.63.tgz#0387c12deb8922a71aa390450412784858407ad5"
+"@wireapp/proteus@7.2.0":
+  version "7.2.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/proteus/-/proteus-7.2.0.tgz#4a9ba2e196c2936692f76ba1f32b86130ca5a32a"
   dependencies:
     "@types/chai" "4.1.4"
     "@types/ed2curve" "0.2.2"
@@ -571,21 +571,21 @@
     ed2curve "0.2.1"
     libsodium-wrappers-sumo "0.7.3"
 
-"@wireapp/react-ui-kit@1.1.44":
-  version "1.1.44"
-  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-1.1.44.tgz#f0ee8056be2fe3f43f078e94ad1fc7381baaf68d"
+"@wireapp/react-ui-kit@1.2.3":
+  version "1.2.3"
+  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-1.2.3.tgz#6ae91977a77073d9ac6918e479c79c2efbedfaee"
   dependencies:
-    bazinga64 "5.2.4"
+    bazinga64 "5.2.5"
     color "3.0.0"
     react "16.4.1"
     react-dom "16.4.1"
     recompose "0.27.1"
-    styled-components "3.3.2"
+    styled-components "3.3.3"
     styled-normalize "4.0.0"
 
-"@wireapp/store-engine@0.11.32":
-  version "0.11.32"
-  resolved "https://registry.yarnpkg.com/@wireapp/store-engine/-/store-engine-0.11.32.tgz#bdbc14130e6dd0da33aa7c16b61b502c3b4ac033"
+"@wireapp/store-engine@0.11.33":
+  version "0.11.33"
+  resolved "https://registry.yarnpkg.com/@wireapp/store-engine/-/store-engine-0.11.33.tgz#379d024a527191ad4e39c5baf0b45bbfb26c170f"
   dependencies:
     "@types/filesystem" "0.0.28"
     "@types/node" "10.3.4"
@@ -1690,9 +1690,9 @@ batch@0.6.1:
   version "0.6.1"
   resolved "https://registry.yarnpkg.com/batch/-/batch-0.6.1.tgz#dc34314f4e679318093fc760272525f94bf25c16"
 
-bazinga64@5.2.4:
-  version "5.2.4"
-  resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.2.4.tgz#45b0403cdfaa3bf9406ff3eee596db59b4c1c9e3"
+bazinga64@5.2.5:
+  version "5.2.5"
+  resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.2.5.tgz#f77ce58926e28b6a74a622db3a353730e02f0e1e"
 
 bcrypt-pbkdf@^1.0.0:
   version "1.0.1"
@@ -5834,9 +5834,9 @@ karma-sourcemap-loader@0.3.7:
   dependencies:
     graceful-fs "^4.1.2"
 
-karma@2.0.3:
-  version "2.0.3"
-  resolved "https://registry.yarnpkg.com/karma/-/karma-2.0.3.tgz#4d5e13d25f5a51331c5378b24c4984709c01120b"
+karma@2.0.4:
+  version "2.0.4"
+  resolved "https://registry.yarnpkg.com/karma/-/karma-2.0.4.tgz#b399785f57e9bab1d3c4384db33fef4dec8ae349"
   dependencies:
     bluebird "^3.3.0"
     body-parser "^1.16.1"
@@ -8028,11 +8028,11 @@ postcss-sass@^0.3.0:
     gonzales-pe "4.2.3"
     postcss "6.0.22"
 
-postcss-scss@1.0.5, postcss-scss@^1.0.2:
-  version "1.0.5"
-  resolved "https://registry.yarnpkg.com/postcss-scss/-/postcss-scss-1.0.5.tgz#40a10cfd03766accf0a3cf8e65a8af887b2bf6c4"
+postcss-scss@1.0.6, postcss-scss@^1.0.2:
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/postcss-scss/-/postcss-scss-1.0.6.tgz#ab903f3bb20161bc177896462293a53d4bff5f7a"
   dependencies:
-    postcss "^6.0.21"
+    postcss "^6.0.23"
 
 postcss-scss@^0.4.0:
   version "0.4.1"
@@ -8110,7 +8110,7 @@ postcss-zindex@^2.0.1:
     postcss "^5.0.4"
     uniqs "^2.0.0"
 
-postcss@6.0.22, postcss@^6.0.14, postcss@^6.0.16, postcss@^6.0.21, postcss@^6.0.22, postcss@^6.0.6, postcss@^6.0.8:
+postcss@6.0.22:
   version "6.0.22"
   resolved "https://registry.yarnpkg.com/postcss/-/postcss-6.0.22.tgz#e23b78314905c3b90cbd61702121e7a78848f2a3"
   dependencies:
@@ -8127,13 +8127,13 @@ postcss@^5.0.0, postcss@^5.0.10, postcss@^5.0.11, postcss@^5.0.12, postcss@^5.0.
     source-map "^0.5.6"
     supports-color "^3.2.3"
 
-postcss@^6.0, postcss@^6.0.0, postcss@^6.0.1, postcss@^6.0.11, postcss@^6.0.13, postcss@^6.0.5:
-  version "6.0.21"
-  resolved "https://registry.yarnpkg.com/postcss/-/postcss-6.0.21.tgz#8265662694eddf9e9a5960db6da33c39e4cd069d"
+postcss@^6.0, postcss@^6.0.0, postcss@^6.0.1, postcss@^6.0.11, postcss@^6.0.13, postcss@^6.0.14, postcss@^6.0.16, postcss@^6.0.22, postcss@^6.0.23, postcss@^6.0.5, postcss@^6.0.6, postcss@^6.0.8:
+  version "6.0.23"
+  resolved "https://registry.yarnpkg.com/postcss/-/postcss-6.0.23.tgz#61c82cc328ac60e677645f979054eb98bc0e3324"
   dependencies:
-    chalk "^2.3.2"
+    chalk "^2.4.1"
     source-map "^0.6.1"
-    supports-color "^5.3.0"
+    supports-color "^5.4.0"
 
 prebuild-install@^2.3.0:
   version "2.3.0"
@@ -8785,9 +8785,9 @@ reduce-function-call@^1.0.1, reduce-function-call@^1.0.2:
   dependencies:
     balanced-match "^0.4.2"
 
-redux-devtools-extension@2.13.4:
-  version "2.13.4"
-  resolved "https://registry.yarnpkg.com/redux-devtools-extension/-/redux-devtools-extension-2.13.4.tgz#f89b6c0da27c3321e20b8c100801d32a7c8420f5"
+redux-devtools-extension@2.13.5:
+  version "2.13.5"
+  resolved "https://registry.yarnpkg.com/redux-devtools-extension/-/redux-devtools-extension-2.13.5.tgz#3ff34f7227acfeef3964194f5f7fc2765e5c5a39"
 
 redux-logger@3.0.6:
   version "3.0.6"
@@ -9908,9 +9908,9 @@ style-search@^0.1.0:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/style-search/-/style-search-0.1.0.tgz#7958c793e47e32e07d2b5cafe5c0bf8e12e77902"
 
-styled-components@3.3.2:
-  version "3.3.2"
-  resolved "https://registry.yarnpkg.com/styled-components/-/styled-components-3.3.2.tgz#087b96830ee3d60d9a8b5ef17c132b4f29cc71df"
+styled-components@3.3.3:
+  version "3.3.3"
+  resolved "https://registry.yarnpkg.com/styled-components/-/styled-components-3.3.3.tgz#09e702055ab11f7a8eab8229b1c0d0b855095686"
   dependencies:
     buffer "^5.0.3"
     css-to-react-native "^2.0.3"
@@ -9951,9 +9951,9 @@ stylelint-config-idiomatic-order@5.0.0:
     stylelint-config-standard "^16.0.0"
     stylelint-order "^0.5.0"
 
-stylelint-config-prettier@3.2.0:
-  version "3.2.0"
-  resolved "https://registry.yarnpkg.com/stylelint-config-prettier/-/stylelint-config-prettier-3.2.0.tgz#af32b7845adeeddbf0a0bd642ace4ca1e68958e2"
+stylelint-config-prettier@3.3.0:
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/stylelint-config-prettier/-/stylelint-config-prettier-3.3.0.tgz#cc22a4b5310c1919cee77131d6e220c60a62a480"
   dependencies:
     stylelint "^9.1.1"
 

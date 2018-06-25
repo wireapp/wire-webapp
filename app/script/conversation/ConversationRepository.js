@@ -30,7 +30,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       EXTERNAL_MESSAGE_THRESHOLD: 200 * 1024,
       GROUP: {
         MAX_NAME_LENGTH: 64,
-        MAX_SIZE: 128,
+        MAX_SIZE: 256,
       },
       STATE_EVENTS: [
         z.event.Backend.CONVERSATION.ACCESS_UPDATE,
@@ -1494,7 +1494,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     }
   }
 
-  _handleTooManyMembersError(participants = 128) {
+  _handleTooManyMembersError(participants = ConversationRepository.CONFIG.GROUP.MAX_SIZE) {
     const openSpots = ConversationRepository.CONFIG.GROUP.MAX_SIZE - participants;
     const substitutions = {number1: ConversationRepository.CONFIG.GROUP.MAX_SIZE, number2: Math.max(0, openSpots)};
 
