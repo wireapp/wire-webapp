@@ -86,6 +86,11 @@ export default class ConversationService {
     });
   }
 
+  private getSelfConversation(): Promise<Conversation> {
+    const {userId} = this.apiClient.context!;
+    return this.apiClient.conversation.api.getConversation(userId);
+  }
+
   private async sendConfirmation(
     conversationId: string,
     payloadBundle: PayloadBundleOutgoingUnsent
@@ -366,6 +371,58 @@ export default class ConversationService {
       id: messageId,
       state: PayloadBundleState.OUTGOING_UNSENT,
       type: GenericMessageType.CLIENT_ACTION,
+    };
+  }
+
+  public async deleteMessageLocal(conversationId: string, messageIdToHide: string): Promise<PayloadBundleOutgoing> {
+    const messageId = new UUID(4).format();
+
+    const messageHide = this.protocolBuffers.MessageHide.create({
+      conversationId,
+      messageId: messageIdToHide,
+    });
+
+    const genericMessage = this.protocolBuffers.GenericMessage.create({
+      [GenericMessageType.HIDDEN]: messageHide,
+      messageId,
+    });
+
+    const {id: selfConversationId} = await this.getSelfConversation();
+
+    await this.sendGenericMessage(this.clientID, selfConversationId, genericMessage);
+
+    return {
+      conversation: conversationId,
+      from: this.clientID,
+      id: messageId,
+      state: PayloadBundleState.OUTGOING_SENT,
+      type: GenericMessageType.HIDDEN,
+    };
+  }
+
+  public async deleteMessageEveryone(
+    conversationId: string,
+    messageIdToDelete: string
+  ): Promise<PayloadBundleOutgoing> {
+    const messageId = new UUID(4).format();
+
+    const messageDelete = this.protocolBuffers.MessageDelete.create({
+      messageId: messageIdToDelete,
+    });
+
+    const genericMessage = this.protocolBuffers.GenericMessage.create({
+      [GenericMessageType.DELETED]: messageDelete,
+      messageId,
+    });
+
+    await this.sendGenericMessage(this.clientID, conversationId, genericMessage);
+
+    return {
+      conversation: conversationId,
+      from: this.clientID,
+      id: messageId,
+      state: PayloadBundleState.OUTGOING_SENT,
+      type: GenericMessageType.DELETED,
     };
   }
 

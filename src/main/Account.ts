@@ -61,6 +61,7 @@ class Account extends EventEmitter {
     ASSET: 'Account.INCOMING.ASSET',
     CLIENT_ACTION: 'Account.INCOMING.CLIENT_ACTION',
     CONFIRMATION: 'Account.INCOMING.CONFIRMATION',
+    DELETED: 'Account.INCOMING.DELETED',
     MESSAGE_TIMER_UPDATE: 'Account.INCOMING.MESSAGE_TIMER_UPDATE',
     PING: 'Account.INCOMING.PING',
     TEXT_MESSAGE: 'Account.INCOMING.TEXT_MESSAGE',
@@ -94,7 +95,9 @@ class Account extends EventEmitter {
       External: root.lookup('External'),
       GenericMessage: root.lookup('GenericMessage'),
       Knock: root.lookup('Knock'),
+      MessageDelete: root.lookup('MessageDelete'),
       MessageEdit: root.lookup('MessageEdit'),
+      MessageHide: root.lookup('MessageHide'),
       Text: root.lookup('Text'),
     };
 
@@ -304,6 +307,9 @@ class Account extends EventEmitter {
             break;
           case GenericMessageType.CONFIRMATION:
             this.emit(Account.INCOMING.CONFIRMATION, data);
+            break;
+          case GenericMessageType.DELETED:
+            this.emit(Account.INCOMING.DELETED, data);
             break;
           case GenericMessageType.KNOCK:
             this.emit(Account.INCOMING.PING, data);
