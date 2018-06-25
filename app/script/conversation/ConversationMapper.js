@@ -63,6 +63,19 @@
 /**
  * @typedef {object} SelfStatusUpdate
  * @property {number=} archived_timestamp
+ * @property {number=} cleared_timestamp
+ * @property {number=} ephemeral_timer
+ * @property {number=} message_timer
+ * @property {number=} last_event_timestamp
+ * @property {number=} last_read_timestamp
+ * @property {number=} last_server_timestamp
+ * @property {boolean=} otr_archived
+ * @property {string=} otr_archived_ref
+ * @property {boolean=} otr_muted
+ * @property {string=} otr_muted_ref
+ * @property {boolean=} muted_state
+ * @property {number=} status
+ * @property {number=} verification_state
  */
 
 /**
