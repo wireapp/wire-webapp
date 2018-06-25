@@ -39,17 +39,8 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.icon-account:before {
-  content: "\e187";
-}
-.icon-devices:before {
-  content: "\e188";
-}
 .icon-options:before {
   content: "\e135";
-}
-.icon-support:before {
-  content: "\e1270";
 }
 .icon-wire:before {
   content: "\e202";
@@ -78,9 +69,6 @@
 .icon-down:before {
   content: "\e113";
 }
-.icon-undo:before {
-  content: "\e116";
-}
 .icon-reload:before {
   content: "\e117";
 }
@@ -92,9 +80,6 @@
 }
 .icon-spinner:before {
   content: "\e126";
-}
-.icon-info:before {
-  content: "\e127";
 }
 .icon-play:before {
   content: "\e131";
@@ -108,20 +93,11 @@
 .icon-ping-timed:before {
   content: "\e637";
 }
-.icon-exit-fullscreen:before {
-  content: "\e138";
-}
-.icon-fullscreen:before {
-  content: "\e139";
-}
 .icon-people:before {
   content: "\e142";
 }
 .icon-camera:before {
   content: "\e143";
-}
-.icon-shutter:before {
-  content: "\e144";
 }
 .icon-library:before {
   content: "\e145";
@@ -134,9 +110,6 @@
 }
 .icon-location:before {
   content: "\e148";
-}
-.icon-chat:before {
-  content: "\e150";
 }
 .icon-file:before {
   content: "\e152";
@@ -152,15 +125,6 @@
 }
 .icon-microphone:before {
   content: "\e160";
-}
-.icon-mute:before {
-  content: "\e159";
-}
-.icon-mute-small:before {
-  content: "\e1590";
-}
-.icon-notification:before {
-  content: "\e161";
 }
 .icon-silence:before {
   content: "\e162";
@@ -201,9 +165,6 @@
 .icon-trash:before {
   content: "\e186";
 }
-.icon-trash-small:before {
-  content: "\e1860";
-}
 .icon-delete-for-me:before {
   content: "\e1861";
 }
@@ -213,12 +174,6 @@
 .icon-download:before {
   content: "\e197";
 }
-.icon-download-small:before {
-  content: "\e1970";
-}
-.icon-leave:before {
-  content: "\e205";
-}
 .icon-error:before {
   content: "\e208";
 }
@@ -227,9 +182,6 @@
 }
 .icon-archive:before {
   content: "\e212";
-}
-.icon-people-add:before {
-  content: "\e215";
 }
 .icon-gif:before {
   content: "\e219";
@@ -252,12 +204,6 @@
 .icon-screensharing:before {
   content: "\e227";
 }
-.icon-screensharing-small:before {
-  content: "\e2270";
-}
-.icon-video-off:before {
-  content: "\e231";
-}
 .icon-send:before {
   content: "\e235";
 }
@@ -267,20 +213,11 @@
 .icon-hourglass:before {
   content: "\e239";
 }
-.icon-collection:before {
-  content: "\e260";
-}
 .icon-av:before {
   content: "\e261";
 }
 .icon-dismiss:before {
   content: "\e262";
-}
-.icon-checkbox:before {
-  content: "\e600";
-}
-.icon-checkbox-checked:before {
-  content: "\e601";
 }
 .icon-contacts:before {
   content: "\e602";
