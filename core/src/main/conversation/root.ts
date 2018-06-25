@@ -25,6 +25,7 @@ import ConversationService from './ConversationService';
 import DecodedMessage from './DecodedMessage';
 import GenericMessageType from './GenericMessageType';
 import Image from './Image';
+import {MessageTimer} from './MessageTimer';
 import {
   PayloadBundle,
   PayloadBundleIncoming,
@@ -32,7 +33,6 @@ import {
   PayloadBundleOutgoingUnsent,
   PayloadBundleState,
 } from './PayloadBundle';
-import {TimerService} from './TimerService';
 
 export {
   Asset,
@@ -51,5 +51,5 @@ export {
   PayloadBundleOutgoingUnsent,
   PayloadBundleState,
   RemoteData,
-  TimerService,
+  MessageTimer,
 };

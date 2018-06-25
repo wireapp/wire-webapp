@@ -35,11 +35,11 @@ import {
   GenericMessageType,
   Image,
   ImageAsset,
+  MessageTimer,
   PayloadBundleOutgoing,
   PayloadBundleOutgoingUnsent,
   PayloadBundleState,
   RemoteData,
-  TimerService,
 } from '../conversation/root';
 import * as AssetCryptography from '../cryptography/AssetCryptography.node';
 import {CryptographyService, EncryptedAsset} from '../cryptography/root';
@@ -49,7 +49,7 @@ import APIClient = require('@wireapp/api-client');
 
 export default class ConversationService {
   private clientID: string = '';
-  public readonly timerService: TimerService;
+  public readonly messageTimer: MessageTimer;
 
   constructor(
     private readonly apiClient: APIClient,
@@ -57,7 +57,7 @@ export default class ConversationService {
     private readonly cryptographyService: CryptographyService,
     private readonly assetService: AssetService
   ) {
-    this.timerService = new TimerService();
+    this.messageTimer = new MessageTimer();
   }
 
   private createEphemeral(originalGenericMessage: any, expireAfterMillis: number): any {
@@ -189,7 +189,7 @@ export default class ConversationService {
       messageId: payloadBundle.id,
     });
 
-    const expireAfterMillis = this.timerService.getMessageTimer(conversationId);
+    const expireAfterMillis = this.messageTimer.getMessageTimer(conversationId);
     if (expireAfterMillis > 0) {
       genericMessage = this.createEphemeral(genericMessage, expireAfterMillis);
     }
@@ -224,7 +224,7 @@ export default class ConversationService {
       messageId: payloadBundle.id,
     });
 
-    const expireAfterMillis = this.timerService.getMessageTimer(conversationId);
+    const expireAfterMillis = this.messageTimer.getMessageTimer(conversationId);
     if (expireAfterMillis > 0) {
       genericMessage = this.createEphemeral(genericMessage, expireAfterMillis);
     }
@@ -262,7 +262,7 @@ export default class ConversationService {
       text: this.protocolBuffers.Text.create({content: payloadBundle.content}),
     });
 
-    const expireAfterMillis = this.timerService.getMessageTimer(conversationId);
+    const expireAfterMillis = this.messageTimer.getMessageTimer(conversationId);
     if (expireAfterMillis > 0) {
       genericMessage = this.createEphemeral(genericMessage, expireAfterMillis);
     }
