@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="8.5.2"></a>
+## [8.5.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/compare/@wireapp/cryptobox@8.5.1...@wireapp/cryptobox@8.5.2) (2018-06-25)
+
+
+
+
+**Note:** Version bump only for package @wireapp/cryptobox
+
 <a name="8.5.1"></a>
 ## [8.5.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/compare/@wireapp/cryptobox@8.5.0...@wireapp/cryptobox@8.5.1) (2018-06-21)
 
