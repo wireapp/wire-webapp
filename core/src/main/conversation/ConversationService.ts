@@ -61,13 +61,13 @@ export default class ConversationService {
   }
 
   private createEphemeral(originalGenericMessage: any, expireAfterMillis: number): any {
-    const ephemeral = this.protocolBuffers.Ephemeral.create({
+    const ephemeralMessage = this.protocolBuffers.Ephemeral.create({
       expireAfterMillis,
       [originalGenericMessage.content]: originalGenericMessage[originalGenericMessage.content],
     });
 
     const genericMessage = this.protocolBuffers.GenericMessage.create({
-      ephemeral,
+      [GenericMessageType.EPHEMERAL]: ephemeralMessage,
       messageId: originalGenericMessage.messageId,
     });
 
@@ -95,13 +95,13 @@ export default class ConversationService {
     conversationId: string,
     payloadBundle: PayloadBundleOutgoingUnsent
   ): Promise<PayloadBundleOutgoing> {
-    const confirmation = this.protocolBuffers.Confirmation.create({
+    const confirmationMessage = this.protocolBuffers.Confirmation.create({
       firstMessageId: payloadBundle.content,
       type: ConfirmationType.DELIVERED,
     });
 
     const genericMessage = this.protocolBuffers.GenericMessage.create({
-      confirmation,
+      [GenericMessageType.CONFIRMATION]: confirmationMessage,
       messageId: payloadBundle.id,
     });
 
@@ -171,7 +171,7 @@ export default class ConversationService {
     });
 
     const original = this.protocolBuffers.Asset.Original.create({
-      image: imageMetadata,
+      [GenericMessageType.IMAGE]: imageMetadata,
       mimeType: encryptedAsset.image.type,
       name: null,
       size: encryptedAsset.image.data.length,
@@ -184,13 +184,13 @@ export default class ConversationService {
       sha256: encryptedAsset.asset.sha256,
     });
 
-    const asset = this.protocolBuffers.Asset.create({
+    const assetMessage = this.protocolBuffers.Asset.create({
       original,
       uploaded: remoteData,
     });
 
     let genericMessage = this.protocolBuffers.GenericMessage.create({
-      asset,
+      [GenericMessageType.ASSET]: assetMessage,
       messageId: payloadBundle.id,
     });
 
@@ -223,9 +223,8 @@ export default class ConversationService {
     conversationId: string,
     payloadBundle: PayloadBundleOutgoingUnsent
   ): Promise<PayloadBundleOutgoing> {
-    const knock = this.protocolBuffers.Knock.create();
     let genericMessage = this.protocolBuffers.GenericMessage.create({
-      knock,
+      [GenericMessageType.KNOCK]: this.protocolBuffers.Knock.create(),
       messageId: payloadBundle.id,
     });
 
@@ -244,7 +243,7 @@ export default class ConversationService {
     payloadBundle: PayloadBundleOutgoingUnsent
   ): Promise<PayloadBundleOutgoing> {
     const sessionReset = this.protocolBuffers.GenericMessage.create({
-      clientAction: ClientAction.RESET_SESSION,
+      [GenericMessageType.CLIENT_ACTION]: ClientAction.RESET_SESSION,
       messageId: payloadBundle.id,
     });
 
@@ -264,7 +263,7 @@ export default class ConversationService {
     };
     let genericMessage = this.protocolBuffers.GenericMessage.create({
       messageId: payloadBundle.id,
-      text: this.protocolBuffers.Text.create({content: payloadBundle.content}),
+      [GenericMessageType.TEXT]: this.protocolBuffers.Text.create({content: payloadBundle.content}),
     });
 
     const expireAfterMillis = this.messageTimer.getMessageTimer(conversationId);
