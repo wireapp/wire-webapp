@@ -3058,11 +3058,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     const updateSequence = selfUserRejoins ? this.updateConversationFromBackend(conversationEntity) : Promise.resolve();
 
-    return updateSequence
-      .then(() => this.updateParticipatingUserEntities(conversationEntity, false, true))
-      .then(() => {
-        this.verification_state_handler.onMemberJoined(conversationEntity, eventData.user_ids);
-      });
+    return updateSequence.then(() => this.updateParticipatingUserEntities(conversationEntity, false, true)).then(() => {
+      this.verification_state_handler.onMemberJoined(conversationEntity, eventData.user_ids);
+    });
   }
 
   /**
