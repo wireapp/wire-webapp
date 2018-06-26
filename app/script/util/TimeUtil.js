@@ -23,49 +23,60 @@ window.z = window.z || {};
 window.z.util = z.util || {};
 
 z.util.TimeUtil = {
+  UNITS_IN_MILLIS: {
+    DAY: 1000 * 60 * 60 * 24,
+    HOUR: 1000 * 60 * 60,
+    MINUTE: 1000 * 60,
+    SECOND: 1000,
+    WEEK: 1000 * 60 * 60 * 24 * 7,
+    YEAR: 1000 * 60 * 60 * 24 * 365,
+  },
+
   adjustCurrentTimestamp: function(timeOffset) {
     timeOffset = _.isNumber(timeOffset) ? timeOffset : 0;
     return Date.now() - timeOffset;
   },
 
-  durationUnits: [
-    {
-      plural: 'ephemeralUnitsYears',
-      singular: 'ephemeralUnitsYear',
-      unit: 'y',
-      value: 1000 * 60 * 60 * 24 * 365,
-    },
-    {
-      plural: 'ephemeralUnitsWeeks',
-      singular: 'ephemeralUnitsWeek',
-      unit: 'w',
-      value: 1000 * 60 * 60 * 24 * 7,
-    },
-    {
-      plural: 'ephemeralUnitsDays',
-      singular: 'ephemeralUnitsDay',
-      unit: 'd',
-      value: 1000 * 60 * 60 * 24,
-    },
-    {
-      plural: 'ephemeralUnitsHours',
-      singular: 'ephemeralUnitsHour',
-      unit: 'h',
-      value: 1000 * 60 * 60,
-    },
-    {
-      plural: 'ephemeralUnitsMinutes',
-      singular: 'ephemeralUnitsMinute',
-      unit: 'm',
-      value: 1000 * 60,
-    },
-    {
-      plural: 'ephemeralUnitsSeconds',
-      singular: 'ephemeralUnitsSecond',
-      unit: 's',
-      value: 1000,
-    },
-  ],
+  durationUnits: () => {
+    return [
+      {
+        plural: 'ephemeralUnitsYears',
+        singular: 'ephemeralUnitsYear',
+        unit: 'y',
+        value: z.util.TimeUtil.UNITS_IN_MILLIS.YEAR,
+      },
+      {
+        plural: 'ephemeralUnitsWeeks',
+        singular: 'ephemeralUnitsWeek',
+        unit: 'w',
+        value: z.util.TimeUtil.UNITS_IN_MILLIS.WEEK,
+      },
+      {
+        plural: 'ephemeralUnitsDays',
+        singular: 'ephemeralUnitsDay',
+        unit: 'd',
+        value: z.util.TimeUtil.UNITS_IN_MILLIS.DAY,
+      },
+      {
+        plural: 'ephemeralUnitsHours',
+        singular: 'ephemeralUnitsHour',
+        unit: 'h',
+        value: z.util.TimeUtil.UNITS_IN_MILLIS.HOUR,
+      },
+      {
+        plural: 'ephemeralUnitsMinutes',
+        singular: 'ephemeralUnitsMinute',
+        unit: 'm',
+        value: z.util.TimeUtil.UNITS_IN_MILLIS.MINUTE,
+      },
+      {
+        plural: 'ephemeralUnitsSeconds',
+        singular: 'ephemeralUnitsSecond',
+        unit: 's',
+        value: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND,
+      },
+    ];
+  },
 
   /**
    * Format milliseconds into 15s, 2m.
@@ -76,10 +87,10 @@ z.util.TimeUtil = {
    * @returns {Object} Unit, value and localized string
    */
   formatDuration: (duration, rounded = true, maximumUnits = 1) => {
-    const mappedUnits = z.util.TimeUtil.durationUnits.map((unit, index) => {
+    const mappedUnits = z.util.TimeUtil.durationUnits().map((unit, index) => {
       let value = duration;
       if (index > 0) {
-        value %= z.util.TimeUtil.durationUnits[index - 1].value;
+        value %= z.util.TimeUtil.durationUnits()[index - 1].value;
       }
       value /= unit.value;
       value = rounded && value >= 1 ? Math.round(value) : Math.floor(value);

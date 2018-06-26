@@ -1038,9 +1038,11 @@ describe('ConversationRepository', () => {
       conversationRepository.conversations([conversation]);
       const conversationPromise = Promise.resolve(conversation);
 
-      const inBoundValues = [1000, 5000, 12341234, 31557600000];
-      const outOfBoundValues = [1, 31557600001];
-      const expectedValues = inBoundValues.map(val => val.toString()).concat(['1000', '31557600000']);
+      const inBoundValues = [1000, 5000, 12341234, 31536000000];
+      const outOfBoundValues = [1, 999, 31536000001, 31557600000];
+      const expectedValues = inBoundValues
+        .map(val => val.toString())
+        .concat(['1000', '1000', '31536000000', '31536000000']);
 
       spyOn(conversationRepository.conversation_service, 'post_encrypted_message').and.returnValue(Promise.resolve({}));
       spyOn(conversationRepository.conversation_mapper, 'map_conversations').and.returnValue(conversationPromise);
