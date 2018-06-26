@@ -28,6 +28,7 @@ import {
   Columns,
   Column,
   Form,
+  ICON_NAME,
   InputSubmitCombo,
   Input,
   RoundIconButton,
@@ -129,6 +130,7 @@ class TeamName extends Component {
                         disabled={!enteredTeamName || !isValidTeamName}
                         type="submit"
                         formNoValidate
+                        icon={ICON_NAME.ARROW}
                         onClick={this.handleSubmit}
                         data-uie-name="do-next"
                       />

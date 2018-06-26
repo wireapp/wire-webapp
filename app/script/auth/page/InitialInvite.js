@@ -28,6 +28,7 @@ import {
   COLOR,
   CheckIcon,
   ContainerXS,
+  ICON_NAME,
   InputSubmitCombo,
   Input,
   RoundIconButton,
@@ -139,8 +140,8 @@ class InitialInvite extends React.PureComponent {
                 />
                 <RoundIconButton
                   disabled={isFetching || !enteredEmail}
-                  icon="plane"
                   type="submit"
+                  icon={ICON_NAME.PLANE}
                   data-uie-name="do-send-invite"
                   formNoValidate
                 />
