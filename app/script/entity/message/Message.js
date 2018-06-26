@@ -82,7 +82,7 @@ z.entity.Message = class Message {
     this.category = undefined;
 
     this.display_timestamp_short = () => {
-      const date = moment.unix(this.timestamp() / 1000);
+      const date = moment.unix(this.timestamp() / z.util.TimeUtil.UNITS_IN_MILLIS.SECOND);
       return date.local().format('HH:mm');
     };
 

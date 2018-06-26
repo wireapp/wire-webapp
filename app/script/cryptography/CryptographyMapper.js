@@ -175,7 +175,9 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
     const audioData = original.audio;
     if (audioData) {
       const loudnessArray = audioData.normalized_loudness ? audioData.normalized_loudness.toArrayBuffer() : [];
-      const durationInSeconds = audioData.duration_in_millis ? audioData.duration_in_millis / 1000 : 0;
+      const durationInSeconds = audioData.duration_in_millis
+        ? audioData.duration_in_millis / z.util.TimeUtil.UNITS_IN_MILLIS.SECOND
+        : 0;
 
       return {
         duration: durationInSeconds,

@@ -33,7 +33,7 @@ z.notification.NotificationRepository = class NotificationRepository {
     return {
       BODY_LENGTH: 80,
       ICON_URL: '/image/logo/notification.png',
-      TIMEOUT: 5 * 1000,
+      TIMEOUT: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND * 5,
       TITLE_LENGTH: 38,
     };
   }

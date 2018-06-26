@@ -27,10 +27,10 @@ z.service.BackendClient = class BackendClient {
     return {
       CONNECTIVITY_CHECK: {
         INITIAL_TIMEOUT: 0,
-        RECHECK_TIMEOUT: 2000,
-        REQUEST_TIMEOUT: 500,
+        RECHECK_TIMEOUT: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND * 2,
+        REQUEST_TIMEOUT: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND * 0.5,
       },
-      QUEUE_CHECK_TIMEOUT: 60 * 1000,
+      QUEUE_CHECK_TIMEOUT: z.util.TimeUtil.UNITS_IN_MILLIS.MINUTE,
     };
   }
 
