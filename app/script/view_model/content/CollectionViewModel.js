@@ -72,7 +72,7 @@ z.viewModel.content.CollectionViewModel = class CollectionViewModel {
   itemAdded(messageEntity) {
     const isCurrentConversation = this.conversationEntity().id === messageEntity.conversation_id;
     if (isCurrentConversation) {
-      this._populate_items([messageEntity]);
+      this._populateItems([messageEntity]);
     }
   }
 
@@ -85,10 +85,7 @@ z.viewModel.content.CollectionViewModel = class CollectionViewModel {
   }
 
   messageRemoved(messageEntity) {
-    const isCurrentConversation = this.conversationEntity().id === messageEntity.conversation_id;
-    if (isCurrentConversation) {
-      this.itemRemoved(messageEntity.id);
-    }
+    this.itemRemoved(messageEntity.id, messageEntity.conversation_id);
   }
 
   removedFromView() {
@@ -107,11 +104,11 @@ z.viewModel.content.CollectionViewModel = class CollectionViewModel {
 
       this.conversation_repository
         .get_events_for_category(conversationEntity, z.message.MessageCategory.LINK_PREVIEW)
-        .then(messageEntities => this._populate_items(messageEntities));
+        .then(messageEntities => this._populateItems(messageEntities));
     }
   }
 
-  _populate_items(messageEntities) {
+  _populateItems(messageEntities) {
     messageEntities.forEach(messageEntity => {
       if (!messageEntity.is_expired()) {
         // TODO: create binary map helper
