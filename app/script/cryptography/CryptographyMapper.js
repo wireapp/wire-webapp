@@ -264,7 +264,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
     const millisecondsAsNumber = genericMessage.ephemeral.expire_after_millis.toNumber();
     genericMessage.ephemeral.message_id = genericMessage.message_id;
 
-    const clampedTimer = z.conversation.ConversationEphemeralHandler.clampTimer(millisecondsAsNumber);
+    const clampedTimer = z.conversation.ConversationEphemeralHandler.validateTimer(millisecondsAsNumber);
 
     const embedded_message = this._mapGenericMessage(genericMessage.ephemeral, event);
     embedded_message.ephemeral_expires = clampedTimer;
