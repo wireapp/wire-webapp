@@ -26,7 +26,7 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
   .AbstractConversationEventHandler {
   static get CONFIG() {
     return {
-      INTERVAL_TIME: 250,
+      INTERVAL_TIME: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND * 0.25,
       TIMER_RANGE: {
         MAX: z.util.TimeUtil.UNITS_IN_MILLIS.YEAR,
         MIN: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND,

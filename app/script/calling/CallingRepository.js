@@ -1025,7 +1025,7 @@ z.calling.CallingRepository = class CallingRepository {
           action: () => {
             const terminationReason = z.calling.enum.TERMINATION_REASON.CONCURRENT_CALL;
             amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, ongoingCallId, terminationReason);
-            window.setTimeout(resolve, 1000);
+            window.setTimeout(resolve, z.util.TimeUtil.UNITS_IN_MILLIS.SECOND);
           },
           close: () => {
             const isIncomingCall = callState === z.calling.enum.CALL_STATE.INCOMING;
@@ -1549,8 +1549,9 @@ z.calling.CallingRepository = class CallingRepository {
       if (callingConfig) {
         this._clearConfigTimeout();
 
-        const ttl = callingConfig.ttl * 0.9 || CallingRepository.CONFIG.DEFAULT_CONFIG_TTL;
-        const timeout = Math.min(ttl, CallingRepository.CONFIG.DEFAULT_CONFIG_TTL) * 1000;
+        const {DEFAULT_CONFIG_TTL} = CallingRepository.CONFIG;
+        const ttl = callingConfig.ttl * 0.9 || DEFAULT_CONFIG_TTL;
+        const timeout = Math.min(ttl, DEFAULT_CONFIG_TTL) * z.util.TimeUtil.UNITS_IN_MILLIS.SECOND;
         const expirationDate = new Date(Date.now() + timeout);
         callingConfig.expiration = expirationDate;
 

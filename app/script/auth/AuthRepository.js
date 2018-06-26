@@ -25,7 +25,7 @@ window.z.auth = z.auth || {};
 z.auth.AuthRepository = class AuthRepository {
   static get CONFIG() {
     return {
-      REFRESH_THRESHOLD: 60 * 1000,
+      REFRESH_THRESHOLD: z.util.TimeUtil.UNITS_IN_MILLIS.MINUTE,
     };
   }
 
@@ -200,7 +200,7 @@ z.auth.AuthRepository = class AuthRepository {
    * @returns {Object} Access token data
    */
   saveAccessToken(accessTokenData) {
-    const expiresInMillis = 1000 * accessTokenData.expires_in;
+    const expiresInMillis = accessTokenData.expires_in * z.util.TimeUtil.UNITS_IN_MILLIS.SECOND;
     const expirationTimestamp = Date.now() + expiresInMillis;
 
     z.util.StorageUtil.setValue(

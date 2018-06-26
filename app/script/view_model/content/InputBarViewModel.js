@@ -34,7 +34,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       IMAGE: {
         FILE_TYPES: ['image/bmp', 'image/gif', 'image/jpeg', 'image/jpg', 'image/png', '.jpg-large'],
       },
-      PING_TIMEOUT: 2000,
+      PING_TIMEOUT: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND * 2,
     };
   }
 

@@ -228,7 +228,7 @@ ko.bindingHandlers.file_select = {
         // wait before clearing to fix autotests
         window.setTimeout(() => {
           $(event.target).val(null);
-        }, 1000);
+        }, z.util.TimeUtil.UNITS_IN_MILLIS.SECOND);
       }
     };
 
@@ -386,13 +386,11 @@ ko.bindingHandlers.relative_timestamp = (function() {
   const timestamps = [];
 
   // should be fine to fire all 60 sec
-  window.setInterval(() => {
-    timestamps.map(timestamp_func => timestamp_func());
-  }, 60 * 1000);
+  window.setInterval(() => timestamps.map(timestamp_func => timestamp_func()), z.util.TimeUtil.UNITS_IN_MILLIS.MINUTE);
 
   const calculate = function(element, timestamp) {
     timestamp = window.parseInt(timestamp);
-    const date = moment.unix(timestamp / 1000);
+    const date = moment.unix(timestamp / z.util.TimeUtil.UNITS_IN_MILLIS.SECOND);
 
     const now = moment().local();
     const today = now.format('YYMMDD');

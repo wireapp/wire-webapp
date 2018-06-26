@@ -160,5 +160,5 @@ z.util.TimeUtil = {
 
   getCurrentDate: () => new Date().toISOString().substring(0, 10),
 
-  getUnixTimestamp: () => Math.floor(Date.now() / 1000),
+  getUnixTimestamp: () => Math.floor(Date.now() / z.util.TimeUtil.UNITS_IN_MILLIS.SECOND),
 };

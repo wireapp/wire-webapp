@@ -25,7 +25,7 @@ window.z.event = z.event || {};
 z.event.EventRepository = class EventRepository {
   static get CONFIG() {
     return {
-      E_CALL_EVENT_LIFETIME: 30 * 1000, // 30 seconds
+      E_CALL_EVENT_LIFETIME: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND * 30,
       IGNORED_ERRORS: [
         z.cryptography.CryptographyError.TYPE.IGNORED_ASSET,
         z.cryptography.CryptographyError.TYPE.IGNORED_PREVIEW,

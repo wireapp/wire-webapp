@@ -131,7 +131,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
           window.setTimeout(() => {
             this.conversation_repository.mark_as_read(this.mark_as_read_on_focus);
             this.mark_as_read_on_focus = undefined;
-          }, 1000);
+          }, z.util.TimeUtil.UNITS_IN_MILLIS.SECOND);
         }
       });
 
