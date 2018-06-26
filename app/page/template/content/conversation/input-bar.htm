@@ -24,7 +24,7 @@
                              resize_callback: scrollMessageList,
                              click: onInputClick,
                              attr: {'placeholder': inputPlaceholder},
-                             css: {'conversation-input-bar-text--accent': !!conversationEntity().localMessageTimer()},
+                             css: {'conversation-input-bar-text--accent': hasLocalEphemeralTimer()},
                              paste_file: onPasteFiles"
                   data-uie-name="input-message"
                   dir="auto">
