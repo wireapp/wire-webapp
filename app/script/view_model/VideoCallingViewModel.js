@@ -25,8 +25,8 @@ window.z.viewModel = z.viewModel || {};
 z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
   static get CONFIG() {
     return {
-      AUTO_MINIMIZE_TIMEOUT: 4 * 1000,
-      HIDE_CONTROLS_TIMEOUT: 4 * 1000,
+      AUTO_MINIMIZE_TIMEOUT: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND * 4,
+      HIDE_CONTROLS_TIMEOUT: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND * 4,
     };
   }
 

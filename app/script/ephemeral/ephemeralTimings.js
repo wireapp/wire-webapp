@@ -25,12 +25,12 @@ window.z.ephemeral = z.ephemeral || {};
 z.ephemeral.timings = class {
   static get VALUES() {
     return [
-      1000 * 10,
-      1000 * 60 * 5,
-      1000 * 60 * 60,
-      1000 * 60 * 60 * 24,
-      1000 * 60 * 60 * 24 * 7,
-      1000 * 60 * 60 * 24 * 28,
+      z.util.TimeUtil.UNITS_IN_MILLIS.SECOND * 10,
+      z.util.TimeUtil.UNITS_IN_MILLIS.MINUTE * 5,
+      z.util.TimeUtil.UNITS_IN_MILLIS.HOUR,
+      z.util.TimeUtil.UNITS_IN_MILLIS.DAY,
+      z.util.TimeUtil.UNITS_IN_MILLIS.WEEK,
+      z.util.TimeUtil.UNITS_IN_MILLIS.WEEK * 4,
     ];
   }
 };

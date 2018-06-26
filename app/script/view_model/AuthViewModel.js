@@ -34,7 +34,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
         z.auth.URLParameter.LOCALE,
         z.auth.URLParameter.TRACKING,
       ],
-      RESET_TIMEOUT: 2000,
+      RESET_TIMEOUT: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND * 2,
     };
   }
 
