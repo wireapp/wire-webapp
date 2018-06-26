@@ -117,12 +117,14 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
     const isExpired = !!this._updateTimedMessage(messageEntity);
     if (!isExpired) {
       const {id, conversation_id: conversationId} = messageEntity;
-
-      const isAlreadyAdded = this.timedMessages().some(timedMessageEntity => {
+      const matchingMessageEntity = this.timedMessages().find(timedMessageEntity => {
         const {conversation_id: timedConversationId, id: timedMessageId} = timedMessageEntity;
         return timedMessageId === id && timedConversationId === conversationId;
       });
-      if (!isAlreadyAdded) {
+
+      if (matchingMessageEntity) {
+        this.timedMessages.replace(matchingMessageEntity, messageEntity);
+      } else {
         this.timedMessages.push(messageEntity);
       }
 
@@ -136,35 +138,35 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
       .filter(messageEntity => messageEntity);
   }
 
-  _obfuscateAssetMessage(assetEntity) {
-    const asset = assetEntity.get_first_asset();
-    assetEntity.ephemeral_expires(true);
+  _obfuscateAssetMessage(messageEntity) {
+    messageEntity.ephemeral_expires(true);
 
-    this.conversationService.update_message_in_db(assetEntity, {
+    const assetEntity = messageEntity.get_first_asset();
+    this.conversationService.update_message_in_db(messageEntity, {
       data: {
-        content_type: asset.file_type,
+        content_type: assetEntity.file_type,
         meta: {},
       },
       ephemeral_expires: true,
     });
-    this.logger.info(`Obfuscated asset message '${assetEntity.id}'`);
+    this.logger.info(`Obfuscated asset message '${messageEntity.id}'`);
   }
 
-  _obfuscateImageMessage(assetEntity) {
-    const asset = assetEntity.get_first_asset();
-    assetEntity.ephemeral_expires(true);
+  _obfuscateImageMessage(messageEntity) {
+    messageEntity.ephemeral_expires(true);
 
-    this.conversationService.update_message_in_db(assetEntity, {
+    const assetEntity = messageEntity.get_first_asset();
+    this.conversationService.update_message_in_db(messageEntity, {
       data: {
         info: {
-          height: asset.height,
+          height: assetEntity.height,
           tag: 'medium',
-          width: asset.width,
+          width: assetEntity.width,
         },
       },
       ephemeral_expires: true,
     });
-    this.logger.info(`Obfuscated image message '${assetEntity.id}'`);
+    this.logger.info(`Obfuscated image message '${messageEntity.id}'`);
   }
 
   _obfuscateMessage(messageEntity) {
@@ -180,19 +182,20 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
   }
 
   _obfuscateTextMessage(messageEntity) {
-    const asset = messageEntity.get_first_asset();
+    messageEntity.ephemeral_expires(true);
+
+    const assetEntity = messageEntity.get_first_asset();
     const obfuscatedAsset = new z.entity.Text(messageEntity.id);
-    const obfuscatedPreviews = asset.previews().map(linkPreview => {
+    const obfuscatedPreviews = assetEntity.previews().map(linkPreview => {
       linkPreview.obfuscate();
       const article = new z.proto.Article(linkPreview.url, linkPreview.title); // deprecated format
       return new z.proto.LinkPreview(linkPreview.url, 0, article, linkPreview.url, linkPreview.title).encode64();
     });
 
-    obfuscatedAsset.text = z.util.StringUtil.obfuscate(asset.text);
-    obfuscatedAsset.previews(asset.previews());
+    obfuscatedAsset.text = z.util.StringUtil.obfuscate(assetEntity.text);
+    obfuscatedAsset.previews(assetEntity.previews());
 
     messageEntity.assets([obfuscatedAsset]);
-    messageEntity.ephemeral_expires(true);
 
     this.conversationService.update_message_in_db(messageEntity, {
       data: {
