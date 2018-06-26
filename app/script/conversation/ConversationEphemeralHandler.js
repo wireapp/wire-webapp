@@ -30,8 +30,11 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
     };
   }
 
-  constructor(conversationService, conversationMapper) {
+  constructor(conversationService, conversationMapper, eventListeners) {
     super();
+
+    const defaultEventListeners = {onMessageTimeout: () => {}};
+    this.eventListeners = Object.assign({}, defaultEventListeners, eventListeners);
 
     this.setEventHandlingConfig({
       [z.event.Backend.CONVERSATION.MESSAGE_TIMER_UPDATE]: this._updateEphemeralTimer.bind(this),
@@ -203,7 +206,7 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
         this._obfuscateMessage(messageEntity);
       }
 
-      amplify.publish(z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, messageEntity);
+      this.eventListeners.onMessageTimeout(messageEntity);
     }
   }
 

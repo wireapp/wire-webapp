@@ -156,7 +156,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
     );
     this.ephemeralHandler = new z.conversation.ConversationEphemeralHandler(
       this.conversation_service,
-      this.conversation_mapper
+      this.conversation_mapper,
+      {onMessageTimeout: this.handleMessageExpiration.bind(this)}
     );
     this.checkMessageTimer = this.ephemeralHandler.checkMessageTimer;
   }
@@ -197,7 +198,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   _init_subscriptions() {
     amplify.subscribe(z.event.WebApp.CONVERSATION.ASSET.CANCEL, this.cancel_asset_upload.bind(this));
-    amplify.subscribe(z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, this.handleMessageExpiration.bind(this));
     amplify.subscribe(z.event.WebApp.CONVERSATION.EVENT_FROM_BACKEND, this.onConversationEvent.bind(this));
     amplify.subscribe(z.event.WebApp.CONVERSATION.MAP_CONNECTION, this.map_connection.bind(this));
     amplify.subscribe(z.event.WebApp.CONVERSATION.MISSED_EVENTS, this.on_missed_events.bind(this));
@@ -3391,6 +3391,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   handleMessageExpiration(messageEntity) {
+    amplify.publish(z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, messageEntity);
     if (!messageEntity.user().is_me) {
       this.get_conversation_by_id(messageEntity.conversation_id).then(conversationEntity => {
         if (conversationEntity.is_group()) {
