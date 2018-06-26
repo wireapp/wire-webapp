@@ -28,8 +28,8 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
     return {
       INTERVAL_TIME: 250,
       TIMER_RANGE: {
-        MAX: 31557600000,
-        MIN: 1000,
+        MAX: z.util.TimeUtil.UNITS_IN_MILLIS.YEAR,
+        MIN: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND,
       },
     };
   }
