@@ -2155,7 +2155,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return message_mapped;
       })
       .then(message_stored => {
-        if (generic_message.content === z.cryptography.GENERIC_MESSAGE_TYPE.KNOCK) {
+        const {KNOCK: TYPE_KNOCK, EPHEMERAL: TYPE_EPHEMERAL} = z.cryptography.GENERIC_MESSAGE_TYPE;
+        const isPing = message => message.content === TYPE_KNOCK;
+        const isEphemeralPing = message => message.content === TYPE_EPHEMERAL && isPing(message.ephemeral);
+        const shouldPlayPingAudio = isPing(generic_message) || isEphemeralPing(generic_message);
+        if (shouldPlayPingAudio) {
           amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.OUTGOING_PING);
         }
 
