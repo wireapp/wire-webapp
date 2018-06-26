@@ -33,7 +33,7 @@ z.util.TimeUtil = {
       plural: 'ephemeralUnitsYears',
       singular: 'ephemeralUnitsYear',
       unit: 'y',
-      value: 1000 * 60 * 60 * 24 * 365.25,
+      value: 1000 * 60 * 60 * 24 * 365,
     },
     {
       plural: 'ephemeralUnitsWeeks',
@@ -69,6 +69,7 @@ z.util.TimeUtil = {
 
   /**
    * Format milliseconds into 15s, 2m.
+   * @note Implementation based on: https://gist.github.com/deanrobertcook/7168b38150c303a2b4196216913d34c1
    * @param {number} duration - Duration to format in milliseconds
    * @param {boolean} rounded - Enables rounding of numbers
    * @param {number} maximumUnits - Maximum number of units shown in the textual representation
