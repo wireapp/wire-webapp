@@ -1805,7 +1805,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         ];
 
         if (initiating_call_message.includes(call_message_et.type)) {
-          return this._track_contributed(conversation_et, generic_message, call_message_et);
+          return this._trackContributed(conversation_et, generic_message, call_message_et);
         }
       })
       .catch(error => {
@@ -2167,7 +2167,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
         return this.send_generic_message_to_conversation(conversation_et.id, generic_message)
           .then(payload => {
-            this._track_contributed(conversation_et, generic_message);
+            this._trackContributed(conversation_et, generic_message);
 
             const backend_iso_date = sync_timestamp ? payload.time : '';
             return this._update_message_as_sent(conversation_et, message_stored, backend_iso_date);
@@ -3727,54 +3727,54 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Track generic messages for media actions.
    *
    * @private
-   * @param {Conversation} conversation_et - Conversation entity
-   * @param {z.proto.GenericMessage} generic_message - Protobuf message
-   * @param {z.calling.entities.CallMessageEntity} call_message_et - Optional call message
+   * @param {Conversation} conversationEntity - Conversation entity
+   * @param {z.proto.GenericMessage} genericMessage - Protobuf message
+   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Optional call message
    * @returns {undefined} No return value
    */
-  _track_contributed(conversation_et, generic_message, call_message_et) {
-    let ephemeral_time;
+  _trackContributed(conversationEntity, genericMessage, callMessageEntity) {
+    let messageTimer;
     let message;
-    let message_content_type;
+    let messageContentType;
 
-    const is_ephemeral = generic_message.content === z.cryptography.GENERIC_MESSAGE_TYPE.EPHEMERAL;
-    if (is_ephemeral) {
-      message = generic_message.ephemeral;
-      message_content_type = generic_message.ephemeral.content;
-      ephemeral_time = generic_message.ephemeral.expire_after_millis / 1000;
+    const isEphemeral = genericMessage.content === z.cryptography.GENERIC_MESSAGE_TYPE.EPHEMERAL;
+    if (isEphemeral) {
+      message = genericMessage.ephemeral;
+      messageContentType = genericMessage.ephemeral.content;
+      messageTimer = genericMessage.ephemeral.expire_after_millis / 1000;
     } else {
-      message = generic_message;
-      message_content_type = generic_message.content;
+      message = genericMessage;
+      messageContentType = genericMessage.content;
     }
 
-    let action_type;
-    switch (message_content_type) {
+    let actionType;
+    switch (messageContentType) {
       case 'asset': {
         if (message.asset.original !== null) {
-          action_type = message.asset.original.image !== null ? 'photo' : 'file';
+          actionType = message.asset.original.image !== null ? 'photo' : 'file';
         }
         break;
       }
 
       case 'calling': {
-        const {properties} = call_message_et;
-        action_type = properties.videosend === z.calling.enum.PROPERTY_STATE.TRUE ? 'video_call' : 'audio_call';
+        const {properties} = callMessageEntity;
+        actionType = properties.videosend === z.calling.enum.PROPERTY_STATE.TRUE ? 'video_call' : 'audio_call';
         break;
       }
 
       case 'image': {
-        action_type = 'photo';
+        actionType = 'photo';
         break;
       }
 
       case 'knock': {
-        action_type = 'ping';
+        actionType = 'ping';
         break;
       }
 
       case 'text': {
         if (!message.text.link_preview.length) {
-          action_type = 'text';
+          actionType = 'text';
         }
         break;
       }
@@ -3783,18 +3783,19 @@ z.conversation.ConversationRepository = class ConversationRepository {
         break;
     }
 
-    if (action_type) {
+    if (actionType) {
       const attributes = {
-        action: action_type,
-        conversation_type: z.tracking.helpers.get_conversation_type(conversation_et),
-        ephemeral_time: is_ephemeral ? ephemeral_time : undefined,
-        is_ephemeral: is_ephemeral,
-        with_service: conversation_et.isWithBot(),
+        action: actionType,
+        conversation_type: z.tracking.helpers.get_conversation_type(conversationEntity),
+        ephemeral_time: isEphemeral ? messageTimer : undefined,
+        is_ephemeral: isEphemeral,
+        is_global_ephemeral: !!conversationEntity.globalMessageTimer(),
+        with_service: conversationEntity.isWithBot(),
       };
 
-      const isTeamConversation = !!conversation_et.team_id;
+      const isTeamConversation = !!conversationEntity.team_id;
       if (isTeamConversation) {
-        Object.assign(attributes, z.tracking.helpers.getGuestAttributes(conversation_et));
+        Object.assign(attributes, z.tracking.helpers.getGuestAttributes(conversationEntity));
       }
 
       amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONTRIBUTED, attributes);
