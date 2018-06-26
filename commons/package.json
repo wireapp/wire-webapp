@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@types/node": "10.3.5"
+    "@types/node": "10.3.6"
   },
   "devDependencies": {
     "jasmine": "3.1.0",
