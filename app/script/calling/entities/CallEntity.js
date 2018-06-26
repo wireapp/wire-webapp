@@ -31,7 +31,7 @@ z.calling.entities.CallEntity = class CallEntity {
         MAXIMUM_TIMEOUT: 90,
         MINIMUM_TIMEOUT: 60,
       },
-      STATE_TIMEOUT: 30 * z.util.TimeUtil.UNITS_IN_MILLIS.SECOND,
+      STATE_TIMEOUT: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND * 30,
       TIMER: {
         INIT_THRESHOLD: 100,
         UPDATE_INTERVAL: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND,

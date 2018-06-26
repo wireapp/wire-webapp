@@ -28,7 +28,7 @@ z.main.App = class App {
       COOKIES_CHECK: {
         COOKIE_NAME: 'cookies_enabled',
       },
-      NOTIFICATION_CHECK: 10 * z.util.TimeUtil.UNITS_IN_MILLIS.SECOND,
+      NOTIFICATION_CHECK: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND * 10,
       SIGN_OUT_REASONS: {
         IMMEDIATE: [
           z.auth.SIGN_OUT_REASON.ACCOUNT_DELETED,
