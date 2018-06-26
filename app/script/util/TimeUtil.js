@@ -28,67 +28,73 @@ z.util.TimeUtil = {
     return Date.now() - timeOffset;
   },
 
+  durationUnits: [
+    {
+      plural: 'ephemeralUnitsYears',
+      singular: 'ephemeralUnitsYear',
+      unit: 'y',
+      value: 1000 * 60 * 60 * 24 * 365,
+    },
+    {
+      plural: 'ephemeralUnitsWeeks',
+      singular: 'ephemeralUnitsWeek',
+      unit: 'w',
+      value: 1000 * 60 * 60 * 24 * 7,
+    },
+    {
+      plural: 'ephemeralUnitsDays',
+      singular: 'ephemeralUnitsDay',
+      unit: 'd',
+      value: 1000 * 60 * 60 * 24,
+    },
+    {
+      plural: 'ephemeralUnitsHours',
+      singular: 'ephemeralUnitsHour',
+      unit: 'h',
+      value: 1000 * 60 * 60,
+    },
+    {
+      plural: 'ephemeralUnitsMinutes',
+      singular: 'ephemeralUnitsMinute',
+      unit: 'm',
+      value: 1000 * 60,
+    },
+    {
+      plural: 'ephemeralUnitsSeconds',
+      singular: 'ephemeralUnitsSecond',
+      unit: 's',
+      value: 1000,
+    },
+  ],
+
   /**
    * Format milliseconds into 15s, 2m.
+   * @note Implementation based on: https://gist.github.com/deanrobertcook/7168b38150c303a2b4196216913d34c1
    * @param {number} duration - Duration to format in milliseconds
+   * @param {boolean} rounded - Enables rounding of numbers
    * @param {number} maximumUnits - Maximum number of units shown in the textual representation
    * @returns {Object} Unit, value and localized string
    */
-  formatDuration: (duration, maximumUnits = 1) => {
-    const momentDuration = moment.duration(duration);
-    const units = [
-      {
-        plural: z.string.ephemeralUnitsYears,
-        singular: z.string.ephemeralUnitsYear,
-        unit: 'y',
-        value: momentDuration.years(),
-      },
-      {
-        plural: z.string.ephemeralUnitsMonths,
-        singular: z.string.ephemeralUnitsMonth,
-        unit: 'M',
-        value: momentDuration.months(),
-      },
-      {
-        plural: z.string.ephemeralUnitsWeeks,
-        singular: z.string.ephemeralUnitsWeek,
-        unit: 'w',
-        value: momentDuration.weeks(),
-      },
-      {
-        plural: z.string.ephemeralUnitsDays,
-        singular: z.string.ephemeralUnitsDay,
-        unit: 'd',
-        value: momentDuration.days() % 7,
-      },
-      {
-        plural: z.string.ephemeralUnitsHours,
-        singular: z.string.ephemeralUnitsHour,
-        unit: 'h',
-        value: momentDuration.hours(),
-      },
-      {
-        plural: z.string.ephemeralUnitsMinutes,
-        singular: z.string.ephemeralUnitsMinute,
-        unit: 'm',
-        value: momentDuration.minutes(),
-      },
-      {
-        plural: z.string.ephemeralUnitsSeconds,
-        singular: z.string.ephemeralUnitsSecond,
-        unit: 's',
-        value: momentDuration.seconds(),
-      },
-    ];
-    const validUnits = units.filter(unit => unit.value > 0).slice(0, maximumUnits);
+  formatDuration: (duration, rounded = true, maximumUnits = 1) => {
+    const mappedUnits = z.util.TimeUtil.durationUnits.map((unit, index) => {
+      let value = duration;
+      if (index > 0) {
+        value %= z.util.TimeUtil.durationUnits[index - 1].value;
+      }
+      value /= unit.value;
+      value = rounded && value >= 1 ? Math.round(value) : Math.floor(value);
+      const longUnit = z.string[value === 1 ? unit.singular : unit.plural];
+      return {
+        longUnit,
+        unit: unit.unit,
+        value,
+      };
+    });
 
-    const longText = validUnits
-      .map(unit => {
-        const isSingular = unit.value === 1;
-        return isSingular ? `1 ${z.l10n.text(unit.singular)}` : `${unit.value} ${z.l10n.text(unit.plural)}`;
-      })
-      .join(', ');
-
+    const firstNonZeroUnit = mappedUnits.find(unit => unit.value > 0);
+    const startIndex = mappedUnits.indexOf(firstNonZeroUnit);
+    const validUnits = mappedUnits.slice(startIndex, startIndex + maximumUnits);
+    const longText = validUnits.map(unit => `${unit.value} ${z.l10n.text(unit.longUnit)}`).join(', ');
     const upperUnit = validUnits[0] || {};
 
     return {
