@@ -40,7 +40,7 @@ z.entity.Message = class Message {
     this.super_type = super_type;
     this.ephemeral_caption = ko.pureComputed(() => {
       const remainingTime = this.ephemeral_remaining();
-      return remainingTime ? z.util.TimeUtil.formatDuration(remainingTime, 3).text : '';
+      return remainingTime ? z.util.TimeUtil.formatDuration(remainingTime, false, 3).text : '';
     });
     this.ephemeral_duration = ko.observable(0);
     this.ephemeral_remaining = ko.observable(0);

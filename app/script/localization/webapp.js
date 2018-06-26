@@ -822,7 +822,5 @@ z.string.ephemeralUnitsDay = 'day';
 z.string.ephemeralUnitsDays = 'days';
 z.string.ephemeralUnitsWeek = 'week';
 z.string.ephemeralUnitsWeeks = 'weeks';
-z.string.ephemeralUnitsMonth = 'month';
-z.string.ephemeralUnitsMonths = 'months';
 z.string.ephemeralUnitsYear = 'year';
 z.string.ephemeralUnitsYears = 'years';
