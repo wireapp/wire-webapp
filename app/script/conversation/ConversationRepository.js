@@ -2089,9 +2089,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   _wrap_in_ephemeral_message(generic_message, millis) {
     const ephemeral = new z.proto.Ephemeral();
-    const clampedTimer = z.conversation.ConversationEphemeralHandler.validateTimer(millis);
-
-    ephemeral.set('expire_after_millis', clampedTimer);
+    ephemeral.set('expire_after_millis', z.conversation.ConversationEphemeralHandler.validateTimer(millis));
     ephemeral.set(generic_message.content, generic_message[generic_message.content]);
 
     generic_message = new z.proto.GenericMessage(generic_message.message_id);

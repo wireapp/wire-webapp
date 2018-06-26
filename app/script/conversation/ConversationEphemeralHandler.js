@@ -223,8 +223,7 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
    * @returns {Promise} Resolves when the event was handled
    */
   _updateEphemeralTimer(conversationEntity, eventJson) {
-    const clampedTimer = ConversationEphemeralHandler.validateTimer(eventJson.data.message_timer);
-    const updates = {globalMessageTimer: clampedTimer};
+    const updates = {globalMessageTimer: ConversationEphemeralHandler.validateTimer(eventJson.data.message_timer)};
     this.conversationMapper.update_properties(conversationEntity, updates);
     return Promise.resolve(conversationEntity);
   }
