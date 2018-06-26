@@ -3391,14 +3391,15 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   handleMessageExpiration(messageEntity) {
     amplify.publish(z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, messageEntity);
-    if (!messageEntity.user().is_me) {
+    const shouldDeleteMessage = !messageEntity.user().is_me || messageEntity.is_ping();
+    if (shouldDeleteMessage) {
       this.get_conversation_by_id(messageEntity.conversation_id).then(conversationEntity => {
         if (conversationEntity.is_group()) {
           const user_ids = _.union([this.selfUser().id], [messageEntity.from]);
           return this.delete_message_everyone(conversationEntity, messageEntity, user_ids);
         }
 
-        return this.delete_message_everyone(conversationEntity, messageEntity);
+        this.delete_message_everyone(conversationEntity, messageEntity);
       });
     }
   }
