@@ -1,3 +1,4 @@
+/* eslint-disable no-magic-numbers, no-unused-vars */
 //@ts-check
 
 process.on('uncaughtException', error =>
@@ -7,8 +8,9 @@ process.on('unhandledRejection', error =>
   console.error(`Uncaught rejection "${error.constructor.name}" (code: ${error.code}): ${error.message}`, error)
 );
 
-const path = require('path');
 const logdown = require('logdown');
+const path = require('path');
+const TimeUnits = require('./TimeUnits');
 require('dotenv').config({path: path.join(__dirname, 'echo2.env')});
 
 const logger = logdown('@wireapp/core/demo/sender.js', {
@@ -55,6 +57,12 @@ const {FileEngine} = require('@wireapp/store-engine');
     setTimeout(async () => {
       await account.service.conversation.deleteMessageEveryone(CONVERSATION_ID, messageId);
     }, fiveSecondsInMillis);
+  }
+
+  async function sendConversationLevelTimer(timeInMillis = TimeUnits.ONE_YEAR_IN_MILLIS) {
+    await account.service.conversation.apiClient.conversation.api.putConversationMessageTimer(CONVERSATION_ID, {
+      message_timer: timeInMillis,
+    });
   }
 
   async function sendEphemeralText(expiry = MESSAGE_TIMER) {
