@@ -40,9 +40,9 @@ z.event.WebSocketService = class WebSocketService {
 
   static get CONFIG() {
     return {
-      PING_INTERVAL: 30000,
-      PING_INTERVAL_THRESHOLD: 2000,
-      RECONNECT_INTERVAL: 15000,
+      PING_INTERVAL: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND * 30,
+      PING_INTERVAL_THRESHOLD: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND * 2,
+      RECONNECT_INTERVAL: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND * 15,
     };
   }
 

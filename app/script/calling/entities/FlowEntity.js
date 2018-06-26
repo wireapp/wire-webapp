@@ -27,10 +27,10 @@ z.calling.entities.FlowEntity = class FlowEntity {
   static get CONFIG() {
     return {
       DATA_CHANNEL_LABEL: 'calling-3.0',
-      NEGOTIATION_FAILED_TIMEOUT: 30 * 1000 + 500,
-      NEGOTIATION_RESTART_TIMEOUT: 2500,
-      SDP_SEND_TIMEOUT: 5 * 1000,
-      SDP_SEND_TIMEOUT_RESET: 1000,
+      NEGOTIATION_FAILED_TIMEOUT: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND * 30.5,
+      NEGOTIATION_RESTART_TIMEOUT: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND * 2.5,
+      SDP_SEND_TIMEOUT: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND * 5,
+      SDP_SEND_TIMEOUT_RESET: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND,
     };
   }
 

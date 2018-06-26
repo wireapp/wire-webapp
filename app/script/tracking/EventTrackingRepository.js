@@ -34,7 +34,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
     return {
       ERROR_REPORTING: {
         API_KEY: RAYGUN_API_KEY,
-        REPORTING_THRESHOLD: 60 * 1000, // milliseconds
+        REPORTING_THRESHOLD: z.util.TimeUtil.UNITS_IN_MILLIS.MINUTE, // milliseconds
       },
       USER_ANALYTICS: {
         API_KEY: MIXPANEL_TOKEN,

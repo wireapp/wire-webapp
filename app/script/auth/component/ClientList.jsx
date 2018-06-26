@@ -55,7 +55,8 @@ class ClientList extends React.Component {
 
   removeClient = (clientId, password) => {
     this.setState({showLoading: true});
-    this.loadingTimeout = window.setTimeout(this.resetLoadingSpinner.bind(this), 1000);
+    const timeout = z.util.TimeUtil.UNITS_IN_MILLIS.SECOND;
+    this.loadingTimeout = window.setTimeout(this.resetLoadingSpinner.bind(this), timeout);
     return Promise.resolve()
       .then(() => this.props.doRemoveClient(clientId, password))
       .then(() => {
