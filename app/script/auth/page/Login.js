@@ -24,6 +24,7 @@ import {
   Columns,
   Column,
   Form,
+  ICON_NAME,
   InputSubmitCombo,
   Input,
   InputBlock,
@@ -312,6 +313,7 @@ class Login extends React.PureComponent {
                           disabled={!email || !password}
                           type="submit"
                           formNoValidate
+                          icon={ICON_NAME.ARROW}
                           onClick={this.handleSubmit}
                           data-uie-name="do-sign-in"
                         />

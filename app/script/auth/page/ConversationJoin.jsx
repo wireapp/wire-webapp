@@ -24,6 +24,7 @@ import {
   Small,
   Form,
   Button,
+  ICON_NAME,
   InputSubmitCombo,
   Input,
   RoundIconButton,
@@ -269,6 +270,7 @@ class ConversationJoin extends Component {
               disabled={!enteredName || !isValidName}
               type="submit"
               formNoValidate
+              icon={ICON_NAME.ARROW}
               onClick={this.handleSubmit}
               data-uie-name="do-next"
             />

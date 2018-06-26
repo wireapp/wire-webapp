@@ -503,9 +503,9 @@
     "@webassemblyjs/wast-parser" "1.5.12"
     long "^3.2.0"
 
-"@wireapp/api-client@1.4.0":
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-1.4.0.tgz#44345b62e36463c253d0518ee05fa757b8b574ed"
+"@wireapp/api-client@1.4.1":
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-1.4.1.tgz#bafe5df15865e062007426f6c7fb1eb0d9aef9d4"
   dependencies:
     "@types/node" "10.3.5"
     "@types/spark-md5" "3.0.0"
@@ -523,12 +523,12 @@
   version "3.0.51"
   resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-3.0.51.tgz#293e21c00838086a9d8128fe4ac3dba499a862f4"
 
-"@wireapp/core@3.6.0":
-  version "3.6.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-3.6.0.tgz#f044e221c6d834b939eef49d29508772b3446948"
+"@wireapp/core@3.6.2":
+  version "3.6.2"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-3.6.2.tgz#ed83304176e3e7f775fb0ff186d43746181e806b"
   dependencies:
     "@types/node" "10.3.5"
-    "@wireapp/api-client" "1.4.0"
+    "@wireapp/api-client" "1.4.1"
     "@wireapp/cryptobox" "8.5.2"
     "@wireapp/store-engine" "0.11.34"
     bazinga64 "5.2.6"
@@ -571,9 +571,9 @@
     ed2curve "0.2.1"
     libsodium-wrappers-sumo "0.7.3"
 
-"@wireapp/react-ui-kit@1.4.0":
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-1.4.0.tgz#49dd243dc3203b4c0ef217dda7c16207539315d0"
+"@wireapp/react-ui-kit@1.4.1":
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-1.4.1.tgz#be88bc23186d3343d5ec0243bf0142b5611b500e"
   dependencies:
     bazinga64 "5.2.6"
     color "3.0.0"
@@ -581,7 +581,7 @@
     react-dom "16.4.1"
     recompose "0.27.1"
     styled-components "3.3.3"
-    styled-normalize "4.0.0"
+    styled-normalize "8.0.0"
 
 "@wireapp/store-engine@0.11.34":
   version "0.11.34"
@@ -3616,9 +3616,9 @@ eslint-visitor-keys@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/eslint-visitor-keys/-/eslint-visitor-keys-1.0.0.tgz#3f3180fb2e291017716acb4c9d6d5b5c34a6a81d"
 
-eslint@5.0.0:
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/eslint/-/eslint-5.0.0.tgz#3576704f7377aca072da69c00862277c5fe57153"
+eslint@5.0.1:
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/eslint/-/eslint-5.0.1.tgz#109b90ab7f7a736f54e0f341c8bb9d09777494c3"
   dependencies:
     ajv "^6.5.0"
     babel-code-frame "^6.26.0"
@@ -9967,9 +9967,9 @@ styled-components@3.3.3:
     stylis-rule-sheet "^0.0.10"
     supports-color "^3.2.3"
 
-styled-normalize@4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/styled-normalize/-/styled-normalize-4.0.0.tgz#18437c655bc0c42a18f8b5345f1c310cce775c18"
+styled-normalize@8.0.0:
+  version "8.0.0"
+  resolved "https://registry.yarnpkg.com/styled-normalize/-/styled-normalize-8.0.0.tgz#54881c9389540bf9fb2a3d34dca2e2d4d68601f2"
 
 stylehacks@^2.3.2:
   version "2.3.2"
@@ -10452,9 +10452,9 @@ uglify-es@^3.3.4:
     commander "~2.13.0"
     source-map "~0.6.1"
 
-uglify-js@3.4.1:
-  version "3.4.1"
-  resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-3.4.1.tgz#006da540dc25e9319d106a99a5ef1d24ae04ce60"
+uglify-js@3.4.2:
+  version "3.4.2"
+  resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-3.4.2.tgz#70511a390eb62423675ba63c374ba1abf045116c"
   dependencies:
     commander "~2.15.0"
     source-map "~0.6.1"
@@ -10481,9 +10481,9 @@ uglify-to-browserify@~1.0.0:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/uglify-to-browserify/-/uglify-to-browserify-1.0.2.tgz#6e0924d6bda6b5afe349e39a6d632850a0f882b7"
 
-uglifyjs-webpack-plugin@1.2.6, uglifyjs-webpack-plugin@^1.2.4:
-  version "1.2.6"
-  resolved "https://registry.yarnpkg.com/uglifyjs-webpack-plugin/-/uglifyjs-webpack-plugin-1.2.6.tgz#f4bb44f02431e82b301d8d4624330a6a35729381"
+uglifyjs-webpack-plugin@1.2.7, uglifyjs-webpack-plugin@^1.2.4:
+  version "1.2.7"
+  resolved "https://registry.yarnpkg.com/uglifyjs-webpack-plugin/-/uglifyjs-webpack-plugin-1.2.7.tgz#57638dd99c853a1ebfe9d97b42160a8a507f9d00"
   dependencies:
     cacache "^10.0.4"
     find-cache-dir "^1.0.0"

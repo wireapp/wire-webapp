@@ -142,7 +142,12 @@ class ClientItem extends React.Component {
   };
 
   render() {
-    const {client, selected, clientError, intl: {formatMessage: _}} = this.props;
+    const {
+      client,
+      selected,
+      clientError,
+      intl: {formatMessage: _},
+    } = this.props;
     const {validationError, validPassword, password, animationStep, isAnimating} = this.state;
     const animationPosition = animationStep / ClientItem.CONFIG.animationSteps;
     const marginTop = animationPosition * 16;
