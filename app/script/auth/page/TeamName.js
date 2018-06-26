@@ -139,7 +139,7 @@ class TeamName extends Component {
                     </ErrorMessage>
                   </Form>
                 </div>
-                {(!isDesktopApp() || !isMacOS()) && (
+                {!(isDesktopApp() && isMacOS()) && (
                   <div>
                     <Link href={EXTERNAL_ROUTE.WIRE_TEAM_FEATURES} target="_blank" data-uie-name="go-what-is">
                       {_(teamNameStrings.whatIsWireTeamsLink)}
