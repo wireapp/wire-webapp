@@ -123,7 +123,11 @@ z.entity.Conversation = class Conversation {
     });
 
     // Messages
-    this.ephemeral_timer = ko.observable(false);
+    this.localMessageTimer = ko.observable(null);
+    this.globalMessageTimer = ko.observable(null);
+
+    this.messageTimer = ko.pureComputed(() => this.globalMessageTimer() || this.localMessageTimer());
+    this.hasGlobalMessageTimer = ko.pureComputed(() => this.globalMessageTimer() > 0);
 
     this.messages_unordered = ko.observableArray();
     this.messages = ko.pureComputed(() =>
@@ -232,7 +236,7 @@ z.entity.Conversation = class Conversation {
       this.archived_state,
       this.archived_timestamp,
       this.cleared_timestamp,
-      this.ephemeral_timer,
+      this.messageTimer,
       this.isGuest,
       this.last_event_timestamp,
       this.last_read_timestamp,
@@ -670,7 +674,8 @@ z.entity.Conversation = class Conversation {
       archived_state: this.archived_state(),
       archived_timestamp: this.archived_timestamp(),
       cleared_timestamp: this.cleared_timestamp(),
-      ephemeral_timer: this.ephemeral_timer(),
+      ephemeral_timer: this.localMessageTimer(),
+      global_message_timer: this.globalMessageTimer(),
       id: this.id,
       is_guest: this.isGuest(),
       is_managed: this.isManaged,

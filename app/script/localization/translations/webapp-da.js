@@ -727,13 +727,13 @@ z.string.da.initEvents = 'Indlæser meddelelser';
 z.string.da.initUpdatedFromNotifications = 'Snart færdig - God fornøjelse med Wire';
 z.string.da.initProgress = ' — {{number1}} af {{number2}}';
 
-z.string.da.ephememalUnitsNone = 'Slået Fra';
-z.string.da.ephememalUnitsSecond = 'sekund';
-z.string.da.ephememalUnitsSeconds = 'sekunder';
-z.string.da.ephememalUnitsMinute = 'minut';
-z.string.da.ephememalUnitsMinutes = 'minutter';
-z.string.da.ephememalUnitsHour = 'time';
-z.string.da.ephememalUnitsHours = 'timer';
-z.string.da.ephememalUnitsDay = 'dag';
-z.string.da.ephememalUnitsDays = 'dage';
+z.string.da.ephemeralUnitsNone = 'Slået Fra';
+z.string.da.ephemeralUnitsSecond = 'sekund';
+z.string.da.ephemeralUnitsSeconds = 'sekunder';
+z.string.da.ephemeralUnitsMinute = 'minut';
+z.string.da.ephemeralUnitsMinutes = 'minutter';
+z.string.da.ephemeralUnitsHour = 'time';
+z.string.da.ephemeralUnitsHours = 'timer';
+z.string.da.ephemeralUnitsDay = 'dag';
+z.string.da.ephemeralUnitsDays = 'dage';
 

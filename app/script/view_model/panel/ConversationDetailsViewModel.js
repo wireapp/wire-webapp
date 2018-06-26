@@ -130,6 +130,9 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
       return !this.conversationEntity().is_request() && !this.conversationEntity().is_cleared();
     });
     this.showActionGuestOptions = ko.pureComputed(() => this.conversationEntity().inTeam());
+    this.showActionTimedMessages = ko.pureComputed(() => {
+      return this.conversationEntity().is_group() && !this.conversationEntity().isGuest();
+    });
     this.showActionLeave = ko.pureComputed(() => {
       return this.conversationEntity().is_group() && !this.conversationEntity().removed_from_conversation();
     });
@@ -148,6 +151,14 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
     });
     this.guestOptionsText = ko.pureComputed(() => {
       return this.isTeamOnly() ? z.string.conversationDetailsGuestsOff : z.string.conversationDetailsGuestsOn;
+    });
+
+    this.timedMessagesText = ko.pureComputed(() => {
+      const conversation = this.conversationEntity();
+      const hasMessageTimeSet = conversation.messageTimer() && conversation.hasGlobalMessageTimer();
+      return hasMessageTimeSet
+        ? z.util.TimeUtil.formatDuration(conversation.messageTimer()).text
+        : z.l10n.text(z.string.ephemeralUnitsNone);
     });
 
     this.shouldUpdateScrollbar = ko
@@ -178,6 +189,10 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
 
   clickOnGuestOptions() {
     this.panelViewModel.switchState(z.viewModel.PanelViewModel.STATE.GUEST_OPTIONS);
+  }
+
+  clickOnTimedMessages() {
+    this.panelViewModel.switchState(z.viewModel.PanelViewModel.STATE.TIMED_MESSAGES);
   }
 
   clickOnShowUser(userEntity) {
@@ -235,7 +250,7 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
     const hasNameChanged = newConversationName.length && newConversationName !== currentConversationName;
     if (hasNameChanged) {
       event.target.value = currentConversationName;
-      this.conversationRepository.rename_conversation(this.conversationEntity(), newConversationName);
+      this.conversationRepository.renameConversation(this.conversationEntity(), newConversationName);
     }
   }
 };

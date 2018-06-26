@@ -30,6 +30,7 @@ z.viewModel.content.CollectionViewModel = class CollectionViewModel {
     this.clickOnMessage = this.clickOnMessage.bind(this);
     this.itemAdded = this.itemAdded.bind(this);
     this.itemRemoved = this.itemRemoved.bind(this);
+    this.messageRemoved = this.messageRemoved.bind(this);
     this.onInputChange = this.onInputChange.bind(this);
     this.removedFromView = this.removedFromView.bind(this);
     this.searchInConversation = this.searchInConversation.bind(this);
@@ -52,6 +53,7 @@ z.viewModel.content.CollectionViewModel = class CollectionViewModel {
   addedToView() {
     amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.ADDED, this.itemAdded);
     amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, this.itemRemoved);
+    amplify.subscribe(z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, this.messageRemoved);
     $(document).on('keydown.collection', keyboardEvent => {
       if (z.util.KeyboardUtil.isEscapeKey(keyboardEvent)) {
         amplify.publish(z.event.WebApp.CONVERSATION.SHOW, this.conversationEntity());
@@ -68,20 +70,28 @@ z.viewModel.content.CollectionViewModel = class CollectionViewModel {
   }
 
   itemAdded(messageEntity) {
-    const isExpectedId = this.conversationEntity().id === messageEntity.conversation_id;
-    if (isExpectedId) {
-      this._populate_items([messageEntity]);
+    const isCurrentConversation = this.conversationEntity().id === messageEntity.conversation_id;
+    if (isCurrentConversation) {
+      this._populateItems([messageEntity]);
     }
   }
 
-  itemRemoved(removedMessageId) {
-    const _removeItem = messageEntity => messageEntity.id === removedMessageId;
-    [this.audio, this.files, this.images, this.links].forEach(array => array.remove(_removeItem));
+  itemRemoved(messageId, conversationId) {
+    const isCurrentConversation = this.conversationEntity().id === conversationId;
+    if (isCurrentConversation) {
+      const _removeItem = messageEntity => messageEntity.id === messageId;
+      [this.audio, this.files, this.images, this.links].forEach(array => array.remove(_removeItem));
+    }
+  }
+
+  messageRemoved(messageEntity) {
+    this.itemRemoved(messageEntity.id, messageEntity.conversation_id);
   }
 
   removedFromView() {
     amplify.unsubscribe(z.event.WebApp.CONVERSATION.MESSAGE.ADDED, this.itemAdded);
     amplify.unsubscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, this.itemRemoved);
+    amplify.unsubscribe(z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, this.messageRemoved);
     $(document).off('keydown.collection');
     this.conversationEntity(null);
     this.searchInput('');
@@ -94,28 +104,30 @@ z.viewModel.content.CollectionViewModel = class CollectionViewModel {
 
       this.conversation_repository
         .get_events_for_category(conversationEntity, z.message.MessageCategory.LINK_PREVIEW)
-        .then(messageEntities => this._populate_items(messageEntities));
+        .then(messageEntities => this._populateItems(messageEntities));
     }
   }
 
-  _populate_items(messageEntities) {
-    messageEntities.map(messageEntity => {
-      // TODO: create binary map helper
-      const isImage = messageEntity.category & z.message.MessageCategory.IMAGE;
-      const isGif = messageEntity.category & z.message.MessageCategory.GIF;
-      if (isImage && !isGif) {
-        return this.images.push(messageEntity);
-      }
+  _populateItems(messageEntities) {
+    messageEntities.forEach(messageEntity => {
+      if (!messageEntity.is_expired()) {
+        // TODO: create binary map helper
+        const isImage = messageEntity.category & z.message.MessageCategory.IMAGE;
+        const isGif = messageEntity.category & z.message.MessageCategory.GIF;
+        if (isImage && !isGif) {
+          return this.images.push(messageEntity);
+        }
 
-      const isFile = messageEntity.category & z.message.MessageCategory.FILE;
-      if (isFile) {
-        const isAudio = messageEntity.get_first_asset().is_audio();
-        return isAudio ? this.audio.push(messageEntity) : this.files.push(messageEntity);
-      }
+        const isFile = messageEntity.category & z.message.MessageCategory.FILE;
+        if (isFile) {
+          const isAudio = messageEntity.get_first_asset().is_audio();
+          return isAudio ? this.audio.push(messageEntity) : this.files.push(messageEntity);
+        }
 
-      const isLinkPreview = messageEntity.category & z.message.MessageCategory.LINK_PREVIEW;
-      if (isLinkPreview) {
-        this.links.push(messageEntity);
+        const isLinkPreview = messageEntity.category & z.message.MessageCategory.LINK_PREVIEW;
+        if (isLinkPreview) {
+          this.links.push(messageEntity);
+        }
       }
     });
   }

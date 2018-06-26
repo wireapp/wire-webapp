@@ -23,7 +23,7 @@
       <div class="panel__content__scroll" data-bind="antiscroll: shouldUpdateScrollbar">
         <!-- ko if: showDevicesFound() -->
           <div class="participant-devices__header">
-            <div class="participant-devices__text-block" data-bind="text: devicesHeadlineText"></div>
+            <div class="participant-devices__text-block panel__info-text" data-bind="text: devicesHeadlineText"></div>
             <a class="participant-devices__link" data-bind="attr: {href: z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.WEBSITE, z.config.URL_PATH.PRIVACY_WHY)}, l10n_text: z.string.participantDevicesWhyVerify" rel="nofollow noopener noreferrer" target="_blank" class="text-theme"></a>
           </div>
 
@@ -44,7 +44,7 @@
 
         <!-- ko if: showDevicesNotFound() -->
           <div class="participant-devices__header">
-            <div class="participant-devices__text-block" data-bind="text: noDevicesHeadlineText"></div>
+            <div class="participant-devices__text-block panel__info-text" data-bind="text: noDevicesHeadlineText"></div>
             <a class="participant-devices__link" data-bind="l10n_text: z.string.participantDevicesLearnMore, l10n_href: {type: z.util.URLUtil.TYPE.WEBSITE, path: z.string.urlWebsitePrivacy}" rel="nofollow noopener noreferrer" target="_blank" class="text-theme"></a>
           </div>
         <!-- /ko -->
@@ -52,7 +52,7 @@
         <!-- ko if: showDeviceDetails() -->
           <div class="participant-devices__header">
             <div class="participant-devices__link participant-devices__show-self-fingerprint text-theme" data-bind="click: clickToShowSelfFingerprint, l10n_text: z.string.participantDevicesDetailShowMyDevice"></div>
-            <div data-bind="foreach: detailMessage"><span class="participant-devices__text-block" data-bind="css: {'participant-devices__text-block--highlight': $data.isStyled}, text: $data.text"></span></div>
+            <div data-bind="foreach: detailMessage"><span class="participant-devices__text-block panel__info-text" data-bind="css: {'participant-devices__text-block--highlight': $data.isStyled}, text: $data.text"></span></div>
             <a class="participant-devices__link" data-bind="attr: {href: z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.WEBSITE, z.config.URL_PATH.PRIVACY_HOW)}, l10n_text: z.string.participantDevicesDetailHowTo" rel="nofollow noopener noreferrer" target="_blank" class="text-theme"></a>
 
           <device-card class="participant-devices__single-client" params="device: selectedClient()"></device-card>

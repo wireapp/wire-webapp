@@ -572,31 +572,6 @@ z.util.bucketValues = (value, bucketLimits) => {
   return `${last_limit + 1}-`;
 };
 
-z.util.formatTimeRemaining = timeRemaining => {
-  const momentDuration = moment.duration(timeRemaining);
-
-  let title = '';
-  if (momentDuration.asHours() === 1) {
-    title += `${momentDuration.hours()} ${z.l10n.text(z.string.ephememalUnitsHour)}, `;
-  } else if (momentDuration.asHours() > 1) {
-    title += `${momentDuration.hours()} ${z.l10n.text(z.string.ephememalUnitsHours)}, `;
-  }
-
-  if (momentDuration.asMinutes() === 1) {
-    title += `${momentDuration.minutes()} ${z.l10n.text(z.string.ephememalUnitsMinute)} ${z.l10n.text(z.string.and)} `;
-  } else if (momentDuration.asMinutes() > 1) {
-    title += `${momentDuration.minutes()} ${z.l10n.text(z.string.ephememalUnitsMinutes)} ${z.l10n.text(z.string.and)} `;
-  }
-
-  if (momentDuration.asSeconds() === 1) {
-    title += `${momentDuration.seconds()} ${z.l10n.text(z.string.ephememalUnitsSecond)}`;
-  } else if (momentDuration.asSeconds() > 1) {
-    title += `${momentDuration.seconds()} ${z.l10n.text(z.string.ephememalUnitsSeconds)}`;
-  }
-
-  return title || '';
-};
-
 // https://developer.mozilla.org/en-US/Firefox/Performance_best_practices_for_Firefox_fe_engineers
 z.util.afterRender = callback => window.requestAnimationFrame(() => window.setTimeout(callback, 0));
 

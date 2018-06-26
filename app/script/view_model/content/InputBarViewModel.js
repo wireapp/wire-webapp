@@ -65,15 +65,6 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
     this.pingDisabled = ko.observable(false);
 
-    this.ephemeralTimerText = ko.pureComputed(() => {
-      if (this.hasEphemeralTimer()) {
-        return z.util.TimeUtil.formatMilliseconds(this.conversationEntity().ephemeral_timer());
-      }
-      return {};
-    });
-    this.hasEphemeralTimer = ko.pureComputed(() => {
-      return this.conversationEntity() ? this.conversationEntity().ephemeral_timer() : false;
-    });
     this.hasFocus = ko.pureComputed(() => this.isEditing() || this.conversationHasFocus()).extend({notify: 'always'});
     this.hasTextInput = ko.pureComputed(() => {
       return this.conversationEntity() ? this.conversationEntity().input().length > 0 : false;
@@ -123,7 +114,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
         return z.l10n.text(stringId, userEntity.first_name());
       }
 
-      stringId = this.conversationEntity().ephemeral_timer()
+      stringId = this.conversationEntity().messageTimer()
         ? z.string.tooltipConversationEphemeral
         : z.string.tooltipConversationInputPlaceholder;
 
@@ -181,6 +172,11 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       this.pastedFileName(null);
     });
 
+    this.hasLocalEphemeralTimer = ko.pureComputed(() => {
+      const conversationEntity = this.conversationEntity();
+      return conversationEntity.localMessageTimer() && !conversationEntity.hasGlobalMessageTimer();
+    });
+
     this._init_subscriptions();
   }
 
@@ -207,33 +203,6 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
     this.editMessageEntity(undefined);
     this.editInput('');
-  }
-
-  /**
-   * Click on ephemeral button
-   * @param {Object} data - Object
-   * @param {DOMEvent} event - Triggered event
-   * @returns {undefined} No return value
-   */
-  clickOnEphemeral(data, event) {
-    const entries = [
-      {
-        click: () => this.setEphemeralTimer(0),
-        label: z.l10n.text(z.string.ephememalUnitsNone),
-      },
-    ].concat(
-      z.ephemeral.timings.getValues().map(milliseconds => {
-        const {unit, value} = z.util.TimeUtil.formatMilliseconds(milliseconds);
-        const localizedUnit = this._getLocalizedUnitString(value, unit);
-
-        return {
-          click: () => this.setEphemeralTimer(milliseconds),
-          label: `${value} ${localizedUnit}`,
-        };
-      })
-    );
-
-    z.ui.Context.from(event, entries, 'ephemeral-options-menu');
   }
 
   clickToCancelPastedFile() {
@@ -387,18 +356,6 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     $('.messages-wrap').scrollBy(newListHeight - previousListHeight);
   }
 
-  setEphemeralTimer(milliseconds) {
-    const conversationName = this.conversationEntity().display_name();
-
-    if (!milliseconds) {
-      this.conversationEntity().ephemeral_timer(false);
-      return this.logger.info(`Ephemeral timer for conversation '${conversationName}' turned off.`);
-    }
-
-    this.conversationEntity().ephemeral_timer(milliseconds);
-    this.logger.info(`Ephemeral timer for conversation '${conversationName}' is now at '${milliseconds}'.`);
-  }
-
   sendGiphy() {
     if (this.conversationEntity()) {
       this.conversationEntity().input('');
@@ -470,34 +427,6 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       }
 
       this.conversationRepository.upload_files(this.conversationEntity(), files);
-    }
-  }
-
-  /**
-   * Returns the full localized unit string.
-   *
-   * @private
-   * @param {number} value - Number to localize
-   * @param {string} unit - Unit of type 's', 'm', 'd', 'h'
-   * @returns {string} Localized unit string
-   */
-  _getLocalizedUnitString(value, unit) {
-    let stringId;
-    const valueIs1 = value === 1;
-
-    if (unit === 's') {
-      stringId = valueIs1 ? z.string.ephememalUnitsSecond : z.string.ephememalUnitsSeconds;
-      return z.l10n.text(stringId);
-    }
-
-    if (unit === 'm') {
-      stringId = valueIs1 ? z.string.ephememalUnitsMinute : z.string.ephememalUnitsMinutes;
-      return z.l10n.text(stringId);
-    }
-
-    if (unit === 'd') {
-      stringId = valueIs1 ? z.string.ephememalUnitsDay : z.string.ephememalUnitsDays;
-      return z.l10n.text(stringId);
     }
   }
 

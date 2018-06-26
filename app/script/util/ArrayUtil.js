@@ -32,18 +32,6 @@ z.util.ArrayUtil = {
     return chunks;
   },
 
-  findClosest: (array, value) => {
-    let [closest] = array;
-
-    array.forEach(current => {
-      if (value >= current) {
-        closest = current;
-      }
-    });
-
-    return closest;
-  },
-
   getDifference: (array1, array2) => {
     return array2.filter(element => !array1.includes(element));
   },

@@ -750,13 +750,13 @@ z.string.lt.initEvents = 'Įkeliamos žinutės';
 z.string.lt.initUpdatedFromNotifications = 'Beveik baigta – mėgaukitės „Wire“';
 z.string.lt.initProgress = ' — {{number1}} iš {{number2}}';
 
-z.string.lt.ephememalUnitsNone = 'Išjungta';
-z.string.lt.ephememalUnitsSecond = 'sek.';
-z.string.lt.ephememalUnitsSeconds = 'sek.';
-z.string.lt.ephememalUnitsMinute = 'min.';
-z.string.lt.ephememalUnitsMinutes = 'min.';
-z.string.lt.ephememalUnitsHour = 'val.';
-z.string.lt.ephememalUnitsHours = 'val.';
-z.string.lt.ephememalUnitsDay = 'diena';
-z.string.lt.ephememalUnitsDays = 'dienos(-ų)';
+z.string.lt.ephemeralUnitsNone = 'Išjungta';
+z.string.lt.ephemeralUnitsSecond = 'sek.';
+z.string.lt.ephemeralUnitsSeconds = 'sek.';
+z.string.lt.ephemeralUnitsMinute = 'min.';
+z.string.lt.ephemeralUnitsMinutes = 'min.';
+z.string.lt.ephemeralUnitsHour = 'val.';
+z.string.lt.ephemeralUnitsHours = 'val.';
+z.string.lt.ephemeralUnitsDay = 'diena';
+z.string.lt.ephemeralUnitsDays = 'dienos(-ų)';
 

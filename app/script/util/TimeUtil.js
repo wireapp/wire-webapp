@@ -23,29 +23,96 @@ window.z = window.z || {};
 window.z.util = z.util || {};
 
 z.util.TimeUtil = {
+  UNITS_IN_MILLIS: {
+    DAY: 1000 * 60 * 60 * 24,
+    HOUR: 1000 * 60 * 60,
+    MINUTE: 1000 * 60,
+    SECOND: 1000,
+    WEEK: 1000 * 60 * 60 * 24 * 7,
+    YEAR: 1000 * 60 * 60 * 24 * 365,
+  },
+
   adjustCurrentTimestamp: function(timeOffset) {
     timeOffset = _.isNumber(timeOffset) ? timeOffset : 0;
     return Date.now() - timeOffset;
   },
 
-  /**
-   * Format seconds into 15s, 2m.
-   * @param {number} duration - Duration to format in seconds
-   * @returns {Object} Unit and value
-   */
-  formatMilliseconds: duration => {
-    const seconds = Math.floor(duration / 1000);
+  durationUnits: () => {
+    return [
+      {
+        plural: 'ephemeralUnitsYears',
+        singular: 'ephemeralUnitsYear',
+        unit: 'y',
+        value: z.util.TimeUtil.UNITS_IN_MILLIS.YEAR,
+      },
+      {
+        plural: 'ephemeralUnitsWeeks',
+        singular: 'ephemeralUnitsWeek',
+        unit: 'w',
+        value: z.util.TimeUtil.UNITS_IN_MILLIS.WEEK,
+      },
+      {
+        plural: 'ephemeralUnitsDays',
+        singular: 'ephemeralUnitsDay',
+        unit: 'd',
+        value: z.util.TimeUtil.UNITS_IN_MILLIS.DAY,
+      },
+      {
+        plural: 'ephemeralUnitsHours',
+        singular: 'ephemeralUnitsHour',
+        unit: 'h',
+        value: z.util.TimeUtil.UNITS_IN_MILLIS.HOUR,
+      },
+      {
+        plural: 'ephemeralUnitsMinutes',
+        singular: 'ephemeralUnitsMinute',
+        unit: 'm',
+        value: z.util.TimeUtil.UNITS_IN_MILLIS.MINUTE,
+      },
+      {
+        plural: 'ephemeralUnitsSeconds',
+        singular: 'ephemeralUnitsSecond',
+        unit: 's',
+        value: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND,
+      },
+    ];
+  },
 
-    switch (false) {
-      case !(seconds < 60):
-        return {unit: 's', value: seconds};
-      case !(seconds < 60 * 60):
-        return {unit: 'm', value: Math.floor(seconds / 60)};
-      case !(seconds < 60 * 60 * 24):
-        return {unit: 'h', value: Math.floor(seconds / 60 / 60)};
-      default:
-        return {unit: 'd', value: Math.floor(seconds / 60 / 60 / 24)};
-    }
+  /**
+   * Format milliseconds into 15s, 2m.
+   * @note Implementation based on: https://gist.github.com/deanrobertcook/7168b38150c303a2b4196216913d34c1
+   * @param {number} duration - Duration to format in milliseconds
+   * @param {boolean} rounded - Enables rounding of numbers
+   * @param {number} maximumUnits - Maximum number of units shown in the textual representation
+   * @returns {Object} Unit, value and localized string
+   */
+  formatDuration: (duration, rounded = true, maximumUnits = 1) => {
+    const mappedUnits = z.util.TimeUtil.durationUnits().map((unit, index) => {
+      let value = duration;
+      if (index > 0) {
+        value %= z.util.TimeUtil.durationUnits()[index - 1].value;
+      }
+      value /= unit.value;
+      value = rounded && value >= 1 ? Math.round(value) : Math.floor(value);
+      const longUnit = z.string[value === 1 ? unit.singular : unit.plural];
+      return {
+        longUnit,
+        unit: unit.unit,
+        value,
+      };
+    });
+
+    const firstNonZeroUnit = mappedUnits.find(unit => unit.value > 0);
+    const startIndex = mappedUnits.indexOf(firstNonZeroUnit);
+    const validUnits = mappedUnits.slice(startIndex, startIndex + maximumUnits);
+    const longText = validUnits.map(unit => `${unit.value} ${z.l10n.text(unit.longUnit)}`).join(', ');
+    const upperUnit = validUnits[0] || {};
+
+    return {
+      text: longText,
+      unit: upperUnit.unit,
+      value: upperUnit.value,
+    };
   },
 
   /**
