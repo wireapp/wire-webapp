@@ -100,11 +100,11 @@ z.conversation.EventMapper = class EventMapper {
       case z.event.Backend.CONVERSATION.MEMBER_LEAVE:
         messageEntity = this._mapEventMemberLeave(event);
         break;
-      case z.event.Backend.CONVERSATION.RENAME:
-        messageEntity = this._mapEventRename(event);
-        break;
       case z.event.Backend.CONVERSATION.MESSAGE_TIMER_UPDATE:
         messageEntity = this._mapEventMessageTimerUpdate(event);
+        break;
+      case z.event.Backend.CONVERSATION.RENAME:
+        messageEntity = this._mapEventRename(event);
         break;
       case z.event.Client.CONVERSATION.ASSET_ADD:
         messageEntity = this._mapEventAssetAdd(event, createDummyImage);
@@ -114,6 +114,10 @@ z.conversation.EventMapper = class EventMapper {
         break;
       case z.event.Client.CONVERSATION.GROUP_CREATION:
         messageEntity = this._mapEventGroupCreation(event);
+        break;
+      case z.event.Client.CONVERSATION.INCOMING_MESSAGE_TOO_BIG:
+      case z.event.Client.CONVERSATION.UNABLE_TO_DECRYPT:
+        messageEntity = this._mapEventUnableToDecrypt(event);
         break;
       case z.event.Client.CONVERSATION.KNOCK:
         messageEntity = this._mapEventPing();
@@ -132,10 +136,6 @@ z.conversation.EventMapper = class EventMapper {
         break;
       case z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE:
         messageEntity = this._mapEventTeamMemberLeave(event);
-        break;
-      case z.event.Client.CONVERSATION.UNABLE_TO_DECRYPT:
-      case z.event.Client.CONVERSATION.INCOMING_MESSAGE_TOO_BIG:
-        messageEntity = this._mapEventUnableToDecrypt(event);
         break;
       case z.event.Client.CONVERSATION.VERIFICATION:
         messageEntity = this._mapEventVerification(event);

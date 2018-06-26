@@ -20,19 +20,12 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.media = z.media || {};
+window.z.permission = z.permission || {};
 
-z.media.MediaStreamInfo = class MediaStreamInfo {
-  constructor(source, flowId, stream, callEntity) {
-    this.source = source;
-    this.flowId = flowId;
-    this.stream = stream;
-    this.callEntity = callEntity;
-
-    this.conversationId = callEntity ? callEntity.id : undefined;
-  }
-
-  getType() {
-    return z.media.MediaStreamHandler.detectMediaStreamType(this.stream);
-  }
+// https://developer.mozilla.org/en-US/docs/Web/API/Permissions/query
+z.permission.PermissionType = {
+  CAMERA: 'camera',
+  GEO_LOCATION: 'geolocation',
+  MICROPHONE: 'microphone',
+  NOTIFICATIONS: 'notifications',
 };

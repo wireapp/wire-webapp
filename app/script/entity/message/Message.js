@@ -269,9 +269,10 @@ z.entity.Message = class Message {
     }
 
     if (this.ephemeral_status() === z.message.EphemeralStatusType.INACTIVE) {
-      const expirationDate = `${Date.now() + this.ephemeral_expires()}`;
-      this.ephemeral_expires(expirationDate);
-      this.ephemeral_started(`${Date.now()}`);
+      const startingTimestamp = this.user().is_me ? this.timestamp() : Date.now();
+      const expirationTimestamp = `${startingTimestamp + this.ephemeral_expires()}`;
+      this.ephemeral_expires(expirationTimestamp);
+      this.ephemeral_started(`${startingTimestamp}`);
     }
 
     const remainingTime = this.ephemeral_expires() - Date.now();

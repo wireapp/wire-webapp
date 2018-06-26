@@ -106,10 +106,22 @@
       .box-list-dark {
         background: #222;
       }
+
+      #icons * {
+        font-size: 0;
+        margin: 8px;
+      }
+
+      #icons *:not(.override-color) svg path{
+        fill: currentColor;
+      }
     </style>
   </head>
-
+  
   <body class="theme-blue main-accent-color-1">
+  #include('../../page/template/#dest/vendor.htm')
+  #include('../../page/template/#dest/component.htm')
+  <script src="../script/components/icons.js"></script>
   #include('microbar.htm')
   <h1>Colors</h1>
   #include('colors.htm')
@@ -125,9 +137,9 @@
   #include('avatars.htm')
   <h1>Dots</h1>
   #include('dots.htm')
+  <h1>SVG Icons</h1>
+  #include('icons.htm')
 
-  #include('../../page/template/#dest/vendor.htm')
-  #include('../../page/template/#dest/component.htm')
 
   <script>
     $(() => {
@@ -161,6 +173,7 @@
           enable_click: true,
         });
       });
+      ko.applyBindings(()=>{},document.querySelector('#icons'));
     });
   </script>
   </body>

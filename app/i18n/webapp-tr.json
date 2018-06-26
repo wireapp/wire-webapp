@@ -44,7 +44,7 @@
   "acceptNewsModal.headline": "",
   "acceptNewsModal.unsubscribeDescription": "",
   "acceptNewsModal.privacyDescription": "",
-  "acceptNewsModal.declineButton": "",
+  "acceptNewsModal.declineButton": "Reddet",
   "acceptNewsModal.confirmButton": "Kabul et",
   "unsupported.headlineBrowser": "",
   "unsupported.subheadBrowser": "",

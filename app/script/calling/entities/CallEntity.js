@@ -63,13 +63,7 @@ z.calling.entities.CallEntity = class CallEntity {
     const loggerName = 'z.calling.entities.CallEntity';
     this.callLogger = new z.telemetry.calling.CallLogger(loggerName, this.id, z.config.LOGGER.OPTIONS, this.messageLog);
 
-    this.callLogger.info({
-      data: {
-        default: [this.id],
-        obfuscated: [this.callLogger.obfuscate(this.id)],
-      },
-      message: `Created new call entity in conversation {0}`,
-    });
+    this.callLogger.info(`Created new call entity in conversation ${this.id}`);
 
     // IDs and references
     this.timings = undefined;

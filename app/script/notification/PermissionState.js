@@ -20,19 +20,13 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.media = z.media || {};
+window.z.notification = z.notification || {};
 
-z.media.MediaStreamInfo = class MediaStreamInfo {
-  constructor(source, flowId, stream, callEntity) {
-    this.source = source;
-    this.flowId = flowId;
-    this.stream = stream;
-    this.callEntity = callEntity;
-
-    this.conversationId = callEntity ? callEntity.id : undefined;
-  }
-
-  getType() {
-    return z.media.MediaStreamHandler.detectMediaStreamType(this.stream);
-  }
+// https://developer.mozilla.org/en-US/docs/Web/API/Notification/permission
+z.notification.PermissionState = {
+  DEFAULT: 'default',
+  DENIED: 'denied',
+  GRANTED: 'granted',
+  IGNORED: 'ignored',
+  UNSUPPORTED: 'unsupported',
 };

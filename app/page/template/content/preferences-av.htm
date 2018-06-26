@@ -64,7 +64,7 @@
           <!-- /ko -->
           <div class="preferences-option" data-bind="css: {'preferences-av-select-disabled': permissionDenied}">
             <div class="preferences-option-icon preferences-av-select-icon">
-              <div class="icon-video"></div>
+              <camera-icon></camera-icon>
             </div>
             <div class="input-select">
               <select class="preferences-av-select" name="select"
@@ -79,6 +79,9 @@
               <label class="icon-down preferences-av-label" data-bind="visible: availableDevices.videoInput().length >= 2"></label>
             </div>
           </div>
+          <!-- ko if: isTemporaryGuest() -->
+            <div class="preferences-detail" data-bind="l10n_text: z.string.preferencesAVTemporaryDisclaimer"></div>
+          <!-- /ko -->
           <video class="preferences-av-video"
                  autoplay
                  data-bind="css: {'preferences-av-video-disabled': permissionDenied},

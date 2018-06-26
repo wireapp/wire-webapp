@@ -94,17 +94,23 @@ z.viewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
     this._loadImage();
     $(document).on('keydown.lightbox', keyboardEvent => {
       switch (keyboardEvent.key) {
-        case z.util.KeyboardUtil.KEY.ESC:
+        case z.util.KeyboardUtil.KEY.ESC: {
           this.clickOnClose();
           break;
+        }
+
         case z.util.KeyboardUtil.KEY.ARROW_DOWN:
-        case z.util.KeyboardUtil.KEY.ARROW_RIGHT:
+        case z.util.KeyboardUtil.KEY.ARROW_RIGHT: {
           this.clickOnShowNext(this, keyboardEvent);
           break;
+        }
+
         case z.util.KeyboardUtil.KEY.ARROW_LEFT:
-        case z.util.KeyboardUtil.KEY.ARROW_UP:
+        case z.util.KeyboardUtil.KEY.ARROW_UP: {
           this.clickOnShowPrevious(this, keyboardEvent);
           break;
+        }
+
         default:
           break;
       }
@@ -112,19 +118,22 @@ z.viewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
   }
 
   messageAdded(messageEntity) {
-    const isExpectedId = messageEntity.conversation === this.conversationEntity().id;
-    if (isExpectedId) {
+    const isCurrentConversation = this.conversationEntity().id === messageEntity.conversation;
+    if (isCurrentConversation) {
       this.items.push(messageEntity);
     }
   }
 
-  messageRemoved(removedMessageId) {
-    const isExpectedId = this.messageEntity().id === removedMessageId;
-    if (isExpectedId) {
-      return this.imageModal.hide();
-    }
+  messageRemoved(messageId, conversationId) {
+    const isCurrentConversation = this.conversationEntity().id === conversationId;
+    if (isCurrentConversation) {
+      const isVisibleMessage = this.messageEntity().id === messageId;
+      if (isVisibleMessage) {
+        return this.imageModal.hide();
+      }
 
-    this.items.remove(message_et => message_et.id === removedMessageId);
+      this.items.remove(messageEntity => messageEntity.id === messageId);
+    }
   }
 
   _loadImage() {
@@ -165,20 +174,19 @@ z.viewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
 
   clickOnShowNext(imageDetailViewViewModel, event) {
     event.stopPropagation();
-    const nextMessageEntity = z.util.ArrayUtil.iterateItem(this.items(), this.messageEntity());
-
-    if (nextMessageEntity) {
-      this.messageEntity(nextMessageEntity);
-      this._loadImage();
-    }
+    this._iterateImage(true);
   }
 
   clickOnShowPrevious(imageDetailViewViewModel, event) {
     event.stopPropagation();
-    const previousMessageEntity = z.util.ArrayUtil.iterateItem(this.items(), this.messageEntity(), true);
+    this._iterateImage(false);
+  }
 
-    if (previousMessageEntity) {
-      this.messageEntity(z.util.ArrayUtil.iterateItem(this.items(), this.messageEntity(), true));
+  _iterateImage(reverse) {
+    const messageEntity = z.util.ArrayUtil.iterateItem(this.items(), this.messageEntity(), reverse);
+
+    if (messageEntity) {
+      this.messageEntity(messageEntity);
       this._loadImage();
     }
   }

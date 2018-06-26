@@ -31,15 +31,16 @@
 }
 
 .message-timer-button {
-  .circle(@avatar-diameter-xs);
+  .circle(22px);
 
   position: relative;
   margin: 4px;
   border-style: solid;
-  border-width: 1px;
+  border-width: 2px;
   font-size: @font-size-xs;
   font-weight: @font-weight-bold;
-  line-height: @avatar-diameter-xs - 2;
+  letter-spacing: -1px;
+  line-height: 18px;
   text-align: center;
 
   svg path {
@@ -53,18 +54,18 @@
 
   &--enabled {
     .accent-color;
-    .accent-border-color(24%);
 
     cursor: pointer;
   }
 }
 
 .message-timer-button-unit {
-  .circle(16px);
+  .circle(14px);
 
   position: absolute;
-  top: -2px;
-  right: -8px;
+  top: -4px;
+  right: -9px;
   background-color: #fff;
+  letter-spacing: 0;
   line-height: 14px;
 }
