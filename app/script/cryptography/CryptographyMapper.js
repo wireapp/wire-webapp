@@ -23,14 +23,6 @@ window.z = window.z || {};
 window.z.cryptography = z.cryptography || {};
 
 z.cryptography.CryptographyMapper = class CryptographyMapper {
-  static get CONFIG() {
-    return {
-      TIMED_MESSAGES_RANGE: {
-        MAX: 31557600000,
-        MIN: 1000,
-      },
-    };
-  }
   /**
    * Construct a new CryptographyMapper.
    */
@@ -272,14 +264,10 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
     const millisecondsAsNumber = genericMessage.ephemeral.expire_after_millis.toNumber();
     genericMessage.ephemeral.message_id = genericMessage.message_id;
 
-    const fixedTimer = z.util.NumberUtil.clamp(
-      millisecondsAsNumber,
-      CryptographyMapper.CONFIG.TIMED_MESSAGES_RANGE.MIN,
-      CryptographyMapper.CONFIG.TIMED_MESSAGES_RANGE.MAX
-    );
+    const clampedTimer = z.conversation.ConversationEphemeralHandler.validateTimer(millisecondsAsNumber);
 
     const embedded_message = this._mapGenericMessage(genericMessage.ephemeral, event);
-    embedded_message.ephemeral_expires = fixedTimer;
+    embedded_message.ephemeral_expires = clampedTimer;
 
     return embedded_message;
   }

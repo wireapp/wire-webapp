@@ -27,7 +27,18 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
   static get CONFIG() {
     return {
       INTERVAL_TIME: 250,
+      TIMER_RANGE: {
+        MAX: 31557600000,
+        MIN: 1000,
+      },
     };
+  }
+
+  static validateTimer(messageTimer) {
+    const {TIMER_RANGE} = ConversationEphemeralHandler.CONFIG;
+    const isTimerReset = messageTimer === null;
+
+    return isTimerReset ? messageTimer : z.util.NumberUtil.clamp(messageTimer, TIMER_RANGE.MIN, TIMER_RANGE.MAX);
   }
 
   constructor(conversationService, conversationMapper, eventListeners) {
@@ -219,7 +230,8 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
    * @returns {Promise} Resolves when the event was handled
    */
   _updateEphemeralTimer(conversationEntity, eventJson) {
-    const updates = {globalMessageTimer: eventJson.data.message_timer};
+    const clampedTimer = ConversationEphemeralHandler.validateTimer(eventJson.data.message_timer);
+    const updates = {globalMessageTimer: clampedTimer};
     this.conversationMapper.update_properties(conversationEntity, updates);
     return Promise.resolve(conversationEntity);
   }

@@ -1294,6 +1294,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when conversation was updated on server side
    */
   updateConversationMessageTimer(conversationEntity, messageTimer) {
+    messageTimer = z.conversation.ConversationEphemeralHandler.validateTimer(messageTimer);
+
     return this.conversation_service
       .updateConversationMessageTimer(conversationEntity.id, messageTimer)
       .then(response => {
@@ -2087,12 +2089,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   _wrap_in_ephemeral_message(generic_message, millis) {
     const ephemeral = new z.proto.Ephemeral();
-    const fixedTimer = z.util.NumberUtil.clamp(
-      millis,
-      z.cryptography.CryptographyMapper.CONFIG.TIMED_MESSAGES_RANGE.MIN,
-      z.cryptography.CryptographyMapper.CONFIG.TIMED_MESSAGES_RANGE.MAX
-    );
-    ephemeral.set('expire_after_millis', fixedTimer);
+    const clampedTimer = z.conversation.ConversationEphemeralHandler.validateTimer(millis);
+
+    ephemeral.set('expire_after_millis', clampedTimer);
     ephemeral.set(generic_message.content, generic_message[generic_message.content]);
 
     generic_message = new z.proto.GenericMessage(generic_message.message_id);
