@@ -172,6 +172,11 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       this.pastedFileName(null);
     });
 
+    this.hasLocalEphemeralTimer = ko.pureComputed(() => {
+      const conversationEntity = this.conversationEntity();
+      return conversationEntity.localMessageTimer() && !conversationEntity.hasGlobalMessageTimer();
+    });
+
     this._init_subscriptions();
   }
 
