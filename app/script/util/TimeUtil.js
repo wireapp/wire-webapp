@@ -82,7 +82,7 @@ z.util.TimeUtil = {
         value %= z.util.TimeUtil.durationUnits[index - 1].value;
       }
       value /= unit.value;
-      value = rounded ? Math.round(value) : Math.floor(value);
+      value = rounded && value >= 1 ? Math.round(value) : Math.floor(value);
       const longUnit = z.string[value === 1 ? unit.singular : unit.plural];
       return {
         longUnit,
