@@ -96,10 +96,7 @@ z.viewModel.content.CollectionDetailsViewModel = class CollectionDetailsViewMode
   }
 
   messageRemoved(messageEntity) {
-    const isCurrentConversation = this.conversationEntity().id === messageEntity.conversation_id;
-    if (isCurrentConversation) {
-      this.itemRemoved(messageEntity.id);
-    }
+    this.itemRemoved(messageEntity.id, messageEntity.conversation_id);
   }
 
   removedFromView() {
