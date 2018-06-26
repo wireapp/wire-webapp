@@ -261,15 +261,13 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
   }
 
   _mapEphemeral(genericMessage, event) {
-    const millisecondsAsNumber = genericMessage.ephemeral.expire_after_millis.toNumber();
+    const messageTimer = genericMessage.ephemeral.expire_after_millis.toNumber();
     genericMessage.ephemeral.message_id = genericMessage.message_id;
 
-    const clampedTimer = z.conversation.ConversationEphemeralHandler.validateTimer(millisecondsAsNumber);
+    const embeddedMessage = this._mapGenericMessage(genericMessage.ephemeral, event);
+    embeddedMessage.ephemeral_expires = z.conversation.ConversationEphemeralHandler.validateTimer(messageTimer);
 
-    const embedded_message = this._mapGenericMessage(genericMessage.ephemeral, event);
-    embedded_message.ephemeral_expires = clampedTimer;
-
-    return embedded_message;
+    return embeddedMessage;
   }
 
   /**

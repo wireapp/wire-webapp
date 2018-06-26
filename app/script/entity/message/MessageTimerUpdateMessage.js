@@ -28,7 +28,8 @@ z.entity.MessageTimerUpdateMessage = class MessageTimerUpdateMessage extends z.e
 
     this.type = z.event.Backend.CONVERSATION.MESSAGE_TIMER_UPDATE;
     this.system_message_type = z.message.SystemMessageType.CONVERSATION_MESSAGE_TIMER_UPDATE;
-    this.message_timer = messageTimer;
+
+    this.message_timer = z.conversation.ConversationEphemeralHandler.validateTimer(messageTimer);
 
     this.caption = ko.pureComputed(() => {
       if (!this.message_timer) {
