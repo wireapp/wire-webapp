@@ -159,8 +159,6 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
   _obfuscateMessage(messageEntity) {
     if (messageEntity.has_asset_text()) {
       this._obfuscateTextMessage(messageEntity);
-    } else if (messageEntity.is_ping()) {
-      this._obfuscatePingMessage(messageEntity);
     } else if (messageEntity.has_asset()) {
       this._obfuscateAssetMessage(messageEntity);
     } else if (messageEntity.has_asset_image()) {
@@ -168,11 +166,6 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
     } else {
       this.logger.warn(`Ephemeral message of unsupported type: ${messageEntity.type}`);
     }
-  }
-  _obfuscatePingMessage(messageEntity) {
-    messageEntity.ephemeral_expires(true);
-    this.conversationService.update_message_in_db(messageEntity, {ephemeral_expires: true});
-    this.logger.info(`Obfuscated ping message '${messageEntity.id}'`);
   }
 
   _obfuscateTextMessage(messageEntity) {
