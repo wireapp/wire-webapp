@@ -14,7 +14,7 @@
                     <!-- /ko -->
                 </div>
                 <!-- ko foreach: {data: messageTimes, afterRender: () => isRendered(true)} -->
-                    <div class="panel__action-item" data-bind="click: $parent.clickOnMessageTime" data-uie-name="item-timed-messages-option">
+                    <div data-bind="css: $data.isCustom ? 'panel__action-item custom' : 'panel__action-item', click: $data.isCustom ? null : $parent.clickOnMessageTime" data-uie-name="item-timed-messages-option">
                         <div class="panel__action-item__text" data-bind="text: text"></div>
                         <!-- ko if: $parent.currentMessageTimer() === value -->
                             <check-icon></check-icon>
