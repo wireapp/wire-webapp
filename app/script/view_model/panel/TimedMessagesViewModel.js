@@ -34,16 +34,22 @@ z.viewModel.panel.TimedMessagesViewModel = class TimedMessagesViewModel {
       const times = z.ephemeral.timings.VALUES;
       const currentTime = this.currentMessageTimer();
 
-      if (currentTime && !times.includes(currentTime)) {
-        times.push(currentTime);
-      }
-
       times.sort((timeA, timeB) => timeA - timeB);
 
-      return times.map(time => ({
+      const mappedTimes = times.map(time => ({
         text: z.util.TimeUtil.formatDuration(time).text,
         value: time,
       }));
+
+      if (currentTime && !times.includes(currentTime)) {
+        mappedTimes.push({
+          isCustom: true,
+          text: z.util.TimeUtil.formatDuration(currentTime).text,
+          value: currentTime,
+        });
+      }
+
+      return mappedTimes;
     });
 
     this.isRendered = ko.observable(false).extend({notify: 'always'});
