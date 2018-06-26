@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="3.6.2"></a>
+## [3.6.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@3.6.1...@wireapp/core@3.6.2) (2018-06-26)
+
+
+### Bug Fixes
+
+* **core:** Set 'from' to selfId when sending delete message ([#765](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/765)) ([bba16d6](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/bba16d6))
+
+
+
+
 <a name="3.6.1"></a>
 ## [3.6.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@3.6.0...@wireapp/core@3.6.1) (2018-06-25)
 
