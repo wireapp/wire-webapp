@@ -26,7 +26,7 @@ window.z.conversation = z.conversation || {};
 z.conversation.ConversationRepository = class ConversationRepository {
   static get CONFIG() {
     return {
-      CONFIRMATION_THRESHOLD: 7 * 24 * 60 * 60 * 1000,
+      CONFIRMATION_THRESHOLD: z.util.TimeUtil.UNITS_IN_MILLIS.WEEK,
       EXTERNAL_MESSAGE_THRESHOLD: 200 * 1024,
       GROUP: {
         MAX_NAME_LENGTH: 64,
@@ -2512,7 +2512,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       })
       .then(() => this.send_asset_remotedata(conversation_et, file, message_id))
       .then(() => {
-        const upload_duration = (Date.now() - upload_started) / 1000;
+        const upload_duration = (Date.now() - upload_started) / z.util.TimeUtil.UNITS_IN_MILLIS.SECOND;
         this.logger.info(`Finished to upload asset for conversation'${conversation_et.id} in ${upload_duration}`);
       })
       .catch(error => {
@@ -3739,7 +3739,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     if (isEphemeral) {
       message = genericMessage.ephemeral;
       messageContentType = genericMessage.ephemeral.content;
-      messageTimer = genericMessage.ephemeral.expire_after_millis / 1000;
+      messageTimer = genericMessage.ephemeral.expire_after_millis / z.util.TimeUtil.UNITS_IN_MILLIS.SECOND;
     } else {
       message = genericMessage;
       messageContentType = genericMessage.content;

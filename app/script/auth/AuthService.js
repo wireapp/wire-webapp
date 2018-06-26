@@ -26,7 +26,7 @@ z.auth.AuthService = class AuthService {
   static get CONFIG() {
     return {
       POST_ACCESS_RETRY_LIMIT: 10,
-      POST_ACCESS_RETRY_TIMEOUT: 500,
+      POST_ACCESS_RETRY_TIMEOUT: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND * 0.5,
       URL_ACCESS: '/access',
       URL_ACTIVATE: '/activate',
       URL_COOKIES: '/cookies',

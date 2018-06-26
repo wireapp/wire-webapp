@@ -25,7 +25,7 @@ window.z.util = z.util || {};
 z.util.PromiseQueue = class PromiseQueue {
   static get CONFIG() {
     return {
-      UNBLOCK_INTERVAL: 60 * 1000,
+      UNBLOCK_INTERVAL: z.util.TimeUtil.UNITS_IN_MILLIS.MINUTE,
     };
   }
 

@@ -68,7 +68,7 @@ z.user.UserRepository = class UserRepository {
           .filter(user_et => user_et.is_connected())
           .sort((user_a, user_b) => z.util.StringUtil.sortByPriority(user_a.first_name(), user_b.first_name()));
       })
-      .extend({rateLimit: 1000});
+      .extend({rateLimit: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND});
 
     this.isActivatedAccount = ko.pureComputed(() => this.self() && !this.self().isTemporaryGuest());
     this.isTemporaryGuest = ko.pureComputed(() => this.self() && this.self().isTemporaryGuest());
