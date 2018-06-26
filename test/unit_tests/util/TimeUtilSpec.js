@@ -169,6 +169,8 @@ describe('z.util.TimeUtil', () => {
 
     it('formats durations in weeks', () => {
       expect(z.util.TimeUtil.formatDuration(ONE_WEEK_IN_MILLIS)).toEqual({text: '1 week', unit: 'w', value: 1});
+      expect(z.util.TimeUtil.formatDuration(ONE_WEEK_IN_MILLIS * 26)).toEqual({text: '26 weeks', unit: 'w', value: 26});
+      expect(z.util.TimeUtil.formatDuration(ONE_WEEK_IN_MILLIS * 27)).toEqual({text: '27 weeks', unit: 'w', value: 27});
     });
 
     it('formats durations in years', () => {
