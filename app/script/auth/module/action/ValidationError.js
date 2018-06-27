@@ -71,6 +71,7 @@ export default class ValidationError extends Error {
     EMAIL: {...ValidationError.mapErrorsToField('email'), name: 'email'},
     NAME: {...ValidationError.mapErrorsToField('name'), name: 'name'},
     PASSWORD: {...ValidationError.mapErrorsToField('password'), name: 'password'},
+    PASSWORD_LOGIN: {...ValidationError.mapErrorsToField('password-login'), name: 'password-login'},
   };
 
   static getFieldByName = fieldName => {
