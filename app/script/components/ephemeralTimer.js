@@ -23,14 +23,12 @@ window.z = window.z || {};
 window.z.components = z.components || {};
 
 z.components.EphemeralTimer = class EphemeralTimer {
-  constructor(params, componentInfo) {
-    const messageEntity = params.message;
-
-    const ephemeralDuration = messageEntity.ephemeral_expires() - messageEntity.ephemeral_started();
+  constructor({message: messageEntity}, componentInfo) {
+    const duration = messageEntity.ephemeral_expires() - messageEntity.ephemeral_started();
     const dashLength = 12.6;
 
     this.remainingTime = messageEntity.ephemeral_expires() - Date.now();
-    this.initialDashOffset = dashLength - (this.remainingTime / ephemeralDuration) * -dashLength;
+    this.initialDashOffset = dashLength - (this.remainingTime / duration) * -dashLength;
 
     const dial = componentInfo.element.querySelector('.ephemeral-timer__dial');
     z.util.afterRender(() => (dial.style.strokeDashoffset = dashLength));

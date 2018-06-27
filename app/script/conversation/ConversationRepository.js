@@ -159,7 +159,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
       this.conversation_mapper,
       {onMessageTimeout: this.handleMessageExpiration.bind(this)}
     );
-    this.checkMessageTimer = this.ephemeralHandler.checkMessageTimer;
+  }
+
+  checkMessageTimer(messageEntity) {
+    this.ephemeralHandler.checkMessageTimer(messageEntity, this.timeOffset);
   }
 
   _initStateUpdates() {
@@ -206,7 +209,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE,
       this.set_notification_handling_state.bind(this)
     );
-    amplify.subscribe(z.event.WebApp.EVENT.UPDATE_TIME_OFFSET, this.update_time_offset.bind(this));
+    amplify.subscribe(z.event.WebApp.EVENT.UPDATE_TIME_OFFSET, this.updateTimeOffset.bind(this));
     amplify.subscribe(z.event.WebApp.TEAM.MEMBER_LEAVE, this.teamMemberLeave.bind(this));
     amplify.subscribe(z.event.WebApp.USER.UNBLOCKED, this.unblocked_user.bind(this));
   }
@@ -1069,11 +1072,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   /**
    * Update time offset.
-   * @param {number} time_offset - Approximate time different to backend in milliseconds
+   * @param {number} timeOffset - Approximate time different to backend in milliseconds
    * @returns {undefined} No return value
    */
-  update_time_offset(time_offset) {
-    this.timeOffset = time_offset;
+  updateTimeOffset(timeOffset) {
+    this.timeOffset = timeOffset;
   }
 
   /**

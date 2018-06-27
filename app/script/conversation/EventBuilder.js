@@ -208,7 +208,8 @@ z.conversation.EventBuilder = {
     };
   },
   buildVoiceChannelDeactivate(callMessageEntity, reason, timeOffset = 0) {
-    const {conversationId, userId, time = new Date(Date.now() - timeOffset).toISOString()} = callMessageEntity;
+    const {conversationId, userId} = callMessageEntity;
+    const time = callMessageEntity.time || new Date(z.util.TimeUtil.adjustCurrentTimestamp(timeOffset)).toISOString();
 
     return {
       conversation: conversationId,
