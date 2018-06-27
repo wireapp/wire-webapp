@@ -57,10 +57,8 @@
                            data-uie-name="enter-phone">
                   </div>
                 </div>
-                <ul class="error-list" data-uie-name="status-error">
-                  <!-- ko foreach: validation_errors -->
-                    <li class="error" data-bind="text: message"></li>
-                  <!-- /ko -->
+                <ul class="error-list" data-bind="foreach: validation_errors" data-uie-name="status-error">
+                  <li class="error" data-bind="text: message"></li>
                 </ul>
                 <div id="wire-login-phone-remember" data-bind="electron_remove">
                   <div class="checkbox checkbox-remember">
@@ -91,10 +89,8 @@
                        data-bind="css: {'input-error': failed_validation_password}, event: {input: clear_error_password}, l10n_tooltip: z.string.authPlaceholderPasswordSet, l10n_placeholder: z.string.authPlaceholderPasswordSet, textInput: password"
                        data-uie-name="enter-password">
               </div>
-              <ul class="error-list" data-uie-name="status-error">
-                <!-- ko foreach: validation_errors -->
-                  <li class="error" data-bind="text: message"></li>
-                <!-- /ko -->
+              <ul class="error-list" data-bind="foreach: validation_errors" data-uie-name="status-error">
+                <li class="error" data-bind="text: message"></li>
               </ul>
               <div class="footer">
                 <div class="column">
@@ -168,10 +164,8 @@
                        data-bind="css: {'input-error': failed_validation_password}, event: {input: clear_error_password}, l10n_tooltip: z.string.authPlaceholderPasswordPut, l10n_placeholder: z.string.authPlaceholderPasswordPut, textInput: password"
                        data-uie-name="enter-password">
               </div>
-              <ul class="error-list" data-uie-name="status-error">
-                <!-- ko foreach: validation_errors -->
-                  <li class="error" data-bind="text: message"></li>
-                <!-- /ko -->
+              <ul class="error-list" data-bind="foreach: validation_errors" data-uie-name="status-error">
+                <li class="error" data-bind="text: message"></li>
               </ul>
               <div class="footer">
                 <div class="column">
