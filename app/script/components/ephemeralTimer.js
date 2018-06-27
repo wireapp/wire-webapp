@@ -25,13 +25,20 @@ window.z.components = z.components || {};
 z.components.EphemeralTimer = class EphemeralTimer {
   constructor({message: messageEntity}, componentInfo) {
     const duration = messageEntity.ephemeral_expires() - messageEntity.ephemeral_started();
+
     const dashLength = 12.6;
-
-    this.remainingTime = messageEntity.ephemeral_expires() - Date.now();
-    this.initialDashOffset = dashLength - (this.remainingTime / duration) * -dashLength;
-
     const dial = componentInfo.element.querySelector('.ephemeral-timer__dial');
-    z.util.afterRender(() => (dial.style.strokeDashoffset = dashLength));
+
+    const animatePie = () => {
+      const remainingTime = messageEntity.ephemeral_expires() - Date.now();
+      dial.style.strokeDashoffset = dashLength - (remainingTime / duration) * -dashLength;
+      this.animationFrameCallback = window.requestAnimationFrame(animatePie);
+    };
+    this.animationFrameCallback = window.requestAnimationFrame(animatePie);
+  }
+
+  dispose() {
+    window.cancelAnimationFrame(this.animationFrameCallback);
   }
 };
 
@@ -39,7 +46,7 @@ ko.components.register('ephemeral-timer', {
   template: `
     <svg class="ephemeral-timer" viewBox="0 0 8 8" width="8" height="8">
       <circle class="ephemeral-timer__background" cx="4" cy="4" r="4"></circle>
-      <circle class="ephemeral-timer__dial" cx="4" cy="4" r="2" stroke-width="4" transform="rotate(-90 4 4)" stroke-dasharray="12.6" data-bind="attr: {'stroke-dashoffset': initialDashOffset}, style: {'transition-duration': remainingTime + 'ms'}">
+      <circle class="ephemeral-timer__dial" cx="4" cy="4" r="2" stroke-width="4" transform="rotate(-90 4 4)" stroke-dasharray="12.6">
       </circle>
     </svg>
   `,
