@@ -53,8 +53,6 @@ const Wrapper = Component => (
   <AppContainer>
     <Provider store={store}>
       <Component />
-      <Component />
-      <Component />
     </Provider>
   </AppContainer>
 );
