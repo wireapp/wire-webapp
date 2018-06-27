@@ -570,13 +570,13 @@ z.entity.Conversation = class Conversation {
    * @returns {z.entity.Message} Last delivered message
    */
   getLastDeliveredMessage() {
-    const messageEntities = this.messages()
+    return this.messages()
       .slice()
-      .reverse();
-    return messageEntities.find(messageEntity => {
-      const isDelivered = messageEntity.status() === z.message.StatusType.DELIVERED;
-      return isDelivered && messageEntity.user().is_me;
-    });
+      .reverse()
+      .find(messageEntity => {
+        const isDelivered = messageEntity.status() === z.message.StatusType.DELIVERED;
+        return isDelivered && messageEntity.user().is_me;
+      });
   }
 
   /**
