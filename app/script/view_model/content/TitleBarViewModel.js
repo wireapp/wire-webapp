@@ -43,7 +43,7 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
     this.isActivatedAccount = mainViewModel.isActivatedAccount;
 
     // TODO remove the titlebar for now to ensure that buttons are clickable in macOS wrappers
-    window.setTimeout(() => $('.titlebar').remove(), 1000);
+    window.setTimeout(() => $('.titlebar').remove(), z.util.TimeUtil.UNITS_IN_MILLIS.SECOND);
 
     this.conversationEntity = this.conversationRepository.active_conversation;
 

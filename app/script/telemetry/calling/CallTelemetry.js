@@ -158,7 +158,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
   track_duration(callEntity) {
     const {terminationReason, timerStart, durationTime} = callEntity;
 
-    const duration = Math.floor((Date.now() - timerStart) / 1000);
+    const duration = Math.floor((Date.now() - timerStart) / z.util.TimeUtil.UNITS_IN_MILLIS.SECOND);
 
     if (!window.isNaN(duration)) {
       this.logger.info(`Call duration: ${duration} seconds.`, durationTime());

@@ -30,9 +30,7 @@ z.util.StorageUtil = {
     return z.util.StorageUtil.setValue(key, null);
   },
   setValue: function(key, value, secondsToExpire) {
-    if (secondsToExpire) {
-      return amplify.store(key, value, {expires: secondsToExpire * 1000});
-    }
-    return amplify.store(key, value);
+    const config = secondsToExpire ? {expires: secondsToExpire * z.util.TimeUtil.UNITS_IN_MILLIS.SECOND} : undefined;
+    return amplify.store(key, value, config);
   },
 };
