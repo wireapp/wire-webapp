@@ -422,6 +422,10 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     return iconComponents[message.system_message_type];
   }
 
+  getServerTimeOffset() {
+    return this.conversation_repository.timeOffset;
+  }
+
   /**
    * Shows detail image view.
    *

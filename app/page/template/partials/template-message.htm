@@ -88,7 +88,7 @@
 
   <div class="message-body" data-bind="attr: {'title': message.ephemeral_caption()}">
     <!-- ko if: message.ephemeral_status() === z.message.EphemeralStatusType.ACTIVE -->
-      <ephemeral-timer class="message-ephemeral-timer" params="message: message"></ephemeral-timer>
+      <ephemeral-timer class="message-ephemeral-timer" params="message: message, serverTimeOffset: $parent.getServerTimeOffset()"></ephemeral-timer>
     <!-- /ko -->
 
     <!-- ko foreach: {data: message.assets, as: 'asset'} -->

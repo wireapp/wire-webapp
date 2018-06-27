@@ -275,7 +275,7 @@ z.entity.Message = class Message {
       this.ephemeral_started(`${startingTimestamp}`);
     }
 
-    const remainingTime = this.ephemeral_expires() - Date.now();
+    const remainingTime = this.ephemeral_expires() - this.ephemeral_started();
     this.ephemeral_remaining(remainingTime);
     this.messageTimerStarted = true;
   }

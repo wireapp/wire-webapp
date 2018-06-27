@@ -23,14 +23,18 @@ window.z = window.z || {};
 window.z.components = z.components || {};
 
 z.components.EphemeralTimer = class EphemeralTimer {
-  constructor(params, componentInfo) {
-    const messageEntity = params.message;
-
-    const ephemeralDuration = messageEntity.ephemeral_expires() - messageEntity.ephemeral_started();
+  constructor({message: messageEntity, serverTimeOffset}, componentInfo) {
+    const duration = messageEntity.ephemeral_expires() - messageEntity.ephemeral_started();
     const dashLength = 12.6;
 
-    this.remainingTime = messageEntity.ephemeral_expires() - Date.now();
-    this.initialDashOffset = dashLength - (this.remainingTime / ephemeralDuration) * -dashLength;
+    // if the message was sent by me, the base time used is the server time in order for all my clients
+    // to use the same frame of reference. Thus, we need to fix the timestamp used by the ephemeral timer
+    const fixedLocalClock = messageEntity.user().is_me
+      ? z.util.TimeUtil.adjustCurrentTimestamp(serverTimeOffset)
+      : Date.now();
+
+    this.remainingTime = messageEntity.ephemeral_expires() - fixedLocalClock;
+    this.initialDashOffset = dashLength - (this.remainingTime / duration) * -dashLength;
 
     const dial = componentInfo.element.querySelector('.ephemeral-timer__dial');
     z.util.afterRender(() => (dial.style.strokeDashoffset = dashLength));
