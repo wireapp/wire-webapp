@@ -142,7 +142,7 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
       }
     };
 
-    const _createObserver = () => {
+    const _createObserver = element => {
       const onIntersect = (entries, intersectionObserver) => {
         entries.forEach(entry => {
           if (entry.isIntersecting) {
@@ -155,7 +155,7 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
 
       const options = {root: null, rootMargin: '0px', threshold: 0.0};
       const intersectionObserver = new IntersectionObserver(onIntersect, options);
-      intersectionObserver.observe(this.element[0]);
+      intersectionObserver.observe(element);
       return intersectionObserver;
     };
 
@@ -192,7 +192,7 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
     });
 
     this.participantSubscription = this.participant.subscribe(() => _loadAvatarPicture());
-    this.intersectionObserver = _createObserver();
+    this.intersectionObserver = _createObserver(componentInfo.element);
   }
 
   dispose() {
