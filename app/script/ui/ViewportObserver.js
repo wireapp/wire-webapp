@@ -38,9 +38,10 @@ z.ui.ViewportObserver = (() => {
     const onIntersect = entries => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
-          const trackedElement = _getElement(entry.target);
+          const trackedElement = _getObservedElement(entry.target);
           trackedElement.callback();
           intersectionObserver.unobserve(trackedElement.element);
+          _removeObservedElement(trackedElement);
         }
       });
     };
@@ -50,16 +51,18 @@ z.ui.ViewportObserver = (() => {
     return intersectionObserver;
   };
 
-  const _getElement = element => {
-    return observedElements.find(trackedElement => trackedElement.element === element);
-  };
+  const _getObservedElement = requestedElement => observedElements.find(({element}) => element === requestedElement);
 
   const _removeElement = element => {
-    const removedElement = _getElement(element);
-    if (removedElement) {
-      observedElements.splice(observedElements.indexOf(removedElement), 1);
+    const observedElement = _getObservedElement(element);
+    if (observedElement) {
+      _removeObservedElement(observedElement);
     }
     intersectionObserver.unobserve(element);
+  };
+
+  const _removeObservedElement = observedElement => {
+    observedElements.splice(observedElements.indexOf(observedElement), 1);
   };
 
   return {
