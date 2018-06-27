@@ -168,12 +168,12 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
       }
     };
 
-    const _onInViewPort = () => {
+    const _onInViewport = () => {
       this.avatarEnteredViewport = true;
       _loadAvatarPicture();
     };
 
-    z.ui.ViewportObserver.addElement(componentInfo.element, _onInViewPort);
+    z.ui.ViewportObserver.addElement(componentInfo.element, _onInViewport);
 
     this.picturePreviewSubscription = this.participant().previewPictureResource.subscribe(() => {
       if (this.avatarEnteredViewport) {
