@@ -162,12 +162,12 @@ z.conversation.EventMapper = class EventMapper {
     messageEntity.type = type;
     messageEntity.version = version || 1;
 
+    if (messageEntity.is_content()) {
+      messageEntity.status(event.status || z.message.StatusType.DELIVERED);
+    }
+
     if (messageEntity.is_reactable()) {
-      const {reactions, status} = event;
-      messageEntity.reactions(reactions || {});
-      if (status) {
-        messageEntity.status(status);
-      }
+      messageEntity.reactions(event.reactions || {});
     }
 
     if (event.ephemeral_expires) {

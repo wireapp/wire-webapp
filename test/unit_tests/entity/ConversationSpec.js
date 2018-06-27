@@ -248,9 +248,9 @@ describe('Conversation', () => {
     });
   });
 
-  describe('get_last_delivered_message', () => {
+  describe('getLastDeliveredMessage', () => {
     it('returns undefined if conversation has no messages', () => {
-      expect(conversation_et.get_last_delivered_message()).not.toBeDefined();
+      expect(conversation_et.getLastDeliveredMessage()).not.toBeDefined();
     });
 
     it('returns last delivered message', () => {
@@ -258,25 +258,25 @@ describe('Conversation', () => {
       sent_message_et.id = z.util.createRandomUuid();
       sent_message_et.status(z.message.StatusType.SENT);
       conversation_et.add_message(sent_message_et);
-      expect(conversation_et.get_last_delivered_message()).not.toBeDefined();
+      expect(conversation_et.getLastDeliveredMessage()).not.toBeDefined();
 
       const delivered_message_et = new z.entity.ContentMessage();
       delivered_message_et.id = z.util.createRandomUuid();
       delivered_message_et.status(z.message.StatusType.DELIVERED);
       conversation_et.add_message(delivered_message_et);
-      expect(conversation_et.get_last_delivered_message()).toBe(delivered_message_et);
+      expect(conversation_et.getLastDeliveredMessage()).toBe(delivered_message_et);
 
       const next_sent_message_et = new z.entity.ContentMessage();
       next_sent_message_et.id = z.util.createRandomUuid();
       next_sent_message_et.status(z.message.StatusType.SENT);
       conversation_et.add_message(next_sent_message_et);
-      expect(conversation_et.get_last_delivered_message()).toBe(delivered_message_et);
+      expect(conversation_et.getLastDeliveredMessage()).toBe(delivered_message_et);
 
       const next_delivered_message_et = new z.entity.ContentMessage();
       next_delivered_message_et.id = z.util.createRandomUuid();
       next_delivered_message_et.status(z.message.StatusType.DELIVERED);
       conversation_et.add_message(next_delivered_message_et);
-      expect(conversation_et.get_last_delivered_message()).toBe(next_delivered_message_et);
+      expect(conversation_et.getLastDeliveredMessage()).toBe(next_delivered_message_et);
     });
   });
 

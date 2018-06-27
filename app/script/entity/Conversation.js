@@ -569,14 +569,12 @@ z.entity.Conversation = class Conversation {
    * Get the last delivered message.
    * @returns {z.entity.Message} Last delivered message
    */
-  get_last_delivered_message() {
-    const messages = this.messages();
-    for (let index = messages.length - 1; index >= 0; index--) {
-      const message_et = messages[index];
-      if (message_et.status() === z.message.StatusType.DELIVERED) {
-        return message_et;
-      }
-    }
+  getLastDeliveredMessage() {
+    const messageEntities = this.messages().reverse();
+    return messageEntities.find(messageEntity => {
+      const isDelivered = messageEntity.status() === z.message.StatusType.DELIVERED;
+      return isDelivered && messageEntity.user().is_me;
+    });
   }
 
   /**

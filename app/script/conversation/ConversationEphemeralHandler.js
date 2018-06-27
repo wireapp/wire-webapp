@@ -85,6 +85,11 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
    * @returns {undefined} No return value
    */
   checkMessageTimer(messageEntity, timeOffset) {
+    const hasHitBackend = messageEntity.status() > z.message.StatusType.SENDING;
+    if (!hasHitBackend) {
+      return;
+    }
+
     switch (messageEntity.ephemeral_status()) {
       case z.message.EphemeralStatusType.TIMED_OUT: {
         this._timeoutEphemeralMessage(messageEntity);
