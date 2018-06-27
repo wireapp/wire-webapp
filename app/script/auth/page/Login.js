@@ -172,7 +172,8 @@ class Login extends React.PureComponent {
         }
       })
       .then(() => {
-        const {email, password, persist} = this.state;
+        const {password, persist} = this.state;
+        const email = this.state.email.trim();
         const login = {clientType: persist ? ClientType.PERMANENT : ClientType.TEMPORARY, password};
 
         if (this.isValidEmail(email)) {
