@@ -161,6 +161,7 @@
     "deploy-travis-dev": "grunt app_deploy_travis:dev",
     "deploy-travis-prod": "grunt app_deploy_travis:prod",
     "deploy-travis-staging": "grunt app_deploy_travis:staging",
+    "dist": "grunt prepare_dist",
     "fix": "yarn fix:assets && yarn fix:scripts",
     "fix:assets": "yarn prettier --write && yarn stylelint",
     "fix:scripts": "yarn test:scripts --fix",
