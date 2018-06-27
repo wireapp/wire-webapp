@@ -289,7 +289,7 @@ class Login extends React.PureComponent {
                       />
                       <InputSubmitCombo>
                         <Input
-                          name="password"
+                          name="password-login"
                           tabIndex="2"
                           onChange={event =>
                             this.setState({
