@@ -23,7 +23,7 @@ window.z = window.z || {};
 window.z.components = z.components || {};
 
 z.components.EphemeralTimer = class EphemeralTimer {
-  constructor({message: messageEntity, serverTimeOffset}, componentInfo) {
+  constructor({message: messageEntity}, componentInfo) {
     const duration = messageEntity.ephemeral_expires() - messageEntity.ephemeral_started();
     const dashLength = 12.6;
 
