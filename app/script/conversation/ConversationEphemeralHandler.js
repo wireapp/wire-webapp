@@ -79,10 +79,12 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
 
   /**
    * Check the remaining lifetime for a given ephemeral message.
+   *
    * @param {Message} messageEntity - Message to check
+   * @param {number} timeOffset - Approximate time different to backend in milliseconds
    * @returns {undefined} No return value
    */
-  checkMessageTimer(messageEntity) {
+  checkMessageTimer(messageEntity, timeOffset) {
     switch (messageEntity.ephemeral_status()) {
       case z.message.EphemeralStatusType.TIMED_OUT: {
         this._timeoutEphemeralMessage(messageEntity);
@@ -90,12 +92,12 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
       }
 
       case z.message.EphemeralStatusType.ACTIVE: {
-        messageEntity.startMessageTimer();
+        messageEntity.startMessageTimer(timeOffset);
         break;
       }
 
       case z.message.EphemeralStatusType.INACTIVE: {
-        messageEntity.startMessageTimer();
+        messageEntity.startMessageTimer(timeOffset);
         this.conversationService.update_message_in_db(messageEntity, {
           ephemeral_expires: messageEntity.ephemeral_expires(),
           ephemeral_started: messageEntity.ephemeral_started(),

@@ -263,13 +263,13 @@ z.entity.Message = class Message {
   }
 
   // Start the ephemeral timer for the message.
-  startMessageTimer() {
+  startMessageTimer(timeOffset) {
     if (this.messageTimerStarted) {
       return;
     }
 
     if (this.ephemeral_status() === z.message.EphemeralStatusType.INACTIVE) {
-      const startingTimestamp = this.user().is_me ? this.timestamp() : Date.now();
+      const startingTimestamp = this.user().is_me ? Math.min(this.timestamp() + timeOffset, Date.now()) : Date.now();
       const expirationTimestamp = `${startingTimestamp + this.ephemeral_expires()}`;
       this.ephemeral_expires(expirationTimestamp);
       this.ephemeral_started(`${startingTimestamp}`);
