@@ -25,7 +25,7 @@ import {Link, H3, Button, Container, Columns, Column, Modal, Text, COLOR} from '
 
 const AcceptNewsModal = ({onConfirm, onDecline, intl: {formatMessage: _}}) => (
   <Modal>
-    <Container style={{maxWidth: '400px'}} data-uie-name="modal-marketing-consent">
+    <Container style={{maxWidth: '800px'}} data-uie-name="modal-marketing-consent">
       <H3 style={{fontWeight: '500', marginTop: '10px'}} data-uie-name="modal-marketing-consent-title">
         {_(acceptNewsModalStrings.headline)}
       </H3>
