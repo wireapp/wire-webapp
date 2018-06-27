@@ -19,14 +19,20 @@
 
 import EventEmitter = require('events');
 import {IncomingNotification} from '../conversation/';
-import {HttpClient} from '../http/';
+import {HttpClient, NetworkError} from '../http/';
 
 const buffer = require('../shims/node/buffer');
 const Html5WebSocket = require('html5-websocket');
+const logdown = require('logdown');
 const ReconnectingWebsocket = require('reconnecting-websocket');
 
 class WebSocketClient extends EventEmitter {
   private clientId: string | undefined;
+
+  private readonly logger: any = logdown('@wireapp/api-client/tcp/WebSocketClient', {
+    logger: console,
+    markdown: false,
+  });
 
   private socket: WebSocket | undefined;
 
@@ -48,7 +54,7 @@ class WebSocketClient extends EventEmitter {
   };
 
   public static TOPIC = {
-    ON_MESSAGE: 'message',
+    ON_MESSAGE: 'WebSocketClient.TOPIC.ON_MESSAGE',
   };
 
   constructor(private readonly baseURL: string, public client: HttpClient) {
@@ -80,7 +86,14 @@ class WebSocketClient extends EventEmitter {
         this.emit(WebSocketClient.TOPIC.ON_MESSAGE, notification);
       };
 
-      this.socket.onerror = () => this.client.refreshAccessToken();
+      this.socket.onerror = () =>
+        this.client.refreshAccessToken().catch(error => {
+          if (error instanceof NetworkError) {
+            this.logger.warn(error);
+          } else {
+            throw error;
+          }
+        });
       this.socket.onopen = () => (this.socket ? (this.socket.binaryType = 'arraybuffer') : undefined);
     }
 

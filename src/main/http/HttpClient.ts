@@ -20,25 +20,34 @@
 import {PriorityQueue} from '@wireapp/priority-queue';
 import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine';
 import axios, {AxiosError, AxiosPromise, AxiosRequestConfig, AxiosResponse} from 'axios';
+import EventEmitter = require('events');
 import {AccessTokenData, AccessTokenStore, AuthAPI} from '../auth';
-import {ContentType} from '../http';
+import {ConnectionState, ContentType, NetworkError} from '../http';
 import {sendRequestWithCookie} from '../shims/node/cookie';
 
 const logdown = require('logdown');
 
-class HttpClient {
-  // private _authAPI: AuthAPI;
-  private readonly logger: any = logdown('@wireapp/api-client/http.HttpClient', {
+class HttpClient extends EventEmitter {
+  private readonly logger: any = logdown('@wireapp/api-client/http/HttpClient', {
     logger: console,
     markdown: false,
   });
+  private connectionState: ConnectionState;
   private readonly requestQueue: PriorityQueue;
+
+  public static TOPIC = {
+    ON_CONNECTION_STATE_CHANGE: 'HttpClient.TOPIC.ON_CONNECTION_STATE_CHANGE',
+  };
 
   constructor(
     private readonly baseURL: string,
     public accessTokenStore: AccessTokenStore,
     private readonly engine: CRUDEngine
   ) {
+    super();
+
+    this.connectionState = ConnectionState.UNDEFINED;
+
     this.requestQueue = new PriorityQueue({
       maxRetries: 0,
       retryDelay: 1000,
@@ -64,9 +73,12 @@ class HttpClient {
     });
   }
 
-  // set authAPI(authAPI: AuthAPI) {
-  //   this._authAPI = authAPI;
-  // }
+  private updateConnectionState(state: ConnectionState): void {
+    if (this.connectionState !== state) {
+      this.connectionState = state;
+      this.emit(HttpClient.TOPIC.ON_CONNECTION_STATE_CHANGE, this.connectionState);
+    }
+  }
 
   public createUrl(url: string) {
     return `${this.baseURL}${url}`;
@@ -91,13 +103,29 @@ class HttpClient {
       }
     }
 
-    return axios.request(config).catch((error: AxiosError) => {
-      if (error.response && error.response.status === 401) {
-        return this.refreshAccessToken().then(() => this._sendRequest(config, tokenAsParam));
-      }
+    return axios
+      .request(config)
+      .then((response: AxiosResponse) => {
+        this.updateConnectionState(ConnectionState.CONNECTED);
+        return response;
+      })
+      .catch((error: AxiosError) => {
+        const isNetworkError = !error.response && error.request && Object.keys(error.request).length === 0;
+        const isUnauthorized = error.response && error.response.status === 401;
 
-      return Promise.reject(error);
-    });
+        if (isNetworkError) {
+          const message = `Cannot do "${error.config.method}" request to "${error.config.url}".`;
+          const networkError = new NetworkError(message);
+          this.updateConnectionState(ConnectionState.DISCONNECTED);
+          return Promise.reject(networkError);
+        }
+
+        if (isUnauthorized) {
+          return this.refreshAccessToken().then(() => this._sendRequest(config, tokenAsParam));
+        }
+
+        return Promise.reject(error);
+      });
   }
 
   public refreshAccessToken(): Promise<AccessTokenData> {

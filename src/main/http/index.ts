@@ -19,6 +19,8 @@
 
 export * from './BackendError';
 export * from './BackendErrorLabel';
+export * from './ConnectionState';
 export * from './ContentType';
 export * from './HttpClient';
+export * from './NetworkError';
 export * from './StatusCode';
