@@ -44,7 +44,7 @@ z.components.EphemeralTimer = class EphemeralTimer {
   }
 
   dispose() {
-    window.clearTimeout(this.animationInterval);
+    window.clearInterval(this.animationInterval);
   }
 };
 
