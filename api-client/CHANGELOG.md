@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="1.5.0"></a>
+# [1.5.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@1.4.3...@wireapp/api-client@1.5.0) (2018-06-27)
+
+
+### Features
+
+* **api-client:** Emit ConnectionState ([#773](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/773)) ([23c4246](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/23c4246))
+
+
+
+
 <a name="1.4.3"></a>
 ## [1.4.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@1.4.2...@wireapp/api-client@1.4.3) (2018-06-27)
 
