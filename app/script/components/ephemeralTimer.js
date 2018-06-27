@@ -29,18 +29,21 @@ z.components.EphemeralTimer = class EphemeralTimer {
     const dashLength = 12.6;
     const dial = componentInfo.element.querySelector('.ephemeral-timer__dial');
 
-    const numberOfAnimationSteps = 100;
-    const animationRate = duration / numberOfAnimationSteps;
+    const numberOfAnimationSteps = 40;
+    const animationInterval = Math.min(duration / numberOfAnimationSteps, z.util.TimeUtil.UNITS_IN_MILLIS.HOUR);
     const animatePie = () => {
       const remainingTime = messageEntity.ephemeral_expires() - Date.now();
-      dial.style.strokeDashoffset = dashLength - (remainingTime / duration) * -dashLength;
-      this.animationTimeout = window.setTimeout(animatePie, animationRate);
+      const newDashoffset = dashLength - (remainingTime / duration) * -dashLength;
+      dial.style.strokeDashoffset = Math.max(newDashoffset, dashLength);
+      if (newDashoffset === dashLength) {
+        window.clearInterval(this.animationInterval);
+      }
     };
-    this.animationTimeout = window.setTimeout(animatePie, animationRate);
+    this.animationInterval = window.setInterval(animatePie, animationInterval);
   }
 
   dispose() {
-    window.clearTimeout(this.animationTimeout);
+    window.clearTimeout(this.animationInterval);
   }
 };
 
