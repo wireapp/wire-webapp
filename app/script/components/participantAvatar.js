@@ -142,23 +142,6 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
       }
     };
 
-    const _createObserver = element => {
-      const onIntersect = (entries, intersectionObserver) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            this.avatarEnteredViewport = true;
-            _loadAvatarPicture();
-            intersectionObserver.disconnect();
-          }
-        });
-      };
-
-      const options = {root: null, rootMargin: '0px', threshold: 0.0};
-      const intersectionObserver = new IntersectionObserver(onIntersect, options);
-      intersectionObserver.observe(element);
-      return intersectionObserver;
-    };
-
     const _loadAvatarPicture = () => {
       this.element.find('.avatar-image').html('');
       this.element.removeClass('avatar-image-loaded avatar-loading-transition');
@@ -185,6 +168,13 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
       }
     };
 
+    const _onInViewPort = () => {
+      this.avatarEnteredViewport = true;
+      _loadAvatarPicture();
+    };
+
+    z.ui.ViewportObserver.addElement(componentInfo.element, _onInViewPort);
+
     this.picturePreviewSubscription = this.participant().previewPictureResource.subscribe(() => {
       if (this.avatarEnteredViewport) {
         _loadAvatarPicture();
@@ -192,11 +182,10 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
     });
 
     this.participantSubscription = this.participant.subscribe(() => _loadAvatarPicture());
-    this.intersectionObserver = _createObserver(componentInfo.element);
   }
 
   dispose() {
-    this.intersectionObserver.disconnect();
+    z.ui.ViewportObserver.removeElement(this.element[0]);
     this.participantSubscription.dispose();
     this.picturePreviewSubscription.dispose();
   }
