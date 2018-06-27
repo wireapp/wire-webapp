@@ -23,8 +23,8 @@ window.z = window.z || {};
 window.z.entity = z.entity || {};
 
 z.entity.ContentMessage = class ContentMessage extends z.entity.Message {
-  constructor() {
-    super();
+  constructor(id) {
+    super(id);
 
     this.assets = ko.observableArray([]);
     this.super_type = z.message.SuperType.CONTENT;
