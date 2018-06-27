@@ -34,10 +34,8 @@ z.components.DeviceToggleButton = class DeviceToggleButton {
 
 ko.components.register('device-toggle-button', {
   template: `
-    <div class="device-toggle-button-indicator">
-      <!-- ko foreach: ko.utils.range(0, numberOfDevices() - 1) -->
-        <span class="device-toggle-button-indicator-dot" data-bind="css: {'device-toggle-button-indicator-dot-active': $data == $parent.currentDeviceIndex()}"></span>
-      <!-- /ko -->
+    <div class="device-toggle-button-indicator" data-bind="foreach: ko.utils.range(0, numberOfDevices() - 1)">
+      <span class="device-toggle-button-indicator-dot" data-bind="css: {'device-toggle-button-indicator-dot-active': $data == $parent.currentDeviceIndex()}"></span>
     </div>
   `,
   viewModel: z.components.DeviceToggleButton,
