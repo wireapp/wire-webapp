@@ -30,16 +30,17 @@ z.components.EphemeralTimer = class EphemeralTimer {
     const dial = componentInfo.element.querySelector('.ephemeral-timer__dial');
 
     const numberOfAnimationSteps = 40;
-    const animationInterval = Math.min(duration / numberOfAnimationSteps, z.util.TimeUtil.UNITS_IN_MILLIS.HOUR);
+    const animationIntervalValue = Math.min(duration / numberOfAnimationSteps, z.util.TimeUtil.UNITS_IN_MILLIS.HOUR);
     const animatePie = () => {
       const remainingTime = messageEntity.ephemeral_expires() - Date.now();
       const newDashoffset = dashLength - (remainingTime / duration) * -dashLength;
       dial.style.strokeDashoffset = Math.max(newDashoffset, dashLength);
       if (newDashoffset === dashLength) {
         window.clearInterval(this.animationInterval);
+        this.animationInterval = undefined;
       }
     };
-    this.animationInterval = window.setInterval(animatePie, animationInterval);
+    this.animationInterval = window.setInterval(animatePie, animationIntervalValue);
   }
 
   dispose() {
