@@ -2171,7 +2171,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
             this._trackContributed(conversation_et, generic_message);
 
             const backend_iso_date = sync_timestamp ? payload.time : '';
-            return this._update_message_as_sent(conversation_et, message_stored, backend_iso_date);
+            return this._updateMessageAsSent(conversation_et, message_stored, backend_iso_date);
           })
           .then(() => message_stored);
       });
@@ -2180,32 +2180,31 @@ z.conversation.ConversationRepository = class ConversationRepository {
   /**
    * Update message as sent in db and view.
    *
-   * @param {Conversation} conversation_et - Conversation entity
-   * @param {Object} event_json - Event object
-   * @param {string} iso_date - If defined it will update event timestamp
+   * @param {Conversation} conversationEntity - Conversation entity
+   * @param {Object} eventJson - Event object
+   * @param {string} isoDate - If defined it will update event timestamp
    * @returns {Promise} Resolves when sent status was updated
    */
-  _update_message_as_sent(conversation_et, event_json, iso_date) {
-    return this.get_message_in_conversation_by_id(conversation_et, event_json.id)
-      .then(message_et => {
-        const changes = {
-          status: z.message.StatusType.SENT,
-        };
-        message_et.status(z.message.StatusType.SENT);
+  _updateMessageAsSent(conversationEntity, eventJson, isoDate) {
+    return this.get_message_in_conversation_by_id(conversationEntity, eventJson.id)
+      .then(messageEntity => {
+        messageEntity.status(z.message.StatusType.SENT);
 
-        if (iso_date) {
-          changes.time = iso_date;
+        const changes = {status: z.message.StatusType.SENT};
+        if (isoDate) {
+          changes.time = isoDate;
 
-          const timestamp = new Date(iso_date).getTime();
+          const timestamp = new Date(isoDate).getTime();
           if (!_.isNaN(timestamp)) {
-            message_et.timestamp(timestamp);
-            conversation_et.update_timestamp_server(timestamp, true);
-            conversation_et.update_timestamps(message_et);
+            messageEntity.timestamp(timestamp);
+            conversationEntity.update_timestamp_server(timestamp, true);
+            conversationEntity.update_timestamps(messageEntity);
           }
         }
 
-        if (z.event.EventTypeHandling.STORE.includes(message_et.type) || message_et.has_asset_image()) {
-          return this.conversation_service.update_message_in_db(message_et, changes);
+        this.checkMessageTimer(messageEntity);
+        if (z.event.EventTypeHandling.STORE.includes(messageEntity.type) || messageEntity.has_asset_image()) {
+          return this.conversation_service.update_message_in_db(messageEntity, changes);
         }
       })
       .catch(error => {

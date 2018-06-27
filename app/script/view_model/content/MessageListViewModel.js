@@ -495,7 +495,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
    * @returns {boolean} Message is last delivered one
    */
   is_last_delivered_message(message_et) {
-    return this.conversation().get_last_delivered_message() === message_et;
+    return this.conversation().getLastDeliveredMessage() === message_et;
   }
 
   click_on_cancel_request(messageEntity) {
