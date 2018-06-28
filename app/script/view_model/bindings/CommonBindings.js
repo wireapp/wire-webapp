@@ -506,8 +506,13 @@ ko.bindingHandlers.in_viewport = (function() {
     init(element, valueAccessor, allBindingsAccessor) {
       function _inView(domElement) {
         const box = domElement.getBoundingClientRect();
+        const elementAtPoint = document.elementFromPoint(box.x, box.y);
+        const isHidden =
+          !elementAtPoint.contains(domElement) && !domElement.contains(elementAtPoint) && domElement !== elementAtPoint;
+
         const isInRightPanel = document.querySelector('#right-column').contains(domElement);
         return (
+          !isHidden &&
           box.right >= 0 &&
           box.bottom >= 0 &&
           (isInRightPanel || box.left <= document.documentElement.clientWidth) &&
