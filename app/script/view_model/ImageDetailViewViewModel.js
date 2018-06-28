@@ -27,6 +27,7 @@ z.viewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
     this.beforeHideCallback = this.beforeHideCallback.bind(this);
     this.hideCallback = this.hideCallback.bind(this);
     this.messageAdded = this.messageAdded.bind(this);
+    this.messageExpired = this.messageExpired.bind(this);
     this.messageRemoved = this.messageRemoved.bind(this);
 
     this.elementId = 'detail-view';
@@ -73,6 +74,7 @@ z.viewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
     this.messageEntity(undefined);
     this.source = undefined;
 
+    amplify.unsubscribe(z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, this.messageExpired);
     amplify.unsubscribe(z.event.WebApp.CONVERSATION.MESSAGE.ADDED, this.messageAdded);
     amplify.unsubscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, this.messageRemoved);
   }
@@ -82,6 +84,7 @@ z.viewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
     this.messageEntity(messageEntity);
     this.source = source;
 
+    amplify.subscribe(z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, this.messageExpired);
     amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.ADDED, this.messageAdded);
     amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, this.messageRemoved);
 
@@ -118,19 +121,26 @@ z.viewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
   }
 
   messageAdded(messageEntity) {
-    const isExpectedId = messageEntity.conversation === this.conversationEntity().id;
-    if (isExpectedId) {
+    const isCurrentConversation = this.conversationEntity().id === messageEntity.conversation;
+    if (isCurrentConversation) {
       this.items.push(messageEntity);
     }
   }
 
-  messageRemoved(removedMessageId) {
-    const isExpectedId = this.messageEntity().id === removedMessageId;
-    if (isExpectedId) {
-      return this.imageModal.hide();
-    }
+  messageExpired(messageEntity) {
+    this.messageRemoved(messageEntity.id, messageEntity.conversation_id);
+  }
 
-    this.items.remove(message_et => message_et.id === removedMessageId);
+  messageRemoved(messageId, conversationId) {
+    const isCurrentConversation = this.conversationEntity().id === conversationId;
+    if (isCurrentConversation) {
+      const isVisibleMessage = this.messageEntity().id === messageId;
+      if (isVisibleMessage) {
+        return this.imageModal.hide();
+      }
+
+      this.items.remove(messageEntity => messageEntity.id === messageId);
+    }
   }
 
   _loadImage() {

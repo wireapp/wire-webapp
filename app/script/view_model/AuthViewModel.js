@@ -34,7 +34,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
         z.auth.URLParameter.LOCALE,
         z.auth.URLParameter.TRACKING,
       ],
-      RESET_TIMEOUT: 2000,
+      RESET_TIMEOUT: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND * 2,
     };
   }
 
@@ -1464,10 +1464,9 @@ z.viewModel.AuthViewModel = class AuthViewModel {
    */
   _validate_password(mode) {
     if (this.password().length < z.config.MINIMUM_PASSWORD_LENGTH) {
-      if (mode === z.auth.AuthView.MODE.ACCOUNT_PASSWORD) {
-        return this._add_error(z.string.authErrorPasswordWrong, z.auth.AuthView.TYPE.PASSWORD);
-      }
-      this._add_error(z.string.authErrorPasswordShort, z.auth.AuthView.TYPE.PASSWORD);
+      const isPasswordVerification = mode === z.auth.AuthView.MODE.VERIFY_PASSWORD;
+      const stringId = isPasswordVerification ? z.string.authErrorPasswordWrong : z.string.authErrorPasswordShort;
+      this._add_error(stringId, z.auth.AuthView.TYPE.PASSWORD);
     }
   }
 

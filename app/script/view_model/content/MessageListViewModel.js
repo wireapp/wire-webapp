@@ -131,7 +131,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
           window.setTimeout(() => {
             this.conversation_repository.mark_as_read(this.mark_as_read_on_focus);
             this.mark_as_read_on_focus = undefined;
-          }, 1000);
+          }, z.util.TimeUtil.UNITS_IN_MILLIS.SECOND);
         }
       });
 
@@ -414,33 +414,12 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
       .catch(() => reset_progress());
   }
 
-  /**
-   * Gets CSS class that will be applied to the message div in order to style.
-   * @param {z.entity.Message} message - Message entity for generating css class
-   * @returns {string} CSS class that is applied to the element
-   */
-  get_css_class(message) {
-    switch (message.super_type) {
-      case z.message.SuperType.CALL:
-        return 'message-system message-call';
-      case z.message.SuperType.CONTENT:
-        return 'message-normal';
-      case z.message.SuperType.MEMBER:
-        return 'message message-system message-member';
-      case z.message.SuperType.PING:
-        return 'message-ping';
-      case z.message.SuperType.SYSTEM:
-        if (message.system_message_type === z.message.SystemMessageType.CONVERSATION_RENAME) {
-          return 'message-system message-rename';
-        }
-        break;
-      case z.message.SuperType.UNABLE_TO_DECRYPT:
-        return 'message-system';
-      case z.message.SuperType.VERIFICATION:
-        return 'message-system';
-      default:
-        break;
-    }
+  getSystemMessageIconComponent(message) {
+    const iconComponents = {
+      [z.message.SystemMessageType.CONVERSATION_RENAME]: 'edit-icon',
+      [z.message.SystemMessageType.CONVERSATION_MESSAGE_TIMER_UPDATE]: 'hourglass-icon',
+    };
+    return iconComponents[message.system_message_type];
   }
 
   /**
@@ -516,7 +495,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
    * @returns {boolean} Message is last delivered one
    */
   is_last_delivered_message(message_et) {
-    return this.conversation().get_last_delivered_message() === message_et;
+    return this.conversation().getLastDeliveredMessage() === message_et;
   }
 
   click_on_cancel_request(messageEntity) {
@@ -544,13 +523,13 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     }
 
     if (document.hasFocus()) {
-      this.conversation_repository.check_ephemeral_timer(message_et);
+      this.conversation_repository.checkMessageTimer(message_et);
     } else {
       const start_timer_on_focus = this.conversation.id;
 
       $(window).one('focus', () => {
         if (start_timer_on_focus === this.conversation.id) {
-          this.conversation_repository.check_ephemeral_timer(message_et);
+          this.conversation_repository.checkMessageTimer(message_et);
         }
       });
     }
@@ -561,7 +540,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
   on_context_menu_click(message_et, event) {
     const entries = [];
 
-    if (message_et.is_downloadable() && !message_et.is_ephemeral()) {
+    if (message_et.is_downloadable()) {
       entries.push({
         click: () => message_et.download(),
         label: z.l10n.text(z.string.conversationContextMenuDownload),

@@ -35,10 +35,13 @@ z.entity.Message = class Message {
   constructor(id = '0', super_type = '') {
     this.equals = this.equals.bind(this);
     this.is_expired = this.is_expired.bind(this);
-    this.start_ephemeral_timer = this.start_ephemeral_timer.bind(this);
+    this.startMessageTimer = this.startMessageTimer.bind(this);
     this.id = id;
     this.super_type = super_type;
-    this.ephemeral_caption = ko.observable('');
+    this.ephemeral_caption = ko.pureComputed(() => {
+      const remainingTime = this.ephemeral_remaining();
+      return remainingTime ? z.util.TimeUtil.formatDuration(remainingTime, false, 3).text : '';
+    });
     this.ephemeral_duration = ko.observable(0);
     this.ephemeral_remaining = ko.observable(0);
     this.ephemeral_expires = ko.observable(false);
@@ -79,7 +82,7 @@ z.entity.Message = class Message {
     this.category = undefined;
 
     this.display_timestamp_short = () => {
-      const date = moment.unix(this.timestamp() / 1000);
+      const date = moment.unix(this.timestamp() / z.util.TimeUtil.UNITS_IN_MILLIS.SECOND);
       return date.local().format('HH:mm');
     };
 
@@ -168,9 +171,14 @@ z.entity.Message = class Message {
    * @returns {boolean} True, if the message has downloadable content.
    */
   is_downloadable() {
-    if (typeof this.get_first_asset === 'function') {
-      const asset_et = this.get_first_asset();
-      if (asset_et && typeof asset_et.download === 'function') {
+    const isExpiredEphemeral = this.ephemeral_status() === z.message.EphemeralStatusType.TIMED_OUT;
+    if (isExpiredEphemeral) {
+      return false;
+    }
+
+    if (this.is_content()) {
+      const assetEntity = this.get_first_asset();
+      if (assetEntity && typeof assetEntity.download === 'function') {
         return true;
       }
     }
@@ -260,27 +268,21 @@ z.entity.Message = class Message {
   }
 
   // Start the ephemeral timer for the message.
-  start_ephemeral_timer() {
-    if (this.ephemeral_timeout_id) {
+  startMessageTimer(timeOffset) {
+    if (this.messageTimerStarted) {
       return;
     }
 
     if (this.ephemeral_status() === z.message.EphemeralStatusType.INACTIVE) {
-      this.ephemeral_expires(new Date(Date.now() + this.ephemeral_expires()).getTime().toString());
-      this.ephemeral_started(new Date(Date.now()).getTime().toString());
+      const startingTimestamp = this.user().is_me ? Math.min(this.timestamp() + timeOffset, Date.now()) : Date.now();
+      const expirationTimestamp = `${startingTimestamp + this.ephemeral_expires()}`;
+      this.ephemeral_expires(expirationTimestamp);
+      this.ephemeral_started(`${startingTimestamp}`);
     }
 
-    this.ephemeral_remaining(this.ephemeral_expires() - Date.now());
-
-    this.ephemeral_interval_id = window.setInterval(() => {
-      this.ephemeral_remaining(this.ephemeral_expires() - Date.now());
-      this.ephemeral_caption(z.util.formatTimeRemaining(this.ephemeral_remaining()));
-    }, 250);
-
-    this.ephemeral_timeout_id = window.setTimeout(() => {
-      amplify.publish(z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, this);
-      window.clearInterval(this.ephemeral_interval_id);
-    }, this.ephemeral_remaining());
+    const remainingTime = this.ephemeral_expires() - this.ephemeral_started();
+    this.ephemeral_remaining(remainingTime);
+    this.messageTimerStarted = true;
   }
 
   /**

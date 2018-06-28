@@ -44,7 +44,7 @@
   "acceptNewsModal.headline": "",
   "acceptNewsModal.unsubscribeDescription": "",
   "acceptNewsModal.privacyDescription": "",
-  "acceptNewsModal.declineButton": "Décliner",
+  "acceptNewsModal.declineButton": "",
   "acceptNewsModal.confirmButton": "Accepter",
   "unsupported.headlineBrowser": "Ce navigateur n'est pas supporté.",
   "unsupported.subheadBrowser":
@@ -107,6 +107,7 @@
   "ValidationError.FIELD.NAME.PATTERN_MISMATCH": "Saisissez un nom composé d’au moins 2 caractères",
   "ValidationError.FIELD.NAME.VALUE_MISSING": "Saisissez un nom composé d’au moins 2 caractères",
   "ValidationError.FIELD.PASSWORD.PATTERN_MISMATCH": "Entrez un mot de passe contenant au moins 8 caractères",
+  "ValidationError.FIELD.PASSWORD_LOGIN.PATTERN_MISMATCH": "Mot de passe incorrect. Veuillez réessayer.",
   "ValidationError.FIELD.EMAIL.TYPE_MISMATCH": "",
   "login.subhead": "Entrez votre adresse email ou votre identifiant.",
   "login.emailPlaceholder": "E-mail ou nom d'utilisateur",

@@ -190,13 +190,11 @@ ko.bindingHandlers.relative_timestamp = (function() {
   };
 
   // should be fine to update every minute
-  window.setInterval(() => {
-    timestamps.map(timestamp_func => timestamp_func());
-  }, 60 * 1000);
+  window.setInterval(() => timestamps.map(timestamp_func => timestamp_func()), z.util.TimeUtil.UNITS_IN_MILLIS.MINUTE);
 
   const calculate = function(element, timestamp, is_day) {
     timestamp = window.parseInt(timestamp);
-    const date = moment.unix(timestamp / 1000);
+    const date = moment.unix(timestamp / z.util.TimeUtil.UNITS_IN_MILLIS.SECOND);
 
     if (is_day) {
       return $(element).text(calculate_timestamp_day(date));

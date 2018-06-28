@@ -25,10 +25,8 @@
                   <span class="collection-header-all text-theme" data-bind="click: function() { clickOnSection('images', images()) }"><span data-bind="l10n_html: {'id': z.string.collectionShowAll, 'substitute': images().length}" data-uie-name="collection-show-all"></span> <span class="icon-forward font-size-xxs"></span></span>
                 <!-- /ko -->
               </header>
-              <div class="collection-images">
-                <!-- ko foreach: {data: images.slice(0, 12), as: 'messageEntity'} -->
-                  <image-component class="collection-image" params="asset: messageEntity.get_first_asset().resource, click: function() {$parent.clickOnImage(messageEntity)}"></image-component>
-                <!-- /ko -->
+              <div class="collection-images" data-bind="foreach: {data: images.slice(0, 12), as: 'messageEntity'}">
+                <image-component class="collection-image" params="asset: messageEntity.get_first_asset().resource, click: function() {$parent.clickOnImage(messageEntity)}"></image-component>
               </div>
             </section>
           <!-- /ko -->
@@ -42,10 +40,8 @@
                   <span class="collection-header-all text-theme" data-bind="click: function() { clickOnSection('links', links()) }"><span data-bind="l10n_html: {'id': z.string.collectionShowAll, 'substitute': links().length}" data-uie-name="collection-show-all"></span> <span class="icon-forward font-size-xxs"></span></span>
                 <!-- /ko -->
               </header>
-              <div class="collection-images">
-                <!-- ko foreach: {data: links.slice(0, 4), as: 'messageEntity'} -->
-                  <link-preview-asset params="message: messageEntity, header: true"></link-preview-asset>
-                <!-- /ko -->
+              <div class="collection-images" data-bind="foreach: {data: links.slice(0, 4), as: 'messageEntity'}">
+                <link-preview-asset params="message: messageEntity, header: true"></link-preview-asset>
               </div>
             </section>
           <!-- /ko -->
@@ -59,10 +55,8 @@
                   <span class="collection-header-all text-theme" data-bind="click: function() { clickOnSection('audio', audio()) }"><span data-bind="l10n_html: {'id': z.string.collectionShowAll, 'substitute': audio().length}" data-uie-name="collection-show-all"></span> <span class="icon-forward font-size-xxs"></span></span>
                 <!-- /ko -->
               </header>
-              <div class="collection-images">
-                <!-- ko foreach: {data: audio.slice(0, 4), as: 'messageEntity'} -->
-                  <audio-asset class="collection-file" params="message: messageEntity, header: true"></audio-asset>
-                <!-- /ko -->
+              <div class="collection-images" data-bind="foreach: {data: audio.slice(0, 4), as: 'messageEntity'}">
+                <audio-asset class="collection-file" params="message: messageEntity, header: true"></audio-asset>
               </div>
             </section>
           <!-- /ko -->
@@ -76,10 +70,8 @@
                   <span class="collection-header-all text-theme" data-bind="click: function() { clickOnSection('files', files()) }"><span data-bind="l10n_html: {'id': z.string.collectionShowAll, 'substitute': files().length}" data-uie-name="collection-show-all"></span> <span class="icon-forward font-size-xxs"></span></span>
                 <!-- /ko -->
               </header>
-              <div class="collection-images">
-                <!-- ko foreach: {data: files.slice(0, 4), as: 'messageEntity'} -->
-                  <file-asset class="collection-file" params="message: messageEntity, header: true"></file-asset>
-                <!-- /ko -->
+              <div class="collection-images" data-bind="foreach: {data: files.slice(0, 4), as: 'messageEntity'}">
+                <file-asset class="collection-file" params="message: messageEntity, header: true"></file-asset>
               </div>
             </section>
           <!-- /ko -->

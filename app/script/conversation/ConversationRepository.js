@@ -26,17 +26,12 @@ window.z.conversation = z.conversation || {};
 z.conversation.ConversationRepository = class ConversationRepository {
   static get CONFIG() {
     return {
-      CONFIRMATION_THRESHOLD: 7 * 24 * 60 * 60 * 1000,
+      CONFIRMATION_THRESHOLD: z.util.TimeUtil.UNITS_IN_MILLIS.WEEK,
       EXTERNAL_MESSAGE_THRESHOLD: 200 * 1024,
       GROUP: {
         MAX_NAME_LENGTH: 64,
         MAX_SIZE: 256,
       },
-      STATE_EVENTS: [
-        z.event.Backend.CONVERSATION.ACCESS_UPDATE,
-        z.event.Backend.CONVERSATION.CODE_DELETE,
-        z.event.Backend.CONVERSATION.CODE_UPDATE,
-      ],
     };
   }
 
@@ -155,7 +150,19 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     this._init_subscriptions();
 
-    this.stateHandler = new z.conversation.ConversationStateHandler(this.conversation_service, this);
+    this.stateHandler = new z.conversation.ConversationStateHandler(
+      this.conversation_service,
+      this.conversation_mapper
+    );
+    this.ephemeralHandler = new z.conversation.ConversationEphemeralHandler(
+      this.conversation_service,
+      this.conversation_mapper,
+      {onMessageTimeout: this.handleMessageExpiration.bind(this)}
+    );
+  }
+
+  checkMessageTimer(messageEntity) {
+    this.ephemeralHandler.checkMessageTimer(messageEntity, this.timeOffset);
   }
 
   _initStateUpdates() {
@@ -195,7 +202,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
   _init_subscriptions() {
     amplify.subscribe(z.event.WebApp.CONVERSATION.ASSET.CANCEL, this.cancel_asset_upload.bind(this));
     amplify.subscribe(z.event.WebApp.CONVERSATION.EVENT_FROM_BACKEND, this.onConversationEvent.bind(this));
-    amplify.subscribe(z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, this.timeout_ephemeral_message.bind(this));
     amplify.subscribe(z.event.WebApp.CONVERSATION.MAP_CONNECTION, this.map_connection.bind(this));
     amplify.subscribe(z.event.WebApp.CONVERSATION.MISSED_EVENTS, this.on_missed_events.bind(this));
     amplify.subscribe(z.event.WebApp.CONVERSATION.PERSIST_STATE, this.save_conversation_state_in_db.bind(this));
@@ -203,7 +209,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE,
       this.set_notification_handling_state.bind(this)
     );
-    amplify.subscribe(z.event.WebApp.EVENT.UPDATE_TIME_OFFSET, this.update_time_offset.bind(this));
+    amplify.subscribe(z.event.WebApp.EVENT.UPDATE_TIME_OFFSET, this.updateTimeOffset.bind(this));
     amplify.subscribe(z.event.WebApp.TEAM.MEMBER_LEAVE, this.teamMemberLeave.bind(this));
     amplify.subscribe(z.event.WebApp.USER.UNBLOCKED, this.unblocked_user.bind(this));
   }
@@ -335,7 +341,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return Promise.all([this.conversation_service.load_conversation_states_from_db(), remote_conversations_promise])
       .then(([local_conversations, remote_conversations = []]) => {
         if (remote_conversations.length) {
-          const conversations = this.conversation_mapper.merge_conversations(local_conversations, remote_conversations);
+          const conversations = this.conversation_mapper.mergeConversation(local_conversations, remote_conversations);
           return this.conversation_service.save_conversations_in_db(conversations);
         }
 
@@ -427,7 +433,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   _addPrecedingEventsToConversation(events, conversationEntity) {
     const hasAdditionalMessages = events.length === z.config.MESSAGES_FETCH_LIMIT;
 
-    return this._add_events_to_conversation(events, conversationEntity).then(mappedMessageEntities => {
+    return this._addEventsToConversation(events, conversationEntity).then(mappedMessageEntities => {
       conversationEntity.hasAdditionalMessages(hasAdditionalMessages);
 
       if (!hasAdditionalMessages) {
@@ -483,7 +489,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       this.conversation_service.load_subsequent_events_from_db(conversation_et.id, message_date, padding, true),
     ])
       .then(([older_events, newer_events]) =>
-        this._add_events_to_conversation(older_events.concat(newer_events), conversation_et)
+        this._addEventsToConversation(older_events.concat(newer_events), conversation_et)
       )
       .then(mapped_messages => {
         conversation_et.is_pending(false);
@@ -505,7 +511,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     return this.conversation_service
       .load_subsequent_events_from_db(conversation_et.id, message_date, z.config.MESSAGES_FETCH_LIMIT, include_message)
-      .then(events => this._add_events_to_conversation(events, conversation_et))
+      .then(events => this._addEventsToConversation(events, conversation_et))
       .then(mapped_messages => {
         conversation_et.is_pending(false);
         return mapped_messages;
@@ -566,7 +572,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         .load_preceding_events_from_db(conversation_et.id, lower_bound, upper_bound)
         .then(events => {
           if (events.length) {
-            this._add_events_to_conversation(events, conversation_et);
+            this._addEventsToConversation(events, conversation_et);
           }
           conversation_et.is_pending(false);
         })
@@ -610,6 +616,14 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   update_conversations_unarchived() {
     this.updateConversations(this.conversations_unarchived());
+  }
+
+  updateConversationFromBackend(conversationEntity) {
+    return this.conversation_service.get_conversation_by_id(conversationEntity.id).then(conversationData => {
+      const {name, message_timer} = conversationData;
+      this.conversation_mapper.update_properties(conversationEntity, {name});
+      this.conversation_mapper.update_self_status(conversationEntity, {message_timer});
+    });
   }
 
   /**
@@ -667,11 +681,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Conversation} Conversation is locally available
    */
   _find_conversation_by_id(conversation_id) {
-    for (const conversation of this.conversations()) {
-      if (conversation.id === conversation_id) {
-        return conversation;
-      }
-    }
+    return this.conversations().find(conversation => conversation.id === conversation_id);
   }
 
   get_all_users_in_conversation(conversation_id) {
@@ -1062,11 +1072,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   /**
    * Update time offset.
-   * @param {number} time_offset - Approximate time different to backend in milliseconds
+   * @param {number} timeOffset - Approximate time different to backend in milliseconds
    * @returns {undefined} No return value
    */
-  update_time_offset(time_offset) {
-    this.timeOffset = time_offset;
+  updateTimeOffset(timeOffset) {
+    this.timeOffset = timeOffset;
   }
 
   /**
@@ -1270,13 +1280,33 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {string} name - New conversation name
    * @returns {Promise} Resolves when conversation was renamed
    */
-  rename_conversation(conversation_et, name) {
-    return this.conversation_service.update_conversation_properties(conversation_et.id, name).then(response => {
+  renameConversation(conversation_et, name) {
+    return this.conversation_service.updateConversationName(conversation_et.id, name).then(response => {
       if (response) {
         amplify.publish(z.event.WebApp.EVENT.INJECT, response, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
         return response;
       }
     });
+  }
+
+  /**
+   * Set the global message timer
+   *
+   * @param {Conversation} conversationEntity - Conversation to update
+   * @param {number} messageTimer - New message timer value
+   * @returns {Promise} Resolves when conversation was updated on server side
+   */
+  updateConversationMessageTimer(conversationEntity, messageTimer) {
+    messageTimer = z.conversation.ConversationEphemeralHandler.validateTimer(messageTimer);
+
+    return this.conversation_service
+      .updateConversationMessageTimer(conversationEntity.id, messageTimer)
+      .then(response => {
+        if (response) {
+          amplify.publish(z.event.WebApp.EVENT.INJECT, response, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
+          return response;
+        }
+      });
   }
 
   reset_session(user_id, client_id, conversation_id) {
@@ -1579,14 +1609,14 @@ z.conversation.ConversationRepository = class ConversationRepository {
         genericMessage = new z.proto.GenericMessage(messageId);
         genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, asset);
 
-        if (conversationEntity.ephemeral_timer()) {
-          genericMessage = this._wrap_in_ephemeral_message(genericMessage, conversationEntity.ephemeral_timer());
+        if (conversationEntity.messageTimer()) {
+          genericMessage = this._wrap_in_ephemeral_message(genericMessage, conversationEntity.messageTimer());
         }
 
         return this.send_generic_message_to_conversation(conversationEntity.id, genericMessage);
       })
       .then(payload => {
-        const {uploaded: assetData} = conversationEntity.ephemeral_timer()
+        const {uploaded: assetData} = conversationEntity.messageTimer()
           ? genericMessage.ephemeral.asset
           : genericMessage.asset;
 
@@ -1641,8 +1671,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
         let generic_message = new z.proto.GenericMessage(z.util.createRandomUuid());
         generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, asset);
 
-        if (conversation_et.ephemeral_timer()) {
-          generic_message = this._wrap_in_ephemeral_message(generic_message, conversation_et.ephemeral_timer());
+        if (conversation_et.messageTimer()) {
+          generic_message = this._wrap_in_ephemeral_message(generic_message, conversation_et.messageTimer());
         }
 
         return this._send_and_inject_generic_message(conversation_et, generic_message);
@@ -1778,7 +1808,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         ];
 
         if (initiating_call_message.includes(call_message_et.type)) {
-          return this._track_contributed(conversation_et, generic_message, call_message_et);
+          return this._trackContributed(conversation_et, generic_message, call_message_et);
         }
       })
       .catch(error => {
@@ -1807,8 +1837,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
         let genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
         genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, asset);
 
-        if (conversationEntity.ephemeral_timer()) {
-          genericMessage = this._wrap_in_ephemeral_message(genericMessage, conversationEntity.ephemeral_timer());
+        if (conversationEntity.messageTimer()) {
+          genericMessage = this._wrap_in_ephemeral_message(genericMessage, conversationEntity.messageTimer());
         }
 
         return this._send_and_inject_generic_message(conversationEntity, genericMessage);
@@ -1829,8 +1859,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
     let generic_message = new z.proto.GenericMessage(z.util.createRandomUuid());
     generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.KNOCK, new z.proto.Knock(false));
 
-    if (conversation_et.ephemeral_timer()) {
-      generic_message = this._wrap_in_ephemeral_message(generic_message, conversation_et.ephemeral_timer());
+    if (conversation_et.messageTimer()) {
+      generic_message = this._wrap_in_ephemeral_message(generic_message, conversation_et.messageTimer());
     }
 
     return this._send_and_inject_generic_message(conversation_et, generic_message).catch(error => {
@@ -2024,8 +2054,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
     let generic_message = new z.proto.GenericMessage(z.util.createRandomUuid());
     generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT, new z.proto.Text(message));
 
-    if (conversation_et.ephemeral_timer()) {
-      generic_message = this._wrap_in_ephemeral_message(generic_message, conversation_et.ephemeral_timer());
+    if (conversation_et.messageTimer()) {
+      generic_message = this._wrap_in_ephemeral_message(generic_message, conversation_et.messageTimer());
     }
 
     return this._send_and_inject_generic_message(conversation_et, generic_message).then(() => generic_message);
@@ -2062,7 +2092,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   _wrap_in_ephemeral_message(generic_message, millis) {
     const ephemeral = new z.proto.Ephemeral();
-    ephemeral.set('expire_after_millis', millis);
+    ephemeral.set('expire_after_millis', z.conversation.ConversationEphemeralHandler.validateTimer(millis));
     ephemeral.set(generic_message.content, generic_message[generic_message.content]);
 
     generic_message = new z.proto.GenericMessage(generic_message.message_id);
@@ -2102,11 +2132,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   send_generic_message_to_conversation(conversation_id, generic_message) {
     return this.sending_queue.push(() => {
-      const skip_own_clients = generic_message.content === z.cryptography.GENERIC_MESSAGE_TYPE.EPHEMERAL;
-
-      return this.create_recipients(conversation_id, skip_own_clients).then(recipients => {
-        const precondition_option = skip_own_clients ? Object.keys(recipients) : undefined;
-        return this._sendGenericMessage(conversation_id, generic_message, recipients, precondition_option);
+      return this.create_recipients(conversation_id).then(recipients => {
+        return this._sendGenericMessage(conversation_id, generic_message, recipients);
       });
     });
   }
@@ -2129,7 +2156,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return message_mapped;
       })
       .then(message_stored => {
-        if (generic_message.content === z.cryptography.GENERIC_MESSAGE_TYPE.KNOCK) {
+        const {KNOCK: TYPE_KNOCK, EPHEMERAL: TYPE_EPHEMERAL} = z.cryptography.GENERIC_MESSAGE_TYPE;
+        const isPing = message => message.content === TYPE_KNOCK;
+        const isEphemeralPing = message => message.content === TYPE_EPHEMERAL && isPing(message.ephemeral);
+        const shouldPlayPingAudio = isPing(generic_message) || isEphemeralPing(generic_message);
+        if (shouldPlayPingAudio) {
           amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.OUTGOING_PING);
         }
 
@@ -2137,10 +2168,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
         return this.send_generic_message_to_conversation(conversation_et.id, generic_message)
           .then(payload => {
-            this._track_contributed(conversation_et, generic_message);
+            this._trackContributed(conversation_et, generic_message);
 
             const backend_iso_date = sync_timestamp ? payload.time : '';
-            return this._update_message_as_sent(conversation_et, message_stored, backend_iso_date);
+            return this._updateMessageAsSent(conversation_et, message_stored, backend_iso_date);
           })
           .then(() => message_stored);
       });
@@ -2149,32 +2180,31 @@ z.conversation.ConversationRepository = class ConversationRepository {
   /**
    * Update message as sent in db and view.
    *
-   * @param {Conversation} conversation_et - Conversation entity
-   * @param {Object} event_json - Event object
-   * @param {string} iso_date - If defined it will update event timestamp
+   * @param {Conversation} conversationEntity - Conversation entity
+   * @param {Object} eventJson - Event object
+   * @param {string} isoDate - If defined it will update event timestamp
    * @returns {Promise} Resolves when sent status was updated
    */
-  _update_message_as_sent(conversation_et, event_json, iso_date) {
-    return this.get_message_in_conversation_by_id(conversation_et, event_json.id)
-      .then(message_et => {
-        const changes = {
-          status: z.message.StatusType.SENT,
-        };
-        message_et.status(z.message.StatusType.SENT);
+  _updateMessageAsSent(conversationEntity, eventJson, isoDate) {
+    return this.get_message_in_conversation_by_id(conversationEntity, eventJson.id)
+      .then(messageEntity => {
+        messageEntity.status(z.message.StatusType.SENT);
 
-        if (iso_date) {
-          changes.time = iso_date;
+        const changes = {status: z.message.StatusType.SENT};
+        if (isoDate) {
+          changes.time = isoDate;
 
-          const timestamp = new Date(iso_date).getTime();
+          const timestamp = new Date(isoDate).getTime();
           if (!_.isNaN(timestamp)) {
-            message_et.timestamp(timestamp);
-            conversation_et.update_timestamp_server(timestamp, true);
-            conversation_et.update_timestamps(message_et);
+            messageEntity.timestamp(timestamp);
+            conversationEntity.update_timestamp_server(timestamp, true);
+            conversationEntity.update_timestamps(messageEntity);
           }
         }
 
-        if (z.event.EventTypeHandling.STORE.includes(message_et.type) || message_et.has_asset_image()) {
-          return this.conversation_service.update_message_in_db(message_et, changes);
+        this.checkMessageTimer(messageEntity);
+        if (z.event.EventTypeHandling.STORE.includes(messageEntity.type) || messageEntity.has_asset_image()) {
+          return this.conversation_service.update_message_in_db(messageEntity, changes);
         }
       })
       .catch(error => {
@@ -2484,7 +2514,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       })
       .then(() => this.send_asset_remotedata(conversation_et, file, message_id))
       .then(() => {
-        const upload_duration = (Date.now() - upload_started) / 1000;
+        const upload_duration = (Date.now() - upload_started) / z.util.TimeUtil.UNITS_IN_MILLIS.SECOND;
         this.logger.info(`Finished to upload asset for conversation'${conversation_et.id} in ${upload_duration}`);
       })
       .catch(error => {
@@ -2525,7 +2555,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         });
       })
       .then(() => {
-        amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, message_et.id);
+        amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, message_et.id, conversation_et.id);
         return this._delete_message_by_id(conversation_et, message_et.id);
       })
       .catch(error => {
@@ -2558,7 +2588,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return this.send_generic_message_to_conversation(this.self_conversation().id, generic_message);
       })
       .then(() => {
-        amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, message_et.id);
+        amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, message_et.id, conversation_et.id);
         return this._delete_message_by_id(conversation_et, message_et.id);
       })
       .catch(error => {
@@ -2567,141 +2597,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
           error
         );
         throw error;
-      });
-  }
-
-  /**
-   * Check the remaining lifetime for a given ephemeral message.
-   * @param {Message} message_et - Message to check
-   * @returns {undefined} No return value
-   */
-  check_ephemeral_timer(message_et) {
-    switch (message_et.ephemeral_status()) {
-      case z.message.EphemeralStatusType.TIMED_OUT:
-        this.timeout_ephemeral_message(message_et);
-        break;
-      case z.message.EphemeralStatusType.ACTIVE:
-        message_et.start_ephemeral_timer();
-        break;
-      case z.message.EphemeralStatusType.INACTIVE:
-        message_et.start_ephemeral_timer();
-        this.conversation_service.update_message_in_db(message_et, {
-          ephemeral_expires: message_et.ephemeral_expires(),
-          ephemeral_started: message_et.ephemeral_started(),
-        });
-        break;
-      default:
-        this.logger.warn(`Ephemeral message of unsupported type: ${message_et.type}`);
-    }
-  }
-
-  timeout_ephemeral_message(message_et) {
-    if (!message_et.is_expired()) {
-      this.get_conversation_by_id(message_et.conversation_id).then(conversation_et => {
-        if (message_et.user().is_me) {
-          switch (false) {
-            case !message_et.has_asset_text():
-              return this._obfuscate_text_message(conversation_et, message_et.id);
-            case !message_et.is_ping():
-              return this._obfuscate_ping_message(conversation_et, message_et.id);
-            case !message_et.has_asset():
-              return this._obfuscate_asset_message(conversation_et, message_et.id);
-            case !message_et.has_asset_image():
-              return this._obfuscate_image_message(conversation_et, message_et.id);
-            default:
-              return this.logger.warn(`Ephemeral message of unsupported type: ${message_et.type}`);
-          }
-        }
-
-        if (conversation_et.is_group()) {
-          const user_ids = _.union([this.selfUser().id], [message_et.from]);
-          return this.delete_message_everyone(conversation_et, message_et, user_ids);
-        }
-
-        return this.delete_message_everyone(conversation_et, message_et);
-      });
-    }
-  }
-
-  _obfuscate_asset_message(conversation_et, message_id) {
-    return this.get_message_in_conversation_by_id(conversation_et, message_id)
-      .then(message_et => {
-        const asset = message_et.get_first_asset();
-        message_et.ephemeral_expires(true);
-
-        return this.conversation_service.update_message_in_db(message_et, {
-          data: {
-            content_type: asset.file_type,
-            meta: {},
-          },
-          ephemeral_expires: true,
-        });
-      })
-      .then(() => {
-        this.logger.info(`Obfuscated asset message '${message_id}'`);
-      });
-  }
-
-  _obfuscate_image_message(conversation_et, message_id) {
-    return this.get_message_in_conversation_by_id(conversation_et, message_id)
-      .then(message_et => {
-        const asset = message_et.get_first_asset();
-        message_et.ephemeral_expires(true);
-
-        return this.conversation_service.update_message_in_db(message_et, {
-          data: {
-            info: {
-              height: asset.height,
-              tag: 'medium',
-              width: asset.width,
-            },
-          },
-          ephemeral_expires: true,
-        });
-      })
-      .then(() => {
-        this.logger.info(`Obfuscated image message '${message_id}'`);
-      });
-  }
-
-  _obfuscate_text_message(conversation_et, message_id) {
-    return this.get_message_in_conversation_by_id(conversation_et, message_id)
-      .then(message_et => {
-        const asset = message_et.get_first_asset();
-        const obfuscated_asset = new z.entity.Text(message_et.id);
-        const obfuscated_previews = asset.previews().map(link_preview => {
-          link_preview.obfuscate();
-          const article = new z.proto.Article(link_preview.url, link_preview.title); // deprecated format
-          return new z.proto.LinkPreview(link_preview.url, 0, article, link_preview.url, link_preview.title).encode64();
-        });
-
-        obfuscated_asset.text = z.util.StringUtil.obfuscate(asset.text);
-        obfuscated_asset.previews(asset.previews());
-
-        message_et.assets([obfuscated_asset]);
-        message_et.ephemeral_expires(true);
-
-        return this.conversation_service.update_message_in_db(message_et, {
-          data: {
-            content: obfuscated_asset.text,
-            previews: obfuscated_previews,
-          },
-          ephemeral_expires: true,
-        });
-      })
-      .then(() => {
-        this.logger.info(`Obfuscated text message '${message_id}'`);
-      });
-  }
-
-  _obfuscate_ping_message(conversation_et, message_id) {
-    return this.get_message_in_conversation_by_id(conversation_et, message_id)
-      .then(message_et => {
-        message_et.ephemeral_expires(true);
-        return this.conversation_service.update_message_in_db(message_et, {ephemeral_expires: true});
-      })
-      .then(() => {
-        this.logger.info(`Obfuscated ping message '${message_id}'`);
       });
   }
 
@@ -2749,11 +2644,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const logMessage = `»» Conversation Event: '${eventJson.type}' (Source: ${eventSource})`;
     this.logger.info(logMessage, logObject);
 
-    const isStateEvent = ConversationRepository.CONFIG.STATE_EVENTS.includes(eventJson.type);
-    if (isStateEvent) {
-      return this.stateHandler.onConversationEvent(eventJson, eventSource);
-    }
-
     return this._pushToReceivingQueue(eventJson, eventSource);
   }
 
@@ -2794,39 +2684,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
           conversationEntity.update_timestamp_server(eventJson.server_time || eventJson.time, isBackendTimestamp);
         }
 
-        switch (type) {
-          case z.event.Backend.CONVERSATION.CREATE:
-            return this._onCreate(eventJson, eventSource);
-          case z.event.Backend.CONVERSATION.MEMBER_JOIN:
-            return this._onMemberJoin(conversationEntity, eventJson);
-          case z.event.Backend.CONVERSATION.MEMBER_LEAVE:
-          case z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE:
-            return this._onMemberLeave(conversationEntity, eventJson);
-          case z.event.Backend.CONVERSATION.MEMBER_UPDATE:
-            return this._onMemberUpdate(conversationEntity, eventJson);
-          case z.event.Backend.CONVERSATION.RENAME:
-            return this._onRename(conversationEntity, eventJson);
-          case z.event.Client.CONVERSATION.ASSET_ADD:
-            return this._on_asset_add(conversationEntity, eventJson);
-          case z.event.Client.CONVERSATION.CONFIRMATION:
-            return this._on_confirmation(conversationEntity, eventJson);
-          case z.event.Client.CONVERSATION.GROUP_CREATION:
-            return this._onGroupCreation(conversationEntity, eventJson);
-          case z.event.Client.CONVERSATION.MESSAGE_ADD:
-            return this._on_message_add(conversationEntity, eventJson);
-          case z.event.Client.CONVERSATION.MESSAGE_DELETE:
-            return this._onMessageDeleted(conversationEntity, eventJson);
-          case z.event.Client.CONVERSATION.MESSAGE_HIDDEN:
-            return this._onMessageHidden(eventJson);
-          case z.event.Client.CONVERSATION.ONE2ONE_CREATION:
-            return this._on1to1Creation(conversationEntity, eventJson);
-          case z.event.Client.CONVERSATION.REACTION:
-            return this._on_reaction(conversationEntity, eventJson);
-          default:
-            return this._onAddEvent(conversationEntity, eventJson);
-        }
+        return conversationEntity;
       })
-      .then((entityObject = {}) => this._handledConversationEvent(entityObject, eventSource, previouslyArchived))
+      .then(conversationEntity => this._triggerFeatureEventHandlers(conversationEntity, eventJson, eventSource))
+      .then(conversationEntity => this._reactToConversationEvent(conversationEntity, eventJson, eventSource))
+      .then((entityObject = {}) => this._handleConversationNotification(entityObject, eventSource, previouslyArchived))
       .catch(error => {
         const isMessageNotFound = error.type === z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND;
         if (!isMessageNotFound) {
@@ -2835,7 +2697,97 @@ z.conversation.ConversationRepository = class ConversationRepository {
       });
   }
 
-  _handledConversationEvent(entityObject = {}, eventSource, previouslyArchived) {
+  /**
+   * Triggers the methods associated with a specific event.
+   *
+   * @param {Conversation} conversationEntity - Conversation targeted by the event
+   * @param {Object} eventJson - JSON data of the event
+   * @param {z.event.EventRepository.SOURCE} eventSource - Source of event
+   * @returns {Promise<any>} Resolves when the event has been treated
+   */
+  _reactToConversationEvent(conversationEntity, eventJson, eventSource) {
+    switch (eventJson.type) {
+      case z.event.Backend.CONVERSATION.CREATE:
+        return this._onCreate(eventJson, eventSource);
+
+      case z.event.Backend.CONVERSATION.MEMBER_JOIN:
+        return this._onMemberJoin(conversationEntity, eventJson);
+
+      case z.event.Backend.CONVERSATION.MEMBER_LEAVE:
+      case z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE:
+        return this._onMemberLeave(conversationEntity, eventJson);
+
+      case z.event.Backend.CONVERSATION.MEMBER_UPDATE:
+        return this._onMemberUpdate(conversationEntity, eventJson);
+
+      case z.event.Backend.CONVERSATION.RENAME:
+        return this._onRename(conversationEntity, eventJson);
+
+      case z.event.Client.CONVERSATION.ASSET_ADD:
+        return this._on_asset_add(conversationEntity, eventJson);
+
+      case z.event.Client.CONVERSATION.CONFIRMATION:
+        return this._on_confirmation(conversationEntity, eventJson);
+
+      case z.event.Client.CONVERSATION.GROUP_CREATION:
+        return this._onGroupCreation(conversationEntity, eventJson);
+
+      case z.event.Client.CONVERSATION.MESSAGE_ADD:
+        return this._on_message_add(conversationEntity, eventJson);
+
+      case z.event.Client.CONVERSATION.MESSAGE_DELETE:
+        return this._onMessageDeleted(conversationEntity, eventJson);
+
+      case z.event.Client.CONVERSATION.MESSAGE_HIDDEN:
+        return this._onMessageHidden(eventJson);
+
+      case z.event.Client.CONVERSATION.ONE2ONE_CREATION:
+        return this._on1to1Creation(conversationEntity, eventJson);
+
+      case z.event.Client.CONVERSATION.REACTION:
+        return this._on_reaction(conversationEntity, eventJson);
+
+      case z.event.Backend.CONVERSATION.MESSAGE_TIMER_UPDATE:
+      case z.event.Client.CONVERSATION.DELETE_EVERYWHERE:
+      case z.event.Client.CONVERSATION.INCOMING_MESSAGE_TOO_BIG:
+      case z.event.Client.CONVERSATION.KNOCK:
+      case z.event.Client.CONVERSATION.LOCATION:
+      case z.event.Client.CONVERSATION.MISSED_MESSAGES:
+      case z.event.Client.CONVERSATION.UNABLE_TO_DECRYPT:
+      case z.event.Client.CONVERSATION.VERIFICATION:
+      case z.event.Client.CONVERSATION.VOICE_CHANNEL_ACTIVATE:
+      case z.event.Client.CONVERSATION.VOICE_CHANNEL_DEACTIVATE:
+        return this._addEventToConversation(conversationEntity, eventJson);
+    }
+  }
+
+  /**
+   * Calls the feature specific event handler on the current event being handled.
+   *
+   * @private
+   * @param {Conversation} conversationEntity - Conversation targeted by the event
+   * @param {Object} eventJson - JSON data of the event
+   * @param {z.event.EventRepository.SOURCE} eventSource - Source of event
+   * @returns {Promise} Resolves when all the handlers have done their job
+   */
+  _triggerFeatureEventHandlers(conversationEntity, eventJson, eventSource) {
+    const conversationEventHandlers = [this.ephemeralHandler, this.stateHandler];
+    const handlePromises = conversationEventHandlers.map(handler =>
+      handler.handleConversationEvent(conversationEntity, eventJson, eventSource)
+    );
+    return Promise.all(handlePromises).then(() => conversationEntity);
+  }
+
+  /**
+   * Handles conversation update and notification message.
+   *
+   * @private
+   * @param {Object} entityObject - Object containing the conversation and the message that are targeted by the event
+   * @param {z.event.EventRepository.SOURCE} eventSource - Source of event
+   * @param {boolean} previouslyArchived - true if the previous state of the conversation was archived
+   * @returns {Promise} Resolves when the conversation was updated
+   */
+  _handleConversationNotification(entityObject = {}, eventSource, previouslyArchived) {
     const {conversationEntity, messageEntity} = entityObject;
 
     if (conversationEntity) {
@@ -2860,7 +2812,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
       // Check if event needs to be un-archived
       if (previouslyArchived) {
-        // Add to check for unarchive at the end of stream handling
+        // Add to check for un-archiving at the end of stream handling
         if (eventFromStream) {
           return (this.conversations_with_new_events[conversationEntity.id] = conversationEntity);
         }
@@ -2943,20 +2895,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
         return {conversationEntity};
       });
-  }
-
-  /**
-   * A message or ping received in a conversation.
-   *
-   * @private
-   * @param {Conversation} conversationEntity - Conversation to add the event to
-   * @param {Object} eventJson - JSON data of 'conversation.message-add' or 'conversation.knock' event
-   * @returns {Promise} Resolves when event was handled
-   */
-  _onAddEvent(conversationEntity, eventJson) {
-    return this._add_event_to_conversation(eventJson, conversationEntity).then(messageEntity => {
-      return {conversationEntity, messageEntity};
-    });
   }
 
   /**
@@ -3109,9 +3047,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
       conversationEntity.status(z.conversation.ConversationStatus.CURRENT_MEMBER);
     }
 
-    return this.updateParticipatingUserEntities(conversationEntity, false, true)
-      .then(() => this._add_event_to_conversation(eventJson, conversationEntity))
-      .then(messageEntity => {
+    const updateSequence = selfUserRejoins ? this.updateConversationFromBackend(conversationEntity) : Promise.resolve();
+
+    return updateSequence
+      .then(() => this.updateParticipatingUserEntities(conversationEntity, false, true))
+      .then(() => this._addEventToConversation(conversationEntity, eventJson))
+      .then(({messageEntity}) => {
         this.verification_state_handler.onMemberJoined(conversationEntity, eventData.user_ids);
         return {conversationEntity, messageEntity};
       });
@@ -3145,8 +3086,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
     }
 
     if (!selfLeavingClearedConversation) {
-      return this._add_event_to_conversation(eventJson, conversationEntity)
-        .then(messageEntity => {
+      return this._addEventToConversation(conversationEntity, eventJson)
+        .then(({messageEntity}) => {
           messageEntity
             .userEntities()
             .filter(userEntity => !userEntity.is_me)
@@ -3250,7 +3191,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       })
       .then(updated_event_json => {
         if (updated_event_json) {
-          return this._onAddEvent(conversation_et, updated_event_json);
+          return this._addEventToConversation(conversation_et, updated_event_json);
         }
       });
   }
@@ -3303,7 +3244,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         if (event) {
           conversation_et.remove_message_by_id(event_json.id);
 
-          return this._onAddEvent(conversation_et, event).then(({messageEntity}) => {
+          return this._addEventToConversation(conversation_et, event).then(({messageEntity}) => {
             const first_asset = messageEntity.get_first_asset();
             if (first_asset.is_image() || first_asset.status() === z.assets.AssetTransferState.UPLOADED) {
               return {conversationEntity: conversation_et, messageEntity};
@@ -3341,7 +3282,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         }
       })
       .then(() => {
-        amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, eventData.message_id);
+        amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, eventData.message_id, conversationEntity.id);
         return this._delete_message_by_id(conversationEntity, eventData.message_id);
       })
       .catch(error => {
@@ -3378,7 +3319,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return this.get_conversation_by_id(eventData.conversation_id);
       })
       .then(conversationEntity => {
-        amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, eventData.message_id);
+        amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, eventData.message_id, conversationEntity.id);
         return this._delete_message_by_id(conversationEntity, eventData.message_id);
       })
       .catch(error => {
@@ -3446,10 +3387,25 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when the event was handled
    */
   _onRename(conversationEntity, eventJson) {
-    return this._add_event_to_conversation(eventJson, conversationEntity).then(messageEntity => {
+    return this._addEventToConversation(conversationEntity, eventJson).then(({messageEntity}) => {
       this.conversation_mapper.update_properties(conversationEntity, eventJson.data);
       return {conversationEntity, messageEntity};
     });
+  }
+
+  handleMessageExpiration(messageEntity) {
+    amplify.publish(z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, messageEntity);
+    const shouldDeleteMessage = !messageEntity.user().is_me || messageEntity.is_ping();
+    if (shouldDeleteMessage) {
+      this.get_conversation_by_id(messageEntity.conversation_id).then(conversationEntity => {
+        if (conversationEntity.is_group()) {
+          const user_ids = _.union([this.selfUser().id], [messageEntity.from]);
+          return this.delete_message_everyone(conversationEntity, messageEntity, user_ids);
+        }
+
+        this.delete_message_everyone(conversationEntity, messageEntity);
+      });
+    }
   }
 
   //##############################################################################
@@ -3460,20 +3416,20 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Convert a JSON event into an entity and add it to a given conversation.
    *
    * @private
-   * @param {Object} json - Event data
-   * @param {Conversation} conversation_et - Conversation entity the event will be added to
+   * @param {Conversation} conversationEntity - Conversation entity the event will be added to
+   * @param {Object} eventJson - Event data
    * @returns {Promise} Promise that resolves with the message entity for the event
    */
-  _add_event_to_conversation(json, conversation_et) {
+  _addEventToConversation(conversationEntity, eventJson) {
     return this.event_mapper
-      .mapJsonEvent(json, conversation_et, true)
-      .then(message_et => this._updateMessageUserEntities(message_et))
-      .then(message_et => {
-        if (conversation_et && message_et) {
-          conversation_et.add_message(message_et);
+      .mapJsonEvent(eventJson, conversationEntity, true)
+      .then(messageEntity => this._updateMessageUserEntities(messageEntity))
+      .then(messageEntity => this.ephemeralHandler.validateMessage(messageEntity))
+      .then(messageEntity => {
+        if (conversationEntity && messageEntity) {
+          conversationEntity.add_message(messageEntity);
         }
-
-        return message_et;
+        return {conversationEntity, messageEntity};
       });
   }
 
@@ -3486,17 +3442,17 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {boolean} [prepend=true] - Should existing messages be prepended
    * @returns {Promise} Resolves with an array of mapped messages
    */
-  _add_events_to_conversation(events, conversationEntity, prepend = true) {
+  _addEventsToConversation(events, conversationEntity, prepend = true) {
     return this.event_mapper
       .mapJsonEvents(events, conversationEntity, true)
       .then(messageEntities => this._updateMessagesUserEntities(messageEntities))
+      .then(messageEntities => this.ephemeralHandler.validateMessages(messageEntities))
       .then(messageEntities => {
         if (prepend && conversationEntity.messages().length) {
           conversationEntity.prepend_messages(messageEntities);
         } else {
           conversationEntity.add_messages(messageEntities);
         }
-
         return messageEntities;
       });
   }
@@ -3771,54 +3727,54 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Track generic messages for media actions.
    *
    * @private
-   * @param {Conversation} conversation_et - Conversation entity
-   * @param {z.proto.GenericMessage} generic_message - Protobuf message
-   * @param {z.calling.entities.CallMessageEntity} call_message_et - Optional call message
+   * @param {Conversation} conversationEntity - Conversation entity
+   * @param {z.proto.GenericMessage} genericMessage - Protobuf message
+   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Optional call message
    * @returns {undefined} No return value
    */
-  _track_contributed(conversation_et, generic_message, call_message_et) {
-    let ephemeral_time;
+  _trackContributed(conversationEntity, genericMessage, callMessageEntity) {
+    let messageTimer;
     let message;
-    let message_content_type;
+    let messageContentType;
 
-    const is_ephemeral = generic_message.content === z.cryptography.GENERIC_MESSAGE_TYPE.EPHEMERAL;
-    if (is_ephemeral) {
-      message = generic_message.ephemeral;
-      message_content_type = generic_message.ephemeral.content;
-      ephemeral_time = generic_message.ephemeral.expire_after_millis / 1000;
+    const isEphemeral = genericMessage.content === z.cryptography.GENERIC_MESSAGE_TYPE.EPHEMERAL;
+    if (isEphemeral) {
+      message = genericMessage.ephemeral;
+      messageContentType = genericMessage.ephemeral.content;
+      messageTimer = genericMessage.ephemeral.expire_after_millis / z.util.TimeUtil.UNITS_IN_MILLIS.SECOND;
     } else {
-      message = generic_message;
-      message_content_type = generic_message.content;
+      message = genericMessage;
+      messageContentType = genericMessage.content;
     }
 
-    let action_type;
-    switch (message_content_type) {
+    let actionType;
+    switch (messageContentType) {
       case 'asset': {
         if (message.asset.original !== null) {
-          action_type = message.asset.original.image !== null ? 'photo' : 'file';
+          actionType = message.asset.original.image !== null ? 'photo' : 'file';
         }
         break;
       }
 
       case 'calling': {
-        const {properties} = call_message_et;
-        action_type = properties.videosend === z.calling.enum.PROPERTY_STATE.TRUE ? 'video_call' : 'audio_call';
+        const {properties} = callMessageEntity;
+        actionType = properties.videosend === z.calling.enum.PROPERTY_STATE.TRUE ? 'video_call' : 'audio_call';
         break;
       }
 
       case 'image': {
-        action_type = 'photo';
+        actionType = 'photo';
         break;
       }
 
       case 'knock': {
-        action_type = 'ping';
+        actionType = 'ping';
         break;
       }
 
       case 'text': {
         if (!message.text.link_preview.length) {
-          action_type = 'text';
+          actionType = 'text';
         }
         break;
       }
@@ -3827,18 +3783,19 @@ z.conversation.ConversationRepository = class ConversationRepository {
         break;
     }
 
-    if (action_type) {
+    if (actionType) {
       const attributes = {
-        action: action_type,
-        conversation_type: z.tracking.helpers.get_conversation_type(conversation_et),
-        ephemeral_time: is_ephemeral ? ephemeral_time : undefined,
-        is_ephemeral: is_ephemeral,
-        with_service: conversation_et.isWithBot(),
+        action: actionType,
+        conversation_type: z.tracking.helpers.get_conversation_type(conversationEntity),
+        ephemeral_time: isEphemeral ? messageTimer : undefined,
+        is_ephemeral: isEphemeral,
+        is_global_ephemeral: !!conversationEntity.globalMessageTimer(),
+        with_service: conversationEntity.isWithBot(),
       };
 
-      const isTeamConversation = !!conversation_et.team_id;
+      const isTeamConversation = !!conversationEntity.team_id;
       if (isTeamConversation) {
-        Object.assign(attributes, z.tracking.helpers.getGuestAttributes(conversation_et));
+        Object.assign(attributes, z.tracking.helpers.getGuestAttributes(conversationEntity));
       }
 
       amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONTRIBUTED, attributes);

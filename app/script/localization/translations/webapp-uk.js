@@ -92,6 +92,7 @@ z.string.uk.authErrorSignIn = 'Будь ласка, перевірте ваші 
 z.string.uk.callStateOutgoing = 'Дзвінок…';
 z.string.uk.callStateConnecting = 'Підключення…';
 z.string.uk.callStateIncoming = 'Дзвінок…';
+z.string.uk.callStateIncomingGroup = '{{user}} дзвонить';
 z.string.uk.callDecline = 'Скасувати';
 z.string.uk.callAccept = 'Прийняти';
 z.string.uk.callJoin = 'Приєднатись';
@@ -103,6 +104,7 @@ z.string.uk.videoCallOverlayMute = 'Вимкнути звук';
 z.string.uk.videoCallOverlayVideo = 'Відео';
 z.string.uk.videoCallOverlayShareScreen = 'Показати свій екран';
 z.string.uk.videoCallOverlayHangUp = 'Завершити';
+z.string.uk.videoCallPaused="Відео призупинене";
 
 z.string.uk.modalAcknowledgeAction = 'ОК';
 z.string.uk.modalAcknowledgeHeadline = 'Щось пішло не так';
@@ -397,6 +399,7 @@ z.string.uk.conversationsPopoverNotify = 'Увімк. звук';
 z.string.uk.conversationsPopoverSilence = 'Вимк. звук';
 z.string.uk.conversationsPopoverUnarchive = 'Розархівувати';
 
+z.string.uk.conversationsSecondaryLineIncomingCall = '{{user}} дзвонить';
 z.string.uk.conversationsSecondaryLineMissedCall = '{{number}} пропущений дзвінок';
 z.string.uk.conversationsSecondaryLineMissedCalls = '{{number}} пропущених дзвінків';
 z.string.uk.conversationsSecondaryLineNewMessage = '{{number}} нове повідомлення';
@@ -543,6 +546,7 @@ z.string.uk.preferencesAVCamera = 'Камера';
 z.string.uk.preferencesAVMicrophone = 'Мікрофон';
 z.string.uk.preferencesAVPermissionDetail = 'Увімкніть в налаштуваннях свого браузера';
 z.string.uk.preferencesAVSpeakers = 'Гучномовець';
+z.string.uk.preferencesAVTemporaryDisclaimer = 'Гості не можуть розпочинати відеоконференції. Оберіть, яку з камер ви хотіли б використовувати при підключенні до відеоконференції.';
 
 z.string.uk.preferencesDevicesActivatedIn = 'в {{location}}';
 z.string.uk.preferencesDevicesActivatedOn = 'Активований: {{date}}';
@@ -754,13 +758,13 @@ z.string.uk.initEvents = 'Завантажую повідомлення';
 z.string.uk.initUpdatedFromNotifications = 'Майже завершено - Приємного користування!';
 z.string.uk.initProgress = ' — {{number1}} з {{number2}}';
 
-z.string.uk.ephememalUnitsNone = 'Вимкнений';
-z.string.uk.ephememalUnitsSecond = 'секунда';
-z.string.uk.ephememalUnitsSeconds = 'сек';
-z.string.uk.ephememalUnitsMinute = 'хв';
-z.string.uk.ephememalUnitsMinutes = 'хв';
-z.string.uk.ephememalUnitsHour = 'година';
-z.string.uk.ephememalUnitsHours = 'годин';
-z.string.uk.ephememalUnitsDay = 'день';
-z.string.uk.ephememalUnitsDays = 'дні';
+z.string.uk.ephemeralUnitsNone = 'Вимкнений';
+z.string.uk.ephemeralUnitsSecond = 'секунда';
+z.string.uk.ephemeralUnitsSeconds = 'сек';
+z.string.uk.ephemeralUnitsMinute = 'хв';
+z.string.uk.ephemeralUnitsMinutes = 'хв';
+z.string.uk.ephemeralUnitsHour = 'година';
+z.string.uk.ephemeralUnitsHours = 'годин';
+z.string.uk.ephemeralUnitsDay = 'день';
+z.string.uk.ephemeralUnitsDays = 'дні';
 

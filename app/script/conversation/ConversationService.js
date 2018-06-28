@@ -130,24 +130,38 @@ z.conversation.ConversationService = class ConversationService {
   }
 
   /**
-   * Update conversation properties.
+   * Update the conversation name.
    *
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/updateConversation
    *
-   * @param {string} conversation_id - ID of conversation to rename
-   * @param {string} name - New conversation name
+   * @param {string} conversationId - ID of conversation to rename
+   * @param {string} name - new name of the conversation
    * @returns {Promise} Resolves with the server response
    */
-  update_conversation_properties(conversation_id, name) {
+  updateConversationName(conversationId, name) {
     return this.client.send_json({
-      data: {
-        name: name,
-      },
+      data: {name},
       type: 'PUT',
-      url: this.client.create_url(`${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversation_id}`),
+      url: this.client.create_url(`${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}`),
     });
   }
 
+  /**
+   * Update the conversation message timer value.
+   *
+   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/updateConversationMessageTimer
+   *
+   * @param {string} conversationId - ID of conversation to rename
+   * @param {number} messageTimer - new message timer of the conversation
+   * @returns {Promise} Resolves with the server response
+   */
+  updateConversationMessageTimer(conversationId, messageTimer) {
+    return this.client.send_json({
+      data: {message_timer: messageTimer},
+      type: 'PUT',
+      url: this.client.create_url(`${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/message-timer`),
+    });
+  }
   /**
    * Update self membership properties.
    *

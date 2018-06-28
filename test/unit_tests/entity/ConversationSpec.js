@@ -248,35 +248,45 @@ describe('Conversation', () => {
     });
   });
 
-  describe('get_last_delivered_message', () => {
+  describe('getLastDeliveredMessage', () => {
     it('returns undefined if conversation has no messages', () => {
-      expect(conversation_et.get_last_delivered_message()).not.toBeDefined();
+      expect(conversation_et.getLastDeliveredMessage()).not.toBeDefined();
     });
 
     it('returns last delivered message', () => {
-      const sent_message_et = new z.entity.ContentMessage();
-      sent_message_et.id = z.util.createRandomUuid();
-      sent_message_et.status(z.message.StatusType.SENT);
-      conversation_et.add_message(sent_message_et);
-      expect(conversation_et.get_last_delivered_message()).not.toBeDefined();
+      const remoteUserEntity = new z.entity.User(z.util.createRandomUuid());
+      const selfUserEntity = new z.entity.User(z.util.createRandomUuid());
+      selfUserEntity.is_me = true;
 
-      const delivered_message_et = new z.entity.ContentMessage();
-      delivered_message_et.id = z.util.createRandomUuid();
-      delivered_message_et.status(z.message.StatusType.DELIVERED);
-      conversation_et.add_message(delivered_message_et);
-      expect(conversation_et.get_last_delivered_message()).toBe(delivered_message_et);
+      const sentMessageEntity = new z.entity.ContentMessage(z.util.createRandomUuid());
+      sentMessageEntity.user(selfUserEntity);
+      sentMessageEntity.status(z.message.StatusType.SENT);
+      conversation_et.add_message(sentMessageEntity);
+      expect(conversation_et.getLastDeliveredMessage()).not.toBeDefined();
 
-      const next_sent_message_et = new z.entity.ContentMessage();
-      next_sent_message_et.id = z.util.createRandomUuid();
-      next_sent_message_et.status(z.message.StatusType.SENT);
-      conversation_et.add_message(next_sent_message_et);
-      expect(conversation_et.get_last_delivered_message()).toBe(delivered_message_et);
+      const deliveredMessageEntity = new z.entity.ContentMessage(z.util.createRandomUuid());
+      deliveredMessageEntity.user(selfUserEntity);
+      deliveredMessageEntity.status(z.message.StatusType.DELIVERED);
+      conversation_et.add_message(deliveredMessageEntity);
+      expect(conversation_et.getLastDeliveredMessage()).toBe(deliveredMessageEntity);
 
-      const next_delivered_message_et = new z.entity.ContentMessage();
-      next_delivered_message_et.id = z.util.createRandomUuid();
-      next_delivered_message_et.status(z.message.StatusType.DELIVERED);
-      conversation_et.add_message(next_delivered_message_et);
-      expect(conversation_et.get_last_delivered_message()).toBe(next_delivered_message_et);
+      const nextSentMessageEntity = new z.entity.ContentMessage(z.util.createRandomUuid());
+      nextSentMessageEntity.user(selfUserEntity);
+      nextSentMessageEntity.status(z.message.StatusType.SENT);
+      conversation_et.add_message(nextSentMessageEntity);
+      expect(conversation_et.getLastDeliveredMessage()).toBe(deliveredMessageEntity);
+
+      const nextDeliveredMessageEntity = new z.entity.ContentMessage(z.util.createRandomUuid());
+      nextDeliveredMessageEntity.user(selfUserEntity);
+      nextDeliveredMessageEntity.status(z.message.StatusType.DELIVERED);
+      conversation_et.add_message(nextDeliveredMessageEntity);
+      expect(conversation_et.getLastDeliveredMessage()).toBe(nextDeliveredMessageEntity);
+
+      const remoteMessageEntity = new z.entity.ContentMessage(z.util.createRandomUuid());
+      remoteMessageEntity.user(remoteUserEntity);
+      remoteMessageEntity.status(z.message.StatusType.DELIVERED);
+      conversation_et.add_message(remoteMessageEntity);
+      expect(conversation_et.getLastDeliveredMessage()).toBe(nextDeliveredMessageEntity);
     });
   });
 

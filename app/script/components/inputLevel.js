@@ -45,10 +45,8 @@ z.components.InputLevel = class InputLevel {
 
 ko.components.register('input-level', {
   template: `\
-    <ul class="input-level">
-      <!-- ko foreach: bullet_count -->
-       <li class="input-level-bullet" data-bind="css: $parent.is_bullet_active($data)"></li>
-      <!-- /ko -->
+    <ul class="input-level" data-bind="foreach: bullet_count">
+     <li class="input-level-bullet" data-bind="css: $parent.is_bullet_active($data)"></li>
     </ul>\
   `,
   viewModel: z.components.InputLevel,

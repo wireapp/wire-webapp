@@ -175,7 +175,9 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
     const audioData = original.audio;
     if (audioData) {
       const loudnessArray = audioData.normalized_loudness ? audioData.normalized_loudness.toArrayBuffer() : [];
-      const durationInSeconds = audioData.duration_in_millis ? audioData.duration_in_millis / 1000 : 0;
+      const durationInSeconds = audioData.duration_in_millis
+        ? audioData.duration_in_millis / z.util.TimeUtil.UNITS_IN_MILLIS.SECOND
+        : 0;
 
       return {
         duration: durationInSeconds,
@@ -261,13 +263,13 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
   }
 
   _mapEphemeral(genericMessage, event) {
-    const millisecondsAsNumber = genericMessage.ephemeral.expire_after_millis.toNumber();
+    const messageTimer = genericMessage.ephemeral.expire_after_millis.toNumber();
     genericMessage.ephemeral.message_id = genericMessage.message_id;
 
-    const embedded_message = this._mapGenericMessage(genericMessage.ephemeral, event);
-    embedded_message.ephemeral_expires = z.ephemeral.timings.mapToClosestTiming(millisecondsAsNumber);
+    const embeddedMessage = this._mapGenericMessage(genericMessage.ephemeral, event);
+    embeddedMessage.ephemeral_expires = z.conversation.ConversationEphemeralHandler.validateTimer(messageTimer);
 
-    return embedded_message;
+    return embeddedMessage;
   }
 
   /**
