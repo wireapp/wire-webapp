@@ -43,9 +43,9 @@ z.viewModel.content.CollectionDetailsViewModel = class CollectionDetailsViewMode
   }
 
   setConversation(conversationEntity, category, items) {
+    amplify.subscribe(z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, this.messageRemoved);
     amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.ADDED, this.itemAdded);
     amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, this.itemRemoved);
-    amplify.subscribe(z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, this.messageRemoved);
     this.template(category);
     this.conversationEntity(conversationEntity);
     z.util.koPushDeferred(this.items, items);
@@ -100,9 +100,9 @@ z.viewModel.content.CollectionDetailsViewModel = class CollectionDetailsViewMode
   }
 
   removedFromView() {
+    amplify.unsubscribe(z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, this.messageRemoved);
     amplify.unsubscribe(z.event.WebApp.CONVERSATION.MESSAGE.ADDED, this.itemAdded);
     amplify.unsubscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, this.itemRemoved);
-    amplify.unsubscribe(z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, this.messageRemoved);
     this.lastMessageTimestamp = undefined;
     this.conversationEntity(null);
     this.items.removeAll();
