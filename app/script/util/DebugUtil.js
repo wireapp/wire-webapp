@@ -58,6 +58,28 @@ z.util.DebugUtil = class DebugUtil {
       .then(() => this.logger.log(`Corrupted Session ID '${sessionId}'`));
   }
 
+  findMessageInNotificationStream(messageId) {
+    const userId = wire.app.repository.user.self().id;
+    const conversationId = wire.app.repository.conversation.active_conversation().id;
+    const clientId = wire.app.repository.client.currentClient().id;
+
+    const isOTRMessage = notification => notification.type === 'conversation.otr-message-add';
+    const isCurrentConversation = notification => notification.conversation === conversationId;
+    const isFromUs = notification =>
+      notification.from === userId && (notification.data && notification.data.sender === clientId);
+
+    return wire.app.repository.event.notificationService
+      .getNotifications(undefined, undefined, 10000)
+      .then(({notifications}) =>
+        notifications
+          .map(notification => notification.payload)
+          .reduce((acc, payload) => acc.concat(payload))
+          .filter(isOTRMessage)
+          .filter(isCurrentConversation)
+          .filter(isFromUs)
+      );
+  }
+
   getEventInfo(event) {
     const debugInformation = {event};
 
