@@ -36,12 +36,13 @@ z.ui.ViewportObserver = (() => {
 
   const _createObserver = () => {
     const onIntersect = entries => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const observedElement = _getObservedElement(entry.target);
+      entries.forEach(({isIntersecting, target: element}) => {
+        if (isIntersecting) {
+          intersectionObserver.unobserve(element);
+
+          const observedElement = _getObservedElement(element);
           if (observedElement) {
             observedElement.callback();
-            intersectionObserver.unobserve(observedElement.element);
             _removeObservedElement(observedElement);
           }
         }
