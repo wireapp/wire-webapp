@@ -25,32 +25,32 @@ describe('Message Entities', () => {
   let message_et = null;
 
   describe('is_downloadable', () => {
-    it('message with asset text should not be downloadable', () => {
+    it('message with text asset should not be downloadable', () => {
       message_et = new z.entity.ContentMessage();
       message_et.assets.push(new z.entity.Text());
       expect(message_et.is_downloadable()).toBeFalsy();
     });
 
-    it('message with asset image should be downloadable', () => {
+    it('message with image asset should be downloadable', () => {
       message_et = new z.entity.ContentMessage();
       message_et.assets.push(new z.entity.MediumImage());
       expect(message_et.is_downloadable()).toBeTruthy();
     });
 
-    it('message with asset file should be downloadable', () => {
+    it('message with file asset should be downloadable', () => {
       message_et = new z.entity.ContentMessage();
       message_et.assets.push(new z.entity.File());
       expect(message_et.is_downloadable()).toBeTruthy();
     });
 
-    it('ephemeral message with asset image should be downloadable', () => {
+    it('ephemeral message with image asset should be downloadable', () => {
       message_et = new z.entity.ContentMessage();
       message_et.assets.push(new z.entity.MediumImage());
       message_et.ephemeral_expires(12312123);
       expect(message_et.is_downloadable()).toBeTruthy();
     });
 
-    it('expired ephemeral message with asset image should not be downloadable', () => {
+    it('expired ephemeral message with image asset should not be downloadable', () => {
       message_et = new z.entity.ContentMessage();
       message_et.assets.push(new z.entity.MediumImage());
       message_et.ephemeral_expires(true);
