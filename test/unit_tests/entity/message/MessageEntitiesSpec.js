@@ -42,6 +42,20 @@ describe('Message Entities', () => {
       message_et.assets.push(new z.entity.File());
       expect(message_et.is_downloadable()).toBeTruthy();
     });
+
+    it('ephemeral message with asset image should be downloadable', () => {
+      message_et = new z.entity.ContentMessage();
+      message_et.assets.push(new z.entity.MediumImage());
+      message_et.ephemeral_expires(12312123);
+      expect(message_et.is_downloadable()).toBeTruthy();
+    });
+
+    it('expired ephemeral message with asset image should not be downloadable', () => {
+      message_et = new z.entity.ContentMessage();
+      message_et.assets.push(new z.entity.MediumImage());
+      message_et.ephemeral_expires(true);
+      expect(message_et.is_downloadable()).toBeFalsy();
+    });
   });
 
   describe('ContentMessage', () => {

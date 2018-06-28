@@ -51,9 +51,9 @@ z.viewModel.content.CollectionViewModel = class CollectionViewModel {
   }
 
   addedToView() {
+    amplify.subscribe(z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, this.messageRemoved);
     amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.ADDED, this.itemAdded);
     amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, this.itemRemoved);
-    amplify.subscribe(z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, this.messageRemoved);
     $(document).on('keydown.collection', keyboardEvent => {
       if (z.util.KeyboardUtil.isEscapeKey(keyboardEvent)) {
         amplify.publish(z.event.WebApp.CONVERSATION.SHOW, this.conversationEntity());
@@ -89,9 +89,9 @@ z.viewModel.content.CollectionViewModel = class CollectionViewModel {
   }
 
   removedFromView() {
+    amplify.unsubscribe(z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, this.messageRemoved);
     amplify.unsubscribe(z.event.WebApp.CONVERSATION.MESSAGE.ADDED, this.itemAdded);
     amplify.unsubscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, this.itemRemoved);
-    amplify.unsubscribe(z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, this.messageRemoved);
     $(document).off('keydown.collection');
     this.conversationEntity(null);
     this.searchInput('');

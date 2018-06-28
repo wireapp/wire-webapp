@@ -27,6 +27,7 @@ z.viewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
     this.beforeHideCallback = this.beforeHideCallback.bind(this);
     this.hideCallback = this.hideCallback.bind(this);
     this.messageAdded = this.messageAdded.bind(this);
+    this.messageExpired = this.messageExpired.bind(this);
     this.messageRemoved = this.messageRemoved.bind(this);
 
     this.elementId = 'detail-view';
@@ -73,6 +74,7 @@ z.viewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
     this.messageEntity(undefined);
     this.source = undefined;
 
+    amplify.unsubscribe(z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, this.messageExpired);
     amplify.unsubscribe(z.event.WebApp.CONVERSATION.MESSAGE.ADDED, this.messageAdded);
     amplify.unsubscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, this.messageRemoved);
   }
@@ -82,6 +84,7 @@ z.viewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
     this.messageEntity(messageEntity);
     this.source = source;
 
+    amplify.subscribe(z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, this.messageExpired);
     amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.ADDED, this.messageAdded);
     amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, this.messageRemoved);
 
@@ -122,6 +125,10 @@ z.viewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
     if (isCurrentConversation) {
       this.items.push(messageEntity);
     }
+  }
+
+  messageExpired(messageEntity) {
+    this.messageRemoved(messageEntity.id, messageEntity.conversation_id);
   }
 
   messageRemoved(messageId, conversationId) {

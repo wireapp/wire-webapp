@@ -171,9 +171,14 @@ z.entity.Message = class Message {
    * @returns {boolean} True, if the message has downloadable content.
    */
   is_downloadable() {
-    if (typeof this.get_first_asset === 'function') {
-      const asset_et = this.get_first_asset();
-      if (asset_et && typeof asset_et.download === 'function') {
+    const isExpiredEphemeral = this.ephemeral_status() === z.message.EphemeralStatusType.TIMED_OUT;
+    if (isExpiredEphemeral) {
+      return false;
+    }
+
+    if (this.is_content()) {
+      const assetEntity = this.get_first_asset();
+      if (assetEntity && typeof assetEntity.download === 'function') {
         return true;
       }
     }

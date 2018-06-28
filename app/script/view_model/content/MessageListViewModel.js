@@ -540,7 +540,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
   on_context_menu_click(message_et, event) {
     const entries = [];
 
-    if (message_et.is_downloadable() && !message_et.is_ephemeral()) {
+    if (message_et.is_downloadable()) {
       entries.push({
         click: () => message_et.download(),
         label: z.l10n.text(z.string.conversationContextMenuDownload),
