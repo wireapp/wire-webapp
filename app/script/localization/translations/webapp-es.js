@@ -33,6 +33,7 @@ z.string.es.authAccountSignInPhone = 'Teléfono';
 z.string.es.authBlockedCookies = 'Habilita las cookies para iniciar sesión.';
 z.string.es.authBlockedDatabase = 'Wire necesita acceso al almacenamiento local para mostrar los mensajes. No está disponible en modo privado.';
 z.string.es.authBlockedTabs = 'Wire ya está abierto en otra pestaña.';
+z.string.es.authBlockedTabsAction = 'Utilice esta pestaña en su lugar';
 
 z.string.es.authVerifyAccountAdd = 'Agregar';
 z.string.es.authVerifyAccountDetail = 'Esto le permite usar Wire en múltiples dispositivos.';
@@ -89,26 +90,36 @@ z.string.es.authErrorSignIn = 'Por favor, verifica tus datos y vuelve a intentar
 z.string.es.callStateOutgoing = 'Sonando…';
 z.string.es.callStateConnecting = 'Conectando…';
 z.string.es.callStateIncoming = 'Llamando…';
+z.string.es.callStateIncomingGroup = '{{user}} está llamando';
 z.string.es.callDecline = 'Rechazar';
 z.string.es.callAccept = 'Aceptar';
 z.string.es.callJoin = 'Entrar';
 z.string.es.callChooseSharedScreen = 'Elige una pantalla para compartir';
 z.string.es.callParticipants = '{{number}} en la llamada';
 
+z.string.es.videoCallOverlayConversations = 'Conversaciones';
 z.string.es.videoCallOverlayMute = 'Silenciar';
+z.string.es.videoCallOverlayVideo = 'Video';
+z.string.es.videoCallOverlayShareScreen = 'Compartir Panllta';
 z.string.es.videoCallOverlayHangUp = 'Colgar';
+z.string.es.videoCallPaused="Video en Pausa";
 
 z.string.es.modalAcknowledgeAction = 'OK';
+z.string.es.modalAcknowledgeHeadline = 'Algo salió mal';
 z.string.es.modalConfirmSecondary = 'Cancelar';
 z.string.es.modalOptionSecondary = 'Cancelar';
 
 z.string.es.modalAccountCreateAction = 'OK';
+z.string.es.modalAccountCreateHeadline = 'Crear una cuenta?\n';
+z.string.es.modalAccountCreateMessage = 'Al crear una cuenta usted perderá el historial de conversaciones en éste cuarto de invitados';
 
 z.string.es.modalAccountDeletionAction = 'Eliminar';
 z.string.es.modalAccountDeletionHeadline = 'Eliminar cuenta';
 z.string.es.modalAccountDeletionMessage = 'Enviaremos un mensaje por correo electrónico o SMS. Sigue el enlace para borrar permanentemente tu cuenta.';
 
 z.string.es.modalAccountLeaveGuestRoomAction = 'Abandonar';
+z.string.es.modalAccountLeaveGuestRoomHeadline = '¿Dejar el cuarto de Invitados?';
+z.string.es.modalAccountLeaveGuestRoomMessage = 'El historial de la conversacion será elimincado. Para guardarlo, debe crear una cuenta la próxima vez.';
 
 z.string.es.modalAccountLogoutAction = 'Cerrar sesión';
 z.string.es.modalAccountLogoutHeadline = '¿Borrar los Datos?';
@@ -124,12 +135,17 @@ z.string.es.modalAccountRemoveDeviceHeadline = 'Eliminar "{{device}}"';
 z.string.es.modalAccountRemoveDeviceMessage = 'Se requiere tu contraseña para eliminar el dispositivo.';
 z.string.es.modalAccountRemoveDevicePlaceholder = 'Contraseña';
 
+z.string.es.modalAssetTooLargeHeadline = 'Archivo demasiado grande';
 z.string.es.modalAssetTooLargeMessage = 'Puedes enviar archivos de hasta {{number}}';
 
+z.string.es.modalAssetParallelUploadsHeadline = 'Demasiados archivos a la vez';
 z.string.es.modalAssetParallelUploadsMessage = 'Puede enviar hasta {{number}} archivos a la vez.';
 
 z.string.es.modalCallEmptyConversationHeadline = 'Nadie para llamar';
 z.string.es.modalCallEmptyConversationMessage = 'No hay nadie aqui.';
+
+z.string.es.modalCallEmptyLogHeadline = 'No hay llamadas';
+z.string.es.modalCallEmptyLogMessage = 'No hay llamadas para establecer el informe de depuración.';
 
 z.string.es.modalCallNoGroupVideoHeadline = 'No hay videollamadas en grupos';
 z.string.es.modalCallNoGroupVideoMessage = 'Video llamadas no están disponibles en conversaciones de grupo.';
@@ -161,9 +177,12 @@ z.string.es.modalConnectAcceptMessage = 'Esto los conectará y abrirá la conver
 z.string.es.modalConnectAcceptSecondary = 'Ignorar';
 
 z.string.es.modalConversationAddBotAction = 'Confirmar';
+z.string.es.modalConversationAddBotHeadline = 'Añadir Servicio';
+z.string.es.modalConversationAddBotMessage = '¿Usted desea iniciar una nueva llamada con {{name}}?';
 
 z.string.es.modalConversationClearAction = 'Eliminar';
 z.string.es.modalConversationClearHeadline = '¿Borrar contenido?';
+z.string.es.modalConversationClearMessage = 'Esto borrará el historial de conversaciones en todos sus dispositivos.';
 z.string.es.modalConversationClearOption = 'También abandonar la conversación';
 
 z.string.es.modalConversationDeleteMessageAction = 'Eliminar';
@@ -185,7 +204,7 @@ z.string.es.modalConversationNewDeviceHeadlineMany = '{{user}}s comenzaron a uti
 z.string.es.modalConversationNewDeviceHeadlineYou = '{{user}} comenzó a utilizar un dispositivo nuevo';
 z.string.es.modalConversationNewDeviceIncomingCallAction = '¿Acepta la llamada?';
 z.string.es.modalConversationNewDeviceIncomingCallMessage = '¿Desea aceptar la llamada?';
-z.string.es.modalConversationNewDeviceMessage = '¿Aún quieres enviar tus mensajes?';
+z.string.es.modalConversationNewDeviceMessage = '¿Aún quieres enviar tu mensaje?';
 z.string.es.modalConversationNewDeviceOutgoingCallAction = 'Llamar de todos modos';
 z.string.es.modalConversationNewDeviceOutgoingCallMessage = '¿Desea realizar la llamada?';
 
@@ -269,6 +288,7 @@ z.string.es.conversationUnableToDecryptLink = '¿Por qué?';
 z.string.es.conversationUnableToDecryptErrorMessage = 'Error';
 z.string.es.conversationUnableToDecryptResetSession = 'Restablecer sesión';
 z.string.es.conversationMissedMessages = 'No has utilizado este dispositivo durante un tiempo. Algunos mensajes no aparecerán aquí.';
+z.string.es.conversationAssetUploading = 'Cargando...';
 z.string.es.conversationAssetDownloading = 'Descargando…';
 z.string.es.conversationAssetUploadFailed = 'Error al subir la información';
 z.string.es.conversationPlaybackError = 'Incapaz de reproducir';
@@ -313,6 +333,7 @@ z.string.es.conversationsPopoverNotify = 'Sonido';
 z.string.es.conversationsPopoverSilence = 'Silenciar';
 z.string.es.conversationsPopoverUnarchive = 'Desarchivar';
 
+z.string.es.conversationsSecondaryLineIncomingCall = '{{user}} está llamando';
 z.string.es.conversationsSecondaryLineMissedCall = '{{number}} llamada perdida';
 z.string.es.conversationsSecondaryLineMissedCalls = '{{number}} llamadas perdidas';
 z.string.es.conversationsSecondaryLineNewMessage = '{{number}} mensaje nuevo';
@@ -458,6 +479,7 @@ z.string.es.preferencesOptionsNotificationsObfuscate = 'Ocultar detalles';
 z.string.es.preferencesOptionsNotificationsObfuscateMessage = 'Mostrar remitente';
 z.string.es.preferencesOptionsNotificationsOn = 'Mostrar remitente y mensaje';
 
+z.string.es.backupImportGenericErrorHeadline = 'Algo salió mal';
 z.string.es.backupCancel = 'Cancelar';
 
 z.string.es.searchConnect = 'Conectar';

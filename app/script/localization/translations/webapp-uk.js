@@ -92,6 +92,7 @@ z.string.uk.authErrorSignIn = 'Будь ласка, перевірте ваші 
 z.string.uk.callStateOutgoing = 'Дзвінок…';
 z.string.uk.callStateConnecting = 'Підключення…';
 z.string.uk.callStateIncoming = 'Дзвінок…';
+z.string.uk.callStateIncomingGroup = '{{user}} дзвонить';
 z.string.uk.callDecline = 'Скасувати';
 z.string.uk.callAccept = 'Прийняти';
 z.string.uk.callJoin = 'Приєднатись';
@@ -103,6 +104,7 @@ z.string.uk.videoCallOverlayMute = 'Вимкнути звук';
 z.string.uk.videoCallOverlayVideo = 'Відео';
 z.string.uk.videoCallOverlayShareScreen = 'Показати свій екран';
 z.string.uk.videoCallOverlayHangUp = 'Завершити';
+z.string.uk.videoCallPaused="Відео призупинене";
 
 z.string.uk.modalAcknowledgeAction = 'ОК';
 z.string.uk.modalAcknowledgeHeadline = 'Щось пішло не так';
@@ -397,6 +399,7 @@ z.string.uk.conversationsPopoverNotify = 'Увімк. звук';
 z.string.uk.conversationsPopoverSilence = 'Вимк. звук';
 z.string.uk.conversationsPopoverUnarchive = 'Розархівувати';
 
+z.string.uk.conversationsSecondaryLineIncomingCall = '{{user}} дзвонить';
 z.string.uk.conversationsSecondaryLineMissedCall = '{{number}} пропущений дзвінок';
 z.string.uk.conversationsSecondaryLineMissedCalls = '{{number}} пропущених дзвінків';
 z.string.uk.conversationsSecondaryLineNewMessage = '{{number}} нове повідомлення';
@@ -543,6 +546,7 @@ z.string.uk.preferencesAVCamera = 'Камера';
 z.string.uk.preferencesAVMicrophone = 'Мікрофон';
 z.string.uk.preferencesAVPermissionDetail = 'Увімкніть в налаштуваннях свого браузера';
 z.string.uk.preferencesAVSpeakers = 'Гучномовець';
+z.string.uk.preferencesAVTemporaryDisclaimer = 'Гості не можуть розпочинати відеоконференції. Оберіть, яку з камер ви хотіли б використовувати при підключенні до відеоконференції.';
 
 z.string.uk.preferencesDevicesActivatedIn = 'в {{location}}';
 z.string.uk.preferencesDevicesActivatedOn = 'Активований: {{date}}';
