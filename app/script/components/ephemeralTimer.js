@@ -41,6 +41,7 @@ z.components.EphemeralTimer = class EphemeralTimer {
       }
     };
     this.animationInterval = window.setInterval(animatePie, animationIntervalValue);
+    animatePie();
   }
 
   dispose() {
