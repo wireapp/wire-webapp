@@ -45,7 +45,7 @@
   "acceptNewsModal.headline": "Kas soovid saada Wire'i uudiseid ja tooteuuendusi e-posti teel?",
   "acceptNewsModal.unsubscribeDescription": "Saad igal ajal tellimuse lõpetada.",
   "acceptNewsModal.privacyDescription": "Vaata Wire <b>privaatsuspõhimõtted</b> üle.",
-  "acceptNewsModal.declineButton": "Keeldu",
+  "acceptNewsModal.declineButton": "Tänan, ei",
   "acceptNewsModal.confirmButton": "Nõustu",
   "unsupported.headlineBrowser": "Seda brauserit ei toetata.",
   "unsupported.subheadBrowser":
@@ -109,6 +109,7 @@
   "ValidationError.FIELD.NAME.PATTERN_MISMATCH": "Sisesta vähemalt 2-täheline nimi",
   "ValidationError.FIELD.NAME.VALUE_MISSING": "Sisesta vähemalt 2-täheline nimi",
   "ValidationError.FIELD.PASSWORD.PATTERN_MISMATCH": "Sisesta vähemalt 8-märgiline parool",
+  "ValidationError.FIELD.PASSWORD_LOGIN.PATTERN_MISMATCH": "Vale parool. Palun proovi uuesti.",
   "ValidationError.FIELD.EMAIL.TYPE_MISMATCH": "Palun sisesta kehtiv e-posti aadress",
   "login.subhead": "Sisesta oma e-posti aadress või kasutajanimi.",
   "login.emailPlaceholder": "E-post või kasutajanimi",

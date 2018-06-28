@@ -90,7 +90,7 @@ z.string.de.authErrorSignIn = 'Überprüfe deine Eingaben und versuche es erneut
 
 z.string.de.callStateOutgoing = 'Klingeln…';
 z.string.de.callStateConnecting = 'Verbinde…';
-z.string.de.callStateIncoming = 'Klingelt…';
+z.string.de.callStateIncoming = 'Ruft an…';
 z.string.de.callStateIncomingGroup = '{{user}} ruft an';
 z.string.de.callDecline = 'Ablehnen';
 z.string.de.callAccept = 'Annehmen';
@@ -319,6 +319,8 @@ z.string.de.conversationMemberLeaveRemovedYou = ' hast {{users}} entfernt';
 z.string.de.conversationMessageDelivered = 'Zugestellt';
 z.string.de.conversationRename = ' hat die Unterhaltung umbenannt';
 z.string.de.conversationRenameYou = ' hast die Unterhaltung umbenannt';
+z.string.de.conversationUpdatedTimer = ' hat temporäre Nachrichten auf {{time}} gestellt';
+z.string.de.conversationResetTimer = ' hat temporäre Nachrichten ausgeschaltet';
 z.string.de.conversationResume = 'Beginne eine Unterhaltung mit {{users}}';
 z.string.de.conversationTeamLeave = ' wurde aus dem Team entfernt';
 z.string.de.conversationPing = ' hat gepingt';
@@ -360,7 +362,7 @@ z.string.de.groupCreationParticipantsActionSkip = 'Überspringen';
 z.string.de.groupCreationParticipantsHeader = 'Personen hinzufügen';
 z.string.de.groupCreationParticipantsHeaderWithCounter = 'Personen hinzufügen ({{number}})';
 z.string.de.groupCreationParticipantsPlaceholder = 'Nach Namen suchen';
-z.string.de.groupSizeInfo = 'Bis zu {{count}} Personen können an einer Unterhaltung teilnehmen. Videoanrufe funktionieren in Gruppen mit vier oder weniger Personen.';
+z.string.de.groupSizeInfo = 'Bis zu {{count}} Personen können an einer Unterhaltung teilnehmen. Videoanrufe funktionieren mit bis zu 3 anderen Personen und dir.';
 
 z.string.de.guestRoomConversationName = 'Gästebereich';
 z.string.de.guestRoomToggleName = 'Gäste zulassen';
@@ -455,6 +457,7 @@ z.string.de.conversationDetailsActionClear = 'Unterhaltungsverlauf löschen…';
 z.string.de.conversationDetailsActionCreateGroup = 'Gruppe erstellen';
 z.string.de.conversationDetailsActionDevices = 'Geräte';
 z.string.de.conversationDetailsActionGuestOptions = 'Gast-Optionen';
+z.string.de.conversationDetailsActionTimedMessages = 'Temporäre Nachrichten';
 z.string.de.conversationDetailsActionLeave = 'Gruppe verlassen…';
 z.string.de.conversationDetailsGuestsOff = 'Aus';
 z.string.de.conversationDetailsGuestsOn = 'An';
@@ -485,6 +488,9 @@ z.string.de.guestOptionsInfoHeader = 'Andere per Link einladen';
 z.string.de.guestOptionsInfoText = 'Jeder kann der Gruppe mit diesem Link beitreten - auch ohne eine Wire-Benutzerkonto.';
 z.string.de.guestOptionsRevokeLink = 'Link widerrufen';
 z.string.de.guestOptionsTitle = 'Gast-Optionen';
+
+z.string.de.timedMessagesTitle = 'Temporäre Nachrichten';
+z.string.de.timedMessageDisclaimer = 'Temporäre Nachrichten werden für alle Teilnehmer dieser Unterhaltung eingeschaltet.';
 
 z.string.de.participantDevicesDetailHeadline = 'Überprüfe, ob dieser Fingerabdruck mit dem auf {{html1}}{{user}}s Gerät{{html2}} übereinstimmt.';
 z.string.de.participantDevicesDetailHowTo = 'Wie mache ich das?';
@@ -766,4 +772,8 @@ z.string.de.ephemeralUnitsHour = 'Stunde';
 z.string.de.ephemeralUnitsHours = 'Stunden';
 z.string.de.ephemeralUnitsDay = 'Tag';
 z.string.de.ephemeralUnitsDays = 'Tage';
+z.string.de.ephemeralUnitsWeek = 'Woche';
+z.string.de.ephemeralUnitsWeeks = 'Wochen';
+z.string.de.ephemeralUnitsYear = 'Jahr';
+z.string.de.ephemeralUnitsYears = 'Jahre';
 
