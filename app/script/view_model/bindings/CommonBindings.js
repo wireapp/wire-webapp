@@ -491,7 +491,10 @@ ko.bindingHandlers.removed_from_view = {
  */
 ko.bindingHandlers.in_viewport = {
   init(element, valueAccessor) {
-    const onElementVisible = valueAccessor() || (() => {});
+    const onElementVisible = valueAccessor();
+    if (!onElementVisible) {
+      return;
+    }
     z.ui.ViewportObserver.addElement(element, () => {
       return z.ui.OverlayedObserver.onElementVisible(element, onElementVisible);
     });

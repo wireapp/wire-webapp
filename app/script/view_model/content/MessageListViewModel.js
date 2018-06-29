@@ -514,27 +514,23 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
 
   /**
    * Message appeared in viewport.
-   * @param {z.entity.Message} message_et - Message to check
+   * @param {z.entity.Message} messageEntity - Message to check
    * @returns {boolean} Message is in viewport
    */
-  message_in_viewport(message_et) {
-    if (!message_et.is_ephemeral()) {
-      return true;
+  getInViewportCallback(messageEntity) {
+    if (!messageEntity.is_ephemeral()) {
+      return null;
     }
 
-    if (document.hasFocus()) {
-      this.conversation_repository.checkMessageTimer(message_et);
-    } else {
-      const start_timer_on_focus = this.conversation.id;
-
-      $(window).one('focus', () => {
-        if (start_timer_on_focus === this.conversation.id) {
-          this.conversation_repository.checkMessageTimer(message_et);
+    return () => {
+      const previouslyActiveConversation = this.conversation.id;
+      const startTimer = () => {
+        if (previouslyActiveConversation === this.conversation.id) {
+          this.conversation_repository.checkMessageTimer(messageEntity);
         }
-      });
-    }
-
-    return true;
+      };
+      return document.hasFocus() ? startTimer() : $(window).one('focus', startTimer);
+    };
   }
 
   on_context_menu_click(message_et, event) {
