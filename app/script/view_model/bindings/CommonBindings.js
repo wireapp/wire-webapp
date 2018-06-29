@@ -498,6 +498,7 @@ ko.bindingHandlers.in_viewport = {
 
     ko.utils.domNodeDisposal.addDisposeCallback(element, () => {
       z.ui.OverlayedObserver.removeElement(element);
+      z.ui.ViewportObserver.removeElement(element);
     });
   },
 };
