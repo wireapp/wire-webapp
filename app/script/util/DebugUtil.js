@@ -64,8 +64,8 @@ z.util.DebugUtil = class DebugUtil {
     const clientId = wire.app.repository.client.currentClient().id;
 
     const isOTRMessage = notification => notification.type === 'conversation.otr-message-add';
-    const isCurrentConversation = notification => notification.conversation === conversationId;
-    const isFromUs = notification =>
+    const isMessageInCurrentConversation = notification => notification.conversation === conversationId;
+    const wasSentByOurCurrentClient = notification =>
       notification.from === userId && (notification.data && notification.data.sender === clientId);
 
     return wire.app.repository.event.notificationService
@@ -75,8 +75,8 @@ z.util.DebugUtil = class DebugUtil {
           .map(notification => notification.payload)
           .reduce((acc, payload) => acc.concat(payload))
           .filter(isOTRMessage)
-          .filter(isCurrentConversation)
-          .filter(isFromUs)
+          .filter(isMessageInCurrentConversation)
+          .filter(wasSentByOurCurrentClient)
       );
   }
 
