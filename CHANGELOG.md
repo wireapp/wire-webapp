@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="1.5.0"></a>
+# [1.5.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@1.4.3...@wireapp/react-ui-kit@1.5.0) (2018-06-29)
+
+
+### Features
+
+* **react-ui-kit:** Menu modal ([#782](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/782)) ([b544f9b](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/b544f9b))
+
+
+
+
 <a name="1.4.3"></a>
 ## [1.4.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@1.4.2...@wireapp/react-ui-kit@1.4.3) (2018-06-29)
 
