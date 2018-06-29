@@ -2539,6 +2539,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when message was deleted
    */
   delete_message_everyone(conversation_et, message_et, precondition_option) {
+    const conversationId = conversation_et.id;
     return Promise.resolve()
       .then(() => {
         if (!message_et.user().is_me && !message_et.ephemeral_expires()) {
@@ -2549,8 +2550,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
         generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.DELETED, new z.proto.MessageDelete(message_et.id));
 
         return this.sending_queue.push(() => {
-          return this.create_recipients(conversation_et.id, false, precondition_option).then(recipients =>
-            this._sendGenericMessage(conversation_et.id, generic_message, recipients, precondition_option)
+          return this.create_recipients(conversationId, false, precondition_option).then(recipients =>
+            this._sendGenericMessage(conversationId, generic_message, recipients, precondition_option)
           );
         });
       })
@@ -2559,12 +2560,13 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return this._delete_message_by_id(conversation_et, message_et.id);
       })
       .catch(error => {
-        this.logger.info(
-          `Failed to send delete message for everyone with id '${message_et.id}' for conversation '${
-            conversation_et.id
-          }'`,
-          error
-        );
+        const isConversationNotFound = error.code === z.service.BackendClientError.STATUS_CODE.NOT_FOUND;
+        if (isConversationNotFound) {
+          this.logger.warn(`Conversation '${conversationId}' not found. Deleting message for self user only.`);
+          return this.delete_message(conversation_et, message_et);
+        }
+        const message = `Failed to delete message '${message_et.id}' in conversation '${conversationId}' for everyone`;
+        this.logger.info(message, error);
         throw error;
       });
   }
@@ -3398,12 +3400,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const shouldDeleteMessage = !messageEntity.user().is_me || messageEntity.is_ping();
     if (shouldDeleteMessage) {
       this.get_conversation_by_id(messageEntity.conversation_id).then(conversationEntity => {
-        if (conversationEntity.is_group()) {
-          const user_ids = _.union([this.selfUser().id], [messageEntity.from]);
-          return this.delete_message_everyone(conversationEntity, messageEntity, user_ids);
+        if (conversationEntity.removed_from_conversation()) {
+          return this.delete_message(conversationEntity, messageEntity);
         }
 
-        this.delete_message_everyone(conversationEntity, messageEntity);
+        const userIds = conversationEntity.is_group() ? [this.selfUser().id, messageEntity.from] : undefined;
+        this.delete_message_everyone(conversationEntity, messageEntity, userIds);
       });
     }
   }
