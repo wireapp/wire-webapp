@@ -58,15 +58,20 @@ z.util.DebugUtil = class DebugUtil {
       .then(() => this.logger.log(`Corrupted Session ID '${sessionId}'`));
   }
 
-  findMessageInNotificationStream(messageId) {
+  haveISentThisMessageToMyOtherClients(messageId) {
     const userId = wire.app.repository.user.self().id;
-    const conversationId = wire.app.repository.conversation.active_conversation().id;
+    const conversation = wire.app.repository.conversation.active_conversation();
+    const conversationId = conversation.id;
     const clientId = wire.app.repository.client.currentClient().id;
+    const message = conversation.get_message_by_id(messageId);
+    const dateTime = new Date(message.timestamp());
+    let amountOfMessagesSent = 0;
 
     const isOTRMessage = notification => notification.type === 'conversation.otr-message-add';
-    const isMessageInCurrentConversation = notification => notification.conversation === conversationId;
+    const isInCurrentConversation = notification => notification.conversation === conversationId;
     const wasSentByOurCurrentClient = notification =>
       notification.from === userId && (notification.data && notification.data.sender === clientId);
+    const hasExpectedTimestamp = notification => notification.time === dateTime.toISOString();
 
     return wire.app.repository.event.notificationService
       .getNotifications(undefined, undefined, 10000)
@@ -75,9 +80,15 @@ z.util.DebugUtil = class DebugUtil {
           .map(notification => notification.payload)
           .reduce((acc, payload) => acc.concat(payload))
           .filter(isOTRMessage)
-          .filter(isMessageInCurrentConversation)
+          .filter(isInCurrentConversation)
           .filter(wasSentByOurCurrentClient)
-      );
+          .filter(hasExpectedTimestamp)
+      )
+      .then(filteredNotifications => {
+        amountOfMessagesSent = filteredNotifications.length;
+        return wire.app.repository.client.getClientsForSelf();
+      })
+      .then(selfClients => selfClients.length === amountOfMessagesSent);
   }
 
   getEventInfo(event) {
