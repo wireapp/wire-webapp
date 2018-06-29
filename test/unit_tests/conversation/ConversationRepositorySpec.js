@@ -308,7 +308,7 @@ describe('ConversationRepository', () => {
     });
   });
 
-  describe('get_groups_by_name', () => {
+  describe('getGroupsByName', () => {
     beforeEach(done => {
       const group_a = _generate_conversation(z.conversation.ConversationType.REGULAR);
       group_a.name('Web Dudes');
@@ -343,29 +343,29 @@ describe('ConversationRepository', () => {
     });
 
     it('should return expected matches', () => {
-      let result = TestFactory.conversation_repository.get_groups_by_name('Web Dudes');
+      let result = TestFactory.conversation_repository.getGroupsByName('Web Dudes');
       expect(result.length).toBe(1);
 
-      result = TestFactory.conversation_repository.get_groups_by_name('Dudes');
+      result = TestFactory.conversation_repository.getGroupsByName('Dudes');
       expect(result.length).toBe(1);
 
-      result = TestFactory.conversation_repository.get_groups_by_name('e');
+      result = TestFactory.conversation_repository.getGroupsByName('e');
       expect(result.length).toBe(3);
 
-      result = TestFactory.conversation_repository.get_groups_by_name('Rene');
+      result = TestFactory.conversation_repository.getGroupsByName('Rene');
       expect(result.length).toBe(1);
 
-      result = TestFactory.conversation_repository.get_groups_by_name('John');
+      result = TestFactory.conversation_repository.getGroupsByName('John');
       expect(result.length).toBe(1);
     });
 
     it('should return a cleared group with the user still being member of it', () => {
-      const result = TestFactory.conversation_repository.get_groups_by_name('Cleared');
+      const result = TestFactory.conversation_repository.getGroupsByName('Cleared');
       expect(result.length).toBe(1);
     });
 
     it('should not return a cleared group that the user left', () => {
-      const result = TestFactory.conversation_repository.get_groups_by_name('Removed');
+      const result = TestFactory.conversation_repository.getGroupsByName('Removed');
       expect(result.length).toBe(0);
     });
   });

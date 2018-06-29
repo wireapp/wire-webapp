@@ -337,7 +337,7 @@ z.main.App = class App {
         amplify.publish(z.event.WebApp.LIFECYCLE.LOADED);
         amplify.publish(z.event.WebApp.LOADED); // todo: deprecated - remove when user base of wrappers version >= 2.12 is large enough
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.APP_LOADED);
-        return this.repository.conversation.update_conversations_unarchived();
+        return this.repository.conversation.updateConversationsOnAppInit();
       })
       .then(() => {
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.UPDATED_CONVERSATIONS);
