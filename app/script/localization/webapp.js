@@ -235,11 +235,11 @@ z.string.modalConversationRemoveHeadline = 'Remove?';
 z.string.modalConversationRemoveMessage = '{{user}} won’t be able to send or receive messages in this conversation.';
 
 z.string.modalConversationRemoveGuestsAction = 'Remove guests';
-z.string.modalConversationRemoveGuestsHeadline = 'Turning off guest access?';
-z.string.modalConversationRemoveGuestsMessage = 'Current guest will be removed from the conversation. New guests will not be allowed.';
+z.string.modalConversationRemoveGuestsHeadline = 'Turn off guest access?';
+z.string.modalConversationRemoveGuestsMessage = 'Current guests will be removed from the conversation. New guests will not be allowed.';
 
 z.string.modalConversationRevokeLinkAction = 'Revoke link';
-z.string.modalConversationRevokeLinkHeadline = 'Revoking the link?';
+z.string.modalConversationRevokeLinkHeadline = 'Revoke the link?';
 z.string.modalConversationRevokeLinkMessage = 'New guests will not be able to join with this link. Current guests will still have access.';
 
 z.string.modalConversationGuestOptionsAllowGuestMessage = 'Could not allow guests. Please try again.';
