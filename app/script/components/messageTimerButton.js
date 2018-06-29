@@ -68,20 +68,20 @@ z.components.MessageTimerButton = class MessageTimerButton {
 ko.components.register('message-timer-button', {
   template: `
     <span id="conversation-input-bar-message-timer"
-        class="controls-right-button conversation-input-bar-message-timer"
-        data-bind="click: onClick, l10n_tooltip: z.string.tooltipConversationEphemeral, attr: {'data-uie-value': isTimerDisabled() ? 'disabled' : 'enabled'}"
-        data-uie-name="do-set-ephemeral-timer"
-        data-uie-value>
-        <!-- ko if: hasMessageTimer() && conversationEntity()-->
-            <div class="message-timer-button" data-bind="css: isTimerDisabled() ? 'message-timer-button--disabled' : 'message-timer-button--enabled'">
-                <span class="message-timer-button-unit" data-bind="text: duration().unit"></span>
-                <span class="full-screen" data-bind="text: duration().value"></span>
-            </div>
-        <!-- /ko -->
+      class="controls-right-button conversation-input-bar-message-timer"
+      data-bind="click: onClick, l10n_tooltip: z.string.tooltipConversationEphemeral, attr: {'data-uie-value': isTimerDisabled() ? 'disabled' : 'enabled'}"
+      data-uie-name="do-set-ephemeral-timer"
+      data-uie-value>
+      <!-- ko if: hasMessageTimer() && conversationEntity()-->
+        <div class="message-timer-button" data-bind="css: isTimerDisabled() ? 'message-timer-button--disabled' : 'message-timer-button--enabled'">
+          <span class="message-timer-button-unit" data-bind="text: duration().unit"></span>
+          <span class="full-screen" data-bind="text: duration().value"></span>
+        </div>
+      <!-- /ko -->
 
-        <!-- ko ifnot: hasMessageTimer() -->
-            <hourglass-icon class="button-icon-large"></hourglass-icon>
-        <!-- /ko -->
+      <!-- ko ifnot: hasMessageTimer() -->
+        <hourglass-icon class="button-icon-large"></hourglass-icon>
+      <!-- /ko -->
     </span>
     `,
   viewModel: z.components.MessageTimerButton,
