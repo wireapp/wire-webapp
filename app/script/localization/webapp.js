@@ -235,11 +235,11 @@ z.string.modalConversationRemoveHeadline = 'Remove?';
 z.string.modalConversationRemoveMessage = '{{user}} won’t be able to send or receive messages in this conversation.';
 
 z.string.modalConversationRemoveGuestsAction = 'Remove guests';
-z.string.modalConversationRemoveGuestsHeadline = 'Turning off guest access?';
-z.string.modalConversationRemoveGuestsMessage = 'Current guest will be removed from the conversation. New guests will not be allowed.';
+z.string.modalConversationRemoveGuestsHeadline = 'Turn off guest access?';
+z.string.modalConversationRemoveGuestsMessage = 'Current guests will be removed from the conversation. New guests will not be allowed.';
 
 z.string.modalConversationRevokeLinkAction = 'Revoke link';
-z.string.modalConversationRevokeLinkHeadline = 'Revoking the link?';
+z.string.modalConversationRevokeLinkHeadline = 'Revoke the link?';
 z.string.modalConversationRevokeLinkMessage = 'New guests will not be able to join with this link. Current guests will still have access.';
 
 z.string.modalConversationGuestOptionsAllowGuestMessage = 'Could not allow guests. Please try again.';
@@ -754,6 +754,8 @@ z.string.notificationConnectionAccepted = 'Accepted your connection request';
 z.string.notificationConnectionConnected = 'You are now connected';
 z.string.notificationConnectionRequest = 'Wants to connect';
 z.string.notificationConversationCreate = '{{user}} started a conversation';
+z.string.notificationConversationMessageTimerUpdate = '{{user}} set the message timer to {{time}}';
+z.string.notificationConversationMessageTimerReset = '{{user}} turned off the message timer';
 z.string.notificationConversationRename = '{{user}} renamed the conversation to {{name}}';
 z.string.notificationMemberJoinMany = '{{user}} added {{number}} people to the conversation';
 z.string.notificationMemberJoinSelf = '{{user}} joined the conversation';

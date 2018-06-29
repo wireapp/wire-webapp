@@ -350,7 +350,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .then(conversations => this.map_conversations(conversations))
       .then(conversation_ets => {
         this.save_conversations(conversation_ets);
-        this.update_conversations_offline();
         return this.conversations();
       });
   }
@@ -594,27 +593,30 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   /**
-   * Update users and events for archived conversations currently visible.
+   * Update all conversations on app init.
    * @returns {undefined} No return value
    */
-  update_conversations_archived() {
-    this.updateConversations(this.conversations_archived());
+  updateConversationsOnAppInit() {
+    this.logger.info('Updating group participants');
+    this.updateUnarchivedConversations();
+    this.sorted_conversations().map(conversationEntity => {
+      this.updateParticipatingUserEntities(conversationEntity, true);
+    });
   }
 
   /**
-   * Map users to all conversations without any backend requests.
+   * Update users and events for archived conversations currently visible.
    * @returns {undefined} No return value
    */
-  update_conversations_offline() {
-    this.logger.info('Updating group participants offline');
-    this.sorted_conversations().map(conversation_et => this.updateParticipatingUserEntities(conversation_et, true));
+  updateArchivedConversations() {
+    this.updateConversations(this.conversations_archived());
   }
 
   /**
    * Update users and events for all unarchived conversations.
    * @returns {undefined} No return value
    */
-  update_conversations_unarchived() {
+  updateUnarchivedConversations() {
     this.updateConversations(this.conversations_unarchived());
   }
 
@@ -724,41 +726,36 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Get group conversations by name.
    *
    * @param {string} query - Query to be searched in group conversation names
-   * @param {boolean} is_handle - Query string is handle
+   * @param {boolean} isHandle - Query string is handle
    * @returns {Array<Conversation>} Matching group conversations
    */
-  get_groups_by_name(query, is_handle) {
+  getGroupsByName(query, isHandle) {
     return this.sorted_conversations()
-      .filter(conversation_et => {
-        if (!conversation_et.is_group()) {
+      .filter(conversationEntity => {
+        if (!conversationEntity.is_group()) {
           return false;
         }
 
-        if (is_handle) {
-          if (z.util.StringUtil.compareTransliteration(conversation_et.display_name(), `@${query}`)) {
-            return true;
-          }
+        const queryString = isHandle ? `@${query}` : query;
+        if (z.util.StringUtil.compareTransliteration(conversationEntity.display_name(), queryString)) {
+          return true;
+        }
 
-          for (const user_et of conversation_et.participating_user_ets()) {
-            if (z.util.StringUtil.startsWith(user_et.username(), query)) {
-              return true;
-            }
-          }
-        } else {
-          if (z.util.StringUtil.compareTransliteration(conversation_et.display_name(), query)) {
+        for (const userEntity of conversationEntity.participating_user_ets()) {
+          const nameString = isHandle ? userEntity.username() : userEntity.name();
+          if (z.util.StringUtil.startsWith(nameString, query)) {
             return true;
-          }
-
-          for (const user_et of conversation_et.participating_user_ets()) {
-            if (z.util.StringUtil.compareTransliteration(user_et.name(), query)) {
-              return true;
-            }
           }
         }
+
         return false;
       })
-      .sort((conversation_a, conversation_b) => {
-        return z.util.StringUtil.sortByPriority(conversation_a.display_name(), conversation_b.display_name(), query);
+      .sort((conversationA, conversationB) => {
+        return z.util.StringUtil.sortByPriority(conversationA.display_name(), conversationB.display_name(), query);
+      })
+      .map(conversationEntity => {
+        this.updateParticipatingUserEntities(conversationEntity);
+        return conversationEntity;
       });
   }
 
@@ -2539,6 +2536,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when message was deleted
    */
   delete_message_everyone(conversation_et, message_et, precondition_option) {
+    const conversationId = conversation_et.id;
     return Promise.resolve()
       .then(() => {
         if (!message_et.user().is_me && !message_et.ephemeral_expires()) {
@@ -2549,8 +2547,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
         generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.DELETED, new z.proto.MessageDelete(message_et.id));
 
         return this.sending_queue.push(() => {
-          return this.create_recipients(conversation_et.id, false, precondition_option).then(recipients =>
-            this._sendGenericMessage(conversation_et.id, generic_message, recipients, precondition_option)
+          return this.create_recipients(conversationId, false, precondition_option).then(recipients =>
+            this._sendGenericMessage(conversationId, generic_message, recipients, precondition_option)
           );
         });
       })
@@ -2559,12 +2557,13 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return this._delete_message_by_id(conversation_et, message_et.id);
       })
       .catch(error => {
-        this.logger.info(
-          `Failed to send delete message for everyone with id '${message_et.id}' for conversation '${
-            conversation_et.id
-          }'`,
-          error
-        );
+        const isConversationNotFound = error.code === z.service.BackendClientError.STATUS_CODE.NOT_FOUND;
+        if (isConversationNotFound) {
+          this.logger.warn(`Conversation '${conversationId}' not found. Deleting message for self user only.`);
+          return this.delete_message(conversation_et, message_et);
+        }
+        const message = `Failed to delete message '${message_et.id}' in conversation '${conversationId}' for everyone`;
+        this.logger.info(message, error);
         throw error;
       });
   }
@@ -3398,12 +3397,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const shouldDeleteMessage = !messageEntity.user().is_me || messageEntity.is_ping();
     if (shouldDeleteMessage) {
       this.get_conversation_by_id(messageEntity.conversation_id).then(conversationEntity => {
-        if (conversationEntity.is_group()) {
-          const user_ids = _.union([this.selfUser().id], [messageEntity.from]);
-          return this.delete_message_everyone(conversationEntity, messageEntity, user_ids);
+        if (conversationEntity.removed_from_conversation()) {
+          return this.delete_message(conversationEntity, messageEntity);
         }
 
-        this.delete_message_everyone(conversationEntity, messageEntity);
+        const userIds = conversationEntity.is_group() ? [this.selfUser().id, messageEntity.from] : undefined;
+        this.delete_message_everyone(conversationEntity, messageEntity, userIds);
       });
     }
   }
