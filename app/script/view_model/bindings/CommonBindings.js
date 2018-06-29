@@ -490,57 +490,63 @@ ko.bindingHandlers.removed_from_view = {
  * Element is in viewport. return true within the callback to dispose the subscription
  */
 ko.bindingHandlers.in_viewport = (function() {
-  const listeners = [];
+  const overlayedElements = new Map();
 
-  // listeners can be deleted during iteration
-  const notifyListeners = _.throttle(event => {
-    for (let index = listeners.length; index--; ) {
-      listeners[index](event);
+  const isOverlayed = domElement => {
+    const box = domElement.getBoundingClientRect();
+    const elementAtPoint = document.elementFromPoint(box.x, box.y);
+    return (
+      elementAtPoint &&
+      !elementAtPoint.contains(domElement) &&
+      !domElement.contains(elementAtPoint) &&
+      domElement !== elementAtPoint
+    );
+  };
+
+  const checkOverlayedElements = mutations => {
+    mutations.forEach(({removedNodes}) => {
+      if (removedNodes && removedNodes.length) {
+        overlayedElements.forEach((onVisible, element) => {
+          if (!isOverlayed(element)) {
+            onVisible();
+            removeVisibleListener(element);
+          }
+        });
+      }
+    });
+  };
+
+  const mutationObserver = new MutationObserver(checkOverlayedElements);
+
+  const addVisibleListener = (element, onVisible) => {
+    if (overlayedElements.size === 0) {
+      mutationObserver.observe(document.body, {childList: true, subtree: true});
     }
-  }, 300);
+    overlayedElements.set(element, onVisible);
+  };
 
-  window.addEventListener('scroll', notifyListeners, true);
-  notifyListeners();
+  const removeVisibleListener = element => {
+    overlayedElements.delete(element);
+    if (overlayedElements.size < 1) {
+      mutationObserver.disconnect();
+    }
+  };
 
   return {
-    init(element, valueAccessor, allBindingsAccessor) {
-      function _inView(domElement) {
-        const box = domElement.getBoundingClientRect();
-        const elementAtPoint = document.elementFromPoint(box.x, box.y);
-        const isHidden =
-          !elementAtPoint.contains(domElement) && !domElement.contains(elementAtPoint) && domElement !== elementAtPoint;
-
-        const isInRightPanel = document.querySelector('#right-column').contains(domElement);
-        return (
-          !isHidden &&
-          box.right >= 0 &&
-          box.bottom >= 0 &&
-          (isInRightPanel || box.left <= document.documentElement.clientWidth) &&
-          box.top <= document.documentElement.clientHeight
-        );
-      }
-
+    init(element, valueAccessor) {
       function _dispose() {
-        z.util.ArrayUtil.removeElement(listeners, _checkElement);
+        mutationObserver.disconnect();
       }
 
-      function _checkElement(event) {
-        const isChild = event ? event.target.contains(element) : true;
+      const executeCallback = () => {
+        const onElementOnScreen = valueAccessor();
+        const shouldDispose = onElementOnScreen && onElementOnScreen();
 
-        if (isChild && _inView(element)) {
-          const callback = valueAccessor();
-          const dispose = callback && callback();
-
-          if (dispose) {
-            _dispose();
-          }
-        }
-      }
-
-      listeners.push(_checkElement);
-      window.setTimeout(_checkElement, allBindingsAccessor.get('delay') || 0);
-
-      ko.utils.domNodeDisposal.addDisposeCallback(element, _dispose);
+        return shouldDispose ? _dispose : undefined;
+      };
+      z.ui.ViewportObserver.addElement(element, () => {
+        return !isOverlayed(element) ? executeCallback() : addVisibleListener(element, executeCallback);
+      });
     },
   };
 })();
