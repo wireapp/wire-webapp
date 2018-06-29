@@ -133,11 +133,12 @@ z.user.UserRepository = class UserRepository {
         .then(users => {
           if (users.length) {
             this.logger.log(`Loaded state of '${users.length}' users from database`, users);
-            return Promise.all(
-              users.map(user => {
-                return this.get_user_by_id(user.id).then(userEntity => userEntity.availability(user.availability));
-              })
-            );
+
+            const mappingPromises = users.map(user => {
+              return this.get_user_by_id(user.id).then(userEntity => userEntity.availability(user.availability));
+            });
+
+            return Promise.all(mappingPromises);
           }
         })
         .then(() => this.users().forEach(userEntity => userEntity.subscribeToChanges()));

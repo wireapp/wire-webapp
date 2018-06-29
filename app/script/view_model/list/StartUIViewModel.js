@@ -554,7 +554,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
   _searchConversationsForServices(query) {
     const normalizedQuery = z.search.SearchRepository.normalizeQuery(query);
     const conversationsForServices = this.conversationRepository
-      .get_groups_by_name(normalizedQuery, false)
+      .getGroupsByName(normalizedQuery, false)
       .filter(conversationEntity => conversationEntity.inTeam());
     this.serviceConversations(conversationsForServices);
   }
@@ -584,7 +584,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
         this.searchResults.contacts(this.userRepository.search_for_connected_users(normalizedQuery, isHandle));
       }
 
-      this.searchResults.groups(this.conversationRepository.get_groups_by_name(normalizedQuery, isHandle));
+      this.searchResults.groups(this.conversationRepository.getGroupsByName(normalizedQuery, isHandle));
     }
   }
 
