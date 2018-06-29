@@ -58,32 +58,37 @@ z.util.DebugUtil = class DebugUtil {
       .then(() => this.logger.log(`Corrupted Session ID '${sessionId}'`));
   }
 
-  haveISentThisMessageToMyOtherClients(messageId) {
-    const userId = wire.app.repository.user.self().id;
-    const conversation = wire.app.repository.conversation.active_conversation();
-    const conversationId = conversation.id;
-    const clientId = wire.app.repository.client.currentClient().id;
-    const message = conversation.get_message_by_id(messageId);
-    const dateTime = new Date(message.timestamp());
+  haveISentThisMessageToMyOtherClients(
+    messageId,
+    conversationId = wire.app.repository.conversation.active_conversation().id
+  ) {
     let amountOfMessagesSent = 0;
+    let dateTime = undefined;
 
-    const isOTRMessage = notification => notification.type === 'conversation.otr-message-add';
+    const clientId = wire.app.repository.client.currentClient().id;
+    const userId = wire.app.repository.user.self().id;
+
+    const isOTRMessage = notification => notification.type === z.event.Backend.CONVERSATION.OTR_MESSAGE_ADD;
     const isInCurrentConversation = notification => notification.conversation === conversationId;
     const wasSentByOurCurrentClient = notification =>
       notification.from === userId && (notification.data && notification.data.sender === clientId);
     const hasExpectedTimestamp = notification => notification.time === dateTime.toISOString();
 
-    return wire.app.repository.event.notificationService
-      .getNotifications(undefined, undefined, 10000)
-      .then(({notifications}) =>
-        notifications
+    return wire.app.repository.conversation
+      .get_conversation_by_id(conversationId)
+      .then(conversation => {
+        return wire.app.repository.conversation.get_message_in_conversation_by_id(conversation, messageId);
+      })
+      .then(message => {
+        dateTime = new Date(message.timestamp());
+        return wire.app.repository.event.notificationService.getNotifications(undefined, undefined, 10000);
+      })
+      .then(({notifications}) => {
+        return notifications
           .map(notification => notification.payload)
-          .reduce((acc, payload) => acc.concat(payload))
-          .filter(isOTRMessage)
-          .filter(isInCurrentConversation)
-          .filter(wasSentByOurCurrentClient)
-          .filter(hasExpectedTimestamp)
-      )
+          .reduce((accumulator, payload) => accumulator.concat(payload))
+          .filter(isOTRMessage && isInCurrentConversation && wasSentByOurCurrentClient && hasExpectedTimestamp);
+      })
       .then(filteredNotifications => {
         amountOfMessagesSent = filteredNotifications.length;
         return wire.app.repository.client.getClientsForSelf();
