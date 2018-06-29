@@ -107,7 +107,12 @@ export default class ConversationService {
 
     await this.sendGenericMessage(this.clientID, conversationId, genericMessage);
 
-    return {...payloadBundle, conversation: conversationId, state: PayloadBundleState.OUTGOING_SENT};
+    return {
+      ...payloadBundle,
+      conversation: conversationId,
+      messageTimer: 0,
+      state: PayloadBundleState.OUTGOING_SENT,
+    };
   }
 
   private async sendExternalGenericMessage(
@@ -204,7 +209,12 @@ export default class ConversationService {
     const payload: EncryptedAsset = await AssetCryptography.encryptAsset(plainTextBuffer);
 
     await this.sendExternalGenericMessage(this.clientID, conversationId, payload, preKeyBundles as UserPreKeyBundleMap);
-    return {...payloadBundle, conversation: conversationId, state: PayloadBundleState.OUTGOING_SENT};
+    return {
+      ...payloadBundle,
+      conversation: conversationId,
+      messageTimer: this.messageTimer.getMessageTimer(conversationId),
+      state: PayloadBundleState.OUTGOING_SENT,
+    };
   }
 
   private sendOTRMessage(
@@ -235,7 +245,12 @@ export default class ConversationService {
 
     await this.sendGenericMessage(this.clientID, conversationId, genericMessage);
 
-    return {...payloadBundle, conversation: conversationId, state: PayloadBundleState.OUTGOING_SENT};
+    return {
+      ...payloadBundle,
+      conversation: conversationId,
+      messageTimer: this.messageTimer.getMessageTimer(conversationId),
+      state: PayloadBundleState.OUTGOING_SENT,
+    };
   }
 
   private async sendSessionReset(
@@ -249,7 +264,12 @@ export default class ConversationService {
 
     await this.sendGenericMessage(this.clientID, conversationId, sessionReset);
 
-    return {...payloadBundle, conversation: conversationId, state: PayloadBundleState.OUTGOING_SENT};
+    return {
+      ...payloadBundle,
+      conversation: conversationId,
+      messageTimer: this.messageTimer.getMessageTimer(conversationId),
+      state: PayloadBundleState.OUTGOING_SENT,
+    };
   }
 
   private async sendText(
@@ -259,6 +279,7 @@ export default class ConversationService {
     const payloadBundle: PayloadBundleOutgoing = {
       ...originalPayloadBundle,
       conversation: conversationId,
+      messageTimer: this.messageTimer.getMessageTimer(conversationId),
       state: PayloadBundleState.OUTGOING_SENT,
     };
     let genericMessage = this.protocolBuffers.GenericMessage.create({
@@ -394,6 +415,7 @@ export default class ConversationService {
       conversation: conversationId,
       from: this.apiClient.context!.userId,
       id: messageId,
+      messageTimer: this.messageTimer.getMessageTimer(conversationId),
       state: PayloadBundleState.OUTGOING_SENT,
       type: GenericMessageType.HIDDEN,
     };
@@ -420,6 +442,7 @@ export default class ConversationService {
       conversation: conversationId,
       from: this.apiClient.context!.userId,
       id: messageId,
+      messageTimer: this.messageTimer.getMessageTimer(conversationId),
       state: PayloadBundleState.OUTGOING_SENT,
       type: GenericMessageType.DELETED,
     };

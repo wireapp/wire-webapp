@@ -32,6 +32,7 @@ type PayloadBundleIncoming = PayloadBundle & {
 };
 type PayloadBundleOutgoing = PayloadBundle & {
   conversation: string;
+  messageTimer: number;
   state: PayloadBundleState.OUTGOING_SENT;
 };
 type PayloadBundleOutgoingUnsent = PayloadBundle & {state: PayloadBundleState.OUTGOING_UNSENT};
