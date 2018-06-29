@@ -23,49 +23,34 @@ window.z = window.z || {};
 window.z.ui = z.ui || {};
 
 z.ui.ViewportObserver = (() => {
-  let intersectionObserver = undefined;
-  const observedElements = [];
-
-  const _addElement = (element, callback) => {
-    if (!intersectionObserver) {
-      _createObserver();
-    }
-    observedElements.push({callback, element});
-    intersectionObserver.observe(element);
-  };
-
-  const _createObserver = () => {
+  const observedElements = new Map();
+  const intersectionObserver = (() => {
     const onIntersect = entries => {
       entries.forEach(({isIntersecting, target: element}) => {
         if (isIntersecting) {
           intersectionObserver.unobserve(element);
 
-          const observedElement = _getObservedElement(element);
-          if (observedElement) {
-            observedElement.callback();
-            _removeObservedElement(observedElement);
+          const onElementIntersects = observedElements.get(element);
+          if (onElementIntersects) {
+            onElementIntersects();
+            _removeElement(element);
           }
         }
       });
     };
 
     const options = {root: null, rootMargin: '0px', threshold: 0.0};
-    intersectionObserver = new IntersectionObserver(onIntersect, options);
-    return intersectionObserver;
-  };
+    return new IntersectionObserver(onIntersect, options);
+  })();
 
-  const _getObservedElement = requestedElement => observedElements.find(({element}) => element === requestedElement);
+  const _addElement = (element, callback) => {
+    observedElements.set(element, callback);
+    intersectionObserver.observe(element);
+  };
 
   const _removeElement = element => {
-    const observedElement = _getObservedElement(element);
-    if (observedElement) {
-      _removeObservedElement(observedElement);
-    }
+    observedElements.delete(element);
     intersectionObserver.unobserve(element);
-  };
-
-  const _removeObservedElement = observedElement => {
-    observedElements.splice(observedElements.indexOf(observedElement), 1);
   };
 
   return {
