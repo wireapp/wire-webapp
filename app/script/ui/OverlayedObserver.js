@@ -62,7 +62,7 @@ z.ui.OverlayedObserver = (() => {
     );
   };
 
-  const onElementVisible = (element, onVisible) => {
+  const addElement = (element, onVisible) => {
     if (!isOverlayed(element)) {
       return onVisible();
     }
@@ -79,5 +79,5 @@ z.ui.OverlayedObserver = (() => {
     }
   };
 
-  return {onElementVisible};
+  return {onElementVisible: addElement, removeElement};
 })();
