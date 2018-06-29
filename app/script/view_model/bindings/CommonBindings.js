@@ -490,62 +490,11 @@ ko.bindingHandlers.removed_from_view = {
  * Element is in viewport. return true within the callback to dispose the subscription
  */
 ko.bindingHandlers.in_viewport = (function() {
-  const overlayedElements = new Map();
-
-  const isOverlayed = domElement => {
-    const box = domElement.getBoundingClientRect();
-    const elementAtPoint = document.elementFromPoint(box.x, box.y);
-    return (
-      elementAtPoint &&
-      !elementAtPoint.contains(domElement) &&
-      !domElement.contains(elementAtPoint) &&
-      domElement !== elementAtPoint
-    );
-  };
-
-  const checkOverlayedElements = mutations => {
-    mutations.forEach(({removedNodes}) => {
-      if (removedNodes && removedNodes.length) {
-        overlayedElements.forEach((onVisible, element) => {
-          if (!isOverlayed(element)) {
-            onVisible();
-            removeVisibleListener(element);
-          }
-        });
-      }
-    });
-  };
-
-  const mutationObserver = new MutationObserver(checkOverlayedElements);
-
-  const addVisibleListener = (element, onVisible) => {
-    if (overlayedElements.size === 0) {
-      mutationObserver.observe(document.body, {childList: true, subtree: true});
-    }
-    overlayedElements.set(element, onVisible);
-  };
-
-  const removeVisibleListener = element => {
-    overlayedElements.delete(element);
-    if (overlayedElements.size < 1) {
-      mutationObserver.disconnect();
-    }
-  };
-
   return {
     init(element, valueAccessor) {
-      function _dispose() {
-        mutationObserver.disconnect();
-      }
-
-      const executeCallback = () => {
-        const onElementOnScreen = valueAccessor();
-        const shouldDispose = onElementOnScreen && onElementOnScreen();
-
-        return shouldDispose ? _dispose : undefined;
-      };
+      const onElementVisible = valueAccessor() || (() => {});
       z.ui.ViewportObserver.addElement(element, () => {
-        return !isOverlayed(element) ? executeCallback() : addVisibleListener(element, executeCallback);
+        return z.ui.OverlayedObserver.onElementVisible(element, onElementVisible);
       });
     },
   };
