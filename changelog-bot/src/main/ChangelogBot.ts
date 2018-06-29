@@ -17,15 +17,15 @@
  *
  */
 
+import APIClient = require('@wireapp/api-client');
 import {LoginData} from '@wireapp/api-client/dist/commonjs/auth/';
 import {Config} from '@wireapp/api-client/dist/commonjs/Config';
 import {Account} from '@wireapp/core';
 import {MemoryEngine} from '@wireapp/store-engine';
 import {exec} from 'child_process';
-import {promisify} from 'util';
-
-import APIClient = require('@wireapp/api-client');
 import * as Changelog from 'generate-changelog';
+import {promisify} from 'util';
+import {ChangelogData} from './ChangelogData';
 
 const logdown = require('logdown');
 
@@ -34,18 +34,12 @@ const logger = logdown('@wireapp/changelog-bot/ChangelogBot', {
   markdown: false,
 });
 
-export interface MessageData {
-  content: string;
-  conversationIds?: Array<string>;
-}
-
 class ChangelogBot {
-  constructor(private readonly loginData: LoginData, private readonly messageData: MessageData) {}
+  constructor(private readonly loginData: LoginData, private readonly messageData: ChangelogData) {}
 
   get message(): string {
-    const {content} = this.messageData;
-
-    return `\n**Changelog:** \n\n` + content + '\n';
+    const {content, repoSlug} = this.messageData;
+    return `\n**Changelog for "${repoSlug}":**\n\n${content}\n`;
   }
 
   async start(): Promise<void> {

@@ -19,7 +19,8 @@
 
 import {LoginData} from '@wireapp/api-client/dist/commonjs/auth/';
 import {ClientType} from '@wireapp/api-client/dist/commonjs/client/';
-import {ChangelogBot, MessageData} from './ChangelogBot';
+import {ChangelogBot} from './ChangelogBot';
+import {ChangelogData} from './ChangelogData';
 
 export async function start(parameters: {[index: string]: string}): Promise<ChangelogBot> {
   const {conversationIds, email, password} = parameters;
@@ -31,10 +32,19 @@ export async function start(parameters: {[index: string]: string}): Promise<Chan
     password,
   };
 
-  const changelog = await ChangelogBot.generateChangelog(String(TRAVIS_REPO_SLUG), String(TRAVIS_COMMIT_RANGE));
+  if (!TRAVIS_REPO_SLUG) {
+    throw Error('You need to specify a repository slug. Otherwise this script will not work.');
+  }
 
-  const messageData: MessageData = {
+  if (!TRAVIS_COMMIT_RANGE) {
+    throw Error('You need to specify a commit range. Otherwise this script will not work.');
+  }
+
+  const changelog = await ChangelogBot.generateChangelog(TRAVIS_REPO_SLUG, TRAVIS_COMMIT_RANGE);
+
+  const messageData: ChangelogData = {
     content: changelog,
+    repoSlug: TRAVIS_REPO_SLUG,
   };
 
   if (conversationIds) {
