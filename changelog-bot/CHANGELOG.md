@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="0.2.0"></a>
+# [0.2.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/changelog-bot/compare/@wireapp/changelog-bot@0.1.43...@wireapp/changelog-bot@0.2.0) (2018-06-29)
+
+
+### Features
+
+* **changelog-bot:** Add repo slug to message header ([#775](https://github.com/wireapp/wire-web-packages/tree/master/packages/changelog-bot/issues/775)) ([d3cd5fc](https://github.com/wireapp/wire-web-packages/tree/master/packages/changelog-bot/commit/d3cd5fc))
+
+
+
+
 <a name="0.1.43"></a>
 ## [0.1.43](https://github.com/wireapp/wire-web-packages/tree/master/packages/changelog-bot/compare/@wireapp/changelog-bot@0.1.42...@wireapp/changelog-bot@0.1.43) (2018-06-29)
 
