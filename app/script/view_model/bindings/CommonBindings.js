@@ -487,7 +487,7 @@ ko.bindingHandlers.removed_from_view = {
 };
 
 /**
- * Adds a callback called whenever an element is in viewport and not overlayed by another element
+ * Adds a callback called whenever an element is in viewport and not overlayed by another element.
  */
 ko.bindingHandlers.in_viewport = {
   init(element, valueAccessor) {
