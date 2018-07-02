@@ -125,7 +125,7 @@ class Demo extends React.PureComponent {
       <StyledApp>
         {this.state.isModalOpen && (
           <Modal onClose={() => this.setState({isModalOpen: false})}>
-            <H1>Normal Modal</H1>
+            <Text>Normal Modal</Text>
           </Modal>
         )}
         {this.state.isFullscreenModalOpen && (
