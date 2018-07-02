@@ -50,6 +50,11 @@ z.viewModel.panel.GuestOptionsViewModel = class GuestOptionsViewModel {
 
     this.conversationEntity.subscribe(conversationEntity => this._updateCode(this.isVisible(), conversationEntity));
     this.isVisible.subscribe(isVisible => this._updateCode(isVisible, this.conversationEntity()));
+    this.hasAccessCode.subscribe(hasAccessCode => {
+      if (hasAccessCode) {
+        z.util.afterRender(this.resizeLink);
+      }
+    });
 
     this.toggleAccessState = this.toggleAccessState.bind(this);
     this.clickOnBack = this.clickOnBack.bind(this);
@@ -57,6 +62,7 @@ z.viewModel.panel.GuestOptionsViewModel = class GuestOptionsViewModel {
     this.requestAccessCode = this.requestAccessCode.bind(this);
     this.revokeAccessCode = this.revokeAccessCode.bind(this);
     this.copyLink = this.copyLink.bind(this);
+    this.resizeLink = this.resizeLink.bind(this);
     this.shouldUpdateScrollbar = ko
       .computed(() => this.isGuestEnabled() && this.hasAccessCode() && this.isVisible())
       .extend({notify: 'always', rateLimit: {method: 'notifyWhenChangesStop', timeout: 0}});
@@ -81,6 +87,14 @@ z.viewModel.panel.GuestOptionsViewModel = class GuestOptionsViewModel {
       this.isLinkCopied(true);
       amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.GUEST_ROOMS.LINK_COPIED);
       window.setTimeout(() => this.isLinkCopied(false), GuestOptionsViewModel.CONFIG.CONFIRM_DURATION);
+    }
+  }
+
+  resizeLink() {
+    const link = document.querySelector('.guest-options__link');
+    if (link) {
+      link.style.height = '';
+      link.style.height = `${link.scrollHeight}px`;
     }
   }
 
