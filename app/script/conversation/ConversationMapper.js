@@ -345,15 +345,16 @@ z.conversation.ConversationMapper = class ConversationMapper {
   }
 
   mapAccessCode(conversationEntity, accessCode) {
+    const {code, key, uri} = accessCode;
     const isTeamConversation = conversationEntity && conversationEntity.team_id;
-    if (isTeamConversation) {
+
+    if (uri && isTeamConversation) {
       if (z.util.Environment.frontend.isInternal()) {
-        const {code, key} = accessCode;
         const accessLink = `${z.config.URL.WEBAPP.INTERNAL}/join/?key=${key}&code=${code}`;
         return conversationEntity.accessCode(accessLink);
       }
 
-      conversationEntity.accessCode(accessCode.uri);
+      conversationEntity.accessCode(uri);
     }
   }
 
