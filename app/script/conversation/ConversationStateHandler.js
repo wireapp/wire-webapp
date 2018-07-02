@@ -104,9 +104,11 @@ z.conversation.ConversationStateHandler = class ConversationStateHandler extends
     return this.conversationService
       .postConversationCode(conversationEntity.id)
       .then(response => {
-        const accessCode = response.data || response;
-        this.conversationMapper.mapAccessCode(conversationEntity, accessCode);
-        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.GUEST_ROOMS.LINK_CREATED);
+        const accessCode = response && response.data;
+        if (accessCode) {
+          this.conversationMapper.mapAccessCode(conversationEntity, accessCode);
+          amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.GUEST_ROOMS.LINK_CREATED);
+        }
       })
       .catch(() => this._showModal(z.string.modalConversationGuestOptionsRequestCodeMessage));
   }
@@ -122,7 +124,8 @@ z.conversation.ConversationStateHandler = class ConversationStateHandler extends
   }
 
   _mapConversationAccessState(conversationEntity, eventJson) {
-    this.conversationMapper.mapAccessState(conversationEntity, eventJson.access, eventJson.access_role);
+    const {access: accessModes, access_role: accessRole} = eventJson.data;
+    this.conversationMapper.mapAccessState(conversationEntity, accessModes, accessRole);
   }
 
   _resetConversationAccessCode(conversationEntity) {
@@ -130,7 +133,7 @@ z.conversation.ConversationStateHandler = class ConversationStateHandler extends
   }
 
   _updateConversationAccessCode(conversationEntity, eventJson) {
-    this.conversationMapper.mapAccessCode(conversationEntity, eventJson);
+    this.conversationMapper.mapAccessCode(conversationEntity, eventJson.data);
   }
 
   _showModal(messageStringId) {
