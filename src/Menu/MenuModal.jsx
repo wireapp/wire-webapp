@@ -22,6 +22,24 @@ import {COLOR} from '../Identity/';
 import PropTypes from 'prop-types';
 import React from 'react';
 
+const bottomUpMovement = keyframes`
+  0% {
+    transform: translateY(100%);
+  }
+  100% {
+    transform: translateY(0);
+  }
+`;
+
+const backgroundFade = keyframes`
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+`;
+
 const MenuModalWrapper = styled.div`
   position: fixed;
   display: flex;
@@ -43,12 +61,12 @@ const MenuModalBody = styled.div`
   background-color: #fff;
   display: flex;
   flex-direction: column;
-  padding: 8px 24px;
+  padding: 8px 16px;
   z-index: 9999;
   margin-left: auto;
   margin-right: auto;
-  -webkit-transform: translate3d(0, 0, 0);
   width: 767px;
+  animation: ${bottomUpMovement} 0.55s cubic-bezier(0.19, 1, 0.22, 1);
   @media (max-width: 767px) {
     width: 100%;
   }
@@ -60,7 +78,7 @@ const MenuModalContent = styled.ul`
   padding: 0;
   margin: 0;
   li {
-    border-bottom: 1px solid ${COLOR.GRAY};
+    border-bottom: 1px solid ${COLOR.GRAY_LIGHTEN_72};
   }
   li:last-child {
     border-bottom: 0;
@@ -69,19 +87,12 @@ const MenuModalContent = styled.ul`
 
 const MenuItemContent = styled.li`
   color: ${COLOR.GRAY_DARKEN_72};
+  display: flex;
+  align-items: center;
   max-width: 100%;
   cursor: pointer;
-  padding: 10px 0;
+  height: 56px;
   list-style-type: none;
-`;
-
-const backgroundFade = keyframes`
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
 `;
 
 const MenuModalBackground = styled.div`
