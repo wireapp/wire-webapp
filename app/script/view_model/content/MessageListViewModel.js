@@ -523,9 +523,8 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     }
 
     return () => {
-      const previouslyActiveConversation = this.conversation.id;
       const startTimer = () => {
-        if (previouslyActiveConversation === this.conversation.id) {
+        if (messageEntity.conversation_id === this.conversation().id) {
           this.conversation_repository.checkMessageTimer(messageEntity);
         }
       };
