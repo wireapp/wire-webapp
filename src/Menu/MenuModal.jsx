@@ -17,28 +17,11 @@
  *
  */
 
-import styled, {keyframes} from 'styled-components';
+import {ANIMATION, DURATION, EASE} from '../Identity/motions';
 import {COLOR} from '../Identity/';
 import PropTypes from 'prop-types';
 import React from 'react';
-
-const bottomUpMovement = keyframes`
-  0% {
-    transform: translateY(100%);
-  }
-  100% {
-    transform: translateY(0);
-  }
-`;
-
-const backgroundFade = keyframes`
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-`;
+import styled from 'styled-components';
 
 const MenuModalWrapper = styled.div`
   position: fixed;
@@ -66,7 +49,7 @@ const MenuModalBody = styled.div`
   margin-left: auto;
   margin-right: auto;
   width: 767px;
-  animation: ${bottomUpMovement} 0.55s cubic-bezier(0.19, 1, 0.22, 1);
+  animation: ${ANIMATION.bottomUpMovement} ${DURATION.DEFAULT} ${EASE.EXPONENTIAL};
   @media (max-width: 767px) {
     width: 100%;
   }
@@ -103,7 +86,7 @@ const MenuModalBackground = styled.div`
   width: 100vw;
   background: rgba(50, 54, 57, 0.4);
   z-index: 9998;
-  animation: ${backgroundFade} 0.3s ease;
+  animation: ${ANIMATION.fadeIn} ${DURATION.PROACTIVE_SLOW} ${EASE.EXPONENTIAL};
 `;
 
 const noop = () => {};

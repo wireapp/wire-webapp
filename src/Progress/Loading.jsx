@@ -17,6 +17,7 @@
  *
  */
 
+import {ANIMATION, DURATION} from '../Identity/motions';
 import styled, {css, keyframes} from 'styled-components';
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -61,15 +62,6 @@ const fillAnimation = keyframes`
   }
 `;
 
-const rotateAnimation = keyframes`
-  0% {
-    transform: rotate(0);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-`;
-
 const Loading = styled(LoadingComponent)`
   ${props =>
     props.progress === null &&
@@ -77,7 +69,8 @@ const Loading = styled(LoadingComponent)`
       circle:nth-of-type(2) {
         stroke-dasharray: ${pathLength};
       }
-      animation: ${fillAnimation} 2.4s infinite ease-in-out, ${rotateAnimation} 2.4s infinite linear;
+      animation: ${fillAnimation} ${DURATION.EXTRA_LONG} infinite ease-in-out,
+        ${ANIMATION.rotate} ${DURATION.EXTRA_LONG} infinite linear;
     `};
 `;
 

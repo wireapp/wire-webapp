@@ -17,10 +17,11 @@
  *
  */
 
-import styled, {keyframes} from 'styled-components';
+import {ANIMATION, DURATION, EASE} from '../Identity/motions';
 import {CloseIcon} from '../Icon';
 import PropTypes from 'prop-types';
 import React from 'react';
+import styled from 'styled-components';
 
 const ModalWrapper = styled.div`
   position: fixed;
@@ -87,15 +88,6 @@ const ModalContent = styled.div`
   overflow-y: auto;
 `;
 
-const backgroundFade = keyframes`
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-`;
-
 const ModalBackground = styled.div`
   position: fixed;
   top: 0px;
@@ -104,7 +96,7 @@ const ModalBackground = styled.div`
   width: 100vw;
   background: rgba(50, 54, 57, 0.4);
   z-index: 9998;
-  animation: ${backgroundFade} 0.3s ease;
+  animation: ${ANIMATION.fadeIn} ${DURATION.PROACTIVE_SLOW} ${EASE.QUART};
 `;
 
 const noop = () => {};
