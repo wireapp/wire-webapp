@@ -77,9 +77,6 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     // Store message subscription id
     this.messages_subscription = undefined;
 
-    this.viewport_changed = ko.observable(false);
-    this.viewport_changed.extend({rateLimit: 100});
-
     this.recalculate_timeout = undefined;
 
     // Should we scroll to bottom when new message comes in
@@ -97,8 +94,6 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
 
     this.on_scroll = _.throttle((data, event) => {
       if (this.capture_scrolling_event) {
-        this.viewport_changed(!this.viewport_changed());
-
         const element = $(event.currentTarget);
 
         // On some HDPI screen scrollTop returns a floating point number instead of an integer
@@ -122,18 +117,14 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
       }
     }, 100);
 
-    $(window)
-      .on('resize', () => {
-        this.viewport_changed(!this.viewport_changed());
-      })
-      .on('focus', () => {
-        if (this.mark_as_read_on_focus) {
-          window.setTimeout(() => {
-            this.conversation_repository.mark_as_read(this.mark_as_read_on_focus);
-            this.mark_as_read_on_focus = undefined;
-          }, z.util.TimeUtil.UNITS_IN_MILLIS.SECOND);
-        }
-      });
+    $(window).on('focus', () => {
+      if (this.mark_as_read_on_focus) {
+        window.setTimeout(() => {
+          this.conversation_repository.mark_as_read(this.mark_as_read_on_focus);
+          this.mark_as_read_on_focus = undefined;
+        }, z.util.TimeUtil.UNITS_IN_MILLIS.SECOND);
+      }
+    });
 
     this.showInvitePeople = ko.pureComputed(() => {
       return (
