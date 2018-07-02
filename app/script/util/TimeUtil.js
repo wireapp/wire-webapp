@@ -17,7 +17,23 @@
  *
  */
 
+//@ts-check
+
 'use strict';
+
+/**
+ * @typedef {object} DiscreteTimeUnit
+ * @property {string} longUnit
+ * @property {string} unit
+ * @property {number} value
+ */
+
+/**
+ * @typedef {object} DurationUnit
+ * @property {string} text
+ * @property {string} unit
+ * @property {number} value
+ */
 
 window.z = window.z || {};
 window.z.util = z.util || {};
@@ -80,13 +96,10 @@ z.util.TimeUtil = {
 
   /**
    * Format milliseconds into 15s, 2m.
-   * @note Implementation based on: https://gist.github.com/deanrobertcook/7168b38150c303a2b4196216913d34c1
    * @param {number} duration - Duration to format in milliseconds
-   * @param {boolean} rounded - Enables rounding of numbers
-   * @param {number} maximumUnits - Maximum number of units shown in the textual representation
-   * @returns {Object} Unit, value and localized string
+   * @returns {DurationUnit} Unit, value and localized string
    */
-  formatDuration: (duration, rounded = true, maximumUnits = 1) => {
+  formatDuration: duration => {
     const mappedUnits = z.util.TimeUtil.mapUnits(duration, true);
     const firstNonZeroUnit = mappedUnits.find(unit => unit.value > 0);
     return {
@@ -96,6 +109,11 @@ z.util.TimeUtil = {
     };
   },
 
+  /**
+   * Generate a human readable string of the remaining time
+   * @param {number} duration - the remaining time in milliseconds
+   * @returns {string} readable representation of the remaining time
+   */
   formatDurationCaption: duration => {
     const mappedUnits = z.util.TimeUtil.mapUnits(duration, false);
     const hours = mappedUnits.find(unit => unit.unit === 'h');
@@ -170,6 +188,13 @@ z.util.TimeUtil = {
 
   getUnixTimestamp: () => Math.floor(Date.now() / z.util.TimeUtil.UNITS_IN_MILLIS.SECOND),
 
+  /**
+   * Calculate the discrete time units (years, weeks, days, hours, minutes, seconds) for a given duration
+   * @note Implementation based on: https://gist.github.com/deanrobertcook/7168b38150c303a2b4196216913d34c1
+   * @param {number} duration - duration in milliseconds
+   * @param {boolean} rounded - should the units be rounded as opposed to floored
+   * @returns {DiscreteTimeUnit[]} calculated time units
+   */
   mapUnits: (duration, rounded) => {
     const mappedUnits = z.util.TimeUtil.durationUnits().map((unit, index, units) => {
       let value = duration;
