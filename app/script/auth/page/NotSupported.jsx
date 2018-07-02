@@ -38,4 +38,9 @@ function NotSupported({intl: {formatMessage: _}}) {
   );
 }
 
-export default injectIntl(connect(state => ({language: getLanguage(state)}), {...TrackingAction})(NotSupported));
+export default injectIntl(
+  connect(
+    state => ({language: getLanguage(state)}),
+    {...TrackingAction}
+  )(NotSupported)
+);

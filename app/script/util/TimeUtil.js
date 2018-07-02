@@ -87,23 +87,17 @@ z.util.TimeUtil = {
    * @returns {Object} Unit, value and localized string
    */
   formatDuration: (duration, rounded = true, maximumUnits = 1) => {
-    const mappedUnits = this.mapUnits(duration, rounded);
-
+    const mappedUnits = z.util.TimeUtil.mapUnits(duration, true);
     const firstNonZeroUnit = mappedUnits.find(unit => unit.value > 0);
-    const startIndex = mappedUnits.indexOf(firstNonZeroUnit);
-    const validUnits = mappedUnits.slice(startIndex, startIndex + maximumUnits);
-    const longText = validUnits.map(unit => `${unit.value} ${z.l10n.text(unit.longUnit)}`).join(', ');
-    const upperUnit = validUnits[0] || {};
-
     return {
-      text: longText,
-      unit: upperUnit.unit,
-      value: upperUnit.value,
+      text: `${firstNonZeroUnit.value} ${z.l10n.text(firstNonZeroUnit.longUnit)}`,
+      unit: firstNonZeroUnit.unit,
+      value: firstNonZeroUnit.value,
     };
   },
 
   formatDurationCaption: duration => {
-    const mappedUnits = this.mapUnits(duration, false);
+    const mappedUnits = z.util.TimeUtil.mapUnits(duration, false);
     const hours = mappedUnits.find(unit => unit.unit === 'h');
     const minutes = mappedUnits.find(unit => unit.unit === 'm');
     const hasHours = hours.value > 0;
@@ -117,11 +111,16 @@ z.util.TimeUtil = {
       if (unit.value > 0) {
         validUnitStrings.push(`${unit.value} ${unit.longUnit}`);
       }
-      if ((validUnitStrings.length = 2 || (mappedUnits[index + 1] && mappedUnits[index + 1].value === 0))) {
+      if (validUnitStrings.length === 2) {
+        break;
+      }
+      const nextUnit = mappedUnits[index + 1];
+      if (validUnitStrings.length > 0 && nextUnit && nextUnit.value === 0) {
         break;
       }
     }
-    return `${validUnitStrings.join(` ${z.l10n.text(z.string.and)} `)} remaining`;
+    const joiner = ` ${z.l10n.text(z.string.and)} `;
+    return `${validUnitStrings.join(joiner)} ${z.l10n.text(z.string.ephemeralRemaining)}`;
   },
 
   /**
@@ -171,7 +170,7 @@ z.util.TimeUtil = {
 
   getUnixTimestamp: () => Math.floor(Date.now() / z.util.TimeUtil.UNITS_IN_MILLIS.SECOND),
 
-  mapUnits(duration, rounded = false) {
+  mapUnits: (duration, rounded) => {
     const mappedUnits = z.util.TimeUtil.durationUnits().map((unit, index, units) => {
       let value = duration;
       if (index > 0) {
