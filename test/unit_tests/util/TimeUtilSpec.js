@@ -179,6 +179,14 @@ describe('z.util.TimeUtil', () => {
     });
   });
 
+  describe('"formatDurationCaption"', () => {
+    it('renders hours and minutes correctly', () => {
+      expect(z.util.TimeUtil.formatDurationCaption(ONE_HOUR_IN_MILLIS + ONE_MINUTE_IN_MILLIS)).toEqual(
+        '01:01 remaining'
+      );
+    });
+  });
+
   describe('"formatSeconds"', () => {
     it('formats seconds', () => {
       expect(z.util.TimeUtil.formatSeconds(50)).toBe('00:50');

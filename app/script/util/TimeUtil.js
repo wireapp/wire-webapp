@@ -87,20 +87,7 @@ z.util.TimeUtil = {
    * @returns {Object} Unit, value and localized string
    */
   formatDuration: (duration, rounded = true, maximumUnits = 1) => {
-    const mappedUnits = z.util.TimeUtil.durationUnits().map((unit, index) => {
-      let value = duration;
-      if (index > 0) {
-        value %= z.util.TimeUtil.durationUnits()[index - 1].value;
-      }
-      value /= unit.value;
-      value = rounded && value >= 1 ? Math.round(value) : Math.floor(value);
-      const longUnit = z.string[value === 1 ? unit.singular : unit.plural];
-      return {
-        longUnit,
-        unit: unit.unit,
-        value,
-      };
-    });
+    const mappedUnits = this.mapUnits(duration, rounded);
 
     const firstNonZeroUnit = mappedUnits.find(unit => unit.value > 0);
     const startIndex = mappedUnits.indexOf(firstNonZeroUnit);
@@ -113,6 +100,28 @@ z.util.TimeUtil = {
       unit: upperUnit.unit,
       value: upperUnit.value,
     };
+  },
+
+  formatDurationCaption: duration => {
+    const mappedUnits = this.mapUnits(duration, false);
+    const hours = mappedUnits.find(unit => unit.unit === 'h');
+    const minutes = mappedUnits.find(unit => unit.unit === 'm');
+    const hasHours = hours.value > 0;
+    const validUnitStrings = [];
+    for (let index = 0; index < mappedUnits.length; index++) {
+      const unit = mappedUnits[index];
+      if (unit === hours && hasHours) {
+        validUnitStrings.push(`${z.util.zeroPadding(hours.value)}:${z.util.zeroPadding(minutes.value)}`);
+        break;
+      }
+      if (unit.value > 0) {
+        validUnitStrings.push(`${unit.value} ${unit.longUnit}`);
+      }
+      if ((validUnitStrings.length = 2 || (mappedUnits[index + 1] && mappedUnits[index + 1].value === 0))) {
+        break;
+      }
+    }
+    return `${validUnitStrings.join(` ${z.l10n.text(z.string.and)} `)} remaining`;
   },
 
   /**
@@ -161,4 +170,22 @@ z.util.TimeUtil = {
   getCurrentDate: () => new Date().toISOString().substring(0, 10),
 
   getUnixTimestamp: () => Math.floor(Date.now() / z.util.TimeUtil.UNITS_IN_MILLIS.SECOND),
+
+  mapUnits(duration, rounded = false) {
+    const mappedUnits = z.util.TimeUtil.durationUnits().map((unit, index, units) => {
+      let value = duration;
+      if (index > 0) {
+        value %= units[index - 1].value;
+      }
+      value /= unit.value;
+      value = rounded && value >= 1 ? Math.round(value) : Math.floor(value);
+      const longUnit = z.string[value === 1 ? unit.singular : unit.plural];
+      return {
+        longUnit,
+        unit: unit.unit,
+        value,
+      };
+    });
+    return mappedUnits;
+  },
 };
