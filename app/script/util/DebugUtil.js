@@ -104,7 +104,12 @@ z.util.DebugUtil = class DebugUtil {
         amountOfMessagesSent = filteredNotifications.length;
         return wire.app.repository.client.getClientsForSelf();
       })
-      .then(selfClients => selfClients.length === amountOfMessagesSent);
+      .then(selfClients => {
+        const isSent = selfClients.length === amountOfMessagesSent;
+        this.logger.info(`Message was sent to all other "${selfClients.length}" clients: ${isSent}`);
+        return isSent;
+      })
+      .catch(error => this.logger.info(`Message was not sent to other clients. Reason: ${error.message}`, error));
   }
 
   getEventInfo(event) {
