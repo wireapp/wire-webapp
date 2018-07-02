@@ -63,7 +63,6 @@ z.util.DebugUtil = class DebugUtil {
     conversationId = wire.app.repository.conversation.active_conversation().id
   ) {
     let amountOfMessagesSent = 0;
-    let dateTime = undefined;
 
     const clientId = wire.app.repository.client.currentClient().id;
     const userId = wire.app.repository.user.self().id;
@@ -72,7 +71,7 @@ z.util.DebugUtil = class DebugUtil {
     const isInCurrentConversation = notification => notification.conversation === conversationId;
     const wasSentByOurCurrentClient = notification =>
       notification.from === userId && (notification.data && notification.data.sender === clientId);
-    const hasExpectedTimestamp = notification => notification.time === dateTime.toISOString();
+    const hasExpectedTimestamp = (dateTime, notification) => notification.time === dateTime.toISOString();
 
     return wire.app.repository.conversation
       .get_conversation_by_id(conversationId)
@@ -80,14 +79,24 @@ z.util.DebugUtil = class DebugUtil {
         return wire.app.repository.conversation.get_message_in_conversation_by_id(conversation, messageId);
       })
       .then(message => {
-        dateTime = new Date(message.timestamp());
-        return wire.app.repository.event.notificationService.getNotifications(undefined, undefined, 10000);
+        return wire.app.repository.event.notificationService
+          .getNotifications(undefined, undefined, 10000)
+          .then(({notifications}) => ({
+            message,
+            notifications,
+          }));
       })
-      .then(({notifications}) => {
+      .then(({message, notifications}) => {
+        const dateTime = new Date(message.timestamp());
         return notifications
           .map(notification => notification.payload)
           .reduce((accumulator, payload) => accumulator.concat(payload))
-          .filter(isOTRMessage && isInCurrentConversation && wasSentByOurCurrentClient && hasExpectedTimestamp);
+          .filter(
+            isOTRMessage &&
+              isInCurrentConversation &&
+              wasSentByOurCurrentClient &&
+              hasExpectedTimestamp.bind(null, dateTime)
+          );
       })
       .then(filteredNotifications => {
         amountOfMessagesSent = filteredNotifications.length;
