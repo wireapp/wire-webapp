@@ -99,7 +99,6 @@
             background_image: asset.resource,
             click: function(data, event) {$parents[1].show_detail(message, event)},
             css: {'bg-color-ephemeral': message.is_expired()},
-            viewport_changed: $parents[1].viewport_changed
             " data-uie-name="go-image-detail">
             <!-- ko ifnot: message.is_expired() -->
               <img class="image-element" data-bind="attr: {src: asset.dummy_url}"/>
