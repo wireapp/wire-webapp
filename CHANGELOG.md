@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="1.5.1"></a>
+## [1.5.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@1.5.0...@wireapp/react-ui-kit@1.5.1) (2018-07-02)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Adjust MenuModal padding, colors & animation ([#787](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/787)) ([0ca4789](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/0ca4789))
+
+
+
+
 <a name="1.5.0"></a>
 # [1.5.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@1.4.3...@wireapp/react-ui-kit@1.5.0) (2018-06-29)
 
