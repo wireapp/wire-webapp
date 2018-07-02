@@ -50,11 +50,6 @@ z.viewModel.panel.GuestOptionsViewModel = class GuestOptionsViewModel {
 
     this.conversationEntity.subscribe(conversationEntity => this._updateCode(this.isVisible(), conversationEntity));
     this.isVisible.subscribe(isVisible => this._updateCode(isVisible, this.conversationEntity()));
-    this.hasAccessCode.subscribe(hasAccessCode => {
-      if (hasAccessCode) {
-        z.util.afterRender(this.resizeLink);
-      }
-    });
 
     this.toggleAccessState = this.toggleAccessState.bind(this);
     this.clickOnBack = this.clickOnBack.bind(this);
