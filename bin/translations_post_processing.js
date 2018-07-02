@@ -45,7 +45,7 @@ function fixApostrophe(file) {
   const lines = fs.readFileSync(file, 'utf8').split('\n');
   const newLines = lines.map(line => {
     const lineRgx = /^([^']*')(.*?)('[^']*)$/.exec(line);
-    return lineRgx ? `${lineRgx[1]}${lineRgx[2].replace("'", '’')}${lineRgx[3]}` : line; // eslint-disable-line no-magic-numbers
+    return lineRgx ? `${lineRgx[1]}${lineRgx[2].replace(/'/g, '’')}${lineRgx[3]}` : line; // eslint-disable-line no-magic-numbers
   });
   fs.writeFileSync(file, newLines.join('\n'));
 }
