@@ -71,7 +71,7 @@ z.util.DebugUtil = class DebugUtil {
     const isInCurrentConversation = notification => notification.conversation === conversationId;
     const wasSentByOurCurrentClient = notification =>
       notification.from === userId && (notification.data && notification.data.sender === clientId);
-    const hasExpectedTimestamp = (dateTime, notification) => notification.time === dateTime.toISOString();
+    const hasExpectedTimestamp = (notification, dateTime) => notification.time === dateTime.toISOString();
 
     return wire.app.repository.conversation
       .get_conversation_by_id(conversationId)
@@ -91,12 +91,14 @@ z.util.DebugUtil = class DebugUtil {
         return notifications
           .map(notification => notification.payload)
           .reduce((accumulator, payload) => accumulator.concat(payload))
-          .filter(
-            isOTRMessage &&
-              isInCurrentConversation &&
-              wasSentByOurCurrentClient &&
-              hasExpectedTimestamp.bind(null, dateTime)
-          );
+          .filter(notification => {
+            return (
+              isOTRMessage(notification) &&
+              isInCurrentConversation(notification) &&
+              wasSentByOurCurrentClient(notification) &&
+              hasExpectedTimestamp(notification, dateTime)
+            );
+          });
       })
       .then(filteredNotifications => {
         amountOfMessagesSent = filteredNotifications.length;
