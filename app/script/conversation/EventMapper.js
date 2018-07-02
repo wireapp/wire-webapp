@@ -163,7 +163,7 @@ z.conversation.EventMapper = class EventMapper {
     messageEntity.version = version || 1;
 
     if (messageEntity.is_content()) {
-      messageEntity.status(event.status || z.message.StatusType.DELIVERED);
+      messageEntity.status(event.status || z.message.StatusType.SENT);
     }
 
     if (messageEntity.is_reactable()) {
