@@ -75,7 +75,6 @@ z.util.URLUtil = (() => {
    */
   const _getDomainName = (url = '') => {
     return url
-      .toLowerCase()
       .replace(/.*?:\/\//, '') // remove protocol
       .replace(/\/$/, '') // remove trailing slash
       .replace('www.', '');
