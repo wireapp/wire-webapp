@@ -81,12 +81,14 @@ describe('z.util.URLUtil', () => {
         'http://www.wire.com/join?key=ZE4543fdRETg',
         'https://www.wire.com/join?key=ZE4543fdRETg',
         'http://www.wire.com/join?key=ZE4543fdRETg',
-        'https://wire.com/join?key=ZE4543fdRETg',
-        'http://wire.com/join?key=ZE4543fdRETg',
-        'https://wire.com/join?key=ZE4543fdRETg',
+        'https://wirE.com/join?key=ZE4543fdRETg',
+        'http://wiRe.com/join?key=ZE4543fdRETg',
+        'https://Wire.com/join?key=ZE4543fdRETg',
         'http://wire.com/join?key=ZE4543fdRETg',
         'www.wire.com/join?key=ZE4543fdRETg',
+        'www.WIRE.com/join?key=ZE4543fdRETg',
         'wire.com/join?key=ZE4543fdRETg',
+        'wIrE.CoM/join?key=ZE4543fdRETg',
       ];
 
       urls.map(url => z.util.URLUtil.getDomainName(url)).forEach(url => expect(url).toBe(expectedUrl));
