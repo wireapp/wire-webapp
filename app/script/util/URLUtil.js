@@ -77,8 +77,8 @@ z.util.URLUtil = (() => {
     // force a protocol if there is none
     url = url.replace(/^(?!https?:\/\/)/i, 'http://');
     try {
-      const {hostname, pathname, search} = new URL(url);
-      return hostname.replace(/^www./, '') + pathname.replace(/\/$/, '') + search;
+      const {hostname, pathname, search, hash} = new URL(url);
+      return hostname.replace(/^www./, '') + pathname.replace(/\/$/, '') + search + hash;
     } catch (error) {
       return '';
     }
