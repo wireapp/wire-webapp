@@ -113,6 +113,7 @@ z.calling.CallingRepository = class CallingRepository {
    */
   shareCallStates() {
     this.mediaRepository.streamHandler.calls = this.calls;
+    this.mediaRepository.streamHandler.getCallById = this.getCallById.bind(this);
     this.mediaRepository.streamHandler.joinedCall = this.joinedCall;
   }
 
