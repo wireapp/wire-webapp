@@ -74,7 +74,7 @@ ko.components.register('message-timer-button', {
       data-uie-value>
       <!-- ko if: hasMessageTimer() && conversationEntity()-->
         <div class="message-timer-button" data-bind="css: isTimerDisabled() ? 'message-timer-button--disabled' : 'message-timer-button--enabled'">
-          <span class="message-timer-button-unit" data-bind="text: duration().unit"></span>
+          <span class="message-timer-button-unit" data-bind="text: duration().symbol"></span>
           <span class="full-screen" data-bind="text: duration().value"></span>
         </div>
       <!-- /ko -->

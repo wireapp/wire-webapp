@@ -24,14 +24,14 @@
 /**
  * @typedef {object} DiscreteTimeUnit
  * @property {string} longUnit
- * @property {string} unit
+ * @property {string} symbol
  * @property {number} value
  */
 
 /**
  * @typedef {object} DurationUnit
  * @property {string} text
- * @property {string} unit
+ * @property {string} symbol
  * @property {number} value
  */
 
@@ -58,37 +58,37 @@ z.util.TimeUtil = {
       {
         plural: 'ephemeralUnitsYears',
         singular: 'ephemeralUnitsYear',
-        unit: 'y',
+        symbol: 'y',
         value: z.util.TimeUtil.UNITS_IN_MILLIS.YEAR,
       },
       {
         plural: 'ephemeralUnitsWeeks',
         singular: 'ephemeralUnitsWeek',
-        unit: 'w',
+        symbol: 'w',
         value: z.util.TimeUtil.UNITS_IN_MILLIS.WEEK,
       },
       {
         plural: 'ephemeralUnitsDays',
         singular: 'ephemeralUnitsDay',
-        unit: 'd',
+        symbol: 'd',
         value: z.util.TimeUtil.UNITS_IN_MILLIS.DAY,
       },
       {
         plural: 'ephemeralUnitsHours',
         singular: 'ephemeralUnitsHour',
-        unit: 'h',
+        symbol: 'h',
         value: z.util.TimeUtil.UNITS_IN_MILLIS.HOUR,
       },
       {
         plural: 'ephemeralUnitsMinutes',
         singular: 'ephemeralUnitsMinute',
-        unit: 'm',
+        symbol: 'm',
         value: z.util.TimeUtil.UNITS_IN_MILLIS.MINUTE,
       },
       {
         plural: 'ephemeralUnitsSeconds',
         singular: 'ephemeralUnitsSecond',
-        unit: 's',
+        symbol: 's',
         value: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND,
       },
     ];
@@ -103,8 +103,8 @@ z.util.TimeUtil = {
     const mappedUnits = z.util.TimeUtil.mapUnits(duration, true);
     const firstNonZeroUnit = mappedUnits.find(unit => unit.value > 0);
     return {
+      symbol: firstNonZeroUnit.symbol,
       text: `${firstNonZeroUnit.value} ${z.l10n.text(firstNonZeroUnit.longUnit)}`,
-      unit: firstNonZeroUnit.unit,
       value: firstNonZeroUnit.value,
     };
   },
@@ -116,8 +116,8 @@ z.util.TimeUtil = {
    */
   formatDurationCaption: duration => {
     const mappedUnits = z.util.TimeUtil.mapUnits(duration, false);
-    const hours = mappedUnits.find(unit => unit.unit === 'h');
-    const minutes = mappedUnits.find(unit => unit.unit === 'm');
+    const hours = mappedUnits.find(unit => unit.symbol === 'h');
+    const minutes = mappedUnits.find(unit => unit.symbol === 'm');
     const hasHours = hours.value > 0;
     const validUnitStrings = [];
     for (let index = 0; index < mappedUnits.length; index++) {
@@ -206,7 +206,7 @@ z.util.TimeUtil = {
       const longUnit = z.string[value === 1 ? unit.singular : unit.plural];
       return {
         longUnit,
-        unit: unit.unit,
+        symbol: unit.symbol,
         value,
       };
     });

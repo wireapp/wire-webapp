@@ -31,151 +31,163 @@ describe('z.util.TimeUtil', () => {
 
   describe('"formatDuration"', () => {
     it('formats durations in seconds', () => {
-      expect(z.util.TimeUtil.formatDuration(ONE_SECOND_IN_MILLIS)).toEqual({text: '1 second', unit: 's', value: 1});
+      expect(z.util.TimeUtil.formatDuration(ONE_SECOND_IN_MILLIS)).toEqual({symbol: 's', text: '1 second', value: 1});
       expect(z.util.TimeUtil.formatDuration(ONE_SECOND_IN_MILLIS + 300)).toEqual({
+        symbol: 's',
         text: '1 second',
-        unit: 's',
         value: 1,
       });
       expect(z.util.TimeUtil.formatDuration(ONE_SECOND_IN_MILLIS * 2)).toEqual({
+        symbol: 's',
         text: '2 seconds',
-        unit: 's',
         value: 2,
       });
       expect(z.util.TimeUtil.formatDuration(ONE_SECOND_IN_MILLIS * 2 + 300)).toEqual({
+        symbol: 's',
         text: '2 seconds',
-        unit: 's',
         value: 2,
       });
-      expect(z.util.TimeUtil.formatDuration(5000)).toEqual({text: '5 seconds', unit: 's', value: 5});
-      expect(z.util.TimeUtil.formatDuration(15000)).toEqual({text: '15 seconds', unit: 's', value: 15});
+      expect(z.util.TimeUtil.formatDuration(5000)).toEqual({symbol: 's', text: '5 seconds', value: 5});
+      expect(z.util.TimeUtil.formatDuration(15000)).toEqual({symbol: 's', text: '15 seconds', value: 15});
     });
 
     it('formats durations in minutes', () => {
-      expect(z.util.TimeUtil.formatDuration(ONE_MINUTE_IN_MILLIS)).toEqual({text: '1 minute', unit: 'm', value: 1});
+      expect(z.util.TimeUtil.formatDuration(ONE_MINUTE_IN_MILLIS)).toEqual({symbol: 'm', text: '1 minute', value: 1});
       expect(z.util.TimeUtil.formatDuration(ONE_SECOND_IN_MILLIS * 60)).toEqual({
+        symbol: 'm',
         text: '1 minute',
-        unit: 'm',
         value: 1,
       });
       expect(z.util.TimeUtil.formatDuration(ONE_MINUTE_IN_MILLIS * 5)).toEqual({
+        symbol: 'm',
         text: '5 minutes',
-        unit: 'm',
         value: 5,
       });
       expect(z.util.TimeUtil.formatDuration(ONE_MINUTE_IN_MILLIS + 3 * ONE_SECOND_IN_MILLIS)).toEqual({
+        symbol: 'm',
         text: '1 minute',
-        unit: 'm',
         value: 1,
       });
       expect(z.util.TimeUtil.formatDuration(ONE_MINUTE_IN_MILLIS + 29 * ONE_SECOND_IN_MILLIS)).toEqual({
+        symbol: 'm',
         text: '1 minute',
-        unit: 'm',
         value: 1,
       });
       expect(z.util.TimeUtil.formatDuration(ONE_MINUTE_IN_MILLIS + 30 * ONE_SECOND_IN_MILLIS)).toEqual({
+        symbol: 'm',
         text: '2 minutes',
-        unit: 'm',
         value: 2,
       });
       expect(z.util.TimeUtil.formatDuration(ONE_MINUTE_IN_MILLIS * 2 + 3 * ONE_SECOND_IN_MILLIS)).toEqual({
+        symbol: 'm',
         text: '2 minutes',
-        unit: 'm',
         value: 2,
       });
-      expect(z.util.TimeUtil.formatDuration(60000)).toEqual({text: '1 minute', unit: 'm', value: 1});
-      expect(z.util.TimeUtil.formatDuration(900000)).toEqual({text: '15 minutes', unit: 'm', value: 15});
+      expect(z.util.TimeUtil.formatDuration(60000)).toEqual({symbol: 'm', text: '1 minute', value: 1});
+      expect(z.util.TimeUtil.formatDuration(900000)).toEqual({symbol: 'm', text: '15 minutes', value: 15});
     });
 
     it('formats durations in hours', () => {
-      expect(z.util.TimeUtil.formatDuration(ONE_HOUR_IN_MILLIS)).toEqual({text: '1 hour', unit: 'h', value: 1});
-      expect(z.util.TimeUtil.formatDuration(ONE_MINUTE_IN_MILLIS * 60)).toEqual({text: '1 hour', unit: 'h', value: 1});
-      expect(z.util.TimeUtil.formatDuration(ONE_HOUR_IN_MILLIS + 3 * ONE_SECOND_IN_MILLIS)).toEqual({
+      expect(z.util.TimeUtil.formatDuration(ONE_HOUR_IN_MILLIS)).toEqual({symbol: 'h', text: '1 hour', value: 1});
+      expect(z.util.TimeUtil.formatDuration(ONE_MINUTE_IN_MILLIS * 60)).toEqual({
+        symbol: 'h',
         text: '1 hour',
-        unit: 'h',
+        value: 1,
+      });
+      expect(z.util.TimeUtil.formatDuration(ONE_HOUR_IN_MILLIS + 3 * ONE_SECOND_IN_MILLIS)).toEqual({
+        symbol: 'h',
+        text: '1 hour',
         value: 1,
       });
       expect(z.util.TimeUtil.formatDuration(ONE_HOUR_IN_MILLIS + 3 * ONE_MINUTE_IN_MILLIS)).toEqual({
+        symbol: 'h',
         text: '1 hour',
-        unit: 'h',
         value: 1,
       });
       expect(z.util.TimeUtil.formatDuration(ONE_HOUR_IN_MILLIS + 29 * ONE_MINUTE_IN_MILLIS)).toEqual({
+        symbol: 'h',
         text: '1 hour',
-        unit: 'h',
         value: 1,
       });
       expect(z.util.TimeUtil.formatDuration(ONE_HOUR_IN_MILLIS + 30 * ONE_MINUTE_IN_MILLIS)).toEqual({
+        symbol: 'h',
         text: '2 hours',
-        unit: 'h',
         value: 2,
       });
       expect(z.util.TimeUtil.formatDuration(ONE_HOUR_IN_MILLIS * 2 + 3 * ONE_SECOND_IN_MILLIS)).toEqual({
+        symbol: 'h',
         text: '2 hours',
-        unit: 'h',
         value: 2,
       });
       expect(z.util.TimeUtil.formatDuration(ONE_HOUR_IN_MILLIS * 2 + 3 * ONE_MINUTE_IN_MILLIS)).toEqual({
+        symbol: 'h',
         text: '2 hours',
-        unit: 'h',
         value: 2,
       });
     });
 
     it('formats durations in days', () => {
-      expect(z.util.TimeUtil.formatDuration(ONE_DAY_IN_MILLIS)).toEqual({text: '1 day', unit: 'd', value: 1});
-      expect(z.util.TimeUtil.formatDuration(ONE_HOUR_IN_MILLIS * 24)).toEqual({text: '1 day', unit: 'd', value: 1});
+      expect(z.util.TimeUtil.formatDuration(ONE_DAY_IN_MILLIS)).toEqual({symbol: 'd', text: '1 day', value: 1});
+      expect(z.util.TimeUtil.formatDuration(ONE_HOUR_IN_MILLIS * 24)).toEqual({symbol: 'd', text: '1 day', value: 1});
       expect(z.util.TimeUtil.formatDuration(ONE_DAY_IN_MILLIS + 3 * ONE_SECOND_IN_MILLIS)).toEqual({
+        symbol: 'd',
         text: '1 day',
-        unit: 'd',
         value: 1,
       });
       expect(z.util.TimeUtil.formatDuration(ONE_DAY_IN_MILLIS + 3 * ONE_MINUTE_IN_MILLIS)).toEqual({
+        symbol: 'd',
         text: '1 day',
-        unit: 'd',
         value: 1,
       });
       expect(z.util.TimeUtil.formatDuration(ONE_DAY_IN_MILLIS + 3 * ONE_HOUR_IN_MILLIS)).toEqual({
+        symbol: 'd',
         text: '1 day',
-        unit: 'd',
         value: 1,
       });
       expect(z.util.TimeUtil.formatDuration(ONE_DAY_IN_MILLIS + 11 * ONE_HOUR_IN_MILLIS)).toEqual({
+        symbol: 'd',
         text: '1 day',
-        unit: 'd',
         value: 1,
       });
       expect(z.util.TimeUtil.formatDuration(ONE_DAY_IN_MILLIS + 12 * ONE_HOUR_IN_MILLIS)).toEqual({
+        symbol: 'd',
         text: '2 days',
-        unit: 'd',
         value: 2,
       });
       expect(z.util.TimeUtil.formatDuration(2 * ONE_DAY_IN_MILLIS + 3 * ONE_SECOND_IN_MILLIS)).toEqual({
+        symbol: 'd',
         text: '2 days',
-        unit: 'd',
         value: 2,
       });
       expect(z.util.TimeUtil.formatDuration(2 * ONE_DAY_IN_MILLIS + 3 * ONE_MINUTE_IN_MILLIS)).toEqual({
+        symbol: 'd',
         text: '2 days',
-        unit: 'd',
         value: 2,
       });
       expect(z.util.TimeUtil.formatDuration(2 * ONE_DAY_IN_MILLIS + 3 * ONE_HOUR_IN_MILLIS)).toEqual({
+        symbol: 'd',
         text: '2 days',
-        unit: 'd',
         value: 2,
       });
     });
 
     it('formats durations in weeks', () => {
-      expect(z.util.TimeUtil.formatDuration(ONE_WEEK_IN_MILLIS)).toEqual({text: '1 week', unit: 'w', value: 1});
-      expect(z.util.TimeUtil.formatDuration(ONE_WEEK_IN_MILLIS * 26)).toEqual({text: '26 weeks', unit: 'w', value: 26});
-      expect(z.util.TimeUtil.formatDuration(ONE_WEEK_IN_MILLIS * 27)).toEqual({text: '27 weeks', unit: 'w', value: 27});
+      expect(z.util.TimeUtil.formatDuration(ONE_WEEK_IN_MILLIS)).toEqual({symbol: 'w', text: '1 week', value: 1});
+      expect(z.util.TimeUtil.formatDuration(ONE_WEEK_IN_MILLIS * 26)).toEqual({
+        symbol: 'w',
+        text: '26 weeks',
+        value: 26,
+      });
+      expect(z.util.TimeUtil.formatDuration(ONE_WEEK_IN_MILLIS * 27)).toEqual({
+        symbol: 'w',
+        text: '27 weeks',
+        value: 27,
+      });
     });
 
     it('formats durations in years', () => {
-      expect(z.util.TimeUtil.formatDuration(ONE_YEAR_IN_MILLIS)).toEqual({text: '1 year', unit: 'y', value: 1});
-      expect(z.util.TimeUtil.formatDuration(2 * ONE_YEAR_IN_MILLIS)).toEqual({text: '2 years', unit: 'y', value: 2});
+      expect(z.util.TimeUtil.formatDuration(ONE_YEAR_IN_MILLIS)).toEqual({symbol: 'y', text: '1 year', value: 1});
+      expect(z.util.TimeUtil.formatDuration(2 * ONE_YEAR_IN_MILLIS)).toEqual({symbol: 'y', text: '2 years', value: 2});
     });
   });
 
