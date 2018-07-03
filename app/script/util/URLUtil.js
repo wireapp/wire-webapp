@@ -74,10 +74,13 @@ z.util.URLUtil = (() => {
    * @returns {string} Plain URL
    */
   const _getDomainName = (url = '') => {
-    return url
-      .replace(/.*?:\/\//, '') // remove protocol
-      .replace(/\/$/, '') // remove trailing slash
-      .replace('www.', '');
+    url = url.length > 0 && !url.match(/^https?:\/\//i) ? `http://${url}` : url;
+    try {
+      const {hostname, pathname, search} = new URL(url);
+      return hostname.replace(/^www./, '') + pathname.replace(/\/$/, '') + search;
+    } catch (error) {
+      return '';
+    }
   };
 
   const _getParameter = (parameterName, locationSearch = window.location.search) => {
