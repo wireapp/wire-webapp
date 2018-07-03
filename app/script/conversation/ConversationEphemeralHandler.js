@@ -184,7 +184,7 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
     } else if (messageEntity.has_asset_image()) {
       this._obfuscateImageMessage(messageEntity);
     } else {
-      this.logger.warn(`Ephemeral message of unsupported type: ${messageEntity.type}`);
+      this.logger.warn(`Ephemeral message of unsupported type: ${messageEntity.type}`, messageEntity);
     }
   }
 

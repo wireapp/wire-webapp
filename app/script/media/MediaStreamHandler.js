@@ -91,9 +91,8 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
     this.permissionRepository = permissionRepository;
     this.logger = new z.util.Logger('z.media.MediaStreamHandler', z.config.LOGGER.OPTIONS);
 
-    this.calls = () => [];
-    this.getCallById = () => undefined;
-    this.joinedCall = () => undefined;
+    this.currentCalls = new Map();
+    this.joinedCall = ko.observable();
 
     this.constraintsHandler = this.mediaRepository.constraintsHandler;
     this.devicesHandler = this.mediaRepository.devicesHandler;
@@ -444,36 +443,31 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
    */
   _initiateMediaStreamSuccess(conversationId, mediaStreamInfo) {
     if (mediaStreamInfo) {
+      const conversationNeedsMedia = this.currentCalls.get(conversationId);
       const mediaStream = mediaStreamInfo.stream;
 
-      this.getCallById(conversationId)
-        .then(() => {
-          const mediaType = mediaStreamInfo.getType();
-          const isVideoSend = mediaType === z.media.MediaType.AUDIO_VIDEO;
-          this.selfStreamState.videoSend(isVideoSend);
-          if (isVideoSend) {
-            this.localMediaType(z.media.MediaType.VIDEO);
-          }
+      if (!conversationNeedsMedia) {
+        this.logger.debug('Releasing obsolete MediaStream as call has ended');
+        return this._releaseMediaStream(mediaStream);
+      }
 
-          const logMessage = `Received initial MediaStream containing '${mediaStream.getTracks().length}' tracks/s`;
-          const logObject = {
-            audioTracks: mediaStream.getAudioTracks(),
-            stream: mediaStream,
-            videoTracks: mediaStream.getVideoTracks(),
-          };
-          this.logger.debug(logMessage, logObject);
+      const mediaType = mediaStreamInfo.getType();
+      const isVideoSend = mediaType === z.media.MediaType.AUDIO_VIDEO;
+      this.selfStreamState.videoSend(isVideoSend);
+      if (isVideoSend) {
+        this.localMediaType(z.media.MediaType.VIDEO);
+      }
 
-          this._setStreamState(mediaStream, mediaType);
-          this.localMediaStream(mediaStream);
-        })
-        .catch(error => {
-          const isNotFound = error.type === z.calling.CallError.TYPE.NOT_FOUND;
-          if (isNotFound) {
-            return this._releaseMediaStream(mediaStream);
-          }
+      const logMessage = `Received initial MediaStream containing '${mediaStream.getTracks().length}' tracks/s`;
+      const logObject = {
+        audioTracks: mediaStream.getAudioTracks(),
+        stream: mediaStream,
+        videoTracks: mediaStream.getVideoTracks(),
+      };
+      this.logger.debug(logMessage, logObject);
 
-          throw error;
-        });
+      this._setStreamState(mediaStream, mediaType);
+      this.localMediaStream(mediaStream);
     }
   }
 
@@ -787,9 +781,8 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
    * @returns {boolean} Returns true if an active media stream is needed for at least one call
    */
   needsMediaStream() {
-    for (const callEntity of this.calls()) {
-      const hasPreJoinVideo = callEntity.isIncoming() && callEntity.isRemoteVideoCall();
-      if (!callEntity.isOngoingOnAnotherClient() && (callEntity.selfClientJoined() || hasPreJoinVideo)) {
+    for (const needsMediaStream of this.currentCalls) {
+      if (needsMediaStream) {
         return true;
       }
     }
