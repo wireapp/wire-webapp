@@ -23,9 +23,9 @@ window.z = window.z || {};
 window.z.components = z.components || {};
 
 z.components.EphemeralTimer = class EphemeralTimer {
-  constructor({message}) {
-    this.started = message.ephemeral_started();
-    this.duration = (message.ephemeral_expires() - this.started) / 1000;
+  constructor({message: messageEntity}) {
+    this.started = messageEntity.ephemeral_started();
+    this.duration = (messageEntity.ephemeral_expires() - this.started) / 1000;
   }
 
   setAnimationDelay(data, event) {
