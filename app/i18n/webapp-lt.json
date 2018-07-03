@@ -45,7 +45,7 @@
   "acceptNewsModal.headline": "Ar norite gauti naujienas ir produktų pakeitimus iš „Wire“ el. paštu?",
   "acceptNewsModal.unsubscribeDescription": "Atsisakyti galite bet kada.",
   "acceptNewsModal.privacyDescription": "Susipažinkite su <b>privatumo politika</b>.",
-  "acceptNewsModal.declineButton": "Atmesti",
+  "acceptNewsModal.declineButton": "Ne, dėkui",
   "acceptNewsModal.confirmButton": "Priimti",
   "unsupported.headlineBrowser": "Naršyklė nepalaikoma.",
   "unsupported.subheadBrowser":
@@ -110,6 +110,7 @@
   "ValidationError.FIELD.NAME.PATTERN_MISMATCH": "Įveskite bent 2 simbolių vardą",
   "ValidationError.FIELD.NAME.VALUE_MISSING": "Įveskite bent 2 simbolių vardą",
   "ValidationError.FIELD.PASSWORD.PATTERN_MISMATCH": "Įrašykite bent 8 simbolių slaptažodį",
+  "ValidationError.FIELD.PASSWORD_LOGIN.PATTERN_MISMATCH": "Neteisingas slaptažodis. Bandykite dar kartą.",
   "ValidationError.FIELD.EMAIL.TYPE_MISMATCH": "Įrašykite teisingą el. pašto adresą",
   "login.subhead": "Įrašykite savo el. pašto adresą arba naudotojo vardą.",
   "login.emailPlaceholder": "El. paštas ar naudotojo vardas",

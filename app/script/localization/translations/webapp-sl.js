@@ -553,13 +553,13 @@ z.string.sl.initValidatedClient = 'Pridobivam vaše povezave in pogovore';
 z.string.sl.initReceivedUserData = 'Preverjanje za morebitna nova sporočila';
 z.string.sl.initEvents = 'Nalagam sporočila';
 
-z.string.sl.ephememalUnitsNone = 'Izklopljeno';
-z.string.sl.ephememalUnitsSecond = 'sekunda';
-z.string.sl.ephememalUnitsSeconds = 'sekund';
-z.string.sl.ephememalUnitsMinute = 'minuta';
-z.string.sl.ephememalUnitsMinutes = 'minut';
-z.string.sl.ephememalUnitsHour = 'ura';
-z.string.sl.ephememalUnitsHours = 'ur';
-z.string.sl.ephememalUnitsDay = 'dan';
-z.string.sl.ephememalUnitsDays = 'dni';
+z.string.sl.ephemeralUnitsNone = 'Izklopljeno';
+z.string.sl.ephemeralUnitsSecond = 'sekunda';
+z.string.sl.ephemeralUnitsSeconds = 'sekund';
+z.string.sl.ephemeralUnitsMinute = 'minuta';
+z.string.sl.ephemeralUnitsMinutes = 'minut';
+z.string.sl.ephemeralUnitsHour = 'ura';
+z.string.sl.ephemeralUnitsHours = 'ur';
+z.string.sl.ephemeralUnitsDay = 'dan';
+z.string.sl.ephemeralUnitsDays = 'dni';
 

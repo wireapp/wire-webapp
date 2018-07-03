@@ -85,7 +85,11 @@
       </div>
     </div>
   <!-- /ko -->
-  <div class="message-body">
+
+  <div class="message-body" data-bind="attr: {'title': message.ephemeral_caption()}">
+    <!-- ko if: message.ephemeral_status() === z.message.EphemeralStatusType.ACTIVE -->
+      <ephemeral-timer class="message-ephemeral-timer" params="message: message"></ephemeral-timer>
+    <!-- /ko -->
 
     <!-- ko foreach: {data: message.assets, as: 'asset'} -->
       <!-- ko if: asset.is_image() -->
@@ -155,9 +159,6 @@
       <!-- /ko -->
       <!-- ko if: $parent.is_last_delivered_message(message) -->
         <span class="message-status" data-bind="l10n_text: z.string.conversationMessageDelivered"></span>
-      <!-- /ko -->
-      <!-- ko if: message.ephemeral_status() === z.message.EphemeralStatusType.ACTIVE -->
-        <ephemeral-timer class="message-ephemeral-timer" data-bind="attr: {'title': message.ephemeral_caption()}" params="message: message"></ephemeral-timer>
       <!-- /ko -->
     </div>
 
@@ -232,14 +233,12 @@
           </div>
         <!-- /ko -->
       </div>
-      <div class="message-body">
-        <!-- ko foreach: remoteUserEntities -->
-          <!-- ko if: message.isGroupCreation() -->
-            <participant-avatar class="avatar-no-border" params="participant: $data, click: $parents[1].onMessageUserClick, size: z.components.ParticipantAvatar.SIZE.MEDIUM"></participant-avatar>
-          <!-- /ko -->
-          <!-- ko if: message.isMemberJoin() || message.isMemberLeave() -->
-            <participant-avatar data-bind="css: {'translucent': message.isMemberLeave()}" params="participant: $data, click: $parents[1].onMessageUserClick, size: z.components.ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
-          <!-- /ko -->
+      <div class="message-body" data-bind="foreach: remoteUserEntities">
+        <!-- ko if: message.isGroupCreation() -->
+          <participant-avatar class="avatar-no-border" params="participant: $data, click: $parents[1].onMessageUserClick, size: z.components.ParticipantAvatar.SIZE.MEDIUM"></participant-avatar>
+        <!-- /ko -->
+        <!-- ko if: message.isMemberJoin() || message.isMemberLeave() -->
+          <participant-avatar data-bind="css: {'translucent': message.isMemberLeave()}" params="participant: $data, click: $parents[1].onMessageUserClick, size: z.components.ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
         <!-- /ko -->
       </div>
     <!-- /ko -->
@@ -272,26 +271,20 @@
     <div class="message-header-icon">
       <div class="icon-ping" data-bind="css: message.get_icon_classes"></div>
     </div>
-    <div class="message-header-label" data-bind="css: {'ephemeral-message-obfuscated': message.is_expired()}">
+    <div class="message-header-label" data-bind="attr: {title: message.ephemeral_caption()}, css: {'ephemeral-message-obfuscated': message.is_expired()}">
       <span class="message-header-sender-name" data-bind='text: message.sender_name()'></span>
       <span class="ellipsis" data-bind="text: message.caption"></span>
     </div>
     <div class="message-body-actions">
-      <!-- ko if: message.ephemeral_status() === z.message.EphemeralStatusType.ACTIVE -->
-        <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp, 'data-uie-uid': message.id, 'title': message.ephemeral_caption()}"></time>
-        <ephemeral-timer class="message-ephemeral-timer" data-bind="attr: {'title': message.ephemeral_caption()}" params="message: message"></ephemeral-timer>
-      <!-- /ko -->
-      <!-- ko ifnot: message.ephemeral_status() === z.message.EphemeralStatusType.ACTIVE -->
-        <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp}"></time>
-      <!-- /ko -->
+      <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp}"></time>
     </div>
   </div>
 </script>
 
 <script type="text/html" id="system">
   <div class="message-header">
-    <div class="message-header-icon text-graphite">
-      <span class="icon-edit"></span>
+    <div class="message-header-icon message-header-icon--svg text-graphite">
+      <span data-bind="component: $parent.getSystemMessageIconComponent(message)"></span>
     </div>
     <div class="message-header-label">
       <span class="message-header-sender-name" data-bind='text: message.sender_name()'></span>

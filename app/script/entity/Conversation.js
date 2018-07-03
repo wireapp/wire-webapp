@@ -123,7 +123,11 @@ z.entity.Conversation = class Conversation {
     });
 
     // Messages
-    this.ephemeral_timer = ko.observable(false);
+    this.localMessageTimer = ko.observable(null);
+    this.globalMessageTimer = ko.observable(null);
+
+    this.messageTimer = ko.pureComputed(() => this.globalMessageTimer() || this.localMessageTimer());
+    this.hasGlobalMessageTimer = ko.pureComputed(() => this.globalMessageTimer() > 0);
 
     this.messages_unordered = ko.observableArray();
     this.messages = ko.pureComputed(() =>
@@ -232,7 +236,7 @@ z.entity.Conversation = class Conversation {
       this.archived_state,
       this.archived_timestamp,
       this.cleared_timestamp,
-      this.ephemeral_timer,
+      this.messageTimer,
       this.isGuest,
       this.last_event_timestamp,
       this.last_read_timestamp,
@@ -565,14 +569,14 @@ z.entity.Conversation = class Conversation {
    * Get the last delivered message.
    * @returns {z.entity.Message} Last delivered message
    */
-  get_last_delivered_message() {
-    const messages = this.messages();
-    for (let index = messages.length - 1; index >= 0; index--) {
-      const message_et = messages[index];
-      if (message_et.status() === z.message.StatusType.DELIVERED) {
-        return message_et;
-      }
-    }
+  getLastDeliveredMessage() {
+    return this.messages()
+      .slice()
+      .reverse()
+      .find(messageEntity => {
+        const isDelivered = messageEntity.status() === z.message.StatusType.DELIVERED;
+        return isDelivered && messageEntity.user().is_me;
+      });
   }
 
   /**
@@ -670,7 +674,8 @@ z.entity.Conversation = class Conversation {
       archived_state: this.archived_state(),
       archived_timestamp: this.archived_timestamp(),
       cleared_timestamp: this.cleared_timestamp(),
-      ephemeral_timer: this.ephemeral_timer(),
+      ephemeral_timer: this.localMessageTimer(),
+      global_message_timer: this.globalMessageTimer(),
       id: this.id,
       is_guest: this.isGuest(),
       is_managed: this.isManaged,

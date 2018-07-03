@@ -34,7 +34,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
     return {
       ERROR_REPORTING: {
         API_KEY: RAYGUN_API_KEY,
-        REPORTING_THRESHOLD: 60 * 1000, // milliseconds
+        REPORTING_THRESHOLD: z.util.TimeUtil.UNITS_IN_MILLIS.MINUTE,
       },
       USER_ANALYTICS: {
         API_KEY: MIXPANEL_TOKEN,
@@ -283,32 +283,6 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
   //##############################################################################
 
   /**
-   * Attach to rejected Promises.
-   * @returns {undefined} No return value
-   */
-  _attach_promise_rejection_handler() {
-    window.onunhandledrejection = ({reason: error, promise: rejected_promise}) => {
-      if (window.onerror) {
-        if (error) {
-          if (_.isString(error)) {
-            window.onerror.call(this, error, null, null, null);
-          } else if (error.message) {
-            window.onerror.call(this, error.message, error.fileName, error.lineNumber, error.columnNumber, error);
-          }
-        }
-
-        if (rejected_promise) {
-          window.setTimeout(() => {
-            rejected_promise.catch(promise_error => {
-              this.logger.log(this.logger.levels.OFF, 'Handled uncaught Promise in error reporting', promise_error);
-            });
-          }, 0);
-        }
-      }
-    };
-  }
-
-  /**
    * Checks if a Raygun payload should be reported.
    *
    * @see https://github.com/MindscapeHQ/raygun4js#onbeforesend
@@ -330,16 +304,11 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
     return false;
   }
 
-  _detach_promise_rejection_handler() {
-    window.onunhandledrejection = undefined;
-  }
-
   _disable_error_reporting() {
     this.logger.debug('Disabling Raygun error reporting');
     this.is_error_reporting_activated = false;
     Raygun.detach();
     Raygun.init(EventTrackingRepository.CONFIG.ERROR_REPORTING.API_KEY, {disableErrorTracking: true});
-    this._detach_promise_rejection_handler();
   }
 
   _enable_error_reporting() {
@@ -371,6 +340,5 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
       Raygun.withCustomData({electron_version: z.util.Environment.version(true)});
     }
     Raygun.onBeforeSend(this._check_error_payload.bind(this));
-    this._attach_promise_rejection_handler();
   }
 };

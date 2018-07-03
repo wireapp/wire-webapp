@@ -5,6 +5,7 @@
 <script src="/script/util/EmojiUtil.js"></script>
 <script src="/script/util/Environment.js"></script>
 <script src="/script/util/util.js"></script>
+<script src="/script/util/TimeUtil.js"></script>
 <script src="/script/util/protobuf.js"></script>
 <script src="/script/util/KeyboardUtil.js"></script>
 <script src="/script/util/LocalizerUtil.js"></script>
@@ -16,7 +17,6 @@
 <script src="/script/util/scroll-helpers.js"></script>
 <script src="/script/util/StorageUtil.js"></script>
 <script src="/script/util/StringUtil.js"></script>
-<script src="/script/util/TimeUtil.js"></script>
 <script src="/script/util/CountryCodes.js"></script>
 <script src="/script/util/worker.js"></script>
 <script src="/script/util/URLUtil.js"></script>
@@ -149,11 +149,13 @@
 <script src="/script/client/ClientService.js"></script>
 <script src="/script/client/ClientType.js"></script>
 <!-- Conversation -->
+<script src="/script/conversation/AbstractConversationEventHandler.js"></script>
 <script src="/script/conversation/AccessMode.js"></script>
 <script src="/script/conversation/AccessRole.js"></script>
 <script src="/script/conversation/AccessState.js"></script>
 <script src="/script/conversation/ClientMismatchHandler.js"></script>
 <script src="/script/conversation/ConversationCellState.js"></script>
+<script src="/script/conversation/ConversationEphemeralHandler.js"></script>
 <script src="/script/conversation/ConversationError.js"></script>
 <script src="/script/conversation/ConversationMapper.js"></script>
 <script src="/script/conversation/ConversationRepository.js"></script>
@@ -230,10 +232,15 @@
 <!-- Motion -->
 <script src="/script/motion/MotionDuration.js"></script>
 <!-- Notification -->
-<script src="/script/notification/PermissionStatusState.js"></script>
+<script src="/script/notification/PermissionState.js"></script>
 <script src="/script/notification/NotificationError.js"></script>
 <script src="/script/notification/NotificationPreference.js"></script>
 <script src="/script/notification/NotificationRepository.js"></script>
+<!-- Permission -->
+<script src="/script/permission/PermissionError.js"></script>
+<script src="/script/permission/PermissionRepository.js"></script>
+<script src="/script/permission/PermissionStatusState.js"></script>
+<script src="/script/permission/PermissionType.js"></script>
 <!-- Properties -->
 <script src="/script/properties/PropertiesEntity.js"></script>
 <script src="/script/properties/PropertiesRepository.js"></script>
@@ -320,6 +327,7 @@
 <script src="/script/view_model/panel/GroupParticipantUserViewModel.js"></script>
 <script src="/script/view_model/panel/GroupParticipantServiceViewModel.js"></script>
 <script src="/script/view_model/panel/GuestOptionsViewModel.js"></script>
+<script src="/script/view_model/panel/TimedMessagesViewModel.js"></script>
 <script src="/script/view_model/panel/ParticipantDevicesViewModel.js"></script>
 <!-- View Models: List -->
 <script src="/script/view_model/ListViewModel.js"></script>
@@ -341,6 +349,7 @@
 <script src="/script/components/image.js"></script>
 <script src="/script/components/inputElement.js"></script>
 <script src="/script/components/inputLevel.js"></script>
+<script src="/script/components/messageTimerButton.js"></script>
 <script src="/script/components/serviceList.js"></script>
 <script src="/script/components/topPeople.js"></script>
 <script src="/script/components/participantAvatar.js"></script>
@@ -388,6 +397,7 @@
 <script src="/script/entity/message/MemberMessage.js"></script>
 <script src="/script/entity/message/MissedMessage.js"></script>
 <script src="/script/entity/message/ContentMessage.js"></script>
+<script src="/script/entity/message/MessageTimerUpdateMessage.js"></script>
 <script src="/script/entity/message/RenameMessage.js"></script>
 <script src="/script/entity/message/PingMessage.js"></script>
 <script src="/script/entity/message/CallMessage.js"></script>
@@ -402,5 +412,6 @@
 <script src="/script/ui/ShortcutType.js"></script>
 <script src="/script/ui/Shortcut.js"></script>
 <script src="/script/ui/WindowHandler.js"></script>
+<script src="/script/ui/ViewportObserver.js"></script>
 <!-- Main -->
 <script src="/script/main/app.js"></script>

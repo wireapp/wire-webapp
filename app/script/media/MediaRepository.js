@@ -42,14 +42,15 @@ z.media.MediaRepository = class MediaRepository {
 
   /**
    * Construct a new Media repository.
+   * @param {z.permission.PermissionRepository} permissionRepository - Repository for all permission interactions
    */
-  constructor() {
+  constructor(permissionRepository) {
     this.logger = new z.util.Logger('z.media.MediaRepository', z.config.LOGGER.OPTIONS);
 
     this.constraintsHandler = new z.media.MediaConstraintsHandler(this);
     this.devicesHandler = new z.media.MediaDevicesHandler(this);
     this.elementHandler = new z.media.MediaElementHandler(this);
-    this.streamHandler = new z.media.MediaStreamHandler(this);
+    this.streamHandler = new z.media.MediaStreamHandler(this, permissionRepository);
 
     this.audioContext = undefined;
   }

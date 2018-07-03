@@ -28,6 +28,7 @@ z.viewModel.content.CollectionDetailsViewModel = class CollectionDetailsViewMode
   constructor() {
     this.itemAdded = this.itemAdded.bind(this);
     this.itemRemoved = this.itemRemoved.bind(this);
+    this.messageRemoved = this.messageRemoved.bind(this);
     this.removedFromView = this.removedFromView.bind(this);
     this.setConversation = this.setConversation.bind(this);
 
@@ -42,6 +43,7 @@ z.viewModel.content.CollectionDetailsViewModel = class CollectionDetailsViewMode
   }
 
   setConversation(conversationEntity, category, items) {
+    amplify.subscribe(z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, this.messageRemoved);
     amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.ADDED, this.itemAdded);
     amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, this.itemRemoved);
     this.template(category);
@@ -50,8 +52,8 @@ z.viewModel.content.CollectionDetailsViewModel = class CollectionDetailsViewMode
   }
 
   itemAdded(messageEntity) {
-    const isExpectedId = this.conversationEntity().id === messageEntity.conversation_id;
-    if (isExpectedId) {
+    const isCurrentConversation = this.conversationEntity().id === messageEntity.conversation_id;
+    if (isCurrentConversation) {
       switch (this.template()) {
         case 'images': {
           const isImage = messageEntity.category & z.message.MessageCategory.IMAGE;
@@ -83,14 +85,22 @@ z.viewModel.content.CollectionDetailsViewModel = class CollectionDetailsViewMode
     }
   }
 
-  itemRemoved(removedMessageId) {
-    this.items.remove(messageEntity => messageEntity.id === removedMessageId);
-    if (!this.items().length) {
-      this.clickOnBackButton();
+  itemRemoved(messageId, conversationId) {
+    const isCurrentConversation = this.conversationEntity().id === conversationId;
+    if (isCurrentConversation) {
+      this.items.remove(messageEntity => messageEntity.id === messageId);
+      if (!this.items().length) {
+        this.clickOnBackButton();
+      }
     }
   }
 
+  messageRemoved(messageEntity) {
+    this.itemRemoved(messageEntity.id, messageEntity.conversation_id);
+  }
+
   removedFromView() {
+    amplify.unsubscribe(z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, this.messageRemoved);
     amplify.unsubscribe(z.event.WebApp.CONVERSATION.MESSAGE.ADDED, this.itemAdded);
     amplify.unsubscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, this.itemRemoved);
     this.lastMessageTimestamp = undefined;

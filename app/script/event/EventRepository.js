@@ -25,7 +25,7 @@ window.z.event = z.event || {};
 z.event.EventRepository = class EventRepository {
   static get CONFIG() {
     return {
-      E_CALL_EVENT_LIFETIME: 30 * 1000, // 30 seconds
+      E_CALL_EVENT_LIFETIME: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND * 30,
       IGNORED_ERRORS: [
         z.cryptography.CryptographyError.TYPE.IGNORED_ASSET,
         z.cryptography.CryptographyError.TYPE.IGNORED_PREVIEW,
@@ -755,7 +755,7 @@ z.event.EventRepository = class EventRepository {
     const {content = {}, conversation: conversationId, time, type} = event;
     const forcedEventTypes = [z.calling.enum.CALL_MESSAGE_TYPE.CANCEL, z.calling.enum.CALL_MESSAGE_TYPE.GROUP_LEAVE];
 
-    const correctedTimestamp = Date.now() - this.timeOffset;
+    const correctedTimestamp = z.util.TimeUtil.adjustCurrentTimestamp(this.timeOffset);
     const thresholdTimestamp = new Date(time).getTime() + EventRepository.CONFIG.E_CALL_EVENT_LIFETIME;
 
     const isForcedEventType = forcedEventTypes.includes(content.type);

@@ -376,7 +376,7 @@ z.calling.CallingRepository = class CallingRepository {
 
         const isSelfUser = userId === this.selfUserId();
         if (isSelfUser) {
-          this._remoteSelfJoin(callEntity, callMessageEntity);
+          return this._remoteSelfJoin(callEntity, callMessageEntity);
         }
 
         if (callEntity.isOutgoing()) {
@@ -446,14 +446,7 @@ z.calling.CallingRepository = class CallingRepository {
         }
 
         if (!callEntity.selfClientJoined()) {
-          const logMessage = {
-            data: {
-              default: [conversationId],
-              obfuscated: [this.callLogger.obfuscate(conversationId)],
-            },
-            message: `Rejecting call in conversation '{0}'`,
-          };
-          this.callLogger.info(logMessage, callEntity);
+          this.callLogger.info(`Rejecting call in conversation '${conversationId}'`, callEntity);
           callEntity.rejectCall(false);
         }
       })
@@ -1032,7 +1025,7 @@ z.calling.CallingRepository = class CallingRepository {
           action: () => {
             const terminationReason = z.calling.enum.TERMINATION_REASON.CONCURRENT_CALL;
             amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, ongoingCallId, terminationReason);
-            window.setTimeout(resolve, 1000);
+            window.setTimeout(resolve, z.util.TimeUtil.UNITS_IN_MILLIS.SECOND);
           },
           close: () => {
             const isIncomingCall = callState === z.calling.enum.CALL_STATE.INCOMING;
@@ -1162,9 +1155,14 @@ z.calling.CallingRepository = class CallingRepository {
   _joinCall(conversationId, mediaType, callState, callEntity) {
     this._checkCallingSupport(conversationId, mediaType, callState)
       .then(() => this._checkConcurrentJoinedCall(conversationId, callState))
-      .then(() => (callEntity ? callEntity : this._initiateOutgoingCall(conversationId, mediaType, callState)))
+      .then(() => callEntity || this._initiateOutgoingCall(conversationId, mediaType, callState))
       .then(callEntityToJoin => this._initiateMediaStream(callEntityToJoin, mediaType))
-      .then(callEntityToJoin => this._initiateJoinCall(callEntityToJoin, mediaType));
+      .then(callEntityToJoin => this._initiateJoinCall(callEntityToJoin, mediaType))
+      .catch(error => {
+        this.callLogger.warn(`Failed to join call in conversation '${conversationId}'`, error);
+        const isOutgoingCall = !callEntity;
+        return isOutgoingCall ? this.deleteCall(conversationId) : this.rejectCall(conversationId, true);
+      });
   }
 
   /**
@@ -1551,8 +1549,9 @@ z.calling.CallingRepository = class CallingRepository {
       if (callingConfig) {
         this._clearConfigTimeout();
 
-        const ttl = callingConfig.ttl * 0.9 || CallingRepository.CONFIG.DEFAULT_CONFIG_TTL;
-        const timeout = Math.min(ttl, CallingRepository.CONFIG.DEFAULT_CONFIG_TTL) * 1000;
+        const {DEFAULT_CONFIG_TTL} = CallingRepository.CONFIG;
+        const ttl = callingConfig.ttl * 0.9 || DEFAULT_CONFIG_TTL;
+        const timeout = Math.min(ttl, DEFAULT_CONFIG_TTL) * z.util.TimeUtil.UNITS_IN_MILLIS.SECOND;
         const expirationDate = new Date(Date.now() + timeout);
         callingConfig.expiration = expirationDate;
 
@@ -1645,46 +1644,21 @@ z.calling.CallingRepository = class CallingRepository {
   _logMessage(isOutgoing, callMessageEntity, date = new Date().toISOString()) {
     const {conversationId, destinationUserId, remoteUserId, response, type, userId} = callMessageEntity;
 
-    let logMessage;
+    let log;
+    const target = `conversation '${conversationId}'`;
     if (isOutgoing) {
-      if (remoteUserId) {
-        logMessage = {
-          data: {
-            default: [type, response, remoteUserId, conversationId],
-            obfuscated: [
-              type,
-              response,
-              this.callLogger.obfuscate(remoteUserId),
-              this.callLogger.obfuscate(conversationId),
-            ],
-          },
-          message: `Sending '{0}' message (response: {1}) to user '{2}' in conversation '{3}'`,
-        };
-      } else {
-        logMessage = {
-          data: {
-            default: [type, response, conversationId],
-            obfuscated: [type, response, this.callLogger.obfuscate(conversationId)],
-          },
-          message: `Sending '{0}' message (response: {1}) to conversation '{2}'`,
-        };
-      }
+      const additionalMessage = remoteUserId ? `user '${remoteUserId}' in ${target}` : `${target}`;
+      log = `Sending '${type}' message (response: ${response}) to ${additionalMessage}`;
     } else {
       const isSelfUser = destinationUserId === this.selfUserId();
       if (destinationUserId && !isSelfUser) {
         return;
       }
 
-      logMessage = {
-        data: {
-          default: [type, response, userId, conversationId],
-          obfuscated: [type, response, this.callLogger.obfuscate(userId), this.callLogger.obfuscate(conversationId)],
-        },
-        message: `Received '{0}' message (response: {1}) from user '{2}' in conversation '{3}'`,
-      };
+      log = `Received '${type}' message (response: ${response}) from user '${userId}' in ${target}`;
     }
 
-    this.callLogger.info(logMessage, callMessageEntity);
+    this.callLogger.info(log, callMessageEntity);
   }
 
   /**

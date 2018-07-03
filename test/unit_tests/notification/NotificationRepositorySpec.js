@@ -71,7 +71,7 @@ describe('z.notification.NotificationRepository', () => {
 
         // Mocks
         document.hasFocus = () => false;
-        TestFactory.notification_repository.permissionState = z.notification.PermissionStatusState.GRANTED;
+        TestFactory.notification_repository.permissionState(z.permission.PermissionStatusState.GRANTED);
         z.util.Environment.browser.supports.notifications = true;
         window.wire.app = {
           service: {
@@ -285,7 +285,7 @@ describe('z.notification.NotificationRepository', () => {
     });
 
     it('if the user permission was denied', done => {
-      TestFactory.notification_repository.permissionState = z.notification.PermissionStatusState.DENIED;
+      TestFactory.notification_repository.permissionState(z.permission.PermissionStatusState.DENIED);
 
       TestFactory.notification_repository
         .notify(message_et, undefined, conversation_et)

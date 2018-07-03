@@ -23,52 +23,43 @@ window.z = window.z || {};
 window.z.components = z.components || {};
 
 z.components.EphemeralTimer = class EphemeralTimer {
-  constructor(params) {
-    this.destroy = this.destroy.bind(this);
+  constructor({message: messageEntity}, componentInfo) {
+    const duration = messageEntity.ephemeral_expires() - messageEntity.ephemeral_started();
 
-    this.message_et = params.message;
+    const dashLength = 12.6;
+    const dial = componentInfo.element.querySelector('.ephemeral-timer__dial');
 
-    this.ephemeral_duration = ko.computed(() => {
-      return this.message_et.ephemeral_expires() - this.message_et.ephemeral_started();
-    });
-
-    this.progress = ko.observable(0);
-    this.remaining_time = ko.observable(0);
-
-    this.remaining_subscription = this.message_et.ephemeral_remaining.subscribe(remaining_time => {
-      if (Date.now() >= this.message_et.ephemeral_expires()) {
-        return this.progress(1);
+    const numberOfAnimationSteps = 40;
+    const animationIntervalValue = Math.min(duration / numberOfAnimationSteps, z.util.TimeUtil.UNITS_IN_MILLIS.HOUR);
+    const animatePie = () => {
+      const remainingTime = messageEntity.ephemeral_expires() - Date.now();
+      const newDashoffset = dashLength - (remainingTime / duration) * -dashLength;
+      dial.style.strokeDashoffset = Math.max(newDashoffset, dashLength);
+      if (newDashoffset === dashLength) {
+        window.clearInterval(this.animationInterval);
+        this.animationInterval = undefined;
       }
-      const elapsed_time = this.ephemeral_duration() - remaining_time;
-      return this.progress(elapsed_time / this.ephemeral_duration());
-    });
-
-    this.bullet_count = [0, 1, 2, 3, 4];
+    };
+    this.animationInterval = window.setInterval(animatePie, animationIntervalValue);
+    animatePie();
   }
 
-  is_bullet_active(index) {
-    const passed_index = this.progress() > (index + 1) / this.bullet_count.length;
-    if (passed_index) {
-      return 'ephemeral-timer-bullet-inactive';
-    }
-  }
-
-  destroy() {
-    this.remaining_subscription.dispose();
-    window.clearInterval(this.message_et.ephemeral_interval_id);
-    this.message_et.ephemeral_interval_id = undefined;
-    window.clearTimeout(this.message_et.ephemeral_timeout_id);
-    this.message_et.ephemeral_timeout_id = undefined;
+  dispose() {
+    window.clearInterval(this.animationInterval);
   }
 };
 
 ko.components.register('ephemeral-timer', {
   template: `
-    <ul class="ephemeral-timer">
-      <!-- ko foreach: bullet_count -->
-       <li class="ephemeral-timer-bullet" data-bind="css: $parent.is_bullet_active($data)"></li>
-      <!-- /ko -->
-    </ul>
+    <svg class="ephemeral-timer" viewBox="0 0 8 8" width="8" height="8">
+      <circle class="ephemeral-timer__background" cx="4" cy="4" r="4"></circle>
+      <circle class="ephemeral-timer__dial" cx="4" cy="4" r="2" stroke-width="4" transform="rotate(-90 4 4)" stroke-dasharray="12.6">
+      </circle>
+    </svg>
   `,
-  viewModel: z.components.EphemeralTimer,
+  viewModel: {
+    createViewModel(params, componentInfo) {
+      return new z.components.EphemeralTimer(params, componentInfo);
+    },
+  },
 });

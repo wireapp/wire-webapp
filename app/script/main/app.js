@@ -28,7 +28,7 @@ z.main.App = class App {
       COOKIES_CHECK: {
         COOKIE_NAME: 'cookies_enabled',
       },
-      NOTIFICATION_CHECK: 10 * 1000,
+      NOTIFICATION_CHECK: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND * 10,
       SIGN_OUT_REASONS: {
         IMMEDIATE: [
           z.auth.SIGN_OUT_REASON.ACCOUNT_DELETED,
@@ -43,7 +43,7 @@ z.main.App = class App {
       },
       TABS_CHECK: {
         COOKIE_NAME: 'app_opened',
-        INTERVAL: 1000,
+        INTERVAL: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND,
       },
     };
   }
@@ -88,7 +88,7 @@ z.main.App = class App {
     repositories.audio = this.auth.audio;
     repositories.cache = new z.cache.CacheRepository();
     repositories.giphy = new z.extension.GiphyRepository(this.service.giphy);
-    repositories.media = new z.media.MediaRepository();
+    repositories.permission = new z.permission.PermissionRepository();
     repositories.storage = new z.storage.StorageRepository(this.service.storage);
 
     repositories.cryptography = new z.cryptography.CryptographyRepository(
@@ -96,6 +96,7 @@ z.main.App = class App {
       repositories.storage
     );
     repositories.client = new z.client.ClientRepository(this.service.client, repositories.cryptography);
+    repositories.media = new z.media.MediaRepository(repositories.permission);
     repositories.user = new z.user.UserRepository(
       this.service.user,
       this.service.asset,
@@ -163,7 +164,8 @@ z.main.App = class App {
     );
     repositories.notification = new z.notification.NotificationRepository(
       repositories.calling,
-      repositories.conversation
+      repositories.conversation,
+      repositories.permission
     );
     repositories.videoGrid = new z.calling.VideoGridRepository(repositories.calling, repositories.media);
 

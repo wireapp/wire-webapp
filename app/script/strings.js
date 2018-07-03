@@ -228,7 +228,7 @@ export const acceptNewsModalStrings = defineMessages({
   },
   declineButton: {
     id: 'acceptNewsModal.declineButton',
-    defaultMessage: 'Decline',
+    defaultMessage: 'No, thanks',
   },
   confirmButton: {
     id: 'acceptNewsModal.confirmButton',
@@ -497,6 +497,10 @@ export const validationErrorStrings = defineMessages({
   [ValidationError.FIELD.PASSWORD.PATTERN_MISMATCH]: {
     id: 'ValidationError.FIELD.PASSWORD.PATTERN_MISMATCH',
     defaultMessage: 'Enter a password with at least 8 characters',
+  },
+  [ValidationError.FIELD.PASSWORD_LOGIN.PATTERN_MISMATCH]: {
+    id: 'ValidationError.FIELD.PASSWORD_LOGIN.PATTERN_MISMATCH',
+    defaultMessage: 'Wrong password. Please try again.',
   },
   [ValidationError.FIELD.EMAIL.TYPE_MISMATCH]: {
     id: 'ValidationError.FIELD.EMAIL.TYPE_MISMATCH',

@@ -45,7 +45,7 @@
   "acceptNewsModal.headline": "Szeretnél híreket és termékinformációkat kapni e-mailben a Wire-től?",
   "acceptNewsModal.unsubscribeDescription": "Bármikor leiratkozhatsz.",
   "acceptNewsModal.privacyDescription": "Nézd meg az <b>Adatvédelmi Szabályzatot</b>.",
-  "acceptNewsModal.declineButton": "Elutasítás",
+  "acceptNewsModal.declineButton": "",
   "acceptNewsModal.confirmButton": "Elfogadás",
   "unsupported.headlineBrowser": "Ez a böngésző nem támogatott.",
   "unsupported.subheadBrowser":
@@ -110,6 +110,7 @@
   "ValidationError.FIELD.NAME.PATTERN_MISMATCH": "Legalább 2 karakterből álló nevet adj meg",
   "ValidationError.FIELD.NAME.VALUE_MISSING": "Legalább 2 karakterből álló nevet adj meg",
   "ValidationError.FIELD.PASSWORD.PATTERN_MISMATCH": "Válassz egy legalább 8 karakter hosszú jelszót",
+  "ValidationError.FIELD.PASSWORD_LOGIN.PATTERN_MISMATCH": "Hibás jelszó. Kérjük, próbáld meg újra.",
   "ValidationError.FIELD.EMAIL.TYPE_MISMATCH": "Kérjük, érvényes e-mail címet adj meg",
   "login.subhead": "Add meg az e-mail címed vagy felhasználóneved.",
   "login.emailPlaceholder": "E-mail vagy felhasználónév",

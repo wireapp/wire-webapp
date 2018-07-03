@@ -556,13 +556,13 @@ z.string.it.initReceivedUserData = 'Controllo nuovi messaggi';
 z.string.it.initDecryption = 'Decriptare i messaggi';
 z.string.it.initEvents = 'Caricamento messaggi';
 
-z.string.it.ephememalUnitsNone = 'Off';
-z.string.it.ephememalUnitsSecond = 'secondo';
-z.string.it.ephememalUnitsSeconds = 'secondi';
-z.string.it.ephememalUnitsMinute = 'minuto';
-z.string.it.ephememalUnitsMinutes = 'minuti';
-z.string.it.ephememalUnitsHour = 'ora';
-z.string.it.ephememalUnitsHours = 'ore';
-z.string.it.ephememalUnitsDay = 'giorno';
-z.string.it.ephememalUnitsDays = 'giorni';
+z.string.it.ephemeralUnitsNone = 'Off';
+z.string.it.ephemeralUnitsSecond = 'secondo';
+z.string.it.ephemeralUnitsSeconds = 'secondi';
+z.string.it.ephemeralUnitsMinute = 'minuto';
+z.string.it.ephemeralUnitsMinutes = 'minuti';
+z.string.it.ephemeralUnitsHour = 'ora';
+z.string.it.ephemeralUnitsHours = 'ore';
+z.string.it.ephemeralUnitsDay = 'giorno';
+z.string.it.ephemeralUnitsDays = 'giorni';
 

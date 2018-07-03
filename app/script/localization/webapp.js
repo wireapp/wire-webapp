@@ -337,6 +337,10 @@ z.string.conversationMemberLeaveRemovedYou = ' removed {{users}}';
 z.string.conversationMessageDelivered = 'Delivered';
 z.string.conversationRename = ' renamed the conversation';
 z.string.conversationRenameYou = ' renamed the conversation';
+z.string.conversationUpdatedTimer = ' set the message timer to {{time}}';
+z.string.conversationUpdatedTimerYou = ' set the message timer to {{time}}';
+z.string.conversationResetTimer = ' turned off the message timer';
+z.string.conversationResetTimerYou = ' turned off the message timer';
 z.string.conversationResume = 'Start a conversation with {{users}}';
 z.string.conversationTeamLeave = ' was removed from the team';
 z.string.conversationPing = ' pinged';
@@ -379,7 +383,7 @@ z.string.groupCreationParticipantsActionSkip = 'Skip';
 z.string.groupCreationParticipantsHeader = 'Add people';
 z.string.groupCreationParticipantsHeaderWithCounter = 'Add people ({{number}})';
 z.string.groupCreationParticipantsPlaceholder = 'Search by name';
-z.string.groupSizeInfo = 'Up to {{count}} people can join a group conversation. Video calls work in groups of 4 or less.';
+z.string.groupSizeInfo = 'Up to {{count}} people can join a group conversation. Video calls work with up to 3 other people and you.';
 
 // Guest room
 z.string.guestRoomConversationName = 'Guest room';
@@ -487,6 +491,7 @@ z.string.conversationDetailsActionClear = 'Delete content…';
 z.string.conversationDetailsActionCreateGroup = 'Create group';
 z.string.conversationDetailsActionDevices = 'Devices';
 z.string.conversationDetailsActionGuestOptions = 'Guest options';
+z.string.conversationDetailsActionTimedMessages = 'Timed messages';
 z.string.conversationDetailsActionLeave = 'Leave group…';
 z.string.conversationDetailsGuestsOff = 'Off';
 z.string.conversationDetailsGuestsOn = 'On';
@@ -519,6 +524,10 @@ z.string.guestOptionsInfoHeader = 'Invite others with a link';
 z.string.guestOptionsInfoText = 'Anyone with the link can join the conversation, even if they don’t have Wire.';
 z.string.guestOptionsRevokeLink = 'Revoke link…';
 z.string.guestOptionsTitle = 'Guest options';
+
+// Panel: Timed messages
+z.string.timedMessagesTitle = 'Timed messages';
+z.string.timedMessageDisclaimer = 'Timed messages will be turned on for all the participants in this conversation.';
 
 // Panel: Participant devices
 z.string.participantDevicesDetailHeadline = 'Verify that this matches the fingerprint shown on {{html1}}{{user}}’s device{{html2}}.';
@@ -804,12 +813,16 @@ z.string.initEvents = 'Loading messages';
 z.string.initUpdatedFromNotifications = 'Almost done - Enjoy Wire';
 z.string.initProgress = ' — {{number1}} of {{number2}}';
 
-z.string.ephememalUnitsNone = 'Off';
-z.string.ephememalUnitsSecond = 'second';
-z.string.ephememalUnitsSeconds = 'seconds';
-z.string.ephememalUnitsMinute = 'minute';
-z.string.ephememalUnitsMinutes = 'minutes';
-z.string.ephememalUnitsHour = 'hour';
-z.string.ephememalUnitsHours = 'hours';
-z.string.ephememalUnitsDay = 'day';
-z.string.ephememalUnitsDays = 'days';
+z.string.ephemeralUnitsNone = 'Off';
+z.string.ephemeralUnitsSecond = 'second';
+z.string.ephemeralUnitsSeconds = 'seconds';
+z.string.ephemeralUnitsMinute = 'minute';
+z.string.ephemeralUnitsMinutes = 'minutes';
+z.string.ephemeralUnitsHour = 'hour';
+z.string.ephemeralUnitsHours = 'hours';
+z.string.ephemeralUnitsDay = 'day';
+z.string.ephemeralUnitsDays = 'days';
+z.string.ephemeralUnitsWeek = 'week';
+z.string.ephemeralUnitsWeeks = 'weeks';
+z.string.ephemeralUnitsYear = 'year';
+z.string.ephemeralUnitsYears = 'years';

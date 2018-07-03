@@ -97,10 +97,10 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
       if (this.isService()) {
         return '';
       }
-      if (this.element.hasClass('avatar-xs')) {
-        return z.util.StringUtil.getFirstChar(this.participant().initials());
-      }
-      return this.participant().initials();
+
+      return this.element.hasClass('avatar-xs')
+        ? z.util.StringUtil.getFirstChar(this.participant().initials())
+        : this.participant().initials();
     });
 
     this.state = ko.pureComputed(() => {
@@ -130,10 +130,10 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
       if (this.isService()) {
         return 'accent-color-bot';
       }
-      if (this.isTemporaryGuest()) {
-        return 'accent-color-temporary';
-      }
-      return `accent-color-${this.participant().accent_id()} ${this.state()}`;
+
+      return this.isTemporaryGuest()
+        ? 'accent-color-temporary'
+        : `accent-color-${this.participant().accent_id()} ${this.state()}`;
     });
 
     this.onClick = (data, event) => {
@@ -142,13 +142,7 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
       }
     };
 
-    this.onInViewport = () => {
-      this.avatarEnteredViewport = true;
-      this._loadAvatarPicture();
-      return true;
-    };
-
-    this._loadAvatarPicture = () => {
+    const _loadAvatarPicture = () => {
       this.element.find('.avatar-image').html('');
       this.element.removeClass('avatar-image-loaded avatar-loading-transition');
       if (!this.avatarLoadingBlocked) {
@@ -174,16 +168,24 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
       }
     };
 
+    const _onInViewport = () => {
+      this.avatarEnteredViewport = true;
+      _loadAvatarPicture();
+    };
+
+    z.ui.ViewportObserver.addElement(componentInfo.element, _onInViewport);
+
     this.picturePreviewSubscription = this.participant().previewPictureResource.subscribe(() => {
       if (this.avatarEnteredViewport) {
-        this._loadAvatarPicture();
+        _loadAvatarPicture();
       }
     });
 
-    this.participantSubscription = this.participant.subscribe(() => this._loadAvatarPicture());
+    this.participantSubscription = this.participant.subscribe(() => _loadAvatarPicture());
   }
 
   dispose() {
+    z.ui.ViewportObserver.removeElement(this.element[0]);
     this.participantSubscription.dispose();
     this.picturePreviewSubscription.dispose();
   }
@@ -191,7 +193,7 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
 
 ko.components.register('participant-avatar', {
   template: `
-    <div class="participant-avatar" data-bind="attr: {title: participant().name, 'data-uie-name': avatarType()}, css: cssClasses(), click: onClick, in_viewport: onInViewport, delay: delay">
+    <div class="participant-avatar" data-bind="attr: {title: participant().name, 'data-uie-name': avatarType()}, css: cssClasses(), click: onClick, delay: delay">
       <div class="avatar-background"></div>
       <!-- ko if: isUser -->
         <div class="avatar-initials" data-bind="text: initials()"></div>

@@ -24,6 +24,7 @@ import {
   Small,
   Form,
   Button,
+  ICON_NAME,
   InputSubmitCombo,
   Input,
   RoundIconButton,
@@ -196,7 +197,7 @@ class ConversationJoin extends Component {
     const {error} = this.state;
     return (
       <ContainerXS style={{margin: 'auto 0'}}>
-        <AppAlreadyOpen />
+        <AppAlreadyOpen fullscreen={this.isPwaSupportedBrowser()} />
         <H2
           style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}}
           color={COLOR.GRAY}
@@ -239,7 +240,7 @@ class ConversationJoin extends Component {
     const {enteredName, isValidName, error} = this.state;
     return (
       <ContainerXS style={{margin: 'auto 0'}}>
-        <AppAlreadyOpen />
+        <AppAlreadyOpen fullscreen={this.isPwaSupportedBrowser()} />
         <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}} color={COLOR.GRAY}>
           <FormattedHTMLMessage {...conversationJoinStrings.headline} />
         </H2>
@@ -269,6 +270,7 @@ class ConversationJoin extends Component {
               disabled={!enteredName || !isValidName}
               type="submit"
               formNoValidate
+              icon={ICON_NAME.ARROW}
               onClick={this.handleSubmit}
               data-uie-name="do-next"
             />

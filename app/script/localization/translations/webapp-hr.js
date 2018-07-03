@@ -508,13 +508,13 @@ z.string.hr.initValidatedClient = 'Učitavanje veze i razgovora';
 z.string.hr.initReceivedUserData = 'Provjeravanje novih poruka';
 z.string.hr.initEvents = 'Učitavanje poruka';
 
-z.string.hr.ephememalUnitsNone = 'Isključi';
-z.string.hr.ephememalUnitsSecond = 'sekunda';
-z.string.hr.ephememalUnitsSeconds = 'sekundi';
-z.string.hr.ephememalUnitsMinute = 'minuta';
-z.string.hr.ephememalUnitsMinutes = 'minuta';
-z.string.hr.ephememalUnitsHour = 'sat';
-z.string.hr.ephememalUnitsHours = 'sati';
-z.string.hr.ephememalUnitsDay = 'dan';
-z.string.hr.ephememalUnitsDays = 'dani';
+z.string.hr.ephemeralUnitsNone = 'Isključi';
+z.string.hr.ephemeralUnitsSecond = 'sekunda';
+z.string.hr.ephemeralUnitsSeconds = 'sekundi';
+z.string.hr.ephemeralUnitsMinute = 'minuta';
+z.string.hr.ephemeralUnitsMinutes = 'minuta';
+z.string.hr.ephemeralUnitsHour = 'sat';
+z.string.hr.ephemeralUnitsHours = 'sati';
+z.string.hr.ephemeralUnitsDay = 'dan';
+z.string.hr.ephemeralUnitsDays = 'dani';
 

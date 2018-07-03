@@ -31,10 +31,10 @@ z.calling.entities.CallEntity = class CallEntity {
         MAXIMUM_TIMEOUT: 90,
         MINIMUM_TIMEOUT: 60,
       },
-      STATE_TIMEOUT: 30 * 1000,
+      STATE_TIMEOUT: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND * 30,
       TIMER: {
         INIT_THRESHOLD: 100,
-        UPDATE_INTERVAL: 1000,
+        UPDATE_INTERVAL: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND,
       },
     };
   }
@@ -63,13 +63,7 @@ z.calling.entities.CallEntity = class CallEntity {
     const loggerName = 'z.calling.entities.CallEntity';
     this.callLogger = new z.telemetry.calling.CallLogger(loggerName, this.id, z.config.LOGGER.OPTIONS, this.messageLog);
 
-    this.callLogger.info({
-      data: {
-        default: [this.id],
-        obfuscated: [this.callLogger.obfuscate(this.id)],
-      },
-      message: `Created new call entity in conversation {0}`,
-    });
+    this.callLogger.info(`Created new call entity in conversation ${this.id}`);
 
     // IDs and references
     this.timings = undefined;
@@ -154,7 +148,7 @@ z.calling.entities.CallEntity = class CallEntity {
         this.timerStart = Date.now() - CallEntity.CONFIG.TIMER.INIT_THRESHOLD;
 
         this.callTimerInterval = window.setInterval(() => {
-          const durationInSeconds = Math.floor((Date.now() - this.timerStart) / 1000);
+          const durationInSeconds = Math.floor((Date.now() - this.timerStart) / z.util.TimeUtil.UNITS_IN_MILLIS.SECOND);
           this.durationTime(durationInSeconds);
         }, CallEntity.CONFIG.TIMER.UPDATE_INTERVAL);
       }
@@ -517,7 +511,7 @@ z.calling.entities.CallEntity = class CallEntity {
     const {MAXIMUM_TIMEOUT, MINIMUM_TIMEOUT} = CallEntity.CONFIG.GROUP_CHECK;
     const timeoutInSeconds = z.util.NumberUtil.getRandomNumber(MINIMUM_TIMEOUT, MAXIMUM_TIMEOUT);
 
-    const timeout = timeoutInSeconds * 1000;
+    const timeout = timeoutInSeconds * z.util.TimeUtil.UNITS_IN_MILLIS.SECOND;
     this.groupCheckTimeoutId = window.setTimeout(() => this._onSendGroupCheckTimeout(timeoutInSeconds), timeout);
 
     const timeoutId = this.groupCheckTimeoutId;
@@ -531,8 +525,9 @@ z.calling.entities.CallEntity = class CallEntity {
    */
   _setVerifyGroupCheckTimeout() {
     const {ACTIVITY_TIMEOUT} = CallEntity.CONFIG.GROUP_CHECK;
+    const timeout = ACTIVITY_TIMEOUT * z.util.TimeUtil.UNITS_IN_MILLIS.SECOND;
 
-    this.groupCheckTimeoutId = window.setTimeout(() => this._onVerifyGroupCheckTimeout(), ACTIVITY_TIMEOUT * 1000);
+    this.groupCheckTimeoutId = window.setTimeout(() => this._onVerifyGroupCheckTimeout(), timeout);
     this.callLogger.debug(`Set verifying group check after '${ACTIVITY_TIMEOUT}s' (ID: ${this.groupCheckTimeoutId})`);
   }
 

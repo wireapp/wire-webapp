@@ -23,54 +23,53 @@ window.z = window.z || {};
 window.z.components = z.components || {};
 
 z.components.Image = class Image {
-  constructor(params) {
+  constructor(params, componentInfo) {
     this.asset = ko.unwrap(params.asset);
-    this.asset_src = ko.observable();
-    this.asset_is_loading = ko.observable(false);
+    this.assetSrc = ko.observable();
+    this.assetIsLoading = ko.observable(false);
+    this.element = componentInfo.element;
 
-    this.on_click = () => {
-      if (!this.asset_is_loading() && typeof params.click === 'function') {
+    this.onClick = () => {
+      if (!this.assetIsLoading() && typeof params.click === 'function') {
         params.click(this.asset);
       }
     };
 
-    this.on_entered_viewport = () => {
-      this.load_image_asset();
-      return true;
-    };
-
-    this.load_image_asset = () => {
-      this.asset_is_loading(true);
+    const _onInViewport = () => {
+      this.assetIsLoading(true);
       this.asset.load().then(blob => {
         if (blob) {
-          this.asset_src(window.URL.createObjectURL(blob));
+          this.assetSrc(window.URL.createObjectURL(blob));
         }
-        this.asset_is_loading(false);
+        this.assetIsLoading(false);
       });
     };
+
+    z.ui.ViewportObserver.addElement(this.element, _onInViewport);
   }
 
   dispose() {
-    if (this.asset_src()) {
-      window.URL.revokeObjectURL(this.asset_src());
+    z.ui.ViewportObserver.removeElement(this.element);
+    if (this.assetSrc()) {
+      window.URL.revokeObjectURL(this.assetSrc());
     }
   }
 };
 
 ko.components.register('image-component', {
   template: `
-    <!-- ko if: asset_src() -->
-      <img data-bind="attr:{src: asset_src}, click: on_click"/>
+    <!-- ko if: assetSrc() -->
+      <img data-bind="attr:{src: assetSrc}, click: onClick"/>
     <!-- /ko -->
-    <!-- ko ifnot: asset_src() -->
-      <div data-bind="in_viewport: on_entered_viewport, css: {'three-dots': asset_is_loading()}">
+    <!-- ko ifnot: assetSrc() -->
+      <div data-bind="css: {'three-dots': assetIsLoading()}">
         <span></span><span></span><span></span>
       </div>
     <!-- /ko -->
   `,
   viewModel: {
-    createViewModel(params, component_info) {
-      return new z.components.Image(params, component_info);
+    createViewModel(params, componentInfo) {
+      return new z.components.Image(params, componentInfo);
     },
   },
 });

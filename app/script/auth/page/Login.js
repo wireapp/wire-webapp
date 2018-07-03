@@ -24,6 +24,7 @@ import {
   Columns,
   Column,
   Form,
+  ICON_NAME,
   InputSubmitCombo,
   Input,
   InputBlock,
@@ -171,7 +172,8 @@ class Login extends React.PureComponent {
         }
       })
       .then(() => {
-        const {email, password, persist} = this.state;
+        const {password, persist} = this.state;
+        const email = this.state.email.trim();
         const login = {clientType: persist ? ClientType.PERMANENT : ClientType.TEMPORARY, password};
 
         if (this.isValidEmail(email)) {
@@ -287,7 +289,7 @@ class Login extends React.PureComponent {
                       />
                       <InputSubmitCombo>
                         <Input
-                          name="password"
+                          name="password-login"
                           tabIndex="2"
                           onChange={event =>
                             this.setState({
@@ -312,6 +314,7 @@ class Login extends React.PureComponent {
                           disabled={!email || !password}
                           type="submit"
                           formNoValidate
+                          icon={ICON_NAME.ARROW}
                           onClick={this.handleSubmit}
                           data-uie-name="do-sign-in"
                         />

@@ -22,6 +22,7 @@ import {
   H1,
   Text,
   ContainerXS,
+  ICON_NAME,
   InputSubmitCombo,
   Input,
   RoundIconButton,
@@ -111,6 +112,7 @@ class ChooseHandle extends React.PureComponent {
               <RoundIconButton
                 disabled={!this.state.handle || isFetching}
                 type="submit"
+                icon={ICON_NAME.ARROW}
                 data-uie-name="do-send-handle"
                 formNoValidate
               />

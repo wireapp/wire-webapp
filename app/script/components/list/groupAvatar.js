@@ -30,10 +30,8 @@ z.components.GroupAvatar = class GroupAvatar {
 
 ko.components.register('group-avatar', {
   template: `
-    <div class="group-avatar-box-wrapper">
-      <!-- ko foreach: users -->
-        <div class="group-avatar-box" data-bind="text: Array.from($data.initials())[0], style: {color: $data.accent_color()}"></div>
-      <!-- /ko -->
+    <div class="group-avatar-box-wrapper" data-bind="foreach: users">
+      <div class="group-avatar-box" data-bind="text: Array.from($data.initials())[0], style: {color: $data.accent_color()}"></div>
     </div>
   `,
   viewModel: z.components.GroupAvatar,

@@ -17,7 +17,72 @@
  *
  */
 
+// @ts-check
+
 'use strict';
+
+/**
+ * @typedef {object} ConversationBackendData
+ * @property {string[]=} access
+ * @property {string=} access_role
+ * @property {string=} creator
+ * @property {string=} id
+ * @property {string=} last_event
+ * @property {string=} last_event_time
+ * @property {ConversationMembers=} members
+ * @property {?number=} message_timer
+ * @property {string=} name
+ * @property {?string=} team
+ * @property {number} type
+ */
+
+/**
+ * @typedef {object} ConversationMembers
+ * @property {OtherMember[]} others
+ * @property {Member} self
+ */
+
+/**
+ * @typedef {object} Member
+ * @property {string=} hidden_ref
+ * @property {boolean=} hidden
+ * @property {string=} id
+ * @property {string=} otr_archived_ref
+ * @property {boolean=} otr_archived
+ * @property {string=} otr_muted_ref
+ * @property {boolean=} otr_muted
+ * @property {ServiceRef=} service
+ */
+
+/**
+ * @typedef {object} OtherMember
+ * @property {string} id
+ * @property {number} status
+ */
+
+/**
+ * @typedef {object} SelfStatusUpdate
+ * @property {number=} archived_timestamp
+ * @property {number=} cleared_timestamp
+ * @property {number=} ephemeral_timer
+ * @property {number=} message_timer
+ * @property {number=} last_event_timestamp
+ * @property {number=} last_read_timestamp
+ * @property {number=} last_server_timestamp
+ * @property {boolean=} otr_archived
+ * @property {string=} otr_archived_ref
+ * @property {boolean=} otr_muted
+ * @property {string=} otr_muted_ref
+ * @property {boolean=} muted_state
+ * @property {number=} status
+ * @property {number=} verification_state
+ */
+
+/**
+ * @typedef {object} ServiceRef
+ * @property {string} id
+ * @property {string} provider
+ */
 
 window.z = window.z || {};
 window.z.conversation = z.conversation || {};
@@ -47,13 +112,13 @@ z.conversation.ConversationMapper = class ConversationMapper {
    * @todo make utility?
    *
    * @param {Conversation} conversationEntity - Conversation to be updated
-   * @param {Object} conversationData - Conversation data
+   * @param {ConversationBackendData} conversationData - Conversation data from backend
    * @returns {Conversation} Updated conversation entity
    */
   update_properties(conversationEntity, conversationData) {
     Object.entries(conversationData).forEach(([key, value]) => {
       if (key !== 'id') {
-        if (value !== undefined) {
+        if (value !== undefined && conversationEntity.hasOwnProperty(key)) {
           if (ko.isObservable(conversationEntity[key])) {
             conversationEntity[key](value);
           } else {
@@ -70,7 +135,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
    * Update the membership properties of a conversation.
    *
    * @param {Conversation} conversation_et - Conversation to be updated
-   * @param {Object} self_state - Conversation self data
+   * @param {SelfStatusUpdate} self_state - Conversation self data from the database
    * @param {boolean} [disablePersistence=false] - Disable persistence of state changes during update
    * @returns {Conversation} Updated conversation entity
    */
@@ -85,6 +150,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
         archived_timestamp,
         cleared_timestamp,
         ephemeral_timer,
+        message_timer,
         last_event_timestamp,
         last_read_timestamp,
         last_server_timestamp,
@@ -103,7 +169,11 @@ z.conversation.ConversationMapper = class ConversationMapper {
       }
 
       if (ephemeral_timer !== undefined) {
-        conversation_et.ephemeral_timer(ephemeral_timer);
+        conversation_et.localMessageTimer(ephemeral_timer);
+      }
+
+      if (message_timer !== undefined) {
+        conversation_et.globalMessageTimer(message_timer);
       }
 
       if (last_event_timestamp) {
@@ -187,7 +257,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
     conversation_et.participating_user_ids(participatingUserIds);
 
     // Team ID from database or backend payload
-    const team_id = conversation_data.team_id ? conversation_data.team_id : conversation_data.team;
+    const team_id = conversation_data.team_id || conversation_data.team;
     if (team_id) {
       conversation_et.team_id = team_id;
     }
@@ -197,8 +267,8 @@ z.conversation.ConversationMapper = class ConversationMapper {
     }
 
     // Access related data
-    const accessModes = conversation_data.accessModes ? conversation_data.accessModes : conversation_data.access;
-    const accessRole = conversation_data.accessRole ? conversation_data.accessRole : conversation_data.access_role;
+    const accessModes = conversation_data.accessModes || conversation_data.access;
+    const accessRole = conversation_data.accessRole || conversation_data.access_role;
     if (accessModes && accessRole) {
       this.mapAccessState(conversation_et, accessModes, accessRole);
     }
@@ -212,78 +282,79 @@ z.conversation.ConversationMapper = class ConversationMapper {
    * @param {Array} remote - Backend payload
    * @returns {Array} Merged conversation data
    */
-  merge_conversations(local, remote) {
+  mergeConversation(local, remote) {
     return remote.map((remote_conversation, index) => {
-      const {access, access_role, id, creator, members, name, team, type} = remote_conversation;
-      let local_conversation = local.filter(conversation => conversation).find(conversation => conversation.id === id);
+      const {access, access_role, id, creator, members, message_timer, name, team, type} = remote_conversation;
+      const localConversation = local.filter(conversation => conversation).find(conversation => conversation.id === id);
 
-      if (!local_conversation) {
-        local_conversation = {id};
-      }
-
-      local_conversation.accessModes = access;
-      local_conversation.accessRole = access_role;
-      local_conversation.creator = creator;
-      local_conversation.name = name;
-      local_conversation.status = members.self.status;
-      local_conversation.team_id = team;
-      local_conversation.type = type;
+      const updates = {
+        accessModes: access,
+        accessRole: access_role,
+        creator,
+        message_timer,
+        name,
+        status: members.self.status,
+        team_id: team,
+        type,
+      };
+      const mergedConversation = Object.assign({}, localConversation || {id}, updates);
 
       const isGroup = type === z.conversation.ConversationType.REGULAR;
-      const noOthers = !local_conversation.others || !local_conversation.others.length;
+      const noOthers = !mergedConversation.others || !mergedConversation.others.length;
       if (isGroup || noOthers) {
-        local_conversation.others = members.others
+        mergedConversation.others = members.others
           .filter(other => other.status === z.conversation.ConversationStatus.CURRENT_MEMBER)
           .map(other => other.id);
       }
 
       // This should ensure a proper order
-      if (!local_conversation.last_event_timestamp) {
-        local_conversation.last_event_timestamp = index + 1;
+      if (!mergedConversation.last_event_timestamp) {
+        mergedConversation.last_event_timestamp = index + 1;
       }
 
       // Set initially or correct server timestamp
-      const wrong_server_timestamp = local_conversation.last_server_timestamp < local_conversation.last_event_timestamp;
-      if (!local_conversation.last_server_timestamp || wrong_server_timestamp) {
-        local_conversation.last_server_timestamp = local_conversation.last_event_timestamp;
+      const wrong_server_timestamp = mergedConversation.last_server_timestamp < mergedConversation.last_event_timestamp;
+      if (!mergedConversation.last_server_timestamp || wrong_server_timestamp) {
+        mergedConversation.last_server_timestamp = mergedConversation.last_event_timestamp;
       }
 
       // Some archived timestamp were not properly stored in the database.
       // To fix this we check if the remote one is newer and update our local timestamp.
-      const {archived_state: local_archived_state, archived_timestamp: local_archived_timestamp} = local_conversation;
+      const {archived_state: local_archived_state, archived_timestamp: local_archived_timestamp} = mergedConversation;
       const remote_archived_timestamp = new Date(members.self.otr_archived_ref).getTime();
       const is_remote_archived_timestamp_newer =
         local_archived_timestamp !== undefined && remote_archived_timestamp > local_archived_timestamp;
 
       if (is_remote_archived_timestamp_newer || local_archived_state === undefined) {
-        local_conversation.archived_state = members.self.otr_archived;
-        local_conversation.archived_timestamp = remote_archived_timestamp;
+        mergedConversation.archived_state = members.self.otr_archived;
+        mergedConversation.archived_timestamp = remote_archived_timestamp;
       }
 
-      const {muted_state: local_muted_state, muted_timestamp: local_muted_timestamp} = local_conversation;
+      const {muted_state: local_muted_state, muted_timestamp: local_muted_timestamp} = mergedConversation;
       const remote_muted_timestamp = new Date(members.self.otr_muted_ref).getTime();
       const is_remote_muted_timestamp_newer =
         local_muted_timestamp !== undefined && remote_muted_timestamp > local_muted_timestamp;
 
       if (is_remote_muted_timestamp_newer || local_muted_state === undefined) {
-        local_conversation.muted_state = members.self.otr_muted;
-        local_conversation.muted_timestamp = remote_muted_timestamp;
+        mergedConversation.muted_state = members.self.otr_muted;
+        mergedConversation.muted_timestamp = remote_muted_timestamp;
       }
 
-      return local_conversation;
+      return mergedConversation;
     });
   }
 
   mapAccessCode(conversationEntity, accessCode) {
+    const {code, key, uri} = accessCode;
     const isTeamConversation = conversationEntity && conversationEntity.team_id;
-    if (isTeamConversation) {
+
+    if (uri && isTeamConversation) {
       if (z.util.Environment.frontend.isInternal()) {
-        const {code, key} = accessCode;
         const accessLink = `${z.config.URL.WEBAPP.INTERNAL}/join/?key=${key}&code=${code}`;
         return conversationEntity.accessCode(accessLink);
       }
 
-      conversationEntity.accessCode(accessCode.uri);
+      conversationEntity.accessCode(uri);
     }
   }
 
