@@ -11,7 +11,7 @@ process.on('unhandledRejection', error =>
 const logdown = require('logdown');
 const path = require('path');
 const TimeUnits = require('./TimeUnits');
-require('dotenv').config({path: path.join(__dirname, 'echo2.env')});
+require('dotenv').config({path: path.join(__dirname, 'sender.env')});
 
 const logger = logdown('@wireapp/core/demo/sender.js', {
   logger: console,
