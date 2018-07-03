@@ -17,13 +17,8 @@
  *
  */
 
-import {GenericMessageType} from '../conversation/root';
-
-interface DecodedEvent {
-  content?: string;
-  id: string;
-  messageTimer: number;
-  type: GenericMessageType;
+interface ConfirmationContent {
+  confirmMessageId: string;
 }
 
-export default DecodedEvent;
+export {ConfirmationContent};

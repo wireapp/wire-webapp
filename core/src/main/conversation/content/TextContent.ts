@@ -16,9 +16,8 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
-
-enum ClientActionType {
-  RESET_SESSION = 0,
+interface TextContent {
+  text: string;
 }
 
-export {ClientActionType};
+export {TextContent};

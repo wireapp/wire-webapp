@@ -17,8 +17,33 @@
  *
  */
 
-enum ClientActionType {
-  RESET_SESSION = 0,
+import {ImageContent} from '../../conversation/root';
+import {EncryptedAsset} from '../../cryptography/root';
+
+interface RemoteData {
+  assetId: string;
+  otrKey: Uint8Array | Buffer;
+  sha256: Uint8Array | Buffer;
+  assetToken?: string;
 }
 
-export {ClientActionType};
+interface Original {
+  mimeType: string;
+  size: number;
+  image?: {
+    height: number;
+    width: number;
+  };
+}
+
+interface AssetContent {
+  uploaded: RemoteData;
+  original: Original;
+}
+
+interface ImageAssetContent {
+  asset: EncryptedAsset & {key: string; token: string};
+  image: ImageContent;
+}
+
+export {AssetContent, ImageAssetContent, Original, RemoteData};

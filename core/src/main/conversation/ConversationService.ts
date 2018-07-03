@@ -30,11 +30,11 @@ import {AxiosError} from 'axios';
 import {Encoder} from 'bazinga64';
 import {
   AssetService,
-  ClientAction,
+  ClientActionType,
   ConfirmationType,
   GenericMessageType,
-  Image,
-  ImageAsset,
+  ImageAssetContent,
+  ImageContent,
   MessageTimer,
   PayloadBundleOutgoing,
   PayloadBundleOutgoingUnsent,
@@ -168,7 +168,7 @@ export default class ConversationService {
       throw new Error('No content for sendImage provided!');
     }
 
-    const encryptedAsset = payloadBundle.content as ImageAsset;
+    const encryptedAsset = payloadBundle.content as ImageAssetContent;
 
     const imageMetadata = this.protocolBuffers.Asset.ImageMetaData.create({
       height: encryptedAsset.image.height,
@@ -258,7 +258,7 @@ export default class ConversationService {
     payloadBundle: PayloadBundleOutgoingUnsent
   ): Promise<PayloadBundleOutgoing> {
     const sessionReset = this.protocolBuffers.GenericMessage.create({
-      [GenericMessageType.CLIENT_ACTION]: ClientAction.RESET_SESSION,
+      [GenericMessageType.CLIENT_ACTION]: ClientActionType.RESET_SESSION,
       messageId: payloadBundle.id,
     });
 
@@ -335,7 +335,7 @@ export default class ConversationService {
   }
 
   public async createImage(
-    image: Image,
+    image: ImageContent,
     messageId: string = ConversationService.createId()
   ): Promise<PayloadBundleOutgoingUnsent> {
     const imageAsset = await this.assetService.uploadImageAsset(image);
@@ -352,9 +352,9 @@ export default class ConversationService {
     };
   }
 
-  public createText(message: string, messageId: string = ConversationService.createId()): PayloadBundleOutgoingUnsent {
+  public createText(text: string, messageId: string = ConversationService.createId()): PayloadBundleOutgoingUnsent {
     return {
-      content: message,
+      content: {text},
       from: this.apiClient.context!.userId,
       id: messageId,
       state: PayloadBundleState.OUTGOING_UNSENT,
@@ -367,7 +367,7 @@ export default class ConversationService {
     messageId: string = ConversationService.createId()
   ): PayloadBundleOutgoingUnsent {
     return {
-      content: confirmMessageId,
+      content: {confirmMessageId},
       from: this.apiClient.context!.userId,
       id: messageId,
       state: PayloadBundleState.OUTGOING_UNSENT,
@@ -386,7 +386,7 @@ export default class ConversationService {
 
   public createSessionReset(messageId: string = ConversationService.createId()): PayloadBundleOutgoingUnsent {
     return {
-      content: String(ClientAction.RESET_SESSION),
+      content: ClientActionType.RESET_SESSION,
       from: this.apiClient.context!.userId,
       id: messageId,
       state: PayloadBundleState.OUTGOING_UNSENT,
@@ -476,7 +476,7 @@ export default class ConversationService {
     switch (payloadBundle.type) {
       case GenericMessageType.ASSET: {
         if (payloadBundle.content) {
-          if ((payloadBundle.content as ImageAsset).image) {
+          if ((payloadBundle.content as ImageAssetContent).image) {
             return this.sendImage(conversationId, payloadBundle);
           }
           throw new Error(`No send method implemented for sending other assets than images.`);
@@ -484,7 +484,7 @@ export default class ConversationService {
         throw new Error(`No send method implemented for "${payloadBundle.type}" without content".`);
       }
       case GenericMessageType.CLIENT_ACTION: {
-        if (payloadBundle.content === ClientAction.RESET_SESSION) {
+        if (payloadBundle.content === ClientActionType.RESET_SESSION) {
           return this.sendSessionReset(conversationId, payloadBundle);
         }
         throw new Error(
