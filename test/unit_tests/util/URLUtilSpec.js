@@ -53,26 +53,32 @@ describe('z.util.URLUtil', () => {
   });
 
   describe('getDomainName', () => {
-    it('returns naked urls', () => {
-      const expectedUrl = 'wire.com';
-      const urls = [
-        'HTTPS://WWW.WIRE.COM/',
-        'https://www.wire.com/',
-        'http://www.wire.com/',
-        'https://www.wire.com',
-        'http://www.wire.com',
-        'https://wire.com/',
-        'http://wire.com/',
-        'https://wire.com',
-        'http://wire.com',
-        'www.wire.com/',
-        'www.wire.com',
-        'wire.com/',
+    it('lowercases domains and respects others components case', () => {
+      const baseUrl = 'wire.com';
+      const tests = [
+        {expected: baseUrl, url: 'HTTPS://WWW.WIRE.COM/'},
+        {expected: baseUrl, url: 'https://www.wire.com/'},
+        {expected: baseUrl, url: 'http://www.wire.com/'},
+        {expected: baseUrl, url: 'https://www.wire.com'},
+        {expected: baseUrl, url: 'http://www.wire.com'},
+        {expected: baseUrl, url: 'https://wire.com/'},
+        {expected: baseUrl, url: 'http://wire.com/'},
+        {expected: baseUrl, url: 'https://wire.com'},
+        {expected: baseUrl, url: 'http://wire.com'},
+        {expected: baseUrl, url: 'www.wire.com/'},
+        {expected: baseUrl, url: 'www.WIRE.com/'},
+        {expected: baseUrl, url: 'www.wire.com'},
+        {expected: baseUrl, url: 'wire.com/'},
+        {expected: `${baseUrl}/join`, url: `${baseUrl}/join`},
+        {expected: `${baseUrl}/join`, url: `${baseUrl}/join/`},
+        {expected: `${baseUrl}/join?key=ZE4543fdRETg`, url: `${baseUrl}/join?key=ZE4543fdRETg`},
+        {expected: `${baseUrl}/join?key=ZE4543fdRETg#lOgIn`, url: `${baseUrl}/join?key=ZE4543fdRETg#lOgIn`},
       ];
 
-      const allUrlsNaked = urls.map(url => z.util.URLUtil.getDomainName(url)).every(url => url === expectedUrl);
-
-      expect(allUrlsNaked).toBeTruthy();
+      tests.forEach(({url, expected}) => {
+        const result = z.util.URLUtil.getDomainName(url);
+        expect(result).toBe(expected);
+      });
     });
 
     it('returns empty string if url is not set', () => expect(z.util.URLUtil.getDomainName()).toBe(''));
