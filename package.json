@@ -53,5 +53,5 @@
     "test:node": "jasmine --config=jasmine.json"
   },
   "types": "./dist/Account.d.ts",
-  "version": "3.6.13"
+  "version": "3.6.14"
 }
