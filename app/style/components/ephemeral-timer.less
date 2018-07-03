@@ -17,15 +17,27 @@
  *
  */
 
+@strokelength: 12.6;
+
 .ephemeral-timer {
   &__background {
     fill: fade(@graphite, 16%);
   }
 
   &__dial {
+    animation-name: dial-animation;
+    animation-timing-function: linear;
     fill: none;
     stroke: @graphite;
-    transition-property: stroke-dashoffset;
-    transition-timing-function: linear;
+    stroke-dashoffset: @strokelength;
+  }
+}
+
+@keyframes dial-animation {
+  0% {
+    stroke-dashoffset: @strokelength * 2;
+  }
+  100% {
+    stroke-dashoffset: @strokelength;
   }
 }
