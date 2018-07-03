@@ -58,6 +58,6 @@ z.viewModel.list.ArchiveViewModel = class ArchiveViewModel {
   }
 
   updateList() {
-    this.conversationRepository.update_conversations_archived();
+    this.conversationRepository.updateArchivedConversations();
   }
 };

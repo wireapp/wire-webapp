@@ -350,7 +350,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .then(conversations => this.map_conversations(conversations))
       .then(conversation_ets => {
         this.save_conversations(conversation_ets);
-        this.update_conversations_offline();
         return this.conversations();
       });
   }
@@ -594,27 +593,30 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   /**
-   * Update users and events for archived conversations currently visible.
+   * Update all conversations on app init.
    * @returns {undefined} No return value
    */
-  update_conversations_archived() {
-    this.updateConversations(this.conversations_archived());
+  updateConversationsOnAppInit() {
+    this.logger.info('Updating group participants');
+    this.updateUnarchivedConversations();
+    this.sorted_conversations().map(conversationEntity => {
+      this.updateParticipatingUserEntities(conversationEntity, true);
+    });
   }
 
   /**
-   * Map users to all conversations without any backend requests.
+   * Update users and events for archived conversations currently visible.
    * @returns {undefined} No return value
    */
-  update_conversations_offline() {
-    this.logger.info('Updating group participants offline');
-    this.sorted_conversations().map(conversation_et => this.updateParticipatingUserEntities(conversation_et, true));
+  updateArchivedConversations() {
+    this.updateConversations(this.conversations_archived());
   }
 
   /**
    * Update users and events for all unarchived conversations.
    * @returns {undefined} No return value
    */
-  update_conversations_unarchived() {
+  updateUnarchivedConversations() {
     this.updateConversations(this.conversations_unarchived());
   }
 
@@ -693,7 +695,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   /**
    * Check for conversation locally and fetch it from the server otherwise.
    * @param {string} conversation_id - ID of conversation to get
-   * @returns {Promise} Resolves with the Conversation
+   * @returns {Promise} Resolves with the Conversation entity
    */
   get_conversation_by_id(conversation_id) {
     if (!_.isString(conversation_id)) {
@@ -724,41 +726,36 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Get group conversations by name.
    *
    * @param {string} query - Query to be searched in group conversation names
-   * @param {boolean} is_handle - Query string is handle
+   * @param {boolean} isHandle - Query string is handle
    * @returns {Array<Conversation>} Matching group conversations
    */
-  get_groups_by_name(query, is_handle) {
+  getGroupsByName(query, isHandle) {
     return this.sorted_conversations()
-      .filter(conversation_et => {
-        if (!conversation_et.is_group()) {
+      .filter(conversationEntity => {
+        if (!conversationEntity.is_group()) {
           return false;
         }
 
-        if (is_handle) {
-          if (z.util.StringUtil.compareTransliteration(conversation_et.display_name(), `@${query}`)) {
-            return true;
-          }
+        const queryString = isHandle ? `@${query}` : query;
+        if (z.util.StringUtil.compareTransliteration(conversationEntity.display_name(), queryString)) {
+          return true;
+        }
 
-          for (const user_et of conversation_et.participating_user_ets()) {
-            if (z.util.StringUtil.startsWith(user_et.username(), query)) {
-              return true;
-            }
-          }
-        } else {
-          if (z.util.StringUtil.compareTransliteration(conversation_et.display_name(), query)) {
+        for (const userEntity of conversationEntity.participating_user_ets()) {
+          const nameString = isHandle ? userEntity.username() : userEntity.name();
+          if (z.util.StringUtil.startsWith(nameString, query)) {
             return true;
-          }
-
-          for (const user_et of conversation_et.participating_user_ets()) {
-            if (z.util.StringUtil.compareTransliteration(user_et.name(), query)) {
-              return true;
-            }
           }
         }
+
         return false;
       })
-      .sort((conversation_a, conversation_b) => {
-        return z.util.StringUtil.sortByPriority(conversation_a.display_name(), conversation_b.display_name(), query);
+      .sort((conversationA, conversationB) => {
+        return z.util.StringUtil.sortByPriority(conversationA.display_name(), conversationB.display_name(), query);
+      })
+      .map(conversationEntity => {
+        this.updateParticipatingUserEntities(conversationEntity);
+        return conversationEntity;
       });
   }
 

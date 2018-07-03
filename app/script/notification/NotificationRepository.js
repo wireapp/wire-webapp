@@ -239,18 +239,6 @@ z.notification.NotificationRepository = class NotificationRepository {
   }
 
   /**
-   * Creates the notification body for a renamed conversation.
-   *
-   * @private
-   * @param {z.entity.RenameMessage} messageEntity - Rename message entity
-   * @returns {string} Notification message body
-   */
-  _createBodyConversationRename(messageEntity) {
-    const substitutions = {name: messageEntity.name, user: messageEntity.user().first_name()};
-    return z.l10n.text(z.string.notificationConversationRename, substitutions);
-  }
-
-  /**
    * Creates the notification body for people being added to a group conversation.
    *
    * @private
@@ -365,9 +353,30 @@ z.notification.NotificationRepository = class NotificationRepository {
    * @returns {string} Notification message body
    */
   _createBodySystem(messageEntity) {
-    const isConversationRename = messageEntity.system_message_type === z.message.SystemMessageType.CONVERSATION_RENAME;
-    if (isConversationRename) {
-      return this._createBodyConversationRename(messageEntity);
+    const createBodyMessageTimerUpdate = () => {
+      const messageTimer = z.conversation.ConversationEphemeralHandler.validateTimer(messageEntity.message_timer);
+
+      if (messageTimer) {
+        const timeString = z.util.TimeUtil.formatDuration(messageTimer).text;
+        const substitutions = {time: timeString, user: messageEntity.user().first_name()};
+        return z.l10n.text(z.string.notificationConversationMessageTimerUpdate, substitutions);
+      }
+      return z.l10n.text(z.string.notificationConversationMessageTimerReset, messageEntity.user().first_name());
+    };
+
+    const createBodyRename = () => {
+      const substitutions = {name: messageEntity.name, user: messageEntity.user().first_name()};
+      return z.l10n.text(z.string.notificationConversationRename, substitutions);
+    };
+
+    switch (messageEntity.system_message_type) {
+      case z.message.SystemMessageType.CONVERSATION_RENAME: {
+        return createBodyRename();
+      }
+
+      case z.message.SystemMessageType.CONVERSATION_MESSAGE_TIMER_UPDATE: {
+        return createBodyMessageTimerUpdate(messageEntity);
+      }
     }
   }
 

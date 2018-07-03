@@ -520,8 +520,8 @@ z.client.ClientRepository = class ClientRepository {
   }
 
   /**
-   * Retrieves meta information about all the clients of the self user.
-   * @returns {Promise} Resolves with the retrieved information about the clients
+   * Retrieves meta information about all other clients of the self user.
+   * @returns {Promise} Resolves with all clients except the current one.
    */
   getClientsForSelf() {
     this.logger.info(`Retrieving all clients for the self user '${this.selfUser().id}'`);

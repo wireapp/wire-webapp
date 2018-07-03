@@ -58,6 +58,60 @@ z.util.DebugUtil = class DebugUtil {
       .then(() => this.logger.log(`Corrupted Session ID '${sessionId}'`));
   }
 
+  haveISentThisMessageToMyOtherClients(
+    messageId,
+    conversationId = wire.app.repository.conversation.active_conversation().id
+  ) {
+    let amountOfMessagesSent = 0;
+
+    const clientId = wire.app.repository.client.currentClient().id;
+    const userId = wire.app.repository.user.self().id;
+
+    const isOTRMessage = notification => notification.type === z.event.Backend.CONVERSATION.OTR_MESSAGE_ADD;
+    const isInCurrentConversation = notification => notification.conversation === conversationId;
+    const wasSentByOurCurrentClient = notification =>
+      notification.from === userId && (notification.data && notification.data.sender === clientId);
+    const hasExpectedTimestamp = (notification, dateTime) => notification.time === dateTime.toISOString();
+
+    return wire.app.repository.conversation
+      .get_conversation_by_id(conversationId)
+      .then(conversation => {
+        return wire.app.repository.conversation.get_message_in_conversation_by_id(conversation, messageId);
+      })
+      .then(message => {
+        return wire.app.repository.event.notificationService
+          .getNotifications(undefined, undefined, 10000)
+          .then(({notifications}) => ({
+            message,
+            notifications,
+          }));
+      })
+      .then(({message, notifications}) => {
+        const dateTime = new Date(message.timestamp());
+        return notifications
+          .map(notification => notification.payload)
+          .reduce((accumulator, payload) => accumulator.concat(payload))
+          .filter(notification => {
+            return (
+              isOTRMessage(notification) &&
+              isInCurrentConversation(notification) &&
+              wasSentByOurCurrentClient(notification) &&
+              hasExpectedTimestamp(notification, dateTime)
+            );
+          });
+      })
+      .then(filteredNotifications => {
+        amountOfMessagesSent = filteredNotifications.length;
+        return wire.app.repository.client.getClientsForSelf();
+      })
+      .then(selfClients => {
+        const isSent = selfClients.length === amountOfMessagesSent;
+        this.logger.info(`Message was sent to all other "${selfClients.length}" clients: ${isSent}`);
+        return isSent;
+      })
+      .catch(error => this.logger.info(`Message was not sent to other clients. Reason: ${error.message}`, error));
+  }
+
   getEventInfo(event) {
     const debugInformation = {event};
 
