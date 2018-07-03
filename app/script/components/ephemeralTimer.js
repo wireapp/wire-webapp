@@ -39,7 +39,7 @@ ko.components.register('ephemeral-timer', {
   template: `
     <svg class="ephemeral-timer" viewBox="0 0 8 8" width="8" height="8">
       <circle class="ephemeral-timer__background" cx="4" cy="4" r="4"></circle>
-      <circle class="ephemeral-timer__dial" cx="4" cy="4" r="2" stroke-width="4" transform="rotate(-90 4 4)" stroke-dasharray="12.6" data-bind="style: {'animation-duration': duration + 's'}, event: {animationstart: setAnimationDelay}">
+      <circle class="ephemeral-timer__dial" cx="4" cy="4" r="2" transform="rotate(-90 4 4)" data-bind="style: {'animation-duration': duration + 's'}, event: {animationstart: setAnimationDelay}">
       </circle>
     </svg>
   `,

@@ -17,7 +17,8 @@
  *
  */
 
-@strokelength: 12.6;
+@strokewidth: 4;
+@strokelength: @strokewidth * pi();
 
 .ephemeral-timer {
   &__background {
@@ -29,7 +30,9 @@
     animation-timing-function: linear;
     fill: none;
     stroke: @graphite;
+    stroke-dasharray: @strokelength;
     stroke-dashoffset: @strokelength;
+    stroke-width: @strokewidth;
   }
 }
 
