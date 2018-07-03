@@ -87,7 +87,6 @@ z.viewModel.panel.GuestOptionsViewModel = class GuestOptionsViewModel {
   resizeLink() {
     const link = document.querySelector('.guest-options__link');
     if (link) {
-      link.style.height = ''; // Reset the height to have the scrollheight purely based on the content
       link.style.height = `${link.scrollHeight}px`;
     }
   }
