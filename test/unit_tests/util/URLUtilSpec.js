@@ -70,9 +70,26 @@ describe('z.util.URLUtil', () => {
         'wire.com/',
       ];
 
-      const allUrlsNaked = urls.map(url => z.util.URLUtil.getDomainName(url)).every(url => url === expectedUrl);
+      urls.map(url => z.util.URLUtil.getDomainName(url)).forEach(url => expect(url).toBe(expectedUrl));
+    });
 
-      expect(allUrlsNaked).toBeTruthy();
+    it('lowercases the domain name but respects others components case', () => {
+      const expectedUrl = 'wire.com/join?key=ZE4543fdRETg';
+      const urls = [
+        'HTTPS://WWW.WIRE.COM/join?key=ZE4543fdRETg',
+        'https://www.wire.com/join?key=ZE4543fdRETg',
+        'http://www.wire.com/join?key=ZE4543fdRETg',
+        'https://www.wire.com/join?key=ZE4543fdRETg',
+        'http://www.wire.com/join?key=ZE4543fdRETg',
+        'https://wire.com/join?key=ZE4543fdRETg',
+        'http://wire.com/join?key=ZE4543fdRETg',
+        'https://wire.com/join?key=ZE4543fdRETg',
+        'http://wire.com/join?key=ZE4543fdRETg',
+        'www.wire.com/join?key=ZE4543fdRETg',
+        'wire.com/join?key=ZE4543fdRETg',
+      ];
+
+      urls.map(url => z.util.URLUtil.getDomainName(url)).forEach(url => expect(url).toBe(expectedUrl));
     });
 
     it('returns empty string if url is not set', () => expect(z.util.URLUtil.getDomainName()).toBe(''));
