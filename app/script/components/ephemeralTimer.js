@@ -23,29 +23,15 @@ window.z = window.z || {};
 window.z.components = z.components || {};
 
 z.components.EphemeralTimer = class EphemeralTimer {
-  constructor({message: messageEntity}, componentInfo) {
-    const duration = messageEntity.ephemeral_expires() - messageEntity.ephemeral_started();
-
-    const dashLength = 12.6;
-    const dial = componentInfo.element.querySelector('.ephemeral-timer__dial');
-
-    const numberOfAnimationSteps = 40;
-    const animationIntervalValue = Math.min(duration / numberOfAnimationSteps, z.util.TimeUtil.UNITS_IN_MILLIS.HOUR);
-    const animatePie = () => {
-      const remainingTime = messageEntity.ephemeral_expires() - Date.now();
-      const newDashoffset = dashLength - (remainingTime / duration) * -dashLength;
-      dial.style.strokeDashoffset = Math.max(newDashoffset, dashLength);
-      if (newDashoffset === dashLength) {
-        window.clearInterval(this.animationInterval);
-        this.animationInterval = undefined;
-      }
-    };
-    this.animationInterval = window.setInterval(animatePie, animationIntervalValue);
-    animatePie();
+  constructor({message: messageEntity}) {
+    this.started = messageEntity.ephemeral_started();
+    this.duration = (messageEntity.ephemeral_expires() - this.started) / 1000;
   }
 
-  dispose() {
-    window.clearInterval(this.animationInterval);
+  setAnimationDelay(data, event) {
+    // every time the component gets rendered, the animation delay gets set
+    // to accomodate for the passed lifetime of the timed message
+    event.target.style.animationDelay = `${(this.started - Date.now()) / 1000}s`;
   }
 };
 
@@ -53,13 +39,9 @@ ko.components.register('ephemeral-timer', {
   template: `
     <svg class="ephemeral-timer" viewBox="0 0 8 8" width="8" height="8">
       <circle class="ephemeral-timer__background" cx="4" cy="4" r="4"></circle>
-      <circle class="ephemeral-timer__dial" cx="4" cy="4" r="2" stroke-width="4" transform="rotate(-90 4 4)" stroke-dasharray="12.6">
+      <circle class="ephemeral-timer__dial" cx="4" cy="4" r="2" transform="rotate(-90 4 4)" data-bind="style: {'animation-duration': duration + 's'}, event: {animationstart: setAnimationDelay}">
       </circle>
     </svg>
   `,
-  viewModel: {
-    createViewModel(params, componentInfo) {
-      return new z.components.EphemeralTimer(params, componentInfo);
-    },
-  },
+  viewModel: z.components.EphemeralTimer,
 });
