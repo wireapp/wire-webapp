@@ -828,3 +828,4 @@ z.string.ephemeralUnitsWeek = 'week';
 z.string.ephemeralUnitsWeeks = 'weeks';
 z.string.ephemeralUnitsYear = 'year';
 z.string.ephemeralUnitsYears = 'years';
+z.string.ephemeralRemaining = 'remaining';

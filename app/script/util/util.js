@@ -380,7 +380,8 @@ z.util.koPushDeferred = (target, src, number = 100, delay = 300) => {
  * @returns {string} Input value with leading zeros (padding)
  */
 z.util.zeroPadding = (value, length = 2) => {
-  return value.toString().length < length ? z.util.zeroPadding(`0${value}`, length) : `${value}`;
+  const zerosNeeded = Math.max(0, length - value.toString().length);
+  return `${'0'.repeat(zerosNeeded)}${value}`;
 };
 
 /**
