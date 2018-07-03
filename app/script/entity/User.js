@@ -169,7 +169,7 @@ z.entity.User = class User {
 
     this.is_request = ko.pureComputed(() => this.connection().is_request());
 
-    this.devices = ko.observableArray();
+    this.devices = ko.observableArray(); // does not include current client/device
     this.is_verified = ko.pureComputed(() => {
       if (this.devices().length === 0 && !this.is_me) {
         return false;
