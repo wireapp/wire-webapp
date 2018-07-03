@@ -74,7 +74,8 @@ z.util.URLUtil = (() => {
    * @returns {string} Plain URL
    */
   const _getDomainName = (url = '') => {
-    url = url.length > 0 && !url.match(/^https?:\/\//i) ? `http://${url}` : url;
+    const isMissingProtocol = url.length > 0 && !url.match(/^https?:\/\//i);
+    url = isMissingProtocol ? `http://${url}` : url;
     try {
       const {hostname, pathname, search} = new URL(url);
       return hostname.replace(/^www./, '') + pathname.replace(/\/$/, '') + search;
