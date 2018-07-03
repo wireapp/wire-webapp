@@ -37,7 +37,6 @@ import {ClientInfo, ClientService} from './client/root';
 import {
   AssetService,
   ConversationService,
-  DecodedMessage,
   GenericMessageType,
   PayloadBundleIncoming,
   PayloadBundleState,
@@ -252,13 +251,14 @@ class Account extends EventEmitter {
       .then(() => this);
   }
 
-  private async decodeGenericMessage(otrMessage: ConversationOtrMessageAddEvent): Promise<DecodedMessage> {
+  private async decodeGenericMessage(otrMessage: ConversationOtrMessageAddEvent): Promise<PayloadBundleIncoming> {
     if (!this.service) {
       throw new Error('Services are not set.');
     }
 
     const {
       from,
+      conversation,
       data: {sender, text: cipherText},
     } = otrMessage;
 
@@ -266,29 +266,81 @@ class Account extends EventEmitter {
     const decryptedMessage = await this.service.cryptography.decrypt(sessionId, cipherText);
     const genericMessage = this.protocolBuffers.GenericMessage.decode(decryptedMessage);
 
-    const contentBody = genericMessage.ephemeral ? genericMessage.ephemeral.text : genericMessage.text;
-    const messageTimer = genericMessage.ephemeral ? (genericMessage.ephemeral.expireAfterMillis as Long).toNumber() : 0;
-    const type = genericMessage.ephemeral ? genericMessage.ephemeral.content : genericMessage.content;
+    if (genericMessage.content === GenericMessageType.EPHEMERAL) {
+      const unwrappedMessage = this.mapGenericMessage(genericMessage.ephemeral, conversation, from);
+      unwrappedMessage.messageTimer = (genericMessage.ephemeral.expireAfterMillis as Long).toNumber();
+      return unwrappedMessage;
+    } else {
+      return this.mapGenericMessage(genericMessage, conversation, from);
+    }
+  }
 
-    return {
-      content: contentBody && contentBody.content,
-      id: genericMessage.messageId,
-      messageTimer,
-      type,
-    };
+  private mapGenericMessage(genericMessage: any, conversation: string, from: string): PayloadBundleIncoming {
+    switch (genericMessage.content) {
+      case GenericMessageType.TEXT: {
+        return {
+          content: {
+            text: genericMessage.text.content,
+          },
+          conversation,
+          from,
+          id: genericMessage.messageId,
+          messageTimer: 0,
+          state: PayloadBundleState.INCOMING,
+          type: genericMessage.content,
+        };
+      }
+      case GenericMessageType.DELETED: {
+        return {
+          content: {
+            originalMessageId: genericMessage.deleted.messageId,
+          },
+          conversation,
+          from,
+          id: genericMessage.messageId,
+          messageTimer: 0,
+          state: PayloadBundleState.INCOMING,
+          type: genericMessage.content,
+        };
+      }
+      case GenericMessageType.HIDDEN: {
+        return {
+          content: {
+            conversationId: genericMessage.hidden.conversationId,
+            originalMessageId: genericMessage.hidden.messageId,
+          },
+          conversation,
+          from,
+          id: genericMessage.messageId,
+          messageTimer: 0,
+          state: PayloadBundleState.INCOMING,
+          type: genericMessage.content,
+        };
+      }
+      default: {
+        this.logger.warn(`Unhandled event type "${genericMessage.content}": ${genericMessage}`);
+        return {
+          conversation,
+          from,
+          id: genericMessage.messageId,
+          messageTimer: 0,
+          state: PayloadBundleState.INCOMING,
+          type: genericMessage.content,
+        };
+      }
+    }
   }
 
   private async handleEvent(event: ConversationEvent): Promise<PayloadBundleIncoming | ConversationEvent | void> {
     this.logger.info('handleEvent', event.type);
-    const {conversation, from} = event;
 
     const ENCRYPTED_EVENTS = [CONVERSATION_EVENT.OTR_MESSAGE_ADD];
     const META_EVENTS = [CONVERSATION_EVENT.MESSAGE_TIMER_UPDATE, CONVERSATION_EVENT.TYPING];
 
     if (ENCRYPTED_EVENTS.includes(event.type)) {
-      const decodedMessage = await this.decodeGenericMessage(event as ConversationOtrMessageAddEvent);
-      return {...decodedMessage, from, conversation, state: PayloadBundleState.INCOMING};
+      return this.decodeGenericMessage(event as ConversationOtrMessageAddEvent);
     } else if (META_EVENTS.includes(event.type)) {
+      const {conversation, from} = event;
       return {...event, from, conversation};
     }
   }

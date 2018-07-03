@@ -19,7 +19,7 @@
 
 import APIClient = require('@wireapp/api-client');
 import {AssetRetentionPolicy} from '@wireapp/api-client/dist/commonjs/asset/AssetRetentionPolicy';
-import {Image} from '../conversation/root';
+import {ImageContent} from '../conversation/root';
 import * as AssetCryptography from '../cryptography/AssetCryptography.node';
 import {EncryptedAsset} from '../cryptography/root';
 
@@ -48,7 +48,7 @@ export default class AssetService {
   }
 
   public uploadImageAsset(
-    image: Image,
+    image: ImageContent,
     options?: AssetOptions
   ): Promise<EncryptedAsset & {key: string; token: string}> {
     return this.postAsset(image.data, options);

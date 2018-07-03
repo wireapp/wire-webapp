@@ -17,33 +17,11 @@
  *
  */
 
-import {Image} from '../conversation/root';
-import {EncryptedAsset} from '../cryptography/root';
-
-interface RemoteData {
-  assetId: string;
-  otrKey: Uint8Array | Buffer;
-  sha256: Uint8Array | Buffer;
-  assetToken?: string;
+interface ImageContent {
+  data: Buffer;
+  height: number;
+  type: string;
+  width: number;
 }
 
-interface Original {
-  mimeType: string;
-  size: number;
-  image?: {
-    height: number;
-    width: number;
-  };
-}
-
-interface Asset {
-  uploaded: RemoteData;
-  original: Original;
-}
-
-interface ImageAsset {
-  asset: EncryptedAsset & {key: string; token: string};
-  image: Image;
-}
-
-export {Asset, ImageAsset, Original, RemoteData};
+export {ImageContent};

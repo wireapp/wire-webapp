@@ -16,12 +16,8 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
-
-interface Image {
-  data: Buffer;
-  height: number;
-  type: string;
-  width: number;
+interface HiddenContent {
+  originalMessageId: string;
 }
 
-export default Image;
+export {HiddenContent};

@@ -19,6 +19,7 @@
 
 enum GenericMessageType {
   ASSET = 'asset',
+  AVAILABILITY = 'availability',
   CALLING = 'calling',
   CLEARED = 'cleared',
   CLIENT_ACTION = 'clientAction',
