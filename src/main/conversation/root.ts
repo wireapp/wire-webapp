@@ -18,7 +18,7 @@
  */
 
 import AssetService from './AssetService';
-import {ClientActionType} from './ClientAction';
+import {ClientActionType} from './ClientActionType';
 import {ConfirmationType} from './ConfirmationType';
 import {AssetContent, ImageAssetContent, Original, RemoteData} from './content/AssetContent';
 import {ConfirmationContent} from './content/ConfirmationContent';
