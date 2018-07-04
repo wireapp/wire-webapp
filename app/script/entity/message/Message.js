@@ -64,6 +64,10 @@ z.entity.Message = class Message {
       return z.message.EphemeralStatusType.NONE;
     });
 
+    this.isObfuscated = ko.pureComputed(() => {
+      return this.ephemeral_status() === z.message.EphemeralStatusType.INACTIVE || this.is_expired();
+    });
+
     this.conversation_id = '';
     this.from = '';
     this.isEditing = ko.observable(false);
