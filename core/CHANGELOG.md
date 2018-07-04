@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="3.7.0"></a>
+# [3.7.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@3.6.18...@wireapp/core@3.7.0) (2018-07-04)
+
+
+### Features
+
+* **core:** Send and receive connection requests ([#798](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/798)) ([cd118e8](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/cd118e8))
+
+
+
+
 <a name="3.6.18"></a>
 ## [3.6.18](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@3.6.17...@wireapp/core@3.6.18) (2018-07-04)
 
