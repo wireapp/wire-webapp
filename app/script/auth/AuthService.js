@@ -86,7 +86,7 @@ z.auth.AuthService = class AuthService {
         const request_forbidden = jqXHR.status === z.service.BackendClientError.STATUS_CODE.FORBIDDEN;
         if (request_forbidden) {
           this.logger.error(`Requesting access token failed after ${retryAttempt} attempt(s): ${errorThrown}`, jqXHR);
-          reject(new z.auth.AccessTokenError(z.auth.AccessTokenError.TYPE.REQUEST_FORBIDDEN));
+          return reject(new z.auth.AccessTokenError(z.auth.AccessTokenError.TYPE.REQUEST_FORBIDDEN));
         }
 
         if (retryAttempt <= AuthService.CONFIG.POST_ACCESS_RETRY_LIMIT) {
