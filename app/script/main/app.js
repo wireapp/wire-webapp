@@ -570,8 +570,8 @@ z.main.App = class App {
   _checkSingleInstanceOnInterval() {
     const singleInstanceCookie = Cookies.getJSON(App.CONFIG.TABS_CHECK.COOKIE_NAME);
 
-    const shouldBlockTab = !singleInstanceCookie || singleInstanceCookie.appInstanceId !== this.instanceId;
-    if (shouldBlockTab) {
+    const isRunningInstance = singleInstanceCookie && singleInstanceCookie.appInstanceId === this.instanceId;
+    if (!isRunningInstance) {
       return this._redirectToLogin(z.auth.SIGN_OUT_REASON.MULTIPLE_TABS);
     }
   }
@@ -589,12 +589,13 @@ z.main.App = class App {
     const cookieData = {appInstanceId: this.instanceId};
     Cookies.set(App.CONFIG.TABS_CHECK.COOKIE_NAME, cookieData);
 
-    window.setInterval(() => this._checkSingleInstanceOnInterval(), App.CONFIG.TABS_CHECK.INTERVAL);
-    this._registerSingleInstanceCookieDeletion();
+    const intervalId = window.setInterval(() => this._checkSingleInstanceOnInterval(), App.CONFIG.TABS_CHECK.INTERVAL);
+    this._registerSingleInstanceCookieDeletion(intervalId);
   }
 
-  _registerSingleInstanceCookieDeletion() {
+  _registerSingleInstanceCookieDeletion(singleInstanceCheckIntervalId) {
     $(window).on('beforeunload', () => {
+      window.clearInterval(singleInstanceCheckIntervalId);
       const singleInstanceCookie = Cookies.getJSON(App.CONFIG.TABS_CHECK.COOKIE_NAME);
 
       const isOwnInstanceId = singleInstanceCookie && singleInstanceCookie.appInstanceId === this.instanceId;
