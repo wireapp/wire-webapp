@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="3.6.17"></a>
+## [3.6.17](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@3.6.16...@wireapp/core@3.6.17) (2018-07-04)
+
+
+### Bug Fixes
+
+* **core:** Encode correct content with protobuf ([#796](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/796)) ([f5ef1ff](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/f5ef1ff))
+
+
+
+
 <a name="3.6.16"></a>
 ## [3.6.16](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@3.6.15...@wireapp/core@3.6.16) (2018-07-04)
 
