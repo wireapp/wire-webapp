@@ -91,8 +91,8 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
     this.permissionRepository = permissionRepository;
     this.logger = new z.util.Logger('z.media.MediaStreamHandler', z.config.LOGGER.OPTIONS);
 
-    this.calls = () => [];
-    this.joinedCall = () => undefined;
+    this.currentCalls = new Map();
+    this.joinedCall = ko.observable();
 
     this.constraintsHandler = this.mediaRepository.constraintsHandler;
     this.devicesHandler = this.mediaRepository.devicesHandler;
@@ -159,17 +159,9 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
       .updateCurrentDevices(videoSend)
       .then(() => this.constraintsHandler.getMediaStreamConstraints(true, videoSend, isGroup))
       .then(streamConstraints => this.requestMediaStream(mediaType, streamConstraints))
-      .then(mediaStreamInfo => {
-        this.selfStreamState.videoSend(videoSend);
-        if (videoSend) {
-          this.localMediaType(z.media.MediaType.VIDEO);
-        }
-        return this._initiateMediaStreamSuccess(mediaStreamInfo);
-      })
+      .then(mediaStreamInfo => this._initiateMediaStreamSuccess(conversationId, mediaStreamInfo))
       .catch(error => {
-        if (error.mediaType) {
-          this._initiateMediaStreamFailure(error, conversationId);
-        }
+        this._initiateMediaStreamFailure(error, conversationId);
 
         amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CALLING.FAILED_REQUESTING_MEDIA, {
           cause: error.name || error.message,
@@ -445,13 +437,26 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
    * Initial request for local MediaStream was successful.
    *
    * @private
+   * @param {string} conversationId - ID of conversation to initiate MediaStream for
    * @param {z.media.MediaStreamInfo} mediaStreamInfo - Type of requested MediaStream
    * @returns {undefined} No return value
    */
-  _initiateMediaStreamSuccess(mediaStreamInfo) {
+  _initiateMediaStreamSuccess(conversationId, mediaStreamInfo) {
     if (mediaStreamInfo) {
+      const conversationNeedsMedia = this.currentCalls.get(conversationId);
       const mediaStream = mediaStreamInfo.stream;
+
+      if (!conversationNeedsMedia) {
+        this.logger.debug('Releasing obsolete MediaStream as call has ended');
+        return this._releaseMediaStream(mediaStream);
+      }
+
       const mediaType = mediaStreamInfo.getType();
+      const isVideoSend = mediaType === z.media.MediaType.AUDIO_VIDEO;
+      this.selfStreamState.videoSend(isVideoSend);
+      if (isVideoSend) {
+        this.localMediaType(z.media.MediaType.VIDEO);
+      }
 
       const logMessage = `Received initial MediaStream containing '${mediaStream.getTracks().length}' tracks/s`;
       const logObject = {
@@ -477,10 +482,12 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
   _initiateMediaStreamFailure(error, conversationId) {
     const {type, mediaType} = error;
 
-    const isStreamDeviceError = type === z.media.MediaError.TYPE.MEDIA_STREAM_DEVICE;
-    return isStreamDeviceError
-      ? this._showDeviceNotFoundHint(mediaType, conversationId)
-      : this._showPermissionDeniedHint(mediaType);
+    if (mediaType) {
+      const isStreamDeviceError = type === z.media.MediaError.TYPE.MEDIA_STREAM_DEVICE;
+      return isStreamDeviceError
+        ? this._showDeviceNotFoundHint(mediaType, conversationId)
+        : this._showPermissionDeniedHint(mediaType);
+    }
   }
 
   /**
@@ -774,9 +781,8 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
    * @returns {boolean} Returns true if an active media stream is needed for at least one call
    */
   needsMediaStream() {
-    for (const callEntity of this.calls()) {
-      const hasPreJoinVideo = callEntity.isIncoming() && callEntity.isRemoteVideoCall();
-      if (!callEntity.isOngoingOnAnotherClient() && (callEntity.selfClientJoined() || hasPreJoinVideo)) {
+    for (const needsMediaStream of this.currentCalls) {
+      if (needsMediaStream) {
         return true;
       }
     }
@@ -956,5 +962,17 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
       const mediaStreamTracks = MediaStreamHandler.getMediaTracks(this.localMediaStream(), mediaType);
       mediaStreamTracks.forEach(mediaStreamTrack => (mediaStreamTrack.enabled = sendState));
     }
+  }
+
+  addCurrentCall(conversationId, needsMediaStream) {
+    this.currentCalls.set(conversationId, needsMediaStream);
+  }
+
+  clearCurrentCalls() {
+    this.currentCalls.clear();
+  }
+
+  setJoinedCall(callEntity) {
+    this.joinedCall(callEntity);
   }
 };

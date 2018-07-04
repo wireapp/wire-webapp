@@ -112,8 +112,17 @@ z.calling.CallingRepository = class CallingRepository {
    * @returns {undefined} No return value
    */
   shareCallStates() {
-    this.mediaRepository.streamHandler.calls = this.calls;
-    this.mediaRepository.streamHandler.joinedCall = this.joinedCall;
+    this.calls.subscribe(callEntities => {
+      this.mediaStreamHandler.clearCurrentCalls();
+      callEntities.forEach(callEntity => {
+        const hasPreJoinVideo = callEntity.isIncoming() && callEntity.isRemoteVideoCall();
+        const hasActiveCall = callEntity.selfClientJoined() || hasPreJoinVideo;
+        const needsMediaStream = hasActiveCall && !callEntity.isOngoingOnAnotherClient();
+        this.mediaStreamHandler.addCurrentCall(callEntity.id, needsMediaStream);
+      });
+    });
+
+    this.joinedCall.subscribe(joinedCallEntity => this.mediaStreamHandler.setJoinedCall(joinedCallEntity));
   }
 
   /**
