@@ -963,4 +963,16 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
       mediaStreamTracks.forEach(mediaStreamTrack => (mediaStreamTrack.enabled = sendState));
     }
   }
+
+  addCurrentCall(conversationId, needsMediaStream) {
+    this.currentCalls.set(conversationId, needsMediaStream);
+  }
+
+  clearCurrentCalls() {
+    this.currentCalls.clear();
+  }
+
+  setJoinedCall(callEntity) {
+    this.joinedCall(callEntity);
+  }
 };
