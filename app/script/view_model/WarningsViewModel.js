@@ -130,7 +130,7 @@ z.viewModel.WarningsViewModel = class WarningsViewModel {
 
       case WarningsViewModel.TYPE.REQUEST_NOTIFICATION: {
         // We block subsequent permission requests for notifications when the user ignores the request.
-        amplify.publish(z.event.WebApp.NOTIFICATION.PERMISSION_STATE, z.notification.PermissionStatusState.IGNORED);
+        amplify.publish(z.event.WebApp.NOTIFICATION.PERMISSION_STATE, z.notification.PermissionState.IGNORED);
         break;
       }
 
