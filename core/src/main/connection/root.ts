@@ -17,14 +17,6 @@
  *
  */
 
-import {PaymentInterval} from '../payment/';
+import ConnectionService from './ConnectionService';
 
-interface PaymentPlan {
-  amount: number;
-  custom: boolean;
-  id: 'wire_annual_plan' | 'wire_monthly_plan';
-  interval: PaymentInterval;
-  name: string;
-}
-
-export {PaymentPlan};
+export {ConnectionService};

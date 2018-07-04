@@ -17,14 +17,19 @@
  *
  */
 
-import {PaymentInterval} from '../payment/';
+const {ValidationUtil} = require('@wireapp/commons');
 
-interface PaymentPlan {
-  amount: number;
-  custom: boolean;
-  id: 'wire_annual_plan' | 'wire_monthly_plan';
-  interval: PaymentInterval;
-  name: string;
-}
+describe('ValidationUtil', () => {
+  describe('"isUUIDv4"', () => {
+    it('recognizes correct UUIDv4 strings', () => {
+      expect(ValidationUtil.isUUIDv4('22087638-0b00-4e0d-864d-37c08041a2cf')).toBe(true);
+      expect(ValidationUtil.isUUIDv4('c45bc829-f028-4550-a66b-1af2b2ac4801')).toBe(true);
+      expect(ValidationUtil.isUUIDv4('D45EDF1F-F1D6-4DC9-A560-84F6603A8CED')).toBe(true);
+    });
 
-export {PaymentPlan};
+    it('recognizes incorrect UUIDv4 strings', () => {
+      expect(ValidationUtil.isUUIDv4('d76259eb-25e1-46d-b170-bfcee91a2733')).toBe(false);
+      expect(ValidationUtil.isUUIDv4('d76259eb')).toBe(false);
+    });
+  });
+});

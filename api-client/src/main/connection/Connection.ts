@@ -17,12 +17,14 @@
  *
  */
 
+import {ConnectionStatus} from '../connection/';
+
 interface Connection {
   conversation?: string;
   from: string;
   last_update: string;
   message?: string;
-  status: 'accepted' | 'blocked' | 'cancelled' | 'ignored' | 'pending' | 'sent';
+  status: ConnectionStatus;
   to: string;
 }
 

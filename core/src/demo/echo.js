@@ -116,6 +116,15 @@ const {MemoryEngine} = require('@wireapp/store-engine/dist/commonjs/engine');
     logger.log(`Hidden message "${messageId}" in "${conversationId}" by "${from}".`, data);
   });
 
+  account.on(Account.INCOMING.CONNECTION, async data => {
+    const {
+      connection: {conversation: conversationId, to: connectingUserId},
+      user: {name: connectingUser},
+    } = data;
+    logger.log(`Connection request from "${connectingUser}" in "${conversationId}".`);
+    await account.service.connection.acceptConnection(connectingUserId);
+  });
+
   try {
     logger.log('Logging in ...');
     await account.login(login);

@@ -21,5 +21,6 @@ import * as CommonConfig from './config/CommonConfig';
 import * as RandomUtil from './util/RandomUtil';
 import * as StringUtil from './util/StringUtil';
 import * as UrlUtil from './util/UrlUtil';
+import * as ValidationUtil from './util/ValidationUtil';
 
-export {RandomUtil, StringUtil, UrlUtil, CommonConfig};
+export {RandomUtil, StringUtil, UrlUtil, CommonConfig, ValidationUtil};

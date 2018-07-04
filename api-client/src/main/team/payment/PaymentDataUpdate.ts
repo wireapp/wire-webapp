@@ -17,8 +17,10 @@
  *
  */
 
+import {PaymentInterval} from '../payment/';
+
 interface PaymentDataUpdate {
-  interval?: 'day' | 'week' | 'month' | 'year';
+  interval?: PaymentInterval;
   source?: string;
 }
 

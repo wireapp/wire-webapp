@@ -17,6 +17,11 @@
  *
  */
 
+import {AudioPreference} from '../audio/';
+import {RegisteredClient} from '../client/';
+import {Connection} from '../connection/';
+import {NotificationPreference} from '../notification/';
+import {Self} from '../self/';
 import {BackendEvent} from './BackendEvent';
 
 enum USER_EVENT {
@@ -25,6 +30,7 @@ enum USER_EVENT {
   CLIENT_REMOVE = 'user.client-remove',
   CONNECTION = 'user.connection',
   DELETE = 'user.delete',
+  PROPERTIES_SET = 'user.properties-set',
   UPDATE = 'user.update',
 }
 
@@ -34,22 +40,56 @@ interface UserEvent extends BackendEvent {
 
 interface UserActivateEvent extends UserEvent {
   type: USER_EVENT.ACTIVATE;
+  user: Self;
 }
 
 interface UserClientAddEvent extends UserEvent {
+  client: RegisteredClient;
   type: USER_EVENT.CLIENT_ADD;
 }
 
 interface UserClientRemoveEvent extends UserEvent {
+  client: {
+    id: string;
+  };
   type: USER_EVENT.CLIENT_REMOVE;
 }
 
 interface UserConnectionEvent extends UserEvent {
+  connection: Connection;
+  user: {
+    name: string;
+  };
   type: USER_EVENT.CONNECTION;
 }
 
 interface UserDeleteEvent extends UserEvent {
   type: USER_EVENT.DELETE;
+}
+
+interface UserPropertiesSetEvent extends UserEvent {
+  value: {
+    contact_import: Object;
+    enable_debugging: boolean;
+    settings: {
+      emoji: {
+        replace_inline: boolean;
+      };
+      notifications: NotificationPreference;
+      previews: {
+        send: boolean;
+      };
+      privacy: {
+        improve_wire: boolean;
+      };
+      sound: {
+        alerts: AudioPreference;
+      };
+    };
+    version: number;
+  };
+  key: 'webapp';
+  type: USER_EVENT.PROPERTIES_SET;
 }
 
 interface UserUpdateEvent extends UserEvent {
@@ -58,11 +98,12 @@ interface UserUpdateEvent extends UserEvent {
 
 export {
   USER_EVENT,
-  UserEvent,
   UserActivateEvent,
   UserClientAddEvent,
   UserClientRemoveEvent,
   UserConnectionEvent,
   UserDeleteEvent,
+  UserEvent,
+  UserPropertiesSetEvent,
   UserUpdateEvent,
 };

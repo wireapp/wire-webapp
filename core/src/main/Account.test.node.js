@@ -25,12 +25,12 @@ const {ConversationAPI} = require('@wireapp/api-client/dist/commonjs/conversatio
 const {MemoryEngine} = require('@wireapp/store-engine');
 const {NotificationAPI} = require('@wireapp/api-client/dist/commonjs/notification/');
 const {StatusCode} = require('@wireapp/api-client/dist/commonjs/http/');
+const {ValidationUtil} = require('@wireapp/commons');
 const APIClient = require('@wireapp/api-client');
 const nock = require('nock');
 
 const BASE_URL = 'mock-backend.wire.com';
 const BASE_URL_HTTPS = `https://${BASE_URL}`;
-const UUID4_REGEX = /(\w{8}(-\w{4}){3}-\w{12}?)/;
 
 describe('Account', () => {
   describe('"init"', () => {
@@ -137,7 +137,7 @@ describe('Account', () => {
       });
 
       expect(clientId).toBe(CLIENT_ID);
-      expect(userId).toMatch(UUID4_REGEX);
+      expect(ValidationUtil.isUUIDv4(userId)).toBe(true);
       expect(clientType).toBe(ClientType.TEMPORARY);
 
       done();

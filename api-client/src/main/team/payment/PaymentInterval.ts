@@ -17,14 +17,11 @@
  *
  */
 
-import {PaymentInterval} from '../payment/';
-
-interface PaymentPlan {
-  amount: number;
-  custom: boolean;
-  id: 'wire_annual_plan' | 'wire_monthly_plan';
-  interval: PaymentInterval;
-  name: string;
+enum PaymentInterval {
+  DAY = 'day',
+  WEEK = 'week',
+  MONTH = 'month',
+  YEAR = 'year',
 }
 
-export {PaymentPlan};
+export {PaymentInterval};

@@ -19,5 +19,6 @@
 
 export * from './BackendEvent';
 export * from './ConversationEvent';
+export * from './IncomingEvent';
 export * from './TeamEvent';
 export * from './UserEvent';

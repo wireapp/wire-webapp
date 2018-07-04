@@ -17,12 +17,12 @@
  *
  */
 
-import {ConversationEvent} from '../event/ConversationEvent';
+import {IncomingEvent} from '../event/';
 
 interface IncomingNotification {
-  payload: ConversationEvent[];
   id: string;
-  transient: boolean;
+  payload: IncomingEvent[];
+  transient?: boolean;
 }
 
 export {IncomingNotification};

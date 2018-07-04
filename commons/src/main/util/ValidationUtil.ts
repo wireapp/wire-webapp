@@ -17,14 +17,7 @@
  *
  */
 
-import {PaymentInterval} from '../payment/';
-
-interface PaymentPlan {
-  amount: number;
-  custom: boolean;
-  id: 'wire_annual_plan' | 'wire_monthly_plan';
-  interval: PaymentInterval;
-  name: string;
+export function isUUIDv4(candidate: string): boolean {
+  const uuidv4Regex = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/;
+  return uuidv4Regex.test(candidate.toLowerCase());
 }
-
-export {PaymentPlan};
