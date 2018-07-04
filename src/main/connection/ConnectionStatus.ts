@@ -17,14 +17,13 @@
  *
  */
 
-import {PaymentInterval} from '../payment/';
-
-interface PaymentPlan {
-  amount: number;
-  custom: boolean;
-  id: 'wire_annual_plan' | 'wire_monthly_plan';
-  interval: PaymentInterval;
-  name: string;
+enum ConnectionStatus {
+  ACCEPTED = 'accepted',
+  BLOCKED = 'blocked',
+  CANCELLED = 'cancelled',
+  IGNORED = 'ignored',
+  PENDING = 'pending',
+  SENT = 'sent',
 }
 
-export {PaymentPlan};
+export {ConnectionStatus};

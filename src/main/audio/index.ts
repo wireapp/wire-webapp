@@ -17,14 +17,4 @@
  *
  */
 
-import {PaymentInterval} from '../payment/';
-
-interface PaymentPlan {
-  amount: number;
-  custom: boolean;
-  id: 'wire_annual_plan' | 'wire_monthly_plan';
-  interval: PaymentInterval;
-  name: string;
-}
-
-export {PaymentPlan};
+export * from './AudioPreference';

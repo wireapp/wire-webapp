@@ -22,6 +22,7 @@ export * from './PaymentAPI';
 export * from './PaymentBillingData';
 export * from './PaymentData';
 export * from './PaymentDataUpdate';
+export * from './PaymentInterval';
 export * from './PaymentPlan';
 export * from './PaymentStripeCharge';
 export * from './PaymentStripeInvoice';

@@ -108,14 +108,15 @@ class ConnectionAPI {
   /**
    * Update a connection.
    * Note: You can have no more than 1000 connections in accepted or sent state.
+   * @param userId The ID of the other user
    * @param updatedConnection: The updated connection
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/updateConnection
    */
-  public putConnection(updatedConnection: ConnectionUpdate): Promise<Connection> {
+  public putConnection(userId: string, updatedConnection: ConnectionUpdate): Promise<Connection> {
     const config: AxiosRequestConfig = {
       data: updatedConnection,
       method: 'put',
-      url: ConnectionAPI.URL.CONNECTIONS,
+      url: `${ConnectionAPI.URL.CONNECTIONS}/${userId}`,
     };
 
     return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);

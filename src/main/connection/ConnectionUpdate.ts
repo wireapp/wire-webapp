@@ -17,8 +17,10 @@
  *
  */
 
+import {ConnectionStatus} from '../connection/';
+
 interface ConnectionUpdate {
-  status: 'accepted' | 'blocked' | 'cancelled' | 'ignored' | 'pending' | 'sent';
+  status: ConnectionStatus;
 }
 
 export {ConnectionUpdate};

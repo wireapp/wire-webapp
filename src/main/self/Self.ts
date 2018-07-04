@@ -17,7 +17,8 @@
  *
  */
 
-import {UserAsset} from '../user';
+import {Picture} from '../self/';
+import {UserAsset} from '../user/';
 
 interface Self {
   accent_id?: number;
@@ -29,6 +30,7 @@ interface Self {
   id: string;
   locale: string;
   name: string;
+  picture?: Picture[];
   phone?: string;
   team?: string;
 }

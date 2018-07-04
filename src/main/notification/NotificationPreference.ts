@@ -17,14 +17,11 @@
  *
  */
 
-import {PaymentInterval} from '../payment/';
-
-interface PaymentPlan {
-  amount: number;
-  custom: boolean;
-  id: 'wire_annual_plan' | 'wire_monthly_plan';
-  interval: PaymentInterval;
-  name: string;
+enum NotificationPreference {
+  NONE = 'none',
+  OBFUSCATE = 'obfuscate',
+  OBFUSCATE_MESSAGE = 'obfuscate-message',
+  ON = 'on',
 }
 
-export {PaymentPlan};
+export {NotificationPreference};

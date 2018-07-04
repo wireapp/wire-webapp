@@ -18,9 +18,10 @@
  */
 
 export * from './ChangePassword';
+export * from './Consent';
+export * from './ConsentType';
 export * from './Delete';
+export * from './Picture';
 export * from './SearchableStatus';
 export * from './Self';
 export * from './SelfAPI';
-export * from './Consent';
-export * from './ConsentType';
