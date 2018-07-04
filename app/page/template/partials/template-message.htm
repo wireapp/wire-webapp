@@ -100,8 +100,11 @@
             click: function(data, event) {$parents[1].show_detail(message, event)},
             css: {'bg-color-ephemeral': message.isObfuscated()},
             " data-uie-name="go-image-detail">
+            <!-- ko if: message.isObfuscated() -->
+              <div class="icon-library flex-center full-screen text-white"></div>
+            <!-- /ko -->
+            <img class="image-element" data-bind="attr: {src: asset.dummy_url}, css: {'image-ephemeral': message.isObfuscated()}"/>
             <!-- ko ifnot: message.isObfuscated() -->
-              <img class="image-element" data-bind="attr: {src: asset.dummy_url}"/>
               <span class="image-placeholder-icon">
                 <div class="three-dots">
                   <span></span>
@@ -109,10 +112,6 @@
                   <span></span>
                 </div>
               </span>
-            <!-- /ko -->
-            <!-- ko if: message.isObfuscated() -->
-              <div class="icon-library flex-center full-screen text-white"></div>
-              <img class="image-element image-ephemeral" data-bind="attr: {src: asset.dummy_url}"/>
             <!-- /ko -->
           </div>
         </div>
