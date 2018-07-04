@@ -31,6 +31,7 @@ import {Encoder} from 'bazinga64';
 import {
   AssetService,
   ClientActionType,
+  ConfirmationContent,
   ConfirmationType,
   GenericMessageType,
   ImageAssetContent,
@@ -40,6 +41,7 @@ import {
   PayloadBundleOutgoingUnsent,
   PayloadBundleState,
   RemoteData,
+  TextContent,
 } from '../conversation/root';
 import * as AssetCryptography from '../cryptography/AssetCryptography.node';
 import {CryptographyService, EncryptedAsset} from '../cryptography/root';
@@ -96,7 +98,7 @@ export default class ConversationService {
     payloadBundle: PayloadBundleOutgoingUnsent
   ): Promise<PayloadBundleOutgoing> {
     const confirmationMessage = this.protocolBuffers.Confirmation.create({
-      firstMessageId: payloadBundle.content,
+      firstMessageId: (payloadBundle.content as ConfirmationContent).confirmMessageId,
       type: ConfirmationType.DELIVERED,
     });
 
@@ -282,9 +284,12 @@ export default class ConversationService {
       messageTimer: this.messageTimer.getMessageTimer(conversationId),
       state: PayloadBundleState.OUTGOING_SENT,
     };
+
     let genericMessage = this.protocolBuffers.GenericMessage.create({
       messageId: payloadBundle.id,
-      [GenericMessageType.TEXT]: this.protocolBuffers.Text.create({content: payloadBundle.content}),
+      [GenericMessageType.TEXT]: this.protocolBuffers.Text.create({
+        content: (payloadBundle.content as TextContent).text,
+      }),
     });
 
     const expireAfterMillis = this.messageTimer.getMessageTimer(conversationId);
