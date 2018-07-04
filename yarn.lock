@@ -503,9 +503,9 @@
     "@webassemblyjs/wast-parser" "1.5.12"
     long "^3.2.0"
 
-"@wireapp/api-client@1.5.6":
-  version "1.5.6"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-1.5.6.tgz#5379702a8eedfe9d9eea68b44f787f836c5c7760"
+"@wireapp/api-client@1.5.7":
+  version "1.5.7"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-1.5.7.tgz#1cf4f54c92cb47a81b55e9db806b411a70839ccf"
   dependencies:
     "@types/node" "10.5.1"
     "@types/spark-md5" "3.0.0"
@@ -523,12 +523,12 @@
   version "3.0.56"
   resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-3.0.56.tgz#5e5d20e5848d02f8fff5fdc2c86d2e0ecc510540"
 
-"@wireapp/core@3.6.12":
-  version "3.6.12"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-3.6.12.tgz#5509fcfdda61f06daa2a885dcaeef86e4a873b34"
+"@wireapp/core@3.6.13":
+  version "3.6.13"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-3.6.13.tgz#8c474deded7bc2b233c2becafe8ce82f976f0ba5"
   dependencies:
     "@types/node" "10.5.1"
-    "@wireapp/api-client" "1.5.6"
+    "@wireapp/api-client" "1.5.7"
     "@wireapp/cryptobox" "8.5.7"
     "@wireapp/store-engine" "0.11.39"
     bazinga64 "5.2.8"
@@ -2503,13 +2503,17 @@ commander@2.6.0:
   version "2.6.0"
   resolved "https://registry.yarnpkg.com/commander/-/commander-2.6.0.tgz#9df7e52fb2a0cb0fb89058ee80c3104225f37e1d"
 
-commander@^2.14.1, commander@^2.15.1, commander@^2.9.0, commander@~2.15.0:
+commander@^2.14.1, commander@^2.15.1, commander@^2.9.0:
   version "2.15.1"
   resolved "https://registry.yarnpkg.com/commander/-/commander-2.15.1.tgz#df46e867d0fc2aec66a34662b406a9ccafff5b0f"
 
 commander@~2.13.0:
   version "2.13.0"
   resolved "https://registry.yarnpkg.com/commander/-/commander-2.13.0.tgz#6964bca67685df7c1f1430c584f07d7597885b9c"
+
+commander@~2.16.0:
+  version "2.16.0"
+  resolved "https://registry.yarnpkg.com/commander/-/commander-2.16.0.tgz#f16390593996ceb4f3eeb020b31d78528f7f8a50"
 
 comment-parser@^0.4.2:
   version "0.4.2"
@@ -9458,9 +9462,9 @@ simple-swizzle@^0.2.2:
   dependencies:
     is-arrayish "^0.3.1"
 
-sinon@6.0.1:
-  version "6.0.1"
-  resolved "https://registry.yarnpkg.com/sinon/-/sinon-6.0.1.tgz#4247b97dd8fecbe1e19f8b816a5e7eed3993bcfe"
+sinon@6.1.0:
+  version "6.1.0"
+  resolved "https://registry.yarnpkg.com/sinon/-/sinon-6.1.0.tgz#9ee3d3900616333078464aa3969ba5688456fea3"
   dependencies:
     "@sinonjs/formatio" "^2.0.0"
     diff "^3.5.0"
@@ -10464,11 +10468,11 @@ uglify-es@^3.3.4:
     commander "~2.13.0"
     source-map "~0.6.1"
 
-uglify-js@3.4.2:
-  version "3.4.2"
-  resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-3.4.2.tgz#70511a390eb62423675ba63c374ba1abf045116c"
+uglify-js@3.4.3:
+  version "3.4.3"
+  resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-3.4.3.tgz#a4fd757b6f34a95f717f7a7a0dccafcaaa60cf7f"
   dependencies:
-    commander "~2.15.0"
+    commander "~2.16.0"
     source-map "~0.6.1"
 
 uglify-js@^2.6:
