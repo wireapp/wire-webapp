@@ -48,6 +48,10 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
    * @returns {Array} MediaStreamTracks
    */
   static getMediaTracks(mediaStream, mediaType = z.media.MediaType.AUDIO_VIDEO) {
+    if (!mediaStream) {
+      throw new z.media.MediaError(z.media.MediaError.TYPE.STREAM_NOT_FOUND);
+    }
+
     switch (mediaType) {
       case z.media.MediaType.AUDIO: {
         return mediaStream.getAudioTracks();
@@ -218,9 +222,14 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
     const replaceMediaTracksLocally = newMediaStreamInfo => {
       const mediaStream = newMediaStreamInfo.stream;
       const mediaType = newMediaStreamInfo.getType();
+      const localMediaStream = this.localMediaStream();
 
-      this._releaseTracksFromStream(this.localMediaStream(), mediaType);
-      this._addTracksToStream(mediaStream, this.localMediaStream(), mediaType);
+      if (localMediaStream) {
+        this._releaseTracksFromStream(localMediaStream, mediaType);
+        this._addTracksToStream(mediaStream, localMediaStream, mediaType);
+      } else {
+        this.localMediaStream(mediaStream);
+      }
     };
 
     return replace ? replaceMediaStreamLocally(mediaStreamInfo) : replaceMediaTracksLocally(mediaStreamInfo);
