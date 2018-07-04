@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="3.6.16"></a>
+## [3.6.16](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@3.6.15...@wireapp/core@3.6.16) (2018-07-04)
+
+
+### Bug Fixes
+
+* **core:** Emit hide messages ([#795](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/795)) ([96df1c8](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/96df1c8))
+
+
+
+
 <a name="3.6.15"></a>
 ## [3.6.15](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@3.6.14...@wireapp/core@3.6.15) (2018-07-03)
 
