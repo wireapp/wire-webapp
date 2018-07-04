@@ -38,8 +38,9 @@ z.main.SingleInstanceHandler = (() => {
       };
     }
 
-    constructor(instanceId) {
-      this.instanceId = instanceId;
+    constructor() {
+      this.instanceId = undefined;
+      this.instanceRegistered = false;
     }
 
     /**
@@ -47,30 +48,42 @@ z.main.SingleInstanceHandler = (() => {
      * returns true if the instance has been registered successfully
      * returns false if the app is already running in another instance
      *
+     * @param {string} instanceId - the instance id to register
      * @returns {boolean} - has the app being registered successfully
      */
-    registerInstance() {
-      if (!this.instanceId) {
-        throw new Error('No instance id provided');
-      }
+    registerInstance(instanceId) {
+      this.instanceId = instanceId;
       const cookieName = SingleInstanceHandler.CONFIG.TABS_CHECK.COOKIE_NAME;
       if (!!Cookies.get(cookieName)) {
         return false;
       }
+      this.instanceRegistered = true;
       Cookies.set(cookieName, {appInstanceId: this.instanceId});
       this._startSingleInstanceCheck();
       return true;
     }
 
-    deregisterInstance() {
+    /**
+     * Removes the cookie that keeps track of the running instance
+     *
+     * @param {boolean} forceRemoval - do not check that the instance removing it is the current instance
+     * @returns {void} - returns nothing
+     */
+    deregisterInstance(forceRemoval = false) {
       const singleInstanceCookie = Cookies.getJSON(SingleInstanceHandler.CONFIG.TABS_CHECK.COOKIE_NAME);
 
       const isOwnInstanceId = singleInstanceCookie && singleInstanceCookie.appInstanceId === this.instanceId;
-      if (isOwnInstanceId) {
+      if (forceRemoval || isOwnInstanceId) {
         Cookies.remove(SingleInstanceHandler.CONFIG.TABS_CHECK.COOKIE_NAME);
       }
     }
 
+    /**
+     * Adds a listener that will be called whenever another instance boots
+     *
+     * @param {Function} listener - a listener to be executed
+     * @returns {void} - returns nothing
+     */
     addExtraInstanceStartedListener(listener) {
       instanceListeners.push(listener);
       if (instanceListeners.length === 1) {
@@ -78,12 +91,35 @@ z.main.SingleInstanceHandler = (() => {
       }
     }
 
+    /**
+     * Removes a listener that would have been called whenever another instance boots
+     *
+     * @param {Function} listener - a listener to be removed
+     * @returns {void} - returns nothing
+     */
     removeExtraInstanceStartedListener(listener) {
       const index = instanceListeners.indexOf(listener);
       instanceListeners.splice(index, 1);
       if (instanceListeners.length === 0) {
         this._stopSingleInstanceCheck();
       }
+    }
+
+    /**
+     * Returns true if another instance is running.
+     * Does not check for the id of the running instance and thus cannot be
+     * invoked once the registering of the current instance has been done.
+     *
+     * @param {Function} listener - a listener to be removed
+     * @throws {Error} if the current app has already been registered
+     * @returns {void} - returns nothing
+     */
+    hasOtherRunningInstance() {
+      if (this.instanceRegistered) {
+        throw new Error('Current instance has been registered, cannot check other running instances');
+      }
+
+      return !!Cookies.get(SingleInstanceHandler.CONFIG.TABS_CHECK.COOKIE_NAME);
     }
 
     _isSingleRunningInstance() {

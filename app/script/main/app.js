@@ -63,7 +63,7 @@ z.main.App = class App {
 
     this.instanceId = z.util.createRandomUuid();
 
-    this.singleInstanceHandler = new z.main.SingleInstanceHandler(this.instanceId);
+    this.singleInstanceHandler = new z.main.SingleInstanceHandler();
     this._onExtraInstanceStarted = this._onExtraInstanceStarted.bind(this);
     this.singleInstanceHandler.addExtraInstanceStartedListener(this._onExtraInstanceStarted);
 
@@ -560,7 +560,7 @@ z.main.App = class App {
    * @returns {Promise} Resolves when page is the first tab
    */
   _registerSingleInstance() {
-    if (this.singleInstanceHandler.registerInstance()) {
+    if (this.singleInstanceHandler.registerInstance(this.instanceId)) {
       this._registerSingleInstanceCleaning();
       return Promise.resolve();
     }
