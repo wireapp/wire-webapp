@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="1.6.0"></a>
+# [1.6.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@1.5.7...@wireapp/api-client@1.6.0) (2018-07-04)
+
+
+### Features
+
+* **core:** Send and receive connection requests ([#798](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/798)) ([cd118e8](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/cd118e8))
+
+
+
+
 <a name="1.5.7"></a>
 ## [1.5.7](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@1.5.6...@wireapp/api-client@1.5.7) (2018-07-03)
 
