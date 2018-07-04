@@ -79,8 +79,20 @@ describe('Account', () => {
   beforeAll(async done => {
     if (CAN_RUN) {
       logger.info('Running smoke tests for @wireapp/core ...');
-      alice = await getAccount(process.env.ALICE_EMAIL, process.env.ALICE_PASSWORD);
-      bob = await getAccount(process.env.BOB_EMAIL, process.env.BOB_PASSWORD);
+
+      try {
+        alice = await getAccount(process.env.ALICE_EMAIL, process.env.ALICE_PASSWORD);
+      } catch (error) {
+        logger.error(`Cannot login with email "${process.env.ALICE_EMAIL}". Aborting test.`);
+        return done.fail(error);
+      }
+
+      try {
+        bob = await getAccount(process.env.BOB_EMAIL, process.env.BOB_PASSWORD);
+      } catch (error) {
+        logger.error(`Cannot login with email "${process.env.ALICE_EMAIL}". Aborting test.`);
+        return done.fail(error);
+      }
     }
     done();
   });
