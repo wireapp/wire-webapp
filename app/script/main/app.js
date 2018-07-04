@@ -41,10 +41,6 @@ z.main.App = class App {
           z.auth.SIGN_OUT_REASON.USER_REQUESTED,
         ],
       },
-      TABS_CHECK: {
-        COOKIE_NAME: 'app_opened',
-        INTERVAL: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND,
-      },
     };
   }
 
@@ -66,6 +62,10 @@ z.main.App = class App {
     this.util = this._setup_utils();
 
     this.instanceId = z.util.createRandomUuid();
+
+    this.singleInstanceHandler = new z.main.SingleInstanceHandler(this.instanceId);
+    this._onExtraInstanceStarted = this._onExtraInstanceStarted.bind(this);
+    this.singleInstanceHandler.addExtraInstanceStartedListener(this._onExtraInstanceStarted);
 
     this._subscribeToEvents();
 
@@ -249,7 +249,7 @@ z.main.App = class App {
   initApp(isReload = this._isReload()) {
     z.util
       .checkIndexedDb()
-      .then(() => this._checkSingleInstanceOnInit())
+      .then(() => this._registerSingleInstance())
       .then(() => this._loadAccessToken())
       .then(() => {
         this.view.loading.updateProgress(2.5);
@@ -559,49 +559,18 @@ z.main.App = class App {
    * Check that this is the single instance tab of the app.
    * @returns {Promise} Resolves when page is the first tab
    */
-  _checkSingleInstanceOnInit() {
-    if (!z.util.Environment.electron) {
-      return this._setSingleInstanceCookie();
+  _registerSingleInstance() {
+    if (this.singleInstanceHandler.registerInstance()) {
+      this._registerSingleInstanceCleaning();
+      return Promise.resolve();
     }
-
-    return Promise.resolve();
+    return Promise.reject(new Error('App already running in another instance'));
   }
 
-  _checkSingleInstanceOnInterval() {
-    const singleInstanceCookie = Cookies.getJSON(App.CONFIG.TABS_CHECK.COOKIE_NAME);
-
-    const isRunningInstance = singleInstanceCookie && singleInstanceCookie.appInstanceId === this.instanceId;
-    if (!isRunningInstance) {
-      return this._redirectToLogin(z.auth.SIGN_OUT_REASON.MULTIPLE_TABS);
-    }
-  }
-
-  /**
-   * Set the cookie to verify we are running a single instace tab.
-   * @returns {undefined} No return value
-   */
-  _setSingleInstanceCookie() {
-    const shouldBlockTab = !!Cookies.get(App.CONFIG.TABS_CHECK.COOKIE_NAME);
-    if (shouldBlockTab) {
-      return Promise.reject(new z.auth.AuthError(z.auth.AuthError.TYPE.MULTIPLE_TABS));
-    }
-
-    const cookieData = {appInstanceId: this.instanceId};
-    Cookies.set(App.CONFIG.TABS_CHECK.COOKIE_NAME, cookieData);
-
-    const intervalId = window.setInterval(() => this._checkSingleInstanceOnInterval(), App.CONFIG.TABS_CHECK.INTERVAL);
-    this._registerSingleInstanceCookieDeletion(intervalId);
-  }
-
-  _registerSingleInstanceCookieDeletion(singleInstanceCheckIntervalId) {
+  _registerSingleInstanceCleaning(singleInstanceCheckIntervalId) {
     $(window).on('beforeunload', () => {
-      window.clearInterval(singleInstanceCheckIntervalId);
-      const singleInstanceCookie = Cookies.getJSON(App.CONFIG.TABS_CHECK.COOKIE_NAME);
-
-      const isOwnInstanceId = singleInstanceCookie && singleInstanceCookie.appInstanceId === this.instanceId;
-      if (isOwnInstanceId) {
-        Cookies.remove(App.CONFIG.TABS_CHECK.COOKIE_NAME);
-      }
+      this.singleInstanceHandler.removeExtraInstanceStartedListener(this._onExtraInstanceStarted);
+      this.singleInstanceHandler.deregisterInstance();
     });
   }
 
@@ -850,6 +819,10 @@ z.main.App = class App {
     liveReload.src = 'http://localhost:32123/livereload.js';
     document.body.appendChild(liveReload);
     $('html').addClass('development');
+  }
+
+  _onExtraInstanceStarted() {
+    return this._redirectToLogin(z.auth.SIGN_OUT_REASON.MULTIPLE_TABS);
   }
 };
 
