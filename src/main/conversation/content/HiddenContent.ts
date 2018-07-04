@@ -17,6 +17,7 @@
  *
  */
 interface HiddenContent {
+  conversationId: string;
   originalMessageId: string;
 }
 
