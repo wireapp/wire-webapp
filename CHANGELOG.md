@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="3.6.18"></a>
+## [3.6.18](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@3.6.17...@wireapp/core@3.6.18) (2018-07-04)
+
+
+### Bug Fixes
+
+* **core:** Add conversationId field to HiddenContent ([#797](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/797)) ([21d5508](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/21d5508))
+
+
+
+
 <a name="3.6.17"></a>
 ## [3.6.17](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@3.6.16...@wireapp/core@3.6.17) (2018-07-04)
 
