@@ -87,8 +87,7 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
 
         const participantCount = this.userParticipants().length;
         if (participantCount > ConversationDetailsViewModel.CONFIG.MAX_USERS_VISIBLE) {
-          const removeCount = participantCount - ConversationDetailsViewModel.CONFIG.REDUCED_USERS_COUNT;
-          this.userParticipants.splice(5, removeCount);
+          this.userParticipants.splice(ConversationDetailsViewModel.CONFIG.REDUCED_USERS_COUNT);
           this.showAllUsersCount(participantCount);
         } else {
           this.showAllUsersCount(0);
