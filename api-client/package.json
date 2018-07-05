@@ -20,7 +20,7 @@
   "devDependencies": {
     "@wireapp/react-ui-kit": "1.5.3",
     "babel-core": "6.26.3",
-    "babel-loader": "7.1.4",
+    "babel-loader": "7.1.5",
     "babel-preset-react": "6.24.1",
     "browser-sync": "2.24.5",
     "concurrently": "3.6.0",
