@@ -27,10 +27,10 @@ z.viewModel.panel.ConversationParticipantsViewModel = class ConversationParticip
   constructor(panelViewModel, repositories) {
     this.panelViewModel = panelViewModel;
     this.isVisible = this.panelViewModel.conversationParticipantsVisible;
-    const conversationEntity = repositories.conversation.active_conversation;
+    const activeConversation = repositories.conversation.active_conversation;
     this.participants = ko.pureComputed(() => {
-      if (conversationEntity()) {
-        return conversationEntity()
+      if (activeConversation()) {
+        return activeConversation()
           .participating_user_ets()
           .filter(userEntity => !userEntity.isBot);
       }
