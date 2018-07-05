@@ -89,9 +89,8 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
         const exceedsMaxUserCount = userCount > ConversationDetailsViewModel.CONFIG.MAX_USERS_VISIBLE;
         if (exceedsMaxUserCount) {
           this.userParticipants.splice(ConversationDetailsViewModel.CONFIG.REDUCED_USERS_COUNT);
-        } else {
-          this.showAllUsersCount(exceedsMaxUserCount ? userCount : 0);
         }
+        this.showAllUsersCount(exceedsMaxUserCount ? userCount : 0);
       }
     });
 
