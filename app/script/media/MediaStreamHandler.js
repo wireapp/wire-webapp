@@ -983,7 +983,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
 
   updateCurrentCalls(callEntities) {
     this.currentCalls.clear();
-    callEntities.forEach(callEntity => this.currentCalls(callEntity.id, callEntity));
+    callEntities.forEach(callEntity => this.currentCalls.set(callEntity.id, callEntity));
   }
 
   setJoinedCall(callEntity) {
