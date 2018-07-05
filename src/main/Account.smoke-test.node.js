@@ -94,6 +94,7 @@ describe('Account', () => {
         return done.fail(error);
       }
     }
+    logger.warn('Skipping smoke tests because environment variables are not set.');
     done();
   });
 
@@ -108,7 +109,6 @@ describe('Account', () => {
 
     it('can send and receive messages', async done => {
       if (!CAN_RUN) {
-        logger.warn('Skipping smoke tests because environment variables are not set.');
         return done();
       }
 
