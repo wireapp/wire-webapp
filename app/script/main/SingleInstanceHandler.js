@@ -40,11 +40,11 @@ z.main.SingleInstanceHandler = (() => {
 
     /**
      * Set the cookie to verify we are running a single instace tab.
-     * returns true if the instance has been registered successfully
-     * returns false if the app is already running in another instance
+     * Returns true if the instance has been registered successfully.
+     * Returns false if the app is already running in another instance.
      *
-     * @param {string} instanceId - the instance id to register
-     * @returns {boolean} - has the app being registered successfully
+     * @param {string} instanceId - The instance id to register.
+     * @returns {boolean} - Has the app being registered successfully.
      */
     registerInstance(instanceId) {
       this.instanceId = instanceId;
@@ -59,8 +59,8 @@ z.main.SingleInstanceHandler = (() => {
     /**
      * Removes the cookie that keeps track of the running instance.
      *
-     * @param {boolean} forceRemoval - do not check that the instance removing it is the current instance
-     * @returns {void} - returns nothing
+     * @param {boolean} forceRemoval - Do not check that the instance removing it is the current instance.
+     * @returns {void} - Returns nothing.
      */
     deregisterInstance(forceRemoval = false) {
       const singleInstanceCookie = Cookies.getJSON(CONFIG.COOKIE_NAME);
@@ -74,8 +74,8 @@ z.main.SingleInstanceHandler = (() => {
     /**
      * Adds a listener that will be called whenever another instance boots.
      *
-     * @param {Function} listener - a listener to be executed
-     * @returns {void} - returns nothing
+     * @param {Function} listener - A listener to be executed.
+     * @returns {void} - Returns nothing.
      */
     addExtraInstanceStartedListener(listener) {
       instanceListeners.push(listener);
@@ -87,8 +87,8 @@ z.main.SingleInstanceHandler = (() => {
     /**
      * Removes a listener that would have been called whenever another instance boots.
      *
-     * @param {Function} listener - a listener to be removed
-     * @returns {void} - returns nothing
+     * @param {Function} listener - A listener to be removed.
+     * @returns {void} - Returns nothing.
      */
     removeExtraInstanceStartedListener(listener) {
       const index = instanceListeners.indexOf(listener);
@@ -103,9 +103,9 @@ z.main.SingleInstanceHandler = (() => {
      * Does not check for the id of the running instance and thus cannot be
      * invoked once the registering of the current instance has been done.
      *
-     * @param {Function} listener - a listener to be removed
-     * @throws {Error} if the current app has already been registered
-     * @returns {void} - returns nothing
+     * @param {Function} listener - A listener to be removed.
+     * @throws {Error} - When the current app has already been registered.
+     * @returns {void} - Returns nothing.
      */
     hasOtherRunningInstance() {
       if (this.instanceId) {
