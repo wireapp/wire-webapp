@@ -277,7 +277,10 @@ class Account extends EventEmitter {
 
     if (genericMessage.content === GenericMessageType.EPHEMERAL) {
       const unwrappedMessage = this.mapGenericMessage(genericMessage.ephemeral, conversation, from);
-      unwrappedMessage.messageTimer = (genericMessage.ephemeral.expireAfterMillis as Long).toNumber();
+      const expireAfterMillis = genericMessage.ephemeral.expireAfterMillis;
+      unwrappedMessage.messageTimer = expireAfterMillis.toNumber
+        ? (expireAfterMillis as Long).toNumber()
+        : expireAfterMillis;
       return unwrappedMessage;
     } else {
       return this.mapGenericMessage(genericMessage, conversation, from);
