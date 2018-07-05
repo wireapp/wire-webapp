@@ -34,7 +34,7 @@
     "rimraf": "2.6.2",
     "run-sequence": "2.2.1",
     "typescript": "2.9.2",
-    "webpack": "4.15.0",
+    "webpack": "4.15.1",
     "webpack-cli": "3.0.8"
   },
   "files": [
