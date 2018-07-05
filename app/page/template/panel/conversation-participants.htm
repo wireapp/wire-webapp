@@ -5,8 +5,8 @@
             <div class="panel__header__title" data-bind="l10n_text: z.string.conversationParticipantsTitle"></div>
             <close-icon class="right-panel-close icon-button" data-bind="click: clickOnClose" data-uie-name="do-close"></close-icon>
         </div>
-        <div class="panel__content">
-            <user-input class="user-list-light" params="input: searchInput, placeholder: z.string.conversationParticipantsSearchPlaceholder"
+        <div class="panel__content conversation-participants__content">
+            <user-input class="user-list-light" params="input: searchInput, placeholder: z.string.conversationParticipantsSearchPlaceholder, focusDelay: z.motion.MotionDuration.MEDIUM"
                 spellcheck="false"></user-input>
             <div class="conversation-participants__list panel__content">
                 <div class="panel__content__scroll" data-bind="antiscroll: shouldUpdateScrollbar">
