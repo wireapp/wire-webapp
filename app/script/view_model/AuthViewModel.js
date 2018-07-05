@@ -76,6 +76,8 @@ z.viewModel.AuthViewModel = class AuthViewModel {
       this.client_repository
     );
 
+    this.singleInstanceHandler = new z.main.SingleInstanceHandler();
+
     this.notification_service = new z.event.NotificationService(this.auth.client, this.storageService);
     this.web_socket_service = new z.event.WebSocketService(this.auth.client);
     this.event_repository = new z.event.EventRepository(
@@ -353,8 +355,8 @@ z.viewModel.AuthViewModel = class AuthViewModel {
         this._setTabsCheckInterval();
       }
 
-      const hasTabsCheckCookie = !!Cookies.get(z.main.App.CONFIG.TABS_CHECK.COOKIE_NAME);
-      if (hasTabsCheckCookie) {
+      const otherInstanceRunning = this.singleInstanceHandler.hasOtherRunningInstance();
+      if (otherInstanceRunning) {
         const currentHash = this._get_hash();
 
         if (!this.previousHash) {
@@ -710,7 +712,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
   }
 
   clickOnHandover() {
-    Cookies.remove(z.main.App.CONFIG.TABS_CHECK.COOKIE_NAME);
+    this.singleInstanceHandler.deregisterInstance(true);
     this._checkSingleInstance();
   }
 
