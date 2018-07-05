@@ -65,7 +65,6 @@ z.main.App = class App {
 
     this.singleInstanceHandler = new z.main.SingleInstanceHandler();
     this._onExtraInstanceStarted = this._onExtraInstanceStarted.bind(this);
-    this.singleInstanceHandler.addExtraInstanceStartedListener(this._onExtraInstanceStarted);
 
     this._subscribeToEvents();
 
@@ -561,6 +560,7 @@ z.main.App = class App {
    */
   _registerSingleInstance() {
     if (this.singleInstanceHandler.registerInstance(this.instanceId)) {
+      this.singleInstanceHandler.addExtraInstanceStartedListener(this._onExtraInstanceStarted);
       this._registerSingleInstanceCleaning();
       return Promise.resolve();
     }
