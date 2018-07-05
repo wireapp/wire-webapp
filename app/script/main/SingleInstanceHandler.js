@@ -33,6 +33,13 @@ z.main.SingleInstanceHandler = (() => {
   };
 
   return class SingleInstanceHandler {
+    /**
+     * Class responsible for checking that only the current instance of the app is running.
+     *
+     * @param {function=} onOtherInstanceStarted - A callback to be called if another instance starts
+     *    If provided, will also run an interval that checks the instance integrity
+     * @returns {boolean} - Has the app being registered successfully.
+     */
     constructor(onOtherInstanceStarted) {
       this.instanceId = undefined;
       this.onOtherInstanceStarted = onOtherInstanceStarted;
