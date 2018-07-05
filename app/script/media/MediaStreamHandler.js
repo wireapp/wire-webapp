@@ -241,7 +241,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
    * @returns {Promise} Resolves when the input source has been replaced
    */
   replaceInputSource(mediaType) {
-    const isPreferenceChange = !this.needsMediaStream();
+    const isPreferenceChange = !this.mediaStreamInUse();
 
     let constraintsPromise;
     switch (mediaType) {
@@ -452,10 +452,11 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
    */
   _initiateMediaStreamSuccess(conversationId, mediaStreamInfo) {
     if (mediaStreamInfo) {
-      const conversationNeedsMedia = this.currentCalls.get(conversationId);
+      const callEntity = this.currentCalls.get(conversationId);
+      const callNeedsMediaStream = this._callNeedsMediaStream(callEntity);
       const mediaStream = mediaStreamInfo.stream;
 
-      if (!conversationNeedsMedia) {
+      if (!callNeedsMediaStream) {
         this.logger.debug('Releasing obsolete MediaStream as call has ended');
         return this._releaseMediaStream(mediaStream);
       }
@@ -569,7 +570,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
       })
       .catch(error => {
         const {message, name} = error;
-        this.logger.warn(`MediaStream request for '${mediaType}' failed: ${name} ${message}`);
+        this.logger.warn(`MediaStream request for '${mediaType}' failed: ${name} ${message}`, error);
         this._clearPermissionRequestHint(mediaType);
 
         if (z.media.MEDIA_STREAM_ERROR_TYPES.DEVICE.includes(name)) {
@@ -789,14 +790,21 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
    * Check for active calls that need a MediaStream.
    * @returns {boolean} Returns true if an active media stream is needed for at least one call
    */
-  needsMediaStream() {
-    for (const needsMediaStream of this.currentCalls) {
-      if (needsMediaStream) {
+  mediaStreamInUse() {
+    for (const callEntity of this.currentCalls.values()) {
+      const callNeedsMediaStream = this._callNeedsMediaStream(callEntity);
+      if (callNeedsMediaStream) {
         return true;
       }
     }
 
     return false;
+  }
+
+  _callNeedsMediaStream(callEntity) {
+    const hasPreJoinVideo = callEntity.isIncoming() && callEntity.isRemoteVideoCall();
+    const hasActiveCall = callEntity.selfClientJoined() || hasPreJoinVideo;
+    return hasActiveCall && !callEntity.isOngoingOnAnotherClient();
   }
 
   // Toggle the mute state of the microphone.
@@ -824,7 +832,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
 
   // Reset the MediaStream and states.
   resetMediaStream() {
-    if (!this.needsMediaStream()) {
+    if (!this.mediaStreamInUse()) {
       this.releaseMediaStream();
       this.resetSelfStates();
       this.mediaRepository.closeAudioContext();
@@ -973,12 +981,9 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
     }
   }
 
-  addCurrentCall(conversationId, needsMediaStream) {
-    this.currentCalls.set(conversationId, needsMediaStream);
-  }
-
-  clearCurrentCalls() {
+  updateCurrentCalls(callEntities) {
     this.currentCalls.clear();
+    callEntities.forEach(callEntity => this.currentCalls(callEntity.id, callEntity));
   }
 
   setJoinedCall(callEntity) {
