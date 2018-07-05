@@ -85,7 +85,7 @@ z.main.SingleInstanceHandler = (() => {
     }
 
     /**
-     * Removes a listener that would have been called whenever another instance boots
+     * Removes a listener that would have been called whenever another instance boots.
      *
      * @param {Function} listener - a listener to be removed
      * @returns {void} - returns nothing

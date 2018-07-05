@@ -564,7 +564,7 @@ z.main.App = class App {
       this._registerSingleInstanceCleaning();
       return Promise.resolve();
     }
-    return Promise.reject(new Error('App already running in another instance'));
+    return Promise.reject(new z.auth.AuthError(z.auth.AuthError.TYPE.MULTIPLE_TABS));
   }
 
   _registerSingleInstanceCleaning(singleInstanceCheckIntervalId) {
