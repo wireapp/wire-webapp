@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="3.7.2"></a>
+## [3.7.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@3.7.1...@wireapp/core@3.7.2) (2018-07-05)
+
+
+### Bug Fixes
+
+* **core:** Ephemeral timer type casting ([#801](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/801)) ([5441a88](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/5441a88))
+
+
+
+
 <a name="3.7.1"></a>
 ## [3.7.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@3.7.0...@wireapp/core@3.7.1) (2018-07-05)
 
