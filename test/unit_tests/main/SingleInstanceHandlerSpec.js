@@ -20,14 +20,9 @@
 // grunt test_init && grunt test_run:main/SingleInstanceHandler
 
 describe('z.main.SingleInstanceHandler', () => {
-  let singleInstanceHandler;
-
-  beforeEach(() => {
-    singleInstanceHandler = new z.main.SingleInstanceHandler();
-  });
-
   describe('registerInstance', () => {
     it('registers the current instance', () => {
+      const singleInstanceHandler = new z.main.SingleInstanceHandler();
       const instanceId = 'instance-id-12';
       spyOn(Cookies, 'get').and.returnValue(undefined);
       spyOn(Cookies, 'set').and.returnValue(undefined);
@@ -37,7 +32,20 @@ describe('z.main.SingleInstanceHandler', () => {
       expect(result).toBe(true);
     });
 
+    it('starts check interval when a callback was given', () => {
+      const singleInstanceHandler = new z.main.SingleInstanceHandler(() => {});
+      const instanceId = 'instance-id-12';
+      spyOn(window, 'setInterval').and.returnValue(12);
+      spyOn(Cookies, 'get').and.returnValue(undefined);
+      spyOn(Cookies, 'set').and.returnValue(undefined);
+
+      singleInstanceHandler.registerInstance(instanceId);
+
+      expect(window.setInterval).toHaveBeenCalled();
+    });
+
     it("doesn't register the current instance if instance already running", () => {
+      const singleInstanceHandler = new z.main.SingleInstanceHandler();
       spyOn(Cookies, 'get').and.returnValue(true);
       spyOn(Cookies, 'set').and.returnValue(undefined);
       const result = singleInstanceHandler.registerInstance('instance-id');
@@ -48,18 +56,23 @@ describe('z.main.SingleInstanceHandler', () => {
   });
 
   describe('deregisterInstance', () => {
-    it('deregister current instance if the instance id matches the registered instance', () => {
+    it('deregister current instance and stops interval if the instance id matches the registered instance', () => {
+      const singleInstanceHandler = new z.main.SingleInstanceHandler(() => {});
       const instanceId = 'instance-id-12';
       spyOn(Cookies, 'getJSON').and.returnValue({appInstanceId: instanceId});
       spyOn(Cookies, 'remove').and.returnValue(undefined);
-      singleInstanceHandler.instanceId = instanceId;
+      spyOn(window, 'clearInterval').and.returnValue(undefined);
+      spyOn(window, 'setInterval').and.returnValue(12);
 
+      singleInstanceHandler.registerInstance(instanceId);
       singleInstanceHandler.deregisterInstance();
 
       expect(Cookies.remove).toHaveBeenCalledWith('app_opened');
+      expect(window.clearInterval).toHaveBeenCalledWith(12);
     });
 
     it('does not deregister current instance if instance ids do not match', () => {
+      const singleInstanceHandler = new z.main.SingleInstanceHandler();
       const instanceId = 'instance-id-12';
       spyOn(Cookies, 'getJSON').and.returnValue({appInstanceId: 'other-instance-id'});
       spyOn(Cookies, 'remove').and.returnValue(undefined);
@@ -71,6 +84,7 @@ describe('z.main.SingleInstanceHandler', () => {
     });
 
     it('forces deregistration even if ids do not match', () => {
+      const singleInstanceHandler = new z.main.SingleInstanceHandler();
       const instanceId = 'instance-id-12';
       spyOn(Cookies, 'getJSON').and.returnValue({appInstanceId: 'other-instance-id'});
       spyOn(Cookies, 'remove').and.returnValue(undefined);
@@ -82,42 +96,8 @@ describe('z.main.SingleInstanceHandler', () => {
     });
   });
 
-  describe('addExtraInstanceStartedListener', () => {
-    it('starts and stops interval when listeners are added/removed', () => {
-      const noop = () => {};
-      const intervalId = 12;
-      spyOn(window, 'setInterval').and.returnValue(intervalId);
-      spyOn(window, 'clearInterval').and.returnValue(undefined);
-
-      singleInstanceHandler.addExtraInstanceStartedListener(noop);
-
-      expect(window.setInterval).toHaveBeenCalled();
-      expect(window.clearInterval.calls.any()).toBe(false);
-
-      singleInstanceHandler.removeExtraInstanceStartedListener(noop);
-      expect(window.clearInterval).toHaveBeenCalledWith(intervalId);
-    });
-
-    it('starts interval only once', () => {
-      const noop1 = () => {};
-      const noop2 = () => {};
-      spyOn(window, 'setInterval').and.returnValue(13);
-      spyOn(window, 'clearInterval').and.returnValue(undefined);
-
-      singleInstanceHandler.addExtraInstanceStartedListener(noop1);
-      singleInstanceHandler.addExtraInstanceStartedListener(noop2);
-
-      expect(window.setInterval.calls.count()).toBe(1);
-
-      singleInstanceHandler.removeExtraInstanceStartedListener(noop1);
-      expect(window.clearInterval.calls.any()).toBe(false);
-
-      singleInstanceHandler.removeExtraInstanceStartedListener(noop2);
-      expect(window.clearInterval).toHaveBeenCalledWith(13);
-    });
-  });
-
   describe('hasOtherRunningInstance', () => {
+    const singleInstanceHandler = new z.main.SingleInstanceHandler();
     it('returns false if the cookie is not set', () => {
       spyOn(Cookies, 'get').and.returnValue(undefined);
       const hasOtherInstance = singleInstanceHandler.hasOtherRunningInstance();
