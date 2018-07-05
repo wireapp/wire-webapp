@@ -24,6 +24,13 @@ window.z.viewModel = z.viewModel || {};
 window.z.viewModel.panel = z.viewModel.panel || {};
 
 z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewModel {
+  static get CONFIG() {
+    return {
+      MAX_USERS_VISIBLE: 7,
+      REDUCED_USERS_COUNT: 5,
+    };
+  }
+
   constructor(mainViewModel, panelViewModel, repositories) {
     this.clickOnShowService = this.clickOnShowService.bind(this);
     this.clickOnShowUser = this.clickOnShowUser.bind(this);
@@ -47,6 +54,7 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
 
     this.serviceParticipants = ko.observableArray();
     this.userParticipants = ko.observableArray();
+    this.showAllUsersCount = ko.observable(0);
 
     this.isVisible = ko.pureComputed(() => {
       return this.conversationEntity() && this.panelViewModel.conversationDetailsVisible();
@@ -76,6 +84,15 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
             }
             this.userParticipants.push(userEntity);
           });
+
+        const participantCount = this.userParticipants().length;
+        if (participantCount > ConversationDetailsViewModel.CONFIG.MAX_USERS_VISIBLE) {
+          const removeCount = participantCount - ConversationDetailsViewModel.CONFIG.REDUCED_USERS_COUNT;
+          this.userParticipants.splice(5, removeCount);
+          this.showAllUsersCount(participantCount);
+        } else {
+          this.showAllUsersCount(0);
+        }
       }
     });
 
@@ -173,6 +190,10 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
 
   clickOnAddParticipants() {
     this.panelViewModel.switchState(z.viewModel.PanelViewModel.STATE.ADD_PARTICIPANTS, false, true);
+  }
+
+  clickOnShowAll() {
+    this.panelViewModel.switchState(z.viewModel.PanelViewModel.STATE.CONVERSATION_PARTICIPANTS);
   }
 
   clickOnClose() {

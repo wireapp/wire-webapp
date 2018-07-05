@@ -28,6 +28,7 @@ z.viewModel.PanelViewModel = class PanelViewModel {
       ADD_PARTICIPANTS: 'PanelViewModel.STATE.ADD_PARTICIPANTS',
       ADD_SERVICE: 'PanelViewModel.STATE.ADD_SERVICE',
       CONVERSATION_DETAILS: 'PanelViewModel.STATE.CONVERSATION_DETAILS',
+      CONVERSATION_PARTICIPANTS: 'PanelViewModel.STATE.CONVERSATION_PARTICIPANTS',
       GROUP_PARTICIPANT_SERVICE: 'PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE',
       GROUP_PARTICIPANT_USER: 'PanelViewModel.STATE.GROUP_PARTICIPANT_USER',
       GUEST_OPTIONS: 'PanelViewModel.STATE.GUEST_OPTIONS',
@@ -81,7 +82,9 @@ z.viewModel.PanelViewModel = class PanelViewModel {
       return this._isStateVisible(PanelViewModel.STATE.PARTICIPANT_DEVICES);
     });
     this.timedMessagesVisible = ko.pureComputed(() => this._isStateVisible(PanelViewModel.STATE.TIMED_MESSAGES));
-
+    this.conversationParticipantsVisible = ko.pureComputed(() =>
+      this._isStateVisible(PanelViewModel.STATE.CONVERSATION_PARTICIPANTS)
+    );
     this.isGuestRoom = ko.pureComputed(() => this.conversationEntity() && this.conversationEntity().isGuestRoom());
     this.isTeamOnly = ko.pureComputed(() => this.conversationEntity() && this.conversationEntity().isTeamOnly());
 
@@ -110,6 +113,7 @@ z.viewModel.PanelViewModel = class PanelViewModel {
       repositories
     );
     this.guestOptions = new z.viewModel.panel.GuestOptionsViewModel(mainViewModel, this, repositories);
+    this.conversationParticipants = new z.viewModel.panel.ConversationParticipantsViewModel(this, repositories);
     this.participantDevices = new z.viewModel.panel.ParticipantDevicesViewModel(mainViewModel, this, repositories);
     this.timedMessages = new z.viewModel.panel.TimedMessagesViewModel(mainViewModel, this, repositories);
 
@@ -264,6 +268,8 @@ z.viewModel.PanelViewModel = class PanelViewModel {
     switch (panelState) {
       case PanelViewModel.STATE.ADD_PARTICIPANTS:
         return 'add-participants';
+      case PanelViewModel.STATE.CONVERSATION_PARTICIPANTS:
+        return 'conversation-participants';
       case PanelViewModel.STATE.ADD_SERVICE:
       case PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE:
         return 'group-participant-service';
@@ -287,6 +293,11 @@ z.viewModel.PanelViewModel = class PanelViewModel {
         if (!isStateAddService) {
           this.addParticipants.resetView();
         }
+        break;
+      }
+
+      case PanelViewModel.STATE.CONVERSATION_PARTICIPANTS: {
+        this.conversationParticipants.resetView();
         break;
       }
 
