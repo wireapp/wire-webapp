@@ -85,12 +85,12 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
             this.userParticipants.push(userEntity);
           });
 
-        const participantCount = this.userParticipants().length;
-        if (participantCount > ConversationDetailsViewModel.CONFIG.MAX_USERS_VISIBLE) {
+        const userCount = this.userParticipants().length;
+        const exceedsMaxUserCount = userCount > ConversationDetailsViewModel.CONFIG.MAX_USERS_VISIBLE;
+        if (exceedsMaxUserCount) {
           this.userParticipants.splice(ConversationDetailsViewModel.CONFIG.REDUCED_USERS_COUNT);
-          this.showAllUsersCount(participantCount);
         } else {
-          this.showAllUsersCount(0);
+          this.showAllUsersCount(exceedsMaxUserCount ? userCount : 0);
         }
       }
     });
