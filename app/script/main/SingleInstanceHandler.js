@@ -28,16 +28,12 @@ z.main.SingleInstanceHandler = (() => {
   const instanceListeners = [];
   let checkInterval = undefined;
 
-  return class SingleInstanceHandler {
-    static get CONFIG() {
-      return {
-        TABS_CHECK: {
-          COOKIE_NAME: 'app_opened',
-          INTERVAL: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND,
-        },
-      };
-    }
+  const CONFIG = {
+    COOKIE_NAME: 'app_opened',
+    INTERVAL: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND,
+  };
 
+  return class SingleInstanceHandler {
     constructor() {
       this.instanceId = undefined;
       this.instanceRegistered = false;
@@ -53,7 +49,7 @@ z.main.SingleInstanceHandler = (() => {
      */
     registerInstance(instanceId) {
       this.instanceId = instanceId;
-      const cookieName = SingleInstanceHandler.CONFIG.TABS_CHECK.COOKIE_NAME;
+      const cookieName = CONFIG.COOKIE_NAME;
       if (!!Cookies.get(cookieName)) {
         return false;
       }
@@ -70,11 +66,11 @@ z.main.SingleInstanceHandler = (() => {
      * @returns {void} - returns nothing
      */
     deregisterInstance(forceRemoval = false) {
-      const singleInstanceCookie = Cookies.getJSON(SingleInstanceHandler.CONFIG.TABS_CHECK.COOKIE_NAME);
+      const singleInstanceCookie = Cookies.getJSON(CONFIG.COOKIE_NAME);
 
       const isOwnInstanceId = singleInstanceCookie && singleInstanceCookie.appInstanceId === this.instanceId;
       if (forceRemoval || isOwnInstanceId) {
-        Cookies.remove(SingleInstanceHandler.CONFIG.TABS_CHECK.COOKIE_NAME);
+        Cookies.remove(CONFIG.COOKIE_NAME);
       }
     }
 
@@ -119,14 +115,14 @@ z.main.SingleInstanceHandler = (() => {
         throw new Error('Current instance has been registered, cannot check other running instances');
       }
 
-      return !!Cookies.get(SingleInstanceHandler.CONFIG.TABS_CHECK.COOKIE_NAME);
+      return !!Cookies.get(CONFIG.COOKIE_NAME);
     }
 
     _isSingleRunningInstance() {
       if (z.util.Environment.electron) {
         return true;
       }
-      const singleInstanceCookie = Cookies.getJSON(SingleInstanceHandler.CONFIG.TABS_CHECK.COOKIE_NAME);
+      const singleInstanceCookie = Cookies.getJSON(CONFIG.COOKIE_NAME);
 
       return singleInstanceCookie && singleInstanceCookie.appInstanceId === this.instanceId;
     }
@@ -142,10 +138,7 @@ z.main.SingleInstanceHandler = (() => {
       if (checkInterval) {
         this._stopSingleInstanceCheck();
       }
-      checkInterval = window.setInterval(
-        this._checkSingleInstance.bind(this),
-        SingleInstanceHandler.CONFIG.TABS_CHECK.INTERVAL
-      );
+      checkInterval = window.setInterval(this._checkSingleInstance.bind(this), CONFIG.INTERVAL);
     }
 
     _stopSingleInstanceCheck() {
