@@ -26,7 +26,7 @@ window.z.main = z.main || {};
 
 z.main.SingleInstanceHandler = (() => {
   const instanceListeners = [];
-  let checkInterval = undefined;
+  let checkIntervalId = undefined;
 
   const CONFIG = {
     COOKIE_NAME: 'app_opened',
@@ -36,7 +36,6 @@ z.main.SingleInstanceHandler = (() => {
   return class SingleInstanceHandler {
     constructor() {
       this.instanceId = undefined;
-      this.instanceRegistered = false;
     }
 
     /**
@@ -53,14 +52,12 @@ z.main.SingleInstanceHandler = (() => {
       if (!!Cookies.get(cookieName)) {
         return false;
       }
-      this.instanceRegistered = true;
       Cookies.set(cookieName, {appInstanceId: this.instanceId});
-      this._startSingleInstanceCheck();
       return true;
     }
 
     /**
-     * Removes the cookie that keeps track of the running instance
+     * Removes the cookie that keeps track of the running instance.
      *
      * @param {boolean} forceRemoval - do not check that the instance removing it is the current instance
      * @returns {void} - returns nothing
@@ -75,7 +72,7 @@ z.main.SingleInstanceHandler = (() => {
     }
 
     /**
-     * Adds a listener that will be called whenever another instance boots
+     * Adds a listener that will be called whenever another instance boots.
      *
      * @param {Function} listener - a listener to be executed
      * @returns {void} - returns nothing
@@ -111,7 +108,7 @@ z.main.SingleInstanceHandler = (() => {
      * @returns {void} - returns nothing
      */
     hasOtherRunningInstance() {
-      if (this.instanceRegistered) {
+      if (this.instanceId) {
         throw new Error('Current instance has been registered, cannot check other running instances');
       }
 
@@ -135,14 +132,15 @@ z.main.SingleInstanceHandler = (() => {
     }
 
     _startSingleInstanceCheck() {
-      if (checkInterval) {
-        this._stopSingleInstanceCheck();
-      }
-      checkInterval = window.setInterval(this._checkSingleInstance.bind(this), CONFIG.INTERVAL);
+      this._stopSingleInstanceCheck();
+      checkIntervalId = window.setInterval(this._checkSingleInstance.bind(this), CONFIG.INTERVAL);
     }
 
     _stopSingleInstanceCheck() {
-      window.clearInterval(checkInterval);
+      if (checkIntervalId) {
+        window.clearInterval(checkIntervalId);
+      }
+      checkIntervalId = undefined;
     }
   };
 })();
