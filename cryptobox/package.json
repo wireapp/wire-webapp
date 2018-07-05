@@ -20,7 +20,7 @@
     "gulp-bower-assets": "0.0.3",
     "gulp-clean": "0.4.0",
     "gulp-concat": "2.6.1",
-    "gulp-eslint": "4.0.2",
+    "gulp-eslint": "5.0.0",
     "gulp-util": "3.0.8",
     "gutil": "1.6.4",
     "jasmine": "3.1.0",
