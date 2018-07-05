@@ -82,9 +82,9 @@ z.viewModel.PanelViewModel = class PanelViewModel {
       return this._isStateVisible(PanelViewModel.STATE.PARTICIPANT_DEVICES);
     });
     this.timedMessagesVisible = ko.pureComputed(() => this._isStateVisible(PanelViewModel.STATE.TIMED_MESSAGES));
-    this.conversationParticipantsVisible = ko.pureComputed(() =>
-      this._isStateVisible(PanelViewModel.STATE.CONVERSATION_PARTICIPANTS)
-    );
+    this.conversationParticipantsVisible = ko.pureComputed(() => {
+      return this._isStateVisible(PanelViewModel.STATE.CONVERSATION_PARTICIPANTS);
+    });
     this.isGuestRoom = ko.pureComputed(() => this.conversationEntity() && this.conversationEntity().isGuestRoom());
     this.isTeamOnly = ko.pureComputed(() => this.conversationEntity() && this.conversationEntity().isTeamOnly());
 
