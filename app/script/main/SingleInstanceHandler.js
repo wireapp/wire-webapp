@@ -25,7 +25,6 @@ window.z = window.z || {};
 window.z.main = z.main || {};
 
 z.main.SingleInstanceHandler = (() => {
-  const instanceListeners = [];
   let checkIntervalId = undefined;
 
   const CONFIG = {
@@ -34,14 +33,17 @@ z.main.SingleInstanceHandler = (() => {
   };
 
   return class SingleInstanceHandler {
-    constructor() {
+    constructor(onOtherInstanceStarted) {
       this.instanceId = undefined;
+      this.onOtherInstanceStarted = onOtherInstanceStarted;
     }
 
     /**
      * Set the cookie to verify we are running a single instace tab.
      * Returns true if the instance has been registered successfully.
      * Returns false if the app is already running in another instance.
+     *
+     * Side Effects: will also start the interval check if a callback was provided in the constructor
      *
      * @param {string} instanceId - The instance id to register.
      * @returns {boolean} - Has the app being registered successfully.
@@ -53,11 +55,16 @@ z.main.SingleInstanceHandler = (() => {
         return false;
       }
       Cookies.set(cookieName, {appInstanceId: this.instanceId});
+      if (this.onOtherInstanceStarted) {
+        this._startSingleInstanceCheck();
+      }
       return true;
     }
 
     /**
      * Removes the cookie that keeps track of the running instance.
+     *
+     * Side Effects: will also stop the interval check
      *
      * @param {boolean} forceRemoval - Do not check that the instance removing it is the current instance.
      * @returns {void} - Returns nothing.
@@ -68,32 +75,6 @@ z.main.SingleInstanceHandler = (() => {
       const isOwnInstanceId = singleInstanceCookie && singleInstanceCookie.appInstanceId === this.instanceId;
       if (forceRemoval || isOwnInstanceId) {
         Cookies.remove(CONFIG.COOKIE_NAME);
-      }
-    }
-
-    /**
-     * Adds a listener that will be called whenever another instance boots.
-     *
-     * @param {Function} listener - A listener to be executed.
-     * @returns {void} - Returns nothing.
-     */
-    addExtraInstanceStartedListener(listener) {
-      instanceListeners.push(listener);
-      if (instanceListeners.length === 1) {
-        this._startSingleInstanceCheck();
-      }
-    }
-
-    /**
-     * Removes a listener that would have been called whenever another instance boots.
-     *
-     * @param {Function} listener - A listener to be removed.
-     * @returns {void} - Returns nothing.
-     */
-    removeExtraInstanceStartedListener(listener) {
-      const index = instanceListeners.indexOf(listener);
-      instanceListeners.splice(index, 1);
-      if (instanceListeners.length === 0) {
         this._stopSingleInstanceCheck();
       }
     }
@@ -127,7 +108,7 @@ z.main.SingleInstanceHandler = (() => {
     _checkSingleInstance() {
       if (!this._isSingleRunningInstance()) {
         // warn listeners if the app has started in another instance
-        instanceListeners.forEach(listener => listener());
+        this.onOtherInstanceStarted();
       }
     }
 

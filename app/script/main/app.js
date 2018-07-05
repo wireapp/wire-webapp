@@ -63,8 +63,8 @@ z.main.App = class App {
 
     this.instanceId = z.util.createRandomUuid();
 
-    this.singleInstanceHandler = new z.main.SingleInstanceHandler();
     this._onExtraInstanceStarted = this._onExtraInstanceStarted.bind(this);
+    this.singleInstanceHandler = new z.main.SingleInstanceHandler(this._onExtraInstanceStarted);
 
     this._subscribeToEvents();
 
@@ -560,7 +560,6 @@ z.main.App = class App {
    */
   _registerSingleInstance() {
     if (this.singleInstanceHandler.registerInstance(this.instanceId)) {
-      this.singleInstanceHandler.addExtraInstanceStartedListener(this._onExtraInstanceStarted);
       this._registerSingleInstanceCleaning();
       return Promise.resolve();
     }
@@ -569,7 +568,6 @@ z.main.App = class App {
 
   _registerSingleInstanceCleaning(singleInstanceCheckIntervalId) {
     $(window).on('beforeunload', () => {
-      this.singleInstanceHandler.removeExtraInstanceStartedListener(this._onExtraInstanceStarted);
       this.singleInstanceHandler.deregisterInstance();
     });
   }
