@@ -488,6 +488,7 @@ z.string.conversationDetailsActionAddParticipants = 'Add participants';
 z.string.conversationDetailsActionBlock = 'Block…';
 z.string.conversationDetailsActionCancelRequest = 'Cancel request…';
 z.string.conversationDetailsActionClear = 'Delete content…';
+z.string.conversationDetailsActionConversationParticipants = 'Show all ({{number}})';
 z.string.conversationDetailsActionCreateGroup = 'Create group';
 z.string.conversationDetailsActionDevices = 'Devices';
 z.string.conversationDetailsActionGuestOptions = 'Guest options';
@@ -501,6 +502,10 @@ z.string.conversationDetailsParticipantsUsersOne = 'Person';
 z.string.conversationDetailsParticipantsUsersMany = 'People';
 z.string.conversationDetailsPeople = 'People';
 z.string.conversationDetailsServices = 'Services';
+
+// Panel: Conversation participants
+z.string.conversationParticipantsTitle = 'People';
+z.string.conversationParticipantsSearchPlaceholder = 'Search by name';
 
 // Panel: Group participant
 z.string.groupParticipantActionBlock = 'Block…';
