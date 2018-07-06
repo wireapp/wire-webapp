@@ -23,15 +23,16 @@ window.z = window.z || {};
 window.z.util = z.util || {};
 
 z.util.DebugUtil = class DebugUtil {
-  constructor(callingRepository, conversationRepository, userRepository) {
+  constructor(callingRepository, conversationRepository, userRepository, storageRepository) {
     this.callingRepository = callingRepository;
     this.conversationRepository = conversationRepository;
+    this.storageRepository = storageRepository;
     this.userRepository = userRepository;
     this.logger = new z.util.Logger('z.util.DebugUtil', z.config.LOGGER.OPTIONS);
   }
 
   blockAllConnections() {
-    const blockUsers = wire.app.repository.user.users().map(user_et => this.userRepository.blockUser(user_et));
+    const blockUsers = this.userRepository.users().map(user_et => this.userRepository.blockUser(user_et));
     return Promise.all(blockUsers);
   }
 
@@ -58,14 +59,21 @@ z.util.DebugUtil = class DebugUtil {
       .then(() => this.logger.log(`Corrupted Session ID '${sessionId}'`));
   }
 
+  getLastMessagesFromDatabase(amount = 10, conversationId = this.conversationRepository.active_conversation().id) {
+    return this.storageRepository.storageService.db.events.toArray(records => {
+      const messages = records.filter(events => events.conversation === conversationId);
+      return messages.slice(amount * -1).reverse();
+    });
+  }
+
   haveISentThisMessageToMyOtherClients(
     messageId,
-    conversationId = wire.app.repository.conversation.active_conversation().id
+    conversationId = this.conversationRepository.active_conversation().id
   ) {
     let amountOfMessagesSent = 0;
 
     const clientId = wire.app.repository.client.currentClient().id;
-    const userId = wire.app.repository.user.self().id;
+    const userId = this.userRepository.self().id;
 
     const isOTRMessage = notification => notification.type === z.event.Backend.CONVERSATION.OTR_MESSAGE_ADD;
     const isInCurrentConversation = notification => notification.conversation === conversationId;
@@ -76,7 +84,7 @@ z.util.DebugUtil = class DebugUtil {
     return wire.app.repository.conversation
       .get_conversation_by_id(conversationId)
       .then(conversation => {
-        return wire.app.repository.conversation.get_message_in_conversation_by_id(conversation, messageId);
+        return this.conversationRepository.get_message_in_conversation_by_id(conversation, messageId);
       })
       .then(message => {
         return wire.app.repository.event.notificationService
@@ -133,7 +141,7 @@ z.util.DebugUtil = class DebugUtil {
 
   exportCryptobox() {
     const clientId = wire.app.repository.client.currentClient().id;
-    const userId = wire.app.repository.user.self().id;
+    const userId = this.userRepository.self().id;
     const fileName = `cryptobox-${userId}-${clientId}.json`;
 
     wire.app.repository.cryptography.cryptobox
@@ -162,7 +170,7 @@ z.util.DebugUtil = class DebugUtil {
 
   getNotificationsFromStream(remoteUserId, remoteClientId, matchingNotifications = [], notificationIdSince) {
     const localClientId = wire.app.repository.client.currentClient().id;
-    const localUserId = wire.app.repository.user.self().id;
+    const localUserId = this.userRepository.self().id;
 
     const _gotNotifications = ({hasMore, notifications}) => {
       const additionalNotifications = !remoteUserId
