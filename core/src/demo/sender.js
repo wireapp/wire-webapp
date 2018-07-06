@@ -2,10 +2,10 @@
 //@ts-check
 
 process.on('uncaughtException', error =>
-  console.error(`Uncaught exception "${error.constructor.name}" (code: ${error.code}): ${error.message}`, error)
+  console.error(`Uncaught exception "${error.constructor.name}": ${error.message}`, error)
 );
 process.on('unhandledRejection', error =>
-  console.error(`Uncaught rejection "${error.constructor.name}" (code: ${error.code}): ${error.message}`, error)
+  console.error(`Uncaught rejection "${error.constructor.name}": ${error.message}`, error)
 );
 
 const logdown = require('logdown');

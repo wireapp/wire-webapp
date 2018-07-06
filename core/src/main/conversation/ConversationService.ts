@@ -20,11 +20,12 @@
 import {
   ClientMismatch,
   Conversation,
+  NewConversation,
   NewOTRMessage,
   OTRRecipients,
   UserClients,
-} from '@wireapp/api-client/dist/commonjs/conversation/index';
-import {CONVERSATION_TYPING} from '@wireapp/api-client/dist/commonjs/event/index';
+} from '@wireapp/api-client/dist/commonjs/conversation/';
+import {CONVERSATION_TYPING, ConversationMemberLeaveEvent} from '@wireapp/api-client/dist/commonjs/event/';
 import {UserPreKeyBundleMap} from '@wireapp/api-client/dist/commonjs/user/index';
 import {AxiosError} from 'axios';
 import {Encoder} from 'bazinga64';
@@ -453,6 +454,25 @@ export default class ConversationService {
     };
   }
 
+  public leaveConversation(conversationId: string, userId: string = ''): Promise<ConversationMemberLeaveEvent> {
+    if (userId.length === 0 && this.apiClient.context) {
+      userId = this.apiClient.context.userId;
+    }
+
+    return this.apiClient.conversation.api.deleteMember(conversationId, userId);
+  }
+
+  public createConversation(name: string, otherUserIds: string | string[] = []): Promise<Conversation> {
+    const ids = typeof otherUserIds === 'string' ? [otherUserIds] : otherUserIds;
+
+    const newConversation: NewConversation = {
+      name,
+      users: ids,
+    };
+
+    return this.apiClient.conversation.api.postConversation(newConversation);
+  }
+
   public async getConversations(conversationId: string): Promise<Conversation>;
   public async getConversations(conversationId?: string[]): Promise<Conversation[]>;
   public async getConversations(conversationId?: string | string[]): Promise<Conversation[] | Conversation> {
@@ -472,6 +492,19 @@ export default class ConversationService {
       keyBytes: Buffer.from(otrKey.buffer),
       sha256: Buffer.from(sha256.buffer),
     });
+  }
+
+  public async addUser(conversationId: string, userId: string): Promise<string>;
+  public async addUser(conversationId: string, userIds: string[]): Promise<string[]>;
+  public async addUser(conversationId: string, userIds: string | string[]): Promise<string | string[]> {
+    const ids = typeof userIds === 'string' ? [userIds] : userIds;
+    await this.apiClient.conversation.api.postMembers(conversationId, ids);
+    return userIds;
+  }
+
+  public async removeUser(conversationId: string, userId: string): Promise<string> {
+    await this.apiClient.conversation.api.deleteMember(conversationId, userId);
+    return userId;
   }
 
   public async send(

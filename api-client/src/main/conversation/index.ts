@@ -21,6 +21,7 @@ export * from './ClientMismatch';
 export * from './Conversation';
 export * from './ConversationAPI';
 export * from './ConversationCode';
+export * from './ConversationError';
 export * from './ConversationIds';
 export * from './ConversationMembers';
 export * from './ConversationMessageTimerUpdate';

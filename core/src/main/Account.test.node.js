@@ -24,7 +24,7 @@ const {Config} = require('@wireapp/api-client/dist/commonjs/Config');
 const {ConversationAPI} = require('@wireapp/api-client/dist/commonjs/conversation/');
 const {MemoryEngine} = require('@wireapp/store-engine');
 const {NotificationAPI} = require('@wireapp/api-client/dist/commonjs/notification/');
-const {StatusCode} = require('@wireapp/api-client/dist/commonjs/http/');
+const {BackendErrorLabel, StatusCode} = require('@wireapp/api-client/dist/commonjs/http/');
 const {ValidationUtil} = require('@wireapp/commons');
 const APIClient = require('@wireapp/api-client');
 const nock = require('nock');
@@ -77,7 +77,7 @@ describe('Account', () => {
         .post(`${AuthAPI.URL.LOGIN}`, body => {
           return body.email && body.password;
         })
-        .query(queryObject => true)
+        .query(() => true)
         .reply((uri, body) => {
           const parsedBody = JSON.parse(body);
           if (parsedBody.password === 'wrong') {
@@ -85,7 +85,7 @@ describe('Account', () => {
               StatusCode.FORBIDDEN,
               JSON.stringify({
                 code: StatusCode.FORBIDDEN,
-                label: 'invalid-credentials',
+                label: BackendErrorLabel.INVALID_CREDENTIALS,
                 message: 'Authentication failed.',
               }),
             ];
@@ -162,13 +162,8 @@ describe('Account', () => {
 
         done.fail('Should not be logged in');
       } catch (error) {
-        const {
-          status: errorCode,
-          data: {message: errorMessage},
-        } = error.response;
-
-        expect(errorCode).toBe(StatusCode.FORBIDDEN);
-        expect(errorMessage).toBe('Authentication failed.');
+        expect(error.code).toBe(StatusCode.FORBIDDEN);
+        expect(error.label).toBe(BackendErrorLabel.INVALID_CREDENTIALS);
 
         done();
       }

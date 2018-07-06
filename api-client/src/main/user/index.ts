@@ -30,6 +30,7 @@ export * from './SendActivationCode';
 export * from './User';
 export * from './UserAPI';
 export * from './UserAsset';
+export * from './UserError';
 export * from './UserPreKeyBundleMap';
 export * from './UserUpdate';
 export * from './VerifyDelete';

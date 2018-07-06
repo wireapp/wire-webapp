@@ -33,7 +33,7 @@ import {
   NewOTRMessage,
   Typing,
 } from '../conversation/';
-import {ConversationEvent} from '../event/ConversationEvent';
+import {ConversationEvent, ConversationMemberJoinEvent, ConversationMemberLeaveEvent} from '../event/';
 import {HttpClient} from '../http/';
 import {ValidationError} from '../validation/';
 
@@ -74,7 +74,7 @@ class ConversationAPI {
    * @param userId The user to remove
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/removeMember
    */
-  public deleteMember(conversationId: string, userId: string): Promise<ConversationEvent> {
+  public deleteMember(conversationId: string, userId: string): Promise<ConversationMemberLeaveEvent> {
     const config: AxiosRequestConfig = {
       method: 'delete',
       url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.MEMBERS}/${userId}`,
@@ -446,6 +446,24 @@ class ConversationAPI {
       data: messageTimerData,
       method: 'put',
       url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/message-timer`,
+    };
+
+    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+  }
+
+  /**
+   * Add users to an existing conversation.
+   * @param conversationId The conversation ID to add the users to
+   * @param userIds List of user IDs to add to a conversation
+   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/addMembers
+   */
+  public postMembers(conversationId: string, userIds: string[]): Promise<ConversationMemberJoinEvent> {
+    const config: AxiosRequestConfig = {
+      data: {
+        users: userIds,
+      },
+      method: 'post',
+      url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.MEMBERS}`,
     };
 
     return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);

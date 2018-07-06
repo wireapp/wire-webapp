@@ -21,8 +21,8 @@ import {PriorityQueue} from '@wireapp/priority-queue';
 import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine';
 import axios, {AxiosError, AxiosPromise, AxiosRequestConfig, AxiosResponse} from 'axios';
 import EventEmitter = require('events');
-import {AccessTokenData, AccessTokenStore, AuthAPI} from '../auth';
-import {ConnectionState, ContentType, NetworkError} from '../http';
+import {AccessTokenData, AccessTokenStore, AuthAPI} from '../auth/';
+import {BackendErrorMapper, ConnectionState, ContentType, NetworkError} from '../http/';
 import {sendRequestWithCookie} from '../shims/node/cookie';
 
 const logdown = require('logdown');
@@ -109,9 +109,11 @@ class HttpClient extends EventEmitter {
         this.updateConnectionState(ConnectionState.CONNECTED);
         return response;
       })
-      .catch((error: AxiosError) => {
+      .catch(error => {
+        // Map Axios errors
         const isNetworkError = !error.response && error.request && Object.keys(error.request).length === 0;
         const isUnauthorized = error.response && error.response.status === 401;
+        const isBackendError = error.response && error.response.data;
 
         if (isNetworkError) {
           const message = `Cannot do "${error.config.method}" request to "${error.config.url}".`;
@@ -122,6 +124,10 @@ class HttpClient extends EventEmitter {
 
         if (isUnauthorized) {
           return this.refreshAccessToken().then(() => this._sendRequest(config, tokenAsParam));
+        }
+
+        if (isBackendError) {
+          error = BackendErrorMapper.map(error.response.data);
         }
 
         return Promise.reject(error);

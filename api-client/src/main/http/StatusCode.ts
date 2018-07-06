@@ -34,6 +34,7 @@ class StatusCode {
   public static readonly REQUEST_TOO_LARGE: number = 413;
   public static readonly TOO_MANY_REQUESTS: number = 429;
   public static readonly UNAUTHORIZED: number = 401;
+  public static readonly UNKNOWN: number = -1;
 }
 
 export {StatusCode};
