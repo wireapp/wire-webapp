@@ -41,6 +41,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
   /**
    * View model for the auth page.
    * @param {z.main.Auth} auth - App authentication
+   * @param {z.location.LocationRepository} locationRepository - Location Repository
    */
   constructor(auth) {
     this.click_on_remove_device_submit = this.click_on_remove_device_submit.bind(this);
@@ -58,6 +59,9 @@ z.viewModel.AuthViewModel = class AuthViewModel {
     // @todo Don't operate with the service directly. Get a repository!
     this.storageService = new z.storage.StorageService();
     this.storage_repository = new z.storage.StorageRepository(this.storageService);
+
+    const locationService = new z.location.LocationService(this.auth.client);
+    this.locationRepository = new z.location.LocationRepository(locationService);
 
     this.cryptography_service = new z.cryptography.CryptographyRepository(this.auth.client);
     this.cryptography_repository = new z.cryptography.CryptographyRepository(
