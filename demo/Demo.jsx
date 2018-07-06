@@ -68,6 +68,7 @@ import {
   MenuModal,
   MessageIcon,
   Modal,
+  MoreIcon,
   MuteIcon,
   Muted,
   OptionsIcon,
@@ -166,6 +167,7 @@ class Demo extends React.PureComponent {
               <AttachmentIcon height={32} />
               <PingIcon height={32} />
               <MuteIcon height={32} />
+              <MoreIcon height={32} />
               <CamIcon width={32} />
               <SpeakerIcon height={32} />
               <HangupIcon width={32} />
