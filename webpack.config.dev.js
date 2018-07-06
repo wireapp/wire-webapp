@@ -39,9 +39,12 @@ module.exports = Object.assign(commonConfig, {
     overlay: true,
     port: '8080',
     proxy: {
+      /* eslint-disable sort-keys */
+      '/applogin': {pathRewrite: {'^/applogin': ''}, target: `http://${localIP}:8888/login/`},
       '/app': {pathRewrite: {'^/app': ''}, target: `http://${localIP}:8888`},
       '/audio': `http://${localIP}:8888`,
       '/style': `http://${localIP}:8888`,
+      /* eslint-enable sort-keys */
     },
     public: 'localhost:8080',
     publicPath: '/',
