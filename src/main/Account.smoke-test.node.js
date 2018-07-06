@@ -27,6 +27,7 @@ const {Config} = require('@wireapp/api-client/dist/commonjs/Config');
 const {ClientType} = require('@wireapp/api-client/dist/commonjs/client/');
 const {MemoryEngine} = require('@wireapp/store-engine');
 const {ValidationUtil} = require('@wireapp/commons');
+const {UnconnectedUserError} = require('@wireapp/api-client/dist/commonjs/user/');
 const logdown = require('logdown');
 
 const logger = logdown('@wireapp/core/main/Account(SmokeTest)', {
@@ -35,13 +36,34 @@ const logger = logdown('@wireapp/core/main/Account(SmokeTest)', {
 });
 logger.state.isEnabled = true;
 
+function getId(user) {
+  return user.apiClient.context.userId;
+}
+
+function isMissingEnvironmentVariable() {
+  let isMissing = false;
+  const requiredVariables = [
+    'ALICE_EMAIL',
+    'ALICE_PASSWORD',
+    'BOB_EMAIL',
+    'BOB_PASSWORD',
+    'EVE_EMAIL',
+    'EVE_PASSWORD',
+    'WILL_RELEASE',
+  ];
+
+  requiredVariables.forEach(variable => {
+    if (!process.env[variable]) {
+      isMissing = process.env.variable;
+      logger.warn(`Missing environment variable "${variable}".`);
+    }
+  });
+
+  return isMissing;
+}
+
 // Note: We need to listen to the "WILL_RELEASE" environment variable, otherwise our tests get executed on every commit in a Pull Request (PR) which will cause the "login too frequently" backend error for the smoke tests accounts.
-const CAN_RUN =
-  process.env.ALICE_EMAIL &&
-  process.env.ALICE_PASSWORD &&
-  process.env.BOB_EMAIL &&
-  process.env.BOB_PASSWORD &&
-  process.env.WILL_RELEASE === '0';
+const CAN_RUN = !isMissingEnvironmentVariable() && process.env.WILL_RELEASE === '0';
 
 async function getAccount(email, password) {
   const login = {
@@ -72,9 +94,16 @@ function sendText(sender, conversationId, message = 'Hello, World!') {
   return sender.service.conversation.send(conversationId, payload);
 }
 
+async function connect(sender, receiver) {
+  const {conversation: conversationId, from: connectingUserId} = await createConnection(sender, receiver);
+  await acceptConnection(receiver, connectingUserId);
+  return conversationId;
+}
+
 describe('Account', () => {
   let alice;
   let bob;
+  let eve;
 
   beforeAll(async done => {
     if (CAN_RUN) {
@@ -83,18 +112,35 @@ describe('Account', () => {
       try {
         alice = await getAccount(process.env.ALICE_EMAIL, process.env.ALICE_PASSWORD);
       } catch (error) {
-        logger.error(`Cannot login with email "${process.env.ALICE_EMAIL}". Aborting test.`);
+        logger.error(
+          `Cannot login with email "${process.env.ALICE_EMAIL}". Aborting test.`,
+          error && error.response && error.response.data ? error.response.data : ''
+        );
         return done.fail(error);
       }
 
       try {
         bob = await getAccount(process.env.BOB_EMAIL, process.env.BOB_PASSWORD);
       } catch (error) {
-        logger.error(`Cannot login with email "${process.env.ALICE_EMAIL}". Aborting test.`);
+        logger.error(
+          `Cannot login with email "${process.env.ALICE_EMAIL}". Aborting test.`,
+          error && error.response && error.response.data ? error.response.data : ''
+        );
         return done.fail(error);
       }
+
+      try {
+        eve = await getAccount(process.env.EVE_EMAIL, process.env.EVE_PASSWORD);
+      } catch (error) {
+        logger.error(
+          `Cannot login with email "${process.env.EVE_EMAIL}". Aborting test.`,
+          error && error.response && error.response.data ? error.response.data : ''
+        );
+        return done.fail(error);
+      }
+    } else {
+      logger.warn('Skipping smoke tests because environment variables are not set.');
     }
-    logger.warn('Skipping smoke tests because environment variables are not set.');
     done();
   });
 
@@ -107,7 +153,7 @@ describe('Account', () => {
       done();
     });
 
-    it('can send and receive messages', async done => {
+    it('sends and receive messages.', async done => {
       if (!CAN_RUN) {
         return done();
       }
@@ -120,9 +166,40 @@ describe('Account', () => {
       });
 
       await bob.listen();
-      const {conversation: conversationId, from: connectingUserId} = await createConnection(alice, bob);
-      await acceptConnection(bob, connectingUserId);
+      const conversationId = await connect(
+        alice,
+        bob
+      );
       await sendText(alice, conversationId, message);
+    });
+
+    it('creates conversations and add participants.', async done => {
+      if (!CAN_RUN) {
+        return done();
+      }
+
+      // Alice connects to Bob
+      await connect(
+        alice,
+        bob
+      );
+
+      // Alice connects to Eve (Bob doesn't know Eve)
+      await connect(
+        alice,
+        eve
+      );
+
+      // Bob creates a conversation with Alice
+      const {id: conversationId} = await bob.service.conversation.createConversation('Test Group', getId(alice));
+
+      // Bob tries to add Eve but it will fail because there are not connected
+      try {
+        await bob.service.conversation.addUser(conversationId, getId(eve));
+      } catch (error) {
+        expect(error.name).toBe(UnconnectedUserError.name);
+        done();
+      }
     });
   });
 });
