@@ -58,6 +58,13 @@ z.util.DebugUtil = class DebugUtil {
       .then(() => this.logger.log(`Corrupted Session ID '${sessionId}'`));
   }
 
+  getLastMessagesFromDatabase(amount = 10, conversationId = wire.app.repository.conversation.active_conversation().id) {
+    return wire.app.repository.storage.storageService.db.events.toArray(records => {
+      const messages = records.filter(events => events.conversation === conversationId);
+      return messages.slice(amount * -1).reverse();
+    });
+  }
+
   haveISentThisMessageToMyOtherClients(
     messageId,
     conversationId = wire.app.repository.conversation.active_conversation().id
