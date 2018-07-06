@@ -343,9 +343,9 @@
   version "10.1.2"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-10.1.2.tgz#1b928a0baa408fc8ae3ac012cc81375addc147c6"
 
-"@types/node@10.5.1":
-  version "10.5.1"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-10.5.1.tgz#d578446f4abff5c0b49ade9b4e5274f6badaadfc"
+"@types/node@10.5.2":
+  version "10.5.2"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-10.5.2.tgz#f19f05314d5421fe37e74153254201a7bf00a707"
 
 "@types/node@^6.0.46":
   version "6.0.90"
@@ -503,15 +503,15 @@
     "@webassemblyjs/wast-parser" "1.5.13"
     long "^3.2.0"
 
-"@wireapp/api-client@1.6.1":
-  version "1.6.1"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-1.6.1.tgz#550484fe2903235dd20392f3893827e84a79d9f8"
+"@wireapp/api-client@1.6.2":
+  version "1.6.2"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-1.6.2.tgz#1b6a8f39d4700c57566f81153ce706eec1f8676d"
   dependencies:
-    "@types/node" "10.5.1"
+    "@types/node" "10.5.2"
     "@types/spark-md5" "3.0.0"
     "@types/tough-cookie" "2.3.3"
-    "@wireapp/priority-queue" "0.1.55"
-    "@wireapp/store-engine" "0.11.40"
+    "@wireapp/priority-queue" "0.1.56"
+    "@wireapp/store-engine" "0.11.41"
     axios "0.18.0"
     html5-websocket "2.0.3"
     logdown "3.2.3"
@@ -519,55 +519,55 @@
     spark-md5 "3.0.0"
     tough-cookie "2.4.3"
 
-"@wireapp/cbor@3.0.57":
-  version "3.0.57"
-  resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-3.0.57.tgz#c2c59c81dbb112704958b3b9cee2f835aeb727fd"
+"@wireapp/cbor@3.0.58":
+  version "3.0.58"
+  resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-3.0.58.tgz#a564186072848e96e782c4ab6da7896cdd5a2c30"
 
-"@wireapp/core@3.7.2":
-  version "3.7.2"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-3.7.2.tgz#205905eabff746b44e49f3840d6f6e411edc092e"
+"@wireapp/core@3.7.3":
+  version "3.7.3"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-3.7.3.tgz#0fa5e7392fde70f391dc610f2805df1a3db89b15"
   dependencies:
-    "@types/node" "10.5.1"
-    "@wireapp/api-client" "1.6.1"
-    "@wireapp/cryptobox" "8.5.8"
-    "@wireapp/store-engine" "0.11.40"
-    bazinga64 "5.2.9"
+    "@types/node" "10.5.2"
+    "@wireapp/api-client" "1.6.2"
+    "@wireapp/cryptobox" "8.5.9"
+    "@wireapp/store-engine" "0.11.41"
+    bazinga64 "5.2.10"
     logdown "3.2.3"
     protobufjs "6.8.6"
     pure-uuid "1.5.3"
 
-"@wireapp/cryptobox@8.5.8":
-  version "8.5.8"
-  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-8.5.8.tgz#d7eb13d5d9228066c6a4c0a2be39a63cd14daf2a"
+"@wireapp/cryptobox@8.5.9":
+  version "8.5.9"
+  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-8.5.9.tgz#48dfa74a615189916b7f0fb9f3d630869708aeef"
   dependencies:
     "@types/fs-extra" "5.0.3"
-    "@types/node" "10.5.1"
-    "@wireapp/lru-cache" "2.1.32"
-    "@wireapp/priority-queue" "0.1.55"
-    "@wireapp/proteus" "7.2.7"
-    "@wireapp/store-engine" "0.11.40"
+    "@types/node" "10.5.2"
+    "@wireapp/lru-cache" "2.1.33"
+    "@wireapp/priority-queue" "0.1.56"
+    "@wireapp/proteus" "7.2.8"
+    "@wireapp/store-engine" "0.11.41"
     dexie "2.0.4"
     fs-extra "6.0.1"
 
-"@wireapp/lru-cache@2.1.32":
-  version "2.1.32"
-  resolved "https://registry.yarnpkg.com/@wireapp/lru-cache/-/lru-cache-2.1.32.tgz#30a6117c18e0c5075d62b649ffba58d87b5e9a22"
+"@wireapp/lru-cache@2.1.33":
+  version "2.1.33"
+  resolved "https://registry.yarnpkg.com/@wireapp/lru-cache/-/lru-cache-2.1.33.tgz#13a38b082b2726c15e1197d09d629ddb4711907b"
 
-"@wireapp/priority-queue@0.1.55":
-  version "0.1.55"
-  resolved "https://registry.yarnpkg.com/@wireapp/priority-queue/-/priority-queue-0.1.55.tgz#8e7c778084d7f2e195da008c1ebcfa2037b51f36"
+"@wireapp/priority-queue@0.1.56":
+  version "0.1.56"
+  resolved "https://registry.yarnpkg.com/@wireapp/priority-queue/-/priority-queue-0.1.56.tgz#ada88a7b2103098e00ad9429e18fb707a848d7db"
   dependencies:
-    "@types/node" "10.5.1"
+    "@types/node" "10.5.2"
     pure-uuid "1.5.3"
 
-"@wireapp/proteus@7.2.7":
-  version "7.2.7"
-  resolved "https://registry.yarnpkg.com/@wireapp/proteus/-/proteus-7.2.7.tgz#8503fc3426c58dfe6dd74e75bd410a7bcf6a9445"
+"@wireapp/proteus@7.2.8":
+  version "7.2.8"
+  resolved "https://registry.yarnpkg.com/@wireapp/proteus/-/proteus-7.2.8.tgz#8fc773c4c54d8fabfd4edec83c6f038d6e0f6ef0"
   dependencies:
     "@types/chai" "4.1.4"
     "@types/ed2curve" "0.2.2"
-    "@types/node" "10.5.1"
-    "@wireapp/cbor" "3.0.57"
+    "@types/node" "10.5.2"
+    "@wireapp/cbor" "3.0.58"
     ed2curve "0.2.1"
     libsodium-wrappers-sumo "0.7.3"
 
@@ -583,12 +583,12 @@
     styled-components "3.3.3"
     styled-normalize "8.0.0"
 
-"@wireapp/store-engine@0.11.40":
-  version "0.11.40"
-  resolved "https://registry.yarnpkg.com/@wireapp/store-engine/-/store-engine-0.11.40.tgz#3b3b43224b6756a74355870e975e6e155721a88b"
+"@wireapp/store-engine@0.11.41":
+  version "0.11.41"
+  resolved "https://registry.yarnpkg.com/@wireapp/store-engine/-/store-engine-0.11.41.tgz#5e9d0b461cfa0f21e45469b9434a2436a2aa12bd"
   dependencies:
     "@types/filesystem" "0.0.28"
-    "@types/node" "10.5.1"
+    "@types/node" "10.5.2"
     bro-fs "0.4.0"
     dexie "2.0.4"
     fs-extra "6.0.1"
@@ -1694,6 +1694,10 @@ basic-auth@~2.0.0:
 batch@0.6.1:
   version "0.6.1"
   resolved "https://registry.yarnpkg.com/batch/-/batch-0.6.1.tgz#dc34314f4e679318093fc760272525f94bf25c16"
+
+bazinga64@5.2.10:
+  version "5.2.10"
+  resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.2.10.tgz#fd5ea13e43308d766e15e7e897c08abe4f469d7c"
 
 bazinga64@5.2.9:
   version "5.2.9"
