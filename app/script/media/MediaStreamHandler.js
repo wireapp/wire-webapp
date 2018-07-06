@@ -803,7 +803,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
 
   _callNeedsMediaStream(callEntity) {
     const hasPreJoinVideo = callEntity.isIncoming() && callEntity.isRemoteVideoCall();
-    const hasActiveCall = callEntity.selfClientJoined() || hasPreJoinVideo;
+    const hasActiveCall = callEntity.isOutgoing() || callEntity.selfClientJoined() || hasPreJoinVideo;
     return hasActiveCall && !callEntity.isOngoingOnAnotherClient();
   }
 
