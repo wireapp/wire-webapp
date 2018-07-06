@@ -31,6 +31,7 @@ export * from './HangupIcon';
 export * from './ImageIcon';
 export * from './LeaveIcon';
 export * from './MessageIcon';
+export * from './MoreIcon';
 export * from './MuteIcon';
 export * from './OptionsIcon';
 export * from './PingIcon';
