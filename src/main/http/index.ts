@@ -18,6 +18,7 @@
  */
 
 export * from './BackendError';
+export * from './BackendErrorMapper';
 export * from './BackendErrorLabel';
 export * from './ConnectionState';
 export * from './ContentType';

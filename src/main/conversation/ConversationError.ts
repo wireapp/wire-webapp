@@ -17,26 +17,24 @@
  *
  */
 
-import {BackendErrorLabel, StatusCode} from '../http/';
+import {BackendError, BackendErrorLabel, StatusCode} from '../http/';
 
-class BackendError extends Error {
-  code: StatusCode;
-  label: BackendErrorLabel;
-  message: string;
-
-  constructor(
-    message: string,
-    label: BackendErrorLabel = BackendErrorLabel.UNKNOWN,
-    code: StatusCode = StatusCode.UNKNOWN
-  ) {
-    super(message);
-    this.code = code;
-    this.label = label;
-    this.message = message;
-    // @see
-    // https://github.com/Microsoft/TypeScript/wiki/Breaking-Changes#extending-built-ins-like-error-array-and-map-may-no-longer-work
-    Object.setPrototypeOf(this, BackendError.prototype);
+export class ConversationError extends BackendError {
+  constructor(message: string, label: BackendErrorLabel, code: StatusCode) {
+    super(message, label, code);
+    Object.setPrototypeOf(this, ConversationError.prototype);
+    this.name = 'ConversationError';
   }
 }
 
-export {BackendError};
+export class UnknownConversationError extends ConversationError {
+  constructor(
+    message: string,
+    label: BackendErrorLabel = BackendErrorLabel.CLIENT_ERROR,
+    code: StatusCode = StatusCode.BAD_REQUEST
+  ) {
+    super(message, label, code);
+    Object.setPrototypeOf(this, UnknownConversationError.prototype);
+    this.name = 'UnknownConversationError';
+  }
+}

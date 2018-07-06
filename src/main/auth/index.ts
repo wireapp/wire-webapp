@@ -26,6 +26,7 @@ export {AUTH_ACCESS_TOKEN_KEY, AUTH_COOKIE_KEY, AUTH_TABLE_NAME};
 export * from './AccessTokenData';
 export * from './AccessTokenStore';
 export * from './AuthAPI';
+export * from './AuthenticationError';
 export * from './ClientPreKey';
 export * from './Context';
 export * from './Cookie';
