@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="1.7.0"></a>
+# [1.7.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@1.6.2...@wireapp/api-client@1.7.0) (2018-07-07)
+
+
+### Bug Fixes
+
+* **api-client:** Stricter backend error check ([9e78b2b](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/9e78b2b))
+
+
+### Features
+
+* **core:** Add and remove conversation participants ([#803](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/803)) ([3ffec6d](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/3ffec6d))
+
+
+
+
 <a name="1.6.2"></a>
 ## [1.6.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@1.6.1...@wireapp/api-client@1.6.2) (2018-07-06)
 
