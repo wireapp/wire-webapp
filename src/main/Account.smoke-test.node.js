@@ -123,7 +123,7 @@ describe('Account', () => {
         bob = await getAccount(process.env.BOB_EMAIL, process.env.BOB_PASSWORD);
       } catch (error) {
         logger.error(
-          `Cannot login with email "${process.env.ALICE_EMAIL}". Aborting test.`,
+          `Cannot login with email "${process.env.BOB_EMAIL}". Aborting test.`,
           error && error.response && error.response.data ? error.response.data : ''
         );
         return done.fail(error);
