@@ -113,7 +113,12 @@ class HttpClient extends EventEmitter {
         // Map Axios errors
         const isNetworkError = !error.response && error.request && Object.keys(error.request).length === 0;
         const isUnauthorized = error.response && error.response.status === 401;
-        const isBackendError = error.response && error.response.data;
+        const isBackendError =
+          error.response &&
+          error.response.data &&
+          error.response.data.code &&
+          error.response.data.label &&
+          error.response.data.message;
 
         if (isNetworkError) {
           const message = `Cannot do "${error.config.method}" request to "${error.config.url}".`;
