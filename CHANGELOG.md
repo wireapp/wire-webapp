@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="3.8.0"></a>
+# [3.8.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@3.7.3...@wireapp/core@3.8.0) (2018-07-07)
+
+
+### Bug Fixes
+
+* **api-client:** Stricter backend error check ([9e78b2b](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/9e78b2b))
+
+
+### Features
+
+* **core:** Add and remove conversation participants ([#803](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/803)) ([3ffec6d](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/3ffec6d))
+
+
+
+
 <a name="3.7.3"></a>
 ## [3.7.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@3.7.2...@wireapp/core@3.7.3) (2018-07-06)
 
