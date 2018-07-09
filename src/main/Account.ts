@@ -267,7 +267,6 @@ class Account extends EventEmitter {
 
     const {
       from,
-      conversation,
       data: {sender, text: cipherText},
     } = otrMessage;
 
@@ -276,29 +275,30 @@ class Account extends EventEmitter {
     const genericMessage = this.protocolBuffers.GenericMessage.decode(decryptedMessage);
 
     if (genericMessage.content === GenericMessageType.EPHEMERAL) {
-      const unwrappedMessage = this.mapGenericMessage(genericMessage.ephemeral, conversation, from);
+      const unwrappedMessage = this.mapGenericMessage(genericMessage.ephemeral, otrMessage);
       const expireAfterMillis = genericMessage.ephemeral.expireAfterMillis;
       unwrappedMessage.messageTimer = expireAfterMillis.toNumber
         ? (expireAfterMillis as Long).toNumber()
         : expireAfterMillis;
       return unwrappedMessage;
     } else {
-      return this.mapGenericMessage(genericMessage, conversation, from);
+      return this.mapGenericMessage(genericMessage, otrMessage);
     }
   }
 
-  private mapGenericMessage(genericMessage: any, conversation: string, from: string): PayloadBundleIncoming {
+  private mapGenericMessage(genericMessage: any, event: ConversationOtrMessageAddEvent): PayloadBundleIncoming {
     switch (genericMessage.content) {
       case GenericMessageType.TEXT: {
         return {
           content: {
             text: genericMessage.text.content,
           },
-          conversation,
-          from,
+          conversation: event.conversation,
+          from: event.from,
           id: genericMessage.messageId,
           messageTimer: 0,
           state: PayloadBundleState.INCOMING,
+          timestamp: new Date(event.time).getTime(),
           type: genericMessage.content,
         };
       }
@@ -307,11 +307,12 @@ class Account extends EventEmitter {
           content: {
             originalMessageId: genericMessage.deleted.messageId,
           },
-          conversation,
-          from,
+          conversation: event.conversation,
+          from: event.from,
           id: genericMessage.messageId,
           messageTimer: 0,
           state: PayloadBundleState.INCOMING,
+          timestamp: new Date(event.time).getTime(),
           type: genericMessage.content,
         };
       }
@@ -321,22 +322,24 @@ class Account extends EventEmitter {
             conversationId: genericMessage.hidden.conversationId,
             originalMessageId: genericMessage.hidden.messageId,
           },
-          conversation,
-          from,
+          conversation: event.from,
+          from: event.from,
           id: genericMessage.messageId,
           messageTimer: 0,
           state: PayloadBundleState.INCOMING,
+          timestamp: new Date(event.time).getTime(),
           type: genericMessage.content,
         };
       }
       default: {
         this.logger.warn(`Unhandled event type "${genericMessage.content}": ${genericMessage}`);
         return {
-          conversation,
-          from,
+          conversation: event.conversation,
+          from: event.from,
           id: genericMessage.messageId,
           messageTimer: 0,
           state: PayloadBundleState.INCOMING,
+          timestamp: new Date(event.time).getTime(),
           type: genericMessage.content,
         };
       }

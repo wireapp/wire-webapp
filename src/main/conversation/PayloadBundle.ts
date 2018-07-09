@@ -60,6 +60,7 @@ interface PayloadBundle {
   from: string;
   id: string;
   state: PayloadBundleState;
+  timestamp: number;
   type: GenericMessageType;
 }
 
