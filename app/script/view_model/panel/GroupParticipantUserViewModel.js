@@ -28,6 +28,7 @@ z.viewModel.panel.GroupParticipantUserViewModel = class GroupParticipantUserView
   constructor(params) {
     super(params);
     this.userRepository = this.repositories.user;
+    this.locationRepository = this.repositories.location;
     this.logger = new z.util.Logger('z.viewModel.panel.GroupParticipantUserViewModel', z.config.LOGGER.OPTIONS);
 
     this.availabilityLabel = ko.pureComputed(() => {
