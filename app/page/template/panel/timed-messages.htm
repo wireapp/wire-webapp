@@ -1,9 +1,9 @@
-<div id="timed-messages" class="panel__page timed-messages" data-bind="with: $root.timedMessages">
+<div id="timed-messages" class="panel__page timed-messages" data-bind="with: $root.subViews[z.viewModel.PanelViewModel.STATE.TIMED_MESSAGES]">
   <!-- ko if: isVisible() -->
     <div class="panel__header">
-      <arrow-left-icon class="icon-button" data-bind="click: clickOnBack" data-uie-name="go-back-timed-messages-options"></arrow-left-icon>
+      <arrow-left-icon class="icon-button" data-bind="click: onGoBack" data-uie-name="go-back-timed-messages-options"></arrow-left-icon>
       <div class="panel__header__title" data-bind="l10n_text: z.string.timedMessagesTitle"></div>
-      <close-icon class="right-panel-close icon-button" data-bind="click: clickOnClose" data-uie-name="do-close"></close-icon>
+      <close-icon class="right-panel-close icon-button" data-bind="click: onClose" data-uie-name="do-close"></close-icon>
     </div>
     <div class="panel__content">
       <div class="panel__content__scroll" data-bind="antiscroll: shouldUpdateScrollbar">
