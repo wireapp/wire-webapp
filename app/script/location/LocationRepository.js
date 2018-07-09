@@ -24,7 +24,14 @@ window.z.location = window.z.location || {};
 
 z.location.LocationRepository = class LocationRepository {
   constructor(locationService) {
-    this.getMapsUrl = locationService.getMapsUrl.bind(locationService);
-    this.getLocation = locationService.getLocation.bind(locationService);
+    this.locationService = locationService;
+  }
+
+  getMapsUrl(latitude, longitude, name, zoom) {
+    return this.locationService.getMapsUrl(latitude, longitude, name, zoom);
+  }
+
+  getLocation(latitude, longitude) {
+    return this.locationService.getLocation(latitude, longitude);
   }
 };
