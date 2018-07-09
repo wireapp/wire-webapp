@@ -37,12 +37,15 @@ z.viewModel.panel.BasePanelViewModel = class BasePanelViewModel {
   }
 
   initView() {}
+
   getElementId() {
     return 'conversation-details';
   }
+
   getEntityId() {
     return this.activeConversation().id;
   }
+
   shouldSkipTransition() {
     return false;
   }

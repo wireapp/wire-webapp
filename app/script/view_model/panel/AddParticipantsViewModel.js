@@ -128,12 +128,7 @@ z.viewModel.panel.AddParticipantsViewModel = class AddParticipantsViewModel exte
   }
 
   clickToAddParticipants() {
-    if (this.isStateAddService()) {
-      this._addService();
-    } else {
-      this._addMembers();
-    }
-
+    this._addMembers();
     this.onGoBack();
   }
 
@@ -175,6 +170,4 @@ z.viewModel.panel.AddParticipantsViewModel = class AddParticipantsViewModel exte
       amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.ADD_PARTICIPANTS, attributes);
     });
   }
-
-  _addService() {}
 };
