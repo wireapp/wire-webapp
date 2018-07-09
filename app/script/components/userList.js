@@ -39,6 +39,7 @@ z.components.UserList = class UserList {
    * @param {ko.observable} params.filter - Filter list items
    * @param {Function} params.click - Called when a list item is selected
    * @param {ko.observableArray} params.selected - Populated will all the selected items
+   * @param {Array} params.highlightedUsers - List of highlighted items
    */
   constructor(params) {
     this.click = params.click;
@@ -46,7 +47,7 @@ z.components.UserList = class UserList {
     this.selectedUsers = params.selected;
     this.mode = params.mode || UserList.MODE.DEFAULT;
     this.userEntities = params.user;
-    const highlightedUsers = ko.unwrap(params.highlightedUsers) || [];
+    const highlightedUsers = params.highlightedUsers || [];
     this.highlightedUserIds = highlightedUsers.map(user => user().id);
     this.isSelectEnabled = typeof params.selected === 'function';
     this.altStyle = params.altStyle;
