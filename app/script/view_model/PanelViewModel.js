@@ -259,7 +259,8 @@ z.viewModel.PanelViewModel = class PanelViewModel {
   _openPanel(newState, params) {
     if (!this.isAnimating()) {
       this._hidePanel(this.state());
-      this.stateHistory = [{state: PanelViewModel.STATE.CONVERSATION_DETAILS}, {params, state: newState}];
+      const rootState = PanelViewModel.STATE.CONVERSATION_DETAILS;
+      this.stateHistory = [{state: rootState}, {params, state: newState}];
       this.isAnimating(true);
       this.exitingState(undefined);
       this.isVisible(true);
