@@ -52,7 +52,7 @@ z.viewModel.panel.ConversationParticipantsViewModel = class ConversationParticip
     this.navigateTo(z.viewModel.PanelViewModel.STATE.GROUP_PARTICIPANT_USER, userEntity);
   }
 
-  initView(highlightedUsers) {
+  initView(highlightedUsers = []) {
     this.searchInput('');
     this.highlightedUsers(highlightedUsers);
   }
