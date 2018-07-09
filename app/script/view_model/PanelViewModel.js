@@ -232,7 +232,7 @@ z.viewModel.PanelViewModel = class PanelViewModel {
   togglePanel(addPeople = false) {
     const canAddPeople = this.conversationEntity() && this.conversationEntity().isActiveParticipant();
     if (addPeople && canAddPeople) {
-      if (this.addParticipantsVisible()) {
+      if (this._isStateVisible(PanelViewModel.STATE.ADD_PARTICIPANTS)) {
         return this.closePanel();
       }
 
