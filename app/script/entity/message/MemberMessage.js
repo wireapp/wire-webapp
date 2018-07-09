@@ -35,6 +35,8 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
 
     this.hasUsers = ko.pureComputed(() => this.userEntities().length);
 
+    this.teamRepository = wire.app.repository.team;
+
     // Users joined the conversation without sender
     this.joinedUserEntities = ko.pureComputed(() => {
       return this.userEntities()
@@ -228,5 +230,12 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
 
   isMemberRemoval() {
     return this.isMemberLeave() || this.isTeamMemberLeave();
+  }
+
+  isCompleteTeam() {
+    return (
+      this.teamRepository.isTeam() &&
+      this.teamRepository.teamUsers().every(teamUser => this.userIds.includes(teamUser.id))
+    );
   }
 };
