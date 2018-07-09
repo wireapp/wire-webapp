@@ -31,8 +31,79 @@ const nock = require('nock');
 
 const BASE_URL = 'mock-backend.wire.com';
 const BASE_URL_HTTPS = `https://${BASE_URL}`;
+const MOCK_BACKEND = {
+  name: 'mock',
+  rest: BASE_URL_HTTPS,
+  ws: `wss://${BASE_URL}`,
+};
+
+async function createAccount(storageName = `test-${Date.now()}`) {
+  const storeEngine = new MemoryEngine();
+  await storeEngine.init(storageName);
+
+  const config = new Config(storeEngine, MOCK_BACKEND);
+  const apiClient = new APIClient(config);
+  return new Account(apiClient);
+}
 
 describe('Account', () => {
+  const CLIENT_ID = '4e37b32f57f6da55';
+
+  const accessTokenData = {
+    access_token:
+      'iJCRCjc8oROO-dkrkqCXOade997oa8Jhbz6awMUQPBQo80VenWqp_oNvfY6AnU5BxEsdDPOBfBP-uz_b0gAKBQ==.v=1.k=1.d=1498600993.t=a.l=.u=aaf9a833-ef30-4c22-86a0-9adc8a15b3b4.c=15037015562284012115',
+    expires_in: 900,
+    token_type: 'Bearer',
+    user: 'aaf9a833-ef30-4c22-86a0-9adc8a15b3b4',
+  };
+
+  beforeEach(() => {
+    nock(BASE_URL_HTTPS)
+      .post(`${AuthAPI.URL.LOGIN}`, body => {
+        return body.email && body.password;
+      })
+      .query(() => true)
+      .reply((uri, body) => {
+        const parsedBody = JSON.parse(body);
+        if (parsedBody.password === 'wrong') {
+          return [
+            StatusCode.FORBIDDEN,
+            JSON.stringify({
+              code: StatusCode.FORBIDDEN,
+              label: 'invalid-credentials',
+              message: 'Authentication failed.',
+            }),
+          ];
+        }
+        return [StatusCode.OK, JSON.stringify(accessTokenData)];
+      });
+
+    nock(BASE_URL_HTTPS)
+      .post(`${AuthAPI.URL.ACCESS}/${AuthAPI.URL.LOGOUT}`)
+      .reply(StatusCode.OK, undefined);
+
+    nock(BASE_URL_HTTPS)
+      .post(ClientAPI.URL.CLIENTS)
+      .reply(StatusCode.OK, {id: CLIENT_ID});
+
+    nock(BASE_URL_HTTPS)
+      .post(
+        new RegExp(`${ConversationAPI.URL.CONVERSATIONS}/.*/${ConversationAPI.URL.OTR}/${ConversationAPI.URL.MESSAGES}`)
+      )
+      .query({ignore_missing: false})
+      .reply(StatusCode.OK)
+      .persist();
+
+    nock(BASE_URL_HTTPS)
+      .get(`${NotificationAPI.URL.NOTIFICATION}/${NotificationAPI.URL.LAST}`)
+      .query({client: CLIENT_ID})
+      .reply(StatusCode.OK, {});
+
+    nock(BASE_URL_HTTPS)
+      .get(ClientAPI.URL.CLIENTS)
+      .reply(StatusCode.OK, [{id: CLIENT_ID}]);
+  });
+
   describe('"init"', () => {
     it('initializes the Protocol buffers', async done => {
       const account = new Account();
@@ -56,71 +127,6 @@ describe('Account', () => {
   });
 
   describe('"login"', () => {
-    const MOCK_BACKEND = {
-      name: 'mock',
-      rest: BASE_URL_HTTPS,
-      ws: `wss://${BASE_URL}`,
-    };
-
-    const CLIENT_ID = '4e37b32f57f6da55';
-
-    const accessTokenData = {
-      access_token:
-        'iJCRCjc8oROO-dkrkqCXOade997oa8Jhbz6awMUQPBQo80VenWqp_oNvfY6AnU5BxEsdDPOBfBP-uz_b0gAKBQ==.v=1.k=1.d=1498600993.t=a.l=.u=aaf9a833-ef30-4c22-86a0-9adc8a15b3b4.c=15037015562284012115',
-      expires_in: 900,
-      token_type: 'Bearer',
-      user: 'aaf9a833-ef30-4c22-86a0-9adc8a15b3b4',
-    };
-
-    beforeEach(() => {
-      nock(BASE_URL_HTTPS)
-        .post(`${AuthAPI.URL.LOGIN}`, body => {
-          return body.email && body.password;
-        })
-        .query(() => true)
-        .reply((uri, body) => {
-          const parsedBody = JSON.parse(body);
-          if (parsedBody.password === 'wrong') {
-            return [
-              StatusCode.FORBIDDEN,
-              JSON.stringify({
-                code: StatusCode.FORBIDDEN,
-                label: BackendErrorLabel.INVALID_CREDENTIALS,
-                message: 'Authentication failed.',
-              }),
-            ];
-          }
-          return [StatusCode.OK, JSON.stringify(accessTokenData)];
-        });
-
-      nock(BASE_URL_HTTPS)
-        .post(`${AuthAPI.URL.ACCESS}/${AuthAPI.URL.LOGOUT}`)
-        .reply(StatusCode.OK, undefined);
-
-      nock(BASE_URL_HTTPS)
-        .post(ClientAPI.URL.CLIENTS)
-        .reply(StatusCode.OK, {id: CLIENT_ID});
-
-      nock(BASE_URL_HTTPS)
-        .post(
-          new RegExp(
-            `${ConversationAPI.URL.CONVERSATIONS}/.*/${ConversationAPI.URL.OTR}/${ConversationAPI.URL.MESSAGES}`
-          )
-        )
-        .query({ignore_missing: false})
-        .reply(StatusCode.OK)
-        .persist();
-
-      nock(BASE_URL_HTTPS)
-        .get(`${NotificationAPI.URL.NOTIFICATION}/${NotificationAPI.URL.LAST}`)
-        .query({client: CLIENT_ID})
-        .reply(StatusCode.OK, {});
-
-      nock(BASE_URL_HTTPS)
-        .get(ClientAPI.URL.CLIENTS)
-        .reply(StatusCode.OK, [{id: CLIENT_ID}]);
-    });
-
     it('logs in with correct credentials', async done => {
       const storeEngine = new MemoryEngine();
       await storeEngine.init('account.test');
@@ -167,6 +173,30 @@ describe('Account', () => {
 
         done();
       }
+    });
+  });
+
+  describe('"createText"', () => {
+    it('creates a text payload.', async done => {
+      const account = await createAccount();
+      expect(account.apiClient.context).toBeUndefined();
+
+      await account.init();
+
+      await account.login({
+        clientType: ClientType.TEMPORARY,
+        email: 'hello@example.com',
+        password: 'my-secret',
+      });
+
+      expect(account.apiClient.context.userId).toBeDefined();
+
+      const text = 'FIFA World Cup';
+      const payload = account.service.conversation.createText(text);
+
+      expect(payload.timestamp).toBeGreaterThan(0);
+
+      done();
     });
   });
 });

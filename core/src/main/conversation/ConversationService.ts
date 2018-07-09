@@ -354,6 +354,7 @@ export default class ConversationService {
       from: this.apiClient.context!.userId,
       id: messageId,
       state: PayloadBundleState.OUTGOING_UNSENT,
+      timestamp: Date.now(),
       type: GenericMessageType.ASSET,
     };
   }
@@ -364,6 +365,7 @@ export default class ConversationService {
       from: this.apiClient.context!.userId,
       id: messageId,
       state: PayloadBundleState.OUTGOING_UNSENT,
+      timestamp: Date.now(),
       type: GenericMessageType.TEXT,
     };
   }
@@ -377,6 +379,7 @@ export default class ConversationService {
       from: this.apiClient.context!.userId,
       id: messageId,
       state: PayloadBundleState.OUTGOING_UNSENT,
+      timestamp: Date.now(),
       type: GenericMessageType.CONFIRMATION,
     };
   }
@@ -386,6 +389,7 @@ export default class ConversationService {
       from: this.apiClient.context!.userId,
       id: messageId,
       state: PayloadBundleState.OUTGOING_UNSENT,
+      timestamp: Date.now(),
       type: GenericMessageType.KNOCK,
     };
   }
@@ -396,6 +400,7 @@ export default class ConversationService {
       from: this.apiClient.context!.userId,
       id: messageId,
       state: PayloadBundleState.OUTGOING_UNSENT,
+      timestamp: Date.now(),
       type: GenericMessageType.CLIENT_ACTION,
     };
   }
@@ -423,6 +428,7 @@ export default class ConversationService {
       id: messageId,
       messageTimer: this.messageTimer.getMessageTimer(conversationId),
       state: PayloadBundleState.OUTGOING_SENT,
+      timestamp: Date.now(),
       type: GenericMessageType.HIDDEN,
     };
   }
@@ -450,6 +456,7 @@ export default class ConversationService {
       id: messageId,
       messageTimer: this.messageTimer.getMessageTimer(conversationId),
       state: PayloadBundleState.OUTGOING_SENT,
+      timestamp: Date.now(),
       type: GenericMessageType.DELETED,
     };
   }
