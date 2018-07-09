@@ -23,7 +23,8 @@ window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 window.z.viewModel.panel = z.viewModel.panel || {};
 
-z.viewModel.panel.AddParticipantsViewModel = class AddParticipantsViewModel {
+z.viewModel.panel.AddParticipantsViewModel = class AddParticipantsViewModel extends z.viewModel.panel
+  .BasePanelViewModel {
   static get STATE() {
     return {
       ADD_PEOPLE: 'AddParticipantsViewModel.STATE.ADD_PEOPLE',
@@ -31,23 +32,24 @@ z.viewModel.panel.AddParticipantsViewModel = class AddParticipantsViewModel {
     };
   }
 
-  constructor(mainViewModel, panelViewModel, repositories) {
-    this.panelViewModel = panelViewModel;
-
-    this.conversationRepository = repositories.conversation;
-    this.integrationRepository = repositories.integration;
-    this.teamRepository = repositories.team;
-    this.userRepository = repositories.user;
-
-    this.logger = new z.util.Logger('z.viewModel.panel.AddParticipantsViewModel', z.config.LOGGER.OPTIONS);
-
-    this.conversationEntity = this.conversationRepository.active_conversation;
+  constructor(params) {
+    super(params);
+    this.conversationRepository = this.repositories.conversation;
+    this.integrationRepository = this.repositories.integration;
+    this.teamRepository = this.repositories.team;
+    this.userRepository = this.repositories.user;
     this.isTeam = this.teamRepository.isTeam;
-    this.isTeamOnly = this.panelViewModel.isTeamOnly;
-    this.isVisible = this.panelViewModel.addParticipantsVisible;
-    this.panelState = this.panelViewModel.panelState;
+    this.isTeamOnly = ko.pureComputed(() => this.activeConversation() && this.activeConversation().isTeamOnly());
     this.services = this.integrationRepository.services;
-    this.showIntegrations = this.panelViewModel.showIntegrations;
+    this.showIntegrations = ko.pureComputed(() => {
+      if (this.activeConversation()) {
+        const firstUserEntity = this.activeConversation().firstUserEntity();
+        const hasBotUser = firstUserEntity && firstUserEntity.isBot;
+        const allowIntegrations = this.activeConversation().is_group() || hasBotUser;
+        const enableIntegrations = this.repositories.integration.enableIntegrations();
+        return enableIntegrations && allowIntegrations && !this.isTeamOnly();
+      }
+    });
     this.teamUsers = this.teamRepository.teamUsers;
     this.teamMembers = this.teamRepository.teamMembers;
 
@@ -62,10 +64,10 @@ z.viewModel.panel.AddParticipantsViewModel = class AddParticipantsViewModel {
     this.isStateAddService = ko.pureComputed(() => this.state() === AddParticipantsViewModel.STATE.ADD_SERVICE);
 
     this.contacts = ko.pureComputed(() => {
-      const conversationEntity = this.conversationEntity();
+      const activeConversation = this.activeConversation();
       let userEntities = [];
 
-      if (!conversationEntity) {
+      if (!activeConversation) {
         return userEntities;
       }
 
@@ -80,7 +82,7 @@ z.viewModel.panel.AddParticipantsViewModel = class AddParticipantsViewModel {
       }
 
       return userEntities.filter(userEntity => {
-        return !conversationEntity.participating_user_ids().find(id => userEntity.id === id);
+        return !activeConversation.participating_user_ids().find(id => userEntity.id === id);
       });
     });
 
@@ -100,6 +102,14 @@ z.viewModel.panel.AddParticipantsViewModel = class AddParticipantsViewModel {
     this.clickOnSelectService = this.clickOnSelectService.bind(this);
   }
 
+  getElementId() {
+    return 'add-participants';
+  }
+
+  shouldSkipTransition() {
+    return true;
+  }
+
   clickOnAddPeople() {
     this.state(AddParticipantsViewModel.STATE.ADD_PEOPLE);
   }
@@ -109,17 +119,12 @@ z.viewModel.panel.AddParticipantsViewModel = class AddParticipantsViewModel {
     this.searchServices(this.searchInput());
   }
 
-  clickOnBack() {
-    this._switchToConversationDetails();
-  }
-
-  clickOnClose() {
-    this.panelViewModel.closePanel().then(didClose => didClose && this.resetView());
-  }
-
   clickOnSelectService(serviceEntity) {
     this.selectedService(serviceEntity);
-    this.panelViewModel.showAddService(serviceEntity);
+    this.navigateTo(z.viewModel.PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE, {
+      addMode: true,
+      service: serviceEntity,
+    });
   }
 
   clickToAddParticipants() {
@@ -129,10 +134,10 @@ z.viewModel.panel.AddParticipantsViewModel = class AddParticipantsViewModel {
       this._addMembers();
     }
 
-    this._switchToConversationDetails();
+    this.onGoBack();
   }
 
-  resetView() {
+  initView() {
     this.state(AddParticipantsViewModel.STATE.ADD_PEOPLE);
     this.selectedContacts.removeAll();
     this.selectedService(undefined);
@@ -146,22 +151,22 @@ z.viewModel.panel.AddParticipantsViewModel = class AddParticipantsViewModel {
   }
 
   _addMembers() {
-    const conversationEntity = this.conversationEntity();
+    const activeConversation = this.activeConversation();
     const userEntities = this.selectedContacts().slice();
 
-    this.conversationRepository.addMembers(conversationEntity, userEntities).then(() => {
+    this.conversationRepository.addMembers(activeConversation, userEntities).then(() => {
       const attributes = {
         method: 'add',
         user_num: userEntities.length,
       };
 
-      const isTeamConversation = !!this.conversationEntity().team_id;
+      const isTeamConversation = !!this.activeConversation().team_id;
       if (isTeamConversation) {
         const participants = z.tracking.helpers.getParticipantTypes(userEntities, false);
 
         Object.assign(attributes, {
           guest_num: participants.guests,
-          is_allow_guests: conversationEntity.isGuestRoom(),
+          is_allow_guests: activeConversation.isGuestRoom(),
           temporary_guest_num: participants.temporaryGuests,
           user_num: participants.users,
         });
@@ -171,12 +176,5 @@ z.viewModel.panel.AddParticipantsViewModel = class AddParticipantsViewModel {
     });
   }
 
-  _addService() {
-    this.integrationRepository.addService(this.conversationEntity(), this.selectedService(), 'conversation_details');
-  }
-
-  _switchToConversationDetails() {
-    this.panelViewModel.switchState(z.viewModel.PanelViewModel.STATE.CONVERSATION_DETAILS, false, true);
-    this.resetView();
-  }
+  _addService() {}
 };

@@ -1,9 +1,9 @@
-<div id="guest-options" class="panel__page guest-options" data-bind="with: $root.guestOptions">
+<div id="guest-options" class="panel__page guest-options" data-bind="with: $root.subViews[z.viewModel.PanelViewModel.STATE.GUEST_OPTIONS]">
   <!-- ko if: isVisible() -->
     <div class="panel__header">
-      <arrow-left-icon class="icon-button" data-bind="click: clickOnBack" data-uie-name="go-back-guest-options"></arrow-left-icon>
+      <arrow-left-icon class="icon-button" data-bind="click: onGoBack" data-uie-name="go-back-guest-options"></arrow-left-icon>
       <div class="panel__header__title" data-bind="l10n_text: z.string.guestOptionsTitle"></div>
-      <close-icon class="right-panel-close icon-button" data-bind="click: clickOnClose" data-uie-name="do-close"></close-icon>
+      <close-icon class="right-panel-close icon-button" data-bind="click: onClose" data-uie-name="do-close"></close-icon>
     </div>
     <div class="panel__content">
       <div class="panel__content__scroll" data-bind="antiscroll: shouldUpdateScrollbar">
@@ -16,7 +16,7 @@
             <div data-bind="l10n_text: z.string.guestOptionsInfoText" data-uie-name="status-guest-options-info"></div>
           </div>
           <!-- ko if: hasAccessCode() -->
-            <textarea disabled class="guest-options__link" data-bind="value: conversationEntity().accessCode(), template: {afterRender: resizeLink}" data-uie-name="status-invite-link"></textarea>
+            <textarea disabled class="guest-options__link" data-bind="value: activeConversation().accessCode(), template: {afterRender: resizeLink}" data-uie-name="status-invite-link"></textarea>
             <div class="panel__action-item panel__action-item--alternate" data-bind="click: copyLink, css: {'panel__action-item--show-alternative': isLinkCopied}" data-uie-name="do-copy-link">
               <div class="panel__action-item__default">
                 <copy-icon class="panel__action-item__icon"></copy-icon>
