@@ -1,9 +1,9 @@
-<div id="conversation-participants" class="panel__page conversation-participants" data-bind="with: $root.conversationParticipants">
+<div id="conversation-participants" class="panel__page conversation-participants" data-bind="with: $root.subViews[z.viewModel.PanelViewModel.STATE.CONVERSATION_PARTICIPANTS]">
     <!-- ko if: isVisible() -->
         <div class="panel__header">
-            <arrow-left-icon class="icon-button" data-bind="click: clickOnBack" data-uie-name="go-back-conversation-participants"></arrow-left-icon>
+            <arrow-left-icon class="icon-button" data-bind="click: onGoBack" data-uie-name="go-back-conversation-participants"></arrow-left-icon>
             <div class="panel__header__title" data-bind="l10n_text: z.string.conversationParticipantsTitle"></div>
-            <close-icon class="right-panel-close icon-button" data-bind="click: clickOnClose" data-uie-name="do-close"></close-icon>
+            <close-icon class="right-panel-close icon-button" data-bind="click: onClose" data-uie-name="do-close"></close-icon>
         </div>
         <div class="panel__content conversation-participants__content">
             <user-input class="user-list-light" params="input: searchInput, placeholder: z.string.conversationParticipantsSearchPlaceholder, focusDelay: z.motion.MotionDuration.MEDIUM" spellcheck="false"></user-input>

@@ -23,13 +23,10 @@ window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 window.z.viewModel.panel = z.viewModel.panel || {};
 
-z.viewModel.panel.TimedMessagesViewModel = class TimedMessagesViewModel {
-  constructor(mainViewModel, panelViewModel, repositories) {
-    this.panelViewModel = panelViewModel;
-    this.isVisible = this.panelViewModel.timedMessagesVisible;
-    this.conversationRepository = repositories.conversation;
-    this.conversationEntity = this.conversationRepository.active_conversation;
-
+z.viewModel.panel.TimedMessagesViewModel = class TimedMessagesViewModel extends z.viewModel.panel.BasePanelViewModel {
+  constructor(params) {
+    super(params);
+    this.conversationRepository = this.repositories.conversation;
     this.messageTimes = ko.pureComputed(() => {
       const times = z.ephemeral.timings.VALUES;
       const currentTime = this.currentMessageTimer();
@@ -55,7 +52,7 @@ z.viewModel.panel.TimedMessagesViewModel = class TimedMessagesViewModel {
     this.isRendered = ko.observable(false).extend({notify: 'always'});
 
     this.currentMessageTimer = ko.pureComputed(() => {
-      return this.conversationEntity().hasGlobalMessageTimer() ? this.conversationEntity().messageTimer() : 0;
+      return this.activeConversation().hasGlobalMessageTimer() ? this.activeConversation().messageTimer() : 0;
     });
 
     this.shouldUpdateScrollbar = ko
@@ -66,18 +63,14 @@ z.viewModel.panel.TimedMessagesViewModel = class TimedMessagesViewModel {
     this.clickOnMessageTimeOff = this.clickOnMessageTime.bind(this, {value: null});
   }
 
-  clickOnBack() {
-    this.panelViewModel.switchState(z.viewModel.PanelViewModel.STATE.CONVERSATION_DETAILS, true);
-  }
-
-  clickOnClose() {
-    this.panelViewModel.closePanel();
+  getElementId() {
+    return 'timed-messages';
   }
 
   clickOnMessageTime({value}) {
-    const conversationEntity = this.conversationEntity();
-    conversationEntity.globalMessageTimer(value);
-    this.conversationRepository.updateConversationMessageTimer(conversationEntity, value);
-    this.clickOnBack();
+    const activeConversation = this.activeConversation();
+    activeConversation.globalMessageTimer(value);
+    this.conversationRepository.updateConversationMessageTimer(activeConversation, value);
+    this.onGoBack();
   }
 };

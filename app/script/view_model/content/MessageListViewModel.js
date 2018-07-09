@@ -500,7 +500,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
   }
 
   clickOnInvitePeople() {
-    this.mainViewModel.panel.switchState(z.viewModel.PanelViewModel.STATE.GUEST_OPTIONS);
+    this.mainViewModel.panel.navigateTo(z.viewModel.PanelViewModel.STATE.GUEST_OPTIONS);
   }
 
   /**

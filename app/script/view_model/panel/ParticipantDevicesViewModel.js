@@ -23,7 +23,8 @@ window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 window.z.viewModel.panel = z.viewModel.panel || {};
 
-z.viewModel.panel.ParticipantDevicesViewModel = class ParticipantDevicesViewModel {
+z.viewModel.panel.ParticipantDevicesViewModel = class ParticipantDevicesViewModel extends z.viewModel.panel
+  .BasePanelViewModel {
   static get MODE() {
     return {
       FOUND: 'ParticipantDevicesViewModel.MODE.FOUND',
@@ -32,17 +33,15 @@ z.viewModel.panel.ParticipantDevicesViewModel = class ParticipantDevicesViewMode
     };
   }
 
-  constructor(mainViewModel, panelViewModel, repositories) {
+  constructor(params) {
+    super(params);
     this.clickOnDevice = this.clickOnDevice.bind(this);
-
-    this.panelViewModel = panelViewModel;
-    this.clientRepository = repositories.client;
-    this.cryptographyRepository = repositories.cryptography;
-    this.conversationRepository = repositories.conversation;
+    this.clientRepository = this.repositories.client;
+    this.cryptographyRepository = this.repositories.cryptography;
+    this.conversationRepository = this.repositories.conversation;
     this.logger = new z.util.Logger('z.viewModel.panel.ParticipantDevicesViewModel', z.config.LOGGER.OPTIONS);
 
     this.conversationEntity = this.conversationRepository.active_conversation;
-    this.previousState = this.panelViewModel.previousState;
     this.selfClient = this.clientRepository.currentClient;
 
     this.deviceMode = ko.observable(ParticipantDevicesViewModel.MODE.REQUESTING);
@@ -53,8 +52,6 @@ z.viewModel.panel.ParticipantDevicesViewModel = class ParticipantDevicesViewMode
     this.selectedClient = ko.observable();
     this.selectedClientSubscription = undefined;
     this.userEntity = ko.observable();
-
-    this.isVisible = ko.pureComputed(() => this.panelViewModel.participantDevicesVisible() && this.userEntity());
 
     this.clientEntities = ko.pureComputed(() => this.userEntity() && this.userEntity().devices());
 
@@ -72,8 +69,8 @@ z.viewModel.panel.ParticipantDevicesViewModel = class ParticipantDevicesViewMode
       const substitution = {user: z.util.escapeHtml(this.userEntity().first_name())};
       const text = z.l10n.text(z.string.participantDevicesDetailHeadline, substitution);
 
-      const textWithHtmlTags = new RegExp('\\{\\{[^\\}]+\\}\\}[^\\{]+\\{\\{[^\\}]+\\}\\}');
-      const textWithinHtmlTags = new RegExp('\\{\\{[^\\}]+\\}\\}', 'gm');
+      const textWithHtmlTags = /\{\{[^\}]+\}\}[^\{]+\{\{[^\}]+\}\}/;
+      const textWithinHtmlTags = /\{\{[^\}]+\}\}/gm;
 
       const [pivot] = text.match(textWithHtmlTags) || [];
       const sanitizedText = z.util.StringUtil.splitAtPivotElement(text, pivot, pivot);
@@ -127,6 +124,10 @@ z.viewModel.panel.ParticipantDevicesViewModel = class ParticipantDevicesViewMode
       .extend({notify: 'always', rateLimit: {method: 'notifyWhenChangesStop', timeout: 0}});
   }
 
+  getElementId() {
+    return 'participant-devices';
+  }
+
   clickOnBack() {
     if (this.showSelfFingerprint()) {
       return this.showSelfFingerprint(false);
@@ -136,16 +137,7 @@ z.viewModel.panel.ParticipantDevicesViewModel = class ParticipantDevicesViewMode
       return this.selectedClient(undefined);
     }
 
-    const stateWasGroupParticipant = this.previousState() === z.viewModel.PanelViewModel.STATE.GROUP_PARTICIPANT_USER;
-    if (stateWasGroupParticipant) {
-      return this.panelViewModel.showParticipant(this.userEntity(), true);
-    }
-
-    this.panelViewModel.switchState(this.previousState(), true);
-  }
-
-  clickOnClose() {
-    this.panelViewModel.closePanel().then(didClose => didClose && this.resetView());
+    this.onGoBack();
   }
 
   clickOnDevice(clientEntity) {
@@ -181,11 +173,7 @@ z.viewModel.panel.ParticipantDevicesViewModel = class ParticipantDevicesViewMode
       .catch(error => this.logger.warn(`Failed to toggle client verification: ${error.message}`));
   }
 
-  showParticipantDevices(userEntity) {
-    this.userEntity(userEntity);
-  }
-
-  resetView() {
+  initView(userEntity) {
     this.showSelfFingerprint(false);
     this.selectedClient(undefined);
     this.deviceMode(ParticipantDevicesViewModel.MODE.REQUESTING);
@@ -193,5 +181,6 @@ z.viewModel.panel.ParticipantDevicesViewModel = class ParticipantDevicesViewMode
     if (this.selectedClientSubscription) {
       this.selectedClientSubscription.dispose();
     }
+    this.userEntity(userEntity);
   }
 };

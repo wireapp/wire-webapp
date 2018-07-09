@@ -1,9 +1,9 @@
-<div id="add-participants" class="add-participants panel__page" data-bind="with: $root.addParticipants">
+<div id="add-participants" class="add-participants panel__page" data-bind="with: $root.subViews[z.viewModel.PanelViewModel.STATE.ADD_PARTICIPANTS]">
   <!-- ko if: isVisible() -->
     <div class="panel__header">
-      <arrow-left-icon class="icon-button" data-bind="click: clickOnBack" data-uie-name="go-back-add-participants"></arrow-left-icon>
+      <arrow-left-icon class="icon-button" data-bind="click: onGoBack" data-uie-name="go-back-add-participants"></arrow-left-icon>
       <div class="panel__header__title" data-bind="text: headerText" data-uie-name="status-people-selected"></div>
-      <close-icon class="icon-button" data-bind="click: clickOnClose" data-uie-name="do-close"></close-icon>
+      <close-icon class="icon-button" data-bind="click: onClose" data-uie-name="do-close"></close-icon>
     </div>
     <div class="panel__content">
       <user-input class="user-list-light" params="input: searchInput, selected: selectedContacts, placeholder: z.string.addParticipantsSearchPlaceholder" spellcheck="false"></user-input>
