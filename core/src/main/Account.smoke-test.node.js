@@ -153,6 +153,15 @@ describe('Account', () => {
       done();
     });
 
+    beforeEach(async done => {
+      if (CAN_RUN) {
+        await alice.service.conversation.leaveConversations();
+        await bob.service.conversation.leaveConversations();
+        await eve.service.conversation.leaveConversations();
+      }
+      done();
+    });
+
     it('sends and receive messages.', async done => {
       if (!CAN_RUN) {
         return done();
@@ -173,10 +182,11 @@ describe('Account', () => {
       await sendText(alice, conversationId, message);
     });
 
-    it('creates conversations and add participants.', async done => {
+    it('creates conversations and adds participants.', async done => {
       if (!CAN_RUN) {
         return done();
       }
+      jasmine.DEFAULT_TIMEOUT_INTERVAL = 5000;
 
       // Alice connects to Bob
       await connect(
@@ -198,8 +208,11 @@ describe('Account', () => {
         await bob.service.conversation.addUser(conversationId, getId(eve));
       } catch (error) {
         expect(error.name).toBe(UnconnectedUserError.name);
-        done();
       }
+
+      // Alice adds Eve to the conversation
+      await alice.service.conversation.addUser(conversationId, getId(eve));
+      done();
     });
   });
 });

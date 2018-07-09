@@ -18,8 +18,8 @@
  */
 
 const {BackendErrorMapper} = require('@wireapp/api-client/dist/commonjs/http/');
-const {UnknownConversationError} = require('@wireapp/api-client/dist/commonjs/conversation/');
-const {UnknownUserError} = require('@wireapp/api-client/dist/commonjs/user/');
+const {ConversationIsUnknownError} = require('@wireapp/api-client/dist/commonjs/conversation/');
+const {UserIsUnknownError} = require('@wireapp/api-client/dist/commonjs/user/');
 
 describe('BackendErrorMapper', () => {
   describe('"map"', () => {
@@ -31,7 +31,7 @@ describe('BackendErrorMapper', () => {
       };
 
       const userError = BackendErrorMapper.map(userIdError);
-      expect(userError).toEqual(jasmine.any(UnknownUserError));
+      expect(userError).toEqual(jasmine.any(UserIsUnknownError));
 
       const conversationIdError = {
         code: 400,
@@ -40,7 +40,7 @@ describe('BackendErrorMapper', () => {
       };
 
       const conversationError = BackendErrorMapper.map(conversationIdError);
-      expect(conversationError).toEqual(jasmine.any(UnknownConversationError));
+      expect(conversationError).toEqual(jasmine.any(ConversationIsUnknownError));
     });
   });
 });

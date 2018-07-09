@@ -27,14 +27,26 @@ export class ConversationError extends BackendError {
   }
 }
 
-export class UnknownConversationError extends ConversationError {
+export class ConversationIsUnknownError extends ConversationError {
   constructor(
     message: string,
     label: BackendErrorLabel = BackendErrorLabel.CLIENT_ERROR,
     code: StatusCode = StatusCode.BAD_REQUEST
   ) {
     super(message, label, code);
-    Object.setPrototypeOf(this, UnknownConversationError.prototype);
-    this.name = 'UnknownConversationError';
+    Object.setPrototypeOf(this, ConversationIsUnknownError.prototype);
+    this.name = 'ConversationIsUnknownError';
+  }
+}
+
+export class ConversationOperationError extends ConversationError {
+  constructor(
+    message: string,
+    label: BackendErrorLabel = BackendErrorLabel.INVALID_OPERATION,
+    code: StatusCode = StatusCode.FORBIDDEN
+  ) {
+    super(message, label, code);
+    Object.setPrototypeOf(this, ConversationOperationError.prototype);
+    this.name = 'ConversationOperationError';
   }
 }

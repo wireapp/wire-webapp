@@ -27,15 +27,15 @@ export class UserError extends BackendError {
   }
 }
 
-export class UnknownUserError extends UserError {
+export class UserIsUnknownError extends UserError {
   constructor(
     message: string,
     label: BackendErrorLabel = BackendErrorLabel.CLIENT_ERROR,
     code: StatusCode = StatusCode.BAD_REQUEST
   ) {
     super(message, label, code);
-    Object.setPrototypeOf(this, UnknownUserError.prototype);
-    this.name = 'UnknownUserError';
+    Object.setPrototypeOf(this, UserIsUnknownError.prototype);
+    this.name = 'UserIsUnknownError';
   }
 }
 
@@ -46,7 +46,7 @@ export class UnconnectedUserError extends UserError {
     code: StatusCode = StatusCode.FORBIDDEN
   ) {
     super(message, label, code);
-    Object.setPrototypeOf(this, UnknownUserError.prototype);
+    Object.setPrototypeOf(this, UserIsUnknownError.prototype);
     this.name = 'UnconnectedUserError';
   }
 }

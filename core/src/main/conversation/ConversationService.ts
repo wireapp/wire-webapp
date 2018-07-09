@@ -20,6 +20,7 @@
 import {
   ClientMismatch,
   Conversation,
+  CONVERSATION_TYPE,
   NewConversation,
   NewOTRMessage,
   OTRRecipients,
@@ -461,12 +462,19 @@ export default class ConversationService {
     };
   }
 
-  public leaveConversation(conversationId: string, userId: string = ''): Promise<ConversationMemberLeaveEvent> {
-    if (userId.length === 0 && this.apiClient.context) {
-      userId = this.apiClient.context.userId;
+  public leaveConversation(conversationId: string): Promise<ConversationMemberLeaveEvent> {
+    return this.apiClient.conversation.api.deleteMember(conversationId, this.apiClient.context!.userId);
+  }
+
+  public async leaveConversations(conversationIds?: string[]): Promise<ConversationMemberLeaveEvent[]> {
+    if (!conversationIds) {
+      const conversation = await this.getConversations();
+      conversationIds = conversation
+        .filter(conversation => conversation.type === CONVERSATION_TYPE.REGULAR)
+        .map(conversation => conversation.id);
     }
 
-    return this.apiClient.conversation.api.deleteMember(conversationId, userId);
+    return Promise.all(conversationIds.map(conversationId => this.leaveConversation(conversationId)));
   }
 
   public createConversation(name: string, otherUserIds: string | string[] = []): Promise<Conversation> {
