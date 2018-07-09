@@ -18,9 +18,9 @@
  */
 
 import {InvalidCredentialsError, LoginTooFrequentError} from '../auth/';
-import {UnknownConversationError} from '../conversation/';
+import {ConversationIsUnknownError, ConversationOperationError} from '../conversation/';
 import {BackendError, BackendErrorLabel, StatusCode} from '../http/';
-import {UnconnectedUserError, UnknownUserError} from '../user/';
+import {UnconnectedUserError, UserIsUnknownError} from '../user/';
 
 class BackendErrorMapper {
   public static get ERRORS(): {
@@ -31,9 +31,13 @@ class BackendErrorMapper {
     };
   } {
     return {
-      [Number(StatusCode.TOO_MANY_REQUESTS)]: {
+      [Number(StatusCode.BAD_REQUEST)]: {
         [String(BackendErrorLabel.CLIENT_ERROR)]: {
-          ['Logins too frequent']: new LoginTooFrequentError('Logins too frequent. User login temporarily disabled.'),
+          ["[path] 'cnv' invalid: Failed reading: Invalid UUID"]: new ConversationIsUnknownError(
+            'Conversation ID is unknown.'
+          ),
+          ["[path] 'usr' invalid: Failed reading: Invalid UUID"]: new UserIsUnknownError('User ID is unknown.'),
+          ['Error in $: Failed reading: satisfy']: new BackendError('Wrong set of parameters.'),
         },
       },
       [Number(StatusCode.FORBIDDEN)]: {
@@ -45,14 +49,13 @@ class BackendErrorMapper {
         [String(BackendErrorLabel.NOT_CONNECTED)]: {
           ['Users are not connected']: new UnconnectedUserError('Users are not connected.'),
         },
+        [String(BackendErrorLabel.INVALID_OPERATION)]: {
+          ['invalid operation for 1:1 conversations']: new ConversationOperationError('Cannot leave 1:1 conversation.'),
+        },
       },
-      [Number(StatusCode.BAD_REQUEST)]: {
+      [Number(StatusCode.TOO_MANY_REQUESTS)]: {
         [String(BackendErrorLabel.CLIENT_ERROR)]: {
-          ["[path] 'cnv' invalid: Failed reading: Invalid UUID"]: new UnknownConversationError(
-            'Conversation ID is unknown.'
-          ),
-          ["[path] 'usr' invalid: Failed reading: Invalid UUID"]: new UnknownUserError('User ID is unknown.'),
-          ['Error in $: Failed reading: satisfy']: new BackendError('Wrong set of parameters.'),
+          ['Logins too frequent']: new LoginTooFrequentError('Logins too frequent. User login temporarily disabled.'),
         },
       },
     };
