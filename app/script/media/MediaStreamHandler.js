@@ -48,6 +48,10 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
    * @returns {Array} MediaStreamTracks
    */
   static getMediaTracks(mediaStream, mediaType = z.media.MediaType.AUDIO_VIDEO) {
+    if (!mediaStream) {
+      throw new z.media.MediaError(z.media.MediaError.TYPE.STREAM_NOT_FOUND);
+    }
+
     switch (mediaType) {
       case z.media.MediaType.AUDIO: {
         return mediaStream.getAudioTracks();
@@ -91,8 +95,8 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
     this.permissionRepository = permissionRepository;
     this.logger = new z.util.Logger('z.media.MediaStreamHandler', z.config.LOGGER.OPTIONS);
 
-    this.calls = () => [];
-    this.joinedCall = () => undefined;
+    this.currentCalls = new Map();
+    this.joinedCall = ko.observable();
 
     this.constraintsHandler = this.mediaRepository.constraintsHandler;
     this.devicesHandler = this.mediaRepository.devicesHandler;
@@ -159,17 +163,9 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
       .updateCurrentDevices(videoSend)
       .then(() => this.constraintsHandler.getMediaStreamConstraints(true, videoSend, isGroup))
       .then(streamConstraints => this.requestMediaStream(mediaType, streamConstraints))
-      .then(mediaStreamInfo => {
-        this.selfStreamState.videoSend(videoSend);
-        if (videoSend) {
-          this.localMediaType(z.media.MediaType.VIDEO);
-        }
-        return this._initiateMediaStreamSuccess(mediaStreamInfo);
-      })
+      .then(mediaStreamInfo => this._initiateMediaStreamSuccess(conversationId, mediaStreamInfo))
       .catch(error => {
-        if (error.mediaType) {
-          this._initiateMediaStreamFailure(error, conversationId);
-        }
+        this._initiateMediaStreamFailure(error, conversationId);
 
         amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CALLING.FAILED_REQUESTING_MEDIA, {
           cause: error.name || error.message,
@@ -226,9 +222,14 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
     const replaceMediaTracksLocally = newMediaStreamInfo => {
       const mediaStream = newMediaStreamInfo.stream;
       const mediaType = newMediaStreamInfo.getType();
+      const localMediaStream = this.localMediaStream();
 
-      this._releaseTracksFromStream(this.localMediaStream(), mediaType);
-      this._addTracksToStream(mediaStream, this.localMediaStream(), mediaType);
+      if (localMediaStream) {
+        this._releaseTracksFromStream(localMediaStream, mediaType);
+        this._addTracksToStream(mediaStream, localMediaStream, mediaType);
+      } else {
+        this.localMediaStream(mediaStream);
+      }
     };
 
     return replace ? replaceMediaStreamLocally(mediaStreamInfo) : replaceMediaTracksLocally(mediaStreamInfo);
@@ -240,7 +241,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
    * @returns {Promise} Resolves when the input source has been replaced
    */
   replaceInputSource(mediaType) {
-    const isPreferenceChange = !this.needsMediaStream();
+    const isPreferenceChange = !this.mediaStreamInUse();
 
     let constraintsPromise;
     switch (mediaType) {
@@ -267,6 +268,11 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
     return constraintsPromise
       .then(streamConstraints => {
         return this.requestMediaStream(mediaType, streamConstraints).then(mediaStreamInfo => {
+          if (!this.mediaStreamInUse()) {
+            this.logger.warn('Releasing obsolete MediaStream as there is no active call', mediaStreamInfo);
+            return this._releaseMediaStream(mediaStreamInfo.stream);
+          }
+
           this._setSelfStreamState(mediaType);
           this.changeMediaStream(mediaStreamInfo);
         });
@@ -445,13 +451,27 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
    * Initial request for local MediaStream was successful.
    *
    * @private
+   * @param {string} conversationId - ID of conversation to initiate MediaStream for
    * @param {z.media.MediaStreamInfo} mediaStreamInfo - Type of requested MediaStream
    * @returns {undefined} No return value
    */
-  _initiateMediaStreamSuccess(mediaStreamInfo) {
+  _initiateMediaStreamSuccess(conversationId, mediaStreamInfo) {
     if (mediaStreamInfo) {
+      const callEntity = this.currentCalls.get(conversationId);
+      const callNeedsMediaStream = callEntity && callEntity.needsMediaStream();
       const mediaStream = mediaStreamInfo.stream;
+
+      if (!callNeedsMediaStream) {
+        this.logger.warn(`Releasing obsolete MediaStream as call '${callEntity.id}' is no longer active`, callEntity);
+        return this._releaseMediaStream(mediaStream);
+      }
+
       const mediaType = mediaStreamInfo.getType();
+      const isVideoSend = mediaType === z.media.MediaType.AUDIO_VIDEO;
+      this.selfStreamState.videoSend(isVideoSend);
+      if (isVideoSend) {
+        this.localMediaType(z.media.MediaType.VIDEO);
+      }
 
       const logMessage = `Received initial MediaStream containing '${mediaStream.getTracks().length}' tracks/s`;
       const logObject = {
@@ -477,10 +497,12 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
   _initiateMediaStreamFailure(error, conversationId) {
     const {type, mediaType} = error;
 
-    const isStreamDeviceError = type === z.media.MediaError.TYPE.MEDIA_STREAM_DEVICE;
-    return isStreamDeviceError
-      ? this._showDeviceNotFoundHint(mediaType, conversationId)
-      : this._showPermissionDeniedHint(mediaType);
+    if (mediaType) {
+      const isStreamDeviceError = type === z.media.MediaError.TYPE.MEDIA_STREAM_DEVICE;
+      return isStreamDeviceError
+        ? this._showDeviceNotFoundHint(mediaType, conversationId)
+        : this._showPermissionDeniedHint(mediaType);
+    }
   }
 
   /**
@@ -553,7 +575,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
       })
       .catch(error => {
         const {message, name} = error;
-        this.logger.warn(`MediaStream request for '${mediaType}' failed: ${name} ${message}`);
+        this.logger.warn(`MediaStream request for '${mediaType}' failed: ${name} ${message}`, error);
         this._clearPermissionRequestHint(mediaType);
 
         if (z.media.MEDIA_STREAM_ERROR_TYPES.DEVICE.includes(name)) {
@@ -773,10 +795,10 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
    * Check for active calls that need a MediaStream.
    * @returns {boolean} Returns true if an active media stream is needed for at least one call
    */
-  needsMediaStream() {
-    for (const callEntity of this.calls()) {
-      const hasPreJoinVideo = callEntity.isIncoming() && callEntity.isRemoteVideoCall();
-      if (!callEntity.isOngoingOnAnotherClient() && (callEntity.selfClientJoined() || hasPreJoinVideo)) {
+  mediaStreamInUse() {
+    for (const callEntity of this.currentCalls.values()) {
+      const callNeedsMediaStream = callEntity.needsMediaStream();
+      if (callNeedsMediaStream) {
         return true;
       }
     }
@@ -809,7 +831,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
 
   // Reset the MediaStream and states.
   resetMediaStream() {
-    if (!this.needsMediaStream()) {
+    if (!this.mediaStreamInUse()) {
       this.releaseMediaStream();
       this.resetSelfStates();
       this.mediaRepository.closeAudioContext();
@@ -956,5 +978,14 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
       const mediaStreamTracks = MediaStreamHandler.getMediaTracks(this.localMediaStream(), mediaType);
       mediaStreamTracks.forEach(mediaStreamTrack => (mediaStreamTrack.enabled = sendState));
     }
+  }
+
+  updateCurrentCalls(callEntities) {
+    this.currentCalls.clear();
+    callEntities.forEach(callEntity => this.currentCalls.set(callEntity.id, callEntity));
+  }
+
+  setJoinedCall(callEntity) {
+    this.joinedCall(callEntity);
   }
 };

@@ -283,7 +283,6 @@ z.calling.entities.CallEntity = class CallEntity {
     if (this.canConnectState()) {
       this.state(z.calling.enum.CALL_STATE.CONNECTING);
     }
-    this.setSelfState(true);
 
     return this.isGroup ? this._joinGroupCall(mediaType) : this._join1to1Call();
   }
@@ -1044,6 +1043,12 @@ z.calling.entities.CallEntity = class CallEntity {
    */
   _resetFlows() {
     this.getFlows().forEach(flowEntity => flowEntity.resetFlow());
+  }
+
+  needsMediaStream() {
+    const hasPreJoinVideo = this.isIncoming() && this.isRemoteVideoCall();
+    const hasActiveCall = hasPreJoinVideo || this.selfClientJoined();
+    return hasActiveCall && !this.isOngoingOnAnotherClient();
   }
 
   //##############################################################################
