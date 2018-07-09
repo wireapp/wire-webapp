@@ -35,6 +35,7 @@ z.viewModel.panel.ConversationParticipantsViewModel = class ConversationParticip
       }
       return [];
     });
+    this.highlightedUsers = ko.observable([]);
     this.searchInput = ko.observable('');
     this.shouldUpdateScrollbar = ko
       .computed(() => (this.participants() || this.searchInput()) && this.isVisible())
@@ -51,7 +52,8 @@ z.viewModel.panel.ConversationParticipantsViewModel = class ConversationParticip
     this.navigateTo(z.viewModel.PanelViewModel.STATE.GROUP_PARTICIPANT_USER, userEntity);
   }
 
-  initView() {
+  initView(highlightedUsers) {
     this.searchInput('');
+    this.highlightedUsers(highlightedUsers);
   }
 };

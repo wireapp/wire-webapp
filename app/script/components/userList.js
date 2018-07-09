@@ -46,7 +46,8 @@ z.components.UserList = class UserList {
     this.selectedUsers = params.selected;
     this.mode = params.mode || UserList.MODE.DEFAULT;
     this.userEntities = params.user;
-    this.highlightedUserIds = params.highlightedUsers ? params.highlightedUsers.map(user => user().id) : [];
+    const highlightedUsers = ko.unwrap(params.highlightedUsers) || [];
+    this.highlightedUserIds = highlightedUsers.map(user => user().id);
     this.isSelectEnabled = typeof params.selected === 'function';
     this.altStyle = params.altStyle;
 
@@ -100,7 +101,7 @@ z.components.UserList = class UserList {
 ko.components.register('user-list', {
   template: `
     <div class="search-list" data-bind="css: cssClasses(), foreach: {data: filteredUserEntities}">
-      <participant-item params="participant: $data, canSelect: $parent.isSelectEnabled, isSelected: $parent.isSelected($data), mode: $parent.mode" data-bind="click: $parent.onUserClick, css: {'no-underline': $parent.altStyle, 'show-arrow': $parent.altStyle, 'highlighted': $parent.highlightedUserIds.includes($data().id)}"></participant-item>
+      <participant-item params="participant: $data, canSelect: $parent.isSelectEnabled, isSelected: $parent.isSelected($data), mode: $parent.mode" data-bind="click: $parent.onUserClick, css: {'no-underline': $parent.altStyle, 'show-arrow': $parent.altStyle, 'highlighted': $parent.highlightedUserIds.includes($data.id)}"></participant-item>
     </div>
 
     <!-- ko if: typeof filter === 'function' -->

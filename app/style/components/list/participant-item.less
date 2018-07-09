@@ -63,7 +63,8 @@ participant-item {
   }
 
   &.highlighted {
-    background-color: fade(@graphite, 8%);
+    animation: fadeInUserHighlighting 0.5s @ease-out-quart 0.5s;
+    background-color: fade(@graphite-dark, 8%);
   }
 
   .participant-item {
@@ -117,5 +118,14 @@ participant-item {
         opacity: 0.56;
       }
     }
+  }
+}
+
+@keyframes fadeInUserHighlighting {
+  0% {
+    background-color: fade(@graphite-dark, 0%);
+  }
+  100% {
+    background-color: fade(@graphite-dark, 8%);
   }
 }
