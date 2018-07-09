@@ -142,8 +142,8 @@ z.viewModel.panel.GroupParticipantUserViewModel = class GroupParticipantUserView
     this.actionsViewModel.unblockUser(this.selectedParticipant(), false);
   }
 
-  initView(user) {
-    const userEntity = ko.unwrap(user);
+  initView({entity: user}) {
+    const userEntity = user;
     this.selectedParticipant(userEntity);
 
     if (userEntity.isTemporaryGuest()) {

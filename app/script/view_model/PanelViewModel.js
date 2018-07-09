@@ -79,9 +79,9 @@ z.viewModel.PanelViewModel = class PanelViewModel {
     this.stateHistory = [];
 
     this.isAnimating = ko.observable(false);
-    this.isVisible = ko.observable(false);
+    this.isVisible = ko.pureComputed(() => this.state() !== null);
     this.exitingState = ko.observable(undefined);
-    this.state = ko.observable(PanelViewModel.STATE.CONVERSATION_DETAILS);
+    this.state = ko.observable(null);
     this.isGuestRoom = ko.pureComputed(() => this.conversationEntity() && this.conversationEntity().isGuestRoom());
     this.isTeamOnly = ko.pureComputed(() => this.conversationEntity() && this.conversationEntity().isTeamOnly());
 
@@ -94,13 +94,77 @@ z.viewModel.PanelViewModel = class PanelViewModel {
       }
     });
 
-    this.conversationEntity.subscribe(this.closePanelOnChange.bind(this), null, 'beforeChange');
+    this.conversationEntity.subscribe(this._forceClosePanel.bind(this), null, 'beforeChange');
     this.subViews = this.buildSubViews();
 
-    amplify.subscribe(z.event.WebApp.CONTENT.SWITCH, this.switchContent.bind(this));
-    amplify.subscribe(z.event.WebApp.PEOPLE.TOGGLE, this.togglePanel.bind(this));
-    amplify.subscribe(z.event.WebApp.PEOPLE.SHOW, this.showParticipant.bind(this));
+    amplify.subscribe(z.event.WebApp.CONTENT.SWITCH, this._switchContent.bind(this));
     ko.applyBindings(this, document.getElementById(this.elementId));
+  }
+
+  /**
+   * Will navigate from the current state to the new state.
+   *
+   * @param {string} newState - the new state to navigate to.
+   * @param {Object} params - params to give to the new view.
+   * @returns {void} nothing returned.
+   */
+  navigateTo(newState, params) {
+    this._switchState(newState, this.state(), params);
+    this.stateHistory.push({params, state: newState});
+  }
+
+  /**
+   * Toggles (open/close) a panel.
+   * If the state given is the one visible (and the parameters are the same), the panel closes.
+   * Else the panels opens on the given state.
+   *
+   * Note: panels that are toggled are not counted in the state history.
+   *
+   * @param {string} state - the new state to navigate to.
+   * @param {Object} params - params to give to the new view.
+   * @returns {void} nothing returned
+   */
+  togglePanel(state, params) {
+    const isStateChange = this.state() !== state;
+    if (!isStateChange) {
+      const currentInstance = this.subViews[state];
+      const isNewParams = params && params.entity.id !== currentInstance.getEntityId();
+      if (!isNewParams) {
+        return this.closePanel();
+      }
+    }
+    this._openPanel(state, params);
+  }
+
+  /**
+   * Graciously closes the current opened panel.
+   *
+   * @returns {void} nothing returned
+   */
+  closePanel() {
+    if (this.isAnimating()) {
+      return Promise.resolve(false);
+    }
+
+    this.isAnimating(true);
+    return this.mainViewModel.closePanel().then(() => {
+      this._resetState();
+      return true;
+    });
+  }
+
+  _forceClosePanel() {
+    if (this.isVisible()) {
+      this.mainViewModel.closePanelImmediatly();
+      this._resetState();
+    }
+  }
+
+  _resetState() {
+    this.isAnimating(false);
+    this._hidePanel(this.state());
+    this.state(null);
+    this.stateHistory = [];
   }
 
   _isStateVisible(state) {
@@ -109,94 +173,25 @@ z.viewModel.PanelViewModel = class PanelViewModel {
     return (isStateExiting || isStateActive) && this.isVisible();
   }
 
-  navigateTo(newState, params) {
-    this.switchState(newState, this.state(), params);
-    this.stateHistory.push({params, state: newState});
-  }
-
   _goBack(overrideParams) {
     this.stateHistory.pop();
     const toHistory = this.stateHistory[this.stateHistory.length - 1];
     const toState = toHistory.state;
     const params = overrideParams !== undefined ? overrideParams : toHistory.params;
-    this.switchState(toState, this.state(), params, true);
+    this._switchState(toState, this.state(), params, true);
   }
 
-  closePanel() {
-    if (this.isAnimating()) {
-      return Promise.resolve(false);
-    }
-
-    this.isAnimating(true);
-    return this.mainViewModel.closePanel().then(() => {
-      this.isAnimating(false);
-      this.isVisible(false);
-      return true;
-    });
-  }
-
-  closePanelOnChange() {
-    if (this.isVisible()) {
-      this.mainViewModel.closePanelImmediatly();
-      this.isVisible(false);
-    }
-  }
-
-  showParticipant(userEntity) {
-    userEntity = ko.unwrap(userEntity);
-    const isSingleModeConversation = this.conversationEntity().is_one2one() || this.conversationEntity().is_request();
-
-    if (this.isVisible()) {
-      const isStateGroupParticipant = this.state() === PanelViewModel.STATE.GROUP_PARTICIPANT_USER;
-      const isStateConversationDetails = this.state() === PanelViewModel.STATE.CONVERSATION_DETAILS;
-
-      if (isSingleModeConversation) {
-        const isAlreadyShowingMe = isStateGroupParticipant && userEntity.is_me;
-        const isAlreadyShowingRemote = isStateConversationDetails && !userEntity.is_me;
-        if (isAlreadyShowingMe || isAlreadyShowingRemote) {
-          return this.closePanel();
-        }
-      }
-
-      const participantViewStates = [
-        PanelViewModel.STATE.GROUP_PARTICIPANT_USER,
-        PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE,
-      ];
-
-      const isAlreadyShowingUser = participantViewStates.some(viewState => {
-        return this.state() === viewState && this.subViews[viewState].getEntityId() === userEntity.id;
-      });
-
-      if (isAlreadyShowingUser) {
-        return this.closePanel();
-      }
-    }
-
-    if (isSingleModeConversation && !userEntity.is_me) {
-      return this._openPanel(PanelViewModel.STATE.CONVERSATION_DETAILS);
-    }
-    if (userEntity.isBot) {
-      this._openPanel(PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE, {service: userEntity});
-    } else {
-      this._openPanel(PanelViewModel.STATE.GROUP_PARTICIPANT_USER, userEntity);
-    }
-  }
-
-  switchContent(newContentState) {
+  _switchContent(newContentState) {
     const stateIsCollection = newContentState === z.viewModel.ContentViewModel.STATE.COLLECTION;
     if (stateIsCollection) {
-      this.closePanelOnChange();
+      this._forceClosePanel();
     }
   }
 
-  switchState(toState, fromState, params, fromLeft = false) {
+  _switchState(toState, fromState, params, fromLeft = false) {
     const toViewModel = this.subViews[toState];
     const fromViewModel = this.subViews[fromState];
     toViewModel.initView(params);
-
-    if (!this.isVisible()) {
-      return this._openPanel(toState, params);
-    }
 
     const isSameState = fromState === toState;
     if (isSameState) {
@@ -229,26 +224,10 @@ z.viewModel.PanelViewModel = class PanelViewModel {
     }, z.motion.MotionDuration.MEDIUM);
   }
 
-  togglePanel(addPeople = false) {
-    const canAddPeople = this.conversationEntity() && this.conversationEntity().isActiveParticipant();
-    if (addPeople && canAddPeople) {
-      if (this._isStateVisible(PanelViewModel.STATE.ADD_PARTICIPANTS)) {
-        return this.closePanel();
-      }
-
-      return this.conversationEntity().is_group()
-        ? this._openPanel(PanelViewModel.STATE.ADD_PARTICIPANTS)
-        : this.conversationDetails.clickOnCreateGroup();
-    }
-
-    if (this._isStateVisible(PanelViewModel.STATE.CONVERSATION_DETAILS)) {
-      return this.closePanel();
-    }
-
-    return this._openPanel(PanelViewModel.STATE.CONVERSATION_DETAILS);
-  }
-
   _hidePanel(state) {
+    if (!state || !this.subViews[state]) {
+      return;
+    }
     this.exitingState(undefined);
 
     const panelStateElementId = this.subViews[state].getElementId();
@@ -263,8 +242,7 @@ z.viewModel.PanelViewModel = class PanelViewModel {
       this.stateHistory = [{state: rootState}, {params, state: newState}];
       this.isAnimating(true);
       this.exitingState(undefined);
-      this.isVisible(true);
-      this.switchState(newState, null, params, true);
+      this._switchState(newState, null, params, true);
       this.mainViewModel.openPanel().then(() => this.isAnimating(false));
     }
   }

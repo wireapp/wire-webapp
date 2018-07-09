@@ -72,7 +72,7 @@ z.viewModel.panel.GroupParticipantServiceViewModel = class GroupParticipantServi
       .then(this.onGoBack);
   }
 
-  initView({service, addMode = false}) {
+  initView({entity: service, addMode = false}) {
     const serviceEntity = ko.unwrap(service);
     this.selectedParticipant(serviceEntity);
     this.selectedService(undefined);

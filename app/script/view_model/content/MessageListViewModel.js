@@ -383,7 +383,20 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
    * @returns {undefined} No return value
    */
   onMessageUserClick(userEntity) {
-    amplify.publish(z.event.WebApp.PEOPLE.SHOW, userEntity);
+    userEntity = ko.unwrap(userEntity);
+    const conversationEntity = this.conversation_repository.active_conversation();
+    const isSingleModeConversation = conversationEntity.is_one2one() || conversationEntity.is_request();
+
+    if (isSingleModeConversation && !userEntity.is_me) {
+      return this.mainViewModel.panel.togglePanel(z.viewModel.PanelViewModel.STATE.CONVERSATION_DETAILS);
+    }
+
+    const params = {entity: userEntity};
+    if (userEntity.isBot) {
+      this.mainViewModel.panel.togglePanel(z.viewModel.PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE, params);
+    } else {
+      this.mainViewModel.panel.togglePanel(z.viewModel.PanelViewModel.STATE.GROUP_PARTICIPANT_USER, params);
+    }
   }
 
   /**
@@ -500,7 +513,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
   }
 
   clickOnInvitePeople() {
-    this.mainViewModel.panel.navigateTo(z.viewModel.PanelViewModel.STATE.GUEST_OPTIONS);
+    this.mainViewModel.panel.togglePanel(z.viewModel.PanelViewModel.STATE.GUEST_OPTIONS);
   }
 
   /**
