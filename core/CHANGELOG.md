@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="3.9.0"></a>
+# [3.9.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@3.8.0...@wireapp/core@3.9.0) (2018-07-09)
+
+
+### Features
+
+* **core:** Add "timestamp" to payload bundle ([#810](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/810)) ([e811575](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/e811575))
+
+
+
+
 <a name="3.8.0"></a>
 # [3.8.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@3.7.3...@wireapp/core@3.8.0) (2018-07-07)
 
