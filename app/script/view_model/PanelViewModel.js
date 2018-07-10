@@ -224,7 +224,7 @@ z.viewModel.PanelViewModel = class PanelViewModel {
   }
 
   _hidePanel(state) {
-    if (!state || !this.subViews[state]) {
+    if (!this.subViews[state]) {
       return;
     }
     this.exitingState(undefined);
