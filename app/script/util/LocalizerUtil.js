@@ -23,10 +23,11 @@ window.z = window.z || {};
 window.z.util = z.util || {};
 
 z.util.LocalizerUtil = {
-  joinNames: (userEntities, declension = z.string.Declension.ACCUSATIVE, skipAnd = false) => {
-    const firstNames = userEntities
-      .map(userEntity => z.util.getFirstName(userEntity, declension))
-      .sort((userNameA, userNameB) => z.util.StringUtil.sortByPriority(userNameA, userNameB));
+  joinNames: (userEntities, declension = z.string.Declension.ACCUSATIVE, skipAnd = false, skipSort = false) => {
+    let firstNames = userEntities.map(userEntity => z.util.getFirstName(userEntity, declension));
+    if (!skipSort) {
+      firstNames = firstNames.sort((userNameA, userNameB) => z.util.StringUtil.sortByPriority(userNameA, userNameB));
+    }
 
     const numberOfNames = firstNames.length;
     if (!skipAnd && numberOfNames >= 2) {

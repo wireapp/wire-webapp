@@ -105,7 +105,7 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
           if (this.name().length) {
             const exceedsMaxTeam = this.joinedUserEntities().length > MemberMessage.CONFIG.MAX_WHOLE_TEAM_USERS_VISIBLE;
             if (this.allTeamMembers && exceedsMaxTeam) {
-              const guestCount = this.joinedUserEntities().filter(user => user.isGuest()).length;
+              const guestCount = this.joinedUserEntities().filter(userEntity => userEntity.isGuest()).length;
               if (!guestCount) {
                 return z.l10n.text(z.string.conversationCreateTeam);
               }
@@ -159,13 +159,17 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
             return z.l10n.text(userJoinedStringId, this.senderName());
           }
 
-          const userJoinedStringId = this.user().is_me
-            ? this.exceedsMaxVisibleUsers()
+          let userJoinedStringId = '';
+
+          if (this.user().is_me) {
+            userJoinedStringId = this.exceedsMaxVisibleUsers()
               ? z.string.conversationMemberJoinedYouMore
-              : z.string.conversationMemberJoinedYou
-            : this.exceedsMaxVisibleUsers()
+              : z.string.conversationMemberJoinedYou;
+          } else {
+            userJoinedStringId = this.exceedsMaxVisibleUsers()
               ? z.string.conversationMemberJoinedMore
               : z.string.conversationMemberJoined;
+          }
 
           return z.l10n.text(userJoinedStringId, {
             count: this.hiddenUserCount(),
@@ -230,7 +234,7 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
   }
 
   _generateNameString(skipAnd = false, declension = z.string.Declension.ACCUSATIVE) {
-    return z.util.LocalizerUtil.joinNames(this.visibleUsers(), declension, skipAnd);
+    return z.util.LocalizerUtil.joinNames(this.visibleUsers(), declension, skipAnd, true);
   }
 
   replaceTags(text) {
