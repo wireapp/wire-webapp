@@ -55,6 +55,7 @@ z.viewModel.PanelViewModel = class PanelViewModel {
         navigateTo: this._navigateTo.bind(this),
         onClose: this.closePanel.bind(this),
         onGoBack: this._goBack.bind(this),
+        onGoToRoot: this._goToRoot.bind(this),
         repositories: this.repositories,
       });
       return subViews;
@@ -178,6 +179,10 @@ z.viewModel.PanelViewModel = class PanelViewModel {
     const toHistory = this.stateHistory[this.stateHistory.length - 1];
     const {state, params} = toHistory;
     this._switchState(state, this.state(), params, true);
+  }
+
+  _goToRoot() {
+    this._openPanel(PanelViewModel.STATE.CONVERSATION_DETAILS);
   }
 
   _switchContent(newContentState) {
