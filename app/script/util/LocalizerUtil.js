@@ -24,16 +24,21 @@ window.z.util = z.util || {};
 
 z.util.LocalizerUtil = {
   joinNames: (userEntities, declension = z.string.Declension.ACCUSATIVE, skipAnd = false) => {
-    const selfUser = userEntities.find(userEntity => userEntity.is_me);
-    const otherUsers = userEntities.filter(userEntity => !userEntity.is_me);
-    const firstNames = otherUsers.map(userEntity => z.util.getFirstName(userEntity));
+    const containsSelfUser = !!userEntities.find(userEntity => userEntity.is_me);
+    if (containsSelfUser) {
+      userEntities = userEntities.filter(userEntity => !userEntity.is_me);
+    }
+
+    const firstNames = userEntities.map(userEntity => z.util.getFirstName(userEntity));
     firstNames.sort((userNameA, userNameB) => z.util.StringUtil.sortByPriority(userNameA, userNameB));
-    if (selfUser) {
-      firstNames.push(z.util.getFirstName(selfUser, declension));
+
+    if (containsSelfUser) {
+      firstNames.push(z.util.getSelfName(declension));
     }
 
     const numberOfNames = firstNames.length;
-    if (!skipAnd && numberOfNames >= 2) {
+    const joinByAnd = !skipAnd && numberOfNames >= 2;
+    if (joinByAnd) {
       const [secondLastName, lastName] = firstNames.splice(firstNames.length - 2, 2);
 
       const exactlyTwoNames = numberOfNames === 2;

@@ -512,26 +512,26 @@ z.util.murmurhash3 = (key, seed) => {
   return h1 >>> 0;
 };
 
-z.util.getFirstName = (userEt, declension = z.string.Declension.NOMINATIVE) => {
-  if (userEt.is_me) {
-    let stringId;
+z.util.getFirstName = (userEntity, declension) => {
+  return userEntity.is_me ? z.util.getSelfName(declension) : userEntity.first_name();
+};
 
-    switch (declension) {
-      case z.string.Declension.NOMINATIVE:
-        stringId = z.string.conversationYouNominative;
-        break;
-      case z.string.Declension.DATIVE:
-        stringId = z.string.conversationYouDative;
-        break;
-      case z.string.Declension.ACCUSATIVE:
-        stringId = z.string.conversationYouAccusative;
-        break;
-    }
+z.util.getSelfName = (declension = z.string.Declension.NOMINATIVE) => {
+  let stringId;
 
-    return z.l10n.text(stringId);
+  switch (declension) {
+    case z.string.Declension.NOMINATIVE:
+      stringId = z.string.conversationYouNominative;
+      break;
+    case z.string.Declension.DATIVE:
+      stringId = z.string.conversationYouDative;
+      break;
+    case z.string.Declension.ACCUSATIVE:
+      stringId = z.string.conversationYouAccusative;
+      break;
   }
 
-  return userEt.first_name();
+  return z.l10n.text(stringId);
 };
 
 z.util.printDevicesId = id => {
