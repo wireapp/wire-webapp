@@ -173,7 +173,7 @@ z.viewModel.panel.ParticipantDevicesViewModel = class ParticipantDevicesViewMode
       .catch(error => this.logger.warn(`Failed to toggle client verification: ${error.message}`));
   }
 
-  initView(userEntity) {
+  initView({entity: userEntity}) {
     this.showSelfFingerprint(false);
     this.selectedClient(undefined);
     this.deviceMode(ParticipantDevicesViewModel.MODE.REQUESTING);

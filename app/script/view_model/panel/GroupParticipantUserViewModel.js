@@ -97,7 +97,7 @@ z.viewModel.panel.GroupParticipantUserViewModel = class GroupParticipantUserView
   }
 
   clickOnDevices() {
-    this.navigateTo(z.viewModel.PanelViewModel.STATE.PARTICIPANT_DEVICES, this.selectedParticipant());
+    this.navigateTo(z.viewModel.PanelViewModel.STATE.PARTICIPANT_DEVICES, {entity: this.selectedParticipant()});
   }
 
   clickOnShowProfile() {
