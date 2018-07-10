@@ -25,9 +25,9 @@ window.z.entity = z.entity || {};
 z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
   static get CONFIG() {
     return {
-      MAX_USERS_VISIBLE: 9,
+      MAX_USERS_VISIBLE: 7,
       MAX_WHOLE_TEAM_USERS_VISIBLE: 5,
-      REDUCED_USERS_COUNT: 7,
+      REDUCED_USERS_COUNT: 5,
     };
   }
 
@@ -120,7 +120,7 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
               : z.string.conversationCreateWith;
             return z.l10n.text(createStringId, {
               count: this.hiddenUserCount(),
-              users: this._generateNameString(z.string.Declension.DATIVE),
+              users: this._generateNameString(this.exceedsMaxVisibleUsers(), z.string.Declension.DATIVE),
             });
           }
 
@@ -128,7 +128,10 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
             const createStringId = this.exceedsMaxVisibleUsers()
               ? z.string.conversationCreatedYouMore
               : z.string.conversationCreatedYou;
-            return z.l10n.text(createStringId, {count: this.hiddenUserCount(), users: this._generateNameString()});
+            return z.l10n.text(createStringId, {
+              count: this.hiddenUserCount(),
+              users: this._generateNameString(this.exceedsMaxVisibleUsers()),
+            });
           }
           const createStringId = this.exceedsMaxVisibleUsers()
             ? z.string.conversationCreatedMore
@@ -136,12 +139,12 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
           return z.l10n.text(createStringId, {
             count: this.hiddenUserCount(),
             name: this.senderName(),
-            users: this._generateNameString(z.string.Declension.DATIVE),
+            users: this._generateNameString(this.exceedsMaxVisibleUsers(), z.string.Declension.DATIVE),
           });
         }
 
         case z.message.SystemMessageType.CONVERSATION_RESUME: {
-          return z.l10n.text(z.string.conversationResume, this._generateNameString(z.string.Declension.DATIVE));
+          return z.l10n.text(z.string.conversationResume, this._generateNameString(false, z.string.Declension.DATIVE));
         }
 
         default:
@@ -153,8 +156,8 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
           const senderJoined = this.otherUser().id === this.user().id;
           if (senderJoined) {
             const userJoinedStringId = this.user().is_me
-              ? z.string.conversationMemberJoinSelfYou
-              : z.string.conversationMemberJoinSelf;
+              ? z.string.conversationMemberJoinedSelfYou
+              : z.string.conversationMemberJoinedSelf;
             return z.l10n.text(userJoinedStringId, this.senderName());
           }
 
@@ -169,7 +172,7 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
           return z.l10n.text(userJoinedStringId, {
             count: this.hiddenUserCount(),
             name: this.senderName(),
-            users: this._generateNameString(),
+            users: this._generateNameString(this.exceedsMaxVisibleUsers()),
           });
         }
 
@@ -214,9 +217,7 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
         const groupCreationStringId = this.user().is_me
           ? z.string.conversationCreatedNameYou
           : z.string.conversationCreatedName;
-        return this.replaceTags(
-          z.util.StringUtil.capitalizeFirstChar(z.l10n.text(groupCreationStringId, this.senderName()))
-        );
+        return z.util.StringUtil.capitalizeFirstChar(z.l10n.text(groupCreationStringId, this.senderName()));
       }
       return '';
     });
@@ -230,8 +231,8 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
     };
   }
 
-  _generateNameString(declension = z.string.Declension.ACCUSATIVE) {
-    return z.util.LocalizerUtil.joinNames(this.displayedUsers(), declension);
+  _generateNameString(skipAnd = false, declension = z.string.Declension.ACCUSATIVE) {
+    return z.util.LocalizerUtil.joinNames(this.visibleUsers(), declension, skipAnd);
   }
 
   replaceTags(text) {
