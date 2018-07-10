@@ -123,7 +123,7 @@ z.viewModel.panel.AddParticipantsViewModel = class AddParticipantsViewModel exte
     this.selectedService(serviceEntity);
     this.navigateTo(z.viewModel.PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE, {
       addMode: true,
-      service: serviceEntity,
+      entity: serviceEntity,
     });
   }
 
