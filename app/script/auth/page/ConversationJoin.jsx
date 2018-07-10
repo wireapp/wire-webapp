@@ -56,7 +56,6 @@ import BackendError from '../module/action/BackendError';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
 import WirelessUnsupportedBrowser from '../component/WirelessUnsupportedBrowser';
 import WirelessContainer from '../component/WirelessContainer';
-import * as TrackingAction from '../module/action/TrackingAction';
 import * as AccentColor from '../util/AccentColor';
 import EXTERNAL_ROUTE from '../externalRoute';
 
@@ -109,7 +108,6 @@ class ConversationJoin extends Component {
   };
 
   componentDidMount = () => {
-    this.props.trackEvent({name: TrackingAction.EVENT_NAME.GUEST_ROOMS.OPENED_SIGNUP});
     this.props
       .doInit({shouldValidateLocalClient: true})
       .catch(() => {})
@@ -121,7 +119,6 @@ class ConversationJoin extends Component {
   onOpenWireClick = () => {
     this.props
       .doJoinConversationByCode(this.state.conversationKey, this.state.conversationCode)
-      .then(() => this.trackAddParticipant())
       .then(() => this.routeToApp());
   };
 
@@ -163,7 +160,6 @@ class ConversationJoin extends Component {
         })
         .then(() => this.props.doJoinConversationByCode(this.state.conversationKey, this.state.conversationCode))
         .then(conversationEvent => this.props.setLastEventDate(new Date(conversationEvent.time)))
-        .then(() => this.trackAddParticipant())
         .then(() => this.routeToApp())
         .catch(error => this.props.doLogout());
     }
@@ -174,20 +170,6 @@ class ConversationJoin extends Component {
     error && error.label && error.label === BackendError.CONVERSATION_ERRORS.CONVERSATION_TOO_MANY_MEMBERS;
 
   resetErrors = () => this.setState({error: null, isValidName: true});
-
-  trackAddParticipant = () => {
-    const {isTemporaryGuest, trackEvent} = this.props;
-
-    return trackEvent({
-      attributes: {
-        guest_num: isTemporaryGuest ? 0 : 1,
-        is_allow_guests: true,
-        temporary_guest_num: isTemporaryGuest ? 1 : 0,
-        user_num: 0,
-      },
-      name: TrackingAction.EVENT_NAME.CONVERSATION.ADD_PARTICIPANTS,
-    });
-  };
 
   renderActivatedAccount = () => {
     const {
@@ -358,7 +340,6 @@ export default withRouter(
         ...AuthAction,
         ...ConversationAction,
         ...NotificationAction,
-        ...TrackingAction,
       }
     )(ConversationJoin)
   )

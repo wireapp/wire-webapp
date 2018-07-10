@@ -50,7 +50,6 @@ import * as AuthSelector from '../module/selector/AuthSelector';
 import ValidationError from '../module/action/ValidationError';
 import React, {Component} from 'react';
 import Page from './Page';
-import * as TrackingAction from '../module/action/TrackingAction';
 
 class TeamName extends Component {
   state = {
@@ -75,7 +74,6 @@ class TeamName extends Component {
       Promise.resolve(this.teamNameInput.value)
         .then(teamName => teamName.trim())
         .then(teamName => this.props.pushAccountRegistrationData({team: {name: teamName}}))
-        .then(() => this.props.trackEvent({name: TrackingAction.EVENT_NAME.TEAM.ADDED_TEAM_NAME}))
         .then(() => this.props.history.push(ROUTE.CREATE_TEAM_ACCOUNT));
     }
     this.teamNameInput.focus();
@@ -167,7 +165,6 @@ export default withRouter(
       }),
       {
         ...AuthAction,
-        ...TrackingAction,
         enterTeamCreationFlow,
         resetError,
       }

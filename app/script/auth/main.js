@@ -23,7 +23,6 @@ import {Provider} from 'react-redux';
 import configureStore from './configureStore';
 import configureClient from './configureClient';
 import configureCore from './configureCore';
-import configureTracking from './configureTracking';
 import configureEnvironment from './configureEnvironment';
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -33,7 +32,6 @@ import CookieStore from 'js-cookie';
 configureEnvironment();
 const apiClient = configureClient();
 const core = configureCore(apiClient);
-const mixpanel = configureTracking();
 const cookieStore = CookieStore;
 
 let localStorage;
@@ -46,7 +44,6 @@ const store = configureStore({
   cookieStore,
   core,
   localStorage,
-  mixpanel,
 });
 
 const Wrapper = Component => (
