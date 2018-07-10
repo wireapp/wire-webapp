@@ -62,6 +62,7 @@ z.entity.Conversation = class Conversation {
     this.inTeam = ko.pureComputed(() => this.team_id && !this.isGuest());
     this.isGuestRoom = ko.pureComputed(() => this.accessState() === z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM);
     this.isTeamOnly = ko.pureComputed(() => this.accessState() === z.conversation.ACCESS_STATE.TEAM.TEAM_ONLY);
+    this.withAllTeamMembers = ko.observable(undefined);
 
     this.isTeam1to1 = ko.pureComputed(() => {
       const isGroupConversation = this.type() === z.conversation.ConversationType.REGULAR;
