@@ -32,7 +32,7 @@ z.viewModel.panel.BasePanelViewModel = class BasePanelViewModel {
     this.repositories = repositories;
     this.mainViewModel = mainViewModel;
     this.activeConversation = repositories.conversation.active_conversation;
-    this.actionViewModel = mainViewModel.actions;
+    this.actionsViewModel = mainViewModel.actions;
     this.isActivatedAccount = mainViewModel.isActivatedAccount;
   }
 

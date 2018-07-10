@@ -41,6 +41,7 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
     this.logger = new z.util.Logger('z.viewModel.content.TitleBarViewModel', z.config.LOGGER.OPTIONS);
 
     this.isActivatedAccount = mainViewModel.isActivatedAccount;
+    this.panelViewModel = mainViewModel.panel;
 
     // TODO remove the titlebar for now to ensure that buttons are clickable in macOS wrappers
     window.setTimeout(() => $('.titlebar').remove(), z.util.TimeUtil.UNITS_IN_MILLIS.SECOND);
@@ -97,7 +98,7 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
       amplify.subscribe(z.event.WebApp.SHORTCUT.PEOPLE, () => this.showDetails());
       amplify.subscribe(z.event.WebApp.SHORTCUT.ADD_PEOPLE, () => {
         if (this.isActivatedAccount()) {
-          this.showDetails(true);
+          this.showAddParticipant();
         }
       });
     }, 50);
@@ -110,10 +111,6 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
 
   clickOnCallButton() {
     amplify.publish(z.event.WebApp.CALL.STATE.TOGGLE, z.media.MediaType.AUDIO);
-  }
-
-  clickOnDetails() {
-    this.showDetails();
   }
 
   onMouseDown(_, event) {
@@ -133,6 +130,10 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
     }
   }
 
+  clickOnDetails() {
+    this.showDetails();
+  }
+
   onMouseUp() {
     this.preventPanelOpen = this.isMoved;
     this.isMoved = false;
@@ -147,9 +148,29 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
     amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.COLLECTION);
   }
 
-  showDetails(addPeople) {
+  showAddParticipant() {
+    const canAddPeople = this.conversationEntity() && this.conversationEntity().isActiveParticipant();
+
+    if (!canAddPeople) {
+      return this.showDetails();
+    }
+
+    return this.conversationEntity().is_group()
+      ? this.showDetails(true)
+      : amplify.publish(
+          z.event.WebApp.CONVERSATION.CREATE_GROUP,
+          'conversation_details',
+          this.conversationEntity().firstUserEntity()
+        );
+  }
+
+  showDetails(addParticipants) {
     if (!this.preventPanelOpen) {
-      amplify.publish(z.event.WebApp.PEOPLE.TOGGLE, addPeople);
+      const panelId = addParticipants
+        ? z.viewModel.PanelViewModel.STATE.ADD_PARTICIPANTS
+        : z.viewModel.PanelViewModel.STATE.CONVERSATION_DETAILS;
+
+      this.panelViewModel.togglePanel(panelId);
     }
   }
 };

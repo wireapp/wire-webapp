@@ -49,7 +49,7 @@ z.viewModel.panel.ConversationParticipantsViewModel = class ConversationParticip
   }
 
   clickOnShowUser(userEntity) {
-    this.navigateTo(z.viewModel.PanelViewModel.STATE.GROUP_PARTICIPANT_USER, userEntity);
+    this.navigateTo(z.viewModel.PanelViewModel.STATE.GROUP_PARTICIPANT_USER, {entity: userEntity});
   }
 
   initView(highlightedUsers = []) {
