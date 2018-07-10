@@ -25,9 +25,9 @@ window.z.entity = z.entity || {};
 z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
   static get CONFIG() {
     return {
-      MAX_USERS_VISIBLE: 7,
-      MAX_WHOLE_TEAM_USERS_VISIBLE: 5,
-      REDUCED_USERS_COUNT: 5,
+      MAX_USERS_VISIBLE: 17,
+      MAX_WHOLE_TEAM_USERS_VISIBLE: 10,
+      REDUCED_USERS_COUNT: 15,
     };
   }
 
