@@ -275,14 +275,6 @@ z.viewModel.AuthViewModel = class AuthViewModel {
         return this._set_hash(mode);
       }
     }
-
-    const reason = z.util.URLUtil.getParameter(z.auth.URLParameter.REASON);
-    if (reason) {
-      const isReasonRegistration = reason === z.auth.SIGN_OUT_REASON.ACCOUNT_REGISTRATION;
-      if (isReasonRegistration) {
-        return this._loginFromTeams();
-      }
-    }
   }
 
   //##############################################################################
@@ -411,25 +403,6 @@ z.viewModel.AuthViewModel = class AuthViewModel {
         });
     }, 500);
     $(window).on('unload', () => this._clearTabsCheckInterval());
-  }
-
-  //##############################################################################
-  // Invitation Stuff
-  //##############################################################################
-
-  _loginFromTeams() {
-    this.pending_server_request(true);
-
-    z.util.StorageUtil.setValue(z.storage.StorageKey.AUTH.PERSIST, true);
-    z.util.StorageUtil.setValue(z.storage.StorageKey.AUTH.SHOW_LOGIN, true);
-
-    this.auth.repository
-      .getAccessToken()
-      .then(() => this._authentication_successful(true))
-      .catch(error => {
-        this.pending_server_request(false);
-        throw error;
-      });
   }
 
   //##############################################################################
