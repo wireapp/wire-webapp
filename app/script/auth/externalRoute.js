@@ -38,7 +38,7 @@ const WIRE_PWA = onEnvironment({
 });
 
 export default {
-  PHONE_LOGIN: `${WEBAPP_ENV}login`,
+  PHONE_LOGIN: `${WEBAPP_ENV}login/`,
   PWA: WIRE_PWA,
   PWA_LOGIN: `${WIRE_PWA}login/`,
   WEBAPP: WEBAPP_ENV,
