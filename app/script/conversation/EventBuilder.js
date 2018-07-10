@@ -113,6 +113,7 @@ z.conversation.EventBuilder = {
       data: {
         name: conversationEntity.name(),
         userIds: userIds,
+        allTeamMembers: conversationEntity.withAllTeamMembers(),
       },
       from: isTemporaryGuest ? selfUser.id : creatorId,
       id: z.util.createRandomUuid(),

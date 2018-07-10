@@ -92,6 +92,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.isTeam = this.team_repository.isTeam;
     this.isTeam.subscribe(() => this.map_guest_status_self());
     this.team = this.team_repository.team;
+    this.teamMembers = this.team_repository.teamMembers;
 
     this.selfUser = this.user_repository.self;
 
@@ -463,6 +464,15 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   _addCreationMessage(conversationEntity, isTemporaryGuest, timestamp, eventSource) {
     conversationEntity.hasCreationMessage = true;
+
+    if (conversationEntity.inTeam()) {
+      const allTeamMembersParticipate = this.teamMembers().every(teamMember => {
+        return conversationEntity.participating_user_ids().includes(teamMember.id)
+      });
+
+      conversationEntity.withAllTeamMembers(allTeamMembersParticipate)
+    }
+
     const creationEvent = conversationEntity.is_group()
       ? z.conversation.EventBuilder.buildGroupCreation(conversationEntity, isTemporaryGuest, timestamp)
       : z.conversation.EventBuilder.build1to1Creation(conversationEntity);
