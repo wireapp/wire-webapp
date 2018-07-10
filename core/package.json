@@ -23,7 +23,7 @@
     "karma-jasmine": "1.1.2",
     "karma-jasmine-diff-reporter": "1.2.0",
     "karma-sourcemap-loader": "0.3.7",
-    "nock": "9.4.1",
+    "nock": "9.4.2",
     "rimraf": "2.6.2",
     "typescript": "2.9.2",
     "uglifyjs-webpack-plugin": "1.2.7",
