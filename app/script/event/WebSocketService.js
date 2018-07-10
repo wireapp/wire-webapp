@@ -116,7 +116,7 @@ z.event.WebSocketService = class WebSocketService {
       };
 
       this.socket.onmessage = event => {
-        if (this._mightHaveExperiencedConnectionIssue()) {
+        if (this._pingHasExperiencedSuspiciousInactivity()) {
           const secondsSinceLastPing = (Date.now() - this.lastPingTime) / z.util.TimeUtil.UNITS_IN_MILLIS.SECOND;
           this.logger.warn(`Message received but ping was inactive for ${secondsSinceLastPing} seconds, reconnecting.`);
           return this.reconnect(WebSocketService.CHANGE_TRIGGER.LONG_INACTIVITY);
@@ -214,7 +214,7 @@ z.event.WebSocketService = class WebSocketService {
   sendPing() {
     const isReadyStateOpen = this.socket.readyState === 1;
     if (isReadyStateOpen) {
-      if (this._mightHaveExperiencedConnectionIssue()) {
+      if (this._pingHasExperiencedSuspiciousInactivity()) {
         this.logger.warn('Ping interval check failed');
         return this.reconnect(WebSocketService.CHANGE_TRIGGER.PING_INTERVAL);
       }
@@ -230,9 +230,9 @@ z.event.WebSocketService = class WebSocketService {
   /**
    * Returns true if the gap between the last ping and the current time is too big.
    *
-   * @returns {boolean} Might there have been some network issues.
+   * @returns {boolean} Was the last ping too long ago
    */
-  _mightHaveExperiencedConnectionIssue() {
+  _pingHasExperiencedSuspiciousInactivity() {
     const currentTime = Date.now();
     const lastPingTime = this.lastPingTime || currentTime;
     const pingIntervalDifference = currentTime - lastPingTime;
