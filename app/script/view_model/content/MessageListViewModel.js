@@ -392,11 +392,11 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     }
 
     const params = {entity: userEntity};
-    if (userEntity.isBot) {
-      this.mainViewModel.panel.togglePanel(z.viewModel.PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE, params);
-    } else {
-      this.mainViewModel.panel.togglePanel(z.viewModel.PanelViewModel.STATE.GROUP_PARTICIPANT_USER, params);
-    }
+    const panelId = userEntity.isBot
+      ? z.viewModel.PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE
+      : z.viewModel.PanelViewModel.STATE.GROUP_PARTICIPANT_USER;
+
+    this.mainViewModel.panel.togglePanel(panelId, params);
   }
 
   /**

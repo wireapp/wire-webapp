@@ -52,7 +52,7 @@ z.viewModel.PanelViewModel = class PanelViewModel {
       subViews[state] = new viewModel({
         isVisible: ko.pureComputed(this._isStateVisible.bind(this, state)),
         mainViewModel: this.mainViewModel,
-        navigateTo: this.navigateTo.bind(this),
+        navigateTo: this._navigateTo.bind(this),
         onClose: this.closePanel.bind(this),
         onGoBack: this._goBack.bind(this),
         repositories: this.repositories,
@@ -102,18 +102,6 @@ z.viewModel.PanelViewModel = class PanelViewModel {
   }
 
   /**
-   * Will navigate from the current state to the new state.
-   *
-   * @param {string} newState - the new state to navigate to.
-   * @param {Object} params - params to give to the new view.
-   * @returns {void} nothing returned.
-   */
-  navigateTo(newState, params) {
-    this._switchState(newState, this.state(), params);
-    this.stateHistory.push({params, state: newState});
-  }
-
-  /**
    * Toggles (open/close) a panel.
    * If the state given is the one visible (and the parameters are the same), the panel closes.
    * Else the panels opens on the given state.
@@ -151,6 +139,18 @@ z.viewModel.PanelViewModel = class PanelViewModel {
       this._resetState();
       return true;
     });
+  }
+
+  /**
+   * Will navigate from the current state to the new state.
+   *
+   * @param {string} newState - the new state to navigate to.
+   * @param {Object} params - params to give to the new view.
+   * @returns {void} nothing returned.
+   */
+  _navigateTo(newState, params) {
+    this._switchState(newState, this.state(), params);
+    this.stateHistory.push({params, state: newState});
   }
 
   _forceClosePanel() {
