@@ -73,10 +73,6 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
 
     this.is_error_reporting_activated = false;
     this.is_user_analytics_activated = false;
-
-    if (!this.conversation_repository || !this.team_repository || !this.user_repository) {
-      this.init_without_user_analytics();
-    }
   }
 
   /**
@@ -98,23 +94,6 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
       })
       .then(mixpanel_instance => this._init_mixpanel(mixpanel_instance))
       .then(() => amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.PRIVACY, this.update_privacy_preference));
-  }
-
-  /**
-   * Initialize the repository without user analytics but with error reporting (used for "auth" page).
-   * @note Mode for auth page
-   * @returns {Promise} Resolves after initialization
-   */
-  init_without_user_analytics() {
-    return Promise.resolve()
-      .then(() => {
-        if (this._is_domain_allowed_for_tracking()) {
-          this._enable_error_reporting();
-          return this._init_tracking();
-        }
-        return undefined;
-      })
-      .then(mixpanel_instance => this._init_mixpanel(mixpanel_instance));
   }
 
   update_privacy_preference(privacy_preference) {

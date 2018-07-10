@@ -50,8 +50,6 @@ z.viewModel.AuthViewModel = class AuthViewModel {
     this.auth = auth;
     this.logger = new z.util.Logger('z.viewModel.AuthViewModel', z.config.LOGGER.OPTIONS);
 
-    this.event_tracker = new z.tracking.EventTrackingRepository();
-
     this.audio_repository = this.auth.audio;
 
     // Cryptography
@@ -427,13 +425,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
 
     this.auth.repository
       .getAccessToken()
-      .then(() => {
-        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ACCOUNT.LOGGED_IN, {
-          context: 'auto',
-          remember_me: this.persist(),
-        });
-        this._authentication_successful(true);
-      })
+      .then(() => this._authentication_successful(true))
       .catch(error => {
         this.pending_server_request(false);
         throw error;
@@ -562,13 +554,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
 
       this.auth.repository
         .login(payload, this.persist())
-        .then(() => {
-          amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ACCOUNT.LOGGED_IN, {
-            context: z.auth.AuthView.TYPE.PHONE,
-            remember_me: this.persist(),
-          });
-          this._authentication_successful();
-        })
+        .then(() => this._authentication_successful())
         .catch(() => {
           if (!this.validation_errors().length) {
             this._add_error(z.string.authErrorCode, z.auth.AuthView.TYPE.CODE);
@@ -590,13 +576,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
 
       this.auth.repository
         .login(payload, this.persist())
-        .then(() => {
-          amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ACCOUNT.LOGGED_IN, {
-            context: z.auth.AuthView.TYPE.PHONE,
-            remember_me: this.persist(),
-          });
-          this._authentication_successful();
-        })
+        .then(() => this._authentication_successful())
         .catch(error => {
           this.pending_server_request(false);
           $('#wire-verify-password').focus();
