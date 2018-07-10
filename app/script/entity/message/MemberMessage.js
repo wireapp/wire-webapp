@@ -23,6 +23,14 @@ window.z = window.z || {};
 window.z.entity = z.entity || {};
 
 z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
+  static get CONFIG() {
+    return {
+      MAX_USERS_VISIBLE: 17,
+      MAX_WHOLE_TEAM_USERS_VISIBLE: 10,
+      REDUCED_USERS_COUNT: 15,
+    };
+  }
+
   constructor() {
     super();
 
@@ -237,5 +245,9 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
       this.teamRepository.isTeam() &&
       this.teamRepository.teamUsers().every(teamUser => this.userIds.includes(teamUser.id))
     );
+  }
+
+  guestCount() {
+    return this.joinedUserEntities().filter(user => user.isGuest()).length;
   }
 };

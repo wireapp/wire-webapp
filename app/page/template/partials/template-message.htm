@@ -231,14 +231,6 @@
           </div>
         <!-- /ko -->
       </div>
-      <div class="message-body" data-bind="foreach: remoteUserEntities">
-        <!-- ko if: message.isGroupCreation() -->
-          <participant-avatar class="avatar-no-border" params="participant: $data, click: $parents[1].onMessageUserClick, size: z.components.ParticipantAvatar.SIZE.MEDIUM"></participant-avatar>
-        <!-- /ko -->
-        <!-- ko if: message.isMemberJoin() || message.isMemberLeave() -->
-          <participant-avatar data-bind="css: {'translucent': message.isMemberLeave()}" params="participant: $data, click: $parents[1].onMessageUserClick, size: z.components.ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
-        <!-- /ko -->
-      </div>
     <!-- /ko -->
 
     <!-- ko if: message.isGroupCreation() -->
