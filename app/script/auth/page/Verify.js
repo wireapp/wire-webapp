@@ -17,7 +17,6 @@
  *
  */
 
-import * as TrackingAction from '../module/action/TrackingAction';
 import {H1, Text, Link, ContainerXS, CodeInput, ErrorMessage} from '@wireapp/react-ui-kit';
 import {connect} from 'react-redux';
 import {injectIntl, FormattedHTMLMessage} from 'react-intl';
@@ -45,10 +44,6 @@ const Verify = ({account, authError, history, currentFlow, intl: {formatMessage:
       case REGISTER_FLOW.TEAM: {
         connected
           .doRegisterTeam({...account, email_code})
-          .then(() => {
-            connected.trackEvent({name: TrackingAction.EVENT_NAME.TEAM.CREATED});
-            connected.trackEvent({name: TrackingAction.EVENT_NAME.TEAM.VERIFIED});
-          })
           .then(() => history.push(ROUTE.CHOOSE_HANDLE))
           .catch(error => console.error('Failed to create team account', error));
         break;
@@ -58,11 +53,6 @@ const Verify = ({account, authError, history, currentFlow, intl: {formatMessage:
       case REGISTER_FLOW.GENERIC_INVITATION: {
         connected
           .doRegisterPersonal({...account, email_code})
-          .then(() => {
-            const context = TrackingAction.FLOW_TO_CONTEXT[currentFlow];
-            connected.trackNameWithContext(TrackingAction.EVENT_NAME.PERSONAL.CREATED, context);
-            connected.trackNameWithContext(TrackingAction.EVENT_NAME.PERSONAL.VERIFIED, context);
-          })
           .then(() => history.push(ROUTE.CHOOSE_HANDLE))
           .catch(error => console.error('Failed to create personal account', error));
       }
@@ -116,7 +106,7 @@ export default withRouter(
         authError: AuthSelector.getError(state),
         currentFlow: AuthSelector.getCurrentFlow(state),
       }),
-      {...AuthAction, ...TrackingAction, ...UserAction}
+      {...AuthAction, ...UserAction}
     )(Verify)
   )
 );

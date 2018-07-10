@@ -134,7 +134,7 @@
         <file-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired icon-file': message.isObfuscated()}" params="message: message"></file-asset>
       <!-- /ko -->
       <!-- ko if: asset.is_location() -->
-        <location-asset params="asset: asset"></location-asset>
+        <location-asset params="asset: asset, locationRepository: $parents[1].locationRepository"></location-asset>
       <!-- /ko -->
     <!-- /ko -->
 

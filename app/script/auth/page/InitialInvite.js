@@ -16,7 +16,6 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
-import * as TrackingAction from '../module/action/TrackingAction';
 import React from 'react';
 import {connect} from 'react-redux';
 import {injectIntl} from 'react-intl';
@@ -56,16 +55,7 @@ class InitialInvite extends React.PureComponent {
     this.props.fetchSelf();
   }
 
-  onInviteDone = () => {
-    const {invites} = this.props;
-    const invited = !!invites.length;
-    return this.props
-      .trackEvent({
-        attributes: {invited, invites: invites.length},
-        name: TrackingAction.EVENT_NAME.TEAM.FINISHED_INVITE_STEP,
-      })
-      .then(() => window.location.replace(getAppPath()));
-  };
+  onInviteDone = () => window.location.replace(getAppPath());
 
   renderEmail = email => (
     <div
@@ -180,7 +170,6 @@ export default injectIntl(
       fetchSelf,
       invite,
       resetError,
-      ...TrackingAction,
     }
   )(InitialInvite)
 );
