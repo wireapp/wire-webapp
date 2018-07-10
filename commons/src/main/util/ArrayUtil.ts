@@ -17,11 +17,24 @@
  *
  */
 
-import * as CommonConfig from './config/CommonConfig';
-import * as ArrayUtil from './util/ArrayUtil';
-import * as RandomUtil from './util/RandomUtil';
-import * as StringUtil from './util/StringUtil';
-import * as UrlUtil from './util/UrlUtil';
-import * as ValidationUtil from './util/ValidationUtil';
+export function getDeduplicatedUnion(
+  array1: Array<number | string>,
+  array2: Array<number | string>
+): Array<number | string> {
+  return removeDuplicates(array1.concat(array2));
+}
 
-export {ArrayUtil, CommonConfig, RandomUtil, StringUtil, UrlUtil, ValidationUtil};
+export function getDifference(array1: Array<number | string>, array2: Array<number | string>): Array<number | string> {
+  return array1.filter(value => !array2.includes(value));
+}
+
+export function getIntersection(
+  array1: Array<number | string>,
+  array2: Array<number | string>
+): Array<number | string> {
+  return array1.filter(value => array2.includes(value));
+}
+
+export function removeDuplicates(array: any[]): any[] {
+  return Array.from(new Set(array));
+}
