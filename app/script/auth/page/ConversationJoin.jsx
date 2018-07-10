@@ -135,7 +135,7 @@ class ConversationJoin extends Component {
 
   routeToApp = () => {
     const redirectLocation = this.isPwaSupportedBrowser()
-      ? pathWithParams(EXTERNAL_ROUTE.PWA, QUERY_KEY.IMMEDIATE_LOGIN)
+      ? pathWithParams(EXTERNAL_ROUTE.PWA_LOGIN, QUERY_KEY.IMMEDIATE_LOGIN)
       : getAppPath();
     window.location.replace(redirectLocation);
   };
