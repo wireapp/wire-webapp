@@ -45,7 +45,7 @@
     </div>
     <div class="message-header-label">
       <span class="message-header-sender-name" data-bind='text: message.sender_name()'></span>
-      <span class="ellipsis" data-bind="text: message.caption()"></span>
+      <span class="ellipsis" data-bind="html: message.caption()"></span>
     </div>
     <div class="message-body-actions">
       <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp}"></time>
@@ -206,37 +206,26 @@
   <!-- ko ifnot: showLargeAvatar() -->
     <!-- ko if: showNamedCreation() -->
       <div class="message-group-creation-header">
-        <div class="message-group-creation-header-text" data-bind="text: groupCreationHeader()"></div>
+        <div class="message-group-creation-header-text" data-bind="html: htmlGroupCreationHeader()"></div>
         <div class="message-group-creation-header-name" data-bind="text: name()"></div>
       </div>
     <!-- /ko -->
 
     <!-- ko if: hasUsers() -->
-      <div class="message-header">
+      <div class="message-header" data-bind="template: {afterRender: $parent.bindShowMore}">
         <div class="message-header-icon message-header-icon--svg text-graphite">
           <message-icon data-bind="visible: isGroupCreation()"></message-icon>
           <span class="icon-minus" data-bind="visible: isMemberRemoval()"></span>
           <span class="icon-plus" data-bind="visible: isMemberJoin()"></span>
         </div>
         <div class="message-header-label">
-          <!-- ko if: showSenderName() -->
-            <span class="message-header-sender-name" data-bind='text: senderName()'></span>
-          <!-- /ko -->
-          <span class="ellipsis" data-bind="text: caption()"></span>
+          <span class="message-header-caption" data-bind="html: htmlCaption()"></span>
           <hr class="message-header-line" />
         </div>
         <!-- ko if: isMemberChange() -->
           <div class="message-body-actions">
             <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp}"></time>
           </div>
-        <!-- /ko -->
-      </div>
-      <div class="message-body" data-bind="foreach: remoteUserEntities">
-        <!-- ko if: message.isGroupCreation() -->
-          <participant-avatar class="avatar-no-border" params="participant: $data, click: $parents[1].onMessageUserClick, size: z.components.ParticipantAvatar.SIZE.MEDIUM"></participant-avatar>
-        <!-- /ko -->
-        <!-- ko if: message.isMemberJoin() || message.isMemberLeave() -->
-          <participant-avatar data-bind="css: {'translucent': message.isMemberLeave()}" params="participant: $data, click: $parents[1].onMessageUserClick, size: z.components.ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
         <!-- /ko -->
       </div>
     <!-- /ko -->

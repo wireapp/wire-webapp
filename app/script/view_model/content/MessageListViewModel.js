@@ -42,6 +42,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     this.onMessageUserClick = this.onMessageUserClick.bind(this);
     this.on_session_reset_click = this.on_session_reset_click.bind(this);
     this.should_hide_user_avatar = this.should_hide_user_avatar.bind(this);
+    this.bindShowMore = this.bindShowMore.bind(this);
 
     this.mainViewModel = mainViewModel;
     this.conversation_repository = repositories.conversation;
@@ -582,5 +583,21 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     }
 
     z.ui.Context.from(event, entries, 'message-options-menu');
+  }
+
+  bindShowMore(elements, message) {
+    const label = elements.find(element => element.className === 'message-header-label');
+    if (!label) {
+      return;
+    }
+    const link = label.querySelector('.message-header-show-more');
+    if (link) {
+      link.addEventListener('click', () =>
+        this.mainViewModel.panel.togglePanel(
+          z.viewModel.PanelViewModel.STATE.CONVERSATION_PARTICIPANTS,
+          message.highlightedUsers()
+        )
+      );
+    }
   }
 };

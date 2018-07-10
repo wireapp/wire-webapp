@@ -111,6 +111,7 @@ z.conversation.EventBuilder = {
     return {
       conversation: id,
       data: {
+        allTeamMembers: conversationEntity.withAllTeamMembers(),
         name: conversationEntity.name(),
         userIds: userIds,
       },
