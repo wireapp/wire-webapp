@@ -114,12 +114,11 @@ z.util.DebugUtil = class DebugUtil {
       })
       .then(selfClients => {
         const selfClientIds = selfClients.map(client => client.id);
-        const missingClients = selfClientIds.filter(id => recipients.indexOf(id) === -1);
-        if (missingClients.length === 0) {
-          this.logger.info(`Message was sent to all other "${selfClients.length}" clients.`);
-        } else {
-          this.logger.info(`Message was NOT sent to the following own clients: ${missingClients.join(',')}`);
-        }
+        const missingClients = selfClientIds.filter(id => recipients.includes(id));
+        const logMessage = missingClients.length
+          ? `Message was sent to all other "${selfClients.length}" clients.`
+          : `Message was NOT sent to the following own clients: ${missingClients.join(',')}`;
+        this.logger.info(logMessage);
       })
       .catch(error => this.logger.info(`Message was not sent to other clients. Reason: ${error.message}`, error));
   }
