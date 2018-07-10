@@ -118,7 +118,7 @@ z.event.WebSocketService = class WebSocketService {
       this.socket.onmessage = event => {
         if (this._pingHasExperiencedSuspiciousInactivity()) {
           const secondsSinceLastPing = (Date.now() - this.lastPingTime) / z.util.TimeUtil.UNITS_IN_MILLIS.SECOND;
-          this.logger.warn(`Message received but ping was inactive for ${secondsSinceLastPing} seconds, reconnecting.`);
+          this.logger.warn(`Message received but ping was inactive for "${secondsSinceLastPing}" sec, reconnecting.`);
           return this.reconnect(WebSocketService.CHANGE_TRIGGER.LONG_INACTIVITY);
         }
         if (event.data instanceof Blob) {
