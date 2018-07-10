@@ -116,7 +116,7 @@
     "karma-sourcemap-loader": "0.3.7",
     "lint-staged": "7.2.0",
     "load-grunt-tasks": "4.0.0",
-    "node-sass": "4.9.1",
+    "node-sass": "4.9.2",
     "postcss-cssnext": "3.1.0",
     "postcss-import": "11.1.0",
     "postcss-scss": "1.0.6",
