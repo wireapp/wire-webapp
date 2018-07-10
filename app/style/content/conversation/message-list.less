@@ -94,6 +94,7 @@
 .message-header {
   position: relative;
   display: flex;
+  padding-top: 6px;
   margin-bottom: 4px;
   line-height: @avatar-diameter-xs;
 }
@@ -102,6 +103,7 @@
   .flex-center;
 
   width: @conversation-message-sender-width;
+  align-items: flex-start;
   color: @graphite-dark;
 
   &--svg {
@@ -117,7 +119,7 @@
   display: flex;
   min-width: 0; // fixes ellipsis not working with flexbox (FF)
   flex: 1;
-  align-items: center;
+  align-items: flex-start;
   font-size: 12px;
   font-weight: @font-weight-regular;
 
@@ -128,6 +130,10 @@
   .message-header-sender-name {
     font-weight: @font-weight-bold;
     text-transform: capitalize;
+  }
+
+  & > span {
+    margin-top: -6px;
   }
 }
 

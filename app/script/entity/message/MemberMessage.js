@@ -25,9 +25,9 @@ window.z.entity = z.entity || {};
 z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
   static get CONFIG() {
     return {
-      MAX_USERS_VISIBLE: 17,
+      MAX_USERS_VISIBLE: 9,
       MAX_WHOLE_TEAM_USERS_VISIBLE: 10,
-      REDUCED_USERS_COUNT: 15,
+      REDUCED_USERS_COUNT: 7,
     };
   }
 
@@ -173,7 +173,19 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
   }
 
   _generateNameString(declension = z.string.Declension.ACCUSATIVE) {
-    return z.util.LocalizerUtil.joinNames(this.joinedUserEntities(), declension);
+    const displayedUsers = this.joinedUserEntities().slice();
+    const trimUserList = displayedUsers.length > MemberMessage.CONFIG.MAX_USERS_VISIBLE;
+    if (trimUserList) {
+      displayedUsers.splice(MemberMessage.CONFIG.REDUCED_USERS_COUNT);
+      const selfUser = displayedUsers.find(userEntity => userEntity.is_me);
+      if (selfUser) {
+        displayedUsers.pop();
+        displayedUsers.push(selfUser);
+      }
+    }
+    const hiddenUserCount = this.joinedUserEntities().length - displayedUsers.length;
+    const moreUsersString = hiddenUserCount ? ` and ${hiddenUserCount} more` : '';
+    return z.util.LocalizerUtil.joinNames(displayedUsers, declension) + moreUsersString;
   }
 
   _getCaptionConnection(userEntity) {
