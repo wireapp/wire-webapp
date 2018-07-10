@@ -74,9 +74,9 @@ z.viewModel.MainViewModel = class MainViewModel {
 
     this.actions = new z.viewModel.ActionsViewModel(this, repositories);
 
+    this.panel = new z.viewModel.PanelViewModel(this, repositories);
     this.content = new z.viewModel.ContentViewModel(this, repositories);
     this.list = new z.viewModel.ListViewModel(this, repositories);
-    this.panel = new z.viewModel.PanelViewModel(this, repositories);
 
     this.modals = new z.viewModel.ModalsViewModel();
     this.lightbox = new z.viewModel.ImageDetailViewViewModel(this, repositories);
