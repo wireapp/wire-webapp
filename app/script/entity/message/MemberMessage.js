@@ -41,9 +41,11 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
     this.userIds = ko.observableArray();
     this.name = ko.observable('');
 
-    this.exceedsMaxVisibleUsers = ko.observable(false);
+    this.exceedsMaxVisibleUsers = ko.pureComputed(() => {
+      return this.joinedUserEntities().length > MemberMessage.CONFIG.MAX_USERS_VISIBLE;
+    });
     this.visibleUsers = ko.observable([]);
-    this.hiddenUserCount = ko.observable([]);
+    this.hiddenUserCount = ko.pureComputed(() => this.joinedUserEntities().length - this.visibleUsers().length);
     this.highlightedUsers = ko.pureComputed(() => {
       return this.type === z.event.Backend.CONVERSATION.MEMBER_JOIN ? this.joinedUserEntities() : [];
     });
@@ -61,18 +63,15 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
     });
 
     this.joinedUserEntities.subscribe(joinedUserEntities => {
-      const visibleUsers = joinedUserEntities.slice();
-      this.exceedsMaxVisibleUsers(visibleUsers.length > MemberMessage.CONFIG.MAX_USERS_VISIBLE);
+      const selfUser = joinedUserEntities.find(userEntity => userEntity.is_me);
+      const visibleUsers = joinedUserEntities.filter(userEntity => !userEntity.is_me);
       if (this.exceedsMaxVisibleUsers()) {
         visibleUsers.splice(MemberMessage.CONFIG.REDUCED_USERS_COUNT);
-        const selfUser = visibleUsers.find(userEntity => userEntity.is_me);
-        if (selfUser) {
-          visibleUsers.pop();
-          visibleUsers.push(selfUser);
-        }
+      }
+      if (selfUser) {
+        visibleUsers.splice(-1, 1, selfUser);
       }
       this.visibleUsers(visibleUsers);
-      this.hiddenUserCount(this.joinedUserEntities().length - visibleUsers.length);
     });
 
     // Users joined the conversation without self
@@ -107,13 +106,12 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
             const exceedsMaxTeam = this.joinedUserEntities().length > MemberMessage.CONFIG.MAX_WHOLE_TEAM_USERS_VISIBLE;
             if (this.allTeamMembers && exceedsMaxTeam) {
               const guestCount = this.joinedUserEntities().filter(user => user.isGuest()).length;
-              if (guestCount === 0) {
+              if (!guestCount) {
                 return z.l10n.text(z.string.conversationCreateTeam);
               }
-              if (guestCount === 1) {
-                return z.l10n.text(z.string.conversationCreateTeamGuest);
-              }
-              return z.l10n.text(z.string.conversationCreateTeamGuests, guestCount);
+              return guestCount === 1
+                ? z.l10n.text(z.string.conversationCreateTeamGuest)
+                : z.l10n.text(z.string.conversationCreateTeamGuests, guestCount);
             }
             const createStringId = this.exceedsMaxVisibleUsers()
               ? z.string.conversationCreateWithMore
