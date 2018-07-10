@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="1.8.0"></a>
+# [1.8.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@1.7.1...@wireapp/api-client@1.8.0) (2018-07-10)
+
+
+### Features
+
+* **core:** Leave conversations ([#816](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/816)) ([b421fa7](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/b421fa7))
+
+
+
+
 <a name="1.7.1"></a>
 ## [1.7.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@1.7.0...@wireapp/api-client@1.7.1) (2018-07-09)
 
