@@ -34,7 +34,7 @@ describe('Root', () => {
         },
       };
 
-      store = mockStore(state, {mixpanel: {track: () => 1}});
+      store = mockStore(state, {});
       wrapper = mountWithStore(<Root />, store);
     });
 
