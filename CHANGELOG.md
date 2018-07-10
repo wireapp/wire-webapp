@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="3.10.0"></a>
+# [3.10.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@3.9.0...@wireapp/core@3.10.0) (2018-07-10)
+
+
+### Features
+
+* **core:** Leave conversations ([#816](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/816)) ([b421fa7](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/b421fa7))
+
+
+
+
 <a name="3.9.0"></a>
 # [3.9.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@3.8.0...@wireapp/core@3.9.0) (2018-07-09)
 
