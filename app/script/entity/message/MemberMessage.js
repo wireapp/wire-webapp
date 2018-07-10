@@ -234,7 +234,7 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
   }
 
   _generateNameString(skipAnd = false, declension = z.string.Declension.ACCUSATIVE) {
-    return z.util.LocalizerUtil.joinNames(this.visibleUsers(), declension, skipAnd, true);
+    return z.util.LocalizerUtil.joinNames(this.visibleUsers(), declension, skipAnd);
   }
 
   replaceTags(text) {
