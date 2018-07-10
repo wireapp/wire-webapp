@@ -70,7 +70,7 @@ z.util.DebugUtil = class DebugUtil {
     messageId,
     conversationId = this.conversationRepository.active_conversation().id
   ) {
-    let amountOfMessagesSent = 0;
+    let recipients = [];
 
     const clientId = wire.app.repository.client.currentClient().id;
     const userId = this.userRepository.self().id;
@@ -109,13 +109,18 @@ z.util.DebugUtil = class DebugUtil {
           });
       })
       .then(filteredNotifications => {
-        amountOfMessagesSent = filteredNotifications.length;
+        recipients = filteredNotifications.map(notification => notification.data.recipient);
         return wire.app.repository.client.getClientsForSelf();
       })
       .then(selfClients => {
-        const isSent = selfClients.length === amountOfMessagesSent;
-        this.logger.info(`Message was sent to all other "${selfClients.length}" clients: ${isSent}`);
-        return isSent;
+        const selfClientIds = selfClients.map(client => client.id);
+        const missingClients = selfClientIds.filter(id => recipients.indexOf(id) === -1);
+        const isSent = missingClients.length === 0;
+        if (isSent) {
+          this.logger.info(`Message was sent to all other "${selfClients.length}" clients: ${isSent}`);
+        } else {
+          this.logger.info(`Message was NOT sent to the following own clients: ${missingClients.join(',')}`);
+        }
       })
       .catch(error => this.logger.info(`Message was not sent to other clients. Reason: ${error.message}`, error));
   }
