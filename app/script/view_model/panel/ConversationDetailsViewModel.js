@@ -223,25 +223,25 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
   }
 
   clickToArchive() {
-    this.actionViewModel.archiveConversation(this.activeConversation());
+    this.actionsViewModel.archiveConversation(this.activeConversation());
   }
 
   clickToBlock() {
     const userEntity = this.activeConversation().firstUserEntity();
     const nextConversationEntity = this.conversationRepository.get_next_conversation(this.activeConversation());
 
-    this.actionViewModel.blockUser(userEntity, true, nextConversationEntity);
+    this.actionsViewModel.blockUser(userEntity, true, nextConversationEntity);
   }
 
   clickToCancelRequest() {
     const userEntity = this.activeConversation().firstUserEntity();
     const nextConversationEntity = this.conversationRepository.get_next_conversation(this.activeConversation());
 
-    this.actionViewModel.cancelConnectionRequest(userEntity, true, nextConversationEntity);
+    this.actionsViewModel.cancelConnectionRequest(userEntity, true, nextConversationEntity);
   }
 
   clickToClear() {
-    this.actionViewModel.clearConversation(this.activeConversation());
+    this.actionsViewModel.clearConversation(this.activeConversation());
   }
 
   clickToEditGroupName() {
@@ -251,11 +251,11 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
   }
 
   clickToLeave() {
-    this.actionViewModel.leaveConversation(this.activeConversation());
+    this.actionsViewModel.leaveConversation(this.activeConversation());
   }
 
   clickToToggleMute() {
-    this.actionViewModel.toggleMuteConversation(this.activeConversation());
+    this.actionsViewModel.toggleMuteConversation(this.activeConversation());
   }
 
   renameConversation(data, event) {

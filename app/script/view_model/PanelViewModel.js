@@ -173,12 +173,11 @@ z.viewModel.PanelViewModel = class PanelViewModel {
     return (isStateExiting || isStateActive) && this.isVisible();
   }
 
-  _goBack(overrideParams) {
+  _goBack() {
     this.stateHistory.pop();
     const toHistory = this.stateHistory[this.stateHistory.length - 1];
-    const toState = toHistory.state;
-    const params = overrideParams !== undefined ? overrideParams : toHistory.params;
-    this._switchState(toState, this.state(), params, true);
+    const {state, params} = toHistory;
+    this._switchState(state, this.state(), params, true);
   }
 
   _switchContent(newContentState) {
