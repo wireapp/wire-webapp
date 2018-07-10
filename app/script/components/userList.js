@@ -48,7 +48,7 @@ z.components.UserList = class UserList {
     this.mode = params.mode || UserList.MODE.DEFAULT;
     this.userEntities = params.user;
     const highlightedUsers = params.highlightedUsers ? params.highlightedUsers() : [];
-    this.highlightedUserIds = highlightedUsers.map(user => user().id);
+    this.highlightedUserIds = highlightedUsers.map(user => user.id);
     this.isSelectEnabled = typeof params.selected === 'function';
     this.altStyle = params.altStyle;
 
