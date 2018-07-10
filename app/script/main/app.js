@@ -213,12 +213,7 @@ z.main.App = class App {
     return z.util.Environment.frontend.isProduction()
       ? {}
       : {
-          debug: new z.util.DebugUtil(
-            this.repository.calling,
-            this.repository.conversation,
-            this.repository.user,
-            this.repository.storage
-          ),
+          debug: new z.util.DebugUtil(this.repository),
         };
   }
 

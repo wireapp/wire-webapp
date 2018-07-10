@@ -23,11 +23,14 @@ window.z = window.z || {};
 window.z.util = z.util || {};
 
 z.util.DebugUtil = class DebugUtil {
-  constructor(callingRepository, conversationRepository, userRepository, storageRepository) {
-    this.callingRepository = callingRepository;
-    this.conversationRepository = conversationRepository;
-    this.storageRepository = storageRepository;
-    this.userRepository = userRepository;
+  constructor({calling, client, conversation, cryptography, event, user, storage}) {
+    this.callingRepository = calling;
+    this.clientRepository = client;
+    this.conversationRepository = conversation;
+    this.cryptographyRepository = cryptography;
+    this.eventRepository = event;
+    this.storageRepository = storage;
+    this.userRepository = user;
     this.logger = new z.util.Logger('z.util.DebugUtil', z.config.LOGGER.OPTIONS);
   }
 
@@ -38,7 +41,7 @@ z.util.DebugUtil = class DebugUtil {
 
   breakSession(userId, clientId) {
     const sessionId = `${userId}@${clientId}`;
-    const cryptobox = wire.app.repository.cryptography.cryptobox;
+    const cryptobox = this.cryptographyRepository.cryptobox;
     return cryptobox
       .session_load(sessionId)
       .then(cryptoboxSession => {
@@ -54,7 +57,7 @@ z.util.DebugUtil = class DebugUtil {
         cryptobox.cachedSessions.set(sessionId, cryptoboxSession);
 
         const sessionStoreName = z.storage.StorageSchemata.OBJECT_STORE.SESSIONS;
-        return wire.app.repository.storage.storageService.update(sessionStoreName, sessionId, record);
+        return this.storageRepository.storageService.update(sessionStoreName, sessionId, record);
       })
       .then(() => this.logger.log(`Corrupted Session ID '${sessionId}'`));
   }
@@ -72,7 +75,7 @@ z.util.DebugUtil = class DebugUtil {
   ) {
     let recipients = [];
 
-    const clientId = wire.app.repository.client.currentClient().id;
+    const clientId = this.clientRepository.currentClient().id;
     const userId = this.userRepository.self().id;
 
     const isOTRMessage = notification => notification.type === z.event.Backend.CONVERSATION.OTR_MESSAGE_ADD;
@@ -81,13 +84,13 @@ z.util.DebugUtil = class DebugUtil {
       notification.from === userId && (notification.data && notification.data.sender === clientId);
     const hasExpectedTimestamp = (notification, dateTime) => notification.time === dateTime.toISOString();
 
-    return wire.app.repository.conversation
+    return this.conversationRepository
       .get_conversation_by_id(conversationId)
       .then(conversation => {
         return this.conversationRepository.get_message_in_conversation_by_id(conversation, messageId);
       })
       .then(message => {
-        return wire.app.repository.event.notificationService
+        return this.eventRepository.notificationService
           .getNotifications(undefined, undefined, 10000)
           .then(({notifications}) => ({
             message,
@@ -97,20 +100,19 @@ z.util.DebugUtil = class DebugUtil {
       .then(({message, notifications}) => {
         const dateTime = new Date(message.timestamp());
         return notifications
-          .map(notification => notification.payload)
-          .reduce((accumulator, payload) => accumulator.concat(payload))
-          .filter(notification => {
+          .reduce((accumulator, notification) => accumulator.concat(notification.payload), [])
+          .filter(event => {
             return (
-              isOTRMessage(notification) &&
-              isInCurrentConversation(notification) &&
-              wasSentByOurCurrentClient(notification) &&
-              hasExpectedTimestamp(notification, dateTime)
+              isOTRMessage(event) &&
+              isInCurrentConversation(event) &&
+              wasSentByOurCurrentClient(event) &&
+              hasExpectedTimestamp(event, dateTime)
             );
           });
       })
-      .then(filteredNotifications => {
-        recipients = filteredNotifications.map(notification => notification.data.recipient);
-        return wire.app.repository.client.getClientsForSelf();
+      .then(filteredEvents => {
+        recipients = filteredEvents.map(event => event.data.recipient);
+        return this.clientRepository.getClientsForSelf();
       })
       .then(selfClients => {
         const selfClientIds = selfClients.map(client => client.id);
@@ -143,17 +145,17 @@ z.util.DebugUtil = class DebugUtil {
   }
 
   exportCryptobox() {
-    const clientId = wire.app.repository.client.currentClient().id;
+    const clientId = this.clientRepository.currentClient().id;
     const userId = this.userRepository.self().id;
     const fileName = `cryptobox-${userId}-${clientId}.json`;
 
-    wire.app.repository.cryptography.cryptobox
+    this.cryptographyRepository.cryptobox
       .serialize()
       .then(cryptobox => z.util.downloadText(JSON.stringify(cryptobox), fileName));
   }
 
   getNotificationFromStream(notificationId, notificationIdSince) {
-    const clientId = wire.app.repository.client.currentClient().id;
+    const clientId = this.clientRepository.currentClient().id;
 
     const _gotNotifications = ({hasMore, notifications}) => {
       const matchingNotifications = notifications.filter(notification => notification.id === notificationId);
@@ -172,7 +174,7 @@ z.util.DebugUtil = class DebugUtil {
   }
 
   getNotificationsFromStream(remoteUserId, remoteClientId, matchingNotifications = [], notificationIdSince) {
-    const localClientId = wire.app.repository.client.currentClient().id;
+    const localClientId = this.clientRepository.currentClient().id;
     const localUserId = this.userRepository.self().id;
 
     const _gotNotifications = ({hasMore, notifications}) => {
@@ -257,7 +259,7 @@ z.util.DebugUtil = class DebugUtil {
   logConnectionStatus() {
     this.logger.log('Online Status');
     this.logger.log(`-- Browser online: ${window.navigator.onLine}`);
-    this.logger.log(`-- IndexedDB open: ${wire.app.repository.storage.storageService.db.isOpen()}`);
+    this.logger.log(`-- IndexedDB open: ${this.storageRepository.storageService.db.isOpen()}`);
     this.logger.log(`-- WebSocket ready state: ${window.wire.app.service.web_socket.socket.readyState}`);
   }
 };
