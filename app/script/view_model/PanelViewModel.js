@@ -128,7 +128,7 @@ z.viewModel.PanelViewModel = class PanelViewModel {
     const isStateChange = this.state() !== state;
     if (!isStateChange) {
       const currentInstance = this.subViews[state];
-      const isNewParams = params && params.entity.id !== currentInstance.getEntityId();
+      const isNewParams = params && params.entity && params.entity.id !== currentInstance.getEntityId();
       if (!isNewParams) {
         return this.closePanel();
       }
