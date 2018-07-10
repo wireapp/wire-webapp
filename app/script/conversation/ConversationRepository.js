@@ -467,10 +467,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     if (conversationEntity.inTeam()) {
       const allTeamMembersParticipate = this.teamMembers().every(teamMember => {
-        return conversationEntity.participating_user_ids().includes(teamMember.id)
+        return conversationEntity.participating_user_ids().includes(teamMember.id);
       });
 
-      conversationEntity.withAllTeamMembers(allTeamMembersParticipate)
+      conversationEntity.withAllTeamMembers(allTeamMembersParticipate);
     }
 
     const creationEvent = conversationEntity.is_group()
