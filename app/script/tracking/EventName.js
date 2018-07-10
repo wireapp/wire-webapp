@@ -27,9 +27,6 @@ window.z.tracking = z.tracking || {};
  * @returns {z.tracking.EventName} Event names (defined by Business Intelligence Team)
  */
 z.tracking.EventName = {
-  ACCOUNT: {
-    LOGGED_IN: 'account.logged_in',
-  },
   CALLING: {
     ENDED_CALL: 'calling.ended_call',
     ENDED_VIDEO_CALL: 'calling.ended_video_call',

@@ -63,7 +63,7 @@ z.viewModel.panel.GroupParticipantServiceViewModel = class GroupParticipantServi
 
   clickOnAdd() {
     this.integrationRepository.addService(this.activeConversation(), this.selectedService(), 'conversation_details');
-    this.onGoBack();
+    this.onGoToRoot();
   }
 
   clickToRemove() {
