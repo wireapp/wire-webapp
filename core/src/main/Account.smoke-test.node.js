@@ -21,11 +21,8 @@
 
 require('dotenv').config();
 
+const AccountAction = require('./test/AccountAction');
 const {Account} = require('@wireapp/core');
-const APIClient = require('@wireapp/api-client');
-const {Config} = require('@wireapp/api-client/dist/commonjs/Config');
-const {ClientType} = require('@wireapp/api-client/dist/commonjs/client/');
-const {MemoryEngine} = require('@wireapp/store-engine');
 const {ValidationUtil} = require('@wireapp/commons');
 const {UnconnectedUserError} = require('@wireapp/api-client/dist/commonjs/user/');
 const logdown = require('logdown');
@@ -65,22 +62,6 @@ function isMissingEnvironmentVariable() {
 // Note: We need to listen to the "WILL_RELEASE" environment variable, otherwise our tests get executed on every commit in a Pull Request (PR) which will cause the "login too frequently" backend error for the smoke tests accounts.
 const CAN_RUN = !isMissingEnvironmentVariable() && process.env.WILL_RELEASE === '0';
 
-async function getAccount(email, password) {
-  const login = {
-    clientType: ClientType.TEMPORARY,
-    email,
-    password,
-  };
-  const backend = APIClient.BACKEND.STAGING;
-  const engine = new MemoryEngine();
-  await engine.init(email);
-  const apiClient = new APIClient(new Config(engine, backend));
-  const account = new Account(apiClient);
-  await account.login(login);
-  await account.listen();
-  return account;
-}
-
 function createConnection(sender, receiver) {
   return sender.service.connection.createConnection(receiver.apiClient.context.userId);
 }
@@ -100,6 +81,8 @@ async function connect(sender, receiver) {
   return conversationId;
 }
 
+beforeAll(() => (jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000));
+
 describe('Account', () => {
   let alice;
   let bob;
@@ -110,7 +93,7 @@ describe('Account', () => {
       logger.info('Running smoke tests for @wireapp/core ...');
 
       try {
-        alice = await getAccount(process.env.ALICE_EMAIL, process.env.ALICE_PASSWORD);
+        alice = await AccountAction.getAccount(process.env.ALICE_EMAIL, process.env.ALICE_PASSWORD);
       } catch (error) {
         logger.error(
           `Cannot login with email "${process.env.ALICE_EMAIL}". Aborting test.`,
@@ -120,7 +103,7 @@ describe('Account', () => {
       }
 
       try {
-        bob = await getAccount(process.env.BOB_EMAIL, process.env.BOB_PASSWORD);
+        bob = await AccountAction.getAccount(process.env.BOB_EMAIL, process.env.BOB_PASSWORD);
       } catch (error) {
         logger.error(
           `Cannot login with email "${process.env.BOB_EMAIL}". Aborting test.`,
@@ -130,7 +113,7 @@ describe('Account', () => {
       }
 
       try {
-        eve = await getAccount(process.env.EVE_EMAIL, process.env.EVE_PASSWORD);
+        eve = await AccountAction.getAccount(process.env.EVE_EMAIL, process.env.EVE_PASSWORD);
       } catch (error) {
         logger.error(
           `Cannot login with email "${process.env.EVE_EMAIL}". Aborting test.`,
@@ -186,7 +169,6 @@ describe('Account', () => {
       if (!CAN_RUN) {
         return done();
       }
-      jasmine.DEFAULT_TIMEOUT_INTERVAL = 5000;
 
       // Alice connects to Bob
       await connect(
