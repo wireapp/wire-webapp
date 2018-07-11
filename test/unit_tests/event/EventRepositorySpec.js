@@ -477,6 +477,9 @@ describe('Event Repository', () => {
       spyOn(TestFactory.event_repository.conversationService, 'load_event_from_db').and.returnValue(
         Promise.resolve(previously_stored_event)
       );
+      spyOn(TestFactory.event_repository.conversationService, 'update_event').and.returnValue(
+        Promise.resolve(previously_stored_event)
+      );
 
       const initial_time = event.time;
       const changed_time = new Date(new Date(event.time).getTime() + 60 * 1000).toISOString();
@@ -488,7 +491,8 @@ describe('Event Repository', () => {
         .then(saved_event => {
           expect(saved_event.time).toEqual(initial_time);
           expect(saved_event.time).not.toEqual(changed_time);
-          expect(TestFactory.event_repository.conversationService.save_event).toHaveBeenCalled();
+          expect(saved_event.primary_key).toEqual(previously_stored_event.primary_key);
+          expect(TestFactory.event_repository.conversationService.update_event).toHaveBeenCalled();
           done();
         })
         .catch(done.fail);
