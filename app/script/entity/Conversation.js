@@ -348,6 +348,7 @@ z.entity.Conversation = class Conversation {
           const duplicateIndex = this.messages_unordered.indexOf(duplicateEntity);
           this.messages_unordered.splice(duplicateIndex, 1, messageEntity);
         }
+        // The duplicated message has been treated (either replaced or ignored). Our job here is done.
         return;
       }
       this.messages_unordered.push(messageEntity);
