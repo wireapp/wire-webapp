@@ -21,6 +21,28 @@
 
 'use strict';
 
+async function createEncodedCiphertext(
+  preKey,
+  text = 'Hello, World!',
+  receivingIdentity = TestFactory.cryptography_repository.cryptobox.identity
+) {
+  const bobEngine = new window.StoreEngine.MemoryEngine();
+  await bobEngine.init('bob');
+
+  const sender = new window.cryptobox.Cryptobox(bobEngine, 1);
+  await sender.create();
+
+  const genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
+  genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT, new z.proto.Text(text));
+
+  const sessionId = `from-${sender.identity.public_key.fingerprint()}-to-${preKey.key_pair.public_key.fingerprint()}`;
+  const preKeyBundle = Proteus.keys.PreKeyBundle.new(receivingIdentity.public_key, preKey);
+
+  const cipherText = await sender.encrypt(sessionId, genericMessage.toArrayBuffer(), preKeyBundle.serialise());
+
+  return z.util.arrayToBase64(cipherText);
+}
+
 describe('Event Repository', () => {
   const test_factory = new TestFactory();
   let last_notification_id = undefined;
@@ -38,6 +60,14 @@ describe('Event Repository', () => {
       },
     };
   })();
+
+  beforeAll(done => {
+    z.util.protobuf
+      .loadProtos('ext/proto/generic-message-proto/messages.proto')
+      .then(() => test_factory.exposeClientActors())
+      .then(done)
+      .catch(done.fail);
+  });
 
   beforeEach(done => {
     test_factory
@@ -331,24 +361,30 @@ describe('Event Repository', () => {
 
   describe('_processEvent', () => {
     fit('processes OTR events', done => {
-      const event = {
-        conversation: 'fdc6cf1a-4e37-424e-a106-ab3d2cc5c8e0',
-        data: {
-          recipient: 'f180a823bf0d1204',
-          sender: '4c28652a6dd21938',
-          text:
-            'owABAaEAWCAG862qHoCC8OAJ5vhMzfslsAq5BlW8vIxUULhjq0hYVQJYvAKkAAABoQBYIJ/kyCWGbppqnz+3qZ5Ek/KRyVoA5kOdvCI/Cla0KZUoAqEAoQBYII83u4et5LbnfW+gypN5MADxCngPDIrQyyK5f34shL9uA6UAUAhhIdfy78dNGzFO4oIgRbgBAAIAA6EAWCC8LsO6xPXmz8j3HuqsaoCpS+FgjhrwYUlWBiZ4w9/F+ARYLPoN8lTHlI+2TNoLh2fJAkQ1DnByJVlMb+sAuSjuVLVFJXHDV4u57Ff5IhhR',
-        },
-        from: '6f88716b-1383-44da-9d57-45b51cc64d90',
-        time: '2018-07-10T14:54:21.621Z',
-        type: 'conversation.otr-message-add',
-      };
-      const source = z.event.EventRepository.SOURCE.STREAM;
-      TestFactory.event_repository
-        ._processEvent(event, source)
+      const text = 'Hello, this is a test!';
+      const ownClientId = 'f180a823bf0d1204';
+      TestFactory.client_repository.currentClient(new z.client.ClientEntity({id: ownClientId}));
+
+      return Promise.resolve()
+        .then(() => TestFactory.cryptography_repository.cryptobox.get_prekey())
+        .then(async preKeyBundle => {
+          const ciphertext = await createEncodedCiphertext(preKeyBundle, text);
+          const event = {
+            conversation: 'fdc6cf1a-4e37-424e-a106-ab3d2cc5c8e0',
+            data: {
+              recipient: ownClientId,
+              sender: '4c28652a6dd21938',
+              text: ciphertext,
+            },
+            from: '6f88716b-1383-44da-9d57-45b51cc64d90',
+            time: '2018-07-10T14:54:21.621Z',
+            type: 'conversation.otr-message-add',
+          };
+          const source = z.event.EventRepository.SOURCE.STREAM;
+          return TestFactory.event_repository._processEvent(event, source);
+        })
         .then(() => done)
         .catch(() => done.fail);
-      done();
     });
   });
 
