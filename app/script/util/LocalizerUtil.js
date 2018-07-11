@@ -24,16 +24,21 @@ window.z.util = z.util || {};
 
 z.util.LocalizerUtil = {
   joinNames: (userEntities, declension = z.string.Declension.ACCUSATIVE, skipAnd = false) => {
-    const selfUser = userEntities.find(userEntity => userEntity.is_me);
-    const otherUsers = userEntities.filter(userEntity => !userEntity.is_me);
-    const firstNames = otherUsers.map(userEntity => z.util.getFirstName(userEntity));
+    const containsSelfUser = userEntities.some(userEntity => userEntity.is_me);
+    if (containsSelfUser) {
+      userEntities = userEntities.filter(userEntity => !userEntity.is_me);
+    }
+
+    const firstNames = userEntities.map(userEntity => userEntity.first_name());
     firstNames.sort((userNameA, userNameB) => z.util.StringUtil.sortByPriority(userNameA, userNameB));
-    if (selfUser) {
-      firstNames.push(z.util.getFirstName(selfUser, declension));
+
+    if (containsSelfUser) {
+      firstNames.push(z.util.SanitizationUtil.getEscapedSelfName(declension));
     }
 
     const numberOfNames = firstNames.length;
-    if (!skipAnd && numberOfNames >= 2) {
+    const joinByAnd = !skipAnd && numberOfNames >= 2;
+    if (joinByAnd) {
       const [secondLastName, lastName] = firstNames.splice(firstNames.length - 2, 2);
 
       const exactlyTwoNames = numberOfNames === 2;
@@ -43,6 +48,6 @@ z.util.LocalizerUtil = {
       firstNames.push(additionalNames);
     }
 
-    return firstNames.join(', ');
+    return z.util.SanitizationUtil.escapeString(firstNames.join(', '));
   },
 };
