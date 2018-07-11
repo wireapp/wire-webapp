@@ -246,7 +246,7 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
     };
 
     return Object.entries(tagList).reduce((replaceText, [template, replace]) => {
-      return replaceText.replace(new RegExp(template, 'g'), replace)
+      return replaceText.replace(new RegExp(template, 'g'), replace);
     }, text);
   }
 
