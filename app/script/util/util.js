@@ -473,8 +473,8 @@ z.util.printDevicesId = id => {
   }
 
   const idWithPadding = z.util.zeroPadding(id, 16);
-
-  const prettifiedId = idWithPadding.match(/.{1,2}/g).map(part => `<span class='device-id-part'>${part}</span>`);
+  const parts = idWithPadding.match(/.{1,2}/g) || [];
+  const prettifiedId = parts.map(part => `<span class='device-id-part'>${part}</span>`);
 
   return prettifiedId.join('');
 };
