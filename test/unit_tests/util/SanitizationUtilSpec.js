@@ -17,11 +17,38 @@
  *
  */
 
-// grunt test_init && grunt test_run:util/Util
+// grunt test_init && grunt test_run:util/SanitizationUtil
 
 'use strict';
 
 describe('z.util.SanitizationUtil', () => {
+  describe('escapeRegex', () => {
+    const escapedRegex = z.util.SanitizationUtil.escapeString(':)');
+    expect(escapedRegex).toEqual('');
+  });
+
+  describe('escapeString', () => {
+    const escapedString = z.util.SanitizationUtil.escapeString(`<script>alert('Unsanitzed');</script>`);
+    expect(escapedString).toEqual('');
+  });
+
+  describe('getEscapedFirstName', () => {
+    const userEntity = new z.entity.User();
+    userEntity.name(<script>alert('Unsanitzed');</script>);
+
+    const escapedFirstName = z.util.SanitizationUtil.getEscapedFirstName(userEntity);
+    expect(escapedFirstName).toEqual('');
+
+    userEntity.is_me = trueM
+    const escapedSelfName = z.util.SanitizationUtil.getEscapedFirstName(userEntity);
+    expect(escapedSelfName).toEqual('you');
+  });
+
+  describe('getEscapedSelfName', () => {
+    const escapedSelfName = z.util.SanitizationUtil.getEscapedSelfName(z.string.Declension.NOMINATIVE);
+    expect(escapedSelfName).toEqual('you');
+  });
+
   describe('safeWindowOpen', () => {
     let newWindow = undefined;
     afterEach(() => {

@@ -29,7 +29,7 @@ z.util.LocalizerUtil = {
       userEntities = userEntities.filter(userEntity => !userEntity.is_me);
     }
 
-    const firstNames = userEntities.map(userEntity => z.util.SanitizationUtil.getEscapedFirstName(userEntity));
+    const firstNames = userEntities.map(userEntity => userEntity.first_name());
     firstNames.sort((userNameA, userNameB) => z.util.StringUtil.sortByPriority(userNameA, userNameB));
 
     if (containsSelfUser) {

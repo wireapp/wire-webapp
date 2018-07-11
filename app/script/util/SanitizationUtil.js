@@ -23,13 +23,7 @@ window.z = window.z || {};
 window.z.util = z.util || {};
 
 z.util.SanitizationUtil = (() => {
-  const _escapeRegex = string => string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-
   const _escapeString = string => _.escape(string);
-
-  const _getEscapedFirstName = (userEntity, declension) => {
-    return userEntity.is_me ? _getSelfName(declension) : _escapeString(userEntity.first_name());
-  };
 
   const _getEscapedSelfName = (declension = z.string.Declension.NOMINATIVE) => {
     const selfNameDeclensions = {
@@ -41,46 +35,49 @@ z.util.SanitizationUtil = (() => {
     return _escapeString(z.l10n.text(selfNameDeclensions[declension]));
   };
 
-  /**
-   * Opens a new browser tab (target="_blank") with a given URL in a safe environment.
-   * @see https://mathiasbynens.github.io/rel-noopener/
-   * @param {string} url - URL you want to open in a new browser tab
-   * @param {boolean} focus - True, if the new windows should get browser focus
-   * @returns {Object} New window handle
-   */
-  const _safeWindowOpen = (url, focus = true) => {
-    const newWindow = window.open(z.util.URLUtil.prependProtocol(url));
-
-    if (newWindow) {
-      newWindow.opener = null;
-      if (focus) {
-        newWindow.focus();
-      }
-    }
-
-    return newWindow;
-  };
-
-  const _safeMailtoOpen = (event, email) => {
-    event.preventDefault();
-    event.stopPropagation();
-
-    if (!z.util.isValidEmail(email)) {
-      return;
-    }
-
-    const newWindow = window.open(`mailto:${email}`);
-    if (newWindow) {
-      window.setTimeout(() => newWindow.close(), 10);
-    }
-  };
-
   return {
-    escapeRegex: _escapeRegex,
+    escapeRegex: string => string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'),
+
     escapeString: _escapeString,
-    getEscapedFirstName: _getEscapedFirstName,
+
+    getEscapedFirstName: (userEntity, declension) => {
+      return userEntity.is_me ? _getSelfName(declension) : userEntity.first_name();
+    },
+
     getEscapedSelfName: _getEscapedSelfName,
-    safeMailtoOpen: _safeMailtoOpen,
-    safeWindowOpen: _safeWindowOpen,
+
+    safeMailtoOpen: (event, email) => {
+      event.preventDefault();
+      event.stopPropagation();
+
+      if (!z.util.isValidEmail(email)) {
+        return;
+      }
+
+      const newWindow = window.open(`mailto:${email}`);
+      if (newWindow) {
+        window.setTimeout(() => newWindow.close(), 10);
+      }
+    },
+
+    /**
+     * Opens a new browser tab (target="_blank") with a given URL in a safe environment.
+     * @see https://mathiasbynens.github.io/rel-noopener/
+     * @param {string} url - URL you want to open in a new browser tab
+     * @param {boolean} focus - True, if the new windows should get browser focus
+     * @returns {Object} New window handle
+     */
+    safeWindowOpen: (url, focus = true) => {
+      const newWindow = window.open(z.util.URLUtil.prependProtocol(url));
+
+      if (newWindow) {
+        newWindow.opener = null;
+        if (focus) {
+          newWindow.focus();
+        }
+      }
+
+      return newWindow;
+    },
   };
 })();
