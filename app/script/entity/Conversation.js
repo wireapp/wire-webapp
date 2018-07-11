@@ -482,15 +482,18 @@ z.entity.Conversation = class Conversation {
   }
 
   _findDuplicate(messageEntity) {
-    for (const existingMessageEntity of this.messages_unordered()) {
-      const duplicateMessageId = messageEntity.id && existingMessageEntity.id === messageEntity.id;
-      const fromSameSender = existingMessageEntity.from === messageEntity.from;
-
-      if (duplicateMessageId && fromSameSender) {
-        return existingMessageEntity;
-      }
+    if (!messageEntity.id) {
+      return;
     }
-    return undefined;
+    const areSameMessage = (messageEntity1, messageEntity2) => {
+      const sameId = messageEntity1.id && messageEntity2.id === messageEntity1.id;
+      const sameSender = messageEntity1.from === messageEntity2.from;
+      return sameId && sameSender;
+    };
+
+    return this.messages_unordered().find(existingMessageEntity =>
+      areSameMessage(messageEntity, existingMessageEntity)
+    );
   }
 
   update_timestamp_server(time, is_backend_timestamp = false) {
