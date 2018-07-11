@@ -29,12 +29,12 @@ z.util.LocalizerUtil = {
       userEntities = userEntities.filter(userEntity => !userEntity.is_me);
     }
 
-    let firstNames = userEntities.map(userEntity => userEntity.first_name());
-    firstNames.sort((userNameA, userNameB) => z.util.StringUtil.sortByPriority(userNameA, userNameB));
-
-    if (boldNames) {
-      firstNames = firstNames.map(name => `[bold]${name}[/bold]`);
-    }
+    const firstNames = userEntities
+      .map(userEntity => {
+        const firstName = userEntity.first_name();
+        return boldNames ? `[bold]${firstName}[/bold]` : firstName;
+      })
+      .sort((userNameA, userNameB) => z.util.StringUtil.sortByPriority(userNameA, userNameB));
 
     if (containsSelfUser) {
       firstNames.push(z.util.SanitizationUtil.getEscapedSelfName(declension));
