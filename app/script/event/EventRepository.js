@@ -595,7 +595,7 @@ z.event.EventRepository = class EventRepository {
     const isEncryptedEvent = event.type === z.event.Backend.CONVERSATION.OTR_MESSAGE_ADD;
     const mapEvent = isEncryptedEvent
       ? () => this.cryptographyRepository.handleEncryptedEvent(event)
-      : () => Promise.resolve(event);
+      : Promise.resolve(event);
 
     return mapEvent()
       .then(mappedEvent => {
