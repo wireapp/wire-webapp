@@ -266,10 +266,10 @@ z.util.DebugUtil = class DebugUtil {
   reprocessNotificationStream(conversationId = this.conversationRepository.active_conversation().id) {
     const clientId = wire.app.repository.client.currentClient().id;
 
-    return wire.app.repository.event.notificationService
+    return this.eventRepository.notificationService
       .getNotifications(clientId, undefined, z.event.EventRepository.CONFIG.NOTIFICATION_BATCHES.MAX)
       .then(({notifications}) => {
-        this.logger.info(`Fetched "${notifications.length}" notifications.`, notifications);
+        this.logger.info(`Fetched "${notifications.length}" notifications for client "${clientId}".`, notifications);
 
         const isOTRMessage = notification => notification.type === z.event.Backend.CONVERSATION.OTR_MESSAGE_ADD;
         const isInCurrentConversation = notification => notification.conversation === conversationId;
@@ -282,9 +282,9 @@ z.util.DebugUtil = class DebugUtil {
           });
       })
       .then(events => {
-        this.logger.info(`Reprocessing "${events.length}" OTR messages.`);
+        this.logger.info(`Reprocessing "${events.length}" OTR messages...`);
         for (const event of events) {
-          wire.app.repository.event._processEvent(event, z.event.EventRepository.SOURCE.STREAM);
+          this.eventRepository._processEvent(event, z.event.EventRepository.SOURCE.STREAM);
         }
       });
   }
