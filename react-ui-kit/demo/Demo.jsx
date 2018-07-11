@@ -29,6 +29,7 @@ import {
   CallIcon,
   CamIcon,
   Checkbox,
+  CheckboxLabel,
   CodeInput,
   Column,
   Columns,
@@ -90,7 +91,6 @@ import {
   Uppercase,
   WireIcon,
 } from '@wireapp/react-ui-kit';
-import {CheckboxLabel} from '../src/Form/index';
 import Color from 'color';
 import React from 'react';
 
@@ -102,6 +102,8 @@ class Demo extends React.PureComponent {
     isMenuModalOpen: false,
     isModalOpen: false,
   };
+
+  closeMenuModal = () => this.setState({isMenuModalOpen: false});
 
   render() {
     const ColumnsStyle = {
@@ -135,12 +137,22 @@ class Demo extends React.PureComponent {
           </Modal>
         )}
         {this.state.isMenuModalOpen && (
-          <MenuModal onBackgroundClick={() => this.setState({isMenuModalOpen: false})}>
-            <MenuItem onClick={() => this.setState({isMenuModalOpen: false})}>Like</MenuItem>
-            <MenuItem onClick={() => this.setState({isMenuModalOpen: false})}>Edit</MenuItem>
-            <MenuItem onClick={() => this.setState({isMenuModalOpen: false})}>Delete for me...</MenuItem>
-            <MenuItem onClick={() => this.setState({isMenuModalOpen: false})}>Delete for everyone...</MenuItem>
-            <MenuItem onClick={() => this.setState({isMenuModalOpen: false})}>Cancel</MenuItem>
+          <MenuModal data-uie-name="should-be-there" onBackgroundClick={this.closeMenuModal}>
+            <MenuItem data-uie-name="should-be-there" onClick={this.closeMenuModal}>
+              Like
+            </MenuItem>
+            <MenuItem data-uie-name="should-be-there" onClick={this.closeMenuModal}>
+              Edit
+            </MenuItem>
+            <MenuItem data-uie-name="should-be-there" onClick={this.closeMenuModal}>
+              Delete for me...
+            </MenuItem>
+            <MenuItem data-uie-name="should-be-there" onClick={this.closeMenuModal}>
+              Delete for everyone...
+            </MenuItem>
+            <MenuItem data-uie-name="should-be-there" onClick={this.closeMenuModal}>
+              Cancel
+            </MenuItem>
           </MenuModal>
         )}
         <Header>
