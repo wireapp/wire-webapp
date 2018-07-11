@@ -594,10 +594,10 @@ z.event.EventRepository = class EventRepository {
   _processEvent(event, source) {
     const isEncryptedEvent = event.type === z.event.Backend.CONVERSATION.OTR_MESSAGE_ADD;
     const mapEvent = isEncryptedEvent
-      ? this.cryptographyRepository.handleEncryptedEvent(event)
-      : Promise.resolve(event);
+      ? () => this.cryptographyRepository.handleEncryptedEvent(event)
+      : () => Promise.resolve(event);
 
-    return mapEvent
+    return mapEvent()
       .then(mappedEvent => {
         const saveEvent = z.event.EventTypeHandling.STORE.includes(mappedEvent.type);
         return saveEvent ? this._handleEventSaving(mappedEvent, source) : mappedEvent;
