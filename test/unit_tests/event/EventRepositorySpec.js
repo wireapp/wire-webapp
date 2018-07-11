@@ -217,7 +217,7 @@ describe('Event Repository', () => {
         .catch(done.fail);
     });
 
-    it('accepts conversation.rename events', done => {
+    it('accepts "conversation.rename" events', done => {
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
       const event = {
         conversation: '64dcb45f-bf8d-4eac-a263-649a60d69305',
@@ -239,7 +239,7 @@ describe('Event Repository', () => {
         .catch(done.fail);
     });
 
-    it('accepts conversation.member-join events', done => {
+    it('accepts "conversation.member-join" events', done => {
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
       const event = {
         conversation: '64dcb45f-bf8d-4eac-a263-649a60d69305',
@@ -261,7 +261,7 @@ describe('Event Repository', () => {
         .catch(done.fail);
     });
 
-    it('accepts conversation.member-leave events', done => {
+    it('accepts "conversation.member-leave" events', done => {
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
       const event = {
         conversation: '64dcb45f-bf8d-4eac-a263-649a60d69305',
@@ -283,7 +283,7 @@ describe('Event Repository', () => {
         .catch(done.fail);
     });
 
-    it('accepts conversation.voice-channel-deactivate (missed call) events', done => {
+    it('accepts "conversation.voice-channel-deactivate" (missed call) events', done => {
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
       const event = {
         conversation: '64dcb45f-bf8d-4eac-a263-649a60d69305',
@@ -326,6 +326,26 @@ describe('Event Repository', () => {
           done();
         })
         .catch(done.fail);
+    });
+  });
+
+  describe('_processEvent', () => {
+    fit('processes OTR events', done => {
+      const event = {
+        conversation: 'fdc6cf1a-4e37-424e-a106-ab3d2cc5c8e0',
+        data: {
+          recipient: 'f180a823bf0d1204',
+          sender: '4c28652a6dd21938',
+          text:
+            'owABAaEAWCAG862qHoCC8OAJ5vhMzfslsAq5BlW8vIxUULhjq0hYVQJYvAKkAAABoQBYIJ/kyCWGbppqnz+3qZ5Ek/KRyVoA5kOdvCI/Cla0KZUoAqEAoQBYII83u4et5LbnfW+gypN5MADxCngPDIrQyyK5f34shL9uA6UAUAhhIdfy78dNGzFO4oIgRbgBAAIAA6EAWCC8LsO6xPXmz8j3HuqsaoCpS+FgjhrwYUlWBiZ4w9/F+ARYLPoN8lTHlI+2TNoLh2fJAkQ1DnByJVlMb+sAuSjuVLVFJXHDV4u57Ff5IhhR',
+        },
+        from: '6f88716b-1383-44da-9d57-45b51cc64d90',
+        time: '2018-07-10T14:54:21.621Z',
+        type: 'conversation.otr-message-add',
+      };
+      const source = z.event.EventRepository.SOURCE.STREAM;
+      expect(event).toBe(source);
+      done();
     });
   });
 
