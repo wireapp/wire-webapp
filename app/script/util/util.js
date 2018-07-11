@@ -379,10 +379,7 @@ z.util.koPushDeferred = (target, src, number = 100, delay = 300) => {
  * @param {number} length - Final output length
  * @returns {string} Input value with leading zeros (padding)
  */
-z.util.zeroPadding = (value, length = 2) => {
-  const zerosNeeded = Math.max(0, length - value.toString().length);
-  return `${'0'.repeat(zerosNeeded)}${value}`;
-};
+z.util.zeroPadding = (value, length = 2) => `${'0'.repeat(length)}${value}`.substr(-length);
 
 /**
  * Test whether the given string is ISO 8601 format equally to date.toISOString()
@@ -396,25 +393,18 @@ z.util.isIsoString = dateString => {
 z.util.sortGroupsByLastEvent = (groupA, groupB) => groupB.last_event_timestamp() - groupA.last_event_timestamp();
 
 z.util.sortObjectByKeys = (object, reverse) => {
-  const sortedObject = {};
   const keys = Object.keys(object);
   keys.sort();
 
   if (reverse) {
-    for (let index = keys.length - 1; index >= 0; index--) {
-      const key = keys[index];
-      const value = object[key];
-      sortedObject[key] = value;
-    }
-  } else {
-    for (const key of keys) {
-      const value = object[key];
-      sortedObject[key] = value;
-    }
+    keys.reverse();
   }
 
   // Returns a copy of an object, which is ordered by the keys of the original object.
-  return sortedObject;
+  return keys.reduce((sortedObject, key) => {
+    sortedObject[key] = object[key];
+    return sortedObject;
+  }, {});
 };
 
 // Removes url(' and url(" from the beginning of the string and also ") and ') from the end
