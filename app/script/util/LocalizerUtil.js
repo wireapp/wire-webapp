@@ -24,7 +24,7 @@ window.z.util = z.util || {};
 
 z.util.LocalizerUtil = {
   joinNames: (userEntities, declension = z.string.Declension.ACCUSATIVE, skipAnd = false) => {
-    const containsSelfUser = !!userEntities.find(userEntity => userEntity.is_me);
+    const containsSelfUser = userEntities.some(userEntity => userEntity.is_me);
     if (containsSelfUser) {
       userEntities = userEntities.filter(userEntity => !userEntity.is_me);
     }

@@ -517,21 +517,13 @@ z.util.getFirstName = (userEntity, declension) => {
 };
 
 z.util.getSelfName = (declension = z.string.Declension.NOMINATIVE) => {
-  let stringId;
+  const selfNameDeclensions = {
+    [z.string.Declension.NOMINATIVE]: z.string.conversationYouNominative,
+    [z.string.Declension.DATIVE]: z.string.conversationYouDative,
+    [z.string.Declension.ACCUSATIVE]: z.string.conversationYouAccusative,
+  };
 
-  switch (declension) {
-    case z.string.Declension.NOMINATIVE:
-      stringId = z.string.conversationYouNominative;
-      break;
-    case z.string.Declension.DATIVE:
-      stringId = z.string.conversationYouDative;
-      break;
-    case z.string.Declension.ACCUSATIVE:
-      stringId = z.string.conversationYouAccusative;
-      break;
-  }
-
-  return z.l10n.text(stringId);
+  return z.l10n.text(selfNameDeclensions[declension]);
 };
 
 z.util.printDevicesId = id => {
