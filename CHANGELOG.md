@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="1.5.6"></a>
+## [1.5.6](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@1.5.5...@wireapp/react-ui-kit@1.5.6) (2018-07-11)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Pass MenuModal & MenuItem props ([#822](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/822)) ([fc77c70](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/fc77c70))
+
+
+
+
 <a name="1.5.5"></a>
 ## [1.5.5](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@1.5.4...@wireapp/react-ui-kit@1.5.5) (2018-07-11)
 
