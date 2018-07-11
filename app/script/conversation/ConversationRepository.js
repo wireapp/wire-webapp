@@ -3192,10 +3192,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
           return this._update_edited_message(conversation_et, event_json);
         }
 
-        if (event_data.previews.length) {
-          return this._update_link_preview(conversation_et, event_json);
-        }
-
         return event_json;
       })
       .then(updated_event_json => {
@@ -3436,7 +3432,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .then(messageEntity => this.ephemeralHandler.validateMessage(messageEntity))
       .then(messageEntity => {
         if (conversationEntity && messageEntity) {
-          conversationEntity.add_message(messageEntity);
+          conversationEntity.add_message(messageEntity, true);
         }
         return {conversationEntity, messageEntity};
       });
@@ -3709,23 +3705,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return event_json;
       }
     );
-  }
-
-  /**
-   * Update link preview message.
-   *
-   * @private
-   * @param {Conversation} conversation_et - Conversation of updated message
-   * @param {JSON} event_json - Link preview message event
-   * @returns {Promise} Resolves with the updated event_json
-   */
-  _update_link_preview(conversation_et, event_json) {
-    return this.conversation_service.load_event_from_db(conversation_et.id, event_json.id).then(stored_message => {
-      if (stored_message) {
-        this._delete_message(conversation_et, stored_message);
-      }
-      return event_json;
-    });
   }
 
   //##############################################################################

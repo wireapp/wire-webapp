@@ -335,16 +335,22 @@ z.entity.Conversation = class Conversation {
 
   /**
    * Adds a single message to the conversation.
-   * @param {z.entity.Message} message_et - Message entity to be added to the conversation
-   * @returns {undefined} No return value
+   * @param {z.entity.Message} messageEntity - Message entity to be added to the conversation.
+   * @param {boolean} replaceDuplicate - If a duplicate already exists, replace it with the new entity.
+   * @returns {undefined} No return value.
    */
-  add_message(message_et) {
-    message_et = this._checkForDuplicate(message_et);
-    if (message_et) {
-      this.update_timestamps(message_et);
-      this.messages_unordered.push(message_et);
-      amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.ADDED, message_et);
+  add_message(messageEntity, replaceDuplicate = false) {
+    this.update_timestamps(messageEntity);
+    if (replaceDuplicate) {
+      const duplicateEntity = this._findDuplicate(messageEntity);
+      if (duplicateEntity) {
+        const duplicateIndex = this.messages_unordered.indexOf(duplicateEntity);
+        this.messages_unordered.splice(duplicateIndex, 1, messageEntity);
+        return;
+      }
     }
+    this.messages_unordered.push(messageEntity);
+    amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.ADDED, messageEntity);
   }
 
   /**
@@ -462,24 +468,29 @@ z.entity.Conversation = class Conversation {
    * Checks for message duplicates.
    *
    * @private
-   * @param {z.entity.Message} messageEt - Message entity to be added to the conversation
+   * @param {z.entity.Message} messageEntity - Message entity to be added to the conversation
    * @returns {z.entity.Message|undefined} Message if it is not a duplicate
    */
-  _checkForDuplicate(messageEt) {
-    if (messageEt) {
-      for (const existingMessageEt of this.messages_unordered()) {
-        const duplicateMessageId = messageEt.id && existingMessageEt.id === messageEt.id;
-        const fromSameSender = existingMessageEt.from === messageEt.from;
+  _checkForDuplicate(messageEntity) {
+    const existingMessageEntity = this._findDuplicate(messageEntity);
+    if (existingMessageEntity) {
+      const logData = {additionalMessage: messageEntity, existingMessage: existingMessageEntity};
+      this.logger.warn(`Filtered message '${messageEntity.id}' as duplicate in view`, logData);
+      return undefined;
+    }
+    return messageEntity;
+  }
 
-        if (duplicateMessageId && fromSameSender) {
-          const logData = {additionalMessage: messageEt, existingMessage: existingMessageEt};
-          this.logger.warn(`Filtered message '${messageEt.id}' as duplicate in view`, logData);
-          return undefined;
-        }
+  _findDuplicate(messageEntity) {
+    for (const existingMessageEntity of this.messages_unordered()) {
+      const duplicateMessageId = messageEntity.id && existingMessageEntity.id === messageEntity.id;
+      const fromSameSender = existingMessageEntity.from === messageEntity.from;
+
+      if (duplicateMessageId && fromSameSender) {
+        return existingMessageEntity;
       }
     }
-
-    return messageEt;
+    return undefined;
   }
 
   update_timestamp_server(time, is_backend_timestamp = false) {
