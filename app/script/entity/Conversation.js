@@ -340,19 +340,19 @@ z.entity.Conversation = class Conversation {
    * @returns {undefined} No return value.
    */
   add_message(messageEntity, replaceDuplicate = false) {
-    const duplicateEntity = this._findDuplicate(messageEntity);
-    this.update_timestamps(messageEntity);
-    if (duplicateEntity && !replaceDuplicate) {
-      // If there is a duplicate in db, but we don't want to replace it our job here is done.
-      return;
+    if (messageEntity) {
+      const duplicateEntity = this._findDuplicate(messageEntity);
+      this.update_timestamps(messageEntity);
+      if (duplicateEntity) {
+        if (replaceDuplicate) {
+          const duplicateIndex = this.messages_unordered.indexOf(duplicateEntity);
+          this.messages_unordered.splice(duplicateIndex, 1, messageEntity);
+        }
+        return;
+      }
+      this.messages_unordered.push(messageEntity);
+      amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.ADDED, messageEntity);
     }
-    if (duplicateEntity) {
-      const duplicateIndex = this.messages_unordered.indexOf(duplicateEntity);
-      this.messages_unordered.splice(duplicateIndex, 1, messageEntity);
-      return;
-    }
-    this.messages_unordered.push(messageEntity);
-    amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.ADDED, messageEntity);
   }
 
   /**
