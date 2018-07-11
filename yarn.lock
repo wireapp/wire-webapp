@@ -333,9 +333,9 @@
   version "0.0.28"
   resolved "https://registry.yarnpkg.com/@types/filewriter/-/filewriter-0.0.28.tgz#c054e8af4d9dd75db4e63abc76f885168714d4b3"
 
-"@types/fs-extra@5.0.3":
-  version "5.0.3"
-  resolved "https://registry.yarnpkg.com/@types/fs-extra/-/fs-extra-5.0.3.tgz#feb31d55eeae3ccd5f92dbce806344a6c777a713"
+"@types/fs-extra@5.0.4":
+  version "5.0.4"
+  resolved "https://registry.yarnpkg.com/@types/fs-extra/-/fs-extra-5.0.4.tgz#b971134d162cc0497d221adde3dbb67502225599"
   dependencies:
     "@types/node" "*"
 
@@ -507,9 +507,9 @@
     "@webassemblyjs/wast-parser" "1.5.13"
     long "^3.2.0"
 
-"@wireapp/api-client@1.6.2":
-  version "1.6.2"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-1.6.2.tgz#1b6a8f39d4700c57566f81153ce706eec1f8676d"
+"@wireapp/api-client@1.8.2":
+  version "1.8.2"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-1.8.2.tgz#8408574207012f301204c71c0483f3be35b79955"
   dependencies:
     "@types/node" "10.5.2"
     "@types/spark-md5" "3.0.0"
@@ -527,24 +527,24 @@
   version "3.0.58"
   resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-3.0.58.tgz#a564186072848e96e782c4ab6da7896cdd5a2c30"
 
-"@wireapp/core@3.7.3":
-  version "3.7.3"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-3.7.3.tgz#0fa5e7392fde70f391dc610f2805df1a3db89b15"
+"@wireapp/core@3.10.2":
+  version "3.10.2"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-3.10.2.tgz#dab5a41405322ebd6a22a8bf39de74ef2945bf38"
   dependencies:
     "@types/node" "10.5.2"
-    "@wireapp/api-client" "1.6.2"
-    "@wireapp/cryptobox" "8.5.9"
+    "@wireapp/api-client" "1.8.2"
+    "@wireapp/cryptobox" "8.5.10"
     "@wireapp/store-engine" "0.11.41"
     bazinga64 "5.2.10"
     logdown "3.2.3"
     protobufjs "6.8.6"
     pure-uuid "1.5.3"
 
-"@wireapp/cryptobox@8.5.9":
-  version "8.5.9"
-  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-8.5.9.tgz#48dfa74a615189916b7f0fb9f3d630869708aeef"
+"@wireapp/cryptobox@8.5.10":
+  version "8.5.10"
+  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-8.5.10.tgz#8c750997207fd58629bd8d492a82d1a5442d44ca"
   dependencies:
-    "@types/fs-extra" "5.0.3"
+    "@types/fs-extra" "5.0.4"
     "@types/node" "10.5.2"
     "@wireapp/lru-cache" "2.1.33"
     "@wireapp/priority-queue" "0.1.56"
