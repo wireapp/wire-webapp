@@ -75,7 +75,7 @@ z.l10n = (() => {
      * @returns {string} - string with substituted placeholders
      */
     text(value, substitute) {
-      const string = ko.unwrap(value);
+      const string = z.util.SanitizationUtil.escapeString(ko.unwrap(value));
 
       if (_.isObject(substitute)) {
         return replaceWithObject(string, substitute);
