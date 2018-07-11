@@ -342,6 +342,7 @@ z.string.conversationMemberLeft = '[bold]{{name}}[/bold] left';
 z.string.conversationMemberLeftYou = '[bold]You[/bold] left';
 z.string.conversationMemberRemoved = '[bold]{{name}}[/bold] removed [bold]{{users}}[/bold]';
 z.string.conversationMemberRemovedYou = '[bold]You[/bold] removed [bold]{{users}}[/bold]';
+z.string.conversationTeamLeft = '[bold]{{name}}[/bold] was removed from the team';
 z.string.conversationMessageDelivered = 'Delivered';
 z.string.conversationRename = ' renamed the conversation';
 z.string.conversationRenameYou = ' renamed the conversation';
