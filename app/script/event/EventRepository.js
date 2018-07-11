@@ -578,7 +578,21 @@ z.event.EventRepository = class EventRepository {
    * @returns {Promise} Resolves with the saved record or boolean true if the event was skipped
    */
   _handleEvent(event, source) {
-    return this._handleEventValidation(event, source)
+    return this._handleEventValidation(event, source).then(validatedEvent =>
+      this._processEvent(validatedEvent, source)
+    );
+  }
+
+  /**
+   * Decrypts, saves and distributes an event received from the backend.
+   *
+   * @private
+   * @param {JSON} event - Backend event extracted from notification stream
+   * @param {z.event.EventRepository.SOURCE} source - Source of event
+   * @returns {Promise} Resolves with the saved record or boolean true if the event was skipped
+   */
+  _processEvent(event, source) {
+    return Promise.resolve(event)
       .then(validatedEvent => {
         const isEncryptedEvent = validatedEvent.type === z.event.Backend.CONVERSATION.OTR_MESSAGE_ADD;
         return isEncryptedEvent ? this.cryptographyRepository.handleEncryptedEvent(event) : event;

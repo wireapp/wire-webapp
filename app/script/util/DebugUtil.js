@@ -262,4 +262,30 @@ z.util.DebugUtil = class DebugUtil {
     this.logger.log(`-- IndexedDB open: ${this.storageRepository.storageService.db.isOpen()}`);
     this.logger.log(`-- WebSocket ready state: ${window.wire.app.service.web_socket.socket.readyState}`);
   }
+
+  reprocessNotificationStream(conversationId = this.conversationRepository.active_conversation().id) {
+    const clientId = wire.app.repository.client.currentClient().id;
+
+    return wire.app.repository.event.notificationService
+      .getNotifications(clientId, undefined, 10000)
+      .then(({notifications}) => {
+        this.logger.info(`Fetched "${notifications.length}" notifications.`, notifications);
+
+        const isOTRMessage = notification => notification.type === z.event.Backend.CONVERSATION.OTR_MESSAGE_ADD;
+        const isInCurrentConversation = notification => notification.conversation === conversationId;
+
+        return notifications
+          .map(notification => notification.payload)
+          .reduce((accumulator, payload) => accumulator.concat(payload))
+          .filter(notification => {
+            return isOTRMessage(notification) && isInCurrentConversation(notification);
+          });
+      })
+      .then(events => {
+        this.logger.info(`Re-processing "${events.length}" OTR messages.`);
+        for (const event of events) {
+          wire.app.repository.event._processEvent(event, z.event.EventRepository.SOURCE.STREAM);
+        }
+      });
+  }
 };
