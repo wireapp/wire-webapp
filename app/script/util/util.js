@@ -284,40 +284,6 @@ z.util.alias = {
   animationend: 'transitionend animationend oAnimationEnd MSAnimationEnd mozAnimationEnd webkitAnimationEnd',
 };
 
-/**
- * Opens a new browser tab (target="_blank") with a given URL in a safe environment.
- * @see https://mathiasbynens.github.io/rel-noopener/
- * @param {string} url - URL you want to open in a new browser tab
- * @param {boolean} focus - True, if the new windows should get browser focus
- * @returns {Object} New window handle
- */
-z.util.safeWindowOpen = (url, focus = true) => {
-  const newWindow = window.open(z.util.URLUtil.prependProtocol(url));
-
-  if (newWindow) {
-    newWindow.opener = null;
-    if (focus) {
-      newWindow.focus();
-    }
-  }
-
-  return newWindow;
-};
-
-z.util.safeMailtoOpen = (event, email) => {
-  event.preventDefault();
-  event.stopPropagation();
-
-  if (!z.util.isValidEmail(email)) {
-    return;
-  }
-
-  const newWindow = window.open(`mailto:${email}`);
-  if (newWindow) {
-    window.setTimeout(() => newWindow.close(), 10);
-  }
-};
-
 // Note: We are using "Underscore.js" to escape HTML in the original message
 z.util.renderMessage = message => {
   message = marked(message, {
