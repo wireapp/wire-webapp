@@ -148,9 +148,13 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
       if (!this.avatarLoadingBlocked) {
         this.avatarLoadingBlocked = true;
 
-        const pictureResource = this.participant().previewPictureResource();
+        const isSmall = this.size !== ParticipantAvatar.SIZE.LARGE && this.size !== ParticipantAvatar.SIZE.X_LARGE;
+        const loadHiRes = !isSmall && window.devicePixelRatio > 1;
+        const pictureResource = loadHiRes
+          ? this.participant().mediumPictureResource()
+          : this.participant().previewPictureResource();
+
         if (pictureResource) {
-          const isSmall = this.size !== ParticipantAvatar.SIZE.LARGE && this.size !== ParticipantAvatar.SIZE.X_LARGE;
           const isCached = pictureResource.downloadProgress() === 100;
 
           pictureResource.getObjectUrl().then(url => {
