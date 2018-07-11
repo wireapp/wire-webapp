@@ -351,7 +351,6 @@ z.string.conversationUpdatedTimerYou = ' set the message timer to {{time}}';
 z.string.conversationResetTimer = ' turned off the message timer';
 z.string.conversationResetTimerYou = ' turned off the message timer';
 z.string.conversationResume = 'Start a conversation with {{users}}';
-z.string.conversationTeamLeave = ' was removed from the team';
 z.string.conversationPing = ' pinged';
 z.string.conversationPingYou = ' pinged';
 z.string.conversationToday = 'today';
