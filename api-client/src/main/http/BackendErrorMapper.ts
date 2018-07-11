@@ -17,10 +17,11 @@
  *
  */
 
-import {InvalidCredentialsError, LoginTooFrequentError} from '../auth/';
-import {ConversationIsUnknownError, ConversationOperationError} from '../conversation/';
-import {BackendError, BackendErrorLabel, StatusCode} from '../http/';
-import {UnconnectedUserError, UserIsUnknownError} from '../user/';
+import {BackendError, BackendErrorLabel, StatusCode} from '.';
+import {InvalidCredentialsError, LoginTooFrequentError, SuspendedAccountError} from '../auth';
+import {ConversationIsUnknownError, ConversationOperationError} from '../conversation';
+import {InviteEmailInUseError} from '../team';
+import {UnconnectedUserError, UserIsUnknownError} from '../user';
 
 class BackendErrorMapper {
   public static get ERRORS(): {
@@ -52,10 +53,18 @@ class BackendErrorMapper {
         [String(BackendErrorLabel.INVALID_OPERATION)]: {
           ['invalid operation for 1:1 conversations']: new ConversationOperationError('Cannot leave 1:1 conversation.'),
         },
+        [String(BackendErrorLabel.SUSPENDED_ACCOUNT)]: {
+          ['Account suspended.']: new SuspendedAccountError('Account suspended.'),
+        },
       },
       [Number(StatusCode.TOO_MANY_REQUESTS)]: {
         [String(BackendErrorLabel.CLIENT_ERROR)]: {
           ['Logins too frequent']: new LoginTooFrequentError('Logins too frequent. User login temporarily disabled.'),
+        },
+      },
+      [Number(StatusCode.CONFLICT)]: {
+        [String(BackendErrorLabel.INVITE_EMAIL_EXISTS)]: {
+          ['The given e-mail address is in use.']: new InviteEmailInUseError('The given e-mail address is in use.'),
         },
       },
     };

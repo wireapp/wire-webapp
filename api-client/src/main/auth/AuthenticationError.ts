@@ -17,7 +17,7 @@
  *
  */
 
-import {BackendError, BackendErrorLabel, StatusCode} from '../http/';
+import {BackendError, BackendErrorLabel, StatusCode} from '../http';
 
 export class AuthenticationError extends BackendError {
   constructor(message: string, label: BackendErrorLabel, code: StatusCode) {
@@ -48,5 +48,17 @@ export class InvalidCredentialsError extends AuthenticationError {
     super(message, label, code);
     Object.setPrototypeOf(this, InvalidCredentialsError.prototype);
     this.name = 'InvalidCredentialsError';
+  }
+}
+
+export class SuspendedAccountError extends AuthenticationError {
+  constructor(
+    message: string,
+    label: BackendErrorLabel = BackendErrorLabel.SUSPENDED_ACCOUNT,
+    code: StatusCode = StatusCode.FORBIDDEN
+  ) {
+    super(message, label, code);
+    Object.setPrototypeOf(this, SuspendedAccountError.prototype);
+    this.name = 'SuspendedAccountError';
   }
 }
