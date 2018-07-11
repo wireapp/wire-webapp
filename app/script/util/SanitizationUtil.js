@@ -23,8 +23,6 @@ window.z = window.z || {};
 window.z.util = z.util || {};
 
 z.util.SanitizationUtil = (() => {
-  const _escapeString = string => _.escape(string);
-
   const _getEscapedSelfName = (declension = z.string.Declension.NOMINATIVE) => {
     const selfNameDeclensions = {
       [z.string.Declension.NOMINATIVE]: z.string.conversationYouNominative,
@@ -32,13 +30,13 @@ z.util.SanitizationUtil = (() => {
       [z.string.Declension.ACCUSATIVE]: z.string.conversationYouAccusative,
     };
 
-    return _escapeString(z.l10n.text(selfNameDeclensions[declension]));
+    return z.l10n.text(selfNameDeclensions[declension]);
   };
 
   return {
     escapeRegex: string => string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'),
 
-    escapeString: _escapeString,
+    escapeString: string => _.escape(string),
 
     getEscapedFirstName: (userEntity, declension) => {
       return userEntity.is_me ? _getSelfName(declension) : userEntity.first_name();
