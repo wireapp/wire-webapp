@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="0.3.0"></a>
+# [0.3.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@0.2.2...@wireapp/commons@0.3.0) (2018-07-11)
+
+
+### Features
+
+* **commons:** Add ArrayUtil ([#817](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/issues/817)) ([76ff402](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/commit/76ff402))
+
+
+
+
 <a name="0.2.2"></a>
 ## [0.2.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@0.2.1...@wireapp/commons@0.2.2) (2018-07-06)
 
