@@ -363,6 +363,7 @@ describe('Event Repository', () => {
     fit('processes OTR events', done => {
       const text = 'Hello, this is a test!';
       const ownClientId = 'f180a823bf0d1204';
+
       TestFactory.client_repository.currentClient(new z.client.ClientEntity({id: ownClientId}));
 
       return Promise.resolve()
@@ -383,8 +384,11 @@ describe('Event Repository', () => {
           const source = z.event.EventRepository.SOURCE.STREAM;
           return TestFactory.event_repository._processEvent(event, source);
         })
-        .then(() => done)
-        .catch(() => done.fail);
+        .then(messagePayload => {
+          expect(messagePayload.data.content).toBe(text);
+          done();
+        })
+        .catch(error => done.fail(error));
     });
   });
 
