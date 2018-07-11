@@ -255,8 +255,7 @@ z.string.de.modalPictureTooSmallMessage = 'Wähle ein Bild mit mindestens 320 ×
 z.string.de.modalImproveWireAction = 'Annehmen';
 z.string.de.modalImproveWireSecondary = 'Nicht jetzt';
 z.string.de.modalImproveWireHeadline = 'Hilf uns, Wire zu verbessern';
-z.string.de.modalImproveWireMessage =
-  'Anonymisierte Nutzungs- und Fehlerberichte helfen uns, unsere Produkte und Dienstleistungen zu verbessern. Wir verwenden diese Informationen nicht für andere Zwecke.';
+z.string.de.modalImproveWireMessage = 'Anonymisierte Nutzungs- und Fehlerberichte helfen uns, unsere Produkte und Dienstleistungen zu verbessern. Wir verwenden diese Informationen nicht für andere Zwecke.';
 
 z.string.de.modalServiceUnavailableHeadline = 'Hinzufügen des Dienstes nicht möglich';
 z.string.de.modalServiceUnavailableMessage = 'Der Dienst ist derzeit nicht verfügbar.';
@@ -600,11 +599,9 @@ z.string.de.preferencesOptionsCallLogsDetail = 'Diese Informationen helfen uns, 
 
 z.string.de.preferencesOptionsBackupHeader = 'Gesprächsverlauf';
 z.string.de.preferencesOptionsBackupExportHeadline = 'Unterhaltungen sichern';
-z.string.de.preferencesOptionsBackupExportSecondary =
-  'Erstelle ein Backup, um den Gesprächsverlauf zu sichern. Damit können Unterhaltungen wiederhergestellt werden, falls du deinen Computer verlierst oder einen neuen nutzen möchtest.\n\nWähle ein sicheres Passwort, um die Backup-Datei zu schützen.';
+z.string.de.preferencesOptionsBackupExportSecondary = 'Erstelle ein Backup, um den Gesprächsverlauf zu sichern. Damit können Unterhaltungen wiederhergestellt werden, falls du deinen Computer verlierst oder einen neuen nutzen möchtest.\n\nWähle ein sicheres Passwort, um die Backup-Datei zu schützen.';
 z.string.de.preferencesOptionsBackupImportHeadline = 'Backup wiederherstellen';
-z.string.de.preferencesOptionsBackupImportSecondary =
-  'Es können nur Backup-Dateien derselben Plattform wiederhergestellt werden. Der Inhalt der Backup-Datei ersetzt den Gesprächsverlauf auf diesem Gerät.';
+z.string.de.preferencesOptionsBackupImportSecondary = 'Es können nur Backup-Dateien derselben Plattform wiederhergestellt werden. Der Inhalt der Backup-Datei ersetzt den Gesprächsverlauf auf diesem Gerät.';
 
 z.string.de.backupExportGenericErrorHeadline = 'Datei nicht gespeichert';
 z.string.de.backupExportGenericErrorSecondary = 'Das Backup wurde nicht abgeschlossen.';
