@@ -360,7 +360,7 @@ describe('Event Repository', () => {
   });
 
   describe('_processEvent', () => {
-    fit('processes OTR events', done => {
+    it('processes OTR events', done => {
       const text = 'Hello, this is a test!';
       const ownClientId = 'f180a823bf0d1204';
 
