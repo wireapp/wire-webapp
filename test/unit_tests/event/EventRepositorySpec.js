@@ -344,7 +344,10 @@ describe('Event Repository', () => {
         type: 'conversation.otr-message-add',
       };
       const source = z.event.EventRepository.SOURCE.STREAM;
-      expect(event).toBe(source);
+      TestFactory.event_repository
+        ._processEvent(event, source)
+        .then(() => done)
+        .catch(() => done.fail);
       done();
     });
   });
