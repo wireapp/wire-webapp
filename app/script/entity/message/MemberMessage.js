@@ -199,7 +199,7 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
         }
 
         case z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE: {
-          return z.l10n.text(z.string.conversationTeamLeave);
+          return z.l10n.text(z.string.conversationTeamLeft, this.senderName());
         }
 
         default:
