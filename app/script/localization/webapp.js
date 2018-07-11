@@ -115,7 +115,7 @@ z.string.videoCallOverlayMute = 'Mute';
 z.string.videoCallOverlayVideo = 'Video';
 z.string.videoCallOverlayShareScreen = 'Share Screen';
 z.string.videoCallOverlayHangUp = 'Hang Up';
-z.string.videoCallPaused = "Video paused";
+z.string.videoCallPaused = 'Video paused';
 
 // Modals
 // Modals type defaults
@@ -782,6 +782,7 @@ z.string.notificationSharedAudio = 'Shared an audio message';
 z.string.notificationSharedFile = 'Shared a file';
 z.string.notificationSharedLocation = 'Shared a location';
 z.string.notificationSharedVideo = 'Shared a video';
+z.string.notificationTitleGroup = '{{user}} in {{conversation}}';
 z.string.notificationVoiceChannelActivate = 'Calling';
 z.string.notificationVoiceChannelDeactivate = 'Called';
 

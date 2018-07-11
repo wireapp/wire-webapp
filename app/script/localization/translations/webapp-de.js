@@ -103,7 +103,7 @@ z.string.de.videoCallOverlayMute = 'Stummschalten';
 z.string.de.videoCallOverlayVideo = 'Video';
 z.string.de.videoCallOverlayShareScreen = 'Bildschirm teilen';
 z.string.de.videoCallOverlayHangUp = 'Beenden';
-z.string.de.videoCallPaused="Video wurde angehalten";
+z.string.de.videoCallPaused = 'Video wurde angehalten';
 
 z.string.de.modalAcknowledgeAction = 'Ok';
 z.string.de.modalAcknowledgeHeadline = 'Fehler aufgetreten';
@@ -721,6 +721,7 @@ z.string.de.notificationSharedAudio = 'Hat eine Audio-Nachricht geteilt';
 z.string.de.notificationSharedFile = 'Hat eine Datei geteilt';
 z.string.de.notificationSharedLocation = 'Hat einen Standort geteilt';
 z.string.de.notificationSharedVideo = 'Hat ein Video geteilt';
+z.string.de.notificationTitleGroup = '{{user}} in {{conversation}}';
 z.string.de.notificationVoiceChannelActivate = 'Ruft an';
 z.string.de.notificationVoiceChannelDeactivate = 'Hat versucht anzurufen';
 
@@ -778,4 +779,3 @@ z.string.de.ephemeralUnitsWeek = 'Woche';
 z.string.de.ephemeralUnitsWeeks = 'Wochen';
 z.string.de.ephemeralUnitsYear = 'Jahr';
 z.string.de.ephemeralUnitsYears = 'Jahre';
-

@@ -523,14 +523,17 @@ z.notification.NotificationRepository = class NotificationRepository {
   _createTitle(messageEntity, conversationEntity) {
     let titleMessage;
 
-    const isConversation = conversationEntity && conversationEntity.display_name();
-    if (isConversation) {
+    const conversationName = conversationEntity && conversationEntity.display_name();
+    const userEntity = messageEntity.user();
+
+    if (conversationName) {
       titleMessage = conversationEntity.is_group()
-        ? `${messageEntity.user().first_name()} in ${conversationEntity.display_name()}`
-        : conversationEntity.display_name();
+        ? z.l10n.text(z.string.notificationTitleGroup, {conversation: conversationName, user: userEntity.first_name()})
+        : conversationName;
+    } else {
+      z.util.SanitizationUtil.escapeString(userEntity.name());
     }
 
-    titleMessage = titleMessage || messageEntity.user().name();
     return z.util.StringUtil.truncate(titleMessage, NotificationRepository.CONFIG.TITLE_LENGTH, false);
   }
 
