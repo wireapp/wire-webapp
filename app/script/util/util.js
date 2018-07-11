@@ -279,47 +279,9 @@ z.util.encodeBase64 = text => window.btoa(text);
 
 z.util.encodeSha256Base64 = text => CryptoJS.SHA256(text).toString(CryptoJS.enc.Base64);
 
-z.util.escapeHtml = html => _.escape(html);
-
-z.util.escapeRegex = string => string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-
 // Note IE10 listens to "transitionend" instead of "animationend"
 z.util.alias = {
   animationend: 'transitionend animationend oAnimationEnd MSAnimationEnd mozAnimationEnd webkitAnimationEnd',
-};
-
-/**
- * Opens a new browser tab (target="_blank") with a given URL in a safe environment.
- * @see https://mathiasbynens.github.io/rel-noopener/
- * @param {string} url - URL you want to open in a new browser tab
- * @param {boolean} focus - True, if the new windows should get browser focus
- * @returns {Object} New window handle
- */
-z.util.safeWindowOpen = (url, focus = true) => {
-  const newWindow = window.open(z.util.URLUtil.prependProtocol(url));
-
-  if (newWindow) {
-    newWindow.opener = null;
-    if (focus) {
-      newWindow.focus();
-    }
-  }
-
-  return newWindow;
-};
-
-z.util.safeMailtoOpen = (event, email) => {
-  event.preventDefault();
-  event.stopPropagation();
-
-  if (!z.util.isValidEmail(email)) {
-    return;
-  }
-
-  const newWindow = window.open(`mailto:${email}`);
-  if (newWindow) {
-    window.setTimeout(() => newWindow.close(), 10);
-  }
 };
 
 // Note: We are using "Underscore.js" to escape HTML in the original message
@@ -503,28 +465,6 @@ z.util.murmurhash3 = (key, seed) => {
   h1 ^= h1 >>> 16;
 
   return h1 >>> 0;
-};
-
-z.util.getFirstName = (userEt, declension = z.string.Declension.NOMINATIVE) => {
-  if (userEt.is_me) {
-    let stringId;
-
-    switch (declension) {
-      case z.string.Declension.NOMINATIVE:
-        stringId = z.string.conversationYouNominative;
-        break;
-      case z.string.Declension.DATIVE:
-        stringId = z.string.conversationYouDative;
-        break;
-      case z.string.Declension.ACCUSATIVE:
-        stringId = z.string.conversationYouAccusative;
-        break;
-    }
-
-    return z.l10n.text(stringId);
-  }
-
-  return userEt.first_name();
 };
 
 z.util.printDevicesId = id => {

@@ -120,12 +120,15 @@ z.entity.User = class User {
     this.phone = ko.observable();
 
     this.name = ko.observable('');
-    this.first_name = ko.pureComputed(() => this.name().split(' ')[0]);
+    this.first_name = ko.pureComputed(() => {
+      const [firstName] = this.name().split(' ');
+      return firstName ? z.util.SanitizationUtil.escapeString(firstName) : '';
+    });
 
     this.last_name = ko.pureComputed(() => {
-      const parts = this.name().split(' ');
-      if (parts.length > 1) {
-        return parts.pop();
+      const nameParts = this.name().split(' ');
+      if (nameParts.length > 1) {
+        return z.util.SanitizationUtil.escapeString(nameParts.pop());
       }
     });
 

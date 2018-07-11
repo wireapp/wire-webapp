@@ -101,25 +101,25 @@ describe('z.util.renderMessage', () => {
 
   it('renders an email address', () => {
     const expected =
-      'send it over to <a href="mailto:hello@wire.com" onclick="z.util.safeMailtoOpen(event, \'hello@wire.com\')">hello@wire.com</a>';
+      'send it over to <a href="mailto:hello@wire.com" onclick="z.util.SanitizationUtil.safeMailtoOpen(event, \'hello@wire.com\')">hello@wire.com</a>';
     expect(z.util.renderMessage('send it over to hello@wire.com')).toBe(expected);
   });
 
   it('renders an email address with pluses', () => {
     const expected =
-      'send it over to <a href="mailto:hello+world@wire.com" onclick="z.util.safeMailtoOpen(event, \'hello+world@wire.com\')">hello+world@wire.com</a>';
+      'send it over to <a href="mailto:hello+world@wire.com" onclick="z.util.SanitizationUtil.safeMailtoOpen(event, \'hello+world@wire.com\')">hello+world@wire.com</a>';
     expect(z.util.renderMessage('send it over to hello+world@wire.com')).toBe(expected);
   });
 
   it('renders an email long domains', () => {
     const expected =
-      'send it over to <a href="mailto:janedoe@school.university.edu" onclick="z.util.safeMailtoOpen(event, \'janedoe@school.university.edu\')">janedoe@school.university.edu</a>';
+      'send it over to <a href="mailto:janedoe@school.university.edu" onclick="z.util.SanitizationUtil.safeMailtoOpen(event, \'janedoe@school.university.edu\')">janedoe@school.university.edu</a>';
     expect(z.util.renderMessage('send it over to janedoe@school.university.edu')).toBe(expected);
   });
 
   it('renders an email with multiple subdomains', () => {
     const expected =
-      'send it over to <a href="mailto:bla@foo.co.uk" onclick="z.util.safeMailtoOpen(event, \'bla@foo.co.uk\')">bla@foo.co.uk</a>';
+      'send it over to <a href="mailto:bla@foo.co.uk" onclick="z.util.SanitizationUtil.safeMailtoOpen(event, \'bla@foo.co.uk\')">bla@foo.co.uk</a>';
     expect(z.util.renderMessage('send it over to bla@foo.co.uk')).toBe(expected);
   });
 
@@ -4423,19 +4423,5 @@ describe('bucketValues', () => {
   it('returns the correct bucket if value is above the given limits', () => {
     expect(z.util.bucketValues(100, [0, 5, 10, 15, 20, 25])).toBe('26-');
     expect(z.util.bucketValues(10023, [0, 100, 200, 500, 1000, 2000])).toBe('2001-');
-  });
-});
-
-describe('z.util.safeWindowOpen', () => {
-  let new_window = undefined;
-  afterEach(() => {
-    if (new_window) {
-      new_window.close();
-    }
-  });
-
-  it("doesn't contain a reference to the opening tab", () => {
-    new_window = z.util.safeWindowOpen('https://wire.com/');
-    expect(new_window.opener).toBeNull();
   });
 });
