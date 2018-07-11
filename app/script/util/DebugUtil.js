@@ -91,7 +91,7 @@ z.util.DebugUtil = class DebugUtil {
       })
       .then(message => {
         return this.eventRepository.notificationService
-          .getNotifications(undefined, undefined, 10000)
+          .getNotifications(undefined, undefined, z.event.EventRepository.CONFIG.NOTIFICATION_BATCHES.MAX)
           .then(({notifications}) => ({
             message,
             notifications,
@@ -261,5 +261,29 @@ z.util.DebugUtil = class DebugUtil {
     this.logger.log(`-- Browser online: ${window.navigator.onLine}`);
     this.logger.log(`-- IndexedDB open: ${this.storageRepository.storageService.db.isOpen()}`);
     this.logger.log(`-- WebSocket ready state: ${window.wire.app.service.web_socket.socket.readyState}`);
+  }
+
+  reprocessNotificationStream(conversationId = this.conversationRepository.active_conversation().id) {
+    const clientId = this.clientRepository.currentClient().id;
+
+    return this.eventRepository.notificationService
+      .getNotifications(clientId, undefined, z.event.EventRepository.CONFIG.NOTIFICATION_BATCHES.MAX)
+      .then(({notifications}) => {
+        this.logger.info(`Fetched "${notifications.length}" notifications for client "${clientId}".`, notifications);
+
+        const isOTRMessage = notification => notification.type === z.event.Backend.CONVERSATION.OTR_MESSAGE_ADD;
+        const isInCurrentConversation = notification => notification.conversation === conversationId;
+
+        return notifications
+          .map(notification => notification.payload)
+          .reduce((accumulator, payload) => accumulator.concat(payload))
+          .filter(notification => {
+            return isOTRMessage(notification) && isInCurrentConversation(notification);
+          });
+      })
+      .then(events => {
+        this.logger.info(`Reprocessing "${events.length}" OTR messages...`);
+        events.forEach(event => this.eventRepository._processEvent(event, z.event.EventRepository.SOURCE.STREAM));
+      });
   }
 };
