@@ -488,7 +488,7 @@ z.entity.Conversation = class Conversation {
   _findDuplicate(messageEntity) {
     if (messageEntity && messageEntity.id) {
       return this.messages_unordered().find(existingMessageEntity => {
-        const sameId = messageEntity.id && existingMessageEntity.id === messageEntity.id;
+        const sameId = existingMessageEntity.id === messageEntity.id;
         const sameSender = messageEntity.from === existingMessageEntity.from;
         return sameId && sameSender;
       });
