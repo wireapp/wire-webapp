@@ -17,8 +17,24 @@
  *
  */
 
-export {NewTeamInvitation, TeamInvitation, TeamInvitationAPI, TeamInvitationChunk} from './invitation';
-export {MemberAPI, MemberData, PermissionsData} from './member';
-export {NewTeamData, TeamAPI, TeamChunkData, TeamData, TeamInfo} from './team';
-export {PaymentAPI, PaymentData} from './payment';
-export {TeamError, InviteEmailInUseError} from './TeamError';
+import {BackendError, BackendErrorLabel, StatusCode} from '../http';
+
+export class TeamError extends BackendError {
+  constructor(message: string, label: BackendErrorLabel, code: StatusCode) {
+    super(message, label, code);
+    Object.setPrototypeOf(this, TeamError.prototype);
+    this.name = 'ConversationError';
+  }
+}
+
+export class InviteEmailInUseError extends TeamError {
+  constructor(
+    message: string,
+    label: BackendErrorLabel = BackendErrorLabel.INVITE_EMAIL_EXISTS,
+    code: StatusCode = StatusCode.CONFLICT
+  ) {
+    super(message, label, code);
+    Object.setPrototypeOf(this, InviteEmailInUseError.prototype);
+    this.name = 'EmailInUseError';
+  }
+}
