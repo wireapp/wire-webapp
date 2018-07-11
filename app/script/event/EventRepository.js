@@ -597,7 +597,7 @@ z.event.EventRepository = class EventRepository {
       ? this.cryptographyRepository.handleEncryptedEvent(event)
       : Promise.resolve(event);
 
-    return mapEvent()
+    return mapEvent
       .then(mappedEvent => {
         const saveEvent = z.event.EventTypeHandling.STORE.includes(mappedEvent.type);
         return saveEvent ? this._handleEventSaving(mappedEvent, source) : mappedEvent;
