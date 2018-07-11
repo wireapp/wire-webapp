@@ -23,14 +23,18 @@ window.z = window.z || {};
 window.z.util = z.util || {};
 
 z.util.LocalizerUtil = {
-  joinNames: (userEntities, declension = z.string.Declension.ACCUSATIVE, skipAnd = false) => {
+  joinNames: (userEntities, declension = z.string.Declension.ACCUSATIVE, skipAnd = false, boldNames = false) => {
     const containsSelfUser = userEntities.some(userEntity => userEntity.is_me);
     if (containsSelfUser) {
       userEntities = userEntities.filter(userEntity => !userEntity.is_me);
     }
 
-    const firstNames = userEntities.map(userEntity => userEntity.first_name());
+    let firstNames = userEntities.map(userEntity => userEntity.first_name());
     firstNames.sort((userNameA, userNameB) => z.util.StringUtil.sortByPriority(userNameA, userNameB));
+
+    if (boldNames) {
+      firstNames = firstNames.map(name => `[bold]${name}[/bold]`);
+    }
 
     if (containsSelfUser) {
       firstNames.push(z.util.SanitizationUtil.getEscapedSelfName(declension));
