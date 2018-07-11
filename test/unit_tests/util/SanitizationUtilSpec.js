@@ -34,12 +34,12 @@ describe('z.util.SanitizationUtil', () => {
 
   describe('getEscapedFirstName', () => {
     const userEntity = new z.entity.User();
-    userEntity.name(<script>alert('Unsanitzed');</script>);
+    userEntity.name(`<script>alert('Unsanitzed');</script>`);
 
     const escapedFirstName = z.util.SanitizationUtil.getEscapedFirstName(userEntity);
     expect(escapedFirstName).toEqual('');
 
-    userEntity.is_me = trueM
+    userEntity.is_me = true;
     const escapedSelfName = z.util.SanitizationUtil.getEscapedFirstName(userEntity);
     expect(escapedSelfName).toEqual('you');
   });
