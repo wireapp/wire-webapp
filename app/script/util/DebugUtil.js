@@ -91,7 +91,7 @@ z.util.DebugUtil = class DebugUtil {
       })
       .then(message => {
         return this.eventRepository.notificationService
-          .getNotifications(undefined, undefined, 10000)
+          .getNotifications(undefined, undefined, z.event.EventRepository.CONFIG.NOTIFICATION_BATCHES.MAX)
           .then(({notifications}) => ({
             message,
             notifications,
@@ -267,7 +267,7 @@ z.util.DebugUtil = class DebugUtil {
     const clientId = wire.app.repository.client.currentClient().id;
 
     return wire.app.repository.event.notificationService
-      .getNotifications(clientId, undefined, 10000)
+      .getNotifications(clientId, undefined, z.event.EventRepository.CONFIG.NOTIFICATION_BATCHES.MAX)
       .then(({notifications}) => {
         this.logger.info(`Fetched "${notifications.length}" notifications.`, notifications);
 
@@ -282,7 +282,7 @@ z.util.DebugUtil = class DebugUtil {
           });
       })
       .then(events => {
-        this.logger.info(`Re-processing "${events.length}" OTR messages.`);
+        this.logger.info(`Reprocessing "${events.length}" OTR messages.`);
         for (const event of events) {
           wire.app.repository.event._processEvent(event, z.event.EventRepository.SOURCE.STREAM);
         }
