@@ -245,10 +245,9 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
       '\\[showmore\\]': '<a class="message-header-show-more" data-uie-name="do-show-more">',
     };
 
-    return Object.entries(tagList).reduce(
-      (replaceText, [template, replace]) => replaceText.replace(new RegExp(template, 'g'), replace),
-      text
-    );
+    return Object.entries(tagList).reduce((replaceText, [template, replace]) => {
+      return replaceText.replace(new RegExp(template, 'g'), replace)
+    }, text);
   }
 
   _getCaptionConnection(userEntity) {
