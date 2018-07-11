@@ -25,14 +25,14 @@ describe('z.util.SanitizationUtil', () => {
   describe('escapeRegex', () => {
     it('will return escaped regex strings', () => {
       const escapedRegex = z.util.SanitizationUtil.escapeString(':)');
-      expect(escapedRegex).toEqual('');
+      expect(escapedRegex).toEqual(':)');
     });
   });
 
   describe('escapeString', () => {
     it('will return escaped strings', () => {
       const escapedString = z.util.SanitizationUtil.escapeString(`<script>alert('Unsanitzed');</script>`);
-      expect(escapedString).toEqual('');
+      expect(escapedString).toEqual('&lt;script&gt;alert(&#x27;Unsanitzed&#x27;);&lt;/script&gt;');
     });
   });
 
@@ -42,7 +42,7 @@ describe('z.util.SanitizationUtil', () => {
       userEntity.name(`<script>alert('Unsanitzed');</script>`);
 
       const escapedFirstName = z.util.SanitizationUtil.getEscapedFirstName(userEntity);
-      expect(escapedFirstName).toEqual('');
+      expect(escapedFirstName).toEqual('&lt;script&gt;alert(&#x27;Unsanitzed&#x27;);&lt;/script&gt;');
 
       userEntity.is_me = true;
       const escapedSelfName = z.util.SanitizationUtil.getEscapedFirstName(userEntity);
