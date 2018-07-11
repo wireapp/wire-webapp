@@ -533,13 +533,13 @@ z.util.printDevicesId = id => {
   }
 
   const idWithPadding = z.util.zeroPadding(id, 16);
-  let prettifiedId = '';
+  const prettifiedId = [];
 
   for (const part of idWithPadding.match(/.{1,2}/g)) {
-    prettifiedId += `<span class='device-id-part'>${part}</span>`;
+    prettifiedId.push(`<span class='device-id-part'>${part}</span>`);
   }
 
-  return prettifiedId;
+  return prettifiedId.join('');
 };
 
 /**
