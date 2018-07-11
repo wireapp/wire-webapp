@@ -83,7 +83,7 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
 
     this.senderName = ko.pureComputed(() => {
       const isTeamMemberLeave = this.type === z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE;
-      return isTeamMemberLeave ? this.name() : z.util.getFirstName(this.user());
+      return isTeamMemberLeave ? this.name() : z.util.SanitizationUtil.getEscapedFirstName(this.user());
     });
 
     this.showNamedCreation = ko.pureComputed(() => this.isConversationCreate() && this.name().length);
@@ -244,11 +244,10 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
       '\\[bold\\]': '<b>',
       '\\[showmore\\]': '<a class="message-header-show-more" data-uie-name="do-show-more">',
     };
-    const accumulatedText = z.util.escapeHtml(text);
 
     return Object.entries(tagList).reduce(
       (replaceText, [template, replace]) => replaceText.replace(new RegExp(template, 'g'), replace),
-      accumulatedText
+      text
     );
   }
 

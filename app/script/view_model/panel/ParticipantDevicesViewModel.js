@@ -66,7 +66,7 @@ z.viewModel.panel.ParticipantDevicesViewModel = class ParticipantDevicesViewMode
     });
 
     this.detailMessage = ko.pureComputed(() => {
-      const substitution = {user: z.util.escapeHtml(this.userEntity().first_name())};
+      const substitution = {user: z.util.SanitizationUtil.getEscapedFirstName(this.userEntity())};
       const text = z.l10n.text(z.string.participantDevicesDetailHeadline, substitution);
 
       const textWithHtmlTags = /\{\{[^\}]+\}\}[^\{]+\{\{[^\}]+\}\}/;

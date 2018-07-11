@@ -29,11 +29,11 @@ z.util.LocalizerUtil = {
       userEntities = userEntities.filter(userEntity => !userEntity.is_me);
     }
 
-    const firstNames = userEntities.map(userEntity => z.util.getFirstName(userEntity));
+    const firstNames = userEntities.map(userEntity => z.util.SanitizationUtil.getEscapedFirstName(userEntity));
     firstNames.sort((userNameA, userNameB) => z.util.StringUtil.sortByPriority(userNameA, userNameB));
 
     if (containsSelfUser) {
-      firstNames.push(z.util.getSelfName(declension));
+      firstNames.push(z.util.SanitizationUtil.getEscapedSelfName(declension));
     }
 
     const numberOfNames = firstNames.length;
@@ -48,6 +48,6 @@ z.util.LocalizerUtil = {
       firstNames.push(additionalNames);
     }
 
-    return z.util.escapeHtml(firstNames.join(', '));
+    return z.util.SanitizationUtil.escapeString(firstNames.join(', '));
   },
 };

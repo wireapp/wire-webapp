@@ -88,8 +88,8 @@ z.components.FullSearch = class FullSearch {
   }
 
   formatResult(messageEntity) {
-    const text = _.escape(messageEntity.get_first_asset().text);
-    const input = _.escape(this.input());
+    const text = z.util.SanitizationUtil.escapeString(messageEntity.get_first_asset().text);
+    const input = z.util.SanitizationUtil.escapeString(this.input());
 
     messageEntity.matchesCount = 0;
 

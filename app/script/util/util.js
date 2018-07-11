@@ -279,10 +279,6 @@ z.util.encodeBase64 = text => window.btoa(text);
 
 z.util.encodeSha256Base64 = text => CryptoJS.SHA256(text).toString(CryptoJS.enc.Base64);
 
-z.util.escapeHtml = html => _.escape(html);
-
-z.util.escapeRegex = string => string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-
 // Note IE10 listens to "transitionend" instead of "animationend"
 z.util.alias = {
   animationend: 'transitionend animationend oAnimationEnd MSAnimationEnd mozAnimationEnd webkitAnimationEnd',
@@ -510,20 +506,6 @@ z.util.murmurhash3 = (key, seed) => {
   h1 ^= h1 >>> 16;
 
   return h1 >>> 0;
-};
-
-z.util.getFirstName = (userEntity, declension) => {
-  return userEntity.is_me ? z.util.getSelfName(declension) : z.util.escapeHtml(userEntity.first_name());
-};
-
-z.util.getSelfName = (declension = z.string.Declension.NOMINATIVE) => {
-  const selfNameDeclensions = {
-    [z.string.Declension.NOMINATIVE]: z.string.conversationYouNominative,
-    [z.string.Declension.DATIVE]: z.string.conversationYouDative,
-    [z.string.Declension.ACCUSATIVE]: z.string.conversationYouAccusative,
-  };
-
-  return z.util.escapeHtml(z.l10n.text(selfNameDeclensions[declension]));
 };
 
 z.util.printDevicesId = id => {

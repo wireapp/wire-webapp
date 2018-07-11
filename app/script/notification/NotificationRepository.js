@@ -249,7 +249,10 @@ z.notification.NotificationRepository = class NotificationRepository {
     const updatedOneParticipant = messageEntity.userEntities().length === 1;
     if (updatedOneParticipant) {
       const [otherUserEntity] = messageEntity.userEntities();
-      const nameOfJoinedUser = z.util.getFirstName(otherUserEntity, z.string.Declension.ACCUSATIVE);
+      const nameOfJoinedUser = z.util.SanitizationUtil.getEscapedFirstName(
+        otherUserEntity,
+        z.string.Declension.ACCUSATIVE
+      );
 
       const senderJoined = messageEntity.user().id === otherUserEntity.id;
       if (senderJoined) {
