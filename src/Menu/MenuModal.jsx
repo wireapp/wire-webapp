@@ -91,8 +91,8 @@ const MenuModalBackground = styled.div`
 
 const noop = () => {};
 
-const MenuModal = ({children, onBackgroundClick}) => (
-  <MenuModalWrapper>
+const MenuModal = ({children, onBackgroundClick, ...props}) => (
+  <MenuModalWrapper {...props}>
     <MenuModalBody>
       <MenuModalContent>{children}</MenuModalContent>
     </MenuModalBody>
@@ -100,7 +100,7 @@ const MenuModal = ({children, onBackgroundClick}) => (
   </MenuModalWrapper>
 );
 
-const MenuItem = ({children, onClick}) => <MenuItemContent onClick={onClick}>{children}</MenuItemContent>;
+const MenuItem = ({children, ...props}) => <MenuItemContent {...props}>{children}</MenuItemContent>;
 
 MenuItem.propTypes = {
   children: PropTypes.node,
