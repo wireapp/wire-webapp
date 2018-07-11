@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="1.8.3"></a>
+## [1.8.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@1.8.2...@wireapp/api-client@1.8.3) (2018-07-11)
+
+
+### Bug Fixes
+
+* **api-client:** Map suspended account & invite email exists errors ([#821](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/821)) ([3d4f983](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/3d4f983))
+
+
+
+
 <a name="1.8.2"></a>
 ## [1.8.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@1.8.1...@wireapp/api-client@1.8.2) (2018-07-11)
 
