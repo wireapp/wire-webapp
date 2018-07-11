@@ -29,7 +29,7 @@ z.search.FullTextSearch = (() => {
     const regex = query
       .trim()
       .split(delimiter)
-      .map(word => `(${z.util.SanitizationUtil.sanitizeRegex(word)})`)
+      .map(word => `(${z.util.SanitizationUtil.escapeRegex(word)})`)
       .join('(?:.*)');
 
     return new RegExp(regex, flags);

@@ -23,30 +23,38 @@
 
 describe('z.util.SanitizationUtil', () => {
   describe('escapeRegex', () => {
-    const escapedRegex = z.util.SanitizationUtil.escapeString(':)');
-    expect(escapedRegex).toEqual('');
+    it('will return escaped regex strings', () => {
+      const escapedRegex = z.util.SanitizationUtil.escapeString(':)');
+      expect(escapedRegex).toEqual('');
+    });
   });
 
   describe('escapeString', () => {
-    const escapedString = z.util.SanitizationUtil.escapeString(`<script>alert('Unsanitzed');</script>`);
-    expect(escapedString).toEqual('');
+    it('will return escaped strings', () => {
+      const escapedString = z.util.SanitizationUtil.escapeString(`<script>alert('Unsanitzed');</script>`);
+      expect(escapedString).toEqual('');
+    });
   });
 
   describe('getEscapedFirstName', () => {
-    const userEntity = new z.entity.User();
-    userEntity.name(`<script>alert('Unsanitzed');</script>`);
+    it('will return the escaped first name of the given user', () => {
+      const userEntity = new z.entity.User();
+      userEntity.name(`<script>alert('Unsanitzed');</script>`);
 
-    const escapedFirstName = z.util.SanitizationUtil.getEscapedFirstName(userEntity);
-    expect(escapedFirstName).toEqual('');
+      const escapedFirstName = z.util.SanitizationUtil.getEscapedFirstName(userEntity);
+      expect(escapedFirstName).toEqual('');
 
-    userEntity.is_me = true;
-    const escapedSelfName = z.util.SanitizationUtil.getEscapedFirstName(userEntity);
-    expect(escapedSelfName).toEqual('you');
+      userEntity.is_me = true;
+      const escapedSelfName = z.util.SanitizationUtil.getEscapedFirstName(userEntity);
+      expect(escapedSelfName).toEqual('you');
+    });
   });
 
   describe('getEscapedSelfName', () => {
-    const escapedSelfName = z.util.SanitizationUtil.getEscapedSelfName(z.string.Declension.NOMINATIVE);
-    expect(escapedSelfName).toEqual('you');
+    it('will return the escaped self name in the given declension', () => {
+      const escapedSelfName = z.util.SanitizationUtil.getEscapedSelfName(z.string.Declension.NOMINATIVE);
+      expect(escapedSelfName).toEqual('you');
+    });
   });
 
   describe('safeWindowOpen', () => {
@@ -57,7 +65,7 @@ describe('z.util.SanitizationUtil', () => {
       }
     });
 
-    it("doesn't contain a reference to the opening tab", () => {
+    it('does not contain a reference to the opening tab', () => {
       newWindow = z.util.SanitizationUtil.safeWindowOpen('https://wire.com/');
       expect(newWindow.opener).toBeNull();
     });
