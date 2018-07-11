@@ -637,8 +637,8 @@ z.event.EventRepository = class EventRepository {
 
     return this.conversationService.load_event_from_db(conversationId, eventId).then(storedEvent => {
       if (storedEvent) {
-        const {data: mappedData, from: mappedFrom, type: mappedType, time: mappedTime} = event;
-        const {data: storedData, from: storedFrom, type: storedType, time: storedTime} = storedEvent;
+        const {data: mappedData, from: mappedFrom, type: mappedType} = event;
+        const {data: storedData, from: storedFrom, type: storedType} = storedEvent;
 
         const logMessage = `Ignored '${mappedType}' (${eventId}) in '${conversationId}' from '${mappedFrom}':'`;
 
@@ -650,8 +650,8 @@ z.event.EventRepository = class EventRepository {
         }
 
         const mappedIsMessageAdd = mappedType === z.event.Client.CONVERSATION.MESSAGE_ADD;
-        const storedISMessageAdd = storedType === z.event.Client.CONVERSATION.MESSAGE_ADD;
-        const userReusedId = !mappedIsMessageAdd || !storedISMessageAdd || !mappedData.previews.length;
+        const storedIsMessageAdd = storedType === z.event.Client.CONVERSATION.MESSAGE_ADD;
+        const userReusedId = !mappedIsMessageAdd || !storedIsMessageAdd || !mappedData.previews.length;
         if (userReusedId) {
           this.logger.warn(`${logMessage} ID previously used by same user`, event);
           const errorMessage = 'Event validation failed: ID reused by same user';
@@ -673,8 +673,10 @@ z.event.EventRepository = class EventRepository {
         }
 
         // Only valid case for a duplicate message ID: First update to a text message matching the previous text content with a link preview
-        event.server_time = mappedTime;
-        event.time = storedTime;
+        event.server_time = event.time;
+        event.time = storedEvent.time;
+        event.primary_key = storedEvent.primary_key;
+        return this.conversationService.update_event(event);
       }
 
       return this.conversationService.save_event(event);

@@ -124,6 +124,15 @@ describe('Conversation', () => {
       expect(conversation_et.messages().length).toBe(1);
     });
 
+    it('should replace existing message with new message', () => {
+      const initialLength = conversation_et.messages().length;
+      const newMessageEntity = new z.entity.Message(z.util.createRandomUuid());
+      newMessageEntity.id = initial_message_et.id;
+      conversation_et.add_message(newMessageEntity, true);
+      expect(conversation_et.messages().length).toBe(initialLength);
+      expect(conversation_et.messages()[0]).toBe(newMessageEntity);
+    });
+
     it('should add message with a newer timestamp', () => {
       const message_et = new z.entity.Message(z.util.createRandomUuid());
       message_et.timestamp(second_timestamp);
