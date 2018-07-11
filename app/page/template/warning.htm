@@ -86,7 +86,7 @@
       <!-- ko if: visibleWarning() === z.viewModel.WarningsViewModel.TYPE.UNSUPPORTED_INCOMING_CALL -->
         <div class="warning-bar warning-bar-feature bg-theme">
           <!-- ko ifnot: z.util.Environment.browser.chrome -->
-            <div class="warning-bar-message"><span data-bind="l10n_text: {'id': z.string.warningCallUnsupportedIncoming, substitute: z.util.escapeHtml(name())}"></span>&nbsp;<a class="warning-bar-link" rel="nofollow noopener noreferrer" target="_blank" data-bind="l10n_href: {support: z.config.SUPPORT.ID.CALLING}, l10n_text: z.string.warningLearnMore"></a></div>
+            <div class="warning-bar-message"><span data-bind="l10n_text: {'id': z.string.warningCallUnsupportedIncoming, substitute: z.util.SanitizationUtil.escapeString(name())}"></span>&nbsp;<a class="warning-bar-link" rel="nofollow noopener noreferrer" target="_blank" data-bind="l10n_href: {support: z.config.SUPPORT.ID.CALLING}, l10n_text: z.string.warningLearnMore"></a></div>
           <!-- /ko -->
           <!-- ko if: z.util.Environment.browser.chrome -->
             <!-- ko if: z.util.Environment.desktop -->

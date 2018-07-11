@@ -575,11 +575,11 @@
     ed2curve "0.2.1"
     libsodium-wrappers-sumo "0.7.3"
 
-"@wireapp/react-ui-kit@1.5.4":
-  version "1.5.4"
-  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-1.5.4.tgz#2ddffa3ec445012d136a699318aa1975634ffa76"
+"@wireapp/react-ui-kit@1.5.5":
+  version "1.5.5"
+  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-1.5.5.tgz#6decf5a76973461bef75d6fe4b429b112fb96f24"
   dependencies:
-    bazinga64 "5.2.10"
+    bazinga64 "5.2.11"
     color "3.0.0"
     react "16.4.1"
     react-dom "16.4.1"
@@ -1702,6 +1702,10 @@ batch@0.6.1:
 bazinga64@5.2.10:
   version "5.2.10"
   resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.2.10.tgz#fd5ea13e43308d766e15e7e897c08abe4f469d7c"
+
+bazinga64@5.2.11:
+  version "5.2.11"
+  resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.2.11.tgz#af4ebc8466c4e95998606f411bd829b324e31806"
 
 bcrypt-pbkdf@^1.0.0:
   version "1.0.1"
@@ -2957,9 +2961,9 @@ cssnano-util-same-parent@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/cssnano-util-same-parent/-/cssnano-util-same-parent-4.0.0.tgz#d2a3de1039aa98bc4ec25001fa050330c2a16dac"
 
-cssnano@4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/cssnano/-/cssnano-4.0.0.tgz#e1a4161f17d82dff5fba17a90a7bfd97add79a1b"
+cssnano@4.0.1:
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/cssnano/-/cssnano-4.0.1.tgz#2c611d3375be46d8908d8e1fb28b8ed875376a10"
   dependencies:
     cosmiconfig "^5.0.0"
     cssnano-preset-default "^4.0.0"
