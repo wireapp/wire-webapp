@@ -637,14 +637,8 @@ z.event.EventRepository = class EventRepository {
 
     return this.conversationService.load_event_from_db(conversationId, eventId).then(storedEvent => {
       if (storedEvent) {
-        const {data: mappedData, from: mappedFrom, type: mappedType, time: mappedTime} = event;
-        const {
-          data: storedData,
-          from: storedFrom,
-          type: storedType,
-          time: storedTime,
-          primary_key: storedPrimaryKey,
-        } = storedEvent;
+        const {data: mappedData, from: mappedFrom, type: mappedType} = event;
+        const {data: storedData, from: storedFrom, type: storedType} = storedEvent;
 
         const logMessage = `Ignored '${mappedType}' (${eventId}) in '${conversationId}' from '${mappedFrom}':'`;
 
@@ -679,9 +673,9 @@ z.event.EventRepository = class EventRepository {
         }
 
         // Only valid case for a duplicate message ID: First update to a text message matching the previous text content with a link preview
-        event.server_time = mappedTime;
-        event.time = storedTime;
-        event.primary_key = storedPrimaryKey;
+        event.server_time = event.time;
+        event.time = storedEvent.time;
+        event.primary_key = storedEvent.primary_key;
         return this.conversationService.update_event(event);
       }
 

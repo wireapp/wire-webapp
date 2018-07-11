@@ -474,28 +474,25 @@ z.entity.Conversation = class Conversation {
    * @returns {z.entity.Message|undefined} Message if it is not a duplicate
    */
   _checkForDuplicate(messageEntity) {
-    const existingMessageEntity = this._findDuplicate(messageEntity);
-    if (existingMessageEntity) {
-      const logData = {additionalMessage: messageEntity, existingMessage: existingMessageEntity};
-      this.logger.warn(`Filtered message '${messageEntity.id}' as duplicate in view`, logData);
-      return undefined;
+    if (messageEntity) {
+      const existingMessageEntity = this._findDuplicate(messageEntity);
+      if (existingMessageEntity) {
+        const logData = {additionalMessage: messageEntity, existingMessage: existingMessageEntity};
+        this.logger.warn(`Filtered message '${messageEntity.id}' as duplicate in view`, logData);
+        return undefined;
+      }
+      return messageEntity;
     }
-    return messageEntity;
   }
 
   _findDuplicate(messageEntity) {
-    if (!messageEntity.id) {
-      return;
+    if (messageEntity && messageEntity.id) {
+      return this.messages_unordered().find(existingMessageEntity => {
+        const sameId = messageEntity.id && existingMessageEntity.id === messageEntity.id;
+        const sameSender = messageEntity.from === existingMessageEntity.from;
+        return sameId && sameSender;
+      });
     }
-    const areSameMessage = (messageEntity1, messageEntity2) => {
-      const sameId = messageEntity1.id && messageEntity2.id === messageEntity1.id;
-      const sameSender = messageEntity1.from === messageEntity2.from;
-      return sameId && sameSender;
-    };
-
-    return this.messages_unordered().find(existingMessageEntity =>
-      areSameMessage(messageEntity, existingMessageEntity)
-    );
   }
 
   update_timestamp_server(time, is_backend_timestamp = false) {
