@@ -513,7 +513,7 @@ z.util.murmurhash3 = (key, seed) => {
 };
 
 z.util.getFirstName = (userEntity, declension) => {
-  return userEntity.is_me ? z.util.getSelfName(declension) : userEntity.first_name();
+  return userEntity.is_me ? z.util.getSelfName(declension) : z.util.escapeHtml(userEntity.first_name());
 };
 
 z.util.getSelfName = (declension = z.string.Declension.NOMINATIVE) => {
@@ -523,7 +523,7 @@ z.util.getSelfName = (declension = z.string.Declension.NOMINATIVE) => {
     [z.string.Declension.ACCUSATIVE]: z.string.conversationYouAccusative,
   };
 
-  return z.l10n.text(selfNameDeclensions[declension]);
+  return z.util.escapeHtml(z.l10n.text(selfNameDeclensions[declension]));
 };
 
 z.util.printDevicesId = id => {

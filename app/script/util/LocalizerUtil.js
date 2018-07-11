@@ -48,6 +48,6 @@ z.util.LocalizerUtil = {
       firstNames.push(additionalNames);
     }
 
-    return firstNames.join(', ');
+    return z.util.escapeHtml(firstNames.join(', '));
   },
 };
