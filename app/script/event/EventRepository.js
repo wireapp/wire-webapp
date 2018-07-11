@@ -592,11 +592,12 @@ z.event.EventRepository = class EventRepository {
    * @returns {Promise} Resolves with the saved record or boolean true if the event was skipped
    */
   _processEvent(event, source) {
-    return Promise.resolve(event)
-      .then(validatedEvent => {
-        const isEncryptedEvent = validatedEvent.type === z.event.Backend.CONVERSATION.OTR_MESSAGE_ADD;
-        return isEncryptedEvent ? this.cryptographyRepository.handleEncryptedEvent(event) : event;
-      })
+    const isEncryptedEvent = event.type === z.event.Backend.CONVERSATION.OTR_MESSAGE_ADD;
+    const mapEvent = isEncryptedEvent
+      ? this.cryptographyRepository.handleEncryptedEvent(event)
+      : Promise.resolve(event);
+
+    return mapEvent()
       .then(mappedEvent => {
         const saveEvent = z.event.EventTypeHandling.STORE.includes(mappedEvent.type);
         return saveEvent ? this._handleEventSaving(mappedEvent, source) : mappedEvent;

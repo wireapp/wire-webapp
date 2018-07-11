@@ -264,7 +264,7 @@ z.util.DebugUtil = class DebugUtil {
   }
 
   reprocessNotificationStream(conversationId = this.conversationRepository.active_conversation().id) {
-    const clientId = wire.app.repository.client.currentClient().id;
+    const clientId = this.clientRepository.currentClient().id;
 
     return this.eventRepository.notificationService
       .getNotifications(clientId, undefined, z.event.EventRepository.CONFIG.NOTIFICATION_BATCHES.MAX)
@@ -283,9 +283,7 @@ z.util.DebugUtil = class DebugUtil {
       })
       .then(events => {
         this.logger.info(`Reprocessing "${events.length}" OTR messages...`);
-        for (const event of events) {
-          this.eventRepository._processEvent(event, z.event.EventRepository.SOURCE.STREAM);
-        }
+        events.forEach(event => this.eventRepository._processEvent(event, z.event.EventRepository.SOURCE.STREAM));
       });
   }
 };
