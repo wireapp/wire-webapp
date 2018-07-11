@@ -358,25 +358,18 @@ z.util.isIsoString = dateString => {
 z.util.sortGroupsByLastEvent = (groupA, groupB) => groupB.last_event_timestamp() - groupA.last_event_timestamp();
 
 z.util.sortObjectByKeys = (object, reverse) => {
-  const sortedObject = {};
   const keys = Object.keys(object);
   keys.sort();
 
   if (reverse) {
-    for (let index = keys.length - 1; index >= 0; index--) {
-      const key = keys[index];
-      const value = object[key];
-      sortedObject[key] = value;
-    }
-  } else {
-    for (const key of keys) {
-      const value = object[key];
-      sortedObject[key] = value;
-    }
+    keys.reverse();
   }
 
   // Returns a copy of an object, which is ordered by the keys of the original object.
-  return sortedObject;
+  return keys.reduce((sortedObject, key) => {
+    sortedObject[key] = object[key];
+    return sortedObject;
+  }, {});
 };
 
 // Removes url(' and url(" from the beginning of the string and also ") and ') from the end
@@ -480,13 +473,10 @@ z.util.printDevicesId = id => {
   }
 
   const idWithPadding = z.util.zeroPadding(id, 16);
-  let prettifiedId = '';
+  const parts = idWithPadding.match(/.{1,2}/g) || [];
+  const prettifiedId = parts.map(part => `<span class='device-id-part'>${part}</span>`);
 
-  for (const part of idWithPadding.match(/.{1,2}/g)) {
-    prettifiedId += `<span class='device-id-part'>${part}</span>`;
-  }
-
-  return prettifiedId;
+  return prettifiedId.join('');
 };
 
 /**
