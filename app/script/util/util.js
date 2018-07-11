@@ -379,7 +379,10 @@ z.util.koPushDeferred = (target, src, number = 100, delay = 300) => {
  * @param {number} length - Final output length
  * @returns {string} Input value with leading zeros (padding)
  */
-z.util.zeroPadding = (value, length = 2) => `${'0'.repeat(length)}${value}`.substr(-length);
+z.util.zeroPadding = (value, length = 2) => {
+  const zerosNeeded = Math.max(0, length - value.toString().length);
+  return `${'0'.repeat(zerosNeeded)}${value}`;
+};
 
 /**
  * Test whether the given string is ISO 8601 format equally to date.toISOString()
