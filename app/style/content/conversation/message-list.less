@@ -103,7 +103,8 @@
   .flex-center;
 
   width: @conversation-message-sender-width;
-  align-items: flex-start;
+  height: @avatar-diameter-xs;
+  margin-top: -6px;
   color: @graphite-dark;
 
   &--svg {
@@ -137,7 +138,8 @@
     text-transform: capitalize;
   }
 
-  & > span {
+  & > span,
+  & > a {
     margin-top: -6px;
   }
 }
