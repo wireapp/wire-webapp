@@ -21,6 +21,7 @@ import {BackendError, BackendErrorLabel, StatusCode} from '.';
 import {InvalidCredentialsError, LoginTooFrequentError, SuspendedAccountError} from '../auth';
 import {ConversationIsUnknownError, ConversationOperationError} from '../conversation';
 import {InviteEmailInUseError} from '../team';
+import {InvalidInvitationCodeError} from '../team/index';
 import {UnconnectedUserError, UserIsUnknownError} from '../user';
 
 class BackendErrorMapper {
@@ -39,6 +40,9 @@ class BackendErrorMapper {
           ),
           ["[path] 'usr' invalid: Failed reading: Invalid UUID"]: new UserIsUnknownError('User ID is unknown.'),
           ['Error in $: Failed reading: satisfy']: new BackendError('Wrong set of parameters.'),
+        },
+        [String(BackendErrorLabel.INVALID_INVITATION_CODE)]: {
+          ['Invalid invitation code.']: new InvalidInvitationCodeError('Invalid invitation code.'),
         },
       },
       [Number(StatusCode.FORBIDDEN)]: {

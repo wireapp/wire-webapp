@@ -35,6 +35,18 @@ export class InviteEmailInUseError extends TeamError {
   ) {
     super(message, label, code);
     Object.setPrototypeOf(this, InviteEmailInUseError.prototype);
-    this.name = 'EmailInUseError';
+    this.name = 'InviteEmailInUseError';
+  }
+}
+
+export class InvalidInvitationCodeError extends TeamError {
+  constructor(
+    message: string,
+    label: BackendErrorLabel = BackendErrorLabel.INVALID_INVITATION_CODE,
+    code: StatusCode = StatusCode.BAD_REQUEST
+  ) {
+    super(message, label, code);
+    Object.setPrototypeOf(this, InvalidInvitationCodeError.prototype);
+    this.name = 'InvalidInvitationCodeError';
   }
 }
