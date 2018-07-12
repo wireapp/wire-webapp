@@ -49,7 +49,7 @@ z.localization.Localizer = new Localizer();
 
 z.l10n = (() => {
   const replaceTags = (string, tagSubstitutes) => {
-    Object.values(tagSubstitutes).forEach(([identifier, substitute]) => {
+    Object.entries(tagSubstitutes).forEach(([identifier, substitute]) => {
       string = string.replace(new RegExp(`\\[${identifier}\\]`, 'g'), substitute);
     });
 
@@ -64,7 +64,7 @@ z.l10n = (() => {
     return string;
   };
 
-  const replaceWithObject = (string, substitutions) => replaceWithArray(Object.entries(substitutions));
+  const replaceWithObject = (string, substitutions) => replaceWithArray(string, Object.entries(substitutions));
 
   const replaceWithString = (string, substitute) => string.replace(/{{\w+}}/, substitute);
 
