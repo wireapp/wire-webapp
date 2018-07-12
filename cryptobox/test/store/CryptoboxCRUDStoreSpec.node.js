@@ -132,7 +132,7 @@ describe('cryptobox.store.CryptoboxCRUDStore', () => {
         Proteus.keys.PreKey.new(Proteus.keys.PreKey.MAX_PREKEY_ID),
       ]);
 
-      savedPreKeys = await fileStore.save_prekeys(preKeys);
+      const savedPreKeys = await fileStore.save_prekeys(preKeys);
       expect(savedPreKeys.length).toBe(preKeys.length);
 
       done();

@@ -121,7 +121,7 @@ describe('FileEngine', () => {
         'updateOrCreate',
       ];
 
-      for (operation of functionNames) {
+      for (const operation of functionNames) {
         try {
           await engine[operation]('../etc', 'primary-key', {});
           done.fail();

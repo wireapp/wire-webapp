@@ -18,6 +18,7 @@
  */
 
 /* eslint-disable no-magic-numbers */
+/*global helloDecodedArray, helloEncodedString, helloEncodedArray, numberDecoded, helloDecodedString, numberString*/
 
 const bazinga64 = require('bazinga64');
 

@@ -16,6 +16,7 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+/*global helloDecodedArray, helloEncodedString, helloEncodedArray, helloDecodedString, numberEncoded*/
 
 const bazinga64 = require('bazinga64');
 const fixtures = require('../fixtures/');
