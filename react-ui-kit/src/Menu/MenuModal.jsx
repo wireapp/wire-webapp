@@ -69,7 +69,7 @@ const MenuModalContent = styled.ul`
 `;
 
 const MenuItemContent = styled.li`
-  color: ${COLOR.GRAY_DARKEN_72};
+  color: ${COLOR.TEXT};
   display: flex;
   align-items: center;
   max-width: 100%;

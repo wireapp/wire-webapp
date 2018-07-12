@@ -17,7 +17,6 @@
  *
  */
 
-import {COLOR} from '../Identity';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {Text} from './Text';
@@ -83,13 +82,11 @@ Heading.propTypes = {
 H1.defaultProps = H2.defaultProps = H3.defaultProps = H4.defaultProps = {
   ...Text.defaultProps,
   block: true,
-  color: COLOR.GRAY_DARKEN_72,
 };
 
 Heading.defaultProps = {
   ...Text.defaultProps,
   block: true,
-  color: COLOR.GRAY_DARKEN_72,
   level: '1',
 };
 

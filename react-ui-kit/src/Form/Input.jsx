@@ -41,7 +41,7 @@ const Input = styled.input`
   background: ${COLOR.WHITE};
   border-radius: 4px;
   border: none;
-  color: ${COLOR.GRAY_DARKEN_72};
+  color: ${COLOR.TEXT};
   font-weight: 400;
   outline: none;
   caret-color: ${COLOR.BLUE};
