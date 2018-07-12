@@ -650,51 +650,55 @@ z.event.EventRepository = class EventRepository {
   _handleEventSaving(event, source) {
     const {conversation: conversationId, id: eventId} = event;
 
-    return this.conversationService.load_event_from_db(conversationId, eventId).then(storedEvent => {
-      if (storedEvent) {
-        const {data: mappedData, from: mappedFrom, type: mappedType} = event;
-        const {data: storedData, from: storedFrom, type: storedType} = storedEvent;
+    const loadPromise = eventId
+      ? this.conversationService.load_event_from_db(conversationId, eventId)
+      : Promise.resolve();
 
-        const logMessage = `Ignored '${mappedType}' (${eventId}) in '${conversationId}' from '${mappedFrom}':'`;
-
-        const fromDifferentUsers = storedFrom !== mappedFrom;
-        if (fromDifferentUsers) {
-          this.logger.warn(`${logMessage} ID previously used by user '${storedFrom}'`, event);
-          const errorMessage = 'Event validation failed: ID reused by other user';
-          throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, errorMessage);
-        }
-
-        const mappedIsMessageAdd = mappedType === z.event.Client.CONVERSATION.MESSAGE_ADD;
-        const storedIsMessageAdd = storedType === z.event.Client.CONVERSATION.MESSAGE_ADD;
-        const userReusedId = !mappedIsMessageAdd || !storedIsMessageAdd || !mappedData.previews.length;
-        if (userReusedId) {
-          this.logger.warn(`${logMessage} ID previously used by same user`, event);
-          const errorMessage = 'Event validation failed: ID reused by same user';
-          throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, errorMessage);
-        }
-
-        const updatingLinkPreview = !!storedData.previews.length;
-        if (updatingLinkPreview) {
-          this.logger.warn(`${logMessage} ID of link preview reused`, event);
-          const errorMessage = 'Event validation failed: ID of link preview reused';
-          throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, errorMessage);
-        }
-
-        const textContentMatches = mappedData.content === storedData.content;
-        if (!textContentMatches) {
-          this.logger.warn(`${logMessage} Text content for link preview not matching`, event);
-          const errorMessage = 'Event validation failed: ID of link preview reused';
-          throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, errorMessage);
-        }
-
-        // Only valid case for a duplicate message ID: First update to a text message matching the previous text content with a link preview
-        event.server_time = event.time;
-        event.time = storedEvent.time;
-        event.primary_key = storedEvent.primary_key;
-        return this.conversationService.update_event(event);
+    return loadPromise.then(storedEvent => {
+      if (!storedEvent) {
+        return this.conversationService.save_event(event);
       }
 
-      return this.conversationService.save_event(event);
+      const {data: mappedData, from: mappedFrom, type: mappedType} = event;
+      const {data: storedData, from: storedFrom, type: storedType} = storedEvent;
+
+      const logMessage = `Ignored '${mappedType}' (${eventId}) in '${conversationId}' from '${mappedFrom}':'`;
+
+      const fromDifferentUsers = storedFrom !== mappedFrom;
+      if (fromDifferentUsers) {
+        this.logger.warn(`${logMessage} ID previously used by user '${storedFrom}'`, event);
+        const errorMessage = 'Event validation failed: ID reused by other user';
+        throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, errorMessage);
+      }
+
+      const mappedIsMessageAdd = mappedType === z.event.Client.CONVERSATION.MESSAGE_ADD;
+      const storedIsMessageAdd = storedType === z.event.Client.CONVERSATION.MESSAGE_ADD;
+      const userReusedId = !mappedIsMessageAdd || !storedIsMessageAdd || !mappedData.previews.length;
+      if (userReusedId) {
+        this.logger.warn(`${logMessage} ID previously used by same user`, event);
+        const errorMessage = 'Event validation failed: ID reused by same user';
+        throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, errorMessage);
+      }
+
+      const updatingLinkPreview = !!storedData.previews.length;
+      if (updatingLinkPreview) {
+        this.logger.warn(`${logMessage} ID of link preview reused`, event);
+        const errorMessage = 'Event validation failed: ID of link preview reused';
+        throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, errorMessage);
+      }
+
+      const textContentMatches = mappedData.content === storedData.content;
+      if (!textContentMatches) {
+        this.logger.warn(`${logMessage} Text content for link preview not matching`, event);
+        const errorMessage = 'Event validation failed: ID of link preview reused';
+        throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, errorMessage);
+      }
+
+      // Only valid case for a duplicate message ID: First update to a text message matching the previous text content with a link preview
+      event.server_time = event.time;
+      event.time = storedEvent.time;
+      event.primary_key = storedEvent.primary_key;
+      return this.conversationService.update_event(event);
     });
   }
 
