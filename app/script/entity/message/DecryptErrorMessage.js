@@ -39,14 +39,17 @@ z.entity.DecryptErrorMessage = class DecryptErrorMessage extends z.entity.Messag
         ? z.string.conversationUnableToDecrypt2
         : z.string.conversationUnableToDecrypt1;
 
-      const unsafeSubstitutions = {user: this.user().first_name()};
-
-      const tagSubstitutions = {
-        '\\/highlight': '</span>',
-        highlight: '<span class="label-bold-xs">',
+      const substitutions = {
+        replace: {
+          user: this.user().first_name(),
+        },
+        replaceDangerously: {
+          '\\/highlight': '</span>',
+          highlight: '<span class="label-bold-xs">',
+        },
       };
 
-      return z.l10n.safeHtml(stringId, unsafeSubstitutions, tagSubstitutions);
+      return z.l10n.safeHtml(stringId, substitutions);
     });
 
     this.link = ko.pureComputed(() => {

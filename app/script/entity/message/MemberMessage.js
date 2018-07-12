@@ -96,12 +96,11 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
         return '';
       }
 
-      const tagSubstitutions = {
+      let substitutions;
+      const replaceDangerously = {
         '\\/showmore': '</a>',
         showmore: '<a class="message-header-show-more" data-uie-name="do-show-more">',
       };
-
-      let unsafeSubstitutions;
 
       switch (this.memberMessageType) {
         case z.message.SystemMessageType.CONNECTION_ACCEPTED:
@@ -131,20 +130,23 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
               const teamStringId =
                 guestCount === 1 ? z.string.conversationCreateTeamGuest : z.string.conversationCreateTeamGuests;
 
-              unsafeSubstitutions = {count: guestCount};
-              return z.l10n.safeHtml(teamStringId, unsafeSubstitutions, tagSubstitutions);
+              substitutions = {replace: {count: guestCount}, replaceDangerously};
+              return z.l10n.safeHtml(teamStringId, substitutions);
             }
 
             const createStringId = this.exceedsMaxVisibleUsers()
               ? z.string.conversationCreateWithMore
               : z.string.conversationCreateWith;
 
-            unsafeSubstitutions = {
-              count: this.hiddenUserCount(),
-              users: this._generateNameString(this.exceedsMaxVisibleUsers(), z.string.Declension.DATIVE),
+            substitutions = {
+              replace: {
+                count: this.hiddenUserCount(),
+                users: this._generateNameString(this.exceedsMaxVisibleUsers(), z.string.Declension.DATIVE),
+              },
+              replaceDangerously,
             };
 
-            return z.l10n.safeHtml(createStringId, unsafeSubstitutions, tagSubstitutions);
+            return z.l10n.safeHtml(createStringId, substitutions);
           }
 
           if (this.user().is_me) {
@@ -152,33 +154,41 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
               ? z.string.conversationCreatedYouMore
               : z.string.conversationCreatedYou;
 
-            unsafeSubstitutions = {
-              count: this.hiddenUserCount(),
-              users: this._generateNameString(this.exceedsMaxVisibleUsers()),
+            substitutions = {
+              replace: {
+                count: this.hiddenUserCount(),
+                users: this._generateNameString(this.exceedsMaxVisibleUsers()),
+              },
+              replaceDangerously,
             };
 
-            return z.l10n.safeHtml(createStringId, unsafeSubstitutions, tagSubstitutions);
+            return z.l10n.safeHtml(createStringId, substitutions);
           }
 
           const createStringId = this.exceedsMaxVisibleUsers()
             ? z.string.conversationCreatedMore
             : z.string.conversationCreated;
 
-          unsafeSubstitutions = {
-            count: this.hiddenUserCount(),
-            name: this.senderName(),
-            users: this._generateNameString(this.exceedsMaxVisibleUsers(), z.string.Declension.DATIVE),
+          substitutions = {
+            replace: {
+              count: this.hiddenUserCount(),
+              name: this.senderName(),
+              users: this._generateNameString(this.exceedsMaxVisibleUsers(), z.string.Declension.DATIVE),
+            },
+            replaceDangerously,
           };
 
-          return z.l10n.safeHtml(createStringId, unsafeSubstitutions, tagSubstitutions);
+          return z.l10n.safeHtml(createStringId, substitutions);
         }
 
         case z.message.SystemMessageType.CONVERSATION_RESUME: {
-          unsafeSubstitutions = {
-            users: this._generateNameString(false, z.string.Declension.DATIVE),
+          substitutions = {
+            replace: {
+              users: this._generateNameString(false, z.string.Declension.DATIVE),
+            },
           };
 
-          return z.l10n.safeHtml(z.string.conversationResume, unsafeSubstitutions);
+          return z.l10n.safeHtml(z.string.conversationResume, substitutions);
         }
 
         default:
@@ -207,13 +217,16 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
               : z.string.conversationMemberJoined;
           }
 
-          unsafeSubstitutions = {
-            count: this.hiddenUserCount(),
-            name: this.senderName(),
-            users: this._generateNameString(this.exceedsMaxVisibleUsers()),
+          substitutions = {
+            replace: {
+              count: this.hiddenUserCount(),
+              name: this.senderName(),
+              users: this._generateNameString(this.exceedsMaxVisibleUsers()),
+            },
+            replaceDangerously,
           };
 
-          return z.l10n.safeHtml(userJoinedStringId, unsafeSubstitutions, tagSubstitutions);
+          return z.l10n.safeHtml(userJoinedStringId, substitutions);
         }
 
         case z.event.Backend.CONVERSATION.MEMBER_LEAVE: {
@@ -234,9 +247,9 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
             ? z.string.conversationMemberRemovedYou
             : z.string.conversationMemberRemoved;
 
-          unsafeSubstitutions = {name: this.senderName(), users: this._generateNameString()};
+          substitutions = {replace: {name: this.senderName(), users: this._generateNameString()}};
 
-          return z.l10n.safeHtml(userRemovedStringId, unsafeSubstitutions);
+          return z.l10n.safeHtml(userRemovedStringId, substitutions);
         }
 
         case z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE: {
