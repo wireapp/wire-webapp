@@ -66,10 +66,11 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
       const selfUser = joinedUserEntities.find(userEntity => userEntity.is_me);
       const visibleUsers = joinedUserEntities.filter(userEntity => !userEntity.is_me);
       if (this.exceedsMaxVisibleUsers()) {
-        visibleUsers.splice(MemberMessage.CONFIG.REDUCED_USERS_COUNT);
+        const spliceCount = MemberMessage.CONFIG.REDUCED_USERS_COUNT;
+        visibleUsers.splice(selfUser ? spliceCount - 1 : spliceCount);
       }
       if (selfUser) {
-        visibleUsers.splice(-1, 1, selfUser);
+        visibleUsers.push(selfUser);
       }
       this.visibleUsers(visibleUsers);
     });
