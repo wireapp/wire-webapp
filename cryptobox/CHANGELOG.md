@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="8.5.13"></a>
+## [8.5.13](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/compare/@wireapp/cryptobox@8.5.12...@wireapp/cryptobox@8.5.13) (2018-07-12)
+
+
+### Bug Fixes
+
+* **cryptobox:** Add missing dependency ([#831](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/issues/831)) ([85cf38c](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/commit/85cf38c))
+
+
+
+
 <a name="8.5.12"></a>
 ## [8.5.12](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/compare/@wireapp/cryptobox@8.5.11...@wireapp/cryptobox@8.5.12) (2018-07-12)
 

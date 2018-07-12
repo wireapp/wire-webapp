@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="3.11.0"></a>
+# [3.11.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@3.10.8...@wireapp/core@3.11.0) (2018-07-12)
+
+
+### Features
+
+* **core:** Export conversation event content types ([#829](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/829)) ([a5a4dd8](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/a5a4dd8))
+
+
+
+
 <a name="3.10.8"></a>
 ## [3.10.8](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@3.10.7...@wireapp/core@3.10.8) (2018-07-12)
 
