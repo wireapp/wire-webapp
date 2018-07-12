@@ -650,8 +650,7 @@ z.string.preferencesOptionsCallLogsDetail = 'This information helps Wire Support
 
 z.string.preferencesOptionsBackupHeader = 'History';
 z.string.preferencesOptionsBackupExportHeadline = 'Back up conversations';
-z.string.preferencesOptionsBackupExportSecondary =
-  'Create a backup to preserve your conversation history. You can use this to restore history if you lose your computer or switch to a new one.\nThe backup file is not protected by Wire end-to-end encryption, so store it in a safe place.';
+z.string.preferencesOptionsBackupExportSecondary = 'Create a backup to preserve your conversation history. You can use this to restore history if you lose your computer or switch to a new one.\nThe backup file is not protected by Wire end-to-end encryption, so store it in a safe place.';
 z.string.preferencesOptionsBackupImportHeadline = 'Restore from backup';
 z.string.preferencesOptionsBackupImportSecondary = 'You can only restore history from a backup of the same platform. Your backup will overwrite the conversations that you may have on this device.';
 
