@@ -65,6 +65,7 @@
       }
     ],
     "no-const-assign": 2,
+    "no-undef": 2,
     "no-dupe-class-members": 2,
     "no-else-return": 2,
     "no-lonely-if": 2,
