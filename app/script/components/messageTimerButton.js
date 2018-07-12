@@ -80,7 +80,7 @@ ko.components.register('message-timer-button', {
       <!-- /ko -->
 
       <!-- ko ifnot: hasMessageTimer() -->
-        <hourglass-icon class="button-icon-large"></hourglass-icon>
+        <timer-icon class="button-icon-large"></timer-icon>
       <!-- /ko -->
     </span>
     `,
