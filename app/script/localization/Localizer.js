@@ -69,29 +69,29 @@ z.l10n = (() => {
   const replaceWithString = (string, substitute) => string.replace(/{{\w+}}/, substitute);
 
   return {
-    safeHtml(value, unsafeSubstitute, safeSubstitutes = {}) {
+    safeHtml(value, substitutions = {}) {
       let string = z.util.SanitizationUtil.escapeString(ko.unwrap(value));
 
-      if (unsafeSubstitute) {
-        if (_.isObject(unsafeSubstitute)) {
-          const escapedSubstitutes = Object.entries(unsafeSubstitute).map(([identifier, substitute]) => {
-            return [identifier, z.util.SanitizationUtil.escapeString(substitute)];
-          });
-          string = replaceWithArray(string, escapedSubstitutes);
-        } else if (_.isString(unsafeSubstitute)) {
-          const escapedSubstitute = z.util.SanitizationUtil.escapeString(unsafeSubstitute);
-          string = replaceWithString(string, escapedSubstitute);
-        }
+      if (_.isString(substitutions)) {
+        const escapedSubstitute = z.util.SanitizationUtil.escapeString(substitutions);
+        string = replaceWithString(string, escapedSubstitute);
       }
 
-      safeSubstitutes = {
+      if (substitutions.replace) {
+        const escapedSubstitutes = Object.entries(substitutions.replace).map(([identifier, unescapedSubstitute]) => {
+          return [identifier, z.util.SanitizationUtil.escapeString(unescapedSubstitute)];
+        });
+        string = replaceWithArray(string, escapedSubstitutes);
+      }
+
+      const replaceDangerously = {
         '\\/bold': '</b>',
         '\\/italic': '</i>',
         bold: '<b>',
         italic: '<i>',
-        ...safeSubstitutes,
+        ...substitutions.replaceDangerously,
       };
-      return replaceTags(string, safeSubstitutes);
+      return replaceTags(string, replaceDangerously);
     },
 
     /**

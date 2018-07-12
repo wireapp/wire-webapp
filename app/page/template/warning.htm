@@ -4,7 +4,7 @@
     <div class="warning" data-bind="css:{'warning-dimmed': warningDimmed}">
       <!-- ko if: visibleWarning() === z.viewModel.WarningsViewModel.TYPE.REQUEST_CAMERA -->
         <div class="warning-bar warning-bar-feature bg-theme">
-          <div class="warning-bar-message" data-bind="l10nSafeHtml: {'id': z.string.warningPermissionRequestCamera, 'safeSubstitute': '<span class=\'warning-bar-icon icon-camera\'></span>'}"></div>
+          <div class="warning-bar-message" data-bind="l10nSafeHtml: {'id': z.string.warningPermissionRequestCamera, 'substitutions': {'replaceDangerously': {'icon': '<span class=\'warning-bar-icon icon-camera\'></span>'}}}"></div>
           <span class="warning-bar-close icon-close button-icon" data-bind="click: closeWarning"></span>
         </div>
       <!-- /ko -->
@@ -21,7 +21,7 @@
 
       <!-- ko if: visibleWarning() === z.viewModel.WarningsViewModel.TYPE.REQUEST_MICROPHONE -->
         <div class="warning-bar warning-bar-feature bg-theme">
-          <div class="warning-bar-message" data-bind="l10nSafeHtml: {'id': z.string.warningPermissionRequestMicrophone, 'safeSubstitute': '<span class=\'warning-bar-icon icon-microphone\'></span>'}"></div>
+          <div class="warning-bar-message" data-bind="l10nSafeHtml: {'id': z.string.warningPermissionRequestMicrophone, 'substitutions': {'replaceDangerously': {'icon': '<span class=\'warning-bar-icon icon-microphone\'></span>'}}}"></div>
           <span class="warning-bar-close icon-close button-round button-round-dark" data-bind="click: closeWarning"></span>
         </div>
       <!-- /ko -->
@@ -38,7 +38,7 @@
 
       <!-- ko if: visibleWarning() === z.viewModel.WarningsViewModel.TYPE.REQUEST_SCREEN -->
         <div class="warning-bar warning-bar-feature bg-theme">
-          <div class="warning-bar-message" data-bind="l10nSafeHtml: {'id': z.string.warningPermissionRequestScreen, 'safeSubstitute': '<span class=\'warning-bar-icon icon-screensharing\'></span>'}"></div>
+          <div class="warning-bar-message" data-bind="l10nSafeHtml: {'id': z.string.warningPermissionRequestScreen, 'substitutions': {'replaceDangerously': {'icon': '<span class=\'warning-bar-icon icon-screensharing\'></span>'}}}"></div>
           <span class="warning-bar-close icon-close button-icon" data-bind="click: closeWarning"></span>
         </div>
       <!-- /ko -->
@@ -75,7 +75,7 @@
 
       <!-- ko if: visibleWarning() === z.viewModel.WarningsViewModel.TYPE.REQUEST_NOTIFICATION -->
         <div class="warning-bar warning-bar-feature bg-theme">
-          <div class="warning-bar-message" data-bind="l10nSafeHtml: {'id': z.string.warningPermissionRequestNotification, 'safeSubstitute': '<span class=\'warning-bar-icon icon-envelope\'></span>'}"></div>
+          <div class="warning-bar-message" data-bind="l10nSafeHtml: {'id': z.string.warningPermissionRequestNotification, 'substitutions': {'replaceDangerously': {'icon': '<span class=\'warning-bar-icon icon-envelope\'></span>'}}}"></div>
           <span class="warning-bar-close icon-close button-round button-round-dark" data-bind="click: closeWarning" data-uie-name="do-close-warning"></span>
         </div>
       <!-- /ko -->

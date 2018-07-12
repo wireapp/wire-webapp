@@ -636,7 +636,7 @@ z.string.preferencesOptionsContactsMacos = 'Import from Contacts';
 z.string.preferencesOptionsContactsDetail = 'We use your contact data to connect you with others. We anonymize all information and do not share it with anyone else.';
 z.string.preferencesOptionsPopular = 'By popular demand';
 z.string.preferencesOptionsEmojiReplaceCheckbox = 'Replace type emoticons with emojis';
-z.string.preferencesOptionsEmojiReplaceDetail = ':-) → {{icon}}';
+z.string.preferencesOptionsEmojiReplaceDetail = ':-) → [icon]';
 z.string.preferencesOptionsPreviewsSendCheckbox = 'Create previews for links you send';
 z.string.preferencesOptionsPreviewsSendDetail = 'Previews may still be shown for links from other people.';
 z.string.preferencesOptionsNotifications = 'Notifications';
@@ -751,10 +751,10 @@ z.string.warningNotFoundMicrophone = 'You cannot call because your computer does
 z.string.warningPermissionDeniedCamera = 'You cannot call because your browser does not have access to the camera.';
 z.string.warningPermissionDeniedMicrophone = 'You cannot call because your browser does not have access to the microphone.';
 z.string.warningPermissionDeniedScreen = 'Your browser needs permission to share your screen.';
-z.string.warningPermissionRequestCamera = '{{icon}} Allow access to camera';
-z.string.warningPermissionRequestMicrophone = '{{icon}} Allow access to microphone';
-z.string.warningPermissionRequestNotification = '{{icon}} Allow notifications';
-z.string.warningPermissionRequestScreen = '{{icon}} Allow access to screen';
+z.string.warningPermissionRequestCamera = '[icon] Allow access to camera';
+z.string.warningPermissionRequestMicrophone = '[icon] Allow access to microphone';
+z.string.warningPermissionRequestNotification = '[icon] Allow notifications';
+z.string.warningPermissionRequestScreen = '[icon] Allow access to screen';
 
 // User Availability
 z.string.userAvailabilityAvailable = 'Available';
