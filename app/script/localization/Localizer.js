@@ -84,13 +84,14 @@ z.l10n = (() => {
         string = replaceWithArray(string, escapedSubstitutes);
       }
 
-      const replaceDangerously = {
+      const defaultReplacements = {
         '\\/bold': '</b>',
         '\\/italic': '</i>',
         bold: '<b>',
         italic: '<i>',
-        ...substitutions.replaceDangerously,
       };
+      const replaceDangerously = Object.assign({}, defaultReplacements, substitutions.replaceDangerously);
+
       return replaceTags(string, replaceDangerously);
     },
 
