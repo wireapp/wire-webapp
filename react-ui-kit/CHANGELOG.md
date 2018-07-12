@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="1.5.7"></a>
+## [1.5.7](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@1.5.6...@wireapp/react-ui-kit@1.5.7) (2018-07-12)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Adjust button min-width from 184px to 150px ([#824](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/824)) ([84d12f0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/84d12f0))
+
+
+
+
 <a name="1.5.6"></a>
 ## [1.5.6](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@1.5.5...@wireapp/react-ui-kit@1.5.6) (2018-07-11)
 
