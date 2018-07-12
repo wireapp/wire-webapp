@@ -6,8 +6,10 @@
     "@wireapp/priority-queue": "0.1.57",
     "@wireapp/proteus": "7.2.9",
     "@wireapp/store-engine": "0.11.43",
+    "bazinga64": "5.2.11",
     "dexie": "2.0.4",
-    "fs-extra": "6.0.1"
+    "fs-extra": "6.0.1",
+    "logdown": "3.2.3"
   },
   "description": "High-level API with persistent storage for Proteus.",
   "devDependencies": {
@@ -29,7 +31,6 @@
     "karma-jasmine": "1.1.2",
     "karma-jasmine-diff-reporter": "1.2.0",
     "karma-sourcemap-loader": "0.3.7",
-    "logdown": "3.2.3",
     "pure-uuid": "1.5.3",
     "rimraf": "2.6.2",
     "run-sequence": "2.2.1",
