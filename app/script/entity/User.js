@@ -122,13 +122,13 @@ z.entity.User = class User {
     this.name = ko.observable('');
     this.first_name = ko.pureComputed(() => {
       const [firstName] = this.name().split(' ');
-      return firstName ? z.util.SanitizationUtil.escapeString(firstName) : '';
+      return firstName || '';
     });
 
     this.last_name = ko.pureComputed(() => {
       const nameParts = this.name().split(' ');
       if (nameParts.length > 1) {
-        return z.util.SanitizationUtil.escapeString(nameParts.pop());
+        return nameParts.pop();
       }
     });
 

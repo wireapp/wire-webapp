@@ -45,7 +45,7 @@
     </div>
     <div class="message-header-label">
       <span class="message-header-sender-name" data-bind='text: message.sender_name()'></span>
-      <span class="ellipsis" data-bind="html: message.caption()"></span>
+      <span class="ellipsis" data-bind="text: message.caption()"></span>
     </div>
     <div class="message-body-actions">
       <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp}"></time>
@@ -291,14 +291,14 @@
       <span class="icon-sysmsg-error text-red"></span>
     </div>
     <div class="message-header-label ellipsis">
-      <span data-bind="html: caption"></span>
+      <span data-bind="html: caption()"></span>
       <span>&nbsp;</span>
       <a class="text-theme" data-bind="l10n_text: z.string.conversationUnableToDecryptLink, attr: {'href': link}" rel="nofollow noopener noreferrer" target="_blank"></a>
       <hr class="message-header-line" />
     </div>
   </div>
   <div class="message-body message-body-decrypt-error">
-    <div class="message-header-decrypt-error-label" data-bind="html: error_message"></div>
+    <div class="message-header-decrypt-error-label" data-bind="html: error_message()"></div>
     <!-- ko if: message.is_recoverable -->
       <div class="message-header-decrypt-reset-session">
         <svg class="message-header-decrypt-reset-session-spinner svg-theme spin"

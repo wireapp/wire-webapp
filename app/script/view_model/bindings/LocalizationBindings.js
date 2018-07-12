@@ -48,10 +48,10 @@ ko.bindingHandlers.l10n_text = {
   },
 };
 
-ko.bindingHandlers.l10n_html = {
+ko.bindingHandlers.l10nSafeHtml = {
   update(element, valueAccessor = z.util.noop) {
-    const {id = valueAccessor(), substitute} = valueAccessor();
-    ko.utils.setHtml(element, z.l10n.text(id, substitute));
+    const {id = valueAccessor(), unsafeSubstitute, safeSubstitute} = valueAccessor();
+    ko.utils.setHtml(element, z.l10n.safeHtml(id, unsafeSubstitute, safeSubstitute));
   },
 };
 

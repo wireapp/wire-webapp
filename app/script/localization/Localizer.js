@@ -48,17 +48,45 @@ class Localizer {
 z.localization.Localizer = new Localizer();
 
 z.l10n = (() => {
-  const replaceWithString = (string, substitute) => string.replace(/{{\w+}}/, substitute);
-
-  const replaceWithObject = (string, substitutions) => {
-    Object.entries(substitutions).forEach(([identifier, substitute]) => {
+  const replaceWithArray = (string, substitutions) => {
+    substitutions.forEach(([identifier, substitute]) => {
       string = string.replace(new RegExp(`{{${identifier}}}`, 'g'), substitute);
     });
 
     return string;
   };
 
+  const replaceWithObject = (string, substitutions) => replaceWithArray(Object.entries(substitutions));
+
+  const replaceWithString = (string, substitute) => string.replace(/{{\w+}}/, substitute);
+
   return {
+    safeHtml(value, unsafeSubstitute, safeSubstitute) {
+      let string = z.util.SanitizationUtil.escapeString(ko.unwrap(value));
+
+      if (unsafeSubstitute) {
+        if (_.isObject(unsafeSubstitute)) {
+          const escapedSubstitutes = Object.entries(unsafeSubstitute).map(([identifier, substitute]) => {
+            return [identifier, z.util.SanitizationUtil.escapeString(substitute)];
+          });
+          string = replaceWithArray(string, escapedSubstitutes);
+        } else if (_.isString(unsafeSubstitute)) {
+          const escapedSubstitute = z.util.SanitizationUtil.escapeString(unsafeSubstitute);
+          string = replaceWithString(string, escapedSubstitute);
+        }
+      }
+
+      if (safeSubstitute) {
+        if (_.isObject(safeSubstitute)) {
+          string = replaceWithObject(string, safeSubstitute);
+        } else if (_.isString(safeSubstitute)) {
+          string = replaceWithString(string, safeSubstitute);
+        }
+      }
+
+      return string;
+    },
+
     /**
      * Retrieve localized string and replace placeholders
      *
@@ -80,7 +108,7 @@ z.l10n = (() => {
       if (_.isObject(substitute)) {
         return replaceWithObject(string, substitute);
       }
-      if (_.isString(value)) {
+      if (_.isString(substitute)) {
         return replaceWithString(string, substitute);
       }
       return string;
