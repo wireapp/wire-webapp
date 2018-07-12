@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="1.5.8"></a>
+## [1.5.8](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@1.5.7...@wireapp/react-ui-kit@1.5.8) (2018-07-12)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Adjust line-height and text color ([#826](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/826)) ([d43fd9a](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/d43fd9a))
+
+
+
+
 <a name="1.5.7"></a>
 ## [1.5.7](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@1.5.6...@wireapp/react-ui-kit@1.5.7) (2018-07-12)
 
