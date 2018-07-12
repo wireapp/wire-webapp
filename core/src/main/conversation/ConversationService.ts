@@ -33,18 +33,23 @@ import {Encoder} from 'bazinga64';
 import {
   AssetService,
   ClientActionType,
-  ConfirmationContent,
   ConfirmationType,
   GenericMessageType,
-  ImageAssetContent,
-  ImageContent,
   MessageTimer,
   PayloadBundleOutgoing,
   PayloadBundleOutgoingUnsent,
   PayloadBundleState,
+} from '../conversation/root';
+
+import {
+  ClientActionContent,
+  ConfirmationContent,
+  ImageAssetContent,
+  ImageContent,
   RemoteData,
   TextContent,
-} from '../conversation/root';
+} from '../conversation/content/';
+
 import * as AssetCryptography from '../cryptography/AssetCryptography.node';
 import {CryptographyService, EncryptedAsset} from '../cryptography/root';
 
@@ -347,11 +352,13 @@ export default class ConversationService {
   ): Promise<PayloadBundleOutgoingUnsent> {
     const imageAsset = await this.assetService.uploadImageAsset(image);
 
+    const content: ImageAssetContent = {
+      asset: imageAsset,
+      image,
+    };
+
     return {
-      content: {
-        asset: imageAsset,
-        image,
-      },
+      content,
       from: this.apiClient.context!.userId,
       id: messageId,
       state: PayloadBundleState.OUTGOING_UNSENT,
@@ -361,8 +368,10 @@ export default class ConversationService {
   }
 
   public createText(text: string, messageId: string = ConversationService.createId()): PayloadBundleOutgoingUnsent {
+    const content: TextContent = {text};
+
     return {
-      content: {text},
+      content,
       from: this.apiClient.context!.userId,
       id: messageId,
       state: PayloadBundleState.OUTGOING_UNSENT,
@@ -375,8 +384,9 @@ export default class ConversationService {
     confirmMessageId: string,
     messageId: string = ConversationService.createId()
   ): PayloadBundleOutgoingUnsent {
+    const content: ConfirmationContent = {confirmMessageId};
     return {
-      content: {confirmMessageId},
+      content,
       from: this.apiClient.context!.userId,
       id: messageId,
       state: PayloadBundleState.OUTGOING_UNSENT,
@@ -396,8 +406,11 @@ export default class ConversationService {
   }
 
   public createSessionReset(messageId: string = ConversationService.createId()): PayloadBundleOutgoingUnsent {
+    const content: ClientActionContent = {
+      clientAction: ClientActionType.RESET_SESSION,
+    };
     return {
-      content: ClientActionType.RESET_SESSION,
+      content,
       from: this.apiClient.context!.userId,
       id: messageId,
       state: PayloadBundleState.OUTGOING_UNSENT,
