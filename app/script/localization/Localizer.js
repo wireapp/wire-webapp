@@ -48,6 +48,14 @@ class Localizer {
 z.localization.Localizer = new Localizer();
 
 z.l10n = (() => {
+  const replaceTags = (string, tagSubstitutes) => {
+    Object.values(tagSubstitutes).forEach(([identifier, substitute]) => {
+      string = string.replace(new RegExp(`\\[${identifier}\\]`, 'g'), substitute);
+    });
+
+    return string;
+  };
+
   const replaceWithArray = (string, substitutions) => {
     substitutions.forEach(([identifier, substitute]) => {
       string = string.replace(new RegExp(`{{${identifier}}}`, 'g'), substitute);
@@ -61,7 +69,7 @@ z.l10n = (() => {
   const replaceWithString = (string, substitute) => string.replace(/{{\w+}}/, substitute);
 
   return {
-    safeHtml(value, unsafeSubstitute, safeSubstitute) {
+    safeHtml(value, unsafeSubstitute, safeSubstitutes = {}) {
       let string = z.util.SanitizationUtil.escapeString(ko.unwrap(value));
 
       if (unsafeSubstitute) {
@@ -76,15 +84,14 @@ z.l10n = (() => {
         }
       }
 
-      if (safeSubstitute) {
-        if (_.isObject(safeSubstitute)) {
-          string = replaceWithObject(string, safeSubstitute);
-        } else if (_.isString(safeSubstitute)) {
-          string = replaceWithString(string, safeSubstitute);
-        }
-      }
-
-      return string;
+      safeSubstitutes = {
+        '\\/bold': '</b>',
+        '\\/italic': '</i>',
+        bold: '<b>',
+        italic: '<i>',
+        ...safeSubstitutes,
+      };
+      return replaceTags(string, safeSubstitutes);
     },
 
     /**
