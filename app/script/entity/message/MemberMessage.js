@@ -127,8 +127,10 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
                 return z.l10n.safeHtml(z.string.conversationCreateTeam);
               }
 
-              const teamStringId =
-                guestCount === 1 ? z.string.conversationCreateTeamGuest : z.string.conversationCreateTeamGuests;
+              const hasSingleGuest = guestCount === 1;
+              const teamStringId = hasSingleGuest
+                ? z.string.conversationCreateTeamGuest
+                : z.string.conversationCreateTeamGuests;
 
               substitutions = {replace: {count: guestCount}, replaceDangerously};
               return z.l10n.safeHtml(teamStringId, substitutions);
@@ -248,7 +250,6 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
             : z.string.conversationMemberRemoved;
 
           substitutions = {replace: {name: this.senderName(), users: this._generateNameString()}};
-
           return z.l10n.safeHtml(userRemovedStringId, substitutions);
         }
 
