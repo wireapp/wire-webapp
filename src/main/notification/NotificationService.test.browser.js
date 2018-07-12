@@ -25,9 +25,8 @@ const Client = require('@wireapp/api-client');
 const UUIDVersion = 4;
 
 describe('NotificationService', () => {
+  let storeName = undefined;
   describe('Database "setLastEventDate"', () => {
-    let storeName = undefined;
-
     afterEach(done => {
       if (storeName) {
         const deleteRequest = window.indexedDB.deleteDatabase(storeName);
