@@ -199,6 +199,7 @@ z.event.WebSocketService = class WebSocketService {
       this.socket.close();
       window.clearInterval(this.pingIntervalId);
       window.clearTimeout(this.reconnectTimeoutId);
+      this.lastPingTime = undefined;
     }
 
     if (reconnect) {
