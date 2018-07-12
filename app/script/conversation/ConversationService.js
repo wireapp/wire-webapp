@@ -476,7 +476,7 @@ z.conversation.ConversationService = class ConversationService {
    */
   load_event_from_db(conversationId, messageId) {
     if (!conversationId || !messageId) {
-      this.logger.error(`Cannot get event '${messageId}' in conversation '${conversation_id}' without IDs`);
+      this.logger.error(`Cannot get event '${messageId}' in conversation '${conversationId}' without IDs`);
       throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND);
     }
 
