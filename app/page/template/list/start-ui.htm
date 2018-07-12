@@ -114,6 +114,12 @@
   </div>
 
   <!-- ko if: showNoContacts() -->
+    <ul class="start-ui-create-group left-list-items">
+      <li class="left-list-item left-list-item-clickable" data-bind="click: clickOnCreateGroup" data-uie-name="go-create-group">
+        <group-icon class="left-column-icon"></group-icon>
+        <div class="center-column" data-bind="l10n_text: z.string.searchCreateGroup"></div>
+      </li>
+    </ul>
     <div class="start-ui-import-container">
       <div>
         <h1 class="start-ui-import-headline" data-bind="l10n_text: z.string.searchInviteHeadline"></h1>
