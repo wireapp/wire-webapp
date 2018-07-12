@@ -21,4 +21,4 @@ export {NewTeamInvitation, TeamInvitation, TeamInvitationAPI, TeamInvitationChun
 export {MemberAPI, MemberData, PermissionsData} from './member';
 export {NewTeamData, TeamAPI, TeamChunkData, TeamData, TeamInfo} from './team';
 export {PaymentAPI, PaymentData} from './payment';
-export {TeamError, InviteEmailInUseError} from './TeamError';
+export {TeamError, InviteEmailInUseError, InvalidInvitationCodeError} from './TeamError';
