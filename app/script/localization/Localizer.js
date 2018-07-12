@@ -115,10 +115,8 @@ z.l10n = (() => {
       if (_.isObject(substitute)) {
         return replaceWithObject(string, substitute);
       }
-      if (_.isString(substitute)) {
-        return replaceWithString(string, substitute);
-      }
-      return string;
+
+      return _.isString(value) ? replaceWithString(string, substitute) : string;
     },
   };
 })();
