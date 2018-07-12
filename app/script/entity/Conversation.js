@@ -202,7 +202,7 @@ z.entity.Conversation = class Conversation {
 
       if (this.is_group()) {
         if (this.name()) {
-          return z.util.SanitizationUtil.escapeString(this.name());
+          return this.name();
         }
 
         const hasUserEntities = !!this.participating_user_ets().length;
@@ -214,8 +214,7 @@ z.entity.Conversation = class Conversation {
             .join(', ');
 
           const maxLength = z.conversation.ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;
-          const nameString = z.util.SanitizationUtil.escapeString(joinedNames);
-          return z.util.StringUtil.truncate(nameString, maxLength, false);
+          return z.util.StringUtil.truncate(joinedNames, maxLength, false);
         }
 
         const hasUserIds = !!this.participating_user_ids().length;

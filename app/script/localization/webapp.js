@@ -357,8 +357,8 @@ z.string.conversationToday = 'today';
 z.string.conversationVoiceChannelDeactivate = ' called';
 z.string.conversationVoiceChannelDeactivateYou = ' called';
 z.string.conversationYesterday = 'Yesterday';
-z.string.conversationUnableToDecrypt1 = 'A message from {{user}} was not received.';
-z.string.conversationUnableToDecrypt2 = '{{user}}´s device identity changed. Undelivered message.';
+z.string.conversationUnableToDecrypt1 = 'A message from [highlight]{{user}}[/highlight] was not received.';
+z.string.conversationUnableToDecrypt2 = '[highlight]{{user}}[/highlight]´s device identity changed. Undelivered message.';
 z.string.conversationUnableToDecryptLink = 'Why?';
 z.string.conversationUnableToDecryptErrorMessage = 'Error';
 z.string.conversationUnableToDecryptResetSession = 'Reset session';
@@ -636,7 +636,7 @@ z.string.preferencesOptionsContactsMacos = 'Import from Contacts';
 z.string.preferencesOptionsContactsDetail = 'We use your contact data to connect you with others. We anonymize all information and do not share it with anyone else.';
 z.string.preferencesOptionsPopular = 'By popular demand';
 z.string.preferencesOptionsEmojiReplaceCheckbox = 'Replace type emoticons with emojis';
-z.string.preferencesOptionsEmojiReplaceDetail = ':-) → {{icon}}';
+z.string.preferencesOptionsEmojiReplaceDetail = ':-) → [icon]';
 z.string.preferencesOptionsPreviewsSendCheckbox = 'Create previews for links you send';
 z.string.preferencesOptionsPreviewsSendDetail = 'Previews may still be shown for links from other people.';
 z.string.preferencesOptionsNotifications = 'Notifications';
@@ -650,7 +650,8 @@ z.string.preferencesOptionsCallLogsDetail = 'This information helps Wire Support
 
 z.string.preferencesOptionsBackupHeader = 'History';
 z.string.preferencesOptionsBackupExportHeadline = 'Back up conversations';
-z.string.preferencesOptionsBackupExportSecondary = 'Create a backup to preserve your conversation history. You can use this to restore history if you lose your computer or switch to a new one.\nThe backup file is not protected by Wire end-to-end encryption, so store it in a safe place.';
+z.string.preferencesOptionsBackupExportSecondary =
+  'Create a backup to preserve your conversation history. You can use this to restore history if you lose your computer or switch to a new one.\nThe backup file is not protected by Wire end-to-end encryption, so store it in a safe place.';
 z.string.preferencesOptionsBackupImportHeadline = 'Restore from backup';
 z.string.preferencesOptionsBackupImportSecondary = 'You can only restore history from a backup of the same platform. Your backup will overwrite the conversations that you may have on this device.';
 
@@ -750,10 +751,10 @@ z.string.warningNotFoundMicrophone = 'You cannot call because your computer does
 z.string.warningPermissionDeniedCamera = 'You cannot call because your browser does not have access to the camera.';
 z.string.warningPermissionDeniedMicrophone = 'You cannot call because your browser does not have access to the microphone.';
 z.string.warningPermissionDeniedScreen = 'Your browser needs permission to share your screen.';
-z.string.warningPermissionRequestCamera = '{{icon}} Allow access to camera';
-z.string.warningPermissionRequestMicrophone = '{{icon}} Allow access to microphone';
-z.string.warningPermissionRequestNotification = '{{icon}} Allow notifications';
-z.string.warningPermissionRequestScreen = '{{icon}} Allow access to screen';
+z.string.warningPermissionRequestCamera = '[icon] Allow access to camera';
+z.string.warningPermissionRequestMicrophone = '[icon] Allow access to microphone';
+z.string.warningPermissionRequestNotification = '[icon] Allow notifications';
+z.string.warningPermissionRequestScreen = '[icon] Allow access to screen';
 
 // User Availability
 z.string.userAvailabilityAvailable = 'Available';

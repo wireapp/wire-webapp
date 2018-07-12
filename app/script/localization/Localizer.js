@@ -48,17 +48,53 @@ class Localizer {
 z.localization.Localizer = new Localizer();
 
 z.l10n = (() => {
-  const replaceWithString = (string, substitute) => string.replace(/{{\w+}}/, substitute);
+  const replaceTags = (string, tagSubstitutes) => {
+    Object.entries(tagSubstitutes).forEach(([identifier, substitute]) => {
+      string = string.replace(new RegExp(`\\[${identifier}\\]`, 'g'), substitute);
+    });
 
-  const replaceWithObject = (string, substitutions) => {
-    Object.entries(substitutions).forEach(([identifier, substitute]) => {
+    return string;
+  };
+
+  const replaceWithArray = (string, substitutions) => {
+    substitutions.forEach(([identifier, substitute]) => {
       string = string.replace(new RegExp(`{{${identifier}}}`, 'g'), substitute);
     });
 
     return string;
   };
 
+  const replaceWithObject = (string, substitutions) => replaceWithArray(string, Object.entries(substitutions));
+
+  const replaceWithString = (string, substitute) => string.replace(/{{\w+}}/, substitute);
+
   return {
+    safeHtml(value, substitutions = {}) {
+      let string = z.util.SanitizationUtil.escapeString(ko.unwrap(value));
+
+      if (_.isString(substitutions)) {
+        const escapedSubstitute = z.util.SanitizationUtil.escapeString(substitutions);
+        string = replaceWithString(string, escapedSubstitute);
+      }
+
+      if (substitutions.replace) {
+        const escapedSubstitutes = Object.entries(substitutions.replace).map(([identifier, unescapedSubstitute]) => {
+          return [identifier, z.util.SanitizationUtil.escapeString(unescapedSubstitute)];
+        });
+        string = replaceWithArray(string, escapedSubstitutes);
+      }
+
+      const defaultReplacements = {
+        '\\/bold': '</b>',
+        '\\/italic': '</i>',
+        bold: '<b>',
+        italic: '<i>',
+      };
+      const replaceDangerously = Object.assign({}, defaultReplacements, substitutions.replaceDangerously);
+
+      return replaceTags(string, replaceDangerously);
+    },
+
     /**
      * Retrieve localized string and replace placeholders
      *
@@ -80,10 +116,8 @@ z.l10n = (() => {
       if (_.isObject(substitute)) {
         return replaceWithObject(string, substitute);
       }
-      if (_.isString(value)) {
-        return replaceWithString(string, substitute);
-      }
-      return string;
+
+      return _.isString(value) ? replaceWithString(string, substitute) : string;
     },
   };
 })();
