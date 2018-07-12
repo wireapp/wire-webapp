@@ -34,14 +34,19 @@ z.entity.DecryptErrorMessage = class DecryptErrorMessage extends z.entity.Messag
     this.error_code = '';
     this.client_id = '';
 
-    this.caption = ko.pureComputed(() => {
-      const firstName = z.util.SanitizationUtil.escapeString(this.user().first_name());
-      const content = `<span class='label-bold-xs'>${firstName}</span>`;
-      const string_id = this.is_remote_identity_changed()
+    this.htmlCaption = ko.pureComputed(() => {
+      const stringId = this.is_remote_identity_changed()
         ? z.string.conversationUnableToDecrypt2
         : z.string.conversationUnableToDecrypt1;
 
-      return z.l10n.text(string_id, content);
+      const unsafeSubstitutions = {user: this.user().first_name()};
+
+      const tagSubstitutions = {
+        '\\/highlight': '</span>',
+        highlight: '<span class="label-bold-xs">',
+      };
+
+      return z.l10n.safeHtml(stringId, unsafeSubstitutions, tagSubstitutions);
     });
 
     this.link = ko.pureComputed(() => {
@@ -75,5 +80,7 @@ z.entity.DecryptErrorMessage = class DecryptErrorMessage extends z.entity.Messag
         return `(${parts.join(' ')})`;
       }
     });
+
+    this.htmlErrorMessage = this.error_message;
   }
 };

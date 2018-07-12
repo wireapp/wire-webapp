@@ -291,14 +291,14 @@
       <span class="icon-sysmsg-error text-red"></span>
     </div>
     <div class="message-header-label ellipsis">
-      <span data-bind="html: caption()"></span>
+      <span data-bind="html: htmlCaption()"></span>
       <span>&nbsp;</span>
       <a class="text-theme" data-bind="l10n_text: z.string.conversationUnableToDecryptLink, attr: {'href': link}" rel="nofollow noopener noreferrer" target="_blank"></a>
       <hr class="message-header-line" />
     </div>
   </div>
   <div class="message-body message-body-decrypt-error">
-    <div class="message-header-decrypt-error-label" data-bind="html: error_message()"></div>
+    <div class="message-header-decrypt-error-label" data-bind="html: htmlErrorMessage()"></div>
     <!-- ko if: message.is_recoverable -->
       <div class="message-header-decrypt-reset-session">
         <svg class="message-header-decrypt-reset-session-spinner svg-theme spin"

@@ -90,7 +90,7 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
 
     this.otherUser = ko.pureComputed(() => (this.hasUsers() ? this.userEntities()[0] : new z.entity.User()));
 
-    this.caption = ko.pureComputed(() => {
+    this.htmlCaption = ko.pureComputed(() => {
       if (!this.hasUsers()) {
         return '';
       }
@@ -248,7 +248,7 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
       return '';
     });
 
-    this.groupCreationHeader = ko.pureComputed(() => {
+    this.htmlGroupCreationHeader = ko.pureComputed(() => {
       if (this.showNamedCreation()) {
         if (this.user().isTemporaryGuest()) {
           return z.l10n.safeHtml(z.string.conversationCreateTemporary);
