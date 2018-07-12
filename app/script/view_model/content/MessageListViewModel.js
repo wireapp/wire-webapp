@@ -423,7 +423,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
   getSystemMessageIconComponent(message) {
     const iconComponents = {
       [z.message.SystemMessageType.CONVERSATION_RENAME]: 'edit-icon',
-      [z.message.SystemMessageType.CONVERSATION_MESSAGE_TIMER_UPDATE]: 'hourglass-icon',
+      [z.message.SystemMessageType.CONVERSATION_MESSAGE_TIMER_UPDATE]: 'timer-icon',
     };
     return iconComponents[message.system_message_type];
   }
