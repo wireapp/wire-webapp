@@ -26,7 +26,7 @@ const {Account} = require('@wireapp/core');
 const {Config} = require('@wireapp/api-client/dist/commonjs/Config');
 const {MemoryEngine} = require('@wireapp/store-engine');
 
-const {version} = require('../../package.json');
+const {name, version} = require('../../package.json');
 const logger = logdown('@wireapp/core/StatusBot', {
   logger: console,
   markdown: false,
@@ -35,8 +35,14 @@ const logger = logdown('@wireapp/core/StatusBot', {
 const CONVERSATION_ARGUMENT_INDEX = 2;
 const conversationId = process.argv[CONVERSATION_ARGUMENT_INDEX];
 if (!conversationId) {
-  logger.error(`Error: Conversation id is not set. Example: status-bot.js "c94a6e69-7718-406b-b834-df4144e5a65b".`);
+  logger.error(`Conversation ID is not set. Example: status-bot.js "c94a6e69-7718-406b-b834-df4144e5a65b".`);
   process.exit(1);
+}
+
+const MESSAGE_INDEX = 3;
+const message = process.argv[MESSAGE_INDEX];
+if (!message) {
+  logger.warn(`Message is not set. Will post a default message.`);
 }
 
 ['WIRE_STATUS_BOT_EMAIL', 'WIRE_STATUS_BOT_PASSWORD'].forEach((envVar, index, array) => {
@@ -61,8 +67,9 @@ if (!conversationId) {
     const account = new Account(apiClient);
     await account.login(login);
 
-    const payload = await account.service.conversation.createText(`I am posting from @wireapp/core v${version}. 🌞`);
-    await account.service.conversation.send(conversationId, payload);
+    const text = message || `I am posting from ${name} v${version}. 🌞`;
+    const payload = account.service.conversation.createText(text);
+    await account.service.conversation.send(message, payload);
   } catch (error) {
     logger.error('Error:', error.stack);
   }
