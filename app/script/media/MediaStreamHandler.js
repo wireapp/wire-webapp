@@ -462,7 +462,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
       const mediaStream = mediaStreamInfo.stream;
 
       if (!callNeedsMediaStream) {
-        this.logger.warn(`Releasing obsolete MediaStream as call '${callEntity.id}' is no longer active`, callEntity);
+        this.logger.warn(`Releasing obsolete MediaStream as call '${conversationId}' is no longer active`, callEntity);
         return this._releaseMediaStream(mediaStream);
       }
 
