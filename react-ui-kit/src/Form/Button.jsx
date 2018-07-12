@@ -40,7 +40,7 @@ const Button = Text.withComponent('button').extend`
   max-width: 100%;
   outline: none;
   padding: 0 32px;
-  min-width: 184px;
+  min-width: 150px;
   width: ${props => (props.block ? '100%' : 'auto')};
   &:hover,
   &:focus {
