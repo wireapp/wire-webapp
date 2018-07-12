@@ -17,34 +17,10 @@
  *
  */
 
-import {ImageContent} from '../../conversation/content/';
-import {EncryptedAsset} from '../../cryptography/root';
+import {ClientActionType} from '../../conversation/root';
 
-// https://github.com/wireapp/generic-message-proto/blob/v1.20.0/proto/messages.proto#L201
-interface RemoteData {
-  assetId: string;
-  otrKey: Uint8Array | Buffer;
-  sha256: Uint8Array | Buffer;
-  assetToken?: string;
+interface ClientActionContent {
+  clientAction: ClientActionType;
 }
 
-interface Original {
-  mimeType: string;
-  size: number;
-  image?: {
-    height: number;
-    width: number;
-  };
-}
-
-interface AssetContent {
-  uploaded: RemoteData;
-  original: Original;
-}
-
-interface ImageAssetContent {
-  asset: EncryptedAsset & {key: string; token: string};
-  image: ImageContent;
-}
-
-export {AssetContent, ImageAssetContent, Original, RemoteData};
+export {ClientActionContent};
