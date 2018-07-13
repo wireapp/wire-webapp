@@ -151,7 +151,7 @@ z.conversation.EventMapper = class EventMapper {
         messageEntity = this._mapEventVoiceChannelDeactivate(event);
         break;
       default:
-        this.logger.warn(`Ignored unhandled event ${event.id ? `'${event.id}' ` : ''}of type '${event.type}'`, event);
+        this.logger.warn(`Ignored unhandled '${event.type}' event ${event.id ? `'${event.id}' ` : ''}`, event);
         throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND);
     }
 
