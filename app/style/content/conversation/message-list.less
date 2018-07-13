@@ -103,8 +103,7 @@
   .flex-center;
 
   width: @conversation-message-sender-width;
-  height: @avatar-diameter-xs;
-  margin-top: -6px;
+  max-height: @avatar-diameter-xs;
   color: @graphite-dark;
 
   &--svg {
@@ -120,7 +119,7 @@
   display: flex;
   min-width: 0; // fixes ellipsis not working with flexbox (FF)
   flex: 1;
-  align-items: flex-start;
+  align-items: center;
   font-size: 12px;
   font-weight: @font-weight-regular;
   white-space: pre-wrap;
@@ -137,10 +136,9 @@
     font-weight: @font-weight-bold;
     text-transform: capitalize;
   }
-
-  & > span,
-  & > a {
-    margin-top: -6px;
+  & > hr {
+    align-self: flex-start;
+    margin-top: 12px;
   }
 }
 
@@ -198,6 +196,10 @@
   margin-bottom: 16px;
   line-height: 40px;
   user-select: none;
+
+  .message-header-icon {
+    max-height: 40px;
+  }
 
   &:not(.message-timestamp-visible) {
     display: none;
@@ -392,7 +394,6 @@
 // MESSAGE - ACTIONS
 .message-body-actions {
   position: absolute;
-  top: 0;
   right: 0;
   width: @conversation-message-timestamp-width;
   height: @line-height-lg;
