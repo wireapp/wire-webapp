@@ -54,10 +54,8 @@ z.l10n = (() => {
     if (isStringOrNumber(substitute)) {
       return string.replace(regex, substitute);
     }
-    return string.replace(
-      regex,
-      (found, content) => (substitute.hasOwnProperty(content) ? substitute[content] : found)
-    );
+    const replaceFunction = (found, content) => (substitute.hasOwnProperty(content) ? substitute[content] : found);
+    return string.replace(regex, replaceFunction);
   };
 
   return {
