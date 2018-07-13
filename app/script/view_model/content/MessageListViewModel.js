@@ -269,15 +269,15 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
 
   /**
    * Checks how to scroll message list and if conversation should be marked as unread.
-   * @param {Array} messageDiffs - List of the messages that were added or removed from the list
+   * @param {Array} changedMessages - List of the messages that were added or removed from the list
    * @returns {undefined} No return value
    */
-  _scrollAddedMessagesIntoView(messageDiffs) {
+  _scrollAddedMessagesIntoView(changedMessages) {
     const messages_container = $('.messages-wrap');
-    const lastAddedItem = messageDiffs
+    const lastAddedItem = changedMessages
       .slice()
       .reverse()
-      .find(messageDiff => messageDiff.status === 'added');
+      .find(changedMessage => changedMessage.status === 'added');
 
     // We are only interested in items that were added
     if (!lastAddedItem) {
