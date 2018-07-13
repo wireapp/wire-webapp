@@ -35,7 +35,6 @@ CSP = {
     'https://api.mixpanel.com',
     'https://api.raygun.io',
     'https://apis.google.com',
-    'https://maps.googleapis.com',
     'https://wire.com',
     'https://www.google.com',
     'wss://*.zinfra.io',
