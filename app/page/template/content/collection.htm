@@ -22,7 +22,7 @@
                 <span class="collection-header-icon icon-library"></span>
                 <span class="label-bold-xs" data-bind="l10n_text: z.string.collectionSectionImages"></span>
                 <!-- ko if: images().length > 12 -->
-                  <span class="collection-header-all text-theme" data-bind="click: function() { clickOnSection('images', images()) }"><span data-bind="l10nSafeHtml: {'id': z.string.collectionShowAll, 'substitutions': images().length}" data-uie-name="collection-show-all"></span>&nbps;<span class="icon-forward font-size-xxs"></span></span>
+                  <span class="collection-header-all text-theme" data-bind="click: function() { clickOnSection('images', images()) }"><span data-bind="l10nSafeHtml: {'id': z.string.collectionShowAll, 'substitutions': images().length}" data-uie-name="collection-show-all"></span>&nbsp;<span class="icon-forward font-size-xxs"></span></span>
                 <!-- /ko -->
               </header>
               <div class="collection-images" data-bind="foreach: {data: images.slice(0, 12), as: 'messageEntity'}">
