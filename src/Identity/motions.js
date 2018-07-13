@@ -43,29 +43,37 @@ export const EASE = {
 
 export const ANIMATION = {
   bottomUpMovement: keyframes`
-  0% {
-    transform: translateY(100%);
-  }
-  100% {
-    transform: translateY(0);
-  }
-`,
+    0% {
+      transform: translateY(100%);
+    }
+    100% {
+      transform: translateY(0);
+    }
+  `,
   fadeIn: keyframes`
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-`,
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  `,
   rotate: keyframes`
-  0% {
-    transform: rotate(0);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-`,
+    0% {
+      transform: rotate(0);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  `,
+  topDownMovement: keyframes`
+    0% {
+      transform: translateY(-100%);
+    }
+    100% {
+      transform: translateY(0);
+    }
+  `,
 };
 
 export const defaultTransition = 'transition: all 0.24s;';
