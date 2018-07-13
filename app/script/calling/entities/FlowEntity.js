@@ -357,6 +357,10 @@ z.calling.entities.FlowEntity = class FlowEntity {
     this.callLogger.info(logMessage);
 
     this._createPeerConnection().then(() => {
+      if (!mediaStream) {
+        throw new z.media.MediaError(z.media.MediaError.TYPE.STREAM_NOT_FOUND);
+      }
+
       this._addMediaStream(mediaStream);
       this.audio.hookup(true);
       this._setSdpStates();
