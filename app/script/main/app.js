@@ -763,7 +763,7 @@ z.main.App = class App {
         }
 
         const redirectToLogin = signOutReason !== z.auth.SIGN_OUT_REASON.NOT_SIGNED_IN;
-        const forcedAppLogin = z.util.Environment.desktop && z.window.location.hash === '#login';
+        const forcedAppLogin = z.util.Environment.desktop && window.location.hash === '#login';
         if (redirectToLogin || forcedAppLogin) {
           url = `${url}#login`;
         }
