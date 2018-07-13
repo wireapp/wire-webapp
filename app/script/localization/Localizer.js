@@ -51,11 +51,10 @@ z.l10n = (() => {
   const isStringOrNumber = toTest => _.isString(toTest) || _.isNumber(toTest);
 
   const replaceSubstitute = (string, regex, substitute) => {
-    if (isStringOrNumber(substitute)) {
-      return string.replace(regex, substitute);
-    }
-    const replaceFunction = (found, content) => (substitute.hasOwnProperty(content) ? substitute[content] : found);
-    return string.replace(regex, replaceFunction);
+    const replacement = isStringOrNumber(substitute)
+      ? substitute
+      : (found, content) => (substitute.hasOwnProperty(content) ? substitute[content] : found);
+    return string.replace(regex, replacement);
   };
 
   return {
