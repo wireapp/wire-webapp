@@ -278,12 +278,13 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
       .slice()
       .reverse()
       .find(messageDiff => messageDiff.status === 'added');
-    const lastMessage = lastAddedItem.value;
 
     // We are only interested in items that were added
     if (!lastAddedItem) {
       return;
     }
+
+    const lastMessage = lastAddedItem.value;
 
     if (lastMessage) {
       // Message was prepended
