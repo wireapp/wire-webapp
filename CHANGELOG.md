@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="3.12.0"></a>
+# [3.12.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@3.11.2...@wireapp/core@3.12.0) (2018-07-13)
+
+
+### Features
+
+* **core:** Map assets ([#836](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/836)) ([3ebe869](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/3ebe869))
+
+
+
+
 <a name="3.11.2"></a>
 ## [3.11.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@3.11.1...@wireapp/core@3.11.2) (2018-07-13)
 
