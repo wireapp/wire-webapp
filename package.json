@@ -30,7 +30,7 @@
     "@bower_components/speakingurl": "pid/speakingurl#v14.0.1",
     "@bower_components/uint32": "fxa/uint32.js#0.2.1",
     "@bower_components/underscore": "jashkenas/underscore#1.8.3",
-    "@bower_components/url-search-params-polyfill": "jerrybendy/url-search-params-polyfill#4.0.0",
+    "@bower_components/url-search-params-polyfill": "jerrybendy/url-search-params-polyfill#4.0.1",
     "@bower_components/uuid": "LiosK/UUID.js#4.0.3",
     "@bower_components/webapp-module-bubble": "wireapp/webapp-module-bubble#1.1.1",
     "@bower_components/webapp-module-logger": "wireapp/webapp-module-logger#1.1.1",
