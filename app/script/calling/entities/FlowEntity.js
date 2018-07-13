@@ -128,7 +128,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
 
         case z.calling.rtc.ICE_CONNECTION_STATE.FAILED: {
           if (this.callEntity.selfClientJoined()) {
-            this._removeParticipant();
+            this._removeDroppedParticipant();
           }
           break;
         }
@@ -378,15 +378,12 @@ z.calling.entities.FlowEntity = class FlowEntity {
    * @param {z.calling.enum.TERMINATION_REASON} [terminationReason] - Reason for termination
    * @returns {undefined} No return value
    */
-  _removeParticipant(terminationReason) {
+  _removeDroppedParticipant(terminationReason) {
     this.participantEntity.isConnected(false);
 
+    const deletionTerminationReason = z.calling.enum.TERMINATION_REASON.CONNECTION_DROP;
     this.callEntity
-      .deleteParticipant(
-        this.participantEntity.id,
-        this.remoteClientId,
-        z.calling.enum.TERMINATION_REASON.CONNECTION_DROP
-      )
+      .deleteParticipant(this.participantEntity.id, this.remoteClientId, deletionTerminationReason)
       .then(() => {
         if (!this.callEntity.participants().length) {
           if (!terminationReason) {
@@ -1103,7 +1100,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
     const attributes = {cause: name, location: sdpSource, step: 'set_sdp', type: sdpType};
     this.callEntity.telemetry.track_event(z.tracking.EventName.CALLING.FAILED_RTC, undefined, attributes);
 
-    this._removeParticipant(z.calling.enum.TERMINATION_REASON.SDP_FAILED);
+    this._removeDroppedParticipant(z.calling.enum.TERMINATION_REASON.SDP_FAILED);
   }
 
   /**
@@ -1114,7 +1111,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
   _setNegotiationFailedTimeout() {
     this.negotiationTimeout = window.setTimeout(() => {
       this.callLogger.info('Removing call participant on negotiation timeout');
-      this._removeParticipant(z.calling.enum.TERMINATION_REASON.RENEGOTIATION);
+      this._removeDroppedParticipant(z.calling.enum.TERMINATION_REASON.RENEGOTIATION);
     }, FlowEntity.CONFIG.NEGOTIATION_FAILED_TIMEOUT);
   }
 
