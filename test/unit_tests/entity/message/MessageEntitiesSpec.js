@@ -99,6 +99,12 @@ describe('Message Entities', () => {
       it('has_asset_text return true', () => {
         expect(message_et.has_asset_text()).toBeTruthy();
       });
+
+      it('isObfuscated returns false if it is ephemeral and still sending', () => {
+        message_et.status(z.message.StatusType.SENDING);
+        message_et.ephemeral_expires(12312123);
+        expect(message_et.isObfuscated()).toBeFalsy();
+      });
     });
   });
 });
