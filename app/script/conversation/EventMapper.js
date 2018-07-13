@@ -48,9 +48,11 @@ z.conversation.EventMapper = class EventMapper {
           try {
             return this._mapJsonEvent(event, conversationEntity, createDummyImage);
           } catch (error) {
-            const errorMessage = `Failure while mapping events. Affected type '${event.type}': ${error.message}`;
+            const errorMessage = `Failure while mapping events. Affected '${event.type}' event: ${error.message}`;
             this.logger.error(errorMessage, {error, event});
-            Raygun.send(new Error(errorMessage), {eventType: event.type});
+
+            const customData = {eventTime: new Date(event.time).toISOString(), eventType: event.type};
+            Raygun.send(new Error(errorMessage), customData);
           }
         })
         .filter(messageEntity => messageEntity);
@@ -74,9 +76,11 @@ z.conversation.EventMapper = class EventMapper {
           throw error;
         }
 
-        const errorMessage = `Failure while mapping event. Affected type '${event.type}': ${error.message}`;
+        const errorMessage = `Failure while mapping event. Affected '${event.type}' event: ${error.message}`;
         this.logger.error(errorMessage, {error, event});
-        Raygun.send(new Error(errorMessage), {eventType: event.type});
+
+        const customData = {eventTime: new Date(event.time).toISOString(), eventType: event.type};
+        Raygun.send(new Error(errorMessage), customData);
 
         throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND);
       });
