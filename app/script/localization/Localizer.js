@@ -117,7 +117,8 @@ z.l10n = (() => {
         return replaceWithObject(string, substitute);
       }
 
-      return _.isString(value) ? replaceWithString(string, substitute) : string;
+      const isSingleSubstitute = _.isString(substitute) || _.isNumber(substitute);
+      return isSingleSubstitute ? replaceWithString(string, substitute) : string;
     },
   };
 })();
