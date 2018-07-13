@@ -48,51 +48,42 @@ class Localizer {
 z.localization.Localizer = new Localizer();
 
 z.l10n = (() => {
-  const replaceTags = (string, tagSubstitutes) => {
-    Object.entries(tagSubstitutes).forEach(([identifier, substitute]) => {
-      string = string.replace(new RegExp(`\\[${identifier}\\]`, 'g'), substitute);
-    });
+  const isStringOrNumber = toTest => _.isString(toTest) || _.isNumber(toTest);
 
-    return string;
+  const replaceSubstitute = (string, regex, substitute) => {
+    if (isStringOrNumber(substitute)) {
+      return string.replace(regex, substitute);
+    }
+    return string.replace(
+      regex,
+      (found, content) => (substitute.hasOwnProperty(content) ? substitute[content] : found)
+    );
   };
-
-  const replaceWithArray = (string, substitutions) => {
-    substitutions.forEach(([identifier, substitute]) => {
-      string = string.replace(new RegExp(`{{${identifier}}}`, 'g'), substitute);
-    });
-
-    return string;
-  };
-
-  const replaceWithObject = (string, substitutions) => replaceWithArray(string, Object.entries(substitutions));
-
-  const replaceWithString = (string, substitute) => string.replace(/{{\w+}}/, substitute);
 
   return {
     safeHtml(value, substitutions = {}) {
-      let string = z.util.SanitizationUtil.escapeString(ko.unwrap(value));
-
-      if (_.isString(substitutions)) {
-        const escapedSubstitute = z.util.SanitizationUtil.escapeString(substitutions);
-        string = replaceWithString(string, escapedSubstitute);
-      }
-
-      if (substitutions.replace) {
-        const escapedSubstitutes = Object.entries(substitutions.replace).map(([identifier, unescapedSubstitute]) => {
-          return [identifier, z.util.SanitizationUtil.escapeString(unescapedSubstitute)];
-        });
-        string = replaceWithArray(string, escapedSubstitutes);
-      }
+      const replace = isStringOrNumber(substitutions) ? substitutions : substitutions.replace;
 
       const defaultReplacements = {
-        '\\/bold': '</b>',
-        '\\/italic': '</i>',
+        '/bold': '</b>',
+        '/italic': '</i>',
         bold: '<b>',
         italic: '<i>',
       };
+
       const replaceDangerously = Object.assign({}, defaultReplacements, substitutions.replaceDangerously);
 
-      return replaceTags(string, replaceDangerously);
+      let string = value;
+
+      if (replace !== undefined) {
+        string = replaceSubstitute(string, /{{(.+?)}}/g, replace);
+      }
+
+      string = z.util.SanitizationUtil.escapeString(string);
+
+      string = replaceSubstitute(string, /\[(.+?)\]/g, replaceDangerously);
+
+      return string;
     },
 
     /**
@@ -111,13 +102,8 @@ z.l10n = (() => {
      * @returns {string} - string with substituted placeholders
      */
     text(value, substitute) {
-      const string = z.util.SanitizationUtil.escapeString(ko.unwrap(value));
-
-      if (_.isObject(substitute)) {
-        return replaceWithObject(string, substitute);
-      }
-
-      return _.isString(value) ? replaceWithString(string, substitute) : string;
+      const string = replaceSubstitute(value, /{{(.+?)}}/g, substitute);
+      return z.util.SanitizationUtil.escapeString(string);
     },
   };
 })();

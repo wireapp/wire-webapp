@@ -98,7 +98,7 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
 
       let substitutions;
       const replaceDangerously = {
-        '\\/showmore': '</a>',
+        '/showmore': '</a>',
         showmore: '<a class="message-header-show-more" data-uie-name="do-show-more">',
       };
 
