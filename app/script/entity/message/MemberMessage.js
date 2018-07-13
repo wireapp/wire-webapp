@@ -123,8 +123,9 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
             const exceedsMaxTeam = this.joinedUserEntities().length > MemberMessage.CONFIG.MAX_WHOLE_TEAM_USERS_VISIBLE;
             if (this.allTeamMembers && exceedsMaxTeam) {
               const guestCount = this.joinedUserEntities().filter(userEntity => userEntity.isGuest()).length;
+              substitutions = {replace: {count: guestCount}, replaceDangerously};
               if (!guestCount) {
-                return z.l10n.safeHtml(z.string.conversationCreateTeam);
+                return z.l10n.safeHtml(z.string.conversationCreateTeam, substitutions);
               }
 
               const hasSingleGuest = guestCount === 1;
@@ -132,7 +133,6 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
                 ? z.string.conversationCreateTeamGuest
                 : z.string.conversationCreateTeamGuests;
 
-              substitutions = {replace: {count: guestCount}, replaceDangerously};
               return z.l10n.safeHtml(teamStringId, substitutions);
             }
 

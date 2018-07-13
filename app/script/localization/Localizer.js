@@ -72,8 +72,8 @@ z.l10n = (() => {
     safeHtml(value, substitutions = {}) {
       let string = z.util.SanitizationUtil.escapeString(ko.unwrap(value));
 
-      if (_.isString(substitutions)) {
-        const escapedSubstitute = z.util.SanitizationUtil.escapeString(substitutions);
+      if (_.isString(substitutions) || _.isNumber(substitutions)) {
+        const escapedSubstitute = z.util.SanitizationUtil.escapeString(`${substitutions}`);
         string = replaceWithString(string, escapedSubstitute);
       }
 
