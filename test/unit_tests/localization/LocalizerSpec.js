@@ -38,6 +38,11 @@ describe('l10n', () => {
       expect(text).toBe('Hey Tod');
     });
 
+    it('can replace placeholders in localized strings using shorthand number version', () => {
+      const text = z.l10n.text('Number {{name}} is alive', 5);
+      expect(text).toBe('Number 5 is alive');
+    });
+
     it('can replace placeholders in localized strings using an object', () => {
       const text = z.l10n.text('Hey {{name}}', {name: 'Tod'});
       expect(text).toBe('Hey Tod');
