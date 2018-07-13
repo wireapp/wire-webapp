@@ -73,7 +73,7 @@ z.l10n = (() => {
 
       const replaceDangerously = Object.assign({}, defaultReplacements, substitutions.replaceDangerously);
 
-      let string = value;
+      let string = ko.unwrap(value);
 
       if (replace !== undefined) {
         string = replaceSubstitute(string, /{{(.+?)}}/g, replace);
@@ -102,7 +102,8 @@ z.l10n = (() => {
      * @returns {string} - string with substituted placeholders
      */
     text(value, substitute) {
-      const string = replaceSubstitute(value, /{{(.+?)}}/g, substitute);
+      let string = ko.unwrap(value);
+      string = replaceSubstitute(string, /{{(.+?)}}/g, substitute);
       return z.util.SanitizationUtil.escapeString(string);
     },
   };
