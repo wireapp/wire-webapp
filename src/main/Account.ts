@@ -53,6 +53,7 @@ import {SelfService} from './self/root';
 const logdown = require('logdown');
 import Client = require('@wireapp/api-client');
 import EventEmitter = require('events');
+import {AssetContent, DeletedContent, HiddenContent, TextContent} from './conversation/content/';
 
 class Account extends EventEmitter {
   private readonly logger: any = logdown('@wireapp/core/Account', {
@@ -289,10 +290,11 @@ class Account extends EventEmitter {
   private mapGenericMessage(genericMessage: any, event: ConversationOtrMessageAddEvent): PayloadBundleIncoming {
     switch (genericMessage.content) {
       case GenericMessageType.TEXT: {
+        const content: TextContent = {
+          text: genericMessage.text.content,
+        };
         return {
-          content: {
-            text: genericMessage.text.content,
-          },
+          content,
           conversation: event.conversation,
           from: event.from,
           id: genericMessage.messageId,
@@ -303,10 +305,11 @@ class Account extends EventEmitter {
         };
       }
       case GenericMessageType.DELETED: {
+        const content: DeletedContent = {
+          originalMessageId: genericMessage.deleted.messageId,
+        };
         return {
-          content: {
-            originalMessageId: genericMessage.deleted.messageId,
-          },
+          content,
           conversation: event.conversation,
           from: event.from,
           id: genericMessage.messageId,
@@ -317,11 +320,30 @@ class Account extends EventEmitter {
         };
       }
       case GenericMessageType.HIDDEN: {
+        const content: HiddenContent = {
+          conversationId: genericMessage.hidden.conversationId,
+          originalMessageId: genericMessage.hidden.messageId,
+        };
         return {
-          content: {
-            conversationId: genericMessage.hidden.conversationId,
-            originalMessageId: genericMessage.hidden.messageId,
-          },
+          content,
+          conversation: event.from,
+          from: event.from,
+          id: genericMessage.messageId,
+          messageTimer: 0,
+          state: PayloadBundleState.INCOMING,
+          timestamp: new Date(event.time).getTime(),
+          type: genericMessage.content,
+        };
+      }
+      case GenericMessageType.ASSET: {
+        const content: AssetContent = {
+          abortReason: genericMessage.asset.not_uploaded,
+          original: genericMessage.asset.original,
+          preview: genericMessage.asset.preview,
+          uploaded: genericMessage.asset.uploaded,
+        };
+        return {
+          content,
           conversation: event.from,
           from: event.from,
           id: genericMessage.messageId,
@@ -332,7 +354,7 @@ class Account extends EventEmitter {
         };
       }
       default: {
-        this.logger.warn(`Unhandled event type "${genericMessage.content}": ${genericMessage}`);
+        this.logger.warn(`Unhandled event type "${genericMessage.content}": ${JSON.stringify(genericMessage)}`);
         return {
           conversation: event.conversation,
           from: event.from,

@@ -21,6 +21,13 @@ import {ImageContent} from '../../conversation/content/';
 import {EncryptedAsset} from '../../cryptography/root';
 
 // https://github.com/wireapp/generic-message-proto/blob/v1.20.0/proto/messages.proto#L201
+interface AssetContent {
+  uploaded?: RemoteData;
+  abortReason?: number;
+  original?: Original;
+  preview?: Preview;
+}
+
 interface RemoteData {
   assetId: string;
   otrKey: Uint8Array | Buffer;
@@ -31,15 +38,36 @@ interface RemoteData {
 interface Original {
   mimeType: string;
   size: number;
-  image?: {
-    height: number;
-    width: number;
-  };
+  name?: string;
+  source?: string;
+  caption?: string;
+  image?: ImageMetaData;
+  video?: VideoMetaData;
+  audio?: AudioMetaData;
 }
 
-interface AssetContent {
-  uploaded: RemoteData;
-  original: Original;
+interface ImageMetaData {
+  height: number;
+  width: number;
+  tag?: string;
+}
+
+interface VideoMetaData {
+  height?: number;
+  width?: number;
+  duration?: number;
+}
+
+interface AudioMetaData {
+  duration?: number;
+  loudness?: Uint8Array | Buffer;
+}
+
+interface Preview {
+  mimeType: string;
+  size: number;
+  remote?: RemoteData;
+  image?: ImageMetaData;
 }
 
 interface ImageAssetContent {
@@ -47,4 +75,4 @@ interface ImageAssetContent {
   image: ImageContent;
 }
 
-export {AssetContent, ImageAssetContent, Original, RemoteData};
+export {AssetContent, ImageAssetContent, Original, RemoteData, ImageMetaData, VideoMetaData, AudioMetaData, Preview};
