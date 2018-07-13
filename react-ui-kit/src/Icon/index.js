@@ -18,14 +18,15 @@
  */
 
 export * from './AddPeopleIcon';
-export * from './AudioVideoIcon';
 export * from './ArrowIcon';
 export * from './AttachmentIcon';
+export * from './AudioVideoIcon';
 export * from './CallIcon';
 export * from './CamIcon';
 export * from './CheckIcon';
 export * from './CloseIcon';
 export * from './DeviceIcon';
+export * from './FileIcon';
 export * from './GifIcon';
 export * from './HangupIcon';
 export * from './ImageIcon';

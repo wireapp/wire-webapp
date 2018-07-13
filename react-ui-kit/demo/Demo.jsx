@@ -41,6 +41,7 @@ import {
   DeviceIcon,
   ErrorMessage,
   FacebookIcon,
+  FileIcon,
   Footer,
   Form,
   GifIcon,
@@ -166,29 +167,30 @@ class Demo extends React.PureComponent {
           <Container>
             <H1>Icons</H1>
             <Container style={{alignItems: 'center', display: 'flex', justifyContent: 'space-around'}}>
-              <ProfileIcon />
-              <DeviceIcon height={32} />
-              <TeamIcon />
-              <ArrowIcon direction="up" height={32} />
-              <PlaneIcon height={32} />
-              <SettingsIcon height={32} />
-              <CallIcon height={32} />
-              <MessageIcon height={32} />
-              <TimedIcon height={32} />
-              <ImageIcon height={32} />
-              <AttachmentIcon height={32} />
-              <PingIcon height={32} />
-              <MuteIcon height={32} />
-              <MoreIcon height={32} />
-              <CamIcon width={32} />
-              <SpeakerIcon height={32} />
-              <HangupIcon width={32} />
-              <OptionsIcon height={32} />
-              <AudioVideoIcon height={32} />
-              <WireIcon width={32} />
-              <LeaveIcon height={32} />
               <AddPeopleIcon height={32} />
+              <ArrowIcon direction="up" height={32} />
+              <AttachmentIcon height={32} />
+              <AudioVideoIcon height={32} />
+              <CallIcon height={32} />
+              <CamIcon width={32} />
+              <DeviceIcon height={32} />
+              <FileIcon height={32} />
               <GifIcon width={32} />
+              <HangupIcon width={32} />
+              <ImageIcon height={32} />
+              <LeaveIcon height={32} />
+              <MessageIcon height={32} />
+              <MoreIcon height={32} />
+              <MuteIcon height={32} />
+              <OptionsIcon height={32} />
+              <PingIcon height={32} />
+              <PlaneIcon height={32} />
+              <ProfileIcon />
+              <SettingsIcon height={32} />
+              <SpeakerIcon height={32} />
+              <TeamIcon />
+              <TimedIcon height={32} />
+              <WireIcon width={32} />
             </Container>
             <Line />
             <H1>Brand Icons</H1>
