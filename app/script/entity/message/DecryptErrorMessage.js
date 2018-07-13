@@ -44,7 +44,7 @@ z.entity.DecryptErrorMessage = class DecryptErrorMessage extends z.entity.Messag
           user: this.user().first_name(),
         },
         replaceDangerously: {
-          '\\/highlight': '</span>',
+          '/highlight': '</span>',
           highlight: '<span class="label-bold-xs">',
         },
       };
