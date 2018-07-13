@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="1.6.0"></a>
+# [1.6.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@1.5.9...@wireapp/react-ui-kit@1.6.0) (2018-07-13)
+
+
+### Features
+
+* **react-ui-kit:** Top down animation ([#833](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/833)) ([fae8bd6](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/fae8bd6))
+
+
+
+
 <a name="1.5.9"></a>
 ## [1.5.9](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@1.5.8...@wireapp/react-ui-kit@1.5.9) (2018-07-12)
 
