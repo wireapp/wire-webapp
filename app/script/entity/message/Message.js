@@ -65,7 +65,9 @@ z.entity.Message = class Message {
     });
 
     this.isObfuscated = ko.pureComputed(() => {
-      return this.ephemeral_status() === z.message.EphemeralStatusType.INACTIVE || this.is_expired();
+      const messageIsAtLeastSent = this.status() > z.message.StatusType.SENDING;
+      const isEphemeralInactive = this.ephemeral_status() === z.message.EphemeralStatusType.INACTIVE;
+      return messageIsAtLeastSent && (isEphemeralInactive || this.is_expired());
     });
 
     this.conversation_id = '';
