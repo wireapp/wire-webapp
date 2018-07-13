@@ -470,18 +470,25 @@ z.conversation.ConversationService = class ConversationService {
   /**
    * Load conversation event.
    *
-   * @param {string} conversation_id - ID of conversation
-   * @param {string} message_id - ID of message to retrieve
+   * @param {string} conversationId - ID of conversation
+   * @param {string} messageId - ID of message to retrieve
    * @returns {Promise} Resolves with the stored record
    */
-  load_event_from_db(conversation_id, message_id) {
+  load_event_from_db(conversationId, messageId) {
+    if (!conversationId || !messageId) {
+      this.logger.error(`Cannot get event '${messageId}' in conversation '${conversationId}' without IDs`);
+      const error = new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.MISSING_PARAMETER);
+      return Promise.reject(error);
+    }
+
     return this.storageService.db[this.EVENT_STORE_NAME]
-      .where('conversation')
-      .equals(conversation_id)
-      .filter(record => message_id && record.id === message_id)
+      .where('id')
+      .equals(messageId)
+      .filter(record => record.conversation === conversationId)
       .first()
       .catch(error => {
-        this.logger.error(`Failed to get event for conversation '${conversation_id}': ${error.message}`, error);
+        const logMessage = `Failed to get event '${messageId}' for conversation '${conversationId}': ${error.message}`;
+        this.logger.error(logMessage, error);
         throw error;
       });
   }

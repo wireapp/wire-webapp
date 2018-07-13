@@ -161,11 +161,6 @@ z.event.WebApp = {
   PENDING: {
     SHOW: 'wire.webapp.pending.show',
   },
-  PEOPLE: {
-    HIDE: 'wire.webapp.people.hide',
-    SHOW: 'wire.webapp.people.show',
-    TOGGLE: 'wire.webapp.people.toggle',
-  },
   PREFERENCES: {
     MANAGE_ACCOUNT: 'wire.webapp.preferences.manage_account',
     MANAGE_DEVICES: 'wire.webapp.preferences.manage_devices',

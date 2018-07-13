@@ -24,7 +24,6 @@ import {currentLanguage, currentCurrency} from '../../localeConfig';
 import {deleteLocalStorage, getLocalStorage, setLocalStorage, LocalStorageKey} from './LocalStorageAction';
 import * as ConversationAction from './ConversationAction';
 import * as ClientAction from './ClientAction';
-import * as TrackingAction from './TrackingAction';
 import * as CookieAction from './CookieAction';
 import {ClientType} from '@wireapp/api-client/dist/commonjs/client/index';
 import {APP_INSTANCE_ID} from '../../config';
@@ -55,17 +54,6 @@ function doLoginPlain(loginData, onBeforeLogin, onAfterLogin) {
       .then(() => core.login(loginData, false, ClientAction.generateClientPayload(loginData.clientType)))
       .then(() => persistAuthData(loginData.clientType, core, dispatch))
       .then(() => dispatch(CookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: APP_INSTANCE_ID})))
-      .then(() => {
-        const authenticationContext = loginData.email
-          ? TrackingAction.AUTHENTICATION_CONTEXT.EMAIL
-          : TrackingAction.AUTHENTICATION_CONTEXT.HANDLE;
-
-        const trackingEventData = {
-          attributes: {context: authenticationContext, remember_me: loginData.clientType === ClientType.PERMANENT},
-          name: TrackingAction.EVENT_NAME.ACCOUNT.LOGGED_IN,
-        };
-        return dispatch(TrackingAction.trackEvent(trackingEventData));
-      })
       .then(() => dispatch(SelfAction.fetchSelf()))
       .then(() => onAfterLogin(dispatch, getState, global))
       .then(() => dispatch(ClientAction.doInitializeClient(loginData.clientType, loginData.password)))

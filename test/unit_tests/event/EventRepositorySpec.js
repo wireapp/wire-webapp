@@ -21,6 +21,28 @@
 
 'use strict';
 
+async function createEncodedCiphertext(
+  preKey,
+  text = 'Hello, World!',
+  receivingIdentity = TestFactory.cryptography_repository.cryptobox.identity
+) {
+  const bobEngine = new window.StoreEngine.MemoryEngine();
+  await bobEngine.init('bob');
+
+  const sender = new window.cryptobox.Cryptobox(bobEngine, 1);
+  await sender.create();
+
+  const genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
+  genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT, new z.proto.Text(text));
+
+  const sessionId = `from-${sender.identity.public_key.fingerprint()}-to-${preKey.key_pair.public_key.fingerprint()}`;
+  const preKeyBundle = Proteus.keys.PreKeyBundle.new(receivingIdentity.public_key, preKey);
+
+  const cipherText = await sender.encrypt(sessionId, genericMessage.toArrayBuffer(), preKeyBundle.serialise());
+
+  return z.util.arrayToBase64(cipherText);
+}
+
 describe('Event Repository', () => {
   const test_factory = new TestFactory();
   let last_notification_id = undefined;
@@ -38,6 +60,14 @@ describe('Event Repository', () => {
       },
     };
   })();
+
+  beforeAll(done => {
+    z.util.protobuf
+      .loadProtos('ext/proto/generic-message-proto/messages.proto')
+      .then(() => test_factory.exposeClientActors())
+      .then(done)
+      .catch(done.fail);
+  });
 
   beforeEach(done => {
     test_factory
@@ -217,7 +247,7 @@ describe('Event Repository', () => {
         .catch(done.fail);
     });
 
-    it('accepts conversation.rename events', done => {
+    it('accepts "conversation.rename" events', done => {
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
       const event = {
         conversation: '64dcb45f-bf8d-4eac-a263-649a60d69305',
@@ -239,7 +269,7 @@ describe('Event Repository', () => {
         .catch(done.fail);
     });
 
-    it('accepts conversation.member-join events', done => {
+    it('accepts "conversation.member-join" events', done => {
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
       const event = {
         conversation: '64dcb45f-bf8d-4eac-a263-649a60d69305',
@@ -261,7 +291,7 @@ describe('Event Repository', () => {
         .catch(done.fail);
     });
 
-    it('accepts conversation.member-leave events', done => {
+    it('accepts "conversation.member-leave" events', done => {
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
       const event = {
         conversation: '64dcb45f-bf8d-4eac-a263-649a60d69305',
@@ -283,7 +313,7 @@ describe('Event Repository', () => {
         .catch(done.fail);
     });
 
-    it('accepts conversation.voice-channel-deactivate (missed call) events', done => {
+    it('accepts "conversation.voice-channel-deactivate" (missed call) events', done => {
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
       const event = {
         conversation: '64dcb45f-bf8d-4eac-a263-649a60d69305',
@@ -326,6 +356,39 @@ describe('Event Repository', () => {
           done();
         })
         .catch(done.fail);
+    });
+  });
+
+  describe('_processEvent', () => {
+    it('processes OTR events', done => {
+      const text = 'Hello, this is a test!';
+      const ownClientId = 'f180a823bf0d1204';
+
+      TestFactory.client_repository.currentClient(new z.client.ClientEntity({id: ownClientId}));
+
+      return Promise.resolve()
+        .then(() => TestFactory.cryptography_repository.cryptobox.get_prekey())
+        .then(async preKeyBundle => {
+          const ciphertext = await createEncodedCiphertext(preKeyBundle, text);
+          const event = {
+            conversation: 'fdc6cf1a-4e37-424e-a106-ab3d2cc5c8e0',
+            data: {
+              recipient: ownClientId,
+              sender: '4c28652a6dd21938',
+              text: ciphertext,
+            },
+            from: '6f88716b-1383-44da-9d57-45b51cc64d90',
+            time: '2018-07-10T14:54:21.621Z',
+            type: 'conversation.otr-message-add',
+          };
+          const source = z.event.EventRepository.SOURCE.STREAM;
+          return TestFactory.event_repository._processEvent(event, source);
+        })
+        .then(messagePayload => {
+          expect(messagePayload.data.content).toBe(text);
+          done();
+        })
+        .catch(error => done.fail(error));
     });
   });
 
@@ -477,6 +540,9 @@ describe('Event Repository', () => {
       spyOn(TestFactory.event_repository.conversationService, 'load_event_from_db').and.returnValue(
         Promise.resolve(previously_stored_event)
       );
+      spyOn(TestFactory.event_repository.conversationService, 'update_event').and.returnValue(
+        Promise.resolve(previously_stored_event)
+      );
 
       const initial_time = event.time;
       const changed_time = new Date(new Date(event.time).getTime() + 60 * 1000).toISOString();
@@ -488,7 +554,8 @@ describe('Event Repository', () => {
         .then(saved_event => {
           expect(saved_event.time).toEqual(initial_time);
           expect(saved_event.time).not.toEqual(changed_time);
-          expect(TestFactory.event_repository.conversationService.save_event).toHaveBeenCalled();
+          expect(saved_event.primary_key).toEqual(previously_stored_event.primary_key);
+          expect(TestFactory.event_repository.conversationService.update_event).toHaveBeenCalled();
           done();
         })
         .catch(done.fail);

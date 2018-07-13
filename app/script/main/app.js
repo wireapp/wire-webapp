@@ -87,6 +87,7 @@ z.main.App = class App {
     repositories.audio = this.auth.audio;
     repositories.cache = new z.cache.CacheRepository();
     repositories.giphy = new z.extension.GiphyRepository(this.service.giphy);
+    repositories.location = new z.location.LocationRepository(this.service.location);
     repositories.permission = new z.permission.PermissionRepository();
     repositories.storage = new z.storage.StorageRepository(this.service.storage);
 
@@ -193,6 +194,7 @@ z.main.App = class App {
       giphy: new z.extension.GiphyService(this.auth.client),
       integration: new z.integration.IntegrationService(this.auth.client),
       lifecycle: new z.lifecycle.LifecycleService(),
+      location: new z.location.LocationService(this.auth.client),
       notification: new z.event.NotificationService(this.auth.client, storageService),
       properties: new z.properties.PropertiesService(this.auth.client),
       search: new z.search.SearchService(this.auth.client),
@@ -211,12 +213,7 @@ z.main.App = class App {
     return z.util.Environment.frontend.isProduction()
       ? {}
       : {
-          debug: new z.util.DebugUtil(
-            this.repository.calling,
-            this.repository.conversation,
-            this.repository.user,
-            this.repository.storage
-          ),
+          debug: new z.util.DebugUtil(this.repository),
         };
   }
 

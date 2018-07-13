@@ -42,10 +42,12 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     this.onMessageUserClick = this.onMessageUserClick.bind(this);
     this.on_session_reset_click = this.on_session_reset_click.bind(this);
     this.should_hide_user_avatar = this.should_hide_user_avatar.bind(this);
+    this.bindShowMore = this.bindShowMore.bind(this);
 
     this.mainViewModel = mainViewModel;
     this.conversation_repository = repositories.conversation;
     this.userRepository = repositories.user;
+    this.locationRepository = repositories.location;
     this.logger = new z.util.Logger('z.viewModel.content.MessageListViewModel', z.config.LOGGER.OPTIONS);
 
     this.actionsViewModel = this.mainViewModel.actions;
@@ -383,7 +385,20 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
    * @returns {undefined} No return value
    */
   onMessageUserClick(userEntity) {
-    amplify.publish(z.event.WebApp.PEOPLE.SHOW, userEntity);
+    userEntity = ko.unwrap(userEntity);
+    const conversationEntity = this.conversation_repository.active_conversation();
+    const isSingleModeConversation = conversationEntity.is_one2one() || conversationEntity.is_request();
+
+    if (isSingleModeConversation && !userEntity.is_me) {
+      return this.mainViewModel.panel.togglePanel(z.viewModel.PanelViewModel.STATE.CONVERSATION_DETAILS);
+    }
+
+    const params = {entity: userEntity};
+    const panelId = userEntity.isBot
+      ? z.viewModel.PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE
+      : z.viewModel.PanelViewModel.STATE.GROUP_PARTICIPANT_USER;
+
+    this.mainViewModel.panel.togglePanel(panelId, params);
   }
 
   /**
@@ -408,7 +423,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
   getSystemMessageIconComponent(message) {
     const iconComponents = {
       [z.message.SystemMessageType.CONVERSATION_RENAME]: 'edit-icon',
-      [z.message.SystemMessageType.CONVERSATION_MESSAGE_TIMER_UPDATE]: 'hourglass-icon',
+      [z.message.SystemMessageType.CONVERSATION_MESSAGE_TIMER_UPDATE]: 'timer-icon',
     };
     return iconComponents[message.system_message_type];
   }
@@ -500,7 +515,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
   }
 
   clickOnInvitePeople() {
-    this.mainViewModel.panel.switchState(z.viewModel.PanelViewModel.STATE.GUEST_OPTIONS);
+    this.mainViewModel.panel.togglePanel(z.viewModel.PanelViewModel.STATE.GUEST_OPTIONS);
   }
 
   /**
@@ -568,5 +583,21 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     }
 
     z.ui.Context.from(event, entries, 'message-options-menu');
+  }
+
+  bindShowMore(elements, message) {
+    const label = elements.find(element => element.className === 'message-header-label');
+    if (!label) {
+      return;
+    }
+    const link = label.querySelector('.message-header-show-more');
+    if (link) {
+      link.addEventListener('click', () =>
+        this.mainViewModel.panel.togglePanel(
+          z.viewModel.PanelViewModel.STATE.CONVERSATION_PARTICIPANTS,
+          message.highlightedUsers()
+        )
+      );
+    }
   }
 };

@@ -51,7 +51,7 @@ z.components.LinkPreviewAssetComponent = class LinkPreviewAssetComponent {
 
   on_link_preview_click() {
     if (!this.message_et.is_expired()) {
-      z.util.safeWindowOpen(this.preview.url);
+      z.util.SanitizationUtil.safeWindowOpen(this.preview.url);
     }
   }
 

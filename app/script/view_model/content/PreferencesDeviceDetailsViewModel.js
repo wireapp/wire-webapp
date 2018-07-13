@@ -37,6 +37,7 @@ z.viewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
     this.conversationRepository = repositories.conversation;
     this.cryptographyRepository = repositories.cryptography;
     this.logger = new z.util.Logger('z.viewModel.content.PreferencesDeviceDetailsViewModel', z.config.LOGGER.OPTIONS);
+    this.locationRepository = repositories.location;
 
     this.actionsViewModel = mainViewModel.actions;
     this.selfUser = this.clientRepository.selfUser;
@@ -77,7 +78,7 @@ z.viewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
 
   _updateLocation({lat: latitude, lon: longitude}) {
     if (latitude && longitude) {
-      z.location.getLocation(latitude, longitude).then(mappedLocation => {
+      this.locationRepository.getLocation(latitude, longitude).then(mappedLocation => {
         if (mappedLocation) {
           const {countryCode, place} = mappedLocation;
           this._updateActivationLocation(`${place}, ${countryCode}`);

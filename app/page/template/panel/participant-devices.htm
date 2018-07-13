@@ -1,4 +1,4 @@
-<div id="participant-devices" class="panel__page participant-devices" data-bind="with: $root.participantDevices">
+<div id="participant-devices" class="panel__page participant-devices" data-bind="with: $root.subViews[z.viewModel.PanelViewModel.STATE.PARTICIPANT_DEVICES]">
   <!-- ko if: isVisible() -->
     <div class="panel__header">
       <arrow-left-icon class="icon-button" data-bind="click: clickOnBack" data-uie-name="go-back-participant-devices"></arrow-left-icon>
@@ -16,7 +16,7 @@
           <div class="panel__header__title" data-bind="text: z.util.StringUtil.capitalizeFirstChar(selectedClient().class)"></div>
         <!-- /ko -->
       <!-- /ko -->
-      <close-icon class="icon-button" data-bind="click: clickOnClose" data-uie-name="do-close"></close-icon>
+      <close-icon class="icon-button" data-bind="click: onClose" data-uie-name="do-close"></close-icon>
     </div>
 
     <div class="panel__content">

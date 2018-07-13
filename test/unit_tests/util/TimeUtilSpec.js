@@ -192,28 +192,26 @@ describe('z.util.TimeUtil', () => {
   });
 
   describe('"formatDurationCaption"', () => {
+    let caption;
+
     it('renders hours and minutes correctly', () => {
-      expect(z.util.TimeUtil.formatDurationCaption(ONE_HOUR_IN_MILLIS + ONE_MINUTE_IN_MILLIS)).toEqual(
-        '01:01 remaining'
-      );
+      caption = z.util.TimeUtil.formatDurationCaption(ONE_HOUR_IN_MILLIS + ONE_MINUTE_IN_MILLIS);
+      expect(caption).toEqual('01:01 remaining');
     });
 
     it('renders days and hours:minutes', () => {
-      expect(
-        z.util.TimeUtil.formatDurationCaption(ONE_DAY_IN_MILLIS + ONE_HOUR_IN_MILLIS + ONE_MINUTE_IN_MILLIS)
-      ).toEqual('1 day and 01:01 remaining');
+      caption = z.util.TimeUtil.formatDurationCaption(ONE_DAY_IN_MILLIS + ONE_HOUR_IN_MILLIS + ONE_MINUTE_IN_MILLIS);
+      expect(caption).toEqual('1 day and 01:01 remaining');
     });
 
     it('renders just the days if hours are 0', () => {
-      expect(z.util.TimeUtil.formatDurationCaption(2 * ONE_DAY_IN_MILLIS + ONE_MINUTE_IN_MILLIS)).toEqual(
-        '2 days remaining'
-      );
+      caption = z.util.TimeUtil.formatDurationCaption(2 * ONE_DAY_IN_MILLIS + ONE_MINUTE_IN_MILLIS);
+      expect(caption).toEqual('2 days remaining');
     });
 
     it('renders weeks and days', () => {
-      expect(z.util.TimeUtil.formatDurationCaption(3 * ONE_WEEK_IN_MILLIS + ONE_DAY_IN_MILLIS)).toEqual(
-        '3 weeks and 1 day remaining'
-      );
+      caption = z.util.TimeUtil.formatDurationCaption(3 * ONE_WEEK_IN_MILLIS + ONE_DAY_IN_MILLIS);
+      expect(caption).toEqual('3 weeks and 1 day remaining');
     });
   });
 

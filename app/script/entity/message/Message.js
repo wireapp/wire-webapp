@@ -90,7 +90,7 @@ z.entity.Message = class Message {
       return date.local().format('HH:mm');
     };
 
-    this.sender_name = ko.pureComputed(() => z.util.getFirstName(this.user()), this, {deferEvaluation: true});
+    this.sender_name = ko.pureComputed(() => z.util.SanitizationUtil.getEscapedFirstName(this.user()));
 
     this.accent_color = ko.pureComputed(() => {
       return `accent-color-${this.user().accent_id()}`;

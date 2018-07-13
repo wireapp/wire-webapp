@@ -23,19 +23,19 @@ window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 window.z.viewModel.panel = z.viewModel.panel || {};
 
-z.viewModel.panel.ConversationParticipantsViewModel = class ConversationParticipantsViewModel {
-  constructor(panelViewModel, repositories) {
-    this.panelViewModel = panelViewModel;
-    this.isVisible = this.panelViewModel.conversationParticipantsVisible;
-    const activeConversation = repositories.conversation.active_conversation;
+z.viewModel.panel.ConversationParticipantsViewModel = class ConversationParticipantsViewModel extends z.viewModel.panel
+  .BasePanelViewModel {
+  constructor(params) {
+    super(params);
     this.participants = ko.pureComputed(() => {
-      if (activeConversation()) {
-        return activeConversation()
+      if (this.activeConversation()) {
+        return this.activeConversation()
           .participating_user_ets()
           .filter(userEntity => !userEntity.isBot);
       }
       return [];
     });
+    this.highlightedUsers = ko.observable([]);
     this.searchInput = ko.observable('');
     this.shouldUpdateScrollbar = ko
       .computed(() => (this.participants() || this.searchInput()) && this.isVisible())
@@ -44,19 +44,16 @@ z.viewModel.panel.ConversationParticipantsViewModel = class ConversationParticip
     this.clickOnShowUser = this.clickOnShowUser.bind(this);
   }
 
-  clickOnBack() {
-    this.panelViewModel.switchState(z.viewModel.PanelViewModel.STATE.CONVERSATION_DETAILS, true);
-  }
-
-  clickOnClose() {
-    this.panelViewModel.closePanel();
+  getElementId() {
+    return 'conversation-participants';
   }
 
   clickOnShowUser(userEntity) {
-    this.panelViewModel.showGroupParticipantUser(userEntity);
+    this.navigateTo(z.viewModel.PanelViewModel.STATE.GROUP_PARTICIPANT_USER, {entity: userEntity});
   }
 
-  resetView() {
+  initView(highlightedUsers = []) {
     this.searchInput('');
+    this.highlightedUsers(highlightedUsers);
   }
 };

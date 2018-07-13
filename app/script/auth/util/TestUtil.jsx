@@ -44,7 +44,6 @@ export const mockStore = (
   },
   extraArgument = {
     apiClient,
-    mixpanel: {track: () => 1},
   }
 ) => {
   const middlewares = [thunk.withExtraArgument(extraArgument)];

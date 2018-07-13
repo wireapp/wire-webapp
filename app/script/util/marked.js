@@ -3,6 +3,7 @@
  * Copyright (c) 2011-2014, Christopher Jeffrey. (MIT Licensed)
  * https://github.com/chjj/marked
  */
+/*global define*/
 
 (function() {
   /**
@@ -372,7 +373,7 @@
           const cleanValue = escape(cap.value);
           out +=
             cap.type === 'email'
-              ? `${preString}<a href="${cleanHref}" onclick="z.util.safeMailtoOpen(event, '${cleanHref.replace(
+              ? `${preString}<a href="${cleanHref}" onclick="z.util.SanitizationUtil.safeMailtoOpen(event, '${cleanHref.replace(
                   /^mailto:/,
                   ''
                 )}')">${cleanValue}</a>`

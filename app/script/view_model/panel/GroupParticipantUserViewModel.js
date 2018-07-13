@@ -23,16 +23,13 @@ window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 window.z.viewModel.panel = z.viewModel.panel || {};
 
-z.viewModel.panel.GroupParticipantUserViewModel = class GroupParticipantUserViewModel {
-  constructor(mainViewModel, panelViewModel, repositories) {
-    this.mainViewModel = mainViewModel;
-    this.panelViewModel = panelViewModel;
-    this.conversationRepository = repositories.conversation;
-    this.userRepository = repositories.user;
+z.viewModel.panel.GroupParticipantUserViewModel = class GroupParticipantUserViewModel extends z.viewModel.panel
+  .BasePanelViewModel {
+  constructor(params) {
+    super(params);
+    this.userRepository = this.repositories.user;
+    this.locationRepository = this.repositories.location;
     this.logger = new z.util.Logger('z.viewModel.panel.GroupParticipantUserViewModel', z.config.LOGGER.OPTIONS);
-
-    this.actionsViewModel = this.mainViewModel.actions;
-    this.conversationEntity = this.conversationRepository.active_conversation;
 
     this.availabilityLabel = ko.pureComputed(() => {
       if (this.isVisible() && this.selectedParticipant()) {
@@ -50,22 +47,18 @@ z.viewModel.panel.GroupParticipantUserViewModel = class GroupParticipantUserView
     this.isTemporaryGuest = ko.pureComputed(() => this.selectedParticipant().isTemporaryGuest());
     this.isActivatedAccount = this.mainViewModel.isActivatedAccount;
 
-    this.isVisible = ko.pureComputed(() => {
-      return this.panelViewModel.groupParticipantUserVisible() && this.selectedParticipant();
-    });
-
     this.selectedIsConnected = ko.pureComputed(() => {
       return this.selectedParticipant().is_connected() || this.selectedParticipant().isTeamMember();
     });
     this.selectedIsInConversation = ko.pureComputed(() => {
       if (this.isVisible()) {
-        const participatingUserIds = this.conversationEntity().participating_user_ids();
+        const participatingUserIds = this.activeConversation().participating_user_ids();
         return participatingUserIds.some(id => this.selectedParticipant().id === id);
       }
     });
 
     this.selfIsActiveParticipant = ko.pureComputed(() => {
-      return this.isVisible() ? this.conversationEntity().isActiveParticipant() : false;
+      return this.isVisible() ? this.activeConversation().isActiveParticipant() : false;
     });
 
     this.showActionsIncomingRequest = ko.pureComputed(() => this.selectedParticipant().is_incoming_request());
@@ -86,26 +79,25 @@ z.viewModel.panel.GroupParticipantUserViewModel = class GroupParticipantUserView
       return isNotConnectedUser && canConnect;
     });
     this.showActionLeave = ko.pureComputed(() => {
-      const isActiveParticipant = this.conversationEntity() && !this.conversationEntity().removed_from_conversation();
+      const isActiveParticipant = this.activeConversation() && !this.activeConversation().removed_from_conversation();
       return this.selectedParticipant().is_me && isActiveParticipant;
     });
     this.showActionUnblock = ko.pureComputed(() => this.selectedParticipant().is_blocked());
-    this.showGroupParticipant = this.showGroupParticipant.bind(this);
     this.shouldUpdateScrollbar = ko
       .computed(() => this.selectedParticipant() && this.isVisible())
       .extend({notify: 'always', rateLimit: 500});
   }
 
-  clickOnBack() {
-    this.panelViewModel.switchState(z.viewModel.PanelViewModel.STATE.CONVERSATION_DETAILS, true);
+  getElementId() {
+    return 'group-participant-user';
   }
 
-  clickOnClose() {
-    this.panelViewModel.closePanel().then(didClose => didClose && this.resetView());
+  getEntityId() {
+    return this.selectedParticipant().id;
   }
 
   clickOnDevices() {
-    this.panelViewModel.showParticipantDevices(this.selectedParticipant());
+    this.navigateTo(z.viewModel.PanelViewModel.STATE.PARTICIPANT_DEVICES, {entity: this.selectedParticipant()});
   }
 
   clickOnShowProfile() {
@@ -133,13 +125,13 @@ z.viewModel.panel.GroupParticipantUserViewModel = class GroupParticipantUserView
   }
 
   clickToLeave() {
-    this.actionsViewModel.leaveConversation(this.conversationEntity());
+    this.actionsViewModel.leaveConversation(this.activeConversation());
   }
 
   clickToRemove() {
     this.actionsViewModel
-      .removeFromConversation(this.conversationEntity(), this.selectedParticipant())
-      .then(() => this.panelViewModel.switchState(z.viewModel.PanelViewModel.STATE.CONVERSATION_DETAILS));
+      .removeFromConversation(this.activeConversation(), this.selectedParticipant())
+      .then(this.onGoBack);
   }
 
   clickToSendRequest() {
@@ -150,12 +142,8 @@ z.viewModel.panel.GroupParticipantUserViewModel = class GroupParticipantUserView
     this.actionsViewModel.unblockUser(this.selectedParticipant(), false);
   }
 
-  resetView() {
-    this.selectedParticipant(undefined);
-  }
-
-  showGroupParticipant(user) {
-    const userEntity = ko.unwrap(user);
+  initView({entity: user}) {
+    const userEntity = user;
     this.selectedParticipant(userEntity);
 
     if (userEntity.isTemporaryGuest()) {
