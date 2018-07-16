@@ -24,9 +24,11 @@ import {
   ContainerXS,
   Columns,
   Column,
+  RoundIconButton,
+  InputSubmitCombo,
+  ICON_NAME,
   Form,
   Input,
-  InputBlock,
   H1,
   Text,
   Link,
@@ -134,7 +136,7 @@ class SingleSignOn extends React.PureComponent {
                   <H1 center>{'Company log in'}</H1>
                   <Text>{"Paste here the link from your company's directory"}</Text>
                   <Form style={{marginTop: 30}} data-uie-name="sso">
-                    <InputBlock>
+                    <InputSubmitCombo>
                       <Input
                         name="code"
                         tabIndex="1"
@@ -147,7 +149,7 @@ class SingleSignOn extends React.PureComponent {
                         innerRef={node => (this.inputs.code = node)}
                         markInvalid={!validInputs.code}
                         value={code}
-                        autoComplete="section-login code"
+                        autoComplete="section-login sso-code"
                         placeholder={'PASTE LINK'}
                         maxLength="128"
                         autoFocus
@@ -155,13 +157,19 @@ class SingleSignOn extends React.PureComponent {
                         required
                         data-uie-name="enter-code"
                       />
-                    </InputBlock>
+                      <RoundIconButton
+                        tabIndex="2"
+                        disabled={!code}
+                        type="submit"
+                        formNoValidate
+                        icon={ICON_NAME.ARROW}
+                        onClick={this.handleSubmit}
+                        data-uie-name="do-sso-sign-in"
+                      />
+                    </InputSubmitCombo>
                     {validationErrors.length ? parseValidationErrors(validationErrors) : null}
                     <Button onClick={this.extractSSOLink} data-uie-name="do-paste-sso-code">
                       {'Paste'}
-                    </Button>
-                    <Button onClick={this.handleSubmit} data-uie-name="do-send-sso-code">
-                      {'Submit'}
                     </Button>
                   </Form>
                 </div>
