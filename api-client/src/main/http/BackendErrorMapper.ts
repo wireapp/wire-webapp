@@ -18,7 +18,7 @@
  */
 
 import {BackendError, BackendErrorLabel, StatusCode} from '.';
-import {InvalidCredentialsError, LoginTooFrequentError, SuspendedAccountError} from '../auth';
+import {IdentifierExistsError, InvalidCredentialsError, LoginTooFrequentError, SuspendedAccountError} from '../auth';
 import {ConversationIsUnknownError, ConversationOperationError} from '../conversation';
 import {InviteEmailInUseError} from '../team';
 import {InvalidInvitationCodeError} from '../team/index';
@@ -69,6 +69,11 @@ class BackendErrorMapper {
       [Number(StatusCode.CONFLICT)]: {
         [String(BackendErrorLabel.INVITE_EMAIL_EXISTS)]: {
           ['The given e-mail address is in use.']: new InviteEmailInUseError('The given e-mail address is in use.'),
+        },
+        [String(BackendErrorLabel.KEY_EXISTS)]: {
+          ['The given e-mail address or phone number is in use.']: new IdentifierExistsError(
+            'The given e-mail address or phone number is in use.'
+          ),
         },
       },
     };
