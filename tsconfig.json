@@ -6,7 +6,8 @@
     "noEmitOnError": true,
     "noImplicitReturns": true,
     "noUnusedLocals": true,
+    "rootDir": "app/script",
     "strict": true,
-    "rootDir": "app/script"
+    "target": "ES5"
   }
 }
