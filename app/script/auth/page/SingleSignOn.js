@@ -107,7 +107,7 @@ class SingleSignOn extends React.PureComponent {
 
   extractSSOLink = () => {
     this.readFromClipboard().then(code => {
-      const isValidSSOLink = this.isValidateInput(code);
+      const isValidSSOLink = this.isValidSSOCode(code);
       if (isValidSSOLink) {
         this.setState({code});
       }
@@ -116,7 +116,7 @@ class SingleSignOn extends React.PureComponent {
 
   readFromClipboard = () => navigator.clipboard.readText().catch(error => console.error('Something went wrong', error));
 
-  isValidateInput = inputString => inputString && inputString.includes('sso.wire.com');
+  isValidSSOCode = inputString => inputString && inputString.includes('sso.wire.com');
 
   render() {
     const {
@@ -167,7 +167,7 @@ class SingleSignOn extends React.PureComponent {
                       />
                       <RoundIconButton
                         tabIndex="2"
-                        disabled={!code}
+                        disabled={!this.isValidSSOCode(code)}
                         type="submit"
                         formNoValidate
                         icon={ICON_NAME.ARROW}
