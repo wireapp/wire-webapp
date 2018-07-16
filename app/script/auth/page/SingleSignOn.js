@@ -158,7 +158,7 @@ class SingleSignOn extends React.PureComponent {
 
   readFromClipboard = () => navigator.clipboard.readText().catch(error => console.error('Something went wrong', error));
 
-  isValidSSOCode = code => code && code.includes(SingleSignOn.SSO_CODE_PREFIX) && isUUID(this.stripCode(code));
+  isValidSSOCode = code => code && code.startsWith(SingleSignOn.SSO_CODE_PREFIX) && isUUID(this.stripCode(code));
 
   stripCode = code => code && code.trim().replace(SingleSignOn.SSO_CODE_PREFIX, '');
 
