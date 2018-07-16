@@ -78,7 +78,9 @@ class SingleSignOn extends React.PureComponent {
 
   componentWillReceiveProps = nextProps => {};
 
-  componentWillUnmount = () => {};
+  componentWillUnmount = () => {
+    this.props.resetError();
+  };
 
   handleSubmit = event => {
     event.preventDefault();
@@ -131,7 +133,6 @@ class SingleSignOn extends React.PureComponent {
           }
         }
       });
-    throw new Error('CODE NOT VALID. CONTACT YOUR ADMINISTARTOR');
   };
 
   navigateChooseHandleOrWebapp = () => {
