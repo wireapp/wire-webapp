@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="1.9.0"></a>
+# [1.9.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@1.8.9...@wireapp/api-client@1.9.0) (2018-07-16)
+
+
+### Features
+
+* **core:** Map IdentifierExistsError ([#837](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/837)) ([89f4ecf](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/89f4ecf))
+
+
+
+
 <a name="1.8.9"></a>
 ## [1.8.9](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@1.8.8...@wireapp/api-client@1.8.9) (2018-07-13)
 
