@@ -40,6 +40,7 @@ import SUPPORTED_LOCALE from '../supportedLocales';
 import * as CookieAction from '../module/action/CookieAction';
 import * as CookieSelector from '../module/selector/CookieSelector';
 import {APP_INSTANCE_ID} from '../config';
+import SingleSignOn from './SingleSignOn';
 
 addLocaleData([...de]);
 
@@ -76,6 +77,7 @@ class Root extends React.Component {
               <Route path={ROUTE.INITIAL_INVITE} component={InitialInvite} />
               <Route path={ROUTE.CHOOSE_HANDLE} component={ChooseHandle} />
               <Route path={ROUTE.HISTORY_INFO} component={HistoryInfo} />
+              <Route path={ROUTE.SSO} component={SingleSignOn} />
               <Redirect to={ROUTE.INDEX} />
             </Switch>
           </Router>
