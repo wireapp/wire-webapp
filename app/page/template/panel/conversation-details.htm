@@ -1,9 +1,9 @@
-<div id="conversation-details" class="panel__page panel__page--visible conversation-details" data-bind="with: $root.conversationDetails">
+<div id="conversation-details" class="panel__page conversation-details" data-bind="with: $root.subViews[z.viewModel.PanelViewModel.STATE.CONVERSATION_DETAILS]">
   <!-- ko if: isVisible() -->
     <div class="panel__header panel__header--reverse">
-      <close-icon class="right-panel-close icon-button" data-bind="click: clickOnClose" data-uie-name="do-close"></close-icon>
-      <!-- ko if: !conversationEntity().is_request() && !conversationEntity().removed_from_conversation() -->
-        <mute-icon class="right-panel-mute icon-button" data-bind="click: clickToToggleMute, css: {'right-panel-mute--active': conversationEntity().is_muted()} " data-uie-name="do-mute"></mute-icon>
+      <close-icon class="right-panel-close icon-button" data-bind="click: onClose" data-uie-name="do-close"></close-icon>
+      <!-- ko if: !activeConversation().is_request() && !activeConversation().removed_from_conversation() -->
+        <mute-icon class="right-panel-mute icon-button" data-bind="click: clickToToggleMute, css: {'right-panel-mute--active': activeConversation().is_muted()} " data-uie-name="do-mute"></mute-icon>
       <!-- /ko -->
     </div>
     <div class="panel__content">
@@ -11,7 +11,7 @@
         <div class="conversation-details__header">
           <!-- ko if: isNameEditable() -->
             <div class="conversation-details__name" data-bind="visible: !isEditingName(), click: clickToEditGroupName, l10n_tooltip: z.string.tooltipConversationDetailsRename" data-uie-name="status-name">
-              <div class="conversation-details__name" data-bind="text: conversationEntity().display_name()"></div>
+              <div class="conversation-details__name" data-bind="text: activeConversation().display_name()"></div>
               <edit-icon class="conversation-details__name__edit-icon"></edit-icon>
               <!-- ko if: isVerified() -->
                 <verified-icon class="conversation-details__name__verified-icon-right" data-uie-name="status-verified-conversation"></verified-icon>
@@ -20,7 +20,7 @@
             <textarea class="conversation-details__name conversation-details__name--input"
                       dir="auto"
                       spellcheck="false"
-                      data-bind="attr: {maxlength: z.conversation.ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH}, enter: renameConversation, resize, value: conversationEntity().display_name(), visible: isEditingName()"
+                      data-bind="attr: {maxlength: z.conversation.ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH}, enter: renameConversation, resize, value: activeConversation().display_name(), visible: isEditingName()"
                       data-uie-name="enter-name">
             </textarea>
           <!-- /ko -->
@@ -30,16 +30,16 @@
                 <!-- ko if: isVerified() -->
                   <verified-icon class="conversation-details__name__verified-icon" data-uie-name="status-verified-conversation"></verified-icon>
                 <!-- /ko -->
-                <div data-bind="text: conversationEntity().display_name()" data-uie-name="status-name"></div>
+                <div data-bind="text: activeConversation().display_name()" data-uie-name="status-name"></div>
               </div>
             </div>
           <!-- /ko -->
 
-          <!-- ko if: conversationEntity().is_group() -->
+          <!-- ko if: activeConversation().is_group() -->
             <div class="conversation-details__participant_count">
               <!-- ko if: userParticipants().length -->
                 <span class="conversation-details__participant_count__user">
-                  <span class="conversation-details__participant_count__number" data-bind="text: userParticipants().length" data-uie-name="status-user-count"></span>
+                  <span class="conversation-details__participant_count__number" data-bind="text: showAllUsersCount() || userParticipants().length" data-uie-name="status-user-count"></span>
                   <span class="conversation-details__participant_count__text" data-bind="l10n_text: participantsUserText"></span>
                 </span>
               <!-- /ko -->
@@ -84,7 +84,7 @@
               <!-- ko if: showActionTimedMessages() -->
                 <div class="conversation-details__timed-messages">
                   <div class="panel__action-item" data-bind="click: clickOnTimedMessages" data-uie-name="go-timed-messages">
-                    <hourglass-icon class="panel__action-item__icon"></hourglass-icon>
+                     <timer-icon class="panel__action-item__icon"></timer-icon>
                     <div class="panel__action-item__text" data-bind="l10n_text: z.string.conversationDetailsActionTimedMessages"></div>
                     <div class="panel__action-item__status" data-bind="l10n_text: timedMessagesText" data-uie-name="status-timed-messages"></div>
                     <disclose-icon></disclose-icon>
@@ -96,7 +96,7 @@
         <!-- /ko -->
 
         <div class="conversation-details__participants">
-          <!-- ko if: conversationEntity().is_group() -->
+          <!-- ko if: activeConversation().is_group() -->
             <!-- ko if: userParticipants().length -->
               <div class="conversation-details__list-head" data-bind="text: z.string.conversationDetailsPeople"></div>
               <user-list params="user: userParticipants, click: clickOnShowUser, altStyle: true" data-uie-name="list-users"></user-list>
@@ -114,8 +114,8 @@
               <service-list params="services: serviceParticipants, click: clickOnShowService, altStyle: true" data-uie-name="list-services"></service-list>
             <!-- /ko -->
           <!-- /ko -->
-          <!-- ko if: isSingleUserMode() && conversationEntity().firstUserEntity() -->
-            <participant-avatar params="participant: conversationEntity().firstUserEntity, size: z.components.ParticipantAvatar.SIZE.X_LARGE" data-uie-name="status-profile-picture"></participant-avatar>
+          <!-- ko if: isSingleUserMode() && activeConversation().firstUserEntity() -->
+            <participant-avatar params="participant: activeConversation().firstUserEntity, size: z.components.ParticipantAvatar.SIZE.X_LARGE" data-uie-name="status-profile-picture"></participant-avatar>
             <!-- ko if: isGuest() -->
               <div class="conversation-details__guest-label" data-uie-name="status-guest">
                 <guest-icon></guest-icon>
@@ -125,7 +125,7 @@
             <!-- ko if: isTeam() -->
               <availability-state class="conversation-details__availability"
                 data-uie-name="status-availability"
-                params="availability: conversationEntity().firstUserEntity().availability(), label: availabilityLabel()">
+                params="availability: activeConversation().firstUserEntity().availability(), label: availabilityLabel()">
               </availability-state>
             <!-- /ko -->
           <!-- /ko -->

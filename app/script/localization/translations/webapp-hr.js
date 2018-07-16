@@ -213,8 +213,6 @@ z.string.hr.conversationYouAccusative = 'ti';
 z.string.hr.conversationConnectionAccepted = 'Povezani';
 z.string.hr.conversationConnectionBlocked = 'Blokiran';
 z.string.hr.conversationConnectionCancelRequest = 'Odjavi zahtjev za vezu';
-z.string.hr.conversationCreate = ' započela/o je razgovor s {{users}}';
-z.string.hr.conversationCreateYou = ' započela/o je razgovor s {{users}}';
 z.string.hr.conversationDeviceStartedUsingOne = ' počela/o koristiti';
 z.string.hr.conversationDeviceStartedUsingMany = ' počela/o koristiti';
 z.string.hr.conversationDeviceUnverified = ' neverificirala/o je jedan od';
@@ -224,12 +222,6 @@ z.string.hr.conversationDeviceNewDeviceOne = ' novi uređaj';
 z.string.hr.conversationDeviceNewDeviceMany = ' novi uređaji';
 z.string.hr.conversationJustNow = 'Upravo';
 z.string.hr.conversationLocationLink = 'Otvori kartu';
-z.string.hr.conversationMemberJoin = ' dodala/o {{users}}';
-z.string.hr.conversationMemberJoinYou = ' dodala/o {{users}}';
-z.string.hr.conversationMemberLeaveLeft = ' otišla/o';
-z.string.hr.conversationMemberLeaveLeftYou = ' otišla/o';
-z.string.hr.conversationMemberLeaveRemoved = ' uklonila/o {{users}}';
-z.string.hr.conversationMemberLeaveRemovedYou = ' uklonila/o {{users}}';
 z.string.hr.conversationMessageDelivered = 'Dostavljeno';
 z.string.hr.conversationRename = ' preimenovala/o razgovor';
 z.string.hr.conversationRenameYou = ' preimenovala/o razgovor';
@@ -318,6 +310,9 @@ z.string.hr.conversationDetailsParticipantsServicesMany = 'Usluge';
 z.string.hr.conversationDetailsParticipantsUsersMany = 'Kontakti';
 z.string.hr.conversationDetailsPeople = 'Kontakti';
 z.string.hr.conversationDetailsServices = 'Usluge';
+
+z.string.hr.conversationParticipantsTitle = 'Kontakti';
+z.string.hr.conversationParticipantsSearchPlaceholder = 'Traži po imenu';
 
 z.string.hr.groupParticipantActionCancelRequest = 'Poništi zahtjev';
 z.string.hr.groupParticipantActionDevices = 'Uređaji';
@@ -509,12 +504,4 @@ z.string.hr.initReceivedUserData = 'Provjeravanje novih poruka';
 z.string.hr.initEvents = 'Učitavanje poruka';
 
 z.string.hr.ephemeralUnitsNone = 'Isključi';
-z.string.hr.ephemeralUnitsSecond = 'sekunda';
-z.string.hr.ephemeralUnitsSeconds = 'sekundi';
-z.string.hr.ephemeralUnitsMinute = 'minuta';
-z.string.hr.ephemeralUnitsMinutes = 'minuta';
-z.string.hr.ephemeralUnitsHour = 'sat';
-z.string.hr.ephemeralUnitsHours = 'sati';
-z.string.hr.ephemeralUnitsDay = 'dan';
-z.string.hr.ephemeralUnitsDays = 'dani';
 

@@ -56,9 +56,18 @@
   &:hover .context-menu,
   .show-timestamp.time {
     background-color: @app-bg;
-    cursor: default;
     opacity: 1;
     pointer-events: auto;
+  }
+
+  &.hover .time,
+  &:hover .time,
+  .show-timestamp.time {
+    cursor: default;
+  }
+
+  .context-menu {
+    cursor: pointer;
   }
 
   &:not(:hover) {
@@ -94,14 +103,19 @@
 .message-header {
   position: relative;
   display: flex;
+  padding-top: 6px;
   margin-bottom: 4px;
   line-height: @avatar-diameter-xs;
+  & > .message-body-actions {
+    top: 6px;
+  }
 }
 
 .message-header-icon {
   .flex-center;
 
   width: @conversation-message-sender-width;
+  max-height: @avatar-diameter-xs;
   color: @graphite-dark;
 
   &--svg {
@@ -120,6 +134,11 @@
   align-items: center;
   font-size: 12px;
   font-weight: @font-weight-regular;
+  white-space: pre-wrap;
+
+  a {
+    cursor: pointer;
+  }
 
   .message-header-plain-sender-name {
     font-weight: @font-weight-bold;
@@ -128,6 +147,10 @@
   .message-header-sender-name {
     font-weight: @font-weight-bold;
     text-transform: capitalize;
+  }
+  & > hr {
+    align-self: flex-start;
+    margin-top: 12px;
   }
 }
 
@@ -185,6 +208,10 @@
   margin-bottom: 16px;
   line-height: 40px;
   user-select: none;
+
+  .message-header-icon {
+    max-height: 40px;
+  }
 
   &:not(.message-timestamp-visible) {
     display: none;

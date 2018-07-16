@@ -17,23 +17,21 @@
  *
  */
 
-import BackendError from '../BackendError';
+'use strict';
 
-export const TRACKING_ACTION_START = 'TRACKING_ACTION_START';
-export const TRACKING_ACTION_SUCCESS = 'TRACKING_ACTION_SUCCESS';
-export const TRACKING_ACTION_FAILED = 'TRACKING_ACTION_FAILED';
+window.z = window.z || {};
+window.z.location = window.z.location || {};
 
-export const startTrackingAction = params => ({
-  params,
-  type: TRACKING_ACTION_START,
-});
+z.location.LocationRepository = class LocationRepository {
+  constructor(locationService) {
+    this.locationService = locationService;
+  }
 
-export const successfulTrackingAction = trackingResult => ({
-  payload: trackingResult,
-  type: TRACKING_ACTION_SUCCESS,
-});
+  getMapsUrl(latitude, longitude, name, zoom) {
+    return this.locationService.getMapsUrl(latitude, longitude, name, zoom);
+  }
 
-export const failedTrackingAction = error => ({
-  payload: BackendError.handle(error),
-  type: TRACKING_ACTION_FAILED,
-});
+  getLocation(latitude, longitude) {
+    return this.locationService.getLocation(latitude, longitude);
+  }
+};

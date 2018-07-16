@@ -249,7 +249,9 @@ z.notification.NotificationRepository = class NotificationRepository {
     const updatedOneParticipant = messageEntity.userEntities().length === 1;
     if (updatedOneParticipant) {
       const [otherUserEntity] = messageEntity.userEntities();
-      const nameOfJoinedUser = z.util.getFirstName(otherUserEntity, z.string.Declension.ACCUSATIVE);
+
+      const declension = z.string.Declension.ACCUSATIVE;
+      const nameOfJoinedUser = z.util.SanitizationUtil.getEscapedFirstName(otherUserEntity, declension);
 
       const senderJoined = messageEntity.user().id === otherUserEntity.id;
       if (senderJoined) {
@@ -519,17 +521,17 @@ z.notification.NotificationRepository = class NotificationRepository {
    * @returns {string} Notification message title
    */
   _createTitle(messageEntity, conversationEntity) {
-    let titleMessage;
+    const conversationName = conversationEntity && conversationEntity.display_name();
+    const userEntity = messageEntity.user();
 
-    const isConversation = conversationEntity && conversationEntity.display_name();
-    if (isConversation) {
-      titleMessage = conversationEntity.is_group()
-        ? `${messageEntity.user().first_name()} in ${conversationEntity.display_name()}`
-        : conversationEntity.display_name();
+    let title;
+    if (conversationName) {
+      title = conversationEntity.is_group()
+        ? z.l10n.text(z.string.notificationTitleGroup, {conversation: conversationName, user: userEntity.first_name()})
+        : conversationName;
     }
 
-    titleMessage = titleMessage || messageEntity.user().name();
-    return z.util.StringUtil.truncate(titleMessage, NotificationRepository.CONFIG.TITLE_LENGTH, false);
+    return z.util.StringUtil.truncate(title || userEntity.name(), NotificationRepository.CONFIG.TITLE_LENGTH, false);
   }
 
   /**

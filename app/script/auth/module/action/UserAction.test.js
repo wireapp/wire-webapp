@@ -43,7 +43,6 @@ describe('UserAction', () => {
             },
           },
         },
-        mixpanel: {track: () => 1},
       });
 
       return store.dispatch(UserAction.doActivateAccount(code, key)).then(() => {

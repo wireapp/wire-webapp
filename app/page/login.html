@@ -267,7 +267,7 @@
           <!-- ko foreach: permanent_devices -->
             <section class="modal-limit-section">
               <span class="modal-limit-section-header" data-bind="text: $data.model" data-uie-name="device-header-model"></span>
-              <device-card params="device: $data, detailed: true"></device-card>
+              <device-card params="device: $data, locationRepository: $parent.locationRepository, detailed: true"></device-card>
               <device-remove params="device: $data, error: $parent.remove_form_error, remove: $parent.click_on_remove_device_submit"></device-remove>
             </section>
           <!-- /ko -->

@@ -92,6 +92,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.isTeam = this.team_repository.isTeam;
     this.isTeam.subscribe(() => this.map_guest_status_self());
     this.team = this.team_repository.team;
+    this.teamMembers = this.team_repository.teamMembers;
 
     this.selfUser = this.user_repository.self;
 
@@ -463,6 +464,15 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   _addCreationMessage(conversationEntity, isTemporaryGuest, timestamp, eventSource) {
     conversationEntity.hasCreationMessage = true;
+
+    if (conversationEntity.inTeam()) {
+      const allTeamMembersParticipate = this.teamMembers().length
+        ? this.teamMembers().every(teamMember => conversationEntity.participating_user_ids().includes(teamMember.id))
+        : false;
+
+      conversationEntity.withAllTeamMembers(allTeamMembersParticipate);
+    }
+
     const creationEvent = conversationEntity.is_group()
       ? z.conversation.EventBuilder.buildGroupCreation(conversationEntity, isTemporaryGuest, timestamp)
       : z.conversation.EventBuilder.build1to1Creation(conversationEntity);
@@ -3182,10 +3192,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
           return this._update_edited_message(conversation_et, event_json);
         }
 
-        if (event_data.previews.length) {
-          return this._update_link_preview(conversation_et, event_json);
-        }
-
         return event_json;
       })
       .then(updated_event_json => {
@@ -3426,7 +3432,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .then(messageEntity => this.ephemeralHandler.validateMessage(messageEntity))
       .then(messageEntity => {
         if (conversationEntity && messageEntity) {
-          conversationEntity.add_message(messageEntity);
+          conversationEntity.add_message(messageEntity, true);
         }
         return {conversationEntity, messageEntity};
       });
@@ -3699,23 +3705,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return event_json;
       }
     );
-  }
-
-  /**
-   * Update link preview message.
-   *
-   * @private
-   * @param {Conversation} conversation_et - Conversation of updated message
-   * @param {JSON} event_json - Link preview message event
-   * @returns {Promise} Resolves with the updated event_json
-   */
-  _update_link_preview(conversation_et, event_json) {
-    return this.conversation_service.load_event_from_db(conversation_et.id, event_json.id).then(stored_message => {
-      if (stored_message) {
-        this._delete_message(conversation_et, stored_message);
-      }
-      return event_json;
-    });
   }
 
   //##############################################################################

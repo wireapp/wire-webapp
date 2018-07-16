@@ -1094,6 +1094,28 @@ z.calling.CallingRepository = class CallingRepository {
   }
 
   /**
+   * Handle error when joining a call.
+   *
+   * @private
+   * @param {string} conversationId - ID of call where joining failed
+   * @param {boolean} isOutgoingCall - Was outgoing call
+   * @param {Error} joinError - Error that occured
+   * @returns {undefined} No return value
+   */
+  _handleJoinError(conversationId, isOutgoingCall, joinError) {
+    this.getCallById(conversationId)
+      .then(callEntity => {
+        callEntity.setSelfState(false);
+
+        const logMessage = `Failed to join call in '${callEntity.state()}' conversation '${conversationId}'`;
+        this.callLogger.warn(logMessage, joinError);
+
+        return isOutgoingCall ? this._deleteCall(callEntity) : this._rejectCall(callEntity, true);
+      })
+      .catch(error => this._handleNotFoundError(error));
+  }
+
+  /**
    * Actively join a call.
    *
    * @private
@@ -1121,6 +1143,18 @@ z.calling.CallingRepository = class CallingRepository {
     const messagePayload = z.calling.CallMessageBuilder.createPropSync(this.selfStreamState, videoSend, payload);
     const callMessageEntity = z.calling.CallMessageBuilder.buildPropSync(false, undefined, messagePayload);
     return this._createOutgoingCall(callMessageEntity);
+  }
+
+  /**
+   * Prepare to join a call.
+   *
+   * @private
+   * @param {CallEntity} callEntity - Call to be joined
+   * @returns {undefined} No return value
+   */
+  _initiatePreJoinCall(callEntity) {
+    callEntity.setSelfState(true);
+    return callEntity;
   }
 
   /**
@@ -1156,13 +1190,10 @@ z.calling.CallingRepository = class CallingRepository {
     this._checkCallingSupport(conversationId, mediaType, callState)
       .then(() => this._checkConcurrentJoinedCall(conversationId, callState))
       .then(() => callEntity || this._initiateOutgoingCall(conversationId, mediaType, callState))
+      .then(callEntityToJoin => this._initiatePreJoinCall(callEntityToJoin))
       .then(callEntityToJoin => this._initiateMediaStream(callEntityToJoin, mediaType))
       .then(callEntityToJoin => this._initiateJoinCall(callEntityToJoin, mediaType))
-      .catch(error => {
-        this.callLogger.warn(`Failed to join call in conversation '${conversationId}'`, error);
-        const isOutgoingCall = !callEntity;
-        return isOutgoingCall ? this.deleteCall(conversationId) : this.rejectCall(conversationId, true);
-      });
+      .catch(error => this._handleJoinError(conversationId, !callEntity, error));
   }
 
   /**

@@ -87,9 +87,9 @@ z.components.FullSearch = class FullSearch {
     });
   }
 
-  formatResult(messageEntity) {
-    const text = _.escape(messageEntity.get_first_asset().text);
-    const input = _.escape(this.input());
+  htmlFormatResult(messageEntity) {
+    const text = z.util.SanitizationUtil.escapeString(messageEntity.get_first_asset().text);
+    const input = z.util.SanitizationUtil.escapeString(this.input());
 
     messageEntity.matchesCount = 0;
 
@@ -152,7 +152,7 @@ ko.components.register('full-search', {
           <participant-avatar params="participant: user, size: z.components.ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
         </div>
         <div class="full-search-item-content">
-          <div class="full-search-item-content-text ellipsis" data-bind="html: $parent.formatResult($data)" data-uie-name="full-search-item-text"></div>
+          <div class="full-search-item-content-text ellipsis" data-bind="html: $parent.htmlFormatResult($data)" data-uie-name="full-search-item-text"></div>
           <div class="full-search-item-content-info">
             <span class="font-weight-bold" data-bind="text: user().first_name()" data-uie-name="full-search-item-sender"></span>
             <span data-bind="text: moment($data.timestamp()).format('MMMM D, YYYY')" data-uie-name="full-search-item-timestamp"></span>

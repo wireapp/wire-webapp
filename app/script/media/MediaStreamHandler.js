@@ -268,6 +268,11 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
     return constraintsPromise
       .then(streamConstraints => {
         return this.requestMediaStream(mediaType, streamConstraints).then(mediaStreamInfo => {
+          if (!this.mediaStreamInUse()) {
+            this.logger.warn('Releasing obsolete MediaStream as there is no active call', mediaStreamInfo);
+            return this._releaseMediaStream(mediaStreamInfo.stream);
+          }
+
           this._setSelfStreamState(mediaType);
           this.changeMediaStream(mediaStreamInfo);
         });
@@ -453,11 +458,11 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
   _initiateMediaStreamSuccess(conversationId, mediaStreamInfo) {
     if (mediaStreamInfo) {
       const callEntity = this.currentCalls.get(conversationId);
-      const callNeedsMediaStream = this._callNeedsMediaStream(callEntity);
+      const callNeedsMediaStream = callEntity && callEntity.needsMediaStream();
       const mediaStream = mediaStreamInfo.stream;
 
       if (!callNeedsMediaStream) {
-        this.logger.debug('Releasing obsolete MediaStream as call has ended');
+        this.logger.warn(`Releasing obsolete MediaStream as call '${conversationId}' is no longer active`, callEntity);
         return this._releaseMediaStream(mediaStream);
       }
 
@@ -792,19 +797,13 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
    */
   mediaStreamInUse() {
     for (const callEntity of this.currentCalls.values()) {
-      const callNeedsMediaStream = this._callNeedsMediaStream(callEntity);
+      const callNeedsMediaStream = callEntity.needsMediaStream();
       if (callNeedsMediaStream) {
         return true;
       }
     }
 
     return false;
-  }
-
-  _callNeedsMediaStream(callEntity) {
-    const hasPreJoinVideo = callEntity.isIncoming() && callEntity.isRemoteVideoCall();
-    const hasActiveCall = callEntity.selfClientJoined() || hasPreJoinVideo;
-    return hasActiveCall && !callEntity.isOngoingOnAnotherClient();
   }
 
   // Toggle the mute state of the microphone.

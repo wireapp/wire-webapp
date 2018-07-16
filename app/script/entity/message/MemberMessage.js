@@ -23,6 +23,14 @@ window.z = window.z || {};
 window.z.entity = z.entity || {};
 
 z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
+  static get CONFIG() {
+    return {
+      MAX_USERS_VISIBLE: 17,
+      MAX_WHOLE_TEAM_USERS_VISIBLE: 10,
+      REDUCED_USERS_COUNT: 15,
+    };
+  }
+
   constructor() {
     super();
 
@@ -33,6 +41,18 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
     this.userIds = ko.observableArray();
     this.name = ko.observable('');
 
+    this.exceedsMaxVisibleUsers = ko.pureComputed(() => {
+      return this.joinedUserEntities().length > MemberMessage.CONFIG.MAX_USERS_VISIBLE;
+    });
+    this.visibleUsers = ko.observable([]);
+    this.hiddenUserCount = ko.pureComputed(() => this.joinedUserEntities().length - this.visibleUsers().length);
+    this.highlightedUsers = ko.pureComputed(() => {
+      return this.type === z.event.Backend.CONVERSATION.MEMBER_JOIN ? this.joinedUserEntities() : [];
+    });
+
+    this.hasUsers = ko.pureComputed(() => this.userEntities().length);
+    this.allTeamMembers = undefined;
+
     this.hasUsers = ko.pureComputed(() => this.userEntities().length);
 
     // Users joined the conversation without sender
@@ -40,6 +60,19 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
       return this.userEntities()
         .filter(userEntity => userEntity.id !== this.user().id)
         .map(userEntity => userEntity);
+    });
+
+    this.joinedUserEntities.subscribe(joinedUserEntities => {
+      const selfUser = joinedUserEntities.find(userEntity => userEntity.is_me);
+      const visibleUsers = joinedUserEntities.filter(userEntity => !userEntity.is_me);
+      if (this.exceedsMaxVisibleUsers()) {
+        const spliceCount = MemberMessage.CONFIG.REDUCED_USERS_COUNT;
+        visibleUsers.splice(selfUser ? spliceCount - 1 : spliceCount);
+      }
+      if (selfUser) {
+        visibleUsers.push(selfUser);
+      }
+      this.visibleUsers(visibleUsers);
     });
 
     // Users joined the conversation without self
@@ -51,42 +84,113 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
 
     this.senderName = ko.pureComputed(() => {
       const isTeamMemberLeave = this.type === z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE;
-      return isTeamMemberLeave ? this.name() : z.util.getFirstName(this.user());
+      return isTeamMemberLeave ? this.name() : z.util.SanitizationUtil.getEscapedFirstName(this.user());
     });
 
     this.showNamedCreation = ko.pureComputed(() => this.isConversationCreate() && this.name().length);
-    this.showSenderName = ko.pureComputed(() => {
-      const isUnnamedGroupCreation = this.isConversationCreate() && !this.name().length;
-      return isUnnamedGroupCreation || this.isMemberChange();
-    });
 
     this.otherUser = ko.pureComputed(() => (this.hasUsers() ? this.userEntities()[0] : new z.entity.User()));
 
-    this.caption = ko.pureComputed(() => {
+    this.htmlCaption = ko.pureComputed(() => {
       if (!this.hasUsers()) {
         return '';
       }
 
+      let substitutions;
+      const replaceDangerously = {
+        '/showmore': '</a>',
+        showmore: '<a class="message-header-show-more" data-uie-name="do-show-more">',
+      };
+
       switch (this.memberMessageType) {
         case z.message.SystemMessageType.CONNECTION_ACCEPTED:
         case z.message.SystemMessageType.CONNECTION_REQUEST: {
-          return this._getCaptionConnection(this.otherUser());
+          if (this.otherUser()) {
+            if (this.otherUser().is_blocked()) {
+              return z.l10n.safeHtml(z.string.conversationConnectionBlocked);
+            }
+
+            if (this.otherUser().is_outgoing_request()) {
+              return '';
+            }
+          }
+
+          return z.l10n.safeHtml(z.string.conversationConnectionAccepted);
         }
 
         case z.message.SystemMessageType.CONVERSATION_CREATE: {
           if (this.name().length) {
-            return z.l10n.text(z.string.conversationCreateWith, this._generateNameString(z.string.Declension.DATIVE));
+            const exceedsMaxTeam = this.joinedUserEntities().length > MemberMessage.CONFIG.MAX_WHOLE_TEAM_USERS_VISIBLE;
+            if (this.allTeamMembers && exceedsMaxTeam) {
+              const guestCount = this.joinedUserEntities().filter(userEntity => userEntity.isGuest()).length;
+              substitutions = {replace: {count: guestCount}, replaceDangerously};
+              if (!guestCount) {
+                return z.l10n.safeHtml(z.string.conversationCreateTeam, substitutions);
+              }
+
+              const hasSingleGuest = guestCount === 1;
+              const teamStringId = hasSingleGuest
+                ? z.string.conversationCreateTeamGuest
+                : z.string.conversationCreateTeamGuests;
+
+              return z.l10n.safeHtml(teamStringId, substitutions);
+            }
+
+            const createStringId = this.exceedsMaxVisibleUsers()
+              ? z.string.conversationCreateWithMore
+              : z.string.conversationCreateWith;
+
+            substitutions = {
+              replace: {
+                count: this.hiddenUserCount(),
+                users: this._generateNameString(this.exceedsMaxVisibleUsers(), z.string.Declension.DATIVE),
+              },
+              replaceDangerously,
+            };
+
+            return z.l10n.safeHtml(createStringId, substitutions);
           }
 
           if (this.user().is_me) {
-            return z.l10n.text(z.string.conversationCreateYou, this._generateNameString());
+            const createStringId = this.exceedsMaxVisibleUsers()
+              ? z.string.conversationCreatedYouMore
+              : z.string.conversationCreatedYou;
+
+            substitutions = {
+              replace: {
+                count: this.hiddenUserCount(),
+                users: this._generateNameString(this.exceedsMaxVisibleUsers()),
+              },
+              replaceDangerously,
+            };
+
+            return z.l10n.safeHtml(createStringId, substitutions);
           }
 
-          return z.l10n.text(z.string.conversationCreate, this._generateNameString(z.string.Declension.DATIVE));
+          const createStringId = this.exceedsMaxVisibleUsers()
+            ? z.string.conversationCreatedMore
+            : z.string.conversationCreated;
+
+          substitutions = {
+            replace: {
+              count: this.hiddenUserCount(),
+              name: this.senderName(),
+              users: this._generateNameString(this.exceedsMaxVisibleUsers(), z.string.Declension.DATIVE),
+            },
+            replaceDangerously,
+          };
+
+          return z.l10n.safeHtml(createStringId, substitutions);
         }
 
         case z.message.SystemMessageType.CONVERSATION_RESUME: {
-          return z.l10n.text(z.string.conversationResume, this._generateNameString(z.string.Declension.DATIVE));
+          substitutions = {
+            replace: {
+              users: this._generateNameString(false, z.string.Declension.DATIVE),
+            },
+          };
+
+          return z.l10n.safeHtml(z.string.conversationResume, substitutions);
         }
 
         default:
@@ -98,40 +202,59 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
           const senderJoined = this.otherUser().id === this.user().id;
           if (senderJoined) {
             const userJoinedStringId = this.user().is_me
-              ? z.string.conversationMemberJoinSelfYou
-              : z.string.conversationMemberJoinSelf;
-            return z.l10n.text(userJoinedStringId);
+              ? z.string.conversationMemberJoinedSelfYou
+              : z.string.conversationMemberJoinedSelf;
+            return z.l10n.safeHtml(userJoinedStringId, this.senderName());
           }
 
-          const userJoinedStringId = this.user().is_me
-            ? z.string.conversationMemberJoinYou
-            : z.string.conversationMemberJoin;
+          let userJoinedStringId = '';
 
-          return z.l10n.text(userJoinedStringId, this._generateNameString());
+          if (this.user().is_me) {
+            userJoinedStringId = this.exceedsMaxVisibleUsers()
+              ? z.string.conversationMemberJoinedYouMore
+              : z.string.conversationMemberJoinedYou;
+          } else {
+            userJoinedStringId = this.exceedsMaxVisibleUsers()
+              ? z.string.conversationMemberJoinedMore
+              : z.string.conversationMemberJoined;
+          }
+
+          substitutions = {
+            replace: {
+              count: this.hiddenUserCount(),
+              name: this.senderName(),
+              users: this._generateNameString(this.exceedsMaxVisibleUsers()),
+            },
+            replaceDangerously,
+          };
+
+          return z.l10n.safeHtml(userJoinedStringId, substitutions);
         }
 
         case z.event.Backend.CONVERSATION.MEMBER_LEAVE: {
           const temporaryGuestRemoval = this.otherUser().is_me && this.otherUser().isTemporaryGuest();
           if (temporaryGuestRemoval) {
-            return z.l10n.text(z.string.temporaryGuestLeaveMessage);
+            return z.l10n.safeHtml(z.string.temporaryGuestLeaveMessage);
           }
 
           const senderLeft = this.otherUser().id === this.user().id;
           if (senderLeft) {
             const userLeftStringId = this.user().is_me
-              ? z.string.conversationMemberLeaveLeftYou
-              : z.string.conversationMemberLeaveLeft;
-            return z.l10n.text(userLeftStringId);
+              ? z.string.conversationMemberLeftYou
+              : z.string.conversationMemberLeft;
+            return z.l10n.safeHtml(userLeftStringId, this.senderName());
           }
 
           const userRemovedStringId = this.user().is_me
-            ? z.string.conversationMemberLeaveRemovedYou
-            : z.string.conversationMemberLeaveRemoved;
-          return z.l10n.text(userRemovedStringId, this._generateNameString());
+            ? z.string.conversationMemberRemovedYou
+            : z.string.conversationMemberRemoved;
+
+          substitutions = {replace: {name: this.senderName(), users: this._generateNameString()}};
+          return z.l10n.safeHtml(userRemovedStringId, substitutions);
         }
 
         case z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE: {
-          return z.l10n.text(z.string.conversationTeamLeave);
+          return z.l10n.safeHtml(z.string.conversationTeamLeft, this.senderName());
         }
 
         default:
@@ -140,19 +263,20 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
       return '';
     });
 
-    this.groupCreationHeader = ko.pureComputed(() => {
+    this.htmlGroupCreationHeader = ko.pureComputed(() => {
       if (this.showNamedCreation()) {
         if (this.user().isTemporaryGuest()) {
-          return z.l10n.text(z.string.conversationCreateTemporary);
+          return z.l10n.safeHtml(z.string.conversationCreateTemporary);
         }
 
         const groupCreationStringId = this.user().is_me
-          ? z.string.conversationCreateNameYou
-          : z.string.conversationCreateName;
-        return z.util.StringUtil.capitalizeFirstChar(z.l10n.text(groupCreationStringId, this.senderName()));
+          ? z.string.conversationCreatedNameYou
+          : z.string.conversationCreatedName;
+        return z.util.StringUtil.capitalizeFirstChar(z.l10n.safeHtml(groupCreationStringId, this.senderName()));
       }
       return '';
     });
+
     this.showLargeAvatar = () => {
       const largeAvatarTypes = [
         z.message.SystemMessageType.CONNECTION_ACCEPTED,
@@ -162,22 +286,8 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
     };
   }
 
-  _generateNameString(declension = z.string.Declension.ACCUSATIVE) {
-    return z.util.LocalizerUtil.joinNames(this.joinedUserEntities(), declension);
-  }
-
-  _getCaptionConnection(userEntity) {
-    if (userEntity) {
-      if (userEntity.is_blocked()) {
-        return z.l10n.text(z.string.conversationConnectionBlocked);
-      }
-
-      if (userEntity.is_outgoing_request()) {
-        return '';
-      }
-    }
-
-    return z.l10n.text(z.string.conversationConnectionAccepted);
+  _generateNameString(skipAnd = false, declension = z.string.Declension.ACCUSATIVE) {
+    return z.util.LocalizerUtil.joinNames(this.visibleUsers(), declension, skipAnd, true);
   }
 
   isConnection() {
@@ -228,5 +338,9 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
 
   isMemberRemoval() {
     return this.isMemberLeave() || this.isTeamMemberLeave();
+  }
+
+  guestCount() {
+    return this.joinedUserEntities().filter(user => user.isGuest()).length;
   }
 };

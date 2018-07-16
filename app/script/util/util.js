@@ -279,47 +279,9 @@ z.util.encodeBase64 = text => window.btoa(text);
 
 z.util.encodeSha256Base64 = text => CryptoJS.SHA256(text).toString(CryptoJS.enc.Base64);
 
-z.util.escapeHtml = html => _.escape(html);
-
-z.util.escapeRegex = string => string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-
 // Note IE10 listens to "transitionend" instead of "animationend"
 z.util.alias = {
   animationend: 'transitionend animationend oAnimationEnd MSAnimationEnd mozAnimationEnd webkitAnimationEnd',
-};
-
-/**
- * Opens a new browser tab (target="_blank") with a given URL in a safe environment.
- * @see https://mathiasbynens.github.io/rel-noopener/
- * @param {string} url - URL you want to open in a new browser tab
- * @param {boolean} focus - True, if the new windows should get browser focus
- * @returns {Object} New window handle
- */
-z.util.safeWindowOpen = (url, focus = true) => {
-  const newWindow = window.open(z.util.URLUtil.prependProtocol(url));
-
-  if (newWindow) {
-    newWindow.opener = null;
-    if (focus) {
-      newWindow.focus();
-    }
-  }
-
-  return newWindow;
-};
-
-z.util.safeMailtoOpen = (event, email) => {
-  event.preventDefault();
-  event.stopPropagation();
-
-  if (!z.util.isValidEmail(email)) {
-    return;
-  }
-
-  const newWindow = window.open(`mailto:${email}`);
-  if (newWindow) {
-    window.setTimeout(() => newWindow.close(), 10);
-  }
 };
 
 // Note: We are using "Underscore.js" to escape HTML in the original message
@@ -396,25 +358,18 @@ z.util.isIsoString = dateString => {
 z.util.sortGroupsByLastEvent = (groupA, groupB) => groupB.last_event_timestamp() - groupA.last_event_timestamp();
 
 z.util.sortObjectByKeys = (object, reverse) => {
-  const sortedObject = {};
   const keys = Object.keys(object);
   keys.sort();
 
   if (reverse) {
-    for (let index = keys.length - 1; index >= 0; index--) {
-      const key = keys[index];
-      const value = object[key];
-      sortedObject[key] = value;
-    }
-  } else {
-    for (const key of keys) {
-      const value = object[key];
-      sortedObject[key] = value;
-    }
+    keys.reverse();
   }
 
   // Returns a copy of an object, which is ordered by the keys of the original object.
-  return sortedObject;
+  return keys.reduce((sortedObject, key) => {
+    sortedObject[key] = object[key];
+    return sortedObject;
+  }, {});
 };
 
 // Removes url(' and url(" from the beginning of the string and also ") and ') from the end
@@ -512,41 +467,16 @@ z.util.murmurhash3 = (key, seed) => {
   return h1 >>> 0;
 };
 
-z.util.getFirstName = (userEt, declension = z.string.Declension.NOMINATIVE) => {
-  if (userEt.is_me) {
-    let stringId;
-
-    switch (declension) {
-      case z.string.Declension.NOMINATIVE:
-        stringId = z.string.conversationYouNominative;
-        break;
-      case z.string.Declension.DATIVE:
-        stringId = z.string.conversationYouDative;
-        break;
-      case z.string.Declension.ACCUSATIVE:
-        stringId = z.string.conversationYouAccusative;
-        break;
-    }
-
-    return z.l10n.text(stringId);
-  }
-
-  return userEt.first_name();
-};
-
 z.util.printDevicesId = id => {
   if (!id) {
     return '';
   }
 
   const idWithPadding = z.util.zeroPadding(id, 16);
-  let prettifiedId = '';
+  const parts = idWithPadding.match(/.{1,2}/g) || [];
+  const prettifiedId = parts.map(part => `<span class='device-id-part'>${part}</span>`);
 
-  for (const part of idWithPadding.match(/.{1,2}/g)) {
-    prettifiedId += `<span class='device-id-part'>${part}</span>`;
-  }
-
-  return prettifiedId;
+  return prettifiedId.join('');
 };
 
 /**

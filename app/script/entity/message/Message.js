@@ -65,7 +65,9 @@ z.entity.Message = class Message {
     });
 
     this.isObfuscated = ko.pureComputed(() => {
-      return this.ephemeral_status() === z.message.EphemeralStatusType.INACTIVE || this.is_expired();
+      const messageIsAtLeastSent = this.status() > z.message.StatusType.SENDING;
+      const isEphemeralInactive = this.ephemeral_status() === z.message.EphemeralStatusType.INACTIVE;
+      return messageIsAtLeastSent && (isEphemeralInactive || this.is_expired());
     });
 
     this.conversation_id = '';
@@ -90,7 +92,7 @@ z.entity.Message = class Message {
       return date.local().format('HH:mm');
     };
 
-    this.sender_name = ko.pureComputed(() => z.util.getFirstName(this.user()), this, {deferEvaluation: true});
+    this.sender_name = ko.pureComputed(() => z.util.SanitizationUtil.getEscapedFirstName(this.user()));
 
     this.accent_color = ko.pureComputed(() => {
       return `accent-color-${this.user().accent_id()}`;
