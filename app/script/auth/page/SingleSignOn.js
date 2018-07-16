@@ -28,6 +28,7 @@ import {
   CheckboxLabel,
   RoundIconButton,
   InputSubmitCombo,
+  ErrorMessage,
   ICON_NAME,
   Form,
   Input,
@@ -40,11 +41,12 @@ import {
 import {Link as RRLink} from 'react-router-dom';
 import {connect} from 'react-redux';
 import {injectIntl} from 'react-intl';
-import {parseValidationErrors} from '../util/errorUtil';
+import {parseValidationErrors, parseError} from '../util/errorUtil';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
 import {withRouter} from 'react-router';
 import {isDesktopApp} from '../Runtime';
+import * as AuthAction from '../module/action/AuthAction';
 import {resetError} from '../module/action/creator/AuthActionCreator';
 import Page from './Page';
 import {ROUTE} from '../route';
@@ -95,6 +97,7 @@ class SingleSignOn extends React.PureComponent {
           throw errors[0];
         }
       })
+      .then(() => this.props.doLoginSSO())
       .catch(error => {
         switch (error.label) {
           default: {
@@ -121,6 +124,7 @@ class SingleSignOn extends React.PureComponent {
   render() {
     const {
       intl: {formatMessage: _},
+      loginError,
     } = this.props;
     const {persist, code, validInputs, validationErrors} = this.state;
     return (
@@ -175,6 +179,11 @@ class SingleSignOn extends React.PureComponent {
                         data-uie-name="do-sso-sign-in"
                       />
                     </InputSubmitCombo>
+                    {validationErrors.length ? (
+                      parseValidationErrors(validationErrors)
+                    ) : loginError ? (
+                      <ErrorMessage data-uie-name="error-message">{parseError(loginError)}</ErrorMessage>
+                    ) : null}
                     {!isDesktopApp() && (
                       <Checkbox
                         tabIndex="3"
@@ -186,7 +195,6 @@ class SingleSignOn extends React.PureComponent {
                         <CheckboxLabel>{_(loginStrings.publicComputer)}</CheckboxLabel>
                       </Checkbox>
                     )}
-                    {validationErrors.length ? parseValidationErrors(validationErrors) : null}
                     <Button style={{marginTop: '16px'}} onClick={this.extractSSOLink} data-uie-name="do-paste-sso-code">
                       {'Paste'}
                     </Button>
@@ -209,7 +217,7 @@ export default withRouter(
         isFetching: AuthSelector.isFetching(state),
         loginError: AuthSelector.getError(state),
       }),
-      {resetError}
+      {resetError, ...AuthAction}
     )(SingleSignOn)
   )
 );

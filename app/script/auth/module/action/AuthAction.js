@@ -69,6 +69,17 @@ function doLoginPlain(loginData, onBeforeLogin, onAfterLogin) {
   };
 }
 
+export function doLoginSSO() {
+  return function(dispatch, getState, global) {
+    dispatch(AuthActionCreator.startLogin());
+    return Promise.resolve().then(() => {
+      const error = new BackendError({code: 404, label: 'no-team', message: 'Organisation not found'});
+      dispatch(AuthActionCreator.failedLogin(error));
+      throw error;
+    });
+  };
+}
+
 function persistAuthData(clientType, core, dispatch) {
   const persist = clientType === ClientType.PERMANENT;
   const accessToken = core.apiClient.accessTokenStore.accessToken;
