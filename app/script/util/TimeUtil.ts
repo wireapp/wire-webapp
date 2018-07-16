@@ -1,3 +1,22 @@
+interface DiscreteTimeUnit {
+  longUnit: string;
+  symbol: string;
+  value: number;
+}
+
+interface DurationUnit {
+  plural: string,
+  singular: string,
+  symbol: string,
+  value: number,
+}
+
+interface LocalizedDurationUnit {
+  symbol: string,
+  text: string,
+  value: number,
+}
+
 interface Window {
   z: any;
 }
@@ -16,11 +35,11 @@ window.z.util.TimeUtil = {
     WEEK: 1000 * 60 * 60 * 24 * 7,
     YEAR: 1000 * 60 * 60 * 24 * 365,
   },
-  adjustCurrentTimestamp: function (timeOffset: number) {
+  adjustCurrentTimestamp: function (timeOffset: number): number {
     timeOffset = (typeof timeOffset === 'number') ? timeOffset : 0;
     return Date.now() - timeOffset;
   },
-  durationUnits: () => {
+  durationUnits: (): DurationUnit[] => {
     return [
       {
         plural: 'ephemeralUnitsYears',
@@ -60,29 +79,22 @@ window.z.util.TimeUtil = {
       },
     ];
   },
-  /**
-   * Format milliseconds into 15s, 2m.
-   * @param {number} duration - Duration to format in milliseconds
-   * @returns {DurationUnit} Unit, value and localized string
-   */
-  formatDuration: (duration: number) => {
+  formatDuration: (duration: number): LocalizedDurationUnit => {
     const mappedUnits = window.z.util.TimeUtil.mapUnits(duration, true);
-    const firstNonZeroUnit = mappedUnits.find(unit => unit.value > 0);
+    const firstNonZeroUnit = mappedUnits.find((unit: DiscreteTimeUnit) => {
+      return unit.value > 0;
+    });
     return {
       symbol: firstNonZeroUnit.symbol,
       text: `${firstNonZeroUnit.value} ${window.z.l10n.text(firstNonZeroUnit.longUnit)}`,
       value: firstNonZeroUnit.value,
     };
   },
-  /**
-   * Generate a human readable string of the remaining time
-   * @param {number} duration - the remaining time in milliseconds
-   * @returns {string} readable representation of the remaining time
-   */
-  formatDurationCaption: duration => {
+  // Generate a human readable string of the remaining time
+  formatDurationCaption: (duration: number): string => {
     const mappedUnits = window.z.util.TimeUtil.mapUnits(duration, false);
-    const hours = mappedUnits.find(unit => unit.symbol === 'h');
-    const minutes = mappedUnits.find(unit => unit.symbol === 'm');
+    const hours = mappedUnits.find((unit: DiscreteTimeUnit) => unit.symbol === 'h');
+    const minutes = mappedUnits.find((unit: DiscreteTimeUnit) => unit.symbol === 'm');
     const hasHours = hours.value > 0;
     const validUnitStrings = [];
     for (let index = 0; index < mappedUnits.length; index++) {
@@ -105,13 +117,8 @@ window.z.util.TimeUtil = {
     const joiner = ` ${window.z.l10n.text(window.z.string.and)} `;
     return `${validUnitStrings.join(joiner)} ${window.z.l10n.text(window.z.string.ephemeralRemaining)}`;
   },
-
-  /**
-   * Format seconds into hh:mm:ss.
-   * @param {number} duration - duration to format in seconds
-   * @returns {string} Formatted string
-   */
-  formatSeconds: duration => {
+  // Format seconds into hh:mm:ss.
+  formatSeconds: (duration: number): string => {
     duration = Math.round(duration || 0);
 
     const hours = Math.floor(duration / (60 * 60));
@@ -138,7 +145,7 @@ window.z.util.TimeUtil = {
    * @param {boolean} longFormat - True, if output should have leading numbers
    * @returns {string} Human readable format of a timestamp.
    */
-  formatTimestamp: (timestamp, longFormat = true) => {
+  formatTimestamp: (timestamp: number, longFormat: boolean = true): string => {
     const time = moment(timestamp);
     let format = 'DD.MM.YYYY (HH:mm:ss)';
 
@@ -149,19 +156,16 @@ window.z.util.TimeUtil = {
     return time.format(format);
   },
 
-  getCurrentDate: () => new Date().toISOString().substring(0, 10),
+  getCurrentDate: (): string => new Date().toISOString().substring(0, 10),
 
-  getUnixTimestamp: () => Math.floor(Date.now() / window.z.util.TimeUtil.UNITS_IN_MILLIS.SECOND),
+  getUnixTimestamp: (): number => Math.floor(Date.now() / window.z.util.TimeUtil.UNITS_IN_MILLIS.SECOND),
 
   /**
    * Calculate the discrete time units (years, weeks, days, hours, minutes, seconds) for a given duration
    * @note Implementation based on: https://gist.github.com/deanrobertcook/7168b38150c303a2b4196216913d34c1
-   * @param {number} duration - duration in milliseconds
-   * @param {boolean} rounded - should the units be rounded as opposed to floored
-   * @returns {DiscreteTimeUnit[]} calculated time units
    */
-  mapUnits: (duration: number, rounded: boolean) => {
-    const mappedUnits = window.z.util.TimeUtil.durationUnits().map((unit, index: number, units) => {
+  mapUnits: (duration: number, rounded: boolean): DiscreteTimeUnit[] => {
+    const mappedUnits = window.z.util.TimeUtil.durationUnits().map((unit: DurationUnit, index: number, units: DurationUnit[]) => {
       let value = duration;
       if (index > 0) {
         value %= units[index - 1].value;

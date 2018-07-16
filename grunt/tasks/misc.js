@@ -55,7 +55,7 @@ module.exports = grunt => {
   grunt.registerTask('compile:ts', function() {
     const done = this.async();
     grunt.log.writeln('Compiling TypeScript files ...');
-    grunt.util.spawn({cmd: 'tsc'}, done);
+    grunt.util.spawn({cmd: 'tsc', opts: {stdio: 'inherit'}}, done);
   });
 
   grunt.registerTask('prepare_dist', [
