@@ -52,10 +52,17 @@ module.exports = grunt => {
     grunt.log.ok(`Version set to ${version}`);
   });
 
+  grunt.registerTask('compile:ts', function() {
+    const done = this.async();
+    grunt.log.writeln('Compiling TypeScript files ...');
+    grunt.util.spawn({cmd: 'tsc'}, done);
+  });
+
   grunt.registerTask('prepare_dist', [
     'clean:dist',
     'less:dist',
     'postcss:distribution',
+    'compile:ts',
     'copy:dist',
     'copy:dist_audio',
     'copy:dist_favicon',

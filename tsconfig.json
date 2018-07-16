@@ -1,10 +1,12 @@
 {
   "compilerOptions": {
-    "allowJs": true,
-    "lib": ["DOM", "ES2016"],
-    "checkJs": true,
     "declaration": false,
-    "outDir": "./temp"
-  },
-  "files": ["app/script/util/TimeUtil.js"]
+    "forceConsistentCasingInFileNames": true,
+    "lib": ["DOM", "ES2016"],
+    "noEmitOnError": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "strict": false,
+    "rootDir": "app/script"
+  }
 }
