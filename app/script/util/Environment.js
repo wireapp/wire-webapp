@@ -95,6 +95,9 @@ z.util.Environment = (() => {
 
     return _isEdge() ? false : _isChrome() || _isFirefox() || _isOpera();
   };
+
+  const _supportsClipboard = () => !!navigator.cliboard;
+
   const _supportsIndexedDb = () => {
     try {
       return !!window.indexedDB;
@@ -136,6 +139,7 @@ z.util.Environment = (() => {
       supports: {
         audioOutputSelection: _supportsAudioOutputSelection(),
         calling: _supportsCalling(),
+        clipboard: _supportsClipboard(),
         indexedDb: _supportsIndexedDb(),
         mediaDevices: _supportsMediaDevices(),
         mediaPermissions: _supportsMediaPermissions(),
