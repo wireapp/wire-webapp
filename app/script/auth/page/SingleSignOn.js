@@ -24,6 +24,8 @@ import {
   ContainerXS,
   Columns,
   Column,
+  Checkbox,
+  CheckboxLabel,
   RoundIconButton,
   InputSubmitCombo,
   ICON_NAME,
@@ -42,15 +44,18 @@ import {parseValidationErrors} from '../util/errorUtil';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
 import {withRouter} from 'react-router';
+import {isDesktopApp} from '../Runtime';
 import {resetError} from '../module/action/creator/AuthActionCreator';
 import Page from './Page';
 import {ROUTE} from '../route';
 import ValidationError from '../module/action/ValidationError';
+import {loginStrings} from '../../strings';
 
 class SingleSignOn extends React.PureComponent {
   inputs = {};
   state = {
     code: '',
+    persist: true,
     validInputs: {
       code: true,
     },
@@ -114,7 +119,10 @@ class SingleSignOn extends React.PureComponent {
   isValidateInput = inputString => inputString && inputString.includes('sso.wire.com');
 
   render() {
-    const {code, validInputs, validationErrors} = this.state;
+    const {
+      intl: {formatMessage: _},
+    } = this.props;
+    const {persist, code, validInputs, validationErrors} = this.state;
     return (
       <Page>
         <Container centerText verticalCenter style={{width: '100%'}}>
@@ -167,8 +175,19 @@ class SingleSignOn extends React.PureComponent {
                         data-uie-name="do-sso-sign-in"
                       />
                     </InputSubmitCombo>
+                    {!isDesktopApp() && (
+                      <Checkbox
+                        tabIndex="3"
+                        onChange={event => this.setState({persist: !event.target.checked})}
+                        checked={!persist}
+                        data-uie-name="enter-public-computer-sso-sign-in"
+                        style={{justifyContent: 'center'}}
+                      >
+                        <CheckboxLabel>{_(loginStrings.publicComputer)}</CheckboxLabel>
+                      </Checkbox>
+                    )}
                     {validationErrors.length ? parseValidationErrors(validationErrors) : null}
-                    <Button onClick={this.extractSSOLink} data-uie-name="do-paste-sso-code">
+                    <Button style={{marginTop: '16px'}} onClick={this.extractSSOLink} data-uie-name="do-paste-sso-code">
                       {'Paste'}
                     </Button>
                   </Form>
