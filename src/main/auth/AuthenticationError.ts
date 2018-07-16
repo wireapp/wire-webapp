@@ -62,3 +62,15 @@ export class SuspendedAccountError extends AuthenticationError {
     this.name = 'SuspendedAccountError';
   }
 }
+
+export class IdentifierExistsError extends AuthenticationError {
+  constructor(
+    message: string,
+    label: BackendErrorLabel = BackendErrorLabel.KEY_EXISTS,
+    code: StatusCode = StatusCode.CONFLICT
+  ) {
+    super(message, label, code);
+    Object.setPrototypeOf(this, IdentifierExistsError.prototype);
+    this.name = 'IdentifierExistsError';
+  }
+}
