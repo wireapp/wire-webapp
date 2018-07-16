@@ -37,4 +37,8 @@ module.exports = {
     files: '<%= dir.app_ %>/**/*.htm*',
     tasks: ['prepare_template'],
   },
+  ts: {
+    files: '<%= dir.app_ %>/**/*.ts',
+    tasks: ['compile:ts'],
+  },
 };
