@@ -369,7 +369,6 @@ export default withRouter(
   injectIntl(
     connect(
       state => ({
-        clients: ClientSelector.getClients(state),
         hasHistory: ClientSelector.hasHistory(state),
         hasSelfHandle: SelfSelector.hasSelfHandle(state),
         isFetching: AuthSelector.isFetching(state),

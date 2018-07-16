@@ -38,20 +38,26 @@ import {
   ArrowIcon,
   COLOR,
 } from '@wireapp/react-ui-kit';
+import * as AuthAction from '../module/action/AuthAction';
+import * as AuthSelector from '../module/selector/AuthSelector';
+import * as ClientAction from '../module/action/ClientAction';
+import * as ClientSelector from '../module/selector/ClientSelector';
+import * as ConversationAction from '../module/action/ConversationAction';
+import * as SelfSelector from '../module/selector/SelfSelector';
+import * as URLUtil from '../util/urlUtil';
+import AppAlreadyOpen from '../component/AppAlreadyOpen';
+import BackendError from '../module/action/BackendError';
+import Page from './Page';
+import ValidationError from '../module/action/ValidationError';
 import {Link as RRLink} from 'react-router-dom';
+import {ROUTE} from '../route';
 import {connect} from 'react-redux';
 import {injectIntl} from 'react-intl';
-import {parseValidationErrors, parseError} from '../util/errorUtil';
-import * as AuthSelector from '../module/selector/AuthSelector';
-import AppAlreadyOpen from '../component/AppAlreadyOpen';
-import {withRouter} from 'react-router';
 import {isDesktopApp} from '../Runtime';
-import * as AuthAction from '../module/action/AuthAction';
-import {resetError} from '../module/action/creator/AuthActionCreator';
-import Page from './Page';
-import {ROUTE} from '../route';
-import ValidationError from '../module/action/ValidationError';
 import {loginStrings} from '../../strings';
+import {parseValidationErrors, parseError} from '../util/errorUtil';
+import {resetError} from '../module/action/creator/AuthActionCreator';
+import {withRouter} from 'react-router';
 
 class SingleSignOn extends React.PureComponent {
   inputs = {};
@@ -97,9 +103,29 @@ class SingleSignOn extends React.PureComponent {
           throw errors[0];
         }
       })
-      .then(() => this.props.doLoginSSO())
+      .then(() => this.props.doLoginSSO({code: this.state.code.trim(), persist: this.state.persist}))
+      .then(this.navigateChooseHandleOrWebapp)
       .catch(error => {
         switch (error.label) {
+          case BackendError.LABEL.NEW_CLIENT: {
+            this.props.resetError();
+            /**
+             * Show history screen if:
+             *   1. database contains at least one event
+             *   2. there is at least one previously registered client
+             *   3. new local client is temporary
+             */
+            return this.props.doGetAllClients().then(clients => {
+              const shouldShowHistoryInfo = this.props.hasHistory || clients.length > 1 || !this.state.persist;
+              return shouldShowHistoryInfo
+                ? this.props.history.push(ROUTE.HISTORY_INFO)
+                : this.navigateChooseHandleOrWebapp();
+            });
+          }
+          case BackendError.LABEL.TOO_MANY_CLIENTS: {
+            this.props.resetError();
+            return this.props.history.push(ROUTE.CLIENTS);
+          }
           default: {
             throw error;
           }
@@ -108,7 +134,16 @@ class SingleSignOn extends React.PureComponent {
     throw new Error('CODE NOT VALID. CONTACT YOUR ADMINISTARTOR');
   };
 
-  extractSSOLink = () => {
+  navigateChooseHandleOrWebapp = () => {
+    return this.props.hasSelfHandle
+      ? window.location.replace(URLUtil.getAppPath())
+      : this.props.history.push(ROUTE.CHOOSE_HANDLE);
+  };
+
+  extractSSOLink = event => {
+    if (event) {
+      event.preventDefault();
+    }
     this.readFromClipboard().then(code => {
       const isValidSSOLink = this.isValidSSOCode(code);
       if (isValidSSOLink) {
@@ -214,10 +249,12 @@ export default withRouter(
   injectIntl(
     connect(
       state => ({
+        hasHistory: ClientSelector.hasHistory(state),
+        hasSelfHandle: SelfSelector.hasSelfHandle(state),
         isFetching: AuthSelector.isFetching(state),
         loginError: AuthSelector.getError(state),
       }),
-      {resetError, ...AuthAction}
+      {resetError, ...AuthAction, ...ConversationAction, ...ClientAction}
     )(SingleSignOn)
   )
 );
