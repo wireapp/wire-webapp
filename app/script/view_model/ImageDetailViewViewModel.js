@@ -150,8 +150,10 @@ z.viewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
       .resource()
       .load()
       .then(blob => {
-        this.imageSrc(window.URL.createObjectURL(blob));
-        this.imageVisible(true);
+        if (blob) {
+          this.imageSrc(window.URL.createObjectURL(blob));
+          this.imageVisible(true);
+        }
       });
   }
 

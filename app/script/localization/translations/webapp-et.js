@@ -30,12 +30,12 @@ z.string.et.authAccountCountryCode = 'Riigi kood';
 z.string.et.authAccountPasswordForgot = 'Unustasid parooli?';
 z.string.et.authAccountPublicComputer = 'See on avalik arvuti';
 z.string.et.authAccountSignIn = 'Logi sisse';
-z.string.et.authAccountSignInPhone = 'Telefon';
+z.string.et.authAccountSignInPhone = 'Telefoniga sisse logimine';
 
 z.string.et.authBlockedCookies = 'Wire’i sisselogimiseks luba küpsised.';
 z.string.et.authBlockedDatabase = 'Wire vajab sõnumite kuvamiseks ligipääsu kohalikule hoidlale (local storage). Kohalik hoidla ei ole privaatrežiimis saadaval.';
 z.string.et.authBlockedTabs = 'Wire on juba teisel kaardil avatud.';
-z.string.et.authBlockedTabsAction = 'Kasuta hoopis seda kaarti';
+z.string.et.authBlockedTabsAction = 'Kasuta hoopis seda brauseritäbi';
 
 z.string.et.authVerifyAccountAdd = 'Lisa';
 z.string.et.authVerifyAccountDetail = 'See võimaldab kasutada Wire’i mitmes seadmes.';
@@ -104,7 +104,7 @@ z.string.et.videoCallOverlayMute = 'Vaigista';
 z.string.et.videoCallOverlayVideo = 'Video';
 z.string.et.videoCallOverlayShareScreen = 'Jaga ekraani';
 z.string.et.videoCallOverlayHangUp = 'Lõpeta kõne';
-z.string.et.videoCallPaused="Video pausil";
+z.string.et.videoCallPaused = 'Video pausil';
 
 z.string.et.modalAcknowledgeAction = 'Ok';
 z.string.et.modalAcknowledgeHeadline = 'Midagi läks valesti';
@@ -112,8 +112,8 @@ z.string.et.modalConfirmSecondary = 'Tühista';
 z.string.et.modalOptionSecondary = 'Tühista';
 
 z.string.et.modalAccountCreateAction = 'OK';
-z.string.et.modalAccountCreateHeadline = 'Lood konto?';
-z.string.et.modalAccountCreateMessage = 'Luues konto, kaotad sa vestlusajaloo selles külalistetoas.';
+z.string.et.modalAccountCreateHeadline = 'Loo konto?';
+z.string.et.modalAccountCreateMessage = 'Konto luues kaotad vestluste ajaloo siin külalistetoas.';
 
 z.string.et.modalAccountDeletionAction = 'Kustuta';
 z.string.et.modalAccountDeletionHeadline = 'Kustuta konto';
@@ -121,7 +121,7 @@ z.string.et.modalAccountDeletionMessage = 'Me saadame sõnumi e-posti või SMSi 
 
 z.string.et.modalAccountLeaveGuestRoomAction = 'Lahku';
 z.string.et.modalAccountLeaveGuestRoomHeadline = 'Lahkud külalistetoast?';
-z.string.et.modalAccountLeaveGuestRoomMessage = 'Vestlusajalugu kustutatakse. Selle säilitamiseks loo järgmine kord konto.';
+z.string.et.modalAccountLeaveGuestRoomMessage = 'Vestluse ajalugu kustutatakse. Edaspidi ajaloo säilitamiseks registreeri endale konto.';
 
 z.string.et.modalAccountLogoutAction = 'Logi välja';
 z.string.et.modalAccountLogoutHeadline = 'Tühjendad andmed?';
@@ -147,7 +147,7 @@ z.string.et.modalCallEmptyConversationHeadline = 'Pole kellelegi helistada';
 z.string.et.modalCallEmptyConversationMessage = 'Siia pole kedagi jäänud.';
 
 z.string.et.modalCallEmptyLogHeadline = 'Kõned puuduvad';
-z.string.et.modalCallEmptyLogMessage = 'Kõned puuduvad, seega ei saa teha neil põhinevat silumisaruannet.';
+z.string.et.modalCallEmptyLogMessage = 'Kõned puuduvad, vearaporti saatmine pole võimalik.';
 
 z.string.et.modalCallNoGroupVideoHeadline = 'Videokõnesid ei saa teha gruppides';
 z.string.et.modalCallNoGroupVideoMessage = 'Videokõned pole saadaval grupivestlustes.';
@@ -184,7 +184,7 @@ z.string.et.modalConversationAddBotMessage = 'Kas soovi kindlasti alustada uut v
 
 z.string.et.modalConversationClearAction = 'Kustuta';
 z.string.et.modalConversationClearHeadline = 'Kustuta sisu?';
-z.string.et.modalConversationClearMessage = 'See tühjendab vestlusajaloo sinu kõigis seadmetes.';
+z.string.et.modalConversationClearMessage = 'See kustutab vestluse ajaloo kõigis seadmetes.';
 z.string.et.modalConversationClearOption = 'Lahku samuti vestlusest';
 
 z.string.et.modalConversationDeleteMessageAction = 'Kustuta';
@@ -196,7 +196,7 @@ z.string.et.modalConversationDeleteMessageEveryoneHeadline = 'Kustuta kõigi jao
 z.string.et.modalConversationDeleteMessageEveryoneMessage = 'Seda ei saa tagasi võtta.';
 
 z.string.et.modalConversationLeaveAction = 'Lahku';
-z.string.et.modalConversationLeaveHeadline = 'Lahkud {{name}} vestlusest?';
+z.string.et.modalConversationLeaveHeadline = 'Lahkud vestlusest {{name}}?';
 z.string.et.modalConversationLeaveMessage = 'Sa ei saa selles vestluses sõnumeid saata ega vastu võtta.';
 
 z.string.et.modalConversationMessageTooLongHeadline = 'Sõnum on liiga pikk';
@@ -208,11 +208,11 @@ z.string.et.modalConversationNewDeviceHeadlineMany = '{{users}} hakkasid uusi se
 z.string.et.modalConversationNewDeviceHeadlineYou = '{{user}} hakkasid uut seadet kasutama';
 z.string.et.modalConversationNewDeviceIncomingCallAction = 'Võta kõne vastu';
 z.string.et.modalConversationNewDeviceIncomingCallMessage = 'Kas sa soovid siiski kõne vastu võtta?';
-z.string.et.modalConversationNewDeviceMessage = 'Kas sa siiski soovid oma sõnumeid saata?';
+z.string.et.modalConversationNewDeviceMessage = 'Kas tahad ikka seda sõnumit saata?';
 z.string.et.modalConversationNewDeviceOutgoingCallAction = 'Helista siiski';
 z.string.et.modalConversationNewDeviceOutgoingCallMessage = 'Kas sa soovid siiski kõne teha?';
 
-z.string.et.modalConversationNotConnectedHeadline = 'Kedagi pole vestlusse lisatud';
+z.string.et.modalConversationNotConnectedHeadline = 'Kedagi pole vestlusse veel lisatud';
 z.string.et.modalConversationNotConnectedMessageOne = '{{name}} ei soovi vestlustega liituda.';
 z.string.et.modalConversationNotConnectedMessageMany = 'Üks valitud inimestest ei soovi vestlustega liituda.';
 
@@ -228,8 +228,8 @@ z.string.et.modalConversationRevokeLinkAction = 'Tühista link';
 z.string.et.modalConversationRevokeLinkHeadline = 'Tühistad lingi?';
 z.string.et.modalConversationRevokeLinkMessage = 'Uued külalised ei saa selle lingi abil liituda. Praegustel külalistel on jätkuvalt ligipääs.';
 
-z.string.et.modalConversationGuestOptionsAllowGuestMessage = 'Külalisi ei saanud lubada. Palun proovi uuesti.';
-z.string.et.modalConversationGuestOptionsDisableGuestMessage = 'Külalisi ei saanud eemaldada. Palun proovi uuesti.';
+z.string.et.modalConversationGuestOptionsAllowGuestMessage = 'Külaliste lubamine ebaõnnestus. Palun proovi uuesti.';
+z.string.et.modalConversationGuestOptionsDisableGuestMessage = 'Külaliste eemaldamine ebaõnnestus. Palun proovi uuesti.';
 z.string.et.modalConversationGuestOptionsGetCodeMessage = 'Ligipääsulinki ei saadud.';
 z.string.et.modalConversationGuestOptionsRequestCodeMessage = 'Ligipääsulingi taotlemine ebaõnnestus. Palun proovi uuesti.';
 z.string.et.modalConversationGuestOptionsRevokeCodeMessage = 'Ligipääsulingi tühistamine ebaõnnestus. Palun proovi uuesti.';
@@ -292,12 +292,8 @@ z.string.et.conversationBotUser = 'Bot';
 z.string.et.conversationConnectionAccepted = 'Ühendatud';
 z.string.et.conversationConnectionBlocked = 'Blokeeritud';
 z.string.et.conversationConnectionCancelRequest = 'Tühista ühendussoov';
-z.string.et.conversationCreate = ' alustas vestlust kasutajatega {{users}}';
-z.string.et.conversationCreateName = '{{user}} alustas vestlust';
-z.string.et.conversationCreateNameYou = '{{user}} alustas vestlust';
 z.string.et.conversationCreateTemporary = 'Sina liitusid vestlusega';
 z.string.et.conversationCreateWith = ' koos {{users}}';
-z.string.et.conversationCreateYou = ' alustasid vestlust kasutajatega {{users}}';
 z.string.et.conversationDeviceStartedUsingOne = ' hakkas kasutama';
 z.string.et.conversationDeviceStartedUsingMany = ' hakkas kasutama';
 z.string.et.conversationDeviceUnverified = ' eemaldasid kinnituse ühel';
@@ -309,21 +305,35 @@ z.string.et.conversationDeviceNewPeopleJoined = 'Uued inimesed liitusid.';
 z.string.et.conversationDeviceNewPeopleJoinedVerify = ' kinnita seadmed';
 z.string.et.conversationJustNow = 'Just nüüd';
 z.string.et.conversationLocationLink = 'Ava kaart';
-z.string.et.conversationMemberJoin = ' lisas {{users}}';
-z.string.et.conversationMemberJoinYou = ' lisasid {{users}}';
-z.string.et.conversationMemberJoinSelf = ' liitusid';
-z.string.et.conversationMemberJoinSelfYou = ' liitusid';
-z.string.et.conversationMemberLeaveLeft = ' lahkus';
-z.string.et.conversationMemberLeaveLeftYou = ' lahkusid';
-z.string.et.conversationMemberLeaveRemoved = ' eemaldas {{users}}';
-z.string.et.conversationMemberLeaveRemovedYou = ' eemaldasid {{users}}';
+z.string.et.conversationCreated = '[bold]{{name}}[/bold] alustas vestlust kasutajate {{users}} ja [showmore]{{count}} teisega[/showmore]';
+z.string.et.conversationCreatedMore = '[bold]{{name}}[/bold] alustas vestlust kasutajate {{users}} ja [showmore]{{count}} teisega[/showmore]';
+z.string.et.conversationCreatedName = '[bold]{{name}}[/bold] alustas vestlust';
+z.string.et.conversationCreatedNameYou = '[bold]Sina[/bold] alustasid vestlust';
+z.string.et.conversationCreatedYou = 'Sina alustasid vestlust kasutajatega {{users}}';
+z.string.et.conversationCreatedYouMore = 'Sina alustasid vestlust kasutajate {{users}} ja [showmore]{{count}} teisega[/showmore]';
+z.string.et.conversationCreateWithMore = 'kasutajate {{users}} ja [showmore]{{count}} teisega[/showmore]';
+z.string.et.conversationCreateTeam = '[showmore]kõikide meeskonnaliikmetega[/showmore]';
+z.string.et.conversationCreateTeamGuest = '[showmore]kõikide meeskonnaliikmete ja ühe külalisega[/showmore]';
+z.string.et.conversationCreateTeamGuests = '[showmore]kõikide meeskonnaliikmete ja {{count}} külalisega[/showmore]';
+z.string.et.conversationMemberJoined = '[bold]{{name}}[/bold] lisas vestlusesse {{users}}';
+z.string.et.conversationMemberJoinedYou = '[bold]Sina[/bold] lisasid vestlusesse {{users}}';
+z.string.et.conversationMemberJoinedMore = '[bold]{{name}}[/bold] lisas vestlusesse {{users}} ja [showmore]{{count}} teist[/showmore]';
+z.string.et.conversationMemberJoinedYouMore = '[bold]Sina[/bold] lisasid vestlusesse {{users}} ja [showmore]{{count}} teist[/showmore]';
+z.string.et.conversationMemberJoinedSelf = '[bold]{{name}}[/bold] liitus';
+z.string.et.conversationMemberJoinedSelfYou = '[bold]Sina[/bold] liitusid';
+z.string.et.conversationMemberLeft = '[bold]{{name}}[/bold] lahkus';
+z.string.et.conversationMemberLeftYou = '[bold]Sina[/bold] lahkusid';
+z.string.et.conversationMemberRemoved = '[bold]{{name}}[/bold] eemaldas {{users}}';
+z.string.et.conversationMemberRemovedYou = '[bold]Sina[/bold] eemaldasid {{users}}';
+z.string.et.conversationTeamLeft = '[bold]{{name}}[/bold] eemaldati meeskonnast';
 z.string.et.conversationMessageDelivered = 'Kohale toimetatud';
 z.string.et.conversationRename = ' nimetas vestluse ümber';
 z.string.et.conversationRenameYou = ' nimetasid vestluse ümber';
 z.string.et.conversationUpdatedTimer = ' määras sõnumi taimeriks {{time}}';
+z.string.et.conversationUpdatedTimerYou = ' määras sõnumi taimeriks {{time}}';
 z.string.et.conversationResetTimer = ' lülitas sõnumi taimeri välja';
+z.string.et.conversationResetTimerYou = ' lülitas sõnumi taimeri välja';
 z.string.et.conversationResume = 'Alusta vestlust kasutajatega {{users}}';
-z.string.et.conversationTeamLeave = ' eemaldati meeskonnast';
 z.string.et.conversationPing = ' pingis';
 z.string.et.conversationPingYou = ' pingisid';
 z.string.et.conversationToday = 'täna';
@@ -455,6 +465,7 @@ z.string.et.conversationDetailsActionAddParticipants = 'Lisa osalejaid';
 z.string.et.conversationDetailsActionBlock = 'Blokeeri kontakt';
 z.string.et.conversationDetailsActionCancelRequest = 'Tühista taotlus…';
 z.string.et.conversationDetailsActionClear = 'Kustuta sisu';
+z.string.et.conversationDetailsActionConversationParticipants = 'Kuva kõik ({{number}})';
 z.string.et.conversationDetailsActionCreateGroup = 'Uus grupp';
 z.string.et.conversationDetailsActionDevices = 'Seadmed';
 z.string.et.conversationDetailsActionGuestOptions = 'Külaliste valikud';
@@ -468,6 +479,9 @@ z.string.et.conversationDetailsParticipantsUsersOne = 'Inimene';
 z.string.et.conversationDetailsParticipantsUsersMany = 'Inimesed';
 z.string.et.conversationDetailsPeople = 'Inimesed';
 z.string.et.conversationDetailsServices = 'Teenused';
+
+z.string.et.conversationParticipantsTitle = 'Inimesed';
+z.string.et.conversationParticipantsSearchPlaceholder = 'Otsi nime järgi';
 
 z.string.et.groupParticipantActionBlock = 'Blokeeri kontakt…';
 z.string.et.groupParticipantActionCancelRequest = 'Tühista taotlus…';
@@ -707,6 +721,8 @@ z.string.et.notificationConnectionAccepted = 'Nõustus sinu ühendamistaotlusega
 z.string.et.notificationConnectionConnected = 'Sa oled nüüd ühendatud';
 z.string.et.notificationConnectionRequest = 'Soovib ühenduda';
 z.string.et.notificationConversationCreate = '{{user}} alustas vestlust';
+z.string.et.notificationConversationMessageTimerUpdate = '{{user}} määras sõnumi taimeriks {{time}}';
+z.string.et.notificationConversationMessageTimerReset = '{{user}} lülitas sõnumi taimeri välja';
 z.string.et.notificationConversationRename = '{{user}} nimetas vestluse ümber: {{name}}';
 z.string.et.notificationMemberJoinMany = '{{user}} lisas vestlusesse {{number}} inimest';
 z.string.et.notificationMemberJoinSelf = '{{user}} liitus vestlusega';
@@ -720,6 +736,7 @@ z.string.et.notificationSharedAudio = 'Jagas häälsõnumit';
 z.string.et.notificationSharedFile = 'Jagas faili';
 z.string.et.notificationSharedLocation = 'Jagas asukohta';
 z.string.et.notificationSharedVideo = 'Jagas videot';
+z.string.et.notificationTitleGroup = '{{user}} vestluses {{conversation}}';
 z.string.et.notificationVoiceChannelActivate = 'Helistamine';
 z.string.et.notificationVoiceChannelDeactivate = 'helistas';
 
@@ -777,4 +794,5 @@ z.string.et.ephemeralUnitsWeek = 'nädal';
 z.string.et.ephemeralUnitsWeeks = 'nädalat';
 z.string.et.ephemeralUnitsYear = 'aasta';
 z.string.et.ephemeralUnitsYears = 'aastat';
+z.string.et.ephemeralRemaining = 'on jäänud';
 

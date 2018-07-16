@@ -466,9 +466,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
     conversationEntity.hasCreationMessage = true;
 
     if (conversationEntity.inTeam()) {
-      const allTeamMembersParticipate = this.teamMembers().every(teamMember => {
-        return conversationEntity.participating_user_ids().includes(teamMember.id);
-      });
+      const allTeamMembersParticipate = this.teamMembers().length
+        ? this.teamMembers().every(teamMember => conversationEntity.participating_user_ids().includes(teamMember.id))
+        : false;
 
       conversationEntity.withAllTeamMembers(allTeamMembersParticipate);
     }

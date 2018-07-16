@@ -48,17 +48,41 @@ class Localizer {
 z.localization.Localizer = new Localizer();
 
 z.l10n = (() => {
-  const replaceWithString = (string, substitute) => string.replace(/{{\w+}}/, substitute);
+  const isStringOrNumber = toTest => _.isString(toTest) || _.isNumber(toTest);
 
-  const replaceWithObject = (string, substitutions) => {
-    Object.entries(substitutions).forEach(([identifier, substitute]) => {
-      string = string.replace(new RegExp(`{{${identifier}}}`, 'g'), substitute);
-    });
-
-    return string;
+  const replaceSubstitute = (string, regex, substitute) => {
+    const replacement = isStringOrNumber(substitute)
+      ? substitute
+      : (found, content) => (substitute.hasOwnProperty(content) ? substitute[content] : found);
+    return string.replace(regex, replacement);
   };
 
   return {
+    safeHtml(value, substitutions = {}) {
+      const replace = isStringOrNumber(substitutions) ? substitutions : substitutions.replace;
+
+      const defaultReplacements = {
+        '/bold': '</b>',
+        '/italic': '</i>',
+        bold: '<b>',
+        italic: '<i>',
+      };
+
+      const replaceDangerously = Object.assign({}, defaultReplacements, substitutions.replaceDangerously);
+
+      let string = ko.unwrap(value);
+
+      if (replace !== undefined) {
+        string = replaceSubstitute(string, /{{(.+?)}}/g, replace);
+      }
+
+      string = z.util.SanitizationUtil.escapeString(string);
+
+      string = replaceSubstitute(string, /\[(.+?)\]/g, replaceDangerously);
+
+      return string;
+    },
+
     /**
      * Retrieve localized string and replace placeholders
      *
@@ -75,15 +99,9 @@ z.l10n = (() => {
      * @returns {string} - string with substituted placeholders
      */
     text(value, substitute) {
-      const string = z.util.SanitizationUtil.escapeString(ko.unwrap(value));
-
-      if (_.isObject(substitute)) {
-        return replaceWithObject(string, substitute);
-      }
-      if (_.isString(value)) {
-        return replaceWithString(string, substitute);
-      }
-      return string;
+      let string = ko.unwrap(value);
+      string = replaceSubstitute(string, /{{(.+?)}}/g, substitute);
+      return z.util.SanitizationUtil.escapeString(string);
     },
   };
 })();

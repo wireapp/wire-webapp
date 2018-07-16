@@ -111,7 +111,7 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
       }
 
       default:
-        this.logger.warn(`Ephemeral message of unsupported type: ${messageEntity.type}`);
+        this.logger.info(this.logger.levels.OFF, `Non-ephemeral message of type: ${messageEntity.type}`);
     }
   }
 

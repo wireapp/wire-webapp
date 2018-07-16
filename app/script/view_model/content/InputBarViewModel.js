@@ -99,8 +99,8 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
         const availabilityStrings = {
           [z.user.AvailabilityType.AVAILABLE]: z.string.tooltipConversationInputPlaceholderAvailable,
-          [z.user.AvailabilityType.AWAY]: z.string.tooltipConversationInputPlaceholderAWAY,
-          [z.user.AvailabilityType.BUSY]: z.string.tooltipConversationInputPlaceholderBUSY,
+          [z.user.AvailabilityType.AWAY]: z.string.tooltipConversationInputPlaceholderAway,
+          [z.user.AvailabilityType.BUSY]: z.string.tooltipConversationInputPlaceholderBusy,
         };
 
         return z.l10n.text(availabilityStrings[userEntity.availability()], userEntity.first_name());

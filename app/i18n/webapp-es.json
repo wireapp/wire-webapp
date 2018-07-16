@@ -44,7 +44,7 @@
   "acceptNewsModal.headline": "¿Desea usted recibir noticias y actualizaciones de producto de WIRE vía email?",
   "acceptNewsModal.unsubscribeDescription": "",
   "acceptNewsModal.privacyDescription": "Revise nuestras<b>Políticas de Privacidad</b>.",
-  "acceptNewsModal.declineButton": "",
+  "acceptNewsModal.declineButton": "No, gracias",
   "acceptNewsModal.confirmButton": "Aceptar",
   "unsupported.headlineBrowser": "",
   "unsupported.subheadBrowser": "",

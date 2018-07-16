@@ -29,14 +29,14 @@ describe('Message Entities', () => {
       message_et = new z.entity.MemberMessage();
     });
 
-    it('can return correct string for more then one users', () => {
+    it('can return correct string for more than one user', () => {
       const user_a = new z.entity.User(z.util.createRandomUuid());
       user_a.name('John');
       message_et.userEntities.push(user_a);
       expect(message_et._generateNameString()).toBe('[bold]John[/bold]');
     });
 
-    it('can return correct string for more then one users', () => {
+    it('can return correct string for more than one user', () => {
       const user_a = new z.entity.User(z.util.createRandomUuid());
       user_a.name('John');
       const user_b = new z.entity.User(z.util.createRandomUuid());
@@ -45,7 +45,7 @@ describe('Message Entities', () => {
       expect(message_et._generateNameString()).toBe('[bold]Jim[/bold] and [bold]John[/bold]');
     });
 
-    it('can return correct string for more then one users', () => {
+    it('can return correct string for more than one user', () => {
       const user_a = new z.entity.User(z.util.createRandomUuid());
       user_a.name('John');
       const user_b = new z.entity.User(z.util.createRandomUuid());
@@ -56,7 +56,7 @@ describe('Message Entities', () => {
       expect(message_et._generateNameString()).toBe('[bold]Jill[/bold], [bold]Jim[/bold], and [bold]John[/bold]');
     });
 
-    it('can return correct string for more then one users without sender', () => {
+    it('can return correct string for more than one user without sender', () => {
       const user_sender = new z.entity.User(z.util.createRandomUuid());
       user_sender.name('Sender');
       message_et.user(user_sender);

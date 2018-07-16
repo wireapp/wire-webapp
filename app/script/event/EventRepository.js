@@ -698,6 +698,7 @@ z.event.EventRepository = class EventRepository {
       event.server_time = event.time;
       event.time = storedEvent.time;
       event.primary_key = storedEvent.primary_key;
+      event.category = z.message.MessageCategorization.categoryFromEvent(event);
       return this.conversationService.update_event(event);
     });
   }

@@ -32,7 +32,7 @@ window.z.viewModel.content = z.viewModel.content || {};
  */
 z.viewModel.content.MessageListViewModel = class MessageListViewModel {
   constructor(mainViewModel, contentViewModel, repositories) {
-    this._on_message_add = this._on_message_add.bind(this);
+    this._scrollAddedMessagesIntoView = this._scrollAddedMessagesIntoView.bind(this);
     this.click_on_cancel_request = this.click_on_cancel_request.bind(this);
     this.click_on_like = this.click_on_like.bind(this);
     this.clickOnInvitePeople = this.clickOnInvitePeople.bind(this);
@@ -258,7 +258,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
 
         // Subscribe for incoming messages
         this.messages_subscription = conversation_et.messages_visible.subscribe(
-          this._on_message_add,
+          this._scrollAddedMessagesIntoView,
           null,
           'arrayChange'
         );
@@ -269,27 +269,31 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
 
   /**
    * Checks how to scroll message list and if conversation should be marked as unread.
-   * @param {Array} messages - Message entities
+   * @param {Array} changedMessages - List of the messages that were added or removed from the list
    * @returns {undefined} No return value
    */
-  _on_message_add(messages) {
+  _scrollAddedMessagesIntoView(changedMessages) {
     const messages_container = $('.messages-wrap');
-    const last_item = messages[messages.length - 1];
-    const last_message = last_item.value;
+    const lastAddedItem = changedMessages
+      .slice()
+      .reverse()
+      .find(changedMessage => changedMessage.status === 'added');
 
     // We are only interested in items that were added
-    if (last_item.status !== 'added') {
+    if (!lastAddedItem) {
       return;
     }
 
-    if (last_message) {
+    const lastMessage = lastAddedItem.value;
+
+    if (lastMessage) {
       // Message was prepended
-      if (last_message.timestamp() < this.conversation().last_event_timestamp()) {
+      if (lastMessage.timestamp() < this.conversation().last_event_timestamp()) {
         return;
       }
 
       // Scroll to bottom if self user send the message
-      if (last_message.from === this.selfUser().id) {
+      if (lastMessage.from === this.selfUser().id) {
         window.requestAnimationFrame(() => messages_container.scrollToBottom());
         return;
       }
@@ -423,7 +427,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
   getSystemMessageIconComponent(message) {
     const iconComponents = {
       [z.message.SystemMessageType.CONVERSATION_RENAME]: 'edit-icon',
-      [z.message.SystemMessageType.CONVERSATION_MESSAGE_TIMER_UPDATE]: 'hourglass-icon',
+      [z.message.SystemMessageType.CONVERSATION_MESSAGE_TIMER_UPDATE]: 'timer-icon',
     };
     return iconComponents[message.system_message_type];
   }

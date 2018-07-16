@@ -45,7 +45,7 @@ ko.components.register('availability-state', {
       <!-- /ko -->
       <!-- ko if: $data.availability() === z.user.AvailabilityType.BUSY -->
         <svg class="availability-state-icon" viewBox="0 0 10 10" data-uie-name="busy">
-          <path stroke="none" d="M5 10A5 5 0 1 1 5 0a5 5 0 0 1 0 10zM2 4v2h6V4H2z"></path>
+          <path stroke="none" d="M5 10A5 5 0 1 1 5 0a5 5 0 0 1 0 10zM3 4a1 1 0 0 0 0 2h4a1 1 0 0 0 0-2H3z"></path>
         </svg>
       <!-- /ko -->
       <!-- ko if: $data.label -->
