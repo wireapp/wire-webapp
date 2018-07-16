@@ -1,3 +1,5 @@
+declare const moment: any;
+
 interface DiscreteTimeUnit {
   longUnit: string;
   symbol: string;
@@ -20,8 +22,6 @@ interface LocalizedDurationUnit {
 interface Window {
   z: any;
 }
-
-declare const moment: any;
 
 window.z = window.z || {};
 window.z.util = window.z.util || {};
