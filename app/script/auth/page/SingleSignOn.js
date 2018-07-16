@@ -19,6 +19,7 @@
 
 import React from 'react';
 import {
+  Button,
   Container,
   ContainerXS,
   Columns,
@@ -54,7 +55,11 @@ class SingleSignOn extends React.PureComponent {
     validationErrors: [],
   };
 
-  componentDidMount = () => {};
+  componentDidMount = () => {
+    // if (z.util.Environment.browser.supports.clipboard) {
+    this.extractSSOLink();
+    // }
+  };
 
   componentWillReceiveProps = nextProps => {};
 
@@ -92,6 +97,20 @@ class SingleSignOn extends React.PureComponent {
       });
     throw new Error('CODE NOT VALID. CONTACT YOUR ADMINISTARTOR');
   };
+
+  extractSSOLink = () => {
+    this.readFromClipboard().then(code => {
+      const isValidSSOLink = this.isValidateInput(code);
+      if (isValidSSOLink) {
+        this.setState({code});
+      }
+    });
+  };
+
+  readFromClipboard = () => navigator.clipboard.readText().catch(error => console.error('Something went wrong', error));
+
+  isValidateInput = inputString => inputString && inputString.includes('sso.wire.com');
+
   render() {
     const {code, validInputs, validationErrors} = this.state;
     return (
@@ -113,7 +132,7 @@ class SingleSignOn extends React.PureComponent {
               >
                 <div>
                   <H1 center>{'Company log in'}</H1>
-                  <Text>{'Paste here the link from your company`s directory'}</Text>
+                  <Text>{"Paste here the link from your company's directory"}</Text>
                   <Form style={{marginTop: 30}} data-uie-name="sso">
                     <InputBlock>
                       <Input
@@ -131,12 +150,19 @@ class SingleSignOn extends React.PureComponent {
                         autoComplete="section-login code"
                         placeholder={'PASTE LINK'}
                         maxLength="128"
+                        autoFocus
                         type="text"
                         required
                         data-uie-name="enter-code"
                       />
                     </InputBlock>
                     {validationErrors.length ? parseValidationErrors(validationErrors) : null}
+                    <Button onClick={this.extractSSOLink} data-uie-name="do-paste-sso-code">
+                      {'Paste'}
+                    </Button>
+                    <Button onClick={this.handleSubmit} data-uie-name="do-send-sso-code">
+                      {'Submit'}
+                    </Button>
                   </Form>
                 </div>
               </ContainerXS>
