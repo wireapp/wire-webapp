@@ -756,14 +756,15 @@ z.main.App = class App {
         }
 
         const baseUrl = z.util.Environment.frontend.isLocalhost() ? '/page/auth.html' : '/auth/';
-        let url = `${baseUrl}${location.search}`;
+        let url = `${baseUrl}${window.location.search}`;
         const isImmediateSignOutReason = App.CONFIG.SIGN_OUT_REASONS.IMMEDIATE.includes(signOutReason);
         if (isImmediateSignOutReason) {
           url = z.util.URLUtil.appendParameter(url, `${z.auth.URLParameter.REASON}=${signOutReason}`);
         }
 
         const redirectToLogin = signOutReason !== z.auth.SIGN_OUT_REASON.NOT_SIGNED_IN;
-        if (redirectToLogin) {
+        const forcedAppLogin = z.util.Environment.desktop && window.location.hash === '#login';
+        if (redirectToLogin || forcedAppLogin) {
           url = `${url}#login`;
         }
 
