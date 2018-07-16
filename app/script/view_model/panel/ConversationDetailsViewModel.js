@@ -144,7 +144,7 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
     this.showActionClear = ko.pureComputed(() => {
       return !this.activeConversation().is_request() && !this.activeConversation().is_cleared();
     });
-    this.showActionGuestOptions = ko.pureComputed(() => this.activeConversation().inTeam());
+    this.showActionGuests = ko.pureComputed(() => this.activeConversation().inTeam());
     this.showActionTimedMessages = ko.pureComputed(() => {
       return this.activeConversation().is_group() && !this.activeConversation().isGuest();
     });
@@ -164,7 +164,7 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
         ? z.string.conversationDetailsParticipantsServicesMany
         : z.string.conversationDetailsParticipantsServicesOne;
     });
-    this.guestOptionsText = ko.pureComputed(() => {
+    this.guestsText = ko.pureComputed(() => {
       return this.isTeamOnly() ? z.string.conversationDetailsGuestsOff : z.string.conversationDetailsGuestsOn;
     });
 
@@ -206,7 +206,7 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
     this.navigateTo(z.viewModel.PanelViewModel.STATE.PARTICIPANT_DEVICES, {entity: this.firstParticipant()});
   }
 
-  clickOnGuestOptions() {
+  clickOnGuests() {
     this.navigateTo(z.viewModel.PanelViewModel.STATE.GUEST_OPTIONS);
   }
 
