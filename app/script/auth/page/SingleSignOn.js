@@ -53,13 +53,16 @@ import {Link as RRLink} from 'react-router-dom';
 import {ROUTE} from '../route';
 import {connect} from 'react-redux';
 import {injectIntl} from 'react-intl';
-import {isDesktopApp} from '../Runtime';
+import {isDesktopApp, isSupportingClipboard} from '../Runtime';
 import {loginStrings} from '../../strings';
 import {parseValidationErrors, parseError} from '../util/errorUtil';
 import {resetError} from '../module/action/creator/AuthActionCreator';
 import {withRouter} from 'react-router';
+import {isUUID} from '../util/stringUtil';
 
 class SingleSignOn extends React.PureComponent {
+  static SSO_CODE_PREFIX = 'wire-';
+
   inputs = {};
   state = {
     code: '',
@@ -71,9 +74,7 @@ class SingleSignOn extends React.PureComponent {
   };
 
   componentDidMount = () => {
-    // if (z.util.Environment.browser.supports.clipboard) {
     this.extractSSOLink();
-    // }
   };
 
   componentWillReceiveProps = nextProps => {};
@@ -105,7 +106,7 @@ class SingleSignOn extends React.PureComponent {
           throw errors[0];
         }
       })
-      .then(() => this.props.doLoginSSO({code: this.state.code.trim(), persist: this.state.persist}))
+      .then(() => this.props.doLoginSSO({code: this.stripCode(this.state.code), persist: this.state.persist}))
       .then(this.navigateChooseHandleOrWebapp)
       .catch(error => {
         switch (error.label) {
@@ -145,17 +146,21 @@ class SingleSignOn extends React.PureComponent {
     if (event) {
       event.preventDefault();
     }
-    this.readFromClipboard().then(code => {
-      const isValidSSOLink = this.isValidSSOCode(code);
-      if (isValidSSOLink) {
-        this.setState({code});
-      }
-    });
+    if (isSupportingClipboard()) {
+      this.readFromClipboard().then(code => {
+        const isValidSSOLink = this.isValidSSOCode(code);
+        if (isValidSSOLink) {
+          this.setState({code});
+        }
+      });
+    }
   };
 
   readFromClipboard = () => navigator.clipboard.readText().catch(error => console.error('Something went wrong', error));
 
-  isValidSSOCode = inputString => inputString && inputString.includes('sso.wire.com');
+  isValidSSOCode = code => code && code.includes(SingleSignOn.SSO_CODE_PREFIX) && isUUID(this.stripCode(code));
+
+  stripCode = code => code && code.trim().replace(SingleSignOn.SSO_CODE_PREFIX, '');
 
   render() {
     const {
@@ -231,7 +236,12 @@ class SingleSignOn extends React.PureComponent {
                         <CheckboxLabel>{_(loginStrings.publicComputer)}</CheckboxLabel>
                       </Checkbox>
                     )}
-                    <Button style={{marginTop: '16px'}} onClick={this.extractSSOLink} data-uie-name="do-paste-sso-code">
+                    <Button
+                      style={{marginTop: '16px'}}
+                      onClick={this.extractSSOLink}
+                      disabled={!isSupportingClipboard()}
+                      data-uie-name="do-paste-sso-code"
+                    >
                       {'Paste'}
                     </Button>
                   </Form>
