@@ -40,6 +40,9 @@ z.conversation.ConversationError = class ConversationError extends Error {
       case ConversationError.TYPE.MESSAGE_NOT_FOUND:
         this.message = 'Message not found';
         break;
+      case ConversationError.TYPE.MISSING_PARAMETER:
+        this.message = 'Required parameter is not defined';
+        break;
       case ConversationError.TYPE.NO_CHANGES:
         this.message = 'Missing changes to message';
         break;
@@ -71,6 +74,7 @@ z.conversation.ConversationError = class ConversationError extends Error {
       CONVERSATION_NOT_FOUND: 'ConversationError.TYPE.CONVERSATION_NOT_FOUND',
       DEGRADED_CONVERSATION_CANCELLATION: 'ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION',
       MESSAGE_NOT_FOUND: 'ConversationError.TYPE.MESSAGE_NOT_FOUND',
+      MISSING_PARAMETER: 'ConversationError.TYPE.MISSING_PARAMETER',
       NO_CHANGES: 'ConversationError.TYPE.NO_CHANGES',
       NO_CONVERSATION_ID: 'ConversationError.TYPE.NO_CONVERSATION_ID',
       REQUEST_FAILURE: 'ConversationError.TYPE.REQUEST_FAILURE',

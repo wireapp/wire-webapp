@@ -41,6 +41,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
   /**
    * View model for the auth page.
    * @param {z.main.Auth} auth - App authentication
+   * @param {z.location.LocationRepository} locationRepository - Location Repository
    */
   constructor(auth) {
     this.click_on_remove_device_submit = this.click_on_remove_device_submit.bind(this);
@@ -49,8 +50,6 @@ z.viewModel.AuthViewModel = class AuthViewModel {
     this.auth = auth;
     this.logger = new z.util.Logger('z.viewModel.AuthViewModel', z.config.LOGGER.OPTIONS);
 
-    this.event_tracker = new z.tracking.EventTrackingRepository();
-
     this.audio_repository = this.auth.audio;
 
     // Cryptography
@@ -58,6 +57,9 @@ z.viewModel.AuthViewModel = class AuthViewModel {
     // @todo Don't operate with the service directly. Get a repository!
     this.storageService = new z.storage.StorageService();
     this.storage_repository = new z.storage.StorageRepository(this.storageService);
+
+    const locationService = new z.location.LocationService(this.auth.client);
+    this.locationRepository = new z.location.LocationRepository(locationService);
 
     this.cryptography_service = new z.cryptography.CryptographyRepository(this.auth.client);
     this.cryptography_repository = new z.cryptography.CryptographyRepository(
@@ -75,6 +77,8 @@ z.viewModel.AuthViewModel = class AuthViewModel {
       undefined,
       this.client_repository
     );
+
+    this.singleInstanceHandler = new z.main.SingleInstanceHandler();
 
     this.notification_service = new z.event.NotificationService(this.auth.client, this.storageService);
     this.web_socket_service = new z.event.WebSocketService(this.auth.client);
@@ -271,14 +275,6 @@ z.viewModel.AuthViewModel = class AuthViewModel {
         return this._set_hash(mode);
       }
     }
-
-    const reason = z.util.URLUtil.getParameter(z.auth.URLParameter.REASON);
-    if (reason) {
-      const isReasonRegistration = reason === z.auth.SIGN_OUT_REASON.ACCOUNT_REGISTRATION;
-      if (isReasonRegistration) {
-        return this._loginFromTeams();
-      }
-    }
   }
 
   //##############################################################################
@@ -353,8 +349,8 @@ z.viewModel.AuthViewModel = class AuthViewModel {
         this._setTabsCheckInterval();
       }
 
-      const hasTabsCheckCookie = !!Cookies.get(z.main.App.CONFIG.TABS_CHECK.COOKIE_NAME);
-      if (hasTabsCheckCookie) {
+      const otherInstanceRunning = this.singleInstanceHandler.hasOtherRunningInstance();
+      if (otherInstanceRunning) {
         const currentHash = this._get_hash();
 
         if (!this.previousHash) {
@@ -407,31 +403,6 @@ z.viewModel.AuthViewModel = class AuthViewModel {
         });
     }, 500);
     $(window).on('unload', () => this._clearTabsCheckInterval());
-  }
-
-  //##############################################################################
-  // Invitation Stuff
-  //##############################################################################
-
-  _loginFromTeams() {
-    this.pending_server_request(true);
-
-    z.util.StorageUtil.setValue(z.storage.StorageKey.AUTH.PERSIST, true);
-    z.util.StorageUtil.setValue(z.storage.StorageKey.AUTH.SHOW_LOGIN, true);
-
-    this.auth.repository
-      .getAccessToken()
-      .then(() => {
-        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ACCOUNT.LOGGED_IN, {
-          context: 'auto',
-          remember_me: this.persist(),
-        });
-        this._authentication_successful(true);
-      })
-      .catch(error => {
-        this.pending_server_request(false);
-        throw error;
-      });
   }
 
   //##############################################################################
@@ -556,13 +527,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
 
       this.auth.repository
         .login(payload, this.persist())
-        .then(() => {
-          amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ACCOUNT.LOGGED_IN, {
-            context: z.auth.AuthView.TYPE.PHONE,
-            remember_me: this.persist(),
-          });
-          this._authentication_successful();
-        })
+        .then(() => this._authentication_successful())
         .catch(() => {
           if (!this.validation_errors().length) {
             this._add_error(z.string.authErrorCode, z.auth.AuthView.TYPE.CODE);
@@ -584,13 +549,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
 
       this.auth.repository
         .login(payload, this.persist())
-        .then(() => {
-          amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ACCOUNT.LOGGED_IN, {
-            context: z.auth.AuthView.TYPE.PHONE,
-            remember_me: this.persist(),
-          });
-          this._authentication_successful();
-        })
+        .then(() => this._authentication_successful())
         .catch(error => {
           this.pending_server_request(false);
           $('#wire-verify-password').focus();
@@ -710,12 +669,13 @@ z.viewModel.AuthViewModel = class AuthViewModel {
   }
 
   clickOnHandover() {
-    Cookies.remove(z.main.App.CONFIG.TABS_CHECK.COOKIE_NAME);
+    this.singleInstanceHandler.deregisterInstance(true);
     this._checkSingleInstance();
   }
 
   clicked_on_password() {
-    z.util.safeWindowOpen(z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.ACCOUNT, z.config.URL_PATH.PASSWORD_RESET));
+    const url = z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.ACCOUNT, z.config.URL_PATH.PASSWORD_RESET);
+    z.util.SanitizationUtil.safeWindowOpen(url);
   }
 
   clicked_on_resend_code() {
@@ -752,7 +712,7 @@ z.viewModel.AuthViewModel = class AuthViewModel {
 
   clicked_on_wire_link() {
     const path = z.l10n.text(z.string.urlWebsiteRoot);
-    z.util.safeWindowOpen(z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.WEBSITE, path));
+    z.util.SanitizationUtil.safeWindowOpen(z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.WEBSITE, path));
   }
 
   keydown_auth(keyboard_event) {

@@ -40,7 +40,7 @@ z.entity.Message = class Message {
     this.super_type = super_type;
     this.ephemeral_caption = ko.pureComputed(() => {
       const remainingTime = this.ephemeral_remaining();
-      return remainingTime ? z.util.TimeUtil.formatDuration(remainingTime, false, 3).text : '';
+      return remainingTime ? z.util.TimeUtil.formatDurationCaption(remainingTime) : '';
     });
     this.ephemeral_duration = ko.observable(0);
     this.ephemeral_remaining = ko.observable(0);
@@ -62,6 +62,12 @@ z.entity.Message = class Message {
       }
 
       return z.message.EphemeralStatusType.NONE;
+    });
+
+    this.isObfuscated = ko.pureComputed(() => {
+      const messageIsAtLeastSent = this.status() > z.message.StatusType.SENDING;
+      const isEphemeralInactive = this.ephemeral_status() === z.message.EphemeralStatusType.INACTIVE;
+      return messageIsAtLeastSent && (isEphemeralInactive || this.is_expired());
     });
 
     this.conversation_id = '';
@@ -86,7 +92,7 @@ z.entity.Message = class Message {
       return date.local().format('HH:mm');
     };
 
-    this.sender_name = ko.pureComputed(() => z.util.getFirstName(this.user()), this, {deferEvaluation: true});
+    this.sender_name = ko.pureComputed(() => z.util.SanitizationUtil.getEscapedFirstName(this.user()));
 
     this.accent_color = ko.pureComputed(() => {
       return `accent-color-${this.user().accent_id()}`;

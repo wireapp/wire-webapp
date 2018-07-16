@@ -79,46 +79,32 @@ ko.bindingHandlers.show_all_timestamps = {
  */
 ko.bindingHandlers.background_image = {
   init(element, valueAccessor, allBindingsAccessor) {
-    let object_url;
+    const assetLoader = valueAccessor();
 
-    const _in_view = function(dom_element) {
-      const box = dom_element.getBoundingClientRect();
-      return (
-        box.right >= 0 &&
-        box.bottom >= 0 &&
-        box.left <= document.documentElement.clientWidth &&
-        box.top <= document.documentElement.clientHeight
-      );
+    if (!assetLoader) {
+      return;
+    }
+
+    const imageElement = $(element).find('img');
+    let objectUrl;
+
+    const loadImage = () => {
+      assetLoader()
+        .load()
+        .then(blob => {
+          $(element).removeClass('image-loading');
+          objectUrl = window.URL.createObjectURL(blob);
+          imageElement[0].src = objectUrl;
+        })
+        .catch(() => {});
     };
 
-    const _on_viewport_change = _.debounce(() => {
-      if (_in_view(element) && asset_remote_data()) {
-        asset_remote_data()
-          .load()
-          .then(blob => {
-            $(element).removeClass('image-loading');
-            object_url = window.URL.createObjectURL(blob);
-            image_element[0].src = object_url;
-            viewport_subscription.dispose();
-          })
-          .catch(() => {});
-      }
-    }, 500);
-
-    const image_element = $(element).find('img');
-    const asset_remote_data = valueAccessor();
-
-    const viewport_changed = allBindingsAccessor.get('viewport_changed');
-    const viewport_subscription = viewport_changed.subscribe(_on_viewport_change);
-    const asset_subscription = asset_remote_data.subscribe(_on_viewport_change);
-
-    _on_viewport_change();
+    z.ui.ViewportObserver.addElement(element, loadImage);
 
     ko.utils.domNodeDisposal.addDisposeCallback(element, () => {
-      viewport_subscription.dispose();
-      asset_subscription.dispose();
-      if (object_url) {
-        window.URL.revokeObjectURL(object_url);
+      z.ui.ViewportObserver.removeElement(element);
+      if (objectUrl) {
+        window.URL.revokeObjectURL(objectUrl);
       }
     });
   },

@@ -74,9 +74,9 @@ z.viewModel.MainViewModel = class MainViewModel {
 
     this.actions = new z.viewModel.ActionsViewModel(this, repositories);
 
+    this.panel = new z.viewModel.PanelViewModel(this, repositories);
     this.content = new z.viewModel.ContentViewModel(this, repositories);
     this.list = new z.viewModel.ListViewModel(this, repositories);
-    this.panel = new z.viewModel.PanelViewModel(this, repositories);
 
     this.modals = new z.viewModel.ModalsViewModel();
     this.lightbox = new z.viewModel.ImageDetailViewViewModel(this, repositories);
@@ -174,10 +174,10 @@ z.viewModel.MainViewModel = class MainViewModel {
       }
 
       z.util.afterRender(() => {
-        panel.style.transition = 'transform .35s cubic-bezier(0.19, 1, 0.22, 1)';
         const widthTransition = 'width .35s cubic-bezier(0.19, 1, 0.22, 1)';
-        titleBar.style.transition = widthTransition;
-        input.style.transition = widthTransition;
+        this._applyStyle(panel, {transition: 'transform .35s cubic-bezier(0.19, 1, 0.22, 1)'});
+        this._applyStyle(titleBar, {transition: widthTransition});
+        this._applyStyle(input, {transition: widthTransition});
 
         if (isPanelOpen) {
           this._applyStyle(panel, MainViewModel.PANEL_STYLE.CLOSED);

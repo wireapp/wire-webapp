@@ -120,12 +120,15 @@ z.entity.User = class User {
     this.phone = ko.observable();
 
     this.name = ko.observable('');
-    this.first_name = ko.pureComputed(() => this.name().split(' ')[0]);
+    this.first_name = ko.pureComputed(() => {
+      const [firstName] = this.name().split(' ');
+      return firstName || '';
+    });
 
     this.last_name = ko.pureComputed(() => {
-      const parts = this.name().split(' ');
-      if (parts.length > 1) {
-        return parts.pop();
+      const nameParts = this.name().split(' ');
+      if (nameParts.length > 1) {
+        return nameParts.pop();
       }
     });
 
@@ -169,7 +172,7 @@ z.entity.User = class User {
 
     this.is_request = ko.pureComputed(() => this.connection().is_request());
 
-    this.devices = ko.observableArray();
+    this.devices = ko.observableArray(); // does not include current client/device
     this.is_verified = ko.pureComputed(() => {
       if (this.devices().length === 0 && !this.is_me) {
         return false;

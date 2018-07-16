@@ -244,7 +244,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
 
   clickOnInviteMember() {
     const path = `${z.config.URL_PATH.MANAGE_TEAM}?utm_source=client_landing&utm_term=desktop`;
-    z.util.safeWindowOpen(z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.TEAM_SETTINGS, path));
+    z.util.SanitizationUtil.safeWindowOpen(z.util.URLUtil.buildUrl(z.util.URLUtil.TYPE.TEAM_SETTINGS, path));
     amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM);
   }
 
@@ -554,7 +554,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
   _searchConversationsForServices(query) {
     const normalizedQuery = z.search.SearchRepository.normalizeQuery(query);
     const conversationsForServices = this.conversationRepository
-      .get_groups_by_name(normalizedQuery, false)
+      .getGroupsByName(normalizedQuery, false)
       .filter(conversationEntity => conversationEntity.inTeam());
     this.serviceConversations(conversationsForServices);
   }
@@ -584,7 +584,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
         this.searchResults.contacts(this.userRepository.search_for_connected_users(normalizedQuery, isHandle));
       }
 
-      this.searchResults.groups(this.conversationRepository.get_groups_by_name(normalizedQuery, isHandle));
+      this.searchResults.groups(this.conversationRepository.getGroupsByName(normalizedQuery, isHandle));
     }
   }
 

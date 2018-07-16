@@ -246,6 +246,7 @@ z.conversation.EventMapper = class EventMapper {
     messageEntity.memberMessageType = z.message.SystemMessageType.CONVERSATION_CREATE;
     messageEntity.name(eventData.name || '');
     messageEntity.userIds(eventData.userIds);
+    messageEntity.allTeamMembers = eventData.allTeamMembers;
     return messageEntity;
   }
 

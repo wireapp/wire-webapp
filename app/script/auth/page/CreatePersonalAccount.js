@@ -26,7 +26,6 @@ import {withRouter} from 'react-router';
 import React from 'react';
 import {ROUTE} from '../route';
 import AccountForm from '../component/AccountForm';
-import * as TrackingAction from '../module/action/TrackingAction';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import * as AuthActionCreator from '../module/action/creator/AuthActionCreator';
 import * as AuthAction from '../module/action/AuthAction';
@@ -53,20 +52,10 @@ class CreatePersonalAccount extends React.PureComponent {
   }
 
   createAccount = () => {
-    const {account, trackNameWithContext, history, doRegisterPersonal, match} = this.props;
+    const {account, history, doRegisterPersonal, match} = this.props;
     doRegisterPersonal({...account, invitation_code: match.params.invitationCode})
-      .then(() => {
-        const authenticationContext = TrackingAction.AUTHENTICATION_CONTEXT.PERSONAL_INVITE;
-        trackNameWithContext(TrackingAction.EVENT_NAME.PERSONAL.CREATED, authenticationContext);
-        trackNameWithContext(TrackingAction.EVENT_NAME.PERSONAL.VERIFIED, authenticationContext);
-      })
       .then(() => history.push(ROUTE.CHOOSE_HANDLE))
       .catch(error => console.error('Failed to create personal account from invite', error));
-  };
-
-  handleBeforeSubmit = () => {
-    const authenticationContext = TrackingAction.FLOW_TO_CONTEXT[this.props.currentFlow];
-    this.props.trackNameWithContext(TrackingAction.EVENT_NAME.PERSONAL.ENTERED_ACCOUNT_DATA, authenticationContext);
   };
 
   handleSubmit = () => {
@@ -89,11 +78,7 @@ class CreatePersonalAccount extends React.PureComponent {
         style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: 428}}
       >
         <H1 center>{_(createPersonalAccountStrings.headLine)}</H1>
-        <AccountForm
-          beforeSubmit={this.handleBeforeSubmit}
-          onSubmit={this.handleSubmit}
-          submitText={_(createPersonalAccountStrings.submitButton)}
-        />
+        <AccountForm onSubmit={this.handleSubmit} submitText={_(createPersonalAccountStrings.submitButton)} />
       </ContainerXS>
     );
     return (
@@ -132,7 +117,6 @@ export default withRouter(
       {
         ...AuthAction,
         ...AuthActionCreator,
-        ...TrackingAction,
       }
     )(CreatePersonalAccount)
   )

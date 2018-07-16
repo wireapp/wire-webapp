@@ -30,9 +30,9 @@
  * @property {string=} last_event
  * @property {string=} last_event_time
  * @property {ConversationMembers=} members
- * @property {?number=} message_timer
+ * @property {number=} message_timer
  * @property {string=} name
- * @property {?string=} team
+ * @property {string=} team
  * @property {number} type
  */
 

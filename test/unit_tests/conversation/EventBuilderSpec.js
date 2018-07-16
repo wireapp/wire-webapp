@@ -88,7 +88,7 @@ describe('z.conversation.EventBuilder', () => {
 
   it('buildGroupCreation', done => {
     conversation_et.participating_user_ids(['one', 'two', 'three']);
-    conversation.creator = 'one';
+    conversation_et.creator = 'one';
     const event = z.conversation.EventBuilder.buildGroupCreation(conversation_et);
     event_mapper
       .mapJsonEvent(event, conversation_et)

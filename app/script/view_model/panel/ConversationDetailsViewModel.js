@@ -23,37 +23,45 @@ window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 window.z.viewModel.panel = z.viewModel.panel || {};
 
-z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewModel {
-  constructor(mainViewModel, panelViewModel, repositories) {
+z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewModel extends z.viewModel.panel
+  .BasePanelViewModel {
+  static get CONFIG() {
+    return {
+      MAX_USERS_VISIBLE: 7,
+      REDUCED_USERS_COUNT: 5,
+    };
+  }
+
+  constructor(params) {
+    super(params);
     this.clickOnShowService = this.clickOnShowService.bind(this);
     this.clickOnShowUser = this.clickOnShowUser.bind(this);
 
-    this.elementId = 'conversation-details';
-    this.mainViewModel = mainViewModel;
-    this.panelViewModel = panelViewModel;
-
-    this.conversationRepository = repositories.conversation;
-    this.integrationRepository = repositories.integration;
-    this.teamRepository = repositories.team;
-    this.userRepository = repositories.user;
+    this.conversationRepository = this.repositories.conversation;
+    this.integrationRepository = this.repositories.integration;
+    this.teamRepository = this.repositories.team;
+    this.userRepository = this.repositories.user;
     this.logger = new z.util.Logger('z.viewModel.panel.ConversationDetailsViewModel', z.config.LOGGER.OPTIONS);
 
-    this.actionsViewModel = this.mainViewModel.actions;
-    this.conversationEntity = this.conversationRepository.active_conversation;
     this.isActivatedAccount = this.mainViewModel.isActivatedAccount;
     this.isTeam = this.teamRepository.isTeam;
-    this.isTeamOnly = this.panelViewModel.isTeamOnly;
-    this.showIntegrations = this.panelViewModel.showIntegrations;
+    this.isTeamOnly = ko.pureComputed(() => this.activeConversation() && this.activeConversation().isTeamOnly());
+    this.showIntegrations = ko.pureComputed(() => {
+      if (this.activeConversation()) {
+        const firstUserEntity = this.activeConversation().firstUserEntity();
+        const hasBotUser = firstUserEntity && firstUserEntity.isBot;
+        const allowIntegrations = this.activeConversation().is_group() || hasBotUser;
+        const enableIntegrations = this.repositories.integration.enableIntegrations();
+        return enableIntegrations && allowIntegrations && !this.isTeamOnly();
+      }
+    });
 
     this.serviceParticipants = ko.observableArray();
     this.userParticipants = ko.observableArray();
-
-    this.isVisible = ko.pureComputed(() => {
-      return this.conversationEntity() && this.panelViewModel.conversationDetailsVisible();
-    });
+    this.showAllUsersCount = ko.observable(0);
 
     this.availabilityLabel = ko.pureComputed(() => {
-      if (this.isVisible() && this.isTeam() && this.conversationEntity().is_one2one()) {
+      if (this.isVisible() && this.isTeam() && this.activeConversation().is_one2one()) {
         const userAvailability = this.firstParticipant() && this.firstParticipant().availability();
         const availabilitySetToNone = userAvailability === z.user.AvailabilityType.NONE;
 
@@ -64,11 +72,11 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
     });
 
     ko.computed(() => {
-      if (this.conversationEntity()) {
+      if (this.activeConversation()) {
         this.serviceParticipants.removeAll();
         this.userParticipants.removeAll();
 
-        this.conversationEntity()
+        this.activeConversation()
           .participating_user_ets()
           .map(userEntity => {
             if (userEntity.isBot) {
@@ -76,15 +84,22 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
             }
             this.userParticipants.push(userEntity);
           });
+
+        const userCount = this.userParticipants().length;
+        const exceedsMaxUserCount = userCount > ConversationDetailsViewModel.CONFIG.MAX_USERS_VISIBLE;
+        if (exceedsMaxUserCount) {
+          this.userParticipants.splice(ConversationDetailsViewModel.CONFIG.REDUCED_USERS_COUNT);
+        }
+        this.showAllUsersCount(exceedsMaxUserCount ? userCount : 0);
       }
     });
 
     this.firstParticipant = ko.pureComputed(() => {
-      return this.conversationEntity() && this.conversationEntity().firstUserEntity();
+      return this.activeConversation() && this.activeConversation().firstUserEntity();
     });
     this.isSingleUserMode = ko.pureComputed(() => {
-      if (this.conversationEntity()) {
-        return this.conversationEntity().is_one2one() || this.conversationEntity().is_request();
+      if (this.activeConversation()) {
+        return this.activeConversation().is_one2one() || this.activeConversation().is_request();
       }
     });
     this.userName = ko.pureComputed(() => (this.firstParticipant() ? this.firstParticipant().username() : ''));
@@ -94,18 +109,18 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
     });
 
     this.isActiveParticipant = ko.pureComputed(() => {
-      return this.conversationEntity() ? this.conversationEntity().isActiveParticipant() : false;
+      return this.activeConversation() ? this.activeConversation().isActiveParticipant() : false;
     });
 
     this.isNameEditable = ko.pureComputed(() => {
-      if (this.conversationEntity()) {
-        return this.conversationEntity().is_group() && this.conversationEntity().isActiveParticipant();
+      if (this.activeConversation()) {
+        return this.activeConversation().is_group() && this.activeConversation().isActiveParticipant();
       }
     });
 
     this.isVerified = ko.pureComputed(() => {
-      if (this.conversationEntity()) {
-        return this.conversationEntity().verification_state() === z.conversation.ConversationVerificationState.VERIFIED;
+      if (this.activeConversation()) {
+        return this.activeConversation().verification_state() === z.conversation.ConversationVerificationState.VERIFIED;
       }
     });
 
@@ -118,23 +133,23 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
       $('.conversation-details__name').css('height', `${name.height()}px`);
     });
 
-    this.showActionAddParticipants = ko.pureComputed(() => this.conversationEntity().is_group());
+    this.showActionAddParticipants = ko.pureComputed(() => this.activeConversation().is_group());
     this.showActionBlock = ko.pureComputed(() => {
       if (this.isSingleUserMode() && this.firstParticipant()) {
         return this.firstParticipant().is_connected() || this.firstParticipant().is_request();
       }
     });
-    this.showActionCreateGroup = ko.pureComputed(() => this.conversationEntity().is_one2one());
-    this.showActionCancelRequest = ko.pureComputed(() => this.conversationEntity().is_request());
+    this.showActionCreateGroup = ko.pureComputed(() => this.activeConversation().is_one2one());
+    this.showActionCancelRequest = ko.pureComputed(() => this.activeConversation().is_request());
     this.showActionClear = ko.pureComputed(() => {
-      return !this.conversationEntity().is_request() && !this.conversationEntity().is_cleared();
+      return !this.activeConversation().is_request() && !this.activeConversation().is_cleared();
     });
-    this.showActionGuestOptions = ko.pureComputed(() => this.conversationEntity().inTeam());
+    this.showActionGuestOptions = ko.pureComputed(() => this.activeConversation().inTeam());
     this.showActionTimedMessages = ko.pureComputed(() => {
-      return this.conversationEntity().is_group() && !this.conversationEntity().isGuest();
+      return this.activeConversation().is_group() && !this.activeConversation().isGuest();
     });
     this.showActionLeave = ko.pureComputed(() => {
-      return this.conversationEntity().is_group() && !this.conversationEntity().removed_from_conversation();
+      return this.activeConversation().is_group() && !this.activeConversation().removed_from_conversation();
     });
 
     this.participantsUserText = ko.pureComputed(() => {
@@ -154,7 +169,7 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
     });
 
     this.timedMessagesText = ko.pureComputed(() => {
-      const conversation = this.conversationEntity();
+      const conversation = this.activeConversation();
       const hasMessageTimeSet = conversation.messageTimer() && conversation.hasGlobalMessageTimer();
       return hasMessageTimeSet
         ? z.util.TimeUtil.formatDuration(conversation.messageTimer()).text
@@ -171,12 +186,16 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
     });
   }
 
-  clickOnAddParticipants() {
-    this.panelViewModel.switchState(z.viewModel.PanelViewModel.STATE.ADD_PARTICIPANTS, false, true);
+  getElementId() {
+    return 'conversation-details';
   }
 
-  clickOnClose() {
-    this.panelViewModel.closePanel();
+  clickOnAddParticipants() {
+    this.navigateTo(z.viewModel.PanelViewModel.STATE.ADD_PARTICIPANTS);
+  }
+
+  clickOnShowAll() {
+    this.navigateTo(z.viewModel.PanelViewModel.STATE.CONVERSATION_PARTICIPANTS);
   }
 
   clickOnCreateGroup() {
@@ -184,45 +203,45 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
   }
 
   clickOnDevices() {
-    this.panelViewModel.showParticipantDevices(this.firstParticipant());
+    this.navigateTo(z.viewModel.PanelViewModel.STATE.PARTICIPANT_DEVICES, {entity: this.firstParticipant()});
   }
 
   clickOnGuestOptions() {
-    this.panelViewModel.switchState(z.viewModel.PanelViewModel.STATE.GUEST_OPTIONS);
+    this.navigateTo(z.viewModel.PanelViewModel.STATE.GUEST_OPTIONS);
   }
 
   clickOnTimedMessages() {
-    this.panelViewModel.switchState(z.viewModel.PanelViewModel.STATE.TIMED_MESSAGES);
+    this.navigateTo(z.viewModel.PanelViewModel.STATE.TIMED_MESSAGES);
   }
 
   clickOnShowUser(userEntity) {
-    this.panelViewModel.showGroupParticipantUser(userEntity);
+    this.navigateTo(z.viewModel.PanelViewModel.STATE.GROUP_PARTICIPANT_USER, {entity: userEntity});
   }
 
   clickOnShowService(serviceEntity) {
-    this.panelViewModel.showGroupParticipantService(serviceEntity);
+    this.navigateTo(z.viewModel.PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE, {entity: serviceEntity});
   }
 
   clickToArchive() {
-    this.actionsViewModel.archiveConversation(this.conversationEntity());
+    this.actionsViewModel.archiveConversation(this.activeConversation());
   }
 
   clickToBlock() {
-    const userEntity = this.conversationEntity().firstUserEntity();
-    const nextConversationEntity = this.conversationRepository.get_next_conversation(this.conversationEntity());
+    const userEntity = this.activeConversation().firstUserEntity();
+    const nextConversationEntity = this.conversationRepository.get_next_conversation(this.activeConversation());
 
     this.actionsViewModel.blockUser(userEntity, true, nextConversationEntity);
   }
 
   clickToCancelRequest() {
-    const userEntity = this.conversationEntity().firstUserEntity();
-    const nextConversationEntity = this.conversationRepository.get_next_conversation(this.conversationEntity());
+    const userEntity = this.activeConversation().firstUserEntity();
+    const nextConversationEntity = this.conversationRepository.get_next_conversation(this.activeConversation());
 
     this.actionsViewModel.cancelConnectionRequest(userEntity, true, nextConversationEntity);
   }
 
   clickToClear() {
-    this.actionsViewModel.clearConversation(this.conversationEntity());
+    this.actionsViewModel.clearConversation(this.activeConversation());
   }
 
   clickToEditGroupName() {
@@ -232,15 +251,15 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
   }
 
   clickToLeave() {
-    this.actionsViewModel.leaveConversation(this.conversationEntity());
+    this.actionsViewModel.leaveConversation(this.activeConversation());
   }
 
   clickToToggleMute() {
-    this.actionsViewModel.toggleMuteConversation(this.conversationEntity());
+    this.actionsViewModel.toggleMuteConversation(this.activeConversation());
   }
 
   renameConversation(data, event) {
-    const currentConversationName = this.conversationEntity()
+    const currentConversationName = this.activeConversation()
       .display_name()
       .trim();
 
@@ -250,7 +269,7 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
     const hasNameChanged = newConversationName.length && newConversationName !== currentConversationName;
     if (hasNameChanged) {
       event.target.value = currentConversationName;
-      this.conversationRepository.renameConversation(this.conversationEntity(), newConversationName);
+      this.conversationRepository.renameConversation(this.activeConversation(), newConversationName);
     }
   }
 };

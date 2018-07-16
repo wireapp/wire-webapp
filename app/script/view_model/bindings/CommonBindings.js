@@ -487,55 +487,21 @@ ko.bindingHandlers.removed_from_view = {
 };
 
 /**
- * Element is in viewport. return true within the callback to dispose the subscription
+ * Adds a callback called whenever an element is in viewport and not overlayed by another element.
  */
-ko.bindingHandlers.in_viewport = (function() {
-  const listeners = [];
-
-  // listeners can be deleted during iteration
-  const notifyListeners = _.throttle(event => {
-    for (let index = listeners.length; index--; ) {
-      listeners[index](event);
+ko.bindingHandlers.in_viewport = {
+  init(element, valueAccessor) {
+    const onElementVisible = valueAccessor();
+    if (!onElementVisible) {
+      return;
     }
-  }, 300);
+    z.ui.ViewportObserver.addElement(element, () => {
+      return z.ui.OverlayedObserver.onElementVisible(element, onElementVisible);
+    });
 
-  window.addEventListener('scroll', notifyListeners, true);
-  notifyListeners();
-
-  return {
-    init(element, valueAccessor, allBindingsAccessor) {
-      function _inView(domElement) {
-        const box = domElement.getBoundingClientRect();
-        const isInRightPanel = document.querySelector('#right-column').contains(domElement);
-        return (
-          box.right >= 0 &&
-          box.bottom >= 0 &&
-          (isInRightPanel || box.left <= document.documentElement.clientWidth) &&
-          box.top <= document.documentElement.clientHeight
-        );
-      }
-
-      function _dispose() {
-        z.util.ArrayUtil.removeElement(listeners, _checkElement);
-      }
-
-      function _checkElement(event) {
-        const isChild = event ? event.target.contains(element) : true;
-
-        if (isChild && _inView(element)) {
-          const callback = valueAccessor();
-          const dispose = callback && callback();
-
-          if (dispose) {
-            _dispose();
-          }
-        }
-      }
-
-      listeners.push(_checkElement);
-      window.setTimeout(_checkElement, allBindingsAccessor.get('delay') || 0);
-
-      ko.utils.domNodeDisposal.addDisposeCallback(element, _dispose);
-    },
-  };
-})();
+    ko.utils.domNodeDisposal.addDisposeCallback(element, () => {
+      z.ui.OverlayedObserver.removeElement(element);
+      z.ui.ViewportObserver.removeElement(element);
+    });
+  },
+};

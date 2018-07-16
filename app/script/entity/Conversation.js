@@ -62,6 +62,7 @@ z.entity.Conversation = class Conversation {
     this.inTeam = ko.pureComputed(() => this.team_id && !this.isGuest());
     this.isGuestRoom = ko.pureComputed(() => this.accessState() === z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM);
     this.isTeamOnly = ko.pureComputed(() => this.accessState() === z.conversation.ACCESS_STATE.TEAM.TEAM_ONLY);
+    this.withAllTeamMembers = ko.observable(undefined);
 
     this.isTeam1to1 = ko.pureComputed(() => {
       const isGroupConversation = this.type() === z.conversation.ConversationType.REGULAR;
@@ -333,15 +334,24 @@ z.entity.Conversation = class Conversation {
 
   /**
    * Adds a single message to the conversation.
-   * @param {z.entity.Message} message_et - Message entity to be added to the conversation
-   * @returns {undefined} No return value
+   * @param {z.entity.Message} messageEntity - Message entity to be added to the conversation.
+   * @param {boolean} replaceDuplicate - If a duplicate already exists, replace it with the new entity.
+   * @returns {undefined} No return value.
    */
-  add_message(message_et) {
-    message_et = this._checkForDuplicate(message_et);
-    if (message_et) {
-      this.update_timestamps(message_et);
-      this.messages_unordered.push(message_et);
-      amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.ADDED, message_et);
+  add_message(messageEntity, replaceDuplicate = false) {
+    if (messageEntity) {
+      const duplicateEntity = this._findDuplicate(messageEntity);
+      this.update_timestamps(messageEntity);
+      if (duplicateEntity) {
+        if (replaceDuplicate) {
+          const duplicateIndex = this.messages_unordered.indexOf(duplicateEntity);
+          this.messages_unordered.splice(duplicateIndex, 1, messageEntity);
+        }
+        // The duplicated message has been treated (either replaced or ignored). Our job here is done.
+        return;
+      }
+      this.messages_unordered.push(messageEntity);
+      amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.ADDED, messageEntity);
     }
   }
 
@@ -460,24 +470,29 @@ z.entity.Conversation = class Conversation {
    * Checks for message duplicates.
    *
    * @private
-   * @param {z.entity.Message} messageEt - Message entity to be added to the conversation
+   * @param {z.entity.Message} messageEntity - Message entity to be added to the conversation
    * @returns {z.entity.Message|undefined} Message if it is not a duplicate
    */
-  _checkForDuplicate(messageEt) {
-    if (messageEt) {
-      for (const existingMessageEt of this.messages_unordered()) {
-        const duplicateMessageId = messageEt.id && existingMessageEt.id === messageEt.id;
-        const fromSameSender = existingMessageEt.from === messageEt.from;
-
-        if (duplicateMessageId && fromSameSender) {
-          const logData = {additionalMessage: messageEt, existingMessage: existingMessageEt};
-          this.logger.warn(`Filtered message '${messageEt.id}' as duplicate in view`, logData);
-          return undefined;
-        }
+  _checkForDuplicate(messageEntity) {
+    if (messageEntity) {
+      const existingMessageEntity = this._findDuplicate(messageEntity);
+      if (existingMessageEntity) {
+        const logData = {additionalMessage: messageEntity, existingMessage: existingMessageEntity};
+        this.logger.warn(`Filtered message '${messageEntity.id}' as duplicate in view`, logData);
+        return undefined;
       }
+      return messageEntity;
     }
+  }
 
-    return messageEt;
+  _findDuplicate(messageEntity) {
+    if (messageEntity && messageEntity.id) {
+      return this.messages_unordered().find(existingMessageEntity => {
+        const sameId = existingMessageEntity.id === messageEntity.id;
+        const sameSender = messageEntity.from === existingMessageEntity.from;
+        return sameId && sameSender;
+      });
+    }
   }
 
   update_timestamp_server(time, is_backend_timestamp = false) {

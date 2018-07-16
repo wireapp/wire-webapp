@@ -5,6 +5,7 @@
 <script src="/script/util/EmojiUtil.js"></script>
 <script src="/script/util/Environment.js"></script>
 <script src="/script/util/util.js"></script>
+<script src="/script/util/SanitizationUtil.js"></script>
 <script src="/script/util/TimeUtil.js"></script>
 <script src="/script/util/protobuf.js"></script>
 <script src="/script/util/KeyboardUtil.js"></script>
@@ -212,7 +213,8 @@
 <script src="/script/links/LinkPreviewRepository.js"></script>
 <script src="/script/links/LinkPreviewBlackList.js"></script>
 <!-- GeoLocation -->
-<script src="/script/location/GeoLocation.js"></script>
+<script src="/script/location/LocationService.js"></script>
+<script src="/script/location/LocationRepository.js"></script>
 <!-- Media -->
 <script src="/script/media/MediaConstraintsHandler.js"></script>
 <script src="/script/media/MediaDevicesHandler.js"></script>
@@ -322,8 +324,10 @@
 <script src="/script/view_model/content/TitleBarViewModel.js"></script>
 <!-- View Models: Panel -->
 <script src="/script/view_model/PanelViewModel.js"></script>
+<script src="/script/view_model/panel/BasePanelViewModel.js"></script>
 <script src="/script/view_model/panel/AddParticipantsViewModel.js"></script>
 <script src="/script/view_model/panel/ConversationDetailsViewModel.js"></script>
+<script src="/script/view_model/panel/ConversationParticipantsViewModel.js"></script>
 <script src="/script/view_model/panel/GroupParticipantUserViewModel.js"></script>
 <script src="/script/view_model/panel/GroupParticipantServiceViewModel.js"></script>
 <script src="/script/view_model/panel/GuestOptionsViewModel.js"></script>
@@ -409,9 +413,11 @@
 <!-- View -->
 <script src="/script/ui/AvailabilityContextMenu.js"></script>
 <script src="/script/ui/ContextMenu.js"></script>
+<script src="/script/ui/OverlayedObserver.js"></script>
 <script src="/script/ui/ShortcutType.js"></script>
 <script src="/script/ui/Shortcut.js"></script>
-<script src="/script/ui/WindowHandler.js"></script>
 <script src="/script/ui/ViewportObserver.js"></script>
+<script src="/script/ui/WindowHandler.js"></script>
 <!-- Main -->
+<script src="/script/main/SingleInstanceHandler.js"></script>
 <script src="/script/main/app.js"></script>

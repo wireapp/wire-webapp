@@ -117,7 +117,8 @@ z.viewModel.WarningsViewModel = class WarningsViewModel {
       case WarningsViewModel.TYPE.REQUEST_MICROPHONE: {
         amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, {
           action: () => {
-            z.util.safeWindowOpen(z.util.URLUtil.buildSupportUrl(z.config.SUPPORT.ID.MICROPHONE_ACCESS_DENIED));
+            const url = z.util.URLUtil.buildSupportUrl(z.config.SUPPORT.ID.MICROPHONE_ACCESS_DENIED);
+            z.util.SanitizationUtil.safeWindowOpen(url);
           },
           text: {
             action: z.l10n.text(z.string.modalCallNoMicrophoneAction),
@@ -130,7 +131,7 @@ z.viewModel.WarningsViewModel = class WarningsViewModel {
 
       case WarningsViewModel.TYPE.REQUEST_NOTIFICATION: {
         // We block subsequent permission requests for notifications when the user ignores the request.
-        amplify.publish(z.event.WebApp.NOTIFICATION.PERMISSION_STATE, z.notification.PermissionStatusState.IGNORED);
+        amplify.publish(z.event.WebApp.NOTIFICATION.PERMISSION_STATE, z.notification.PermissionState.IGNORED);
         break;
       }
 

@@ -29,6 +29,7 @@ z.event.WebSocketService = class WebSocketService {
       CLOSE: 'WebSocketService.CHANGE_TRIGGER.CLOSE',
       ERROR: 'WebSocketService.CHANGE_TRIGGER.ERROR',
       LOGOUT: 'WebSocketService.CHANGE_TRIGGER.LOGOUT',
+      LONG_INACTIVITY: 'WebSocketService.CHANGE_TRIGGER.LONG_INACTIVITY',
       OFFLINE: 'WebSocketService.CHANGE_TRIGGER.OFFLINE',
       ONLINE: 'WebSocketService.CHANGE_TRIGGER.ONLINE',
       PAGE_NAVIGATION: 'WebSocketService.CHANGE_TRIGGER.PAGE_NAVIGATION',
@@ -115,6 +116,11 @@ z.event.WebSocketService = class WebSocketService {
       };
 
       this.socket.onmessage = event => {
+        if (this._pingHasExperiencedSuspiciousInactivity()) {
+          const secondsSinceLastPing = (Date.now() - this.lastPingTime) / z.util.TimeUtil.UNITS_IN_MILLIS.SECOND;
+          this.logger.warn(`Message received but ping was inactive for "${secondsSinceLastPing}" sec, reconnecting.`);
+          return this.reconnect(WebSocketService.CHANGE_TRIGGER.LONG_INACTIVITY);
+        }
         if (event.data instanceof Blob) {
           const blobReader = new FileReader();
           blobReader.onload = () => onNotification(JSON.parse(blobReader.result));
@@ -193,6 +199,7 @@ z.event.WebSocketService = class WebSocketService {
       this.socket.close();
       window.clearInterval(this.pingIntervalId);
       window.clearTimeout(this.reconnectTimeoutId);
+      this.lastPingTime = undefined;
     }
 
     if (reconnect) {
@@ -208,20 +215,30 @@ z.event.WebSocketService = class WebSocketService {
   sendPing() {
     const isReadyStateOpen = this.socket.readyState === 1;
     if (isReadyStateOpen) {
-      const currentTime = Date.now();
-      this.lastPingTime = this.lastPingTime || currentTime;
-      const pingIntervalDifference = this.lastPingTime - currentTime;
-
-      const maxDifference = WebSocketService.CONFIG.PING_INTERVAL + WebSocketService.CONFIG.PING_INTERVAL_THRESHOLD;
-      if (pingIntervalDifference > maxDifference) {
+      if (this._pingHasExperiencedSuspiciousInactivity()) {
         this.logger.warn('Ping interval check failed');
         return this.reconnect(WebSocketService.CHANGE_TRIGGER.PING_INTERVAL);
       }
       this.logger.info('Sending ping to WebSocket');
+      this.lastPingTime = Date.now();
       return this.socket.send('Wire is so much nicer with internet!');
     }
 
     this.logger.warn(`WebSocket connection is closed. Current ready state: ${this.socket.readyState}`);
     this.reconnect(WebSocketService.CHANGE_TRIGGER.READY_STATE);
+  }
+
+  /**
+   * Returns true if the gap between the last ping and the current time is too big.
+   *
+   * @returns {boolean} Was the last ping too long ago
+   */
+  _pingHasExperiencedSuspiciousInactivity() {
+    const currentTime = Date.now();
+    const lastPingTime = this.lastPingTime || currentTime;
+    const pingIntervalDifference = currentTime - lastPingTime;
+
+    const maxDifference = WebSocketService.CONFIG.PING_INTERVAL + WebSocketService.CONFIG.PING_INTERVAL_THRESHOLD;
+    return pingIntervalDifference > maxDifference;
   }
 };

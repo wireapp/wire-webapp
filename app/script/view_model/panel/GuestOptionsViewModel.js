@@ -23,37 +23,29 @@ window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 window.z.viewModel.panel = z.viewModel.panel || {};
 
-z.viewModel.panel.GuestOptionsViewModel = class GuestOptionsViewModel {
+z.viewModel.panel.GuestOptionsViewModel = class GuestOptionsViewModel extends z.viewModel.panel.BasePanelViewModel {
   static get CONFIG() {
     return {
       CONFIRM_DURATION: 1500,
     };
   }
 
-  constructor(mainViewModel, panelViewModel, repositories) {
-    this.panelViewModel = panelViewModel;
-    this.conversationRepository = repositories.conversation;
+  constructor(params) {
+    super(params);
+    this.conversationRepository = this.repositories.conversation;
     this.stateHandler = this.conversationRepository.stateHandler;
-
-    this.conversationEntity = this.conversationRepository.active_conversation;
-    this.panelState = this.panelViewModel.state;
-    this.isGuestRoom = this.panelViewModel.isGuestRoom;
-    this.isTeamOnly = this.panelViewModel.isTeamOnly;
-    this.isVisible = this.panelViewModel.guestOptionsVisible;
+    this.isGuestRoom = ko.pureComputed(() => this.activeConversation() && this.activeConversation().isGuestRoom());
+    this.isTeamOnly = ko.pureComputed(() => this.activeConversation() && this.activeConversation().isTeamOnly());
+    this.hasAccessCode = ko.pureComputed(() => (this.isGuestRoom() ? !!this.activeConversation().accessCode() : false));
+    this.isGuestEnabled = ko.pureComputed(() => !this.isTeamOnly());
+    this.showLinkOptions = ko.pureComputed(() => this.isGuestEnabled());
 
     this.isLinkCopied = ko.observable(false);
     this.requestOngoing = ko.observable(false);
 
-    this.hasAccessCode = ko.pureComputed(() => (this.isGuestRoom() ? !!this.conversationEntity().accessCode() : false));
-    this.isGuestEnabled = ko.pureComputed(() => !this.isTeamOnly());
-    this.showLinkOptions = ko.pureComputed(() => this.isGuestEnabled());
-
-    this.conversationEntity.subscribe(conversationEntity => this._updateCode(this.isVisible(), conversationEntity));
-    this.isVisible.subscribe(isVisible => this._updateCode(isVisible, this.conversationEntity()));
-
+    this.activeConversation.subscribe(conversationEntity => this._updateCode(this.isVisible(), conversationEntity));
+    this.isVisible.subscribe(isVisible => this._updateCode(isVisible, this.activeConversation()));
     this.toggleAccessState = this.toggleAccessState.bind(this);
-    this.clickOnBack = this.clickOnBack.bind(this);
-    this.clickOnClose = this.clickOnClose.bind(this);
     this.requestAccessCode = this.requestAccessCode.bind(this);
     this.revokeAccessCode = this.revokeAccessCode.bind(this);
     this.copyLink = this.copyLink.bind(this);
@@ -62,12 +54,8 @@ z.viewModel.panel.GuestOptionsViewModel = class GuestOptionsViewModel {
       .extend({notify: 'always', rateLimit: {method: 'notifyWhenChangesStop', timeout: 0}});
   }
 
-  clickOnBack() {
-    this.panelViewModel.switchState(z.viewModel.PanelViewModel.STATE.CONVERSATION_DETAILS, true);
-  }
-
-  clickOnClose() {
-    this.panelViewModel.closePanel();
+  getElementId() {
+    return 'guest-options';
   }
 
   copyLink() {
@@ -84,17 +72,24 @@ z.viewModel.panel.GuestOptionsViewModel = class GuestOptionsViewModel {
     }
   }
 
+  resizeLink() {
+    const link = document.querySelector('.guest-options__link');
+    if (link) {
+      link.style.height = `${link.scrollHeight}px`;
+    }
+  }
+
   requestAccessCode() {
     // Handle conversations in legacy state
     const accessStatePromise = this.isGuestRoom()
       ? Promise.resolve()
-      : this.stateHandler.changeAccessState(this.conversationEntity(), z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM);
+      : this.stateHandler.changeAccessState(this.activeConversation(), z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM);
 
     accessStatePromise.then(() => {
       if (!this.requestOngoing()) {
         this.requestOngoing(true);
 
-        this.stateHandler.requestAccessCode(this.conversationEntity()).then(() => this.requestOngoing(false));
+        this.stateHandler.requestAccessCode(this.activeConversation()).then(() => this.requestOngoing(false));
       }
     });
   }
@@ -105,7 +100,7 @@ z.viewModel.panel.GuestOptionsViewModel = class GuestOptionsViewModel {
         if (!this.requestOngoing()) {
           this.requestOngoing(true);
 
-          this.stateHandler.revokeAccessCode(this.conversationEntity()).then(() => this.requestOngoing(false));
+          this.stateHandler.revokeAccessCode(this.activeConversation()).then(() => this.requestOngoing(false));
         }
       },
       preventClose: true,
@@ -118,7 +113,7 @@ z.viewModel.panel.GuestOptionsViewModel = class GuestOptionsViewModel {
   }
 
   toggleAccessState() {
-    const conversationEntity = this.conversationEntity();
+    const conversationEntity = this.activeConversation();
     if (conversationEntity.inTeam()) {
       const newAccessState = this.isTeamOnly()
         ? z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM

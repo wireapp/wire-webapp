@@ -94,27 +94,19 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     });
 
     this.inputPlaceholder = ko.pureComputed(() => {
-      let stringId;
-
       if (this.showAvailabilityTooltip()) {
         const userEntity = this.conversationEntity().firstUserEntity();
 
-        switch (userEntity.availability()) {
-          case z.user.AvailabilityType.AVAILABLE:
-            stringId = z.string.tooltipConversationInputPlaceholderAvailable;
-            break;
-          case z.user.AvailabilityType.AWAY:
-            stringId = z.string.tooltipConversationInputPlaceholderAway;
-            break;
-          case z.user.AvailabilityType.BUSY:
-            stringId = z.string.tooltipConversationInputPlaceholderBusy;
-            break;
-        }
+        const availabilityStrings = {
+          [z.user.AvailabilityType.AVAILABLE]: z.string.tooltipConversationInputPlaceholderAvailable,
+          [z.user.AvailabilityType.AWAY]: z.string.tooltipConversationInputPlaceholderAway,
+          [z.user.AvailabilityType.BUSY]: z.string.tooltipConversationInputPlaceholderBusy,
+        };
 
-        return z.l10n.text(stringId, userEntity.first_name());
+        return z.l10n.text(availabilityStrings[userEntity.availability()], userEntity.first_name());
       }
 
-      stringId = this.conversationEntity().messageTimer()
+      const stringId = this.conversationEntity().messageTimer()
         ? z.string.tooltipConversationEphemeral
         : z.string.tooltipConversationInputPlaceholder;
 
