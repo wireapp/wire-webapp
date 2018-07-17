@@ -54,7 +54,7 @@ import {ROUTE} from '../route';
 import {connect} from 'react-redux';
 import {injectIntl} from 'react-intl';
 import {isDesktopApp, isSupportingClipboard} from '../Runtime';
-import {loginStrings} from '../../strings';
+import {loginStrings, ssoLoginStrings} from '../../strings';
 import {parseValidationErrors, parseError} from '../util/errorUtil';
 import {resetError} from '../module/action/creator/AuthActionCreator';
 import {withRouter} from 'react-router';
@@ -186,8 +186,8 @@ class SingleSignOn extends React.PureComponent {
                 style={{display: 'flex', flexDirection: 'column', height: 428, justifyContent: 'space-between'}}
               >
                 <div>
-                  <H1 center>{'Company log in'}</H1>
-                  <Text>{"Paste here the link from your company's directory"}</Text>
+                  <H1 center>{_(ssoLoginStrings.headline)}</H1>
+                  <Text>{_(ssoLoginStrings.subhead)}</Text>
                   <Form style={{marginTop: 30}} data-uie-name="sso">
                     <InputSubmitCombo>
                       <Input
@@ -203,7 +203,7 @@ class SingleSignOn extends React.PureComponent {
                         markInvalid={!validInputs.code}
                         value={code}
                         autoComplete="section-login sso-code"
-                        placeholder={'PASTE LINK'}
+                        placeholder={_(ssoLoginStrings.codePlaceholder)}
                         maxLength="128"
                         autoFocus
                         type="text"
@@ -242,7 +242,7 @@ class SingleSignOn extends React.PureComponent {
                       disabled={!isSupportingClipboard()}
                       data-uie-name="do-paste-sso-code"
                     >
-                      {'Paste'}
+                      {_(ssoLoginStrings.pasteButton)}
                     </Button>
                   </Form>
                 </div>

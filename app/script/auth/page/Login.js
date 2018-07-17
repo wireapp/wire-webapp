@@ -341,12 +341,20 @@ class Login extends React.PureComponent {
                         <CheckboxLabel>{_(loginStrings.publicComputer)}</CheckboxLabel>
                       </Checkbox>
                     )}
+                    <Link
+                      center
+                      style={{marginTop: '8px'}}
+                      onClick={this.forgotPassword}
+                      data-uie-name="go-forgot-password"
+                    >
+                      {_(loginStrings.forgotPassword)}
+                    </Link>
                   </Form>
                 </div>
                 <Columns>
                   <Column>
-                    <Link onClick={this.forgotPassword} data-uie-name="go-forgot-password">
-                      {_(loginStrings.forgotPassword)}
+                    <Link to={ROUTE.SSO} component={RRLink} data-uie-name="go-sign-in-sso">
+                      {_(loginStrings.ssoLogin)}
                     </Link>
                   </Column>
                   <Column>

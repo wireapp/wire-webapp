@@ -533,6 +533,10 @@ export const loginStrings = defineMessages({
     id: 'login.forgotPassword',
     defaultMessage: 'Forgot password?',
   },
+  ssoLogin: {
+    id: 'login.ssoLogin',
+    defaultMessage: 'For companies',
+  },
   phoneLogin: {
     id: 'login.phoneLogin',
     defaultMessage: 'Log in with phone number',
@@ -540,6 +544,25 @@ export const loginStrings = defineMessages({
   publicComputer: {
     id: 'login.publicComputer',
     defaultMessage: 'This is a public computer',
+  },
+});
+
+export const ssoLoginStrings = defineMessages({
+  headline: {
+    id: 'ssoLogin.headline',
+    defaultMessage: 'Company log in',
+  },
+  subhead: {
+    id: 'ssoLogin.subhead',
+    defaultMessage: "Paste here the link from your company's directory",
+  },
+  codePlaceholder: {
+    id: 'ssoLogin.codePlaceholder',
+    defaultMessage: 'Paste link',
+  },
+  pasteButton: {
+    id: 'ssoLogin.pasteButton',
+    defaultMessage: 'Paste',
   },
 });
 
