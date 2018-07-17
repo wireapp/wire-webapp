@@ -32,8 +32,6 @@ import {AxiosError} from 'axios';
 import {Encoder} from 'bazinga64';
 import {
   AssetService,
-  ClientActionType,
-  ConfirmationType,
   GenericMessageType,
   MessageTimer,
   PayloadBundleOutgoing,
@@ -41,6 +39,18 @@ import {
   PayloadBundleState,
 } from '../conversation/root';
 
+import {
+  Asset,
+  ClientAction,
+  Confirmation,
+  Ephemeral,
+  GenericMessage,
+  Knock,
+  MessageDelete,
+  MessageEdit,
+  MessageHide,
+  Text,
+} from '@wireapp/protocol-messaging';
 import {
   ClientActionContent,
   ConfirmationContent,
@@ -62,20 +72,19 @@ export default class ConversationService {
 
   constructor(
     private readonly apiClient: APIClient,
-    private readonly protocolBuffers: any = {},
     private readonly cryptographyService: CryptographyService,
     private readonly assetService: AssetService
   ) {
     this.messageTimer = new MessageTimer();
   }
 
-  private createEphemeral(originalGenericMessage: any, expireAfterMillis: number): any {
-    const ephemeralMessage = this.protocolBuffers.Ephemeral.create({
+  private createEphemeral(originalGenericMessage: GenericMessage, expireAfterMillis: number): GenericMessage {
+    const ephemeralMessage = Ephemeral.create({
       expireAfterMillis,
-      [originalGenericMessage.content]: originalGenericMessage[originalGenericMessage.content],
+      [originalGenericMessage.content!]: originalGenericMessage[originalGenericMessage.content!],
     });
 
-    const genericMessage = this.protocolBuffers.GenericMessage.create({
+    const genericMessage = GenericMessage.create({
       [GenericMessageType.EPHEMERAL]: ephemeralMessage,
       messageId: originalGenericMessage.messageId,
     });
@@ -104,12 +113,12 @@ export default class ConversationService {
     conversationId: string,
     payloadBundle: PayloadBundleOutgoingUnsent
   ): Promise<PayloadBundleOutgoing> {
-    const confirmationMessage = this.protocolBuffers.Confirmation.create({
+    const confirmationMessage = Confirmation.create({
       firstMessageId: (payloadBundle.content as ConfirmationContent).confirmMessageId,
-      type: ConfirmationType.DELIVERED,
+      type: Confirmation.Type.DELIVERED,
     });
 
-    const genericMessage = this.protocolBuffers.GenericMessage.create({
+    const genericMessage = GenericMessage.create({
       [GenericMessageType.CONFIRMATION]: confirmationMessage,
       messageId: payloadBundle.id,
     });
@@ -133,19 +142,19 @@ export default class ConversationService {
     const {cipherText, keyBytes, sha256} = asset;
     const messageId = ConversationService.createId();
 
-    const externalMessage = this.protocolBuffers.External.create({
+    const externalMessage = {
       otrKey: new Uint8Array(keyBytes),
       sha256: new Uint8Array(sha256),
-    });
+    };
 
     const base64CipherText = Encoder.toBase64(cipherText).asString;
 
-    const customTextMessage = this.protocolBuffers.GenericMessage.create({
+    const customTextMessage = GenericMessage.create({
       external: externalMessage,
       messageId,
     });
 
-    const plainTextBuffer: Buffer = this.protocolBuffers.GenericMessage.encode(customTextMessage).finish();
+    const plainTextBuffer = GenericMessage.encode(customTextMessage).finish();
     const recipients = await this.cryptographyService.encrypt(plainTextBuffer, preKeyBundles as UserPreKeyBundleMap);
 
     const message: NewOTRMessage = {
@@ -160,9 +169,9 @@ export default class ConversationService {
   private async sendGenericMessage(
     sendingClientId: string,
     conversationId: string,
-    genericMessage: any
+    genericMessage: GenericMessage
   ): Promise<ClientMismatch> {
-    const plainTextBuffer: Buffer = this.protocolBuffers.GenericMessage.encode(genericMessage).finish();
+    const plainTextBuffer: Uint8Array = GenericMessage.encode(genericMessage).finish();
     const preKeyBundles = await this.getPreKeyBundles(conversationId);
     const recipients = await this.cryptographyService.encrypt(plainTextBuffer, preKeyBundles as UserPreKeyBundleMap);
 
@@ -179,31 +188,31 @@ export default class ConversationService {
 
     const encryptedAsset = payloadBundle.content as ImageAssetContent;
 
-    const imageMetadata = this.protocolBuffers.Asset.ImageMetaData.create({
+    const imageMetadata = Asset.ImageMetaData.create({
       height: encryptedAsset.image.height,
       width: encryptedAsset.image.width,
     });
 
-    const original = this.protocolBuffers.Asset.Original.create({
+    const original = Asset.Original.create({
       [GenericMessageType.IMAGE]: imageMetadata,
       mimeType: encryptedAsset.image.type,
       name: null,
       size: encryptedAsset.image.data.length,
     });
 
-    const remoteData = this.protocolBuffers.Asset.RemoteData.create({
+    const remoteData = Asset.RemoteData.create({
       assetId: encryptedAsset.asset.key,
       assetToken: encryptedAsset.asset.token,
       otrKey: encryptedAsset.asset.keyBytes,
       sha256: encryptedAsset.asset.sha256,
     });
 
-    const assetMessage = this.protocolBuffers.Asset.create({
+    const assetMessage = Asset.create({
       original,
       uploaded: remoteData,
     });
 
-    let genericMessage = this.protocolBuffers.GenericMessage.create({
+    let genericMessage = GenericMessage.create({
       [GenericMessageType.ASSET]: assetMessage,
       messageId: payloadBundle.id,
     });
@@ -214,7 +223,7 @@ export default class ConversationService {
     }
 
     const preKeyBundles = await this.getPreKeyBundles(conversationId);
-    const plainTextBuffer: Buffer = this.protocolBuffers.GenericMessage.encode(genericMessage).finish();
+    const plainTextBuffer: Uint8Array = GenericMessage.encode(genericMessage).finish();
     const payload: EncryptedAsset = await AssetCryptography.encryptAsset(plainTextBuffer);
 
     await this.sendExternalGenericMessage(this.clientID, conversationId, payload, preKeyBundles as UserPreKeyBundleMap);
@@ -242,8 +251,8 @@ export default class ConversationService {
     conversationId: string,
     payloadBundle: PayloadBundleOutgoingUnsent
   ): Promise<PayloadBundleOutgoing> {
-    let genericMessage = this.protocolBuffers.GenericMessage.create({
-      [GenericMessageType.KNOCK]: this.protocolBuffers.Knock.create(),
+    let genericMessage = GenericMessage.create({
+      [GenericMessageType.KNOCK]: Knock.create(),
       messageId: payloadBundle.id,
     });
 
@@ -266,8 +275,8 @@ export default class ConversationService {
     conversationId: string,
     payloadBundle: PayloadBundleOutgoingUnsent
   ): Promise<PayloadBundleOutgoing> {
-    const sessionReset = this.protocolBuffers.GenericMessage.create({
-      [GenericMessageType.CLIENT_ACTION]: ClientActionType.RESET_SESSION,
+    const sessionReset = GenericMessage.create({
+      [GenericMessageType.CLIENT_ACTION]: ClientAction.RESET_SESSION,
       messageId: payloadBundle.id,
     });
 
@@ -292,9 +301,9 @@ export default class ConversationService {
       state: PayloadBundleState.OUTGOING_SENT,
     };
 
-    let genericMessage = this.protocolBuffers.GenericMessage.create({
+    let genericMessage = GenericMessage.create({
       messageId: payloadBundle.id,
-      [GenericMessageType.TEXT]: this.protocolBuffers.Text.create({
+      [GenericMessageType.TEXT]: Text.create({
         content: (payloadBundle.content as TextContent).text,
       }),
     });
@@ -305,7 +314,7 @@ export default class ConversationService {
     }
 
     const preKeyBundles = await this.getPreKeyBundles(conversationId);
-    const plainTextBuffer: Buffer = this.protocolBuffers.GenericMessage.encode(genericMessage).finish();
+    const plainTextBuffer = GenericMessage.encode(genericMessage).finish();
 
     if (this.shouldSendAsExternal(plainTextBuffer, preKeyBundles as UserPreKeyBundleMap)) {
       const encryptedAsset: EncryptedAsset = await AssetCryptography.encryptAsset(plainTextBuffer);
@@ -328,7 +337,7 @@ export default class ConversationService {
     return payloadBundle;
   }
 
-  private shouldSendAsExternal(plainText: Buffer, preKeyBundles: UserPreKeyBundleMap): boolean {
+  private shouldSendAsExternal(plainText: Uint8Array, preKeyBundles: UserPreKeyBundleMap): boolean {
     const EXTERNAL_MESSAGE_THRESHOLD_BYTES = 200 * 1024;
 
     let clientCount = 0;
@@ -407,7 +416,7 @@ export default class ConversationService {
 
   public createSessionReset(messageId: string = ConversationService.createId()): PayloadBundleOutgoingUnsent {
     const content: ClientActionContent = {
-      clientAction: ClientActionType.RESET_SESSION,
+      clientAction: ClientAction.RESET_SESSION,
     };
     return {
       content,
@@ -422,12 +431,12 @@ export default class ConversationService {
   public async deleteMessageLocal(conversationId: string, messageIdToHide: string): Promise<PayloadBundleOutgoing> {
     const messageId = new UUID(4).format();
 
-    const messageHide = this.protocolBuffers.MessageHide.create({
+    const messageHide = MessageHide.create({
       conversationId,
       messageId: messageIdToHide,
     });
 
-    const genericMessage = this.protocolBuffers.GenericMessage.create({
+    const genericMessage = GenericMessage.create({
       [GenericMessageType.HIDDEN]: messageHide,
       messageId,
     });
@@ -453,11 +462,11 @@ export default class ConversationService {
   ): Promise<PayloadBundleOutgoing> {
     const messageId = new UUID(4).format();
 
-    const messageDelete = this.protocolBuffers.MessageDelete.create({
+    const messageDelete = MessageDelete.create({
       messageId: messageIdToDelete,
     });
 
-    const genericMessage = this.protocolBuffers.GenericMessage.create({
+    const genericMessage = GenericMessage.create({
       [GenericMessageType.DELETED]: messageDelete,
       messageId,
     });
@@ -550,7 +559,7 @@ export default class ConversationService {
         throw new Error(`No send method implemented for "${payloadBundle.type}" without content".`);
       }
       case GenericMessageType.CLIENT_ACTION: {
-        if (payloadBundle.content === ClientActionType.RESET_SESSION) {
+        if (payloadBundle.content === ClientAction.RESET_SESSION) {
           return this.sendSessionReset(conversationId, payloadBundle);
         }
         throw new Error(
@@ -583,18 +592,18 @@ export default class ConversationService {
   public async updateText(conversationId: string, originalMessageId: string, newMessage: string): Promise<string> {
     const messageId = ConversationService.createId();
 
-    const editedMessage = this.protocolBuffers.MessageEdit.create({
+    const editedMessage = MessageEdit.create({
       replacingMessageId: originalMessageId,
-      text: this.protocolBuffers.Text.create({content: newMessage}),
+      text: Text.create({content: newMessage}),
     });
 
-    const genericMessage = this.protocolBuffers.GenericMessage.create({
+    const genericMessage = GenericMessage.create({
       edited: editedMessage,
       messageId,
     });
 
     const preKeyBundles = await this.getPreKeyBundles(conversationId);
-    const plainTextBuffer: Buffer = this.protocolBuffers.GenericMessage.encode(genericMessage).finish();
+    const plainTextBuffer = GenericMessage.encode(genericMessage).finish();
     const payload: EncryptedAsset = await AssetCryptography.encryptAsset(plainTextBuffer);
 
     await this.sendExternalGenericMessage(this.clientID, conversationId, payload, preKeyBundles as UserPreKeyBundleMap);

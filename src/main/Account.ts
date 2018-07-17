@@ -32,12 +32,13 @@ import {
 import {StatusCode} from '@wireapp/api-client/dist/commonjs/http/index';
 import {WebSocketClient} from '@wireapp/api-client/dist/commonjs/tcp/index';
 import * as cryptobox from '@wireapp/cryptobox';
+import {GenericMessage} from '@wireapp/protocol-messaging';
 import {RecordNotFoundError} from '@wireapp/store-engine/dist/commonjs/engine/error/index';
 import * as Long from 'long';
-import {Root} from 'protobufjs';
 import {LoginSanitizer} from './auth/root';
 import {ClientInfo, ClientService} from './client/root';
 import {ConnectionService} from './connection/root';
+import {AssetContent, DeletedContent, HiddenContent, TextContent} from './conversation/content/';
 import {
   AssetService,
   ConversationService,
@@ -47,13 +48,11 @@ import {
 } from './conversation/root';
 import {CryptographyService} from './cryptography/root';
 import {NotificationService} from './notification/root';
-import proto from './Protobuf';
 import {SelfService} from './self/root';
 
 const logdown = require('logdown');
 import Client = require('@wireapp/api-client');
 import EventEmitter = require('events');
-import {AssetContent, DeletedContent, HiddenContent, TextContent} from './conversation/content/';
 
 class Account extends EventEmitter {
   private readonly logger: any = logdown('@wireapp/core/Account', {
@@ -74,7 +73,6 @@ class Account extends EventEmitter {
     TYPING: 'Account.INCOMING.TYPING',
   };
   private readonly apiClient: Client;
-  private protocolBuffers: any = {};
   public service?: {
     client: ClientService;
     conversation: ConversationService;
@@ -92,32 +90,11 @@ class Account extends EventEmitter {
   public async init(): Promise<void> {
     this.logger.log('init');
 
-    const root: Root = Root.fromJSON(proto);
-
-    this.protocolBuffers = {
-      Asset: root.lookup('Asset'),
-      ClientAction: root.lookup('ClientAction'),
-      Confirmation: root.lookup('Confirmation'),
-      Ephemeral: root.lookup('Ephemeral'),
-      External: root.lookup('External'),
-      GenericMessage: root.lookup('GenericMessage'),
-      Knock: root.lookup('Knock'),
-      MessageDelete: root.lookup('MessageDelete'),
-      MessageEdit: root.lookup('MessageEdit'),
-      MessageHide: root.lookup('MessageHide'),
-      Text: root.lookup('Text'),
-    };
-
     const cryptographyService = new CryptographyService(this.apiClient, this.apiClient.config.store);
     const clientService = new ClientService(this.apiClient, this.apiClient.config.store, cryptographyService);
     const connectionService = new ConnectionService(this.apiClient);
     const assetService = new AssetService(this.apiClient);
-    const conversationService = new ConversationService(
-      this.apiClient,
-      this.protocolBuffers,
-      cryptographyService,
-      assetService
-    );
+    const conversationService = new ConversationService(this.apiClient, cryptographyService, assetService);
     const notificationService = new NotificationService(this.apiClient, this.apiClient.config.store);
     const selfService = new SelfService(this.apiClient);
 
@@ -273,14 +250,15 @@ class Account extends EventEmitter {
 
     const sessionId = CryptographyService.constructSessionId(from, sender);
     const decryptedMessage = await this.service.cryptography.decrypt(sessionId, cipherText);
-    const genericMessage = this.protocolBuffers.GenericMessage.decode(decryptedMessage);
+    const genericMessage = GenericMessage.decode(decryptedMessage);
 
     if (genericMessage.content === GenericMessageType.EPHEMERAL) {
       const unwrappedMessage = this.mapGenericMessage(genericMessage.ephemeral, otrMessage);
-      const expireAfterMillis = genericMessage.ephemeral.expireAfterMillis;
-      unwrappedMessage.messageTimer = expireAfterMillis.toNumber
-        ? (expireAfterMillis as Long).toNumber()
-        : expireAfterMillis;
+      if (genericMessage.ephemeral) {
+        const expireAfterMillis = genericMessage.ephemeral.expireAfterMillis;
+        unwrappedMessage.messageTimer =
+          typeof expireAfterMillis === 'number' ? expireAfterMillis : (expireAfterMillis as Long).toNumber();
+      }
       return unwrappedMessage;
     } else {
       return this.mapGenericMessage(genericMessage, otrMessage);

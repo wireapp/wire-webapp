@@ -17,10 +17,10 @@
  *
  */
 
-import {ClientActionType} from '../../conversation/root';
+import {ClientAction} from '@wireapp/protocol-messaging';
 
 interface ClientActionContent {
-  clientAction: ClientActionType;
+  clientAction: ClientAction;
 }
 
 export {ClientActionContent};
