@@ -21,15 +21,16 @@
 const APIClient = require('@wireapp/api-client');
 const UUID = require('pure-uuid');
 const {Account} = require('@wireapp/core');
+const {GenericMessage, Text} = require('@wireapp/protocol-messaging');
 const {MemoryEngine} = require('@wireapp/store-engine');
 
 const createMessage = (conversationRepository, content) => {
-  const customTextMessage = conversationRepository.protocolBuffers.GenericMessage.create({
+  const customTextMessage = GenericMessage.create({
     messageId: new UUID(4).format(),
-    text: conversationRepository.protocolBuffers.Text.create({content}),
+    text: Text.create({content}),
   });
 
-  return conversationRepository.protocolBuffers.GenericMessage.encode(customTextMessage).finish();
+  return GenericMessage.encode(customTextMessage).finish();
 };
 
 const generatePreKeyBundles = (users, devicesPerUser) => {
@@ -64,7 +65,7 @@ describe('ConversationService', () => {
   });
 
   describe("'shouldSendAsExternal'", () => {
-    it('returns true for a big payload', async done => {
+    it('returns true for a big payload', () => {
       const {conversation} = account.service;
       const preKeyBundles = generatePreKeyBundles(128, 4);
 
@@ -73,10 +74,7 @@ describe('ConversationService', () => {
       const plainText = createMessage(conversation, longMessage);
 
       const shouldSendAsExternal = conversation.shouldSendAsExternal(plainText, preKeyBundles);
-
       expect(shouldSendAsExternal).toBe(true);
-
-      done();
     });
 
     it('returns false for a small payload', async done => {

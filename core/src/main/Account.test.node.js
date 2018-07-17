@@ -26,6 +26,7 @@ const {MemoryEngine} = require('@wireapp/store-engine');
 const {NotificationAPI} = require('@wireapp/api-client/dist/commonjs/notification/');
 const {BackendErrorLabel, StatusCode} = require('@wireapp/api-client/dist/commonjs/http/');
 const {ValidationUtil} = require('@wireapp/commons');
+const {GenericMessage, Text} = require('@wireapp/protocol-messaging');
 const APIClient = require('@wireapp/api-client');
 const nock = require('nock');
 
@@ -108,17 +109,14 @@ describe('Account', () => {
     it('initializes the Protocol buffers', async done => {
       const account = new Account();
 
-      expect(account.service).not.toBeDefined();
-      expect(account.protocolBuffers.GenericMessage).not.toBeDefined();
-
       await account.init();
 
       expect(account.service.conversation).toBeDefined();
       expect(account.service.cryptography).toBeDefined();
 
-      const message = account.protocolBuffers.GenericMessage.create({
+      const message = GenericMessage.create({
         messageId: '2d7cb6d8-118f-11e8-b642-0ed5f89f718b',
-        text: account.protocolBuffers.Text.create({content: 'Hello, World!'}),
+        text: Text.create({content: 'Hello, World!'}),
       });
 
       expect(message.content).toBe('text');

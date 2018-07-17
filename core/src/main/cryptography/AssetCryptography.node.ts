@@ -54,7 +54,7 @@ export const decryptAsset = async ({
   return Buffer.concat([decipherUpdated, decipherFinal]);
 };
 
-export const encryptAsset = async (plainText: Buffer): Promise<EncryptedAsset> => {
+export const encryptAsset = async (plainText: Uint8Array): Promise<EncryptedAsset> => {
   const initializationVector = crypto.randomBytes(16);
   const keyBytes = crypto.randomBytes(32);
 
