@@ -42,7 +42,7 @@ z.viewModel.panel.GroupParticipantUserViewModel = class GroupParticipantUserView
 
     this.selectedParticipant = ko.observable(undefined);
 
-    this.isTeam = ko.pureComputed(() => this.selectedParticipant().isTeamMember());
+    this.inTeam = ko.pureComputed(() => this.selectedParticipant().inTeam());
     this.isGuest = ko.pureComputed(() => this.selectedParticipant().isGuest());
     this.isTemporaryGuest = ko.pureComputed(() => this.selectedParticipant().isTemporaryGuest());
     this.isActivatedAccount = this.mainViewModel.isActivatedAccount;

@@ -144,13 +144,15 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
     this.showActionClear = ko.pureComputed(() => {
       return !this.activeConversation().is_request() && !this.activeConversation().is_cleared();
     });
+    this.showActionLeave = ko.pureComputed(() => {
+      return this.activeConversation().is_group() && !this.activeConversation().removed_from_conversation();
+    });
+
     this.showActionGuestOptions = ko.pureComputed(() => this.activeConversation().inTeam());
     this.showActionTimedMessages = ko.pureComputed(() => {
       return this.activeConversation().is_group() && !this.activeConversation().isGuest();
     });
-    this.showActionLeave = ko.pureComputed(() => {
-      return this.activeConversation().is_group() && !this.activeConversation().removed_from_conversation();
-    });
+    this.showSectionOptions = ko.pureComputed(() => this.showActionGuestOptions() || this.showActionTimedMessages());
 
     this.participantsUserText = ko.pureComputed(() => {
       const hasMultipleParticipants = this.userParticipants().length > 1;
