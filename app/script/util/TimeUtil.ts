@@ -35,7 +35,7 @@ window.z.util.TimeUtil = {
     WEEK: 1000 * 60 * 60 * 24 * 7,
     YEAR: 1000 * 60 * 60 * 24 * 365,
   },
-  adjustCurrentTimestamp: function (timeOffset: number): number {
+  adjustCurrentTimestamp: (timeOffset: number): number => {
     timeOffset = (typeof timeOffset === 'number') ? timeOffset : 0;
     return Date.now() - timeOffset;
   },
@@ -90,7 +90,7 @@ window.z.util.TimeUtil = {
       value: firstNonZeroUnit.value,
     };
   },
-  // Generate a human readable string of the remaining time
+  // Generate a human readable string of the remaining time.
   formatDurationCaption: (duration: number): string => {
     const mappedUnits = window.z.util.TimeUtil.mapUnits(duration, false);
     const hours = mappedUnits.find((unit: DiscreteTimeUnit) => unit.symbol === 'h');
@@ -117,7 +117,7 @@ window.z.util.TimeUtil = {
     const joiner = ` ${window.z.l10n.text(window.z.string.and)} `;
     return `${validUnitStrings.join(joiner)} ${window.z.l10n.text(window.z.string.ephemeralRemaining)}`;
   },
-  // Format seconds into hh:mm:ss.
+  // Format seconds into "hh:mm:ss".
   formatSeconds: (duration: number): string => {
     duration = Math.round(duration || 0);
 
@@ -161,7 +161,7 @@ window.z.util.TimeUtil = {
   getUnixTimestamp: (): number => Math.floor(Date.now() / window.z.util.TimeUtil.UNITS_IN_MILLIS.SECOND),
 
   /**
-   * Calculate the discrete time units (years, weeks, days, hours, minutes, seconds) for a given duration
+   * Calculate the discrete time units (years, weeks, days, hours, minutes, seconds) for a given duration.
    * @note Implementation based on: https://gist.github.com/deanrobertcook/7168b38150c303a2b4196216913d34c1
    */
   mapUnits: (duration: number, rounded: boolean): DiscreteTimeUnit[] => {
