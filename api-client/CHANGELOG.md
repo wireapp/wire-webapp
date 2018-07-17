@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="1.9.1"></a>
+## [1.9.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@1.9.0...@wireapp/api-client@1.9.1) (2018-07-17)
+
+
+### Bug Fixes
+
+* **api-client,core:** logger.info -> logger.log for old browsers ([#846](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/846)) ([c0f606a](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/c0f606a))
+
+
+
+
 <a name="1.9.0"></a>
 # [1.9.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@1.8.9...@wireapp/api-client@1.9.0) (2018-07-16)
 

@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="1.0.79"></a>
+## [1.0.79](https://github.com/wireapp/wire-web-packages/tree/master/packages/travis-bot/compare/@wireapp/travis-bot@1.0.78...@wireapp/travis-bot@1.0.79) (2018-07-17)
+
+
+### Bug Fixes
+
+* **api-client,core:** logger.info -> logger.log for old browsers ([#846](https://github.com/wireapp/wire-web-packages/tree/master/packages/travis-bot/issues/846)) ([c0f606a](https://github.com/wireapp/wire-web-packages/tree/master/packages/travis-bot/commit/c0f606a))
+
+
+
+
 <a name="1.0.78"></a>
 ## [1.0.78](https://github.com/wireapp/wire-web-packages/tree/master/packages/travis-bot/compare/@wireapp/travis-bot@1.0.77...@wireapp/travis-bot@1.0.78) (2018-07-16)
 
