@@ -6,6 +6,7 @@
     "noEmitOnError": true,
     "noImplicitReturns": true,
     "noUnusedLocals": true,
+    "outDir": "dist",
     "rootDir": "app/script",
     "strict": true,
     "target": "ES5"

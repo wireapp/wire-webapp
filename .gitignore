@@ -37,6 +37,3 @@
 aws-keys.json
 npm-debug.log
 yarn-error.log
-
-# TypeScript compilation files
-app/script/util/TimeUtil.js
