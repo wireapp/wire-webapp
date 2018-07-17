@@ -250,7 +250,10 @@ z.calling.entities.CallEntity = class CallEntity {
       }
 
       this.terminationReason = terminationReason;
-      const eventSource = z.event.EventRepository.SOURCE.WEB_SOCKET;
+      const eventSource = onGroupCheck
+        ? z.event.EventRepository.SOURCE.INJECTED
+        : z.event.EventRepository.SOURCE.WEB_SOCKET;
+
       callMessageEntity.userId = this.creatingUser.id;
       this.callingRepository.injectDeactivateEvent(callMessageEntity, eventSource, reason);
 
