@@ -91,7 +91,7 @@ const start = async (): Promise<TravisBot> => {
     messageData.conversationIds = WIRE_WEBAPP_BOT_CONVERSATION_IDS.replace(' ', '').split(',');
   }
 
-  logger.info('Booting up ...');
+  logger.log('Booting up ...');
 
   const bot = new TravisBot(loginData, messageData);
   await bot.start();
@@ -99,7 +99,7 @@ const start = async (): Promise<TravisBot> => {
   return bot;
 };
 
-logger.info(setBold(`wire-travis-bot v${version}`) + '\n');
+logger.log(setBold(`wire-travis-bot v${version}`) + '\n');
 
 const SECOND_ARGUMENT = 2;
 

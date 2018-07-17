@@ -51,7 +51,7 @@ const parameters = {
   password: program.password || process.env.WIRE_CHANGELOG_BOT_PASSWORD,
 };
 
-logger.info(chalk`{bold wire-changelog-bot v${version}}`);
+logger.log(chalk`{bold wire-changelog-bot v${version}}`);
 
 TRAVIS_ENV_VARS.forEach(envVar => {
   if (!process.env[envVar]) {

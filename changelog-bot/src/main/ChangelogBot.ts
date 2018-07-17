@@ -65,7 +65,7 @@ class ChangelogBot {
           throw new Error(`Account service is not set. Not logged in?`);
         }
         if (id) {
-          logger.info(`Sending message to conversation ${id} ...`);
+          logger.log(`Sending message to conversation ${id} ...`);
           const textPayload = await account.service.conversation.createText(this.message);
           await account.service.conversation.send(id, textPayload);
         }

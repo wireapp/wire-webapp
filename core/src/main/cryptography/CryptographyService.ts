@@ -56,7 +56,7 @@ class CryptographyService {
   }
 
   public async createCryptobox(): Promise<Array<SerializedPreKey>> {
-    this.logger.info('createCryptobox');
+    this.logger.log('createCryptobox');
     const initialPreKeys: Array<ProteusKeys.PreKey> = await this.cryptobox.create();
 
     return initialPreKeys
@@ -71,7 +71,7 @@ class CryptographyService {
   }
 
   public decrypt(sessionId: string, encodedCiphertext: string): Promise<Uint8Array> {
-    this.logger.info('decrypt');
+    this.logger.log('decrypt');
     const messageBytes: Uint8Array = Decoder.fromBase64(encodedCiphertext).asBytes;
     return this.cryptobox.decrypt(sessionId, messageBytes.buffer);
   }
@@ -81,7 +81,7 @@ class CryptographyService {
   }
 
   public async encrypt(plainText: Uint8Array, preKeyBundles: UserPreKeyBundleMap): Promise<OTRRecipients> {
-    this.logger.info('encrypt');
+    this.logger.log('encrypt');
     const recipients: OTRRecipients = {};
     const encryptions: Array<Promise<SessionPayloadBundle>> = [];
 
@@ -115,7 +115,7 @@ class CryptographyService {
     plainText: Uint8Array,
     base64EncodedPreKey: string
   ): Promise<SessionPayloadBundle> {
-    this.logger.info('encryptPayloadForSession');
+    this.logger.log('encryptPayloadForSession');
     let encryptedPayload;
 
     try {
@@ -134,18 +134,18 @@ class CryptographyService {
   }
 
   public async initCryptobox(): Promise<void> {
-    this.logger.info('initCryptobox');
+    this.logger.log('initCryptobox');
     await this.cryptobox.load();
   }
 
   public deleteCryptographyStores(): Promise<boolean[]> {
-    this.logger.info('deleteCryptographyStores');
+    this.logger.log('deleteCryptographyStores');
     return this.database.deleteStores();
   }
 
   public async resetSession(sessionId: string): Promise<void> {
     await this.cryptobox.session_delete(sessionId);
-    this.logger.info(`Deleted session ID "${sessionId}".`);
+    this.logger.log(`Deleted session ID "${sessionId}".`);
   }
 }
 

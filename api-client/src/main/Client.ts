@@ -223,7 +223,7 @@ class Client {
   private async initEngine(context: Context) {
     const clientType = context.clientType === ClientType.NONE ? '' : `@${context.clientType}`;
     const dbName = `${this.STORE_NAME_PREFIX}@${this.config.urls.name}@${context.userId}${clientType}`;
-    this.logger.info(`Initialising store with name "${dbName}"`);
+    this.logger.log(`Initialising store with name "${dbName}"`);
     try {
       const db = await this.config.store.init(dbName);
       const isDexieStore = db && db.constructor.name === 'Dexie';
