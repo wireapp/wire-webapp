@@ -121,7 +121,8 @@ ko.components.register('video-asset', {
   template: `
     <!-- ko ifnot: expired() -->
       <div class="video-asset-container" data-bind="hide_controls: 2000, attr: {'data-uie-value': asset.file_name}" data-uie-name="video-asset">
-        <video data-bind="attr: {src: video_src},
+        <video playisinline
+               data-bind="attr: {src: video_src},
                           css: {hidden: asset.status() === z.assets.AssetTransferState.UPLOADING},
                           event: {loadedmetadata: on_loadedmetadata,
                                   timeupdate: on_timeupdate,
