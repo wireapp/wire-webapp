@@ -431,6 +431,7 @@ z.string.da.conversationDetailsActionGuestOptions = 'Gæst indstillinger';
 z.string.da.conversationDetailsActionLeave = 'Forlad gruppen…';
 z.string.da.conversationDetailsGuestsOff = 'Slået Fra';
 z.string.da.conversationDetailsGuestsOn = 'Aktiv';
+z.string.da.conversationDetailsOptions = 'Egenskaber';
 z.string.da.conversationDetailsParticipantsServicesOne = 'Tjeneste';
 z.string.da.conversationDetailsParticipantsServicesMany = 'Tjenester';
 z.string.da.conversationDetailsParticipantsUsersOne = 'Person';
