@@ -58,7 +58,7 @@ import {loginStrings, ssoLoginStrings} from '../../strings';
 import {parseValidationErrors, parseError} from '../util/errorUtil';
 import {resetError} from '../module/action/creator/AuthActionCreator';
 import {withRouter} from 'react-router';
-import {isUUID} from '../util/stringUtil';
+import {isUUID, UUID_REGEX} from '../util/stringUtil';
 import {ClientType} from '@wireapp/api-client/dist/commonjs/client/index';
 
 class SingleSignOn extends React.PureComponent {
@@ -197,7 +197,7 @@ class SingleSignOn extends React.PureComponent {
                   <Form style={{marginTop: 30}} data-uie-name="sso">
                     <InputSubmitCombo>
                       <Input
-                        name="code"
+                        name="sso-code"
                         tabIndex="1"
                         onChange={event =>
                           this.setState({
@@ -211,6 +211,7 @@ class SingleSignOn extends React.PureComponent {
                         autoComplete="section-login sso-code"
                         placeholder={_(ssoLoginStrings.codePlaceholder)}
                         maxLength="128"
+                        pattern={`^${SingleSignOn.SSO_CODE_PREFIX}${UUID_REGEX}$`}
                         autoFocus
                         type="text"
                         required
@@ -218,7 +219,7 @@ class SingleSignOn extends React.PureComponent {
                       />
                       <RoundIconButton
                         tabIndex="2"
-                        disabled={!this.isValidSSOCode(code)}
+                        disabled={!code}
                         type="submit"
                         formNoValidate
                         icon={ICON_NAME.ARROW}

@@ -502,6 +502,10 @@ export const validationErrorStrings = defineMessages({
     id: 'ValidationError.FIELD.PASSWORD_LOGIN.PATTERN_MISMATCH',
     defaultMessage: 'Wrong password. Please try again.',
   },
+  [ValidationError.FIELD.SSO_LOGIN.PATTERN_MISMATCH]: {
+    id: 'ValidationError.FIELD.SSO_LOGIN.PATTERN_MISMATCH',
+    defaultMessage: 'Invalid code',
+  },
   [ValidationError.FIELD.EMAIL.TYPE_MISMATCH]: {
     id: 'ValidationError.FIELD.EMAIL.TYPE_MISMATCH',
     defaultMessage: 'Please enter a valid email address',
