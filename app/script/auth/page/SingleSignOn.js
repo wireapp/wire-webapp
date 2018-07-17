@@ -59,6 +59,7 @@ import {parseValidationErrors, parseError} from '../util/errorUtil';
 import {resetError} from '../module/action/creator/AuthActionCreator';
 import {withRouter} from 'react-router';
 import {isUUID} from '../util/stringUtil';
+import {ClientType} from '@wireapp/api-client/dist/commonjs/client/index';
 
 class SingleSignOn extends React.PureComponent {
   static SSO_CODE_PREFIX = 'wire-';
@@ -106,7 +107,12 @@ class SingleSignOn extends React.PureComponent {
           throw errors[0];
         }
       })
-      .then(() => this.props.doLoginSSO({code: this.stripCode(this.state.code), persist: this.state.persist}))
+      .then(() =>
+        this.props.doLoginSSO({
+          clientType: this.state.persist ? ClientType.PERMANENT : ClientType.TEMPORARY,
+          code: this.stripCode(this.state.code),
+        })
+      )
       .then(this.navigateChooseHandleOrWebapp)
       .catch(error => {
         switch (error.label) {
