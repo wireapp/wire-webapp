@@ -381,6 +381,7 @@ z.string.pl.conversationDetailsActionArchive = 'Archiwizuj';
 z.string.pl.conversationDetailsActionCancelRequest = 'Anuluj żądanie';
 z.string.pl.conversationDetailsActionDevices = 'Urządzenia';
 z.string.pl.conversationDetailsGuestsOff = 'Wyłącz';
+z.string.pl.conversationDetailsOptions = 'Opcje';
 z.string.pl.conversationDetailsParticipantsServicesMany = 'Usługi';
 z.string.pl.conversationDetailsParticipantsUsersMany = 'Osoby';
 z.string.pl.conversationDetailsPeople = 'Osoby';

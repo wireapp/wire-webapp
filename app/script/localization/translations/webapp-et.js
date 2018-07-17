@@ -473,6 +473,7 @@ z.string.et.conversationDetailsActionTimedMessages = 'Kustuvad sõnumid';
 z.string.et.conversationDetailsActionLeave = 'Lahku grupist';
 z.string.et.conversationDetailsGuestsOff = 'Väljas';
 z.string.et.conversationDetailsGuestsOn = 'Sees';
+z.string.et.conversationDetailsOptions = 'Valikud';
 z.string.et.conversationDetailsParticipantsServicesOne = 'Teenus';
 z.string.et.conversationDetailsParticipantsServicesMany = 'Teenused';
 z.string.et.conversationDetailsParticipantsUsersOne = 'Inimene';

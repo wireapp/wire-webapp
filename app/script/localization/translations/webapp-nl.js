@@ -366,6 +366,7 @@ z.string.nl.conversationDetailsActionCancelRequest = 'Annuleer verzoek';
 z.string.nl.conversationDetailsActionCreateGroup = 'Nieuwe groep';
 z.string.nl.conversationDetailsActionDevices = 'Apparaten';
 z.string.nl.conversationDetailsGuestsOff = 'Uit';
+z.string.nl.conversationDetailsOptions = 'Opties';
 z.string.nl.conversationDetailsParticipantsServicesMany = 'Services';
 z.string.nl.conversationDetailsParticipantsUsersMany = 'Deelnemers';
 z.string.nl.conversationDetailsPeople = 'Deelnemers';

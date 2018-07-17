@@ -339,6 +339,7 @@ z.string.it.conversationDetailsActionArchive = 'Archivia';
 z.string.it.conversationDetailsActionCancelRequest = 'Annulla richiesta';
 z.string.it.conversationDetailsActionDevices = 'Dispositivi';
 z.string.it.conversationDetailsGuestsOff = 'Off';
+z.string.it.conversationDetailsOptions = 'Opzioni';
 z.string.it.conversationDetailsParticipantsServicesMany = 'Servizi';
 z.string.it.conversationDetailsParticipantsUsersMany = 'Persone';
 z.string.it.conversationDetailsPeople = 'Persone';

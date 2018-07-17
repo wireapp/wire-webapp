@@ -344,6 +344,7 @@ z.string.sk.conversationDetailsActionArchive = 'Archív';
 z.string.sk.conversationDetailsActionCancelRequest = 'Zrušiť požiadavku';
 z.string.sk.conversationDetailsActionDevices = 'Zariadenia';
 z.string.sk.conversationDetailsGuestsOff = 'Vypnúť';
+z.string.sk.conversationDetailsOptions = 'Možnosti';
 z.string.sk.conversationDetailsParticipantsServicesMany = 'Služby';
 z.string.sk.conversationDetailsParticipantsUsersMany = 'Ľudia';
 z.string.sk.conversationDetailsPeople = 'Ľudia';
