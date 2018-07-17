@@ -62,7 +62,7 @@ z.util.Environment = (() => {
   };
 
   const _getVersion = () => {
-    const browserVersion = window.platform.version || [];
+    const browserVersion = window.platform.version || '';
     const [majorVersion] = browserVersion.split('.');
     return window.parseInt(majorVersion, 10);
   };
