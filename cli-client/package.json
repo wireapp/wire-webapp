@@ -6,7 +6,7 @@
     "@wireapp/core": "3.12.1",
     "commander": "2.16.0",
     "dotenv": "6.0.0",
-    "fs-extra": "6.0.1"
+    "fs-extra": "7.0.0"
   },
   "devDependencies": {
     "rimraf": "2.6.2",
