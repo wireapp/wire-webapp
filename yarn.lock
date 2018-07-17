@@ -3193,9 +3193,9 @@ detect-node@^2.0.3:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/detect-node/-/detect-node-2.0.3.tgz#a2033c09cc8e158d37748fbde7507832bd6ce127"
 
-dexie-batch@ffflorian/dexie-batch#dbf3b4dd9c24066a5ad11d875566ef61ffa53150:
-  version "0.3.1"
-  resolved "https://codeload.github.com/ffflorian/dexie-batch/tar.gz/dbf3b4dd9c24066a5ad11d875566ef61ffa53150"
+dexie-batch@0.4.1:
+  version "0.4.1"
+  resolved "https://registry.yarnpkg.com/dexie-batch/-/dexie-batch-0.4.1.tgz#c4c586683909c78b0de47bcdb7de4841a41ae757"
 
 dexie@2.0.4:
   version "2.0.4"

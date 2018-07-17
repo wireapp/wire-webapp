@@ -43,7 +43,7 @@
     "@wireapp/react-ui-kit": "1.5.6",
     "babel-plugin-react-intl": "2.4.0",
     "babel-polyfill": "6.26.0",
-    "dexie-batch": "ffflorian/dexie-batch#dbf3b4dd9c24066a5ad11d875566ef61ffa53150",
+    "dexie-batch": "0.4.1",
     "intl": "1.2.5",
     "jquery": "3.3.1",
     "js-cookie": "2.2.0",
