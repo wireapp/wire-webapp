@@ -17,8 +17,6 @@
  *
  */
 
-import BackendError from '../BackendError';
-
 export const CONVERSATION_CODE_CHECK_START = 'CONVERSATION_CODE_CHECK_START';
 export const CONVERSATION_CODE_CHECK_SUCCESS = 'CONVERSATION_CODE_CHECK_SUCCESS';
 export const CONVERSATION_CODE_CHECK_FAILED = 'CONVERSATION_CODE_CHECK_FAILED';
@@ -37,7 +35,7 @@ export const successfulConversationCodeCheck = () => ({
 });
 
 export const failedConversationCodeCheck = error => ({
-  payload: BackendError.handle(error),
+  payload: error,
   type: CONVERSATION_CODE_CHECK_FAILED,
 });
 
@@ -52,6 +50,6 @@ export const successfulJoinConversationByCode = data => ({
 });
 
 export const failedJoinConversationByCode = error => ({
-  payload: BackendError.handle(error),
+  payload: error,
   type: CONVERSATION_CODE_JOIN_FAILED,
 });
