@@ -17,8 +17,6 @@
  *
  */
 
-import BackendError from '../BackendError';
-
 export const LOGIN_START = 'LOGIN_START';
 export const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
 export const LOGIN_FAILED = 'LOGIN_FAILED';
@@ -76,7 +74,7 @@ export const successfulLogin = () => ({
 });
 
 export const failedLogin = error => ({
-  payload: BackendError.handle(error),
+  payload: error,
   type: LOGIN_FAILED,
 });
 
@@ -91,7 +89,7 @@ export const successfulRegisterTeam = authData => ({
 });
 
 export const failedRegisterTeam = error => ({
-  payload: BackendError.handle(error),
+  payload: error,
   type: REGISTER_TEAM_FAILED,
 });
 
@@ -106,7 +104,7 @@ export const successfulRegisterPersonal = authData => ({
 });
 
 export const failedRegisterPersonal = error => ({
-  payload: BackendError.handle(error),
+  payload: error,
   type: REGISTER_PERSONAL_FAILED,
 });
 
@@ -121,7 +119,7 @@ export const successfulRegisterWireless = authData => ({
 });
 
 export const failedRegisterWireless = error => ({
-  payload: BackendError.handle(error),
+  payload: error,
   type: REGISTER_WIRELESS_FAILED,
 });
 
@@ -136,7 +134,7 @@ export const successfulRegisterJoin = authData => ({
 });
 
 export const failedRegisterJoin = error => ({
-  payload: BackendError.handle(error),
+  payload: error,
   type: REGISTER_JOIN_FAILED,
 });
 
@@ -150,7 +148,7 @@ export const successfulRefresh = authData => ({
 });
 
 export const failedRefresh = error => ({
-  payload: BackendError.handle(error),
+  payload: error,
   type: REFRESH_FAILED,
 });
 
@@ -180,7 +178,7 @@ export const successfulSilentLogout = () => ({
 });
 
 export const failedLogout = error => ({
-  payload: BackendError.handle(error),
+  payload: error,
   type: LOGOUT_FAILED,
 });
 
@@ -223,6 +221,6 @@ export const successfulGetInvitationFromCode = invitation => ({
 });
 
 export const failedGetInvitationFromCode = error => ({
-  payload: BackendError.handle(error),
+  payload: error,
   type: GET_INVITATION_FROM_CODE_FAILED,
 });
