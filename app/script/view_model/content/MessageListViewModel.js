@@ -545,6 +545,13 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
   on_context_menu_click(message_et, event) {
     const entries = [];
 
+    if (message_et.has_asset_text()) {
+      entries.push({
+        click: () => message_et.copy(),
+        label: z.l10n.text(z.string.conversationContextMenuCopy),
+      });
+    }
+
     if (message_et.is_downloadable()) {
       entries.push({
         click: () => message_et.download(),
