@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="3.13.2"></a>
+## [3.13.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@3.13.1...@wireapp/core@3.13.2) (2018-07-18)
+
+
+### Bug Fixes
+
+* **core:** Fix message sending in status bot ([d9f3618](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/d9f3618))
+
+
+
+
 <a name="3.13.1"></a>
 ## [3.13.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@3.13.0...@wireapp/core@3.13.1) (2018-07-18)
 
