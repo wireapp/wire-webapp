@@ -395,6 +395,7 @@ describe('ConversationRepository', () => {
 
   describe('getPrecedingMessages', () => {
     it('gets messages which are not broken by design', done => {
+      spyOn(amplify, 'publish').and.returnValue(undefined);
       spyOn(TestFactory.user_repository, 'get_user_by_id').and.returnValue(Promise.resolve(new z.entity.User()));
 
       conversation_et = new z.entity.Conversation(z.util.createRandomUuid());
@@ -1031,7 +1032,7 @@ describe('ConversationRepository', () => {
     });
   });
 
-  fdescribe('send_text_with_link_preview', () => {
+  describe('send_text_with_link_preview', () => {
     it('sends ephemeral message (within the range [1 second, 1 year])', () => {
       const conversationRepository = TestFactory.conversation_repository;
       const eventRepository = TestFactory.event_repository;
