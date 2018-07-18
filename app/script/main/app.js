@@ -126,11 +126,11 @@ z.main.App = class App {
       this.service.asset,
       repositories.client,
       repositories.cryptography,
+      repositories.event,
       repositories.giphy,
       repositories.links,
       repositories.team,
-      repositories.user,
-      repositories.event
+      repositories.user
     );
 
     repositories.backup = new z.backup.BackupRepository(

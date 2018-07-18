@@ -380,11 +380,11 @@ window.TestFactory.prototype.exposeConversationActors = function() {
         TestFactory.asset_service,
         TestFactory.client_repository,
         TestFactory.cryptography_repository,
+        TestFactory.event_repository,
         undefined,
         undefined,
         TestFactory.team_repository,
-        TestFactory.user_repository,
-        TestFactory.event_repository
+        TestFactory.user_repository
       );
       TestFactory.conversation_repository.logger.level = this.settings.logging_level;
 

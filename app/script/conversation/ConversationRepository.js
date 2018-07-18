@@ -50,22 +50,22 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {AssetService} asset_service - Backend REST API asset service implementation
    * @param {ClientRepository} client_repository - Repository for client interactions
    * @param {CryptographyRepository} cryptography_repository - Repository for all cryptography interactions
+   * @param {EventRepository} eventRepository - Repository that handles events
    * @param {GiphyRepository} giphy_repository - Repository for Giphy GIFs
    * @param {LinkPreviewRepository} link_repository - Repository for link previews
    * @param {TeamRepository} team_repository - Repository for teams
    * @param {UserRepository} user_repository - Repository for all user and connection interactions
-   * @param {EventRepository} eventRepository - Repository that handles events
    */
   constructor(
     conversation_service,
     asset_service,
     client_repository,
     cryptography_repository,
+    eventRepository,
     giphy_repository,
     link_repository,
     team_repository,
-    user_repository,
-    eventRepository
+    user_repository
   ) {
     this.eventRepository = eventRepository;
     this.conversation_service = conversation_service;
