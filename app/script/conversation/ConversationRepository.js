@@ -2155,14 +2155,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         const optimistic_event = z.conversation.EventBuilder.buildMessageAdd(conversation_et, this.timeOffset);
         return this.cryptography_repository.cryptographyMapper.mapGenericMessage(generic_message, optimistic_event);
       })
-      .then(message_mapped => {
-        if (z.event.EventTypeHandling.STORE.includes(message_mapped.type)) {
-          return this.conversation_service.save_event(message_mapped);
-        }
-
-        return message_mapped;
-      })
-      .then(message_stored => {
+      .then(mappedEvent => {
         const {KNOCK: TYPE_KNOCK, EPHEMERAL: TYPE_EPHEMERAL} = z.cryptography.GENERIC_MESSAGE_TYPE;
         const isPing = message => message.content === TYPE_KNOCK;
         const isEphemeralPing = message => message.content === TYPE_EPHEMERAL && isPing(message.ephemeral);
@@ -2171,16 +2164,20 @@ z.conversation.ConversationRepository = class ConversationRepository {
           amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.OUTGOING_PING);
         }
 
-        this._handleConversationEvent(message_stored, z.event.EventRepository.SOURCE.INJECTED);
+        return mappedEvent;
+      })
+      .then(mappedEvent => {
+        this._handleConversationEvent(mappedEvent, z.event.EventRepository.SOURCE.INJECTED);
+        amplify.publish(z.event.WebApp.EVENT.INJECT, mappedEvent);
 
         return this.send_generic_message_to_conversation(conversation_et.id, generic_message)
           .then(payload => {
             this._trackContributed(conversation_et, generic_message);
 
             const backend_iso_date = sync_timestamp ? payload.time : '';
-            return this._updateMessageAsSent(conversation_et, message_stored, backend_iso_date);
+            return this._updateMessageAsSent(conversation_et, mappedEvent, backend_iso_date);
           })
-          .then(() => message_stored);
+          .then(() => mappedEvent);
       });
   }
 
