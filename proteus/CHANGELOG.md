@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="7.3.0"></a>
+# [7.3.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/compare/@wireapp/proteus@7.2.10...@wireapp/proteus@7.3.0) (2018-07-18)
+
+
+### Features
+
+* **core:** Handle duplicate message errors ([#845](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/issues/845)) ([0394c8a](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/commit/0394c8a))
+
+
+
+
 <a name="7.2.10"></a>
 ## [7.2.10](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/compare/@wireapp/proteus@7.2.9...@wireapp/proteus@7.2.10) (2018-07-16)
 

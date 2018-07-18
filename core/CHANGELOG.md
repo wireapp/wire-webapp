@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="3.13.0"></a>
+# [3.13.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@3.12.3...@wireapp/core@3.13.0) (2018-07-18)
+
+
+### Features
+
+* **core:** Handle duplicate message errors ([#845](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/845)) ([0394c8a](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/0394c8a))
+
+
+
+
 <a name="3.12.3"></a>
 ## [3.12.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@3.12.2...@wireapp/core@3.12.3) (2018-07-17)
 

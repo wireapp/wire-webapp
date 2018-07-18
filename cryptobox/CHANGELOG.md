@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="8.6.0"></a>
+# [8.6.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/compare/@wireapp/cryptobox@8.5.15...@wireapp/cryptobox@8.6.0) (2018-07-18)
+
+
+### Features
+
+* **core:** Handle duplicate message errors ([#845](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/issues/845)) ([0394c8a](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/commit/0394c8a))
+
+
+
+
 <a name="8.5.15"></a>
 ## [8.5.15](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/compare/@wireapp/cryptobox@8.5.14...@wireapp/cryptobox@8.5.15) (2018-07-17)
 
