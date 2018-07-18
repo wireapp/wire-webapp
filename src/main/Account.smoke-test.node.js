@@ -21,7 +21,7 @@
 
 require('dotenv').config();
 
-const AccountAction = require('./test/AccountAction');
+const AccountHelper = require('./test/AccountHelper');
 const {Account} = require('@wireapp/core');
 const {ValidationUtil} = require('@wireapp/commons');
 const {UnconnectedUserError} = require('@wireapp/api-client/dist/commonjs/user/');
@@ -93,7 +93,7 @@ describe('Account', () => {
       logger.log('Running smoke tests for @wireapp/core ...');
 
       try {
-        alice = await AccountAction.getAccount(process.env.ALICE_EMAIL, process.env.ALICE_PASSWORD);
+        alice = await AccountHelper.getAccount(process.env.ALICE_EMAIL, process.env.ALICE_PASSWORD);
       } catch (error) {
         logger.error(
           `Cannot login with email "${process.env.ALICE_EMAIL}". Aborting test.`,
@@ -103,7 +103,7 @@ describe('Account', () => {
       }
 
       try {
-        bob = await AccountAction.getAccount(process.env.BOB_EMAIL, process.env.BOB_PASSWORD);
+        bob = await AccountHelper.getAccount(process.env.BOB_EMAIL, process.env.BOB_PASSWORD);
       } catch (error) {
         logger.error(
           `Cannot login with email "${process.env.BOB_EMAIL}". Aborting test.`,
@@ -113,7 +113,7 @@ describe('Account', () => {
       }
 
       try {
-        eve = await AccountAction.getAccount(process.env.EVE_EMAIL, process.env.EVE_PASSWORD);
+        eve = await AccountHelper.getAccount(process.env.EVE_EMAIL, process.env.EVE_PASSWORD);
       } catch (error) {
         logger.error(
           `Cannot login with email "${process.env.EVE_EMAIL}". Aborting test.`,
