@@ -18,6 +18,15 @@
  */
 
 export default class BackendError extends Error {
+  constructor(params) {
+    super();
+    this.name = this.constructor.name;
+    this.stack = new Error().stack;
+    this.code = params.code;
+    this.label = params.label;
+    this.message = params.message;
+  }
+
   static AUTH_ERRORS = {
     BLACKLISTED_EMAIL: 'blacklisted-email',
     BLACKLISTED_PHONE: 'blacklisted-phone',
