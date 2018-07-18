@@ -67,7 +67,7 @@ if (!message) {
     const account = new Account(apiClient);
     await account.login(login);
 
-    const text = message || `I am posting from ${name} v${version}. 🌞`;
+    const text = message || `I am posting from ${name} v${version} (Build #${process.env.TRAVIS_BUILD_NUMBER}). 🌞`;
     const payload = account.service.conversation.createText(text);
     await account.service.conversation.send(message, payload);
   } catch (error) {
