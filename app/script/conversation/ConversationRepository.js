@@ -2178,14 +2178,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
          * and send the actual message to the backend.
          * When both those actions are done, we can update our local event and say that is has been sent.
          */
-        return Promise.all([injectEventPromise, messageSentPromise])
-          .then(([processedEvent, sentPayload]) => {
-            this._trackContributed(conversation_et, generic_message);
+        return Promise.all([injectEventPromise, messageSentPromise]).then(([event, sentPayload]) => {
+          this._trackContributed(conversation_et, generic_message);
 
-            const backend_iso_date = sync_timestamp ? sentPayload.time : '';
-            return this._updateMessageAsSent(conversation_et, processedEvent, backend_iso_date);
-          })
-          .then(() => mappedEvent);
+          const backend_iso_date = sync_timestamp ? sentPayload.time : '';
+          return this._updateMessageAsSent(conversation_et, event, backend_iso_date).then(() => event);
+        });
       });
   }
 
