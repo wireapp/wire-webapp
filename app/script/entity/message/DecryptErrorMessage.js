@@ -72,7 +72,7 @@ z.entity.DecryptErrorMessage = class DecryptErrorMessage extends z.entity.Messag
 
       if (this.error_code) {
         const error_text = z.l10n.text(z.string.conversationUnableToDecryptErrorMessage);
-        parts.push(`${error_text}: <span class='label-bold-xs'>${this.error_code}</span>`);
+        parts.push(`${error_text}: <span class='label-bold-xs'>${this.error_code}</span> `);
       }
 
       if (this.client_id) {
@@ -80,7 +80,7 @@ z.entity.DecryptErrorMessage = class DecryptErrorMessage extends z.entity.Messag
       }
 
       if (parts.length) {
-        return `(${parts.join(' ')})`;
+        return `(${parts.join('')})`;
       }
     });
 
