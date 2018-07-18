@@ -2174,7 +2174,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         const messageSentPromise = this.send_generic_message_to_conversation(conversation_et.id, generic_message);
 
         /**
-         * We will, in parallele, inject events to the repo (where they will be processed and saved in DB)
+         * We will, in parallel, inject events to the repo (where they will be processed and saved in DB)
          * and send the actual message to the backend.
          * When both those actions are done, we can update our local event and say that is has been sent.
          */
