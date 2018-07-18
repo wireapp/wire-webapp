@@ -54,6 +54,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {LinkPreviewRepository} link_repository - Repository for link previews
    * @param {TeamRepository} team_repository - Repository for teams
    * @param {UserRepository} user_repository - Repository for all user and connection interactions
+   * @param {EventRepository} eventRepository - Repository that handles events
    */
   constructor(
     conversation_service,
@@ -63,8 +64,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
     giphy_repository,
     link_repository,
     team_repository,
-    user_repository
+    user_repository,
+    eventRepository
   ) {
+    this.eventRepository = eventRepository;
     this.conversation_service = conversation_service;
     this.asset_service = asset_service;
     this.client_repository = client_repository;
@@ -2167,15 +2170,15 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return mappedEvent;
       })
       .then(mappedEvent => {
-        this._handleConversationEvent(mappedEvent, z.event.EventRepository.SOURCE.INJECTED);
-        amplify.publish(z.event.WebApp.EVENT.INJECT, mappedEvent);
+        const injectEventPromise = this.eventRepository.injectEvent(mappedEvent);
+        const messageSentPromise = this.send_generic_message_to_conversation(conversation_et.id, generic_message);
 
-        return this.send_generic_message_to_conversation(conversation_et.id, generic_message)
-          .then(payload => {
+        return Promise.all([injectEventPromise, messageSentPromise])
+          .then(([processedEvent, sentPayload]) => {
             this._trackContributed(conversation_et, generic_message);
 
-            const backend_iso_date = sync_timestamp ? payload.time : '';
-            return this._updateMessageAsSent(conversation_et, mappedEvent, backend_iso_date);
+            const backend_iso_date = sync_timestamp ? sentPayload.time : '';
+            return this._updateMessageAsSent(conversation_et, processedEvent, backend_iso_date);
           })
           .then(() => mappedEvent);
       });

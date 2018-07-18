@@ -129,7 +129,8 @@ z.main.App = class App {
       repositories.giphy,
       repositories.links,
       repositories.team,
-      repositories.user
+      repositories.user,
+      repositories.event
     );
 
     repositories.backup = new z.backup.BackupRepository(

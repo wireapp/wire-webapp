@@ -1031,9 +1031,10 @@ describe('ConversationRepository', () => {
     });
   });
 
-  describe('send_text_with_link_preview', () => {
+  fdescribe('send_text_with_link_preview', () => {
     it('sends ephemeral message (within the range [1 second, 1 year])', () => {
       const conversationRepository = TestFactory.conversation_repository;
+      const eventRepository = TestFactory.event_repository;
       const conversation = _generate_conversation();
       conversationRepository.conversations([conversation]);
       const conversationPromise = Promise.resolve(conversation);
@@ -1044,6 +1045,10 @@ describe('ConversationRepository', () => {
         .map(val => val.toString())
         .concat(['1000', '1000', '31536000000', '31536000000']);
 
+      spyOn(eventRepository, 'injectEvent').and.returnValue(Promise.resolve({}));
+      spyOn(conversationRepository, 'get_message_in_conversation_by_id').and.returnValue(
+        Promise.resolve(new z.entity.Message())
+      );
       spyOn(conversationRepository.conversation_service, 'post_encrypted_message').and.returnValue(Promise.resolve({}));
       spyOn(conversationRepository.conversation_mapper, 'map_conversations').and.returnValue(conversationPromise);
       spyOn(conversationRepository.cryptography_repository, 'encryptGenericMessage').and.callFake(
