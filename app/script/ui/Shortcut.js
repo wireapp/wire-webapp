@@ -65,19 +65,6 @@ z.ui.Shortcut = (() => {
         },
       },
     },
-    [z.ui.ShortcutType.CALL_MUTE]: {
-      event: z.event.WebApp.SHORTCUT.CALL_MUTE,
-      shortcut: {
-        electron: {
-          macos: 'command + alt + m',
-          pc: 'ctrl + alt + m',
-        },
-        webapp: {
-          macos: 'command + alt + m',
-          pc: 'ctrl + alt + m',
-        },
-      },
-    },
     [z.ui.ShortcutType.PREV]: {
       event: z.event.WebApp.SHORTCUT.PREV,
       shortcut: {
