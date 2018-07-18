@@ -32,23 +32,27 @@ z.viewModel.panel.GuestOptionsViewModel = class GuestOptionsViewModel extends z.
 
   constructor(params) {
     super(params);
+
+    this.copyLink = this.copyLink.bind(this);
+    this.toggleAccessState = this.toggleAccessState.bind(this);
+    this.requestAccessCode = this.requestAccessCode.bind(this);
+    this.revokeAccessCode = this.revokeAccessCode.bind(this);
+
     this.conversationRepository = this.repositories.conversation;
     this.stateHandler = this.conversationRepository.stateHandler;
+
+    this.isLinkCopied = ko.observable(false);
+    this.requestOngoing = ko.observable(false);
+    this.triggerCopy = ko.observable();
+
     this.isGuestRoom = ko.pureComputed(() => this.activeConversation() && this.activeConversation().isGuestRoom());
     this.isTeamOnly = ko.pureComputed(() => this.activeConversation() && this.activeConversation().isTeamOnly());
     this.hasAccessCode = ko.pureComputed(() => (this.isGuestRoom() ? !!this.activeConversation().accessCode() : false));
     this.isGuestEnabled = ko.pureComputed(() => !this.isTeamOnly());
     this.showLinkOptions = ko.pureComputed(() => this.isGuestEnabled());
 
-    this.isLinkCopied = ko.observable(false);
-    this.requestOngoing = ko.observable(false);
-
     this.activeConversation.subscribe(conversationEntity => this._updateCode(this.isVisible(), conversationEntity));
     this.isVisible.subscribe(isVisible => this._updateCode(isVisible, this.activeConversation()));
-    this.toggleAccessState = this.toggleAccessState.bind(this);
-    this.requestAccessCode = this.requestAccessCode.bind(this);
-    this.revokeAccessCode = this.revokeAccessCode.bind(this);
-    this.copyLink = this.copyLink.bind(this);
     this.shouldUpdateScrollbar = ko
       .computed(() => this.isGuestEnabled() && this.hasAccessCode() && this.isVisible())
       .extend({notify: 'always', rateLimit: {method: 'notifyWhenChangesStop', timeout: 0}});
@@ -59,23 +63,13 @@ z.viewModel.panel.GuestOptionsViewModel = class GuestOptionsViewModel extends z.
   }
 
   copyLink() {
-    if (!this.isLinkCopied()) {
-      const link = document.querySelector('.guest-options__link');
-      link.disabled = false;
-      link.select();
-      document.execCommand('copy');
-      link.setSelectionRange(0, 0);
-      link.disabled = true;
-      this.isLinkCopied(true);
-      amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.GUEST_ROOMS.LINK_COPIED);
-      window.setTimeout(() => this.isLinkCopied(false), GuestOptionsViewModel.CONFIG.CONFIRM_DURATION);
-    }
-  }
-
-  resizeLink() {
-    const link = document.querySelector('.guest-options__link');
-    if (link) {
-      link.style.height = `${link.scrollHeight}px`;
+    const triggerFn = this.triggerCopy();
+    if (!this.isLinkCopied() && typeof triggerFn === 'function') {
+      triggerFn().then(() => {
+        this.isLinkCopied(true);
+        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.GUEST_ROOMS.LINK_COPIED);
+        window.setTimeout(() => this.isLinkCopied(false), GuestOptionsViewModel.CONFIG.CONFIRM_DURATION);
+      });
     }
   }
 
