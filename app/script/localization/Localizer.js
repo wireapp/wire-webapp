@@ -101,7 +101,7 @@ z.l10n = (() => {
     text(value, substitute) {
       let string = ko.unwrap(value);
       string = replaceSubstitute(string, /{{(.+?)}}/g, substitute);
-      return z.util.SanitizationUtil.escapeString(string);
+      return string;
     },
   };
 })();
