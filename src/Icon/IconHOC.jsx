@@ -17,6 +17,7 @@
  *
  */
 
+import {COLOR} from '../Identity/colors';
 import PropTypes from 'prop-types';
 import React from 'react';
 
@@ -44,7 +45,7 @@ const IconHOC = (svgBody, realWidth = 0, realHeight = 0) => {
   };
 
   wrapper.defaultProps = {
-    color: '#000',
+    color: COLOR.ICON,
     height: null,
     scale: 1,
     width: null,
