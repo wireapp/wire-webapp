@@ -19,7 +19,12 @@
 
 import LRUCache from '@wireapp/lru-cache';
 import {PriorityQueue} from '@wireapp/priority-queue';
-import {keys as ProteusKeys, message as ProteusMessage, session as ProteusSession} from '@wireapp/proteus';
+import {
+  errors as ProteusErrors,
+  keys as ProteusKeys,
+  message as ProteusMessage,
+  session as ProteusSession,
+} from '@wireapp/proteus';
 import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine/';
 import {Decoder, Encoder} from 'bazinga64';
 import EventEmitter = require('events');
@@ -394,7 +399,7 @@ class Cryptobox extends EventEmitter {
     });
   }
 
-  public decrypt(session_id: string, ciphertext: ArrayBuffer): Promise<Uint8Array> {
+  public async decrypt(session_id: string, ciphertext: ArrayBuffer): Promise<Uint8Array | undefined> {
     let is_new_session = false;
     let message: Uint8Array;
     let session: CryptoboxSession;
@@ -431,6 +436,12 @@ class Cryptobox extends EventEmitter {
           })
           .then(() => this.refill_prekeys(true))
           .then(() => message)
+          .catch(error => {
+            if (error.code === ProteusErrors.DecryptError.CODE.CASE_209) {
+              return undefined;
+            }
+            throw error;
+          })
       );
     });
   }

@@ -44,7 +44,7 @@ class DecryptError extends ProteusError {
 }
 
 class DuplicateMessage extends DecryptError {
-  constructor(message = 'Duplicate message', code: number) {
+  constructor(message = 'Duplicate message', code: number = DecryptError.CODE.CASE_209) {
     super(message, code);
     Object.setPrototypeOf(this, DuplicateMessage.prototype);
   }
