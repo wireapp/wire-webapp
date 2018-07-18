@@ -423,6 +423,7 @@ z.string.es.conversationDetailsActionCancelRequest = 'Cancelar solicitud';
 z.string.es.conversationDetailsActionCreateGroup = 'Crear grupo';
 z.string.es.conversationDetailsActionDevices = 'Dispositivos';
 z.string.es.conversationDetailsGuestsOff = 'Desactivar';
+z.string.es.conversationDetailsOptions = 'Opciones';
 z.string.es.conversationDetailsParticipantsServicesMany = 'Servicios';
 z.string.es.conversationDetailsParticipantsUsersMany = 'Personas';
 z.string.es.conversationDetailsPeople = 'Personas';

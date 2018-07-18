@@ -380,6 +380,7 @@ z.string.fr.conversationDetailsActionCancelRequest = 'Annuler la demande';
 z.string.fr.conversationDetailsActionCreateGroup = 'Nouveau groupe';
 z.string.fr.conversationDetailsActionDevices = 'Appareils';
 z.string.fr.conversationDetailsGuestsOff = 'Désactiver';
+z.string.fr.conversationDetailsOptions = 'Options';
 z.string.fr.conversationDetailsParticipantsServicesMany = 'Services';
 z.string.fr.conversationDetailsParticipantsUsersMany = 'Personnes';
 z.string.fr.conversationDetailsPeople = 'Personnes';

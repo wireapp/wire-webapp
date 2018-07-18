@@ -131,7 +131,7 @@ ko.components.register('group-video-grid', {
         <div class="group-video-grid" data-bind="foreach: {data: grid, as: 'id'}, css: {'group-video-grid--black-background': hasBlackBackground()}">
           <!-- ko if: id !== 0 -->
             <div class="group-video-grid__element" data-bind="css: $parent.getClassNameForVideo($index(), $parent.getStreamInfo(id).isSelf && $parent.getStreamInfo(id).videoSend()), attr: {'data-uie-name': 'item-grid', 'data-uie-value': $parent.getUIEValueForVideo($index())}, event: {dblclick: $parent.doubleClickedOnVideo}">
-              <video autoplay class="group-video-grid__element-video" data-bind="sourceStream: $parent.getStreamInfo(id).stream, muteMediaElement: $parent.getStreamInfo(id).stream">
+              <video class="group-video-grid__element-video" autoplay playsinline data-bind="sourceStream: $parent.getStreamInfo(id).stream, muteMediaElement: $parent.getStreamInfo(id).stream">
               </video>
               <!-- ko if: $parent.getStreamInfo(id).isSelf && !$parent.getStreamInfo(id).audioSend() && !$parent.minimized -->
                 <div class="group-video-grid__mute-overlay">
@@ -152,7 +152,7 @@ ko.components.register('group-video-grid', {
         </div>
         <!-- ko if: thumbnailStream() && thumbnailStream().stream -->
           <div class="group-video__thumbnail" data-bind="css: {'group-video__thumbnail--minimized': minimized}">
-            <video autoplay class="mirror group-video__thumbnail-video" data-uie-name="self-video-thumbnail" data-bind="css: {'group-video__thumbnail--minimized': minimized, 'mirror': thumbnailStream().videoSend()}, sourceStream: thumbnailStream().stream, muteMediaElement: thumbnailStream().stream">
+            <video class="mirror group-video__thumbnail-video" autoplay playsinline data-uie-name="self-video-thumbnail" data-bind="css: {'group-video__thumbnail--minimized': minimized, 'mirror': thumbnailStream().videoSend()}, sourceStream: thumbnailStream().stream, muteMediaElement: thumbnailStream().stream">
             </video>
             <!-- ko if: !thumbnailStream().audioSend() && !minimized -->
               <div class="group-video-grid__mute-overlay">

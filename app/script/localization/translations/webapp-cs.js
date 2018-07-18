@@ -344,6 +344,7 @@ z.string.cs.conversationDetailsActionArchive = 'Archivovat';
 z.string.cs.conversationDetailsActionCancelRequest = 'Zrušit žádost';
 z.string.cs.conversationDetailsActionDevices = 'Přístroje';
 z.string.cs.conversationDetailsGuestsOff = 'Vypnout';
+z.string.cs.conversationDetailsOptions = 'Nastavení';
 z.string.cs.conversationDetailsParticipantsServicesMany = 'Služby';
 z.string.cs.conversationDetailsParticipantsUsersMany = 'Kontakty';
 z.string.cs.conversationDetailsPeople = 'Kontakty';

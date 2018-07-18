@@ -348,6 +348,7 @@ z.string.pt.conversationDetailsActionArchive = 'Arquivar';
 z.string.pt.conversationDetailsActionCancelRequest = 'Cancelar pedido';
 z.string.pt.conversationDetailsActionDevices = 'Dispositivos';
 z.string.pt.conversationDetailsGuestsOff = 'Desligado';
+z.string.pt.conversationDetailsOptions = 'Opções';
 z.string.pt.conversationDetailsParticipantsServicesMany = 'Serviços';
 z.string.pt.conversationDetailsParticipantsUsersMany = 'Pessoas';
 z.string.pt.conversationDetailsPeople = 'Pessoas';

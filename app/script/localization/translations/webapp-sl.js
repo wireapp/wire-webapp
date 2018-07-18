@@ -336,6 +336,7 @@ z.string.sl.conversationDetailsActionArchive = 'Arhiviraj';
 z.string.sl.conversationDetailsActionCancelRequest = 'Prekliči prošnjo';
 z.string.sl.conversationDetailsActionDevices = 'Naprave';
 z.string.sl.conversationDetailsGuestsOff = 'Izklopljeno';
+z.string.sl.conversationDetailsOptions = 'Možnosti';
 z.string.sl.conversationDetailsParticipantsServicesMany = 'Storitve';
 z.string.sl.conversationDetailsParticipantsUsersMany = 'Osebe';
 z.string.sl.conversationDetailsPeople = 'Osebe';

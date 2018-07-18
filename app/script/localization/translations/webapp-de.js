@@ -472,6 +472,7 @@ z.string.de.conversationDetailsActionTimedMessages = 'Temporäre Nachrichten';
 z.string.de.conversationDetailsActionLeave = 'Gruppe verlassen…';
 z.string.de.conversationDetailsGuestsOff = 'Aus';
 z.string.de.conversationDetailsGuestsOn = 'An';
+z.string.de.conversationDetailsOptions = 'Optionen';
 z.string.de.conversationDetailsParticipantsServicesOne = 'Dienst';
 z.string.de.conversationDetailsParticipantsServicesMany = 'Dienste';
 z.string.de.conversationDetailsParticipantsUsersOne = 'Person';

@@ -306,6 +306,7 @@ z.string.hr.conversationDetailsActionArchive = 'Arhiviraj';
 z.string.hr.conversationDetailsActionCancelRequest = 'Poništi zahtjev';
 z.string.hr.conversationDetailsActionDevices = 'Uređaji';
 z.string.hr.conversationDetailsGuestsOff = 'Isključi';
+z.string.hr.conversationDetailsOptions = 'Opcije';
 z.string.hr.conversationDetailsParticipantsServicesMany = 'Usluge';
 z.string.hr.conversationDetailsParticipantsUsersMany = 'Kontakti';
 z.string.hr.conversationDetailsPeople = 'Kontakti';

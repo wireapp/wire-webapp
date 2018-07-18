@@ -56,9 +56,18 @@
   &:hover .context-menu,
   .show-timestamp.time {
     background-color: @app-bg;
-    cursor: default;
     opacity: 1;
     pointer-events: auto;
+  }
+
+  &.hover .time,
+  &:hover .time,
+  .show-timestamp.time {
+    cursor: default;
+  }
+
+  .context-menu {
+    cursor: pointer;
   }
 
   &:not(:hover) {
@@ -97,6 +106,9 @@
   padding-top: 6px;
   margin-bottom: 4px;
   line-height: @avatar-diameter-xs;
+  & > .message-body-actions {
+    top: 6px;
+  }
 }
 
 .message-header-icon {
@@ -394,6 +406,7 @@
 // MESSAGE - ACTIONS
 .message-body-actions {
   position: absolute;
+  top: 0;
   right: 0;
   width: @conversation-message-timestamp-width;
   height: @line-height-lg;

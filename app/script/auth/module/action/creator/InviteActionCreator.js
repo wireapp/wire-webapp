@@ -17,8 +17,6 @@
  *
  */
 
-import BackendError from '../BackendError';
-
 export const INVITE_ADD_START = 'INVITE_ADD_START';
 export const INVITE_ADD_SUCCESS = 'INVITE_ADD_SUCCESS';
 export const INVITE_ADD_FAILED = 'INVITE_ADD_FAILED';
@@ -36,7 +34,7 @@ export const successfulAddInvite = invite => ({
 });
 
 export const failedAddInvite = error => ({
-  payload: BackendError.handle(error),
+  payload: error,
   type: INVITE_ADD_FAILED,
 });
 

@@ -371,6 +371,7 @@ z.string.el.conversationDetailsActionClear = 'Διαγραφή περιεχομ�
 z.string.el.conversationDetailsActionCreateGroup = 'Δημιουργία ομάδος';
 z.string.el.conversationDetailsActionDevices = 'Συσκευές';
 z.string.el.conversationDetailsGuestsOff = 'Ανενεργό';
+z.string.el.conversationDetailsOptions = 'Επιλογές';
 z.string.el.conversationDetailsParticipantsServicesOne = 'Υπηρεσία';
 z.string.el.conversationDetailsParticipantsServicesMany = 'Υπηρεσίες';
 z.string.el.conversationDetailsParticipantsUsersOne = 'Άτομο';
