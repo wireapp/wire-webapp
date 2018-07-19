@@ -3,7 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-      <a name="1.8.0"></a>
+  <a name="1.8.1"></a>
+## [1.8.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@1.8.0...@wireapp/react-ui-kit@1.8.1) (2018-07-19)
+
+
+### Bug Fixes
+
+* avoid jittery loading animation ([#861](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/861)) ([b8c5f32](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/b8c5f32))
+
+
+
+
+  <a name="1.8.0"></a>
 # [1.8.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@1.7.5...@wireapp/react-ui-kit@1.8.0) (2018-07-19)
 
 
@@ -46,7 +57,7 @@ H3:
 
 
 
-      <a name="1.7.5"></a>
+<a name="1.7.5"></a>
 ## [1.7.5](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@1.7.4...@wireapp/react-ui-kit@1.7.5) (2018-07-19)
 
 
