@@ -61,6 +61,7 @@ import {
   InputSubmitCombo,
   Label,
   LabelLink,
+  Lead,
   LeaveIcon,
   Line,
   Link,
@@ -541,7 +542,11 @@ class Demo extends React.PureComponent {
               perferendis alias porro, placeat totam molestiae similique reiciendis harum consequuntur, earum autem
               excepturi expedita molestias laborum quae non cupiditate!
             </Paragraph>
-
+            <Lead>
+              Lead<br />Lorem ipsum dolor sit amet consectetur adipisicing elit. Ut at eveniet numquam non aperiam,
+              provident sed atque quibusdam! Vitae velit tempore ea pariatur voluptatum. Iure dolorum laudantium, rem
+              iusto eveniet obcaecati perspiciatis.
+            </Lead>
             <Label>Label</Label>
             <LabelLink block>LabelLink</LabelLink>
             <Line />
