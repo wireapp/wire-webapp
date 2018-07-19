@@ -3650,38 +3650,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return this.conversation_service.update_asset_as_uploaded_in_db(message_et.primary_key, event_json);
   }
 
-  /**
-   * Update edited message with timestamp from the original message and delete original.
-   *
-   * @private
-   * @param {Conversation} conversation_et - Conversation of edited message
-   * @param {JSON} event_json - Edit message event
-   * @returns {Promise} Resolves with the updated event_json
-   */
-  _update_edited_message(conversation_et, event_json) {
-    const {data: event_data, from, id, time} = event_json;
-
-    return this.get_message_in_conversation_by_id(conversation_et, event_data.replacing_message_id).then(
-      original_message_et => {
-        const from_original_user = from === original_message_et.from;
-        if (!from_original_user) {
-          throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_USER);
-        }
-
-        if (!original_message_et.timestamp()) {
-          throw new TypeError('Missing timestamp');
-        }
-
-        event_json.edited_time = time;
-        event_json.time = new Date(original_message_et.timestamp()).toISOString();
-        this._delete_message_by_id(conversation_et, id);
-        this._delete_message_by_id(conversation_et, event_data.replacing_message_id);
-        this.conversation_service.save_event(event_json);
-        return event_json;
-      }
-    );
-  }
-
   //##############################################################################
   // Tracking helpers
   //##############################################################################

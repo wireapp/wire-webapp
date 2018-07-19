@@ -695,25 +695,38 @@ z.event.EventRepository = class EventRepository {
         throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, errorMessage);
       }
 
-      /*
-       * The only two valid cases for a duplicate event are:
-       *  - a link preview has been received (the text message already being in DB) ;
-       *  - a message has been updated
-       */
-      if (mappedData.replacing_message_id) {
-        // case of a message edit
-        event.edited_time = event.time;
-        event.time = new Date(storedEvent.time).toISOString();
-        event.id = mappedData.replacing_message_id;
-      } else {
-        // case of a link preview
-        event.server_time = event.time;
-        event.time = storedEvent.time;
-        event.category = z.message.MessageCategorization.categoryFromEvent(event);
-      }
-      event.primary_key = storedEvent.primary_key;
-      return this.conversationService.update_event(event);
+      return this._handleDuplicateEvents(storedEvent, event);
     });
+  }
+
+  _handleDuplicateEvents(originalEvent, newEvent) {
+    const newData = newEvent.data;
+    let updates;
+    /*
+     * The only two valid cases for a duplicate event are:
+     *  - a link preview has been received (the text message already being in DB) ;
+     *  - a message has been updated
+     */
+    if (newData.replacing_message_id) {
+      // case of a message edit
+      const dataUpdates = Object.assign({}, originalEvent.data, {
+        content: newData.content,
+      });
+      updates = Object.assign({}, originalEvent, {
+        data: dataUpdates,
+        edited_time: newEvent.time,
+      });
+    } else if (newData.link_previews.length) {
+      // case of a link preview
+      updates = Object.assign({}, newEvent, {
+        category: z.message.MessageCategorization.categoryFromEvent(newEvent),
+        server_time: newEvent.time,
+        time: originalEvent.time,
+      });
+    }
+    // TODO throw an error is no updates are there, it means we have forgotten a case
+    updates.primary_key = originalEvent.primary_key;
+    return this.conversationService.update_event(updates);
   }
 
   /**
