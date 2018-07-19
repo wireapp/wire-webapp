@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="1.7.4"></a>
+## [1.7.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@1.7.3...@wireapp/react-ui-kit@1.7.4) (2018-07-19)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Revert remove flex-basis of columns ([#851](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/851)) ([0a5cc52](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/0a5cc52))
+
+
+
+
 <a name="1.7.3"></a>
 ## [1.7.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@1.7.2...@wireapp/react-ui-kit@1.7.3) (2018-07-18)
 
