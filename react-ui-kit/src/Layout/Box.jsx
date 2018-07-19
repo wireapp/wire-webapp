@@ -17,15 +17,13 @@
  *
  */
 
-import setGlobalStyles from '../globalStyles';
+import {COLOR} from '../Identity';
+import styled from 'styled-components';
 
-setGlobalStyles();
+const Box = styled.div`
+  border: 2px solid ${COLOR.GRAY_LIGHTEN_72};
+  border-radius: 4px;
+  padding: 16px 32px;
+`;
 
-export * from './Box';
-export * from './Column';
-export * from './Container';
-export * from './Content';
-export * from './Footer';
-export * from './Header';
-export * from './Spacer';
-export * from './StyledApp';
+export {Box};

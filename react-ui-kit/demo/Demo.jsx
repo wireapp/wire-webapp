@@ -23,6 +23,7 @@ import {
   AttachmentIcon,
   AudioVideoIcon,
   Bold,
+  Box,
   Button,
   ButtonLink,
   COLOR,
@@ -262,6 +263,13 @@ class Demo extends React.PureComponent {
                 </Columns>
               </Column>
             </Columns>
+            <H2>Box</H2>
+
+            <Box>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce a mattis nibh, sed maximus leo. Fusce a
+              lacinia sem, vitae ornare dolor. Quisque rhoncus, magna non lacinia sagittis, erat augue fringilla metus,
+              eu consectetur leo velit non lacus. Phasellus ipsum turpis, dapibus ut purus in, lobortis consectetur mi.
+            </Box>
 
             <H1>Input</H1>
             <Line />
