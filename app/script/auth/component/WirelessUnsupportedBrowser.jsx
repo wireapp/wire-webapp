@@ -17,7 +17,7 @@
  *
  */
 
-import {H2, H3, ContainerXS, COLOR} from '@wireapp/react-ui-kit';
+import {H2, H3, ContainerXS} from '@wireapp/react-ui-kit';
 import {unsupportedJoinStrings} from '../../strings';
 import WirelessContainer from './WirelessContainer';
 import * as RuntimeSelector from '../module/selector/RuntimeSelector';
@@ -32,7 +32,7 @@ export const WirelessUnsupportedBrowser = ({children, isSupportedBrowser, intl: 
   ) : (
     <WirelessContainer>
       <ContainerXS style={{margin: 'auto 0'}}>
-        <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}} color={COLOR.GRAY}>
+        <H2 style={{marginBottom: '10px', marginTop: '0'}}>
           <FormattedHTMLMessage {...unsupportedJoinStrings.unsupportedJoinHeadline} />
         </H2>
         {isMobileOs() ? (
