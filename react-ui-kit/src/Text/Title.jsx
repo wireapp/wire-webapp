@@ -17,14 +17,24 @@
  *
  */
 
-import setGlobalStyles from '../globalStyles';
+import {COLOR} from '../Identity';
+import {Text} from './Text';
 
-setGlobalStyles();
+const Title = Text.withComponent('div').extend`
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: ${COLOR.GRAY};
+`;
 
-export {Heading, H1, H2, H3, H4} from './Heading';
-export {Label, LabelLink} from './Label';
-export * from './Line';
-export * from './Link';
-export * from './Paragraph';
-export * from './Text';
-export * from './Title';
+Title.propTypes = {
+  ...Text.propTypes,
+};
+
+Title.defaultProps = {
+  ...Text.defaultProps,
+  block: true,
+  center: true,
+  fontSize: '32px',
+};
+
+export {Title};

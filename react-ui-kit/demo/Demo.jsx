@@ -90,6 +90,7 @@ import {
   TeamIcon,
   Text,
   TimedIcon,
+  Title,
   TwitterIcon,
   Uppercase,
   WireIcon,
@@ -439,6 +440,12 @@ class Demo extends React.PureComponent {
 
             <H1>Typography</H1>
             <Line />
+            <Columns>
+              <Column>Title</Column>
+              <Column>
+                <Title>Title</Title>
+              </Column>
+            </Columns>
             <Columns>
               <Column>Default heading</Column>
               <Column>
