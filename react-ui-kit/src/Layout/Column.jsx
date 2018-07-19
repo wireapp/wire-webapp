@@ -32,6 +32,7 @@ const Columns = styled.div`
 const Column = styled.div`
   display: block;
   flex-grow: 1;
+  flex-basis: 0;
   flex-shrink: 1;
   margin-left: ${GUTTER}px;
 `;
