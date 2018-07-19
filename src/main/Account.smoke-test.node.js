@@ -189,7 +189,7 @@ describe('Account', () => {
       try {
         await bob.service.conversation.addUser(conversationId, getId(eve));
       } catch (error) {
-        expect(error.name).toBe(UnconnectedUserError.name);
+        expect(error.name).toBe(`${UnconnectedUserError.name}a`);
       }
 
       // Alice adds Eve to the conversation
