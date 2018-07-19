@@ -647,7 +647,8 @@ z.event.EventRepository = class EventRepository {
    * @returns {Promise} Resolves with the saved event
    */
   _handleEventSaving(event, source) {
-    const {conversation: conversationId, id: eventId} = event;
+    const conversationId = event.conversation;
+    const eventId = event.data.replacing_message_id || event.id;
 
     const loadPromise = eventId
       ? this.conversationService.load_event_from_db(conversationId, eventId)
@@ -672,7 +673,8 @@ z.event.EventRepository = class EventRepository {
 
       const mappedIsMessageAdd = mappedType === z.event.Client.CONVERSATION.MESSAGE_ADD;
       const storedIsMessageAdd = storedType === z.event.Client.CONVERSATION.MESSAGE_ADD;
-      const userReusedId = !mappedIsMessageAdd || !storedIsMessageAdd || !mappedData.previews.length;
+      const userReusedId =
+        !mappedIsMessageAdd || !storedIsMessageAdd || !(mappedData.previews.length || mappedData.replacing_message_id);
       if (userReusedId) {
         this.logger.warn(`${logMessage} ID previously used by same user`, event);
         const errorMessage = 'Event validation failed: ID reused by same user';
@@ -686,18 +688,30 @@ z.event.EventRepository = class EventRepository {
         throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, errorMessage);
       }
 
-      const textContentMatches = mappedData.content === storedData.content;
+      const textContentMatches = !mappedData.previews.length || mappedData.content === storedData.content;
       if (!textContentMatches) {
         this.logger.warn(`${logMessage} Text content for link preview not matching`, event);
         const errorMessage = 'Event validation failed: ID of link preview reused';
         throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, errorMessage);
       }
 
-      // Only valid case for a duplicate message ID: First update to a text message matching the previous text content with a link preview
-      event.server_time = event.time;
-      event.time = storedEvent.time;
+      /*
+       * The only two valid cases for a duplicate event are:
+       *  - a link preview has been received (the text message already being in DB) ;
+       *  - a message has been updated
+       */
+      if (mappedData.replacing_message_id) {
+        // case of a message edit
+        event.edited_time = event.time;
+        event.time = new Date(storedEvent.time).toISOString();
+        event.id = mappedData.replacing_message_id;
+      } else {
+        // case of a link preview
+        event.server_time = event.time;
+        event.time = storedEvent.time;
+        event.category = z.message.MessageCategorization.categoryFromEvent(event);
+      }
       event.primary_key = storedEvent.primary_key;
-      event.category = z.message.MessageCategorization.categoryFromEvent(event);
       return this.conversationService.update_event(event);
     });
   }

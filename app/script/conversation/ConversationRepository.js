@@ -2744,9 +2744,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
       case z.event.Client.CONVERSATION.GROUP_CREATION:
         return this._onGroupCreation(conversationEntity, eventJson);
 
-      case z.event.Client.CONVERSATION.MESSAGE_ADD:
-        return this._on_message_add(conversationEntity, eventJson);
-
       case z.event.Client.CONVERSATION.MESSAGE_DELETE:
         return this._onMessageDeleted(conversationEntity, eventJson);
 
@@ -2759,6 +2756,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       case z.event.Client.CONVERSATION.REACTION:
         return this._on_reaction(conversationEntity, eventJson);
 
+      case z.event.Client.CONVERSATION.MESSAGE_ADD:
       case z.event.Backend.CONVERSATION.MESSAGE_TIMER_UPDATE:
       case z.event.Client.CONVERSATION.DELETE_EVERYWHERE:
       case z.event.Client.CONVERSATION.INCOMING_MESSAGE_TOO_BIG:
@@ -3176,32 +3174,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
     if (isActiveConversation && (conversationEntity.is_archived() || conversationEntity.is_cleared())) {
       amplify.publish(z.event.WebApp.CONVERSATION.SHOW, nextConversationEt);
     }
-  }
-
-  /**
-   * A text message received in a conversation.
-   *
-   * @private
-   * @param {Conversation} conversation_et - Conversation to add the event to
-   * @param {Object} event_json - JSON data of 'conversation.message-add'
-   * @returns {Promise} Resolves when the event was handled
-   */
-  _on_message_add(conversation_et, event_json) {
-    return Promise.resolve()
-      .then(() => {
-        const event_data = event_json.data;
-
-        if (event_data.replacing_message_id) {
-          return this._update_edited_message(conversation_et, event_json);
-        }
-
-        return event_json;
-      })
-      .then(updated_event_json => {
-        if (updated_event_json) {
-          return this._addEventToConversation(conversation_et, updated_event_json);
-        }
-      });
   }
 
   /**
