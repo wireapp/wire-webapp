@@ -50,6 +50,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {AssetService} asset_service - Backend REST API asset service implementation
    * @param {ClientRepository} client_repository - Repository for client interactions
    * @param {CryptographyRepository} cryptography_repository - Repository for all cryptography interactions
+   * @param {EventRepository} eventRepository - Repository that handles events
    * @param {GiphyRepository} giphy_repository - Repository for Giphy GIFs
    * @param {LinkPreviewRepository} link_repository - Repository for link previews
    * @param {TeamRepository} team_repository - Repository for teams
@@ -60,11 +61,13 @@ z.conversation.ConversationRepository = class ConversationRepository {
     asset_service,
     client_repository,
     cryptography_repository,
+    eventRepository,
     giphy_repository,
     link_repository,
     team_repository,
     user_repository
   ) {
+    this.eventRepository = eventRepository;
     this.conversation_service = conversation_service;
     this.asset_service = asset_service;
     this.client_repository = client_repository;
@@ -477,7 +480,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       ? z.conversation.EventBuilder.buildGroupCreation(conversationEntity, isTemporaryGuest, timestamp)
       : z.conversation.EventBuilder.build1to1Creation(conversationEntity);
 
-    amplify.publish(z.event.WebApp.EVENT.INJECT, creationEvent, eventSource);
+    this.eventRepository.injectEvent(creationEvent, eventSource);
   }
 
   /**
@@ -1127,7 +1130,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .then(response => {
         const event = response ? response.event : undefined;
         if (event) {
-          amplify.publish(z.event.WebApp.EVENT.INJECT, response.event, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
+          this.eventRepository.injectEvent(response.event, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
           this.logger.debug(`Successfully added bot to conversation '${conversationEntity.display_name()}'`, response);
         }
 
@@ -1150,7 +1153,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .postMembers(conversationEntity.id, userIds)
       .then(response => {
         if (response) {
-          amplify.publish(z.event.WebApp.EVENT.INJECT, response, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
+          this.eventRepository.injectEvent(response, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
         }
       })
       .catch(error => this._handleAddToConversationError(error, conversationEntity, userIds));
@@ -1257,7 +1260,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         ? response.event
         : z.conversation.EventBuilder.buildMemberLeave(conversationEntity, userId, true, this.timeOffset);
 
-      amplify.publish(z.event.WebApp.EVENT.INJECT, event, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
+      this.eventRepository.injectEvent(event, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
       return event;
     });
   }
@@ -1275,7 +1278,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         ? response
         : z.conversation.EventBuilder.buildMemberLeave(conversationEntity, userId, true, this.timeOffset);
 
-      amplify.publish(z.event.WebApp.EVENT.INJECT, event, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
+      this.eventRepository.injectEvent(event, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
       return event;
     });
   }
@@ -1290,7 +1293,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   renameConversation(conversation_et, name) {
     return this.conversation_service.updateConversationName(conversation_et.id, name).then(response => {
       if (response) {
-        amplify.publish(z.event.WebApp.EVENT.INJECT, response, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
+        this.eventRepository.injectEvent(response, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
         return response;
       }
     });
@@ -1310,7 +1313,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .updateConversationMessageTimer(conversationEntity.id, messageTimer)
       .then(response => {
         if (response) {
-          amplify.publish(z.event.WebApp.EVENT.INJECT, response, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
+          this.eventRepository.injectEvent(response, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
           return response;
         }
       });
@@ -1375,7 +1378,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         })
         .forEach(conversationEntity => {
           const leaveEvent = z.conversation.EventBuilder.buildTeamMemberLeave(conversationEntity, userEntity, isoDate);
-          amplify.publish(z.event.WebApp.EVENT.INJECT, leaveEvent);
+          this.eventRepository.injectEvent(leaveEvent);
         });
     });
   }
@@ -2155,14 +2158,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         const optimistic_event = z.conversation.EventBuilder.buildMessageAdd(conversation_et, this.timeOffset);
         return this.cryptography_repository.cryptographyMapper.mapGenericMessage(generic_message, optimistic_event);
       })
-      .then(message_mapped => {
-        if (z.event.EventTypeHandling.STORE.includes(message_mapped.type)) {
-          return this.conversation_service.save_event(message_mapped);
-        }
-
-        return message_mapped;
-      })
-      .then(message_stored => {
+      .then(mappedEvent => {
         const {KNOCK: TYPE_KNOCK, EPHEMERAL: TYPE_EPHEMERAL} = z.cryptography.GENERIC_MESSAGE_TYPE;
         const isPing = message => message.content === TYPE_KNOCK;
         const isEphemeralPing = message => message.content === TYPE_EPHEMERAL && isPing(message.ephemeral);
@@ -2171,16 +2167,23 @@ z.conversation.ConversationRepository = class ConversationRepository {
           amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.OUTGOING_PING);
         }
 
-        this._handleConversationEvent(message_stored, z.event.EventRepository.SOURCE.INJECTED);
+        return mappedEvent;
+      })
+      .then(mappedEvent => {
+        const injectEventPromise = this.eventRepository.injectEvent(mappedEvent);
+        const messageSentPromise = this.send_generic_message_to_conversation(conversation_et.id, generic_message);
 
-        return this.send_generic_message_to_conversation(conversation_et.id, generic_message)
-          .then(payload => {
-            this._trackContributed(conversation_et, generic_message);
+        /**
+         * We will, in parallel, inject events to the repo (where they will be processed and saved in DB)
+         * and send the actual message to the backend.
+         * When both those actions are done, we can update our local event and say that is has been sent.
+         */
+        return Promise.all([injectEventPromise, messageSentPromise]).then(([event, sentPayload]) => {
+          this._trackContributed(conversation_et, generic_message);
 
-            const backend_iso_date = sync_timestamp ? payload.time : '';
-            return this._updateMessageAsSent(conversation_et, message_stored, backend_iso_date);
-          })
-          .then(() => message_stored);
+          const backend_iso_date = sync_timestamp ? sentPayload.time : '';
+          return this._updateMessageAsSent(conversation_et, event, backend_iso_date).then(() => event);
+        });
       });
   }
 
@@ -2883,7 +2886,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .filter(conversation_et => !conversation_et.removed_from_conversation())
       .forEach(conversation_et => {
         const missed_event = z.conversation.EventBuilder.buildMissed(conversation_et, this.timeOffset);
-        amplify.publish(z.event.WebApp.EVENT.INJECT, missed_event);
+        this.eventRepository.injectEvent(missed_event);
       });
   }
 
@@ -3615,7 +3618,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   _addDeleteMessage(conversationId, messageId, time, messageEntity) {
     const deleteEvent = z.conversation.EventBuilder.buildDelete(conversationId, messageId, time, messageEntity);
-    amplify.publish(z.event.WebApp.EVENT.INJECT, deleteEvent);
+    this.eventRepository.injectEvent(deleteEvent);
   }
 
   //##############################################################################
