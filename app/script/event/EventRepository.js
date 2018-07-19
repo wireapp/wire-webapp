@@ -587,7 +587,7 @@ z.event.EventRepository = class EventRepository {
           throw error;
         }
 
-        return true;
+        return event;
       });
   }
 
