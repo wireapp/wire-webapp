@@ -61,7 +61,7 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
     this.showAllUsersCount = ko.observable(0);
 
     this.availabilityLabel = ko.pureComputed(() => {
-      if (this.isVisible() && this.isTeam() && this.activeConversation().is_one2one()) {
+      if (this.isVisible() && this.isTeam() && this.activeConversation() && this.activeConversation().is_one2one()) {
         const userAvailability = this.firstParticipant() && this.firstParticipant().availability();
         const availabilitySetToNone = userAvailability === z.user.AvailabilityType.NONE;
 
@@ -133,7 +133,9 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
       $('.conversation-details__name').css('height', `${name.height()}px`);
     });
 
-    this.showActionAddParticipants = ko.pureComputed(() => this.activeConversation().is_group());
+    this.showActionAddParticipants = ko.pureComputed(() => {
+      return this.activeConversation() && this.activeConversation().is_group();
+    });
     this.showActionBlock = ko.pureComputed(() => {
       if (this.isSingleUserMode() && this.firstParticipant()) {
         return this.firstParticipant().is_connected() || this.firstParticipant().is_request();
@@ -142,15 +144,21 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
     this.showActionCreateGroup = ko.pureComputed(() => this.activeConversation().is_one2one());
     this.showActionCancelRequest = ko.pureComputed(() => this.activeConversation().is_request());
     this.showActionClear = ko.pureComputed(() => {
-      return !this.activeConversation().is_request() && !this.activeConversation().is_cleared();
+      return (
+        this.activeConversation() && !this.activeConversation().is_request() && !this.activeConversation().is_cleared()
+      );
     });
     this.showActionLeave = ko.pureComputed(() => {
-      return this.activeConversation().is_group() && !this.activeConversation().removed_from_conversation();
+      return (
+        this.activeConversation() &&
+        this.activeConversation().is_group() &&
+        !this.activeConversation().removed_from_conversation()
+      );
     });
 
     this.showActionGuestOptions = ko.pureComputed(() => this.activeConversation().inTeam());
     this.showActionTimedMessages = ko.pureComputed(() => {
-      return this.activeConversation().is_group() && !this.activeConversation().isGuest();
+      return this.activeConversation() && this.activeConversation().is_group() && !this.activeConversation().isGuest();
     });
     this.showSectionOptions = ko.pureComputed(() => this.showActionGuestOptions() || this.showActionTimedMessages());
 
@@ -172,7 +180,7 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
 
     this.timedMessagesText = ko.pureComputed(() => {
       const conversation = this.activeConversation();
-      const hasMessageTimeSet = conversation.messageTimer() && conversation.hasGlobalMessageTimer();
+      const hasMessageTimeSet = conversation && conversation.messageTimer() && conversation.hasGlobalMessageTimer();
       return hasMessageTimeSet
         ? z.util.TimeUtil.formatDuration(conversation.messageTimer()).text
         : z.l10n.text(z.string.ephemeralUnitsNone);
@@ -229,17 +237,21 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
   }
 
   clickToBlock() {
-    const userEntity = this.activeConversation().firstUserEntity();
-    const nextConversationEntity = this.conversationRepository.get_next_conversation(this.activeConversation());
+    if (this.activeConversation()) {
+      const userEntity = this.activeConversation().firstUserEntity();
+      const nextConversationEntity = this.conversationRepository.get_next_conversation(this.activeConversation());
 
-    this.actionsViewModel.blockUser(userEntity, true, nextConversationEntity);
+      this.actionsViewModel.blockUser(userEntity, true, nextConversationEntity);
+    }
   }
 
   clickToCancelRequest() {
-    const userEntity = this.activeConversation().firstUserEntity();
-    const nextConversationEntity = this.conversationRepository.get_next_conversation(this.activeConversation());
+    if (this.activeConversation()) {
+      const userEntity = this.activeConversation().firstUserEntity();
+      const nextConversationEntity = this.conversationRepository.get_next_conversation(this.activeConversation());
 
-    this.actionsViewModel.cancelConnectionRequest(userEntity, true, nextConversationEntity);
+      this.actionsViewModel.cancelConnectionRequest(userEntity, true, nextConversationEntity);
+    }
   }
 
   clickToClear() {
@@ -261,17 +273,19 @@ z.viewModel.panel.ConversationDetailsViewModel = class ConversationDetailsViewMo
   }
 
   renameConversation(data, event) {
-    const currentConversationName = this.activeConversation()
-      .display_name()
-      .trim();
+    if (this.activeConversation()) {
+      const currentConversationName = this.activeConversation()
+        .display_name()
+        .trim();
 
-    const newConversationName = z.util.StringUtil.removeLineBreaks(event.target.value.trim());
+      const newConversationName = z.util.StringUtil.removeLineBreaks(event.target.value.trim());
 
-    this.isEditingName(false);
-    const hasNameChanged = newConversationName.length && newConversationName !== currentConversationName;
-    if (hasNameChanged) {
-      event.target.value = currentConversationName;
-      this.conversationRepository.renameConversation(this.activeConversation(), newConversationName);
+      this.isEditingName(false);
+      const hasNameChanged = newConversationName.length && newConversationName !== currentConversationName;
+      if (hasNameChanged) {
+        event.target.value = currentConversationName;
+        this.conversationRepository.renameConversation(this.activeConversation(), newConversationName);
+      }
     }
   }
 };

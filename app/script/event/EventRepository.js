@@ -513,7 +513,7 @@ z.event.EventRepository = class EventRepository {
    *
    * @param {Object} event - Event payload to be injected
    * @param {z.event.EventRepository.SOURCE} [source=EventRepository.SOURCE.INJECTED] - Source of injection
-   * @returns {undefined} No return value
+   * @returns {Promise<Event>} Resolves when the event has been processed
    */
   injectEvent(event, source = EventRepository.SOURCE.INJECTED) {
     if (!event) {
@@ -529,8 +529,9 @@ z.event.EventRepository = class EventRepository {
     const inSelfConversation = conversationId === this.userRepository.self().id;
     if (!inSelfConversation) {
       this.logger.info(`Injected event ID '${id}' of type '${type}'`, event);
-      this._handleEvent(event, source);
+      return this._handleEvent(event, source);
     }
+    return Promise.resolve(event);
   }
 
   /**

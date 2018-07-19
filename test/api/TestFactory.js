@@ -365,6 +365,7 @@ window.TestFactory.prototype.exposeConversationActors = function() {
   this.logger.info('- exposeConversationActors');
   return Promise.resolve()
     .then(() => this.exposeTeamActors())
+    .then(() => this.exposeEventActors())
     .then(() => {
       this.logger.info('✓ exposedTeamActors');
 
@@ -379,6 +380,7 @@ window.TestFactory.prototype.exposeConversationActors = function() {
         TestFactory.asset_service,
         TestFactory.client_repository,
         TestFactory.cryptography_repository,
+        TestFactory.event_repository,
         undefined,
         undefined,
         TestFactory.team_repository,
