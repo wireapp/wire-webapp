@@ -22,7 +22,7 @@ import PropTypes from 'prop-types';
 import {Text} from '../Text';
 import {defaultTransition} from '../Identity/motions';
 
-const darkenAmount = 0.08;
+const darkenAmount = 0.06;
 const Button = Text.withComponent('button').extend`
   /* appearance */
   background-color: ${props => (props.disabled ? COLOR.DISABLED : props.backgroundColor)};
