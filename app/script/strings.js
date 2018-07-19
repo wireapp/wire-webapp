@@ -479,6 +479,10 @@ export const errorHandlerStrings = defineMessages({
     defaultMessage:
       'This email address is already in use. <a target="_blank" rel="noopener noreferrer" href="https://support.wire.com/hc/articles/115004082129">Learn more</a>',
   },
+  [BackendError.LABEL.NO_SSO_CODE]: {
+    id: 'BackendError.LABEL.NO_SSO_CODE',
+    defaultMessage: 'No SSO access code detected',
+  },
   unexpected: {
     id: 'BackendError.unexpected',
     defaultMessage: 'Unexpected error ({code} {message})',
