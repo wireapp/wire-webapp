@@ -43,7 +43,6 @@ z.viewModel.panel.GuestOptionsViewModel = class GuestOptionsViewModel extends z.
 
     this.isLinkCopied = ko.observable(false);
     this.requestOngoing = ko.observable(false);
-    this.triggerCopy = ko.observable();
 
     this.isGuestRoom = ko.pureComputed(() => this.activeConversation() && this.activeConversation().isGuestRoom());
     this.isTeamOnly = ko.pureComputed(() => this.activeConversation() && this.activeConversation().isTeamOnly());
@@ -63,9 +62,8 @@ z.viewModel.panel.GuestOptionsViewModel = class GuestOptionsViewModel extends z.
   }
 
   copyLink() {
-    const triggerFn = this.triggerCopy();
-    if (!this.isLinkCopied() && typeof triggerFn === 'function') {
-      triggerFn().then(() => {
+    if (!this.isLinkCopied() && this.activeConversation()) {
+      z.util.ClipboardUtil.copyText(this.activeConversation().accessCode()).then(() => {
         this.isLinkCopied(true);
         amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.GUEST_ROOMS.LINK_COPIED);
         window.setTimeout(() => this.isLinkCopied(false), GuestOptionsViewModel.CONFIG.CONFIRM_DURATION);

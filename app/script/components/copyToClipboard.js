@@ -23,19 +23,17 @@ window.z = window.z || {};
 window.z.components = z.components || {};
 
 z.components.CopyToClipboard = class CopyToClipboard {
-  constructor({text, trigger}) {
-    this.text = text;
+  constructor(params, componentInfo) {
+    this.text = params.text;
 
-    trigger(() => z.util.ClipboardUtil.copyText(document.getElementById('copy-to-clipboard__source').innerText));
-  }
-
-  onClick() {
-    if (window.getSelection) {
-      const selectionRange = document.createRange();
-      selectionRange.selectNode(document.getElementById('copy-to-clipboard__source'));
-      window.getSelection().removeAllRanges();
-      window.getSelection().addRange(selectionRange);
-    }
+    this.onClick = () => {
+      if (window.getSelection) {
+        const selectionRange = document.createRange();
+        selectionRange.selectNode(componentInfo.element);
+        window.getSelection().removeAllRanges();
+        window.getSelection().addRange(selectionRange);
+      }
+    };
   }
 };
 
@@ -43,5 +41,9 @@ ko.components.register('copy-to-clipboard', {
   template: `
     <div id="copy-to-clipboard__source" data-bind="click: onClick, text: text()"></div>
   `,
-  viewModel: z.components.CopyToClipboard,
+  viewModel: {
+    createViewModel(params, componentInfo) {
+      return new z.components.CopyToClipboard(params, componentInfo);
+    },
+  },
 });
