@@ -23,39 +23,42 @@ import {Text} from './Text';
 import media from '../mediaQueries';
 
 const H1 = Text.withComponent('h1').extend`
-  /* appearance */
-  font-size: 40px;
+  font-size: 48px;
   font-weight: 300;
-
-  /* positioning */
-  line-height: 48px;
-  margin-bottom: 52px;
+  line-height: 56px;
+  margin-bottom: 64px;
   margin-top: 0;
   min-height: 48px;
   ${media.mobile`
-    font-size: 24px;
-    line-height: 32px;
+    font-size: 40px;
+    line-height: 48px;
   `}
 `;
 
 const H2 = Text.withComponent('h2').extend`
-  /* appearance */
   font-size: 24px;
-  font-weight: 300;
+  font-weight: 700;
+  line-height: 32px;
+  margin-bottom: 24px;
+  margin-top: 48px;
+
+  ${media.mobile`
+    font-size: 20px;
+    line-height: 28px;
+    margin-bottom: 20px;
+    margin-top: 44px;
+  `}
 `;
 
 const H3 = Text.withComponent('h3').extend`
-  /* appearance */
-  font-size: 18px;
-  font-weight: 300;
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 16px;
 `;
 
 const H4 = Text.withComponent('h4').extend`
-  /* appearance */
   font-size: 11px;
   font-weight: 300;
-
-  /* positioning */
   margin-bottom: 5px;
   margin-top: 20px;
 `;
