@@ -63,9 +63,7 @@
   overflow: hidden;
   flex: 1 1;
   flex-direction: column;
-  &.split-view,
-  &.split-view .start-ui-list {
-    overflow: hidden;
+  &.split-view {
     flex: unset;
   }
 }
@@ -75,6 +73,10 @@
   flex: 1 1;
   overflow-x: hidden;
   overflow-y: scroll;
+  .split-view & {
+    overflow: hidden;
+    flex: unset;
+  }
 }
 
 .start-ui-list-spinner {
