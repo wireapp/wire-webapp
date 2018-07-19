@@ -58,7 +58,7 @@ import {loginStrings, ssoLoginStrings} from '../../strings';
 import {parseValidationErrors, parseError} from '../util/errorUtil';
 import {resetError} from '../module/action/creator/AuthActionCreator';
 import {withRouter} from 'react-router';
-import {isUUID, UUID_REGEX} from '../util/stringUtil';
+import {UUID_REGEX} from '../util/stringUtil';
 import {ClientType} from '@wireapp/api-client/dist/commonjs/client/index';
 
 class SingleSignOn extends React.PureComponent {
@@ -66,6 +66,7 @@ class SingleSignOn extends React.PureComponent {
 
   inputs = {};
   state = {
+    clipboardError: null,
     code: '',
     persist: true,
     validInputs: {
@@ -75,7 +76,9 @@ class SingleSignOn extends React.PureComponent {
   };
 
   componentDidMount = () => {
-    this.extractSSOLink();
+    if (isDesktopApp()) {
+      this.extractSSOLink();
+    }
   };
 
   componentWillReceiveProps = nextProps => {};
@@ -110,7 +113,7 @@ class SingleSignOn extends React.PureComponent {
       .then(() =>
         this.props.doLoginSSO({
           clientType: this.state.persist ? ClientType.PERMANENT : ClientType.TEMPORARY,
-          code: this.stripCode(this.state.code),
+          code: this.stripPrefix(this.state.code),
         })
       )
       .then(this.navigateChooseHandleOrWebapp)
@@ -153,27 +156,42 @@ class SingleSignOn extends React.PureComponent {
       event.preventDefault();
     }
     if (isSupportingClipboard()) {
-      this.readFromClipboard().then(code => {
-        const isValidSSOLink = this.isValidSSOCode(code);
-        if (isValidSSOLink) {
-          this.setState({code});
-        }
-      });
+      this.readFromClipboard()
+        .then(text => {
+          const isContainingValidSSOLink = this.containsSSOCode(text);
+          if (isContainingValidSSOLink) {
+            const code = this.extractCode(text);
+            this.setState({code});
+          } else {
+            const error = new Error();
+            error.label = 'no-sso-code-found';
+          }
+        })
+        .catch(error => this.setState({clipboardError: error}));
     }
   };
 
   readFromClipboard = () => navigator.clipboard.readText().catch(error => console.error('Something went wrong', error));
 
-  isValidSSOCode = code => code && code.startsWith(SingleSignOn.SSO_CODE_PREFIX) && isUUID(this.stripCode(code));
+  containsSSOCode = text => text && new RegExp(`${SingleSignOn.SSO_CODE_PREFIX}${UUID_REGEX}`, 'gm').test(text);
 
-  stripCode = code => code && code.trim().replace(SingleSignOn.SSO_CODE_PREFIX, '');
+  isSSOCode = text => text && new RegExp(`^${SingleSignOn.SSO_CODE_PREFIX}${UUID_REGEX}$`, 'i').test(text);
+
+  extractCode = text => {
+    if (this.containsSSOCode(text)) {
+      return text.match(new RegExp(`${SingleSignOn.SSO_CODE_PREFIX}${UUID_REGEX}`, 'gm'))[0];
+    }
+    return '';
+  };
+
+  stripPrefix = code => code && code.trim().replace(SingleSignOn.SSO_CODE_PREFIX, '');
 
   render() {
     const {
       intl: {formatMessage: _},
       loginError,
     } = this.props;
-    const {persist, code, validInputs, validationErrors} = this.state;
+    const {persist, code, validInputs, validationErrors, clipboardError} = this.state;
     return (
       <Page>
         <Container centerText verticalCenter style={{width: '100%'}}>
@@ -210,8 +228,8 @@ class SingleSignOn extends React.PureComponent {
                         value={code}
                         autoComplete="section-login sso-code"
                         placeholder={_(ssoLoginStrings.codePlaceholder)}
-                        maxLength="128"
-                        pattern={`^${SingleSignOn.SSO_CODE_PREFIX}${UUID_REGEX}$`}
+                        maxLength="1024"
+                        pattern={`${SingleSignOn.SSO_CODE_PREFIX}${UUID_REGEX}`}
                         autoFocus
                         type="text"
                         required
@@ -231,6 +249,8 @@ class SingleSignOn extends React.PureComponent {
                       parseValidationErrors(validationErrors)
                     ) : loginError ? (
                       <ErrorMessage data-uie-name="error-message">{parseError(loginError)}</ErrorMessage>
+                    ) : clipboardError ? (
+                      <ErrorMessage data-uie-name="error-message">{parseError(clipboardError)}</ErrorMessage>
                     ) : null}
                     {!isDesktopApp() && (
                       <Checkbox
