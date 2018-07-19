@@ -579,31 +579,8 @@ z.event.EventRepository = class EventRepository {
    * @returns {Promise} Resolves with the saved record or boolean true if the event was skipped
    */
   _handleEvent(event, source) {
-    return this._handleEventValidation(event, source).then(validatedEvent =>
-      this._processEvent(validatedEvent, source)
-    );
-  }
-
-  /**
-   * Decrypts, saves and distributes an event received from the backend.
-   *
-   * @private
-   * @param {JSON} event - Backend event extracted from notification stream
-   * @param {z.event.EventRepository.SOURCE} source - Source of event
-   * @returns {Promise} Resolves with the saved record or boolean true if the event was skipped
-   */
-  _processEvent(event, source) {
-    const isEncryptedEvent = event.type === z.event.Backend.CONVERSATION.OTR_MESSAGE_ADD;
-    const mapEvent = isEncryptedEvent
-      ? this.cryptographyRepository.handleEncryptedEvent(event)
-      : Promise.resolve(event);
-
-    return mapEvent
-      .then(mappedEvent => {
-        const saveEvent = z.event.EventTypeHandling.STORE.includes(mappedEvent.type);
-        return saveEvent ? this._handleEventSaving(mappedEvent, source) : mappedEvent;
-      })
-      .then(savedEvent => this._handleEventDistribution(savedEvent, source))
+    return this._handleEventValidation(event, source)
+      .then(validatedEvent => this.processEvent(validatedEvent, source))
       .catch(error => {
         const isIgnoredError = EventRepository.CONFIG.IGNORED_ERRORS.includes(error.type);
         if (!isIgnoredError) {
@@ -612,6 +589,27 @@ z.event.EventRepository = class EventRepository {
 
         return true;
       });
+  }
+
+  /**
+   * Decrypts, saves and distributes an event received from the backend.
+   *
+   * @param {JSON} event - Backend event extracted from notification stream
+   * @param {z.event.EventRepository.SOURCE} source - Source of event
+   * @returns {Promise} Resolves with the saved record or boolean true if the event was skipped
+   */
+  processEvent(event, source) {
+    const isEncryptedEvent = event.type === z.event.Backend.CONVERSATION.OTR_MESSAGE_ADD;
+    const mapEvent = isEncryptedEvent
+      ? this.cryptographyRepository.handleEncryptedEvent(event)
+      : Promise.resolve(event);
+
+    return mapEvent
+      .then(mappedEvent => {
+        const shouldSaveEvent = z.event.EventTypeHandling.STORE.includes(mappedEvent.type);
+        return shouldSaveEvent ? this._handleEventSaving(mappedEvent, source) : mappedEvent;
+      })
+      .then(savedEvent => this._handleEventDistribution(savedEvent, source));
   }
 
   /**
@@ -719,7 +717,7 @@ z.event.EventRepository = class EventRepository {
       const isIgnoredEvent = z.event.EventTypeHandling.IGNORE.includes(eventType);
       if (isIgnoredEvent) {
         this.logger.info(`Event ignored: '${event.type}'`, {event_json: JSON.stringify(event), event_object: event});
-        const errorMessage = 'Event validation failed: Type ignored';
+        const errorMessage = 'Event ignored: Type ignored';
         throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, errorMessage);
       }
 
