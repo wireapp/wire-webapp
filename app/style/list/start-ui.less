@@ -63,6 +63,11 @@
   overflow: hidden;
   flex: 1 1;
   flex-direction: column;
+  &.split-view,
+  &.split-view .start-ui-list {
+    overflow: hidden;
+    flex: unset;
+  }
 }
 
 .start-ui-list {
@@ -298,7 +303,7 @@
 
 .start-ui-import-container {
   display: flex;
-  height: 100%;
+  flex-grow: 1;
   align-items: center;
   margin-right: 24px;
   margin-left: 24px;
