@@ -38,7 +38,6 @@ function LoadingComponent({className, progress}) {
         r="20"
         stroke="#218fd1"
         strokeLinecap="round"
-        transform="rotate(-90 21.5 21.5)"
         strokeDasharray={pathLength}
         {...additionalProps}
       />
@@ -62,15 +61,19 @@ const fillAnimation = keyframes`
   }
 `;
 
+const rotationOffset = -0.75;
+const rotationDelay = `${parseFloat(DURATION.EXTRA_LONG) * rotationOffset}s`;
+
 const Loading = styled(LoadingComponent)`
   ${props =>
     props.progress === null &&
     css`
       circle:nth-of-type(2) {
+        transform-origin: 50% 50%;
         stroke-dasharray: ${pathLength};
+        animation: ${fillAnimation} ${DURATION.EXTRA_LONG} ease-in-out infinite,
+          ${ANIMATION.rotate} ${DURATION.EXTRA_LONG} linear ${rotationDelay} infinite;
       }
-      animation: ${fillAnimation} ${DURATION.EXTRA_LONG} infinite ease-in-out,
-        ${ANIMATION.rotate} ${DURATION.EXTRA_LONG} infinite linear;
     `};
 `;
 
