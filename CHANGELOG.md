@@ -3,7 +3,50 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-<a name="1.7.5"></a>
+      <a name="1.8.0"></a>
+# [1.8.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@1.7.5...@wireapp/react-ui-kit@1.8.0) (2018-07-19)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Update Heading styles ([#856](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/856)) ([ebbe7f2](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/ebbe7f2))
+
+
+### Features
+
+* **react-ui-kit:** Add Title element ([#860](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/860)) ([8f15295](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/8f15295))
+
+
+### BREAKING CHANGES
+
+* **react-ui-kit:** H1: 
+- font size 40px -> 48px
+- line-height: 56px
+- margin-bottom: 64px
+- mobile
+- font-size 24px -> 40px
+- line-height: 32px -> 48px
+
+H2: 
+- font-weight: 300 -> 700
+- line-height: 32px;
+- margin-bottom: 24px;
+- margin-top: 48px;
+- mobile
+- font-size: 20px;
+- line-height: 28px;
+- margin-bottom: 20px;
+- margin-top: 44px;
+
+H3:
+- font-size: 18px -> 16px
+- font-weight: 300 -> 600
+- margin-bottom: 16px
+
+
+
+
+      <a name="1.7.5"></a>
 ## [1.7.5](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@1.7.4...@wireapp/react-ui-kit@1.7.5) (2018-07-19)
 
 
