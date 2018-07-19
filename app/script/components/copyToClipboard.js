@@ -17,27 +17,29 @@
  *
  */
 
-.guest-options {
-  &__content {
-    padding: 32px 16px 0;
+'use strict';
+
+window.z = window.z || {};
+window.z.components = z.components || {};
+
+z.components.CopyToClipboard = class CopyToClipboard {
+  constructor(params) {
+    this.text = params.text;
   }
 
-  &__info {
-    padding-top: 16px;
-    border-top: 1px solid fade(@graphite-dark, 8%);
-    margin: 24px 16px 16px;
-
-    &__head {
-      margin-bottom: 8px;
-      font-weight: @font-weight-bold;
-      text-transform: uppercase;
+  onClick(viewModel, event) {
+    if (window.getSelection) {
+      const selectionRange = document.createRange();
+      selectionRange.selectNode(event.currentTarget);
+      window.getSelection().removeAllRanges();
+      window.getSelection().addRange(selectionRange);
     }
   }
+};
 
-  &__link {
-    min-height: 104px;
-    padding: 16px;
-    font-size: 16px;
-    line-height: 24px;
-  }
-}
+ko.components.register('copy-to-clipboard', {
+  template: `
+    <div class="copy-to-clipboard" data-bind="click: onClick, text: text()"></div>
+  `,
+  viewModel: z.components.CopyToClipboard,
+});
