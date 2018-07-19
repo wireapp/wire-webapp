@@ -39,7 +39,7 @@ z.components.CopyToClipboard = class CopyToClipboard {
 
 ko.components.register('copy-to-clipboard', {
   template: `
-    <div id="copy-to-clipboard__source" data-bind="click: onClick, text: text()"></div>
+    <div class="copy-to-clipboard" data-bind="click: onClick, text: text()"></div>
   `,
   viewModel: {
     createViewModel(params, componentInfo) {
