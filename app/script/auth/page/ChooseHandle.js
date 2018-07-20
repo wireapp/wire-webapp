@@ -27,6 +27,7 @@ import {
   Input,
   RoundIconButton,
   Form,
+  Muted,
   ErrorMessage,
 } from '@wireapp/react-ui-kit';
 import {injectIntl} from 'react-intl';
@@ -94,7 +95,7 @@ class ChooseHandle extends React.PureComponent {
       <Page isAuthenticated>
         <ContainerXS centerText verticalCenter style={{display: 'flex', flexDirection: 'column', minHeight: 428}}>
           <H1 center>{_(chooseHandleStrings.headline)}</H1>
-          <Text center>{_(chooseHandleStrings.subhead)}</Text>
+          <Muted center>{_(chooseHandleStrings.subhead)}</Muted>
           <Form style={{marginTop: 30}} onSubmit={this.onSetHandle}>
             <InputSubmitCombo style={{paddingLeft: 0}}>
               <Text center style={{minWidth: 38}}>

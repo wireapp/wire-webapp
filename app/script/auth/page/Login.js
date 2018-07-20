@@ -32,7 +32,7 @@ import {
   Checkbox,
   CheckboxLabel,
   H1,
-  Text,
+  Muted,
   Small,
   Link,
   ArrowIcon,
@@ -265,7 +265,7 @@ class Login extends React.PureComponent {
               >
                 <div>
                   <H1 center>{_(loginStrings.headline)}</H1>
-                  <Text>{_(loginStrings.subhead)}</Text>
+                  <Muted>{_(loginStrings.subhead)}</Muted>
                   <Form style={{marginTop: 30}} data-uie-name="login">
                     <InputBlock>
                       <Input
@@ -324,11 +324,12 @@ class Login extends React.PureComponent {
                       parseValidationErrors(validationErrors)
                     ) : loginError ? (
                       <ErrorMessage data-uie-name="error-message">{parseError(loginError)}</ErrorMessage>
-                    ) : null}
-                    {logoutReason && (
+                    ) : logoutReason ? (
                       <Small center style={{marginBottom: '16px'}} data-uie-name="status-logout-reason">
                         <FormattedHTMLMessage {...logoutReasonStrings[logoutReason]} />
                       </Small>
+                    ) : (
+                      <div style={{marginTop: '4px'}}>&nbsp;</div>
                     )}
                     {!isDesktopApp() && (
                       <Checkbox
@@ -336,14 +337,14 @@ class Login extends React.PureComponent {
                         onChange={event => this.setState({persist: !event.target.checked})}
                         checked={!persist}
                         data-uie-name="enter-public-computer-sign-in"
-                        style={{justifyContent: 'center'}}
+                        style={{justifyContent: 'center', marginTop: '12px'}}
                       >
                         <CheckboxLabel>{_(loginStrings.publicComputer)}</CheckboxLabel>
                       </Checkbox>
                     )}
                     <Link
                       center
-                      style={{marginTop: '8px'}}
+                      style={{marginTop: '36px'}}
                       onClick={this.forgotPassword}
                       data-uie-name="go-forgot-password"
                     >
@@ -351,7 +352,7 @@ class Login extends React.PureComponent {
                     </Link>
                   </Form>
                 </div>
-                <Columns>
+                <Columns style={{marginTop: '36px'}}>
                   <Column>
                     <Link to={ROUTE.SSO} component={RRLink} data-uie-name="go-sign-in-sso">
                       {_(loginStrings.ssoLogin)}

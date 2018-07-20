@@ -218,7 +218,15 @@ class SingleSignOn extends React.PureComponent {
                       {isSupportingClipboard() &&
                         !code && (
                           <Button
-                            style={{lineHeight: '16px', margin: '0 0 0 12px', maxHeight: '32px', padding: '0 16px'}}
+                            style={{
+                              borderRadius: '4px',
+                              fontSize: '11px',
+                              lineHeight: '16px',
+                              margin: '0 0 0 12px',
+                              maxHeight: '32px',
+                              minWidth: '100px',
+                              padding: '0 12px',
+                            }}
                             onClick={this.extractSSOLink}
                             data-uie-name="do-paste-sso-code"
                           >
@@ -261,14 +269,16 @@ class SingleSignOn extends React.PureComponent {
                       <ErrorMessage data-uie-name="error-message">{parseError(loginError)}</ErrorMessage>
                     ) : clipboardError ? (
                       <ErrorMessage data-uie-name="error-message">{parseError(clipboardError)}</ErrorMessage>
-                    ) : null}
+                    ) : (
+                      <span style={{marginBottom: '4px'}}>&nbsp;</span>
+                    )}
                     {!isDesktopApp() && (
                       <Checkbox
                         tabIndex="3"
                         onChange={event => this.setState({persist: !event.target.checked})}
                         checked={!persist}
                         data-uie-name="enter-public-computer-sso-sign-in"
-                        style={{justifyContent: 'center'}}
+                        style={{justifyContent: 'center', marginTop: '36px'}}
                       >
                         <CheckboxLabel>{_(loginStrings.publicComputer)}</CheckboxLabel>
                       </Checkbox>

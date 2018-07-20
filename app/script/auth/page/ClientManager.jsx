@@ -17,7 +17,7 @@
  *
  */
 
-import {H1, Text, Link, ContainerXS} from '@wireapp/react-ui-kit';
+import {H1, Muted, Link, ContainerXS} from '@wireapp/react-ui-kit';
 import {injectIntl} from 'react-intl';
 import Page from './Page';
 import React from 'react';
@@ -51,9 +51,9 @@ class ClientManager extends React.Component {
           <H1 center style={{marginTop: '140px'}}>
             {_(clientManagerStrings.headline)}
           </H1>
-          <Text center style={{marginBottom: '42px'}} data-uie-name="status-device-limit-info">
+          <Muted center style={{marginBottom: '42px'}} data-uie-name="status-device-limit-info">
             {_(clientManagerStrings.subhead)}
-          </Text>
+          </Muted>
           <ClientList />
           <Link
             onClick={this.logout}

@@ -21,7 +21,7 @@ import {
   COLOR,
   ArrowIcon,
   H1,
-  Text,
+  Muted,
   Link,
   Container,
   ContainerXS,
@@ -107,7 +107,7 @@ class TeamName extends Component {
               >
                 <div>
                   <H1 center>{_(teamNameStrings.headline)}</H1>
-                  <Text>{_(teamNameStrings.subhead)}</Text>
+                  <Muted>{_(teamNameStrings.subhead)}</Muted>
                   <Form style={{marginTop: 30}}>
                     <InputSubmitCombo>
                       <Input
