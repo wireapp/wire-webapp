@@ -40,7 +40,7 @@
     "@bower_components/wire-audio-files": "wireapp/wire-audio-files#1.1.1",
     "@bower_components/wire-theme": "wireapp/wire-theme#1.0.6",
     "@wireapp/core": "3.13.10",
-    "@wireapp/react-ui-kit": "1.8.0",
+    "@wireapp/react-ui-kit": "1.8.3",
     "babel-plugin-react-intl": "2.4.0",
     "babel-polyfill": "6.26.0",
     "dexie-batch": "0.4.1",
