@@ -19,6 +19,7 @@
 
 import {getURLParameter} from './util/urlUtil';
 import {QUERY_KEY} from './route';
+import APIClient from '@wireapp/api-client';
 
 export const LOCAL = 'LOCAL';
 export const STAGING = 'STAGING';
@@ -72,3 +73,8 @@ export function onEnvironment(environmentConditions) {
     }
   }
 }
+
+export const BACKEND = onEnvironment({
+  onProduction: APIClient.BACKEND.PRODUCTION,
+  onStaging: APIClient.BACKEND.STAGING,
+});

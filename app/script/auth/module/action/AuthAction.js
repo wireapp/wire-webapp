@@ -28,6 +28,7 @@ import * as CookieAction from './CookieAction';
 import {ClientType} from '@wireapp/api-client/dist/commonjs/client/index';
 import {APP_INSTANCE_ID} from '../../config';
 import {COOKIE_NAME_APP_OPENED} from '../selector/CookieSelector';
+import {BACKEND} from '../../Environment';
 
 export const doLogin = loginData => {
   const onBeforeLogin = dispatch => dispatch(doSilentLogout());
@@ -69,14 +70,58 @@ function doLoginPlain(loginData, onBeforeLogin, onAfterLogin) {
   };
 }
 
-export function doLoginSSO() {
-  return function(dispatch, getState, global) {
+function handleSSOLogin(code) {
+  return new Promise((resolve, reject) => {
+    let timerId = undefined;
+    const checkWindowTitle = win => {
+      const title = win.document.title;
+      if (title && title.startsWith('wire:sso:success')) {
+        window.clearInterval(timerId);
+        win.close();
+        resolve();
+      }
+      if (title && title.startsWith('wire:sso:error')) {
+        window.clearInterval(timerId);
+        win.close();
+        reject(new Error('Failed authentication'));
+      }
+    };
+    const ssoWindow = window.open(
+      `${BACKEND.rest}/sso/initiate-login/${code}`,
+      '_blank',
+      `
+        location=no,
+        menubar=no,
+        resizable=no,
+        status=no,
+        toolbar=no,
+        width=500,
+        height=500,
+      `
+    );
+    timerId = setInterval(() => checkWindowTitle(ssoWindow), 1000);
+  });
+}
+
+export function doLoginSSO({code, clientType}) {
+  return function(dispatch, getState, {core}) {
     dispatch(AuthActionCreator.startLogin());
-    return Promise.resolve().then(() => {
-      const error = new BackendError({code: 404, label: 'no-team', message: 'Organisation not found'});
-      dispatch(AuthActionCreator.failedLogin(error));
-      throw error;
-    });
+    return Promise.resolve()
+      .then(() => handleSSOLogin(code))
+      .then(() => core.init())
+      .then(() => persistAuthData(clientType, core, dispatch))
+      .then(() => dispatch(CookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: APP_INSTANCE_ID})))
+      .then(() => dispatch(SelfAction.fetchSelf()))
+      .then(() => dispatch(ClientAction.doInitializeClient(clientType)))
+      .then(() => dispatch(AuthActionCreator.successfulLogin()))
+      .catch(error => {
+        if (error.label === BackendError.LABEL.NEW_CLIENT || error.label === BackendError.LABEL.TOO_MANY_CLIENTS) {
+          dispatch(AuthActionCreator.successfulLogin());
+        } else {
+          dispatch(AuthActionCreator.failedLogin(error));
+        }
+        throw BackendError.handle(error);
+      });
   };
 }
 
