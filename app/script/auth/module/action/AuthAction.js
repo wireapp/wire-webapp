@@ -110,7 +110,6 @@ export function doLoginSSO({code, clientType}) {
       .then(() => handleSSOLogin(code))
       .then(() => dispatch(doInit()))
       .then(() => dispatch(CookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: APP_INSTANCE_ID})))
-      .then(() => dispatch(SelfAction.fetchSelf()))
       .then(() => dispatch(ClientAction.doInitializeClient(clientType)))
       .then(() => dispatch(AuthActionCreator.successfulLogin()))
       .catch(error => {
