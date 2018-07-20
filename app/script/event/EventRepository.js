@@ -708,13 +708,9 @@ z.event.EventRepository = class EventRepository {
      *  - a message has been updated
      */
     if (newData.replacing_message_id) {
-      // case of a message edit
-      const dataUpdates = Object.assign({}, originalEvent.data, {
-        content: newData.content,
-      });
-      updates = Object.assign({}, originalEvent, {
-        data: dataUpdates,
+      updates = Object.assign({}, newEvent, {
         edited_time: newEvent.time,
+        time: originalEvent.time,
       });
     } else if (newData.link_previews.length) {
       // case of a link preview
