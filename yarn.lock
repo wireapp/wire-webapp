@@ -343,11 +343,15 @@
   version "3.0.32"
   resolved "https://registry.yarnpkg.com/@types/long/-/long-3.0.32.tgz#f4e5af31e9e9b196d8e5fca8a5e2e20aa3d60b69"
 
+"@types/long@^4.0.0":
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/@types/long/-/long-4.0.0.tgz#719551d2352d301ac8b81db732acb6bdc28dbdef"
+
 "@types/node@*":
   version "10.1.2"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-10.1.2.tgz#1b928a0baa408fc8ae3ac012cc81375addc147c6"
 
-"@types/node@10.5.2":
+"@types/node@10.5.2", "@types/node@^10.1.0":
   version "10.5.2"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-10.5.2.tgz#f19f05314d5421fe37e74153254201a7bf00a707"
 
@@ -507,9 +511,9 @@
     "@webassemblyjs/wast-parser" "1.5.13"
     long "^3.2.0"
 
-"@wireapp/api-client@1.9.4":
-  version "1.9.4"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-1.9.4.tgz#ebbf755fb3631335af47e0b2ae0c0bbe92c9c54b"
+"@wireapp/api-client@1.9.8":
+  version "1.9.8"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-1.9.8.tgz#020feff2cc90ddeed3156172757f476da72384d5"
   dependencies:
     "@types/node" "10.5.2"
     "@types/spark-md5" "3.0.0"
@@ -527,18 +531,18 @@
   version "3.0.61"
   resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-3.0.61.tgz#5f9628cb4da75df7415fa4629c9b1dd37aa2c954"
 
-"@wireapp/core@3.13.5":
-  version "3.13.5"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-3.13.5.tgz#2639573bce4e71af4c7f52644471e962f831d0de"
+"@wireapp/core@3.13.10":
+  version "3.13.10"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-3.13.10.tgz#554072ea95029e4476090223c70d219097f118db"
   dependencies:
     "@types/node" "10.5.2"
-    "@wireapp/api-client" "1.9.4"
+    "@wireapp/api-client" "1.9.8"
     "@wireapp/cryptobox" "8.6.1"
     "@wireapp/protocol-messaging" "1.20.1"
     "@wireapp/store-engine" "0.11.46"
     bazinga64 "5.2.13"
     logdown "3.2.3"
-    protobufjs "6.8.6"
+    protobufjs "6.8.8"
     pure-uuid "1.5.3"
 
 "@wireapp/cryptobox@8.6.1":
@@ -8507,6 +8511,24 @@ protobufjs@6.8.6:
     "@protobufjs/utf8" "^1.1.0"
     "@types/long" "^3.0.32"
     "@types/node" "^8.9.4"
+    long "^4.0.0"
+
+protobufjs@6.8.8:
+  version "6.8.8"
+  resolved "https://registry.yarnpkg.com/protobufjs/-/protobufjs-6.8.8.tgz#c8b4f1282fd7a90e6f5b109ed11c84af82908e7c"
+  dependencies:
+    "@protobufjs/aspromise" "^1.1.2"
+    "@protobufjs/base64" "^1.1.2"
+    "@protobufjs/codegen" "^2.0.4"
+    "@protobufjs/eventemitter" "^1.1.0"
+    "@protobufjs/fetch" "^1.1.0"
+    "@protobufjs/float" "^1.0.2"
+    "@protobufjs/inquire" "^1.1.0"
+    "@protobufjs/path" "^1.1.2"
+    "@protobufjs/pool" "^1.1.0"
+    "@protobufjs/utf8" "^1.1.0"
+    "@types/long" "^4.0.0"
+    "@types/node" "^10.1.0"
     long "^4.0.0"
 
 proxy-addr@~2.0.2:
