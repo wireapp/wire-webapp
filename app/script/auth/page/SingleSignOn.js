@@ -33,7 +33,7 @@ import {
   Form,
   Input,
   H1,
-  Text,
+  Muted,
   Link,
   ArrowIcon,
   COLOR,
@@ -212,7 +212,7 @@ class SingleSignOn extends React.PureComponent {
               >
                 <div>
                   <H1 center>{_(ssoLoginStrings.headline)}</H1>
-                  <Text>{_(ssoLoginStrings.subhead)}</Text>
+                  <Muted>{_(ssoLoginStrings.subhead)}</Muted>
                   <Form style={{marginTop: 30}} data-uie-name="sso">
                     <InputSubmitCombo>
                       {isSupportingClipboard() &&
