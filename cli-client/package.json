@@ -3,7 +3,7 @@
     "wire-cli": "dist/commonjs/index.js"
   },
   "dependencies": {
-    "@wireapp/core": "3.13.9",
+    "@wireapp/core": "3.13.10",
     "commander": "2.16.0",
     "dotenv": "6.0.0",
     "fs-extra": "7.0.0"
@@ -30,5 +30,5 @@
     "prepare": "yarn build"
   },
   "types": "./dist/commonjs/index.d.ts",
-  "version": "2.1.66"
+  "version": "2.1.67"
 }
