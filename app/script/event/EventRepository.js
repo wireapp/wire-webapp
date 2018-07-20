@@ -648,7 +648,7 @@ z.event.EventRepository = class EventRepository {
    */
   _handleEventSaving(event, source) {
     const conversationId = event.conversation;
-    const eventId = event.data.replacing_message_id || event.id;
+    const eventId = (event.data || {}).replacing_message_id || event.id;
 
     const loadPromise = eventId
       ? this.conversationService.load_event_from_db(conversationId, eventId)
@@ -701,28 +701,27 @@ z.event.EventRepository = class EventRepository {
 
   _handleDuplicateEvents(originalEvent, newEvent) {
     const newData = newEvent.data;
+    const primaryKeyUpdate = {primary_key: originalEvent.primary_key};
     let updates;
     /*
      * The only two valid cases for a duplicate event are:
      *  - a link preview has been received (the text message already being in DB) ;
      *  - a message has been updated
      */
-    if (newData.replacing_message_id) {
-      updates = Object.assign({}, newEvent, {
+    if (newData && newData.replacing_message_id) {
+      updates = Object.assign({}, newEvent, primaryKeyUpdate, {
         edited_time: newEvent.time,
         time: originalEvent.time,
       });
-    } else if (newData.link_previews.length) {
+    } else if (newData && newData.previews && newData.previews.length) {
       // case of a link preview
-      updates = Object.assign({}, newEvent, {
+      updates = Object.assign({}, newEvent, primaryKeyUpdate, {
         category: z.message.MessageCategorization.categoryFromEvent(newEvent),
         server_time: newEvent.time,
         time: originalEvent.time,
       });
     }
-    // TODO throw an error is no updates are there, it means we have forgotten a case
-    updates.primary_key = originalEvent.primary_key;
-    return this.conversationService.update_event(updates);
+    return updates ? this.conversationService.update_event(updates) : originalEvent;
   }
 
   /**
