@@ -543,7 +543,7 @@ export const loginStrings = defineMessages({
   },
   ssoLogin: {
     id: 'login.ssoLogin',
-    defaultMessage: 'For companies',
+    defaultMessage: 'Company log in',
   },
   phoneLogin: {
     id: 'login.phoneLogin',
@@ -562,15 +562,11 @@ export const ssoLoginStrings = defineMessages({
   },
   subhead: {
     id: 'ssoLogin.subhead',
-    defaultMessage: "Paste here the link from your company's directory",
-  },
-  codePlaceholder: {
-    id: 'ssoLogin.codePlaceholder',
-    defaultMessage: 'Paste link',
+    defaultMessage: 'Enter the company SSO access code.',
   },
   pasteButton: {
     id: 'ssoLogin.pasteButton',
-    defaultMessage: 'Paste',
+    defaultMessage: 'Paste code',
   },
 });
 

@@ -76,8 +76,8 @@ class SingleSignOn extends React.PureComponent {
   };
 
   componentDidMount = () => {
-    if (isDesktopApp()) {
-      this.extractSSOLink();
+    if (isDesktopApp() && isSupportingClipboard()) {
+      this.extractSSOLink(undefined, false);
     }
   };
 
@@ -151,7 +151,7 @@ class SingleSignOn extends React.PureComponent {
       : this.props.history.push(ROUTE.CHOOSE_HANDLE);
   };
 
-  extractSSOLink = event => {
+  extractSSOLink = (event, shouldEmitError = true) => {
     if (event) {
       event.preventDefault();
     }
@@ -162,7 +162,7 @@ class SingleSignOn extends React.PureComponent {
           if (isContainingValidSSOLink) {
             const code = this.extractCode(text);
             this.setState({code});
-          } else {
+          } else if (shouldEmitError) {
             const error = new Error();
             error.label = 'no-sso-code-found';
             throw error;
@@ -215,6 +215,16 @@ class SingleSignOn extends React.PureComponent {
                   <Text>{_(ssoLoginStrings.subhead)}</Text>
                   <Form style={{marginTop: 30}} data-uie-name="sso">
                     <InputSubmitCombo>
+                      {isSupportingClipboard() &&
+                        !code && (
+                          <Button
+                            style={{lineHeight: '16px', margin: '0 0 0 12px', maxHeight: '32px', padding: '0 16px'}}
+                            onClick={this.extractSSOLink}
+                            data-uie-name="do-paste-sso-code"
+                          >
+                            {_(ssoLoginStrings.pasteButton)}
+                          </Button>
+                        )}
                       <Input
                         name="sso-code"
                         tabIndex="1"
@@ -228,7 +238,6 @@ class SingleSignOn extends React.PureComponent {
                         markInvalid={!validInputs.code}
                         value={code}
                         autoComplete="section-login sso-code"
-                        placeholder={_(ssoLoginStrings.codePlaceholder)}
                         maxLength="1024"
                         pattern={`${SingleSignOn.SSO_CODE_PREFIX}${UUID_REGEX}`}
                         autoFocus
@@ -264,14 +273,6 @@ class SingleSignOn extends React.PureComponent {
                         <CheckboxLabel>{_(loginStrings.publicComputer)}</CheckboxLabel>
                       </Checkbox>
                     )}
-                    <Button
-                      style={{marginTop: '16px'}}
-                      onClick={this.extractSSOLink}
-                      disabled={!isSupportingClipboard()}
-                      data-uie-name="do-paste-sso-code"
-                    >
-                      {_(ssoLoginStrings.pasteButton)}
-                    </Button>
                   </Form>
                 </div>
               </ContainerXS>
