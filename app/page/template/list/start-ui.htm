@@ -16,7 +16,7 @@
     <!-- /ko -->
   </div>
 
-  <div class="left-list-center start-ui-list-wrapper">
+  <div class="left-list-center start-ui-list-wrapper" data-bind="css: {'split-view': showNoContacts()}">
     <div class="start-ui-list" data-bind="antiscroll: shouldUpdateScrollbar, bordered_list: teamName">
       <!-- ko if: showSpinner() -->
         <div class="start-ui-list-spinner">
@@ -43,14 +43,12 @@
                 </li>
               </ul>
             <!-- /ko -->
-            <!-- ko if: showContacts() -->
-              <ul class="start-ui-create-group left-list-items">
-                <li class="left-list-item left-list-item-clickable" data-bind="click: clickOnCreateGroup" data-uie-name="go-create-group">
-                  <group-icon class="left-column-icon"></group-icon>
-                  <div class="center-column" data-bind="l10n_text: z.string.searchCreateGroup"></div>
-                </li>
-              </ul>
-            <!-- /ko -->
+            <ul class="start-ui-create-group left-list-items">
+              <li class="left-list-item left-list-item-clickable" data-bind="click: clickOnCreateGroup" data-uie-name="go-create-group">
+                <group-icon class="left-column-icon"></group-icon>
+                <div class="center-column" data-bind="l10n_text: z.string.searchCreateGroup"></div>
+              </li>
+            </ul>
             <!-- ko if: showCreateGuestRoom() -->
               <ul class="start-ui-create-guest-room left-list-items">
                 <li class="left-list-item left-list-item-clickable" data-bind="click: clickOnCreateGuestRoom" data-uie-name="do-create-guest-room">
