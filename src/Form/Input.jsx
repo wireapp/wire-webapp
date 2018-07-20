@@ -37,7 +37,6 @@ const invalidDot = `
 const base64Dot = Encoder.toBase64(invalidDot).asString;
 
 const Input = styled.input`
-  /* appearance */
   background: ${COLOR.WHITE};
   border-radius: 4px;
   border: none;
@@ -45,12 +44,11 @@ const Input = styled.input`
   font-weight: 400;
   outline: none;
   caret-color: ${COLOR.BLUE};
-
-  /* positioning */
   line-height: 24px;
   margin: 0 0 16px;
-  padding: 16px;
+  padding: 0 16px;
   width: 100%;
+  height: 56px;
 
   &::-webkit-input-placeholder {
     /* WebKit, Blink, Edge */
