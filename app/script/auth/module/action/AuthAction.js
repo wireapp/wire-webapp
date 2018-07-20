@@ -108,8 +108,7 @@ export function doLoginSSO({code, clientType}) {
     dispatch(AuthActionCreator.startLogin());
     return Promise.resolve()
       .then(() => handleSSOLogin(code))
-      .then(() => core.init())
-      .then(() => persistAuthData(clientType, core, dispatch))
+      .then(() => dispatch(doInit()))
       .then(() => dispatch(CookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: APP_INSTANCE_ID})))
       .then(() => dispatch(SelfAction.fetchSelf()))
       .then(() => dispatch(ClientAction.doInitializeClient(clientType)))
@@ -206,7 +205,6 @@ export function doRegisterPersonal(registration) {
       .then(() => core.init())
       .then(() => persistAuthData(clientType, core, dispatch))
       .then(() => dispatch(CookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: APP_INSTANCE_ID})))
-      .then(() => dispatch(SelfAction.fetchSelf()))
       .then(() => dispatch(ClientAction.doInitializeClient(clientType)))
       .then(() => dispatch(AuthActionCreator.successfulRegisterPersonal(createdAccount)))
       .catch(error => {
