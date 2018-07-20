@@ -25,8 +25,6 @@ import {Text} from '../Text';
 import styled from 'styled-components';
 
 const StyledContainerCheckbox = styled.div`
-  /* appearance */
-  /* positioning */
   display: flex;
   justify-content: flex-start;
   align-items: center;
@@ -84,6 +82,7 @@ const CheckboxLabel = Text.extend`
 CheckboxLabel.defaultProps = {
   ...Text.defaultProps,
   bold: true,
+  color: COLOR.GRAY_DARKEN_24,
   fontSize: '11px',
   textTransform: 'uppercase',
 };
