@@ -38,7 +38,7 @@ describe('OverlayObserver', () => {
       expect(callbackSpy.onVisible).toHaveBeenCalled();
     });
 
-    it('does not calls the callback if the element is overlayed', () => {
+    it('does not call the callback if the element is overlayed', () => {
       const callbackSpy = {
         onVisible: () => {},
       };
@@ -91,7 +91,7 @@ describe('OverlayObserver', () => {
 
       document.body.removeChild(overlay);
 
-      setTimeout(() => {
+      window.setTimeout(() => {
         expect(callbackSpy.onVisible).toHaveBeenCalled();
         done();
       });
