@@ -284,6 +284,7 @@ z.string.fr.conversationAssetUploading = 'Envoi en cours…';
 z.string.fr.conversationAssetDownloading = 'Téléchargement en cours…';
 z.string.fr.conversationAssetUploadFailed = 'Échec de l’envoi';
 z.string.fr.conversationPlaybackError = 'Lecture impossible';
+z.string.fr.conversationContextMenuCopy = 'Copier';
 z.string.fr.conversationContextMenuEdit = 'Édition';
 z.string.fr.conversationContextMenuDelete = 'Supprimer pour moi';
 z.string.fr.conversationContextMenuDeleteEveryone = 'Supprimer pour tout le monde';

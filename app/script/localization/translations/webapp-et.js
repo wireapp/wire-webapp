@@ -350,6 +350,7 @@ z.string.et.conversationAssetUploading = 'Üleslaadimine…';
 z.string.et.conversationAssetDownloading = 'Allalaadimine…';
 z.string.et.conversationAssetUploadFailed = 'Üleslaadimine ebaõnnestus';
 z.string.et.conversationPlaybackError = 'Ei saa esitada';
+z.string.et.conversationContextMenuCopy = 'Kopeeri';
 z.string.et.conversationContextMenuEdit = 'Muuda';
 z.string.et.conversationContextMenuDelete = 'Kustuta minu jaoks';
 z.string.et.conversationContextMenuDeleteEveryone = 'Kustuta kõigi jaoks…';

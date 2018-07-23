@@ -271,6 +271,7 @@ z.string.nl.conversationMissedMessages = 'Je hebt dit apparaat een tijdje niet g
 z.string.nl.conversationAssetDownloading = 'Downloaden…';
 z.string.nl.conversationAssetUploadFailed = 'Uploaden mislukt';
 z.string.nl.conversationPlaybackError = 'Niet in staat om te af te spelen';
+z.string.nl.conversationContextMenuCopy = 'Kopiëren';
 z.string.nl.conversationContextMenuEdit = 'Bewerken';
 z.string.nl.conversationContextMenuDelete = 'Verwijderen voor mij';
 z.string.nl.conversationContextMenuDeleteEveryone = 'Verwijderen voor iedereen';

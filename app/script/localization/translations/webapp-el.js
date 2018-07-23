@@ -270,6 +270,7 @@ z.string.el.conversationMissedMessages = 'Δεν έχετε χρησιμοποι
 z.string.el.conversationAssetDownloading = 'Γίνετε λήψη…';
 z.string.el.conversationAssetUploadFailed = 'Η Μεταφόρτωση Απέτυχε';
 z.string.el.conversationPlaybackError = 'Αδύνατη η αναπαραγωγή';
+z.string.el.conversationContextMenuCopy = 'Αντιγραφή';
 z.string.el.conversationContextMenuEdit = 'Eπεξεργασία';
 z.string.el.conversationContextMenuDelete = 'Διαγραφή για εμένα';
 z.string.el.conversationContextMenuDeleteEveryone = 'Διαγραφή για όλους';
