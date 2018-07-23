@@ -340,9 +340,9 @@ z.entity.Conversation = class Conversation {
    */
   add_message(messageEntity, replaceDuplicate = false) {
     if (messageEntity) {
-      const entityToReplace =
-        this._findDuplicate(messageEntity.id, messageEntity.from) ||
-        this._findDuplicate(messageEntity.replacing_message_id, messageEntity.from);
+      const messageWithLinkPreview = () => this._findDuplicate(messageEntity.id, messageEntity.from);
+      const editedMessage = () => this._findDuplicate(messageEntity.replacing_message_id, messageEntity.from);
+      const entityToReplace = messageWithLinkPreview() || editedMessage();
       this.update_timestamps(messageEntity);
       if (entityToReplace) {
         if (replaceDuplicate) {
