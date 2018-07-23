@@ -500,7 +500,7 @@ z.main.App = class App {
         this.logger.info('User does not have an activated identity and seems to be wireless');
 
         if (!userEntity.isTemporaryGuest()) {
-          throw new Error('User does not have an activated identity');
+          this.logger.info('User does not have an activated identity');
         }
       }
 
