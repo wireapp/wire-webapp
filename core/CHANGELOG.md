@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="3.13.13"></a>
+## [3.13.13](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@3.13.11...@wireapp/core@3.13.13) (2018-07-23)
+
+
+### Bug Fixes
+
+* **core:** Prevent sending "undefined" password string when creating clients ([#874](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/874)) ([9c85ef2](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/9c85ef2))
+
+
+
+
 <a name="3.13.12"></a>
 ## [3.13.12](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@3.13.11...@wireapp/core@3.13.12) (2018-07-23)
 
