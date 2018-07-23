@@ -104,10 +104,12 @@ function handleSSOLogin(code) {
 }
 
 export function doLoginSSO({code, clientType}) {
-  return function(dispatch, getState, {core}) {
+  return function(dispatch, getState, {apiClient, core}) {
     dispatch(AuthActionCreator.startLogin());
     return Promise.resolve()
       .then(() => handleSSOLogin(code))
+      .then(() => apiClient.init(clientType))
+      .then(() => persistAuthData(clientType, core, dispatch))
       .then(() => dispatch(doInit()))
       .then(() => dispatch(CookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: APP_INSTANCE_ID})))
       .then(() => dispatch(ClientAction.doInitializeClient(clientType)))
