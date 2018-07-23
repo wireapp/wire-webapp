@@ -268,7 +268,7 @@ export const unsupportedStrings = defineMessages({
 export const unsupportedJoinStrings = defineMessages({
   unsupportedJoinHeadline: {
     id: 'conversationJoin.unsupportedJoinHeadline',
-    defaultMessage: 'You have been invited <br />to join a <b style="color: black;">Wire guest room.</b>',
+    defaultMessage: 'You have been invited <br />to join a Wire guest room.',
   },
   unsupportedJoinSubhead: {
     id: 'conversationJoin.unsupportedJoinSubhead',
@@ -284,7 +284,7 @@ export const unsupportedJoinStrings = defineMessages({
 export const conversationJoinStrings = defineMessages({
   headline: {
     id: 'conversationJoin.headline',
-    defaultMessage: 'You have been invited <br />to join a <b style="color: black;">Wire guest room.</b>',
+    defaultMessage: 'You have been invited <br />to join a Wire guest room.',
   },
   subhead: {
     id: 'conversationJoin.subhead',
@@ -292,7 +292,7 @@ export const conversationJoinStrings = defineMessages({
   },
   existentAccountHeadline: {
     id: 'conversationJoin.existentAccountHeadline',
-    defaultMessage: '{name}, you have been invited <br />to join a <b style="color: black;">Wire guest room.</b>',
+    defaultMessage: '{name}, you have been invited <br />to join a Wire guest room.',
   },
   existentAccountSubhead: {
     id: 'conversationJoin.subheadExistentAccount',
@@ -312,7 +312,7 @@ export const conversationJoinStrings = defineMessages({
   },
   invalidHeadline: {
     id: 'conversationJoin.invalidHeadline',
-    defaultMessage: 'This <b style="color: black;">Wire guest room</b><br />is now closed.',
+    defaultMessage: 'This Wire guest room<br />is now closed.',
   },
   invalidSubhead: {
     id: 'conversationJoin.invalidSubhead',
@@ -328,7 +328,7 @@ export const conversationJoinStrings = defineMessages({
   },
   fullConversationHeadline: {
     id: 'conversationJoin.fullConversationHeadline',
-    defaultMessage: 'This <b style="color: black;">Wire guest room</b><br />is full.',
+    defaultMessage: 'This Wire guest room<br />is full.',
   },
   fullConversationSubhead: {
     id: 'conversationJoin.fullConversationSubhead',

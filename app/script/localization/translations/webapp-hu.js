@@ -448,6 +448,7 @@ z.string.hu.conversationDetailsActionGuestOptions = 'Vendég opciók';
 z.string.hu.conversationDetailsActionLeave = 'Kilépés a csoportból';
 z.string.hu.conversationDetailsGuestsOff = 'Kikapcsolva';
 z.string.hu.conversationDetailsGuestsOn = 'Be';
+z.string.hu.conversationDetailsOptions = 'Beállítások';
 z.string.hu.conversationDetailsParticipantsServicesOne = 'Szolgáltatás';
 z.string.hu.conversationDetailsParticipantsServicesMany = 'Szolgáltatások';
 z.string.hu.conversationDetailsParticipantsUsersOne = 'Személy';

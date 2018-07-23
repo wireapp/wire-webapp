@@ -17,27 +17,10 @@
  *
  */
 
-export const INVITE_ADD_START = 'INVITE_ADD_START';
-export const INVITE_ADD_SUCCESS = 'INVITE_ADD_SUCCESS';
-export const INVITE_ADD_FAILED = 'INVITE_ADD_FAILED';
+copy-to-clipboard {
+  display: block;
 
-export const INVITE_RESET_ERROR = 'INVITE_RESET_ERROR';
-
-export const startAddInvite = params => ({
-  params,
-  type: INVITE_ADD_START,
-});
-
-export const successfulAddInvite = invite => ({
-  payload: {invite},
-  type: INVITE_ADD_SUCCESS,
-});
-
-export const failedAddInvite = error => ({
-  payload: error,
-  type: INVITE_ADD_FAILED,
-});
-
-export const resetError = () => ({
-  type: INVITE_RESET_ERROR,
-});
+  .copy-to-clipboard {
+    word-break: break-all;
+  }
+}

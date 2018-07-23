@@ -78,6 +78,7 @@ describe('ConversationRepository', () => {
         );
         ({storageService: storage_service} = conversation_repository.conversation_service);
 
+        spyOn(TestFactory.event_repository, 'injectEvent').and.returnValue(Promise.resolve({}));
         conversation_et = _generate_conversation(z.conversation.ConversationType.SELF);
         conversation_et.id = payload.conversations.knock.post.conversation;
 
@@ -1044,6 +1045,9 @@ describe('ConversationRepository', () => {
         .map(val => val.toString())
         .concat(['1000', '1000', '31536000000', '31536000000']);
 
+      spyOn(conversationRepository, 'get_message_in_conversation_by_id').and.returnValue(
+        Promise.resolve(new z.entity.Message())
+      );
       spyOn(conversationRepository.conversation_service, 'post_encrypted_message').and.returnValue(Promise.resolve({}));
       spyOn(conversationRepository.conversation_mapper, 'map_conversations').and.returnValue(conversationPromise);
       spyOn(conversationRepository.cryptography_repository, 'encryptGenericMessage').and.callFake(

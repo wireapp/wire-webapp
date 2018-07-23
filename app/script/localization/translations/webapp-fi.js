@@ -347,6 +347,7 @@ z.string.fi.conversationDetailsActionArchive = 'Arkistoi';
 z.string.fi.conversationDetailsActionCancelRequest = 'Peru pyyntö';
 z.string.fi.conversationDetailsActionDevices = 'Laitteet';
 z.string.fi.conversationDetailsGuestsOff = 'Pois päältä';
+z.string.fi.conversationDetailsOptions = 'Valinnat';
 z.string.fi.conversationDetailsParticipantsServicesMany = 'Palvelut';
 z.string.fi.conversationDetailsParticipantsUsersMany = 'Ihmiset';
 z.string.fi.conversationDetailsPeople = 'Ihmiset';

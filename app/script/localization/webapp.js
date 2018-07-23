@@ -367,6 +367,7 @@ z.string.conversationAssetUploading = 'Uploading…';
 z.string.conversationAssetDownloading = 'Downloading…';
 z.string.conversationAssetUploadFailed = 'Upload Failed';
 z.string.conversationPlaybackError = 'Unable to play';
+z.string.conversationContextMenuCopy = 'Copy';
 z.string.conversationContextMenuEdit = 'Edit';
 z.string.conversationContextMenuDelete = 'Delete for Me…';
 z.string.conversationContextMenuDeleteEveryone = 'Delete for Everyone…';

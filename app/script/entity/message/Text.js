@@ -47,10 +47,7 @@ z.entity.Text = class Text extends z.entity.Asset {
 
   // Process text before rendering it
   render() {
-    let message = z.util.renderMessage(this.text);
-    if (!this.previews().length) {
-      message = z.media.MediaParser.renderMediaEmbeds(message, this.theme_color);
-    }
-    return message;
+    const message = z.util.renderMessage(this.text);
+    return !this.previews().length ? z.media.MediaParser.renderMediaEmbeds(message, this.theme_color) : message;
   }
 };

@@ -374,6 +374,7 @@ z.string.ro.conversationDetailsActionCancelRequest = 'Anulează cererea';
 z.string.ro.conversationDetailsActionCreateGroup = 'Grup nou';
 z.string.ro.conversationDetailsActionDevices = 'Dispozitive';
 z.string.ro.conversationDetailsGuestsOff = 'Închis';
+z.string.ro.conversationDetailsOptions = 'Opțiuni';
 z.string.ro.conversationDetailsParticipantsServicesMany = 'Servicii';
 z.string.ro.conversationDetailsParticipantsUsersMany = 'Persoane';
 z.string.ro.conversationDetailsPeople = 'Persoane';

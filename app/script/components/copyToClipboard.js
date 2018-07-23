@@ -17,27 +17,29 @@
  *
  */
 
-export const INVITE_ADD_START = 'INVITE_ADD_START';
-export const INVITE_ADD_SUCCESS = 'INVITE_ADD_SUCCESS';
-export const INVITE_ADD_FAILED = 'INVITE_ADD_FAILED';
+'use strict';
 
-export const INVITE_RESET_ERROR = 'INVITE_RESET_ERROR';
+window.z = window.z || {};
+window.z.components = z.components || {};
 
-export const startAddInvite = params => ({
-  params,
-  type: INVITE_ADD_START,
-});
+z.components.CopyToClipboard = class CopyToClipboard {
+  constructor(params) {
+    this.text = params.text;
+  }
 
-export const successfulAddInvite = invite => ({
-  payload: {invite},
-  type: INVITE_ADD_SUCCESS,
-});
+  onClick(viewModel, event) {
+    if (window.getSelection) {
+      const selectionRange = document.createRange();
+      selectionRange.selectNode(event.currentTarget);
+      window.getSelection().removeAllRanges();
+      window.getSelection().addRange(selectionRange);
+    }
+  }
+};
 
-export const failedAddInvite = error => ({
-  payload: error,
-  type: INVITE_ADD_FAILED,
-});
-
-export const resetError = () => ({
-  type: INVITE_RESET_ERROR,
+ko.components.register('copy-to-clipboard', {
+  template: `
+    <div class="copy-to-clipboard" data-bind="click: onClick, text: text()"></div>
+  `,
+  viewModel: z.components.CopyToClipboard,
 });

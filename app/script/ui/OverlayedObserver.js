@@ -53,7 +53,9 @@ z.ui.OverlayedObserver = (() => {
    */
   const isOverlayed = domElement => {
     const box = domElement.getBoundingClientRect();
-    const elementAtPoint = document.elementFromPoint(box.left, box.top);
+    const middlePointX = (box.right + box.left) / 2;
+    const middlePointY = (box.bottom + box.top) / 2;
+    const elementAtPoint = document.elementFromPoint(middlePointX, middlePointY);
     return elementAtPoint && domElement !== elementAtPoint && !domElement.contains(elementAtPoint);
   };
 

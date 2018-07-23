@@ -348,6 +348,7 @@ z.string.tr.conversationDetailsActionArchive = 'Arşivle';
 z.string.tr.conversationDetailsActionCancelRequest = 'İsteği iptal et';
 z.string.tr.conversationDetailsActionDevices = 'Cihazlar';
 z.string.tr.conversationDetailsGuestsOff = 'Yok';
+z.string.tr.conversationDetailsOptions = 'Ayarlar';
 z.string.tr.conversationDetailsParticipantsServicesMany = 'Servisler';
 z.string.tr.conversationDetailsParticipantsUsersMany = 'İnsanlar';
 z.string.tr.conversationDetailsPeople = 'İnsanlar';
