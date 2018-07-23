@@ -115,7 +115,7 @@ export default class ClientService {
         ),
         location: clientInfo.location,
         model: clientInfo.model,
-        password: String(loginData.password),
+        password: loginData.password ? String(loginData.password) : undefined,
         prekeys: serializedPreKeys,
         sigkeys: {
           enckey: 'Wuec0oJi9/q9VsgOil9Ds4uhhYwBT+CAUrvi/S9vcz0=',
