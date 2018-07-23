@@ -239,7 +239,7 @@ z.conversation.EventMapper = class EventMapper {
   }
 
   /**
-   *Map JSON ata of group creation event to message entity
+   * Maps JSON data of group creation event to message entity
    *
    * @private
    * @param {Object} eventData - Message data

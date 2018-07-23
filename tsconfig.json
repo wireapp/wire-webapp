@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "declaration": false,
+    "forceConsistentCasingInFileNames": true,
+    "lib": ["DOM", "ES2016"],
+    "noEmitOnError": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "rootDir": "app/script",
+    "strict": true,
+    "target": "ES5"
+  }
+}

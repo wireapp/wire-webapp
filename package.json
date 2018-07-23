@@ -130,6 +130,7 @@
     "stylelint": "9.3.0",
     "stylelint-config-idiomatic-order": "5.0.0",
     "stylelint-config-prettier": "3.3.0",
+    "typescript": "2.9.2",
     "uglify-js": "3.4.5",
     "uglifyjs-webpack-plugin": "1.2.7",
     "webpack": "4.16.2",
