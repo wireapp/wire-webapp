@@ -2756,12 +2756,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
       case z.event.Client.CONVERSATION.REACTION:
         return this._on_reaction(conversationEntity, eventJson);
 
-      case z.event.Client.CONVERSATION.MESSAGE_ADD:
       case z.event.Backend.CONVERSATION.MESSAGE_TIMER_UPDATE:
       case z.event.Client.CONVERSATION.DELETE_EVERYWHERE:
       case z.event.Client.CONVERSATION.INCOMING_MESSAGE_TOO_BIG:
       case z.event.Client.CONVERSATION.KNOCK:
       case z.event.Client.CONVERSATION.LOCATION:
+      case z.event.Client.CONVERSATION.MESSAGE_ADD:
       case z.event.Client.CONVERSATION.MISSED_MESSAGES:
       case z.event.Client.CONVERSATION.UNABLE_TO_DECRYPT:
       case z.event.Client.CONVERSATION.VERIFICATION:
