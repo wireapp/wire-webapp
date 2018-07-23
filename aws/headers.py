@@ -45,6 +45,7 @@ CSP = {
     'data:',
   ],
   'frame-src': [
+    'https://*.zinfra.io/',
     'https://*.soundcloud.com',
     'https://*.spotify.com',
     'https://*.vimeo.com',

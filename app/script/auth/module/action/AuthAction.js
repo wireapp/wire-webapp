@@ -73,19 +73,25 @@ function doLoginPlain(loginData, onBeforeLogin, onAfterLogin) {
 function handleSSOLogin(code) {
   return new Promise((resolve, reject) => {
     let timerId = undefined;
+    const receiveMessage = event => {
+      console.error('event', event.source, event.data);
+    };
     const checkWindowTitle = win => {
       const title = win.document.title;
       if (title && title.startsWith('wire:sso:success')) {
         window.clearInterval(timerId);
+        window.removeEventListener('message', receiveMessage, false);
         win.close();
         resolve();
       }
       if (title && title.startsWith('wire:sso:error')) {
         window.clearInterval(timerId);
+        window.removeEventListener('message', receiveMessage, false);
         win.close();
         reject(new Error('Failed authentication'));
       }
     };
+    window.addEventListener('message', receiveMessage, false);
     const ssoWindow = window.open(
       `${BACKEND.rest}/sso/initiate-login/${code}`,
       '_blank',
