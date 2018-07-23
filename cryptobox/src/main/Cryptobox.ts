@@ -17,7 +17,7 @@
  *
  */
 
-import LRUCache from '@wireapp/lru-cache';
+import {LRUCache} from '@wireapp/lru-cache';
 import {PriorityQueue} from '@wireapp/priority-queue';
 import {
   errors as ProteusErrors,
@@ -27,7 +27,7 @@ import {
 } from '@wireapp/proteus';
 import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine/';
 import {Decoder, Encoder} from 'bazinga64';
-import EventEmitter = require('events');
+import * as EventEmitter from 'events';
 import CryptoboxSession from './CryptoboxSession';
 import DecryptionError from './DecryptionError';
 import {CryptoboxError} from './error/root';
@@ -37,7 +37,7 @@ import {CryptoboxCRUDStore} from './store/root';
 
 const DEFAULT_CAPACITY = 1000;
 const logdown = require('logdown');
-const VERSION = require('../../package.json').version;
+const {version}: {version: string} = require('../../package.json');
 
 class Cryptobox extends EventEmitter {
   public static TOPIC = {
@@ -56,7 +56,7 @@ class Cryptobox extends EventEmitter {
 
   public lastResortPreKey: ProteusKeys.PreKey | undefined;
   public identity: ProteusKeys.IdentityKeyPair | undefined;
-  public static VERSION: string = VERSION;
+  public static VERSION = version;
 
   constructor(engine: CRUDEngine, minimumAmountOfPreKeys: number = 1) {
     super();

@@ -17,7 +17,7 @@
  *
  */
 
-import APIClient = require('@wireapp/api-client');
+import {APIClient} from '@wireapp/api-client';
 import {Self} from '@wireapp/api-client/dist/commonjs/self/index';
 
 export default class SelfService {

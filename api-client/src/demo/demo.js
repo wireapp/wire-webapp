@@ -22,8 +22,8 @@ import {COLOR, Logo} from '@wireapp/react-ui-kit/Identity';
 import {ContainerXS, Content, Header, StyledApp} from '@wireapp/react-ui-kit/Layout';
 import {H1, Link, Text} from '@wireapp/react-ui-kit/Text';
 import React, {Component} from 'react';
+import {APIClient} from '@wireapp/api-client';
 import {AccessTokenStore} from '@wireapp/api-client/dist/commonjs/auth/';
-import Client from '@wireapp/api-client/dist/commonjs/Client';
 import {IndexedDBEngine} from '@wireapp/store-engine/dist/commonjs/engine';
 import ReactDOM from 'react-dom';
 import {WebSocketClient} from '@wireapp/api-client/dist/commonjs/tcp/';
@@ -31,7 +31,7 @@ import {WebSocketClient} from '@wireapp/api-client/dist/commonjs/tcp/';
 const logger = require('logdown')('@wireapp/api-client/demo/demo.js');
 logger.state.isEnabled = true;
 
-const BACKEND_ENV = Client.BACKEND.STAGING;
+const BACKEND_ENV = APIClient.BACKEND.STAGING;
 
 class Auth extends Component {
   constructor(props) {
@@ -122,7 +122,7 @@ window.onload = function() {
     store: new IndexedDBEngine(),
     urls: BACKEND_ENV,
   };
-  const client = new Client(config);
+  const client = new APIClient(config);
   client.transport.ws.on(WebSocketClient.TOPIC.ON_MESSAGE, notification => {
     logger.log('Received notification via WebSocket', notification);
   });

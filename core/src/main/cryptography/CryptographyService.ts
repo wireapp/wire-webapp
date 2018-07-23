@@ -18,7 +18,7 @@
  */
 
 const logdown = require('logdown');
-import APIClient = require('@wireapp/api-client');
+import {APIClient} from '@wireapp/api-client';
 import {PreKey as SerializedPreKey} from '@wireapp/api-client/dist/commonjs/auth/index';
 import {RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/index';
 import {OTRRecipients} from '@wireapp/api-client/dist/commonjs/conversation/index';

@@ -17,14 +17,14 @@
  *
  */
 
-import EventEmitter = require('events');
+import * as EventEmitter from 'events';
 import {IncomingNotification} from '../conversation/';
 import {HttpClient, NetworkError} from '../http/';
 
-const buffer = require('../shims/node/buffer');
-const Html5WebSocket = require('html5-websocket');
-const logdown = require('logdown');
+import * as Html5WebSocket from 'html5-websocket';
+import * as buffer from '../shims/node/buffer';
 const ReconnectingWebsocket = require('reconnecting-websocket');
+const logdown = require('logdown');
 
 class WebSocketClient extends EventEmitter {
   private clientId: string | undefined;

@@ -17,6 +17,7 @@
  *
  */
 
+import {APIClient} from '@wireapp/api-client';
 import {LoginData} from '@wireapp/api-client/dist/commonjs/auth/';
 import {Config} from '@wireapp/api-client/dist/commonjs/Config';
 import {Account} from '@wireapp/core';
@@ -24,7 +25,6 @@ import {MemoryEngine} from '@wireapp/store-engine';
 import {exec} from 'child_process';
 import {promisify} from 'util';
 
-import APIClient = require('@wireapp/api-client');
 import * as Changelog from 'generate-changelog';
 
 const logdown = require('logdown');

@@ -63,8 +63,8 @@ import {
 import * as AssetCryptography from '../cryptography/AssetCryptography.node';
 import {CryptographyService, EncryptedAsset} from '../cryptography/root';
 
-const UUID = require('pure-uuid');
-import APIClient = require('@wireapp/api-client');
+import {APIClient} from '@wireapp/api-client';
+import UUID from 'pure-uuid';
 
 export default class ConversationService {
   private clientID: string = '';

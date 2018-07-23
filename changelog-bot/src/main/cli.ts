@@ -26,7 +26,7 @@ import {start as startChangelogBot} from './start';
 
 const program = require('commander');
 const logdown = require('logdown');
-const {description, version} = require('../package.json');
+const {description, version}: {description: string; version: string} = require('../package.json');
 
 const logger = logdown('@wireapp/changelog-bot/cli', {
   logger: console,

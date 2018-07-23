@@ -20,7 +20,7 @@
 const UUID = require('pure-uuid');
 const {NotificationService} = require('@wireapp/core/dist/notification/root');
 const {IndexedDBEngine} = require('@wireapp/store-engine');
-const Client = require('@wireapp/api-client');
+const {APIClient} = require('@wireapp/api-client');
 
 const UUIDVersion = 4;
 
@@ -38,14 +38,14 @@ describe('NotificationService', () => {
 
     it('initializes last event date if database entry is not present', async done => {
       const engine = new IndexedDBEngine();
-      const apiClient = new Client({
+      const apiClient = new APIClient({
         schemaCallback: db => {
           db.version(1).stores({
             amplify: '',
           });
         },
         store: engine,
-        urls: Client.BACKEND.STAGING,
+        urls: APIClient.BACKEND.STAGING,
       });
 
       const notificationService = new NotificationService(apiClient, engine);
@@ -73,14 +73,14 @@ describe('NotificationService', () => {
 
     it('updates last event date if lesser database entry exists', async done => {
       const engine = new IndexedDBEngine();
-      const apiClient = new Client({
+      const apiClient = new APIClient({
         schemaCallback: db => {
           db.version(1).stores({
             amplify: '',
           });
         },
         store: engine,
-        urls: Client.BACKEND.STAGING,
+        urls: APIClient.BACKEND.STAGING,
       });
 
       const notificationService = new NotificationService(apiClient, engine);
@@ -111,14 +111,14 @@ describe('NotificationService', () => {
 
   it('ignores last event date update if greater database entry exists', async done => {
     const engine = new IndexedDBEngine();
-    const apiClient = new Client({
+    const apiClient = new APIClient({
       schemaCallback: db => {
         db.version(1).stores({
           amplify: '',
         });
       },
       store: engine,
-      urls: Client.BACKEND.STAGING,
+      urls: APIClient.BACKEND.STAGING,
     });
 
     const notificationService = new NotificationService(apiClient, engine);
@@ -151,14 +151,14 @@ describe('NotificationService', () => {
 
   it('initializes last notification ID if database entry is not present', async done => {
     const engine = new IndexedDBEngine();
-    const apiClient = new Client({
+    const apiClient = new APIClient({
       schemaCallback: db => {
         db.version(1).stores({
           amplify: '',
         });
       },
       store: engine,
-      urls: Client.BACKEND.STAGING,
+      urls: APIClient.BACKEND.STAGING,
     });
 
     const notificationService = new NotificationService(apiClient, engine);
@@ -186,14 +186,14 @@ describe('NotificationService', () => {
 
   it('updates last notification ID  if database entry exists', async done => {
     const engine = new IndexedDBEngine();
-    const apiClient = new Client({
+    const apiClient = new APIClient({
       schemaCallback: db => {
         db.version(1).stores({
           amplify: '',
         });
       },
       store: engine,
-      urls: Client.BACKEND.STAGING,
+      urls: APIClient.BACKEND.STAGING,
     });
 
     const notificationService = new NotificationService(apiClient, engine);

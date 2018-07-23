@@ -188,4 +188,4 @@ class LRUCache<T> {
   }
 }
 
-export default LRUCache;
+export {LRUCache};

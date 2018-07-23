@@ -18,7 +18,7 @@
  */
 
 /* eslint-disable no-magic-numbers */
-const APIClient = require('@wireapp/api-client');
+const {APIClient} = require('@wireapp/api-client');
 const UUID = require('pure-uuid');
 const {Account} = require('@wireapp/core');
 const {MemoryEngine} = require('@wireapp/store-engine');

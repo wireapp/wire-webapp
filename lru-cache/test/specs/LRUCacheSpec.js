@@ -20,7 +20,7 @@
 /* eslint no-magic-numbers: "off" */
 
 describe('LRUCache', () => {
-  const LRUCache = require('../../dist/commonjs/LRUCache').default;
+  const {LRUCache} = require('../../dist/commonjs/LRUCache');
 
   describe('"constructor"', () => {
     it('sets a default capacity', () => {

@@ -18,7 +18,7 @@
  */
 
 const logdown = require('logdown');
-import EventEmitter = require('events');
+import * as EventEmitter from 'events';
 import {AccessTokenData} from '../auth';
 
 class AccessTokenStore extends EventEmitter {

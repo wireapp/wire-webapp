@@ -1,5 +1,5 @@
-const fs = require('fs-extra');
-import path = require('path');
+import * as fs from 'fs-extra';
+import * as path from 'path';
 import CRUDEngine from './CRUDEngine';
 import {isBrowser} from './EnvironmentUtil';
 import {
@@ -110,10 +110,7 @@ export default class FileEngine implements CRUDEngine {
 
   delete(tableName: string, primaryKey: string): Promise<string> {
     return this.resolvePath(tableName, primaryKey).then(file => {
-      return fs
-        .remove(file)
-        .then(() => primaryKey)
-        .catch(() => false);
+      return fs.remove(file).then(() => primaryKey);
     });
   }
 

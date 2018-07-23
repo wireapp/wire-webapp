@@ -21,6 +21,7 @@
 
 import {LoginData} from '@wireapp/api-client/dist/commonjs/auth/';
 import {ClientType} from '@wireapp/api-client/dist/commonjs/client/';
+import * as path from 'path';
 import {MessageData, TravisBot} from './index';
 
 const logdown = require('logdown');
@@ -31,7 +32,7 @@ const logger = logdown('@wireapp/travis-bot/cli', {
   markdown: false,
 });
 
-const scriptName = require('path').basename(process.argv[1]);
+const scriptName = path.basename(process.argv[1]);
 
 const requiredEnvVars = ['WIRE_WEBAPP_BOT_EMAIL', 'WIRE_WEBAPP_BOT_PASSWORD'];
 const travisEnvVars = ['TRAVIS_BRANCH', 'TRAVIS_BUILD_NUMBER', 'TRAVIS_COMMIT', 'TRAVIS_REPO_SLUG'];

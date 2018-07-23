@@ -21,7 +21,6 @@ import CRUDEngine from './CRUDEngine';
 import {isBrowser} from './EnvironmentUtil';
 import {RecordAlreadyExistsError, RecordNotFoundError, UnsupportedError} from './error';
 import {RecordTypeError} from './error/';
-
 const fs = require('bro-fs');
 
 export type FileSystemEngineOptions = {

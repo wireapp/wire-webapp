@@ -19,21 +19,23 @@
  *
  */
 
-const fs = require('fs-extra');
-const program = require('commander');
-const {Account} = require('@wireapp/core');
-const {description, version} = require('../../package.json');
-const {FileEngine} = require('@wireapp/store-engine');
-import APIClient = require('@wireapp/api-client');
+import {APIClient} from '@wireapp/api-client';
 import {ClientType, RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/';
 import {Config} from '@wireapp/api-client/dist/commonjs/Config';
 import {BackendErrorLabel} from '@wireapp/api-client/dist/commonjs/http/';
+import {Account} from '@wireapp/core';
 import {PayloadBundleIncoming} from '@wireapp/core/dist/conversation/root';
+import {FileEngine} from '@wireapp/store-engine';
 import {AxiosError} from 'axios';
+import * as program from 'commander';
+import * as fs from 'fs-extra';
 import * as os from 'os';
 import * as path from 'path';
 
-require('dotenv').config();
+import * as dotenv from 'dotenv';
+dotenv.config();
+
+const {description, version}: {description: string; version: string} = require('../../package.json');
 
 program
   .version(version)
@@ -100,8 +102,10 @@ storeEngine.init('', {fileExtension: '.json'}).then(() => {
       const stdin = process.openStdin();
       stdin.addListener('data', data => {
         const message = data.toString().trim();
-        const payload = account.service.conversation.createText(message);
-        account.service.conversation.send(conversationID, payload);
+        if (account.service) {
+          const payload = account.service.conversation.createText(message);
+          account.service.conversation.send(conversationID, payload);
+        }
       });
     })
     .catch((error: Error) => {

@@ -20,7 +20,7 @@
 import {PriorityQueue} from '@wireapp/priority-queue';
 import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine';
 import axios, {AxiosError, AxiosPromise, AxiosRequestConfig, AxiosResponse} from 'axios';
-import EventEmitter = require('events');
+import * as EventEmitter from 'events';
 import {AccessTokenData, AccessTokenStore, AuthAPI} from '../auth/';
 import {BackendErrorMapper, ConnectionState, ContentType, NetworkError} from '../http/';
 import {sendRequestWithCookie} from '../shims/node/cookie';

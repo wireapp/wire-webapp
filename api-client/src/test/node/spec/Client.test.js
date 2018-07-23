@@ -20,13 +20,13 @@
 
 const nock = require('nock');
 
-const Client = require('@wireapp/api-client/dist/commonjs/Client');
+const {APIClient} = require('@wireapp/api-client');
 const {AUTH_TABLE_NAME, AuthAPI} = require('@wireapp/api-client/dist/commonjs/auth/');
 const {UserAPI} = require('@wireapp/api-client/dist/commonjs/user/');
 const {MemoryEngine} = require('@wireapp/store-engine');
 
 describe('Client', () => {
-  const baseURL = Client.BACKEND.PRODUCTION.rest;
+  const baseURL = APIClient.BACKEND.PRODUCTION.rest;
 
   let accessTokenData = {
     access_token:
@@ -38,21 +38,21 @@ describe('Client', () => {
 
   describe('"constructor"', () => {
     it('constructs a client with production backend and StoreEngine by default', () => {
-      const client = new Client();
-      expect(client.transport.http.baseURL).toBe(Client.BACKEND.PRODUCTION.rest);
-      expect(client.transport.ws.baseURL).toBe(Client.BACKEND.PRODUCTION.ws);
+      const client = new APIClient();
+      expect(client.transport.http.baseURL).toBe(APIClient.BACKEND.PRODUCTION.rest);
+      expect(client.transport.ws.baseURL).toBe(APIClient.BACKEND.PRODUCTION.ws);
     });
 
     it('constructs StoreEngine when only the URLs is provided', () => {
-      const client = new Client({urls: Client.BACKEND.PRODUCTION});
-      expect(client.transport.http.baseURL).toBe(Client.BACKEND.PRODUCTION.rest);
-      expect(client.transport.ws.baseURL).toBe(Client.BACKEND.PRODUCTION.ws);
+      const client = new APIClient({urls: APIClient.BACKEND.PRODUCTION});
+      expect(client.transport.http.baseURL).toBe(APIClient.BACKEND.PRODUCTION.rest);
+      expect(client.transport.ws.baseURL).toBe(APIClient.BACKEND.PRODUCTION.ws);
     });
 
     it('constructs URLs when only the StoreEngine is provided', () => {
-      const client = new Client({store: new MemoryEngine()});
-      expect(client.transport.http.baseURL).toBe(Client.BACKEND.PRODUCTION.rest);
-      expect(client.transport.ws.baseURL).toBe(Client.BACKEND.PRODUCTION.ws);
+      const client = new APIClient({store: new MemoryEngine()});
+      expect(client.transport.http.baseURL).toBe(APIClient.BACKEND.PRODUCTION.rest);
+      expect(client.transport.ws.baseURL).toBe(APIClient.BACKEND.PRODUCTION.ws);
     });
 
     it('constructs schema callback when provided', () => {
@@ -61,7 +61,7 @@ describe('Client', () => {
           [AUTH_TABLE_NAME]: '',
         });
       };
-      const client = new Client({
+      const client = new APIClient({
         schemaCallback,
         store: new MemoryEngine(),
       });
@@ -143,7 +143,7 @@ describe('Client', () => {
     });
 
     it('creates a context from a successful login', done => {
-      const client = new Client();
+      const client = new APIClient();
       client.login(loginData).then(context => {
         expect(context.userId).toBe(accessTokenData.user);
         expect(client.accessTokenStore.accessToken.access_token).toBe(accessTokenData.access_token);
@@ -152,7 +152,7 @@ describe('Client', () => {
     });
 
     it('can login after a logout', done => {
-      const client = new Client();
+      const client = new APIClient();
       client
         .login(loginData)
         .then(() => client.logout())
@@ -177,7 +177,7 @@ describe('Client', () => {
         .post(AuthAPI.URL.ACCESS)
         .reply(200, accessTokenData);
 
-      const client = new Client();
+      const client = new APIClient();
       client
         .login(loginData)
         .then(context => {
@@ -204,7 +204,7 @@ describe('Client', () => {
     });
 
     it('can logout a user', async done => {
-      const client = new Client();
+      const client = new APIClient();
 
       const context = client.createContext(
         '3721e5d3-558d-45ac-b476-b4a64a8f74c1',
@@ -244,7 +244,7 @@ describe('Client', () => {
     });
 
     it('automatically gets an access token after registration', done => {
-      const client = new Client({
+      const client = new APIClient({
         schemaCallback: db => {
           db.version(1).stores({
             [AUTH_TABLE_NAME]: '',

@@ -27,7 +27,7 @@ const argv = require('optimist')
 const logger = require('logdown')('@wireapp/api-client/index.js');
 logger.state.isEnabled = true;
 
-const Client = require('@wireapp/api-client');
+const {APIClient} = require('@wireapp/api-client');
 const path = require('path');
 const {FileEngine} = require('@wireapp/store-engine');
 const {WebSocketClient} = require('@wireapp/api-client/dist/commonjs/tcp/');
@@ -46,7 +46,7 @@ const config = {
   store: new FileEngine(storagePath),
 };
 
-const apiClient = new Client(config);
+const apiClient = new APIClient(config);
 
 Promise.resolve()
   .then(() => {
