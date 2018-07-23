@@ -77,6 +77,7 @@ function handleSSOLogin(code) {
       console.error('event', event.source, event.data);
     };
     const checkWindowTitle = win => {
+      console.error('window href', win.location.href);
       const title = win.document.title;
       if (title && title.startsWith('wire:sso:success')) {
         window.clearInterval(timerId);
