@@ -647,8 +647,8 @@ z.event.EventRepository = class EventRepository {
    * @returns {Promise} Resolves with the saved event
    */
   _handleEventSaving(event, source) {
-    const {conversation: conversationId, data: eventData = {}} = event;
-    const eventId = eventData.replacing_message_id || event.id;
+    const {conversation: conversationId, data: mappedData} = event;
+    const eventId = (mappedData && mappedData.replacing_message_id) || event.id;
 
     const loadPromise = eventId
       ? this.conversationService.load_event_from_db(conversationId, eventId)
@@ -659,7 +659,7 @@ z.event.EventRepository = class EventRepository {
         return this.conversationService.save_event(event);
       }
 
-      const {data: mappedData, from: mappedFrom, type: mappedType} = event;
+      const {from: mappedFrom, type: mappedType} = event;
       const {data: storedData, from: storedFrom, type: storedType} = storedEvent;
 
       const logMessage = `Ignored '${mappedType}' (${eventId}) in '${conversationId}' from '${mappedFrom}':'`;
@@ -713,14 +713,15 @@ z.event.EventRepository = class EventRepository {
     const isLinkPreviewUpdate = !!(newData && newData.previews && newData.previews.length);
 
     switch (true) {
-      case isMessageEdit:
+      case isMessageEdit: {
         updates = Object.assign({}, newEvent, primaryKeyUpdate, {
           edited_time: newEvent.time,
           time: originalEvent.time,
         });
         break;
+      }
 
-      case isLinkPreviewUpdate:
+      case isLinkPreviewUpdate: {
         // case of a link preview
         updates = Object.assign({}, newEvent, primaryKeyUpdate, {
           category: z.message.MessageCategorization.categoryFromEvent(newEvent),
@@ -728,8 +729,13 @@ z.event.EventRepository = class EventRepository {
           time: originalEvent.time,
         });
         break;
-      default:
-      // throw error?
+      }
+
+      default: {
+        this.logger.error(`Unhandled ID duplication '${originalEvent.id}' by event '${newEvent.type}'`, newEvent);
+        const errorMessage = 'Event validation failed: Unhandled event duplicate';
+        throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, errorMessage);
+      }
     }
     return updates ? this.conversationService.update_event(updates) : originalEvent;
   }
