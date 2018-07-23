@@ -647,7 +647,8 @@ z.event.EventRepository = class EventRepository {
    * @returns {Promise} Resolves with the saved event
    */
   _handleEventSaving(event, source) {
-    const {conversation: conversationId, id: eventId} = event;
+    const {conversation: conversationId, data: mappedData} = event;
+    const eventId = (mappedData && mappedData.replacing_message_id) || event.id;
 
     const loadPromise = eventId
       ? this.conversationService.load_event_from_db(conversationId, eventId)
@@ -658,7 +659,7 @@ z.event.EventRepository = class EventRepository {
         return this.conversationService.save_event(event);
       }
 
-      const {data: mappedData, from: mappedFrom, type: mappedType} = event;
+      const {from: mappedFrom, type: mappedType} = event;
       const {data: storedData, from: storedFrom, type: storedType} = storedEvent;
 
       const logMessage = `Ignored '${mappedType}' (${eventId}) in '${conversationId}' from '${mappedFrom}':'`;
@@ -672,7 +673,8 @@ z.event.EventRepository = class EventRepository {
 
       const mappedIsMessageAdd = mappedType === z.event.Client.CONVERSATION.MESSAGE_ADD;
       const storedIsMessageAdd = storedType === z.event.Client.CONVERSATION.MESSAGE_ADD;
-      const userReusedId = !mappedIsMessageAdd || !storedIsMessageAdd || !mappedData.previews.length;
+      const isLegitMessageReplacement = mappedData.previews.length || mappedData.replacing_message_id;
+      const userReusedId = !mappedIsMessageAdd || !storedIsMessageAdd || !isLegitMessageReplacement;
       if (userReusedId) {
         this.logger.warn(`${logMessage} ID previously used by same user`, event);
         const errorMessage = 'Event validation failed: ID reused by same user';
@@ -686,20 +688,56 @@ z.event.EventRepository = class EventRepository {
         throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, errorMessage);
       }
 
-      const textContentMatches = mappedData.content === storedData.content;
+      const textContentMatches = !mappedData.previews.length || mappedData.content === storedData.content;
       if (!textContentMatches) {
         this.logger.warn(`${logMessage} Text content for link preview not matching`, event);
         const errorMessage = 'Event validation failed: ID of link preview reused';
         throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, errorMessage);
       }
 
-      // Only valid case for a duplicate message ID: First update to a text message matching the previous text content with a link preview
-      event.server_time = event.time;
-      event.time = storedEvent.time;
-      event.primary_key = storedEvent.primary_key;
-      event.category = z.message.MessageCategorization.categoryFromEvent(event);
-      return this.conversationService.update_event(event);
+      return this._handleDuplicateEvents(storedEvent, event);
     });
+  }
+
+  _handleDuplicateEvents(originalEvent, newEvent) {
+    const newData = newEvent.data;
+    const primaryKeyUpdate = {primary_key: originalEvent.primary_key};
+    let updates;
+
+    /*
+     * The only two valid cases for a duplicate event are:
+     *  - a link preview has been received (the text message already being in DB) ;
+     *  - a message has been updated
+     */
+    const isMessageEdit = !!(newData && newData.replacing_message_id);
+    const isLinkPreviewUpdate = !!(newData && newData.previews && newData.previews.length);
+
+    switch (true) {
+      case isMessageEdit: {
+        updates = Object.assign({}, newEvent, primaryKeyUpdate, {
+          edited_time: newEvent.time,
+          time: originalEvent.time,
+        });
+        break;
+      }
+
+      case isLinkPreviewUpdate: {
+        // case of a link preview
+        updates = Object.assign({}, newEvent, primaryKeyUpdate, {
+          category: z.message.MessageCategorization.categoryFromEvent(newEvent),
+          server_time: newEvent.time,
+          time: originalEvent.time,
+        });
+        break;
+      }
+
+      default: {
+        this.logger.error(`Unhandled ID duplication '${originalEvent.id}' by event '${newEvent.type}'`, newEvent);
+        const errorMessage = 'Event validation failed: Unhandled event duplicate';
+        throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, errorMessage);
+      }
+    }
+    return updates ? this.conversationService.update_event(updates) : originalEvent;
   }
 
   /**
