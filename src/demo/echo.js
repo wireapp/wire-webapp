@@ -18,7 +18,7 @@ const logger = logdown('@wireapp/core/demo/echo.js', {
 logger.state.isEnabled = true;
 
 const {Account} = require('@wireapp/core');
-const APIClient = require('@wireapp/api-client');
+const {APIClient} = require('@wireapp/api-client');
 const {ClientType} = require('@wireapp/api-client/dist/commonjs/client/ClientType');
 const fs = require('fs');
 const {promisify} = require('util');

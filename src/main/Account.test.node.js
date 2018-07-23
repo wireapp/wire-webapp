@@ -27,7 +27,7 @@ const {NotificationAPI} = require('@wireapp/api-client/dist/commonjs/notificatio
 const {BackendErrorLabel, StatusCode} = require('@wireapp/api-client/dist/commonjs/http/');
 const {ValidationUtil} = require('@wireapp/commons');
 const {GenericMessage, Text} = require('@wireapp/protocol-messaging');
-const APIClient = require('@wireapp/api-client');
+const {APIClient} = require('@wireapp/api-client');
 const nock = require('nock');
 
 const BASE_URL = 'mock-backend.wire.com';

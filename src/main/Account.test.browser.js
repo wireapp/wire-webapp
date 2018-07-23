@@ -20,7 +20,7 @@
 const UUID = require('pure-uuid');
 const {Account} = require('@wireapp/core');
 const {IndexedDBEngine} = require('@wireapp/store-engine');
-const Client = require('@wireapp/api-client');
+const {APIClient} = require('@wireapp/api-client');
 
 const UUIDVersion = 4;
 
@@ -39,7 +39,7 @@ describe('Account', () => {
 
     it('creates a client if there is none', async done => {
       const engine = new IndexedDBEngine();
-      const apiClient = new Client({
+      const apiClient = new APIClient({
         schemaCallback: db => {
           db.version(1).stores({
             amplify: '',
@@ -50,7 +50,7 @@ describe('Account', () => {
           });
         },
         store: engine,
-        urls: Client.BACKEND.STAGING,
+        urls: APIClient.BACKEND.STAGING,
       });
 
       const context = {
@@ -82,10 +82,10 @@ describe('Account', () => {
   describe('"loadAndValidateLocalClient"', () => {
     it('synchronizes the client ID', async done => {
       const engine = new IndexedDBEngine();
-      const apiClient = new Client({
+      const apiClient = new APIClient({
         schemaCallback: db => {},
         store: engine,
-        urls: Client.BACKEND.STAGING,
+        urls: APIClient.BACKEND.STAGING,
       });
       const clientId = new UUID(UUIDVersion).toString();
       const account = new Account(apiClient);
@@ -110,10 +110,10 @@ describe('Account', () => {
   describe('"registerClient"', () => {
     it('synchronizes the client ID', async done => {
       const engine = new IndexedDBEngine();
-      const apiClient = new Client({
+      const apiClient = new APIClient({
         schemaCallback: db => {},
         store: engine,
-        urls: Client.BACKEND.STAGING,
+        urls: APIClient.BACKEND.STAGING,
       });
       const clientId = new UUID(UUIDVersion).toString();
       const account = new Account(apiClient);
