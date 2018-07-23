@@ -647,8 +647,8 @@ z.event.EventRepository = class EventRepository {
    * @returns {Promise} Resolves with the saved event
    */
   _handleEventSaving(event, source) {
-    const conversationId = event.conversation;
-    const eventId = (event.data || {}).replacing_message_id || event.id;
+    const {conversation: conversationId, data: eventData = {}} = event;
+    const eventId = eventData.replacing_message_id || event.id;
 
     const loadPromise = eventId
       ? this.conversationService.load_event_from_db(conversationId, eventId)
@@ -673,8 +673,8 @@ z.event.EventRepository = class EventRepository {
 
       const mappedIsMessageAdd = mappedType === z.event.Client.CONVERSATION.MESSAGE_ADD;
       const storedIsMessageAdd = storedType === z.event.Client.CONVERSATION.MESSAGE_ADD;
-      const userReusedId =
-        !mappedIsMessageAdd || !storedIsMessageAdd || !(mappedData.previews.length || mappedData.replacing_message_id);
+      const isLegitMessageReplacement = mappedData.previews.length || mappedData.replacing_message_id;
+      const userReusedId = !mappedIsMessageAdd || !storedIsMessageAdd || !isLegitMessageReplacement;
       if (userReusedId) {
         this.logger.warn(`${logMessage} ID previously used by same user`, event);
         const errorMessage = 'Event validation failed: ID reused by same user';
@@ -703,23 +703,33 @@ z.event.EventRepository = class EventRepository {
     const newData = newEvent.data;
     const primaryKeyUpdate = {primary_key: originalEvent.primary_key};
     let updates;
+
     /*
      * The only two valid cases for a duplicate event are:
      *  - a link preview has been received (the text message already being in DB) ;
      *  - a message has been updated
      */
-    if (newData && newData.replacing_message_id) {
-      updates = Object.assign({}, newEvent, primaryKeyUpdate, {
-        edited_time: newEvent.time,
-        time: originalEvent.time,
-      });
-    } else if (newData && newData.previews && newData.previews.length) {
-      // case of a link preview
-      updates = Object.assign({}, newEvent, primaryKeyUpdate, {
-        category: z.message.MessageCategorization.categoryFromEvent(newEvent),
-        server_time: newEvent.time,
-        time: originalEvent.time,
-      });
+    const isMessageEdit = !!(newData && newData.replacing_message_id);
+    const isLinkPreviewUpdate = !!(newData && newData.previews && newData.previews.length);
+
+    switch (true) {
+      case isMessageEdit:
+        updates = Object.assign({}, newEvent, primaryKeyUpdate, {
+          edited_time: newEvent.time,
+          time: originalEvent.time,
+        });
+        break;
+
+      case isLinkPreviewUpdate:
+        // case of a link preview
+        updates = Object.assign({}, newEvent, primaryKeyUpdate, {
+          category: z.message.MessageCategorization.categoryFromEvent(newEvent),
+          server_time: newEvent.time,
+          time: originalEvent.time,
+        });
+        break;
+      default:
+      // throw error?
     }
     return updates ? this.conversationService.update_event(updates) : originalEvent;
   }
