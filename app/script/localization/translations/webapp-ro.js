@@ -280,6 +280,7 @@ z.string.ro.conversationAssetUploading = 'Se încarcă…';
 z.string.ro.conversationAssetDownloading = 'Se descarcă…';
 z.string.ro.conversationAssetUploadFailed = 'Încărcarea a eșuat';
 z.string.ro.conversationPlaybackError = 'Nu se poate reda';
+z.string.ro.conversationContextMenuCopy = 'Copiază';
 z.string.ro.conversationContextMenuEdit = 'Editează';
 z.string.ro.conversationContextMenuDelete = 'Șterge pentru mine';
 z.string.ro.conversationContextMenuDeleteEveryone = 'Șterge pentru toată lumea';

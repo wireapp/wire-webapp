@@ -260,6 +260,7 @@ z.string.sk.conversationMissedMessages = 'Na chvíľu ste nepoužili toto zariad
 z.string.sk.conversationAssetDownloading = 'Sťahovanie…';
 z.string.sk.conversationAssetUploadFailed = 'Nahrávanie zlyhalo';
 z.string.sk.conversationPlaybackError = 'Prehrávanie sa nepodarilo';
+z.string.sk.conversationContextMenuCopy = 'Kopírovať';
 z.string.sk.conversationContextMenuEdit = 'Upraviť';
 z.string.sk.conversationContextMenuDelete = 'Vymazať pre mňa';
 z.string.sk.conversationContextMenuDeleteEveryone = 'Vymazať pre všetkých';

@@ -295,6 +295,7 @@ z.string.pl.conversationMissedMessages = 'Dość długo nie używałeś tego urz
 z.string.pl.conversationAssetDownloading = 'Pobieranie…';
 z.string.pl.conversationAssetUploadFailed = 'Błąd wysyłania';
 z.string.pl.conversationPlaybackError = 'Nie można odtworzyć';
+z.string.pl.conversationContextMenuCopy = 'Kopiuj';
 z.string.pl.conversationContextMenuEdit = 'Edycja';
 z.string.pl.conversationContextMenuDelete = 'Usuń dla mnie';
 z.string.pl.conversationContextMenuDeleteEveryone = 'Usuń dla wszystkich';
