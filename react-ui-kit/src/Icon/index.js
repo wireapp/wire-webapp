@@ -26,6 +26,7 @@ export * from './CamIcon';
 export * from './CheckIcon';
 export * from './CloseIcon';
 export * from './DeviceIcon';
+export * from './EditIcon';
 export * from './FileIcon';
 export * from './GifIcon';
 export * from './HangupIcon';
