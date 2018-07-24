@@ -252,8 +252,8 @@ class Account extends EventEmitter {
 
     const sessionId = CryptographyService.constructSessionId(from, sender);
     const decryptedMessage = await this.service.cryptography.decrypt(sessionId, cipherText);
-    if (decryptedMessage) {
-      const genericMessage = GenericMessage.decode(decryptedMessage);
+    if (decryptedMessage.isSuccess) {
+      const genericMessage = GenericMessage.decode(decryptedMessage.value);
 
       if (genericMessage.content === GenericMessageType.EPHEMERAL) {
         const unwrappedMessage = this.mapGenericMessage(genericMessage.ephemeral, otrMessage);

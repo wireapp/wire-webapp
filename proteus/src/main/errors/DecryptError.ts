@@ -66,7 +66,7 @@ namespace DecryptError {
   }
 
   export class OutdatedMessage extends DecryptError {
-    constructor(message = 'Outdated message', code: number) {
+    constructor(message = 'Outdated message', code: number = DecryptError.CODE.CASE_208) {
       super(message, code);
       Object.setPrototypeOf(this, OutdatedMessage.prototype);
     }

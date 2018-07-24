@@ -24,7 +24,7 @@ import {RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/index';
 import {OTRRecipients} from '@wireapp/api-client/dist/commonjs/conversation/index';
 import {UserPreKeyBundleMap} from '@wireapp/api-client/dist/commonjs/user/index';
 import {Cryptobox} from '@wireapp/cryptobox';
-import * as ProteusKeys from '@wireapp/proteus/dist/keys/root';
+import {errors as ProteusErrors, keys as ProteusKeys} from '@wireapp/proteus';
 import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine/index';
 import {Decoder, Encoder} from 'bazinga64';
 import {SessionPayloadBundle} from '../cryptography/root';
@@ -36,6 +36,16 @@ export interface MetaClient extends RegisteredClient {
     primary_key: string;
   };
 }
+
+export type DecryptionResult =
+  | {
+      isSuccess: true;
+      value: Uint8Array;
+    }
+  | {
+      isSuccess: false;
+      error: Error;
+    };
 
 class CryptographyService {
   private readonly logger: any = logdown('@wireapp/core/cryptography/CryptographyService', {
@@ -70,10 +80,29 @@ class CryptographyService {
       .filter(serializedPreKey => serializedPreKey.key);
   }
 
-  public decrypt(sessionId: string, encodedCiphertext: string): Promise<Uint8Array | undefined> {
+  public async decrypt(sessionId: string, encodedCiphertext: string): Promise<DecryptionResult> {
     this.logger.log('decrypt');
     const messageBytes: Uint8Array = Decoder.fromBase64(encodedCiphertext).asBytes;
-    return this.cryptobox.decrypt(sessionId, messageBytes.buffer);
+
+    try {
+      const result = await this.cryptobox.decrypt(sessionId, messageBytes.buffer);
+      return {
+        isSuccess: true,
+        value: result,
+      };
+    } catch (error) {
+      const isOutdatedMessage = error instanceof ProteusErrors.DecryptError.OutdatedMessage;
+      const isDuplicateMessage = error instanceof ProteusErrors.DecryptError.DuplicateMessage;
+
+      if (isOutdatedMessage || isDuplicateMessage) {
+        return {
+          error,
+          isSuccess: false,
+        };
+      }
+
+      throw error;
+    }
   }
 
   private static dismantleSessionId(sessionId: string): Array<string> {
