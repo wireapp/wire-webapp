@@ -24,6 +24,7 @@ import {
   ClientActionContent,
   ConfirmationContent,
   DeletedContent,
+  EditedTextContent,
   HiddenContent,
   ImageAssetContent,
   ImageContent,
@@ -55,6 +56,7 @@ interface PayloadBundle {
     | ClientActionType
     | ConfirmationContent
     | DeletedContent
+    | EditedTextContent
     | HiddenContent
     | ImageAssetContent
     | ImageContent
