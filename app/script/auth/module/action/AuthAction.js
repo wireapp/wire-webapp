@@ -72,20 +72,25 @@ function doLoginPlain(loginData, onBeforeLogin, onAfterLogin) {
 
 function handleSSOLogin(code) {
   return new Promise((resolve, reject) => {
-    let timerId = undefined;
-    const checkWindowTitle = win => {
-      const title = win.document.title;
-      if (title && title.startsWith('wire:sso:success')) {
-        window.clearInterval(timerId);
-        win.close();
-        resolve();
+    const onReceiveChildWindowMessage = event => {
+      if (event.origin === BACKEND.rest) {
+        const eventType = event.data && event.data.type;
+        switch (eventType) {
+          case 'AUTH_SUCCESS': {
+            return resolve();
+          }
+          case 'AUTH_ERROR': {
+            return reject(new Error(`Authentication error: "${event.data.payload}"`));
+          }
+          default: {
+            return reject(new Error(`Unmatched event type: "${event}"`));
+          }
+        }
       }
-      if (title && title.startsWith('wire:sso:error')) {
-        window.clearInterval(timerId);
-        win.close();
-        reject(new Error('Failed authentication'));
-      }
+      return reject(new Error(`Received event "${event}" doesn't match origin "${BACKEND.rest}"`));
     };
+    window.addEventListener('message', onReceiveChildWindowMessage, {once: true});
+
     const ssoWindow = window.open(
       `${BACKEND.rest}/sso/initiate-login/${code}`,
       '_blank',
@@ -99,7 +104,18 @@ function handleSSOLogin(code) {
         height=500,
       `
     );
-    timerId = setInterval(() => checkWindowTitle(ssoWindow), 1000);
+    const onChildWindowClose = () => {
+      window.removeEventListener('message', onReceiveChildWindowMessage);
+      window.removeEventListener('unload', onParentWindowClose);
+      reject(new Error('Aborted by user'));
+    };
+    ssoWindow.addEventListener('unload', onChildWindowClose);
+
+    const onParentWindowClose = () => {
+      ssoWindow.close();
+      reject(new Error('Aborted by user'));
+    };
+    window.addEventListener('unload', onParentWindowClose);
   });
 }
 
