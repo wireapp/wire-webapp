@@ -531,13 +531,13 @@
   version "3.0.62"
   resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-3.0.62.tgz#73144aef3db75a666e6cda5448026532ecb94b61"
 
-"@wireapp/core@3.14.4":
-  version "3.14.4"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-3.14.4.tgz#36bb58776afcc27fad045d31ee06a6269cc19c11"
+"@wireapp/core@3.14.5":
+  version "3.14.5"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-3.14.5.tgz#1f72ca94860ac8adc365841b07c746af09503633"
   dependencies:
     "@types/node" "10.5.2"
     "@wireapp/api-client" "1.9.14"
-    "@wireapp/cryptobox" "8.6.5"
+    "@wireapp/cryptobox" "8.6.6"
     "@wireapp/protocol-messaging" "1.20.1"
     "@wireapp/store-engine" "0.11.48"
     bazinga64 "5.2.14"
@@ -545,13 +545,13 @@
     protobufjs "6.8.8"
     pure-uuid "1.5.3"
 
-"@wireapp/cryptobox@8.6.5":
-  version "8.6.5"
-  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-8.6.5.tgz#11cb69b0dcc228497335f60d377d9dd148d036aa"
+"@wireapp/cryptobox@8.6.6":
+  version "8.6.6"
+  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-8.6.6.tgz#1e401859e49d03d65d18f12730ff7c7b4c7149d7"
   dependencies:
     "@types/fs-extra" "5.0.4"
     "@types/node" "10.5.2"
-    "@wireapp/lru-cache" "2.1.38"
+    "@wireapp/lru-cache" "2.1.39"
     "@wireapp/priority-queue" "0.1.60"
     "@wireapp/proteus" "7.3.4"
     "@wireapp/store-engine" "0.11.48"
@@ -560,9 +560,9 @@
     fs-extra "7.0.0"
     logdown "3.2.3"
 
-"@wireapp/lru-cache@2.1.38":
-  version "2.1.38"
-  resolved "https://registry.yarnpkg.com/@wireapp/lru-cache/-/lru-cache-2.1.38.tgz#16892a5aca598af0ddf60b15c4f593f7d85c73c4"
+"@wireapp/lru-cache@2.1.39":
+  version "2.1.39"
+  resolved "https://registry.yarnpkg.com/@wireapp/lru-cache/-/lru-cache-2.1.39.tgz#f1a1a30ba94ac461dbeb0f65125a2da28c042a44"
 
 "@wireapp/priority-queue@0.1.60":
   version "0.1.60"
