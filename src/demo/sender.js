@@ -84,7 +84,16 @@ const {FileEngine} = require('@wireapp/store-engine');
     await account.service.conversation.send(CONVERSATION_ID, payload);
   }
 
-  const methods = [sendAndDeleteMessage, sendEphemeralText, sendPing, sendText];
+  async function sendAndEdit() {
+    const payload = account.service.conversation.createText('Hello, Wolrd!');
+    const {id: originalMessageId} = await account.service.conversation.send(CONVERSATION_ID, payload);
+    setInterval(async () => {
+      const editedPayload = account.service.conversation.createEditedText('Hello, World!', originalMessageId);
+      await account.service.conversation.send(CONVERSATION_ID, editedPayload);
+    }, 2000);
+  }
+
+  const methods = [sendAndDeleteMessage, sendEphemeralText, sendPing, sendText, sendAndEdit];
 
   const timeoutInMillis = 2000;
   setInterval(() => {

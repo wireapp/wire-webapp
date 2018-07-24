@@ -17,8 +17,9 @@
  *
  */
 
-interface TextContent {
+interface EditedTextContent {
+  originalMessageId: string;
   text: string;
 }
 
-export {TextContent};
+export {EditedTextContent};
