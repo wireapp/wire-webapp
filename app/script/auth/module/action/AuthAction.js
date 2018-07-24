@@ -109,12 +109,6 @@ function handleSSOLogin(code) {
         height=500,
       `
     );
-    const onChildWindowClose = () => {
-      window.removeEventListener('message', onReceiveChildWindowMessage);
-      window.removeEventListener('unload', onParentWindowClose);
-      reject(new Error('Aborted by user'));
-    };
-    ssoWindow.addEventListener('unload', onChildWindowClose);
 
     const onParentWindowClose = () => {
       ssoWindow.close();
