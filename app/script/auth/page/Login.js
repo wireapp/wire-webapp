@@ -353,11 +353,13 @@ class Login extends React.PureComponent {
                   </Form>
                 </div>
                 <Columns style={{marginTop: '36px'}}>
-                  <Column>
-                    <Link to={ROUTE.SSO} component={RRLink} data-uie-name="go-sign-in-sso">
-                      {_(loginStrings.ssoLogin)}
-                    </Link>
-                  </Column>
+                  {Environment.isInternalEnvironment() && (
+                    <Column>
+                      <Link to={ROUTE.SSO} component={RRLink} data-uie-name="go-sign-in-sso">
+                        {_(loginStrings.ssoLogin)}
+                      </Link>
+                    </Column>
+                  )}
                   <Column>
                     <Link href={EXTERNAL_ROUTE.PHONE_LOGIN + window.location.search} data-uie-name="go-sign-in-phone">
                       {_(loginStrings.phoneLogin)}

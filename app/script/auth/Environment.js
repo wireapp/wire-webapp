@@ -29,7 +29,7 @@ export const APP_ENVIRONMENT = getEnvironmentFromQuery();
 checkEnvironment();
 export function getEnvironmentFromQuery() {
   const isProductionHost = window.location.hostname.endsWith('wire.com');
-  const isLocalHost = window.location.hostname.includes('localhost') || window.location.hostname.startsWith('192.168.');
+  const isLocalHost = isLocalhost();
   switch (getURLParameter(QUERY_KEY.ENVIRONMENT)) {
     case 'staging':
       return STAGING;
@@ -38,6 +38,14 @@ export function getEnvironmentFromQuery() {
     default:
       return isProductionHost ? PRODUCTION : isLocalHost ? LOCAL : STAGING;
   }
+}
+
+export function isLocalhost() {
+  return window.location.hostname.includes('localhost') || window.location.hostname.startsWith('192.168.');
+}
+
+export function isInternalEnvironment() {
+  return window.location.hostname.includes('wire-webapp') || isLocalhost();
 }
 
 export function checkEnvironment() {
