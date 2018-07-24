@@ -660,7 +660,7 @@ z.event.EventRepository = class EventRepository {
       }
 
       const {from: mappedFrom, type: mappedType} = event;
-      const {data: storedData, from: storedFrom, type: storedType} = storedEvent;
+      const {from: storedFrom, type: storedType} = storedEvent;
 
       const logMessage = `Ignored '${mappedType}' (${eventId}) in '${conversationId}' from '${mappedFrom}':'`;
 
@@ -678,20 +678,6 @@ z.event.EventRepository = class EventRepository {
       if (userReusedId) {
         this.logger.warn(`${logMessage} ID previously used by same user`, event);
         const errorMessage = 'Event validation failed: ID reused by same user';
-        throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, errorMessage);
-      }
-
-      const updatingLinkPreview = !!storedData.previews.length;
-      if (updatingLinkPreview) {
-        this.logger.warn(`${logMessage} ID of link preview reused`, event);
-        const errorMessage = 'Event validation failed: ID of link preview reused';
-        throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, errorMessage);
-      }
-
-      const textContentMatches = !mappedData.previews.length || mappedData.content === storedData.content;
-      if (!textContentMatches) {
-        this.logger.warn(`${logMessage} Text content for link preview not matching`, event);
-        const errorMessage = 'Event validation failed: ID of link preview reused';
         throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, errorMessage);
       }
 
@@ -714,20 +700,13 @@ z.event.EventRepository = class EventRepository {
 
     switch (true) {
       case isMessageEdit: {
-        updates = Object.assign({}, newEvent, primaryKeyUpdate, {
-          edited_time: newEvent.time,
-          time: originalEvent.time,
-        });
+        updates = this._getUpdatesForMessageEdit(originalEvent, newEvent);
         break;
       }
 
       case isLinkPreviewUpdate: {
         // case of a link preview
-        updates = Object.assign({}, newEvent, primaryKeyUpdate, {
-          category: z.message.MessageCategorization.categoryFromEvent(newEvent),
-          server_time: newEvent.time,
-          time: originalEvent.time,
-        });
+        updates = this._getUpdatesForLinkPreview(originalEvent, newEvent);
         break;
       }
 
@@ -737,7 +716,39 @@ z.event.EventRepository = class EventRepository {
         throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, errorMessage);
       }
     }
-    return updates ? this.conversationService.update_event(updates) : originalEvent;
+    const identifiedUpdates = Object.assign({}, primaryKeyUpdate, updates);
+    return this.conversationService.update_event(identifiedUpdates);
+  }
+
+  _getUpdatesForMessageEdit(originalEvent, newEvent) {
+    return Object.assign({}, newEvent, {
+      edited_time: newEvent.time,
+      time: originalEvent.time,
+    });
+  }
+
+  _getUpdatesForLinkPreview(originalEvent, newEvent) {
+    const newData = newEvent.data;
+    const originalData = originalEvent.data;
+    const updatingLinkPreview = !!originalData.previews.length;
+    if (updatingLinkPreview) {
+      this.logger.warn(`ID of link preview reused`, newEvent);
+      const errorMessage = 'Event validation failed: ID of link preview reused';
+      throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, errorMessage);
+    }
+
+    const textContentMatches = !newData.previews.length || newData.content === originalData.content;
+    if (!textContentMatches) {
+      this.logger.warn(`Text content for link preview not matching`, newEvent);
+      const errorMessage = 'Event validation failed: ID of link preview reused';
+      throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, errorMessage);
+    }
+
+    return Object.assign({}, newEvent, {
+      category: z.message.MessageCategorization.categoryFromEvent(newEvent),
+      server_time: newEvent.time,
+      time: originalEvent.time,
+    });
   }
 
   /**
