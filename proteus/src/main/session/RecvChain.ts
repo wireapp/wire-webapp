@@ -56,7 +56,7 @@ class RecvChain {
       const message = `Message too old. Counter for oldest staged chain key is '${
         this.message_keys[0].counter
       }' while message counter is '${msg.counter}'.`;
-      throw new (<any>DecryptError).OutdatedMessage(message, DecryptError.CODE.CASE_208);
+      throw new DecryptError.OutdatedMessage(message, DecryptError.CODE.CASE_208);
     }
 
     const idx = this.message_keys.findIndex(mk => {
@@ -64,14 +64,14 @@ class RecvChain {
     });
 
     if (idx === -1) {
-      throw new (<any>DecryptError).DuplicateMessage(undefined, DecryptError.CODE.CASE_209);
+      throw new DecryptError.DuplicateMessage(undefined, DecryptError.CODE.CASE_209);
     }
     const mk = this.message_keys.splice(idx, 1)[0];
     if (!envelope.verify(mk.mac_key)) {
       const message = `Envelope verification failed for message with counter behind. Message index is '${
         msg.counter
       }' while receive chain index is '${this.chain_key.idx}'.`;
-      throw new (<any>DecryptError).InvalidSignature(message, DecryptError.CODE.CASE_210);
+      throw new DecryptError.InvalidSignature(message, DecryptError.CODE.CASE_210);
     }
 
     return mk.decrypt(msg.cipher_text);
@@ -81,12 +81,12 @@ class RecvChain {
     const num = msg.counter - this.chain_key.idx;
     if (num > RecvChain.MAX_COUNTER_GAP) {
       if (this.chain_key.idx === 0) {
-        throw new (<any>DecryptError).TooDistantFuture(
+        throw new DecryptError.TooDistantFuture(
           'Skipped too many message at the beginning of a receive chain.',
           DecryptError.CODE.CASE_211
         );
       }
-      throw new (<any>DecryptError).TooDistantFuture(
+      throw new DecryptError.TooDistantFuture(
         `Skipped too many message within a used receive chain. Receive chain counter is '${this.chain_key.idx}'`,
         DecryptError.CODE.CASE_212
       );

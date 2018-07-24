@@ -63,7 +63,7 @@ class KeyPair {
     if (sk_curve25519) {
       return SecretKey.new(sk_ed25519, sk_curve25519);
     }
-    throw new (<any>InputError).ConversionError('Could not convert private key with ed2curve.', 409);
+    throw new InputError.ConversionError('Could not convert private key with ed2curve.', 409);
   }
 
   /**
@@ -76,7 +76,7 @@ class KeyPair {
     if (pk_curve25519) {
       return PublicKey.new(pk_ed25519, pk_curve25519);
     }
-    throw new (<any>InputError).ConversionError('Could not convert public key with ed2curve.', 408);
+    throw new InputError.ConversionError('Could not convert public key with ed2curve.', 408);
   }
 
   encode(encoder: CBOR.Encoder): CBOR.Encoder {

@@ -46,7 +46,7 @@ class Message {
       case 2:
         return PreKeyMessage.decode(decoder);
       default:
-        throw new (<any>DecodeError).InvalidType('Unrecognised message type', DecodeError.CODE.CASE_302);
+        throw new DecodeError.InvalidType('Unrecognised message type', DecodeError.CODE.CASE_302);
     }
   }
 }

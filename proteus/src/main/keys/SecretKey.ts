@@ -92,7 +92,7 @@ class SecretKey {
       self.sec_curve = sec_curve;
       return self;
     }
-    throw new (<any>InputError).ConversionError('Could not convert public key with ed2curve.', 408);
+    throw new InputError.ConversionError('Could not convert public key with ed2curve.', 408);
   }
 }
 

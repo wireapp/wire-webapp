@@ -190,7 +190,7 @@ class SessionState {
       const mks = rc.chain_key.message_keys();
 
       if (!envelope.verify(mks.mac_key)) {
-        throw new (<any>DecryptError).InvalidSignature(
+        throw new DecryptError.InvalidSignature(
           `Envelope verification failed for message with counters in sync at '${
             msg.counter
           }'. The received message was possibly encrypted for another client.`,
@@ -205,7 +205,7 @@ class SessionState {
       const [chk, mk, mks] = rc.stage_message_keys(msg);
 
       if (!envelope.verify((<MessageKeys>mk).mac_key)) {
-        throw new (<any>DecryptError).InvalidSignature(
+        throw new DecryptError.InvalidSignature(
           `Envelope verification failed for message with counter ahead. Message index is '${
             msg.counter
           }' while receive chain index is '${rc.chain_key.idx}'.`,

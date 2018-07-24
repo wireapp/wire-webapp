@@ -52,7 +52,7 @@ class SessionTag {
 
     const bytes = new Uint8Array(decoder.bytes());
     if (bytes.byteLength !== length) {
-      throw (<any>DecodeError).InvalidArrayLen(
+      throw new DecodeError.InvalidArrayLen(
         `Session tag should be 16 bytes, not ${bytes.byteLength} bytes.`,
         DecodeError.CODE.CASE_303
       );

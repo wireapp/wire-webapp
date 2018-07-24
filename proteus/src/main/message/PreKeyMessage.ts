@@ -96,10 +96,7 @@ class PreKeyMessage extends Message {
     if (!isNaN(prekey_id) && base_key && identity_key && message) {
       return PreKeyMessage.new(prekey_id, base_key, identity_key, message);
     } else {
-      throw new (<any>InputError).TypeError(
-        `Given PreKeyMessage doesn't match expected signature.`,
-        InputError.CODE.CASE_406
-      );
+      throw new InputError.TypeError(`Given PreKeyMessage doesn't match expected signature.`, InputError.CODE.CASE_406);
     }
   }
 }

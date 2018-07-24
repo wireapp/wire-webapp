@@ -54,17 +54,14 @@ class PreKey {
 
   static validate_pre_key_id(pre_key_id: number): void {
     if (pre_key_id === undefined) {
-      throw new (<any>InputError).TypeError('PreKey ID is undefined.', InputError.CODE.CASE_404);
+      throw new InputError.TypeError('PreKey ID is undefined.', InputError.CODE.CASE_404);
     } else if (typeof pre_key_id === 'string') {
-      throw new (<any>InputError).TypeError(`PreKey ID "${pre_key_id}" is a string.`, InputError.CODE.CASE_403);
+      throw new InputError.TypeError(`PreKey ID "${pre_key_id}" is a string.`, InputError.CODE.CASE_403);
     } else if (pre_key_id % 1 !== 0) {
-      throw new (<any>InputError).TypeError(
-        `PreKey ID "${pre_key_id}" is a floating-point number.`,
-        InputError.CODE.CASE_403
-      );
+      throw new InputError.TypeError(`PreKey ID "${pre_key_id}" is a floating-point number.`, InputError.CODE.CASE_403);
     } else if (pre_key_id < 0 || pre_key_id > PreKey.MAX_PREKEY_ID) {
       const message = `PreKey ID (${pre_key_id}) must be between or equal to 0 and ${PreKey.MAX_PREKEY_ID}.`;
-      throw new (<any>InputError).RangeError(message, InputError.CODE.CASE_400);
+      throw new InputError.RangeError(message, InputError.CODE.CASE_400);
     }
   }
 

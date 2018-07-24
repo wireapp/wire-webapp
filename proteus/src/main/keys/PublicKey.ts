@@ -81,7 +81,7 @@ class PublicKey {
       self.pub_curve = pub_curve;
       return self;
     }
-    throw new (<any>InputError).ConversionError('Could not convert private key with ed2curve.', 409);
+    throw new InputError.ConversionError('Could not convert private key with ed2curve.', 409);
   }
 }
 

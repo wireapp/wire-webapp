@@ -77,10 +77,7 @@ export class RootKey {
     if (cipher_key) {
       return RootKey.from_cipher_key(cipher_key);
     } else {
-      throw new (<any>InputError).TypeError(
-        `Given RootKey doesn't match expected signature.`,
-        InputError.CODE.CASE_407
-      );
+      throw new InputError.TypeError(`Given RootKey doesn't match expected signature.`, InputError.CODE.CASE_407);
     }
   }
 }

@@ -99,14 +99,14 @@ export class Session {
     return new Promise((resolve, reject) => {
       const pkmsg = (() => {
         if (envelope.message instanceof CipherMessage) {
-          throw new (<any>DecryptError).InvalidMessage(
+          throw new DecryptError.InvalidMessage(
             "Can't initialise a session from a CipherMessage.",
             DecryptError.CODE.CASE_201
           );
         } else if (envelope.message instanceof PreKeyMessage) {
           return envelope.message;
         } else {
-          throw new (<any>DecryptError).InvalidMessage(
+          throw new DecryptError.InvalidMessage(
             'Unknown message format: The message is neither a "CipherMessage" nor a "PreKeyMessage".',
             DecryptError.CODE.CASE_202
           );
@@ -133,7 +133,7 @@ export class Session {
               .then(() => resolve([session, plain]))
               .catch(error => {
                 reject(
-                  new (<any>DecryptError).PrekeyNotFound(
+                  new DecryptError.PrekeyNotFound(
                     `Could not delete PreKey: ${error.message}`,
                     DecryptError.CODE.CASE_203
                   )
@@ -243,7 +243,7 @@ export class Session {
 
         if (actual_fingerprint !== expected_fingerprint) {
           const message = `Fingerprints do not match: We expected '${expected_fingerprint}', but received '${actual_fingerprint}'.`;
-          throw new (<any>DecryptError).RemoteIdentityChanged(message, DecryptError.CODE.CASE_204);
+          throw new DecryptError.RemoteIdentityChanged(message, DecryptError.CODE.CASE_204);
         }
         return resolve(this._decrypt_prekey_message(envelope, <PreKeyMessage>msg, prekey_store));
       }
@@ -259,10 +259,7 @@ export class Session {
     return Promise.resolve()
       .then(() => this._decrypt_cipher_message(envelope, msg.message))
       .catch(async error => {
-        if (
-          error instanceof (<any>DecryptError).InvalidSignature ||
-          error instanceof (<any>DecryptError).InvalidMessage
-        ) {
+        if (error instanceof DecryptError.InvalidSignature || error instanceof DecryptError.InvalidMessage) {
           return this._new_state(prekey_store, msg).then(async state => {
             const plaintext = await state.decrypt(envelope, msg.message);
 
@@ -285,7 +282,7 @@ export class Session {
   private async _decrypt_cipher_message(envelope: Envelope, msg: CipherMessage): Promise<Uint8Array> {
     const state = this.session_states[msg.session_tag.toString()];
     if (!state) {
-      throw new (<any>DecryptError).InvalidMessage(
+      throw new DecryptError.InvalidMessage(
         `Local session not found for message session tag '${msg.session_tag}'.`,
         DecryptError.CODE.CASE_205
       );
@@ -364,7 +361,7 @@ export class Session {
         case 2: {
           const identity_key = IdentityKey.decode(decoder);
           if (local_identity.public_key.fingerprint() !== identity_key.fingerprint()) {
-            throw new (<any>DecodeError).LocalIdentityChanged(null, DecodeError.CODE.CASE_300);
+            throw new DecodeError.LocalIdentityChanged(undefined, DecodeError.CODE.CASE_300);
           }
           self.local_identity = local_identity;
           break;
@@ -392,7 +389,7 @@ export class Session {
               }
               break;
             default:
-              throw new (<any>DecodeError).InvalidType(null, DecodeError.CODE.CASE_301);
+              throw new DecodeError.InvalidType(undefined, DecodeError.CODE.CASE_301);
           }
           break;
         }

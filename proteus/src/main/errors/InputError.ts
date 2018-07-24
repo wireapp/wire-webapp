@@ -39,31 +39,27 @@ class InputError extends ProteusError {
   }
 }
 
-class RangeError extends InputError {
-  constructor(message = 'Invalid array length', code: number) {
-    super(message, code);
-    Object.setPrototypeOf(this, RangeError.prototype);
+namespace InputError {
+  export class RangeError extends InputError {
+    constructor(message = 'Invalid array length', code: number) {
+      super(message, code);
+      Object.setPrototypeOf(this, RangeError.prototype);
+    }
+  }
+
+  export class TypeError extends InputError {
+    constructor(message = 'Invalid type', code: number) {
+      super(message, code);
+      Object.setPrototypeOf(this, TypeError.prototype);
+    }
+  }
+
+  export class ConversionError extends InputError {
+    constructor(message = 'Conversion error', code: number) {
+      super(message, code);
+      Object.setPrototypeOf(this, ConversionError.prototype);
+    }
   }
 }
-
-class TypeError extends InputError {
-  constructor(message = 'Invalid type', code: number) {
-    super(message, code);
-    Object.setPrototypeOf(this, TypeError.prototype);
-  }
-}
-
-class ConversionError extends InputError {
-  constructor(message = 'Conversion error', code: number) {
-    super(message, code);
-    Object.setPrototypeOf(this, TypeError.prototype);
-  }
-}
-
-Object.assign(InputError, {
-  ConversionError,
-  RangeError,
-  TypeError,
-});
 
 export default InputError;
