@@ -118,7 +118,7 @@ function handleSSOLogin(code) {
         clearInterval(timerId);
         reject(new Error('Aborted by user'));
       }
-    });
+    }, 1000);
 
     const onParentWindowClose = () => {
       ssoWindow.close();
