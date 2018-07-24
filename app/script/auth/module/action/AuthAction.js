@@ -72,26 +72,31 @@ function doLoginPlain(loginData, onBeforeLogin, onAfterLogin) {
 
 function handleSSOLogin(code) {
   return new Promise((resolve, reject) => {
+    let ssoWindow = undefined;
     const onReceiveChildWindowMessage = event => {
       if (event.origin === BACKEND.rest) {
         const eventType = event.data && event.data.type;
         switch (eventType) {
           case 'AUTH_SUCCESS': {
+            ssoWindow.close();
             return resolve();
           }
           case 'AUTH_ERROR': {
+            ssoWindow.close();
             return reject(new Error(`Authentication error: "${event.data.payload}"`));
           }
           default: {
+            ssoWindow.close();
             return reject(new Error(`Unmatched event type: "${event}"`));
           }
         }
       }
+      ssoWindow.close();
       return reject(new Error(`Received event "${event}" doesn't match origin "${BACKEND.rest}"`));
     };
     window.addEventListener('message', onReceiveChildWindowMessage, {once: true});
 
-    const ssoWindow = window.open(
+    ssoWindow = window.open(
       `${BACKEND.rest}/sso/initiate-login/${code}`,
       '_blank',
       `
