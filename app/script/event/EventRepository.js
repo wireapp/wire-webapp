@@ -724,6 +724,7 @@ z.event.EventRepository = class EventRepository {
     return Object.assign({}, newEvent, {
       edited_time: newEvent.time,
       time: originalEvent.time,
+      version: 1,
     });
   }
 
@@ -748,6 +749,7 @@ z.event.EventRepository = class EventRepository {
       category: z.message.MessageCategorization.categoryFromEvent(newEvent),
       server_time: newEvent.time,
       time: originalEvent.time,
+      version: originalEvent.version,
     });
   }
 
