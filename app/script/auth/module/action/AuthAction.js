@@ -73,6 +73,7 @@ function doLoginPlain(loginData, onBeforeLogin, onAfterLogin) {
 function handleSSOLogin(code) {
   return new Promise((resolve, reject) => {
     let ssoWindow = undefined;
+    let timerId = undefined;
     const onReceiveChildWindowMessage = event => {
       if (event.origin === BACKEND.rest) {
         const eventType = event.data && event.data.type;
@@ -109,6 +110,15 @@ function handleSSOLogin(code) {
         height=500,
       `
     );
+
+    timerId = window.setInterval(() => {
+      if (!ssoWindow) {
+        window.removeEventListener('message', onReceiveChildWindowMessage);
+        window.removeEventListener('unload', onParentWindowClose);
+        clearInterval(timerId);
+        reject(new Error('Aborted by user'));
+      }
+    });
 
     const onParentWindowClose = () => {
       ssoWindow.close();
