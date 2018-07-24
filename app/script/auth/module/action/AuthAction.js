@@ -84,16 +84,16 @@ function handleSSOLogin(code) {
           }
           case 'AUTH_ERROR': {
             ssoWindow.close();
-            return reject(new Error(`Authentication error: "${event.data.payload}"`));
+            return reject(new Error(`Authentication error: "${JSON.stringify(event.data.payload)}"`));
           }
           default: {
             ssoWindow.close();
-            return reject(new Error(`Unmatched event type: "${event}"`));
+            return reject(new Error(`Unmatched event type: "${JSON.stringify(event)}"`));
           }
         }
       }
       ssoWindow.close();
-      return reject(new Error(`Received event "${event}" doesn't match origin "${BACKEND.rest}"`));
+      return reject(new Error(`Received event "${JSON.stringify(event)}" doesn't match origin "${BACKEND.rest}"`));
     };
     window.addEventListener('message', onReceiveChildWindowMessage, {once: true});
 
