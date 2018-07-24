@@ -147,7 +147,7 @@ class HeaderMenu extends React.PureComponent {
     return (
       <MenuWrapper>
         <MenuContent open={isOpen}>
-          <MenuLogo>{logoElement}</MenuLogo>
+          <MenuLogo onClick={this.closeMenu}>{logoElement}</MenuLogo>
           <MenuItems onClick={this.closeMenu} open={isOpen}>
             {children}
           </MenuItems>
