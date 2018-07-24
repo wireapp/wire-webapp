@@ -9,14 +9,13 @@
   </head>
   <body>
     <script>
-      window.LRUCache = LRUCache.default;
-      const cache = new LRUCache(3);
+      const cache = new window.LRUCache.LRUCache(3);
       cache.set('1', 'Apple');
       cache.set('2', 'Orange');
       cache.set('3', 'Tomato');
       cache.delete('2');
       document.write(cache.size()); // "2"
-      document.write(cache.getAll()); // [{"1": "Apple"}, {"2": "Orange"}, {"3": "Tomato"}]
+      document.write(JSON.stringify(cache.getAll())); // [{"1": "Apple"}, {"2": "Orange"}, {"3": "Tomato"}]
     </script>
   </body>
 </html>
