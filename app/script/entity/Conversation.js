@@ -488,11 +488,13 @@ z.entity.Conversation = class Conversation {
   }
 
   _findDuplicate(messageId, from) {
-    return this.messages_unordered().find(messageEntity => {
-      const sameId = messageEntity.id === messageId;
-      const sameSender = messageEntity.from === from;
-      return sameId && sameSender;
-    });
+    if (messageId) {
+      return this.messages_unordered().find(messageEntity => {
+        const sameId = messageEntity.id === messageId;
+        const sameSender = messageEntity.from === from;
+        return sameId && sameSender;
+      });
+    }
   }
 
   update_timestamp_server(time, is_backend_timestamp = false) {
