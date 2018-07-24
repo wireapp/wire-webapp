@@ -17,9 +17,9 @@ module.exports = {
     return bazinga64.Encoder.toBase64(encryptedPreKeyMessage).asString;
   },
   getPlainText: async (cryptographyService, encodedPreKeyMessage, sessionId = `temp-${Date.now()}`) => {
-    const decodedMessageBuffer = await cryptographyService.decrypt(sessionId, encodedPreKeyMessage);
-    if (decodedMessageBuffer) {
-      return Buffer.from(decodedMessageBuffer).toString('utf8');
+    const decryptResult = await cryptographyService.decrypt(sessionId, encodedPreKeyMessage);
+    if (decryptResult.isSuccess) {
+      return Buffer.from(decryptResult.value).toString('utf8');
     }
   },
 };
